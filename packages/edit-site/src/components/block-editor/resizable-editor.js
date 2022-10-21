@@ -141,7 +141,7 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 		>
 			<Iframe
 				isZoomedOut={ isZoomOutMode }
-				style={ enableResizing ? undefined : deviceStyles }
+				style={ enableResizing ? { height } : deviceStyles }
 				head={
 					<>
 						<EditorStyles styles={ settings.styles } />
