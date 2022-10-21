@@ -169,12 +169,15 @@ const UnforwardedFontSizePicker = (
 		__( 'Currently selected font size: %s' ),
 		selectedOption.name
 	);
+
+	const headerAriaLabel = `${ __( 'Size' ) } ${ headerHint || '' }`;
+
 	return (
 		<Container ref={ ref } className="components-font-size-picker">
 			<VisuallyHidden as="legend">{ __( 'Font size' ) }</VisuallyHidden>
 			<Spacer>
 				<HStack className="components-font-size-picker__header">
-					<HeaderLabel>
+					<HeaderLabel aria-label={ headerAriaLabel }>
 						{ __( 'Size' ) }
 						{ headerHint && (
 							<HeaderHint className="components-font-size-picker__header__hint">

@@ -3,8 +3,6 @@
  */
 import {
 	createNewPost,
-	createUser,
-	deleteUser,
 	getOption,
 	insertBlock,
 	loginUser,
@@ -36,11 +34,9 @@ describe( 'Site Title block', () => {
 	const username = 'testuser';
 	beforeAll( async () => {
 		originalSiteTitle = await getOption( 'blogname' );
-		password = await createUser( username, { role: 'editor' } );
 	} );
 
 	afterAll( async () => {
-		await deleteUser( username );
 		await setOption( 'blogname', originalSiteTitle );
 	} );
 

@@ -78,14 +78,44 @@ describe( 'state', () => {
 			const action = {
 				type: 'SET_META_BOXES_PER_LOCATIONS',
 				metaBoxesPerLocation: {
-					normal: [ 'postcustom' ],
+					normal: [ { id: 'postcustom' } ],
 				},
 			};
 
 			const state = metaBoxLocations( undefined, action );
 
 			expect( state ).toEqual( {
-				normal: [ 'postcustom' ],
+				normal: [ { id: 'postcustom' } ],
+			} );
+		} );
+
+		it( 'should merge new meta box locations into the existing ones', () => {
+			const oldState = {
+				normal: [
+					{ id: 'a', title: 'A' },
+					{ id: 'b', title: 'B' },
+				],
+				side: [ { id: 's', title: 'S' } ],
+			};
+			const action = {
+				type: 'SET_META_BOXES_PER_LOCATIONS',
+				metaBoxesPerLocation: {
+					normal: [
+						{ id: 'b', title: 'B-updated' },
+						{ id: 'c', title: 'C' },
+					],
+					advanced: [ { id: 'd', title: 'D' } ],
+				},
+			};
+			const newState = metaBoxLocations( oldState, action );
+			expect( newState ).toEqual( {
+				normal: [
+					{ id: 'a', title: 'A' },
+					{ id: 'b', title: 'B-updated' },
+					{ id: 'c', title: 'C' },
+				],
+				advanced: [ { id: 'd', title: 'D' } ],
+				side: [ { id: 's', title: 'S' } ],
 			} );
 		} );
 	} );
