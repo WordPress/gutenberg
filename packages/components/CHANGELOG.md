@@ -15,6 +15,8 @@
 
 -   `Snackbar`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44934](https://github.com/WordPress/gutenberg/pull/44934))
 -   `AnglePickerControl`: Set Storybook Label control type to 'text' ([#45122](https://github.com/WordPress/gutenberg/pull/45122)).
+-   `SlotFill`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44403](https://github.com/WordPress/gutenberg/pull/44403))
+-   `Context`: updated to ignore `react/exhaustive-deps` eslint rule ([#45044](https://github.com/WordPress/gutenberg/pull/45044))
 -   `Button`: Refactor Storybook to controls and align docs ([#44105](https://github.com/WordPress/gutenberg/pull/44105)).
 
 ## 21.3.0 (2022-10-19)
@@ -40,7 +42,6 @@
 -   `withFocusReturn`: Refactor tests to `@testing-library/react` ([#45012](https://github.com/WordPress/gutenberg/pull/45012)).
 -   `ToolsPanel`: updated to satisfy `react/exhaustive-deps` eslint rule ([#45028](https://github.com/WordPress/gutenberg/pull/45028))
 -   `Tooltip`: updated to ignore `react/exhaustive-deps` eslint rule ([#45043](https://github.com/WordPress/gutenberg/pull/45043))
--   `SlotFill`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44403](https://github.com/WordPress/gutenberg/pull/44403))
 
 ## 21.2.0 (2022-10-05)
 
