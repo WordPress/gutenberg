@@ -74,4 +74,88 @@ test.describe( 'Gallery', () => {
 			.poll( editor.getEditedPostContent )
 			.toBe( editedPostContent );
 	} );
+
+	test( 'gallery caption can be edited', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		const galleryCaption = 'Tested gallery caption';
+
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/gallery',
+			innerBlocks: [
+				{
+					name: 'core/image',
+					attributes: {
+						id: uploadedMedia.id,
+						url: uploadedMedia.source_url,
+					},
+				},
+			],
+		} );
+
+		const gallery = page.locator( 'role=document[name="Block: Gallery"i]' );
+		const caption = gallery.locator(
+			'role=textbox[name="Gallery caption text"i]'
+		);
+		await expect( gallery ).toBeVisible();
+
+		await gallery.click();
+		await expect( caption ).toBeVisible();
+		await caption.click();
+
+		await page.keyboard.type( galleryCaption );
+
+		await expect
+			.poll( editor.getEditedPostContent )
+			.toMatch(
+				new RegExp( `<figcaption.*?>${ galleryCaption }</figcaption>` )
+			);
+	} );
+
+	test( "uploaded images' captions can be edited", async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		const caption = 'Tested caption';
+
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/gallery',
+			innerBlocks: [
+				{
+					name: 'core/image',
+					attributes: {
+						id: uploadedMedia.id,
+						url: uploadedMedia.source_url,
+					},
+				},
+			],
+		} );
+
+		const galleryImage = page.locator(
+			'role=document[name="Block: Gallery"i] >> role=document[name="Block: Image"i]'
+		);
+		const imageCaption = galleryImage.locator(
+			'role=textbox[name="Image caption text"i]'
+		);
+		await expect( galleryImage ).toBeVisible();
+
+		await galleryImage.click();
+		await editor.clickBlockToolbarButton( 'Add caption' );
+
+		await expect( imageCaption ).toBeVisible();
+		await imageCaption.click();
+
+		await page.keyboard.type( caption );
+
+		await expect
+			.poll( editor.getEditedPostContent )
+			.toMatch(
+				new RegExp( `<figcaption.*?>${ caption }</figcaption>` )
+			);
+	} );
 } );
