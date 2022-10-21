@@ -869,7 +869,8 @@ export function useGlobalStylesOutput() {
 		// TODO: refactor this.
 		if (
 			mergedConfig.styles?.blocks[ 'core/separator' ] &&
-			mergedConfig.styles?.blocks[ 'core/separator' ].color?.background
+			mergedConfig.styles?.blocks[ 'core/separator' ].color?.background &&
+			! mergedConfig.styles?.blocks[ 'core/separator' ].border?.color
 		) {
 			mergedConfig = {
 				...mergedConfig,
