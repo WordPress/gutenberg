@@ -18,9 +18,48 @@ _Returns_
 
 -   `Object`: Whether the current user can create media or not.
 
+### getCurrentTemplate
+
+Returns the post currently being edited in its last known saved state, not
+including unsaved edits. Returns an object containing relevant default post
+values if the post has not yet been saved.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `Object`: Post object.
+
+### getCurrentTemplateLastRevisionId
+
+Returns the last revision ID of the post currently being edited,
+or null if the post has no revisions.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `?number`: ID of the last revision.
+
 ### getCurrentTemplateNavigationPanelSubMenu
 
 > **Deprecated**
+
+### getCurrentTemplateRevisionsCount
+
+Returns the number of revisions of the post currently being edited.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `number`: Number of revisions.
 
 ### getCurrentTemplateTemplateParts
 

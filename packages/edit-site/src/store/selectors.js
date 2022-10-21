@@ -289,6 +289,61 @@ export function getEditorMode( state ) {
 }
 
 /**
+ * Returns the post currently being edited in its last known saved state, not
+ * including unsaved edits. Returns an object containing relevant default post
+ * values if the post has not yet been saved.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} Post object.
+ */
+export const getCurrentTemplate = createRegistrySelector(
+	( select ) => ( state ) => {
+		const templateType = getEditedPostType( state );
+		const templateId = getEditedPostId( state );
+		const template = templateId
+			? select( coreDataStore ).getEntityRecord(
+					'postType',
+					templateType,
+					templateId
+			  )
+			: null;
+
+		return template;
+	}
+);
+
+/**
+ * Returns the number of revisions of the template currently being edited.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {number} Number of revisions.
+ */
+export function getCurrentTemplateRevisionsCount( state ) {
+	const template = getCurrentTemplate( state );
+	if ( template.source === 'theme' ) {
+		return 0;
+	}
+	return ( template?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0 ) + 1;
+}
+
+/**
+ * Returns the last revision ID of the template currently being edited,
+ * or null if the template is from the theme
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {?number} ID of the last revision.
+ */
+export function getCurrentTemplateLastRevisionId( state ) {
+	return (
+		getCurrentTemplate( state )?._links?.[ 'predecessor-version' ]?.[ 0 ]
+			?.id ?? null
+	);
+}
+
+/**
  * @deprecated
  */
 export function getCurrentTemplateNavigationPanelSubMenu() {

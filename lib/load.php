@@ -56,6 +56,8 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_Rest_Customizer_Nonces' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-customizer-nonces.php';
 	}
+	require_once __DIR__ . '/experimental/class-gutenberg-rest-templates-controller.php';
+
 	require_once __DIR__ . '/experimental/rest-api.php';
 }
 
