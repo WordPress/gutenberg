@@ -1,11 +1,15 @@
 /**
  * WordPress dependencies
  */
-const { test } = require( '@wordpress/e2e-test-utils-playwright' );
+const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Block list view', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'emptytheme' );
+		await Promise.all( [
+			requestUtils.activateTheme( 'emptytheme' ),
+			requestUtils.deleteAllTemplates( 'wp_template' ),
+			requestUtils.deleteAllTemplates( 'wp_template_part' ),
+		] );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -19,17 +23,12 @@ test.describe( 'Block list view', () => {
 	test( 'inserter toggle button should toggle global inserter', async ( {
 		page,
 	} ) => {
-		await page
-			.locator( 'role=button[name="Toggle block inserter"i]' )
-			.click();
+		await page.click( 'role=button[name="Toggle block inserter"i]' );
 		await page
 			.locator( '.edit-site-editor__inserter-panel' )
 			.waitFor( { state: 'visible' } );
-		await page
-			.locator( 'role=button[name="Toggle block inserter"i]' )
-			.click();
-		await page
-			.locator( '.edit-site-editor__inserter-panel' )
-			.waitFor( { state: 'hidden' } );
+		await expect(
+			page.locator( 'role=region[name="Block Library"i]' )
+		).toBeVisible();
 	} );
 } );
