@@ -8,6 +8,7 @@
 
 ### Bug Fix
 
+-   `Button`: Normalize button primary, link, and default variants in relation to the destructive state ([#44427](https://github.com/WordPress/gutenberg/pull/44427)).
 -   `Button`: Fix RTL alignment for buttons containing an icon and text ([#44787](https://github.com/WordPress/gutenberg/pull/44787)).
 -   `FontSizePicker`: Fallback to font size `slug` if `name` is undefined  ([#45041](https://github.com/WordPress/gutenberg/pull/45041)).
 

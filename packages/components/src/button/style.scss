@@ -52,15 +52,14 @@
 		// Show the boundary of the button, in High Contrast Mode.
 		outline: 1px solid transparent;
 
-		&:hover:not(:disabled) {
+		&:hover:not(:disabled),
+		&:focus:not(:disabled) {
 			background: $components-color-accent-darker-20;
 			color: $white;
 		}
 
-		&:focus:not(:disabled),
 		&:active:not(:disabled) {
-			background: $components-color-accent-darker-20;
-			border-color: $components-color-accent-darker-20;
+			background: $components-color-accent;
 			color: $white;
 		}
 
@@ -176,14 +175,14 @@
 		color: $alert-red;
 		box-shadow: inset 0 0 0 $border-width $alert-red;
 
-		&:hover:not(:disabled) {
+		&:hover:not(:disabled),
+		&:focus:not(:disabled) {
 			color: darken($alert-red, 20%);
 			box-shadow: inset 0 0 0 $border-width darken($alert-red, 20%);
 		}
 
-		&:focus:not(:disabled),
 		&:active:not(:disabled) {
-			color: alert-red;
+			color: $alert-red;
 		}
 	}
 
@@ -192,19 +191,15 @@
 		background: $alert-red;
 		box-shadow: inset 0 0 0 $border-width $alert-red;
 
-		&:hover:not(:disabled) {
+		&:hover:not(:disabled),
+		&:focus:not(:disabled) {
 			color: #fff;
 			background: darken($alert-red, 20%);
 			box-shadow: inset 0 0 0 $border-width darken($alert-red, 20%);
 		}
 
-		&:focus:not(:disabled) {
-			background: $alert-red;
-			color: #fff;
-		}
-
 		&:active:not(:disabled) {
-			background: darken($alert-red, 20%);
+			background: $alert-red;
 			color: #fff;
 		}
 	}
@@ -244,11 +239,12 @@
 		@include reduce-motion("transition");
 		height: auto;
 
-		&:hover:not(:disabled) {
+		&:hover:not(:disabled),
+		&:focus:not(:disabled) {
 			color: $components-color-accent-darker-20;
 		}
-		&:active:not(:disabled),
-		&:focus:not(:disabled) {
+
+		&:active:not(:disabled) {
 			color: $components-color-accent;
 		}
 
@@ -260,13 +256,12 @@
 		&.is-destructive {
 			color: $alert-red;
 
-			&:hover:not(:disabled) {
+			&:hover:not(:disabled),
+			&:focus:not(:disabled) {
 				color: darken($alert-red, 20%);
-				background: transparent;
 			}
 
-			&:active:not(:disabled),
-			&:focus:not(:disabled) {
+			&:active:not(:disabled) {
 				color: $alert-red;
 			}
 		}
