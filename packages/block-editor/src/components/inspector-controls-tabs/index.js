@@ -53,41 +53,39 @@ const getSettingsTab = ( hasSingleBlockSelection = false ) => (
 	</>
 );
 
-const getAppearanceTab = ( blockName, clientId, hasBlockStyles ) => {
-	return (
-		<>
-			{ hasBlockStyles && (
-				<div>
-					<PanelBody title={ __( 'Styles' ) }>
-						<BlockStyles clientId={ clientId } />
-						{ hasBlockSupport(
-							blockName,
-							'defaultStylePicker',
-							true
-						) && <DefaultStylePicker blockName={ blockName } /> }
-					</PanelBody>
-				</div>
-			) }
-			<InspectorControls.Slot
-				__experimentalGroup="color"
-				label={ __( 'Color' ) }
-				className="color-block-support-panel__inner-wrapper"
-			/>
-			<InspectorControls.Slot
-				__experimentalGroup="typography"
-				label={ __( 'Typography' ) }
-			/>
-			<InspectorControls.Slot
-				__experimentalGroup="dimensions"
-				label={ __( 'Dimensions' ) }
-			/>
-			<InspectorControls.Slot
-				__experimentalGroup="border"
-				label={ __( 'Border' ) }
-			/>
-		</>
-	);
-};
+const getAppearanceTab = ( blockName, clientId, hasBlockStyles ) => (
+	<>
+		{ hasBlockStyles && (
+			<div>
+				<PanelBody title={ __( 'Styles' ) }>
+					<BlockStyles clientId={ clientId } />
+					{ hasBlockSupport(
+						blockName,
+						'defaultStylePicker',
+						true
+					) && <DefaultStylePicker blockName={ blockName } /> }
+				</PanelBody>
+			</div>
+		) }
+		<InspectorControls.Slot
+			__experimentalGroup="color"
+			label={ __( 'Color' ) }
+			className="color-block-support-panel__inner-wrapper"
+		/>
+		<InspectorControls.Slot
+			__experimentalGroup="typography"
+			label={ __( 'Typography' ) }
+		/>
+		<InspectorControls.Slot
+			__experimentalGroup="dimensions"
+			label={ __( 'Dimensions' ) }
+		/>
+		<InspectorControls.Slot
+			__experimentalGroup="border"
+			label={ __( 'Border' ) }
+		/>
+	</>
+);
 
 export default function InspectorControlsTabs( {
 	blockName,
