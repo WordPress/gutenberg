@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `Popover`: The deprecated `range` and `__unstableShift` props have been removed ([#45195](https://github.com/WordPress/gutenberg/pull/45195)).
+
+### Deprecations
+
+-   `Popover`: the deprecation messages for anchor-related props (`anchorRef`, `anchorRect`, `getAnchorRect`) has been updated. ([#45195](https://github.com/WordPress/gutenberg/pull/45195)).
+
 ### New Feature
 
 -   `BoxControl` & `CustomSelectControl`: Add `onMouseOver` and `onMouseOut` callback props to allow handling of these events by parent components ([#44955](https://github.com/WordPress/gutenberg/pull/44955))
