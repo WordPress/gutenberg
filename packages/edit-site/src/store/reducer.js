@@ -183,6 +183,26 @@ export function listViewPanel( state = false, action ) {
 	return state;
 }
 
+/**
+ * Reducer to set the save view panel open or closed.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ */
+export function saveViewPanel( state = false, action ) {
+	switch ( action.type ) {
+		case 'OPEN_NAVIGATION_PANEL_TO_MENU':
+			return false;
+		case 'SET_IS_NAVIGATION_PANEL_OPENED':
+			return action.isOpen ? false : state;
+		case 'SET_IS_SAVE_VIEW_OPENED':
+			return action.isOpen;
+		case 'SET_CANVAS_MODE':
+			return false;
+	}
+	return state;
+}
+
 export default combineReducers( {
 	deviceType,
 	settings,
@@ -191,4 +211,5 @@ export default combineReducers( {
 	navigationPanel,
 	blockInserterPanel,
 	listViewPanel,
+	saveViewPanel,
 } );

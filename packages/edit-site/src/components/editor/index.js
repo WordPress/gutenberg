@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
+import { useEffect, useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Popover, Button, Notice } from '@wordpress/components';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
@@ -65,6 +65,7 @@ function Editor( { onError } ) {
 	const {
 		isInserterOpen,
 		isListViewOpen,
+		isSaveViewOpen,
 		sidebarIsOpened,
 		settings,
 		entityId,
@@ -82,6 +83,7 @@ function Editor( { onError } ) {
 		const {
 			isInserterOpened,
 			isListViewOpened,
+			isSaveViewOpened,
 			getSettings,
 			getEditedPostType,
 			getEditedPostId,
@@ -98,6 +100,7 @@ function Editor( { onError } ) {
 		return {
 			isInserterOpen: isInserterOpened(),
 			isListViewOpen: isListViewOpened(),
+			isSaveViewOpen: isSaveViewOpened(),
 			sidebarIsOpened: !! select(
 				interfaceStore
 			).getActiveComplementaryArea( editSiteStore.name ),
@@ -130,18 +133,9 @@ function Editor( { onError } ) {
 			blockEditorMode: __unstableGetEditorMode(),
 		};
 	}, [] );
-	const { setPage, setIsInserterOpened } = useDispatch( editSiteStore );
+	const { setPage, setIsInserterOpened, setIsSaveViewOpened } =
+		useDispatch( editSiteStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
-
-	const [ isEntitiesSavedStatesOpen, setIsEntitiesSavedStatesOpen ] =
-		useState( false );
-	const openEntitiesSavedStates = useCallback(
-		() => setIsEntitiesSavedStatesOpen( true ),
-		[]
-	);
-	const closeEntitiesSavedStates = useCallback( () => {
-		setIsEntitiesSavedStatesOpen( false );
-	}, [] );
 
 	const blockContext = useMemo(
 		() => ( {
@@ -247,9 +241,6 @@ function Editor( { onError } ) {
 											}
 											header={
 												<Header
-													openEntitiesSavedStates={
-														openEntitiesSavedStates
-													}
 													showIconLabels={
 														showIconLabels
 													}
@@ -286,19 +277,17 @@ function Editor( { onError } ) {
 																) }
 															</Notice>
 														) }
-													<KeyboardShortcuts
-														openEntitiesSavedStates={
-															openEntitiesSavedStates
-														}
-													/>
+													<KeyboardShortcuts />
 												</>
 											}
 											actions={
 												<>
-													{ isEntitiesSavedStatesOpen ? (
+													{ isSaveViewOpen ? (
 														<EntitiesSavedStates
-															close={
-																closeEntitiesSavedStates
+															close={ () =>
+																setIsSaveViewOpened(
+																	false
+																)
 															}
 														/>
 													) : (
@@ -306,8 +295,10 @@ function Editor( { onError } ) {
 															<Button
 																variant="secondary"
 																className="edit-site-editor__toggle-save-panel-button"
-																onClick={
-																	openEntitiesSavedStates
+																onClick={ () =>
+																	setIsInserterOpened(
+																		true
+																	)
 																}
 																aria-expanded={
 																	false
