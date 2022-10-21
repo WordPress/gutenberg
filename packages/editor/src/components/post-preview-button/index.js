@@ -99,7 +99,7 @@ function writeInterstitialMessage( targetDocument ) {
 	targetDocument.close();
 }
 
-function PostPreviewButton( {
+export default function PostPreviewButton( {
 	className,
 	textContent,
 	forceIsAutosaveable,
@@ -112,7 +112,7 @@ function PostPreviewButton( {
 			const core = select( coreStore );
 
 			const postType = core.getPostType(
-				editor.getEditedPostAttribute( 'type' )
+				editor.getCurrentPostType( 'type' )
 			);
 
 			return {
@@ -186,5 +186,3 @@ function PostPreviewButton( {
 		</Button>
 	);
 }
-
-export default PostPreviewButton;
