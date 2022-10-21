@@ -296,7 +296,7 @@ function Editor( { onError } ) {
 																variant="secondary"
 																className="edit-site-editor__toggle-save-panel-button"
 																onClick={ () =>
-																	setIsInserterOpened(
+																	setIsSaveViewOpened(
 																		true
 																	)
 																}
