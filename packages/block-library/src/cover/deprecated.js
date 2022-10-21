@@ -274,6 +274,7 @@ const v10 = {
 							alt={ alt }
 							src={ url }
 							style={ { objectPosition } }
+							data-object-fit="cover"
 							data-object-position={ objectPosition }
 						/>
 					) }
@@ -289,6 +290,7 @@ const v10 = {
 						playsInline
 						src={ url }
 						style={ { objectPosition } }
+						data-object-fit="cover"
 						data-object-position={ objectPosition }
 					/>
 				) }
@@ -403,6 +405,7 @@ const v9 = {
 						alt={ alt }
 						src={ url }
 						style={ { objectPosition } }
+						data-object-fit="cover"
 						data-object-position={ objectPosition }
 					/>
 				) }
@@ -418,6 +421,7 @@ const v9 = {
 						playsInline
 						src={ url }
 						style={ { objectPosition } }
+						data-object-fit="cover"
 						data-object-position={ objectPosition }
 					/>
 				) }
@@ -527,6 +531,7 @@ const v8 = {
 						alt={ alt }
 						src={ url }
 						style={ { objectPosition } }
+						data-object-fit="cover"
 						data-object-position={ objectPosition }
 					/>
 				) }
@@ -542,6 +547,7 @@ const v8 = {
 						playsInline
 						src={ url }
 						style={ { objectPosition } }
+						data-object-fit="cover"
 						data-object-position={ objectPosition }
 					/>
 				) }
@@ -675,6 +681,7 @@ const v7 = {
 						alt={ alt }
 						src={ url }
 						style={ { objectPosition } }
+						data-object-fit="cover"
 						data-object-position={ objectPosition }
 					/>
 				) }
@@ -690,6 +697,7 @@ const v7 = {
 						playsInline
 						src={ url }
 						style={ { objectPosition } }
+						data-object-fit="cover"
 						data-object-position={ objectPosition }
 					/>
 				) }
