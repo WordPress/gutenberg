@@ -28,6 +28,7 @@ const meta: ComponentMeta< typeof ColorPalette > = {
 				type: null,
 			},
 		},
+		as: { control: { type: null } },
 		onChange: { action: 'onChange', control: { type: null } },
 		value: { control: { type: null } },
 	},
