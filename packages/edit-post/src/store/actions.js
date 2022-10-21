@@ -333,18 +333,16 @@ export const hideBlockTypes =
 	};
 
 /**
- * Returns an action object used in signaling
- * what Meta boxes are available in which location.
+ * Stores info about which Meta boxes are available in which location.
  *
  * @param {Object} metaBoxesPerLocation Meta boxes per location.
  */
-export const setAvailableMetaBoxesPerLocation =
-	( metaBoxesPerLocation ) =>
-	( { dispatch } ) =>
-		dispatch( {
-			type: 'SET_META_BOXES_PER_LOCATIONS',
-			metaBoxesPerLocation,
-		} );
+export function setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
+	return {
+		type: 'SET_META_BOXES_PER_LOCATIONS',
+		metaBoxesPerLocation,
+	};
+}
 
 /**
  * Update a metabox.
