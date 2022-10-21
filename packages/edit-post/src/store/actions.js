@@ -570,7 +570,7 @@ export const initializeMetaBoxes =
 
 		// Save metaboxes on save completion, except for autosaves.
 		addFilter(
-			'editor.SavePost',
+			'editor.__unstableSavePost',
 			'core/edit-post/save-metaboxes',
 			( previous, options ) =>
 				previous.then( () => {

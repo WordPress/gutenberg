@@ -189,7 +189,7 @@ export const savePost =
 
 		if ( ! error ) {
 			await applyFilters(
-				'editor.SavePost',
+				'editor.__unstableSavePost',
 				Promise.resolve(),
 				options
 			).catch( ( err ) => {
