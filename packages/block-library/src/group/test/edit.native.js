@@ -6,9 +6,7 @@ import {
 	fireEvent,
 	getEditorHtml,
 	initializeEditor,
-	within,
 	getBlock,
-	waitFor,
 } from 'test/helpers';
 
 /**
@@ -43,34 +41,15 @@ afterAll( () => {
 describe( 'Group block', () => {
 	it( 'inserts block and adds a Heading block as an inner block', async () => {
 		const screen = await initializeEditor();
-		const { getByTestId, getByText } = screen;
 
 		// Add block
 		await addBlock( screen, 'Group' );
 
 		// Get block
 		const groupBlock = await getBlock( screen, 'Group' );
-		fireEvent.press( groupBlock );
 
-		// Append a block in the Group block
-		const appenderButton =
-			within( groupBlock ).getByTestId( 'appender-button' );
-		fireEvent.press( appenderButton );
-
-		// Look for a block in the inserter
-		const blockList = getByTestId( 'InserterUI-Blocks' );
-
-		// onScroll event used to force the FlatList to render all items
-		fireEvent.scroll( blockList, {
-			nativeEvent: {
-				contentOffset: { y: 0, x: 0 },
-				contentSize: { width: 100, height: 100 },
-				layoutMeasurement: { width: 100, height: 100 },
-			},
-		} );
-
-		// Add a block
-		fireEvent.press( await waitFor( () => getByText( 'Heading' ) ) );
+		// Add Heading within Group
+		await addBlock( screen, 'Heading', groupBlock );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
