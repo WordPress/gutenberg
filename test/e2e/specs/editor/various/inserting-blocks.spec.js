@@ -191,6 +191,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		);
 
 		// FIXME: I think we should show the indicator when hovering on patterns as well?
+		// @see https://github.com/WordPress/gutenberg/issues/45183
 		// await expect( insertingBlocksUtils.indicator ).toBeVisible();
 
 		const paragraphBoundingBox = await paragraphBlock.boundingBox();
