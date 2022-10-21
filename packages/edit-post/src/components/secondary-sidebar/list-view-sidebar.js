@@ -50,9 +50,9 @@ export default function ListViewSidebar() {
 	useShortcut( 'core/edit-post/toggle-list-view', () => {
 		// If the list view has focus, we know it is safe to close.
 		if (
-			listViewRef.current.contains(
-				listViewRef.current.ownerDocument.activeElement
-			)
+			listViewRef.current
+				.closest( '[role="region"]' )
+				.contains( listViewRef.current.ownerDocument.activeElement )
 		) {
 			setIsListViewOpened( false );
 			// If the list view does not have focus, we should move focus to it.
