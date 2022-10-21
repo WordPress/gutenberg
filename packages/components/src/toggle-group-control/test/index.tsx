@@ -178,7 +178,7 @@ describe( 'ToggleGroupControl', () => {
 		} );
 
 		describe( 'isDeselectable = true', () => {
-			it( 'should  be deselectable', async () => {
+			it( 'should be deselectable', async () => {
 				const mockOnChange = jest.fn();
 				const user = userEvent.setup( {
 					advanceTimers: jest.advanceTimersByTime,
@@ -196,7 +196,7 @@ describe( 'ToggleGroupControl', () => {
 				);
 
 				await user.click(
-					await screen.findByRole( 'button', {
+					await screen.getByRole( 'button', {
 						name: 'R',
 						pressed: true,
 					} )
