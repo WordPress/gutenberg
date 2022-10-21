@@ -79,7 +79,9 @@
 			outline: none;
 
 			&:focus:enabled {
-				box-shadow: 0 0 0 $border-width $white, 0 0 0 3px $components-color-accent;
+				box-shadow:
+					0 0 0 $border-width $white,
+					0 0 0 3px $components-color-accent;
 			}
 		}
 
