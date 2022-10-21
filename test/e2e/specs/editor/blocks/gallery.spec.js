@@ -136,10 +136,11 @@ test.describe( 'Gallery', () => {
 		const caption = gallery.locator(
 			'role=textbox[name="Gallery caption text"i]'
 		);
-		await expect( gallery ).toBeVisible();
 
-		await gallery.click();
+		await expect( gallery ).toBeVisible();
 		await expect( caption ).toBeVisible();
+
+		// The inserted Gallery is already selected. Only select the caption field.
 		await caption.click();
 
 		await page.keyboard.type( galleryCaption );
