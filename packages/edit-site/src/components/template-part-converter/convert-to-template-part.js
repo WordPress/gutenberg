@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { paramCase as kebabCase } from 'change-case';
+import { kebabCase } from 'lodash';
 
 /**
  * WordPress dependencies
