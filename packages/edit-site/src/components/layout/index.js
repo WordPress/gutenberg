@@ -80,7 +80,11 @@ export default function Layout() {
 			>
 				<motion.div
 					className="edit-site-layout__canvas"
-					layout={ ! disableMotion }
+					layout
+					transition={ {
+						type: 'tween',
+						duration: disableMotion ? 0 : 0.5,
+					} }
 				>
 					<ErrorBoundary>
 						{ isEditorPage && <Editor /> }
