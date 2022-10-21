@@ -143,6 +143,8 @@ const v3 = {
 	},
 };
 
+// In #41140 support was added to global styles for caption elements which added a `wp-element-button` classname
+// to the download link element.
 const v2 = {
 	attributes: {
 		id: {
