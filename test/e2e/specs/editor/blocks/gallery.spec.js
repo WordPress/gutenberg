@@ -133,14 +133,14 @@ test.describe( 'Gallery', () => {
 		} );
 
 		const gallery = page.locator( 'role=document[name="Block: Gallery"i]' );
+
+		await expect( gallery ).toBeVisible();
+		await editor.selectBlocks( gallery );
+
 		const caption = gallery.locator(
 			'role=textbox[name="Gallery caption text"i]'
 		);
-
-		await expect( gallery ).toBeVisible();
 		await expect( caption ).toBeVisible();
-
-		// The inserted Gallery is already selected. Only select the caption field.
 		await caption.click();
 
 		await page.keyboard.type( galleryCaption );
