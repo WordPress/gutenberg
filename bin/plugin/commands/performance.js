@@ -215,10 +215,11 @@ async function runPerformanceTests( branches, options ) {
 	log( '    >> Cloning the repository' );
 	const baseDirectory = getRandomTemporaryPath();
 	fs.mkdirSync( baseDirectory, { recursive: true } );
+	runShellScript( 'cp -R ' + options.clonePath + ' ' + baseDirectory );
 
 	// @ts-ignore
 	const git = SimpleGit();
-	await git.clone( options.clonePath, baseDirectory )
+	await git.clone( baseDirectory )
 	const mergeHEAD = options.testsBranch;
 	const trunkHEAD = await git.raw( 'rev-parse', 'HEAD~' );
 	branches = [ mergeHEAD, trunkHEAD ];
