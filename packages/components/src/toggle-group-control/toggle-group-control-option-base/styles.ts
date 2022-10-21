@@ -8,7 +8,10 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import { CONFIG, COLORS, reduceMotion } from '../../utils';
-import type { ToggleGroupControlProps } from '../types';
+import type {
+	ToggleGroupControlProps,
+	ToggleGroupControlOptionBaseProps,
+} from '../types';
 
 export const LabelView = styled.div`
 	display: inline-flex;
@@ -26,12 +29,10 @@ export const buttonView = ( {
 	isIcon,
 	isPressed,
 	size,
-}: {
-	isDeselectable?: boolean;
-	isIcon?: boolean;
-	isPressed?: boolean;
-	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
-} ) => css`
+}: Pick< ToggleGroupControlProps, 'isDeselectable' | 'size' > &
+	Pick< ToggleGroupControlOptionBaseProps, 'isIcon' > & {
+		isPressed?: boolean;
+	} ) => css`
 	align-items: center;
 	appearance: none;
 	background: transparent;
@@ -94,10 +95,8 @@ export const ButtonContentView = styled.div`
 `;
 
 const isIconStyles = ( {
-	size,
-}: {
-	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
-} ) => {
+	size = 'default',
+}: Pick< ToggleGroupControlProps, 'size' > ) => {
 	const iconButtonSizes = {
 		default: '30px',
 		'__unstable-large': '34px',
