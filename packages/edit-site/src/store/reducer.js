@@ -197,8 +197,6 @@ export function saveViewPanel( state = false, action ) {
 			return action.isOpen ? false : state;
 		case 'SET_IS_SAVE_VIEW_OPENED':
 			return action.isOpen;
-		case 'SET_CANVAS_MODE':
-			return false;
 	}
 	return state;
 }
