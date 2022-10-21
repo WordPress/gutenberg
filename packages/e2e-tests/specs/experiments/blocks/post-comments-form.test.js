@@ -6,7 +6,6 @@ import {
 	activateTheme,
 	setOption,
 	visitSiteEditor,
-	toggleCanvasMode,
 	deleteAllTemplates,
 	canvas,
 } from '@wordpress/e2e-test-utils';
@@ -30,8 +29,6 @@ describe( 'Post Comments Form', () => {
 			await expect( page ).toClick( '.components-heading > a', {
 				text: /singular/i,
 			} );
-
-			await toggleCanvasMode();
 
 			// Insert post comments form
 			await insertBlock( 'Post Comments Form' );
