@@ -888,6 +888,14 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 					}
 				)
 			);
+			$text_color_matches   = array_values(
+				array_filter(
+					$declarations,
+					function( $declaration ) {
+						return str_contains( $declaration['name'], 'color' );
+					}
+				)
+			);
 			$background_matches   = array_values(
 				array_filter(
 					$declarations,
@@ -896,7 +904,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 					}
 				)
 			);
-			if ( ! empty( $background_matches && isset( $background_matches[0]['value'] ) ) && empty( $border_color_matches ) ) {
+			if ( ! empty( $background_matches && isset( $background_matches[0]['value'] ) ) && empty( $border_color_matches ) && empty( $text_color_matches ) ) {
 				$declarations[] = array(
 					'name'  => 'border-color',
 					'value' => $background_matches[0]['value'],

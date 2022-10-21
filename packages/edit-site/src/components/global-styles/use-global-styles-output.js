@@ -870,6 +870,7 @@ export function useGlobalStylesOutput() {
 		if (
 			mergedConfig.styles?.blocks[ 'core/separator' ] &&
 			mergedConfig.styles?.blocks[ 'core/separator' ].color?.background &&
+			! mergedConfig.styles?.blocks[ 'core/separator' ].color?.text &&
 			! mergedConfig.styles?.blocks[ 'core/separator' ].border?.color
 		) {
 			mergedConfig = {
