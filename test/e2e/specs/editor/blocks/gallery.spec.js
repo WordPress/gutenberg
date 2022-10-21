@@ -2,11 +2,20 @@
  * External dependencies
  */
 const path = require( 'path' );
+const fs = require( 'fs/promises' );
+const os = require( 'os' );
+const { v4: uuid } = require( 'uuid' );
 
 /**
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+
+test.use( {
+	galleryBlockUtils: async ( { page }, use ) => {
+		await use( new GalleryBlockUtils( { page } ) );
+	},
+} );
 
 test.describe( 'Gallery', () => {
 	let uploadedMedia;
@@ -73,6 +82,33 @@ test.describe( 'Gallery', () => {
 		await expect
 			.poll( editor.getEditedPostContent )
 			.toBe( editedPostContent );
+	} );
+
+	test( 'can be created using uploaded images', async ( {
+		admin,
+		editor,
+		page,
+		galleryBlockUtils,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( { name: 'core/gallery' } );
+		const galleryBlock = page.locator(
+			'role=document[name="Block: Gallery"i]'
+		);
+		await expect( galleryBlock ).toBeVisible();
+
+		const filename = await galleryBlockUtils.upload(
+			galleryBlock.locator( 'data-testid=form-file-upload-input' )
+		);
+
+		const image = galleryBlock.locator( 'role=img' );
+		await expect( image ).toBeVisible();
+		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
+
+		const regex = new RegExp(
+			`<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":\\d+,\\"sizeSlug\\":\\"(?:full|large)\\",\\"linkDestination\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-image (?:size-full|size-large)\\"><img src=\\"[^"]+\/${ filename }\.png\\" alt=\\"\\" class=\\"wp-image-\\d+\\"\/><\/figure>\\s*<!-- \/wp:image --><\/figure>\\s*<!-- \/wp:gallery -->`
+		);
+		await expect.poll( editor.getEditedPostContent ).toMatch( regex );
 	} );
 
 	test( 'gallery caption can be edited', async ( {
@@ -158,4 +194,48 @@ test.describe( 'Gallery', () => {
 				new RegExp( `<figcaption.*?>${ caption }</figcaption>` )
 			);
 	} );
+
+	// Disable reason:
+	// This test would be good to enable, but the media modal contains an
+	// invalid role, which is causing Axe tests to fail:
+	// https://core.trac.wordpress.org/ticket/50273
+	//
+	// Attempts to add an Axe exception for the media modal haven't proved
+	// successful:
+	// https://github.com/WordPress/gutenberg/pull/22719
+	test.fixme(
+		'when initially added the media library shows the Create Gallery view',
+		async ( { admin, editor } ) => {
+			await admin.createNewPost();
+			await editor.insertBlock( { name: 'core/gallery' } );
+		}
+	);
 } );
+
+class GalleryBlockUtils {
+	constructor( { page } ) {
+		this.page = page;
+
+		this.TEST_IMAGE_FILE_PATH = path.join(
+			__dirname,
+			'..',
+			'..',
+			'..',
+			'assets',
+			'10x10_e2e_test_image_z9T8jK.png'
+		);
+	}
+
+	async upload( inputElement ) {
+		const tmpDirectory = await fs.mkdtemp(
+			path.join( os.tmpdir(), 'gutenberg-test-image-' )
+		);
+		const filename = uuid();
+		const tmpFileName = path.join( tmpDirectory, filename + '.png' );
+		await fs.copyFile( this.TEST_IMAGE_FILE_PATH, tmpFileName );
+
+		await inputElement.setInputFiles( tmpFileName );
+
+		return filename;
+	}
+}
