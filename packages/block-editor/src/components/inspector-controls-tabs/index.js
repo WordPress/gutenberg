@@ -21,7 +21,7 @@ import {
 	InspectorAdvancedControls,
 } from '../inspector-controls';
 
-const AdvancedControls = () => {
+export const AdvancedControls = () => {
 	const fills = useSlotFills( InspectorAdvancedControls.slotName );
 	const hasFills = Boolean( fills && fills.length );
 

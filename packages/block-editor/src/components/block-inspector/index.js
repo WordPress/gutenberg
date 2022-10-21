@@ -5,10 +5,12 @@ import { __ } from '@wordpress/i18n';
 import {
 	getBlockType,
 	getUnregisteredTypeHandlerName,
+	hasBlockSupport,
 	store as blocksStore,
 } from '@wordpress/blocks';
 import {
 	FlexItem,
+	PanelBody,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	Button,
@@ -26,7 +28,13 @@ import BlockVariationTransforms from '../block-variation-transforms';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
-import InspectorControlsTabs from '../inspector-controls-tabs';
+import BlockStyles from '../block-styles';
+import DefaultStylePicker from '../default-style-picker';
+import { default as InspectorControls } from '../inspector-controls';
+import {
+	default as InspectorControlsTabs,
+	AdvancedControls,
+} from '../inspector-controls-tabs';
 
 function useContentBlocks( blockTypes, block ) {
 	const contentBlocksObjectAux = useMemo( () => {
@@ -158,11 +166,37 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 		};
 	}, [] );
 
+	const areBlockInspectorTabsEnabled =
+		window?.__experimentalEnableBlockInspectorTabs;
+
 	if ( count > 1 ) {
 		return (
 			<div className="block-editor-block-inspector">
 				<MultiSelectionInspector />
-				<InspectorControlsTabs />
+				{ areBlockInspectorTabsEnabled ? (
+					<InspectorControlsTabs />
+				) : (
+					<>
+						<InspectorControls.Slot />
+						<InspectorControls.Slot
+							__experimentalGroup="color"
+							label={ __( 'Color' ) }
+							className="color-block-support-panel__inner-wrapper"
+						/>
+						<InspectorControls.Slot
+							__experimentalGroup="typography"
+							label={ __( 'Typography' ) }
+						/>
+						<InspectorControls.Slot
+							__experimentalGroup="dimensions"
+							label={ __( 'Dimensions' ) }
+						/>
+						<InspectorControls.Slot
+							__experimentalGroup="border"
+							label={ __( 'Border' ) }
+						/>
+					</>
+				) }
 			</div>
 		);
 	}
@@ -199,11 +233,12 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 		<BlockInspectorSingleBlock
 			clientId={ selectedBlockClientId }
 			blockName={ blockType.name }
+			showTabs={ areBlockInspectorTabsEnabled }
 		/>
 	);
 };
 
-const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
+const BlockInspectorSingleBlock = ( { clientId, blockName, showTabs } ) => {
 	const hasBlockStyles = useSelect(
 		( select ) => {
 			const { getBlockStyles } = select( blocksStore );
@@ -218,11 +253,54 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 		<div className="block-editor-block-inspector">
 			<BlockCard { ...blockInformation } />
 			<BlockVariationTransforms blockClientId={ clientId } />
-			<InspectorControlsTabs
-				hasBlockStyles={ hasBlockStyles }
-				clientId={ clientId }
-				blockName={ blockName }
-			/>
+			{ showTabs && (
+				<InspectorControlsTabs
+					hasBlockStyles={ hasBlockStyles }
+					clientId={ clientId }
+					blockName={ blockName }
+				/>
+			) }
+			{ ! showTabs && (
+				<>
+					{ hasBlockStyles && (
+						<div>
+							<PanelBody title={ __( 'Styles' ) }>
+								<BlockStyles clientId={ clientId } />
+								{ hasBlockSupport(
+									blockName,
+									'defaultStylePicker',
+									true
+								) && (
+									<DefaultStylePicker
+										blockName={ blockName }
+									/>
+								) }
+							</PanelBody>
+						</div>
+					) }
+					<InspectorControls.Slot />
+					<InspectorControls.Slot
+						__experimentalGroup="color"
+						label={ __( 'Color' ) }
+						className="color-block-support-panel__inner-wrapper"
+					/>
+					<InspectorControls.Slot
+						__experimentalGroup="typography"
+						label={ __( 'Typography' ) }
+					/>
+					<InspectorControls.Slot
+						__experimentalGroup="dimensions"
+						label={ __( 'Dimensions' ) }
+					/>
+					<InspectorControls.Slot
+						__experimentalGroup="border"
+						label={ __( 'Border' ) }
+					/>
+					<div>
+						<AdvancedControls />
+					</div>
+				</>
+			) }
 			<SkipToSelectedBlock key="back" />
 		</div>
 	);
