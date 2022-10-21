@@ -24,6 +24,8 @@ const oldColors = {
 	'subtle-pale-pink': '#fcf0ef',
 };
 
+// In #41140 support was added to global styles for caption elements which
+// added a `wp-element-caption` classname to the embed figcaption element.
 const v3 = {
 	attributes: {
 		hasFixedLayout: {
