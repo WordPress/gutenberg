@@ -186,7 +186,11 @@ function AudioEdit( {
 					} }
 					icon={ captionIcon }
 					isPressed={ showCaption }
-					label={ __( 'Caption' ) }
+					label={
+						showCaption
+							? __( 'Remove caption' )
+							: __( 'Add caption' )
+					}
 				/>
 			</BlockControls>
 			<BlockControls group="other">
