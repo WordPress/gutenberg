@@ -63,12 +63,12 @@ export function getAutoCompleterUI( autocompleter ) {
 				position="top right"
 				className="components-autocomplete__popover"
 				anchor={ popoverAnchor }
+				ref={ popoverRef }
 			>
 				<div
 					id={ listBoxId }
 					role="listbox"
 					className="components-autocomplete__results"
-					ref={ popoverRef }
 				>
 					{ map( items, ( option, index ) => (
 						<Button
