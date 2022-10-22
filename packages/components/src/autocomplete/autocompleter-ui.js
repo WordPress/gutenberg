@@ -43,9 +43,7 @@ export function getAutoCompleterUI( autocompleter ) {
 
 		const popoverRef = useRef();
 
-		useOnClickOutside( popoverRef, () => {
-			reset();
-		} );
+		useOnClickOutside( popoverRef, reset );
 
 		useLayoutEffect( () => {
 			onChangeOptions( items );
