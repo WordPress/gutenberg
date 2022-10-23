@@ -101,7 +101,7 @@ export {
 	rest as __experimentalRest,
 	batch as __experimentalBatch,
 } from './rest-api';
-export { openListView, closeListView } from './list-view';
+export { isListViewOpen, openListView, closeListView } from './list-view';
 export {
 	clickSiteEditorMenuItem,
 	closeSiteEditorNavigationPanel,

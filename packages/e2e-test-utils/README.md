@@ -551,6 +551,10 @@ _Returns_
 
 -   `Promise`: Promise resolving with a boolean indicating if the focused block is the default block.
 
+### isListViewOpen
+
+Undocumented declaration.
+
 ### isOfflineMode
 
 Undocumented declaration.
