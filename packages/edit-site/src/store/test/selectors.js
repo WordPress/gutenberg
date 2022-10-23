@@ -1,78 +1,63 @@
 /**
+ * WordPress dependencies
+ */
+import { store as coreDataStore } from '@wordpress/core-data';
+
+/**
  * Internal dependencies
  */
 import {
-	isFeatureActive,
 	getCanUserCreateMedia,
 	getSettings,
 	getHomeTemplateId,
-	getTemplateId,
-	getTemplatePartId,
-	getTemplateType,
-	getTemplateIds,
-	getTemplatePartIds,
+	getEditedPostType,
+	getEditedPostId,
 	getPage,
-	getShowOnFront,
+	getNavigationPanelActiveMenu,
+	getReusableBlocks,
+	isNavigationOpened,
+	isInserterOpened,
+	isListViewOpened,
+	__unstableGetPreference,
 } from '../selectors';
 
 describe( 'selectors', () => {
 	const canUser = jest.fn( () => true );
+	const getEntityRecords = jest.fn( () => [] );
+	const get = jest.fn();
 	getCanUserCreateMedia.registry = {
 		select: jest.fn( () => ( { canUser } ) ),
 	};
-
-	describe( 'isFeatureActive', () => {
-		it( 'is tolerant to an undefined features preference', () => {
-			// See: https://github.com/WordPress/gutenberg/issues/14580
-			const state = {
-				preferences: {},
-			};
-
-			expect( isFeatureActive( state, 'chicken' ) ).toBe( false );
-		} );
-
-		it( 'should return true if feature is active', () => {
-			const state = {
-				preferences: {
-					features: {
-						chicken: true,
-					},
-				},
-			};
-
-			expect( isFeatureActive( state, 'chicken' ) ).toBe( true );
-		} );
-
-		it( 'should return false if feature is not active', () => {
-			const state = {
-				preferences: {
-					features: {
-						chicken: false,
-					},
-				},
-			};
-
-			expect( isFeatureActive( state, 'chicken' ) ).toBe( false );
-		} );
-
-		it( 'should return false if feature is not referred', () => {
-			const state = {
-				preferences: {
-					features: {},
-				},
-			};
-
-			expect( isFeatureActive( state, 'chicken' ) ).toBe( false );
-		} );
-	} );
+	getReusableBlocks.registry = {
+		select: jest.fn( () => ( { getEntityRecords } ) ),
+	};
+	__unstableGetPreference.registry = {
+		select: jest.fn( () => ( { get } ) ),
+	};
 
 	describe( 'getCanUserCreateMedia', () => {
 		it( "selects `canUser( 'create', 'media' )` from the core store", () => {
 			expect( getCanUserCreateMedia() ).toBe( true );
 			expect(
 				getCanUserCreateMedia.registry.select
-			).toHaveBeenCalledWith( 'core' );
+			).toHaveBeenCalledWith( coreDataStore );
 			expect( canUser ).toHaveBeenCalledWith( 'create', 'media' );
+		} );
+	} );
+
+	describe( 'getReusableBlocks', () => {
+		it( "selects `getEntityRecords( 'postType', 'wp_block' )` from the core store", () => {
+			expect( getReusableBlocks() ).toEqual( [] );
+			expect( getReusableBlocks.registry.select ).toHaveBeenCalledWith(
+				coreDataStore
+			);
+			expect( getEntityRecords ).toHaveBeenCalledWith(
+				'postType',
+				'wp_block',
+				{
+					per_page: -1,
+				}
+			);
 		} );
 	} );
 
@@ -80,25 +65,51 @@ describe( 'selectors', () => {
 		it( "returns the settings when the user can't create media", () => {
 			canUser.mockReturnValueOnce( false );
 			canUser.mockReturnValueOnce( false );
-			const state = { settings: {}, preferences: {} };
-			expect( getSettings( state ) ).toBe( state.settings );
+			get.mockImplementation( ( scope, name ) => {
+				if ( name === 'focusMode' ) return false;
+				if ( name === 'fixedToolbar' ) return false;
+			} );
+			const state = {
+				settings: {},
+				preferences: {},
+				editedPost: { type: 'wp_template' },
+			};
+			const setInserterOpened = () => {};
+			expect( getSettings( state, setInserterOpened ) ).toEqual( {
+				outlineMode: true,
+				focusMode: false,
+				hasFixedToolbar: false,
+				keepCaretInsideBlock: false,
+				showIconLabels: false,
+				__experimentalSetIsInserterOpened: setInserterOpened,
+				__experimentalReusableBlocks: [],
+				__experimentalPreferPatternsOnRoot: true,
+			} );
 		} );
 
 		it( 'returns the extended settings when the user can create media', () => {
+			get.mockImplementation( ( scope, name ) => {
+				if ( name === 'focusMode' ) return true;
+				if ( name === 'fixedToolbar' ) return true;
+			} );
+
 			const state = {
 				settings: { key: 'value' },
-				preferences: {
-					features: {
-						focusMode: true,
-						fixedToolbar: true,
-					},
-				},
+				editedPost: { type: 'wp_template_part' },
 			};
-			expect( getSettings( state ) ).toEqual( {
+			const setInserterOpened = () => {};
+
+			expect( getSettings( state, setInserterOpened ) ).toEqual( {
+				outlineMode: true,
 				key: 'value',
 				focusMode: true,
 				hasFixedToolbar: true,
+				keepCaretInsideBlock: false,
+				showIconLabels: false,
+				__experimentalSetIsInserterOpened: setInserterOpened,
+				__experimentalReusableBlocks: [],
 				mediaUpload: expect.any( Function ),
+				__experimentalPreferPatternsOnRoot: false,
 			} );
 		} );
 	} );
@@ -110,52 +121,67 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getTemplateId', () => {
+	describe( 'getEditedPostId', () => {
 		it( 'returns the template ID', () => {
-			const state = { templateId: {} };
-			expect( getTemplateId( state ) ).toBe( state.templateId );
+			const state = { editedPost: { id: 10 } };
+			expect( getEditedPostId( state ) ).toBe( 10 );
 		} );
 	} );
 
-	describe( 'getTemplatePartId', () => {
-		it( 'returns the template part ID', () => {
-			const state = { templatePartId: {} };
-			expect( getTemplatePartId( state ) ).toBe( state.templatePartId );
-		} );
-	} );
-
-	describe( 'getTemplateType', () => {
+	describe( 'getEditedPostType', () => {
 		it( 'returns the template type', () => {
-			const state = { templateType: {} };
-			expect( getTemplateType( state ) ).toBe( state.templateType );
-		} );
-	} );
-
-	describe( 'getTemplateIds', () => {
-		it( 'returns the template IDs', () => {
-			const state = { templateIds: {} };
-			expect( getTemplateIds( state ) ).toBe( state.templateIds );
-		} );
-	} );
-
-	describe( 'getTemplatePartIds', () => {
-		it( 'returns the template part IDs', () => {
-			const state = { templatePartIds: {} };
-			expect( getTemplatePartIds( state ) ).toBe( state.templatePartIds );
+			const state = { editedPost: { type: 'wp_template' } };
+			expect( getEditedPostType( state ) ).toBe( 'wp_template' );
 		} );
 	} );
 
 	describe( 'getPage', () => {
 		it( 'returns the page object', () => {
-			const state = { page: {} };
-			expect( getPage( state ) ).toBe( state.page );
+			const page = {};
+			const state = { editedPost: { page } };
+			expect( getPage( state ) ).toBe( page );
 		} );
 	} );
 
-	describe( 'getShowOnFront', () => {
-		it( 'returns the `show_on_front` setting', () => {
-			const state = { showOnFront: {} };
-			expect( getShowOnFront( state ) ).toBe( state.showOnFront );
+	describe( 'getNavigationPanelActiveMenu', () => {
+		it( 'returns the current navigation menu', () => {
+			const state = {
+				navigationPanel: { menu: 'test-menu', isOpen: false },
+			};
+			expect( getNavigationPanelActiveMenu( state ) ).toBe( 'test-menu' );
+		} );
+	} );
+
+	describe( 'isNavigationOpened', () => {
+		it( 'returns the navigation panel isOpened state', () => {
+			const state = {
+				navigationPanel: { menu: 'test-menu', isOpen: false },
+			};
+			expect( isNavigationOpened( state ) ).toBe( false );
+			state.navigationPanel.isOpen = true;
+			expect( isNavigationOpened( state ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isInserterOpened', () => {
+		it( 'returns the block inserter panel isOpened state', () => {
+			const state = {
+				blockInserterPanel: true,
+			};
+			expect( isInserterOpened( state ) ).toBe( true );
+			state.blockInserterPanel = false;
+			expect( isInserterOpened( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isListViewOpened', () => {
+		it( 'returns the list view panel isOpened state', () => {
+			const state = {
+				listViewPanel: true,
+			};
+			expect( isListViewOpened( state ) ).toBe( true );
+			state.listViewPanel = false;
+			expect( isListViewOpened( state ) ).toBe( false );
 		} );
 	} );
 } );

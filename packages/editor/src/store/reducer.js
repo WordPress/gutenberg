@@ -1,10 +1,4 @@
 /**
- * External dependencies
- */
-import optimist from 'redux-optimist';
-import { omit, keys, isEqual, keyBy } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
@@ -12,7 +6,7 @@ import { combineReducers } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { PREFERENCES_DEFAULTS, EDITOR_SETTINGS_DEFAULTS } from './defaults';
+import { EDITOR_SETTINGS_DEFAULTS } from './defaults';
 
 /**
  * Returns a post attribute value, flattening nested rendered content using its
@@ -40,7 +34,12 @@ export function getPostRawValue( value ) {
  * @return {boolean} Whether the two objects have the same keys.
  */
 export function hasSameKeys( a, b ) {
-	return isEqual( keys( a ), keys( b ) );
+	const keysA = Object.keys( a ).sort();
+	const keysB = Object.keys( b ).sort();
+	return (
+		keysA.length === keysB.length &&
+		keysA.every( ( key, index ) => keysB[ index ] === key )
+	);
 }
 
 /**
@@ -85,8 +84,6 @@ export function shouldOverwriteState( action, previousAction ) {
 export function postId( state = null, action ) {
 	switch ( action.type ) {
 		case 'SETUP_EDITOR_STATE':
-		case 'RESET_POST':
-		case 'UPDATE_POST':
 			return action.post.id;
 	}
 
@@ -96,8 +93,6 @@ export function postId( state = null, action ) {
 export function postType( state = null, action ) {
 	switch ( action.type ) {
 		case 'SETUP_EDITOR_STATE':
-		case 'RESET_POST':
-		case 'UPDATE_POST':
 			return action.post.type;
 	}
 
@@ -118,32 +113,6 @@ export function template( state = { isValid: true }, action ) {
 			return {
 				...state,
 				isValid: action.isValid,
-			};
-	}
-
-	return state;
-}
-
-/**
- * Reducer returning the user preferences.
- *
- * @param {Object}  state                 Current state.
- * @param {Object}  action                Dispatched action.
- *
- * @return {string} Updated state.
- */
-export function preferences( state = PREFERENCES_DEFAULTS, action ) {
-	switch ( action.type ) {
-		case 'ENABLE_PUBLISH_SIDEBAR':
-			return {
-				...state,
-				isPublishSidebarEnabled: true,
-			};
-
-		case 'DISABLE_PUBLISH_SIDEBAR':
-			return {
-				...state,
-				isPublishSidebarEnabled: false,
 			};
 	}
 
@@ -173,11 +142,31 @@ export function saving( state = {}, action ) {
 }
 
 /**
+ * Reducer returning deleting post request state.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function deleting( state = {}, action ) {
+	switch ( action.type ) {
+		case 'REQUEST_POST_DELETE_START':
+		case 'REQUEST_POST_DELETE_FINISH':
+			return {
+				pending: action.type === 'REQUEST_POST_DELETE_START',
+			};
+	}
+
+	return state;
+}
+
+/**
  * Post Lock State.
  *
  * @typedef {Object} PostLockState
  *
- * @property {boolean} isLocked       Whether the post is locked.
+ * @property {boolean}  isLocked       Whether the post is locked.
  * @property {?boolean} isTakeover     Whether the post editing has been taken over.
  * @property {?boolean} activePostLock Active post lock value.
  * @property {?Object}  user           User that took over the post.
@@ -187,7 +176,7 @@ export function saving( state = {}, action ) {
  * Reducer returning the post lock status.
  *
  * @param {PostLockState} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {Object}        action Dispatched action.
  *
  * @return {PostLockState} Updated state.
  */
@@ -215,8 +204,11 @@ export function postSavingLock( state = {}, action ) {
 		case 'LOCK_POST_SAVING':
 			return { ...state, [ action.lockName ]: true };
 
-		case 'UNLOCK_POST_SAVING':
-			return omit( state, action.lockName );
+		case 'UNLOCK_POST_SAVING': {
+			const { [ action.lockName ]: removedLockName, ...restState } =
+				state;
+			return restState;
+		}
 	}
 	return state;
 }
@@ -236,102 +228,14 @@ export function postAutosavingLock( state = {}, action ) {
 		case 'LOCK_POST_AUTOSAVING':
 			return { ...state, [ action.lockName ]: true };
 
-		case 'UNLOCK_POST_AUTOSAVING':
-			return omit( state, action.lockName );
+		case 'UNLOCK_POST_AUTOSAVING': {
+			const { [ action.lockName ]: removedLockName, ...restState } =
+				state;
+			return restState;
+		}
 	}
 	return state;
 }
-
-export const reusableBlocks = combineReducers( {
-	data( state = {}, action ) {
-		switch ( action.type ) {
-			case 'RECEIVE_REUSABLE_BLOCKS': {
-				return {
-					...state,
-					...keyBy( action.results, 'id' ),
-				};
-			}
-
-			case 'UPDATE_REUSABLE_BLOCK': {
-				const { id, changes } = action;
-				return {
-					...state,
-					[ id ]: {
-						...state[ id ],
-						...changes,
-					},
-				};
-			}
-
-			case 'SAVE_REUSABLE_BLOCK_SUCCESS': {
-				const { id, updatedId } = action;
-
-				// If a temporary reusable block is saved, we swap the temporary id with the final one
-				if ( id === updatedId ) {
-					return state;
-				}
-
-				const value = state[ id ];
-				return {
-					...omit( state, id ),
-					[ updatedId ]: {
-						...value,
-						id: updatedId,
-					},
-				};
-			}
-
-			case 'REMOVE_REUSABLE_BLOCK': {
-				const { id } = action;
-				return omit( state, id );
-			}
-		}
-
-		return state;
-	},
-
-	isFetching( state = {}, action ) {
-		switch ( action.type ) {
-			case 'FETCH_REUSABLE_BLOCKS': {
-				const { id } = action;
-				if ( ! id ) {
-					return state;
-				}
-
-				return {
-					...state,
-					[ id ]: true,
-				};
-			}
-
-			case 'FETCH_REUSABLE_BLOCKS_SUCCESS':
-			case 'FETCH_REUSABLE_BLOCKS_FAILURE': {
-				const { id } = action;
-				return omit( state, id );
-			}
-		}
-
-		return state;
-	},
-
-	isSaving( state = {}, action ) {
-		switch ( action.type ) {
-			case 'SAVE_REUSABLE_BLOCK':
-				return {
-					...state,
-					[ action.id ]: true,
-				};
-
-			case 'SAVE_REUSABLE_BLOCK_SUCCESS':
-			case 'SAVE_REUSABLE_BLOCK_FAILURE': {
-				const { id } = action;
-				return omit( state, id );
-			}
-		}
-
-		return state;
-	},
-} );
 
 /**
  * Reducer returning whether the editor is ready to be rendered.
@@ -339,7 +243,7 @@ export const reusableBlocks = combineReducers( {
  * the post object is loaded properly and the initial blocks parsed.
  *
  * @param {boolean} state
- * @param {Object} action
+ * @param {Object}  action
  *
  * @return {boolean} Updated state.
  */
@@ -375,18 +279,15 @@ export function editorSettings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
 	return state;
 }
 
-export default optimist(
-	combineReducers( {
-		postId,
-		postType,
-		preferences,
-		saving,
-		postLock,
-		reusableBlocks,
-		template,
-		postSavingLock,
-		isReady,
-		editorSettings,
-		postAutosavingLock,
-	} )
-);
+export default combineReducers( {
+	postId,
+	postType,
+	saving,
+	deleting,
+	postLock,
+	template,
+	postSavingLock,
+	isReady,
+	editorSettings,
+	postAutosavingLock,
+} );

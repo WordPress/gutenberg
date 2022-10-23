@@ -36,13 +36,11 @@ export const Edit = ( props ) => {
 	const blockContext = useContext( BlockContext );
 
 	// Assign context values using the block type's declared context needs.
-	const context = useMemo(
-		() =>
-			blockType && blockType.context
-				? pick( blockContext, blockType.context )
-				: DEFAULT_BLOCK_CONTEXT,
-		[ blockType, blockContext ]
-	);
+	const context = useMemo( () => {
+		return blockType && blockType.usesContext
+			? pick( blockContext, blockType.usesContext )
+			: DEFAULT_BLOCK_CONTEXT;
+	}, [ blockType, blockContext ] );
 
 	if ( ! blockType ) {
 		return null;
@@ -52,21 +50,20 @@ export const Edit = ( props ) => {
 	// with which a block is displayed. If `blockType` is valid, assign
 	// them preferentially as the render value for the block.
 	const Component = blockType.edit || blockType.save;
-	const lightBlockWrapper = hasBlockSupport(
-		blockType,
-		'lightBlockWrapper',
-		false
-	);
 
-	if ( lightBlockWrapper ) {
+	if ( blockType.apiVersion > 1 ) {
 		return <Component { ...props } context={ context } />;
 	}
 
-	// Generate a class name for the block's editable form
+	// Generate a class name for the block's editable form.
 	const generatedClassName = hasBlockSupport( blockType, 'className', true )
 		? getBlockDefaultClassName( name )
 		: null;
-	const className = classnames( generatedClassName, attributes.className );
+	const className = classnames(
+		generatedClassName,
+		attributes.className,
+		props.className
+	);
 
 	return (
 		<Component { ...props } context={ context } className={ className } />

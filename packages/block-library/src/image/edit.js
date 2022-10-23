@@ -2,46 +2,66 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, omit, pick } from 'lodash';
+import { get, isEmpty, pick } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
-import { withNotices } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { Placeholder } from '@wordpress/components';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
-	BlockAlignmentToolbar,
+	BlockAlignmentControl,
 	BlockControls,
 	BlockIcon,
 	MediaPlaceholder,
-	MediaReplaceFlow,
-	__experimentalBlock as Block,
+	useBlockProps,
+	store as blockEditorStore,
+	__experimentalUseBorderProps as useBorderProps,
 } from '@wordpress/block-editor';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
 import Image from './image';
 
+// Much of this description is duplicated from MediaPlaceholder.
+const placeholder = ( content ) => {
+	return (
+		<Placeholder
+			className="block-editor-media-placeholder"
+			withIllustration={ true }
+			icon={ icon }
+			label={ __( 'Image' ) }
+			instructions={ __(
+				'Upload an image file, pick one from your media library, or add one with a URL.'
+			) }
+		>
+			{ content }
+		</Placeholder>
+	);
+};
+
 /**
  * Module constants
  */
 import {
-	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_ATTACHMENT,
+	LINK_DESTINATION_CUSTOM,
+	LINK_DESTINATION_MEDIA,
+	LINK_DESTINATION_NONE,
 	ALLOWED_MEDIA_TYPES,
-	DEFAULT_SIZE_SLUG,
 } from './constants';
 
-export const pickRelevantMediaFiles = ( image ) => {
+export const pickRelevantMediaFiles = ( image, size ) => {
 	const imageProps = pick( image, [ 'alt', 'id', 'link', 'caption' ] );
 	imageProps.url =
-		get( image, [ 'sizes', 'large', 'url' ] ) ||
-		get( image, [ 'media_details', 'sizes', 'large', 'source_url' ] ) ||
+		get( image, [ 'sizes', size, 'url' ] ) ||
+		get( image, [ 'media_details', 'sizes', size, 'source_url' ] ) ||
 		image.url;
 	return imageProps;
 };
@@ -50,7 +70,7 @@ export const pickRelevantMediaFiles = ( image ) => {
  * Is the URL a temporary blob URL? A blob URL is one that is used temporarily
  * while the image is being uploaded and will not have an id yet allocated.
  *
- * @param {number=} id The id of the image.
+ * @param {number=} id  The id of the image.
  * @param {string=} url The url of the image.
  *
  * @return {boolean} Is the URL a Blob URL
@@ -66,17 +86,33 @@ const isTemporaryImage = ( id, url ) => ! id && isBlobURL( url );
  *
  * @return {boolean} Is the url an externally hosted url?
  */
-const isExternalImage = ( id, url ) => url && ! id && ! isBlobURL( url );
+export const isExternalImage = ( id, url ) => url && ! id && ! isBlobURL( url );
+
+/**
+ * Checks if WP generated default image size. Size generation is skipped
+ * when the image is smaller than the said size.
+ *
+ * @param {Object} image
+ * @param {string} defaultSize
+ *
+ * @return {boolean} Whether or not it has default image size.
+ */
+function hasDefaultSize( image, defaultSize ) {
+	return (
+		'url' in ( image?.sizes?.[ defaultSize ] ?? {} ) ||
+		'source_url' in ( image?.media_details?.sizes?.[ defaultSize ] ?? {} )
+	);
+}
 
 export function ImageEdit( {
 	attributes,
 	setAttributes,
 	isSelected,
 	className,
-	noticeUI,
 	insertBlocksAfter,
-	noticeOperations,
 	onReplace,
+	context,
+	clientId,
 } ) {
 	const {
 		url = '',
@@ -84,20 +120,47 @@ export function ImageEdit( {
 		caption,
 		align,
 		id,
-		linkDestination,
 		width,
 		height,
 		sizeSlug,
 	} = attributes;
-	const ref = useRef();
-	const mediaUpload = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
-		return getSettings().mediaUpload;
-	} );
+	const [ temporaryURL, setTemporaryURL ] = useState();
 
+	const altRef = useRef();
+	useEffect( () => {
+		altRef.current = alt;
+	}, [ alt ] );
+
+	const captionRef = useRef();
+	useEffect( () => {
+		captionRef.current = caption;
+	}, [ caption ] );
+
+	const ref = useRef();
+	const { imageDefaultSize, mediaUpload, isContentLocked } = useSelect(
+		( select ) => {
+			const { getSettings, __unstableGetContentLockingParent } =
+				select( blockEditorStore );
+			const settings = getSettings();
+			return {
+				imageDefaultSize: settings.imageDefaultSize,
+				mediaUpload: settings.mediaUpload,
+				isContentLocked:
+					!! __unstableGetContentLockingParent( clientId ),
+			};
+		},
+		[]
+	);
+
+	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
-		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
+		createErrorNotice( message, { type: 'snackbar' } );
+		setAttributes( {
+			src: undefined,
+			id: undefined,
+			url: undefined,
+		} );
+		setTemporaryURL( undefined );
 	}
 
 	function onSelectImage( media ) {
@@ -109,23 +172,25 @@ export function ImageEdit( {
 				title: undefined,
 				caption: undefined,
 			} );
+
 			return;
 		}
 
-		let mediaAttributes = pickRelevantMediaFiles( media );
-
-		// If the current image is temporary but an alt text was meanwhile
-		// written by the user, make sure the text is not overwritten.
-		if ( isTemporaryImage( id, url ) ) {
-			if ( alt ) {
-				mediaAttributes = omit( mediaAttributes, [ 'alt' ] );
-			}
+		if ( isBlobURL( media.url ) ) {
+			setTemporaryURL( media.url );
+			return;
 		}
+
+		setTemporaryURL();
+
+		let mediaAttributes = pickRelevantMediaFiles( media, imageDefaultSize );
 
 		// If a caption text was meanwhile written by the user,
 		// make sure the text is not overwritten by empty captions.
-		if ( caption && ! get( mediaAttributes, [ 'caption' ] ) ) {
-			mediaAttributes = omit( mediaAttributes, [ 'caption' ] );
+		if ( captionRef.current && ! get( mediaAttributes, [ 'caption' ] ) ) {
+			const { caption: omittedCaption, ...restMediaAttributes } =
+				mediaAttributes;
+			mediaAttributes = restMediaAttributes;
 		}
 
 		let additionalAttributes;
@@ -134,7 +199,11 @@ export function ImageEdit( {
 			additionalAttributes = {
 				width: undefined,
 				height: undefined,
-				sizeSlug: DEFAULT_SIZE_SLUG,
+				// Fallback to size "full" if there's no default image size.
+				// It means the image is smaller, and the block will use a full-size URL.
+				sizeSlug: hasDefaultSize( media, imageDefaultSize )
+					? imageDefaultSize
+					: 'full',
 			};
 		} else {
 			// Keep the same url when selecting the same file, so "Image Size"
@@ -142,21 +211,49 @@ export function ImageEdit( {
 			additionalAttributes = { url };
 		}
 
-		// Check if the image is linked to it's media.
-		if ( linkDestination === LINK_DESTINATION_MEDIA ) {
-			// Update the media link.
-			mediaAttributes.href = media.url;
+		// Check if default link setting should be used.
+		let linkDestination = attributes.linkDestination;
+		if ( ! linkDestination ) {
+			// Use the WordPress option to determine the proper default.
+			// The constants used in Gutenberg do not match WP options so a little more complicated than ideal.
+			// TODO: fix this in a follow up PR, requires updating media-text and ui component.
+			switch (
+				window?.wp?.media?.view?.settings?.defaultProps?.link ||
+				LINK_DESTINATION_NONE
+			) {
+				case 'file':
+				case LINK_DESTINATION_MEDIA:
+					linkDestination = LINK_DESTINATION_MEDIA;
+					break;
+				case 'post':
+				case LINK_DESTINATION_ATTACHMENT:
+					linkDestination = LINK_DESTINATION_ATTACHMENT;
+					break;
+				case LINK_DESTINATION_CUSTOM:
+					linkDestination = LINK_DESTINATION_CUSTOM;
+					break;
+				case LINK_DESTINATION_NONE:
+					linkDestination = LINK_DESTINATION_NONE;
+					break;
+			}
 		}
 
-		// Check if the image is linked to the attachment page.
-		if ( linkDestination === LINK_DESTINATION_ATTACHMENT ) {
-			// Update the media link.
-			mediaAttributes.href = media.link;
+		// Check if the image is linked to it's media.
+		let href;
+		switch ( linkDestination ) {
+			case LINK_DESTINATION_MEDIA:
+				href = media.url;
+				break;
+			case LINK_DESTINATION_ATTACHMENT:
+				href = media.link;
+				break;
 		}
+		mediaAttributes.href = href;
 
 		setAttributes( {
 			...mediaAttributes,
 			...additionalAttributes,
+			linkDestination,
 		} );
 	}
 
@@ -165,7 +262,9 @@ export function ImageEdit( {
 			setAttributes( {
 				url: newURL,
 				id: undefined,
-				sizeSlug: DEFAULT_SIZE_SLUG,
+				width: undefined,
+				height: undefined,
+				sizeSlug: imageDefaultSize,
 			} );
 		}
 	}
@@ -180,7 +279,7 @@ export function ImageEdit( {
 		} );
 	}
 
-	const isTemp = isTemporaryImage( id, url );
+	let isTemp = isTemporaryImage( id, url );
 
 	// Upload a temporary image on mount.
 	useEffect( () => {
@@ -198,7 +297,8 @@ export function ImageEdit( {
 				},
 				allowedTypes: ALLOWED_MEDIA_TYPES,
 				onError: ( message ) => {
-					noticeOperations.createErrorNotice( message );
+					isTemp = false;
+					onUploadError( message );
 				},
 			} );
 		}
@@ -207,35 +307,14 @@ export function ImageEdit( {
 	// If an image is temporary, revoke the Blob url when it is uploaded (and is
 	// no longer temporary).
 	useEffect( () => {
-		if ( ! isTemp ) {
+		if ( isTemp ) {
+			setTemporaryURL( url );
 			return;
 		}
-
-		return () => {
-			revokeBlobURL( url );
-		};
-	}, [ isTemp ] );
+		revokeBlobURL( temporaryURL );
+	}, [ isTemp, url ] );
 
 	const isExternal = isExternalImage( id, url );
-	const controls = (
-		<BlockControls>
-			<BlockAlignmentToolbar
-				value={ align }
-				onChange={ updateAlignment }
-			/>
-			{ url && (
-				<MediaReplaceFlow
-					mediaId={ id }
-					mediaURL={ url }
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					accept="image/*"
-					onSelect={ onSelectImage }
-					onSelectURL={ onSelectURL }
-					onError={ onUploadError }
-				/>
-			) }
-		</BlockControls>
-	);
 	const src = isExternal ? url : undefined;
 	const mediaPreview = !! url && (
 		<img
@@ -246,50 +325,62 @@ export function ImageEdit( {
 		/>
 	);
 
-	const mediaPlaceholder = (
-		<MediaPlaceholder
-			icon={ <BlockIcon icon={ icon } /> }
-			onSelect={ onSelectImage }
-			onSelectURL={ onSelectURL }
-			notices={ noticeUI }
-			onError={ onUploadError }
-			accept="image/*"
-			allowedTypes={ ALLOWED_MEDIA_TYPES }
-			value={ { id, src } }
-			mediaPreview={ mediaPreview }
-			disableMediaButtons={ url }
-		/>
-	);
+	const borderProps = useBorderProps( attributes );
 
 	const classes = classnames( className, {
-		'is-transient': isBlobURL( url ),
+		'is-transient': temporaryURL,
 		'is-resized': !! width || !! height,
-		'is-focused': isSelected,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
+		'has-custom-border':
+			!! borderProps.className || ! isEmpty( borderProps.style ),
 	} );
 
-	// Focussing the image caption after inserting an image relies on the
-	// component remounting. This needs to be fixed.
-	const key = !! url;
+	const blockProps = useBlockProps( {
+		ref,
+		className: classes,
+	} );
 
 	return (
-		<>
-			{ controls }
-			<Block.figure ref={ ref } className={ classes } key={ key }>
-				{ url && (
-					<Image
-						attributes={ attributes }
-						setAttributes={ setAttributes }
-						isSelected={ isSelected }
-						insertBlocksAfter={ insertBlocksAfter }
-						onReplace={ onReplace }
-						containerRef={ ref }
+		<figure { ...blockProps }>
+			{ ( temporaryURL || url ) && (
+				<Image
+					temporaryURL={ temporaryURL }
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					isSelected={ isSelected }
+					insertBlocksAfter={ insertBlocksAfter }
+					onReplace={ onReplace }
+					onSelectImage={ onSelectImage }
+					onSelectURL={ onSelectURL }
+					onUploadError={ onUploadError }
+					containerRef={ ref }
+					context={ context }
+					clientId={ clientId }
+					isContentLocked={ isContentLocked }
+				/>
+			) }
+			{ ! url && ! isContentLocked && (
+				<BlockControls group="block">
+					<BlockAlignmentControl
+						value={ align }
+						onChange={ updateAlignment }
 					/>
-				) }
-				{ mediaPlaceholder }
-			</Block.figure>
-		</>
+				</BlockControls>
+			) }
+			<MediaPlaceholder
+				icon={ <BlockIcon icon={ icon } /> }
+				onSelect={ onSelectImage }
+				onSelectURL={ onSelectURL }
+				onError={ onUploadError }
+				placeholder={ placeholder }
+				accept="image/*"
+				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				value={ { id, src } }
+				mediaPreview={ mediaPreview }
+				disableMediaButtons={ temporaryURL || url }
+			/>
+		</figure>
 	);
 }
 
-export default withNotices( ImageEdit );
+export default ImageEdit;

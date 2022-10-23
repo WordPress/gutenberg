@@ -1,5 +1,12 @@
 .block-editor-block-switcher {
 	position: relative;
+
+	// @todo: override toolbar group inherited paddings from components/block-tools/style.scss.
+	// This is best fixed by making the mover control area a proper single toolbar group.
+	// It needs specificity due to style inherited from .components-accessible-toolbar .components-button.has-icon.has-icon.
+	.components-button.components-dropdown-menu__toggle.has-icon.has-icon {
+		min-width: $button-size;
+	}
 }
 
 // Show an indicator triangle.
@@ -7,7 +14,6 @@
 .block-editor-block-switcher__toggle {
 	position: relative;
 }
-
 
 .components-button.block-editor-block-switcher__toggle,
 .components-button.block-editor-block-switcher__no-switcher-icon {
@@ -20,12 +26,26 @@
 	}
 }
 
-.components-button.block-editor-block-switcher__no-switcher-icon {
-	width: $block-toolbar-height;
+.block-editor-block-switcher__toggle-text {
+	margin-left: $grid-unit-10;
 
-	.block-editor-blocks-icon {
+	// Account for double label when show-text-buttons is set.
+	.show-icon-labels & {
+		display: none;
+	}
+}
+
+.show-icon-labels .block-editor-block-toolbar .block-editor-block-switcher .components-button.has-icon::after {
+	font-size: 14px;
+}
+
+.components-button.block-editor-block-switcher__no-switcher-icon {
+	display: flex;
+
+	.block-editor-block-icon {
 		margin-right: auto;
 		margin-left: auto;
+		min-width: $icon-size !important;
 	}
 }
 
@@ -36,7 +56,7 @@
 	// Since it's not clickable, though, don't show a hover state.
 	&,
 	.block-editor-block-icon.has-colors {
-		color: $dark-gray-primary !important;
+		color: $gray-900;
 	}
 }
 
@@ -46,14 +66,13 @@
 .block-editor-block-toolbar .components-toolbar .components-button.block-editor-block-switcher__no-switcher-icon.has-icon.has-icon,
 .block-editor-block-toolbar .components-toolbar-group .components-button.block-editor-block-switcher__toggle.has-icon.has-icon,
 .block-editor-block-toolbar .components-toolbar .components-button.block-editor-block-switcher__toggle.has-icon.has-icon {
-	padding: 0;
-
 	.block-editor-block-icon {
 		height: 100%;
 		position: relative;
 		margin: 0 auto;
 		display: flex;
 		align-items: center;
+		min-width: 100%;
 	}
 
 	// Position the focus style correctly.
@@ -65,82 +84,51 @@
 	}
 }
 
-
-// We double the max-width for it to fit both the preview & content but we keep the min width the same for the border to work.
 .components-popover.block-editor-block-switcher__popover .components-popover__content {
 	min-width: 300px;
-	max-width: calc(340px * 2);
-	display: flex;
-	background: $white;
-	padding: 0;
+}
 
-	.components-menu-group {
-		padding: $grid-unit-20 $grid-unit-30;
-	}
-
-	.components-menu-group + .components-menu-group {
-		border-color: $light-gray-secondary;
+.block-editor-block-switcher__popover__preview__parent {
+	.block-editor-block-switcher__popover__preview__container {
+		position: absolute;
+		top: -$grid-unit-15;
+		left: calc(100% + #{$grid-unit-20});
 	}
 }
 
-.block-editor-block-switcher__popover .components-popover__content {
-	.block-editor-block-switcher__container {
-		min-width: 300px;
-		max-width: 340px;
-		width: 50%;
+.block-editor-block-switcher__preview__popover {
+	display: none;
+
+	// Position correctly. Needs specificity.
+	&.components-popover {
+		margin-top: $grid-unit-15 - $border-width;
 	}
 
-	.block-editor-block-switcher__label {
-		margin-bottom: $grid-unit-15;
-		color: $medium-gray-text;
-		text-transform: uppercase;
-		font-size: 11px;
-		font-weight: 500;
+	@include break-medium() {
+		display: block;
 	}
 
-	@include break-medium {
-		position: relative;
-
-		.block-editor-block-switcher__preview {
-			border-left: $border-width solid $light-gray-500;
-			box-shadow: $shadow-popover;
-			background: $white;
-			width: 300px;
-			height: auto;
-			// Sticky helps us keep the preview at the top when scrolling
-			position: sticky;
-			align-self: stretch;
-			// For sticky to work we need top
-			top: 0;
-			padding: 10px;
-		}
+	.components-popover__content {
+		box-shadow: none;
+		border: $border-width solid $gray-900;
+		background: $white;
+		border-radius: $radius-block-ui;
+		outline: none;
 	}
 
-	// Hide the bottom border on the last panel so it stacks with the popover.
-	.components-panel__body {
-		border: 0;
-
-		// Elevate this so the hover style is visible.
-		position: relative;
-		z-index: 1;
+	.block-editor-block-switcher__preview {
+		width: 300px;
+		height: auto;
+		// Subtract margin from max-height.
+		max-height: calc(500px - #{$grid-unit-40});
+		margin: $grid-unit-20;
+		overflow: hidden;
 	}
-
-	.components-panel__body + .components-panel__body {
-		border-top: $border-width solid $light-gray-500;
-	}
-}
-
-.block-editor-block-switcher__popover .block-editor-block-styles {
-	margin: 0 -3px; // Remove the panel body padding while keeping it for the title.
-}
-
-.block-editor-block-switcher__popover .block-editor-block-types-list {
-	margin: $grid-unit-15 0 0 0;
 }
 
 .block-editor-block-switcher__preview-title {
 	margin-bottom: $grid-unit-15;
-	color: $medium-gray-text;
+	color: $gray-700;
 	text-transform: uppercase;
 	font-size: 11px;
 	font-weight: 500;
@@ -148,17 +136,14 @@
 
 // The block switcher in the contextual toolbar should be bigger.
 .block-editor-block-contextual-toolbar {
-	.components-button.block-editor-block-switcher__toggle,
 	.components-button.block-editor-block-switcher__no-switcher-icon {
-		height: $grid-unit-60;
-	}
-
-	.components-button.block-editor-block-switcher__no-switcher-icon {
-		width: $grid-unit-60;
+		min-width: $button-size;
 	}
 
 	.components-button.block-editor-block-switcher__no-switcher-icon,
 	.components-button.block-editor-block-switcher__toggle {
+		height: $grid-unit-60;
+
 		.block-editor-block-icon,
 		.block-editor-block-switcher__transform {
 			width: $block-toolbar-height;
@@ -167,6 +152,45 @@
 
 		.block-editor-block-switcher__transform {
 			padding: $grid-unit-15;
+		}
+	}
+}
+
+.block-editor-block-switcher__preview-patterns-container {
+	padding-bottom: $grid-unit-20;
+
+	.block-editor-block-switcher__preview-patterns-container-list__list-item {
+		margin-top: $grid-unit-20;
+
+		.block-editor-block-preview__container {
+			cursor: pointer;
+		}
+
+		.block-editor-block-switcher__preview-patterns-container-list__item {
+			height: 100%;
+			border-radius: $radius-block-ui;
+			transition: all 0.05s ease-in-out;
+			position: relative;
+			border: $border-width solid transparent;
+
+			&:hover,
+			&:focus {
+				box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+				// Windows High Contrast mode will show this outline, but not the box-shadow.
+				outline: 2px solid transparent;
+			}
+
+			&:hover {
+				box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) $gray-900;
+			}
+
+			.block-editor-block-switcher__preview-patterns-container-list__item-title {
+				padding: $grid-unit-05;
+				font-size: 12px;
+				text-align: center;
+				cursor: pointer;
+			}
 		}
 	}
 }

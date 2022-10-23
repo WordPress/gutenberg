@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty } from 'lodash';
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -96,7 +95,7 @@ describe( 'Slot', () => {
 	it( 'calls the functions passed as the Slot’s fillProps in the Fill', () => {
 		const onClose = jest.fn();
 
-		const { getByText } = render(
+		render(
 			<Provider>
 				<Slot name="chicken" fillProps={ { onClose } } />
 				<Fill name="chicken">
@@ -109,7 +108,7 @@ describe( 'Slot', () => {
 			</Provider>
 		);
 
-		fireEvent.click( getByText( 'Click me' ) );
+		fireEvent.click( screen.getByText( 'Click me' ) );
 
 		expect( onClose ).toHaveBeenCalledTimes( 1 );
 	} );
@@ -120,9 +119,9 @@ describe( 'Slot', () => {
 				<div>
 					<Slot name="chicken">
 						{ ( fills ) =>
-							! isEmpty( fills ) && (
+							[ ...fills ].length ? (
 								<blockquote>{ fills }</blockquote>
-							)
+							) : null
 						}
 					</Slot>
 				</div>
@@ -151,7 +150,7 @@ describe( 'Slot', () => {
 	} );
 
 	it( 'should re-render Slot when not bubbling virtually', () => {
-		const { container, getByRole } = render(
+		const { container } = render(
 			<Provider>
 				<div>
 					<Slot name="egg" />
@@ -162,12 +161,73 @@ describe( 'Slot', () => {
 
 		expect( container ).toMatchSnapshot();
 
-		fireEvent.click( getByRole( 'button' ) );
+		fireEvent.click( screen.getByRole( 'button' ) );
 
 		expect( container ).toMatchSnapshot();
 	} );
 
-	it( 'should render in expected order', () => {
+	it( 'should render in expected order when fills always mounted', () => {
+		const { container, rerender } = render(
+			<Provider>
+				<div key="slot">
+					<Slot name="egg" />
+				</div>
+			</Provider>
+		);
+
+		rerender(
+			<Provider>
+				<div key="slot">
+					<Slot name="egg" />
+				</div>
+				<Fill name="egg" key="first">
+					first
+				</Fill>
+				<Fill name="egg" key="second">
+					second
+				</Fill>
+			</Provider>
+		);
+
+		rerender(
+			<Provider>
+				<div key="slot">
+					<Slot name="egg" />
+				</div>
+				<Fill name="egg" key="first" />
+				<Fill name="egg" key="second">
+					second
+				</Fill>
+				<Fill name="egg" key="third">
+					third
+				</Fill>
+			</Provider>
+		);
+
+		rerender(
+			<Provider>
+				<div key="slot">
+					<Slot name="egg" />
+				</div>
+				<Fill name="egg" key="first">
+					first (rerendered)
+				</Fill>
+				<Fill name="egg" key="second">
+					second
+				</Fill>
+				<Fill name="egg" key="third">
+					third
+				</Fill>
+				<Fill name="egg" key="fourth">
+					fourth (new)
+				</Fill>
+			</Provider>
+		);
+
+		expect( container ).toMatchSnapshot();
+	} );
+
+	it( 'should render in expected order when fills unmounted', () => {
 		const { container, rerender } = render(
 			<Provider>
 				<div key="slot">
@@ -192,6 +252,7 @@ describe( 'Slot', () => {
 					<Slot name="egg" />
 				</div>
 				<Filler name="egg" key="second" text="second" />
+				<Filler name="egg" key="third" text="third" />
 			</Provider>
 		);
 
@@ -200,12 +261,28 @@ describe( 'Slot', () => {
 				<div key="slot">
 					<Slot name="egg" />
 				</div>
-				<Filler name="egg" key="first" text="first" />
+				<Filler name="egg" key="first" text="first (rerendered)" />
 				<Filler name="egg" key="second" text="second" />
+				<Filler name="egg" key="third" text="third" />
+				<Filler name="egg" key="fourth" text="fourth (new)" />
 			</Provider>
 		);
 
 		expect( container ).toMatchSnapshot();
+	} );
+
+	it( 'should warn without a Provider', () => {
+		const { container } = render(
+			<>
+				<div>
+					<Slot name="chicken" bubblesVirtually />
+				</div>
+				<Fill name="chicken" />
+			</>
+		);
+
+		expect( container ).toMatchSnapshot();
+		expect( console ).toHaveWarned();
 	} );
 
 	describe.each( [ false, true ] )(
@@ -298,22 +375,6 @@ describe( 'Slot', () => {
 						<Fill name="egg">Content</Fill>
 					</Provider>
 				);
-				expect( container ).toMatchSnapshot();
-			} );
-
-			it( 'should not break without a Provider', () => {
-				const { container } = render(
-					<>
-						<div>
-							<Slot
-								name="chicken"
-								bubblesVirtually={ bubblesVirtually }
-							/>
-						</div>
-						<Fill name="chicken" />
-					</>
-				);
-
 				expect( container ).toMatchSnapshot();
 			} );
 		}

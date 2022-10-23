@@ -9,7 +9,10 @@ import { useState } from '@wordpress/element';
 import Radio from '../../radio';
 import RadioGroup from '../';
 
-export default { title: 'Components/RadioGroup', component: RadioGroup };
+export default {
+	title: 'Components (Experimental)/RadioGroup',
+	component: RadioGroup,
+};
 
 export const _default = () => {
 	/* eslint-disable no-restricted-syntax */
@@ -17,7 +20,7 @@ export const _default = () => {
 		<RadioGroup
 			// id is required for server side rendering
 			id="default-radiogroup"
-			accessibilityLabel="options"
+			label="options"
 			defaultChecked="option2"
 		>
 			<Radio value="option1">Option 1</Radio>
@@ -35,7 +38,7 @@ export const disabled = () => {
 			// id is required for server side rendering
 			id="disabled-radiogroup"
 			disabled
-			accessibilityLabel="options"
+			label="options"
 			defaultChecked="option2"
 		>
 			<Radio value="option1">Option 1</Radio>
@@ -47,20 +50,20 @@ export const disabled = () => {
 };
 
 const ControlledRadioGroupWithState = () => {
-	const [ checked, setChecked ] = useState( 'option2' );
+	const [ checked, setChecked ] = useState( 1 );
 
 	/* eslint-disable no-restricted-syntax */
 	return (
 		<RadioGroup
 			// id is required for server side rendering
 			id="controlled-radiogroup"
-			accessibilityLabel="options"
+			label="options"
 			checked={ checked }
 			onChange={ setChecked }
 		>
-			<Radio value="option1">Option 1</Radio>
-			<Radio value="option2">Option 2</Radio>
-			<Radio value="option3">Option 3</Radio>
+			<Radio value={ 0 }>Option 1</Radio>
+			<Radio value={ 1 }>Option 2</Radio>
+			<Radio value={ 2 }>Option 3</Radio>
 		</RadioGroup>
 	);
 	/* eslint-enable no-restricted-syntax */

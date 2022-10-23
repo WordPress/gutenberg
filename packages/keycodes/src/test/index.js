@@ -91,9 +91,9 @@ describe( 'displayShortcutList', () => {
 			expect( shortcut ).toEqual( [ 'Shift', '+', 'Alt', '+', 'M' ] );
 		} );
 
-		it( 'should output [^, ⌥, M ] on MacOS', () => {
+		it( 'should output [⌃, ⌥, M ] on MacOS', () => {
 			const shortcut = displayShortcutList.access( 'm', isAppleOSTrue );
-			expect( shortcut ).toEqual( [ '^', '⌥', 'M' ] );
+			expect( shortcut ).toEqual( [ '⌃', '⌥', 'M' ] );
 		} );
 	} );
 } );
@@ -159,7 +159,7 @@ describe( 'displayShortcut', () => {
 
 		it( 'should output control+option symbols on MacOS', () => {
 			const shortcut = displayShortcut.access( 'm', isAppleOSTrue );
-			expect( shortcut ).toEqual( '^⌥M' );
+			expect( shortcut ).toEqual( '⌃⌥M' );
 		} );
 	} );
 } );
@@ -277,10 +277,13 @@ describe( 'isKeyboardEvent', () => {
 		}
 	} );
 
-	function keyPress( target, modifiers = {} ) {
+	function keyPress( target, modifiers ) {
 		[ 'keydown', 'keypress', 'keyup' ].forEach( ( eventName ) => {
-			const event = new window.Event( eventName, { bubbles: true } );
-			Object.assign( event, modifiers );
+			const event = new window.KeyboardEvent( eventName, {
+				...modifiers,
+				bubbles: true,
+				keyCode: modifiers.key.charCodeAt( 0 ),
+			} );
 			target.dispatchEvent( event );
 		} );
 	}

@@ -1,19 +1,31 @@
 /**
  * External dependencies
  */
-import { find, pickBy, reduce, some, upperFirst } from 'lodash';
+import { find, pickBy, reduce, some } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { createHigherOrderComponent, compose } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
-import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { getFontSize, getFontSizeClass } from './utils';
+import useSetting from '../use-setting';
+
+const DEFAULT_FONT_SIZES = [];
+
+/**
+ * Capitalizes the first letter in a string.
+ *
+ * @param {string} str The string whose first letter the function will capitalize.
+ *
+ * @return {string} Capitalized string.
+ */
+const upperFirst = ( [ firstLetter, ...rest ] ) =>
+	firstLetter.toUpperCase() + rest.join( '' );
 
 /**
  * Higher-order component, which handles font size logic for class generation,
@@ -44,14 +56,20 @@ export default ( ...fontSizeNames ) => {
 
 	return createHigherOrderComponent(
 		compose( [
-			withSelect( ( select ) => {
-				const { fontSizes } = select(
-					'core/block-editor'
-				).getSettings();
-				return {
-					fontSizes,
-				};
-			} ),
+			createHigherOrderComponent(
+				( WrappedComponent ) => ( props ) => {
+					const fontSizes =
+						useSetting( 'typography.fontSizes' ) ||
+						DEFAULT_FONT_SIZES;
+					return (
+						<WrappedComponent
+							{ ...props }
+							fontSizes={ fontSizes }
+						/>
+					);
+				},
+				'withFontSizes'
+			),
 			( WrappedComponent ) => {
 				return class extends Component {
 					constructor( props ) {
@@ -70,9 +88,8 @@ export default ( ...fontSizeNames ) => {
 								customFontSizeAttributeName,
 								fontSizeAttributeName
 							) => {
-								const upperFirstFontSizeAttributeName = upperFirst(
-									fontSizeAttributeName
-								);
+								const upperFirstFontSizeAttributeName =
+									upperFirst( fontSizeAttributeName );
 								settersAccumulator[
 									`set${ upperFirstFontSizeAttributeName }`
 								] = this.createSetFontSize(
@@ -115,7 +132,7 @@ export default ( ...fontSizeNames ) => {
 							fontSizeAttributeName
 						) => {
 							if ( previousState[ fontSizeAttributeName ] ) {
-								// if new font size is name compare with the previous slug
+								// If new font size is name compare with the previous slug.
 								if ( attributes[ fontSizeAttributeName ] ) {
 									return (
 										attributes[ fontSizeAttributeName ] !==
@@ -123,14 +140,14 @@ export default ( ...fontSizeNames ) => {
 											.slug
 									);
 								}
-								// if font size is not named, update when the font size value changes.
+								// If font size is not named, update when the font size value changes.
 								return (
 									previousState[ fontSizeAttributeName ]
 										.size !==
 									attributes[ customFontSizeAttributeName ]
 								);
 							}
-							// in this case we need to build the font size object
+							// In this case we need to build the font size object.
 							return true;
 						};
 

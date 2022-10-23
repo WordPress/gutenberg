@@ -18,11 +18,10 @@
 	}
 
 	@include break-medium() {
-		z-index: z-index(".entities-saved-states__panel {greater than small}");
 		top: $admin-bar-height;
 		left: auto;
 		width: $sidebar-width;
-		border-left: $border-width solid $light-gray-500;
+		border-left: $border-width solid $gray-300;
 
 		body.is-fullscreen-mode & {
 			top: 0;
@@ -41,23 +40,10 @@
 		padding-left: $grid-unit-10;
 		padding-right: $grid-unit-10;
 		height: $header-height + $border-width;
-		border-bottom: $border-width solid $light-gray-500;
-		display: flex;
-		align-items: center;
-		align-content: space-between;
-
-		.editor-entities-saved-states__save-button {
-			margin: auto;
-		}
-
-		.components-button.has-icon {
-			position: absolute;
-			right: $grid-unit-10;
-		}
+		border-bottom: $border-width solid $gray-300;
 	}
 
 	.entities-saved-states__text-prompt {
-		border-bottom: $border-width solid $light-gray-500;
 		padding: $grid-unit-20;
 		padding-bottom: $grid-unit-05;
 	}

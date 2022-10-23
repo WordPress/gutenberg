@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { act, fireEvent, render } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -16,7 +16,10 @@ import Sandbox from '../';
 describe( 'Sandbox', () => {
 	const TestWrapper = () => {
 		const [ html, setHtml ] = useState(
-			'<iframe class="mock-iframe" src="https://super.embed"></iframe>'
+			// MuatationObserver implementation from JSDom does not work as intended
+			// with iframes so we need to ignore it for the time being.
+			'<script type="text/javascript">window.MutationObserver = null;</script>' +
+				'<iframe class="mock-iframe" src="https://super.embed"></iframe>'
 		);
 
 		const updateHtml = () => {
@@ -35,44 +38,26 @@ describe( 'Sandbox', () => {
 		);
 	};
 
-	beforeAll( () => {
-		// MuatationObserver implmentation from JSDom does not work as intended
-		// with iframes so we need to ignore it for the time being.
-		jest.spyOn(
-			global.MutationObserver.prototype,
-			'observe'
-		).mockImplementation( () => {} );
-	} );
-
-	afterAll( () => {
-		global.MutationObserver.prototype.mockReset();
-	} );
-
 	it( 'should rerender with new emdeded content if html prop changes', () => {
-		let result;
-		act( () => {
-			result = render( <TestWrapper /> );
-		} );
+		const { container } = render( <TestWrapper /> );
 
-		const iframe = result.container.querySelector( '.components-sandbox' );
+		const iframe = container.querySelector( '.components-sandbox' );
 
-		let sandboxedIframe = iframe.contentWindow.document.body.querySelector(
-			'.mock-iframe'
-		);
+		let sandboxedIframe =
+			iframe.contentWindow.document.body.querySelector( '.mock-iframe' );
 
-		expect( sandboxedIframe.getAttribute( 'src' ) ).toBe(
+		expect( sandboxedIframe ).toHaveAttribute(
+			'src',
 			'https://super.embed'
 		);
 
-		act( () => {
-			fireEvent.click( result.getByRole( 'button' ) );
-		} );
+		fireEvent.click( screen.getByRole( 'button' ) );
 
-		sandboxedIframe = iframe.contentWindow.document.body.querySelector(
-			'.mock-iframe'
-		);
+		sandboxedIframe =
+			iframe.contentWindow.document.body.querySelector( '.mock-iframe' );
 
-		expect( sandboxedIframe.getAttribute( 'src' ) ).toBe(
+		expect( sandboxedIframe ).toHaveAttribute(
+			'src',
 			'https://another.super.embed'
 		);
 	} );

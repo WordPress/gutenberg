@@ -10,7 +10,7 @@
 	flex-direction: column;
 	width: 100%;
 	font-size: $default-font-size;
-	color: $dark-gray-700;
+	color: $gray-900;
 	padding: $grid-unit-10;
 	align-items: stretch;
 	justify-content: center;
@@ -18,7 +18,6 @@
 	background: transparent;
 	word-break: break-word;
 	border-radius: $radius-block-ui;
-	border: $border-width solid transparent;
 	transition: all 0.05s ease-in-out;
 	@include reduce-motion("transition");
 	position: relative;
@@ -31,13 +30,37 @@
 
 	&:not(:disabled) {
 		&:hover {
-			border-color: var(--wp-admin-theme-color);
-			color: var(--wp-admin-theme-color) !important;
+			.block-editor-block-types-list__item-title {
+				color: var(--wp-admin-theme-color) !important;
+				filter: brightness(0.95);
+			}
+
+			svg {
+				color: var(--wp-admin-theme-color) !important;
+			}
+
+			&::after {
+				content: "";
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				border-radius: $radius-block-ui;
+				opacity: 0.04;
+				background: var(--wp-admin-theme-color);
+				// This fixes drag-and-drop in Firefox.
+				pointer-events: none;
+			}
+		}
+
+		&:focus {
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		}
 
 		&.is-active {
 			color: $white;
-			background: $dark-gray-primary;
+			background: $gray-900;
 
 			// Windows High Contrast mode will show this outline, but not the box-shadow.
 			outline: 2px solid transparent;
@@ -49,7 +72,7 @@
 .block-editor-block-types-list__item-icon {
 	padding: 12px 20px;
 	border-radius: $radius-block-ui;
-	color: $dark-gray-primary;
+	color: $gray-900;
 	transition: all 0.05s ease-in-out;
 	@include reduce-motion("transition");
 
@@ -61,6 +84,10 @@
 	svg {
 		transition: all 0.15s ease-out;
 		@include reduce-motion("transition");
+	}
+
+	.block-editor-block-types-list__list-item[draggable="true"] & {
+		cursor: grab;
 	}
 }
 

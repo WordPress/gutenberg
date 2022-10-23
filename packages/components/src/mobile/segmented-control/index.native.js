@@ -6,11 +6,9 @@ import {
 	TouchableWithoutFeedback,
 	Text,
 	Platform,
-	LayoutAnimation,
 	Animated,
 	Easing,
 } from 'react-native';
-import { take, values, map, reduce } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -20,13 +18,14 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import { performLayoutAnimation } from '../layout-animation';
 import styles from './style.scss';
 
 const ANIMATION_DURATION = 200;
 
 const isIOS = Platform.OS === 'ios';
 
-const Segment = ( { isSelected, title, onPress, onLayout } ) => {
+const Segment = ( { isSelected, title, onPress, onLayout, ...props } ) => {
 	const isSelectedIOS = isIOS && isSelected;
 
 	const segmentStyle = [ styles.segment, isIOS && styles.segmentIOS ];
@@ -44,7 +43,7 @@ const Segment = ( { isSelected, title, onPress, onLayout } ) => {
 	return (
 		<View style={ isSelectedIOS && shadowStyle }>
 			<TouchableWithoutFeedback onPress={ onPress }>
-				<View style={ segmentStyle } onLayout={ onLayout }>
+				<View style={ segmentStyle } onLayout={ onLayout } { ...props }>
 					<Text
 						style={ [ textStyle, isSelected && selectedTextStyle ] }
 						maxFontSizeMultiplier={ 2 }
@@ -65,9 +64,8 @@ const SegmentedControls = ( {
 	addonRight,
 } ) => {
 	const selectedSegmentIndex = selectedIndex || 0;
-	const [ activeSegmentIndex, setActiveSegmentIndex ] = useState(
-		selectedSegmentIndex
-	);
+	const [ activeSegmentIndex, setActiveSegmentIndex ] =
+		useState( selectedSegmentIndex );
 	const [ segmentsDimensions, setSegmentsDimensions ] = useState( {
 		[ activeSegmentIndex ]: { width: 0, height: 0 },
 	} );
@@ -76,12 +74,18 @@ const SegmentedControls = ( {
 	useEffect( () => {
 		setActiveSegmentIndex( selectedSegmentIndex );
 		segmentHandler( segments[ selectedSegmentIndex ] );
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
 	useEffect( () => {
 		positionAnimationValue.setValue(
 			calculateEndValue( activeSegmentIndex )
 		);
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ segmentsDimensions ] );
 
 	const containerStyle = usePreferredColorSchemeStyle(
@@ -89,11 +93,12 @@ const SegmentedControls = ( {
 		styles.containerDark
 	);
 
-	function performAnimation( index ) {
+	function performSwatchAnimation( index ) {
 		Animated.timing( positionAnimationValue, {
 			toValue: calculateEndValue( index ),
 			duration: ANIMATION_DURATION,
 			easing: Easing.ease,
+			useNativeDriver: false,
 		} ).start();
 	}
 
@@ -101,11 +106,13 @@ const SegmentedControls = ( {
 		const { paddingLeft: offset } = isIOS
 			? styles.containerIOS
 			: styles.container;
-		const widths = map( values( segmentsDimensions ), 'width' );
-		const widthsDistance = take( widths, index );
-		const widthsDistanceSum = reduce(
-			widthsDistance,
-			( sum, n ) => sum + n
+		const widths = Object.values( segmentsDimensions ).map(
+			( dimension ) => dimension.width
+		);
+		const widthsDistance = widths.slice( 0, index );
+		const widthsDistanceSum = widthsDistance.reduce(
+			( sum, n ) => sum + n,
+			0
 		);
 
 		const endValue = index === 0 ? 0 : widthsDistanceSum;
@@ -113,16 +120,10 @@ const SegmentedControls = ( {
 	}
 
 	function onHandlePress( segment, index ) {
-		LayoutAnimation.configureNext(
-			LayoutAnimation.create(
-				ANIMATION_DURATION,
-				LayoutAnimation.Types.easeInEaseOut,
-				LayoutAnimation.Properties.opacity
-			)
-		);
+		performLayoutAnimation( ANIMATION_DURATION );
 		setActiveSegmentIndex( index );
 		segmentHandler( segment );
-		performAnimation( index, segment );
+		performSwatchAnimation( index );
 	}
 
 	function segmentOnLayout( event, index ) {
@@ -158,6 +159,14 @@ const SegmentedControls = ( {
 							onLayout={ ( event ) =>
 								segmentOnLayout( event, index )
 							}
+							accessibilityState={ {
+								selected: activeSegmentIndex === index,
+							} }
+							accessibilityRole={ 'button' }
+							accessibilityLabel={ segment }
+							accessibilityHint={ `${ index + 1 } on ${
+								segments.length
+							}` }
 						/>
 					);
 				} ) }

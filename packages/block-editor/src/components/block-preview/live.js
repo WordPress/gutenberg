@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { Disabled } from '@wordpress/components';
-
-/**
  * Internal dependencies
  */
 import BlockList from '../block-list';
@@ -16,9 +11,9 @@ export default function LiveBlockPreview( { onClick } ) {
 			onClick={ onClick }
 			onKeyPress={ onClick }
 		>
-			<Disabled>
+			<div inert="true">
 				<BlockList />
-			</Disabled>
+			</div>
 		</div>
 	);
 }

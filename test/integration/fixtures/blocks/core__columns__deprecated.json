@@ -1,0 +1,72 @@
+[
+	{
+		"name": "core/columns",
+		"isValid": true,
+		"attributes": {
+			"isStackedOnMobile": true
+		},
+		"innerBlocks": [
+			{
+				"name": "core/column",
+				"isValid": true,
+				"attributes": {},
+				"innerBlocks": [
+					{
+						"name": "core/paragraph",
+						"isValid": true,
+						"attributes": {
+							"content": "Column One, Paragraph One",
+							"dropCap": false,
+							"className": "layout-column-1"
+						},
+						"innerBlocks": []
+					},
+					{
+						"name": "core/paragraph",
+						"isValid": true,
+						"attributes": {
+							"content": "Column One, Paragraph Two",
+							"dropCap": false,
+							"className": "layout-column-1"
+						},
+						"innerBlocks": []
+					}
+				]
+			},
+			{
+				"name": "core/column",
+				"isValid": true,
+				"attributes": {},
+				"innerBlocks": [
+					{
+						"name": "core/paragraph",
+						"isValid": true,
+						"attributes": {
+							"content": "Column Two, Paragraph One",
+							"dropCap": false,
+							"className": "layout-column-2"
+						},
+						"innerBlocks": []
+					}
+				]
+			},
+			{
+				"name": "core/column",
+				"isValid": true,
+				"attributes": {},
+				"innerBlocks": [
+					{
+						"name": "core/paragraph",
+						"isValid": true,
+						"attributes": {
+							"content": "Column Three, Paragraph One",
+							"dropCap": false,
+							"className": "layout-column-3"
+						},
+						"innerBlocks": []
+					}
+				]
+			}
+		]
+	}
+]

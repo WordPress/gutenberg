@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { clickBlockAppender, createNewPost } from '@wordpress/e2e-test-utils';
+import {
+	clickBlockAppender,
+	createNewPost,
+	showBlockToolbar,
+} from '@wordpress/e2e-test-utils';
 
 describe( 'isTyping', () => {
 	beforeEach( async () => {
@@ -13,18 +17,17 @@ describe( 'isTyping', () => {
 
 		await clickBlockAppender();
 
-		// Type in a paragraph
+		// Type in a paragraph.
 		await page.keyboard.type( 'Type' );
 
 		// Toolbar is hidden
 		let blockToolbar = await page.$( blockToolbarSelector );
 		expect( blockToolbar ).toBe( null );
 
-		// Moving the mouse shows the toolbar
-		await page.mouse.move( 0, 0 );
-		await page.mouse.move( 10, 10 );
+		// Moving the mouse shows the toolbar.
+		await showBlockToolbar();
 
-		// Toolbar is visible
+		// Toolbar is visible.
 		blockToolbar = await page.$( blockToolbarSelector );
 		expect( blockToolbar ).not.toBe( null );
 
@@ -37,9 +40,9 @@ describe( 'isTyping', () => {
 	} );
 
 	it( 'should not close the dropdown when typing in it', async () => {
-		// Adds a Dropdown with an input to all blocks
+		// Adds a Dropdown with an input to all blocks.
 		await page.evaluate( () => {
-			const { Dropdown, Button, Fill } = wp.components;
+			const { Dropdown, ToolbarButton, Fill } = wp.components;
 			const { createElement: el, Fragment } = wp.element;
 			function AddDropdown( BlockListBlock ) {
 				return ( props ) => {
@@ -52,7 +55,7 @@ describe( 'isTyping', () => {
 							el( Dropdown, {
 								renderToggle: ( { onToggle } ) =>
 									el(
-										Button,
+										ToolbarButton,
 										{
 											onClick: onToggle,
 											className: 'dropdown-open',
@@ -79,20 +82,19 @@ describe( 'isTyping', () => {
 
 		await clickBlockAppender();
 
-		// Type in a paragraph
+		// Type in a paragraph.
 		await page.keyboard.type( 'Type' );
 
-		// Show Toolbar
-		await page.mouse.move( 0, 0 );
-		await page.mouse.move( 10, 10 );
+		// Show Toolbar.
+		await showBlockToolbar();
 
-		// Open the dropdown
+		// Open the dropdown.
 		await page.click( '.dropdown-open' );
 
 		// Type inside the dropdown's input
 		await page.type( '.dropdown-input', 'Random' );
 
-		// The input should still be visible
+		// The input should still be visible.
 		const input = await page.$( '.dropdown-input' );
 		expect( input ).not.toBe( null );
 	} );

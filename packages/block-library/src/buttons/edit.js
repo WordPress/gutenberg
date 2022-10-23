@@ -1,37 +1,69 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
-	__experimentalAlignmentHookSettingsProvider as AlignmentHookSettingsProvider,
-	InnerBlocks,
-	__experimentalBlock as Block,
+	useBlockProps,
+	useInnerBlocksProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { name as buttonBlockName } from '../button/';
+import { name as buttonBlockName } from '../button';
 
 const ALLOWED_BLOCKS = [ buttonBlockName ];
-const BUTTONS_TEMPLATE = [ [ 'core/button' ] ];
 
-// Inside buttons block alignment options are not supported.
-const alignmentHooksSetting = {
-	isEmbedButton: true,
+const DEFAULT_BLOCK = {
+	name: buttonBlockName,
+	attributesToCopy: [
+		'backgroundColor',
+		'border',
+		'className',
+		'fontFamily',
+		'fontSize',
+		'gradient',
+		'style',
+		'textColor',
+		'width',
+	],
 };
 
-function ButtonsEdit() {
-	return (
-		<Block.div>
-			<AlignmentHookSettingsProvider value={ alignmentHooksSetting }>
-				<InnerBlocks
-					allowedBlocks={ ALLOWED_BLOCKS }
-					template={ BUTTONS_TEMPLATE }
-					__experimentalMoverDirection="horizontal"
-				/>
-			</AlignmentHookSettingsProvider>
-		</Block.div>
-	);
+function ButtonsEdit( { attributes, className } ) {
+	const { fontSize, layout = {}, style } = attributes;
+	const blockProps = useBlockProps( {
+		className: classnames( className, {
+			'has-custom-font-size': fontSize || style?.typography?.fontSize,
+		} ),
+	} );
+	const preferredStyle = useSelect( ( select ) => {
+		const preferredStyleVariations =
+			select( blockEditorStore ).getSettings()
+				.__experimentalPreferredStyleVariations;
+		return preferredStyleVariations?.value?.[ buttonBlockName ];
+	}, [] );
+
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		allowedBlocks: ALLOWED_BLOCKS,
+		__experimentalDefaultBlock: DEFAULT_BLOCK,
+		__experimentalDirectInsert: true,
+		template: [
+			[
+				buttonBlockName,
+				{ className: preferredStyle && `is-style-${ preferredStyle }` },
+			],
+		],
+		__experimentalLayout: layout,
+		templateInsertUpdatesSelection: true,
+	} );
+
+	return <div { ...innerBlocksProps } />;
 }
 
 export default ButtonsEdit;

@@ -1,14 +1,9 @@
 /**
- * External dependencies
- */
-import { debounce, without } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
 import { addAction, applyFilters, removeAction } from '@wordpress/hooks';
-import { createHigherOrderComponent } from '@wordpress/compose';
+import { createHigherOrderComponent, debounce } from '@wordpress/compose';
 
 const ANIMATION_FRAME_PERIOD = 16;
 
@@ -64,10 +59,10 @@ export default function withFilters( hookName ) {
 			}
 
 			componentWillUnmount() {
-				FilteredComponentRenderer.instances = without(
-					FilteredComponentRenderer.instances,
-					this
-				);
+				FilteredComponentRenderer.instances =
+					FilteredComponentRenderer.instances.filter(
+						( instance ) => instance !== this
+					);
 
 				// If this was the last of the mounted components filtered on
 				// this hook, remove the hook handler.

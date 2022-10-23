@@ -13,11 +13,14 @@ import useSelect from '../use-select';
  * selectors.
  *
  * @param {Function} mapSelectToProps Function called on every state change,
- *                                   expected to return object of props to
- *                                   merge with the component's own props.
+ *                                    expected to return object of props to
+ *                                    merge with the component's own props.
  *
  * @example
  * ```js
+ * import { withSelect } from '@wordpress/data';
+ * import { store as myCustomStore } from 'my-custom-store';
+ *
  * function PriceDisplay( { price, currency } ) {
  * 	return new Intl.NumberFormat( 'en-US', {
  * 		style: 'currency',
@@ -25,10 +28,8 @@ import useSelect from '../use-select';
  * 	} ).format( price );
  * }
  *
- * const { withSelect } = wp.data;
- *
  * const HammerPriceDisplay = withSelect( ( select, ownProps ) => {
- * 	const { getPrice } = select( 'my-shop' );
+ * 	const { getPrice } = select( myCustomStore );
  * 	const { currency } = ownProps;
  *
  * 	return {

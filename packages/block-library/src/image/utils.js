@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, each } from 'lodash';
+import { isEmpty, get } from 'lodash';
 
 /**
  * Internal dependencies
@@ -13,7 +13,7 @@ export function removeNewTabRel( currentRel ) {
 
 	if ( currentRel !== undefined && ! isEmpty( newRel ) ) {
 		if ( ! isEmpty( newRel ) ) {
-			each( NEW_TAB_REL, ( relVal ) => {
+			NEW_TAB_REL.forEach( ( relVal ) => {
 				const regExp = new RegExp( '\\b' + relVal + '\\b', 'gi' );
 				newRel = newRel.replace( regExp, '' );
 			} );
@@ -35,9 +35,9 @@ export function removeNewTabRel( currentRel ) {
 /**
  * Helper to get the link target settings to be stored.
  *
- * @param {boolean} value         The new link target value.
- * @param {Object} attributes     Block attributes.
- * @param {Object} attributes.rel Image block's rel attribute.
+ * @param {boolean} value          The new link target value.
+ * @param {Object}  attributes     Block attributes.
+ * @param {Object}  attributes.rel Image block's rel attribute.
  *
  * @return {Object} Updated link target settings.
  */
@@ -55,4 +55,20 @@ export function getUpdatedLinkTargetSettings( value, { rel } ) {
 		linkTarget,
 		rel: updatedRel,
 	};
+}
+
+/**
+ * Determines new Image block attributes size selection.
+ *
+ * @param {Object} image Media file object for gallery image.
+ * @param {string} size  Selected size slug to apply.
+ */
+export function getImageSizeAttributes( image, size ) {
+	const url = get( image, [ 'media_details', 'sizes', size, 'source_url' ] );
+
+	if ( url ) {
+		return { url, width: undefined, height: undefined, sizeSlug: size };
+	}
+
+	return {};
 }

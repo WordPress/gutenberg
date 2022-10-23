@@ -1,18 +1,27 @@
 /**
  * External dependencies
  */
-const { camelCase, nth, upperFirst } = require( 'lodash' );
+const { pascalCase } = require( 'change-case' );
 const fs = require( 'fs' );
 const glob = require( 'glob' ).sync;
+const { join } = require( 'path' );
 
 const baseRepoUrl = '..';
 const componentPaths = glob( 'packages/components/src/*/**/README.md', {
-	// Don't expose documentation for mobile only components just yet.
-	ignore: '**/mobile/*/README.md',
+	// Don't expose documentation for mobile only and G2 components just yet.
+	ignore: [
+		'**/src/mobile/**/README.md',
+		'**/src/ui/**/README.md',
+		'packages/components/src/view/README.md',
+	],
 } );
-const packagePaths = glob( 'packages/*/package.json' ).map(
-	( fileName ) => fileName.split( '/' )[ 1 ]
-);
+const packagePaths = glob( 'packages/*/package.json' )
+	.filter(
+		// Ignore private packages.
+		( fileName ) =>
+			! require( join( __dirname, '..', '..', fileName ) ).private
+	)
+	.map( ( fileName ) => fileName.split( '/' )[ 1 ] );
 
 /**
  * Generates the package manifest.
@@ -22,15 +31,25 @@ const packagePaths = glob( 'packages/*/package.json' ).map(
  * @return {Array} Manifest
  */
 function getPackageManifest( packageFolderNames ) {
-	return packageFolderNames.map( ( folderName ) => {
+	return packageFolderNames.reduce( ( manifest, folderName ) => {
 		const path = `${ baseRepoUrl }/packages/${ folderName }/README.md`;
-		return {
+		const tocPath = `${ baseRepoUrl }/packages/${ folderName }/docs/toc.json`;
+
+		// First add any README files to the TOC
+		manifest.push( {
 			title: `@wordpress/${ folderName }`,
 			slug: `packages-${ folderName }`,
 			markdown_source: path,
 			parent: 'packages',
-		};
-	} );
+		} );
+
+		// Next add any items in the docs/toc.json if found.
+		if ( fs.existsSync( join( __dirname, '..', tocPath ) ) ) {
+			const toc = require( join( __dirname, '..', tocPath ) ).values();
+			manifest.push( ...toc );
+		}
+		return manifest;
+	}, [] );
 }
 
 /**
@@ -42,9 +61,10 @@ function getPackageManifest( packageFolderNames ) {
  */
 function getComponentManifest( paths ) {
 	return paths.map( ( filePath ) => {
-		const slug = nth( filePath.split( '/' ), -2 );
+		const pathFragments = filePath.split( '/' );
+		const slug = pathFragments[ pathFragments.length - 2 ];
 		return {
-			title: upperFirst( camelCase( slug ) ),
+			title: pascalCase( slug ),
 			slug,
 			markdown_source: `${ baseRepoUrl }/${ filePath }`,
 			parent: 'components',
@@ -61,17 +81,21 @@ function generateRootManifestFromTOCItems( items, parent = null ) {
 	items.forEach( ( obj ) => {
 		const fileName = Object.keys( obj )[ 0 ];
 		const children = obj[ fileName ];
+		const fileNameFragments = fileName.split( '/' );
 
-		let slug = nth( fileName.split( '/' ), -1 ).replace( '.md', '' );
+		let slug = fileNameFragments[ fileNameFragments.length - 1 ].replace(
+			'.md',
+			''
+		);
 		if ( 'readme' === slug.toLowerCase() ) {
-			slug = nth( fileName.split( '/' ), -2 );
+			slug = fileNameFragments[ fileNameFragments.length - 2 ];
 
 			// Special case - the root 'docs' readme needs the 'handbook' slug.
 			if ( parent === null && 'docs' === slug ) {
 				slug = 'handbook';
 			}
 		}
-		let title = upperFirst( camelCase( slug ) );
+		let title = pascalCase( slug );
 		const markdownSource = fs.readFileSync( fileName, 'utf8' );
 		const titleMarkdown = markdownSource.match( /^#\s(.+)$/m );
 		if ( titleMarkdown ) {

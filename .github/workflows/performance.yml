@@ -1,0 +1,80 @@
+name: Performance Tests
+
+on:
+    pull_request:
+    release:
+        types: [published]
+    push:
+        branches: [trunk]
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    cancel-in-progress: true
+
+jobs:
+    performance:
+        name: Run performance tests
+        runs-on: ubuntu-latest
+        if: ${{ github.repository == 'WordPress/gutenberg' }}
+
+        steps:
+            - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+
+            - name: Use desired version of NodeJS
+              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: npm
+
+            - name: Npm install
+              run: |
+                  npm ci
+
+            - name: Compare performance with trunk
+              if: github.event_name == 'pull_request'
+              run: ./bin/plugin/cli.js perf --ci $GITHUB_SHA trunk --tests-branch $GITHUB_SHA
+
+            - name: Compare performance with current WordPress Core and previous Gutenberg versions
+              if: github.event_name == 'release'
+              env:
+                  PLUGIN_VERSION: ${{ github.event.release.name }}
+              shell: bash
+              run: |
+                  IFS=. read -ra PLUGIN_VERSION_ARRAY <<< "$PLUGIN_VERSION"
+                  CURRENT_RELEASE_BRANCH="release/${PLUGIN_VERSION_ARRAY[0]}.${PLUGIN_VERSION_ARRAY[1]}"
+                  PREVIOUS_VERSION_BASE_10=$((PLUGIN_VERSION_ARRAY[0] * 10 + PLUGIN_VERSION_ARRAY[1] - 1))
+                  PREVIOUS_RELEASE_BRANCH="release/$((PREVIOUS_VERSION_BASE_10 / 10)).$((PREVIOUS_VERSION_BASE_10 % 10))"
+                  WP_VERSION=$(awk -F ': ' '/^Tested up to/{print $2}' readme.txt)
+                  IFS=. read -ra WP_VERSION_ARRAY <<< "$WP_VERSION"
+                  WP_MAJOR="${WP_VERSION_ARRAY[0]}.${WP_VERSION_ARRAY[1]}"
+                  ./bin/plugin/cli.js perf --ci "wp/$WP_MAJOR" "$PREVIOUS_RELEASE_BRANCH" "$CURRENT_RELEASE_BRANCH" --wp-version "$WP_MAJOR"
+
+            - name: Compare performance with base branch
+              if: github.event_name == 'push'
+              # The base hash used here need to be a commit that is compatible with the current WP version
+              # The current one is debd225d007f4e441ceec80fbd6fa96653f94737 and it needs to be updated every WP major release.
+              # It is used as a base comparison point to avoid fluctuation in the performance metrics.
+              run: |
+                  WP_VERSION=$(awk -F ': ' '/^Tested up to/{print $2}' readme.txt)
+                  IFS=. read -ra WP_VERSION_ARRAY <<< "$WP_VERSION"
+                  WP_MAJOR="${WP_VERSION_ARRAY[0]}.${WP_VERSION_ARRAY[1]}"
+                  ./bin/plugin/cli.js perf --ci $GITHUB_SHA debd225d007f4e441ceec80fbd6fa96653f94737 --tests-branch $GITHUB_SHA  --wp-version "$WP_MAJOR"
+
+            - uses: actions/github-script@d556feaca394842dc55e4734bf3bb9f685482fa0 # v6.3.3
+              if: github.event_name == 'push'
+              id: commit-timestamp
+              with:
+                  github-token: ${{secrets.GITHUB_TOKEN}}
+                  script: |
+                      const commit_details = await github.rest.git.getCommit({owner: context.repo.owner, repo: context.repo.repo, commit_sha: context.sha});
+                      return parseInt((new Date( commit_details.data.author.date ).getTime() / 1000).toFixed(0))
+
+            - name: Publish performance results
+              if: github.event_name == 'push'
+              env:
+                  COMMITTED_AT: ${{ steps.commit-timestamp.outputs.result }}
+                  CODEHEALTH_PROJECT_TOKEN: ${{ secrets.CODEHEALTH_PROJECT_TOKEN }}
+              run: ./bin/log-perormance-results.js $CODEHEALTH_PROJECT_TOKEN trunk $GITHUB_SHA debd225d007f4e441ceec80fbd6fa96653f94737 $COMMITTED_AT

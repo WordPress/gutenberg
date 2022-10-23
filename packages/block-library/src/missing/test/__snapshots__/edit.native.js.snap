@@ -1,10 +1,28 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Missing block renders without crashing 1`] = `
-<View>
+<View
+  accessibilityHint="Tap here to show help"
+  accessibilityLabel="Help button"
+  accessibilityRole="button"
+  accessibilityState={
+    Object {
+      "disabled": true,
+    }
+  }
+  accessible={true}
+  focusable={true}
+  onClick={[Function]}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+>
   <View
     accessibilityHint="Tap here to show help"
-    accessibilityLabel="Help icon"
+    accessibilityLabel="Help button"
     accessibilityRole="button"
     accessible={true}
     focusable={true}
@@ -25,6 +43,5 @@ exports[`Missing block renders without crashing 1`] = `
   <Text>
     Unsupported
   </Text>
-  Modal
 </View>
 `;

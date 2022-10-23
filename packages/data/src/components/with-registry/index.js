@@ -17,13 +17,14 @@ import { RegistryConsumer } from '../registry-provider';
  * @return {WPComponent} Enhanced component.
  */
 const withRegistry = createHigherOrderComponent(
-	( OriginalComponent ) => ( props ) => (
-		<RegistryConsumer>
-			{ ( registry ) => (
-				<OriginalComponent { ...props } registry={ registry } />
-			) }
-		</RegistryConsumer>
-	),
+	( OriginalComponent ) => ( props ) =>
+		(
+			<RegistryConsumer>
+				{ ( registry ) => (
+					<OriginalComponent { ...props } registry={ registry } />
+				) }
+			</RegistryConsumer>
+		),
 	'withRegistry'
 );
 

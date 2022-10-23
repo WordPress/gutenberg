@@ -3,6 +3,9 @@
  */
 import { createBlobURL } from '@wordpress/blob';
 import { createBlock, getBlockAttributes } from '@wordpress/blocks';
+import { dispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
+import { __ } from '@wordpress/i18n';
 
 export function stripFirstImage( attributes, { shortcode } ) {
 	const { body } = document.implementation.createHTMLDocument( '' );
@@ -11,7 +14,7 @@ export function stripFirstImage( attributes, { shortcode } ) {
 
 	let nodeToRemove = body.querySelector( 'img' );
 
-	// if an image has parents, find the topmost node to remove
+	// If an image has parents, find the topmost node to remove.
 	while (
 		nodeToRemove &&
 		nodeToRemove.parentNode &&
@@ -82,9 +85,11 @@ const transforms = {
 					node.className +
 					' ' +
 					node.querySelector( 'img' ).className;
-				const alignMatches = /(?:^|\s)align(left|center|right)(?:$|\s)/.exec(
-					className
-				);
+				const alignMatches =
+					/(?:^|\s)align(left|center|right)(?:$|\s)/.exec(
+						className
+					);
+				const anchor = node.id === '' ? undefined : node.id;
 				const align = alignMatches ? alignMatches[ 1 ] : undefined;
 				const idMatches = /(?:^|\s)wp-image-(\d+)(?:$|\s)/.exec(
 					className
@@ -115,27 +120,49 @@ const transforms = {
 						href,
 						rel,
 						linkClass,
+						anchor,
 					}
 				);
 				return createBlock( 'core/image', attributes );
 			},
 		},
 		{
+			// Note: when dragging and dropping multiple files onto a gallery this overrides the
+			// gallery transform in order to add new images to the gallery instead of
+			// creating a new gallery.
 			type: 'files',
 			isMatch( files ) {
-				return (
-					files.length === 1 &&
-					files[ 0 ].type.indexOf( 'image/' ) === 0
+				// The following check is intended to catch non-image files when dropped together with images.
+				if (
+					files.some(
+						( file ) => file.type.indexOf( 'image/' ) === 0
+					) &&
+					files.some(
+						( file ) => file.type.indexOf( 'image/' ) !== 0
+					)
+				) {
+					const { createErrorNotice } = dispatch( noticesStore );
+					createErrorNotice(
+						__(
+							'If uploading to a gallery all files need to be image formats'
+						),
+						{
+							id: 'gallery-transform-invalid-file',
+							type: 'snackbar',
+						}
+					);
+				}
+				return files.every(
+					( file ) => file.type.indexOf( 'image/' ) === 0
 				);
 			},
 			transform( files ) {
-				const file = files[ 0 ];
-				// We don't need to upload the media directly here
-				// It's already done as part of the `componentDidMount`
-				// int the image block
-				return createBlock( 'core/image', {
-					url: createBlobURL( file ),
+				const blocks = files.map( ( file ) => {
+					return createBlock( 'core/image', {
+						url: createBlobURL( file ),
+					} );
 				} );
+				return blocks;
 			},
 		},
 		{

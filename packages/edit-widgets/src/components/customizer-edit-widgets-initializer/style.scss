@@ -2,11 +2,7 @@
 	position: relative;
 	.edit-widgets-header {
 		margin-top: -16px;
-		border-top: 1px solid $light-gray-500;
-	}
-
-	.edit-widgets-header,
-	.edit-widgets-header__block-toolbar {
+		border-top: 1px solid $gray-300;
 		background: #fff;
 		margin-left: -12px;
 		margin-right: -12px;

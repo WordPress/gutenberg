@@ -2,19 +2,21 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { InnerBlocks } from '@wordpress/block-editor';
+import { useInnerBlocksProps, useBlockProps } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { imageFillStyles } from './media-container';
+import { DEFAULT_MEDIA_SIZE_SLUG } from './constants';
 
 const DEFAULT_MEDIA_WIDTH = 50;
+const noop = () => {};
 
 export default function save( { attributes } ) {
 	const {
@@ -33,17 +35,19 @@ export default function save( { attributes } ) {
 		linkTarget,
 		rel,
 	} = attributes;
+	const mediaSizeSlug = attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 	const newRel = isEmpty( rel ) ? undefined : rel;
+
+	const imageClasses = classnames( {
+		[ `wp-image-${ mediaId }` ]: mediaId && mediaType === 'image',
+		[ `size-${ mediaSizeSlug }` ]: mediaId && mediaType === 'image',
+	} );
 
 	let image = (
 		<img
 			src={ mediaUrl }
 			alt={ mediaAlt }
-			className={
-				mediaId && mediaType === 'image'
-					? `wp-image-${ mediaId }`
-					: null
-			}
+			className={ imageClasses || null }
 		/>
 	);
 
@@ -84,17 +88,37 @@ export default function save( { attributes } ) {
 	const style = {
 		gridTemplateColumns,
 	};
+
+	if ( 'right' === mediaPosition ) {
+		return (
+			<div { ...useBlockProps.save( { className, style } ) }>
+				<div
+					{ ...useInnerBlocksProps.save( {
+						className: 'wp-block-media-text__content',
+					} ) }
+				/>
+				<figure
+					className="wp-block-media-text__media"
+					style={ backgroundStyles }
+				>
+					{ ( mediaTypeRenders[ mediaType ] || noop )() }
+				</figure>
+			</div>
+		);
+	}
 	return (
-		<div className={ className } style={ style }>
+		<div { ...useBlockProps.save( { className, style } ) }>
 			<figure
 				className="wp-block-media-text__media"
 				style={ backgroundStyles }
 			>
 				{ ( mediaTypeRenders[ mediaType ] || noop )() }
 			</figure>
-			<div className="wp-block-media-text__content">
-				<InnerBlocks.Content />
-			</div>
+			<div
+				{ ...useInnerBlocksProps.save( {
+					className: 'wp-block-media-text__content',
+				} ) }
+			/>
 		</div>
 	);
 }

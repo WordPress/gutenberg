@@ -6,8 +6,8 @@ import { Animated, Easing, View, Platform } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { ToolbarButton, Toolbar } from '@wordpress/components';
-import { useEffect, useState } from '@wordpress/element';
+import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -18,12 +18,11 @@ import { __ } from '@wordpress/i18n';
 import styles from './styles.scss';
 import NavigateUpSVG from './nav-up-icon';
 import BlockSelectionButton from '../block-list/block-selection-button.native';
+import { store as blockEditorStore } from '../../store';
 
 const EASE_IN_DURATION = 250;
 const EASE_OUT_DURATION = 80;
 const TRANSLATION_RANGE = 8;
-
-const opacity = new Animated.Value( 0 );
 
 const FloatingToolbar = ( {
 	selectedClientId,
@@ -32,6 +31,7 @@ const FloatingToolbar = ( {
 	onNavigateUp,
 	isRTL,
 } ) => {
+	const opacity = useRef( new Animated.Value( 0 ) ).current;
 	// Sustain old selection for proper block selection button rendering when exit animation is ongoing.
 	const [ previousSelection, setPreviousSelection ] = useState( {} );
 
@@ -78,9 +78,12 @@ const FloatingToolbar = ( {
 
 	return (
 		!! opacity && (
-			<Animated.View style={ [ styles.floatingToolbar, animationStyle ] }>
+			<Animated.View
+				style={ [ styles.floatingToolbar, animationStyle ] }
+				pointerEvents={ showFloatingToolbar ? 'auto' : 'none' }
+			>
 				{ showNavUpButton && (
-					<Toolbar passedStyle={ styles.toolbar }>
+					<ToolbarGroup passedStyle={ styles.toolbar }>
 						<ToolbarButton
 							title={ __( 'Navigate Up' ) }
 							onClick={
@@ -90,7 +93,7 @@ const FloatingToolbar = ( {
 							icon={ <NavigateUpSVG isRTL={ isRTL } /> }
 						/>
 						<View style={ styles.pipe } />
-					</Toolbar>
+					</ToolbarGroup>
 				) }
 				<BlockSelectionButton
 					clientId={ blockSelectionButtonClientId }
@@ -108,7 +111,7 @@ export default compose( [
 			getBlockRootClientId,
 			getBlockCount,
 			getSettings,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		const selectedClientId = getSelectedBlockClientId();
 
@@ -124,7 +127,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { selectBlock } = dispatch( 'core/block-editor' );
+		const { selectBlock } = dispatch( blockEditorStore );
 
 		return {
 			onNavigateUp( clientId, initialPosition ) {

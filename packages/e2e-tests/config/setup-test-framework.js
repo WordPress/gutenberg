@@ -2,21 +2,21 @@
  * External dependencies
  */
 import { get } from 'lodash';
+import { toMatchInlineSnapshot, toMatchSnapshot } from 'jest-snapshot';
 
 /**
  * WordPress dependencies
  */
 import {
 	activatePlugin,
+	activateTheme,
 	clearLocalStorage,
 	enablePageDialogAccept,
 	isOfflineMode,
+	resetPreferences,
 	setBrowserViewport,
-	switchUserToAdmin,
-	switchUserToTest,
-	visitAdminPage,
+	trashAllPosts,
 } from '@wordpress/e2e-test-utils';
-import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Timeout, in seconds, that the test should be allowed to run.
@@ -37,7 +37,14 @@ const THROTTLE_CPU = process.env.THROTTLE_CPU;
  *
  * @type {string|undefined}
  */
-const DOWNLOAD_THROUGHPUT = process.env.DOWNLOAD_THROUGHPUT;
+const SLOW_NETWORK = process.env.SLOW_NETWORK;
+
+/**
+ * Emulate no internet connection.
+ *
+ * @type {string|undefined}
+ */
+const OFFLINE = process.env.OFFLINE;
 
 /**
  * Set of console logging types observed to protect against unexpected yet
@@ -59,46 +66,19 @@ const OBSERVED_CONSOLE_MESSAGE_TYPES = {
  */
 const pageEvents = [];
 
-// The Jest timeout is increased because these tests are a bit slow
+// The Jest timeout is increased because these tests are a bit slow.
 jest.setTimeout( PUPPETEER_TIMEOUT || 100000 );
+
+// Retry failed tests at most 2 times in CI.
+// This enables `flaky-tests-reporter` and `report-flaky-tests` GitHub action
+// to mark test as flaky and automatically create a tracking issue about it.
+if ( process.env.CI ) {
+	jest.retryTimes( 2 );
+}
 
 async function setupBrowser() {
 	await clearLocalStorage();
 	await setBrowserViewport( 'large' );
-}
-
-/**
- * Navigates to the post listing screen and bulk-trashes any posts which exist.
- *
- * @param {string} postType - String slug for type of post to trash.
- *
- * @return {Promise} Promise resolving once posts have been trashed.
- */
-export async function trashExistingPosts( postType = 'post' ) {
-	await switchUserToAdmin();
-	// Visit `/wp-admin/edit.php` so we can see a list of posts and delete them.
-	const query = addQueryArgs( '', {
-		post_type: postType,
-	} ).slice( 1 );
-	await visitAdminPage( 'edit.php', query );
-
-	// If this selector doesn't exist there are no posts for us to delete.
-	const bulkSelector = await page.$( '#bulk-action-selector-top' );
-	if ( ! bulkSelector ) {
-		return;
-	}
-
-	// Select all posts.
-	await page.waitForSelector( '[id^=cb-select-all-]' );
-	await page.click( '[id^=cb-select-all-]' );
-	// Select the "bulk actions" > "trash" option.
-	await page.select( '#bulk-action-selector-top', 'trash' );
-	// Submit the form to send all draft/scheduled/published posts to the trash.
-	await page.click( '#doaction' );
-	await page.waitForXPath(
-		'//*[contains(@class, "updated notice")]/p[contains(text(), "moved to the Trash.")]'
-	);
-	await switchUserToTest();
 }
 
 /**
@@ -174,11 +154,8 @@ function observeConsoleLogging() {
 			return;
 		}
 
-		// As of WordPress 5.3.2 in Chrome 79, navigating to the block editor
-		// (Posts > Add New) will display a console warning about
-		// non - unique IDs.
-		// See: https://core.trac.wordpress.org/ticket/23165
-		if ( text.includes( 'elements with non-unique id #_wpnonce' ) ) {
+		// Ignore all JQMIGRATE (jQuery migrate) deprecation warnings.
+		if ( text.includes( 'JQMIGRATE' ) ) {
 			return;
 		}
 
@@ -212,73 +189,51 @@ function observeConsoleLogging() {
 }
 
 /**
- * Runs Axe tests when the block editor is found on the current page.
- *
- * @return {?Promise} Promise resolving once Axe texts are finished.
- */
-async function runAxeTestsForBlockEditor() {
-	if ( ! ( await page.$( '.block-editor' ) ) ) {
-		return;
-	}
-
-	await expect( page ).toPassAxeTests( {
-		// Temporary disabled rules to enable initial integration.
-		// See: https://github.com/WordPress/gutenberg/pull/15018.
-		disabledRules: [
-			'aria-allowed-role',
-			'aria-allowed-attr',
-			'aria-hidden-focus',
-			'aria-input-field-name',
-			'aria-valid-attr-value',
-			'button-name',
-			'color-contrast',
-			'dlitem',
-			'duplicate-id',
-			'label',
-			'landmark-one-main',
-			'link-name',
-			'listitem',
-			'region',
-		],
-		exclude: [
-			// Ignores elements created by metaboxes.
-			'.edit-post-layout__metaboxes',
-			// Ignores elements created by TinyMCE.
-			'.mce-container',
-			// These properties were not included in the 1.1 spec
-			// through error, they should be allowed on role="row":
-			// https://github.com/w3c/aria/issues/558
-			'[role="treegrid"] [aria-posinset]',
-			'[role="treegrid"] [aria-setsize]',
-		],
-	} );
-}
-
-/**
  * Simulate slow network or throttled CPU if provided via environment variables.
  */
 async function simulateAdverseConditions() {
-	if ( ! DOWNLOAD_THROUGHPUT && ! THROTTLE_CPU ) {
+	if ( ! SLOW_NETWORK && ! OFFLINE && ! THROTTLE_CPU ) {
 		return;
 	}
 
-	const client = await page.target().createCDPSession();
+	if ( OFFLINE ) {
+		await page.setOfflineMode( true );
+	}
 
-	if ( DOWNLOAD_THROUGHPUT ) {
+	if ( SLOW_NETWORK ) {
 		// See: https://chromedevtools.github.io/devtools-protocol/tot/Network#method-emulateNetworkConditions
-		await client.send( 'Network.emulateNetworkConditions', {
-			// Simulated download speed (bytes/s)
-			downloadThroughput: Number( DOWNLOAD_THROUGHPUT ),
+		// The values below simulate fast 3G conditions as per https://github.com/ChromeDevTools/devtools-frontend/blob/80c102878fd97a7a696572054007d40560dcdd21/front_end/sdk/NetworkManager.js#L252-L274
+		await page.emulateNetworkConditions( {
+			// Download speed (bytes/s)
+			download: ( ( 1.6 * 1024 * 1024 ) / 8 ) * 0.9,
+			// Upload speed (bytes/s)
+			upload: ( ( 750 * 1024 ) / 8 ) * 0.9,
+			// Latency (ms)
+			latency: 150 * 3.75,
 		} );
 	}
 
 	if ( THROTTLE_CPU ) {
 		// See: https://chromedevtools.github.io/devtools-protocol/tot/Emulation#method-setCPUThrottlingRate
-		await client.send( 'Emulation.setCPUThrottlingRate', {
-			rate: Number( THROTTLE_CPU ),
-		} );
+		await page.emulateCPUThrottling( Number( THROTTLE_CPU ) );
 	}
 }
+
+// Override snapshot matchers to throw errors as soon as possible,
+// See https://jestjs.io/docs/expect#bail-out
+// This is to fix a bug in Jest that snapshot failures won't trigger `test_fn_failure` events.
+expect.extend( {
+	toMatchInlineSnapshot( ...args ) {
+		this.dontThrow = () => {};
+
+		return toMatchInlineSnapshot.call( this, ...args );
+	},
+	toMatchSnapshot( ...args ) {
+		this.dontThrow = () => {};
+
+		return toMatchSnapshot.call( this, ...args );
+	},
+} );
 
 // Before every test suite run, delete all content created by the test. This ensures
 // other posts/comments/etc. aren't dirtying tests and tests don't depend on
@@ -288,14 +243,19 @@ beforeAll( async () => {
 	enablePageDialogAccept();
 	observeConsoleLogging();
 	await simulateAdverseConditions();
-
-	await trashExistingPosts();
+	await resetPreferences();
+	await activateTheme( 'twentytwentyone' );
+	await trashAllPosts();
+	await trashAllPosts( 'wp_block' );
 	await setupBrowser();
 	await activatePlugin( 'gutenberg-test-plugin-disables-the-css-animations' );
+	await page.emulateMediaFeatures( [
+		{ name: 'prefers-reduced-motion', value: 'reduce' },
+	] );
 } );
 
 afterEach( async () => {
-	await runAxeTestsForBlockEditor();
+	await resetPreferences();
 	await setupBrowser();
 } );
 

@@ -1,0 +1,37 @@
+.edit-widgets-block-editor {
+	position: relative;
+
+	// This is the default font that is going to be used in the content of the areas (blocks).
+	font-family: $default-font;
+
+	// Block list needs to stretch to full screen height so blocks can
+	// be deselected when clicking outside widget areas.
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+
+	> div:last-of-type,
+	.block-editor-writing-flow,
+	.block-editor-writing-flow > div {
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+	}
+
+	.edit-widgets-main-block-list {
+		height: 100%;
+	}
+
+	// The button element easily inherits styles that are meant for the editor style.
+	// These rules enhance the specificity to reduce that inheritance.
+	// This is copied from edit-post/src/components/style.scss but without the padding.
+	& .components-button {
+		font-family: $default-font;
+		font-size: $default-font-size;
+
+		&.is-tertiary,
+		&.has-icon {
+			padding: 6px;
+		}
+	}
+}

@@ -1,34 +1,47 @@
 /**
  * External dependencies
  */
-import renderer from 'react-test-renderer';
+import { render } from 'test/helpers';
 
 /**
  * Internal dependencies
  */
-import Verse from '../edit';
+import { metadata, settings, name } from '../index';
 
 /**
  * WordPress dependencies
  */
-import { RichText } from '@wordpress/block-editor';
+import { BlockEdit } from '@wordpress/block-editor';
+import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+
+const Verse = ( { clientId, ...props } ) => (
+	<BlockEdit name={ name } clientId={ clientId || 0 } { ...props } />
+);
 
 describe( 'Verse Block', () => {
+	beforeAll( () => {
+		registerBlockType( name, {
+			...metadata,
+			...settings,
+		} );
+	} );
+
+	afterAll( () => {
+		unregisterBlockType( name );
+	} );
+
 	it( 'renders without crashing', () => {
-		const component = renderer.create(
-			<Verse attributes={ { content: '' } } />
-		);
+		const component = render( <Verse attributes={ { content: '' } } /> );
 		const rendered = component.toJSON();
 		expect( rendered ).toBeTruthy();
 	} );
 
 	it( 'renders given text without crashing', () => {
-		const component = renderer.create(
+		const component = render(
 			<Verse attributes={ { content: 'sample text' } } />
 		);
-		const testInstance = component.root;
-		const richText = testInstance.findByType( RichText );
-		expect( richText ).toBeTruthy();
-		expect( richText.props.value ).toBe( 'sample text' );
+		expect(
+			component.getByDisplayValue( '<pre>sample text</pre>' )
+		).toBeTruthy();
 	} );
 } );

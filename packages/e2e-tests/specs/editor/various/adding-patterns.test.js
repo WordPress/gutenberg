@@ -7,15 +7,15 @@ import {
 	getEditedPostContent,
 } from '@wordpress/e2e-test-utils';
 
-/** @typedef {import('puppeteer').ElementHandle} ElementHandle */
+/** @typedef {import('puppeteer-core').ElementHandle} ElementHandle */
 
-describe( 'adding blocks', () => {
+describe( 'adding patterns', () => {
 	beforeEach( async () => {
 		await createNewPost();
 	} );
 
 	it( 'should insert a block pattern', async () => {
-		await insertPattern( 'Two Buttons' );
+		await insertPattern( 'Social links with a shared background color' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

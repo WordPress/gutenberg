@@ -1,11 +1,7 @@
 /**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-
-/**
  * Internal dependencies
  */
+import initBlock from '../utils/init-block';
 import edit from './edit';
 import metadata from './block.json';
 import save from './save';
@@ -16,10 +12,6 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Text Columns (deprecated)' ),
-	description: __(
-		'This block is deprecated. Please use the Columns block instead.'
-	),
 	transforms,
 	getEditWrapperProps( attributes ) {
 		const { width } = attributes;
@@ -30,3 +22,5 @@ export const settings = {
 	edit,
 	save,
 };
+
+export const init = () => initBlock( { name, metadata, settings } );

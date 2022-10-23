@@ -1,213 +1,242 @@
 /**
  * WordPress dependencies
  */
-import { __unstableUseDropZone as useDropZone } from '@wordpress/components';
-import {
-	pasteHandler,
-	getBlockTransforms,
-	findTransform,
-} from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useState, useCallback } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
+import {
+	useThrottle,
+	__experimentalUseDropZone as useDropZone,
+} from '@wordpress/compose';
+import { isRTL } from '@wordpress/i18n';
+import { isUnmodifiedDefaultBlock as getIsUnmodifiedDefaultBlock } from '@wordpress/blocks';
 
-const parseDropEvent = ( event ) => {
-	let result = {
-		srcRootClientId: null,
-		srcClientId: null,
-		srcIndex: null,
-		type: null,
-	};
+/**
+ * Internal dependencies
+ */
+import useOnBlockDrop from '../use-on-block-drop';
+import {
+	getDistanceToNearestEdge,
+	isPointContainedByRect,
+} from '../../utils/math';
+import { store as blockEditorStore } from '../../store';
 
-	if ( ! event.dataTransfer ) {
-		return result;
-	}
+/** @typedef {import('../../utils/math').WPPoint} WPPoint */
+/** @typedef {import('../use-on-block-drop/types').WPDropOperation} WPDropOperation */
 
-	try {
-		result = Object.assign(
-			result,
-			JSON.parse( event.dataTransfer.getData( 'text' ) )
-		);
-	} catch ( err ) {
-		return result;
-	}
+/**
+ * The orientation of a block list.
+ *
+ * @typedef {'horizontal'|'vertical'|undefined} WPBlockListOrientation
+ */
 
-	return result;
-};
+/**
+ * The insert position when dropping a block.
+ *
+ * @typedef {'before'|'after'} WPInsertPosition
+ */
 
-export default function useBlockDropZone( { element, rootClientId } ) {
-	const [ clientId, setClientId ] = useState( null );
+/**
+ * @typedef {Object} WPBlockData
+ * @property {boolean}       isUnmodifiedDefaultBlock Is the block unmodified default block.
+ * @property {() => DOMRect} getBoundingClientRect    Get the bounding client rect of the block.
+ * @property {number}        blockIndex               The index of the block.
+ */
 
-	function selector( select ) {
-		const {
-			getBlockIndex,
-			getClientIdsOfDescendants,
-			getSettings,
-			getTemplateLock,
-		} = select( 'core/block-editor' );
-		return {
-			getBlockIndex,
-			blockIndex: getBlockIndex( clientId, rootClientId ),
-			getClientIdsOfDescendants,
-			hasUploadPermissions: !! getSettings().mediaUpload,
-			isLockedAll: getTemplateLock( rootClientId ) === 'all',
-		};
-	}
+/**
+ * Get the drop target position from a given drop point and the orientation.
+ *
+ * @param {WPBlockData[]}          blocksData  The block data list.
+ * @param {WPPoint}                position    The position of the item being dragged.
+ * @param {WPBlockListOrientation} orientation The orientation of the block list.
+ * @return {[number, WPDropOperation]} The drop target position.
+ */
+export function getDropTargetPosition(
+	blocksData,
+	position,
+	orientation = 'vertical'
+) {
+	const allowedEdges =
+		orientation === 'horizontal'
+			? [ 'left', 'right' ]
+			: [ 'top', 'bottom' ];
 
-	const {
-		getBlockIndex,
-		blockIndex,
-		getClientIdsOfDescendants,
-		hasUploadPermissions,
-		isLockedAll,
-	} = useSelect( selector, [ rootClientId, clientId ] );
-	const {
-		insertBlocks,
-		updateBlockAttributes,
-		moveBlockToPosition,
-	} = useDispatch( 'core/block-editor' );
+	const isRightToLeft = isRTL();
 
-	const onFilesDrop = useCallback(
-		( files ) => {
-			if ( ! hasUploadPermissions ) {
-				return;
-			}
+	let nearestIndex = 0;
+	let insertPosition = 'before';
+	let minDistance = Infinity;
 
-			const transformation = findTransform(
-				getBlockTransforms( 'from' ),
-				( transform ) =>
-					transform.type === 'files' && transform.isMatch( files )
+	blocksData.forEach(
+		( { isUnmodifiedDefaultBlock, getBoundingClientRect, blockIndex } ) => {
+			const rect = getBoundingClientRect();
+
+			let [ distance, edge ] = getDistanceToNearestEdge(
+				position,
+				rect,
+				allowedEdges
 			);
-
-			if ( transformation ) {
-				const blocks = transformation.transform(
-					files,
-					updateBlockAttributes
-				);
-				insertBlocks( blocks, blockIndex, rootClientId );
-			}
-		},
-		[
-			hasUploadPermissions,
-			updateBlockAttributes,
-			insertBlocks,
-			blockIndex,
-			rootClientId,
-		]
-	);
-
-	const onHTMLDrop = useCallback(
-		( HTML ) => {
-			const blocks = pasteHandler( { HTML, mode: 'BLOCKS' } );
-
-			if ( blocks.length ) {
-				insertBlocks( blocks, blockIndex, rootClientId );
-			}
-		},
-		[ insertBlocks, blockIndex, rootClientId ]
-	);
-
-	const onDrop = useCallback(
-		( event ) => {
-			const {
-				srcRootClientId,
-				srcClientId,
-				srcIndex,
-				type,
-			} = parseDropEvent( event );
-
-			const isBlockDropType = ( dropType ) => dropType === 'block';
-			const isSameLevel = ( srcRoot, dstRoot ) => {
-				// Note that rootClientId of top-level blocks will be undefined OR a void string,
-				// so we also need to account for that case separately.
-				return (
-					srcRoot === dstRoot ||
-					( ! srcRoot === true && ! dstRoot === true )
-				);
-			};
-			const isSameBlock = ( src, dst ) => src === dst;
-			const isSrcBlockAnAncestorOfDstBlock = ( src, dst ) =>
-				getClientIdsOfDescendants( [ src ] ).some(
-					( id ) => id === dst
-				);
-
+			// Prioritize the element if the point is inside of an unmodified default block.
 			if (
-				! isBlockDropType( type ) ||
-				isSameBlock( srcClientId, clientId ) ||
-				isSrcBlockAnAncestorOfDstBlock(
-					srcClientId,
-					clientId || rootClientId
-				)
+				isUnmodifiedDefaultBlock &&
+				isPointContainedByRect( position, rect )
 			) {
-				return;
+				distance = 0;
 			}
 
-			const dstIndex = clientId
-				? getBlockIndex( clientId, rootClientId )
-				: undefined;
-			const positionIndex = blockIndex;
-			// If the block is kept at the same level and moved downwards,
-			// subtract to account for blocks shifting upward to occupy its old position.
-			const insertIndex =
-				dstIndex &&
-				srcIndex < dstIndex &&
-				isSameLevel( srcRootClientId, rootClientId )
-					? positionIndex - 1
-					: positionIndex;
-			moveBlockToPosition(
-				srcClientId,
-				srcRootClientId,
-				rootClientId,
-				insertIndex
-			);
-		},
-		[
-			getClientIdsOfDescendants,
-			getBlockIndex,
-			clientId,
-			blockIndex,
-			moveBlockToPosition,
-			rootClientId,
-		]
+			if ( distance < minDistance ) {
+				// Where the dropped block will be inserted on the nearest block.
+				insertPosition =
+					edge === 'bottom' ||
+					( ! isRightToLeft && edge === 'right' ) ||
+					( isRightToLeft && edge === 'left' )
+						? 'after'
+						: 'before';
+
+				// Update the currently known best candidate.
+				minDistance = distance;
+				nearestIndex = blockIndex;
+			}
+		}
 	);
 
-	const { position } = useDropZone( {
-		element,
-		onFilesDrop,
-		onHTMLDrop,
-		onDrop,
-		isDisabled: isLockedAll,
-		withPosition: true,
+	const adjacentIndex =
+		nearestIndex + ( insertPosition === 'after' ? 1 : -1 );
+	const isNearestBlockUnmodifiedDefaultBlock =
+		!! blocksData[ nearestIndex ]?.isUnmodifiedDefaultBlock;
+	const isAdjacentBlockUnmodifiedDefaultBlock =
+		!! blocksData[ adjacentIndex ]?.isUnmodifiedDefaultBlock;
+
+	// If both blocks are not unmodified default blocks then just insert between them.
+	if (
+		! isNearestBlockUnmodifiedDefaultBlock &&
+		! isAdjacentBlockUnmodifiedDefaultBlock
+	) {
+		// If the user is dropping to the trailing edge of the block
+		// add 1 to the index to represent dragging after.
+		const insertionIndex =
+			insertPosition === 'after' ? nearestIndex + 1 : nearestIndex;
+		return [ insertionIndex, 'insert' ];
+	}
+
+	// Otherwise, replace the nearest unmodified default block.
+	return [
+		isNearestBlockUnmodifiedDefaultBlock ? nearestIndex : adjacentIndex,
+		'replace',
+	];
+}
+
+/**
+ * @typedef  {Object} WPBlockDropZoneConfig
+ * @property {string} rootClientId The root client id for the block list.
+ */
+
+/**
+ * A React hook that can be used to make a block list handle drag and drop.
+ *
+ * @param {WPBlockDropZoneConfig} dropZoneConfig configuration data for the drop zone.
+ */
+export default function useBlockDropZone( {
+	// An undefined value represents a top-level block. Default to an empty
+	// string for this so that `targetRootClientId` can be easily compared to
+	// values returned by the `getRootBlockClientId` selector, which also uses
+	// an empty string to represent top-level blocks.
+	rootClientId: targetRootClientId = '',
+} = {} ) {
+	const [ dropTarget, setDropTarget ] = useState( {
+		index: null,
+		operation: 'insert',
 	} );
 
-	useEffect( () => {
-		if ( position ) {
-			const { y } = position;
-			const rect = element.current.getBoundingClientRect();
-
-			const offset = y - rect.top;
-			const target = Array.from( element.current.children ).find(
-				( blockEl ) => {
-					return (
-						blockEl.offsetTop + blockEl.offsetHeight / 2 > offset
-					);
-				}
+	const isDisabled = useSelect(
+		( select ) => {
+			const {
+				getTemplateLock,
+				__unstableIsWithinBlockOverlay,
+				__unstableHasActiveBlockOverlayActive,
+			} = select( blockEditorStore );
+			const templateLock = getTemplateLock( targetRootClientId );
+			return (
+				[ 'all', 'contentOnly' ].some(
+					( lock ) => lock === templateLock
+				) ||
+				__unstableHasActiveBlockOverlayActive( targetRootClientId ) ||
+				__unstableIsWithinBlockOverlay( targetRootClientId )
 			);
+		},
+		[ targetRootClientId ]
+	);
 
-			if ( ! target ) {
-				return;
-			}
+	const { getBlockListSettings, getBlocks, getBlockIndex } =
+		useSelect( blockEditorStore );
+	const { showInsertionPoint, hideInsertionPoint } =
+		useDispatch( blockEditorStore );
 
-			const targetClientId = target.id.slice( 'block-'.length );
+	const onBlockDrop = useOnBlockDrop( targetRootClientId, dropTarget.index, {
+		operation: dropTarget.operation,
+	} );
+	const throttled = useThrottle(
+		useCallback(
+			( event, ownerDocument ) => {
+				const blocks = getBlocks( targetRootClientId );
 
-			if ( ! targetClientId ) {
-				return;
-			}
+				// The block list is empty, don't show the insertion point but still allow dropping.
+				if ( blocks.length === 0 ) {
+					setDropTarget( {
+						index: 0,
+						operation: 'insert',
+					} );
+					return;
+				}
 
-			setClientId( targetClientId );
-		}
-	}, [ position ] );
+				const blocksData = blocks.map( ( block ) => {
+					const clientId = block.clientId;
 
-	if ( position ) {
-		return clientId;
-	}
+					return {
+						isUnmodifiedDefaultBlock:
+							getIsUnmodifiedDefaultBlock( block ),
+						getBoundingClientRect: () =>
+							ownerDocument
+								.getElementById( `block-${ clientId }` )
+								.getBoundingClientRect(),
+						blockIndex: getBlockIndex( clientId ),
+					};
+				} );
+
+				const [ targetIndex, operation ] = getDropTargetPosition(
+					blocksData,
+					{ x: event.clientX, y: event.clientY },
+					getBlockListSettings( targetRootClientId )?.orientation
+				);
+
+				setDropTarget( {
+					index: targetIndex,
+					operation,
+				} );
+				showInsertionPoint( targetRootClientId, targetIndex, {
+					operation,
+				} );
+			},
+			[ targetRootClientId ]
+		),
+		200
+	);
+
+	return useDropZone( {
+		isDisabled,
+		onDrop: onBlockDrop,
+		onDragOver( event ) {
+			// `currentTarget` is only available while the event is being
+			// handled, so get it now and pass it to the thottled function.
+			// https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget
+			throttled( event, event.currentTarget.ownerDocument );
+		},
+		onDragLeave() {
+			throttled.cancel();
+			hideInsertionPoint();
+		},
+		onDragEnd() {
+			throttled.cancel();
+			hideInsertionPoint();
+		},
+	} );
 }

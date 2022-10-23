@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
@@ -13,22 +8,23 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import { BaseControl } from '../base-control';
 import Button from '../button';
 import { FlexItem, FlexBlock } from '../flex';
 import AllInputControl from './all-input-control';
 import InputControls from './input-controls';
+import AxialInputControls from './axial-input-controls';
 import BoxControlIcon from './icon';
-import Text from '../text';
 import LinkedButton from './linked-button';
-import Visualizer from './visualizer';
 import {
 	Root,
 	Header,
 	HeaderControlWrapper,
 } from './styles/box-control-styles';
+import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 import {
 	DEFAULT_VALUES,
-	DEFAULT_VISUALIZER_VALUES,
+	getInitialSide,
 	isValuesMixed,
 	isValuesDefined,
 } from './utils';
@@ -38,38 +34,59 @@ const defaultInputProps = {
 	min: 0,
 };
 
-function useUniqueId( idProp ) {
-	const instanceId = useInstanceId( BoxControl );
-	const id = `inspector-box-control-${ instanceId }`;
+const noop = () => {};
 
-	return idProp || id;
+function useUniqueId( idProp ) {
+	const instanceId = useInstanceId( BoxControl, 'inspector-box-control' );
+
+	return idProp || instanceId;
 }
 export default function BoxControl( {
 	id: idProp,
 	inputProps = defaultInputProps,
 	onChange = noop,
-	onChangeShowVisualizer = noop,
 	label = __( 'Box Control' ),
 	values: valuesProp,
 	units,
+	sides,
+	splitOnAxis = false,
+	allowReset = true,
+	resetValues = DEFAULT_VALUES,
+	onMouseOver,
+	onMouseOut,
 } ) {
-	const [ values, setValues ] = useControlledState( valuesProp );
+	const [ values, setValues ] = useControlledState( valuesProp, {
+		fallback: DEFAULT_VALUES,
+	} );
 	const inputValues = values || DEFAULT_VALUES;
 	const hasInitialValue = isValuesDefined( valuesProp );
+	const hasOneSide = sides?.length === 1;
 
 	const [ isDirty, setIsDirty ] = useState( hasInitialValue );
 	const [ isLinked, setIsLinked ] = useState(
-		! hasInitialValue || ! isValuesMixed( inputValues )
+		! hasInitialValue || ! isValuesMixed( inputValues ) || hasOneSide
 	);
 
-	const [ side, setSide ] = useState( isLinked ? 'all' : 'top' );
+	const [ side, setSide ] = useState(
+		getInitialSide( isLinked, splitOnAxis )
+	);
+
+	// Tracking selected units via internal state allows filtering of CSS unit
+	// only values from being saved while maintaining preexisting unit selection
+	// behaviour. Filtering CSS only values prevents invalid style values.
+	const [ selectedUnits, setSelectedUnits ] = useState( {
+		top: parseQuantityAndUnitFromRawValue( valuesProp?.top )[ 1 ],
+		right: parseQuantityAndUnitFromRawValue( valuesProp?.right )[ 1 ],
+		bottom: parseQuantityAndUnitFromRawValue( valuesProp?.bottom )[ 1 ],
+		left: parseQuantityAndUnitFromRawValue( valuesProp?.left )[ 1 ],
+	} );
 
 	const id = useUniqueId( idProp );
 	const headingId = `${ id }-heading`;
 
 	const toggleLinked = () => {
 		setIsLinked( ! isLinked );
-		setSide( ! isLinked ? 'all' : 'top' );
+		setSide( getInitialSide( ! isLinked, splitOnAxis ) );
 	};
 
 	const handleOnFocus = ( event, { side: nextSide } ) => {
@@ -82,19 +99,10 @@ export default function BoxControl( {
 		setIsDirty( true );
 	};
 
-	const handleOnHoverOn = ( next = {} ) => {
-		onChangeShowVisualizer( { ...DEFAULT_VISUALIZER_VALUES, ...next } );
-	};
-
-	const handleOnHoverOff = ( next = {} ) => {
-		onChangeShowVisualizer( { ...DEFAULT_VISUALIZER_VALUES, ...next } );
-	};
-
 	const handleOnReset = () => {
-		const initialValues = DEFAULT_VALUES;
-
-		onChange( initialValues );
-		setValues( initialValues );
+		onChange( resetValues );
+		setValues( resetValues );
+		setSelectedUnits( resetValues );
 		setIsDirty( false );
 	};
 
@@ -102,55 +110,69 @@ export default function BoxControl( {
 		...inputProps,
 		onChange: handleOnChange,
 		onFocus: handleOnFocus,
-		onHoverOn: handleOnHoverOn,
-		onHoverOff: handleOnHoverOff,
 		isLinked,
 		units,
+		selectedUnits,
+		setSelectedUnits,
+		sides,
 		values: inputValues,
+		onMouseOver,
+		onMouseOut,
 	};
 
 	return (
-		<Root id={ id } role="region" aria-labelledby={ headingId }>
+		<Root id={ id } role="group" aria-labelledby={ headingId }>
 			<Header className="component-box-control__header">
 				<FlexItem>
-					<Text
-						id={ headingId }
-						className="component-box-control__label"
-					>
+					<BaseControl.VisualLabel id={ headingId }>
 						{ label }
-					</Text>
+					</BaseControl.VisualLabel>
 				</FlexItem>
-				<FlexItem>
-					<Button
-						className="component-box-control__reset-button"
-						isSecondary
-						isSmall
-						onClick={ handleOnReset }
-						disabled={ ! isDirty }
-					>
-						{ __( 'Reset' ) }
-					</Button>
-				</FlexItem>
+				{ allowReset && (
+					<FlexItem>
+						<Button
+							className="component-box-control__reset-button"
+							isSecondary
+							isSmall
+							onClick={ handleOnReset }
+							disabled={ ! isDirty }
+						>
+							{ __( 'Reset' ) }
+						</Button>
+					</FlexItem>
+				) }
 			</Header>
 			<HeaderControlWrapper className="component-box-control__header-control-wrapper">
 				<FlexItem>
-					<BoxControlIcon side={ side } />
+					<BoxControlIcon side={ side } sides={ sides } />
 				</FlexItem>
 				{ isLinked && (
 					<FlexBlock>
-						<AllInputControl { ...inputControlProps } />
+						<AllInputControl
+							aria-label={ label }
+							{ ...inputControlProps }
+						/>
 					</FlexBlock>
 				) }
-				<FlexItem>
-					<LinkedButton
-						onClick={ toggleLinked }
-						isLinked={ isLinked }
-					/>
-				</FlexItem>
+				{ ! isLinked && splitOnAxis && (
+					<FlexBlock>
+						<AxialInputControls { ...inputControlProps } />
+					</FlexBlock>
+				) }
+				{ ! hasOneSide && (
+					<FlexItem>
+						<LinkedButton
+							onClick={ toggleLinked }
+							isLinked={ isLinked }
+						/>
+					</FlexItem>
+				) }
 			</HeaderControlWrapper>
-			{ ! isLinked && <InputControls { ...inputControlProps } /> }
+			{ ! isLinked && ! splitOnAxis && (
+				<InputControls { ...inputControlProps } />
+			) }
 		</Root>
 	);
 }
 
-BoxControl.__Visualizer = Visualizer;
+export { applyValueToSides } from './utils';

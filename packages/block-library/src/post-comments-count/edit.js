@@ -1,15 +1,40 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { useEntityId } from '@wordpress/core-data';
+import {
+	AlignmentControl,
+	BlockControls,
+	Warning,
+	useBlockProps,
+} from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
+import { __ } from '@wordpress/i18n';
 
-function PostCommentsCountDisplay( { className } ) {
-	const postId = useEntityId( 'postType', 'post' );
+export default function PostCommentsCountEdit( {
+	attributes,
+	context,
+	setAttributes,
+} ) {
+	const { textAlign } = attributes;
+	const { postId } = context;
 	const [ commentsCount, setCommentsCount ] = useState();
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
+
 	useEffect( () => {
+		if ( ! postId ) {
+			return;
+		}
 		const currentPostId = postId;
 		apiFetch( {
 			path: addQueryArgs( '/wp/v2/comments', {
@@ -23,16 +48,34 @@ function PostCommentsCountDisplay( { className } ) {
 			}
 		} );
 	}, [ postId ] );
-	return (
-		<span className={ className }>
-			{ commentsCount !== undefined && commentsCount }
-		</span>
-	);
-}
 
-export default function PostCommentsCountEdit( { className } ) {
-	if ( ! useEntityId( 'postType', 'post' ) ) {
-		return 'Post Comments Count Placeholder';
-	}
-	return <PostCommentsCountDisplay className={ className } />;
+	const hasPostAndComments = postId && commentsCount !== undefined;
+	const blockStyles = {
+		...blockProps.style,
+		textDecoration: hasPostAndComments
+			? blockProps.style?.textDecoration
+			: undefined,
+	};
+
+	return (
+		<>
+			<BlockControls group="block">
+				<AlignmentControl
+					value={ textAlign }
+					onChange={ ( nextAlign ) => {
+						setAttributes( { textAlign: nextAlign } );
+					} }
+				/>
+			</BlockControls>
+			<div { ...blockProps } style={ blockStyles }>
+				{ hasPostAndComments ? (
+					commentsCount
+				) : (
+					<Warning>
+						{ __( 'Post Comments Count block: post not found.' ) }
+					</Warning>
+				) }
+			</div>
+		</>
+	);
 }

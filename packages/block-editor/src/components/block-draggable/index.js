@@ -1,40 +1,48 @@
 /**
  * WordPress dependencies
  */
+import { getBlockType } from '@wordpress/blocks';
 import { Draggable } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 
-const BlockDraggable = ( { children, clientIds, cloneClassname } ) => {
-	const { srcRootClientId, index, isDraggable } = useSelect(
+/**
+ * Internal dependencies
+ */
+import BlockDraggableChip from './draggable-chip';
+import useScrollWhenDragging from './use-scroll-when-dragging';
+import { store as blockEditorStore } from '../../store';
+
+const BlockDraggable = ( {
+	children,
+	clientIds,
+	cloneClassname,
+	onDragStart,
+	onDragEnd,
+} ) => {
+	const { srcRootClientId, isDraggable, icon } = useSelect(
 		( select ) => {
-			const {
-				getBlockIndex,
-				getBlockRootClientId,
-				getTemplateLock,
-			} = select( 'core/block-editor' );
-			const rootClientId =
-				clientIds.length === 1
-					? getBlockRootClientId( clientIds[ 0 ] )
-					: null;
-			const templateLock = rootClientId
-				? getTemplateLock( rootClientId )
-				: null;
+			const { canMoveBlocks, getBlockRootClientId, getBlockName } =
+				select( blockEditorStore );
+			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
+			const blockName = getBlockName( clientIds[ 0 ] );
 
 			return {
-				index: getBlockIndex( clientIds[ 0 ], rootClientId ),
 				srcRootClientId: rootClientId,
-				isDraggable: clientIds.length === 1 && 'all' !== templateLock,
+				isDraggable: canMoveBlocks( clientIds, rootClientId ),
+				icon: getBlockType( blockName )?.icon,
 			};
 		},
 		[ clientIds ]
 	);
 	const isDragging = useRef( false );
-	const { startDraggingBlocks, stopDraggingBlocks } = useDispatch(
-		'core/block-editor'
-	);
+	const [ startScrolling, scrollOnDragOver, stopScrolling ] =
+		useScrollWhenDragging();
 
-	// Stop dragging blocks if the block draggable is unmounted
+	const { startDraggingBlocks, stopDraggingBlocks } =
+		useDispatch( blockEditorStore );
+
+	// Stop dragging blocks if the block draggable is unmounted.
 	useEffect( () => {
 		return () => {
 			if ( isDragging.current ) {
@@ -44,36 +52,50 @@ const BlockDraggable = ( { children, clientIds, cloneClassname } ) => {
 	}, [] );
 
 	if ( ! isDraggable ) {
-		return children( { isDraggable: false } );
+		return children( { draggable: false } );
 	}
 
-	const blockElementId = `block-${ clientIds[ 0 ] }`;
 	const transferData = {
 		type: 'block',
-		srcIndex: index,
-		srcClientId: clientIds[ 0 ],
+		srcClientIds: clientIds,
 		srcRootClientId,
 	};
 
 	return (
 		<Draggable
 			cloneClassname={ cloneClassname }
-			elementId={ blockElementId }
+			__experimentalTransferDataType="wp-blocks"
 			transferData={ transferData }
-			onDragStart={ () => {
-				startDraggingBlocks();
+			onDragStart={ ( event ) => {
+				startDraggingBlocks( clientIds );
 				isDragging.current = true;
+
+				startScrolling( event );
+
+				if ( onDragStart ) {
+					onDragStart();
+				}
 			} }
+			onDragOver={ scrollOnDragOver }
 			onDragEnd={ () => {
 				stopDraggingBlocks();
 				isDragging.current = false;
+
+				stopScrolling();
+
+				if ( onDragEnd ) {
+					onDragEnd();
+				}
 			} }
+			__experimentalDragComponent={
+				<BlockDraggableChip count={ clientIds.length } icon={ icon } />
+			}
 		>
 			{ ( { onDraggableStart, onDraggableEnd } ) => {
 				return children( {
-					isDraggable: true,
-					onDraggableStart,
-					onDraggableEnd,
+					draggable: true,
+					onDragStart: onDraggableStart,
+					onDragEnd: onDraggableEnd,
 				} );
 			} }
 		</Draggable>

@@ -5,11 +5,12 @@ const BUNDLED_PACKAGES = [ '@wordpress/icons', '@wordpress/interface' ];
  * Default request to global transformation
  *
  * Transform @wordpress dependencies:
+ * - request `@wordpress/api-fetch` becomes `[ 'wp', 'apiFetch' ]`
+ * - request `@wordpress/i18n` becomes `[ 'wp', 'i18n' ]`
  *
- *   request `@wordpress/api-fetch` becomes `wp.apiFetch`
- *   request `@wordpress/i18n` becomes `wp.i18n`
- *
- * @type {import('.').RequestToExternal}
+ * @param {string} request Module request (the module name in `import from`) to be transformed
+ * @return {string|string[]|undefined} The resulting external definition. Return `undefined`
+ *   to ignore the request. Return `string|string[]` to map the request to an external.
  */
 function defaultRequestToExternal( request ) {
 	switch ( request ) {
@@ -33,6 +34,10 @@ function defaultRequestToExternal( request ) {
 			return 'ReactDOM';
 	}
 
+	if ( request.includes( 'react-refresh/runtime' ) ) {
+		return 'ReactRefreshRuntime';
+	}
+
 	if ( BUNDLED_PACKAGES.includes( request ) ) {
 		return undefined;
 	}
@@ -49,11 +54,12 @@ function defaultRequestToExternal( request ) {
  * Default request to WordPress script handle transformation
  *
  * Transform @wordpress dependencies:
+ * - request `@wordpress/i18n` becomes `wp-i18n`
+ * - request `@wordpress/escape-html` becomes `wp-escape-html`
  *
- *   request `@wordpress/i18n` becomes `wp-i18n`
- *   request `@wordpress/escape-html` becomes `wp-escape-html`
- *
- * @type {import('.').RequestToHandle}
+ * @param {string} request Module request (the module name in `import from`) to be transformed
+ * @return {string|undefined} WordPress script handle to map the request to. Return `undefined`
+ *   to use the same name as the module.
  */
 function defaultRequestToHandle( request ) {
 	switch ( request ) {
@@ -62,6 +68,10 @@ function defaultRequestToHandle( request ) {
 
 		case 'lodash-es':
 			return 'lodash';
+	}
+
+	if ( request.includes( 'react-refresh/runtime' ) ) {
+		return 'wp-react-refresh-runtime';
 	}
 
 	if ( request.startsWith( WORDPRESS_NAMESPACE ) ) {
@@ -76,7 +86,6 @@ function defaultRequestToHandle( request ) {
  * following numbers.
  *
  * @param {string} string Input dash-delimited string.
- *
  * @return {string} Camel-cased string.
  */
 function camelCaseDash( string ) {

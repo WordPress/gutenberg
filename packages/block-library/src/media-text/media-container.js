@@ -1,21 +1,25 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { ResizableBox, withNotices } from '@wordpress/components';
+import { ResizableBox, Spinner } from '@wordpress/components';
 import {
 	BlockControls,
 	BlockIcon,
 	MediaPlaceholder,
 	MediaReplaceFlow,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
+import { forwardRef } from '@wordpress/element';
+import { isBlobURL } from '@wordpress/blob';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -26,31 +30,39 @@ import icon from './media-container-icon';
  * Constants
  */
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
+const noop = () => {};
 
 export function imageFillStyles( url, focalPoint ) {
 	return url
 		? {
 				backgroundImage: `url(${ url })`,
 				backgroundPosition: focalPoint
-					? `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`
+					? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round(
+							focalPoint.y * 100
+					  ) }%`
 					: `50% 50%`,
 		  }
 		: {};
 }
 
-function ResizableBoxContainer( { isSelected, isStackedOnMobile, ...props } ) {
-	const isMobile = useViewportMatch( 'small', '<' );
-	return (
-		<ResizableBox
-			showHandle={ isSelected && ( ! isMobile || ! isStackedOnMobile ) }
-			{ ...props }
-		/>
-	);
-}
+const ResizableBoxContainer = forwardRef(
+	( { isSelected, isStackedOnMobile, ...props }, ref ) => {
+		const isMobile = useViewportMatch( 'small', '<' );
+		return (
+			<ResizableBox
+				ref={ ref }
+				showHandle={
+					isSelected && ( ! isMobile || ! isStackedOnMobile )
+				}
+				{ ...props }
+			/>
+		);
+	}
+);
 
 function ToolbarEditButton( { mediaId, mediaUrl, onSelectMedia } ) {
 	return (
-		<BlockControls>
+		<BlockControls group="other">
 			<MediaReplaceFlow
 				mediaId={ mediaId }
 				mediaURL={ mediaUrl }
@@ -62,15 +74,11 @@ function ToolbarEditButton( { mediaId, mediaUrl, onSelectMedia } ) {
 	);
 }
 
-function PlaceholderContainer( {
-	className,
-	noticeOperations,
-	noticeUI,
-	onSelectMedia,
-} ) {
+function PlaceholderContainer( { className, mediaUrl, onSelectMedia } ) {
+	const { createErrorNotice } = useDispatch( noticesStore );
+
 	const onUploadError = ( message ) => {
-		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
+		createErrorNotice( message, { type: 'snackbar' } );
 	};
 
 	return (
@@ -83,13 +91,13 @@ function PlaceholderContainer( {
 			onSelect={ onSelectMedia }
 			accept="image/*,video/*"
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
-			notices={ noticeUI }
 			onError={ onUploadError }
+			disableMediaButtons={ mediaUrl }
 		/>
 	);
 }
 
-function MediaContainer( props ) {
+function MediaContainer( props, ref ) {
 	const {
 		className,
 		commitWidthChange,
@@ -105,11 +113,14 @@ function MediaContainer( props ) {
 		mediaWidth,
 		onSelectMedia,
 		onWidthChange,
+		isContentLocked,
 	} = props;
 
-	const { toggleSelection } = useDispatch( 'core/block-editor' );
+	const isTemporaryMedia = ! mediaId && isBlobURL( mediaUrl );
 
-	if ( mediaType && mediaUrl ) {
+	const { toggleSelection } = useDispatch( blockEditorStore );
+
+	if ( mediaUrl ) {
 		const onResizeStart = () => {
 			toggleSelection( false );
 		};
@@ -121,8 +132,8 @@ function MediaContainer( props ) {
 			commitWidthChange( parseInt( elt.style.width ) );
 		};
 		const enablePositions = {
-			right: mediaPosition === 'left',
-			left: mediaPosition === 'right',
+			right: ! isContentLocked && mediaPosition === 'left',
+			left: ! isContentLocked && mediaPosition === 'right',
 		};
 
 		const backgroundStyles =
@@ -137,7 +148,13 @@ function MediaContainer( props ) {
 
 		return (
 			<ResizableBoxContainer
-				className="editor-media-container__resizer"
+				as="figure"
+				className={ classnames(
+					className,
+					'editor-media-container__resizer',
+					{ 'is-transient': isTemporaryMedia }
+				) }
+				style={ backgroundStyles }
 				size={ { width: mediaWidth + '%' } }
 				minWidth="10%"
 				maxWidth="100%"
@@ -148,15 +165,16 @@ function MediaContainer( props ) {
 				axis="x"
 				isSelected={ isSelected }
 				isStackedOnMobile={ isStackedOnMobile }
+				ref={ ref }
 			>
 				<ToolbarEditButton
 					onSelectMedia={ onSelectMedia }
 					mediaUrl={ mediaUrl }
 					mediaId={ mediaId }
 				/>
-				<figure className={ className } style={ backgroundStyles }>
-					{ ( mediaTypeRenderers[ mediaType ] || noop )() }
-				</figure>
+				{ ( mediaTypeRenderers[ mediaType ] || noop )() }
+				{ isTemporaryMedia && <Spinner /> }
+				<PlaceholderContainer { ...props } />
 			</ResizableBoxContainer>
 		);
 	}
@@ -164,4 +182,4 @@ function MediaContainer( props ) {
 	return <PlaceholderContainer { ...props } />;
 }
 
-export default withNotices( MediaContainer );
+export default forwardRef( MediaContainer );

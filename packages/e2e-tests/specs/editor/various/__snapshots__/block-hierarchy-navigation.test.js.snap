@@ -30,7 +30,7 @@ exports[`Navigating the block hierarchy should navigate block hierarchy using on
 <!-- /wp:columns -->"
 `;
 
-exports[`Navigating the block hierarchy should navigate using the block hierarchy dropdown menu 1`] = `
+exports[`Navigating the block hierarchy should navigate using the list view sidebar 1`] = `
 "<!-- wp:columns -->
 <div class=\\"wp-block-columns\\"><!-- wp:column -->
 <div class=\\"wp-block-column\\"><!-- wp:paragraph -->
@@ -50,14 +50,14 @@ exports[`Navigating the block hierarchy should navigate using the block hierarch
 <!-- /wp:columns -->"
 `;
 
-exports[`Navigating the block hierarchy should select the wrapper div for a group  1`] = `
-"<!-- wp:group -->
-<div class=\\"wp-block-group\\"><div class=\\"wp-block-group__inner-container\\"><!-- wp:paragraph -->
+exports[`Navigating the block hierarchy should select the wrapper div for a group 1`] = `
+"<!-- wp:group {\\"layout\\":{\\"type\\":\\"constrained\\"}} -->
+<div class=\\"wp-block-group\\"><!-- wp:paragraph -->
 <p>just a paragraph</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:separator -->
-<hr class=\\"wp-block-separator\\"/>
-<!-- /wp:separator --></div></div>
+<hr class=\\"wp-block-separator has-alpha-channel-opacity\\"/>
+<!-- /wp:separator --></div>
 <!-- /wp:group -->"
 `;

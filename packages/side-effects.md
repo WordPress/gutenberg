@@ -9,8 +9,8 @@ Here is an example:
 ```js
 import { registerStore } from '@wordpress/data';
 
-const store = registerStore( STORE_KEY, {
-  // ...
+const store = registerStore( STORE_NAME, {
+	// ...
 } );
 ```
 
@@ -22,7 +22,7 @@ However, if this were to happen inside of an `init` function that doesn't get ca
 import { registerStore } from '@wordpress/data';
 
 export function init() {
-  const store = registerStore( STORE_KEY, {
+	const store = registerStore( STORE_NAME, {
 		// ...
 	} );
 }
@@ -85,20 +85,4 @@ If it has a few files with side effects, it can list them:
 }
 ```
 
-This allows the bundler to assume that only the modules that were declared have side effects, and *nothing else does*. Of course, this means that we need to be careful to include everything that *does* have side effects, or problems can arise in applications that make use of the package.
-
-## The approach in `@wordpress`
-
-In order to reduce maintenance cost and minimize the chance of breakage, we opted for using inverse globs for a number of `@wordpress` packages, where we list the paths that *do not* include side effects, leaving the bundler to assume that everything else does. Here's an example:
-
-```json
-{
-	"sideEffects": [
-		"!((src|build|build-module)/(components|utils)/**)"
-	],
-}
-```
-
-The above means that the bundler should assume that anything outside the `components` and `utils` directories contains side effects, and nothing in those directories does. These directories can be inside of a `src`, `build`, or `build-module` top-level directory in the package, due to the way `@wordpress` packages are built.
-
-This approach should guarantee that everything in `components` and `utils` can be tree-shaken. It will only potentially cause problems if one of the files in there uses side effects, which would be a bad practice for a component or utility file.
+This allows the bundler to assume that only the modules that were declared have side effects, and _nothing else does_. Of course, this means that we need to be careful to include everything that _does_ have side effects, or problems can arise in applications that make use of the package.

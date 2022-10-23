@@ -1,12 +1,7 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { has } from 'lodash';
-
-/**
- * Internal dependencies
- */
-import { isTextContent } from './phrasing-content';
+import { isTextContent } from '@wordpress/dom';
 
 /**
  * Whether or not the given node is figure content.
@@ -25,7 +20,7 @@ function isFigureContent( node, schema ) {
 		return false;
 	}
 
-	return has( schema, [ 'figure', 'children', tag ] );
+	return tag in ( schema?.figure?.children ?? {} );
 }
 
 /**
@@ -39,7 +34,7 @@ function isFigureContent( node, schema ) {
 function canHaveAnchor( node, schema ) {
 	const tag = node.nodeName.toLowerCase();
 
-	return has( schema, [ 'figure', 'children', 'a', 'children', tag ] );
+	return tag in ( schema?.figure?.children?.a?.children ?? {} );
 }
 
 /**

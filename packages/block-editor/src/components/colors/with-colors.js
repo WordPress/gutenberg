@@ -1,13 +1,12 @@
 /**
  * External dependencies
  */
-import { get, isString, kebabCase, reduce, upperFirst } from 'lodash';
+import { kebabCase, reduce } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-import { withSelect } from '@wordpress/data';
+import { useMemo, Component } from '@wordpress/element';
 import { compose, createHigherOrderComponent } from '@wordpress/compose';
 
 /**
@@ -19,8 +18,17 @@ import {
 	getColorObjectByAttributeValues,
 	getMostReadableColor,
 } from './utils';
+import useSetting from '../use-setting';
 
-const DEFAULT_COLORS = [];
+/**
+ * Capitalizes the first letter in a string.
+ *
+ * @param {string} str The string whose first letter the function will capitalize.
+ *
+ * @return {string} Capitalized string.
+ */
+const upperFirst = ( [ firstLetter, ...rest ] ) =>
+	firstLetter.toUpperCase() + rest.join( '' );
 
 /**
  * Higher order component factory for injecting the `colorsArray` argument as
@@ -32,9 +40,8 @@ const DEFAULT_COLORS = [];
  */
 const withCustomColorPalette = ( colorsArray ) =>
 	createHigherOrderComponent(
-		( WrappedComponent ) => ( props ) => (
-			<WrappedComponent { ...props } colors={ colorsArray } />
-		),
+		( WrappedComponent ) => ( props ) =>
+			<WrappedComponent { ...props } colors={ colorsArray } />,
 		'withCustomColorPalette'
 	);
 
@@ -45,12 +52,26 @@ const withCustomColorPalette = ( colorsArray ) =>
  * @return {Function} The higher order component.
  */
 const withEditorColorPalette = () =>
-	withSelect( ( select ) => {
-		const settings = select( 'core/block-editor' ).getSettings();
-		return {
-			colors: get( settings, [ 'colors' ], DEFAULT_COLORS ),
-		};
-	} );
+	createHigherOrderComponent(
+		( WrappedComponent ) => ( props ) => {
+			// Some color settings have a special handling for deprecated flags in `useSetting`,
+			// so we can't unwrap them by doing const { ... } = useSetting('color')
+			// until https://github.com/WordPress/gutenberg/issues/37094 is fixed.
+			const userPalette = useSetting( 'color.palette.custom' );
+			const themePalette = useSetting( 'color.palette.theme' );
+			const defaultPalette = useSetting( 'color.palette.default' );
+			const allColors = useMemo(
+				() => [
+					...( userPalette || [] ),
+					...( themePalette || [] ),
+					...( defaultPalette || [] ),
+				],
+				[ userPalette, themePalette, defaultPalette ]
+			);
+			return <WrappedComponent { ...props } colors={ allColors } />;
+		},
+		'withEditorColorPalette'
+	);
 
 /**
  * Helper function used with `createHigherOrderComponent` to create
@@ -67,7 +88,7 @@ function createColorHOC( colorTypes, withColorPalette ) {
 		( colorObject, colorType ) => {
 			return {
 				...colorObject,
-				...( isString( colorType )
+				...( typeof colorType === 'string'
 					? { [ colorType ]: kebabCase( colorType ) }
 					: colorType ),
 			};
@@ -84,9 +105,8 @@ function createColorHOC( colorTypes, withColorPalette ) {
 
 					this.setters = this.createSetters();
 					this.colorUtils = {
-						getMostReadableColor: this.getMostReadableColor.bind(
-							this
-						),
+						getMostReadableColor:
+							this.getMostReadableColor.bind( this ),
 					};
 
 					this.state = {};
@@ -105,9 +125,8 @@ function createColorHOC( colorTypes, withColorPalette ) {
 							colorContext,
 							colorAttributeName
 						) => {
-							const upperFirstColorAttributeName = upperFirst(
-								colorAttributeName
-							);
+							const upperFirstColorAttributeName =
+								upperFirst( colorAttributeName );
 							const customColorAttributeName = `custom${ upperFirstColorAttributeName }`;
 							settersAccumulator[
 								`set${ upperFirstColorAttributeName }`
@@ -159,9 +178,7 @@ function createColorHOC( colorTypes, withColorPalette ) {
 
 							const previousColorObject =
 								previousState[ colorAttributeName ];
-							const previousColor = get( previousColorObject, [
-								'color',
-							] );
+							const previousColor = previousColorObject?.color;
 							/**
 							 * The "and previousColorObject" condition checks that a previous color object was already computed.
 							 * At the start previousColorObject and colorValue are both equal to undefined
@@ -171,9 +188,8 @@ function createColorHOC( colorTypes, withColorPalette ) {
 								previousColor === colorObject.color &&
 								previousColorObject
 							) {
-								newState[
-									colorAttributeName
-								] = previousColorObject;
+								newState[ colorAttributeName ] =
+									previousColorObject;
 							} else {
 								newState[ colorAttributeName ] = {
 									...colorObject,

@@ -7,188 +7,17 @@ import deepFreeze from 'deep-freeze';
  * Internal dependencies
  */
 import {
-	preferences,
 	activeModal,
 	isSavingMetaBoxes,
 	metaBoxLocations,
 	removedPanels,
+	blockInserterPanel,
+	listViewPanel,
 } from '../reducer';
-import { PREFERENCES_DEFAULTS } from '../defaults';
+
+import { setIsInserterOpened, setIsListViewOpened } from '../actions';
 
 describe( 'state', () => {
-	describe( 'preferences()', () => {
-		it( 'should apply all defaults', () => {
-			const state = preferences( undefined, {} );
-
-			expect( state ).toEqual( PREFERENCES_DEFAULTS );
-		} );
-
-		it( 'should disable panels by default', () => {
-			const original = deepFreeze( {
-				panels: {},
-			} );
-			const state = preferences( original, {
-				type: 'TOGGLE_PANEL_ENABLED',
-				panelName: 'post-status',
-			} );
-			expect( state.panels ).toEqual( {
-				'post-status': { enabled: false },
-			} );
-		} );
-
-		it( 'should disable panels that are enabled', () => {
-			const original = deepFreeze( {
-				panels: {
-					'post-status': { enabled: true },
-				},
-			} );
-			const state = preferences( original, {
-				type: 'TOGGLE_PANEL_ENABLED',
-				panelName: 'post-status',
-			} );
-			expect( state.panels ).toEqual( {
-				'post-status': { enabled: false },
-			} );
-		} );
-
-		it( 'should enable panels that are disabled', () => {
-			const original = deepFreeze( {
-				panels: {
-					'post-status': { enabled: false },
-				},
-			} );
-			const state = preferences( original, {
-				type: 'TOGGLE_PANEL_ENABLED',
-				panelName: 'post-status',
-			} );
-			expect( state.panels ).toEqual( {
-				'post-status': { enabled: true },
-			} );
-		} );
-
-		it( 'should open panels by default', () => {
-			const original = deepFreeze( {
-				panels: {},
-			} );
-			const state = preferences( original, {
-				type: 'TOGGLE_PANEL_OPENED',
-				panelName: 'post-status',
-			} );
-			expect( state.panels ).toEqual( {
-				'post-status': { opened: true },
-			} );
-		} );
-
-		it( 'should open panels that are closed', () => {
-			const original = deepFreeze( {
-				panels: {
-					'post-status': { opened: false },
-				},
-			} );
-			const state = preferences( original, {
-				type: 'TOGGLE_PANEL_OPENED',
-				panelName: 'post-status',
-			} );
-			expect( state.panels ).toEqual( {
-				'post-status': { opened: true },
-			} );
-		} );
-
-		it( 'should close panels that are opened', () => {
-			const original = deepFreeze( {
-				panels: {
-					'post-status': { opened: true },
-				},
-			} );
-			const state = preferences( original, {
-				type: 'TOGGLE_PANEL_OPENED',
-				panelName: 'post-status',
-			} );
-			expect( state.panels ).toEqual( {
-				'post-status': { opened: false },
-			} );
-		} );
-
-		it( 'should open panels that are legacy closed', () => {
-			const original = deepFreeze( {
-				panels: {
-					'post-status': false,
-				},
-			} );
-			const state = preferences( original, {
-				type: 'TOGGLE_PANEL_OPENED',
-				panelName: 'post-status',
-			} );
-			expect( state.panels ).toEqual( {
-				'post-status': { opened: true },
-			} );
-		} );
-
-		it( 'should close panels that are legacy opened', () => {
-			const original = deepFreeze( {
-				panels: {
-					'post-status': true,
-				},
-			} );
-			const state = preferences( original, {
-				type: 'TOGGLE_PANEL_OPENED',
-				panelName: 'post-status',
-			} );
-			expect( state.panels ).toEqual( {
-				'post-status': { opened: false },
-			} );
-		} );
-
-		it( 'should return switched mode', () => {
-			const state = preferences( deepFreeze( { editorMode: 'visual' } ), {
-				type: 'SWITCH_MODE',
-				mode: 'text',
-			} );
-
-			expect( state.editorMode ).toBe( 'text' );
-		} );
-
-		it( 'should toggle a feature flag', () => {
-			const state = preferences(
-				deepFreeze( { features: { chicken: true } } ),
-				{
-					type: 'TOGGLE_FEATURE',
-					feature: 'chicken',
-				}
-			);
-
-			expect( state.features ).toEqual( { chicken: false } );
-		} );
-
-		describe( 'hiddenBlockTypes', () => {
-			it( 'concatenates unique names on disable', () => {
-				const original = deepFreeze( {
-					hiddenBlockTypes: [ 'a', 'b' ],
-				} );
-
-				const state = preferences( original, {
-					type: 'HIDE_BLOCK_TYPES',
-					blockNames: [ 'b', 'c' ],
-				} );
-
-				expect( state.hiddenBlockTypes ).toEqual( [ 'a', 'b', 'c' ] );
-			} );
-
-			it( 'omits present names by enable', () => {
-				const original = deepFreeze( {
-					hiddenBlockTypes: [ 'a', 'b' ],
-				} );
-
-				const state = preferences( original, {
-					type: 'SHOW_BLOCK_TYPES',
-					blockNames: [ 'b', 'c' ],
-				} );
-
-				expect( state.hiddenBlockTypes ).toEqual( [ 'a' ] );
-			} );
-		} );
-	} );
-
 	describe( 'activeModal', () => {
 		it( 'should default to null', () => {
 			const state = activeModal( undefined, {} );
@@ -249,14 +78,44 @@ describe( 'state', () => {
 			const action = {
 				type: 'SET_META_BOXES_PER_LOCATIONS',
 				metaBoxesPerLocation: {
-					normal: [ 'postcustom' ],
+					normal: [ { id: 'postcustom' } ],
 				},
 			};
 
 			const state = metaBoxLocations( undefined, action );
 
 			expect( state ).toEqual( {
-				normal: [ 'postcustom' ],
+				normal: [ { id: 'postcustom' } ],
+			} );
+		} );
+
+		it( 'should merge new meta box locations into the existing ones', () => {
+			const oldState = {
+				normal: [
+					{ id: 'a', title: 'A' },
+					{ id: 'b', title: 'B' },
+				],
+				side: [ { id: 's', title: 'S' } ],
+			};
+			const action = {
+				type: 'SET_META_BOXES_PER_LOCATIONS',
+				metaBoxesPerLocation: {
+					normal: [
+						{ id: 'b', title: 'B-updated' },
+						{ id: 'c', title: 'C' },
+					],
+					advanced: [ { id: 'd', title: 'D' } ],
+				},
+			};
+			const newState = metaBoxLocations( oldState, action );
+			expect( newState ).toEqual( {
+				normal: [
+					{ id: 'a', title: 'A' },
+					{ id: 'b', title: 'B-updated' },
+					{ id: 'c', title: 'C' },
+				],
+				advanced: [ { id: 'd', title: 'D' } ],
+				side: [ { id: 's', title: 'S' } ],
 			} );
 		} );
 	} );
@@ -278,6 +137,68 @@ describe( 'state', () => {
 				panelName: 'post-status',
 			} );
 			expect( state ).toBe( original );
+		} );
+	} );
+
+	describe( 'blockInserterPanel()', () => {
+		it( 'should apply default state', () => {
+			expect( blockInserterPanel( undefined, {} ) ).toEqual( false );
+		} );
+
+		it( 'should default to returning the same state', () => {
+			expect( blockInserterPanel( true, {} ) ).toBe( true );
+		} );
+
+		it( 'should set the open state of the inserter panel', () => {
+			expect(
+				blockInserterPanel( false, setIsInserterOpened( true ) )
+			).toBe( true );
+			expect(
+				blockInserterPanel( true, setIsInserterOpened( false ) )
+			).toBe( false );
+		} );
+
+		it( 'should close the inserter when opening the list view panel', () => {
+			expect(
+				blockInserterPanel( true, setIsListViewOpened( true ) )
+			).toBe( false );
+		} );
+
+		it( 'should not change the state when closing the list view panel', () => {
+			expect(
+				blockInserterPanel( true, setIsListViewOpened( false ) )
+			).toBe( true );
+		} );
+	} );
+
+	describe( 'listViewPanel()', () => {
+		it( 'should apply default state', () => {
+			expect( listViewPanel( undefined, {} ) ).toEqual( false );
+		} );
+
+		it( 'should default to returning the same state', () => {
+			expect( listViewPanel( true, {} ) ).toBe( true );
+		} );
+
+		it( 'should set the open state of the list view panel', () => {
+			expect( listViewPanel( false, setIsListViewOpened( true ) ) ).toBe(
+				true
+			);
+			expect( listViewPanel( true, setIsListViewOpened( false ) ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'should close the list view when opening the inserter panel', () => {
+			expect( listViewPanel( true, setIsInserterOpened( true ) ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'should not change the state when closing the inserter panel', () => {
+			expect( listViewPanel( true, setIsInserterOpened( false ) ) ).toBe(
+				true
+			);
 		} );
 	} );
 } );

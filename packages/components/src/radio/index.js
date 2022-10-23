@@ -22,8 +22,7 @@ function Radio( { children, value, ...props }, ref ) {
 		<ReakitRadio
 			ref={ ref }
 			as={ Button }
-			isPrimary={ checked }
-			isSecondary={ ! checked }
+			variant={ checked ? 'primary' : 'secondary' }
 			value={ value }
 			{ ...radioContext }
 			{ ...props }

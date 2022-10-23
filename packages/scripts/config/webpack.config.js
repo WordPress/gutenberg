@@ -2,10 +2,13 @@
  * External dependencies
  */
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
-const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
-const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
 const { CleanWebpackPlugin } = require( 'clean-webpack-plugin' );
-const path = require( 'path' );
+const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
+const browserslist = require( 'browserslist' );
+const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
+const { basename, dirname, resolve } = require( 'path' );
+const ReactRefreshWebpackPlugin = require( '@pmmmwh/react-refresh-webpack-plugin' );
+const TerserPlugin = require( 'terser-webpack-plugin' );
 
 /**
  * WordPress dependencies
@@ -16,11 +19,27 @@ const postcssPlugins = require( '@wordpress/postcss-plugins-preset' );
 /**
  * Internal dependencies
  */
-const { hasBabelConfig, hasPostCSSConfig } = require( '../utils' );
-const FixStyleWebpackPlugin = require( './fix-style-webpack-plugin' );
+const {
+	fromConfigRoot,
+	hasBabelConfig,
+	hasArgInCLI,
+	hasCssnanoConfig,
+	hasPostCSSConfig,
+	getWordPressSrcDirectory,
+	getWebpackEntryPoints,
+	getRenderPropPaths,
+} = require( '../utils' );
 
 const isProduction = process.env.NODE_ENV === 'production';
 const mode = isProduction ? 'production' : 'development';
+let target = 'browserslist';
+if ( ! browserslist.findConfig( '.' ) ) {
+	target += ':' + fromConfigRoot( '.browserslistrc' );
+}
+const hasReactFastRefresh = hasArgInCLI( '--hot' ) && ! isProduction;
+
+// Get paths of the `render` props included in `block.json` files
+const renderPaths = getRenderPropPaths();
 
 const cssLoaders = [
 	{
@@ -30,6 +49,9 @@ const cssLoaders = [
 		loader: require.resolve( 'css-loader' ),
 		options: {
 			sourceMap: ! isProduction,
+			modules: {
+				auto: true,
+			},
 		},
 	},
 	{
@@ -38,8 +60,29 @@ const cssLoaders = [
 			// Provide a fallback configuration if there's not
 			// one explicitly available in the project.
 			...( ! hasPostCSSConfig() && {
-				ident: 'postcss',
-				plugins: postcssPlugins,
+				postcssOptions: {
+					ident: 'postcss',
+					sourceMap: ! isProduction,
+					plugins: isProduction
+						? [
+								...postcssPlugins,
+								require( 'cssnano' )( {
+									// Provide a fallback configuration if there's not
+									// one explicitly available in the project.
+									...( ! hasCssnanoConfig() && {
+										preset: [
+											'default',
+											{
+												discardComments: {
+													removeAll: true,
+												},
+											},
+										],
+									} ),
+								} ),
+						  ]
+						: postcssPlugins,
+				},
 			} ),
 		},
 	},
@@ -47,41 +90,62 @@ const cssLoaders = [
 
 const config = {
 	mode,
-	entry: {
-		index: path.resolve( process.cwd(), 'src', 'index.js' ),
-	},
+	target,
+	entry: getWebpackEntryPoints,
 	output: {
 		filename: '[name].js',
-		path: path.resolve( process.cwd(), 'build' ),
+		path: resolve( process.cwd(), 'build' ),
 	},
 	resolve: {
 		alias: {
 			'lodash-es': 'lodash',
 		},
+		extensions: [ '.jsx', '.ts', '.tsx', '...' ],
 	},
 	optimization: {
 		// Only concatenate modules in production, when not analyzing bundles.
-		concatenateModules:
-			mode === 'production' && ! process.env.WP_BUNDLE_ANALYZER,
+		concatenateModules: isProduction && ! process.env.WP_BUNDLE_ANALYZER,
 		splitChunks: {
 			cacheGroups: {
 				style: {
-					test: /[\\/]style\.(sc|sa|c)ss$/,
+					type: 'css/mini-extract',
+					test: /[\\/]style(\.module)?\.(sc|sa|c)ss$/,
 					chunks: 'all',
 					enforce: true,
-					automaticNameDelimiter: '-',
+					name( _, chunks, cacheGroupKey ) {
+						const chunkName = chunks[ 0 ].name;
+						return `${ dirname(
+							chunkName
+						) }/${ cacheGroupKey }-${ basename( chunkName ) }`;
+					},
 				},
 				default: false,
 			},
 		},
+		minimizer: [
+			new TerserPlugin( {
+				parallel: true,
+				terserOptions: {
+					output: {
+						comments: /translators:/i,
+					},
+					compress: {
+						passes: 2,
+					},
+					mangle: {
+						reserved: [ '__', '_n', '_nx', '_x' ],
+					},
+				},
+				extractComments: false,
+			} ),
+		],
 	},
 	module: {
 		rules: [
 			{
-				test: /\.js$/,
+				test: /\.(j|t)sx?$/,
 				exclude: /node_modules/,
 				use: [
-					require.resolve( 'thread-loader' ),
 					{
 						loader: require.resolve( 'babel-loader' ),
 						options: {
@@ -101,24 +165,23 @@ const config = {
 										'@wordpress/babel-preset-default'
 									),
 								],
+								plugins: [
+									hasReactFastRefresh &&
+										require.resolve(
+											'react-refresh/babel'
+										),
+								].filter( Boolean ),
 							} ),
 						},
 					},
 				],
 			},
 			{
-				test: /\.svg$/,
-				exclude: /node_modules/,
-				use: [ '@svgr/webpack', 'url-loader' ],
-			},
-			{
 				test: /\.css$/,
-				exclude: /node_modules/,
 				use: cssLoaders,
 			},
 			{
 				test: /\.(sc|sa)ss$/,
-				exclude: /node_modules/,
 				use: [
 					...cssLoaders,
 					{
@@ -129,31 +192,104 @@ const config = {
 					},
 				],
 			},
+			{
+				test: /\.svg$/,
+				issuer: /\.(j|t)sx?$/,
+				use: [ '@svgr/webpack', 'url-loader' ],
+				type: 'javascript/auto',
+			},
+			{
+				test: /\.svg$/,
+				issuer: /\.(sc|sa|c)ss$/,
+				type: 'asset/inline',
+			},
+			{
+				test: /\.(bmp|png|jpe?g|gif|webp)$/i,
+				type: 'asset/resource',
+				generator: {
+					filename: 'images/[name].[hash:8][ext]',
+				},
+			},
+			{
+				test: /\.(woff|woff2|eot|ttf|otf)$/i,
+				type: 'asset/resource',
+				generator: {
+					filename: 'fonts/[name].[hash:8][ext]',
+				},
+			},
 		],
 	},
 	plugins: [
-		// During rebuilds, all webpack assets that are not used anymore
-		// will be removed automatically.
-		new CleanWebpackPlugin(),
+		// During rebuilds, all webpack assets that are not used anymore will be
+		// removed automatically. There is an exception added in watch mode for
+		// fonts and images. It is a known limitations:
+		// https://github.com/johnagan/clean-webpack-plugin/issues/159
+		new CleanWebpackPlugin( {
+			cleanAfterEveryBuildPatterns: [ '!fonts/**', '!images/**' ],
+			// Prevent it from deleting webpack assets during builds that have
+			// multiple configurations returned in the webpack config.
+			cleanStaleWebpackAssets: false,
+		} ),
+		new CopyWebpackPlugin( {
+			patterns: [
+				{
+					from: '**/block.json',
+					context: getWordPressSrcDirectory(),
+					noErrorOnMissing: true,
+					transform( content, absoluteFrom ) {
+						const convertExtension = ( path ) => {
+							return path.replace( /\.(j|t)sx?$/, '.js' );
+						};
+
+						if ( basename( absoluteFrom ) === 'block.json' ) {
+							const blockJson = JSON.parse( content.toString() );
+							[ 'viewScript', 'script', 'editorScript' ].forEach(
+								( key ) => {
+									if ( Array.isArray( blockJson[ key ] ) ) {
+										blockJson[ key ] =
+											blockJson[ key ].map(
+												convertExtension
+											);
+									} else if (
+										typeof blockJson[ key ] === 'string'
+									) {
+										blockJson[ key ] = convertExtension(
+											blockJson[ key ]
+										);
+									}
+								}
+							);
+
+							return JSON.stringify( blockJson, null, 2 );
+						}
+
+						return content;
+					},
+				},
+				{
+					from: '**/*.php',
+					context: getWordPressSrcDirectory(),
+					noErrorOnMissing: true,
+					filter: ( filepath ) => {
+						return (
+							process.env.WP_COPY_PHP_FILES_TO_DIST ||
+							renderPaths.includes( filepath )
+						);
+					},
+				},
+			],
+		} ),
 		// The WP_BUNDLE_ANALYZER global variable enables a utility that represents
 		// bundle content as a convenient interactive zoomable treemap.
 		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
 		// MiniCSSExtractPlugin to extract the CSS thats gets imported into JavaScript.
-		new MiniCSSExtractPlugin( { esModule: false, filename: '[name].css' } ),
-		// MiniCSSExtractPlugin creates JavaScript assets for CSS that are
-		// obsolete and should be removed. Related webpack issue:
-		// https://github.com/webpack-contrib/mini-css-extract-plugin/issues/85
-		new FixStyleWebpackPlugin(),
-		// WP_LIVE_RELOAD_PORT global variable changes port on which live reload
-		// works when running watch mode.
-		! isProduction &&
-			new LiveReloadPlugin( {
-				port: process.env.WP_LIVE_RELOAD_PORT || 35729,
-			} ),
+		new MiniCSSExtractPlugin( { filename: '[name].css' } ),
+		// React Fast Refresh.
+		hasReactFastRefresh && new ReactRefreshWebpackPlugin(),
 		// WP_NO_EXTERNALS global variable controls whether scripts' assets get
 		// generated, and the default externals set.
 		! process.env.WP_NO_EXTERNALS &&
-			new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
+			new DependencyExtractionWebpackPlugin(),
 	].filter( Boolean ),
 	stats: {
 		children: false,
@@ -165,10 +301,26 @@ if ( ! isProduction ) {
 	// See: https://webpack.js.org/configuration/devtool/#devtool.
 	config.devtool = process.env.WP_DEVTOOL || 'source-map';
 	config.module.rules.unshift( {
-		test: /\.js$/,
+		test: /\.(j|t)sx?$/,
+		exclude: [ /node_modules/ ],
 		use: require.resolve( 'source-map-loader' ),
 		enforce: 'pre',
 	} );
+	config.devServer = {
+		devMiddleware: {
+			writeToDisk: true,
+		},
+		allowedHosts: 'auto',
+		host: 'localhost',
+		port: 8887,
+		proxy: {
+			'/build': {
+				pathRewrite: {
+					'^/build': '',
+				},
+			},
+		},
+	};
 }
 
 module.exports = config;

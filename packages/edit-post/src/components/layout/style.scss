@@ -1,14 +1,6 @@
 .edit-post-layout__metaboxes {
 	flex-shrink: 0;
-}
-.edit-post-layout__metaboxes:not(:empty) {
-	border-top: $border-width solid $light-gray-500;
-	padding: 10px 0 10px;
 	clear: both;
-
-	.edit-post-meta-boxes-area {
-		margin: auto 20px;
-	}
 }
 
 // Adjust the position of the notices
@@ -19,6 +11,13 @@
 	padding-left: 16px;
 	padding-right: 16px;
 }
+
+.is-distraction-free {
+	.components-editor-notices__snackbar {
+		bottom: 20px;
+	}
+}
+
 @include editor-left(".edit-post-layout .components-editor-notices__snackbar");
 
 .edit-post-layout .editor-post-publish-panel {
@@ -34,8 +33,8 @@
 		z-index: z-index(".edit-post-layout .edit-post-post-publish-panel {greater than small}");
 		top: $admin-bar-height;
 		left: auto;
-		width: $sidebar-width;
-		border-left: $border-width solid $light-gray-500;
+		width: $sidebar-width + $border-width;
+		border-left: $border-width solid $gray-300;
 		transform: translateX(+100%);
 		animation: edit-post-post-publish-panel__slide-in-animation 0.1s forwards;
 		@include reduce-motion("animation");
@@ -45,7 +44,7 @@
 		}
 
 		// Keep it open on focus to avoid conflict with navigate-regions animation.
-		.is-focusing-regions & {
+		[role="region"]:focus & {
 			transform: translateX(0%);
 		}
 	}
@@ -57,19 +56,15 @@
 	}
 }
 
-.interface-interface-skeleton__sidebar > div {
-	height: 100%;
-}
-
 .edit-post-layout .editor-post-publish-panel__header-publish-button {
 	justify-content: center;
 }
 
 
 .edit-post-layout__toggle-publish-panel,
-.edit-post-layout__toogle-sidebar-panel,
+.edit-post-layout__toggle-sidebar-panel,
 .edit-post-layout__toggle-entities-saved-states-panel {
-	z-index: z-index(".edit-post-layout__toogle-sidebar-panel");
+	z-index: z-index(".edit-post-layout__toggle-sidebar-panel");
 	position: fixed !important; // Need to override the default relative positionning
 	top: -9999em;
 	bottom: auto;
@@ -77,62 +72,15 @@
 	right: 0;
 	width: $sidebar-width;
 	background-color: $white;
-	border: 1px dotted $light-gray-500;
+	border: 1px dotted $gray-300;
 	height: auto !important; // Need to override the default sidebar positionnings
 	padding: $grid-unit-30;
 	display: flex;
 	justify-content: center;
 
 	.interface-interface-skeleton__actions:focus &,
-	.interface-interface-skeleton__actions:focus-within &,
-	.interface-interface-skeleton__actions:focus &,
 	.interface-interface-skeleton__actions:focus-within & {
 		top: auto;
 		bottom: 0;
-	}
-}
-
-.edit-post-layout__footer {
-	display: none;
-	z-index: z-index(".edit-post-layout__footer");
-
-	// Stretch to mimic outline padding on desktop.
-	@include break-medium() {
-		display: flex;
-		background: $white;
-		height: $footer-height;
-		align-items: center;
-		font-size: $default-font-size;
-		padding: 0 ($grid-unit-15 + 6px);
-	}
-}
-
-.edit-post-layout .interface-interface-skeleton__content {
-	background-color: $light-gray-700;
-}
-
-.edit-post-layout__inserter-panel {
-	height: 100%;
-	display: flex;
-	flex-direction: column;
-}
-
-.edit-post-layout__inserter-panel-header {
-	padding-top: $grid-unit-10;
-	padding-right: $grid-unit-10;
-	display: flex;
-	justify-content: flex-end;
-
-	@include break-medium() {
-		display: none;
-	}
-}
-
-.edit-post-layout__inserter-panel-content {
-	// Leave space for the close button
-	height: calc(100% - #{$button-size} - #{$grid-unit-10});
-
-	@include break-medium() {
-		height: 100%;
 	}
 }

@@ -2,17 +2,18 @@
  * External dependencies
  */
 import styled from '@emotion/styled';
-import { css } from '@emotion/core';
+import { css } from '@emotion/react';
 
 /**
  * Internal dependencies
  */
-import { color, reduceMotion } from '../../utils/style-mixins';
+import { COLORS, reduceMotion } from '../../utils';
 
 export const rootBase = () => {
 	return css`
 		border-radius: 2px;
 		box-sizing: border-box;
+		direction: ltr;
 		display: grid;
 		grid-template-columns: repeat( 3, 1fr );
 		outline: none;
@@ -43,11 +44,9 @@ export const Row = styled.div`
 `;
 
 const pointActive = ( { isActive } ) => {
-	const boxShadow = isActive ? `0 0 0 2px ${ color( 'black' ) }` : null;
-	const pointColor = isActive ? color( 'black' ) : color( 'lightGray.800' );
-	const pointColorHover = isActive
-		? color( 'black' )
-		: color( 'blue.medium.focus' );
+	const boxShadow = isActive ? `0 0 0 2px ${ COLORS.gray[ 900 ] }` : null;
+	const pointColor = isActive ? COLORS.gray[ 900 ] : COLORS.gray[ 400 ];
+	const pointColorHover = isActive ? COLORS.gray[ 900 ] : COLORS.ui.theme;
 
 	return css`
 		box-shadow: ${ boxShadow };

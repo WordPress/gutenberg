@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
+import memoize from 'memize';
 
 /**
  * WordPress dependencies
@@ -13,13 +13,13 @@ import { addAction, removeAction } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { PluginContextProvider } from '../plugin-context';
+import { PluginErrorBoundary } from '../plugin-error-boundary';
 import { getPlugins } from '../../api';
 
 /**
  * A component that renders all plugin fills in a hidden div.
  *
  * @example
- * <caption>ES5</caption>
  * ```js
  * // Using ES5 syntax
  * var el = wp.element.createElement;
@@ -28,7 +28,7 @@ import { getPlugins } from '../../api';
  * function Layout() {
  * 	return el(
  * 		'div',
- * 		{},
+ * 		{ scope: 'my-page' },
  * 		'Content of the page',
  * 		PluginArea
  * 	);
@@ -36,15 +36,14 @@ import { getPlugins } from '../../api';
  * ```
  *
  * @example
- * <caption>ESNext</caption>
  * ```js
  * // Using ESNext syntax
- * const { PluginArea } = wp.plugins;
+ * import { PluginArea } from '@wordpress/plugins';
  *
  * const Layout = () => (
  * 	<div>
  * 		Content of the page
- * 		<PluginArea />
+ * 		<PluginArea scope="my-page" />
  * 	</div>
  * );
  * ```
@@ -56,20 +55,25 @@ class PluginArea extends Component {
 		super( ...arguments );
 
 		this.setPlugins = this.setPlugins.bind( this );
+		this.memoizedContext = memoize( ( name, icon ) => {
+			return {
+				name,
+				icon,
+			};
+		} );
 		this.state = this.getCurrentPluginsState();
 	}
 
 	getCurrentPluginsState() {
 		return {
-			plugins: map( getPlugins(), ( { icon, name, render } ) => {
-				return {
-					Plugin: render,
-					context: {
-						name,
-						icon,
-					},
-				};
-			} ),
+			plugins: getPlugins( this.props.scope ).map(
+				( { icon, name, render } ) => {
+					return {
+						Plugin: render,
+						context: this.memoizedContext( name, icon ),
+					};
+				}
+			),
 		};
 	}
 
@@ -104,12 +108,17 @@ class PluginArea extends Component {
 	render() {
 		return (
 			<div style={ { display: 'none' } }>
-				{ map( this.state.plugins, ( { context, Plugin } ) => (
+				{ this.state.plugins.map( ( { context, Plugin } ) => (
 					<PluginContextProvider
 						key={ context.name }
 						value={ context }
 					>
-						<Plugin />
+						<PluginErrorBoundary
+							name={ context.name }
+							onError={ this.props.onError }
+						>
+							<Plugin />
+						</PluginErrorBoundary>
 					</PluginContextProvider>
 				) ) }
 			</div>

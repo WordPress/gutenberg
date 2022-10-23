@@ -1,5 +1,0 @@
-{
-	"name": "core/post-comments",
-	"category": "design",
-	"context": [ "postId" ]
-}

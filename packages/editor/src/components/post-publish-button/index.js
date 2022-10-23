@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop, get, some } from 'lodash';
+import { get, some } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -17,6 +17,9 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import PublishButtonLabel from './label';
+import { store as editorStore } from '../../store';
+
+const noop = () => {};
 
 export class PostPublishButton extends Component {
 	constructor( props ) {
@@ -24,9 +27,8 @@ export class PostPublishButton extends Component {
 		this.buttonNode = createRef();
 
 		this.createOnClick = this.createOnClick.bind( this );
-		this.closeEntitiesSavedStates = this.closeEntitiesSavedStates.bind(
-			this
-		);
+		this.closeEntitiesSavedStates =
+			this.closeEntitiesSavedStates.bind( this );
 
 		this.state = {
 			entitiesSavedStatesCallback: false,
@@ -40,19 +42,26 @@ export class PostPublishButton extends Component {
 
 	createOnClick( callback ) {
 		return ( ...args ) => {
-			const { hasNonPostEntityChanges } = this.props;
-			if ( hasNonPostEntityChanges ) {
+			const { hasNonPostEntityChanges, setEntitiesSavedStatesCallback } =
+				this.props;
+			// If a post with non-post entities is published, but the user
+			// elects to not save changes to the non-post entities, those
+			// entities will still be dirty when the Publish button is clicked.
+			// We also need to check that the `setEntitiesSavedStatesCallback`
+			// prop was passed. See https://github.com/WordPress/gutenberg/pull/37383
+			if ( hasNonPostEntityChanges && setEntitiesSavedStatesCallback ) {
 				// The modal for multiple entity saving will open,
 				// hold the callback for saving/publishing the post
 				// so that we can call it if the post entity is checked.
 				this.setState( {
 					entitiesSavedStatesCallback: () => callback( ...args ),
 				} );
+
 				// Open the save panel by setting its callback.
 				// To set a function on the useState hook, we must set it
 				// with another function (() => myFunction). Passing the
 				// function on its own will cause an error when called.
-				this.props.setEntitiesSavedStatesCallback(
+				setEntitiesSavedStatesCallback(
 					() => this.closeEntitiesSavedStates
 				);
 				return noop;
@@ -94,6 +103,7 @@ export class PostPublishButton extends Component {
 			isPublished,
 			isSaveable,
 			isSaving,
+			isAutoSaving,
 			isToggle,
 			onSave,
 			onStatusChange,
@@ -101,21 +111,24 @@ export class PostPublishButton extends Component {
 			onToggle,
 			visibility,
 			hasNonPostEntityChanges,
+			isSavingNonPostEntityChanges,
 		} = this.props;
 
 		const isButtonDisabled =
-			isSaving ||
-			forceIsSaving ||
-			! isSaveable ||
-			isPostSavingLocked ||
-			( ! isPublishable && ! forceIsDirty );
+			( isSaving ||
+				forceIsSaving ||
+				! isSaveable ||
+				isPostSavingLocked ||
+				( ! isPublishable && ! forceIsDirty ) ) &&
+			( ! hasNonPostEntityChanges || isSavingNonPostEntityChanges );
 
 		const isToggleDisabled =
-			isPublished ||
-			isSaving ||
-			forceIsSaving ||
-			! isSaveable ||
-			( ! isPublishable && ! forceIsDirty );
+			( isPublished ||
+				isSaving ||
+				forceIsSaving ||
+				! isSaveable ||
+				( ! isPublishable && ! forceIsDirty ) ) &&
+			( ! hasNonPostEntityChanges || isSavingNonPostEntityChanges );
 
 		let publishStatus;
 		if ( ! hasPublishAction ) {
@@ -145,19 +158,19 @@ export class PostPublishButton extends Component {
 		};
 
 		const buttonProps = {
-			'aria-disabled': isButtonDisabled && ! hasNonPostEntityChanges,
+			'aria-disabled': isButtonDisabled,
 			className: 'editor-post-publish-button',
-			isBusy: isSaving && isPublished,
-			isPrimary: true,
+			isBusy: ! isAutoSaving && isSaving && isPublished,
+			variant: 'primary',
 			onClick: this.createOnClick( onClickButton ),
 		};
 
 		const toggleProps = {
-			'aria-disabled': isToggleDisabled && ! hasNonPostEntityChanges,
+			'aria-disabled': isToggleDisabled,
 			'aria-expanded': isOpen,
 			className: 'editor-post-publish-panel__toggle',
 			isBusy: isSaving && isPublished,
-			isPrimary: true,
+			variant: 'primary',
 			onClick: this.createOnClick( onClickToggle ),
 		};
 
@@ -197,6 +210,7 @@ export default compose( [
 	withSelect( ( select ) => {
 		const {
 			isSavingPost,
+			isAutosavingPost,
 			isEditedPostBeingScheduled,
 			getEditedPostVisibility,
 			isCurrentPostPublished,
@@ -207,9 +221,12 @@ export default compose( [
 			getCurrentPostType,
 			getCurrentPostId,
 			hasNonPostEntityChanges,
-		} = select( 'core/editor' );
+			isSavingNonPostEntityChanges,
+		} = select( editorStore );
+		const _isAutoSaving = isAutosavingPost();
 		return {
-			isSaving: isSavingPost(),
+			isSaving: isSavingPost() || _isAutoSaving,
+			isAutoSaving: _isAutoSaving,
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			visibility: getEditedPostVisibility(),
 			isSaveable: isEditedPostSaveable(),
@@ -224,10 +241,11 @@ export default compose( [
 			postType: getCurrentPostType(),
 			postId: getCurrentPostId(),
 			hasNonPostEntityChanges: hasNonPostEntityChanges(),
+			isSavingNonPostEntityChanges: isSavingNonPostEntityChanges(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { editPost, savePost } = dispatch( 'core/editor' );
+		const { editPost, savePost } = dispatch( editorStore );
 		return {
 			onStatusChange: ( status ) =>
 				editPost( { status }, { undoIgnore: true } ),

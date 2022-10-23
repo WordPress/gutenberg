@@ -8,44 +8,53 @@ Assuming you have a form component, you can disable all form inputs by wrapping 
 
 ```jsx
 import { Button, Disabled, TextControl } from '@wordpress/components';
-import { withState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
-const MyDisabled = withState( {
-	isDisabled: true,
-} )( ( { isDisabled, setState } ) => { 
+const MyDisabled = () => {
+	const [ isDisabled, setIsDisabled ] = useState( true );
+
 	let input = <TextControl label="Input" onChange={ () => {} } />;
 	if ( isDisabled ) {
 		input = <Disabled>{ input }</Disabled>;
 	}
-	
+
 	const toggleDisabled = () => {
-		setState( ( state ) => ( { isDisabled: ! state.isDisabled } ) );
+		setIsDisabled( ( state ) => ! state );
 	};
-	
+
 	return (
 		<div>
 			{ input }
-			<Button isPrimary onClick={ toggleDisabled }>
+			<Button variant="primary" onClick={ toggleDisabled }>
 				Toggle Disabled
 			</Button>
 		</div>
 	);
-} );
+};
 ```
 
-A component can detect if it has been wrapped in a `<Disabled>` by accessing its [context](https://reactjs.org/docs/context.html) using `Disabled.Consumer`.
+A component can detect if it has been wrapped in a `<Disabled />` by accessing its [context](https://reactjs.org/docs/context.html) using `Disabled.Context`.
 
 ```jsx
-function CustomButton() {
+function CustomButton( props ) {
+	const isDisabled = useContext( Disabled.Context );
 	return (
-		<Disabled.Consumer>
-			{ ( isDisabled ) => (
-				<button
-					{ ...this.props }
-					style={ { opacity: isDisabled ? 0.5 : 1 } }
-				/>
-			) }
-		</Disabled.Consumer>
+		<button
+			{ ...props }
+			style={ { opacity: isDisabled ? 0.5 : 1 } }
+		/>
 	);
 }
 ```
+
+### Props
+
+The component accepts the following props:
+
+#### isDisabled
+
+Whether to disable all the descendant fields. Defaults to `true`.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `true`

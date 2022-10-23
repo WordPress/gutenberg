@@ -5,7 +5,7 @@
 	margin-bottom: $default-block-margin;
 }
 
-.block-editor .wp-block-more { // needs specificity
+.wp-block-more {
 	display: block;
 	text-align: center;
 	white-space: nowrap;
@@ -17,7 +17,7 @@
 		text-transform: uppercase;
 		font-weight: 600;
 		font-family: $default-font;
-		color: $dark-gray-300;
+		color: $gray-700;
 		border: none;
 		box-shadow: none;
 		white-space: nowrap;
@@ -41,6 +41,6 @@
 		top: calc(50%);
 		left: 0;
 		right: 0;
-		border-top: 3px dashed $light-gray-700;
+		border-top: 3px dashed $gray-400;
 	}
 }

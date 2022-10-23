@@ -47,11 +47,16 @@ const defaultIgnoreArgs = ! hasIgnoredFiles
 	? [ '--ignore-path', fromConfigRoot( '.eslintignore' ) ]
 	: [];
 
+const defaultExtArgs = hasArgInCLI( '--ext' )
+	? []
+	: [ '--ext', 'js,jsx,ts,tsx' ];
+
 const result = spawn(
 	resolveBin( 'eslint' ),
 	[
 		...defaultConfigArgs,
 		...defaultIgnoreArgs,
+		...defaultExtArgs,
 		...args,
 		...defaultFilesArgs,
 	],

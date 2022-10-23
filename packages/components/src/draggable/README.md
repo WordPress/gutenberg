@@ -1,6 +1,6 @@
 # Draggable
 
-`Draggable` is a Component that provides a way to set up a a cross-browser (including IE) customisable drag image and the transfer data for the drag event. It decouples the drag handle and the element to drag: use it by wrapping the component that will become the drag handle and providing the DOM ID of the element to drag.
+`Draggable` is a Component that provides a way to set up a cross-browser (including IE) customisable drag image and the transfer data for the drag event. It decouples the drag handle and the element to drag: use it by wrapping the component that will become the drag handle and providing the DOM ID of the element to drag.
 
 Note that the drag handle needs to declare the `draggable="true"` property and bind the `Draggable`s `onDraggableStart` and `onDraggableEnd` event handlers to its own `onDragStart` and `onDragEnd` respectively. `Draggable` takes care of the logic to setup the drag image and the transfer data, but is not concerned with creating an actual DOM element that is draggable.
 
@@ -24,7 +24,15 @@ Arbitrary data object attached to the drag and drop event.
 
 ### onDragStart
 
-A function to be called when dragging starts.
+A function called when dragging starts. This callback receives the `event` object from the `dragstart` event as its first parameter.
+
+-   Type: `Function`
+-   Required: No
+-   Default: `noop`
+
+### onDragOver
+
+A function called when the element being dragged is dragged over a valid drop target. This callback receives the `event` object from the `dragover` event as its first parameter.
 
 -   Type: `Function`
 -   Required: No
@@ -32,7 +40,7 @@ A function to be called when dragging starts.
 
 ### onDragEnd
 
-A function to be called when dragging ends.
+A function called when dragging ends. This callback receives the `event` object from the `dragend` event as its first parameter.
 
 -   Type: `Function`
 -   Required: No

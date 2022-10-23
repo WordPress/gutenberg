@@ -1,23 +1,21 @@
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useRef, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { useRovingTabIndexContext } from './roving-tab-index-context';
 
-export default function RovingTabIndexItem( {
-	children,
-	as: Component,
-	...props
-} ) {
-	const ref = useRef();
-	const {
-		lastFocusedElement,
-		setLastFocusedElement,
-	} = useRovingTabIndexContext();
+export default forwardRef( function RovingTabIndexItem(
+	{ children, as: Component, ...props },
+	forwardedRef
+) {
+	const localRef = useRef();
+	const ref = forwardedRef || localRef;
+	const { lastFocusedElement, setLastFocusedElement } =
+		useRovingTabIndexContext();
 	let tabIndex;
 
 	if ( lastFocusedElement ) {
@@ -32,4 +30,4 @@ export default function RovingTabIndexItem( {
 	}
 
 	return <Component { ...allProps }>{ children }</Component>;
-}
+} );

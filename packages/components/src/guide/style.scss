@@ -6,12 +6,21 @@
 		width: 600px;
 	}
 
-	.components-modal__header {
-		background: none;
-		border-bottom: none;
-		width: 100%;
+	.components-modal__content {
 		padding: 0;
-		margin: 0;
+		margin-top: 0;
+		border-radius: $radius-block-ui;
+
+		&::before {
+			content: none;
+		}
+	}
+
+	.components-modal__header {
+		border-bottom: none;
+		padding: 0;
+		position: sticky;
+		height: $header-height;
 
 		.components-button {
 			align-self: flex-start;
@@ -54,29 +63,22 @@
 		padding: 0 $grid-unit-40;
 		position: relative;
 		width: 100%;
-
-		@media (max-width: $break-small) {
-			position: absolute;
-			bottom: 0;
-		}
 	}
 
 	&__page-control {
-		margin: $grid-unit-10 0 $grid-unit-10 0;
+		margin: 0;
 		text-align: center;
 
 		li {
 			display: inline-block;
+			margin: 0;
 		}
 
 		.components-button {
 			height: 30px;
 			min-width: 20px;
+			margin: -6px 0;
 		}
-	}
-
-	.components-modal__content {
-		padding: 0;
 	}
 }
 
@@ -86,12 +88,9 @@
 	height: 80vh;
 	max-height: 575px;
 
-	@media (max-width: $break-small) {
-		bottom: 5%;
-		left: $grid-unit-20;
-		right: $grid-unit-20;
-		top: 5%;
-		margin: 0 auto;
+	@media ( max-width: $break-small ) {
+		margin: auto;
+		max-width: calc(100vw - #{$grid-unit-20} * 2);
 	}
 }
 
@@ -129,9 +128,5 @@
 
 	&.components-guide__finish-button {
 		right: $grid-unit-40;
-	}
-
-	&.components-guide__inline-finish-button {
-		display: none;
 	}
 }

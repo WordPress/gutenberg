@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { size } from 'lodash';
+import classnames from 'classnames';
+
 /**
  * WordPress dependencies
  */
@@ -11,13 +12,15 @@ import { Dropdown, Button } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, store as blocksStore } from '@wordpress/blocks';
 import { plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import InserterMenu from './menu';
+import QuickInserter from './quick-inserter';
+import { store as blockEditorStore } from '../../store';
 
 const defaultRenderToggle = ( {
 	onToggle,
@@ -25,7 +28,8 @@ const defaultRenderToggle = ( {
 	isOpen,
 	blockTitle,
 	hasSingleBlockType,
-	toggleProps,
+	toggleProps = {},
+	prioritizePatterns,
 } ) => {
 	let label;
 	if ( hasSingleBlockType ) {
@@ -34,20 +38,35 @@ const defaultRenderToggle = ( {
 			_x( 'Add %s', 'directly add the only allowed block' ),
 			blockTitle
 		);
+	} else if ( prioritizePatterns ) {
+		label = __( 'Add pattern' );
 	} else {
 		label = _x( 'Add block', 'Generic label for block inserter button' );
 	}
+
+	const { onClick, ...rest } = toggleProps;
+
+	// Handle both onClick functions from the toggle and the parent component.
+	function handleClick( event ) {
+		if ( onToggle ) {
+			onToggle( event );
+		}
+		if ( onClick ) {
+			onClick( event );
+		}
+	}
+
 	return (
 		<Button
 			icon={ plus }
 			label={ label }
 			tooltipPosition="bottom"
-			onClick={ onToggle }
+			onClick={ handleClick }
 			className="block-editor-inserter__toggle"
 			aria-haspopup={ ! hasSingleBlockType ? 'true' : false }
 			aria-expanded={ ! hasSingleBlockType ? isOpen : false }
 			disabled={ disabled }
-			{ ...toggleProps }
+			{ ...rest }
 		/>
 	);
 };
@@ -64,7 +83,7 @@ class Inserter extends Component {
 	onToggle( isOpen ) {
 		const { onToggle } = this.props;
 
-		// Surface toggle callback to parent component
+		// Surface toggle callback to parent component.
 		if ( onToggle ) {
 			onToggle( isOpen );
 		}
@@ -85,9 +104,11 @@ class Inserter extends Component {
 			disabled,
 			blockTitle,
 			hasSingleBlockType,
+			directInsertBlock,
 			toggleProps,
 			hasItems,
 			renderToggle = defaultRenderToggle,
+			prioritizePatterns,
 		} = this.props;
 
 		return renderToggle( {
@@ -96,7 +117,9 @@ class Inserter extends Component {
 			disabled: disabled || ! hasItems,
 			blockTitle,
 			hasSingleBlockType,
+			directInsertBlock,
 			toggleProps,
+			prioritizePatterns,
 		} );
 	}
 
@@ -115,17 +138,37 @@ class Inserter extends Component {
 			clientId,
 			isAppender,
 			showInserterHelpPanel,
-			__experimentalSelectBlockOnInsert: selectBlockOnInsert,
+
+			// This prop is experimental to give some time for the quick inserter to mature
+			// Feel free to make them stable after a few releases.
+			__experimentalIsQuick: isQuick,
+			prioritizePatterns,
 		} = this.props;
+
+		if ( isQuick ) {
+			return (
+				<QuickInserter
+					onSelect={ () => {
+						onClose();
+					} }
+					rootClientId={ rootClientId }
+					clientId={ clientId }
+					isAppender={ isAppender }
+					prioritizePatterns={ prioritizePatterns }
+				/>
+			);
+		}
 
 		return (
 			<InserterMenu
-				onSelect={ onClose }
+				onSelect={ () => {
+					onClose();
+				} }
 				rootClientId={ rootClientId }
 				clientId={ clientId }
 				isAppender={ isAppender }
 				showInserterHelpPanel={ showInserterHelpPanel }
-				__experimentalSelectBlockOnInsert={ selectBlockOnInsert }
+				prioritizePatterns={ prioritizePatterns }
 			/>
 		);
 	}
@@ -134,23 +177,30 @@ class Inserter extends Component {
 		const {
 			position,
 			hasSingleBlockType,
+			directInsertBlock,
 			insertOnlyAllowedBlock,
+			__experimentalIsQuick: isQuick,
+			onSelectOrClose,
 		} = this.props;
 
-		if ( hasSingleBlockType ) {
+		if ( hasSingleBlockType || directInsertBlock ) {
 			return this.renderToggle( { onToggle: insertOnlyAllowedBlock } );
 		}
 
 		return (
 			<Dropdown
 				className="block-editor-inserter"
-				contentClassName="block-editor-inserter__popover"
+				contentClassName={ classnames(
+					'block-editor-inserter__popover',
+					{ 'is-quick': isQuick }
+				) }
 				position={ position }
 				onToggle={ this.onToggle }
 				expandOnMobile
 				headerTitle={ __( 'Add a block' ) }
 				renderToggle={ this.renderToggle }
 				renderContent={ this.renderContent }
+				onClose={ onSelectOrClose }
 			/>
 		);
 	}
@@ -162,22 +212,26 @@ export default compose( [
 			getBlockRootClientId,
 			hasInserterItems,
 			__experimentalGetAllowedBlocks,
-			getBlockSelectionEnd,
-		} = select( 'core/block-editor' );
-		const { getBlockVariations } = select( 'core/blocks' );
+			__experimentalGetDirectInsertBlock,
+			getSettings,
+		} = select( blockEditorStore );
+
+		const { getBlockVariations } = select( blocksStore );
 
 		rootClientId =
-			rootClientId ||
-			getBlockRootClientId( clientId || getBlockSelectionEnd() ) ||
-			undefined;
+			rootClientId || getBlockRootClientId( clientId ) || undefined;
 
 		const allowedBlocks = __experimentalGetAllowedBlocks( rootClientId );
 
+		const directInsertBlock =
+			__experimentalGetDirectInsertBlock( rootClientId );
+
+		const settings = getSettings();
+
 		const hasSingleBlockType =
-			size( allowedBlocks ) === 1 &&
-			size(
-				getBlockVariations( allowedBlocks[ 0 ].name, 'inserter' )
-			) === 0;
+			allowedBlocks?.length === 1 &&
+			getBlockVariations( allowedBlocks[ 0 ].name, 'inserter' )
+				?.length === 0;
 
 		let allowedBlockType = false;
 		if ( hasSingleBlockType ) {
@@ -189,21 +243,84 @@ export default compose( [
 			hasSingleBlockType,
 			blockTitle: allowedBlockType ? allowedBlockType.title : '',
 			allowedBlockType,
+			directInsertBlock,
 			rootClientId,
+			prioritizePatterns:
+				settings.__experimentalPreferPatternsOnRoot && ! rootClientId,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
 		return {
 			insertOnlyAllowedBlock() {
-				const { rootClientId, clientId, isAppender } = ownProps;
 				const {
+					rootClientId,
+					clientId,
+					isAppender,
 					hasSingleBlockType,
 					allowedBlockType,
-					__experimentalSelectBlockOnInsert: selectBlockOnInsert,
+					directInsertBlock,
+					onSelectOrClose,
 				} = ownProps;
 
-				if ( ! hasSingleBlockType ) {
+				if ( ! hasSingleBlockType && ! directInsertBlock ) {
 					return;
+				}
+
+				function getAdjacentBlockAttributes( attributesToCopy ) {
+					const { getBlock, getPreviousBlockClientId } =
+						select( blockEditorStore );
+
+					if (
+						! attributesToCopy ||
+						( ! clientId && ! rootClientId )
+					) {
+						return {};
+					}
+
+					const result = {};
+					let adjacentAttributes = {};
+
+					// If there is no clientId, then attempt to get attributes
+					// from the last block within innerBlocks of the root block.
+					if ( ! clientId ) {
+						const parentBlock = getBlock( rootClientId );
+
+						if ( parentBlock?.innerBlocks?.length ) {
+							const lastInnerBlock =
+								parentBlock.innerBlocks[
+									parentBlock.innerBlocks.length - 1
+								];
+
+							if (
+								directInsertBlock &&
+								directInsertBlock?.name === lastInnerBlock.name
+							) {
+								adjacentAttributes = lastInnerBlock.attributes;
+							}
+						}
+					} else {
+						// Otherwise, attempt to get attributes from the
+						// previous block relative to the current clientId.
+						const currentBlock = getBlock( clientId );
+						const previousBlock = getBlock(
+							getPreviousBlockClientId( clientId )
+						);
+
+						if ( currentBlock?.name === previousBlock?.name ) {
+							adjacentAttributes =
+								previousBlock?.attributes || {};
+						}
+					}
+
+					// Copy over only those attributes flagged to be copied.
+					attributesToCopy.forEach( ( attribute ) => {
+						if ( adjacentAttributes.hasOwnProperty( attribute ) ) {
+							result[ attribute ] =
+								adjacentAttributes[ attribute ];
+						}
+					} );
+
+					return result;
 				}
 
 				function getInsertionIndex() {
@@ -211,42 +328,60 @@ export default compose( [
 						getBlockIndex,
 						getBlockSelectionEnd,
 						getBlockOrder,
-					} = select( 'core/block-editor' );
+						getBlockRootClientId,
+					} = select( blockEditorStore );
 
 					// If the clientId is defined, we insert at the position of the block.
 					if ( clientId ) {
-						return getBlockIndex( clientId, rootClientId );
+						return getBlockIndex( clientId );
 					}
 
 					// If there a selected block, we insert after the selected block.
 					const end = getBlockSelectionEnd();
-					if ( ! isAppender && end ) {
-						return getBlockIndex( end, rootClientId ) + 1;
+					if (
+						! isAppender &&
+						end &&
+						getBlockRootClientId( end ) === rootClientId
+					) {
+						return getBlockIndex( end ) + 1;
 					}
 
-					// Otherwise, we insert at the end of the current rootClientId
+					// Otherwise, we insert at the end of the current rootClientId.
 					return getBlockOrder( rootClientId ).length;
 				}
 
-				const { insertBlock } = dispatch( 'core/block-editor' );
+				const { insertBlock } = dispatch( blockEditorStore );
 
-				const blockToInsert = createBlock( allowedBlockType.name );
+				let blockToInsert;
 
-				insertBlock(
-					blockToInsert,
-					getInsertionIndex(),
-					rootClientId,
-					selectBlockOnInsert
-				);
-
-				if ( ! selectBlockOnInsert ) {
-					const message = sprintf(
-						// translators: %s: the name of the block that has been added
-						__( '%s block added' ),
-						allowedBlockType.title
+				// Attempt to augment the directInsertBlock with attributes from an adjacent block.
+				// This ensures styling from nearby blocks is preserved in the newly inserted block.
+				// See: https://github.com/WordPress/gutenberg/issues/37904
+				if ( directInsertBlock ) {
+					const newAttributes = getAdjacentBlockAttributes(
+						directInsertBlock.attributesToCopy
 					);
-					speak( message );
+
+					blockToInsert = createBlock( directInsertBlock.name, {
+						...( directInsertBlock.attributes || {} ),
+						...newAttributes,
+					} );
+				} else {
+					blockToInsert = createBlock( allowedBlockType.name );
 				}
+
+				insertBlock( blockToInsert, getInsertionIndex(), rootClientId );
+
+				if ( onSelectOrClose ) {
+					onSelectOrClose();
+				}
+
+				const message = sprintf(
+					// translators: %s: the name of the block that has been added
+					__( '%s block added' ),
+					allowedBlockType.title
+				);
+				speak( message );
 			},
 		};
 	} ),

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { find } from 'lodash';
 
 /**
  * Returns all the available format types.
@@ -20,7 +19,7 @@ export const getFormatTypes = createSelector(
  * Returns a format type by name.
  *
  * @param {Object} state Data state.
- * @param {string} name Format type name.
+ * @param {string} name  Format type name.
  *
  * @return {Object?} Format type.
  */
@@ -38,7 +37,7 @@ export function getFormatType( state, name ) {
  * @return {?Object} Format type.
  */
 export function getFormatTypeForBareElement( state, bareElementTagName ) {
-	return find( getFormatTypes( state ), ( { className, tagName } ) => {
+	return getFormatTypes( state ).find( ( { className, tagName } ) => {
 		return className === null && bareElementTagName === tagName;
 	} );
 }
@@ -52,7 +51,7 @@ export function getFormatTypeForBareElement( state, bareElementTagName ) {
  * @return {?Object} Format type.
  */
 export function getFormatTypeForClassName( state, elementClassName ) {
-	return find( getFormatTypes( state ), ( { className } ) => {
+	return getFormatTypes( state ).find( ( { className } ) => {
 		if ( className === null ) {
 			return false;
 		}

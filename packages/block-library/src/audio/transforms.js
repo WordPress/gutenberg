@@ -18,7 +18,7 @@ const transforms = {
 				const file = files[ 0 ];
 				// We don't need to upload the media directly here
 				// It's already done as part of the `componentDidMount`
-				// in the audio block
+				// in the audio block.
 				const block = createBlock( 'core/audio', {
 					src: createBlobURL( file ),
 				} );
@@ -32,8 +32,10 @@ const transforms = {
 			attributes: {
 				src: {
 					type: 'string',
-					shortcode: ( { named: { src } } ) => {
-						return src;
+					shortcode: ( {
+						named: { src, mp3, m4a, ogg, wav, wma },
+					} ) => {
+						return src || mp3 || m4a || ogg || wav || wma;
 					},
 				},
 				loop: {

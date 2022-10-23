@@ -10,7 +10,7 @@
  *
  * Holds the block structure in memory
  *
- * @since 3.8.0
+ * @since 5.0.0
  */
 class WP_Block_Parser_Block {
 	/**
@@ -18,7 +18,7 @@ class WP_Block_Parser_Block {
 	 *
 	 * @example "core/paragraph"
 	 *
-	 * @since 3.8.0
+	 * @since 5.0.0
 	 * @var string
 	 */
 	public $blockName;
@@ -29,7 +29,7 @@ class WP_Block_Parser_Block {
 	 * @example null
 	 * @example array( 'columns' => 3 )
 	 *
-	 * @since 3.8.0
+	 * @since 5.0.0
 	 * @var array|null
 	 */
 	public $attrs;
@@ -37,7 +37,7 @@ class WP_Block_Parser_Block {
 	/**
 	 * List of inner blocks (of this same class)
 	 *
-	 * @since 3.8.0
+	 * @since 5.0.0
 	 * @var WP_Block_Parser_Block[]
 	 */
 	public $innerBlocks;
@@ -48,7 +48,7 @@ class WP_Block_Parser_Block {
 	 *
 	 * @example "...Just <!-- wp:test /--> testing..." -> "Just testing..."
 	 *
-	 * @since 3.8.0
+	 * @since 5.0.0
 	 * @var string
 	 */
 	public $innerHTML;
@@ -72,7 +72,7 @@ class WP_Block_Parser_Block {
 	 *
 	 * Will populate object properties from the provided arguments.
 	 *
-	 * @since 3.8.0
+	 * @since 5.0.0
 	 *
 	 * @param string $name         Name of block.
 	 * @param array  $attrs        Optional set of attributes from block comment delimiters.
@@ -80,7 +80,7 @@ class WP_Block_Parser_Block {
 	 * @param string $innerHTML    Resultant HTML from inside block comment delimiters after removing inner blocks.
 	 * @param array  $innerContent List of string fragments and null markers where inner blocks were found.
 	 */
-	function __construct( $name, $attrs, $innerBlocks, $innerHTML, $innerContent ) {
+	public function __construct( $name, $attrs, $innerBlocks, $innerHTML, $innerContent ) {
 		$this->blockName    = $name;
 		$this->attrs        = $attrs;
 		$this->innerBlocks  = $innerBlocks;
@@ -95,13 +95,13 @@ class WP_Block_Parser_Block {
  * Holds partial blocks in memory while parsing
  *
  * @internal
- * @since 3.8.0
+ * @since 5.0.0
  */
 class WP_Block_Parser_Frame {
 	/**
 	 * Full or partial block
 	 *
-	 * @since 3.8.0
+	 * @since 5.0.0
 	 * @var WP_Block_Parser_Block
 	 */
 	public $block;
@@ -109,7 +109,7 @@ class WP_Block_Parser_Frame {
 	/**
 	 * Byte offset into document for start of parse token
 	 *
-	 * @since 3.8.0
+	 * @since 5.0.0
 	 * @var int
 	 */
 	public $token_start;
@@ -117,7 +117,7 @@ class WP_Block_Parser_Frame {
 	/**
 	 * Byte length of entire parse token string
 	 *
-	 * @since 3.8.0
+	 * @since 5.0.0
 	 * @var int
 	 */
 	public $token_length;
@@ -126,7 +126,7 @@ class WP_Block_Parser_Frame {
 	 * Byte offset into document for after parse token ends
 	 * (used during reconstruction of stack into parse production)
 	 *
-	 * @since 3.8.0
+	 * @since 5.0.0
 	 * @var int
 	 */
 	public $prev_offset;
@@ -134,7 +134,7 @@ class WP_Block_Parser_Frame {
 	/**
 	 * Byte offset into document where leading HTML before token starts
 	 *
-	 * @since 3.8.0
+	 * @since 5.0.0
 	 * @var int
 	 */
 	public $leading_html_start;
@@ -144,7 +144,7 @@ class WP_Block_Parser_Frame {
 	 *
 	 * Will populate object properties from the provided arguments.
 	 *
-	 * @since 3.8.0
+	 * @since 5.0.0
 	 *
 	 * @param WP_Block_Parser_Block $block              Full or partial block.
 	 * @param int                   $token_start        Byte offset into document for start of parse token.
@@ -152,7 +152,7 @@ class WP_Block_Parser_Frame {
 	 * @param int                   $prev_offset        Byte offset into document for after parse token ends.
 	 * @param int                   $leading_html_start Byte offset into document where leading HTML before token starts.
 	 */
-	function __construct( $block, $token_start, $token_length, $prev_offset = null, $leading_html_start = null ) {
+	public function __construct( $block, $token_start, $token_length, $prev_offset = null, $leading_html_start = null ) {
 		$this->block              = $block;
 		$this->token_start        = $token_start;
 		$this->token_length       = $token_length;
@@ -166,7 +166,7 @@ class WP_Block_Parser_Frame {
  *
  * Parses a document and constructs a list of parsed block objects
  *
- * @since 3.8.0
+ * @since 5.0.0
  * @since 4.0.0 returns arrays not objects, all attributes are arrays
  */
 class WP_Block_Parser {
@@ -175,7 +175,7 @@ class WP_Block_Parser {
 	 *
 	 * @example "Pre-text\n<!-- wp:paragraph -->This is inside a block!<!-- /wp:paragraph -->"
 	 *
-	 * @since 3.8.0
+	 * @since 5.0.0
 	 * @var string
 	 */
 	public $document;
@@ -183,7 +183,7 @@ class WP_Block_Parser {
 	/**
 	 * Tracks parsing progress through document
 	 *
-	 * @since 3.8.0
+	 * @since 5.0.0
 	 * @var int
 	 */
 	public $offset;
@@ -191,7 +191,7 @@ class WP_Block_Parser {
 	/**
 	 * List of parsed blocks
 	 *
-	 * @since 3.8.0
+	 * @since 5.0.0
 	 * @var WP_Block_Parser_Block[]
 	 */
 	public $output;
@@ -199,7 +199,7 @@ class WP_Block_Parser {
 	/**
 	 * Stack of partially-parsed structures in memory during parse
 	 *
-	 * @since 3.8.0
+	 * @since 5.0.0
 	 * @var WP_Block_Parser_Frame[]
 	 */
 	public $stack;
@@ -219,21 +219,21 @@ class WP_Block_Parser {
 	 * parse. In contrast to the specification parser this does not
 	 * return an error on invalid inputs.
 	 *
-	 * @since 3.8.0
+	 * @since 5.0.0
 	 *
 	 * @param string $document Input document being parsed.
-	 * @return WP_Block_Parser_Block[]
+	 * @return array[]
 	 */
-	function parse( $document ) {
+	public function parse( $document ) {
 		$this->document    = $document;
 		$this->offset      = 0;
 		$this->output      = array();
 		$this->stack       = array();
 		$this->empty_attrs = json_decode( '{}', true );
 
-		do {
-			// twiddle our thumbs.
-		} while ( $this->proceed() );
+		while ( $this->proceed() ) {
+			continue;
+		}
 
 		return $this->output;
 	}
@@ -249,10 +249,10 @@ class WP_Block_Parser {
 	 * or breaking out of a level of nesting.
 	 *
 	 * @internal
-	 * @since 3.8.0
+	 * @since 5.0.0
 	 * @return bool
 	 */
-	function proceed() {
+	public function proceed() {
 		$next_token = $this->next_token();
 		list( $token_type, $block_name, $attrs, $start_offset, $token_length ) = $next_token;
 		$stack_depth = count( $this->stack );
@@ -300,7 +300,7 @@ class WP_Block_Parser {
 				 */
 				if ( 0 === $stack_depth ) {
 					if ( isset( $leading_html_start ) ) {
-						$this->output[] = (array) self::freeform(
+						$this->output[] = (array) $this->freeform(
 							substr(
 								$this->document,
 								$leading_html_start,
@@ -394,11 +394,11 @@ class WP_Block_Parser {
 	 * Returns the type of the find: kind of find, block information, attributes
 	 *
 	 * @internal
-	 * @since 3.8.0
+	 * @since 5.0.0
 	 * @since 4.6.1 fixed a bug in attribute parsing which caused catastrophic backtracking on invalid block comments
 	 * @return array
 	 */
-	function next_token() {
+	public function next_token() {
 		$matches = null;
 
 		/*
@@ -473,7 +473,7 @@ class WP_Block_Parser {
 	 * @param string $innerHTML HTML content of block.
 	 * @return WP_Block_Parser_Block freeform block object.
 	 */
-	function freeform( $innerHTML ) {
+	public function freeform( $innerHTML ) {
 		return new WP_Block_Parser_Block( null, $this->empty_attrs, array(), $innerHTML, array( $innerHTML ) );
 	}
 
@@ -482,17 +482,17 @@ class WP_Block_Parser {
 	 * to the output list as a freeform block.
 	 *
 	 * @internal
-	 * @since 3.8.0
+	 * @since 5.0.0
 	 * @param null $length how many bytes of document text to output.
 	 */
-	function add_freeform( $length = null ) {
+	public function add_freeform( $length = null ) {
 		$length = $length ? $length : strlen( $this->document ) - $this->offset;
 
 		if ( 0 === $length ) {
 			return;
 		}
 
-		$this->output[] = (array) self::freeform( substr( $this->document, $this->offset, $length ) );
+		$this->output[] = (array) $this->freeform( substr( $this->document, $this->offset, $length ) );
 	}
 
 	/**
@@ -500,13 +500,13 @@ class WP_Block_Parser {
 	 * a new block to the output list.
 	 *
 	 * @internal
-	 * @since 3.8.0
+	 * @since 5.0.0
 	 * @param WP_Block_Parser_Block $block        The block to add to the output.
 	 * @param int                   $token_start  Byte offset into the document where the first token for the block starts.
 	 * @param int                   $token_length Byte length of entire block from start of opening token to end of closing token.
 	 * @param int|null              $last_offset  Last byte offset into document if continuing form earlier output.
 	 */
-	function add_inner_block( WP_Block_Parser_Block $block, $token_start, $token_length, $last_offset = null ) {
+	public function add_inner_block( WP_Block_Parser_Block $block, $token_start, $token_length, $last_offset = null ) {
 		$parent                       = $this->stack[ count( $this->stack ) - 1 ];
 		$parent->block->innerBlocks[] = (array) $block;
 		$html                         = substr( $this->document, $parent->prev_offset, $token_start - $parent->prev_offset );
@@ -524,10 +524,10 @@ class WP_Block_Parser {
 	 * Pushes the top block from the parsing stack to the output list.
 	 *
 	 * @internal
-	 * @since 3.8.0
+	 * @since 5.0.0
 	 * @param int|null $end_offset byte offset into document for where we should stop sending text output as HTML.
 	 */
-	function add_block_from_stack( $end_offset = null ) {
+	public function add_block_from_stack( $end_offset = null ) {
 		$stack_top   = array_pop( $this->stack );
 		$prev_offset = $stack_top->prev_offset;
 
@@ -541,7 +541,7 @@ class WP_Block_Parser {
 		}
 
 		if ( isset( $stack_top->leading_html_start ) ) {
-			$this->output[] = (array) self::freeform(
+			$this->output[] = (array) $this->freeform(
 				substr(
 					$this->document,
 					$stack_top->leading_html_start,

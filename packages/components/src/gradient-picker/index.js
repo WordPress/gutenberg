@@ -8,24 +8,25 @@ import { map } from 'lodash';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useMemo } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
 import CircularOptionPicker from '../circular-option-picker';
 import CustomGradientPicker from '../custom-gradient-picker';
+import { VStack } from '../v-stack';
+import { ColorHeading } from '../color-palette/styles';
+import { Spacer } from '../spacer';
 
-export default function GradientPicker( {
+function SingleOrigin( {
 	className,
+	clearGradient,
 	gradients,
 	onChange,
 	value,
-	clearable = true,
-	disableCustomGradients = false,
+	actions,
 } ) {
-	const clearGradient = useCallback( () => onChange( undefined ), [
-		onChange,
-	] );
 	const gradientOptions = useMemo( () => {
 		return map( gradients, ( { gradient, name } ) => (
 			<CircularOptionPicker.Option
@@ -57,19 +58,112 @@ export default function GradientPicker( {
 		<CircularOptionPicker
 			className={ className }
 			options={ gradientOptions }
-			actions={
-				clearable && (
-					<CircularOptionPicker.ButtonAction
-						onClick={ clearGradient }
-					>
-						{ __( 'Clear' ) }
-					</CircularOptionPicker.ButtonAction>
-				)
-			}
-		>
-			{ ! disableCustomGradients && (
-				<CustomGradientPicker value={ value } onChange={ onChange } />
-			) }
-		</CircularOptionPicker>
+			actions={ actions }
+		/>
+	);
+}
+
+function MultipleOrigin( {
+	className,
+	clearGradient,
+	gradients,
+	onChange,
+	value,
+	actions,
+} ) {
+	return (
+		<VStack spacing={ 3 } className={ className }>
+			{ gradients.map( ( { name, gradients: gradientSet }, index ) => {
+				return (
+					<VStack spacing={ 2 } key={ index }>
+						<ColorHeading>{ name }</ColorHeading>
+						<SingleOrigin
+							clearGradient={ clearGradient }
+							gradients={ gradientSet }
+							onChange={ onChange }
+							value={ value }
+							{ ...( gradients.length === index + 1
+								? { actions }
+								: {} ) }
+						/>
+					</VStack>
+				);
+			} ) }
+		</VStack>
+	);
+}
+
+export default function GradientPicker( {
+	/** Start opting into the new margin-free styles that will become the default in a future version. */
+	__nextHasNoMargin = false,
+	className,
+	gradients,
+	onChange,
+	value,
+	clearable = true,
+	disableCustomGradients = false,
+	__experimentalHasMultipleOrigins,
+	__experimentalIsRenderedInSidebar,
+} ) {
+	const clearGradient = useCallback(
+		() => onChange( undefined ),
+		[ onChange ]
+	);
+	const Component =
+		__experimentalHasMultipleOrigins && gradients?.length
+			? MultipleOrigin
+			: SingleOrigin;
+
+	if ( ! __nextHasNoMargin ) {
+		deprecated( 'Outer margin styles for wp.components.GradientPicker', {
+			since: '6.1',
+			version: '6.4',
+			hint: 'Set the `__nextHasNoMargin` prop to true to start opting into the new styles, which will become the default in a future version',
+		} );
+	}
+
+	const deprecatedMarginSpacerProps = ! __nextHasNoMargin
+		? {
+				marginTop: ! gradients?.length ? 3 : undefined,
+				marginBottom: ! clearable ? 6 : 0,
+		  }
+		: {};
+
+	return (
+		// Outmost Spacer wrapper can be removed when deprecation period is over
+		<Spacer marginBottom={ 0 } { ...deprecatedMarginSpacerProps }>
+			<VStack spacing={ gradients?.length ? 4 : 0 }>
+				{ ! disableCustomGradients && (
+					<CustomGradientPicker
+						__nextHasNoMargin
+						__experimentalIsRenderedInSidebar={
+							__experimentalIsRenderedInSidebar
+						}
+						value={ value }
+						onChange={ onChange }
+					/>
+				) }
+				{ ( gradients?.length || clearable ) && (
+					<Component
+						className={ className }
+						clearable={ clearable }
+						clearGradient={ clearGradient }
+						gradients={ gradients }
+						onChange={ onChange }
+						value={ value }
+						actions={
+							clearable &&
+							! disableCustomGradients && (
+								<CircularOptionPicker.ButtonAction
+									onClick={ clearGradient }
+								>
+									{ __( 'Clear' ) }
+								</CircularOptionPicker.ButtonAction>
+							)
+						}
+					/>
+				) }
+			</VStack>
+		</Spacer>
 	);
 }

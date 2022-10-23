@@ -37,6 +37,19 @@ export function getBlobByURL( url ) {
 }
 
 /**
+ * Retrieve a blob type based on URL. The file must have been created by
+ * `createBlobURL` and not removed by `revokeBlobURL`, otherwise it will return
+ * `undefined`.
+ *
+ * @param {string} url The blob URL.
+ *
+ * @return {string|undefined} The blob type.
+ */
+export function getBlobTypeByURL( url ) {
+	return getBlobByURL( url )?.type.split( '/' )[ 0 ]; // 0: media type , 1: file extension eg ( type: 'image/jpeg' ).
+}
+
+/**
  * Remove the resource and file cache from memory.
  *
  * @param {string} url The blob URL.

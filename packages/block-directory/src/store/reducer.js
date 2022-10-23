@@ -11,27 +11,22 @@ import { combineReducers } from '@wordpress/data';
  *
  * @return {Object} Updated state.
  */
-export const downloadableBlocks = (
-	state = {
-		results: {},
-		isRequestingDownloadableBlocks: true,
-	},
-	action
-) => {
+export const downloadableBlocks = ( state = {}, action ) => {
 	switch ( action.type ) {
 		case 'FETCH_DOWNLOADABLE_BLOCKS':
 			return {
 				...state,
-				isRequestingDownloadableBlocks: true,
+				[ action.filterValue ]: {
+					isRequesting: true,
+				},
 			};
 		case 'RECEIVE_DOWNLOADABLE_BLOCKS':
 			return {
 				...state,
-				results: {
-					...state.results,
-					[ action.filterValue ]: action.downloadableBlocks,
+				[ action.filterValue ]: {
+					results: action.downloadableBlocks,
+					isRequesting: false,
 				},
-				isRequestingDownloadableBlocks: false,
 			};
 	}
 	return state;
@@ -81,22 +76,6 @@ export const blockManagement = (
 };
 
 /**
- * Reducer returning an array of downloadable blocks.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function hasPermission( state = true, action ) {
-	if ( action.type === 'SET_INSTALL_BLOCKS_PERMISSION' ) {
-		return action.hasPermission;
-	}
-
-	return state;
-}
-
-/**
  * Reducer returning an object of error notices.
  *
  * @param {Object} state  Current state.
@@ -109,8 +88,14 @@ export const errorNotices = ( state = {}, action ) => {
 		case 'SET_ERROR_NOTICE':
 			return {
 				...state,
-				[ action.blockId ]: action.notice,
+				[ action.blockId ]: {
+					message: action.message,
+					isFatal: action.isFatal,
+				},
 			};
+		case 'CLEAR_ERROR_NOTICE':
+			const { [ action.blockId ]: blockId, ...restState } = state;
+			return restState;
 	}
 	return state;
 };
@@ -118,6 +103,5 @@ export const errorNotices = ( state = {}, action ) => {
 export default combineReducers( {
 	downloadableBlocks,
 	blockManagement,
-	hasPermission,
 	errorNotices,
 } );

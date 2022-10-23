@@ -1,0 +1,12 @@
+[
+	{
+		"blockName": "core/navigation",
+		"attrs": {
+			"orientation": "vertical",
+			"itemsJustification": "center"
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	}
+]

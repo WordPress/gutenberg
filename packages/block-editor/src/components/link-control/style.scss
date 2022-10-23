@@ -1,4 +1,17 @@
 $block-editor-link-control-number-of-actions: 1;
+$preview-image-height: 140px;
+
+@keyframes loadingpulse {
+	0% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
 
 .block-editor-link-control {
 	position: relative;
@@ -17,28 +30,50 @@ $block-editor-link-control-number-of-actions: 1;
 	position: relative;
 }
 
-// LinkControl popover.
-.block-editor-link-control .block-editor-link-control__search-input {
-	// Specificity override.
-	&.block-editor-link-control__search-input input[type="text"] {
+// Provides positioning context for search actions
+.block-editor-link-control__search-input-container {
+	position: relative;
+}
+
+// If the input doesn't have a visible label then
+// we need to expand the input itself to occupy
+// the full available horizontal space.
+.block-editor-link-control__search-input.has-no-label .block-editor-url-input__input {
+	flex: 1;
+}
+
+.block-editor-link-control__field {
+	margin: $grid-unit-20; // allow margin collapse for vertical spacing.
+
+	// Element wrapping the label and input.
+	> .components-base-control__field {
+		display: flex;
+		align-items: center;
+		margin: 0;
+	}
+
+	.components-base-control__label {
+		margin-right: $grid-unit-20;
+		margin-bottom: 0;
+	}
+
+	input[type="text"],
+	// Specificity overide of URLInput defaults.
+	&.block-editor-url-input input[type="text"].block-editor-url-input__input {
 		@include input-control;
-		width: calc(100% - #{$grid-unit-20*2});
+		width: calc(100% - #{$grid-unit-20 * 2});
 		display: block;
 		padding: 11px $grid-unit-20;
 		padding-right: ( $button-size * $block-editor-link-control-number-of-actions ); // width of reset and submit buttons
-		margin: $grid-unit-20;
+		margin: 0;
 		position: relative;
-		border: 1px solid $light-gray-500;
-		border-radius: $radius-round-rectangle;
-	}
-
-	.components-base-control__field {
-		margin-bottom: 0;
+		border: 1px solid $gray-300;
+		border-radius: $radius-block-ui;
 	}
 }
 
 .block-editor-link-control__search-error {
-	margin: -$grid-unit-20/2 $grid-unit-20 $grid-unit-20; // negative margin to bring the error a bit closer to the button
+	margin: -$grid-unit-20*0.5 $grid-unit-20 $grid-unit-20; // negative margin to bring the error a bit closer to the button
 }
 
 .block-editor-link-control__search-actions {
@@ -48,15 +83,18 @@ $block-editor-link-control-number-of-actions: 1;
 	 * when suggestions are rendered.
 	 *
 	 * Compensate for:
-	 *  - Input margin ($grid-unit-20)
 	 *  - Border (1px)
 	 *  - Vertically, for the difference in height between the input (40px) and
 	 *    the icon buttons.
 	 *  - Horizontally, pad to the minimum of: default input padding, or the
 	 *    equivalent of the vertical padding.
 	 */
-	top: $grid-unit-20 + 1px + ( ( 40px - $button-size ) / 2 );
-	right: $grid-unit-20 + 1px + min($grid-unit-10, ( 40px - $button-size ) / 2);
+	top: 1px + ( ( 40px - $button-size ) * 0.5 );
+	right: $grid-unit-20 + 1px + min($grid-unit-10, ( 40px - $button-size ) * 0.5);
+}
+
+.components-button .block-editor-link-control__search-submit .has-icon {
+	margin: -1px;
 }
 
 .block-editor-link-control__search-results-wrapper {
@@ -75,29 +113,27 @@ $block-editor-link-control-number-of-actions: 1;
 	}
 
 	&::before {
-		height: $grid-unit-20/2;
+		height: $grid-unit-20*0.5;
 		top: 0;
 		bottom: auto;
-		background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
 	}
 
 	&::after {
 		height: $grid-unit-20;
 		bottom: 0;
 		top: auto;
-		background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%);
 	}
 }
 
 .block-editor-link-control__search-results-label {
-	padding: 15px 30px 0 30px;
+	padding: $grid-unit-20 $grid-unit-40 0;
 	display: block;
-	font-size: 1.1em;
+	font-weight: 600;
 }
 
 .block-editor-link-control__search-results {
 	margin: 0;
-	padding: $grid-unit-20/2 $grid-unit-20 $grid-unit-20/2;
+	padding: $grid-unit-20*0.5 $grid-unit-20 $grid-unit-20*0.5;
 	max-height: 200px;
 	overflow-y: auto; // allow results list to scroll
 
@@ -109,29 +145,33 @@ $block-editor-link-control-number-of-actions: 1;
 .block-editor-link-control__search-item {
 	position: relative;
 	display: flex;
-	align-items: center;
+	align-items: flex-start; // when link text is very long it is important this indicator remains visible and thus should be aligned top.
 	font-size: $default-font-size;
 	cursor: pointer;
 	background: $white;
 	width: 100%;
 	border: none;
 	text-align: left;
-	padding: 10px 15px;
-	border-radius: 5px;
+	padding: $grid-unit-15 $grid-unit-20;
+	border-radius: 2px;
 	height: auto;
 
 	&:hover,
 	&:focus {
-		background-color: $light-gray-300;
+		background-color: $gray-100;
+
+		.block-editor-link-control__search-item-type {
+			background: $white;
+		}
 	}
 
 	// The added specificity is needed to override.
 	&:focus:not(:disabled) {
-		box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color) inset;
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color) inset;
 	}
 
 	&.is-selected {
-		background: $light-gray-200;
+		background: $gray-100;
 
 		.block-editor-link-control__search-item-type {
 			background: $white;
@@ -139,67 +179,217 @@ $block-editor-link-control-number-of-actions: 1;
 	}
 
 	&.is-current {
+		flex-direction: column; // allow for stacking.
 		background: transparent;
 		border: 0;
 		width: 100%;
 		cursor: default;
 		padding: $grid-unit-20;
-		padding-left: $grid-unit-30;
 	}
 
 	.block-editor-link-control__search-item-header {
 		display: block;
-		margin-right: $grid-unit-30;
-		overflow: hidden;
-		white-space: nowrap;
+		flex-direction: row;
+		align-items: flex-start;
+		margin-right: $grid-unit-10;
+
+		// Force text to wrap to improve UX when encountering long lines
+		// of text, particular those with no spaces.
+		// See: https://github.com/WordPress/gutenberg/issues/33586#issuecomment-888921188
+		white-space: pre-wrap;
+		overflow-wrap: break-word;
+
+		.block-editor-link-control__search-item-info {
+			word-break: break-all;
+		}
+	}
+
+	&.is-preview .block-editor-link-control__search-item-header {
+		display: flex;
+		flex: 1; // Fill available space.
+	}
+
+	&.is-error .block-editor-link-control__search-item-header {
+		align-items: center;
 	}
 
 	.block-editor-link-control__search-item-icon {
-		margin-right: 1em;
-		min-width: 24px;
+		position: relative;
+		top: 0.2em;
+		margin-right: $grid-unit-10;
+		max-height: 24px;
+		flex-shrink: 0;
+		width: 24px;
+		display: flex;
+		justify-content: center;
+
+		img {
+			width: 16px; // favicons often have a source of 32px
+		}
 	}
+
+	&.is-error .block-editor-link-control__search-item-icon {
+		top: 0;
+		width: 32px;
+		max-height: 32px;
+	}
+
 
 	.block-editor-link-control__search-item-info,
 	.block-editor-link-control__search-item-title {
-		max-width: 230px;
 		overflow: hidden;
 		text-overflow: ellipsis;
-	}
 
-	.block-editor-link-control__search-item-title mark {
-		color: $dark-gray-900;
+		.components-external-link__icon {
+			position: absolute;
+			right: 0;
+			margin-top: 0;
+		}
 	}
 
 	.block-editor-link-control__search-item-title {
 		display: block;
 		margin-bottom: 0.2em;
 		font-weight: 500;
+		position: relative;
 
 		mark {
 			font-weight: 700;
-			color: $black;
+			color: inherit;
 			background-color: transparent;
 		}
 
 		span {
 			font-weight: normal;
 		}
+
+		svg {
+			display: none; // specifically requested to be removed visually as well.
+		}
 	}
 
 	.block-editor-link-control__search-item-info {
 		display: block;
-		color: $dark-gray-300;
+		color: $gray-700;
 		font-size: 0.9em;
 		line-height: 1.3;
 	}
 
+	.block-editor-link-control__search-item-error-notice {
+		font-style: italic;
+		font-size: 1.1em;
+	}
+
 	.block-editor-link-control__search-item-type {
 		display: block;
-		padding: 3px 8px;
+		padding: 3px 6px;
 		margin-left: auto;
 		font-size: 0.9em;
-		background-color: $light-gray-200;
+		background-color: $gray-100;
 		border-radius: 2px;
+		white-space: nowrap; // tags shouldn't go over two lines.
+	}
+
+	.block-editor-link-control__search-item-description {
+		padding-top: 12px;
+		margin: 0;
+
+		&.is-placeholder {
+			margin-top: 12px;
+			padding-top: 0;
+			height: 28px;
+			display: flex;
+			flex-direction: column;
+			justify-content: space-around;
+
+			&::before,
+			&::after {
+				display: block;
+				content: "";
+				height: 0.7em;
+				width: 100%;
+				background-color: $gray-100;
+				border-radius: 3px;
+			}
+		}
+
+		.components-text {
+			font-size: 0.9em;
+		}
+	}
+
+	.block-editor-link-control__search-item-image {
+		display: flex;
+		width: 100%;
+		background-color: $gray-100;
+		justify-content: center;
+		height: $preview-image-height; // limit height
+		max-height: $preview-image-height; // limit height
+		overflow: hidden;
+		border-radius: 2px;
+		margin-top: 12px;
+
+		&.is-placeholder {
+			background-color: $gray-100;
+			border-radius: 3px;
+		}
+
+		img {
+			display: block; // remove unwanted space below image
+			max-width: 100%;
+			height: $preview-image-height; // limit height
+			max-height: $preview-image-height; // limit height
+		}
+	}
+}
+
+.block-editor-link-control__search-item-top {
+	display: flex;
+	flex-direction: row;
+	width: 100%; // clip.
+}
+
+.block-editor-link-control__search-item-bottom {
+	transition: opacity 1.5s;
+	width: 100%;
+}
+
+
+.block-editor-link-control__search-item.is-fetching {
+
+	.block-editor-link-control__search-item-description {
+		&::before,
+		&::after {
+			animation: loadingpulse 1s linear infinite;
+			animation-delay: 0.5s; // avoid animating for fast network responses
+		}
+
+	}
+
+	.block-editor-link-control__search-item-image {
+		animation: loadingpulse 1s linear infinite;
+		animation-delay: 0.5s; // avoid animating for fast network responses
+	}
+
+	.block-editor-link-control__search-item-icon {
+		svg,
+		img {
+			opacity: 0;
+		}
+
+		&::before {
+			content: "";
+			display: block;
+			background-color: $gray-100;
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			border-radius: 100%;
+			animation: loadingpulse 1s linear infinite;
+			animation-delay: 0.5s; // avoid animating for fast network responses
+		}
 	}
 }
 
@@ -215,9 +405,8 @@ $block-editor-link-control-number-of-actions: 1;
 
 // Separate Create button when following other suggestions.
 .components-button + .block-editor-link-control__search-create {
-	margin-top: 20px;
 	overflow: visible;
-	padding: 12px 15px;
+	padding: $grid-unit-15 $grid-unit-20;
 
 	// Create fake border. We cannot use border because the button has a border
 	// radius applied to it
@@ -228,22 +417,50 @@ $block-editor-link-control-number-of-actions: 1;
 		left: 0;
 		display: block;
 		width: 100%;
-		border-top: 1px solid $light-gray-500;
 	}
 }
 
-// Specificity overide
+.block-editor-link-control__search-create {
+	align-items: center; // align text with icon.
+
+	.block-editor-link-control__search-item-title {
+		margin-bottom: 0;
+	}
+
+	.block-editor-link-control__search-item-icon {
+		top: 0; // cancel compensatory spacing added to default suggestions.
+	}
+}
+
+// Specificity override
 .block-editor-link-control__search-results div[role="menu"] > .block-editor-link-control__search-item.block-editor-link-control__search-item {
 	padding: 10px;
 }
 
-.block-editor-link-control__settings {
-	border-top: 1px solid $light-gray-500;
+.block-editor-link-control__tools {
+	display: flex;
+	align-items: center;
+	border-top: $border-width solid $gray-300;
 	margin: 0;
-	padding: $grid-unit-20 $grid-unit-30;
+	padding: $grid-unit-20;
+}
+
+.block-editor-link-control__unlink {
+	padding-left: $grid-unit-20;
+	padding-right: $grid-unit-20;
+}
+
+.block-editor-link-control__settings {
+	flex: 1;
+	margin: 0;
+
 
 	:last-child {
 		margin-bottom: 0;
+	}
+
+	.is-alternate & {
+		border-top: $border-width solid $gray-900;
 	}
 }
 
@@ -266,16 +483,10 @@ $block-editor-link-control-number-of-actions: 1;
 		 * Position spinner to the left of the actions.
 		 *
 		 * Compensate for:
-		 *  - Input margin ($grid-unit-20)
-		 *  - Border (1px)
-		 *  - Vertically, for the difference in height between the input (40px)
-		 *    and the spinner.
-		 *  - Horizontally, adjust for the width occupied by the icon buttons,
-		 *    then artificially create spacing that mimics as if the spinner
-		 *    were center-padded to the same width as an icon button.
+		 *  - Input padding right ($button-size)
 		 */
-		top: $grid-unit-20 + 1px + ( ( 40px - $spinner-size ) / 2 );
-		right: $grid-unit-20 + 1px + ( $button-size * $block-editor-link-control-number-of-actions ) + ( ( $button-size - $spinner-size ) / 2 );
+		top: calc(50% - #{$spinner-size} / 2);
+		right: $button-size;
 	}
 }
 

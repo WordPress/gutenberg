@@ -19,6 +19,11 @@
 		box-sizing: border-box;
 	}
 
+	.postbox-header {
+		border-top: $border-width solid $gray-300;
+		border-bottom: 0;
+	}
+
 	/* Match width and positioning of the meta boxes. Override default styles. */
 	#poststuff {
 		margin: 0 auto;
@@ -30,12 +35,11 @@
 	#poststuff h3.hndle,
 	#poststuff .stuffbox > h3,
 	#poststuff h2.hndle { /* WordPress selectors yolo */
-		border-bottom: $border-width solid $light-gray-500;
 		box-sizing: border-box;
 		color: inherit;
 		font-weight: 600;
 		outline: none;
-		padding: 15px;
+		padding: 0 $grid-unit-30;
 		position: relative;
 		width: 100%;
 	}
@@ -47,9 +51,8 @@
 	}
 
 	.postbox > .inside {
-		border-bottom: $border-width solid $light-gray-500;
 		color: inherit;
-		padding: 0 $block-padding $block-padding;
+		padding: 0 $grid-unit-30 $grid-unit-30;
 		margin: 0;
 	}
 
@@ -88,11 +91,11 @@
 	// @todo: remove this entire rule once checkboxes are the same everywhere.
 	// See: https://github.com/WordPress/gutenberg/issues/18053
 	.metabox-location-side .postbox input[type="checkbox"] {
-		border: $border-width solid $dark-gray-300;
+		border: $border-width solid $gray-700;
 
 		&:checked {
 			background: $white;
-			border-color: $dark-gray-300;
+			border-color: $gray-700;
 		}
 
 		&::before {

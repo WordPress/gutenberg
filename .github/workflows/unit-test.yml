@@ -1,0 +1,111 @@
+name: Unit Tests
+
+# Since Unit Tests are required to pass for each PR,
+# we cannot disable them for documentation-only changes.
+on:
+    pull_request:
+    push:
+        branches:
+            - trunk
+            - 'release/**'
+            - 'wp/**'
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    cancel-in-progress: true
+
+jobs:
+    unit-js:
+        name: JavaScript
+        runs-on: ubuntu-latest
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+
+        strategy:
+            fail-fast: false
+            matrix:
+                node: ['14']
+
+        steps:
+            - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+
+            - name: Use desired version of NodeJS
+              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+              with:
+                  node-version: ${{ matrix.node }}
+                  cache: npm
+
+            - name: Npm install and build
+              # It's not necessary to run the full build, since Jest can interpret
+              # source files with `babel-jest`. Some packages have their own custom
+              # build tasks, however. These must be run.
+              run: |
+                  npm ci
+                  npx lerna run build
+
+            - name: Running the tests
+              run: npm run test:unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+
+            - name: Running the date tests
+              run: npm run test:unit:date -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+
+    unit-php:
+        name: PHP
+        runs-on: ubuntu-latest
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+
+        steps:
+            - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+
+            - name: Use desired version of NodeJS
+              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: npm
+
+            - name: Npm install and build
+              run: |
+                  npm ci
+                  npm run build
+
+            - name: Install WordPress
+              run: |
+                  npm run wp-env start
+
+            - name: Running lint check
+              run: npm run lint:php
+
+            - name: Running single site unit tests
+              run: npm run test:unit:php
+              if: ${{ success() || failure() }}
+
+            - name: Running multisite unit tests
+              run: npm run test:unit:php:multisite
+              if: ${{ success() || failure() }}
+
+    mobile-unit-js:
+        name: Mobile
+        runs-on: ubuntu-latest
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+
+        steps:
+            - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+
+            - name: Use desired version of NodeJS
+              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: npm
+
+            - name: Npm install and build
+              # It's not necessary to run the full build, since Jest can interpret
+              # source files with `babel-jest`. Some packages have their own custom
+              # build tasks, however. These must be run.
+              run: |
+                  npm ci
+                  npx lerna run build
+
+            - name: Running the tests
+              run: npm run native test -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"

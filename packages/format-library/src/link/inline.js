@@ -1,22 +1,32 @@
 /**
- * External dependencies
- */
-import { uniqueId } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { useMemo, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { useState, useRef, createInterpolateElement } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 import { withSpokenMessages, Popover } from '@wordpress/components';
 import { prependHTTP } from '@wordpress/url';
-import { create, insert, isCollapsed, applyFormat } from '@wordpress/rich-text';
-import { __experimentalLinkControl as LinkControl } from '@wordpress/block-editor';
+import {
+	create,
+	insert,
+	isCollapsed,
+	applyFormat,
+	useAnchor,
+	removeFormat,
+	slice,
+	replace,
+} from '@wordpress/rich-text';
+import {
+	__experimentalLinkControl as LinkControl,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { createLinkFormat, isValidHref } from './utils';
+import { createLinkFormat, isValidHref, getFormatBoundary } from './utils';
+import { link as settings } from './index';
+import useLinkInstanceKey from './use-link-instance-key';
 
 function InlineLinkUI( {
 	isActive,
@@ -26,22 +36,12 @@ function InlineLinkUI( {
 	onChange,
 	speak,
 	stopAddingLink,
+	contentRef,
 } ) {
-	/**
-	 * A unique key is generated when switching between editing and not editing
-	 * a link, based on:
-	 *
-	 * - This component may be rendered _either_ when a link is active _or_
-	 *   when adding or editing a link.
-	 * - It's only desirable to shift focus into the Popover when explicitly
-	 *   adding or editing a link, not when in the inline boundary of a link.
-	 * - Focus behavior can only be controlled on a Popover at the time it
-	 *   mounts, so a new instance of the component must be mounted to
-	 *   programmatically enact the focusOnMount behavior.
-	 *
-	 * @type {string}
-	 */
-	const mountingKey = useMemo( uniqueId, [ addingLink ] );
+	const richLinkTextValue = getRichTextValueFromSelection( value, isActive );
+
+	// Get the text content minus any HTML tags.
+	const richTextText = richLinkTextValue.text;
 
 	/**
 	 * Pending settings to be applied to the next link. When inserting a new
@@ -53,38 +53,31 @@ function InlineLinkUI( {
 	 */
 	const [ nextLinkValue, setNextLinkValue ] = useState();
 
-	const anchorRef = useMemo( () => {
-		const selection = window.getSelection();
+	const { createPageEntity, userCanCreatePages } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const _settings = getSettings();
 
-		if ( ! selection.rangeCount ) {
-			return;
-		}
-
-		const range = selection.getRangeAt( 0 );
-
-		if ( addingLink && ! isActive ) {
-			return range;
-		}
-
-		let element = range.startContainer;
-
-		// If the caret is right before the element, select the next element.
-		element = element.nextElementSibling || element;
-
-		while ( element.nodeType !== window.Node.ELEMENT_NODE ) {
-			element = element.parentNode;
-		}
-
-		return element.closest( 'a' );
-	}, [ addingLink, value.start, value.end ] );
+		return {
+			createPageEntity: _settings.__experimentalCreatePageEntity,
+			userCanCreatePages: _settings.__experimentalUserCanCreatePages,
+		};
+	}, [] );
 
 	const linkValue = {
 		url: activeAttributes.url,
 		type: activeAttributes.type,
 		id: activeAttributes.id,
 		opensInNewTab: activeAttributes.target === '_blank',
+		title: richTextText,
 		...nextLinkValue,
 	};
+
+	function removeLink() {
+		const newValue = removeFormat( value, 'core/link' );
+		onChange( newValue );
+		stopAddingLink();
+		speak( __( 'Link removed.' ), 'assertive' );
+	}
 
 	function onChangeLink( nextValue ) {
 		// Merge with values from state, both for the purpose of assigning the
@@ -115,7 +108,7 @@ function InlineLinkUI( {
 		}
 
 		const newUrl = prependHTTP( nextValue.url );
-		const format = createLinkFormat( {
+		const linkFormat = createLinkFormat( {
 			url: newUrl,
 			type: nextValue.type,
 			id:
@@ -125,17 +118,46 @@ function InlineLinkUI( {
 			opensInNewWindow: nextValue.opensInNewTab,
 		} );
 
+		const newText = nextValue.title || newUrl;
 		if ( isCollapsed( value ) && ! isActive ) {
-			const newText = nextValue.title || newUrl;
+			// Scenario: we don't have any actively selected text or formats.
 			const toInsert = applyFormat(
 				create( { text: newText } ),
-				format,
+				linkFormat,
 				0,
 				newText.length
 			);
 			onChange( insert( value, toInsert ) );
 		} else {
-			const newValue = applyFormat( value, format );
+			// Scenario: we have any active text selection or an active format.
+			let newValue;
+
+			if ( newText === richTextText ) {
+				// If we're not updating the text then ignore.
+				newValue = applyFormat( value, linkFormat );
+			} else {
+				// Create new RichText value for the new text in order that we
+				// can apply formats to it.
+				newValue = create( { text: newText } );
+
+				// Apply the new Link format to this new text value.
+				newValue = applyFormat(
+					newValue,
+					linkFormat,
+					0,
+					newText.length
+				);
+
+				// Update the original (full) RichTextValue replacing the
+				// target text with the *new* RichTextValue containing:
+				// 1. The new text content.
+				// 2. The new link format.
+				// Note original formats will be lost when applying this change.
+				// That is expected behaviour.
+				// See: https://github.com/WordPress/gutenberg/pull/33849#issuecomment-936134179.
+				newValue = replace( value, richTextText, newValue );
+			}
+
 			newValue.start = newValue.end;
 			newValue.activeFormats = [];
 			onChange( newValue );
@@ -161,21 +183,94 @@ function InlineLinkUI( {
 		}
 	}
 
+	const popoverAnchor = useAnchor( {
+		editableContentElement: contentRef.current,
+		value,
+		settings,
+	} );
+
+	// Generate a string based key that is unique to this anchor reference.
+	// This is used to force re-mount the LinkControl component to avoid
+	// potential stale state bugs caused by the component not being remounted
+	// See https://github.com/WordPress/gutenberg/pull/34742.
+	const forceRemountKey = useLinkInstanceKey( popoverAnchor );
+
+	// The focusOnMount prop shouldn't evolve during render of a Popover
+	// otherwise it causes a render of the content.
+	const focusOnMount = useRef( addingLink ? 'firstElement' : false );
+
+	async function handleCreate( pageTitle ) {
+		const page = await createPageEntity( {
+			title: pageTitle,
+			status: 'draft',
+		} );
+
+		return {
+			id: page.id,
+			type: page.type,
+			title: page.title.rendered,
+			url: page.link,
+			kind: 'post-type',
+		};
+	}
+
+	function createButtonText( searchTerm ) {
+		return createInterpolateElement(
+			sprintf(
+				/* translators: %s: search term. */
+				__( 'Create Page: <mark>%s</mark>' ),
+				searchTerm
+			),
+			{ mark: <mark /> }
+		);
+	}
+
 	return (
 		<Popover
-			key={ mountingKey }
-			anchorRef={ anchorRef }
-			focusOnMount={ addingLink ? 'firstElement' : false }
+			anchor={ popoverAnchor }
+			focusOnMount={ focusOnMount.current }
 			onClose={ stopAddingLink }
 			position="bottom center"
+			shift
 		>
 			<LinkControl
+				key={ forceRemountKey }
 				value={ linkValue }
 				onChange={ onChangeLink }
+				onRemove={ removeLink }
 				forceIsEditingLink={ addingLink }
+				hasRichPreviews
+				createSuggestion={ createPageEntity && handleCreate }
+				withCreateSuggestion={ userCanCreatePages }
+				createSuggestionButtonText={ createButtonText }
+				hasTextControl
 			/>
 		</Popover>
 	);
+}
+
+function getRichTextValueFromSelection( value, isActive ) {
+	// Default to the selection ranges on the RichTextValue object.
+	let textStart = value.start;
+	let textEnd = value.end;
+
+	// If the format is currently active then the rich text value
+	// should always be taken from the bounds of the active format
+	// and not the selected text.
+	if ( isActive ) {
+		const boundary = getFormatBoundary( value, {
+			type: 'core/link',
+		} );
+
+		textStart = boundary.start;
+
+		// Text *selection* always extends +1 beyond the edge of the format.
+		// We account for that here.
+		textEnd = boundary.end + 1;
+	}
+
+	// Get a RichTextValue containing the selected text content.
+	return slice( value, textStart, textEnd );
 }
 
 export default withSpokenMessages( InlineLinkUI );

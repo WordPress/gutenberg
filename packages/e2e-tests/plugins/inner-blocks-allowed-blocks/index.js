@@ -1,4 +1,4 @@
-( function() {
+( function () {
 	const { withSelect } = wp.data;
 	const { registerBlockType } = wp.blocks;
 	const { createElement: el } = wp.element;
@@ -16,7 +16,7 @@
 	const allowedBlocksWhenSingleEmptyChild = [ 'core/image', 'core/list' ];
 	const allowedBlocksWhenMultipleChildren = [ 'core/gallery', 'core/video' ];
 
-	const save = function() {
+	const save = function () {
 		return el( 'div', divProps, el( InnerBlocks.Content ) );
 	};
 	registerBlockType( 'test/allowed-blocks-unset', {
@@ -61,12 +61,12 @@
 		icon: 'carrot',
 		category: 'text',
 
-		edit: withSelect( function( select, ownProps ) {
-			var getBlockOrder = select( 'core/block-editor' ).getBlockOrder;
+		edit: withSelect( function ( select, ownProps ) {
+			const getBlockOrder = select( 'core/block-editor' ).getBlockOrder;
 			return {
 				numberOfChildren: getBlockOrder( ownProps.clientId ).length,
 			};
-		} )( function( props ) {
+		} )( function ( props ) {
 			return el(
 				'div',
 				{

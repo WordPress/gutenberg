@@ -15,7 +15,7 @@ import {
 } from '@wordpress/blocks';
 import { Button } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { Warning } from '@wordpress/block-editor';
+import { Warning, store as blockEditorStore } from '@wordpress/block-editor';
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import { compose, createHigherOrderComponent } from '@wordpress/compose';
@@ -43,7 +43,7 @@ const enhance = compose(
 
 		// Otherwise, only pass `originalBlockClientId` if it refers to a different
 		// block from the current one.
-		const blocks = select( 'core/block-editor' ).getBlocks();
+		const blocks = select( blockEditorStore ).getBlocks();
 		const firstOfSameType = find(
 			blocks,
 			( { name } ) => block.name === name
@@ -56,9 +56,7 @@ const enhance = compose(
 	} ),
 	withDispatch( ( dispatch, { originalBlockClientId } ) => ( {
 		selectFirst: () =>
-			dispatch( 'core/block-editor' ).selectBlock(
-				originalBlockClientId
-			),
+			dispatch( blockEditorStore ).selectBlock( originalBlockClientId ),
 	} ) )
 );
 
@@ -80,14 +78,14 @@ const withMultipleValidation = createHigherOrderComponent( ( BlockEdit ) => {
 				actions={ [
 					<Button
 						key="find-original"
-						isSecondary
+						variant="secondary"
 						onClick={ selectFirst }
 					>
 						{ __( 'Find original' ) }
 					</Button>,
 					<Button
 						key="remove"
-						isSecondary
+						variant="secondary"
 						onClick={ () => props.onReplace( [] ) }
 					>
 						{ __( 'Remove' ) }
@@ -95,7 +93,7 @@ const withMultipleValidation = createHigherOrderComponent( ( BlockEdit ) => {
 					outboundType && (
 						<Button
 							key="transform"
-							isSecondary
+							variant="secondary"
 							onClick={ () =>
 								props.onReplace(
 									createBlock(
@@ -110,7 +108,7 @@ const withMultipleValidation = createHigherOrderComponent( ( BlockEdit ) => {
 					),
 				] }
 			>
-				<strong>{ blockType.title }: </strong>
+				<strong>{ blockType?.title }: </strong>
 				{ __( 'This block can only be used once.' ) }
 			</Warning>,
 		];
@@ -126,7 +124,7 @@ const withMultipleValidation = createHigherOrderComponent( ( BlockEdit ) => {
  * @return {?Object} The chosen default block type.
  */
 function getOutboundType( blockName ) {
-	// Grab the first outbound transform
+	// Grab the first outbound transform.
 	const transform = findTransform(
 		getBlockTransforms( 'to', blockName ),
 		( { type, blocks } ) => type === 'block' && blocks.length === 1 // What about when .length > 1?

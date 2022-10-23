@@ -1,7 +1,7 @@
 /**
  * Set of HTTP methods which are eligible to be overridden.
  *
- * @type {Set}
+ * @type {Set<string>}
  */
 const OVERRIDE_METHODS = new Set( [ 'PATCH', 'PUT', 'DELETE' ] );
 
@@ -21,12 +21,9 @@ const DEFAULT_METHOD = 'GET';
  * API Fetch middleware which overrides the request method for HTTP v1
  * compatibility leveraging the REST API X-HTTP-Method-Override header.
  *
- * @param {Object}   options Fetch options.
- * @param {Function} next    [description]
- *
- * @return {*} The evaluated result of the remaining middleware chain.
+ * @type {import('../types').APIFetchMiddleware}
  */
-function httpV1Middleware( options, next ) {
+const httpV1Middleware = ( options, next ) => {
 	const { method = DEFAULT_METHOD } = options;
 	if ( OVERRIDE_METHODS.has( method.toUpperCase() ) ) {
 		options = {
@@ -40,7 +37,7 @@ function httpV1Middleware( options, next ) {
 		};
 	}
 
-	return next( options, next );
-}
+	return next( options );
+};
 
 export default httpV1Middleware;
