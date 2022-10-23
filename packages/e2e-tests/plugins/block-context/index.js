@@ -32,6 +32,7 @@
 				el( InnerBlocks, {
 					template: [ [ 'gutenberg/test-context-consumer', {} ] ],
 					templateLock: 'all',
+					templateInsertUpdatesSelection: true,
 				} )
 			);
 		},
@@ -49,7 +50,7 @@
 		// TODO: While redundant with server-side registration, it's required
 		// to assign this value since it is not picked in the implementation of
 		// `get_block_editor_server_block_settings`.
-		context: [ 'gutenberg/recordId' ],
+		usesContext: [ 'gutenberg/recordId' ],
 
 		category: 'text',
 

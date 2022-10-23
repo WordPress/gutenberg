@@ -1,3 +1,5 @@
+@import "./functions";
+
 /**
  * Breakpoint mixins
  */
@@ -75,7 +77,7 @@
 	}
 
 	@if $direction == "bottom" {
-		background: linear-gradient(to top, rgba($color, 0), $color 90%);
+		background: linear-gradient(to top, transparent, $color 90%);
 		left: $edge;
 		right: $edge;
 		top: $edge;
@@ -84,7 +86,7 @@
 	}
 
 	@if $direction == "top" {
-		background: linear-gradient(to bottom, rgba($color, 0), $color 90%);
+		background: linear-gradient(to bottom, transparent, $color 90%);
 		top: calc(100% - $size);
 		left: $edge;
 		right: $edge;
@@ -93,7 +95,7 @@
 	}
 
 	@if $direction == "left" {
-		background: linear-gradient(to left, rgba($color, 0), $color 90%);
+		background: linear-gradient(to left, transparent, $color 90%);
 		top: $edge;
 		left: $edge;
 		bottom: $edge;
@@ -103,7 +105,7 @@
 	}
 
 	@if $direction == "right" {
-		background: linear-gradient(to right, rgba($color, 0), $color 90%);
+		background: linear-gradient(to right, transparent, $color 90%);
 		top: $edge;
 		bottom: $edge;
 		right: $edge;
@@ -118,7 +120,7 @@
  */
 
 @mixin block-toolbar-button-style__focus() {
-	box-shadow: inset 0 0 0 $border-width-focus var(--wp-admin-theme-color), inset 0 0 0 4px $white;
+	box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 0 4px $white;
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
@@ -129,7 +131,7 @@
 	box-shadow: 0 0 0 transparent;
 	transition: box-shadow 0.1s linear;
 	border-radius: $radius-block-ui;
-	border: $border-width solid $medium-gray-text;
+	border: $border-width solid $gray-700;
 	@include reduce-motion("transition");
 }
 
@@ -175,20 +177,6 @@
 		}
 	}
 
-	/* Mobile menu opened. */
-	@media (max-width: #{ ($break-medium + 1) }) {
-		.auto-fold .wp-responsive-open #{$selector} {
-			left: $admin-sidebar-width-big;
-		}
-	}
-
-	/* In small screens with responsive menu expanded there is small white space. */
-	@media (max-width: #{ ($break-small) }) {
-		.auto-fold .wp-responsive-open #{$selector} {
-			margin-left: -18px;
-		}
-	}
-
 	body.is-fullscreen-mode #{$selector} {
 		left: 0 !important;
 	}
@@ -205,11 +193,30 @@
 }
 
 @mixin caption-style-theme() {
-	color: $dark-gray-500;
+	color: #555;
 	font-size: $default-font-size;
 	text-align: center;
+
+	.is-dark-theme & {
+		color: $light-gray-placeholder;
+	}
 }
 
+@mixin placeholder-style() {
+	border-radius: $radius-block-ui;
+
+	&::before {
+		content: "";
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		pointer-events: none;
+		background: currentColor;
+		opacity: 0.1;
+	}
+}
 
 /**
  * Allows users to opt-out of animations via OS-level preferences.
@@ -220,22 +227,21 @@
 	@if $property == "transition" {
 		@media (prefers-reduced-motion: reduce) {
 			transition-duration: 0s;
+			transition-delay: 0s;
 		}
-	}
-
-	@else if $property == "animation" {
+	} @else if $property == "animation" {
 		@media (prefers-reduced-motion: reduce) {
 			animation-duration: 1ms;
+			animation-delay: 0s;
 		}
-	}
-
-	@else {
+	} @else {
 		@media (prefers-reduced-motion: reduce) {
 			transition-duration: 0s;
+			transition-delay: 0s;
 			animation-duration: 1ms;
+			animation-delay: 0s;
 		}
 	}
-
 }
 
 @mixin input-control {
@@ -259,55 +265,42 @@
 
 	// Use opacity to work in various editor styles.
 	&::-webkit-input-placeholder {
-		color: $dark-opacity-300;
+		color: $dark-gray-placeholder;
 	}
 
 	&::-moz-placeholder {
 		opacity: 1; // Necessary because Firefox reduces this from 1.
-		color: $dark-opacity-300;
+		color: $dark-gray-placeholder;
 	}
 
 	&:-ms-input-placeholder {
-		color: $dark-opacity-300;
-	}
-
-	.is-dark-theme & {
-		&::-webkit-input-placeholder {
-			color: $light-opacity-300;
-		}
-
-		&::-moz-placeholder {
-			opacity: 1; // Necessary because Firefox reduces this from 1.
-			color: $light-opacity-300;
-		}
-
-		&:-ms-input-placeholder {
-			color: $light-opacity-300;
-		}
+		color: $dark-gray-placeholder;
 	}
 }
 
 @mixin checkbox-control {
 	@include input-control;
-	border: $border-width + 1 solid $medium-gray-text;
+	border: $border-width solid $gray-900;
 	margin-right: $grid-unit-15;
 	transition: none;
 	border-radius: $radius-block-ui;
 
 	&:focus {
-		border-color: $medium-gray-text;
-		box-shadow: 0 0 0 1px $medium-gray-text;
+		box-shadow: 0 0 0 ($border-width * 2) $white, 0 0 0 ($border-width * 2 + $border-width-focus) var(--wp-admin-theme-color);
+
+		// Only visible in Windows High Contrast mode.
+		outline: 2px solid transparent;
 	}
 
 	&:checked {
 		background: var(--wp-admin-theme-color);
 		border-color: var(--wp-admin-theme-color);
-	}
 
-	&:checked:focus {
-		box-shadow: 0 0 0 $border-width-focus $medium-gray-text;
+		// Hide default checkbox styles in IE.
+		&::-ms-check {
+			opacity: 0;
+		}
 	}
-
 
 	&:checked::before,
 	&[aria-checked="mixed"]::before {
@@ -343,51 +336,57 @@
 				font-size: 21px;
 			}
 		}
-
-		&:focus {
-			box-shadow: 0 0 0 $border-width-focus $dark-gray-500;
-		}
 	}
 }
 
 @mixin radio-control {
 	@include input-control;
-	border: $border-width + 1 solid $medium-gray-text;
+	border: $border-width solid $gray-900;
 	margin-right: $grid-unit-15;
 	transition: none;
 	border-radius: $radius-round;
+	width: $radio-input-size-sm;
+	height: $radio-input-size-sm;
+
+	@include break-small() {
+		height: $radio-input-size;
+		width: $radio-input-size;
+	}
 
 	&:checked::before {
-		width: 6px;
-		height: 6px;
-		margin: 6px 0 0 6px;
+		box-sizing: inherit;
+		width: 8px;
+		height: 8px;
+		transform: translate(7px, 7px);
+		margin: 0;
 		background-color: $white;
 
-		@include break-medium() {
-			margin: 3px 0 0 3px;
+		// This border serves as a background color in Windows High Contrast mode.
+		border: 4px solid $white;
+
+		@include break-small() {
+			transform: translate(5px, 5px);
 		}
 	}
 
 	&:focus {
-		border-color: $medium-gray-text;
-		box-shadow: 0 0 0 1px $medium-gray-text;
+		box-shadow: 0 0 0 ($border-width * 2) $white, 0 0 0 ($border-width * 2 + $border-width-focus) var(--wp-admin-theme-color);
+
+		// Only visible in Windows High Contrast mode.
+		outline: 2px solid transparent;
 	}
 
 	&:checked {
 		background: var(--wp-admin-theme-color);
 		border-color: var(--wp-admin-theme-color);
 	}
-
-	&:checked:focus {
-		box-shadow: 0 0 0 $border-width-focus $medium-gray-text;
-	}
-
 }
 
 /**
  * Reset default styles for JavaScript UI based pages.
  * This is a WP-admin agnostic reset
  */
+
 @mixin reset {
 	box-sizing: border-box;
 
@@ -401,6 +400,7 @@
 /**
  * Reset the WP Admin page styles for Gutenberg-like pages.
  */
+
 @mixin wp-admin-reset( $content-container ) {
 	background: $white;
 
@@ -439,20 +439,31 @@
 }
 
 @mixin admin-scheme($color-primary) {
+	// Define RGB equivalents for use in rgba function.
+	// Hexadecimal css vars do not work in the rgba function.
 	--wp-admin-theme-color: #{$color-primary};
+	--wp-admin-theme-color--rgb: #{hex-to-rgb($color-primary)};
+	// Darker shades.
+	--wp-admin-theme-color-darker-10: #{darken($color-primary, 5%)};
+	--wp-admin-theme-color-darker-10--rgb: #{hex-to-rgb(darken($color-primary, 5%))};
+	--wp-admin-theme-color-darker-20: #{darken($color-primary, 10%)};
+	--wp-admin-theme-color-darker-20--rgb: #{hex-to-rgb(darken($color-primary, 10%))};
 
-	// Ideally, we should limit these computed variables,
-	// because we can"t compute colors based on CSS variables.
-	// This requires refactoring some existing styles.
-	--wp-admin-theme-color-darker-20: #{darken($color-primary, 20%)};
-	--wp-admin-theme-color-darker-10: #{darken($color-primary, 10%)};
-	--wp-admin-theme-color-lighter-10: #{lighten($color-primary, 10%)};
-	--wp-admin-theme-color-lighter-40: #{lighten($color-primary, 40%)};
+	// Focus style width.
+	// Avoid rounding issues by showing a whole 2px for 1x screens, and 1.5px on high resolution screens.
+	--wp-admin-border-width-focus: 2px;
+	@media ( -webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+		--wp-admin-border-width-focus: 1.5px;
+	}
 }
 
 @mixin wordpress-admin-schemes() {
 	body.admin-color-light {
 		@include admin-scheme(#0085ba);
+	}
+
+	body.admin-color-modern {
+		@include admin-scheme(#3858e9);
 	}
 
 	body.admin-color-blue {
@@ -480,8 +491,62 @@
 	}
 }
 
-// It is important to include these styles in all built stylesheets
-// This allows to CSS variables post CSS plugin to generate fallbacks.
-:root {
-	@include admin-scheme(#007cba);
+// Deprecated from UI, kept for back-compat.
+@mixin background-colors-deprecated() {
+	.has-very-light-gray-background-color {
+		background-color: #eee;
+	}
+
+	.has-very-dark-gray-background-color {
+		background-color: #313131;
+	}
+}
+
+// Deprecated from UI, kept for back-compat.
+@mixin foreground-colors-deprecated() {
+	.has-very-light-gray-color {
+		color: #eee;
+	}
+
+	.has-very-dark-gray-color {
+		color: #313131;
+	}
+}
+
+// Deprecated from UI, kept for back-compat.
+@mixin gradient-colors-deprecated() {
+	/*
+	 * Our classes uses the same values we set for gradient value attributes,
+	 * and we can not use spacing because of WP multi site kses rule.
+	 */
+
+	/* stylelint-disable function-comma-space-after */
+	.has-vivid-green-cyan-to-vivid-cyan-blue-gradient-background {
+		background: linear-gradient(135deg,rgba(0,208,132,1) 0%,rgba(6,147,227,1) 100%);
+	}
+
+	.has-purple-crush-gradient-background {
+		background: linear-gradient(135deg,rgb(52,226,228) 0%,rgb(71,33,251) 50%,rgb(171,29,254) 100%);
+	}
+
+	.has-hazy-dawn-gradient-background {
+		background: linear-gradient(135deg,rgb(250,172,168) 0%,rgb(218,208,236) 100%);
+	}
+
+	.has-subdued-olive-gradient-background {
+		background: linear-gradient(135deg,rgb(250,250,225) 0%,rgb(103,166,113) 100%);
+	}
+
+	.has-atomic-cream-gradient-background {
+		background: linear-gradient(135deg,rgb(253,215,154) 0%,rgb(0,74,89) 100%);
+	}
+
+	.has-nightshade-gradient-background {
+		background: linear-gradient(135deg,rgb(51,9,104) 0%,rgb(49,205,207) 100%);
+	}
+
+	.has-midnight-gradient-background {
+		background: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);
+	}
+	/* stylelint-enable function-comma-space-after */
 }

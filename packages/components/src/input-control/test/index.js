@@ -1,12 +1,23 @@
 /**
  * External dependencies
  */
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+/**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import BaseInputControl from '../';
+
+const setupUser = () =>
+	userEvent.setup( {
+		advanceTimers: jest.advanceTimersByTime,
+	} );
 
 const getInput = () => screen.getByTestId( 'input' );
 
@@ -29,61 +40,96 @@ describe( 'InputControl', () => {
 
 			const input = getInput();
 
-			expect( input.getAttribute( 'type' ) ).toBe( 'number' );
+			expect( input ).toHaveAttribute( 'type', 'number' );
 		} );
-	} );
 
-	describe( 'Label', () => {
 		it( 'should render label', () => {
 			render( <InputControl label="Hello" value="There" /> );
 
 			const input = screen.getByText( 'Hello' );
 
-			expect( input ).toBeTruthy();
+			expect( input ).toBeInTheDocument();
 		} );
+	} );
 
-		it( 'should render label, if floating', () => {
-			render(
-				<InputControl isFloatingLabel label="Hello" value="There" />
-			);
+	describe( 'Ensurance of focus for number inputs', () => {
+		it( 'should focus its input on mousedown events', async () => {
+			const user = setupUser();
+			const spy = jest.fn();
+			render( <InputControl type="number" onFocus={ spy } /> );
+			const target = getInput();
 
-			const input = screen.getAllByText( 'Hello' );
+			// Hovers the input and presses (without releasing) primary button.
+			await user.pointer( [
+				{ target },
+				{ keys: '[MouseLeft]', target },
+			] );
 
-			expect( input ).toBeTruthy();
+			expect( spy ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 
 	describe( 'Value', () => {
-		it( 'should update value onChange', () => {
+		it( 'should update value onChange', async () => {
+			const user = setupUser();
 			const spy = jest.fn();
-			render( <InputControl value="Hello" onChange={ spy } /> );
-
+			render(
+				<InputControl value="Hello" onChange={ ( v ) => spy( v ) } />
+			);
 			const input = getInput();
 
-			fireEvent.change( input, { target: { value: 'There' } } );
+			await user.type( input, ' there' );
 
-			expect( input.value ).toBe( 'There' );
-			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( input ).toHaveValue( 'Hello there' );
+			expect( spy ).toHaveBeenCalledTimes( ' there'.length );
+			expect( spy ).toHaveBeenLastCalledWith( 'Hello there' );
 		} );
 
-		it( 'should work as a controlled component', () => {
+		it( 'should work as a controlled component given normal, falsy or nullish values', async () => {
+			const user = setupUser();
 			const spy = jest.fn();
-			const { rerender } = render(
-				<InputControl value="Original" onChange={ spy } />
-			);
-
+			const heldKeySet = new Set();
+			const Example = () => {
+				const [ state, setState ] = useState( 'one' );
+				const onChange = ( value ) => {
+					setState( value );
+					spy( value );
+				};
+				const onKeyDown = ( { key } ) => {
+					heldKeySet.add( key );
+					if ( key === 'Escape' ) {
+						if ( heldKeySet.has( 'Meta' ) ) setState( 'qux' );
+						else if ( heldKeySet.has( 'Alt' ) )
+							setState( undefined );
+						else setState( '' );
+					}
+				};
+				const onKeyUp = ( { key } ) => heldKeySet.delete( key );
+				return (
+					<InputControl
+						value={ state }
+						onChange={ onChange }
+						onKeyDown={ onKeyDown }
+						onKeyUp={ onKeyUp }
+					/>
+				);
+			};
+			render( <Example /> );
 			const input = getInput();
 
-			fireEvent.change( input, { target: { value: 'State' } } );
+			await user.type( input, '2' );
+			// Make a controlled update with a falsy value.
+			await user.keyboard( '{Escape}' );
+			expect( input ).toHaveValue( '' );
 
-			// Assuming <InputControl /> is controlled...
+			// Make a controlled update with a normal value.
+			await user.keyboard( '{Meta>}{Escape}{/Meta}' );
+			expect( input ).toHaveValue( 'qux' );
 
-			// Updating the value
-			rerender( <InputControl value="New" onChange={ spy } /> );
-
-			expect( input.value ).toBe( 'New' );
-
-			/**
+			// Make a controlled update with a nullish value.
+			await user.keyboard( '{Alt>}{Escape}{/Alt}' );
+			expect( input ).toHaveValue( '' );
+			/*
 			 * onChange called only once. onChange is not called when a
 			 * parent component explicitly passed a (new value) change down to
 			 * the <InputControl />.
@@ -96,21 +142,68 @@ describe( 'InputControl', () => {
 			const { rerender } = render(
 				<InputControl value="Original" onChange={ spy } />
 			);
-
 			const input = getInput();
 
-			// Assuming <InputControl /> is controlled...
-
-			// Updating the value
+			// Updating the value.
 			rerender( <InputControl value="New" onChange={ spy } /> );
 
-			expect( input.value ).toBe( 'New' );
+			expect( input ).toHaveValue( 'New' );
 
-			// Change it back to the original value
+			// Change it back to the original value.
 			rerender( <InputControl value="Original" onChange={ spy } /> );
 
-			expect( input.value ).toBe( 'Original' );
+			expect( input ).toHaveValue( 'Original' );
 			expect( spy ).toHaveBeenCalledTimes( 0 );
+		} );
+
+		it( 'should not commit value until blurred when isPressEnterToChange is true', async () => {
+			const user = setupUser();
+			const spy = jest.fn();
+			render(
+				<InputControl
+					value=""
+					onChange={ ( v ) => spy( v ) }
+					isPressEnterToChange
+				/>
+			);
+			const input = getInput();
+
+			await user.type( input, 'that was then' );
+			// Clicking document.body to trigger a blur event on the input.
+			await user.click( document.body );
+
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( spy ).toHaveBeenCalledWith( 'that was then' );
+		} );
+
+		it( 'should commit value when blurred if value is invalid', async () => {
+			const user = setupUser();
+			const spyChange = jest.fn();
+			render(
+				<InputControl
+					value="this is"
+					onChange={ ( v ) => spyChange( v ) }
+					// If the value contains 'now' it is not valid.
+					pattern="(?!.*now)^.*$"
+					__unstableStateReducer={ ( state, action ) => {
+						let { value } = state;
+						if (
+							action.type === 'COMMIT' &&
+							action.payload.event.type === 'blur'
+						)
+							value = value.replace( /\bnow\b/, 'meow' );
+
+						return { ...state, value };
+					} }
+				/>
+			);
+			const input = getInput();
+
+			await user.type( input, ' now' );
+			// Clicking document.body to trigger a blur event on the input.
+			await user.click( document.body );
+
+			expect( spyChange ).toHaveBeenLastCalledWith( 'this is meow' );
 		} );
 	} );
 } );

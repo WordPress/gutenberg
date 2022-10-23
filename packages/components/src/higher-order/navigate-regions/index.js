@@ -1,71 +1,106 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import { useCallback, useState, useRef } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import {
 	createHigherOrderComponent,
-	useKeyboardShortcut,
+	useRefEffect,
+	useMergeRefs,
 } from '@wordpress/compose';
-import { rawShortcut } from '@wordpress/keycodes';
+import { isKeyboardEvent } from '@wordpress/keycodes';
 
 const defaultShortcuts = {
-	previous: [ 'ctrl+shift+`', rawShortcut.access( 'p' ) ],
-	next: [ 'ctrl+`', rawShortcut.access( 'n' ) ],
+	previous: [
+		{
+			modifier: 'ctrlShift',
+			character: '`',
+		},
+		{
+			modifier: 'access',
+			character: 'p',
+		},
+	],
+	next: [
+		{
+			modifier: 'ctrl',
+			character: '`',
+		},
+		{
+			modifier: 'access',
+			character: 'n',
+		},
+	],
 };
 
-export default createHigherOrderComponent( ( WrappedComponent ) => {
-	return ( { shortcuts = defaultShortcuts, ...props } ) => {
-		const container = useRef();
-		const [ isFocusingRegions, setIsFocusingRegions ] = useState( false );
-		const className = classnames( 'components-navigate-regions', {
-			'is-focusing-regions': isFocusingRegions,
-		} );
+export function useNavigateRegions( shortcuts = defaultShortcuts ) {
+	const ref = useRef();
+	const [ isFocusingRegions, setIsFocusingRegions ] = useState( false );
 
-		function focusRegion( offset ) {
-			const regions = Array.from(
-				container.current.querySelectorAll( '[role="region"]' )
-			);
-			if ( ! regions.length ) {
-				return;
-			}
-			let nextRegion = regions[ 0 ];
-			const selectedIndex = regions.indexOf( document.activeElement );
-			if ( selectedIndex !== -1 ) {
-				let nextIndex = selectedIndex + offset;
-				nextIndex = nextIndex === -1 ? regions.length - 1 : nextIndex;
-				nextIndex = nextIndex === regions.length ? 0 : nextIndex;
-				nextRegion = regions[ nextIndex ];
-			}
-
-			nextRegion.focus();
-			setIsFocusingRegions( true );
-		}
-		const focusPrevious = useCallback( () => focusRegion( -1 ), [
-			container,
-		] );
-		const focusNext = useCallback( () => focusRegion( 1 ), [ container ] );
-
-		useKeyboardShortcut( shortcuts.previous, focusPrevious, {
-			bindGlobal: true,
-		} );
-		useKeyboardShortcut( shortcuts.next, focusNext, { bindGlobal: true } );
-
-		// Disable reason: Clicking the editor should dismiss the regions focus style
-		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
-		return (
-			<div
-				ref={ container }
-				className={ className }
-				onClick={ () => setIsFocusingRegions( false ) }
-			>
-				<WrappedComponent { ...props } />
-			</div>
+	function focusRegion( offset ) {
+		const regions = Array.from(
+			ref.current.querySelectorAll( '[role="region"]' )
 		);
-		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
+		if ( ! regions.length ) {
+			return;
+		}
+		let nextRegion = regions[ 0 ];
+		const selectedIndex = regions.indexOf(
+			ref.current.ownerDocument.activeElement
+		);
+		if ( selectedIndex !== -1 ) {
+			let nextIndex = selectedIndex + offset;
+			nextIndex = nextIndex === -1 ? regions.length - 1 : nextIndex;
+			nextIndex = nextIndex === regions.length ? 0 : nextIndex;
+			nextRegion = regions[ nextIndex ];
+		}
+
+		nextRegion.focus();
+		setIsFocusingRegions( true );
+	}
+
+	const clickRef = useRefEffect(
+		( element ) => {
+			function onClick() {
+				setIsFocusingRegions( false );
+			}
+
+			element.addEventListener( 'click', onClick );
+
+			return () => {
+				element.removeEventListener( 'click', onClick );
+			};
+		},
+		[ setIsFocusingRegions ]
+	);
+
+	return {
+		ref: useMergeRefs( [ ref, clickRef ] ),
+		className: isFocusingRegions ? 'is-focusing-regions' : '',
+		onKeyDown( event ) {
+			if (
+				shortcuts.previous.some( ( { modifier, character } ) => {
+					return isKeyboardEvent[ modifier ]( event, character );
+				} )
+			) {
+				focusRegion( -1 );
+			} else if (
+				shortcuts.next.some( ( { modifier, character } ) => {
+					return isKeyboardEvent[ modifier ]( event, character );
+				} )
+			) {
+				focusRegion( 1 );
+			}
+		},
 	};
-}, 'navigateRegions' );
+}
+
+export default createHigherOrderComponent(
+	( Component ) =>
+		( { shortcuts, ...props } ) =>
+			(
+				<div { ...useNavigateRegions( shortcuts ) }>
+					<Component { ...props } />
+				</div>
+			),
+	'navigateRegions'
+);

@@ -1,18 +1,9 @@
 /**
- * External dependencies
- */
-import { stubTrue, without } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { createHigherOrderComponent } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
-import Provider, { Consumer } from './context';
+import { createHigherOrderComponent, useFocusReturn } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Returns true if the given object is component-like. An object is component-
@@ -33,94 +24,41 @@ function isComponentLike( object ) {
  * when the component is unmounted.
  *
  * @param {(WPComponent|Object)} options The component to be enhanced with
- *                                      focus return behavior, or an object
- *                                      describing the component and the
- *                                      focus return characteristics.
+ *                                       focus return behavior, or an object
+ *                                       describing the component and the
+ *                                       focus return characteristics.
  *
- * @return {WPComponent} Component with the focus restauration behaviour.
+ * @return {Function} Higher Order Component with the focus restauration behaviour.
  */
-function withFocusReturn( options ) {
-	// Normalize as overloaded form `withFocusReturn( options )( Component )`
-	// or as `withFocusReturn( Component )`.
-	if ( isComponentLike( options ) ) {
-		const WrappedComponent = options;
-		return withFocusReturn( {} )( WrappedComponent );
-	}
-
-	const { onFocusReturn = stubTrue } = options;
-
-	return ( WrappedComponent ) => {
-		class FocusReturn extends Component {
-			constructor() {
-				super( ...arguments );
-
-				this.ownFocusedElements = new Set();
-				this.activeElementOnMount = document.activeElement;
-				this.setIsFocusedFalse = () => ( this.isFocused = false );
-				this.setIsFocusedTrue = ( event ) => {
-					this.ownFocusedElements.add( event.target );
-					this.isFocused = true;
-				};
-			}
-
-			componentWillUnmount() {
-				const {
-					activeElementOnMount,
-					isFocused,
-					ownFocusedElements,
-				} = this;
-
-				if ( ! isFocused ) {
-					return;
-				}
-
-				// Defer to the component's own explicit focus return behavior,
-				// if specified. The function should return `false` to prevent
-				// the default behavior otherwise occurring here. This allows
-				// for support that the `onFocusReturn` decides to allow the
-				// default behavior to occur under some conditions.
-				if ( onFocusReturn() === false ) {
-					return;
-				}
-
-				const stack = [
-					...without(
-						this.props.focus.focusHistory,
-						...ownFocusedElements
-					),
-					activeElementOnMount,
-				];
-
-				let candidate;
-				while ( ( candidate = stack.pop() ) ) {
-					if ( document.body.contains( candidate ) ) {
-						candidate.focus();
-						return;
-					}
-				}
-			}
-
-			render() {
+export default createHigherOrderComponent( ( options ) => {
+	const HoC =
+		( { onFocusReturn } = {} ) =>
+		( WrappedComponent ) => {
+			const WithFocusReturn = ( props ) => {
+				const ref = useFocusReturn( onFocusReturn );
 				return (
-					<div
-						onFocus={ this.setIsFocusedTrue }
-						onBlur={ this.setIsFocusedFalse }
-					>
-						<WrappedComponent { ...this.props.childProps } />
+					<div ref={ ref }>
+						<WrappedComponent { ...props } />
 					</div>
 				);
-			}
-		}
+			};
 
-		return ( props ) => (
-			<Consumer>
-				{ ( context ) => (
-					<FocusReturn childProps={ props } focus={ context } />
-				) }
-			</Consumer>
-		);
-	};
-}
+			return WithFocusReturn;
+		};
 
-export default createHigherOrderComponent( withFocusReturn, 'withFocusReturn' );
-export { Provider };
+	if ( isComponentLike( options ) ) {
+		const WrappedComponent = options;
+		return HoC()( WrappedComponent );
+	}
+
+	return HoC( options );
+}, 'withFocusReturn' );
+
+export const Provider = ( { children } ) => {
+	deprecated( 'wp.components.FocusReturnProvider component', {
+		since: '5.7',
+		hint: 'This provider is not used anymore. You can just remove it from your codebase',
+	} );
+
+	return children;
+};

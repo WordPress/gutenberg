@@ -1,32 +1,36 @@
 name: Storybook GitHub Pages
 
 on:
-  push:
-    branches:
-      - master
+    push:
+        branches:
+            - trunk
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          ref: master
+    deploy:
+        runs-on: ubuntu-latest
+        if: ${{ github.repository == 'WordPress/gutenberg' }}
 
-      - name: Setup Node
-        uses: actions/setup-node@v1
-        with:
-          node-version: '12.x'
+        steps:
+            - name: Checkout
+              uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+              with:
+                  ref: trunk
 
-      - name: Install Dependencies
-        run: npm ci
+            - name: Use desired version of NodeJS
+              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: npm
 
-      - name: Build Storybook
-        run: npm run storybook:build
+            - name: Install Dependencies
+              run: npm ci
 
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./playground/dist
+            - name: Build Storybook
+              run: npm run storybook:build
+
+            - name: Deploy
+              uses: peaceiris/actions-gh-pages@068dc23d9710f1ba62e86896f84735d869951305 # v3.8.0
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  publish_dir: ./storybook/build
+                  force_orphan: true

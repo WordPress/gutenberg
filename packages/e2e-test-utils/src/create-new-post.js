@@ -34,6 +34,8 @@ export async function createNewPost( {
 
 	await visitAdminPage( 'post-new.php', query );
 
+	await page.waitForSelector( '.edit-post-layout' );
+
 	const isWelcomeGuideActive = await page.evaluate( () =>
 		wp.data.select( 'core/edit-post' ).isFeatureActive( 'welcomeGuide' )
 	);
@@ -47,6 +49,7 @@ export async function createNewPost( {
 		);
 
 		await page.reload();
+		await page.waitForSelector( '.edit-post-layout' );
 	}
 
 	if ( isFullscreenMode ) {
@@ -55,5 +58,7 @@ export async function createNewPost( {
 				.dispatch( 'core/edit-post' )
 				.toggleFeature( 'fullscreenMode' )
 		);
+
+		await page.waitForSelector( 'body:not(.is-fullscreen-mode)' );
 	}
 }

@@ -6,4 +6,10 @@
 .progressBar {
 	background-color: $gray-lighten-30;
 	z-index: 1;
+	height: 6px;
+	margin-bottom: -6px;
+}
+
+.progressBarHidden {
+	background-color: transparent;
 }

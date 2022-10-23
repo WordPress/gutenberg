@@ -1,21 +1,32 @@
-( function() {
-	var Button = wp.components.Button;
-	var PanelBody = wp.components.PanelBody;
-	var PanelRow = wp.components.PanelRow;
-	var compose = wp.compose.compose;
-	var withDispatch = wp.data.withDispatch;
-	var withSelect = wp.data.withSelect;
-	var select = wp.data.select;
-	var dispatch = wp.data.dispatch;
-	var PlainText = wp.blockEditor.PlainText;
-	var Fragment = wp.element.Fragment;
-	var el = wp.element.createElement;
-	var __ = wp.i18n.__;
-	var registerPlugin = wp.plugins.registerPlugin;
-	var PluginSidebar = wp.editPost.PluginSidebar;
-	var PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
+( function () {
+	const Button = wp.components.Button;
+	const PanelBody = wp.components.PanelBody;
+	const PanelRow = wp.components.PanelRow;
+	const editorStore = wp.editor.store;
+	const useDispatch = wp.data.useDispatch;
+	const useSelect = wp.data.useSelect;
+	const PlainText = wp.blockEditor.PlainText;
+	const Fragment = wp.element.Fragment;
+	const el = wp.element.createElement;
+	const __ = wp.i18n.__;
+	const registerPlugin = wp.plugins.registerPlugin;
+	const PluginSidebar = wp.editPost.PluginSidebar;
+	const PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
 
-	function SidebarContents( props ) {
+	function SidebarContents() {
+		const postTitle = useSelect( ( select ) =>
+			select( editorStore ).getEditedPostAttribute( 'title' )
+		);
+		const editPost = useDispatch( editorStore ).editPost;
+
+		function resetTitle() {
+			editPost( { title: '' } );
+		}
+
+		function updateTitle( title ) {
+			editPost( { title } );
+		}
+
 		return el(
 			PanelBody,
 			{ className: 'sidebar-title-plugin-panel' },
@@ -25,19 +36,16 @@
 				el(
 					'label',
 					{
-						'htmlFor': 'title-plain-text'
+						htmlFor: 'title-plain-text',
 					},
-					__( 'Title:' ),
+					__( 'Title:' )
 				),
-				el(
-					PlainText,
-					{
-						id: 'title-plain-text',
-						onChange: props.updateTitle,
-						placeholder: __( '(no title)' ),
-						value: props.title
-					}
-				)
+				el( PlainText, {
+					id: 'title-plain-text',
+					onChange: updateTitle,
+					placeholder: __( '(no title)' ),
+					value: postTitle,
+				} )
 			),
 			el(
 				PanelRow,
@@ -45,38 +53,14 @@
 				el(
 					Button,
 					{
-						isPrimary: true,
-						onClick: props.resetTitle
+						variant: 'primary',
+						onClick: resetTitle,
 					},
 					__( 'Reset' )
 				)
 			)
 		);
 	}
-
-	var SidebarContentsWithDataHandling = compose( [
-		withSelect( function( select ) {
-			return {
-				title: select( 'core/editor' ).getEditedPostAttribute( 'title' ),
-			};
-		} ),
-		withDispatch( function( dispatch ) {
-			function editPost( title ) {
-				dispatch( 'core/editor' ).editPost( {
-					title: title
-				} );
-			}
-
-			return {
-				updateTitle: function( title ) {
-					editPost( title );
-				},
-				resetTitle: function() {
-					editPost( '' );
-				}
-			};
-		} )
-	] )( SidebarContents );
 
 	function MySidebarPlugin() {
 		return el(
@@ -86,25 +70,22 @@
 				PluginSidebar,
 				{
 					name: 'title-sidebar',
-					title: __( 'Sidebar title plugin' )
+					title: __( 'Plugin sidebar title' ),
 				},
-				el(
-					SidebarContentsWithDataHandling,
-					{}
-				)
+				el( SidebarContents, {} )
 			),
 			el(
 				PluginSidebarMoreMenuItem,
 				{
-					target: 'title-sidebar'
+					target: 'title-sidebar',
 				},
-				__( 'Sidebar title plugin' )
+				__( 'Plugin sidebar more menu title' )
 			)
 		);
 	}
 
 	registerPlugin( 'my-sidebar-plugin', {
 		icon: 'text',
-		render: MySidebarPlugin
+		render: MySidebarPlugin,
 	} );
 } )();

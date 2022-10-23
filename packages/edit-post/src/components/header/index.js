@@ -1,12 +1,16 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
-import {
-	PinnedItems,
-	__experimentalMainDashboardButton as MainDashboardButton,
-} from '@wordpress/interface';
+import { PinnedItems } from '@wordpress/interface';
+import { useViewportMatch } from '@wordpress/compose';
+import { __unstableMotion as motion } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -16,35 +20,65 @@ import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 import { default as DevicePreview } from '../device-preview';
+import MainDashboardButton from './main-dashboard-button';
+import { store as editPostStore } from '../../store';
+import TemplateTitle from './template-title';
 
-function Header( {
-	onToggleInserter,
-	isInserterOpen,
-	setEntitiesSavedStatesCallback,
-} ) {
-	const { hasActiveMetaboxes, isPublishSidebarOpened, isSaving } = useSelect(
+function Header( { setEntitiesSavedStatesCallback, isDistractionFree } ) {
+	const {
+		hasActiveMetaboxes,
+		isPublishSidebarOpened,
+		isSaving,
+		showIconLabels,
+	} = useSelect(
 		( select ) => ( {
-			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
-			isPublishSidebarOpened: select(
-				'core/edit-post'
-			).isPublishSidebarOpened(),
-			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
+			isPublishSidebarOpened:
+				select( editPostStore ).isPublishSidebarOpened(),
+			isSaving: select( editPostStore ).isSavingMetaBoxes(),
+			showIconLabels:
+				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
 		} ),
 		[]
 	);
 
+	const isLargeViewport = useViewportMatch( 'large' );
+
+	const classes = classnames( 'edit-post-header' );
+
+	const slideY = {
+		hidden: isDistractionFree ? { y: '-50' } : { y: 0 },
+		hover: { y: 0, transition: { type: 'tween', delay: 0.2 } },
+	};
+
+	const slideX = {
+		hidden: isDistractionFree ? { x: '-100%' } : { x: 0 },
+		hover: { x: 0, transition: { type: 'tween', delay: 0.2 } },
+	};
+
 	return (
-		<div className="edit-post-header">
+		<div className={ classes }>
 			<MainDashboardButton.Slot>
-				<FullscreenModeClose />
+				<motion.div
+					variants={ slideX }
+					transition={ { type: 'tween', delay: 0.8 } }
+				>
+					<FullscreenModeClose showTooltip />
+				</motion.div>
 			</MainDashboardButton.Slot>
-			<div className="edit-post-header__toolbar">
-				<HeaderToolbar
-					onToggleInserter={ onToggleInserter }
-					isInserterOpen={ isInserterOpen }
-				/>
-			</div>
-			<div className="edit-post-header__settings">
+			<motion.div
+				variants={ slideY }
+				transition={ { type: 'tween', delay: 0.8 } }
+				className="edit-post-header__toolbar"
+			>
+				<HeaderToolbar />
+				<TemplateTitle />
+			</motion.div>
+			<motion.div
+				variants={ slideY }
+				transition={ { type: 'tween', delay: 0.8 } }
+				className="edit-post-header__settings"
+			>
 				{ ! isPublishSidebarOpened && (
 					// This button isn't completely hidden by the publish sidebar.
 					// We can't hide the whole toolbar when the publish sidebar is open because
@@ -54,6 +88,7 @@ function Header( {
 					<PostSavedState
 						forceIsDirty={ hasActiveMetaboxes }
 						forceIsSaving={ isSaving }
+						showIconLabels={ showIconLabels }
 					/>
 				) }
 				<DevicePreview />
@@ -68,9 +103,16 @@ function Header( {
 						setEntitiesSavedStatesCallback
 					}
 				/>
-				<PinnedItems.Slot scope="core/edit-post" />
-				<MoreMenu />
-			</div>
+				{ ( isLargeViewport || ! showIconLabels ) && (
+					<>
+						<PinnedItems.Slot scope="core/edit-post" />
+						<MoreMenu showIconLabels={ showIconLabels } />
+					</>
+				) }
+				{ showIconLabels && ! isLargeViewport && (
+					<MoreMenu showIconLabels={ showIconLabels } />
+				) }
+			</motion.div>
 		</div>
 	);
 }

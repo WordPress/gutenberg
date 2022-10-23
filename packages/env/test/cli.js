@@ -18,6 +18,7 @@ jest.mock( '../lib/env', () => ( {
 	start: jest.fn( Promise.resolve.bind( Promise ) ),
 	stop: jest.fn( Promise.resolve.bind( Promise ) ),
 	clean: jest.fn( Promise.resolve.bind( Promise ) ),
+	run: jest.fn( Promise.resolve.bind( Promise ) ),
 	ValidationError: jest.requireActual( '../lib/env' ).ValidationError,
 } ) );
 
@@ -61,6 +62,21 @@ describe( 'env cli', () => {
 		expect( spinner.text ).toBe( '' );
 	} );
 
+	it( 'parses run commands without arguments.', () => {
+		cli().parse( [ 'run', 'tests-wordpress', 'test' ] );
+		const { container, command, spinner } = env.run.mock.calls[ 0 ][ 0 ];
+		expect( container ).toBe( 'tests-wordpress' );
+		expect( command ).toStrictEqual( [ 'test' ] );
+		expect( spinner.text ).toBe( '' );
+	} );
+	it( 'parses run commands with variadic arguments.', () => {
+		cli().parse( [ 'run', 'tests-wordpress', 'test', 'test1', '--test2' ] );
+		const { container, command, spinner } = env.run.mock.calls[ 0 ][ 0 ];
+		expect( container ).toBe( 'tests-wordpress' );
+		expect( command ).toStrictEqual( [ 'test', 'test1', '--test2' ] );
+		expect( spinner.text ).toBe( '' );
+	} );
+
 	it( 'handles successful commands with messages.', async () => {
 		env.start.mockResolvedValueOnce( 'success message' );
 		cli().parse( [ 'start' ] );
@@ -82,7 +98,6 @@ describe( 'env cli', () => {
 	} );
 
 	it( 'handles failed commands with messages.', async () => {
-		/* eslint-disable no-console */
 		env.start.mockRejectedValueOnce( {
 			message: 'failure message',
 		} );
@@ -100,10 +115,8 @@ describe( 'env cli', () => {
 		expect( process.exit ).toHaveBeenCalledWith( 1 );
 		console.error = consoleError;
 		process.exit = processExit;
-		/* eslint-enable no-console */
 	} );
 	it( 'handles failed docker commands with errors.', async () => {
-		/* eslint-disable no-console */
 		env.start.mockRejectedValueOnce( {
 			err: 'failure error',
 			out: 'message',
@@ -128,6 +141,5 @@ describe( 'env cli', () => {
 		console.error = consoleError;
 		process.exit = processExit;
 		process.stderr.write = stderr;
-		/* eslint-enable no-console */
 	} );
 } );

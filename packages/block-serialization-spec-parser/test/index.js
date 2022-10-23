@@ -9,7 +9,7 @@ import path from 'path';
 import { parse } from '../';
 import { jsTester, phpTester } from '../shared-tests';
 
-describe( 'block-serialization-spec-parser-js', jsTester( parse ) ); // eslint-disable-line jest/valid-describe
+describe( 'block-serialization-spec-parser-js', jsTester( parse ) ); // eslint-disable-line jest/valid-describe-callback
 
 phpTester(
 	'block-serialization-spec-parser-php',

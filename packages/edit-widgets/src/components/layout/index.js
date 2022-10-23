@@ -1,39 +1,50 @@
 /**
  * WordPress dependencies
  */
+import { __, sprintf } from '@wordpress/i18n';
 import { Popover } from '@wordpress/components';
-import { InterfaceSkeleton, ComplementaryArea } from '@wordpress/interface';
-import { useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
+import { PluginArea } from '@wordpress/plugins';
+import { store as noticesStore } from '@wordpress/notices';
+
 /**
  * Internal dependencies
  */
-import Header from '../header';
-import Sidebar from '../sidebar';
+import ErrorBoundary from '../error-boundary';
 import WidgetAreasBlockEditorProvider from '../widget-areas-block-editor-provider';
-import WidgetAreasBlockEditorContent from '../widget-areas-block-editor-content';
+import Sidebar from '../sidebar';
+import Interface from './interface';
+import UnsavedChangesWarning from './unsaved-changes-warning';
+import WelcomeGuide from '../welcome-guide';
 
-function Layout( { blockEditorSettings } ) {
-	const hasSidebarEnabled = useSelect( ( select ) => {
-		return !! select( 'core/interface' ).getActiveComplementaryArea(
-			'core/edit-widgets'
+function Layout( { blockEditorSettings, onError } ) {
+	const { createErrorNotice } = useDispatch( noticesStore );
+
+	function onPluginAreaError( name ) {
+		createErrorNotice(
+			sprintf(
+				/* translators: %s: plugin name */
+				__(
+					'The "%s" plugin has encountered an error and cannot be rendered.'
+				),
+				name
+			)
 		);
-	} );
+	}
+
 	return (
-		<WidgetAreasBlockEditorProvider
-			blockEditorSettings={ blockEditorSettings }
-		>
-			<InterfaceSkeleton
-				header={ <Header /> }
-				sidebar={
-					hasSidebarEnabled && (
-						<ComplementaryArea.Slot scope="core/edit-widgets" />
-					)
-				}
-				content={ <WidgetAreasBlockEditorContent /> }
-			/>
-			<Sidebar />
-			<Popover.Slot />
-		</WidgetAreasBlockEditorProvider>
+		<ErrorBoundary onError={ onError }>
+			<WidgetAreasBlockEditorProvider
+				blockEditorSettings={ blockEditorSettings }
+			>
+				<Interface blockEditorSettings={ blockEditorSettings } />
+				<Sidebar />
+				<Popover.Slot />
+				<PluginArea onError={ onPluginAreaError } />
+				<UnsavedChangesWarning />
+				<WelcomeGuide />
+			</WidgetAreasBlockEditorProvider>
+		</ErrorBoundary>
 	);
 }
 

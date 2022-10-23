@@ -5,6 +5,7 @@ import {
 	insertBlock,
 	createNewPost,
 	clickBlockToolbarButton,
+	clickMenuItem,
 	pressKeyWithModifier,
 	getEditedPostContent,
 	transformBlockTo,
@@ -12,6 +13,7 @@ import {
 	getAvailableBlockTransforms,
 	activatePlugin,
 	deactivatePlugin,
+	createReusableBlock,
 } from '@wordpress/e2e-test-utils';
 
 async function insertBlocksOfSameType() {
@@ -37,13 +39,13 @@ async function insertBlocksOfMultipleTypes() {
 
 describe( 'Block Grouping', () => {
 	beforeEach( async () => {
-		// Posts are auto-removed at the end of each test run
+		// Posts are auto-removed at the end of each test run.
 		await createNewPost();
 	} );
 
 	describe( 'Group creation', () => {
 		it( 'creates a group from multiple blocks of the same type via block transforms', async () => {
-			// Creating test blocks
+			// Creating test blocks.
 			await insertBlocksOfSameType();
 
 			// Multiselect via keyboard.
@@ -56,7 +58,7 @@ describe( 'Block Grouping', () => {
 		} );
 
 		it( 'creates a group from multiple blocks of different types via block transforms', async () => {
-			// Creating test blocks
+			// Creating test blocks.
 			await insertBlocksOfMultipleTypes();
 
 			// Multiselect via keyboard.
@@ -69,74 +71,110 @@ describe( 'Block Grouping', () => {
 		} );
 
 		it( 'creates a group from multiple blocks of the same type via options toolbar', async () => {
-			// Creating test blocks
+			// Creating test blocks.
 			await insertBlocksOfSameType();
 
 			// Multiselect via keyboard.
 			await pressKeyWithModifier( 'primary', 'a' );
 			await pressKeyWithModifier( 'primary', 'a' );
 
-			await clickBlockToolbarButton( 'More options' );
-
-			const groupButton = await page.waitForXPath(
-				'//button[text()="Group"]'
-			);
-			await groupButton.click();
+			await clickBlockToolbarButton( 'Options' );
+			await clickMenuItem( 'Group' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
 
 		it( 'groups and ungroups multiple blocks of different types via options toolbar', async () => {
-			// Creating test blocks
+			// Creating test blocks.
 			await insertBlocksOfMultipleTypes();
 			await pressKeyWithModifier( 'primary', 'a' );
 			await pressKeyWithModifier( 'primary', 'a' );
 
-			// Group
-			await clickBlockToolbarButton( 'More options' );
-			const groupButton = await page.waitForXPath(
-				'//button[text()="Group"]'
-			);
-			await groupButton.click();
+			// Group.
+			await clickBlockToolbarButton( 'Options' );
+			await clickMenuItem( 'Group' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 
-			// UnGroup
-			await clickBlockToolbarButton( 'More options' );
-			const unGroupButton = await page.waitForXPath(
-				'//button[text()="Ungroup"]'
-			);
-			await unGroupButton.click();
+			// UnGroup.
+			await clickBlockToolbarButton( 'Options' );
+			await clickMenuItem( 'Ungroup' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
 
 		it( 'does not allow ungrouping a group block that has no children', async () => {
 			await insertBlock( 'Group' );
-			await clickBlockToolbarButton( 'More options' );
+			await clickBlockToolbarButton( 'Options' );
 			const ungroupButtons = await page.$x(
-				'//button[text()="Ungroup"]'
+				'//button/span[text()="Ungroup"]'
 			);
 			expect( ungroupButtons ).toHaveLength( 0 );
+		} );
+		it( 'should group and ungroup a controlled block properly', async () => {
+			const getParagraphText = async () => {
+				const paragraphInReusableSelector =
+					'.block-editor-block-list__block[data-type="core/block"] p';
+				await page.waitForSelector( paragraphInReusableSelector );
+				return page.$eval(
+					paragraphInReusableSelector,
+					( element ) => element.innerText
+				);
+			};
+
+			const paragraphText = 'hi';
+			await createReusableBlock( paragraphText, 'Block' );
+			// Group
+			await clickBlockToolbarButton( 'Options' );
+			await clickMenuItem( 'Group' );
+
+			let group = await page.$$( '[data-type="core/group"]' );
+			expect( group ).toHaveLength( 1 );
+			// Make sure the paragraph in reusable block exists.
+			expect( await getParagraphText() ).toMatch( paragraphText );
+
+			await clickBlockToolbarButton( 'Options' );
+			await clickMenuItem( 'Ungroup' );
+			group = await page.$$( '[data-type="core/group"]' );
+			expect( group ).toHaveLength( 0 );
+			// Make sure the paragraph in reusable block exists.
+			expect( await getParagraphText() ).toEqual( paragraphText );
+		} );
+		it( 'should group another Group block via options toolbar', async () => {
+			await insertBlock( 'Paragraph' );
+			await page.keyboard.type( '1' );
+			await clickBlockToolbarButton( 'Options' );
+			await clickMenuItem( 'Group' );
+			await clickBlockToolbarButton( 'Options' );
+			await clickMenuItem( 'Group' );
+			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+			"<!-- wp:group {\\"layout\\":{\\"type\\":\\"constrained\\"}} -->
+			<div class=\\"wp-block-group\\"><!-- wp:group {\\"layout\\":{\\"type\\":\\"constrained\\"}} -->
+			<div class=\\"wp-block-group\\"><!-- wp:paragraph -->
+			<p>1</p>
+			<!-- /wp:paragraph --></div>
+			<!-- /wp:group --></div>
+			<!-- /wp:group -->"
+		` );
 		} );
 	} );
 
 	describe( 'Grouping Block availability', () => {
 		beforeEach( async () => {
-			// Disable the Group block
+			// Disable the Group block.
 			await page.evaluate( () => {
 				const { dispatch } = wp.data;
 				dispatch( 'core/edit-post' ).hideBlockTypes( [ 'core/group' ] );
 			} );
 
-			// Create a Group
+			// Create a Group.
 			await insertBlocksOfMultipleTypes();
 			await pressKeyWithModifier( 'primary', 'a' );
 			await pressKeyWithModifier( 'primary', 'a' );
 		} );
 
 		afterAll( async () => {
-			// Re-enable the Group block
+			// Re-enable the Group block.
 			await page.evaluate( () => {
 				const { dispatch } = wp.data;
 				dispatch( 'core/edit-post' ).showBlockTypes( [ 'core/group' ] );
@@ -149,8 +187,8 @@ describe( 'Block Grouping', () => {
 			expect( availableTransforms ).not.toContain( 'Group' );
 		} );
 
-		it( 'does not show group option in the options toolbar if Grouping block is disabled ', async () => {
-			await clickBlockToolbarButton( 'More options' );
+		it( 'does not show group option in the options toolbar if Grouping block is disabled', async () => {
+			await clickBlockToolbarButton( 'Options' );
 
 			const blockOptionsDropdownHTML = await page.evaluate(
 				() =>
@@ -170,15 +208,25 @@ describe( 'Block Grouping', () => {
 
 			// Full width image.
 			await insertBlock( 'Image' );
-			await clickBlockToolbarButton( 'Change alignment' );
-			const FULL_WIDTH_BUTTON_XPATH = `//button[contains(@class,'components-dropdown-menu__menu-item') and contains(text(), 'Full width')]`;
-			await ( await page.$x( FULL_WIDTH_BUTTON_XPATH ) )[ 0 ].click();
+			await clickBlockToolbarButton( 'Align' );
+			const fullButton = await page.waitForXPath(
+				`//button[contains(@class,'components-dropdown-menu__menu-item')]//span[contains(text(), 'Full width')]`
+			);
+			await fullButton.evaluate( ( element ) =>
+				element.scrollIntoView()
+			);
+			await fullButton.click();
 
 			// Wide width image.
 			await insertBlock( 'Image' );
-			await clickBlockToolbarButton( 'Change alignment' );
-			const WIDE_BUTTON_XPATH = `//button[contains(@class,'components-dropdown-menu__menu-item') and contains(text(), 'Wide width')]`;
-			await ( await page.$x( WIDE_BUTTON_XPATH ) )[ 0 ].click();
+			await clickBlockToolbarButton( 'Align' );
+			const wideButton = await page.waitForXPath(
+				`//button[contains(@class,'components-dropdown-menu__menu-item')]//span[contains(text(), 'Wide width')]`
+			);
+			await wideButton.evaluate( ( element ) =>
+				element.scrollIntoView()
+			);
+			await wideButton.click();
 
 			await insertBlock( 'Paragraph' );
 			await page.keyboard.type( 'Some paragraph' );
@@ -208,14 +256,14 @@ describe( 'Block Grouping', () => {
 		} );
 
 		it( 'should use registered grouping block for grouping interactions', async () => {
-			// Set custom Block as the Block to use for Grouping
+			// Set custom Block as the Block to use for Grouping.
 			await page.evaluate( () => {
 				window.wp.blocks.setGroupingBlockName(
 					'test/alternative-group-block'
 				);
 			} );
 
-			// Creating test blocks
+			// Creating test blocks.
 			await insertBlocksOfSameType();
 
 			// Multiselect via keyboard.
@@ -225,11 +273,8 @@ describe( 'Block Grouping', () => {
 			// Group - this will use whichever Block is registered as the Grouping Block
 			// as opposed to "transformTo()" which uses whatever is passed to it. To
 			// ensure this test is meaningful we must rely on what is registered.
-			await clickBlockToolbarButton( 'More options' );
-			const groupButton = await page.waitForXPath(
-				'//button[text()="Group"]'
-			);
-			await groupButton.click();
+			await clickBlockToolbarButton( 'Options' );
+			await clickMenuItem( 'Group' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );

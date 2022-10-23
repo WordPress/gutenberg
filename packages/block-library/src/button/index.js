@@ -7,6 +7,7 @@ import { button as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
@@ -17,23 +18,13 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Button' ),
-	description: __(
-		'Prompt visitors to take action with a button-style link.'
-	),
 	icon,
-	keywords: [ __( 'link' ) ],
 	example: {
 		attributes: {
 			className: 'is-style-fill',
-			backgroundColor: 'vivid-green-cyan',
 			text: __( 'Call to Action' ),
 		},
 	},
-	styles: [
-		{ name: 'fill', label: __( 'Fill' ), isDefault: true },
-		{ name: 'outline', label: __( 'Outline' ) },
-	],
 	edit,
 	save,
 	deprecated,
@@ -42,3 +33,5 @@ export const settings = {
 		text: ( a.text || '' ) + text,
 	} ),
 };
+
+export const init = () => initBlock( { name, metadata, settings } );

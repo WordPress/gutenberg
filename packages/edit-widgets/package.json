@@ -1,7 +1,6 @@
 {
 	"name": "@wordpress/edit-widgets",
-	"version": "0.18.0",
-	"private": true,
+	"version": "4.17.0",
 	"description": "Widgets Page module for WordPress..",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -11,7 +10,7 @@
 		"editor",
 		"widgets"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/edit-widgets/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/edit-widgets/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -20,15 +19,15 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"engines": {
+		"node": ">=12"
+	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
-	"sideEffects": [
-		"build-style/**",
-		"!((src|build|build-module)/components/**)"
-	],
 	"dependencies": {
-		"@babel/runtime": "^7.9.2",
+		"@babel/runtime": "^7.16.0",
+		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/block-library": "file:../block-library",
 		"@wordpress/blocks": "file:../blocks",
@@ -36,7 +35,8 @@
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
-		"@wordpress/data-controls": "file:../data-controls",
+		"@wordpress/deprecated": "file:../deprecated",
+		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/i18n": "file:../i18n",
@@ -46,9 +46,16 @@
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",
-		"classnames": "^2.2.5",
-		"lodash": "^4.17.15",
-		"rememo": "^3.0.0"
+		"@wordpress/plugins": "file:../plugins",
+		"@wordpress/preferences": "file:../preferences",
+		"@wordpress/reusable-blocks": "file:../reusable-blocks",
+		"@wordpress/url": "file:../url",
+		"@wordpress/widgets": "file:../widgets",
+		"classnames": "^2.3.1"
+	},
+	"peerDependencies": {
+		"react": "^17.0.0",
+		"react-dom": "^17.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

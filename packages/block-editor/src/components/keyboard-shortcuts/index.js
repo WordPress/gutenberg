@@ -1,136 +1,18 @@
 /**
- * External dependencies
- */
-import { first, last } from 'lodash';
-/**
  * WordPress dependencies
  */
-import { useEffect, useCallback } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import { useEffect } from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
 
 function KeyboardShortcuts() {
-	// Shortcuts Logic
-	const { clientIds, rootBlocksClientIds } = useSelect( ( select ) => {
-		const { getSelectedBlockClientIds, getBlockOrder } = select(
-			'core/block-editor'
-		);
-		return {
-			clientIds: getSelectedBlockClientIds(),
-			rootBlocksClientIds: getBlockOrder(),
-		};
-	}, [] );
-
-	const {
-		duplicateBlocks,
-		removeBlocks,
-		insertAfterBlock,
-		insertBeforeBlock,
-		multiSelect,
-		clearSelectedBlock,
-	} = useDispatch( 'core/block-editor' );
-
-	// Prevents bookmark all Tabs shortcut in Chrome when devtools are closed.
-	// Prevents reposition Chrome devtools pane shortcut when devtools are open.
-	useShortcut(
-		'core/block-editor/duplicate',
-		useCallback(
-			( event ) => {
-				event.preventDefault();
-				duplicateBlocks( clientIds );
-			},
-			[ clientIds, duplicateBlocks ]
-		),
-		{ bindGlobal: true, isDisabled: clientIds.length === 0 }
-	);
-
-	// Does not clash with any known browser/native shortcuts, but preventDefault
-	// is used to prevent any obscure unknown shortcuts from triggering.
-	useShortcut(
-		'core/block-editor/remove',
-		useCallback(
-			( event ) => {
-				event.preventDefault();
-				removeBlocks( clientIds );
-			},
-			[ clientIds, removeBlocks ]
-		),
-		{ bindGlobal: true, isDisabled: clientIds.length === 0 }
-	);
-
-	// Does not clash with any known browser/native shortcuts, but preventDefault
-	// is used to prevent any obscure unknown shortcuts from triggering.
-	useShortcut(
-		'core/block-editor/insert-after',
-		useCallback(
-			( event ) => {
-				event.preventDefault();
-				insertAfterBlock( last( clientIds ) );
-			},
-			[ clientIds, insertAfterBlock ]
-		),
-		{ bindGlobal: true, isDisabled: clientIds.length === 0 }
-	);
-
-	// Prevent 'view recently closed tabs' in Opera using preventDefault.
-	useShortcut(
-		'core/block-editor/insert-before',
-		useCallback(
-			( event ) => {
-				event.preventDefault();
-				insertBeforeBlock( first( clientIds ) );
-			},
-			[ clientIds, insertBeforeBlock ]
-		),
-		{ bindGlobal: true, isDisabled: clientIds.length === 0 }
-	);
-
-	useShortcut(
-		'core/block-editor/delete-multi-selection',
-		useCallback(
-			( event ) => {
-				event.preventDefault();
-				removeBlocks( clientIds );
-			},
-			[ clientIds, removeBlocks ]
-		),
-		{ isDisabled: clientIds.length < 1 }
-	);
-
-	useShortcut(
-		'core/block-editor/select-all',
-		useCallback(
-			( event ) => {
-				event.preventDefault();
-				multiSelect(
-					first( rootBlocksClientIds ),
-					last( rootBlocksClientIds )
-				);
-			},
-			[ rootBlocksClientIds, multiSelect ]
-		)
-	);
-
-	useShortcut(
-		'core/block-editor/unselect',
-		useCallback(
-			( event ) => {
-				event.preventDefault();
-				clearSelectedBlock();
-				window.getSelection().removeAllRanges();
-			},
-			[ clientIds, clearSelectedBlock ]
-		),
-		{ isDisabled: clientIds.length < 2 }
-	);
-
 	return null;
 }
 
 function KeyboardShortcutsRegister() {
-	// Registering the shortcuts
-	const { registerShortcut } = useDispatch( 'core/keyboard-shortcuts' );
+	// Registering the shortcuts.
+	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 	useEffect( () => {
 		registerShortcut( {
 			name: 'core/block-editor/duplicate',
@@ -179,7 +61,7 @@ function KeyboardShortcutsRegister() {
 		registerShortcut( {
 			name: 'core/block-editor/delete-multi-selection',
 			category: 'block',
-			description: __( 'Remove multiple selected blocks.' ),
+			description: __( 'Delete selection.' ),
 			keyCombination: {
 				character: 'del',
 			},
@@ -218,6 +100,26 @@ function KeyboardShortcutsRegister() {
 			keyCombination: {
 				modifier: 'alt',
 				character: 'F10',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/move-up',
+			category: 'block',
+			description: __( 'Move the selected block(s) up.' ),
+			keyCombination: {
+				modifier: 'secondary',
+				character: 't',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/move-down',
+			category: 'block',
+			description: __( 'Move the selected block(s) down.' ),
+			keyCombination: {
+				modifier: 'secondary',
+				character: 'y',
 			},
 		} );
 	}, [ registerShortcut ] );

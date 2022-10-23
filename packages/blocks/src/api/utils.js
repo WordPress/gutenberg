@@ -1,8 +1,10 @@
 /**
  * External dependencies
  */
-import { every, has, isFunction, isString } from 'lodash';
-import { default as tinycolor, mostReadable } from 'tinycolor2';
+import { reduce } from 'lodash';
+import { colord, extend } from 'colord';
+import namesPlugin from 'colord/plugins/names';
+import a11yPlugin from 'colord/plugins/a11y';
 
 /**
  * WordPress dependencies
@@ -14,8 +16,11 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 /**
  * Internal dependencies
  */
+import { BLOCK_ICON_DEFAULT } from './constants';
 import { getBlockType, getDefaultBlockName } from './registration';
 import { createBlock } from './factory';
+
+extend( [ namesPlugin, a11yPlugin ] );
 
 /**
  * Array of icon colors containing a color to be used if the icon color
@@ -30,9 +35,9 @@ const ICON_COLORS = [ '#191e23', '#f8f9f9' ];
  * and its attributes are equal to the default attributes
  * which means the block is unmodified.
  *
- * @param  {WPBlock} block Block Object
+ * @param {WPBlock} block Block Object
  *
- * @return {boolean}       Whether the block is an unmodified default block
+ * @return {boolean} Whether the block is an unmodified default block
  */
 export function isUnmodifiedDefaultBlock( block ) {
 	const defaultBlockName = getDefaultBlockName();
@@ -52,17 +57,15 @@ export function isUnmodifiedDefaultBlock( block ) {
 	const newDefaultBlock = isUnmodifiedDefaultBlock.block;
 	const blockType = getBlockType( defaultBlockName );
 
-	return every(
-		blockType.attributes,
-		( value, key ) =>
-			newDefaultBlock.attributes[ key ] === block.attributes[ key ]
+	return Object.keys( blockType?.attributes ?? {} ).every(
+		( key ) => newDefaultBlock.attributes[ key ] === block.attributes[ key ]
 	);
 }
 
 /**
  * Function that checks if the parameter is a valid icon.
  *
- * @param {*} icon  Parameter to be checked.
+ * @param {*} icon Parameter to be checked.
  *
  * @return {boolean} True if the parameter is a valid icon and false otherwise.
  */
@@ -70,9 +73,9 @@ export function isUnmodifiedDefaultBlock( block ) {
 export function isValidIcon( icon ) {
 	return (
 		!! icon &&
-		( isString( icon ) ||
+		( typeof icon === 'string' ||
 			isValidElement( icon ) ||
-			isFunction( icon ) ||
+			typeof icon === 'function' ||
 			icon instanceof Component )
 	);
 }
@@ -89,23 +92,26 @@ export function isValidIcon( icon ) {
  * @return {WPBlockTypeIconDescriptor} Object describing the icon.
  */
 export function normalizeIconObject( icon ) {
+	icon = icon || BLOCK_ICON_DEFAULT;
 	if ( isValidIcon( icon ) ) {
 		return { src: icon };
 	}
 
-	if ( has( icon, [ 'background' ] ) ) {
-		const tinyBgColor = tinycolor( icon.background );
+	if ( 'background' in icon ) {
+		const colordBgColor = colord( icon.background );
+		const getColorContrast = ( iconColor ) =>
+			colordBgColor.contrast( iconColor );
+		const maxContrast = Math.max( ...ICON_COLORS.map( getColorContrast ) );
 
 		return {
 			...icon,
 			foreground: icon.foreground
 				? icon.foreground
-				: mostReadable( tinyBgColor, ICON_COLORS, {
-						includeFallbackColors: true,
-						level: 'AA',
-						size: 'large',
-				  } ).toHexString(),
-			shadowColor: tinyBgColor.setAlpha( 0.3 ).toRgbString(),
+				: ICON_COLORS.find(
+						( iconColor ) =>
+							getColorContrast( iconColor ) === maxContrast
+				  ),
+			shadowColor: colordBgColor.alpha( 0.3 ).toRgbString(),
 		};
 	}
 
@@ -117,12 +123,12 @@ export function normalizeIconObject( icon ) {
  * it converts it to the matching block type object.
  * It passes the original object otherwise.
  *
- * @param {string|Object} blockTypeOrName  Block type or name.
+ * @param {string|Object} blockTypeOrName Block type or name.
  *
  * @return {?Object} Block type.
  */
 export function normalizeBlockType( blockTypeOrName ) {
-	if ( isString( blockTypeOrName ) ) {
+	if ( typeof blockTypeOrName === 'string' ) {
 		return getBlockType( blockTypeOrName );
 	}
 
@@ -157,7 +163,7 @@ export function getBlockLabel( blockType, attributes, context = 'visual' ) {
  * than the visual label and includes the block title and the value of the
  * `getLabel` function if it's specified.
  *
- * @param {Object}  blockType              The block type.
+ * @param {?Object} blockType              The block type.
  * @param {Object}  attributes             The values of the block's attributes.
  * @param {?number} position               The position of the block in the block list.
  * @param {string}  [direction='vertical'] The direction of the block layout.
@@ -171,8 +177,10 @@ export function getAccessibleBlockLabel(
 	direction = 'vertical'
 ) {
 	// `title` is already localized, `label` is a user-supplied value.
-	const { title } = blockType;
-	const label = getBlockLabel( blockType, attributes, 'accessibility' );
+	const title = blockType?.title;
+	const label = blockType
+		? getBlockLabel( blockType, attributes, 'accessibility' )
+		: '';
 	const hasPosition = position !== undefined;
 
 	// getBlockLabel returns the block title as a fallback when there's no label,
@@ -230,5 +238,81 @@ export function getAccessibleBlockLabel(
 		/* translators: accessibility text. %s: The block title. */
 		__( '%s Block' ),
 		title
+	);
+}
+
+/**
+ * Ensure attributes contains only values defined by block type, and merge
+ * default values for missing attributes.
+ *
+ * @param {string} name       The block's name.
+ * @param {Object} attributes The block's attributes.
+ * @return {Object} The sanitized attributes.
+ */
+export function __experimentalSanitizeBlockAttributes( name, attributes ) {
+	// Get the type definition associated with a registered block.
+	const blockType = getBlockType( name );
+
+	if ( undefined === blockType ) {
+		throw new Error( `Block type '${ name }' is not registered.` );
+	}
+
+	return reduce(
+		blockType.attributes,
+		( accumulator, schema, key ) => {
+			const value = attributes[ key ];
+
+			if ( undefined !== value ) {
+				accumulator[ key ] = value;
+			} else if ( schema.hasOwnProperty( 'default' ) ) {
+				accumulator[ key ] = schema.default;
+			}
+
+			if ( [ 'node', 'children' ].indexOf( schema.source ) !== -1 ) {
+				// Ensure value passed is always an array, which we're expecting in
+				// the RichText component to handle the deprecated value.
+				if ( typeof accumulator[ key ] === 'string' ) {
+					accumulator[ key ] = [ accumulator[ key ] ];
+				} else if ( ! Array.isArray( accumulator[ key ] ) ) {
+					accumulator[ key ] = [];
+				}
+			}
+
+			return accumulator;
+		},
+		{}
+	);
+}
+
+/**
+ * Filter block attributes by `role` and return their names.
+ *
+ * @param {string} name Block attribute's name.
+ * @param {string} role The role of a block attribute.
+ *
+ * @return {string[]} The attribute names that have the provided role.
+ */
+export function __experimentalGetBlockAttributesNamesByRole( name, role ) {
+	const attributes = getBlockType( name )?.attributes;
+	if ( ! attributes ) return [];
+	const attributesNames = Object.keys( attributes );
+	if ( ! role ) return attributesNames;
+	return attributesNames.filter(
+		( attributeName ) =>
+			attributes[ attributeName ]?.__experimentalRole === role
+	);
+}
+
+/**
+ * Return a new object with the specified keys omitted.
+ *
+ * @param {Object} object Original object.
+ * @param {Array}  keys   Keys to be omitted.
+ *
+ * @return {Object} Object with omitted keys.
+ */
+export function omit( object, keys ) {
+	return Object.fromEntries(
+		Object.entries( object ).filter( ( [ key ] ) => ! keys.includes( key ) )
 	);
 }

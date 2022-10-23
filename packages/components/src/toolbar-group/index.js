@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { flatMap } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -56,7 +55,7 @@ function ToolbarGroup( {
 	...props
 } ) {
 	// It'll contain state if `ToolbarGroup` is being used within
-	// `<Toolbar accessibilityLabel="label" />`
+	// `<Toolbar label="label" />`
 	const accessibleToolbarState = useContext( ToolbarContext );
 
 	if ( ( ! controls || ! controls.length ) && ! children ) {
@@ -92,7 +91,7 @@ function ToolbarGroup( {
 
 	return (
 		<ToolbarGroupContainer className={ finalClassName } { ...props }>
-			{ flatMap( controlSets, ( controlSet, indexOfSet ) =>
+			{ controlSets?.flatMap( ( controlSet, indexOfSet ) =>
 				controlSet.map( ( control, indexOfControl ) => (
 					<ToolbarButton
 						key={ [ indexOfSet, indexOfControl ].join() }

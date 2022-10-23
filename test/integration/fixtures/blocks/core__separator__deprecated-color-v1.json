@@ -1,0 +1,11 @@
+[
+	{
+		"name": "core/separator",
+		"isValid": true,
+		"attributes": {
+			"backgroundColor": "accent",
+			"opacity": "css"
+		},
+		"innerBlocks": []
+	}
+]

@@ -20,24 +20,24 @@ While modals can be an effective way to disclose additional controls or informat
 
 #### Principles
 
-- **Focused**. Modals pull user attention away from the rest of the screen to focus their attention, ensuring that the modal’s content is addressed.
-- **Direct**. Modal text should communicate important information and be dedicated to helping the user appropriately complete a task.
-- **Helpful**. Modals should appear in response to a user task or an action to offer relevant and contextual information.
+-   **Focused**. Modals pull user attention away from the rest of the screen to focus their attention, ensuring that the modal’s content is addressed.
+-   **Direct**. Modal text should communicate important information and be dedicated to helping the user appropriately complete a task.
+-   **Helpful**. Modals should appear in response to a user task or an action to offer relevant and contextual information.
 
 #### When to use
 
 Modals are used for:
 
-- Errors that block normal operation.
-- Critical information that requires a specific user task, decision, or acknowledgement.
-- Contextual information that appears in response to a user task or action.
+-   Errors that block normal operation.
+-   Critical information that requires a specific user task, decision, or acknowledgement.
+-   Contextual information that appears in response to a user task or action.
 
 ### Anatomy
 
 ![A modal diagram with labels](https://wordpress.org/gutenberg/files/2019/04/Modal-diagram.png)
 
 1. Container
-2. Title (optional)
+2. Title
 3. Supporting text
 4. Buttons
 5. Scrim
@@ -52,11 +52,12 @@ To clarify that the rest of the screen is inaccessible and to focus attention on
 ### Title
 
 A modal’s purpose is communicated through its title and button text.
+All modals should have a title for accessibility reasons (the `contentLabel` prop can be used to set titles that aren't visible).
 
 Titles should:
 
-- Contain a brief, clear statement or question
-- Avoid apologies (“Sorry for the interruption”), alarm (“Warning!”), or ambiguity (“Are you sure?”).
+-   Contain a brief, clear statement or question
+-   Avoid apologies (“Sorry for the interruption”), alarm (“Warning!”), or ambiguity (“Are you sure?”).
 
 ![A modal that asks "Trash post?"](https://wordpress.org/gutenberg/files/2019/04/Modal-do-1.png)
 
@@ -102,9 +103,9 @@ When viewing a scrollable list of options, the modal title and buttons remain fi
 
 Modals are dismissible in three ways:
 
-- Tapping outside of the modal
-- Tapping the “Cancel” button
-- Tapping the “Close” icon button, or pressing the `esc` key
+-   Tapping outside of the modal
+-   Tapping the “Cancel” button
+-   Tapping the “Close” icon button, or pressing the `esc` key
 
 If the user’s ability to dismiss a modal is disabled, they must choose a modal action to proceed.
 
@@ -129,19 +130,19 @@ const MyModal = () => {
 
 	return (
 		<>
-			<Button isSecondary onClick={ openModal }>Open Modal</Button>
+			<Button variant="secondary" onClick={ openModal }>
+				Open Modal
+			</Button>
 			{ isOpen && (
-				<Modal
-					title="This is my modal"
-					onRequestClose={ closeModal }>
-					<Button isSecondary onClick={ closeModal }>
+				<Modal title="This is my modal" onRequestClose={ closeModal }>
+					<Button variant="secondary" onClick={ closeModal }>
 						My custom close button
 					</Button>
 				</Modal>
 			) }
 		</>
-	)
-}
+	);
+};
 ```
 
 ### Props
@@ -149,99 +150,120 @@ const MyModal = () => {
 The set of props accepted by the component will be specified below.
 Props not included in this set will be applied to the input elements.
 
-#### title
-
-This property is used as the modal header's title. It is required for accessibility reasons.
-
-- Type: `String`
-- Required: Yes
-
-#### onRequestClose
-
-This function is called to indicate that the modal should be closed.
-
-- Type: `function`
-- Required: Yes
-
-#### contentLabel
-
-If this property is added, it will be added to the modal content `div` as `aria-label`.
-You are encouraged to use this if `aria.labelledby` is not provided.
-
-- Type: `String`
-- Required: No
-
-#### aria.labelledby
-
-If this property is added, it will be added to the modal content `div` as `aria-labelledby`.
-You are encouraged to use this when the modal is visually labelled.
-
-- Type: `String`
-- Required: No
-- Default: `modal-heading`
-
-#### aria.describedby
+#### `aria.describedby`: `string`
 
 If this property is added, it will be added to the modal content `div` as `aria-describedby`.
 
-- Type: `String`
-- Required: No
+-   Required: No
 
-#### focusOnMount
+#### `aria.labelledby`: `string`
 
-If this property is true, it will focus the first tabbable element rendered in the modal.
+If this property is added, it will be added to the modal content `div` as `aria-labelledby`.
+Use this when you are rendering the title yourself within the modal's content area instead of using the `title` prop. This ensures the title is usable by assistive technology.
 
-- Type: `boolean`
-- Required: No
-- Default: true
+Titles are required for accessibility reasons, see `contentLabel` and `title` for other ways to provide a title.
 
-#### shouldCloseOnEsc
+-   Required: No
+-   Default: if the `title` prop is provided, this will default to the id of the element that renders `title`
 
-If this property is added, it will determine whether the modal requests to close when the escape key is pressed.
+#### `bodyOpenClassName`: `string`
 
-- Type: `boolean`
-- Required: No
-- Default: true
+Class name added to the body element when the modal is open.
 
-#### shouldCloseOnClickOutside
+-   Required: No
+-   Default: `modal-open`
 
-If this property is added, it will determine whether the modal requests to close when a mouse click occurs outside of the modal content.
-
-- Type: `boolean`
-- Required: No
-- Default: true
-
-#### isDismissible
-
-If this property is set to false, the modal will not display a close icon and cannot be dismissed.
-
-- Type: `boolean`
-- Required: No
-- Default: true
-
-#### className
+#### `className`: `string`
 
 If this property is added, it will an additional class name to the modal content `div`.
 
-- Type: `String`
-- Required: No
+-   Required: No
 
-#### role
+#### `contentLabel`: `string`
 
-If this property is added, it will override the default role of the modal.
+If this property is added, it will be added to the modal content `div` as `aria-label`.
 
-- Type: `String`
-- Required: No
-- Default: `dialog`
+Titles are required for accessibility reasons, see `aria.labelledby` and `title` for other ways to provide a title.
 
-#### overlayClassName
+-   Required: No
+
+#### `focusOnMount`: `boolean | 'firstElement'`
+
+If this property is true, it will focus the first tabbable element rendered in the modal.
+
+-   Required: No
+-   Default: `true`
+
+#### `isDismissible`: `boolean`
+
+If this property is set to false, the modal will not display a close icon and cannot be dismissed.
+
+-   Required: No
+-   Default: `true`
+
+#### `isFullScreen`: `boolean`
+
+This property when set to `true` will render a full screen modal.
+
+-   Required: No
+-   Default: `false`
+
+#### `onRequestClose`: ``
+
+This function is called to indicate that the modal should be closed.
+
+-   Required: Yes
+
+#### `overlayClassName`: `string`
 
 If this property is added, it will an additional class name to the modal overlay `div`.
 
-- Type: `String`
-- Required: No
+-   Required: No
 
+#### `role`: `AriaRole`
+
+If this property is added, it will override the default role of the modal.
+
+-   Required: No
+-   Default: `dialog`
+
+#### `shouldCloseOnClickOutside`: `boolean`
+
+If this property is added, it will determine whether the modal requests to close when a mouse click occurs outside of the modal content.
+
+-   Required: No
+-   Default: `true`
+
+#### `shouldCloseOnEsc`: `boolean`
+
+If this property is added, it will determine whether the modal requests to close when the escape key is pressed.
+
+-   Required: No
+-   Default: `true`
+
+#### `style`: `CSSProperties`
+
+If this property is added, it will be added to the modal frame `div`.
+
+-   Required: No
+
+#### `title`: `string`
+
+This property is used as the modal header's title.
+
+Titles are required for accessibility reasons, see `aria.labelledby` and `contentLabel` for other ways to provide a title.
+
+-   Required: No
+
+#### `__experimentalHideHeader`: `boolean`
+
+When set to `true`, the Modal's header (including the icon, title and close button) will not be rendered.
+
+_Warning_: This property is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+
+-   Required: No
+-   Default: `false`
 
 ## Related components
 
-- To notify a user with a message of medium importance, use `Notice`.
+-   To notify a user with a message of medium importance, use `Notice`.

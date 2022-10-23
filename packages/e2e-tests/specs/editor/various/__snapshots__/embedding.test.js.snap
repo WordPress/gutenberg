@@ -5,3 +5,63 @@ exports[`Embedding content should allow the user to convert unembeddable URLs to
 <p><a href=\\"https://twitter.com/wooyaygutenberg123454312\\">https://twitter.com/wooyaygutenberg123454312</a></p>
 <!-- /wp:paragraph -->"
 `;
+
+exports[`Embedding content should allow the user to try embedding a failed URL again 1`] = `
+"<!-- wp:embed {\\"url\\":\\"https://twitter.com/wooyaygutenberg123454312\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true} -->
+<figure class=\\"wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter\\"><div class=\\"wp-block-embed__wrapper\\">
+https://twitter.com/wooyaygutenberg123454312
+</div></figure>
+<!-- /wp:embed -->"
+`;
+
+exports[`Embedding content should render embeds in the correct state 1`] = `
+"<!-- wp:embed {\\"url\\":\\"https://twitter.com/notnownikki\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\",\\"responsive\\":true} -->
+<figure class=\\"wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter\\"><div class=\\"wp-block-embed__wrapper\\">
+https://twitter.com/notnownikki
+</div></figure>
+<!-- /wp:embed -->
+
+<!-- wp:embed {\\"url\\":\\"https://twitter.com/wooyaygutenberg123454312\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"embed-handler\\",\\"responsive\\":true} -->
+<figure class=\\"wp-block-embed is-type-rich is-provider-embed-handler wp-block-embed-embed-handler\\"><div class=\\"wp-block-embed__wrapper\\">
+https://twitter.com/wooyaygutenberg123454312
+</div></figure>
+<!-- /wp:embed -->
+
+<!-- wp:embed {\\"url\\":\\"https://wordpress.org/gutenberg/handbook/\\"} -->
+<figure class=\\"wp-block-embed\\"><div class=\\"wp-block-embed__wrapper\\">
+https://wordpress.org/gutenberg/handbook/
+</div></figure>
+<!-- /wp:embed -->
+
+<!-- wp:embed {\\"url\\":\\"https://twitter.com/thatbunty\\"} -->
+<figure class=\\"wp-block-embed\\"><div class=\\"wp-block-embed__wrapper\\">
+https://twitter.com/thatbunty
+</div></figure>
+<!-- /wp:embed -->
+
+<!-- wp:embed {\\"url\\":\\"https://wordpress.org/gutenberg/handbook/block-api/attributes/\\",\\"type\\":\\"wp-embed\\",\\"providerNameSlug\\":\\"wordpress\\"} -->
+<figure class=\\"wp-block-embed is-type-wp-embed is-provider-wordpress wp-block-embed-wordpress\\"><div class=\\"wp-block-embed__wrapper\\">
+https://wordpress.org/gutenberg/handbook/block-api/attributes/
+</div></figure>
+<!-- /wp:embed -->
+
+<!-- wp:embed {\\"url\\":\\"https://www.youtube.com/watch?v=lXMskKTw3Bc\\",\\"type\\":\\"video\\",\\"providerNameSlug\\":\\"youtube\\",\\"responsive\\":true,\\"className\\":\\"wp-embed-aspect-16-9 wp-has-aspect-ratio\\"} -->
+<figure class=\\"wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio\\"><div class=\\"wp-block-embed__wrapper\\">
+https://www.youtube.com/watch?v=lXMskKTw3Bc
+</div></figure>
+<!-- /wp:embed -->
+
+<!-- wp:embed {\\"url\\":\\"https://cloudup.com/cQFlxqtY4ob\\",\\"type\\":\\"photo\\",\\"providerNameSlug\\":\\"cloudup\\",\\"responsive\\":true} -->
+<figure class=\\"wp-block-embed is-type-photo is-provider-cloudup wp-block-embed-cloudup\\"><div class=\\"wp-block-embed__wrapper\\">
+https://cloudup.com/cQFlxqtY4ob
+</div></figure>
+<!-- /wp:embed -->"
+`;
+
+exports[`Embedding content should retry embeds that could not be embedded with trailing slashes, without the trailing slashes 1`] = `
+"<!-- wp:embed {\\"url\\":\\"https://twitter.com/notnownikki/\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"embed-handler\\",\\"responsive\\":true} -->
+<figure class=\\"wp-block-embed is-type-rich is-provider-embed-handler wp-block-embed-embed-handler\\"><div class=\\"wp-block-embed__wrapper\\">
+https://twitter.com/notnownikki/
+</div></figure>
+<!-- /wp:embed -->"
+`;

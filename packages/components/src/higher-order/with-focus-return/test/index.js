@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import renderer from 'react-test-renderer';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
@@ -12,13 +12,18 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import withFocusReturn, { Provider } from '../';
+import withFocusReturn from '../';
 
 class Test extends Component {
 	render() {
+		const { className, focusHistory } = this.props;
 		return (
-			<div className="test">
-				<textarea />
+			<div
+				className={ className }
+				data-testid="test-element"
+				data-focus-history={ focusHistory }
+			>
+				<textarea aria-label="Textarea" />
 			</div>
 		);
 	}
@@ -41,32 +46,25 @@ describe( 'withFocusReturn()', () => {
 		} );
 
 		it( 'should render a basic Test component inside the HOC', () => {
-			const renderedComposite = renderer.create( <Composite /> );
-			const wrappedElement = renderedComposite.root.findByType( Test );
-			const wrappedElementShallow = wrappedElement.children[ 0 ];
-			expect( wrappedElementShallow.props.className ).toBe( 'test' );
-			expect( wrappedElementShallow.type ).toBe( 'div' );
-			expect( wrappedElementShallow.children[ 0 ].type ).toBe(
-				'textarea'
-			);
+			render( <Composite /> );
+
+			expect( screen.getByTestId( 'test-element' ) ).toBeVisible();
 		} );
 
 		it( 'should pass own props through to the wrapped element', () => {
-			const renderedComposite = renderer.create(
-				<Composite test="test" />
+			render( <Composite className="test" /> );
+
+			expect( screen.getByTestId( 'test-element' ) ).toHaveClass(
+				'test'
 			);
-			const wrappedElement = renderedComposite.root.findByType( Test );
-			// Ensure that the wrapped Test element has the appropriate props.
-			expect( wrappedElement.props.test ).toBe( 'test' );
 		} );
 
 		it( 'should not pass any withFocusReturn context props through to the wrapped element', () => {
-			const renderedComposite = renderer.create(
-				<Composite test="test" />
+			render( <Composite className="test" /> );
+
+			expect( screen.getByTestId( 'test-element' ) ).not.toHaveAttribute(
+				'data-focus-history'
 			);
-			const wrappedElement = renderedComposite.root.findByType( Test );
-			// Ensure that the wrapped Test element has the appropriate props.
-			expect( wrappedElement.props.focusHistory ).toBeUndefined();
 		} );
 
 		it( 'should not switch focus back to the bound focus element', () => {
@@ -78,70 +76,37 @@ describe( 'withFocusReturn()', () => {
 
 			// Change activeElement.
 			switchFocusTo.focus();
-			expect( document.activeElement ).toBe( switchFocusTo );
+			expect( switchFocusTo ).toHaveFocus();
 
 			// Should keep focus on switchFocusTo, because it is not within HOC.
 			unmount();
-			expect( document.activeElement ).toBe( switchFocusTo );
+			expect( switchFocusTo ).toHaveFocus();
 		} );
 
-		it( 'should switch focus back when unmounted while having focus', () => {
+		it( 'should switch focus back when unmounted while having focus', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
 			const { container, unmount } = render( <Composite />, {
 				container: document.body.appendChild(
 					document.createElement( 'div' )
 				),
 			} );
 
-			const textarea = container.querySelector( 'textarea' );
-			textarea.focus();
-			expect( document.activeElement ).toBe( textarea );
+			// Click inside the textarea to focus it.
+			await user.click(
+				screen.getByRole( 'textbox', {
+					name: 'Textarea',
+				} )
+			);
 
 			// Should return to the activeElement saved with this component.
 			unmount();
-			expect( document.activeElement ).toBe( activeElement );
-		} );
-
-		it( 'should switch focus to the most recent still-available focus target', () => {
-			const TestComponent = ( props ) => (
-				<Provider>
-					<input name="first" />
-					{ props.renderSecondInput && <input name="second" /> }
-					{ props.renderComposite && <Composite /> }
-				</Provider>
-			);
-
-			const { container, rerender } = render(
-				<TestComponent renderSecondInput />,
-				{
-					container: document.body.appendChild(
-						document.createElement( 'div' )
-					),
-				}
-			);
-
-			const firstInput = container.querySelector( 'input[name="first"]' );
-			firstInput.focus();
-
-			const secondInput = container.querySelector(
-				'input[name="second"]'
-			);
-			secondInput.focus();
-
-			expect( document.activeElement ).toBe( secondInput );
-
-			rerender( <TestComponent renderSecondInput renderComposite /> );
-			const textarea = container.querySelector( 'textarea' );
-			textarea.focus();
-
-			expect( document.activeElement ).toBe( textarea );
-
-			rerender( <TestComponent renderComposite /> );
-
-			expect( document.activeElement ).toBe( textarea );
-
-			rerender( <TestComponent /> );
-
-			expect( document.activeElement ).toBe( firstInput );
+			render( <div></div>, {
+				container,
+			} );
+			expect( activeElement ).toHaveFocus();
 		} );
 	} );
 } );

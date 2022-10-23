@@ -1,26 +1,41 @@
 /**
  * External dependencies
  */
-import { shallow, mount } from 'enzyme';
+import { render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
  */
-import { DOWN } from '@wordpress/keycodes';
 import { arrowLeft, arrowRight, arrowUp, arrowDown } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import DropdownMenu from '../';
-import { Button, MenuItem, NavigableMenu } from '../../';
+import { MenuItem } from '../../';
 
 describe( 'DropdownMenu', () => {
-	const children = ( { onClose } ) => <MenuItem onClick={ onClose } />;
+	it( 'should not render when neither controls nor children are assigned', () => {
+		render( <DropdownMenu /> );
 
-	let controls;
-	beforeEach( () => {
-		controls = [
+		// The button toggle should not even be rendered
+		expect( screen.queryByRole( 'button' ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'should not render when controls are empty and children is not specified', () => {
+		render( <DropdownMenu controls={ [] } /> );
+
+		// The button toggle should not even be rendered
+		expect( screen.queryByRole( 'button' ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'should open menu when pressing arrow down on the toggle and the controls prop is used to define menu items', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
+
+		const controls = [
 			{
 				title: 'Up',
 				icon: arrowUp,
@@ -42,59 +57,50 @@ describe( 'DropdownMenu', () => {
 				onClick: jest.fn(),
 			},
 		];
+
+		render( <DropdownMenu controls={ controls } /> );
+
+		// Move focus on the toggle button
+		await user.tab();
+
+		await user.keyboard( '[ArrowDown]' );
+
+		let menu;
+		await waitFor( () => {
+			menu = screen.getByRole( 'menu' );
+			return expect( menu ).toBeVisible();
+		} );
+
+		expect( within( menu ).getAllByRole( 'menuitem' ) ).toHaveLength(
+			controls.length
+		);
 	} );
 
-	describe( 'basic rendering', () => {
-		it( 'should render a null element when neither controls nor children are assigned', () => {
-			const wrapper = shallow( <DropdownMenu /> );
-
-			expect( wrapper.type() ).toBeNull();
+	it( 'should open menu when pressing arrow down on the toggle and the children prop is used to define menu items', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
 		} );
 
-		it( 'should render a null element when controls are empty and children is not specified', () => {
-			const wrapper = shallow( <DropdownMenu controls={ [] } /> );
+		render(
+			<DropdownMenu
+				children={ ( { onClose } ) => <MenuItem onClick={ onClose } /> }
+			/>
+		);
 
-			expect( wrapper.type() ).toBeNull();
+		const button = screen.getByRole( 'button' );
+		button.focus();
+
+		await user.keyboard( '[ArrowDown]' );
+
+		let menu;
+		await waitFor( () => {
+			menu = screen.getByRole( 'menu' );
+			return expect( menu ).toBeVisible();
 		} );
 
-		it( 'should open menu on arrow down (controls)', () => {
-			const wrapper = mount( <DropdownMenu controls={ controls } /> );
-			const button = wrapper
-				.find( Button )
-				.filter( '.components-dropdown-menu__toggle' );
+		// Clicking the menu item will close the dropdown menu
+		await user.click( within( menu ).getByRole( 'menuitem' ) );
 
-			button.simulate( 'keydown', {
-				stopPropagation: () => {},
-				preventDefault: () => {},
-				keyCode: DOWN,
-			} );
-
-			expect( wrapper.find( NavigableMenu ) ).toHaveLength( 1 );
-			expect(
-				wrapper
-					.find( Button )
-					.filter( '.components-dropdown-menu__menu-item' )
-			).toHaveLength( controls.length );
-		} );
-
-		it( 'should open menu on arrow down (children)', () => {
-			const wrapper = mount( <DropdownMenu children={ children } /> );
-			const button = wrapper
-				.find( Button )
-				.filter( '.components-dropdown-menu__toggle' );
-
-			button.simulate( 'keydown', {
-				stopPropagation: () => {},
-				preventDefault: () => {},
-				keyCode: DOWN,
-			} );
-
-			expect( wrapper.find( NavigableMenu ) ).toHaveLength( 1 );
-
-			wrapper.find( MenuItem ).props().onClick();
-			wrapper.update();
-
-			expect( wrapper.find( NavigableMenu ) ).toHaveLength( 0 );
-		} );
+		expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
 	} );
 } );

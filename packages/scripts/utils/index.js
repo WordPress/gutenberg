@@ -11,15 +11,19 @@ const {
 	spawnScript,
 } = require( './cli' );
 const {
-	getWebpackArgs,
-	hasBabelConfig,
 	getJestOverrideConfigFile,
+	getWebpackArgs,
+	getWordPressSrcDirectory,
+	getWebpackEntryPoints,
+	getRenderPropPaths,
+	hasBabelConfig,
+	hasCssnanoConfig,
 	hasJestConfig,
-	hasPrettierConfig,
 	hasPostCSSConfig,
+	hasPrettierConfig,
 } = require( './config' );
 const { fromProjectRoot, fromConfigRoot, hasProjectFile } = require( './file' );
-const { hasPackageProp } = require( './package' );
+const { getPackageProp, hasPackageProp } = require( './package' );
 
 module.exports = {
 	fromProjectRoot,
@@ -27,16 +31,21 @@ module.exports = {
 	getArgFromCLI,
 	getArgsFromCLI,
 	getFileArgsFromCLI,
-	getNodeArgsFromCLI,
-	getWebpackArgs,
-	hasBabelConfig,
-	hasArgInCLI,
-	hasFileArgInCLI,
 	getJestOverrideConfigFile,
+	getNodeArgsFromCLI,
+	getPackageProp,
+	getWebpackArgs,
+	getWordPressSrcDirectory,
+	getWebpackEntryPoints,
+	getRenderPropPaths,
+	hasArgInCLI,
+	hasBabelConfig,
+	hasCssnanoConfig,
+	hasFileArgInCLI,
 	hasJestConfig,
 	hasPackageProp,
-	hasPrettierConfig,
 	hasPostCSSConfig,
+	hasPrettierConfig,
 	hasProjectFile,
 	spawnScript,
 };

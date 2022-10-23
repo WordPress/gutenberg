@@ -1,31 +1,28 @@
 /**
  * External dependencies
  */
-import { get, times } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { PanelBody, RangeControl } from '@wordpress/components';
 import {
 	BlockControls,
 	BlockAlignmentToolbar,
 	InspectorControls,
 	RichText,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import deprecated from '@wordpress/deprecated';
 
-export default function TextColumnsEdit( {
-	attributes,
-	setAttributes,
-	className,
-} ) {
+export default function TextColumnsEdit( { attributes, setAttributes } ) {
 	const { width, content, columns } = attributes;
 
 	deprecated( 'The Text Columns block', {
+		since: '5.3',
 		alternative: 'the Columns block',
-		plugin: 'Gutenberg',
 	} );
 
 	return (
@@ -54,9 +51,11 @@ export default function TextColumnsEdit( {
 				</PanelBody>
 			</InspectorControls>
 			<div
-				className={ `${ className } align${ width } columns-${ columns }` }
+				{ ...useBlockProps( {
+					className: `align${ width } columns-${ columns }`,
+				} ) }
 			>
-				{ times( columns, ( index ) => {
+				{ Array.from( { length: columns } ).map( ( _, index ) => {
 					return (
 						<div
 							className="wp-block-column"
@@ -74,6 +73,11 @@ export default function TextColumnsEdit( {
 										],
 									} );
 								} }
+								aria-label={ sprintf(
+									// translators: %d: column index (starting with 1)
+									__( 'Column %d text' ),
+									index + 1
+								) }
 								placeholder={ __( 'New Column' ) }
 							/>
 						</div>

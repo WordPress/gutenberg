@@ -6,19 +6,22 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Animate, Button, Panel, Slot, Fill } from '@wordpress/components';
+import { Button, Panel, Slot, Fill } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { starEmpty, starFilled } from '@wordpress/icons';
+import { check, starEmpty, starFilled } from '@wordpress/icons';
 import { useEffect, useRef } from '@wordpress/element';
+import { store as viewportStore } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
  */
 import ComplementaryAreaHeader from '../complementary-area-header';
+import ComplementaryAreaMoreMenuItem from '../complementary-area-more-menu-item';
 import ComplementaryAreaToggle from '../complementary-area-toggle';
 import withComplementaryAreaContext from '../complementary-area-context';
 import PinnedItems from '../pinned-items';
+import { store as interfaceStore } from '../../store';
 
 function ComplementaryAreaSlot( { scope, ...props } ) {
 	return <Slot name={ `ComplementaryArea/${ scope }` } { ...props } />;
@@ -27,9 +30,7 @@ function ComplementaryAreaSlot( { scope, ...props } ) {
 function ComplementaryAreaFill( { scope, children, className } ) {
 	return (
 		<Fill name={ `ComplementaryArea/${ scope }` }>
-			<Animate type="slide-in" options={ { origin: 'left' } }>
-				{ () => <div className={ className }>{ children }</div> }
-			</Animate>
+			<div className={ className }>{ children }</div>
 		</Fill>
 	);
 }
@@ -43,9 +44,8 @@ function useAdjustComplementaryListener(
 ) {
 	const previousIsSmall = useRef( false );
 	const shouldOpenWhenNotSmall = useRef( false );
-	const { enableComplementaryArea, disableComplementaryArea } = useDispatch(
-		'core/interface'
-	);
+	const { enableComplementaryArea, disableComplementaryArea } =
+		useDispatch( interfaceStore );
 	useEffect( () => {
 		// If the complementary area is active and the editor is switching from a big to a small window size.
 		if ( isActive && isSmall && ! previousIsSmall.current ) {
@@ -90,24 +90,24 @@ function ComplementaryArea( {
 	isPinnable = true,
 	panelClassName,
 	scope,
+	name,
 	smallScreenTitle,
 	title,
 	toggleShortcut,
 	isActiveByDefault,
+	showIconLabels = false,
 } ) {
-	const { isActive, isPinned, activeArea, isSmall } = useSelect(
+	const { isActive, isPinned, activeArea, isSmall, isLarge } = useSelect(
 		( select ) => {
-			const { getActiveComplementaryArea, isItemPinned } = select(
-				'core/interface'
-			);
+			const { getActiveComplementaryArea, isItemPinned } =
+				select( interfaceStore );
 			const _activeArea = getActiveComplementaryArea( scope );
 			return {
 				isActive: _activeArea === identifier,
 				isPinned: isItemPinned( scope, identifier ),
 				activeArea: _activeArea,
-				isSmall: select( 'core/viewport' ).isViewportMatch(
-					'< medium'
-				),
+				isSmall: select( viewportStore ).isViewportMatch( '< medium' ),
+				isLarge: select( viewportStore ).isViewportMatch( 'large' ),
 			};
 		},
 		[ identifier, scope ]
@@ -124,7 +124,7 @@ function ComplementaryArea( {
 		disableComplementaryArea,
 		pinItem,
 		unpinItem,
-	} = useDispatch( 'core/interface' );
+	} = useDispatch( interfaceStore );
 
 	useEffect( () => {
 		if ( isActiveByDefault && activeArea === undefined && ! isSmall ) {
@@ -134,17 +134,32 @@ function ComplementaryArea( {
 
 	return (
 		<>
-			{ isPinned && isPinnable && (
+			{ isPinnable && (
 				<PinnedItems scope={ scope }>
-					<ComplementaryAreaToggle
-						scope={ scope }
-						identifier={ identifier }
-						isPressed={ isActive }
-						aria-expanded={ isActive }
-						label={ title }
-						icon={ icon }
-					/>
+					{ isPinned && (
+						<ComplementaryAreaToggle
+							scope={ scope }
+							identifier={ identifier }
+							isPressed={
+								isActive && ( ! showIconLabels || isLarge )
+							}
+							aria-expanded={ isActive }
+							label={ title }
+							icon={ showIconLabels ? check : icon }
+							showTooltip={ ! showIconLabels }
+							variant={ showIconLabels ? 'tertiary' : undefined }
+						/>
+					) }
 				</PinnedItems>
+			) }
+			{ name && isPinnable && (
+				<ComplementaryAreaMoreMenuItem
+					target={ name }
+					scope={ scope }
+					icon={ icon }
+				>
+					{ title }
+				</ComplementaryAreaMoreMenuItem>
 			) }
 			{ isActive && (
 				<ComplementaryAreaFill
@@ -200,9 +215,8 @@ function ComplementaryArea( {
 	);
 }
 
-const ComplementaryAreaWrapped = withComplementaryAreaContext(
-	ComplementaryArea
-);
+const ComplementaryAreaWrapped =
+	withComplementaryAreaContext( ComplementaryArea );
 
 ComplementaryAreaWrapped.Slot = ComplementaryAreaSlot;
 

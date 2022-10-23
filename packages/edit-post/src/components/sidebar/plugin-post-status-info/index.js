@@ -1,5 +1,5 @@
 /**
- * Defines as extensibility slot for the Status & visibility panel.
+ * Defines as extensibility slot for the Summary panel.
  */
 
 /**
@@ -10,7 +10,7 @@ import { createSlotFill, PanelRow } from '@wordpress/components';
 export const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
 
 /**
- * Renders a row in the Status & visibility panel of the Document sidebar.
+ * Renders a row in the Summary panel of the Document sidebar.
  * It should be noted that this is named and implemented around the function it serves
  * and not its location, which may change in future iterations.
  *
@@ -19,7 +19,6 @@ export const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
  * @param {WPElement} props.children    Children to be rendered.
  *
  * @example
- * <caption>ES5</caption>
  * ```js
  * // Using ES5 syntax
  * var __ = wp.i18n.__;
@@ -37,11 +36,10 @@ export const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
  * ```
  *
  * @example
- * <caption>ESNext</caption>
  * ```jsx
  * // Using ESNext syntax
- * const { __ } = wp.i18n;
- * const { PluginPostStatusInfo } = wp.editPost;
+ * import { __ } from '@wordpress/i18n';
+ * import { PluginPostStatusInfo } from '@wordpress/edit-post';
  *
  * const MyPluginPostStatusInfo = () => (
  * 	<PluginPostStatusInfo

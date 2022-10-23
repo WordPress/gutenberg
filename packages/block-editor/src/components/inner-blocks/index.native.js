@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { getBlockType, withBlockContentContext } from '@wordpress/blocks';
+import {
+	getBlockType,
+	__unstableGetInnerBlocksProps as getInnerBlocksProps,
+} from '@wordpress/blocks';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -17,9 +21,50 @@ import getBlockContext from './get-block-context';
  * Internal dependencies
  */
 import BlockList from '../block-list';
+import BlockListCompact from '../block-list/block-list-compact';
 import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { BlockContextProvider } from '../block-context';
+import { defaultLayout, LayoutProvider } from '../block-list/layout';
+import { store as blockEditorStore } from '../../store';
+
+/**
+ * This hook is used to lightly mark an element as an inner blocks wrapper
+ * element. Call this hook and pass the returned props to the element to mark as
+ * an inner blocks wrapper, automatically rendering inner blocks as children. If
+ * you define a ref for the element, it is important to pass the ref to this
+ * hook, which the hook in turn will pass to the component through the props it
+ * returns. Optionally, you can also pass any other props through this hook, and
+ * they will be merged and returned.
+ *
+ * @param {Object} props   Optional. Props to pass to the element. Must contain
+ *                         the ref if one is defined.
+ * @param {Object} options Optional. Inner blocks options.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md
+ */
+export function useInnerBlocksProps( props = {}, options = {} ) {
+	const fallbackRef = useRef();
+	const { clientId } = useBlockEditContext();
+
+	const ref = props.ref || fallbackRef;
+	const InnerBlocks =
+		options.value && options.onChange
+			? ControlledInnerBlocks
+			: UncontrolledInnerBlocks;
+
+	return {
+		...props,
+		ref,
+		children: (
+			<InnerBlocks
+				{ ...options }
+				clientId={ clientId }
+				wrapperRef={ ref }
+			/>
+		),
+	};
+}
 
 /**
  * InnerBlocks is a component which allows a single block to have multiple blocks
@@ -36,7 +81,7 @@ function UncontrolledInnerBlocks( props ) {
 		template,
 		templateLock,
 		templateInsertUpdatesSelection,
-		__experimentalMoverDirection,
+		orientation,
 		renderAppender,
 		renderFooterAppender,
 		parentWidth,
@@ -48,10 +93,16 @@ function UncontrolledInnerBlocks( props ) {
 		marginVertical,
 		marginHorizontal,
 		horizontalAlignment,
+		filterInnerBlocks,
+		blockWidth,
+		__experimentalLayout: layout = defaultLayout,
+		gridProperties,
+		useCompactList,
 	} = props;
 
-	const block = useSelect( ( select ) =>
-		select( 'core/block-editor' ).getBlock( clientId )
+	const block = useSelect(
+		( select ) => select( blockEditorStore ).getBlock( clientId ),
+		[ clientId ]
 	) || { innerBlocks: [] };
 
 	useNestedSettingsUpdate( clientId, allowedBlocks, templateLock );
@@ -63,15 +114,17 @@ function UncontrolledInnerBlocks( props ) {
 		templateInsertUpdatesSelection
 	);
 
+	const BlockListComponent = useCompactList ? BlockListCompact : BlockList;
+
 	let blockList = (
-		<BlockList
+		<BlockListComponent
 			marginVertical={ marginVertical }
 			marginHorizontal={ marginHorizontal }
 			rootClientId={ clientId }
 			renderAppender={ renderAppender }
 			renderFooterAppender={ renderFooterAppender }
 			withFooter={ false }
-			__experimentalMoverDirection={ __experimentalMoverDirection }
+			orientation={ orientation }
 			parentWidth={ parentWidth }
 			horizontalAlignment={ horizontalAlignment }
 			horizontal={ horizontal }
@@ -79,6 +132,9 @@ function UncontrolledInnerBlocks( props ) {
 			contentStyle={ contentStyle }
 			onAddBlock={ onAddBlock }
 			onDeleteBlock={ onDeleteBlock }
+			filterInnerBlocks={ filterInnerBlocks }
+			gridProperties={ gridProperties }
+			blockWidth={ blockWidth }
 		/>
 	);
 
@@ -88,9 +144,11 @@ function UncontrolledInnerBlocks( props ) {
 		const context = getBlockContext( block.attributes, blockType );
 
 		blockList = (
-			<BlockContextProvider value={ context }>
-				{ blockList }
-			</BlockContextProvider>
+			<LayoutProvider value={ layout }>
+				<BlockContextProvider value={ context }>
+					{ blockList }
+				</BlockContextProvider>
+			</LayoutProvider>
 		);
 	}
 
@@ -138,11 +196,11 @@ const InnerBlocks = ( props ) => {
 InnerBlocks.DefaultBlockAppender = DefaultBlockAppender;
 InnerBlocks.ButtonBlockAppender = ButtonBlockAppender;
 
-InnerBlocks.Content = withBlockContentContext( ( { BlockContent } ) => (
-	<BlockContent />
-) );
+useInnerBlocksProps.save = getInnerBlocksProps;
+
+InnerBlocks.Content = () => useInnerBlocksProps.save().children;
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md
  */
 export default InnerBlocks;

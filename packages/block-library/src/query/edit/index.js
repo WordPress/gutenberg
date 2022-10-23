@@ -1,44 +1,101 @@
 /**
  * WordPress dependencies
  */
-import { useInstanceId } from '@wordpress/compose';
-import { useEffect } from '@wordpress/element';
-import { BlockControls, InnerBlocks } from '@wordpress/block-editor';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useState, useMemo } from '@wordpress/element';
+import {
+	BlockContextProvider,
+	store as blockEditorStore,
+	__experimentalBlockPatternSetup as BlockPatternSetup,
+} from '@wordpress/block-editor';
+import { Modal } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import QueryToolbar from './query-toolbar';
-import QueryProvider from './query-provider';
+import QueryContent from './query-content';
+import QueryPlaceholder from './query-placeholder';
+import {
+	useBlockNameForPatterns,
+	getTransformedBlocksFromPattern,
+} from '../utils';
 
-const TEMPLATE = [ [ 'core/query-loop' ], [ 'core/query-pagination' ] ];
-export default function QueryEdit( {
-	attributes: { queryId, query },
-	setAttributes,
-} ) {
-	const instanceId = useInstanceId( QueryEdit );
-	// We need this for multi-query block pagination.
-	// Query parameters for each block are scoped to their ID.
-	useEffect( () => {
-		if ( ! queryId ) {
-			setAttributes( { queryId: instanceId } );
-		}
-	}, [ queryId, instanceId ] );
+const QueryEdit = ( props ) => {
+	const { clientId, attributes } = props;
+	const [ isPatternSelectionModalOpen, setIsPatternSelectionModalOpen ] =
+		useState( false );
+	const hasInnerBlocks = useSelect(
+		( select ) =>
+			!! select( blockEditorStore ).getBlocks( clientId ).length,
+		[ clientId ]
+	);
+	const Component = hasInnerBlocks ? QueryContent : QueryPlaceholder;
 	return (
 		<>
-			<BlockControls>
-				<QueryToolbar
-					query={ query }
-					setQuery={ ( newQuery ) =>
-						setAttributes( { query: { ...query, ...newQuery } } )
+			<Component
+				{ ...props }
+				openPatternSelectionModal={ () =>
+					setIsPatternSelectionModalOpen( true )
+				}
+			/>
+			{ isPatternSelectionModalOpen && (
+				<PatternSelectionModal
+					clientId={ clientId }
+					attributes={ attributes }
+					setIsPatternSelectionModalOpen={
+						setIsPatternSelectionModalOpen
 					}
 				/>
-			</BlockControls>
-			<QueryProvider>
-				<InnerBlocks template={ TEMPLATE } />
-			</QueryProvider>
+			) }
 		</>
+	);
+};
+
+function PatternSelectionModal( {
+	clientId,
+	attributes,
+	setIsPatternSelectionModalOpen,
+} ) {
+	const { replaceBlock, selectBlock } = useDispatch( blockEditorStore );
+	const onBlockPatternSelect = ( blocks ) => {
+		const { newBlocks, queryClientIds } = getTransformedBlocksFromPattern(
+			blocks,
+			attributes
+		);
+		replaceBlock( clientId, newBlocks );
+		if ( queryClientIds[ 0 ] ) {
+			selectBlock( queryClientIds[ 0 ] );
+		}
+	};
+	// When we preview Query Loop blocks we should prefer the current
+	// block's postType, which is passed through block context.
+	const blockPreviewContext = useMemo(
+		() => ( {
+			previewPostType: attributes.query.postType,
+		} ),
+		[ attributes.query.postType ]
+	);
+	const blockNameForPatterns = useBlockNameForPatterns(
+		clientId,
+		attributes
+	);
+	return (
+		<Modal
+			className="block-editor-query-pattern__selection-modal"
+			title={ __( 'Choose a pattern' ) }
+			closeLabel={ __( 'Cancel' ) }
+			onRequestClose={ () => setIsPatternSelectionModalOpen( false ) }
+		>
+			<BlockContextProvider value={ blockPreviewContext }>
+				<BlockPatternSetup
+					blockName={ blockNameForPatterns }
+					clientId={ clientId }
+					onBlockPatternSelect={ onBlockPatternSelect }
+				/>
+			</BlockContextProvider>
+		</Modal>
 	);
 }
 
-export * from './query-provider';
+export default QueryEdit;

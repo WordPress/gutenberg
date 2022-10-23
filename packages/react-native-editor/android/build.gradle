@@ -1,0 +1,39 @@
+buildscript {
+    ext {
+        gradlePluginVersion = '7.2.1'
+        kotlinVersion = '1.5.32'
+        buildToolsVersion = "31.0.0"
+        minSdkVersion = 21
+        compileSdkVersion = 31
+        targetSdkVersion = 31
+        supportLibVersion = '28.0.0'
+        ndkVersion = "21.4.7075529"
+    }
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:$gradlePluginVersion"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+    }
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        maven {
+            url "https://a8c-libs.s3.amazonaws.com/android"
+            content {
+                includeGroup "org.wordpress"
+                includeGroup "org.wordpress.aztec"
+                includeGroup "org.wordpress-mobile"
+            }
+        }
+        maven { url "https://a8c-libs.s3.amazonaws.com/android/react-native-mirror" }
+        maven { url "https://a8c-libs.s3.amazonaws.com/android/hermes-mirror" }
+        maven { url 'https://www.jitpack.io' }
+        google()
+    }
+}

@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { close } from '@wordpress/icons';
+import { closeSmall } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -20,7 +20,7 @@ const ComplementaryAreaHeader = ( {
 	toggleButtonProps,
 } ) => {
 	const toggleButton = (
-		<ComplementaryAreaToggle icon={ close } { ...toggleButtonProps } />
+		<ComplementaryAreaToggle icon={ closeSmall } { ...toggleButtonProps } />
 	);
 	return (
 		<>

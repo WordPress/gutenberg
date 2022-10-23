@@ -1,14 +1,11 @@
 /**
- * External dependencies
- */
-
-import { find, reject } from 'lodash';
-
-/**
  * Internal dependencies
  */
 
 import { normaliseFormats } from './normalise-formats';
+
+/** @typedef {import('./create').RichTextValue} RichTextValue */
+/** @typedef {import('./create').RichTextFormat} RichTextFormat */
 
 function replace( array, index, value ) {
 	array = array.slice();
@@ -21,12 +18,12 @@ function replace( array, index, value ) {
  * given `endIndex`. Indices are retrieved from the selection if none are
  * provided.
  *
- * @param {Object} value        Value to modify.
- * @param {Object} format       Format to apply.
- * @param {number} [startIndex] Start index.
- * @param {number} [endIndex]   End index.
+ * @param {RichTextValue}  value        Value to modify.
+ * @param {RichTextFormat} format       Format to apply.
+ * @param {number}         [startIndex] Start index.
+ * @param {number}         [endIndex]   End index.
  *
- * @return {Object} A new value with the format applied.
+ * @return {RichTextValue} A new value with the format applied.
  */
 export function applyFormat(
 	value,
@@ -39,9 +36,9 @@ export function applyFormat(
 
 	// The selection is collapsed.
 	if ( startIndex === endIndex ) {
-		const startFormat = find( newFormats[ startIndex ], {
-			type: format.type,
-		} );
+		const startFormat = newFormats[ startIndex ]?.find(
+			( { type } ) => type === format.type
+		);
 
 		// If the caret is at a format of the same type, expand start and end to
 		// the edges of the format. This is useful to apply new attributes.
@@ -107,7 +104,9 @@ export function applyFormat(
 		// inputs with the format so new input appears with the format applied,
 		// and ensures a format of the same type uses the latest values.
 		activeFormats: [
-			...reject( activeFormats, { type: format.type } ),
+			...( activeFormats?.filter(
+				( { type } ) => type !== format.type
+			) || [] ),
 			format,
 		],
 	} );

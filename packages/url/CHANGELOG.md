@@ -1,6 +1,73 @@
-<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+
+## 3.21.0 (2022-10-19)
+
+## 3.20.0 (2022-10-05)
+
+## 3.19.0 (2022-09-21)
+
+## 3.18.0 (2022-09-13)
+
+## 3.17.0 (2022-08-24)
+
+## 3.16.0 (2022-08-10)
+
+## 3.15.0 (2022-07-27)
+
+## 3.14.0 (2022-07-13)
+
+## 3.13.0 (2022-06-29)
+
+## 3.12.0 (2022-06-15)
+
+## 3.11.0 (2022-06-01)
+
+## 3.10.0 (2022-05-18)
+
+## 3.9.0 (2022-05-04)
+
+## 3.8.0 (2022-04-21)
+
+## 3.7.0 (2022-04-08)
+
+## 3.6.0 (2022-03-23)
+
+## 3.5.0 (2022-03-11)
+
+## 3.4.0 (2022-01-27)
+
+## 3.3.0 (2021-11-07)
+
+### New Feature
+
+-   Added new `normalizePath` function ([#35992](https://github.com/WordPress/gutenberg/pull/35992)).
+
+## 3.2.3 (2021-10-12)
+
+### Bug Fix
+
+-   Removed unused `react-native-url-polyfill` dependency ([#34687](https://github.com/WordPress/gutenberg/pull/34687)).
+
+## 3.2.0 (2021-07-21)
+
+## 3.1.0 (2021-05-20)
+
+## 3.0.0 (2021-05-14)
+
+### Breaking Changes
+
+-   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.
+-   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at https://nodejs.org/en/about/releases/.
+
+## 2.22.0 (2021-03-17)
+
+## 2.21.0 (2021-01-05)
+
+### New Feature
+
+-   Add optional argument `maxLength` for truncating URL in `filterURLForDisplay`
 
 ## 2.16.0 (2020-06-15)
 

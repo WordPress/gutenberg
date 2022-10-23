@@ -1,0 +1,109 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BlockVerticalAlignmentUI should match snapshot when controls are hidden 1`] = `
+<div>
+  <div
+    class="components-dropdown components-dropdown-menu components-toolbar"
+    tabindex="-1"
+  >
+    <button
+      aria-expanded="false"
+      aria-haspopup="true"
+      aria-label="Change vertical alignment"
+      class="components-button components-dropdown-menu__toggle has-icon"
+      data-toolbar-item="true"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        focusable="false"
+        height="24"
+        viewBox="0 0 24 24"
+        width="24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M9 20h6V9H9v11zM4 4v1.5h16V4H4z"
+        />
+      </svg>
+    </button>
+  </div>
+</div>
+`;
+
+exports[`BlockVerticalAlignmentUI should match snapshot when controls are visible 1`] = `
+<div>
+  <div
+    class="components-toolbar"
+    icon="[object Object]"
+    label="Change vertical alignment"
+  >
+    <div>
+      <button
+        aria-label="Align top"
+        aria-pressed="true"
+        class="components-button components-toolbar__control is-pressed has-icon"
+        data-toolbar-item="true"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          height="24"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M9 20h6V9H9v11zM4 4v1.5h16V4H4z"
+          />
+        </svg>
+      </button>
+    </div>
+    <div>
+      <button
+        aria-label="Align middle"
+        aria-pressed="false"
+        class="components-button components-toolbar__control has-icon"
+        data-toolbar-item="true"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          height="24"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M20 11h-5V4H9v7H4v1.5h5V20h6v-7.5h5z"
+          />
+        </svg>
+      </button>
+    </div>
+    <div>
+      <button
+        aria-label="Align bottom"
+        aria-pressed="false"
+        class="components-button components-toolbar__control has-icon"
+        data-toolbar-item="true"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          height="24"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M15 4H9v11h6V4zM4 18.5V20h16v-1.5H4z"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+`;

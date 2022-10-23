@@ -6,56 +6,68 @@ import {
 	useContext,
 	useCallback,
 	useEffect,
-	useMemo,
 } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { parse, serialize } from '@wordpress/blocks';
+import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import { defaultEntities, kinds } from './entities';
+import { STORE_NAME } from './name';
 
-const entities = {
-	...defaultEntities.reduce( ( acc, entity ) => {
-		if ( ! acc[ entity.kind ] ) {
-			acc[ entity.kind ] = {};
+/** @typedef {import('@wordpress/blocks').WPBlock} WPBlock */
+
+const EMPTY_ARRAY = [];
+
+/**
+ * Internal dependencies
+ */
+import { rootEntitiesConfig, additionalEntityConfigLoaders } from './entities';
+
+const entityContexts = {
+	...rootEntitiesConfig.reduce( ( acc, loader ) => {
+		if ( ! acc[ loader.kind ] ) {
+			acc[ loader.kind ] = {};
 		}
-		acc[ entity.kind ][ entity.name ] = { context: createContext() };
+		acc[ loader.kind ][ loader.name ] = {
+			context: createContext( undefined ),
+		};
 		return acc;
 	}, {} ),
-	...kinds.reduce( ( acc, kind ) => {
-		acc[ kind.name ] = {};
+	...additionalEntityConfigLoaders.reduce( ( acc, loader ) => {
+		acc[ loader.kind ] = {};
 		return acc;
 	}, {} ),
 };
-const getEntity = ( kind, type ) => {
-	if ( ! entities[ kind ] ) {
+const getEntityContext = ( kind, name ) => {
+	if ( ! entityContexts[ kind ] ) {
 		throw new Error( `Missing entity config for kind: ${ kind }.` );
 	}
 
-	if ( ! entities[ kind ][ type ] ) {
-		entities[ kind ][ type ] = { context: createContext() };
+	if ( ! entityContexts[ kind ][ name ] ) {
+		entityContexts[ kind ][ name ] = {
+			context: createContext( undefined ),
+		};
 	}
 
-	return entities[ kind ][ type ];
+	return entityContexts[ kind ][ name ].context;
 };
 
 /**
  * Context provider component for providing
- * an entity for a specific entity type.
+ * an entity for a specific entity.
  *
  * @param {Object} props          The component's props.
  * @param {string} props.kind     The entity kind.
- * @param {string} props.type     The entity type.
+ * @param {string} props.type     The entity name.
  * @param {number} props.id       The entity ID.
  * @param {*}      props.children The children to wrap.
  *
  * @return {Object} The provided children, wrapped with
  *                   the entity's context provider.
  */
-export default function EntityProvider( { kind, type, id, children } ) {
-	const Provider = getEntity( kind, type ).context.Provider;
+export default function EntityProvider( { kind, type: name, id, children } ) {
+	const Provider = getEntityContext( kind, name ).Provider;
 	return <Provider value={ id }>{ children }</Provider>;
 }
 
@@ -64,10 +76,10 @@ export default function EntityProvider( { kind, type, id, children } ) {
  * provided entity of the specified type.
  *
  * @param {string} kind The entity kind.
- * @param {string} type The entity type.
+ * @param {string} name The entity name.
  */
-export function useEntityId( kind, type ) {
-	return useContext( getEntity( kind, type ).context );
+export function useEntityId( kind, name ) {
+	return useContext( getEntityContext( kind, name ) );
 }
 
 /**
@@ -76,40 +88,44 @@ export function useEntityId( kind, type ) {
  * entity of the specified type.
  *
  * @param {string} kind  The entity kind.
- * @param {string} type  The entity type.
+ * @param {string} name  The entity name.
  * @param {string} prop  The property name.
  * @param {string} [_id] An entity ID to use instead of the context-provided one.
  *
- * @return {[*, Function]} A tuple where the first item is the
- *                          property value and the second is the
- *                          setter.
+ * @return {[*, Function, *]} An array where the first item is the
+ *                            property value, the second is the
+ *                            setter and the third is the full value
+ * 							  object from REST API containing more
+ * 							  information like `raw`, `rendered` and
+ * 							  `protected` props.
  */
-export function useEntityProp( kind, type, prop, _id ) {
-	const providerId = useEntityId( kind, type );
+export function useEntityProp( kind, name, prop, _id ) {
+	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
 
 	const { value, fullValue } = useSelect(
 		( select ) => {
-			const { getEntityRecord, getEditedEntityRecord } = select( 'core' );
-			const entity = getEntityRecord( kind, type, id ); // Trigger resolver.
-			const editedEntity = getEditedEntityRecord( kind, type, id );
-			return entity && editedEntity
+			const { getEntityRecord, getEditedEntityRecord } =
+				select( STORE_NAME );
+			const record = getEntityRecord( kind, name, id ); // Trigger resolver.
+			const editedRecord = getEditedEntityRecord( kind, name, id );
+			return record && editedRecord
 				? {
-						value: editedEntity[ prop ],
-						fullValue: entity[ prop ],
+						value: editedRecord[ prop ],
+						fullValue: record[ prop ],
 				  }
 				: {};
 		},
-		[ kind, type, id, prop ]
+		[ kind, name, id, prop ]
 	);
-	const { editEntityRecord } = useDispatch( 'core' );
+	const { editEntityRecord } = useDispatch( STORE_NAME );
 	const setValue = useCallback(
 		( newValue ) => {
-			editEntityRecord( kind, type, id, {
+			editEntityRecord( kind, name, id, {
 				[ prop ]: newValue,
 			} );
 		},
-		[ kind, type, id, prop ]
+		[ kind, name, id, prop ]
 	);
 
 	return [ value, setValue, fullValue ];
@@ -126,69 +142,77 @@ export function useEntityProp( kind, type, prop, _id ) {
  * `BlockEditorProvider` and are intended to be used with it,
  * or similar components or hooks.
  *
- * @param {string} kind                            The entity kind.
- * @param {string} type                            The entity type.
+ * @param {string} kind         The entity kind.
+ * @param {string} name         The entity name.
  * @param {Object} options
- * @param {Object} [options.initialEdits]          Initial edits object for the entity record.
- * @param {string} [options.blocksProp='blocks']   The name of the entity prop that holds the blocks array.
- * @param {string} [options.contentProp='content'] The name of the entity prop that holds the serialized blocks.
- * @param {string} [options.id]                    An entity ID to use instead of the context-provided one.
+ * @param {string} [options.id] An entity ID to use instead of the context-provided one.
  *
  * @return {[WPBlock[], Function, Function]} The block array and setters.
  */
-export function useEntityBlockEditor(
-	kind,
-	type,
-	{
-		initialEdits,
-		blocksProp = 'blocks',
-		contentProp = 'content',
-		id: _id,
-	} = {}
-) {
-	const providerId = useEntityId( kind, type );
+export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
+	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
-
-	const [ content, setContent ] = useEntityProp(
-		kind,
-		type,
-		contentProp,
-		id
+	const { content, blocks } = useSelect(
+		( select ) => {
+			const { getEditedEntityRecord } = select( STORE_NAME );
+			const editedRecord = getEditedEntityRecord( kind, name, id );
+			return {
+				blocks: editedRecord.blocks,
+				content: editedRecord.content,
+			};
+		},
+		[ kind, name, id ]
 	);
+	const { __unstableCreateUndoLevel, editEntityRecord } =
+		useDispatch( STORE_NAME );
 
-	const { editEntityRecord } = useDispatch( 'core' );
 	useEffect( () => {
-		if ( initialEdits ) {
-			editEntityRecord( kind, type, id, initialEdits, {
-				undoIgnore: true,
-			} );
-		}
-	}, [ id ] );
-	const initialBlocks = useMemo( () => {
+		// Load the blocks from the content if not already in state
 		// Guard against other instances that might have
-		// set content to a function already.
-		if ( content && typeof content !== 'function' ) {
+		// set content to a function already or the blocks are already in state.
+		if ( content && typeof content !== 'function' && ! blocks ) {
 			const parsedContent = parse( content );
-			return parsedContent.length ? parsedContent : [];
+			editEntityRecord(
+				kind,
+				name,
+				id,
+				{
+					blocks: parsedContent,
+				},
+				{ undoIgnore: true }
+			);
 		}
-		return [];
 	}, [ content ] );
-	const [ blocks = initialBlocks, onInput ] = useEntityProp(
-		kind,
-		type,
-		blocksProp,
-		id
-	);
 
 	const onChange = useCallback(
-		( nextBlocks ) => {
-			onInput( nextBlocks );
-			// Use a function edit to avoid serializing often.
-			setContent( ( { blocks: blocksToSerialize } ) =>
-				serialize( blocksToSerialize )
-			);
+		( newBlocks, options ) => {
+			const { selection } = options;
+			const edits = { blocks: newBlocks, selection };
+
+			const noChange = blocks === edits.blocks;
+			if ( noChange ) {
+				return __unstableCreateUndoLevel( kind, name, id );
+			}
+
+			// We create a new function here on every persistent edit
+			// to make sure the edit makes the post dirty and creates
+			// a new undo level.
+			edits.content = ( { blocks: blocksForSerialization = [] } ) =>
+				__unstableSerializeAndClean( blocksForSerialization );
+
+			editEntityRecord( kind, name, id, edits );
 		},
-		[ onInput, setContent ]
+		[ kind, name, id, blocks ]
 	);
-	return [ blocks, onInput, onChange ];
+
+	const onInput = useCallback(
+		( newBlocks, options ) => {
+			const { selection } = options;
+			const edits = { blocks: newBlocks, selection };
+			editEntityRecord( kind, name, id, edits );
+		},
+		[ kind, name, id ]
+	);
+
+	return [ blocks ?? EMPTY_ARRAY, onInput, onChange ];
 }

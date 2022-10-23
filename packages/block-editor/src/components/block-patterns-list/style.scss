@@ -1,0 +1,51 @@
+.block-editor-block-patterns-list__list-item {
+	cursor: pointer;
+	margin-bottom: $grid-unit-30;
+
+	// The list item contains absolutely positioned visually hidden text,
+	// so make this container relative. This prevents the bug experienced in
+	// https://github.com/WordPress/gutenberg/issues/44842.
+	position: relative;
+
+	&.is-placeholder {
+		min-height: 100px;
+	}
+
+	&[draggable="true"] .block-editor-block-preview__container {
+		cursor: grab;
+	}
+}
+
+.block-editor-block-patterns-list__item {
+	height: 100%;
+
+	.block-editor-block-preview__container {
+		display: flex;
+		align-items: center;
+		overflow: hidden;
+		border-radius: 4px;
+	}
+
+	.block-editor-block-patterns-list__item-title {
+		padding-top: $grid-unit-10;
+		font-size: 12px;
+		text-align: center;
+	}
+
+	&:hover .block-editor-block-preview__container {
+		box-shadow: 0 0 0 2px var(--wp-admin-theme-color);
+	}
+
+	&:focus .block-editor-block-preview__container {
+		box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
+	}
+
+
+	&:hover .block-editor-block-patterns-list__item-title,
+	&:focus .block-editor-block-patterns-list__item-title {
+		color: var(--wp-admin-theme-color);
+	}
+}

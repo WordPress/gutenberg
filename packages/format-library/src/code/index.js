@@ -3,11 +3,14 @@
  */
 import { __ } from '@wordpress/i18n';
 import { toggleFormat, remove, applyFormat } from '@wordpress/rich-text';
-import { RichTextToolbarButton } from '@wordpress/block-editor';
+import {
+	RichTextToolbarButton,
+	RichTextShortcut,
+} from '@wordpress/block-editor';
 import { code as codeIcon } from '@wordpress/icons';
 
 const name = 'core/code';
-const title = __( 'Inline Code' );
+const title = __( 'Inline code' );
 
 export const code = {
 	name,
@@ -46,17 +49,25 @@ export const code = {
 	},
 	edit( { value, onChange, onFocus, isActive } ) {
 		function onClick() {
-			onChange( toggleFormat( value, { type: name } ) );
+			onChange( toggleFormat( value, { type: name, title } ) );
 			onFocus();
 		}
 
 		return (
-			<RichTextToolbarButton
-				icon={ codeIcon }
-				title={ title }
-				onClick={ onClick }
-				isActive={ isActive }
-			/>
+			<>
+				<RichTextShortcut
+					type="access"
+					character="x"
+					onUse={ onClick }
+				/>
+				<RichTextToolbarButton
+					icon={ codeIcon }
+					title={ title }
+					onClick={ onClick }
+					isActive={ isActive }
+					role="menuitemcheckbox"
+				/>
+			</>
 		);
 	},
 };

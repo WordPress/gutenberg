@@ -1,118 +1,63 @@
-.block-editor-block-mover {
-	display: inline-flex;
-	flex-direction: row;
-}
-
-.block-editor-block-mover-button__description {
-	display: none;
-}
-
-.block-editor-block-mover-button.has-icon {
+.block-editor-block-mover__move-button-container {
+	display: flex;
 	padding: 0;
+	border: none;
+
+	@include break-small() {
+		.block-editor-block-mover:not(.is-horizontal) & {
+			flex-direction: column;
+
+			> * {
+				height: $block-toolbar-height * 0.5;
+				width: 100%;
+				min-width: 0 !important; // overrides default button width.
+
+				// Focus style.
+				&::before {
+					height: calc(100% - 4px);
+					width: calc(100% - 4px);
+				}
+			}
+
+			.block-editor-block-mover-button.is-up-button svg {
+				top: 5px;
+				flex-shrink: 0;
+			}
+
+			.block-editor-block-mover-button.is-down-button svg {
+				bottom: 5px;
+				flex-shrink: 0;
+			}
+		}
+
+		.block-editor-block-mover.is-horizontal & {
+			width: $block-toolbar-height;
+
+			> * {
+				width: $block-toolbar-height * 0.5;
+				min-width: 0 !important; // overrides default button width.
+				padding-left: 0 !important;
+				padding-right: 0 !important;
+				overflow: hidden;
+			}
+
+			.block-editor-block-mover-button.is-up-button svg {
+				left: 5px;
+			}
+
+			.block-editor-block-mover-button.is-down-button svg {
+				right: 5px;
+			}
+		}
+	}
 }
 
-// Show the mover in a single button under the contextual toolbar.
-.block-editor-block-mover {
-	.components-toolbar-group,
-	.components-toolbar {
-		flex-direction: column;
-		flex: 1;
-	}
-
-	&.is-horizontal .components-toolbar-group,
-	&.is-horizontal .components-toolbar {
-		flex-direction: row;
-	}
-
-	.block-editor-block-mover-button {
-		height: $block-toolbar-height/2;
-		width: $block-toolbar-height;
-		padding: 0 !important;
-
-		// Focus style.
-		// Overrides .components-toolbar-group styles
-		&::before {
-			left: $grid-unit-10 !important;
-			right: $grid-unit-10 !important;
-		}
-	}
-
-	// Position the icons correctly.
-	.components-toolbar-group .block-editor-block-mover-button.is-up-button,
-	.components-toolbar .block-editor-block-mover-button.is-up-button {
-		svg {
-			margin-bottom: -$grid-unit-10;
-		}
-
-		// Focus style.
-		&::before {
-			bottom: 0;
-			height: calc(100% - #{ $grid-unit-10 });
-		}
-	}
-
-	.components-toolbar-group .block-editor-block-mover-button.is-down-button,
-	.components-toolbar .block-editor-block-mover-button.is-down-button {
-		svg {
-			margin-top: -$grid-unit-10;
-		}
-
-		// Focus style.
-		&::before {
-			top: 0;
-			height: calc(100% - #{ $grid-unit-10 });
-		}
-	}
-
-	// Mover is horizontal.
-	&.is-horizontal {
-		.block-editor-block-mover-button.has-icon {
-			height: $block-toolbar-height;
-			// Overrides .components-toolbar-group styles
-			width: $block-toolbar-height / 2;
-			min-width: $grid-unit-30;
-			padding-left: 0;
-			padding-right: 0;
-
-			// Focus style.
-			&::before {
-				top: $grid-unit-10;
-				bottom: $grid-unit-10;
-				min-width: 0;
-				width: auto;
-				height: auto;
-			}
-		}
-
-		// Position the icons correctly.
-		.block-editor-block-mover-button.is-up-button.has-icon {
-			svg {
-				margin-left: 0;
-				margin-right: -$grid-unit-10;
-				margin-bottom: 0;
-			}
-
-			// Focus style.
-			// Overrides .components-toolbar-group styles
-			&::before {
-				left: $grid-unit-10 !important;
-				right: 0 !important;
-			}
-		}
-
-		.block-editor-block-mover-button.is-down-button.has-icon {
-			svg {
-				margin-left: -$grid-unit-10;
-				margin-right: 0;
-				margin-top: 0;
-			}
-
-			// Focus style.
-			// Overrides .components-toolbar-group styles
-			&::before {
-				left: 0 !important;
-				right: $grid-unit-10 !important;
-			}
-		}
+.block-editor-block-mover__drag-handle {
+	@include break-small() {
+		width: $block-toolbar-height * 0.5;
+		min-width: 0 !important; // overrides default button width.
+		padding-left: 0 !important;
+		padding-right: 0 !important;
+		overflow: hidden;
 	}
 }

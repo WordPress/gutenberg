@@ -9,9 +9,10 @@ import {
 	insertBlock,
 	openGlobalBlockInserter,
 	closeGlobalBlockInserter,
+	clickBlockToolbarButton,
 } from '@wordpress/e2e-test-utils';
 
-describe( 'Allowed Blocks Setting on InnerBlocks ', () => {
+describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 	const paragraphSelector =
 		'.block-editor-rich-text__editable[data-type="core/paragraph"]';
 	beforeAll( async () => {
@@ -35,7 +36,9 @@ describe( 'Allowed Blocks Setting on InnerBlocks ', () => {
 		await page.click( childParagraphSelector );
 		await openGlobalBlockInserter();
 		await expect(
-			( await getAllBlockInserterItemTitles() ).length
+			(
+				await getAllBlockInserterItemTitles()
+			 ).length
 		).toBeGreaterThan( 20 );
 	} );
 
@@ -72,9 +75,17 @@ describe( 'Allowed Blocks Setting on InnerBlocks ', () => {
 			await page.$x( `//button//span[contains(text(), 'List')]` )
 		 )[ 0 ];
 		await insertButton.click();
+		// Select the list wrapper so the image is inserable.
+		await page.keyboard.press( 'ArrowUp' );
 		await insertBlock( 'Image' );
 		await closeGlobalBlockInserter();
 		await page.waitForSelector( '.product[data-number-of-children="2"]' );
+		await clickBlockToolbarButton( 'Select Allowed Blocks Dynamic' );
+		// This focus shouldn't be neessary but there's a bug in trunk right now
+		// Where if you open the inserter, don't do anything and click the "appender" on the canvas
+		// the appender is not opened right away.
+		// It needs to be investigated on its own.
+		await page.focus( appenderSelector );
 		await page.click( appenderSelector );
 		expect( await getAllBlockInserterItemTitles() ).toEqual( [
 			'Gallery',

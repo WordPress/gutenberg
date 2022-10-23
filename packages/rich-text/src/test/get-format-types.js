@@ -1,14 +1,11 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { getFormatTypes } from '../get-format-types';
 import { unregisterFormatType } from '../unregister-format-type';
 import { registerFormatType } from '../register-format-type';
+
+const noop = () => {};
 
 describe( 'getFormatTypes', () => {
 	beforeAll( () => {

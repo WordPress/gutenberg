@@ -16,15 +16,14 @@ A RangeControl for volume
 
 ### Anatomy
 
-![](https://make.wordpress.org/design/files/2018/12/rangecontrol-anatomy.png)
-
 A RangeControl can contain the following elements:
 
-1. **Track**: The track shows the range available for user selection. For left-to-right (LTR) languages, the smallest value appears on the far left, and the largest value on the far right. For right-to-left (RTL) languages this orientation is reversed, with the smallest value on the far right and the largest value on the far left.
-2. **Thumb**: The thumb slides along the track, displaying the selected value through its position.
-3. **Value entry field**: The value entry field displays the currently selected, specific numerical value.
-4. **Icon** (optional): An icon can be displayed before or after the slider.
-5. **Tick mark** (optional): Tick marks represent predetermined values to which the user can move the slider.
+1. **Rail**: The rail represents the entire surface area of the slider, from the minimum value selectable by the user to the maximum value selectable by the user. For left-to-right (LTR) languages, the minimum value appears on the far left, and the maximum value on the far right. For right-to-left (RTL) languages this orientation is reversed, with the minimum value on the far right and the maximum value on the far left.
+2. **Track**: The track represents the portion of the rail from the minimum value to the currently selected value.
+3. **Thumb**: The thumb slides along the track, displaying the selected value through its position.
+4. **Value entry field**: The value entry field displays the currently selected, specific numerical value.
+5. **Icon** (optional): An icon can be displayed before or after the slider.
+6. **Tick mark** (optional): Tick marks represent predetermined values to which the user can move the slider.
 
 ### Types
 
@@ -40,12 +39,12 @@ Possible selections may be organized through the use of tick marks, which a thum
 
 ### Behavior
 
-- **Click and drag**: The slider is controlled by clicking the thumb and dragging it.
-- **Click jump**: The slider is controlled by clicking the track.
-- **Click and arrow**: The slider is controlled by clicking the thumb, then using arrow keys to move it.
-- **Tab and arrow**: The slider is controlled by using the tab key to select the thumb of the desired slider, then using arrow keys to move it.
-- **Value entry field**: Discrete sliders have value entry fields. After a text entry is made, the slider position automatically updates to reflect the new value.
-- **Tick marks** (Optional) Discrete sliders can use evenly spaced tick marks along the slider track, and the thumb will snap to them. Each tick mark should change the setting in increments that are discernible to the user.
+-   **Click and drag**: The slider is controlled by clicking the thumb and dragging it.
+-   **Click jump**: The slider is controlled by clicking the track.
+-   **Click and arrow**: The slider is controlled by clicking the thumb, then using arrow keys to move it.
+-   **Tab and arrow**: The slider is controlled by using the tab key to select the thumb of the desired slider, then using arrow keys to move it.
+-   **Value entry field**: Discrete sliders have value entry fields. After a text entry is made, the slider position automatically updates to reflect the new value.
+-   **Tick marks** (Optional) Discrete sliders can use evenly spaced tick marks along the slider track, and the thumb will snap to them. Each tick mark should change the setting in increments that are discernible to the user.
 
 ### Usage
 
@@ -92,84 +91,117 @@ Render a RangeControl to make a selection from a range of incremental values.
 
 ```jsx
 import { RangeControl } from '@wordpress/components';
-import { withState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
-const MyRangeControl = withState( {
-        columns: 2,
-} )( ( { columns, setState } ) => (
-    <RangeControl
-        label="Columns"
-        value={ columns }
-        onChange={ ( columns ) => setState( { columns } ) }
-        min={ 2 }
-        max={ 10 }
-    />
-) );
+const MyRangeControl = () => {
+	const [ columns, setColumns ] = useState( 2 );
+
+	return(
+		<RangeControl
+			label="Columns"
+			value={ columns }
+			onChange={ ( value ) => setColumns( value ) }
+			min={ 2 }
+			max={ 10 }
+		/>
+	);
+};
 ```
 
-### Props
+## Props
 
 The set of props accepted by the component will be specified below.
 Props not included in this set will be applied to the input elements.
 
-#### label
+### `afterIcon`: `string|Function|WPComponent|null`
 
-If this property is added, a label will be generated using label property as the content.
+If this property is added, an [Icon component](/packages/components/src/icon/README.md) will be rendered after the slider with the icon equal to `afterIcon`.
 
-- Type: `String`
-- Required: No
-- Platform: Web | Mobile
+For more information on `IconType` see the [Icon component](/packages/components/src/icon/index.tsx#L23).
 
-#### help
+-   Required: No
+-   Platform: Web
 
-If this property is added, a help text will be generated using help property as the content.
+### `allowReset`: `boolean`
 
-- Type: `String|WPElement`
-- Required: No
-- Platform: Web
+If this property is true, a button to reset the slider is rendered.
 
-#### beforeIcon
+-   Required: No
+-   Default: `false`
+-   Platform: Web | Mobile
 
-If this property is added, a DashIcon component will be rendered before the slider with the icon equal to beforeIcon
+### `beforeIcon`: `string|Function|WPComponent|null`
 
-- Type: `String`
-- Required: No
-- Platform: Web
+If this property is added, an [Icon component](/packages/components/src/icon/README.md) will be rendered before the slider with the icon equal to `beforeIcon`.
 
-#### afterIcon
+For more information on `IconType` see the [Icon component](/packages/components/src/icon/index.tsx#L23).
 
-If this property is added, a DashIcon component will be rendered after the slider with the icon equal to afterIcon
+-   Required: No
+-   Platform: Web
 
-- Type: `String`
-- Required: No
-- Platform: Web
+### `color`: `CSSProperties['color']`
 
-#### allowReset
+CSS color string for the `RangeControl` wrapper.
 
-If this property is true, a button to reset the the slider is rendered.
+-   Required: No
+-   Platform: Web
 
-- Type: `Boolean`
-- Required: No
-- Platform: Web | Mobile
+### `currentInput`: `number`
 
-#### disabled
+The current input to use as a fallback if `value` is currently `undefined`.
+
+-   Required: No
+-   Platform: Web
+
+### `disabled`: `boolean`
 
 Disables the `input`, preventing new values from being applied.
 
-- Type: `Boolean`
+-   Required: No
+-   Platform: Web
+
+
+### `help`: `string|WPElement`
+
+If this property is added, a help text will be generated using help property as the content.
+
+-   Required: No
+-   Platform: Web
+
+### `hideLabelFromVision`: `boolean`
+
+Provides control over whether the label will only be visible to screen readers.
+
 - Required: No
-- Platform: Web
 
-#### initialPosition
+### `icon`: `string`
 
-If no value exists this prop contains the slider starting position.
+An icon to be shown above the slider next to its container title.
 
-- Type: `Number`
-- Required: No
-- Platform: Web | Mobile
+-   Required: No
+-   Platform: Mobile
 
+### `initialPosition`: `number`
 
-#### marks
+The slider starting position, used when no `value` is passed. The `initialPosition` will be clamped between the provided `min` and `max` prop values.
+
+-   Required: No
+-   Platform: Web | Mobile
+
+### `isShiftStepEnabled`: `boolean`
+
+Passed as a prop to the `NumberControl` component and is only applicable if `withInputField` is true. If true, while the number input has focus, pressing `UP` or `DOWN` along with the `SHIFT` key will change the value by the `shiftStep` value.
+
+-   Required: No
+
+### `label`: `string`
+
+If this property is added, a label will be generated using label property as the content.
+
+-   Required: No
+-   Platform: Web | Mobile
+
+### `marks`: `Array|boolean`
 
 Renders a visual representation of `step` ticks. Custom mark indicators can be provided by an `Array`.
 
@@ -196,40 +228,72 @@ const marks = [
 ];
 
 const MyRangeControl() {
-	return (<RangeControl marks={ marks } min={ 0 } max={ 10 } step={ 1 } />)
+	return ( <RangeControl marks={ marks } min={ 0 } max={ 10 } step={ 1 } /> )
 }
 ```
 
-- Type: `Array|Boolean`
-- Required: No
-- Platform: Web
+-   Required: No
+-   Platform: Web
 
-#### onChange
+### `onBlur`: `FocusEventHandler< HTMLInputElement >`
 
-A function that receives the new value.
-If allowReset is true, when onChange is called without any parameter passed it should reset the value.
+Callback for when `RangeControl` input loses focus.
 
-- Type: `function`
-- Required: Yes
-- Platform: Web | Mobile
+-   Required: No
+-   Platform: Web
 
-#### min
+### `onChange`: `( value?: number ) => void`
 
-The minimum value accepted. If smaller values are inserted onChange will not be called and the value gets reverted when blur event fires.
+A function that receives the new value. The value will be less than `max` and more than `min` unless a reset (enabled by `allowReset`) has occurred. In which case the value will be either that of `resetFallbackValue` if it has been specified or otherwise `undefined`.
 
-- Type: `Number`
-- Required: No
-- Platform: Web | Mobile
+-   Required: No
+-   Platform: Web | Mobile
 
-#### max
+### `onFocus`: `FocusEventHandler< HTMLInputElement >`
 
-The maximum value accepted. If higher values are inserted onChange will not be called and the value gets reverted when blur event fires.
+Callback for when `RangeControl` input gains focus.
 
-- Type: `Number`
-- Required: No
-- Platform: Web | Mobile
+-   Required: No
+-   Platform: Web
 
-#### renderTooltipContent
+### `onMouseLeave`: `MouseEventHandler< HTMLInputElement >`
+
+Callback for when mouse exits the `RangeControl`.
+
+-   Required: No
+-   Platform: Web
+
+### `onMouseMove`: `MouseEventHandler< HTMLInputElement >`
+
+Callback for when mouse moves within the `RangeControl`.
+
+-   Required: No
+-   Platform: Web
+
+### `min`: `number`
+
+The minimum `value` allowed.
+
+-   Required: No
+-   Default: 0
+-   Platform: Web | Mobile
+
+### `max`: `number`
+
+The maximum `value` allowed.
+
+-   Required: No
+-   Default: 100
+-   Platform: Web | Mobile
+
+### `railColor`: `CSSProperties[ 'color' ]`
+
+CSS color string to customize the rail element's background.
+
+-   Required: No
+-   Platform: Web
+
+### `renderTooltipContent`: ( value ) => value
 
 A way to customize the rendered UI of the value. Example:
 
@@ -241,75 +305,70 @@ const MyRangeControl() {
 }
 ```
 
-- Type: `Function`
-- Required: No
-- Platform: Web
+-   Required: No
+-   Platform: Web
 
-#### resetFallbackValue
+### `resetFallbackValue`: `number`
 
 The value to revert to if the Reset button is clicked (enabled by `allowReset`)
 
-- Type: `Number`
-- Required: No
-- Platform: Web
+-   Required: No
+-   Platform: Web
 
-#### showTooltip
-
-Forcing the Tooltip UI to show or hide.
-
-- Type: `Boolean`
-- Required: No
-- Platform: Web
-
-#### step
-
-The stepping interval between `min` and `max` values. Step is used both for user interface and validation purposes.
-
-- Type: `Number`
-- Required: No
-- Platform: Web
-
-#### value
-
-The current value of the range slider.
-
-- Type: `Number`
-- Required: Yes
-- Platform: Web | Mobile
-
-#### withInputField
-
-Determines if the `input` number field will render next to the RangeControl.
-
-- Type: `Boolean`
-- Required: No
-- Platform: Web
-
-#### icon
-
-An icon to be shown above the slider next to it's container title.
-
-- Type: `String`
-- Required: No
-- Platform: Mobile
-
-#### separatorType
+### `separatorType`: `'none' | 'fullWidth' | 'topFullWidth'`
 
 Define if separator line under/above control row should be disabled or full width. By default it is placed below excluding underline the control icon.
 
-- Type: `String Enum`
-- Values: `none` | `fullWidth` | `topFullWidth`
-- Required: No
-- Platform: Mobile
+-   Required: No
+-   Platform: Mobile
 
-#### type
+### `shiftStep`: `number`
 
-Define if the value selection should present a stepper control or a slider control in the bottom sheet on mobile. To use the stepper set the type value as  `stepper`. Defaults to slider if no option is provided.
+Passed as a prop to the `NumberControl` component and is only applicable if `withInputField` and `isShiftStepEnabled` are both true and while the number input has focus. Acts as a multiplier of `step`.
 
-- Type: `String`
-- Required: No
-- Platform: Mobile
+-   Required: No
+
+### `showTooltip`: `boolean`
+
+Forcing the Tooltip UI to show or hide. This is overridden to `false` when `step` is set to the special string value `any`.
+
+-   Required: No
+-   Platform: Web
+
+### `step`: `number | 'any'`
+
+The minimum amount by which `value` changes. It is also a factor in validation as `value` must be a multiple of `step` (offset by `min`) to be valid. Accepts the special string value `any` that voids the validation constraint and overrides both `withInputField` and `showTooltip` props to `false`.
+
+-   Required: No
+-   Platform: Web
+### `trackColor`: `CSSProperties[ 'color' ]`
+
+CSS color string to customize the track element's background.
+
+-   Required: No
+-   Platform: Web
+
+### `type`: `string`
+
+Define if the value selection should present a stepper control or a slider control in the bottom sheet on mobile. To use the stepper set the type value as `stepper`. Defaults to slider if no option is provided.
+
+-   Required: No
+-   Platform: Mobile
+
+### `value`: `number`
+
+The current value of the range slider.
+
+-   Required: No
+-   Platform: Web | Mobile
+
+### `withInputField`: `boolean`
+
+Determines if the `input` number field will render next to the RangeControl. This is overridden to `false` when `step` is set to the special string value `any`.
+
+-   Required: No
+-   Platform: Web
 
 ## Related components
 
-- To collect a numerical input in a text field, use the `TextControl` component.
+-   To collect a numerical input in a text field, use the `TextControl` component.

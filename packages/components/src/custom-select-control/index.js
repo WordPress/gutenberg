@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
@@ -7,13 +8,21 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Icon, check, chevronDown } from '@wordpress/icons';
+import { Icon, check } from '@wordpress/icons';
+import { __, sprintf } from '@wordpress/i18n';
+import { useCallback, useState } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
+
 /**
  * Internal dependencies
  */
-import { Button, VisuallyHidden } from '../';
+import { VisuallyHidden } from '../visually-hidden';
+import { Select as SelectControlSelect } from '../select-control/styles/select-control-styles';
+import SelectControlChevronDown from '../select-control/chevron-down';
+import { InputBaseWithBackCompatMinWidth } from './styles';
+import { StyledLabel } from '../base-control/styles/base-control-styles';
 
-const itemToString = ( item ) => item && item.name;
+const itemToString = ( item ) => item?.name;
 // This is needed so that in Windows, where
 // the menu does not necessarily open on
 // key up/down, you can still switch between
@@ -52,14 +61,26 @@ const stateReducer = (
 			return changes;
 	}
 };
-export default function CustomSelectControl( {
-	className,
-	hideLabelFromVision,
-	label,
-	options: items,
-	onChange: onSelectedItemChange,
-	value: _selectedItem,
-} ) {
+
+export default function CustomSelectControl( props ) {
+	const {
+		/** Start opting into the larger default height that will become the default size in a future version. */
+		__next36pxDefaultSize = false,
+		/** Start opting into the unconstrained width that will become the default in a future version. */
+		__nextUnconstrainedWidth = false,
+		className,
+		hideLabelFromVision,
+		label,
+		describedBy,
+		options: items,
+		onChange: onSelectedItemChange,
+		/** @type {import('../select-control/types').SelectControlProps.size} */
+		size = 'default',
+		value: _selectedItem,
+		onMouseOver,
+		onMouseOut,
+	} = props;
+
 	const {
 		getLabelProps,
 		getToggleButtonProps,
@@ -73,22 +94,54 @@ export default function CustomSelectControl( {
 		items,
 		itemToString,
 		onSelectedItemChange,
-		selectedItem: _selectedItem,
+		...( typeof _selectedItem !== 'undefined' && _selectedItem !== null
+			? { selectedItem: _selectedItem }
+			: undefined ),
 		stateReducer,
 	} );
+
+	const [ isFocused, setIsFocused ] = useState( false );
+
+	if ( ! __nextUnconstrainedWidth ) {
+		deprecated(
+			'Constrained width styles for wp.components.CustomSelectControl',
+			{
+				since: '6.1',
+				version: '6.4',
+				hint: 'Set the `__nextUnconstrainedWidth` prop to true to start opting into the new styles, which will become the default in a future version',
+			}
+		);
+	}
+
+	function getDescribedBy() {
+		if ( describedBy ) {
+			return describedBy;
+		}
+
+		if ( ! selectedItem ) {
+			return __( 'No selection' );
+		}
+
+		// translators: %s: The selected option.
+		return sprintf( __( 'Currently selected: %s' ), selectedItem.name );
+	}
 
 	const menuProps = getMenuProps( {
 		className: 'components-custom-select-control__menu',
 		'aria-hidden': ! isOpen,
 	} );
-	// We need this here, because the null active descendant is not
-	// fully ARIA compliant.
+
+	const onKeyDownHandler = useCallback(
+		( e ) => {
+			e.stopPropagation();
+			menuProps?.onKeyDown?.( e );
+		},
+		[ menuProps ]
+	);
+
+	// We need this here, because the null active descendant is not fully ARIA compliant.
 	if (
-		menuProps[ 'aria-activedescendant' ] &&
-		menuProps[ 'aria-activedescendant' ].slice(
-			0,
-			'downshift-null'.length
-		) === 'downshift-null'
+		menuProps[ 'aria-activedescendant' ]?.startsWith( 'downshift-null' )
 	) {
 		delete menuProps[ 'aria-activedescendant' ];
 	}
@@ -105,30 +158,46 @@ export default function CustomSelectControl( {
 				</VisuallyHidden>
 			) : (
 				/* eslint-disable-next-line jsx-a11y/label-has-associated-control, jsx-a11y/label-has-for */
-				<label
+				<StyledLabel
 					{ ...getLabelProps( {
 						className: 'components-custom-select-control__label',
 					} ) }
 				>
 					{ label }
-				</label>
+				</StyledLabel>
 			) }
-			<Button
-				{ ...getToggleButtonProps( {
-					// This is needed because some speech recognition software don't support `aria-labelledby`.
-					'aria-label': label,
-					'aria-labelledby': undefined,
-					className: 'components-custom-select-control__button',
-					isSmall: true,
-				} ) }
+			<InputBaseWithBackCompatMinWidth
+				__next36pxDefaultSize={ __next36pxDefaultSize }
+				__nextUnconstrainedWidth={ __nextUnconstrainedWidth }
+				isFocused={ isOpen || isFocused }
+				__unstableInputWidth={
+					__nextUnconstrainedWidth ? undefined : 'auto'
+				}
+				labelPosition={ __nextUnconstrainedWidth ? undefined : 'top' }
+				size={ size }
+				suffix={ <SelectControlChevronDown /> }
 			>
-				{ itemToString( selectedItem ) }
-				<Icon
-					icon={ chevronDown }
-					className="components-custom-select-control__button-icon"
-				/>
-			</Button>
-			<ul { ...menuProps }>
+				<SelectControlSelect
+					onMouseOver={ onMouseOver }
+					onMouseOut={ onMouseOut }
+					as="button"
+					onFocus={ () => setIsFocused( true ) }
+					onBlur={ () => setIsFocused( false ) }
+					selectSize={ size }
+					__next36pxDefaultSize={ __next36pxDefaultSize }
+					{ ...getToggleButtonProps( {
+						// This is needed because some speech recognition software don't support `aria-labelledby`.
+						'aria-label': label,
+						'aria-labelledby': undefined,
+						className: 'components-custom-select-control__button',
+						describedBy: getDescribedBy(),
+					} ) }
+				>
+					{ itemToString( selectedItem ) }
+				</SelectControlSelect>
+			</InputBaseWithBackCompatMinWidth>
+			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
+			<ul { ...menuProps } onKeyDown={ onKeyDownHandler }>
 				{ isOpen &&
 					items.map( ( item, index ) => (
 						// eslint-disable-next-line react/jsx-key
@@ -143,18 +212,26 @@ export default function CustomSelectControl( {
 									{
 										'is-highlighted':
 											index === highlightedIndex,
+										'has-hint': !! item.__experimentalHint,
+										'is-next-36px-default-size':
+											__next36pxDefaultSize,
 									}
 								),
 								style: item.style,
 							} ) }
 						>
+							{ item.name }
+							{ item.__experimentalHint && (
+								<span className="components-custom-select-control__item-hint">
+									{ item.__experimentalHint }
+								</span>
+							) }
 							{ item === selectedItem && (
 								<Icon
 									icon={ check }
 									className="components-custom-select-control__item-icon"
 								/>
 							) }
-							{ item.name }
 						</li>
 					) ) }
 			</ul>

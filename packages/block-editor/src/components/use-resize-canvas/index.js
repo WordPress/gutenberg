@@ -4,11 +4,6 @@
 import { useEffect, useState } from '@wordpress/element';
 
 /**
- * Internal dependencies
- */
-import { default as useSimulatedMediaQuery } from '../../components/use-simulated-media-query';
-
-/**
  * Function to resize the editor window.
  *
  * @param {string} deviceType Used for determining the size of the container (e.g. Desktop, Tablet, Mobile)
@@ -51,25 +46,22 @@ export default function useResizeCanvas( deviceType ) {
 	const marginValue = () => ( window.innerHeight < 800 ? 36 : 72 );
 
 	const contentInlineStyles = ( device ) => {
+		const height = device === 'Mobile' ? '768px' : '1024px';
 		switch ( device ) {
 			case 'Tablet':
 			case 'Mobile':
 				return {
 					width: getCanvasWidth( device ),
 					margin: marginValue() + 'px auto',
-					flexGrow: 0,
-					maxHeight: device === 'Mobile' ? '768px' : '1024px',
+					height,
+					borderRadius: '2px 2px 2px 2px',
+					border: '1px solid #ddd',
 					overflowY: 'auto',
 				};
 			default:
 				return null;
 		}
 	};
-
-	useSimulatedMediaQuery(
-		'resizable-editor-section',
-		getCanvasWidth( deviceType )
-	);
 
 	return contentInlineStyles( deviceType );
 }

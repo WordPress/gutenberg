@@ -1,0 +1,126 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Block Mover Picker should match snapshot 1`] = `
+Array [
+  <View>
+    <View
+      accessibilityHint="Double tap to move the block to the left"
+      accessibilityLabel="Move block left from position 2 to position 1"
+      accessibilityRole="button"
+      accessibilityState={
+        Object {
+          "disabled": false,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      nativeID="animatedComponent"
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "alignItems": "center",
+          "flex": 1,
+          "justifyContent": "center",
+          "opacity": 1,
+          "padding": 3,
+        }
+      }
+    >
+      <View
+        collapsable={false}
+        handlerTag={3}
+        handlerType="LongPressGestureHandler"
+        onGestureHandlerEvent={[Function]}
+        onGestureHandlerStateChange={[Function]}
+        style={
+          Object {
+            "alignItems": "center",
+            "aspectRatio": 1,
+            "flex": 1,
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "opacity": 1,
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "flexDirection": "row",
+            }
+          }
+        >
+          Svg
+        </View>
+      </View>
+    </View>
+  </View>,
+  <View>
+    <View
+      accessibilityHint="Double tap to move the block to the right"
+      accessibilityLabel="Move block right"
+      accessibilityRole="button"
+      accessibilityState={
+        Object {
+          "disabled": true,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      nativeID="animatedComponent"
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "alignItems": "center",
+          "flex": 1,
+          "justifyContent": "center",
+          "opacity": 1,
+          "padding": 3,
+        }
+      }
+    >
+      <View
+        collapsable={false}
+        handlerTag={4}
+        handlerType="LongPressGestureHandler"
+        onGestureHandlerEvent={[Function]}
+        onGestureHandlerStateChange={[Function]}
+        style={
+          Object {
+            "alignItems": "center",
+            "aspectRatio": 1,
+            "flex": 1,
+            "flexDirection": "row",
+            "justifyContent": "center",
+            "opacity": 0.3,
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "flexDirection": "row",
+            }
+          }
+        >
+          Svg
+        </View>
+      </View>
+    </View>
+  </View>,
+]
+`;

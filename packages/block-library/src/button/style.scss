@@ -1,27 +1,14 @@
-$blocks-button__height: 56px;
+// This variable is repeated across Button, Buttons, and Buttons editor styles.
+$blocks-block__margin: 0.5em;
 
 // Prefer the link selector instead of the regular button classname
 // to support the previous markup in addition to the new one.
 .wp-block-button__link {
-	color: $white;
-	background-color: $dark-gray-700;
-	border: none;
-	border-radius: $blocks-button__height / 2;
-	box-shadow: none;
 	cursor: pointer;
 	display: inline-block;
-	font-size: $big-font-size;
-	padding: 12px 24px;
 	text-align: center;
-	text-decoration: none;
-	overflow-wrap: break-word;
-
-	&:hover,
-	&:focus,
-	&:active,
-	&:visited {
-		color: $white;
-	}
+	word-break: break-word; // overflow-wrap doesn't work well if a link is wrapped in the div, so use word-break here.
+	box-sizing: border-box;
 
 	&.aligncenter {
 		text-align: center;
@@ -33,6 +20,72 @@ $blocks-button__height: 56px;
 	}
 }
 
+// These rules are set to zero specificity to keep the default styles for buttons.
+// They are needed for backwards compatibility.
+:where(.wp-block-button__link) {
+	// This needs a low specificity so it won't override the rules from the button element if defined in theme.json.
+	box-shadow: none;
+	text-decoration: none;
+
+	// 100% causes an oval, but any explicit but really high value retains the pill shape.
+	border-radius: 9999px;
+
+	// The extra 2px are added to size solids the same as the outline versions.
+	padding: calc(0.667em + 2px) calc(1.333em + 2px);
+}
+
+.wp-block-button[style*="text-decoration"] .wp-block-button__link {
+	text-decoration: inherit;
+}
+
+// Increased specificity needed to override margins.
+.wp-block-buttons > .wp-block-button {
+	&.has-custom-width {
+		max-width: none;
+		.wp-block-button__link {
+			width: 100%;
+		}
+	}
+
+	&.has-custom-font-size {
+		.wp-block-button__link {
+			font-size: inherit;
+		}
+	}
+
+	&.wp-block-button__width-25 {
+		width: calc(25% - (var(--wp--style--block-gap, #{$blocks-block__margin}) * 0.75));
+	}
+
+	&.wp-block-button__width-50 {
+		width: calc(50% - (var(--wp--style--block-gap, #{$blocks-block__margin}) * 0.5));
+	}
+
+	&.wp-block-button__width-75 {
+		width: calc(75% - (var(--wp--style--block-gap, #{$blocks-block__margin}) * 0.25));
+	}
+
+	&.wp-block-button__width-100 {
+		width: 100%;
+		flex-basis: 100%;
+	}
+}
+
+// For vertical buttons, gap is not factored into width calculations.
+.wp-block-buttons.is-vertical > .wp-block-button {
+	&.wp-block-button__width-25 {
+		width: 25%;
+	}
+
+	&.wp-block-button__width-50 {
+		width: 50%;
+	}
+
+	&.wp-block-button__width-75 {
+		width: 75%;
+	}
+}
+
 // the first selector is required for old buttons markup
 .wp-block-button.is-style-squared,
 .wp-block-button__link.wp-block-button.is-style-squared {
@@ -41,15 +94,23 @@ $blocks-button__height: 56px;
 
 
 // the first selector is required for old buttons markup
-
 .wp-block-button.no-border-radius,
 .wp-block-button__link.no-border-radius {
 	border-radius: 0 !important;
 }
 
-.wp-block-button.is-style-outline .wp-block-button__link,
-.wp-block-button__link.is-style-outline {
-	color: $dark-gray-700;
+.wp-block-button.is-style-outline > .wp-block-button__link,
+.wp-block-button .wp-block-button__link.is-style-outline {
+	border: 2px solid currentColor;
+	padding: 0.667em 1.333em;
+}
+
+.wp-block-button.is-style-outline > .wp-block-button__link:not(.has-text-color),
+.wp-block-button .wp-block-button__link.is-style-outline:not(.has-text-color) {
+	color: currentColor;
+}
+
+.wp-block-button.is-style-outline > .wp-block-button__link:not(.has-background),
+.wp-block-button .wp-block-button__link.is-style-outline:not(.has-background) {
 	background-color: transparent;
-	border: 2px solid;
 }

@@ -1,116 +1,95 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
-import {
-	useInstanceId,
-	__experimentalUseDragging as useDragging,
-} from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import BaseControl from '../base-control';
-
-function getAngle( centerX, centerY, pointX, pointY ) {
-	const y = pointY - centerY;
-	const x = pointX - centerX;
-
-	const angleInRadians = Math.atan2( y, x );
-	const angleInDeg = Math.round( angleInRadians * ( 180 / Math.PI ) ) + 90;
-	if ( angleInDeg < 0 ) {
-		return 360 + angleInDeg;
-	}
-	return angleInDeg;
-}
-
-const AngleCircle = ( { value, onChange, ...props } ) => {
-	const angleCircleRef = useRef();
-	const angleCircleCenter = useRef();
-
-	const setAngleCircleCenter = () => {
-		const rect = angleCircleRef.current.getBoundingClientRect();
-		angleCircleCenter.current = {
-			x: rect.x + rect.width / 2,
-			y: rect.y + rect.height / 2,
-		};
-	};
-
-	const changeAngleToPosition = ( event ) => {
-		const { x: centerX, y: centerY } = angleCircleCenter.current;
-		// Prevent (drag) mouse events from selecting and accidentally
-		// triggering actions from other elements.
-		event.preventDefault();
-
-		onChange( getAngle( centerX, centerY, event.clientX, event.clientY ) );
-	};
-
-	const { startDrag, isDragging } = useDragging( {
-		onDragStart: ( event ) => {
-			setAngleCircleCenter();
-			changeAngleToPosition( event );
-		},
-		onDragMove: changeAngleToPosition,
-		onDragEnd: changeAngleToPosition,
-	} );
-	return (
-		/* eslint-disable jsx-a11y/no-static-element-interactions */
-		<div
-			ref={ angleCircleRef }
-			onMouseDown={ startDrag }
-			className="components-angle-picker-control__angle-circle"
-			style={ isDragging ? { cursor: 'grabbing' } : undefined }
-			{ ...props }
-		>
-			<div
-				style={
-					value ? { transform: `rotate(${ value }deg)` } : undefined
-				}
-				className="components-angle-picker-control__angle-circle-indicator-wrapper"
-			>
-				<span className="components-angle-picker-control__angle-circle-indicator" />
-			</div>
-		</div>
-		/* eslint-enable jsx-a11y/no-static-element-interactions */
-	);
-};
+import { FlexBlock, FlexItem } from '../flex';
+import NumberControl from '../number-control';
+import AngleCircle from './angle-circle';
+import { Root } from './styles/angle-picker-control-styles';
+import { space } from '../ui/utils/space';
+import { Text } from '../text';
+import { Spacer } from '../spacer';
 
 export default function AnglePickerControl( {
-	value,
-	onChange,
+	/** Start opting into the new margin-free styles that will become the default in a future version. */
+	__nextHasNoMarginBottom = false,
+	className,
 	label = __( 'Angle' ),
+	onChange,
+	value,
 } ) {
-	const instanceId = useInstanceId( AnglePickerControl );
-	const inputId = `components-angle-picker-control__input-${ instanceId }`;
+	if ( ! __nextHasNoMarginBottom ) {
+		deprecated(
+			'Bottom margin styles for wp.components.AnglePickerControl',
+			{
+				since: '6.1',
+				version: '6.4',
+				hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version.',
+			}
+		);
+	}
+
+	const handleOnNumberChange = ( unprocessedValue ) => {
+		const inputValue =
+			unprocessedValue !== '' ? parseInt( unprocessedValue, 10 ) : 0;
+		onChange( inputValue );
+	};
+
+	const classes = classnames( 'components-angle-picker-control', className );
+
 	return (
-		<BaseControl
-			label={ label }
-			id={ inputId }
-			className="components-angle-picker-control"
+		<Root
+			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+			className={ classes }
+			gap={ 4 }
 		>
-			<AngleCircle
-				value={ value }
-				onChange={ onChange }
-				aria-hidden="true"
-			/>
-			<input
-				className="components-angle-picker-control__input-field"
-				type="number"
-				id={ inputId }
-				onChange={ ( event ) => {
-					const unprocessedValue = event.target.value;
-					const inputValue =
-						unprocessedValue !== ''
-							? parseInt( event.target.value, 10 )
-							: 0;
-					onChange( inputValue );
+			<FlexBlock>
+				<NumberControl
+					label={ label }
+					className="components-angle-picker-control__input-field"
+					max={ 360 }
+					min={ 0 }
+					onChange={ handleOnNumberChange }
+					size="__unstable-large"
+					step="1"
+					value={ value }
+					hideHTMLArrows
+					suffix={
+						<Spacer
+							as={ Text }
+							marginBottom={ 0 }
+							marginRight={ space( 3 ) }
+							style={ {
+								color: 'var( --wp-admin-theme-color )',
+							} }
+						>
+							°
+						</Spacer>
+					}
+				/>
+			</FlexBlock>
+			<FlexItem
+				style={ {
+					marginBottom: space( 1 ),
+					marginTop: 'auto',
 				} }
-				value={ value }
-				min={ 0 }
-				max={ 360 }
-				step="1"
-			/>
-		</BaseControl>
+			>
+				<AngleCircle
+					aria-hidden="true"
+					value={ value }
+					onChange={ onChange }
+				/>
+			</FlexItem>
+		</Root>
 	);
 }

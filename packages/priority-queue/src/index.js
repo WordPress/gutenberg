@@ -38,9 +38,10 @@ import requestIdleCallback from './request-idle-callback';
  *
  * @typedef {Object} WPPriorityQueue
  *
- * @property {WPPriorityQueueAdd}   add   Add callback to queue for context.
- * @property {WPPriorityQueueFlush} flush Flush queue for context.
- * @property {WPPriorityQueueReset} reset Reset queue.
+ * @property {WPPriorityQueueAdd}   add    Add callback to queue for context.
+ * @property {WPPriorityQueueFlush} flush  Flush queue for context.
+ * @property {WPPriorityQueueFlush} cancel Clear queue for context.
+ * @property {WPPriorityQueueReset} reset  Reset queue.
  */
 
 /**
@@ -74,14 +75,12 @@ export const createQueue = () => {
 
 	let isRunning = false;
 
-	/* eslint-disable jsdoc/valid-types */
 	/**
 	 * Callback to process as much queue as time permits.
 	 *
 	 * @param {IdleDeadline|number} deadline Idle callback deadline object, or
 	 *                                       animation frame timestamp.
 	 */
-	/* eslint-enable */
 	const runWaitingList = ( deadline ) => {
 		const hasTimeRemaining =
 			typeof deadline === 'number'
@@ -94,10 +93,15 @@ export const createQueue = () => {
 				return;
 			}
 
-			const nextElement = /** @type {WPPriorityQueueContext} */ ( waitingList.shift() );
-			const callback = /** @type {WPPriorityQueueCallback} */ ( elementsMap.get(
-				nextElement
-			) );
+			const nextElement = /** @type {WPPriorityQueueContext} */ (
+				waitingList.shift()
+			);
+			const callback = /** @type {WPPriorityQueueCallback} */ (
+				elementsMap.get( nextElement )
+			);
+			// If errors with undefined callbacks are encountered double check that all of your useSelect calls
+			// have all dependecies set correctly in second parameter. Missing dependencies can cause unexpected
+			// loops and race conditions in the queue.
 			callback();
 			elementsMap.delete( nextElement );
 		} while ( hasTimeRemaining() );
@@ -141,11 +145,34 @@ export const createQueue = () => {
 
 		const index = waitingList.indexOf( element );
 		waitingList.splice( index, 1 );
-		const callback = /** @type {WPPriorityQueueCallback} */ ( elementsMap.get(
-			element
-		) );
+		const callback = /** @type {WPPriorityQueueCallback} */ (
+			elementsMap.get( element )
+		);
 		elementsMap.delete( element );
 		callback();
+
+		return true;
+	};
+
+	/**
+	 * Clears the queue for a given context, cancelling the callbacks without
+	 * executing them. Returns `true` if there were scheduled callbacks to cancel,
+	 * or `false` if there was is no queue for the given context.
+	 *
+	 * @type {WPPriorityQueueFlush}
+	 *
+	 * @param {WPPriorityQueueContext} element Context object.
+	 *
+	 * @return {boolean} Whether any callbacks got cancelled.
+	 */
+	const cancel = ( element ) => {
+		if ( ! elementsMap.has( element ) ) {
+			return false;
+		}
+
+		const index = waitingList.indexOf( element );
+		waitingList.splice( index, 1 );
+		elementsMap.delete( element );
 
 		return true;
 	};
@@ -164,6 +191,7 @@ export const createQueue = () => {
 	return {
 		add,
 		flush,
+		cancel,
 		reset,
 	};
 };

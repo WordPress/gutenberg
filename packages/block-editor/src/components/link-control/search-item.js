@@ -9,7 +9,44 @@ import classnames from 'classnames';
 import { safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
 import { Button, TextHighlight } from '@wordpress/components';
-import { Icon, globe } from '@wordpress/icons';
+import {
+	Icon,
+	globe,
+	page,
+	tag,
+	postList,
+	category,
+	file,
+} from '@wordpress/icons';
+
+const ICONS_MAP = {
+	post: postList,
+	page,
+	post_tag: tag,
+	category,
+	attachment: file,
+};
+
+function SearchItemIcon( { isURL, suggestion } ) {
+	let icon = null;
+
+	if ( isURL ) {
+		icon = globe;
+	} else if ( suggestion.type in ICONS_MAP ) {
+		icon = ICONS_MAP[ suggestion.type ];
+	}
+
+	if ( icon ) {
+		return (
+			<Icon
+				className="block-editor-link-control__search-item-icon"
+				icon={ icon }
+			/>
+		);
+	}
+
+	return null;
+}
 
 export const LinkControlSearchItem = ( {
 	itemProps,
@@ -18,6 +55,7 @@ export const LinkControlSearchItem = ( {
 	onClick,
 	isURL = false,
 	searchTerm = '',
+	shouldShowType = false,
 } ) => {
 	return (
 		<Button
@@ -29,12 +67,8 @@ export const LinkControlSearchItem = ( {
 				'is-entity': ! isURL,
 			} ) }
 		>
-			{ isURL && (
-				<Icon
-					className="block-editor-link-control__search-item-icon"
-					icon={ globe }
-				/>
-			) }
+			<SearchItemIcon suggestion={ suggestion } isURL={ isURL } />
+
 			<span className="block-editor-link-control__search-item-header">
 				<span className="block-editor-link-control__search-item-title">
 					<TextHighlight
@@ -54,13 +88,22 @@ export const LinkControlSearchItem = ( {
 					{ isURL && __( 'Press ENTER to add this link' ) }
 				</span>
 			</span>
-			{ suggestion.type && (
+			{ shouldShowType && suggestion.type && (
 				<span className="block-editor-link-control__search-item-type">
-					{ suggestion.type }
+					{ getVisualTypeName( suggestion ) }
 				</span>
 			) }
 		</Button>
 	);
 };
+
+function getVisualTypeName( suggestion ) {
+	if ( suggestion.isFrontPage ) {
+		return 'front page';
+	}
+
+	// Rename 'post_tag' to 'tag'. Ideally, the API would return the localised CPT or taxonomy label.
+	return suggestion.type === 'post_tag' ? 'tag' : suggestion.type;
+}
 
 export default LinkControlSearchItem;

@@ -8,6 +8,7 @@ import {
 	TextInput,
 	I18nManager,
 	AccessibilityInfo,
+	Platform,
 } from 'react-native';
 import { isEmpty, get } from 'lodash';
 
@@ -25,8 +26,9 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  */
 import styles from './styles.scss';
 import platformStyles from './cellStyles.scss';
-import TouchableRipple from './ripple.native.js';
+import TouchableRipple from './ripple';
 
+const isIOS = Platform.OS === 'ios';
 class BottomSheetCell extends Component {
 	constructor( props ) {
 		super( ...arguments );
@@ -35,35 +37,37 @@ class BottomSheetCell extends Component {
 			isScreenReaderEnabled: false,
 		};
 
-		this.handleScreenReaderToggled = this.handleScreenReaderToggled.bind(
-			this
-		);
+		this.handleScreenReaderToggled =
+			this.handleScreenReaderToggled.bind( this );
+
+		this.isCurrent = false;
 	}
 
-	componentDidUpdate() {
-		if ( this.state.isEditingValue ) {
+	componentDidUpdate( prevProps, prevState ) {
+		if ( ! prevState.isEditingValue && this.state.isEditingValue ) {
 			this._valueTextInput.focus();
 		}
 	}
 
 	componentDidMount() {
-		AccessibilityInfo.addEventListener(
+		this.isCurrent = true;
+		this.a11yInfoChangeSubscription = AccessibilityInfo.addEventListener(
 			'screenReaderChanged',
 			this.handleScreenReaderToggled
 		);
 
 		AccessibilityInfo.isScreenReaderEnabled().then(
 			( isScreenReaderEnabled ) => {
-				this.setState( { isScreenReaderEnabled } );
+				if ( this.isCurrent ) {
+					this.setState( { isScreenReaderEnabled } );
+				}
 			}
 		);
 	}
 
 	componentWillUnmount() {
-		AccessibilityInfo.removeEventListener(
-			'screenReaderChanged',
-			this.handleScreenReaderToggled
-		);
+		this.isCurrent = false;
+		this.a11yInfoChangeSubscription.remove();
 	}
 
 	handleScreenReaderToggled( isScreenReaderEnabled ) {
@@ -91,11 +95,14 @@ class BottomSheetCell extends Component {
 			disabled = false,
 			activeOpacity,
 			onPress,
+			onLongPress,
 			label,
+			subLabel,
 			value,
 			valuePlaceholder = '',
 			icon,
 			leftAlign,
+			iconStyle = {},
 			labelStyle = {},
 			valueStyle = {},
 			cellContainerStyle = {},
@@ -112,6 +119,7 @@ class BottomSheetCell extends Component {
 			type,
 			step,
 			borderless,
+			help,
 			...valueProps
 		} = this.props;
 
@@ -137,6 +145,11 @@ class BottomSheetCell extends Component {
 				? cellLabelStyle
 				: defaultMissingIconAndValue;
 
+		const defaultSubLabelStyleText = getStylesFromColorScheme(
+			styles.cellSubLabelText,
+			styles.cellSubLabelTextDark
+		);
+
 		const drawSeparator =
 			( separatorType && separatorType !== 'none' ) ||
 			separatorStyle === undefined;
@@ -151,6 +164,11 @@ class BottomSheetCell extends Component {
 			styles.cellRowContainer,
 			cellRowContainerStyle,
 		];
+
+		const isInteractive =
+			isValueEditable ||
+			onPress !== undefined ||
+			onLongPress !== undefined;
 
 		const onCellPress = () => {
 			if ( isValueEditable ) {
@@ -171,7 +189,7 @@ class BottomSheetCell extends Component {
 		};
 
 		const separatorStyle = () => {
-			//eslint-disable-next-line @wordpress/no-unused-vars-before-return
+			// eslint-disable-next-line @wordpress/no-unused-vars-before-return
 			const defaultSeparatorStyle = this.props.getStylesFromColorScheme(
 				styles.separator,
 				styles.separatorDark
@@ -248,25 +266,45 @@ class BottomSheetCell extends Component {
 		};
 
 		const getAccessibilityLabel = () => {
+			if ( accessible === false ) {
+				return;
+			}
 			if ( accessibilityLabel || ! showValue ) {
 				return accessibilityLabel || label;
 			}
-			return isEmpty( value )
+
+			if ( isEmpty( value ) ) {
+				return isEmpty( help )
+					? sprintf(
+							/* translators: accessibility text. Empty state of a inline textinput cell. %s: The cell's title */
+							_x( '%s. Empty', 'inline textinput cell' ),
+							label
+					  )
+					: // Separating by ',' is necessary to make a pause on urls (non-capitalized text)
+					  sprintf(
+							/* translators: accessibility text. Empty state of a inline textinput cell. %1: Cell title, %2: cell help. */
+							_x( '%1$s, %2$s. Empty', 'inline textinput cell' ),
+							label,
+							help
+					  );
+			}
+			return isEmpty( help )
 				? sprintf(
-						/* translators: accessibility text. Empty state of a inline textinput cell. %s: The cell's title */
-						_x( '%s. Empty', 'inline textinput cell' ),
-						label
-				  )
-				: // Separating by ',' is necessary to make a pause on urls (non-capitalized text)
-				  sprintf(
 						/* translators: accessibility text. Inline textinput title and value.%1: Cell title, %2: cell value. */
 						_x( '%1$s, %2$s', 'inline textinput cell' ),
 						label,
 						value
+				  ) // Separating by ',' is necessary to make a pause on urls (non-capitalized text)
+				: sprintf(
+						/* translators: accessibility text. Inline textinput title, value and help text.%1: Cell title, %2: cell value, , %3: cell help. */
+						_x( '%1$s, %2$s, %3$s', 'inline textinput cell' ),
+						label,
+						value,
+						help
 				  );
 		};
 
-		const iconStyle = getStylesFromColorScheme(
+		const iconStyleBase = getStylesFromColorScheme(
 			styles.icon,
 			styles.iconDark
 		);
@@ -274,6 +312,10 @@ class BottomSheetCell extends Component {
 			styles.resetButton,
 			styles.resetButtonDark
 		);
+		const cellHelpStyle = [
+			styles.cellHelpLabel,
+			isIOS && styles.cellHelpLabelIOS,
+		];
 		const containerPointerEvents =
 			this.state.isScreenReaderEnabled && accessible ? 'none' : 'auto';
 		const { title, handler } = customActionButton || {};
@@ -298,9 +340,10 @@ class BottomSheetCell extends Component {
 						  __( 'Double tap to edit this value' )
 						: accessibilityHint
 				}
-				disabled={ disabled }
+				disabled={ disabled || ! isInteractive }
 				activeOpacity={ opacity }
 				onPress={ onCellPress }
+				onLongPress={ onLongPress }
 				style={ [ styles.clipToBounds, style ] }
 				borderless={ borderless }
 			>
@@ -312,11 +355,20 @@ class BottomSheetCell extends Component {
 					<View style={ rowContainerStyles }>
 						<View style={ styles.cellRowContainer }>
 							{ icon && (
-								<View style={ styles.cellRowContainer }>
+								<View
+									style={ [
+										styles.cellRowContainer,
+										styles.cellRowIcon,
+									] }
+								>
 									<Icon
 										icon={ icon }
 										size={ 24 }
-										color={ iconStyle.color }
+										fill={
+											iconStyle.color ||
+											iconStyleBase.color
+										}
+										style={ iconStyle }
 										isPressed={ false }
 									/>
 									<View
@@ -326,9 +378,28 @@ class BottomSheetCell extends Component {
 									/>
 								</View>
 							) }
-							<Text style={ [ defaultLabelStyle, labelStyle ] }>
-								{ label }
-							</Text>
+							{ subLabel && label && (
+								<View>
+									<Text
+										style={ [
+											defaultLabelStyle,
+											labelStyle,
+										] }
+									>
+										{ label }
+									</Text>
+									<Text style={ defaultSubLabelStyleText }>
+										{ subLabel }
+									</Text>
+								</View>
+							) }
+							{ ! subLabel && label && (
+								<Text
+									style={ [ defaultLabelStyle, labelStyle ] }
+								>
+									{ label }
+								</Text>
+							) }
 						</View>
 						{ customActionButton && (
 							<TouchableOpacity
@@ -350,6 +421,11 @@ class BottomSheetCell extends Component {
 					{ showValue && getValueComponent() }
 					{ children }
 				</View>
+				{ help && (
+					<Text style={ [ cellHelpStyle, styles.placeholderColor ] }>
+						{ help }
+					</Text>
+				) }
 				{ ! drawTopSeparator && <View style={ separatorStyle() } /> }
 			</TouchableRipple>
 		);

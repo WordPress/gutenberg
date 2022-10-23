@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { castArray, defaults, pick } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -169,14 +164,10 @@ const getGalleryDetailsMediaFrame = () => {
 					multiple: 'add',
 					editable: false,
 
-					library: wp.media.query(
-						defaults(
-							{
-								type: 'image',
-							},
-							this.options.library
-						)
-					),
+					library: wp.media.query( {
+						type: 'image',
+						...this.options.library,
+					} ),
 				} ),
 				new wp.media.controller.EditImage( {
 					model: this.options.editImage,
@@ -196,8 +187,8 @@ const getGalleryDetailsMediaFrame = () => {
 	} );
 };
 
-// the media library image object contains numerous attributes
-// we only need this set to display the image in the library
+// The media library image object contains numerous attributes
+// we only need this set to display the image in the library.
 const slimImageObject = ( img ) => {
 	const attrSet = [
 		'sizes',
@@ -210,7 +201,12 @@ const slimImageObject = ( img ) => {
 		'link',
 		'caption',
 	];
-	return pick( img, attrSet );
+	return attrSet.reduce( ( result, key ) => {
+		if ( img?.hasOwnProperty( key ) ) {
+			result[ key ] = img[ key ];
+		}
+		return result;
+	}, {} );
 };
 
 const getAttachmentsCollection = ( ids ) => {
@@ -369,25 +365,47 @@ class MediaUpload extends Component {
 
 	onSelect() {
 		const { onSelect, multiple = false } = this.props;
-		// Get media attachment details from the frame state
+		// Get media attachment details from the frame state.
 		const attachment = this.frame.state().get( 'selection' ).toJSON();
 		onSelect( multiple ? attachment : attachment[ 0 ] );
 	}
 
 	onOpen() {
+		const { value } = this.props;
 		this.updateCollection();
-		if ( ! this.props.value ) {
+
+		//Handle active tab in media model on model open.
+		if ( this.props.mode ) {
+			this.frame.content.mode( this.props.mode );
+		}
+
+		// Handle both this.props.value being either (number[]) multiple ids
+		// (for galleries) or a (number) singular id (e.g. image block).
+		const hasMedia = Array.isArray( value ) ? !! value?.length : !! value;
+
+		if ( ! hasMedia ) {
 			return;
 		}
-		if ( ! this.props.gallery ) {
-			const selection = this.frame.state().get( 'selection' );
-			castArray( this.props.value ).forEach( ( id ) => {
+
+		const isGallery = this.props.gallery;
+		const selection = this.frame.state().get( 'selection' );
+		const valueArray = Array.isArray( value ) ? value : [ value ];
+
+		if ( ! isGallery ) {
+			valueArray.forEach( ( id ) => {
 				selection.add( wp.media.attachment( id ) );
 			} );
 		}
 
-		// load the images so they are available in the media modal.
-		getAttachmentsCollection( castArray( this.props.value ) ).more();
+		// Load the images so they are available in the media modal.
+		const attachments = getAttachmentsCollection( valueArray );
+
+		// Once attachments are loaded, set the current selection.
+		attachments.more().done( function () {
+			if ( isGallery && attachments?.models?.length ) {
+				selection.add( attachments.models );
+			}
+		} );
 	}
 
 	onClose() {
@@ -403,15 +421,15 @@ class MediaUpload extends Component {
 		if ( frameContent && frameContent.collection ) {
 			const collection = frameContent.collection;
 
-			// clean all attachments we have in memory.
+			// Clean all attachments we have in memory.
 			collection
 				.toArray()
 				.forEach( ( model ) => model.trigger( 'destroy', model ) );
 
-			// reset has more flag, if library had small amount of items all items may have been loaded before.
+			// Reset has more flag, if library had small amount of items all items may have been loaded before.
 			collection.mirroring._hasMore = true;
 
-			// request items
+			// Request items.
 			collection.more();
 		}
 	}

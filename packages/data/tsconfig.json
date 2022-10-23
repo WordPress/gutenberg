@@ -1,0 +1,18 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"declarationDir": "build-types",
+		"noUnusedParameters": false,
+		"checkJs": false
+	},
+	"references": [
+		{ "path": "../compose" },
+		{ "path": "../deprecated" },
+		{ "path": "../element" },
+		{ "path": "../is-shallow-equal" },
+		{ "path": "../priority-queue" },
+		{ "path": "../redux-routine" }
+	],
+	"include": [ "src/**/*" ]
+}

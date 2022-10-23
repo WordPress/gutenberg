@@ -1,20 +1,11 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-/**
  * WordPress dependencies
  */
-import { useDispatch } from '@wordpress/data';
-import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
+import { useState, useRef, useEffect } from '@wordpress/element';
 
-const {
-	clearTimeout,
-	requestAnimationFrame,
-	cancelAnimationFrame,
-	setTimeout,
-} = window;
-const DEBOUNCE_TIMEOUT = 250;
+const { clearTimeout, setTimeout } = window;
+const noop = () => {};
+const DEBOUNCE_TIMEOUT = 200;
 
 /**
  * Hook that creates a showMover state, as well as debounced show/hide callbacks.
@@ -35,7 +26,10 @@ export function useDebouncedShowMovers( {
 	const timeoutRef = useRef();
 
 	const handleOnChange = ( nextIsFocused ) => {
-		setShowMovers( nextIsFocused );
+		if ( ref?.current ) {
+			setShowMovers( nextIsFocused );
+		}
+
 		onChange( nextIsFocused );
 	};
 
@@ -45,7 +39,6 @@ export function useDebouncedShowMovers( {
 
 	const shouldHideMovers = () => {
 		const isHovered = getIsHovered();
-
 		return ! isFocused && ! isHovered;
 	};
 
@@ -83,7 +76,18 @@ export function useDebouncedShowMovers( {
 		}, debounceTimeout );
 	};
 
-	useEffect( () => () => clearTimeoutRef(), [] );
+	useEffect(
+		() => () => {
+			/**
+			 * We need to call the change handler with `isFocused`
+			 * set to false on unmount because we also clear the
+			 * timeout that would handle that.
+			 */
+			handleOnChange( false );
+			clearTimeoutRef();
+		},
+		[]
+	);
 
 	return {
 		showMovers,
@@ -107,16 +111,16 @@ export function useShowMoversGestures( {
 	onChange = noop,
 } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
-	const {
-		showMovers,
-		debouncedShowMovers,
-		debouncedHideMovers,
-	} = useDebouncedShowMovers( { ref, debounceTimeout, isFocused, onChange } );
+	const { showMovers, debouncedShowMovers, debouncedHideMovers } =
+		useDebouncedShowMovers( { ref, debounceTimeout, isFocused, onChange } );
 
 	const registerRef = useRef( false );
 
 	const isFocusedWithin = () => {
-		return ref?.current && ref.current.contains( document.activeElement );
+		return (
+			ref?.current &&
+			ref.current.contains( ref.current.ownerDocument.activeElement )
+		);
 	};
 
 	useEffect( () => {
@@ -167,42 +171,4 @@ export function useShowMoversGestures( {
 			onMouseLeave: debouncedHideMovers,
 		},
 	};
-}
-
-let requestAnimationFrameId;
-
-/**
- * Hook that toggles the highlight (outline) state of a block
- *
- * @param {string} clientId The block's clientId
- *
- * @return {Function} Callback function to toggle highlight state.
- */
-export function useToggleBlockHighlight( clientId ) {
-	const { toggleBlockHighlight } = useDispatch( 'core/block-editor' );
-
-	const updateBlockHighlight = useCallback(
-		( isFocused ) => {
-			toggleBlockHighlight( clientId, isFocused );
-		},
-		[ clientId ]
-	);
-
-	useEffect( () => {
-		// On mount, we make sure to cancel any pending animation frame request
-		// that hasn't been completed yet. Components like NavigableToolbar may
-		// mount and unmount quickly.
-		if ( requestAnimationFrameId ) {
-			cancelAnimationFrame( requestAnimationFrameId );
-		}
-		return () => {
-			// Sequences state change to enable editor updates (e.g. cursor
-			// position) to render correctly.
-			requestAnimationFrameId = requestAnimationFrame( () => {
-				updateBlockHighlight( false );
-			} );
-		};
-	}, [] );
-
-	return updateBlockHighlight;
 }

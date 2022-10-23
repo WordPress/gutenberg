@@ -5,29 +5,30 @@
 	display: none;
 }
 
-// Forcing some space above the list of options in
-// the dropdown to visually balance them.
-.block-editor-media-replace-flow__options .components-popover__content {
-	padding-top: $grid-unit-20;
-}
-
 .block-editor-media-replace-flow__indicator {
 	margin-left: 4px;
 }
 
-.block-editor-media-replace-flow__media-upload-menu {
-	margin-bottom: $grid-unit-20;
-}
-
 .block-editor-media-flow__url-input {
+	border-top: $border-width solid $gray-900;
+	margin-top: $grid-unit-10;
+	margin-right: -$grid-unit-10;
+	margin-left: -$grid-unit-10;
+	padding: $grid-unit-20;
 
 	.block-editor-media-replace-flow__image-url-label {
+		display: block;
 		top: $grid-unit-20;
+		margin-bottom: $grid-unit-10;
 	}
 
 	.block-editor-link-control {
-		margin-top: -16px;
-		width: auto;
+		width: 220px; // Hardcoded width avoids resizing of control when switching between preview/edit.
+
+		.block-editor-url-input {
+			padding: 0; // Cancel unnecessary default 1px padding in this case.
+			margin: 0; // Reset default LinkControl margins.
+		}
 
 		.components-base-control .components-base-control__field {
 			margin-bottom: 0;
@@ -35,7 +36,11 @@
 
 		.block-editor-link-control__search-item-title {
 			max-width: 180px;
-			margin-top: $grid-unit-20;
+			white-space: nowrap;
+		}
+
+		.block-editor-link-control__search-item-info {
+			white-space: nowrap;
 		}
 
 		.block-editor-link-control__search-item.is-current {
@@ -44,11 +49,12 @@
 		}
 
 		.block-editor-link-control__search-input.block-editor-link-control__search-input input[type="text"] {
-			margin: 16px 0 0 0;
+			margin: 0;
 			width: 100%;
 		}
 
 		.block-editor-link-control__search-actions {
+			top: 0; // cancel default top positioning
 			right: 4px;
 		}
 	}

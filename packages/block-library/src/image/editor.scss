@@ -1,3 +1,44 @@
+// Provide special styling for the placeholder.
+// @todo: this particular minimal style of placeholder could be componentized further.
+.wp-block-image.wp-block-image {
+	// Show Placeholder style on-select.
+	&.is-selected .components-placeholder {
+		// Block UI appearance.
+		color: $gray-900;
+		background-color: $white;
+		box-shadow: inset 0 0 0 $border-width $gray-900;
+		border: none;
+
+		// Disable any duotone filter applied in the selected state.
+		filter: none;
+
+		// @todo: this should eventually be overridden by a custom border-radius set in the inspector.
+		border-radius: $radius-block-ui;
+
+		> svg {
+			opacity: 0;
+		}
+
+		.components-placeholder__illustration {
+			display: none;
+		}
+
+		&::before {
+			opacity: 0;
+		}
+	}
+
+	// Remove the transition while we still have a legacy placeholder style.
+	// Otherwise the content jumps between the 1px placeholder border, and any inherited custom
+	// parent border that may get applied when you deselect.
+	.components-placeholder__label,
+	.components-placeholder__instructions,
+	.components-button {
+		transition: none;
+	}
+}
+
+
 figure.wp-block-image:not(.wp-block) {
 	margin: 0;
 }
@@ -5,6 +46,7 @@ figure.wp-block-image:not(.wp-block) {
 .wp-block-image {
 	position: relative;
 
+	.is-applying img,
 	&.is-transient img {
 		opacity: 0.3;
 	}
@@ -13,19 +55,21 @@ figure.wp-block-image:not(.wp-block) {
 		display: inline;
 	}
 
-	// Shown while image is being uploaded
+	// Shown while image is being uploaded.
 	.components-spinner {
 		position: absolute;
 		top: 50%;
 		left: 50%;
-		margin-top: -9px;
-		margin-left: -9px;
+		transform: translate(-50%, -50%);
 	}
 }
 
 // This is necessary for the editor resize handles to accurately work on a non-floated, non-resized, small image.
 .wp-block-image .components-resizable-box__container {
-	display: inline-block;
+	// Using "display: table" because:
+	// - it visually hides empty white space in between elements
+	// - it allows the element to be as wide as its contents (instead of 100% width, as it would be with `display: block`)
+	display: table;
 	img {
 		display: block;
 		width: inherit;
@@ -47,7 +91,21 @@ figure.wp-block-image:not(.wp-block) {
 [data-align="wide"] > .wp-block-image,
 [data-align="full"] > .wp-block-image {
 	img {
+		height: auto;
 		width: 100%;
+	}
+}
+
+.wp-block[data-align="left"],
+.wp-block[data-align="center"],
+.wp-block[data-align="right"] {
+	> .wp-block-image {
+		display: table;
+
+		> figcaption {
+			display: table-caption;
+			caption-side: bottom;
+		}
 	}
 }
 
@@ -71,51 +129,22 @@ figure.wp-block-image:not(.wp-block) {
 	text-align: center;
 }
 
-// Working State.
-.richimage__working {
-	position: relative;
-
-	.richimage__working-spinner {
-		position: absolute;
-		z-index: 1;
-		left: 50%;
-		top: calc(50% - #{ $grid-unit-60 });
-		transform: translate(-50%, -50%);
-	}
-
-	img {
-		opacity: 0.6;
-		transition: all 0.4s ease; // Make flips smooth.
-	}
-
-	&.richimage__working__flipv img {
-		transform: scale(1, -1);
-	}
-
-	&.richimage__working__fliph img {
-		transform: scale(-1, 1);
-	}
-}
-
-// Without this the toolbar buttons gain padding, making them too tall and breaking the toolbar
-// This only happens during the processing state as we change the dropdowns into buttons to disable the dropdowns
-.richimage-toolbar__working {
-	padding: 0 6px;
-}
-
-.richimage-crop {
-	.components-resizable-box__handle {
-		display: block;
-	}
-}
-
-.richimage__crop-area {
+.wp-block-image__crop-area {
 	position: relative;
 	max-width: 100%;
 	width: 100%;
+	overflow: hidden;
+
+	// This removes the border from the img within the image cropper so it
+	// can be applied to the cropper itself. This then allows the image to be
+	// cropped within the visual border providing more accurate editing and
+	// smoother UX.
+	.reactEasyCrop_Container .reactEasyCrop_Image {
+		border: none;
+	}
 }
 
-.richimage__crop-icon {
+.wp-block-image__crop-icon {
 	padding: 0 8px;
 	min-width: 48px;
 	display: flex;
@@ -127,34 +156,33 @@ figure.wp-block-image:not(.wp-block) {
 	}
 }
 
-.richimage__zoom-control {
-	border: $border-width solid $dark-gray-primary;
-	border-radius: $radius-block-ui;
-	background-color: $white;
-	margin-top: $grid-unit-15;
-	margin-bottom: $grid-unit-15;
-	padding: $grid-unit-15 $grid-unit-15 $grid-unit-10;
-	line-height: 1;
-}
-
-// Make the toolbar dropdowns blend in.
-.components-toolbar.richimage-toolbar__dropdown { // Needs specificity.
-	padding: 0;
-	border-left: none;
-	border-right: none;
-
-	.components-icon-button.has-text svg {
-		margin-right: 0;
+.wp-block-image__zoom {
+	.components-popover__content {
+		min-width: 260px;
+		overflow: visible !important;
 	}
 
-	.components-dropdown-menu__indicator {
-		display: none;
+	.components-range-control {
+		flex: 1;
+	}
+
+	.components-base-control__field {
+		display: flex;
+		margin-bottom: 0;
+		flex-direction: column;
+		align-items: flex-start;
 	}
 }
 
-// Make icons 24x24 unscaled.
-.richimage-toolbar__dropdown > .components-button,
-.richimage-toolbar__dropdown,
-.richimage-toolbar__control {
-	padding: 6px;
+.wp-block-image__aspect-ratio {
+	height: $grid-unit-60 - $border-width - $border-width;
+	margin-bottom: -$grid-unit-10;
+	display: flex;
+	align-items: center;
+
+	.components-button {
+		width: $button-size;
+		padding-left: 0;
+		padding-right: 0;
+	}
 }

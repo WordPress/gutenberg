@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import { css } from '@emotion/core';
+import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
 /**
  * Internal dependencies
  */
-import { color, rtl } from '../../utils/style-mixins';
+import { COLORS, rtl } from '../../utils';
 
 const containerPositionStyles = ( { isPositionAbsolute } ) => {
 	if ( ! isPositionAbsolute ) return '';
@@ -31,7 +31,7 @@ export const Container = styled.div`
 
 export const Side = styled.div`
 	box-sizing: border-box;
-	background: ${ color( 'ui.brand' ) };
+	background: ${ COLORS.ui.theme };
 	filter: brightness( 1 );
 	opacity: 0;
 	position: absolute;

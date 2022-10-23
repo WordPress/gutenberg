@@ -1,3 +1,4 @@
+
 $dot-size: 8px; // Size of the indicator dot
 $dot-scale: 3;  // How much the pulse animation should scale up by in size
 
@@ -12,32 +13,33 @@ $dot-scale: 3;  // How much the pulse animation should scale up by in size
 
 	&::before {
 		animation: nux-pulse 1.6s infinite cubic-bezier(0.17, 0.67, 0.92, 0.62);
-		background: rgba($blue-medium-800, 0.9);
+		background: rgba(#00739c, 0.9);
+		opacity: 0.9;
 		height: $dot-size * $dot-scale;
-		left: -($dot-size * $dot-scale) / 2;
-		top: -($dot-size * $dot-scale) / 2;
-		transform: scale((1 / $dot-scale));
+		left: -($dot-size * $dot-scale) * 0.5;
+		top: -($dot-size * $dot-scale) * 0.5;
+		transform: scale(math.div(1, $dot-scale));
 		width: $dot-size * $dot-scale;
 	}
 
 	&::after {
-		background: $blue-medium-800;
+		background: #00739c;
 		height: $dot-size;
-		left: -$dot-size / 2;
-		top: -$dot-size / 2;
+		left: -$dot-size * 0.5;
+		top: -$dot-size * 0.5;
 		width: $dot-size;
 	}
 
 	@keyframes nux-pulse {
 		100% {
-			background: rgba($blue-medium-800, 0);
+			background: rgba(#00739c, 0);
 			transform: scale(1);
 		}
 	}
 
 	.components-popover__content {
-		padding: 5px (36px + 5px) 5px 20px;
 		width: 350px;
+		padding: 20px 18px;
 
 		@include break-small {
 			width: 450px;
@@ -52,16 +54,16 @@ $dot-scale: 3;  // How much the pulse animation should scale up by in size
 
 	// Position the dot right next to the edge of the button
 	&[data-y-axis="top"] {
-		margin-top: -$dot-size / 2;
+		margin-top: -$dot-size * 0.5;
 	}
 	&[data-y-axis="bottom"] {
-		margin-top: $dot-size / 2;
+		margin-top: $dot-size * 0.5;
 	}
 	&[data-y-axis="middle"][data-y-axis="left"] {
-		margin-left: -$dot-size / 2;
+		margin-left: -$dot-size * 0.5;
 	}
 	&[data-y-axis="middle"][data-y-axis="right"] {
-		margin-left: $dot-size / 2;
+		margin-left: $dot-size * 0.5;
 	}
 
 	// Position the tip content away from the dot
@@ -109,12 +111,12 @@ $dot-scale: 3;  // How much the pulse animation should scale up by in size
 		margin-right: 0;
 	}
 
-	&.components-popover.edit-post-more-menu__content:not([data-y-axis="middle"])[data-y-axis="right"] .components-popover__content {
+	&.components-popover.interface-more-menu-dropdown__content:not([data-y-axis="middle"])[data-y-axis="right"] .components-popover__content {
 		/*!rtl:ignore*/
 		margin-left: -12px;
 	}
 
-	&.components-popover.edit-post-more-menu__content:not([data-y-axis="middle"])[data-y-axis="left"] .components-popover__content {
+	&.components-popover.interface-more-menu-dropdown__content:not([data-y-axis="middle"])[data-y-axis="left"] .components-popover__content {
 		/*!rtl:ignore*/
 		margin-right: -12px;
 	}

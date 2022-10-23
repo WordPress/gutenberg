@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { BlockControls, InspectorControls } from '@wordpress/block-editor';
+import {
+	BlockControls,
+	InspectorControls,
+	useBlockProps,
+} from '@wordpress/block-editor';
 import {
 	Button,
 	Disabled,
@@ -13,12 +17,13 @@ import {
 	ToolbarGroup,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-import { grid, list, pencil, rss } from '@wordpress/icons';
+import { grid, list, edit, rss } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import { prependHTTP } from '@wordpress/url';
 import ServerSideRender from '@wordpress/server-side-render';
 
 const DEFAULT_MIN_ITEMS = 1;
-const DEFAULT_MAX_ITEMS = 10;
+const DEFAULT_MAX_ITEMS = 20;
 
 export default function RSSEdit( { attributes, setAttributes } ) {
 	const [ isEditing, setIsEditing ] = useState( ! attributes.feedURL );
@@ -46,36 +51,41 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 		event.preventDefault();
 
 		if ( feedURL ) {
+			setAttributes( { feedURL: prependHTTP( feedURL ) } );
 			setIsEditing( false );
 		}
 	}
 
+	const blockProps = useBlockProps();
+
 	if ( isEditing ) {
 		return (
-			<Placeholder icon={ rss } label="RSS">
-				<form
-					onSubmit={ onSubmitURL }
-					className="wp-block-rss__placeholder-form"
-				>
-					<TextControl
-						placeholder={ __( 'Enter URL here…' ) }
-						value={ feedURL }
-						onChange={ ( value ) =>
-							setAttributes( { feedURL: value } )
-						}
-						className="wp-block-rss__placeholder-input"
-					/>
-					<Button isPrimary type="submit">
-						{ __( 'Use URL' ) }
-					</Button>
-				</form>
-			</Placeholder>
+			<div { ...blockProps }>
+				<Placeholder icon={ rss } label="RSS">
+					<form
+						onSubmit={ onSubmitURL }
+						className="wp-block-rss__placeholder-form"
+					>
+						<TextControl
+							placeholder={ __( 'Enter URL here…' ) }
+							value={ feedURL }
+							onChange={ ( value ) =>
+								setAttributes( { feedURL: value } )
+							}
+							className="wp-block-rss__placeholder-input"
+						/>
+						<Button variant="primary" type="submit">
+							{ __( 'Use URL' ) }
+						</Button>
+					</form>
+				</Placeholder>
+			</div>
 		);
 	}
 
 	const toolbarControls = [
 		{
-			icon: pencil,
+			icon: edit,
 			title: __( 'Edit RSS URL' ),
 			onClick: () => setIsEditing( true ),
 		},
@@ -99,7 +109,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 				<ToolbarGroup controls={ toolbarControls } />
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'RSS settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<RangeControl
 						label={ __( 'Number of items' ) }
 						value={ itemsToShow }
@@ -151,9 +161,14 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 					) }
 				</PanelBody>
 			</InspectorControls>
-			<Disabled>
-				<ServerSideRender block="core/rss" attributes={ attributes } />
-			</Disabled>
+			<div { ...blockProps }>
+				<Disabled>
+					<ServerSideRender
+						block="core/rss"
+						attributes={ attributes }
+					/>
+				</Disabled>
+			</div>
 		</>
 	);
 }

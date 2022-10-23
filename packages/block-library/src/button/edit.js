@@ -7,119 +7,63 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback, useEffect, useState, useRef } from '@wordpress/element';
 import {
-	KeyboardShortcuts,
+	Button,
+	ButtonGroup,
 	PanelBody,
-	RangeControl,
 	TextControl,
-	ToggleControl,
 	ToolbarButton,
-	ToolbarGroup,
 	Popover,
 } from '@wordpress/components';
 import {
 	BlockControls,
 	InspectorControls,
 	RichText,
-	__experimentalBlock as Block,
+	useBlockProps,
+	__experimentalUseBorderProps as useBorderProps,
+	__experimentalUseColorProps as useColorProps,
+	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	__experimentalLinkControl as LinkControl,
+	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
-import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
-import { link } from '@wordpress/icons';
+import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
+import { link, linkOff } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
-import ColorEdit from './color-edit';
-import getColorAndStyleProps from './color-props';
+import { useMergeRefs } from '@wordpress/compose';
 
 const NEW_TAB_REL = 'noreferrer noopener';
-const MIN_BORDER_RADIUS_VALUE = 0;
-const MAX_BORDER_RADIUS_VALUE = 50;
-const INITIAL_BORDER_RADIUS_POSITION = 5;
 
-function BorderPanel( { borderRadius = '', setAttributes } ) {
-	const setBorderRadius = useCallback(
-		( newBorderRadius ) => {
-			setAttributes( { borderRadius: newBorderRadius } );
-		},
-		[ setAttributes ]
-	);
+function WidthPanel( { selectedWidth, setAttributes } ) {
+	function handleChange( newWidth ) {
+		// Check if we are toggling the width off
+		const width = selectedWidth === newWidth ? undefined : newWidth;
+
+		// Update attributes.
+		setAttributes( { width } );
+	}
+
 	return (
-		<PanelBody title={ __( 'Border settings' ) }>
-			<RangeControl
-				value={ borderRadius }
-				label={ __( 'Border radius' ) }
-				min={ MIN_BORDER_RADIUS_VALUE }
-				max={ MAX_BORDER_RADIUS_VALUE }
-				initialPosition={ INITIAL_BORDER_RADIUS_POSITION }
-				allowReset
-				onChange={ setBorderRadius }
-			/>
+		<PanelBody title={ __( 'Width settings' ) }>
+			<ButtonGroup aria-label={ __( 'Button width' ) }>
+				{ [ 25, 50, 75, 100 ].map( ( widthValue ) => {
+					return (
+						<Button
+							key={ widthValue }
+							isSmall
+							variant={
+								widthValue === selectedWidth
+									? 'primary'
+									: undefined
+							}
+							onClick={ () => handleChange( widthValue ) }
+						>
+							{ widthValue }%
+						</Button>
+					);
+				} ) }
+			</ButtonGroup>
 		</PanelBody>
-	);
-}
-
-function URLPicker( {
-	isSelected,
-	url,
-	setAttributes,
-	opensInNewTab,
-	onToggleOpenInNewTab,
-} ) {
-	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
-	const openLinkControl = () => {
-		setIsURLPickerOpen( true );
-
-		// prevents default behaviour for event
-		return false;
-	};
-	const linkControl = isURLPickerOpen && (
-		<Popover
-			position="bottom center"
-			onClose={ () => setIsURLPickerOpen( false ) }
-		>
-			<LinkControl
-				className="wp-block-navigation-link__inline-link-input"
-				value={ { url, opensInNewTab } }
-				onChange={ ( {
-					url: newURL = '',
-					opensInNewTab: newOpensInNewTab,
-				} ) => {
-					setAttributes( { url: newURL } );
-
-					if ( opensInNewTab !== newOpensInNewTab ) {
-						onToggleOpenInNewTab( newOpensInNewTab );
-					}
-				} }
-			/>
-		</Popover>
-	);
-	return (
-		<>
-			<BlockControls>
-				<ToolbarGroup>
-					<ToolbarButton
-						name="link"
-						icon={ link }
-						title={ __( 'Link' ) }
-						shortcut={ displayShortcut.primary( 'k' ) }
-						onClick={ openLinkControl }
-					/>
-				</ToolbarGroup>
-			</BlockControls>
-			{ isSelected && (
-				<KeyboardShortcuts
-					bindGlobal
-					shortcuts={ {
-						[ rawShortcut.primary( 'k' ) ]: openLinkControl,
-					} }
-				/>
-			) }
-			{ linkControl }
-		</>
 	);
 }
 
@@ -132,14 +76,8 @@ function ButtonEdit( props ) {
 		onReplace,
 		mergeBlocks,
 	} = props;
-	const {
-		borderRadius,
-		linkTarget,
-		placeholder,
-		rel,
-		text,
-		url,
-	} = attributes;
+	const { linkTarget, placeholder, rel, style, text, url, width } =
+		attributes;
 	const onSetLinkRel = useCallback(
 		( value ) => {
 			setAttributes( { rel: value } );
@@ -147,49 +85,107 @@ function ButtonEdit( props ) {
 		[ setAttributes ]
 	);
 
-	const onToggleOpenInNewTab = useCallback(
-		( value ) => {
-			const newLinkTarget = value ? '_blank' : undefined;
+	function onToggleOpenInNewTab( value ) {
+		const newLinkTarget = value ? '_blank' : undefined;
 
-			let updatedRel = rel;
-			if ( newLinkTarget && ! rel ) {
-				updatedRel = NEW_TAB_REL;
-			} else if ( ! newLinkTarget && rel === NEW_TAB_REL ) {
-				updatedRel = undefined;
-			}
+		let updatedRel = rel;
+		if ( newLinkTarget && ! rel ) {
+			updatedRel = NEW_TAB_REL;
+		} else if ( ! newLinkTarget && rel === NEW_TAB_REL ) {
+			updatedRel = undefined;
+		}
 
-			setAttributes( {
-				linkTarget: newLinkTarget,
-				rel: updatedRel,
-			} );
-		},
-		[ rel, setAttributes ]
-	);
+		setAttributes( {
+			linkTarget: newLinkTarget,
+			rel: updatedRel,
+		} );
+	}
 
-	const colorProps = getColorAndStyleProps( attributes );
+	function setButtonText( newText ) {
+		// Remove anchor tags from button text content.
+		setAttributes( { text: newText.replace( /<\/?a[^>]*>/g, '' ) } );
+	}
+
+	function onKeyDown( event ) {
+		if ( isKeyboardEvent.primary( event, 'k' ) ) {
+			startEditing( event );
+		} else if ( isKeyboardEvent.primaryShift( event, 'k' ) ) {
+			unlink();
+			richTextRef.current?.focus();
+		}
+	}
+
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+
+	const borderProps = useBorderProps( attributes );
+	const colorProps = useColorProps( attributes );
+	const spacingProps = useSpacingProps( attributes );
+	const ref = useRef();
+	const richTextRef = useRef();
+	const blockProps = useBlockProps( {
+		ref: useMergeRefs( [ setPopoverAnchor, ref ] ),
+		onKeyDown,
+	} );
+
+	const [ isEditingURL, setIsEditingURL ] = useState( false );
+	const isURLSet = !! url;
+	const opensInNewTab = linkTarget === '_blank';
+
+	function startEditing( event ) {
+		event.preventDefault();
+		setIsEditingURL( true );
+	}
+
+	function unlink() {
+		setAttributes( {
+			url: undefined,
+			linkTarget: undefined,
+			rel: undefined,
+		} );
+		setIsEditingURL( false );
+	}
+
+	useEffect( () => {
+		if ( ! isSelected ) {
+			setIsEditingURL( false );
+		}
+	}, [ isSelected ] );
 
 	return (
 		<>
-			<ColorEdit { ...props } />
-			<Block.div>
+			<div
+				{ ...blockProps }
+				className={ classnames( blockProps.className, {
+					[ `has-custom-width wp-block-button__width-${ width }` ]:
+						width,
+					[ `has-custom-font-size` ]: blockProps.style.fontSize,
+				} ) }
+			>
 				<RichText
+					ref={ richTextRef }
+					aria-label={ __( 'Button text' ) }
 					placeholder={ placeholder || __( 'Add text…' ) }
 					value={ text }
-					onChange={ ( value ) => setAttributes( { text: value } ) }
+					onChange={ ( value ) => setButtonText( value ) }
 					withoutInteractiveFormatting
 					className={ classnames(
 						className,
 						'wp-block-button__link',
 						colorProps.className,
+						borderProps.className,
 						{
-							'no-border-radius': borderRadius === 0,
-						}
+							// For backwards compatibility add style that isn't
+							// provided via block support.
+							'no-border-radius': style?.border?.radius === 0,
+						},
+						__experimentalGetElementClassName( 'button' )
 					) }
 					style={ {
-						borderRadius: borderRadius
-							? borderRadius + 'px'
-							: undefined,
+						...borderProps.style,
 						...colorProps.style,
+						...spacingProps.style,
 					} }
 					onSplit={ ( value ) =>
 						createBlock( 'core/button', {
@@ -201,31 +197,73 @@ function ButtonEdit( props ) {
 					onMerge={ mergeBlocks }
 					identifier="text"
 				/>
-			</Block.div>
-			<URLPicker
-				url={ url }
-				setAttributes={ setAttributes }
-				isSelected={ isSelected }
-				opensInNewTab={ linkTarget === '_blank' }
-				onToggleOpenInNewTab={ onToggleOpenInNewTab }
-			/>
+			</div>
+			<BlockControls group="block">
+				{ ! isURLSet && (
+					<ToolbarButton
+						name="link"
+						icon={ link }
+						title={ __( 'Link' ) }
+						shortcut={ displayShortcut.primary( 'k' ) }
+						onClick={ startEditing }
+					/>
+				) }
+				{ isURLSet && (
+					<ToolbarButton
+						name="link"
+						icon={ linkOff }
+						title={ __( 'Unlink' ) }
+						shortcut={ displayShortcut.primaryShift( 'k' ) }
+						onClick={ unlink }
+						isActive={ true }
+					/>
+				) }
+			</BlockControls>
+			{ isSelected && ( isEditingURL || isURLSet ) && (
+				<Popover
+					position="bottom center"
+					onClose={ () => {
+						setIsEditingURL( false );
+						richTextRef.current?.focus();
+					} }
+					anchor={ popoverAnchor }
+					focusOnMount={ isEditingURL ? 'firstElement' : false }
+					__unstableSlotName={ '__unstable-block-tools-after' }
+					shift
+				>
+					<LinkControl
+						className="wp-block-navigation-link__inline-link-input"
+						value={ { url, opensInNewTab } }
+						onChange={ ( {
+							url: newURL = '',
+							opensInNewTab: newOpensInNewTab,
+						} ) => {
+							setAttributes( { url: newURL } );
+
+							if ( opensInNewTab !== newOpensInNewTab ) {
+								onToggleOpenInNewTab( newOpensInNewTab );
+							}
+						} }
+						onRemove={ () => {
+							unlink();
+							richTextRef.current?.focus();
+						} }
+						forceIsEditingLink={ isEditingURL }
+					/>
+				</Popover>
+			) }
 			<InspectorControls>
-				<BorderPanel
-					borderRadius={ borderRadius }
+				<WidthPanel
+					selectedWidth={ width }
 					setAttributes={ setAttributes }
 				/>
-				<PanelBody title={ __( 'Link settings' ) }>
-					<ToggleControl
-						label={ __( 'Open in new tab' ) }
-						onChange={ onToggleOpenInNewTab }
-						checked={ linkTarget === '_blank' }
-					/>
-					<TextControl
-						label={ __( 'Link rel' ) }
-						value={ rel || '' }
-						onChange={ onSetLinkRel }
-					/>
-				</PanelBody>
+			</InspectorControls>
+			<InspectorControls __experimentalGroup="advanced">
+				<TextControl
+					label={ __( 'Link rel' ) }
+					value={ rel || '' }
+					onChange={ onSetLinkRel }
+				/>
 			</InspectorControls>
 		</>
 	);

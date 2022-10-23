@@ -1,21 +1,44 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
  */
+import { useSelect } from '@wordpress/data';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
-import { DOWN } from '@wordpress/keycodes';
-import { ToolbarButton } from '@wordpress/components';
+import { copy } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { BlockSwitcher } from '../';
+import { BlockSwitcher, BlockSwitcherDropdownMenu } from '../';
+
+jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+jest.mock( '../../block-title/use-block-display-title', () =>
+	jest.fn().mockReturnValue( 'Block Name' )
+);
 
 describe( 'BlockSwitcher', () => {
+	test( 'should not render block switcher without blocks', () => {
+		useSelect.mockImplementation( () => ( {} ) );
+		const { container } = render( <BlockSwitcher /> );
+		expect( container ).toBeEmptyDOMElement();
+	} );
+
+	test( 'should not render block switcher with null blocks', () => {
+		useSelect.mockImplementation( () => ( { blocks: [ null ] } ) );
+		const { container } = render(
+			<BlockSwitcher
+				clientIds={ [ 'a1303fd6-3e60-4fff-a770-0e0ea656c5b9' ] }
+			/>
+		);
+		expect( container ).toBeEmptyDOMElement();
+	} );
+} );
+describe( 'BlockSwitcherDropdownMenu', () => {
 	const headingBlock1 = {
 		attributes: {
 			content: [ 'How are you?' ],
@@ -93,135 +116,180 @@ describe( 'BlockSwitcher', () => {
 		unregisterBlockType( 'core/paragraph' );
 	} );
 
-	test( 'should not render block switcher without blocks', () => {
-		const wrapper = shallow( <BlockSwitcher /> );
-
-		expect( wrapper.html() ).toBeNull();
-	} );
-
 	test( 'should render switcher with blocks', () => {
-		const blocks = [ headingBlock1 ];
-		const inserterItems = [
-			{ name: 'core/heading', frecency: 1 },
-			{ name: 'core/paragraph', frecency: 1 },
-		];
-
-		const wrapper = shallow(
-			<BlockSwitcher blocks={ blocks } inserterItems={ inserterItems } />
+		useSelect.mockImplementation( () => ( {
+			possibleBlockTransformations: [
+				{ name: 'core/heading', frecency: 1 },
+				{ name: 'core/paragraph', frecency: 1 },
+			],
+			canRemove: true,
+		} ) );
+		const { container } = render(
+			<BlockSwitcherDropdownMenu blocks={ [ headingBlock1 ] } />
 		);
-
-		expect( wrapper ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
 	test( 'should render disabled block switcher with multi block of different types when no transforms', () => {
-		const blocks = [ headingBlock1, textBlock ];
-		const inserterItems = [
-			{ name: 'core/heading', frecency: 1 },
-			{ name: 'core/paragraph', frecency: 1 },
-		];
-
-		const wrapper = shallow(
-			<BlockSwitcher blocks={ blocks } inserterItems={ inserterItems } />
+		useSelect.mockImplementation( () => ( {
+			possibleBlockTransformations: [],
+			icon: copy,
+		} ) );
+		const { container } = render(
+			<BlockSwitcherDropdownMenu
+				blocks={ [ headingBlock1, textBlock ] }
+			/>
 		);
-
-		expect( wrapper ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
 	test( 'should render enabled block switcher with multi block when transforms exist', () => {
-		const blocks = [ headingBlock1, headingBlock2 ];
-		const inserterItems = [
-			{ name: 'core/heading', frecency: 1 },
-			{ name: 'core/paragraph', frecency: 1 },
-		];
-
-		const wrapper = shallow(
-			<BlockSwitcher blocks={ blocks } inserterItems={ inserterItems } />
+		useSelect.mockImplementation( () => ( {
+			possibleBlockTransformations: [
+				{ name: 'core/heading', frecency: 1 },
+				{ name: 'core/paragraph', frecency: 1 },
+			],
+			canRemove: true,
+		} ) );
+		const { container } = render(
+			<BlockSwitcherDropdownMenu
+				blocks={ [ headingBlock1, headingBlock2 ] }
+			/>
 		);
-
-		expect( wrapper ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
 	describe( 'Dropdown', () => {
-		const blocks = [ headingBlock1 ];
-
-		const inserterItems = [
-			{ name: 'core/quote', frecency: 1 },
-			{ name: 'core/cover-image', frecency: 2 },
-			{ name: 'core/paragraph', frecency: 3 },
-			{ name: 'core/heading', frecency: 4 },
-			{ name: 'core/text', frecency: 5 },
-		];
-
-		const onTransformStub = jest.fn();
-		const getDropdown = () => {
-			const blockSwitcher = shallow(
-				<BlockSwitcher
-					blocks={ blocks }
-					onTransform={ onTransformStub }
-					inserterItems={ inserterItems }
-				/>
-			);
-			return blockSwitcher.find( 'Dropdown' );
-		};
+		beforeAll( () => {
+			useSelect.mockImplementation( () => ( {
+				possibleBlockTransformations: [
+					{ name: 'core/paragraph', frecency: 3 },
+				],
+				canRemove: true,
+			} ) );
+		} );
 
 		test( 'should dropdown exist', () => {
-			expect( getDropdown() ).toHaveLength( 1 );
+			render(
+				<BlockSwitcherDropdownMenu blocks={ [ headingBlock1 ] } />
+			);
+
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Block Name',
+					expanded: false,
+				} )
+			).toBeVisible();
 		} );
 
-		describe( '.renderToggle', () => {
-			const onToggleStub = jest.fn();
-			const mockKeyDown = {
-				preventDefault: () => {},
-				stopPropagation: () => {},
-				keyCode: DOWN,
-			};
-
-			afterEach( () => {
-				onToggleStub.mockReset();
+		test( 'should simulate a keydown event, which should open transform toggle.', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
 			} );
 
-			test( 'should simulate a keydown event, which should call onToggle and open transform toggle.', () => {
-				const toggleClosed = shallow(
-					getDropdown().props().renderToggle( {
-						onToggle: onToggleStub,
-						isOpen: false,
-					} )
-				);
-				const iconButtonClosed = toggleClosed.find( ToolbarButton );
+			render(
+				<BlockSwitcherDropdownMenu blocks={ [ headingBlock1 ] } />
+			);
 
-				iconButtonClosed.simulate( 'keydown', mockKeyDown );
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Block Name',
+					expanded: false,
+				} )
+			).toBeVisible();
+			expect(
+				screen.queryByRole( 'menu', {
+					name: 'Block Name',
+				} )
+			).not.toBeInTheDocument();
 
-				expect( onToggleStub ).toHaveBeenCalledTimes( 1 );
+			await user.type(
+				screen.getByRole( 'button', {
+					name: 'Block Name',
+					expanded: false,
+				} ),
+				'[ArrowDown]'
+			);
+
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Block Name',
+					expanded: true,
+				} )
+			).toBeVisible();
+
+			const menu = screen.getByRole( 'menu', {
+				name: 'Block Name',
 			} );
-
-			test( 'should simulate a click event, which should call onToggle.', () => {
-				const toggleOpen = shallow(
-					getDropdown().props().renderToggle( {
-						onToggle: onToggleStub,
-						isOpen: true,
-					} )
-				);
-				const iconButtonOpen = toggleOpen.find( ToolbarButton );
-
-				iconButtonOpen.simulate( 'keydown', mockKeyDown );
-
-				expect( onToggleStub ).toHaveBeenCalledTimes( 0 );
-			} );
+			expect( menu ).toBeInTheDocument();
+			expect( menu ).not.toBeVisible();
 		} );
 
-		describe( '.renderContent', () => {
-			test( 'should create the transform items for the chosen block. A heading block will have 3 items', () => {
-				const onCloseStub = jest.fn();
-				const content = shallow(
-					<div>
-						{ getDropdown()
-							.props()
-							.renderContent( { onClose: onCloseStub } ) }
-					</div>
-				);
-				const blockList = content.find( 'BlockTypesList' );
-				expect( blockList.prop( 'items' ) ).toHaveLength( 1 );
+		test( 'should simulate a click event, which should call onToggle.', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
 			} );
+
+			render(
+				<BlockSwitcherDropdownMenu blocks={ [ headingBlock1 ] } />
+			);
+
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Block Name',
+					expanded: false,
+				} )
+			).toBeVisible();
+			expect(
+				screen.queryByRole( 'menu', {
+					name: 'Block Name',
+				} )
+			).not.toBeInTheDocument();
+
+			await user.click(
+				screen.getByRole( 'button', {
+					name: 'Block Name',
+					expanded: false,
+				} )
+			);
+
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Block Name',
+					expanded: true,
+				} )
+			).toBeVisible();
+
+			const menu = screen.getByRole( 'menu', {
+				name: 'Block Name',
+			} );
+			expect( menu ).toBeInTheDocument();
+			expect( menu ).not.toBeVisible();
+		} );
+
+		test( 'should create the transform items for the chosen block.', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			render(
+				<BlockSwitcherDropdownMenu blocks={ [ headingBlock1 ] } />
+			);
+
+			await user.click(
+				screen.getByRole( 'button', {
+					name: 'Block Name',
+					expanded: false,
+				} )
+			);
+
+			expect(
+				within(
+					screen.getByRole( 'menu', {
+						name: 'Block Name',
+					} )
+				).getByRole( 'menuitem' )
+			).toBeInTheDocument();
 		} );
 	} );
 } );

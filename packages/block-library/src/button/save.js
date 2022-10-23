@@ -6,34 +6,54 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { RichText } from '@wordpress/block-editor';
+import {
+	RichText,
+	useBlockProps,
+	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
+	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
+	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
+	__experimentalGetElementClassName,
+} from '@wordpress/block-editor';
 
-/**
- * Internal dependencies
- */
-import getColorAndStyleProps from './color-props';
+export default function save( { attributes, className } ) {
+	const { fontSize, linkTarget, rel, style, text, title, url, width } =
+		attributes;
 
-export default function save( { attributes } ) {
-	const { borderRadius, linkTarget, rel, text, title, url } = attributes;
-	const colorProps = getColorAndStyleProps( attributes );
+	if ( ! text ) {
+		return null;
+	}
+
+	const borderProps = getBorderClassesAndStyles( attributes );
+	const colorProps = getColorClassesAndStyles( attributes );
+	const spacingProps = getSpacingClassesAndStyles( attributes );
 	const buttonClasses = classnames(
 		'wp-block-button__link',
 		colorProps.className,
+		borderProps.className,
 		{
-			'no-border-radius': borderRadius === 0,
-		}
+			// For backwards compatibility add style that isn't provided via
+			// block support.
+			'no-border-radius': style?.border?.radius === 0,
+		},
+		__experimentalGetElementClassName( 'button' )
 	);
 	const buttonStyle = {
-		borderRadius: borderRadius ? borderRadius + 'px' : undefined,
+		...borderProps.style,
 		...colorProps.style,
+		...spacingProps.style,
 	};
 
 	// The use of a `title` attribute here is soft-deprecated, but still applied
 	// if it had already been assigned, for the sake of backward-compatibility.
 	// A title will no longer be assigned for new or updated button block links.
 
+	const wrapperClasses = classnames( className, {
+		[ `has-custom-width wp-block-button__width-${ width }` ]: width,
+		[ `has-custom-font-size` ]: fontSize || style?.typography?.fontSize,
+	} );
+
 	return (
-		<div>
+		<div { ...useBlockProps.save( { className: wrapperClasses } ) }>
 			<RichText.Content
 				tagName="a"
 				className={ buttonClasses }
