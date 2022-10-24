@@ -182,6 +182,7 @@ class WP_Theme_JSON_6_0 extends WP_Theme_JSON {
 		'templateParts',
 		'version',
 		'title',
+		'description',
 	);
 
 	const APPEARANCE_TOOLS_OPT_INS = array(
