@@ -4,17 +4,17 @@
 		"isValid": true,
 		"attributes": {
 			"originalName": "core/form",
-			"originalUndelimitedContent": "<form>\n<label class=\"wp-block-input-field-label\"><div class=\"wp-block-input-field-label__content\">Name</div><input class=\"wp-block-input-field\" type=\"text\" name=\"Name\" required aria-required=\"true\"/></label>\n<label class=\"wp-block-input-field-label\"><div class=\"wp-block-input-field-label__content\">Email</div><input class=\"wp-block-input-field\" type=\"email\" name=\"Email\" required aria-required=\"true\"/></label>\n<label class=\"wp-block-input-field-label\"><div class=\"wp-block-input-field-label__content\">Website</div><input class=\"wp-block-input-field\" type=\"url\" name=\"Website\" aria-required=\"false\"/></label>\n<label class=\"wp-block-input-field-label\"><div class=\"wp-block-input-field-label__content\">Comment</div><textarea class=\"wp-block-input-field\" name=\"Comment\" required aria-required=\"true\"></textarea></label>\n<div class=\"wp-block-buttons\"><div class=\"wp-block-button\"><button class=\"wp-block-button__link wp-element-button\">Submit</button></div></div>\n</form>",
-			"originalContent": "<!-- wp:form -->\n<form>\n<!-- wp:input-field {\"label\":\"Name\",\"required\":true} -->\n<label class=\"wp-block-input-field-label\"><div class=\"wp-block-input-field-label__content\">Name</div><input class=\"wp-block-input-field\" type=\"text\" name=\"Name\" required=\"\" aria-required=\"true\"></label>\n<!-- /wp:input-field -->\n<!-- wp:input-field {\"type\":\"email\",\"label\":\"Email\",\"required\":true} -->\n<label class=\"wp-block-input-field-label\"><div class=\"wp-block-input-field-label__content\">Email</div><input class=\"wp-block-input-field\" type=\"email\" name=\"Email\" required=\"\" aria-required=\"true\"></label>\n<!-- /wp:input-field -->\n<!-- wp:input-field {\"type\":\"url\",\"label\":\"Website\"} -->\n<label class=\"wp-block-input-field-label\"><div class=\"wp-block-input-field-label__content\">Website</div><input class=\"wp-block-input-field\" type=\"url\" name=\"Website\" aria-required=\"false\"></label>\n<!-- /wp:input-field -->\n<!-- wp:input-field {\"type\":\"textarea\",\"label\":\"Comment\",\"required\":true} -->\n<label class=\"wp-block-input-field-label\"><div class=\"wp-block-input-field-label__content\">Comment</div><textarea class=\"wp-block-input-field\" name=\"Comment\" required=\"\" aria-required=\"true\"></textarea></label>\n<!-- /wp:input-field -->\n<!-- wp:input-field {\"type\":\"submit\",\"label\":\"Submit\"} -->\n<div class=\"wp-block-buttons\"><div class=\"wp-block-button\"><button class=\"wp-block-button__link wp-element-button\">Submit</button></div></div>\n<!-- /wp:input-field -->\n</form>\n<!-- /wp:form -->"
+			"originalUndelimitedContent": "<form>\n<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Name</div><input class=\"wp-block-form-input\" type=\"text\" name=\"Name\" required aria-required=\"true\"/></label>\n<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Email</div><input class=\"wp-block-form-input\" type=\"email\" name=\"Email\" required aria-required=\"true\"/></label>\n<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Website</div><input class=\"wp-block-form-input\" type=\"url\" name=\"Website\" aria-required=\"false\"/></label>\n<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Comment</div><textarea class=\"wp-block-form-input\" name=\"Comment\" required aria-required=\"true\"></textarea></label>\n<div class=\"wp-block-buttons\"><div class=\"wp-block-button\"><button class=\"wp-block-button__link wp-element-button\">Submit</button></div></div>\n</form>",
+			"originalContent": "<!-- wp:form -->\n<form>\n<!-- wp:form-input {\"label\":\"Name\",\"required\":true} -->\n<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Name</div><input class=\"wp-block-form-input\" type=\"text\" name=\"Name\" required=\"\" aria-required=\"true\"></label>\n<!-- /wp:form-input -->\n<!-- wp:form-input {\"type\":\"email\",\"label\":\"Email\",\"required\":true} -->\n<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Email</div><input class=\"wp-block-form-input\" type=\"email\" name=\"Email\" required=\"\" aria-required=\"true\"></label>\n<!-- /wp:form-input -->\n<!-- wp:form-input {\"type\":\"url\",\"label\":\"Website\"} -->\n<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Website</div><input class=\"wp-block-form-input\" type=\"url\" name=\"Website\" aria-required=\"false\"></label>\n<!-- /wp:form-input -->\n<!-- wp:form-input {\"type\":\"textarea\",\"label\":\"Comment\",\"required\":true} -->\n<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Comment</div><textarea class=\"wp-block-form-input\" name=\"Comment\" required=\"\" aria-required=\"true\"></textarea></label>\n<!-- /wp:form-input -->\n<!-- wp:form-input {\"type\":\"submit\",\"label\":\"Submit\"} -->\n<div class=\"wp-block-buttons\"><div class=\"wp-block-button\"><button class=\"wp-block-button__link wp-element-button\">Submit</button></div></div>\n<!-- /wp:form-input -->\n</form>\n<!-- /wp:form -->"
 		},
 		"innerBlocks": [
 			{
 				"name": "core/missing",
 				"isValid": true,
 				"attributes": {
-					"originalName": "core/input-field",
-					"originalUndelimitedContent": "<label class=\"wp-block-input-field-label\"><div class=\"wp-block-input-field-label__content\">Name</div><input class=\"wp-block-input-field\" type=\"text\" name=\"Name\" required aria-required=\"true\"/></label>",
-					"originalContent": "<!-- wp:input-field {\"label\":\"Name\",\"required\":true} -->\n<label class=\"wp-block-input-field-label\"><div class=\"wp-block-input-field-label__content\">Name</div><input class=\"wp-block-input-field\" type=\"text\" name=\"Name\" required=\"\" aria-required=\"true\"></label>\n<!-- /wp:input-field -->"
+					"originalName": "core/form-input",
+					"originalUndelimitedContent": "<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Name</div><input class=\"wp-block-form-input\" type=\"text\" name=\"Name\" required aria-required=\"true\"/></label>",
+					"originalContent": "<!-- wp:form-input {\"label\":\"Name\",\"required\":true} -->\n<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Name</div><input class=\"wp-block-form-input\" type=\"text\" name=\"Name\" required=\"\" aria-required=\"true\"></label>\n<!-- /wp:form-input -->"
 				},
 				"innerBlocks": []
 			},
@@ -22,9 +22,9 @@
 				"name": "core/missing",
 				"isValid": true,
 				"attributes": {
-					"originalName": "core/input-field",
-					"originalUndelimitedContent": "<label class=\"wp-block-input-field-label\"><div class=\"wp-block-input-field-label__content\">Email</div><input class=\"wp-block-input-field\" type=\"email\" name=\"Email\" required aria-required=\"true\"/></label>",
-					"originalContent": "<!-- wp:input-field {\"type\":\"email\",\"label\":\"Email\",\"required\":true} -->\n<label class=\"wp-block-input-field-label\"><div class=\"wp-block-input-field-label__content\">Email</div><input class=\"wp-block-input-field\" type=\"email\" name=\"Email\" required=\"\" aria-required=\"true\"></label>\n<!-- /wp:input-field -->"
+					"originalName": "core/form-input",
+					"originalUndelimitedContent": "<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Email</div><input class=\"wp-block-form-input\" type=\"email\" name=\"Email\" required aria-required=\"true\"/></label>",
+					"originalContent": "<!-- wp:form-input {\"type\":\"email\",\"label\":\"Email\",\"required\":true} -->\n<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Email</div><input class=\"wp-block-form-input\" type=\"email\" name=\"Email\" required=\"\" aria-required=\"true\"></label>\n<!-- /wp:form-input -->"
 				},
 				"innerBlocks": []
 			},
@@ -32,9 +32,9 @@
 				"name": "core/missing",
 				"isValid": true,
 				"attributes": {
-					"originalName": "core/input-field",
-					"originalUndelimitedContent": "<label class=\"wp-block-input-field-label\"><div class=\"wp-block-input-field-label__content\">Website</div><input class=\"wp-block-input-field\" type=\"url\" name=\"Website\" aria-required=\"false\"/></label>",
-					"originalContent": "<!-- wp:input-field {\"type\":\"url\",\"label\":\"Website\"} -->\n<label class=\"wp-block-input-field-label\"><div class=\"wp-block-input-field-label__content\">Website</div><input class=\"wp-block-input-field\" type=\"url\" name=\"Website\" aria-required=\"false\"></label>\n<!-- /wp:input-field -->"
+					"originalName": "core/form-input",
+					"originalUndelimitedContent": "<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Website</div><input class=\"wp-block-form-input\" type=\"url\" name=\"Website\" aria-required=\"false\"/></label>",
+					"originalContent": "<!-- wp:form-input {\"type\":\"url\",\"label\":\"Website\"} -->\n<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Website</div><input class=\"wp-block-form-input\" type=\"url\" name=\"Website\" aria-required=\"false\"></label>\n<!-- /wp:form-input -->"
 				},
 				"innerBlocks": []
 			},
@@ -42,9 +42,9 @@
 				"name": "core/missing",
 				"isValid": true,
 				"attributes": {
-					"originalName": "core/input-field",
-					"originalUndelimitedContent": "<label class=\"wp-block-input-field-label\"><div class=\"wp-block-input-field-label__content\">Comment</div><textarea class=\"wp-block-input-field\" name=\"Comment\" required aria-required=\"true\"></textarea></label>",
-					"originalContent": "<!-- wp:input-field {\"type\":\"textarea\",\"label\":\"Comment\",\"required\":true} -->\n<label class=\"wp-block-input-field-label\"><div class=\"wp-block-input-field-label__content\">Comment</div><textarea class=\"wp-block-input-field\" name=\"Comment\" required=\"\" aria-required=\"true\"></textarea></label>\n<!-- /wp:input-field -->"
+					"originalName": "core/form-input",
+					"originalUndelimitedContent": "<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Comment</div><textarea class=\"wp-block-form-input\" name=\"Comment\" required aria-required=\"true\"></textarea></label>",
+					"originalContent": "<!-- wp:form-input {\"type\":\"textarea\",\"label\":\"Comment\",\"required\":true} -->\n<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Comment</div><textarea class=\"wp-block-form-input\" name=\"Comment\" required=\"\" aria-required=\"true\"></textarea></label>\n<!-- /wp:form-input -->"
 				},
 				"innerBlocks": []
 			},
@@ -52,9 +52,9 @@
 				"name": "core/missing",
 				"isValid": true,
 				"attributes": {
-					"originalName": "core/input-field",
+					"originalName": "core/form-input",
 					"originalUndelimitedContent": "<div class=\"wp-block-buttons\"><div class=\"wp-block-button\"><button class=\"wp-block-button__link wp-element-button\">Submit</button></div></div>",
-					"originalContent": "<!-- wp:input-field {\"type\":\"submit\",\"label\":\"Submit\"} -->\n<div class=\"wp-block-buttons\"><div class=\"wp-block-button\"><button class=\"wp-block-button__link wp-element-button\">Submit</button></div></div>\n<!-- /wp:input-field -->"
+					"originalContent": "<!-- wp:form-input {\"type\":\"submit\",\"label\":\"Submit\"} -->\n<div class=\"wp-block-buttons\"><div class=\"wp-block-button\"><button class=\"wp-block-button__link wp-element-button\">Submit</button></div></div>\n<!-- /wp:form-input -->"
 				},
 				"innerBlocks": []
 			}

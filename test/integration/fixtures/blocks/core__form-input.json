@@ -1,0 +1,12 @@
+[
+	{
+		"name": "core/missing",
+		"isValid": true,
+		"attributes": {
+			"originalName": "core/form-input",
+			"originalUndelimitedContent": "<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Name</div><input class=\"wp-block-form-input\" type=\"text\" name=\"Name\" required aria-required=\"true\"/></label>",
+			"originalContent": "<!-- wp:form-input {\"label\":\"Name\",\"required\":true} -->\n<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Name</div><input class=\"wp-block-form-input\" type=\"text\" name=\"Name\" required=\"\" aria-required=\"true\"></label>\n<!-- /wp:form-input -->"
+		},
+		"innerBlocks": []
+	}
+]

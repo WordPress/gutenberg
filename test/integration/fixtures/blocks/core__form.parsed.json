@@ -4,57 +4,57 @@
 		"attrs": {},
 		"innerBlocks": [
 			{
-				"blockName": "core/input-field",
+				"blockName": "core/form-input",
 				"attrs": {
 					"label": "Name",
 					"required": true
 				},
 				"innerBlocks": [],
-				"innerHTML": "\n<label class=\"wp-block-input-field-label\"><div class=\"wp-block-input-field-label__content\">Name</div><input class=\"wp-block-input-field\" type=\"text\" name=\"Name\" required aria-required=\"true\"/></label>\n",
+				"innerHTML": "\n<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Name</div><input class=\"wp-block-form-input\" type=\"text\" name=\"Name\" required aria-required=\"true\"/></label>\n",
 				"innerContent": [
-					"\n<label class=\"wp-block-input-field-label\"><div class=\"wp-block-input-field-label__content\">Name</div><input class=\"wp-block-input-field\" type=\"text\" name=\"Name\" required aria-required=\"true\"/></label>\n"
+					"\n<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Name</div><input class=\"wp-block-form-input\" type=\"text\" name=\"Name\" required aria-required=\"true\"/></label>\n"
 				]
 			},
 			{
-				"blockName": "core/input-field",
+				"blockName": "core/form-input",
 				"attrs": {
 					"type": "email",
 					"label": "Email",
 					"required": true
 				},
 				"innerBlocks": [],
-				"innerHTML": "\n<label class=\"wp-block-input-field-label\"><div class=\"wp-block-input-field-label__content\">Email</div><input class=\"wp-block-input-field\" type=\"email\" name=\"Email\" required aria-required=\"true\"/></label>\n",
+				"innerHTML": "\n<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Email</div><input class=\"wp-block-form-input\" type=\"email\" name=\"Email\" required aria-required=\"true\"/></label>\n",
 				"innerContent": [
-					"\n<label class=\"wp-block-input-field-label\"><div class=\"wp-block-input-field-label__content\">Email</div><input class=\"wp-block-input-field\" type=\"email\" name=\"Email\" required aria-required=\"true\"/></label>\n"
+					"\n<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Email</div><input class=\"wp-block-form-input\" type=\"email\" name=\"Email\" required aria-required=\"true\"/></label>\n"
 				]
 			},
 			{
-				"blockName": "core/input-field",
+				"blockName": "core/form-input",
 				"attrs": {
 					"type": "url",
 					"label": "Website"
 				},
 				"innerBlocks": [],
-				"innerHTML": "\n<label class=\"wp-block-input-field-label\"><div class=\"wp-block-input-field-label__content\">Website</div><input class=\"wp-block-input-field\" type=\"url\" name=\"Website\" aria-required=\"false\"/></label>\n",
+				"innerHTML": "\n<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Website</div><input class=\"wp-block-form-input\" type=\"url\" name=\"Website\" aria-required=\"false\"/></label>\n",
 				"innerContent": [
-					"\n<label class=\"wp-block-input-field-label\"><div class=\"wp-block-input-field-label__content\">Website</div><input class=\"wp-block-input-field\" type=\"url\" name=\"Website\" aria-required=\"false\"/></label>\n"
+					"\n<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Website</div><input class=\"wp-block-form-input\" type=\"url\" name=\"Website\" aria-required=\"false\"/></label>\n"
 				]
 			},
 			{
-				"blockName": "core/input-field",
+				"blockName": "core/form-input",
 				"attrs": {
 					"type": "textarea",
 					"label": "Comment",
 					"required": true
 				},
 				"innerBlocks": [],
-				"innerHTML": "\n<label class=\"wp-block-input-field-label\"><div class=\"wp-block-input-field-label__content\">Comment</div><textarea class=\"wp-block-input-field\" name=\"Comment\" required aria-required=\"true\"></textarea></label>\n",
+				"innerHTML": "\n<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Comment</div><textarea class=\"wp-block-form-input\" name=\"Comment\" required aria-required=\"true\"></textarea></label>\n",
 				"innerContent": [
-					"\n<label class=\"wp-block-input-field-label\"><div class=\"wp-block-input-field-label__content\">Comment</div><textarea class=\"wp-block-input-field\" name=\"Comment\" required aria-required=\"true\"></textarea></label>\n"
+					"\n<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Comment</div><textarea class=\"wp-block-form-input\" name=\"Comment\" required aria-required=\"true\"></textarea></label>\n"
 				]
 			},
 			{
-				"blockName": "core/input-field",
+				"blockName": "core/form-input",
 				"attrs": {
 					"type": "submit",
 					"label": "Submit"

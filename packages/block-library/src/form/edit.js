@@ -12,14 +12,14 @@ import { PanelBody, TextControl } from '@wordpress/components';
 const ALLOWED_BLOCKS = [
 	'core/paragraph',
 	'core/heading',
-	'core/input-field',
+	'core/form-input',
 	'core/columns',
 	'core/group',
 ];
 
 const TEMPLATE = [
 	[
-		'core/input-field',
+		'core/form-input',
 		{
 			type: 'text',
 			label: __( 'Name' ),
@@ -27,7 +27,7 @@ const TEMPLATE = [
 		},
 	],
 	[
-		'core/input-field',
+		'core/form-input',
 		{
 			type: 'email',
 			label: __( 'Email' ),
@@ -35,14 +35,14 @@ const TEMPLATE = [
 		},
 	],
 	[
-		'core/input-field',
+		'core/form-input',
 		{
 			type: 'url',
 			label: __( 'Website' ),
 		},
 	],
 	[
-		'core/input-field',
+		'core/form-input',
 		{
 			type: 'textarea',
 			label: __( 'Comment' ),
@@ -50,7 +50,7 @@ const TEMPLATE = [
 		},
 	],
 	[
-		'core/input-field',
+		'core/form-input',
 		{
 			type: 'submit',
 			label: __( 'Submit' ),

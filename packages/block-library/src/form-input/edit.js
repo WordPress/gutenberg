@@ -95,14 +95,14 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 			{ type === 'textarea' && (
 				/* eslint-disable jsx-a11y/label-has-associated-control */
 				<label
-					className={ classNames( 'wp-block-input-field-label', {
+					className={ classNames( 'wp-block-form-input-label', {
 						'is-label-inline': inlineLabel,
 					} ) }
 				>
 					<RichText
 						identifier="label"
 						tagName="div"
-						className="wp-block-input-field-label__content"
+						className="wp-block-form-input-label__content"
 						{ ...blockProps }
 						value={ label }
 						onChange={ ( newLabel ) =>
@@ -118,7 +118,7 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 						__unstableAllowPrefixTransformations
 					/>
 					<textarea
-						className="wp-block-input-field"
+						className="wp-block-form-input"
 						disabled="true"
 						name={ name }
 						required={ required }
@@ -162,14 +162,14 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 			{ type !== 'textarea' && type !== 'submit' && (
 				/* eslint-disable jsx-a11y/label-has-associated-control */
 				<label
-					className={ classNames( 'wp-block-input-field-label', {
+					className={ classNames( 'wp-block-form-input-label', {
 						'is-label-inline': inlineLabel,
 					} ) }
 				>
 					<RichText
 						identifier="label"
 						tagName="span"
-						className="wp-block-input-field-label__content"
+						className="wp-block-form-input-label__content"
 						{ ...blockProps }
 						value={ label }
 						onChange={ ( newLabel ) =>
@@ -185,7 +185,7 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 						__unstableAllowPrefixTransformations
 					/>
 					<input
-						className="wp-block-input-field"
+						className="wp-block-form-input"
 						type={ type }
 						name={ name }
 						disabled="true"

@@ -1,0 +1,14 @@
+[
+	{
+		"blockName": "core/form-input",
+		"attrs": {
+			"label": "Name",
+			"required": true
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Name</div><input class=\"wp-block-form-input\" type=\"text\" name=\"Name\" required aria-required=\"true\"/></label>\n",
+		"innerContent": [
+			"\n<label class=\"wp-block-form-input-label\"><div class=\"wp-block-form-input-label__content\">Name</div><input class=\"wp-block-form-input\" type=\"text\" name=\"Name\" required aria-required=\"true\"/></label>\n"
+		]
+	}
+]

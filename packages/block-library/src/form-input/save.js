@@ -11,15 +11,15 @@ export default function save( { attributes } ) {
 			{ type === 'textarea' && (
 				/* eslint-disable jsx-a11y/label-has-associated-control */
 				<label
-					className={ classNames( 'wp-block-input-field-label', {
+					className={ classNames( 'wp-block-form-input-label', {
 						'is-label-inline': inlineLabel,
 					} ) }
 				>
-					<div className="wp-block-input-field-label__content">
+					<div className="wp-block-form-input-label__content">
 						{ label }
 					</div>
 					<textarea
-						className="wp-block-input-field"
+						className="wp-block-form-input"
 						name={ name || label }
 						required={ required }
 						aria-required={ required }
@@ -41,15 +41,15 @@ export default function save( { attributes } ) {
 			{ type !== 'textarea' && type !== 'submit' && (
 				/* eslint-disable jsx-a11y/label-has-associated-control */
 				<label
-					className={ classNames( 'wp-block-input-field-label', {
+					className={ classNames( 'wp-block-form-input-label', {
 						'is-label-inline': inlineLabel,
 					} ) }
 				>
-					<div className="wp-block-input-field-label__content">
+					<div className="wp-block-form-input-label__content">
 						{ label }
 					</div>
 					<input
-						className="wp-block-input-field"
+						className="wp-block-form-input"
 						type={ type }
 						name={ name || label }
 						required={ required }
