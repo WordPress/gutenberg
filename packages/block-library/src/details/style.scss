@@ -1,0 +1,21 @@
+.wp-block-details {
+	box-sizing: inherit;
+
+	> summary {
+		padding: 10px;
+		cursor: default;
+	}
+
+	> summary:hover {
+		cursor: pointer;
+	}
+
+	.wp-block-details__summary-text {
+		margin-left: 0.5em;
+	}
+
+	> .wp-block-details__inner-container {
+		cursor: default;
+		padding: 0 1em;
+	}
+}
