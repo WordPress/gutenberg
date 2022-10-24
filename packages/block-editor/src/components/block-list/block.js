@@ -84,7 +84,7 @@ function BlockListBlock( {
 	isSelected,
 	isSelectionEnabled,
 	className,
-	layoutClassNames,
+	__unstableLayoutClassNames: layoutClassNames,
 	name,
 	isValid,
 	attributes,
@@ -147,7 +147,7 @@ function BlockListBlock( {
 			clientId={ clientId }
 			isSelectionEnabled={ isSelectionEnabled }
 			toggleSelection={ toggleSelection }
-			layoutClassNames={ layoutClassNames }
+			__unstableLayoutClassNames={ layoutClassNames }
 		/>
 	);
 

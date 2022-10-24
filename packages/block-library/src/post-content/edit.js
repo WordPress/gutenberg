@@ -121,7 +121,7 @@ function RecursionError() {
 export default function PostContentEdit( {
 	context,
 	attributes,
-	layoutClassNames,
+	__unstableLayoutClassNames: layoutClassNames,
 } ) {
 	const { postId: contextPostId, postType: contextPostType } = context;
 	const { layout = {} } = attributes;

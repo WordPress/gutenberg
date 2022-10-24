@@ -408,7 +408,10 @@ export const withLayoutStyles = createHigherOrderComponent(
 						/>,
 						element
 					) }
-				<BlockListBlock { ...props } layoutClassNames={ className } />
+				<BlockListBlock
+					{ ...props }
+					__unstableLayoutClassNames={ className }
+				/>
 			</>
 		);
 	}

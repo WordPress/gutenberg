@@ -20,12 +20,12 @@ import { BlockEditContextProvider, useBlockEditContext } from './context';
 export { useBlockEditContext };
 
 export default function BlockEdit( props ) {
-	const { name, isSelected, clientId, layoutClassNames } = props;
+	const { name, isSelected, clientId, __unstableLayoutClassNames } = props;
 	const context = {
 		name,
 		isSelected,
 		clientId,
-		layoutClassNames,
+		__unstableLayoutClassNames,
 	};
 	return (
 		<BlockEditContextProvider

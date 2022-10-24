@@ -26,7 +26,7 @@ export const Gallery = ( props ) => {
 		mediaPlaceholder,
 		insertBlocksAfter,
 		blockProps,
-		layoutClassNames,
+		__unstableLayoutClassNames: layoutClassNames,
 	} = props;
 
 	const { align, columns, caption, imageCrop } = attributes;
