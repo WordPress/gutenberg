@@ -17,7 +17,11 @@ import { useState, useMemo, forwardRef } from '@wordpress/element';
 import Button from '../button';
 import RangeControl from '../range-control';
 import { Flex, FlexItem } from '../flex';
-import { default as UnitControl, useCustomUnits } from '../unit-control';
+import {
+	default as UnitControl,
+	parseQuantityAndUnitFromRawValue,
+	useCustomUnits,
+} from '../unit-control';
 import CustomSelectControl from '../custom-select-control';
 import { VisuallyHidden } from '../visually-hidden';
 import {
@@ -27,7 +31,6 @@ import {
 import {
 	getFontSizeOptions,
 	getSelectedOption,
-	parseNumberAndUnitFromSize,
 	isSimpleCssValue,
 	CUSTOM_FONT_SIZE,
 } from './utils';
@@ -124,8 +127,9 @@ const UnforwardedFontSizePicker = (
 			! fontSizesContainComplexValues &&
 			typeof selectedOption.size === 'string'
 		) {
-			const [ , unit ] = parseNumberAndUnitFromSize(
-				selectedOption.size
+			const [ , unit ] = parseQuantityAndUnitFromRawValue(
+				selectedOption.size,
+				units
 			);
 			hint += `(${ unit })`;
 		}
@@ -158,7 +162,10 @@ const UnforwardedFontSizePicker = (
 	const hasUnits =
 		typeof value === 'string' || typeof fontSizes[ 0 ]?.size === 'string';
 
-	const [ valueNumber, valueUnit ] = parseNumberAndUnitFromSize( value );
+	const [ valueQuantity, valueUnit ] = parseQuantityAndUnitFromRawValue(
+		value,
+		units
+	);
 	const isValueUnitRelative =
 		!! valueUnit && [ 'em', 'rem' ].includes( valueUnit );
 
@@ -299,7 +306,7 @@ const UnforwardedFontSizePicker = (
 										className="components-font-size-picker__custom-input"
 										label={ __( 'Custom Size' ) }
 										hideLabelFromVision
-										value={ valueNumber }
+										value={ valueQuantity }
 										initialPosition={ fallbackFontSize }
 										withInputField={ false }
 										onChange={ ( newValue ) => {

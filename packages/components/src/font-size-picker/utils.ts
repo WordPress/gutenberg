@@ -44,24 +44,6 @@ const FONT_SIZES_ALIASES = [
 ];
 
 /**
- * Given a font size, returns the numeric part and unit part. For example, given
- * '30px', 30 and 'px' would be returned.
- *
- * @param  size Font size.
- * @return An array with the number and the unit if it exists.
- */
-export function parseNumberAndUnitFromSize(
-	size: FontSizePickerProps[ 'value' ]
-): [ number, string ] | [ number ] | [] {
-	const [ , rawNumber, unit ] = `${ size }`.match( /^([\d\.]+)(\D*)/ ) ?? [];
-	const number = Number( rawNumber );
-	if ( ! isNaN( number ) && isFinite( number ) ) {
-		return unit ? [ number, unit ] : [ number ];
-	}
-	return [];
-}
-
-/**
  * Some themes use css vars for their font sizes, so until we
  * have the way of calculating them don't display them.
  *
