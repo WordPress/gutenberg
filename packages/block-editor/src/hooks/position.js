@@ -32,6 +32,8 @@ const POSITION_OPTIONS = [
 	},
 ];
 
+const POSITION_SIDES = [ 'top', 'right', 'bottom', 'left' ];
+
 /**
  * Determines if there is position support.
  *
@@ -51,7 +53,7 @@ export function hasPositionSupport( blockType ) {
  * @return {boolean}     Whether or not the block has a position value set.
  */
 export function hasPositionValue( props ) {
-	return props.attributes.layout?.position !== undefined;
+	return props.attributes.style?.layout?.position !== undefined;
 }
 
 /**
@@ -63,12 +65,19 @@ export function hasPositionValue( props ) {
  * @param {Object} props.setAttributes Function to set block's attributes.
  */
 export function resetPosition( { attributes = {}, setAttributes } ) {
-	const { layout = {} } = attributes;
+	const { style = {} } = attributes;
 
 	setAttributes( {
-		layout: cleanEmptyObject( {
-			...layout,
-			position: undefined,
+		style: cleanEmptyObject( {
+			...style,
+			layout: {
+				...style?.layout,
+				position: undefined,
+				top: undefined,
+				right: undefined,
+				bottom: undefined,
+				left: undefined,
+			},
 		} ),
 	} );
 }
@@ -87,6 +96,29 @@ export function useIsPositionDisabled( { name: blockName } = {} ) {
 }
 
 /**
+ * From a style.layout object, find the first side with a value.
+ *
+ * This allows inferring the selected area based on the presence of a value for one of
+ * the four sides, `top`, `bottom`, `right`, and `left.
+ *
+ * @param {Object} styleLayout An object that can contain `top`, `bottom`, `right`, and `left` keys.
+ * @return {?string} The side with a value.
+ */
+function getFirstActiveAreaValue( styleLayout ) {
+	if ( ! styleLayout ) {
+		return;
+	}
+	const foundSide = Object.entries( styleLayout ).find(
+		( [ key, value ] ) =>
+			POSITION_SIDES.includes( key ) && value !== undefined
+	);
+
+	if ( foundSide ) {
+		return foundSide[ 0 ];
+	}
+}
+
+/**
  * Inspector control panel containing the padding related configuration
  *
  * @param {Object} props
@@ -95,7 +127,7 @@ export function useIsPositionDisabled( { name: blockName } = {} ) {
  */
 export function PositionEdit( props ) {
 	const {
-		attributes: { layout = {} },
+		attributes: { style = {} },
 		setAttributes,
 	} = props;
 
@@ -104,32 +136,54 @@ export function PositionEdit( props ) {
 	}
 
 	const onChangeSide = ( next ) => {
-		const newLayout = {
-			...layout,
-			position: {
-				...layout?.position,
-				side: next,
+		if ( next !== undefined && ! POSITION_SIDES.includes( next ) ) {
+			return;
+		}
+
+		// For now, use a hard-coded `0px` value for the position.
+		// `0px` is preferred over `0` as it can be used in `calc()` functions.
+		// In the future, it could be useful to allow for an offset value.
+		const newValue = '0px';
+
+		const newSides = {
+			top: undefined,
+			right: undefined,
+			bottom: undefined,
+			left: undefined,
+		};
+
+		if ( next !== undefined ) {
+			newSides[ next ] = newValue;
+		}
+
+		const newStyle = {
+			...style,
+			layout: {
+				...style?.layout,
+				...newSides,
 			},
 		};
 
 		setAttributes( {
-			layout: cleanEmptyObject( newLayout ),
+			style: cleanEmptyObject( newStyle ),
 		} );
 	};
 
 	const onChangeType = ( next ) => {
-		const newLayout = {
-			...layout,
-			position: {
-				...layout?.position,
-				type: next,
+		const newStyle = {
+			...style,
+			layout: {
+				...style?.layout,
+				position: next,
 			},
 		};
 
 		setAttributes( {
-			layout: cleanEmptyObject( newLayout ),
+			style: cleanEmptyObject( newStyle ),
 		} );
 	};
+
+	const areaValue = getFirstActiveAreaValue( style?.layout );
 
 	return Platform.select( {
 		web: (
@@ -139,14 +193,14 @@ export function PositionEdit( props ) {
 						'The area of a page that this block should occupy'
 					) }
 					onChange={ onChangeSide }
-					value={ layout?.position?.side }
+					value={ areaValue }
 				/>
 				<ToggleGroupControl
 					label={ __( 'Position' ) }
 					help={ __(
 						"Lock this block to an area of the page so it doesn't scroll with page content"
 					) }
-					value={ layout?.position?.type || '' }
+					value={ style?.layout?.position || '' }
 					onChange={ ( newValue ) => {
 						onChangeType( newValue );
 					} }

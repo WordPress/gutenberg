@@ -76,27 +76,28 @@ const VALID_POSITION_TYPES = [ 'sticky', 'fixed' ];
  *
  * @param {Object} props          Component props.
  * @param {string} props.selector Selector to use.
- * @param {Object} props.layout   Layout object.
+ * @param {Object} props.style    Style object.
  * @return {string} The generated CSS rules.
  */
-export function getPositionCSS( { selector, layout } ) {
+export function getPositionCSS( { selector, style } ) {
 	let output = '';
 
-	const { type, side } = layout?.position || {};
+	const { position } = style?.layout || {};
 
-	if (
-		! VALID_POSITION_TYPES.includes( type ) ||
-		! VALID_POSITION_SIDES.includes( side )
-	) {
+	if ( ! VALID_POSITION_TYPES.includes( position ) ) {
 		return output;
 	}
 
-	const offsetValue = '0px';
-
 	output += `${ selector } {`;
-	output += `position: ${ type };`;
-	output += `${ side }: ${ offsetValue };`;
-	if ( type === 'sticky' || type === 'fixed' ) {
+	output += `position: ${ position };`;
+
+	VALID_POSITION_SIDES.forEach( ( side ) => {
+		if ( style?.layout?.[ side ] !== undefined ) {
+			output += `${ side }: ${ style.layout[ side ] };`;
+		}
+	} );
+
+	if ( position === 'sticky' || position === 'fixed' ) {
 		// TODO: Work out where to put the magic z-index value.
 		output += `z-index: 250`;
 	}

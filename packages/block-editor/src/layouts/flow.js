@@ -21,7 +21,6 @@ export default {
 	},
 	getLayoutStyle: function getLayoutStyle( {
 		selector,
-		layout,
 		style,
 		blockName,
 		hasBlockGapSupport,
@@ -54,7 +53,7 @@ export default {
 		}
 
 		// Add position CSS where applicable.
-		output += getPositionCSS( { selector, layout } );
+		output += getPositionCSS( { selector, style } );
 
 		return output;
 	},

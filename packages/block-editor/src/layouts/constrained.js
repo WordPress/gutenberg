@@ -236,7 +236,7 @@ export default {
 		}
 
 		// Add position CSS where applicable.
-		output += getPositionCSS( { selector, layout } );
+		output += getPositionCSS( { selector, style } );
 
 		return output;
 	},

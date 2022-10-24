@@ -26,34 +26,47 @@ function gutenberg_register_layout_support( $block_type ) {
 }
 
 /**
- * Generates the CSS for position support from the layout object.
+ * Generates the CSS for position support from the style object.
  *
  * @param string $selector CSS selector.
- * @param array  $layout   Layout object. The one that is passed has already checked
- *                         the existence of default block layout.
+ * @param array  $style    Style object.
  * @return string CSS styles on success. Else, empty string.
  */
-function gutenberg_get_layout_position_style( $selector, $layout ) {
+function gutenberg_get_layout_position_style( $selector, $style ) {
 	$position_styles = array();
-
-	$position_type = _wp_array_get( $layout, array( 'position', 'type' ), '' );
-	$position_side = _wp_array_get( $layout, array( 'position', 'side' ), '' );
-	$offset_value  = '0';
+	$position_type   = _wp_array_get( $style, array( 'layout', 'position' ), '' );
 
 	if (
-		in_array( $position_type, array( 'fixed', 'sticky' ), true ) &&
-		in_array( $position_side, array( 'top', 'right', 'bottom', 'left' ), true )
+		in_array( $position_type, array( 'fixed', 'sticky' ), true )
 	) {
-		/*
-		 * For fixed or sticky top positions,
-		 * ensure the value includes an offset for the logged in admin bar.
-		 */
-		if (
-			'top' === $position_side &&
-			'fixed' === $position_type ||
-			'sticky' === $position_type
-		) {
-			$offset_value = 'var(--wp-admin--admin-bar--height, 0px)';
+		$sides = array( 'top', 'right', 'bottom', 'left' );
+
+		foreach( $sides as $side ) {
+			$side_value = _wp_array_get( $style, array( 'layout', $side ) );
+			if ( $side_value !== null ) {
+
+				/*
+				* For fixed or sticky top positions,
+				* ensure the value includes an offset for the logged in admin bar.
+				*/
+				if (
+					'top' === $side &&
+					'fixed' === $position_type ||
+					'sticky' === $position_type
+				) {
+					// TODO: wrap the following value in a `calc()` + `$side_value`,
+					// so that any included value is treated as an offset.
+					$side_value = 'var(--wp-admin--admin-bar--height, 0px)';
+				}
+
+				$position_styles[] =
+					array(
+						'selector'     => "$selector",
+						'declarations' => array(
+							$side => $side_value
+						),
+					);
+			}
 		}
 
 		$position_styles[] =
@@ -61,7 +74,6 @@ function gutenberg_get_layout_position_style( $selector, $layout ) {
 				'selector'     => "$selector",
 				'declarations' => array(
 					'position'     => $position_type,
-					$position_side => $offset_value,
 					'z-index'      => '250', // TODO: This hard-coded value should live somewhere else.
 				),
 			);
@@ -480,7 +492,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			$block_spacing
 		);
 
-		$style .= gutenberg_get_layout_position_style( ".$block_classname.$container_class", $used_layout );
+		$style_attribute = _wp_array_get( $block, array( 'attrs', 'style' ), null );
+		$style          .= gutenberg_get_layout_position_style( ".$block_classname.$container_class", $style_attribute );
 
 		// Only add container class and enqueue block support styles if unique styles were generated.
 		if ( ! empty( $style ) ) {
