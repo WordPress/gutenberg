@@ -47,7 +47,7 @@
 
 ### Internal
 
--   Remove unneccessary argument from an instance of `Array#pop`.
+-   Remove unnecessary argument from an instance of `Array#pop`.
 
 ## 1.0.0 (2019-03-06)
 

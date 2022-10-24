@@ -272,7 +272,7 @@ function Navigation( {
 			fallbackNavigationMenus?.length > 0 ||
 			classicMenus?.length !== 1
 		) {
-			return false;
+			return;
 		}
 
 		// If there's non fallback navigation menus and
@@ -481,24 +481,22 @@ function Navigation( {
 
 	// Prompt the user to publish the menu they have set as a draft
 	const isDraftNavigationMenu = navigationMenu?.status === 'draft';
-	useEffect( async () => {
+	useEffect( () => {
 		hideMenuAutoPublishDraftNotice();
-		if ( ! isDraftNavigationMenu ) return;
-		try {
-			await editEntityRecord(
-				'postType',
-				'wp_navigation',
-				navigationMenu?.id,
-				{
-					status: 'publish',
-				},
-				{ throwOnError: true }
-			);
-		} catch {
+		if ( ! isDraftNavigationMenu ) {
+			return;
+		}
+		editEntityRecord(
+			'postType',
+			'wp_navigation',
+			navigationMenu?.id,
+			{ status: 'publish' },
+			{ throwOnError: true }
+		).catch( () => {
 			showMenuAutoPublishDraftNotice(
 				__( 'Error occurred while publishing the navigation menu.' )
 			);
-		}
+		} );
 	}, [ isDraftNavigationMenu, navigationMenu ] );
 
 	const stylingInspectorControls = (

@@ -65,14 +65,14 @@ describe( 'ItemGroup', () => {
 				</ItemGroup>
 			);
 
-			const { container: seperatedItems } = render(
+			const { container: separatedItems } = render(
 				<ItemGroup isSeparated={ true }>
 					<Item>Code is poetry</Item>
 				</ItemGroup>
 			);
 
 			expect( groupedItems.firstChild ).toMatchDiffSnapshot(
-				seperatedItems.firstChild
+				separatedItems.firstChild
 			);
 		} );
 	} );

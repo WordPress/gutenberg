@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escape, without } from 'lodash';
+import { escape } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -486,7 +486,9 @@ export default function NavigationSubmenuEdit( {
 	const innerBlocksColors = getColors( context, true );
 
 	const allowedBlocks = isAtMaxNesting
-		? without( ALLOWED_BLOCKS, 'core/navigation-submenu' )
+		? ALLOWED_BLOCKS.filter(
+				( blockName ) => blockName !== 'core/navigation-submenu'
+		  )
 		: ALLOWED_BLOCKS;
 
 	const innerBlocksProps = useInnerBlocksProps(

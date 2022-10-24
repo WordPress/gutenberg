@@ -167,7 +167,7 @@ Contains the block elements used to display a comment, like the title, date, aut
 
 -	**Name:** core/comment-template
 -	**Category:** design
--	**Supports:** align, typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** align, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** 
 
 ## Comments
@@ -491,7 +491,7 @@ Display a post's comments count. ([Source](https://github.com/WordPress/gutenber
 
 -	**Name:** core/post-comments-count
 -	**Category:** theme
--	**Supports:** color (background, gradients, text), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** textAlign
 
 ## Post Comments Form
@@ -509,7 +509,7 @@ Displays the link to the current post comments. ([Source](https://github.com/Wor
 
 -	**Name:** core/post-comments-link
 -	**Category:** theme
--	**Supports:** color (background, link, ~~text~~), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** color (background, link, ~~text~~), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** textAlign
 
 ## Post Content

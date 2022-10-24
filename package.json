@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "14.4.0-rc.1",
+	"version": "14.4.0-rc.2",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -188,6 +188,7 @@
 		"eslint-plugin-jest-dom": "4.0.2",
 		"eslint-plugin-playwright": "0.8.0",
 		"eslint-plugin-ssr-friendly": "1.0.6",
+		"eslint-plugin-testing-library": "5.7.2",
 		"execa": "4.0.2",
 		"fast-glob": "3.2.7",
 		"filenamify": "4.2.0",
