@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { RefCallback } from 'react';
+
+/**
  * Internal dependencies
  */
 import { debounce } from '../../utils/debounce';
@@ -11,9 +16,9 @@ import useRefEffect from '../use-ref-effect';
  *
  * If you can, prefer the use of the inert HTML attribute.
  *
- * @param {Object}   config            Configuration object.
- * @param {boolean=} config.isDisabled Whether the element should be disabled.
- * @return {import('react').RefCallback<HTMLElement>} Element Ref.
+ * @param  config            Configuration object.
+ * @param  config.isDisabled Whether the element should be disabled.
+ * @return Element Ref.
  *
  * @example
  * ```js
@@ -77,5 +82,5 @@ export default function useDisabled( {
 			};
 		},
 		[ isDisabledProp ]
-	);
+	) as RefCallback< HTMLElement >;
 }

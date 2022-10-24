@@ -55,7 +55,7 @@ function Disabled( {
 	return (
 		<Provider value={ isDisabled }>
 			<div
-				// @ts-ignore Reason: inert is a recent HTML attribute
+				// @ts-expect-error Reason: inert is a recent HTML attribute
 				inert={ isDisabled ? 'true' : undefined }
 				className={
 					isDisabled
