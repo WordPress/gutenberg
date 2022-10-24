@@ -85,7 +85,7 @@ function Variation( { variation } ) {
 				onClick={ selectVariation }
 				onKeyDown={ selectOnEnter }
 				tabIndex="0"
-				aria-label={ variation?.title }
+				aria-label={ variation?.description }
 				aria-current={ isActive }
 				onFocus={ () => setIsFocused( true ) }
 				onBlur={ () => setIsFocused( false ) }
