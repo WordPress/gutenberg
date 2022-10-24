@@ -1,5 +1,7 @@
 # ColorPalette
 
+ColorPalette allows the user to pick a color from a list of pre-defined color entries.
+
 ## Props
 
 The component accepts the following props.
