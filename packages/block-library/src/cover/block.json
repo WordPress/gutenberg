@@ -105,12 +105,6 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
-		},
-		"__experimentalLayout": {
-			"allowSwitching": true,
-			"default": {
-				"type": "constrained"
-			}
 		}
 	},
 	"editorStyle": "wp-block-cover-editor",
