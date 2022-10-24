@@ -3,7 +3,7 @@
  */
 import type { CSSProperties, MouseEventHandler, ReactNode } from 'react';
 
-export type OnColorChange = ( newColor?: string ) => void;
+type OnColorChange = ( newColor?: string ) => void;
 
 export type ColorObject = {
 	name: string;

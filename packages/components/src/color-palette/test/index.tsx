@@ -8,16 +8,15 @@ import userEvent from '@testing-library/user-event';
  * Internal dependencies
  */
 import ColorPalette from '..';
-import type { ColorObject, OnColorChange } from '../types';
 
 describe( 'ColorPalette', () => {
-	const colors: ColorObject[] = [
+	const colors = [
 		{ name: 'red', color: '#f00' },
 		{ name: 'white', color: '#fff' },
 		{ name: 'blue', color: '#00f' },
 	];
 	const currentColor = '#f00';
-	const onChange: jest.Mock< OnColorChange > = jest.fn();
+	const onChange = jest.fn();
 
 	beforeEach( () => {
 		onChange.mockClear();
