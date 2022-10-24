@@ -321,9 +321,9 @@ const UnforwardedFontSizePicker = (
 												onChange?.( newValue );
 											}
 										} }
-										min={ isValueUnitRelative ? 0.75 : 12 }
-										max={ isValueUnitRelative ? 6.25 : 100 }
-										step={ isValueUnitRelative ? 0.05 : 1 }
+										min={ 0 }
+										max={ isValueUnitRelative ? 10 : 100 }
+										step={ isValueUnitRelative ? 0.1 : 1 }
 									/>
 								</Spacer>
 							</FlexItem>
