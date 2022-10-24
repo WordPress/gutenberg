@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -22,28 +22,37 @@ const defaultBorder = {
 	width: '1px',
 };
 
-const props = {
-	colors,
-	label: 'Border',
-	onChange: jest.fn().mockImplementation( ( newValue ) => {
-		props.value = newValue;
-	} ),
-	value: defaultBorder,
-};
+function createProps( customProps ) {
+	const props = {
+		colors,
+		label: 'Border',
+		onChange: jest.fn().mockImplementation( ( newValue ) => {
+			props.value = newValue;
+		} ),
+		value: defaultBorder,
+		...customProps,
+	};
+	return props;
+}
 
 const toggleLabelRegex = /Border color( and style)* picker/;
 
-const renderBorderControl = ( customProps ) => {
-	return render( <BorderControl { ...{ ...props, ...customProps } } /> );
+const renderBorderControl = async ( props ) => {
+	const view = render( <BorderControl { ...props } /> );
+	await act( () => Promise.resolve() );
+	return view;
 };
 
-const rerenderBorderControl = ( rerender, customProps ) => {
-	return rerender( <BorderControl { ...{ ...props, ...customProps } } /> );
+const rerenderBorderControl = async ( rerender, props ) => {
+	const view = rerender( <BorderControl { ...props } /> );
+	await act( () => Promise.resolve() );
+	return view;
 };
 
-const openPopover = () => {
+const openPopover = async () => {
 	const toggleButton = screen.getByLabelText( toggleLabelRegex );
 	fireEvent.click( toggleButton );
+	await act( () => Promise.resolve() );
 };
 
 const getButton = ( name ) => {
@@ -67,7 +76,9 @@ const getWidthInput = () => {
 };
 const setWidthInput = ( value ) => {
 	const widthInput = getWidthInput();
-	widthInput.focus();
+	act( () => {
+		widthInput.focus();
+	} );
 	fireEvent.change( widthInput, { target: { value } } );
 };
 
@@ -75,8 +86,9 @@ const clearWidthInput = () => setWidthInput( '' );
 
 describe( 'BorderControl', () => {
 	describe( 'basic rendering', () => {
-		it( 'should render standard border control', () => {
-			renderBorderControl();
+		it( 'should render standard border control', async () => {
+			const props = createProps();
+			await renderBorderControl( props );
 
 			const label = screen.getByText( props.label );
 			const colorButton = screen.getByLabelText( toggleLabelRegex );
@@ -95,8 +107,9 @@ describe( 'BorderControl', () => {
 			expect( slider ).not.toBeInTheDocument();
 		} );
 
-		it( 'should hide label', () => {
-			renderBorderControl( { hideLabelFromVision: true } );
+		it( 'should hide label', async () => {
+			const props = createProps( { hideLabelFromVision: true } );
+			await renderBorderControl( props );
 			const label = screen.getByText( props.label );
 
 			// As visually hidden labels are still included in the document
@@ -108,23 +121,26 @@ describe( 'BorderControl', () => {
 			);
 		} );
 
-		it( 'should render with slider', () => {
-			renderBorderControl( { withSlider: true } );
+		it( 'should render with slider', async () => {
+			const props = createProps( { withSlider: true } );
+			await renderBorderControl( props );
 
 			const slider = getSliderInput();
 			expect( slider ).toBeInTheDocument();
 		} );
 
-		it( 'should render placeholder in UnitControl', () => {
-			renderBorderControl( { placeholder: 'Mixed' } );
-			const widthInput = getWidthInput();
+		it( 'should render placeholder in UnitControl', async () => {
+			const props = createProps( { placeholder: 'Mixed' } );
+			await renderBorderControl( props );
 
+			const widthInput = getWidthInput();
 			expect( widthInput ).toHaveAttribute( 'placeholder', 'Mixed' );
 		} );
 
-		it( 'should render color and style popover', () => {
-			renderBorderControl();
-			openPopover();
+		it( 'should render color and style popover', async () => {
+			const props = createProps();
+			await renderBorderControl( props );
+			await openPopover();
 
 			const customColorPicker = getButton( /Custom color picker/ );
 			const colorSwatchButtons = screen.getAllByRole( 'button', {
@@ -145,9 +161,10 @@ describe( 'BorderControl', () => {
 			expect( resetButton ).toBeInTheDocument();
 		} );
 
-		it( 'should render color and style popover header', () => {
-			renderBorderControl( { showDropdownHeader: true } );
-			openPopover();
+		it( 'should render color and style popover header', async () => {
+			const props = createProps( { showDropdownHeader: true } );
+			await renderBorderControl( props );
+			await openPopover();
 
 			const headerLabel = screen.getByText( 'Border color' );
 			const closeButton = getButton( 'Close border color' );
@@ -156,9 +173,10 @@ describe( 'BorderControl', () => {
 			expect( closeButton ).toBeInTheDocument();
 		} );
 
-		it( 'should not render style options when opted out of', () => {
-			renderBorderControl( { enableStyle: false } );
-			openPopover();
+		it( 'should not render style options when opted out of', async () => {
+			const props = createProps( { enableStyle: false } );
+			await renderBorderControl( props );
+			await openPopover();
 
 			const styleLabel = screen.queryByText( 'Style' );
 			const solidButton = queryButton( 'Solid' );
@@ -174,16 +192,18 @@ describe( 'BorderControl', () => {
 
 	describe( 'color and style picker aria labels', () => {
 		describe( 'with style selection enabled', () => {
-			it( 'should include both color and style in label', () => {
-				renderBorderControl( { value: undefined } );
+			it( 'should include both color and style in label', async () => {
+				const props = createProps( { value: undefined } );
+				await renderBorderControl( props );
 
 				expect(
 					screen.getByLabelText( 'Border color and style picker.' )
 				).toBeInTheDocument();
 			} );
 
-			it( 'should correctly describe named color selection', () => {
-				renderBorderControl( { value: { color: '#72aee6' } } );
+			it( 'should correctly describe named color selection', async () => {
+				const props = createProps( { value: { color: '#72aee6' } } );
+				await renderBorderControl( props );
 
 				expect(
 					screen.getByLabelText(
@@ -192,8 +212,9 @@ describe( 'BorderControl', () => {
 				).toBeInTheDocument();
 			} );
 
-			it( 'should correctly describe custom color selection', () => {
-				renderBorderControl( { value: { color: '#4b1d80' } } );
+			it( 'should correctly describe custom color selection', async () => {
+				const props = createProps( { value: { color: '#4b1d80' } } );
+				await renderBorderControl( props );
 
 				expect(
 					screen.getByLabelText(
@@ -202,10 +223,11 @@ describe( 'BorderControl', () => {
 				).toBeInTheDocument();
 			} );
 
-			it( 'should correctly describe named color and style selections', () => {
-				renderBorderControl( {
+			it( 'should correctly describe named color and style selections', async () => {
+				const props = createProps( {
 					value: { color: '#72aee6', style: 'dotted' },
 				} );
+				await renderBorderControl( props );
 
 				expect(
 					screen.getByLabelText(
@@ -214,10 +236,11 @@ describe( 'BorderControl', () => {
 				).toBeInTheDocument();
 			} );
 
-			it( 'should correctly describe custom color and style selections', () => {
-				renderBorderControl( {
+			it( 'should correctly describe custom color and style selections', async () => {
+				const props = createProps( {
 					value: { color: '#4b1d80', style: 'dashed' },
 				} );
+				await renderBorderControl( props );
 
 				expect(
 					screen.getByLabelText(
@@ -228,19 +251,24 @@ describe( 'BorderControl', () => {
 		} );
 
 		describe( 'with style selection disabled', () => {
-			it( 'should only include color in the label', () => {
-				renderBorderControl( { value: undefined, enableStyle: false } );
+			it( 'should only include color in the label', async () => {
+				const props = createProps( {
+					value: undefined,
+					enableStyle: false,
+				} );
+				await renderBorderControl( props );
 
 				expect(
 					screen.getByLabelText( 'Border color picker.' )
 				).toBeInTheDocument();
 			} );
 
-			it( 'should correctly describe named color selection', () => {
-				renderBorderControl( {
+			it( 'should correctly describe named color selection', async () => {
+				const props = createProps( {
 					value: { color: '#72aee6' },
 					enableStyle: false,
 				} );
+				await renderBorderControl( props );
 
 				expect(
 					screen.getByLabelText(
@@ -249,11 +277,12 @@ describe( 'BorderControl', () => {
 				).toBeInTheDocument();
 			} );
 
-			it( 'should correctly describe custom color selection', () => {
-				renderBorderControl( {
+			it( 'should correctly describe custom color selection', async () => {
+				const props = createProps( {
 					value: { color: '#4b1d80' },
 					enableStyle: false,
 				} );
+				await renderBorderControl( props );
 
 				expect(
 					screen.getByLabelText(
@@ -265,13 +294,9 @@ describe( 'BorderControl', () => {
 	} );
 
 	describe( 'onChange handling', () => {
-		beforeEach( () => {
-			jest.clearAllMocks();
-			props.value = defaultBorder;
-		} );
-
-		it( 'should update width with slider value', () => {
-			const { rerender } = renderBorderControl( { withSlider: true } );
+		it( 'should update width with slider value', async () => {
+			const props = createProps( { withSlider: true } );
+			const { rerender } = await renderBorderControl( props );
 
 			const slider = getSliderInput();
 			fireEvent.change( slider, { target: { value: '5' } } );
@@ -281,15 +306,16 @@ describe( 'BorderControl', () => {
 				width: '5px',
 			} );
 
-			rerenderBorderControl( rerender, { withSlider: true } );
+			await rerenderBorderControl( rerender, props );
 			const widthInput = getWidthInput();
 
 			expect( widthInput.value ).toEqual( '5' );
 		} );
 
-		it( 'should update color selection', () => {
-			renderBorderControl();
-			openPopover();
+		it( 'should update color selection', async () => {
+			const props = createProps();
+			await renderBorderControl( props );
+			await openPopover();
 			clickButton( 'Color: Green' );
 
 			expect( props.onChange ).toHaveBeenNthCalledWith( 1, {
@@ -298,9 +324,10 @@ describe( 'BorderControl', () => {
 			} );
 		} );
 
-		it( 'should clear color selection when toggling swatch off', () => {
-			renderBorderControl();
-			openPopover();
+		it( 'should clear color selection when toggling swatch off', async () => {
+			const props = createProps();
+			await renderBorderControl( props );
+			await openPopover();
 			clickButton( 'Color: Blue' );
 
 			expect( props.onChange ).toHaveBeenNthCalledWith( 1, {
@@ -309,9 +336,10 @@ describe( 'BorderControl', () => {
 			} );
 		} );
 
-		it( 'should update style selection', () => {
-			renderBorderControl();
-			openPopover();
+		it( 'should update style selection', async () => {
+			const props = createProps();
+			await renderBorderControl( props );
+			await openPopover();
 			clickButton( 'Dashed' );
 
 			expect( props.onChange ).toHaveBeenNthCalledWith( 1, {
@@ -320,17 +348,19 @@ describe( 'BorderControl', () => {
 			} );
 		} );
 
-		it( 'should take no action when color and style popover is closed', () => {
-			renderBorderControl( { showDropdownHeader: true } );
-			openPopover();
+		it( 'should take no action when color and style popover is closed', async () => {
+			const props = createProps( { showDropdownHeader: true } );
+			await renderBorderControl( props );
+			await openPopover();
 			clickButton( 'Close border color' );
 
 			expect( props.onChange ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should reset color and style only when popover reset button clicked', () => {
-			renderBorderControl();
-			openPopover();
+		it( 'should reset color and style only when popover reset button clicked', async () => {
+			const props = createProps();
+			await renderBorderControl( props );
+			await openPopover();
 			clickButton( 'Reset to default' );
 
 			expect( props.onChange ).toHaveBeenNthCalledWith( 1, {
@@ -340,23 +370,25 @@ describe( 'BorderControl', () => {
 			} );
 		} );
 
-		it( 'should sanitize border when width and color are undefined', () => {
-			const { rerender } = renderBorderControl();
+		it( 'should sanitize border when width and color are undefined', async () => {
+			const props = createProps();
+			const { rerender } = await renderBorderControl( props );
 			clearWidthInput();
-			rerenderBorderControl( rerender );
-			openPopover();
+			await rerenderBorderControl( rerender, props );
+			await openPopover();
 			clickButton( 'Color: Blue' );
 
 			expect( props.onChange ).toHaveBeenCalledWith( undefined );
 		} );
 
-		it( 'should not sanitize border when requested', () => {
-			const { rerender } = renderBorderControl( {
+		it( 'should not sanitize border when requested', async () => {
+			const props = createProps( {
 				shouldSanitizeBorder: false,
 			} );
+			const { rerender } = await renderBorderControl( props );
 			clearWidthInput();
-			rerenderBorderControl( rerender, { shouldSanitizeBorder: false } );
-			openPopover();
+			await rerenderBorderControl( rerender, props );
+			await openPopover();
 			clickButton( 'Color: Blue' );
 
 			expect( props.onChange ).toHaveBeenNthCalledWith( 2, {
@@ -366,9 +398,10 @@ describe( 'BorderControl', () => {
 			} );
 		} );
 
-		it( 'should clear color and set style to `none` when setting zero width', () => {
-			renderBorderControl();
-			openPopover();
+		it( 'should clear color and set style to `none` when setting zero width', async () => {
+			const props = createProps();
+			await renderBorderControl( props );
+			await openPopover();
 			clickButton( 'Color: Green' );
 			clickButton( 'Dotted' );
 			setWidthInput( '0' );
@@ -380,13 +413,14 @@ describe( 'BorderControl', () => {
 			} );
 		} );
 
-		it( 'should reselect color and style selections when changing to non-zero width', () => {
-			const { rerender } = renderBorderControl();
-			openPopover();
+		it( 'should reselect color and style selections when changing to non-zero width', async () => {
+			const props = createProps();
+			const { rerender } = await renderBorderControl( props );
+			await openPopover();
 			clickButton( 'Color: Green' );
-			rerenderBorderControl( rerender );
+			await rerenderBorderControl( rerender, props );
 			clickButton( 'Dotted' );
-			rerenderBorderControl( rerender );
+			await rerenderBorderControl( rerender, props );
 			setWidthInput( '0' );
 			setWidthInput( '5' );
 
@@ -397,9 +431,10 @@ describe( 'BorderControl', () => {
 			} );
 		} );
 
-		it( 'should set a non-zero width when applying color to zero width border', () => {
-			const { rerender } = renderBorderControl( { value: undefined } );
-			openPopover();
+		it( 'should set a non-zero width when applying color to zero width border', async () => {
+			const props = createProps( { value: undefined } );
+			const { rerender } = await renderBorderControl( props );
+			await openPopover();
 			clickButton( 'Color: Yellow' );
 
 			expect( props.onChange ).toHaveBeenCalledWith( {
@@ -409,7 +444,7 @@ describe( 'BorderControl', () => {
 			} );
 
 			setWidthInput( '0' );
-			rerenderBorderControl( rerender );
+			await rerenderBorderControl( rerender, props );
 			clickButton( 'Color: Green' );
 
 			expect( props.onChange ).toHaveBeenCalledWith( {
@@ -419,12 +454,13 @@ describe( 'BorderControl', () => {
 			} );
 		} );
 
-		it( 'should set a non-zero width when applying style to zero width border', () => {
-			const { rerender } = renderBorderControl( {
+		it( 'should set a non-zero width when applying style to zero width border', async () => {
+			const props = createProps( {
 				value: undefined,
 				shouldSanitizeBorder: false,
 			} );
-			openPopover();
+			const { rerender } = await renderBorderControl( props );
+			await openPopover();
 			clickButton( 'Dashed' );
 
 			expect( props.onChange ).toHaveBeenCalledWith( {
@@ -434,7 +470,7 @@ describe( 'BorderControl', () => {
 			} );
 
 			setWidthInput( '0' );
-			rerenderBorderControl( rerender, { shouldSanitizeBorder: false } );
+			await rerenderBorderControl( rerender, props );
 			clickButton( 'Dotted' );
 
 			expect( props.onChange ).toHaveBeenCalledWith( {
