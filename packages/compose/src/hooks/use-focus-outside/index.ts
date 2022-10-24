@@ -151,6 +151,16 @@ export default function useFocusOutside(
 			return;
 		}
 
+		// The usage of this attribute should be avoided. The only use case
+		// would be when we load modals that are not React components and
+		// therefore don't exist in the React tree. An example is opening
+		// the Media Library modal from another dialog.
+		if (
+			event.target.hasAttribute( 'data-unstable-ignore-focus-outside' )
+		) {
+			return;
+		}
+
 		blurCheckTimeoutId.current = setTimeout( () => {
 			// If document is not focused then focus should remain
 			// inside the wrapped component and therefore we cancel

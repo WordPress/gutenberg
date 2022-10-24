@@ -19,6 +19,7 @@ import {
 	FlexBlock,
 	Button,
 } from '@wordpress/components';
+import { useCallback } from '@wordpress/element';
 import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
 
 /**
@@ -28,6 +29,7 @@ import { MediaCategoryPanel } from './media-panel';
 import MediaUploadCheck from '../../media-upload/check';
 import MediaUpload from '../../media-upload';
 import { useMediaCategories } from './hooks';
+import { getBlocksFromMedia } from './utils';
 
 function MediaTab( {
 	rootClientId,
@@ -38,6 +40,15 @@ function MediaTab( {
 	const mediaCategories = useMediaCategories( rootClientId );
 	const isMobile = useViewportMatch( 'medium', '<' );
 	const baseCssClass = 'block-editor-inserter__media-tabs';
+	const onSelectMedia = useCallback(
+		( media ) => {
+			if ( ! media?.url ) {
+				return;
+			}
+			onInsert( getBlocksFromMedia( media, media.type ) );
+		},
+		[ onInsert ]
+	);
 	return (
 		<>
 			{ ! isMobile && (
@@ -83,13 +94,13 @@ function MediaTab( {
 								<MediaUploadCheck>
 									<MediaUpload
 										multiple={ false }
-										// onSelect={ ( media ) => selectMedia( media, onClose ) }
-										// allowedTypes={ [ 'image' ] }
+										onSelect={ onSelectMedia }
 										render={ ( { open } ) => (
 											<Button
 												onClick={ open }
 												className="block-editor-inserter__media-library-button"
 												variant="secondary"
+												data-unstable-ignore-focus-outside
 											>
 												{ __( 'Open Media Library' ) }
 											</Button>

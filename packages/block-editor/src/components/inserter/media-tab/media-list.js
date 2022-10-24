@@ -7,7 +7,6 @@ import {
 	__unstableUseCompositeState as useCompositeState,
 	__unstableCompositeItem as CompositeItem,
 } from '@wordpress/components';
-import { createBlock } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -15,28 +14,10 @@ import { __ } from '@wordpress/i18n';
  */
 import InserterDraggableBlocks from '../../inserter-draggable-blocks';
 import BlockPreview from '../../block-preview';
-
-function getBlocksPreview( media, mediaType ) {
-	let attributes;
-	// TODO: check all the needed attributes(alt, caption, etc..)
-	if ( mediaType === 'image' ) {
-		attributes = {
-			id: media.id,
-			url: media.source_url,
-			caption: media.caption?.rendered || undefined,
-			alt: media.alt_text,
-		};
-	} else if ( mediaType === 'video' || mediaType === 'audio' ) {
-		attributes = {
-			id: media.id,
-			src: media.source_url,
-		};
-	}
-	return createBlock( `core/${ mediaType }`, attributes );
-}
+import { getBlocksFromMedia } from './utils';
 
 function MediaPreview( { media, onClick, composite, mediaType } ) {
-	const blocks = getBlocksPreview( media, mediaType );
+	const blocks = getBlocksFromMedia( media, mediaType );
 	// TODO: we have to set a max height for previews as the image can be very tall.
 	// Probably a fixed-max height for all(?).
 	const title = media.title?.rendered || media.title;
