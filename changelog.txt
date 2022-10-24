@@ -1,5 +1,30 @@
 == Changelog ==
 
+= 14.4.0-rc.2 =
+
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Plugin
+- Don't use the custom 'Template Parts' page with WP 6.1 and above. ([45158](https://github.com/WordPress/gutenberg/pull/45158))
+
+
+## First time contributors
+
+The following PRs were merged by first time contributors:
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@Mamaduka
+
+
 = 14.4.0-rc.1 =
 
 
