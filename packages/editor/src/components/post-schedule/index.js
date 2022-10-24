@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { parseISO, endOfMonth, startOfMonth } from 'date-fns';
+
+/**
  * WordPress dependencies
  */
 import { getSettings } from '@wordpress/date';
@@ -11,15 +16,6 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-/**
- * External dependencies
- */
-import { endOfMonth, startOfMonth } from 'date-fns';
-
-function getDayOfTheMonth( date = new Date(), firstDay = true ) {
-	const dayOfMonth = firstDay ? startOfMonth( date ) : endOfMonth( date );
-	return dayOfMonth.toISOString();
-}
 
 export default function PostSchedule( { onClose } ) {
 	const { postDate, postType } = useSelect(
@@ -34,7 +30,7 @@ export default function PostSchedule( { onClose } ) {
 	const onUpdateDate = ( date ) => editPost( { date } );
 
 	const [ previewedMonth, setPreviewedMonth ] = useState(
-		getDayOfTheMonth( postDate )
+		startOfMonth( new Date( postDate ) )
 	);
 
 	// Pick up published and schduled site posts.
@@ -42,8 +38,8 @@ export default function PostSchedule( { onClose } ) {
 		( select ) =>
 			select( coreStore ).getEntityRecords( 'postType', postType, {
 				status: 'publish,future',
-				after: getDayOfTheMonth( previewedMonth ),
-				before: getDayOfTheMonth( previewedMonth, false ),
+				after: startOfMonth( previewedMonth ).toISOString(),
+				before: endOfMonth( previewedMonth ).toISOString(),
 				exclude: [ select( editorStore ).getCurrentPostId() ],
 				per_page: 100,
 				_fields: 'id,date',
@@ -78,7 +74,9 @@ export default function PostSchedule( { onClose } ) {
 			onChange={ onUpdateDate }
 			is12Hour={ is12HourTime }
 			events={ events }
-			onMonthPreviewed={ setPreviewedMonth }
+			onMonthPreviewed={ ( date ) =>
+				setPreviewedMonth( parseISO( date ) )
+			}
 			onClose={ onClose }
 		/>
 	);
