@@ -1202,6 +1202,9 @@
 								},
 								":active": {
 									"$ref": "#/definitions/stylesPropertiesComplete"
+								},
+								":visited": {
+									"$ref": "#/definitions/stylesPropertiesComplete"
 								}
 							},
 							"additionalProperties": false
@@ -1227,6 +1230,9 @@
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								},
 								":active": {
+									"$ref": "#/definitions/stylesPropertiesComplete"
+								},
+								":visited": {
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								}
 							},
