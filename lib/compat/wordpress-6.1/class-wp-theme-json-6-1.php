@@ -769,11 +769,12 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	}
 
 	/**
-	 * Returns the stylesheet if there is a separator block with only a background style defined on theme.json.
+	 * Returns a filtered declarations array if there is a separator block with only a background
+	 * style defined on theme.json by adding a color attribute to reflect the changes in the front.
 	 *
 	 * @param array $declarations List of declarations.
 	 *
-	 * returns string The stylesheet.
+	 * @return array $declarations List of declarations filtered.
 	 */
 	private function update_separator_declarations( $declarations ) {
 		$background_matches = array_values(
