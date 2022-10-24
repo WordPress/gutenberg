@@ -27,7 +27,7 @@ function chunk( arr, chunkSize ) {
  * @param {Array} requests List of API requests to perform at once.
  *
  * @return {Promise} Promise that resolves to a list of objects containing
- *                   either `output` (if that request was succesful) or `error`
+ *                   either `output` (if that request was successful) or `error`
  *                   (if not ).
  */
 export default async function defaultProcessor( requests ) {
