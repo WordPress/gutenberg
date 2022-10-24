@@ -94,7 +94,7 @@ export default function BorderRadiusControl( { onChange, values } ) {
 				{ isLinked ? (
 					<>
 						<AllInputControl
-							__unstableWrapperClassName="components-border-radius-control__unit-control"
+							className="components-border-radius-control__unit-control"
 							values={ values }
 							min={ MIN_BORDER_RADIUS_VALUE }
 							onChange={ onChange }
