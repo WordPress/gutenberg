@@ -27,6 +27,7 @@ const noop = () => {};
 
 const {
 	clearSelectedBlock,
+	hideBlockToolbar,
 	insertBlock,
 	insertBlocks,
 	mergeBlocks,
@@ -39,6 +40,7 @@ const {
 	replaceInnerBlocks,
 	resetBlocks,
 	selectBlock,
+	showBlockToolbar,
 	showInsertionPoint,
 	startMultiSelect,
 	startTyping,
@@ -771,6 +773,22 @@ describe( 'actions', () => {
 			expect( toggleBlockMode( clientId ) ).toEqual( {
 				type: 'TOGGLE_BLOCK_MODE',
 				clientId,
+			} );
+		} );
+	} );
+
+	describe( 'hideBlockToolbar', () => {
+		it( 'should return the HIDE_BLOCK_TOOLBAR action', () => {
+			expect( hideBlockToolbar() ).toEqual( {
+				type: 'HIDE_BLOCK_TOOLBAR',
+			} );
+		} );
+	} );
+
+	describe( 'showBlockToolbar', () => {
+		it( 'should return the SHOW_BLOCK_TOOLBAR action', () => {
+			expect( showBlockToolbar() ).toEqual( {
+				type: 'SHOW_BLOCK_TOOLBAR',
 			} );
 		} );
 	} );
