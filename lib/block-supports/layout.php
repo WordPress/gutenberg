@@ -437,7 +437,9 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$content = new WP_HTML_Tag_Processor( $block_content );
 	if ( $inner_content_classnames ) {
 		$content->next_tag( array( 'class_name' => $inner_content_classnames ) );
-		$content->add_class( implode( ' ', $class_names ) );
+		foreach ( $class_names as $class_name ) {
+			$content->add_class( $class_name );
+		}
 	} else {
 		$content->next_tag();
 		$content->add_class( implode( ' ', $class_names ) );
