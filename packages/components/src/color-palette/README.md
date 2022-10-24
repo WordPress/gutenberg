@@ -6,18 +6,26 @@ ColorPalette allows the user to pick a color from a list of pre-defined color en
 
 The component accepts the following props.
 
-{ colors, disableCustomColors = false, value, onChange, className, clearable = true }
+{ colors = [],  disableCustomColors = false, enableAlpha, value, onchange, className, clearable = true, __experimentalHasMultipleOrigins = false, __experimentalIsRenderedInSidebar = false }
 
 ### colors
-
-Array with the colors to be shown.
+Array with the colors to be shown. When displaying multiple color palettes to choose from, the format of the array changes from an array of colors objects, to an array of color palettes.
 
 -   Type: `Array`
--   Required: Yes
+-   Required: No
+-   Default: `[]`
 
 ### disableCustomColors
 
-Whether to allow custom color or not.
+Whether to allow the user to pick a custom color on top of the predefined choices (defined via the `colors` prop).
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: false
+
+### enableAlpha
+
+Whether the color picker should display the alpha channel both in the bottom inputs as well as in the color picker itself.
 
 -   Type: `Boolean`
 -   Required: No
@@ -46,11 +54,27 @@ classes to be applied to the container.
 
 ### clearable
 
-Whether the palette should have a clearing button or not.
+Whether the palette should have a clearing button.
 
 -   Type: `Boolean`
 -   Required: No
 -   Default: true
+
+### __experimentalHasMultipleOrigins
+
+Whether the colors prop is an array of color palettes, rather than an array of color objects.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: false
+
+### __experimentalIsRenderedInSidebar
+
+Whether this is rendered in the sidebar.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: false
 
 ## Usage
 
