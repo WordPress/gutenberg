@@ -49,7 +49,9 @@ export type ColorPaletteProps = {
 	 */
 	clearable?: boolean;
 	/**
-	 * Array with the colors to be shown.
+	 * Array with the colors to be shown. When displaying multiple color palettes
+	 * to choose from, the format of the array changes from an array of colors
+	 * objects, to an array of color palettes.
 	 *
 	 * @default []
 	 */
