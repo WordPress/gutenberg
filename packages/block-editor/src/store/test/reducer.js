@@ -19,6 +19,7 @@ import {
 	hasSameKeys,
 	isUpdatingSameBlockAttribute,
 	blocks,
+	isBlockToolbarHidden,
 	isTyping,
 	draggedBlocks,
 	selection,
@@ -2250,6 +2251,24 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toBe( null );
+		} );
+	} );
+
+	describe( 'isBlockToolbarHidden()', () => {
+		it( 'should set the hide block toolbar flag to true', () => {
+			const state = isBlockToolbarHidden( false, {
+				type: 'HIDE_BLOCK_TOOLBAR',
+			} );
+
+			expect( state ).toBe( true );
+		} );
+
+		it( 'should set the hide block toolbar flag to false', () => {
+			const state = isBlockToolbarHidden( false, {
+				type: 'SHOW_BLOCK_TOOLBAR',
+			} );
+
+			expect( state ).toBe( false );
 		} );
 	} );
 
