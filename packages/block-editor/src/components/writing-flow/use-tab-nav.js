@@ -18,8 +18,12 @@ export default function useTabNav() {
 	const focusCaptureBeforeRef = useRef();
 	const focusCaptureAfterRef = useRef();
 	const lastFocus = useRef();
-	const { hasMultiSelection, getSelectedBlockClientId, getBlockCount } =
-		useSelect( blockEditorStore );
+	const {
+		hasMultiSelection,
+		getSelectedBlockClientId,
+		getBlockCount,
+		getSettings,
+	} = useSelect( blockEditorStore );
 	const { setNavigationMode } = useDispatch( blockEditorStore );
 	const isNavigationMode = useSelect(
 		( select ) => select( blockEditorStore ).isNavigationMode(),
@@ -106,25 +110,33 @@ export default function useTabNav() {
 				return;
 			}
 
+			const { keepCaretInsideBlock } = getSettings();
+
 			// Allow tabbing from the block wrapper to a form element,
 			// and between form elements rendered in a block,
 			// such as inside a placeholder. Form elements are generally
 			// meant to be UI rather than part of the content. Ideally
 			// these are not rendered in the content and perhaps in the
 			// future they can be rendered in an iframe or shadow DOM.
+			//
+			// When the `keepCaretInsideBlock` setting is enabled, we want the
+			// Tab key to work inside the block because of limitation for arrow
+			// keys in screen readers.
 			if (
 				( isFormElement( event.target, {
-					includeContentEditable: true,
+					__unstableIncludeContentEditable: keepCaretInsideBlock,
 				} ) ||
 					event.target.getAttribute( 'data-block' ) ===
 						getSelectedBlockClientId() ) &&
 				isFormElement( focus.tabbable[ direction ]( event.target ), {
-					includeContentEditable: true,
+					__unstableIncludeContentEditable: keepCaretInsideBlock,
 				} ) &&
-				isInSameBlock(
-					event.target,
-					focus.tabbable[ direction ]( event.target )
-				)
+				keepCaretInsideBlock
+					? isInSameBlock(
+							event.target,
+							focus.tabbable[ direction ]( event.target )
+					  )
+					: true
 			) {
 				return;
 			}

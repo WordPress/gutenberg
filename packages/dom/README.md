@@ -192,7 +192,7 @@ Detects if element is a form element.
 _Parameters_
 
 -   _element_ `Element`: The element to check.
--   _options_ `{ includeContentEditable: boolean }`: Options object.
+-   _options_ `{ __unstableIncludeContentEditable: boolean }`: Options object.
 
 _Returns_
 

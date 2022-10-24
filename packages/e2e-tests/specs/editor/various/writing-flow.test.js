@@ -282,7 +282,7 @@ describe( 'Writing Flow', () => {
 	} );
 
 	it( 'should not create extra line breaks in multiline value', async () => {
-		await insertBlock( 'List' );
+		await insertBlock( 'Quote' );
 		await page.keyboard.type( 'a' );
 		await page.keyboard.press( 'Backspace' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -680,7 +680,6 @@ describe( 'Writing Flow', () => {
 		// Create the table.
 		await page.keyboard.press( 'Space' );
 		// Navigate to the second cell.
-		await page.waitForSelector( '.wp-block-table' );
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( '2' );
 		// Confirm correct setup.
@@ -753,98 +752,5 @@ describe( 'Writing Flow', () => {
 			( nodes ) => Array.from( nodes ).map( ( node ) => node.innerHTML )
 		);
 		expect( paragraphs ).toEqual( [ 'first', 'second' ] );
-	} );
-
-	it( 'Allows block settings sidebar focus when there are no next focus elements', async () => {
-		// Insert an image block.
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( '/Image' );
-		await page.keyboard.press( 'Enter' );
-
-		// Make sure the upload button has focus.
-		const uploadButton = await page.waitForXPath(
-			'//button[contains( text(), "Upload" ) ]'
-		);
-		await expect( uploadButton ).toHaveFocus();
-
-		// Try to focus the image block settings sidebar.
-		await pressKeyTimes( 'Tab', 5 );
-		const getAriaLabel = await page.evaluate( () =>
-			document.activeElement?.getAttribute( 'aria-label' )
-		);
-		await expect( getAriaLabel ).toEqual( 'Block (selected)' );
-	} );
-
-	it( 'should move to the start of the first line on ArrowUp', async () => {
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'a' );
-
-		async function getHeight() {
-			return await page.evaluate(
-				() => document.activeElement.offsetHeight
-			);
-		}
-
-		const height = await getHeight();
-
-		// Keep typing until the height of the element increases. We need two
-		// lines.
-		while ( height === ( await getHeight() ) ) {
-			await page.keyboard.type( 'a' );
-		}
-
-		// Move to the start of the second line.
-		await page.keyboard.press( 'ArrowLeft' );
-		// Move to the start of the first line.
-		await page.keyboard.press( 'ArrowUp' );
-		// Insert a "." for testing.
-		await page.keyboard.type( '.' );
-
-		// Expect the "." to be added at the start of the paragraph.
-		expect(
-			await page.evaluate( () =>
-				document.activeElement.getAttribute( 'data-type' )
-			)
-		).toBe( 'core/paragraph' );
-		expect(
-			await page.evaluate( () => document.activeElement.textContent )
-		).toMatch( /^\.a+$/ );
-	} );
-
-	it( 'should vertically move the caret from corner to corner', async () => {
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'a' );
-
-		async function getHeight() {
-			return await page.evaluate(
-				() => document.activeElement.offsetHeight
-			);
-		}
-
-		const height = await getHeight();
-
-		// Keep typing until the height of the element increases. We need two
-		// lines.
-		while ( height === ( await getHeight() ) ) {
-			await page.keyboard.type( 'a' );
-		}
-
-		// Create a new paragraph.
-		await page.keyboard.press( 'Enter' );
-		// Move to the start of the first line.
-		await page.keyboard.press( 'ArrowUp' );
-		// Insert a "." for testing.
-		await page.keyboard.type( '.' );
-
-		// Expect the "." to be added at the start of the second line.
-		// It should not be added to the first line!
-		expect(
-			await page.evaluate( () =>
-				document.activeElement.getAttribute( 'data-type' )
-			)
-		).toBe( 'core/paragraph' );
-		expect(
-			await page.evaluate( () => document.activeElement.textContent )
-		).toMatch( /^a+\.a$/ );
 	} );
 } );
