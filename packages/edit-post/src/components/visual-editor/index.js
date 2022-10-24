@@ -31,7 +31,7 @@ import {
 	__experimentaluseLayoutClasses as useLayoutClasses,
 	__experimentaluseLayoutStyles as useLayoutStyles,
 } from '@wordpress/block-editor';
-import { useEffect, useRef, useMemo } from '@wordpress/element';
+import { useEffect, useRef, useMemo, memo } from '@wordpress/element';
 import { Button, __unstableMotion as motion } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMergeRefs } from '@wordpress/compose';
@@ -110,7 +110,7 @@ function findPostContent( blocks ) {
 	}
 }
 
-export default function VisualEditor( { styles } ) {
+const VisualEditor = memo( ( { styles } ) => {
 	const {
 		deviceType,
 		isWelcomeGuideVisible,
@@ -397,4 +397,6 @@ export default function VisualEditor( { styles } ) {
 			</__unstableBlockSettingsMenuFirstItem>
 		</BlockTools>
 	);
-}
+} );
+
+export default VisualEditor;

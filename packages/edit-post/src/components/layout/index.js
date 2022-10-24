@@ -27,7 +27,7 @@ import {
 	InterfaceSkeleton,
 	store as interfaceStore,
 } from '@wordpress/interface';
-import { useState, useEffect, useCallback } from '@wordpress/element';
+import { useState, useEffect, useCallback, memo } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -63,7 +63,7 @@ const interfaceLabels = {
 	footer: __( 'Editor footer' ),
 };
 
-function Layout( { styles } ) {
+const Layout = memo( ( { styles } ) => {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
 	const { openGeneralSidebar, closeGeneralSidebar, setIsInserterOpened } =
@@ -293,6 +293,6 @@ function Layout( { styles } ) {
 			<PluginArea onError={ onPluginAreaError } />
 		</>
 	);
-}
+} );
 
 export default Layout;
