@@ -906,7 +906,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			);
 			if ( ! empty( $background_matches && isset( $background_matches[0]['value'] ) ) && empty( $border_color_matches ) && empty( $text_color_matches ) ) {
 				$declarations[] = array(
-					'name'  => 'border-color',
+					'name'  => 'color',
 					'value' => $background_matches[0]['value'],
 				);
 				$block_rules    = static::to_ruleset( $selector, $declarations );
