@@ -282,11 +282,7 @@ function Iframe(
 
 	head = (
 		<>
-			<style>
-				{
-					'html{height:auto!important;}body{height:auto;important!;margin:0}'
-				}
-			</style>
+			<style>{ 'html{height:auto!important;}body{margin:0}' }</style>
 			{ styles.map(
 				( { tagName, href, id, rel, media, textContent } ) => {
 					const TagName = tagName.toLowerCase();
