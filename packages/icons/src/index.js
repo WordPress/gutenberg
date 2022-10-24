@@ -228,6 +228,7 @@ export { default as footer } from './library/footer';
 export { default as header } from './library/header';
 export { default as sidebar } from './library/sidebar';
 export { default as textColor } from './library/text-color';
+export { default as textTracks } from './library/text-tracks';
 export { default as tablet } from './library/tablet';
 export { default as title } from './library/title';
 export { default as tip } from './library/tip';
