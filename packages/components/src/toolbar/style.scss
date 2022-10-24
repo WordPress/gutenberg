@@ -66,7 +66,7 @@
 			}
 		}
 
-		// Focus style
+		// Focus style.
 		&:focus::before {
 			@include block-toolbar-button-style__focus();
 		}
