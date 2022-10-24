@@ -776,7 +776,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 *
 	 * @return array $declarations List of declarations filtered.
 	 */
-	private function update_separator_declarations( $declarations ) {
+	private static function update_separator_declarations( $declarations ) {
 		$background_matches = array_values(
 			array_filter(
 				$declarations,
