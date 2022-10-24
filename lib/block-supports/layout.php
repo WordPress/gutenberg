@@ -41,10 +41,9 @@ function gutenberg_get_layout_position_style( $selector, $style ) {
 	) {
 		$sides = array( 'top', 'right', 'bottom', 'left' );
 
-		foreach( $sides as $side ) {
+		foreach ( $sides as $side ) {
 			$side_value = _wp_array_get( $style, array( 'layout', $side ) );
-			if ( $side_value !== null ) {
-
+			if ( null !== $side_value ) {
 				/*
 				* For fixed or sticky top positions,
 				* ensure the value includes an offset for the logged in admin bar.
@@ -63,7 +62,7 @@ function gutenberg_get_layout_position_style( $selector, $style ) {
 					array(
 						'selector'     => "$selector",
 						'declarations' => array(
-							$side => $side_value
+							$side => $side_value,
 						),
 					);
 			}
@@ -73,8 +72,8 @@ function gutenberg_get_layout_position_style( $selector, $style ) {
 			array(
 				'selector'     => "$selector",
 				'declarations' => array(
-					'position'     => $position_type,
-					'z-index'      => '250', // TODO: This hard-coded value should live somewhere else.
+					'position' => $position_type,
+					'z-index'  => '250', // TODO: This hard-coded value should live somewhere else.
 				),
 			);
 	}
