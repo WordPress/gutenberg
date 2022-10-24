@@ -99,10 +99,6 @@ export function TabPanel( {
 	useEffect( () => {
 		if ( ! selectedTab?.name && tabs.length > 0 ) {
 			handleTabSelection( initialTabName || tabs[ 0 ].name );
-			setSelected(
-				initialTabName ||
-					( tabs.length > 0 ? tabs[ 0 ].name : undefined )
-			);
 		}
 	}, [ tabs, selectedTab?.name, initialTabName ] );
 
