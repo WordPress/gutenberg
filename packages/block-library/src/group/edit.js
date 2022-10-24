@@ -35,7 +35,12 @@ const htmlElementMessages = {
 	),
 };
 
-function GroupEdit( { attributes, setAttributes, clientId } ) {
+function GroupEdit( {
+	attributes,
+	setAttributes,
+	clientId,
+	__unstableLayoutClassNames: layoutClassNames,
+} ) {
 	const { hasInnerBlocks, themeSupportsLayout } = useSelect(
 		( select ) => {
 			const { getBlock, getSettings } = select( blockEditorStore );
@@ -55,7 +60,9 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 	const { type = 'default' } = usedLayout;
 	const layoutSupportEnabled = themeSupportsLayout || type === 'flex';
 
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		className: ! layoutSupportEnabled ? layoutClassNames : null,
+	} );
 
 	const innerBlocksProps = useInnerBlocksProps(
 		layoutSupportEnabled
