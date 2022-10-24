@@ -27,6 +27,7 @@ import usePatternsState from './hooks/use-patterns-state';
 import BlockPatternList from '../block-patterns-list';
 import PatternsExplorerModal from './block-patterns-explorer/explorer';
 import MobileTabNavigation from './mobile-tab-navigation';
+import PatternsExplorerModal2 from './block-patterns-explorer2/explorer';
 
 function usePatternsCategories( rootClientId ) {
 	const [ allPatterns, allCategories ] = usePatternsState(
@@ -188,6 +189,8 @@ function BlockPatternsTabs( {
 } ) {
 	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
 	const categories = usePatternsCategories( rootClientId );
+	const [ showPatternsExplorer2, setShowPatternsExplorer2 ] =
+		useState( false );
 	const isMobile = useViewportMatch( 'medium', '<' );
 	return (
 		<>
@@ -233,7 +236,7 @@ function BlockPatternsTabs( {
 									}
 									variant="secondary"
 								>
-									{ __( 'Explore all patterns' ) }
+									{ __( 'Pattern Directory' ) }
 								</Button>
 							</div>
 						</ItemGroup>
@@ -257,6 +260,13 @@ function BlockPatternsTabs( {
 					initialCategory={ selectedCategory }
 					patternCategories={ categories }
 					onModalClose={ () => setShowPatternsExplorer( false ) }
+				/>
+			) }
+			{ showPatternsExplorer2 && (
+				<PatternsExplorerModal2
+					initialCategory={ selectedCategory }
+					patternCategories={ categories }
+					onModalClose={ () => setShowPatternsExplorer2( false ) }
 				/>
 			) }
 		</>

@@ -10,6 +10,7 @@ import {
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
+import { parse } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -31,10 +32,18 @@ function BlockPattern( {
 	composite,
 	showTooltip,
 } ) {
-	const { blocks, viewportWidth } = pattern;
-	const instanceId = useInstanceId( BlockPattern );
-	const descriptionId = `block-editor-block-patterns-list__item-description-${ instanceId }`;
-
+	const { viewportWidth } = pattern;
+	let { blocks } = pattern;
+	// Fallback for patterns fro PD, that haven't been parsed.
+	if ( ! blocks ) {
+		blocks = parse( pattern.content, {
+			__unstableSkipMigrationLogs: true,
+		} );
+	}
+	const descriptionId = useInstanceId(
+		BlockPattern,
+		'block-editor-block-patterns-list__item-description'
+	);
 	return (
 		<InserterDraggableBlocks
 			isEnabled={ isDraggable }
@@ -69,6 +78,7 @@ function BlockPattern( {
 							/>
 							{ ! showTooltip && (
 								<div className="block-editor-block-patterns-list__item-title">
+									{ /* // TODO: decode titles from PD */ }
 									{ pattern.title }
 								</div>
 							) }
@@ -112,7 +122,7 @@ function BlockPatternList( {
 				const isShown = shownPatterns.includes( pattern );
 				return isShown ? (
 					<BlockPattern
-						key={ pattern.name }
+						key={ pattern.name || pattern.id } // TODO: This is a temporary fix to avoid a crash from PD.
 						pattern={ pattern }
 						onClick={ onClickPattern }
 						isDraggable={ isDraggable }
@@ -120,7 +130,9 @@ function BlockPatternList( {
 						showTooltip={ showTitlesAsTooltip }
 					/>
 				) : (
-					<BlockPatternPlaceholder key={ pattern.name } />
+					<BlockPatternPlaceholder
+						key={ pattern.name || pattern.id }
+					/>
 				);
 			} ) }
 		</Composite>
