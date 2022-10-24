@@ -93,7 +93,6 @@ html.interface-interface-skeleton__html-container {
 
 .interface-interface-skeleton__secondary-sidebar,
 .interface-interface-skeleton__sidebar {
-	display: block;
 	flex-shrink: 0;
 	position: absolute;
 	z-index: z-index(".interface-interface-skeleton__sidebar");
@@ -177,10 +176,6 @@ html.interface-interface-skeleton__html-container {
 	&:focus-within {
 		top: auto;
 		bottom: 0;
-
-		.is-sidebar-opened & {
-			top: 0;
-		}
 	}
 }
 

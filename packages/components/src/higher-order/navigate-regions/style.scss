@@ -1,6 +1,8 @@
-// Allow the position to be easily overridden to e.g. fixed.
 [role="region"] {
-	position: relative;
+	// Make the grid container children establish an independent stacking context
+	// and avoid to use position asto allow the position to be easily overridden
+	// to e.g. fixed.
+	display: grid;
 }
 
 .is-focusing-regions [role="region"] {
@@ -11,8 +13,9 @@
 		outline-offset: -4px;
 
 		> * {
-			position: relative;
-			z-index: z-index(".is-focusing-regions [role='region']:focus > *");
+			// Children of a grid container establish a new stacking context.
+			// See https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context
+			z-index: -1 !important;
 		}
 	}
 }
