@@ -358,7 +358,7 @@ function UnforwardedColorPalette(
 }
 
 /**
- * Allows selecting from given colors.
+ * Allows the user to pick a color from a list of pre-defined color entries.
  *
  * ```jsx
  * import { ColorPalette } from '@wordpress/components';
