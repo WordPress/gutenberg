@@ -116,7 +116,6 @@ describe( 'Font Size Picker', () => {
 												slug: 'tiny',
 												size: '11px',
 											},
-											,
 											{
 												name: 'Small',
 												slug: 'small',
@@ -158,7 +157,7 @@ describe( 'Font Size Picker', () => {
 			await page.keyboard.type( 'Paragraph to be made "large"' );
 
 			await openFontSizeSelectControl();
-			await pressKeyTimes( 'ArrowDown', 5 );
+			await pressKeyTimes( 'ArrowDown', 4 );
 			await page.keyboard.press( 'Enter' );
 
 			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
@@ -175,7 +174,7 @@ describe( 'Font Size Picker', () => {
 			);
 
 			await openFontSizeSelectControl();
-			await pressKeyTimes( 'ArrowDown', 4 );
+			await pressKeyTimes( 'ArrowDown', 3 );
 			await page.keyboard.press( 'Enter' );
 			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
 			"<!-- wp:paragraph {\\"fontSize\\":\\"medium\\"} -->
@@ -202,7 +201,7 @@ describe( 'Font Size Picker', () => {
 			);
 
 			await openFontSizeSelectControl();
-			await pressKeyTimes( 'ArrowDown', 3 );
+			await pressKeyTimes( 'ArrowDown', 2 );
 			await page.keyboard.press( 'Enter' );
 			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
 			"<!-- wp:paragraph {\\"fontSize\\":\\"small\\"} -->
