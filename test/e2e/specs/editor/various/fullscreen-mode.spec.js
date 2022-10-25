@@ -16,7 +16,9 @@ test.describe( 'Fullscreen Mode', () => {
 		page,
 	} ) => {
 		// Open Options
-		await page.locator( ' [aria-label="Options"]' ).click();
+		await page.click(
+			'role=region[name="Editor top bar"i] >> role=button[name="Options"i]'
+		);
 
 		// Verify All options are visible
 		page.locator( '.interface-more-menu-dropdown__content' );
