@@ -20,7 +20,7 @@ if ( ! function_exists( 'wp_theme_has_theme_json' ) ) {
 			$theme_has_support = null;
 		}
 
-		if ( isset( $theme_has_support ) ) {
+		if ( null !== $theme_has_support ) {
 			return $theme_has_support;
 		}
 
