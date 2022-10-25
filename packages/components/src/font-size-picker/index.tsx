@@ -34,8 +34,8 @@ import {
 	ResetButton,
 } from './styles';
 import { Spacer } from '../spacer';
-import FontSizePickerSelect from './select';
-import FontSizePickerToggleGroup from './toggle-group';
+import FontSizePickerSelect from './font-size-picker-select';
+import FontSizePickerToggleGroup from './font-size-picker-toggle-group';
 
 const UnforwardedFontSizePicker = (
 	props: FontSizePickerProps,
