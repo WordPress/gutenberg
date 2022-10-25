@@ -5,12 +5,11 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 import {
 	useBlockProps,
-	__experimentalBlockVariationPicker,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { store as blocksStore } from '@wordpress/blocks';
-import { Path, SVG } from '@wordpress/components';
+import { Path, SVG, Button, Placeholder } from '@wordpress/components';
 
 const getGroupPlaceholderIcons = ( name = 'group' ) => {
 	const icons = {
@@ -105,31 +104,54 @@ function GroupPlaceHolder( { clientId, name, setAttributes } ) {
 		( newClientId ) => selectBlock( newClientId, -1 ),
 		[ selectBlock ]
 	);
+	const selectVariation = ( nextVariation = defaultVariation ) => {
+		/*
+				Remove layout.isDefault if present.
+				`isDefault` exists to identify blocks that have been inserted, programmatically or otherwise, with no changes.
+				When a user selects a layout `isDefault` should not appear in the block's attributes.
+			 */
+		const { isDefault, ...rest } = nextVariation.attributes?.layout;
+		const newAttributes = {
+			...nextVariation.attributes,
+			layout: rest,
+		};
+		setAttributes( newAttributes );
+		updateSelection( clientId );
+	};
 	return (
 		<div { ...blockProps }>
-			<__experimentalBlockVariationPicker
+			<Placeholder
 				icon={ blockType?.icon?.src }
 				label={ blockType?.title }
-				variations={ variations }
-				onSelect={ ( nextVariation = defaultVariation ) => {
-					/*
-						Remove layout.isDefault if present.
-						`isDefault` exists to identify blocks that have been inserted, programmatically or otherwise, with no changes.
-						When a user selects a layout `isDefault` should not appear in the block's attributes.
-					 */
-					const { isDefault, ...rest } =
-						nextVariation.attributes?.layout;
-					const newAttributes = {
-						...nextVariation.attributes,
-						layout: rest,
-					};
-					setAttributes( newAttributes );
-					updateSelection( clientId );
-				} }
 				instructions={ __( 'Group blocks together. Select a layout:' ) }
-				allowSkip={ false }
-				buttonType="tertiary"
-			/>
+			>
+				{ /*
+				 * Taken from BlockVariationPicker component.
+				 * Disable reason: The `list` ARIA role is redundant but
+				 * Safari+VoiceOver won't announce the list otherwise.
+				 */
+				/* eslint-disable jsx-a11y/no-redundant-roles */ }
+				<ul
+					role="list"
+					className="wp-block-group-placeholder__variations"
+					aria-label={ __( 'Block variations' ) }
+				>
+					{ variations.map( ( variation ) => (
+						<li key={ variation.name }>
+							<Button
+								variant="tertiary"
+								icon={
+									variation.placeHolderIcon || variation.icon
+								}
+								iconSize={ 64 }
+								onClick={ () => selectVariation( variation ) }
+							/>
+							<span role="presentation">{ variation.title }</span>
+						</li>
+					) ) }
+				</ul>
+				{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
+			</Placeholder>
 		</div>
 	);
 }

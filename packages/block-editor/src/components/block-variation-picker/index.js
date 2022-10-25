@@ -17,7 +17,6 @@ function BlockVariationPicker( {
 	variations,
 	onSelect,
 	allowSkip,
-	buttonType = 'secondary',
 } ) {
 	const classes = classnames( 'block-editor-block-variation-picker', {
 		'has-many-variations': variations.length > 4,
@@ -43,8 +42,8 @@ function BlockVariationPicker( {
 				{ variations.map( ( variation ) => (
 					<li key={ variation.name }>
 						<Button
-							variant={ buttonType }
-							icon={ variation.placeHolderIcon || variation.icon }
+							variant="secondary"
+							icon={ variation.icon }
 							iconSize={ 48 }
 							onClick={ () => onSelect( variation ) }
 							className="block-editor-block-variation-picker__variation"
@@ -62,13 +61,7 @@ function BlockVariationPicker( {
 			{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 			{ allowSkip && (
 				<div className="block-editor-block-variation-picker__skip">
-					<Button
-						variant="link"
-						onClick={ () => onSelect() }
-						aria-label={ __(
-							'Skip selection and choose default block variation.'
-						) }
-					>
+					<Button variant="link" onClick={ () => onSelect() }>
 						{ __( 'Skip' ) }
 					</Button>
 				</div>
