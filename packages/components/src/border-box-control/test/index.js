@@ -309,7 +309,7 @@ describe( 'BorderBoxControl', () => {
 			await user.click( colorButtons[ 3 ] );
 			assertStyleOptionsMissing();
 			await user.click( colorButtons[ 3 ] );
-		} );
+		}, 10000 );
 	} );
 
 	describe( 'onChange handling', () => {
