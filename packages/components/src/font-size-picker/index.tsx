@@ -84,19 +84,23 @@ const UnforwardedFontSizePicker = (
 		// If we have a custom value that is not available in the font sizes,
 		// show it as a hint as long as it's a simple CSS value.
 		if ( isCustomValue ) {
-			return value !== undefined && isSimpleCssValue( value )
-				? `(${ value })`
-				: '';
-		}
-
-		if ( ! selectedFontSize ) {
-			return '';
+			return (
+				value !== undefined &&
+				isSimpleCssValue( value ) &&
+				`(${ value })`
+			);
 		}
 
 		if ( shouldUseSelectControl ) {
-			return isSimpleCssValue( selectedFontSize.size )
-				? `(${ selectedFontSize.size })`
-				: '';
+			return (
+				selectedFontSize?.size !== undefined &&
+				isSimpleCssValue( selectedFontSize?.size ) &&
+				`(${ selectedFontSize?.size })`
+			);
+		}
+
+		if ( ! selectedFontSize ) {
+			return __( 'Default' );
 		}
 
 		// Calculate the `hint` for toggle group control.
