@@ -33,9 +33,9 @@ add_action( 'rest_api_init', 'gutenberg_register_block_editor_settings' );
  * Registers the template REST API routes.
  */
 function gutenberg_register_rest_template() {
-	$template_controller = new Gutenberg_Experimental_REST_Templates_Controller('wp_template');
+	$template_controller = new Gutenberg_REST_Template_Revision_Count('wp_template');
 	$template_controller->register_routes();
-	$template_parts_controller = new Gutenberg_Experimental_REST_Templates_Controller('wp_template_part');
+	$template_parts_controller = new Gutenberg_REST_Template_Revision_Count('wp_template_part');
 	$template_parts_controller->register_routes();
 }
 

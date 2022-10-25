@@ -34,8 +34,8 @@ _Returns_
 
 ### getCurrentTemplateLastRevisionId
 
-Returns the last revision ID of the post currently being edited,
-or null if the post has no revisions.
+Returns the last revision ID of the template currently being edited,
+or null if the template is from the theme
 
 _Parameters_
 
@@ -51,7 +51,7 @@ _Returns_
 
 ### getCurrentTemplateRevisionsCount
 
-Returns the number of revisions of the post currently being edited.
+Returns the number of revisions of the template currently being edited.
 
 _Parameters_
 

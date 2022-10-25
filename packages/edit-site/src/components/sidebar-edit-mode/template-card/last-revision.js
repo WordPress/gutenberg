@@ -49,7 +49,7 @@ const PostLastRevision = () => {
 					revision: lastRevisionId,
 					gutenberg: true,
 				} ) }
-				className="editor-post-last-revision__title"
+				className="edit-site-template-last-revision__title"
 				icon={ backup }
 			>
 				{ sprintf(
@@ -65,7 +65,7 @@ const PostLastRevision = () => {
 export default function LastRevision() {
 	return (
 		<PostLastRevisionCheck>
-			<PanelBody className="edit-post-last-revision__panel">
+			<PanelBody className="edit-site-template-last-revision__panel">
 				<PostLastRevision />
 			</PanelBody>
 		</PostLastRevisionCheck>

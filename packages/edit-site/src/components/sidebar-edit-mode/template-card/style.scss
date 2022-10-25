@@ -57,6 +57,34 @@
 			min-width: auto;
 		}
 	}
+
+	.edit-site-template-last-revision__title {
+		width: 100%;
+		font-weight: 600;
+
+		.dashicon {
+			margin-right: 5px;
+		}
+	}
+
+	.components-button.edit-site-template-last-revision__title {
+		height: 100%;
+
+		&:hover,
+		&:active {
+			// Override the default button hover style
+			background: $gray-100;
+		}
+
+		&:focus {
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			border-radius: 0;
+		}
+	}
+
+	.edit-site-template-last-revision__title.components-button {
+		padding: $grid-unit-20;
+	}
 }
 
 h3.edit-site-template-card__template-areas-title {

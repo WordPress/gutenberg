@@ -2,10 +2,13 @@
 /**
  * WP_REST_Templates_Controller class
  *
+ * When merging into core, prepare_item_for_response() and get_item_schema()
+ * should be merged with the parent methods
+ *
  * @package gutenberg
  */
 
- class Gutenberg_Experimental_REST_Templates_Controller extends WP_REST_Templates_Controller {
+ class Gutenberg_REST_Template_Revision_Count extends WP_REST_Templates_Controller {
 	/**
 	 * Add revisions to the response.
 	 *
