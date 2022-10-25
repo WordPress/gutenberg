@@ -58,41 +58,6 @@ const Form = () => {
 					{ value: 'c', label: 'Option C' },
 				] }
 			/>
-
-			<hr
-				style={ {
-					marginTop: '100px',
-					borderColor: '#ddd',
-					borderStyle: 'solid',
-					borderBottom: 'none',
-				} }
-			/>
-
-			<p
-				style={ {
-					color: '#aaa',
-					fontSize: '0.9em',
-				} }
-			>
-				Note: this component may not behave as expected in browsers that
-				don&apos;t support the{ ' ' }
-				<a
-					href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/inert"
-					target="_blank"
-					rel="noreferrer"
-				>
-					inert HTML attribute
-				</a>
-				. We recommend adding{ ' ' }
-				<a
-					href="https://github.com/WICG/inert"
-					target="_blank"
-					rel="noreferrer"
-				>
-					the polyfill
-				</a>{ ' ' }
-				when using this component in your project.
-			</p>
 		</div>
 	);
 };
