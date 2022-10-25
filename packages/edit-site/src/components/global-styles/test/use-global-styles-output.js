@@ -782,7 +782,7 @@ describe( 'global styles renderer', () => {
 				'padding-bottom: 33px',
 				'padding-left: 33px',
 				'font-family: sans-serif',
-				'font-size: clamp(14px, 0.875rem + ((1vw - 7.68px) * 0.841), 21px)',
+				'font-size: clamp(10.5px, 0.65625rem + ((1vw - 7.68px) * 1.262), 21px)',
 			] );
 		} );
 
