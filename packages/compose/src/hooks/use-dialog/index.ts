@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { KeyboardEvent, RefCallback, SyntheticEvent } from 'react';
+import type { RefCallback, SyntheticEvent } from 'react';
 
 /**
  * WordPress dependencies
@@ -64,7 +64,7 @@ function useDialog( options: DialogOptions ): useDialogReturn {
 			currentOptions.current.onClose();
 		}
 	} );
-	const closeOnEscapeRef = useCallback( ( node ) => {
+	const closeOnEscapeRef = useCallback( ( node: HTMLElement ) => {
 		if ( ! node ) {
 			return;
 		}
