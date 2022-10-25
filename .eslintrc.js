@@ -168,6 +168,7 @@ module.exports = {
 							'upperFirst',
 							'values',
 							'without',
+							'words',
 							'xor',
 							'zip',
 						],
