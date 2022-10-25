@@ -84,13 +84,11 @@ const Template: ComponentStory< typeof BorderControl > = ( {
 
 	return (
 		<SlotFillProvider>
-			<div style={ { maxWidth: '280px' } }>
-				<BorderControl
-					onChange={ onChangeMerged }
-					value={ border }
-					{ ...props }
-				/>
-			</div>
+			<BorderControl
+				onChange={ onChangeMerged }
+				value={ border }
+				{ ...props }
+			/>
 			{ /* @ts-expect-error Ignore until Popover.Slot is converted to TS */ }
 			<Popover.Slot />
 		</SlotFillProvider>

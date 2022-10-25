@@ -54,13 +54,11 @@ const Template: ComponentStory< typeof BorderBoxControl > = ( props ) => {
 
 	return (
 		<SlotFillProvider>
-			<div style={ { maxWidth: '248px', padding: '16px' } }>
-				<BorderBoxControl
-					{ ...otherProps }
-					onChange={ onChangeMerged }
-					value={ borders }
-				/>
-			</div>
+			<BorderBoxControl
+				{ ...otherProps }
+				onChange={ onChangeMerged }
+				value={ borders }
+			/>
 			<hr
 				style={ {
 					marginTop: '100px',
