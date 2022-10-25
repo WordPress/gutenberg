@@ -1340,7 +1340,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEquals( $expected, $root_rules . $style_rules );
 	}
 
-	public function test_get_stylesheet_with_separator_block_in_theme_json() {
+	public function test_update_separator_declarations() {
 		// If only background is defined, test that includes border-color to the style so it is applied on the front end.
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
