@@ -31,10 +31,10 @@ test.describe( 'Fullscreen Mode', () => {
 			/is-fullscreen-mode/
 		);
 
-		const fullscreenCloseButton = await page.locator(
-			'.edit-post-fullscreen-mode-close'
-		);
-
-		expect( fullscreenCloseButton ).not.toBeNull();
+		await expect(
+			page.locator(
+				'role=region[name="Editor top bar"i] >> role=link[name="View Posts"i]'
+			)
+		).toBeVisible();
 	} );
 } );
