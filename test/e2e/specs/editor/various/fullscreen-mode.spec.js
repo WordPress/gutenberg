@@ -20,8 +20,6 @@ test.describe( 'Fullscreen Mode', () => {
 			'role=region[name="Editor top bar"i] >> role=button[name="Options"i]'
 		);
 
-		// Verify All options are visible
-		page.locator( '.interface-more-menu-dropdown__content' );
 
 		// Choose Full Screen Mode
 		await page
