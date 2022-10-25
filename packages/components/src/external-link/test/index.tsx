@@ -1,70 +1,88 @@
 /**
  * External dependencies
  */
-import { render, screen, fireEvent, createEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
  */
 import { ExternalLink } from '..';
 
+const setupUser = () =>
+	userEvent.setup( {
+		advanceTimers: jest.advanceTimersByTime,
+	} );
+
 describe( 'ExternalLink', () => {
-	test( 'should call function passed in onClick handler when clicking the link', () => {
-		const doSomething = jest.fn();
+	test( 'should call function passed in onClick handler when clicking the link', async () => {
+		const user = setupUser();
+		const onClickMock = jest.fn();
 
 		render(
-			<ExternalLink
-				href="https://wordpress.org"
-				onClick={ doSomething }
-				data-testid="external-link"
-			>
+			<ExternalLink href="https://wordpress.org" onClick={ onClickMock }>
 				WordPress.org
 			</ExternalLink>
 		);
 
-		fireEvent.click( screen.getByTestId( 'external-link' ) );
+		const link = screen.getByRole( 'link', {
+			name: 'WordPress.org (opens in a new tab)',
+		} );
 
-		expect( doSomething ).toHaveBeenCalled();
+		await user.click( link );
+
+		expect( onClickMock ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	test( 'should prevent default action when clicking an internal anchor link', () => {
+	test( 'should prevent default action when clicking an internal anchor link without passing onClick prop', async () => {
+		const user = setupUser();
+
 		render(
-			<ExternalLink href="#test" data-testid="external-link">
-				I&apos;m an anchor link!
-			</ExternalLink>
+			<ExternalLink href="#test">I&apos;m an anchor link!</ExternalLink>
 		);
 
-		const component = screen.getByTestId( 'external-link' );
-		const clickEvent = createEvent.click( component );
+		const link = screen.getByRole( 'link', {
+			name: "I'm an anchor link! (opens in a new tab)",
+		} );
 
-		fireEvent( component, clickEvent );
+		const onClickMock = jest.fn();
+		link.onclick = onClickMock;
 
-		expect( clickEvent.defaultPrevented ).toBe( true );
+		await user.click( link );
+		expect( onClickMock ).toHaveBeenCalledTimes( 1 );
+		expect( onClickMock ).toHaveBeenLastCalledWith(
+			expect.objectContaining( { defaultPrevented: true } )
+		);
 	} );
 
-	test( 'should call function passed in onClick handler and prevent default action when clicking an internal anchor link', () => {
-		const doSomething = jest.fn();
+	test( 'should call function passed in onClick handler and prevent default action when clicking an internal anchor link', async () => {
+		const user = setupUser();
+		const onClickMock = jest.fn();
 
 		render(
 			<ExternalLink
 				href="#test"
-				onClick={ doSomething }
+				onClick={ onClickMock }
 				data-testid="external-link"
 			>
 				I&apos;m an anchor link!
 			</ExternalLink>
 		);
 
-		const component = screen.getByTestId( 'external-link' );
-		const clickEvent = createEvent.click( component );
+		const link = screen.getByRole( 'link', {
+			name: "I'm an anchor link! (opens in a new tab)",
+		} );
 
-		fireEvent( component, clickEvent );
-
-		expect( doSomething ).toHaveBeenCalled();
-		expect( clickEvent.defaultPrevented ).toBe( true );
+		await user.click( link );
+		expect( onClickMock ).toHaveBeenCalledTimes( 1 );
+		expect( onClickMock ).toHaveBeenLastCalledWith(
+			expect.objectContaining( { defaultPrevented: true } )
+		);
 	} );
 
-	test( 'should not prevent default action when clicking a non anchor link', () => {
+	test( 'should not prevent default action when clicking a non anchor link without passing onClick prop', async () => {
+		const user = setupUser();
+
 		render(
 			<ExternalLink
 				href="https://wordpress.org"
@@ -74,11 +92,18 @@ describe( 'ExternalLink', () => {
 			</ExternalLink>
 		);
 
-		const component = screen.getByTestId( 'external-link' );
-		const clickEvent = createEvent.click( component );
+		const link = screen.getByRole( 'link', {
+			name: "I'm not an anchor link! (opens in a new tab)",
+		} );
 
-		fireEvent( component, clickEvent );
+		const onClickMock = jest.fn();
+		link.onclick = onClickMock;
 
-		expect( clickEvent.defaultPrevented ).toBe( false );
+		await user.click( link );
+
+		expect( onClickMock ).toHaveBeenCalledTimes( 1 );
+		expect( onClickMock ).toHaveBeenLastCalledWith(
+			expect.objectContaining( { defaultPrevented: false } )
+		);
 	} );
 } );
