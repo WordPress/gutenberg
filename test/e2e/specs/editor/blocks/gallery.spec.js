@@ -205,13 +205,14 @@ test.describe( 'Gallery', () => {
 		await editor.insertBlock( { name: 'core/gallery' } );
 		await page.click( 'role=button[name="Media Library"i]' );
 
-		await expect( page.locator( '.media-frame' ) ).toBeVisible();
-		await expect( page.locator( '.media-frame-title h1' ) ).toContainText(
-			'Create gallery'
+		const mediaLibrary = page.locator(
+			'role=dialog[name="Create gallery"i]'
 		);
+
+		await expect( mediaLibrary ).toBeVisible();
 		await expect(
-			page.locator( '.media-toolbar-primary button' )
-		).toContainText( 'Create a new gallery' );
+			mediaLibrary.locator( 'role=button[name="Create a new gallery"i]' )
+		).toBeVisible();
 	} );
 } );
 
