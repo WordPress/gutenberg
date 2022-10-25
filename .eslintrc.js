@@ -81,6 +81,7 @@ module.exports = {
 						importNames: [
 							'camelCase',
 							'capitalize',
+							'castArray',
 							'chunk',
 							'clamp',
 							'cloneDeep',
@@ -97,6 +98,7 @@ module.exports = {
 							'dropRight',
 							'each',
 							'escapeRegExp',
+							'every',
 							'extend',
 							'findIndex',
 							'findKey',
@@ -134,6 +136,7 @@ module.exports = {
 							'negate',
 							'noop',
 							'nth',
+							'omitBy',
 							'once',
 							'overEvery',
 							'partial',
@@ -164,6 +167,7 @@ module.exports = {
 							'uniqWith',
 							'upperFirst',
 							'values',
+							'without',
 							'xor',
 							'zip',
 						],
@@ -317,6 +321,22 @@ module.exports = {
 			files: [ 'packages/jest*/**/*.js', '**/test/**/*.js' ],
 			excludedFiles: [ 'test/e2e/**/*.js' ],
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-unit' ],
+		},
+		{
+			files: [ '**/test/**/*.js' ],
+			excludedFiles: [
+				'**/*.@(android|ios|native).js',
+				'packages/react-native-*/**/*.js',
+				'test/native/**/*.js',
+			],
+			extends: [
+				'plugin:jest-dom/recommended',
+				'plugin:testing-library/react',
+			],
+			rules: {
+				'testing-library/no-container': 'off',
+				'testing-library/no-node-access': 'off',
+			},
 		},
 		{
 			files: [ 'packages/e2e-test*/**/*.js' ],

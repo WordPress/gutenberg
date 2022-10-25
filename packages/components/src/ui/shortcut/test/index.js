@@ -28,7 +28,8 @@ describe( 'Shortcut', () => {
 		};
 		render( <Shortcut shortcut={ shortcutObject } /> );
 		const shortcut = screen.getByText( shortcutObject.display );
-		expect( shortcut.getAttribute( 'aria-label' ) ).toBe(
+		expect( shortcut ).toHaveAttribute(
+			'aria-label',
 			shortcutObject.ariaLabel
 		);
 	} );

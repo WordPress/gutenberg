@@ -169,7 +169,7 @@ jobs:
                   ref: ${{ needs.bump-version.outputs.release_branch || github.ref }}
 
             - name: Use desired version of NodeJS
-              uses: actions/setup-node@969bd2663942d722d85b6a8626225850c2f7be4b # v3.5.0
+              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
               with:
                   node-version-file: '.nvmrc'
                   cache: npm
@@ -266,12 +266,12 @@ jobs:
               run: echo ::set-output name=version::$(echo $VERSION | cut -d / -f 3 | sed 's/-rc./ RC/' )
 
             - name: Download Plugin Zip Artifact
-              uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v3.0.0
+              uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # v3.0.1
               with:
                   name: gutenberg-plugin
 
             - name: Download Release Notes Artifact
-              uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v3.0.0
+              uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # v3.0.1
               with:
                   name: release-notes
 
@@ -327,7 +327,7 @@ jobs:
                   git config user.email gutenberg@wordpress.org
 
             - name: Setup Node (for CLI)
-              uses: actions/setup-node@969bd2663942d722d85b6a8626225850c2f7be4b # v3.5.0
+              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
               with:
                   node-version-file: 'main/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'

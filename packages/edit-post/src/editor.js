@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, without } from 'lodash';
+import { map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -139,9 +139,8 @@ function Editor( {
 					? map( blockTypes, 'name' )
 					: settings.allowedBlockTypes || [];
 
-			result.allowedBlockTypes = without(
-				defaultAllowedBlockTypes,
-				...hiddenBlockTypes
+			result.allowedBlockTypes = defaultAllowedBlockTypes.filter(
+				( type ) => ! hiddenBlockTypes.includes( type )
 			);
 		}
 

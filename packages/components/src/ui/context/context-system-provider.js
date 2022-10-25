@@ -10,33 +10,20 @@ import {
 	createContext,
 	useContext,
 	useRef,
-	useEffect,
 	useMemo,
 	memo,
 } from '@wordpress/element';
 import warn from '@wordpress/warning';
 
+/**
+ * Internal dependencies
+ */
+import { useUpdateEffect } from '../../utils';
+
 export const ComponentsContext = createContext(
 	/** @type {Record<string, any>} */ ( {} )
 );
 export const useComponentsContext = () => useContext( ComponentsContext );
-
-/**
- * Runs an effect only on update (i.e., ignores the first render)
- *
- * @param {import('react').EffectCallback} effect
- * @param {import('react').DependencyList} deps
- */
-function useUpdateEffect( effect, deps ) {
-	const mounted = useRef( false );
-	useEffect( () => {
-		if ( mounted.current ) {
-			return effect();
-		}
-		mounted.current = true;
-		return undefined;
-	}, deps );
-}
 
 /**
  * Consolidates incoming ContextSystem values with a (potential) parent ContextSystem value.

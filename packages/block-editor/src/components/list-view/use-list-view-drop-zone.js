@@ -11,7 +11,10 @@ import {
 /**
  * Internal dependencies
  */
-import { getDistanceToNearestEdge } from '../../utils/math';
+import {
+	getDistanceToNearestEdge,
+	isPointContainedByRect,
+} from '../../utils/math';
 import useOnBlockDrop from '../use-on-block-drop';
 import { store as blockEditorStore } from '../../store';
 
@@ -47,23 +50,6 @@ import { store as blockEditorStore } from '../../store';
  * @property {'top'|'bottom'|'inside'} dropPosition The position relative to the block that the user is dropping to.
  *                                                  'inside' refers to nesting as an inner block.
  */
-
-/**
- * Is the point contained by the rectangle.
- *
- * @param {WPPoint} point The point.
- * @param {DOMRect} rect  The rectangle.
- *
- * @return {boolean} True if the point is contained by the rectangle, false otherwise.
- */
-function isPointContainedByRect( point, rect ) {
-	return (
-		rect.left <= point.x &&
-		rect.right >= point.x &&
-		rect.top <= point.y &&
-		rect.bottom >= point.y
-	);
-}
 
 /**
  * Determines whether the user positioning the dragged block to nest as an

@@ -2,12 +2,51 @@
 
 ## Unreleased
 
+### New Feature
+
+-   `BoxControl` & `CustomSelectControl`: Add `onMouseOver` and `onMouseOut` callback props to allow handling of these events by parent components ([#44955](https://github.com/WordPress/gutenberg/pull/44955))
+
+## Enhancements
+
+-   `FontSizePicker`: Improved slider design when `withSlider` is set ([#44598](https://github.com/WordPress/gutenberg/pull/44598)).
+
 ### Bug Fix
--   `FontSizePicker`: Ensure that fluid font size presets appear correctly in the UI controls ([#44791](https://github.com/WordPress/gutenberg/pull/44791))
+
+-   `Button`: Fix RTL alignment for buttons containing an icon and text ([#44787](https://github.com/WordPress/gutenberg/pull/44787)).
+-   `TabPanel`: Call `onSelect()` on every tab selection, regardless of whether it was triggered by user interaction ([#44028](https://github.com/WordPress/gutenberg/pull/44028)).
+-   `FontSizePicker`: Fallback to font size `slug` if `name` is undefined  ([#45041](https://github.com/WordPress/gutenberg/pull/45041)).
+
+### Internal
+
+-   `Snackbar`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44934](https://github.com/WordPress/gutenberg/pull/44934))
+-   `AnglePickerControl`: Set Storybook Label control type to 'text' ([#45122](https://github.com/WordPress/gutenberg/pull/45122)).
+-   `SlotFill`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44403](https://github.com/WordPress/gutenberg/pull/44403))
+-   `Context`: updated to ignore `react/exhaustive-deps` eslint rule ([#45044](https://github.com/WordPress/gutenberg/pull/45044))
+-   `Button`: Refactor Storybook to controls and align docs ([#44105](https://github.com/WordPress/gutenberg/pull/44105)).
+
+## 21.3.0 (2022-10-19)
+
+### Bug Fix
+
+-   `FontSizePicker`: Ensure that fluid font size presets appear correctly in the UI controls ([#44791](https://github.com/WordPress/gutenberg/pull/44791)).
+-   `ToggleGroupControl`: Remove unsupported `disabled` prop from types, and correctly mark `label` prop as required ([#45114](https://github.com/WordPress/gutenberg/pull/45114)).
+-   `Navigator`: prevent partially hiding focus ring styles, by removing unnecessary overflow rules on `NavigatorScreen` ([#44973](https://github.com/WordPress/gutenberg/pull/44973)).
+-   `Navigator`: restore focus only once per location  ([#44972](https://github.com/WordPress/gutenberg/pull/44972)).
 
 ### Documentation
 
--   `VisuallyHidden`: Add some notes on best practices around stacking contexts when using this component ([#44867](https://github.com/WordPress/gutenberg/pull/44867))
+-   `VisuallyHidden`: Add some notes on best practices around stacking contexts when using this component ([#44867](https://github.com/WordPress/gutenberg/pull/44867)).
+
+### Internal
+
+-   `Modal`: Convert to TypeScript ([#42949](https://github.com/WordPress/gutenberg/pull/42949)).
+-   `Sandbox`: Use `toString` to create observe and resize script string ([#42872](https://github.com/WordPress/gutenberg/pull/42872)).
+-   `Navigator`: refactor unit tests to TypeScript and to `user-event` ([#44970](https://github.com/WordPress/gutenberg/pull/44970)).
+-   `Navigator`: Refactor Storybook code to TypeScript and controls ([#44979](https://github.com/WordPress/gutenberg/pull/44979)).
+-   `withFilters`: Refactor away from `_.without()` ([#44980](https://github.com/WordPress/gutenberg/pull/44980/)).
+-   `withFocusReturn`: Refactor tests to `@testing-library/react` ([#45012](https://github.com/WordPress/gutenberg/pull/45012)).
+-   `ToolsPanel`: updated to satisfy `react/exhaustive-deps` eslint rule ([#45028](https://github.com/WordPress/gutenberg/pull/45028))
+-   `Tooltip`: updated to ignore `react/exhaustive-deps` eslint rule ([#45043](https://github.com/WordPress/gutenberg/pull/45043))
 
 ## 21.2.0 (2022-10-05)
 
@@ -24,6 +63,11 @@
 -   `ToggleGroupControl`: adjust icon color when inactive, from `gray-700` to `gray-900` ([#44575](https://github.com/WordPress/gutenberg/pull/44575)).
 -   `TokenInput`: improve logic around the `aria-activedescendant` attribute, which was causing unintended focus behavior for some screen readers ([#44526](https://github.com/WordPress/gutenberg/pull/44526)).
 -   `NavigatorScreen`: fix focus issue where back button received focus unexpectedly ([#44239](https://github.com/WordPress/gutenberg/pull/44239))
+-   `FontSizePicker`: Fix header order in RTL languages ([#44590](https://github.com/WordPress/gutenberg/pull/44590)).
+
+### Enhancements
+
+-   `SuggestionList`: use `requestAnimationFrame` instead of `setTimeout` when scrolling selected item into view. This change improves the responsiveness of the `ComboboxControl` and `FormTokenField` components when rapidly hovering over the suggestion items in the list ([#44573](https://github.com/WordPress/gutenberg/pull/44573)).
 
 ### Internal
 
@@ -34,6 +78,10 @@
 -   `Sandbox`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44378](https://github.com/WordPress/gutenberg/pull/44378))
 -   `FontSizePicker`: Convert to TypeScript ([#44449](https://github.com/WordPress/gutenberg/pull/44449)).
 -   `FontSizePicker`: Replace SCSS with Emotion + components ([#44483](https://github.com/WordPress/gutenberg/pull/44483)).
+
+### Experimental
+
+-   Add experimental `Theme` component ([#44668](https://github.com/WordPress/gutenberg/pull/44668)).
 
 ## 21.1.0 (2022-09-21)
 
@@ -57,7 +105,6 @@
 -   `RangeControl`: updated to pass `react/exhaustive-deps` eslint rule ([#44271](https://github.com/WordPress/gutenberg/pull/44271)).
 -   `UnitControl` updated to pass the `react/exhaustive-deps` eslint rule ([#44161](https://github.com/WordPress/gutenberg/pull/44161)).
 -   `Notice`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44157](https://github.com/WordPress/gutenberg/pull/44157))
-
 
 ## 21.0.0 (2022-09-13)
 
@@ -158,7 +205,7 @@
 -   `ComboboxControl`: Normalize hyphen-like characters to an ASCII hyphen ([#42942](https://github.com/WordPress/gutenberg/pull/42942)).
 -   `FormTokenField`: Refactor away from `_.difference()` ([#43224](https://github.com/WordPress/gutenberg/pull/43224/)).
 -   `Autocomplete`: use `KeyboardEvent.code` instead of `KeyboardEvent.keyCode` ([#43432](https://github.com/WordPress/gutenberg/pull/43432/)).
--   `ConfirmDialog`: replace (almost) every usage of `fireEvent` with `@testing-library/user-event`  ([#43429](https://github.com/WordPress/gutenberg/pull/43429/)).
+-   `ConfirmDialog`: replace (almost) every usage of `fireEvent` with `@testing-library/user-event` ([#43429](https://github.com/WordPress/gutenberg/pull/43429/)).
 -   `Popover`: Introduce new `flip` and `resize` props ([#43546](https://github.com/WordPress/gutenberg/pull/43546/)).
 
 ### Internal

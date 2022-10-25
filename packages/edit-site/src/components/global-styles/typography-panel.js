@@ -256,6 +256,7 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
 						fontSizes={ fontSizesWithFluidValues }
 						disableCustomFontSizes={ disableCustomFontSizes }
 						withReset={ false }
+						withSlider
 						size="__unstable-large"
 						__nextHasNoMarginBottom
 					/>

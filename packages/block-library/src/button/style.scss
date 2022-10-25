@@ -113,4 +113,6 @@ $blocks-block__margin: 0.5em;
 .wp-block-button.is-style-outline > .wp-block-button__link:not(.has-background),
 .wp-block-button .wp-block-button__link.is-style-outline:not(.has-background) {
 	background-color: transparent;
+	// background-image is required to overwrite a gradient background
+	background-image: none;
 }

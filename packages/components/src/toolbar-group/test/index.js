@@ -13,13 +13,13 @@ describe( 'ToolbarGroup', () => {
 		it( 'should render an empty node, when controls are not passed', () => {
 			const { container } = render( <ToolbarGroup /> );
 
-			expect( container.innerHTML ).toBe( '' );
+			expect( container ).toBeEmptyDOMElement();
 		} );
 
 		it( 'should render an empty node, when controls are empty', () => {
 			const { container } = render( <ToolbarGroup controls={ [] } /> );
 
-			expect( container.innerHTML ).toBe( '' );
+			expect( container ).toBeEmptyDOMElement();
 		} );
 
 		it( 'should render a list of controls with buttons', () => {
@@ -36,10 +36,8 @@ describe( 'ToolbarGroup', () => {
 			render( <ToolbarGroup controls={ controls } /> );
 
 			const toolbarButton = screen.getByLabelText( 'WordPress' );
-			expect( toolbarButton.getAttribute( 'aria-pressed' ) ).toBe(
-				'false'
-			);
-			expect( toolbarButton.getAttribute( 'type' ) ).toBe( 'button' );
+			expect( toolbarButton ).toHaveAttribute( 'aria-pressed', 'false' );
+			expect( toolbarButton ).toHaveAttribute( 'type', 'button' );
 		} );
 
 		it( 'should render a list of controls with buttons and active control', () => {
@@ -56,10 +54,8 @@ describe( 'ToolbarGroup', () => {
 			render( <ToolbarGroup controls={ controls } /> );
 
 			const toolbarButton = screen.getByLabelText( 'WordPress' );
-			expect( toolbarButton.getAttribute( 'aria-pressed' ) ).toBe(
-				'true'
-			);
-			expect( toolbarButton.getAttribute( 'type' ) ).toBe( 'button' );
+			expect( toolbarButton ).toHaveAttribute( 'aria-pressed', 'true' );
+			expect( toolbarButton ).toHaveAttribute( 'type', 'button' );
 		} );
 
 		it( 'should render a nested list of controls with separator between', () => {

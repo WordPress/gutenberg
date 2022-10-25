@@ -86,6 +86,7 @@ function Navigation( {
 		openSubmenusOnClick,
 		overlayMenu,
 		showSubmenuIcon,
+		templateLock,
 		layout: {
 			justifyContent,
 			orientation = 'horizontal',
@@ -271,7 +272,7 @@ function Navigation( {
 			fallbackNavigationMenus?.length > 0 ||
 			classicMenus?.length !== 1
 		) {
-			return false;
+			return;
 		}
 
 		// If there's non fallback navigation menus and
@@ -480,24 +481,22 @@ function Navigation( {
 
 	// Prompt the user to publish the menu they have set as a draft
 	const isDraftNavigationMenu = navigationMenu?.status === 'draft';
-	useEffect( async () => {
+	useEffect( () => {
 		hideMenuAutoPublishDraftNotice();
-		if ( ! isDraftNavigationMenu ) return;
-		try {
-			await editEntityRecord(
-				'postType',
-				'wp_navigation',
-				navigationMenu?.id,
-				{
-					status: 'publish',
-				},
-				{ throwOnError: true }
-			);
-		} catch {
-			showMenuAutoPublishDraftNotice(
-				__( 'Error ocurred while publishing the navigation menu.' )
-			);
+		if ( ! isDraftNavigationMenu ) {
+			return;
 		}
+		editEntityRecord(
+			'postType',
+			'wp_navigation',
+			navigationMenu?.id,
+			{ status: 'publish' },
+			{ throwOnError: true }
+		).catch( () => {
+			showMenuAutoPublishDraftNotice(
+				__( 'Error occurred while publishing the navigation menu.' )
+			);
+		} );
 	}, [ isDraftNavigationMenu, navigationMenu ] );
 
 	const stylingInspectorControls = (
@@ -706,6 +705,7 @@ function Navigation( {
 					<UnsavedInnerBlocks
 						blocks={ uncontrolledInnerBlocks }
 						clientId={ clientId }
+						templateLock={ templateLock }
 						navigationMenus={ navigationMenus }
 						hasSelection={ isSelected || isInnerBlockSelected }
 						hasSavedUnsavedInnerBlocks={
@@ -944,6 +944,7 @@ function Navigation( {
 									hasCustomPlaceholder={
 										!! CustomPlaceholder
 									}
+									templateLock={ templateLock }
 									orientation={ orientation }
 								/>
 							) }

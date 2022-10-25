@@ -9,28 +9,6 @@ import { __ } from '@wordpress/i18n';
 import type { FontSizePickerProps } from './types';
 
 /**
- * Helper util to split a font size to its numeric value
- * and its `unit`, if exists.
- *
- * @param  size Font size.
- * @return An array with the numeric value and the unit if exists.
- */
-export function splitValueAndUnitFromSize(
-	size: NonNullable< FontSizePickerProps[ 'value' ] >
-) {
-	const [ numericValue, unit ] = `${ size }`.match( /[\d\.]+|\D+/g ) ?? [];
-
-	if (
-		! isNaN( parseFloat( numericValue ) ) &&
-		isFinite( Number( numericValue ) )
-	) {
-		return [ numericValue, unit ];
-	}
-
-	return [];
-}
-
-/**
  * Some themes use css vars for their font sizes, so until we
  * have the way of calculating them don't display them.
  *

@@ -21,7 +21,6 @@ import {
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
-import { useDisabled } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { renderToString, useEffect } from '@wordpress/element';
@@ -55,7 +54,6 @@ export default function TableOfContentsEdit( {
 	setAttributes,
 } ) {
 	const blockProps = useBlockProps();
-	const disabledRef = useDisabled();
 
 	const canInsertList = useSelect(
 		( select ) => {
@@ -295,7 +293,7 @@ export default function TableOfContentsEdit( {
 	return (
 		<>
 			<nav { ...blockProps }>
-				<ol ref={ disabledRef }>
+				<ol inert="true">
 					<TableOfContentsList nestedHeadingList={ headingTree } />
 				</ol>
 			</nav>

@@ -16,6 +16,7 @@ import {
 	clickButton,
 	openListView,
 	getListViewBlocks,
+	clickBlockToolbarButton,
 } from '@wordpress/e2e-test-utils';
 
 async function upload( selector ) {
@@ -110,7 +111,7 @@ describe( 'Gallery', () => {
 
 		const imageListLink = ( await getListViewBlocks( 'Image' ) )[ 0 ];
 		await imageListLink.click();
-
+		await clickBlockToolbarButton( 'Add caption' );
 		const captionElement = await figureElement.$(
 			'.block-editor-rich-text__editable'
 		);

@@ -17,6 +17,7 @@ yarn.lock
 /composer.lock
 
 .cache
+.eslintcache
 *.tsbuildinfo
 
 # Operating system specific files

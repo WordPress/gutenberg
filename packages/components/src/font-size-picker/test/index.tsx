@@ -215,7 +215,7 @@ describe( 'FontSizePicker', () => {
 				);
 				const element = screen.getByLabelText( 'Large' );
 				expect( element ).toBeInTheDocument();
-				expect( element.children[ 0 ].textContent ).toBe( 'L' );
+				expect( element.children[ 0 ] ).toHaveTextContent( 'L' );
 			} );
 			it( 'should use incremental sequence of t-shirt sizes as labels if we have complex css', () => {
 				const fontSizes = [
@@ -240,9 +240,50 @@ describe( 'FontSizePicker', () => {
 				const extraLargeElement =
 					screen.getByLabelText( 'Extra Large' );
 				expect( extraLargeElement ).toBeInTheDocument();
-				expect( extraLargeElement.children[ 0 ].textContent ).toBe(
+				expect( extraLargeElement.children[ 0 ] ).toHaveTextContent(
 					'XL'
 				);
+			} );
+			it( 'should use font size `slug` for for header hint label by default', () => {
+				const fontSizes = [
+					{
+						name: 'Allosaurus Large',
+						slug: 'allosaurus-l',
+						size: '20rem',
+					},
+				];
+				render(
+					<FontSizePicker
+						fontSizes={ fontSizes }
+						value={ fontSizes[ 0 ].size }
+						__nextHasNoMarginBottom
+					/>
+				);
+
+				const largeFontSizeElement = screen.getByLabelText(
+					'Size Allosaurus Large(rem)'
+				);
+				expect( largeFontSizeElement ).toBeInTheDocument();
+			} );
+			it( 'should fallback to font size `slug` for header hint label if `name` is undefined', () => {
+				const fontSizes = [
+					{
+						slug: 'gigantosaurus',
+						size: '1000px',
+					},
+				];
+				render(
+					<FontSizePicker
+						fontSizes={ fontSizes }
+						value={ fontSizes[ 0 ].size }
+						__nextHasNoMarginBottom
+					/>
+				);
+
+				const giganticFontSizeElement = screen.getByLabelText(
+					'Size gigantosaurus(px)'
+				);
+				expect( giganticFontSizeElement ).toBeInTheDocument();
 			} );
 			it( 'should use t-shirt labels if sizes have no names', () => {
 				const fontSizes = [];

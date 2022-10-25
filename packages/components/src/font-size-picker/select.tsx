@@ -7,11 +7,11 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import CustomSelectControl from '../custom-select-control';
+import { parseQuantityAndUnitFromRawValue } from '../unit-control';
 import type {
 	FontSizePickerSelectProps,
 	FontSizePickerSelectOption,
 } from './types';
-import { splitValueAndUnitFromSize } from './utils';
 
 const DEFAULT_OPTION: FontSizePickerSelectOption = {
 	key: 'default',
@@ -37,12 +37,15 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 	const options: FontSizePickerSelectOption[] = [
 		DEFAULT_OPTION,
 		...fontSizes.map( ( fontSize ) => {
-			const [ parsedValue ] = splitValueAndUnitFromSize( fontSize.size );
+			const [ quantity ] = parseQuantityAndUnitFromRawValue(
+				fontSize.size
+			);
 			return {
 				key: fontSize.slug,
 				name: fontSize.name || fontSize.slug,
 				value: fontSize.size,
-				__experimentalHint: parsedValue,
+				__experimentalHint:
+					quantity !== undefined ? String( quantity ) : undefined,
 			};
 		} ),
 		...( disableCustomFontSizes ? [] : [ CUSTOM_OPTION ] ),
