@@ -24,7 +24,8 @@ export default function useRegisterShortcuts() {
 					character: 'n',
 				},
 				{
-					character: 'escape',
+					modifier: 'primary',
+					character: 'F6',
 				},
 			],
 		} );
@@ -43,8 +44,8 @@ export default function useRegisterShortcuts() {
 					character: 'p',
 				},
 				{
-					modifier: 'shift',
-					character: 'escape',
+					modifier: 'primaryShift',
+					character: 'F6',
 				},
 			],
 		} );

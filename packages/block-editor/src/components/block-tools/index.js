@@ -59,6 +59,7 @@ export default function BlockTools( {
 		removeBlocks,
 		insertAfterBlock,
 		insertBeforeBlock,
+		clearSelectedBlock,
 		moveBlocksUp,
 		moveBlocksDown,
 	} = useDispatch( blockEditorStore );
@@ -103,6 +104,16 @@ export default function BlockTools( {
 			if ( clientIds.length ) {
 				event.preventDefault();
 				insertBeforeBlock( clientIds[ 0 ] );
+			}
+		} else if ( isMatch( 'core/block-editor/unselect', event ) ) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length ) {
+				event.preventDefault();
+				clearSelectedBlock();
+				event.target.ownerDocument.defaultView
+					.getSelection()
+					.removeAllRanges();
+				__unstableContentRef?.current.focus();
 			}
 		}
 	}

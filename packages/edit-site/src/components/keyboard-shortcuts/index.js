@@ -164,7 +164,8 @@ function KeyboardShortcutsRegister() {
 					character: 'n',
 				},
 				{
-					character: 'escape',
+					modifier: 'primary',
+					character: 'F6',
 				},
 			],
 		} );
@@ -183,8 +184,8 @@ function KeyboardShortcutsRegister() {
 					character: 'p',
 				},
 				{
-					modifier: 'shift',
-					character: 'escape',
+					modifier: 'primaryShift',
+					character: 'F6',
 				},
 			],
 		} );

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { focus, isFormElement } from '@wordpress/dom';
-import { TAB } from '@wordpress/keycodes';
+import { TAB, ESCAPE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect, useMergeRefs } from '@wordpress/compose';
 import { useRef } from '@wordpress/element';
@@ -72,6 +72,12 @@ export default function useTabNav() {
 	const ref = useRefEffect( ( node ) => {
 		function onKeyDown( event ) {
 			if ( event.defaultPrevented ) {
+				return;
+			}
+
+			if ( event.keyCode === ESCAPE ) {
+				event.preventDefault();
+				setNavigationMode( true );
 				return;
 			}
 

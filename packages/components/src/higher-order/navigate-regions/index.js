@@ -12,8 +12,8 @@ import { isKeyboardEvent } from '@wordpress/keycodes';
 const defaultShortcuts = {
 	previous: [
 		{
-			modifier: 'shift',
-			character: 'escape',
+			modifier: 'primary',
+			character: 'F6',
 		},
 		{
 			modifier: 'ctrlShift',
@@ -26,7 +26,8 @@ const defaultShortcuts = {
 	],
 	next: [
 		{
-			character: 'escape',
+			modifier: 'primaryShift',
+			character: 'F6',
 		},
 		{
 			modifier: 'ctrl',
