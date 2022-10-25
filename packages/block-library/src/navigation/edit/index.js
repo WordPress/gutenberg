@@ -66,7 +66,11 @@ import useConvertClassicToBlockMenu, {
 } from './use-convert-classic-menu-to-block-menu';
 import useCreateNavigationMenu from './use-create-navigation-menu';
 import { useInnerBlocks } from './use-inner-blocks';
-import { detectColors } from './utils';
+import {
+	detectColors,
+	hasCustomMobileBreakpoint,
+	normalizeMobileBreakpoint,
+} from './utils';
 import ManageMenusButton from './manage-menus-button';
 import MenuInspectorControls from './menu-inspector-controls';
 import DeletedNavigationWarning from './deleted-navigation-warning';
@@ -278,8 +282,13 @@ function Navigation( {
 		} = {},
 		hasIcon,
 		icon = 'handle',
+		mobileBreakpoint,
 	} = attributes;
 
+	const normalizedMobileBreakpoint =
+		normalizeMobileBreakpoint( mobileBreakpoint );
+	const hasCustomMobileBreakpointValue =
+		hasCustomMobileBreakpoint( mobileBreakpoint );
 	const ref = attributes.ref;
 	useLayoutCustomProperties( {
 		clientId,
@@ -642,6 +651,8 @@ function Navigation( {
 					backgroundColor?.slug
 				) ]: !! backgroundColor?.slug,
 				[ `has-text-decoration-${ textDecoration }` ]: textDecoration,
+				'has-custom-mobile-breakpoint':
+					isResponsive && hasCustomMobileBreakpointValue,
 				'block-editor-block-content-overlay': hasBlockOverlay,
 			},
 			layoutClassNames
@@ -935,6 +946,7 @@ function Navigation( {
 						isResponsive={ isResponsive }
 						currentTheme={ currentTheme }
 						hasOverlays={ hasOverlays }
+						mobileBreakpoint={ normalizedMobileBreakpoint }
 					/>
 				</InspectorControls>
 			) }
@@ -1008,6 +1020,10 @@ function Navigation( {
 						overlayTextColor={ overlayTextColor }
 						overlay={ overlay }
 						onNavigateToEntityRecord={ onNavigateToEntityRecord }
+						mobileBreakpoint={ normalizedMobileBreakpoint }
+						hasCustomMobileBreakpoint={
+							hasCustomMobileBreakpointValue
+						}
 					>
 						<UnsavedInnerBlocks
 							createNavigationMenu={ createNavigationMenu }
@@ -1176,6 +1192,12 @@ function Navigation( {
 									overlay={ overlay }
 									onNavigateToEntityRecord={
 										onNavigateToEntityRecord
+									}
+									mobileBreakpoint={
+										normalizedMobileBreakpoint
+									}
+									hasCustomMobileBreakpoint={
+										hasCustomMobileBreakpointValue
 									}
 								>
 									{ isEntityAvailable && (

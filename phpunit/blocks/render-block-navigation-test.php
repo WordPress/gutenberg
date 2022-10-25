@@ -12,6 +12,11 @@
  * @group blocks
  */
 class Render_Block_Navigation_Test extends WP_UnitTestCase {
+	public function tear_down() {
+		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+		parent::tear_down();
+	}
+
 	/**
 	 * @covers gutenberg_block_core_navigation_from_block_get_post_ids
 	 */
@@ -149,6 +154,85 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 		$actual = gutenberg_block_core_navigation_add_support_classes_to_container( $block_content, $block );
 
 		$this->assertSame( $block_content, $actual );
+	}
+
+	/**
+	 * Test that the default mobile breakpoint preserves the original markup.
+	 *
+	 * @covers ::block_core_navigation_get_mobile_breakpoint
+	 * @covers ::block_core_navigation_has_custom_mobile_breakpoint
+	 * @covers ::gutenberg_block_core_navigation_add_support_classes_to_container
+	 */
+	public function test_default_mobile_breakpoint_preserves_block_markup() {
+		$block_content = '<nav class="wp-block-navigation is-responsive"><button class="wp-block-navigation__responsive-container-open">Menu</button><div class="wp-block-navigation__responsive-container"><div class="wp-block-navigation__responsive-close"><div class="wp-block-navigation__responsive-dialog"><button class="wp-block-navigation__responsive-container-close">Close</button><div class="wp-block-navigation__responsive-container-content"><ul class="wp-block-navigation__container wp-block-navigation"><li>Item</li></ul></div></div></div></div></nav>';
+		$block         = array(
+			'blockName' => 'core/navigation',
+			'attrs'     => array(
+				'overlayMenu' => 'mobile',
+			),
+		);
+
+		$actual = gutenberg_block_core_navigation_add_support_classes_to_container( $block_content, $block );
+
+		$this->assertSame( $block_content, $actual );
+		$this->assertSame( '600px', block_core_navigation_get_mobile_breakpoint( $block['attrs'] ) );
+		$this->assertFalse( block_core_navigation_has_custom_mobile_breakpoint( $block['attrs'] ) );
+	}
+
+	/**
+	 * Test that custom mobile breakpoints add a scoping class and CSS.
+	 *
+	 * @covers ::block_core_navigation_get_mobile_breakpoint
+	 * @covers ::block_core_navigation_has_custom_mobile_breakpoint
+	 * @covers ::gutenberg_block_core_navigation_add_support_classes_to_container
+	 */
+	public function test_custom_mobile_breakpoint_adds_scoped_styles() {
+		$block_content = '<nav class="wp-block-navigation is-responsive has-custom-mobile-breakpoint"><button class="wp-block-navigation__responsive-container-open">Menu</button><div class="wp-block-navigation__responsive-container"><div class="wp-block-navigation__responsive-close"><div class="wp-block-navigation__responsive-dialog"><button class="wp-block-navigation__responsive-container-close">Close</button><div class="wp-block-navigation__responsive-container-content"><ul class="wp-block-navigation__container wp-block-navigation"><li>Item</li></ul></div></div></div></div></nav>';
+		$block         = array(
+			'blockName' => 'core/navigation',
+			'attrs'     => array(
+				'overlayMenu'       => 'mobile',
+				'mobileBreakpoint'  => '48rem',
+			),
+		);
+
+		$actual = gutenberg_block_core_navigation_add_support_classes_to_container( $block_content, $block );
+		$this->assertMatchesRegularExpression( '/\bwp-block-navigation-custom-breakpoint-(\d+)\b/', $actual );
+		preg_match( '/\bwp-block-navigation-custom-breakpoint-(\d+)\b/', $actual, $matches );
+		$breakpoint_class = $matches[0];
+		$stylesheet       = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertSame( '48rem', block_core_navigation_get_mobile_breakpoint( $block['attrs'] ) );
+		$this->assertTrue( block_core_navigation_has_custom_mobile_breakpoint( $block['attrs'] ) );
+		$this->assertStringContainsString( "@media (min-width: 48rem){.wp-block-navigation.$breakpoint_class.has-custom-mobile-breakpoint .wp-block-navigation__responsive-container:not(.hidden-by-default):not(.is-menu-open){display:block;width:100%;position:relative;z-index:auto;background-color:inherit;}", $stylesheet );
+		$this->assertStringContainsString( ".wp-block-navigation.$breakpoint_class.has-custom-mobile-breakpoint .wp-block-navigation__responsive-container-open:not(.always-shown){display:none;}", $stylesheet );
+	}
+
+	/**
+	 * Test that invalid mobile breakpoints fall back to the default.
+	 *
+	 * @covers ::block_core_navigation_get_mobile_breakpoint
+	 * @covers ::block_core_navigation_has_custom_mobile_breakpoint
+	 * @covers ::gutenberg_block_core_navigation_add_support_classes_to_container
+	 */
+	public function test_invalid_mobile_breakpoint_falls_back_to_default() {
+		$block_content = '<nav class="wp-block-navigation is-responsive"><button class="wp-block-navigation__responsive-container-open">Menu</button><div class="wp-block-navigation__responsive-container"><div class="wp-block-navigation__responsive-close"><div class="wp-block-navigation__responsive-dialog"><button class="wp-block-navigation__responsive-container-close">Close</button><div class="wp-block-navigation__responsive-container-content"><ul class="wp-block-navigation__container wp-block-navigation"><li>Item</li></ul></div></div></div></div></nav>';
+		$block         = array(
+			'blockName' => 'core/navigation',
+			'attrs'     => array(
+				'overlayMenu'       => 'mobile',
+				'mobileBreakpoint'  => 'calc(100vw - 1rem)',
+			),
+		);
+
+		$actual     = gutenberg_block_core_navigation_add_support_classes_to_container( $block_content, $block );
+		$stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertSame( $block_content, $actual );
+		$this->assertSame( '600px', block_core_navigation_get_mobile_breakpoint( $block['attrs'] ) );
+		$this->assertFalse( block_core_navigation_has_custom_mobile_breakpoint( $block['attrs'] ) );
+		$this->assertStringNotContainsString( 'wp-block-navigation-custom-breakpoint-', $stylesheet );
+		$this->assertStringNotContainsString( 'calc(100vw - 1rem)', $stylesheet );
 	}
 
 	/**

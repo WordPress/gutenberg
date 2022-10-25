@@ -1,7 +1,36 @@
 /**
  * Internal dependencies
  */
-import { getUniqueTemplatePartTitle, getCleanTemplatePartSlug } from '../utils';
+import {
+	getUniqueTemplatePartTitle,
+	getCleanTemplatePartSlug,
+	hasCustomMobileBreakpoint,
+	normalizeMobileBreakpoint,
+} from '../utils';
+
+describe( 'normalizeMobileBreakpoint', () => {
+	it( 'normalizes valid breakpoint values', () => {
+		expect( normalizeMobileBreakpoint( '48rem' ) ).toBe( '48rem' );
+		expect( normalizeMobileBreakpoint( '37.5EM' ) ).toBe( '37.5em' );
+		expect( normalizeMobileBreakpoint( ' 720px ' ) ).toBe( '720px' );
+	} );
+
+	it( 'falls back to the default for empty, invalid, or non-positive values', () => {
+		expect( normalizeMobileBreakpoint() ).toBe( '600px' );
+		expect( normalizeMobileBreakpoint( '' ) ).toBe( '600px' );
+		expect( normalizeMobileBreakpoint( '0px' ) ).toBe( '600px' );
+		expect( normalizeMobileBreakpoint( '-1px' ) ).toBe( '600px' );
+		expect( normalizeMobileBreakpoint( '40vw' ) ).toBe( '600px' );
+	} );
+} );
+
+describe( 'hasCustomMobileBreakpoint', () => {
+	it( 'returns true only for valid non-default breakpoints', () => {
+		expect( hasCustomMobileBreakpoint( '600px' ) ).toBe( false );
+		expect( hasCustomMobileBreakpoint( '0px' ) ).toBe( false );
+		expect( hasCustomMobileBreakpoint( '48rem' ) ).toBe( true );
+	} );
+} );
 
 describe( 'getUniqueTemplatePartTitle', () => {
 	it( 'should return the title if it is unique', () => {
