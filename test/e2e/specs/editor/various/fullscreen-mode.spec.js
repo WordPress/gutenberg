@@ -26,12 +26,10 @@ test.describe( 'Fullscreen Mode', () => {
 			.locator( 'role=menuitemcheckbox', { hasText: 'Fullscreen mode' } )
 			.click();
 
-		// Validate Fullscreen
-		const isFullscreenEnabled = await page.$eval( 'body', ( body ) => {
-			return body.classList.contains( 'is-fullscreen-mode' );
-		} );
-
-		expect( isFullscreenEnabled ).toBe( true );
+		// Check the body class.
+		await expect( page.locator( 'body' ) ).toHaveClass(
+			/is-fullscreen-mode/
+		);
 
 		const fullscreenCloseButton = await page.locator(
 			'.edit-post-fullscreen-mode-close'
