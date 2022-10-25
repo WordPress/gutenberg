@@ -28,6 +28,14 @@ export const SELECT_NAVIGATION_MENUS_ARGS = [
 	PRELOADED_NAVIGATION_MENUS_QUERY,
 ];
 
+export const DEFAULT_MOBILE_BREAKPOINT = '600px';
+
+export const MOBILE_BREAKPOINT_UNITS = [
+	{ value: 'px', label: 'px', default: 600 },
+	{ value: 'em', label: 'em', default: 37.5 },
+	{ value: 'rem', label: 'rem', default: 37.5 },
+];
+
 /**
  * Template part area identifier for navigation overlays.
  * This constant defines the area name used when registering and filtering

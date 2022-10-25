@@ -5,8 +5,10 @@ import { __ } from '@wordpress/i18n';
 import { getColorClassName } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { useMediaQuery } from '@wordpress/compose';
 import OverlayMenuIcon from './overlay-menu-icon';
 import { createTemplatePartId } from '../../template-part/edit/utils/create-template-part-id';
+import { DEFAULT_MOBILE_BREAKPOINT } from '../constants';
 
 export default function ResponsiveWrapper( {
 	children,
@@ -21,10 +23,15 @@ export default function ResponsiveWrapper( {
 	icon,
 	overlay,
 	onNavigateToEntityRecord,
+	mobileBreakpoint = DEFAULT_MOBILE_BREAKPOINT,
+	hasCustomMobileBreakpoint = false,
 } ) {
 	const currentTheme = useSelect(
 		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,
 		[]
+	);
+	const isCustomMobileBreakpointDesktop = useMediaQuery(
+		`(min-width: ${ mobileBreakpoint })`
 	);
 
 	if ( ! isResponsive ) {
@@ -33,6 +40,8 @@ export default function ResponsiveWrapper( {
 
 	// Only apply overlay colors if there's no custom overlay template part.
 	const hasCustomOverlay = !! overlay;
+	const shouldUseDesktopLayout =
+		hasCustomMobileBreakpoint && isCustomMobileBreakpointDesktop;
 
 	const responsiveContainerClasses = clsx(
 		'wp-block-navigation__responsive-container',
@@ -52,6 +61,7 @@ export default function ResponsiveWrapper( {
 		{
 			'is-menu-open': isOpen,
 			'hidden-by-default': isHiddenByDefault,
+			'is-custom-mobile-breakpoint-desktop': shouldUseDesktopLayout,
 		}
 	);
 
@@ -67,7 +77,10 @@ export default function ResponsiveWrapper( {
 
 	const openButtonClasses = clsx(
 		'wp-block-navigation__responsive-container-open',
-		{ 'always-shown': isHiddenByDefault }
+		{
+			'always-shown': isHiddenByDefault,
+			'is-custom-mobile-breakpoint-desktop': shouldUseDesktopLayout,
+		}
 	);
 
 	const modalId = `${ id }-modal`;
