@@ -152,7 +152,7 @@ export default function VisualEditor( { styles } ) {
 			editedPostTemplate:
 				supportsTemplateMode && canEditTemplate
 					? getEditedPostTemplate()
-					: {},
+					: undefined,
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 		};
