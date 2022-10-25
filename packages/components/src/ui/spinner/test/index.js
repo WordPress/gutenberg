@@ -11,7 +11,7 @@ import { Spinner } from '..';
 describe( 'props', () => {
 	test( 'should render correctly', () => {
 		const { container } = render( <Spinner /> );
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
 	test( 'should render color', () => {

@@ -48,7 +48,7 @@ describe( 'ToggleGroupControl', () => {
 				</ToggleGroupControl>
 			);
 
-			expect( container.firstChild ).toMatchSnapshot();
+			expect( container ).toMatchSnapshot();
 		} );
 		it( 'with icons', () => {
 			const { container } = render(
@@ -69,7 +69,7 @@ describe( 'ToggleGroupControl', () => {
 				</ToggleGroupControl>
 			);
 
-			expect( container.firstChild ).toMatchSnapshot();
+			expect( container ).toMatchSnapshot();
 		} );
 	} );
 	it( 'should call onChange with proper value', () => {
