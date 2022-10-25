@@ -38,6 +38,7 @@ import { useMergeRefs } from '@wordpress/compose';
 import { arrowLeft } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { parse } from '@wordpress/blocks';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -137,6 +138,10 @@ export default function VisualEditor( { styles } ) {
 		}
 
 		const supportsTemplateMode = getEditorSettings().supportsTemplateMode;
+		const canEditTemplate = select( coreStore ).canUser(
+			'create',
+			'templates'
+		);
 
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
@@ -144,9 +149,10 @@ export default function VisualEditor( { styles } ) {
 			isTemplateMode: _isTemplateMode,
 			// Post template fetch returns a 404 on classic themes, which
 			// messes with e2e tests, so we check it's a block theme first.
-			editedPostTemplate: supportsTemplateMode
-				? getEditedPostTemplate()
-				: {},
+			editedPostTemplate:
+				supportsTemplateMode && canEditTemplate
+					? getEditedPostTemplate()
+					: {},
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 		};
