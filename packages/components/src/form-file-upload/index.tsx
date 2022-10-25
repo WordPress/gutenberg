@@ -40,16 +40,13 @@ export function FormFileUpload( {
 		ref.current?.click();
 	};
 
-	let ui = null;
-	if ( render ) {
-		render( { openFileDialog } );
-	} else {
-		ui = (
-			<Button onClick={ openFileDialog } { ...props }>
-				{ children }
-			</Button>
-		);
-	}
+	const ui = render ? (
+		render( { openFileDialog } )
+	) : (
+		<Button onClick={ openFileDialog } { ...props }>
+			{ children }
+		</Button>
+	);
 
 	return (
 		<div className="components-form-file-upload">
