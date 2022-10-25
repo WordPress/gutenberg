@@ -25,7 +25,6 @@ class WP_Theme_Json_Test extends WP_UnitTestCase {
 	 * @group theme_json
 	 *
 	 * @covers wp_theme_has_theme_json
-	 *
 	 */
 	public function test_switching_themes_recalculates_support() {
 		// The "default" theme doesn't have theme.json support.
