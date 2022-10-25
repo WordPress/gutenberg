@@ -150,7 +150,7 @@ const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md
  */
 export function useInnerBlocksProps( props = {}, options = {} ) {
-	const { __experimentalLayout } = options;
+	const { __unstableNoLayoutClassNames } = options;
 	const { clientId, __unstableLayoutClassNames: layoutClassNames = '' } =
 		useBlockEditContext();
 	const isSmallScreen = useViewportMatch( 'medium', '<' );
@@ -209,9 +209,9 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		className: classnames(
 			props.className,
 			'block-editor-block-list__layout',
+			__unstableNoLayoutClassNames ? '' : layoutClassNames,
 			{
 				'has-overlay': hasOverlay,
-				[ layoutClassNames ]: __experimentalLayout,
 			}
 		),
 		children: clientId ? (
