@@ -8,14 +8,12 @@ import {
 	FlexBlock,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
 import HeaderEditMode from '../header-edit-mode';
-import SiteIconAndTitle from '../site-icon-and-title';
 import SaveButton from '../save-button';
 import DocumentActions from '../header-edit-mode/document-actions';
 import HomeButton from '../home-button';
@@ -28,31 +26,22 @@ export default function Header() {
 		[]
 	);
 	const { __unstableSetCanvasMode } = useDispatch( editSiteStore );
-	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 
 	return (
 		<HStack
 			className={ `edit-site-header-wrapper is-canvas-mode-${ canvasMode }` }
 		>
-			<Button
-				className={ `edit-site-header__toggle is-canvas-mode-${ canvasMode }` }
-				label={ __( 'Toggle Navigation Sidebar' ) }
-				onClick={ () => {
-					clearSelectedBlock();
-					__unstableSetCanvasMode(
-						canvasMode === 'view' ? 'edit' : 'view'
-					);
-				} }
-				variant={ canvasMode === 'view' ? 'secondary' : undefined }
-			>
-				{ canvasMode === 'edit' && (
-					<SiteIconAndTitle
-						className="edit-site-header__toggle-icon"
-						showTitle={ false }
-					/>
-				) }
-				{ canvasMode === 'view' && __( 'Edit' ) }
-			</Button>
+			{ canvasMode === 'view' && (
+				<Button
+					label={ __( 'Open the editor' ) }
+					onClick={ () => {
+						__unstableSetCanvasMode( 'edit' );
+					} }
+					variant="secondary"
+				>
+					{ __( 'Edit' ) }
+				</Button>
+			) }
 			<FlexBlock>
 				{ canvasMode === 'edit' && <HeaderEditMode /> }
 				{ canvasMode === 'view' && (
