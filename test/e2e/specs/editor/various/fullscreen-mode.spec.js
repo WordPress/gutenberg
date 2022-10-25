@@ -15,13 +15,12 @@ test.describe( 'Fullscreen Mode', () => {
 	test( 'should open the fullscreen mode from the more menu', async ( {
 		page,
 	} ) => {
-		// Open Options
+		// Open Options Menu
 		await page.click(
 			'role=region[name="Editor top bar"i] >> role=button[name="Options"i]'
 		);
 
-
-		// Choose Full Screen Mode
+		// Select Full Screen Mode
 		await page
 			.locator( 'role=menuitemcheckbox', { hasText: 'Fullscreen mode' } )
 			.click();
