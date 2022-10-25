@@ -38,6 +38,7 @@
 -   `TabPanel`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44935](https://github.com/WordPress/gutenberg/pull/44935))
 -   `ColorPalette`: Convert to TypeScript ([#44632](https://github.com/WordPress/gutenberg/pull/44632)).
 -   `UnitControl`: Add tests ([#45260](https://github.com/WordPress/gutenberg/pull/45260)).
+-   `Disabled`: Refactor the component to rely on the HTML `inert` attribute.
 
 ## 21.3.0 (2022-10-19)
 

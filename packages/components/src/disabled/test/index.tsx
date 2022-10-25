@@ -24,7 +24,6 @@ describe( 'Disabled', () => {
 			</Disabled>
 		);
 
-		// @ts-ignore
 		expect( container.firstChild ).toHaveAttribute( 'inert' );
 	} );
 
@@ -40,12 +39,10 @@ describe( 'Disabled', () => {
 
 		const { container, rerender } = render( <MaybeDisable /> );
 
-		// @ts-ignore
 		expect( container.firstChild ).toHaveAttribute( 'inert' );
 
 		rerender( <MaybeDisable isDisabled={ false } /> );
 
-		// @ts-ignore
 		expect( container.firstChild ).not.toHaveAttribute( 'inert' );
 	} );
 
@@ -58,12 +55,10 @@ describe( 'Disabled', () => {
 
 		const { rerender, container } = render( <MaybeDisable /> );
 
-		// @ts-ignore
 		expect( container.firstChild ).toHaveAttribute( 'inert' );
 
 		rerender( <MaybeDisable isDisabled={ false } /> );
 
-		// @ts-ignore
 		expect( container.firstChild ).not.toHaveAttribute( 'inert' );
 	} );
 
