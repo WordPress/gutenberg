@@ -39,12 +39,18 @@ const toggleLabelRegex = /Border color( and style)* picker/;
 
 const renderBorderControl = async ( props ) => {
 	const view = render( <BorderControl { ...props } /> );
+	// When the `Popover` component is rendered or updated, the `useFloating`
+	// hook from the `floating-ui` package will schedule a state update in a
+	// promise handler. We need to wait for this promise handler to execute
+	// before checking results. That's what this async `act()` call achieves.
+	// See also: https://floating-ui.com/docs/react-dom#testing
 	await act( () => Promise.resolve() );
 	return view;
 };
 
 const rerenderBorderControl = async ( rerender, props ) => {
 	const view = rerender( <BorderControl { ...props } /> );
+	// Same reason to `act()` as in `renderBorderControl` above.
 	await act( () => Promise.resolve() );
 	return view;
 };
@@ -52,6 +58,7 @@ const rerenderBorderControl = async ( rerender, props ) => {
 const openPopover = async () => {
 	const toggleButton = screen.getByLabelText( toggleLabelRegex );
 	fireEvent.click( toggleButton );
+	// Same reason to `act()` as in `renderBorderControl` above.
 	await act( () => Promise.resolve() );
 };
 
