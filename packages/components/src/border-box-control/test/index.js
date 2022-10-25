@@ -56,9 +56,15 @@ describe( 'BorderBoxControl', () => {
 
 			const label = screen.getByText( props.label );
 			const colorButton = screen.getByLabelText( toggleLabelRegex );
-			const widthInput = screen.getByRole( 'spinbutton' );
-			const unitSelect = screen.getByRole( 'combobox' );
-			const slider = screen.getByRole( 'slider' );
+			const widthInput = screen.getByRole( 'spinbutton', {
+				name: 'Border width',
+			} );
+			const unitSelect = screen.getByRole( 'combobox', {
+				name: 'Select unit',
+			} );
+			const slider = screen.getByRole( 'slider', {
+				name: 'Border width',
+			} );
 			const linkedButton = screen.getByLabelText( 'Unlink sides' );
 
 			expect( label ).toBeInTheDocument();
@@ -87,7 +93,9 @@ describe( 'BorderBoxControl', () => {
 		it( 'should show correct width value when flat border value provided', () => {
 			render( <BorderBoxControl { ...props } value={ defaultBorder } /> );
 
-			const widthInput = screen.getByRole( 'spinbutton' );
+			const widthInput = screen.getByRole( 'spinbutton', {
+				name: 'Border width',
+			} );
 
 			expect( widthInput.value ).toBe( '1' );
 		} );
@@ -97,7 +105,9 @@ describe( 'BorderBoxControl', () => {
 				<BorderBoxControl { ...props } value={ defaultBorders } />
 			);
 
-			const widthInput = screen.getByRole( 'spinbutton' );
+			const widthInput = screen.getByRole( 'spinbutton', {
+				name: 'Border width',
+			} );
 
 			expect( widthInput.value ).toBe( '1' );
 		} );
@@ -114,8 +124,12 @@ describe( 'BorderBoxControl', () => {
 				screen.getByRole( 'button', { name: 'Link sides' } )
 			);
 
-			const widthInput = screen.getByRole( 'spinbutton' );
-			const unitSelect = screen.queryByRole( 'combobox' );
+			const widthInput = screen.getByRole( 'spinbutton', {
+				name: 'Border width',
+			} );
+			const unitSelect = screen.queryByRole( 'combobox', {
+				name: 'Select unit',
+			} );
 
 			expect( widthInput ).toHaveAttribute( 'placeholder', 'Mixed' );
 			expect( unitSelect ).not.toBeInTheDocument();
@@ -152,8 +166,12 @@ describe( 'BorderBoxControl', () => {
 				screen.getByRole( 'button', { name: 'Link sides' } )
 			);
 
-			const linkedInput = screen.getByRole( 'spinbutton' );
-			const unitSelect = screen.getByRole( 'combobox' );
+			const linkedInput = screen.getByRole( 'spinbutton', {
+				name: 'Border width',
+			} );
+			const unitSelect = screen.getByRole( 'combobox', {
+				name: 'Select unit',
+			} );
 
 			expect( linkedInput.value ).toBe( '5' );
 			expect( unitSelect ).toBeInTheDocument();
@@ -192,9 +210,15 @@ describe( 'BorderBoxControl', () => {
 			render( <BorderBoxControl { ...props } value={ mixedBorders } /> );
 
 			const colorButtons = screen.getAllByLabelText( toggleLabelRegex );
-			const widthInputs = screen.getAllByRole( 'spinbutton' );
-			const unitSelects = screen.getAllByRole( 'combobox' );
-			const sliders = screen.queryAllByRole( 'slider' );
+			const widthInputs = screen.getAllByRole( 'spinbutton', {
+				name: 'Border width',
+			} );
+			const unitSelects = screen.getAllByRole( 'combobox', {
+				name: 'Select unit',
+			} );
+			const sliders = screen.queryAllByRole( 'slider', {
+				name: 'Border width',
+			} );
 			const linkedButton = screen.getByLabelText( 'Link sides' );
 
 			expect( colorButtons.length ).toBe( 4 );
@@ -207,7 +231,9 @@ describe( 'BorderBoxControl', () => {
 		it( 'should render correct width values in appropriate inputs', () => {
 			render( <BorderBoxControl { ...props } value={ mixedBorders } /> );
 
-			const widthInputs = screen.getAllByRole( 'spinbutton' );
+			const widthInputs = screen.getAllByRole( 'spinbutton', {
+				name: 'Border width',
+			} );
 
 			expect( widthInputs[ 0 ].value ).toBe( '1' ); // Top.
 			expect( widthInputs[ 1 ].value ).toBe( '0.75' ); // Left.
@@ -228,7 +254,9 @@ describe( 'BorderBoxControl', () => {
 				screen.getByRole( 'button', { name: 'Unlink sides' } )
 			);
 
-			const widthInputs = screen.getAllByRole( 'spinbutton' );
+			const widthInputs = screen.getAllByRole( 'spinbutton', {
+				name: 'Border width',
+			} );
 			expect( widthInputs[ 0 ].value ).toBe( '1' ); // Top.
 			expect( widthInputs[ 1 ].value ).toBe( '1' ); // Left.
 			expect( widthInputs[ 2 ].value ).toBe( '1' ); // Right.
@@ -300,7 +328,9 @@ describe( 'BorderBoxControl', () => {
 					<BorderBoxControl { ...props } value={ { width: '1px' } } />
 				);
 
-				await user.clear( screen.getByRole( 'spinbutton' ) );
+				await user.clear(
+					screen.getByRole( 'spinbutton', { name: 'Border width' } )
+				);
 
 				expect( props.onChange ).toHaveBeenCalledWith( undefined );
 			} );
@@ -314,7 +344,9 @@ describe( 'BorderBoxControl', () => {
 					<BorderBoxControl { ...props } value={ defaultBorder } />
 				);
 
-				const widthInput = screen.getByRole( 'spinbutton' );
+				const widthInput = screen.getByRole( 'spinbutton', {
+					name: 'Border width',
+				} );
 				await user.clear( widthInput );
 				await user.type( widthInput, '3' );
 
@@ -345,7 +377,9 @@ describe( 'BorderBoxControl', () => {
 					screen.getByRole( 'button', { name: 'Link sides' } )
 				);
 
-				const widthInput = screen.getByRole( 'spinbutton' );
+				const widthInput = screen.getByRole( 'spinbutton', {
+					name: 'Border width',
+				} );
 				await user.clear( widthInput );
 				await user.type( widthInput, '4' );
 
@@ -366,7 +400,9 @@ describe( 'BorderBoxControl', () => {
 					<BorderBoxControl { ...props } value={ defaultBorders } />
 				);
 
-				const widthInput = screen.getByRole( 'spinbutton' );
+				const widthInput = screen.getByRole( 'spinbutton', {
+					name: 'Border width',
+				} );
 				await user.clear( widthInput );
 				await user.type( widthInput, '10' );
 
@@ -393,7 +429,9 @@ describe( 'BorderBoxControl', () => {
 					/>
 				);
 
-				await user.clear( screen.getByRole( 'spinbutton' ) );
+				await user.clear(
+					screen.getByRole( 'spinbutton', { name: 'Border width' } )
+				);
 
 				expect( props.onChange ).toHaveBeenCalledWith( undefined );
 			} );
@@ -419,7 +457,9 @@ describe( 'BorderBoxControl', () => {
 					screen.getByRole( 'button', { name: 'Link sides' } )
 				);
 
-				const widthInput = screen.getByRole( 'spinbutton' );
+				const widthInput = screen.getByRole( 'spinbutton', {
+					name: 'Border width',
+				} );
 				await user.clear( widthInput );
 				await user.type( widthInput, '10' );
 
@@ -445,7 +485,9 @@ describe( 'BorderBoxControl', () => {
 
 				render( <BorderBoxControl { ...props } value={ borders } /> );
 
-				const widthInput = screen.getAllByRole( 'spinbutton' )[ 0 ];
+				const widthInput = screen.getAllByRole( 'spinbutton', {
+					name: 'Border width',
+				} )[ 0 ];
 				await user.clear( widthInput );
 				await user.type( widthInput, '5' );
 
@@ -469,7 +511,9 @@ describe( 'BorderBoxControl', () => {
 
 				render( <BorderBoxControl { ...props } value={ borders } /> );
 
-				const widthInput = screen.getAllByRole( 'spinbutton' )[ 0 ];
+				const widthInput = screen.getAllByRole( 'spinbutton', {
+					name: 'Border width',
+				} )[ 0 ];
 				await user.clear( widthInput );
 				await user.type( widthInput, '1' );
 
