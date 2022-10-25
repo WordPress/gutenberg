@@ -129,8 +129,8 @@ const unitSelectSizes = ( { selectSize = 'default' }: SelectProps ) => {
 };
 
 export const UnitSelect = styled.select< SelectProps >`
-	// The && counteracts <select> styles in WP forms.css
-	&& {
+	// The &&& counteracts <select> styles in WP forms.css
+	&&& {
 		appearance: none;
 		background: transparent;
 		border-radius: 2px;

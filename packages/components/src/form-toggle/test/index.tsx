@@ -36,7 +36,7 @@ describe( 'FormToggle', () => {
 			const { container } = render( <FormToggle onChange={ noop } /> );
 
 			expect( getInput() ).not.toBeChecked();
-			expect( container.firstChild ).toMatchSnapshot();
+			expect( container ).toMatchSnapshot();
 		} );
 
 		it( 'should render a checked checkbox when providing checked prop', () => {

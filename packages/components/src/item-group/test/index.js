@@ -16,7 +16,7 @@ describe( 'ItemGroup', () => {
 					<Item>Code is poetry</Item>
 				</ItemGroup>
 			);
-			expect( container.firstChild ).toMatchSnapshot();
+			expect( container ).toMatchSnapshot();
 		} );
 
 		it( 'should show borders when the isBordered prop is true', () => {

@@ -2691,6 +2691,11 @@ export const __unstableGetVisibleBlocks = createSelector(
 	( state ) => [ state.blockVisibility ]
 );
 
+/**
+ * DO-NOT-USE in production.
+ * This selector is created for internal/experimental only usage and may be
+ * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
+ */
 export const __unstableGetContentLockingParent = createSelector(
 	( state, clientId ) => {
 		let current = clientId;
@@ -2706,6 +2711,13 @@ export const __unstableGetContentLockingParent = createSelector(
 	( state ) => [ state.blocks.parents, state.blockListSettings ]
 );
 
+/**
+ * DO-NOT-USE in production.
+ * This selector is created for internal/experimental only usage and may be
+ * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
+ *
+ * @param {Object} state Global application state.
+ */
 export function __unstableGetTemporarilyEditingAsBlocks( state ) {
 	return state.temporarilyEditingAsBlocks;
 }
