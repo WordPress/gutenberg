@@ -36,8 +36,6 @@ for the `ColorPalette`'s color swatches, by rendering your `ColorPalette` with a
 
 The component accepts the following props.
 
-{ colors = [],  disableCustomColors = false, enableAlpha, value, onchange, className, clearable = true, __experimentalHasMultipleOrigins = false, __experimentalIsRenderedInSidebar = false }
-
 ### colors
 Array with the colors to be shown. When displaying multiple color palettes to choose from, the format of the array changes from an array of colors objects, to an array of color palettes.
 
