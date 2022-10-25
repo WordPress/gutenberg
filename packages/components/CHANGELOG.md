@@ -8,7 +8,7 @@
 
 ### Deprecations
 
--   `Popover`: the deprecation messages for anchor-related props (`anchorRef`, `anchorRect`, `getAnchorRect`) has been updated. ([#45195](https://github.com/WordPress/gutenberg/pull/45195)).
+-   `Popover`: the deprecation messages for anchor-related props (`anchorRef`, `anchorRect`, `getAnchorRect`) have been updated. ([#45195](https://github.com/WordPress/gutenberg/pull/45195)).
 
 ### New Feature
 
