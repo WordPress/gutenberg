@@ -29,6 +29,7 @@ import {
 	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	__experimentalInputControl as InputControl,
 	Button,
 	Spinner,
 } from '@wordpress/components';
@@ -94,6 +95,7 @@ function Navigation( {
 		} = {},
 		hasIcon,
 		icon = 'handle',
+		mobileBreakpoint,
 	} = attributes;
 
 	const ref = attributes.ref;
@@ -561,6 +563,15 @@ function Navigation( {
 							label={ __( 'Always' ) }
 						/>
 					</ToggleGroupControl>
+
+					<InputControl
+						value={ mobileBreakpoint }
+						onChange={ ( nextValue ) =>
+							setAttributes( {
+								mobileBreakpoint: nextValue,
+							} )
+						}
+					/>
 					{ hasSubmenus && (
 						<>
 							<h3>{ __( 'Submenus' ) }</h3>
@@ -701,6 +712,7 @@ function Navigation( {
 					isHiddenByDefault={ 'always' === overlayMenu }
 					overlayBackgroundColor={ overlayBackgroundColor }
 					overlayTextColor={ overlayTextColor }
+					mobileBreakpoint={ mobileBreakpoint }
 				>
 					<UnsavedInnerBlocks
 						blocks={ uncontrolledInnerBlocks }
@@ -937,6 +949,7 @@ function Navigation( {
 							isHiddenByDefault={ 'always' === overlayMenu }
 							overlayBackgroundColor={ overlayBackgroundColor }
 							overlayTextColor={ overlayTextColor }
+							mobileBreakpoint={ mobileBreakpoint }
 						>
 							{ isEntityAvailable && (
 								<NavigationInnerBlocks

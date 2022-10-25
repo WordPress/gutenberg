@@ -10,6 +10,7 @@ import { close, Icon } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { getColorClassName } from '@wordpress/block-editor';
+import { useMediaQuery } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -27,7 +28,14 @@ export default function ResponsiveWrapper( {
 	overlayTextColor,
 	hasIcon,
 	icon,
+	mobileBreakpoint,
 } ) {
+	const isMobileBreakPoint = useMediaQuery(
+		`(max-width: ${ mobileBreakpoint })`
+	);
+
+	console.log( { mobileBreakpoint, isMobileBreakPoint } );
+
 	if ( ! isResponsive ) {
 		return children;
 	}
@@ -48,6 +56,7 @@ export default function ResponsiveWrapper( {
 			) ]: !! overlayBackgroundColor?.slug,
 			'is-menu-open': isOpen,
 			'hidden-by-default': isHiddenByDefault,
+			'is-mobile-breakpoint': isMobileBreakPoint,
 		}
 	);
 
@@ -61,7 +70,10 @@ export default function ResponsiveWrapper( {
 
 	const openButtonClasses = classnames(
 		'wp-block-navigation__responsive-container-open',
-		{ 'always-shown': isHiddenByDefault }
+		{
+			'always-shown': isHiddenByDefault,
+			'is-mobile-breakpoint': isMobileBreakPoint,
+		}
 	);
 
 	const modalId = `${ id }-modal`;

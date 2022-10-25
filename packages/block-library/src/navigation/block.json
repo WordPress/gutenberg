@@ -71,6 +71,10 @@
 		"templateLock": {
 			"type": [ "string", "boolean" ],
 			"enum": [ "all", "insert", "contentOnly", false ]
+		},
+		"mobileBreakpoint": {
+			"type": "string",
+			"default": "782px"
 		}
 	},
 	"providesContext": {

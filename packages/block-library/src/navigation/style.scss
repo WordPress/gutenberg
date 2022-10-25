@@ -10,6 +10,8 @@
 // Size of burger and close icons.
 $navigation-icon-size: 24px;
 
+
+
 .wp-block-navigation {
 	position: relative;
 
@@ -591,7 +593,8 @@ button.wp-block-navigation-item__content {
 		}
 	}
 
-	@include break-small() {
+	// @include break-small() {
+	&:not(.is-mobile-breakpoint) {
 		&:not(.hidden-by-default) {
 			&:not(.is-menu-open) {
 				display: block;
@@ -654,7 +657,8 @@ button.wp-block-navigation-item__content {
 	display: flex;
 
 	&:not(.always-shown) {
-		@include break-small {
+		// @include break-small {
+		&:not(.is-mobile-breakpoint) {
 			display: none;
 		}
 	}
