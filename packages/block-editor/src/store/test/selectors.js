@@ -3995,7 +3995,7 @@ describe( 'selectors', () => {
 } );
 
 describe( 'getInserterItems with core blocks prioritization', () => {
-	// This test is in a seperate `describe` because all other tests register
+	// This test is in a separate `describe` because all other tests register
 	// some test `core` blocks and interfere with the purpose of the specific test.
 	// This tests the functionality to ensure core blocks are prioritized in the
 	// returned results, because third party blocks can be registered earlier than

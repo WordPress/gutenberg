@@ -71,7 +71,7 @@ const withSpinner =
 					console.error( error );
 					process.exit( 1 );
 				} else {
-					spinner.fail( 'An unknown error occured.' );
+					spinner.fail( 'An unknown error occurred.' );
 					process.exit( 1 );
 				}
 			}
