@@ -48,7 +48,18 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 		$rel_target_attributes = 'rel="noopener nofollow" target="_blank"';
 	}
 
-	$icon               = block_core_social_link_get_icon( $service );
+	$icon = block_core_social_link_get_icon( $service );
+	
+	/**
+	 * Filters the social icon to custom icon
+	 * 
+	 * @param string $icon SVG Element for service icon.
+	 * @param string $service The service icon.
+	 *
+	 * @return string SVG Element for service icon.
+	 */
+	$icon = apply_filters( 'block_social_link_icon', $icon, $service );
+	
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
 			'class' => 'wp-social-link wp-social-link-' . $service,
