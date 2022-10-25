@@ -7,6 +7,7 @@ import {
 	MenuItem,
 	FormFileUpload,
 	MenuGroup,
+	ToolbarGroup,
 	ToolbarButton,
 	Dropdown,
 	Button,
@@ -18,7 +19,7 @@ import {
 	MediaUploadCheck,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { upload, media, textTracks } from '@wordpress/icons';
+import { upload, media } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { getFilename } from '@wordpress/url';
@@ -180,14 +181,17 @@ export default function TracksEditor( { tracks = [], onChange } ) {
 		<Dropdown
 			contentClassName="block-library-video-tracks-editor"
 			renderToggle={ ( { isOpen, onToggle } ) => (
-				<ToolbarButton
-					label={ __( 'Text tracks' ) }
-					showTooltip
-					aria-expanded={ isOpen }
-					aria-haspopup="true"
-					onClick={ onToggle }
-					icon={ textTracks }
-				/>
+				<ToolbarGroup>
+					<ToolbarButton
+						label={ __( 'Text tracks' ) }
+						showTooltip
+						aria-expanded={ isOpen }
+						aria-haspopup="true"
+						onClick={ onToggle }
+					>
+						{ __( 'Text tracks' ) }
+					</ToolbarButton>
+				</ToolbarGroup>
 			) }
 			renderContent={ () => {
 				if ( trackBeingEdited !== null ) {
