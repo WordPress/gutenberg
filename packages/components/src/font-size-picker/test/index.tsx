@@ -303,7 +303,7 @@ describe( 'FontSizePicker', () => {
 				for ( const label of [ 'S', 'M', 'L', 'XL', 'XXL' ] ) {
 					const element = screen.getByLabelText( label );
 					expect( element ).toBeInTheDocument();
-					expect( element.children[ 0 ].textContent ).toBe( label );
+					expect( element ).toHaveTextContent( label );
 				}
 			} );
 		} );
