@@ -313,11 +313,11 @@ const DisabledExample = () => {
 _Parameters_
 
 -   _config_ `Object`: Configuration object.
--   _config.isDisabled_ `boolean=`: Whether the element should be disabled.
+-   _config.isDisabled_ `boolean`: Whether the element should be disabled.
 
 _Returns_
 
--   `import('react').RefCallback<HTMLElement>`: Element Ref.
+-   Element Ref.
 
 ### useFocusableIframe
 

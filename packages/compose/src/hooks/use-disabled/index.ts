@@ -16,8 +16,8 @@ import useRefEffect from '../use-ref-effect';
  *
  * If you can, prefer the use of the inert HTML attribute.
  *
- * @param  config            Configuration object.
- * @param  config.isDisabled Whether the element should be disabled.
+ * @param {Object}  config            Configuration object.
+ * @param {boolean} config.isDisabled Whether the element should be disabled.
  * @return Element Ref.
  *
  * @example
