@@ -206,9 +206,17 @@ test.describe( 'Gallery', () => {
 	// https://github.com/WordPress/gutenberg/pull/22719
 	test.fixme(
 		'when initially added the media library shows the Create Gallery view',
-		async ( { admin, editor } ) => {
+		async ( { admin, editor, page } ) => {
 			await admin.createNewPost();
 			await editor.insertBlock( { name: 'core/gallery' } );
+			await page.click( 'role=button[name="Media Library"i]' );
+			await page.waitForSelector( '.media-frame' );
+			expect( await page.innerText( '.media-frame-title h1' ) ).toBe(
+				'Create gallery'
+			);
+			expect(
+				await page.innerText( '.media-toolbar-primary button' )
+			).toBe( 'Create a new gallery' );
 		}
 	);
 } );
