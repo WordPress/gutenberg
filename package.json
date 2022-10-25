@@ -182,6 +182,7 @@
 		"cssnano": "5.0.7",
 		"deep-freeze": "0.0.1",
 		"equivalent-key-map": "0.2.2",
+		"escape-html": "1.0.3",
 		"eslint-import-resolver-node": "0.3.4",
 		"eslint-plugin-eslint-comments": "3.1.2",
 		"eslint-plugin-import": "2.25.2",
