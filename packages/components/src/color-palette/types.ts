@@ -39,7 +39,7 @@ export type CustomColorPickerDropdownProps = {
 	renderToggle: ( props: {
 		isOpen: boolean;
 		onToggle: MouseEventHandler< HTMLButtonElement >;
-	} ) => JSX.Element;
+	} ) => ReactNode;
 };
 
 export type ColorPaletteProps = {
