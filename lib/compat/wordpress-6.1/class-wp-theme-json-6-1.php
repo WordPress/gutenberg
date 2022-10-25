@@ -770,7 +770,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 
 	/**
 	 * Returns a filtered declarations array if there is a separator block with only a background
-	 * style defined on theme.json by adding a color attribute to reflect the changes in the front.
+	 * style defined in theme.json by adding a color attribute to reflect the changes in the front.
 	 *
 	 * @param array $declarations List of declarations.
 	 *

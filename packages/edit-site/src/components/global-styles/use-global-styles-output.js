@@ -846,7 +846,7 @@ export const getBlockSelectors = ( blockTypes ) => {
 };
 
 /**
- * If there is separator block, which color is defined in theme.json via background,
+ * If there is a separator block whose color is defined in theme.json via background,
  * update the separator color to the same value by using border color.
  *
  * @param {Object} config Theme.json configuration file object.
