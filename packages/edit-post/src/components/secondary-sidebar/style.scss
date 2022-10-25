@@ -32,7 +32,6 @@
 }
 
 .edit-post-editor__list-view-panel-header {
-	align-items: center;
 	border-bottom: $border-width solid $gray-300;
 	display: flex;
 	justify-content: space-between;
@@ -44,8 +43,9 @@
 	}
 	li {
 		width: 50%;
-		& button {
+		button {
 			width: 100%;
+			text-align: initial;
 		}
 	}
 	li:only-child {
