@@ -18,6 +18,7 @@
 
 ### Internal
 
+-   `Disabled`: add a note about the lack of polyfill for the `inert` attribute in the Storybook example ([#45272](https://github.com/WordPress/gutenberg/pull/45272))
 -   `Snackbar`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44934](https://github.com/WordPress/gutenberg/pull/44934))
 -   `AnglePickerControl`: Set Storybook Label control type to 'text' ([#45122](https://github.com/WordPress/gutenberg/pull/45122)).
 -   `SlotFill`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44403](https://github.com/WordPress/gutenberg/pull/44403))
