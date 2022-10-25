@@ -26,75 +26,6 @@ function gutenberg_register_layout_support( $block_type ) {
 }
 
 /**
- * Generates the CSS for position support from the style object.
- *
- * @param string $selector CSS selector.
- * @param array  $style    Style object.
- * @return string CSS styles on success. Else, empty string.
- */
-function gutenberg_get_layout_position_style( $selector, $style ) {
-	$position_styles = array();
-	$position_type   = _wp_array_get( $style, array( 'layout', 'position' ), '' );
-
-	if (
-		in_array( $position_type, array( 'fixed', 'sticky' ), true )
-	) {
-		$sides = array( 'top', 'right', 'bottom', 'left' );
-
-		foreach ( $sides as $side ) {
-			$side_value = _wp_array_get( $style, array( 'layout', $side ) );
-			if ( null !== $side_value ) {
-				/*
-				* For fixed or sticky top positions,
-				* ensure the value includes an offset for the logged in admin bar.
-				*/
-				if (
-					'top' === $side &&
-					'fixed' === $position_type ||
-					'sticky' === $position_type
-				) {
-					// TODO: wrap the following value in a `calc()` + `$side_value`,
-					// so that any included value is treated as an offset.
-					$side_value = 'var(--wp-admin--admin-bar--height, 0px)';
-				}
-
-				$position_styles[] =
-					array(
-						'selector'     => "$selector",
-						'declarations' => array(
-							$side => $side_value,
-						),
-					);
-			}
-		}
-
-		$position_styles[] =
-			array(
-				'selector'     => "$selector",
-				'declarations' => array(
-					'position' => $position_type,
-					'z-index'  => '250', // TODO: This hard-coded value should live somewhere else.
-				),
-			);
-	}
-
-	if ( ! empty( $position_styles ) ) {
-		/*
-		 * Add to the style engine store to enqueue and render layout styles.
-		 */
-		return gutenberg_style_engine_get_stylesheet_from_css_rules(
-			$position_styles,
-			array(
-				'context'  => 'block-supports',
-				'prettify' => false,
-			)
-		);
-	}
-
-	return '';
-}
-
-/**
  * Generates the CSS corresponding to the provided layout.
  *
  * @param string               $selector                      CSS selector.
@@ -491,9 +422,6 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			$block_spacing
 		);
 
-		$style_attribute = _wp_array_get( $block, array( 'attrs', 'style' ), null );
-		$style          .= gutenberg_get_layout_position_style( ".$block_classname.$container_class", $style_attribute );
-
 		// Only add container class and enqueue block support styles if unique styles were generated.
 		if ( ! empty( $style ) ) {
 			$class_names[] = $container_class;
@@ -532,6 +460,114 @@ if ( function_exists( 'wp_render_layout_support_flag' ) ) {
 	remove_filter( 'render_block', 'wp_render_layout_support_flag' );
 }
 add_filter( 'render_block', 'gutenberg_render_layout_support_flag', 10, 2 );
+
+/**
+ * Generates the CSS for layout position support from the style object.
+ *
+ * @param string $selector CSS selector.
+ * @param array  $style    Style object.
+ * @return string CSS styles on success. Else, empty string.
+ */
+function gutenberg_get_layout_position_style( $selector, $style ) {
+	$position_styles = array();
+	$position_type   = _wp_array_get( $style, array( 'layout', 'position' ), '' );
+
+	if (
+		in_array( $position_type, array( 'fixed', 'sticky' ), true )
+	) {
+		$sides = array( 'top', 'right', 'bottom', 'left' );
+
+		foreach ( $sides as $side ) {
+			$side_value = _wp_array_get( $style, array( 'layout', $side ) );
+			if ( null !== $side_value ) {
+				/*
+				* For fixed or sticky top positions,
+				* ensure the value includes an offset for the logged in admin bar.
+				*/
+				if (
+					'top' === $side &&
+					'fixed' === $position_type ||
+					'sticky' === $position_type
+				) {
+					// TODO: wrap the following value in a `calc()` + `$side_value`,
+					// so that any included value is treated as an offset.
+					$side_value = 'var(--wp-admin--admin-bar--height, 0px)';
+				}
+
+				$position_styles[] =
+					array(
+						'selector'     => "$selector",
+						'declarations' => array(
+							$side => $side_value,
+						),
+					);
+			}
+		}
+
+		$position_styles[] =
+			array(
+				'selector'     => "$selector",
+				'declarations' => array(
+					'position' => $position_type,
+					'z-index'  => '250', // TODO: This hard-coded value should live somewhere else.
+				),
+			);
+	}
+
+	if ( ! empty( $position_styles ) ) {
+		/*
+		 * Add to the style engine store to enqueue and render layout styles.
+		 */
+		return gutenberg_style_engine_get_stylesheet_from_css_rules(
+			$position_styles,
+			array(
+				'context'  => 'block-supports',
+				'prettify' => false,
+			)
+		);
+	}
+
+	return '';
+}
+
+/**
+ * Renders layout position styles to the block wrapper.
+ *
+ * Position related styles should always be applied to the outer wrapper,
+ * so this logic is separate from the layout support's innerBlocks wrapper logic.
+ *
+ * @param  string $block_content Rendered block content.
+ * @param  array  $block         Block object.
+ * @return string                Filtered block content.
+ */
+function gutenberg_render_layout_position_support( $block_content, $block ) {
+	$block_type                  = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	$has_layout_position_support = block_has_support( $block_type, array( '__experimentalLayout', 'allowPosition' ), false );
+
+	if (
+		! $has_layout_position_support ||
+		empty( $block['attrs']['style']['layout'] )
+	) {
+		return $block_content;
+	}
+
+	$style_attribute = _wp_array_get( $block, array( 'attrs', 'style' ), null );
+	$class_name      = wp_unique_id( 'wp-container-' );
+	$style           = gutenberg_get_layout_position_style( ".$class_name.$class_name", $style_attribute );
+
+	if ( ! empty( $style ) ) {
+		$content = new WP_HTML_Tag_Processor( $block_content );
+		$content->next_tag();
+		$content->add_class( $class_name );
+		return $content;
+	}
+	return $block_content;
+}
+
+if ( function_exists( 'wp_render_layout_position_support' ) ) {
+	remove_filter( 'render_block', 'wp_render_layout_position_support' );
+}
+add_filter( 'render_block', 'gutenberg_render_layout_position_support', 10, 2 );
 
 /**
  * For themes without theme.json file, make sure
