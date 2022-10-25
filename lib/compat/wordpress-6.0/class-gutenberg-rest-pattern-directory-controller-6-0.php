@@ -1,15 +1,15 @@
 <?php
 /**
- * REST API: Gutenberg_REST_Global_Styles_Controller class
+ * REST API: Gutenberg_REST_Pattern_Directory_Controller_6_0 class
  *
  * @package    Gutenberg
  * @subpackage REST_API
  */
 
 /**
- * Controller which provides REST endpoint for block patterns.
+ * Controller which provides REST endpoint for block patterns from wordpress.org/patterns.
  */
-class Gutenberg_REST_Pattern_Directory_Controller extends WP_REST_Pattern_Directory_Controller {
+class Gutenberg_REST_Pattern_Directory_Controller_6_0 extends WP_REST_Pattern_Directory_Controller {
 	/**
 	 * Search and retrieve block patterns metadata
 	 *

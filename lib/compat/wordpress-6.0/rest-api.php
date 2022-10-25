@@ -19,7 +19,7 @@ add_action( 'rest_api_init', 'gutenberg_register_global_styles_endpoints' );
  * Registers the block pattern directory.
  */
 function gutenberg_register_rest_pattern_directory() {
-	$pattern_directory_controller = new Gutenberg_REST_Pattern_Directory_Controller();
+	$pattern_directory_controller = new Gutenberg_REST_Pattern_Directory_Controller_6_0();
 	$pattern_directory_controller->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_pattern_directory' );
