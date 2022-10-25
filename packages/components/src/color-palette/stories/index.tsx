@@ -58,7 +58,7 @@ const Template: ComponentStory< typeof ColorPalette > = ( {
 					onChange?.( newColor );
 				} }
 			/>
-			{ /* @ts-ignore Property 'Slot' does not exist on type. */ }
+			{ /* @ts-expect-error The 'Slot' component hasn't been typed yet. */ }
 			<Popover.Slot />
 		</SlotFillProvider>
 	);
