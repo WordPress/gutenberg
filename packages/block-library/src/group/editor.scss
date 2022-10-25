@@ -80,22 +80,22 @@
 		flex-direction: column;
 		align-items: center;
 	}
-	.wp-block-group-placeholder__variations li > button {
+	.wp-block-group-placeholder__variations li > .wp-block-group-placeholder__variation {
 		margin: 0 0 $grid-unit-20 0;
-		height: auto;
+		height: 68px;
 	}
 	.is-small,
 	.is-medium {
 		.wp-block-group-placeholder__variations,
-		.wp-block-group-placeholder__variations li > button,
+		.wp-block-group-placeholder__variations li > .wp-block-group-placeholder__variation,
 		.wp-block-group-placeholder__variations > li {
 			margin: 0;
 		}
 		.wp-block-group-placeholder__variations svg {
 			width: 48px;
 		}
-		.wp-block-group-placeholder__variations li > button {
-			height: inherit;
+		.wp-block-group-placeholder__variations li > .wp-block-group-placeholder__variation {
+			height: 52px;
 		}
 	}
 }

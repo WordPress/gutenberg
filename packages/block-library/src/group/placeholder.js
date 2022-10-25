@@ -145,6 +145,10 @@ function GroupPlaceHolder( { clientId, name, setAttributes } ) {
 								}
 								iconSize={ 64 }
 								onClick={ () => selectVariation( variation ) }
+								className="wp-block-group-placeholder__variation"
+								label={
+									variation.description || variation.title
+								}
 							/>
 							<span role="presentation">{ variation.title }</span>
 						</li>
