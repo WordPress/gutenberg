@@ -72,6 +72,10 @@ function Variation( { variation } ) {
 		return compareVariations( user, variation );
 	}, [ user, variation ] );
 
+	const label =
+		variation.title +
+		( variation?.description ? '. ' + variation?.description : '' );
+
 	return (
 		<GlobalStylesContext.Provider value={ context }>
 			<div
@@ -85,7 +89,7 @@ function Variation( { variation } ) {
 				onClick={ selectVariation }
 				onKeyDown={ selectOnEnter }
 				tabIndex="0"
-				aria-label={ variation?.description }
+				aria-label={ label }
 				aria-current={ isActive }
 				onFocus={ () => setIsFocused( true ) }
 				onBlur={ () => setIsFocused( false ) }
