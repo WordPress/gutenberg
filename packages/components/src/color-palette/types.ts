@@ -34,7 +34,7 @@ export type MultiplePalettesProps = PaletteProps & {
 // TODO: should extend `Dropdown`'s props once it gets refactored to TypeScript
 export type CustomColorPickerDropdownProps = {
 	isRenderedInSidebar: boolean;
-	renderContent: () => JSX.Element;
+	renderContent: () => ReactNode;
 	popoverProps?: string[];
 	renderToggle: ( props: {
 		isOpen: boolean;
