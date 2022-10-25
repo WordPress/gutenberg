@@ -878,7 +878,7 @@ export class ImageEdit extends Component {
 				<BlockCaption
 					clientId={ this.props.clientId }
 					isSelected={ this.state.isCaptionSelected }
-					accessible
+					accessible={ ! this.state.isCaptionSelected }
 					accessibilityLabelCreator={ this.accessibilityLabelCreator }
 					onFocus={ this.onFocusCaption }
 					onBlur={ this.props.onBlur } // Always assign onBlur as props.
