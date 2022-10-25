@@ -15,8 +15,9 @@ import {
 	store as blockEditorStore,
 	__experimentalRecursionProvider as RecursionProvider,
 	__experimentalUseHasRecursion as useHasRecursion,
+	InspectorControls,
 } from '@wordpress/block-editor';
-import { Spinner, Modal, MenuItem } from '@wordpress/components';
+import { Spinner, Modal, MenuItem, PanelBody } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState, createInterpolateElement } from '@wordpress/element';
@@ -217,6 +218,17 @@ export default function TemplatePartEdit( {
 					/>
 				</Modal>
 			) }
+			<InspectorControls>
+				<PanelBody title={ __( 'Replacements' ) }>
+					<TemplatePartSelectionModal
+						templatePartId={ templatePartId }
+						clientId={ clientId }
+						area={ area }
+						setAttributes={ setAttributes }
+						onClose={ () => {} } //no operation
+					/>
+				</PanelBody>
+			</InspectorControls>
 		</>
 	);
 }
