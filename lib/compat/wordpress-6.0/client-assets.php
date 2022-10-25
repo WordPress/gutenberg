@@ -105,6 +105,10 @@ function gutenberg_resolve_assets() {
 add_filter(
 	'block_editor_settings_all',
 	function( $settings ) {
+		if ( function_exists( '_wp_get_iframed_editor_assets' ) ) {
+			return $settings;
+		}
+
 		// In the future we can allow WP Dependency handles to be passed.
 		$settings['__unstableResolvedAssets'] = gutenberg_resolve_assets();
 		return $settings;
