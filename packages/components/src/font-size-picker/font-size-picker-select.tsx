@@ -51,8 +51,9 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 		...( disableCustomFontSizes ? [] : [ CUSTOM_OPTION ] ),
 	];
 
-	const selectedOption =
-		options.find( ( option ) => option.value === value ) ?? CUSTOM_OPTION;
+	const selectedOption = value
+		? options.find( ( option ) => option.value === value ) ?? CUSTOM_OPTION
+		: DEFAULT_OPTION;
 
 	return (
 		<CustomSelectControl
