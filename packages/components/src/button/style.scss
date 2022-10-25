@@ -52,14 +52,14 @@
 		// Show the boundary of the button, in High Contrast Mode.
 		outline: 1px solid transparent;
 
-		&:hover:not(:disabled),
-		&:focus:not(:disabled) {
-			background: $components-color-accent-darker-20;
+		&:hover:not(:disabled) {
+			background: $components-color-accent-darker-10;
 			color: $white;
 		}
 
 		&:active:not(:disabled) {
-			background: $components-color-accent;
+			background: $components-color-accent-darker-20;
+			border-color: $components-color-accent-darker-20;
 			color: $white;
 		}
 
@@ -115,13 +115,13 @@
 
 		&:active:not(:disabled) {
 			background: $gray-300;
-			color: $components-color-accent-darker-20;
+			color: $components-color-accent-darker-10;
 			box-shadow: none;
 		}
 
 		&:hover:not(:disabled) {
-			color: $components-color-accent-darker-20;
-			box-shadow: inset 0 0 0 $border-width $components-color-accent-darker-20;
+			color: $components-color-accent-darker-10;
+			box-shadow: inset 0 0 0 $border-width $components-color-accent-darker-10;
 		}
 
 		&:disabled,
@@ -244,15 +244,6 @@
 		transition-timing-function: ease-in-out;
 		@include reduce-motion("transition");
 		height: auto;
-
-		&:hover:not(:disabled),
-		&:focus:not(:disabled) {
-			color: $components-color-accent-darker-20;
-		}
-
-		&:active:not(:disabled) {
-			color: $components-color-accent;
-		}
 
 		&:focus {
 			border-radius: $radius-block-ui;
