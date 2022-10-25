@@ -43,7 +43,7 @@ import { space } from '../ui/utils/space';
 export function ToggleControl( {
 	__nextHasNoMarginBottom,
 	label,
-	checked,
+	checked = false,
 	help,
 	className,
 	onChange,
