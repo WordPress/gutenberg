@@ -1,6 +1,6 @@
 # ColorPalette
 
-ColorPalette allows the user to pick a color from a list of pre-defined color entries.
+`ColorPalette` allows the user to pick a color from a list of pre-defined color entries.
 
 ## Usage
 
