@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+import type { CSSProperties } from 'react';
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
+
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -6,34 +12,25 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import ColorPalette from '../';
+import ColorPalette from '..';
 import Popover from '../../popover';
 import { Provider as SlotFillProvider } from '../../slot-fill';
+import type { ColorObject, PaletteObject } from '../types';
 
-const meta = {
+const meta: ComponentMeta< typeof ColorPalette > = {
 	title: 'Components/ColorPalette',
 	component: ColorPalette,
 	argTypes: {
+		// Removing the control because setting this prop without changing the
+		// format of the `colors` prop can break the component.
 		__experimentalHasMultipleOrigins: {
 			control: {
 				type: null,
 			},
 		},
-		__experimentalIsRenderedInSidebar: {
-			control: {
-				type: 'boolean',
-			},
-		},
-		clearable: {
-			control: {
-				type: 'boolean',
-			},
-		},
-		disableCustomColors: {
-			control: {
-				type: 'boolean',
-			},
-		},
+		as: { control: { type: null } },
+		onChange: { action: 'onChange', control: { type: null } },
+		value: { control: { type: null } },
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -42,14 +39,26 @@ const meta = {
 };
 export default meta;
 
-const Template = ( args ) => {
+const Template: ComponentStory< typeof ColorPalette > = ( {
+	onChange,
+	...args
+} ) => {
 	const firstColor =
-		args.colors[ 0 ].color || args.colors[ 0 ].colors[ 0 ].color;
-	const [ color, setColor ] = useState( firstColor );
+		( args.colors as ColorObject[] )[ 0 ].color ||
+		( args.colors as PaletteObject[] )[ 0 ].colors[ 0 ].color;
+	const [ color, setColor ] = useState< string | undefined >( firstColor );
 
 	return (
 		<SlotFillProvider>
-			<ColorPalette { ...args } value={ color } onChange={ setColor } />
+			<ColorPalette
+				{ ...args }
+				value={ color }
+				onChange={ ( newColor ) => {
+					setColor( newColor );
+					onChange?.( newColor );
+				} }
+			/>
+			{ /* @ts-expect-error The 'Slot' component hasn't been typed yet. */ }
 			<Popover.Slot />
 		</SlotFillProvider>
 	);
@@ -92,14 +101,16 @@ MultipleOrigins.args = {
 	],
 };
 
-export const CSSVariables = ( args ) => {
+export const CSSVariables: ComponentStory< typeof ColorPalette > = ( args ) => {
 	return (
 		<div
-			style={ {
-				'--red': '#f00',
-				'--yellow': '#ff0',
-				'--blue': '#00f',
-			} }
+			style={
+				{
+					'--red': '#f00',
+					'--yellow': '#ff0',
+					'--blue': '#00f',
+				} as CSSProperties
+			}
 		>
 			<Template { ...args } />
 		</div>
