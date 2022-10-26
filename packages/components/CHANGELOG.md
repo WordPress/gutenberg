@@ -35,6 +35,7 @@
 -   `Context`: updated to ignore `react/exhaustive-deps` eslint rule ([#45044](https://github.com/WordPress/gutenberg/pull/45044))
 -   `Button`: Refactor Storybook to controls and align docs ([#44105](https://github.com/WordPress/gutenberg/pull/44105)).
 -   `TabPanel`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44935](https://github.com/WordPress/gutenberg/pull/44935))
+-   `UnitControl`: Add tests ([#45260](https://github.com/WordPress/gutenberg/pull/45260)).
 
 ## 21.3.0 (2022-10-19)
 
