@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   `useDisabled`: Refactor the component to rely on the HTML `inert` attribute.
+
 ## 5.18.0 (2022-10-19)
 
 ## 5.17.0 (2022-10-05)
