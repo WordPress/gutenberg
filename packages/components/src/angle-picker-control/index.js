@@ -21,8 +21,6 @@ import { Text } from '../text';
 import { Spacer } from '../spacer';
 import { COLORS } from '../utils/colors-values';
 
-const accentColor = COLORS.ui.theme;
-
 export default function AnglePickerControl( {
 	/** Start opting into the new margin-free styles that will become the default in a future version. */
 	__nextHasNoMarginBottom = false,
@@ -73,7 +71,7 @@ export default function AnglePickerControl( {
 							marginBottom={ 0 }
 							marginRight={ space( 3 ) }
 							style={ {
-								color: accentColor,
+								color: COLORS.ui.theme,
 							} }
 						>
 							°
