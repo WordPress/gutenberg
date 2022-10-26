@@ -10,7 +10,6 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
-	TableOfContents,
 	EditorHistoryRedo,
 	EditorHistoryUndo,
 	store as editorStore,
@@ -77,13 +76,6 @@ function HeaderToolbar() {
 	);
 	const overflowItems = (
 		<>
-			<ToolbarItem
-				as={ TableOfContents }
-				hasOutlineItemsDisabled={ isTextModeEnabled }
-				repositionDropdown={ showIconLabels && ! isWideViewport }
-				showTooltip={ ! showIconLabels }
-				variant={ showIconLabels ? 'tertiary' : undefined }
-			/>
 			<ToolbarItem
 				as={ Button }
 				className="edit-post-header-toolbar__list-view-toggle"

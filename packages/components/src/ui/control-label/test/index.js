@@ -12,7 +12,7 @@ describe( 'props', () => {
 	test( 'should render correctly', () => {
 		const { container } = render( <ControlLabel>Label</ControlLabel> );
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
 	test( 'should render htmlFor', () => {
@@ -28,7 +28,7 @@ describe( 'props', () => {
 			<ControlLabel size="small">Label</ControlLabel>
 		);
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
 	test( 'should render no truncate', () => {
@@ -36,6 +36,6 @@ describe( 'props', () => {
 			<ControlLabel truncate={ false }>Label</ControlLabel>
 		);
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 } );

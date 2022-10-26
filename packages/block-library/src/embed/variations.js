@@ -32,7 +32,7 @@ import {
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
 
 /**
- * Template option choices for predefined columns layouts.
+ * The embed provider services.
  *
  * @type {WPBlockVariation[]}
  */
@@ -309,7 +309,7 @@ const variations = [
 		icon: embedTumblrIcon,
 		keywords: [ __( 'social' ) ],
 		description: __( 'Embed a Tumblr post.' ),
-		patterns: [ /^https?:\/\/(www\.)?tumblr\.com\/.+/i ],
+		patterns: [ /^https?:\/\/(.+)\.tumblr\.com\/.+/i ],
 		attributes: { providerNameSlug: 'tumblr', responsive: true },
 	},
 	{

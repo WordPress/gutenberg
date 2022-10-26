@@ -1,9 +1,9 @@
 /**
  * External dependencies
  */
-import { noCase } from 'change-case';
 import removeAccents from 'remove-accents';
 import { find } from 'lodash';
+import { noCase } from 'change-case';
 
 // Default search helpers.
 const defaultGetName = ( item ) => item.name || '';
@@ -12,6 +12,25 @@ const defaultGetDescription = ( item ) => item.description || '';
 const defaultGetKeywords = ( item ) => item.keywords || [];
 const defaultGetCategory = ( item ) => item.category;
 const defaultGetCollection = () => null;
+
+/**
+ * Extracts words from an input string.
+ *
+ * @param {string} input The input string.
+ *
+ * @return {Array} Words, extracted from the input string.
+ */
+function extractWords( input = '' ) {
+	return noCase( input, {
+		splitRegexp: [
+			/([\p{Ll}\p{Lo}\p{N}])([\p{Lu}\p{Lt}])/gu, // One lowercase or digit, followed by one uppercase.
+			/([\p{Lu}\p{Lt}])([\p{Lu}\p{Lt}][\p{Ll}\p{Lo}])/gu, // One uppercase followed by one uppercase and one lowercase.
+		],
+		stripRegexp: /(\p{C}|\p{P}|\p{S})+/giu, // Anything that's not a punctuation, symbol or control/format character.
+	} )
+		.split( ' ' )
+		.filter( Boolean );
+}
 
 /**
  * Sanitizes the search input string.
@@ -34,17 +53,6 @@ function normalizeSearchInput( input = '' ) {
 	input = input.toLowerCase();
 
 	return input;
-}
-
-/**
- * Extracts words from an input string.
- *
- * @param {string} input The input string.
- *
- * @return {Array} Words, extracted from the input string.
- */
-function extractWords( input = '' ) {
-	return noCase( input ).split( ' ' ).filter( Boolean );
 }
 
 /**

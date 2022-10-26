@@ -74,6 +74,7 @@ The following configurable variables are used with the template files. Template 
 -   `customScripts` (default: {}) – the list of custom scripts to add to `package.json` . It also allows overriding default scripts.
 -   `npmDependencies` (default: `[]`) – the list of remote npm packages to be installed in the project with [`npm install`](https://docs.npmjs.com/cli/v8/commands/npm-install) when `wpScripts` is enabled.
 -   `npmDevDependencies` (default: `[]`) – the list of remote npm packages to be installed in the project with [`npm install --save-dev`](https://docs.npmjs.com/cli/v8/commands/npm-install) when `wpScripts` is enabled.
+-   `customPackageJSON` (no default) - allows definition of additional properties for the generated package.json file.
 
 **Plugin header fields** ([learn more](https://developer.wordpress.org/plugins/plugin-basics/header-requirements/)):
 
@@ -101,3 +102,5 @@ The following configurable variables are used with the template files. Template 
 -   `editorScript` (default: `'file:./index.js'`) – an editor script definition.
 -   `editorStyle` (default: `'file:./index.css'`) – an editor style definition.
 -   `style` (default: `'file:./style-index.css'`) – a frontend and editor style definition.
+-   `render` (no default) – a path to the PHP file used when rendering the block type on the server before presenting on the front end.
+-   `customBlockJSON` (no default) - allows definition of additional properties for the generated block.json file.

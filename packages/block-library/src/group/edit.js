@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+
 import {
 	InnerBlocks,
 	useBlockProps,
@@ -35,7 +35,12 @@ const htmlElementMessages = {
 	),
 };
 
-function GroupEdit( { attributes, setAttributes, clientId } ) {
+function GroupEdit( {
+	attributes,
+	setAttributes,
+	clientId,
+	__unstableLayoutClassNames: layoutClassNames,
+} ) {
 	const { hasInnerBlocks, themeSupportsLayout } = useSelect(
 		( select ) => {
 			const { getBlock, getSettings } = select( blockEditorStore );
@@ -53,9 +58,11 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 		? { ...defaultLayout, ...layout, type: 'default' }
 		: { ...defaultLayout, ...layout };
 	const { type = 'default' } = usedLayout;
-	const layoutSupportEnabled = themeSupportsLayout || type !== 'default';
+	const layoutSupportEnabled = themeSupportsLayout || type === 'flex';
 
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		className: ! layoutSupportEnabled ? layoutClassNames : null,
+	} );
 
 	const innerBlocksProps = useInnerBlocksProps(
 		layoutSupportEnabled
@@ -67,18 +74,9 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 				? undefined
 				: InnerBlocks.ButtonBlockAppender,
 			__experimentalLayout: layoutSupportEnabled ? usedLayout : undefined,
+			__unstableDisableLayoutClassNames: ! layoutSupportEnabled,
 		}
 	);
-
-	const { __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
-	const { type: layoutType = null } = layout;
-	useEffect( () => {
-		if ( layoutType ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { layout: { ...layout, type: layoutType } } );
-		}
-	}, [ layoutType ] );
 
 	return (
 		<>

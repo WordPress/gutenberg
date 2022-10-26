@@ -131,13 +131,7 @@ function CoverEdit( {
 		createErrorNotice( message, { type: 'snackbar' } );
 	};
 
-	const mediaElement = useRef();
-	const isCoverDark = useCoverIsDark(
-		url,
-		dimRatio,
-		overlayColor.color,
-		mediaElement
-	);
+	const isCoverDark = useCoverIsDark( url, dimRatio, overlayColor.color );
 
 	useEffect( () => {
 		// This side-effect should not create an undo level.
@@ -201,6 +195,7 @@ function CoverEdit( {
 		}
 	);
 
+	const mediaElement = useRef();
 	const currentSettings = {
 		isVideoBackground,
 		isImageBackground,

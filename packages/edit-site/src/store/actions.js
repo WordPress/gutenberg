@@ -321,6 +321,19 @@ export function setIsListViewOpened( isOpen ) {
 }
 
 /**
+ * Sets whether the save view panel should be open.
+ *
+ * @param {boolean} isOpen If true, opens the save view. If false, closes it.
+ *                         It does not toggle the state, but sets it directly.
+ */
+export function setIsSaveViewOpened( isOpen ) {
+	return {
+		type: 'SET_IS_SAVE_VIEW_OPENED',
+		isOpen,
+	};
+}
+
+/**
  * Reverts a template to its original theme-provided file.
  *
  * @param {Object}  template            The template to revert.

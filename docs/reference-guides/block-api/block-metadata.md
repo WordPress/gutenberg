@@ -51,9 +51,9 @@ Starting in WordPress 5.8 release, we encourage using the `block.json` metadata 
 	],
 	"editorScript": "file:./index.js",
 	"script": "file:./script.js",
-	"viewScript": "file:./view.js",
+	"viewScript": [ "file:./view.js", "example-shared-view-script" ],
 	"editorStyle": "file:./index.css",
-	"style": "file:./style.css",
+	"style": [ "file:./style.css", "example-shared-style" ],
 	"render": "file:./render.php"
 }
 ```
@@ -464,7 +464,7 @@ See the [the variations documentation](/docs/reference-guides/block-api/block-va
 
 ### Editor Script
 
--   Type: `WPDefinedAsset` ([learn more](#wpdefinedasset))
+-   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
 -   Optional
 -   Localized: No
 -   Property: `editorScript`
@@ -473,11 +473,15 @@ See the [the variations documentation](/docs/reference-guides/block-api/block-va
 { "editorScript": "file:./index.js" }
 ```
 
-Block type editor script definition. It will only be enqueued in the context of the editor.
+Block type editor scripts definition. They will only be enqueued in the context of the editor.
+
+It's possible to pass a script handle registered with the [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/) function, a path to a JavaScript file relative to the `block.json` file, or a list with a mix of both ([learn more](#wpdefinedasset)).
+
+_Note: An option to pass also an array of editor scripts exists since WordPress `6.1.0`._
 
 ### Script
 
--   Type: `WPDefinedAsset` ([learn more](#wpdefinedasset))
+-   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
 -   Optional
 -   Localized: No
 -   Property: `script`
@@ -486,7 +490,11 @@ Block type editor script definition. It will only be enqueued in the context of 
 { "script": "file:./script.js" }
 ```
 
-Block type frontend and editor script definition. It will be enqueued both in the editor and when viewing the content on the front of the site.
+Block type frontend and editor scripts definition. They will be enqueued both in the editor and when viewing the content on the front of the site.
+
+It's possible to pass a script handle registered with the [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/) function, a path to a JavaScript file relative to the `block.json` file, or a list with a mix of both ([learn more](#wpdefinedasset)).
+
+_Note: An option to pass also an array of scripts exists since WordPress `6.1.0`._
 
 ### View Script
 
@@ -497,10 +505,12 @@ Block type frontend and editor script definition. It will be enqueued both in th
 -   Since: `WordPress 5.9.0`
 
 ```json
-{ "viewScript": "file:./view.js" }
+{ "viewScript": [ "file:./view.js", "example-shared-view-script" ] }
 ```
 
-Block type frontend script definition. It will be enqueued only when viewing the content on the front of the site.
+Block type frontend scripts definition. They will be enqueued only when viewing the content on the front of the site.
+
+It's possible to pass a script handle registered with the [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/) function, a path to a JavaScript file relative to the `block.json` file, or a list with a mix of both ([learn more](#wpdefinedasset)).
 
 _Note: An option to pass also an array of view scripts exists since WordPress `6.1.0`._
 
@@ -515,7 +525,9 @@ _Note: An option to pass also an array of view scripts exists since WordPress `6
 { "editorStyle": "file:./index.css" }
 ```
 
-Block type editor style definition. It will only be enqueued in the context of the editor.
+Block type editor styles definition. They will only be enqueued in the context of the editor.
+
+It's possible to pass a style handle registered with the [`wp_register_style`](https://developer.wordpress.org/reference/functions/wp_register_style/) function, a path to a CSS file relative to the `block.json` file, or a list with a mix of both ([learn more](#wpdefinedasset)).
 
 _Note: An option to pass also an array of editor styles exists since WordPress `5.9.0`._
 
@@ -527,10 +539,12 @@ _Note: An option to pass also an array of editor styles exists since WordPress `
 -   Property: `style`
 
 ```json
-{ "style": "file:./style.css" }
+{ "style": [ "file:./style.css", "example-shared-style" ] }
 ```
 
-Block type frontend and editor style definition. It will be enqueued both in the editor and when viewing the content on the front of the site.
+Block type frontend and editor styles definition. They will be enqueued both in the editor and when viewing the content on the front of the site.
+
+It's possible to pass a style handle registered with the [`wp_register_style`](https://developer.wordpress.org/reference/functions/wp_register_style/) function, a path to a CSS file relative to the `block.json` file, or a list with a mix of both ([learn more](#wpdefinedasset)).
 
 _Note: An option to pass also an array of styles exists since WordPress `5.9.0`._
 
@@ -579,10 +593,10 @@ In `block.json`:
 ```json
 {
 	"editorScript": "file:./index.js",
-	"script": "my-script-handle",
-	"viewScript": "file:./view.js",
-	"editorStyle": "my-editor-style-handle",
-	"style": [ "file:./style.css", "my-style-handle" ]
+	"script": "file:./script.js",
+	"viewScript": [ "file:./view.js", "example-shared-view-script" ],
+	"editorStyle": "file:./index.css",
+	"style": [ "file:./style.css", "example-shared-style" ]
 }
 ```
 
@@ -632,7 +646,7 @@ return array(
 Starting in the WordPress 5.8 release, it is possible to instruct WordPress to enqueue scripts and styles for a block type only when rendered on the frontend. It applies to the following asset fields in the `block.json` file:
 
 -   `script`
--   `viewScript` (when the block defines `render_callback` during registration in PHP or a `render` field in its `block.json`, then the script is registered but the block author is responsible for enqueuing it)
+-   `viewScript`
 -   `style`
 
 ## Internationalization

@@ -26,6 +26,7 @@ export { unregisterFormatType } from './unregister-format-type';
 export { createElement as __unstableCreateElement } from './create-element';
 
 export { useAnchorRef } from './component/use-anchor-ref';
+export { useAnchor } from './component/use-anchor';
 
 export {
 	default as __experimentalRichText,

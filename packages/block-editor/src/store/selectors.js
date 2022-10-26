@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, map, reduce, some, find, filter, orderBy } from 'lodash';
+import { map, reduce, some, find, filter, orderBy } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -319,12 +319,13 @@ export const __experimentalGetGlobalBlocksByName = createSelector(
  */
 export const getBlocksByClientId = createSelector(
 	( state, clientIds ) =>
-		map( castArray( clientIds ), ( clientId ) =>
-			getBlock( state, clientId )
+		map(
+			Array.isArray( clientIds ) ? clientIds : [ clientIds ],
+			( clientId ) => getBlock( state, clientId )
 		),
 	( state, clientIds ) =>
 		map(
-			castArray( clientIds ),
+			Array.isArray( clientIds ) ? clientIds : [ clientIds ],
 			( clientId ) => state.blocks.tree[ clientId ]
 		)
 );
@@ -1435,7 +1436,7 @@ export function getTemplateLock( state, rootClientId ) {
 
 	const blockListSettings = getBlockListSettings( state, rootClientId );
 	if ( ! blockListSettings ) {
-		return null;
+		return undefined;
 	}
 
 	return blockListSettings.templateLock;
@@ -2065,7 +2066,7 @@ export const getInserterItems = createSelector(
  */
 export const getBlockTransformItems = createSelector(
 	( state, blocks, rootClientId = null ) => {
-		const normalizedBlocks = castArray( blocks );
+		const normalizedBlocks = Array.isArray( blocks ) ? blocks : [ blocks ];
 		const [ sourceBlock ] = normalizedBlocks;
 		const buildBlockTypeTransformItem = buildBlockTypeItem( state, {
 			buildScope: 'transform',
@@ -2670,7 +2671,7 @@ export function wasBlockJustInserted( state, clientId, source ) {
  * @return {boolean} True if the block is visible.
  */
 export function isBlockVisible( state, clientId ) {
-	return state.blocks.visibility?.[ clientId ] ?? true;
+	return state.blockVisibility?.[ clientId ] ?? true;
 }
 
 /**
@@ -2682,21 +2683,26 @@ export function isBlockVisible( state, clientId ) {
 export const __unstableGetVisibleBlocks = createSelector(
 	( state ) => {
 		return new Set(
-			Object.keys( state.blocks.visibility ).filter(
-				( key ) => state.blocks.visibility[ key ]
+			Object.keys( state.blockVisibility ).filter(
+				( key ) => state.blockVisibility[ key ]
 			)
 		);
 	},
-	( state ) => [ state.blocks.visibility ]
+	( state ) => [ state.blockVisibility ]
 );
 
+/**
+ * DO-NOT-USE in production.
+ * This selector is created for internal/experimental only usage and may be
+ * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
+ */
 export const __unstableGetContentLockingParent = createSelector(
 	( state, clientId ) => {
 		let current = clientId;
 		let result;
 		while ( !! state.blocks.parents[ current ] ) {
 			current = state.blocks.parents[ current ];
-			if ( getTemplateLock( state, current ) === 'noContent' ) {
+			if ( getTemplateLock( state, current ) === 'contentOnly' ) {
 				result = current;
 			}
 		}
@@ -2705,6 +2711,13 @@ export const __unstableGetContentLockingParent = createSelector(
 	( state ) => [ state.blocks.parents, state.blockListSettings ]
 );
 
+/**
+ * DO-NOT-USE in production.
+ * This selector is created for internal/experimental only usage and may be
+ * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
+ *
+ * @param {Object} state Global application state.
+ */
 export function __unstableGetTemporarilyEditingAsBlocks( state ) {
 	return state.temporarilyEditingAsBlocks;
 }
@@ -2720,6 +2733,7 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 	// In zoom-out mode, the block overlay is always active for top level blocks.
 	if (
 		editorMode === 'zoom-out' &&
+		clientId &&
 		! getBlockRootClientId( state, clientId )
 	) {
 		return true;

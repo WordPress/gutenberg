@@ -6,7 +6,9 @@ The behavior of the popover when it exceeds the viewport's edges can be controll
 
 ## Usage
 
-Render a Popover within the parent to which it should anchor:
+Render a Popover within the parent to which it should anchor.
+
+If a Popover is returned by your component, it will be shown. To hide the popover, simply omit it from your component's render value.
 
 ```jsx
 import { Button, Popover } from '@wordpress/components';
@@ -27,7 +29,36 @@ const MyPopover = () => {
 };
 ```
 
-If a Popover is returned by your component, it will be shown. To hide the popover, simply omit it from your component's render value.
+In order to pass an explicit anchor, you can use the `anchor` prop. When doing so, **the anchor element should be stored in local state** rather than a plain React ref to ensure reactive updating when it changes.
+
+```jsx
+import { Button, Popover } from '@wordpress/components';
+import { useState } from '@wordpress/element';
+
+const MyPopover = () => {
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState();
+	const [ isVisible, setIsVisible ] = useState( false );
+	const toggleVisible = () => {
+		setIsVisible( ( state ) => ! state );
+	};
+
+	return (
+		<p ref={ setPopoverAnchor }>Popover s anchor</p>
+		<Button variant="secondary" onClick={ toggleVisible }>
+			Toggle Popover!
+		</Button>
+		{ isVisible && (
+			<Popover
+				anchor={ popoverAnchor }
+			>
+				Popover is toggled!
+			</Popover>
+		) }
+	);
+};
+```
 
 If you want Popover elements to render to a specific location on the page to allow style cascade to take effect, you must render a `Popover.Slot` further up the element tree:
 
@@ -51,13 +82,25 @@ render(
 
 The component accepts the following props. Props not included in this set will be applied to the element wrapping Popover content.
 
+### `anchor`: `Element | VirtualElement | null`
+
+The element that should be used by the `Popover` as its anchor. It can either be an `Element` or, alternatively, a `VirtualElement` — ie. an object with the `getBoundingClientRect()` and the `ownerDocument` properties defined.
+
+The element should be stored in state rather than a plain ref to ensure reactive updating when it changes.
+
+-   Required: No
+
 ### `anchorRect`: `DomRectWithOwnerDocument`
+
+_Note: this prop is deprecated. Please use the `anchor` prop instead._
 
 An object extending a `DOMRect` with an additional optional `ownerDocument` property, used to specify a fixed popover position.
 
 -   Required: No
 
 ### `anchorRef`: `Element | PopoverAnchorRefReference | PopoverAnchorRefTopBottom | Range`
+
+_Note: this prop is deprecated. Please use the `anchor` prop instead._
 
 Used to specify a fixed popover position. It can be an `Element`, a React reference to an `element`, an object with a `top` and a `bottom` properties (both pointing to elements), or a `range`.
 
@@ -113,6 +156,8 @@ When not provided, the `onClose` callback will be called instead.
 -   Required: No
 
 ### `getAnchorRect`: `( fallbackReferenceElement: Element | null ) => DomRectWithOwnerDocument`
+
+_Note: this prop is deprecated. Please use the `anchor` prop instead._
 
 A function returning the same value as the one expected by the `anchorRect` prop, used to specify a dynamic popover position.
 
@@ -177,9 +222,3 @@ Adjusts the size of the popover to prevent its contents from going out of view w
 
 -   Required: No
 -   Default: `true`
-
-### `range`: `unknown`
-
-_Note: this prop is deprecated and has no effect on the component._
-
--   Required: No

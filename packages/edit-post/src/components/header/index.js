@@ -10,6 +10,7 @@ import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
+import { __unstableMotion as motion } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -29,7 +30,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 		isPublishSidebarOpened,
 		isSaving,
 		showIconLabels,
-		hasReducedUI,
+		isDistractionFree,
 	} = useSelect(
 		( select ) => ( {
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
@@ -38,28 +39,49 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 			isSaving: select( editPostStore ).isSavingMetaBoxes(),
 			showIconLabels:
 				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
-			hasReducedUI:
-				select( editPostStore ).isFeatureActive( 'reducedUI' ),
+			isDistractionFree:
+				select( editPostStore ).isFeatureActive( 'distractionFree' ),
 		} ),
 		[]
 	);
 
 	const isLargeViewport = useViewportMatch( 'large' );
 
-	const classes = classnames( 'edit-post-header', {
-		'has-reduced-ui': hasReducedUI,
-	} );
+	const classes = classnames( 'edit-post-header' );
+
+	const slideY = {
+		hidden: isDistractionFree ? { y: '-50' } : { y: 0 },
+		hover: { y: 0, transition: { type: 'tween', delay: 0.2 } },
+	};
+
+	const slideX = {
+		hidden: isDistractionFree ? { x: '-100%' } : { x: 0 },
+		hover: { x: 0, transition: { type: 'tween', delay: 0.2 } },
+	};
 
 	return (
 		<div className={ classes }>
 			<MainDashboardButton.Slot>
-				<FullscreenModeClose showTooltip />
+				<motion.div
+					variants={ slideX }
+					transition={ { type: 'tween', delay: 0.8 } }
+				>
+					<FullscreenModeClose showTooltip />
+				</motion.div>
 			</MainDashboardButton.Slot>
-			<div className="edit-post-header__toolbar">
+			<motion.div
+				variants={ slideY }
+				transition={ { type: 'tween', delay: 0.8 } }
+				className="edit-post-header__toolbar"
+			>
 				<HeaderToolbar />
 				<TemplateTitle />
-			</div>
-			<div className="edit-post-header__settings">
+			</motion.div>
+			<motion.div
+				variants={ slideY }
+				transition={ { type: 'tween', delay: 0.8 } }
+				className="edit-post-header__settings"
+			>
 				{ ! isPublishSidebarOpened && (
 					// This button isn't completely hidden by the publish sidebar.
 					// We can't hide the whole toolbar when the publish sidebar is open because
@@ -93,7 +115,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				{ showIconLabels && ! isLargeViewport && (
 					<MoreMenu showIconLabels={ showIconLabels } />
 				) }
-			</div>
+			</motion.div>
 		</div>
 	);
 }

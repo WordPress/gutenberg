@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/blocks",
-	"version": "11.15.0",
+	"version": "11.19.0",
 	"description": "Block API for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -32,6 +32,7 @@
 		"@wordpress/autop": "file:../autop",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/block-serialization-default-parser": "file:../block-serialization-default-parser",
+		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",

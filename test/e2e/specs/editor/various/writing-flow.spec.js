@@ -14,6 +14,10 @@ test.describe( 'Writing Flow', () => {
 		await admin.createNewPost();
 	} );
 
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
+	} );
+
 	test( 'Should navigate inner blocks with arrow keys', async ( {
 		editor,
 		page,
@@ -700,6 +704,9 @@ test.describe( 'Writing Flow', () => {
 		const x = paragraphRect.x + ( 2 * paragraphRect.width ) / 3;
 		const y = paragraphRect.y + paragraphRect.height + 1;
 
+		// The typing observer requires two mouse moves to detect an actual
+		// move.
+		await page.mouse.move( x - 1, y - 1 );
 		await page.mouse.move( x, y );
 
 		const inserter = page.locator( 'role=button[name="Add block"i]' );
@@ -955,6 +962,40 @@ test.describe( 'Writing Flow', () => {
 		await expect(
 			page.locator( 'role=document[name="Paragraph block"i]' )
 		).toHaveText( /^a+\.a$/ );
+	} );
+
+	test( 'should vertically move the caret when pressing Alt', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'a' );
+
+		async function getHeight() {
+			return await page.evaluate(
+				() => document.activeElement.offsetHeight
+			);
+		}
+
+		const height = await getHeight();
+
+		// Keep typing until the height of the element increases. We need two
+		// lines.
+		while ( height === ( await getHeight() ) ) {
+			await page.keyboard.type( 'a' );
+		}
+
+		// Create a new paragraph.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'b' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await pageUtils.pressKeyWithModifier( 'alt', 'ArrowUp' );
+		await page.keyboard.type( '.' );
+
+		// Expect the "." to be added at the start of the paragraph
+		await expect(
+			page.locator( 'role=document[name="Paragraph block"i] >> nth = 0' )
+		).toHaveText( /^.a+$/ );
 	} );
 } );
 

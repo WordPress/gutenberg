@@ -84,6 +84,7 @@ function BlockListBlock( {
 	isSelected,
 	isSelectionEnabled,
 	className,
+	__unstableLayoutClassNames: layoutClassNames,
 	name,
 	isValid,
 	attributes,
@@ -118,7 +119,7 @@ function BlockListBlock( {
 					),
 				hasContentLockedParent: _hasContentLockedParent,
 				isContentLocking:
-					getTemplateLock( clientId ) === 'noContent' &&
+					getTemplateLock( clientId ) === 'contentOnly' &&
 					! _hasContentLockedParent,
 				isTemporarilyEditingAsBlocks:
 					__unstableGetTemporarilyEditingAsBlocks() === clientId,
@@ -146,6 +147,7 @@ function BlockListBlock( {
 			clientId={ clientId }
 			isSelectionEnabled={ isSelectionEnabled }
 			toggleSelection={ toggleSelection }
+			__unstableLayoutClassNames={ layoutClassNames }
 		/>
 	);
 
@@ -296,7 +298,7 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 	};
 } );
 
-const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
+const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 	const {
 		updateBlockAttributes,
 		insertBlocks,
@@ -304,6 +306,9 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		replaceBlocks,
 		toggleSelection,
 		__unstableMarkLastChangeAsPersistent,
+		moveBlocksToPosition,
+		removeBlock,
+		selectBlock,
 	} = dispatch( blockEditorStore );
 
 	// Do not add new properties here, use `useDispatch` instead to avoid
@@ -311,7 +316,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 	return {
 		setAttributes( newAttributes ) {
 			const { getMultiSelectedBlockClientIds } =
-				select( blockEditorStore );
+				registry.select( blockEditorStore );
 			const multiSelectedBlockClientIds =
 				getMultiSelectedBlockClientIds();
 			const { clientId } = ownProps;
@@ -327,26 +332,124 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		},
 		onInsertBlocksAfter( blocks ) {
 			const { clientId, rootClientId } = ownProps;
-			const { getBlockIndex } = select( blockEditorStore );
+			const { getBlockIndex } = registry.select( blockEditorStore );
 			const index = getBlockIndex( clientId );
 			insertBlocks( blocks, index + 1, rootClientId );
 		},
 		onMerge( forward ) {
 			const { clientId, rootClientId } = ownProps;
-			const { getPreviousBlockClientId, getNextBlockClientId, getBlock } =
-				select( blockEditorStore );
+			const {
+				getPreviousBlockClientId,
+				getNextBlockClientId,
+				getBlock,
+				getBlockAttributes,
+				getBlockName,
+				getBlockOrder,
+			} = registry.select( blockEditorStore );
 
+			// For `Delete` or forward merge, we should do the exact same thing
+			// as `Backspace`, but from the other block.
 			if ( forward ) {
+				if ( rootClientId ) {
+					const nextRootClientId =
+						getNextBlockClientId( rootClientId );
+
+					if ( nextRootClientId ) {
+						// If there is a block that follows with the same parent
+						// block name and the same attributes, merge the inner
+						// blocks.
+						if (
+							getBlockName( rootClientId ) ===
+							getBlockName( nextRootClientId )
+						) {
+							const rootAttributes =
+								getBlockAttributes( rootClientId );
+							const previousRootAttributes =
+								getBlockAttributes( nextRootClientId );
+
+							if (
+								Object.keys( rootAttributes ).every(
+									( key ) =>
+										rootAttributes[ key ] ===
+										previousRootAttributes[ key ]
+								)
+							) {
+								registry.batch( () => {
+									moveBlocksToPosition(
+										getBlockOrder( nextRootClientId ),
+										nextRootClientId,
+										rootClientId
+									);
+									removeBlock( nextRootClientId, false );
+								} );
+								return;
+							}
+						} else {
+							mergeBlocks( rootClientId, nextRootClientId );
+							return;
+						}
+					}
+				}
+
 				const nextBlockClientId = getNextBlockClientId( clientId );
-				if ( nextBlockClientId ) {
+
+				if ( ! nextBlockClientId ) {
+					return;
+				}
+
+				// Check if it's possibile to "unwrap" the following block
+				// before trying to merge.
+				const replacement = switchToBlockType(
+					getBlock( nextBlockClientId ),
+					'*'
+				);
+
+				if ( replacement && replacement.length ) {
+					replaceBlocks( nextBlockClientId, replacement );
+				} else {
 					mergeBlocks( clientId, nextBlockClientId );
 				}
 			} else {
 				const previousBlockClientId =
 					getPreviousBlockClientId( clientId );
+
 				if ( previousBlockClientId ) {
 					mergeBlocks( previousBlockClientId, clientId );
 				} else if ( rootClientId ) {
+					const previousRootClientId =
+						getPreviousBlockClientId( rootClientId );
+
+					// If there is a preceding block with the same parent block
+					// name and the same attributes, merge the inner blocks.
+					if (
+						previousRootClientId &&
+						getBlockName( rootClientId ) ===
+							getBlockName( previousRootClientId )
+					) {
+						const rootAttributes =
+							getBlockAttributes( rootClientId );
+						const previousRootAttributes =
+							getBlockAttributes( previousRootClientId );
+
+						if (
+							Object.keys( rootAttributes ).every(
+								( key ) =>
+									rootAttributes[ key ] ===
+									previousRootAttributes[ key ]
+							)
+						) {
+							registry.batch( () => {
+								moveBlocksToPosition(
+									getBlockOrder( rootClientId ),
+									rootClientId,
+									previousRootClientId
+								);
+								removeBlock( rootClientId, false );
+							} );
+							return;
+						}
+					}
+
 					// Attempt to "unwrap" the block contents when there's no
 					// preceding block to merge with.
 					const replacement = switchToBlockType(
@@ -354,7 +457,10 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 						'*'
 					);
 					if ( replacement && replacement.length ) {
-						replaceBlocks( rootClientId, replacement, 0 );
+						registry.batch( () => {
+							replaceBlocks( rootClientId, replacement );
+							selectBlock( replacement[ 0 ].clientId, 0 );
+						} );
 					}
 				}
 			}

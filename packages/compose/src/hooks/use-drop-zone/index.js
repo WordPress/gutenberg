@@ -107,11 +107,6 @@ export default function useDropZone( {
 
 				isDragging = true;
 
-				ownerDocument.removeEventListener(
-					'dragenter',
-					maybeDragStart
-				);
-
 				// Note that `dragend` doesn't fire consistently for file and
 				// HTML drag events where the drag origin is outside the browser
 				// window. In Firefox it may also not fire if the originating
@@ -161,6 +156,8 @@ export default function useDropZone( {
 				// leaving the drop zone, which means the `relatedTarget`
 				// (element that has been entered) should be outside the drop
 				// zone.
+				// Note: This is not entirely reliable in Safari due to this bug
+				// https://bugs.webkit.org/show_bug.cgi?id=66547
 				if ( isElementInZone( event.relatedTarget ) ) {
 					return;
 				}
@@ -200,7 +197,6 @@ export default function useDropZone( {
 
 				isDragging = false;
 
-				ownerDocument.addEventListener( 'dragenter', maybeDragStart );
 				ownerDocument.removeEventListener( 'dragend', maybeDragEnd );
 				ownerDocument.removeEventListener( 'mousemove', maybeDragEnd );
 
@@ -219,12 +215,6 @@ export default function useDropZone( {
 			ownerDocument.addEventListener( 'dragenter', maybeDragStart );
 
 			return () => {
-				onDropRef.current = null;
-				onDragStartRef.current = null;
-				onDragEnterRef.current = null;
-				onDragLeaveRef.current = null;
-				onDragEndRef.current = null;
-				onDragOverRef.current = null;
 				delete element.dataset.isDropZone;
 				element.removeEventListener( 'drop', onDrop );
 				element.removeEventListener( 'dragenter', onDragEnter );
@@ -232,7 +222,10 @@ export default function useDropZone( {
 				element.removeEventListener( 'dragleave', onDragLeave );
 				ownerDocument.removeEventListener( 'dragend', maybeDragEnd );
 				ownerDocument.removeEventListener( 'mousemove', maybeDragEnd );
-				ownerDocument.addEventListener( 'dragenter', maybeDragStart );
+				ownerDocument.removeEventListener(
+					'dragenter',
+					maybeDragStart
+				);
 			};
 		},
 		[ isDisabled ]

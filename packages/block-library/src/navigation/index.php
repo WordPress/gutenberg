@@ -248,6 +248,99 @@ function block_core_navigation_render_submenu_icon() {
 	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
 }
 
+/**
+ * Get the classic navigation menu to use as a fallback.
+ *
+ * @return object WP_Term The classic navigation.
+ */
+function block_core_navigation_get_classic_menu_fallback() {
+	$classic_nav_menus = wp_get_nav_menus();
+
+	// If menus exist.
+	if ( $classic_nav_menus && ! is_wp_error( $classic_nav_menus ) && count( $classic_nav_menus ) === 1 ) {
+		// Use the first classic menu only. Handles simple use case where user has a single
+		// classic menu and switches to a block theme. In future this maybe expanded to
+		// determine the most appropriate classic menu to be used based on location.
+		return $classic_nav_menus[0];
+	}
+}
+
+/**
+ * Converts a classic navigation to blocks.
+ *
+ * @param  object $classic_nav_menu WP_Term The classic navigation object to convert.
+ * @return array the normalized parsed blocks.
+ */
+function block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_menu ) {
+	// BEGIN: Code that already exists in wp_nav_menu().
+	$menu_items = wp_get_nav_menu_items( $classic_nav_menu->term_id, array( 'update_post_term_cache' => false ) );
+
+	// Set up the $menu_item variables.
+	_wp_menu_item_classes_by_context( $menu_items );
+
+	$sorted_menu_items = array();
+	foreach ( (array) $menu_items as $menu_item ) {
+		$sorted_menu_items[ $menu_item->menu_order ] = $menu_item;
+	}
+
+	unset( $menu_items, $menu_item );
+
+	// END: Code that already exists in wp_nav_menu().
+
+	$menu_items_by_parent_id = array();
+	foreach ( $sorted_menu_items as $menu_item ) {
+		$menu_items_by_parent_id[ $menu_item->menu_item_parent ][] = $menu_item;
+	}
+
+	$inner_blocks = block_core_navigation_parse_blocks_from_menu_items(
+		isset( $menu_items_by_parent_id[0] )
+			? $menu_items_by_parent_id[0]
+			: array(),
+		$menu_items_by_parent_id
+	);
+
+	return serialize_blocks( $inner_blocks );
+}
+
+/**
+ * If there's a the classic menu then use it as a fallback.
+ *
+ * @return array the normalized parsed blocks.
+ */
+function block_core_navigation_maybe_use_classic_menu_fallback() {
+	// See if we have a classic menu.
+	$classic_nav_menu = block_core_navigation_get_classic_menu_fallback();
+
+	if ( ! $classic_nav_menu ) {
+		return;
+	}
+
+	// If we have a classic menu then convert it to blocks.
+	$classic_nav_menu_blocks = block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_menu );
+
+	if ( empty( $classic_nav_menu_blocks ) ) {
+		return;
+	}
+
+	// Create a new navigation menu from the classic menu.
+	$wp_insert_post_result = wp_insert_post(
+		array(
+			'post_content' => $classic_nav_menu_blocks,
+			'post_title'   => $classic_nav_menu->slug,
+			'post_name'    => $classic_nav_menu->slug,
+			'post_status'  => 'publish',
+			'post_type'    => 'wp_navigation',
+		),
+		true // So that we can check whether the result is an error.
+	);
+
+	if ( is_wp_error( $wp_insert_post_result ) ) {
+		return;
+	}
+
+	// Fetch the most recently published navigation which will be the classic one created above.
+	return block_core_navigation_get_most_recently_published_navigation();
+}
 
 /**
  * Finds the most recently published `wp_navigation` Post.
@@ -255,7 +348,8 @@ function block_core_navigation_render_submenu_icon() {
  * @return WP_Post|null the first non-empty Navigation or null.
  */
 function block_core_navigation_get_most_recently_published_navigation() {
-	// We default to the most recently created menu.
+
+	// Default to the most recently created menu.
 	$parsed_args = array(
 		'post_type'      => 'wp_navigation',
 		'no_found_rows'  => true,
@@ -307,9 +401,6 @@ function block_core_navigation_get_fallback_blocks() {
 	$page_list_fallback = array(
 		array(
 			'blockName' => 'core/page-list',
-			'attrs'     => array(
-				'__unstableMaxPages' => 4,
-			),
 		),
 	);
 
@@ -322,7 +413,13 @@ function block_core_navigation_get_fallback_blocks() {
 
 	$navigation_post = block_core_navigation_get_most_recently_published_navigation();
 
-	// Prefer using the first non-empty Navigation as fallback if available.
+	// If there are no navigation posts then try to find a classic menu
+	// and convert it into a block based navigation menu.
+	if ( ! $navigation_post ) {
+		$navigation_post = block_core_navigation_maybe_use_classic_menu_fallback();
+	}
+
+	// Use the first non-empty Navigation as fallback if available.
 	if ( $navigation_post ) {
 		$maybe_fallback = block_core_navigation_filter_out_empty_blocks( parse_blocks( $navigation_post->post_content ) );
 
@@ -502,8 +599,17 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		}
 
 		$inner_blocks = new WP_Block_List( $fallback_blocks, $attributes );
-
 	}
+
+	/**
+	 * Filter navigation block $inner_blocks.
+	 * Allows modification of a navigation block menu items.
+	 *
+	 * @since 6.1.0
+	 *
+	 * @param \WP_Block_List $inner_blocks
+	 */
+	$inner_blocks = apply_filters( 'block_core_navigation_render_inner_blocks', $inner_blocks );
 
 	$layout_justification = array(
 		'left'          => 'items-justified-left',
@@ -611,12 +717,10 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	$should_display_icon_label = isset( $attributes['hasIcon'] ) && true === $attributes['hasIcon'];
 	$toggle_button_icon        = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="7.5" width="16" height="1.5" /><rect x="4" y="15" width="16" height="1.5" /></svg>';
-	if ( 'menu' === $attributes['icon'] ) {
-		$toggle_button_icon = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 5v1.5h14V5H5zm0 7.8h14v-1.5H5v1.5zM5 19h14v-1.5H5V19z" /></svg>';
-	} elseif ( 'more-vertical' === $attributes['icon'] ) {
-		$toggle_button_icon = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 19h-2v-2h2v2zm0-6h-2v-2h2v2zm0-6h-2V5h2v2z" /></svg>';
-	} elseif ( 'more-horizontal' === $attributes['icon'] ) {
-		$toggle_button_icon = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 13h2v-2h-2v2zm-6 0h2v-2H5v2zm12-2v2h2v-2h-2z" /></svg>';
+	if ( isset( $attributes['icon'] ) ) {
+		if ( 'menu' === $attributes['icon'] ) {
+			$toggle_button_icon = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 5v1.5h14V5H5zm0 7.8h14v-1.5H5v1.5zM5 19h14v-1.5H5V19z" /></svg>';
+		}
 	}
 	$toggle_button_content       = $should_display_icon_label ? $toggle_button_icon : __( 'Menu' );
 	$toggle_close_button_icon    = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';
@@ -642,7 +746,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$toggle_aria_label_close,
 		esc_attr( implode( ' ', $responsive_container_classes ) ),
 		esc_attr( implode( ' ', $open_button_classes ) ),
-		safecss_filter_attr( $colors['overlay_inline_styles'] ),
+		esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) ),
 		__( 'Menu' ),
 		$toggle_button_content,
 		$toggle_close_button_content

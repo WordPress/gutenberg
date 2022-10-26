@@ -2,12 +2,13 @@
  * External dependencies
  */
 import { parse as hpqParse } from 'hpq';
-import { flow, mapValues, castArray } from 'lodash';
+import { mapValues } from 'lodash';
 import memoize from 'memize';
 
 /**
  * WordPress dependencies
  */
+import { pipe } from '@wordpress/compose';
 import { applyFilters } from '@wordpress/hooks';
 
 /**
@@ -28,7 +29,7 @@ import { normalizeBlockType } from '../utils';
  * @return {Function} Enhanced hpq matcher.
  */
 export const toBooleanAttributeMatcher = ( matcher ) =>
-	flow( [
+	pipe( [
 		matcher,
 		// Expected values from `attr( 'disabled' )`:
 		//
@@ -164,7 +165,10 @@ export function getBlockAttribute(
  * @return {boolean} Whether value is valid.
  */
 export function isValidByType( value, type ) {
-	return type === undefined || isOfTypes( value, castArray( type ) );
+	return (
+		type === undefined ||
+		isOfTypes( value, Array.isArray( type ) ? type : [ type ] )
+	);
 }
 
 /**
@@ -213,7 +217,7 @@ export const matcherFromSource = memoize( ( sourceConfig ) => {
 			);
 			return query( sourceConfig.selector, subMatchers );
 		case 'tag':
-			return flow( [
+			return pipe( [
 				prop( sourceConfig.selector, 'nodeName' ),
 				( nodeName ) =>
 					nodeName ? nodeName.toLowerCase() : undefined,
