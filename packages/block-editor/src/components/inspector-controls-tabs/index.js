@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { hasBlockSupport } from '@wordpress/blocks';
+import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import {
 	PanelBody,
 	TabPanel,
@@ -115,11 +115,15 @@ export default function InspectorControlsTabs( {
 		}
 	}
 
+	const blockType = getBlockType( blockName );
+
 	// We have multiple tabs with contents so render complete TabPanel.
 	return (
 		<TabPanel
 			className="block-editor-block-inspector__tabs"
 			tabs={ availableTabs }
+			initialTabName={ blockType.defaultTab }
+			key={ clientId }
 		>
 			{ ( tab ) => {
 				if ( tab.name === TAB_MENU.name ) {
