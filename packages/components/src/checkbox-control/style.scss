@@ -35,7 +35,8 @@ $checkbox-input-size-sm: 24px; // Width & height for small viewports.
 	}
 
 	&:checked,
-	&:indeterminate {
+	&:indeterminate,
+	&[aria-checked="mixed"] {
 		background: $components-color-accent;
 		border-color: $components-color-accent;
 
