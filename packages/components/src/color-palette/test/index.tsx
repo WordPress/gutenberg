@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 /**
  * Internal dependencies
  */
-import ColorPalette from '../';
+import ColorPalette from '..';
 
 describe( 'ColorPalette', () => {
 	const colors = [
