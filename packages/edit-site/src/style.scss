@@ -26,10 +26,19 @@
 @import "./components/site-icon-and-title/style.scss";
 
 
+html #wpadminbar {
+	display: none;
+}
+
+html #wpbody {
+	padding-top: 0;
+}
+
 // In order to use mix-blend-mode, this element needs to have an explicitly set background-color.
 // We scope it to .wp-toolbar to be wp-admin only, to prevent bleed into other implementations.
 html.wp-toolbar {
 	background: $white;
+	padding-top: 0;
 }
 
 body.appearance_page_gutenberg-template-parts,
@@ -44,13 +53,15 @@ body.site-editor-php {
 }
 
 .edit-site {
+	height: 100vh;
+
 	// On mobile the main content area has to scroll, otherwise you can invoke
 	// the over-scroll bounce on the non-scrolling container, for a bad experience.
 	@include break-small {
 		bottom: 0;
 		left: 0;
 		min-height: 100vh;
-		position: absolute;
+		position: fixed;
 		right: 0;
 		top: 0;
 	}

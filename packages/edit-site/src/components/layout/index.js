@@ -12,9 +12,10 @@ import {
 	__unstableAnimatePresence as AnimatePresence,
 	Button,
 } from '@wordpress/components';
-import { useReducedMotion } from '@wordpress/compose';
+import { useReducedMotion, useViewportMatch } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { useState, useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -41,7 +42,31 @@ export default function Layout() {
 	const { __unstableSetCanvasMode } = useDispatch( editSiteStore );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const disableMotion = useReducedMotion();
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const [ isMobileCanvasVisible, setIsMobileCanvasVisible ] =
+		useState( false );
 	const isFullCanvas = isEditorPage && canvasMode === 'edit';
+	const canvasPadding = isMobileViewport ? 0 : 24;
+	const sidebarWidth = isMobileViewport ? '100%' : 280;
+	const showSidebar =
+		( isMobileViewport && ! isMobileCanvasVisible ) ||
+		( ! isMobileViewport && ! isFullCanvas );
+	const showCanvas =
+		( isMobileViewport && isMobileCanvasVisible ) || ! isMobileViewport;
+	const showLogo =
+		( isMobileViewport && ! isMobileCanvasVisible ) ||
+		! isMobileViewport ||
+		canvasMode === 'edit';
+	// Ideally this effect could be removed if we move the "isMobileCanvasVisible" into the store.
+	useEffect( () => {
+		if ( canvasMode === 'view' && isMobileViewport ) {
+			setIsMobileCanvasVisible( false );
+		}
+	}, [ canvasMode, isMobileViewport ] );
+	const initialRendering = useRef( true );
+	useEffect( () => {
+		initialRendering.current = false;
+	}, [] );
 
 	return (
 		<>
@@ -50,36 +75,53 @@ export default function Layout() {
 					'is-full-canvas': isFullCanvas,
 				} ) }
 			>
-				<div className="edit-site-layout__logo">
-					{ isFullCanvas && (
-						<Button
-							className="edit-site-layout__view-mode-toggle"
-							label={ __( 'Open Navigation Sidebar' ) }
-							onClick={ () => {
-								clearSelectedBlock();
-								__unstableSetCanvasMode( 'view' );
-							} }
-						>
-							<SiteIconAndTitle
-								className="edit-site-layout__view-mode-toggle-icon"
-								showTitle={ false }
-							/>
-						</Button>
-					) }
-					{ ! isFullCanvas && (
-						<Button
-							href="index.php"
-							aria-label={ __( 'Go back to the dashboard' ) }
-						>
-							<SiteIconAndTitle />
-						</Button>
-					) }
-				</div>
+				{ showLogo && (
+					<div className="edit-site-layout__logo">
+						{ isFullCanvas && (
+							<Button
+								className="edit-site-layout__view-mode-toggle"
+								label={ __( 'Open Navigation Sidebar' ) }
+								onClick={ () => {
+									clearSelectedBlock();
+									__unstableSetCanvasMode( 'view' );
+								} }
+							>
+								<SiteIconAndTitle
+									className="edit-site-layout__view-mode-toggle-icon"
+									showTitle={ false }
+								/>
+							</Button>
+						) }
+						{ ! isFullCanvas && (
+							<Button
+								href="index.php"
+								aria-label={ __( 'Go back to the dashboard' ) }
+							>
+								<SiteIconAndTitle />
+							</Button>
+						) }
+
+						{ canvasMode === 'view' && isMobileViewport && (
+							<Button
+								onClick={ () =>
+									setIsMobileCanvasVisible( true )
+								}
+							>
+								{ __( 'View Editor' ) }
+							</Button>
+						) }
+					</div>
+				) }
 				<AnimatePresence>
-					{ ! isFullCanvas && (
+					{ showSidebar && (
 						<motion.div
-							initial={ { opacity: 0.25, width: 280 } }
-							animate={ { opacity: 1, width: 280 } }
+							initial={ {
+								opacity: 0.25,
+								width: initialRendering.current
+									? sidebarWidth
+									: 0,
+							} }
+							animate={ { opacity: 1, width: sidebarWidth } }
 							exit={ {
 								opacity: 0.25,
 								width: 0,
@@ -90,38 +132,51 @@ export default function Layout() {
 							} }
 							className="edit-site-layout__sidebar"
 						>
-							<div style={ { width: 280, height: '100%' } }>
+							<div
+								style={ {
+									width: sidebarWidth,
+									height: '100%',
+								} }
+							>
 								<Sidebar />
 							</div>
 						</motion.div>
 					) }
 				</AnimatePresence>
-				<motion.div
-					className="edit-site-layout__canvas-container"
-					animate={ {
-						paddingTop: isFullCanvas ? 0 : 24,
-						paddingRight: isFullCanvas ? 0 : 24,
-						paddingBottom: isFullCanvas ? 0 : 24,
-					} }
-					transition={ {
-						type: 'tween',
-						duration: disableMotion ? 0 : 0.5,
-					} }
-				>
-					<motion.div
-						className="edit-site-layout__canvas"
-						layout
-						transition={ {
-							type: 'tween',
-							duration: disableMotion ? 0 : 0.5,
-						} }
-					>
-						<ErrorBoundary>
-							{ isEditorPage && <Editor /> }
-							{ isListPage && <ListPage /> }
-						</ErrorBoundary>
-					</motion.div>
-				</motion.div>
+				<AnimatePresence>
+					{ showCanvas && (
+						<motion.div
+							className="edit-site-layout__canvas-container"
+							animate={ {
+								paddingTop: isFullCanvas ? 0 : canvasPadding,
+								paddingRight: isFullCanvas ? 0 : canvasPadding,
+								paddingBottom: isFullCanvas ? 0 : canvasPadding,
+								opacity: 1,
+							} }
+							exit={ {
+								opacity: 0.25,
+							} }
+							transition={ {
+								type: 'tween',
+								duration: disableMotion ? 0 : 0.5,
+							} }
+						>
+							<motion.div
+								className="edit-site-layout__canvas"
+								layout
+								transition={ {
+									type: 'tween',
+									duration: disableMotion ? 0 : 0.5,
+								} }
+							>
+								<ErrorBoundary>
+									{ isEditorPage && <Editor /> }
+									{ isListPage && <ListPage /> }
+								</ErrorBoundary>
+							</motion.div>
+						</motion.div>
+					) }
+				</AnimatePresence>
 			</div>
 		</>
 	);
