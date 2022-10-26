@@ -23,7 +23,7 @@
 		$data = $response->get_data();
 		$fields = $this->get_fields_for_response( $request );
 
-		if ( ! is_null( $template->wp_id ) && $template->wp_id !== 0 ) {
+		if ( ! empty( $template->wp_id ) && $template->wp_id > 0 ) {
 			$revisions = wp_get_latest_revision_id_and_total_count( $template->wp_id );
 		} else {
 			// TODO: Should this be included if it's a file-based template?
