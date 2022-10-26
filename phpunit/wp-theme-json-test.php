@@ -7,16 +7,66 @@
 
 class WP_Theme_Json_Test extends WP_UnitTestCase {
 
+	/**
+	 * Test that it reports correctly themes that have a theme.json.
+	 *
+	 * @group theme_json
+	 *
+	 * @covers wp_theme_has_theme_json
+	 */
 	public function test_theme_has_theme_json() {
-		$this->assertSame( true, false );
+		switch_theme( 'block-theme' );
+		$this->assertTrue( wp_theme_has_theme_json() );
 	}
 
-	public function test_theme_and_parent_do_not_have_theme_json() {
-		$this->assertSame( true, false );
+	/**
+	 * Test that it reports correctly themes that do not have a theme.json.
+	 *
+	 * @group theme_json
+	 *
+	 * @covers wp_theme_has_theme_json
+	 */
+	public function test_theme_has_no_theme_json() {
+		switch_theme( 'default' );
+		$this->assertFalse( wp_theme_has_theme_json() );
 	}
 
-	public function test_theme_has_not_theme_json_but_parent_has() {
-		$this->assertSame( true, false );
+	/**
+	 * Test it reports correctly child themes that have a theme.json.
+	 *
+	 * @group theme_json
+	 *
+	 * @covers wp_theme_has_theme_json
+	 */
+	public function test_child_theme_has_theme_json() {
+		switch_theme( 'block-theme-child' );
+		$this->assertTrue( wp_theme_has_theme_json() );
+	}
+
+	/**
+	 * Test that it reports correctly child themes that do not have a theme.json
+	 * and the parent does.
+	 *
+	 * @group theme_json
+	 *
+	 * @covers wp_theme_has_theme_json
+	 */
+	public function test_child_theme_has_not_theme_json_but_parent_has() {
+		switch_theme( 'block-theme-child-no-theme-json' );
+		$this->assertTrue( wp_theme_has_theme_json() );
+	}
+
+	/**
+	 * Test that it reports correctly child themes that do not have a theme.json
+	 * and the parent does not either.
+	 *
+	 * @group theme_json
+	 *
+	 * @covers wp_theme_has_theme_json
+	 */
+	public function test_neither_child_or_parent_themes_have_theme_json() {
+		switch_theme( 'default-child-no-theme-json' );
+		$this->assertFalse( wp_theme_has_theme_json() );
 	}
 
 	/**
@@ -33,10 +83,9 @@ class WP_Theme_Json_Test extends WP_UnitTestCase {
 
 		// Switch to a theme that does have support.
 		switch_theme( 'block-theme' );
-		$has_theme_json_support = wp_theme_has_theme_json();
+		$block_theme = wp_theme_has_theme_json();
 
-		$this->assertSame( true, false );
 		$this->assertFalse( $default );
-		$this->assertTrue( $has_theme_json_support );
+		$this->assertTrue( $block_theme );
 	}
 }
