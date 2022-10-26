@@ -84,7 +84,7 @@ final class WP_Style_Engine_Block_Supports {
 	 * @return void
 	 */
 	public static function reset_metadata() {
-		static::$merged_block_support_metadata = wp_json_decode( wp_json_encode( WP_Style_Engine::BLOCK_STYLE_DEFINITIONS_METADATA ), true );
+		static::$merged_block_support_metadata = json_decode( wp_json_encode( WP_Style_Engine::BLOCK_STYLE_DEFINITIONS_METADATA ), true );
 	}
 
 	/**
