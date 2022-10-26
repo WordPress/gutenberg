@@ -13,6 +13,15 @@
 	align-items: center;
 	height: $header-height;
 	display: flex;
+	justify-content: space-between;
+
+	.edit-site-layout:not(.is-full-canvas) & {
+		width: 100%;
+
+		@include break-small {
+			width: auto;
+		}
+	}
 
 	.components-button {
 		color: currentColor;
@@ -31,13 +40,19 @@
 .edit-site-layout__canvas {
 	background: $white;
 	color: $gray-900;
-	border-radius: $radius-block-ui * 2;
 	position: absolute;
-	top: $grid-unit-30;
+	top: 0;
+	right: 0;
+	bottom: 0;
 	left: 0;
-	right: $grid-unit-30;
-	bottom: $grid-unit-30;
 	overflow-y: auto;
+
+	@include break-small {
+		top: $grid-unit-30;
+		right: $grid-unit-30;
+		bottom: $grid-unit-30;
+		border-radius: $radius-block-ui * 2;
+	}
 
 	.edit-site-layout.is-full-canvas & {
 		top: 0;
