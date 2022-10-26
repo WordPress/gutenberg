@@ -646,7 +646,7 @@ return array(
 Starting in the WordPress 5.8 release, it is possible to instruct WordPress to enqueue scripts and styles for a block type only when rendered on the frontend. It applies to the following asset fields in the `block.json` file:
 
 -   `script`
--   `viewScript` (when the block defines `render_callback` during registration in PHP or a `render` field in its `block.json`, then the script is registered but the block author is responsible for enqueuing it)
+-   `viewScript`
 -   `style`
 
 ## Internationalization
