@@ -16,7 +16,7 @@ export type Border = {
 
 export type Color = {
 	name: string;
-	color: CSSProperties[ 'color' ];
+	color: NonNullable< CSSProperties[ 'color' ] >;
 };
 
 export type ColorOrigin = {
