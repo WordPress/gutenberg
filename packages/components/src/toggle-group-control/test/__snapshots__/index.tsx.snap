@@ -41,7 +41,6 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
 .emotion-8 {
   background: #fff;
   border: 1px solid transparent;
-  border-radius: 2px;
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
@@ -53,12 +52,17 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
   transition: transform 100ms linear;
   min-height: 36px;
   border-color: #757575;
+  border-radius: 2px;
 }
 
 @media ( prefers-reduced-motion: reduce ) {
   .emotion-8 {
     transition-duration: 0ms;
   }
+}
+
+.emotion-8:hover {
+  border-color: #757575;
 }
 
 .emotion-8:focus-within {
@@ -68,14 +72,9 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
   z-index: 1;
 }
 
-.emotion-8:hover {
-  border-color: #757575;
-}
-
 .emotion-10 {
   background: #1e1e1e;
   border-radius: 2px;
-  box-shadow: transparent;
   left: 0;
   position: absolute;
   top: 2px;
@@ -142,6 +141,11 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
   user-select: none;
   width: 100%;
   z-index: 2;
+  color: #1e1e1e;
+  width: 30px;
+  padding-left: 0;
+  padding-right: 0;
+  color: #fff;
 }
 
 @media ( prefers-reduced-motion: reduce ) {
@@ -158,24 +162,71 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
   background: #fff;
 }
 
+.emotion-14:active {
+  background: transparent;
+}
+
 .emotion-15 {
+  font-size: 13px;
+  line-height: 1;
+}
+
+.emotion-19 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  background: transparent;
+  border: none;
+  border-radius: 2px;
+  color: #757575;
+  fill: currentColor;
+  cursor: pointer;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  font-family: inherit;
+  height: 100%;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  line-height: 100%;
+  outline: none;
+  padding: 0 12px;
+  position: relative;
+  text-align: center;
+  -webkit-transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
+  transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 100%;
+  z-index: 2;
   color: #1e1e1e;
   width: 30px;
   padding-left: 0;
   padding-right: 0;
 }
 
-.emotion-16 {
-  color: #fff;
+@media ( prefers-reduced-motion: reduce ) {
+  .emotion-19 {
+    transition-duration: 0ms;
+  }
 }
 
-.emotion-16:active {
-  background: transparent;
+.emotion-19::-moz-focus-inner {
+  border: 0;
 }
 
-.emotion-17 {
-  font-size: 13px;
-  line-height: 1;
+.emotion-19:active {
+  background: #fff;
 }
 
 <div>
@@ -217,7 +268,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
           <button
             aria-checked="true"
             aria-label="Uppercase"
-            class="emotion-14 emotion-15 components-toggle-group-control-option-base emotion-16"
+            class="emotion-14 components-toggle-group-control-option-base"
             data-value="uppercase"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
@@ -226,7 +277,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
             tabindex="0"
           >
             <div
-              class="emotion-17 emotion-18"
+              class="emotion-15 emotion-16"
             >
               <svg
                 aria-hidden="true"
@@ -249,7 +300,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
           <button
             aria-checked="false"
             aria-label="Lowercase"
-            class="emotion-14 emotion-15 components-toggle-group-control-option-base"
+            class="emotion-19 components-toggle-group-control-option-base"
             data-value="lowercase"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
@@ -258,7 +309,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
             tabindex="-1"
           >
             <div
-              class="emotion-17 emotion-18"
+              class="emotion-15 emotion-16"
             >
               <svg
                 aria-hidden="true"
@@ -322,7 +373,6 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
 .emotion-8 {
   background: #fff;
   border: 1px solid transparent;
-  border-radius: 2px;
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
@@ -334,6 +384,7 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
   transition: transform 100ms linear;
   min-height: 36px;
   border-color: #757575;
+  border-radius: 2px;
 }
 
 @media ( prefers-reduced-motion: reduce ) {
@@ -342,15 +393,15 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
   }
 }
 
+.emotion-8:hover {
+  border-color: #757575;
+}
+
 .emotion-8:focus-within {
   border-color: var( --wp-admin-theme-color-darker-10, #006ba1);
   box-shadow: 0 0 0 0.5px var( --wp-admin-theme-color, #007cba);
   outline: none;
   z-index: 1;
-}
-
-.emotion-8:hover {
-  border-color: #757575;
 }
 
 .emotion-10 {
