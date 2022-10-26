@@ -56,14 +56,14 @@
 		$schema['properties']['revision_count'] = array(
 			'description' => __( 'The number of revisions of the template.' ),
 			'type'        => 'integer',
-			'context'     => array( 'view', 'edit', 'embed' ),
+			'context'     => array( 'edit', 'embed' ),
 			'readonly'    => true,
 		);
 
 		$schema['properties']['latest_revision_id'] = array(
 			'description' => __( 'The id of the latest revision of the template.' ),
 			'type'        => 'integer',
-			'context'     => array( 'view', 'edit', 'embed' ),
+			'context'     => array( 'edit', 'embed' ),
 			'readonly'    => true,
 		);
 
