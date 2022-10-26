@@ -108,9 +108,9 @@ function ToggleGroupControlOptionBase(
 					</button>
 				) : (
 					<Radio
-						as="button"
 						{ ...otherButtonProps }
 						{ ...otherContextProps }
+						as="button"
 						className={ classes }
 						data-value={ value }
 						ref={ forwardedRef }
