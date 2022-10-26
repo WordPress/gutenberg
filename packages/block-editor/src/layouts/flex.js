@@ -165,7 +165,6 @@ export default {
 				blockGapValue
 			);
 		}
-
 		return output;
 	},
 	getOrientation( layout ) {

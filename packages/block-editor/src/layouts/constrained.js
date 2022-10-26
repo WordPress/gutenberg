@@ -22,7 +22,7 @@ import { getCSSRules } from '@wordpress/style-engine';
  * Internal dependencies
  */
 import useSetting from '../components/use-setting';
-import { appendSelectors, getAlignmentsInfo, getBlockGapCSS } from './utils';
+import { appendSelectors, getBlockGapCSS, getAlignmentsInfo } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import { shouldSkipSerialization } from '../hooks/utils';
 
@@ -229,7 +229,6 @@ export default {
 				blockGapValue
 			);
 		}
-
 		return output;
 	},
 	getOrientation() {
