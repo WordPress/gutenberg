@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/components';
-import { Platform, useState } from '@wordpress/element';
+import { Platform, useState, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getBlockSupport } from '@wordpress/blocks';
 
@@ -46,8 +46,8 @@ export const AXIAL_SIDES = [ 'vertical', 'horizontal' ];
 
 function useVisualizerMouseOver() {
 	const [ isMouseOver, setIsMouseOver ] = useState( false );
-	const onMouseOver = () => setIsMouseOver( true );
-	const onMouseOut = () => setIsMouseOver( false );
+	const onMouseOver = useCallback( () => setIsMouseOver( true ), [] );
+	const onMouseOut = useCallback( () => setIsMouseOver( false ), [] );
 	return { isMouseOver, onMouseOver, onMouseOut };
 }
 
