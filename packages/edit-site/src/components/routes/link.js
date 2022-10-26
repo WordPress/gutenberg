@@ -32,20 +32,12 @@ export default function Link( {
 	state,
 	replace: shouldReplace = false,
 	children,
-	onClick: onClickProp,
 	...props
 } ) {
 	const { href, onClick } = useLink( params, state, shouldReplace );
 
 	return (
-		<a
-			href={ href }
-			onClick={ ( event ) => {
-				onClickProp( event );
-				onClick( event );
-			} }
-			{ ...props }
-		>
+		<a href={ href } onClick={ onClick } { ...props }>
 			{ children }
 		</a>
 	);
