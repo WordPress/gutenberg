@@ -453,6 +453,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 			[
 				'border',
 				'color',
+				'dimensions',
 				'spacing',
 				'typography',
 				'filter',

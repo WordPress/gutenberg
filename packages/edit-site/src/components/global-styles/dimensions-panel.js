@@ -35,8 +35,16 @@ export function useHasDimensionsPanel( name ) {
 	const hasPadding = useHasPadding( name );
 	const hasMargin = useHasMargin( name );
 	const hasGap = useHasGap( name );
+	const hasMinHeight = useHasMinHeight( name );
 
-	return hasContentSize || hasWideSize || hasPadding || hasMargin || hasGap;
+	return (
+		hasContentSize ||
+		hasWideSize ||
+		hasPadding ||
+		hasMargin ||
+		hasGap ||
+		hasMinHeight
+	);
 }
 
 function useHasContentSize( name ) {
@@ -72,6 +80,13 @@ function useHasGap( name ) {
 	const [ settings ] = useSetting( 'spacing.blockGap', name );
 
 	return settings && supports.includes( 'blockGap' );
+}
+
+function useHasMinHeight( name ) {
+	const supports = getSupportedGlobalStylesPanels( name );
+	const [ settings ] = useSetting( 'dimensions.minHeight', name );
+
+	return settings && supports.includes( 'minHeight' );
 }
 
 function useHasSpacingPresets() {
@@ -271,12 +286,29 @@ function useBlockGapProps( name ) {
 	};
 }
 
+// Props for managing `dimensions.minHeight`.
+function useMinHeightProps( name ) {
+	const [ minHeightValue, setMinHeightValue ] = useStyle(
+		'dimensions.minHeight',
+		name
+	);
+	const resetMinHeightValue = () => setMinHeightValue( undefined );
+	const hasMinHeightValue = () => !! minHeightValue;
+	return {
+		minHeightValue,
+		setMinHeightValue,
+		resetMinHeightValue,
+		hasMinHeightValue,
+	};
+}
+
 export default function DimensionsPanel( { name } ) {
 	const showContentSizeControl = useHasContentSize( name );
 	const showWideSizeControl = useHasWideSize( name );
 	const showPaddingControl = useHasPadding( name );
 	const showMarginControl = useHasMargin( name );
 	const showGapControl = useHasGap( name );
+	const showMinHeightControl = useHasMinHeight( name );
 	const showSpacingPresetsControl = useHasSpacingPresets();
 	const units = useCustomUnits( {
 		availableUnits: useSetting( 'spacing.units', name )[ 0 ] || [
@@ -335,6 +367,14 @@ export default function DimensionsPanel( { name } ) {
 		resetGapValue,
 		hasGapValue,
 	} = useBlockGapProps( name );
+
+	// Props for managing `dimensions.minHeight`.
+	const {
+		minHeightValue,
+		setMinHeightValue,
+		resetMinHeightValue,
+		hasMinHeightValue,
+	} = useMinHeightProps( name );
 
 	const resetAll = () => {
 		resetPaddingValue();
@@ -399,6 +439,23 @@ export default function DimensionsPanel( { name } ) {
 							<Icon icon={ stretchWide } />
 						</View>
 					</HStack>
+				</ToolsPanelItem>
+			) }
+			{ showMinHeightControl && (
+				<ToolsPanelItem
+					className="single-column"
+					hasValue={ hasMinHeightValue }
+					label={ __( 'Minimum height' ) }
+					onDeselect={ resetMinHeightValue }
+					isShownByDefault={ true }
+				>
+					<UnitControl
+						label={ __( 'Minimum height' ) }
+						value={ minHeightValue }
+						onChange={ setMinHeightValue }
+						units={ units }
+						min={ 0 }
+					/>
 				</ToolsPanelItem>
 			) }
 			{ showPaddingControl && (
