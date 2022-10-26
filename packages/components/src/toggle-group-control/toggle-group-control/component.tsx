@@ -22,6 +22,7 @@ import type { ToggleGroupControlProps } from '../types';
 import { VisualLabelWrapper } from './styles';
 import * as styles from './styles';
 import { ToggleGroupControlAsRadio } from './as-radio';
+import { ToggleGroupControlAsButtonGroup } from './as-button-group';
 
 const noop = () => {};
 
@@ -66,7 +67,19 @@ function UnconnectedToggleGroupControl(
 					<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel>
 				</VisualLabelWrapper>
 			) }
-			{ ! isDeselectable && (
+			{ isDeselectable ? (
+				<ToggleGroupControlAsButtonGroup
+					{ ...otherProps }
+					children={ children }
+					className={ classes }
+					isAdaptiveWidth={ isAdaptiveWidth }
+					label={ label }
+					onChange={ onChange }
+					ref={ forwardedRef }
+					size={ size }
+					value={ value }
+				/>
+			) : (
 				<ToggleGroupControlAsRadio
 					{ ...otherProps }
 					children={ children }
@@ -76,7 +89,7 @@ function UnconnectedToggleGroupControl(
 					onChange={ onChange }
 					ref={ forwardedRef }
 					size={ size }
-					value={ Array.isArray( value ) ? value[ 0 ] : value }
+					value={ value }
 				/>
 			) }
 		</BaseControl>

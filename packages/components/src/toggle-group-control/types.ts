@@ -124,14 +124,10 @@ export type ToggleGroupControlProps = Pick<
 	size?: 'default' | '__unstable-large';
 };
 
-export type ToggleGroupControlContextProps = RadioStateReturn &
-	Pick< ToggleGroupControlProps, 'size' > & {
-		/**
-		 * Renders `ToggleGroupControl` as a (CSS) block element.
-		 *
-		 * @default false
-		 */
-		isBlock?: boolean;
+export type ToggleGroupControlContextProps = Partial< RadioStateReturn > &
+	Pick< RadioStateReturn, 'state' | 'setState' > &
+	Pick< ToggleGroupControlProps, 'isBlock' | 'isDeselectable' | 'size' > & {
+		baseId: string;
 	};
 
 export type ToggleGroupControlBackdropProps = {

@@ -122,3 +122,13 @@ WithIcons.args = {
 		{ value: 'lowercase', label: 'Lowercase', icon: formatLowercase },
 	].map( mapPropsToOptionIconComponent ),
 };
+
+/**
+ * When the `isDeselectable` prop is true, the option can be deselected by clicking on it again.
+ */
+export const Deselectable: ComponentStory< typeof ToggleGroupControl > =
+	Template.bind( {} );
+Deselectable.args = {
+	...WithIcons.args,
+	isDeselectable: true,
+};

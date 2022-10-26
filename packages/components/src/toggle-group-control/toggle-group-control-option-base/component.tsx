@@ -58,20 +58,21 @@ function ToggleGroupControlOptionBase(
 		'ToggleGroupControlOptionBase'
 	);
 	const {
-		className,
 		isBlock = false,
+		isDeselectable = false,
+		size = 'default',
+		...otherContextProps
+	} = toggleGroupControlContext;
+	const {
+		className,
 		isIcon = false,
 		value,
 		children,
-		size = 'default',
 		showTooltip = false,
-		...radioProps
-	} = {
-		...toggleGroupControlContext,
-		...buttonProps,
-	};
+		...otherButtonProps
+	} = buttonProps;
 
-	const isActive = radioProps.state === value;
+	const isActive = otherContextProps.state === value;
 	const cx = useCx();
 	const labelViewClasses = cx( isBlock && styles.labelBlock );
 	const classes = cx(
@@ -81,23 +82,44 @@ function ToggleGroupControlOptionBase(
 		isActive && styles.buttonActive
 	);
 
+	const buttonOnClick = () => {
+		if ( isDeselectable && isActive ) {
+			otherContextProps.setState( undefined );
+		} else {
+			otherContextProps.setState( value );
+		}
+	};
+
 	return (
-		<LabelView className={ labelViewClasses } data-active={ isActive }>
+		<LabelView className={ labelViewClasses }>
 			<WithToolTip
 				showTooltip={ showTooltip }
-				text={ radioProps[ 'aria-label' ] }
+				text={ otherButtonProps[ 'aria-label' ] }
 			>
-				<Radio
-					{ ...radioProps }
-					as="button"
-					aria-label={ radioProps[ 'aria-label' ] }
-					className={ classes }
-					data-value={ value }
-					ref={ forwardedRef }
-					value={ value }
-				>
-					<ButtonContentView>{ children }</ButtonContentView>
-				</Radio>
+				{ isDeselectable ? (
+					<button
+						{ ...otherButtonProps }
+						type="button"
+						className={ classes }
+						data-value={ value }
+						onClick={ buttonOnClick }
+						ref={ forwardedRef }
+					>
+						<ButtonContentView>{ children }</ButtonContentView>
+					</button>
+				) : (
+					<Radio
+						as="button"
+						{ ...otherButtonProps }
+						{ ...otherContextProps }
+						className={ classes }
+						data-value={ value }
+						ref={ forwardedRef }
+						value={ value }
+					>
+						<ButtonContentView>{ children }</ButtonContentView>
+					</Radio>
+				) }
 			</WithToolTip>
 		</LabelView>
 	);
