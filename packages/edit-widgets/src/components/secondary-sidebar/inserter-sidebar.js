@@ -8,7 +8,7 @@ import {
 	useViewportMatch,
 	__experimentalUseDialog as useDialog,
 } from '@wordpress/compose';
-import { useCallback, useEffect, useRef } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
@@ -34,11 +34,6 @@ export default function InserterSidebar() {
 		focusOnMount: null,
 	} );
 
-	const libraryRef = useRef();
-	useEffect( () => {
-		libraryRef.current.focusSearch();
-	}, [] );
-
 	return (
 		<div
 			ref={ inserterDialogRef }
@@ -58,7 +53,6 @@ export default function InserterSidebar() {
 					shouldFocusBlock={ isMobileViewport }
 					rootClientId={ rootClientId }
 					__experimentalInsertionIndex={ insertionIndex }
-					ref={ libraryRef }
 				/>
 			</div>
 		</div>

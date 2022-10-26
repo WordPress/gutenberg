@@ -7,12 +7,11 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
-	forwardRef,
 	useState,
 	useCallback,
 	useMemo,
-	useImperativeHandle,
 	useRef,
+	useEffect,
 } from '@wordpress/element';
 import { VisuallyHidden, SearchControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -33,21 +32,18 @@ import useInsertionPoint from './hooks/use-insertion-point';
 import InserterTabs from './tabs';
 import { store as blockEditorStore } from '../../store';
 
-function InserterMenu(
-	{
-		rootClientId,
-		clientId,
-		isAppender,
-		__experimentalInsertionIndex,
-		onSelect,
-		showInserterHelpPanel,
-		showMostUsedBlocks,
-		__experimentalFilterValue = '',
-		shouldFocusBlock = true,
-		prioritizePatterns,
-	},
-	ref
-) {
+function InserterMenu( {
+	rootClientId,
+	clientId,
+	isAppender,
+	__experimentalInsertionIndex,
+	onSelect,
+	showInserterHelpPanel,
+	showMostUsedBlocks,
+	__experimentalFilterValue = '',
+	shouldFocusBlock = true,
+	prioritizePatterns,
+} ) {
 	const [ filterValue, setFilterValue ] = useState(
 		__experimentalFilterValue
 	);
@@ -171,12 +167,9 @@ function InserterMenu(
 	);
 
 	const searchRef = useRef();
-	// TODO: this doesn't work now..
-	useImperativeHandle( ref, () => ( {
-		focusSearch: () => {
-			searchRef.current?.focus();
-		},
-	} ) );
+	useEffect( () => {
+		searchRef.current?.focus();
+	}, [ selectedTab ] );
 
 	const getCurrentTab = useCallback(
 		( tab ) => {
@@ -239,6 +232,7 @@ function InserterMenu(
 				</>
 			);
 		},
+		// TODO: check/add deps..
 		[ blocksTab, patternsTab, reusableBlocksTab, filterValue ]
 	);
 
@@ -263,9 +257,9 @@ function InserterMenu(
 						{ getCurrentTab }
 					</InserterTabs>
 				) }
-				{ ! filterValue && ! showAsTabs && (
+				{ ! showAsTabs && (
 					<div className="block-editor-inserter__no-tab-container">
-						{ blocksTab }
+						{ getCurrentTab( { name: 'blocks' } ) }
 					</div>
 				) }
 			</div>
@@ -283,4 +277,4 @@ function InserterMenu(
 	);
 }
 
-export default forwardRef( InserterMenu );
+export default InserterMenu;

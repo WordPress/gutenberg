@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -12,20 +11,17 @@ import { store as blockEditorStore } from '../../store';
 
 const noop = () => {};
 
-function InserterLibrary(
-	{
-		rootClientId,
-		clientId,
-		isAppender,
-		showInserterHelpPanel,
-		showMostUsedBlocks = false,
-		__experimentalInsertionIndex,
-		__experimentalFilterValue,
-		onSelect = noop,
-		shouldFocusBlock = false,
-	},
-	ref
-) {
+function InserterLibrary( {
+	rootClientId,
+	clientId,
+	isAppender,
+	showInserterHelpPanel,
+	showMostUsedBlocks = false,
+	__experimentalInsertionIndex,
+	__experimentalFilterValue,
+	onSelect = noop,
+	shouldFocusBlock = false,
+} ) {
 	const { destinationRootClientId, prioritizePatterns } = useSelect(
 		( select ) => {
 			const { getBlockRootClientId, getSettings } =
@@ -54,9 +50,8 @@ function InserterLibrary(
 			__experimentalFilterValue={ __experimentalFilterValue }
 			shouldFocusBlock={ shouldFocusBlock }
 			prioritizePatterns={ prioritizePatterns }
-			ref={ ref }
 		/>
 	);
 }
 
-export default forwardRef( InserterLibrary );
+export default InserterLibrary;
