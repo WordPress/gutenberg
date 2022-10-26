@@ -196,29 +196,24 @@ test.describe( 'Gallery', () => {
 			);
 	} );
 
-	// Disable reason:
-	// This test would be good to enable, but the media modal contains an
-	// invalid role, which is causing Axe tests to fail:
-	// https://core.trac.wordpress.org/ticket/50273
-	//
-	// Attempts to add an Axe exception for the media modal haven't proved
-	// successful:
-	// https://github.com/WordPress/gutenberg/pull/22719
-	test.fixme(
-		'when initially added the media library shows the Create Gallery view',
-		async ( { admin, editor, page } ) => {
-			await admin.createNewPost();
-			await editor.insertBlock( { name: 'core/gallery' } );
-			await page.click( 'role=button[name="Media Library"i]' );
-			await page.waitForSelector( '.media-frame' );
-			expect( await page.innerText( '.media-frame-title h1' ) ).toBe(
-				'Create gallery'
-			);
-			expect(
-				await page.innerText( '.media-toolbar-primary button' )
-			).toBe( 'Create a new gallery' );
-		}
-	);
+	test( 'when initially added the media library shows the Create Gallery view', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( { name: 'core/gallery' } );
+		await page.click( 'role=button[name="Media Library"i]' );
+
+		const mediaLibrary = page.locator(
+			'role=dialog[name="Create gallery"i]'
+		);
+
+		await expect( mediaLibrary ).toBeVisible();
+		await expect(
+			mediaLibrary.locator( 'role=button[name="Create a new gallery"i]' )
+		).toBeVisible();
+	} );
 } );
 
 class GalleryBlockUtils {

@@ -565,7 +565,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
   border: 1px solid transparent;
   cursor: pointer;
   background: none;
-  text-align: left;
+  text-align: start;
   padding: calc((36px - calc(13px * 1.2) - 2px) / 2) 12px;
   width: 100%;
   display: block;

@@ -149,14 +149,6 @@ export type PopoverProps = {
 	 */
 	__unstableForcePosition?: boolean;
 	/**
-	 * Enables the `Popover` to shift in order to stay in view when meeting the
-	 * viewport edges.
-	 * _Note: this prop is deprecated. Use the `shift` prop instead._
-	 *
-	 * @deprecated
-	 */
-	__unstableShift?: boolean;
-	/**
 	 * An object extending a `DOMRect` with an additional optional `ownerDocument`
 	 * property, used to specify a fixed popover position.
 	 *
@@ -184,10 +176,4 @@ export type PopoverProps = {
 	getAnchorRect?: (
 		fallbackReferenceElement: Element | null
 	) => DomRectWithOwnerDocument;
-	/**
-	 * _Note: this prop is deprecated and has no effect on the component._
-	 *
-	 * @deprecated
-	 */
-	range?: unknown;
 };
