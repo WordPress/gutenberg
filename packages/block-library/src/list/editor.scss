@@ -1,0 +1,9 @@
+// In Safari, every nested block level element in a hierarchy gets highlighted
+// by a text selection marker, causing a stacked and incorrect appearance.
+// By forcing the editable to be full-width inline-block, this appearance is improved.
+.wp-block-list {
+	> li.block-editor-block-list__block > div.block-editor-rich-text__editable {
+		display: inline-block;
+		width: 100%;
+	}
+}
