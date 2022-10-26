@@ -29,16 +29,17 @@ class Gutenberg_REST_Pattern_Directory_Controller_6_2 extends Gutenberg_REST_Pat
 		require ABSPATH . WPINC . '/version.php';
 
 		$valid_query_args = array( 'offset', 'order', 'orderby', 'page', 'per_page', 'search', 'slug' );
-		$query_args = array_merge(
+		$query_args       = array_merge(
 			array_intersect_key( $request->get_params(), array_flip( $valid_query_args ) ),
 			array(
-				'locale' => get_user_locale(),
-				'wp-version' => $wp_version,
+				'locale'     => get_user_locale(),
+				'wp-version' => $wp_version, // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable -- it's defined in `version.php` above.
 			)
 		);
 
-		$query_args['pattern-categories'] = $request['category'] ?? false;
-		$query_args['pattern-keywords'] = $request['keyword'] ?? false;
+		$query_args['pattern-categories'] = isset( $request['category'] ) ? $request['category'] : false;
+		$query_args['pattern-keywords']   = isset( $request['keyword'] ) ? $request['keyword'] : false;
+
 		$query_args = array_filter( $query_args );
 
 		$transient_key = $this->get_transient_key( $query_args );
@@ -75,8 +76,8 @@ class Gutenberg_REST_Pattern_Directory_Controller_6_2 extends Gutenberg_REST_Pat
 					'pattern_api_failed',
 					sprintf(
 						/* translators: %s: Support forums URL. */
-						__( 'An unexpected error occurred. Something may be wrong with WordPress.org or this server&#8217;s configuration. If you continue to have problems, please try the <a href="%s">support forums</a>.' ),
-						__( 'https://wordpress.org/support/forums/' )
+						__( 'An unexpected error occurred. Something may be wrong with WordPress.org or this server&#8217;s configuration. If you continue to have problems, please try the <a href="%s">support forums</a>.', 'gutenberg' ),
+						__( 'https://wordpress.org/support/forums/', 'gutenberg' )
 					),
 					array(
 						'response' => wp_remote_retrieve_body( $wporg_response ),
