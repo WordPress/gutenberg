@@ -45,6 +45,8 @@ describe( 'ExternalLink', () => {
 			name: "I'm an anchor link! (opens in a new tab)",
 		} );
 
+		// We are using this approach so we can test the defaultPrevented
+		// without passing an onClick prop to the component.
 		const onClickMock = jest.fn();
 		link.onclick = onClickMock;
 
@@ -96,6 +98,8 @@ describe( 'ExternalLink', () => {
 			name: "I'm not an anchor link! (opens in a new tab)",
 		} );
 
+		// We are using this approach so we can test the defaultPrevented
+		// without passing an onClick prop to the component.
 		const onClickMock = jest.fn();
 		link.onclick = onClickMock;
 
