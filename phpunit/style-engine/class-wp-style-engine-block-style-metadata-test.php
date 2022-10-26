@@ -1,6 +1,6 @@
 <?php
 /**
- * Tests the Style Engine Block Supports class.
+ * Tests the Style Engine Block Style Metadata class.
  *
  * @package    Gutenberg
  * @subpackage style-engine
@@ -9,14 +9,14 @@
 /**
  * Tests fetching, extending and otherwise manipulation block supports style definitions.
  *
- * @coversDefaultClass WP_Style_Engine_Block_Supports_Gutenberg
+ * @coversDefaultClass WP_Style_Engine_Block_Style_Metadata_Gutenberg
  */
-class WP_Style_Engine_Block_Supports_Test extends WP_UnitTestCase {
+class WP_Style_Engine_Block_Style_Metadata_Test extends WP_UnitTestCase {
 	/**
 	 * Resets metadata after each test.
 	 */
 	public function tear_down() {
-		WP_Style_Engine_Block_Supports_Gutenberg::reset_metadata();
+		WP_Style_Engine_Block_Style_Metadata_Gutenberg::reset_metadata();
 		parent::tear_down();
 	}
 
@@ -26,16 +26,16 @@ class WP_Style_Engine_Block_Supports_Test extends WP_UnitTestCase {
 	 * @covers ::get_metadata
 	 */
 	public function test_should_get_metadata() {
-		$metadata = WP_Style_Engine_Block_Supports_Gutenberg::get_metadata();
+		$metadata = WP_Style_Engine_Block_Style_Metadata_Gutenberg::get_metadata();
 		$this->assertEquals( WP_Style_Engine_Gutenberg::BLOCK_STYLE_DEFINITIONS_METADATA, $metadata, 'Returning all default definitions' );
 
-		$color_metadata = WP_Style_Engine_Block_Supports_Gutenberg::get_metadata( array( 'color' ) );
+		$color_metadata = WP_Style_Engine_Block_Style_Metadata_Gutenberg::get_metadata( array( 'color' ) );
 		$this->assertEquals( WP_Style_Engine_Gutenberg::BLOCK_STYLE_DEFINITIONS_METADATA['color'], $color_metadata, 'Returning top-level color definition' );
 
-		$color_metadata = WP_Style_Engine_Block_Supports_Gutenberg::get_metadata( array( 'color', 'background' ) );
+		$color_metadata = WP_Style_Engine_Block_Style_Metadata_Gutenberg::get_metadata( array( 'color', 'background' ) );
 		$this->assertEquals( WP_Style_Engine_Gutenberg::BLOCK_STYLE_DEFINITIONS_METADATA['color']['background'], $color_metadata, 'Returning second-level color > background definition' );
 
-		$null_metadata = WP_Style_Engine_Block_Supports_Gutenberg::get_metadata( array( 'something', 'background' ) );
+		$null_metadata = WP_Style_Engine_Block_Style_Metadata_Gutenberg::get_metadata( array( 'something', 'background' ) );
 		$this->assertNull( $null_metadata, 'Returning `null` where the path is invalid' );
 	}
 
@@ -72,8 +72,8 @@ class WP_Style_Engine_Block_Supports_Test extends WP_UnitTestCase {
 				),
 			),
 		);
-		WP_Style_Engine_Block_Supports_Gutenberg::add_metadata( $new_metadata );
-		$this->assertEquals( $new_metadata['layout'], WP_Style_Engine_Block_Supports_Gutenberg::get_metadata( array( 'layout' ) ), 'A new style definition for `layout` should be registered' );
+		WP_Style_Engine_Block_Style_Metadata_Gutenberg::add_metadata( $new_metadata );
+		$this->assertEquals( $new_metadata['layout'], WP_Style_Engine_Block_Style_Metadata_Gutenberg::get_metadata( array( 'layout' ) ), 'A new style definition for `layout` should be registered' );
 
 		$block_styles     = array(
 			'layout' => array(
@@ -117,8 +117,8 @@ class WP_Style_Engine_Block_Supports_Test extends WP_UnitTestCase {
 				),
 			),
 		);
-		WP_Style_Engine_Block_Supports_Gutenberg::add_metadata( $new_metadata );
-		$this->assertEquals( $new_metadata['typography']['textIndent'], WP_Style_Engine_Block_Supports_Gutenberg::get_metadata( array( 'typography', 'textIndent' ) ) );
+		WP_Style_Engine_Block_Style_Metadata_Gutenberg::add_metadata( $new_metadata );
+		$this->assertEquals( $new_metadata['typography']['textIndent'], WP_Style_Engine_Block_Style_Metadata_Gutenberg::get_metadata( array( 'typography', 'textIndent' ) ) );
 
 		$block_styles     = array(
 			'typography' => array(
@@ -170,10 +170,10 @@ class WP_Style_Engine_Block_Supports_Test extends WP_UnitTestCase {
 			),
 		);
 
-		WP_Style_Engine_Block_Supports_Gutenberg::add_metadata( $new_metadata );
+		WP_Style_Engine_Block_Style_Metadata_Gutenberg::add_metadata( $new_metadata );
 		$this->assertEquals(
 			$expected_merged_metadata['spacing']['padding'],
-			WP_Style_Engine_Block_Supports_Gutenberg::get_metadata( array( 'spacing', 'padding' ) ),
+			WP_Style_Engine_Block_Style_Metadata_Gutenberg::get_metadata( array( 'spacing', 'padding' ) ),
 			'The newly-merged property metadata should be present'
 		);
 
@@ -240,8 +240,8 @@ class WP_Style_Engine_Block_Supports_Test extends WP_UnitTestCase {
 			),
 		);
 
-		WP_Style_Engine_Block_Supports_Gutenberg::add_metadata( $new_metadata );
-		$this->assertEquals( $expected_merged_metadata['spacing']['padding'], WP_Style_Engine_Block_Supports_Gutenberg::get_metadata( array( 'spacing', 'padding' ) ), 'Should merge' );
+		WP_Style_Engine_Block_Style_Metadata_Gutenberg::add_metadata( $new_metadata );
+		$this->assertEquals( $expected_merged_metadata['spacing']['padding'], WP_Style_Engine_Block_Style_Metadata_Gutenberg::get_metadata( array( 'spacing', 'padding' ) ), 'Should merge' );
 		$this->assertEquals( $expected_original_metadata['spacing']['padding'], WP_Style_Engine_Gutenberg::BLOCK_STYLE_DEFINITIONS_METADATA['spacing']['padding'], 'Should not affect original' );
 	}
 }

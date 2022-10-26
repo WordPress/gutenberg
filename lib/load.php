@@ -215,8 +215,8 @@ if ( is_dir( __DIR__ . '/../build/style-engine' ) ) {
 	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-css-rules-store-gutenberg.php';
 	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-processor-gutenberg.php';
 }
-if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-block-supports-gutenberg.php' ) ) {
-	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-block-supports-gutenberg.php';
+if ( file_exists( __DIR__ . '/../build/style-engine/class-wp-style-engine-block-style-metadata-gutenberg.php' ) ) {
+	require_once __DIR__ . '/../build/style-engine/class-wp-style-engine-block-style-metadata-gutenberg.php';
 }
 
 // Block supports overrides.

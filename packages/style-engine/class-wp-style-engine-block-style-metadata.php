@@ -1,13 +1,13 @@
 <?php
 /**
- * WP_Style_Engine_Block_Supports
+ * WP_Style_Engine_Block_Style_Metadata
  *
  * Stores block support metadata and associated rules.
  *
  * @package Gutenberg
  */
 
-if ( class_exists( 'WP_Style_Engine_Block_Supports' ) ) {
+if ( class_exists( 'WP_Style_Engine_Block_Style_Metadata' ) ) {
 	return;
 }
 
@@ -16,7 +16,7 @@ if ( class_exists( 'WP_Style_Engine_Block_Supports' ) ) {
  *
  * @access private
  */
-final class WP_Style_Engine_Block_Supports {
+final class WP_Style_Engine_Block_Style_Metadata {
 	/**
 	 * The merged metadata.
 	 *
