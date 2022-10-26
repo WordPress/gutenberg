@@ -61,7 +61,7 @@ function ToggleGroupControlOptionBase(
 		isBlock = false,
 		isDeselectable = false,
 		size = 'default',
-		...otherContextProps
+		...otherContextProps /* context props for Ariakit Radio */
 	} = toggleGroupControlContext;
 	const {
 		className,
@@ -109,7 +109,9 @@ function ToggleGroupControlOptionBase(
 				) : (
 					<Radio
 						{ ...otherButtonProps }
-						{ ...otherContextProps }
+						{
+							...otherContextProps /* these are only for Ariakit Radio */
+						}
 						as="button"
 						className={ classes }
 						data-value={ value }
