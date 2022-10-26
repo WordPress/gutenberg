@@ -25,13 +25,11 @@ if ( ! function_exists( 'wp_theme_has_theme_json' ) ) {
 		}
 
 		// Has the own theme a theme.json?
-		$candidate         = get_stylesheet_directory() . '/theme.json';
-		$theme_has_support = is_readable( $candidate );
+		$theme_has_support = is_readable( get_stylesheet_directory() . '/theme.json' );
 
-		// Has the parent a theme.json if the theme does not?
+		// Look up the parent if the child does not have a theme.json.
 		if ( ! $theme_has_support ) {
-			$candidate         = get_template_directory() . '/theme.json';
-			$theme_has_support = is_readable( $candidate );
+			$theme_has_support = is_readable( get_template_directory() . '/theme.json' );
 		}
 
 		return $theme_has_support;
