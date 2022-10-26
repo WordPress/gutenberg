@@ -101,13 +101,14 @@ function InterfaceSkeleton(
 			<div className="interface-interface-skeleton__editor">
 				{ !! header && isDistractionFree && (
 					<NavigableRegion
-						initial={ isDistractionFree ? 'hidden' : 'hover' }
-						whileHover="hover"
-						variants={ headerVariants }
-						transition={ { type: 'tween', delay: 0.8 } }
 						className="interface-interface-skeleton__header"
 						aria-label={ mergedLabels.header }
-						useMotion={ true }
+						motionProps={ {
+							initial: isDistractionFree ? 'hidden' : 'hover',
+							whileHover: 'hover',
+							variants: headerVariants,
+							transition: { type: 'tween', delay: 0.8 },
+						} }
 					>
 						{ header }
 					</NavigableRegion>

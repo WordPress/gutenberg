@@ -12,19 +12,9 @@ export default function NavigableRegion( {
 	children,
 	className,
 	ariaLabel,
-	useMotion = false,
-	...props
+	motionProps = {},
 } ) {
-	const Tag = useMotion ? motion.div : 'div';
-
-	const motionProps = useMotion
-		? {
-				initial: props.initial,
-				whileHover: props.whileHover,
-				variants: props.variants,
-				transition: props.transition,
-		  }
-		: {};
+	const Tag = Object.keys( motionProps ).length ? motion.div : 'div';
 
 	return (
 		<Tag
