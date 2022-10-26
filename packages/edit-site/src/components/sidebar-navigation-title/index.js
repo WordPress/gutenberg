@@ -3,8 +3,6 @@
  */
 import {
 	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-	__experimentalView as View,
 	__experimentalNavigatorBackButton as NavigatorBackButton,
 	Button,
 } from '@wordpress/components';
@@ -18,24 +16,18 @@ export default function SidebarNavigationTitle( {
 } ) {
 	const BackComponent = parentHref ? Button : NavigatorBackButton;
 	return (
-		<VStack spacing={ 10 }>
-			<View>
-				<HStack spacing={ 2 }>
-					<BackComponent
-						className="edit-site-sidebar-navigation-title__back"
-						icon={ isRTL() ? chevronRight : chevronLeft }
-						aria-label={ sprintf(
-							/* translators: %s: previous page. */
-							__( 'Navigate to the previous view: %s' ),
-							parentTitle
-						) }
-						href={ parentHref }
-					>
-						{ parentTitle }
-					</BackComponent>
-				</HStack>
-			</View>
+		<HStack spacing={ 2 } justify="flex-start">
+			<BackComponent
+				className="edit-site-sidebar-navigation-title__back"
+				icon={ isRTL() ? chevronRight : chevronLeft }
+				aria-label={ sprintf(
+					/* translators: %s: previous page. */
+					__( 'Navigate to the previous view: %s' ),
+					parentTitle
+				) }
+				href={ parentHref }
+			/>
 			<div className="edit-site-sidebar-navigation-title">{ title }</div>
-		</VStack>
+		</HStack>
 	);
 }

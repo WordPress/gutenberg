@@ -33,13 +33,11 @@ export default function SidebarNavigationRoot() {
 
 	return (
 		<VStack spacing={ 6 }>
-			<div className="edit-site-sidebar-navigation-root__header">
-				<SidebarNavigationTitle
-					parentTitle={ __( 'Dashboard' ) }
-					title={ __( 'Design' ) }
-					parentHref="index.php"
-				/>
-			</div>
+			<SidebarNavigationTitle
+				parentTitle={ __( 'Dashboard' ) }
+				title={ __( 'Design' ) }
+				parentHref="index.php"
+			/>
 			<nav>
 				<ItemGroup>
 					<SidebarNavigationItem
