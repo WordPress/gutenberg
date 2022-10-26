@@ -643,30 +643,32 @@ export default function Image( {
 			{ ! temporaryURL && controls }
 			{ img }
 			{ showCaption &&
-      ( ! RichText.isEmpty( caption ) || isSelected ) && (
-				<RichText
-					className={ __experimentalGetElementClassName( 'caption' ) }
-					ref={ captionRef }
-					tagName="figcaption"
-					aria-label={ __( 'Image caption text' ) }
-					placeholder={ __( 'Add caption' ) }
-					value={ caption }
-					id={
-						! alt && ! RichText.isEmpty( caption )
-							? describedById
-							: undefined
-					}
-					onChange={ ( value ) =>
-						setAttributes( { caption: value } )
-					}
-					inlineToolbar
-					__unstableOnSplitAtEnd={ () =>
-						insertBlocksAfter(
-							createBlock( getDefaultBlockName() )
-						)
-					}
-				/>
-			) }
+				( ! RichText.isEmpty( caption ) || isSelected ) && (
+					<RichText
+						className={ __experimentalGetElementClassName(
+							'caption'
+						) }
+						ref={ captionRef }
+						tagName="figcaption"
+						aria-label={ __( 'Image caption text' ) }
+						placeholder={ __( 'Add caption' ) }
+						value={ caption }
+						id={
+							! alt && ! RichText.isEmpty( caption )
+								? describedById
+								: undefined
+						}
+						onChange={ ( value ) =>
+							setAttributes( { caption: value } )
+						}
+						inlineToolbar
+						__unstableOnSplitAtEnd={ () =>
+							insertBlocksAfter(
+								createBlock( getDefaultBlockName() )
+							)
+						}
+					/>
+				) }
 		</ImageEditingProvider>
 	);
 }
