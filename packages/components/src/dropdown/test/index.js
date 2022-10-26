@@ -1,42 +1,28 @@
 /**
  * External dependencies
  */
-import { fireEvent, render } from '@testing-library/react';
+import { act, fireEvent, render, waitFor } from '@testing-library/react';
 
 /**
  * Internal dependencies
  */
 import Dropdown from '../';
 
-function getButtonElement( container ) {
-	return container.querySelector( 'button' );
-}
-function getOpenCloseButton( container, selector ) {
-	return container.querySelector( selector );
+function getPopover( container ) {
+	return container.querySelector( '.components-popover' );
 }
 
 describe( 'Dropdown', () => {
-	function expectPopoverVisible( container, value ) {
-		const popover = container.querySelector( '.components-popover' );
-		if ( value ) {
-			expect( popover ).toBeTruthy();
-		} else {
-			expect( popover ).toBeFalsy();
-		}
-	}
-
-	it( 'should toggle the dropdown properly', () => {
+	it( 'should toggle the dropdown properly', async () => {
 		const expectButtonExpanded = ( container, expanded ) => {
 			expect( container.querySelectorAll( 'button' ) ).toHaveLength( 1 );
-			expect( getButtonElement( container ) ).toHaveAttribute(
+			expect( container.querySelector( 'button' ) ).toHaveAttribute(
 				'aria-expanded',
 				expanded.toString()
 			);
 		};
 
-		const {
-			container: { firstChild: dropdownContainer },
-		} = render(
+		const { container } = render(
 			<Dropdown
 				className="container"
 				contentClassName="content"
@@ -49,20 +35,28 @@ describe( 'Dropdown', () => {
 			/>
 		);
 
-		expectButtonExpanded( dropdownContainer, false );
-		expectPopoverVisible( dropdownContainer, false );
+		const dropdownContainer = container.firstChild;
 
-		const button = getButtonElement( dropdownContainer );
+		expectButtonExpanded( dropdownContainer, false );
+		expect( getPopover( dropdownContainer ) ).not.toBeInTheDocument();
+
+		const button = dropdownContainer.querySelector( 'button' );
 		fireEvent.click( button );
 
+		// Wait for the `floating-ui` effects in `DropDown`/`Popover` to finish running
+		// See also: https://floating-ui.com/docs/react-dom#testing
+		await act( () => Promise.resolve() );
+
 		expectButtonExpanded( dropdownContainer, true );
-		expectPopoverVisible( dropdownContainer, true );
+
+		// we need to wait because showing the dropdown is animated
+		await waitFor( () =>
+			expect( getPopover( dropdownContainer ) ).toBeVisible()
+		);
 	} );
 
-	it( 'should close the dropdown when calling onClose', () => {
-		const {
-			container: { firstChild: dropdownContainer },
-		} = render(
+	it( 'should close the dropdown when calling onClose', async () => {
+		const { container } = render(
 			<Dropdown
 				className="container"
 				contentClassName="content"
@@ -83,16 +77,29 @@ describe( 'Dropdown', () => {
 			/>
 		);
 
-		expectPopoverVisible( dropdownContainer, false );
+		const dropdownContainer = container.firstChild;
 
-		const openButton = getOpenCloseButton( dropdownContainer, '.open' );
+		expect( getPopover( dropdownContainer ) ).not.toBeInTheDocument();
+
+		const openButton = dropdownContainer.querySelector( '.open' );
 		fireEvent.click( openButton );
 
-		expectPopoverVisible( dropdownContainer, true );
+		// Wait for the `floating-ui` effects in `Dropdown`/`Popover` to finish running
+		// See also: https://floating-ui.com/docs/react-dom#testing
+		await act( () => Promise.resolve() );
 
-		const closeButton = getOpenCloseButton( dropdownContainer, '.close' );
+		// we need to wait because showing the dropdown is animated
+		await waitFor( () =>
+			expect( getPopover( dropdownContainer ) ).toBeVisible()
+		);
+
+		const closeButton = dropdownContainer.querySelector( '.close' );
 		fireEvent.click( closeButton );
 
-		expectPopoverVisible( dropdownContainer, false );
+		// Wait for the `floating-ui` effects in `Dropdown`/`Popover` to finish running
+		// See also: https://floating-ui.com/docs/react-dom#testing
+		await act( () => Promise.resolve() );
+
+		expect( getPopover( dropdownContainer ) ).not.toBeInTheDocument();
 	} );
 } );

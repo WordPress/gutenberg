@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { render, screen, fireEvent, within } from '@testing-library/react';
+import { act } from 'react-test-renderer';
 
 /**
  * Internal dependencies
@@ -170,9 +171,10 @@ const getMenuButton = () => {
  *
  * @return {HTMLElement} The menuButton.
  */
-const openDropdownMenu = () => {
+const openDropdownMenu = async () => {
 	const menuButton = getMenuButton();
 	fireEvent.click( menuButton );
+	await act( () => Promise.resolve() );
 	return menuButton;
 };
 
@@ -240,16 +242,16 @@ describe( 'ToolsPanel', () => {
 			expect( menu ).not.toBeInTheDocument();
 		} );
 
-		it( 'should render panel menu when at least one panel item', () => {
+		it( 'should render panel menu when at least one panel item', async () => {
 			renderPanel();
 
-			const menuButton = openDropdownMenu();
+			const menuButton = await openDropdownMenu();
 			expect( menuButton ).toBeInTheDocument();
 		} );
 
 		it( 'should render reset all item in menu', async () => {
 			renderPanel();
-			openDropdownMenu();
+			await openDropdownMenu();
 
 			const resetAllItem = await screen.findByRole( 'menuitem' );
 
@@ -258,7 +260,7 @@ describe( 'ToolsPanel', () => {
 
 		it( 'should render panel menu items correctly', async () => {
 			renderPanel();
-			openDropdownMenu();
+			await openDropdownMenu();
 
 			const menuItems = await screen.findAllByRole( 'menuitemcheckbox' );
 
@@ -355,7 +357,7 @@ describe( 'ToolsPanel', () => {
 					</ToolsPanelItem>
 				</ToolsPanel>
 			);
-			openDropdownMenu();
+			await openDropdownMenu();
 
 			const menuGroups = screen.getAllByRole( 'group' );
 
@@ -419,7 +421,7 @@ describe( 'ToolsPanel', () => {
 			let linkedItem = screen.queryByText( 'Linked control' );
 			expect( linkedItem ).not.toBeInTheDocument();
 
-			openDropdownMenu();
+			await openDropdownMenu();
 
 			// The linked control should initially appear in the optional controls
 			// menu group. There should be three menu groups: default controls,
@@ -503,7 +505,7 @@ describe( 'ToolsPanel', () => {
 
 			// The conditional control should not yet appear in the default controls
 			// menu group.
-			openDropdownMenu();
+			await openDropdownMenu();
 			let menuGroups = screen.getAllByRole( 'group' );
 			let defaultItem = within( menuGroups[ 0 ] ).queryByText(
 				'Conditional'
@@ -735,7 +737,7 @@ describe( 'ToolsPanel', () => {
 
 		it( 'should render grouped items within the menu', async () => {
 			renderGroupedItemsInPanel();
-			openDropdownMenu();
+			await openDropdownMenu();
 
 			const defaultItem = screen.getByText( 'Nested Control 1' );
 			const defaultMenuItem = screen.getByRole( 'menuitem', {
@@ -771,9 +773,9 @@ describe( 'ToolsPanel', () => {
 			expect( altItem ).not.toBeInTheDocument();
 		} );
 
-		it( 'should render wrapped items within the menu', () => {
+		it( 'should render wrapped items within the menu', async () => {
 			renderWrappedItemInPanel();
-			openDropdownMenu();
+			await openDropdownMenu();
 
 			const defaultItem = screen.getByText( 'Nested Control 1' );
 			const defaultMenuItem = screen.getByRole( 'menuitem', {

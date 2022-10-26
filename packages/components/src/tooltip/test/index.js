@@ -24,7 +24,7 @@ describe( 'Tooltip', () => {
 			);
 
 			const button = screen.getByText( 'Button 1' );
-			button.focus();
+			act( () => button.focus() );
 			expect( screen.queryByText( 'Help text' ) ).not.toBeInTheDocument();
 		} );
 
@@ -41,7 +41,7 @@ describe( 'Tooltip', () => {
 			expect( screen.queryByText( 'Help text' ) ).not.toBeInTheDocument();
 		} );
 
-		it( 'should render children with additional tooltip when focused', () => {
+		it( 'should render children with additional tooltip when focused', async () => {
 			const mockOnFocus = jest.fn();
 
 			render(
@@ -56,7 +56,7 @@ describe( 'Tooltip', () => {
 			// Before focus, the tooltip is not shown.
 			expect( screen.queryByText( 'Help text' ) ).not.toBeInTheDocument();
 
-			button.focus();
+			await act( () => button.focus() );
 
 			// Tooltip is shown after focusing the anchor.
 			expect( screen.getByText( 'Help text' ) ).toBeInTheDocument();
@@ -86,7 +86,7 @@ describe( 'Tooltip', () => {
 			// Tooltip hasn't appeared yet
 			expect( screen.queryByText( 'Help text' ) ).not.toBeInTheDocument();
 
-			act( () => jest.advanceTimersByTime( TOOLTIP_DELAY ) );
+			await act( () => jest.advanceTimersByTime( TOOLTIP_DELAY ) );
 
 			// Tooltip shows after the delay
 			expect( screen.getByText( 'Help text' ) ).toBeInTheDocument();
@@ -158,7 +158,9 @@ describe( 'Tooltip', () => {
 			expect( screen.queryByText( 'Help text' ) ).not.toBeInTheDocument();
 
 			// Advance time again, so that we reach the full TEST_DELAY time
-			act( () => jest.advanceTimersByTime( TEST_DELAY - TOOLTIP_DELAY ) );
+			await act( () =>
+				jest.advanceTimersByTime( TEST_DELAY - TOOLTIP_DELAY )
+			);
 
 			// Tooltip shows after TEST_DELAY time
 			expect( screen.getByText( 'Help text' ) ).toBeInTheDocument();
@@ -195,7 +197,7 @@ describe( 'Tooltip', () => {
 				screen.queryByText( 'Show helpful text here' )
 			).not.toBeInTheDocument();
 
-			act( () => jest.advanceTimersByTime( TOOLTIP_DELAY ) );
+			await act( () => jest.advanceTimersByTime( TOOLTIP_DELAY ) );
 
 			// Tooltip shows after the delay
 			expect(

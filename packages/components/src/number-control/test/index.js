@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { act, render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -59,13 +59,13 @@ describe( 'NumberControl', () => {
 			);
 
 			const input = getInput();
-			input.focus();
+			act( () => input.focus() );
 			fireEvent.change( input, { target: { value: 10 } } );
 
 			expect( spy ).toHaveBeenCalledWith( '10' );
 		} );
 
-		it( 'should call onChange callback when value is clamped on blur', async () => {
+		it( 'should call onChange callback when value is clamped on blur', () => {
 			const spy = jest.fn();
 			render(
 				<NumberControl
@@ -77,22 +77,18 @@ describe( 'NumberControl', () => {
 			);
 
 			const input = getInput();
-			input.focus();
+			act( () => input.focus() );
 			fireEvent.change( input, { target: { value: 1 } } );
 
 			// Before blurring, the value is still un-clamped
 			expect( input.value ).toBe( '1' );
 
-			input.blur();
+			act( () => input.blur() );
 
 			// After blur, value is clamped
 			expect( input.value ).toBe( '4' );
 
-			// After the blur, the `onChange` callback fires asynchronously.
-			await waitFor( () => {
-				expect( spy ).toHaveBeenCalledTimes( 2 );
-			} );
-
+			expect( spy ).toHaveBeenCalledTimes( 2 );
 			expect( spy ).toHaveBeenNthCalledWith( 1, '1' );
 			expect( spy ).toHaveBeenNthCalledWith( 2, 4 );
 		} );
@@ -111,7 +107,7 @@ describe( 'NumberControl', () => {
 			);
 
 			const input = getInput();
-			input.focus();
+			act( () => input.focus() );
 			fireEvent.change( input, { target: { value: 14 } } );
 
 			expect( input.value ).toBe( '14' );
@@ -134,7 +130,7 @@ describe( 'NumberControl', () => {
 			render( <NumberControl value={ 5 } min={ 0 } max={ 10 } /> );
 
 			const input = getInput();
-			input.focus();
+			act( () => input.focus() );
 			fireEvent.change( input, { target: { value: -100 } } );
 			fireKeyDown( { keyCode: ENTER } );
 
@@ -150,13 +146,13 @@ describe( 'NumberControl', () => {
 			render( <NumberControl value={ 5 } min={ 0 } max={ 10 } /> );
 
 			const input = getInput();
-			input.focus();
+			act( () => input.focus() );
 			fireEvent.change( input, { target: { value: 41 } } );
 
 			// Before blurring, the value is still un-clamped
 			expect( input.value ).toBe( '41' );
 
-			input.blur();
+			act( () => input.blur() );
 
 			// After blur, value is clamped
 			expect( input.value ).toBe( '10' );
@@ -166,7 +162,7 @@ describe( 'NumberControl', () => {
 			render( <NumberControl value={ 5 } required={ true } /> );
 
 			const input = getInput();
-			input.focus();
+			act( () => input.focus() );
 			fireEvent.change( input, { target: { value: '10 abc' } } );
 			fireKeyDown( { keyCode: ENTER } );
 
@@ -177,7 +173,7 @@ describe( 'NumberControl', () => {
 			render( <NumberControl value={ 5 } required={ false } /> );
 
 			const input = getInput();
-			input.focus();
+			act( () => input.focus() );
 			fireEvent.change( input, { target: { value: '10 abc' } } );
 			fireKeyDown( { keyCode: ENTER } );
 
@@ -188,7 +184,7 @@ describe( 'NumberControl', () => {
 			render( <NumberControl value={ 5 } required={ false } /> );
 
 			const input = getInput();
-			input.focus();
+			act( () => input.focus() );
 			fireEvent.change( input, { target: { value: '' } } );
 			fireKeyDown( { keyCode: ENTER } );
 
@@ -199,7 +195,7 @@ describe( 'NumberControl', () => {
 			render( <NumberControl value={ 5 } /> );
 
 			const input = getInput();
-			input.focus();
+			act( () => input.focus() );
 			fireEvent.change( input, { target: { value: '' } } );
 			fireKeyDown( { keyCode: ENTER } );
 
@@ -210,7 +206,7 @@ describe( 'NumberControl', () => {
 			render( <NumberControl value={ 5 } required={ true } /> );
 
 			const input = getInput();
-			input.focus();
+			act( () => input.focus() );
 			fireEvent.change( input, { target: { value: '' } } );
 			fireKeyDown( { keyCode: ENTER } );
 
@@ -224,7 +220,8 @@ describe( 'NumberControl', () => {
 
 			render( <StatefulNumberControl value={ 5 } onKeyDown={ spy } /> );
 
-			getInput().focus();
+			const input = getInput();
+			act( () => input.focus() );
 			fireKeyDown( { keyCode: UP } );
 
 			expect( spy ).toHaveBeenCalled();
@@ -234,7 +231,7 @@ describe( 'NumberControl', () => {
 			render( <StatefulNumberControl value={ 5 } /> );
 
 			const input = getInput();
-			input.focus();
+			act( () => input.focus() );
 			fireKeyDown( { keyCode: UP } );
 
 			expect( input.value ).toBe( '6' );
@@ -244,7 +241,7 @@ describe( 'NumberControl', () => {
 			render( <StatefulNumberControl value={ -5 } /> );
 
 			const input = getInput();
-			input.focus();
+			act( () => input.focus() );
 			fireKeyDown( { keyCode: UP } );
 
 			expect( input.value ).toBe( '-4' );
@@ -254,7 +251,7 @@ describe( 'NumberControl', () => {
 			render( <StatefulNumberControl value={ 866.5309 } step="any" /> );
 
 			const input = getInput();
-			input.focus();
+			act( () => input.focus() );
 			fireKeyDown( { keyCode: UP } );
 
 			expect( input.value ).toBe( '867.5309' );
@@ -264,7 +261,7 @@ describe( 'NumberControl', () => {
 			render( <StatefulNumberControl value={ 5 } shiftStep={ 10 } /> );
 
 			const input = getInput();
-			input.focus();
+			act( () => input.focus() );
 			fireKeyDown( { keyCode: UP, shiftKey: true } );
 
 			expect( input.value ).toBe( '20' );
@@ -274,7 +271,7 @@ describe( 'NumberControl', () => {
 			render( <StatefulNumberControl value={ 857.5309 } step="any" /> );
 
 			const input = getInput();
-			input.focus();
+			act( () => input.focus() );
 			fireKeyDown( { keyCode: UP, shiftKey: true } );
 
 			expect( input.value ).toBe( '867.5309' );
@@ -284,7 +281,7 @@ describe( 'NumberControl', () => {
 			render( <StatefulNumberControl value={ 5 } shiftStep={ 100 } /> );
 
 			const input = getInput();
-			input.focus();
+			act( () => input.focus() );
 			fireKeyDown( { keyCode: UP, shiftKey: true } );
 
 			expect( input.value ).toBe( '100' );
@@ -300,7 +297,7 @@ describe( 'NumberControl', () => {
 			);
 
 			const input = getInput();
-			input.focus();
+			act( () => input.focus() );
 			fireKeyDown( { keyCode: UP, shiftKey: true } );
 
 			expect( input.value ).toBe( '99' );
@@ -316,7 +313,7 @@ describe( 'NumberControl', () => {
 			);
 
 			const input = getInput();
-			input.focus();
+			act( () => input.focus() );
 			fireKeyDown( { keyCode: UP, shiftKey: true } );
 
 			expect( input.value ).toBe( '6' );
@@ -328,7 +325,8 @@ describe( 'NumberControl', () => {
 			const spy = jest.fn();
 			render( <StatefulNumberControl value={ 5 } onKeyDown={ spy } /> );
 
-			getInput().focus();
+			const input = getInput();
+			act( () => input.focus() );
 			fireKeyDown( { keyCode: DOWN } );
 
 			expect( spy ).toHaveBeenCalled();
@@ -338,7 +336,7 @@ describe( 'NumberControl', () => {
 			render( <StatefulNumberControl value={ 5 } /> );
 
 			const input = getInput();
-			input.focus();
+			act( () => input.focus() );
 			fireKeyDown( { keyCode: DOWN } );
 
 			expect( input.value ).toBe( '4' );
@@ -348,7 +346,7 @@ describe( 'NumberControl', () => {
 			render( <StatefulNumberControl value={ -5 } /> );
 
 			const input = getInput();
-			input.focus();
+			act( () => input.focus() );
 			fireKeyDown( { keyCode: DOWN } );
 
 			expect( input.value ).toBe( '-6' );
@@ -358,7 +356,7 @@ describe( 'NumberControl', () => {
 			render( <StatefulNumberControl value={ 868.5309 } step="any" /> );
 
 			const input = getInput();
-			input.focus();
+			act( () => input.focus() );
 			fireKeyDown( { keyCode: DOWN } );
 
 			expect( input.value ).toBe( '867.5309' );
@@ -368,7 +366,7 @@ describe( 'NumberControl', () => {
 			render( <StatefulNumberControl value={ 5 } /> );
 
 			const input = getInput();
-			input.focus();
+			act( () => input.focus() );
 			fireKeyDown( { keyCode: DOWN, shiftKey: true } );
 
 			expect( input.value ).toBe( '0' );
@@ -378,7 +376,7 @@ describe( 'NumberControl', () => {
 			render( <StatefulNumberControl value={ 877.5309 } step="any" /> );
 
 			const input = getInput();
-			input.focus();
+			act( () => input.focus() );
 			fireKeyDown( { keyCode: DOWN, shiftKey: true } );
 
 			expect( input.value ).toBe( '867.5309' );
@@ -388,7 +386,7 @@ describe( 'NumberControl', () => {
 			render( <StatefulNumberControl value={ 5 } shiftStep={ 100 } /> );
 
 			const input = getInput();
-			input.focus();
+			act( () => input.focus() );
 			fireKeyDown( { keyCode: DOWN, shiftKey: true } );
 
 			expect( input.value ).toBe( '-100' );
@@ -404,7 +402,7 @@ describe( 'NumberControl', () => {
 			);
 
 			const input = getInput();
-			input.focus();
+			act( () => input.focus() );
 			fireKeyDown( { keyCode: DOWN, shiftKey: true } );
 
 			expect( input.value ).toBe( '4' );
@@ -420,7 +418,7 @@ describe( 'NumberControl', () => {
 			);
 
 			const input = getInput();
-			input.focus();
+			act( () => input.focus() );
 			fireKeyDown( { keyCode: DOWN, shiftKey: true } );
 
 			expect( input.value ).toBe( '4' );
