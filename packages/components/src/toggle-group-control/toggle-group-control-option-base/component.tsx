@@ -88,6 +88,13 @@ function ToggleGroupControlOptionBase(
 		}
 	};
 
+	const commonProps = {
+		...otherButtonProps,
+		className: classes,
+		'data-value': value,
+		ref: forwardedRef,
+	};
+
 	return (
 		<LabelView className={ labelViewClasses }>
 			<WithToolTip
@@ -96,26 +103,20 @@ function ToggleGroupControlOptionBase(
 			>
 				{ isDeselectable ? (
 					<button
-						{ ...otherButtonProps }
+						{ ...commonProps }
 						aria-pressed={ isPressed }
 						type="button"
-						className={ classes }
-						data-value={ value }
 						onClick={ buttonOnClick }
-						ref={ forwardedRef }
 					>
 						<ButtonContentView>{ children }</ButtonContentView>
 					</button>
 				) : (
 					<Radio
-						{ ...otherButtonProps }
+						{ ...commonProps }
 						{
 							...otherContextProps /* these are only for Ariakit Radio */
 						}
 						as="button"
-						className={ classes }
-						data-value={ value }
-						ref={ forwardedRef }
 						value={ value }
 					>
 						<ButtonContentView>{ children }</ButtonContentView>
