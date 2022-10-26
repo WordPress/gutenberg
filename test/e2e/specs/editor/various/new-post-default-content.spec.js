@@ -1,9 +1,6 @@
 /**
  * WordPress dependencies
  */
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'new editor filtered state', () => {
@@ -25,7 +22,6 @@ test.describe( 'new editor filtered state', () => {
 	} );
 
 	test( 'should respect default content', async ( { editor, page } ) => {
-		const content = await editor.getEditedPostContent();
 		await editor.openDocumentSettingsSidebar();
 		await page.click( 'role=button[name="Excerpt"i]' );
 
