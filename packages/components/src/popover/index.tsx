@@ -184,22 +184,13 @@ const UnforwardedPopover = (
 
 		// Deprecated props
 		__unstableForcePosition,
-		__unstableShift,
 		anchorRef,
 		anchorRect,
 		getAnchorRect,
-		range,
 
 		// Rest
 		...contentProps
 	} = props;
-
-	if ( range ) {
-		deprecated( '`range` prop in wp.components.Popover', {
-			since: '6.1',
-			version: '6.3',
-		} );
-	}
 
 	let computedFlipProp = flip;
 	let computedResizeProp = resize;
@@ -216,22 +207,9 @@ const UnforwardedPopover = (
 		computedResizeProp = ! __unstableForcePosition;
 	}
 
-	let shouldShift = shift;
-	if ( __unstableShift !== undefined ) {
-		deprecated( '`__unstableShift` prop in wp.components.Popover', {
-			since: '6.1',
-			version: '6.3',
-			alternative: '`shift` prop`',
-		} );
-
-		// Back-compat.
-		shouldShift = __unstableShift;
-	}
-
 	if ( anchorRef !== undefined ) {
 		deprecated( '`anchorRef` prop in wp.components.Popover', {
 			since: '6.1',
-			version: '6.3',
 			alternative: '`anchor` prop',
 		} );
 	}
@@ -239,7 +217,6 @@ const UnforwardedPopover = (
 	if ( anchorRect !== undefined ) {
 		deprecated( '`anchorRect` prop in wp.components.Popover', {
 			since: '6.1',
-			version: '6.3',
 			alternative: '`anchor` prop',
 		} );
 	}
@@ -247,12 +224,11 @@ const UnforwardedPopover = (
 	if ( getAnchorRect !== undefined ) {
 		deprecated( '`getAnchorRect` prop in wp.components.Popover', {
 			since: '6.1',
-			version: '6.3',
 			alternative: '`anchor` prop',
 		} );
 	}
 
-	const arrowRef = useRef( null );
+	const arrowRef = useRef< HTMLElement | null >( null );
 
 	const [ fallbackReferenceElement, setFallbackReferenceElement ] =
 		useState< HTMLSpanElement | null >( null );
@@ -325,7 +301,7 @@ const UnforwardedPopover = (
 					},
 			  } )
 			: undefined,
-		shouldShift
+		shift
 			? shiftMiddleware( {
 					crossAxis: true,
 					limiter: customLimitShift(),
@@ -385,7 +361,7 @@ const UnforwardedPopover = (
 	} );
 
 	const arrowCallbackRef = useCallback(
-		( node ) => {
+		( node: HTMLElement | null ) => {
 			arrowRef.current = node;
 			update();
 		},

@@ -67,7 +67,7 @@ function KeyboardShortcuts() {
 		registerShortcut( {
 			name: 'core/edit-post/toggle-distraction-free',
 			category: 'global',
-			description: __( 'Toggle disrtaction free mode.' ),
+			description: __( 'Toggle distraction free mode.' ),
 			keyCombination: {
 				modifier: 'primaryShift',
 				character: '\\',

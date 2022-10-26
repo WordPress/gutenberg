@@ -132,7 +132,13 @@ export function reinitializeEditor( target, settings ) {
 	window.addEventListener( 'dragover', ( e ) => e.preventDefault(), false );
 	window.addEventListener( 'drop', ( e ) => e.preventDefault(), false );
 
-	render( <EditSiteApp reboot={ reboot } />, target );
+	render(
+		<EditSiteApp
+			reboot={ reboot }
+			homeTemplate={ settings.__unstableHomeTemplate }
+		/>,
+		target
+	);
 }
 
 /**
@@ -161,6 +167,6 @@ export function initializeEditor( id, settings ) {
 
 export { default as __experimentalMainDashboardButton } from './components/main-dashboard-button';
 export { default as __experimentalNavigationToggle } from './components/navigation-sidebar/navigation-toggle';
-export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
-export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';
-export { default as PluginMoreMenuItem } from './components/header/plugin-more-menu-item';
+export { default as PluginSidebar } from './components/sidebar-edit-mode/plugin-sidebar';
+export { default as PluginSidebarMoreMenuItem } from './components/header-edit-mode/plugin-sidebar-more-menu-item';
+export { default as PluginMoreMenuItem } from './components/header-edit-mode/plugin-more-menu-item';

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escape, without } from 'lodash';
+import escapeHtml from 'escape-html';
 
 /**
  * WordPress dependencies
@@ -248,8 +248,8 @@ export const updateNavigationLinkBlockAttributes = (
 		normalizedTitle !== normalizedURL &&
 		originalLabel !== title;
 	const label = escapeTitle
-		? escape( title )
-		: originalLabel || escape( normalizedURL );
+		? escapeHtml( title )
+		: originalLabel || escapeHtml( normalizedURL );
 
 	// In https://github.com/WordPress/gutenberg/pull/24670 we decided to use "tag" in favor of "post_tag"
 	const type = newType === 'post_tag' ? 'tag' : newType.replace( '-', '_' );
@@ -486,7 +486,9 @@ export default function NavigationSubmenuEdit( {
 	const innerBlocksColors = getColors( context, true );
 
 	const allowedBlocks = isAtMaxNesting
-		? without( ALLOWED_BLOCKS, 'core/navigation-submenu' )
+		? ALLOWED_BLOCKS.filter(
+				( blockName ) => blockName !== 'core/navigation-submenu'
+		  )
 		: ALLOWED_BLOCKS;
 
 	const innerBlocksProps = useInnerBlocksProps(

@@ -67,7 +67,7 @@ describe( 'props', () => {
 			</FormGroup>
 		);
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
 	test( 'should render vertically', () => {
@@ -77,7 +77,7 @@ describe( 'props', () => {
 			</FormGroup>
 		);
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 } );
 /* eslint-enable no-restricted-syntax */

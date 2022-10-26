@@ -13,7 +13,7 @@ export const unstyledButton = css`
 	border: 1px solid transparent;
 	cursor: pointer;
 	background: none;
-	text-align: left;
+	text-align: start;
 
 	&:hover {
 		color: ${ COLORS.ui.theme };

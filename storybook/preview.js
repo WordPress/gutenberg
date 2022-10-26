@@ -3,7 +3,9 @@
  */
 import { WithGlobalCSS } from './decorators/with-global-css';
 import { WithMarginChecker } from './decorators/with-margin-checker';
+import { WithMaxWidthWrapper } from './decorators/with-max-width-wrapper';
 import { WithRTL } from './decorators/with-rtl';
+import { WithTheme } from './decorators/with-theme';
 import './style.scss';
 
 export const globalTypes = {
@@ -16,6 +18,19 @@ export const globalTypes = {
 			items: [
 				{ value: 'ltr', title: 'LTR' },
 				{ value: 'rtl', title: 'RTL' },
+			],
+		},
+	},
+	componentsTheme: {
+		name: 'Theme',
+		description: 'Change the components theme. (Work in progress)',
+		defaultValue: 'default',
+		toolbar: {
+			icon: 'paintbrush',
+			items: [
+				{ value: 'default', title: 'Default' },
+				{ value: 'modern', title: 'Modern' },
+				{ value: 'sunrise', title: 'Sunrise' },
 			],
 		},
 	},
@@ -49,9 +64,27 @@ export const globalTypes = {
 			],
 		},
 	},
+	maxWidthWrapper: {
+		name: 'Max-Width Wrapper',
+		description: 'Wrap the component in a div with a max-width.',
+		defaultValue: 'none',
+		toolbar: {
+			icon: 'outline',
+			items: [
+				{ value: 'none', title: 'None' },
+				{ value: 'wordpress-sidebar', title: 'WP Sidebar' },
+			],
+		},
+	},
 };
 
-export const decorators = [ WithGlobalCSS, WithMarginChecker, WithRTL ];
+export const decorators = [
+	WithTheme,
+	WithGlobalCSS,
+	WithMarginChecker,
+	WithRTL,
+	WithMaxWidthWrapper,
+];
 
 export const parameters = {
 	controls: {

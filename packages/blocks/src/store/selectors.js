@@ -3,7 +3,7 @@
  */
 import createSelector from 'rememo';
 import removeAccents from 'remove-accents';
-import { filter, get, includes, map, some } from 'lodash';
+import { filter, get, map, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -555,7 +555,7 @@ export const getChildBlockNames = createSelector(
 	( state, blockName ) => {
 		return map(
 			filter( state.blockTypes, ( blockType ) => {
-				return includes( blockType.parent, blockName );
+				return blockType.parent?.includes( blockName );
 			} ),
 			( { name } ) => name
 		);
@@ -710,7 +710,7 @@ export function isMatchingSearchTerm( state, nameOrType, searchTerm ) {
 	const isSearchMatch = pipe( [
 		getNormalizedSearchTerm,
 		( normalizedCandidate ) =>
-			includes( normalizedCandidate, normalizedSearchTerm ),
+			normalizedCandidate.includes( normalizedSearchTerm ),
 	] );
 
 	return (
@@ -797,6 +797,11 @@ export const hasChildBlocksWithInserterSupport = ( state, blockName ) => {
 	} );
 };
 
+/**
+ * DO-NOT-USE in production.
+ * This selector is created for internal/experimental only usage and may be
+ * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
+ */
 export const __experimentalHasContentRoleAttribute = createSelector(
 	( state, blockTypeName ) => {
 		const blockType = getBlockType( state, blockTypeName );

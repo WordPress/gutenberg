@@ -41,14 +41,14 @@ function InserterBlockList( props ) {
 }
 
 const initializeAllClosedMenuState = ( propOverrides ) => {
-	const result = render( <InserterBlockList { ...propOverrides } /> );
-	const activeTabs = result.container.querySelectorAll(
+	const { container } = render( <InserterBlockList { ...propOverrides } /> );
+	const activeTabs = container.querySelectorAll(
 		'.components-panel__body.is-opened button.components-panel__body-toggle'
 	);
 	activeTabs.forEach( ( tab ) => {
 		fireEvent.click( tab );
 	} );
-	return result;
+	return container;
 };
 
 describe( 'InserterMenu', () => {
@@ -92,7 +92,7 @@ describe( 'InserterMenu', () => {
 	} );
 
 	it( 'should list reusable blocks', () => {
-		const { container } = initializeAllClosedMenuState();
+		const container = initializeAllClosedMenuState();
 		const blocks = container.querySelectorAll(
 			'.block-editor-block-types-list__item-title'
 		);
