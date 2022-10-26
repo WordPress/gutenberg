@@ -97,6 +97,7 @@ module.exports = {
 							'differenceWith',
 							'dropRight',
 							'each',
+							'escape',
 							'escapeRegExp',
 							'every',
 							'extend',
