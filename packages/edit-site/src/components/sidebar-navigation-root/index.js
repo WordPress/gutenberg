@@ -6,7 +6,7 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { globe, layout, symbolFilled } from '@wordpress/icons';
+import { layout, symbolFilled } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -18,10 +18,6 @@ import { useLocation } from '../routes';
 
 export default function SidebarNavigationRoot() {
 	const { params } = useLocation();
-	const browseLink = useLink( {
-		postType: undefined,
-		postId: undefined,
-	} );
 	const templatesLink = useLink( {
 		postType: 'wp_template',
 		postId: undefined,
@@ -30,9 +26,6 @@ export default function SidebarNavigationRoot() {
 		postType: 'wp_template_part',
 		postId: undefined,
 	} );
-	const isEditorPage =
-		( ! params.postType && ! params.postId ) ||
-		( !! params.postType && !! params.postId );
 	const isTemplatesPage =
 		params.postType === 'wp_template' && ! params.postId;
 	const isTemplatePartsPage =
@@ -49,13 +42,6 @@ export default function SidebarNavigationRoot() {
 			</div>
 			<nav>
 				<ItemGroup>
-					<SidebarNavigationItem
-						{ ...browseLink }
-						icon={ globe }
-						aria-current={ isEditorPage ? 'page' : undefined }
-					>
-						{ __( 'Editor' ) }
-					</SidebarNavigationItem>
 					<SidebarNavigationItem
 						{ ...templatesLink }
 						icon={ layout }
