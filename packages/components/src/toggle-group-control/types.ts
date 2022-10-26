@@ -124,11 +124,21 @@ export type ToggleGroupControlProps = Pick<
 	size?: 'default' | '__unstable-large';
 };
 
-export type ToggleGroupControlContextProps = Partial< RadioStateReturn > &
-	Pick< RadioStateReturn, 'state' | 'setState' > &
-	Pick< ToggleGroupControlProps, 'isBlock' | 'isDeselectable' | 'size' > & {
-		baseId: string;
-	};
+type ToggleGroupControlAsRadioContext = {
+	isDeselectable?: false;
+} & RadioStateReturn;
+
+type ToggleGroupControlAsButtonContext = { isDeselectable: true } & Pick<
+	RadioStateReturn,
+	'state' | 'setState'
+>;
+
+export type ToggleGroupControlContextProps = Pick<
+	ToggleGroupControlProps,
+	'isBlock' | 'size'
+> & {
+	baseId: string;
+} & ( ToggleGroupControlAsRadioContext | ToggleGroupControlAsButtonContext );
 
 export type ToggleGroupControlBackdropProps = {
 	containerRef: MutableRefObject< HTMLElement | undefined >;
