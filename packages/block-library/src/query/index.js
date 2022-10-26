@@ -24,6 +24,7 @@ export const settings = {
 	save,
 	variations,
 	deprecated,
+	defaultTab: 'settings',
 };
 
 export const init = () => {

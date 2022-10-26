@@ -50,6 +50,7 @@ export const settings = {
 	edit,
 	save,
 	deprecated,
+	defaultTab: 'menu',
 };
 
 export const init = () => initBlock( { name, metadata, settings } );
