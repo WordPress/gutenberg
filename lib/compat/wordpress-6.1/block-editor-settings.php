@@ -13,6 +13,23 @@
  * @return array New block editor settings.
  */
 function gutenberg_get_block_editor_settings( $settings ) {
+	global $post_id;
+	$template_slug    = get_page_template_slug( $post_id );
+	$current_template = gutenberg_get_block_templates( array( 'slug__in' => array( $template_slug ) ) );
+
+	if ( ! empty( $current_template ) ) {
+		$template_blocks    = parse_blocks( $current_template[0]->content );
+		$post_content_block = array();
+
+		foreach ( $template_blocks as $template_block ) {
+			if ( 'core/post-content' === $template_block['blockName'] ) {
+				$post_content_block = $template_block;
+			}
+		}
+		// mismatched naming x(.
+		$post_content_block['attributes'] = $post_content_block['attrs'];
+		$settings['postContentBlock']     = $post_content_block;
+	}
 	// Set what is the context for this data request.
 	$context = 'other';
 	if (
