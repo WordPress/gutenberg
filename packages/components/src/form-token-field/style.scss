@@ -12,6 +12,13 @@
 
 	&.is-active {
 		@include input-style__focus();
+		border-color: $components-color-accent;
+		box-shadow: 0 0 0 ($border-width-focus - $border-width) $components-color-accent;
+	}
+
+	&:focus {
+		border-color: $components-color-accent;
+		box-shadow: 0 0 0 ($border-width-focus - $border-width) $components-color-accent;
 	}
 
 	// Token input
