@@ -19,6 +19,9 @@ Use the selector engine [role-selector](https://playwright.dev/docs/selectors#ro
 ```js
 // Select a button with the accessible name "Hello World" (case-insensitive).
 page.locator( 'role=button[name="Hello World"i]' );
+
+// Using short-form API, the `name` is case-insensitive by default.
+page.getByRole( 'button', { name: 'Hello World' } );
 ```
 
 It's recommended to append `i` to the name attribute to match it case-insensitively wherever it makes sense. It can also be chained with built-in selector engines to perform complex queries:
