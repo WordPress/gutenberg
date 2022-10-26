@@ -1,21 +1,33 @@
+// Allow the position to be easily overridden to e.g. fixed.
 [role="region"] {
-	// Make the grid container children establish an independent stacking context
-	// and avoid to use position asto allow the position to be easily overridden
-	// to e.g. fixed.
-	display: grid;
+	position: relative;
 }
 
-.is-focusing-regions [role="region"] {
-	&:focus {
-		outline-style: solid;
-		outline-color: $components-color-accent;
-		outline-width: 4px;
+.is-focusing-regions {
+	[role="region"]:focus {
+		outline: 4px solid $components-color-accent;
 		outline-offset: -4px;
 
-		> * {
-			// Children of a grid container establish a new stacking context.
-			// See https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context
-			z-index: -1 !important;
+		.interface-navigable-region__stacker {
+			position: relative;
+			z-index: z-index(".is-focusing-regions [role='region']:focus .interface-navigable-region__stacker");
+		}
+	}
+
+	// Fixes for edge cases.
+	// Some of the regions are currently used for layout purposes as 'interface skeleton'
+	// items. When they're absolutely positioned or when they contain absolutely
+	// positioned elements, they may have no size therefore the focus style is not
+	// visible. For the future, it's important to take into consideration that
+	// the navigable regions should always have a computed size. For now, we can
+	// fix some edge cases but these CSS rules should be later removed in favor of
+	// a more abstracted approach to make the navigabel regions focus style work
+	// regardles of the CSS used on other components.
+	&.is-distraction-free .interface-interface-skeleton__header {
+		.interface-navigable-region__stacker,
+		.edit-post-header {
+			outline: inherit;
+			outline-offset: inherit;
 		}
 	}
 }
