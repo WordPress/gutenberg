@@ -38,7 +38,7 @@ $header-toolbar-min-width: 335px;
 	padding-left: $grid-unit-10;
 
 	@include break-small() {
-		padding-left: $grid-unit-20;
+		padding-left: $grid-unit-30;
 	}
 
 	@include break-wide() {
