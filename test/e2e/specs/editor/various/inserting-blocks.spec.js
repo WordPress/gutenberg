@@ -42,8 +42,9 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			'role=region[name="Editor top bar"i] >> role=button[name="Toggle block inserter"i]'
 		);
 
+		// TODO: need to await for the search input when the tabs are loaded.
 		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
+			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks"i]',
 			'Heading'
 		);
 
@@ -119,8 +120,9 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			'role=region[name="Editor top bar"i] >> role=button[name="Toggle block inserter"i]'
 		);
 
+		// TODO: need to await for the search input when the tabs are loaded.
 		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
+			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks"i]',
 			'Heading'
 		);
 
@@ -179,10 +181,14 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			'role=region[name="Editor top bar"i] >> role=button[name="Toggle block inserter"i]'
 		);
 
+		await page.click(
+			'role=region[name="Block Library"i] >> role=tab[name="Patterns"i]'
+		);
+
 		const PATTERN_NAME = 'Social links with a shared background color';
 
 		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
+			'role=region[name="Block Library"i] >> role=searchbox[name="Search for patterns"i]',
 			PATTERN_NAME
 		);
 
@@ -247,10 +253,14 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			'role=region[name="Editor top bar"i] >> role=button[name="Toggle block inserter"i]'
 		);
 
+		await page.click(
+			'role=region[name="Block Library"i] >> role=tab[name="Patterns"i]'
+		);
+
 		const PATTERN_NAME = 'Social links with a shared background color';
 
 		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
+			'role=region[name="Block Library"i] >> role=searchbox[name="Search for patterns"i]',
 			PATTERN_NAME
 		);
 

@@ -27,16 +27,12 @@ test.describe( 'Site Editor Inserter', () => {
 
 		// Visibility check
 		await expect(
-			page.locator(
-				'role=searchbox[name="Search for blocks and patterns"i]'
-			)
+			page.locator( 'role=searchbox[name="Search for patterns"i]' )
 		).toBeVisible();
 		await page.click( 'role=button[name="Toggle block inserter"i]' );
 		//Hidden State check
 		await expect(
-			page.locator(
-				'role=searchbox[name="Search for blocks and patterns"i]'
-			)
+			page.locator( 'role=searchbox[name="Search for patterns"i]' )
 		).toBeHidden();
 	} );
 } );

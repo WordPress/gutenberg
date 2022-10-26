@@ -88,7 +88,7 @@ describe( 'Widgets screen', () => {
 
 		const searchBox = await find( {
 			role: 'searchbox',
-			name: 'Search for blocks and patterns',
+			name: 'Search for blocks',
 		} );
 		await searchBox.type( blockName );
 

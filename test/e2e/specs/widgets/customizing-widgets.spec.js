@@ -654,7 +654,7 @@ class WidgetsCustomizerPage {
 		);
 
 		const searchBox = this.page.locator(
-			'role=searchbox[name="Search for blocks and patterns"i]'
+			'role=searchbox[name="Search for blocks"i]'
 		);
 
 		// Clear the input.
