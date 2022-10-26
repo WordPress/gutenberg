@@ -74,7 +74,7 @@ function GroupEdit( {
 				? undefined
 				: InnerBlocks.ButtonBlockAppender,
 			__experimentalLayout: layoutSupportEnabled ? usedLayout : undefined,
-			__unstableNoLayoutClassNames: ! layoutSupportEnabled,
+			__unstableDisableLayoutClassNames: ! layoutSupportEnabled,
 		}
 	);
 
