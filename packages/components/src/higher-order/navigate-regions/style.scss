@@ -23,6 +23,8 @@
 	// fix some edge cases but these CSS rules should be later removed in favor of
 	// a more abstracted approach to make the navigabel regions focus style work
 	// regardles of the CSS used on other components.
+
+	// Header top bar when Distraction free mode is on.
 	&.is-distraction-free .interface-interface-skeleton__header {
 		.interface-navigable-region__stacker,
 		.edit-post-header {
@@ -30,4 +32,53 @@
 			outline-offset: inherit;
 		}
 	}
+
+	// Sidebar toggle button shown when navigating regions.
+	.interface-interface-skeleton__sidebar {
+		.interface-navigable-region__stacker,
+		.edit-post-layout__toggle-sidebar-panel {
+			outline: inherit;
+			outline-offset: inherit;
+		}
+	}
+
+	// Publish sidebar toggle button shown when navigating regions.
+	.interface-interface-skeleton__actions {
+		.interface-navigable-region__stacker,
+		.edit-post-layout__toggle-publish-panel {
+			outline: inherit;
+			outline-offset: inherit;
+		}
+	}
+
+	// Publish sidebar.
+	[role="region"].interface-interface-skeleton__actions:focus  .editor-post-publish-panel {
+		outline: 4px solid var(--wp-admin-theme-color);
+		outline-offset: -4px;
+	}
+
+	// Edit site Navigation Drawer.
+	.interface-interface-skeleton__drawer {
+		z-index: z-index(".edit-site-navigation-toggle");
+
+		.interface-navigable-region__stacker,
+		.edit-site-navigation-toggle {
+			outline: inherit;
+			outline-offset: inherit;
+		}
+
+		.edit-site-navigation-toggle.is-open {
+			outline: none;
+		}
+
+		.edit-site-navigation-toggle__button {
+			z-index: -1;
+		}
+	}
+}
+
+// Fixes for edge cases.
+// Edit site Drawer.
+.interface-interface-skeleton__drawer .interface-navigable-region__stacker {
+	height: 100%;
 }
