@@ -30,6 +30,7 @@
  *     @type bool        $convert_vars_to_classnames Whether to skip converting incoming CSS var patterns, e.g., `var:preset|<PRESET_TYPE>|<PRESET_SLUG>`, to var( --wp--preset--* ) values. Default `false`.
  *     @type string      $selector                   Optional. When a selector is passed, the value of `$css` in the return value will comprise a full CSS rule `$selector { ...$css_declarations }`,
  *                                                   otherwise, the value will be a concatenated string of CSS declarations.
+ *     @type array      $metadata                    An associate array in the format of WP_Style_Engine::BLOCK_STYLE_DEFINITIONS_METADATA that extends the latter.
  * }
  *
  * @return array {
@@ -45,10 +46,13 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
 			'selector'                   => null,
 			'context'                    => null,
 			'convert_vars_to_classnames' => false,
+			'metadata'                   => array(),
 		)
 	);
 
-	$parsed_styles = WP_Style_Engine::parse_block_styles( $block_styles, $options );
+	$block_style_metadata = new WP_Style_Engine_Block_Style_Metadata( WP_Style_Engine::BLOCK_STYLE_DEFINITIONS_METADATA );
+	$options['metadata']  = $block_style_metadata->add_metadata( $options['metadata'] )->get_metadata();
+	$parsed_styles        = WP_Style_Engine::parse_block_styles( $block_styles, $options );
 
 	// Output.
 	$styles_output = array();

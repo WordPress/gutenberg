@@ -16,34 +16,49 @@ if ( class_exists( 'WP_Style_Engine_Block_Style_Metadata' ) ) {
  *
  * @access private
  */
-final class WP_Style_Engine_Block_Style_Metadata {
+class WP_Style_Engine_Block_Style_Metadata {
+	/**
+	 * The original metadata.
+	 *
+	 * @var array
+	 */
+	protected $base_metadata = array();
+
 	/**
 	 * The merged metadata.
 	 *
 	 * @var array
 	 */
-	protected static $merged_block_support_metadata = array();
+	protected $merged_block_support_metadata = array();
+
+	/**
+	 * Constructor for this object.
+	 *
+	 * If a `$declarations` array is passed, it will be used to populate
+	 * the initial $declarations prop of the object by calling add_declarations().
+	 *
+	 * @param array $base_metadata An associative array of block style metadata to extend.
+	 */
+	public function __construct( $base_metadata = array() ) {
+		$this->base_metadata = $base_metadata;
+		$this->reset_metadata();
+	}
 
 	/**
 	 * Add block style metadata.
 	 *
 	 * @param array $metadata The $metadata.
 	 *
-	 * @return void
+	 * @return WP_Style_Engine_Block_Style_Metadata Returns the object to allow chaining methods.
 	 */
-	public static function add_metadata( $metadata = array() ) {
-		// Assigns value to $merged_block_support_metadata if not already set.
-		if ( empty( static::$merged_block_support_metadata ) ) {
-			static::reset_metadata();
-		}
-
+	public function add_metadata( $metadata = array() ) {
 		foreach ( $metadata as $definition_group_key => $definition_group_style ) {
 			if ( ! is_array( $definition_group_style ) || empty( $definition_group_style ) ) {
 				continue;
 			}
 
-			if ( ! array_key_exists( $definition_group_key, static::$merged_block_support_metadata ) ) {
-				static::$merged_block_support_metadata[ $definition_group_key ] = array();
+			if ( ! array_key_exists( $definition_group_key, $this->merged_block_support_metadata ) ) {
+				$this->merged_block_support_metadata[ $definition_group_key ] = array();
 			}
 
 			foreach ( $definition_group_style as $style_definition_key => $style_definition ) {
@@ -51,14 +66,15 @@ final class WP_Style_Engine_Block_Style_Metadata {
 					continue;
 				}
 
-				$array_to_extend         = array_key_exists( $style_definition_key, static::$merged_block_support_metadata[ $definition_group_key ] ) ? static::$merged_block_support_metadata[ $definition_group_key ][ $style_definition_key ] : array();
-				$merged_style_definition = static::merge_custom_style_definitions_metadata( $array_to_extend, $style_definition );
+				$array_to_extend         = array_key_exists( $style_definition_key, $this->merged_block_support_metadata[ $definition_group_key ] ) ? $this->merged_block_support_metadata[ $definition_group_key ][ $style_definition_key ] : array();
+				$merged_style_definition = $this->merge_custom_style_definitions_metadata( $array_to_extend, $style_definition );
 
 				if ( $merged_style_definition ) {
-					static::$merged_block_support_metadata[ $definition_group_key ][ $style_definition_key ] = $merged_style_definition;
+					$this->merged_block_support_metadata[ $definition_group_key ][ $style_definition_key ] = $merged_style_definition;
 				}
 			}
 		}
+		return $this;
 	}
 
 	/**
@@ -67,15 +83,11 @@ final class WP_Style_Engine_Block_Style_Metadata {
 	 * @param array $path A path to an array item in static::$merged_block_support_metadata.
 	 * @return array
 	 */
-	public static function get_metadata( $path = array() ) {
-		// Assigns value to $merged_block_support_metadata if not already set.
-		if ( empty( static::$merged_block_support_metadata ) ) {
-			static::reset_metadata();
-		}
+	public function get_metadata( $path = array() ) {
 		if ( ! empty( $path ) ) {
-			return _wp_array_get( static::$merged_block_support_metadata, $path, null );
+			return _wp_array_get( $this->merged_block_support_metadata, $path, null );
 		}
-		return static::$merged_block_support_metadata;
+		return $this->merged_block_support_metadata;
 	}
 
 	/**
@@ -83,8 +95,8 @@ final class WP_Style_Engine_Block_Style_Metadata {
 	 *
 	 * @return void
 	 */
-	public static function reset_metadata() {
-		static::$merged_block_support_metadata = json_decode( wp_json_encode( WP_Style_Engine::BLOCK_STYLE_DEFINITIONS_METADATA ), true );
+	public function reset_metadata() {
+		$this->merged_block_support_metadata = json_decode( wp_json_encode( $this->base_metadata ), true );
 	}
 
 	/**
@@ -95,7 +107,7 @@ final class WP_Style_Engine_Block_Style_Metadata {
 	 *
 	 * @return array|void The merged definition metadata.
 	 */
-	protected static function merge_custom_style_definitions_metadata( $style_definition, $custom_definition = array() ) {
+	protected function merge_custom_style_definitions_metadata( $style_definition, $custom_definition = array() ) {
 		// Required metadata.
 		if ( ! isset( $style_definition['path'] ) && ! isset( $custom_definition['path'] ) && ! is_array( $custom_definition['path'] ) ) {
 			return;

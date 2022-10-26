@@ -36,6 +36,7 @@ _Parameters_
     -   _context_ `string` An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is 'block-supports'. When both `context` and `selector` are set, the Style Engine will store the CSS rules using the `context` as a key.
     -   _convert_vars_to_classnames_ `boolean` Whether to skip converting CSS var:? values to var( --wp--preset--\* ) values. Default is `false`.
     -   _selector_ `string` When a selector is passed, `generate()` will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
+    -   _metadata_ `array` An associate array in the format of WP_Style_Engine::BLOCK_STYLE_DEFINITIONS_METADATA that extends the latter.
 
 _Returns_
 `array<string|array>|null`
@@ -83,6 +84,41 @@ print_r( $styles );
 array(
     'css'          => '.a-selector{padding:100px}'
     'declarations' => array( 'padding' => '100px' )
+)
+*/
+```
+
+The default block style support can be extended by passing metadata in the options.
+
+```php
+$block_attributes =  array(
+     'style' => array(
+        'layout' => array( 'float' => 'left' ),
+     ),
+);
+
+$styles = wp_style_engine_get_styles(
+    $block_attributes['style'],
+    array(
+        'selector' => '.a-selector',
+        'metadata' => array(
+			'layout' => array(
+				'float' => array(
+					'property_keys' => array(
+						'default' => 'float',
+					),
+					'path'          => array( 'layout', 'float' ),
+				),
+			),
+		)
+    )
+);
+print_r( $styles );
+
+/*
+array(
+    'css'          => '.a-selector{float:left}'
+    'declarations' => array( 'float' => 'left' )
 )
 */
 ```
