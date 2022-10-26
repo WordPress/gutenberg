@@ -16,7 +16,7 @@ if ( ! function_exists( 'wp_theme_has_theme_json' ) ) {
 	function wp_theme_has_theme_json( $clear_cache = false ) {
 		static $theme_has_support = null;
 
-		if ( false === $clear_cache ) {
+		if ( true === $clear_cache ) {
 			$theme_has_support = null;
 		}
 
