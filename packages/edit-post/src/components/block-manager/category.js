@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { includes, map } from 'lodash';
+import { map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -37,7 +37,7 @@ function BlockManagerCategory( { title, blockTypes } ) {
 			return blockTypes;
 		}
 		return blockTypes.filter( ( { name } ) => {
-			return includes( defaultAllowedBlockTypes || [], name );
+			return defaultAllowedBlockTypes?.includes( name );
 		} );
 	}, [ defaultAllowedBlockTypes, blockTypes ] );
 	const { showBlockTypes, hideBlockTypes } = useDispatch( editPostStore );
