@@ -228,7 +228,7 @@ const UnforwardedPopover = (
 		} );
 	}
 
-	const arrowRef = useRef( null );
+	const arrowRef = useRef< HTMLElement | null >( null );
 
 	const [ fallbackReferenceElement, setFallbackReferenceElement ] =
 		useState< HTMLSpanElement | null >( null );
@@ -361,7 +361,7 @@ const UnforwardedPopover = (
 	} );
 
 	const arrowCallbackRef = useCallback(
-		( node ) => {
+		( node: HTMLElement | null ) => {
 			arrowRef.current = node;
 			update();
 		},
