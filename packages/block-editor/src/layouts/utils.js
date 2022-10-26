@@ -68,44 +68,6 @@ export function getBlockGapCSS(
 	return output;
 }
 
-const VALID_POSITION_SIDES = [ 'top', 'right', 'bottom', 'left' ];
-const VALID_POSITION_TYPES = [ 'sticky', 'fixed' ];
-
-/**
- * Get calculated position CSS.
- *
- * @param {Object} props          Component props.
- * @param {string} props.selector Selector to use.
- * @param {Object} props.style    Style object.
- * @return {string} The generated CSS rules.
- */
-export function getPositionCSS( { selector, style } ) {
-	let output = '';
-
-	const { position } = style?.layout || {};
-
-	if ( ! VALID_POSITION_TYPES.includes( position ) ) {
-		return output;
-	}
-
-	output += `${ selector } {`;
-	output += `position: ${ position };`;
-
-	VALID_POSITION_SIDES.forEach( ( side ) => {
-		if ( style?.layout?.[ side ] !== undefined ) {
-			output += `${ side }: ${ style.layout[ side ] };`;
-		}
-	} );
-
-	if ( position === 'sticky' || position === 'fixed' ) {
-		// TODO: Work out where to put the magic z-index value.
-		output += `z-index: 250`;
-	}
-	output += `}`;
-
-	return output;
-}
-
 /**
  * Helper method to assign contextual info to clarify
  * alignment settings.

@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { getBlockGapCSS, getPositionCSS, getAlignmentsInfo } from './utils';
+import { getBlockGapCSS, getAlignmentsInfo } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import { shouldSkipSerialization } from '../hooks/utils';
 
@@ -51,9 +51,6 @@ export default {
 				blockGapValue
 			);
 		}
-
-		// Add position CSS where applicable.
-		output += getPositionCSS( { selector, style } );
 
 		return output;
 	},

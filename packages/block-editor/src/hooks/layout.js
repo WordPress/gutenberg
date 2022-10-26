@@ -29,7 +29,7 @@ import useSetting from '../components/use-setting';
 import { LayoutStyle } from '../components/block-list/layout';
 import BlockList from '../components/block-list';
 import { getLayoutType, getLayoutTypes } from '../layouts';
-import { PositionEdit } from './position';
+import { PositionEdit, getPositionCSS } from './position';
 
 export const LAYOUT_SUPPORT_KEY = '__experimentalLayout';
 
@@ -352,6 +352,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 		const shouldRenderLayoutStyles =
 			hasLayoutBlockSupport && ! disableLayoutStyles;
 		const id = useInstanceId( BlockListBlock );
+		const positionId = useInstanceId( BlockListBlock );
 		const defaultThemeLayout = useSetting( 'layout' ) || {};
 		const element = useContext( BlockList.__unstableElementContext );
 		const { layout } = attributes;
@@ -364,18 +365,23 @@ export const withLayoutStyles = createHigherOrderComponent(
 		const layoutClasses = hasLayoutBlockSupport
 			? useLayoutClasses( block )
 			: null;
+
 		// Higher specificity to override defaults from theme.json.
 		const selector = `.wp-container-${ id }.wp-container-${ id }`;
+		const positionSelector = `.wp-container-${ positionId }.wp-container-${ positionId }`;
 		const blockGapSupport = useSetting( 'spacing.blockGap' );
 		const hasBlockGapSupport = blockGapSupport !== null;
 
 		// Get CSS string for the current layout type.
 		// The CSS and `style` element is only output if it is not empty.
 		let css;
+		let positionCss;
 		if ( shouldRenderLayoutStyles ) {
 			const fullLayoutType = getLayoutType(
 				usedLayout?.type || 'default'
 			);
+
+			// Add layout CSS.
 			css = fullLayoutType?.getLayoutStyle?.( {
 				blockName: name,
 				selector,
@@ -384,12 +390,24 @@ export const withLayoutStyles = createHigherOrderComponent(
 				style: attributes?.style,
 				hasBlockGapSupport,
 			} );
+
+			// Add position CSS where applicable.
+			positionCss =
+				getPositionCSS( {
+					selector: positionSelector,
+					style: attributes?.style,
+				} ) || '';
+
+			// Concatenate CSS for output.
+			css += positionCss;
 		}
 
 		// Attach a `wp-container-` id-based class name as well as a layout class name such as `is-layout-flex`.
 		const layoutClassNames = classnames(
 			{
 				[ `wp-container-${ id }` ]: shouldRenderLayoutStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
+				[ `wp-container-${ positionId }` ]:
+					shouldRenderLayoutStyles && !! positionCss, // Use separate container class for position styles in prep for layout styles moving to inner wrapper in: https://github.com/WordPress/gutenberg/pull/44600
 			},
 			layoutClasses
 		);
