@@ -48,6 +48,8 @@ function gutenberg_apply_dimensions_support( $block_type, $block_attributes ) { 
 		return array();
 	}
 
+	$attributes = array();
+
 	// Width support to be added in near future.
 
 	$has_min_height_support = block_has_support( $block_type, array( 'dimensions', 'minHeight' ), false );
