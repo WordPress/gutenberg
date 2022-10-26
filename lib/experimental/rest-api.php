@@ -30,16 +30,24 @@ add_action( 'rest_api_init', 'gutenberg_register_block_editor_settings' );
 
 
 /**
- * Registers the template REST API routes.
+ * Hook in to the nav menu item post type and decorate the template rest endpoint.
+ *
+ * When merging to core, this can be removed once Gutenberg_REST_Template_Revision_Count is
+ * merged with WP_REST_Template_Controller.
+ *
+ * @param array  $args Current registered post type args.
+ * @param string $post_type Name of post type.
+ *
+ * @return array
  */
-function gutenberg_register_rest_template() {
-	$template_controller = new Gutenberg_REST_Template_Revision_Count('wp_template');
-	$template_controller->register_routes();
-	$template_parts_controller = new Gutenberg_REST_Template_Revision_Count('wp_template_part');
-	$template_parts_controller->register_routes();
-}
+function wp_api_template_revision_args( $args, $post_type ) {
+	if ( 'wp_template' === $post_type || 'wp_template_part' === $post_type ) {
+		$args['rest_controller_class'] = 'Gutenberg_REST_Template_Revision_Count';
+	}
 
-add_action( 'rest_api_init', 'gutenberg_register_rest_template' );
+	return $args;
+}
+add_filter( 'register_post_type_args', 'wp_api_template_revision_args', 10, 2 );
 
 /**
  * Shim for get_sample_permalink() to add support for auto-draft status.
