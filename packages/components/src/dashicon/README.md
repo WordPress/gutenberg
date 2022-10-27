@@ -35,7 +35,7 @@ The name of the icon. See the list below for all possible values.
 
 ### className
 
-Additional classes for the `<span>` element.
+Additional classnames added to the component
 
 -   Type: `string`
 -   Required: No
