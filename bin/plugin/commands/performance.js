@@ -259,7 +259,7 @@ async function runPerformanceTests( branches, options ) {
 
 	log( '    >> Installing dependencies and building packages' );
 	await runShellScript(
-		'npm ci && npm run build:packages',
+		'npm ci && node ./bin/packages/build.js',
 		performanceTestDirectory
 	);
 	log( '    >> Creating the environment folders' );
@@ -283,7 +283,10 @@ async function runPerformanceTests( branches, options ) {
 		await SimpleGit( buildPath ).reset( 'hard' ).checkout( ref );
 
 		log( '        >> Building the ' + formats.success( ref ) + ' ref' );
-		await runShellScript( 'npm ci && npm run build', buildPath );
+		await runShellScript(
+			'npm ci && node ./bin/packages/build.js',
+			buildPath
+		);
 
 		await runShellScript(
 			'cp ' +
