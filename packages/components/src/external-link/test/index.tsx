@@ -62,11 +62,7 @@ describe( 'ExternalLink', () => {
 		const onClickMock = jest.fn();
 
 		render(
-			<ExternalLink
-				href="#test"
-				onClick={ onClickMock }
-				data-testid="external-link"
-			>
+			<ExternalLink href="#test" onClick={ onClickMock }>
 				I&apos;m an anchor link!
 			</ExternalLink>
 		);
@@ -86,10 +82,7 @@ describe( 'ExternalLink', () => {
 		const user = setupUser();
 
 		render(
-			<ExternalLink
-				href="https://wordpress.org"
-				data-testid="external-link"
-			>
+			<ExternalLink href="https://wordpress.org">
 				I&apos;m not an anchor link!
 			</ExternalLink>
 		);
