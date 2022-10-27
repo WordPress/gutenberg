@@ -20,7 +20,7 @@ jobs:
               run: |
                   IFS='.' read -r -a VERSION_ARRAY <<< "${TAG#v}"
                   RELEASE_BRANCH="release/${VERSION_ARRAY[0]}.${VERSION_ARRAY[1]}"
-                  echo "::set-output name=release_branch::$(echo $RELEASE_BRANCH)"
+                  echo "release_branch=$(echo $RELEASE_BRANCH)" >> $GITHUB_OUTPUT
 
     update-changelog:
         name: Update Changelog on ${{ matrix.branch }} branch
@@ -113,7 +113,7 @@ jobs:
 
             - name: Get previous stable version
               id: get_previous_stable_version
-              run: echo ::set-output name=stable_version::$(awk -F ':\ ' '$1 == "Stable tag" {print $2}' ./trunk/readme.txt)
+              run: echo "stable_version=$(awk -F ':\ ' '$1 == "Stable tag" {print $2}' ./trunk/readme.txt)" >> $GITHUB_OUTPUT
 
             - name: Delete everything
               working-directory: ./trunk
