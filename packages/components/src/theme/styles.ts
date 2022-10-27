@@ -64,8 +64,8 @@ const backgroundColor = ( { accent, background }: ThemeProps ) => {
 
 	const foreground = getForegroundForColor( background );
 
-	// TODO: Check against default accent color when not provided
-	if ( ! colord( background ).isReadable( accent ) ) {
+	// TODO: Add unit test
+	if ( ! colord( background ).isReadable( accent || COLORS.ui.theme ) ) {
 		// eslint-disable-next-line no-console
 		console.warn(
 			`wp.components.Theme: The background color provided ("${ background }") does not have sufficient contrast against the accent color ("${ accent }").`
