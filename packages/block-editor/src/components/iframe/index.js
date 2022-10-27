@@ -188,7 +188,16 @@ async function loadScript( head, { id, src } ) {
 }
 
 function Iframe(
-	{ contentRef, children, head, tabIndex = 0, assets, isZoomedOut, ...props },
+	{
+		contentRef,
+		children,
+		head,
+		tabIndex = 0,
+		assets,
+		scale = 1,
+		frameSize = 0,
+		...props
+	},
 	ref
 ) {
 	const [ , forceRender ] = useReducer( () => ( {} ) );
@@ -322,7 +331,7 @@ function Iframe(
 								{ head }
 								<style>
 									{ `html { transition: background 5s; ${
-										isZoomedOut
+										frameSize
 											? 'background: #2f2f2f; transition: background 0s;'
 											: ''
 									} }` }
@@ -333,20 +342,21 @@ function Iframe(
 								className={ classnames(
 									'block-editor-iframe__body',
 									BODY_CLASS_NAME,
-									...bodyClasses,
-									{
-										'is-zoomed-out': isZoomedOut,
-									}
+									...bodyClasses
 								) }
 								style={
-									isZoomedOut
+									scale || frameSize
 										? {
 												// This is the remaining percentage from the scaling down
 												// of the iframe body(`scale(0.45)`). We also need to subtract
 												// the body's bottom margin.
 												marginBottom: `-${
-													contentHeight * 0.55 - 100
+													contentHeight *
+														( 1 - scale ) -
+													frameSize
 												}px`,
+												marginTop: frameSize,
+												transform: `scale( ${ scale } )`,
 										  }
 										: {}
 								}
