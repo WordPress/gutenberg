@@ -1,18 +1,10 @@
 /**
- * External dependencies
- */
-import { colord, extend } from 'colord';
-import a11yPlugin from 'colord/plugins/a11y';
-import namesPlugin from 'colord/plugins/names';
-
-/**
  * Internal dependencies
  */
 import type { ThemeProps } from './types';
 import type { WordPressComponentProps } from '../ui/context';
 import { Wrapper } from './styles';
-
-extend( [ namesPlugin, a11yPlugin ] );
+import { generateThemeVariables } from './color-algorithms';
 
 /**
  * `Theme` allows defining theme variables for components in the `@wordpress/components` package.
@@ -37,15 +29,9 @@ extend( [ namesPlugin, a11yPlugin ] );
  * ```
  */
 function Theme( props: WordPressComponentProps< ThemeProps, 'div', true > ) {
-	const { accent } = props;
-	if ( accent && ! colord( accent ).isValid() ) {
-		// eslint-disable-next-line no-console
-		console.warn(
-			`wp.components.Theme: "${ accent }" is not a valid color value for the 'accent' prop.`
-		);
-	}
+	const themeVariables = generateThemeVariables( props );
 
-	return <Wrapper { ...props } />;
+	return <Wrapper { ...themeVariables } />;
 }
 
 export default Theme;
