@@ -173,7 +173,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				'expected_output' => array(
 					'css'          => 'min-height:50vh;',
 					'declarations' => array(
-						'min-height'      => '50vh',
+						'min-height' => '50vh',
 					),
 				),
 			),
