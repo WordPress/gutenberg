@@ -62,40 +62,41 @@
 		flex-wrap: wrap;
 		width: 100%;
 		padding: 0;
-		margin-bottom: $grid-unit-20;
+		margin: 0;
 	}
 	.components-placeholder__instructions {
 		text-align: center;
+		margin-bottom: 18px;
 	}
 	.wp-block-group-placeholder__variations svg {
 		fill: $gray-400 !important;
 	}
 	.wp-block-group-placeholder__variations svg:hover {
-		fill: $gray-600 !important;
+		fill: var(--wp-admin-theme-color) !important;
 	}
 	.wp-block-group-placeholder__variations > li {
-		margin: 0 $grid-unit-20;
+		margin: 0 $grid-unit-15;
 		width: auto;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 	}
-	.wp-block-group-placeholder__variations li > .wp-block-group-placeholder__variation {
-		margin: 0 0 $grid-unit-20 0;
-		height: 68px;
+	.wp-block-group-placeholder__variations li > .wp-block-group-placeholder__variation-button {
+		width: 44px;
+		height: 32px;
+		padding: 0;
+		&:hover {
+			box-shadow: none;
+		}
+	}
+	.components-placeholder {
+		min-height: auto;
+		padding: $grid-unit-30;
 	}
 	.is-small,
 	.is-medium {
-		.wp-block-group-placeholder__variations,
-		.wp-block-group-placeholder__variations li > .wp-block-group-placeholder__variation,
-		.wp-block-group-placeholder__variations > li {
-			margin: 0;
-		}
-		.wp-block-group-placeholder__variations svg {
-			width: 48px;
-		}
-		.wp-block-group-placeholder__variations li > .wp-block-group-placeholder__variation {
-			height: 52px;
+		.wp-block-group-placeholder__variations li {
+			margin: $grid-unit-15;
 		}
 	}
 }

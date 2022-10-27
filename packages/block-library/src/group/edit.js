@@ -69,7 +69,13 @@ function GroupEditControls( { tagName, onSelectTagName } ) {
 	);
 }
 
-function GroupEdit( { attributes, name, setAttributes, clientId } ) {
+function GroupEdit( {
+	attributes,
+	name,
+	setAttributes,
+	clientId,
+	__unstableLayoutClassNames: layoutClassNames,
+} ) {
 	const { hasInnerBlocks, themeSupportsLayout } = useSelect(
 		( select ) => {
 			const { getBlock, getSettings } = select( blockEditorStore );
@@ -101,7 +107,9 @@ function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 	const layoutSupportEnabled = themeSupportsLayout || type === 'flex';
 
 	// Hooks.
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		className: ! layoutSupportEnabled ? layoutClassNames : null,
+	} );
 
 	const innerBlocksProps = useInnerBlocksProps(
 		layoutSupportEnabled
@@ -113,6 +121,7 @@ function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 				? undefined
 				: InnerBlocks.ButtonBlockAppender,
 			__experimentalLayout: layoutSupportEnabled ? usedLayout : undefined,
+			__unstableDisableLayoutClassNames: ! layoutSupportEnabled,
 		}
 	);
 

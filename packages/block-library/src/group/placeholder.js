@@ -67,30 +67,13 @@ const getGroupPlaceholderIcons = ( name = 'group' ) => {
  * @return {JSX.Element}                The placeholder.
  */
 function GroupPlaceHolder( { clientId, name, setAttributes } ) {
-	const { blockType, defaultVariation, variations } = useSelect(
+	const { defaultVariation, variations } = useSelect(
 		( select ) => {
-			const {
-				getBlockVariations,
-				getBlockType,
-				getDefaultBlockVariation,
-			} = select( blocksStore );
-
-			const variationsWithPlaceHolderIcons = (
-				getBlockVariations( name, 'block' ) || []
-			).map( ( groupVariation ) => {
-				const placeholderIcon = getGroupPlaceholderIcons(
-					groupVariation.name
-				);
-				if ( !! placeholderIcon ) {
-					groupVariation.placeHolderIcon = placeholderIcon;
-				}
-				return groupVariation;
-			} );
-
+			const { getBlockVariations, getDefaultBlockVariation } =
+				select( blocksStore );
 			return {
-				blockType: getBlockType( name ),
 				defaultVariation: getDefaultBlockVariation( name, 'block' ),
-				variations: variationsWithPlaceHolderIcons,
+				variations: getBlockVariations( name, 'block' ) || [],
 			};
 		},
 		[ name ]
@@ -106,10 +89,10 @@ function GroupPlaceHolder( { clientId, name, setAttributes } ) {
 	);
 	const selectVariation = ( nextVariation = defaultVariation ) => {
 		/*
-				Remove layout.isDefault if present.
-				`isDefault` exists to identify blocks that have been inserted, programmatically or otherwise, with no changes.
-				When a user selects a layout `isDefault` should not appear in the block's attributes.
-			 */
+		 * Remove layout.isDefault if present.
+		 * `isDefault` exists to identify blocks that have been inserted, programmatically or otherwise, with no changes.
+		 * When a user selects a layout `isDefault` should not appear in the block's attributes.
+		 */
 		const { isDefault, ...rest } = nextVariation.attributes?.layout;
 		const newAttributes = {
 			...nextVariation.attributes,
@@ -118,11 +101,10 @@ function GroupPlaceHolder( { clientId, name, setAttributes } ) {
 		setAttributes( newAttributes );
 		updateSelection( clientId );
 	};
+
 	return (
 		<div { ...blockProps }>
 			<Placeholder
-				icon={ blockType?.icon?.src }
-				label={ blockType?.title }
 				instructions={ __( 'Group blocks together. Select a layout:' ) }
 			>
 				{ /*
@@ -140,17 +122,14 @@ function GroupPlaceHolder( { clientId, name, setAttributes } ) {
 						<li key={ variation.name }>
 							<Button
 								variant="tertiary"
-								icon={
-									variation.placeHolderIcon || variation.icon
-								}
-								iconSize={ 64 }
+								icon={ getGroupPlaceholderIcons(
+									variation.name
+								) }
+								iconSize={ 44 }
 								onClick={ () => selectVariation( variation ) }
-								className="wp-block-group-placeholder__variation"
-								label={
-									variation.description || variation.title
-								}
+								className="wp-block-group-placeholder__variation-button"
+								label={ `${ variation.title }: ${ variation.description }` }
 							/>
-							<span role="presentation">{ variation.title }</span>
 						</li>
 					) ) }
 				</ul>

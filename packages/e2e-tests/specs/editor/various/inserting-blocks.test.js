@@ -279,7 +279,7 @@ describe( 'Inserting blocks', () => {
 		await insertBlock( 'Group' );
 		// Select the default, selected Group layout from the variation picker.
 		await page.click(
-			'button[aria-label="Gather blocks in a container."]'
+			'button[aria-label="Group: Gather blocks in a container."]'
 		);
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Paragraph after group' );
@@ -301,7 +301,7 @@ describe( 'Inserting blocks', () => {
 		await insertBlock( 'Group' );
 		// Select the default, selected Group layout from the variation picker.
 		await page.click(
-			'button[aria-label="Gather blocks in a container."]'
+			'button[aria-label="Group: Gather blocks in a container."]'
 		);
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Text' );

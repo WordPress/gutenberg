@@ -169,7 +169,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await insertBlock( 'Group' );
 		// Select the default, selected Group layout from the variation picker.
 		await page.click(
-			'button[aria-label="Gather blocks in a container."]'
+			'button[aria-label="Group: Gather blocks in a container."]'
 		);
 		// Insert some random blocks.
 		// The last block shouldn't be a textual block.

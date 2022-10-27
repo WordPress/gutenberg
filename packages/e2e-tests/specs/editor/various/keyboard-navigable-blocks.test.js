@@ -225,7 +225,7 @@ describe( 'Order of block keyboard navigation', () => {
 		await insertBlock( 'Group' );
 		// Select the default, selected Group layout from the variation picker.
 		await page.click(
-			'button[aria-label="Gather blocks in a container."]'
+			'button[aria-label="Group: Gather blocks in a container."]'
 		);
 		// If active label matches, that means focus did not change from group block wrapper.
 		await expect( await getActiveLabel() ).toBe( 'Block: Group' );

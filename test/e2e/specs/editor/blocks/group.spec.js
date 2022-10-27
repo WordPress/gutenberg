@@ -30,7 +30,7 @@ test.describe( 'Group', () => {
 
 		// Select the default, selected Group layout from the variation picker.
 		await page.click(
-			'role=button[name="Gather blocks in a container."i]'
+			'role=button[name="Group: Gather blocks in a container."i]'
 		);
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
@@ -49,7 +49,7 @@ test.describe( 'Group', () => {
 
 		// Select the default, selected Group layout from the variation picker.
 		await page.click(
-			'role=button[name="Gather blocks in a container."i]'
+			'role=button[name="Group: Gather blocks in a container."i]'
 		);
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
