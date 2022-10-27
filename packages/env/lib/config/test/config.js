@@ -838,75 +838,6 @@ describe( 'readConfig', () => {
 			} );
 		} );
 
-		it( 'certain wp-config values should include the port number', async () => {
-			readFile.mockImplementation( () =>
-				Promise.resolve(
-					JSON.stringify( {
-						port: 1000,
-						testsPort: 2000,
-					} )
-				)
-			);
-			const config = await readConfig( '.wp-env.json' );
-			// Custom port is overriden while testsPort gets the deault value.
-			expect( config ).toMatchObject( {
-				env: {
-					development: {
-						port: 1000,
-						config: {
-							WP_TESTS_DOMAIN: 'localhost',
-							WP_SITEURL: 'http://localhost:1000/',
-							WP_HOME: 'http://localhost:1000/',
-						},
-					},
-					tests: {
-						port: 2000,
-						config: {
-							WP_TESTS_DOMAIN: 'localhost',
-							WP_SITEURL: 'http://localhost:2000/',
-							WP_HOME: 'http://localhost:2000/',
-						},
-					},
-				},
-			} );
-		} );
-
-		it( 'should not overwrite port number for WP_HOME if set', async () => {
-			readFile.mockImplementation( () =>
-				Promise.resolve(
-					JSON.stringify( {
-						port: 1000,
-						testsPort: 2000,
-						config: {
-							WP_HOME: 'http://localhost:3000/',
-						},
-					} )
-				)
-			);
-			const config = await readConfig( '.wp-env.json' );
-			// Custom port is overriden while testsPort gets the deault value.
-			expect( config ).toMatchObject( {
-				env: {
-					development: {
-						port: 1000,
-						config: {
-							WP_TESTS_DOMAIN: 'localhost',
-							WP_SITEURL: 'http://localhost:1000/',
-							WP_HOME: 'http://localhost:3000/',
-						},
-					},
-					tests: {
-						port: 2000,
-						config: {
-							WP_TESTS_DOMAIN: 'localhost',
-							WP_SITEURL: 'http://localhost:2000/',
-							WP_HOME: 'http://localhost:3000/',
-						},
-					},
-				},
-			} );
-		} );
-
 		it( 'should throw an error if the port number environment variable is invalid', async () => {
 			readFile.mockImplementation( () =>
 				Promise.resolve( JSON.stringify( {} ) )
@@ -1153,9 +1084,6 @@ describe( 'readConfig', () => {
 				WP_PHP_BINARY: 'php',
 				WP_TESTS_EMAIL: 'admin@example.org',
 				WP_TESTS_TITLE: 'Test Blog',
-				WP_TESTS_DOMAIN: 'localhost',
-				WP_SITEURL: 'http://localhost:8889/',
-				WP_HOME: 'http://localhost:8889/',
 			} );
 
 			expect( config.env.development.config ).toEqual( {
@@ -1167,9 +1095,6 @@ describe( 'readConfig', () => {
 				WP_PHP_BINARY: 'php',
 				WP_TESTS_EMAIL: 'admin@example.org',
 				WP_TESTS_TITLE: 'Test Blog',
-				WP_TESTS_DOMAIN: 'localhost',
-				WP_SITEURL: 'http://localhost:8888/',
-				WP_HOME: 'http://localhost:8888/',
 			} );
 		} );
 	} );

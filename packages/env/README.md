@@ -523,16 +523,11 @@ SCRIPT_DEBUG: true,
 WP_PHP_BINARY: 'php',
 WP_TESTS_EMAIL: 'admin@example.org',
 WP_TESTS_TITLE: 'Test Blog',
-WP_TESTS_DOMAIN: 'localhost',
-WP_SITEURL: 'http://localhost',
-WP_HOME: 'http://localhost',
 ```
 
 On the test instance, all of the above are still defined, but `WP_DEBUG` and `SCRIPT_DEBUG` are set to false.
 
 These can be overridden by setting a value within the `config` configuration. Setting it to `null` will prevent the constant being defined entirely.
-
-Additionally, the values referencing a URL include the specified port for the given environment. So if you set `testsPort: 3000, port: 2000`, `WP_HOME` (for example) will be `http://localhost:3000` on the tests instance and `http://localhost:2000` on the development instance.
 
 ### Examples
 

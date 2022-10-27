@@ -45,10 +45,8 @@ async function checkDatabaseConnection( { dockerComposeConfigPath, debug } ) {
  */
 async function configureWordPress( environment, config, spinner ) {
 	const url =
-		environment === 'tests'
-			? config.env.tests.config.WP_TESTS_DOMAIN
-			: config.env.development.config.WP_SITEURL;
-
+		config.env[ environment ].config?.WP_SITEURL ??
+		`http://localhost:` + config.env[ environment ].port;
 	const installCommand = `wp core install --url="${ url }" --title="${ config.name }" --admin_user=admin --admin_password=password --admin_email=wordpress@example.com --skip-email`;
 
 	// -eo pipefail exits the command as soon as anything fails in bash.

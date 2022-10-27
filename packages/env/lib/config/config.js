@@ -93,20 +93,23 @@ module.exports = async function readConfig( configPath ) {
 		port: 8888,
 		mappings: {},
 		config: {
-			WP_DEBUG: true,
-			SCRIPT_DEBUG: true,
 			WP_ENVIRONMENT_TYPE: 'local',
 			WP_PHP_BINARY: 'php',
 			WP_TESTS_EMAIL: 'admin@example.org',
 			WP_TESTS_TITLE: 'Test Blog',
-			WP_TESTS_DOMAIN: 'localhost',
-			WP_SITEURL: 'http://localhost',
-			WP_HOME: 'http://localhost',
 		},
 		env: {
-			development: {}, // No overrides needed, but it should exist.
+			development: {
+				config: {
+					WP_DEBUG: true,
+					SCRIPT_DEBUG: true,
+				},
+			},
 			tests: {
-				config: { WP_DEBUG: false, SCRIPT_DEBUG: false },
+				config: {
+					WP_DEBUG: false,
+					SCRIPT_DEBUG: false,
+				},
 				port: 8889,
 			},
 		},
@@ -271,26 +274,6 @@ function withOverrides( config ) {
 		process.env.WP_ENV_PHP_VERSION || config.env.development.phpVersion;
 	config.env.tests.phpVersion =
 		process.env.WP_ENV_PHP_VERSION || config.env.tests.phpVersion;
-
-	const updateEnvUrl = ( configKey ) => {
-		[ 'development', 'tests' ].forEach( ( envKey ) => {
-			try {
-				const baseUrl = new URL(
-					config.env[ envKey ].config[ configKey ]
-				);
-
-				config.env[ envKey ].config[ configKey ] = baseUrl.toString();
-			} catch ( error ) {
-				throw new ValidationError(
-					`Invalid .wp-env.json: config.${ configKey } must be a valid URL.`
-				);
-			}
-		} );
-	};
-
-	// Update wp config options to include the correct port number in the URL.
-	updateEnvUrl( 'WP_SITEURL' );
-	updateEnvUrl( 'WP_HOME' );
 
 	return config;
 }
