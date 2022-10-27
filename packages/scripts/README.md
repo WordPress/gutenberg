@@ -275,7 +275,7 @@ _Example:_
 
 This is how you execute the script with presented setup:
 
--   `npm run lint:style` - lints CSS and SCSS files in the entire project’s directories.
+-   `npm run lint:style` - lints CSS, PCSS, and SCSS files in the entire project’s directories.
 -   `npm run lint:css:src` - lints only CSS files in the project’s `src` subfolder’s directories.
 
 When you run commands similar to the `npm run lint:css:src` example above, be sure to include the quotation marks around file globs. This ensures that you can use the powers of [globby](https://github.com/sindresorhus/globby) (like the `**` globstar) regardless of your shell. See [more examples](https://github.com/stylelint/stylelint/blob/HEAD/docs/user-guide/cli.md#examples).
@@ -587,6 +587,7 @@ $body-color: red;
 
 ```js
 // index.js
+import './index.pcss';
 import './index.scss';
 import './style.css';
 ```
@@ -594,7 +595,7 @@ import './style.css';
 When you run the build using the default command `wp-scripts build` (also applies to `start`) in addition to the JavaScript file `index.js` generated in the `build` folder, you should see two more files:
 
 1. `index.css` – all imported CSS files are bundled into one chunk named after the entry point, which defaults to `index.js`, and thus the file created becomes `index.css`. This is for styles used only in the editor.
-2. `style-index.css` – imported `style.css` file(s) (applies to SASS and SCSS extensions) get bundled into one `style-index.css` file that is meant to be used both on the front-end and in the editor.
+2. `style-index.css` – imported `style.css` file(s) (applies to PCSS, SASS and SCSS extensions) get bundled into one `style-index.css` file that is meant to be used both on the front-end and in the editor.
 
 You can also have multiple entry points as described in the docs for the script:
 
