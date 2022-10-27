@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, pickBy, reduce, some } from 'lodash';
+import { find, pickBy, reduce } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -152,8 +152,7 @@ export default ( ...fontSizeNames ) => {
 						};
 
 						if (
-							! some(
-								fontSizeAttributeNames,
+							! Object.values( fontSizeAttributeNames ).some(
 								didAttributesChange
 							)
 						) {
