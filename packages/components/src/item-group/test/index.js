@@ -16,7 +16,7 @@ describe( 'ItemGroup', () => {
 					<Item>Code is poetry</Item>
 				</ItemGroup>
 			);
-			expect( container.firstChild ).toMatchSnapshot();
+			expect( container ).toMatchSnapshot();
 		} );
 
 		it( 'should show borders when the isBordered prop is true', () => {
@@ -65,14 +65,14 @@ describe( 'ItemGroup', () => {
 				</ItemGroup>
 			);
 
-			const { container: seperatedItems } = render(
+			const { container: separatedItems } = render(
 				<ItemGroup isSeparated={ true }>
 					<Item>Code is poetry</Item>
 				</ItemGroup>
 			);
 
 			expect( groupedItems.firstChild ).toMatchDiffSnapshot(
-				seperatedItems.firstChild
+				separatedItems.firstChild
 			);
 		} );
 	} );

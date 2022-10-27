@@ -38,7 +38,7 @@ function UnforwardedExternalLink(
 		),
 	].join( ' ' );
 	const classes = classnames( 'components-external-link', className );
-	/* Anchor links are percieved as external links.
+	/* Anchor links are perceived as external links.
 	This constant helps check for on page anchor links,
 	to prevent them from being opened in the editor. */
 	const isInternalAnchor = !! href?.startsWith( '#' );

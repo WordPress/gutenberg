@@ -100,11 +100,15 @@ export function useBorderBoxControl(
 
 	const cx = useCx();
 	const classes = useMemo( () => {
-		return cx( styles.BorderBoxControl, className );
+		return cx( styles.borderBoxControl, className );
 	}, [ cx, className ] );
 
 	const linkedControlClassName = useMemo( () => {
-		return cx( styles.LinkedBorderControl );
+		return cx( styles.linkedBorderControl() );
+	}, [ cx ] );
+
+	const wrapperClassName = useMemo( () => {
+		return cx( styles.wrapper );
 	}, [ cx ] );
 
 	return {
@@ -119,5 +123,6 @@ export function useBorderBoxControl(
 		toggleLinked,
 		linkedValue,
 		splitValue,
+		wrapperClassName,
 	};
 }

@@ -39,7 +39,7 @@ function NavLink( { params, replace, ...props } ) {
 	return <NavigationItem { ...linkProps } { ...props } />;
 }
 
-const NavigationPanel = ( { activeItem = SITE_EDITOR_KEY } ) => {
+const NavigationPanel = ( { activeItem } ) => {
 	const { homeTemplate, isNavigationOpen, isTemplatePartsMode, siteTitle } =
 		useSelect( ( select ) => {
 			const { getEntityRecord } = select( coreDataStore );
