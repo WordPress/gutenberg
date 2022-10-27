@@ -434,18 +434,4 @@
 .block-editor-iframe__body {
 	transition: all 0.3s;
 	transform-origin: top center;
-
-	&.is-zoomed-out {
-		margin: 100px 0;
-		transform: scale(0.45);
-
-		// Add a bit more space between the top level blocks.
-		.wp-site-blocks > * + * {
-			margin-block-start: 2.5rem;
-		}
-
-		> .block-list-appender {
-			display: none;
-		}
-	}
 }
