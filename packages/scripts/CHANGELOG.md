@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Update default webpack config and lint-style script to allow PostCSS (`.pcss` extension) file usage. (PR# TBD)
+
 ## 24.4.0 (2022-10-19)
 
 ## 24.3.0 (2022-10-05)
