@@ -4,6 +4,7 @@
 const fs = require( 'fs' );
 const path = require( 'path' );
 const { mapValues, kebabCase } = require( 'lodash' );
+const SimpleGit = require( 'simple-git' );
 
 /**
  * Internal dependencies
@@ -15,7 +16,6 @@ const {
 	askForConfirmation,
 	getRandomTemporaryPath,
 } = require( '../lib/utils' );
-const git = require( '../lib/git' );
 const config = require( '../config' );
 
 /**
@@ -147,24 +147,6 @@ function curateResults( results ) {
 }
 
 /**
- * Set up the given branch for testing.
- *
- * @param {string} branch               Branch name.
- * @param {string} environmentDirectory Path to the plugin environment's clone.
- */
-async function setUpGitBranch( branch, environmentDirectory ) {
-	// Restore clean working directory (e.g. if `package-lock.json` has local
-	// changes after install).
-	await git.discardLocalChanges( environmentDirectory );
-
-	log( '        >> Fetching the ' + formats.success( branch ) + ' branch' );
-	await git.checkoutRemoteBranch( environmentDirectory, branch );
-
-	log( '        >> Building the ' + formats.success( branch ) + ' branch' );
-	await runShellScript( 'npm ci && npm run build', environmentDirectory );
-}
-
-/**
  * Runs the performance tests on the current branch.
  *
  * @param {string} testSuite                Name of the tests set.
@@ -214,24 +196,47 @@ async function runPerformanceTests( branches, options ) {
 	// 1- Preparing the tests directory.
 	log( '\n>> Preparing the tests directories' );
 	log( '    >> Cloning the repository' );
-	const baseDirectory = await git.clone( config.gitRepositoryURL );
+
+	/**
+	 * @type {string[]} git refs against which to run tests;
+	 *                  could be commit SHA, branch name, tag, etc...
+	 */
+	if ( branches.length < 2 ) {
+		throw new Error( `Need at least two git refs to run` );
+	}
+
+	const baseDirectory = getRandomTemporaryPath();
+	fs.mkdirSync( baseDirectory, { recursive: true } );
+
+	// @ts-ignore
+	const git = SimpleGit( baseDirectory );
+	await git
+		.raw( 'init' )
+		.raw( 'remote', 'add', 'origin', config.gitRepositoryURL );
+
+	for ( const branch of branches ) {
+		await git.raw( 'fetch', '--depth=1', 'origin', branch );
+	}
+
+	await git.raw( 'checkout', branches[ 0 ] );
+
 	const rootDirectory = getRandomTemporaryPath();
 	const performanceTestDirectory = rootDirectory + '/tests';
 	await runShellScript( 'mkdir -p ' + rootDirectory );
 	await runShellScript(
 		'cp -R ' + baseDirectory + ' ' + performanceTestDirectory
 	);
+
 	if ( !! options.testsBranch ) {
-		log(
-			'    >> Fetching the test branch: ' +
-				formats.success( options.testsBranch ) +
-				' branch'
-		);
-		await git.checkoutRemoteBranch(
-			performanceTestDirectory,
-			options.testsBranch
-		);
+		const branchName = formats.success( options.testsBranch );
+		log( `    >> Fetching the test-runner branch: ${ branchName }` );
+
+		// @ts-ignore
+		await SimpleGit( performanceTestDirectory )
+			.raw( 'fetch', '--depth=1', 'origin', options.testsBranch )
+			.raw( 'checkout', options.testsBranch );
 	}
+
 	log( '    >> Installing dependencies and building packages' );
 	await runShellScript(
 		'npm ci && npm run build:packages',
@@ -244,16 +249,22 @@ async function runPerformanceTests( branches, options ) {
 	log( '\n>> Preparing an environment directory per branch' );
 	const branchDirectories = {};
 	for ( const branch of branches ) {
-		log( '    >> Branch: ' + branch );
+		log( `    >> Branch: ${ branch }` );
 		const environmentDirectory =
 			rootDirectory + '/envs/' + kebabCase( branch );
 		// @ts-ignore
 		branchDirectories[ branch ] = environmentDirectory;
+		const buildPath = `${ environmentDirectory }/plugin`;
 		await runShellScript( 'mkdir ' + environmentDirectory );
-		await runShellScript(
-			'cp -R ' + baseDirectory + ' ' + environmentDirectory + '/plugin'
-		);
-		await setUpGitBranch( branch, environmentDirectory + '/plugin' );
+		await runShellScript( `cp -R ${ baseDirectory } ${ buildPath }` );
+
+		log( `        >> Fetching the ${ formats.success( branch ) } branch` );
+		// @ts-ignore
+		await SimpleGit( buildPath ).reset( 'hard' ).checkout( branch );
+
+		log( `        >> Building the ${ formats.success( branch ) } branch` );
+		await runShellScript( 'npm ci && npm run build', buildPath );
+
 		await runShellScript(
 			'cp ' +
 				path.resolve(
@@ -302,13 +313,9 @@ async function runPerformanceTests( branches, options ) {
 			formats.success( performanceTestDirectory )
 	);
 	for ( const branch of branches ) {
-		log(
-			'>> Environment Directory (' +
-				branch +
-				') : ' +
-				// @ts-ignore
-				formats.success( branchDirectories[ branch ] )
-		);
+		// @ts-ignore
+		const envPath = formats.success( branchDirectories[ branch ] );
+		log( `>> Environment Directory (${ branch }) : ${ envPath }` );
 	}
 
 	// 4- Running the tests.
@@ -328,7 +335,7 @@ async function runPerformanceTests( branches, options ) {
 			for ( const branch of branches ) {
 				// @ts-ignore
 				const environmentDirectory = branchDirectories[ branch ];
-				log( '    >> Branch: ' + branch + ', Suite: ' + testSuite );
+				log( `    >> Branch: ${ branch }, Suite: ${ testSuite }` );
 				log( '        >> Starting the environment.' );
 				await runShellScript(
 					'../../tests/node_modules/.bin/wp-env start',
