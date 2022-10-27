@@ -204,7 +204,7 @@ const config = {
 			},
 			{
 				test: /\.svg$/,
-				issuer: /\.(sc|sa|c)ss$/,
+				issuer: /\.(pc|sc|sa|c)ss$/,
 				type: 'asset/inline',
 			},
 			{
