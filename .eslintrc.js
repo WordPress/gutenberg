@@ -114,6 +114,7 @@ module.exports = {
 							'fromPairs',
 							'has',
 							'identity',
+							'includes',
 							'invoke',
 							'isArray',
 							'isBoolean',

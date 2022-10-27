@@ -305,7 +305,7 @@ function gutenberg_get_classnames_from_last_tag( $html ) {
 		$last_classnames = $tags->get_attribute( 'class' );
 	}
 
-	return $last_classnames;
+	return (string) $last_classnames;
 }
 
 /**
@@ -445,7 +445,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$content->add_class( implode( ' ', $class_names ) );
 	}
 
-	return $content;
+	return (string) $content;
 }
 
 // Register the block support. (overrides core one).
