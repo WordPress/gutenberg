@@ -30,29 +30,33 @@ const accentColor = ( { accent }: ThemeProps ) =>
 		  `
 		: undefined;
 
+// TODO: Add unit test so the result of this matches the default case (#fff to #1e1e1e)
 function generateShades( background: string, foreground: string ) {
 	// Start from #fff (background)
 	const shades = {
-		// 0: 0,
 		100: 0.06,
-		200: 0.12,
+		200: 0.121,
 		300: 0.132,
 		400: 0.2,
 		600: 0.42,
-		700: 0.54,
-		800: 0.817,
-		// 900: 0.884,
+		700: 0.543,
+		800: 0.821,
 	};
 
+	// Darkness of COLORS.gray[ 900 ], relative to #fff
+	const limit = 0.884;
+
+	const direction = colord( background ).isDark() ? 'lighten' : 'darken';
+	const range =
+		Math.abs(
+			colord( background ).toHsl().l - colord( foreground ).toHsl().l
+		) / 100;
+
 	const result: Record< string, string > = {};
+
 	Object.entries( shades ).forEach( ( [ k, v ] ) => {
-		const range =
-			( colord( background ).toHsl().l -
-				colord( foreground ).toHsl().l ) /
-			100;
-		const dir = colord( background ).isDark() ? 'lighten' : 'darken';
 		result[ k ] = colord( background )
-			[ dir ]( v * range )
+			[ direction ]( ( v / limit ) * range )
 			.toHex();
 	} );
 
