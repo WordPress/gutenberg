@@ -89,6 +89,7 @@ function CoverEdit( {
 		hasParallax,
 		isDark,
 		isRepeated,
+		layout = {},
 		minHeight,
 		minHeightUnit,
 		alt,
@@ -187,6 +188,11 @@ function CoverEdit( {
 		fontSize: hasFontSizes ? 'large' : undefined,
 	} );
 
+	const defaultLayout = useSetting( 'layout' ) || {};
+	const usedLayout = ! layout?.type
+		? { ...defaultLayout, ...layout, type: 'constrained' }
+		: { ...defaultLayout, ...layout };
+
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-cover__inner-container',
@@ -198,6 +204,7 @@ function CoverEdit( {
 			templateInsertUpdatesSelection: true,
 			allowedBlocks,
 			templateLock,
+			__experimentalLayout: usedLayout,
 		}
 	);
 
