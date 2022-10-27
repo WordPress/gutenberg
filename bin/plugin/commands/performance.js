@@ -215,17 +215,14 @@ async function runPerformanceTests( branches, options ) {
 
 	// @ts-ignore
 	const git = SimpleGit( baseDirectory );
-	await git
-		.raw( 'init' )
-		.raw( 'remote', 'add', 'local', localRepo )
-		.catch( () => {
-			/*
-			 * If we don't have a copy of a local checkout from
-			 * Github then this will fail, but we can ignore it
-			 * because we're adding the remote repo as well.
-			 */
-		} )
-		.raw( 'remote', 'add', 'origin', remoteRepo );
+	await git.raw( 'init' );
+
+	try {
+		await git.raw( 'remote', 'add', 'local', localRepo );
+	} catch ( e ) {
+		// ignore errors, it's okay because we're adding the remote URL too
+	}
+	await git.raw( 'remote', 'add', 'origin', remoteRepo );
 
 	for ( const ref of refs ) {
 		try {
