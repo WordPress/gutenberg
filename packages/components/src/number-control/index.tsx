@@ -186,6 +186,19 @@ function UnforwardedNumberControl(
 			return nextState;
 		};
 
+	const buildSpinHandler =
+		( direction: 'up' | 'down' ) =>
+		( event: ChangeEvent< HTMLInputElement > ) => {
+			let nextValue = isValueEmpty( valueProp ) ? baseValue : valueProp;
+			if ( direction === 'up' ) {
+				nextValue = add( nextValue, baseStep );
+			} else if ( direction === 'down' ) {
+				nextValue = subtract( nextValue, baseStep );
+			}
+			nextValue = constrainValue( nextValue );
+			onChange( String( nextValue ), { event } );
+		};
+
 	return (
 		<Input
 			autoComplete={ autoComplete }
@@ -219,41 +232,13 @@ function UnforwardedNumberControl(
 									icon={ plusIcon }
 									isSmall
 									aria-hidden="true"
-									onClick={ (
-										event: ChangeEvent< HTMLInputElement >
-									) => {
-										const currentValue = isValueEmpty(
-											valueProp
-										)
-											? baseValue
-											: valueProp;
-										const nextValue = constrainValue(
-											add( currentValue, baseStep )
-										);
-										onChange?.( String( nextValue ), {
-											event,
-										} );
-									} }
+									onClick={ buildSpinHandler( 'up' ) }
 								/>
 								<SpinButton
 									icon={ resetIcon }
 									isSmall
 									aria-hidden="true"
-									onClick={ (
-										event: ChangeEvent< HTMLInputElement >
-									) => {
-										const currentValue = isValueEmpty(
-											valueProp
-										)
-											? baseValue
-											: valueProp;
-										const nextValue = constrainValue(
-											subtract( currentValue, baseStep )
-										);
-										onChange?.( String( nextValue ), {
-											event,
-										} );
-									} }
+									onClick={ buildSpinHandler( 'down' ) }
 								/>
 							</HStack>
 						</Spacer>
