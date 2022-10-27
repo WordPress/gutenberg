@@ -1,5 +1,9 @@
 {
-	"setupTasks": [ "npm install", "npm run dev" ],
+	"setupTasks": [
+		"npm install",
+		"npm run build",
+		"node ./bin/prepare-codesandbox.js"
+	],
 	"tasks": {
 		"install-dependencies": {
 			"name": "Install Dependencies",
