@@ -360,26 +360,6 @@ function gutenberg_get_typography_value_and_unit( $raw_value, $options = array()
  * @return string|null A font-size value using clamp().
  */
 function gutenberg_get_computed_fluid_font_size_value( $args = array() ) {
-	/**
-	 * Filters the fluid font size arguments array before the internal calculations take place.
-	 *
-	 * Return a non-null value to bypass the WordPress internal calculations.
-	 *
-	 * @param string|null $fluid_typography_value Return a font-size value using the passed arguments to short-circuit the default calculations,
-	 *                                            or null to allow WordPress to calculate the font size value.
-	 * @param array $args array(
-	 *     'maximum_viewport_width' => (string) Maximum size up to which type will have fluidity.
-	 *     'minimum_viewport_width' => (string) Minimum viewport size from which type will have fluidity.
-	 *     'maximum_font_size'      => (string) Maximum font size.
-	 *     'minimum_font_size'      => (string) Minimum font size.
-	 *     'scale_factor'           => (number) A scale factor to determine how fast a font scales within boundaries.
-	 * );.
-	 */
-	$fluid_typography_value = apply_filters( 'pre_get_computed_fluid_font_size_value', null, $args );
-	if ( ! is_null( $fluid_typography_value ) ) {
-		return $fluid_typography_value;
-	}
-
 	$maximum_viewport_width_raw = isset( $args['maximum_viewport_width'] ) ? $args['maximum_viewport_width'] : null;
 	$minimum_viewport_width_raw = isset( $args['minimum_viewport_width'] ) ? $args['minimum_viewport_width'] : null;
 	$maximum_font_size_raw      = isset( $args['maximum_font_size'] ) ? $args['maximum_font_size'] : null;
