@@ -147,12 +147,26 @@ final class WP_Style_Engine {
 					'spacing' => '--wp--preset--spacing--$slug',
 				),
 			),
-			'margin'  => array(
+			'margin' => array(
 				'property_keys' => array(
 					'default'    => 'margin',
 					'individual' => 'margin-%s',
 				),
 				'path'          => array( 'spacing', 'margin' ),
+				'css_vars'      => array(
+					'spacing' => '--wp--preset--spacing--$slug',
+				),
+			),
+		),
+		'dimensions' => array(
+			'minHeight' => array(
+				'property_keys' => array(
+					'default' => 'min-height',
+				),
+				'path'          => array( 'dimensions', 'minHeight' ),
+				'classnames'    => array(
+					'has-$slug-font-size' => 'font-size',
+				),
 				'css_vars'      => array(
 					'spacing' => '--wp--preset--spacing--$slug',
 				),
