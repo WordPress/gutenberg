@@ -181,6 +181,10 @@ const config = {
 				use: cssLoaders,
 			},
 			{
+				test: /\.pcss$/,
+				use: cssLoaders,
+			},
+			{
 				test: /\.(sc|sa)ss$/,
 				use: [
 					...cssLoaders,
