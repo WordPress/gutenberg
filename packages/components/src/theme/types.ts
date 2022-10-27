@@ -19,3 +19,5 @@ export type ThemeProps = {
 	 */
 	children?: ReactNode;
 };
+
+export type ThemeProviderProps = ThemeProps;
