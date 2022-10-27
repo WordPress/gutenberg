@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -66,6 +66,7 @@ describe( 'BlockAlignmentUI', () => {
 				name: 'Align',
 			} )
 		);
+		await act( () => Promise.resolve() );
 
 		expect(
 			screen.getAllByRole( 'menuitemradio', {

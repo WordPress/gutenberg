@@ -151,7 +151,7 @@ class URLInput extends Component {
 
 		// Initial suggestions may only show if there is no value
 		// (note: this includes whitespace).
-		const isInitialSuggestions = ! value?.length;
+		const isInitialSuggestions = value.length === 0;
 
 		// Trim only now we've determined whether or not it originally had a "length"
 		// (even if that value was all whitespace).

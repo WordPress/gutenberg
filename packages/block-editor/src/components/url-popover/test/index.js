@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -9,23 +9,32 @@ import userEvent from '@testing-library/user-event';
  */
 import URLPopover from '../';
 
+jest.useRealTimers();
+
 describe( 'URLPopover', () => {
-	it( 'matches the snapshot in its default state', () => {
+	it( 'matches the snapshot in its default state', async () => {
 		const { container } = render(
-			<URLPopover renderSettings={ () => <div>Settings</div> }>
+			<URLPopover
+				animate={ false }
+				renderSettings={ () => <div>Settings</div> }
+			>
 				<div>Editor</div>
 			</URLPopover>
 		);
+
+		// wait for `Popover` effects to finish
+		await act( () => Promise.resolve() );
 
 		expect( container ).toMatchSnapshot();
 	} );
 
 	it( 'matches the snapshot when the settings are toggled open', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const { container } = render(
-			<URLPopover renderSettings={ () => <div>Settings</div> }>
+			<URLPopover
+				animate={ false }
+				renderSettings={ () => <div>Settings</div> }
+			>
 				<div>Editor</div>
 			</URLPopover>
 		);
@@ -37,12 +46,15 @@ describe( 'URLPopover', () => {
 		expect( container ).toMatchSnapshot();
 	} );
 
-	it( 'matches the snapshot when there are no settings', () => {
+	it( 'matches the snapshot when there are no settings', async () => {
 		const { container } = render(
-			<URLPopover>
+			<URLPopover animate={ false }>
 				<div>Editor</div>
 			</URLPopover>
 		);
+
+		// wait for `Popover` effects to finish
+		await act( () => Promise.resolve() );
 
 		expect( container ).toMatchSnapshot();
 	} );

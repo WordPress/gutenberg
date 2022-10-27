@@ -15,6 +15,7 @@ import { copy } from '@wordpress/icons';
  * Internal dependencies
  */
 import { BlockSwitcher, BlockSwitcherDropdownMenu } from '../';
+import { act } from 'react-test-renderer';
 
 jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
 jest.mock( '../../block-title/use-block-display-title', () =>
@@ -210,6 +211,7 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 				} ),
 				'[ArrowDown]'
 			);
+			await act( () => Promise.resolve() );
 
 			expect(
 				screen.getByRole( 'button', {
@@ -252,6 +254,7 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 					expanded: false,
 				} )
 			);
+			await act( () => Promise.resolve() );
 
 			expect(
 				screen.getByRole( 'button', {
@@ -282,6 +285,7 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 					expanded: false,
 				} )
 			);
+			await act( () => Promise.resolve() );
 
 			expect(
 				within(

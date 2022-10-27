@@ -8,6 +8,7 @@ import userEvent from '@testing-library/user-event';
  * WordPress dependencies
  */
 import { alignLeft, alignCenter } from '@wordpress/icons';
+import { act } from 'react-test-renderer';
 
 /**
  * Internal dependencies
@@ -71,6 +72,7 @@ describe( 'AlignmentUI', () => {
 				name: 'Align',
 			} )
 		);
+		await act( () => Promise.resolve() );
 
 		expect(
 			screen.getAllByRole( 'menuitemradio', {

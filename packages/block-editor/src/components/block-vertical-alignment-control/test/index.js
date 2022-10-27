@@ -3,6 +3,7 @@
  */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { act } from 'react-test-renderer';
 
 /**
  * Internal dependencies
@@ -64,6 +65,7 @@ describe( 'BlockVerticalAlignmentUI', () => {
 				name: 'Change vertical alignment',
 			} )
 		);
+		await act( () => Promise.resolve() );
 
 		expect(
 			screen.getAllByRole( 'menuitemradio', {
