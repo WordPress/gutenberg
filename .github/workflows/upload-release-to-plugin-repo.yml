@@ -79,7 +79,7 @@ jobs:
             - name: Commit the Changelog update
               run: |
                   git add changelog.txt
-                  # Remove files that are not meant to be commited
+                  # Remove files that are not meant to be committed
                   # ie. release_notes.txt created on the previous step.
                   git clean -fd
                   # Only attempt to commit changelog if it has been modified.

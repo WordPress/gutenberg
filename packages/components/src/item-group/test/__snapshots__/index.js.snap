@@ -82,22 +82,24 @@ exports[`ItemGroup ItemGroup component should render correctly 1`] = `
   border-radius: 2px;
 }
 
-<div
-  class="components-item-group emotion-0 emotion-1"
-  data-wp-c16t="true"
-  data-wp-component="ItemGroup"
-  role="list"
->
+<div>
   <div
-    class="emotion-2"
-    role="listitem"
+    class="components-item-group emotion-0 emotion-1"
+    data-wp-c16t="true"
+    data-wp-component="ItemGroup"
+    role="list"
   >
     <div
-      class="components-item emotion-3 emotion-1"
-      data-wp-c16t="true"
-      data-wp-component="Item"
+      class="emotion-2"
+      role="listitem"
     >
-      Code is poetry
+      <div
+        class="components-item emotion-3 emotion-1"
+        data-wp-c16t="true"
+        data-wp-component="Item"
+      >
+        Code is poetry
+      </div>
     </div>
   </div>
 </div>

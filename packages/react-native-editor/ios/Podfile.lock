@@ -544,12 +544,12 @@ SPEC CHECKSUMS:
   React-logger: faee236598b0f7e1a5e3b68577016ac451f1f993
   react-native-blur: ef741a08d020010ba65e411be0ab82d1d325e7ad
   react-native-get-random-values: b6fb85e7169b9822976793e467458c151c3e8b69
-  react-native-keyboard-aware-scroll-view: 0bc6c2dfe9056935a40dc1a70e764b7a1bbf6568
+  react-native-keyboard-aware-scroll-view: 374b637c8684d7de50bd930df1a2d2b8fd49daa5
   react-native-safe-area: c9cf765aa2dd96159476a99633e7d462ce5bb94f
-  react-native-safe-area-context: f0906bf8bc9835ac9a9d3f97e8bde2a997d8da79
+  react-native-safe-area-context: e471852c5ed67eea4b10c5d9d43c1cebae3b231d
   react-native-slider: a433f1c13c5da3c17a587351bff7371f65cc9a07
-  react-native-video: bbc5d6759a481da913f1d917dd119c3366f4c36d
-  react-native-webview: 193d233c29eacce1f42ca2637dab7ba79c25a6de
+  react-native-video: 628148a219f300d4d9f8127563aea2fe0120b718
+  react-native-webview: 1f56115845c98f0a59dfbbac685797c014a821be
   React-perflogger: 5ab487cacfe6ec19bfe3d3f8072bf71eb07d63da
   React-RCTActionSheet: 03f25695e095fb5aa003828620943c74cc281fec
   React-RCTAnimation: eaf82da39f0c36fb0ef2a28df797c5f73a2a98ea
@@ -562,8 +562,8 @@ SPEC CHECKSUMS:
   React-RCTVibration: 3e815c3d2dd2e0e931b68595b5b92d23ba38b3fb
   React-runtimeexecutor: 393e26602c1b248683372051e34db63e359e3b01
   ReactCommon: c0263c1a41509aeb94be3214fa7bc3b71eae5ef6
-  RNCClipboard: 99fc8ad669a376b756fbc8098ae2fd05c0ed0668
-  RNCMaskedView: c298b644a10c0c142055b3ae24d83879ecb13ccd
+  RNCClipboard: f49f3de56b40d0f4104680dabadc7a1f063f4fd4
+  RNCMaskedView: d367b2a8df3992114e31b32b091a0c00dc800827
   RNFastImage: 1f2cab428712a4baaf78d6169eaec7f622556dd7
   RNGestureHandler: 3e0ea0c115175e66680032904339696bab928ca3
   RNReanimated: 2366094144f5bfc2179b401237ef49034ecbee3e
@@ -575,6 +575,6 @@ SPEC CHECKSUMS:
   WordPress-Aztec-iOS: 7d11d598f14c82c727c08b56bd35fbeb7dafb504
   Yoga: 9a08effa851c1d8cc1647691895540bc168ea65f
 
-PODFILE CHECKSUM: d0a2d4714ee19a1821eb2a30029333be8d6a729f
+PODFILE CHECKSUM: efade6f93821f386d9f463cf4d0ab66f76f971ec
 
 COCOAPODS: 1.10.1

@@ -13,7 +13,7 @@
 ### New feature
 
 -   Include TypeScript type declarations ([#18942](https://github.com/WordPress/gutenberg/pull/18942))
--   The "Add First Time Contributor Label" task now prompts the user to link their GitHub account to their WordPress.org profile if neccessary for props credit. The task has been renamed "First Time Contributor".
+-   The "Add First Time Contributor Label" task now prompts the user to link their GitHub account to their WordPress.org profile if necessary for props credit. The task has been renamed "First Time Contributor".
 
 ### Improvements
 
