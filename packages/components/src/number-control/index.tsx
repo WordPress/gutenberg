@@ -42,6 +42,7 @@ function UnforwardedNumberControl(
 		type: typeProp = 'number',
 		value: valueProp,
 		size = 'default',
+		suffix,
 		onChange = noop,
 		...props
 	}: WordPressComponentProps< NumberControlProps, 'input', false >,
@@ -209,52 +210,56 @@ function UnforwardedNumberControl(
 			} }
 			size={ size }
 			suffix={
-				size === '__unstable-large' &&
-				! hideHTMLArrows && (
-					<Spacer marginBottom={ 0 } marginRight={ 2 }>
-						<HStack spacing={ 1 }>
-							<SpinButton
-								icon={ plusIcon }
-								isSmall
-								aria-hidden="true"
-								onClick={ (
-									event: ChangeEvent< HTMLInputElement >
-								) => {
-									const currentValue = isValueEmpty(
-										valueProp
-									)
-										? baseValue
-										: valueProp;
-									const nextValue = constrainValue(
-										add( currentValue, baseStep )
-									);
-									onChange?.( String( nextValue ), {
-										event,
-									} );
-								} }
-							/>
-							<SpinButton
-								icon={ resetIcon }
-								isSmall
-								aria-hidden="true"
-								onClick={ (
-									event: ChangeEvent< HTMLInputElement >
-								) => {
-									const currentValue = isValueEmpty(
-										valueProp
-									)
-										? baseValue
-										: valueProp;
-									const nextValue = constrainValue(
-										subtract( currentValue, baseStep )
-									);
-									onChange?.( String( nextValue ), {
-										event,
-									} );
-								} }
-							/>
-						</HStack>
-					</Spacer>
+				size === '__unstable-large' && ! hideHTMLArrows ? (
+					<>
+						{ suffix }
+						<Spacer marginBottom={ 0 } marginRight={ 2 }>
+							<HStack spacing={ 1 }>
+								<SpinButton
+									icon={ plusIcon }
+									isSmall
+									aria-hidden="true"
+									onClick={ (
+										event: ChangeEvent< HTMLInputElement >
+									) => {
+										const currentValue = isValueEmpty(
+											valueProp
+										)
+											? baseValue
+											: valueProp;
+										const nextValue = constrainValue(
+											add( currentValue, baseStep )
+										);
+										onChange?.( String( nextValue ), {
+											event,
+										} );
+									} }
+								/>
+								<SpinButton
+									icon={ resetIcon }
+									isSmall
+									aria-hidden="true"
+									onClick={ (
+										event: ChangeEvent< HTMLInputElement >
+									) => {
+										const currentValue = isValueEmpty(
+											valueProp
+										)
+											? baseValue
+											: valueProp;
+										const nextValue = constrainValue(
+											subtract( currentValue, baseStep )
+										);
+										onChange?.( String( nextValue ), {
+											event,
+										} );
+									} }
+								/>
+							</HStack>
+						</Spacer>
+					</>
+				) : (
+					suffix
 				)
 			}
 			onChange={ onChange }
