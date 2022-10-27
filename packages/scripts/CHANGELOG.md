@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Update default webpack config and lint-style script to allow PostCSS (`.pcss` extension) file usage. (PR# TBD)
+-   Update default webpack config and lint-style script to allow PostCSS (`.pcss` extension) file usage. ([#45352](https://github.com/WordPress/gutenberg/pull/45352)).
 
 ## 24.4.0 (2022-10-19)
 
