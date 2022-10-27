@@ -20,8 +20,8 @@ import { add, subtract, roundClamp } from '../utils/math';
 import { ensureNumber, isValueEmpty } from '../utils/values';
 import type { WordPressComponentProps } from '../ui/context/wordpress-component';
 import type { NumberControlProps } from './types';
-import InputControlSuffixWrapper from '../input-control/input-suffix-wrapper';
 import { HStack } from '../h-stack';
+import { Spacer } from '../spacer';
 
 const noop = () => {};
 
@@ -211,8 +211,8 @@ function UnforwardedNumberControl(
 			suffix={
 				size === '__unstable-large' &&
 				! hideHTMLArrows && (
-					<InputControlSuffixWrapper>
-						<HStack spacing={ 2 }>
+					<Spacer marginBottom={ 0 } marginRight={ 2 }>
+						<HStack spacing={ 1 }>
 							<SpinButton
 								icon={ plusIcon }
 								isSmall
@@ -254,7 +254,7 @@ function UnforwardedNumberControl(
 								} }
 							/>
 						</HStack>
-					</InputControlSuffixWrapper>
+					</Spacer>
 				)
 			}
 			onChange={ onChange }
