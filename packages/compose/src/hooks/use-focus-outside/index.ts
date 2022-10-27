@@ -144,10 +144,19 @@ export default function useFocusOutside(
 		// due to recycling behavior, except when explicitly persisted.
 		event.persist();
 
+		console.log( `${ event.target } blurred!` );
+
 		// Skip blur check if clicking button. See `normalizeButtonFocus`.
 		if ( preventBlurCheck.current ) {
 			return;
 		}
+
+		// console.log( {
+		// 	docAE: document.activeElement,
+		// 	wrapperAE: wrapperRef.current?.ownerDocument.activeElement,
+		// 	eventAE: event.target.ownerDocument.activeElement,
+		// 	relatedTarget: event.relatedTarget,
+		// } );
 
 		blurCheckTimeoutId.current = setTimeout( () => {
 			const documentLostFocus = ! document.hasFocus();
@@ -156,6 +165,13 @@ export default function useFocusOutside(
 				wrapperEl?.ownerDocument.activeElement ?? null;
 			const activeElementIsInWrapper =
 				wrapperEl?.contains( activeElement );
+
+			console.log( {
+				documentLostFocus,
+				activeElementIsInWrapper,
+				wrapperEl,
+				activeElement,
+			} );
 
 			// If document is not focused then focus should remain
 			// inside the wrapped component and therefore we cancel
