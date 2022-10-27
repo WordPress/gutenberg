@@ -187,7 +187,7 @@ function gutenberg_template_parts_screen_init( $hook ) {
 	wp_enqueue_media();
 
 	if (
-		current_theme_supports( 'wp-block-styles' ) ||
+		current_theme_supports( 'wp-block-styles' ) &&
 		( ! is_array( $editor_styles ) || count( $editor_styles ) === 0 )
 	) {
 		wp_enqueue_style( 'wp-block-library-theme' );
