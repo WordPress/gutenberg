@@ -180,6 +180,8 @@ async function runPerformanceTests( branches, options ) {
 	const inferTestBranches = runningInCI && ! branchesWereSpecified;
 	const mergeRef = process.env.GITHUB_SHA ?? '';
 	const baseRef = process.env.GITHUB_BASE_REF ?? '';
+	const localRepo = process.env.GITHUB_WORKSPACE ?? '';
+	const remoteRepo = config.gitRepositoryURL;
 
 	// The default value doesn't work because commander provides an array.
 	if ( branches.length === 0 ) {
@@ -217,10 +219,22 @@ async function runPerformanceTests( branches, options ) {
 	const git = SimpleGit( baseDirectory );
 	await git
 		.raw( 'init' )
-		.raw( 'remote', 'add', 'origin', config.gitRepositoryURL );
+		.raw( 'remote', 'add', 'local', localRepo )
+		.catch( () => {
+			/*
+			 * If we don't have a copy of a local checkout from
+			 * Github then this will fail, but we can ignore it
+			 * because we're adding the remote repo as well.
+			 */
+		} )
+		.raw( 'remote', 'add', 'origin', remoteRepo );
 
 	for ( const ref of refs ) {
-		await git.raw( 'fetch', '--depth=1', 'origin', ref );
+		try {
+			await git.raw( 'fetch', '--depth=1', 'local', ref );
+		} catch ( e ) {
+			await git.raw( 'fetch', '--depth=1', 'origin', ref );
+		}
 	}
 
 	await git.raw( 'checkout', refs[ 0 ] );
@@ -233,13 +247,14 @@ async function runPerformanceTests( branches, options ) {
 	);
 
 	if ( !! options.testsBranch ) {
-		const branchName = formats.success( options.testsBranch );
-		log( `    >> Fetching the test branch: ${ branchName } branch` );
+		const ref = options.testsBranch;
+		const refName = formats.success( ref );
+		log( `    >> Fetching the test-source commit: ${ refName } ref` );
 
 		// @ts-ignore
 		await SimpleGit( performanceTestDirectory )
-			.raw( 'fetch', '--depth=1', 'origin', options.testsBranch )
-			.raw( 'checkout', options.testsBranch );
+			.raw( 'fetch', '--depth=1', 'origin', ref )
+			.raw( 'checkout', ref );
 	}
 
 	log( '    >> Installing dependencies and building packages' );
