@@ -44,37 +44,12 @@ function UnconnectedThemeProvider(
 }
 
 /**
- * The `NavigatorProvider` component allows rendering nested views/panels/menus
- * (via the `NavigatorScreen` component and navigate between these different
- * view (via the `NavigatorButton` and `NavigatorBackButton` components or the
- * `useNavigator` hook).
+ * The `ThemeProvider` component allows components (e.g. a `Popover`) rendered in a different
+ * DOM node than their parent `Theme` component to maintain access to all of the current `Theme` props.
  *
  * @example
  * ```jsx
- * import {
- *   __experimentalNavigatorProvider as NavigatorProvider,
- *   __experimentalNavigatorScreen as NavigatorScreen,
- *   __experimentalNavigatorButton as NavigatorButton,
- *   __experimentalNavigatorBackButton as NavigatorBackButton,
- * } from '@wordpress/components';
- *
- * const MyNavigation = () => (
- *   <NavigatorProvider initialPath="/">
- *     <NavigatorScreen path="/">
- *       <p>This is the home screen.</p>
- *        <NavigatorButton path="/child">
- *          Navigate to child screen.
- *       </NavigatorButton>
- *     </NavigatorScreen>
- *
- *     <NavigatorScreen path="/child">
- *       <p>This is the child screen.</p>
- *       <NavigatorBackButton>
- *         Go back
- *       </NavigatorBackButton>
- *     </NavigatorScreen>
- *   </NavigatorProvider>
- * );
+ * WIP
  * ```
  */
 export const ThemeProvider = contextConnect(
