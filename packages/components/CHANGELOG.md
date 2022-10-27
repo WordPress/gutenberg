@@ -54,6 +54,10 @@
 -   `Autocomplete`: use Popover's new `placement` prop instead of legacy `position` prop ([#44396](https://github.com/WordPress/gutenberg/pull/44396/)).
 -   `FontSizePicker`: Add more comprehensive tests ([#45298](https://github.com/WordPress/gutenberg/pull/45298)).
 
+### Experimental
+-   Theming: updated Components package to utilize the new `accent` prop of the experimental `Theme` component.
+
+
 ## 21.3.0 (2022-10-19)
 
 ### Bug Fix
