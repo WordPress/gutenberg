@@ -136,6 +136,7 @@ export function TabPanel( {
 					role="tabpanel"
 					id={ `${ selectedId }-view` }
 					className="components-tab-panel__tab-content"
+					tabIndex={ -1 }
 				>
 					{ children( selectedTab ) }
 				</div>
