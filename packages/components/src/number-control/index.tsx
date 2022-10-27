@@ -232,12 +232,14 @@ function UnforwardedNumberControl(
 									icon={ plusIcon }
 									isSmall
 									aria-hidden="true"
+									tabIndex={ -1 }
 									onClick={ buildSpinHandler( 'up' ) }
 								/>
 								<SpinButton
 									icon={ resetIcon }
 									isSmall
 									aria-hidden="true"
+									tabIndex={ -1 }
 									onClick={ buildSpinHandler( 'down' ) }
 								/>
 							</HStack>
