@@ -9,6 +9,7 @@ import type {
 	FocusEvent,
 	MouseEvent,
 	TouchEvent,
+	MutableRefObject,
 } from 'react';
 
 /**
@@ -64,6 +65,7 @@ type UseFocusOutsideReturn = {
 	onTouchStart: TouchEventHandler;
 	onTouchEnd: TouchEventHandler;
 	onBlur: FocusEventHandler;
+	ref: MutableRefObject< HTMLElement | null >;
 };
 
 /**
@@ -79,6 +81,7 @@ type UseFocusOutsideReturn = {
 export default function useFocusOutside(
 	onFocusOutside: ( event: FocusEvent ) => void
 ): UseFocusOutsideReturn {
+	const wrapperRef = useRef< HTMLElement | null >( null );
 	const currentOnFocusOutside = useRef( onFocusOutside );
 	useEffect( () => {
 		currentOnFocusOutside.current = onFocusOutside;
@@ -147,11 +150,18 @@ export default function useFocusOutside(
 		}
 
 		blurCheckTimeoutId.current = setTimeout( () => {
+			const documentLostFocus = ! document.hasFocus();
+			const wrapperEl = wrapperRef.current;
+			const activeElement =
+				wrapperEl?.ownerDocument.activeElement ?? null;
+			const activeElementIsInWrapper =
+				wrapperEl?.contains( activeElement );
+
 			// If document is not focused then focus should remain
 			// inside the wrapped component and therefore we cancel
 			// this blur event thereby leaving focus in place.
 			// https://developer.mozilla.org/en-US/docs/Web/API/Document/hasFocus.
-			if ( ! document.hasFocus() ) {
+			if ( documentLostFocus || activeElementIsInWrapper ) {
 				event.preventDefault();
 				return;
 			}
@@ -169,5 +179,6 @@ export default function useFocusOutside(
 		onTouchStart: normalizeButtonFocus,
 		onTouchEnd: normalizeButtonFocus,
 		onBlur: queueBlurCheck,
+		ref: wrapperRef,
 	};
 }

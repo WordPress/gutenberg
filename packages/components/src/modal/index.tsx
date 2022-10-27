@@ -75,7 +75,8 @@ function UnforwardedModal(
 	const focusOnMountRef = useFocusOnMount( focusOnMount );
 	const constrainedTabbingRef = useConstrainedTabbing();
 	const focusReturnRef = useFocusReturn();
-	const focusOutsideProps = useFocusOutside( onRequestClose );
+	const { ref: focusOutsideRef, ...focusOutsideProps } =
+		useFocusOutside( onRequestClose );
 
 	const [ hasScrolledContent, setHasScrolledContent ] = useState( false );
 
@@ -147,6 +148,7 @@ function UnforwardedModal(
 						constrainedTabbingRef,
 						focusReturnRef,
 						focusOnMountRef,
+						focusOutsideRef,
 					] ) }
 					role={ role }
 					aria-label={ contentLabel }
