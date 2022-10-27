@@ -324,6 +324,11 @@
 	.components-visually-hidden {
 		height: auto;
 	}
+
+	// Override for theming on the block mover handle. `.block-editor-block-mover__drag-handle` was needed for specificity to override declaration order.
+	.components-accessible-toolbar &.block-editor-block-mover__drag-handle:focus::before {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent, inset 0 0 0 4px $white;
+	}
 }
 
 @keyframes components-button__busy-animation {
