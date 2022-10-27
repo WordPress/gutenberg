@@ -29,9 +29,9 @@ export const globalTypes = {
 			icon: 'paintbrush',
 			items: [
 				{ value: 'default', title: 'Default' },
-				{ value: 'dark', title: 'Dark' },
-				{ value: 'modern', title: 'Modern' },
-				{ value: 'sunrise', title: 'Sunrise' },
+				{ value: 'darkBg', title: 'Dark (background)' },
+				{ value: 'lightGrayBg', title: 'Light gray (background)' },
+				{ value: 'modern', title: 'Modern (accent)' },
 			],
 		},
 	},
@@ -93,6 +93,10 @@ export const parameters = {
 			{
 				name: 'dark',
 				value: '#1e1e1e',
+			},
+			{
+				name: 'light gray',
+				value: '#f0f0f0',
 			},
 		],
 		grid: { disable: true },

@@ -10,17 +10,16 @@ import Theme from '../../packages/components/src/theme';
 export const WithTheme = ( Story, context ) => {
 	const themes = {
 		default: {},
-		dark: {
+		darkBg: {
 			accent: '#f7c849',
 			background: '#1e1e1e',
 		},
+		lightGrayBg: {
+			accent: '#3858e9',
+			background: '#f0f0f0',
+		},
 		modern: {
 			accent: '#3858e9',
-		},
-		sunrise: {
-			// This color was chosen intentionally, because for sufficient contrast,
-			// the foreground text should be black when this orange is used as a background color.
-			accent: '#dd823b',
 		},
 	};
 
