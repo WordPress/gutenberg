@@ -406,11 +406,14 @@ export const withLayoutStyles = createHigherOrderComponent(
 		const layoutClassNames = classnames(
 			{
 				[ `wp-container-${ id }` ]: shouldRenderLayoutStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
-				[ `wp-container-${ positionId }` ]:
-					shouldRenderLayoutStyles && !! positionCss, // Use separate container class for position styles in prep for layout styles moving to inner wrapper in: https://github.com/WordPress/gutenberg/pull/44600
 			},
 			layoutClasses
 		);
+
+		const wrapperClassNames = classnames( props?.className, {
+			[ `wp-container-${ positionId }` ]:
+				shouldRenderLayoutStyles && !! positionCss, // Use separate container class for position styles in prep for layout styles moving to inner wrapper in: https://github.com/WordPress/gutenberg/pull/44600
+		} );
 
 		return (
 			<>
@@ -429,6 +432,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 					) }
 				<BlockListBlock
 					{ ...props }
+					className={ wrapperClassNames }
 					__unstableLayoutClassNames={ layoutClassNames }
 				/>
 			</>

@@ -559,7 +559,7 @@ function gutenberg_render_layout_position_support( $block_content, $block ) {
 		$content = new WP_HTML_Tag_Processor( $block_content );
 		$content->next_tag();
 		$content->add_class( $class_name );
-		return $content;
+		return (string) $content;
 	}
 	return $block_content;
 }
