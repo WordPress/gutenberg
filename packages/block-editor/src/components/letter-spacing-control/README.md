@@ -20,11 +20,11 @@ Renders a letter spacing control.
 import { LetterSpacingControl } from '@wordpress/block-editor';
 
 const MyLetterSpacingControl = () => (
-		<LetterSpacingControl
-			value={ value }
-			onChange={ onChange }
-			__unstableInputWidth="auto"
-		/>
+	<LetterSpacingControl
+		value={ value }
+		onChange={ onChange }
+		__unstableInputWidth="auto"
+	/>
 );
 ```
 
