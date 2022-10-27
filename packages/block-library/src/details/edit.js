@@ -43,7 +43,6 @@ function DetailsBlock( { attributes, setAttributes } ) {
 			template: DETAILS,
 		}
 	);
-
 	return (
 		<>
 			<BlockControls group="block">
@@ -66,7 +65,15 @@ function DetailsBlock( { attributes, setAttributes } ) {
 					}
 				/>
 			</BlockControls>
-			<details { ...blockProps } open={ showContent }>
+			<details
+				{ ...blockProps }
+				open={ showContent }
+				aria-label={
+					showContent
+						? __( 'Block: Details. Expanded.' )
+						: __( 'Block: Details. Collapsed.' )
+				}
+			>
 				<summary
 					className={ classnames( 'wp-block-details__summary' ) }
 					onClick={ ( event ) => event.preventDefault() }
