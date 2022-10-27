@@ -54,6 +54,31 @@ describe( 'Group block', () => {
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
+	it.only( 'nests deeply', async () => {
+		const screen = await initializeEditor();
+
+		// Add block
+		await addBlock( screen, 'Group' );
+		const groupBlock1 = await getBlock( screen, 'Group' );
+		await addBlock( screen, 'Group', groupBlock1 );
+		const groupBlock2 = await getBlock( screen, 'Group', {
+			container: groupBlock1,
+		} );
+		await addBlock( screen, 'Group', { container: groupBlock1 } );
+
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:group {\\"layout\\":{\\"type\\":\\"constrained\\"}} -->
+		<div class=\\"wp-block-group\\"><!-- wp:group {\\"layout\\":{\\"type\\":\\"constrained\\"}} -->
+		<div class=\\"wp-block-group\\"></div>
+		<!-- /wp:group -->
+
+		<!-- wp:group {\\"layout\\":{\\"type\\":\\"constrained\\"}} -->
+		<div class=\\"wp-block-group\\"></div>
+		<!-- /wp:group --></div>
+		<!-- /wp:group -->"
+	` );
+	} );
+
 	it( 'ungroups inner blocks', async () => {
 		const screen = await initializeEditor( {
 			initialHtml: NESTED_GROUP_BLOCK,

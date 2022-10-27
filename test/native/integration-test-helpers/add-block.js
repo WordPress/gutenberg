@@ -38,4 +38,20 @@ export const addBlock = async ( screen, blockName, container ) => {
 	} );
 
 	fireEvent.press( await waitFor( () => getByText( blockName ) ) );
+
+	if ( container ) {
+		// A layout event must be explicitly dispatched in BlockList component,
+		// otherwise the inner blocks are not rendered.
+		fireEvent(
+			within( container ).getByTestId( 'block-list-wrapper' ),
+			'layout',
+			{
+				nativeEvent: {
+					layout: {
+						width: 100,
+					},
+				},
+			}
+		);
+	}
 };
