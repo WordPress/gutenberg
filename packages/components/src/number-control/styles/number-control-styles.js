@@ -4,10 +4,13 @@
  */
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
+
 /**
  * Internal dependencies
  */
 import InputControl from '../../input-control';
+import { COLORS } from '../../utils';
+import Button from '../../button';
 
 const htmlArrowStyles = ( { hideHTMLArrows } ) => {
 	if ( ! hideHTMLArrows ) return ``;
@@ -27,4 +30,10 @@ const htmlArrowStyles = ( { hideHTMLArrows } ) => {
 
 export const Input = styled( InputControl )`
 	${ htmlArrowStyles };
+`;
+
+export const SpinButton = styled( Button )`
+	&&& {
+		color: ${ COLORS.ui.theme };
+	}
 `;

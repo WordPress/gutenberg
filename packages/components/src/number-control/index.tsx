@@ -2,23 +2,28 @@
  * External dependencies
  */
 import classNames from 'classnames';
-import type { ForwardedRef } from 'react';
+import type { ForwardedRef, ChangeEvent } from 'react';
 
 /**
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
+import { plus as plusIcon, reset as resetIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { Input } from './styles/number-control-styles';
+import { Input, SpinButton } from './styles/number-control-styles';
 import * as inputControlActionTypes from '../input-control/reducer/actions';
 import { add, subtract, roundClamp } from '../utils/math';
 import { ensureNumber, isValueEmpty } from '../utils/values';
 import type { WordPressComponentProps } from '../ui/context/wordpress-component';
 import type { NumberControlProps } from './types';
+import InputControlSuffixWrapper from '../input-control/input-suffix-wrapper';
+import { HStack } from '../h-stack';
+
+const noop = () => {};
 
 function UnforwardedNumberControl(
 	{
@@ -36,6 +41,8 @@ function UnforwardedNumberControl(
 		step = 1,
 		type: typeProp = 'number',
 		value: valueProp,
+		size = 'default',
+		onChange = noop,
 		...props
 	}: WordPressComponentProps< NumberControlProps, 'input', false >,
 	ref: ForwardedRef< any >
@@ -185,7 +192,7 @@ function UnforwardedNumberControl(
 			{ ...props }
 			className={ classes }
 			dragDirection={ dragDirection }
-			hideHTMLArrows={ hideHTMLArrows }
+			hideHTMLArrows={ size === '__unstable-large' || hideHTMLArrows }
 			isDragEnabled={ isDragEnabled }
 			label={ label }
 			max={ max }
@@ -200,6 +207,57 @@ function UnforwardedNumberControl(
 				const baseState = numberControlStateReducer( state, action );
 				return stateReducerProp?.( baseState, action ) ?? baseState;
 			} }
+			size={ size }
+			suffix={
+				size === '__unstable-large' &&
+				! hideHTMLArrows && (
+					<InputControlSuffixWrapper>
+						<HStack spacing={ 2 }>
+							<SpinButton
+								icon={ plusIcon }
+								isSmall
+								aria-hidden="true"
+								onClick={ (
+									event: ChangeEvent< HTMLInputElement >
+								) => {
+									const currentValue = isValueEmpty(
+										valueProp
+									)
+										? baseValue
+										: valueProp;
+									const nextValue = constrainValue(
+										add( currentValue, baseStep )
+									);
+									onChange?.( String( nextValue ), {
+										event,
+									} );
+								} }
+							/>
+							<SpinButton
+								icon={ resetIcon }
+								isSmall
+								aria-hidden="true"
+								onClick={ (
+									event: ChangeEvent< HTMLInputElement >
+								) => {
+									const currentValue = isValueEmpty(
+										valueProp
+									)
+										? baseValue
+										: valueProp;
+									const nextValue = constrainValue(
+										subtract( currentValue, baseStep )
+									);
+									onChange?.( String( nextValue ), {
+										event,
+									} );
+								} }
+							/>
+						</HStack>
+					</InputControlSuffixWrapper>
+				)
+			}
+			onChange={ onChange }
 		/>
 	);
 }
