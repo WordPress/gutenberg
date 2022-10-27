@@ -11,10 +11,18 @@ fs.writeFileSync(
 	`{
 		"config": {
 			"development": {
-				"WP_SITEURL": "${ process.env.CODESANDBOX_HOST.replace( '$PORT', 8888 ) }"
+				"WP_SITEURL": "https://${ process.env.CODESANDBOX_HOST.replace(
+					'$PORT',
+					8888
+				) }",
+				"WP_HOME": "https://${ process.env.CODESANDBOX_HOST.replace( '$PORT', 8888 ) }"
 			},
 			"tests": {
-				"WP_SITEURL": "${ process.env.CODESANDBOX_HOST.replace( '$PORT', 8889 ) }"
+				"WP_SITEURL": "https://${ process.env.CODESANDBOX_HOST.replace(
+					'$PORT',
+					8889
+				) }",
+				"WP_HOME": "https://${ process.env.CODESANDBOX_HOST.replace( '$PORT', 8889 ) }"
 			}
 		}
 	}`
