@@ -38,7 +38,7 @@ export default function SidebarNavigationRoot() {
 				title={ __( 'Design' ) }
 				parentHref="index.php"
 			/>
-			<nav>
+			<nav className="edit-site-sidebar-navigation-root">
 				<ItemGroup>
 					<SidebarNavigationItem
 						{ ...templatesLink }
