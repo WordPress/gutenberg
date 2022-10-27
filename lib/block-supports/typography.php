@@ -477,6 +477,8 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 		return $preset['size'];
 	}
 
+	$fluid_settings = is_array( $typography_settings['fluid'] ) ? $typography_settings['fluid'] : array();
+
 	// Defaults.
 	$default_maximum_viewport_width   = isset( $fluid_settings['maxViewPortWidth'] ) ? $fluid_settings['maxViewPortWidth'] : '1600px';
 	$default_minimum_viewport_width   = isset( $fluid_settings['minViewPortWidth'] ) ? $fluid_settings['minViewPortWidth'] : '768px';
