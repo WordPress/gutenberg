@@ -99,15 +99,13 @@ function median( array ) {
 }
 
 /**
- * Rounds and format a time passed in milliseconds.
+ * Rounds a number to two decimal places.
  *
- * @param {number} number
- *
- * @return {number} Formatted time.
+ * @param {number} number of arbitrary precision.
+ * @return {number} number limited to two decimal places.
  */
-function formatTime( number ) {
-	const factor = Math.pow( 10, 2 );
-	return Math.round( number * factor ) / factor;
+function roundedToCents( number ) {
+	return Math.round( number * 100 ) / 100;
 }
 
 /**
@@ -241,7 +239,7 @@ async function runPerformanceTests( branches, options ) {
 
 	const rootDirectory = getRandomTemporaryPath();
 	const performanceTestDirectory = rootDirectory + '/tests';
-	await runShellScript( 'mkdir -p ' + rootDirectory );
+	fs.mkdirSync( rootDirectory, { recursive: true } );
 	await runShellScript(
 		'cp -R ' + baseDirectory + ' ' + performanceTestDirectory
 	);
@@ -263,7 +261,7 @@ async function runPerformanceTests( branches, options ) {
 		performanceTestDirectory
 	);
 	log( '    >> Creating the environment folders' );
-	await runShellScript( 'mkdir -p ' + rootDirectory + '/envs' );
+	fs.mkdirSync( `${ rootDirectory }/envs`, { recursive: true } );
 
 	// 2- Preparing the environment directories per branch.
 	log( '\n>> Preparing an environment directory per branch' );
@@ -275,7 +273,7 @@ async function runPerformanceTests( branches, options ) {
 		// @ts-ignore
 		branchDirectories[ ref ] = environmentDirectory;
 		const buildPath = `${ environmentDirectory }/plugin`;
-		await runShellScript( 'mkdir ' + environmentDirectory );
+		fs.mkdirSync( environmentDirectory, { recursive: true } );
 		await runShellScript( `cp -R ${ baseDirectory } ${ buildPath }` );
 
 		log( '        >> Fetching the ' + formats.success( ref ) + ' ref' );
@@ -440,7 +438,7 @@ async function runPerformanceTests( branches, options ) {
 			);
 
 			// Format results as times.
-			results[ testSuite ][ ref ] = mapValues( medians, formatTime );
+			results[ testSuite ][ ref ] = mapValues( medians, roundedToCents );
 		}
 	}
 
