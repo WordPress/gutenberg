@@ -10,7 +10,9 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
-- [*] [iOS] Fixed iOS Voice Control support within Image block captions. [#44850]
+
+## 1.85.0
+-   [*] [iOS] Fixed iOS Voice Control support within Image block captions. [#44850]
 
 ## 1.84.1
 -   [**] Native inner blocks merge where appropriate [#45048]
