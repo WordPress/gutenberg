@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 
 // Need to mock the BlockControls wrapper as this requires a slot to run
 // so can't be easily unit tested.
@@ -57,6 +57,42 @@ describe( 'Cover block controls', () => {
 				minHeight: 100,
 				minHeightUnit: 'vh',
 			} );
+		} );
+	} );
+	describe( 'Content position', () => {
+		test( 'displays content position button', () => {
+			render( <CoverBlockControls { ...defaultProps } /> );
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Change content position',
+				} )
+			).toBeInTheDocument();
+		} );
+		test( 'sets contentPosition attribute', async () => {
+			render( <CoverBlockControls { ...defaultProps } /> );
+
+			fireEvent.click(
+				screen.getByLabelText( 'Change content position' )
+			);
+			within( screen.getByRole( 'grid' ) )
+				.getByRole( 'gridcell', {
+					name: 'top left',
+				} )
+				.focus();
+
+			expect( setAttributes ).toHaveBeenCalledWith( {
+				contentPosition: 'top left',
+			} );
+		} );
+	} );
+	describe( 'Duotone filter', () => {
+		test( 'displays the add media button', () => {
+			render( <CoverBlockControls { ...defaultProps } /> );
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Add Media',
+				} )
+			).toBeInTheDocument();
 		} );
 	} );
 } );
