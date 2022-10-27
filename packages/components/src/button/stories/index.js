@@ -128,6 +128,36 @@ Default.args = {
 	children: 'Code is poetry',
 };
 
+export const Primary = Template.bind( {} );
+Primary.args = {
+	...Default.args,
+	variant: 'primary',
+};
+
+export const Secondary = Template.bind( {} );
+Secondary.args = {
+	...Default.args,
+	variant: 'secondary',
+};
+
+export const Tertiary = Template.bind( {} );
+Tertiary.args = {
+	...Default.args,
+	variant: 'tertiary',
+};
+
+export const Link = Template.bind( {} );
+Link.args = {
+	...Default.args,
+	variant: 'link',
+};
+
+export const IsDestructive = Template.bind( {} );
+IsDestructive.args = {
+	...Default.args,
+	isDestructive: true,
+};
+
 export const Icon = Template.bind( {} );
 Icon.args = {
 	label: 'Code is poetry',

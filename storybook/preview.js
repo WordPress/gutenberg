@@ -29,6 +29,7 @@ export const globalTypes = {
 			icon: 'paintbrush',
 			items: [
 				{ value: 'default', title: 'Default' },
+				{ value: 'dark', title: 'Dark' },
 				{ value: 'modern', title: 'Modern' },
 				{ value: 'sunrise', title: 'Sunrise' },
 			],
@@ -87,6 +88,15 @@ export const decorators = [
 ];
 
 export const parameters = {
+	backgrounds: {
+		values: [
+			{
+				name: 'dark',
+				value: '#1e1e1e',
+			},
+		],
+		grid: { disable: true },
+	},
 	controls: {
 		sort: 'requiredFirst',
 	},

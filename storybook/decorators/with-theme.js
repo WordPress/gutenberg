@@ -10,6 +10,10 @@ import Theme from '../../packages/components/src/theme';
 export const WithTheme = ( Story, context ) => {
 	const themes = {
 		default: {},
+		dark: {
+			accent: '#f7c849',
+			background: '#1e1e1e',
+		},
 		modern: {
 			accent: '#3858e9',
 		},

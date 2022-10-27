@@ -14,6 +14,7 @@ export type ThemeProps = {
 	 * `var(--my-custom-property)`) are _not_ supported values for this property.
 	 */
 	accent?: string;
+	background?: string;
 	/**
 	 * The children elements.
 	 */

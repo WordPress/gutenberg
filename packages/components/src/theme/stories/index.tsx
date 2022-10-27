@@ -14,6 +14,7 @@ const meta: ComponentMeta< typeof Theme > = {
 	title: 'Components (Experimental)/Theme',
 	argTypes: {
 		accent: { control: { type: 'color' } },
+		background: { control: { type: 'color' } },
 	},
 	parameters: {
 		controls: { expanded: true },

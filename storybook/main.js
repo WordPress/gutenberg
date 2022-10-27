@@ -17,6 +17,7 @@ module.exports = {
 			name: '@storybook/addon-docs',
 			options: { configureJSX: true },
 		},
+		'@storybook/addon-backgrounds',
 		'@storybook/addon-controls',
 		'@storybook/addon-knobs', // Deprecated, new stories should use addon-controls.
 		'@storybook/addon-storysource',
