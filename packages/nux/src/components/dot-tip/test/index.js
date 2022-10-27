@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -12,22 +12,26 @@ import { DotTip } from '..';
 const noop = () => {};
 
 describe( 'DotTip', () => {
-	it( 'should not render anything if invisible', () => {
+	it( 'should not render anything if invisible', async () => {
 		render(
 			<DotTip>
 				It looks like you’re writing a letter. Would you like help?
 			</DotTip>
 		);
 
+		await act( () => Promise.resolve() );
+
 		expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
 	} );
 
-	it( 'should render correctly', () => {
+	it( 'should render correctly', async () => {
 		render(
 			<DotTip isVisible setTimeout={ noop }>
 				It looks like you’re writing a letter. Would you like help?
 			</DotTip>
 		);
+
+		await act( () => Promise.resolve() );
 
 		expect( screen.getByRole( 'dialog' ) ).toMatchSnapshot();
 	} );
@@ -43,6 +47,8 @@ describe( 'DotTip', () => {
 				It looks like you’re writing a letter. Would you like help?
 			</DotTip>
 		);
+
+		await act( () => Promise.resolve() );
 
 		await user.click( screen.getByRole( 'button', { name: 'Got it' } ) );
 
@@ -60,6 +66,8 @@ describe( 'DotTip', () => {
 				It looks like you’re writing a letter. Would you like help?
 			</DotTip>
 		);
+
+		await act( () => Promise.resolve() );
 
 		await user.click(
 			screen.getByRole( 'button', { name: 'Disable tips' } )
