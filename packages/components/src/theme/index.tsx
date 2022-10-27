@@ -11,6 +11,7 @@ import namesPlugin from 'colord/plugins/names';
 import type { ThemeProps } from './types';
 import type { WordPressComponentProps } from '../ui/context';
 import { Wrapper } from './styles';
+import ThemeProvider from '.';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
@@ -45,7 +46,11 @@ function Theme( props: WordPressComponentProps< ThemeProps, 'div', true > ) {
 		);
 	}
 
-	return <Wrapper { ...props } />;
+	return (
+		<ThemeProvider>
+			<Wrapper { ...props } />
+		</ThemeProvider>
+	);
 }
 
 export default Theme;
