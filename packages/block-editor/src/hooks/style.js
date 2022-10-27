@@ -103,7 +103,7 @@ const skipSerializationPathsEdit = {
 	[ `${ TYPOGRAPHY_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
 		TYPOGRAPHY_SUPPORT_KEY,
 	],
-	[ `${ SPACING_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
+	[ `${ DIMENSIONS_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
 		DIMENSIONS_SUPPORT_KEY,
 	],
 	[ `${ SPACING_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
