@@ -8,7 +8,7 @@
  * @package gutenberg
  */
 
- class Gutenberg_REST_Template_Revision_Count extends WP_REST_Templates_Controller {
+class Gutenberg_REST_Template_Revision_Count extends WP_REST_Templates_Controller {
 	/**
 	 * Add revisions to the response.
 	 *
@@ -19,54 +19,65 @@
 	public function prepare_item_for_response( $item, $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		$template = $item;
 
-		$response = parent::prepare_item_for_response( $item, $request );
-		$data = $response->get_data();
 		$fields = $this->get_fields_for_response( $request );
 
-		if ( ! empty( $template->wp_id ) && $template->wp_id > 0 ) {
-			$revisions = wp_get_latest_revision_id_and_total_count( $template->wp_id );
-		} else {
-			// TODO: Should this be included if it's a file-based template?
-			$revisions = array(
-				'count' => 0,
-				'latest_id' => 0,
-			);
+		$response = parent::prepare_item_for_response( $item, $request );
+
+		if ( rest_is_field_included( '_links', $fields ) || rest_is_field_included( '_embedded', $fields ) ) {
+			$links = $this->prepare_links( $template );
+			$response->add_links( $links );
+			if ( ! empty( $links['self']['href'] ) ) {
+				$actions = $this->get_available_actions();
+				$self    = $links['self']['href'];
+				foreach ( $actions as $rel ) {
+					$response->add_link( $rel, $self );
+				}
+			}
 		}
 
-		if ( rest_is_field_included( 'revision_count', $fields ) ) {
-			$data['revision_count'] = (int) $revisions['count'];
-		}
-
-		if ( rest_is_field_included( 'latest_revision_id', $fields ) ) {
-			$data['latest_revision_id'] = (int) $revisions['latest_id'];
-		}
-
-		$response->set_data( $data );
 		return $response;
 	}
 
 	/**
-	 * Adds revision_count and latest_revision_id to the template schema.
+	 * Prepares links for the request.
 	 *
-	 * @return array Item schema data.
+	 * @since 6.2.0
+	 *
+	 * @param WP_Block_Template $template    Template instance.
+	 * @return array Links for the given post.
 	 */
-	public function get_item_schema() {
-		$schema = parent::get_item_schema();
-
-		$schema['properties']['revision_count'] = array(
-			'description' => __( 'The number of revisions of the template.' ),
-			'type'        => 'integer',
-			'context'     => array( 'edit', 'embed' ),
-			'readonly'    => true,
+	protected function prepare_links( $template ) {
+		$base  = sprintf( '%s/%s', $this->namespace, $this->rest_base );
+		$links = array(
+			'self'       => array(
+				'href' => rest_url( trailingslashit( $base ) . $template->id ),
+			),
+			'collection' => array(
+				'href' => rest_url( rest_get_route_for_post_type_items( $this->post_type ) ),
+			),
+			'about'      => array(
+				'href' => rest_url( 'wp/v2/types/' . $this->post_type ),
+			),
 		);
 
-		$schema['properties']['latest_revision_id'] = array(
-			'description' => __( 'The id of the latest revision of the template.' ),
-			'type'        => 'integer',
-			'context'     => array( 'edit', 'embed' ),
-			'readonly'    => true,
-		);
+		if ( post_type_supports( $this->post_type, 'revisions' ) && (int) $template->wp_id ) {
+			$revisions       = wp_get_latest_revision_id_and_total_count( (int) $template->wp_id );
+			$revisions_count = ! is_wp_error( $revisions ) ? $revisions['count'] : 0;
+			$revisions_base  = sprintf( '/%s/%s/%s/revisions', $this->namespace, $this->rest_base, $template->id );
 
-		return $schema;
+			$links['version-history'] = array(
+				'href'  => rest_url( $revisions_base ),
+				'count' => $revisions_count,
+			);
+
+			if ( $revisions_count > 0 ) {
+				$links['predecessor-version'] = array(
+					'href' => rest_url( $revisions_base . '/' . $revisions['latest_id'] ),
+					'id'   => $revisions['latest_id'],
+				);
+			}
+		}
+
+		return $links;
 	}
 }
