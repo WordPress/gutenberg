@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { includes } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
@@ -19,7 +14,7 @@ import { combineReducers } from '@wordpress/data';
 export function removedPanels( state = [], action ) {
 	switch ( action.type ) {
 		case 'REMOVE_PANEL':
-			if ( ! includes( state, action.panelName ) ) {
+			if ( ! state.includes( action.panelName ) ) {
 				return [ ...state, action.panelName ];
 			}
 	}

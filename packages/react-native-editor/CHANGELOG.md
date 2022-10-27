@@ -19,6 +19,7 @@ For each user feature we should also add a importance categorization label  to i
 
 ## 1.84.0
 -   [*] Upgrade compile and target sdk version to Android API 31 [#44610]
+-   [*] [iOS] Fixed iOS Voice Control support within Image block captions. [#44850]
 
 ## 1.83.0
 * No User facing changes *

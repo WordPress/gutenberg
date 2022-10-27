@@ -132,7 +132,13 @@ export function reinitializeEditor( target, settings ) {
 	window.addEventListener( 'dragover', ( e ) => e.preventDefault(), false );
 	window.addEventListener( 'drop', ( e ) => e.preventDefault(), false );
 
-	render( <EditSiteApp reboot={ reboot } />, target );
+	render(
+		<EditSiteApp
+			reboot={ reboot }
+			homeTemplate={ settings.__unstableHomeTemplate }
+		/>,
+		target
+	);
 }
 
 /**

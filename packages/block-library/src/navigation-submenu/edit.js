@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escape } from 'lodash';
+import escapeHtml from 'escape-html';
 
 /**
  * WordPress dependencies
@@ -248,8 +248,8 @@ export const updateNavigationLinkBlockAttributes = (
 		normalizedTitle !== normalizedURL &&
 		originalLabel !== title;
 	const label = escapeTitle
-		? escape( title )
-		: originalLabel || escape( normalizedURL );
+		? escapeHtml( title )
+		: originalLabel || escapeHtml( normalizedURL );
 
 	// In https://github.com/WordPress/gutenberg/pull/24670 we decided to use "tag" in favor of "post_tag"
 	const type = newType === 'post_tag' ? 'tag' : newType.replace( '-', '_' );

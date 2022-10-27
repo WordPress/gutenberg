@@ -230,6 +230,8 @@ function VideoEdit( {
 							: __( 'Add caption' )
 					}
 				/>
+			</BlockControls>
+			<BlockControls>
 				<TracksEditor
 					tracks={ tracks }
 					onChange={ ( newTracks ) => {
