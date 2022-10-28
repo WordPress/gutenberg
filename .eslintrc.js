@@ -149,6 +149,7 @@ module.exports = {
 							'reverse',
 							'size',
 							'snakeCase',
+							'some',
 							'sortBy',
 							'startCase',
 							'startsWith',
