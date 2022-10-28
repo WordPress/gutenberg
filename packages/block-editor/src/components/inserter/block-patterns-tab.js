@@ -23,6 +23,7 @@ import {
 } from '@wordpress/components';
 import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
 import { focus } from '@wordpress/dom';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -30,6 +31,7 @@ import { focus } from '@wordpress/dom';
 import usePatternsState from './hooks/use-patterns-state';
 import BlockPatternList from '../block-patterns-list';
 import PatternsExplorerModal from './block-patterns-explorer/explorer';
+import { store as blockEditorStore } from '../../store';
 
 function usePatternsCategories() {
 	const [ allPatterns, allCategories ] = usePatternsState();
@@ -96,6 +98,20 @@ export function BlockPatternsCategoryDialog( {
 		} );
 		return () => clearTimeout( timeout );
 	}, [ category ] );
+
+	const { getSettings } = useSelect( blockEditorStore );
+	useEffect( () => {
+		if ( getSettings().__experimentalOnInserterPatternTabCategoryOpen ) {
+			getSettings().__experimentalOnInserterPatternTabCategoryOpen();
+		}
+		return () => {
+			if (
+				getSettings().__experimentalOnInserterPatternTabCategoryClose
+			) {
+				return getSettings().__experimentalOnInserterPatternTabCategoryClose();
+			}
+		};
+	}, [] );
 
 	return (
 		<div

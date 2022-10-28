@@ -39,6 +39,7 @@ import { store as editSiteStore } from '../../store';
 import BlockInspectorButton from './block-inspector-button';
 import BackButton from './back-button';
 import ResizableEditor from './resizable-editor';
+import useOpenZoomOutOnPatterns from './use-open-zoom-out-on-patterns';
 
 const LAYOUT = {
 	type: 'default',
@@ -122,6 +123,11 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		[ settingsBlockPatternCategories, restBlockPatternCategories ]
 	);
 
+	const [
+		__experimentalOnInserterPatternTabCategoryOpen,
+		__experimentalOnInserterPatternTabCategoryClose,
+	] = useOpenZoomOutOnPatterns();
+
 	const settings = useMemo( () => {
 		const {
 			__experimentalAdditionalBlockPatterns,
@@ -133,8 +139,16 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			...restStoredSettings,
 			__experimentalBlockPatterns: blockPatterns,
 			__experimentalBlockPatternCategories: blockPatternCategories,
+			__experimentalOnInserterPatternTabCategoryOpen,
+			__experimentalOnInserterPatternTabCategoryClose,
 		};
-	}, [ storedSettings, blockPatterns, blockPatternCategories ] );
+	}, [
+		storedSettings,
+		blockPatterns,
+		blockPatternCategories,
+		__experimentalOnInserterPatternTabCategoryOpen,
+		__experimentalOnInserterPatternTabCategoryClose,
+	] );
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
