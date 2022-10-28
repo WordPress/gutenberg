@@ -47,7 +47,7 @@ export default function Layout() {
 		useState( false );
 	const isFullCanvas = isEditorPage && canvasMode === 'edit';
 	const canvasPadding = isMobileViewport ? 0 : 24;
-	const sidebarWidth = isMobileViewport ? '100%' : 280;
+	const sidebarWidth = isMobileViewport ? '100%' : 320;
 	const showSidebar =
 		( isMobileViewport && ! isMobileCanvasVisible ) ||
 		( ! isMobileViewport && ! isFullCanvas );
