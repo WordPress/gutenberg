@@ -239,8 +239,8 @@ describe( 'FontSizePicker', () => {
 				size: '30px',
 			},
 			{
-				slug: 'massive',
-				name: 'Massive',
+				slug: 'gigantosaurus',
+				name: 'Gigantosaurus',
 				size: '40px',
 			},
 		];
@@ -262,13 +262,13 @@ describe( 'FontSizePicker', () => {
 			expect( options[ 3 ] ).toHaveTextContent( 'XL' );
 			expect( options[ 3 ] ).toHaveAccessibleName( 'Huge' );
 			expect( options[ 4 ] ).toHaveTextContent( 'XXL' );
-			expect( options[ 4 ] ).toHaveAccessibleName( 'Massive' );
+			expect( options[ 4 ] ).toHaveAccessibleName( 'Gigantosaurus' );
 		} );
 
 		test.each( [
 			{ value: undefined, expectedLabel: 'Size Default' },
 			{ value: '12px', expectedLabel: 'Size small(px)' },
-			{ value: '40px', expectedLabel: 'Size Massive(px)' },
+			{ value: '40px', expectedLabel: 'Size Gigantosaurus(px)' },
 		] )(
 			'displays $expectedLabel as label when value is $value',
 			( { value, expectedLabel } ) => {
