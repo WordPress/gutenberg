@@ -12,57 +12,50 @@ function gutenberg_register_core_block_patterns_and_categories() {
 	register_block_pattern_category(
 		'buttons',
 		array(
-			'label'       => _x( 'Buttons', 'Block pattern category', 'gutenberg' ),
-			'description' => __( 'Buttons description', 'gutenberg' ),
+			'label' => _x( 'Buttons', 'Block pattern category', 'gutenberg' ),
 		)
 	);
 	register_block_pattern_category(
 		'columns',
 		array(
-			'label'       => _x( 'Columns', 'Block pattern category', 'gutenberg' ),
-			'description' => __( 'Columns description', 'gutenberg' ),
+			'label' => _x( 'Columns', 'Block pattern category', 'gutenberg' ),
 		)
 	);
 	register_block_pattern_category(
 		'footer',
 		array(
-			'label'       => _x( 'Footers', 'Block pattern category', 'gutenberg' ),
-			'description' => __( 'Footers description', 'gutenberg' ),
+			'label' => _x( 'Footers', 'Block pattern category', 'gutenberg' ),
 		)
 	);
 	register_block_pattern_category(
 		'gallery',
 		array(
-			'label'       => _x( 'Gallery', 'Block pattern category', 'gutenberg' ),
-			'description' => __( 'Gallery description', 'gutenberg' ),
+			'label' => _x( 'Gallery', 'Block pattern category', 'gutenberg' ),
 		)
 	);
 	register_block_pattern_category(
 		'header',
 		array(
-			'label'       => _x( 'Headers', 'Block pattern category', 'gutenberg' ),
-			'description' => __( 'Headers description', 'gutenberg' ),
+			'label' => _x( 'Headers', 'Block pattern category', 'gutenberg' ),
 		)
 	);
 	register_block_pattern_category(
 		'text',
 		array(
-			'label'       => _x( 'Text', 'Block pattern category', 'gutenberg' ),
-			'description' => __( 'Text description', 'gutenberg' ),
+			'label' => _x( 'Text', 'Block pattern category', 'gutenberg' ),
 		)
 	);
 	register_block_pattern_category(
 		'query',
 		array(
 			'label'       => _x( 'Query', 'Block pattern category', 'gutenberg' ),
-			'description' => __( 'Query description', 'gutenberg' ),
+			'description' => __( 'Display post summaries in lists, grids, and other layouts', 'gutenberg' ),
 		)
 	);
 	register_block_pattern_category(
 		'featured',
 		array(
-			'label'       => _x( 'Featured', 'Block pattern category', 'gutenberg' ),
-			'description' => __( 'Featured description', 'gutenberg' ),
+			'label' => _x( 'Featured', 'Block pattern category', 'gutenberg' ),
 		)
 	);
 }
