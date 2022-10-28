@@ -194,7 +194,7 @@ function build_template_part_block_instance_variations() {
 		return array();
 	}
 
-	if ( ! current_theme_supports( 'block-templates' ) ) {
+	if ( ! current_theme_supports( 'block-templates' ) && ! current_theme_supports(  'block-template-parts' ) ) {
 		return array();
 	}
 
