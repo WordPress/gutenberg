@@ -130,7 +130,7 @@ describe( 'useFocusOutside', () => {
 			advanceTimers: jest.advanceTimersByTime,
 		} );
 
-		const { rerender } = render(
+		const { unmount } = render(
 			<FocusOutsideComponent onFocusOutside={ mockOnFocusOutside } />
 		);
 
@@ -143,7 +143,7 @@ describe( 'useFocusOutside', () => {
 		// Simulate a blur event and the wrapper unmounting while the blur event
 		// handler is queued
 		button.blur();
-		rerender( <div /> );
+		unmount();
 
 		jest.runAllTimers();
 
