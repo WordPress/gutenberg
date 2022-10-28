@@ -8,7 +8,7 @@ import type { ForwardedRef, ChangeEvent } from 'react';
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
-import { isRTL } from '@wordpress/i18n';
+import { isRTL, __ } from '@wordpress/i18n';
 import { plus as plusIcon, reset as resetIcon } from '@wordpress/icons';
 
 /**
@@ -232,6 +232,7 @@ function UnforwardedNumberControl(
 									icon={ plusIcon }
 									isSmall
 									aria-hidden="true"
+									aria-label={ __( 'Increment' ) }
 									tabIndex={ -1 }
 									onClick={ buildSpinHandler( 'up' ) }
 								/>
@@ -239,6 +240,7 @@ function UnforwardedNumberControl(
 									icon={ resetIcon }
 									isSmall
 									aria-hidden="true"
+									aria-label={ __( 'Decrement' ) }
 									tabIndex={ -1 }
 									onClick={ buildSpinHandler( 'down' ) }
 								/>
