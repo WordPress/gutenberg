@@ -18,7 +18,7 @@ if ( class_exists( 'WP_Style_Engine_Block_Style_Metadata' ) ) {
  */
 class WP_Style_Engine_Block_Style_Metadata {
 	/**
-	 * The original metadata.
+	 * A variable to cache original metadata.
 	 *
 	 * @var array
 	 */
@@ -34,9 +34,6 @@ class WP_Style_Engine_Block_Style_Metadata {
 	/**
 	 * Constructor for this object.
 	 *
-	 * If a `$declarations` array is passed, it will be used to populate
-	 * the initial $declarations prop of the object by calling add_declarations().
-	 *
 	 * @param array $base_metadata An associative array of block style metadata to extend.
 	 */
 	public function __construct( $base_metadata = array() ) {
@@ -45,7 +42,7 @@ class WP_Style_Engine_Block_Style_Metadata {
 	}
 
 	/**
-	 * Add block style metadata.
+	 * Adds block style metadata.
 	 *
 	 * @param array $metadata The $metadata.
 	 *
@@ -78,7 +75,7 @@ class WP_Style_Engine_Block_Style_Metadata {
 	}
 
 	/**
-	 * Get the metadata array.
+	 * Returns merged metadata.
 	 *
 	 * @param array $path A path to an array item in static::$merged_block_support_metadata.
 	 * @return array
