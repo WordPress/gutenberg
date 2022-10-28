@@ -331,6 +331,7 @@ module.exports = {
 				'**/*.@(android|ios|native).js',
 				'packages/react-native-*/**/*.js',
 				'test/native/**/*.js',
+				'test/e2e/**/*.[tj]s',
 			],
 			extends: [
 				'plugin:jest-dom/recommended',
