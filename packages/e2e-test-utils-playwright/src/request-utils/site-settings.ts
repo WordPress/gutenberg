@@ -36,7 +36,9 @@ export async function getSiteSettings( this: RequestUtils ) {
 }
 
 /**
- * Delete all comments using the REST API.
+ * Update the site settings.
+ *
+ * @see https://developer.wordpress.org/rest-api/reference/settings/#update-a-site-setting
  *
  * @param  this         RequestUtils.
  * @param  siteSettings The partial settings payload to update.
