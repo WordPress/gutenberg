@@ -14,7 +14,7 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import ButtonGroup from '../button-group';
-import RadioContext from '../radio-context';
+import RadioContext from './radio-context';
 
 function RadioGroup(
 	{ label, checked, defaultChecked, disabled, onChange, ...props },

@@ -13,7 +13,7 @@ import { useContext, forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Button from '../button';
+import Button from '../../button';
 import RadioContext from '../radio-context';
 
 function Radio( { children, value, ...props }, ref ) {

@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Radio from '../../radio';
+import Radio from '../radio';
 import RadioGroup from '../';
 
 export default {
