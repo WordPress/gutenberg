@@ -67,7 +67,7 @@ describe( 'useFocusOutside', () => {
 		expect( mockOnFocusOutside ).not.toHaveBeenCalled();
 	} );
 
-	it( "should call handler if focus doesn't shift to element within component", async () => {
+	it( 'should call handler if focus shifts to element outside component', async () => {
 		const mockOnFocusOutside = jest.fn();
 		const user = userEvent.setup( {
 			advanceTimers: jest.advanceTimersByTime,
