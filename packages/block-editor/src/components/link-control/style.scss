@@ -239,6 +239,7 @@ $preview-image-height: 140px;
 	.block-editor-link-control__search-item-title {
 		overflow: hidden;
 		text-overflow: ellipsis;
+		word-break: break-word;
 
 		.components-external-link__icon {
 			position: absolute;
