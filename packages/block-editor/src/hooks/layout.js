@@ -15,6 +15,8 @@ import {
 	Button,
 	ButtonGroup,
 	ToggleControl,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 	PanelBody,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -265,6 +267,31 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	);
 }
 
+function ChildLayoutPanel() {
+	return (
+		<InspectorControls>
+			<PanelBody title={ __( 'Layout' ) }>
+				<ToggleGroupControl
+					label={ __( 'Width' ) }
+					value={ 'fill' }
+					onChange={ () => null }
+				>
+					<ToggleGroupControlOptionIcon
+						key={ 'fill' }
+						value={ 'fill' }
+						label={ __( 'Fill' ) }
+					/>
+					<ToggleGroupControlOptionIcon
+						key={ 'fixed' }
+						value={ 'fixed' }
+						label={ __( 'Fixed' ) }
+					/>
+				</ToggleGroupControl>
+			</PanelBody>
+		</InspectorControls>
+	);
+}
+
 function LayoutTypeSwitcher( { type, onChange } ) {
 	return (
 		<ButtonGroup>
@@ -315,13 +342,18 @@ export function addAttribute( settings ) {
  */
 export const withInspectorControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const { name: blockName } = props;
+		const { name: blockName, __unstableParentLayout: parentLayout } = props;
 		const supportLayout = hasBlockSupport(
 			blockName,
 			layoutBlockSupportKey
 		);
 
+		const { type = 'default' } = parentLayout;
+
 		return [
+			type === 'flex' && (
+				<ChildLayoutPanel key="child-layout" { ...props } />
+			),
 			supportLayout && <LayoutPanel key="layout" { ...props } />,
 			<BlockEdit key="edit" { ...props } />,
 		];
