@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { some } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -24,7 +19,7 @@ export default function SaveButton() {
 		const { isSaveViewOpened } = select( editSiteStore );
 		return {
 			isDirty: dirtyEntityRecords.length > 0,
-			isSaving: some( dirtyEntityRecords, ( record ) =>
+			isSaving: dirtyEntityRecords.some( ( record ) =>
 				isSavingEntityRecord( record.kind, record.name, record.key )
 			),
 			isSaveViewOpen: isSaveViewOpened(),
