@@ -233,7 +233,7 @@ describe( 'Font Size Picker', () => {
 			await page.keyboard.type( 'Paragraph to be made "large"' );
 
 			await clickFontSizeButtonByLabel( 'Large' );
-			const buttonSelector = `${ FONT_SIZE_TOGGLE_GROUP_SELECTOR }//div[@data-active='true']//button`;
+			const buttonSelector = `${ FONT_SIZE_TOGGLE_GROUP_SELECTOR }//button[@aria-checked='true']`;
 			const [ activeButton ] = await page.$x( buttonSelector );
 			const activeLabel = await page.evaluate(
 				( element ) => element?.getAttribute( 'aria-label' ),
