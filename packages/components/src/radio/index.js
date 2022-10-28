@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * External dependencies
  */
@@ -32,4 +34,7 @@ function Radio( { children, value, ...props }, ref ) {
 	);
 }
 
+/**
+ * @deprecated Use `RadioControl` or `ToggleGroupControl` instead.
+ */
 export default forwardRef( Radio );

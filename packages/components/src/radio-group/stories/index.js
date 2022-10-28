@@ -10,8 +10,17 @@ import Radio from '../../radio';
 import RadioGroup from '../';
 
 export default {
-	title: 'Components (Experimental)/RadioGroup',
+	title: 'Components (Deprecated)/RadioGroup',
+	subcomponents: { Radio },
 	component: RadioGroup,
+	parameters: {
+		docs: {
+			description: {
+				component:
+					'This component is deprecated. Use `RadioControl` or `ToggleGroupControl` instead.',
+			},
+		},
+	},
 };
 
 export const _default = () => {

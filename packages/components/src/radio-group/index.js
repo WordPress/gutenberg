@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * External dependencies
  */
@@ -43,4 +45,7 @@ function RadioGroup(
 	);
 }
 
+/**
+ * @deprecated Use `RadioControl` or `ToggleGroupControl` instead.
+ */
 export default forwardRef( RadioGroup );
