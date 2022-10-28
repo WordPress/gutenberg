@@ -14,14 +14,17 @@ concurrency:
 
 jobs:
     test:
+        name: Test ${{ matrix.native-test-name }} on ${{ matrix.profile }} API level ${{ matrix.api-level }}
         runs-on: macos-latest
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             matrix:
-                native-test-name: [gutenberg-editor-initial-html]
+                native-test-name: ['gutenberg-editor-initial-html']
+                api-level: ['28']
+                profile: ['pixel_xl']
 
         steps:
-            - name: checkout
+            - name: Checkout repository
               uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
 
             - name: Cache Gradle build
@@ -34,7 +37,7 @@ jobs:
                   path: |
                       ~/.android/avd/*
                       ~/.android/adb*
-                  key: avd-28
+                  key: avd-${{ matrix.api-level }}
 
             - name: Use desired version of Java
               uses: actions/setup-java@de1bb2b0c5634f0fc4438d7aa9944e68f9bf86cc # v3.6.0
@@ -42,7 +45,7 @@ jobs:
                   distribution: 'temurin'
                   java-version: '11'
 
-            - name: Use desired version of NodeJS
+            - name: Use desired version of Node.js
               uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
               with:
                   node-version-file: '.nvmrc'
@@ -51,13 +54,13 @@ jobs:
             - name: Install npm dependencies
               run: npm ci
 
-            - name: create AVD and generate snapshot for caching
+            - name: Create Android virtual device snapshot for caching
               if: ${{ steps.avd-cache.outputs.cache-hit != 'true' }}
               uses: reactivecircus/android-emulator-runner@d7b53ddc6e44254e1f4cf4a6ad67345837027a66 # v2.26.0
               with:
-                  api-level: 28
+                  api-level: ${{ matrix.api-level }}
                   emulator-build: 7425822 # https://github.com/ReactiveCircus/android-emulator-runner/issues/160#issuecomment-868615730
-                  profile: pixel_xl
+                  profile: ${{ matrix.profile }}
                   force-avd-creation: false
                   emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
                   disable-animations: false
@@ -66,21 +69,23 @@ jobs:
             - name: Run tests
               uses: reactivecircus/android-emulator-runner@d7b53ddc6e44254e1f4cf4a6ad67345837027a66 # v2.26.0
               with:
-                  api-level: 28
+                  api-level: ${{ matrix.api-level }}
                   emulator-build: 7425822 # https://github.com/ReactiveCircus/android-emulator-runner/issues/160#issuecomment-868615730
-                  profile: pixel_xl
+                  profile: ${{ matrix.profile }}
                   force-avd-creation: false
                   emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
                   disable-animations: true
                   script: npm run native test:e2e:android:local ${{ matrix.native-test-name }}
 
-            - uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
+            - name: Upload screen recodings
+              uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
               if: always()
               with:
                   name: android-screen-recordings
                   path: packages/react-native-editor/android-screen-recordings
 
-            - uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
+            - name: Upload Appium logs
+              uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
               if: always()
               with:
                   name: appium-logs
