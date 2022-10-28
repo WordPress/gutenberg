@@ -36,6 +36,7 @@
 -   `Button`: Refactor Storybook to controls and align docs ([#44105](https://github.com/WordPress/gutenberg/pull/44105)).
 -   `TabPanel`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44935](https://github.com/WordPress/gutenberg/pull/44935))
 -   `UnitControl`: Add tests ([#45260](https://github.com/WordPress/gutenberg/pull/45260)).
+-   `FontSizePicker`: Add more comprehensive tests ([#45298](https://github.com/WordPress/gutenberg/pull/45298)).
 
 ## 21.3.0 (2022-10-19)
 
