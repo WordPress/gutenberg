@@ -141,7 +141,7 @@ describe( 'useFocusOutside', () => {
 		await user.click( button );
 
 		// Simulate a blur event and the wrapper unmounting while the blur event
-		//  handler is queued
+		// handler is queued
 		button.blur();
 		rerender( <div /> );
 
