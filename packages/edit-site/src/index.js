@@ -15,7 +15,6 @@ import {
 import { store as editorStore } from '@wordpress/editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { __ } from '@wordpress/i18n';
 import { addFilter } from '@wordpress/hooks';
 
 /**
@@ -23,7 +22,6 @@ import { addFilter } from '@wordpress/hooks';
  */
 import './hooks';
 import { store as editSiteStore } from './store';
-import ErrorBoundaryWarning from './components/error-boundary/warning';
 import App from './components/app';
 
 /**
@@ -35,22 +33,6 @@ import App from './components/app';
  * @param {?Object} settings Editor settings object.
  */
 export function reinitializeEditor( target, settings ) {
-	// Display warning if editor wasn't able to resolve homepage template.
-	if ( ! settings.__unstableHomeTemplate ) {
-		render(
-			<ErrorBoundaryWarning
-				message={ __(
-					'The editor is unable to find a block template for the homepage.'
-				) }
-				dashboardLink={
-					settings.__experimentalDashboardLink ?? 'index.php'
-				}
-			/>,
-			target
-		);
-		return;
-	}
-
 	/*
 	 * Prevent adding the Clasic block in the site editor.
 	 * Only add the filter when the site editor is initialized, not imported.
