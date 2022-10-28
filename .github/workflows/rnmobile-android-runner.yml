@@ -24,12 +24,23 @@ jobs:
             - name: checkout
               uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
 
+            - name: Cache Gradle build
+              uses: gradle/gradle-build-action@3fbe033aaae657f011f88f29be9e65ed26bd29ef # v2.3.3
+
+            - name: Cache the Android virtual device
+              uses: actions/cache@v3
+              id: avd-cache
+              with:
+                  path: |
+                      ~/.android/avd/*
+                      ~/.android/adb*
+                  key: avd-28
+
             - name: Use desired version of Java
               uses: actions/setup-java@de1bb2b0c5634f0fc4438d7aa9944e68f9bf86cc # v3.6.0
               with:
                   distribution: 'temurin'
                   java-version: '11'
-                  cache: 'gradle'
 
             - name: Use desired version of NodeJS
               uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
@@ -37,19 +48,30 @@ jobs:
                   node-version-file: '.nvmrc'
                   cache: npm
 
-            - run: npm ci
+            - name: Install npm dependencies
+              run: npm ci
 
-            - name: Restore Gradle cache
-              uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 # v3.0.11
-              with:
-                  path: ~/.gradle/caches
-                  key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-
-            - uses: reactivecircus/android-emulator-runner@d7b53ddc6e44254e1f4cf4a6ad67345837027a66 # v2.26.0
+            - name: create AVD and generate snapshot for caching
+              if: ${{ steps.avd-cache.outputs.cache-hit != 'true' }}
+              uses: reactivecircus/android-emulator-runner@d7b53ddc6e44254e1f4cf4a6ad67345837027a66 # v2.26.0
               with:
                   api-level: 28
                   emulator-build: 7425822 # https://github.com/ReactiveCircus/android-emulator-runner/issues/160#issuecomment-868615730
                   profile: pixel_xl
+                  force-avd-creation: false
+                  emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+                  disable-animations: false
+                  script: echo "Generated AVD snapshot for caching."
+
+            - name: Run tests
+              uses: reactivecircus/android-emulator-runner@d7b53ddc6e44254e1f4cf4a6ad67345837027a66 # v2.26.0
+              with:
+                  api-level: 28
+                  emulator-build: 7425822 # https://github.com/ReactiveCircus/android-emulator-runner/issues/160#issuecomment-868615730
+                  profile: pixel_xl
+                  force-avd-creation: false
+                  emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+                  disable-animations: true
                   script: npm run native test:e2e:android:local ${{ matrix.native-test-name }}
 
             - uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
