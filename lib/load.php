@@ -107,6 +107,7 @@ require __DIR__ . '/compat/wordpress-6.2/get-global-styles-and-settings.php';
 require __DIR__ . '/compat/wordpress-6.2/default-filters.php';
 require __DIR__ . '/compat/wordpress-6.2/class-wp-theme-json-resolver-6-2.php';
 require __DIR__ . '/compat/wordpress-6.2/class-wp-theme-json-6-2.php';
+require __DIR__ . '/compat/wordpress-6.2/site-editor.php';
 
 // Experimental features.
 remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WP 6.0's stopgap handler for Webfonts API.
