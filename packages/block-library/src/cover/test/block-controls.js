@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 // Need to mock the BlockControls wrapper as this requires a slot to run
 // so can't be easily unit tested.
@@ -14,6 +15,13 @@ jest.mock( '@wordpress/block-editor', () => ( {
  * Internal dependencies
  */
 import CoverBlockControls from '../edit/block-controls';
+
+function setup( jsx ) {
+	return {
+		user: userEvent.setup( { advanceTimers: jest.advanceTimersByTime } ),
+		...render( jsx ),
+	};
+}
 
 const setAttributes = jest.fn();
 const onSelectMedia = jest.fn();
@@ -50,9 +58,11 @@ describe( 'Cover block controls', () => {
 				} )
 			).toBeInTheDocument();
 		} );
-		test( 'sets minHeight attributes to 100vh when clicked', () => {
-			render( <CoverBlockControls { ...defaultProps } /> );
-			fireEvent.click( screen.getByLabelText( 'Toggle full height' ) );
+		test( 'sets minHeight attributes to 100vh when clicked', async () => {
+			const { user } = setup(
+				<CoverBlockControls { ...defaultProps } />
+			);
+			await user.click( screen.getByLabelText( 'Toggle full height' ) );
 			expect( setAttributes ).toHaveBeenCalledWith( {
 				minHeight: 100,
 				minHeightUnit: 'vh',
@@ -69,9 +79,11 @@ describe( 'Cover block controls', () => {
 			).toBeInTheDocument();
 		} );
 		test( 'sets contentPosition attribute', async () => {
-			render( <CoverBlockControls { ...defaultProps } /> );
+			const { user } = setup(
+				<CoverBlockControls { ...defaultProps } />
+			);
 
-			fireEvent.click(
+			await user.click(
 				screen.getByLabelText( 'Change content position' )
 			);
 			within( screen.getByRole( 'grid' ) )
