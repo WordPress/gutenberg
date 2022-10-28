@@ -21,19 +21,23 @@ class Gutenberg_REST_Pattern_Directory_Controller_6_2 extends Gutenberg_REST_Pat
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_items( $request ) {
-		/*
+		/**
 		 * Include an unmodified `$wp_version`, so the API can craft a response that's tailored to
 		 * it. Some plugins modify the version in a misguided attempt to improve security by
 		 * obscuring the version, which can cause invalid requests.
 		 */
 		require ABSPATH . WPINC . '/version.php';
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+
+		$gutenberg_data = get_plugin_data( dirname( dirname( dirname( __DIR__ ) ) ) . '/gutenberg.php', false );
 
 		$valid_query_args = array( 'offset', 'order', 'orderby', 'page', 'per_page', 'search', 'slug' );
 		$query_args       = array_merge(
 			array_intersect_key( $request->get_params(), array_flip( $valid_query_args ) ),
 			array(
-				'locale'     => get_user_locale(),
-				'wp-version' => $wp_version, // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable -- it's defined in `version.php` above.
+				'locale'            => get_user_locale(),
+				'wp-version'        => $wp_version, // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable -- it's defined in `version.php` above.
+				'gutenberg-version' => $gutenberg_data['Version'],
 			)
 		);
 
