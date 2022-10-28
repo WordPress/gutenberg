@@ -4,17 +4,20 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-// Need to mock the BlockControls wrapper as this requires a slot to run
+// Need to mock the InspectorControls wrapper as this requires a slot to run
 // so can't be easily unit tested.
-jest.mock( '@wordpress/block-editor', () => ( {
-	...jest.requireActual( '@wordpress/block-editor' ),
-	InspectorControls: ( { children } ) => (
-		<div className="inspector-control">{ children }</div>
-	),
-	ToolsPanelItem: ( { children } ) => (
-		<div className="tools-panel-item">{ children }</div>
-	),
-} ) );
+jest.mock(
+	'@wordpress/block-editor/src/components/inspector-controls',
+	() =>
+		( { children } ) =>
+			<div className="inspector-control">{ children }</div>
+);
+jest.mock(
+	'@wordpress/components/src/tools-panel/tools-panel-item',
+	() =>
+		( { children } ) =>
+			<div className="tools-panel-item">{ children }</div>
+);
 
 /**
  * Internal dependencies

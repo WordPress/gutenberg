@@ -6,10 +6,12 @@ import userEvent from '@testing-library/user-event';
 
 // Need to mock the BlockControls wrapper as this requires a slot to run
 // so can't be easily unit tested.
-jest.mock( '@wordpress/block-editor', () => ( {
-	...jest.requireActual( '@wordpress/block-editor' ),
-	BlockControls: ( { children } ) => <div>{ children }</div>,
-} ) );
+jest.mock(
+	'@wordpress/block-editor/src/components/block-controls',
+	() =>
+		( { children } ) =>
+			<div className="block-control">{ children }</div>
+);
 
 /**
  * Internal dependencies
