@@ -22,6 +22,11 @@ import { useCallback, useEffect, useRef } from '@wordpress/element';
  */
 const INPUT_BUTTON_TYPES = [ 'button', 'submit' ];
 
+/**
+ * List of HTML button elements subject to focus normalization
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
+ */
 type FocusNormalizedButton =
 	| HTMLButtonElement
 	| HTMLLinkElement
