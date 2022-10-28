@@ -21,6 +21,7 @@
 -   `BorderControl` & `BorderBoxControl`: Replace `__next36pxDefaultSize` with "default" and "large" size variants ([#41860](https://github.com/WordPress/gutenberg/pull/41860)).
 -   `UnitControl`: Remove outer wrapper to normalize className placement ([#41860](https://github.com/WordPress/gutenberg/pull/41860)).
 -   `ColorPalette`: Fix transparent checkered background pattern ([#45295](https://github.com/WordPress/gutenberg/pull/45295)).
+-   `NumberControl`: Add custom spin buttons ([#45333](https://github.com/WordPress/gutenberg/pull/45333)).
 
 ### Bug Fix
 
