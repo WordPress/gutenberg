@@ -27,7 +27,7 @@ class WP_Theme_JSON_Resolver_6_2 extends WP_Theme_JSON_Resolver_6_1 {
 	 * @return bool
 	 */
 	public static function theme_has_support() {
-		_deprecated_function( __METHOD__, '6.2.0', 'wp_theme_has_theme_json()');
+		_deprecated_function( __METHOD__, '6.2.0', 'wp_theme_has_theme_json()' );
 
 		return wp_theme_has_theme_json();
 	}
