@@ -21,11 +21,9 @@ test.describe( 'Site editor iframe rendering mode', () => {
 			postType: 'wp_template',
 		} );
 
-		const compatMode = await page.evaluate(
-			() =>
-				document.querySelector( `iframe[name='editor-canvas']` )
-					.contentDocument.compatMode
-		);
+		const compatMode = await page
+			.locator( 'iframe[name="editor-canvas"]' )
+			.evaluate( ( iframe ) => iframe.contentDocument.compatMode );
 
 		// CSS1Compat = expected standards mode.
 		// BackCompat = quirks mode.
