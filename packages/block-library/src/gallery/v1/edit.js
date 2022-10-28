@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, find, get, isEmpty, map, reduce, some } from 'lodash';
+import { filter, find, get, isEmpty, map, reduce } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -302,9 +302,10 @@ function GalleryEdit( props ) {
 	}
 
 	function getImagesSizeOptions() {
+		const resizedImageSizes = Object.values( resizedImages );
 		return map(
 			filter( imageSizes, ( { slug } ) =>
-				some( resizedImages, ( sizes ) => sizes[ slug ] )
+				resizedImageSizes.some( ( sizes ) => sizes[ slug ] )
 			),
 			( { name, slug } ) => ( { value: slug, label: name } )
 		);

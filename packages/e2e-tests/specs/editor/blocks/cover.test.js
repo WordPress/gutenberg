@@ -134,7 +134,7 @@ describe( 'Cover', () => {
 
 		const heightInput = (
 			await page.$x(
-				'//div[./label[contains(text(),"Minimum height of cover")]]//input'
+				'//div[./label[contains(text(),"Minimum height of cover")]]/following-sibling::div//input'
 			)
 		 )[ 0 ];
 

@@ -1,7 +1,7 @@
-// @ts-nocheck
 /**
  * External dependencies
  */
+import type { ForwardedRef } from 'react';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
@@ -10,7 +10,7 @@ import a11yPlugin from 'colord/plugins/a11y';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { useCallback, useMemo } from '@wordpress/element';
+import { useCallback, useMemo, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,6 +23,15 @@ import { Flex, FlexItem } from '../flex';
 import { Truncate } from '../truncate';
 import { ColorHeading } from './styles';
 import DropdownContentWrapper from '../dropdown/dropdown-content-wrapper';
+import type {
+	ColorObject,
+	ColorPaletteProps,
+	CustomColorPickerDropdownProps,
+	MultiplePalettesProps,
+	PaletteObject,
+	SinglePaletteProps,
+} from './types';
+import type { WordPressComponentProps } from '../ui/context';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
@@ -33,7 +42,7 @@ function SinglePalette( {
 	onChange,
 	value,
 	actions,
-} ) {
+}: SinglePaletteProps ) {
 	const colorOptions = useMemo( () => {
 		return colors.map( ( { color, name }, index ) => {
 			const colordColor = colord( color );
@@ -74,6 +83,11 @@ function SinglePalette( {
 			);
 		} );
 	}, [ colors, value, onChange, clearColor ] );
+
+	if ( colors.length === 0 ) {
+		return null;
+	}
+
 	return (
 		<CircularOptionPicker
 			className={ className }
@@ -90,7 +104,11 @@ function MultiplePalettes( {
 	onChange,
 	value,
 	actions,
-} ) {
+}: MultiplePalettesProps ) {
+	if ( colors.length === 0 ) {
+		return null;
+	}
+
 	return (
 		<VStack spacing={ 3 } className={ className }>
 			{ colors.map( ( { name, colors: colorPalette }, index ) => {
@@ -117,7 +135,7 @@ export function CustomColorPickerDropdown( {
 	isRenderedInSidebar,
 	popoverProps: receivedPopoverProps,
 	...props
-} ) {
+}: CustomColorPickerDropdownProps ) {
 	const popoverProps = useMemo(
 		() => ( {
 			shift: true,
@@ -148,9 +166,9 @@ export function CustomColorPickerDropdown( {
 }
 
 export const extractColorNameFromCurrentValue = (
-	currentValue,
-	colors = [],
-	showMultiplePalettes = false
+	currentValue?: ColorPaletteProps[ 'value' ],
+	colors: ColorPaletteProps[ 'colors' ] = [],
+	showMultiplePalettes: ColorPaletteProps[ '__experimentalHasMultipleOrigins' ] = false
 ) => {
 	if ( ! currentValue ) {
 		return '';
@@ -162,7 +180,10 @@ export const extractColorNameFromCurrentValue = (
 		: colord( currentValue ).toHex();
 
 	// Normalize format of `colors` to simplify the following loop
-	const colorPalettes = showMultiplePalettes ? colors : [ { colors } ];
+	type normalizedPaletteObject = { colors: ColorObject[] };
+	const colorPalettes: normalizedPaletteObject[] = showMultiplePalettes
+		? ( colors as PaletteObject[] )
+		: [ { colors: colors as ColorObject[] } ];
 	for ( const { colors: paletteColors } of colorPalettes ) {
 		for ( const { name: colorName, color: colorValue } of paletteColors ) {
 			const normalizedColorValue = currentValueIsCssVariable
@@ -179,28 +200,62 @@ export const extractColorNameFromCurrentValue = (
 	return __( 'Custom' );
 };
 
-export const showTransparentBackground = ( currentValue ) => {
+export const showTransparentBackground = ( currentValue?: string ) => {
 	if ( typeof currentValue === 'undefined' ) {
 		return true;
 	}
 	return colord( currentValue ).alpha() === 0;
 };
 
-export default function ColorPalette( {
-	clearable = true,
-	className,
-	colors,
-	disableCustomColors = false,
-	enableAlpha,
-	onChange,
-	value,
-	__experimentalHasMultipleOrigins = false,
-	__experimentalIsRenderedInSidebar = false,
-} ) {
+const areColorsMultiplePalette = (
+	colors: NonNullable< ColorPaletteProps[ 'colors' ] >
+): colors is PaletteObject[] => {
+	return colors.every( ( colorObj ) =>
+		Array.isArray( ( colorObj as PaletteObject ).colors )
+	);
+};
+
+function UnforwardedColorPalette(
+	props: WordPressComponentProps< ColorPaletteProps, 'div' >,
+	forwardedRef: ForwardedRef< any >
+) {
+	const {
+		clearable = true,
+		colors = [],
+		disableCustomColors = false,
+		enableAlpha,
+		onChange,
+		value,
+		__experimentalHasMultipleOrigins = false,
+		__experimentalIsRenderedInSidebar = false,
+		...otherProps
+	} = props;
 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
-	const showMultiplePalettes =
-		__experimentalHasMultipleOrigins && colors?.length;
-	const Component = showMultiplePalettes ? MultiplePalettes : SinglePalette;
+
+	const buttonLabelName = useMemo(
+		() =>
+			extractColorNameFromCurrentValue(
+				value,
+				colors,
+				__experimentalHasMultipleOrigins
+			),
+		[ value, colors, __experimentalHasMultipleOrigins ]
+	);
+
+	// Make sure that the `colors` array has a format (single/multiple) that is
+	// compatible with the `__experimentalHasMultipleOrigins` flag. This is true
+	// when __experimentalHasMultipleOrigins and areColorsMultiplePalette() are
+	// either both `true` or both `false`.
+	if (
+		colors.length > 0 &&
+		__experimentalHasMultipleOrigins !== areColorsMultiplePalette( colors )
+	) {
+		// eslint-disable-next-line no-console
+		console.warn(
+			'wp.components.ColorPalette: please specify a format for the `colors` prop that is compatible with the `__experimentalHasMultipleOrigins` prop.'
+		);
+		return null;
+	}
 
 	const renderCustomColorPicker = () => (
 		<DropdownContentWrapper paddingSize="none">
@@ -212,20 +267,11 @@ export default function ColorPalette( {
 		</DropdownContentWrapper>
 	);
 
-	const colordColor = colord( value );
+	const colordColor = colord( value ?? '' );
 
 	const valueWithoutLeadingHash = value?.startsWith( '#' )
 		? value.substring( 1 )
 		: value ?? '';
-	const buttonLabelName = useMemo(
-		() =>
-			extractColorNameFromCurrentValue(
-				value,
-				colors,
-				showMultiplePalettes
-			),
-		[ value, colors, showMultiplePalettes ]
-	);
 
 	const customColorAccessibleLabel = !! valueWithoutLeadingHash
 		? sprintf(
@@ -238,8 +284,20 @@ export default function ColorPalette( {
 		  )
 		: __( 'Custom color picker.' );
 
+	const paletteCommonProps = {
+		clearable,
+		clearColor,
+		onChange,
+		value,
+		actions: !! clearable && (
+			<CircularOptionPicker.ButtonAction onClick={ clearColor }>
+				{ __( 'Clear' ) }
+			</CircularOptionPicker.ButtonAction>
+		),
+	};
+
 	return (
-		<VStack spacing={ 3 } className={ className }>
+		<VStack spacing={ 3 } ref={ forwardedRef } { ...otherProps }>
 			{ ! disableCustomColors && (
 				<CustomColorPickerDropdown
 					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
@@ -284,22 +342,45 @@ export default function ColorPalette( {
 					) }
 				/>
 			) }
-			<Component
-				clearable={ clearable }
-				clearColor={ clearColor }
-				colors={ colors }
-				onChange={ onChange }
-				value={ value }
-				actions={
-					!! clearable && (
-						<CircularOptionPicker.ButtonAction
-							onClick={ clearColor }
-						>
-							{ __( 'Clear' ) }
-						</CircularOptionPicker.ButtonAction>
-					)
-				}
-			/>
+			{ __experimentalHasMultipleOrigins ? (
+				<MultiplePalettes
+					{ ...paletteCommonProps }
+					colors={ colors as PaletteObject[] }
+				/>
+			) : (
+				<SinglePalette
+					{ ...paletteCommonProps }
+					colors={ colors as ColorObject[] }
+				/>
+			) }
 		</VStack>
 	);
 }
+
+/**
+ * Allows the user to pick a color from a list of pre-defined color entries.
+ *
+ * ```jsx
+ * import { ColorPalette } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const MyColorPalette = () => {
+ *   const [ color, setColor ] = useState ( '#f00' )
+ *   const colors = [
+ *     { name: 'red', color: '#f00' },
+ *     { name: 'white', color: '#fff' },
+ *     { name: 'blue', color: '#00f' },
+ *   ];
+ *   return (
+ *     <ColorPalette
+ *       colors={ colors }
+ *       value={ color }
+ *       onChange={ ( color ) => setColor( color ) }
+ *     />
+ *   );
+ * } );
+ * ```
+ */
+export const ColorPalette = forwardRef( UnforwardedColorPalette );
+
+export default ColorPalette;

@@ -125,19 +125,23 @@ export default function useFocusOutside( onFocusOutside ) {
 	 * intends to normalize this as treating click on buttons as focus.
 	 *
 	 * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
-	 *
-	 * @param {SyntheticEvent} event Event for mousedown or mouseup.
 	 */
-	const normalizeButtonFocus = useCallback( ( event ) => {
-		const { type, target } = event;
-		const isInteractionEnd = [ 'mouseup', 'touchend' ].includes( type );
+	const normalizeButtonFocus = useCallback(
+		/**
+		 * @param {SyntheticEvent} event Event for mousedown or mouseup.
+		 */
+		( event ) => {
+			const { type, target } = event;
+			const isInteractionEnd = [ 'mouseup', 'touchend' ].includes( type );
 
-		if ( isInteractionEnd ) {
-			preventBlurCheck.current = false;
-		} else if ( isFocusNormalizedButton( target ) ) {
-			preventBlurCheck.current = true;
-		}
-	}, [] );
+			if ( isInteractionEnd ) {
+				preventBlurCheck.current = false;
+			} else if ( isFocusNormalizedButton( target ) ) {
+				preventBlurCheck.current = true;
+			}
+		},
+		[]
+	);
 
 	/**
 	 * A callback triggered when a blur event occurs on the element the handler
@@ -145,34 +149,38 @@ export default function useFocusOutside( onFocusOutside ) {
 	 *
 	 * Calls the `onFocusOutside` callback in an immediate timeout if focus has
 	 * move outside the bound element and is still within the document.
-	 *
-	 * @param {SyntheticEvent} event Blur event.
 	 */
-	const queueBlurCheck = useCallback( ( event ) => {
-		// React does not allow using an event reference asynchronously
-		// due to recycling behavior, except when explicitly persisted.
-		event.persist();
+	const queueBlurCheck = useCallback(
+		/**
+		 * @param {SyntheticEvent} event Blur event.
+		 */
+		( event ) => {
+			// React does not allow using an event reference asynchronously
+			// due to recycling behavior, except when explicitly persisted.
+			event.persist();
 
-		// Skip blur check if clicking button. See `normalizeButtonFocus`.
-		if ( preventBlurCheck.current ) {
-			return;
-		}
-
-		blurCheckTimeoutId.current = setTimeout( () => {
-			// If document is not focused then focus should remain
-			// inside the wrapped component and therefore we cancel
-			// this blur event thereby leaving focus in place.
-			// https://developer.mozilla.org/en-US/docs/Web/API/Document/hasFocus.
-			if ( ! document.hasFocus() ) {
-				event.preventDefault();
+			// Skip blur check if clicking button. See `normalizeButtonFocus`.
+			if ( preventBlurCheck.current ) {
 				return;
 			}
 
-			if ( 'function' === typeof currentOnFocusOutside.current ) {
-				currentOnFocusOutside.current( event );
-			}
-		}, 0 );
-	}, [] );
+			blurCheckTimeoutId.current = setTimeout( () => {
+				// If document is not focused then focus should remain
+				// inside the wrapped component and therefore we cancel
+				// this blur event thereby leaving focus in place.
+				// https://developer.mozilla.org/en-US/docs/Web/API/Document/hasFocus.
+				if ( ! document.hasFocus() ) {
+					event.preventDefault();
+					return;
+				}
+
+				if ( 'function' === typeof currentOnFocusOutside.current ) {
+					currentOnFocusOutside.current( event );
+				}
+			}, 0 );
+		},
+		[]
+	);
 
 	return {
 		onFocus: cancelBlurCheck,
