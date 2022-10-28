@@ -48,8 +48,8 @@ function gutenberg_register_core_block_patterns_and_categories() {
 	register_block_pattern_category(
 		'query',
 		array(
-			'label'       => _x( 'Query', 'Block pattern category', 'gutenberg' ),
-			'description' => __( 'Display post summaries in lists, grids, and other layouts', 'gutenberg' ),
+			'label'       => _x( 'Posts', 'Block pattern category', 'gutenberg' ),
+			'description' => __( 'Display post summaries in lists, grids, and other layouts.', 'gutenberg' ),
 		)
 	);
 	register_block_pattern_category(
