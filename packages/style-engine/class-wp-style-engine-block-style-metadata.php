@@ -59,6 +59,12 @@ class WP_Style_Engine_Block_Style_Metadata {
 			}
 
 			foreach ( $definition_group_style as $style_definition_key => $style_definition ) {
+				// Bails early if merging metadata is attempting to overwrite existing, original style metadata.
+				if ( array_key_exists( $definition_group_key, $this->base_metadata )
+					&& array_key_exists( $style_definition_key, $this->base_metadata[ $definition_group_key ] ) ) {
+					continue;
+				}
+
 				if ( ! is_array( $style_definition ) || empty( $style_definition ) ) {
 					continue;
 				}
@@ -120,13 +126,9 @@ class WP_Style_Engine_Block_Style_Metadata {
 			return;
 		}
 
-		// Only allow specific value_func.
-		if ( isset( $custom_definition['value_func'] ) && 'WP_Style_Engine::get_individual_property_css_declarations' !== $custom_definition['value_func'] ) {
-			return;
-		}
-
 		$custom_definition['property_keys']['default'] = sanitize_key( $custom_definition['property_keys']['default'] );
 
+		// A white list of keys that may be merged. Note the absence of the callable `value_func`.
 		$valid_keys = array( 'path', 'property_keys', 'css_vars', 'classnames' );
 		foreach ( $valid_keys as $key ) {
 			if ( isset( $custom_definition[ $key ] ) && is_array( $custom_definition[ $key ] ) ) {

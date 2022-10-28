@@ -493,6 +493,71 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					),
 				),
 			),
+
+			'extend_block_style_definitions_with_metadata' => array(
+				'block_styles'    => array(
+					'layout'     => array(
+						'float' => 'var:preset|layout|left',
+						'width' => array(
+							'max' => '100px',
+							'min' => '20px',
+						),
+					),
+					'typography' => array(
+						'textIndent' => '1rem',
+					),
+				),
+				'options'         => array(
+					'metadata' => array(
+						'layout'     => array(
+							'float' => array(
+								'property_keys' => array(
+									'default' => 'float',
+								),
+								'path'          => array( 'layout', 'float' ),
+								'css_vars'      => array(
+									'layout' => '--wp--preset--float--$slug',
+								),
+								'classnames'    => array(
+									'has-float-layout' => true,
+									'has-$slug-float'  => 'layout',
+								),
+							),
+							'width' => array(
+								'property_keys' => array(
+									'default'    => 'width',
+									'individual' => '%s-width',
+								),
+								'path'          => array( 'layout', 'width' ),
+								'classnames'    => array(
+									'has-$slug-width' => 'layout',
+								),
+							),
+						),
+						'typography' => array(
+							'textIndent' => array(
+								'property_keys' => array(
+									'default' => 'text-indent',
+								),
+								'path'          => array( 'typography', 'textIndent' ),
+								'classnames'    => array(
+									'has-text-indent' => true,
+								),
+							),
+						),
+					),
+				),
+				'expected_output' => array(
+					'css'          => 'text-indent:1rem;float:var(--wp--preset--float--left);max-width:100px;min-width:20px;',
+					'declarations' => array(
+						'text-indent' => '1rem',
+						'float'       => 'var(--wp--preset--float--left)',
+						'max-width'   => '100px',
+						'min-width'   => '20px',
+					),
+					'classnames'   => 'has-text-indent has-float-layout has-left-float',
+				),
+			),
 		);
 	}
 
