@@ -47,6 +47,7 @@
 -   `UnitControl`: Add tests ([#45260](https://github.com/WordPress/gutenberg/pull/45260)).
 -   `Disabled`: Refactor the component to rely on the HTML `inert` attribute.
 -   `CustomGradientBar`: Refactor away from Lodash ([#45367](https://github.com/WordPress/gutenberg/pull/45367/)).
+-   `Autocomplete`: use Popover's new `placement` prop instead of legacy `position` prop ([#44396](https://github.com/WordPress/gutenberg/pull/44396/)).
 
 ## 21.3.0 (2022-10-19)
 
