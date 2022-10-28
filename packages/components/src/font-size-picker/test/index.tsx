@@ -143,12 +143,12 @@ describe( 'FontSizePicker', () => {
 		} );
 
 		test.each( [
-			{ value: undefined, expectedHint: 'Size' },
-			{ value: '8px', expectedHint: 'Size(8px)' },
-			{ value: '3px', expectedHint: 'Size(Custom)' },
+			{ value: undefined, expectedLabel: 'Size' },
+			{ value: '8px', expectedLabel: 'Size (8px)' },
+			{ value: '3px', expectedLabel: 'Size (Custom)' },
 		] )(
-			'displays $expectedHint as header hint when value is $value',
-			( { value, expectedHint } ) => {
+			'displays $expectedLabel as label when value is $value',
+			( { value, expectedLabel } ) => {
 				render(
 					<FontSizePicker
 						__nextHasNoMarginBottom
@@ -156,11 +156,9 @@ describe( 'FontSizePicker', () => {
 						value={ value }
 					/>
 				);
-				// TODO: There's no accessible way to select the label.
-				const label = document.querySelector(
-					'.components-base-control__label'
-				);
-				expect( label ).toHaveTextContent( expectedHint );
+				expect(
+					screen.getByLabelText( expectedLabel )
+				).toBeInTheDocument();
 			}
 		);
 
@@ -268,12 +266,12 @@ describe( 'FontSizePicker', () => {
 		} );
 
 		test.each( [
-			{ value: undefined, expectedHint: 'Size' },
-			{ value: '12px', expectedHint: 'small' },
-			{ value: '40px', expectedHint: 'Massive' },
+			{ value: undefined, expectedLabel: 'Size Default' },
+			{ value: '12px', expectedLabel: 'Size small(px)' },
+			{ value: '40px', expectedLabel: 'Size Massive(px)' },
 		] )(
-			'displays $hint as header hint when value is $value',
-			( { value, expectedHint } ) => {
+			'displays $expectedLabel as label when value is $value',
+			( { value, expectedLabel } ) => {
 				render(
 					<FontSizePicker
 						__nextHasNoMarginBottom
@@ -281,11 +279,9 @@ describe( 'FontSizePicker', () => {
 						value={ value }
 					/>
 				);
-				// TODO: There's no accessible way to select the label.
-				const label = document.querySelector(
-					'.components-base-control__label'
-				);
-				expect( label ).toHaveTextContent( expectedHint );
+				expect(
+					screen.getByLabelText( expectedLabel )
+				).toBeInTheDocument();
 			}
 		);
 
