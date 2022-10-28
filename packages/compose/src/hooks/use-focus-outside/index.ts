@@ -40,7 +40,7 @@ type FocusNormalizedButton =
  *
  * @param  eventTarget The target from a mouse or touch event.
  *
- * @return Whether element is a button.
+ * @return Whether the element is a button element subject to focus normalization.
  */
 function isFocusNormalizedButton(
 	eventTarget: EventTarget
