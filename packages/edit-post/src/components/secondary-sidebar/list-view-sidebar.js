@@ -15,12 +15,11 @@ import {
 } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
-import { useRef } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { ESCAPE } from '@wordpress/keycodes';
-import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -44,27 +43,34 @@ export default function ListViewSidebar() {
 
 	const [ tab, setTab ] = useState( 'list-view' );
 
-	// This ref helps us focus the list view.
+	// This ref refers to the list view only.
 	const listViewRef = useRef();
-	// This only fires when the list view is open because of the conditional rendering. It is the same shortcut to open but that is defined as a global shortcut and only fires when the list view is closed.
+	// This ref refers to the sidebar as a whole.
+	const sidebarRef = useRef();
+	// This only fires when the sidebar is open because of the conditional rendering. It is the same shortcut to open but that is defined as a global shortcut and only fires when the sidebar is closed.
 	useShortcut( 'core/edit-post/toggle-list-view', () => {
-		// If the list view has focus, we know it is safe to close.
+		// If the sidebar has focus, it is safe to close.
 		if (
-			listViewRef.current
-				.closest( '[role="region"][tabindex="-1"]' )
-				.contains( listViewRef.current.ownerDocument.activeElement )
+			sidebarRef.current.contains(
+				sidebarRef.current.ownerDocument.activeElement
+			)
 		) {
 			setIsListViewOpened( false );
 			// If the list view does not have focus, we should move focus to it.
-		} else {
-			// Find the first tabbable based on the attached ref.
+		} else if ( tab === 'list-view' ) {
+			// Find the 1st tabbable based on the attached list view ref.
 			focus.tabbable.find( listViewRef.current )[ 0 ].focus();
+			// If the outline does not have focus, we should move focus to it.
+		} else if ( tab === 'outline' ) {
+			// Find the 3rd tabbable based on the attached sidebar ref. This is to skip over the close button, list view tab button, and landing on outline tab button since there is nothing else to focus after.
+			focus.tabbable.find( sidebarRef.current )[ 2 ].focus();
 		}
 	} );
 
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
+<<<<<<< HEAD
 			aria-label={ __( 'Document Overview' ) }
 			className="edit-post-editor__document-overview-panel"
 			onKeyDown={ closeOnEscape }
