@@ -77,7 +77,6 @@ export function useNotifyCopy() {
 export function useClipboardHandler() {
 	const {
 		getBlocksByClientId,
-		getBlockName,
 		getSelectedBlockClientIds,
 		hasMultiSelection,
 		getSettings,
@@ -100,14 +99,6 @@ export function useClipboardHandler() {
 			const selectedBlockClientIds = getSelectedBlockClientIds();
 
 			if ( selectedBlockClientIds.length === 0 ) {
-				return;
-			}
-
-			// Don't execute if widget area block is included
-			if (
-				getBlockName( selectedBlockClientIds[ 0 ] ) ===
-				'core/widget-area'
-			) {
 				return;
 			}
 
