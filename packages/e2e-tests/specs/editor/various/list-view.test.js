@@ -378,7 +378,9 @@ describe( 'List view', () => {
 		// Open list view.
 		await pressKeyWithModifier( 'access', 'o' );
 
-		// Focus the list view close button and make sure the shortcut will close the list view. This is to catch a bug where elements could be out of range of the sidebar region.
+		// Focus the list view close button and make sure the shortcut will close the list view. This is to catch a bug where elements could be out of range of the sidebar region. Must shift+tab 3 times to reach cclose button before tabs.
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
 		await pressKeyWithModifier( 'shift', 'Tab' );
 		await expect( await getActiveElementLabel() ).toEqual(
 			'Close List View Sidebar'
