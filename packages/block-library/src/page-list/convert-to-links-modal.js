@@ -107,9 +107,8 @@ export default function ConvertToLinksModal( { onClose, clientId } ) {
 			</p>
 			<p>
 				<a href="https://wordpress.org/support/article/navigation-block/">
-					{ __( 'Click here' ) }
+					{ __( 'Click here to learn more about menu management.' ) }
 				</a>
-				{ __( ' to learn more about menu management.' ) }
 			</p>
 			<div className="wp-block-page-list-modal-buttons">
 				<Button variant="tertiary" onClick={ onClose }>
