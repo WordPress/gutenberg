@@ -58,6 +58,9 @@ import {
 	isEmptyTableSection,
 } from './state';
 
+const MAX_INITIAL_ROW_COUNT = 30;
+const MAX_INITIAL_COLUMN_COUNT = 30;
+
 const ALIGNMENT_CONTROLS = [
 	{
 		icon: alignLeft,
@@ -115,7 +118,9 @@ function TableEdit( {
 	 * @param {number} count New initial column count.
 	 */
 	function onChangeInitialColumnCount( count ) {
-		setInitialColumnCount( count );
+		setInitialColumnCount(
+			count !== '' ? Math.min( MAX_INITIAL_COLUMN_COUNT, count ) : count
+		);
 	}
 
 	/**
@@ -124,7 +129,9 @@ function TableEdit( {
 	 * @param {number} count New initial row count.
 	 */
 	function onChangeInitialRowCount( count ) {
-		setInitialRowCount( count );
+		setInitialRowCount(
+			count !== '' ? Math.min( MAX_INITIAL_ROW_COUNT, count ) : count
+		);
 	}
 
 	/**

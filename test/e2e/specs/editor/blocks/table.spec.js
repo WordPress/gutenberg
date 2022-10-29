@@ -45,6 +45,36 @@ test.describe( 'Table', () => {
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	test( 'limits the maximum number of row and column input fields.', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/table' } );
+
+		// Modify the column count.
+		const columnCountInput = page.locator(
+			'role=spinbutton[name="Column count"i]'
+		);
+
+		await columnCountInput.click();
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( '50' );
+
+		// Modify the row count.
+		const rowCountInput = page.locator(
+			'role=spinbutton[name="Row count"i]'
+		);
+		await rowCountInput.click();
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( '50' );
+
+		// Create the table.
+		await page.click( 'role=button[name="Create Table"i]' );
+
+		// Expect the post content to have a correctly sized table.
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	test( 'allows text to by typed into cells', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/table' } );
 
