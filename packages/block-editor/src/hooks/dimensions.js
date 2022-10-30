@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/components';
-import { Platform, useState, useCallback } from '@wordpress/element';
+import { Platform, useState, useCallback, memo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getBlockSupport } from '@wordpress/blocks';
 
@@ -51,6 +51,8 @@ function useVisualizerMouseOver() {
 	return { isMouseOver, onMouseOver, onMouseOut };
 }
 
+const MemoizedPaddingEdit = memo( PaddingEdit );
+const MemoizedMarginEdit = memo( MarginEdit );
 /**
  * Inspector controls for dimensions support.
  *
@@ -105,7 +107,7 @@ export function DimensionsPanel( props ) {
 						isShownByDefault={ defaultSpacingControls?.padding }
 						panelId={ props.clientId }
 					>
-						<PaddingEdit
+						<MemoizedPaddingEdit
 							onMouseOver={ paddingMouseOver.onMouseOver }
 							onMouseOut={ paddingMouseOver.onMouseOut }
 							{ ...props }
@@ -122,7 +124,7 @@ export function DimensionsPanel( props ) {
 						isShownByDefault={ defaultSpacingControls?.margin }
 						panelId={ props.clientId }
 					>
-						<MarginEdit
+						<MemoizedMarginEdit
 							onMouseOver={ marginMouseOver.onMouseOver }
 							onMouseOut={ marginMouseOver.onMouseOut }
 							{ ...props }
