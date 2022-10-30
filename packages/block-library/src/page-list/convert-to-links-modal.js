@@ -7,6 +7,7 @@ import { useDispatch } from '@wordpress/data';
 import { useEntityRecords } from '@wordpress/core-data';
 import { createBlock as create } from '@wordpress/blocks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { createInterpolateElement } from '@wordpress/element';
 
 const PAGE_FIELDS = [ 'id', 'title', 'link', 'type', 'parent' ];
 const MAX_PAGE_COUNT = 100;
@@ -106,9 +107,10 @@ export default function ConvertToLinksModal( { onClose, clientId } ) {
 				) }
 			</p>
 			<p>
-				<a href="https://wordpress.org/support/article/navigation-block/">
-					{ __( 'Click here to learn more about menu management.' ) }
-				</a>
+				{ createInterpolateElement(
+					__( '<a>Click here</a> to learn more about menu management.' ),
+					{ a: <a href="https://wordpress.org/support/article/navigation-block" /> }
+				) }
 			</p>
 			<div className="wp-block-page-list-modal-buttons">
 				<Button variant="tertiary" onClick={ onClose }>
