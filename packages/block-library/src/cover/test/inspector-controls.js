@@ -4,7 +4,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-// Need to mock the InspectorControls wrapper as this requires a slot to run
+// Need to mock the InspectorControls and ToolsPanel wrappers as these require a slot to run
 // so can't be easily unit tested.
 jest.mock(
 	'@wordpress/block-editor/src/components/inspector-controls',
