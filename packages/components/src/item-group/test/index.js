@@ -11,12 +11,12 @@ import { Item, ItemGroup } from '..';
 describe( 'ItemGroup', () => {
 	describe( 'ItemGroup component', () => {
 		it( 'should render correctly', () => {
-			const wrapper = render(
+			const { container } = render(
 				<ItemGroup>
 					<Item>Code is poetry</Item>
 				</ItemGroup>
 			);
-			expect( wrapper.container.firstChild ).toMatchSnapshot();
+			expect( container ).toMatchSnapshot();
 		} );
 
 		it( 'should show borders when the isBordered prop is true', () => {
@@ -65,14 +65,14 @@ describe( 'ItemGroup', () => {
 				</ItemGroup>
 			);
 
-			const { container: seperatedItems } = render(
+			const { container: separatedItems } = render(
 				<ItemGroup isSeparated={ true }>
 					<Item>Code is poetry</Item>
 				</ItemGroup>
 			);
 
 			expect( groupedItems.firstChild ).toMatchDiffSnapshot(
-				seperatedItems.firstChild
+				separatedItems.firstChild
 			);
 		} );
 	} );

@@ -20,7 +20,7 @@ describe( 'TreeGridRow', () => {
 			</table>
 		);
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
 	it( 'forwards other props to the rendered tr element', () => {
@@ -39,6 +39,6 @@ describe( 'TreeGridRow', () => {
 			</table>
 		);
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 } );

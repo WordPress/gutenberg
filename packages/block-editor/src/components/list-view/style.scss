@@ -249,39 +249,12 @@
 			}
 		}
 
-		// Don't show the focus inherited by the Button component.
-		&:focus:enabled {
-			box-shadow: none;
-			outline: none;
-		}
-
-		// Focus style.
-		&:focus {
-			box-shadow: none;
-			outline: none;
-		}
-
-		&:focus::before {
-			@include block-toolbar-button-style__focus();
-		}
-
-		// Focus and toggle pseudo elements.
+		// Tweak size and position of focus ring.
 		&::before {
-			content: "";
-			position: absolute;
-			display: block;
-			border-radius: $radius-block-ui;
 			height: 16px;
 			min-width: 100%;
-
-			// Position the focus rectangle.
 			left: 0;
 			right: 0;
-
-			// Animate in.
-			animation: components-button__appear-animation 0.1s ease;
-			animation-fill-mode: forwards;
-			@include reduce-motion("animation");
 		}
 	}
 

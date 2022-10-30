@@ -203,7 +203,6 @@ export const ToolsPanelWithItemGroupSlot = () => {
 };
 
 const PanelWrapperView = styled.div`
-	max-width: 280px;
 	font-size: 13px;
 
 	.components-dropdown-menu__menu {

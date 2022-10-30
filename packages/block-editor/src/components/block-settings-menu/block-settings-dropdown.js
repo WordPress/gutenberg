@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { castArray } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -58,7 +53,9 @@ export function BlockSettingsDropdown( {
 	__unstableDisplayLocation,
 	...props
 } ) {
-	const blockClientIds = castArray( clientIds );
+	const blockClientIds = Array.isArray( clientIds )
+		? clientIds
+		: [ clientIds ];
 	const count = blockClientIds.length;
 	const firstBlockClientId = blockClientIds[ 0 ];
 	const {

@@ -81,6 +81,7 @@ module.exports = {
 						importNames: [
 							'camelCase',
 							'capitalize',
+							'castArray',
 							'chunk',
 							'clamp',
 							'cloneDeep',
@@ -96,6 +97,7 @@ module.exports = {
 							'differenceWith',
 							'dropRight',
 							'each',
+							'escape',
 							'escapeRegExp',
 							'every',
 							'extend',
@@ -112,6 +114,7 @@ module.exports = {
 							'fromPairs',
 							'has',
 							'identity',
+							'includes',
 							'invoke',
 							'isArray',
 							'isBoolean',
@@ -146,6 +149,7 @@ module.exports = {
 							'reverse',
 							'size',
 							'snakeCase',
+							'some',
 							'sortBy',
 							'startCase',
 							'startsWith',
@@ -166,6 +170,8 @@ module.exports = {
 							'uniqWith',
 							'upperFirst',
 							'values',
+							'without',
+							'words',
 							'xor',
 							'zip',
 						],
@@ -322,8 +328,20 @@ module.exports = {
 		},
 		{
 			files: [ '**/test/**/*.js' ],
-			excludedFiles: [ '**/*.@(android|ios|native).js' ],
-			extends: [ 'plugin:jest-dom/recommended' ],
+			excludedFiles: [
+				'**/*.@(android|ios|native).js',
+				'packages/react-native-*/**/*.js',
+				'test/native/**/*.js',
+				'test/e2e/**/*.[tj]s',
+			],
+			extends: [
+				'plugin:jest-dom/recommended',
+				'plugin:testing-library/react',
+			],
+			rules: {
+				'testing-library/no-container': 'off',
+				'testing-library/no-node-access': 'off',
+			},
 		},
 		{
 			files: [ 'packages/e2e-test*/**/*.js' ],

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, map, reduce, some, find, filter, orderBy } from 'lodash';
+import { map, reduce, find, filter, orderBy } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -319,12 +319,13 @@ export const __experimentalGetGlobalBlocksByName = createSelector(
  */
 export const getBlocksByClientId = createSelector(
 	( state, clientIds ) =>
-		map( castArray( clientIds ), ( clientId ) =>
-			getBlock( state, clientId )
+		map(
+			Array.isArray( clientIds ) ? clientIds : [ clientIds ],
+			( clientId ) => getBlock( state, clientId )
 		),
 	( state, clientIds ) =>
 		map(
-			castArray( clientIds ),
+			Array.isArray( clientIds ) ? clientIds : [ clientIds ],
 			( clientId ) => state.blocks.tree[ clientId ]
 		)
 );
@@ -1183,8 +1184,7 @@ export function isBlockSelected( state, clientId ) {
  * @return {boolean} Whether the block as an inner block selected
  */
 export function hasSelectedInnerBlock( state, clientId, deep = false ) {
-	return some(
-		getBlockOrder( state, clientId ),
+	return getBlockOrder( state, clientId ).some(
 		( innerClientId ) =>
 			isBlockSelected( state, innerClientId ) ||
 			isBlockMultiSelected( state, innerClientId ) ||
@@ -1332,7 +1332,7 @@ export function isAncestorBeingDragged( state, clientId ) {
 	}
 
 	const parents = getBlockParents( state, clientId );
-	return some( parents, ( parentClientId ) =>
+	return parents.some( ( parentClientId ) =>
 		isBlockBeingDragged( state, parentClientId )
 	);
 }
@@ -1531,7 +1531,7 @@ const canInsertBlockTypeUnmemoized = (
 			...getBlockParents( state, rootClientId ),
 		];
 
-		hasBlockAllowedAncestor = some( ancestors, ( ancestorClientId ) =>
+		hasBlockAllowedAncestor = ancestors.some( ( ancestorClientId ) =>
 			checkAllowList(
 				blockAllowedAncestorBlocks,
 				getBlockName( state, ancestorClientId )
@@ -1845,13 +1845,10 @@ const buildBlockTypeItem =
 
 		let isDisabled = false;
 		if ( ! hasBlockSupport( blockType.name, 'multiple', true ) ) {
-			isDisabled = some(
-				getBlocksByClientId(
-					state,
-					getClientIdsWithDescendants( state )
-				),
-				{ name: blockType.name }
-			);
+			isDisabled = getBlocksByClientId(
+				state,
+				getClientIdsWithDescendants( state )
+			).some( ( { name } ) => name === blockType.name );
 		}
 
 		const { time, count = 0 } = getInsertUsage( state, id ) || {};
@@ -2065,7 +2062,7 @@ export const getInserterItems = createSelector(
  */
 export const getBlockTransformItems = createSelector(
 	( state, blocks, rootClientId = null ) => {
-		const normalizedBlocks = castArray( blocks );
+		const normalizedBlocks = Array.isArray( blocks ) ? blocks : [ blocks ];
 		const [ sourceBlock ] = normalizedBlocks;
 		const buildBlockTypeTransformItem = buildBlockTypeItem( state, {
 			buildScope: 'transform',
@@ -2129,7 +2126,7 @@ export const getBlockTransformItems = createSelector(
  */
 export const hasInserterItems = createSelector(
 	( state, rootClientId = null ) => {
-		const hasBlockType = some( getBlockTypes(), ( blockType ) =>
+		const hasBlockType = getBlockTypes().some( ( blockType ) =>
 			canIncludeBlockTypeInInserter( state, blockType, rootClientId )
 		);
 		if ( hasBlockType ) {
@@ -2690,6 +2687,11 @@ export const __unstableGetVisibleBlocks = createSelector(
 	( state ) => [ state.blockVisibility ]
 );
 
+/**
+ * DO-NOT-USE in production.
+ * This selector is created for internal/experimental only usage and may be
+ * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
+ */
 export const __unstableGetContentLockingParent = createSelector(
 	( state, clientId ) => {
 		let current = clientId;
@@ -2705,6 +2707,13 @@ export const __unstableGetContentLockingParent = createSelector(
 	( state ) => [ state.blocks.parents, state.blockListSettings ]
 );
 
+/**
+ * DO-NOT-USE in production.
+ * This selector is created for internal/experimental only usage and may be
+ * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
+ *
+ * @param {Object} state Global application state.
+ */
 export function __unstableGetTemporarilyEditingAsBlocks( state ) {
 	return state.temporarilyEditingAsBlocks;
 }

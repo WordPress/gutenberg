@@ -61,21 +61,26 @@ const stateReducer = (
 			return changes;
 	}
 };
-export default function CustomSelectControl( {
-	/** Start opting into the larger default height that will become the default size in a future version. */
-	__next36pxDefaultSize = false,
-	/** Start opting into the unconstrained width that will become the default in a future version. */
-	__nextUnconstrainedWidth = false,
-	className,
-	hideLabelFromVision,
-	label,
-	describedBy,
-	options: items,
-	onChange: onSelectedItemChange,
-	/** @type {import('../select-control/types').SelectControlProps.size} */
-	size = 'default',
-	value: _selectedItem,
-} ) {
+
+export default function CustomSelectControl( props ) {
+	const {
+		/** Start opting into the larger default height that will become the default size in a future version. */
+		__next36pxDefaultSize = false,
+		/** Start opting into the unconstrained width that will become the default in a future version. */
+		__nextUnconstrainedWidth = false,
+		className,
+		hideLabelFromVision,
+		label,
+		describedBy,
+		options: items,
+		onChange: onSelectedItemChange,
+		/** @type {import('../select-control/types').SelectControlProps.size} */
+		size = 'default',
+		value: _selectedItem,
+		onMouseOver,
+		onMouseOut,
+	} = props;
+
 	const {
 		getLabelProps,
 		getToggleButtonProps,
@@ -173,6 +178,8 @@ export default function CustomSelectControl( {
 				suffix={ <SelectControlChevronDown /> }
 			>
 				<SelectControlSelect
+					onMouseOver={ onMouseOver }
+					onMouseOut={ onMouseOut }
 					as="button"
 					onFocus={ () => setIsFocused( true ) }
 					onBlur={ () => setIsFocused( false ) }

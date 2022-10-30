@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { some } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -67,8 +62,7 @@ export default function EntityTypeList( {
 						key={ record.key || record.property }
 						record={ record }
 						checked={
-							! some(
-								unselectedEntities,
+							! unselectedEntities.some(
 								( elt ) =>
 									elt.kind === record.kind &&
 									elt.name === record.name &&
