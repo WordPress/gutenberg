@@ -50,11 +50,13 @@ function useVisualizerMouseOver() {
 	const [ isMouseOver, setIsMouseOver ] = useState( false );
 	const { hideBlockInterface, showBlockInterface } =
 		useDispatch( blockEditorStore );
-	const onMouseOver = () => {
+	const onMouseOver = ( e ) => {
+		e.stopPropagation();
 		hideBlockInterface();
 		setIsMouseOver( true );
 	};
-	const onMouseOut = () => {
+	const onMouseOut = ( e ) => {
+		e.stopPropagation();
 		showBlockInterface();
 		setIsMouseOver( false );
 	};
