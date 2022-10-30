@@ -19,7 +19,7 @@ import {
 	hasSameKeys,
 	isUpdatingSameBlockAttribute,
 	blocks,
-	isBlockToolbarHidden,
+	isBlockInterfaceHidden,
 	isTyping,
 	draggedBlocks,
 	selection,
@@ -2254,18 +2254,18 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'isBlockToolbarHidden()', () => {
-		it( 'should set the hide block toolbar flag to true', () => {
-			const state = isBlockToolbarHidden( false, {
-				type: 'HIDE_BLOCK_TOOLBAR',
+	describe( 'isBlockInterfaceHidden()', () => {
+		it( 'should set the hide block interface flag to true', () => {
+			const state = isBlockInterfaceHidden( false, {
+				type: 'HIDE_BLOCK_INTERFACE',
 			} );
 
 			expect( state ).toBe( true );
 		} );
 
-		it( 'should set the hide block toolbar flag to false', () => {
-			const state = isBlockToolbarHidden( false, {
-				type: 'SHOW_BLOCK_TOOLBAR',
+		it( 'should set the hide block interface flag to false', () => {
+			const state = isBlockInterfaceHidden( false, {
+				type: 'SHOW_BLOCK_INTERFACE',
 			} );
 
 			expect( state ).toBe( false );

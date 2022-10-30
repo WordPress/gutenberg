@@ -1264,24 +1264,24 @@ export function toggleBlockMode( clientId ) {
 }
 
 /**
- * Returns an action object used in signalling that the user has begun to show spacing visualizer.
+ * Returns an action object used in signalling that the block interface, eg. toolbar, outline, etc. should be hidden.
  *
  * @return {Object} Action object.
  */
-export function hideBlockToolbar() {
+export function hideBlockInterface() {
 	return {
-		type: 'HIDE_BLOCK_TOOLBAR',
+		type: 'HIDE_BLOCK_INTERFACE',
 	};
 }
 
 /**
- * Returns an action object used in signalling that the user has stopped showing spacing visualizer.
+ * Returns an action object used in signalling that the block interface, eg. toolbar, outline, etc. should be shown.
  *
  * @return {Object} Action object.
  */
-export function showBlockToolbar() {
+export function showBlockInterface() {
 	return {
-		type: 'SHOW_BLOCK_TOOLBAR',
+		type: 'SHOW_BLOCK_INTERFACE',
 	};
 }
 

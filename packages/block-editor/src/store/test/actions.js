@@ -27,7 +27,7 @@ const noop = () => {};
 
 const {
 	clearSelectedBlock,
-	hideBlockToolbar,
+	hideBlockInterface,
 	insertBlock,
 	insertBlocks,
 	mergeBlocks,
@@ -40,7 +40,7 @@ const {
 	replaceInnerBlocks,
 	resetBlocks,
 	selectBlock,
-	showBlockToolbar,
+	showBlockInterface,
 	showInsertionPoint,
 	startMultiSelect,
 	startTyping,
@@ -777,18 +777,18 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'hideBlockToolbar', () => {
-		it( 'should return the HIDE_BLOCK_TOOLBAR action', () => {
-			expect( hideBlockToolbar() ).toEqual( {
-				type: 'HIDE_BLOCK_TOOLBAR',
+	describe( 'hideBlockInterface', () => {
+		it( 'should return the HIDE_BLOCK_INTERFACE action', () => {
+			expect( hideBlockInterface() ).toEqual( {
+				type: 'HIDE_BLOCK_INTERFACE',
 			} );
 		} );
 	} );
 
-	describe( 'showBlockToolbar', () => {
-		it( 'should return the SHOW_BLOCK_TOOLBAR action', () => {
-			expect( showBlockToolbar() ).toEqual( {
-				type: 'SHOW_BLOCK_TOOLBAR',
+	describe( 'showBlockInterface', () => {
+		it( 'should return the SHOW_BLOCK_INTERFACE action', () => {
+			expect( showBlockInterface() ).toEqual( {
+				type: 'SHOW_BLOCK_INTERFACE',
 			} );
 		} );
 	} );

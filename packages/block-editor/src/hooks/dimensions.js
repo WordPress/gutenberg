@@ -48,14 +48,14 @@ export const AXIAL_SIDES = [ 'vertical', 'horizontal' ];
 
 function useVisualizerMouseOver() {
 	const [ isMouseOver, setIsMouseOver ] = useState( false );
-	const { hideBlockToolbar, showBlockToolbar } =
+	const { hideBlockInterface, showBlockInterface } =
 		useDispatch( blockEditorStore );
 	const onMouseOver = () => {
-		hideBlockToolbar();
+		hideBlockInterface();
 		setIsMouseOver( true );
 	};
 	const onMouseOut = () => {
-		showBlockToolbar();
+		showBlockInterface();
 		setIsMouseOver( false );
 	};
 	return { isMouseOver, onMouseOver, onMouseOut };

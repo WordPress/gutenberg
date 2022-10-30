@@ -1277,14 +1277,14 @@ export function isTyping( state ) {
 }
 
 /**
- * Returns true if the the block toolbar should be hidden, or false otherwise.
+ * Returns true if the the block interface should be hidden, or false otherwise.
  *
  * @param {Object} state Global application state.
  *
  * @return {boolean} Whether the block toolbar is hidden.
  */
-export function isBlockToolbarHidden( state ) {
-	return state.isBlockToolbarHidden;
+export function isBlockInterfaceHidden( state ) {
+	return state.isBlockInterfaceHidden;
 }
 
 /**

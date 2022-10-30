@@ -1161,19 +1161,19 @@ export const blocks = pipe(
 } );
 
 /**
- * Reducer returning visibility status of block toolbar.
+ * Reducer returning visibility status of block interface.
  *
  * @param {boolean} state  Current state.
  * @param {Object}  action Dispatched action.
  *
  * @return {boolean} Updated state.
  */
-export function isBlockToolbarHidden( state = false, action ) {
+export function isBlockInterfaceHidden( state = false, action ) {
 	switch ( action.type ) {
-		case 'HIDE_BLOCK_TOOLBAR':
+		case 'HIDE_BLOCK_INTERFACE':
 			return true;
 
-		case 'SHOW_BLOCK_TOOLBAR':
+		case 'SHOW_BLOCK_INTERFACE':
 			return false;
 	}
 
@@ -1829,7 +1829,7 @@ export function temporarilyEditingAsBlocks( state = '', action ) {
 export default combineReducers( {
 	blocks,
 	isTyping,
-	isBlockToolbarHidden,
+	isBlockInterfaceHidden,
 	draggedBlocks,
 	selection,
 	isMultiSelecting,

@@ -44,7 +44,7 @@ const {
 	isBlockMultiSelected,
 	isFirstMultiSelectedBlock,
 	getBlockMode,
-	isBlockToolbarHidden,
+	isBlockInterfaceHidden,
 	isTyping,
 	isDraggingBlocks,
 	getDraggedBlockClientIds,
@@ -1941,21 +1941,21 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'isBlockToolbarHidden', () => {
-		it( 'should return the true if toggled try in state', () => {
+	describe( 'isBlockInterfaceHidden', () => {
+		it( 'should return the true if toggled true in state', () => {
 			const state = {
-				isBlockToolbarHidden: true,
+				isBlockInterfaceHidden: true,
 			};
 
-			expect( isBlockToolbarHidden( state ) ).toBe( true );
+			expect( isBlockInterfaceHidden( state ) ).toBe( true );
 		} );
 
-		it( 'should return false if toggle false in state', () => {
+		it( 'should return false if toggled false in state', () => {
 			const state = {
-				isBlockToolbarHidden: false,
+				isBlockInterfaceHidden: false,
 			};
 
-			expect( isBlockToolbarHidden( state ) ).toBe( false );
+			expect( isBlockInterfaceHidden( state ) ).toBe( false );
 		} );
 	} );
 

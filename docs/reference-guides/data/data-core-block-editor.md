@@ -935,6 +935,18 @@ _Returns_
 
 -   `?boolean`: Whether the insertion point is visible or not.
 
+### isBlockInterfaceHidden
+
+Returns true if the the block interface should be hidden, or false otherwise.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether the block toolbar is hidden.
+
 ### isBlockMultiSelected
 
 Returns true if the client ID occurs within the block multi-selection, or
@@ -962,18 +974,6 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether block is selected and multi-selection exists.
-
-### isBlockToolbarHidden
-
-Returns true if the the block toolbar should be hidden, or false otherwise.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `boolean`: Whether the block toolbar is hidden.
 
 ### isBlockValid
 
@@ -1199,9 +1199,9 @@ _Parameters_
 
 -   _clientId_ `string`: Target block client ID.
 
-### hideBlockToolbar
+### hideBlockInterface
 
-Returns an action object used in signalling that the user has begun to show spacing visualizer.
+Returns an action object used in signalling that the block interface, eg. toolbar, outline, etc. should be hidden.
 
 _Returns_
 
@@ -1522,9 +1522,9 @@ _Returns_
 
 -   `Object`: Action object.
 
-### showBlockToolbar
+### showBlockInterface
 
-Returns an action object used in signalling that the user has stopped showing spacing visualizer.
+Returns an action object used in signalling that the block interface, eg. toolbar, outline, etc. should be shown.
 
 _Returns_
 
