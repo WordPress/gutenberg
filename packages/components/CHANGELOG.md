@@ -9,10 +9,12 @@
 ### Deprecations
 
 -   `Popover`: the deprecation messages for anchor-related props (`anchorRef`, `anchorRect`, `getAnchorRect`) have been updated. ([#45195](https://github.com/WordPress/gutenberg/pull/45195)).
+-   `Popover`: The `isAlternate` prop has been replaced with a `variant` prop that can be called with the `'toolbar'` string ([#45137](https://github.com/WordPress/gutenberg/pull/45137)).
 
 ### New Feature
 
 -   `BoxControl` & `CustomSelectControl`: Add `onMouseOver` and `onMouseOut` callback props to allow handling of these events by parent components ([#44955](https://github.com/WordPress/gutenberg/pull/44955))
+-   `Popover`: A `variant` prop has been added to style popovers, with `'unstyled'` and `'toolbar'` possible values ([#45137](https://github.com/WordPress/gutenberg/pull/45137)).
 
 ### Enhancements
 
