@@ -53,8 +53,8 @@
 		border-radius: $radius-block-ui * 2;
 
 		// Not sure why this is necessary.
-		.edit-site-visual-editor__editor-canvas,
-		.interface-interface-skeleton__content {
+		.edit-site-layout:not(.is-full-canvas) & .edit-site-visual-editor__editor-canvas,
+		.edit-site-layout:not(.is-full-canvas) & .interface-interface-skeleton__content {
 			border-radius: $radius-block-ui * 2;
 		}
 	}
