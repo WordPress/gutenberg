@@ -100,12 +100,20 @@ async function waitForInserterCloseAndContentFocus() {
 }
 
 async function selectInserterTab( tabName ) {
-	const tab = await page.waitForXPath(
-		`//div[contains(@class, "block-editor-inserter__tabs")]//button[.="${ tabName }"]`
-	);
-	if ( ! tab.ariaSelected ) {
-		return tab.click();
-	}
+	try {
+		// There are cases that the inserter has no tabs, but we always show the block types tab.
+		// In these cases, we can skip the tab selection.
+		const tab = await page.waitForXPath(
+			`//div[contains(@class, "block-editor-inserter__tabs")]//button[.="${ tabName }"]`,
+			{ timeout: 3000 }
+		);
+		const ariaSelected = await (
+			await tab.getProperty( 'ariaSelected' )
+		 ).jsonValue();
+		if ( ariaSelected !== 'true' ) {
+			return tab.click();
+		}
+	} catch ( e ) {}
 }
 
 /**
