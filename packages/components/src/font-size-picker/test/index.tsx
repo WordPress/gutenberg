@@ -379,8 +379,6 @@ describe( 'FontSizePicker', () => {
 			const sliderInput = document.querySelector(
 				'.components-range-control__slider'
 			);
-			// Fake the slider drag using fireEvent. Testing drag-and-drop using
-			// userEvent is a job for the RangeControl tests.
 			fireEvent.change( sliderInput!, {
 				target: { value: 80 },
 			} );
