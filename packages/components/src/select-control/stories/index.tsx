@@ -23,6 +23,7 @@ const meta: ComponentMeta< typeof SelectControl > = {
 		prefix: { control: { type: 'text' } },
 		suffix: { control: { type: 'text' } },
 		value: { control: { type: null } },
+		onChange: { action: 'onChange' },
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -31,9 +32,10 @@ const meta: ComponentMeta< typeof SelectControl > = {
 };
 export default meta;
 
-const SelectControlWithState: ComponentStory< typeof SelectControl > = (
-	args
-) => {
+const SelectControlWithState: ComponentStory< typeof SelectControl > = ( {
+	onChange,
+	...args
+} ) => {
 	const [ selection, setSelection ] =
 		useState< ComponentProps< typeof SelectControl >[ 'value' ] >();
 
@@ -41,7 +43,10 @@ const SelectControlWithState: ComponentStory< typeof SelectControl > = (
 		<SelectControl
 			{ ...args }
 			value={ selection }
-			onChange={ setSelection }
+			onChange={ ( value ) => {
+				setSelection( value );
+				onChange?.( value );
+			} }
 		/>
 	);
 };
