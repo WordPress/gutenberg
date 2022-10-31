@@ -66,24 +66,6 @@ describe( 'FontSizePicker', () => {
 		}
 	);
 
-	it( 'should not use units when the initial value has no unit', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
-		const onChange = jest.fn();
-		render(
-			<FontSizePicker
-				__nextHasNoMarginBottom
-				value={ 12 }
-				onChange={ onChange }
-			/>
-		);
-		const input = screen.getByLabelText( 'Custom' );
-		await user.clear( input );
-		await user.type( input, '80' );
-		expect( onChange ).toHaveBeenCalledWith( 80 );
-	} );
-
 	describe( 'with > 5 font sizes', () => {
 		const fontSizes = [
 			{
