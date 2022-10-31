@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, filter, isEmpty, map, pick, includes } from 'lodash';
+import { get, filter, isEmpty, map, pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -32,7 +32,13 @@ import {
 	__experimentalGetElementClassName,
 	__experimentalUseBorderProps as useBorderProps,
 } from '@wordpress/block-editor';
-import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
+import {
+	useEffect,
+	useMemo,
+	useState,
+	useRef,
+	useCallback,
+} from '@wordpress/element';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
 import {
@@ -93,7 +99,6 @@ export default function Image( {
 		sizeSlug,
 	} = attributes;
 	const imageRef = useRef();
-	const captionRef = useRef();
 	const prevCaption = usePrevious( caption );
 	const [ showCaption, setShowCaption ] = useState( !! caption );
 	const { allowResize = true } = context;
@@ -151,7 +156,7 @@ export default function Image( {
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const isWideAligned = includes( [ 'wide', 'full' ], align );
+	const isWideAligned = [ 'wide', 'full' ].includes( align );
 	const [
 		{ loadedNaturalWidth, loadedNaturalHeight },
 		setLoadedNaturalSize,
@@ -195,11 +200,14 @@ export default function Image( {
 	}, [ caption, prevCaption ] );
 
 	// Focus the caption when we click to add one.
-	useEffect( () => {
-		if ( showCaption && ! caption ) {
-			captionRef.current?.focus();
-		}
-	}, [ caption, showCaption ] );
+	const captionRef = useCallback(
+		( node ) => {
+			if ( node && ! caption ) {
+				node.focus();
+			}
+		},
+		[ caption ]
+	);
 
 	// Get naturalWidth and naturalHeight from image ref, and fall back to loaded natural
 	// width and height. This resolves an issue in Safari where the loaded natural
@@ -343,7 +351,11 @@ export default function Image( {
 						} }
 						icon={ captionIcon }
 						isPressed={ showCaption }
-						label={ __( 'Caption' ) }
+						label={
+							showCaption
+								? __( 'Remove caption' )
+								: __( 'Add caption' )
+						}
 					/>
 				) }
 				{ ! multiImageSelection && ! isEditingImage && (

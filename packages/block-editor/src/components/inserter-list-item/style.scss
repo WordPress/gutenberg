@@ -49,6 +49,8 @@
 				border-radius: $radius-block-ui;
 				opacity: 0.04;
 				background: var(--wp-admin-theme-color);
+				// This fixes drag-and-drop in Firefox.
+				pointer-events: none;
 			}
 		}
 

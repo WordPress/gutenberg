@@ -1090,7 +1090,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @param array $styles Styles subtree.
 	 * @param array $path   Which property to process.
 	 * @param array $theme_json Theme JSON array.
-	 * @return string Style property value.
+	 * @return string|array|null Style property value.
 	 */
 	protected static function get_property_value( $styles, $path, $theme_json = null ) {
 		$value = _wp_array_get( $styles, $path );
@@ -1113,7 +1113,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			}
 		}
 
-		if ( is_array( $value ) ) {
+		if ( ! $value || is_array( $value ) ) {
 			return $value;
 		}
 

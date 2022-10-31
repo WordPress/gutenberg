@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.3.0 (2022-10-19)
+
 ### Internal
 
 -   Fix doc for extending the prettier config in `.prettierrc` config file.

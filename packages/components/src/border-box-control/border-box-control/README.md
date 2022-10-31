@@ -138,6 +138,14 @@ Works in conjunctions with `popoverPlacement` and allows leaving a space between
 
 - Required: No
 
+### `size`: `string`
+
+Size of the control.
+
+- Required: No
+- Default: `default`
+- Allowed values: `default`, `__unstable-large`
+
 ### `value`: `Object`
 
 An object representing the current border configuration.

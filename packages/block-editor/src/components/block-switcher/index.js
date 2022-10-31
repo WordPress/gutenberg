@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { castArray } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -52,7 +47,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 			const { getBlockStyles, getBlockType } = select( blocksStore );
 			const { canRemoveBlocks } = select( blockEditorStore );
 			const rootClientId = getBlockRootClientId(
-				castArray( clientIds )[ 0 ]
+				Array.isArray( clientIds ) ? clientIds[ 0 ] : clientIds
 			);
 			const [ { name: firstBlockName } ] = blocks;
 			const _isSingleBlockSelected = blocks.length === 1;
@@ -163,7 +158,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 						label={ blockSwitcherLabel }
 						popoverProps={ {
 							position: 'bottom right',
-							isAlternate: true,
+							variant: 'toolbar',
 							className: 'block-editor-block-switcher__popover',
 						} }
 						icon={
