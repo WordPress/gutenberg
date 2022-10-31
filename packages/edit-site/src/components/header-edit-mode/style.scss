@@ -1,12 +1,16 @@
 $header-toolbar-min-width: 335px;
 
 .edit-site-header-edit-mode {
+	height: $header-height;
 	align-items: center;
 	background-color: $white;
 	display: flex;
 	box-sizing: border-box;
 	width: 100%;
 	justify-content: space-between;
+
+	// Leave room for the site editor toggle.
+	padding-left: $header-height;
 
 	.edit-site-header-edit-mode__start {
 		display: flex;
