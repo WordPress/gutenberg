@@ -486,8 +486,7 @@ function gutenberg_get_layout_position_style( $selector, $style ) {
 				*/
 				if (
 					'top' === $side &&
-					'fixed' === $position_type ||
-					'sticky' === $position_type
+					( 'fixed' === $position_type || 'sticky' === $position_type )
 				) {
 					// TODO: wrap the following value in a `calc()` + `$side_value`,
 					// so that any included value is treated as an offset.
