@@ -1,0 +1,14 @@
+.edit-site-header-view-mode {
+	position: absolute;
+	top: - $canvas-padding;
+	color: $white;
+
+	.edit-site-document-actions__title {
+		color: $gray-600;
+	}
+}
+
+.edit-site-header-view-mode__edit-button.components-button {
+	color: $white;
+	padding: 0;
+}

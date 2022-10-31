@@ -26,7 +26,7 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 /**
  * Internal dependencies
  */
-import Header from '../header';
+import Header from '../header-edit-mode';
 import { SidebarComplementaryAreaFills } from '../sidebar-edit-mode';
 import BlockEditor from '../block-editor';
 import CodeEditor from '../code-editor';
@@ -39,6 +39,7 @@ import { store as editSiteStore } from '../../store';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
 import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
 import useTitle from '../routes/use-title';
+import HeaderViewMode from '../header-view-mode';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */
@@ -169,6 +170,7 @@ export default function Editor() {
 
 	return (
 		<>
+			{ isViewMode && <HeaderViewMode /> }
 			{ isEditMode && <WelcomeGuide /> }
 			<KeyboardShortcuts.Register />
 			<SidebarComplementaryAreaFills />
@@ -181,7 +183,7 @@ export default function Editor() {
 					<GlobalStylesProvider>
 						<BlockContextProvider value={ blockContext }>
 							<InterfaceSkeleton
-								header={ <Header /> }
+								header={ isEditMode && <Header /> }
 								notices={ isEditMode && <EditorSnackbars /> }
 								content={
 									<>

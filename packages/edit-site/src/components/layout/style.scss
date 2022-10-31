@@ -45,13 +45,18 @@
 	right: 0;
 	bottom: 0;
 	left: 0;
-	overflow-y: auto;
 
 	@include break-small {
-		top: $grid-unit-30;
-		right: $grid-unit-30;
-		bottom: $grid-unit-30;
+		top: $canvas-padding;
+		right: $canvas-padding;
+		bottom: $canvas-padding;
 		border-radius: $radius-block-ui * 2;
+
+		// Not sure why this is necessary.
+		.edit-site-visual-editor__editor-canvas,
+		.interface-interface-skeleton__content {
+			border-radius: $radius-block-ui * 2;
+		}
 	}
 
 	.edit-site-layout.is-full-canvas & {

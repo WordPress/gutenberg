@@ -5,6 +5,7 @@
 @import "./components/global-styles/style.scss";
 @import "./components/header-edit-mode/style.scss";
 @import "./components/header-edit-mode/document-actions/style.scss";
+@import "./components/header-view-mode/style.scss";
 @import "./components/list/style.scss";
 @import "./components/add-new-template/style.scss";
 @import "./components/sidebar-edit-mode/style.scss";
@@ -18,13 +19,11 @@
 @import "./components/welcome-guide/style.scss";
 @import "./components/keyboard-shortcut-help-modal/style.scss";
 @import "./components/layout/style.scss";
-@import "./components/header/style.scss";
 @import "./components/sidebar/style.scss";
 @import "./components/sidebar-navigation-item/style.scss";
 @import "./components/sidebar-navigation-root/style.scss";
 @import "./components/sidebar-navigation-title/style.scss";
 @import "./components/site-icon-and-title/style.scss";
-
 
 html #wpadminbar {
 	display: none;
