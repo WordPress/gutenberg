@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -38,73 +38,82 @@ function setUpMediaReplaceFlow() {
 
 describe( 'General media replace flow', () => {
 	it( 'renders successfully', () => {
-		const container = setUpMediaReplaceFlow();
+		setUpMediaReplaceFlow();
 
-		const mediaReplaceButton = container.querySelector(
-			'button[aria-expanded="false"]'
-		);
+		const mediaReplaceButton = screen.getByRole( 'button', {
+			expanded: false,
+		} );
 
-		expect( mediaReplaceButton ).not.toBeNull();
+		expect( mediaReplaceButton ).toBeVisible();
 	} );
 
 	it( 'renders replace menu', () => {
-		const container = setUpMediaReplaceFlow();
+		setUpMediaReplaceFlow();
 
-		const mediaReplaceButton = container.querySelector(
-			'button[aria-expanded="false"]'
-		);
+		const mediaReplaceButton = screen.getByRole( 'button', {
+			expanded: false,
+		} );
 		mediaReplaceButton.click();
 
-		const uploadMenu = container.querySelector(
-			'.block-editor-media-replace-flow__media-upload-menu'
-		);
+		const uploadMenu = screen.getByRole( 'menu' );
 
-		expect( uploadMenu ).not.toBeNull();
+		expect( uploadMenu ).toBeInTheDocument();
+		expect( uploadMenu ).not.toBeVisible();
 	} );
 
 	it( 'displays media URL', () => {
-		const container = setUpMediaReplaceFlow();
+		setUpMediaReplaceFlow();
 
-		const mediaReplaceButton = container.querySelector(
-			'button[aria-expanded="false"]'
-		);
+		const mediaReplaceButton = screen.getByRole( 'button', {
+			expanded: false,
+		} );
+
 		mediaReplaceButton.click();
 
-		const mediaURL = container.querySelector( '.components-external-link' );
+		const mediaURL = screen.getByRole( 'link', {
+			name: 'example.media (opens in a new tab)',
+		} );
 
-		expect( mediaURL.href ).toEqual( 'https://example.media/' );
+		expect( mediaURL ).toHaveAttribute( 'href', 'https://example.media' );
 	} );
 
 	it( 'edits media URL', () => {
-		const container = setUpMediaReplaceFlow();
+		setUpMediaReplaceFlow();
 
-		const mediaReplaceButton = container.querySelector(
-			'button[aria-expanded="false"]'
-		);
+		const mediaReplaceButton = screen.getByRole( 'button', {
+			expanded: false,
+		} );
+
 		mediaReplaceButton.click();
 
-		const editMediaURL = container.querySelector(
-			'.block-editor-link-control__search-item-action'
-		);
+		const editMediaURL = screen.getByRole( 'button', {
+			name: 'Edit',
+		} );
 
 		editMediaURL.click();
 
-		const mediaURLInput = container.querySelector(
-			'.block-editor-url-input__input'
-		);
+		const mediaURLInput = screen.getByRole( 'combobox', {
+			name: 'URL',
+			expanded: false,
+		} );
 
 		fireEvent.change( mediaURLInput, {
 			target: { value: 'https://new.example.media' },
 		} );
 
-		const saveMediaURLButton = container.querySelector(
-			'.block-editor-link-control__search-submit'
-		);
+		const saveMediaURLButton = screen.getByRole( 'button', {
+			name: 'Submit',
+		} );
 
 		saveMediaURLButton.click();
 
-		const mediaURL = container.querySelector( '.components-external-link' );
+		const mediaURL = screen.getByRole( 'link', {
+			name: 'new.example.media (opens in a new tab)',
+		} );
 
-		expect( mediaURL.href ).toEqual( 'https://new.example.media/' );
+		expect( mediaURL ).toHaveAttribute(
+			'href',
+			'https://new.example.media'
+		);
 	} );
 } );
