@@ -27,6 +27,7 @@ function InserterTabs( {
 	showReusableBlocks = false,
 	onSelect,
 	prioritizePatterns,
+	initialTabName,
 } ) {
 	const tabs = useMemo( () => {
 		const tempTabs = [];
@@ -56,6 +57,7 @@ function InserterTabs( {
 			className="block-editor-inserter__tabs"
 			tabs={ tabs }
 			onSelect={ onSelect }
+			initialTabName={ initialTabName }
 		>
 			{ children }
 		</TabPanel>

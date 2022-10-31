@@ -35,6 +35,22 @@ const INITIAL_INSERTER_RESULTS = 9;
  */
 const EMPTY_ARRAY = [];
 
+export function useFilteredBlockPatterns(
+	filterValue,
+	patterns,
+	maxBlockPatterns
+) {
+	return useMemo( () => {
+		if ( maxBlockPatterns === 0 ) {
+			return [];
+		}
+		const results = searchItems( patterns, filterValue );
+		return maxBlockPatterns !== undefined
+			? results.slice( 0, maxBlockPatterns )
+			: results;
+	}, [ filterValue, patterns, maxBlockPatterns ] );
+}
+
 function InserterSearchResults( {
 	filterValue,
 	onSelect,
@@ -71,15 +87,11 @@ function InserterSearchResults( {
 		destinationRootClientId
 	);
 
-	const filteredBlockPatterns = useMemo( () => {
-		if ( maxBlockPatterns === 0 ) {
-			return [];
-		}
-		const results = searchItems( patterns, filterValue );
-		return maxBlockPatterns !== undefined
-			? results.slice( 0, maxBlockPatterns )
-			: results;
-	}, [ filterValue, patterns, maxBlockPatterns ] );
+	const filteredBlockPatterns = useFilteredBlockPatterns(
+		filterValue,
+		patterns,
+		maxBlockPatterns
+	);
 
 	let maxBlockTypesToShow = maxBlockTypes;
 	if ( prioritizePatterns && filteredBlockPatterns.length > 2 ) {

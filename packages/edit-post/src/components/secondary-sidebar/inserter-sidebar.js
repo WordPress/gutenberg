@@ -57,6 +57,7 @@ export default function InserterSidebar() {
 						insertionPoint.insertionIndex
 					}
 					__experimentalFilterValue={ insertionPoint.filterValue }
+					initialTabName={ insertionPoint.initialTabName }
 				/>
 			</div>
 		</div>

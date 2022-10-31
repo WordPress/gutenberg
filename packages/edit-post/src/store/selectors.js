@@ -464,9 +464,9 @@ export function isInserterOpened( state ) {
  * @return {Object} The root client ID, index to insert at and starting filter value.
  */
 export function __experimentalGetInsertionPoint( state ) {
-	const { rootClientId, insertionIndex, filterValue } =
+	const { rootClientId, insertionIndex, filterValue, initialTabName } =
 		state.blockInserterPanel;
-	return { rootClientId, insertionIndex, filterValue };
+	return { rootClientId, insertionIndex, filterValue, initialTabName };
 }
 
 /**

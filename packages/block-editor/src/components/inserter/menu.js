@@ -41,13 +41,14 @@ function InserterMenu( {
 	showInserterHelpPanel,
 	showMostUsedBlocks,
 	__experimentalFilterValue = '',
+	initialTabName,
 	shouldFocusBlock = true,
 	prioritizePatterns,
 } ) {
 	const [ filterValue, setFilterValue ] = useState(
 		__experimentalFilterValue
 	);
-	const [ hoveredItem, setHoveredItem ] = useState( null );
+	const [ hoveredItem, setHoveredItem ] = useState( initialTabName );
 	const [ selectedPatternCategory, setSelectedPatternCategory ] =
 		useState( null );
 	const [ selectedTab, setSelectedTab ] = useState( null );
@@ -252,6 +253,7 @@ function InserterMenu( {
 						showPatterns={ showPatterns }
 						showReusableBlocks={ hasReusableBlocks }
 						prioritizePatterns={ prioritizePatterns }
+						initialTabName={ initialTabName }
 						onSelect={ setSelectedTab }
 					>
 						{ getCurrentTab }

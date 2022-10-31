@@ -14,7 +14,10 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import InserterSearchResults from './search-results';
+import {
+	default as InserterSearchResults,
+	useFilteredBlockPatterns,
+} from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import usePatternsState from './hooks/use-patterns-state';
 import useBlockTypesState from './hooks/use-block-types-state';
@@ -80,7 +83,14 @@ export default function QuickInserter( {
 	// When clicking Browse All select the appropriate block so as
 	// the insertion point can work as expected.
 	const onBrowseAll = () => {
-		setInserterIsOpened( { rootClientId, insertionIndex, filterValue } );
+		setInserterIsOpened( {
+			rootClientId,
+			insertionIndex,
+			filterValue,
+			initialTabName: !! filteredBlockPatterns.length
+				? 'patterns'
+				: 'blocks',
+		} );
 	};
 
 	let maxBlockPatterns = 0;
@@ -89,6 +99,15 @@ export default function QuickInserter( {
 			? SHOWN_BLOCK_PATTERNS_WITH_PRIORITIZATION
 			: SHOWN_BLOCK_PATTERNS;
 	}
+
+	// We need to know if the search results will contain at least
+	// one pattern. If they do, select the `patterns` tab when
+	// `Browse All` button is clicked.
+	const filteredBlockPatterns = useFilteredBlockPatterns(
+		filterValue,
+		patterns,
+		maxBlockPatterns
+	);
 
 	return (
 		<div

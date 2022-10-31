@@ -19,6 +19,7 @@ function InserterLibrary( {
 	showMostUsedBlocks = false,
 	__experimentalInsertionIndex,
 	__experimentalFilterValue,
+	initialTabName,
 	onSelect = noop,
 	shouldFocusBlock = false,
 } ) {
@@ -48,6 +49,7 @@ function InserterLibrary( {
 			showMostUsedBlocks={ showMostUsedBlocks }
 			__experimentalInsertionIndex={ __experimentalInsertionIndex }
 			__experimentalFilterValue={ __experimentalFilterValue }
+			initialTabName={ initialTabName }
 			shouldFocusBlock={ shouldFocusBlock }
 			prioritizePatterns={ prioritizePatterns }
 		/>
