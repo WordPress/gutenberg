@@ -36,11 +36,11 @@ describe( 'General media replace flow', () => {
 	it( 'renders successfully', () => {
 		render( <TestWrapper /> );
 
-		const mediaReplaceButton = screen.getByRole( 'button', {
-			expanded: false,
-		} );
-
-		expect( mediaReplaceButton ).toBeVisible();
+		expect(
+			screen.getByRole( 'button', {
+				expanded: false,
+			} )
+		).toBeVisible();
 	} );
 
 	it( 'renders replace menu', async () => {
@@ -50,11 +50,11 @@ describe( 'General media replace flow', () => {
 
 		render( <TestWrapper /> );
 
-		const mediaReplaceButton = screen.getByRole( 'button', {
-			expanded: false,
-		} );
-
-		await user.click( mediaReplaceButton );
+		await user.click(
+			screen.getByRole( 'button', {
+				expanded: false,
+			} )
+		);
 
 		const uploadMenu = screen.getByRole( 'menu' );
 
@@ -69,17 +69,17 @@ describe( 'General media replace flow', () => {
 
 		render( <TestWrapper /> );
 
-		const mediaReplaceButton = screen.getByRole( 'button', {
-			expanded: false,
-		} );
+		await user.click(
+			screen.getByRole( 'button', {
+				expanded: false,
+			} )
+		);
 
-		await user.click( mediaReplaceButton );
-
-		const mediaURL = screen.getByRole( 'link', {
-			name: 'example.media (opens in a new tab)',
-		} );
-
-		expect( mediaURL ).toHaveAttribute( 'href', 'https://example.media' );
+		expect(
+			screen.getByRole( 'link', {
+				name: 'example.media (opens in a new tab)',
+			} )
+		).toHaveAttribute( 'href', 'https://example.media' );
 	} );
 
 	it( 'edits media URL', async () => {
@@ -89,17 +89,17 @@ describe( 'General media replace flow', () => {
 
 		render( <TestWrapper /> );
 
-		const mediaReplaceButton = screen.getByRole( 'button', {
-			expanded: false,
-		} );
+		await user.click(
+			screen.getByRole( 'button', {
+				expanded: false,
+			} )
+		);
 
-		await user.click( mediaReplaceButton );
-
-		const editMediaURL = screen.getByRole( 'button', {
-			name: 'Edit',
-		} );
-
-		await user.click( editMediaURL );
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Edit',
+			} )
+		);
 
 		const mediaURLInput = screen.getByRole( 'combobox', {
 			name: 'URL',
@@ -109,19 +109,16 @@ describe( 'General media replace flow', () => {
 		await user.clear( mediaURLInput );
 		await user.type( mediaURLInput, 'https://new.example.media' );
 
-		const saveMediaURLButton = screen.getByRole( 'button', {
-			name: 'Submit',
-		} );
-
-		await user.click( saveMediaURLButton );
-
-		const mediaURL = screen.getByRole( 'link', {
-			name: 'new.example.media (opens in a new tab)',
-		} );
-
-		expect( mediaURL ).toHaveAttribute(
-			'href',
-			'https://new.example.media'
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Submit',
+			} )
 		);
+
+		expect(
+			screen.getByRole( 'link', {
+				name: 'new.example.media (opens in a new tab)',
+			} )
+		).toHaveAttribute( 'href', 'https://new.example.media' );
 	} );
 } );
