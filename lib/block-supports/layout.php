@@ -488,9 +488,13 @@ function gutenberg_get_layout_position_style( $selector, $style ) {
 					'top' === $side &&
 					( 'fixed' === $position_type || 'sticky' === $position_type )
 				) {
-					// TODO: wrap the following value in a `calc()` + `$side_value`,
-					// so that any included value is treated as an offset.
-					$side_value = 'var(--wp-admin--admin-bar--height, 0px)';
+					// Ensure 0 values can be used in `calc()` calculations.
+					if ( '0' === $side_value || 0 === $side_value ) {
+						$side_value = '0px';
+					}
+
+					// Ensure current side value also factors in the height of the logged in admin bar.
+					$side_value = "calc($side_value + var(--wp-admin--admin-bar--height, 0px))";
 				}
 
 				$position_styles[] =
