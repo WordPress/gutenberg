@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classNames from 'classnames';
-import type { ForwardedRef, ChangeEvent } from 'react';
+import type { ForwardedRef, KeyboardEvent, MouseEvent } from 'react';
 
 /**
  * WordPress dependencies
@@ -64,6 +64,23 @@ function UnforwardedNumberControl(
 	const autoComplete = typeProp === 'number' ? 'off' : undefined;
 	const classes = classNames( 'components-number-control', className );
 
+	const spinValue = (
+		value: string | number | undefined,
+		direction: 'up' | 'down',
+		event: KeyboardEvent | MouseEvent | undefined
+	) => {
+		event?.preventDefault();
+		const shift = event?.shiftKey && isShiftStepEnabled;
+		const delta = shift ? ensureNumber( shiftStep ) * baseStep : baseStep;
+		let nextValue = isValueEmpty( value ) ? baseValue : value;
+		if ( direction === 'up' ) {
+			nextValue = add( nextValue, delta );
+		} else if ( direction === 'down' ) {
+			nextValue = subtract( nextValue, delta );
+		}
+		return constrainValue( nextValue, shift ? delta : undefined );
+	};
+
 	/**
 	 * "Middleware" function that intercepts updates from InputControl.
 	 * This allows us to tap into actions to transform the (next) state for
@@ -86,33 +103,11 @@ function UnforwardedNumberControl(
 				type === inputControlActionTypes.PRESS_UP ||
 				type === inputControlActionTypes.PRESS_DOWN
 			) {
-				const enableShift =
-					( event as KeyboardEvent | undefined )?.shiftKey &&
-					isShiftStepEnabled;
-
-				const incrementalValue = enableShift
-					? ensureNumber( shiftStep ) * baseStep
-					: baseStep;
-				let nextValue = isValueEmpty( currentValue )
-					? baseValue
-					: currentValue;
-
-				if ( event?.preventDefault ) {
-					event.preventDefault();
-				}
-
-				if ( type === inputControlActionTypes.PRESS_UP ) {
-					nextValue = add( nextValue, incrementalValue );
-				}
-
-				if ( type === inputControlActionTypes.PRESS_DOWN ) {
-					nextValue = subtract( nextValue, incrementalValue );
-				}
-
 				// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
-				nextState.value = constrainValue(
-					nextValue,
-					enableShift ? incrementalValue : undefined
+				nextState.value = spinValue(
+					currentValue,
+					type === inputControlActionTypes.PRESS_UP ? 'up' : 'down',
+					event as KeyboardEvent | undefined
 				);
 			}
 
@@ -186,19 +181,6 @@ function UnforwardedNumberControl(
 			return nextState;
 		};
 
-	const buildSpinHandler =
-		( direction: 'up' | 'down' ) =>
-		( event: ChangeEvent< HTMLInputElement > ) => {
-			let nextValue = isValueEmpty( valueProp ) ? baseValue : valueProp;
-			if ( direction === 'up' ) {
-				nextValue = add( nextValue, baseStep );
-			} else if ( direction === 'down' ) {
-				nextValue = subtract( nextValue, baseStep );
-			}
-			nextValue = constrainValue( nextValue );
-			onChange( String( nextValue ), { event } );
-		};
-
 	return (
 		<Input
 			autoComplete={ autoComplete }
@@ -234,7 +216,21 @@ function UnforwardedNumberControl(
 									aria-hidden="true"
 									aria-label={ __( 'Increment' ) }
 									tabIndex={ -1 }
-									onClick={ buildSpinHandler( 'up' ) }
+									onClick={ (
+										event: MouseEvent< HTMLButtonElement >
+									) => {
+										onChange(
+											String(
+												spinValue(
+													valueProp,
+													'up',
+													event
+												)
+											),
+											// @ts-expect-error TODO: Make InputChangeCallback less opinionated about event type.
+											{ event }
+										);
+									} }
 								/>
 								<SpinButton
 									icon={ resetIcon }
@@ -242,7 +238,21 @@ function UnforwardedNumberControl(
 									aria-hidden="true"
 									aria-label={ __( 'Decrement' ) }
 									tabIndex={ -1 }
-									onClick={ buildSpinHandler( 'down' ) }
+									onClick={ (
+										event: MouseEvent< HTMLButtonElement >
+									) => {
+										onChange(
+											String(
+												spinValue(
+													valueProp,
+													'down',
+													event
+												)
+											),
+											// @ts-expect-error TODO: Make InputChangeCallback less opinionated about event type.
+											{ event }
+										);
+									} }
 								/>
 							</HStack>
 						</Spacer>
