@@ -220,7 +220,7 @@
 		"progress": "2.0.3",
 		"react": "18.2.0",
 		"react-dom": "18.2.0",
-		"react-native": "0.66.2",
+		"react-native": "0.70.4",
 		"react-native-url-polyfill": "1.1.2",
 		"react-refresh": "0.10.0",
 		"react-test-renderer": "18.2.0",
