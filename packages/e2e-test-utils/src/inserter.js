@@ -99,6 +99,15 @@ async function waitForInserterCloseAndContentFocus() {
 	);
 }
 
+async function selectInserterTab( tabName ) {
+	const tab = await page.waitForXPath(
+		`//div[contains(@class, "block-editor-inserter__tabs")]//button[.="${ tabName }"]`
+	);
+	if ( ! tab.ariaSelected ) {
+		return tab.click();
+	}
+}
+
 /**
  * Search for block in the global inserter
  *
@@ -106,6 +115,7 @@ async function waitForInserterCloseAndContentFocus() {
  */
 export async function searchForBlock( searchTerm ) {
 	await openGlobalBlockInserter();
+	await selectInserterTab( 'Blocks' );
 	await page.waitForSelector( INSERTER_SEARCH_SELECTOR );
 	await page.focus( INSERTER_SEARCH_SELECTOR );
 	await pressKeyWithModifier( 'primary', 'a' );
@@ -119,11 +129,7 @@ export async function searchForBlock( searchTerm ) {
  */
 export async function searchForPattern( searchTerm ) {
 	await openGlobalBlockInserter();
-	// Select the patterns tab.
-	const tab = await page.waitForXPath(
-		'//div[contains(@class, "block-editor-inserter__tabs")]//button[.="Patterns"]'
-	);
-	await tab.click();
+	await selectInserterTab( 'Patterns' );
 	await page.waitForSelector( INSERTER_SEARCH_SELECTOR );
 	await page.focus( INSERTER_SEARCH_SELECTOR );
 	await pressKeyWithModifier( 'primary', 'a' );
@@ -137,19 +143,7 @@ export async function searchForPattern( searchTerm ) {
  */
 export async function searchForReusableBlock( searchTerm ) {
 	await openGlobalBlockInserter();
-
-	// The reusable blocks tab won't appear until the reusable blocks have been
-	// fetched. They aren't fetched until an inserter is used or the post
-	// already contains reusable blocks, so wait for the tab to appear.
-	await page.waitForXPath(
-		'//div[contains(@class, "block-editor-inserter__tabs")]//button[text()="Reusable"]'
-	);
-
-	// Select the reusable blocks tab.
-	const tab = await page.waitForXPath(
-		'//div[contains(@class, "block-editor-inserter__tabs")]//button[text()="Reusable"]'
-	);
-	await tab.click();
+	await selectInserterTab( 'Reusable' );
 	await page.waitForSelector( INSERTER_SEARCH_SELECTOR );
 	await page.focus( INSERTER_SEARCH_SELECTOR );
 	await pressKeyWithModifier( 'primary', 'a' );
