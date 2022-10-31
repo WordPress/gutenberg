@@ -455,6 +455,7 @@ export default function DimensionsPanel( { name } ) {
 						onChange={ setMinHeightValue }
 						units={ units }
 						min={ 0 }
+						size={ '__unstable-large' }
 					/>
 				</ToolsPanelItem>
 			) }

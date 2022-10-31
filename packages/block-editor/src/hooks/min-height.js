@@ -115,6 +115,7 @@ export function MinHeightEdit( props ) {
 			units={ units }
 			onChange={ onChange }
 			min={ 0 }
+			size={ '__unstable-large' }
 		/>
 	);
 }
