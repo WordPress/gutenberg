@@ -17,12 +17,11 @@ const meta: ComponentMeta< typeof TextControl > = {
 	component: TextControl,
 	title: 'Components/TextControl',
 	argTypes: {
-		onChange: {
-			action: 'onChange',
-		},
-		value: {
-			control: { type: null },
-		},
+		help: { control: { type: 'text' } },
+		label: { control: { type: 'text' } },
+		type: { control: { type: 'text' } },
+		onChange: { action: 'onChange' },
+		value: { control: { type: null } },
 	},
 	parameters: {
 		controls: {
