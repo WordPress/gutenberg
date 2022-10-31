@@ -39,6 +39,7 @@ describe( 'General media replace flow', () => {
 		expect(
 			screen.getByRole( 'button', {
 				expanded: false,
+				name: 'Replace',
 			} )
 		).toBeVisible();
 	} );
@@ -53,6 +54,7 @@ describe( 'General media replace flow', () => {
 		await user.click(
 			screen.getByRole( 'button', {
 				expanded: false,
+				name: 'Replace',
 			} )
 		);
 
@@ -72,6 +74,7 @@ describe( 'General media replace flow', () => {
 		await user.click(
 			screen.getByRole( 'button', {
 				expanded: false,
+				name: 'Replace',
 			} )
 		);
 
@@ -92,6 +95,7 @@ describe( 'General media replace flow', () => {
 		await user.click(
 			screen.getByRole( 'button', {
 				expanded: false,
+				name: 'Replace',
 			} )
 		);
 
