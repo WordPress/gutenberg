@@ -59,6 +59,12 @@ export type TabPanelProps = {
 	 */
 	orientation?: 'horizontal' | 'vertical';
 	/**
+	 * If true, the tabpanel will not activated automatically when a tab is selected.
+	 *
+	 * @default `false`
+	 */
+	manualTabActivation?: boolean;
+	/**
 	 * Array of tab objects. Each tab object should contain at least a `name` and a `title`.
 	 */
 	tabs: Tab[];

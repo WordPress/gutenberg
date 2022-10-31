@@ -80,6 +80,7 @@ export function TabPanel( {
 	initialTabName,
 	orientation = 'horizontal',
 	activeClass = 'is-active',
+	manualTabActivation = false,
 	onSelect,
 }: WordPressComponentProps< TabPanelProps, 'div', false > ) {
 	const instanceId = useInstanceId( TabPanel, 'tab-panel' );
@@ -136,6 +137,7 @@ export function TabPanel( {
 					role="tabpanel"
 					id={ `${ selectedId }-view` }
 					className="components-tab-panel__tab-content"
+					tabIndex={ manualTabActivation ? -1 : undefined }
 				>
 					{ children( selectedTab ) }
 				</div>
