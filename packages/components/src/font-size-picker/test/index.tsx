@@ -350,12 +350,9 @@ describe( 'FontSizePicker', () => {
 			await user.click(
 				screen.getByRole( 'button', { name: 'Set custom size' } )
 			);
-			// TODO: There are two spinbuttons with similar names, so can't
-			// select the slider's input in an accessible way.
-			const sliderInput = document.querySelector(
-				'.components-range-control__slider'
-			);
-			expect( sliderInput ).not.toBeInTheDocument();
+			expect(
+				screen.queryByLabelText( 'Custom Size' )
+			).not.toBeInTheDocument();
 		} );
 
 		it( 'allows a slider to be used when withSlider is set', async () => {
@@ -374,11 +371,7 @@ describe( 'FontSizePicker', () => {
 			await user.click(
 				screen.getByRole( 'button', { name: 'Set custom size' } )
 			);
-			// TODO: There are two spinbuttons with similar names, so can't
-			// select the slider's input in an accessible way.
-			const sliderInput = document.querySelector(
-				'.components-range-control__slider'
-			);
+			const sliderInput = screen.getByLabelText( 'Custom Size' );
 			fireEvent.change( sliderInput!, {
 				target: { value: 80 },
 			} );
