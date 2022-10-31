@@ -19,7 +19,7 @@ const meta: ComponentMeta< typeof TextControl > = {
 	argTypes: {
 		help: { control: { type: 'text' } },
 		label: { control: { type: 'text' } },
-		type: { control: { type: 'text' } },
+		type: { control: { type: 'select' } },
 		onChange: { action: 'onChange' },
 		value: { control: { type: null } },
 	},
