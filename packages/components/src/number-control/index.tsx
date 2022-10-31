@@ -227,7 +227,6 @@ function UnforwardedNumberControl(
 													event
 												)
 											),
-											// @ts-expect-error TODO: Make InputChangeCallback less opinionated about event type.
 											{ event }
 										);
 									} }
@@ -249,7 +248,6 @@ function UnforwardedNumberControl(
 													event
 												)
 											),
-											// @ts-expect-error TODO: Make InputChangeCallback less opinionated about event type.
 											{ event }
 										);
 									} }
