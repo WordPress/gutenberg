@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, fireEvent, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
@@ -42,13 +43,18 @@ describe( 'General media replace flow', () => {
 		expect( mediaReplaceButton ).toBeVisible();
 	} );
 
-	it( 'renders replace menu', () => {
+	it( 'renders replace menu', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
+
 		render( <TestWrapper /> );
 
 		const mediaReplaceButton = screen.getByRole( 'button', {
 			expanded: false,
 		} );
-		mediaReplaceButton.click();
+
+		await user.click( mediaReplaceButton );
 
 		const uploadMenu = screen.getByRole( 'menu' );
 
@@ -56,14 +62,18 @@ describe( 'General media replace flow', () => {
 		expect( uploadMenu ).not.toBeVisible();
 	} );
 
-	it( 'displays media URL', () => {
+	it( 'displays media URL', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
+
 		render( <TestWrapper /> );
 
 		const mediaReplaceButton = screen.getByRole( 'button', {
 			expanded: false,
 		} );
 
-		mediaReplaceButton.click();
+		await user.click( mediaReplaceButton );
 
 		const mediaURL = screen.getByRole( 'link', {
 			name: 'example.media (opens in a new tab)',
@@ -72,35 +82,38 @@ describe( 'General media replace flow', () => {
 		expect( mediaURL ).toHaveAttribute( 'href', 'https://example.media' );
 	} );
 
-	it( 'edits media URL', () => {
+	it( 'edits media URL', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
+
 		render( <TestWrapper /> );
 
 		const mediaReplaceButton = screen.getByRole( 'button', {
 			expanded: false,
 		} );
 
-		mediaReplaceButton.click();
+		await user.click( mediaReplaceButton );
 
 		const editMediaURL = screen.getByRole( 'button', {
 			name: 'Edit',
 		} );
 
-		editMediaURL.click();
+		await user.click( editMediaURL );
 
 		const mediaURLInput = screen.getByRole( 'combobox', {
 			name: 'URL',
 			expanded: false,
 		} );
 
-		fireEvent.change( mediaURLInput, {
-			target: { value: 'https://new.example.media' },
-		} );
+		await user.clear( mediaURLInput );
+		await user.type( mediaURLInput, 'https://new.example.media' );
 
 		const saveMediaURLButton = screen.getByRole( 'button', {
 			name: 'Submit',
 		} );
 
-		saveMediaURLButton.click();
+		await user.click( saveMediaURLButton );
 
 		const mediaURL = screen.getByRole( 'link', {
 			name: 'new.example.media (opens in a new tab)',
