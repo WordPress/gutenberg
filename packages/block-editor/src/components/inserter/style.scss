@@ -355,6 +355,12 @@ $block-inserter-tabs-height: 44px;
 	@include break-medium {
 		width: $block-inserter-width;
 	}
+
+	.block-editor-inserter__quick-inserter-patterns {
+		.block-editor-block-patterns-list {
+			grid-template-columns: 1fr 1fr;
+		}
+	}
 }
 
 .block-editor-inserter__quick-inserter-results .block-editor-inserter__panel-header {

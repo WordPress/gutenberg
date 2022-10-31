@@ -48,7 +48,7 @@ function InserterMenu( {
 	const [ filterValue, setFilterValue ] = useState(
 		__experimentalFilterValue
 	);
-	const [ hoveredItem, setHoveredItem ] = useState( initialTabName );
+	const [ hoveredItem, setHoveredItem ] = useState();
 	const [ selectedPatternCategory, setSelectedPatternCategory ] =
 		useState( null );
 	const [ selectedTab, setSelectedTab ] = useState( null );
