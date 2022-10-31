@@ -31,14 +31,9 @@ function TestWrapper() {
 	);
 }
 
-function setUpMediaReplaceFlow() {
-	const { container } = render( <TestWrapper /> );
-	return container;
-}
-
 describe( 'General media replace flow', () => {
 	it( 'renders successfully', () => {
-		setUpMediaReplaceFlow();
+		render( <TestWrapper /> );
 
 		const mediaReplaceButton = screen.getByRole( 'button', {
 			expanded: false,
@@ -48,7 +43,7 @@ describe( 'General media replace flow', () => {
 	} );
 
 	it( 'renders replace menu', () => {
-		setUpMediaReplaceFlow();
+		render( <TestWrapper /> );
 
 		const mediaReplaceButton = screen.getByRole( 'button', {
 			expanded: false,
@@ -62,7 +57,7 @@ describe( 'General media replace flow', () => {
 	} );
 
 	it( 'displays media URL', () => {
-		setUpMediaReplaceFlow();
+		render( <TestWrapper /> );
 
 		const mediaReplaceButton = screen.getByRole( 'button', {
 			expanded: false,
@@ -78,7 +73,7 @@ describe( 'General media replace flow', () => {
 	} );
 
 	it( 'edits media URL', () => {
-		setUpMediaReplaceFlow();
+		render( <TestWrapper /> );
 
 		const mediaReplaceButton = screen.getByRole( 'button', {
 			expanded: false,
