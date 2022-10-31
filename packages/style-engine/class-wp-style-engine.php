@@ -142,9 +142,6 @@ final class WP_Style_Engine {
 					'default' => 'min-height',
 				),
 				'path'          => array( 'dimensions', 'minHeight' ),
-				'classnames'    => array(
-					'has-$slug-font-size' => 'font-size',
-				),
 				'css_vars'      => array(
 					'spacing' => '--wp--preset--spacing--$slug',
 				),
