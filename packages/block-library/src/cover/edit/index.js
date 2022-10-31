@@ -70,7 +70,7 @@ function getInnerBlocksTemplate( attributes ) {
  */
 const isTemporaryMedia = ( id, url ) => ! id && isBlobURL( url );
 
-function CoverEdit( {
+export function CoverEdit( {
 	attributes,
 	clientId,
 	isSelected,
@@ -172,9 +172,12 @@ function CoverEdit( {
 	const hasBackground = !! ( url || overlayColor.color || gradientValue );
 
 	const hasInnerBlocks = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getBlock( clientId ).innerBlocks.length >
-			0,
+		( select ) => {
+			return (
+				select( blockEditorStore ).getBlock( clientId ).innerBlocks
+					.length > 0
+			);
+		},
 		[ clientId ]
 	);
 
