@@ -235,7 +235,7 @@ Add an image or video with a text overlay — great for headers. ([Source](https
 
 ## Details
 
-An advanced block that allows displaying a summary and hiding and displaying detailed content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details))
+A block that displays a summary and shows or hides additional content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details))
 
 -	**Name:** core/details
 -	**Category:** theme
