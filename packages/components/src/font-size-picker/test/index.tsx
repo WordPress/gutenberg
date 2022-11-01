@@ -33,6 +33,7 @@ describe( 'FontSizePicker', () => {
 			const input = screen.getByLabelText( 'Custom' );
 			await user.clear( input );
 			await user.type( input, '80' );
+			expect( onChange ).toHaveBeenCalledTimes( 3 ); // Once for the clear, then once per keystroke.
 			expect( onChange ).toHaveBeenCalledWith( expectedValue );
 		}
 	);
@@ -60,8 +61,8 @@ describe( 'FontSizePicker', () => {
 				screen.getByRole( 'button', { name: 'Set custom size' } )
 			);
 			const input = screen.getByLabelText( 'Custom' );
-			await user.clear( input );
 			await user.type( input, '80' );
+			expect( onChange ).toHaveBeenCalledTimes( 2 ); // Once per keystroke.
 			expect( onChange ).toHaveBeenCalledWith( expectedValue );
 		}
 	);
@@ -179,6 +180,7 @@ describe( 'FontSizePicker', () => {
 				await user.click(
 					screen.getByRole( 'option', { name: option } )
 				);
+				expect( onChange ).toHaveBeenCalledTimes( 1 );
 				expect( onChange ).toHaveBeenCalledWith( expectedValue );
 			}
 		);
@@ -292,6 +294,7 @@ describe( 'FontSizePicker', () => {
 				/>
 			);
 			await user.click( screen.getByRole( 'radio', { name: 'Medium' } ) );
+			expect( onChange ).toHaveBeenCalledTimes( 1 );
 			expect( onChange ).toHaveBeenCalledWith( '16px' );
 		} );
 
@@ -391,6 +394,7 @@ describe( 'FontSizePicker', () => {
 				await user.click(
 					screen.getByRole( 'radio', { name: radio } )
 				);
+				expect( onChange ).toHaveBeenCalledTimes( 1 );
 				expect( onChange ).toHaveBeenCalledWith( expectedValue );
 			}
 		);
@@ -415,6 +419,7 @@ describe( 'FontSizePicker', () => {
 				screen.getByRole( 'button', { name: 'Set custom size' } )
 			);
 			await user.type( screen.getByLabelText( 'Custom' ), '80' );
+			expect( onChange ).toHaveBeenCalledTimes( 2 ); // Once per keystroke.
 			expect( onChange ).toHaveBeenCalledWith( '80px' );
 		} );
 
@@ -466,9 +471,10 @@ describe( 'FontSizePicker', () => {
 				screen.getByRole( 'button', { name: 'Set custom size' } )
 			);
 			const sliderInput = screen.getByLabelText( 'Custom Size' );
-			fireEvent.change( sliderInput!, {
+			fireEvent.change( sliderInput, {
 				target: { value: 80 },
 			} );
+			expect( onChange ).toHaveBeenCalledTimes( 1 );
 			expect( onChange ).toHaveBeenCalledWith( '80px' );
 		} );
 
@@ -489,6 +495,7 @@ describe( 'FontSizePicker', () => {
 				screen.getByRole( 'button', { name: 'Set custom size' } )
 			);
 			await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
+			expect( onChange ).toHaveBeenCalledTimes( 1 );
 			expect( onChange ).toHaveBeenCalledWith( undefined );
 		} );
 
