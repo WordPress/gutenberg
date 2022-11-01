@@ -833,6 +833,33 @@ function Navigation( {
 		);
 	}
 
+	const navigationMenuSelectorInstance = (
+		<NavigationMenuSelector
+			currentMenuId={ ref }
+			clientId={ clientId }
+			onSelectNavigationMenu={ ( menuId ) => {
+				handleUpdateMenu( menuId );
+			} }
+			onSelectClassicMenu={ async ( classicMenu ) => {
+				const navMenu = await convertClassicMenu(
+					classicMenu.id,
+					classicMenu.name,
+					'draft'
+				);
+				if ( navMenu ) {
+					handleUpdateMenu( navMenu.id, {
+						focusNavigationBlock: true,
+					} );
+				}
+			} }
+			onCreateNew={ createUntitledEmptyNavigationMenu }
+			createNavigationMenuIsSuccess={ createNavigationMenuIsSuccess }
+			createNavigationMenuIsError={ createNavigationMenuIsError }
+			/* translators: %s: The name of a menu. */
+			actionLabel={ __( "Switch to '%s'" ) }
+		/>
+	);
+
 	return (
 		<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
 			<RecursionProvider uniqueId={ recursionId }>
@@ -846,39 +873,7 @@ function Navigation( {
 								>
 									{ __( 'Menu' ) }
 								</Heading>
-								<NavigationMenuSelector
-									currentMenuId={ ref }
-									clientId={ clientId }
-									onSelectNavigationMenu={ ( menuId ) => {
-										handleUpdateMenu( menuId );
-									} }
-									onSelectClassicMenu={ async (
-										classicMenu
-									) => {
-										const navMenu =
-											await convertClassicMenu(
-												classicMenu.id,
-												classicMenu.name,
-												'draft'
-											);
-										if ( navMenu ) {
-											handleUpdateMenu( navMenu.id, {
-												focusNavigationBlock: true,
-											} );
-										}
-									} }
-									onCreateNew={
-										createUntitledEmptyNavigationMenu
-									}
-									createNavigationMenuIsSuccess={
-										createNavigationMenuIsSuccess
-									}
-									createNavigationMenuIsError={
-										createNavigationMenuIsError
-									}
-									/* translators: %s: The name of a menu. */
-									actionLabel={ __( "Switch to '%s'" ) }
-								/>
+								{ navigationMenuSelectorInstance }
 							</HStack>
 
 							<OffCanvasEditor
@@ -890,36 +885,7 @@ function Navigation( {
 					) }
 					{ ! isOffCanvasNavigationEditorEnabled && (
 						<PanelBody title={ __( 'Menu' ) }>
-							<NavigationMenuSelector
-								currentMenuId={ ref }
-								clientId={ clientId }
-								onSelectNavigationMenu={ ( menuId ) => {
-									handleUpdateMenu( menuId );
-								} }
-								onSelectClassicMenu={ async ( classicMenu ) => {
-									const navMenu = await convertClassicMenu(
-										classicMenu.id,
-										classicMenu.name,
-										'draft'
-									);
-									if ( navMenu ) {
-										handleUpdateMenu( navMenu.id, {
-											focusNavigationBlock: true,
-										} );
-									}
-								} }
-								onCreateNew={
-									createUntitledEmptyNavigationMenu
-								}
-								createNavigationMenuIsSuccess={
-									createNavigationMenuIsSuccess
-								}
-								createNavigationMenuIsError={
-									createNavigationMenuIsError
-								}
-								/* translators: %s: The name of a menu. */
-								actionLabel={ __( "Switch to '%s'" ) }
-							/>
+							{ navigationMenuSelectorInstance }
 							<Button
 								variant="link"
 								disabled={
