@@ -3,8 +3,13 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
-import { Button, Popover } from '@wordpress/components';
+import {
+	Button,
+	Popover,
+	__experimentalPopoverPositionToPlacement as positionToPlacement,
+} from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -18,8 +23,21 @@ function URLPopover( {
 	renderSettings,
 	placement = 'bottom',
 	focusOnMount = 'firstElement',
+	// Deprecated
+	position,
+	// Rest
 	...popoverProps
 } ) {
+	let computedPlacement = placement;
+	if ( position !== undefined ) {
+		deprecated( '`position` prop in wp.blockEditor.URLPopover', {
+			since: '6.2',
+			alternative: '`placement` prop',
+		} );
+
+		computedPlacement = positionToPlacement( position );
+	}
+
 	const [ isSettingsExpanded, setIsSettingsExpanded ] = useState( false );
 
 	const showSettings = !! renderSettings && isSettingsExpanded;
@@ -32,7 +50,7 @@ function URLPopover( {
 		<Popover
 			className="block-editor-url-popover"
 			focusOnMount={ focusOnMount }
-			placement={ placement }
+			placement={ computedPlacement }
 			shift
 			{ ...popoverProps }
 		>

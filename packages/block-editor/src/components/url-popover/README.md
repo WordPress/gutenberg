@@ -194,3 +194,13 @@ Reference passed to the auto complete element of the ([URLInput component](/pack
 
 -   Type: `Object`
 -   Required: no
+
+### position
+
+_Note: this prop is deprecated. Please use the `placement` prop instead._
+
+Where the Popover should be positioned relative to its parent. Defaults to "bottom center".
+
+-   Type: `String`
+-   Required: No
+-   Default: "bottom center"
