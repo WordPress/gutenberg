@@ -28,7 +28,7 @@ class Gutenberg_REST_Block_Pattern_Categories_Controller extends WP_REST_Block_P
 		$keys   = array( 'name', 'label', 'description' );
 		$data   = array();
 		foreach ( $keys as $key ) {
-			if ( rest_is_field_included( $key, $fields ) ) {
+			if ( isset( $item[ $key ] ) && rest_is_field_included( $key, $fields ) ) {
 				$data[ $key ] = $item[ $key ];
 			}
 		}
