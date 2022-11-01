@@ -16,7 +16,8 @@ import {
 	ButtonGroup,
 	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	__experimentalUnitControl as UnitControl,
 	PanelBody,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -267,26 +268,54 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	);
 }
 
-function ChildLayoutPanel() {
+function ChildLayoutPanel( { setAttributes, attributes } ) {
+	const { style: { layout = {} } = {} } = attributes;
+	const { selfStretch, flexWidth } = layout;
+
 	return (
 		<InspectorControls>
-			<PanelBody title={ __( 'Layout' ) }>
+			<PanelBody title={ __( 'Child Layout' ) }>
 				<ToggleGroupControl
 					label={ __( 'Width' ) }
-					value={ 'fill' }
-					onChange={ () => null }
+					value={ selfStretch || 'fill' }
+					onChange={ ( value ) => {
+						setAttributes( {
+							style: {
+								layout: {
+									...layout,
+									selfStretch: value,
+								},
+							},
+						} );
+					} }
+					isBlock={ true }
 				>
-					<ToggleGroupControlOptionIcon
+					<ToggleGroupControlOption
 						key={ 'fill' }
 						value={ 'fill' }
 						label={ __( 'Fill' ) }
 					/>
-					<ToggleGroupControlOptionIcon
+					<ToggleGroupControlOption
 						key={ 'fixed' }
 						value={ 'fixed' }
 						label={ __( 'Fixed' ) }
 					/>
 				</ToggleGroupControl>
+				{ selfStretch === 'fixed' && (
+					<UnitControl
+						onChange={ ( value ) => {
+							setAttributes( {
+								style: {
+									layout: {
+										...layout,
+										flexWidth: value,
+									},
+								},
+							} );
+						} }
+						value={ flexWidth }
+					/>
+				) }
 			</PanelBody>
 		</InspectorControls>
 	);
@@ -448,6 +477,57 @@ export const withLayoutStyles = createHigherOrderComponent(
 	}
 );
 
+/**
+ * Override the default block element to add the child layout styles.
+ *
+ * @param {Function} BlockListBlock Original component.
+ *
+ * @return {Function} Wrapped component.
+ */
+export const withChildLayoutStyles = createHigherOrderComponent(
+	( BlockListBlock ) => ( props ) => {
+		const { attributes } = props;
+		const { style: { layout = {} } = {} } = attributes;
+		const { selfStretch, flexWidth } = layout;
+		const hasChildLayout = selfStretch || flexWidth;
+		const disableLayoutStyles = useSelect( ( select ) => {
+			const { getSettings } = select( blockEditorStore );
+			return !! getSettings().disableLayoutStyles;
+		} );
+		const shouldRenderChildLayoutStyles =
+			hasChildLayout && ! disableLayoutStyles;
+
+		const element = useContext( BlockList.__unstableElementContext );
+		const id = useInstanceId( BlockListBlock );
+		const selector = `.wp-container-content-${ id }`;
+
+		let css = '';
+
+		if ( selfStretch === 'fixed' && flexWidth ) {
+			css += `${ selector } {
+				flex-shrink: 0;
+				flex-basis: ${ flexWidth };
+			}`;
+		}
+
+		// Attach a `wp-container-content` id-based classname.
+		const className = classnames( props?.className, {
+			[ `wp-container-content-${ id }` ]:
+				shouldRenderChildLayoutStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
+		} );
+
+		return (
+			<>
+				{ shouldRenderChildLayoutStyles &&
+					element &&
+					!! css &&
+					createPortal( <style>{ css }</style>, element ) }
+				<BlockListBlock { ...props } className={ className } />
+			</>
+		);
+	}
+);
+
 addFilter(
 	'blocks.registerBlockType',
 	'core/layout/addAttribute',
@@ -457,6 +537,11 @@ addFilter(
 	'editor.BlockListBlock',
 	'core/editor/layout/with-layout-styles',
 	withLayoutStyles
+);
+addFilter(
+	'editor.BlockListBlock',
+	'core/editor/layout/with-child-layout-styles',
+	withChildLayoutStyles
 );
 addFilter(
 	'editor.BlockEdit',
