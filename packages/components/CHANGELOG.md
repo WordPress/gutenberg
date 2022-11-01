@@ -22,7 +22,6 @@
 -   `UnitControl`: Remove outer wrapper to normalize className placement ([#41860](https://github.com/WordPress/gutenberg/pull/41860)).
 -   `ColorPalette`: Fix transparent checkered background pattern ([#45295](https://github.com/WordPress/gutenberg/pull/45295)).
 -   `ToggleGroupControl`: Add `isDeselectable` prop to allow deselecting the selected option ([#45123](https://github.com/WordPress/gutenberg/pull/45123)).
--   `NumberControl`: Add custom spin buttons ([#45333](https://github.com/WordPress/gutenberg/pull/45333)).
 
 ### Bug Fix
 
@@ -46,6 +45,10 @@
 -   `ColorPalette`: Convert to TypeScript ([#44632](https://github.com/WordPress/gutenberg/pull/44632)).
 -   `UnitControl`: Add tests ([#45260](https://github.com/WordPress/gutenberg/pull/45260)).
 -   `Disabled`: Refactor the component to rely on the HTML `inert` attribute.
+
+### Experimental
+
+-   `NumberControl`: Replace `hideHTMLArrows` prop with `spinControls` prop. Allow custom spin controls via `spinControls="custom"` ([#45333](https://github.com/WordPress/gutenberg/pull/45333)).
 
 ## 21.3.0 (2022-10-19)
 
