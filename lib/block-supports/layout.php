@@ -340,7 +340,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		);
 
 		gutenberg_style_engine_get_stylesheet_from_css_rules(
-			$child_layout_styles,
+			array( $child_layout_styles ),
 			array(
 				'context'  => 'block-supports',
 				'prettify' => false,
@@ -353,7 +353,6 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	// Return early if only child layout exists.
 	if ( ! $support_layout && ! empty( $outer_class_names ) ) {
-		echo "BLOCK RETURN RELR, $blocknaem";
 		$content = new WP_HTML_Tag_Processor( $block_content );
 		$content->next_tag();
 		$content->add_class( implode( ' ', $outer_class_names ) );
