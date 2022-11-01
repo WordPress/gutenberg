@@ -72,8 +72,7 @@ export type BorderControlProps = ColorProps &
 		 */
 		disableUnits?: boolean;
 		/**
-		 * This controls whether to include border style options within the
-		 * `BorderDropdown` sub-component.
+		 * This controls whether to support border style selection.
 		 *
 		 * @default true
 		 */
@@ -131,7 +130,7 @@ export type BorderControlProps = ColorProps &
 	};
 
 export type DropdownProps = ColorProps &
-	Pick< BorderControlProps, 'size' > & {
+	Pick< BorderControlProps, 'enableStyle' | 'size' > & {
 		/**
 		 * An object representing a border or `undefined`. This component will
 		 * extract the border color and style selections from this object to use as
@@ -142,12 +141,6 @@ export type DropdownProps = ColorProps &
 		 * An internal prop used to control the visibility of the dropdown.
 		 */
 		__unstablePopoverProps?: Omit< PopoverProps, 'children' >;
-		/**
-		 * This controls whether to render border style options.
-		 *
-		 * @default true
-		 */
-		enableStyle?: boolean;
 		/**
 		 * A callback invoked when the border color or style selections change.
 		 */

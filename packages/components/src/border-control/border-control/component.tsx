@@ -41,7 +41,7 @@ const UnconnectedBorderControl = (
 		disableCustomColors,
 		disableUnits,
 		enableAlpha,
-		enableStyle = true,
+		enableStyle,
 		hideLabelFromVision,
 		innerWrapperClassName,
 		inputWidth,

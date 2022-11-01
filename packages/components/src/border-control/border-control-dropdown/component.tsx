@@ -131,6 +131,7 @@ const BorderControlDropdown = (
 		colors,
 		disableCustomColors,
 		enableAlpha,
+		enableStyle,
 		indicatorClassName,
 		indicatorWrapperClassName,
 		onReset,
@@ -140,7 +141,6 @@ const BorderControlDropdown = (
 		popoverControlsClassName,
 		resetButtonClassName,
 		showDropdownHeader,
-		enableStyle = true,
 		__unstablePopoverProps,
 		...otherProps
 	} = useBorderControlDropdown( props );

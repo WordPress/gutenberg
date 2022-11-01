@@ -32,6 +32,7 @@ export function useBorderControl(
 		className,
 		isCompact,
 		onChange,
+		enableStyle = true,
 		shouldSanitizeBorder = true,
 		size = 'default',
 		value: border,
@@ -137,6 +138,7 @@ export function useBorderControl(
 	return {
 		...otherProps,
 		className: classes,
+		enableStyle,
 		innerWrapperClassName,
 		inputWidth: wrapperWidth,
 		onBorderChange,
