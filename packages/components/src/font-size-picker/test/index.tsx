@@ -114,6 +114,7 @@ describe( 'FontSizePicker', () => {
 				screen.getByRole( 'button', { name: 'Font size' } )
 			);
 			const options = screen.getAllByRole( 'option' );
+			expect( options ).toHaveLength( 8 );
 			expect( options[ 0 ] ).toHaveAccessibleName( 'Default' );
 			expect( options[ 1 ] ).toHaveAccessibleName( 'Tiny 8' );
 			expect( options[ 2 ] ).toHaveAccessibleName( 'Small 1' );
@@ -245,6 +246,7 @@ describe( 'FontSizePicker', () => {
 				/>
 			);
 			const options = screen.getAllByRole( 'radio' );
+			expect( options ).toHaveLength( 5 );
 			expect( options[ 0 ] ).toHaveTextContent( 'S' );
 			expect( options[ 0 ] ).toHaveAccessibleName( 'S' );
 			expect( options[ 1 ] ).toHaveTextContent( 'M' );
@@ -328,6 +330,7 @@ describe( 'FontSizePicker', () => {
 				/>
 			);
 			const options = screen.getAllByRole( 'radio' );
+			expect( options ).toHaveLength( 4 );
 			expect( options[ 0 ] ).toHaveTextContent( 'S' );
 			expect( options[ 0 ] ).toHaveAccessibleName( 'Small' );
 			expect( options[ 1 ] ).toHaveTextContent( 'M' );
