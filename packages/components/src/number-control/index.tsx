@@ -11,6 +11,7 @@ import { useRef, forwardRef } from '@wordpress/element';
 import { isRTL, __ } from '@wordpress/i18n';
 import { plus as plusIcon, reset as resetIcon } from '@wordpress/icons';
 import { useMergeRefs } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -31,6 +32,7 @@ function UnforwardedNumberControl(
 		__unstableStateReducer: stateReducerProp,
 		className,
 		dragDirection = 'n',
+		hideHTMLArrows = false,
 		spinControls = 'native',
 		isDragEnabled = true,
 		isShiftStepEnabled = true,
@@ -49,6 +51,15 @@ function UnforwardedNumberControl(
 	}: WordPressComponentProps< NumberControlProps, 'input', false >,
 	forwardedRef: ForwardedRef< any >
 ) {
+	if ( hideHTMLArrows ) {
+		deprecated( 'hideHTMLArrows', {
+			alternative: 'spinControls="none"',
+			since: '6.2',
+			version: '6.3',
+		} );
+		spinControls = 'none';
+	}
+
 	const inputRef = useRef< HTMLInputElement >();
 	const mergedRef = useMergeRefs( [ inputRef, forwardedRef ] );
 

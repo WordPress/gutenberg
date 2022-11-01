@@ -8,6 +8,13 @@ export type NumberControlProps = Omit<
 	'isDragEnabled' | 'min' | 'max' | 'required' | 'step' | 'type' | 'value'
 > & {
 	/**
+	 * If true, the default `input` HTML arrows will be hidden.
+	 *
+	 * @deprecated
+	 * @default false
+	 */
+	hideHTMLArrows?: boolean;
+	/**
 	 * The type of spin controls to display. These are butons that allow the
 	 * user to quickly increment and decrement the number.
 	 *
