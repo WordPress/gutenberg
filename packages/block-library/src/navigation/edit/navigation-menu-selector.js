@@ -136,7 +136,6 @@ function NavigationMenuSelector( {
 			</>
 		),
 		isBusy: ! enableOptions,
-		isSmall: true,
 		disabled: ! enableOptions,
 		__experimentalIsFocusable: true,
 		onClick: () => {
