@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Platform, ScrollView, View } from 'react-native';
+import { Platform, ScrollView, View, Keyboard } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -185,6 +185,12 @@ export default compose( [
 			onHideKeyboard() {
 				clearSelectedBlock();
 				togglePostTitleSelection( false );
+				// Explicitly dismiss the keyboard for circumstances where Aztec race
+				// conditions lead to one block's rich text focused, but a different
+				// non-rich-text block selected. In this context, merely clearing block
+				// selection does not trigger a blur event and therefore will not
+				// dismiss the keyboard.
+				Keyboard.dismiss();
 			},
 		};
 	} ),
