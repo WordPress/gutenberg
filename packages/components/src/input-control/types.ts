@@ -166,11 +166,6 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 	 */
 	disabled?: boolean;
 	/**
-	 * The class name to be added to the wrapper element.
-	 */
-	className?: string;
-	id?: string;
-	/**
 	 * If this property is added, a label will be generated using label property as the content.
 	 */
 	label?: ReactNode;
