@@ -42,7 +42,6 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			'role=region[name="Editor top bar"i] >> role=button[name="Toggle block inserter"i]'
 		);
 
-		// TODO: need to await for the search input when the tabs are loaded.
 		await page.fill(
 			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks"i]',
 			'Heading'
@@ -120,7 +119,6 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			'role=region[name="Editor top bar"i] >> role=button[name="Toggle block inserter"i]'
 		);
 
-		// TODO: need to await for the search input when the tabs are loaded.
 		await page.fill(
 			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks"i]',
 			'Heading'
