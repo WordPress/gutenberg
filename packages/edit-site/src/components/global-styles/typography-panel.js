@@ -110,23 +110,25 @@ function useStyleWithReset( path, blockName ) {
 	return [ style, setStyle, hasStyle, resetStyle ];
 }
 
-function useFontSizeStyleWithReset(
-	path,
-	blockName,
-	isFluidTypographyEnabled
-) {
-	const [ style, setStyleCallback ] = useStyle( path, blockName );
+function useFontSizeStyleWithReset( path, blockName ) {
+	const [ fontSize, setStyleCallback ] = useStyle( path, blockName );
 	const [ userStyle ] = useStyle( path, blockName, 'user' );
-	const hasStyle = () => !! userStyle;
-	const resetStyle = () => setStyleCallback( undefined );
-	const setStyle = ( newValue, metadata ) => {
+	const hasFontSize = () => !! userStyle;
+	const resetFontSize = () => setStyleCallback( undefined );
+	const setFontSize = ( newValue, metadata ) => {
 		// Convert font size styles to fluid if fluid is activated.
-		if ( isFluidTypographyEnabled && !! metadata?.slug ) {
+		if ( !! metadata?.slug ) {
 			newValue = `var:preset|font-size|${ metadata?.slug }`;
 		}
 		setStyleCallback( newValue );
 	};
-	return [ style, setStyle, hasStyle, resetStyle ];
+
+	return {
+		fontSize,
+		setFontSize,
+		hasFontSize,
+		resetFontSize,
+	};
 }
 
 function useFontAppearance( prefix, name ) {
@@ -210,12 +212,8 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
 
 	const [ fontFamily, setFontFamily, hasFontFamily, resetFontFamily ] =
 		useStyleWithReset( prefix + 'typography.fontFamily', name );
-	const [ fontSize, setFontSize, hasFontSize, resetFontSize ] =
-		useFontSizeStyleWithReset(
-			prefix + 'typography.fontSize',
-			name,
-			fluidTypography
-		);
+	const { fontSize, setFontSize, hasFontSize, resetFontSize } =
+		useFontSizeStyleWithReset( prefix + 'typography.fontSize', name );
 	const {
 		fontStyle,
 		setFontStyle,
