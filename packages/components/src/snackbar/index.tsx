@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ForwardedRef, KeyboardEvent, MouseEvent, ReactNode } from 'react';
+import type { ForwardedRef, KeyboardEvent, MouseEvent } from 'react';
 import classnames from 'classnames';
 
 /**
@@ -27,8 +27,8 @@ const NOTICE_TIMEOUT = 10000;
  * valid message is provided.
  */
 function useSpokenMessage(
-	message: ReactNode,
-	politeness: 'polite' | 'assertive'
+	message: SnackbarProps[ 'spokenMessage' ],
+	politeness: SnackbarProps[ 'politeness' ]
 ) {
 	const spokenMessage =
 		typeof message === 'string' ? message : renderToString( message );
