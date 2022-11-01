@@ -3,6 +3,11 @@
  */
 import type { CSSProperties, MouseEventHandler, ReactNode } from 'react';
 
+/**
+ * Internal dependencies
+ */
+import type { PopoverProps } from '../popover/types';
+
 export type ColorObject = {
 	name: string;
 	color: NonNullable< CSSProperties[ 'color' ] >;
@@ -36,7 +41,7 @@ export type MultiplePalettesProps = PaletteProps & {
 export type CustomColorPickerDropdownProps = {
 	isRenderedInSidebar: boolean;
 	renderContent: () => ReactNode;
-	popoverProps?: string[];
+	popoverProps?: Omit< PopoverProps, 'children' >;
 	renderToggle: ( props: {
 		isOpen: boolean;
 		onToggle: MouseEventHandler< HTMLButtonElement >;
