@@ -464,7 +464,7 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 	$default_minimum_viewport_width   = isset( $fluid_settings['minViewPortWidth'] ) ? $fluid_settings['minViewPortWidth'] : '768px';
 	$default_minimum_font_size_factor = isset( $fluid_settings['minFontSizeFactor'] ) && is_numeric( $fluid_settings['minFontSizeFactor'] ) ? $fluid_settings['minFontSizeFactor'] : 0.75;
 	$default_scale_factor             = isset( $fluid_settings['scaleFactor'] ) && is_numeric( $fluid_settings['scaleFactor'] ) ? $fluid_settings['scaleFactor'] : 1;
-	$default_minimum_font_size_limit  = '14px';
+	$global_minimum_font_size         = isset( $fluid_settings['minFontSize'] ) && is_numeric( $fluid_settings['minFontSize'] ) ? $fluid_settings['minFontSize'] : '14px';
 
 	// Font sizes.
 	$fluid_font_size_settings = isset( $preset['fluid'] ) ? $preset['fluid'] : null;
@@ -488,7 +488,7 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 
 	// Parses the minimum font size limit, so we can perform checks using it.
 	$minimum_font_size_limit = gutenberg_get_typography_value_and_unit(
-		$default_minimum_font_size_limit,
+		$global_minimum_font_size,
 		array(
 			'coerce_to' => $preferred_size['unit'],
 		)
