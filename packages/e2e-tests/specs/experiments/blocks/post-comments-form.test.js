@@ -35,7 +35,9 @@ describe( 'Post Comments Form', () => {
 			} );
 
 			// Insert post comments form
-			await insertBlock( 'Post Comments Form' );
+			await insertBlock( 'Post Comments Form', {
+				checkSelectedTab: true,
+			} );
 
 			// Ensure the placeholder is there
 			await expect( canvas() ).toMatchElement(
