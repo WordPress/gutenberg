@@ -33,9 +33,7 @@ describe( 'ItemGroup', () => {
 				</ItemGroup>
 			);
 
-			expect( noBorders.firstChild ).toMatchDiffSnapshot(
-				withBorders.firstChild
-			);
+			expect( noBorders ).toMatchDiffSnapshot( withBorders );
 		} );
 
 		it( 'should show rounded corners when the isRounded prop is true', () => {
@@ -52,9 +50,7 @@ describe( 'ItemGroup', () => {
 				</ItemGroup>
 			);
 
-			expect( roundCorners.firstChild ).toMatchDiffSnapshot(
-				squaredCorners.firstChild
-			);
+			expect( roundCorners ).toMatchDiffSnapshot( squaredCorners );
 		} );
 
 		it( 'should render items individually when the isSeparated prop is true', () => {
@@ -71,9 +67,7 @@ describe( 'ItemGroup', () => {
 				</ItemGroup>
 			);
 
-			expect( groupedItems.firstChild ).toMatchDiffSnapshot(
-				separatedItems.firstChild
-			);
+			expect( groupedItems ).toMatchDiffSnapshot( separatedItems );
 		} );
 	} );
 
@@ -120,9 +114,7 @@ describe( 'ItemGroup', () => {
 				<Item size="large">Code is poetry</Item>
 			);
 
-			expect( mediumSize.firstChild ).toMatchDiffSnapshot(
-				largeSize.firstChild
-			);
+			expect( mediumSize ).toMatchDiffSnapshot( largeSize );
 		} );
 
 		it( 'should read the value of the size prop from context when the prop is not defined', () => {
@@ -145,9 +137,7 @@ describe( 'ItemGroup', () => {
 				</ItemGroup>
 			);
 
-			expect( mediumSize.firstChild ).toMatchDiffSnapshot(
-				largeSize.firstChild
-			);
+			expect( mediumSize ).toMatchDiffSnapshot( largeSize );
 		} );
 	} );
 } );
