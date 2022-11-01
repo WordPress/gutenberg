@@ -17,8 +17,11 @@ export function useBorderBoxControlSplitControls(
 ) {
 	const {
 		className,
+		colors = [],
 		enableStyle = true,
 		size = 'default',
+		__experimentalHasMultipleOrigins = false,
+		__experimentalIsRenderedInSidebar = false,
 		...otherProps
 	} = useContextSystem( props, 'BorderBoxControlSplitControls' );
 
@@ -40,8 +43,11 @@ export function useBorderBoxControlSplitControls(
 		...otherProps,
 		centeredClassName,
 		className: classes,
+		colors,
 		enableStyle,
 		rightAlignedClassName,
 		size,
+		__experimentalHasMultipleOrigins,
+		__experimentalIsRenderedInSidebar,
 	};
 }

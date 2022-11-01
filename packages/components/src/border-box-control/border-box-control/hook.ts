@@ -27,10 +27,13 @@ export function useBorderBoxControl(
 ) {
 	const {
 		className,
+		colors = [],
 		onChange,
 		enableStyle = true,
 		size = 'default',
 		value,
+		__experimentalHasMultipleOrigins = false,
+		__experimentalIsRenderedInSidebar = false,
 		...otherProps
 	} = useContextSystem( props, 'BorderBoxControl' );
 
@@ -118,6 +121,7 @@ export function useBorderBoxControl(
 	return {
 		...otherProps,
 		className: classes,
+		colors,
 		disableUnits: mixedBorders && ! hasWidthValue,
 		enableStyle,
 		hasMixedBorders: mixedBorders,
@@ -130,5 +134,7 @@ export function useBorderBoxControl(
 		size,
 		splitValue,
 		wrapperClassName,
+		__experimentalHasMultipleOrigins,
+		__experimentalIsRenderedInSidebar,
 	};
 }
