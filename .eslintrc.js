@@ -144,6 +144,7 @@ module.exports = {
 							'partial',
 							'partialRight',
 							'random',
+							'reduce',
 							'reject',
 							'repeat',
 							'reverse',
