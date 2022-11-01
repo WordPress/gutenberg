@@ -16,7 +16,7 @@ export default function SidebarNavigationTitle( {
 } ) {
 	const BackComponent = parentHref ? Button : NavigatorBackButton;
 	return (
-		<HStack spacing={ 2 } justify="flex-start">
+		<HStack spacing={ 4 } justify="flex-start">
 			<BackComponent
 				className="edit-site-sidebar-navigation-title__back"
 				icon={ isRTL() ? chevronRight : chevronLeft }
