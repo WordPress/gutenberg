@@ -169,7 +169,6 @@ const UnforwardedPopover = (
 		children,
 		className,
 		noArrow = true,
-		isAlternate,
 		position,
 		placement: placementProp = 'bottom-start',
 		offset: offsetProp = 0,
@@ -181,12 +180,14 @@ const UnforwardedPopover = (
 		flip = true,
 		resize = true,
 		shift = false,
+		variant,
 
 		// Deprecated props
 		__unstableForcePosition,
 		anchorRef,
 		anchorRect,
 		getAnchorRect,
+		isAlternate,
 
 		// Rest
 		...contentProps
@@ -195,7 +196,7 @@ const UnforwardedPopover = (
 	let computedFlipProp = flip;
 	let computedResizeProp = resize;
 	if ( __unstableForcePosition !== undefined ) {
-		deprecated( '`__unstableForcePosition` prop wp.components.Popover', {
+		deprecated( '`__unstableForcePosition` prop in wp.components.Popover', {
 			since: '6.1',
 			version: '6.3',
 			alternative: '`flip={ false }` and  `resize={ false }`',
@@ -225,6 +226,14 @@ const UnforwardedPopover = (
 		deprecated( '`getAnchorRect` prop in wp.components.Popover', {
 			since: '6.1',
 			alternative: '`anchor` prop',
+		} );
+	}
+
+	const computedVariant = isAlternate ? 'toolbar' : variant;
+	if ( isAlternate !== undefined ) {
+		deprecated( '`isAlternate` prop in wp.components.Popover', {
+			since: '6.2',
+			alternative: "`variant` prop with the `'toolbar'` value",
 		} );
 	}
 
@@ -452,7 +461,12 @@ const UnforwardedPopover = (
 			placement={ computedPlacement }
 			className={ classnames( 'components-popover', className, {
 				'is-expanded': isExpanded,
-				'is-alternate': isAlternate,
+				// Use the 'alternate' classname for 'toolbar' variant for back compat.
+				[ `is-${
+					computedVariant === 'toolbar'
+						? 'alternate'
+						: computedVariant
+				}` ]: computedVariant,
 			} ) }
 			{ ...contentProps }
 			ref={ mergedFloatingRef }

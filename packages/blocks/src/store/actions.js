@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { isPlainObject } from 'is-plain-object';
-import { pick, some } from 'lodash';
+import { pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -114,9 +114,9 @@ const processBlockType = ( blockType, { select } ) => {
 
 	if (
 		'category' in settings &&
-		! some( select.getCategories(), {
-			slug: settings.category,
-		} )
+		! select
+			.getCategories()
+			.some( ( { slug } ) => slug === settings.category )
 	) {
 		warn(
 			'The block "' +
