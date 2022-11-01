@@ -1168,7 +1168,7 @@ export const blocks = pipe(
  *
  * @return {boolean} Updated state.
  */
-export function __experimentalIsBlockInterfaceHidden( state = false, action ) {
+export function isBlockInterfaceHidden( state = false, action ) {
 	switch ( action.type ) {
 		case 'HIDE_BLOCK_INTERFACE':
 			return true;
@@ -1829,7 +1829,7 @@ export function temporarilyEditingAsBlocks( state = '', action ) {
 export default combineReducers( {
 	blocks,
 	isTyping,
-	__experimentalIsBlockInterfaceHidden,
+	isBlockInterfaceHidden,
 	draggedBlocks,
 	selection,
 	isMultiSelecting,
