@@ -1,17 +1,7 @@
 /**
  * External dependencies
  */
-import showdown from 'showdown';
-
-// Reuse the same showdown converter.
-const converter = new showdown.Converter( {
-	noHeaderId: true,
-	tables: true,
-	literalMidWordUnderscores: true,
-	omitExtraWLInCodeBlocks: true,
-	simpleLineBreaks: true,
-	strikethrough: true,
-} );
+import { micromark } from 'micromark';
 
 /**
  * Corrects the Slack Markdown variant of the code block.
@@ -39,5 +29,5 @@ function slackMarkdownVariantCorrector( text ) {
  * @return {string} HTML.
  */
 export default function markdownConverter( text ) {
-	return converter.makeHtml( slackMarkdownVariantCorrector( text ) );
+	return micromark( slackMarkdownVariantCorrector( text ) );
 }

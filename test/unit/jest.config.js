@@ -36,6 +36,9 @@ module.exports = {
 	transform: {
 		'^.+\\.[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
 	},
+	transformIgnorePatterns: [
+		'node_modules/(?!micromark|decode-named-character-reference|character-entities)',
+	],
 	snapshotSerializers: [
 		'@emotion/jest/serializer',
 		'snapshot-diff/serializer',
