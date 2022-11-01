@@ -12,7 +12,7 @@ import {
 	URLInput,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { Fragment, useState } from '@wordpress/element';
+import { Fragment, useState, useCallback } from '@wordpress/element';
 import {
 	Button,
 	PanelBody,
@@ -66,7 +66,7 @@ const SocialLinkEdit = ( {
 	isSelected,
 	setAttributes,
 } ) => {
-	const { url, service, label } = attributes;
+	const { url, service, label, rel } = attributes;
 	const { showLabels, iconColorValue, iconBackgroundColorValue } = context;
 	const [ showURLPopover, setPopover ] = useState( false );
 	const classes = classNames( 'wp-social-link', 'wp-social-link-' + service, {
@@ -87,6 +87,13 @@ const SocialLinkEdit = ( {
 			backgroundColor: iconBackgroundColorValue,
 		},
 	} );
+
+	const onSetLinkRel = useCallback(
+		( value ) => {
+			setAttributes( { rel: value } );
+		},
+		[ setAttributes ]
+	);
 
 	return (
 		<Fragment>
@@ -112,6 +119,13 @@ const SocialLinkEdit = ( {
 						/>
 					</PanelRow>
 				</PanelBody>
+			</InspectorControls>
+			<InspectorControls __experimentalGroup="advanced">
+				<TextControl
+					label={ __( 'Link rel' ) }
+					value={ rel || '' }
+					onChange={ onSetLinkRel }
+				/>
 			</InspectorControls>
 			<li { ...blockProps }>
 				<Button
