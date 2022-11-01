@@ -53,7 +53,7 @@ const UnconnectedBorderControl = (
 		__unstablePopoverProps,
 		previousStyleSelection,
 		showDropdownHeader,
-		size = 'default',
+		size,
 		sliderClassName,
 		value: border,
 		widthUnit,

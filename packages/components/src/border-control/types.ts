@@ -130,46 +130,41 @@ export type BorderControlProps = ColorProps &
 		size?: 'default' | '__unstable-large';
 	};
 
-export type DropdownProps = ColorProps & {
-	/**
-	 * An object representing a border or `undefined`. This component will
-	 * extract the border color and style selections from this object to use as
-	 * values for its popover controls.
-	 */
-	border?: Border;
-	/**
-	 * An internal prop used to control the visibility of the dropdown.
-	 */
-	__unstablePopoverProps?: Omit< PopoverProps, 'children' >;
-	/**
-	 * This controls whether to render border style options.
-	 *
-	 * @default true
-	 */
-	enableStyle?: boolean;
-	/**
-	 * A callback invoked when the border color or style selections change.
-	 */
-	onChange: ( newBorder?: Border ) => void;
-	/**
-	 * Any previous style selection made by the user. This can be used to
-	 * reapply that previous selection when, for example, a zero border width is
-	 * to a non-zero value.
-	 */
-	previousStyleSelection?: string;
-	/**
-	 * Whether or not to render a header for the border color and style picker
-	 * dropdown. The header includes a label for the color picker and a
-	 * close button.
-	 */
-	showDropdownHeader?: boolean;
-	/**
-	 * Size of the control.
-	 *
-	 * @default 'default'
-	 */
-	size?: 'default' | '__unstable-large';
-};
+export type DropdownProps = ColorProps &
+	Pick< BorderControlProps, 'size' > & {
+		/**
+		 * An object representing a border or `undefined`. This component will
+		 * extract the border color and style selections from this object to use as
+		 * values for its popover controls.
+		 */
+		border?: Border;
+		/**
+		 * An internal prop used to control the visibility of the dropdown.
+		 */
+		__unstablePopoverProps?: Omit< PopoverProps, 'children' >;
+		/**
+		 * This controls whether to render border style options.
+		 *
+		 * @default true
+		 */
+		enableStyle?: boolean;
+		/**
+		 * A callback invoked when the border color or style selections change.
+		 */
+		onChange: ( newBorder?: Border ) => void;
+		/**
+		 * Any previous style selection made by the user. This can be used to
+		 * reapply that previous selection when, for example, a zero border width is
+		 * to a non-zero value.
+		 */
+		previousStyleSelection?: string;
+		/**
+		 * Whether or not to render a header for the border color and style picker
+		 * dropdown. The header includes a label for the color picker and a
+		 * close button.
+		 */
+		showDropdownHeader?: boolean;
+	};
 
 export type StylePickerProps = LabelProps & {
 	/**
