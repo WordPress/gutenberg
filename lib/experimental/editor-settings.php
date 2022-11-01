@@ -85,7 +85,7 @@ function gutenberg_enable_zoomed_out_view() {
 add_action( 'admin_init', 'gutenberg_enable_zoomed_out_view' );
 
 /**
- * Sets a global JS variable used to trigger the availability of zoomed out view.
+ * Sets a global JS variable used to trigger the availability of the Navigation List View experiment.
  */
 function gutenberg_enable_off_canvas_navigation_editor() {
 	$gutenberg_experiments = get_option( 'gutenberg-experiments' );
