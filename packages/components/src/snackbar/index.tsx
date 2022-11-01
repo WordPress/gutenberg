@@ -28,7 +28,7 @@ const NOTICE_TIMEOUT = 10000;
  */
 function useSpokenMessage(
 	message: SnackbarProps[ 'spokenMessage' ],
-	politeness: SnackbarProps[ 'politeness' ]
+	politeness: NonNullable< SnackbarProps[ 'politeness' ] >
 ) {
 	const spokenMessage =
 		typeof message === 'string' ? message : renderToString( message );
