@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { RefCallback } from 'react';
+
+/**
  * Internal dependencies
  */
 import useRefEffect from '../use-ref-effect';
@@ -9,7 +14,7 @@ import useRefEffect from '../use-ref-effect';
  *
  * @return Ref to pass to the iframe.
  */
-export default function useFocusableIframe() {
+export default function useFocusableIframe(): RefCallback< HTMLIFrameElement > {
 	return useRefEffect( ( element ) => {
 		const { ownerDocument } = element;
 		if ( ! ownerDocument ) return;
