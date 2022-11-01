@@ -22,7 +22,7 @@ import {
 	getSizeConfig,
 } from './styles/input-control-styles';
 import type { InputBaseProps, LabelPosition } from './types';
-import { ContextSystemProvider } from '../ui/context';
+import { ContextSystemProvider, WordPressComponentProps } from '../ui/context';
 
 function useUniqueId( idProp?: string ) {
 	const instanceId = useInstanceId( InputBase );
@@ -67,7 +67,7 @@ export function InputBase(
 		size = 'default',
 		suffix,
 		...props
-	}: InputBaseProps,
+	}: WordPressComponentProps< InputBaseProps, 'div' >,
 	ref: ForwardedRef< HTMLDivElement >
 ) {
 	const id = useUniqueId( idProp );
