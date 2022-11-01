@@ -274,7 +274,7 @@ describe( 'Multi-entity save flow', () => {
 			await page.click( 'button[aria-label="Close List View Sidebar"]' );
 
 			// Insert something to dirty the editor.
-			await insertBlock( 'Paragraph' );
+			await insertBlock( 'Paragraph', { checkSelectedTab: true } );
 
 			const enabledButton = await page.waitForSelector(
 				activeSaveSiteSelector
@@ -303,7 +303,7 @@ describe( 'Multi-entity save flow', () => {
 			} );
 
 			// Insert a paragraph at the bottom.
-			await insertBlock( 'Paragraph' );
+			await insertBlock( 'Paragraph', { checkSelectedTab: true } );
 
 			// Open the block settings.
 			await page.click( 'button[aria-label="Settings"]' );

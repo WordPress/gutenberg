@@ -101,8 +101,8 @@ async function waitForInserterCloseAndContentFocus() {
 
 async function selectInserterTab( tabName ) {
 	try {
-		// There are cases that the inserter has no tabs, but we always show the block types tab.
-		// In these cases, we can skip the tab selection.
+		// There are cases that the inserter has no tabs, where
+		// usually the block types tab is the main content.
 		const tab = await page.waitForXPath(
 			`//div[contains(@class, "block-editor-inserter__tabs")]//button[.="${ tabName }"]`,
 			{ timeout: 3000 }
@@ -119,11 +119,18 @@ async function selectInserterTab( tabName ) {
 /**
  * Search for block in the global inserter
  *
- * @param {string} searchTerm The text to search the inserter for.
+ * @param {string}  searchTerm                       The text to search the inserter for.
+ * @param {Object}  [options={}]                     Options for the searchForBlock function.
+ * @param {boolean} [options.checkSelectedTab=false] Whether to check and/or select the blocks tab in the inserter.
  */
-export async function searchForBlock( searchTerm ) {
+export async function searchForBlock(
+	searchTerm,
+	{ checkSelectedTab = false } = {}
+) {
 	await openGlobalBlockInserter();
-	await selectInserterTab( 'Blocks' );
+	if ( checkSelectedTab ) {
+		await selectInserterTab( 'Blocks' );
+	}
 	await page.waitForSelector( INSERTER_SEARCH_SELECTOR );
 	await page.focus( INSERTER_SEARCH_SELECTOR );
 	await pressKeyWithModifier( 'primary', 'a' );
@@ -162,10 +169,15 @@ export async function searchForReusableBlock( searchTerm ) {
  * Opens the inserter, searches for the given term, then selects the first
  * result that appears. It then waits briefly for the block list to update.
  *
- * @param {string} searchTerm The text to search the inserter for.
+ * @param {string}  searchTerm                       The text to search the inserter for.
+ * @param {Object}  [options={}]                     Options for the searchForBlock function.
+ * @param {boolean} [options.checkSelectedTab=false] Whether to check and/or select the blocks tab in the inserter.
  */
-export async function insertBlock( searchTerm ) {
-	await searchForBlock( searchTerm );
+export async function insertBlock(
+	searchTerm,
+	{ checkSelectedTab = false } = {}
+) {
+	await searchForBlock( searchTerm, { checkSelectedTab } );
 	const insertButton = await page.waitForXPath(
 		`//button//span[contains(text(), '${ searchTerm }')]`
 	);

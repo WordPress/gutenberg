@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   Add an optional `options` param to `insertBlock` and `searchForBlocks` which can contain the `checkSelectedTab` property that defaults to `false`. If we set this to `true` there will be a check if the block types tab is selected, and if not it will select it. This is useful in cases where the block types tab is not the first tab in the global inserter ([#45203](https://github.com/WordPress/gutenberg/pull/45203)).
+
 ## 8.4.0 (2022-10-19)
 
 ## 8.3.0 (2022-10-05)

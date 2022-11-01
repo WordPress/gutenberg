@@ -481,6 +481,8 @@ result that appears. It then waits briefly for the block list to update.
 _Parameters_
 
 -   _searchTerm_ `string`: The text to search the inserter for.
+-   _options_ `[Object]`: Options for the searchForBlock function.
+-   _options.checkSelectedTab_ `[boolean]`: Whether to check and/or select the blocks tab in the inserter.
 
 ### insertBlockDirectoryBlock
 
@@ -715,6 +717,8 @@ Search for block in the global inserter
 _Parameters_
 
 -   _searchTerm_ `string`: The text to search the inserter for.
+-   _options_ `[Object]`: Options for the searchForBlock function.
+-   _options.checkSelectedTab_ `[boolean]`: Whether to check and/or select the blocks tab in the inserter.
 
 ### searchForPattern
 

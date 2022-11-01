@@ -99,11 +99,11 @@ describe( 'Settings sidebar', () => {
 				'Template (selected)'
 			);
 			// By inserting the block is also selected.
-			await insertBlock( 'Heading' );
+			await insertBlock( 'Heading', { checkSelectedTab: true } );
 			expect( await getActiveTabLabel() ).toEqual( 'Block (selected)' );
 		} );
 		it( 'should switch to Template tab when a block was selected and we select the Template', async () => {
-			await insertBlock( 'Heading' );
+			await insertBlock( 'Heading', { checkSelectedTab: true } );
 			await toggleSidebar();
 			expect( await getActiveTabLabel() ).toEqual( 'Block (selected)' );
 			await page.evaluate( () => {
