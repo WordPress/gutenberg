@@ -3,7 +3,14 @@
 	"settings": {
 		"appearanceTools": true,
 		"typography": {
-			"fluid": true
+			"fluid": {
+				"maxViewPortWidth": "2000px",
+				"minViewPortWidth": "1000px",
+				"minFontSizeFactor": 1.5,
+				"maxFontSizeFactor": 2,
+				"scaleFactor": 2,
+				"minFontSize": "16px"
+			}
 		}
 	}
 }
