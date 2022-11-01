@@ -121,7 +121,12 @@ export interface InputFieldProps extends BaseProps {
 	type?: HTMLInputTypeAttribute;
 }
 
-export interface InputBaseProps extends BaseProps, FlexProps {
+export interface InputBaseProps
+	extends Pick<
+			WordPressComponentProps< BaseProps, 'div' >,
+			'className' | 'id' | 'style' | keyof BaseProps
+		>,
+		FlexProps {
 	children: ReactNode;
 	/**
 	 * Renders an element on the left side of the input.
@@ -166,18 +171,9 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 	 */
 	disabled?: boolean;
 	/**
-	 * The class name to be added to the wrapper element.
-	 */
-	className?: string;
-	id?: string;
-	/**
 	 * If this property is added, a label will be generated using label property as the content.
 	 */
 	label?: ReactNode;
-	/**
-	 * If this property is added, it will be added to the modal frame `div`.
-	 */
-	style?: CSSProperties;
 }
 
 export interface InputControlProps
