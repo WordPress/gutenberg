@@ -51,7 +51,7 @@ for the `BorderControl`'s color and style options, by rendering your
 
 ## Props
 
-### `colors`: `Array`
+### `colors`: `( PaletteObject | ColorObject )[]`
 
 An array of color definitions. This may also be a multi-dimensional array where
 colors are organized by multiple origins.
@@ -59,6 +59,7 @@ colors are organized by multiple origins.
 Each color may be an object containing a `name` and `color` value.
 
 - Required: No
+- Default: `[]`
 
 ### `disableCustomColors`: `boolean`
 
@@ -78,6 +79,7 @@ This controls whether the alpha channel will be offered when selecting
 custom colors.
 
 - Required: No
+- Default: `false`
 
 ### `enableStyle`: `boolean`
 
@@ -170,19 +172,5 @@ Controls the visual width of the `BorderControl`. It has no effect if the
 
 Flags whether this `BorderControl` should also render a `RangeControl` for
 additional control over a border's width.
-
-- Required: No
-
-### `__experimentalHasMultipleOrigins`: `boolean`
-
-This is passed on to the color related sub-components which need to be made
-aware of whether the colors prop contains multiple origins.
-
-- Required: No
-
-### `__experimentalIsRenderedInSidebar`: `boolean`
-
-This is passed on to the color related sub-components so they may render more
-effectively when used within a sidebar.
 
 - Required: No

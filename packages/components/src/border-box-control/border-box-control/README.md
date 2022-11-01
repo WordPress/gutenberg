@@ -68,7 +68,7 @@ a `SlotFillProvider` overall.
 
 ## Props
 
-### `colors`: `Array`
+### `colors`: `( PaletteObject | ColorObject )[]`
 
 An array of color definitions. This may also be a multi-dimensional array where
 colors are organized by multiple origins.
@@ -76,6 +76,7 @@ colors are organized by multiple origins.
 Each color may be an object containing a `name` and `color` value.
 
 - Required: No
+- Default: `[]`
 
 ### `disableCustomColors`: `boolean`
 
@@ -89,6 +90,7 @@ This controls whether the alpha channel will be offered when selecting
 custom colors.
 
 - Required: No
+- Default: `false`
 
 ### `enableStyle`: `boolean`
 
@@ -164,19 +166,5 @@ const splitBorders = {
 	left: { color: '#f2d675', style: 'dotted', width: '1em' },
 };
 ```
-
-- Required: No
-
-### `__experimentalHasMultipleOrigins`: `boolean`
-
-This is passed on to the color related sub-components which need to be made
-aware of whether the colors prop contains multiple origins.
-
-- Required: No
-
-### `__experimentalIsRenderedInSidebar`: `boolean`
-
-This is passed on to the color related sub-components so they may render more
-effectively when used within a sidebar.
 
 - Required: No
