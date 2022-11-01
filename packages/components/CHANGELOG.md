@@ -46,6 +46,7 @@
 -   `UnitControl`: Add tests ([#45260](https://github.com/WordPress/gutenberg/pull/45260)).
 -   `Disabled`: Refactor the component to rely on the HTML `inert` attribute.
 -   `FontSizePicker`: Add more comprehensive tests ([#45298](https://github.com/WordPress/gutenberg/pull/45298)).
+-   `FontSizePicker`: Refactor to use components instead of helper functions ([#44891](https://github.com/WordPress/gutenberg/pull/44891)).
 
 ## 21.3.0 (2022-10-19)
 
