@@ -428,19 +428,18 @@ describe( 'NumberControl', () => {
 	} );
 
 	describe( 'custom spin buttons', () => {
-		test.each( [
-			{},
-			{ size: 'small' },
-			{ size: '__unstable-large', hideHTMLArrows: true },
-		] )( 'should not appear when props = %o', ( props ) => {
-			render( <NumberControl { ...props } /> );
-			expect(
-				screen.queryByLabelText( 'Increment' )
-			).not.toBeInTheDocument();
-			expect(
-				screen.queryByLabelText( 'Decrement' )
-			).not.toBeInTheDocument();
-		} );
+		test.each( [ undefined, 'none', 'native' ] )(
+			'should not appear when spinControls = %s',
+			( spinControls ) => {
+				render( <NumberControl spinControls={ spinControls } /> );
+				expect(
+					screen.queryByLabelText( 'Increment' )
+				).not.toBeInTheDocument();
+				expect(
+					screen.queryByLabelText( 'Decrement' )
+				).not.toBeInTheDocument();
+			}
+		);
 
 		test.each( [
 			[ 'up', '1', {} ],
@@ -461,7 +460,7 @@ describe( 'NumberControl', () => {
 				render(
 					<NumberControl
 						{ ...props }
-						size="__unstable-large"
+						spinControls="custom"
 						onChange={ onChange }
 					/>
 				);

@@ -8,11 +8,16 @@ export type NumberControlProps = Omit<
 	'isDragEnabled' | 'min' | 'max' | 'required' | 'step' | 'type' | 'value'
 > & {
 	/**
-	 * If true, the default `input` HTML arrows will be hidden.
+	 * The type of spin controls to display. These are butons that allow the
+	 * user to quickly increment and decrement the number.
 	 *
-	 * @default false
+	 * - 'none' - Do not show spin controls.
+	 * - 'native' - Use browser's native HTML `input` controls.
+	 * - 'custom' - Use plus and minus icon buttons.
+	 *
+	 * @default 'native'
 	 */
-	hideHTMLArrows?: boolean;
+	spinControls?: 'none' | 'native' | 'custom';
 	/**
 	 * If true, enables mouse drag gestures.
 	 *

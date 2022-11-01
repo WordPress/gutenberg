@@ -11,9 +11,12 @@ import styled from '@emotion/styled';
 import InputControl from '../../input-control';
 import { COLORS } from '../../utils';
 import Button from '../../button';
+import { space } from '../../ui/utils/space';
 
 const htmlArrowStyles = ( { hideHTMLArrows } ) => {
-	if ( ! hideHTMLArrows ) return ``;
+	if ( ! hideHTMLArrows ) {
+		return ``;
+	}
 
 	return css`
 		input[type='number']::-webkit-outer-spin-button,
@@ -32,8 +35,21 @@ export const Input = styled( InputControl )`
 	${ htmlArrowStyles };
 `;
 
+const spinButtonSizeStyles = ( { size } ) => {
+	if ( size !== 'small' ) {
+		return ``;
+	}
+
+	return css`
+		width: ${ space( 5 ) };
+		min-width: ${ space( 5 ) };
+		height: ${ space( 5 ) };
+	`;
+};
+
 export const SpinButton = styled( Button )`
-	&&& {
+	&&&&& {
 		color: ${ COLORS.ui.theme };
+		${ spinButtonSizeStyles }
 	}
 `;

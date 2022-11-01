@@ -31,7 +31,7 @@ function UnforwardedNumberControl(
 		__unstableStateReducer: stateReducerProp,
 		className,
 		dragDirection = 'n',
-		hideHTMLArrows = false,
+		spinControls = 'native',
 		isDragEnabled = true,
 		isShiftStepEnabled = true,
 		label,
@@ -204,7 +204,7 @@ function UnforwardedNumberControl(
 			{ ...props }
 			className={ classes }
 			dragDirection={ dragDirection }
-			hideHTMLArrows={ size === '__unstable-large' || hideHTMLArrows }
+			hideHTMLArrows={ spinControls !== 'native' }
 			isDragEnabled={ isDragEnabled }
 			label={ label }
 			max={ max }
@@ -221,7 +221,7 @@ function UnforwardedNumberControl(
 			} }
 			size={ size }
 			suffix={
-				size === '__unstable-large' && ! hideHTMLArrows ? (
+				spinControls === 'custom' ? (
 					<>
 						{ suffix }
 						<Spacer marginBottom={ 0 } marginRight={ 2 }>
@@ -235,6 +235,7 @@ function UnforwardedNumberControl(
 									onClick={ buildSpinButtonClickHandler(
 										'up'
 									) }
+									size={ size }
 								/>
 								<SpinButton
 									icon={ resetIcon }
@@ -245,6 +246,7 @@ function UnforwardedNumberControl(
 									onClick={ buildSpinButtonClickHandler(
 										'down'
 									) }
+									size={ size }
 								/>
 							</HStack>
 						</Spacer>
