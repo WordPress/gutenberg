@@ -204,8 +204,7 @@ describe( 'FontSizePicker', () => {
 				screen.getByRole( 'option', { name: 'Custom' } )
 			);
 			expect( screen.getByLabelText( 'Custom' ) ).toBeInTheDocument();
-			// TODO: onChange() shouldn't be called.
-			//expect( onChange ).not.toHaveBeenCalled();
+			expect( onChange ).not.toHaveBeenCalled();
 		} );
 
 		commonTests( fontSizes );
