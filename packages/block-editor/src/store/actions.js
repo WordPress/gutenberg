@@ -1268,7 +1268,7 @@ export function toggleBlockMode( clientId ) {
  *
  * @return {Object} Action object.
  */
-export function hideBlockInterface() {
+export function __experimentalHideBlockInterface() {
 	return {
 		type: 'HIDE_BLOCK_INTERFACE',
 	};
@@ -1279,7 +1279,7 @@ export function hideBlockInterface() {
  *
  * @return {Object} Action object.
  */
-export function showBlockInterface() {
+export function __experimentalShowBlockInterface() {
 	return {
 		type: 'SHOW_BLOCK_INTERFACE',
 	};

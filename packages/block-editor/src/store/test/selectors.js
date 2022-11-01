@@ -44,7 +44,7 @@ const {
 	isBlockMultiSelected,
 	isFirstMultiSelectedBlock,
 	getBlockMode,
-	isBlockInterfaceHidden,
+	__experimentalIsBlockInterfaceHidden: isBlockInterfaceHidden,
 	isTyping,
 	isDraggingBlocks,
 	getDraggedBlockClientIds,

@@ -28,7 +28,7 @@ function selector( select ) {
 		isMultiSelecting,
 		hasMultiSelection,
 		isTyping,
-		isBlockInterfaceHidden,
+		__experimentalIsBlockInterfaceHidden: isBlockInterfaceHidden,
 		getSettings,
 		getLastMultiSelectedBlockClientId,
 	} = select( blockEditorStore );

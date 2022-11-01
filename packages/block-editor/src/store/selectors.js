@@ -1283,7 +1283,7 @@ export function isTyping( state ) {
  *
  * @return {boolean} Whether the block toolbar is hidden.
  */
-export function isBlockInterfaceHidden( state ) {
+export function __experimentalIsBlockInterfaceHidden( state ) {
 	return state.isBlockInterfaceHidden;
 }
 

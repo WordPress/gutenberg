@@ -935,18 +935,6 @@ _Returns_
 
 -   `?boolean`: Whether the insertion point is visible or not.
 
-### isBlockInterfaceHidden
-
-Returns true if the the block interface should be hidden, or false otherwise.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `boolean`: Whether the block toolbar is hidden.
-
 ### isBlockMultiSelected
 
 Returns true if the client ID occurs within the block multi-selection, or
@@ -1198,14 +1186,6 @@ Action that "flashes" the block with a given `clientId` by rhythmically highligh
 _Parameters_
 
 -   _clientId_ `string`: Target block client ID.
-
-### hideBlockInterface
-
-Returns an action object used in signalling that the block interface, eg. toolbar, outline, etc. should be hidden.
-
-_Returns_
-
--   `Object`: Action object.
 
 ### hideInsertionPoint
 
@@ -1517,14 +1497,6 @@ Action that resets the template validity.
 _Parameters_
 
 -   _isValid_ `boolean`: template validity flag.
-
-_Returns_
-
--   `Object`: Action object.
-
-### showBlockInterface
-
-Returns an action object used in signalling that the block interface, eg. toolbar, outline, etc. should be shown.
 
 _Returns_
 

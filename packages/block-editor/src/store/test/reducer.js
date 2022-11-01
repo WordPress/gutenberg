@@ -19,7 +19,7 @@ import {
 	hasSameKeys,
 	isUpdatingSameBlockAttribute,
 	blocks,
-	isBlockInterfaceHidden,
+	__experimentalIsBlockInterfaceHidden as isBlockInterfaceHidden,
 	isTyping,
 	draggedBlocks,
 	selection,

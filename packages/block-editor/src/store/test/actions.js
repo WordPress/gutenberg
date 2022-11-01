@@ -27,7 +27,7 @@ const noop = () => {};
 
 const {
 	clearSelectedBlock,
-	hideBlockInterface,
+	__experimentalHideBlockInterface: hideBlockInterface,
 	insertBlock,
 	insertBlocks,
 	mergeBlocks,
@@ -40,7 +40,7 @@ const {
 	replaceInnerBlocks,
 	resetBlocks,
 	selectBlock,
-	showBlockInterface,
+	__experimentalShowBlockInterface: showBlockInterface,
 	showInsertionPoint,
 	startMultiSelect,
 	startTyping,
