@@ -4,7 +4,8 @@
 
 ### Internal
 
--   `useDisabled`: Refactor the component to rely on the HTML `inert` attribute.
+-   `useDisabled`: Refactor the component to rely on the HTML `inert` attribute ([#44865](https://github.com/WordPress/gutenberg/pull/44865)).
+-   `useFocusOutside`: Refactor the hook to TypeScript, rewrite tests using modern RTL and jest features ([#45317](https://github.com/WordPress/gutenberg/pull/45317)).
 
 ## 5.18.0 (2022-10-19)
 
