@@ -76,17 +76,17 @@ describe( 'FontSizePicker', () => {
 			{
 				slug: 'small',
 				name: 'Small',
-				size: '12px',
+				size: '1em',
 			},
 			{
 				slug: 'medium',
 				name: 'Medium',
-				size: '16px',
+				size: '2rem',
 			},
 			{
 				slug: 'large',
 				name: 'Large',
-				size: '22px',
+				size: 'clamp(1.75rem, 3vw, 2.25rem)',
 			},
 			{
 				slug: 'x-large',
@@ -116,9 +116,9 @@ describe( 'FontSizePicker', () => {
 			const options = screen.getAllByRole( 'option' );
 			expect( options[ 0 ] ).toHaveAccessibleName( 'Default' );
 			expect( options[ 1 ] ).toHaveAccessibleName( 'Tiny 8' );
-			expect( options[ 2 ] ).toHaveAccessibleName( 'Small 12' );
-			expect( options[ 3 ] ).toHaveAccessibleName( 'Medium 16' );
-			expect( options[ 4 ] ).toHaveAccessibleName( 'Large 22' );
+			expect( options[ 2 ] ).toHaveAccessibleName( 'Small 1' );
+			expect( options[ 3 ] ).toHaveAccessibleName( 'Medium 2' );
+			expect( options[ 4 ] ).toHaveAccessibleName( 'Large' );
 			expect( options[ 5 ] ).toHaveAccessibleName( 'Extra Large 30' );
 			expect( options[ 6 ] ).toHaveAccessibleName( 'xx-large 40' );
 			expect( options[ 7 ] ).toHaveAccessibleName( 'Custom' );
@@ -127,6 +127,9 @@ describe( 'FontSizePicker', () => {
 		test.each( [
 			{ value: undefined, expectedLabel: 'Size' },
 			{ value: '8px', expectedLabel: 'Size (8px)' },
+			{ value: '1em', expectedLabel: 'Size (1em)' },
+			{ value: '2rem', expectedLabel: 'Size (2rem)' },
+			{ value: 'clamp(1.75rem, 3vw, 2.25rem)', expectedLabel: 'Size' },
 			{ value: '3px', expectedLabel: 'Size (Custom)' },
 		] )(
 			'displays $expectedLabel as label when value is $value',
@@ -146,7 +149,14 @@ describe( 'FontSizePicker', () => {
 
 		test.each( [
 			{ option: 'Default', value: '8px', expectedValue: undefined },
-			{ option: 'Small 12', value: '8px', expectedValue: '12px' },
+			{ option: 'Tiny 8', value: undefined, expectedValue: '8px' },
+			{ option: 'Small 1', value: '8px', expectedValue: '1em' },
+			{ option: 'Medium 2', value: '8px', expectedValue: '2rem' },
+			{
+				option: 'Large',
+				value: '8px',
+				expectedValue: 'clamp(1.75rem, 3vw, 2.25rem)',
+			},
 		] )(
 			'calls onChange( $expectedValue ) when $option is selected',
 			async ( { option, value, expectedValue } ) => {
@@ -198,7 +208,7 @@ describe( 'FontSizePicker', () => {
 		commonTests( fontSizes );
 	} );
 
-	describe( 'with <= 5 font sizes', () => {
+	describe( 'with ≤ 5 homogeneous font sizes', () => {
 		const fontSizes = [
 			{
 				slug: 'small',
@@ -286,6 +296,105 @@ describe( 'FontSizePicker', () => {
 		commonTests( fontSizes );
 	} );
 
+	describe( 'with ≤ 5 heterogeneous font sizes', () => {
+		const fontSizes = [
+			{
+				slug: 'small',
+				name: 'Small',
+				size: '12px',
+			},
+			{
+				slug: 'medium',
+				name: 'Medium',
+				size: '1em',
+			},
+			{
+				slug: 'large',
+				name: 'Large',
+				size: '2rem',
+			},
+			{
+				slug: 'x-large',
+				name: 'Extra Large',
+				size: 'clamp(1.75rem, 3vw, 2.25rem)',
+			},
+		];
+
+		it( 'displays a toggle group control with t-shirt sizes', () => {
+			render(
+				<FontSizePicker
+					__nextHasNoMarginBottom
+					fontSizes={ fontSizes }
+				/>
+			);
+			const options = screen.getAllByRole( 'radio' );
+			expect( options[ 0 ] ).toHaveTextContent( 'S' );
+			expect( options[ 0 ] ).toHaveAccessibleName( 'Small' );
+			expect( options[ 1 ] ).toHaveTextContent( 'M' );
+			expect( options[ 1 ] ).toHaveAccessibleName( 'Medium' );
+			expect( options[ 2 ] ).toHaveTextContent( 'L' );
+			expect( options[ 2 ] ).toHaveAccessibleName( 'Large' );
+			expect( options[ 3 ] ).toHaveTextContent( 'XL' );
+			expect( options[ 3 ] ).toHaveAccessibleName( 'Extra Large' );
+		} );
+
+		test.each( [
+			{ value: undefined, expectedLabel: 'Size Default' },
+			{ value: '12px', expectedLabel: 'Size Small' },
+			{ value: '1em', expectedLabel: 'Size Medium' },
+			{ value: '2rem', expectedLabel: 'Size Large' },
+			{
+				value: 'clamp(1.75rem, 3vw, 2.25rem)',
+				expectedLabel: 'Size Extra Large',
+			},
+		] )(
+			'displays $expectedLabel as label when value is $value',
+			( { value, expectedLabel } ) => {
+				render(
+					<FontSizePicker
+						__nextHasNoMarginBottom
+						fontSizes={ fontSizes }
+						value={ value }
+					/>
+				);
+				expect(
+					screen.getByLabelText( expectedLabel )
+				).toBeInTheDocument();
+			}
+		);
+
+		test.each( [
+			{ radio: 'Small', expectedValue: '12px' },
+			{ radio: 'Medium', expectedValue: '1em' },
+			{ radio: 'Large', expectedValue: '2rem' },
+			{
+				radio: 'Extra Large',
+				expectedValue: 'clamp(1.75rem, 3vw, 2.25rem)',
+			},
+		] )(
+			'calls onChange( $expectedValue ) when $radio is selected',
+			async ( { radio, expectedValue } ) => {
+				const user = userEvent.setup( {
+					advanceTimers: jest.advanceTimersByTime,
+				} );
+				const onChange = jest.fn();
+				render(
+					<FontSizePicker
+						__nextHasNoMarginBottom
+						fontSizes={ fontSizes }
+						onChange={ onChange }
+					/>
+				);
+				await user.click(
+					screen.getByRole( 'radio', { name: radio } )
+				);
+				expect( onChange ).toHaveBeenCalledWith( expectedValue );
+			}
+		);
+
+		commonTests( fontSizes );
+	} );
+
 	function commonTests( fontSizes: FontSize[] ) {
 		it( 'allows custom values by default', async () => {
 			const user = userEvent.setup( {
@@ -369,7 +478,7 @@ describe( 'FontSizePicker', () => {
 				<FontSizePicker
 					__nextHasNoMarginBottom
 					fontSizes={ fontSizes }
-					value="12px"
+					value={ fontSizes[ 0 ].size }
 					onChange={ onChange }
 				/>
 			);
@@ -388,7 +497,7 @@ describe( 'FontSizePicker', () => {
 				<FontSizePicker
 					__nextHasNoMarginBottom
 					fontSizes={ fontSizes }
-					value="12px"
+					value={ fontSizes[ 0 ].size }
 					withReset={ false }
 				/>
 			);
