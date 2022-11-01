@@ -38,6 +38,8 @@ export function useBorderControl(
 		size = 'default',
 		value: border,
 		width,
+		__experimentalHasMultipleOrigins = false,
+		__experimentalIsRenderedInSidebar = false,
 		...otherProps
 	} = useContextSystem( props, 'BorderControl' );
 
@@ -152,5 +154,7 @@ export function useBorderControl(
 		widthUnit,
 		widthValue,
 		size,
+		__experimentalHasMultipleOrigins,
+		__experimentalIsRenderedInSidebar,
 	};
 }

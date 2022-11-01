@@ -24,6 +24,8 @@ export function useBorderControlDropdown(
 		onChange,
 		previousStyleSelection,
 		size = 'default',
+		__experimentalHasMultipleOrigins = false,
+		__experimentalIsRenderedInSidebar = false,
 		...otherProps
 	} = useContextSystem( props, 'BorderControlDropdown' );
 
@@ -91,5 +93,7 @@ export function useBorderControlDropdown(
 		popoverContentClassName,
 		popoverControlsClassName,
 		resetButtonClassName,
+		__experimentalHasMultipleOrigins,
+		__experimentalIsRenderedInSidebar,
 	};
 }

@@ -15,21 +15,17 @@ export type Border = {
 	width?: CSSProperties[ 'borderWidth' ];
 };
 
-export type ColorProps = Pick< ColorPaletteProps, 'colors' | 'enableAlpha' > & {
+export type ColorProps = Pick<
+	ColorPaletteProps,
+	| 'colors'
+	| 'enableAlpha'
+	| '__experimentalHasMultipleOrigins'
+	| '__experimentalIsRenderedInSidebar'
+> & {
 	/**
 	 * This toggles the ability to choose custom colors.
 	 */
 	disableCustomColors?: boolean;
-	/**
-	 * This is passed on to the color related sub-components which need to be
-	 * made aware of whether the colors prop contains multiple origins.
-	 */
-	__experimentalHasMultipleOrigins?: boolean;
-	/**
-	 * This is passed on to the color related sub-components so they may render
-	 * more effectively when used within a sidebar.
-	 */
-	__experimentalIsRenderedInSidebar?: boolean;
 };
 
 export type LabelProps = {
