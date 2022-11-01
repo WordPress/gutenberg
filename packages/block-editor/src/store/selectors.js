@@ -2733,25 +2733,24 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 		return true;
 	}
 
-	// In navigation mode, the block overlay is active when the block is not
-	// selected (and doesn't contain a selected child). The same behavior is
-	// also enabled in all modes for blocks that have controlled children
-	// (reusable block, template part, navigation), unless explicitly disabled
-	// with `supports.__experimentalDisableBlockOverlay`.
-	const blockSupportDisable = hasBlockSupport(
+	// In navigation mode, the block overlay is active for all blocks when the block is not
+	// selected (and doesn't contain a selected child).
+	if ( editorMode === 'navigation' ) {
+		return (
+			! isBlockSelected( state, clientId ) &&
+			! hasSelectedInnerBlock( state, clientId, true )
+		);
+	}
+	const blockSupportBlockOverlay = hasBlockSupport(
 		getBlockName( state, clientId ),
-		'__experimentalDisableBlockOverlay',
+		'__experimentalBlockOverlay',
 		false
 	);
-	const shouldEnableIfUnselected =
-		editorMode === 'navigation' ||
-		( blockSupportDisable
-			? false
-			: areInnerBlocksControlled( state, clientId ) );
 
+	// For blocks that support the block overlay, The user can click "edit" button to remove the overlay.
 	return (
-		shouldEnableIfUnselected &&
-		! isBlockSelected( state, clientId ) &&
+		blockSupportBlockOverlay &&
+		! __unstableIsEditingBlock( state, clientId ) &&
 		! hasSelectedInnerBlock( state, clientId, true )
 	);
 }
@@ -2765,4 +2764,8 @@ export function __unstableIsWithinBlockOverlay( state, clientId ) {
 		parent = state.blocks.parents[ parent ];
 	}
 	return false;
+}
+
+export function __unstableIsEditingBlock( state, clientId ) {
+	return !! state.editedBlocks?.[ clientId ];
 }

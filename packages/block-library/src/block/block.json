@@ -14,7 +14,8 @@
 	"supports": {
 		"customClassName": false,
 		"html": false,
-		"inserter": false
+		"inserter": false,
+		"__experimentalBlockOverlay": true
 	},
 	"editorStyle": "wp-block-editor"
 }

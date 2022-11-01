@@ -1726,3 +1726,10 @@ export function __unstableSetTemporarilyEditingAsBlocks(
 		temporarilyEditingAsBlocks,
 	};
 }
+
+export function __unstableStartEditingBlocks( clientId ) {
+	return {
+		type: 'START_EDITING_BLOCKS',
+		clientId,
+	};
+}

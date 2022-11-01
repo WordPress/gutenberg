@@ -1806,26 +1806,109 @@ export function temporarilyEditingAsBlocks( state = '', action ) {
 	return state;
 }
 
-export default combineReducers( {
-	blocks,
-	isTyping,
-	draggedBlocks,
-	selection,
-	isMultiSelecting,
-	isSelectionEnabled,
-	initialPosition,
-	blocksMode,
-	blockListSettings,
-	insertionPoint,
-	template,
-	settings,
-	preferences,
-	lastBlockAttributesChange,
-	editorMode,
-	hasBlockMovingClientId,
-	automaticChangeStatus,
-	highlightedBlock,
-	lastBlockInserted,
-	temporarilyEditingAsBlocks,
-	blockVisibility,
-} );
+export const withEditedBlock = ( reducer ) => ( state, action ) => {
+	const newState = reducer( state, action );
+
+	if ( state === undefined ) {
+		return {
+			...newState,
+			editedState: {},
+		};
+	}
+
+	if ( action.type === 'START_EDITING_BLOCKS' ) {
+		return {
+			...newState,
+			editedBlocks: {
+				...state.editedBlocks,
+				[ action.clientId ]: true,
+			},
+		};
+	}
+
+	if (
+		newState === state ||
+		( state.selection.selectionStart?.clientId ===
+			newState.selection.selectionStart?.clientId &&
+			state.selection.selectionEnd?.clientId ===
+				newState.selection.selectionEnd?.clientId )
+	) {
+		return {
+			...newState,
+			editedBlocks: state.editedBlocks,
+		};
+	}
+
+	// We the block selection changes, we need to update the edited blocks state and reset the ones outside of the selection or not parent of the selection.
+	if ( ! state.selection.selectionStart?.clientId ) {
+		return {
+			...newState,
+			editedBlocks: {},
+		};
+	}
+	const newEditedBlocks = { ...state.editedBlocks };
+	const isParent = ( parent, clientId ) => {
+		const currentParent = newState.blocks.parents[ clientId ];
+		if ( ! currentParent ) {
+			return false;
+		}
+
+		if ( currentParent === parent ) {
+			return true;
+		}
+
+		return isParent( parent, currentParent );
+	};
+
+	const isMultiSelection =
+		newState.selection.selectionStart?.clientId !==
+		newState.selection.selectionEnd?.clientId;
+
+	for ( const clientId of Object.keys( newEditedBlocks ) ) {
+		if (
+			isParent( clientId, newState.selection.selectionStart?.clientId )
+		) {
+			continue;
+		}
+
+		if (
+			! isMultiSelection &&
+			newState.selection.selectionStart?.clientId === clientId
+		) {
+			continue;
+		}
+
+		delete newEditedBlocks[ clientId ];
+	}
+
+	return {
+		...newState,
+		editedBlocks: newEditedBlocks,
+	};
+};
+
+export default withEditedBlock(
+	combineReducers( {
+		blocks,
+		isTyping,
+		draggedBlocks,
+		selection,
+		isMultiSelecting,
+		isSelectionEnabled,
+		initialPosition,
+		blocksMode,
+		blockListSettings,
+		insertionPoint,
+		template,
+		settings,
+		preferences,
+		lastBlockAttributesChange,
+		editorMode,
+		hasBlockMovingClientId,
+		automaticChangeStatus,
+		highlightedBlock,
+		lastBlockInserted,
+		temporarilyEditingAsBlocks,
+		blockVisibility,
+	} )
+);
