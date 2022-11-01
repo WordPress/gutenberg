@@ -6,6 +6,7 @@ import type { CSSProperties } from 'react';
 /**
  * Internal dependencies
  */
+import type { ColorPaletteProps } from '../color-palette/types';
 import type { PopoverProps } from '../popover/types';
 
 export type Border = {
@@ -14,24 +15,12 @@ export type Border = {
 	width?: CSSProperties[ 'borderWidth' ];
 };
 
-export type Color = {
-	name: string;
-	color: NonNullable< CSSProperties[ 'color' ] >;
-};
-
-export type ColorOrigin = {
-	name: string;
-	colors: Color[];
-};
-
-export type Colors = ColorOrigin[] | Color[];
-
 export type ColorProps = {
 	/**
 	 * An array of color definitions. This may also be a multi-dimensional array
 	 * where colors are organized by multiple origins.
 	 */
-	colors?: Colors;
+	colors?: ColorPaletteProps[ 'colors' ];
 	/**
 	 * This toggles the ability to choose custom colors.
 	 */
