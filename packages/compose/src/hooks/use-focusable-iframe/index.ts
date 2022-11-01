@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { RefCallback } from 'react';
+
+/**
  * Internal dependencies
  */
 import useRefEffect from '../use-ref-effect';
@@ -7,9 +12,9 @@ import useRefEffect from '../use-ref-effect';
  * Dispatches a bubbling focus event when the iframe receives focus. Use
  * `onFocus` as usual on the iframe or a parent element.
  *
- * @return {Object} Ref to pass to the iframe.
+ * @return Ref to pass to the iframe.
  */
-export default function useFocusableIframe() {
+export default function useFocusableIframe(): RefCallback< HTMLIFrameElement > {
 	return useRefEffect( ( element ) => {
 		const { ownerDocument } = element;
 		if ( ! ownerDocument ) return;
@@ -22,7 +27,7 @@ export default function useFocusableIframe() {
 		 */
 		function checkFocus() {
 			if ( ownerDocument && ownerDocument.activeElement === element ) {
-				/** @type {HTMLElement} */ ( element ).focus();
+				( element as HTMLElement ).focus();
 			}
 		}
 
