@@ -18,6 +18,7 @@ export function useBorderBoxControlSplitControls(
 	const {
 		className,
 		colors = [],
+		enableAlpha = false,
 		enableStyle = true,
 		size = 'default',
 		__experimentalHasMultipleOrigins = false,
@@ -44,6 +45,7 @@ export function useBorderBoxControlSplitControls(
 		centeredClassName,
 		className: classes,
 		colors,
+		enableAlpha,
 		enableStyle,
 		rightAlignedClassName,
 		size,
