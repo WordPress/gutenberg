@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import type { MutableRefObject } from 'react';
 import classnames from 'classnames';
 
 /**
@@ -12,11 +13,13 @@ import { useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Snackbar from './';
+import Snackbar from '.';
 import {
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
 } from '../animation';
+import type { Notice, SnackbarListProps } from './types';
+import type { WordPressComponentProps } from '../ui/context';
 
 const noop = () => {};
 const SNACKBAR_VARIANTS = {
@@ -40,27 +43,33 @@ const SNACKBAR_VARIANTS = {
 };
 
 const SNACKBAR_REDUCE_MOTION_VARIANTS = {
-	init: false,
-	open: false,
-	exit: false,
+	init: {},
+	open: {},
+	exit: {},
 };
 
 /**
  * Renders a list of notices.
  *
- * @param {Object}   $0           Props passed to the component.
- * @param {Array}    $0.notices   Array of notices to render.
- * @param {Function} $0.onRemove  Function called when a notice should be removed / dismissed.
- * @param {Object}   $0.className Name of the class used by the component.
- * @param {Object}   $0.children  Array of children to be rendered inside the notice list.
- *
- * @return {Object} The rendered notices list.
+ * ```jsx
+ * const MySnackbarListNotice = () => (
+ *   <SnackbarList
+ *     notices={ notices }
+ *     onRemove={ removeNotice }
+ *   />
+ * );
+ * ```
  */
-function SnackbarList( { notices, className, children, onRemove = noop } ) {
-	const listRef = useRef();
+export function SnackbarList( {
+	notices,
+	className,
+	children,
+	onRemove = noop,
+}: WordPressComponentProps< SnackbarListProps, 'div' > ) {
+	const listRef = useRef() as MutableRefObject< HTMLDivElement >;
 	const isReducedMotion = useReducedMotion();
 	className = classnames( 'components-snackbar-list', className );
-	const removeNotice = ( notice ) => () => onRemove( notice.id );
+	const removeNotice = ( notice: Notice ) => () => onRemove( notice.id );
 	return (
 		<div className={ className } tabIndex={ -1 } ref={ listRef }>
 			{ children }

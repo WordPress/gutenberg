@@ -1,0 +1,116 @@
+/**
+ * External dependencies
+ */
+import type {
+	KeyboardEvent,
+	MouseEvent,
+	MutableRefObject,
+	ReactNode,
+} from 'react';
+
+/**
+ * WordPress dependencies
+ */
+import type { WPElement } from '@wordpress/element';
+
+export type ButtonEvent =
+	| KeyboardEvent< HTMLButtonElement >
+	| MouseEvent< HTMLButtonElement >;
+
+export type Action = {
+	label: string;
+	url: string;
+	onClick?: ( event: ButtonEvent ) => void;
+};
+
+export type Notice = {
+	id: string;
+	spokenMessage: ReactNode;
+	actions: Action[];
+	icon?: WPElement | null;
+	onDismiss?: Function;
+	status: string;
+	content: string;
+	__unstableHTML?: string;
+	isDismissible: boolean;
+	type: string;
+	explicitDismiss: boolean;
+};
+
+export type SnackbarProps = {
+	/**
+	 * The displayed message of a notice. Also used as the spoken message for assistive technology, unless `spokenMessage` is provided as an alternative message.
+	 */
+	children: ReactNode;
+	/**
+	 * Used to provide a custom spoken message in place of the `children` default.
+	 *
+	 * @default children
+	 */
+	spokenMessage?: Notice[ 'spokenMessage' ];
+	/**
+	 * A politeness level for the notice's spoken message. Should be provided as one of the valid options for [an `aria-live` attribute value](https://www.w3.org/TR/wai-aria-1.1/#aria-live). Defaults to `"polite"`. Note that this value should be considered a suggestion; assistive technologies may override it based on internal heuristics.
+	 *
+	 * A value of `'assertive'` is to be used for important, and usually time-sensitive, information. It will interrupt anything else the screen reader is announcing in that moment.
+	 * A value of `'polite'` is to be used for advisory information. It should not interrupt what the screen reader is announcing in that moment (the "speech queue") or interrupt the current task.
+	 *
+	 * @default 'polite'
+	 */
+	politeness?: 'polite' | 'assertive';
+	/**
+	 * An array of action objects. Each member object should contain a `label` and either a `url` link string or `onClick` callback function.
+	 *
+	 * @default []
+	 */
+	actions?: Notice[ 'actions' ];
+	/**
+	 * Called to remove the snackbar from the UI.
+	 *
+	 * @default () => void
+	 */
+	onRemove?: Function;
+	/**
+	 * The icon to render in the snackbar.
+	 *
+	 * @default null
+	 */
+	icon?: Notice[ 'icon' ];
+	/**
+	 * Whether to require user action to dismiss the snackbar.
+	 *
+	 * By default, this is dismissed on a timeout, without user interaction.
+	 *
+	 * @default false
+	 */
+	explicitDismiss?: Notice[ 'explicitDismiss' ];
+	/**
+	 * A callback executed when the snackbar is dismissed.
+	 *
+	 * It is distinct from onRemove, which _looks_ like a callback but is
+	 * actually the function to call to remove the snackbar from the UI.
+	 *
+	 * @default () => void
+	 */
+	onDismiss?: Notice[ 'onDismiss' ];
+	/**
+	 * A ref to the list that contains the snackbar.
+	 */
+	listRef?: MutableRefObject< HTMLDivElement >;
+};
+
+export type SnackbarListProps = {
+	/**
+	 * Array of notices to render.
+	 */
+	notices: Notice[];
+	/**
+	 * Children to be rendered inside the notice list.
+	 */
+	children?: ReactNode;
+	/**
+	 * Function called when a notice should be removed / dismissed.
+	 *
+	 * @default () => void
+	 */
+	onRemove?: Function;
+};

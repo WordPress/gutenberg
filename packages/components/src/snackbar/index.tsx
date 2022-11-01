@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import type { ForwardedRef, KeyboardEvent, MouseEvent, ReactNode } from 'react';
 import classnames from 'classnames';
 
 /**
@@ -14,21 +15,21 @@ import warning from '@wordpress/warning';
 /**
  * Internal dependencies
  */
-import { Button } from '../';
+import Button from '../button';
+import type { Action, ButtonEvent, SnackbarProps } from './types';
+import type { WordPressComponentProps } from '../ui/context';
 
 const noop = () => {};
 const NOTICE_TIMEOUT = 10000;
 
-/** @typedef {import('@wordpress/element').WPElement} WPElement */
-
 /**
  * Custom hook which announces the message with the given politeness, if a
  * valid message is provided.
- *
- * @param {string|WPElement}     [message]  Message to announce.
- * @param {'polite'|'assertive'} politeness Politeness to announce.
  */
-function useSpokenMessage( message, politeness ) {
+function useSpokenMessage(
+	message: ReactNode,
+	politeness: 'polite' | 'assertive'
+) {
 	const spokenMessage =
 		typeof message === 'string' ? message : renderToString( message );
 
@@ -39,7 +40,7 @@ function useSpokenMessage( message, politeness ) {
 	}, [ spokenMessage, politeness ] );
 }
 
-function Snackbar(
+function UnforwardedSnackbar(
 	{
 		className,
 		children,
@@ -54,24 +55,28 @@ function Snackbar(
 		// actually the function to call to remove the snackbar from the UI.
 		onDismiss = noop,
 		listRef,
-	},
-	ref
+	}: WordPressComponentProps< SnackbarProps, 'div' >,
+	ref: ForwardedRef< any >
 ) {
 	onDismiss = onDismiss || noop;
 
-	function dismissMe( event ) {
+	function dismissMe(
+		event:
+			| KeyboardEvent< HTMLDivElement | HTMLSpanElement >
+			| MouseEvent< HTMLDivElement | HTMLSpanElement >
+	) {
 		if ( event && event.preventDefault ) {
 			event.preventDefault();
 		}
 
 		// Prevent focus loss by moving it to the list element.
-		listRef.current.focus();
+		listRef?.current.focus();
 
 		onDismiss();
 		onRemove();
 	}
 
-	function onActionClick( event, onClick ) {
+	function onActionClick( event: ButtonEvent, onClick: Action[ 'onClick' ] ) {
 		event.stopPropagation();
 
 		onRemove();
@@ -119,7 +124,7 @@ function Snackbar(
 			ref={ ref }
 			className={ classes }
 			onClick={ ! explicitDismiss ? dismissMe : noop }
-			tabIndex="0"
+			tabIndex={ 0 }
 			role={ ! explicitDismiss ? 'button' : '' }
 			onKeyPress={ ! explicitDismiss ? dismissMe : noop }
 			aria-label={ ! explicitDismiss ? __( 'Dismiss this notice' ) : '' }
@@ -135,7 +140,7 @@ function Snackbar(
 							key={ index }
 							href={ url }
 							variant="tertiary"
-							onClick={ ( event ) =>
+							onClick={ ( event: ButtonEvent ) =>
 								onActionClick( event, onClick )
 							}
 							className="components-snackbar__action"
@@ -148,7 +153,7 @@ function Snackbar(
 					<span
 						role="button"
 						aria-label="Dismiss this notice"
-						tabIndex="0"
+						tabIndex={ 0 }
 						className="components-snackbar__dismiss-button"
 						onClick={ dismissMe }
 						onKeyPress={ dismissMe }
@@ -161,4 +166,18 @@ function Snackbar(
 	);
 }
 
-export default forwardRef( Snackbar );
+/**
+ * A Snackbar displays a succinct message that is cleared out after a small delay.
+ *
+ * It can also offer the user options, like viewing a published post.
+ * But these options should also be available elsewhere in the UI.
+ *
+ * ```jsx
+ * const MySnackbarNotice = () => (
+ *   <Snackbar>Post published successfully.</Snackbar>
+ * );
+ * ```
+ */
+export const Snackbar = forwardRef( UnforwardedSnackbar );
+
+export default Snackbar;
