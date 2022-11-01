@@ -71,8 +71,8 @@ export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
 	 */
 	disableCustomColors?: boolean;
 	/**
-	 * Whether the color picker should display the alpha channel
-	 * both in the bottom inputs as well as in the color picker itself.
+	 * This controls whether the alpha channel will be offered when selecting
+	 * custom colors.
 	 */
 	enableAlpha?: boolean;
 	/**
