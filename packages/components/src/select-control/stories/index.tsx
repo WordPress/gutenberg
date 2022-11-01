@@ -23,9 +23,9 @@ const meta: ComponentMeta< typeof SelectControl > = {
 		prefix: { control: { type: 'text' } },
 		suffix: { control: { type: 'text' } },
 		value: { control: { type: null } },
-		onChange: { action: 'onChange' },
 	},
 	parameters: {
+		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { source: { state: 'open' } },
 	},
