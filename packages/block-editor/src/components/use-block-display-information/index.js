@@ -16,6 +16,7 @@ import { store as blockEditorStore } from '../../store';
  *
  * @typedef {Object} WPBlockDisplayInformation
  *
+ * @property {string} type        Machine readable block type which is used to indicate if color should be applied.
  * @property {string} title       Human-readable block type label.
  * @property {WPIcon} icon        Block type icon.
  * @property {string} description A detailed block type description.
@@ -51,6 +52,9 @@ export default function useBlockDisplayInformation( clientId ) {
 			const attributes = getBlockAttributes( clientId );
 			const match = getActiveBlockVariation( blockName, attributes );
 			const blockTypeInfo = {
+				isReusable:
+					blockType.name === 'core/block' &&
+					blockType.category === 'reusable',
 				title: blockType.title,
 				icon: blockType.icon,
 				description: blockType.description,
@@ -59,6 +63,7 @@ export default function useBlockDisplayInformation( clientId ) {
 			if ( ! match ) return blockTypeInfo;
 
 			return {
+				isTemplatePart: blockType.name === 'core/template-part',
 				title: match.title || blockType.title,
 				icon: match.icon || blockType.icon,
 				description: match.description || blockType.description,
