@@ -31,7 +31,7 @@ function useUniqueId( idProp?: string ) {
 	return idProp || id;
 }
 
-// Adapter to map props for the new ui/flex compopnent.
+// Adapter to map props for the new ui/flex component.
 function getUIFlexProps( labelPosition?: LabelPosition ) {
 	const props: { direction?: string; gap?: number; justify?: string } = {};
 	switch ( labelPosition ) {
