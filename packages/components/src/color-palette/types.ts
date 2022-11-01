@@ -3,8 +3,6 @@
  */
 import type { CSSProperties, MouseEventHandler, ReactNode } from 'react';
 
-type OnColorChange = ( newColor?: string ) => void;
-
 export type ColorObject = {
 	name: string;
 	color: NonNullable< CSSProperties[ 'color' ] >;
@@ -18,7 +16,10 @@ export type PaletteObject = {
 type PaletteProps = {
 	className?: string;
 	clearColor: () => void;
-	onChange: OnColorChange;
+	/**
+	 * Callback called when a color is selected.
+	 */
+	onChange: ( newColor?: string ) => void;
 	value?: string;
 	actions?: ReactNode;
 };
@@ -42,7 +43,7 @@ export type CustomColorPickerDropdownProps = {
 	} ) => ReactNode;
 };
 
-export type ColorPaletteProps = {
+export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
 	/**
 	 * Whether the palette should have a clearing button.
 	 *
@@ -69,10 +70,6 @@ export type ColorPaletteProps = {
 	 * both in the bottom inputs as well as in the color picker itself.
 	 */
 	enableAlpha?: boolean;
-	/**
-	 * Callback called when a color is selected.
-	 */
-	onChange: OnColorChange;
 	/**
 	 * Currently active value.
 	 */
