@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, some } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -20,20 +20,19 @@ export function ThemeSupportCheck( {
 	postType,
 	supportKeys,
 } ) {
-	const isSupported = some(
-		Array.isArray( supportKeys ) ? supportKeys : [ supportKeys ],
-		( key ) => {
-			const supported = get( themeSupports, [ key ], false );
-			// 'post-thumbnails' can be boolean or an array of post types.
-			// In the latter case, we need to verify `postType` exists
-			// within `supported`. If `postType` isn't passed, then the check
-			// should fail.
-			if ( 'post-thumbnails' === key && Array.isArray( supported ) ) {
-				return supported.includes( postType );
-			}
-			return supported;
+	const isSupported = (
+		Array.isArray( supportKeys ) ? supportKeys : [ supportKeys ]
+	 ).some( ( key ) => {
+		const supported = get( themeSupports, [ key ], false );
+		// 'post-thumbnails' can be boolean or an array of post types.
+		// In the latter case, we need to verify `postType` exists
+		// within `supported`. If `postType` isn't passed, then the check
+		// should fail.
+		if ( 'post-thumbnails' === key && Array.isArray( supported ) ) {
+			return supported.includes( postType );
 		}
-	);
+		return supported;
+	} );
 
 	if ( ! isSupported ) {
 		return null;

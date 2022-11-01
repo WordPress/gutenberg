@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * External dependencies
  */
@@ -11,7 +13,7 @@ import { useContext, forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Button from '../button';
+import Button from '../../button';
 import RadioContext from '../radio-context';
 
 function Radio( { children, value, ...props }, ref ) {
@@ -32,4 +34,7 @@ function Radio( { children, value, ...props }, ref ) {
 	);
 }
 
+/**
+ * @deprecated Use `RadioControl` or `ToggleGroupControl` instead.
+ */
 export default forwardRef( Radio );

@@ -13,7 +13,7 @@ Starting in WordPress 5.8 release, we encourage using the `block.json` metadata 
 	"category": "text",
 	"parent": [ "core/group" ],
 	"icon": "star",
-	"description": "Shows warning, error or success notices…",
+	"description": "Shows warning, error or success notices...",
 	"keywords": [ "alert", "message" ],
 	"version": "1.0.3",
 	"textdomain": "my-plugin",
