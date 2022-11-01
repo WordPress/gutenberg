@@ -316,11 +316,48 @@ function gutenberg_get_classnames_from_last_tag( $html ) {
  * @return string                Filtered block content.
  */
 function gutenberg_render_layout_support_flag( $block_content, $block ) {
-	$block_type     = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$support_layout = block_has_support( $block_type, array( '__experimentalLayout' ), false );
-
-	if ( ! $support_layout ) {
+	$block_type       = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	$support_layout   = block_has_support( $block_type, array( '__experimentalLayout' ), false );
+	$has_child_layout = isset( $block['attrs']['style']['layout']['selfStretch'] ) && isset( $block['attrs']['style']['layout']['flexWidth'] );
+	$blocknaem        = $block['blockName'];
+	if ( ! $support_layout
+	&& ! $has_child_layout ) {
 		return $block_content;
+	}
+
+	$outer_class_names = array();
+
+	if ( $has_child_layout && 'fixed' === $block['attrs']['style']['layout']['selfStretch'] ) {
+
+		$container_content_class = wp_unique_id( 'wp-container-content-' );
+
+		$child_layout_styles = array(
+			'selector'     => ".$container_content_class",
+			'declarations' => array(
+				'flex-shrink' => '0',
+				'flex-basis'  => $block['attrs']['style']['layout']['flexWidth'],
+			),
+		);
+
+		gutenberg_style_engine_get_stylesheet_from_css_rules(
+			$child_layout_styles,
+			array(
+				'context'  => 'block-supports',
+				'prettify' => false,
+			)
+		);
+
+		$outer_class_names[] = $container_content_class;
+
+	}
+
+	// Return early if only child layout exists.
+	if ( ! $support_layout && ! empty( $outer_class_names ) ) {
+		echo "BLOCK RETURN RELR, $blocknaem";
+		$content = new WP_HTML_Tag_Processor( $block_content );
+		$content->next_tag();
+		$content->add_class( implode( ' ', $outer_class_names ) );
+		return $content;
 	}
 
 	$block_gap              = gutenberg_get_global_settings( array( 'spacing', 'blockGap' ) );
@@ -435,14 +472,18 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$inner_content_classnames = isset( $block['innerContent'][0] ) && 'string' === gettype( $block['innerContent'][0] ) ? gutenberg_get_classnames_from_last_tag( $block['innerContent'][0] ) : '';
 
 	$content = new WP_HTML_Tag_Processor( $block_content );
+
 	if ( $inner_content_classnames ) {
 		$content->next_tag( array( 'class_name' => $inner_content_classnames ) );
 		foreach ( $class_names as $class_name ) {
 			$content->add_class( $class_name );
 		}
 	} else {
+		$combined_class_names = array_merge( $class_names, $outer_class_names );
 		$content->next_tag();
-		$content->add_class( implode( ' ', $class_names ) );
+		foreach ( $combined_class_names as $combined_class_name ) {
+			$content->add_class( $combined_class_name );
+		}
 	}
 
 	return (string) $content;
