@@ -15,12 +15,7 @@ export type Border = {
 	width?: CSSProperties[ 'borderWidth' ];
 };
 
-export type ColorProps = {
-	/**
-	 * An array of color definitions. This may also be a multi-dimensional array
-	 * where colors are organized by multiple origins.
-	 */
-	colors?: ColorPaletteProps[ 'colors' ];
+export type ColorProps = Pick< ColorPaletteProps, 'colors' > & {
 	/**
 	 * This toggles the ability to choose custom colors.
 	 */

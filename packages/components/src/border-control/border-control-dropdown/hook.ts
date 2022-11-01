@@ -19,7 +19,7 @@ export function useBorderControlDropdown(
 	const {
 		border,
 		className,
-		colors,
+		colors = [],
 		enableStyle = true,
 		onChange,
 		previousStyleSelection,

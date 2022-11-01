@@ -30,6 +30,7 @@ export function useBorderControl(
 ) {
 	const {
 		className,
+		colors = [],
 		isCompact,
 		onChange,
 		enableStyle = true,
@@ -138,6 +139,7 @@ export function useBorderControl(
 	return {
 		...otherProps,
 		className: classes,
+		colors,
 		enableStyle,
 		innerWrapperClassName,
 		inputWidth: wrapperWidth,
