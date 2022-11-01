@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get, some, unescape as unescapeString } from 'lodash';
+import { find, get, unescape as unescapeString } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -290,7 +290,7 @@ export function HierarchicalTermSelector( { slug } ) {
 		const existingTerm = findTerm( availableTerms, formParent, formName );
 		if ( existingTerm ) {
 			// If the term we are adding exists but is not selected select it.
-			if ( ! some( terms, ( term ) => term === existingTerm.id ) ) {
+			if ( ! terms.some( ( term ) => term === existingTerm.id ) ) {
 				onUpdateTerms( [ ...terms, existingTerm.id ] );
 			}
 

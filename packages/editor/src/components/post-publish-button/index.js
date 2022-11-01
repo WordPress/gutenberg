@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, some } from 'lodash';
+import { get } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -77,8 +77,7 @@ export class PostPublishButton extends Component {
 		this.setState( { entitiesSavedStatesCallback: false }, () => {
 			if (
 				savedEntities &&
-				some(
-					savedEntities,
+				savedEntities.some(
 					( elt ) =>
 						elt.kind === 'postType' &&
 						elt.name === postType &&

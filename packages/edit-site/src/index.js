@@ -45,7 +45,9 @@ export function reinitializeEditor( target, settings ) {
 				message={ __(
 					'The editor is unable to find a block template for the homepage.'
 				) }
-				dashboardLink="index.php"
+				dashboardLink={
+					settings.__experimentalDashboardLink ?? 'index.php'
+				}
 			/>,
 			target
 		);
@@ -165,7 +167,6 @@ export function initializeEditor( id, settings ) {
 	reinitializeEditor( target, settings );
 }
 
-export { default as __experimentalMainDashboardButton } from './components/main-dashboard-button';
 export { default as __experimentalNavigationToggle } from './components/navigation-sidebar/navigation-toggle';
 export { default as PluginSidebar } from './components/sidebar-edit-mode/plugin-sidebar';
 export { default as PluginSidebarMoreMenuItem } from './components/header-edit-mode/plugin-sidebar-more-menu-item';
