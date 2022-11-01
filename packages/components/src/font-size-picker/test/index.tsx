@@ -67,7 +67,119 @@ describe( 'FontSizePicker', () => {
 		}
 	);
 
-	describe( 'with > 5 font sizes', () => {
+	describe( 'with > 5 homogeneous font sizes', () => {
+		const fontSizes = [
+			{
+				slug: 'tiny',
+				name: 'Tiny',
+				size: '8px',
+			},
+			{
+				slug: 'small',
+				name: 'Small',
+				size: '12px',
+			},
+			{
+				slug: 'medium',
+				name: 'Medium',
+				size: '16px',
+			},
+			{
+				slug: 'large',
+				name: 'Large',
+				size: '20px',
+			},
+			{
+				slug: 'x-large',
+				name: 'Extra Large',
+				size: '30px',
+			},
+			{
+				slug: 'xx-large',
+				// no name
+				size: '40px',
+			},
+		];
+
+		it( 'displays a select control', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+			render(
+				<FontSizePicker
+					__nextHasNoMarginBottom
+					fontSizes={ fontSizes }
+				/>
+			);
+			await user.click(
+				screen.getByRole( 'button', { name: 'Font size' } )
+			);
+			const options = screen.getAllByRole( 'option' );
+			expect( options ).toHaveLength( 8 );
+			expect( options[ 0 ] ).toHaveAccessibleName( 'Default' );
+			expect( options[ 1 ] ).toHaveAccessibleName( 'Tiny 8' );
+			expect( options[ 2 ] ).toHaveAccessibleName( 'Small 12' );
+			expect( options[ 3 ] ).toHaveAccessibleName( 'Medium 16' );
+			expect( options[ 4 ] ).toHaveAccessibleName( 'Large 20' );
+			expect( options[ 5 ] ).toHaveAccessibleName( 'Extra Large 30' );
+			expect( options[ 6 ] ).toHaveAccessibleName( 'xx-large 40' );
+			expect( options[ 7 ] ).toHaveAccessibleName( 'Custom' );
+		} );
+
+		test.each( [
+			{ value: undefined, expectedLabel: 'Size (px)' },
+			{ value: '8px', expectedLabel: 'Size (px)' },
+			{ value: '3px', expectedLabel: 'Size Custom' },
+		] )(
+			'displays $expectedLabel as label when value is $value',
+			( { value, expectedLabel } ) => {
+				render(
+					<FontSizePicker
+						__nextHasNoMarginBottom
+						fontSizes={ fontSizes }
+						value={ value }
+					/>
+				);
+				expect(
+					screen.getByLabelText( expectedLabel )
+				).toBeInTheDocument();
+			}
+		);
+
+		test.each( [
+			{ option: 'Default', value: '8px', expectedValue: undefined },
+			{ option: 'Tiny 8', value: undefined, expectedValue: '8px' },
+		] )(
+			'calls onChange( $expectedValue ) when $option is selected',
+			async ( { option, value, expectedValue } ) => {
+				const user = userEvent.setup( {
+					advanceTimers: jest.advanceTimersByTime,
+				} );
+				const onChange = jest.fn();
+				render(
+					<FontSizePicker
+						__nextHasNoMarginBottom
+						fontSizes={ fontSizes }
+						value={ value }
+						onChange={ onChange }
+					/>
+				);
+				await user.click(
+					screen.getByRole( 'button', { name: 'Font size' } )
+				);
+				await user.click(
+					screen.getByRole( 'option', { name: option } )
+				);
+				expect( onChange ).toHaveBeenCalledTimes( 1 );
+				expect( onChange ).toHaveBeenCalledWith( expectedValue );
+			}
+		);
+
+		commonSelectTests( fontSizes );
+		commonTests( fontSizes );
+	} );
+
+	describe( 'with > 5 heterogeneous font sizes', () => {
 		const fontSizes = [
 			{
 				slug: 'tiny',
@@ -117,12 +229,12 @@ describe( 'FontSizePicker', () => {
 			const options = screen.getAllByRole( 'option' );
 			expect( options ).toHaveLength( 8 );
 			expect( options[ 0 ] ).toHaveAccessibleName( 'Default' );
-			expect( options[ 1 ] ).toHaveAccessibleName( 'Tiny 8' );
-			expect( options[ 2 ] ).toHaveAccessibleName( 'Small 1' );
-			expect( options[ 3 ] ).toHaveAccessibleName( 'Medium 2' );
+			expect( options[ 1 ] ).toHaveAccessibleName( 'Tiny 8px' );
+			expect( options[ 2 ] ).toHaveAccessibleName( 'Small 1em' );
+			expect( options[ 3 ] ).toHaveAccessibleName( 'Medium 2rem' );
 			expect( options[ 4 ] ).toHaveAccessibleName( 'Large' );
-			expect( options[ 5 ] ).toHaveAccessibleName( 'Extra Large 30' );
-			expect( options[ 6 ] ).toHaveAccessibleName( 'xx-large 40' );
+			expect( options[ 5 ] ).toHaveAccessibleName( 'Extra Large 30px' );
+			expect( options[ 6 ] ).toHaveAccessibleName( 'xx-large 40px' );
 			expect( options[ 7 ] ).toHaveAccessibleName( 'Custom' );
 		} );
 
@@ -148,11 +260,11 @@ describe( 'FontSizePicker', () => {
 
 		test.each( [
 			{ value: undefined, expectedLabel: 'Size' },
-			{ value: '8px', expectedLabel: 'Size (8px)' },
-			{ value: '1em', expectedLabel: 'Size (1em)' },
-			{ value: '2rem', expectedLabel: 'Size (2rem)' },
+			{ value: '8px', expectedLabel: 'Size' },
+			{ value: '1em', expectedLabel: 'Size' },
+			{ value: '2rem', expectedLabel: 'Size' },
 			{ value: 'clamp(1.75rem, 3vw, 2.25rem)', expectedLabel: 'Size' },
-			{ value: '3px', expectedLabel: 'Size (Custom)' },
+			{ value: '3px', expectedLabel: 'Size Custom' },
 		] )(
 			'displays $expectedLabel as label when value is $value',
 			( { value, expectedLabel } ) => {
@@ -171,9 +283,9 @@ describe( 'FontSizePicker', () => {
 
 		test.each( [
 			{ option: 'Default', value: '8px', expectedValue: undefined },
-			{ option: 'Tiny 8', value: undefined, expectedValue: '8px' },
-			{ option: 'Small 1', value: '8px', expectedValue: '1em' },
-			{ option: 'Medium 2', value: '8px', expectedValue: '2rem' },
+			{ option: 'Tiny 8px', value: undefined, expectedValue: '8px' },
+			{ option: 'Small 1em', value: '8px', expectedValue: '1em' },
+			{ option: 'Medium 2rem', value: '8px', expectedValue: '2rem' },
 			{
 				option: 'Large',
 				value: '8px',
@@ -205,28 +317,7 @@ describe( 'FontSizePicker', () => {
 			}
 		);
 
-		it( 'shows custom input when Custom is selected', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
-			const onChange = jest.fn();
-			render(
-				<FontSizePicker
-					__nextHasNoMarginBottom
-					fontSizes={ fontSizes }
-					onChange={ onChange }
-				/>
-			);
-			await user.click(
-				screen.getByRole( 'button', { name: 'Font size' } )
-			);
-			await user.click(
-				screen.getByRole( 'option', { name: 'Custom' } )
-			);
-			expect( screen.getByLabelText( 'Custom' ) ).toBeInTheDocument();
-			expect( onChange ).not.toHaveBeenCalled();
-		} );
-
+		commonSelectTests( fontSizes );
 		commonTests( fontSizes );
 	} );
 
@@ -269,7 +360,7 @@ describe( 'FontSizePicker', () => {
 			const options = screen.getAllByRole( 'radio' );
 			expect( options ).toHaveLength( 5 );
 			expect( options[ 0 ] ).toHaveTextContent( 'S' );
-			expect( options[ 0 ] ).toHaveAccessibleName( 'S' );
+			expect( options[ 0 ] ).toHaveAccessibleName( 'Small' );
 			expect( options[ 1 ] ).toHaveTextContent( 'M' );
 			expect( options[ 1 ] ).toHaveAccessibleName( 'Medium' );
 			expect( options[ 2 ] ).toHaveTextContent( 'L' );
@@ -281,9 +372,9 @@ describe( 'FontSizePicker', () => {
 		} );
 
 		test.each( [
-			{ value: undefined, expectedLabel: 'Size Default' },
-			{ value: '12px', expectedLabel: 'Size small(px)' },
-			{ value: '40px', expectedLabel: 'Size Gigantosaurus(px)' },
+			{ value: undefined, expectedLabel: 'Size' },
+			{ value: '12px', expectedLabel: 'Size Small' },
+			{ value: '40px', expectedLabel: 'Size Gigantosaurus' },
 		] )(
 			'displays $expectedLabel as label when value is $value',
 			( { value, expectedLabel } ) => {
@@ -365,7 +456,7 @@ describe( 'FontSizePicker', () => {
 		} );
 
 		test.each( [
-			{ value: undefined, expectedLabel: 'Size Default' },
+			{ value: undefined, expectedLabel: 'Size' },
 			{ value: '12px', expectedLabel: 'Size Small' },
 			{ value: '1em', expectedLabel: 'Size Medium' },
 			{ value: '2rem', expectedLabel: 'Size Large' },
@@ -453,6 +544,30 @@ describe( 'FontSizePicker', () => {
 				).not.toBeInTheDocument();
 			}
 		);
+	}
+
+	function commonSelectTests( fontSizes: FontSize[] ) {
+		it( 'shows custom input when Custom is selected', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+			const onChange = jest.fn();
+			render(
+				<FontSizePicker
+					__nextHasNoMarginBottom
+					fontSizes={ fontSizes }
+					onChange={ onChange }
+				/>
+			);
+			await user.click(
+				screen.getByRole( 'button', { name: 'Font size' } )
+			);
+			await user.click(
+				screen.getByRole( 'option', { name: 'Custom' } )
+			);
+			expect( screen.getByLabelText( 'Custom' ) ).toBeInTheDocument();
+			expect( onChange ).not.toHaveBeenCalled();
+		} );
 	}
 
 	function commonTests( fontSizes: FontSize[] ) {
