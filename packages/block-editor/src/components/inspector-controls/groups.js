@@ -14,10 +14,14 @@ const InspectorControlsTypography = createSlotFill(
 	'InspectorControlsTypography'
 );
 const InspectorControlsListView = createSlotFill( 'InspectorControlsListView' );
+const InspectorControlsBlockInformation = createSlotFill(
+	'InspectorControlsBlockInformation'
+);
 
 const groups = {
 	default: InspectorControlsDefault,
 	advanced: InspectorControlsAdvanced,
+	blockInformation: InspectorControlsBlockInformation,
 	border: InspectorControlsBorder,
 	color: InspectorControlsColor,
 	dimensions: InspectorControlsDimensions,
