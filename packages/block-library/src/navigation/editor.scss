@@ -544,6 +544,13 @@ body.editor-styles-wrapper
 	color: inherit;
 }
 
+.components-heading.wp-block-navigation-off-canvas-editor__title {
+	margin: 0;
+}
+.wp-block-navigation-off-canvas-editor__header {
+	margin-bottom: $grid-unit-10;
+}
+
 // Customize the mobile editing.
 // This can be revisited in the future, but for now, inherit design from the parent.
 .is-menu-open .wp-block-navigation__responsive-container-content * {

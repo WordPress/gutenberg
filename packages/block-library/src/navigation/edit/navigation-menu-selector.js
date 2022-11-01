@@ -10,7 +10,7 @@ import {
 	VisuallyHidden,
 } from '@wordpress/components';
 import { useEntityProp } from '@wordpress/core-data';
-import { Icon, chevronUp, chevronDown } from '@wordpress/icons';
+import { Icon, chevronUp, chevronDown, moreVertical } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useEffect, useMemo, useState } from '@wordpress/element';
@@ -31,6 +31,9 @@ function NavigationMenuSelector( {
 	createNavigationMenuIsError,
 	toggleProps = {},
 } ) {
+	const isOffCanvasNavigationEditorEnabled =
+		window?.__experimentalEnableOffCanvasNavigationEditor === true;
+
 	/* translators: %s: The name of a menu. */
 	const createActionLabel = __( "Create from '%s'" );
 
@@ -133,6 +136,7 @@ function NavigationMenuSelector( {
 			</>
 		),
 		isBusy: ! enableOptions,
+		isSmall: true,
 		disabled: ! enableOptions,
 		__experimentalIsFocusable: true,
 		onClick: () => {
@@ -161,11 +165,19 @@ function NavigationMenuSelector( {
 
 	return (
 		<DropdownMenu
-			className="wp-block-navigation__navigation-selector"
+			className={
+				isOffCanvasNavigationEditorEnabled
+					? ''
+					: 'wp-block-navigation__navigation-selector'
+			}
 			label={ selectorLabel }
-			text={ selectorLabel }
-			icon={ null }
-			toggleProps={ toggleProps }
+			text={ isOffCanvasNavigationEditorEnabled ? '' : selectorLabel }
+			icon={ isOffCanvasNavigationEditorEnabled ? moreVertical : null }
+			toggleProps={
+				isOffCanvasNavigationEditorEnabled
+					? { isSmall: true }
+					: toggleProps
+			}
 		>
 			{ ( { onClose } ) => (
 				<>
