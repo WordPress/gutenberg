@@ -117,7 +117,7 @@ describe( 'Site Editor Performance', () => {
 		await canvas().click(
 			'[data-type="core/post-content"] [data-type="core/paragraph"]'
 		);
-		await insertBlock( 'Paragraph' );
+		await insertBlock( 'Paragraph', { checkSelectedTab: true } );
 		i = 200;
 		const traceFile = __dirname + '/trace.json';
 		await page.tracing.start( {
