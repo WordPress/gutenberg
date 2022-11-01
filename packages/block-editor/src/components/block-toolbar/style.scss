@@ -39,6 +39,14 @@
 		border-right: $border-width solid $gray-300;
 	}
 
+	&.is-reusable .block-editor-block-switcher .components-button {
+		color: var(--wp-block-reusable-color);
+	}
+
+	&.is-template-part .block-editor-block-switcher .components-button {
+		color: var(--wp-block-reusable-color);
+	}
+
 	> :last-child,
 	> :last-child .components-toolbar-group,
 	> :last-child .components-toolbar {

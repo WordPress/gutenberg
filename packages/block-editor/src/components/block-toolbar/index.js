@@ -74,6 +74,10 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 		};
 	}, [] );
 
+	const isReusable =
+		blockType.name === 'core/block' && blockType.category === 'reusable';
+	const isTemplatePart = blockType.name === 'core/template-part';
+
 	// Handles highlighting the current block outline on hover or focus of the
 	// block type toolbar area.
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
@@ -112,7 +116,11 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 
 	const classes = classnames(
 		'block-editor-block-toolbar',
-		shouldShowMovers && 'is-showing-movers'
+		shouldShowMovers && 'is-showing-movers',
+		{
+			'is-reusable': isReusable,
+			'is-template-part': isTemplatePart,
+		}
 	);
 
 	return (
