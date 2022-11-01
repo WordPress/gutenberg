@@ -22,11 +22,7 @@ export type BorderSide = keyof Borders;
 
 export type BorderBoxControlProps = ColorProps &
 	LabelProps &
-	Pick< BorderControlProps, 'size' > & {
-		/**
-		 * This controls whether to support border style selections.
-		 */
-		enableStyle?: boolean;
+	Pick< BorderControlProps, 'enableStyle' | 'size' > & {
 		/**
 		 * A callback function invoked when any border value is changed. The value
 		 * received may be a "flat" border object, one that has properties defining
@@ -76,12 +72,7 @@ export type VisualizerProps = Pick< BorderBoxControlProps, 'size' > & {
 };
 
 export type SplitControlsProps = ColorProps &
-	Pick< BorderBoxControlProps, 'size' > & {
-		/**
-		 * This controls whether to include border style options within the
-		 * individual `BorderControl` components.
-		 */
-		enableStyle?: boolean;
+	Pick< BorderBoxControlProps, 'enableStyle' | 'size' > & {
 		/**
 		 * A callback that is invoked whenever an individual side's border has
 		 * changed.

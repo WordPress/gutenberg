@@ -28,6 +28,7 @@ export function useBorderBoxControl(
 	const {
 		className,
 		onChange,
+		enableStyle = true,
 		size = 'default',
 		value,
 		...otherProps
@@ -118,6 +119,7 @@ export function useBorderBoxControl(
 		...otherProps,
 		className: classes,
 		disableUnits: mixedBorders && ! hasWidthValue,
+		enableStyle,
 		hasMixedBorders: mixedBorders,
 		isLinked,
 		linkedControlClassName,

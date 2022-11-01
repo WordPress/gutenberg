@@ -17,6 +17,7 @@ export function useBorderBoxControlSplitControls(
 ) {
 	const {
 		className,
+		enableStyle = true,
 		size = 'default',
 		...otherProps
 	} = useContextSystem( props, 'BorderBoxControlSplitControls' );
@@ -39,6 +40,7 @@ export function useBorderBoxControlSplitControls(
 		...otherProps,
 		centeredClassName,
 		className: classes,
+		enableStyle,
 		rightAlignedClassName,
 		size,
 	};
