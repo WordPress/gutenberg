@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { FocalPointWrapper, PointerCircle } from './styles/focal-point-style';
+import { PointerCircle } from './styles/focal-point-style';
 
 /**
  * External dependencies
@@ -21,9 +21,5 @@ export default function FocalPoint( {
 
 	const style = { left, top };
 
-	return (
-		<FocalPointWrapper { ...props } className={ classes } style={ style }>
-			<PointerCircle />
-		</FocalPointWrapper>
-	);
+	return <PointerCircle { ...props } className={ classes } style={ style } />;
 }
