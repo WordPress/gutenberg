@@ -53,7 +53,7 @@ export type FontSizePickerProps = {
 	/**
 	 * Size of the control.
 	 *
-	 * @default default
+	 * @default 'default'
 	 */
 	size?: 'default' | '__unstable-large';
 };

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { some, includes } from 'lodash';
+import { some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,7 +17,7 @@ import { store as editorStore } from '../../store';
 
 export function PostTaxonomiesCheck( { postType, taxonomies, children } ) {
 	const hasTaxonomies = some( taxonomies, ( taxonomy ) =>
-		includes( taxonomy.types, postType )
+		taxonomy.types.includes( postType )
 	);
 	if ( ! hasTaxonomies ) {
 		return null;
