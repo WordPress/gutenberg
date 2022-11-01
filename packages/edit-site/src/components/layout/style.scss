@@ -50,12 +50,12 @@
 		top: $canvas-padding;
 		right: $canvas-padding;
 		bottom: $canvas-padding;
-		border-radius: $radius-block-ui * 2;
+		border-radius: $radius-block-ui * 4;
 
 		// Not sure why this is necessary.
 		.edit-site-layout:not(.is-full-canvas) & .edit-site-visual-editor__editor-canvas,
 		.edit-site-layout:not(.is-full-canvas) & .interface-interface-skeleton__content {
-			border-radius: $radius-block-ui * 2;
+			border-radius: $radius-block-ui * 4;
 		}
 	}
 
