@@ -10,25 +10,8 @@ import {
 	ToggleGroupControl,
 	ToggleGroupControlOption,
 } from '../toggle-group-control';
+import { T_SHIRT_ABBREVIATIONS, T_SHIRT_NAMES } from './constants';
 import type { FontSizePickerToggleGroupProps } from './types';
-
-/**
- * In case we have at most five font sizes, show a `T-shirt size` alias as a
- * label of the font size. The label assumes that the font sizes are ordered
- * accordingly - from smallest to largest.
- */
-const FONT_SIZES_ALIASES = [
-	/* translators: S stands for 'small' and is a size label. */
-	__( 'S' ),
-	/* translators: M stands for 'medium' and is a size label. */
-	__( 'M' ),
-	/* translators: L stands for 'large' and is a size label. */
-	__( 'L' ),
-	/* translators: XL stands for 'extra large' and is a size label. */
-	__( 'XL' ),
-	/* translators: XXL stands for 'extra extra large' and is a size label. */
-	__( 'XXL' ),
-];
 
 const FontSizePickerToggleGroup = ( props: FontSizePickerToggleGroupProps ) => {
 	const { fontSizes, value, __nextHasNoMarginBottom, size, onChange } = props;
@@ -46,8 +29,8 @@ const FontSizePickerToggleGroup = ( props: FontSizePickerToggleGroupProps ) => {
 				<ToggleGroupControlOption
 					key={ fontSize.slug }
 					value={ fontSize.size }
-					label={ FONT_SIZES_ALIASES[ index ] }
-					aria-label={ fontSize.name || FONT_SIZES_ALIASES[ index ] }
+					label={ T_SHIRT_ABBREVIATIONS[ index ] }
+					aria-label={ fontSize.name || T_SHIRT_NAMES[ index ] }
 					showTooltip
 				/>
 			) ) }
