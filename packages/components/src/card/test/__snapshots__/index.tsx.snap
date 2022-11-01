@@ -90,27 +90,27 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -5,18 +5,18 @@
-  >
-    <div
-      class="css-mgwsf4-View-Content e19lxcc00"
+@@ -6,18 +6,18 @@
     >
       <div
--       class="components-flex components-card__header components-card-header css-3fkkv8-View-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium e19lxcc00"
-+       class="components-flex components-card__header components-card-header css-2feznw-View-Flex-base-ItemsRow-Header-borderRadius-borderColor-large e19lxcc00"
-        data-wp-c16t="true"
-        data-wp-component="CardHeader"
+        class="css-mgwsf4-View-Content e19lxcc00"
       >
-        Header
-      </div>
-      <div
--       class="components-card__body components-card-body css-1nwhnu3-View-Body-borderRadius-medium e19lxcc00"
-+       class="components-card__body components-card-body css-1nonx1n-View-Body-borderRadius-large e19lxcc00"
-        data-wp-c16t="true"
-        data-wp-component="CardBody"
-      >
-        Code is Poetry
-      </div>
+        <div
+-         class="components-flex components-card__header components-card-header css-3fkkv8-View-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium e19lxcc00"
++         class="components-flex components-card__header components-card-header css-2feznw-View-Flex-base-ItemsRow-Header-borderRadius-borderColor-large e19lxcc00"
+          data-wp-c16t="true"
+          data-wp-component="CardHeader"
+        >
+          Header
+        </div>
+        <div
+-         class="components-card__body components-card-body css-1nwhnu3-View-Body-borderRadius-medium e19lxcc00"
++         class="components-card__body components-card-body css-1nonx1n-View-Body-borderRadius-large e19lxcc00"
+          data-wp-c16t="true"
+          data-wp-component="CardBody"
+        >
+          Code is Poetry
+        </div>
 `;
 
 exports[`Card Card component should add rounded border when the isRounded prop is true 1`] = `
@@ -768,24 +768,25 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -8,16 +8,16 @@
-    >
-      Code is Poetry
+@@ -9,17 +9,17 @@
+      >
+        Code is Poetry
+      </div>
+      <div
+        aria-hidden="true"
+-       class="components-elevation css-1lsfy80-View-Elevation-sx-Base-elevationClassName e19lxcc00"
++       class="components-elevation css-15t1t3g-View-Elevation-sx-Base-elevationClassName e19lxcc00"
+        data-wp-c16t="true"
+        data-wp-component="Elevation"
+      />
+      <div
+        aria-hidden="true"
+-       class="components-elevation css-18cl04p-View-Elevation-sx-Base-elevationClassName e19lxcc00"
++       class="components-elevation css-15t1t3g-View-Elevation-sx-Base-elevationClassName e19lxcc00"
+        data-wp-c16t="true"
+        data-wp-component="Elevation"
+      />
     </div>
-    <div
-      aria-hidden="true"
--     class="components-elevation css-1lsfy80-View-Elevation-sx-Base-elevationClassName e19lxcc00"
-+     class="components-elevation css-15t1t3g-View-Elevation-sx-Base-elevationClassName e19lxcc00"
-      data-wp-c16t="true"
-      data-wp-component="Elevation"
-    />
-    <div
-      aria-hidden="true"
--     class="components-elevation css-18cl04p-View-Elevation-sx-Base-elevationClassName e19lxcc00"
-+     class="components-elevation css-15t1t3g-View-Elevation-sx-Base-elevationClassName e19lxcc00"
-      data-wp-c16t="true"
-      data-wp-component="Elevation"
-    />
   </div>
 `;
 
