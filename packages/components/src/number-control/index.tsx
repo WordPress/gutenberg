@@ -7,9 +7,10 @@ import type { ForwardedRef, KeyboardEvent, MouseEvent } from 'react';
 /**
  * WordPress dependencies
  */
-import { forwardRef } from '@wordpress/element';
+import { useRef, forwardRef } from '@wordpress/element';
 import { isRTL, __ } from '@wordpress/i18n';
 import { plus as plusIcon, reset as resetIcon } from '@wordpress/icons';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -46,8 +47,11 @@ function UnforwardedNumberControl(
 		onChange = noop,
 		...props
 	}: WordPressComponentProps< NumberControlProps, 'input', false >,
-	ref: ForwardedRef< any >
+	forwardedRef: ForwardedRef< any >
 ) {
+	const inputRef = useRef< HTMLInputElement >();
+	const mergedRef = useMergeRefs( [ inputRef, forwardedRef ] );
+
 	const isStepAny = step === 'any';
 	const baseStep = isStepAny ? 1 : ensureNumber( step );
 	const baseValue = roundClamp( 0, min, max, baseStep );
@@ -181,6 +185,18 @@ function UnforwardedNumberControl(
 			return nextState;
 		};
 
+	const buildSpinButtonClickHandler =
+		( direction: 'up' | 'down' ) =>
+		( event: MouseEvent< HTMLButtonElement > ) =>
+			onChange( String( spinValue( valueProp, direction, event ) ), {
+				// Set event.target to the <input> so that consumers can use
+				// e.g. event.target.validity.
+				event: {
+					...event,
+					target: inputRef.current!,
+				},
+			} );
+
 	return (
 		<Input
 			autoComplete={ autoComplete }
@@ -193,7 +209,7 @@ function UnforwardedNumberControl(
 			label={ label }
 			max={ max }
 			min={ min }
-			ref={ ref }
+			ref={ mergedRef }
 			required={ required }
 			step={ step }
 			type={ typeProp }
@@ -216,20 +232,9 @@ function UnforwardedNumberControl(
 									aria-hidden="true"
 									aria-label={ __( 'Increment' ) }
 									tabIndex={ -1 }
-									onClick={ (
-										event: MouseEvent< HTMLButtonElement >
-									) => {
-										onChange(
-											String(
-												spinValue(
-													valueProp,
-													'up',
-													event
-												)
-											),
-											{ event }
-										);
-									} }
+									onClick={ buildSpinButtonClickHandler(
+										'up'
+									) }
 								/>
 								<SpinButton
 									icon={ resetIcon }
@@ -237,20 +242,9 @@ function UnforwardedNumberControl(
 									aria-hidden="true"
 									aria-label={ __( 'Decrement' ) }
 									tabIndex={ -1 }
-									onClick={ (
-										event: MouseEvent< HTMLButtonElement >
-									) => {
-										onChange(
-											String(
-												spinValue(
-													valueProp,
-													'down',
-													event
-												)
-											),
-											{ event }
-										);
-									} }
+									onClick={ buildSpinButtonClickHandler(
+										'down'
+									) }
 								/>
 							</HStack>
 						</Spacer>
