@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -38,7 +38,7 @@ describe( 'useMergeRefs', () => {
 
 	function MergedRefs( {
 		count,
-		tagName: TagName = 'div',
+		tagName: TagName = 'ul',
 		disable1,
 		disable2,
 		unused,
@@ -77,9 +77,9 @@ describe( 'useMergeRefs', () => {
 	} );
 
 	it( 'should work', () => {
-		const { container, rerender, unmount } = render( <MergedRefs /> );
+		const { rerender, unmount } = render( <MergedRefs /> );
 
-		const originalElement = container.firstElementChild;
+		const originalElement = screen.getByRole( 'list' );
 
 		// Render 1: both initial callback functions should be called with node.
 		expect( renderCallback.history ).toEqual( [
@@ -108,13 +108,13 @@ describe( 'useMergeRefs', () => {
 	} );
 
 	it( 'should work for node change', () => {
-		const { container, rerender, unmount } = render( <MergedRefs /> );
+		const { rerender, unmount } = render( <MergedRefs /> );
 
-		const originalElement = container.firstElementChild;
+		const originalElement = screen.getByRole( 'list' );
 
 		rerender( <MergedRefs tagName="button" /> );
 
-		const newElement = container.firstElementChild;
+		const newElement = screen.getByRole( 'button' );
 
 		// After a render with the original element and a second render with the
 		// new element, expect the initial callback functions to be called with
@@ -142,11 +142,9 @@ describe( 'useMergeRefs', () => {
 	} );
 
 	it( 'should work with dependencies', () => {
-		const { container, rerender, unmount } = render(
-			<MergedRefs count={ 1 } />
-		);
+		const { rerender, unmount } = render( <MergedRefs count={ 1 } /> );
 
-		const originalElement = container.firstElementChild;
+		const originalElement = screen.getByRole( 'list' );
 
 		expect( renderCallback.history ).toEqual( [
 			[ [ originalElement ], [ originalElement ] ],
@@ -176,11 +174,9 @@ describe( 'useMergeRefs', () => {
 	} );
 
 	it( 'should simultaneously update node and dependencies', () => {
-		const { container, rerender, unmount } = render(
-			<MergedRefs count={ 1 } />
-		);
+		const { rerender, unmount } = render( <MergedRefs count={ 1 } /> );
 
-		const originalElement = container.firstElementChild;
+		const originalElement = screen.getByRole( 'list' );
 
 		expect( renderCallback.history ).toEqual( [
 			[ [ originalElement ], [ originalElement ] ],
@@ -188,7 +184,7 @@ describe( 'useMergeRefs', () => {
 
 		rerender( <MergedRefs count={ 2 } tagName="button" /> );
 
-		const newElement = container.firstElementChild;
+		const newElement = screen.getByRole( 'button' );
 
 		// Both the node changes and the dependencies update for the second
 		// callback, so expect the old callback function to be called with null
@@ -216,13 +212,13 @@ describe( 'useMergeRefs', () => {
 	} );
 
 	it( 'should work for dependency change after node change', () => {
-		const { container, rerender, unmount } = render( <MergedRefs /> );
+		const { rerender, unmount } = render( <MergedRefs /> );
 
-		const originalElement = container.firstElementChild;
+		const originalElement = screen.getByRole( 'list' );
 
 		rerender( <MergedRefs tagName="button" /> );
 
-		const newElement = container.firstElementChild;
+		const newElement = screen.getByRole( 'button' );
 
 		// After a render with the original element and a second render with the
 		// new element, expect the initial callback functions to be called with
@@ -266,11 +262,9 @@ describe( 'useMergeRefs', () => {
 	} );
 
 	it( 'should allow disabling a ref', () => {
-		const { container, rerender, unmount } = render(
-			<MergedRefs disable1 />
-		);
+		const { rerender, unmount } = render( <MergedRefs disable1 /> );
 
-		const originalElement = container.firstElementChild;
+		const originalElement = screen.getByRole( 'list' );
 
 		// Render 1: ref 1 should be disabled.
 		expect( renderCallback.history ).toEqual( [
@@ -315,9 +309,9 @@ describe( 'useMergeRefs', () => {
 	} );
 
 	it( 'should allow the hook being unused', () => {
-		const { container, rerender } = render( <MergedRefs unused /> );
+		const { rerender } = render( <MergedRefs unused /> );
 
-		const originalElement = container.firstElementChild;
+		const originalElement = screen.getByRole( 'list' );
 
 		// Render 1: ref 1 should updated, ref 2 should not.
 		expect( renderCallback.history ).toEqual( [
