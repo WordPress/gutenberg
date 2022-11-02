@@ -13,10 +13,10 @@ export async function transformBlockTo( this: Editor, name: string ) {
 	await this.showBlockToolbar();
 
 	if ( name.includes( '/' ) ) {
-		name = await this.page.evaluate( () => {
+		name = await this.page.evaluate( ( _name ) => {
 			// @ts-ignore (Reason: wp isn't typed).
-			return window.wp.blocks.getBlockType( name ).title;
-		} );
+			return window.wp.blocks.getBlockType( _name ).title;
+		}, name );
 	}
 
 	const switcherToggle = await this.page.waitForSelector(
