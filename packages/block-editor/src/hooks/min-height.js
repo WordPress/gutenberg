@@ -110,7 +110,7 @@ export function MinHeightEdit( props ) {
 
 	return (
 		<UnitControl
-			label={ __( 'Minimum height' ) }
+			label={ __( 'Min. height' ) }
 			value={ style?.dimensions?.minHeight }
 			units={ units }
 			onChange={ onChange }

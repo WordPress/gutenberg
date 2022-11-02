@@ -114,7 +114,7 @@ export function DimensionsPanel( props ) {
 					<ToolsPanelItem
 						className="single-column"
 						hasValue={ () => hasMinHeightValue( props ) }
-						label={ __( 'Minimum height' ) }
+						label={ __( 'Min. height' ) }
 						onDeselect={ () => resetMinHeight( props ) }
 						resetAllFilter={ createResetAllFilter(
 							'minHeight',

@@ -445,12 +445,12 @@ export default function DimensionsPanel( { name } ) {
 				<ToolsPanelItem
 					className="single-column"
 					hasValue={ hasMinHeightValue }
-					label={ __( 'Minimum height' ) }
+					label={ __( 'Min. height' ) }
 					onDeselect={ resetMinHeightValue }
 					isShownByDefault={ true }
 				>
 					<UnitControl
-						label={ __( 'Minimum height' ) }
+						label={ __( 'Min. height' ) }
 						value={ minHeightValue }
 						onChange={ setMinHeightValue }
 						units={ units }
