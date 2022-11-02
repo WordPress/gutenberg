@@ -1,6 +1,6 @@
 # HelpText
 
-Renders a help text shell with a ExternalLink appended at the end.
+Renders help text with a `ExternalLink` appended at the end of the text.
 
 ## Usage
 
