@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 10.4.0 (2022-11-02)
+
 ### Bug Fix
 
 -   `InserterListItem`: Fix dragging and dropping in Firefox. ([#44631](https://github.com/WordPress/gutenberg/pull/44631))
