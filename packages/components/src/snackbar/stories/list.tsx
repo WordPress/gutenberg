@@ -27,20 +27,6 @@ const meta: ComponentMeta< typeof SnackbarList > = {
 };
 export default meta;
 
-const savePostNotice = {
-	id: 'SAVE_POST_NOTICE_ID',
-	spokenMessage: 'Post published.',
-	actions: [
-		{
-			label: 'View Post',
-			url: 'https://example.com/?p=522',
-		},
-	],
-	content: 'Post published.',
-	isDismissible: true,
-	explicitDismiss: false,
-};
-
 export const Default: ComponentStory< typeof SnackbarList > = ( {
 	children,
 	...props
@@ -52,7 +38,19 @@ Default.args = {
 	children:
 		'Use SnackbarList to communicate multiple low priority, non-interruptive messages to the user.',
 	notices: [
-		savePostNotice,
+		{
+			id: 'SAVE_POST_NOTICE_ID',
+			spokenMessage: 'Post published.',
+			actions: [
+				{
+					label: 'View Post',
+					url: 'https://example.com/?p=522',
+				},
+			],
+			content: 'Post published.',
+			isDismissible: true,
+			explicitDismiss: false,
+		},
 		{
 			id: 'SAVE_POST_NOTICE_ID',
 			spokenMessage: 'Post updated',
