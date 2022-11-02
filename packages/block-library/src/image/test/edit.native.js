@@ -72,11 +72,12 @@ describe( 'Image Block', () => {
 		const initialHtml = `
 		<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"media","className":"is-style-default"} -->
 		<figure class="wp-block-image size-large is-style-default">
-			<a href="https://cldup.com/cXyG__fTLN.jpg">
-				<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" aria-describedby="wp-image-caption-1" class="wp-image-1"/>
+			<a href="https://cldup.com/cXyG__fTLN.jpg" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37">
+				<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37" class="wp-image-1"/>
 			</a>
-		<figcaption class="wp-element-caption" id="wp-image-caption-1">Mountain</figcaption></figure>
-		<!-- /wp:image -->`;
+		<figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37">Mountain</figcaption></figure>
+		<!-- /wp:image -->
+		`;
 		const screen = await initializeEditor( { initialHtml } );
 		// We must await the image fetch via `getMedia`
 		await act( () => apiFetchPromise );
@@ -91,8 +92,8 @@ describe( 'Image Block', () => {
 		fireEvent.press( screen.getByText( 'None' ) );
 
 		const expectedHtml = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"none","className":"is-style-default"} -->
-<figure class="wp-block-image size-large is-style-default"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" aria-describedby="wp-image-caption-1" class="wp-image-1"/><figcaption class="wp-element-caption" id="wp-image-caption-1">Mountain</figcaption></figure>
-<!-- /wp:image -->`;
+		<figure class="wp-block-image size-large is-style-default"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37" class="wp-image-1"/><figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37">Mountain</figcaption></figure>
+		<!-- /wp:image -->`;
 		expect( getEditorHtml() ).toBe( expectedHtml );
 	} );
 
@@ -100,8 +101,8 @@ describe( 'Image Block', () => {
 		const initialHtml = `
 		<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"none","className":"is-style-default"} -->
 		<figure class="wp-block-image size-large is-style-default">
-			<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" aria-describedby="wp-image-caption-1" class="wp-image-1"/>
-		<figcaption class="wp-element-caption" id="wp-image-caption-1">Mountain</figcaption></figure>
+			<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37" class="wp-image-1"/>
+		<figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37">Mountain</figcaption></figure>
 		<!-- /wp:image -->`;
 		const screen = await initializeEditor( { initialHtml } );
 		// We must await the image fetch via `getMedia`
@@ -117,7 +118,7 @@ describe( 'Image Block', () => {
 		fireEvent.press( screen.getByText( 'Media File' ) );
 
 		const expectedHtml = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"media","className":"is-style-default"} -->
-<figure class="wp-block-image size-large is-style-default"><a href="https://cldup.com/cXyG__fTLN.jpg"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" aria-describedby="wp-image-caption-1" class="wp-image-1"/></a><figcaption class="wp-element-caption" id="wp-image-caption-1">Mountain</figcaption></figure>
+<figure class="wp-block-image size-large is-style-default"><a href="https://cldup.com/cXyG__fTLN.jpg"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37" class="wp-image-1"/></a><figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37">Mountain</figcaption></figure>
 <!-- /wp:image -->`;
 		expect( getEditorHtml() ).toBe( expectedHtml );
 	} );
@@ -126,8 +127,8 @@ describe( 'Image Block', () => {
 		const initialHtml = `
 		<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"none","className":"is-style-default"} -->
 		<figure class="wp-block-image size-large is-style-default">
-			<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" aria-describedby="wp-image-caption-1" class="wp-image-1"/>
-		<figcaption class="wp-element-caption" id="wp-image-caption-1">Mountain</figcaption></figure>
+			<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37" class="wp-image-1"/>
+		<figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37">Mountain</figcaption></figure>
 		<!-- /wp:image -->`;
 		const screen = await initializeEditor( { initialHtml } );
 		// We must await the image fetch via `getMedia`
@@ -153,7 +154,7 @@ describe( 'Image Block', () => {
 		);
 
 		const expectedHtml = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"custom","className":"is-style-default"} -->
-<figure class="wp-block-image size-large is-style-default"><a href="http://wordpress.org"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" aria-describedby="wp-image-caption-1" class="wp-image-1"/></a><figcaption class="wp-element-caption" id="wp-image-caption-1">Mountain</figcaption></figure>
+<figure class="wp-block-image size-large is-style-default"><a href="http://wordpress.org"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37" class="wp-image-1"/></a><figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37">Mountain</figcaption></figure>
 <!-- /wp:image -->`;
 		expect( getEditorHtml() ).toBe( expectedHtml );
 	} );
@@ -162,8 +163,8 @@ describe( 'Image Block', () => {
 		const initialHtml = `
 		<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"none","className":"is-style-default"} -->
 		<figure class="wp-block-image size-large is-style-default">
-			<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" aria-describedby="wp-image-caption-1" class="wp-image-1"/>
-		<figcaption class="wp-element-caption" id="wp-image-caption-1">Mountain</figcaption></figure>
+			<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37" class="wp-image-1"/>
+		<figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37">Mountain</figcaption></figure>
 		<!-- /wp:image -->`;
 		const screen = await initializeEditor( { initialHtml } );
 		// We must await the image fetch via `getMedia`
@@ -193,7 +194,7 @@ describe( 'Image Block', () => {
 		fireEvent.press( screen.getByText( 'Media File' ) );
 
 		const expectedHtml = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"media","className":"is-style-default"} -->
-<figure class="wp-block-image size-large is-style-default"><a href="https://cldup.com/cXyG__fTLN.jpg"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" aria-describedby="wp-image-caption-1" class="wp-image-1"/></a><figcaption class="wp-element-caption" id="wp-image-caption-1">Mountain</figcaption></figure>
+<figure class="wp-block-image size-large is-style-default"><a href="https://cldup.com/cXyG__fTLN.jpg"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37" class="wp-image-1"/></a><figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37">Mountain</figcaption></figure>
 <!-- /wp:image -->`;
 		expect( getEditorHtml() ).toBe( expectedHtml );
 	} );
@@ -203,9 +204,9 @@ describe( 'Image Block', () => {
 		<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"media","className":"is-style-default"} -->
 		<figure class="wp-block-image size-large is-style-default">
 			<a href="https://cldup.com/cXyG__fTLN.jpg">
-				<img src="https://cldup.com/cXyG__fTLN.jpg?w=683" alt="" aria-describedby="wp-image-caption-1" class="wp-image-1"/>
+				<img src="https://cldup.com/cXyG__fTLN.jpg?w=683" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37" class="wp-image-1"/>
 			</a>
-		<figcaption class="wp-element-caption" id="wp-image-caption-1">Mountain</figcaption></figure>
+		<figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37">Mountain</figcaption></figure>
 		<!-- /wp:image -->`;
 		const screen = await initializeEditor( { initialHtml } );
 		// We must await the image fetch via `getMedia`
@@ -227,9 +228,9 @@ describe( 'Image Block', () => {
 		<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"custom","className":"is-style-default"} -->
 		<figure class="wp-block-image size-large is-style-default">
 			<a href="https://wordpress.org">
-				<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" aria-describedby="wp-image-caption-1" class="wp-image-1"/>
+				<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37" class="wp-image-1"/>
 			</a>
-		<figcaption class="wp-element-caption" id="wp-image-caption-1">Mountain</figcaption></figure>
+		<figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37">Mountain</figcaption></figure>
 		<!-- /wp:image -->`;
 		const screen = await initializeEditor( { initialHtml } );
 		// We must await the image fetch via `getMedia`
@@ -247,7 +248,7 @@ describe( 'Image Block', () => {
 		fireEvent.press( linkTargetButton );
 
 		const expectedHtml = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"custom","className":"is-style-default"} -->
-<figure class="wp-block-image size-large is-style-default"><a href="https://wordpress.org" target="_blank" rel="noreferrer noopener"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" aria-describedby="wp-image-caption-1" class="wp-image-1"/></a><figcaption class="wp-element-caption" id="wp-image-caption-1">Mountain</figcaption></figure>
+<figure class="wp-block-image size-large is-style-default"><a href="https://wordpress.org" target="_blank" rel="noreferrer noopener"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37" class="wp-image-1"/></a><figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37">Mountain</figcaption></figure>
 <!-- /wp:image -->`;
 		expect( getEditorHtml() ).toBe( expectedHtml );
 	} );
@@ -257,9 +258,9 @@ describe( 'Image Block', () => {
 		<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"custom","className":"is-style-default"} -->
 		<figure class="wp-block-image size-large is-style-default">
 			<a href="https://wordpress.org" target="_blank" rel="noreferrer noopener">
-				<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" aria-describedby="wp-image-caption-1" class="wp-image-1"/>
+				<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37" class="wp-image-1"/>
 			</a>
-			<figcaption class="wp-element-caption" id="wp-image-caption-1">Mountain</figcaption>
+			<figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37">Mountain</figcaption>
 		</figure>
 		<!-- /wp:image -->`;
 		const screen = await initializeEditor( { initialHtml } );
@@ -278,7 +279,7 @@ describe( 'Image Block', () => {
 		fireEvent.press( linkTargetButton );
 
 		const expectedHtml = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"custom","className":"is-style-default"} -->
-<figure class="wp-block-image size-large is-style-default"><a href="https://wordpress.org"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" aria-describedby="wp-image-caption-1" class="wp-image-1"/></a><figcaption class="wp-element-caption" id="wp-image-caption-1">Mountain</figcaption></figure>
+<figure class="wp-block-image size-large is-style-default"><a href="https://wordpress.org"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37" class="wp-image-1"/></a><figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37">Mountain</figcaption></figure>
 <!-- /wp:image -->`;
 		expect( getEditorHtml() ).toBe( expectedHtml );
 	} );
