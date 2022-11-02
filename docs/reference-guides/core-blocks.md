@@ -753,7 +753,7 @@ Display an icon linking to a social media profile or site. ([Source](https://git
 -	**Name:** core/social-link
 -	**Category:** widgets
 -	**Supports:** ~~html~~, ~~reusable~~
--	**Attributes:** label, service, url
+-	**Attributes:** label, rel, service, url
 
 ## Social Icons
 
