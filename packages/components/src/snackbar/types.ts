@@ -12,11 +12,19 @@ export type ButtonEvent =
 	| KeyboardEvent< HTMLButtonElement >
 	| MouseEvent< HTMLButtonElement >;
 
-export type Action = {
+export type NoticeActionWithURL = {
 	label: string;
 	url: string;
 	onClick?: ( event: ButtonEvent ) => void;
 };
+
+type NoticeActionWithOnClick = {
+	label: string;
+	url?: string;
+	onClick: ( event: ButtonEvent ) => void;
+};
+
+export type Action = NoticeActionWithURL | NoticeActionWithOnClick;
 
 export type Notice = {
 	id: string;
