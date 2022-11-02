@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	InnerBlocks,
 	useBlockProps,
@@ -12,6 +12,7 @@ import {
 } from '@wordpress/block-editor';
 import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useState, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -89,14 +90,6 @@ function GroupEdit( {
 	);
 
 	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
-	/*
-		Whether to show the variations placeholder.
-		`isDefault: true` only exists in the default layout attributes
-		in order to identify blocks that have been inserted, programmatically or otherwise, with no changes.
-		When a user selects a layout `isDefault` won't appear in the block's attributes.
-	 */
-	const { isDefault = false } = layout;
-	const showPlaceholder = isDefault && ! hasInnerBlocks;
 
 	// Layout settings.
 	const defaultLayout = useSetting( 'layout' ) || {};
@@ -105,6 +98,9 @@ function GroupEdit( {
 		: { ...defaultLayout, ...layout };
 	const { type = 'default' } = usedLayout;
 	const layoutSupportEnabled = themeSupportsLayout || type === 'flex';
+	const [ showPlaceholder, setShowPlaceholder ] = useState(
+		! hasInnerBlocks
+	);
 
 	// Hooks.
 	const blockProps = useBlockProps( {
@@ -125,6 +121,17 @@ function GroupEdit( {
 		}
 	);
 
+	const { selectBlock } = useDispatch( blockEditorStore );
+	const updateSelection = useCallback(
+		( newClientId ) => selectBlock( newClientId, -1 ),
+		[ selectBlock ]
+	);
+	const selectVariation = ( nextVariation ) => {
+		setAttributes( nextVariation.attributes );
+		updateSelection( clientId );
+		setShowPlaceholder( false );
+	};
+
 	return (
 		<>
 			<GroupEditControls
@@ -137,7 +144,7 @@ function GroupEdit( {
 				<GroupPlaceHolder
 					clientId={ clientId }
 					name={ name }
-					setAttributes={ setAttributes }
+					onSelect={ selectVariation }
 				/>
 			) }
 			{ layoutSupportEnabled && ! showPlaceholder && (

@@ -1,12 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
-import {
-	useBlockProps,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import { useBlockProps } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { store as blocksStore } from '@wordpress/blocks';
 import { Path, SVG, Button, Placeholder } from '@wordpress/components';
@@ -59,14 +55,13 @@ const getGroupPlaceholderIcons = ( name = 'group' ) => {
 /**
  * Display group variations if none is selected.
  *
- * @param {Object}   props               Component props.
- * @param {string}   props.clientId      The block's clientId.
- * @param {string}   props.name          The block's name.
- * @param {Function} props.setAttributes Function to set block's attributes.
+ * @param {Object}   props          Component props.
+ * @param {string}   props.name     The block's name.
+ * @param {Function} props.onSelect Function to set block's attributes.
  *
  * @return {JSX.Element}                The placeholder.
  */
-function GroupPlaceHolder( { clientId, name, setAttributes } ) {
+function GroupPlaceHolder( { name, onSelect } ) {
 	const { defaultVariation, variations } = useSelect(
 		( select ) => {
 			const { getBlockVariations, getDefaultBlockVariation } =
@@ -81,26 +76,8 @@ function GroupPlaceHolder( { clientId, name, setAttributes } ) {
 	const blockProps = useBlockProps( {
 		className: 'wp-block-group__placeholder',
 	} );
-	const { selectBlock } = useDispatch( blockEditorStore );
-	// Ensure that the inserted block is selected after a Group variation is selected.
-	const updateSelection = useCallback(
-		( newClientId ) => selectBlock( newClientId, -1 ),
-		[ selectBlock ]
-	);
-	const selectVariation = ( nextVariation = defaultVariation ) => {
-		/*
-		 * Remove layout.isDefault if present.
-		 * `isDefault` exists to identify blocks that have been inserted, programmatically or otherwise, with no changes.
-		 * When a user selects a layout `isDefault` should not appear in the block's attributes.
-		 */
-		const { isDefault, ...rest } = nextVariation.attributes?.layout;
-		const newAttributes = {
-			...nextVariation.attributes,
-			layout: rest,
-		};
-		setAttributes( newAttributes );
-		updateSelection( clientId );
-	};
+	const selectVariation = ( nextVariation = defaultVariation ) =>
+		onSelect( nextVariation.attributes );
 
 	return (
 		<div { ...blockProps }>
