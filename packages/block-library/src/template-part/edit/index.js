@@ -26,6 +26,7 @@ import { useState, createInterpolateElement } from '@wordpress/element';
  */
 import TemplatePartPlaceholder from './placeholder';
 import TemplatePartSelectionModal from './selection-modal';
+import { TemplateParetImportControls } from './import-controls';
 import { TemplatePartAdvancedControls } from './advanced-controls';
 import TemplatePartInnerBlocks from './inner-blocks';
 import { createTemplatePartId } from './utils/create-template-part-id';
@@ -135,6 +136,10 @@ export default function TemplatePartEdit( {
 	return (
 		<>
 			<RecursionProvider uniqueId={ templatePartId }>
+				<TemplateParetImportControls
+					area={ area }
+					setAttributes={ setAttributes }
+				/>
 				<TemplatePartAdvancedControls
 					tagName={ tagName }
 					setAttributes={ setAttributes }
