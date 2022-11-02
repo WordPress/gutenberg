@@ -464,13 +464,25 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		}
 	}
 
+	$content_with_outer_classnames = '';
+
+	if ( ! empty( $outer_class_names ) ) {
+		$content_with_outer_classnames = new WP_HTML_Tag_Processor( $block_content );
+		$content_with_outer_classnames->next_tag();
+		foreach ( $outer_class_names as $outer_class_name ) {
+			$content_with_outer_classnames->add_class( $outer_class_name );
+		}
+
+		$content_with_outer_classnames = (string) $content_with_outer_classnames;
+	}
+
 	/**
 	* The first chunk of innerContent contains the block markup up until the inner blocks start.
 	* We want to target the opening tag of the inner blocks wrapper, which is the last tag in that chunk.
 	*/
 	$inner_content_classnames = isset( $block['innerContent'][0] ) && 'string' === gettype( $block['innerContent'][0] ) ? gutenberg_get_classnames_from_last_tag( $block['innerContent'][0] ) : '';
 
-	$content = new WP_HTML_Tag_Processor( $block_content );
+	$content = $content_with_outer_classnames ? new WP_HTML_Tag_Processor( $content_with_outer_classnames ) : new WP_HTML_Tag_Processor( $block_content );
 
 	if ( $inner_content_classnames ) {
 		$content->next_tag( array( 'class_name' => $inner_content_classnames ) );
@@ -478,10 +490,9 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			$content->add_class( $class_name );
 		}
 	} else {
-		$combined_class_names = array_merge( $class_names, $outer_class_names );
 		$content->next_tag();
-		foreach ( $combined_class_names as $combined_class_name ) {
-			$content->add_class( $combined_class_name );
+		foreach ( $class_names as $class_name ) {
+			$content->add_class( $class_name );
 		}
 	}
 
