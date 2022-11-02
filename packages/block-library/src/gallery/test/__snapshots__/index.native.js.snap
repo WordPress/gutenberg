@@ -121,7 +121,7 @@ exports[`Gallery block sets caption to gallery 1`] = `
 exports[`Gallery block sets caption to gallery items 1`] = `
 "<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
 <figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":2000} -->
-<figure class=\\"wp-block-image\\"><img src=\\"https://test-site.files.wordpress.com/local-image-1.jpeg\\" alt=\\"\\" aria-describedby=\\"wp-image-caption-2000\\" class=\\"wp-image-2000\\"/><figcaption class=\\"wp-element-caption\\" id=\\"wp-image-caption-2000\\"><strong>Bold</strong> <em>italic</em> <s>strikethrough</s> image caption</figcaption></figure>
+<figure class=\\"wp-block-image\\"><img src=\\"https://test-site.files.wordpress.com/local-image-1.jpeg\\" alt=\\"\\" aria-describedby=\\"wp-image-caption-383k3k3g3j1q1f1f3k353j3k1d3j393k351e36393c353j1e3n3f3i343g3i353j3j1e333f3d1f3c3f33313c1d393d3137351d1h1e3a3g3537\\" class=\\"wp-image-2000\\"/><figcaption class=\\"wp-element-caption\\" id=\\"wp-image-caption-383k3k3g3j1q1f1f3k353j3k1d3j393k351e36393c353j1e3n3f3i343g3i353j3j1e333f3d1f3c3f33313c1d393d3137351d1h1e3a3g3537\\"><strong>Bold</strong> <em>italic</em> <s>strikethrough</s> image caption</figcaption></figure>
 <!-- /wp:image --></figure>
 <!-- /wp:gallery -->"
 `;
