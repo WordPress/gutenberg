@@ -60,11 +60,7 @@ function UnforwardedSnackbar(
 ) {
 	onDismiss = onDismiss || noop;
 
-	function dismissMe(
-		event:
-			| KeyboardEvent< HTMLDivElement | HTMLSpanElement >
-			| MouseEvent< HTMLDivElement | HTMLSpanElement >
-	) {
+	function dismissMe( event: KeyboardEvent | MouseEvent ) {
 		if ( event && event.preventDefault ) {
 			event.preventDefault();
 		}
