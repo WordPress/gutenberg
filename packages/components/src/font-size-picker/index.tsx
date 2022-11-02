@@ -70,7 +70,7 @@ const UnforwardedFontSizePicker = (
 	const selectedFontSize = fontSizes.find(
 		( fontSize ) => fontSize.size === value
 	);
-	const isCustomValue = value !== undefined && ! selectedFontSize;
+	const isCustomValue = !! value && ! selectedFontSize;
 
 	const [ showCustomValueControl, setShowCustomValueControl ] = useState(
 		! disableCustomFontSizes && isCustomValue
