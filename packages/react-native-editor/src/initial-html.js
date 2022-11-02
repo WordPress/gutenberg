@@ -60,7 +60,7 @@ else:
 <!-- /wp:image -->
 
 <!-- wp:image -->
-<figure class="wp-block-image"><img src="https://cldup.com/cXyG__fTLN.jpg" alt=""/><figcaption class="wp-element-caption">Mountain</figcaption></figure>
+<figure class="wp-block-image"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37"/><figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37" /><figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37">Mountain</figcaption></figure>
 <!-- /wp:image -->
 
 <!-- wp:video {"id":683} -->
@@ -81,67 +81,67 @@ else:
 
 <!-- wp:gallery {"columns":8,"linkTo":"none","className":"alignfull"} -->
 <figure class="wp-block-gallery has-nested-images columns-8 is-cropped alignfull"><!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon.png" alt=""/><figcaption class="wp-element-caption">Paragraph</figcaption></figure>
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon.png" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1e3g3e37"/><figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1e3g3e37">Paragraph</figcaption></figure>
 <!-- /wp:image -->
 
 <!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Heading.png" alt=""/><figcaption class="wp-element-caption">Heading</figcaption></figure>
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Heading.png" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1d28353134393e371e3g3e37"/><figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1d28353134393e371e3g3e37">Heading</figcaption></figure>
 <!-- /wp:image -->
 
 <!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Subheading.png" alt=""/><figcaption class="wp-element-caption">Subheading</figcaption></figure>
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Subheading.png" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1d2j3l3238353134393e371e3g3e37"/><figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1d2j3l3238353134393e371e3g3e37">Subheading</figcaption></figure>
 <!-- /wp:image -->
 
 <!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Quote.png" alt=""/><figcaption class="wp-element-caption">Quote</figcaption></figure>
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Quote.png" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1d2h3l3f3k351e3g3e37"/><figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1d2h3l3f3k351e3g3e37">Quote</figcaption></figure>
 <!-- /wp:image -->
 
 <!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Image.png" alt=""/><figcaption class="wp-element-caption">Image</figcaption></figure>
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Image.png" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1d293d3137351e3g3e37"/><figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1d293d3137351e3g3e37">Image</figcaption></figure>
 <!-- /wp:image -->
 
 <!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Gallery.png" alt=""/><figcaption class="wp-element-caption">Gallery</figcaption></figure>
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Gallery.png" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1d27313c3c353i3p1e3g3e37"/><figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1d27313c3c353i3p1e3g3e37">Gallery</figcaption></figure>
 <!-- /wp:image -->
 
 <!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Cover-Image.png" alt=""/><figcaption class="wp-element-caption">Cover Image</figcaption></figure>
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Cover-Image.png" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1d233f3m353i1d293d3137351e3g3e37"/><figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1d233f3m353i1d293d3137351e3g3e37">Cover Image</figcaption></figure>
 <!-- /wp:image -->
 
 <!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Video.png" alt=""/><figcaption class="wp-element-caption">Video</figcaption></figure>
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Video.png" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1d2m3934353f1e3g3e37"/><figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1d2m3934353f1e3g3e37">Video</figcaption></figure>
 <!-- /wp:image -->
 
 <!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Audio.png" alt=""/><figcaption class="wp-element-caption">Audio</figcaption></figure>
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Audio.png" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1d213l34393f1e3g3e37"/><figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1d213l34393f1e3g3e37">Audio</figcaption></figure>
 <!-- /wp:image -->
 
 <!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Column.png" alt=""/><figcaption class="wp-element-caption">Columns</figcaption></figure>
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Column.png" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1d233f3c3l3d3e1e3g3e37"/><figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1d233f3c3l3d3e1e3g3e37">Columns</figcaption></figure>
 <!-- /wp:image -->
 
 <!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-File.png" alt=""/><figcaption class="wp-element-caption">File</figcaption></figure>
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-File.png" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1d26393c351e3g3e37"/><figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1d26393c351e3g3e37">File</figcaption></figure>
 <!-- /wp:image -->
 
 <!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Code.png" alt=""/><figcaption class="wp-element-caption">Code</figcaption></figure>
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Code.png" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1d233f34351e3g3e37"/><figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1d233f34351e3g3e37">Code</figcaption></figure>
 <!-- /wp:image -->
 
 <!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-List.png" alt=""/><figcaption class="wp-element-caption">List</figcaption></figure>
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-List.png" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1d2c393j3k1e3g3e37"/><figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1d2c393j3k1e3g3e37">List</figcaption></figure>
 <!-- /wp:image -->
 
 <!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Button.png" alt=""/><figcaption class="wp-element-caption">Button</figcaption></figure>
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Button.png" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1d223l3k3k3f3e1e3g3e37"/><figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1d223l3k3k3f3e1e3g3e37">Button</figcaption></figure>
 <!-- /wp:image -->
 
 <!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Embeds.png" alt=""/><figcaption class="wp-element-caption">Embeds</figcaption></figure>
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Embeds.png" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1d253d3235343j1e3g3e37"/><figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1d253d3235343j1e3g3e37">Embeds</figcaption></figure>
 <!-- /wp:image -->
 
 <!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-More.png" alt=""/><figcaption class="wp-element-caption">More</figcaption></figure>
+<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-More.png" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1d2d3f3i351e3g3e37"/><figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f3n3f3i343g3i353j3j1e3f3i371f373l3k353e32353i371f36393c353j1f1i1g1h1o1f1g1n1f223c3f333b1d29333f3e1d2d3f3i351e3g3e37">More</figcaption></figure>
 <!-- /wp:image --></figure>
 <!-- /wp:gallery -->
 
