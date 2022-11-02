@@ -25,7 +25,7 @@ An optional URL to link, opens in a new window when tapped or clicked.
 
 ### `moreLinkText` 
 
-An optional Text as the click abel text at the end.
+An optional text string to display as the link label for the optional `url` prop. 
 
 -   Type: `String`
 -   Required: No
