@@ -270,7 +270,7 @@ const BlockInspectorSingleBlock = ( {
 				} }
 			/>
 			<BlockVariationTransforms blockClientId={ clientId } />
-			<InspectorControls.Slot __experimentalGroup="blockInformation" />
+			<InspectorControls.Slot __experimentalGroup="info" />
 			{ showTabs && (
 				<InspectorControlsTabs
 					hasBlockStyles={ hasBlockStyles }
