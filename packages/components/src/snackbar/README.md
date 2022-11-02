@@ -64,7 +64,6 @@ An array of action objects. Each member object should contain a `label` and eith
 #### `onRemove`: `Function`
 Function called when dismissing the notice.
 -   Required: No
--   Default: `() => void`
 
 #### `icon`: `ReactNode`
 The icon to render in the snackbar.
@@ -79,7 +78,6 @@ Whether to require user action to dismiss the snackbar. By default, this is dism
 #### `onDismiss`: `Function`
 A callback executed when the snackbar is dismissed. It is distinct from onRemove, which _looks_ like a callback but is actually the function to call to remove the snackbar from the UI.
 -   Required: No
--   Default: `() => void`
 
 #### `listRef`: `MutableRefObject< HTMLDivElement >`
 A ref to the list that contains the snackbar.

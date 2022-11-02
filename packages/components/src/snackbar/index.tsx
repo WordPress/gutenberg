@@ -19,7 +19,6 @@ import Button from '../button';
 import type { Action, ButtonEvent, SnackbarProps } from './types';
 import type { WordPressComponentProps } from '../ui/context';
 
-const noop = () => {};
 const NOTICE_TIMEOUT = 10000;
 
 /**
@@ -47,19 +46,17 @@ function UnforwardedSnackbar(
 		spokenMessage = children,
 		politeness = 'polite',
 		actions = [],
-		onRemove = noop,
+		onRemove,
 		icon = null,
 		explicitDismiss = false,
 		// onDismiss is a callback executed when the snackbar is dismissed.
 		// It is distinct from onRemove, which _looks_ like a callback but is
 		// actually the function to call to remove the snackbar from the UI.
-		onDismiss = noop,
+		onDismiss,
 		listRef,
 	}: WordPressComponentProps< SnackbarProps, 'div' >,
 	ref: ForwardedRef< any >
 ) {
-	onDismiss = onDismiss || noop;
-
 	function dismissMe( event: KeyboardEvent | MouseEvent ) {
 		if ( event && event.preventDefault ) {
 			event.preventDefault();
@@ -68,14 +65,14 @@ function UnforwardedSnackbar(
 		// Prevent focus loss by moving it to the list element.
 		listRef?.current?.focus();
 
-		onDismiss();
-		onRemove();
+		onDismiss?.();
+		onRemove?.();
 	}
 
 	function onActionClick( event: ButtonEvent, onClick: Action[ 'onClick' ] ) {
 		event.stopPropagation();
 
-		onRemove();
+		onRemove?.();
 
 		if ( onClick ) {
 			onClick( event );
@@ -88,8 +85,8 @@ function UnforwardedSnackbar(
 	useEffect( () => {
 		const timeoutHandle = setTimeout( () => {
 			if ( ! explicitDismiss ) {
-				onDismiss();
-				onRemove();
+				onDismiss?.();
+				onRemove?.();
 			}
 		}, NOTICE_TIMEOUT );
 
@@ -119,10 +116,10 @@ function UnforwardedSnackbar(
 		<div
 			ref={ ref }
 			className={ classes }
-			onClick={ ! explicitDismiss ? dismissMe : noop }
+			onClick={ ! explicitDismiss ? dismissMe : undefined }
 			tabIndex={ 0 }
 			role={ ! explicitDismiss ? 'button' : '' }
-			onKeyPress={ ! explicitDismiss ? dismissMe : noop }
+			onKeyPress={ ! explicitDismiss ? dismissMe : undefined }
 			aria-label={ ! explicitDismiss ? __( 'Dismiss this notice' ) : '' }
 		>
 			<div className={ snackbarContentClassnames }>

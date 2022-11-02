@@ -57,8 +57,6 @@ export type SnackbarProps = {
 	actions?: Notice[ 'actions' ];
 	/**
 	 * Called to remove the snackbar from the UI.
-	 *
-	 * @default () => void
 	 */
 	onRemove?: Function;
 	/**
@@ -80,8 +78,6 @@ export type SnackbarProps = {
 	 *
 	 * It is distinct from onRemove, which _looks_ like a callback but is
 	 * actually the function to call to remove the snackbar from the UI.
-	 *
-	 * @default () => void
 	 */
 	onDismiss?: Notice[ 'onDismiss' ];
 	/**
@@ -101,8 +97,6 @@ export type SnackbarListProps = {
 	children?: ReactNode;
 	/**
 	 * Function called when a notice should be removed / dismissed.
-	 *
-	 * @default () => void
 	 */
 	onRemove?: Function;
 };

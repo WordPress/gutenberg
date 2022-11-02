@@ -20,7 +20,6 @@ import {
 import type { Notice, SnackbarListProps } from './types';
 import type { WordPressComponentProps } from '../ui/context';
 
-const noop = () => {};
 const SNACKBAR_VARIANTS = {
 	init: {
 		height: 0,
@@ -63,12 +62,12 @@ export function SnackbarList( {
 	notices,
 	className,
 	children,
-	onRemove = noop,
+	onRemove,
 }: WordPressComponentProps< SnackbarListProps, 'div' > ) {
 	const listRef = useRef< HTMLDivElement | null >( null );
 	const isReducedMotion = useReducedMotion();
 	className = classnames( 'components-snackbar-list', className );
-	const removeNotice = ( notice: Notice ) => () => onRemove( notice.id );
+	const removeNotice = ( notice: Notice ) => () => onRemove?.( notice.id );
 	return (
 		<div className={ className } tabIndex={ -1 } ref={ listRef }>
 			{ children }
