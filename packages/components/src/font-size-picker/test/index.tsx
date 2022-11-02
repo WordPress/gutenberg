@@ -127,6 +127,26 @@ describe( 'FontSizePicker', () => {
 		} );
 
 		test.each( [
+			{ value: undefined, option: 'Default' },
+			{ value: '', option: 'Default' },
+			{ value: '8px', option: 'Tiny' },
+		] )(
+			'defaults to $option when value is $value',
+			( { value, option } ) => {
+				render(
+					<FontSizePicker
+						__nextHasNoMarginBottom
+						fontSizes={ fontSizes }
+						value={ value }
+					/>
+				);
+				expect(
+					screen.getByRole( 'button', { name: 'Font size' } )
+				).toHaveTextContent( option );
+			}
+		);
+
+		test.each( [
 			{ value: undefined, expectedLabel: 'Size' },
 			{ value: '8px', expectedLabel: 'Size (8px)' },
 			{ value: '1em', expectedLabel: 'Size (1em)' },
@@ -204,8 +224,7 @@ describe( 'FontSizePicker', () => {
 				screen.getByRole( 'option', { name: 'Custom' } )
 			);
 			expect( screen.getByLabelText( 'Custom' ) ).toBeInTheDocument();
-			// TODO: onChange() shouldn't be called.
-			//expect( onChange ).not.toHaveBeenCalled();
+			expect( onChange ).not.toHaveBeenCalled();
 		} );
 
 		commonTests( fontSizes );
@@ -298,6 +317,7 @@ describe( 'FontSizePicker', () => {
 			expect( onChange ).toHaveBeenCalledWith( '16px' );
 		} );
 
+		commonToggleGroupTests( fontSizes );
 		commonTests( fontSizes );
 	} );
 
@@ -399,10 +419,54 @@ describe( 'FontSizePicker', () => {
 			}
 		);
 
+		commonToggleGroupTests( fontSizes );
 		commonTests( fontSizes );
 	} );
 
+	function commonToggleGroupTests( fontSizes: FontSize[] ) {
+		it( 'defaults to M when value is 16px', () => {
+			render(
+				<FontSizePicker
+					__nextHasNoMarginBottom
+					fontSizes={ fontSizes }
+					value={ fontSizes[ 0 ].size }
+				/>
+			);
+			expect(
+				screen.getByRole( 'radio', { checked: true } )
+			).toHaveTextContent( 'S' );
+		} );
+
+		test.each( [ undefined, '' ] )(
+			'has no selection when value is %p',
+			( value ) => {
+				render(
+					<FontSizePicker
+						__nextHasNoMarginBottom
+						fontSizes={ fontSizes }
+						value={ value }
+					/>
+				);
+				expect( screen.getByRole( 'radiogroup' ) ).toBeInTheDocument();
+				expect(
+					screen.queryByRole( 'radio', { checked: true } )
+				).not.toBeInTheDocument();
+			}
+		);
+	}
+
 	function commonTests( fontSizes: FontSize[] ) {
+		it( 'shows custom input when value is unknown', () => {
+			render(
+				<FontSizePicker
+					__nextHasNoMarginBottom
+					fontSizes={ fontSizes }
+					value="3px"
+				/>
+			);
+			expect( screen.getByLabelText( 'Custom' ) ).toBeInTheDocument();
+		} );
+
 		it( 'allows custom values by default', async () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
