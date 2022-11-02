@@ -494,7 +494,10 @@ describe( 'FontSizePicker', () => {
 			{ radio: 'Large', expectedArguments: [ '2em', fontSizes[ 2 ] ] },
 			{
 				radio: 'Extra Large',
-				expectedValue: 'clamp(1.75rem, 3vw, 2.25rem)',
+				expectedArguments: [
+					'clamp(1.75rem, 3vw, 2.25rem)',
+					fontSizes[ 3 ],
+				],
 			},
 		] )(
 			'calls onChange( $expectedArguments ) when $radio is selected',
