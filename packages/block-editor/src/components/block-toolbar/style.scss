@@ -44,9 +44,9 @@
 	}
 
 	&.is-template-part .components-toolbar-button.block-editor-block-switcher__no-switcher-icon {
-		color: var(--wp-block-template-color);
+		color: var(--wp-block-template-part-color);
 		&:disabled .block-editor-block-icon.has-colors {
-			color: var(--wp-block-template-color);
+			color: var(--wp-block-template-part-color);
 		}
 	}
 

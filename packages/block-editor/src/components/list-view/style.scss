@@ -20,13 +20,13 @@
 		background: var(--wp-admin-theme-color);
 	}
 	&.is-selected.is-template-part td {
-		background: var(--wp-block-template-color);
+		background: var(--wp-block-template-part-color);
 	}
 	&.is-selected.is-reusable td {
 		background: var(--wp-block-reusable-color);
 	}
 	&.is-template-part .block-editor-list-view-block-contents {
-		color: var(--wp-block-template-color);
+		color: var(--wp-block-template-part-color);
 	}
 	&.is-reusable .block-editor-list-view-block-contents {
 		color: var(--wp-block-reusable-color);
@@ -157,7 +157,7 @@
 
 	&.is-template-part .block-editor-list-view-block-contents:focus {
 		&::after {
-			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-template-color);
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-template-part-color);
 		}
 	}
 
