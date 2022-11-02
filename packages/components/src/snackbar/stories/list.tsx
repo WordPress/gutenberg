@@ -41,15 +41,13 @@ const savePostNotice = {
 	explicitDismiss: false,
 };
 
-const DefaultTemplate: ComponentStory< typeof SnackbarList > = ( {
+export const Default: ComponentStory< typeof SnackbarList > = ( {
 	children,
 	...props
 } ) => {
 	return <SnackbarList { ...props }>{ children }</SnackbarList>;
 };
 
-export const Default: ComponentStory< typeof SnackbarList > =
-	DefaultTemplate.bind( {} );
 Default.args = {
 	children:
 		'Use SnackbarList to communicate multiple low priority, non-interruptive messages to the user.',
