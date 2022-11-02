@@ -27,6 +27,8 @@ const HelpText = ( { moreLinkText, children, url, separatorType } ) => {
 		styles[ 'help-text__separator--dark' ]
 	);
 
+	const hasMoreLink = url && moreLinkText;
+
 	return (
 		<>
 			{ separatorType === 'topFullWidth' && (
@@ -46,8 +48,8 @@ const HelpText = ( { moreLinkText, children, url, separatorType } ) => {
 					style={ styles[ 'help-text__text' ] }
 				>
 					{ children }
-					{ children && url && ' ' }
-					{ url && (
+					{ children && hasMoreLink && ' ' }
+					{ hasMoreLink && (
 						<ExternalLink href={ url }>
 							{ moreLinkText }
 						</ExternalLink>
