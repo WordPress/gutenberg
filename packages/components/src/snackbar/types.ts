@@ -93,7 +93,7 @@ export type SnackbarListProps = {
 	/**
 	 * Children to be rendered inside the notice list.
 	 */
-	children?: ReactNode;
+	children?: string;
 	/**
 	 * Function called when a notice should be removed / dismissed.
 	 */
