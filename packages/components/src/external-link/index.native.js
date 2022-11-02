@@ -20,6 +20,14 @@ export function ExternalLink( { href, children } ) {
 		style[ 'external-link__dark' ]
 	);
 
+	if ( typeof children !== 'string' ) {
+		throw new Error(
+			__(
+				'The ExternalLink component only accepts a string as a child element. This is to ensure the element can be read by screen readers.'
+			)
+		);
+	}
+
 	return (
 		<Text
 			style={ externalLink }
