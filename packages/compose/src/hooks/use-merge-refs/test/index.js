@@ -77,7 +77,7 @@ describe( 'useMergeRefs', () => {
 	} );
 
 	it( 'should work', () => {
-		const { container, rerender } = render( <MergedRefs /> );
+		const { container, rerender, unmount } = render( <MergedRefs /> );
 
 		const originalElement = container.firstElementChild;
 
@@ -95,7 +95,7 @@ describe( 'useMergeRefs', () => {
 			[ [], [] ],
 		] );
 
-		rerender( null );
+		unmount();
 
 		// Unmount: the initial callback functions should receive null.
 		expect( renderCallback.history ).toEqual( [
@@ -108,7 +108,7 @@ describe( 'useMergeRefs', () => {
 	} );
 
 	it( 'should work for node change', () => {
-		const { container, rerender } = render( <MergedRefs /> );
+		const { container, rerender, unmount } = render( <MergedRefs /> );
 
 		const originalElement = container.firstElementChild;
 
@@ -129,7 +129,7 @@ describe( 'useMergeRefs', () => {
 			[ [], [] ],
 		] );
 
-		rerender( null );
+		unmount();
 
 		// Unmount: the initial callback functions should receive null.
 		expect( renderCallback.history ).toEqual( [
@@ -142,7 +142,9 @@ describe( 'useMergeRefs', () => {
 	} );
 
 	it( 'should work with dependencies', () => {
-		const { container, rerender } = render( <MergedRefs count={ 1 } /> );
+		const { container, rerender, unmount } = render(
+			<MergedRefs count={ 1 } />
+		);
 
 		const originalElement = container.firstElementChild;
 
@@ -161,7 +163,7 @@ describe( 'useMergeRefs', () => {
 			[ [], [ originalElement ] ],
 		] );
 
-		rerender( null );
+		unmount();
 
 		// Unmount: current callback functions should be called with null.
 		expect( renderCallback.history ).toEqual( [
@@ -174,7 +176,9 @@ describe( 'useMergeRefs', () => {
 	} );
 
 	it( 'should simultaneously update node and dependencies', () => {
-		const { container, rerender } = render( <MergedRefs count={ 1 } /> );
+		const { container, rerender, unmount } = render(
+			<MergedRefs count={ 1 } />
+		);
 
 		const originalElement = container.firstElementChild;
 
@@ -199,7 +203,7 @@ describe( 'useMergeRefs', () => {
 			[ [], [ newElement ] ],
 		] );
 
-		rerender( null );
+		unmount();
 
 		// Unmount: current callback functions should be called with null.
 		expect( renderCallback.history ).toEqual( [
@@ -212,7 +216,7 @@ describe( 'useMergeRefs', () => {
 	} );
 
 	it( 'should work for dependency change after node change', () => {
-		const { container, rerender } = render( <MergedRefs /> );
+		const { container, rerender, unmount } = render( <MergedRefs /> );
 
 		const originalElement = container.firstElementChild;
 
@@ -248,7 +252,7 @@ describe( 'useMergeRefs', () => {
 			[ [], [ newElement ] ],
 		] );
 
-		rerender( null );
+		unmount();
 
 		// Unmount: current callback functions should be called with null.
 		expect( renderCallback.history ).toEqual( [
@@ -262,7 +266,9 @@ describe( 'useMergeRefs', () => {
 	} );
 
 	it( 'should allow disabling a ref', () => {
-		const { container, rerender } = render( <MergedRefs disable1 /> );
+		const { container, rerender, unmount } = render(
+			<MergedRefs disable1 />
+		);
 
 		const originalElement = container.firstElementChild;
 
@@ -295,7 +301,7 @@ describe( 'useMergeRefs', () => {
 			[ [], [ originalElement ] ],
 		] );
 
-		rerender( null );
+		unmount();
 
 		// Unmount: current callback functions should receive null.
 		expect( renderCallback.history ).toEqual( [
