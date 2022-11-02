@@ -107,7 +107,7 @@ class WP_REST_Pattern_Directory_Controller_Test extends WP_Test_REST_Controller_
 	 */
 	public function data_get_items_query_args() {
 		return array(
-			'per_page default' => array( 'per_page', false, false, 10 ),
+			'per_page default' => array( 'per_page', false, false, 100 ),
 			'per_page custom-1' => array( 'per_page', 5, false, 5 ),
 			'per_page custom-2' => array( 'per_page', 50, false, 50 ),
 			'per_page invalid-1' => array( 'per_page', 200, true, 'rest_invalid_param' ),

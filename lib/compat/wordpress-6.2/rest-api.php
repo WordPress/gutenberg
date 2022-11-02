@@ -42,7 +42,7 @@ function gutenberg_pattern_directory_collection_params_6_2( $query_params ) {
 	$query_params['per_page'] = array(
 		'description'       => __( 'Maximum number of items to be returned in result set.', 'gutenberg' ),
 		'type'              => 'integer',
-		'default'           => 10,
+		'default'           => 100,
 		'minimum'           => 1,
 		'maximum'           => 100,
 		'sanitize_callback' => 'absint',
