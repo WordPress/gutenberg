@@ -60,6 +60,9 @@ test.describe( 'Group', () => {
 		page,
 	} ) => {
 		await editor.insertBlock( { name: 'core/group' } );
+		await page.click(
+			'button[aria-label="Group: Gather blocks in a container."]'
+		);
 		await page.click( 'role=button[name="Add block"i]' );
 		await page.click(
 			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
