@@ -25,7 +25,7 @@ export type Action = {
 
 export type Notice = {
 	id: string;
-	spokenMessage: ReactNode;
+	spokenMessage: string;
 	actions: Action[];
 	icon?: WPElement | null;
 	onDismiss?: Function;
@@ -38,7 +38,7 @@ export type SnackbarProps = {
 	/**
 	 * The displayed message of a notice. Also used as the spoken message for assistive technology, unless `spokenMessage` is provided as an alternative message.
 	 */
-	children: ReactNode;
+	children: string;
 	/**
 	 * Used to provide a custom spoken message in place of the `children` default.
 	 *

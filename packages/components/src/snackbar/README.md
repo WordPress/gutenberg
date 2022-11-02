@@ -40,11 +40,11 @@ const MySnackbarNotice = () => (
 
 The following props are used to control the display of the component.
 
-#### `children`: `ReactNode`
+#### `children`: `string`
 The displayed message of a notice. Also used as the spoken message for assistive technology, unless `spokenMessage` is provided as an alternative message.
 -   Required: Yes
 
-#### `spokenMessage`: `ReactNode`
+#### `spokenMessage`: `string`
 Used to provide a custom spoken message in place of the `children` default.
 -   Required: No
 -   Default: `children`
