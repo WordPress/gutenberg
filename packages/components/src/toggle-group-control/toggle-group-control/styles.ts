@@ -28,26 +28,29 @@ export const ToggleGroupControl = ( {
 	${ reduceMotion( 'transition' ) }
 
 	${ toggleGroupControlSize( size ) }
-	${ isBlock && enclosingBorder }
-	${ ! isDeselectable && enclosingInteractiveBorder }
+	${ ! isDeselectable && enclosingBorders( isBlock ) }
 `;
 
-const enclosingBorder = css`
-	border-color: ${ COLORS.ui.border };
-`;
+const enclosingBorders = ( isBlock: ToggleGroupControlProps[ 'isBlock' ] ) => {
+	const enclosingBorder = css`
+		border-color: ${ COLORS.ui.border };
+	`;
 
-const enclosingInteractiveBorder = css`
-	&:hover {
-		border-color: ${ COLORS.ui.borderHover };
-	}
+	return css`
+		${ isBlock && enclosingBorder }
 
-	&:focus-within {
-		border-color: ${ COLORS.ui.borderFocus };
-		box-shadow: ${ CONFIG.controlBoxShadowFocus };
-		outline: none;
-		z-index: 1;
-	}
-`;
+		&:hover {
+			border-color: ${ COLORS.ui.borderHover };
+		}
+
+		&:focus-within {
+			border-color: ${ COLORS.ui.borderFocus };
+			box-shadow: ${ CONFIG.controlBoxShadowFocus };
+			outline: none;
+			z-index: 1;
+		}
+	`;
+};
 
 export const toggleGroupControlSize = (
 	size: NonNullable< ToggleGroupControlProps[ 'size' ] >
