@@ -10,6 +10,8 @@ import { useMemo, useRef, memo } from '@wordpress/element';
 import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
+	isReusableBlock,
+	isTemplatePart as isTemplate,
 } from '@wordpress/blocks';
 import { __experimentalTruncate as Truncate } from '@wordpress/components';
 import { ENTER, isAppleOS } from '@wordpress/keycodes';
@@ -47,9 +49,8 @@ function InserterListItem( {
 		];
 	}, [ item.name, item.initialAttributes, item.initialAttributes ] );
 
-	const isReusable =
-		item.name === 'core/block' && item.category === 'reusable';
-	const isTemplatePart = item.name === 'core/template-part';
+	const isReusable = isReusableBlock( item );
+	const isTemplatePart = isTemplate( item );
 
 	return (
 		<InserterDraggableBlocks
