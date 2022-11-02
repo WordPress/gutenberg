@@ -87,7 +87,7 @@ export type SnackbarProps = {
 	/**
 	 * A ref to the list that contains the snackbar.
 	 */
-	listRef?: MutableRefObject< HTMLDivElement >;
+	listRef?: MutableRefObject< HTMLDivElement | null >;
 };
 
 export type SnackbarListProps = {

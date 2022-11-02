@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import type { MutableRefObject } from 'react';
 import classnames from 'classnames';
 
 /**
@@ -66,7 +65,7 @@ export function SnackbarList( {
 	children,
 	onRemove = noop,
 }: WordPressComponentProps< SnackbarListProps, 'div' > ) {
-	const listRef = useRef() as MutableRefObject< HTMLDivElement >;
+	const listRef = useRef< HTMLDivElement | null >( null );
 	const isReducedMotion = useReducedMotion();
 	className = classnames( 'components-snackbar-list', className );
 	const removeNotice = ( notice: Notice ) => () => onRemove( notice.id );

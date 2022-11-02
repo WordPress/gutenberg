@@ -66,7 +66,7 @@ function UnforwardedSnackbar(
 		}
 
 		// Prevent focus loss by moving it to the list element.
-		listRef?.current.focus();
+		listRef?.current?.focus();
 
 		onDismiss();
 		onRemove();
