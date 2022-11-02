@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -15,7 +15,7 @@ import PluginPrePublishPanel from '../';
 
 describe( 'PluginPrePublishPanel', () => {
 	test( 'renders fill properly', () => {
-		const { container } = render(
+		render(
 			<SlotFillProvider>
 				<PluginPrePublishPanel
 					className="my-plugin-pre-publish-panel"
@@ -28,6 +28,6 @@ describe( 'PluginPrePublishPanel', () => {
 			</SlotFillProvider>
 		);
 
-		expect( container.innerHTML ).toMatchSnapshot();
+		expect( screen.getByText( 'My panel title' ) ).toBeInTheDocument();
 	} );
 } );
