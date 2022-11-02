@@ -1231,4 +1231,25 @@ test.describe( 'List', () => {
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	test( 'selects all transformed output', async ( { editor, page } ) => {
+		await page.click( 'role=button[name="Add default block"i]' );
+		await page.keyboard.type( '* 1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+
+		// Select the whole list.
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowUp' );
+
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+
+		await editor.transformBlockTo( 'Paragraph' );
+
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+
+		await editor.transformBlockTo( 'List' );
+
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );

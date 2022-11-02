@@ -89,22 +89,26 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	const isReusable = blocks.length === 1 && isReusableBlock( blocks[ 0 ] );
 	const isTemplate = blocks.length === 1 && isTemplatePart( blocks[ 0 ] );
 
+	function selectForMultipleBlocks( insertedBlocks ) {
+		if ( insertedBlocks.length > 1 ) {
+			multiSelect(
+				insertedBlocks[ 0 ].clientId,
+				insertedBlocks[ insertedBlocks.length - 1 ].clientId
+			);
+		}
+	}
+
 	// Simple block tranformation based on the `Block Transforms` API.
 	function onBlockTransform( name ) {
 		const newBlocks = switchToBlockType( blocks, name );
 		replaceBlocks( clientIds, newBlocks );
-		multiSelect(
-			newBlocks[ 0 ].clientId,
-			newBlocks[ newBlocks.length - 1 ].clientId
-		);
+		selectForMultipleBlocks( newBlocks );
 	}
+
 	// Pattern transformation through the `Patterns` API.
 	function onPatternTransform( transformedBlocks ) {
 		replaceBlocks( clientIds, transformedBlocks );
-		multiSelect(
-			transformedBlocks[ 0 ].clientId,
-			transformedBlocks[ transformedBlocks.length - 1 ].clientId
-		);
+		selectForMultipleBlocks( transformedBlocks );
 	}
 
 	/**
