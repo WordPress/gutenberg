@@ -72,7 +72,9 @@ describe( 'Image Block', () => {
 		const initialHtml = `
 		<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"media","className":"is-style-default"} -->
 		<figure class="wp-block-image size-large is-style-default">
-		<a href="https://cldup.com/cXyG__fTLN.jpg"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37" class="wp-image-1"/></a>
+			<a href="https://cldup.com/cXyG__fTLN.jpg">
+				<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" aria-describedby="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37" class="wp-image-1"/>
+			</a>
 		<figcaption class="wp-element-caption" id="wp-image-caption-383k3k3g3j1q1f1f333c343l3g1e333f3d1f332o3p272v2v362k2c2e1e3a3g37">Mountain</figcaption></figure>
 		<!-- /wp:image -->`;
 		const screen = await initializeEditor( { initialHtml } );
