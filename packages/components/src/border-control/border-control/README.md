@@ -83,8 +83,7 @@ custom colors.
 
 ### `enableStyle`: `boolean`
 
-This controls whether to include border style options within the
-`BorderDropdown` sub-component.
+This controls whether to support border style selection.
 
 - Required: No
 - Default: `true`

@@ -126,7 +126,7 @@ _Note: The will be `undefined` if a user clears all borders._
 
 ### `popoverPlacement`: `string`
 
-The position of the color popover relative to the control wrapper.
+The position of the color popovers relative to the control wrapper.
 
 By default, popovers are displayed relative to the button that initiated the popover. By supplying a popover placement, you force the popover to display in a specific location.
 
@@ -136,7 +136,7 @@ The available base placements are 'top', 'right', 'bottom', 'left'. Each of thes
 
 ### `popoverOffset`: `number`
 
-Works in conjunctions with `popoverPlacement` and allows leaving a space between the color popover and the control wrapper.
+The space between the popover and the control wrapper.
 
 - Required: No
 

@@ -82,6 +82,12 @@ export type BorderControlProps = ColorProps &
 		 */
 		showDropdownHeader?: boolean;
 		/**
+		 * Size of the control.
+		 *
+		 * @default 'default'
+		 */
+		size?: 'default' | '__unstable-large';
+		/**
 		 * An object representing a border or `undefined`. Used to set the
 		 * current border configuration for this component.
 		 */
@@ -96,12 +102,6 @@ export type BorderControlProps = ColorProps &
 		 * `RangeControl` for additional control over a border's width.
 		 */
 		withSlider?: boolean;
-		/**
-		 * Size of the control.
-		 *
-		 * @default 'default'
-		 */
-		size?: 'default' | '__unstable-large';
 	};
 
 export type DropdownProps = ColorProps &
