@@ -1,27 +1,18 @@
 /**
  * External dependencies
  */
-import type {
-	KeyboardEvent,
-	MouseEvent,
-	MutableRefObject,
-	ReactNode,
-} from 'react';
-
-export type ButtonEvent =
-	| KeyboardEvent< HTMLButtonElement >
-	| MouseEvent< HTMLButtonElement >;
+import type { MutableRefObject, ReactNode, SyntheticEvent } from 'react';
 
 export type NoticeActionWithURL = {
 	label: string;
 	url: string;
-	onClick?: ( event: ButtonEvent ) => void;
+	onClick?: ( event: SyntheticEvent ) => void;
 };
 
 type NoticeActionWithOnClick = {
 	label: string;
 	url?: string;
-	onClick: ( event: ButtonEvent ) => void;
+	onClick: ( event: SyntheticEvent ) => void;
 };
 
 export type NoticeAction = NoticeActionWithURL | NoticeActionWithOnClick;
