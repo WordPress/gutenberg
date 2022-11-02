@@ -332,7 +332,13 @@ export default function Image( {
 		);
 	}
 
-	const describedById = `wp-image-caption-${ id }`;
+	// Use the hashed url to create an ID to use with aria-describedby.
+	const hashString = ( str ) =>
+		str
+			.split( '' )
+			.map( ( c ) => c.charCodeAt( 0 ).toString( 32 ).padStart( 2, '0' ) )
+			.join( '' );
+	const describedById = `wp-image-caption-${ hashString( url ) }`;
 
 	const controls = (
 		<>

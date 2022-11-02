@@ -7,7 +7,12 @@ import { isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
+import {
+	RichText,
+	useBlockProps,
+	__experimentalGetElementClassName,
+	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
+} from '@wordpress/block-editor';
 
 const blockAttributes = {
 	align: {
@@ -94,6 +99,87 @@ const blockSupports = {
 };
 
 const deprecated = [
+	// Deprecate the version that does not use the caption to describe the image
+	// when the image has a caption but no alt text.
+	{
+		attributes: blockAttributes,
+		supports: blockSupports,
+		save( { attributes } ) {
+			const {
+				url,
+				alt,
+				caption,
+				align,
+				href,
+				rel,
+				linkClass,
+				width,
+				height,
+				id,
+				linkTarget,
+				sizeSlug,
+				title,
+			} = attributes;
+
+			const newRel = isEmpty( rel ) ? undefined : rel;
+			const borderProps = getBorderClassesAndStyles( attributes );
+
+			const classes = classnames( {
+				[ `align${ align }` ]: align,
+				[ `size-${ sizeSlug }` ]: sizeSlug,
+				'is-resized': width || height,
+				'has-custom-border':
+					!! borderProps.className || ! isEmpty( borderProps.style ),
+			} );
+
+			const imageClasses = classnames( borderProps.className, {
+				[ `wp-image-${ id }` ]: !! id,
+			} );
+
+			const image = (
+				<img
+					src={ url }
+					alt={ alt }
+					className={ imageClasses || undefined }
+					style={ borderProps.style }
+					width={ width }
+					height={ height }
+					title={ title }
+				/>
+			);
+
+			const figure = (
+				<>
+					{ href ? (
+						<a
+							className={ linkClass }
+							href={ href }
+							target={ linkTarget }
+							rel={ newRel }
+						>
+							{ image }
+						</a>
+					) : (
+						image
+					) }
+					{ ! RichText.isEmpty( caption ) && (
+						<RichText.Content
+							className={ __experimentalGetElementClassName(
+								'caption'
+							) }
+							tagName="figcaption"
+							value={ caption }
+						/>
+					) }
+				</>
+			);
+			return (
+				<figure { ...useBlockProps.save( { className: classes } ) }>
+					{ figure }
+				</figure>
+			);
+		},
+	},
 	// The following deprecation moves existing border radius styles onto the
 	// inner img element where new border block support styles must be applied.
 	// It will also add a new `.has-custom-border` class for existing blocks
