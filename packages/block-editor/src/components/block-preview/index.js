@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { castArray } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -36,7 +35,10 @@ export function BlockPreview( {
 		() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
 		[ originalSettings ]
 	);
-	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
+	const renderedBlocks = useMemo(
+		() => ( Array.isArray( blocks ) ? blocks : [ blocks ] ),
+		[ blocks ]
+	);
 	if ( ! blocks || blocks.length === 0 ) {
 		return null;
 	}
@@ -99,7 +101,10 @@ export function useBlockPreview( {
 	);
 	const disabledRef = useDisabled();
 	const ref = useMergeRefs( [ props.ref, disabledRef ] );
-	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
+	const renderedBlocks = useMemo(
+		() => ( Array.isArray( blocks ) ? blocks : [ blocks ] ),
+		[ blocks ]
+	);
 
 	const children = (
 		<BlockEditorProvider value={ renderedBlocks } settings={ settings }>

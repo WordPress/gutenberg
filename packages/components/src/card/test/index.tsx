@@ -70,9 +70,7 @@ describe( 'Card', () => {
 				<Card>Code is Poetry</Card>
 			);
 
-			expect( withElevation.firstChild ).toMatchDiffSnapshot(
-				withoutElevation.firstChild
-			);
+			expect( withElevation ).toMatchDiffSnapshot( withoutElevation );
 		} );
 
 		it( 'should add different amounts of white space when using the size prop', () => {
@@ -90,9 +88,7 @@ describe( 'Card', () => {
 				</Card>
 			);
 
-			expect( withSizeDefault.firstChild ).toMatchDiffSnapshot(
-				withSizeLarge.firstChild
-			);
+			expect( withSizeDefault ).toMatchDiffSnapshot( withSizeLarge );
 		} );
 
 		it( 'should warn when the isElevated prop is passed', () => {

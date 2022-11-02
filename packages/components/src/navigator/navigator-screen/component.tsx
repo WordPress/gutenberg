@@ -44,7 +44,10 @@ type Props = Omit<
 	keyof MotionProps
 >;
 
-function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
+function UnconnectedNavigatorScreen(
+	props: Props,
+	forwardedRef: ForwardedRef< any >
+) {
 	const { children, className, path, ...otherProps } = useContextSystem(
 		props,
 		'NavigatorScreen'
@@ -79,14 +82,20 @@ function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
 		// - if the current location is not the initial one (to avoid moving focus on page load)
 		// - when the screen becomes visible
 		// - if the wrapper ref has been assigned
-		if ( isInitialLocation || ! isMatch || ! wrapperRef.current ) {
+		// - if focus hasn't already been restored for the current location
+		if (
+			isInitialLocation ||
+			! isMatch ||
+			! wrapperRef.current ||
+			location.hasRestoredFocus
+		) {
 			return;
 		}
 
 		const activeElement = wrapperRef.current.ownerDocument.activeElement;
 
 		// If an element is already focused within the wrapper do not focus the
-		// element. This prevents inputs or buttons from losing focus unecessarily.
+		// element. This prevents inputs or buttons from losing focus unnecessarily.
 		if ( wrapperRef.current.contains( activeElement ) ) {
 			return;
 		}
@@ -110,10 +119,12 @@ function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
 			elementToFocus = firstTabbable ?? wrapperRef.current;
 		}
 
+		location.hasRestoredFocus = true;
 		elementToFocus.focus();
 	}, [
 		isInitialLocation,
 		isMatch,
+		location.hasRestoredFocus,
 		location.isBack,
 		previousLocation?.focusTargetSelector,
 	] );
@@ -217,9 +228,9 @@ function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
  * );
  * ```
  */
-const ConnectedNavigatorScreen = contextConnect(
-	NavigatorScreen,
+export const NavigatorScreen = contextConnect(
+	UnconnectedNavigatorScreen,
 	'NavigatorScreen'
 );
 
-export default ConnectedNavigatorScreen;
+export default NavigatorScreen;

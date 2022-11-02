@@ -16,7 +16,7 @@ export type Border = {
 
 export type Color = {
 	name: string;
-	color: CSSProperties[ 'color' ];
+	color: NonNullable< CSSProperties[ 'color' ] >;
 };
 
 export type ColorOrigin = {
@@ -123,12 +123,11 @@ export type BorderControlProps = ColorProps &
 		 */
 		withSlider?: boolean;
 		/**
-		 * Start opting into the larger default height that will become the
-		 * default size in a future version.
+		 * Size of the control.
 		 *
-		 * @default false
+		 * @default 'default'
 		 */
-		__next36pxDefaultSize?: boolean;
+		size?: 'default' | '__unstable-large';
 	};
 
 export type DropdownProps = ColorProps & {
@@ -165,12 +164,11 @@ export type DropdownProps = ColorProps & {
 	 */
 	showDropdownHeader?: boolean;
 	/**
-	 * Start opting into the larger default height that will become the
-	 * default size in a future version.
+	 * Size of the control.
 	 *
-	 * @default false
+	 * @default 'default'
 	 */
-	__next36pxDefaultSize?: boolean;
+	size?: 'default' | '__unstable-large';
 };
 
 export type StylePickerProps = LabelProps & {

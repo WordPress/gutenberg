@@ -31,7 +31,7 @@ describe( 'Multi-entity save flow', () => {
 		const checkboxInputs = await page.$$( checkboxInputSelector );
 		expect( checkedBoxes.length - checkboxInputs.length ).toBe( 0 );
 	};
-	const assertExistance = async ( selector, shouldBePresent ) => {
+	const assertExistence = async ( selector, shouldBePresent ) => {
 		const element = await page.$( selector );
 		if ( shouldBePresent ) {
 			expect( element ).not.toBeNull();
@@ -102,10 +102,10 @@ describe( 'Multi-entity save flow', () => {
 			await assertMultiSaveDisabled();
 
 			// Should only have publish panel a11y button active with only post edited.
-			await assertExistance( publishA11ySelector, true );
-			await assertExistance( saveA11ySelector, false );
-			await assertExistance( publishPanelSelector, false );
-			await assertExistance( savePanelSelector, false );
+			await assertExistence( publishA11ySelector, true );
+			await assertExistence( saveA11ySelector, false );
+			await assertExistence( publishPanelSelector, false );
+			await assertExistence( savePanelSelector, false );
 
 			// Add a reusable block and edit it.
 			await createReusableBlock( 'Hi!', 'Test' );
@@ -117,10 +117,10 @@ describe( 'Multi-entity save flow', () => {
 			await assertMultiSaveEnabled();
 
 			// Should only have save panel a11y button active after child entities edited.
-			await assertExistance( publishA11ySelector, false );
-			await assertExistance( saveA11ySelector, true );
-			await assertExistance( publishPanelSelector, false );
-			await assertExistance( savePanelSelector, false );
+			await assertExistence( publishA11ySelector, false );
+			await assertExistence( saveA11ySelector, true );
+			await assertExistence( publishPanelSelector, false );
+			await assertExistence( savePanelSelector, false );
 
 			// Opening panel has boxes checked by default.
 			await page.click( savePostSelector );
@@ -128,18 +128,18 @@ describe( 'Multi-entity save flow', () => {
 			await assertAllBoxesChecked();
 
 			// Should not show other panels (or their a11y buttons) while save panel opened.
-			await assertExistance( publishA11ySelector, false );
-			await assertExistance( saveA11ySelector, false );
-			await assertExistance( publishPanelSelector, false );
+			await assertExistence( publishA11ySelector, false );
+			await assertExistence( saveA11ySelector, false );
+			await assertExistence( publishPanelSelector, false );
 
 			// Publish panel should open after saving.
 			await page.click( entitiesSaveSelector );
 			await page.waitForSelector( publishPanelSelector );
 
 			// No other panels (or their a11y buttons) should be present with publish panel open.
-			await assertExistance( publishA11ySelector, false );
-			await assertExistance( saveA11ySelector, false );
-			await assertExistance( savePanelSelector, false );
+			await assertExistence( publishA11ySelector, false );
+			await assertExistence( saveA11ySelector, false );
+			await assertExistence( savePanelSelector, false );
 
 			// Close publish panel.
 			const closePanelButton = await page.waitForSelector(
@@ -151,7 +151,7 @@ describe( 'Multi-entity save flow', () => {
 			const draftSaved = await page.waitForSelector( draftSavedSelector );
 			expect( draftSaved ).not.toBeNull();
 			await assertMultiSaveDisabled();
-			await assertExistance( saveA11ySelector, false );
+			await assertExistence( saveA11ySelector, false );
 
 			await publishPost();
 			// Wait for the success notice specifically for the published post.
@@ -178,7 +178,7 @@ describe( 'Multi-entity save flow', () => {
 			expect( enabledSaveButton ).not.toBeNull();
 			// Verify multi-entity saving not enabled.
 			await assertMultiSaveDisabled();
-			await assertExistance( saveA11ySelector, false );
+			await assertExistence( saveA11ySelector, false );
 
 			// Update reusable block again.
 			await page.click( 'p[data-type="core/paragraph"]' );
@@ -188,7 +188,7 @@ describe( 'Multi-entity save flow', () => {
 
 			// Multi-entity saving should be enabled.
 			await assertMultiSaveEnabled();
-			await assertExistance( saveA11ySelector, true );
+			await assertExistence( saveA11ySelector, true );
 		} );
 
 		it( 'Site blocks should save individually', async () => {
@@ -252,7 +252,7 @@ describe( 'Multi-entity save flow', () => {
 			await assertAllBoxesChecked();
 
 			// Save a11y button should not be present with save panel open.
-			await assertExistance( saveA11ySelector, false );
+			await assertExistence( saveA11ySelector, false );
 
 			// Saving should result in items being saved.
 			await page.click( entitiesSaveSelector );
@@ -266,7 +266,7 @@ describe( 'Multi-entity save flow', () => {
 			} );
 
 			// Select the header template part via list view.
-			await page.click( '.edit-site-header-toolbar__list-view-toggle' );
+			await page.click( '.edit-site-header-edit-mode__list-view-toggle' );
 			const headerTemplatePartListViewButton = await page.waitForXPath(
 				'//a[contains(@class, "block-editor-list-view-block-select-button")][contains(., "header")]'
 			);
@@ -284,7 +284,7 @@ describe( 'Multi-entity save flow', () => {
 			expect( enabledButton ).not.toBeNull();
 
 			// Save a11y button should be present.
-			await assertExistance( saveA11ySelector, true );
+			await assertExistence( saveA11ySelector, true );
 
 			// Save all changes.
 			await saveAllChanges();

@@ -7,7 +7,7 @@ import {
 	useShortcut,
 	store as keyboardShortcutsStore,
 } from '@wordpress/keyboard-shortcuts';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { store as editorStore } from '@wordpress/editor';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
@@ -67,7 +67,7 @@ function KeyboardShortcuts() {
 		registerShortcut( {
 			name: 'core/edit-post/toggle-distraction-free',
 			category: 'global',
-			description: __( 'Toggle disrtaction free mode.' ),
+			description: __( 'Toggle distraction free mode.' ),
 			keyCombination: {
 				modifier: 'primaryShift',
 				character: '\\',
@@ -168,14 +168,12 @@ function KeyboardShortcuts() {
 		setIsListViewOpened( false );
 		toggleDistractionFree();
 		toggleFeature( 'distractionFree' );
-		const modeState = isFeatureActive( 'distractionFree' )
-			? __( 'on' )
-			: __( 'off' );
 		createInfoNotice(
-			// translators: Mode of distraction free can be 'on' or 'off';
-			sprintf( __( 'Distraction free mode turned %s.' ), modeState ),
+			isFeatureActive( 'distractionFree' )
+				? __( 'Distraction free mode turned on.' )
+				: __( 'Distraction free mode turned off.' ),
 			{
-				speak: true,
+				id: 'core/edit-post/distraction-free-mode/notice',
 				type: 'snackbar',
 			}
 		);

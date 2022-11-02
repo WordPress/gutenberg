@@ -121,22 +121,24 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 
 
 	/**
-	 * Tests that calc, clamp, min, max, and minmax CSS functions are allowed.
+	 * Tests that calc, clamp, min, max, minmax CSS functions and CSS custom properties are allowed.
 	 *
 	 * @covers ::get_declarations_string
 	 * @covers ::filter_declaration
 	 */
-	public function test_should_allow_css_functions_and_strip_unsafe_css_values() {
+	public function test_should_allow_css_functions_and_custom_properties_and_strip_unsafe_css_values() {
 		$input_declarations                        = array(
-			'background'       => 'var(--wp--preset--color--primary, 10px)', // Simple var().
-			'font-size'        => 'clamp(36.00rem, calc(32.00rem + 10.00vw), 40.00rem)', // Nested clamp().
-			'width'            => 'min(150vw, 100px)',
-			'min-width'        => 'max(150vw, 100px)',
-			'max-width'        => 'minmax(400px, 50%)',
-			'padding'          => 'calc(80px * -1)',
-			'background-image' => 'url("https://wordpress.org")',
-			'line-height'      => 'url("https://wordpress.org")',
-			'margin'           => 'illegalfunction(30px)',
+			'background'                        => 'var(--wp--preset--color--primary, 10px)', // Simple var().
+			'font-size'                         => 'clamp(36.00rem, calc(32.00rem + 10.00vw), 40.00rem)', // Nested clamp().
+			'width'                             => 'min(150vw, 100px)',
+			'min-width'                         => 'max(150vw, 100px)',
+			'max-width'                         => 'minmax(400px, 50%)',
+			'padding'                           => 'calc(80px * -1)',
+			'background-image'                  => 'url("https://wordpress.org")',
+			'line-height'                       => 'url("https://wordpress.org")',
+			'margin'                            => 'illegalfunction(30px)',
+			'--wp--style--unstable-gallery-gap' => '12em',
+			'/::border-[<width>]'               => '2000.75em',
 		);
 		$css_declarations                          = new WP_Style_Engine_CSS_Declarations_Gutenberg( $input_declarations );
 		$safecss_filter_attr_allow_css_mock_action = new MockAction();
@@ -146,13 +148,13 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 		$css_declarations_string = $css_declarations->get_declarations_string();
 
 		$this->assertSame(
-			9,
+			11,
 			$safecss_filter_attr_allow_css_mock_action->get_call_count(),
 			'"safecss_filter_attr_allow_css" filters were not applied to CSS declaration values.'
 		);
 
 		$this->assertSame(
-			'background:var(--wp--preset--color--primary, 10px);font-size:clamp(36.00rem, calc(32.00rem + 10.00vw), 40.00rem);width:min(150vw, 100px);min-width:max(150vw, 100px);max-width:minmax(400px, 50%);padding:calc(80px * -1);background-image:url("https://wordpress.org");',
+			'background:var(--wp--preset--color--primary, 10px);font-size:clamp(36.00rem, calc(32.00rem + 10.00vw), 40.00rem);width:min(150vw, 100px);min-width:max(150vw, 100px);max-width:minmax(400px, 50%);padding:calc(80px * -1);background-image:url("https://wordpress.org");--wp--style--unstable-gallery-gap:12em;border-width:2000.75em;',
 			$css_declarations_string,
 			'Unsafe values were not removed'
 		);
