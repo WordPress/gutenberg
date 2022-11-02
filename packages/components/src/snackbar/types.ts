@@ -24,12 +24,12 @@ type NoticeActionWithOnClick = {
 	onClick: ( event: ButtonEvent ) => void;
 };
 
-export type Action = NoticeActionWithURL | NoticeActionWithOnClick;
+export type NoticeAction = NoticeActionWithURL | NoticeActionWithOnClick;
 
 export type Notice = {
 	id: string;
 	spokenMessage: string;
-	actions: Action[];
+	actions: NoticeAction[];
 	icon?: ReactNode;
 	onDismiss?: Function;
 	content: string;

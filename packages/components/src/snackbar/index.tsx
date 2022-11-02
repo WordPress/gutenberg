@@ -16,7 +16,7 @@ import warning from '@wordpress/warning';
  * Internal dependencies
  */
 import Button from '../button';
-import type { Action, ButtonEvent, SnackbarProps } from './types';
+import type { NoticeAction, ButtonEvent, SnackbarProps } from './types';
 import type { WordPressComponentProps } from '../ui/context';
 
 const NOTICE_TIMEOUT = 10000;
@@ -69,7 +69,10 @@ function UnforwardedSnackbar(
 		onRemove?.();
 	}
 
-	function onActionClick( event: ButtonEvent, onClick: Action[ 'onClick' ] ) {
+	function onActionClick(
+		event: ButtonEvent,
+		onClick: NoticeAction[ 'onClick' ]
+	) {
 		event.stopPropagation();
 
 		onRemove?.();
