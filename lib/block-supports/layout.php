@@ -318,8 +318,8 @@ function gutenberg_get_classnames_from_last_tag( $html ) {
 function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$block_type       = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	$support_layout   = block_has_support( $block_type, array( '__experimentalLayout' ), false );
-	$has_child_layout = isset( $block['attrs']['style']['layout']['selfStretch'] ) && isset( $block['attrs']['style']['layout']['flexWidth'] );
-	$blocknaem        = $block['blockName'];
+	$has_child_layout = isset( $block['attrs']['style']['layout']['selfStretch'] );
+
 	if ( ! $support_layout
 	&& ! $has_child_layout ) {
 		return $block_content;
@@ -327,20 +327,31 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	$outer_class_names = array();
 
-	if ( $has_child_layout && 'fixed' === $block['attrs']['style']['layout']['selfStretch'] ) {
+	if ( $has_child_layout && ( 'fixed' === $block['attrs']['style']['layout']['selfStretch'] || 'fill' === $block['attrs']['style']['layout']['selfStretch'] ) ) {
 
 		$container_content_class = wp_unique_id( 'wp-container-content-' );
 
-		$child_layout_styles = array(
-			'selector'     => ".$container_content_class",
-			'declarations' => array(
-				'flex-shrink' => '0',
-				'flex-basis'  => $block['attrs']['style']['layout']['flexWidth'],
-			),
-		);
+		$child_layout_styles = array();
+
+		if ( 'fixed' === $block['attrs']['style']['layout']['selfStretch'] && isset( $block['attrs']['style']['layout']['flexSize'] ) ) {
+			$child_layout_styles[] = array(
+				'selector'     => ".$container_content_class",
+				'declarations' => array(
+					'flex-shrink' => '0',
+					'flex-basis'  => $block['attrs']['style']['layout']['flexSize'],
+				),
+			);
+		} elseif ( 'fill' === $block['attrs']['style']['layout']['selfStretch'] ) {
+			$child_layout_styles[] = array(
+				'selector'     => ".$container_content_class",
+				'declarations' => array(
+					'flex-grow' => '1',
+				),
+			);
+		}
 
 		gutenberg_style_engine_get_stylesheet_from_css_rules(
-			array( $child_layout_styles ),
+			$child_layout_styles,
 			array(
 				'context'  => 'block-supports',
 				'prettify' => false,

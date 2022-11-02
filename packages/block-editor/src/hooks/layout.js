@@ -270,14 +270,14 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 
 function ChildLayoutPanel( { setAttributes, attributes } ) {
 	const { style: { layout = {} } = {} } = attributes;
-	const { selfStretch, flexWidth } = layout;
+	const { selfStretch, flexSize } = layout;
 
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Child Layout' ) }>
 				<ToggleGroupControl
-					label={ __( 'Width' ) }
-					value={ selfStretch || 'fill' }
+					label={ __( 'Relative size' ) }
+					value={ selfStretch || 'hug' }
 					onChange={ ( value ) => {
 						setAttributes( {
 							style: {
@@ -290,6 +290,11 @@ function ChildLayoutPanel( { setAttributes, attributes } ) {
 					} }
 					isBlock={ true }
 				>
+					<ToggleGroupControlOption
+						key={ 'hug' }
+						value={ 'hug' }
+						label={ __( 'Hug' ) }
+					/>
 					<ToggleGroupControlOption
 						key={ 'fill' }
 						value={ 'fill' }
@@ -308,12 +313,12 @@ function ChildLayoutPanel( { setAttributes, attributes } ) {
 								style: {
 									layout: {
 										...layout,
-										flexWidth: value,
+										flexSize: value,
 									},
 								},
 							} );
 						} }
-						value={ flexWidth }
+						value={ flexSize }
 					/>
 				) }
 			</PanelBody>
@@ -488,8 +493,8 @@ export const withChildLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { attributes } = props;
 		const { style: { layout = {} } = {} } = attributes;
-		const { selfStretch, flexWidth } = layout;
-		const hasChildLayout = selfStretch || flexWidth;
+		const { selfStretch, flexSize } = layout;
+		const hasChildLayout = selfStretch || flexSize;
 		const disableLayoutStyles = useSelect( ( select ) => {
 			const { getSettings } = select( blockEditorStore );
 			return !! getSettings().disableLayoutStyles;
@@ -503,10 +508,14 @@ export const withChildLayoutStyles = createHigherOrderComponent(
 
 		let css = '';
 
-		if ( selfStretch === 'fixed' && flexWidth ) {
+		if ( selfStretch === 'fixed' && flexSize ) {
 			css += `${ selector } {
 				flex-shrink: 0;
-				flex-basis: ${ flexWidth };
+				flex-basis: ${ flexSize };
+			}`;
+		} else if ( selfStretch === 'fill' ) {
+			css += `${ selector } {
+				flex-grow: 1;
 			}`;
 		}
 
