@@ -47,6 +47,10 @@ function InserterListItem( {
 		];
 	}, [ item.name, item.initialAttributes, item.initialAttributes ] );
 
+	const isReusable =
+		item.name === 'core/block' && item.category === 'reusable';
+	const isTemplatePart = item.name === 'core/template-part';
+
 	return (
 		<InserterDraggableBlocks
 			isEnabled={ isDraggable && ! item.disabled }
@@ -55,7 +59,14 @@ function InserterListItem( {
 		>
 			{ ( { draggable, onDragStart, onDragEnd } ) => (
 				<div
-					className="block-editor-block-types-list__list-item"
+					className={ classnames(
+						'block-editor-block-types-list__list-item',
+
+						{
+							'is-reusable': isReusable,
+							'is-template-part': isTemplatePart,
+						}
+					) }
 					draggable={ draggable }
 					onDragStart={ ( event ) => {
 						isDragging.current = true;
