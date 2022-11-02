@@ -11,14 +11,15 @@ import { CONFIG, COLORS, reduceMotion } from '../../utils';
 import type { ToggleGroupControlProps } from '../types';
 
 export const ToggleGroupControl = ( {
+	isBlock,
 	isDeselectable,
 	size,
-}: {
-	isDeselectable?: boolean;
+}: Pick< ToggleGroupControlProps, 'isBlock' | 'isDeselectable' > & {
 	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
 } ) => css`
 	background: ${ COLORS.ui.background };
 	border: 1px solid transparent;
+	border-radius: ${ CONFIG.controlBorderRadius };
 	display: inline-flex;
 	min-width: 0;
 	padding: 2px;
@@ -27,13 +28,15 @@ export const ToggleGroupControl = ( {
 	${ reduceMotion( 'transition' ) }
 
 	${ toggleGroupControlSize( size ) }
-	${ ! isDeselectable && enclosingBorder }
+	${ isBlock && enclosingBorder }
+	${ ! isDeselectable && enclosingInteractiveBorder }
 `;
 
 const enclosingBorder = css`
 	border-color: ${ COLORS.ui.border };
-	border-radius: ${ CONFIG.controlBorderRadius };
+`;
 
+const enclosingInteractiveBorder = css`
 	&:hover {
 		border-color: ${ COLORS.ui.borderHover };
 	}
