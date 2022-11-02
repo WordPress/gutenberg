@@ -25,7 +25,7 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	}
 
 	$post_ID             = $block->context['postId'];
-	$more_text           = ! empty( $attributes['moreText'] ) ? '<a class="wp-block-post-excerpt__more-link" href="' . esc_url( get_the_permalink( $post_ID ) ) . '" aria-label="' . esc_attr__( "Post ID: " . $post_ID ) . '">' . wp_kses_post( $attributes['moreText'] ) . '<span class="screen-reader-text">'. get_the_title( $post_ID ) . '</a>' : '';
+	$more_text           = ! empty( $attributes['moreText'] ) ? '<a class="wp-block-post-excerpt__more-link" href="' . esc_url( get_the_permalink( $post_ID ) ) . '" aria-label="' . esc_attr__( "Post ID: " . $post_ID ) . '">' . wp_kses_post( $attributes['moreText'] ) . '<span class="screen-reader-text">'. get_the_title( $post_ID ) . '</span></a>' : '';
 	$filter_excerpt_more = function( $more ) use ( $more_text ) {
 		return empty( $more_text ) ? $more : '';
 	};
