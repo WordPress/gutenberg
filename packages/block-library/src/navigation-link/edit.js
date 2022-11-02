@@ -2,7 +2,8 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escape, unescape } from 'lodash';
+import escapeHtml from 'escape-html';
+import { unescape } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -262,8 +263,8 @@ export const updateNavigationLinkBlockAttributes = (
 	// - https://github.com/WordPress/gutenberg/pull/41063
 	// - https://github.com/WordPress/gutenberg/pull/18617.
 	const label = useNewLabel
-		? escape( newLabel )
-		: originalLabel || escape( newUrlWithoutHttp );
+		? escapeHtml( newLabel )
+		: originalLabel || escapeHtml( newUrlWithoutHttp );
 
 	// In https://github.com/WordPress/gutenberg/pull/24670 we decided to use "tag" in favor of "post_tag"
 	const type = newType === 'post_tag' ? 'tag' : newType.replace( '-', '_' );
@@ -846,7 +847,7 @@ export default function NavigationLinkEdit( {
 					) }
 					{ isLinkOpen && (
 						<Popover
-							position="bottom center"
+							placement="bottom"
 							onClose={ () => setIsLinkOpen( false ) }
 							anchor={ popoverAnchor }
 							shift

@@ -193,6 +193,8 @@ async function runTestSuite( testSuite, performanceTestDirectory ) {
  * @param {WPPerformanceCommandOptions} options  Command options.
  */
 async function runPerformanceTests( branches, options ) {
+	const runningInCI = !! process.env.CI || !! options.ci;
+
 	// The default value doesn't work because commander provides an array.
 	if ( branches.length === 0 ) {
 		branches = [ 'trunk' ];
@@ -201,11 +203,11 @@ async function runPerformanceTests( branches, options ) {
 	log(
 		formats.title( '\n💃 Performance Tests 🕺\n' ),
 		'\nWelcome! This tool runs the performance tests on multiple branches and displays a comparison table.\n' +
-			'In order to run the tests, the tool is going to load a WordPress environment on 8888 and 8889 ports.\n' +
+			'In order to run the tests, the tool is going to load a WordPress environment on ports 8888 and 8889.\n' +
 			'Make sure these ports are not used before continuing.\n'
 	);
 
-	if ( ! options.ci ) {
+	if ( ! runningInCI ) {
 		await askForConfirmation( 'Ready to go? ' );
 	}
 

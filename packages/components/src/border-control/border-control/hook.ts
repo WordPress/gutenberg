@@ -33,9 +33,9 @@ export function useBorderControl(
 		isCompact,
 		onChange,
 		shouldSanitizeBorder = true,
+		size = 'default',
 		value: border,
 		width,
-		__next36pxDefaultSize = false,
 		...otherProps
 	} = useContextSystem( props, 'BorderControl' );
 
@@ -65,7 +65,6 @@ export function useBorderControl(
 			const [ parsedValue ] =
 				parseQuantityAndUnitFromRawValue( newWidth );
 			const hasZeroWidth = parsedValue === 0;
-
 			const updatedBorder = { ...border, width: newWidthValue };
 
 			// Setting the border width explicitly to zero will also set the
@@ -118,13 +117,18 @@ export function useBorderControl(
 		return cx( styles.borderControl, className );
 	}, [ className, cx ] );
 
-	const wrapperWidth = isCompact ? '90px' : width;
+	let wrapperWidth = width;
+	if ( isCompact ) {
+		// Widths below represent the minimum usable width for compact controls.
+		// Taller controls contain greater internal padding, thus greater width.
+		wrapperWidth = size === '__unstable-large' ? '116px' : '90px';
+	}
 	const innerWrapperClassName = useMemo( () => {
 		const widthStyle = !! wrapperWidth && styles.wrapperWidth;
-		const heightStyle = styles.wrapperHeight( __next36pxDefaultSize );
+		const heightStyle = styles.wrapperHeight( size );
 
 		return cx( styles.innerWrapper(), widthStyle, heightStyle );
-	}, [ wrapperWidth, cx, __next36pxDefaultSize ] );
+	}, [ wrapperWidth, cx, size ] );
 
 	const sliderClassName = useMemo( () => {
 		return cx( styles.borderSlider() );
@@ -143,6 +147,6 @@ export function useBorderControl(
 		value: border,
 		widthUnit,
 		widthValue,
-		__next36pxDefaultSize,
+		size,
 	};
 }

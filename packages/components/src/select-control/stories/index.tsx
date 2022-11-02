@@ -25,15 +25,17 @@ const meta: ComponentMeta< typeof SelectControl > = {
 		value: { control: { type: null } },
 	},
 	parameters: {
+		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { source: { state: 'open' } },
 	},
 };
 export default meta;
 
-const SelectControlWithState: ComponentStory< typeof SelectControl > = (
-	args
-) => {
+const SelectControlWithState: ComponentStory< typeof SelectControl > = ( {
+	onChange,
+	...args
+} ) => {
 	const [ selection, setSelection ] =
 		useState< ComponentProps< typeof SelectControl >[ 'value' ] >();
 
@@ -41,7 +43,10 @@ const SelectControlWithState: ComponentStory< typeof SelectControl > = (
 		<SelectControl
 			{ ...args }
 			value={ selection }
-			onChange={ setSelection }
+			onChange={ ( value ) => {
+				setSelection( value );
+				onChange?.( value );
+			} }
 		/>
 	);
 };

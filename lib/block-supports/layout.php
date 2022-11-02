@@ -292,6 +292,23 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 }
 
 /**
+ * Gets classname from last tag in a string of HTML.
+ *
+ * @param string $html markup to be processed.
+ * @return string String of inner wrapper classnames.
+ */
+function gutenberg_get_classnames_from_last_tag( $html ) {
+	$tags            = new WP_HTML_Tag_Processor( $html );
+	$last_classnames = '';
+
+	while ( $tags->next_tag() ) {
+		$last_classnames = $tags->get_attribute( 'class' );
+	}
+
+	return (string) $last_classnames;
+}
+
+/**
  * Renders the layout config to the block wrapper.
  *
  * @param  string $block_content Rendered block content.
@@ -320,7 +337,6 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	$class_names        = array();
 	$layout_definitions = _wp_array_get( $global_layout_settings, array( 'definitions' ), array() );
-	$block_classname    = wp_get_block_default_classname( $block['blockName'] );
 	$container_class    = wp_unique_id( 'wp-container-' );
 	$layout_classname   = '';
 
@@ -397,7 +413,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$should_skip_gap_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' );
 
 		$style = gutenberg_get_layout_style(
-			".$block_classname.$container_class",
+			".$container_class.$container_class",
 			$used_layout,
 			$has_block_gap_support,
 			$gap_value,
@@ -412,18 +428,24 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		}
 	}
 
-	/*
-	 * This assumes the hook only applies to blocks with a single wrapper.
-	 * A limitation of this hook is that nested inner blocks wrappers are not yet supported.
-	 */
-	$content = preg_replace(
-		'/' . preg_quote( 'class="', '/' ) . '/',
-		'class="' . esc_attr( implode( ' ', $class_names ) ) . ' ',
-		$block_content,
-		1
-	);
+	/**
+	* The first chunk of innerContent contains the block markup up until the inner blocks start.
+	* We want to target the opening tag of the inner blocks wrapper, which is the last tag in that chunk.
+	*/
+	$inner_content_classnames = isset( $block['innerContent'][0] ) && 'string' === gettype( $block['innerContent'][0] ) ? gutenberg_get_classnames_from_last_tag( $block['innerContent'][0] ) : '';
 
-	return $content;
+	$content = new WP_HTML_Tag_Processor( $block_content );
+	if ( $inner_content_classnames ) {
+		$content->next_tag( array( 'class_name' => $inner_content_classnames ) );
+		foreach ( $class_names as $class_name ) {
+			$content->add_class( $class_name );
+		}
+	} else {
+		$content->next_tag();
+		$content->add_class( implode( ' ', $class_names ) );
+	}
+
+	return (string) $content;
 }
 
 // Register the block support. (overrides core one).
@@ -433,6 +455,7 @@ WP_Block_Supports::get_instance()->register(
 		'register_attribute' => 'gutenberg_register_layout_support',
 	)
 );
+
 if ( function_exists( 'wp_render_layout_support_flag' ) ) {
 	remove_filter( 'render_block', 'wp_render_layout_support_flag' );
 }
@@ -454,7 +477,7 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 		preg_quote( $tag_name, '/' )
 	);
 	if (
-		WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ||
+		wp_theme_has_theme_json() ||
 		1 === preg_match( $group_with_inner_container_regex, $block_content ) ||
 		( isset( $block['attrs']['layout']['type'] ) && 'flex' === $block['attrs']['layout']['type'] )
 	) {
@@ -519,7 +542,7 @@ function gutenberg_restore_image_outer_container( $block_content, $block ) {
 )/iUx";
 
 	if (
-		WP_Theme_JSON_Resolver::theme_has_support() ||
+		wp_theme_has_theme_json() ||
 		0 === preg_match( $image_with_align, $block_content, $matches )
 	) {
 		return $block_content;

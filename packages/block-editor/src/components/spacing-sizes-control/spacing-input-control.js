@@ -51,6 +51,8 @@ export default function SpacingInputControl( {
 	isMixed = false,
 	type,
 	minimumCustomValue,
+	onMouseOver,
+	onMouseOut,
 } ) {
 	// Treat value as a preset value if the passed in value matches the value of one of the spacingSizes.
 	value = getPresetValueFromCustomValue( value, spacingSizes );
@@ -218,6 +220,8 @@ export default function SpacingInputControl( {
 			{ showCustomValueControl && (
 				<>
 					<UnitControl
+						onMouseOver={ onMouseOver }
+						onMouseOut={ onMouseOut }
 						onChange={ ( newSize ) =>
 							onChange( getNewCustomValue( newSize ) )
 						}
@@ -229,11 +233,12 @@ export default function SpacingInputControl( {
 						label={ ariaLabel }
 						hideLabelFromVision={ true }
 						className="components-spacing-sizes-control__custom-value-input"
-						style={ { gridColumn: '1' } }
 						size={ '__unstable-large' }
 					/>
 
 					<RangeControl
+						onMouseOver={ onMouseOver }
+						onMouseOut={ onMouseOut }
 						value={ customRangeValue }
 						min={ 0 }
 						max={ CUSTOM_VALUE_SETTINGS[ selectedUnit ]?.max ?? 10 }
@@ -248,6 +253,8 @@ export default function SpacingInputControl( {
 			) }
 			{ showRangeControl && ! showCustomValueControl && (
 				<RangeControl
+					onMouseOver={ onMouseOver }
+					onMouseOut={ onMouseOut }
 					className="components-spacing-sizes-control__range-control"
 					value={ currentValue }
 					onChange={ ( newSize ) =>
@@ -293,6 +300,8 @@ export default function SpacingInputControl( {
 					hideLabelFromVision={ true }
 					__nextUnconstrainedWidth={ true }
 					size={ '__unstable-large' }
+					onMouseOver={ onMouseOver }
+					onMouseOut={ onMouseOut }
 				/>
 			) }
 		</>

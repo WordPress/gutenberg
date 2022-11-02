@@ -39,9 +39,9 @@ describe( 'Sandbox', () => {
 	};
 
 	it( 'should rerender with new emdeded content if html prop changes', () => {
-		const result = render( <TestWrapper /> );
+		const { container } = render( <TestWrapper /> );
 
-		const iframe = result.container.querySelector( '.components-sandbox' );
+		const iframe = container.querySelector( '.components-sandbox' );
 
 		let sandboxedIframe =
 			iframe.contentWindow.document.body.querySelector( '.mock-iframe' );

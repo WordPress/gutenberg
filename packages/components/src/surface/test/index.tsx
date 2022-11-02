@@ -16,43 +16,33 @@ describe( 'props', () => {
 	} );
 
 	test( 'should render correctly', () => {
-		expect( base.container.firstChild ).toMatchSnapshot();
+		expect( base.container ).toMatchSnapshot();
 	} );
 
 	test( 'should render variants', () => {
 		const { container } = render(
 			<Surface variant="secondary">Surface</Surface>
 		);
-		expect( container.firstChild ).toMatchDiffSnapshot(
-			base.container.firstChild
-		);
+		expect( container ).toMatchDiffSnapshot( base.container );
 	} );
 
 	test( 'should render borderLeft', () => {
 		const { container } = render( <Surface borderLeft>Surface</Surface> );
-		expect( container.firstChild ).toMatchDiffSnapshot(
-			base.container.firstChild
-		);
+		expect( container ).toMatchDiffSnapshot( base.container );
 	} );
 
 	test( 'should render borderRight', () => {
 		const { container } = render( <Surface borderRight>Surface</Surface> );
-		expect( container.firstChild ).toMatchDiffSnapshot(
-			base.container.firstChild
-		);
+		expect( container ).toMatchDiffSnapshot( base.container );
 	} );
 
 	test( 'should render borderTop', () => {
 		const { container } = render( <Surface borderTop>Surface</Surface> );
-		expect( container.firstChild ).toMatchDiffSnapshot(
-			base.container.firstChild
-		);
+		expect( container ).toMatchDiffSnapshot( base.container );
 	} );
 
 	test( 'should render borderBottom', () => {
 		const { container } = render( <Surface borderBottom>Surface</Surface> );
-		expect( container.firstChild ).toMatchDiffSnapshot(
-			base.container.firstChild
-		);
+		expect( container ).toMatchDiffSnapshot( base.container );
 	} );
 } );

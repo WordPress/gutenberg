@@ -11,7 +11,7 @@ import { Spinner } from '..';
 describe( 'props', () => {
 	test( 'should render correctly', () => {
 		const { container } = render( <Spinner /> );
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
 	test( 'should render color', () => {
@@ -19,9 +19,7 @@ describe( 'props', () => {
 		const { container: secondRenderContainer } = render(
 			<Spinner color="blue" />
 		);
-		expect( secondRenderContainer.firstChild ).toMatchDiffSnapshot(
-			container.firstChild
-		);
+		expect( secondRenderContainer ).toMatchDiffSnapshot( container );
 	} );
 
 	test( 'should render size', () => {
@@ -29,8 +27,6 @@ describe( 'props', () => {
 		const { container: secondRenderContainer } = render(
 			<Spinner size={ 31 } />
 		);
-		expect( secondRenderContainer.firstChild ).toMatchDiffSnapshot(
-			container.firstChild
-		);
+		expect( secondRenderContainer ).toMatchDiffSnapshot( container );
 	} );
 } );
