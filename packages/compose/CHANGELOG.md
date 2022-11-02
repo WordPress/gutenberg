@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.19.0 (2022-11-02)
+
 ### Internal
 
 -   `useDisabled`: Refactor the component to rely on the HTML `inert` attribute ([#44865](https://github.com/WordPress/gutenberg/pull/44865)).

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 22.0.0 (2022-11-02)
+
 ### Breaking Changes
 
 -   `Popover`: The deprecated `range` and `__unstableShift` props have been removed ([#45195](https://github.com/WordPress/gutenberg/pull/45195)).
