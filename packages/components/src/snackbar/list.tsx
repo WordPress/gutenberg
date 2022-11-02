@@ -40,12 +40,6 @@ const SNACKBAR_VARIANTS = {
 	},
 };
 
-const SNACKBAR_REDUCE_MOTION_VARIANTS = {
-	init: {},
-	open: {},
-	exit: {},
-};
-
 /**
  * Renders a list of notices.
  *
@@ -83,9 +77,7 @@ export function SnackbarList( {
 							exit={ 'exit' }
 							key={ notice.id }
 							variants={
-								isReducedMotion
-									? SNACKBAR_REDUCE_MOTION_VARIANTS
-									: SNACKBAR_VARIANTS
+								isReducedMotion ? undefined : SNACKBAR_VARIANTS
 							}
 						>
 							<div className="components-snackbar-list__notice-container">
