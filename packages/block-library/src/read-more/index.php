@@ -19,15 +19,18 @@ function render_block_core_read_more( $attributes, $content, $block ) {
 	}
 
 	$post_ID            = $block->context['postId'];
+	$post_title         = get_the_title( $post_ID );
 	$justify_class_name = empty( $attributes['justifyContent'] ) ? '' : "is-justified-{$attributes['justifyContent']}";
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $justify_class_name ) );
 	$more_text          = ! empty( $attributes['content'] ) ? wp_kses_post( $attributes['content'] ) : __( 'Read more' );
 	return sprintf(
-		'<a %1s href="%2s" target="%3s">%4s</a>',
+		'<a %1s href="%2s" target="%3s" aria-label="%4s">%5s<span class="screen-reader-text">%6s</span></a>',
 		$wrapper_attributes,
 		get_the_permalink( $post_ID ),
 		esc_attr( $attributes['linkTarget'] ),
-		$more_text
+		esc_attr__( 'Post ID: ' . $post_ID ),
+		$more_text,
+		$post_title
 	);
 }
 
