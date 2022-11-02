@@ -9,7 +9,12 @@ import classnames from 'classnames';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
-import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
+import {
+	getBlockType,
+	hasBlockSupport,
+	isReusableBlock,
+	isTemplatePart as isTemplate,
+} from '@wordpress/blocks';
 import { ToolbarGroup } from '@wordpress/components';
 
 /**
@@ -74,10 +79,6 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 		};
 	}, [] );
 
-	const isReusable =
-		blockType.name === 'core/block' && blockType.category === 'reusable';
-	const isTemplatePart = blockType.name === 'core/template-part';
-
 	// Handles highlighting the current block outline on hover or focus of the
 	// block type toolbar area.
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
@@ -113,6 +114,8 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 
 	const shouldShowVisualToolbar = isValid && isVisual;
 	const isMultiToolbar = blockClientIds.length > 1;
+	const isReusable = isReusableBlock( blockType );
+	const isTemplatePart = isTemplate( blockType );
 
 	const classes = classnames(
 		'block-editor-block-toolbar',

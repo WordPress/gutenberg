@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { store as blocksStore } from '@wordpress/blocks';
+import {
+	store as blocksStore,
+	isReusableBlock,
+	isTemplatePart as isTemplate,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -52,10 +56,8 @@ export default function useBlockDisplayInformation( clientId ) {
 			if ( ! blockType ) return null;
 			const attributes = getBlockAttributes( clientId );
 			const match = getActiveBlockVariation( blockName, attributes );
-			const isReusable =
-				blockType.name === 'core/block' &&
-				blockType.category === 'reusable';
-			const isTemplatePart = blockType.name === 'core/template-part';
+			const isReusable = isReusableBlock( blockType );
+			const isTemplatePart = isTemplate( blockType );
 			const blockTypeInfo = {
 				isReusable,
 				isTemplatePart,
