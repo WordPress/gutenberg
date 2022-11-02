@@ -61,7 +61,7 @@ An array of action objects. Each member object should contain a `label` and eith
 -   Required: No
 -   Default: `[]`
 
-#### `onRemove`: `Function`
+#### `onRemove`: `() => void`
 Function called when dismissing the notice.
 -   Required: No
 
@@ -75,7 +75,7 @@ Whether to require user action to dismiss the snackbar. By default, this is dism
 -   Required: No
 -   Default: `false`
 
-#### `onDismiss`: `Function`
+#### `onDismiss`: `() => void`
 A callback executed when the snackbar is dismissed. It is distinct from onRemove, which _looks_ like a callback but is actually the function to call to remove the snackbar from the UI.
 -   Required: No
 

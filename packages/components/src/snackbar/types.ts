@@ -31,7 +31,7 @@ export type Notice = {
 	spokenMessage: string;
 	actions: NoticeAction[];
 	icon?: ReactNode;
-	onDismiss?: Function;
+	onDismiss?: () => void;
 	content: string;
 	isDismissible: boolean;
 	explicitDismiss: boolean;
@@ -66,7 +66,7 @@ export type SnackbarProps = {
 	/**
 	 * Called to remove the snackbar from the UI.
 	 */
-	onRemove?: Function;
+	onRemove?: () => void;
 	/**
 	 * The icon to render in the snackbar.
 	 *
@@ -106,5 +106,5 @@ export type SnackbarListProps = {
 	/**
 	 * Function called when a notice should be removed / dismissed.
 	 */
-	onRemove?: Function;
+	onRemove?: ( id: Notice[ 'id' ] ) => void;
 };
