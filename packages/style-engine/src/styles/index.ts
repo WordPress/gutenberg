@@ -14,7 +14,6 @@ export const styleDefinitions = [
 	...color,
 	...dimensions,
 	...outline,
-	...dimensions,
 	...spacing,
 	...typography,
 	...shadow,
