@@ -693,6 +693,51 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	}
 
 	/**
+	 * Returns a filtered declarations array if there is a separator block with only a background
+	 * style defined in theme.json by adding a color attribute to reflect the changes in the front.
+	 *
+	 * @param array $declarations List of declarations.
+	 *
+	 * @return array $declarations List of declarations filtered.
+	 */
+	private static function update_separator_declarations( $declarations ) {
+		$background_matches = array_values(
+			array_filter(
+				$declarations,
+				function( $declaration ) {
+					return 'background-color' === $declaration['name'];
+				}
+			)
+		);
+		if ( ! empty( $background_matches && isset( $background_matches[0]['value'] ) ) ) {
+			$border_color_matches = array_values(
+				array_filter(
+					$declarations,
+					function( $declaration ) {
+						return 'border-color' === $declaration['name'];
+					}
+				)
+			);
+			$text_color_matches   = array_values(
+				array_filter(
+					$declarations,
+					function( $declaration ) {
+						return 'color' === $declaration['name'];
+					}
+				)
+			);
+			if ( empty( $border_color_matches ) && empty( $text_color_matches ) ) {
+				$declarations[] = array(
+					'name'  => 'color',
+					'value' => $background_matches[0]['value'],
+				);
+			}
+		}
+
+		return $declarations;
+	}
+
+	/**
 	 * Gets the CSS rules for a particular block from theme.json.
 	 *
 	 * @param array $block_metadata Metadata about the block to get styles for.
@@ -778,6 +823,11 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 				unset( $declarations[ $index ] );
 				$declarations_duotone[] = $declaration;
 			}
+		}
+
+		// Update declarations if there are separators with only background color defined.
+		if ( '.wp-block-separator' === $selector ) {
+			$declarations = static::update_separator_declarations( $declarations );
 		}
 
 		// 2. Generate and append the rules that use the general selector.
