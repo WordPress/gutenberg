@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
-import { getBlockType, serialize, parse } from '@wordpress/blocks';
+import { getBlockType, parse } from '@wordpress/blocks';
 import { useDispatch, useRegistry } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __, sprintf } from '@wordpress/i18n';
@@ -11,6 +11,24 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+
+function looksLikeBlocks( text ) {
+	try {
+		const blocks = parse( text, {
+			__unstableSkipMigrationLogs: true,
+			__unstableSkipAutop: true,
+		} );
+		if ( blocks.length === 1 && blocks[ 0 ].name === 'core/freeform' ) {
+			// It's likely that the text is just plain text and not serialized blocks.
+			return false;
+		}
+		return true;
+	} catch ( err ) {
+		// Parsing error, the text is not serialized blocks.
+		// (Even though that it technically won't happen)
+		return false;
+	}
+}
 
 function getStyleAttributes( block ) {
 	const blockType = getBlockType( block.name );
@@ -77,9 +95,8 @@ export default function usePasteStyles() {
 				return;
 			}
 
-			const copiedBlocks = parse( html );
 			// Abort if the copied text is empty or doesn't look like serialized blocks.
-			if ( ! html || serialize( copiedBlocks ) !== html ) {
+			if ( ! html || ! looksLikeBlocks( html ) ) {
 				createWarningNotice(
 					__( "The copied data doesn't appear to be blocks." ),
 					{
@@ -88,6 +105,8 @@ export default function usePasteStyles() {
 				);
 				return;
 			}
+
+			const copiedBlocks = parse( html );
 
 			if ( copiedBlocks.length === 1 ) {
 				// Apply styles of the block to all the target blocks.
