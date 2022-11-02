@@ -269,7 +269,8 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 }
 
 function ChildLayoutPanel( { setAttributes, attributes } ) {
-	const { style: { layout = {} } = {} } = attributes;
+	const { style = {} } = attributes;
+	const { layout = {} } = style;
 	const { selfStretch, flexSize } = layout;
 
 	return (
@@ -311,6 +312,7 @@ function ChildLayoutPanel( { setAttributes, attributes } ) {
 						onChange={ ( value ) => {
 							setAttributes( {
 								style: {
+									...style,
 									layout: {
 										...layout,
 										flexSize: value,
