@@ -6,7 +6,6 @@ import color from './color';
 import dimensions from './dimensions';
 import shadow from './shadow';
 import outline from './outline';
-import dimensions from './dimensions';
 import spacing from './spacing';
 import typography from './typography';
 
