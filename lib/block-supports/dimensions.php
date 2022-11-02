@@ -68,7 +68,7 @@ function gutenberg_apply_dimensions_support( $block_type, $block_attributes ) { 
 		$attributes['style'] = $styles['css'];
 	}
 
-	return empty( $styles ) ? array() : array( 'style' => implode( ' ', $styles ) );
+	return $attributes;
 }
 
 // Register the block support.
