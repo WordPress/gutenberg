@@ -155,18 +155,6 @@
 		}
 	}
 
-	&.is-template-part .block-editor-list-view-block-contents:focus {
-		&::after {
-			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-template-part-color);
-		}
-	}
-
-	&.is-reusable .block-editor-list-view-block-contents:focus {
-		&::after {
-			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-reusable-color);
-		}
-	}
-
 	// Fix focus styling width when one row has fewer cells.
 	&.has-single-cell .block-editor-list-view-block-contents:focus::after {
 		right: 0;
