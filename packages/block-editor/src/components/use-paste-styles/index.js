@@ -15,12 +15,18 @@ import { store as blockEditorStore } from '../../store';
 function getStyleAttributes( block ) {
 	const blockType = getBlockType( block.name );
 	const attributes = {};
-	// Mark every attribute that isn't "content" as a style attribute.
-	for ( const attribute in block.attributes ) {
-		if (
-			blockType.attributes[ attribute ].__experimentalRole !== 'content'
-		) {
-			attributes[ attribute ] = block.attributes[ attribute ];
+	for ( const [ attribute, attributeType ] of Object.entries(
+		blockType.attributes
+	) ) {
+		// Mark every attribute that isn't "content" as a style attribute.
+		if ( attributeType.__experimentalRole !== 'content' ) {
+			// Apply all attributes even when they are undefined to allow overriding styles.
+			attributes[ attribute ] = Object.hasOwn(
+				block.attributes,
+				attribute
+			)
+				? block.attributes[ attribute ]
+				: attributeType.default;
 		}
 	}
 	return attributes;
