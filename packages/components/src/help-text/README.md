@@ -18,7 +18,7 @@ The text that's displayed within the component's tags will be "clickable" and ex
 
 ### `url`
 
-An optional URL that is being linked to and will open in a new window when tapped or clicked.
+An optional URL to link, opens in a new window when tapped or clicked.
 
 -   Type: `String`
 -   Required: No
