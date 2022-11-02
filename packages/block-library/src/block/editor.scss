@@ -13,10 +13,11 @@
 	.components-disabled .block-list-appender {
 		display: none;
 	}
+}
 
+.block-library-block__reusable-block-container {
 	&.is-highlighted,
 	&.is-selected {
-		border-radius: $radius-block-ui;
 		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-reusable-color);
 	}
 
