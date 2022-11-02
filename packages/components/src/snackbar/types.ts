@@ -29,11 +29,8 @@ export type Notice = {
 	actions: Action[];
 	icon?: WPElement | null;
 	onDismiss?: Function;
-	status: string;
 	content: string;
-	__unstableHTML?: string;
 	isDismissible: boolean;
-	type: string;
 	explicitDismiss: boolean;
 };
 
