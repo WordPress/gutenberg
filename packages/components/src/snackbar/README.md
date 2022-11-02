@@ -66,7 +66,7 @@ Function called when dismissing the notice.
 -   Required: No
 -   Default: `() => void`
 
-#### `icon`: `WPElement | null`
+#### `icon`: `ReactNode`
 The icon to render in the snackbar.
 -   Required: No
 -   Default: `null`

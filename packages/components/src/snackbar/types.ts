@@ -8,11 +8,6 @@ import type {
 	ReactNode,
 } from 'react';
 
-/**
- * WordPress dependencies
- */
-import type { WPElement } from '@wordpress/element';
-
 export type ButtonEvent =
 	| KeyboardEvent< HTMLButtonElement >
 	| MouseEvent< HTMLButtonElement >;
@@ -27,7 +22,7 @@ export type Notice = {
 	id: string;
 	spokenMessage: string;
 	actions: Action[];
-	icon?: WPElement | null;
+	icon?: ReactNode;
 	onDismiss?: Function;
 	content: string;
 	isDismissible: boolean;
