@@ -17,7 +17,6 @@ import { selectBlocks } from './select-blocks';
 import { showBlockToolbar } from './show-block-toolbar';
 import { saveSiteEditorEntities } from './site-editor';
 import { transformBlockTo } from './transform-block-to';
-import { clickBlockAppender } from './click-block-appender';
 
 type EditorConstructorProps = {
 	page: Page;
@@ -65,5 +64,4 @@ export class Editor {
 	selectBlocks = selectBlocks.bind( this );
 	showBlockToolbar = showBlockToolbar.bind( this );
 	transformBlockTo = transformBlockTo.bind( this );
-	clickBlockAppender = clickBlockAppender.bind( this );
 }
