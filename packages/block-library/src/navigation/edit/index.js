@@ -656,40 +656,92 @@ function Navigation( {
 		return (
 			<TagName { ...blockProps }>
 				<InspectorControls>
-					<PanelBody title={ __( 'Menu' ) }>
-						<NavigationMenuSelector
-							currentMenuId={ ref }
-							clientId={ clientId }
-							onSelectNavigationMenu={ ( menuId ) => {
-								handleUpdateMenu( menuId );
-							} }
-							onSelectClassicMenu={ async ( classicMenu ) => {
-								const navMenu = await convertClassicMenu(
-									classicMenu.id,
-									classicMenu.name,
-									'draft'
-								);
-								if ( navMenu ) {
-									handleUpdateMenu( navMenu.id, {
-										focusNavigationBlock: true,
-									} );
-								}
-							} }
-							onCreateNew={ createUntitledEmptyNavigationMenu }
-							createNavigationMenuIsSuccess={
-								createNavigationMenuIsSuccess
-							}
-							/* translators: %s: The name of a menu. */
-							actionLabel={ __( "Switch to '%s'" ) }
-						/>
-						{ isOffCanvasNavigationEditorEnabled && (
+					{ isOffCanvasNavigationEditorEnabled && (
+						<PanelBody>
+							<HStack className="wp-block-navigation-off-canvas-editor__header">
+								<Heading
+									className="wp-block-navigation-off-canvas-editor__title"
+									level={ 2 }
+								>
+									{ __( 'Menu' ) }
+								</Heading>
+								<NavigationMenuSelector
+									currentMenuId={ ref }
+									clientId={ clientId }
+									onSelectNavigationMenu={ ( menuId ) => {
+										handleUpdateMenu( menuId );
+									} }
+									onSelectClassicMenu={ async (
+										classicMenu
+									) => {
+										const navMenu =
+											await convertClassicMenu(
+												classicMenu.id,
+												classicMenu.name,
+												'draft'
+											);
+										if ( navMenu ) {
+											handleUpdateMenu( navMenu.id, {
+												focusNavigationBlock: true,
+											} );
+										}
+									} }
+									onCreateNew={
+										createUntitledEmptyNavigationMenu
+									}
+									createNavigationMenuIsSuccess={
+										createNavigationMenuIsSuccess
+									}
+									/* translators: %s: The name of a menu. */
+									actionLabel={ __( "Switch to '%s'" ) }
+								/>
+							</HStack>
+
 							<OffCanvasEditor
 								blocks={ innerBlocks }
 								isExpanded={ true }
 								selectBlockInCanvas={ false }
 							/>
-						) }
-					</PanelBody>
+						</PanelBody>
+					) }
+					{ ! isOffCanvasNavigationEditorEnabled && (
+						<PanelBody title={ __( 'Menu' ) }>
+							<NavigationMenuSelector
+								currentMenuId={ ref }
+								clientId={ clientId }
+								onSelectNavigationMenu={ ( menuId ) => {
+									handleUpdateMenu( menuId );
+								} }
+								onSelectClassicMenu={ async ( classicMenu ) => {
+									const navMenu = await convertClassicMenu(
+										classicMenu.id,
+										classicMenu.name,
+										'draft'
+									);
+									if ( navMenu ) {
+										handleUpdateMenu( navMenu.id, {
+											focusNavigationBlock: true,
+										} );
+									}
+								} }
+								onCreateNew={
+									createUntitledEmptyNavigationMenu
+								}
+								createNavigationMenuIsSuccess={
+									createNavigationMenuIsSuccess
+								}
+								/* translators: %s: The name of a menu. */
+								actionLabel={ __( "Switch to '%s'" ) }
+							/>
+							{ isOffCanvasNavigationEditorEnabled && (
+								<OffCanvasEditor
+									blocks={ innerBlocks }
+									isExpanded={ true }
+									selectBlockInCanvas={ false }
+								/>
+							) }
+						</PanelBody>
+					) }
 				</InspectorControls>
 				{ stylingInspectorControls }
 				<ResponsiveWrapper
@@ -734,33 +786,85 @@ function Navigation( {
 		return (
 			<TagName { ...blockProps }>
 				<InspectorControls>
-					<PanelBody title={ __( 'Menu' ) }>
-						<NavigationMenuSelector
-							currentMenuId={ null }
-							clientId={ clientId }
-							onSelectNavigationMenu={ ( menuId ) => {
-								handleUpdateMenu( menuId );
-							} }
-							onSelectClassicMenu={ async ( classicMenu ) => {
-								const navMenu = await convertClassicMenu(
-									classicMenu.id,
-									classicMenu.name,
-									'draft'
-								);
-								if ( navMenu ) {
-									handleUpdateMenu( navMenu.id, {
-										focusNavigationBlock: true,
-									} );
+					{ isOffCanvasNavigationEditorEnabled && (
+						<PanelBody>
+							<HStack className="wp-block-navigation-off-canvas-editor__header">
+								<Heading
+									className="wp-block-navigation-off-canvas-editor__title"
+									level={ 2 }
+								>
+									{ __( 'Menu' ) }
+								</Heading>
+								<NavigationMenuSelector
+									currentMenuId={ null }
+									clientId={ clientId }
+									onSelectNavigationMenu={ ( menuId ) => {
+										handleUpdateMenu( menuId );
+									} }
+									onSelectClassicMenu={ async (
+										classicMenu
+									) => {
+										const navMenu =
+											await convertClassicMenu(
+												classicMenu.id,
+												classicMenu.name,
+												'draft'
+											);
+										if ( navMenu ) {
+											handleUpdateMenu( navMenu.id, {
+												focusNavigationBlock: true,
+											} );
+										}
+									} }
+									onCreateNew={
+										createUntitledEmptyNavigationMenu
+									}
+									createNavigationMenuIsSuccess={
+										createNavigationMenuIsSuccess
+									}
+									/* translators: %s: The name of a menu. */
+									actionLabel={ __( "Switch to '%s'" ) }
+								/>
+							</HStack>
+
+							<OffCanvasEditor
+								blocks={ innerBlocks }
+								isExpanded={ true }
+								selectBlockInCanvas={ false }
+							/>
+						</PanelBody>
+					) }
+					{ ! isOffCanvasNavigationEditorEnabled && (
+						<PanelBody title={ __( 'Menu' ) }>
+							<NavigationMenuSelector
+								currentMenuId={ null }
+								clientId={ clientId }
+								onSelectNavigationMenu={ ( menuId ) => {
+									handleUpdateMenu( menuId );
+								} }
+								onSelectClassicMenu={ async ( classicMenu ) => {
+									const navMenu = await convertClassicMenu(
+										classicMenu.id,
+										classicMenu.name,
+										'draft'
+									);
+									if ( navMenu ) {
+										handleUpdateMenu( navMenu.id, {
+											focusNavigationBlock: true,
+										} );
+									}
+								} }
+								onCreateNew={
+									createUntitledEmptyNavigationMenu
 								}
-							} }
-							onCreateNew={ createUntitledEmptyNavigationMenu }
-							createNavigationMenuIsSuccess={
-								createNavigationMenuIsSuccess
-							}
-							/* translators: %s: The name of a menu. */
-							actionLabel={ __( "Switch to '%s'" ) }
-						/>
-					</PanelBody>
+								createNavigationMenuIsSuccess={
+									createNavigationMenuIsSuccess
+								}
+								/* translators: %s: The name of a menu. */
+								actionLabel={ __( "Switch to '%s'" ) }
+							/>
+						</PanelBody>
+					) }
 				</InspectorControls>
 				<Warning>
 					{ __(
@@ -925,19 +1029,21 @@ function Navigation( {
 									} }
 								/>
 							) }
-						<Button
-							variant="link"
-							className="wp-block-navigation-manage-menus-button"
-							disabled={
-								! hasManagePermissions ||
-								! hasResolvedNavigationMenus
-							}
-							href={ addQueryArgs( 'edit.php', {
-								post_type: 'wp_navigation',
-							} ) }
-						>
-							{ __( 'Manage menus' ) }
-						</Button>
+						{ isOffCanvasNavigationEditorEnabled && (
+							<Button
+								variant="link"
+								className="wp-block-navigation-manage-menus-button"
+								disabled={
+									! hasManagePermissions ||
+									! hasResolvedNavigationMenus
+								}
+								href={ addQueryArgs( 'edit.php', {
+									post_type: 'wp_navigation',
+								} ) }
+							>
+								{ __( 'Manage menus' ) }
+							</Button>
+						) }
 					</InspectorControls>
 				) }
 
