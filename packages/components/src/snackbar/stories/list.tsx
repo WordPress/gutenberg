@@ -53,12 +53,6 @@ export const Default: ComponentStory< typeof SnackbarList > =
 Default.args = {
 	children:
 		'Use SnackbarList to communicate multiple low priority, non-interruptive messages to the user.',
-	notices: [ savePostNotice ],
-};
-
-export const MultipleNotices: ComponentStory< typeof SnackbarList > =
-	DefaultTemplate.bind( {} );
-MultipleNotices.args = {
 	notices: [
 		savePostNotice,
 		{
