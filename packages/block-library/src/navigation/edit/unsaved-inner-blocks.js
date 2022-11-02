@@ -171,9 +171,6 @@ export default function UnsavedInnerBlocks( {
 	const Wrapper = isSaving ? Disabled : 'div';
 
 	return (
-		<>
-			<Wrapper { ...innerBlocksProps } />
-			{ isSaving && <Spinner /> }
-		</>
+		<>{ isSaving ? <Spinner /> : <Wrapper { ...innerBlocksProps } /> }</>
 	);
 }
