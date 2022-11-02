@@ -12,7 +12,7 @@ import {
 	URLInput,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { Fragment, useState, useCallback } from '@wordpress/element';
+import { Fragment, useState } from '@wordpress/element';
 import {
 	Button,
 	PanelBody,
@@ -88,13 +88,6 @@ const SocialLinkEdit = ( {
 		},
 	} );
 
-	const onSetLinkRel = useCallback(
-		( value ) => {
-			setAttributes( { rel: value } );
-		},
-		[ setAttributes ]
-	);
-
 	return (
 		<Fragment>
 			<InspectorControls>
@@ -124,7 +117,7 @@ const SocialLinkEdit = ( {
 				<TextControl
 					label={ __( 'Link rel' ) }
 					value={ rel || '' }
-					onChange={ onSetLinkRel }
+					onChange={ ( value ) => setAttributes( { rel: value } ) }
 				/>
 			</InspectorControls>
 			<li { ...blockProps }>
