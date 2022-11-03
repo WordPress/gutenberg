@@ -119,8 +119,6 @@ export default function useSetting( path ) {
 
 			let result;
 
-			const normalizedPath = removeCustomPrefixes( path );
-
 			// 1. Take settings from the block instance or its ancestors.
 			// Start from the current block and work our way up the ancestors.
 			const candidates = [
@@ -134,41 +132,42 @@ export default function useSetting( path ) {
 			result = applyFilters(
 				'blockEditor.useSetting.before',
 				result,
-				blockName,
-				normalizedPath,
-				candidates
+				path,
+				clientId,
+				blockName
 			);
 
-			if ( result !== undefined ) {
-				for ( const candidateClientId of candidates ) {
-					const candidateBlockName =
-						select( blockEditorStore ).getBlockName(
+			if ( undefined !== result ) {
+				return result;
+			}
+
+			const normalizedPath = removeCustomPrefixes( path );
+
+			for ( const candidateClientId of candidates ) {
+				const candidateBlockName =
+					select( blockEditorStore ).getBlockName(
+						candidateClientId
+					);
+				if (
+					hasBlockSupport(
+						candidateBlockName,
+						'__experimentalSettings',
+						false
+					)
+				) {
+					const candidateAtts =
+						select( blockEditorStore ).getBlockAttributes(
 							candidateClientId
 						);
-					if (
-						hasBlockSupport(
-							candidateBlockName,
-							'__experimentalSettings',
-							false
-						)
-					) {
-						const candidateAtts =
-							select( blockEditorStore ).getBlockAttributes(
-								candidateClientId
-							);
-						result =
-							get(
-								candidateAtts,
-								`settings.blocks.${ blockName }.${ normalizedPath }`
-							) ??
-							get(
-								candidateAtts,
-								`settings.${ normalizedPath }`
-							);
-						if ( result !== undefined ) {
-							// Stop the search for more distant ancestors and move on.
-							break;
-						}
+					result =
+						get(
+							candidateAtts,
+							`settings.blocks.${ blockName }.${ normalizedPath }`
+						) ??
+						get( candidateAtts, `settings.${ normalizedPath }` );
+					if ( result !== undefined ) {
+						// Stop the search for more distant ancestors and move on.
+						break;
 					}
 				}
 			}
