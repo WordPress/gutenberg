@@ -327,7 +327,7 @@ module.exports = {
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-unit' ],
 		},
 		{
-			files: [ '**/test/**/*.js' ],
+			files: [ '**/test/**/*.[tj]s?(x)' ],
 			excludedFiles: [
 				'**/*.@(android|ios|native).js',
 				'packages/react-native-*/**/*.js',
