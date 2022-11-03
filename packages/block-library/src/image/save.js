@@ -46,13 +46,18 @@ export default function save( { attributes } ) {
 		[ `wp-image-${ id }` ]: !! id,
 	} );
 
-	// Use the hashed url to create an ID to use with aria-describedby.
-	const hashString = ( str ) =>
-		str
-			.split( '' )
-			.map( ( c ) => c.charCodeAt( 0 ).toString( 32 ).padStart( 2, '0' ) )
-			.join( '' );
-	const describedById = `wp-image-caption-${ hashString( url ) }`;
+	let describedById = 'wp-image-caption';
+	if ( url ) {
+		// Use the hashed url to create an ID to use with aria-describedby.
+		const hashString = ( str ) =>
+			str
+				.split( '' )
+				.map( ( c ) =>
+					c.charCodeAt( 0 ).toString( 32 ).padStart( 2, '0' )
+				)
+				.join( '' );
+		describedById = `wp-image-caption-${ hashString( url ) }`;
+	}
 
 	const image = (
 		<img
