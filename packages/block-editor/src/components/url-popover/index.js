@@ -17,26 +17,38 @@ import deprecated from '@wordpress/deprecated';
 import LinkViewer from './link-viewer';
 import LinkEditor from './link-editor';
 
+const DEFAULT_PLACEMENT = 'bottom';
+
 function URLPopover( {
 	additionalControls,
 	children,
 	renderSettings,
-	placement = 'bottom',
+	// The DEFAULT_PLACEMENT value is assigned inside the function's body
+	placement,
 	focusOnMount = 'firstElement',
 	// Deprecated
 	position,
 	// Rest
 	...popoverProps
 } ) {
-	let computedPlacement = placement;
 	if ( position !== undefined ) {
 		deprecated( '`position` prop in wp.blockEditor.URLPopover', {
 			since: '6.2',
 			alternative: '`placement` prop',
 		} );
+	}
 
+	// Compute popover's placement:
+	// - give priority to `placement` prop, if defined
+	// - otherwise, compute it from the legacy `position` prop (if defined)
+	// - finally, fallback to the DEFAULT_PLACEMENT.
+	let computedPlacement;
+	if ( placement !== undefined ) {
+		computedPlacement = placement;
+	} else if ( position !== undefined ) {
 		computedPlacement = positionToPlacement( position );
 	}
+	computedPlacement = computedPlacement || DEFAULT_PLACEMENT;
 
 	const [ isSettingsExpanded, setIsSettingsExpanded ] = useState( false );
 
