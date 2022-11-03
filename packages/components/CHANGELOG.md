@@ -73,12 +73,6 @@
 -   `Autocomplete`: use Popover's new `placement` prop instead of legacy `position` prop ([#44396](https://github.com/WordPress/gutenberg/pull/44396/)).
 -   `SelectControl`: Add `onChange`, `onBlur` and `onFocus` to storybook actions ([#45432](https://github.com/WordPress/gutenberg/pull/45432/)).
 -   `FontSizePicker`: Add more comprehensive tests ([#45298](https://github.com/WordPress/gutenberg/pull/45298)).
--   `FontSizePicker`: Refactor to use components instead of helper functions ([#44891](https://github.com/WordPress/gutenberg/pull/44891)).
-
-### Experimental
-
--   `NumberControl`: Replace `hideHTMLArrows` prop with `spinControls` prop. Allow custom spin controls via `spinControls="custom"` ([#45333](https://github.com/WordPress/gutenberg/pull/45333)).
->>>>>>> trunk
 
 ## 21.3.0 (2022-10-19)
 
