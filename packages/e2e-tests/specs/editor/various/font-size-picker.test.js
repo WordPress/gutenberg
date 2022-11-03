@@ -102,50 +102,59 @@ describe( 'Font Size Picker', () => {
 	describe( 'More font sizes', () => {
 		beforeEach( async () => {
 			await page.evaluate( () => {
-				wp.data.dispatch( 'core/block-editor' ).updateSettings(
-					// eslint-disable-next-line no-undef
-					lodash.merge(
-						wp.data.select( 'core/block-editor' ).getSettings(),
-						{
-							__experimentalFeatures: {
-								typography: {
-									fontSizes: {
-										default: [
-											{
-												name: 'Tiny',
-												slug: 'tiny',
-												size: '11px',
-											},
-											{
-												name: 'Small',
-												slug: 'small',
-												size: '13px',
-											},
-											{
-												name: 'Medium',
-												slug: 'medium',
-												size: '20px',
-											},
-											{
-												name: 'Large',
-												slug: 'large',
-												size: '36px',
-											},
-											{
-												name: 'Extra Large',
-												slug: 'x-large',
-												size: '42px',
-											},
-											{
-												name: 'Huge',
-												slug: 'huge',
-												size: '48px',
-											},
-										],
-									},
-								},
-							},
+				// set a deep `path[]` property in object `obj` to `value`, immutably
+				function setDeep( obj, path, value ) {
+					function doSet( o, i ) {
+						if ( i < path.length ) {
+							const key = path[ i ];
+							return { ...o, [ key ]: doSet( o[ key ], i + 1 ) };
 						}
+						return value;
+					}
+					return doSet( obj, 0 );
+				}
+
+				wp.data.dispatch( 'core/block-editor' ).updateSettings(
+					setDeep(
+						wp.data.select( 'core/block-editor' ).getSettings(),
+						[
+							'__experimentalFeatures',
+							'typography',
+							'fontSizes',
+							'default',
+						],
+						[
+							{
+								name: 'Tiny',
+								slug: 'tiny',
+								size: '11px',
+							},
+							{
+								name: 'Small',
+								slug: 'small',
+								size: '13px',
+							},
+							{
+								name: 'Medium',
+								slug: 'medium',
+								size: '20px',
+							},
+							{
+								name: 'Large',
+								slug: 'large',
+								size: '36px',
+							},
+							{
+								name: 'Extra Large',
+								slug: 'x-large',
+								size: '42px',
+							},
+							{
+								name: 'Huge',
+								slug: 'huge',
+								size: '48px',
+							},
+						]
 					)
 				);
 			} );
