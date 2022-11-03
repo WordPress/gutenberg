@@ -87,9 +87,11 @@ Function called when dismissing the notice.
 
 #### `politeness`: `'polite' | 'assertive'`
 
-A politeness level for the notice's spoken message. Should be provided as one of the valid options for [an `aria-live` attribute value](https://www.w3.org/TR/wai-aria-1.1/#aria-live). Defaults to `"polite"`. Note that this value should be considered a suggestion; assistive technologies may override it based on internal heuristics.
--   A value of `'assertive'` is to be used for important, and usually time-sensitive, information. It will interrupt anything else the screen reader is announcing in that moment.
--   A value of `'polite'` is to be used for advisory information. It should not interrupt what the screen reader is announcing in that moment (the "speech queue") or interrupt the current task.
+A politeness level for the notice's spoken message. Should be provided as one of the valid options for [an `aria-live` attribute value](https://www.w3.org/TR/wai-aria-1.1/#aria-live). Note that this value should be considered a suggestion; assistive technologies may override it based on internal heuristics.
+
+A value of `'assertive'` is to be used for important, and usually time-sensitive, information. It will interrupt anything else the screen reader is announcing in that moment.
+
+A value of `'polite'` is to be used for advisory information. It should not interrupt what the screen reader is announcing in that moment (the "speech queue") or interrupt the current task.
 
 -   Required: No
 -   Default: `'polite'`
