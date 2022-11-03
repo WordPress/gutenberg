@@ -47,11 +47,11 @@ if ( ! function_exists( 'wp_theme_clean_theme_json_cached_data' ) ) {
 }
 
 /**
- * Lookup a CSS selector for the block provided, and return it if it exists
- * 
- * @param string $block_name The name of the block to lookup the CSS selector for
- * 
- * @return string|null the CSS selector for the block
+ * Lookup a CSS selector for the block provided, and return it if it exists.
+ *
+ * @param string $block_name The name of the block to lookup the CSS selector for.
+ *
+ * @return string|null the CSS selector for the block.
  */
 function wp_theme_get_css_selector_for_block( $block_name ) {
 	$registry = WP_Block_Type_Registry::get_instance();
@@ -69,6 +69,6 @@ function wp_theme_get_css_selector_for_block( $block_name ) {
 		}
 	}
 
-	// Selector for the block was not found
+	// Selector for the block was not found.
 	return null;
 }
