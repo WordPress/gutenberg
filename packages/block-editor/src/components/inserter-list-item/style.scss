@@ -4,8 +4,7 @@
 	padding: 0;
 	margin: 0;
 	&.is-synced {
-		.block-editor-block-icon.has-colors,
-		.block-editor-block-types-list__item-title {
+		.block-editor-block-icon.has-colors {
 			color: var(--wp-block-synced-color);
 		}
 	}
