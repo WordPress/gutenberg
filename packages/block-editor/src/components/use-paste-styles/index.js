@@ -12,6 +12,12 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import { store as blockEditorStore } from '../../store';
 
+/**
+ * Determine if the copied text looks like serialized blocks or not.
+ *
+ * @param {string} text The copied text.
+ * @return {boolean} True if the text looks like serialized blocks, false otherwise.
+ */
 function looksLikeBlocks( text ) {
 	try {
 		const blocks = parse( text, {
@@ -30,6 +36,13 @@ function looksLikeBlocks( text ) {
 	}
 }
 
+/**
+ * Get the "style attributes" from a given block.
+ * A "style attribute" is an attribute that doesn't have `__experimentalRole` of `content`.
+ *
+ * @param {WPBlock} block The input block.
+ * @return {Object} the filtered attributes object.
+ */
 function getStyleAttributes( block ) {
 	const blockType = getBlockType( block.name );
 	const attributes = {};
@@ -50,6 +63,13 @@ function getStyleAttributes( block ) {
 	return attributes;
 }
 
+/**
+ * Update the target blocks with style attributes recursively.
+ *
+ * @param {WPBlock[]} targetBlocks          The target blocks to be updated.
+ * @param {WPBlock[]} sourceBlocks          The source blocks to get th style attributes from.
+ * @param {Function}  updateBlockAttributes The function to update the attributes.
+ */
 function recursivelyUpdateBlockAttributes(
 	targetBlocks,
 	sourceBlocks,
@@ -73,6 +93,11 @@ function recursivelyUpdateBlockAttributes(
 	}
 }
 
+/**
+ * A hook to return a pasteStyles event function for handling pasting styles to blocks.
+ *
+ * @return {Function} A function to update the styles to the blocks.
+ */
 export default function usePasteStyles() {
 	const registry = useRegistry();
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
@@ -83,8 +108,19 @@ export default function usePasteStyles() {
 		async ( targetBlocks ) => {
 			let html = '';
 			try {
+				// `http:` sites won't have the clipboard property on navigator.
+				if ( ! window.navigator.clipboard ) {
+					createErrorNotice(
+						__(
+							'Reading from the clipboard is only available in secure contexts (HTTPS) in supporting browsers.'
+						),
+						{ type: 'snackbar' }
+					);
+					return;
+				}
+
 				html = await window.navigator.clipboard.readText();
-			} catch ( err ) {
+			} catch ( error ) {
 				// Possibly the permission is denied.
 				createErrorNotice(
 					__( 'Permission denied: Unable to read from clipboard.' ),
