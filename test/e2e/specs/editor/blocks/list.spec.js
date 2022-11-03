@@ -1245,22 +1245,12 @@ test.describe( 'List', () => {
 			page.locator( 'role=document[name="Block: List"i]' )
 		);
 
-		await page
-			.getByRole( 'button', {
-				name: 'List',
-				description: 'List: Change block type or style',
-			} )
-			.click();
+		await page.getByRole( 'button', { name: 'List' } ).click();
 		await page.getByRole( 'menuitem', { name: 'Paragraph' } ).click();
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 
-		await page
-			.getByRole( 'button', {
-				name: 'Paragraph',
-				description: 'Change type of 2 blocks',
-			} )
-			.click();
+		await page.getByRole( 'button', { name: 'Paragraph' } ).click();
 		await page.getByRole( 'menuitem', { name: 'List' } ).click();
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
