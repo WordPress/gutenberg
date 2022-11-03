@@ -25,15 +25,16 @@
 	z-index: z-index(".block-library-template-part__selection-search");
 }
 
-.is-outline-mode .block-editor-block-list__block:not(.remove-outline).wp-block-template-part {
+.is-outline-mode .block-editor-block-list__block:not(.remove-outline).wp-block-template-part,
+.is-outline-mode .block-editor-block-list__block:not(.remove-outline).is-reusable {
 	&.is-highlighted,
 	&.is-selected {
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-template-part-color);
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-synced-color);
 	}
 
 	&.block-editor-block-list__block:not([contenteditable]):focus {
 		&::after {
-			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-template-part-color);
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-synced-color);
 			// Show a light color for dark themes.
 			.is-dark-theme & {
 				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $dark-theme-focus;
@@ -45,12 +46,12 @@
 .is-outline-mode .block-editor-block-list__block:not(.remove-outline).is-reusable {
 	&.is-highlighted,
 	&.is-selected {
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-reusable-color);
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-synced-color);
 	}
 
 	&.block-editor-block-list__block:not([contenteditable]):focus {
 		&::after {
-			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-reusable-color);
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-synced-color);
 			// Show a light color for dark themes.
 			.is-dark-theme & {
 				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $dark-theme-focus;

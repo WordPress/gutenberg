@@ -13,7 +13,7 @@ import {
 	getBlockType,
 	hasBlockSupport,
 	isReusableBlock,
-	isTemplatePart as isTemplate,
+	isTemplatePart,
 } from '@wordpress/blocks';
 import { ToolbarGroup } from '@wordpress/components';
 
@@ -114,15 +114,14 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 
 	const shouldShowVisualToolbar = isValid && isVisual;
 	const isMultiToolbar = blockClientIds.length > 1;
-	const isReusable = isReusableBlock( blockType );
-	const isTemplatePart = isTemplate( blockType );
+	const isSynced =
+		isReusableBlock( blockType ) || isTemplatePart( blockType );
 
 	const classes = classnames(
 		'block-editor-block-toolbar',
 		shouldShowMovers && 'is-showing-movers',
 		{
-			'is-reusable': isReusable,
-			'is-template-part': isTemplatePart,
+			'is-synced': isSynced,
 		}
 	);
 

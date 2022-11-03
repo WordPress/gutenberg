@@ -207,8 +207,7 @@ function ListViewBlock( {
 		'is-branch-selected': isBranchSelected,
 		'is-dragging': isDragged,
 		'has-single-cell': ! showBlockActions,
-		'is-reusable': blockInformation.isReusable,
-		'is-template-part': blockInformation.isTemplatePart,
+		'is-synced': blockInformation.isSynced,
 	} );
 
 	// Only include all selected blocks if the currently clicked on block

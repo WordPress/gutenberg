@@ -5,7 +5,7 @@ import { useSelect } from '@wordpress/data';
 import {
 	store as blocksStore,
 	isReusableBlock,
-	isTemplatePart as isTemplate,
+	isTemplatePart,
 } from '@wordpress/blocks';
 
 /**
@@ -20,12 +20,11 @@ import { store as blockEditorStore } from '../../store';
  *
  * @typedef {Object} WPBlockDisplayInformation
  *
- * @property {boolean} isReusable     True if is a reusable block
- * @property {boolean} isTemplatePart True if is a template part block
- * @property {string}  title          Human-readable block type label.
- * @property {WPIcon}  icon           Block type icon.
- * @property {string}  description    A detailed block type description.
- * @property {string}  anchor         HTML anchor.
+ * @property {boolean} isSynced    True if is a reusable block or template part
+ * @property {string}  title       Human-readable block type label.
+ * @property {WPIcon}  icon        Block type icon.
+ * @property {string}  description A detailed block type description.
+ * @property {string}  anchor      HTML anchor.
  */
 
 /**
@@ -56,11 +55,10 @@ export default function useBlockDisplayInformation( clientId ) {
 			if ( ! blockType ) return null;
 			const attributes = getBlockAttributes( clientId );
 			const match = getActiveBlockVariation( blockName, attributes );
-			const isReusable = isReusableBlock( blockType );
-			const isTemplatePart = isTemplate( blockType );
+			const isSynced =
+				isReusableBlock( blockType ) || isTemplatePart( blockType );
 			const blockTypeInfo = {
-				isReusable,
-				isTemplatePart,
+				isSynced,
 				title: blockType.title,
 				icon: blockType.icon,
 				description: blockType.description,
@@ -69,8 +67,7 @@ export default function useBlockDisplayInformation( clientId ) {
 			if ( ! match ) return blockTypeInfo;
 
 			return {
-				isReusable,
-				isTemplatePart,
+				isSynced,
 				title: match.title || blockType.title,
 				icon: match.icon || blockType.icon,
 				description: match.description || blockType.description,

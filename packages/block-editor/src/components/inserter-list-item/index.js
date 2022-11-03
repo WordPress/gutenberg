@@ -11,7 +11,7 @@ import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 	isReusableBlock,
-	isTemplatePart as isTemplate,
+	isTemplatePart,
 } from '@wordpress/blocks';
 import { __experimentalTruncate as Truncate } from '@wordpress/components';
 import { ENTER, isAppleOS } from '@wordpress/keycodes';
@@ -49,8 +49,7 @@ function InserterListItem( {
 		];
 	}, [ item.name, item.initialAttributes, item.initialAttributes ] );
 
-	const isReusable = isReusableBlock( item );
-	const isTemplatePart = isTemplate( item );
+	const isSynced = isReusableBlock( item ) || isTemplatePart( item );
 
 	return (
 		<InserterDraggableBlocks
@@ -64,8 +63,7 @@ function InserterListItem( {
 						'block-editor-block-types-list__list-item',
 
 						{
-							'is-reusable': isReusable,
-							'is-template-part': isTemplatePart,
+							'is-synced': isSynced,
 						}
 					) }
 					draggable={ draggable }

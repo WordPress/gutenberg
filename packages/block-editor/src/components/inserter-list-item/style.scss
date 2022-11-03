@@ -3,16 +3,10 @@
 	width: 33.33%;
 	padding: 0;
 	margin: 0;
-	&.is-template-part {
+	&.is-synced {
 		.block-editor-block-icon.has-colors,
 		.block-editor-block-types-list__item-title {
-			color: var(--wp-block-template-part-color);
-		}
-	}
-	&.is-reusable {
-		.block-editor-block-icon.has-colors,
-		.block-editor-block-types-list__item-title {
-			color: var(--wp-block-reusable-color);
+			color: var(--wp-block-synced-color);
 		}
 	}
 }
