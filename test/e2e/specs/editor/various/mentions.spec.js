@@ -46,7 +46,9 @@ test.describe( 'autocomplete mentions', () => {
 		await page.keyboard.type( 'Stuck in the middle with you' );
 		await pageUtils.pressKeyTimes( 'ArrowLeft', 'you'.length );
 		await page.keyboard.type( '@j' );
-		await page.locator( '.components-autocomplete__result' ).waitFor();
+		await expect(
+			page.locator( 'role=listbox >> role=option[name=/testuser/i]' )
+		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( ' ' );
 		await expect.poll( editor.getEditedPostContent ).toBe(
