@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { reduce, omit, mapValues, isEqual, isEmpty } from 'lodash';
+import { omit, mapValues, isEqual, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -683,30 +683,22 @@ const withReplaceInnerBlocks = ( reducer ) => ( state, action ) => {
 		// will be deleted entirely from its entity.
 		stateAfterInsert.order = {
 			...stateAfterInsert.order,
-			...reduce(
-				nestedControllers,
-				( result, value, key ) => {
-					if ( state.order[ key ] ) {
-						result[ key ] = state.order[ key ];
-					}
-					return result;
-				},
-				{}
-			),
+			...Object.keys( nestedControllers ).reduce( ( result, key ) => {
+				if ( state.order[ key ] ) {
+					result[ key ] = state.order[ key ];
+				}
+				return result;
+			}, {} ),
 		};
 		stateAfterInsert.tree = {
 			...stateAfterInsert.tree,
-			...reduce(
-				nestedControllers,
-				( result, value, _key ) => {
-					const key = `controlled||${ _key }`;
-					if ( state.tree[ key ] ) {
-						result[ key ] = state.tree[ key ];
-					}
-					return result;
-				},
-				{}
-			),
+			...Object.keys( nestedControllers ).reduce( ( result, _key ) => {
+				const key = `controlled||${ _key }`;
+				if ( state.tree[ key ] ) {
+					result[ key ] = state.tree[ key ];
+				}
+				return result;
+			}, {} ),
 		};
 	}
 	return stateAfterInsert;
@@ -873,24 +865,22 @@ export const blocks = pipe(
 				const next = action.clientIds.reduce(
 					( accumulator, id ) => ( {
 						...accumulator,
-						[ id ]: reduce(
+						[ id ]: Object.entries(
 							action.uniqueByBlock
 								? action.attributes[ id ]
-								: action.attributes,
-							( result, value, key ) => {
-								// Consider as updates only changed values.
-								if ( value !== result[ key ] ) {
-									result = getMutateSafeObject(
-										state[ id ],
-										result
-									);
-									result[ key ] = value;
-								}
+								: action.attributes ?? {}
+						).reduce( ( result, [ key, value ] ) => {
+							// Consider as updates only changed values.
+							if ( value !== result[ key ] ) {
+								result = getMutateSafeObject(
+									state[ id ],
+									result
+								);
+								result[ key ] = value;
+							}
 
-								return result;
-							},
-							state[ id ]
-						),
+							return result;
+						}, state[ id ] ),
 					} ),
 					{}
 				);
@@ -1056,8 +1046,7 @@ export const blocks = pipe(
 					} ),
 					( nextState ) =>
 						mapValues( nextState, ( subState ) =>
-							reduce(
-								subState,
+							Object.values( subState ).reduce(
 								( result, clientId ) => {
 									if ( clientId === clientIds[ 0 ] ) {
 										return [
