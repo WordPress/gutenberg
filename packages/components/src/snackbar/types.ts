@@ -31,26 +31,45 @@ export type Notice = {
 
 export type SnackbarProps = {
 	/**
-	 * The displayed message of a notice. Also used as the spoken message for assistive technology, unless `spokenMessage` is provided as an alternative message.
+	 * The displayed message of a notice.
+	 *
+	 * Also used as the spoken message for assistive technology,
+	 * unless `spokenMessage` is provided as an alternative message.
 	 */
 	children: string;
 	/**
-	 * Used to provide a custom spoken message in place of the `children` default.
+	 * Used to provide a custom spoken message.
 	 *
 	 * @default children
 	 */
 	spokenMessage?: Notice[ 'spokenMessage' ];
 	/**
-	 * A politeness level for the notice's spoken message. Should be provided as one of the valid options for [an `aria-live` attribute value](https://www.w3.org/TR/wai-aria-1.1/#aria-live). Defaults to `"polite"`. Note that this value should be considered a suggestion; assistive technologies may override it based on internal heuristics.
+	 * A politeness level for the notice's spoken message.
 	 *
-	 * A value of `'assertive'` is to be used for important, and usually time-sensitive, information. It will interrupt anything else the screen reader is announcing in that moment.
-	 * A value of `'polite'` is to be used for advisory information. It should not interrupt what the screen reader is announcing in that moment (the "speech queue") or interrupt the current task.
+	 * Should be provided as one of the valid options
+	 * for an `aria-live` attribute value.
+	 * Note that this value should be considered a suggestion.
+	 * Assistive technologies may override it based on internal heuristics.
+	 *
+	 * A value of `'assertive'` is to be used for important
+	 * and usually time-sensitive, information.
+	 * It will interrupt anything else the screen reader
+	 * is announcing in that moment.
+	 *
+	 * A value of `'polite'` is to be used for advisory information.
+	 * It should not interrupt what the screen reader is announcing
+	 * in that moment (the "speech queue") or interrupt the current task.
+	 *
+	 * @see https://www.w3.org/TR/wai-aria-1.1/#aria-live
 	 *
 	 * @default 'polite'
 	 */
 	politeness?: 'polite' | 'assertive';
 	/**
-	 * An array of action objects. Each member object should contain a `label` and either a `url` link string or `onClick` callback function.
+	 * An array of action objects.
+	 *
+	 * Each member object should contain
+	 * a `label` and either a `url` link string or `onClick` callback function.
 	 *
 	 * @default []
 	 */
