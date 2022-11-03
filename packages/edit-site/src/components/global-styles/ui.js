@@ -22,6 +22,7 @@ import ScreenTextColor from './screen-text-color';
 import ScreenLinkColor from './screen-link-color';
 import ScreenHeadingColor from './screen-heading-color';
 import ScreenButtonColor from './screen-button-color';
+import ScreenShadows from './screen-shadows';
 import ScreenLayout from './screen-layout';
 import ScreenStyleVariations from './screen-style-variations';
 
@@ -106,6 +107,10 @@ function ContextScreens( { name } ) {
 				path={ parentMenu + '/colors/button' }
 			>
 				<ScreenButtonColor name={ name } />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path={ parentMenu + '/shadows' }>
+				<ScreenShadows name={ name } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/layout' }>

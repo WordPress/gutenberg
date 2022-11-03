@@ -10,6 +10,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { useHasBorderPanel } from './border-panel';
 import { useHasColorPanel } from './color-utils';
+import { useHasShadowPanel } from './shadows-panel';
 import { useHasDimensionsPanel } from './dimensions-panel';
 import { useHasTypographyPanel } from './typography-panel';
 import { NavigationButtonAsItem } from './navigation-button';
@@ -17,6 +18,7 @@ import { NavigationButtonAsItem } from './navigation-button';
 function ContextMenu( { name, parentMenu = '' } ) {
 	const hasTypographyPanel = useHasTypographyPanel( name );
 	const hasColorPanel = useHasColorPanel( name );
+	const hasShadowPanel = useHasShadowPanel( name );
 	const hasBorderPanel = useHasBorderPanel( name );
 	const hasDimensionsPanel = useHasDimensionsPanel( name );
 	const hasLayoutPanel = hasBorderPanel || hasDimensionsPanel;
@@ -39,6 +41,15 @@ function ContextMenu( { name, parentMenu = '' } ) {
 					aria-label={ __( 'Colors styles' ) }
 				>
 					{ __( 'Colors' ) }
+				</NavigationButtonAsItem>
+			) }
+			{ hasShadowPanel && (
+				<NavigationButtonAsItem
+					icon={ color }
+					path={ parentMenu + '/shadows' }
+					aria-label={ __( 'Shadow styles' ) }
+				>
+					{ __( 'Shadows' ) }
 				</NavigationButtonAsItem>
 			) }
 			{ hasLayoutPanel && (
