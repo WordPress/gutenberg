@@ -46,11 +46,18 @@ if ( ! function_exists( 'wp_theme_clean_theme_json_cached_data' ) ) {
 	}
 }
 
-function wp_theme_get_selector_for_block( $block_name_to_lookup ) {
+/**
+ * Lookup a CSS selector for the block provided, and return it if it exists
+ * 
+ * @param string $block_name_to_lookup The name of the block to lookup the CSS selector for
+ * 
+ * @return string the CSS selector for the block
+ */
+function get_css_selector_for_block( $block_name_to_lookup ) {
 	$registry = WP_Block_Type_Registry::get_instance();
 	$blocks   = $registry->get_all_registered();
 
-	// Lookup the selector quickly
+	// Lookup the block quickly
 	if ( isset( $blocks[ $block_name_to_lookup ] ) ) {
 		$block = $blocks[ $block_name_to_lookup ];
 		if (
