@@ -38,6 +38,7 @@ const ADMIN = {
 
 const UI = {
 	theme: ADMIN.theme,
+	themeDark10: ADMIN.themeDark10,
 	background: white,
 	backgroundDisabled: GRAY[ 100 ],
 	border: GRAY[ 700 ],
