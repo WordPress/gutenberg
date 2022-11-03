@@ -98,7 +98,7 @@ A value of `'polite'` is to be used for advisory information. It should not inte
 
 #### `spokenMessage`: `string`
 
-Used to provide a custom spoken message in place of the `children` default.
+Used to provide a custom spoken message.
 
 -   Required: No
 -   Default: `children`
