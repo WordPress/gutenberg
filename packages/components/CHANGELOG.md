@@ -10,6 +10,10 @@
 
 -   `Autocomplete`: Fix unexpected block insertion during IME composition ([#45510](https://github.com/WordPress/gutenberg/pull/45510)).
 
+### Internal
+
+-   `PaletteEditListView`: Update to ignore `exhaustive-deps` eslint rule ([#45467](https://github.com/WordPress/gutenberg/pull/45467)).
+
 ## 22.0.0 (2022-11-02)
 
 ### Breaking Changes
