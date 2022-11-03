@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, isEmpty, kebabCase, pickBy, reduce, set } from 'lodash';
+import { get, isEmpty, kebabCase, pickBy, set } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -61,8 +61,7 @@ function compileStyleValue( uncompiledValue ) {
  * @return {Array<Object>} An array of style declarations.
  */
 function getPresetsDeclarations( blockPresets = {}, mergedSettings ) {
-	return reduce(
-		PRESET_METADATA,
+	return PRESET_METADATA.reduce(
 		( declarations, { path, valueKey, valueFunc, cssVarInfix } ) => {
 			const presetByOrigin = get( blockPresets, path, [] );
 			[ 'default', 'theme', 'custom' ].forEach( ( origin ) => {
@@ -102,8 +101,7 @@ function getPresetsDeclarations( blockPresets = {}, mergedSettings ) {
  * @return {string} CSS declarations for the preset classes.
  */
 function getPresetsClasses( blockSelector, blockPresets = {} ) {
-	return reduce(
-		PRESET_METADATA,
+	return PRESET_METADATA.reduce(
 		( declarations, { path, cssVarInfix, classes } ) => {
 			if ( ! classes ) {
 				return declarations;
@@ -193,9 +191,11 @@ export function getStylesDeclarations(
 	tree = {}
 ) {
 	const isRoot = ROOT_BLOCK_SELECTOR === selector;
-	const output = reduce(
-		STYLE_PROPERTY,
-		( declarations, { value, properties, useEngine, rootOnly }, key ) => {
+	const output = Object.entries( STYLE_PROPERTY ).reduce(
+		(
+			declarations,
+			[ key, { value, properties, useEngine, rootOnly } ]
+		) => {
 			if ( rootOnly && ! isRoot ) {
 				return declarations;
 			}
