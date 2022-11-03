@@ -8,6 +8,7 @@ import classnames from 'classnames';
  */
 import { useCallback, useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
+import { store as coreStore } from '@wordpress/core-data';
 import {
 	ToolSelector,
 	__experimentalPreviewOptions as PreviewOptions,
@@ -60,8 +61,8 @@ export default function Header( {
 		listViewShortcut,
 		isLoaded,
 		isVisualMode,
-		settings,
 		blockEditorMode,
+		homeUrl,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -70,7 +71,6 @@ export default function Header( {
 			isInserterOpened,
 			isListViewOpened,
 			getEditorMode,
-			getSettings,
 		} = select( editSiteStore );
 		const { getEditedEntityRecord } = select( coreStore );
 		const { __experimentalGetTemplateInfo: getTemplateInfo } =
@@ -82,6 +82,10 @@ export default function Header( {
 		const postId = getEditedPostId();
 		const record = getEditedEntityRecord( 'postType', postType, postId );
 		const _isLoaded = !! postId;
+
+		const {
+			getUnstableBase, // Site index.
+		} = select( coreStore );
 
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
@@ -95,8 +99,8 @@ export default function Header( {
 				'core/edit-site/toggle-list-view'
 			),
 			isVisualMode: getEditorMode() === 'visual',
-			settings: getSettings(),
 			blockEditorMode: __unstableGetEditorMode(),
+			homeUrl: getUnstableBase()?.home,
 		};
 	}, [] );
 
@@ -256,7 +260,7 @@ export default function Header( {
 							>
 								<MenuGroup>
 									<MenuItem
-										href={ settings?.siteUrl }
+										href={ homeUrl }
 										target="_blank"
 										icon={ external }
 									>
