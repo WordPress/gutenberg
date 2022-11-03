@@ -6,6 +6,11 @@
  */
 
 if ( ! function_exists( '_wp_block_theme_stub_sidebars' ) ) {
+	/**
+	 * Register the previous theme's sidebars for the block themes.
+	 *
+	 * @return void
+	 */
 	function _wp_block_theme_stub_sidebars() {
 		global $wp_registered_sidebars;
 
