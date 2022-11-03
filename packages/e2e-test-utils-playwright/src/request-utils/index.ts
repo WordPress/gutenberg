@@ -39,6 +39,7 @@ class RequestUtils {
 	baseURL?: string;
 
 	pluginsMap: Record< string, string > | null = null;
+
 	static async setup( {
 		user,
 		storageStatePath,
