@@ -503,7 +503,7 @@ export default function Image( {
 				src={ temporaryURL || url }
 				alt={ defaultedAlt }
 				aria-describedby={
-					! alt && ! RichText.isEmpty( caption )
+					! alt && ! RichText.isEmpty( caption ) && ! href
 						? describedById
 						: undefined
 				}

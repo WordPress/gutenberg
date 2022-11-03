@@ -64,7 +64,7 @@ export default function save( { attributes } ) {
 			src={ url }
 			alt={ alt }
 			aria-describedby={
-				! alt && ! RichText.isEmpty( caption )
+				! alt && ! RichText.isEmpty( caption ) && ! href
 					? describedById
 					: undefined
 			}
