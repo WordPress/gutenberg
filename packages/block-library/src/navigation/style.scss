@@ -655,6 +655,12 @@ button.wp-block-navigation-item__content {
 .wp-block-navigation__responsive-container-open {
 	display: flex;
 
+	// When set to collapse into a text button, it should inherit the parent font.
+	// This needs specificity to override inherited properties.
+	&.components-button.components-button {
+		font-family: inherit;
+	}
+
 	&:not(.always-shown) {
 		@include break-small {
 			display: none;
