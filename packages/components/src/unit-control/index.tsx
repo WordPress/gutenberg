@@ -6,8 +6,6 @@ import type {
 	KeyboardEvent,
 	ForwardedRef,
 	SyntheticEvent,
-	ChangeEvent,
-	PointerEvent,
 } from 'react';
 import classnames from 'classnames';
 
@@ -115,9 +113,7 @@ function UnforwardedUnitControl(
 	const handleOnQuantityChange = (
 		nextQuantityValue: number | string | undefined,
 		changeProps: {
-			event:
-				| ChangeEvent< HTMLInputElement >
-				| PointerEvent< HTMLInputElement >;
+			event: SyntheticEvent;
 		}
 	) => {
 		if (
@@ -269,7 +265,7 @@ function UnforwardedUnitControl(
 			autoComplete={ autoComplete }
 			className={ classes }
 			disabled={ disabled }
-			hideHTMLArrows
+			spinControls="none"
 			isPressEnterToChange={ isPressEnterToChange }
 			label={ label }
 			onBlur={ handleOnBlur }

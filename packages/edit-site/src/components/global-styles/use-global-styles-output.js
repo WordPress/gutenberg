@@ -453,6 +453,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 			[
 				'border',
 				'color',
+				'dimensions',
 				'spacing',
 				'typography',
 				'filter',
@@ -845,8 +846,44 @@ export const getBlockSelectors = ( blockTypes ) => {
 	return result;
 };
 
+/**
+ * If there is a separator block whose color is defined in theme.json via background,
+ * update the separator color to the same value by using border color.
+ *
+ * @param {Object} config Theme.json configuration file object.
+ * @return {Object} configTheme.json configuration file object updated.
+ */
+function updateConfigWithSeparator( config ) {
+	const needsSeparatorStyleUpdate =
+		config.styles?.blocks[ 'core/separator' ] &&
+		config.styles?.blocks[ 'core/separator' ].color?.background &&
+		! config.styles?.blocks[ 'core/separator' ].color?.text &&
+		! config.styles?.blocks[ 'core/separator' ].border?.color;
+	if ( needsSeparatorStyleUpdate ) {
+		return {
+			...config,
+			styles: {
+				...config.styles,
+				blocks: {
+					...config.styles.blocks,
+					'core/separator': {
+						...config.styles.blocks[ 'core/separator' ],
+						color: {
+							...config.styles.blocks[ 'core/separator' ].color,
+							text: config.styles?.blocks[ 'core/separator' ]
+								.color.background,
+						},
+					},
+				},
+			},
+		};
+	}
+	return config;
+}
+
 export function useGlobalStylesOutput() {
-	const { merged: mergedConfig } = useContext( GlobalStylesContext );
+	let { merged: mergedConfig } = useContext( GlobalStylesContext );
+
 	const [ blockGap ] = useSetting( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGap !== null;
 	const hasFallbackGapSupport = ! hasBlockGapSupport; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback styles support.
@@ -859,7 +896,7 @@ export function useGlobalStylesOutput() {
 		if ( ! mergedConfig?.styles || ! mergedConfig?.settings ) {
 			return [];
 		}
-
+		mergedConfig = updateConfigWithSeparator( mergedConfig );
 		const blockSelectors = getBlockSelectors( getBlockTypes() );
 		const customProperties = toCustomProperties(
 			mergedConfig,
