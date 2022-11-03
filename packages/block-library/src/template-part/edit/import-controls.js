@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { useSelect, useRegistry } from '@wordpress/data';
 import { InspectorControls } from '@wordpress/block-editor';
@@ -80,7 +80,11 @@ export function TemplateParetImportControls( { area, setAttributes } ) {
 		} );
 		const blocks = widgets.map( transformWidgetToBlock );
 
-		await createFromBlocks( blocks, sidebar.label );
+		await createFromBlocks(
+			blocks,
+			/* translators: %s: name of the widget area */
+			sprintf( __( 'Widget area: %s' ), sidebar.label )
+		);
 
 		setIsBusy( false );
 	}
