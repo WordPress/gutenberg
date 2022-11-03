@@ -40,18 +40,50 @@ const MySnackbarNotice = () => (
 
 The following props are used to control the display of the component.
 
+#### `actions`: `Action[]`
+
+An array of action objects. Each member object should contain a `label` and either a `url` link string or `onClick` callback function.
+
+-   Required: No
+-   Default: `[]`
+
 #### `children`: `string`
 
 The displayed message of a notice. Also used as the spoken message for assistive technology, unless `spokenMessage` is provided as an alternative message.
 
 -   Required: Yes
 
-#### `spokenMessage`: `string`
+#### `explicitDismiss`: `boolean`
 
-Used to provide a custom spoken message in place of the `children` default.
+Whether to require user action to dismiss the snackbar. By default, this is dismissed on a timeout, without user interaction.
 
 -   Required: No
--   Default: `children`
+-   Default: `false`
+
+#### `icon`: `ReactNode`
+
+The icon to render in the snackbar.
+
+-   Required: No
+-   Default: `null`
+
+#### `listRef`: `MutableRefObject< HTMLDivElement >`
+
+A ref to the list that contains the snackbar.
+
+-   Required: No
+
+#### `onDismiss`: `() => void`
+
+A callback executed when the snackbar is dismissed. It is distinct from onRemove, which _looks_ like a callback but is actually the function to call to remove the snackbar from the UI.
+
+-   Required: No
+
+#### `onRemove`: `() => void`
+
+Function called when dismissing the notice.
+
+-   Required: No
 
 #### `politeness`: `'polite' | 'assertive'`
 
@@ -62,44 +94,12 @@ A politeness level for the notice's spoken message. Should be provided as one of
 -   Required: No
 -   Default: `'polite'`
 
-#### `actions`: `Action[]`
+#### `spokenMessage`: `string`
 
-An array of action objects. Each member object should contain a `label` and either a `url` link string or `onClick` callback function.
-
--   Required: No
--   Default: `[]`
-
-#### `onRemove`: `() => void`
-
-Function called when dismissing the notice.
+Used to provide a custom spoken message in place of the `children` default.
 
 -   Required: No
-
-#### `icon`: `ReactNode`
-
-The icon to render in the snackbar.
-
--   Required: No
--   Default: `null`
-
-#### `explicitDismiss`: `boolean`
-
-Whether to require user action to dismiss the snackbar. By default, this is dismissed on a timeout, without user interaction.
-
--   Required: No
--   Default: `false`
-
-#### `onDismiss`: `() => void`
-
-A callback executed when the snackbar is dismissed. It is distinct from onRemove, which _looks_ like a callback but is actually the function to call to remove the snackbar from the UI.
-
--   Required: No
-
-#### `listRef`: `MutableRefObject< HTMLDivElement >`
-
-A ref to the list that contains the snackbar.
-
--   Required: No
+-   Default: `children`
 
 ## Related components
 
