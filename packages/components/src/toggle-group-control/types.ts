@@ -98,17 +98,17 @@ export type ToggleGroupControlProps = Pick<
 	 */
 	isBlock?: boolean;
 	/**
-	 * Borderless style that may be preferred in some contexts.
+	 * Whether an option can be deselected by clicking it again.
 	 *
 	 * @default false
 	 */
-	__experimentalIsBorderless?: boolean;
+	isDeselectable?: boolean;
 	/**
 	 * Callback when a segment is selected.
 	 */
 	onChange?: ( value: ReactText | undefined ) => void;
 	/**
-	 * The value of `ToggleGroupControl`
+	 * The selected value.
 	 */
 	value?: ReactText;
 	/**
@@ -124,19 +124,33 @@ export type ToggleGroupControlProps = Pick<
 	size?: 'default' | '__unstable-large';
 };
 
-export type ToggleGroupControlContextProps = RadioStateReturn &
-	Pick< ToggleGroupControlProps, 'size' > & {
-		/**
-		 * Renders `ToggleGroupControl` as a (CSS) block element.
-		 *
-		 * @default false
-		 */
-		isBlock?: boolean;
-	};
+type ToggleGroupControlAsRadioContext = {
+	isDeselectable?: false;
+} & RadioStateReturn;
+
+type ToggleGroupControlAsButtonContext = { isDeselectable: true } & Pick<
+	RadioStateReturn,
+	'state' | 'setState'
+>;
+
+export type ToggleGroupControlContextProps = Pick<
+	ToggleGroupControlProps,
+	'isBlock' | 'size'
+> & {
+	baseId: string;
+} & ( ToggleGroupControlAsRadioContext | ToggleGroupControlAsButtonContext );
 
 export type ToggleGroupControlBackdropProps = {
 	containerRef: MutableRefObject< HTMLElement | undefined >;
 	containerWidth?: number | null;
 	isAdaptiveWidth?: boolean;
 	state?: any;
+};
+
+export type ToggleGroupControlMainControlProps = Pick<
+	ToggleGroupControlProps,
+	'children' | 'isAdaptiveWidth' | 'label' | 'size'
+> & {
+	onChange: ( value: ReactText | undefined ) => void;
+	value?: ReactText;
 };

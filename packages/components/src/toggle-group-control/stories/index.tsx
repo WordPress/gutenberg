@@ -124,11 +124,11 @@ WithIcons.args = {
 };
 
 /**
- * A borderless style may be preferred in some contexts.
+ * When the `isDeselectable` prop is true, the option can be deselected by clicking on it again.
  */
-export const Borderless: ComponentStory< typeof ToggleGroupControl > =
+export const Deselectable: ComponentStory< typeof ToggleGroupControl > =
 	Template.bind( {} );
-Borderless.args = {
+Deselectable.args = {
 	...WithIcons.args,
-	__experimentalIsBorderless: true,
+	isDeselectable: true,
 };

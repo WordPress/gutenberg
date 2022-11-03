@@ -63,7 +63,7 @@ export default function AnglePickerControl( {
 					size="__unstable-large"
 					step="1"
 					value={ value }
-					hideHTMLArrows
+					spinControls="none"
 					suffix={
 						<Spacer
 							as={ Text }

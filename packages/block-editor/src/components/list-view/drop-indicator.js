@@ -115,6 +115,7 @@ export default function ListViewDropIndicator( {
 			anchor={ popoverAnchor }
 			focusOnMount={ false }
 			className="block-editor-list-view-drop-indicator"
+			variant="unstyled"
 		>
 			<div
 				style={ style }

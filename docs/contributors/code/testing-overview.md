@@ -367,13 +367,13 @@ describe( 'SolarSystem', () => {
 	test( 'should render', () => {
 		const { container } = render( <SolarSystem /> );
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
 	test( 'should contain mars if planets is true', () => {
 		const { container } = render( <SolarSystem planets /> );
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 		expect( screen.getByText( /mars/i ) ).toBeInTheDocument();
 	} );
 } );
@@ -422,7 +422,7 @@ test( 'should contain mars if planets is true', () => {
 	const { container } = render( <SolarSystem planets /> );
 
 	// Snapshot will catch unintended changes
-	expect( container.firstChild ).toMatchSnapshot();
+	expect( container ).toMatchSnapshot();
 
 	// This is what we actually expect to find in our test
 	expect( screen.getByText( /mars/i ) ).toBeInTheDocument();
@@ -447,8 +447,8 @@ Similarly, the `toMatchStyleDiffSnapshot` function allows to snapshot only the d
 test( 'should render margin', () => {
 	const { container: spacer } = render( <Spacer /> );
 	const { container: spacerWithMargin } = render( <Spacer margin={ 5 } /> );
-	expect( spacerWithMargin.firstChild ).toMatchStyleDiffSnapshot(
-		spacer.firstChild
+	expect( spacerWithMargin ).toMatchStyleDiffSnapshot(
+		spacer
 	);
 } );
 ```

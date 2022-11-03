@@ -695,10 +695,7 @@ export const getSelectedBlockClientIds = createSelector(
 	( state ) => {
 		const { selectionStart, selectionEnd } = state.selection;
 
-		if (
-			selectionStart.clientId === undefined ||
-			selectionEnd.clientId === undefined
-		) {
+		if ( ! selectionStart.clientId || ! selectionEnd.clientId ) {
 			return EMPTY_ARRAY;
 		}
 
@@ -713,6 +710,7 @@ export const getSelectedBlockClientIds = createSelector(
 			state,
 			selectionStart.clientId
 		);
+
 		if ( rootClientId === null ) {
 			return EMPTY_ARRAY;
 		}
@@ -1274,6 +1272,17 @@ export function getBlockMode( state, clientId ) {
  */
 export function isTyping( state ) {
 	return state.isTyping;
+}
+
+/**
+ * Returns true if the the block interface should be hidden, or false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the block toolbar is hidden.
+ */
+export function __experimentalIsBlockInterfaceHidden( state ) {
+	return state.isBlockInterfaceHidden;
 }
 
 /**
