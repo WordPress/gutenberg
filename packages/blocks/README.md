@@ -614,7 +614,7 @@ _Parameters_
 
 _Returns_
 
--   `Array`: Block list.
+-   `WPBlock[]`: Block list.
 
 ### parseWithAttributeSchema
 

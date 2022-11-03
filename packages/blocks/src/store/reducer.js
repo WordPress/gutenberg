@@ -36,25 +36,84 @@ export const DEFAULT_CATEGORIES = [
 	{ slug: 'reusable', title: __( 'Reusable blocks' ) },
 ];
 
-// Key block types by their name.
-function keyBlockTypesByName( types ) {
-	return types.reduce(
-		( newBlockTypes, block ) => ( {
-			...newBlockTypes,
-			[ block.name ]: block,
-		} ),
-		{}
-	);
+/**
+ * Create an object from a list whose keys are a given property
+ * of each item and whose values are the items themselves.
+ *
+ * Example
+ * ```js
+ *     keyBy( [
+ *         { name: 'high', level: 10 },
+ *         { name: 'low', level: 3 }
+ *     ] ) === {
+ *         high: { name: 'high', level: 10 },
+ *         low: { name: 'low', level: 3 }
+ *     }
+ * ```
+ *
+ * @template {Record<string, any>} T
+ * @template {keyof T} Key
+ *
+ * @param {Key} keyName Name of property in each item of whose value to use as array key.
+ * @param {T[]} items   List of objects to transform.
+ *
+ * @return {Record<string, T>} keyed object from given input items.
+ */
+function keyBy( keyName, items ) {
+	/** @type {Record<string, any>} */
+	const keyedObject = {};
+
+	for ( const item of items ) {
+		keyedObject[ item[ keyName ] ] = item;
+	}
+
+	return keyedObject;
 }
 
-// Filter items to ensure they're unique by their name.
-function getUniqueItemsByName( items ) {
-	return items.reduce( ( acc, currentItem ) => {
-		if ( ! acc.some( ( item ) => item.name === currentItem.name ) ) {
-			acc.push( currentItem );
+/**
+ * Return a list whose values are unique when compared
+ * with the value of a given property name.
+ *
+ * Duplicate values are discarded, leaving only the first
+ * of several non-unique items in the output.
+ *
+ * Example
+ * ```js
+ *     uniqueBy( 'name', [
+ *         { name: 'JavaScript', project: 'Gutenberg' },
+ *         { name: 'PHP', project: 'WordPress' },
+ *         { name: 'PHP', project: 'php-cs' },
+ *         { name: 'JavaScript', project: 'jquery' },
+ *         { name: 'C', project: 'PHP' }
+ *     ] ) === [
+ *         { name: 'JavaScript', project: 'Gutenberg' },
+ *         { name: 'PHP', project: 'WordPress' },
+ *         { name: 'C', project: 'PHP' }
+ *     ]
+ * ```
+ *
+ * @template {Record<string, any>} T
+ * @template {keyof T} Key
+ *
+ * @param {Key} keyName Name of property in each item of whose value to compare against.
+ * @param {T[]} items   List of objects to filter.
+ *
+ * @return {T[]} List of unique items based on value of given property.
+ */
+function uniqueBy( keyName, items ) {
+	const seen = new Set();
+
+	const uniqueItems = [];
+	for ( const item of items ) {
+		if ( seen.has( item[ keyName ] ) ) {
+			continue;
 		}
-		return acc;
-	}, [] );
+
+		seen.add( item[ keyName ] );
+		uniqueItems.push( item );
+	}
+
+	return uniqueItems;
 }
 
 /**
@@ -95,7 +154,7 @@ export function blockTypes( state = {}, action ) {
 		case 'ADD_BLOCK_TYPES':
 			return {
 				...state,
-				...keyBlockTypesByName( action.blockTypes ),
+				...keyBy( 'name', action.blockTypes ),
 			};
 		case 'REMOVE_BLOCK_TYPES':
 			return omit( state, action.names );
@@ -118,9 +177,9 @@ export function blockStyles( state = {}, action ) {
 			return {
 				...state,
 				...mapValues(
-					keyBlockTypesByName( action.blockTypes ),
+					keyBy( 'name', action.blockTypes ),
 					( blockType ) =>
-						getUniqueItemsByName( [
+						uniqueBy( 'name', [
 							...get( blockType, [ 'styles' ], [] ).map(
 								( style ) => ( {
 									...style,
@@ -136,7 +195,7 @@ export function blockStyles( state = {}, action ) {
 		case 'ADD_BLOCK_STYLES':
 			return {
 				...state,
-				[ action.blockName ]: getUniqueItemsByName( [
+				[ action.blockName ]: uniqueBy( 'name', [
 					...get( state, [ action.blockName ], [] ),
 					...action.styles,
 				] ),
@@ -168,9 +227,9 @@ export function blockVariations( state = {}, action ) {
 			return {
 				...state,
 				...mapValues(
-					keyBlockTypesByName( action.blockTypes ),
+					keyBy( 'name', action.blockTypes ),
 					( blockType ) => {
-						return getUniqueItemsByName( [
+						return uniqueBy( 'name', [
 							...get( blockType, [ 'variations' ], [] ).map(
 								( variation ) => ( {
 									...variation,
@@ -187,7 +246,7 @@ export function blockVariations( state = {}, action ) {
 		case 'ADD_BLOCK_VARIATIONS':
 			return {
 				...state,
-				[ action.blockName ]: getUniqueItemsByName( [
+				[ action.blockName ]: uniqueBy( 'name', [
 					...get( state, [ action.blockName ], [] ),
 					...action.variations,
 				] ),
