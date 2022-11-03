@@ -45,3 +45,14 @@ if ( ! function_exists( 'wp_theme_clean_theme_json_cached_data' ) ) {
 		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
 	}
 }
+
+function wp_theme_get_selector_for_block( $block_name ) {
+	$block_to_selector_map = WP_Theme_JSON_Gutenberg::get_blocks_metadata();
+	$block_selector = null;
+
+	if ( isset( $block_to_selector_map[ $block_name ]['selector'] ) ) {
+		$block_selector = $block_to_selector_map[ $block_name ]['selector'];
+	}
+
+	return $block_selector;
+}
