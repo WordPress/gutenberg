@@ -381,11 +381,6 @@ export default function Image( {
 						linkTarget={ linkTarget }
 						linkClass={ linkClass }
 						rel={ rel }
-						aria-describedby={
-							! alt && ! RichText.isEmpty( caption )
-								? describedById
-								: undefined
-						}
 					/>
 				) }
 				{ allowCrop && (
