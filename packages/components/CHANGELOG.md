@@ -2,7 +2,8 @@
 
 ## Unreleased
 
-## Internal
+### Internal
+
 -   `PaletteEditListView`: Update to ignore `exhaustive-deps` eslint rule ([#45467](https://github.com/WordPress/gutenberg/pull/45467)).
 
 ## 22.0.0 (2022-11-02)
