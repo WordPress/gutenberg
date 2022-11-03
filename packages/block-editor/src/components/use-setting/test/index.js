@@ -80,7 +80,7 @@ describe( 'useSetting', () => {
 		addFilter(
 			'blockEditor.useSetting.before',
 			'test/useSetting.before',
-			( result, blockName ) => {
+			( result, path, clientId, blockName ) => {
 				if ( blockName === 'core/test-block' ) {
 					return '960px';
 				}
