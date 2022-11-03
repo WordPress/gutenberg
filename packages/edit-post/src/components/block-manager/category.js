@@ -88,6 +88,7 @@ function BlockManagerCategory( { title, blockTypes } ) {
 			className="edit-post-block-manager__category"
 		>
 			<CheckboxControl
+				__nextHasNoMarginBottom
 				checked={ isAllChecked }
 				onChange={ toggleAllVisible }
 				className="edit-post-block-manager__category-title"
