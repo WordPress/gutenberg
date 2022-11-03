@@ -46,13 +46,23 @@ if ( ! function_exists( 'wp_theme_clean_theme_json_cached_data' ) ) {
 	}
 }
 
-function wp_theme_get_selector_for_block( $block_name ) {
-	$block_to_selector_map = WP_Theme_JSON_Gutenberg::get_blocks_metadata();
-	$block_selector = null;
+function wp_theme_get_selector_for_block( $block_name_to_lookup ) {
+	$registry = WP_Block_Type_Registry::get_instance();
+	$blocks   = $registry->get_all_registered();
 
-	if ( isset( $block_to_selector_map[ $block_name ]['selector'] ) ) {
-		$block_selector = $block_to_selector_map[ $block_name ]['selector'];
+	// Lookup the selector quickly
+	if ( isset( $blocks[ $block_name_to_lookup ] ) ) {
+		$block = $blocks[ $block_name_to_lookup ];
+		if (
+			isset( $block->supports['__experimentalSelector'] ) &&
+			is_string( $block->supports['__experimentalSelector'] )
+		) {
+			return $block->supports['__experimentalSelector'];
+		} else {
+			return '.wp-block-' . str_replace( '/', '-', str_replace( 'core/', '', $block_name_to_lookup ) );
+		}
 	}
 
-	return $block_selector;
+	// Selector for the block was not found
+	return null;
 }
