@@ -28,6 +28,6 @@ describe( 'PluginPrePublishPanel', () => {
 			</SlotFillProvider>
 		);
 
-		expect( screen.getByText( 'My panel title' ) ).toBeInTheDocument();
+		expect( screen.getByText( 'My panel title' ) ).toBeVisible();
 	} );
 } );
