@@ -1244,11 +1244,25 @@ test.describe( 'List', () => {
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 
-		await editor.transformBlockTo( 'Paragraph' );
+		await editor.showBlockToolbar();
+		await page
+			.getByRole( 'button', {
+				name: 'List',
+				description: 'List: Change block type or style',
+			} )
+			.click();
+		await page.getByRole( 'menuitem', { name: 'Paragraph' } ).click();
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 
-		await editor.transformBlockTo( 'List' );
+		await editor.showBlockToolbar();
+		await page
+			.getByRole( 'button', {
+				name: 'Paragraph',
+				description: 'Change type of 2 blocks',
+			} )
+			.click();
+		await page.getByRole( 'menuitem', { name: 'List' } ).click();
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
