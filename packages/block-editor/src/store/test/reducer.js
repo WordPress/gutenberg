@@ -19,6 +19,7 @@ import {
 	hasSameKeys,
 	isUpdatingSameBlockAttribute,
 	blocks,
+	isBlockInterfaceHidden,
 	isTyping,
 	draggedBlocks,
 	selection,
@@ -2250,6 +2251,24 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toBe( null );
+		} );
+	} );
+
+	describe( 'isBlockInterfaceHidden()', () => {
+		it( 'should set the hide block interface flag to true', () => {
+			const state = isBlockInterfaceHidden( false, {
+				type: 'HIDE_BLOCK_INTERFACE',
+			} );
+
+			expect( state ).toBe( true );
+		} );
+
+		it( 'should set the hide block interface flag to false', () => {
+			const state = isBlockInterfaceHidden( false, {
+				type: 'SHOW_BLOCK_INTERFACE',
+			} );
+
+			expect( state ).toBe( false );
 		} );
 	} );
 
