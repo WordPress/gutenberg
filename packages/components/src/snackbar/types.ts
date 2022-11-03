@@ -82,7 +82,6 @@ export type SnackbarProps = {
 	icon?: Notice[ 'icon' ];
 	/**
 	 * Whether to require user action to dismiss the snackbar.
-	 *
 	 * By default, this is dismissed on a timeout, without user interaction.
 	 *
 	 * @default false
