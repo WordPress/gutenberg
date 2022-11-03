@@ -329,7 +329,7 @@ PODS:
     - React-Core
     - SDWebImage (~> 5.11.1)
     - SDWebImageWebPCoder (~> 0.8.4)
-  - RNGestureHandler (2.5.0-wp-1):
+  - RNGestureHandler (2.3.2-wp-2):
     - React-Core
   - RNReanimated (2.9.1-wp-2):
     - DoubleConversion
@@ -584,7 +584,7 @@ SPEC CHECKSUMS:
   RNCClipboard: 99fc8ad669a376b756fbc8098ae2fd05c0ed0668
   RNCMaskedView: c298b644a10c0c142055b3ae24d83879ecb13ccd
   RNFastImage: 1f2cab428712a4baaf78d6169eaec7f622556dd7
-  RNGestureHandler: 225ee7ea87b1024ced46ec4705537c075ad33ba0
+  RNGestureHandler: 3e0ea0c115175e66680032904339696bab928ca3
   RNReanimated: 8b189a09da0345d84b33b8cde57a57f8ed847352
   RNScreens: 953633729a42e23ad0c93574d676b361e3335e8b
   RNSVG: 36a7359c428dcb7c6bce1cc546fbfebe069809b0
