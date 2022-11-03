@@ -868,7 +868,7 @@ export const blocks = pipe(
 						[ id ]: Object.entries(
 							action.uniqueByBlock
 								? action.attributes[ id ]
-								: action.attributes
+								: action.attributes ?? {}
 						).reduce( ( result, [ key, value ] ) => {
 							// Consider as updates only changed values.
 							if ( value !== result[ key ] ) {

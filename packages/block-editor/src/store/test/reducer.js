@@ -1894,6 +1894,27 @@ describe( 'state', () => {
 
 					expect( state.attributes ).toBe( state.attributes );
 				} );
+
+				it( 'should handle undefined attributes', () => {
+					const original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									clientId: 'kumquat',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						} )
+					);
+					const state = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+					} );
+
+					expect( state.attributes.kumquat ).toEqual( {} );
+				} );
 			} );
 
 			describe( 'isPersistentChange', () => {
