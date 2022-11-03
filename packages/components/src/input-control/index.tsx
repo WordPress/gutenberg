@@ -45,6 +45,7 @@ export function UnforwardedInputControl(
 		onKeyDown = noop,
 		prefix,
 		size = 'default',
+		style,
 		suffix,
 		value,
 		...props
@@ -77,6 +78,7 @@ export function UnforwardedInputControl(
 			labelPosition={ labelPosition }
 			prefix={ prefix }
 			size={ size }
+			style={ style }
 			suffix={ suffix }
 		>
 			<InputField

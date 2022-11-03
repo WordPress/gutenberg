@@ -8,6 +8,7 @@ export default {
 	component: CustomSelectControl,
 	argTypes: {
 		__next36pxDefaultSize: { control: { type: 'boolean' } },
+		__experimentalShowSelectedHint: { control: { type: 'boolean' } },
 		size: {
 			control: {
 				type: 'radio',

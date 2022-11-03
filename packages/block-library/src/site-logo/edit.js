@@ -394,7 +394,7 @@ export default function LogoEdit( {
 		return {
 			siteLogoId: _siteLogoId,
 			canUserEdit: _canUserEdit,
-			url: siteData?.url,
+			url: siteData?.home,
 			mediaItemData: mediaItem,
 			isRequestingMediaItem: _isRequestingMediaItem,
 			siteIconId: _siteIconId,

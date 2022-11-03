@@ -19,7 +19,13 @@ import { applyFilters } from '@wordpress/hooks';
 import { useBlockEditContext } from '../block-edit';
 import { store as blockEditorStore } from '../../store';
 
-const blockedPaths = [ 'color', 'border', 'typography', 'spacing' ];
+const blockedPaths = [
+	'color',
+	'border',
+	'dimensions',
+	'typography',
+	'spacing',
+];
 
 const deprecatedFlags = {
 	'color.palette': ( settings ) => settings.colors,

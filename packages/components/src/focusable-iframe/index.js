@@ -9,7 +9,6 @@ import deprecated from '@wordpress/deprecated';
  * @param {import('react').Ref<HTMLIFrameElement>} props.iframeRef
  */
 export default function FocusableIframe( { iframeRef, ...props } ) {
-	// @ts-expect-error: Return type for useFocusableIframe() is incorrect.
 	const ref = useMergeRefs( [ iframeRef, useFocusableIframe() ] );
 	deprecated( 'wp.components.FocusableIframe', {
 		since: '5.9',
