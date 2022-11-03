@@ -10,12 +10,12 @@ import { HTMLTextInput } from '..';
 
 // Finds the Content TextInput in our HTMLInputView.
 const findContentTextInput = ( screen ) => {
-	return screen.getByA11yLabel( 'html-view-content' );
+	return screen.getByLabelText( 'html-view-content' );
 };
 
 // Finds the Title TextInput in our HTMLInputView.
 const findTitleTextInput = ( screen ) => {
-	return screen.getByA11yLabel( 'html-view-title' );
+	return screen.getByLabelText( 'html-view-title' );
 };
 
 const getStylesFromColorScheme = () => {
