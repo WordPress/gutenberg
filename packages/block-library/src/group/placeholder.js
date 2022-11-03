@@ -6,7 +6,7 @@ import { useBlockProps } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { store as blocksStore } from '@wordpress/blocks';
 import { Path, SVG, Button, Placeholder } from '@wordpress/components';
-import { useState, useEffect } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 
 /**
  * Returns a custom variation icon.
@@ -65,15 +65,20 @@ const getGroupPlaceholderIcons = ( name = 'group' ) => {
  *
  * @param {Object}  props                  Arguments to pass to hook.
  * @param {Object}  [props.attributes]     The block's attributes.
- * @param {string}  [props.usedLayout]     The block's current layout type.
+ * @param {string}  [props.usedLayoutType] The block's current layout type.
  * @param {boolean} [props.hasInnerBlocks] Whether the block has inner blocks.
  *
  * @return {[boolean, Function]} A state value and setter function.
  */
 export function useShouldShowPlaceHolder( {
-	attributes,
-	usedLayout,
-	hasInnerBlocks,
+	attributes = {
+		style: undefined,
+		backgroundColor: undefined,
+		textColor: undefined,
+		fontSize: undefined,
+	},
+	usedLayoutType = '',
+	hasInnerBlocks = false,
 } ) {
 	const { style, backgroundColor, textColor, fontSize } = attributes;
 	/*
@@ -89,27 +94,8 @@ export function useShouldShowPlaceHolder( {
 			! fontSize &&
 			! textColor &&
 			! style &&
-			usedLayout.type !== 'flex'
+			usedLayoutType !== 'flex'
 	);
-
-	useEffect( () => {
-		if (
-			!! hasInnerBlocks ||
-			!! backgroundColor ||
-			!! fontSize ||
-			!! style ||
-			usedLayout.type === 'flex'
-		) {
-			setShowPlaceholder( false );
-		}
-	}, [
-		backgroundColor,
-		fontSize,
-		textColor,
-		style,
-		usedLayout.type,
-		hasInnerBlocks,
-	] );
 
 	return [ showPlaceholder, setShowPlaceholder ];
 }

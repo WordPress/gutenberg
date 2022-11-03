@@ -93,4 +93,10 @@
 		min-height: auto;
 		padding: $grid-unit-30;
 	}
+	.is-small,
+	.is-medium {
+		.wp-block-group-placeholder__variations > li {
+			margin: $grid-unit-15;
+		}
+	}
 }

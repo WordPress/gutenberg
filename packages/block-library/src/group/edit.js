@@ -105,7 +105,7 @@ function GroupEdit( {
 	} );
 	const [ showPlaceholder, setShowPlaceholder ] = useShouldShowPlaceHolder( {
 		attributes,
-		usedLayout,
+		usedLayoutType: usedLayout?.type,
 		hasInnerBlocks,
 	} );
 	const innerBlocksProps = useInnerBlocksProps(
