@@ -110,24 +110,6 @@ export function DimensionsPanel( props ) {
 	return (
 		<>
 			<InspectorControls __experimentalGroup="dimensions">
-				{ ! isMinHeightDisabled && (
-					<ToolsPanelItem
-						className="single-column"
-						hasValue={ () => hasMinHeightValue( props ) }
-						label={ __( 'Min. height' ) }
-						onDeselect={ () => resetMinHeight( props ) }
-						resetAllFilter={ createResetAllFilter(
-							'minHeight',
-							'dimensions'
-						) }
-						isShownByDefault={
-							defaultDimensionsControls?.minHeight
-						}
-						panelId={ props.clientId }
-					>
-						<MinHeightEdit { ...props } />
-					</ToolsPanelItem>
-				) }
 				{ ! isPaddingDisabled && (
 					<ToolsPanelItem
 						className={ spacingClassnames }
@@ -182,6 +164,24 @@ export function DimensionsPanel( props ) {
 						panelId={ props.clientId }
 					>
 						<GapEdit { ...props } />
+					</ToolsPanelItem>
+				) }
+				{ ! isMinHeightDisabled && (
+					<ToolsPanelItem
+						className="single-column"
+						hasValue={ () => hasMinHeightValue( props ) }
+						label={ __( 'Min. height' ) }
+						onDeselect={ () => resetMinHeight( props ) }
+						resetAllFilter={ createResetAllFilter(
+							'minHeight',
+							'dimensions'
+						) }
+						isShownByDefault={
+							defaultDimensionsControls?.minHeight
+						}
+						panelId={ props.clientId }
+					>
+						<MinHeightEdit { ...props } />
 					</ToolsPanelItem>
 				) }
 			</InspectorControls>

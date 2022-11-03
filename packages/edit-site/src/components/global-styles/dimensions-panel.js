@@ -441,24 +441,6 @@ export default function DimensionsPanel( { name } ) {
 					</HStack>
 				</ToolsPanelItem>
 			) }
-			{ showMinHeightControl && (
-				<ToolsPanelItem
-					className="single-column"
-					hasValue={ hasMinHeightValue }
-					label={ __( 'Min. height' ) }
-					onDeselect={ resetMinHeightValue }
-					isShownByDefault={ true }
-				>
-					<UnitControl
-						label={ __( 'Min. height' ) }
-						value={ minHeightValue }
-						onChange={ setMinHeightValue }
-						units={ units }
-						min={ 0 }
-						size={ '__unstable-large' }
-					/>
-				</ToolsPanelItem>
-			) }
 			{ showPaddingControl && (
 				<ToolsPanelItem
 					hasValue={ hasPaddingValue }
@@ -570,6 +552,24 @@ export default function DimensionsPanel( { name } ) {
 							splitOnAxis={ isAxialGap }
 						/>
 					) }
+				</ToolsPanelItem>
+			) }
+			{ showMinHeightControl && (
+				<ToolsPanelItem
+					className="single-column"
+					hasValue={ hasMinHeightValue }
+					label={ __( 'Min. height' ) }
+					onDeselect={ resetMinHeightValue }
+					isShownByDefault={ true }
+				>
+					<UnitControl
+						label={ __( 'Min. height' ) }
+						value={ minHeightValue }
+						onChange={ setMinHeightValue }
+						units={ units }
+						min={ 0 }
+						size={ '__unstable-large' }
+					/>
 				</ToolsPanelItem>
 			) }
 		</ToolsPanel>
