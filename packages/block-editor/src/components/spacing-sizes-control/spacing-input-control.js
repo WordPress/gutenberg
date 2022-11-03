@@ -57,18 +57,6 @@ export default function SpacingInputControl( {
 	// Treat value as a preset value if the passed in value matches the value of one of the spacingSizes.
 	value = getPresetValueFromCustomValue( value, spacingSizes );
 
-	const handleOnMouseOver = ( e ) => {
-		if ( onMouseOver && value && value !== '0' ) {
-			onMouseOver( e );
-		}
-	};
-	const handleOnMouseOut = ( e ) => {
-		// Need to still run this if value is '0' to account for user switching it to '0' before mousing out.
-		if ( onMouseOut && value ) {
-			onMouseOut( e );
-		}
-	};
-
 	let selectListSizes = spacingSizes;
 	const showRangeControl = spacingSizes.length <= 8;
 
@@ -232,8 +220,8 @@ export default function SpacingInputControl( {
 			{ showCustomValueControl && (
 				<>
 					<UnitControl
-						onMouseOver={ handleOnMouseOver }
-						onMouseOut={ handleOnMouseOut }
+						onMouseOver={ onMouseOver }
+						onMouseOut={ onMouseOut }
 						onChange={ ( newSize ) =>
 							onChange( getNewCustomValue( newSize ) )
 						}
@@ -250,8 +238,8 @@ export default function SpacingInputControl( {
 					/>
 
 					<RangeControl
-						onMouseOver={ handleOnMouseOver }
-						onMouseOut={ handleOnMouseOut }
+						onMouseOver={ onMouseOver }
+						onMouseOut={ onMouseOut }
 						value={ customRangeValue }
 						min={ 0 }
 						max={ CUSTOM_VALUE_SETTINGS[ selectedUnit ]?.max ?? 10 }
@@ -266,8 +254,8 @@ export default function SpacingInputControl( {
 			) }
 			{ showRangeControl && ! showCustomValueControl && (
 				<RangeControl
-					onMouseOver={ handleOnMouseOver }
-					onMouseOut={ handleOnMouseOut }
+					onMouseOver={ onMouseOver }
+					onMouseOut={ onMouseOut }
 					className="components-spacing-sizes-control__range-control"
 					value={ currentValue }
 					onChange={ ( newSize ) =>
@@ -313,8 +301,8 @@ export default function SpacingInputControl( {
 					hideLabelFromVision={ true }
 					__nextUnconstrainedWidth={ true }
 					size={ '__unstable-large' }
-					onMouseOver={ handleOnMouseOver }
-					onMouseOut={ handleOnMouseOut }
+					onMouseOver={ onMouseOver }
+					onMouseOut={ onMouseOut }
 				/>
 			) }
 		</>
