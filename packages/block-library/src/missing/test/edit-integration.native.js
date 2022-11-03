@@ -40,12 +40,12 @@ describe( 'Unsupported block', () => {
 		const initialHtml = `<!-- wp:table -->
 			 <figure class="wp-block-table"><table><tbody><tr><td>1</td><td>2</td></tr><tr><td>3</td><td>4</td></tr></tbody></table></figure>
 			 <!-- /wp:table -->`;
-		const { getByA11yLabel } = await initializeEditor( {
+		const { getByLabelText } = await initializeEditor( {
 			initialHtml,
 		} );
 
 		const missingBlock = await waitFor( () =>
-			getByA11yLabel( /Unsupported Block\. Row 1/ )
+			getByLabelText( /Unsupported Block\. Row 1/ )
 		);
 
 		const translatedTableTitle =
@@ -58,18 +58,18 @@ describe( 'Unsupported block', () => {
 		const initialHtml = `<!-- wp:table -->
 		 <figure class="wp-block-table"><table><tbody><tr><td>1</td><td>2</td></tr><tr><td>3</td><td>4</td></tr></tbody></table></figure>
 		 <!-- /wp:table -->`;
-		const { getByA11yLabel, getByText } = await initializeEditor( {
+		const { getByLabelText, getByText } = await initializeEditor( {
 			initialHtml,
 		} );
 
 		const missingBlock = await waitFor( () =>
-			getByA11yLabel( /Unsupported Block\. Row 1/ )
+			getByLabelText( /Unsupported Block\. Row 1/ )
 		);
 
 		fireEvent.press( missingBlock );
 
 		const helpButton = await waitFor( () =>
-			getByA11yLabel( 'Help button' )
+			getByLabelText( 'Help button' )
 		);
 
 		fireEvent.press( helpButton );
