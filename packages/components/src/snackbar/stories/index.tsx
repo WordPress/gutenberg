@@ -81,9 +81,9 @@ WithExplicitDismiss.args = {
 	explicitDismiss: true,
 };
 
-export const WithActionAndExpicitDismiss: ComponentStory< typeof Snackbar > =
+export const WithActionAndExplicitDismiss: ComponentStory< typeof Snackbar > =
 	DefaultTemplate.bind( {} );
-WithActionAndExpicitDismiss.args = {
+WithActionAndExplicitDismiss.args = {
 	actions: [
 		{
 			label: 'Open WP.org',
