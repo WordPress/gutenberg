@@ -15,8 +15,7 @@ test.describe( 'Region navigation (@firefox, @webkit)', () => {
 	test( 'navigates forward and back again', async ( {
 		editor,
 		page,
-		pageUtils,
-	} ) => {
+	}, testInfo ) => {
 		// Insert a paragraph block.
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -24,21 +23,29 @@ test.describe( 'Region navigation (@firefox, @webkit)', () => {
 		} );
 
 		// Navigate to first region and check that we made it.
-		await pageUtils.pressKeyWithModifier( 'ctrl', '`' );
+		await page.keyboard.press( 'Control+`' );
 		const editorTopBar = page.locator(
 			'role=region[name="Editor top bar"i]'
 		);
 		await expect( editorTopBar ).toBeFocused();
 
 		// Navigate to next/second region and check that we made it.
-		await pageUtils.pressKeyWithModifier( 'ctrl', '`' );
+		await page.keyboard.press( 'Control+`' );
 		const editorContent = page.locator(
 			'role=region[name="Editor content"i]'
 		);
 		await expect( editorContent ).toBeFocused();
 
 		// Navigate to previous/first region and check that we made it.
-		await pageUtils.pressKeyWithModifier( 'ctrlShift', '`' );
+		// Make sure navigating backwards works also witht he tilde character,
+		// as browsers interpret the combination of the crtl+shift+backtick keys
+		// and assign it to event.key inconsistently.
+		if ( testInfo.project.name === 'chromium' ) {
+			await page.keyboard.press( 'Control+Shift+`' );
+		} else {
+			await page.keyboard.press( 'Control+Shift+~' );
+		}
+
 		await expect( editorTopBar ).toBeFocused();
 	} );
 } );
