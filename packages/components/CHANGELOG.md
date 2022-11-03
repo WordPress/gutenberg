@@ -13,6 +13,7 @@
 ### Internal
 
 -   `PaletteEditListView`: Update to ignore `exhaustive-deps` eslint rule ([#45467](https://github.com/WordPress/gutenberg/pull/45467)).
+-   `ItemGroup`: Update to pass `exhaustive-deps` eslint rule ([#45531](https://github.com/WordPress/gutenberg/pull/45531)).
 
 ## 22.0.0 (2022-11-02)
 
