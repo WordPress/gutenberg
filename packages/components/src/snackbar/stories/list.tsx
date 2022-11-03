@@ -4,6 +4,11 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react';
 
 /**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import SnackbarList from '../list';
@@ -29,9 +34,26 @@ export default meta;
 
 export const Default: ComponentStory< typeof SnackbarList > = ( {
 	children,
+	notices: noticesProp,
 	...props
 } ) => {
-	return <SnackbarList { ...props }>{ children }</SnackbarList>;
+	const [ notices, setNotices ] = useState( noticesProp );
+
+	const onRemove = ( id: string ) => {
+		const matchIndex = notices.findIndex( ( n ) => n.id === id );
+		if ( matchIndex > -1 ) {
+			setNotices( [
+				...notices.slice( 0, matchIndex ),
+				...notices.slice( matchIndex + 1 ),
+			] );
+		}
+	};
+
+	return (
+		<SnackbarList { ...props } notices={ notices } onRemove={ onRemove }>
+			{ children }
+		</SnackbarList>
+	);
 };
 
 Default.args = {
@@ -39,7 +61,7 @@ Default.args = {
 		'Use SnackbarList to communicate multiple low priority, non-interruptive messages to the user.',
 	notices: [
 		{
-			id: 'SAVE_POST_NOTICE_ID',
+			id: 'SAVE_POST_NOTICE_ID_1',
 			spokenMessage: 'Post published.',
 			actions: [
 				{
@@ -52,7 +74,7 @@ Default.args = {
 			explicitDismiss: false,
 		},
 		{
-			id: 'SAVE_POST_NOTICE_ID',
+			id: 'SAVE_POST_NOTICE_ID_2',
 			spokenMessage: 'Post updated',
 			actions: [
 				{
