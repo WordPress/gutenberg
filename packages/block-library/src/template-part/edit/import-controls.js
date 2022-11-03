@@ -32,20 +32,32 @@ export function TemplateParetImportControls( { area, setAttributes } ) {
 	);
 
 	const options = useMemo( () => {
-		if ( ! sidebars ) {
+		const sidebarOptions = ( sidebars ?? [] )
+			.filter(
+				( widgetArea ) =>
+					widgetArea.status === 'active' &&
+					widgetArea.widgets.length > 0
+			)
+			.map( ( widgetArea ) => {
+				return {
+					value: widgetArea.id,
+					label: widgetArea.name,
+				};
+			} );
+
+		if ( ! sidebarOptions.length ) {
 			return [];
 		}
 
 		return [
 			{ value: '', label: __( 'Select sidebar' ) },
-			...sidebars.map( ( widgetArea ) => {
-				return {
-					value: widgetArea.id,
-					label: widgetArea.name,
-				};
-			} ),
+			...sidebarOptions,
 		];
 	}, [ sidebars ] );
+
+	if ( ! options.length ) {
+		return null;
+	}
 
 	async function createFromWidgets( event ) {
 		event.preventDefault();
