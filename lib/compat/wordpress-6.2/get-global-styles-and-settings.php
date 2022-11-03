@@ -49,24 +49,23 @@ if ( ! function_exists( 'wp_theme_clean_theme_json_cached_data' ) ) {
 /**
  * Lookup a CSS selector for the block provided, and return it if it exists
  * 
- * @param string $block_name_to_lookup The name of the block to lookup the CSS selector for
+ * @param string $block_name The name of the block to lookup the CSS selector for
  * 
- * @return string the CSS selector for the block
+ * @return string|null the CSS selector for the block
  */
-function get_css_selector_for_block( $block_name_to_lookup ) {
+function wp_theme_get_css_selector_for_block( $block_name ) {
 	$registry = WP_Block_Type_Registry::get_instance();
 	$blocks   = $registry->get_all_registered();
 
-	// Lookup the block quickly
-	if ( isset( $blocks[ $block_name_to_lookup ] ) ) {
-		$block = $blocks[ $block_name_to_lookup ];
+	if ( isset( $blocks[ $block_name ] ) ) {
+		$block = $blocks[ $block_name ];
 		if (
 			isset( $block->supports['__experimentalSelector'] ) &&
 			is_string( $block->supports['__experimentalSelector'] )
 		) {
 			return $block->supports['__experimentalSelector'];
 		} else {
-			return '.wp-block-' . str_replace( '/', '-', str_replace( 'core/', '', $block_name_to_lookup ) );
+			return '.wp-block-' . str_replace( '/', '-', str_replace( 'core/', '', $block_name ) );
 		}
 	}
 
