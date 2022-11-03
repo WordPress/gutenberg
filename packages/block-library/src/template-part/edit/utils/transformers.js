@@ -33,5 +33,5 @@ export function transformWidgetToBlock( widget ) {
 		};
 	}
 
-	createBlock( 'core/legacy-widget', attributes, [] );
+	return createBlock( 'core/legacy-widget', attributes, [] );
 }
