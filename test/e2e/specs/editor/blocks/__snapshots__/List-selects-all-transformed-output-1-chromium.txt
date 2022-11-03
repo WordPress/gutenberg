@@ -1,9 +1,7 @@
-<!-- wp:list -->
-<ul><!-- wp:list-item -->
-<li>1</li>
-<!-- /wp:list-item -->
+<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
 
-<!-- wp:list-item -->
-<li>2</li>
-<!-- /wp:list-item --></ul>
-<!-- /wp:list -->
+<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->

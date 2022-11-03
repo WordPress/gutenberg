@@ -1233,18 +1233,18 @@ test.describe( 'List', () => {
 	} );
 
 	test( 'selects all transformed output', async ( { editor, page } ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
-		await page.keyboard.type( '* 1' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( '2' );
+		await editor.insertBlock( {
+			name: 'core/list',
+			innerBlocks: [
+				{ name: 'core/list-item', attributes: { content: '1' } },
+				{ name: 'core/list-item', attributes: { content: '2' } },
+			],
+		} );
 
-		// Select the whole list.
-		await page.keyboard.press( 'ArrowUp' );
-		await page.keyboard.press( 'ArrowUp' );
+		await editor.selectBlocks(
+			page.locator( 'role=document[name="Block: List"i]' )
+		);
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
-
-		await editor.showBlockToolbar();
 		await page
 			.getByRole( 'button', {
 				name: 'List',
@@ -1255,7 +1255,6 @@ test.describe( 'List', () => {
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 
-		await editor.showBlockToolbar();
 		await page
 			.getByRole( 'button', {
 				name: 'Paragraph',
