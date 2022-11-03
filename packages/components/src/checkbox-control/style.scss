@@ -28,15 +28,13 @@ $checkbox-input-size-sm: 24px; // Width & height for small viewports.
 
 	&:focus {
 		box-shadow: 0 0 0 ($border-width * 2) $white, 0 0 0 ($border-width * 2 + $border-width-focus) $components-color-accent;
-		border-color: $components-color-accent;
 
 		// Only visible in Windows High Contrast mode.
 		outline: 2px solid transparent;
 	}
 
 	&:checked,
-	&:indeterminate,
-	&[aria-checked="mixed"] {
+	&:indeterminate {
 		background: $components-color-accent;
 		border-color: $components-color-accent;
 
