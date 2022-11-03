@@ -15,7 +15,7 @@ import { useCreateTemplatePartFromBlocks } from './utils/hooks';
 import { transformWidgetToBlock } from './utils/transformers';
 
 export function TemplateParetImportControls( { area, setAttributes } ) {
-	const [ sidebar, setSidebar ] = useState( '' );
+	const [ selectedSidebar, setSelectedSidebar ] = useState( '' );
 	const [ isBusy, setIsBusy ] = useState( false );
 
 	const registry = useRegistry();
@@ -62,21 +62,25 @@ export function TemplateParetImportControls( { area, setAttributes } ) {
 	async function createFromWidgets( event ) {
 		event.preventDefault();
 
-		if ( isBusy || ! sidebar ) {
+		if ( isBusy || ! selectedSidebar ) {
 			return;
 		}
 
 		setIsBusy( true );
 
+		const sidebar = options.find(
+			( { value } ) => value === selectedSidebar
+		);
 		const { getWidgets } = registry.resolveSelect( coreStore );
 
+		// The widgets API always returns a successful response.
 		const widgets = await getWidgets( {
-			sidebar,
+			sidebar: sidebar.value,
 			_embed: 'about',
 		} );
 		const blocks = widgets.map( transformWidgetToBlock );
 
-		await createFromBlocks( blocks, sidebar );
+		await createFromBlocks( blocks, sidebar.label );
 
 		setIsBusy( false );
 	}
@@ -86,10 +90,10 @@ export function TemplateParetImportControls( { area, setAttributes } ) {
 			<PanelBody title={ __( 'Import' ) }>
 				<form onSubmit={ createFromWidgets }>
 					<SelectControl
-						label={ __( 'Widget areas' ) }
-						value={ sidebar }
+						label={ __( 'Sidebars' ) }
+						value={ selectedSidebar }
 						options={ options }
-						onChange={ ( value ) => setSidebar( value ) }
+						onChange={ ( value ) => setSelectedSidebar( value ) }
 						hideLabelFromVision
 						__next36pxDefaultSize
 					/>
@@ -97,7 +101,7 @@ export function TemplateParetImportControls( { area, setAttributes } ) {
 						variant="primary"
 						type="submit"
 						isBusy={ isBusy }
-						aria-disabled={ isBusy || ! sidebar }
+						aria-disabled={ isBusy || ! selectedSidebar }
 					>
 						{ __( 'Import' ) }
 					</Button>
