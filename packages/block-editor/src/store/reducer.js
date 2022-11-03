@@ -1161,6 +1161,26 @@ export const blocks = pipe(
 } );
 
 /**
+ * Reducer returning visibility status of block interface.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function isBlockInterfaceHidden( state = false, action ) {
+	switch ( action.type ) {
+		case 'HIDE_BLOCK_INTERFACE':
+			return true;
+
+		case 'SHOW_BLOCK_INTERFACE':
+			return false;
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning typing state.
  *
  * @param {boolean} state  Current state.
@@ -1809,6 +1829,7 @@ export function temporarilyEditingAsBlocks( state = '', action ) {
 export default combineReducers( {
 	blocks,
 	isTyping,
+	isBlockInterfaceHidden,
 	draggedBlocks,
 	selection,
 	isMultiSelecting,

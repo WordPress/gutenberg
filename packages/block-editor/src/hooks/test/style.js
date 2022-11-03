@@ -28,6 +28,9 @@ describe( 'getInlineStyles', () => {
 					style: 'dotted',
 					color: '#21759b',
 				},
+				dimensions: {
+					minHeight: '50vh',
+				},
 				spacing: {
 					blockGap: '1em',
 					padding: { top: '10px' },
@@ -44,6 +47,7 @@ describe( 'getInlineStyles', () => {
 			lineHeight: 1.5,
 			fontSize: 10,
 			marginBottom: '15px',
+			minHeight: '50vh',
 			paddingTop: '10px',
 		} );
 	} );
