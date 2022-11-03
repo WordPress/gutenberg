@@ -75,7 +75,7 @@
 		fill: var(--wp-admin-theme-color) !important;
 	}
 	.wp-block-group-placeholder__variations > li {
-		margin: 0 $grid-unit-15;
+		margin: 0 $grid-unit-15 $grid-unit-15 $grid-unit-15;
 		width: auto;
 		display: flex;
 		flex-direction: column;
@@ -92,11 +92,5 @@
 	.components-placeholder {
 		min-height: auto;
 		padding: $grid-unit-30;
-	}
-	.is-small,
-	.is-medium {
-		.wp-block-group-placeholder__variations li {
-			margin: $grid-unit-15;
-		}
 	}
 }

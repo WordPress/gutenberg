@@ -12,12 +12,12 @@ import {
 } from '@wordpress/block-editor';
 import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState, useCallback } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import GroupPlaceHolder from './placeholder';
+import GroupPlaceHolder, { useShouldShowPlaceHolder } from './placeholder';
 
 /**
  * Render inspector controls for the Group block.
@@ -98,15 +98,16 @@ function GroupEdit( {
 		: { ...defaultLayout, ...layout };
 	const { type = 'default' } = usedLayout;
 	const layoutSupportEnabled = themeSupportsLayout || type === 'flex';
-	const [ showPlaceholder, setShowPlaceholder ] = useState(
-		! hasInnerBlocks
-	);
 
 	// Hooks.
 	const blockProps = useBlockProps( {
 		className: ! layoutSupportEnabled ? layoutClassNames : null,
 	} );
-
+	const [ showPlaceholder, setShowPlaceholder ] = useShouldShowPlaceHolder( {
+		attributes,
+		usedLayout,
+		hasInnerBlocks,
+	} );
 	const innerBlocksProps = useInnerBlocksProps(
 		layoutSupportEnabled
 			? blockProps

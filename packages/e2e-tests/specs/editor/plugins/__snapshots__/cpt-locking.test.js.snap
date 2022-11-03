@@ -41,7 +41,7 @@ exports[`cpt locking template_lock all should not error when deleting the cotent
 `;
 
 exports[`cpt locking template_lock all unlocked group should allow blocks to be moved 1`] = `
-"<!-- wp:group {\\"templateLock\\":false,\\"layout\\":{\\"type\\":\\"constrained\\"}} -->
+"<!-- wp:group {\\"templateLock\\":false} -->
 <div class=\\"wp-block-group\\"><!-- wp:paragraph {\\"placeholder\\":\\"Add a description\\"} -->
 <p>p1</p>
 <!-- /wp:paragraph -->

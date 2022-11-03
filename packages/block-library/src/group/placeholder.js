@@ -6,7 +6,15 @@ import { useBlockProps } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { store as blocksStore } from '@wordpress/blocks';
 import { Path, SVG, Button, Placeholder } from '@wordpress/components';
+import { useState, useEffect } from '@wordpress/element';
 
+/**
+ * Returns a custom variation icon.
+ *
+ * @param {string} name The block variation name.
+ *
+ * @return {JSX.Element} The SVG element.
+ */
 const getGroupPlaceholderIcons = ( name = 'group' ) => {
 	const icons = {
 		group: (
@@ -53,6 +61,60 @@ const getGroupPlaceholderIcons = ( name = 'group' ) => {
 };
 
 /**
+ * A custom hook to tell the Group block whether to show the variation placeholder.
+ *
+ * @param {Object}  props                  Arguments to pass to hook.
+ * @param {Object}  [props.attributes]     The block's attributes.
+ * @param {string}  [props.usedLayout]     The block's current layout type.
+ * @param {boolean} [props.hasInnerBlocks] Whether the block has inner blocks.
+ *
+ * @return {[boolean, Function]} A state value and setter function.
+ */
+export function useShouldShowPlaceHolder( {
+	attributes,
+	usedLayout,
+	hasInnerBlocks,
+} ) {
+	const { style, backgroundColor, textColor, fontSize } = attributes;
+	/*
+	 * Shows the placeholder when no known styles are set,
+	 * or when a non-default layout has been selected.
+	 * Should the Group block support more style presets in the
+	 * future, e.g., attributes.spacingSize, we can add them to the
+	 * condition.
+	 */
+	const [ showPlaceholder, setShowPlaceholder ] = useState(
+		! hasInnerBlocks &&
+			! backgroundColor &&
+			! fontSize &&
+			! textColor &&
+			! style &&
+			usedLayout.type !== 'flex'
+	);
+
+	useEffect( () => {
+		if (
+			!! hasInnerBlocks ||
+			!! backgroundColor ||
+			!! fontSize ||
+			!! style ||
+			usedLayout.type === 'flex'
+		) {
+			setShowPlaceholder( false );
+		}
+	}, [
+		backgroundColor,
+		fontSize,
+		textColor,
+		style,
+		usedLayout.type,
+		hasInnerBlocks,
+	] );
+
+	return [ showPlaceholder, setShowPlaceholder ];
+}
+
+/**
  * Display group variations if none is selected.
  *
  * @param {Object}   props          Component props.
@@ -77,7 +139,7 @@ function GroupPlaceHolder( { name, onSelect } ) {
 		className: 'wp-block-group__placeholder',
 	} );
 	const selectVariation = ( nextVariation = defaultVariation ) =>
-		onSelect( nextVariation.attributes );
+		onSelect( nextVariation );
 
 	return (
 		<div { ...blockProps }>
