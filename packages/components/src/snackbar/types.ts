@@ -15,6 +15,7 @@ type NoticeActionWithOnClick = {
 	onClick: ( event: SyntheticEvent ) => void;
 };
 
+// TODO: move this type to the Notice component once it gets typed.
 export type NoticeAction = NoticeActionWithURL | NoticeActionWithOnClick;
 
 export type Notice = {

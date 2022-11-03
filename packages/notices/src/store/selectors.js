@@ -19,8 +19,6 @@ const DEFAULT_NOTICES = [];
 /**
  * @typedef {Object} WPNotice Notice object.
  *
- * TODO: move this type to the Notice component once it gets typed.
- *
  * @property {string}           id             Unique identifier of notice.
  * @property {string}           status         Status of notice, one of `success`,
  *                                             `info`, `error`, or `warning`. Defaults
