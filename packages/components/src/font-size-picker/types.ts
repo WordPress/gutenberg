@@ -24,7 +24,7 @@ export type FontSizePickerProps = {
 	 */
 	onChange?: (
 		value: number | string | undefined,
-		selectedItem?: FontSizeOption
+		selectedItem?: FontSize
 	) => void;
 	/**
 	 * The current font size value.
