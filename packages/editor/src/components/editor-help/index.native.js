@@ -21,6 +21,7 @@ import {
 	requestContactCustomerSupport,
 	requestGotoCustomerSupportOptions,
 } from '@wordpress/react-native-bridge';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -58,14 +59,31 @@ const HELP_TOPICS = [
 ];
 
 function EditorHelpTopics( { close, isVisible, onClose } ) {
-	const { postType } = useSelect( ( select ) => ( {
+	const { postType, enableSupportSection } = useSelect( ( select ) => ( {
 		postType: select( editorStore ).getEditedPostAttribute( 'type' ),
+		enableSupportSection:
+			select( blockEditorStore ).getSettings( 'capabilities' )
+				.supportSection === true,
 	} ) );
 
 	const title =
 		postType === 'page'
 			? __( 'How to edit your page' )
 			: __( 'How to edit your post' );
+
+	const supportSection = (
+		<>
+			<HelpSectionTitle>{ __( 'Get support' ) }</HelpSectionTitle>
+			<HelpGetSupportButton
+				title={ __( 'Contact support' ) }
+				onPress={ requestContactCustomerSupport }
+			/>
+			<HelpGetSupportButton
+				title={ __( 'More support options' ) }
+				onPress={ requestGotoCustomerSupportOptions }
+			/>
+		</>
+	);
 
 	return (
 		<BottomSheet
@@ -153,31 +171,8 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 														);
 													}
 												) }
-												{
-													<HelpSectionTitle>
-														{ __( 'Get support' ) }
-													</HelpSectionTitle>
-												}
-												{
-													<HelpGetSupportButton
-														title={ __(
-															'Contact support'
-														) }
-														onPress={
-															requestContactCustomerSupport
-														}
-													/>
-												}
-												{
-													<HelpGetSupportButton
-														title={ __(
-															'More support options'
-														) }
-														onPress={
-															requestGotoCustomerSupportOptions
-														}
-													/>
-												}
+												{ enableSupportSection &&
+													supportSection }
 											</PanelBody>
 										</ScrollView>
 									);
