@@ -38,6 +38,8 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	Button,
 	Spinner,
+	__experimentalHStack as HStack,
+	__experimentalHeading as Heading,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
@@ -662,56 +664,83 @@ function Navigation( {
 	// Consider this state as 'unsaved' and offer an uncontrolled version of inner blocks,
 	// that automatically saves the menu as an entity when changes are made to the inner blocks.
 	const hasUnsavedBlocks = hasUncontrolledInnerBlocks && ! isEntityAvailable;
+
+	const WrappedNavigationMenuSelector = ( { currentMenuId } ) => (
+		<NavigationMenuSelector
+			currentMenuId={ currentMenuId }
+			clientId={ clientId }
+			onSelectNavigationMenu={ ( menuId ) => {
+				handleUpdateMenu( menuId );
+			} }
+			onSelectClassicMenu={ async ( classicMenu ) => {
+				const navMenu = await convertClassicMenu(
+					classicMenu.id,
+					classicMenu.name,
+					'draft'
+				);
+				if ( navMenu ) {
+					handleUpdateMenu( navMenu.id, {
+						focusNavigationBlock: true,
+					} );
+				}
+			} }
+			onCreateNew={ createUntitledEmptyNavigationMenu }
+			createNavigationMenuIsSuccess={ createNavigationMenuIsSuccess }
+			createNavigationMenuIsError={ createNavigationMenuIsError }
+			/* translators: %s: The name of a menu. */
+			actionLabel={ __( "Switch to '%s'" ) }
+		/>
+	);
+
 	if ( hasUnsavedBlocks ) {
 		return (
 			<TagName { ...blockProps }>
 				<InspectorControls>
-					<PanelBody title={ __( 'Menu' ) }>
-						<NavigationMenuSelector
-							currentMenuId={ ref }
-							clientId={ clientId }
-							onSelectNavigationMenu={ ( menuId ) => {
-								handleUpdateMenu( menuId );
-							} }
-							onSelectClassicMenu={ async ( classicMenu ) => {
-								const navMenu = await convertClassicMenu(
-									classicMenu.id,
-									classicMenu.name,
-									'draft'
-								);
-								if ( navMenu ) {
-									handleUpdateMenu( navMenu.id, {
-										focusNavigationBlock: true,
-									} );
-								}
-							} }
-							onCreateNew={ createUntitledEmptyNavigationMenu }
-							createNavigationMenuIsSuccess={
-								createNavigationMenuIsSuccess
-							}
-							/* translators: %s: The name of a menu. */
-							actionLabel={ __( "Switch to '%s'" ) }
-						/>
+					<PanelBody
+						title={
+							isOffCanvasNavigationEditorEnabled
+								? null
+								: __( 'Menu' )
+						}
+					>
 						{ isOffCanvasNavigationEditorEnabled && (
-							<OffCanvasEditor
-								blocks={ innerBlocks }
-								isExpanded={ true }
-								selectBlockInCanvas={ false }
-							/>
+							<>
+								<HStack className="wp-block-navigation-off-canvas-editor__header">
+									<Heading
+										className="wp-block-navigation-off-canvas-editor__title"
+										level={ 2 }
+									>
+										{ __( 'Menu' ) }
+									</Heading>
+									<WrappedNavigationMenuSelector
+										currentMenuId={ ref }
+									/>
+								</HStack>
+								<OffCanvasEditor
+									blocks={ innerBlocks }
+									isExpanded={ true }
+									selectBlockInCanvas={ false }
+								/>
+							</>
 						) }
 						{ ! isOffCanvasNavigationEditorEnabled && (
-							<Button
-								variant="link"
-								disabled={
-									! hasManagePermissions ||
-									! hasResolvedNavigationMenus
-								}
-								href={ addQueryArgs( 'edit.php', {
-									post_type: 'wp_navigation',
-								} ) }
-							>
-								{ __( 'Manage menus' ) }
-							</Button>
+							<>
+								<WrappedNavigationMenuSelector
+									currentMenuId={ ref }
+								/>
+								<Button
+									variant="link"
+									disabled={
+										! hasManagePermissions ||
+										! hasResolvedNavigationMenus
+									}
+									href={ addQueryArgs( 'edit.php', {
+										post_type: 'wp_navigation',
+									} ) }
+								>
+									{ __( 'Manage menus' ) }
+								</Button>
+							</>
 						) }
 					</PanelBody>
 				</InspectorControls>
@@ -758,45 +787,47 @@ function Navigation( {
 		return (
 			<TagName { ...blockProps }>
 				<InspectorControls>
-					<PanelBody title={ __( 'Menu' ) }>
-						<NavigationMenuSelector
-							currentMenuId={ null }
-							clientId={ clientId }
-							onSelectNavigationMenu={ ( menuId ) => {
-								handleUpdateMenu( menuId );
-							} }
-							onSelectClassicMenu={ async ( classicMenu ) => {
-								const navMenu = await convertClassicMenu(
-									classicMenu.id,
-									classicMenu.name,
-									'draft'
-								);
-								if ( navMenu ) {
-									handleUpdateMenu( navMenu.id, {
-										focusNavigationBlock: true,
-									} );
-								}
-							} }
-							onCreateNew={ createUntitledEmptyNavigationMenu }
-							createNavigationMenuIsSuccess={
-								createNavigationMenuIsSuccess
-							}
-							/* translators: %s: The name of a menu. */
-							actionLabel={ __( "Switch to '%s'" ) }
-						/>
+					<PanelBody
+						title={
+							isOffCanvasNavigationEditorEnabled
+								? null
+								: __( 'Menu' )
+						}
+					>
+						{ isOffCanvasNavigationEditorEnabled && (
+							<>
+								<HStack className="wp-block-navigation-off-canvas-editor__header">
+									<Heading
+										className="wp-block-navigation-off-canvas-editor__title"
+										level={ 2 }
+									>
+										{ __( 'Menu' ) }
+									</Heading>
+									<WrappedNavigationMenuSelector
+										currentMenuId={ null }
+									/>
+								</HStack>
+								<p>Select or create a menu</p>
+							</>
+						) }
 						{ ! isOffCanvasNavigationEditorEnabled && (
-							<Button
-								variant="link"
-								disabled={
-									! hasManagePermissions ||
-									! hasResolvedNavigationMenus
-								}
-								href={ addQueryArgs( 'edit.php', {
-									post_type: 'wp_navigation',
-								} ) }
-							>
-								{ __( 'Manage menus' ) }
-							</Button>
+							<>
+								<WrappedNavigationMenuSelector
+									currentMenuId={ null }
+								/>
+								<Button
+									variant="link"
+									disabled={
+										! hasManagePermissions ||
+										! hasResolvedNavigationMenus
+									}
+									href={ addQueryArgs( 'edit.php', {
+										post_type: 'wp_navigation',
+									} ) }
+								>
+									{ __( 'Manage menus' ) }
+								</Button>
+							</>
 						) }
 					</PanelBody>
 				</InspectorControls>
@@ -875,55 +906,51 @@ function Navigation( {
 		<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
 			<RecursionProvider uniqueId={ recursionId }>
 				<InspectorControls>
-					<PanelBody title={ __( 'Menu' ) }>
-						<NavigationMenuSelector
-							currentMenuId={ ref }
-							clientId={ clientId }
-							onSelectNavigationMenu={ ( menuId ) => {
-								handleUpdateMenu( menuId );
-							} }
-							onSelectClassicMenu={ async ( classicMenu ) => {
-								const navMenu = await convertClassicMenu(
-									classicMenu.id,
-									classicMenu.name,
-									'draft'
-								);
-								if ( navMenu ) {
-									handleUpdateMenu( navMenu.id, {
-										focusNavigationBlock: true,
-									} );
-								}
-							} }
-							onCreateNew={ createUntitledEmptyNavigationMenu }
-							createNavigationMenuIsSuccess={
-								createNavigationMenuIsSuccess
-							}
-							createNavigationMenuIsError={
-								createNavigationMenuIsError
-							}
-							/* translators: %s: The name of a menu. */
-							actionLabel={ __( "Switch to '%s'" ) }
-						/>
+					<PanelBody
+						title={
+							isOffCanvasNavigationEditorEnabled
+								? null
+								: __( 'Menu' )
+						}
+					>
 						{ isOffCanvasNavigationEditorEnabled && (
-							<OffCanvasEditor
-								blocks={ innerBlocks }
-								isExpanded={ true }
-								selectBlockInCanvas={ false }
-							/>
+							<>
+								<HStack className="wp-block-navigation-off-canvas-editor__header">
+									<Heading
+										className="wp-block-navigation-off-canvas-editor__title"
+										level={ 2 }
+									>
+										{ __( 'Menu' ) }
+									</Heading>
+									<WrappedNavigationMenuSelector
+										currentMenuId={ ref }
+									/>
+								</HStack>
+								<OffCanvasEditor
+									blocks={ innerBlocks }
+									isExpanded={ true }
+									selectBlockInCanvas={ false }
+								/>
+							</>
 						) }
 						{ ! isOffCanvasNavigationEditorEnabled && (
-							<Button
-								variant="link"
-								disabled={
-									! hasManagePermissions ||
-									! hasResolvedNavigationMenus
-								}
-								href={ addQueryArgs( 'edit.php', {
-									post_type: 'wp_navigation',
-								} ) }
-							>
-								{ __( 'Manage menus' ) }
-							</Button>
+							<>
+								<WrappedNavigationMenuSelector
+									currentMenuId={ ref }
+								/>
+								<Button
+									variant="link"
+									disabled={
+										! hasManagePermissions ||
+										! hasResolvedNavigationMenus
+									}
+									href={ addQueryArgs( 'edit.php', {
+										post_type: 'wp_navigation',
+									} ) }
+								>
+									{ __( 'Manage menus' ) }
+								</Button>
+							</>
 						) }
 					</PanelBody>
 				</InspectorControls>
