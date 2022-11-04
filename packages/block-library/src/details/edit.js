@@ -11,8 +11,11 @@ import {
 	useBlockProps,
 	useInnerBlocksProps,
 	BlockControls,
+	store as blockEditorStore,
+	InspectorControls,
 } from '@wordpress/block-editor';
-import { ToolbarButton } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { PanelBody, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -31,7 +34,7 @@ const DETAILS = [
 	],
 ];
 
-function DetailsBlock( { attributes, setAttributes } ) {
+function DetailsBlock( { attributes, setAttributes, clientId } ) {
 	const { level, summary, showContent } = attributes;
 	const tagName = 'h' + level;
 	const blockProps = useBlockProps();
@@ -43,21 +46,17 @@ function DetailsBlock( { attributes, setAttributes } ) {
 			template: DETAILS,
 		}
 	);
+
+	// Check if either the block or the inner blocks are selected.
+	const hasSelection = useSelect( ( select ) => {
+		const { isBlockSelected, hasSelectedInnerBlock } =
+			select( blockEditorStore );
+		return hasSelectedInnerBlock( clientId ) || isBlockSelected( clientId );
+	}, [] );
+
 	return (
 		<>
 			<BlockControls group="block">
-				<ToolbarButton
-					title={ __( 'Show content' ) }
-					// Add icon once an icon has been created icon={ }
-					onClick={ () => {
-						setAttributes( {
-							showContent: ! showContent,
-						} );
-					} }
-					className={ showContent ? 'is-pressed' : undefined }
-				>
-					{ __( 'Show content' ) }
-				</ToolbarButton>
 				<HeadingLevelDropdown
 					selectedLevel={ level }
 					onChange={ ( newLevel ) =>
@@ -65,15 +64,20 @@ function DetailsBlock( { attributes, setAttributes } ) {
 					}
 				/>
 			</BlockControls>
-			<details
-				{ ...blockProps }
-				open={ showContent }
-				aria-label={
-					showContent
-						? __( 'Block: Details. Expanded.' )
-						: __( 'Block: Details. Collapsed.' )
-				}
-			>
+			<InspectorControls>
+				<PanelBody title={ __( 'Settings' ) }>
+					<ToggleControl
+						label={ __( 'Open by default' ) }
+						checked={ showContent }
+						onChange={ () =>
+							setAttributes( {
+								showContent: ! showContent,
+							} )
+						}
+					/>
+				</PanelBody>
+			</InspectorControls>
+			<details { ...blockProps } open={ hasSelection || showContent }>
 				<summary
 					className={ classnames( 'wp-block-details__summary' ) }
 					onClick={ ( event ) => event.preventDefault() }
