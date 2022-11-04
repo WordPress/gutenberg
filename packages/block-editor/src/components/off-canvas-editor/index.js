@@ -50,6 +50,7 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
 /**
  * Show a hierarchical list of blocks.
  *
+<<<<<<< HEAD
  * @param {Object}  props                     Components props.
  * @param {string}  props.id                  An HTML element id for the root element of ListView.
  * @param {Array}   props.blocks              Custom subset of block client IDs to be used instead of the default hierarchy.
@@ -66,6 +67,17 @@ function __ExperimentalOffCanvasEditor(
 		isExpanded = false,
 		selectBlockInCanvas = true,
 	},
+=======
+ * @param {Object}  props                 Components props.
+ * @param {string}  props.id              An HTML element id for the root element of ListView.
+ * @param {Array}   props.blocks          Custom subset of block client IDs to be used instead of the default hierarchy.
+ * @param {boolean} props.showBlockMovers Flag to enable block movers
+ * @param {boolean} props.isExpanded      Flag to determine whether nested levels are expanded by default.
+ * @param {Object}  ref                   Forwarded ref
+ */
+function __ExperimentalOffCanvasEditor(
+	{ id, blocks, showBlockMovers = false, isExpanded = false },
+>>>>>>> c86d6580d0 (Adds the gutenberg-off-canvas-navigation-editor experiment)
 	ref
 ) {
 	const { clientIdsTree, draggedClientIds, selectedClientIds } =
@@ -206,7 +218,10 @@ function __ExperimentalOffCanvasEditor(
 						selectedClientIds={ selectedClientIds }
 						isExpanded={ isExpanded }
 						shouldShowInnerBlocks={ shouldShowInnerBlocks }
+<<<<<<< HEAD
 						selectBlockInCanvas={ selectBlockInCanvas }
+=======
+>>>>>>> c86d6580d0 (Adds the gutenberg-off-canvas-navigation-editor experiment)
 					/>
 				</ListViewContext.Provider>
 			</TreeGrid>
