@@ -6,6 +6,9 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+/**
+ * WordPress dependencies
+ */
 import { hasBlockSupport } from '@wordpress/blocks';
 import {
 	__experimentalTreeGridCell as TreeGridCell,
@@ -23,6 +26,9 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { sprintf, __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
 /**
  * Internal dependencies
  */
@@ -54,6 +60,7 @@ function ListViewBlock( {
 	isExpanded,
 	selectedClientIds,
 	preventAnnouncement,
+	selectBlockInCanvas,
 } ) {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
@@ -245,7 +252,13 @@ function ListViewBlock( {
 					<div className="block-editor-list-view-block__contents-container">
 						<ListViewBlockContents
 							block={ block }
-							onClick={ selectEditorBlock }
+							onClick={
+								selectBlockInCanvas
+									? selectEditorBlock
+									: ( event ) => {
+											event.preventDefault();
+									  }
+							}
 							onToggleExpanded={ toggleExpanded }
 							isSelected={ isSelected }
 							position={ position }
