@@ -32,6 +32,29 @@ function block_core_gallery_data_id_backcompatibility( $parsed_block ) {
 
 add_filter( 'render_block_data', 'block_core_gallery_data_id_backcompatibility' );
 
+
+function block_core_gallery_caption_styles( $parsed_block ) {
+
+	$styles = WP_Theme_JSON_Resolver::get_theme_data()->get_data();
+	$borderRadius = '';
+
+	if(isset( $styles['styles']['blocks']['core/image']['border']['radius']) ) {
+		$borderRadius = $styles['styles']['blocks']['core/image']['border']['radius'];
+
+		if ( 'core/gallery' === $parsed_block['blockName'] ) {
+			foreach ( $parsed_block['innerBlocks'] as $key => $inner_block ) {
+				if ( 'core/image' === $inner_block['blockName'] ) {
+					$parsed_block['innerBlocks'][ $key ]['attrs']['border-radius'] = $borderRadius;
+				}
+			}
+		}
+	}
+
+	return $parsed_block;
+}
+
+add_filter( 'render_block_data', 'block_core_gallery_caption_styles' );
+
 /**
  * Adds a style tag for the --wp--style--unstable-gallery-gap var.
  *

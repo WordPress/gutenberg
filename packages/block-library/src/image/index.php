@@ -24,6 +24,11 @@ function render_block_core_image( $attributes, $content ) {
 			$content = str_replace( '<img', '<img ' . $data_id_attribute . ' ', $content );
 		}
 	}
+
+	if ( isset( $attributes['border-radius'] ) ) {
+		$content = str_replace( '<figure', "<figure style='border-radius:" . $attributes['border-radius'] .  ";overflow:hidden;'", $content);
+	}
+
 	return $content;
 }
 
