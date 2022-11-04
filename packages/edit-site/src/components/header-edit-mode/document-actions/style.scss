@@ -53,6 +53,7 @@
 		transition: all ease 0.2s;
 		background: $gray-200;
 		border-radius: 2px;
+		color: var(--wp-block-synced-color);
 		@include reduce-motion(transition);
 	}
 
