@@ -1,13 +1,16 @@
 <?php
 /**
- * WP_REST_Templates_Controller class
+ * REST API: Gutenberg_REST_Template_Revision_Count class
+ *
+ * @package    gutenberg
+ */
+
+/**
+ * Gutenberg_REST_Template_Revision_Count class
  *
  * When merging into core, prepare_revision_links() should be merged with
  * WP_REST_Templates_Controller::prepare_links().
- *
- * @package gutenberg
  */
-
 class Gutenberg_REST_Template_Revision_Count extends WP_REST_Templates_Controller {
 	/**
 	 * Add revisions to the response.
