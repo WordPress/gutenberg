@@ -91,7 +91,9 @@ function Variation( { variation } ) {
 				tabIndex="0"
 				aria-label={ variation.title }
 				aria-current={ isActive }
-				aria-describedby={ describedbyID }
+				aria-describedby={
+					!! variation?.description ? describedbyID : undefined
+				}
 				onFocus={ () => setIsFocused( true ) }
 				onBlur={ () => setIsFocused( false ) }
 			>
@@ -101,9 +103,11 @@ function Variation( { variation } ) {
 						isFocused={ isFocused }
 						withHoverView
 					/>
-					<p id={ describedbyID } hidden>
-						{ variation?.description }
-					</p>
+					{ variation?.description && (
+						<p id={ describedbyID } hidden>
+							{ variation?.description }
+						</p>
+					) }
 				</div>
 			</div>
 		</GlobalStylesContext.Provider>
