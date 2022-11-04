@@ -83,15 +83,3 @@ function gutenberg_enable_zoomed_out_view() {
 }
 
 add_action( 'admin_init', 'gutenberg_enable_zoomed_out_view' );
-
-/**
- * Sets a global JS variable used to trigger the availability of the Navigation List View experiment.
- */
-function gutenberg_enable_off_canvas_navigation_editor() {
-	$gutenberg_experiments = get_option( 'gutenberg-experiments' );
-	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-off-canvas-navigation-editor', $gutenberg_experiments ) ) {
-		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableOffCanvasNavigationEditor = true', 'before' );
-	}
-}
-
-add_action( 'admin_init', 'gutenberg_enable_off_canvas_navigation_editor' );
