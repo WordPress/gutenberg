@@ -93,7 +93,7 @@ jobs:
                       fi
                     fi
                   fi
-                  echo "new_versio=$(echo $NEW_VERSION)" >> $GITHUB_OUTPUT
+                  echo "new_version=${NEW_VERSION}" >> $GITHUB_OUTPUT
                   IFS='.' read -r -a NEW_VERSION_ARRAY <<< "$NEW_VERSION"
                   RELEASE_BRANCH="release/${NEW_VERSION_ARRAY[0]}.${NEW_VERSION_ARRAY[1]}"
                   echo "release_branch=$(echo $RELEASE_BRANCH)" >> $GITHUB_OUTPUT
