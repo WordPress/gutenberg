@@ -19,7 +19,12 @@ function render_block_core_read_more( $attributes, $content, $block ) {
 	}
 
 	$post_ID            = $block->context['postId'];
-	$screen_reader_text = __( 'Read more about ' ) . get_the_title( $post_ID );
+	$post_title         = get_the_title( $post_ID );
+	/* translators: %s is either the post title or post ID to describe the link for screen readers. */
+	$screen_reader_text = sprintf(
+		__( ': %s' ),
+		$post_title !== '' ? $post_title : __( 'post ' ) . $post_ID
+	);
 	$justify_class_name = empty( $attributes['justifyContent'] ) ? '' : "is-justified-{$attributes['justifyContent']}";
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $justify_class_name ) );
 	$more_text          = ! empty( $attributes['content'] ) ? wp_kses_post( $attributes['content'] ) : __( 'Read more' );
