@@ -15,6 +15,6 @@
 		{ "path": "../redux-routine" }
 	],
 	"include": [ 
-	    "src/**/*" 
+	     "src/**/*" 
 	]
 }
