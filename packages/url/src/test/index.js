@@ -723,6 +723,14 @@ describe( 'getQueryArgs', () => {
 				)
 			).toEqual( data );
 		} );
+
+		it( 'should ignore malformed params', () => {
+			const url = 'https://andalouses.example/beach?foo=bar&baz=%E0%A4%A';
+
+			expect( getQueryArgs( url ) ).toEqual( {
+				foo: 'bar',
+			} );
+		} );
 	} );
 } );
 

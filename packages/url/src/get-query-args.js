@@ -80,17 +80,19 @@ export function getQueryArgs( url ) {
 			.replace( /\+/g, '%20' )
 			.split( '&' )
 			.reduce( ( accumulator, keyValue ) => {
-				const [ key, value = '' ] = keyValue
-					.split( '=' )
-					// Filtering avoids decoding as `undefined` for value, where
-					// default is restored in destructuring assignment.
-					.filter( Boolean )
-					.map( decodeURIComponent );
+				try {
+					const [ key, value = '' ] = keyValue
+						.split( '=' )
+						// Filtering avoids decoding as `undefined` for value, where
+						// default is restored in destructuring assignment.
+						.filter( Boolean )
+						.map( decodeURIComponent );
 
-				if ( key ) {
-					const segments = key.replace( /\]/g, '' ).split( '[' );
-					setPath( accumulator, segments, value );
-				}
+					if ( key ) {
+						const segments = key.replace( /\]/g, '' ).split( '[' );
+						setPath( accumulator, segments, value );
+					}
+				} catch ( uriComponentError ) {}
 
 				return accumulator;
 			}, Object.create( null ) )
