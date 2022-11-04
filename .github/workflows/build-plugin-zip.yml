@@ -77,7 +77,7 @@ jobs:
               id: get_version
               run: |
                   OLD_VERSION=$(jq --raw-output '.version' package.json)
-                  echo "old_version=$(echo $OLD_VERSION)" >> $GITHUB_OUTPUT
+                  echo "old_version=${OLD_VERSION}" >> $GITHUB_OUTPUT
                   if [[ ${{ github.event.inputs.version }} == 'stable' ]]; then
                     NEW_VERSION=$(npx semver $OLD_VERSION -i patch)
                   else
