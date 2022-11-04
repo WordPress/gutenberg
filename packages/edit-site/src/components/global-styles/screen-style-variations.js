@@ -33,6 +33,8 @@ import { GlobalStylesContext } from './context';
 import StylesPreview from './preview';
 import ScreenHeader from './header';
 
+let uniqueId = 0;
+
 function compareVariations( a, b ) {
 	return isEqual( a.styles, b.styles ) && isEqual( a.settings, b.settings );
 }
@@ -72,9 +74,7 @@ function Variation( { variation } ) {
 		return compareVariations( user, variation );
 	}, [ user, variation ] );
 
-	const label =
-		variation.title +
-		( variation?.description ? '. ' + variation?.description : '' );
+	const describedbyID = `style-variations-item-${ ++uniqueId }`;
 
 	return (
 		<GlobalStylesContext.Provider value={ context }>
@@ -89,8 +89,9 @@ function Variation( { variation } ) {
 				onClick={ selectVariation }
 				onKeyDown={ selectOnEnter }
 				tabIndex="0"
-				aria-label={ label }
+				aria-label={ variation.title }
 				aria-current={ isActive }
+				aria-describedby={ describedbyID }
 				onFocus={ () => setIsFocused( true ) }
 				onBlur={ () => setIsFocused( false ) }
 			>
@@ -100,6 +101,9 @@ function Variation( { variation } ) {
 						isFocused={ isFocused }
 						withHoverView
 					/>
+					<p id={ describedbyID } hidden>
+						{ variation?.description }
+					</p>
 				</div>
 			</div>
 		</GlobalStylesContext.Provider>
