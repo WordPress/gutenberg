@@ -34,6 +34,7 @@
 
 // The black plus that shows up on the right side of an empty paragraph block, or the initial appender
 // that exists only on empty documents.
+.block-editor-block-list__empty-block-inserter.block-editor-block-list__empty-block-inserter,
 .block-editor-default-block-appender .block-editor-inserter {
 	position: absolute;
 	top: 0;

@@ -21,6 +21,7 @@ import BlockContextualToolbar from './block-contextual-toolbar';
 import { store as blockEditorStore } from '../../store';
 import BlockPopover from '../block-popover';
 import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
+import Inserter from '../inserter';
 
 function selector( select ) {
 	const {
@@ -129,45 +130,82 @@ function SelectedBlockPopover( {
 		clientId,
 	} );
 
-	if ( ! shouldShowBreadcrumb && ! shouldShowContextualToolbar ) {
+	if (
+		! shouldShowBreadcrumb &&
+		! shouldShowContextualToolbar &&
+		! showEmptyBlockSideInserter
+	) {
 		return null;
 	}
 
 	return (
-		<BlockPopover
-			clientId={ capturingClientId || clientId }
-			bottomClientId={ lastClientId }
-			className={ classnames( 'block-editor-block-list__block-popover', {
-				'is-insertion-point-visible': isInsertionPointVisible,
-			} ) }
-			__unstablePopoverSlot={ __unstablePopoverSlot }
-			__unstableContentRef={ __unstableContentRef }
-			resize={ false }
-			{ ...popoverProps }
-		>
-			{ shouldShowContextualToolbar && showContents && (
-				<BlockContextualToolbar
-					// If the toolbar is being shown because of being forced
-					// it should focus the toolbar right after the mount.
-					focusOnMount={ isToolbarForced.current }
-					__experimentalInitialIndex={
-						initialToolbarItemIndexRef.current
-					}
-					__experimentalOnIndexChange={ ( index ) => {
-						initialToolbarItemIndexRef.current = index;
-					} }
-					// Resets the index whenever the active block changes so
-					// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
-					key={ clientId }
-				/>
+		<>
+			{ showEmptyBlockSideInserter && (
+				<BlockPopover
+					clientId={ capturingClientId || clientId }
+					__unstableCoverTarget
+					bottomClientId={ lastClientId }
+					className={ classnames(
+						'block-editor-block-list__block-popover'
+					) }
+					__unstablePopoverSlot={ __unstablePopoverSlot }
+					__unstableContentRef={ __unstableContentRef }
+					resize={ false }
+					shift={ false }
+					{ ...popoverProps }
+				>
+					<div className="block-editor-block-list__empty-block-inserter">
+						<Inserter
+							position="bottom right"
+							rootClientId={ rootClientId }
+							clientId={ clientId }
+							__experimentalIsQuick
+						/>
+					</div>
+				</BlockPopover>
 			) }
-			{ shouldShowBreadcrumb && (
-				<BlockSelectionButton
-					clientId={ clientId }
-					rootClientId={ rootClientId }
-				/>
-			) }
-		</BlockPopover>
+			{ shouldShowBreadcrumb ||
+				( shouldShowContextualToolbar && (
+					<BlockPopover
+						clientId={ capturingClientId || clientId }
+						bottomClientId={ lastClientId }
+						className={ classnames(
+							'block-editor-block-list__block-popover',
+							{
+								'is-insertion-point-visible':
+									isInsertionPointVisible,
+							}
+						) }
+						__unstablePopoverSlot={ __unstablePopoverSlot }
+						__unstableContentRef={ __unstableContentRef }
+						resize={ false }
+						{ ...popoverProps }
+					>
+						{ shouldShowContextualToolbar && showContents && (
+							<BlockContextualToolbar
+								// If the toolbar is being shown because of being forced
+								// it should focus the toolbar right after the mount.
+								focusOnMount={ isToolbarForced.current }
+								__experimentalInitialIndex={
+									initialToolbarItemIndexRef.current
+								}
+								__experimentalOnIndexChange={ ( index ) => {
+									initialToolbarItemIndexRef.current = index;
+								} }
+								// Resets the index whenever the active block changes so
+								// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
+								key={ clientId }
+							/>
+						) }
+						{ shouldShowBreadcrumb && (
+							<BlockSelectionButton
+								clientId={ clientId }
+								rootClientId={ rootClientId }
+							/>
+						) }
+					</BlockPopover>
+				) ) }
+		</>
 	);
 }
 
