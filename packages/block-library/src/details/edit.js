@@ -54,6 +54,8 @@ function DetailsBlock( { attributes, setAttributes, clientId } ) {
 		return hasSelectedInnerBlock( clientId ) || isBlockSelected( clientId );
 	}, [] );
 
+	const isOpen = !! showContent ? showContent : hasSelection;
+
 	return (
 		<>
 			<BlockControls group="block">
@@ -77,7 +79,7 @@ function DetailsBlock( { attributes, setAttributes, clientId } ) {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<details { ...blockProps } open={ hasSelection || showContent }>
+			<details { ...blockProps } open={ isOpen }>
 				<summary
 					className={ classnames( 'wp-block-details__summary' ) }
 					onClick={ ( event ) => event.preventDefault() }
