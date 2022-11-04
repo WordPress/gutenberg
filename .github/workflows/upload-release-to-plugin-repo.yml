@@ -20,7 +20,7 @@ jobs:
               run: |
                   IFS='.' read -r -a VERSION_ARRAY <<< "${TAG#v}"
                   RELEASE_BRANCH="release/${VERSION_ARRAY[0]}.${VERSION_ARRAY[1]}"
-                  echo "release_branch=$(echo $RELEASE_BRANCH)" >> $GITHUB_OUTPUT
+                  echo "release_branch=${RELEASE_BRANCH}" >> $GITHUB_OUTPUT
 
     update-changelog:
         name: Update Changelog on ${{ matrix.branch }} branch
