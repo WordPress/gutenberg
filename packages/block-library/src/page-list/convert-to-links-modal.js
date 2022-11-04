@@ -7,7 +7,6 @@ import { useDispatch } from '@wordpress/data';
 import { useEntityRecords } from '@wordpress/core-data';
 import { createBlock as create } from '@wordpress/blocks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { createInterpolateElement } from '@wordpress/element';
 
 const PAGE_FIELDS = [ 'id', 'title', 'link', 'type', 'parent' ];
 const MAX_PAGE_COUNT = 100;
@@ -92,24 +91,18 @@ export default function ConvertToLinksModal( { onClose, clientId } ) {
 		<Modal
 			closeLabel={ __( 'Close' ) }
 			onRequestClose={ onClose }
-			title={ __( 'Customize your navigation menu' ) }
+			title={ __( 'Customize this menu' ) }
 			className={ 'wp-block-page-list-modal' }
 			aria={ { describedby: 'wp-block-page-list-modal__description' } }
 		>
 			<p id={ 'wp-block-page-list-modal__description' }>
 				{ __(
-					'We’ve provided a default list of your published pages so you can get started quickly. If you’d prefer to edit this menu, click the Convert button below — converting will allow you to add, re-order, and remove items, or edit their labels.'
+					'This menu is automatically kept in sync with pages on your site. You can manage the menu yourself by clicking customize below.'
 				) }
 			</p>
 			<p>
 				{ __(
-					'If you previously created a menu in a classic theme, converting will allow you to import it.'
-				) }
-			</p>
-			<p>
-				{ createInterpolateElement(
-					__( '<a>Click here</a> to learn more about menu management.' ),
-					{ a: <a href="https://wordpress.org/support/article/navigation-block" /> }
+					'Tip: If you want to return to a managed menu, simply add a new menu item and pick the Pages List block.'
 				) }
 			</p>
 			<div className="wp-block-page-list-modal-buttons">
@@ -126,7 +119,7 @@ export default function ConvertToLinksModal( { onClose, clientId } ) {
 						createBlock: create,
 					} ) }
 				>
-					{ __( 'Convert' ) }
+					{ __( 'Customize' ) }
 				</Button>
 			</div>
 		</Modal>
