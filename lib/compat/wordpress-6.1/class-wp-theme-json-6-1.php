@@ -21,8 +21,8 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * Note: this will effect both top level and block level elements.
 	 */
 	const VALID_ELEMENT_PSEUDO_SELECTORS = array(
-		'link'   => array( ':hover', ':focus', ':active', ':visited' ),
-		'button' => array( ':hover', ':focus', ':active', ':visited' ),
+		'link'   => array( ':visited', ':hover', ':focus', ':active' ),
+		'button' => array( ':visited', ':hover', ':focus', ':active' ),
 	);
 
 	/**
