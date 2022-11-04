@@ -6,6 +6,9 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+/**
+ * WordPress dependencies
+ */
 import { hasBlockSupport } from '@wordpress/blocks';
 import {
 	__experimentalTreeGridCell as TreeGridCell,
@@ -23,6 +26,9 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { sprintf, __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
 /**
  * Internal dependencies
  */
