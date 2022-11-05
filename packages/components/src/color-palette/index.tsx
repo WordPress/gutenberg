@@ -44,7 +44,7 @@ function SinglePalette( {
 	actions,
 }: SinglePaletteProps ) {
 	const colorOptions = useMemo( () => {
-		return colors.map( ( { color, name }, index ) => {
+		return colors?.map( ( { color, name }, index ) => {
 			const colordColor = colord( color );
 			const isSelected = value === color;
 
