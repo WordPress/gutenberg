@@ -27,10 +27,12 @@
 .block-editor-block-lock-modal__checklist-item {
 	display: flex;
 	justify-content: space-between;
+	align-items: center;
+	gap: $grid-unit-15;
 	margin-bottom: 0;
 	padding: $grid-unit-15 0 $grid-unit-15 $grid-unit-40;
 
-	svg {
+	.block-editor-block-lock-modal__lock-icon {
 		margin-right: $grid-unit-15;
 		fill: $gray-900;
 	}

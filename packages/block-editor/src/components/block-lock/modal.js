@@ -146,6 +146,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 									}
 								/>
 								<Icon
+									className="block-editor-block-lock-modal__lock-icon"
 									icon={ lock.edit ? lockIcon : unlockIcon }
 								/>
 							</li>
@@ -162,7 +163,10 @@ export default function BlockLockModal( { clientId, onClose } ) {
 									} ) )
 								}
 							/>
-							<Icon icon={ lock.move ? lockIcon : unlockIcon } />
+							<Icon
+								className="block-editor-block-lock-modal__lock-icon"
+								icon={ lock.move ? lockIcon : unlockIcon }
+							/>
 						</li>
 						<li className="block-editor-block-lock-modal__checklist-item">
 							<CheckboxControl
@@ -177,6 +181,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 								}
 							/>
 							<Icon
+								className="block-editor-block-lock-modal__lock-icon"
 								icon={ lock.remove ? lockIcon : unlockIcon }
 							/>
 						</li>
