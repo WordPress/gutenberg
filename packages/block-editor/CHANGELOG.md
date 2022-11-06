@@ -5,6 +5,7 @@
 ### Enhancement
 
 -   `BlockLockModal`: Move Icon component out of CheckboxControl label ([#45535](https://github.com/WordPress/gutenberg/pull/45535))
+-   Fluid typography: adjust font size min and max rules ([#45536](https://github.com/WordPress/gutenberg/pull/45536)).
 
 ## 10.4.0 (2022-11-02)
 
