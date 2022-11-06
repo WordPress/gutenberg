@@ -19,6 +19,10 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * Define which defines which pseudo selectors are enabled for
 	 * which elements.
 	 * Note: this will effect both top level and block level elements.
+	 *
+	 * The order of the selectors should be: visited, hover, focus, active.
+	 * This is to ensure that 'visited' has the lowest specificity
+	 * and the other selectors can always overwrite it.
 	 */
 	const VALID_ELEMENT_PSEUDO_SELECTORS = array(
 		'link'   => array( ':visited', ':hover', ':focus', ':active' ),
