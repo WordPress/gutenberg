@@ -12,4 +12,11 @@
 	padding: calc(0.667em + 2px) calc(1.333em + 2px);
 
 	font-size: 1.125em;
+
+	&:hover,
+	&:focus,
+	&:active,
+	&:visited {
+		color: $white;
+	}
 }
