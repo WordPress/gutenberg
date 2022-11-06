@@ -12,6 +12,10 @@ import { isKeyboardEvent } from '@wordpress/keycodes';
 const defaultShortcuts = {
 	previous: [
 		{
+			modifier: 'primary',
+			character: 'F6',
+		},
+		{
 			modifier: 'ctrlShift',
 			character: '`',
 		},
@@ -21,6 +25,10 @@ const defaultShortcuts = {
 		},
 	],
 	next: [
+		{
+			modifier: 'primaryShift',
+			character: 'F6',
+		},
 		{
 			modifier: 'ctrl',
 			character: '`',
@@ -39,13 +47,16 @@ export function useNavigateRegions( shortcuts = defaultShortcuts ) {
 	function focusRegion( offset ) {
 		const regions = Array.from(
 			ref.current.querySelectorAll( '[role="region"]' )
-		);
+		).filter( ( node ) => {
+			// Ignore if there's (dynamic) child regions.
+			return ! node.querySelector( '[role="region"]' );
+		} );
 		if ( ! regions.length ) {
 			return;
 		}
 		let nextRegion = regions[ 0 ];
 		const selectedIndex = regions.indexOf(
-			ref.current.ownerDocument.activeElement
+			ref.current.ownerDocument.activeElement.closest( '[role="region"]' )
 		);
 		if ( selectedIndex !== -1 ) {
 			let nextIndex = selectedIndex + offset;
@@ -77,6 +88,10 @@ export function useNavigateRegions( shortcuts = defaultShortcuts ) {
 		ref: useMergeRefs( [ ref, clickRef ] ),
 		className: isFocusingRegions ? 'is-focusing-regions' : '',
 		onKeyDown( event ) {
+			if ( event.defaultPrevented ) {
+				return;
+			}
+
 			if (
 				shortcuts.previous.some( ( { modifier, character } ) => {
 					return isKeyboardEvent[ modifier ]( event, character );

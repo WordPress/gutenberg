@@ -117,6 +117,10 @@ function KeyboardShortcuts() {
 					modifier: 'access',
 					character: 'n',
 				},
+				{
+					modifier: 'primary',
+					character: 'F6',
+				},
 			],
 		} );
 
@@ -132,6 +136,10 @@ function KeyboardShortcuts() {
 				{
 					modifier: 'access',
 					character: 'p',
+				},
+				{
+					modifier: 'primaryShift',
+					character: 'F6',
 				},
 			],
 		} );

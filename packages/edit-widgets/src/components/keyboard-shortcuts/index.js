@@ -94,6 +94,10 @@ function KeyboardShortcutsRegister() {
 					modifier: 'access',
 					character: 'n',
 				},
+				{
+					modifier: 'primary',
+					character: 'F6',
+				},
 			],
 		} );
 
@@ -109,6 +113,10 @@ function KeyboardShortcutsRegister() {
 				{
 					modifier: 'access',
 					character: 'p',
+				},
+				{
+					modifier: 'primaryShift',
+					character: 'F6',
 				},
 			],
 		} );

@@ -7,16 +7,26 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+/**
+ * WordPress dependencies
+ */
 import { useRef, useEffect } from '@wordpress/element';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
-import { useViewportMatch } from '@wordpress/compose';
+import {
+	useMergeRefs,
+	useRefEffect,
+	useViewportMatch,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import BlockContextualToolbar from './block-contextual-toolbar';
+/**
+ * Internal dependencies
+ */
+import BlockSelectionButton from './block-selection-button';
 import { store as blockEditorStore } from '../../store';
 import BlockPopover from '../block-popover';
 import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
@@ -27,16 +37,13 @@ function selector( select ) {
 		isMultiSelecting,
 		hasMultiSelection,
 		isTyping,
-		__experimentalIsBlockInterfaceHidden: isBlockInterfaceHidden,
 		getSettings,
 		getLastMultiSelectedBlockClientId,
 	} = select( blockEditorStore );
-
 	return {
 		editorMode: __unstableGetEditorMode(),
 		isMultiSelecting: isMultiSelecting(),
 		isTyping: isTyping(),
-		isBlockInterfaceHidden: isBlockInterfaceHidden(),
 		hasFixedToolbar: getSettings().hasFixedToolbar,
 		isDistractionFree: getSettings().isDistractionFree,
 		lastClientId: hasMultiSelection()
@@ -47,8 +54,8 @@ function selector( select ) {
 
 function SelectedBlockPopover( {
 	clientId,
+	rootClientId,
 	isEmptyDefaultBlock,
-	showContents, // we may need to mount an empty popover because we reuse
 	capturingClientId,
 	__unstablePopoverSlot,
 	__unstableContentRef,
@@ -57,7 +64,6 @@ function SelectedBlockPopover( {
 		editorMode,
 		isMultiSelecting,
 		isTyping,
-		isBlockInterfaceHidden,
 		hasFixedToolbar,
 		isDistractionFree,
 		lastClientId,
@@ -82,7 +88,7 @@ function SelectedBlockPopover( {
 	);
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isToolbarForced = useRef( false );
-	const { stopTyping } = useDispatch( blockEditorStore );
+	const { stopTyping, setNavigationMode } = useDispatch( blockEditorStore );
 
 	const showEmptyBlockSideInserter =
 		! isTyping && editorMode === 'edit' && isEmptyDefaultBlock;
@@ -94,8 +100,7 @@ function SelectedBlockPopover( {
 		isLargeViewport &&
 		! isMultiSelecting &&
 		! showEmptyBlockSideInserter &&
-		! isTyping &&
-		! isBlockInterfaceHidden;
+		! isTyping;
 	const canFocusHiddenToolbar =
 		editorMode === 'edit' &&
 		! shouldShowContextualToolbar &&
@@ -118,14 +123,24 @@ function SelectedBlockPopover( {
 		isToolbarForced.current = false;
 	} );
 
-	// Stores the active toolbar item index so the block toolbar can return focus
-	// to it when re-mounting.
-	const initialToolbarItemIndexRef = useRef();
-
 	const popoverProps = useBlockToolbarPopoverProps( {
 		contentElement: __unstableContentRef?.current,
 		clientId,
 	} );
+
+	// onFocus doesn't work on Popover. Should be fixed.
+	const ref = useMergeRefs( [
+		popoverProps.ref,
+		useRefEffect( ( node ) => {
+			function onFocus() {
+				setNavigationMode( true );
+			}
+			node.addEventListener( 'focus', onFocus );
+			return () => {
+				node.removeEventListener( 'focus', onFocus );
+			};
+		}, [] ),
+	] );
 
 	if ( ! shouldShowBreadcrumb && ! shouldShowContextualToolbar ) {
 		return null;
@@ -142,23 +157,14 @@ function SelectedBlockPopover( {
 			__unstableContentRef={ __unstableContentRef }
 			resize={ false }
 			{ ...popoverProps }
+			ref={ ref }
 			role="region"
 			tabIndex="-1"
 		>
-			{ shouldShowContextualToolbar && showContents && (
-				<BlockContextualToolbar
-					// If the toolbar is being shown because of being forced
-					// it should focus the toolbar right after the mount.
-					focusOnMount={ isToolbarForced.current }
-					__experimentalInitialIndex={
-						initialToolbarItemIndexRef.current
-					}
-					__experimentalOnIndexChange={ ( index ) => {
-						initialToolbarItemIndexRef.current = index;
-					} }
-					// Resets the index whenever the active block changes so
-					// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
-					key={ clientId }
+			{ shouldShowBreadcrumb && (
+				<BlockSelectionButton
+					clientId={ clientId }
+					rootClientId={ rootClientId }
 				/>
 			) }
 		</BlockPopover>

@@ -183,15 +183,26 @@ export default function useTabNav() {
 			}
 		}
 
+		function onFocus() {
+			setNavigationMode( false );
+
+			const clientId = getSelectedBlockClientId();
+
+			if ( clientId ) {
+				node.querySelector( `[data-block="${ clientId }"]` ).focus();
+			}
+		}
+
 		const { ownerDocument } = node;
 		const { defaultView } = ownerDocument;
 		defaultView.addEventListener( 'keydown', preventScrollOnTab );
 		node.addEventListener( 'keydown', onKeyDown );
 		node.addEventListener( 'focusout', onFocusOut );
+		node.addEventListener( 'focus', onFocus );
 		return () => {
 			defaultView.removeEventListener( 'keydown', preventScrollOnTab );
 			node.removeEventListener( 'keydown', onKeyDown );
-			node.removeEventListener( 'focusout', onFocusOut );
+			node.removeEventListener( 'focus', onFocus );
 		};
 	}, [] );
 

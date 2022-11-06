@@ -169,9 +169,12 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 				selectedBlockClientId;
 		}
 		const startingBlockClientId = hasBlockMovingClientId();
-		if ( isEscape && startingBlockClientId && ! event.defaultPrevented ) {
-			setBlockMovingClientId( null );
-			event.preventDefault();
+		if ( isEscape && ! event.defaultPrevented ) {
+			if ( startingBlockClientId && ! event.shiftKey ) {
+				setBlockMovingClientId( null );
+				event.preventDefault();
+			}
+			return;
 		}
 		if ( ( isEnter || isSpace ) && startingBlockClientId ) {
 			const sourceRoot = getBlockRootClientId( startingBlockClientId );
@@ -275,6 +278,9 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 								: undefined
 						}
 						onKeyDown={ onKeyDown }
+						onBlur={ () => {
+							setNavigationMode( false );
+						} }
 						label={ label }
 						showTooltip={ false }
 						className="block-selection-button_select-button"
