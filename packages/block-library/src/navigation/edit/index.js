@@ -6,9 +6,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-/**
- * WordPress dependencies
- */
 import { useState, useEffect, useRef, Platform } from '@wordpress/element';
 import { addQueryArgs } from '@wordpress/url';
 import {
