@@ -11,7 +11,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, useResizeObserver } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -33,6 +33,7 @@ const HANDLE_STYLES_OVERRIDE = {
 };
 
 function ResizableEditor( { enableResizing, settings, children, ...props } ) {
+	const [ resizeObserver, sizes ] = useResizeObserver();
 	const { deviceType, isZoomOutMode } = useSelect(
 		( select ) => ( {
 			deviceType:
@@ -54,12 +55,11 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 			setWidth( iframeRef.current.offsetWidth + deltaPixels );
 		}
 	}, [] );
-
 	return (
 		<ResizableBox
 			size={ {
 				width: enableResizing ? width : '100%',
-				height: enableResizing ? 'auto' : '100%',
+				height: enableResizing && sizes.height ? sizes.height : '100%',
 			} }
 			onResizeStop={ ( event, direction, element ) => {
 				setWidth( element.style.width );
@@ -105,14 +105,11 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 						<style>{
 							// Forming a "block formatting context" to prevent margin collapsing.
 							// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
-							`.is-root-container { display: flow-root; }`
+							`.is-root-container { display: flow-root; }
+							body { position: relative; }`
 						}</style>
 						{ enableResizing && (
 							<style>
-								{
-									// Force the <html> and <body>'s heights to fit the content.
-									`html, body { height: -moz-fit-content !important; height: fit-content !important; min-height: 0 !important; }`
-								}
 								{
 									// Some themes will have `min-height: 100vh` for the root container,
 									// which isn't a requirement in auto resize mode.
@@ -130,6 +127,7 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 			>
 				{ /* Filters need to be rendered before children to avoid Safari rendering issues. */ }
 				{ settings.svgFilters }
+				{ resizeObserver }
 				{ children }
 			</Iframe>
 		</ResizableBox>
