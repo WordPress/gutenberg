@@ -1266,8 +1266,8 @@
 		"parent": "components"
 	},
 	{
-		"title": "OptionIcon",
-		"slug": "option-icon",
+		"title": "ToggleMultipleGroupControlOptionIcon",
+		"slug": "toggle-multiple-group-control-option-icon",
 		"markdown_source": "../packages/components/src/toggle-multiple-group-control/option-icon/README.md",
 		"parent": "components"
 	},
