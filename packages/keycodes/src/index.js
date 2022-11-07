@@ -13,7 +13,7 @@
  * External dependencies
  */
 import { capitalCase } from 'change-case';
-import { get, mapValues, includes } from 'lodash';
+import { get, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -365,7 +365,7 @@ export const isKeyboardEvent = mapValues( modifiers, ( getModifiers ) => {
 		let key = event.key.toLowerCase();
 
 		if ( ! character ) {
-			return includes( mods, key );
+			return mods.includes( /** @type {WPModifierPart} */ ( key ) );
 		}
 
 		if ( event.altKey && character.length === 1 ) {

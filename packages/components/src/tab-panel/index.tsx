@@ -97,11 +97,10 @@ export function TabPanel( {
 	const selectedId = `${ instanceId }-${ selectedTab?.name ?? 'none' }`;
 
 	useEffect( () => {
-		const newSelectedTab = find( tabs, { name: selected } );
-		if ( ! newSelectedTab && tabs.length > 0 ) {
+		if ( ! selectedTab?.name && tabs.length > 0 ) {
 			handleTabSelection( initialTabName || tabs[ 0 ].name );
 		}
-	}, [ tabs ] );
+	}, [ tabs, selectedTab?.name, initialTabName ] );
 
 	return (
 		<div className={ className }>

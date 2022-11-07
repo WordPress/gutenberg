@@ -8,6 +8,7 @@ import classnames from 'classnames';
  */
 import { useCallback, useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
+import { store as coreStore } from '@wordpress/core-data';
 import {
 	ToolSelector,
 	__experimentalPreviewOptions as PreviewOptions,
@@ -41,11 +42,7 @@ const preventDefault = ( event ) => {
 	event.preventDefault();
 };
 
-export default function Header( {
-	openEntitiesSavedStates,
-	isEntitiesSavedStatesOpen,
-	showIconLabels,
-} ) {
+export default function Header( { showIconLabels } ) {
 	const inserterButton = useRef();
 	const {
 		deviceType,
@@ -54,8 +51,8 @@ export default function Header( {
 		isListViewOpen,
 		listViewShortcut,
 		isVisualMode,
-		settings,
 		blockEditorMode,
+		homeUrl,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -63,12 +60,15 @@ export default function Header( {
 			isInserterOpened,
 			isListViewOpened,
 			getEditorMode,
-			getSettings,
 		} = select( editSiteStore );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 
 		const postType = getEditedPostType();
+
+		const {
+			getUnstableBase, // Site index.
+		} = select( coreStore );
 
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
@@ -79,8 +79,8 @@ export default function Header( {
 				'core/edit-site/toggle-list-view'
 			),
 			isVisualMode: getEditorMode() === 'visual',
-			settings: getSettings(),
 			blockEditorMode: __unstableGetEditorMode(),
+			homeUrl: getUnstableBase()?.home,
 		};
 	}, [] );
 
@@ -222,7 +222,7 @@ export default function Header( {
 							>
 								<MenuGroup>
 									<MenuItem
-										href={ settings?.siteUrl }
+										href={ homeUrl }
 										target="_blank"
 										icon={ external }
 									>
@@ -238,10 +238,7 @@ export default function Header( {
 							</PreviewOptions>
 						</div>
 					) }
-					<SaveButton
-						openEntitiesSavedStates={ openEntitiesSavedStates }
-						isEntitiesSavedStatesOpen={ isEntitiesSavedStatesOpen }
-					/>
+					<SaveButton />
 					<PinnedItems.Slot scope="core/edit-site" />
 					<MoreMenu showIconLabels={ showIconLabels } />
 				</div>

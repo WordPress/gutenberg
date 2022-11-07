@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 10.4.0 (2022-11-02)
+
+### Bug Fix
+
+-   `InserterListItem`: Fix dragging and dropping in Firefox. ([#44631](https://github.com/WordPress/gutenberg/pull/44631))
+
+## 10.3.0 (2022-10-19)
+
 ### Bug Fix
 
 -   `FontSizePicker`: Update fluid utils so that only string, floats and integers are treated as valid font sizes for the purposes of fluid typography ([#44847](https://github.com/WordPress/gutenberg/pull/44847))

@@ -172,8 +172,15 @@ export default function UnsavedInnerBlocks( {
 
 	return (
 		<>
-			<Wrapper { ...innerBlocksProps } />
-			{ isSaving && <Spinner /> }
+			{ isSaving ? (
+				<Spinner
+					className={
+						'wp-block-navigation__uncontrolled-inner-blocks-loading-indicator'
+					}
+				/>
+			) : (
+				<Wrapper { ...innerBlocksProps } />
+			) }
 		</>
 	);
 }
