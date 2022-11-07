@@ -156,6 +156,10 @@ export {
 	ToggleGroupControlOption as __experimentalToggleGroupControlOption,
 	ToggleGroupControlOptionIcon as __experimentalToggleGroupControlOptionIcon,
 } from './toggle-group-control';
+export {
+	ToggleMultipleGroupControl as __experimentalToggleMultipleGroupControl,
+	ToggleMultipleGroupControlOptionIcon as __experimentalToggleMultipleGroupControlOptionIcon,
+} from './toggle-multiple-group-control';
 export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
 export { default as ToolbarDropdownMenu } from './toolbar-dropdown-menu';

@@ -11,9 +11,9 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { ToggleGroupControlOptionIcon } from '../toggle-group-control';
-import type { ToggleMultipleGroupControlOptionIconProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import { ToggleGroupControlOptionIcon } from '../../toggle-group-control';
+import type { ToggleMultipleGroupControlOptionIconProps } from '../types';
+import type { WordPressComponentProps } from '../../ui/context';
 
 function UnforwardedToggleMultipleGroupControlOptionIcon(
 	{

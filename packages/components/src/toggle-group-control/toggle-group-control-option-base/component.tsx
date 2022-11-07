@@ -89,6 +89,7 @@ function ToggleGroupControlOptionBase(
 		className
 	);
 
+	// In the multiple selection case, consumers will handle their own pressed states.
 	const singleSelectButtonProps = {
 		'aria-pressed': isPressed,
 		onClick: () =>

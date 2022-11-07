@@ -1266,6 +1266,18 @@
 		"parent": "components"
 	},
 	{
+		"title": "OptionIcon",
+		"slug": "option-icon",
+		"markdown_source": "../packages/components/src/toggle-multiple-group-control/option-icon/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ToggleMultipleGroupControl",
+		"slug": "toggle-multiple-group-control",
+		"markdown_source": "../packages/components/src/toggle-multiple-group-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "ToolbarButton",
 		"slug": "toolbar-button",
 		"markdown_source": "../packages/components/src/toolbar-button/README.md",
