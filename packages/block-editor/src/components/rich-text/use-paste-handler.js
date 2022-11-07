@@ -255,7 +255,7 @@ export function usePasteHandler( props ) {
 
 /**
  * Normalizes a given string of HTML to remove the Windows-specific "Fragment"
- * comments and any preceeding and trailing content.
+ * comments and any preceding and trailing content.
  *
  * @param {string} html the html to be normalized
  * @return {string} the normalized html

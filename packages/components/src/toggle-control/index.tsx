@@ -64,8 +64,19 @@ export function ToggleControl( {
 
 	let describedBy, helpLabel;
 	if ( help ) {
-		describedBy = id + '__help';
-		helpLabel = typeof help === 'function' ? help( checked ) : help;
+		if ( typeof help === 'function' ) {
+			// `help` as a function works only for controlled components where
+			// `checked` is passed down from parent component. Uncontrolled
+			// component can show only a static help label.
+			if ( checked !== undefined ) {
+				helpLabel = help( checked );
+			}
+		} else {
+			helpLabel = help;
+		}
+		if ( helpLabel ) {
+			describedBy = id + '__help';
+		}
 	}
 
 	return (

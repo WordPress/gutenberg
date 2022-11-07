@@ -180,7 +180,7 @@ jobs:
                   NO_CHECKS: 'true'
 
             - name: Upload artifact
-              uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
+              uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
               with:
                   name: gutenberg-plugin
                   path: ./gutenberg.zip
@@ -203,7 +203,7 @@ jobs:
 
             - name: Upload release notes artifact
               if: ${{ needs.bump-version.outputs.new_version }}
-              uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
+              uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
               with:
                   name: release-notes
                   path: ./release-notes.txt
@@ -266,12 +266,12 @@ jobs:
               run: echo ::set-output name=version::$(echo $VERSION | cut -d / -f 3 | sed 's/-rc./ RC/' )
 
             - name: Download Plugin Zip Artifact
-              uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v3.0.0
+              uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # v3.0.1
               with:
                   name: gutenberg-plugin
 
             - name: Download Release Notes Artifact
-              uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v3.0.0
+              uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # v3.0.1
               with:
                   name: release-notes
 

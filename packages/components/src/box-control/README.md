@@ -95,3 +95,17 @@ The `top`, `right`, `bottom`, and `left` box dimension values.
 
 -   Type: `Object`
 -   Required: No
+
+### onMouseOver
+
+A handler for onMouseOver events.
+
+-   Type: `Function`
+-   Required: No
+
+### onMouseOut
+
+A handler for onMouseOut events.
+
+-   Type: `Function`
+-   Required: No

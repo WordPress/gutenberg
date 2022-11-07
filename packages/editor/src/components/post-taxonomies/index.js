@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, includes } from 'lodash';
+import { filter } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -26,7 +26,7 @@ export function PostTaxonomies( {
 	taxonomyWrapper = identity,
 } ) {
 	const availableTaxonomies = filter( taxonomies, ( taxonomy ) =>
-		includes( taxonomy.types, postType )
+		taxonomy.types.includes( postType )
 	);
 	const visibleTaxonomies = filter(
 		availableTaxonomies,

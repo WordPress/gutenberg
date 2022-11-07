@@ -271,13 +271,18 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	/**
 	 * Subscribe handler to a store.
 	 *
-	 * @param {string[]} storeName The store name.
-	 * @param {Function} handler   The function subscribed to the store.
+	 * @param {string|StoreDescriptor} storeNameOrDescriptor The store name.
+	 * @param {Function}               handler               The function subscribed to the store.
 	 * @return {Function} A function to unsubscribe the handler.
 	 */
-	function __unstableSubscribeStore( storeName, handler ) {
-		if ( storeName in stores ) {
-			return stores[ storeName ].subscribe( handler );
+	function __unstableSubscribeStore( storeNameOrDescriptor, handler ) {
+		const storeName = isObject( storeNameOrDescriptor )
+			? storeNameOrDescriptor.name
+			: storeNameOrDescriptor;
+
+		const store = stores[ storeName ];
+		if ( store ) {
+			return store.subscribe( handler );
 		}
 
 		// Trying to access a store that hasn't been registered,
@@ -288,7 +293,10 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 			return subscribe( handler );
 		}
 
-		return parent.__unstableSubscribeStore( storeName, handler );
+		return parent.__unstableSubscribeStore(
+			storeNameOrDescriptor,
+			handler
+		);
 	}
 
 	function batch( callback ) {

@@ -1,8 +1,3 @@
-/**
- * External dependencies
- */
-import type { ReactNode } from 'react';
-
 export type FontSizePickerProps = {
 	/**
 	 * If `true`, it will not be possible to choose a custom fontSize. The user
@@ -58,7 +53,7 @@ export type FontSizePickerProps = {
 	/**
 	 * Size of the control.
 	 *
-	 * @default default
+	 * @default 'default'
 	 */
 	size?: 'default' | '__unstable-large';
 };
@@ -81,18 +76,29 @@ export type FontSize = {
 	slug: string;
 };
 
-export type FontSizeOption = Omit< FontSize, 'size' > &
-	Partial< Pick< FontSize, 'size' > >;
-
-export type FontSizeSelectOption = Pick< FontSizeOption, 'size' > & {
-	key: string;
-	name?: string;
-	__experimentalHint: ReactNode;
+export type FontSizePickerSelectProps = Pick<
+	FontSizePickerProps,
+	'value' | 'size'
+> & {
+	fontSizes: NonNullable< FontSizePickerProps[ 'fontSizes' ] >;
+	disableCustomFontSizes: NonNullable<
+		FontSizePickerProps[ 'disableCustomFontSizes' ]
+	>;
+	onChange: NonNullable< FontSizePickerProps[ 'onChange' ] >;
+	onSelectCustom: () => void;
 };
 
-export type FontSizeToggleGroupOption = {
+export type FontSizePickerSelectOption = {
 	key: string;
-	value: number | string;
-	label: string;
 	name: string;
+	value?: FontSize[ 'size' ];
+	__experimentalHint?: string;
+};
+
+export type FontSizePickerToggleGroupProps = Pick<
+	FontSizePickerProps,
+	'value' | 'size' | '__nextHasNoMarginBottom'
+> & {
+	fontSizes: NonNullable< FontSizePickerProps[ 'fontSizes' ] >;
+	onChange: NonNullable< FontSizePickerProps[ 'onChange' ] >;
 };

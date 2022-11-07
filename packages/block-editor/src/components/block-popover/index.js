@@ -32,6 +32,7 @@ function BlockPopover(
 		__unstableCoverTarget = false,
 		__unstablePopoverSlot,
 		__unstableContentRef,
+		shift = true,
 		...props
 	},
 	ref
@@ -166,12 +167,13 @@ function BlockPopover(
 			placement="top-start"
 			resize={ false }
 			flip={ false }
-			shift
+			shift={ shift }
 			{ ...props }
 			className={ classnames(
 				'block-editor-block-popover',
 				props.className
 			) }
+			variant="unstyled"
 		>
 			{ __unstableCoverTarget && <div style={ style }>{ children }</div> }
 			{ ! __unstableCoverTarget && children }

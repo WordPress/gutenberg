@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -14,7 +14,7 @@ describe( 'Text', () => {
 	describe( 'snapshot tests', () => {
 		test( 'should render correctly', () => {
 			const { container } = render( <Text>Lorem ipsum.</Text> );
-			expect( container.firstChild ).toMatchSnapshot();
+			expect( container ).toMatchSnapshot();
 		} );
 	} );
 
@@ -92,11 +92,11 @@ describe( 'Text', () => {
 	} );
 
 	test( 'should render highlighted words', async () => {
-		const wrapper = render(
+		const { container } = render(
 			<Text highlightWords={ [ 'm' ] }>Lorem ipsum.</Text>
 		);
-		expect( wrapper.container.firstChild?.childNodes ).toHaveLength( 5 );
-		const words = await wrapper.findAllByText( 'm' );
+		expect( container.firstChild?.childNodes ).toHaveLength( 5 );
+		const words = await screen.findAllByText( 'm' );
 		expect( words ).toHaveLength( 2 );
 		words.forEach( ( word ) => expect( word.tagName ).toEqual( 'MARK' ) );
 	} );
@@ -116,7 +116,7 @@ describe( 'Text', () => {
 			</Text>
 		);
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 		// It'll have a length of 1 because there shouldn't be anything but the single span being rendered.
 		expect( container.firstChild?.childNodes ).toHaveLength( 1 );
 	} );

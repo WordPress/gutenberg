@@ -125,19 +125,6 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_switching_themes_recalculates_data() {
-		// The "default" theme doesn't have theme.json support.
-		switch_theme( 'default' );
-		$default = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
-
-		// Switch to a theme that does have support.
-		switch_theme( 'block-theme' );
-		$has_theme_json_support = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
-
-		$this->assertFalse( $default );
-		$this->assertTrue( $has_theme_json_support );
-	}
-
 	public function test_add_theme_supports_are_loaded_for_themes_without_theme_json() {
 		switch_theme( 'default' );
 		$color_palette = array(
@@ -165,7 +152,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		remove_theme_support( 'custom-line-height' );
 		remove_theme_support( 'editor-color-palette' );
 
-		$this->assertFalse( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() );
+		$this->assertFalse( wp_theme_has_theme_json() );
 		$this->assertTrue( $settings['typography']['lineHeight'] );
 		$this->assertSame( $color_palette, $settings['color']['palette']['theme'] );
 	}

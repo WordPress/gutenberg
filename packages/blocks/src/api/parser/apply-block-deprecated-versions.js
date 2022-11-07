@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { castArray } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { DEPRECATED_ENTRY_KEYS } from '../constants';
@@ -102,10 +97,15 @@ export function applyBlockDeprecatedVersions( block, rawBlock, blockType ) {
 		// inner blocks.
 		const { migrate } = deprecatedBlockType;
 		if ( migrate ) {
+			let migrated = migrate( migratedAttributes, block.innerBlocks );
+			if ( ! Array.isArray( migrated ) ) {
+				migrated = [ migrated ];
+			}
+
 			[
 				migratedAttributes = parsedAttributes,
 				migratedInnerBlocks = block.innerBlocks,
-			] = castArray( migrate( migratedAttributes, block.innerBlocks ) );
+			] = migrated;
 		}
 
 		block = {
