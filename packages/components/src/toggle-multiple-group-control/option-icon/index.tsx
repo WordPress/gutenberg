@@ -35,6 +35,10 @@ function UnforwardedToggleMultipleGroupControlOptionIcon(
 	);
 }
 
+/**
+ * `ToggleMultipleGroupControlOptionIcon` is a form component which is meant to be used
+ * as a child of `ToggleMultipleGroupControl` and displays an icon.
+ */
 export const ToggleMultipleGroupControlOptionIcon = forwardRef(
 	UnforwardedToggleMultipleGroupControlOptionIcon
 );
