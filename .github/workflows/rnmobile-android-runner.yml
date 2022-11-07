@@ -29,6 +29,8 @@ jobs:
 
             - name: Cache Gradle build
               uses: gradle/gradle-build-action@3fbe033aaae657f011f88f29be9e65ed26bd29ef # v2.3.3
+              with:
+                  cache-read-only: false
 
             - name: Cache the Android virtual device
               uses: actions/cache@v3
