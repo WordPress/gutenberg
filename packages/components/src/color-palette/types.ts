@@ -3,7 +3,10 @@
  */
 import type { CSSProperties, MouseEventHandler, ReactNode } from 'react';
 
-type OnColorChange = ( newColor?: string ) => void;
+/**
+ * Internal dependencies
+ */
+import type { PopoverProps } from '../popover/types';
 
 export type ColorObject = {
 	name: string;
@@ -18,7 +21,10 @@ export type PaletteObject = {
 type PaletteProps = {
 	className?: string;
 	clearColor: () => void;
-	onChange: OnColorChange;
+	/**
+	 * Callback called when a color is selected.
+	 */
+	onChange: ( newColor?: string ) => void;
 	value?: string;
 	actions?: ReactNode;
 };
@@ -35,14 +41,14 @@ export type MultiplePalettesProps = PaletteProps & {
 export type CustomColorPickerDropdownProps = {
 	isRenderedInSidebar: boolean;
 	renderContent: () => ReactNode;
-	popoverProps?: string[];
+	popoverProps?: Omit< PopoverProps, 'children' >;
 	renderToggle: ( props: {
 		isOpen: boolean;
 		onToggle: MouseEventHandler< HTMLButtonElement >;
 	} ) => ReactNode;
 };
 
-export type ColorPaletteProps = {
+export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
 	/**
 	 * Whether the palette should have a clearing button.
 	 *
@@ -65,14 +71,12 @@ export type ColorPaletteProps = {
 	 */
 	disableCustomColors?: boolean;
 	/**
-	 * Whether the color picker should display the alpha channel
-	 * both in the bottom inputs as well as in the color picker itself.
+	 * This controls whether the alpha channel will be offered when selecting
+	 * custom colors.
+	 *
+	 * @default false
 	 */
 	enableAlpha?: boolean;
-	/**
-	 * Callback called when a color is selected.
-	 */
-	onChange: OnColorChange;
 	/**
 	 * Currently active value.
 	 */

@@ -114,6 +114,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 					className="block-editor-block-lock-modal__options"
 				>
 					<CheckboxControl
+						__nextHasNoMarginBottom
 						className="block-editor-block-lock-modal__options-title"
 						label={
 							<span id={ instanceId }>{ __( 'Lock all' ) }</span>
@@ -134,6 +135,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 						{ allowsEditLocking && (
 							<li className="block-editor-block-lock-modal__checklist-item">
 								<CheckboxControl
+									__nextHasNoMarginBottom
 									label={
 										<>
 											{ __( 'Restrict editing' ) }
@@ -158,6 +160,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 						) }
 						<li className="block-editor-block-lock-modal__checklist-item">
 							<CheckboxControl
+								__nextHasNoMarginBottom
 								label={
 									<>
 										{ __( 'Disable movement' ) }
@@ -181,6 +184,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 						</li>
 						<li className="block-editor-block-lock-modal__checklist-item">
 							<CheckboxControl
+								__nextHasNoMarginBottom
 								label={
 									<>
 										{ __( 'Prevent removal' ) }

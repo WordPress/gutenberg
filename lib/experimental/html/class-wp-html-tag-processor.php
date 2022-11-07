@@ -445,7 +445,7 @@ class WP_HTML_Tag_Processor {
 
 		$at = $this->parsed_bytes;
 
-		while ( true ) {
+		while ( false !== $at && $at < $doc_length ) {
 			$at = strpos( $this->html, '</', $at );
 
 			// If we have no possible tag closer then fail.
@@ -494,6 +494,8 @@ class WP_HTML_Tag_Processor {
 				return;
 			}
 		}
+
+		return false;
 	}
 
 	/**
@@ -507,7 +509,7 @@ class WP_HTML_Tag_Processor {
 		$doc_length = strlen( $html );
 		$at         = $this->parsed_bytes;
 
-		while ( $at < $doc_length ) {
+		while ( false !== $at && $at < $doc_length ) {
 			$at += strcspn( $html, '-<', $at );
 
 			/*
@@ -613,6 +615,8 @@ class WP_HTML_Tag_Processor {
 
 			++$at;
 		}
+
+		return false;
 	}
 
 	/**
@@ -623,10 +627,11 @@ class WP_HTML_Tag_Processor {
 	private function parse_next_tag() {
 		$this->after_tag();
 
-		$html = $this->html;
-		$at   = $this->parsed_bytes;
+		$html       = $this->html;
+		$doc_length = strlen( $html );
+		$at         = $this->parsed_bytes;
 
-		while ( true ) {
+		while ( false !== $at && $at < $doc_length ) {
 			$at = strpos( $html, '<', $at );
 			if ( false === $at ) {
 				return false;
@@ -663,7 +668,12 @@ class WP_HTML_Tag_Processor {
 					'-' === $html[ $at + 2 ] &&
 					'-' === $html[ $at + 3 ]
 				) {
-					$at = strpos( $html, '-->', $at + 4 ) + 3;
+					$closer_at = strpos( $html, '-->', $at + 4 );
+					if ( false === $closer_at ) {
+						return false;
+					}
+
+					$at = $closer_at + 3;
 					continue;
 				}
 
@@ -680,7 +690,12 @@ class WP_HTML_Tag_Processor {
 					'A' === $html[ $at + 7 ] &&
 					'[' === $html[ $at + 8 ]
 				) {
-					$at = strpos( $html, ']]>', $at + 9 ) + 3;
+					$closer_at = strpos( $html, ']]>', $at + 9 );
+					if ( false === $closer_at ) {
+						return false;
+					}
+
+					$at = $closer_at + 3;
 					continue;
 				}
 
@@ -699,7 +714,12 @@ class WP_HTML_Tag_Processor {
 					'P' === strtoupper( $html[ $at + 7 ] ) &&
 					'E' === strtoupper( $html[ $at + 8 ] )
 				) {
-					$at = strpos( $html, '>', $at + 9 ) + 1;
+					$closer_at = strpos( $html, '>', $at + 9 );
+					if ( false === $closer_at ) {
+						return false;
+					}
+
+					$at = $closer_at + 1;
 					continue;
 				}
 
@@ -716,12 +736,19 @@ class WP_HTML_Tag_Processor {
 			 * https://html.spec.whatwg.org/multipage/parsing.html#tag-open-state
 			 */
 			if ( '?' === $html[ $at + 1 ] ) {
-				$at = strpos( $html, '>', $at + 2 ) + 1;
+				$closer_at = strpos( $html, '>', $at + 2 );
+				if ( false === $closer_at ) {
+					return false;
+				}
+
+				$at = $closer_at + 1;
 				continue;
 			}
 
 			++$at;
 		}
+
+		return false;
 	}
 
 	/**

@@ -385,8 +385,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 		}
 
 		// Attach a `wp-container-` id-based class name as well as a layout class name such as `is-layout-flex`.
-		const className = classnames(
-			props?.className,
+		const layoutClassNames = classnames(
 			{
 				[ `wp-container-${ id }` ]: shouldRenderLayoutStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
 			},
@@ -410,7 +409,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 					) }
 				<BlockListBlock
 					{ ...props }
-					__unstableLayoutClassNames={ className }
+					__unstableLayoutClassNames={ layoutClassNames }
 				/>
 			</>
 		);

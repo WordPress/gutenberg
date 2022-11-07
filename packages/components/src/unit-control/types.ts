@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { FocusEventHandler, SyntheticEvent } from 'react';
+import type { FocusEventHandler } from 'react';
 
 /**
  * Internal dependencies
@@ -38,10 +38,9 @@ export type WPUnitControlUnit = {
 	step?: number;
 };
 
-export type UnitControlOnChangeCallback = InputChangeCallback<
-	SyntheticEvent< HTMLSelectElement | HTMLInputElement >,
-	{ data?: WPUnitControlUnit }
->;
+export type UnitControlOnChangeCallback = InputChangeCallback< {
+	data?: WPUnitControlUnit;
+} >;
 
 export type UnitSelectControlProps = Pick< InputControlProps, 'size' > & {
 	/**
@@ -67,7 +66,7 @@ export type UnitSelectControlProps = Pick< InputControlProps, 'size' > & {
 };
 
 export type UnitControlProps = Omit< UnitSelectControlProps, 'unit' > &
-	Omit< NumberControlProps, 'hideHTMLArrows' | 'suffix' | 'type' > & {
+	Omit< NumberControlProps, 'spinControls' | 'suffix' | 'type' > & {
 		/**
 		 * If `true`, the unit `<select>` is hidden.
 		 *

@@ -66,7 +66,7 @@ jobs:
                   script: echo "Generated AVD snapshot for caching."
 
             - name: Run tests
-              uses: reactivecircus/android-emulator-runner@d7b53ddc6e44254e1f4cf4a6ad67345837027a66 # v2.26.0
+            - uses: reactivecircus/android-emulator-runner@50986b1464923454c95e261820bc626f38490ec0 # v2.27.0
               with:
                   api-level: ${{ matrix.api-level }}
                   profile: ${{ matrix.profile }}

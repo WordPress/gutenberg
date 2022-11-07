@@ -389,14 +389,6 @@ $block-navigation-max-indent: 8;
 	}
 }
 
-// Reset some popover defaults for the drop indicator.
-.block-editor-list-view-drop-indicator > .components-popover__content {
-	margin-left: 0;
-	border: none;
-	box-shadow: none;
-	outline: none;
-}
-
 .block-editor-list-view-placeholder {
 	padding: 0;
 	margin: 0;

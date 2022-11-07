@@ -307,7 +307,7 @@ describe( 'when an image is attached', () => {
 		const screen = await initializeEditor( {
 			initialHtml: COVER_BLOCK_IMAGE_HTML,
 		} );
-		const { getByA11yLabel } = screen;
+		const { getByLabelText } = screen;
 
 		// Get block
 		const coverBlock = await getBlock( screen, 'Cover' );
@@ -317,7 +317,7 @@ describe( 'when an image is attached', () => {
 		await openBlockSettings( screen );
 
 		// Update Opacity attribute
-		const opacityControl = getByA11yLabel( /Opacity/ );
+		const opacityControl = getByLabelText( /Opacity/ );
 		fireEvent.press( within( opacityControl ).getByText( '50' ) );
 		const heightTextInput =
 			within( opacityControl ).getByDisplayValue( '50' );
@@ -334,12 +334,12 @@ describe( 'when an image is attached', () => {
 
 describe( 'color settings', () => {
 	it( 'sets a color for the overlay background when the placeholder is visible', async () => {
-		const { getByTestId, getByA11yLabel } = await initializeEditor( {
+		const { getByTestId, getByLabelText } = await initializeEditor( {
 			initialHtml: COVER_BLOCK_PLACEHOLDER_HTML,
 		} );
 
 		const block = await waitFor( () =>
-			getByA11yLabel( 'Cover block. Empty' )
+			getByLabelText( 'Cover block. Empty' )
 		);
 		expect( block ).toBeDefined();
 
@@ -354,13 +354,13 @@ describe( 'color settings', () => {
 
 		// Wait for the block to be created.
 		const coverBlockWithOverlay = await waitFor( () =>
-			getByA11yLabel( /Cover Block\. Row 1/ )
+			getByLabelText( /Cover Block\. Row 1/ )
 		);
 		fireEvent.press( coverBlockWithOverlay );
 
 		// Open Block Settings.
 		const settingsButton = await waitFor( () =>
-			getByA11yLabel( 'Open Settings' )
+			getByLabelText( 'Open Settings' )
 		);
 		fireEvent.press( settingsButton );
 
@@ -370,7 +370,7 @@ describe( 'color settings', () => {
 
 		// Open the overlay color settings.
 		const colorOverlay = await waitFor( () =>
-			getByA11yLabel( 'Color. Empty' )
+			getByLabelText( 'Color. Empty' )
 		);
 		expect( colorOverlay ).toBeDefined();
 		fireEvent.press( colorOverlay );
@@ -389,20 +389,20 @@ describe( 'color settings', () => {
 	} );
 
 	it( 'sets a gradient overlay background when a solid background was already selected', async () => {
-		const { getByTestId, getByA11yLabel } = await initializeEditor( {
+		const { getByTestId, getByLabelText } = await initializeEditor( {
 			initialHtml: COVER_BLOCK_SOLID_COLOR_HTML,
 		} );
 
 		// Wait for the block to be created.
 		const coverBlock = await waitFor( () =>
-			getByA11yLabel( /Cover Block\. Row 1/ )
+			getByLabelText( /Cover Block\. Row 1/ )
 		);
 		expect( coverBlock ).toBeDefined();
 		fireEvent.press( coverBlock );
 
 		// Open Block Settings.
 		const settingsButton = await waitFor( () =>
-			getByA11yLabel( 'Open Settings' )
+			getByLabelText( 'Open Settings' )
 		);
 		fireEvent.press( settingsButton );
 
@@ -412,7 +412,7 @@ describe( 'color settings', () => {
 
 		// Open the overlay color settings.
 		const colorOverlay = await waitFor( () =>
-			getByA11yLabel( 'Color. Empty' )
+			getByLabelText( 'Color. Empty' )
 		);
 		expect( colorOverlay ).toBeDefined();
 		fireEvent.press( colorOverlay );
@@ -423,7 +423,7 @@ describe( 'color settings', () => {
 
 		// Open the gradients.
 		const gradientsButton = await waitFor( () =>
-			getByA11yLabel( 'Gradient' )
+			getByLabelText( 'Gradient' )
 		);
 		expect( gradientsButton ).toBeDefined();
 
@@ -446,12 +446,12 @@ describe( 'color settings', () => {
 	} );
 
 	it( 'toggles between solid colors and gradients', async () => {
-		const { getByTestId, getByA11yLabel } = await initializeEditor( {
+		const { getByTestId, getByLabelText } = await initializeEditor( {
 			initialHtml: COVER_BLOCK_PLACEHOLDER_HTML,
 		} );
 
 		const block = await waitFor( () =>
-			getByA11yLabel( 'Cover block. Empty' )
+			getByLabelText( 'Cover block. Empty' )
 		);
 		expect( block ).toBeDefined();
 
@@ -466,13 +466,13 @@ describe( 'color settings', () => {
 
 		// Wait for the block to be created.
 		const coverBlockWithOverlay = await waitFor( () =>
-			getByA11yLabel( /Cover Block\. Row 1/ )
+			getByLabelText( /Cover Block\. Row 1/ )
 		);
 		fireEvent.press( coverBlockWithOverlay );
 
 		// Open Block Settings.
 		const settingsButton = await waitFor( () =>
-			getByA11yLabel( 'Open Settings' )
+			getByLabelText( 'Open Settings' )
 		);
 		fireEvent.press( settingsButton );
 
@@ -482,7 +482,7 @@ describe( 'color settings', () => {
 
 		// Open the overlay color settings.
 		const colorOverlay = await waitFor( () =>
-			getByA11yLabel( 'Color. Empty' )
+			getByLabelText( 'Color. Empty' )
 		);
 		expect( colorOverlay ).toBeDefined();
 		fireEvent.press( colorOverlay );
@@ -499,7 +499,7 @@ describe( 'color settings', () => {
 
 		// Open the gradients.
 		const gradientsButton = await waitFor( () =>
-			getByA11yLabel( 'Gradient' )
+			getByLabelText( 'Gradient' )
 		);
 		expect( gradientsButton ).toBeDefined();
 
@@ -516,11 +516,11 @@ describe( 'color settings', () => {
 		fireEvent.press( newGradientButton );
 
 		// Go back to the settings list.
-		fireEvent.press( await waitFor( () => getByA11yLabel( 'Go back' ) ) );
+		fireEvent.press( await waitFor( () => getByLabelText( 'Go back' ) ) );
 
 		// Find the color setting.
 		const colorSetting = await waitFor( () =>
-			getByA11yLabel( 'Color. Empty' )
+			getByLabelText( 'Color. Empty' )
 		);
 		expect( colorSetting ).toBeDefined();
 		fireEvent.press( colorSetting );
@@ -532,21 +532,21 @@ describe( 'color settings', () => {
 	} );
 
 	it( 'clears the selected overlay color and mantains the inner blocks', async () => {
-		const { getByTestId, getByA11yLabel, getByText } =
+		const { getByTestId, getByLabelText, getByText } =
 			await initializeEditor( {
 				initialHtml: COVER_BLOCK_SOLID_COLOR_HTML,
 			} );
 
 		// Wait for the block to be created.
 		const coverBlock = await waitFor( () =>
-			getByA11yLabel( /Cover Block\. Row 1/ )
+			getByLabelText( /Cover Block\. Row 1/ )
 		);
 		expect( coverBlock ).toBeDefined();
 		fireEvent.press( coverBlock );
 
 		// Open Block Settings.
 		const settingsButton = await waitFor( () =>
-			getByA11yLabel( 'Open Settings' )
+			getByLabelText( 'Open Settings' )
 		);
 		fireEvent.press( settingsButton );
 
@@ -556,7 +556,7 @@ describe( 'color settings', () => {
 
 		// Open the overlay color settings.
 		const colorOverlay = await waitFor( () =>
-			getByA11yLabel( 'Color. Empty' )
+			getByLabelText( 'Color. Empty' )
 		);
 		expect( colorOverlay ).toBeDefined();
 		fireEvent.press( colorOverlay );
@@ -635,7 +635,7 @@ describe( 'minimum height settings', () => {
 				const screen = await initializeEditor( {
 					initialHtml: COVER_BLOCK_CUSTOM_HEIGHT_HTML,
 				} );
-				const { getByA11yLabel, getByText } = screen;
+				const { getByLabelText, getByText } = screen;
 
 				// Get block
 				const coverBlock = await getBlock( screen, 'Cover' );
@@ -649,7 +649,7 @@ describe( 'minimum height settings', () => {
 				fireEvent.press( getByText( unitName ) );
 
 				// Update height attribute
-				const heightControl = getByA11yLabel( /Minimum height/ );
+				const heightControl = getByLabelText( /Minimum height/ );
 				fireEvent.press( within( heightControl ).getByText( value ) );
 				const heightTextInput =
 					within( heightControl ).getByDisplayValue( value );

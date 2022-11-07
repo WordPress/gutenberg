@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -38,12 +38,11 @@ describe( 'NavigationToggle', () => {
 				} ) );
 			} );
 
-			const { container } = render( <NavigationToggle /> );
-			const siteIcon = container.querySelector(
-				'.edit-site-navigation-toggle__site-icon'
-			);
+			render( <NavigationToggle /> );
 
-			expect( siteIcon ).toBeTruthy();
+			const siteIcon = screen.getByAltText( 'Site Icon' );
+
+			expect( siteIcon ).toBeVisible();
 		} );
 
 		it( 'should display a default site icon if no user uploaded site icon exists', () => {
@@ -59,13 +58,12 @@ describe( 'NavigationToggle', () => {
 			} );
 
 			const { container } = render( <NavigationToggle /> );
-			const siteIcon = container.querySelector(
-				'.edit-site-navigation-toggle__site-icon'
-			);
-			const defaultIcon = container.querySelector( 'svg' );
 
-			expect( siteIcon ).toBeFalsy();
-			expect( defaultIcon ).toBeTruthy();
+			expect(
+				screen.queryByAltText( 'Site Icon' )
+			).not.toBeInTheDocument();
+
+			expect( container ).toMatchSnapshot();
 		} );
 	} );
 } );

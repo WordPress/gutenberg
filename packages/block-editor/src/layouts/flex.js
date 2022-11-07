@@ -257,7 +257,7 @@ function FlexLayoutJustifyContentControl( {
 				onChange={ onJustificationChange }
 				popoverProps={ {
 					position: 'bottom right',
-					isAlternate: true,
+					variant: 'toolbar',
 				} }
 			/>
 		);
