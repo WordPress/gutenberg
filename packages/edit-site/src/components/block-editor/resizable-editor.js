@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
+import { useState, useRef, useCallback } from '@wordpress/element';
 import { ResizableBox } from '@wordpress/components';
 import {
 	__experimentalUseResizeCanvas as useResizeCanvas,
@@ -18,11 +18,6 @@ import { useMergeRefs } from '@wordpress/compose';
  */
 import { store as editSiteStore } from '../../store';
 import ResizeHandle from './resize-handle';
-
-const DEFAULT_STYLES = {
-	width: '100%',
-	height: '100%',
-};
 
 // Removes the inline styles in the drag handles.
 const HANDLE_STYLES_OVERRIDE = {
@@ -49,48 +44,10 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 		[]
 	);
 	const deviceStyles = useResizeCanvas( deviceType );
-	const [ width, setWidth ] = useState( DEFAULT_STYLES.width );
-	const [ height, setHeight ] = useState( DEFAULT_STYLES.height );
+	const [ width, setWidth ] = useState( '100%' );
 	const iframeRef = useRef();
 	const mouseMoveTypingResetRef = useMouseMoveTypingReset();
 	const ref = useMergeRefs( [ iframeRef, mouseMoveTypingResetRef ] );
-
-	useEffect(
-		function autoResizeIframeHeight() {
-			if ( ! iframeRef.current || ! enableResizing ) {
-				return;
-			}
-
-			const iframe = iframeRef.current;
-
-			function setFrameHeight() {
-				setHeight( iframe.contentDocument.body.scrollHeight );
-			}
-
-			let resizeObserver;
-
-			function registerObserver() {
-				resizeObserver?.disconnect();
-
-				resizeObserver = new iframe.contentWindow.ResizeObserver(
-					setFrameHeight
-				);
-
-				// Observe the body, since the `html` element seems to always
-				// have a height of `100%`.
-				resizeObserver.observe( iframe.contentDocument.body );
-				setFrameHeight();
-			}
-
-			iframe.addEventListener( 'load', registerObserver );
-
-			return () => {
-				resizeObserver?.disconnect();
-				iframe.removeEventListener( 'load', registerObserver );
-			};
-		},
-		[ enableResizing, iframeRef.current ]
-	);
 
 	const resizeWidthBy = useCallback( ( deltaPixels ) => {
 		if ( iframeRef.current ) {
@@ -101,8 +58,8 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 	return (
 		<ResizableBox
 			size={ {
-				width,
-				height,
+				width: enableResizing ? width : '100%',
+				height: enableResizing ? 'auto' : '100%',
 			} }
 			onResizeStop={ ( event, direction, element ) => {
 				setWidth( element.style.width );
@@ -141,7 +98,7 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 		>
 			<Iframe
 				isZoomedOut={ isZoomOutMode }
-				style={ enableResizing ? { height } : deviceStyles }
+				style={ enableResizing ? {} : deviceStyles }
 				head={
 					<>
 						<EditorStyles styles={ settings.styles } />
