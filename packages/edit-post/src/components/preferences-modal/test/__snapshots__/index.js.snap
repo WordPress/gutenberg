@@ -253,7 +253,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                     class="components-toggle-control__label"
                     for="inspector-toggle-control-1"
                   >
-                    Distraction Free
+                    Distraction free
                   </label>
                 </div>
               </div>
