@@ -10,7 +10,7 @@
 			"command": "npm install"
 		},
 		"start-app": {
-			"name": "Run Dev Server",
+			"name": "Start WordPress server",
 			"command": "npm run wp-env start",
 			"runAtStart": true,
 			"preview": {
