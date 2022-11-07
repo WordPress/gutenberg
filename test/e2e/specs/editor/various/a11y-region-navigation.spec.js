@@ -37,9 +37,10 @@ test.describe( 'Region navigation (@firefox, @webkit)', () => {
 		await expect( editorContent ).toBeFocused();
 
 		// Navigate to previous/first region and check that we made it.
-		// Make sure navigating backwards works also witht he tilde character,
+		// Make sure navigating backwards works also with the tilde character,
 		// as browsers interpret the combination of the crtl+shift+backtick keys
 		// and assign it to event.key inconsistently.
+		// See https://github.com/WordPress/gutenberg/pull/45019
 		if ( testInfo.project.name === 'chromium' ) {
 			await page.keyboard.press( 'Control+Shift+`' );
 		} else {
