@@ -17,16 +17,20 @@ export default function SidebarNavigationTitle( {
 	const BackComponent = parentHref ? Button : NavigatorBackButton;
 	return (
 		<HStack spacing={ 4 } justify="flex-start">
-			<BackComponent
-				className="edit-site-sidebar-navigation-title__back"
-				icon={ isRTL() ? chevronRight : chevronLeft }
-				aria-label={ sprintf(
-					/* translators: %s: previous page. */
-					__( 'Navigate to the previous view: %s' ),
-					parentTitle
-				) }
-				href={ parentHref }
-			/>
+			{ parentTitle ? (
+				<BackComponent
+					className="edit-site-sidebar-navigation-title__back"
+					icon={ isRTL() ? chevronRight : chevronLeft }
+					aria-label={ sprintf(
+						/* translators: %s: previous page. */
+						__( 'Navigate to the previous view: %s' ),
+						parentTitle
+					) }
+					href={ parentHref }
+				/>
+			) : (
+				<div className="edit-site-sidebar-navigation-title__icon-placeholder" />
+			) }
 			<div className="edit-site-sidebar-navigation-title">{ title }</div>
 		</HStack>
 	);
