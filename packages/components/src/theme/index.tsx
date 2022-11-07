@@ -28,10 +28,14 @@ import { generateThemeVariables } from './color-algorithms';
  * };
  * ```
  */
-function Theme( props: WordPressComponentProps< ThemeProps, 'div', true > ) {
-	const themeVariables = generateThemeVariables( props );
+function Theme( {
+	accent,
+	background,
+	...props
+}: WordPressComponentProps< ThemeProps, 'div', true > ) {
+	const themeVariables = generateThemeVariables( { accent, background } );
 
-	return <Wrapper { ...themeVariables } />;
+	return <Wrapper { ...themeVariables } { ...props } />;
 }
 
 export default Theme;
