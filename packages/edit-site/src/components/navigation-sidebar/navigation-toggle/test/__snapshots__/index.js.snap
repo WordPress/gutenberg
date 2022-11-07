@@ -26,11 +26,12 @@ exports[`NavigationToggle when in full screen mode should display a default site
       <div
         aria-hidden="true"
         class="components-popover components-tooltip"
-        style="position: absolute;"
+        style="position: absolute; left: 0px; top: 1px;"
         tabindex="-1"
       >
         <div
           class="components-popover__content"
+          style="max-height: -4px; overflow: auto;"
         >
           Toggle navigation
         </div>

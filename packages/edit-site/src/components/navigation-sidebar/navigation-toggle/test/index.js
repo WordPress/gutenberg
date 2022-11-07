@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -24,9 +24,27 @@ jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
 
 jest.mock( '@wordpress/core-data' );
 
+// Find an enclosing popover around `element`, and then check if it's been
+// already positioned (by setting the `top` and `left` styles) by the
+// `@floating-ui/react` library's `useFloating` hook. This happens asynchronously
+// so the test code will need to wait for it.
+function isPopover( element ) {
+	if ( ! element ) {
+		return false;
+	}
+
+	const popover = element.closest( '.components-popover' );
+	if ( ! popover ) {
+		return false;
+	}
+
+	const { top, left } = popover.style;
+	return top !== '' && left !== '' ? 'positioned' : 'not-positioned';
+}
+
 describe( 'NavigationToggle', () => {
 	describe( 'when in full screen mode', () => {
-		it( 'should display a user uploaded site icon if it exists', () => {
+		it( 'should display a user uploaded site icon if it exists', async () => {
 			useSelect.mockImplementation( ( cb ) => {
 				return cb( () => ( {
 					getCurrentTemplateNavigationPanelSubMenu: () => 'root',
@@ -40,12 +58,21 @@ describe( 'NavigationToggle', () => {
 
 			render( <NavigationToggle /> );
 
+			// The `NavigationToggle` component auto-focuses on mount, and that
+			// causes the button tooltip to appear and to be positioned relative
+			// to the button. It happens async and we need to wait for it.
+			await waitFor( () =>
+				expect(
+					isPopover( screen.getByText( 'Toggle navigation' ) )
+				).toBe( 'positioned' )
+			);
+
 			const siteIcon = screen.getByAltText( 'Site Icon' );
 
 			expect( siteIcon ).toBeVisible();
 		} );
 
-		it( 'should display a default site icon if no user uploaded site icon exists', () => {
+		it( 'should display a default site icon if no user uploaded site icon exists', async () => {
 			useSelect.mockImplementation( ( cb ) => {
 				return cb( () => ( {
 					getCurrentTemplateNavigationPanelSubMenu: () => 'root',
@@ -58,6 +85,13 @@ describe( 'NavigationToggle', () => {
 			} );
 
 			const { container } = render( <NavigationToggle /> );
+
+			// wait for the button tooltip to appear and to be positioned
+			await waitFor( () =>
+				expect(
+					isPopover( screen.getByText( 'Toggle navigation' ) )
+				).toBe( 'positioned' )
+			);
 
 			expect(
 				screen.queryByAltText( 'Site Icon' )
