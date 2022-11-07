@@ -17,6 +17,7 @@
 ### Experimental
 
 -   `ToggleGroupControl`: Only show enclosing border when `isBlock` and not `isDeselectable` ([#45492](https://github.com/WordPress/gutenberg/pull/45492)).
+-   `ToggleMultipleGroupControl`: Add new component for choosing multiple options ([#45128](https://github.com/WordPress/gutenberg/pull/45128)).
 
 ## 22.0.0 (2022-11-02)
 
