@@ -22,5 +22,5 @@ export type ToggleMultipleGroupControlOptionIconProps =
 		/**
 		 * Listen to click events to manage the `isPressed` state.
 		 */
-		onClick: () => void;
+		onClick: React.MouseEventHandler< HTMLButtonElement >;
 	};
