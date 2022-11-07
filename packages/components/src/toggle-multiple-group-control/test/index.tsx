@@ -14,7 +14,7 @@ import { formatUppercase } from '@wordpress/icons';
  * Internal dependencies
  */
 import ToggleMultipleGroupControl from '../component';
-import { ToggleMultipleGroupControlOptionIcon } from '../option-icon';
+import { ToggleMultipleGroupControlOptionIcon } from '../toggle-multiple-group-control-option-icon';
 
 const TestComponent = () => {
 	const [ uppercase, setIsUppercase ] = useState( false );

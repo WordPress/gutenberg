@@ -1266,15 +1266,15 @@
 		"parent": "components"
 	},
 	{
-		"title": "ToggleMultipleGroupControlOptionIcon",
-		"slug": "toggle-multiple-group-control-option-icon",
-		"markdown_source": "../packages/components/src/toggle-multiple-group-control/option-icon/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "ToggleMultipleGroupControl",
 		"slug": "toggle-multiple-group-control",
 		"markdown_source": "../packages/components/src/toggle-multiple-group-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ToggleMultipleGroupControlOptionIcon",
+		"slug": "toggle-multiple-group-control-option-icon",
+		"markdown_source": "../packages/components/src/toggle-multiple-group-control/toggle-multiple-group-control-option-icon/README.md",
 		"parent": "components"
 	},
 	{

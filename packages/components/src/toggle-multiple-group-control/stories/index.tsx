@@ -13,7 +13,7 @@ import { formatBold, formatItalic, formatUnderline } from '@wordpress/icons';
  * Internal dependencies
  */
 import { ToggleMultipleGroupControl } from '../';
-import { ToggleMultipleGroupControlOptionIcon } from '../option-icon';
+import { ToggleMultipleGroupControlOptionIcon } from '../toggle-multiple-group-control-option-icon';
 
 const meta: ComponentMeta< typeof ToggleMultipleGroupControl > = {
 	component: ToggleMultipleGroupControl,

@@ -4,7 +4,7 @@
 This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-`ToggleMultipleGroupControl` is a variant of [`ToggleGroupControl`](/packages/components/src/toggle-group-control/toggle-group-control/README.md) that allows multiple options to be selected. To render options for this control, use the [`ToggleMultipleGroupControlOptionIcon`](/packages/components/src/toggle-multiple-group-control/option-icon/README.md) component.
+`ToggleMultipleGroupControl` is a variant of [`ToggleGroupControl`](/packages/components/src/toggle-group-control/toggle-group-control/README.md) that allows multiple options to be selected. To render options for this control, use the [`ToggleMultipleGroupControlOptionIcon`](/packages/components/src/toggle-multiple-group-control/toggle-multiple-group-control-option-icon/README.md) component.
 
 Only use this control for icon buttons.
 
