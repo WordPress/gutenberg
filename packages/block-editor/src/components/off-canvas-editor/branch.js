@@ -7,12 +7,6 @@ import { AsyncModeProvider, useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-/**
- * Internal dependencies
- */
-/**
- * Internal dependencies
- */
 import ListViewBlock from './block';
 import { useListViewContext } from './context';
 import { isClientIdSelected } from './utils';
