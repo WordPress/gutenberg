@@ -45,6 +45,7 @@
 	bottom: 0;
 	left: 0;
 	box-shadow: $shadow-modal;
+	background: $white;
 
 	@include break-small {
 		top: $canvas-padding;
