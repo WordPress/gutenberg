@@ -253,4 +253,42 @@ describe( 'ToggleGroupControl', () => {
 			} );
 		} );
 	} );
+
+	it.each( [ false, true ] )(
+		'should not allow multiple selection, when isDeselectable: %p',
+		async ( isDeselectable ) => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			render(
+				<ToggleGroupControl
+					label="Label"
+					isDeselectable={ isDeselectable }
+				>
+					{ options }
+				</ToggleGroupControl>
+			);
+
+			const role = isDeselectable ? 'button' : 'radio';
+
+			await user.click(
+				screen.getByRole( role, {
+					name: 'R',
+				} )
+			);
+
+			await user.click(
+				screen.getByRole( role, {
+					name: 'J',
+				} )
+			);
+
+			const attribute = isDeselectable ? 'pressed' : 'checked';
+			const selectedOptions = screen.getAllByRole( role, {
+				[ attribute ]: true,
+			} );
+			expect( selectedOptions.length ).toBe( 1 );
+		}
+	);
 } );
