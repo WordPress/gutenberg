@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback, useEffect, useState, useRef } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import {
 	Button,
 	ButtonGroup,
@@ -78,12 +78,6 @@ function ButtonEdit( props ) {
 	} = props;
 	const { linkTarget, placeholder, rel, style, text, url, width } =
 		attributes;
-	const onSetLinkRel = useCallback(
-		( value ) => {
-			setAttributes( { rel: value } );
-		},
-		[ setAttributes ]
-	);
 
 	function onToggleOpenInNewTab( value ) {
 		const newLinkTarget = value ? '_blank' : undefined;
@@ -262,7 +256,7 @@ function ButtonEdit( props ) {
 				<TextControl
 					label={ __( 'Link rel' ) }
 					value={ rel || '' }
-					onChange={ onSetLinkRel }
+					onChange={ ( newRel ) => setAttributes( { rel: newRel } ) }
 				/>
 			</InspectorControls>
 		</>
