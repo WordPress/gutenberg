@@ -79,6 +79,7 @@ export default function CustomSelectControl( props ) {
 		value: _selectedItem,
 		onMouseOver,
 		onMouseOut,
+		__experimentalShowSelectedHint = false,
 	} = props;
 
 	const {
@@ -194,6 +195,12 @@ export default function CustomSelectControl( props ) {
 					} ) }
 				>
 					{ itemToString( selectedItem ) }
+					{ __experimentalShowSelectedHint &&
+						selectedItem.__experimentalHint && (
+							<span className="components-custom-select-control__hint">
+								{ selectedItem.__experimentalHint }
+							</span>
+						) }
 				</SelectControlSelect>
 			</InputBaseWithBackCompatMinWidth>
 			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }

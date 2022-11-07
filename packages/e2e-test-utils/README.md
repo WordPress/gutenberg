@@ -322,11 +322,11 @@ Enables Pre-publish checks.
 
 ### ensureSidebarOpened
 
-Verifies that the edit post sidebar is opened, and if it is not, opens it.
+Verifies that the edit post/site/widgets sidebar is opened, and if it is not, opens it.
 
 _Returns_
 
--   `Promise`: Promise resolving once the edit post sidebar is opened.
+-   `Promise`: Promise resolving once the sidebar is opened.
 
 ### findSidebarPanelToggleButtonWithTitle
 

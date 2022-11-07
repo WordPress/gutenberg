@@ -13,6 +13,7 @@ function BlockTypesChecklist( { blockTypes, value, onItemChange } ) {
 					className="edit-post-block-manager__checklist-item"
 				>
 					<CheckboxControl
+						__nextHasNoMarginBottom
 						label={
 							<>
 								{ blockType.title }

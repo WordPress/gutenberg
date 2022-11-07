@@ -78,14 +78,14 @@ describe( 'Reusable block', () => {
 			return Promise.resolve( response );
 		} );
 
-		const { getByA11yLabel, getByTestId, getByText } =
+		const { getByLabelText, getByTestId, getByText } =
 			await initializeEditor( {
 				initialHtml: '',
 				capabilities: { reusableBlock: true },
 			} );
 
 		// Open the inserter menu.
-		fireEvent.press( await waitFor( () => getByA11yLabel( 'Add block' ) ) );
+		fireEvent.press( await waitFor( () => getByLabelText( 'Add block' ) ) );
 
 		// Navigate to reusable tab.
 		const reusableSegment = await waitFor( () => getByText( 'Reusable' ) );
@@ -116,7 +116,7 @@ describe( 'Reusable block', () => {
 
 		// Get the reusable block.
 		const reusableBlock = await waitFor( () =>
-			getByA11yLabel( /Reusable block Block\. Row 1/ )
+			getByLabelText( /Reusable block Block\. Row 1/ )
 		);
 
 		expect( reusableBlock ).toBeDefined();
@@ -128,12 +128,12 @@ describe( 'Reusable block', () => {
 		const id = 3;
 		const initialHtml = `<!-- wp:block {"ref":${ id }} /-->`;
 
-		const { getByA11yLabel } = await initializeEditor( {
+		const { getByLabelText } = await initializeEditor( {
 			initialHtml,
 		} );
 
 		const reusableBlock = await waitFor( () =>
-			getByA11yLabel( /Reusable block Block\. Row 1/ )
+			getByLabelText( /Reusable block Block\. Row 1/ )
 		);
 
 		const blockDeleted = await waitFor( () =>
@@ -163,12 +163,12 @@ describe( 'Reusable block', () => {
 			return Promise.resolve( response );
 		} );
 
-		const { getByA11yLabel } = await initializeEditor( {
+		const { getByLabelText } = await initializeEditor( {
 			initialHtml,
 		} );
 
 		const reusableBlock = await waitFor( () =>
-			getByA11yLabel( /Reusable block Block\. Row 1/ )
+			getByLabelText( /Reusable block Block\. Row 1/ )
 		);
 
 		const innerBlockListWrapper = await waitFor( () =>
@@ -186,7 +186,7 @@ describe( 'Reusable block', () => {
 		} );
 
 		const headingInnerBlock = await waitFor( () =>
-			within( reusableBlock ).getByA11yLabel(
+			within( reusableBlock ).getByLabelText(
 				'Heading Block. Row 1. Level 2. First Reusable block'
 			)
 		);

@@ -36,6 +36,13 @@ for the `ColorPalette`'s color swatches, by rendering your `ColorPalette` with a
 
 The component accepts the following props.
 
+### `clearable`: `boolean`
+
+Whether the palette should have a clearing button.
+
+-   Required: No
+-   Default: `true`
+
 ### `colors`: `( PaletteObject | ColorObject )[]`
 
 Array with the colors to be shown. When displaying multiple color palettes to choose from, the format of the array changes from an array of colors objects, to an array of color palettes.
@@ -45,21 +52,23 @@ Array with the colors to be shown. When displaying multiple color palettes to ch
 
 ### `disableCustomColors`: `boolean`
 
-Whether to allow the user to pick a custom color on top of the predefined choices (defined via the `colors` prop).
+Whether to allow the user to pick a custom color on top of the predefined
+choices (defined via the `colors` prop).
 
 -   Required: No
 -   Default: `false`
 
 ### `enableAlpha`: `boolean`
 
-Whether the color picker should display the alpha channel both in the bottom inputs as well as in the color picker itself.
+This controls whether the alpha channel will be offered when selecting custom
+colors.
 
 -   Required: No
 -   Default: `false`
 
 ### `value`: `string`
 
-currently active value
+Currently active value.
 
 -   Required: No
 
@@ -68,16 +77,3 @@ currently active value
 Callback called when a color is selected.
 
 -   Required: Yes
-
-### `className`: `string`
-
-classes to be applied to the container.
-
--   Required: No
-
-### `clearable`: `boolean`
-
-Whether the palette should have a clearing button.
-
--   Required: No
--   Default: `true`

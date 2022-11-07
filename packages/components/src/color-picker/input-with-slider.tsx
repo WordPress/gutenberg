@@ -45,7 +45,7 @@ export const InputWithSlider = ( {
 						{ abbreviation }
 					</Spacer>
 				}
-				hideHTMLArrows
+				spinControls="none"
 				size="__unstable-large"
 			/>
 			<RangeControl

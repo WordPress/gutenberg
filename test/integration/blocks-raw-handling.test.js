@@ -192,6 +192,31 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
+	it( 'should parse bulleted list', () => {
+		const filtered = pasteHandler( {
+			HTML: '• one<br>• two<br>• three',
+			plainText: '• one\n• two\n• three',
+			mode: 'AUTO',
+		} )
+			.map( getBlockContent )
+			.join( '' );
+
+		expect( filtered ).toMatchInlineSnapshot( `
+		"<ul><!-- wp:list-item -->
+		<li>one</li>
+		<!-- /wp:list-item -->
+
+		<!-- wp:list-item -->
+		<li>two</li>
+		<!-- /wp:list-item -->
+
+		<!-- wp:list-item -->
+		<li>three</li>
+		<!-- /wp:list-item --></ul>"
+	` );
+		expect( console ).toHaveLogged();
+	} );
+
 	it( 'should parse inline Markdown', () => {
 		const filtered = pasteHandler( {
 			HTML: 'Some **bold** text.',
@@ -351,6 +376,7 @@ describe( 'Blocks raw handling', () => {
 			'nested-divs',
 			'apple',
 			'google-docs',
+			'google-docs-list-only',
 			'google-docs-table',
 			'google-docs-table-with-comments',
 			'google-docs-with-comments',
