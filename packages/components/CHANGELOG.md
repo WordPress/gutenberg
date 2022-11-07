@@ -48,6 +48,7 @@
 
 ### Bug Fix
 
+-   `useNavigateRegions`: Add new keyboard shortcut alias to cover backtick and tilde keys inconsistencies across browsers ([#45019](https://github.com/WordPress/gutenberg/pull/45019)).
 -   `Button`: Tweak the destructive button primary, link, and default variants ([#44427](https://github.com/WordPress/gutenberg/pull/44427)).
 -   `UnitControl`: Fix `disabled` style is overridden by core `form.css` style ([#45250](https://github.com/WordPress/gutenberg/pull/45250)).
 -   `ItemGroup`: fix RTL `Item` styles when rendered as a button ([#45280](https://github.com/WordPress/gutenberg/pull/45280)).
