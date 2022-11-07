@@ -80,27 +80,14 @@ export const globalTypes = {
 };
 
 export const decorators = [
-	WithTheme,
 	WithGlobalCSS,
 	WithMarginChecker,
 	WithRTL,
 	WithMaxWidthWrapper,
+	WithTheme,
 ];
 
 export const parameters = {
-	backgrounds: {
-		values: [
-			{
-				name: 'dark',
-				value: '#1e1e1e',
-			},
-			{
-				name: 'light gray',
-				value: '#f0f0f0',
-			},
-		],
-		grid: { disable: true },
-	},
 	controls: {
 		sort: 'requiredFirst',
 	},
