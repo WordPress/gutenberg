@@ -28,7 +28,9 @@
 	}
 
 	&.is-focus-mode {
-		padding: $grid-unit-60;
+		.edit-site-layout.is-full-canvas & {
+			padding: $grid-unit-60;
+		}
 
 		.edit-site-visual-editor__editor-canvas {
 			border-radius: $radius-block-ui;
