@@ -691,7 +691,7 @@ function Navigation( {
 								: __( 'Menu' )
 						}
 					>
-						{ isOffCanvasNavigationEditorEnabled && (
+						{ isOffCanvasNavigationEditorEnabled ? (
 							<>
 								<HStack className="wp-block-navigation-off-canvas-editor__header">
 									<Heading
@@ -710,8 +710,7 @@ function Navigation( {
 									selectBlockInCanvas={ false }
 								/>
 							</>
-						) }
-						{ ! isOffCanvasNavigationEditorEnabled && (
+						) : (
 							<>
 								<WrappedNavigationMenuSelector
 									currentMenuId={ ref }
@@ -782,7 +781,7 @@ function Navigation( {
 								: __( 'Menu' )
 						}
 					>
-						{ isOffCanvasNavigationEditorEnabled && (
+						{ isOffCanvasNavigationEditorEnabled ? (
 							<>
 								<HStack className="wp-block-navigation-off-canvas-editor__header">
 									<Heading
@@ -797,8 +796,7 @@ function Navigation( {
 								</HStack>
 								<p>Select or create a menu</p>
 							</>
-						) }
-						{ ! isOffCanvasNavigationEditorEnabled && (
+						) : (
 							<>
 								<WrappedNavigationMenuSelector
 									currentMenuId={ null }
@@ -901,7 +899,7 @@ function Navigation( {
 								: __( 'Menu' )
 						}
 					>
-						{ isOffCanvasNavigationEditorEnabled && (
+						{ isOffCanvasNavigationEditorEnabled ? (
 							<>
 								<HStack className="wp-block-navigation-off-canvas-editor__header">
 									<Heading
@@ -920,8 +918,7 @@ function Navigation( {
 									selectBlockInCanvas={ false }
 								/>
 							</>
-						) }
-						{ ! isOffCanvasNavigationEditorEnabled && (
+						) : (
 							<>
 								<WrappedNavigationMenuSelector
 									currentMenuId={ ref }
