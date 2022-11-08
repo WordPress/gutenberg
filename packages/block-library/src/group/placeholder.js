@@ -6,7 +6,7 @@ import { useBlockProps } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { store as blocksStore } from '@wordpress/blocks';
 import { Path, SVG, Button, Placeholder } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Returns a custom variation icon.
@@ -96,6 +96,26 @@ export function useShouldShowPlaceHolder( {
 			! style &&
 			usedLayoutType !== 'flex'
 	);
+
+	useEffect( () => {
+		if (
+			!! hasInnerBlocks ||
+			!! backgroundColor ||
+			!! fontSize ||
+			!! textColor ||
+			!! style ||
+			usedLayoutType === 'flex'
+		) {
+			setShowPlaceholder( false );
+		}
+	}, [
+		backgroundColor,
+		fontSize,
+		textColor,
+		style,
+		usedLayoutType,
+		hasInnerBlocks,
+	] );
 
 	return [ showPlaceholder, setShowPlaceholder ];
 }
