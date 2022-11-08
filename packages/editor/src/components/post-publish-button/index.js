@@ -34,10 +34,20 @@ export class PostPublishButton extends Component {
 			entitiesSavedStatesCallback: false,
 		};
 	}
+
 	componentDidMount() {
 		if ( this.props.focusOnMount ) {
-			this.buttonNode.current.focus();
+			// This timeout is necessary to make sure the `useEffect` hook of
+			// `useFocusReturn` gets the correct element (the button that opens the
+			// PostPublishPanel) otherwise it will get this button.
+			this.timeoutID = setTimeout( () => {
+				this.buttonNode.current.focus();
+			}, 0 );
 		}
+	}
+
+	componentWillUnmount() {
+		clearTimeout( this.timeoutID );
 	}
 
 	createOnClick( callback ) {
