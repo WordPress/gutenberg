@@ -111,5 +111,5 @@ export function generateShades( background: string, foreground: string ) {
 			.toHex();
 	} );
 
-	return result as ThemeOutputValues[ 'colors' ][ 'gray' ];
+	return result as NonNullable< ThemeOutputValues[ 'colors' ][ 'gray' ] >;
 }
