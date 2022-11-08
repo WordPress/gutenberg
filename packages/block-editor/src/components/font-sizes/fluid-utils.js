@@ -9,15 +9,16 @@ const DEFAULT_MAXIMUM_VIEWPORT_WIDTH = '1600px';
 const DEFAULT_MINIMUM_VIEWPORT_WIDTH = '768px';
 const DEFAULT_SCALE_FACTOR = 1;
 const DEFAULT_MINIMUM_FONT_SIZE_FACTOR = 0.75;
-const DEFAULT_MINIMUM_FONT_SIZE_LIMIT = '14px';
+const DEFAULT_MINIMUM_FONT_SIZE_LIMIT = '16px';
 
 /**
  * Computes a fluid font-size value that uses clamp(). A minimum and maxinmum
  * font size OR a single font size can be specified.
  *
- * If a single font size is specified, it is scaled up and down by
- * minimumFontSizeFactor and maximumFontSizeFactor to arrive at the minimum and
- * maximum sizes.
+ * If a single font size is specified, it is scaled down by
+ * minimumFontSizeFactor to arrive at the minimum font size.
+ *
+ * The incoming `fontSize` value is used for the maximum font size value.
  *
  * @example
  * ```js
@@ -74,7 +75,7 @@ export function getComputedFluidTypographyValue( {
 			}
 		);
 
-		// Don't enforce minimum font size if a font size has explicitly set a min and max value.
+		// Enforce lower bound font size if a font size has not explicitly set a min and/or a max value.
 		if (
 			!! minimumFontSizeLimitParsed?.value &&
 			! minimumFontSize &&
@@ -96,7 +97,7 @@ export function getComputedFluidTypographyValue( {
 		}
 
 		/*
-		 * If no minimumFontSize is provided, create one using
+		 * If no fluid min font size is provided, create one using
 		 * the given font size multiplied by the min font size scale factor.
 		 */
 		if ( ! minimumFontSize ) {
@@ -105,7 +106,7 @@ export function getComputedFluidTypographyValue( {
 				3
 			);
 
-			// Only use calculated min font size if it's > $minimum_font_size_limit value.
+			// Only use calculated min font size if it is greater that the minimum font size limit.
 			if (
 				!! minimumFontSizeLimitParsed?.value &&
 				calculatedMinimumFontSize < minimumFontSizeLimitParsed?.value
@@ -120,8 +121,10 @@ export function getComputedFluidTypographyValue( {
 	// Grab the minimum font size and normalize it in order to use the value for calculations.
 	const minimumFontSizeParsed = getTypographyValueAndUnit( minimumFontSize );
 
-	// We get a 'preferred' unit to keep units consistent when calculating,
-	// otherwise the result will not be accurate.
+	/*
+	 * We get a 'preferred' unit to keep units consistent when calculating,
+	 * otherwise the result will not be accurate.
+	 */
 	const fontSizeUnit = minimumFontSizeParsed?.unit || 'rem';
 
 	// Grabs the maximum font size and normalize it in order to use the value for calculations.
