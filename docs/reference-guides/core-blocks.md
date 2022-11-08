@@ -240,7 +240,25 @@ A block that displays a summary and shows or hides additional content. ([Source]
 -	**Name:** core/details
 -	**Category:** theme
 -	**Supports:** align, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** level, showContent, summary
+-	**Attributes:** showContent
+
+## Details content
+
+A block that displays a summary and shows or hides additional content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details-content))
+
+-	**Name:** core/details-content
+-	**Category:** theme
+-	**Supports:** align, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** 
+
+## Summary
+
+A block that displays a summary and shows or hides additional content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details-summary))
+
+-	**Name:** core/details-summary
+-	**Category:** theme
+-	**Supports:** align, color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** level, summary
 
 ## Embed
 

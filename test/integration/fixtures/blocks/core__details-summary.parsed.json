@@ -1,0 +1,11 @@
+[
+	{
+		"blockName": "core/details-summary",
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n<summary class=\"wp-block-details-summary\"><h2></h2></summary>\n",
+		"innerContent": [
+			"\n<summary class=\"wp-block-details-summary\"><h2></h2></summary>\n"
+		]
+	}
+]

@@ -5,9 +5,18 @@
 		"attributes": {
 			"level": 2,
 			"summary": "",
-			"showContent": true
+			"showContent": false
 		},
 		"innerBlocks": [
+			{
+				"name": "core/details-summary",
+				"isValid": true,
+				"attributes": {
+					"level": 2,
+					"summary": ""
+				},
+				"innerBlocks": []
+			},
 			{
 				"name": "core/paragraph",
 				"isValid": true,

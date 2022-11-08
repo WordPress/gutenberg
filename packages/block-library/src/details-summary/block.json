@@ -2,27 +2,30 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
 	"__experimental": true,
-	"name": "core/details",
-	"title": "Details",
+	"name": "core/details-summary",
+	"title": "Summary",
 	"category": "theme",
+	"parent": [ "core/details" ],
 	"description": "A block that displays a summary and shows or hides additional content.",
-	"keywords": [ "disclosure", "summary", "hide", "transcript" ],
 	"textdomain": "default",
 	"attributes": {
-		"showContent": {
-			"type": "boolean",
-			"default": false
+		"level": {
+			"type": "number",
+			"default": 2
+		},
+		"summary": {
+			"type": "string",
+			"source": "html",
+			"selector": "h1,h2,h3,h4,h5,h6"
 		}
 	},
 	"supports": {
 		"align": true,
 		"color": {
 			"gradients": true,
-			"link": true,
 			"__experimentalDefaultControls": {
 				"background": true,
-				"text": true,
-				"link": true
+				"text": true
 			}
 		},
 		"__experimentalBorder": {

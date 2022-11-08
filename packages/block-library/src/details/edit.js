@@ -1,16 +1,9 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import {
-	RichText,
 	useBlockProps,
 	useInnerBlocksProps,
-	BlockControls,
 	store as blockEditorStore,
 	InspectorControls,
 } from '@wordpress/block-editor';
@@ -18,34 +11,14 @@ import { useSelect } from '@wordpress/data';
 import { PanelBody, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-/**
- * Internal dependencies
- */
-import HeadingLevelDropdown from './heading-level-dropdown';
-
-const DETAILS = [
-	[
-		'core/paragraph',
-		{
-			placeholder: __(
-				'Add text or blocks that will display when the details block is opened.'
-			),
-		},
-	],
-];
+const TEMPLATE = [ [ 'core/details-summary' ], [ 'core/details-content' ] ];
 
 function DetailsBlock( { attributes, setAttributes, clientId } ) {
-	const { level, summary, showContent } = attributes;
-	const tagName = 'h' + level;
+	const { showContent } = attributes;
 	const blockProps = useBlockProps();
-	const innerBlocksProps = useInnerBlocksProps(
-		{
-			className: 'wp-block-details__content',
-		},
-		{
-			template: DETAILS,
-		}
-	);
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		template: TEMPLATE,
+	} );
 
 	// Check if either the block or the inner blocks are selected.
 	const hasSelection = useSelect( ( select ) => {
@@ -56,14 +29,6 @@ function DetailsBlock( { attributes, setAttributes, clientId } ) {
 
 	return (
 		<>
-			<BlockControls group="block">
-				<HeadingLevelDropdown
-					selectedLevel={ level }
-					onChange={ ( newLevel ) =>
-						setAttributes( { level: newLevel } )
-					}
-				/>
-			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
@@ -77,24 +42,10 @@ function DetailsBlock( { attributes, setAttributes, clientId } ) {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<details { ...blockProps } open={ hasSelection || showContent }>
-				<summary
-					className={ classnames( 'wp-block-details__summary' ) }
-					onClick={ ( event ) => event.preventDefault() }
-				>
-					<RichText
-						tagName={ tagName }
-						aria-label={ __( 'Add summary' ) }
-						placeholder={ __( 'Add summary' ) }
-						withoutInteractiveFormatting
-						value={ summary }
-						onChange={ ( newSummary ) =>
-							setAttributes( { summary: newSummary } )
-						}
-					/>
-				</summary>
-				<div { ...innerBlocksProps } />
-			</details>
+			<details
+				{ ...innerBlocksProps }
+				open={ hasSelection || showContent }
+			></details>
 		</>
 	);
 }
