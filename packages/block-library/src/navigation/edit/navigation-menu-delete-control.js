@@ -11,11 +11,15 @@ import { useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
-export default function NavigationMenuDeleteControl( { onDelete } ) {
+export default function NavigationMenuDeleteControl( {
+	onDelete,
+	kind,
+	type,
+} ) {
 	const [ isConfirmModalVisible, setIsConfirmModalVisible ] =
 		useState( false );
-	const id = useEntityId( 'postType', 'wp_navigation' );
-	const [ title ] = useEntityProp( 'postType', 'wp_navigation', 'title' );
+	const id = useEntityId( kind, type );
+	const [ title ] = useEntityProp( kind, type, 'title' );
 	const { deleteEntityRecord } = useDispatch( coreStore );
 
 	return (
@@ -60,12 +64,9 @@ export default function NavigationMenuDeleteControl( { onDelete } ) {
 							<Button
 								variant="primary"
 								onClick={ () => {
-									deleteEntityRecord(
-										'postType',
-										'wp_navigation',
-										id,
-										{ force: true }
-									);
+									deleteEntityRecord( kind, type, id, {
+										force: true,
+									} );
 									onDelete( title );
 								} }
 							>

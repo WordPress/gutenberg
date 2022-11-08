@@ -12,11 +12,12 @@ import { useContext, useEffect, useRef, useMemo } from '@wordpress/element';
  */
 import useNavigationMenu from '../use-navigation-menu';
 import useCreateNavigationMenu from './use-create-navigation-menu';
+import { DEFAULT_ENTITY_KIND, DEFAULT_ENTITY_TYPE } from '../constants';
 
 const EMPTY_OBJECT = {};
 const DRAFT_MENU_PARAMS = [
-	'postType',
-	'wp_navigation',
+	DEFAULT_ENTITY_KIND,
+	DEFAULT_ENTITY_TYPE,
 	{ status: 'draft', per_page: -1 },
 ];
 
@@ -104,8 +105,8 @@ export default function UnsavedInnerBlocks( {
 
 				return {
 					isSaving: isSavingEntityRecord(
-						'postType',
-						'wp_navigation'
+						DEFAULT_ENTITY_KIND,
+						DEFAULT_ENTITY_TYPE
 					),
 					draftNavigationMenus: getEntityRecords(
 						...DRAFT_MENU_PARAMS

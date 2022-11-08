@@ -544,6 +544,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	if (
 		defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN &&
 		array_key_exists( '__unstableLocation', $attributes ) &&
+		! array_key_exists( 'slug', $attributes ) &&
 		! array_key_exists( 'ref', $attributes ) &&
 		! empty( block_core_navigation_get_menu_items_at_location( $attributes['__unstableLocation'] ) )
 	) {
@@ -558,11 +559,42 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	}
 
 	// Load inner blocks from the navigation post.
-	if ( array_key_exists( 'ref', $attributes ) ) {
-		$navigation_post = get_post( $attributes['ref'] );
-		if ( ! isset( $navigation_post ) ) {
+	if ( array_key_exists( 'slug', $attributes ) || array_key_exists( 'ref', $attributes ) ) {
+
+		$base_args = array(
+			'post_type'              => 'wp_navigation',
+			'nopaging'               => true,
+			'posts_per_page'         => '1',
+			'update_post_term_cache' => false,
+			'no_found_rows'          => true,
+		);
+
+		// Prefer query by slug if available, falling
+		// back to Post ID.
+		if ( ! empty( $attributes['slug'] ) ) {
+			$args = array_merge(
+				$base_args,
+				array(
+					'name' => $attributes['slug'], // query by slug
+				)
+			);
+		} else {
+			$args = array_merge(
+				$base_args,
+				array(
+					'p' => $attributes['ref'], // query by post ID
+				)
+			);
+		}
+
+		// Query for the Navigation Post.
+		$navigation_query = new WP_Query( $args );
+
+		if ( ! isset( $navigation_query->posts[0] ) ) {
 			return '';
 		}
+
+		$navigation_post = $navigation_query->posts[0];
 
 		// Only published posts are valid. If this is changed then a corresponding change
 		// must also be implemented in `use-navigation-menu.js`.

@@ -49,7 +49,7 @@ function NavigationMenuSelector( {
 		isNavigationMenuResolved,
 		canUserCreateNavigationMenu,
 		canSwitchNavigationMenu,
-	} = useNavigationMenu();
+	} = useNavigationMenu( currentMenuId );
 
 	const [ currentTitle ] = useEntityProp(
 		'postType',
@@ -64,14 +64,14 @@ function NavigationMenuSelector( {
 
 	const menuChoices = useMemo( () => {
 		return (
-			navigationMenus?.map( ( { id, title } ) => {
+			navigationMenus?.map( ( { slug, title } ) => {
 				const label = decodeEntities( title.rendered );
-				if ( id === currentMenuId && ! isCreatingMenu ) {
+				if ( slug === currentMenuId && ! isCreatingMenu ) {
 					setSelectorLabel( currentTitle );
 					setEnableOptions( shouldEnableMenuSelector );
 				}
 				return {
-					value: id,
+					value: slug,
 					label,
 					ariaLabel: sprintf( actionLabel, label ),
 				};
@@ -85,6 +85,14 @@ function NavigationMenuSelector( {
 		isNavigationMenuResolved,
 		hasResolvedNavigationMenus,
 	] );
+
+	// If the currentMenuId is a postId then find it.
+	const menuById = navigationMenus?.find( ( { id } ) => {
+		return Number( id ) === Number( currentMenuId );
+	} );
+
+	// Use the slug of the found menu or assume it's already a slug.
+	const selectedMenuSlug = menuById ? menuById?.slug : currentMenuId;
 
 	const hasNavigationMenus = !! navigationMenus?.length;
 	const hasClassicMenus = !! classicMenus?.length;
@@ -172,9 +180,9 @@ function NavigationMenuSelector( {
 					{ showNavigationMenus && hasNavigationMenus && (
 						<MenuGroup label={ __( 'Menus' ) }>
 							<MenuItemsChoice
-								value={ currentMenuId }
-								onSelect={ ( menuId ) => {
-									onSelectNavigationMenu( menuId );
+								value={ selectedMenuSlug }
+								onSelect={ ( menuRef ) => {
+									onSelectNavigationMenu( menuRef );
 								} }
 								choices={ menuChoices }
 							/>

@@ -167,6 +167,28 @@ export const rootEntitiesConfig = [
 		baseURLParams: { context: 'edit' },
 		key: 'plugin',
 	},
+	{
+		// Navigation entities keyed by `slug`.
+		// Note that there is also a separate Navigation `postType` entitiy which
+		// stores `wp_navigation` posts keyed by postId for reasons relating
+		// to backwards compatibility.
+		label: __( 'Navigation Menus' ),
+		name: 'navigation',
+		kind: 'root',
+		baseURL: '/wp/v2/navigation',
+		baseURLParams: { context: 'edit' },
+		key: 'slug',
+		transientEdits: {
+			blocks: true,
+			selection: true,
+		},
+		mergedEdits: { meta: true },
+		rawAttributes: POST_RAW_ATTRIBUTES,
+		getTitle: ( record ) =>
+			record?.title?.rendered || record?.title || String( record.id ),
+		__unstablePrePersist: prePersistPostType,
+		__unstable_rest_base: 'navigation',
+	},
 ];
 
 export const additionalEntityConfigLoaders = [
@@ -181,7 +203,7 @@ export const additionalEntityConfigLoaders = [
  * @param {Object} edits           Edits.
  * @return {Object} Updated edits.
  */
-export const prePersistPostType = ( persistedRecord, edits ) => {
+export function prePersistPostType( persistedRecord, edits ) {
 	const newEdits = {};
 
 	if ( persistedRecord?.status === 'auto-draft' ) {
@@ -202,7 +224,7 @@ export const prePersistPostType = ( persistedRecord, edits ) => {
 	}
 
 	return newEdits;
-};
+}
 
 /**
  * Returns the list of post type entities.

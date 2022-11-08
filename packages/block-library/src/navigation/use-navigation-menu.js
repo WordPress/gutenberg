@@ -7,8 +7,15 @@ import {
 } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import useNavigationEntityTypes from './use-navigation-entity-types';
+
 export default function useNavigationMenu( ref ) {
 	const permissions = useResourcePermissions( 'navigation', ref );
+
+	const entityConfig = useNavigationEntityTypes( ref );
 
 	return useSelect(
 		( select ) => {
@@ -24,13 +31,13 @@ export default function useNavigationMenu( ref ) {
 				navigationMenus,
 				isResolvingNavigationMenus,
 				hasResolvedNavigationMenus,
-			} = selectNavigationMenus( select, ref );
+			} = selectNavigationMenus( select, ref, entityConfig );
 
 			const {
 				navigationMenu,
 				isNavigationMenuResolved,
 				isNavigationMenuMissing,
-			} = selectExistingMenu( select, ref );
+			} = selectExistingMenu( select, ref, entityConfig );
 
 			return {
 				navigationMenus,
@@ -64,15 +71,12 @@ export default function useNavigationMenu( ref ) {
 	);
 }
 
-function selectNavigationMenus( select ) {
+function selectNavigationMenus( select, _ref, entityConfig ) {
 	const { getEntityRecords, hasFinishedResolution, isResolving } =
 		select( coreStore );
 
-	const args = [
-		'postType',
-		'wp_navigation',
-		{ per_page: -1, status: [ 'publish', 'draft' ] },
-	];
+	const args = [ ...entityConfig, { per_page: -1, status: 'publish' } ];
+
 	return {
 		navigationMenus: getEntityRecords( ...args ),
 		isResolvingNavigationMenus: isResolving( 'getEntityRecords', args ),
@@ -83,7 +87,7 @@ function selectNavigationMenus( select ) {
 	};
 }
 
-function selectExistingMenu( select, ref ) {
+function selectExistingMenu( select, ref, entityConfig ) {
 	if ( ! ref ) {
 		return {
 			isNavigationMenuResolved: false,
@@ -91,10 +95,11 @@ function selectExistingMenu( select, ref ) {
 		};
 	}
 
+	const args = [ ...entityConfig, ref ];
+
 	const { getEntityRecord, getEditedEntityRecord, hasFinishedResolution } =
 		select( coreStore );
 
-	const args = [ 'postType', 'wp_navigation', ref ];
 	const navigationMenu = getEntityRecord( ...args );
 	const editedNavigationMenu = getEditedEntityRecord( ...args );
 	const hasResolvedNavigationMenu = hasFinishedResolution(
