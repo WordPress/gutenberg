@@ -905,7 +905,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 				);
 			};
 
-			const { container } = render( <LinkControlConsumer /> );
+			render( <LinkControlConsumer /> );
 
 			// Search Input UI.
 			const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
@@ -932,14 +932,15 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			await eventLoopTick();
 
 			// Check for loading indicator.
-			const loadingIndicator = container.querySelector(
-				'.block-editor-link-control__loading'
-			);
+			const loadingIndicator = screen.getByText( 'Creating…' );
 			const currentLinkLabel =
 				screen.queryByLabelText( 'Currently selected' );
 
 			expect( currentLinkLabel ).not.toBeInTheDocument();
-			expect( loadingIndicator ).toHaveTextContent( 'Creating' );
+			expect( loadingIndicator ).toBeVisible();
+			expect( loadingIndicator ).toHaveClass(
+				'block-editor-link-control__loading'
+			);
 
 			// Resolve the `createSuggestion` promise.
 			await act( async () => {
@@ -1559,18 +1560,17 @@ describe( 'Addition Settings UI', () => {
 			return <LinkControl value={ link } />;
 		};
 
-		const { container } = render( <LinkControlConsumer /> );
+		render( <LinkControlConsumer /> );
 
 		const newTabSettingLabel = screen.getByText( expectedSettingText );
 		expect( newTabSettingLabel ).toBeVisible();
 
-		const newTabSettingLabelForAttr =
-			newTabSettingLabel.getAttribute( 'for' );
-		const newTabSettingInput = container.querySelector(
-			`#${ newTabSettingLabelForAttr }`
-		);
+		const newTabSettingInput = screen.getByRole( 'checkbox', {
+			name: expectedSettingText,
+			checked: false,
+		} );
+
 		expect( newTabSettingInput ).toBeVisible();
-		expect( newTabSettingInput ).not.toBeChecked();
 	} );
 
 	it( 'should display a setting control with correct default state for each of the custom settings provided', async () => {
