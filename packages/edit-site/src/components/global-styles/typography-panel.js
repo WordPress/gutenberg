@@ -109,7 +109,7 @@ function useStyleWithReset( path, blockName ) {
 	return [ style, setStyle, hasStyle, resetStyle ];
 }
 
-function useFontSizeStyleWithReset( path, blockName ) {
+function useFontSizeWithReset( path, blockName ) {
 	const [ fontSize, setStyleCallback ] = useStyle( path, blockName );
 	const [ userStyle ] = useStyle( path, blockName, 'user' );
 	const hasFontSize = () => !! userStyle;
@@ -200,7 +200,7 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
 	const [ fontFamily, setFontFamily, hasFontFamily, resetFontFamily ] =
 		useStyleWithReset( prefix + 'typography.fontFamily', name );
 	const { fontSize, setFontSize, hasFontSize, resetFontSize } =
-		useFontSizeStyleWithReset( prefix + 'typography.fontSize', name );
+		useFontSizeWithReset( prefix + 'typography.fontSize', name );
 	const {
 		fontStyle,
 		setFontStyle,
