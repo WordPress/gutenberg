@@ -755,7 +755,9 @@ describe( 'Default search suggestions', () => {
 		// Click the "Edit/Change" button and check initial suggestions are not
 		// shown.
 		const currentLinkUI = screen.getByLabelText( 'Currently selected' );
-		const currentLinkBtn = currentLinkUI.querySelector( 'button' );
+		const currentLinkBtn = within( currentLinkUI ).getByRole( 'button', {
+			name: 'Edit',
+		} );
 
 		await user.click( currentLinkBtn );
 
@@ -840,18 +842,16 @@ describe( 'Default search suggestions', () => {
 			Promise.resolve( noResults )
 		);
 
-		const { container } = render( <LinkControl showInitialSuggestions /> );
+		render( <LinkControl showInitialSuggestions /> );
 
 		await eventLoopTick();
 
 		const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
 
-		const searchResultsField = screen.queryByRole( 'listbox' );
-		const searchResultLabel = container.querySelector(
-			'.block-editor-link-control__search-results-label'
-		);
+		const searchResultsField = screen.queryByRole( 'listbox', {
+			name: 'Recently updated',
+		} );
 
-		expect( searchResultLabel ).not.toBeInTheDocument();
 		expect( searchResultsField ).not.toBeInTheDocument();
 
 		expect( searchInput ).toHaveAttribute( 'aria-expanded', 'false' );
@@ -976,7 +976,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			);
 		};
 
-		const { container } = render( <LinkControlConsumer /> );
+		render( <LinkControlConsumer /> );
 
 		// Search Input UI.
 		const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
@@ -987,10 +987,11 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 		await eventLoopTick();
 
-		// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
-		const searchResultElements = container.querySelectorAll(
-			'[role="listbox"] [role="option"]'
-		);
+		const searchResultElements = within(
+			screen.getByRole( 'listbox', {
+				name: /Search results for.*/,
+			} )
+		).getAllByRole( 'option' );
 
 		const createButton = Array.from( searchResultElements ).filter(
 			( result ) => result.innerHTML.includes( 'Create:' )
@@ -1031,7 +1032,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			);
 		};
 
-		const { container } = render( <LinkControlConsumer /> );
+		render( <LinkControlConsumer /> );
 
 		// Search Input UI.
 		const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
@@ -1042,10 +1043,11 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 		await eventLoopTick();
 
-		// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
-		const searchResultElements = container.querySelectorAll(
-			'[role="listbox"] [role="option"]'
-		);
+		const searchResultElements = within(
+			screen.getByRole( 'listbox', {
+				name: /Search results for.*/,
+			} )
+		).getAllByRole( 'option' );
 		const createButton = Array.from( searchResultElements ).filter(
 			( result ) => result.innerHTML.includes( 'Create:' )
 		)[ 0 ];
@@ -1079,7 +1081,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			);
 		};
 
-		const { container } = render( <LinkControlConsumer /> );
+		render( <LinkControlConsumer /> );
 
 		// Search Input UI.
 		const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
@@ -1090,10 +1092,11 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 		await eventLoopTick();
 
-		// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
-		const searchResultElements = container.querySelectorAll(
-			'[role="listbox"] [role="option"]'
-		);
+		const searchResultElements = within(
+			screen.getByRole( 'listbox', {
+				name: /Search results for.*/,
+			} )
+		).getAllByRole( 'option' );
 
 		const createButton = Array.from( searchResultElements ).filter(
 			( result ) => result.innerHTML.includes( 'Custom suggestion text' )
@@ -1106,9 +1109,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		it.each( [ [ undefined ], [ null ], [ false ] ] )(
 			'should not show not show an option to create an entity when "createSuggestion" handler is %s',
 			async ( handler ) => {
-				const { container } = render(
-					<LinkControl createSuggestion={ handler } />
-				);
+				render( <LinkControl createSuggestion={ handler } /> );
 
 				// Await the initial suggestions to be fetched.
 				await eventLoopTick();
@@ -1118,22 +1119,16 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 					name: 'URL',
 				} );
 
-				// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
-				const searchResultElements = container.querySelectorAll(
-					'[role="listbox"] [role="option"]'
-				);
-				const createButton = Array.from( searchResultElements ).filter(
-					( result ) => result.innerHTML.includes( 'Create:' )
-				)[ 0 ];
+				const searchResultsField = screen.queryByRole( 'listbox' );
 
 				// Verify input has no value.
 				expect( searchInput ).toHaveValue( '' );
-				expect( createButton ).toBeFalsy(); // Shouldn't exist!
+				expect( searchResultsField ).not.toBeInTheDocument(); // Shouldn't exist!
 			}
 		);
 
 		it( 'should not show not show an option to create an entity when input is empty', async () => {
-			const { container } = render(
+			render(
 				<LinkControl
 					showInitialSuggestions={ true } // Should show even if we're not showing initial suggestions.
 					createSuggestion={ jest.fn() }
@@ -1146,17 +1141,11 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			// Search Input UI.
 			const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
 
-			// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
-			const searchResultElements = container.querySelectorAll(
-				'[role="listbox"] [role="option"]'
-			);
-			const createButton = Array.from( searchResultElements ).filter(
-				( result ) => result.innerHTML.includes( 'New page' )
-			)[ 0 ];
+			const searchResultsField = screen.queryByRole( 'listbox' );
 
 			// Verify input has no value.
 			expect( searchInput ).toHaveValue( '' );
-			expect( createButton ).toBeFalsy(); // Shouldn't exist!
+			expect( searchResultsField ).not.toBeInTheDocument(); // Shouldn't exist!
 		} );
 
 		it.each( [
@@ -1169,9 +1158,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			'should not show option to "Create Page" when text is a form of direct entry (eg: %s)',
 			async ( inputText ) => {
 				const user = userEvent.setup();
-				const { container } = render(
-					<LinkControl createSuggestion={ jest.fn() } />
-				);
+				render( <LinkControl createSuggestion={ jest.fn() } /> );
 
 				// Search Input UI.
 				const searchInput = screen.getByRole( 'combobox', {
@@ -1184,10 +1171,11 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 				await eventLoopTick();
 
-				// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
-				const searchResultElements = container.querySelectorAll(
-					'[role="listbox"] [role="option"]'
-				);
+				const searchResultElements = within(
+					screen.getByRole( 'listbox', {
+						name: /Search results for.*/,
+					} )
+				).getAllByRole( 'option' );
 
 				const createButton = Array.from( searchResultElements ).filter(
 					( result ) => result.innerHTML.includes( 'New page' )
@@ -1223,11 +1211,12 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 			await eventLoopTick();
 
-			// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
-			let searchResultElements = container.querySelectorAll(
-				'[role="listbox"] [role="option"]'
-			);
-			let createButton = Array.from( searchResultElements ).filter(
+			const searchResultElements = within(
+				screen.getByRole( 'listbox', {
+					name: /Search results for.*/,
+				} )
+			).getAllByRole( 'option' );
+			const createButton = Array.from( searchResultElements ).filter(
 				( result ) => result.innerHTML.includes( 'Create:' )
 			)[ 0 ];
 
@@ -1257,14 +1246,6 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			// Verify input is repopulated with original search text.
 			expect( searchInput ).toBeVisible();
 			expect( searchInput ).toHaveValue( searchText );
-
-			// Verify search results are re-shown and create button is available.
-			searchResultElements = container.querySelectorAll(
-				'[role="listbox"] [role="option"]'
-			);
-			createButton = Array.from( searchResultElements ).filter(
-				( result ) => result.innerHTML.includes( 'New page' )
-			)[ 0 ];
 		} );
 	} );
 } );
