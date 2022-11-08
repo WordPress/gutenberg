@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 
 export type ThemeInputValues = {
 	/**
-	 * Used to set the accent color (used by components as the primary color).
+	 * The accent color (used by components as the primary color).
 	 *
 	 * If an accent color is not defined, the default fallback value is the original
 	 * WP Admin main theme color. No all valid CSS color syntaxes are supported —
@@ -15,7 +15,17 @@ export type ThemeInputValues = {
 	 */
 	accent?: string;
 	/**
-	 * TODO: Write description
+	 * The background color.
+	 *
+	 * If a component explicitly has a background, it will be use this color.
+	 * Otherwise, this color will simply be used to determine what the foreground colors should be.
+	 * The actual background color will need to be set on the component's container element.
+	 *
+	 * If a background color is not defined, the default fallback value is #fff.
+	 * No all valid CSS color syntaxes are supported —
+	 * in particular, keywords (like `'currentcolor'`, `'inherit'`, `'initial'`,
+	 * `'revert'`, `'unset'`...) and CSS custom properties (e.g.
+	 * `var(--my-custom-property)`) are _not_ supported values for this property.
 	 */
 	background?: string;
 };
