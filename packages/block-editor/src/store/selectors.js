@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, reduce, find, filter, orderBy } from 'lodash';
+import { map, find, filter, orderBy } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -273,14 +273,10 @@ export const getGlobalBlockCount = createSelector(
 		if ( ! blockName ) {
 			return clientIds.length;
 		}
-		return reduce(
-			clientIds,
-			( accumulator, clientId ) => {
-				const block = state.blocks.byClientId[ clientId ];
-				return block.name === blockName ? accumulator + 1 : accumulator;
-			},
-			0
-		);
+		return clientIds.reduce( ( accumulator, clientId ) => {
+			const block = state.blocks.byClientId[ clientId ];
+			return block.name === blockName ? accumulator + 1 : accumulator;
+		}, 0 );
 	},
 	( state ) => [ state.blocks.order, state.blocks.byClientId ]
 );
@@ -1272,6 +1268,17 @@ export function getBlockMode( state, clientId ) {
  */
 export function isTyping( state ) {
 	return state.isTyping;
+}
+
+/**
+ * Returns true if the the block interface should be hidden, or false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the block toolbar is hidden.
+ */
+export function __experimentalIsBlockInterfaceHidden( state ) {
+	return state.isBlockInterfaceHidden;
 }
 
 /**

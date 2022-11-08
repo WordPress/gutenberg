@@ -223,7 +223,7 @@ function UnforwardedColorPalette(
 		clearable = true,
 		colors = [],
 		disableCustomColors = false,
-		enableAlpha,
+		enableAlpha = false,
 		onChange,
 		value,
 		__experimentalHasMultipleOrigins = false,

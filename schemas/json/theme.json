@@ -188,6 +188,22 @@
 				}
 			}
 		},
+		"settingsPropertiesDimensions": {
+			"properties": {
+				"dimensions": {
+					"description": "Settings related to dimensions.",
+					"type": "object",
+					"properties": {
+						"minHeight": {
+							"description": "Allow users to set custom minimum height.",
+							"type": "boolean",
+							"default": false
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
 		"settingsPropertiesLayout": {
 			"type": "object",
 			"properties": {

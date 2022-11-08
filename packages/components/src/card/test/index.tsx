@@ -18,7 +18,7 @@ import {
 describe( 'Card', () => {
 	describe( 'Card component', () => {
 		it( 'should render correctly', () => {
-			const wrapper = render(
+			const { container } = render(
 				<Card>
 					<CardHeader>Card Header</CardHeader>
 					<CardBody>Card Body 1</CardBody>
@@ -34,7 +34,7 @@ describe( 'Card', () => {
 					<CardFooter>Card Footer</CardFooter>
 				</Card>
 			);
-			expect( wrapper ).toMatchSnapshot();
+			expect( container ).toMatchSnapshot();
 		} );
 
 		it( 'should remove borders when the isBorderless prop is true', () => {

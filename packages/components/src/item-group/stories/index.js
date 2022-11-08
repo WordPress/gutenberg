@@ -150,7 +150,7 @@ const ItemWithChevron = ( {
 
 	const itemClassName = useMemo(
 		() => cx( ! alwaysVisible && appearingChevron, className ),
-		[ alwaysVisible, className, cx ]
+		[ alwaysVisible, className, cx, appearingChevron ]
 	);
 
 	const chevronIconClassName = useMemo(

@@ -196,7 +196,7 @@ describe( 'ToggleGroupControl', () => {
 				);
 
 				await user.click(
-					await screen.getByRole( 'button', {
+					screen.getByRole( 'button', {
 						name: 'R',
 						pressed: true,
 					} )
