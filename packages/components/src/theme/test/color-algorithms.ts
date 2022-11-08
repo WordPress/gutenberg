@@ -31,6 +31,11 @@ describe( 'Theme color algorithms', () => {
 			// eslint-disable-next-line no-console
 			expect( console.warn ).toHaveBeenCalledTimes( 2 );
 		} );
+
+		it( 'should warn if standard foreground colors are not readable against background', () => {
+			validateInputs( { background: '#777' } );
+			expect( console ).toHaveWarned();
+		} );
 	} );
 
 	describe( 'generateShades', () => {

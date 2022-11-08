@@ -40,15 +40,26 @@ export function validateInputs( inputs: ThemeInputValues ) {
 		}
 	}
 
-	if (
-		inputs.background &&
-		! colord( inputs.background ).isReadable(
-			inputs.accent || COLORS.ui.theme
-		)
-	) {
-		warning(
-			`wp.components.Theme: The background color provided ("${ inputs.background }") does not have sufficient contrast against the accent color ("${ inputs.accent }").`
-		);
+	if ( inputs.background ) {
+		if (
+			! colord( inputs.background ).isReadable(
+				inputs.accent || COLORS.ui.theme
+			)
+		) {
+			warning(
+				`wp.components.Theme: The background color provided ("${ inputs.background }") does not have sufficient contrast against the accent color ("${ inputs.accent }").`
+			);
+		}
+
+		if (
+			! colord( inputs.background ).isReadable(
+				getForegroundForColor( inputs.background )
+			)
+		) {
+			warning(
+				`wp.components.Theme: The background color provided ("${ inputs.background }") does not have sufficient contrast against the standard foreground colors.`
+			);
+		}
 	}
 }
 
