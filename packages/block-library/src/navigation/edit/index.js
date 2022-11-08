@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import { useState, useEffect, useRef, Platform } from '@wordpress/element';
 import { addQueryArgs } from '@wordpress/url';
 import {
+	__experimentalOffCanvasEditor as OffCanvasEditor,
 	InspectorControls,
 	useBlockProps,
 	__experimentalRecursionProvider as RecursionProvider,
@@ -82,6 +83,9 @@ function Navigation( {
 	hasColorSettings = true,
 	customPlaceholder: CustomPlaceholder = null,
 } ) {
+	const isOffCanvasNavigationEditorEnabled =
+		window?.__experimentalEnableOffCanvasNavigationEditor === true;
+
 	const {
 		openSubmenusOnClick,
 		overlayMenu,
@@ -676,18 +680,27 @@ function Navigation( {
 							/* translators: %s: The name of a menu. */
 							actionLabel={ __( "Switch to '%s'" ) }
 						/>
-						<Button
-							variant="link"
-							disabled={
-								! hasManagePermissions ||
-								! hasResolvedNavigationMenus
-							}
-							href={ addQueryArgs( 'edit.php', {
-								post_type: 'wp_navigation',
-							} ) }
-						>
-							{ __( 'Manage menus' ) }
-						</Button>
+						{ isOffCanvasNavigationEditorEnabled && (
+							<OffCanvasEditor
+								blocks={ innerBlocks }
+								isExpanded={ true }
+								selectBlockInCanvas={ false }
+							/>
+						) }
+						{ ! isOffCanvasNavigationEditorEnabled && (
+							<Button
+								variant="link"
+								disabled={
+									! hasManagePermissions ||
+									! hasResolvedNavigationMenus
+								}
+								href={ addQueryArgs( 'edit.php', {
+									post_type: 'wp_navigation',
+								} ) }
+							>
+								{ __( 'Manage menus' ) }
+							</Button>
+						) }
 					</PanelBody>
 				</InspectorControls>
 				{ stylingInspectorControls }
@@ -759,18 +772,20 @@ function Navigation( {
 							/* translators: %s: The name of a menu. */
 							actionLabel={ __( "Switch to '%s'" ) }
 						/>
-						<Button
-							variant="link"
-							disabled={
-								! hasManagePermissions ||
-								! hasResolvedNavigationMenus
-							}
-							href={ addQueryArgs( 'edit.php', {
-								post_type: 'wp_navigation',
-							} ) }
-						>
-							{ __( 'Manage menus' ) }
-						</Button>
+						{ ! isOffCanvasNavigationEditorEnabled && (
+							<Button
+								variant="link"
+								disabled={
+									! hasManagePermissions ||
+									! hasResolvedNavigationMenus
+								}
+								href={ addQueryArgs( 'edit.php', {
+									post_type: 'wp_navigation',
+								} ) }
+							>
+								{ __( 'Manage menus' ) }
+							</Button>
+						) }
 					</PanelBody>
 				</InspectorControls>
 				<Warning>
@@ -877,18 +892,27 @@ function Navigation( {
 							/* translators: %s: The name of a menu. */
 							actionLabel={ __( "Switch to '%s'" ) }
 						/>
-						<Button
-							variant="link"
-							disabled={
-								! hasManagePermissions ||
-								! hasResolvedNavigationMenus
-							}
-							href={ addQueryArgs( 'edit.php', {
-								post_type: 'wp_navigation',
-							} ) }
-						>
-							{ __( 'Manage menus' ) }
-						</Button>
+						{ isOffCanvasNavigationEditorEnabled && (
+							<OffCanvasEditor
+								blocks={ innerBlocks }
+								isExpanded={ true }
+								selectBlockInCanvas={ false }
+							/>
+						) }
+						{ ! isOffCanvasNavigationEditorEnabled && (
+							<Button
+								variant="link"
+								disabled={
+									! hasManagePermissions ||
+									! hasResolvedNavigationMenus
+								}
+								href={ addQueryArgs( 'edit.php', {
+									post_type: 'wp_navigation',
+								} ) }
+							>
+								{ __( 'Manage menus' ) }
+							</Button>
+						) }
 					</PanelBody>
 				</InspectorControls>
 				{ stylingInspectorControls }
@@ -915,6 +939,21 @@ function Navigation( {
 									} }
 								/>
 							) }
+						{ isOffCanvasNavigationEditorEnabled && (
+							<Button
+								variant="link"
+								className="wp-block-navigation-manage-menus-button"
+								disabled={
+									! hasManagePermissions ||
+									! hasResolvedNavigationMenus
+								}
+								href={ addQueryArgs( 'edit.php', {
+									post_type: 'wp_navigation',
+								} ) }
+							>
+								{ __( 'Manage menus' ) }
+							</Button>
+						) }
 					</InspectorControls>
 				) }
 
