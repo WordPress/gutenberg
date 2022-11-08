@@ -144,6 +144,7 @@ module.exports = {
 							'partial',
 							'partialRight',
 							'random',
+							'reduce',
 							'reject',
 							'repeat',
 							'reverse',
@@ -327,12 +328,12 @@ module.exports = {
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-unit' ],
 		},
 		{
-			files: [ '**/test/**/*.js' ],
+			files: [ '**/test/**/*.[tj]s?(x)' ],
 			excludedFiles: [
-				'**/*.@(android|ios|native).js',
-				'packages/react-native-*/**/*.js',
-				'test/native/**/*.js',
-				'test/e2e/**/*.[tj]s',
+				'**/*.@(android|ios|native).[tj]s?(x)',
+				'packages/react-native-*/**/*.[tj]s?(x)',
+				'test/native/**/*.[tj]s?(x)',
+				'test/e2e/**/*.[tj]s?(x)',
 			],
 			extends: [
 				'plugin:jest-dom/recommended',

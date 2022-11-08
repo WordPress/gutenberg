@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -92,11 +92,11 @@ describe( 'Text', () => {
 	} );
 
 	test( 'should render highlighted words', async () => {
-		const wrapper = render(
+		const { container } = render(
 			<Text highlightWords={ [ 'm' ] }>Lorem ipsum.</Text>
 		);
-		expect( wrapper.container.firstChild?.childNodes ).toHaveLength( 5 );
-		const words = await wrapper.findAllByText( 'm' );
+		expect( container.firstChild?.childNodes ).toHaveLength( 5 );
+		const words = await screen.findAllByText( 'm' );
 		expect( words ).toHaveLength( 2 );
 		words.forEach( ( word ) => expect( word.tagName ).toEqual( 'MARK' ) );
 	} );
