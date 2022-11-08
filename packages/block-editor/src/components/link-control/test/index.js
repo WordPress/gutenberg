@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -83,18 +83,6 @@ afterEach( () => {
 
 function getURLInput() {
 	return screen.queryByRole( 'combobox', { name: 'URL' } );
-}
-
-function getSearchResults( container ) {
-	const input = getURLInput();
-	// The input has `aria-controls` to indicate that it owns (and is related to)
-	// the search results with `role="listbox"`.
-	const relatedSelector = input.getAttribute( 'aria-controls' );
-
-	// Select by relationship as well as role.
-	return container.querySelectorAll(
-		`#${ relatedSelector }[role="listbox"] [role="option"]`
-	);
 }
 
 function getCurrentLink() {
@@ -338,7 +326,7 @@ describe( 'Searching for a link', () => {
 
 		mockFetchSearchSuggestions.mockImplementation( fauxRequest );
 
-		const { container } = render( <LinkControl /> );
+		render( <LinkControl /> );
 
 		// Search Input UI.
 		const searchInput = getURLInput();
@@ -350,11 +338,11 @@ describe( 'Searching for a link', () => {
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 		await eventLoopTick();
 
-		const searchResultElements = getSearchResults( container );
+		const searchResultsField = screen.queryByRole( 'listbox' );
 
 		let loadingUI = screen.queryByRole( 'presentation' );
 
-		expect( searchResultElements ).toHaveLength( 0 );
+		expect( searchResultsField ).not.toBeInTheDocument();
 
 		expect( loadingUI ).toBeVisible();
 
@@ -374,7 +362,7 @@ describe( 'Searching for a link', () => {
 		const searchTerm = 'Hello world';
 		const firstFauxSuggestion = fauxEntitySuggestions[ 0 ];
 
-		const { container } = render( <LinkControl /> );
+		render( <LinkControl /> );
 
 		// Search Input UI.
 		const searchInput = getURLInput();
@@ -386,7 +374,11 @@ describe( 'Searching for a link', () => {
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 		await eventLoopTick();
 
-		const searchResultElements = getSearchResults( container );
+		const searchResultElements = within(
+			screen.getByRole( 'listbox', {
+				name: /Search results for.*/,
+			} )
+		).getAllByRole( 'option' );
 
 		expect( searchResultElements ).toHaveLength(
 			fauxEntitySuggestions.length
@@ -453,9 +445,7 @@ describe( 'Searching for a link', () => {
 
 	it( 'should not call search handler when showSuggestions is false', async () => {
 		const user = userEvent.setup();
-		const { container } = render(
-			<LinkControl showSuggestions={ false } />
-		);
+		render( <LinkControl showSuggestions={ false } /> );
 
 		// Search Input UI.
 		const searchInput = getURLInput();
@@ -464,12 +454,12 @@ describe( 'Searching for a link', () => {
 		searchInput.focus();
 		await user.keyboard( 'anything' );
 
-		const searchResultElements = getSearchResults( container );
+		const searchResultsField = screen.queryByRole( 'listbox' );
 
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 		await eventLoopTick();
 
-		expect( searchResultElements ).toHaveLength( 0 );
+		expect( searchResultsField ).not.toBeInTheDocument();
 		expect( mockFetchSearchSuggestions ).not.toHaveBeenCalled();
 	} );
 
@@ -480,7 +470,7 @@ describe( 'Searching for a link', () => {
 		'should display a URL suggestion as a default fallback for the search term "%s" which could potentially be a valid url.',
 		async ( searchTerm ) => {
 			const user = userEvent.setup();
-			const { container } = render( <LinkControl /> );
+			render( <LinkControl /> );
 
 			// Search Input UI.
 			const searchInput = getURLInput();
@@ -492,7 +482,11 @@ describe( 'Searching for a link', () => {
 			// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 			await eventLoopTick();
 
-			const searchResultElements = getSearchResults( container );
+			const searchResultElements = within(
+				screen.getByRole( 'listbox', {
+					name: /Search results for.*/,
+				} )
+			).getAllByRole( 'option' );
 
 			const lastSearchResultItem =
 				searchResultElements[ searchResultElements.length - 1 ];
@@ -514,7 +508,7 @@ describe( 'Searching for a link', () => {
 
 	it( 'should not display a URL suggestion as a default fallback when noURLSuggestion is passed.', async () => {
 		const user = userEvent.setup();
-		const { container } = render( <LinkControl noURLSuggestion /> );
+		render( <LinkControl noURLSuggestion /> );
 
 		// Search Input UI.
 		const searchInput = getURLInput();
@@ -526,7 +520,11 @@ describe( 'Searching for a link', () => {
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 		await eventLoopTick();
 
-		const searchResultElements = getSearchResults( container );
+		const searchResultElements = within(
+			screen.getByRole( 'listbox', {
+				name: /Search results for.*/,
+			} )
+		).getAllByRole( 'option' );
 
 		// We should see a search result for each of the expect search suggestions and nothing else.
 		expect( searchResultElements ).toHaveLength(
@@ -544,7 +542,7 @@ describe( 'Manual link entry', () => {
 		'should display a single suggestion result when the current input value is URL-like (eg: %s)',
 		async ( searchTerm ) => {
 			const user = userEvent.setup();
-			const { container } = render( <LinkControl /> );
+			render( <LinkControl /> );
 
 			// Search Input UI.
 			const searchInput = getURLInput();
@@ -556,12 +554,16 @@ describe( 'Manual link entry', () => {
 			// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 			await eventLoopTick();
 
-			const searchResultElements = getSearchResults( container );
+			const searchResultElements = within(
+				screen.getByRole( 'listbox', {
+					name: /Search results for.*/,
+				} )
+			).getByRole( 'option' );
 
-			expect( searchResultElements ).toHaveLength( 1 );
-			expect( searchResultElements[ 0 ] ).toHaveTextContent( searchTerm );
-			expect( searchResultElements[ 0 ] ).toHaveTextContent( 'URL' );
-			expect( searchResultElements[ 0 ] ).toHaveTextContent(
+			expect( searchResultElements ).toBeVisible();
+			expect( searchResultElements ).toHaveTextContent( searchTerm );
+			expect( searchResultElements ).toHaveTextContent( 'URL' );
+			expect( searchResultElements ).toHaveTextContent(
 				'Press ENTER to add this link'
 			);
 		}
@@ -671,7 +673,7 @@ describe( 'Manual link entry', () => {
 			'should recognise "%s" as a %s link and handle as manual entry by displaying a single suggestion',
 			async ( searchTerm, searchType ) => {
 				const user = userEvent.setup();
-				const { container } = render( <LinkControl /> );
+				render( <LinkControl /> );
 
 				// Search Input UI.
 				const searchInput = getURLInput();
@@ -683,16 +685,16 @@ describe( 'Manual link entry', () => {
 				// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 				await eventLoopTick();
 
-				const searchResultElements = getSearchResults( container );
+				const searchResultElements = within(
+					screen.getByRole( 'listbox', {
+						name: /Search results for.*/,
+					} )
+				).getByRole( 'option' );
 
-				expect( searchResultElements ).toHaveLength( 1 );
-				expect( searchResultElements[ 0 ] ).toHaveTextContent(
-					searchTerm
-				);
-				expect( searchResultElements[ 0 ] ).toHaveTextContent(
-					searchType
-				);
-				expect( searchResultElements[ 0 ] ).toHaveTextContent(
+				expect( searchResultElements ).toBeVisible();
+				expect( searchResultElements ).toHaveTextContent( searchTerm );
+				expect( searchResultElements ).toHaveTextContent( searchType );
+				expect( searchResultElements ).toHaveTextContent(
 					'Press ENTER to add this link'
 				);
 			}
@@ -735,7 +737,7 @@ describe( 'Default search suggestions', () => {
 
 		// Render with an initial value an ensure that no initial suggestions
 		// are shown.
-		const { container } = render(
+		render(
 			<LinkControl
 				showInitialSuggestions
 				value={ fauxEntitySuggestions[ 0 ] }
@@ -758,7 +760,11 @@ describe( 'Default search suggestions', () => {
 
 		await eventLoopTick();
 
-		const searchResultElements = getSearchResults( container );
+		const searchResultElements = within(
+			screen.getByRole( 'listbox', {
+				name: /Search results for.*/,
+			} )
+		).getAllByRole( 'option' );
 
 		// Search input is set to the URL value.
 		expect( searchInput ).toHaveValue( fauxEntitySuggestions[ 0 ].url );
@@ -775,7 +781,7 @@ describe( 'Default search suggestions', () => {
 		const user = userEvent.setup();
 		const searchTerm = 'Hello world';
 
-		const { container } = render( <LinkControl showInitialSuggestions /> );
+		render( <LinkControl showInitialSuggestions /> );
 
 		let searchResultElements;
 		let searchInput;
@@ -792,14 +798,22 @@ describe( 'Default search suggestions', () => {
 
 		expect( searchInput ).toHaveValue( searchTerm );
 
-		searchResultElements = getSearchResults( container );
+		searchResultElements = within(
+			screen.getByRole( 'listbox', {
+				name: /Search results for.*/,
+			} )
+		).getAllByRole( 'option' );
 
 		// Delete the text.
 		await userEvent.clear( searchInput );
 
 		await eventLoopTick();
 
-		searchResultElements = getSearchResults( container );
+		searchResultElements = within(
+			screen.getByRole( 'listbox', {
+				name: 'Recently updated',
+			} )
+		).getAllByRole( 'option' );
 
 		searchInput = getURLInput();
 
@@ -828,15 +842,13 @@ describe( 'Default search suggestions', () => {
 
 		const searchInput = getURLInput();
 
-		const searchResultElements = getSearchResults( container );
-
+		const searchResultsField = screen.queryByRole( 'listbox' );
 		const searchResultLabel = container.querySelector(
 			'.block-editor-link-control__search-results-label'
 		);
 
 		expect( searchResultLabel ).not.toBeInTheDocument();
-
-		expect( searchResultElements ).toHaveLength( 0 );
+		expect( searchResultsField ).not.toBeInTheDocument();
 
 		expect( searchInput ).toHaveAttribute( 'aria-expanded', 'false' );
 	} );
@@ -1331,7 +1343,7 @@ describe( 'Selecting links', () => {
 					);
 				};
 
-				const { container } = render( <LinkControlConsumer /> );
+				render( <LinkControlConsumer /> );
 
 				// Search Input UI.
 				const searchInput = getURLInput();
@@ -1343,7 +1355,11 @@ describe( 'Selecting links', () => {
 				// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 				await eventLoopTick();
 
-				const searchResultElements = getSearchResults( container );
+				const searchResultElements = within(
+					screen.getByRole( 'listbox', {
+						name: /Search results for.*/,
+					} )
+				).getAllByRole( 'option' );
 
 				const firstSearchSuggestion = searchResultElements[ 0 ];
 
@@ -1408,7 +1424,11 @@ describe( 'Selecting links', () => {
 				// Step down into the search results, highlighting the first result item.
 				triggerArrowDown( searchInput );
 
-				const searchResultElements = getSearchResults( container );
+				const searchResultElements = within(
+					screen.getByRole( 'listbox', {
+						name: /Search results for.*/,
+					} )
+				).getAllByRole( 'option' );
 
 				const firstSearchSuggestion = searchResultElements[ 0 ];
 				const secondSearchSuggestion = searchResultElements[ 1 ];
@@ -1466,9 +1486,7 @@ describe( 'Selecting links', () => {
 		);
 
 		it( 'should allow selection of initial search results via the keyboard', async () => {
-			const { container } = render(
-				<LinkControl showInitialSuggestions />
-			);
+			render( <LinkControl showInitialSuggestions /> );
 
 			await eventLoopTick();
 
@@ -1486,7 +1504,11 @@ describe( 'Selecting links', () => {
 
 			await eventLoopTick();
 
-			const searchResultElements = getSearchResults( container );
+			const searchResultElements = within(
+				screen.getByRole( 'listbox', {
+					name: 'Recently updated',
+				} )
+			).getAllByRole( 'option' );
 
 			const firstSearchSuggestion = searchResultElements[ 0 ];
 			const secondSearchSuggestion = searchResultElements[ 1 ];
@@ -1595,7 +1617,7 @@ describe( 'Post types', () => {
 		const user = userEvent.setup();
 		const searchTerm = 'Hello world';
 
-		const { container } = render( <LinkControl /> );
+		render( <LinkControl /> );
 
 		// Search Input UI.
 		const searchInput = getURLInput();
@@ -1607,7 +1629,11 @@ describe( 'Post types', () => {
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 		await eventLoopTick();
 
-		const searchResultElements = getSearchResults( container );
+		const searchResultElements = within(
+			screen.getByRole( 'listbox', {
+				name: /Search results for.*/,
+			} )
+		).getAllByRole( 'option' );
 
 		searchResultElements.forEach( ( resultItem, index ) => {
 			expect( resultItem ).toHaveTextContent(
@@ -1622,9 +1648,7 @@ describe( 'Post types', () => {
 			const user = userEvent.setup();
 			const searchTerm = 'Hello world';
 
-			const { container } = render(
-				<LinkControl suggestionsQuery={ { type: postType } } />
-			);
+			render( <LinkControl suggestionsQuery={ { type: postType } } /> );
 
 			// Search Input UI.
 			const searchInput = getURLInput();
@@ -1636,7 +1660,11 @@ describe( 'Post types', () => {
 			// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 			await eventLoopTick();
 
-			const searchResultElements = getSearchResults( container );
+			const searchResultElements = within(
+				screen.getByRole( 'listbox', {
+					name: /Search results for.*/,
+				} )
+			).getAllByRole( 'option' );
 
 			searchResultElements.forEach( ( resultItem, index ) => {
 				expect(
