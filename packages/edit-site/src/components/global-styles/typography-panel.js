@@ -115,7 +115,6 @@ function useFontSizeStyleWithReset( path, blockName ) {
 	const hasFontSize = () => !! userStyle;
 	const resetFontSize = () => setStyleCallback( undefined );
 	const setFontSize = ( newValue, metadata ) => {
-		// Convert font size styles to fluid if fluid is activated.
 		if ( !! metadata?.slug ) {
 			newValue = `var:preset|font-size|${ metadata?.slug }`;
 		}
