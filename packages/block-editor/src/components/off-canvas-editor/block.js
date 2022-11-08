@@ -6,9 +6,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-/**
- * WordPress dependencies
- */
 import { hasBlockSupport } from '@wordpress/blocks';
 import {
 	__experimentalTreeGridCell as TreeGridCell,
