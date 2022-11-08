@@ -29,7 +29,7 @@ export function generateThemeVariables(
 // TODO: Add unit tests
 function validateInputs( inputs: ThemeInputValues ) {
 	for ( const [ key, value ] of Object.entries( inputs ) ) {
-		if ( ! colord( value ).isValid() ) {
+		if ( typeof value !== 'undefined' && ! colord( value ).isValid() ) {
 			// eslint-disable-next-line no-console
 			console.warn(
 				`wp.components.Theme: "${ value }" is not a valid color value for the '${ key }' prop.`
