@@ -24,23 +24,55 @@ jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
 
 jest.mock( '@wordpress/core-data' );
 
-// Find an enclosing popover around `element`, and then check if it's been
-// already positioned (by setting the `top` and `left` styles) by the
-// `@floating-ui/react` library's `useFloating` hook. This happens asynchronously
-// so the test code will need to wait for it.
-function isPopover( element ) {
-	if ( ! element ) {
-		return false;
-	}
+/**
+ * Whether the element has been positioned.
+ * True if `top` and `left` have been set, false otherwise.
+ *
+ * @param {Element} element Element to check.
+ * @return {boolean} True if positioned, false otherwise.
+ */
+function isElementPositioned( element ) {
+	const { getComputedStyle } = element.ownerDocument.defaultView;
 
-	const popover = element.closest( '.components-popover' );
-	if ( ! popover ) {
-		return false;
-	}
-
-	const { top, left } = popover.style;
-	return top !== '' && left !== '' ? 'positioned' : 'not-positioned';
+	const { top, left } = getComputedStyle( element );
+	return top !== '' && left !== '';
 }
+
+/**
+ * Custom jest matcher.
+ * Determines whether an element has been positioned or not.
+ *
+ * @param {Element} element Element to check.
+ * @return {Object} Matcher result
+ */
+function toBePositioned( element ) {
+	const isInDocument =
+		element.ownerDocument === element.getRootNode( { composed: true } );
+	const isPositioned = isInDocument && isElementPositioned( element );
+	return {
+		pass: isPositioned,
+		message: () => {
+			const is = isPositioned ? 'is' : 'is not';
+			return [
+				this.utils.matcherHint(
+					`${ this.isNot ? '.not' : '' }.toBePositioned`,
+					'element',
+					''
+				),
+				'',
+				`Received element ${ is } positioned${
+					isInDocument ? '' : ' (element is not in the document)'
+				}:`,
+				`  ${ this.utils.printReceived( element.cloneNode( false ) ) }`,
+			].join( '\n' );
+		},
+	};
+}
+
+// Register the custom matcher
+expect.extend( {
+	toBePositioned,
+} );
 
 describe( 'NavigationToggle', () => {
 	describe( 'when in full screen mode', () => {
@@ -61,10 +93,12 @@ describe( 'NavigationToggle', () => {
 			// The `NavigationToggle` component auto-focuses on mount, and that
 			// causes the button tooltip to appear and to be positioned relative
 			// to the button. It happens async and we need to wait for it.
-			await waitFor( () =>
-				expect(
-					isPopover( screen.getByText( 'Toggle navigation' ) )
-				).toBe( 'positioned' )
+			await waitFor(
+				() =>
+					expect(
+						screen.getByText( 'Toggle navigation' ).parentElement
+					).toBePositioned(),
+				{ timeout: 2000 } // It might take more than a second to position the popover.
 			);
 
 			const siteIcon = screen.getByAltText( 'Site Icon' );
@@ -87,10 +121,12 @@ describe( 'NavigationToggle', () => {
 			const { container } = render( <NavigationToggle /> );
 
 			// wait for the button tooltip to appear and to be positioned
-			await waitFor( () =>
-				expect(
-					isPopover( screen.getByText( 'Toggle navigation' ) )
-				).toBe( 'positioned' )
+			await waitFor(
+				() =>
+					expect(
+						screen.getByText( 'Toggle navigation' ).parentElement
+					).toBePositioned(),
+				{ timeout: 2000 } // It might take more than a second to position the popover.
 			);
 
 			expect(
