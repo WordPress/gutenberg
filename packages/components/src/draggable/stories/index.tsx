@@ -20,11 +20,12 @@ const meta: ComponentMeta< typeof Draggable > = {
 	title: 'Components/Draggable',
 	argTypes: {
 		elementId: { control: { type: null } },
+		__experimentalDragComponent: { control: { type: null } },
 	},
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
-		docs: { source: { state: 'open' } },
+		docs: { source: { code: '' } },
 	},
 };
 export default meta;
