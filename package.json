@@ -82,6 +82,9 @@
 		"@wordpress/warning": "file:packages/warning",
 		"@wordpress/widgets": "file:packages/widgets",
 		"@wordpress/wordcount": "file:packages/wordcount",
+		"chokidar": "3.5.3",
+		"express": "4.18.2",
+		"express-ws": "5.0.2",
 		"wicg-inert": "3.1.2"
 	},
 	"devDependencies": {
