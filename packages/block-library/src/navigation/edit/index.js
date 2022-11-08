@@ -267,7 +267,6 @@ function Navigation( {
 		__unstableMarkNextChangeAsNotPersistent();
 		setRef( fallbackNavigationMenus[ 0 ].id );
 	}, [
-		navigationMenus,
 		ref,
 		isCreatingNavigationMenu,
 		fallbackNavigationMenus,
