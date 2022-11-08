@@ -1,5 +1,7 @@
 # Migration guide
 
+This document outlines a typical flow of migrating a Jest + Puppeteer test to Playwright. Note that the migration process is also a good opportunity to refactor or rewrite parts of the tests. Please read the [best practices](https://github.com/WordPress/gutenberg/tree/HEAD/docs/contributors/code/e2e/README.md#best-practices) guide before starting the migration.
+
 ## Migration steps for tests
 
 1. Choose a test suite to migrate in `packages/e2e-tests/specs`, rename `.test.js` into `.spec.js` and put it in the same folder structure inside `test/e2e/specs`.
@@ -24,12 +26,17 @@
         },
     } );
     ```
-7. If there's a missing util, go ahead and [migrate it](#migration-steps-for-test-utils).
-8. Manually migrate other details in the tests following the proposed [best practices](https://github.com/WordPress/gutenberg/tree/HEAD/test/e2e/README.md#best-practices). Note that even though the differences in the API of Playwright and Puppeteer are similar, some manual changes are still required.
+7. If there's a missing util, try inline the operations directly in the test if there are only a few steps. If you think it deserves to be implemented as a test util, then follow the [guide](#migration-steps-for-test-utils) below.
+8. Manually migrate other details in the tests following the proposed [best practices](https://github.com/WordPress/gutenberg/tree/HEAD/docs/contributors/code/e2e/README.md#best-practices). Note that even though the differences in the API of Playwright and Puppeteer are similar, some manual changes are still required.
 
 ## Migration steps for test utils
 
-Playwright utilities are organized a little differently to those in the `e2e-test-utils` package. The `e2e-test-utils-playwright` package has the following folders that utils are divided up into:
+Before migrating a test utility function, think twice about whether it's necessary. Playwright offers a lot of readable and powerful APIs which make a lot of the utils obsolete. Try implementing the same thing inline directly in the test first. Only follow the below guide if that doesn't work for you. Some examples of utils that deserve to be implemented in the `e2e-test-utils-playwright` package include complex browser APIs (like `pageUtils.dragFiles` and `pageUtils.pressKeyWithModifier`) and APIs that set states (`requestUtils.*`).
+
+> **Note**
+> The `e2e-test-utils-playwright` package is not meant to be a drop-in replacement of the Jest + Puppeteer's `e2e-test-utils` package. Some utils are only created to ease the migration process, but they are not necessarily required.
+
+Playwright utilities are organized a little differently from those in the `e2e-test-utils` package. The `e2e-test-utils-playwright` package has the following folders that utils are divided up into:
 - `admin` - Utilities related to WordPress admin or WordPress admin's user interface (e.g. `visitAdminPage`).
 - `editor` - Utilities for the block editor (e.g. `clickBlockToolbarButton`).
 - `pageUtils` - General utilities for interacting with the browser (e.g. `pressKeyWithModifier`).
