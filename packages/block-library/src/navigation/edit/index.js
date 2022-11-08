@@ -6,7 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useRef, Platform } from '@wordpress/element';
+import {
+	useState,
+	useEffect,
+	useRef,
+	Platform,
+	memo,
+} from '@wordpress/element';
 import { addQueryArgs } from '@wordpress/url';
 import {
 	__experimentalOffCanvasEditor as OffCanvasEditor,
@@ -230,8 +236,9 @@ function Navigation( {
 		classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_PENDING;
 
 	// Only autofallback to published menus.
-	const fallbackNavigationMenus = navigationMenus?.filter(
-		( menu ) => menu.status === 'publish'
+	const fallbackNavigationMenus = memo(
+		() => navigationMenus?.filter( ( menu ) => menu.status === 'publish' ),
+		[ navigationMenus ]
 	);
 
 	// Attempt to retrieve and prioritize any existing navigation menu unless:
