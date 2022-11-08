@@ -6,6 +6,11 @@ import a11yPlugin from 'colord/plugins/a11y';
 import namesPlugin from 'colord/plugins/names';
 
 /**
+ * WordPress dependencies
+ */
+import warning from '@wordpress/warning';
+
+/**
  * Internal dependencies
  */
 import type { ThemeInputValues, ThemeOutputValues } from './types';
@@ -26,12 +31,10 @@ export function generateThemeVariables(
 	};
 }
 
-// TODO: Add unit tests
-function validateInputs( inputs: ThemeInputValues ) {
+export function validateInputs( inputs: ThemeInputValues ) {
 	for ( const [ key, value ] of Object.entries( inputs ) ) {
 		if ( typeof value !== 'undefined' && ! colord( value ).isValid() ) {
-			// eslint-disable-next-line no-console
-			console.warn(
+			warning(
 				`wp.components.Theme: "${ value }" is not a valid color value for the '${ key }' prop.`
 			);
 		}
@@ -43,8 +46,7 @@ function validateInputs( inputs: ThemeInputValues ) {
 			inputs.accent || COLORS.ui.theme
 		)
 	) {
-		// eslint-disable-next-line no-console
-		console.warn(
+		warning(
 			`wp.components.Theme: The background color provided ("${ inputs.background }") does not have sufficient contrast against the accent color ("${ inputs.accent }").`
 		);
 	}
@@ -78,8 +80,7 @@ function getForegroundForColor( color: string ) {
 	return colord( color ).isDark() ? COLORS.white : COLORS.gray[ 900 ];
 }
 
-// TODO: Add unit test so the result of this matches the default case (#fff to #1e1e1e)
-function generateShades( background: string, foreground: string ) {
+export function generateShades( background: string, foreground: string ) {
 	// How much darkness you need to add to #fff to get the COLORS.gray[n] color
 	const SHADES = {
 		100: 0.06,
