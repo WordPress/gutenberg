@@ -93,7 +93,7 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 					containerWidth={ sizes.width }
 					isAdaptiveWidth={ isAdaptiveWidth }
 				/>
-				<HStack spacing={ 1 }>{ children }</HStack>
+				<HStack spacing={ 2 }>{ children }</HStack>
 			</View>
 		</ToggleGroupControlContext.Provider>
 	);
