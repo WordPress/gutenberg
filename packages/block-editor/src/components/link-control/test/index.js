@@ -1198,9 +1198,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 			const createSuggestion = () => Promise.reject( throwsError() );
 
-			const { container } = render(
-				<LinkControl createSuggestion={ createSuggestion } />
-			);
+			render( <LinkControl createSuggestion={ createSuggestion } /> );
 
 			// Search Input UI.
 			searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
@@ -1226,21 +1224,17 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 			searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
 
-			// This is a Notice component
-			// we allow selecting by className here as an edge case because the
-			// a11y is handled via `speak`.
-			// See: https://github.com/WordPress/gutenberg/tree/HEAD/packages/a11y#speak.
-			const errorNotice = container.querySelector(
-				'.block-editor-link-control__search-error'
-			);
+			const errorNotice = screen.getAllByText(
+				'API response returned invalid entity.'
+			)[ 1 ];
 
 			// Catch the error in the test to avoid test failures.
 			expect( throwsError ).toThrow( Error );
 
 			// Check human readable error notice is perceivable.
 			expect( errorNotice ).toBeVisible();
-			expect( errorNotice ).toHaveTextContent(
-				'API response returned invalid entity'
+			expect( errorNotice.parentElement ).toHaveClass(
+				'block-editor-link-control__search-error'
 			);
 
 			// Verify input is repopulated with original search text.
@@ -1293,7 +1287,9 @@ describe( 'Selecting links', () => {
 
 		// Required in order to select the button below.
 		let currentLinkUI = screen.getByLabelText( 'Currently selected' );
-		const currentLinkBtn = currentLinkUI.querySelector( 'button' );
+		const currentLinkBtn = within( currentLinkUI ).getByRole( 'button', {
+			name: 'Edit',
+		} );
 
 		// Simulate searching for a term.
 		await user.click( currentLinkBtn );
@@ -1809,11 +1805,11 @@ describe( 'Rich link previews', () => {
 		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
 		expect( isRichLinkPreview ).toBe( true );
 
-		const titlePreview = linkPreview.querySelector(
-			'.block-editor-link-control__search-item-title'
-		);
+		const titlePreview = screen.getByText( selectedLink.title );
 
-		expect( titlePreview ).toHaveTextContent( selectedLink.title );
+		expect( titlePreview ).toHaveClass(
+			'block-editor-link-control__search-item-title'
+		);
 	} );
 
 	it( 'should display a fallback when icon is missing from rich data', async () => {
