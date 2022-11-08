@@ -26,9 +26,6 @@ import { sprintf, __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-/**
- * Internal dependencies
- */
 import ListViewLeaf from './leaf';
 import {
 	BlockMoverUpButton,
