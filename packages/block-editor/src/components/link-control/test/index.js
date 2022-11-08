@@ -85,10 +85,6 @@ function getURLInput() {
 	return screen.queryByRole( 'combobox', { name: 'URL' } );
 }
 
-function getCurrentLink() {
-	return screen.queryByLabelText( 'Currently selected' );
-}
-
 /**
  * Workaround to trigger an arrow up keypress event.
  *
@@ -266,7 +262,7 @@ describe( 'Basic rendering', () => {
 				/>
 			);
 
-			const linkPreview = getCurrentLink();
+			const linkPreview = screen.getByLabelText( 'Currently selected' );
 
 			const isPreviewError = linkPreview.classList.contains( 'is-error' );
 			expect( isPreviewError ).toBe( true );
@@ -746,7 +742,7 @@ describe( 'Default search suggestions', () => {
 
 		// Click the "Edit/Change" button and check initial suggestions are not
 		// shown.
-		const currentLinkUI = getCurrentLink();
+		const currentLinkUI = screen.getByLabelText( 'Currently selected' );
 		const currentLinkBtn = currentLinkUI.querySelector( 'button' );
 
 		await user.click( currentLinkBtn );
@@ -927,7 +923,8 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			const loadingIndicator = container.querySelector(
 				'.block-editor-link-control__loading'
 			);
-			const currentLinkLabel = getCurrentLink();
+			const currentLinkLabel =
+				screen.queryByLabelText( 'Currently selected' );
 
 			expect( currentLinkLabel ).not.toBeInTheDocument();
 			expect( loadingIndicator ).toHaveTextContent( 'Creating' );
@@ -939,7 +936,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 			await eventLoopTick();
 
-			const currentLink = getCurrentLink();
+			const currentLink = screen.getByLabelText( 'Currently selected' );
 
 			expect( currentLink ).toHaveTextContent( entityNameText );
 			expect( currentLink ).toHaveTextContent( '/?p=123' );
@@ -991,7 +988,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 		await eventLoopTick();
 
-		const currentLink = getCurrentLink();
+		const currentLink = screen.getByLabelText( 'Currently selected' );
 
 		expect( currentLink ).toHaveTextContent( 'Some new page to create' );
 		expect( currentLink ).toHaveTextContent( '/?p=123' );
@@ -1052,7 +1049,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 		await eventLoopTick();
 
-		expect( getCurrentLink() ).toHaveTextContent( entityNameText );
+		expect(
+			screen.getByLabelText( 'Currently selected' )
+		).toHaveTextContent( entityNameText );
 	} );
 
 	it( 'should allow customisation of button text', async () => {
@@ -1266,7 +1265,7 @@ describe( 'Selecting links', () => {
 
 		render( <LinkControlConsumer /> );
 
-		const currentLink = getCurrentLink();
+		const currentLink = screen.getByLabelText( 'Currently selected' );
 		const currentLinkAnchor = currentLink.querySelector(
 			`[href="${ selectedLink.url }"]`
 		);
@@ -1296,14 +1295,14 @@ describe( 'Selecting links', () => {
 		render( <LinkControlConsumer /> );
 
 		// Required in order to select the button below.
-		let currentLinkUI = getCurrentLink();
+		let currentLinkUI = screen.getByLabelText( 'Currently selected' );
 		const currentLinkBtn = currentLinkUI.querySelector( 'button' );
 
 		// Simulate searching for a term.
 		await user.click( currentLinkBtn );
 
 		const searchInput = getURLInput();
-		currentLinkUI = getCurrentLink();
+		currentLinkUI = screen.queryByLabelText( 'Currently selected' );
 
 		// We should be back to showing the search input.
 		expect( searchInput ).toBeVisible();
@@ -1362,7 +1361,8 @@ describe( 'Selecting links', () => {
 				// Simulate selecting the first of the search suggestions.
 				await user.click( firstSearchSuggestion );
 
-				const currentLink = getCurrentLink();
+				const currentLink =
+					screen.getByLabelText( 'Currently selected' );
 				const currentLinkAnchor = currentLink.querySelector(
 					`[href="${ selectedLink.url }"]`
 				);
@@ -1471,7 +1471,8 @@ describe( 'Selecting links', () => {
 				triggerEnter( searchInput );
 
 				// Check that the suggestion selected via is now shown as selected.
-				const currentLink = getCurrentLink();
+				const currentLink =
+					screen.getByLabelText( 'Currently selected' );
 				const currentLinkAnchor = currentLink.querySelector(
 					`[href="${ selectedLink.url }"]`
 				);
@@ -1722,7 +1723,7 @@ describe( 'Rich link previews', () => {
 			await eventLoopTick();
 		} );
 
-		const linkPreview = getCurrentLink();
+		const linkPreview = screen.getByLabelText( 'Currently selected' );
 
 		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
 
@@ -1748,7 +1749,7 @@ describe( 'Rich link previews', () => {
 			await eventLoopTick();
 		} );
 
-		const linkPreview = getCurrentLink();
+		const linkPreview = screen.getByLabelText( 'Currently selected' );
 
 		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
 
@@ -1772,7 +1773,7 @@ describe( 'Rich link previews', () => {
 			await eventLoopTick();
 		} );
 
-		const linkPreview = getCurrentLink();
+		const linkPreview = screen.getByLabelText( 'Currently selected' );
 
 		// Todo: refactor to use user-facing queries.
 		const hasRichImagePreview = linkPreview.querySelector(
@@ -1805,7 +1806,7 @@ describe( 'Rich link previews', () => {
 			await eventLoopTick();
 		} );
 
-		const linkPreview = getCurrentLink();
+		const linkPreview = screen.getByLabelText( 'Currently selected' );
 
 		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
 		expect( isRichLinkPreview ).toBe( true );
@@ -1834,7 +1835,7 @@ describe( 'Rich link previews', () => {
 			await eventLoopTick();
 		} );
 
-		const linkPreview = getCurrentLink();
+		const linkPreview = screen.getByLabelText( 'Currently selected' );
 
 		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
 		expect( isRichLinkPreview ).toBe( true );
@@ -1872,7 +1873,7 @@ describe( 'Rich link previews', () => {
 				await eventLoopTick();
 			} );
 
-			const linkPreview = getCurrentLink();
+			const linkPreview = screen.getByLabelText( 'Currently selected' );
 
 			const isRichLinkPreview =
 				linkPreview.classList.contains( 'is-rich' );
@@ -1903,7 +1904,7 @@ describe( 'Rich link previews', () => {
 				await eventLoopTick();
 			} );
 
-			const linkPreview = getCurrentLink();
+			const linkPreview = screen.getByLabelText( 'Currently selected' );
 
 			const isRichLinkPreview =
 				linkPreview.classList.contains( 'is-rich' );
@@ -1924,7 +1925,7 @@ describe( 'Rich link previews', () => {
 			await eventLoopTick();
 		} );
 
-		const linkPreview = getCurrentLink();
+		const linkPreview = screen.getByLabelText( 'Currently selected' );
 
 		const isFetchingRichPreview =
 			linkPreview.classList.contains( 'is-fetching' );
@@ -1946,7 +1947,7 @@ describe( 'Rich link previews', () => {
 			await eventLoopTick();
 		} );
 
-		const linkPreview = getCurrentLink();
+		const linkPreview = screen.getByLabelText( 'Currently selected' );
 
 		const isFetchingRichPreview =
 			linkPreview.classList.contains( 'is-fetching' );
