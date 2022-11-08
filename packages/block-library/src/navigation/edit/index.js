@@ -49,9 +49,6 @@ import { close, Icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-/**
- * Internal dependencies
- */
 import useNavigationMenu from '../use-navigation-menu';
 import useNavigationEntities from '../use-navigation-entities';
 import Placeholder from './placeholder';
