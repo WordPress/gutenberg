@@ -1263,11 +1263,11 @@ describe( 'Selecting links', () => {
 		render( <LinkControlConsumer /> );
 
 		const currentLink = screen.getByLabelText( 'Currently selected' );
-		const currentLinkAnchor = currentLink.querySelector(
-			`[href="${ selectedLink.url }"]`
-		);
+		const currentLinkAnchor = screen.getByRole( 'link', {
+			name: `${ selectedLink.title } (opens in a new tab)`,
+		} );
 
-		expect( currentLink ).toHaveTextContent( selectedLink.title );
+		expect( currentLink ).toBeVisible();
 		expect(
 			screen.queryByRole( 'button', { name: 'Edit' } )
 		).toBeVisible();
@@ -1360,14 +1360,11 @@ describe( 'Selecting links', () => {
 				// Simulate selecting the first of the search suggestions.
 				await user.click( firstSearchSuggestion );
 
-				const currentLink =
-					screen.getByLabelText( 'Currently selected' );
-				const currentLinkAnchor = currentLink.querySelector(
-					`[href="${ selectedLink.url }"]`
-				);
+				const currentLinkAnchor = screen.getByRole( 'link', {
+					name: `${ selectedLink.title } (opens in a new tab)`,
+				} );
 
 				// Check that this suggestion is now shown as selected.
-				expect( currentLink ).toHaveTextContent( selectedLink.title );
 				expect(
 					screen.getByRole( 'button', { name: 'Edit' } )
 				).toBeVisible();
@@ -1474,14 +1471,14 @@ describe( 'Selecting links', () => {
 				// Check that the suggestion selected via is now shown as selected.
 				const currentLink =
 					screen.getByLabelText( 'Currently selected' );
-				const currentLinkAnchor = currentLink.querySelector(
-					`[href="${ selectedLink.url }"]`
-				);
+				const currentLinkAnchor = screen.getByRole( 'link', {
+					name: `${ selectedLink.title } (opens in a new tab)`,
+				} );
 
 				// Make sure focus is retained after submission.
 				expect( container ).toContainElement( document.activeElement );
 
-				expect( currentLink ).toHaveTextContent( selectedLink.title );
+				expect( currentLink ).toBeVisible();
 				expect(
 					screen.getByRole( 'button', { name: 'Edit' } )
 				).toBeVisible();
