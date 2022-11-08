@@ -89,10 +89,6 @@ function getCurrentLink() {
 	return screen.queryByLabelText( 'Currently selected' );
 }
 
-function getSelectedResultElement() {
-	return screen.queryByRole( 'option', { selected: true } );
-}
-
 /**
  * Workaround to trigger an arrow up keypress event.
  *
@@ -1433,7 +1429,9 @@ describe( 'Selecting links', () => {
 				const firstSearchSuggestion = searchResultElements[ 0 ];
 				const secondSearchSuggestion = searchResultElements[ 1 ];
 
-				let selectedSearchResultElement = getSelectedResultElement();
+				let selectedSearchResultElement = screen.getByRole( 'option', {
+					selected: true,
+				} );
 
 				// We should have highlighted the first item using the keyboard.
 				expect( selectedSearchResultElement ).toEqual(
@@ -1445,7 +1443,9 @@ describe( 'Selecting links', () => {
 					// Check we can go down again using the down arrow.
 					triggerArrowDown( searchInput );
 
-					selectedSearchResultElement = getSelectedResultElement();
+					selectedSearchResultElement = screen.getByRole( 'option', {
+						selected: true,
+					} );
 
 					// We should have highlighted the first item using the keyboard
 					// eslint-disable-next-line jest/no-conditional-expect
@@ -1456,7 +1456,9 @@ describe( 'Selecting links', () => {
 					// Check we can go back up via up arrow.
 					triggerArrowUp( searchInput );
 
-					selectedSearchResultElement = getSelectedResultElement();
+					selectedSearchResultElement = screen.getByRole( 'option', {
+						selected: true,
+					} );
 
 					// We should be back to highlighting the first search result again
 					// eslint-disable-next-line jest/no-conditional-expect
@@ -1513,7 +1515,9 @@ describe( 'Selecting links', () => {
 			const firstSearchSuggestion = searchResultElements[ 0 ];
 			const secondSearchSuggestion = searchResultElements[ 1 ];
 
-			let selectedSearchResultElement = getSelectedResultElement();
+			let selectedSearchResultElement = screen.getByRole( 'option', {
+				selected: true,
+			} );
 
 			// We should have highlighted the first item using the keyboard.
 			expect( selectedSearchResultElement ).toEqual(
@@ -1523,7 +1527,9 @@ describe( 'Selecting links', () => {
 			// Check we can go down again using the down arrow.
 			triggerArrowDown( searchInput );
 
-			selectedSearchResultElement = getSelectedResultElement();
+			selectedSearchResultElement = screen.getByRole( 'option', {
+				selected: true,
+			} );
 
 			// We should have highlighted the first item using the keyboard.
 			expect( selectedSearchResultElement ).toEqual(
@@ -1533,7 +1539,9 @@ describe( 'Selecting links', () => {
 			// Check we can go back up via up arrow.
 			triggerArrowUp( searchInput );
 
-			selectedSearchResultElement = getSelectedResultElement();
+			selectedSearchResultElement = screen.getByRole( 'option', {
+				selected: true,
+			} );
 
 			// We should be back to highlighting the first search result again.
 			expect( selectedSearchResultElement ).toEqual(
