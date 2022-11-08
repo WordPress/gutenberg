@@ -3,8 +3,6 @@
 		"name": "core/details",
 		"isValid": true,
 		"attributes": {
-			"level": 2,
-			"summary": "",
 			"showContent": false
 		},
 		"innerBlocks": [
@@ -13,19 +11,26 @@
 				"isValid": true,
 				"attributes": {
 					"level": 2,
-					"summary": ""
+					"summary": "Details"
 				},
 				"innerBlocks": []
 			},
 			{
-				"name": "core/paragraph",
+				"name": "core/details-content",
 				"isValid": true,
-				"attributes": {
-					"content": "",
-					"dropCap": false,
-					"placeholder": "Add text or blocks that will display when the details block is opened."
-				},
-				"innerBlocks": []
+				"attributes": {},
+				"innerBlocks": [
+					{
+						"name": "core/paragraph",
+						"isValid": true,
+						"attributes": {
+							"content": "",
+							"dropCap": false,
+							"placeholder": "Add text or blocks that will display when the details block is opened."
+						},
+						"innerBlocks": []
+					}
+				]
 			}
 		]
 	}

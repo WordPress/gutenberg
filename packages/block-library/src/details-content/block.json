@@ -3,10 +3,10 @@
 	"apiVersion": 2,
 	"__experimental": true,
 	"name": "core/details-content",
-	"title": "Details content",
+	"title": "Details Content",
 	"category": "theme",
 	"parent": [ "core/details" ],
-	"description": "A block that displays a summary and shows or hides additional content.",
+	"description": "The content inside the details is hidden until the details are expanded.",
 	"textdomain": "default",
 	"supports": {
 		"align": true,

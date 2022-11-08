@@ -6,7 +6,7 @@
 	"title": "Summary",
 	"category": "theme",
 	"parent": [ "core/details" ],
-	"description": "A block that displays a summary and shows or hides additional content.",
+	"description": "Clicking on the summary will show or hide the content inside the details.",
 	"textdomain": "default",
 	"attributes": {
 		"level": {

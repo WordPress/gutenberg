@@ -242,9 +242,9 @@ A block that displays a summary and shows or hides additional content. ([Source]
 -	**Supports:** align, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** showContent
 
-## Details content
+## Details Content
 
-A block that displays a summary and shows or hides additional content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details-content))
+The content inside the details is hidden until the details are expanded. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details-content))
 
 -	**Name:** core/details-content
 -	**Category:** theme
@@ -253,7 +253,7 @@ A block that displays a summary and shows or hides additional content. ([Source]
 
 ## Summary
 
-A block that displays a summary and shows or hides additional content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details-summary))
+Clicking on the summary will show or hide the content inside the details. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details-summary))
 
 -	**Name:** core/details-summary
 -	**Category:** theme

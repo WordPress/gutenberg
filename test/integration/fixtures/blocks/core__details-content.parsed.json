@@ -1,0 +1,23 @@
+[
+	{
+		"blockName": "core/details-content",
+		"attrs": {},
+		"innerBlocks": [
+			{
+				"blockName": "core/paragraph",
+				"attrs": {
+					"placeholder": "Add text or blocks that will display when the details block is opened."
+				},
+				"innerBlocks": [],
+				"innerHTML": "\n\t<p></p>\n\t",
+				"innerContent": [ "\n\t<p></p>\n\t" ]
+			}
+		],
+		"innerHTML": "\n<div class=\"wp-block-details-content\"></div>\n\t",
+		"innerContent": [
+			"\n<div class=\"wp-block-details-content\">",
+			null,
+			"</div>\n\t"
+		]
+	}
+]

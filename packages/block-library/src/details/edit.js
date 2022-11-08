@@ -24,7 +24,11 @@ function DetailsBlock( { attributes, setAttributes, clientId } ) {
 	const hasSelection = useSelect( ( select ) => {
 		const { isBlockSelected, hasSelectedInnerBlock } =
 			select( blockEditorStore );
-		return hasSelectedInnerBlock( clientId ) || isBlockSelected( clientId );
+		/* Sets deep to true to also find blocks inside the details content block. */
+		return (
+			hasSelectedInnerBlock( clientId, true ) ||
+			isBlockSelected( clientId )
+		);
 	}, [] );
 
 	return (

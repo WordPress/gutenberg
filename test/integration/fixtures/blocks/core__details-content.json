@@ -1,0 +1,19 @@
+[
+	{
+		"name": "core/details-content",
+		"isValid": true,
+		"attributes": {},
+		"innerBlocks": [
+			{
+				"name": "core/paragraph",
+				"isValid": true,
+				"attributes": {
+					"content": "",
+					"dropCap": false,
+					"placeholder": "Add text or blocks that will display when the details block is opened."
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]
