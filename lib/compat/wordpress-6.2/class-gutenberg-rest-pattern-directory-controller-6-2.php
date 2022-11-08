@@ -1,23 +1,24 @@
 <?php
 /**
- * REST API: Gutenberg_REST_Global_Styles_Controller class
+ * REST API: Gutenberg_REST_Pattern_Directory_Controller_6_2 class
  *
  * @package    Gutenberg
  * @subpackage REST_API
  */
 
 /**
- * Controller which provides REST endpoint for block patterns.
+ * Controller which provides REST endpoint for block patterns from wordpress.org/patterns.
  */
-class Gutenberg_REST_Pattern_Directory_Controller extends WP_REST_Pattern_Directory_Controller {
+class Gutenberg_REST_Pattern_Directory_Controller_6_2 extends Gutenberg_REST_Pattern_Directory_Controller_6_0 {
 	/**
 	 * Search and retrieve block patterns metadata
 	 *
-	 * @since 6.0.0
+	 * @since 5.8.0
+	 * @since 6.0.0 Added 'slug' to request.
+	 * @since 6.2.0 Added 'per_page', 'page', 'offset', 'order', and 'orderby' to request.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
-	 *
-	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_items( $request ) {
 		/**
@@ -30,36 +31,24 @@ class Gutenberg_REST_Pattern_Directory_Controller extends WP_REST_Pattern_Direct
 
 		$gutenberg_data = get_plugin_data( dirname( dirname( dirname( __DIR__ ) ) ) . '/gutenberg.php', false );
 
-		$query_args = array(
-			'locale'            => get_user_locale(),
-			'wp-version'        => $wp_version, // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable -- it's defined in `version.php` above.
-			'gutenberg-version' => $gutenberg_data['Version'],
+		$valid_query_args = array( 'offset', 'order', 'orderby', 'page', 'per_page', 'search', 'slug' );
+		$query_args       = array_merge(
+			array_intersect_key( $request->get_params(), array_flip( $valid_query_args ) ),
+			array(
+				'locale'            => get_user_locale(),
+				'wp-version'        => $wp_version, // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable -- it's defined in `version.php` above.
+				'gutenberg-version' => $gutenberg_data['Version'],
+			)
 		);
 
-		$category_id = $request['category'];
-		$keyword_id  = $request['keyword'];
-		$search_term = $request['search'];
-		$slug        = $request['slug'];
+		$query_args['pattern-categories'] = isset( $request['category'] ) ? $request['category'] : false;
+		$query_args['pattern-keywords']   = isset( $request['keyword'] ) ? $request['keyword'] : false;
 
-		if ( $category_id ) {
-			$query_args['pattern-categories'] = $category_id;
-		}
-
-		if ( $keyword_id ) {
-			$query_args['pattern-keywords'] = $keyword_id;
-		}
-
-		if ( $search_term ) {
-			$query_args['search'] = $search_term;
-		}
-
-		if ( $slug ) {
-			$query_args['slug'] = $slug;
-		}
+		$query_args = array_filter( $query_args );
 
 		$transient_key = $this->get_transient_key( $query_args );
 
-		/**
+		/*
 		 * Use network-wide transient to improve performance. The locale is the only site
 		 * configuration that affects the response, and it's included in the transient key.
 		 */
@@ -71,7 +60,7 @@ class Gutenberg_REST_Pattern_Directory_Controller extends WP_REST_Pattern_Direct
 				$api_url = set_url_scheme( $api_url, 'https' );
 			}
 
-			/**
+			/*
 			 * Default to a short TTL, to mitigate cache stampedes on high-traffic sites.
 			 * This assumes that most errors will be short-lived, e.g., packet loss that causes the
 			 * first request to fail, but a follow-up one will succeed. The value should be high
@@ -90,7 +79,7 @@ class Gutenberg_REST_Pattern_Directory_Controller extends WP_REST_Pattern_Direct
 				$raw_patterns = new WP_Error(
 					'pattern_api_failed',
 					sprintf(
-					/* translators: %s: Support forums URL. */
+						/* translators: %s: Support forums URL. */
 						__( 'An unexpected error occurred. Something may be wrong with WordPress.org or this server&#8217;s configuration. If you continue to have problems, please try the <a href="%s">support forums</a>.', 'gutenberg' ),
 						__( 'https://wordpress.org/support/forums/', 'gutenberg' )
 					),
@@ -124,41 +113,5 @@ class Gutenberg_REST_Pattern_Directory_Controller extends WP_REST_Pattern_Direct
 		}
 
 		return new WP_REST_Response( $response );
-	}
-
-	/**
-	 * Include a hash of the query args, so that different requests are stored in
-	 * separate caches.
-	 *
-	 * MD5 is chosen for its speed, low-collision rate, universal availability, and to stay
-	 * under the character limit for `_site_transient_timeout_{...}` keys.
-	 *
-	 * @link https://stackoverflow.com/questions/3665247/fastest-hash-for-non-cryptographic-uses
-	 *
-	 * @since 6.0.0
-	 * @todo This should be removed when the minimum required WordPress version is >= 6.0.
-	 *
-	 * @param array $query_args Query arguments to generate a transient key from.
-	 * @return string Transient key.
-	 */
-	protected function get_transient_key( $query_args ) {
-		if ( method_exists( get_parent_class( $this ), __FUNCTION__ ) ) {
-			return parent::get_transient_key( $query_args );
-		}
-
-		if ( isset( $query_args['slug'] ) ) {
-			// This is an additional precaution because the "sort" function expects an array.
-			$query_args['slug'] = wp_parse_list( $query_args['slug'] );
-
-			// Empty arrays should not affect the transient key.
-			if ( empty( $query_args['slug'] ) ) {
-				unset( $query_args['slug'] );
-			} else {
-				// Sort the array so that the transient key doesn't depend on the order of slugs.
-				sort( $query_args['slug'] );
-			}
-		}
-
-		return 'wp_remote_block_patterns_' . md5( serialize( $query_args ) );
 	}
 }

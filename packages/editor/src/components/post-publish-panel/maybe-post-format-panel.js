@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get, includes } from 'lodash';
+import { find, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -19,7 +19,7 @@ import { store as editorStore } from '../../store';
 
 const getSuggestion = ( supportedFormats, suggestedPostFormat ) => {
 	const formats = POST_FORMATS.filter( ( format ) =>
-		includes( supportedFormats, format.id )
+		supportedFormats?.includes( format.id )
 	);
 	return find( formats, ( format ) => format.id === suggestedPostFormat );
 };

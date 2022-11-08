@@ -305,7 +305,7 @@ function gutenberg_get_classnames_from_last_tag( $html ) {
 		$last_classnames = $tags->get_attribute( 'class' );
 	}
 
-	return $last_classnames;
+	return (string) $last_classnames;
 }
 
 /**
@@ -445,7 +445,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$content->add_class( implode( ' ', $class_names ) );
 	}
 
-	return $content;
+	return (string) $content;
 }
 
 // Register the block support. (overrides core one).
@@ -477,7 +477,7 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 		preg_quote( $tag_name, '/' )
 	);
 	if (
-		WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ||
+		wp_theme_has_theme_json() ||
 		1 === preg_match( $group_with_inner_container_regex, $block_content ) ||
 		( isset( $block['attrs']['layout']['type'] ) && 'flex' === $block['attrs']['layout']['type'] )
 	) {
@@ -542,7 +542,7 @@ function gutenberg_restore_image_outer_container( $block_content, $block ) {
 )/iUx";
 
 	if (
-		WP_Theme_JSON_Resolver::theme_has_support() ||
+		wp_theme_has_theme_json() ||
 		0 === preg_match( $image_with_align, $block_content, $matches )
 	) {
 		return $block_content;

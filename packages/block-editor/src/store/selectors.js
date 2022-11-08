@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, reduce, some, find, filter, orderBy } from 'lodash';
+import { map, find, filter, orderBy } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -273,14 +273,10 @@ export const getGlobalBlockCount = createSelector(
 		if ( ! blockName ) {
 			return clientIds.length;
 		}
-		return reduce(
-			clientIds,
-			( accumulator, clientId ) => {
-				const block = state.blocks.byClientId[ clientId ];
-				return block.name === blockName ? accumulator + 1 : accumulator;
-			},
-			0
-		);
+		return clientIds.reduce( ( accumulator, clientId ) => {
+			const block = state.blocks.byClientId[ clientId ];
+			return block.name === blockName ? accumulator + 1 : accumulator;
+		}, 0 );
 	},
 	( state ) => [ state.blocks.order, state.blocks.byClientId ]
 );
@@ -695,10 +691,7 @@ export const getSelectedBlockClientIds = createSelector(
 	( state ) => {
 		const { selectionStart, selectionEnd } = state.selection;
 
-		if (
-			selectionStart.clientId === undefined ||
-			selectionEnd.clientId === undefined
-		) {
+		if ( ! selectionStart.clientId || ! selectionEnd.clientId ) {
 			return EMPTY_ARRAY;
 		}
 
@@ -713,6 +706,7 @@ export const getSelectedBlockClientIds = createSelector(
 			state,
 			selectionStart.clientId
 		);
+
 		if ( rootClientId === null ) {
 			return EMPTY_ARRAY;
 		}
@@ -1184,8 +1178,7 @@ export function isBlockSelected( state, clientId ) {
  * @return {boolean} Whether the block as an inner block selected
  */
 export function hasSelectedInnerBlock( state, clientId, deep = false ) {
-	return some(
-		getBlockOrder( state, clientId ),
+	return getBlockOrder( state, clientId ).some(
 		( innerClientId ) =>
 			isBlockSelected( state, innerClientId ) ||
 			isBlockMultiSelected( state, innerClientId ) ||
@@ -1278,6 +1271,17 @@ export function isTyping( state ) {
 }
 
 /**
+ * Returns true if the the block interface should be hidden, or false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the block toolbar is hidden.
+ */
+export function __experimentalIsBlockInterfaceHidden( state ) {
+	return state.isBlockInterfaceHidden;
+}
+
+/**
  * Returns true if the user is dragging blocks, or false otherwise.
  *
  * @param {Object} state Global application state.
@@ -1333,7 +1337,7 @@ export function isAncestorBeingDragged( state, clientId ) {
 	}
 
 	const parents = getBlockParents( state, clientId );
-	return some( parents, ( parentClientId ) =>
+	return parents.some( ( parentClientId ) =>
 		isBlockBeingDragged( state, parentClientId )
 	);
 }
@@ -1532,7 +1536,7 @@ const canInsertBlockTypeUnmemoized = (
 			...getBlockParents( state, rootClientId ),
 		];
 
-		hasBlockAllowedAncestor = some( ancestors, ( ancestorClientId ) =>
+		hasBlockAllowedAncestor = ancestors.some( ( ancestorClientId ) =>
 			checkAllowList(
 				blockAllowedAncestorBlocks,
 				getBlockName( state, ancestorClientId )
@@ -1846,13 +1850,10 @@ const buildBlockTypeItem =
 
 		let isDisabled = false;
 		if ( ! hasBlockSupport( blockType.name, 'multiple', true ) ) {
-			isDisabled = some(
-				getBlocksByClientId(
-					state,
-					getClientIdsWithDescendants( state )
-				),
-				{ name: blockType.name }
-			);
+			isDisabled = getBlocksByClientId(
+				state,
+				getClientIdsWithDescendants( state )
+			).some( ( { name } ) => name === blockType.name );
 		}
 
 		const { time, count = 0 } = getInsertUsage( state, id ) || {};
@@ -2130,7 +2131,7 @@ export const getBlockTransformItems = createSelector(
  */
 export const hasInserterItems = createSelector(
 	( state, rootClientId = null ) => {
-		const hasBlockType = some( getBlockTypes(), ( blockType ) =>
+		const hasBlockType = getBlockTypes().some( ( blockType ) =>
 			canIncludeBlockTypeInInserter( state, blockType, rootClientId )
 		);
 		if ( hasBlockType ) {
