@@ -27,7 +27,6 @@
 	display: inline;
 }
 
-
 /**
  * Submenus.
  */
@@ -158,7 +157,7 @@ $colors-selector-size: 22px;
 		min-width: $colors-selector-size;
 		height: $colors-selector-size;
 		min-height: $colors-selector-size;
-		line-height: ( $colors-selector-size - 2 );
+		line-height: ($colors-selector-size - 2);
 		padding: 2px;
 
 		> svg {
@@ -202,7 +201,9 @@ $color-control-label-height: 20px;
 // This should be a temporary fix, to be replaced by improvements to
 // the sibling inserter. Or by the dropdown appender that is used in Group, instead of the "Button block appender".
 // See https://github.com/WordPress/gutenberg/issues/37572.
-.wp-block-navigation .wp-block + .block-list-appender .block-editor-button-block-appender {
+.wp-block-navigation
+.wp-block + .block-list-appender
+.block-editor-button-block-appender {
 	background-color: $gray-900;
 	color: $white;
 
@@ -218,7 +219,6 @@ $color-control-label-height: 20px;
 	background-color: transparent;
 	color: $gray-900;
 }
-
 
 /**
  * Setup state
@@ -389,7 +389,9 @@ $color-control-label-height: 20px;
 }
 
 // Keep as row for medium.
-.wp-block-navigation .components-placeholder.is-medium .components-placeholder__fieldset {
+.wp-block-navigation
+.components-placeholder.is-medium
+.components-placeholder__fieldset {
 	flex-direction: row !important;
 }
 
@@ -420,7 +422,6 @@ $color-control-label-height: 20px;
 		max-height: $grid-unit-20;
 	}
 }
-
 
 /**
  * Mobile menu.
@@ -570,7 +571,8 @@ body.editor-styles-wrapper
 	padding: $grid-unit-10 $grid-unit-15;
 }
 
-.wp-block-navigation .wp-block-navigation__uncontrolled-inner-blocks-loading-indicator {
+.wp-block-navigation
+.wp-block-navigation__uncontrolled-inner-blocks-loading-indicator {
 	margin-top: 0;
 }
 
@@ -637,6 +639,16 @@ body.editor-styles-wrapper
 	border: 1px solid;
 	justify-content: space-between;
 	width: 100%;
+}
+
+.wp-block-navigation__navigation-selector-button__icon {
+	flex: 0 0 auto;
+}
+
+.wp-block-navigation__navigation-selector-button__label {
+	flex: 0 1 auto;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .wp-block-navigation__navigation-selector-button--createnew {
