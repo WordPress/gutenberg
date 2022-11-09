@@ -17,11 +17,13 @@ $header-toolbar-min-width: 335px;
 	}
 
 	.edit-site-header-edit-mode__start {
+		flex: 1;
 		display: flex;
 		border: none;
 	}
 
 	.edit-site-header-edit-mode__end {
+		flex: 1;
 		display: flex;
 		justify-content: flex-end;
 	}
