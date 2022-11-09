@@ -98,7 +98,7 @@ describe( 'NavigationToggle', () => {
 					expect(
 						screen.getByText( 'Toggle navigation' ).parentElement
 					).toBePositioned(),
-				{ timeout: 2000 } // It might take more than a second to position the popover.
+				{ interval: 10 } // It takes many microtask tick to position the popover.
 			);
 
 			const siteIcon = screen.getByAltText( 'Site Icon' );
@@ -126,7 +126,7 @@ describe( 'NavigationToggle', () => {
 					expect(
 						screen.getByText( 'Toggle navigation' ).parentElement
 					).toBePositioned(),
-				{ timeout: 2000 } // It might take more than a second to position the popover.
+				{ interval: 10 } // It takes many microtask tick to position the popover.
 			);
 
 			expect(
