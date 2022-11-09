@@ -8,10 +8,6 @@ import { Button, Modal } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEntityRecords } from '@wordpress/core-data';
 import { createBlock as create } from '@wordpress/blocks';
-import {
-	ComplementaryArea,
-	store as interfaceStore,
-} from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -194,7 +190,6 @@ const ConvertToLinksModal = ( { onClose, clientId } ) => {
 const BlockEditButton = ( { label, clientId } ) => {
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 	const [ convertModalOpen, setConvertModalOpen ] = useState( false );
-	// const [ inspectorPanelOpen, setInspectorPanelOpen ] = useState( false );
 	const { totalPages } = usePageData();
 	const allowConvertToLinks = totalPages <= MAX_PAGE_COUNT;
 
@@ -205,14 +200,10 @@ const BlockEditButton = ( { label, clientId } ) => {
 		[ clientId ]
 	);
 
-	const { enableComplementaryArea } = useDispatch( interfaceStore, [] );
-
 	const onClick = () => {
 		toggleBlockHighlight( clientId, true );
 		if ( 'core/page-list' === block.name ) {
 			setConvertModalOpen( ! convertModalOpen );
-		} else {
-			enableComplementaryArea( 'core/off-canvas-editor-item' );
 		}
 	};
 
@@ -224,12 +215,6 @@ const BlockEditButton = ( { label, clientId } ) => {
 					clientId={ clientId }
 				/>
 			) }
-			<ComplementaryArea
-				scope="core/off-canvas-editor-item"
-				title={ `Edit ${ block.name }` }
-			>
-				Hello, I am a panel.
-			</ComplementaryArea>
 			{ allowConvertToLinks && (
 				<Button icon={ edit } label={ label } onClick={ onClick } />
 			) }
