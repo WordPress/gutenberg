@@ -3,7 +3,7 @@
 	"apiVersion": 2,
 	"__experimental": true,
 	"name": "core/details-summary",
-	"title": "Summary",
+	"title": "Details Summary",
 	"category": "theme",
 	"parent": [ "core/details" ],
 	"description": "Clicking on the summary will show or hide the content inside the details.",
@@ -53,6 +53,5 @@
 			}
 		}
 	},
-	"editorStyle": "wp-block-details",
 	"style": "wp-block-details"
 }

@@ -251,7 +251,7 @@ The content inside the details is hidden until the details are expanded. ([Sourc
 -	**Supports:** align, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** 
 
-## Summary
+## Details Summary
 
 Clicking on the summary will show or hide the content inside the details. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details-summary))
 
