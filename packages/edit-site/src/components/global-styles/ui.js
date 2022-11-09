@@ -6,6 +6,7 @@ import {
 	__experimentalNavigatorScreen as NavigatorScreen,
 } from '@wordpress/components';
 import { getBlockTypes } from '@wordpress/blocks';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -13,8 +14,6 @@ import { getBlockTypes } from '@wordpress/blocks';
 import ScreenRoot from './screen-root';
 import ScreenBlockList from './screen-block-list';
 import ScreenBlock from './screen-block';
-import ScreenTypography from './screen-typography';
-import ScreenTypographyElement from './screen-typography-element';
 import ScreenColors from './screen-colors';
 import ScreenColorPalette from './screen-color-palette';
 import ScreenBackgroundColor from './screen-background-color';
@@ -23,7 +22,13 @@ import ScreenLinkColor from './screen-link-color';
 import ScreenHeadingColor from './screen-heading-color';
 import ScreenButtonColor from './screen-button-color';
 import ScreenLayout from './screen-layout';
+import ScreenTypography from './screen-typography';
+import ScreenTypographyElement from './screen-typography-element';
 import ScreenStyleVariations from './screen-style-variations';
+import ScreenAddFontFamily from './screen-add-font-family';
+import ScreenGoogleFontFacesList from './screen-google-font-faces';
+import ScreenThemeFontFamilies from './screen-theme-font-families';
+import ScreenThemeFontFacesList from './screen-theme-font-faces';
 
 function GlobalStylesNavigationScreen( { className, ...props } ) {
 	return (
@@ -115,6 +120,45 @@ function ContextScreens( { name } ) {
 	);
 }
 
+function FontFamilyScreens() {
+	const [ googleFontSelected, setGoogleFontSelected ] = useState( null );
+	const [ themeFontSelected, setThemeFontSelected ] = useState( null );
+
+	return (
+		<>
+			<GlobalStylesNavigationScreen path={ '/typography/font-families/' }>
+				<ScreenAddFontFamily
+					setGoogleFontSelected={ setGoogleFontSelected }
+				/>
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen
+				path={ '/typography/font-families/theme' }
+			>
+				<ScreenThemeFontFamilies
+					setThemeFontSelected={ setThemeFontSelected }
+				/>
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen
+				path={ '/typography/font-families/theme-font-faces' }
+			>
+				<ScreenThemeFontFacesList
+					themeFontSelected={ themeFontSelected }
+				/>
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen
+				path={ '/typography/font-families/google-font-faces' }
+			>
+				<ScreenGoogleFontFacesList
+					googleFontSelected={ googleFontSelected }
+				/>
+			</GlobalStylesNavigationScreen>
+		</>
+	);
+}
+
 function GlobalStylesUI() {
 	const blocks = getBlockTypes();
 
@@ -145,6 +189,7 @@ function GlobalStylesUI() {
 			) ) }
 
 			<ContextScreens />
+			<FontFamilyScreens />
 
 			{ blocks.map( ( block ) => (
 				<ContextScreens

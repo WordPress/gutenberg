@@ -6,6 +6,7 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
+	__experimentalText as Text,
 	FlexItem,
 } from '@wordpress/components';
 
@@ -14,11 +15,48 @@ import {
  */
 import ScreenHeader from './header';
 import { NavigationButtonAsItem } from './navigation-button';
-import { useStyle } from './hooks';
+import { useStyle, useSetting } from './hooks';
 import Subtitle from './subtitle';
 import TypographyPanel from './typography-panel';
 
-function Item( { name, parentMenu, element, label } ) {
+function AddFontFamilyItem() {
+	return (
+		<NavigationButtonAsItem
+			path={ '/typography/font-families/' }
+			aria-label={ __( 'Add Font Family' ) }
+		>
+			<HStack justify="flex-start">
+				<FlexItem>{ __( '+' ) }</FlexItem>
+				<FlexItem>{ __( 'Add Font Family' ) }</FlexItem>
+			</HStack>
+		</NavigationButtonAsItem>
+	);
+}
+
+function FontFamilies( { parentMenu } ) {
+	const [ fontFamilies ] = useSetting( 'typography.fontFamilies' );
+	const count = fontFamilies
+		? fontFamilies.filter( ( font ) => !! font.slug ).length
+		: 0;
+
+	return (
+		<>
+			<NavigationButtonAsItem
+				path={ parentMenu + '/typography/font-families/theme' }
+				aria-label={ __( 'Theme Font Families' ) }
+			>
+				<HStack justify="space-between">
+					<FlexItem>
+						<Text>{ __( 'Aa' ) }</Text>
+					</FlexItem>
+					<FlexItem>{ count + __( ' Font Families' ) }</FlexItem>
+				</HStack>
+			</NavigationButtonAsItem>
+		</>
+	);
+}
+
+function ElementItem( { name, parentMenu, element, label } ) {
 	const hasSupport = ! name;
 	const prefix =
 		element === 'text' || ! element ? '' : `elements.${ element }.`;
@@ -28,6 +66,7 @@ function Item( { name, parentMenu, element, label } ) {
 					textDecoration: 'underline',
 			  }
 			: {};
+
 	const [ fontFamily ] = useStyle( prefix + 'typography.fontFamily', name );
 	const [ fontStyle ] = useStyle( prefix + 'typography.fontStyle', name );
 	const [ fontWeight ] = useStyle( prefix + 'typography.fontWeight', name );
@@ -90,27 +129,37 @@ function ScreenTypography( { name } ) {
 			{ ! name && (
 				<div className="edit-site-global-styles-screen-typography">
 					<VStack spacing={ 3 }>
+						<Subtitle>{ __( 'Theme Font Families' ) }</Subtitle>
+						<ItemGroup isBordered isSeparated>
+							<FontFamilies parentMenu={ parentMenu } />
+						</ItemGroup>
+
+						<Subtitle>{ __( 'Global Font Families' ) }</Subtitle>
+						<ItemGroup isBordered isSeparated>
+							<AddFontFamilyItem />
+						</ItemGroup>
+
 						<Subtitle>{ __( 'Elements' ) }</Subtitle>
 						<ItemGroup isBordered isSeparated>
-							<Item
+							<ElementItem
 								name={ name }
 								parentMenu={ parentMenu }
 								element="text"
 								label={ __( 'Text' ) }
 							/>
-							<Item
+							<ElementItem
 								name={ name }
 								parentMenu={ parentMenu }
 								element="link"
 								label={ __( 'Links' ) }
 							/>
-							<Item
+							<ElementItem
 								name={ name }
 								parentMenu={ parentMenu }
 								element="heading"
 								label={ __( 'Headings' ) }
 							/>
-							<Item
+							<ElementItem
 								name={ name }
 								parentMenu={ parentMenu }
 								element="button"
@@ -120,6 +169,7 @@ function ScreenTypography( { name } ) {
 					</VStack>
 				</div>
 			) }
+
 			{ /* No typography elements support yet for blocks. */ }
 			{ !! name && <TypographyPanel name={ name } element="text" /> }
 		</>
