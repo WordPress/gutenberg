@@ -110,9 +110,7 @@ const transforms = {
 			type: 'block',
 			blocks: [ '*' ],
 			transform: ( attributes, innerBlocks ) =>
-				innerBlocks
-					.map( ( innerBlock ) => innerBlock.innerBlocks )
-					.flat(),
+				innerBlocks.flatMap( ( innerBlock ) => innerBlock.innerBlocks ),
 		},
 	],
 };
