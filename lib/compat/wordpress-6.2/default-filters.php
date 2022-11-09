@@ -25,3 +25,7 @@
  */
 add_action( 'switch_theme', 'wp_theme_clean_theme_json_cached_data' );
 add_action( 'start_previewing_theme', 'wp_theme_clean_theme_json_cached_data' );
+add_action( 'save_post_wp_global_styles', 'gutenberg_clean_cached_stylesheet' );
+add_action( 'switch_theme', 'gutenberg_clean_cached_stylesheet' );
+add_action( 'start_previewing_theme', 'gutenberg_clean_cached_stylesheet' );
+add_action( 'upgrader_process_complete', '_gutenberg_clean_cached_stylesheet_upon_upgrading_active_theme' );
