@@ -43,14 +43,10 @@ import { createEmitter } from './utils/emitter';
  * @property {Function} registerStore registers store.
  */
 
-function isObject( object ) {
-	return object !== null && typeof object === 'object';
-}
-
 function getStoreName( storeNameOrDescriptor ) {
-	return isObject( storeNameOrDescriptor )
-		? storeNameOrDescriptor.name
-		: storeNameOrDescriptor;
+	return typeof storeNameOrDescriptor === 'string'
+		? storeNameOrDescriptor
+		: storeNameOrDescriptor.name;
 }
 /**
  * Creates a new store registry, given an optional object of initial store
