@@ -98,6 +98,24 @@ import { DEFAULT_LINK_SETTINGS } from './constants';
 
 const noop = () => {};
 
+function useInternalInputValue( value ) {
+	const [ internalInputValue, setInternalInputValue ] = useState(
+		value || ''
+	);
+
+	useEffect( () => {
+		/**
+		 * Update the state value internalInputValue if the url value changes
+		 * for example when clicking on another anchor
+		 */
+		if ( value && value !== internalInputValue ) {
+			setInternalInputValue( value );
+		}
+	}, [ value ] );
+
+	return [ internalInputValue, setInternalInputValue ];
+}
+
 /**
  * Renders a link control. A link control is a controlled input which maintains
  * a value associated with a link (HTML anchor element) and relevant settings
@@ -134,10 +152,10 @@ function LinkControl( {
 	const textInputRef = useRef();
 	const isEndingEditWithFocus = useRef( false );
 
-	const [ internalInputValue, setInternalInputValue ] = useState(
+	const [ internalInputValue, setInternalInputValue ] = useInternalInputValue(
 		value?.url || ''
 	);
-	const [ internalTextValue, setInternalTextValue ] = useState(
+	const [ internalTextValue, setInternalTextValue ] = useInternalInputValue(
 		value?.title || ''
 	);
 
@@ -189,23 +207,15 @@ function LinkControl( {
 		isEndingEditWithFocus.current = false;
 	}, [ isEditingLink, isCreatingPage ] );
 
-	useEffect( () => {
-		/**
-		 * If the value's `text` property changes then sync this
-		 * back up with state.
-		 */
-		if ( value?.title && value.title !== internalTextValue ) {
-			setInternalTextValue( value.title );
-		}
-
-		/**
-		 * Update the state value internalInputValue if the url value changes
-		 * for example when clicking on another anchor
-		 */
-		if ( value?.url ) {
-			setInternalInputValue( value.url );
-		}
-	}, [ value ] );
+	// useEffect( () => {
+	// 	/**
+	// 	 * If the value's `text` property changes then sync this
+	// 	 * back up with state.
+	// 	 */
+	// 	if ( value?.title && value.title !== internalTextValue ) {
+	// 		setInternalTextValue( value.title );
+	// 	}
+	// }, [ value ] );
 
 	/**
 	 * Cancels editing state and marks that focus may need to be restored after
