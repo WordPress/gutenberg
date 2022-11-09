@@ -19,7 +19,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { getSupportedGlobalStylesPanels, useSetting, useStyle } from './hooks';
-import { getTypographyFontSizeValue } from './typography-utils';
 
 export function useHasTypographyPanel( name ) {
 	const hasFontFamily = useHasFontFamilyControl( name );
@@ -110,6 +109,26 @@ function useStyleWithReset( path, blockName ) {
 	return [ style, setStyle, hasStyle, resetStyle ];
 }
 
+function useFontSizeWithReset( path, blockName ) {
+	const [ fontSize, setStyleCallback ] = useStyle( path, blockName );
+	const [ userStyle ] = useStyle( path, blockName, 'user' );
+	const hasFontSize = () => !! userStyle;
+	const resetFontSize = () => setStyleCallback( undefined );
+	const setFontSize = ( newValue, metadata ) => {
+		if ( !! metadata?.slug ) {
+			newValue = `var:preset|font-size|${ metadata?.slug }`;
+		}
+		setStyleCallback( newValue );
+	};
+
+	return {
+		fontSize,
+		setFontSize,
+		hasFontSize,
+		resetFontSize,
+	};
+}
+
 function useFontAppearance( prefix, name ) {
 	const [ fontStyle, setFontStyle ] = useStyle(
 		prefix + 'typography.fontStyle',
@@ -152,18 +171,7 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
 	} else if ( element && element !== 'text' ) {
 		prefix = `elements.${ element }.`;
 	}
-	const [ fluidTypography ] = useSetting( 'typography.fluid', name );
 	const [ fontSizes ] = useSetting( 'typography.fontSizes', name );
-
-	// Convert static font size values to fluid font sizes if fluidTypography is activated.
-	const fontSizesWithFluidValues = fontSizes.map( ( font ) => {
-		if ( !! fluidTypography ) {
-			font.size = getTypographyFontSizeValue( font, {
-				fluid: fluidTypography,
-			} );
-		}
-		return font;
-	} );
 
 	const disableCustomFontSizes = ! useSetting(
 		'typography.customFontSize',
@@ -191,8 +199,8 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
 
 	const [ fontFamily, setFontFamily, hasFontFamily, resetFontFamily ] =
 		useStyleWithReset( prefix + 'typography.fontFamily', name );
-	const [ fontSize, setFontSize, hasFontSize, resetFontSize ] =
-		useStyleWithReset( prefix + 'typography.fontSize', name );
+	const { fontSize, setFontSize, hasFontSize, resetFontSize } =
+		useFontSizeWithReset( prefix + 'typography.fontSize', name );
 	const {
 		fontStyle,
 		setFontStyle,
@@ -253,7 +261,7 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
 					<FontSizePicker
 						value={ fontSize }
 						onChange={ setFontSize }
-						fontSizes={ fontSizesWithFluidValues }
+						fontSizes={ fontSizes }
 						disableCustomFontSizes={ disableCustomFontSizes }
 						withReset={ false }
 						withSlider
