@@ -28,7 +28,10 @@
 		},
 		"required": {
 			"type": "boolean",
-			"default": false
+			"default": false,
+			"selector": ".wp-block-form-input",
+			"source": "attribute",
+			"attribute": "required"
 		}
 	},
 	"style": [ "wp-block-form-input", "wp-block-buttons", "wp-block-button" ]
