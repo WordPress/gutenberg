@@ -97,7 +97,9 @@ When you scaffold a block, you must provide at least a `slug` name, the `namespa
 
 ## Available commands in the scaffolded project
 
-The plugin folder created when executing this command, is a node package with a modern build setup that requires no configuration. A set of scripts are avalable from inside that folder (provided by the `scripts` package) to make your work easier. A full description of these commands is available [here](https://github.com/WordPress/gutenberg/tree/HEAD/packages/scripts#available-scripts)
+The plugin folder created when executing this command, is a node package with a modern build setup that requires no configuration. 
+
+A set of scripts is avalable from inside that folder (provided by the `scripts` package) to make your work easier. A full description of these commands is available [here](https://github.com/WordPress/gutenberg/tree/HEAD/packages/scripts#available-scripts)
 
 _Note: You don’t need to install or configure tools like [webpack](https://webpack.js.org), [Babel](https://babeljs.io) or [ESLint](https://eslint.org) yourself. They are preconfigured and hidden so that you can focus on coding._
 
