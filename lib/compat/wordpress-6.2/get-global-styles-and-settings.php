@@ -26,7 +26,8 @@ if ( ! function_exists( 'wp_theme_has_theme_json' ) ) {
 		 * with the $found parameter which apparently had some issues in some implementations
 		 * https://developer.wordpress.org/reference/functions/wp_cache_get/
 		 */
-		if ( 0 === $theme_has_support || 1 === $theme_has_support ) {
+		if ( ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) &&
+			( 0 === $theme_has_support || 1 === $theme_has_support ) ) {
 			return (bool) $theme_has_support;
 		}
 
