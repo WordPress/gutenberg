@@ -19,4 +19,4 @@
 
 add_action( 'switch_theme', 'wp_theme_has_theme_json_clean_cache' );
 add_action( 'start_previewing_theme', 'wp_theme_has_theme_json_clean_cache' );
-// TODO: clean cache when theme is updated
+add_action( 'upgrader_process_complete', '_wp_theme_has_theme_json_clean_cache_upon_upgrading_active_theme' );

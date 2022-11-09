@@ -50,3 +50,16 @@ if ( ! function_exists( 'wp_theme_has_theme_json_clean_cache' ) ) {
 		wp_cache_delete( 'wp_theme_has_theme_json', 'theme_json' );
 	}
 }
+
+if ( ! function_exists( '_wp_theme_has_theme_json_clean_cache_upon_upgrading_active_theme' ) ) {
+	function _wp_theme_has_theme_json_clean_cache_upon_upgrading_active_theme( $upgrader, $options ) {
+		// The cache only needs cleaning when the active theme was updated.
+		if (
+			'update' === $options[ 'action' ] &&
+			'theme' === $options[ 'type' ] &&
+			array_key_exists( get_stylesheet(), $options[ 'themes' ] )
+		) {
+			wp_theme_has_theme_json_clean_cache();
+		}
+	}
+}
