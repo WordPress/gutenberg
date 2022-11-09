@@ -38,7 +38,7 @@ function PostAuthorEdit( {
 			return {
 				authorId: _authorId,
 				authorDetails: _authorId ? getUser( _authorId ) : null,
-				authors: getUsers( { who: 'authors' } ),
+				authors: getUsers( { who: 'authors', per_page: -1 } ),
 			};
 		},
 		[ postType, postId ]
