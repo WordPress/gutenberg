@@ -26,7 +26,7 @@ $ cd todo-list
 $ npm start
 ```
 
-The `slug` provided (`todo-list` in the example) defines the folder name for the scaffolded plugin and the internal block name. The WordPress plugin generated need to [be installed manually](https://wordpress.org/support/article/managing-plugins/#manual-plugin-installation).
+The `slug` provided (`todo-list` in the example) defines the folder name for the scaffolded plugin and the internal block name. The WordPress plugin generated must [be installed manually](https://wordpress.org/support/article/managing-plugins/#manual-plugin-installation).
 
 
 _(requires `node` version `14.0.0` or above, and `npm` version `6.14.4` or above)_
