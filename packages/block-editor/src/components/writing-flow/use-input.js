@@ -119,6 +119,10 @@ export default function useInput() {
 			const constructorName = prototype.constructor.name;
 			const Constructor = window[ constructorName ];
 			const { anchorNode } = defaultView.getSelection();
+			const anchorElement =
+				anchorNode.nodeType === anchorNode.ELEMENT_NODE
+					? anchorNode
+					: anchorNode.parentElement;
 
 			const init = {};
 
@@ -127,7 +131,7 @@ export default function useInput() {
 			}
 
 			const newEvent = new Constructor( event.type, init );
-			const cancelled = ! anchorNode.dispatchEvent( newEvent );
+			const cancelled = ! anchorElement.dispatchEvent( newEvent );
 
 			if ( cancelled ) {
 				event.preventDefault();
