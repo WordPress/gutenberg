@@ -115,6 +115,7 @@ export function useToolsPanelItem(
 	useEffect( () => {
 		// We check whether this item is currently registered as items rendered
 		// via fills can persist through the parent panel being remounted.
+		// See: https://github.com/WordPress/gutenberg/pull/45673
 		if ( ! isRegistered || isResetting || ! hasMatchingPanel ) {
 			return;
 		}
