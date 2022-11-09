@@ -7,12 +7,18 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import { useEffect, useRef, useCallback } from '@wordpress/element';
+import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../store';
 import { BlockControls, BlockSettingsMenuControls } from '../components';
+import {
+	flattenBlocks,
+	replaceContentsInBlocks,
+	areBlocksAlike,
+} from './utils';
 /**
  * External dependencies
  */
@@ -39,6 +45,89 @@ function StopEditingAsBlocksOnOutsideSelect( {
 		}
 	}, [ isBlockOrDescendantSelected ] );
 	return null;
+}
+
+function ShufflePatternsToolbarItem( { clientId } ) {
+	// TODO: Probably worth to add this to blocks' selectors.
+	const getFlattenContentBlocks = useSelect( ( select ) => {
+		const contentBlockNames = select( blocksStore )
+			.getBlockTypes()
+			.filter(
+				( blockType ) =>
+					blockType.name !== 'core/list-item' &&
+					Object.values( blockType.attributes ).some(
+						( attribute ) =>
+							attribute.__experimentalRole === 'content'
+					)
+			)
+			.map( ( blockType ) => blockType.name );
+
+		return ( blocks ) =>
+			flattenBlocks( blocks ).filter( ( block ) =>
+				contentBlockNames.includes( block.name )
+			);
+	}, [] );
+	const { contentBlocks, patterns } = useSelect(
+		( select ) => {
+			const blocks =
+				select( blockEditorStore ).getBlocksByClientId( clientId );
+			const _contentBlocks = getFlattenContentBlocks( blocks );
+			const allPatterns =
+				select( blockEditorStore ).__experimentalGetAllowedPatterns();
+
+			return {
+				contentBlocks: _contentBlocks,
+				patterns: allPatterns
+					.filter( ( pattern ) => {
+						const patternContentBlocks = getFlattenContentBlocks(
+							pattern.blocks
+						);
+						return (
+							patternContentBlocks.length ===
+								_contentBlocks.length &&
+							_contentBlocks.every(
+								( block, index ) =>
+									block.name ===
+									patternContentBlocks[ index ].name
+							)
+						);
+					} )
+					.filter(
+						( pattern ) =>
+							! areBlocksAlike( blocks, pattern.blocks )
+					),
+			};
+		},
+		[ clientId, getFlattenContentBlocks ]
+	);
+	const { replaceBlocks } = useDispatch( blockEditorStore );
+
+	function shuffle() {
+		// We're not using `Math.random` for instance ids here.
+		// eslint-disable-next-line no-restricted-syntax
+		const randomNumber = Math.floor( Math.random() * patterns.length );
+		const pattern = patterns[ randomNumber ];
+		const replacedPatternBlocks = replaceContentsInBlocks(
+			pattern.blocks,
+			contentBlocks
+		).map( ( block ) => {
+			block.attributes.templateLock = 'contentOnly';
+			return block;
+		} );
+		replaceBlocks( clientId, replacedPatternBlocks );
+	}
+
+	if ( patterns.length === 0 ) {
+		return null;
+	}
+
+	return (
+		<BlockControls group="other">
+			<ToolbarButton onClick={ shuffle }>
+				{ __( 'Shuffle' ) }
+			</ToolbarButton>
+		</BlockControls>
+	);
 }
 
 export const withBlockControls = createHigherOrderComponent(
@@ -124,33 +213,42 @@ export const withBlockControls = createHigherOrderComponent(
 					</>
 				) }
 				{ ! isEditingAsBlocks && isContentLocked && props.isSelected && (
-					<BlockSettingsMenuControls>
-						{ ( { onClose } ) => (
-							<MenuItem
-								onClick={ () => {
-									__unstableMarkNextChangeAsNotPersistent();
-									updateBlockAttributes( props.clientId, {
-										templateLock: undefined,
-									} );
-									updateBlockListSettings( props.clientId, {
-										...getBlockListSettings(
+					<>
+						<BlockSettingsMenuControls>
+							{ ( { onClose } ) => (
+								<MenuItem
+									onClick={ () => {
+										__unstableMarkNextChangeAsNotPersistent();
+										updateBlockAttributes( props.clientId, {
+											templateLock: undefined,
+										} );
+										updateBlockListSettings(
+											props.clientId,
+											{
+												...getBlockListSettings(
+													props.clientId
+												),
+												templateLock: false,
+											}
+										);
+										focusModeToRevert.current =
+											getSettings().focusMode;
+										updateSettings( { focusMode: true } );
+										__unstableSetTemporarilyEditingAsBlocks(
 											props.clientId
-										),
-										templateLock: false,
-									} );
-									focusModeToRevert.current =
-										getSettings().focusMode;
-									updateSettings( { focusMode: true } );
-									__unstableSetTemporarilyEditingAsBlocks(
-										props.clientId
-									);
-									onClose();
-								} }
-							>
-								{ __( 'Modify' ) }
-							</MenuItem>
-						) }
-					</BlockSettingsMenuControls>
+										);
+										onClose();
+									} }
+								>
+									{ __( 'Modify' ) }
+								</MenuItem>
+							) }
+						</BlockSettingsMenuControls>
+
+						<ShufflePatternsToolbarItem
+							clientId={ props.clientId }
+						/>
+					</>
 				) }
 				<BlockEdit
 					{ ...props }

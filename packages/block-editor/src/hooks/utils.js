@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { isEmpty, mapValues, get, setWith, clone } from 'lodash';
+import { isEmpty, mapValues, get, setWith, clone, isEqual } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { getBlockSupport } from '@wordpress/blocks';
+import { getBlockSupport, getBlockType, createBlock } from '@wordpress/blocks';
 
 /**
  * Removed falsy values from nested object.
@@ -110,4 +110,86 @@ export function shouldSkipSerialization( blockType, featureSet, feature ) {
 	}
 
 	return skipSerialization;
+}
+
+export function flattenBlocks( blocks ) {
+	return blocks.flatMap( ( block ) => [
+		block,
+		...flattenBlocks( block.innerBlocks ),
+	] );
+}
+
+export function replaceContentsInBlocks( sourceBlocks, contentBlocks ) {
+	const [ contentBlock, ...restContentBlocks ] = contentBlocks;
+	return sourceBlocks.map( ( block ) => {
+		if ( block.name !== contentBlock.name ) {
+			return createBlock(
+				block.name,
+				block.attributes,
+				replaceContentsInBlocks( block.innerBlocks, contentBlocks )
+			);
+		}
+
+		const blockTypeAttributes = getBlockType( block.name ).attributes;
+		return createBlock(
+			block.name,
+			Object.keys( block.attributes ).reduce(
+				( attributes, attributeName ) => {
+					if (
+						blockTypeAttributes[ attributeName ]
+							.__experimentalRole === 'content'
+					) {
+						attributes[ attributeName ] =
+							contentBlock.attributes[ attributeName ];
+					} else {
+						attributes[ attributeName ] =
+							block.attributes[ attributeName ];
+					}
+					return attributes;
+				},
+				{}
+			),
+			replaceContentsInBlocks( block.innerBlocks, restContentBlocks )
+		);
+	} );
+}
+
+export function areBlocksAlike( sourceBlocks, targetBlocks ) {
+	if ( sourceBlocks.length !== targetBlocks.length ) {
+		return false;
+	}
+
+	for ( let index = 0; index < sourceBlocks.length; index += 1 ) {
+		const sourceBlock = sourceBlocks[ index ];
+		const targetBlock = targetBlocks[ index ];
+
+		if ( sourceBlock.name !== targetBlock.name ) {
+			return false;
+		}
+
+		const blockTypeAttributes = getBlockType( sourceBlock.name ).attributes;
+
+		if (
+			Object.keys( blockTypeAttributes ).some(
+				( attribute ) =>
+					attribute !== 'templateLock' &&
+					blockTypeAttributes[ attribute ].__experimentalRole !==
+						'content' &&
+					! isEqual(
+						sourceBlock.attributes[ attribute ],
+						targetBlock.attributes[ attribute ]
+					)
+			)
+		) {
+			return false;
+		}
+
+		if (
+			! areBlocksAlike( sourceBlock.innerBlocks, targetBlock.innerBlocks )
+		) {
+			return false;
+		}
+	}
+
+	return true;
 }
