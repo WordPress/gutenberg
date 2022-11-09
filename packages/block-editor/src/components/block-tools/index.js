@@ -61,6 +61,7 @@ export default function BlockTools( {
 		clearSelectedBlock,
 		moveBlocksUp,
 		moveBlocksDown,
+		toggleBlockMode,
 	} = useDispatch( blockEditorStore );
 
 	function onKeyDown( event ) {
@@ -113,6 +114,12 @@ export default function BlockTools( {
 					.getSelection()
 					.removeAllRanges();
 				__unstableContentRef?.current.focus();
+			}
+		} else if ( isMatch( 'core/block-editor/edit-html', event ) ) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length ) {
+				event.preventDefault();
+				toggleBlockMode( clientIds[ 0 ] );
 			}
 		}
 	}

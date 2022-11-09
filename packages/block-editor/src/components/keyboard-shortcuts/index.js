@@ -122,6 +122,16 @@ function KeyboardShortcutsRegister() {
 				character: 'y',
 			},
 		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/edit-html',
+			category: 'block',
+			description: __( 'Edit HTML or Edit Visually.' ),
+			keyCombination: {
+				modifier: 'secondary',
+				character: 'h',
+			},
+		} );
 	}, [ registerShortcut ] );
 
 	return null;

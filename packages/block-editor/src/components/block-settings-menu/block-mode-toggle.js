@@ -4,8 +4,9 @@
 import { __ } from '@wordpress/i18n';
 import { MenuItem } from '@wordpress/components';
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { withSelect, withDispatch, useSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -21,6 +22,11 @@ export function BlockModeToggle( {
 	small = false,
 	isCodeEditingEnabled = true,
 } ) {
+	const shortcut = useSelect( ( select ) => {
+		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
+		return getShortcutRepresentation( 'core/block-editor/edit-html' );
+	}, [] );
+
 	if (
 		! blockType ||
 		! hasBlockSupport( blockType, 'html', true ) ||
@@ -32,7 +38,11 @@ export function BlockModeToggle( {
 	const label =
 		mode === 'visual' ? __( 'Edit as HTML' ) : __( 'Edit visually' );
 
-	return <MenuItem onClick={ onToggleMode }>{ ! small && label }</MenuItem>;
+	return (
+		<MenuItem onClick={ onToggleMode } shortcut={ shortcut }>
+			{ ! small && label }
+		</MenuItem>
+	);
 }
 
 export default compose( [
