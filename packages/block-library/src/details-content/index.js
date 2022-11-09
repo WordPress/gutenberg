@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { chevronDown as icon } from '@wordpress/icons';
+import { postContent as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
