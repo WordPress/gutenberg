@@ -43,7 +43,10 @@ module.exports = async (
 		editorScript,
 		editorStyle,
 		style,
+		render,
 		variantVars,
+		customPackageJSON,
+		customBlockJSON,
 	}
 ) => {
 	slug = slug.toLowerCase();
@@ -99,6 +102,9 @@ module.exports = async (
 		editorScript,
 		editorStyle,
 		style,
+		render,
+		customPackageJSON,
+		customBlockJSON,
 		...variantVars,
 	};
 

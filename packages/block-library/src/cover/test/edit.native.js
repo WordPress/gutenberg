@@ -9,6 +9,8 @@ import {
 	fireEvent,
 	waitFor,
 	within,
+	getBlock,
+	openBlockSettings,
 } from 'test/helpers';
 
 /**
@@ -41,12 +43,22 @@ jest.mock( '@wordpress/compose', () => ( {
 	) ),
 } ) );
 
-const COVER_BLOCK_PLACEHOLDER_HTML = `<!-- wp:cover -->
-<div class="wp-block-cover"><span aria-hidden="true" class="has-background-dim-100 wp-block-cover__gradient-background has-background-dim"></span><div class="wp-block-cover__inner-container"></div></div>
+const COVER_BLOCK_PLACEHOLDER_HTML = `<!-- wp:cover {"isDark":false} -->
+<div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-background-dim-100 has-background-dim"></span><div class="wp-block-cover__inner-container"></div></div>
 <!-- /wp:cover -->`;
-const COVER_BLOCK_SOLID_COLOR_HTML = `<!-- wp:cover {"overlayColor":"cyan-bluish-gray"} -->
-<div class="wp-block-cover"><span aria-hidden="true" class="has-cyan-bluish-gray-background-color has-background-dim-100 wp-block-cover__gradient-background has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…"} -->
+const COVER_BLOCK_SOLID_COLOR_HTML = `<!-- wp:cover {"overlayColor":"cyan-bluish-gray","isDark":false} -->
+<div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-cyan-bluish-gray-background-color has-background-dim-100 has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…"} -->
 <p class="has-text-align-center"></p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:cover -->`;
+const COVER_BLOCK_IMAGE_HTML = `<!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":10710,"dimRatio":50,"overlayColor":"foreground","isDark":false} -->
+<div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim"></span><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
+<p class="has-text-align-center has-large-font-size"></p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:cover -->`;
+const COVER_BLOCK_CUSTOM_HEIGHT_HTML = `<!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":10710,"dimRatio":50,"overlayColor":"foreground","minHeight":20,"minHeightUnit":"vw","isDark":false} -->
+<div class="wp-block-cover is-light" style="min-height:20vw"><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim"></span><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
+<p class="has-text-align-center has-large-font-size"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->`;
 
@@ -290,16 +302,44 @@ describe( 'when an image is attached', () => {
 			} )
 		);
 	} );
+
+	it( 'updates background opacity', async () => {
+		const screen = await initializeEditor( {
+			initialHtml: COVER_BLOCK_IMAGE_HTML,
+		} );
+		const { getByLabelText } = screen;
+
+		// Get block
+		const coverBlock = await getBlock( screen, 'Cover' );
+		fireEvent.press( coverBlock );
+
+		// Open block settings
+		await openBlockSettings( screen );
+
+		// Update Opacity attribute
+		const opacityControl = getByLabelText( /Opacity/ );
+		fireEvent.press( within( opacityControl ).getByText( '50' ) );
+		const heightTextInput =
+			within( opacityControl ).getByDisplayValue( '50' );
+		fireEvent.changeText( heightTextInput, '20' );
+
+		// The decreasing button should be disabled
+		fireEvent( opacityControl, 'accessibilityAction', {
+			nativeEvent: { actionName: 'decrement' },
+		} );
+
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
 } );
 
 describe( 'color settings', () => {
 	it( 'sets a color for the overlay background when the placeholder is visible', async () => {
-		const { getByTestId, getByA11yLabel } = await initializeEditor( {
+		const { getByTestId, getByLabelText } = await initializeEditor( {
 			initialHtml: COVER_BLOCK_PLACEHOLDER_HTML,
 		} );
 
 		const block = await waitFor( () =>
-			getByA11yLabel( 'Cover block. Empty' )
+			getByLabelText( 'Cover block. Empty' )
 		);
 		expect( block ).toBeDefined();
 
@@ -314,13 +354,13 @@ describe( 'color settings', () => {
 
 		// Wait for the block to be created.
 		const coverBlockWithOverlay = await waitFor( () =>
-			getByA11yLabel( /Cover Block\. Row 1/ )
+			getByLabelText( /Cover Block\. Row 1/ )
 		);
 		fireEvent.press( coverBlockWithOverlay );
 
 		// Open Block Settings.
 		const settingsButton = await waitFor( () =>
-			getByA11yLabel( 'Open Settings' )
+			getByLabelText( 'Open Settings' )
 		);
 		fireEvent.press( settingsButton );
 
@@ -330,7 +370,7 @@ describe( 'color settings', () => {
 
 		// Open the overlay color settings.
 		const colorOverlay = await waitFor( () =>
-			getByA11yLabel( 'Color. Empty' )
+			getByLabelText( 'Color. Empty' )
 		);
 		expect( colorOverlay ).toBeDefined();
 		fireEvent.press( colorOverlay );
@@ -349,20 +389,20 @@ describe( 'color settings', () => {
 	} );
 
 	it( 'sets a gradient overlay background when a solid background was already selected', async () => {
-		const { getByTestId, getByA11yLabel } = await initializeEditor( {
+		const { getByTestId, getByLabelText } = await initializeEditor( {
 			initialHtml: COVER_BLOCK_SOLID_COLOR_HTML,
 		} );
 
 		// Wait for the block to be created.
 		const coverBlock = await waitFor( () =>
-			getByA11yLabel( /Cover Block\. Row 1/ )
+			getByLabelText( /Cover Block\. Row 1/ )
 		);
 		expect( coverBlock ).toBeDefined();
 		fireEvent.press( coverBlock );
 
 		// Open Block Settings.
 		const settingsButton = await waitFor( () =>
-			getByA11yLabel( 'Open Settings' )
+			getByLabelText( 'Open Settings' )
 		);
 		fireEvent.press( settingsButton );
 
@@ -372,7 +412,7 @@ describe( 'color settings', () => {
 
 		// Open the overlay color settings.
 		const colorOverlay = await waitFor( () =>
-			getByA11yLabel( 'Color. Empty' )
+			getByLabelText( 'Color. Empty' )
 		);
 		expect( colorOverlay ).toBeDefined();
 		fireEvent.press( colorOverlay );
@@ -383,7 +423,7 @@ describe( 'color settings', () => {
 
 		// Open the gradients.
 		const gradientsButton = await waitFor( () =>
-			getByA11yLabel( 'Gradient' )
+			getByLabelText( 'Gradient' )
 		);
 		expect( gradientsButton ).toBeDefined();
 
@@ -406,12 +446,12 @@ describe( 'color settings', () => {
 	} );
 
 	it( 'toggles between solid colors and gradients', async () => {
-		const { getByTestId, getByA11yLabel } = await initializeEditor( {
+		const { getByTestId, getByLabelText } = await initializeEditor( {
 			initialHtml: COVER_BLOCK_PLACEHOLDER_HTML,
 		} );
 
 		const block = await waitFor( () =>
-			getByA11yLabel( 'Cover block. Empty' )
+			getByLabelText( 'Cover block. Empty' )
 		);
 		expect( block ).toBeDefined();
 
@@ -426,13 +466,13 @@ describe( 'color settings', () => {
 
 		// Wait for the block to be created.
 		const coverBlockWithOverlay = await waitFor( () =>
-			getByA11yLabel( /Cover Block\. Row 1/ )
+			getByLabelText( /Cover Block\. Row 1/ )
 		);
 		fireEvent.press( coverBlockWithOverlay );
 
 		// Open Block Settings.
 		const settingsButton = await waitFor( () =>
-			getByA11yLabel( 'Open Settings' )
+			getByLabelText( 'Open Settings' )
 		);
 		fireEvent.press( settingsButton );
 
@@ -442,7 +482,7 @@ describe( 'color settings', () => {
 
 		// Open the overlay color settings.
 		const colorOverlay = await waitFor( () =>
-			getByA11yLabel( 'Color. Empty' )
+			getByLabelText( 'Color. Empty' )
 		);
 		expect( colorOverlay ).toBeDefined();
 		fireEvent.press( colorOverlay );
@@ -459,7 +499,7 @@ describe( 'color settings', () => {
 
 		// Open the gradients.
 		const gradientsButton = await waitFor( () =>
-			getByA11yLabel( 'Gradient' )
+			getByLabelText( 'Gradient' )
 		);
 		expect( gradientsButton ).toBeDefined();
 
@@ -476,11 +516,11 @@ describe( 'color settings', () => {
 		fireEvent.press( newGradientButton );
 
 		// Go back to the settings list.
-		fireEvent.press( await waitFor( () => getByA11yLabel( 'Go back' ) ) );
+		fireEvent.press( await waitFor( () => getByLabelText( 'Go back' ) ) );
 
 		// Find the color setting.
 		const colorSetting = await waitFor( () =>
-			getByA11yLabel( 'Color. Empty' )
+			getByLabelText( 'Color. Empty' )
 		);
 		expect( colorSetting ).toBeDefined();
 		fireEvent.press( colorSetting );
@@ -492,21 +532,21 @@ describe( 'color settings', () => {
 	} );
 
 	it( 'clears the selected overlay color and mantains the inner blocks', async () => {
-		const { getByTestId, getByA11yLabel, getByText } =
+		const { getByTestId, getByLabelText, getByText } =
 			await initializeEditor( {
 				initialHtml: COVER_BLOCK_SOLID_COLOR_HTML,
 			} );
 
 		// Wait for the block to be created.
 		const coverBlock = await waitFor( () =>
-			getByA11yLabel( /Cover Block\. Row 1/ )
+			getByLabelText( /Cover Block\. Row 1/ )
 		);
 		expect( coverBlock ).toBeDefined();
 		fireEvent.press( coverBlock );
 
 		// Open Block Settings.
 		const settingsButton = await waitFor( () =>
-			getByA11yLabel( 'Open Settings' )
+			getByLabelText( 'Open Settings' )
 		);
 		fireEvent.press( settingsButton );
 
@@ -516,7 +556,7 @@ describe( 'color settings', () => {
 
 		// Open the overlay color settings.
 		const colorOverlay = await waitFor( () =>
-			getByA11yLabel( 'Color. Empty' )
+			getByLabelText( 'Color. Empty' )
 		);
 		expect( colorOverlay ).toBeDefined();
 		fireEvent.press( colorOverlay );
@@ -531,5 +571,97 @@ describe( 'color settings', () => {
 		fireEvent.press( resetButton );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+} );
+
+describe( 'minimum height settings', () => {
+	it( 'changes the height value to 20(vw)', async () => {
+		const screen = await initializeEditor( {
+			initialHtml: COVER_BLOCK_IMAGE_HTML,
+		} );
+		const { getByText, getByDisplayValue } = screen;
+
+		// Get block
+		const coverBlock = await getBlock( screen, 'Cover' );
+		fireEvent.press( coverBlock );
+
+		// Open block settings
+		await openBlockSettings( screen );
+
+		// Set vw unit
+		fireEvent.press( getByText( 'px' ) );
+		fireEvent.press( getByText( 'Viewport width (vw)' ) );
+
+		// Update height attribute
+		fireEvent.press( getByText( '300' ) );
+		const heightTextInput = getByDisplayValue( '300' );
+		fireEvent.changeText( heightTextInput, '20' );
+
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'changes the height value between units', async () => {
+		const screen = await initializeEditor( {
+			initialHtml: COVER_BLOCK_CUSTOM_HEIGHT_HTML,
+		} );
+		const { getByText } = screen;
+
+		// Get block
+		const coverBlock = await getBlock( screen, 'Cover' );
+		fireEvent.press( coverBlock );
+
+		// Open block settings
+		await openBlockSettings( screen );
+
+		// Set the pixel unit
+		fireEvent.press( getByText( 'vw' ) );
+		fireEvent.press( getByText( 'Pixels (px)' ) );
+
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	describe( 'disables the decrease button when reaching the minimum value', () => {
+		const testData = [
+			[ 'Pixels (px)', '50', '50' ],
+			[ 'Relative to parent font size (em)', '20', '1' ],
+			[ 'Relative to root font size (rem)', '20', '1' ],
+			[ 'Viewport width (vw)', '20', '1' ],
+			[ 'Viewport height (vh)', '20', '1' ],
+		];
+
+		test.each( testData )(
+			'for %s',
+			async ( unitName, value, minValue ) => {
+				const screen = await initializeEditor( {
+					initialHtml: COVER_BLOCK_CUSTOM_HEIGHT_HTML,
+				} );
+				const { getByLabelText, getByText } = screen;
+
+				// Get block
+				const coverBlock = await getBlock( screen, 'Cover' );
+				fireEvent.press( coverBlock );
+
+				// Open block settings
+				await openBlockSettings( screen );
+
+				// Set the unit name
+				fireEvent.press( getByText( 'vw' ) );
+				fireEvent.press( getByText( unitName ) );
+
+				// Update height attribute
+				const heightControl = getByLabelText( /Minimum height/ );
+				fireEvent.press( within( heightControl ).getByText( value ) );
+				const heightTextInput =
+					within( heightControl ).getByDisplayValue( value );
+				fireEvent.changeText( heightTextInput, minValue );
+
+				// The decreasing button should be disabled
+				fireEvent( heightControl, 'accessibilityAction', {
+					nativeEvent: { actionName: 'decrement' },
+				} );
+
+				expect( getEditorHtml() ).toMatchSnapshot();
+			}
+		);
 	} );
 } );

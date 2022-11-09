@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 /**
  * Internal dependencies
  */
-import Picker from '../index.js';
+import Picker from '..';
 
 describe( 'FocalPointPicker', () => {
 	describe( 'focus and blur', () => {
@@ -112,9 +112,9 @@ describe( 'FocalPointPicker', () => {
 			await user.keyboard( '[ArrowUp]' );
 
 			expect( spy ).toHaveBeenCalled();
-			expect( spyChange ).toHaveBeenCalledWith( {
-				x: '0.91',
-				y: '0.42',
+			expect( spyChange ).toHaveBeenLastCalledWith( {
+				x: 0.91,
+				y: 0.42,
 			} );
 		} );
 	} );
@@ -143,10 +143,30 @@ describe( 'FocalPointPicker', () => {
 			await user.click( dragArea );
 			await user.keyboard( '[ArrowDown]' );
 
-			expect( spyChange ).toHaveBeenCalledWith( {
-				x: '0.14',
-				y: '0.63',
+			expect( spyChange ).toHaveBeenLastCalledWith( {
+				x: 0.14,
+				y: 0.63,
 			} );
+		} );
+	} );
+
+	describe( 'value handling', () => {
+		it( 'should handle legacy string values', () => {
+			const onChangeSpy = jest.fn();
+			render(
+				<Picker
+					value={ { x: '0.1', y: '0.2' } }
+					onChange={ onChangeSpy }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Left' } ).value
+			).toBe( '10' );
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Top' } ).value
+			).toBe( '20' );
+			expect( onChangeSpy ).not.toHaveBeenCalled();
 		} );
 	} );
 } );

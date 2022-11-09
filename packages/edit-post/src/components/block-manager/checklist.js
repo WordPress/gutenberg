@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { partial } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { BlockIcon } from '@wordpress/block-editor';
@@ -18,6 +13,7 @@ function BlockTypesChecklist( { blockTypes, value, onItemChange } ) {
 					className="edit-post-block-manager__checklist-item"
 				>
 					<CheckboxControl
+						__nextHasNoMarginBottom
 						label={
 							<>
 								{ blockType.title }
@@ -25,7 +21,9 @@ function BlockTypesChecklist( { blockTypes, value, onItemChange } ) {
 							</>
 						}
 						checked={ value.includes( blockType.name ) }
-						onChange={ partial( onItemChange, blockType.name ) }
+						onChange={ ( ...args ) =>
+							onItemChange( blockType.name, ...args )
+						}
 					/>
 				</li>
 			) ) }

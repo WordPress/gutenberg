@@ -90,7 +90,7 @@ const initialHtml = `<!-- wp:buttons -->
 <div class="wp-block-button"><a class="wp-block-button__link" style="border-radius:5px" >Hello</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->`;
-const { getByA11yLabel } = initializeEditor( {
+const { getByLabelText } = initializeEditor( {
 	initialHtml,
 } );
 ```
@@ -102,7 +102,7 @@ Once the components are rendered, it’s time to query them. An important note a
 When querying we should follow this priority order:
 
 1. `getByText`: querying by text is the closest flow we can do from the user’s perspective, as text is the visual clue for them to identify elements.
-2. `getByA11yLabel`: in some cases, we want to query elements that don’t provide text so in this case we can fallback to the accessibility label.
+2. `getByLabelText`: in some cases, we want to query elements that don’t provide text so in this case we can fallback to the accessibility label.
 3. `getByTestId`: if none of the previous options fit and/or we don’t have any visual element that we can rely upon, we have to fallback to a specific test id, which can be defined using the `testID` attribute (see [here](https://github.com/WordPress/gutenberg/blob/e5b387b19ffc50555f52ea5f0b415ab846896def/packages/block-editor/src/components/block-types-list/index.native.js#L80) for an example).
 
 Here are some examples:
@@ -112,7 +112,7 @@ const mediaLibraryButton = getByText( 'WordPress Media Library' );
 ```
 
 ```js
-const missingBlock = getByA11yLabel( /Unsupported Block\. Row 1/ );
+const missingBlock = getByLabelText( /Unsupported Block\. Row 1/ );
 ```
 
 ```js
@@ -135,7 +135,7 @@ const mediaLibraryButton = await waitFor( () =>
 
 ```js
 const missingBlock = await waitFor( () =>
-	getByA11yLabel( /Unsupported Block\. Row 1/ )
+	getByLabelText( /Unsupported Block\. Row 1/ )
 );
 ```
 
@@ -155,7 +155,7 @@ It’s also possible to query elements contained in other elements via the `with
 
 ```js
 const missingBlock = await waitFor( () =>
-	getByA11yLabel( /Unsupported Block\. Row 1/ )
+	getByLabelText( /Unsupported Block\. Row 1/ )
 );
 const translatedTableTitle = within( missingBlock ).getByText( 'Tabla' );
 ```
@@ -224,7 +224,7 @@ A common way to query a block is by its accessibility label, here is an example:
 
 ```js
 const spacerBlock = await waitFor( () =>
-	getByA11yLabel( /Spacer Block\. Row 1/ )
+	getByLabelText( /Spacer Block\. Row 1/ )
 );
 ```
 
@@ -236,7 +236,7 @@ Here is an example of how to insert a Paragraph block:
 
 ```js
 // Open the inserter menu
-fireEvent.press( await waitFor( () => getByA11yLabel( 'Add block' ) ) );
+fireEvent.press( await waitFor( () => getByLabelText( 'Add block' ) ) );
 
 const blockList = getByTestId( 'InserterUI-Blocks' );
 // onScroll event used to force the FlatList to render all items
@@ -259,7 +259,7 @@ The block settings can be accessed by tapping the "Open Settings" button after s
 ```js
 fireEvent.press( block );
 
-const settingsButton = await waitFor( () => getByA11yLabel( 'Open Settings' ) );
+const settingsButton = await waitFor( () => getByLabelText( 'Open Settings' ) );
 fireEvent.press( settingsButton );
 ```
 
@@ -326,7 +326,7 @@ fireEvent( innerBlockListWrapper, 'layout', {
 } );
 
 const buttonInnerBlock = await waitFor( () =>
-	within( buttonsBlock ).getByA11yLabel( /Button Block\. Row 1/ )
+	within( buttonsBlock ).getByLabelText( /Button Block\. Row 1/ )
 );
 fireEvent.press( buttonInnerBlock );
 ```

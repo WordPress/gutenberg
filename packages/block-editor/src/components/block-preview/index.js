@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { castArray } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -32,12 +31,14 @@ export function BlockPreview( {
 		( select ) => select( blockEditorStore ).getSettings(),
 		[]
 	);
-	const settings = useMemo( () => {
-		const _settings = { ...originalSettings };
-		_settings.__experimentalBlockPatterns = [];
-		return _settings;
-	}, [ originalSettings ] );
-	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
+	const settings = useMemo(
+		() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
+		[ originalSettings ]
+	);
+	const renderedBlocks = useMemo(
+		() => ( Array.isArray( blocks ) ? blocks : [ blocks ] ),
+		[ blocks ]
+	);
 	if ( ! blocks || blocks.length === 0 ) {
 		return null;
 	}
@@ -94,13 +95,16 @@ export function useBlockPreview( {
 		( select ) => select( blockEditorStore ).getSettings(),
 		[]
 	);
-	const disabledRef = useDisabled();
-	const ref = useMergeRefs( [ props.ref, disabledRef ] );
 	const settings = useMemo(
-		() => ( { ...originalSettings, __experimentalBlockPatterns: [] } ),
+		() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
 		[ originalSettings ]
 	);
-	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
+	const disabledRef = useDisabled();
+	const ref = useMergeRefs( [ props.ref, disabledRef ] );
+	const renderedBlocks = useMemo(
+		() => ( Array.isArray( blocks ) ? blocks : [ blocks ] ),
+		[ blocks ]
+	);
 
 	const children = (
 		<BlockEditorProvider value={ renderedBlocks } settings={ settings }>

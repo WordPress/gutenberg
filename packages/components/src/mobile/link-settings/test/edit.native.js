@@ -77,19 +77,19 @@ describe.each( [
 
 		// Act.
 		const block = await waitFor( () =>
-			subject.getByA11yLabel(
+			subject.getByLabelText(
 				type === 'core/image' ? /Image Block/ : /Button Block/
 			)
 		);
 		fireEvent.press( block );
 		fireEvent.press( block );
 		fireEvent.press(
-			await waitFor( () => subject.getByA11yLabel( 'Open Settings' ) )
+			await waitFor( () => subject.getByLabelText( 'Open Settings' ) )
 		);
 
 		// Assert.
 		const linkToField = await waitFor( () =>
-			subject.getByA11yLabel(
+			subject.getByLabelText(
 				`Link to, ${
 					type === 'core/image' ? 'None' : 'Search or type URL'
 				}`
@@ -114,7 +114,7 @@ describe.each( [
 
 				// Act.
 				const block = await waitFor( () =>
-					subject.getByA11yLabel(
+					subject.getByLabelText(
 						type === 'core/image' ? /Image Block/ : /Button Block/
 					)
 				);
@@ -122,12 +122,12 @@ describe.each( [
 				fireEvent.press( block );
 				fireEvent.press(
 					await waitFor( () =>
-						subject.getByA11yLabel( 'Open Settings' )
+						subject.getByLabelText( 'Open Settings' )
 					)
 				);
 				fireEvent.press(
 					await waitFor( () =>
-						subject.getByA11yLabel(
+						subject.getByLabelText(
 							`Link to, ${
 								type === 'core/image'
 									? 'None'
@@ -139,15 +139,15 @@ describe.each( [
 				if ( type === 'core/image' ) {
 					fireEvent.press(
 						await waitFor( () =>
-							subject.getByA11yLabel( /Custom URL/ )
+							subject.getByLabelText( /Custom URL/ )
 						)
 					);
 				}
-				await waitFor( () => subject.getByA11yLabel( 'Apply' ) );
+				await waitFor( () => subject.getByLabelText( 'Apply' ) );
 
 				// Assert.
 				expect(
-					subject.queryByA11yLabel( /Copy URL from the clipboard[,]/ )
+					subject.queryByLabelText( /Copy URL from the clipboard[,]/ )
 				).toBeNull();
 			} );
 		} );
@@ -167,7 +167,7 @@ describe.each( [
 
 				// Act.
 				const block = await waitFor( () =>
-					subject.getByA11yLabel(
+					subject.getByLabelText(
 						type === 'core/image' ? /Image Block/ : /Button Block/
 					)
 				);
@@ -175,12 +175,12 @@ describe.each( [
 				fireEvent.press( block );
 				fireEvent.press(
 					await waitFor( () =>
-						subject.getByA11yLabel( 'Open Settings' )
+						subject.getByLabelText( 'Open Settings' )
 					)
 				);
 				fireEvent.press(
 					await waitFor( () =>
-						subject.getByA11yLabel(
+						subject.getByLabelText(
 							`Link to, ${
 								type === 'core/image'
 									? 'None'
@@ -192,20 +192,20 @@ describe.each( [
 				if ( type === 'core/image' ) {
 					fireEvent.press(
 						await waitFor( () =>
-							subject.getByA11yLabel( 'Custom URL. Empty' )
+							subject.getByLabelText( 'Custom URL. Empty' )
 						)
 					);
 				}
 				fireEvent.press(
 					await waitFor( () =>
-						subject.getByA11yLabel(
+						subject.getByLabelText(
 							`Copy URL from the clipboard, ${ url }`
 						)
 					)
 				);
 				fireEvent.press(
 					await waitFor( () =>
-						subject.getByA11yLabel(
+						subject.getByLabelText(
 							`Link to, ${
 								type === 'core/image' ? 'Custom URL' : url
 							}`
@@ -215,15 +215,15 @@ describe.each( [
 				if ( type === 'core/image' ) {
 					fireEvent.press(
 						await waitFor( () =>
-							subject.getByA11yLabel( `Custom URL, ${ url }` )
+							subject.getByLabelText( `Custom URL, ${ url }` )
 						)
 					);
 				}
-				await waitFor( () => subject.getByA11yLabel( 'Apply' ) );
+				await waitFor( () => subject.getByLabelText( 'Apply' ) );
 
 				// Assert.
 				expect(
-					subject.queryByA11yLabel( /Copy URL from the clipboard[,]/ )
+					subject.queryByLabelText( /Copy URL from the clipboard[,]/ )
 				).toBeNull();
 			} );
 		} );
@@ -246,7 +246,7 @@ describe.each( [
 
 					// Act.
 					const block = await waitFor( () =>
-						subject.getByA11yLabel(
+						subject.getByLabelText(
 							type === 'core/image'
 								? /Image Block/
 								: /Button Block/
@@ -256,12 +256,12 @@ describe.each( [
 					fireEvent.press( block );
 					fireEvent.press(
 						await waitFor( () =>
-							subject.getByA11yLabel( 'Open Settings' )
+							subject.getByLabelText( 'Open Settings' )
 						)
 					);
 					fireEvent.press(
 						await waitFor( () =>
-							subject.getByA11yLabel(
+							subject.getByLabelText(
 								`Link to, ${
 									type === 'core/image'
 										? 'None'
@@ -273,12 +273,12 @@ describe.each( [
 					if ( type === 'core/image' ) {
 						fireEvent.press(
 							await waitFor( () =>
-								subject.getByA11yLabel( /Custom URL/ )
+								subject.getByLabelText( /Custom URL/ )
 							)
 						);
 					}
 					await waitFor( () =>
-						subject.getByA11yLabel(
+						subject.getByLabelText(
 							`Copy URL from the clipboard, ${ url }`
 						)
 					);
@@ -313,7 +313,7 @@ describe.each( [
 
 					// Act.
 					const block = await waitFor( () =>
-						subject.getByA11yLabel(
+						subject.getByLabelText(
 							type === 'core/image'
 								? /Image Block/
 								: /Button Block/
@@ -323,12 +323,12 @@ describe.each( [
 					fireEvent.press( block );
 					fireEvent.press(
 						await waitFor( () =>
-							subject.getByA11yLabel( 'Open Settings' )
+							subject.getByLabelText( 'Open Settings' )
 						)
 					);
 					fireEvent.press(
 						await waitFor( () =>
-							subject.getByA11yLabel(
+							subject.getByLabelText(
 								`Link to, ${
 									type === 'core/image'
 										? 'None'
@@ -340,13 +340,13 @@ describe.each( [
 					if ( type === 'core/image' ) {
 						fireEvent.press(
 							await waitFor( () =>
-								subject.getByA11yLabel( /Custom URL/ )
+								subject.getByLabelText( /Custom URL/ )
 							)
 						);
 					}
 					fireEvent.press(
 						await waitFor( () =>
-							subject.getByA11yLabel(
+							subject.getByLabelText(
 								`Copy URL from the clipboard, ${ url }`
 							)
 						)
@@ -354,7 +354,7 @@ describe.each( [
 
 					// Assert.
 					const linkToField = await waitFor( () =>
-						subject.getByA11yLabel(
+						subject.getByLabelText(
 							`Link to, ${
 								type === 'core/image' ? 'Custom URL' : url
 							}`

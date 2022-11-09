@@ -9,64 +9,79 @@ import {
 } from '@wordpress/element';
 import { useFocusableIframe, useMergeRefs } from '@wordpress/compose';
 
-const observeAndResizeJS = `
-	( function() {
-		var observer;
+const observeAndResizeJS = function () {
+	const { MutationObserver } = window;
 
-		if ( ! window.MutationObserver || ! document.body || ! window.parent ) {
-			return;
-		}
+	if ( ! MutationObserver || ! document.body || ! window.parent ) {
+		return;
+	}
 
-		function sendResize() {
-			var clientBoundingRect = document.body.getBoundingClientRect();
+	function sendResize() {
+		const clientBoundingRect = document.body.getBoundingClientRect();
 
-			window.parent.postMessage( {
+		window.parent.postMessage(
+			{
 				action: 'resize',
 				width: clientBoundingRect.width,
 				height: clientBoundingRect.height,
-			}, '*' );
+			},
+			'*'
+		);
+	}
+
+	const observer = new MutationObserver( sendResize );
+	observer.observe( document.body, {
+		attributes: true,
+		attributeOldValue: false,
+		characterData: true,
+		characterDataOldValue: false,
+		childList: true,
+		subtree: true,
+	} );
+
+	window.addEventListener( 'load', sendResize, true );
+
+	// Hack: Remove viewport unit styles, as these are relative
+	// the iframe root and interfere with our mechanism for
+	// determining the unconstrained page bounds.
+	function removeViewportStyles( ruleOrNode ) {
+		if ( ruleOrNode.style ) {
+			[ 'width', 'height', 'minHeight', 'maxHeight' ].forEach( function (
+				style
+			) {
+				if (
+					/^\\d+(vmin|vmax|vh|vw)$/.test( ruleOrNode.style[ style ] )
+				) {
+					ruleOrNode.style[ style ] = '';
+				}
+			} );
 		}
+	}
 
-		observer = new MutationObserver( sendResize );
-		observer.observe( document.body, {
-			attributes: true,
-			attributeOldValue: false,
-			characterData: true,
-			characterDataOldValue: false,
-			childList: true,
-			subtree: true
-		} );
-
-		window.addEventListener( 'load', sendResize, true );
-
-		// Hack: Remove viewport unit styles, as these are relative
-		// the iframe root and interfere with our mechanism for
-		// determining the unconstrained page bounds.
-		function removeViewportStyles( ruleOrNode ) {
-			if( ruleOrNode.style ) {
-				[ 'width', 'height', 'minHeight', 'maxHeight' ].forEach( function( style ) {
-					if ( /^\\d+(vmin|vmax|vh|vw)$/.test( ruleOrNode.style[ style ] ) ) {
-						ruleOrNode.style[ style ] = '';
-					}
-				} );
-			}
+	Array.prototype.forEach.call(
+		document.querySelectorAll( '[style]' ),
+		removeViewportStyles
+	);
+	Array.prototype.forEach.call(
+		document.styleSheets,
+		function ( stylesheet ) {
+			Array.prototype.forEach.call(
+				stylesheet.cssRules || stylesheet.rules,
+				removeViewportStyles
+			);
 		}
+	);
 
-		Array.prototype.forEach.call( document.querySelectorAll( '[style]' ), removeViewportStyles );
-		Array.prototype.forEach.call( document.styleSheets, function( stylesheet ) {
-			Array.prototype.forEach.call( stylesheet.cssRules || stylesheet.rules, removeViewportStyles );
-		} );
+	document.body.style.position = 'absolute';
+	document.body.style.width = '100%';
+	document.body.setAttribute( 'data-resizable-iframe-connected', '' );
 
-		document.body.style.position = 'absolute';
-		document.body.style.width = '100%';
-		document.body.setAttribute( 'data-resizable-iframe-connected', '' );
+	sendResize();
 
-		sendResize();
-
-		// Resize events can change the width of elements with 100% width, but we don't
-		// get an DOM mutations for that, so do the resize when the window is resized, too.
-		window.addEventListener( 'resize', sendResize, true );
-} )();`;
+	// Resize events can change the width of elements with 100% width, but we don't
+	// get an DOM mutations for that, so do the resize when the window is resized, too.
+	window.addEventListener( 'resize', sendResize, true );
+};
 
 const style = `
 	body {
@@ -74,14 +89,14 @@ const style = `
 	}
 	html,
 	body,
-	body > div,
-	body > div iframe {
+	body > div {
 		width: 100%;
 	}
 	html.wp-has-aspect-ratio,
 	body.wp-has-aspect-ratio,
 	body.wp-has-aspect-ratio > div,
 	body.wp-has-aspect-ratio > div iframe {
+		width: 100%;
 		height: 100%;
 		overflow: hidden; /* If it has an aspect ratio, it shouldn't scroll. */
 	}
@@ -153,7 +168,7 @@ export default function Sandbox( {
 					<script
 						type="text/javascript"
 						dangerouslySetInnerHTML={ {
-							__html: observeAndResizeJS,
+							__html: `(${ observeAndResizeJS.toString() })();`,
 						} }
 					/>
 					{ scripts.map( ( src ) => (
@@ -205,32 +220,38 @@ export default function Sandbox( {
 			setHeight( data.height );
 		}
 
-		const { ownerDocument } = ref.current;
+		const iframe = ref.current;
+		const { ownerDocument } = iframe;
 		const { defaultView } = ownerDocument;
 
 		// This used to be registered using <iframe onLoad={} />, but it made the iframe blank
 		// after reordering the containing block. See these two issues for more details:
 		// https://github.com/WordPress/gutenberg/issues/6146
 		// https://github.com/facebook/react/issues/18752
-		ref.current.addEventListener( 'load', tryNoForceSandbox, false );
+		iframe.addEventListener( 'load', tryNoForceSandbox, false );
 		defaultView.addEventListener( 'message', checkMessageForResize );
 
 		return () => {
-			ref.current?.removeEventListener(
-				'load',
-				tryNoForceSandbox,
-				false
-			);
+			iframe?.removeEventListener( 'load', tryNoForceSandbox, false );
 			defaultView.addEventListener( 'message', checkMessageForResize );
 		};
+		// Ignore reason: passing `exhaustive-deps` will likely involve a more detailed refactor.
+		// See https://github.com/WordPress/gutenberg/pull/44378
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
 	useEffect( () => {
 		trySandbox();
+		// Ignore reason: passing `exhaustive-deps` will likely involve a more detailed refactor.
+		// See https://github.com/WordPress/gutenberg/pull/44378
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ title, styles, scripts ] );
 
 	useEffect( () => {
 		trySandbox( true );
+		// Ignore reason: passing `exhaustive-deps` will likely involve a more detailed refactor.
+		// See https://github.com/WordPress/gutenberg/pull/44378
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ html, type ] );
 
 	return (

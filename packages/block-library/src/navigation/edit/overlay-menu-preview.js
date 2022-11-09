@@ -28,32 +28,18 @@ export default function OverlayMenuPreview( { setAttributes, hasIcon, icon } ) {
 			<ToggleGroupControl
 				label={ __( 'Icon' ) }
 				value={ icon }
-				help={ __( 'Choose an icon or add your own.' ) }
 				onChange={ ( value ) => setAttributes( { icon: value } ) }
+				isBlock
 			>
 				<ToggleGroupControlOption
 					value="handle"
 					aria-label={ __( 'handle' ) }
 					label={ <OverlayMenuIcon icon="handle" /> }
-					className="wp-block-navigation__icon-button"
 				/>
 				<ToggleGroupControlOption
 					value="menu"
 					aria-label={ __( 'menu' ) }
 					label={ <OverlayMenuIcon icon="menu" /> }
-					className="wp-block-navigation__icon-button"
-				/>
-				<ToggleGroupControlOption
-					value="more-vertical"
-					aria-label={ __( 'more vertical' ) }
-					label={ <OverlayMenuIcon icon="more-vertical" /> }
-					className="wp-block-navigation__icon-button"
-				/>
-				<ToggleGroupControlOption
-					value="more-horizontal"
-					aria-label={ __( 'more horizontal' ) }
-					label={ <OverlayMenuIcon icon="more-horizontal" /> }
-					className="wp-block-navigation__icon-button"
 				/>
 			</ToggleGroupControl>
 		</>

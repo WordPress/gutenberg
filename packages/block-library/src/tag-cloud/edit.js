@@ -168,7 +168,7 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 			{ inspectorControls }
 			<div { ...useBlockProps() }>
 				<ServerSideRender
-					key="tag-cloud"
+					skipBlockSupportAttributes
 					block="core/tag-cloud"
 					attributes={ attributes }
 				/>

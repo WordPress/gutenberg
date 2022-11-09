@@ -211,12 +211,5 @@ export function isValuesDefined( values ) {
 	if ( values === undefined || values === null ) {
 		return false;
 	}
-	return ! isEmpty(
-		Object.values( values ).filter(
-			// Switching units when input is empty causes values only
-			// containing units. This gives false positive on mixed values
-			// unless filtered.
-			( value ) => !! value && /\d/.test( value )
-		)
-	);
+	return ! isEmpty( Object.values( values ).filter( ( value ) => !! value ) );
 }

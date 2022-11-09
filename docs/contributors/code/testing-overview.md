@@ -21,7 +21,7 @@ When writing tests consider the following:
 
 Tests for JavaScript use [Jest](https://jestjs.io/) as the test runner and its API for [globals](https://jestjs.io/docs/en/api.html) (`describe`, `test`, `beforeEach` and so on) [assertions](https://jestjs.io/docs/en/expect.html), [mocks](https://jestjs.io/docs/en/mock-functions.html), [spies](https://jestjs.io/docs/en/jest-object.html#jestspyonobject-methodname) and [mock functions](https://jestjs.io/docs/en/mock-function-api.html). If needed, you can also use [React Testing Library](https://testing-library.com/docs/react-testing-library/intro) for React component testing.
 
-_It should be noted that in the past, React components were unit tested with [Enzyme](https://github.com/airbnb/enzyme). However, React Testing Library (RTL) should be used for new tests instead, and over time old tests should be refactored to use RTL too (typically when working on code that touches an old test)._
+_It should be noted that in the past, React components were unit tested with [Enzyme](https://github.com/airbnb/enzyme). However, React Testing Library (RTL) is now used for all existing and new tests instead._
 
 Assuming you've followed the [instructions](/docs/contributors/code/getting-started-with-code-contribution.md) to install Node and project dependencies, tests can be run from the command-line with NPM:
 
@@ -367,13 +367,13 @@ describe( 'SolarSystem', () => {
 	test( 'should render', () => {
 		const { container } = render( <SolarSystem /> );
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
 	test( 'should contain mars if planets is true', () => {
 		const { container } = render( <SolarSystem planets /> );
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 		expect( screen.getByText( /mars/i ) ).toBeInTheDocument();
 	} );
 } );
@@ -422,7 +422,7 @@ test( 'should contain mars if planets is true', () => {
 	const { container } = render( <SolarSystem planets /> );
 
 	// Snapshot will catch unintended changes
-	expect( container.firstChild ).toMatchSnapshot();
+	expect( container ).toMatchSnapshot();
 
 	// This is what we actually expect to find in our test
 	expect( screen.getByText( /mars/i ) ).toBeInTheDocument();
@@ -447,8 +447,8 @@ Similarly, the `toMatchStyleDiffSnapshot` function allows to snapshot only the d
 test( 'should render margin', () => {
 	const { container: spacer } = render( <Spacer /> );
 	const { container: spacerWithMargin } = render( <Spacer margin={ 5 } /> );
-	expect( spacerWithMargin.firstChild ).toMatchStyleDiffSnapshot(
-		spacer.firstChild
+	expect( spacerWithMargin ).toMatchStyleDiffSnapshot(
+		spacer
 	);
 } );
 ```

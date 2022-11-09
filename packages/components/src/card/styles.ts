@@ -115,5 +115,5 @@ export const cardPaddings = {
 };
 
 export const shady = css`
-	background-color: ${ COLORS.lightGray[ 200 ] };
+	background-color: ${ COLORS.ui.backgroundDisabled };
 `;

@@ -13,7 +13,6 @@ import {
 	PanelBody,
 	SelectControl,
 	ToggleControl,
-	withNotices,
 	RangeControl,
 	Spinner,
 } from '@wordpress/components';
@@ -80,9 +79,7 @@ function GalleryEdit( props ) {
 		attributes,
 		className,
 		clientId,
-		noticeOperations,
 		isSelected,
-		noticeUI,
 		insertBlocksAfter,
 	} = props;
 
@@ -95,7 +92,8 @@ function GalleryEdit( props ) {
 		selectBlock,
 		clearSelectedBlock,
 	} = useDispatch( blockEditorStore );
-	const { createSuccessNotice } = useDispatch( noticesStore );
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
 
 	const { getBlock, getSettings, preferredStyle } = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
@@ -244,12 +242,11 @@ function GalleryEdit( props ) {
 			: selectedImages;
 
 		if ( ! imageArray.every( isValidFileType ) ) {
-			noticeOperations.removeAllNotices();
-			noticeOperations.createErrorNotice(
+			createErrorNotice(
 				__(
 					'If uploading to a gallery all files need to be image formats'
 				),
-				{ id: 'gallery-upload-invalid-file' }
+				{ id: 'gallery-upload-invalid-file', type: 'snackbar' }
 			);
 		}
 
@@ -316,8 +313,7 @@ function GalleryEdit( props ) {
 	}
 
 	function onUploadError( message ) {
-		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
+		createErrorNotice( message, { type: 'snackbar' } );
 	}
 
 	function setLinkTo( value ) {
@@ -470,7 +466,6 @@ function GalleryEdit( props ) {
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			multiple
 			onError={ onUploadError }
-			notices={ noticeUI }
 			{ ...mediaPlaceholderProps }
 		/>
 	);
@@ -560,7 +555,6 @@ function GalleryEdit( props ) {
 					addToGallery={ hasImageIds }
 				/>
 			</BlockControls>
-			{ noticeUI }
 			{ Platform.isWeb && (
 				<GapStyles
 					blockGap={ attributes.style?.spacing?.blockGap }
@@ -581,7 +575,6 @@ function GalleryEdit( props ) {
 		</>
 	);
 }
-export default compose( [
-	withNotices,
-	withViewportMatch( { isNarrow: '< small' } ),
-] )( GalleryEdit );
+export default compose( [ withViewportMatch( { isNarrow: '< small' } ) ] )(
+	GalleryEdit
+);

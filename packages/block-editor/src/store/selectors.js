@@ -1,17 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	castArray,
-	first,
-	last,
-	map,
-	reduce,
-	some,
-	find,
-	filter,
-	orderBy,
-} from 'lodash';
+import { map, find, filter, orderBy } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -283,14 +273,10 @@ export const getGlobalBlockCount = createSelector(
 		if ( ! blockName ) {
 			return clientIds.length;
 		}
-		return reduce(
-			clientIds,
-			( accumulator, clientId ) => {
-				const block = state.blocks.byClientId[ clientId ];
-				return block.name === blockName ? accumulator + 1 : accumulator;
-			},
-			0
-		);
+		return clientIds.reduce( ( accumulator, clientId ) => {
+			const block = state.blocks.byClientId[ clientId ];
+			return block.name === blockName ? accumulator + 1 : accumulator;
+		}, 0 );
 	},
 	( state ) => [ state.blocks.order, state.blocks.byClientId ]
 );
@@ -329,12 +315,13 @@ export const __experimentalGetGlobalBlocksByName = createSelector(
  */
 export const getBlocksByClientId = createSelector(
 	( state, clientIds ) =>
-		map( castArray( clientIds ), ( clientId ) =>
-			getBlock( state, clientId )
+		map(
+			Array.isArray( clientIds ) ? clientIds : [ clientIds ],
+			( clientId ) => getBlock( state, clientId )
 		),
 	( state, clientIds ) =>
 		map(
-			castArray( clientIds ),
+			Array.isArray( clientIds ) ? clientIds : [ clientIds ],
 			( clientId ) => state.blocks.tree[ clientId ]
 		)
 );
@@ -704,10 +691,7 @@ export const getSelectedBlockClientIds = createSelector(
 	( state ) => {
 		const { selectionStart, selectionEnd } = state.selection;
 
-		if (
-			selectionStart.clientId === undefined ||
-			selectionEnd.clientId === undefined
-		) {
+		if ( ! selectionStart.clientId || ! selectionEnd.clientId ) {
 			return EMPTY_ARRAY;
 		}
 
@@ -722,6 +706,7 @@ export const getSelectedBlockClientIds = createSelector(
 			state,
 			selectionStart.clientId
 		);
+
 		if ( rootClientId === null ) {
 			return EMPTY_ARRAY;
 		}
@@ -798,7 +783,7 @@ export const getMultiSelectedBlocks = createSelector(
  * @return {?string} First block client ID in the multi-selection set.
  */
 export function getFirstMultiSelectedBlockClientId( state ) {
-	return first( getMultiSelectedBlockClientIds( state ) ) || null;
+	return getMultiSelectedBlockClientIds( state )[ 0 ] || null;
 }
 
 /**
@@ -810,7 +795,8 @@ export function getFirstMultiSelectedBlockClientId( state ) {
  * @return {?string} Last block client ID in the multi-selection set.
  */
 export function getLastMultiSelectedBlockClientId( state ) {
-	return last( getMultiSelectedBlockClientIds( state ) ) || null;
+	const selectedClientIds = getMultiSelectedBlockClientIds( state );
+	return selectedClientIds[ selectedClientIds.length - 1 ] || null;
 }
 
 /**
@@ -1192,8 +1178,7 @@ export function isBlockSelected( state, clientId ) {
  * @return {boolean} Whether the block as an inner block selected
  */
 export function hasSelectedInnerBlock( state, clientId, deep = false ) {
-	return some(
-		getBlockOrder( state, clientId ),
+	return getBlockOrder( state, clientId ).some(
 		( innerClientId ) =>
 			isBlockSelected( state, innerClientId ) ||
 			isBlockMultiSelected( state, innerClientId ) ||
@@ -1286,6 +1271,17 @@ export function isTyping( state ) {
 }
 
 /**
+ * Returns true if the the block interface should be hidden, or false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the block toolbar is hidden.
+ */
+export function __experimentalIsBlockInterfaceHidden( state ) {
+	return state.isBlockInterfaceHidden;
+}
+
+/**
  * Returns true if the user is dragging blocks, or false otherwise.
  *
  * @param {Object} state Global application state.
@@ -1341,7 +1337,7 @@ export function isAncestorBeingDragged( state, clientId ) {
 	}
 
 	const parents = getBlockParents( state, clientId );
-	return some( parents, ( parentClientId ) =>
+	return parents.some( ( parentClientId ) =>
 		isBlockBeingDragged( state, parentClientId )
 	);
 }
@@ -1444,7 +1440,7 @@ export function getTemplateLock( state, rootClientId ) {
 
 	const blockListSettings = getBlockListSettings( state, rootClientId );
 	if ( ! blockListSettings ) {
-		return null;
+		return undefined;
 	}
 
 	return blockListSettings.templateLock;
@@ -1540,7 +1536,7 @@ const canInsertBlockTypeUnmemoized = (
 			...getBlockParents( state, rootClientId ),
 		];
 
-		hasBlockAllowedAncestor = some( ancestors, ( ancestorClientId ) =>
+		hasBlockAllowedAncestor = ancestors.some( ( ancestorClientId ) =>
 			checkAllowList(
 				blockAllowedAncestorBlocks,
 				getBlockName( state, ancestorClientId )
@@ -1854,13 +1850,10 @@ const buildBlockTypeItem =
 
 		let isDisabled = false;
 		if ( ! hasBlockSupport( blockType.name, 'multiple', true ) ) {
-			isDisabled = some(
-				getBlocksByClientId(
-					state,
-					getClientIdsWithDescendants( state )
-				),
-				{ name: blockType.name }
-			);
+			isDisabled = getBlocksByClientId(
+				state,
+				getClientIdsWithDescendants( state )
+			).some( ( { name } ) => name === blockType.name );
 		}
 
 		const { time, count = 0 } = getInsertUsage( state, id ) || {};
@@ -2074,7 +2067,7 @@ export const getInserterItems = createSelector(
  */
 export const getBlockTransformItems = createSelector(
 	( state, blocks, rootClientId = null ) => {
-		const normalizedBlocks = castArray( blocks );
+		const normalizedBlocks = Array.isArray( blocks ) ? blocks : [ blocks ];
 		const [ sourceBlock ] = normalizedBlocks;
 		const buildBlockTypeTransformItem = buildBlockTypeItem( state, {
 			buildScope: 'transform',
@@ -2138,7 +2131,7 @@ export const getBlockTransformItems = createSelector(
  */
 export const hasInserterItems = createSelector(
 	( state, rootClientId = null ) => {
-		const hasBlockType = some( getBlockTypes(), ( blockType ) =>
+		const hasBlockType = getBlockTypes().some( ( blockType ) =>
 			canIncludeBlockTypeInInserter( state, blockType, rootClientId )
 		);
 		if ( hasBlockType ) {
@@ -2550,7 +2543,18 @@ function getReusableBlocks( state ) {
  * @return {boolean} Is navigation mode enabled.
  */
 export function isNavigationMode( state ) {
-	return state.isNavigationMode;
+	return state.editorMode === 'navigation';
+}
+
+/**
+ * Returns the current editor mode.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {string} the editor mode.
+ */
+export function __unstableGetEditorMode( state ) {
+	return state.editorMode;
 }
 
 /**
@@ -2633,7 +2637,7 @@ export const __experimentalGetActiveBlockIdByBlockNames = createSelector(
 		);
 		if ( entityAreaParents ) {
 			// Last parent closest/most interior.
-			return last( entityAreaParents );
+			return entityAreaParents[ entityAreaParents.length - 1 ];
 		}
 		return null;
 	},
@@ -2668,7 +2672,7 @@ export function wasBlockJustInserted( state, clientId, source ) {
  * @return {boolean} True if the block is visible.
  */
 export function isBlockVisible( state, clientId ) {
-	return state.blocks.visibility?.[ clientId ] ?? true;
+	return state.blockVisibility?.[ clientId ] ?? true;
 }
 
 /**
@@ -2680,21 +2684,26 @@ export function isBlockVisible( state, clientId ) {
 export const __unstableGetVisibleBlocks = createSelector(
 	( state ) => {
 		return new Set(
-			Object.keys( state.blocks.visibility ).filter(
-				( key ) => state.blocks.visibility[ key ]
+			Object.keys( state.blockVisibility ).filter(
+				( key ) => state.blockVisibility[ key ]
 			)
 		);
 	},
-	( state ) => [ state.blocks.visibility ]
+	( state ) => [ state.blockVisibility ]
 );
 
+/**
+ * DO-NOT-USE in production.
+ * This selector is created for internal/experimental only usage and may be
+ * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
+ */
 export const __unstableGetContentLockingParent = createSelector(
 	( state, clientId ) => {
 		let current = clientId;
 		let result;
 		while ( !! state.blocks.parents[ current ] ) {
 			current = state.blocks.parents[ current ];
-			if ( getTemplateLock( state, current ) === 'noContent' ) {
+			if ( getTemplateLock( state, current ) === 'contentOnly' ) {
 				result = current;
 			}
 		}
@@ -2703,6 +2712,64 @@ export const __unstableGetContentLockingParent = createSelector(
 	( state ) => [ state.blocks.parents, state.blockListSettings ]
 );
 
+/**
+ * DO-NOT-USE in production.
+ * This selector is created for internal/experimental only usage and may be
+ * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
+ *
+ * @param {Object} state Global application state.
+ */
 export function __unstableGetTemporarilyEditingAsBlocks( state ) {
 	return state.temporarilyEditingAsBlocks;
+}
+
+export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
+	// If the block editing is locked, the block overlay is always active.
+	if ( ! canEditBlock( state, clientId ) ) {
+		return true;
+	}
+
+	const editorMode = __unstableGetEditorMode( state );
+
+	// In zoom-out mode, the block overlay is always active for top level blocks.
+	if (
+		editorMode === 'zoom-out' &&
+		clientId &&
+		! getBlockRootClientId( state, clientId )
+	) {
+		return true;
+	}
+
+	// In navigation mode, the block overlay is active when the block is not
+	// selected (and doesn't contain a selected child). The same behavior is
+	// also enabled in all modes for blocks that have controlled children
+	// (reusable block, template part, navigation), unless explicitly disabled
+	// with `supports.__experimentalDisableBlockOverlay`.
+	const blockSupportDisable = hasBlockSupport(
+		getBlockName( state, clientId ),
+		'__experimentalDisableBlockOverlay',
+		false
+	);
+	const shouldEnableIfUnselected =
+		editorMode === 'navigation' ||
+		( blockSupportDisable
+			? false
+			: areInnerBlocksControlled( state, clientId ) );
+
+	return (
+		shouldEnableIfUnselected &&
+		! isBlockSelected( state, clientId ) &&
+		! hasSelectedInnerBlock( state, clientId, true )
+	);
+}
+
+export function __unstableIsWithinBlockOverlay( state, clientId ) {
+	let parent = state.blocks.parents[ clientId ];
+	while ( !! parent ) {
+		if ( __unstableHasActiveBlockOverlayActive( state, parent ) ) {
+			return true;
+		}
+		parent = state.blocks.parents[ parent ];
+	}
+	return false;
 }

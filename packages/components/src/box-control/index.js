@@ -52,6 +52,8 @@ export default function BoxControl( {
 	splitOnAxis = false,
 	allowReset = true,
 	resetValues = DEFAULT_VALUES,
+	onMouseOver,
+	onMouseOut,
 } ) {
 	const [ values, setValues ] = useControlledState( valuesProp, {
 		fallback: DEFAULT_VALUES,
@@ -114,6 +116,8 @@ export default function BoxControl( {
 		setSelectedUnits,
 		sides,
 		values: inputValues,
+		onMouseOver,
+		onMouseOut,
 	};
 
 	return (

@@ -16,12 +16,12 @@ import {
 import { __ } from '@wordpress/i18n';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { useState, useCallback } from '@wordpress/element';
+import { useState, useCallback, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { useSplit, useMerge } from './hooks';
+import { useSplit, useMerge, useEnter } from './hooks';
 import { convertToListItems } from './utils';
 import { IndentUI } from './edit.js';
 import styles from './style.scss';
@@ -35,6 +35,7 @@ export default function ListItemEdit( {
 	onReplace,
 	clientId,
 	style,
+	mergeBlocks,
 } ) {
 	const [ contentWidth, setContentWidth ] = useState();
 	const { placeholder, content } = attributes;
@@ -116,8 +117,26 @@ export default function ListItemEdit( {
 		} ),
 	};
 
+	const preventDefault = useRef( false );
+	const { onEnter } = useEnter( { content, clientId }, preventDefault );
 	const onSplit = useSplit( clientId );
-	const onMerge = useMerge( clientId );
+	const onMerge = useMerge( clientId, mergeBlocks );
+	const onSplitList = useCallback(
+		( value ) => {
+			if ( ! preventDefault.current ) {
+				return onSplit( value );
+			}
+		},
+		[ clientId, onSplit ]
+	);
+	const onReplaceList = useCallback(
+		( blocks, ...args ) => {
+			if ( ! preventDefault.current ) {
+				onReplace( convertToListItems( blocks ), ...args );
+			}
+		},
+		[ clientId, onReplace, convertToListItems ]
+	);
 	const onLayout = useCallback( ( { nativeEvent } ) => {
 		setContentWidth( ( prevState ) => {
 			const { width } = nativeEvent.layout;
@@ -158,11 +177,10 @@ export default function ListItemEdit( {
 						placeholderTextColor={
 							defaultPlaceholderTextColorWithOpacity
 						}
-						onSplit={ onSplit }
+						onSplit={ onSplitList }
 						onMerge={ onMerge }
-						onReplace={ ( blocks, ...args ) => {
-							onReplace( convertToListItems( blocks ), ...args );
-						} }
+						onReplace={ onReplaceList }
+						onEnter={ onEnter }
 						style={ styleWithPlaceholderOpacity }
 						deleteEnter={ true }
 						containerWidth={ contentWidth }

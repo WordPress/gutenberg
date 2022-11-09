@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { debounce } from 'lodash';
 import classnames from 'classnames';
 import scrollIntoView from 'dom-scroll-into-view';
 
@@ -18,7 +17,12 @@ import {
 	withSpokenMessages,
 	Popover,
 } from '@wordpress/components';
-import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
+import {
+	compose,
+	debounce,
+	withInstanceId,
+	withSafeTimeout,
+} from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { isURL } from '@wordpress/url';
 
@@ -539,7 +543,7 @@ class URLInput extends Component {
 			!! suggestions.length
 		) {
 			return (
-				<Popover position="bottom" focusOnMount={ false }>
+				<Popover placement="bottom" focusOnMount={ false }>
 					<div
 						{ ...suggestionsListProps }
 						className={ classnames(

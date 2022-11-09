@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
 import scrollView from 'dom-scroll-into-view';
 import classnames from 'classnames';
 import type { MouseEventHandler, ReactNode } from 'react';
@@ -39,7 +38,7 @@ export function SuggestionsList< T extends string | { value: string } >( {
 		( listNode ) => {
 			// only have to worry about scrolling selected suggestion into view
 			// when already expanded.
-			let id: number;
+			let rafId: number | undefined;
 			if (
 				selectedIndex > -1 &&
 				scrollIntoView &&
@@ -53,14 +52,14 @@ export function SuggestionsList< T extends string | { value: string } >( {
 						onlyScrollIfNeeded: true,
 					}
 				);
-				id = window.setTimeout( () => {
+				rafId = requestAnimationFrame( () => {
 					setScrollingIntoView( false );
-				}, 100 );
+				} );
 			}
 
 			return () => {
-				if ( id !== undefined ) {
-					window.clearTimeout( id );
+				if ( rafId !== undefined ) {
+					cancelAnimationFrame( rafId );
 				}
 			};
 		},
@@ -114,7 +113,7 @@ export function SuggestionsList< T extends string | { value: string } >( {
 			id={ `components-form-token-suggestions-${ instanceId }` }
 			role="listbox"
 		>
-			{ map( suggestions, ( suggestion, index ) => {
+			{ suggestions.map( ( suggestion, index ) => {
 				const matchText = computeSuggestionMatch( suggestion );
 				const className = classnames(
 					'components-form-token-field__suggestion',

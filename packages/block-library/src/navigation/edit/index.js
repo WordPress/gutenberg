@@ -6,10 +6,17 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useRef, Platform } from '@wordpress/element';
 import {
+	useState,
+	useEffect,
+	useRef,
+	Platform,
+	useMemo,
+} from '@wordpress/element';
+import { addQueryArgs } from '@wordpress/url';
+import {
+	__experimentalOffCanvasEditor as OffCanvasEditor,
 	InspectorControls,
-	BlockControls,
 	useBlockProps,
 	__experimentalRecursionProvider as RecursionProvider,
 	__experimentalUseHasRecursion as useHasRecursion,
@@ -21,7 +28,7 @@ import {
 	Warning,
 	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
 } from '@wordpress/block-editor';
-import { EntityProvider } from '@wordpress/core-data';
+import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 
 import { useDispatch } from '@wordpress/data';
 import {
@@ -29,9 +36,10 @@ import {
 	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-	ToolbarGroup,
 	Button,
 	Spinner,
+	__experimentalHStack as HStack,
+	__experimentalHeading as Heading,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
@@ -83,17 +91,21 @@ function Navigation( {
 	hasColorSettings = true,
 	customPlaceholder: CustomPlaceholder = null,
 } ) {
+	const isOffCanvasNavigationEditorEnabled =
+		window?.__experimentalEnableOffCanvasNavigationEditor === true;
+
 	const {
 		openSubmenusOnClick,
 		overlayMenu,
 		showSubmenuIcon,
+		templateLock,
 		layout: {
 			justifyContent,
 			orientation = 'horizontal',
 			flexWrap = 'wrap',
 		} = {},
 		hasIcon,
-		icon,
+		icon = 'handle',
 	} = attributes;
 
 	const ref = attributes.ref;
@@ -104,10 +116,11 @@ function Navigation( {
 
 	const recursionId = `navigationMenu/${ ref }`;
 	const hasAlreadyRendered = useHasRecursion( recursionId );
+	const { editEntityRecord } = useDispatch( coreStore );
 
 	// Preload classic menus, so that they don't suddenly pop-in when viewing
 	// the Select Menu dropdown.
-	useNavigationEntities();
+	const { menus: classicMenus } = useNavigationEntities();
 
 	const [ showNavigationMenuStatusNotice, hideNavigationMenuStatusNotice ] =
 		useNavigationNotice( {
@@ -117,6 +130,11 @@ function Navigation( {
 	const [ showClassicMenuConversionNotice, hideClassicMenuConversionNotice ] =
 		useNavigationNotice( {
 			name: 'block-library/core/navigation/classic-menu-conversion',
+		} );
+
+	const [ showMenuAutoPublishDraftNotice, hideMenuAutoPublishDraftNotice ] =
+		useNavigationNotice( {
+			name: 'block-library/core/navigation/auto-publish-draft',
 		} );
 
 	const [
@@ -136,6 +154,10 @@ function Navigation( {
 		isError: createNavigationMenuIsError,
 	} = useCreateNavigationMenu( clientId );
 
+	const createUntitledEmptyNavigationMenu = () => {
+		createNavigationMenu( '' );
+	};
+
 	useEffect( () => {
 		hideNavigationMenuStatusNotice();
 
@@ -144,8 +166,9 @@ function Navigation( {
 		}
 
 		if ( createNavigationMenuIsSuccess ) {
-			setRef( createNavigationMenuPost.id );
-			selectBlock( clientId );
+			handleUpdateMenu( createNavigationMenuPost.id, {
+				focusNavigationBlock: true,
+			} );
 
 			showNavigationMenuStatusNotice(
 				__( `Navigation Menu successfully created.` )
@@ -158,7 +181,6 @@ function Navigation( {
 			);
 		}
 	}, [
-		createNavigationMenu,
 		createNavigationMenuStatus,
 		createNavigationMenuError,
 		createNavigationMenuPost,
@@ -180,9 +202,6 @@ function Navigation( {
 		selectBlock,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
-
-	const [ hasSavedUnsavedInnerBlocks, setHasSavedUnsavedInnerBlocks ] =
-		useState( false );
 
 	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] =
 		useState( false );
@@ -207,6 +226,28 @@ function Navigation( {
 	const navMenuResolvedButMissing =
 		hasResolvedNavigationMenus && isNavigationMenuMissing;
 
+	const {
+		convert: convertClassicMenu,
+		status: classicMenuConversionStatus,
+		error: classicMenuConversionError,
+	} = useConvertClassicToBlockMenu( clientId );
+
+	const isConvertingClassicMenu =
+		classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_PENDING;
+
+	// Only autofallback to published menus.
+	const fallbackNavigationMenus = useMemo(
+		() =>
+			navigationMenus
+				?.filter( ( menu ) => menu.status === 'publish' )
+				?.sort( ( menuA, menuB ) => {
+					const menuADate = new Date( menuA.date );
+					const menuBDate = new Date( menuB.date );
+					return menuADate.getTime() < menuBDate.getTime();
+				} ),
+		[ navigationMenus ]
+	);
+
 	// Attempt to retrieve and prioritize any existing navigation menu unless:
 	// - the are uncontrolled inner blocks already present in the block.
 	// - the user is creating a new menu.
@@ -219,16 +260,10 @@ function Navigation( {
 			hasUncontrolledInnerBlocks ||
 			isCreatingNavigationMenu ||
 			ref ||
-			! navigationMenus?.length
+			! fallbackNavigationMenus?.length
 		) {
 			return;
 		}
-
-		navigationMenus.sort( ( menuA, menuB ) => {
-			const menuADate = new Date( menuA.date );
-			const menuBDate = new Date( menuB.date );
-			return menuADate.getTime() < menuBDate.getTime();
-		} );
 
 		/**
 		 *  This fallback displays (both in editor and on front)
@@ -238,21 +273,34 @@ function Navigation( {
 		 *  nor to be undoable, hence why it is marked as non persistent
 		 */
 		__unstableMarkNextChangeAsNotPersistent();
-		setRef( navigationMenus[ 0 ].id );
-	}, [ navigationMenus ] );
+		setRef( fallbackNavigationMenus[ 0 ].id );
+	}, [
+		ref,
+		isCreatingNavigationMenu,
+		fallbackNavigationMenus,
+		hasUncontrolledInnerBlocks,
+	] );
+
+	useEffect( () => {
+		if (
+			! hasResolvedNavigationMenus ||
+			isConvertingClassicMenu ||
+			fallbackNavigationMenus?.length > 0 ||
+			classicMenus?.length !== 1
+		) {
+			return;
+		}
+
+		// If there's non fallback navigation menus and
+		// only one classic menu then create a new navigation menu based on it.
+		convertClassicMenu(
+			classicMenus[ 0 ].id,
+			classicMenus[ 0 ].name,
+			'publish'
+		);
+	}, [ hasResolvedNavigationMenus ] );
 
 	const navRef = useRef();
-
-	const isDraftNavigationMenu = navigationMenu?.status === 'draft';
-
-	const {
-		convert: convertClassicMenu,
-		status: classicMenuConversionStatus,
-		error: classicMenuConversionError,
-	} = useConvertClassicToBlockMenu( clientId );
-
-	const isConvertingClassicMenu =
-		classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_PENDING;
 
 	// The standard HTML5 tag for the block wrapper.
 	const TagName = 'nav';
@@ -267,18 +315,21 @@ function Navigation( {
 		! isCreatingNavigationMenu &&
 		! isConvertingClassicMenu &&
 		hasResolvedNavigationMenus &&
+		classicMenus?.length === 0 &&
 		! hasUncontrolledInnerBlocks;
 
-	if ( isPlaceholder && ! ref ) {
-		/**
-		 *  this fallback only displays (both in editor and on front)
-		 *  the list of pages block if no menu is available as a fallback.
-		 *  We don't want the fallback to request a save,
-		 *  nor to be undoable, hence we mark it non persistent.
-		 */
-		__unstableMarkNextChangeAsNotPersistent();
-		replaceInnerBlocks( clientId, [ createBlock( 'core/page-list' ) ] );
-	}
+	useEffect( () => {
+		if ( isPlaceholder ) {
+			/**
+			 *  this fallback only displays (both in editor and on front)
+			 *  the list of pages block if no menu is available as a fallback.
+			 *  We don't want the fallback to request a save,
+			 *  nor to be undoable, hence we mark it non persistent.
+			 */
+			__unstableMarkNextChangeAsNotPersistent();
+			replaceInnerBlocks( clientId, [ createBlock( 'core/page-list' ) ] );
+		}
+	}, [ clientId, isPlaceholder, ref ] );
 
 	const isEntityAvailable =
 		! isNavigationMenuMissing && isNavigationMenuResolved;
@@ -334,9 +385,15 @@ function Navigation( {
 	] = useState();
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
 
-	const handleUpdateMenu = ( menuId ) => {
+	const handleUpdateMenu = (
+		menuId,
+		options = { focusNavigationBlock: false }
+	) => {
+		const { focusNavigationBlock } = options;
 		setRef( menuId );
-		selectBlock( clientId );
+		if ( focusNavigationBlock ) {
+			selectBlock( clientId );
+		}
 	};
 
 	useEffect( () => {
@@ -429,27 +486,8 @@ function Navigation( {
 		ref,
 	] );
 
-	const navigationSelectorRef = useRef();
-	const [ shouldFocusNavigationSelector, setShouldFocusNavigationSelector ] =
-		useState( false );
-
-	// Focus support after menu selection.
-	useEffect( () => {
-		if (
-			isDraftNavigationMenu ||
-			! isEntityAvailable ||
-			! shouldFocusNavigationSelector
-		) {
-			return;
-		}
-		navigationSelectorRef?.current?.focus();
-		setShouldFocusNavigationSelector( false );
-	}, [
-		isDraftNavigationMenu,
-		isEntityAvailable,
-		shouldFocusNavigationSelector,
-	] );
-
+	const hasManagePermissions =
+		canUserCreateNavigationMenu || canUserUpdateNavigationMenu;
 	const isResponsive = 'never' !== overlayMenu;
 
 	const overlayMenuPreviewClasses = classnames(
@@ -457,37 +495,61 @@ function Navigation( {
 		{ open: overlayMenuPreview }
 	);
 
+	// Prompt the user to publish the menu they have set as a draft
+	const isDraftNavigationMenu = navigationMenu?.status === 'draft';
+	useEffect( () => {
+		hideMenuAutoPublishDraftNotice();
+		if ( ! isDraftNavigationMenu ) {
+			return;
+		}
+		editEntityRecord(
+			'postType',
+			'wp_navigation',
+			navigationMenu?.id,
+			{ status: 'publish' },
+			{ throwOnError: true }
+		).catch( () => {
+			showMenuAutoPublishDraftNotice(
+				__( 'Error occurred while publishing the navigation menu.' )
+			);
+		} );
+	}, [ isDraftNavigationMenu, navigationMenu ] );
+
 	const stylingInspectorControls = (
 		<InspectorControls>
 			{ hasSubmenuIndicatorSetting && (
 				<PanelBody title={ __( 'Display' ) }>
 					{ isResponsive && (
-						<Button
-							className={ overlayMenuPreviewClasses }
-							onClick={ () => {
-								setOverlayMenuPreview( ! overlayMenuPreview );
-							} }
-						>
-							{ hasIcon && (
-								<>
-									<OverlayMenuIcon icon={ icon } />
-									<Icon icon={ close } />
-								</>
+						<>
+							<Button
+								className={ overlayMenuPreviewClasses }
+								onClick={ () => {
+									setOverlayMenuPreview(
+										! overlayMenuPreview
+									);
+								} }
+							>
+								{ hasIcon && (
+									<>
+										<OverlayMenuIcon icon={ icon } />
+										<Icon icon={ close } />
+									</>
+								) }
+								{ ! hasIcon && (
+									<>
+										<span>{ __( 'Menu' ) }</span>
+										<span>{ __( 'Close' ) }</span>
+									</>
+								) }
+							</Button>
+							{ overlayMenuPreview && (
+								<OverlayMenuPreview
+									setAttributes={ setAttributes }
+									hasIcon={ hasIcon }
+									icon={ icon }
+								/>
 							) }
-							{ ! hasIcon && (
-								<>
-									<span>{ __( 'Menu' ) }</span>
-									<span>{ __( 'Close' ) }</span>
-								</>
-							) }
-						</Button>
-					) }
-					{ overlayMenuPreview && (
-						<OverlayMenuPreview
-							setAttributes={ setAttributes }
-							hasIcon={ hasIcon }
-							icon={ icon }
-						/>
+						</>
 					) }
 					<h3>{ __( 'Overlay Menu' ) }</h3>
 					<ToggleGroupControl
@@ -600,36 +662,85 @@ function Navigation( {
 	// Consider this state as 'unsaved' and offer an uncontrolled version of inner blocks,
 	// that automatically saves the menu as an entity when changes are made to the inner blocks.
 	const hasUnsavedBlocks = hasUncontrolledInnerBlocks && ! isEntityAvailable;
-	if ( hasUnsavedBlocks ) {
+
+	const WrappedNavigationMenuSelector = ( { currentMenuId } ) => (
+		<NavigationMenuSelector
+			currentMenuId={ currentMenuId }
+			clientId={ clientId }
+			onSelectNavigationMenu={ ( menuId ) => {
+				handleUpdateMenu( menuId );
+			} }
+			onSelectClassicMenu={ async ( classicMenu ) => {
+				const navMenu = await convertClassicMenu(
+					classicMenu.id,
+					classicMenu.name,
+					'draft'
+				);
+				if ( navMenu ) {
+					handleUpdateMenu( navMenu.id, {
+						focusNavigationBlock: true,
+					} );
+				}
+			} }
+			onCreateNew={ createUntitledEmptyNavigationMenu }
+			createNavigationMenuIsSuccess={ createNavigationMenuIsSuccess }
+			createNavigationMenuIsError={ createNavigationMenuIsError }
+			/* translators: %s: The name of a menu. */
+			actionLabel={ __( "Switch to '%s'" ) }
+		/>
+	);
+
+	if ( hasUnsavedBlocks && ! isCreatingNavigationMenu ) {
 		return (
 			<TagName { ...blockProps }>
-				<BlockControls>
-					<ToolbarGroup className="wp-block-navigation__toolbar-menu-selector">
-						<NavigationMenuSelector
-							ref={ null }
-							currentMenuId={ null }
-							clientId={ clientId }
-							onSelectNavigationMenu={ ( menuId ) => {
-								handleUpdateMenu( menuId );
-								setShouldFocusNavigationSelector( true );
-							} }
-							onSelectClassicMenu={ async ( classicMenu ) => {
-								const navMenu = await convertClassicMenu(
-									classicMenu.id,
-									classicMenu.name
-								);
-								if ( navMenu ) {
-									handleUpdateMenu( navMenu.id );
-									setShouldFocusNavigationSelector( true );
-								}
-							} }
-							onCreateNew={ () => createNavigationMenu( '', [] ) }
-							/* translators: %s: The name of a menu. */
-							actionLabel={ __( "Switch to '%s'" ) }
-							showManageActions
-						/>
-					</ToolbarGroup>
-				</BlockControls>
+				<InspectorControls>
+					<PanelBody
+						title={
+							isOffCanvasNavigationEditorEnabled
+								? null
+								: __( 'Menu' )
+						}
+					>
+						{ isOffCanvasNavigationEditorEnabled ? (
+							<>
+								<HStack className="wp-block-navigation-off-canvas-editor__header">
+									<Heading
+										className="wp-block-navigation-off-canvas-editor__title"
+										level={ 2 }
+									>
+										{ __( 'Menu' ) }
+									</Heading>
+									<WrappedNavigationMenuSelector
+										currentMenuId={ ref }
+									/>
+								</HStack>
+								<OffCanvasEditor
+									blocks={ innerBlocks }
+									isExpanded={ true }
+									selectBlockInCanvas={ false }
+								/>
+							</>
+						) : (
+							<>
+								<WrappedNavigationMenuSelector
+									currentMenuId={ ref }
+								/>
+								<Button
+									variant="link"
+									disabled={
+										! hasManagePermissions ||
+										! hasResolvedNavigationMenus
+									}
+									href={ addQueryArgs( 'edit.php', {
+										post_type: 'wp_navigation',
+									} ) }
+								>
+									{ __( 'Manage menus' ) }
+								</Button>
+							</>
+						) }
+					</PanelBody>
+				</InspectorControls>
 				{ stylingInspectorControls }
 				<ResponsiveWrapper
 					id={ clientId }
@@ -643,23 +754,11 @@ function Navigation( {
 					overlayTextColor={ overlayTextColor }
 				>
 					<UnsavedInnerBlocks
+						createNavigationMenu={ createNavigationMenu }
 						blocks={ uncontrolledInnerBlocks }
-						clientId={ clientId }
+						templateLock={ templateLock }
 						navigationMenus={ navigationMenus }
 						hasSelection={ isSelected || isInnerBlockSelected }
-						hasSavedUnsavedInnerBlocks={
-							hasSavedUnsavedInnerBlocks
-						}
-						onSave={ ( post ) => {
-							// Set some state used as a guard to prevent the creation of multiple posts.
-							setHasSavedUnsavedInnerBlocks( true );
-							// Switch to using the wp_navigation entity.
-							setRef( post.id );
-
-							showNavigationMenuStatusNotice(
-								__( `New Navigation Menu created.` )
-							);
-						} }
 					/>
 				</ResponsiveWrapper>
 			</TagName>
@@ -671,39 +770,56 @@ function Navigation( {
 	if ( ref && isNavigationMenuMissing ) {
 		return (
 			<TagName { ...blockProps }>
-				<BlockControls>
-					<ToolbarGroup className="wp-block-navigation__toolbar-menu-selector">
-						<NavigationMenuSelector
-							ref={ navigationSelectorRef }
-							currentMenuId={ ref }
-							clientId={ clientId }
-							onSelectNavigationMenu={ ( menuId ) => {
-								handleUpdateMenu( menuId );
-								setShouldFocusNavigationSelector( true );
-							} }
-							onSelectClassicMenu={ async ( classicMenu ) => {
-								const navMenu = await convertClassicMenu(
-									classicMenu.id,
-									classicMenu.name
-								);
-								if ( navMenu ) {
-									handleUpdateMenu( navMenu.id );
-									setShouldFocusNavigationSelector( true );
-								}
-							} }
-							onCreateNew={ () => createNavigationMenu( '', [] ) }
-							/* translators: %s: The name of a menu. */
-							actionLabel={ __( "Switch to '%s'" ) }
-							showManageActions
-						/>
-					</ToolbarGroup>
-				</BlockControls>
+				<InspectorControls>
+					<PanelBody
+						title={
+							isOffCanvasNavigationEditorEnabled
+								? null
+								: __( 'Menu' )
+						}
+					>
+						{ isOffCanvasNavigationEditorEnabled ? (
+							<>
+								<HStack className="wp-block-navigation-off-canvas-editor__header">
+									<Heading
+										className="wp-block-navigation-off-canvas-editor__title"
+										level={ 2 }
+									>
+										{ __( 'Menu' ) }
+									</Heading>
+									<WrappedNavigationMenuSelector
+										currentMenuId={ null }
+									/>
+								</HStack>
+								<p>Select or create a menu</p>
+							</>
+						) : (
+							<>
+								<WrappedNavigationMenuSelector
+									currentMenuId={ null }
+								/>
+								<Button
+									variant="link"
+									disabled={
+										! hasManagePermissions ||
+										! hasResolvedNavigationMenus
+									}
+									href={ addQueryArgs( 'edit.php', {
+										post_type: 'wp_navigation',
+									} ) }
+								>
+									{ __( 'Manage menus' ) }
+								</Button>
+							</>
+						) }
+					</PanelBody>
+				</InspectorControls>
 				<Warning>
 					{ __(
 						'Navigation menu has been deleted or is unavailable. '
 					) }
 					<Button
-						onClick={ () => createNavigationMenu( '', [] ) }
+						onClick={ createUntitledEmptyNavigationMenu }
 						variant="link"
 					>
 						{ __( 'Create a new menu?' ) }
@@ -750,19 +866,20 @@ function Navigation( {
 					}
 					onSelectNavigationMenu={ ( menuId ) => {
 						handleUpdateMenu( menuId );
-						setShouldFocusNavigationSelector( true );
 					} }
 					onSelectClassicMenu={ async ( classicMenu ) => {
 						const navMenu = await convertClassicMenu(
 							classicMenu.id,
-							classicMenu.name
+							classicMenu.name,
+							'draft'
 						);
 						if ( navMenu ) {
-							handleUpdateMenu( navMenu.id );
-							setShouldFocusNavigationSelector( true );
+							handleUpdateMenu( navMenu.id, {
+								focusNavigationBlock: true,
+							} );
 						}
 					} }
-					onCreateEmpty={ () => createNavigationMenu( '', [] ) }
+					onCreateEmpty={ createUntitledEmptyNavigationMenu }
 				/>
 			</TagName>
 		);
@@ -771,39 +888,54 @@ function Navigation( {
 	return (
 		<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
 			<RecursionProvider uniqueId={ recursionId }>
-				<BlockControls>
-					{ ! isDraftNavigationMenu && isEntityAvailable && (
-						<ToolbarGroup className="wp-block-navigation__toolbar-menu-selector">
-							<NavigationMenuSelector
-								ref={ navigationSelectorRef }
-								currentMenuId={ ref }
-								clientId={ clientId }
-								onSelectNavigationMenu={ ( menuId ) => {
-									handleUpdateMenu( menuId );
-									setShouldFocusNavigationSelector( true );
-								} }
-								onSelectClassicMenu={ async ( classicMenu ) => {
-									const navMenu = await convertClassicMenu(
-										classicMenu.id,
-										classicMenu.name
-									);
-									if ( navMenu ) {
-										handleUpdateMenu( navMenu.id );
-										setShouldFocusNavigationSelector(
-											true
-										);
+				<InspectorControls>
+					<PanelBody
+						title={
+							isOffCanvasNavigationEditorEnabled
+								? null
+								: __( 'Menu' )
+						}
+					>
+						{ isOffCanvasNavigationEditorEnabled ? (
+							<>
+								<HStack className="wp-block-navigation-off-canvas-editor__header">
+									<Heading
+										className="wp-block-navigation-off-canvas-editor__title"
+										level={ 2 }
+									>
+										{ __( 'Menu' ) }
+									</Heading>
+									<WrappedNavigationMenuSelector
+										currentMenuId={ ref }
+									/>
+								</HStack>
+								<OffCanvasEditor
+									blocks={ innerBlocks }
+									isExpanded={ true }
+									selectBlockInCanvas={ false }
+								/>
+							</>
+						) : (
+							<>
+								<WrappedNavigationMenuSelector
+									currentMenuId={ ref }
+								/>
+								<Button
+									variant="link"
+									disabled={
+										! hasManagePermissions ||
+										! hasResolvedNavigationMenus
 									}
-								} }
-								onCreateNew={ () =>
-									createNavigationMenu( '', [] )
-								}
-								/* translators: %s: The name of a menu. */
-								actionLabel={ __( "Switch to '%s'" ) }
-								showManageActions
-							/>
-						</ToolbarGroup>
-					) }
-				</BlockControls>
+									href={ addQueryArgs( 'edit.php', {
+										post_type: 'wp_navigation',
+									} ) }
+								>
+									{ __( 'Manage menus' ) }
+								</Button>
+							</>
+						) }
+					</PanelBody>
+				</InspectorControls>
 				{ stylingInspectorControls }
 				{ isEntityAvailable && (
 					<InspectorControls __experimentalGroup="advanced">
@@ -828,6 +960,21 @@ function Navigation( {
 									} }
 								/>
 							) }
+						{ isOffCanvasNavigationEditorEnabled && (
+							<Button
+								variant="link"
+								className="wp-block-navigation-manage-menus-button"
+								disabled={
+									! hasManagePermissions ||
+									! hasResolvedNavigationMenus
+								}
+								href={ addQueryArgs( 'edit.php', {
+									post_type: 'wp_navigation',
+								} ) }
+							>
+								{ __( 'Manage menus' ) }
+							</Button>
+						) }
 					</InspectorControls>
 				) }
 
@@ -857,6 +1004,7 @@ function Navigation( {
 									hasCustomPlaceholder={
 										!! CustomPlaceholder
 									}
+									templateLock={ templateLock }
 									orientation={ orientation }
 								/>
 							) }

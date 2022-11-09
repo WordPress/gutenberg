@@ -91,22 +91,28 @@ function ListViewBranch( props ) {
 		fixedListWindow,
 		isExpanded,
 		parentId,
+		shouldShowInnerBlocks = true,
 	} = props;
 
-	const isContentLocked = useSelect(
+	const canParentExpand = useSelect(
 		( select ) => {
-			return !! (
-				parentId &&
+			if ( ! parentId ) {
+				return true;
+			}
+
+			const isContentLocked =
 				select( blockEditorStore ).getTemplateLock( parentId ) ===
-					'noContent'
-			);
+				'contentOnly';
+			const canEdit = select( blockEditorStore ).canEditBlock( parentId );
+
+			return isContentLocked ? false : canEdit;
 		},
 		[ parentId ]
 	);
 
 	const { expandedState, draggedClientIds } = useListViewContext();
 
-	if ( isContentLocked ) {
+	if ( ! canParentExpand ) {
 		return null;
 	}
 
@@ -138,9 +144,10 @@ function ListViewBranch( props ) {
 						: `${ position }`;
 				const hasNestedBlocks = !! innerBlocks?.length;
 
-				const shouldExpand = hasNestedBlocks
-					? expandedState[ clientId ] ?? isExpanded
-					: undefined;
+				const shouldExpand =
+					hasNestedBlocks && shouldShowInnerBlocks
+						? expandedState[ clientId ] ?? isExpanded
+						: undefined;
 
 				const isDragged = !! draggedClientIds?.includes( clientId );
 

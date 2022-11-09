@@ -506,7 +506,7 @@ Expected mock function not to be called but it was called with: ["POST", "http:/
 				// outside of the Nav block.
 				await insertBlock( 'Paragraph' );
 
-				// Aquire fresh reference to block
+				// Acquire fresh reference to block
 				navBlock = await waitForBlock( 'Navigation' );
 
 				// Check Placeholder Preview is visible.

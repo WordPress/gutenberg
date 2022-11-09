@@ -1,14 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
+import { useEffect, useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Popover, Button, Notice } from '@wordpress/components';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 import {
 	BlockContextProvider,
 	BlockBreadcrumb,
-	BlockStyles,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	InterfaceSkeleton,
@@ -30,8 +30,8 @@ import { store as preferencesStore } from '@wordpress/preferences';
 /**
  * Internal dependencies
  */
-import Header from '../header';
-import { SidebarComplementaryAreaFills } from '../sidebar';
+import Header from '../header-edit-mode';
+import { SidebarComplementaryAreaFills } from '../sidebar-edit-mode';
 import NavigationSidebar from '../navigation-sidebar';
 import BlockEditor from '../block-editor';
 import CodeEditor from '../code-editor';
@@ -65,6 +65,7 @@ function Editor( { onError } ) {
 	const {
 		isInserterOpen,
 		isListViewOpen,
+		isSaveViewOpen,
 		sidebarIsOpened,
 		settings,
 		entityId,
@@ -77,10 +78,12 @@ function Editor( { onError } ) {
 		nextShortcut,
 		editorMode,
 		showIconLabels,
+		blockEditorMode,
 	} = useSelect( ( select ) => {
 		const {
 			isInserterOpened,
 			isListViewOpened,
+			isSaveViewOpened,
 			getSettings,
 			getEditedPostType,
 			getEditedPostId,
@@ -89,6 +92,7 @@ function Editor( { onError } ) {
 			getEditorMode,
 		} = select( editSiteStore );
 		const { hasFinishedResolution, getEntityRecord } = select( coreStore );
+		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();
 
@@ -96,6 +100,7 @@ function Editor( { onError } ) {
 		return {
 			isInserterOpen: isInserterOpened(),
 			isListViewOpen: isListViewOpened(),
+			isSaveViewOpen: isSaveViewOpened(),
 			sidebarIsOpened: !! select(
 				interfaceStore
 			).getActiveComplementaryArea( editSiteStore.name ),
@@ -125,20 +130,12 @@ function Editor( { onError } ) {
 				'core/edit-site',
 				'showIconLabels'
 			),
+			blockEditorMode: __unstableGetEditorMode(),
 		};
 	}, [] );
-	const { setPage, setIsInserterOpened } = useDispatch( editSiteStore );
+	const { setPage, setIsInserterOpened, setIsSaveViewOpened } =
+		useDispatch( editSiteStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
-
-	const [ isEntitiesSavedStatesOpen, setIsEntitiesSavedStatesOpen ] =
-		useState( false );
-	const openEntitiesSavedStates = useCallback(
-		() => setIsEntitiesSavedStatesOpen( true ),
-		[]
-	);
-	const closeEntitiesSavedStates = useCallback( () => {
-		setIsEntitiesSavedStatesOpen( false );
-	}, [] );
 
 	const blockContext = useMemo(
 		() => ( {
@@ -244,9 +241,6 @@ function Editor( { onError } ) {
 											}
 											header={
 												<Header
-													openEntitiesSavedStates={
-														openEntitiesSavedStates
-													}
 													showIconLabels={
 														showIconLabels
 													}
@@ -256,7 +250,6 @@ function Editor( { onError } ) {
 											content={
 												<>
 													<EditorNotices />
-													<BlockStyles.Slot scope="core/block-inspector" />
 													{ editorMode === 'visual' &&
 														template && (
 															<BlockEditor
@@ -284,19 +277,17 @@ function Editor( { onError } ) {
 																) }
 															</Notice>
 														) }
-													<KeyboardShortcuts
-														openEntitiesSavedStates={
-															openEntitiesSavedStates
-														}
-													/>
+													<KeyboardShortcuts />
 												</>
 											}
 											actions={
 												<>
-													{ isEntitiesSavedStatesOpen ? (
+													{ isSaveViewOpen ? (
 														<EntitiesSavedStates
-															close={
-																closeEntitiesSavedStates
+															close={ () =>
+																setIsSaveViewOpened(
+																	false
+																)
 															}
 														/>
 													) : (
@@ -304,8 +295,10 @@ function Editor( { onError } ) {
 															<Button
 																variant="secondary"
 																className="edit-site-editor__toggle-save-panel-button"
-																onClick={
-																	openEntitiesSavedStates
+																onClick={ () =>
+																	setIsSaveViewOpened(
+																		true
+																	)
 																}
 																aria-expanded={
 																	false
@@ -320,11 +313,14 @@ function Editor( { onError } ) {
 												</>
 											}
 											footer={
-												<BlockBreadcrumb
-													rootLabelText={ __(
-														'Template'
-													) }
-												/>
+												blockEditorMode !==
+												'zoom-out' ? (
+													<BlockBreadcrumb
+														rootLabelText={ __(
+															'Template'
+														) }
+													/>
+												) : undefined
 											}
 											shortcuts={ {
 												previous: previousShortcut,

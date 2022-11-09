@@ -395,6 +395,45 @@ _Returns_
 
 -   `?Object`: Color object included in the colors array whose color property equals colorValue. Returns undefined if no color object matches this requirement.
 
+### getComputedFluidTypographyValue
+
+Computes a fluid font-size value that uses clamp(). A minimum and maxinmum
+font size OR a single font size can be specified.
+
+If a single font size is specified, it is scaled up and down by
+minimumFontSizeFactor and maximumFontSizeFactor to arrive at the minimum and
+maximum sizes.
+
+_Usage_
+
+```js
+// Calculate fluid font-size value from a minimum and maximum value.
+const fontSize = getComputedFluidTypographyValue( {
+	minimumFontSize: '20px',
+	maximumFontSize: '45px',
+} );
+// Calculate fluid font-size value from a single font size.
+const fontSize = getComputedFluidTypographyValue( {
+	fontSize: '30px',
+} );
+```
+
+_Parameters_
+
+-   _args_ `Object`:
+-   _args.minimumViewPortWidth_ `?string`: Minimum viewport size from which type will have fluidity. Optional if fontSize is specified.
+-   _args.maximumViewPortWidth_ `?string`: Maximum size up to which type will have fluidity. Optional if fontSize is specified.
+-   _args.fontSize_ `[string|number]`: Size to derive maximumFontSize and minimumFontSize from, if necessary. Optional if minimumFontSize and maximumFontSize are specified.
+-   _args.maximumFontSize_ `?string`: Maximum font size for any clamp() calculation. Optional.
+-   _args.minimumFontSize_ `?string`: Minimum font size for any clamp() calculation. Optional.
+-   _args.scaleFactor_ `?number`: A scale factor to determine how fast a font scales within boundaries. Optional.
+-   _args.minimumFontSizeFactor_ `?number`: How much to scale defaultFontSize by to derive minimumFontSize. Optional.
+-   _args.maximumFontSizeFactor_ `?number`: How much to scale defaultFontSize by to derive maximumFontSize. Optional.
+
+_Returns_
+
+-   `string|null`: A font-size value using clamp().
+
 ### getFontSize
 
 Returns the font size object based on an array of named font sizes and the namedFontSize and customFontSize values.
@@ -473,6 +512,20 @@ _Parameters_
 _Returns_
 
 -   `string`: returns the cssUnit value in a simple px format.
+
+### getTypographyClassesAndStyles
+
+Provides the CSS class names and inline styles for a block's typography support
+attributes.
+
+_Parameters_
+
+-   _attributes_ `Object`: Block attributes.
+-   _isFluidFontSizeActive_ `boolean`: Whether the function should try to convert font sizes to fluid values.
+
+_Returns_
+
+-   `Object`: Typography block support derived CSS classes & styles.
 
 ### InnerBlocks
 
@@ -603,6 +656,7 @@ _Properties_
 -   _codeEditingEnabled_ `boolean`: Whether or not the user can switch to the code editor
 -   _generateAnchors_ `boolean`: Enable/Disable auto anchor generation for Heading blocks
 -   _\_\_experimentalCanUserUseUnfilteredHTML_ `boolean`: Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
+-   _\_\_experimentalClearBlockSelection_ `boolean`: Whether the block editor should clear selection on mousedown when a block is not clicked.
 -   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
 -   _\_\_experimentalBlockPatterns_ `Array`: Array of objects representing the block patterns
 -   _\_\_experimentalBlockPatternCategories_ `Array`: Array of objects representing the block pattern categories
@@ -717,7 +771,6 @@ _Parameters_
 -   _props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
 -   _options_ `Object`: Options for internal use only.
 -   _options.\_\_unstableIsHtml_ `boolean`:
--   _options.\_\_unstableIsDisabled_ `boolean`: Whether the block should be disabled.
 
 _Returns_
 

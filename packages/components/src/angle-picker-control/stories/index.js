@@ -12,7 +12,7 @@ export default {
 	title: 'Components/AnglePickerControl',
 	component: AnglePickerControl,
 	argTypes: {
-		__nextHasNoMarginBottom: { control: { type: 'boolean' } },
+		label: { control: { type: 'text' } },
 	},
 };
 
@@ -24,3 +24,6 @@ const AnglePickerWithState = ( args ) => {
 };
 
 export const Default = AnglePickerWithState.bind( {} );
+Default.args = {
+	__nextHasNoMarginBottom: true,
+};

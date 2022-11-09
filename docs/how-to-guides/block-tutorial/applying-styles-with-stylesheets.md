@@ -102,7 +102,7 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 
 The inline style works well for a small amount of CSS to apply. If you have much more than the above you will likely find that it is easier to manage with them in a separate stylesheet file.
 
-The `useBlockProps` hooks includes the classsname for the block automatically, it generates a name for each block using the block's name prefixed with `wp-block-`, replacing the `/` namespace separator with a single `-`.
+The `useBlockProps` hooks includes the classname for the block automatically, it generates a name for each block using the block's name prefixed with `wp-block-`, replacing the `/` namespace separator with a single `-`.
 
 For example the block name: `gutenberg-examples/example-02-stylesheets` would get the classname: `wp-block-gutenberg-examples-example-02-stylesheets`. It might be a bit long but best to avoid conflicts with other blocks.
 
@@ -156,6 +156,37 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 		},
 	} );
 } )( window.wp.blocks, window.wp.element, window.wp.blockEditor );
+```
+
+{% end %}
+
+### Build or add dependency
+
+In order to include the blockEditor as a dependancy, make sure to run the build step, or update the asset php file.
+
+{% codetabs %}
+{% JSX %}
+
+Build the scripts and update the asset file which is used to keep track of dependencies and the build version.
+```bash
+npm run build
+```
+
+{% Plain %}
+
+Edit the asset file to include the block-editor dependancy for the scripts.
+
+```php
+<?php return
+	array( 'dependencies' =>
+		array(
+			'wp-blocks',
+			'wp-element',
+			'wp-block-editor',
+			'wp-polyfill'
+		),
+		'version' => '0.1'
+	);
 ```
 
 {% end %}

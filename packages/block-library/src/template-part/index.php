@@ -33,7 +33,7 @@ function render_block_core_template_part( $attributes ) {
 				'tax_query'      => array(
 					array(
 						'taxonomy' => 'wp_theme',
-						'field'    => 'slug',
+						'field'    => 'name',
 						'terms'    => $attributes['theme'],
 					),
 				),
@@ -189,6 +189,15 @@ function build_template_part_block_area_variations() {
  * @return array Array containing the block variation objects.
  */
 function build_template_part_block_instance_variations() {
+	// Block themes are unavailable during installation.
+	if ( wp_installing() ) {
+		return array();
+	}
+
+	if ( ! current_theme_supports( 'block-templates' ) && ! current_theme_supports( 'block-template-parts' ) ) {
+		return array();
+	}
+
 	$variations     = array();
 	$template_parts = get_block_templates(
 		array(

@@ -40,12 +40,14 @@
 	}
 
 	// Inherit radius.
+	> div, // A 60px width div shown only in the editor on mobile.
 	.components-resizable-box__container {
 		border-radius: inherit;
 	}
 
 	// Style the placeholder.
 	.components-placeholder {
+		display: flex;
 		justify-content: center;
 		align-items: center;
 		padding: 0;

@@ -23,6 +23,11 @@ const TEMPLATE = [
 	[ 'core/comments-pagination-numbers' ],
 	[ 'core/comments-pagination-next' ],
 ];
+const ALLOWED_BLOCKS = [
+	'core/comments-pagination-previous',
+	'core/comments-pagination-numbers',
+	'core/comments-pagination-next',
+];
 
 const getDefaultBlockLayout = ( blockTypeOrName ) => {
 	const layoutBlockSupportConfig = getBlockSupport(
@@ -58,11 +63,7 @@ export default function QueryPaginationEdit( {
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
-		allowedBlocks: [
-			'core/comments-pagination-previous',
-			'core/comments-pagination-numbers',
-			'core/comments-pagination-next',
-		],
+		allowedBlocks: ALLOWED_BLOCKS,
 		__experimentalLayout: usedLayout,
 	} );
 

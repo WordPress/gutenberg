@@ -24,7 +24,7 @@ test.describe( 'Preview', () => {
 
 		// Disabled until content present.
 		await expect(
-			editorPage.locator( 'role=button[name="View"i]' )
+			editorPage.locator( 'role=button[name="Preview"i]' )
 		).toBeDisabled();
 
 		await editorPage.type(
@@ -184,6 +184,12 @@ test.describe( 'Preview', () => {
 		// FIXME: The confirmation dialog is not named yet.
 		await page.click( 'role=dialog >> role=button[name="OK"i]' );
 
+		// Wait for the status change.
+		// @see https://github.com/WordPress/gutenberg/pull/43933
+		await expect(
+			page.locator( 'role=button[name="Publish"i]' )
+		).toBeVisible();
+
 		// Change the title.
 		await editorPage.type( 'role=textbox[name="Add title"i]', ' Draft' );
 
@@ -276,7 +282,7 @@ test.describe( 'Preview with private custom post type', () => {
 		await admin.createNewPost( { postType: 'not_public', title: 'aaaaa' } );
 
 		// Open the view menu.
-		await page.click( 'role=button[name="View"i]' );
+		await page.click( 'role=button[name="Preview"i]' );
 
 		await expect(
 			page.locator( 'role=menuitem[name="Preview in new tab"i]' )
@@ -291,7 +297,7 @@ class PreviewUtils {
 
 	async waitForPreviewNavigation( previewPage ) {
 		const previewToggle = this.page.locator(
-			'role=button[name="View"i][expanded=false]'
+			'role=button[name="Preview"i][expanded=false]'
 		);
 		const isDropdownClosed = await previewToggle.isVisible();
 		if ( isDropdownClosed ) {

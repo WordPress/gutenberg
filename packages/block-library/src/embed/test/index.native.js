@@ -39,8 +39,7 @@ jest.mock( 'react-native-modal', () => {
 } );
 
 // Mock debounce to prevent potentially belated state updates.
-jest.mock( 'lodash', () => ( {
-	...jest.requireActual( 'lodash' ),
+jest.mock( '@wordpress/compose/src/utils/debounce', () => ( {
 	debounce: ( fn ) => {
 		fn.cancel = jest.fn();
 		return fn;
@@ -148,17 +147,17 @@ const insertEmbedBlock = async ( blockTitle = 'Embed' ) => {
 	const editor = await initializeEditor( {
 		initialHtml: '',
 	} );
-	const { getByA11yLabel, getByText } = editor;
+	const { getByLabelText, getByText } = editor;
 
 	// Open inserter menu.
-	fireEvent.press( await waitFor( () => getByA11yLabel( 'Add block' ) ) );
+	fireEvent.press( await waitFor( () => getByLabelText( 'Add block' ) ) );
 
 	// Insert embed block.
 	fireEvent.press( await waitFor( () => getByText( blockTitle ) ) );
 
 	// Return the embed block.
 	const block = await waitFor( () =>
-		getByA11yLabel( /Embed Block\. Row 1/ )
+		getByLabelText( /Embed Block\. Row 1/ )
 	);
 
 	return { ...editor, block };
@@ -166,10 +165,10 @@ const insertEmbedBlock = async ( blockTitle = 'Embed' ) => {
 
 const initializeWithEmbedBlock = async ( initialHtml, selectBlock = true ) => {
 	const editor = await initializeEditor( { initialHtml } );
-	const { getByA11yLabel } = editor;
+	const { getByLabelText } = editor;
 
 	const block = await waitFor( () =>
-		getByA11yLabel( /Embed Block\. Row 1/ )
+		getByLabelText( /Embed Block\. Row 1/ )
 	);
 
 	if ( selectBlock ) {
@@ -271,7 +270,7 @@ describe( 'Embed block', () => {
 			// Get Twitter link field.
 			const twitterLinkField = within(
 				blockSettingsModal
-			).getByA11yLabel( `Twitter link, ${ expectedURL }` );
+			).getByLabelText( `Twitter link, ${ expectedURL }` );
 
 			expect( twitterLinkField ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
@@ -304,7 +303,7 @@ describe( 'Embed block', () => {
 			// Get Twitter link field.
 			const twitterLinkField = within(
 				blockSettingsModal
-			).getByA11yLabel( `Twitter link, ${ clipboardURL }` );
+			).getByLabelText( `Twitter link, ${ clipboardURL }` );
 
 			expect( autopastedLinkField ).toBeDefined();
 			expect( twitterLinkField ).toBeDefined();
@@ -362,7 +361,7 @@ describe( 'Embed block', () => {
 			// Get Twitter link field.
 			const twitterLinkField = within(
 				blockSettingsModal
-			).getByA11yLabel( `Twitter link, ${ expectedURL }` );
+			).getByLabelText( `Twitter link, ${ expectedURL }` );
 
 			expect( twitterLinkField ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
@@ -398,7 +397,7 @@ describe( 'Embed block', () => {
 			// Get Twitter link field.
 			const twitterLinkField = within(
 				blockSettingsModal
-			).getByA11yLabel( `Twitter link, ${ clipboardURL }` );
+			).getByLabelText( `Twitter link, ${ clipboardURL }` );
 
 			expect( embedLink ).toBeDefined();
 			expect( twitterLinkField ).toBeDefined();
@@ -410,12 +409,12 @@ describe( 'Embed block', () => {
 
 	describe( 'edit URL', () => {
 		it( 'keeps the previous URL if no URL is set', async () => {
-			const { getByA11yLabel, getByTestId } =
+			const { getByLabelText, getByTestId } =
 				await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 			// Open Block Settings.
 			fireEvent.press(
-				await waitFor( () => getByA11yLabel( 'Open Settings' ) )
+				await waitFor( () => getByLabelText( 'Open Settings' ) )
 			);
 
 			// Wait for Block Settings to be visible.
@@ -433,12 +432,12 @@ describe( 'Embed block', () => {
 			const initialURL = 'https://twitter.com/notnownikki';
 			const expectedURL = 'https://www.youtube.com/watch?v=lXMskKTw3Bc';
 
-			const { getByA11yLabel, getByDisplayValue, getByTestId } =
+			const { getByLabelText, getByDisplayValue, getByTestId } =
 				await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 			// Open Block Settings.
 			fireEvent.press(
-				await waitFor( () => getByA11yLabel( 'Open Settings' ) )
+				await waitFor( () => getByLabelText( 'Open Settings' ) )
 			);
 
 			// Wait for Block Settings to be visible.
@@ -447,7 +446,7 @@ describe( 'Embed block', () => {
 
 			// Start editing link.
 			fireEvent.press(
-				within( blockSettingsModal ).getByA11yLabel(
+				within( blockSettingsModal ).getByLabelText(
 					`Twitter link, ${ initialURL }`
 				)
 			);
@@ -463,7 +462,7 @@ describe( 'Embed block', () => {
 
 			// Get YouTube link field.
 			const youtubeLinkField = await waitFor( () =>
-				within( blockSettingsModal ).getByA11yLabel(
+				within( blockSettingsModal ).getByLabelText(
 					`YouTube link, ${ expectedURL }`
 				)
 			);
@@ -477,7 +476,7 @@ describe( 'Embed block', () => {
 			const invalidURL = 'http://';
 
 			const {
-				getByA11yLabel,
+				getByLabelText,
 				getByDisplayValue,
 				getByTestId,
 				getByText,
@@ -485,7 +484,7 @@ describe( 'Embed block', () => {
 
 			// Open Block Settings.
 			fireEvent.press(
-				await waitFor( () => getByA11yLabel( 'Open Settings' ) )
+				await waitFor( () => getByLabelText( 'Open Settings' ) )
 			);
 
 			// Wait for Block Settings to be visible.
@@ -494,7 +493,7 @@ describe( 'Embed block', () => {
 
 			// Start editing link.
 			fireEvent.press(
-				within( blockSettingsModal ).getByA11yLabel(
+				within( blockSettingsModal ).getByLabelText(
 					`Twitter link, ${ previousURL }`
 				)
 			);
@@ -520,7 +519,7 @@ describe( 'Embed block', () => {
 			const previousURL = 'https://twitter.com/notnownikki';
 
 			const {
-				getByA11yLabel,
+				getByLabelText,
 				getByDisplayValue,
 				getByTestId,
 				getByPlaceholderText,
@@ -528,7 +527,7 @@ describe( 'Embed block', () => {
 
 			// Open Block Settings.
 			fireEvent.press(
-				await waitFor( () => getByA11yLabel( 'Open Settings' ) )
+				await waitFor( () => getByLabelText( 'Open Settings' ) )
 			);
 
 			// Get Block Settings modal.
@@ -536,7 +535,7 @@ describe( 'Embed block', () => {
 
 			// Start editing link.
 			fireEvent.press(
-				within( blockSettingsModal ).getByA11yLabel(
+				within( blockSettingsModal ).getByLabelText(
 					`Twitter link, ${ previousURL }`
 				)
 			);
@@ -601,7 +600,7 @@ describe( 'Embed block', () => {
 			const expectedURL = 'https://twitter.com/notnownikki';
 
 			const {
-				getByA11yLabel,
+				getByLabelText,
 				getByDisplayValue,
 				getByPlaceholderText,
 				getByTestId,
@@ -622,7 +621,7 @@ describe( 'Embed block', () => {
 
 			// Open Block Settings.
 			fireEvent.press(
-				await waitFor( () => getByA11yLabel( 'Open Settings' ) )
+				await waitFor( () => getByLabelText( 'Open Settings' ) )
 			);
 
 			// Wait for Block Settings to be visible.
@@ -631,7 +630,7 @@ describe( 'Embed block', () => {
 
 			// Start editing link.
 			fireEvent.press(
-				within( blockSettingsModal ).getByA11yLabel(
+				within( blockSettingsModal ).getByLabelText(
 					`Embed link, ${ badURL }`
 				)
 			);
@@ -647,7 +646,7 @@ describe( 'Embed block', () => {
 
 			// Get Twitter link field.
 			const twitterLinkField = await waitFor( () =>
-				within( blockSettingsModal ).getByA11yLabel(
+				within( blockSettingsModal ).getByLabelText(
 					`Twitter link, ${ expectedURL }`
 				)
 			);
@@ -666,12 +665,12 @@ describe( 'Embed block', () => {
 			'Full width',
 		].forEach( ( alignmentOption ) =>
 			it( `sets ${ alignmentOption } option`, async () => {
-				const { getByA11yLabel, getByText } =
+				const { getByLabelText, getByText } =
 					await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 				// Open alignment options.
 				fireEvent.press(
-					await waitFor( () => getByA11yLabel( 'Align' ) )
+					await waitFor( () => getByLabelText( 'Align' ) )
 				);
 
 				// Select alignment option.
@@ -722,7 +721,7 @@ describe( 'Embed block', () => {
 			// Get Twitter link field.
 			const twitterLinkField = within(
 				blockSettingsModal
-			).getByA11yLabel( `Twitter link, ${ expectedURL }` );
+			).getByLabelText( `Twitter link, ${ expectedURL }` );
 
 			expect( twitterLinkField ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
@@ -740,7 +739,7 @@ describe( 'Embed block', () => {
 				);
 			} );
 
-			const { getByA11yLabel, getByText } =
+			const { getByLabelText, getByText } =
 				await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 			// Convert embed to link.
@@ -749,7 +748,7 @@ describe( 'Embed block', () => {
 
 			// Get paragraph block where the link is created.
 			const paragraphBlock = await waitFor( () =>
-				getByA11yLabel( /Paragraph Block\. Row 1/ )
+				getByLabelText( /Paragraph Block\. Row 1/ )
 			);
 
 			expect( paragraphBlock ).toBeDefined();
@@ -781,7 +780,7 @@ describe( 'Embed block', () => {
 			} );
 
 			const {
-				getByA11yLabel,
+				getByLabelText,
 				getByText,
 				getByTestId,
 				getByDisplayValue,
@@ -791,7 +790,7 @@ describe( 'Embed block', () => {
 			fireEvent.press( getByText( 'Edit link' ) );
 
 			// Start editing link.
-			fireEvent.press( getByA11yLabel( `WordPress link, ${ failURL }` ) );
+			fireEvent.press( getByLabelText( `WordPress link, ${ failURL }` ) );
 
 			// Set an URL.
 			const linkTextInput = getByDisplayValue( failURL );
@@ -809,7 +808,7 @@ describe( 'Embed block', () => {
 			// Get Twitter link field.
 			const twitterLinkField = within(
 				blockSettingsModal
-			).getByA11yLabel( `Twitter link, ${ successURL }` );
+			).getByLabelText( `Twitter link, ${ successURL }` );
 
 			expect( twitterLinkField ).toBeDefined();
 			expect( getEditorHtml() ).toMatchSnapshot();
@@ -866,7 +865,7 @@ describe( 'Embed block', () => {
 			const expectedURL = 'https://www.youtube.com/watch?v=lXMskKTw3Bc';
 
 			const {
-				getByA11yLabel,
+				getByLabelText,
 				getByPlaceholderText,
 				getByTestId,
 				getByText,
@@ -898,7 +897,7 @@ describe( 'Embed block', () => {
 
 			// Get the created embed block.
 			const embedBlock = await waitFor( () =>
-				getByA11yLabel( /Embed Block\. Row 1/ )
+				getByLabelText( /Embed Block\. Row 1/ )
 			);
 
 			expect( embedBlock ).toBeDefined();
@@ -954,7 +953,7 @@ describe( 'Embed block', () => {
 	describe( 'insert via slash inserter', () => {
 		it( 'insert generic embed block', async () => {
 			const embedBlockSlashInserter = '/Embed';
-			const { getByPlaceholderText, getByA11yLabel, getByText } =
+			const { getByPlaceholderText, getByLabelText, getByText } =
 				await initializeEditor( { initialHtml: EMPTY_PARAGRAPH_HTML } );
 
 			const paragraphText = getByPlaceholderText( 'Start writing…' );
@@ -981,7 +980,7 @@ describe( 'Embed block', () => {
 			fireEvent.press( await waitFor( () => getByText( 'Embed' ) ) );
 
 			const block = await waitFor( () =>
-				getByA11yLabel( /Embed Block\. Row 1/ )
+				getByLabelText( /Embed Block\. Row 1/ )
 			);
 
 			const blockName = within( block ).getByText( 'Embed' );
@@ -993,7 +992,7 @@ describe( 'Embed block', () => {
 		MOST_USED_PROVIDERS.forEach( ( { title } ) =>
 			it( `inserts ${ title } embed block`, async () => {
 				const embedBlockSlashInserter = `/${ title }`;
-				const { getByPlaceholderText, getByA11yLabel, getByText } =
+				const { getByPlaceholderText, getByLabelText, getByText } =
 					await initializeEditor( {
 						initialHtml: EMPTY_PARAGRAPH_HTML,
 					} );
@@ -1022,7 +1021,7 @@ describe( 'Embed block', () => {
 				fireEvent.press( await waitFor( () => getByText( title ) ) );
 
 				const block = await waitFor( () =>
-					getByA11yLabel( /Embed Block\. Row 1/ )
+					getByLabelText( /Embed Block\. Row 1/ )
 				);
 
 				const blockName = within( block ).getByText( title );
@@ -1081,12 +1080,12 @@ describe( 'Embed block', () => {
 
 	describe( 'block settings', () => {
 		it( 'toggles resize for smaller devices media settings', async () => {
-			const { getByA11yLabel, getByText } =
+			const { getByLabelText, getByText } =
 				await initializeWithEmbedBlock( RICH_TEXT_EMBED_HTML );
 
 			// Open Block Settings.
 			fireEvent.press(
-				await waitFor( () => getByA11yLabel( 'Open Settings' ) )
+				await waitFor( () => getByLabelText( 'Open Settings' ) )
 			);
 
 			// Untoggle resize for smaller devices.
@@ -1098,12 +1097,12 @@ describe( 'Embed block', () => {
 		} );
 
 		it( 'does not show media settings panel if responsive is not supported', async () => {
-			const { getByA11yLabel, getByText } =
+			const { getByLabelText, getByText } =
 				await initializeWithEmbedBlock( WP_EMBED_HTML );
 
 			// Open Block Settings.
 			fireEvent.press(
-				await waitFor( () => getByA11yLabel( 'Open Settings' ) )
+				await waitFor( () => getByLabelText( 'Open Settings' ) )
 			);
 
 			// Wait for media settings panel.

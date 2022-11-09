@@ -77,6 +77,13 @@ function UncontrolledInnerBlocks( props ) {
 	const context = useSelect(
 		( select ) => {
 			const block = select( blockEditorStore ).getBlock( clientId );
+
+			// This check is here to avoid the Redux zombie bug where a child subscription
+			// is called before a parent, causing potential JS errors when the child has been removed.
+			if ( ! block ) {
+				return;
+			}
+
 			const blockType = getBlockType( block.name );
 
 			if ( ! blockType || ! blockType.providesContext ) {
@@ -143,7 +150,9 @@ const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md
  */
 export function useInnerBlocksProps( props = {}, options = {} ) {
-	const { clientId } = useBlockEditContext();
+	const { __unstableDisableLayoutClassNames } = options;
+	const { clientId, __unstableLayoutClassNames: layoutClassNames = '' } =
+		useBlockEditContext();
 	const isSmallScreen = useViewportMatch( 'medium', '<' );
 	const { __experimentalCaptureToolbars, hasOverlay } = useSelect(
 		( select ) => {
@@ -155,10 +164,11 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				getBlockName,
 				isBlockSelected,
 				hasSelectedInnerBlock,
-				isNavigationMode,
+				__unstableGetEditorMode,
 			} = select( blockEditorStore );
 			const blockName = getBlockName( clientId );
-			const enableClickThrough = isNavigationMode() || isSmallScreen;
+			const enableClickThrough =
+				__unstableGetEditorMode() === 'navigation' || isSmallScreen;
 			return {
 				__experimentalCaptureToolbars: select(
 					blocksStore
@@ -192,12 +202,14 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		innerBlocksProps.value && innerBlocksProps.onChange
 			? ControlledInnerBlocks
 			: UncontrolledInnerBlocks;
+
 	return {
 		...props,
 		ref,
 		className: classnames(
 			props.className,
 			'block-editor-block-list__layout',
+			__unstableDisableLayoutClassNames ? '' : layoutClassNames,
 			{
 				'has-overlay': hasOverlay,
 			}

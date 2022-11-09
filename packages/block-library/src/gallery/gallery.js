@@ -12,7 +12,6 @@ import {
 	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 import { VisuallyHidden } from '@wordpress/components';
-import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { View } from '@wordpress/primitives';
@@ -27,6 +26,7 @@ export const Gallery = ( props ) => {
 		mediaPlaceholder,
 		insertBlocksAfter,
 		blockProps,
+		__unstableLayoutClassNames: layoutClassNames,
 	} = props;
 
 	const { align, columns, caption, imageCrop } = attributes;
@@ -38,31 +38,12 @@ export const Gallery = ( props ) => {
 		__experimentalLayout: { type: 'default', alignments: [] },
 	} );
 
-	const [ captionFocused, setCaptionFocused ] = useState( false );
-
-	function onFocusCaption() {
-		if ( ! captionFocused ) {
-			setCaptionFocused( true );
-		}
-	}
-
-	function removeCaptionFocus() {
-		if ( captionFocused ) {
-			setCaptionFocused( false );
-		}
-	}
-
-	useEffect( () => {
-		if ( ! isSelected ) {
-			setCaptionFocused( false );
-		}
-	}, [ isSelected ] );
-
 	return (
 		<figure
 			{ ...innerBlocksProps }
 			className={ classnames(
 				blockProps.className,
+				layoutClassNames,
 				'blocks-gallery-grid',
 				{
 					[ `align${ align }` ]: align,
@@ -74,17 +55,12 @@ export const Gallery = ( props ) => {
 		>
 			{ children }
 			{ isSelected && ! children && (
-				<View
-					className="blocks-gallery-media-placeholder-wrapper"
-					onClick={ removeCaptionFocus }
-				>
+				<View className="blocks-gallery-media-placeholder-wrapper">
 					{ mediaPlaceholder }
 				</View>
 			) }
 			<RichTextVisibilityHelper
 				isHidden={ ! isSelected && RichText.isEmpty( caption ) }
-				captionFocused={ captionFocused }
-				onFocusCaption={ onFocusCaption }
 				tagName="figcaption"
 				className={ classnames(
 					'blocks-gallery-caption',
@@ -105,8 +81,6 @@ export const Gallery = ( props ) => {
 
 function RichTextVisibilityHelper( {
 	isHidden,
-	captionFocused,
-	onFocusCaption,
 	className,
 	value,
 	placeholder,
@@ -125,8 +99,6 @@ function RichTextVisibilityHelper( {
 			placeholder={ placeholder }
 			className={ className }
 			tagName={ tagName }
-			isSelected={ captionFocused }
-			onClick={ onFocusCaption }
 			{ ...richTextProps }
 		/>
 	);

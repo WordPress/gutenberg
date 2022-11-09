@@ -11,6 +11,28 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.85.0
+-   [*] [iOS] Fixed iOS Voice Control support within Image block captions. [#44850]
+
+## 1.84.1
+-   [**] Native inner blocks merge where appropriate [#45048]
+
+## 1.84.0
+-   [*] Upgrade compile and target sdk version to Android API 31 [#44610]
+-   [*] [iOS] Fixed iOS Voice Control support within Image block captions. [#44850]
+
+## 1.83.0
+* No User facing changes *
+
+## 1.82.1
+-   [**] List block v2: Fix issues splitting or merging paragraphs into the block [#43949]
+
+## 1.82.0
+-   [*] [iOS] Explicitly set tint color for action sheets to always be blue [#43759]
+
+## 1.81.2
+-   [**] List V2 - Prevent error when list is empty [#43861]
+
 ## 1.81.1
 -   [*] List block v2: Fix text color inconsistencies with list items [#43244]
 -   [*] Use default placeholder text color for native List Item [#43353]

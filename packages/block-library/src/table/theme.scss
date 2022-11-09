@@ -1,4 +1,6 @@
 .wp-block-table {
+	margin: "0 0 1em 0";
+
 	thead {
 		border-bottom: 3px solid;
 	}
@@ -9,8 +11,6 @@
 
 	td,
 	th {
-		padding: 0.5em;
-		border: 1px solid;
 		word-break: normal;
 	}
 

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, mapValues, every, pick } from 'lodash';
+import { get, mapValues, pick } from 'lodash';
 
 const INHERITED_COLUMN_ATTRIBUTES = [ 'align' ];
 
@@ -281,7 +281,7 @@ export function deleteColumn( state, { columnIndex } ) {
 }
 
 /**
- * Toggles the existance of a section.
+ * Toggles the existence of a section.
  *
  * @param {Object} state       Current table state.
  * @param {string} sectionName Name of the section to toggle.
@@ -309,7 +309,7 @@ export function toggleSection( state, sectionName ) {
  * @return {boolean} True if the table section is empty, false otherwise.
  */
 export function isEmptyTableSection( section ) {
-	return ! section || ! section.length || every( section, isEmptyRow );
+	return ! section || ! section.length || section.every( isEmptyRow );
 }
 
 /**

@@ -26,6 +26,8 @@ import {
 	START_OF_SELECTED_AREA,
 } from '../utils/selection';
 
+/** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
+
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
 
@@ -624,10 +626,13 @@ export const insertBlocks =
 /**
  * Action that shows the insertion point.
  *
- * @param {?string} rootClientId      Optional root client ID of block list on
- *                                    which to insert.
- * @param {?number} index             Index at which block should be inserted.
- * @param {Object}  __unstableOptions Whether or not to show an inserter button.
+ * @param    {?string}         rootClientId           Optional root client ID of block list on
+ *                                                    which to insert.
+ * @param    {?number}         index                  Index at which block should be inserted.
+ * @param    {?Object}         __unstableOptions      Additional options.
+ * @property {boolean}         __unstableWithInserter Whether or not to show an inserter button.
+ * @property {WPDropOperation} operation              The operation to perform when applied,
+ *                                                    either 'insert' or 'replace' for now.
  *
  * @return {Object} Action object.
  */
@@ -636,25 +641,28 @@ export function showInsertionPoint(
 	index,
 	__unstableOptions = {}
 ) {
-	const { __unstableWithInserter } = __unstableOptions;
+	const { __unstableWithInserter, operation } = __unstableOptions;
 	return {
 		type: 'SHOW_INSERTION_POINT',
 		rootClientId,
 		index,
 		__unstableWithInserter,
+		operation,
 	};
 }
-
 /**
  * Action that hides the insertion point.
- *
- * @return {Object} Action object.
  */
-export function hideInsertionPoint() {
-	return {
-		type: 'HIDE_INSERTION_POINT',
+export const hideInsertionPoint =
+	() =>
+	( { select, dispatch } ) => {
+		if ( ! select.isBlockInsertionPointVisible() ) {
+			return;
+		}
+		dispatch( {
+			type: 'HIDE_INSERTION_POINT',
+		} );
 	};
-}
 
 /**
  * Action that resets the template validity.
@@ -1256,6 +1264,28 @@ export function toggleBlockMode( clientId ) {
 }
 
 /**
+ * Returns an action object used in signalling that the block interface, eg. toolbar, outline, etc. should be hidden.
+ *
+ * @return {Object} Action object.
+ */
+export function __experimentalHideBlockInterface() {
+	return {
+		type: 'HIDE_BLOCK_INTERFACE',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the block interface, eg. toolbar, outline, etc. should be shown.
+ *
+ * @return {Object} Action object.
+ */
+export function __experimentalShowBlockInterface() {
+	return {
+		type: 'SHOW_BLOCK_INTERFACE',
+	};
+}
+
+/**
  * Returns an action object used in signalling that the user has begun to type.
  *
  * @return {Object} Action object.
@@ -1474,25 +1504,52 @@ export const __unstableMarkAutomaticChange =
 /**
  * Action that enables or disables the navigation mode.
  *
- * @param {string} isNavigationMode Enable/Disable navigation mode.
+ * @param {boolean} isNavigationMode Enable/Disable navigation mode.
  */
 export const setNavigationMode =
 	( isNavigationMode = true ) =>
 	( { dispatch } ) => {
-		dispatch( { type: 'SET_NAVIGATION_MODE', isNavigationMode } );
+		dispatch.__unstableSetEditorMode(
+			isNavigationMode ? 'navigation' : 'edit'
+		);
+	};
 
-		if ( isNavigationMode ) {
+/**
+ * Action that sets the editor mode
+ *
+ * @param {string} mode Editor mode
+ */
+export const __unstableSetEditorMode =
+	( mode ) =>
+	( { dispatch, select } ) => {
+		// When switching to zoom-out mode, we need to select the root block
+		if ( mode === 'zoom-out' ) {
+			const firstSelectedClientId = select.getBlockSelectionStart();
+			if ( firstSelectedClientId ) {
+				dispatch.selectBlock(
+					select.getBlockHierarchyRootClientId(
+						firstSelectedClientId
+					)
+				);
+			}
+		}
+
+		dispatch( { type: 'SET_EDITOR_MODE', mode } );
+
+		if ( mode === 'navigation' ) {
 			speak(
 				__(
 					'You are currently in navigation mode. Navigate blocks using the Tab key and Arrow keys. Use Left and Right Arrow keys to move between nesting levels. To exit navigation mode and edit the selected block, press Enter.'
 				)
 			);
-		} else {
+		} else if ( mode === 'edit' ) {
 			speak(
 				__(
 					'You are currently in edit mode. To return to the navigation mode, press Escape.'
 				)
 			);
+		} else if ( mode === 'zoom-out' ) {
+			speak( __( 'You are currently in zoom-out mode.' ) );
 		}
 	};
 
@@ -1676,6 +1733,10 @@ export function setBlockVisibility( updates ) {
 
 /**
  * Action that sets whether a block is being temporaritly edited as blocks.
+ *
+ * DO-NOT-USE in production.
+ * This action is created for internal/experimental only usage and may be
+ * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
  *
  * @param {?string} temporarilyEditingAsBlocks The block's clientId being temporaritly edited as blocks.
  */

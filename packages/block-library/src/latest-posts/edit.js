@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, includes, pickBy } from 'lodash';
+import { get, pickBy } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -19,7 +19,7 @@ import {
 	ToolbarGroup,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { dateI18n, format, __experimentalGetSettings } from '@wordpress/date';
+import { dateI18n, format, getSettings } from '@wordpress/date';
 import {
 	InspectorControls,
 	BlockAlignmentToolbar,
@@ -196,7 +196,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 		} );
 		// We do nothing if the category is not selected
 		// from suggestions.
-		if ( includes( allCategories, null ) ) {
+		if ( allCategories.includes( null ) ) {
 			return false;
 		}
 		setAttributes( { categories: allCategories } );
@@ -422,7 +422,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 		},
 	];
 
-	const dateFormat = __experimentalGetSettings().formats.date;
+	const dateFormat = getSettings().formats.date;
 
 	return (
 		<div>

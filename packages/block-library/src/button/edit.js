@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback, useEffect, useState, useRef } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import {
 	Button,
 	ButtonGroup,
@@ -30,6 +30,7 @@ import {
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { link, linkOff } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
+import { useMergeRefs } from '@wordpress/compose';
 
 const NEW_TAB_REL = 'noreferrer noopener';
 
@@ -77,12 +78,6 @@ function ButtonEdit( props ) {
 	} = props;
 	const { linkTarget, placeholder, rel, style, text, url, width } =
 		attributes;
-	const onSetLinkRel = useCallback(
-		( value ) => {
-			setAttributes( { rel: value } );
-		},
-		[ setAttributes ]
-	);
 
 	function onToggleOpenInNewTab( value ) {
 		const newLinkTarget = value ? '_blank' : undefined;
@@ -114,12 +109,19 @@ function ButtonEdit( props ) {
 		}
 	}
 
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+
 	const borderProps = useBorderProps( attributes );
 	const colorProps = useColorProps( attributes );
 	const spacingProps = useSpacingProps( attributes );
 	const ref = useRef();
 	const richTextRef = useRef();
-	const blockProps = useBlockProps( { ref, onKeyDown } );
+	const blockProps = useBlockProps( {
+		ref: useMergeRefs( [ setPopoverAnchor, ref ] ),
+		onKeyDown,
+	} );
 
 	const [ isEditingURL, setIsEditingURL ] = useState( false );
 	const isURLSet = !! url;
@@ -213,15 +215,15 @@ function ButtonEdit( props ) {
 			</BlockControls>
 			{ isSelected && ( isEditingURL || isURLSet ) && (
 				<Popover
-					position="bottom center"
+					placement="bottom"
 					onClose={ () => {
 						setIsEditingURL( false );
 						richTextRef.current?.focus();
 					} }
-					anchorRef={ ref?.current }
+					anchor={ popoverAnchor }
 					focusOnMount={ isEditingURL ? 'firstElement' : false }
 					__unstableSlotName={ '__unstable-block-tools-after' }
-					__unstableShift
+					shift
 				>
 					<LinkControl
 						className="wp-block-navigation-link__inline-link-input"
@@ -254,7 +256,7 @@ function ButtonEdit( props ) {
 				<TextControl
 					label={ __( 'Link rel' ) }
 					value={ rel || '' }
-					onChange={ onSetLinkRel }
+					onChange={ ( newRel ) => setAttributes( { rel: newRel } ) }
 				/>
 			</InspectorControls>
 		</>

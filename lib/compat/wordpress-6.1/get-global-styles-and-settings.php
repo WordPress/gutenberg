@@ -8,7 +8,7 @@
 /**
  * Adds global style rules to the inline style for each block.
  */
-function wp_add_global_styles_for_blocks() {
+function gutenberg_add_global_styles_for_blocks() {
 	$tree        = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
 	$block_nodes = $tree->get_styles_block_nodes();
 	foreach ( $block_nodes as $metadata ) {
@@ -19,12 +19,16 @@ function wp_add_global_styles_for_blocks() {
 			continue;
 		}
 
+		$stylesheet_handle = 'global-styles';
 		if ( isset( $metadata['name'] ) ) {
-			$block_name = str_replace( 'core/', '', $metadata['name'] );
 			// These block styles are added on block_render.
 			// This hooks inline CSS to them so that they are loaded conditionally
 			// based on whether or not the block is used on the page.
-			wp_add_inline_style( 'wp-block-' . $block_name, $block_css );
+			if ( str_starts_with( $metadata['name'], 'core/' ) ) {
+				$block_name        = str_replace( 'core/', '', $metadata['name'] );
+				$stylesheet_handle = 'wp-block-' . $block_name;
+			}
+			wp_add_inline_style( $stylesheet_handle, $block_css );
 		}
 
 		// The likes of block element styles from theme.json do not have  $metadata['name'] set.
@@ -41,8 +45,11 @@ function wp_add_global_styles_for_blocks() {
 				)
 			);
 			if ( isset( $result[0] ) ) {
-				$block_name = str_replace( 'core/', '', $result[0] );
-				wp_add_inline_style( 'wp-block-' . $block_name, $block_css );
+				if ( str_starts_with( $result[0], 'core/' ) ) {
+					$block_name        = str_replace( 'core/', '', $result[0] );
+					$stylesheet_handle = 'wp-block-' . $block_name;
+				}
+				wp_add_inline_style( $stylesheet_handle, $block_css );
 			}
 		}
 	}
@@ -76,7 +83,7 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 		}
 	}
 	$tree                = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
-	$supports_theme_json = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
+	$supports_theme_json = wp_theme_has_theme_json();
 	if ( empty( $types ) && ! $supports_theme_json ) {
 		$types = array( 'variables', 'presets', 'base-layout-styles' );
 	} elseif ( empty( $types ) ) {
@@ -85,14 +92,22 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 
 	/*
 	 * If variables are part of the stylesheet,
-	 * we add them for all origins (default, theme, user).
+	 * we add them.
+	 *
 	 * This is so themes without a theme.json still work as before 5.9:
 	 * they can override the default presets.
 	 * See https://core.trac.wordpress.org/ticket/54782
 	 */
 	$styles_variables = '';
 	if ( in_array( 'variables', $types, true ) ) {
-		$styles_variables = $tree->get_stylesheet( array( 'variables' ) );
+		/*
+		 * We only use the default, theme, and custom origins.
+		 * This is because styles for blocks origin are added
+		 * at a later phase (render cycle) so we only render the ones in use.
+		 * @see wp_add_global_styles_for_blocks
+		 */
+		$origins          = array( 'default', 'theme', 'custom' );
+		$styles_variables = $tree->get_stylesheet( array( 'variables' ), $origins );
 		$types            = array_diff( $types, array( 'variables' ) );
 	}
 
@@ -104,6 +119,12 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 	 */
 	$styles_rest = '';
 	if ( ! empty( $types ) ) {
+		/*
+		 * We only use the default, theme, and custom origins.
+		 * This is because styles for blocks origin are added
+		 * at a later phase (render cycle) so we only render the ones in use.
+		 * @see wp_add_global_styles_for_blocks
+		 */
 		$origins = array( 'default', 'theme', 'custom' );
 		if ( ! $supports_theme_json ) {
 			$origins = array( 'default' );

@@ -19,6 +19,7 @@ import {
 	hasSameKeys,
 	isUpdatingSameBlockAttribute,
 	blocks,
+	isBlockInterfaceHidden,
 	isTyping,
 	draggedBlocks,
 	selection,
@@ -292,7 +293,6 @@ describe( 'state', () => {
 						chicken: '',
 					},
 					controlledInnerBlocks: {},
-					visibility: {},
 				} );
 				expect( state.tree.chicken ).not.toBe(
 					existingState.tree.chicken
@@ -375,7 +375,6 @@ describe( 'state', () => {
 						chicken: '',
 					},
 					controlledInnerBlocks: {},
-					visibility: {},
 				} );
 				expect( state.tree.chicken ).not.toBe(
 					existingState.tree.chicken
@@ -525,7 +524,6 @@ describe( 'state', () => {
 						[ newChildBlockId3 ]: 'chicken',
 					},
 					controlledInnerBlocks: {},
-					visibility: {},
 				} );
 
 				expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe(
@@ -635,7 +633,6 @@ describe( 'state', () => {
 						[ newChildBlockId ]: 'chicken',
 					},
 					controlledInnerBlocks: {},
-					visibility: {},
 				} );
 
 				// The block object of the parent should be updated.
@@ -657,7 +654,6 @@ describe( 'state', () => {
 				isIgnoredChange: false,
 				tree: {},
 				controlledInnerBlocks: {},
-				visibility: {},
 			} );
 		} );
 
@@ -1899,6 +1895,27 @@ describe( 'state', () => {
 
 					expect( state.attributes ).toBe( state.attributes );
 				} );
+
+				it( 'should handle undefined attributes', () => {
+					const original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									clientId: 'kumquat',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						} )
+					);
+					const state = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+					} );
+
+					expect( state.attributes.kumquat ).toEqual( {} );
+				} );
 			} );
 
 			describe( 'isPersistentChange', () => {
@@ -2255,6 +2272,24 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toBe( null );
+		} );
+	} );
+
+	describe( 'isBlockInterfaceHidden()', () => {
+		it( 'should set the hide block interface flag to true', () => {
+			const state = isBlockInterfaceHidden( false, {
+				type: 'HIDE_BLOCK_INTERFACE',
+			} );
+
+			expect( state ).toBe( true );
+		} );
+
+		it( 'should set the hide block interface flag to false', () => {
+			const state = isBlockInterfaceHidden( false, {
+				type: 'SHOW_BLOCK_INTERFACE',
+			} );
+
+			expect( state ).toBe( false );
 		} );
 	} );
 
@@ -3084,18 +3119,6 @@ describe( 'state', () => {
 			expect( state ).toEqual( {
 				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': { food: 'banana' },
 			} );
-		} );
-
-		it( 'returns null on anything other than block attributes update', () => {
-			const original = deepFreeze( {
-				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': { food: 'banana' },
-			} );
-
-			const state = lastBlockAttributesChange( original, {
-				type: '__INERT__',
-			} );
-
-			expect( state ).toBe( null );
 		} );
 	} );
 

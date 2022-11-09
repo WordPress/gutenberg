@@ -10,7 +10,7 @@ import {
 	insert,
 	isCollapsed,
 	applyFormat,
-	useAnchorRef,
+	useAnchor,
 	removeFormat,
 	slice,
 	replace,
@@ -183,13 +183,17 @@ function InlineLinkUI( {
 		}
 	}
 
-	const anchorRef = useAnchorRef( { ref: contentRef, value, settings } );
+	const popoverAnchor = useAnchor( {
+		editableContentElement: contentRef.current,
+		value,
+		settings,
+	} );
 
 	// Generate a string based key that is unique to this anchor reference.
 	// This is used to force re-mount the LinkControl component to avoid
 	// potential stale state bugs caused by the component not being remounted
 	// See https://github.com/WordPress/gutenberg/pull/34742.
-	const forceRemountKey = useLinkInstanceKey( anchorRef );
+	const forceRemountKey = useLinkInstanceKey( popoverAnchor );
 
 	// The focusOnMount prop shouldn't evolve during render of a Popover
 	// otherwise it causes a render of the content.
@@ -223,11 +227,11 @@ function InlineLinkUI( {
 
 	return (
 		<Popover
-			anchorRef={ anchorRef }
+			anchor={ popoverAnchor }
 			focusOnMount={ focusOnMount.current }
 			onClose={ stopAddingLink }
-			position="bottom center"
-			__unstableShift
+			placement="bottom"
+			shift
 		>
 			<LinkControl
 				key={ forceRemountKey }

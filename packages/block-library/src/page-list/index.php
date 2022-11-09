@@ -119,7 +119,14 @@ function block_core_page_list_build_css_font_sizes( $context ) {
 		$font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $context['fontSize'] );
 	} elseif ( $has_custom_font_size ) {
 		// Add the custom font size inline style.
-		$font_sizes['inline_styles'] = sprintf( 'font-size: %s;', $context['style']['typography']['fontSize'] );
+		$font_sizes['inline_styles'] = sprintf(
+			'font-size: %s;',
+			wp_get_typography_font_size_value(
+				array(
+					'size' => $context['style']['typography']['fontSize'],
+				)
+			)
+		);
 	}
 
 	return $font_sizes;
@@ -189,7 +196,7 @@ function block_core_page_list_render_nested_page_list( $open_submenus_on_click, 
 
 		if ( isset( $page['children'] ) && $is_navigation_child && $open_submenus_on_click ) {
 			$markup .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="' . esc_attr( $navigation_child_content_class ) . ' wp-block-navigation-submenu__toggle" aria-expanded="false">' . esc_html( $title ) .
-			'</button>' . '<span class="wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg></span>';
+			'</button><span class="wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg></span>';
 		} else {
 			$markup .= '<a class="wp-block-pages-list__item__link' . esc_attr( $navigation_child_content_class ) . '" href="' . esc_url( $page['link'] ) . '"' . $aria_current . '>' . $title . '</a>';
 		}
@@ -243,7 +250,7 @@ function block_core_page_list_nest_pages( $current_level, $children ) {
  */
 function render_block_core_page_list( $attributes, $content, $block ) {
 	static $block_id = 0;
-	$block_id++;
+	++$block_id;
 
 	$all_pages = get_pages(
 		array(
@@ -264,7 +271,7 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	$active_page_ancestor_ids = array();
 
 	foreach ( (array) $all_pages as $page ) {
-		$is_active = ! empty( $page->ID ) && ( get_the_ID() === $page->ID );
+		$is_active = ! empty( $page->ID ) && ( get_queried_object_id() === $page->ID );
 
 		if ( $is_active ) {
 			$active_page_ancestor_ids = get_post_ancestors( $page->ID );
@@ -298,11 +305,6 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	$css_classes     = trim( implode( ' ', $classes ) );
 
 	$nested_pages = block_core_page_list_nest_pages( $top_level_pages, $pages_with_children );
-
-	// Limit the number of items to be visually displayed.
-	if ( ! empty( $attributes['__unstableMaxPages'] ) ) {
-		$nested_pages = array_slice( $nested_pages, 0, $attributes['__unstableMaxPages'] );
-	}
 
 	$is_navigation_child = array_key_exists( 'showSubmenuIcon', $block->context );
 

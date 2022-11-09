@@ -476,3 +476,17 @@ Use this setting to enable the following Global Styles settings:
 ```php
 add_theme_support( 'appearance-tools' );
 ```
+
+## Block Based Template Parts
+
+Block Based Template parts allow administrators to edit parts of the site using blocks. This is off by default, and requires the theme to opt in by declaring support:
+
+```php
+add_theme_support( 'block-template-parts' );
+```
+
+This feature is only relevant for non block based themes, as block based themes already support block based template parts as part of the site editor.
+
+The standalone template part editor does not allow editors to create new, or delete existing template parts. This is because the theme manually needs to include the template part in the PHP template.
+
+You can find out more about block based template parts in the [themes handbook block template and template parts section](https://developer.wordpress.org/themes/block-themes/templates-and-template-parts/#block-c5fa39a2-a27d-4bd2-98d0-dc6249a0801a).
