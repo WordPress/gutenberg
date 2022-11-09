@@ -25,12 +25,14 @@ export const InputWithSlider = ( {
 	onChange,
 	value,
 }: InputWithSliderProps ) => {
-	const onNumberControlChange = ( newValue: number | string ) => {
-		if ( newValue === '' ) {
-			return onChange( 0 );
+	const onNumberControlChange = ( newValue?: number | string ) => {
+		if ( ! newValue ) {
+			onChange( 0 );
+			return;
 		}
 		if ( typeof newValue === 'string' ) {
-			return onChange( parseInt( newValue, 10 ) );
+			onChange( parseInt( newValue, 10 ) );
+			return;
 		}
 		onChange( newValue );
 	};
@@ -43,7 +45,6 @@ export const InputWithSlider = ( {
 				label={ label }
 				hideLabelFromVision
 				value={ value }
-				// @ts-expect-error TODO: Resolve discrepancy in NumberControl
 				onChange={ onNumberControlChange }
 				prefix={
 					<Spacer
