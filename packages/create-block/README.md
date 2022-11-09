@@ -95,53 +95,15 @@ $ npx @wordpress/create-block --no-plugin
 
 When you scaffold a block, you must provide at least a `slug` name, the `namespace` which usually corresponds to either the `theme` or `plugin` name. In most cases, we recommended pairing blocks with WordPress plugins rather than themes, because only using plugin ensures that all blocks still work when your theme changes.
 
-## Available Commands
+## Available commands in the scaffolded project
 
-When bootstrapped with the `static` template (or any other project template with `wpScripts` flag enabled), you can run several commands inside the directory:
+The plugin folder created when executing this command, is a node package with a modern build setup that requires no configuration. 
 
-```bash
-$ npm start
-```
-
-Starts the build for development. [Learn more](https://github.com/WordPress/gutenberg/tree/HEAD/packages/scripts#start).
-
-```bash
-$ npm run build
-```
-
-Builds the code for production. [Learn more](https://github.com/WordPress/gutenberg/tree/HEAD/packages/scripts#build).
-
-```bash
-$ npm run format
-```
-
-Formats files. [Learn more](https://github.com/WordPress/gutenberg/tree/HEAD/packages/scripts#format).
-
-```bash
-$ npm run lint:css
-```
-
-Lints CSS files. [Learn more](https://github.com/WordPress/gutenberg/tree/HEAD/packages/scripts#lint-style).
-
-```bash
-$ npm run lint:js
-```
-
-Lints JavaScript files. [Learn more](https://github.com/WordPress/gutenberg/tree/HEAD/packages/scripts#lint-js).
-
-```bash
-$ npm run plugin-zip
-```
-
-Creates a zip file for a WordPress plugin. [Learn more](https://github.com/WordPress/gutenberg/tree/HEAD/packages/scripts#plugin-zip).
-
-```bash
-$ npm run packages-update
-```
-
-Updates WordPress packages to the latest version. [Learn more](https://github.com/WordPress/gutenberg/tree/HEAD/packages/scripts#packages-update).
+A set of scripts is available from inside that folder (provided by the `scripts` package) to make your work easier. [Click here](https://github.com/WordPress/gutenberg/tree/HEAD/packages/scripts#available-scripts) for a full description of these commands. 
 
 _Note: You don’t need to install or configure tools like [webpack](https://webpack.js.org), [Babel](https://babeljs.io) or [ESLint](https://eslint.org) yourself. They are preconfigured and hidden so that you can focus on coding._
+
+For example, running the `start` script from inside the generated folder (`npm start`) would automatically start the build for development.
 
 ## External Project Templates
 
