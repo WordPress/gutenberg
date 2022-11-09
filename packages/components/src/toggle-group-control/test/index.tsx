@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -93,7 +93,11 @@ describe( 'ToggleGroupControl', () => {
 
 		expect( mockOnChange ).toHaveBeenCalledWith( 'rigas' );
 	} );
-	it( 'should render tooltip where `showTooltip` === `true`', () => {
+
+	it( 'should render tooltip where `showTooltip` === `true`', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
 		render(
 			<ToggleGroupControl label="Test Toggle Group Control">
 				{ optionsWithTooltip }
@@ -104,14 +108,19 @@ describe( 'ToggleGroupControl', () => {
 			'Click for Delicious Gnocchi'
 		);
 
-		firstRadio.focus();
+		await user.hover( firstRadio );
 
-		expect(
-			screen.getByText( 'Click for Delicious Gnocchi' )
-		).toBeVisible();
+		await waitFor( () =>
+			expect(
+				screen.getByText( 'Click for Delicious Gnocchi' )
+			).toBeVisible()
+		);
 	} );
 
-	it( 'should not render tooltip', () => {
+	it( 'should not render tooltip', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
 		render(
 			<ToggleGroupControl label="Test Toggle Group Control">
 				{ optionsWithTooltip }
@@ -122,11 +131,13 @@ describe( 'ToggleGroupControl', () => {
 			'Click for Sumptuous Caponata'
 		);
 
-		secondRadio.focus();
+		await user.hover( secondRadio );
 
-		expect(
-			screen.queryByText( 'Click for Sumptuous Caponata' )
-		).not.toBeInTheDocument();
+		await waitFor( () =>
+			expect(
+				screen.queryByText( 'Click for Sumptuous Caponata' )
+			).not.toBeInTheDocument()
+		);
 	} );
 
 	describe( 'isDeselectable', () => {
