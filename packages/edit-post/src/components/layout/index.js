@@ -164,7 +164,7 @@ function Layout( { styles } ) {
 	);
 
 	const secondarySidebarLabel = isListViewOpened
-		? __( 'List View' )
+		? __( 'Document Overview' )
 		: __( 'Block Library' );
 
 	const secondarySidebar = () => {
