@@ -18,7 +18,9 @@
 		},
 		"label": {
 			"type": "string",
-			"default": "Label"
+			"default": "Label",
+			"selector": ".wp-block-form-input-label__content",
+			"source": "html"
 		},
 		"inlineLabel": {
 			"type": "boolean",
