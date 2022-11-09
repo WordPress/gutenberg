@@ -148,7 +148,7 @@ class WP_Theme_JSON_Resolver_6_1 extends WP_Theme_JSON_Resolver_6_0 {
 		$stylesheet       = $theme->get_stylesheet();
 		$args             = array(
 			'posts_per_page'      => 1,
-			'orderby'             => 'post_date',
+			'orderby'             => 'date',
 			'order'               => 'desc',
 			'post_type'           => $post_type_filter,
 			'post_status'         => $post_status_filter,
