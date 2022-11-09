@@ -1500,6 +1500,12 @@
 		"parent": "packages-create-block"
 	},
 	{
+		"title": "Available Commands",
+		"slug": "packages-create-block-available-commands",
+		"markdown_source": "../packages/create-block/docs/available-commands.md",
+		"parent": "packages-create-block"
+	},
+	{
 		"title": "@wordpress/custom-templated-path-webpack-plugin",
 		"slug": "packages-custom-templated-path-webpack-plugin",
 		"markdown_source": "../packages/custom-templated-path-webpack-plugin/README.md",
