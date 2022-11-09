@@ -459,6 +459,8 @@ export function ColorEdit( props ) {
 		Platform.OS === 'web' &&
 		! gradient &&
 		! style?.color?.gradient &&
+		hasBackgroundColor &&
+		( hasLinkColor || hasTextColor ) &&
 		// Contrast checking is enabled by default.
 		// Deactivating it requires `enableContrastChecker` to have
 		// an explicit value of `false`.

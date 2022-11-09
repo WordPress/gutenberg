@@ -78,12 +78,12 @@ function HeaderToolbar() {
 		<>
 			<ToolbarItem
 				as={ Button }
-				className="edit-post-header-toolbar__list-view-toggle"
+				className="edit-post-header-toolbar__document-overview-toggle"
 				icon={ listView }
 				disabled={ isTextModeEnabled }
 				isPressed={ isListViewOpen }
 				/* translators: button label text should, if possible, be under 16 characters. */
-				label={ __( 'List View' ) }
+				label={ __( 'Document Overview' ) }
 				onClick={ toggleListView }
 				shortcut={ listViewShortcut }
 				showTooltip={ ! showIconLabels }

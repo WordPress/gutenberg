@@ -175,6 +175,12 @@
 		&:active {
 			color: $white;
 		}
+
+		// Make sure the button has no hover style when it's disabled.
+		&[aria-disabled="true"]:hover {
+			color: $white;
+		}
+
 		display: flex;
 	}
 	.block-selection-button_select-button.components-button {

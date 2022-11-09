@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, fireEvent, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -73,7 +73,10 @@ describe( 'ToggleGroupControl', () => {
 			expect( container ).toMatchSnapshot();
 		} );
 	} );
-	it( 'should call onChange with proper value', () => {
+	it( 'should call onChange with proper value', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
 		const mockOnChange = jest.fn();
 
 		render(
@@ -86,13 +89,15 @@ describe( 'ToggleGroupControl', () => {
 			</ToggleGroupControl>
 		);
 
-		const firstRadio = screen.getByRole( 'radio', { name: 'R' } );
-
-		fireEvent.click( firstRadio );
+		await user.click( screen.getByRole( 'radio', { name: 'R' } ) );
 
 		expect( mockOnChange ).toHaveBeenCalledWith( 'rigas' );
 	} );
-	it( 'should render tooltip where `showTooltip` === `true`', () => {
+
+	it( 'should render tooltip where `showTooltip` === `true`', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
 		render(
 			<ToggleGroupControl label="Test Toggle Group Control">
 				{ optionsWithTooltip }
@@ -103,14 +108,19 @@ describe( 'ToggleGroupControl', () => {
 			'Click for Delicious Gnocchi'
 		);
 
-		fireEvent.focus( firstRadio );
+		await user.hover( firstRadio );
 
-		expect(
-			screen.getByText( 'Click for Delicious Gnocchi' )
-		).toBeInTheDocument();
+		await waitFor( () =>
+			expect(
+				screen.getByText( 'Click for Delicious Gnocchi' )
+			).toBeVisible()
+		);
 	} );
 
-	it( 'should not render tooltip', () => {
+	it( 'should not render tooltip', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
 		render(
 			<ToggleGroupControl label="Test Toggle Group Control">
 				{ optionsWithTooltip }
@@ -121,11 +131,13 @@ describe( 'ToggleGroupControl', () => {
 			'Click for Sumptuous Caponata'
 		);
 
-		fireEvent.focus( secondRadio );
+		await user.hover( secondRadio );
 
-		expect(
-			screen.queryByText( 'Click for Sumptuous Caponata' )
-		).not.toBeInTheDocument();
+		await waitFor( () =>
+			expect(
+				screen.queryByText( 'Click for Sumptuous Caponata' )
+			).not.toBeInTheDocument()
+		);
 	} );
 
 	describe( 'isDeselectable', () => {
@@ -208,7 +220,7 @@ describe( 'ToggleGroupControl', () => {
 						name: 'R',
 						pressed: false,
 					} )
-				).toBeInTheDocument();
+				).toBeVisible();
 			} );
 
 			it( 'should tab to the next option button', async () => {
