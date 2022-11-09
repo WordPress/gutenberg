@@ -123,17 +123,19 @@ class WP_Theme_JSON_Resolver_6_1 extends WP_Theme_JSON_Resolver_6_0 {
 
 	/**
 	 * Returns the custom post type that contains the user's origin config
-	 * for the current theme or a void array if none are found.
+	 * for the active theme or a void array if none are found.
 	 *
 	 * This can also create and return a new draft custom post type.
 	 *
-	 * @param WP_Theme $theme              The theme object.  If empty, it
-	 *                                     defaults to the current theme.
+	 * @since 5.9.0
+	 *
+	 * @param WP_Theme $theme              The theme object. If empty, it
+	 *                                     defaults to the active theme.
 	 * @param bool     $create_post        Optional. Whether a new custom post
 	 *                                     type should be created if none are
-	 *                                     found.  False by default.
-	 * @param array    $post_status_filter Filter Optional. custom post type by
-	 *                                     post status.  ['publish'] by default,
+	 *                                     found. Default false.
+	 * @param array    $post_status_filter Optional. Filter custom post type by
+	 *                                     post status. Default `array( 'publish' )`,
 	 *                                     so it only fetches published posts.
 	 * @return array Custom Post Type for the user's origin config.
 	 */
@@ -143,39 +145,45 @@ class WP_Theme_JSON_Resolver_6_1 extends WP_Theme_JSON_Resolver_6_0 {
 		}
 		$user_cpt         = array();
 		$post_type_filter = 'wp_global_styles';
+		$stylesheet       = $theme->get_stylesheet();
 		$args             = array(
-			'numberposts' => 1,
-			'orderby'     => 'date',
-			'order'       => 'desc',
-			'post_type'   => $post_type_filter,
-			'post_status' => $post_status_filter,
-			'tax_query'   => array(
+			'posts_per_page'      => 1,
+			'orderby'             => 'post_date',
+			'order'               => 'desc',
+			'post_type'           => $post_type_filter,
+			'post_status'         => $post_status_filter,
+			'ignore_sticky_posts' => true,
+			'no_found_rows'       => true,
+			'tax_query'           => array(
 				array(
 					'taxonomy' => 'wp_theme',
 					'field'    => 'name',
-					'terms'    => $theme->get_stylesheet(),
+					'terms'    => $stylesheet,
 				),
 			),
 		);
 
-		$recent_posts = wp_get_recent_posts( $args );
-		if ( is_array( $recent_posts ) && ( count( $recent_posts ) === 1 ) ) {
-			$user_cpt = $recent_posts[0];
+		$global_style_query = new WP_Query();
+		$recent_posts       = $global_style_query->query( $args );
+		if ( count( $recent_posts ) === 1 ) {
+			$user_cpt = get_post( $recent_posts[0], ARRAY_A );
 		} elseif ( $create_post ) {
 			$cpt_post_id = wp_insert_post(
 				array(
-					'post_content' => '{"version": ' . WP_Theme_JSON_Gutenberg::LATEST_SCHEMA . ', "isGlobalStylesUserThemeJSON": true }',
+					'post_content' => '{"version": ' . WP_Theme_JSON::LATEST_SCHEMA . ', "isGlobalStylesUserThemeJSON": true }',
 					'post_status'  => 'publish',
-					'post_title'   => __( 'Custom Styles', 'default' ),
+					'post_title'   => 'Custom Styles', // Do not make string translatable, see https://core.trac.wordpress.org/ticket/54518.
 					'post_type'    => $post_type_filter,
-					'post_name'    => 'wp-global-styles-' . urlencode( wp_get_theme()->get_stylesheet() ),
+					'post_name'    => sprintf( 'wp-global-styles-%s', urlencode( $stylesheet ) ),
 					'tax_input'    => array(
-						'wp_theme' => array( wp_get_theme()->get_stylesheet() ),
+						'wp_theme' => array( $stylesheet ),
 					),
 				),
 				true
 			);
-			$user_cpt    = get_post( $cpt_post_id, ARRAY_A );
+			if ( ! is_wp_error( $cpt_post_id ) ) {
+				$user_cpt = get_post( $cpt_post_id, ARRAY_A );
+			}
 		}
 
 		return $user_cpt;
