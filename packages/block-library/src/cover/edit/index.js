@@ -188,7 +188,7 @@ function CoverEdit( {
 			className: 'wp-block-cover__inner-container',
 		},
 		{
-			template: innerBlocksTemplate,
+			template: ! hasInnerBlocks ? innerBlocksTemplate : undefined,
 			templateInsertUpdatesSelection: true,
 			allowedBlocks,
 			templateLock,
