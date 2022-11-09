@@ -18,6 +18,11 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 
+const AUTHORS_QUERY = {
+	who: 'authors',
+	per_page: -1,
+};
+
 function PostAuthorEdit( {
 	isSelected,
 	context: { postType, postId, queryId },
@@ -38,7 +43,7 @@ function PostAuthorEdit( {
 			return {
 				authorId: _authorId,
 				authorDetails: _authorId ? getUser( _authorId ) : null,
-				authors: getUsers( { who: 'authors' } ),
+				authors: getUsers( AUTHORS_QUERY ),
 			};
 		},
 		[ postType, postId ]
