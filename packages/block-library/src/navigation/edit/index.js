@@ -11,7 +11,7 @@ import {
 	useEffect,
 	useRef,
 	Platform,
-	memo,
+	useMemo,
 } from '@wordpress/element';
 import { addQueryArgs } from '@wordpress/url';
 import {
@@ -236,10 +236,15 @@ function Navigation( {
 		classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_PENDING;
 
 	// Only autofallback to published menus.
-	const fallbackNavigationMenus = memo(
-		() => navigationMenus?.filter( ( menu ) => menu.status === 'publish' ),
-		[ navigationMenus ]
-	);
+	const fallbackNavigationMenus = useMemo( () => {
+		return navigationMenus
+			?.filter( ( menu ) => menu.status === 'publish' )
+			?.sort( ( menuA, menuB ) => {
+				const menuADate = new Date( menuA.date );
+				const menuBDate = new Date( menuB.date );
+				return menuADate.getTime() < menuBDate.getTime();
+			} );
+	}, [ navigationMenus ] );
 
 	// Attempt to retrieve and prioritize any existing navigation menu unless:
 	// - the are uncontrolled inner blocks already present in the block.
@@ -257,12 +262,6 @@ function Navigation( {
 		) {
 			return;
 		}
-
-		fallbackNavigationMenus.sort( ( menuA, menuB ) => {
-			const menuADate = new Date( menuA.date );
-			const menuBDate = new Date( menuB.date );
-			return menuADate.getTime() < menuBDate.getTime();
-		} );
 
 		/**
 		 *  This fallback displays (both in editor and on front)
