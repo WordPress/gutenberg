@@ -4,11 +4,11 @@
 import { store as blocksStore } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import {
-	Button,
 	DropdownMenu,
 	MenuGroup,
 	MenuItemsChoice,
-	VisuallyHidden,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -17,7 +17,6 @@ import { chevronDown } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
 
 function VariationsButtons( {
@@ -28,28 +27,34 @@ function VariationsButtons( {
 } ) {
 	return (
 		<fieldset className={ className }>
-			<VisuallyHidden as="legend">
-				{ __( 'Transform to variation' ) }
-			</VisuallyHidden>
-			{ variations.map( ( variation ) => (
-				<Button
-					key={ variation.name }
-					icon={ <BlockIcon icon={ variation.icon } showColors /> }
-					isPressed={ selectedValue === variation.name }
-					label={
-						selectedValue === variation.name
-							? variation.title
-							: sprintf(
-									/* translators: %s: Name of the block variation */
-									__( 'Transform to %s' ),
-									variation.title
-							  )
-					}
-					onClick={ () => onSelectVariation( variation.name ) }
-					aria-label={ variation.title }
-					showTooltip
-				/>
-			) ) }
+			<ToggleGroupControl
+				label={ __( 'Transform to variation' ) }
+				value={ selectedValue }
+				isBlock
+				hideLabelFromVision
+				showTooltip
+				onChange={ ( variation ) => {
+					onSelectVariation( variation );
+				} }
+			>
+				{ variations.map( ( variation ) => (
+					<ToggleGroupControlOptionIcon
+						key={ variation.name }
+						icon={ variation.icon }
+						value={ variation.name }
+						aria-label={ variation.title }
+						label={
+							selectedValue === variation.name
+								? variation.title
+								: sprintf(
+										/* translators: %s: Name of the block variation */
+										__( 'Transform to %s' ),
+										variation.title
+								  )
+						}
+					/>
+				) ) }
+			</ToggleGroupControl>
 		</fieldset>
 	);
 }
