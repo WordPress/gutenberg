@@ -33,6 +33,7 @@
 	padding: $grid-unit-15 0 $grid-unit-15 $grid-unit-40;
 
 	.block-editor-block-lock-modal__lock-icon {
+		flex-shrink: 0;
 		margin-right: $grid-unit-15;
 		fill: $gray-900;
 	}
