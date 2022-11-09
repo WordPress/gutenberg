@@ -14,6 +14,8 @@ import {
 	removeFormat,
 	slice,
 	replace,
+	split,
+	concat,
 } from '@wordpress/rich-text';
 import {
 	__experimentalLinkControl as LinkControl,
@@ -119,6 +121,7 @@ function InlineLinkUI( {
 		} );
 
 		const newText = nextValue.title || newUrl;
+
 		if ( isCollapsed( value ) && ! isActive ) {
 			// Scenario: we don't have any actively selected text or formats.
 			const toInsert = applyFormat(
@@ -148,6 +151,15 @@ function InlineLinkUI( {
 					newText.length
 				);
 
+				// Get the boundary of the active format.
+				const boundary = getFormatBoundary( value, {
+					type: 'core/link',
+				} );
+
+				const bTextStart = boundary.start;
+
+				const [ valBefore, valAfter ] = split( value, bTextStart );
+
 				// Update the original (full) RichTextValue replacing the
 				// target text with the *new* RichTextValue containing:
 				// 1. The new text content.
@@ -155,7 +167,9 @@ function InlineLinkUI( {
 				// Note original formats will be lost when applying this change.
 				// That is expected behaviour.
 				// See: https://github.com/WordPress/gutenberg/pull/33849#issuecomment-936134179.
-				newValue = replace( value, richTextText, newValue );
+				const newValAfter = replace( valAfter, richTextText, newValue );
+
+				newValue = concat( valBefore, newValAfter );
 			}
 
 			newValue.start = newValue.end;
