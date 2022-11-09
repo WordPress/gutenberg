@@ -8,6 +8,8 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
  */
 import Theme from '../index';
 import Button from '../../button';
+import { generateThemeVariables } from '../color-algorithms';
+import { HStack } from '../../h-stack';
 
 const meta: ComponentMeta< typeof Theme > = {
 	component: Theme,
@@ -45,4 +47,55 @@ export const Nested: ComponentStory< typeof Theme > = ( args ) => (
 );
 Nested.args = {
 	accent: 'blue',
+};
+
+/**
+ * The rest of the required colors are generated based on the given accent and background colors.
+ */
+export const ColorScheme: ComponentStory< typeof Theme > = ( {
+	accent,
+	background,
+} ) => {
+	const { colors } = generateThemeVariables( { accent, background } );
+	const { gray, ...otherColors } = colors;
+
+	const Chip = ( { color, name }: { color: string; name: string } ) => (
+		<HStack justify="flex-start">
+			<div
+				style={ {
+					backgroundColor: color,
+					height: '1.25em',
+					width: 40,
+				} }
+			/>
+			<div style={ { fontSize: 14 } }>{ name }</div>
+		</HStack>
+	);
+
+	return (
+		<>
+			{ Object.entries( otherColors ).map( ( [ key, value ] ) => (
+				<Chip color={ value } name={ key } key={ key } />
+			) ) }
+			{ Object.entries( gray as NonNullable< typeof gray > ).map(
+				( [ key, value ] ) => (
+					<Chip
+						color={ value }
+						name={ `gray ${ key }` }
+						key={ key }
+					/>
+				)
+			) }
+		</>
+	);
+};
+ColorScheme.args = {
+	accent: '#007cba',
+	background: '#fff',
+};
+ColorScheme.argTypes = {
+	children: { table: { disable: true } },
+};
+ColorScheme.parameters = {
+	docs: { source: { state: 'closed' } },
 };
