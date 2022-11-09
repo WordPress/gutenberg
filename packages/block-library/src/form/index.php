@@ -49,20 +49,17 @@ function render_block_core_form( $attributes, $content, $block ) {
 
 	$form_id = empty( $attributes['formId'] ) ? md5( json_encode( array( $attributes, $block ) ) ) : $attributes['formId'];
 
+	// Add the form action & method.
+	$processed_content = new WP_HTML_Tag_Processor( $content );
+	$processed_content->next_tag( 'form' );
+	$processed_content->set_attribute( 'action', esc_attr( $action ) );
+	$processed_content->set_attribute( 'method', esc_attr( $method ) );
+
+	// Inject a hidden input with the block form-ID.
 	return str_replace(
-		array(
-			'<form ',
-			'</form>',
-		),
-		array(
-			sprintf(
-				'<form action="%1$s" method="%2$s" ',
-				esc_attr( $action ),
-				esc_attr( $method )
-			),
-			'<input type="hidden" name="block-form-id" value="' . esc_attr( $form_id ) . '" /><form>',
-		),
-		$content
+		'</form>',
+		'<input type="hidden" name="block-form-id" value="' . esc_attr( $form_id ) . '" /><form>',
+		$processed_content->get_updated_html()
 	);
 }
 
