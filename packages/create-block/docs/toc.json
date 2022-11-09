@@ -4,5 +4,11 @@
 		"slug": "packages-create-block-external-template",
 		"markdown_source": "../packages/create-block/docs/external-template.md",
 		"parent": "packages-create-block"
+	},
+	{
+		"title": "Available Commands",
+		"slug": "packages-create-block-available-commands",
+		"markdown_source": "../packages/create-block/docs/available-commands.md",
+		"parent": "packages-create-block"
 	}
 ]
