@@ -711,7 +711,7 @@ describe( 'global styles renderer', () => {
 			},
 			typography: {
 				fontFamily: 'sans-serif',
-				fontSize: '15px',
+				fontSize: '17px',
 			},
 		};
 
@@ -725,7 +725,7 @@ describe( 'global styles renderer', () => {
 				'--wp--style--root--padding-left: 33px',
 				'background-color: var(--wp--preset--color--light-green-cyan)',
 				'font-family: sans-serif',
-				'font-size: 15px',
+				'font-size: 17px',
 			] );
 		} );
 
@@ -739,7 +739,7 @@ describe( 'global styles renderer', () => {
 				'padding-bottom: 33px',
 				'padding-left: 33px',
 				'font-family: sans-serif',
-				'font-size: 15px',
+				'font-size: 17px',
 			] );
 		} );
 
@@ -757,7 +757,7 @@ describe( 'global styles renderer', () => {
 				'padding-bottom: 33px',
 				'padding-left: 33px',
 				'font-family: sans-serif',
-				'font-size: 15px',
+				'font-size: 17px',
 			] );
 		} );
 
@@ -782,7 +782,7 @@ describe( 'global styles renderer', () => {
 				'padding-bottom: 33px',
 				'padding-left: 33px',
 				'font-family: sans-serif',
-				'font-size: clamp(14px, 0.875rem + ((1vw - 7.68px) * 0.12), 15px)',
+				'font-size: clamp(16px, 1rem + ((1vw - 7.68px) * 0.12), 17px)',
 			] );
 		} );
 
@@ -807,7 +807,7 @@ describe( 'global styles renderer', () => {
 				'padding-bottom: 33px',
 				'padding-left: 33px',
 				'font-family: sans-serif',
-				'font-size: 15px',
+				'font-size: 17px',
 			] );
 		} );
 	} );
