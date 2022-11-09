@@ -197,9 +197,6 @@ function Navigation( {
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
 
-	const [ hasSavedUnsavedInnerBlocks, setHasSavedUnsavedInnerBlocks ] =
-		useState( false );
-
 	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] =
 		useState( false );
 
@@ -269,7 +266,13 @@ function Navigation( {
 		 */
 		__unstableMarkNextChangeAsNotPersistent();
 		setRef( fallbackNavigationMenus[ 0 ].id );
-	}, [ navigationMenus ] );
+	}, [
+		navigationMenus,
+		ref,
+		isCreatingNavigationMenu,
+		fallbackNavigationMenus,
+		hasUncontrolledInnerBlocks,
+	] );
 
 	useEffect( () => {
 		if (
@@ -680,7 +683,7 @@ function Navigation( {
 		/>
 	);
 
-	if ( hasUnsavedBlocks ) {
+	if ( hasUnsavedBlocks && ! isCreatingNavigationMenu ) {
 		return (
 			<TagName { ...blockProps }>
 				<InspectorControls>
@@ -744,24 +747,11 @@ function Navigation( {
 					overlayTextColor={ overlayTextColor }
 				>
 					<UnsavedInnerBlocks
+						createNavigationMenu={ createNavigationMenu }
 						blocks={ uncontrolledInnerBlocks }
-						clientId={ clientId }
 						templateLock={ templateLock }
 						navigationMenus={ navigationMenus }
 						hasSelection={ isSelected || isInnerBlockSelected }
-						hasSavedUnsavedInnerBlocks={
-							hasSavedUnsavedInnerBlocks
-						}
-						onSave={ ( post ) => {
-							// Set some state used as a guard to prevent the creation of multiple posts.
-							setHasSavedUnsavedInnerBlocks( true );
-							// Switch to using the wp_navigation entity.
-							setRef( post.id );
-
-							showNavigationMenuStatusNotice(
-								__( `New Navigation Menu created.` )
-							);
-						} }
 					/>
 				</ResponsiveWrapper>
 			</TagName>
