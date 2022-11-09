@@ -339,4 +339,23 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$query_count = count( $this->queries ) - $query_count;
 		$this->assertSame( 1, $query_count, 'Unexpected SQL queries detected for the wp_global_style post type after creation.' );
 	}
+
+	/**
+	 * @covers WP_Theme_JSON_Resolver::get_user_data_from_wp_global_styles
+	 */
+	function test_get_user_data_from_wp_global_styles_does_not_use_uncached_queries_for_logged_out_users() {
+		$theme = wp_get_theme();
+		WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( $theme );
+		add_filter( 'query', array( $this, 'filter_db_query' ) );
+		$query_count = count( $this->queries );
+		for ( $i = 0; $i < 3; $i++ ) {
+			WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( $theme );
+			WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+		}
+		$query_count = count( $this->queries ) - $query_count;
+		$this->assertSame( 0, $query_count, 'Unexpected SQL queries detected for the wp_global_style post type prior to creation.' );
+
+		$user_cpt = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( $theme );
+		$this->assertEmpty( $user_cpt, 'User CPT is expected to be empty.' );
+	}
 }
