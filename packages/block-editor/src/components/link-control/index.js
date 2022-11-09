@@ -20,6 +20,7 @@ import LinkControlSettingsDrawer from './settings-drawer';
 import LinkControlSearchInput from './search-input';
 import LinkPreview from './link-preview';
 import useCreatePage from './use-create-page';
+import useInternalInputValue from './use-internal-input-value';
 import { ViewerFill } from './viewer-slot';
 import { DEFAULT_LINK_SETTINGS } from './constants';
 
@@ -95,26 +96,7 @@ import { DEFAULT_LINK_SETTINGS } from './constants';
  * @property {string|Function|undefined}  createSuggestionButtonText The text to use in the button that calls createSuggestion.
  * @property {Function}                   renderControlBottom        Optional controls to be rendered at the bottom of the component.
  */
-
 const noop = () => {};
-
-function useInternalInputValue( value ) {
-	const [ internalInputValue, setInternalInputValue ] = useState(
-		value || ''
-	);
-
-	useEffect( () => {
-		/**
-		 * Update the state value internalInputValue if the url value changes
-		 * for example when clicking on another anchor
-		 */
-		if ( value && value !== internalInputValue ) {
-			setInternalInputValue( value );
-		}
-	}, [ value ] );
-
-	return [ internalInputValue, setInternalInputValue ];
-}
 
 /**
  * Renders a link control. A link control is a controlled input which maintains
