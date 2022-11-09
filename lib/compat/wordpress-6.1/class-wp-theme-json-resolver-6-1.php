@@ -170,7 +170,7 @@ class WP_Theme_JSON_Resolver_6_1 extends WP_Theme_JSON_Resolver_6_0 {
 		} elseif ( $create_post ) {
 			$cpt_post_id = wp_insert_post(
 				array(
-					'post_content' => '{"version": ' . WP_Theme_JSON::LATEST_SCHEMA . ', "isGlobalStylesUserThemeJSON": true }',
+					'post_content' => '{"version": ' . WP_Theme_JSON_Gutenberg::LATEST_SCHEMA . ', "isGlobalStylesUserThemeJSON": true }',
 					'post_status'  => 'publish',
 					'post_title'   => 'Custom Styles', // Do not make string translatable, see https://core.trac.wordpress.org/ticket/54518.
 					'post_type'    => $post_type_filter,
