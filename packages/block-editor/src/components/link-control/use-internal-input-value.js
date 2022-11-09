@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 
 export default function useInternalInputValue( value ) {
 	const [ internalInputValue, setInternalInputValue ] = useState(
