@@ -20,6 +20,7 @@ export function BlockModeToggle( {
 	onToggleMode,
 	small = false,
 	isCodeEditingEnabled = true,
+	shortcut,
 } ) {
 	if (
 		! blockType ||
@@ -32,7 +33,11 @@ export function BlockModeToggle( {
 	const label =
 		mode === 'visual' ? __( 'Edit as HTML' ) : __( 'Edit visually' );
 
-	return <MenuItem onClick={ onToggleMode }>{ ! small && label }</MenuItem>;
+	return (
+		<MenuItem onClick={ onToggleMode } shortcut={ shortcut }>
+			{ ! small && label }
+		</MenuItem>
+	);
 }
 
 export default compose( [

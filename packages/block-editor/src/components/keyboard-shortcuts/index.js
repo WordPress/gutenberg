@@ -59,6 +59,18 @@ function KeyboardShortcutsRegister() {
 		} );
 
 		registerShortcut( {
+			name: 'core/block-editor/toggle-block-mode',
+			category: 'block',
+			description: __(
+				'Toggle between editing the block visually and editing HTML'
+			),
+			keyCombination: {
+				modifier: 'secondary',
+				character: 'h',
+			},
+		} );
+
+		registerShortcut( {
 			name: 'core/block-editor/delete-multi-selection',
 			category: 'block',
 			description: __( 'Delete selection.' ),
