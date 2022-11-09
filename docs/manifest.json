@@ -234,7 +234,7 @@
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "Getting Started with JavaScript",
+		"title": "How to use JavaScript with Gutenberg",
 		"slug": "javascript",
 		"markdown_source": "../docs/how-to-guides/javascript/README.md",
 		"parent": "how-to-guides"
