@@ -60,7 +60,8 @@ The rest of the configuration is set to all default values unless overridden wit
 
 ### Interactive Mode
 
-When no `[slug]` or `[options]` are provided, the script will run in interactive mode giving a chance to customize the important options before generating the files.
+When no `[slug]` is provided, the script will run in interactive mode and will start prompting for the input required to scaffold the project.
+
 
 ### `options`
 
