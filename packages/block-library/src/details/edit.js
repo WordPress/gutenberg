@@ -17,6 +17,7 @@ function DetailsBlock( { attributes, setAttributes, clientId } ) {
 	const { showContent } = attributes;
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		allowedBlocks: TEMPLATE,
 		template: TEMPLATE,
 	} );
 
