@@ -379,6 +379,17 @@ const UnforwardedPopover = (
 
 	// When any of the possible anchor "sources" change,
 	// recompute the reference element (real or virtual) and its owner document.
+
+	const anchorRefTop = ( anchorRef as PopoverAnchorRefTopBottom | undefined )
+		?.top;
+	const anchorRefBottom = (
+		anchorRef as PopoverAnchorRefTopBottom | undefined
+	 )?.bottom;
+	const anchorRefStartContainer = ( anchorRef as Range | undefined )
+		?.startContainer;
+	const anchorRefCurrent = ( anchorRef as PopoverAnchorRefReference )
+		?.current;
+
 	useLayoutEffect( () => {
 		const resultingReferenceOwnerDoc = getReferenceOwnerDocument( {
 			anchor,
@@ -401,11 +412,11 @@ const UnforwardedPopover = (
 		setReferenceOwnerDocument( resultingReferenceOwnerDoc );
 	}, [
 		anchor,
-		anchorRef as Element | undefined,
-		( anchorRef as PopoverAnchorRefTopBottom | undefined )?.top,
-		( anchorRef as PopoverAnchorRefTopBottom | undefined )?.bottom,
-		( anchorRef as Range | undefined )?.startContainer,
-		( anchorRef as PopoverAnchorRefReference )?.current,
+		anchorRef,
+		anchorRefTop,
+		anchorRefBottom,
+		anchorRefStartContainer,
+		anchorRefCurrent,
 		anchorRect,
 		getAnchorRect,
 		fallbackReferenceElement,
