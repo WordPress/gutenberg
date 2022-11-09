@@ -1,20 +1,22 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 
 export default function useInternalInputValue( value ) {
 	const [ internalInputValue, setInternalInputValue ] = useState(
 		value || ''
 	);
 
-	/**
-	 * Update the state value internalInputValue if the url value changes
-	 * for example when clicking on another anchor
-	 */
-	if ( value && value !== internalInputValue ) {
-		setInternalInputValue( value );
-	}
+	useEffect( () => {
+		/**
+		 * If the value's `text` property changes then sync this
+		 * back up with state.
+		 */
+		if ( value?.title && value.title !== internalInputValue ) {
+			setInternalInputValue( value.title );
+		}
+	}, [ value ] );
 
 	return [ internalInputValue, setInternalInputValue ];
 }
