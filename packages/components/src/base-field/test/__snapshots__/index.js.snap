@@ -127,8 +127,8 @@ exports[`base field should render correctly 1`] = `
 
 .emotion-0:focus,
 .emotion-0[data-focused='true'] {
-  border-color: var( --wp-admin-theme-color, #007cba);
-  box-shadow: 0 0 0 0.5px var( --wp-admin-theme-color, #007cba);
+  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+  box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
 }
 
 <div

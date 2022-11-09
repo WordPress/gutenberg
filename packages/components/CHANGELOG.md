@@ -88,6 +88,10 @@
 
 -   `NumberControl`: Replace `hideHTMLArrows` prop with `spinControls` prop. Allow custom spin controls via `spinControls="custom"` ([#45333](https://github.com/WordPress/gutenberg/pull/45333)).
 
+### Experimental
+-   Theming: updated Components package to utilize the new `accent` prop of the experimental `Theme` component.
+
+
 ## 21.3.0 (2022-10-19)
 
 ### Bug Fix
