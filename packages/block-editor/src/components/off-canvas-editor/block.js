@@ -33,6 +33,7 @@ import {
 } from '../block-mover/button';
 import ListViewBlockContents from './block-contents';
 import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdown';
+import BlockEditButton from './block-edit-button';
 import { useListViewContext } from './context';
 import { getBlockPositionDescription } from './utils';
 import { store as blockEditorStore } from '../../store';
@@ -132,6 +133,14 @@ function ListViewBlock( {
 		  )
 		: __( 'Options' );
 
+	const editAriaLabel = blockInformation
+		? sprintf(
+				// translators: %s: The title of the block.
+				__( 'Edit %s block' ),
+				blockInformation.title
+		  )
+		: __( 'Edit' );
+
 	const { isTreeGridMounted, expand, collapse } = useListViewContext();
 
 	const hasSiblings = siblingBlockCount > 0;
@@ -142,6 +151,11 @@ function ListViewBlock( {
 	);
 
 	const listViewBlockSettingsClassName = classnames(
+		'block-editor-list-view-block__menu-cell',
+		{ 'is-visible': isHovered || isFirstSelectedBlock }
+	);
+
+	const listViewBlockEditClassName = classnames(
 		'block-editor-list-view-block__menu-cell',
 		{ 'is-visible': isHovered || isFirstSelectedBlock }
 	);
@@ -307,26 +321,44 @@ function ListViewBlock( {
 			) }
 
 			{ showBlockActions && (
-				<TreeGridCell
-					className={ listViewBlockSettingsClassName }
-					aria-selected={ !! isSelected || forceSelectionContentLock }
-				>
-					{ ( { ref, tabIndex, onFocus } ) => (
-						<BlockSettingsDropdown
-							clientIds={ dropdownClientIds }
-							icon={ moreVertical }
-							label={ settingsAriaLabel }
-							toggleProps={ {
-								ref,
-								className: 'block-editor-list-view-block__menu',
-								tabIndex,
-								onFocus,
-							} }
-							disableOpenOnArrowDown
-							__experimentalSelectBlock={ updateSelection }
-						/>
-					) }
-				</TreeGridCell>
+				<>
+					<TreeGridCell
+						className={ listViewBlockEditClassName }
+						aria-selected={
+							!! isSelected || forceSelectionContentLock
+						}
+					>
+						{ () => (
+							<BlockEditButton
+								label={ editAriaLabel }
+								clientId={ clientId }
+							/>
+						) }
+					</TreeGridCell>
+					<TreeGridCell
+						className={ listViewBlockSettingsClassName }
+						aria-selected={
+							!! isSelected || forceSelectionContentLock
+						}
+					>
+						{ ( { ref, tabIndex, onFocus } ) => (
+							<BlockSettingsDropdown
+								clientIds={ dropdownClientIds }
+								icon={ moreVertical }
+								label={ settingsAriaLabel }
+								toggleProps={ {
+									ref,
+									className:
+										'block-editor-list-view-block__menu',
+									tabIndex,
+									onFocus,
+								} }
+								disableOpenOnArrowDown
+								__experimentalSelectBlock={ updateSelection }
+							/>
+						) }
+					</TreeGridCell>
+				</>
 			) }
 		</ListViewLeaf>
 	);
