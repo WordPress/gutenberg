@@ -93,27 +93,25 @@ describe( 'ToggleGroupControl', () => {
 
 		expect( mockOnChange ).toHaveBeenCalledWith( 'rigas' );
 	} );
-	it( 'should render tooltip where `showTooltip` === `true`', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+	it( 'should render tooltip where `showTooltip` === `true`', () => {
 		render(
 			<ToggleGroupControl label="Test Toggle Group Control">
 				{ optionsWithTooltip }
 			</ToggleGroupControl>
 		);
 
-		await user.tab();
+		const firstRadio = screen.getByLabelText(
+			'Click for Delicious Gnocchi'
+		);
+
+		firstRadio.focus();
 
 		expect(
 			screen.getByText( 'Click for Delicious Gnocchi' )
 		).toBeVisible();
 	} );
 
-	it( 'should not render tooltip', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+	it( 'should not render tooltip', () => {
 		render(
 			<ToggleGroupControl label="Test Toggle Group Control">
 				{ optionsWithTooltip }
@@ -124,7 +122,7 @@ describe( 'ToggleGroupControl', () => {
 			'Click for Sumptuous Caponata'
 		);
 
-		await user.click( secondRadio );
+		secondRadio.focus();
 
 		expect(
 			screen.queryByText( 'Click for Sumptuous Caponata' )
