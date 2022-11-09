@@ -19,11 +19,17 @@ $header-toolbar-min-width: 335px;
 	.edit-site-header-edit-mode__start {
 		display: flex;
 		border: none;
+		width: 20%;
+
+		body.is-fullscreen-mode & {
+			width: calc(20% - 60px);
+		}
 	}
 
 	.edit-site-header-edit-mode__end {
 		display: flex;
 		justify-content: flex-end;
+		width: 20%;
 	}
 
 	.edit-site-header-edit-mode__center {
