@@ -169,7 +169,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	function onKeyDown( event: KeyboardEvent ) {
 		let preventDefault = false;
 
-		if ( event.defaultPrevented ) {
+		if ( event.defaultPrevented || event.nativeEvent.isComposing ) {
 			return;
 		}
 		switch ( event.key ) {
