@@ -4,11 +4,13 @@
 import { store as blocksStore } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import {
+	Button,
 	DropdownMenu,
 	MenuGroup,
 	MenuItemsChoice,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+	VisuallyHidden,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -17,6 +19,7 @@ import { chevronDown } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
 
 function VariationsButtons( {
@@ -27,35 +30,28 @@ function VariationsButtons( {
 } ) {
 	return (
 		<fieldset className={ className }>
-			<ToggleGroupControl
-				label={ __( 'Transform to variation' ) }
-				value={ selectedValue }
-				isBlock
-				hideLabelFromVision
-				showTooltip
-				onChange={ ( variation ) => {
-					onSelectVariation( variation );
-				} }
-				size="__unstable-large"
-			>
-				{ variations.map( ( variation ) => (
-					<ToggleGroupControlOptionIcon
-						key={ variation.name }
-						icon={ variation.icon }
-						value={ variation.name }
-						aria-label={ variation.title }
-						label={
-							selectedValue === variation.name
-								? variation.title
-								: sprintf(
-										/* translators: %s: Name of the block variation */
-										__( 'Transform to %s' ),
-										variation.title
-								  )
-						}
-					/>
-				) ) }
-			</ToggleGroupControl>
+			<VisuallyHidden as="legend">
+				{ __( 'Transform to variation' ) }
+			</VisuallyHidden>
+			{ variations.map( ( variation ) => (
+				<Button
+					key={ variation.name }
+					icon={ <BlockIcon icon={ variation.icon } showColors /> }
+					isPressed={ selectedValue === variation.name }
+					label={
+						selectedValue === variation.name
+							? variation.title
+							: sprintf(
+									/* translators: %s: Name of the block variation */
+									__( 'Transform to %s' ),
+									variation.title
+							  )
+					}
+					onClick={ () => onSelectVariation( variation.name ) }
+					aria-label={ variation.title }
+					showTooltip
+				/>
+			) ) }
 		</fieldset>
 	);
 }
@@ -98,6 +94,47 @@ function VariationsDropdown( {
 				</div>
 			) }
 		</DropdownMenu>
+	);
+}
+
+function VariationsToggleGroupControl( {
+	className,
+	onSelectVariation,
+	selectedValue,
+	variations,
+} ) {
+	return (
+		<fieldset className={ className }>
+			<ToggleGroupControl
+				label={ __( 'Transform to variation' ) }
+				value={ selectedValue }
+				isBlock
+				hideLabelFromVision
+				showTooltip
+				onChange={ ( variation ) => {
+					onSelectVariation( variation );
+				} }
+				size="__unstable-large"
+			>
+				{ variations.map( ( variation ) => (
+					<ToggleGroupControlOptionIcon
+						key={ variation.name }
+						icon={ variation.icon }
+						value={ variation.name }
+						aria-label={ variation.title }
+						label={
+							selectedValue === variation.name
+								? variation.title
+								: sprintf(
+										/* translators: %s: Name of the block variation */
+										__( 'Transform to %s' ),
+										variation.title
+								  )
+						}
+					/>
+				) ) }
+			</ToggleGroupControl>
+		</fieldset>
 	);
 }
 
@@ -144,16 +181,25 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 		} );
 	};
 
-	const baseClass = 'block-editor-block-variation-transforms';
-
 	// Skip rendering if there are no variations
 	if ( ! variations?.length ) return null;
 
-	const Component = hasUniqueIcons ? VariationsButtons : VariationsDropdown;
+	// Show buttons if there are more than 5 variations because the ToggleGroupControl does not wrap
+	const showButtons = variations.length > 5;
+
+	const ButtonComponent = showButtons
+		? VariationsButtons
+		: VariationsToggleGroupControl;
+
+	const className = showButtons
+		? 'block-editor-block-variation-transforms buttons'
+		: 'block-editor-block-variation-transforms toggle-group-control';
+
+	const Component = hasUniqueIcons ? ButtonComponent : VariationsDropdown;
 
 	return (
 		<Component
-			className={ baseClass }
+			className={ className }
 			onSelectVariation={ onSelectVariation }
 			selectedValue={ selectedValue }
 			variations={ variations }
