@@ -639,6 +639,17 @@ body.editor-styles-wrapper
 	width: 100%;
 }
 
+.wp-block-navigation__navigation-selector-button__icon {
+	flex: 0 0 auto;
+}
+
+.wp-block-navigation__navigation-selector-button__label {
+	flex: 0 1 auto;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
 .wp-block-navigation__navigation-selector-button--createnew {
 	border: 1px solid;
 	margin-bottom: $grid-unit-20;
