@@ -1830,6 +1830,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "Advanced Usage",
+		"slug": "packages-scripts-advanced-usage",
+		"markdown_source": "../packages/scripts/docs/advanced-usage.md",
+		"parent": "packages-scripts"
+	},
+	{
 		"title": "@wordpress/server-side-render",
 		"slug": "packages-server-side-render",
 		"markdown_source": "../packages/server-side-render/README.md",
