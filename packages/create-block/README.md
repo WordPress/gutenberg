@@ -95,9 +95,12 @@ $ npx @wordpress/create-block --no-plugin
 
 When you scaffold a block, you must provide at least a `slug` name, the `namespace` which usually corresponds to either the `theme` or `plugin` name. In most cases, we recommended pairing blocks with WordPress plugins rather than themes, because only using plugin ensures that all blocks still work when your theme changes.
 
-## Available Commands
+## Available commands in the scaffolded project
 
-[Click here](https://github.com/WordPress/gutenberg/tree/HEAD/packages/create-block/docs/available-commands.md) for information on the available commands on the plugin folder created by this command. 
+The plugin folder created when executing this command, is a node package with a set of scripts that are avalable from inside that folder (provided by the `scripts` package). A full description of these commands is available [here](https://github.com/WordPress/gutenberg/tree/HEAD/packages/scripts#available-scripts)
+
+
+For example, running the `start` script from inside the generated folder (`npm start`) would start the build for development.
 
 ## External Project Templates
 
