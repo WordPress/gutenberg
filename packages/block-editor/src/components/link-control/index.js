@@ -152,12 +152,11 @@ function LinkControl( {
 	const textInputRef = useRef();
 	const isEndingEditWithFocus = useRef( false );
 
-	const [ internalInputValue, setInternalInputValue ] = useInternalInputValue(
-		value?.url || ''
-	);
-	const [ internalTextValue, setInternalTextValue ] = useInternalInputValue(
-		value?.title || ''
-	);
+	const [ internalUrlInputValue, setInternalUrlInputValue ] =
+		useInternalInputValue( value?.url || '' );
+
+	const [ internalTextInputValue, setInternalTextInputValue ] =
+		useInternalInputValue( value?.title || '' );
 
 	const [ isEditingLink, setIsEditingLink ] = useState(
 		forceIsEditingLink !== undefined
@@ -207,16 +206,6 @@ function LinkControl( {
 		isEndingEditWithFocus.current = false;
 	}, [ isEditingLink, isCreatingPage ] );
 
-	// useEffect( () => {
-	// 	/**
-	// 	 * If the value's `text` property changes then sync this
-	// 	 * back up with state.
-	// 	 */
-	// 	if ( value?.title && value.title !== internalTextValue ) {
-	// 		setInternalTextValue( value.title );
-	// 	}
-	// }, [ value ] );
-
 	/**
 	 * Cancels editing state and marks that focus may need to be restored after
 	 * the next render, if focus was within the wrapper when editing finished.
@@ -232,20 +221,20 @@ function LinkControl( {
 	const handleSelectSuggestion = ( updatedValue ) => {
 		onChange( {
 			...updatedValue,
-			title: internalTextValue || updatedValue?.title,
+			title: internalTextInputValue || updatedValue?.title,
 		} );
 		stopEditing();
 	};
 
 	const handleSubmit = () => {
 		if (
-			currentInputValue !== value?.url ||
-			internalTextValue !== value?.title
+			currentUrlInputValue !== value?.url ||
+			internalTextInputValue !== value?.title
 		) {
 			onChange( {
 				...value,
-				url: currentInputValue,
-				title: internalTextValue,
+				url: currentUrlInputValue,
+				title: internalTextInputValue,
 			} );
 		}
 		stopEditing();
@@ -262,9 +251,9 @@ function LinkControl( {
 		}
 	};
 
-	const currentInputValue = propInputValue || internalInputValue;
+	const currentUrlInputValue = propInputValue || internalUrlInputValue;
 
-	const currentInputIsEmpty = ! currentInputValue?.trim()?.length;
+	const currentInputIsEmpty = ! currentUrlInputValue?.trim()?.length;
 
 	const shownUnlinkControl =
 		onRemove && value && ! isEditingLink && ! isCreatingPage;
@@ -301,8 +290,8 @@ function LinkControl( {
 								ref={ textInputRef }
 								className="block-editor-link-control__field block-editor-link-control__text-content"
 								label="Text"
-								value={ internalTextValue }
-								onChange={ setInternalTextValue }
+								value={ internalTextInputValue }
+								onChange={ setInternalTextInputValue }
 								onKeyDown={ handleSubmitWithEnter }
 							/>
 						) }
@@ -311,10 +300,10 @@ function LinkControl( {
 							currentLink={ value }
 							className="block-editor-link-control__field block-editor-link-control__search-input"
 							placeholder={ searchInputPlaceholder }
-							value={ currentInputValue }
+							value={ currentUrlInputValue }
 							withCreateSuggestion={ withCreateSuggestion }
 							onCreateSuggestion={ createPage }
-							onChange={ setInternalInputValue }
+							onChange={ setInternalUrlInputValue }
 							onSelect={ handleSelectSuggestion }
 							showInitialSuggestions={ showInitialSuggestions }
 							allowDirectEntry={ ! noDirectEntry }
