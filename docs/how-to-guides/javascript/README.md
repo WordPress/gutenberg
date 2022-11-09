@@ -1,6 +1,6 @@
-# How to use JavaScript with Gutenberg 
+# How to use JavaScript with the Block Editor
 
-The Block Editor Handbook contains information on the APIs available for working with this new setup. The goal of this tutorial is to get you comfortable on how to use the API reference and snippets of code found within.
+The Block Editor Handbook contains information on the APIs available for working with this new setup. The goal of this tutorial is to get you comfortable using the API reference and snippets of code found within.
 
 ### What is JavaScript
 
