@@ -96,6 +96,7 @@ import { DEFAULT_LINK_SETTINGS } from './constants';
  * @property {string|Function|undefined}  createSuggestionButtonText The text to use in the button that calls createSuggestion.
  * @property {Function}                   renderControlBottom        Optional controls to be rendered at the bottom of the component.
  */
+
 const noop = () => {};
 
 /**
