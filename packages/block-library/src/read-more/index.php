@@ -18,8 +18,8 @@ function render_block_core_read_more( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$post_ID            = $block->context['postId'];
-	$post_title         = get_the_title( $post_ID );
+	$post_ID    = $block->context['postId'];
+	$post_title = get_the_title( $post_ID );
 	/* translators: %s is either the post title or post ID to describe the link for screen readers. */
 	$screen_reader_text = sprintf(
 		__( ': %s' ),
