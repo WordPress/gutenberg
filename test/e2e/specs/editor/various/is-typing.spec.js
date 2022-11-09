@@ -12,7 +12,7 @@ test.describe( 'isTyping', () => {
 	} );
 
 	test( 'should hide the toolbar when typing', async ( { page, editor } ) => {
-		const blockToolbar = 'role=toolbar[name="Block tools"i]';
+		const blockToolbar = page.locator( 'role=toolbar[name="Block tools"i]' );
 
 		await page.click( 'role=button[name="Add default block"i]' );
 
@@ -20,19 +20,19 @@ test.describe( 'isTyping', () => {
 		await page.keyboard.type( 'Type' );
 
 		// Toolbar is hidden
-		await expect( page.locator( blockToolbar ) ).toBeHidden();
+		await expect( blockToolbar ).toBeHidden();
 
 		// Moving the mouse shows the toolbar.
 		await editor.showBlockToolbar();
 
 		// Toolbar is visible.
-		expect( page.locator( blockToolbar ) ).not.toBe( null );
+		expect( blockToolbar ).not.toBe( null );
 
 		// Typing again hides the toolbar
 		await page.keyboard.type( ' and continue' );
 
 		// Toolbar is hidden again
-		await expect( page.locator( blockToolbar ) ).toBeHidden();
+		await expect( blockToolbar ).toBeHidden();
 	} );
 
 	test( 'should not close the dropdown when typing in it', async ( {
