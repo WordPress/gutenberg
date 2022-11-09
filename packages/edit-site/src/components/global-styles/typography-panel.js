@@ -7,6 +7,7 @@ import {
 	__experimentalFontAppearanceControl as FontAppearanceControl,
 	__experimentalLetterSpacingControl as LetterSpacingControl,
 	__experimentalTextTransformControl as TextTransformControl,
+	__experimentalTextDecorationControl as TextDecorationControl,
 } from '@wordpress/block-editor';
 import {
 	FontSizePicker,
@@ -101,6 +102,15 @@ function useHasTextTransformControl( name, element ) {
 	return supports.includes( 'textTransform' );
 }
 
+function useHasTextDecorationControl( name, element ) {
+	// This is an exception for link elements.
+	// We shouldn't allow other blocks or elements to set textDecoration
+	// because this will be inherited by their children.
+	if ( ! name && element === 'link' ) {
+		return true;
+	}
+}
+
 function useStyleWithReset( path, blockName ) {
 	const [ style, setStyle ] = useStyle( path, blockName );
 	const [ userStyle ] = useStyle( path, blockName, 'user' );
@@ -190,6 +200,10 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
 	const appearanceControlLabel = useAppearanceControlLabel( name );
 	const hasLetterSpacingControl = useHasLetterSpacingControl( name, element );
 	const hasTextTransformControl = useHasTextTransformControl( name, element );
+	const hasTextDecorationControl = useHasTextDecorationControl(
+		name,
+		element
+	);
 
 	/* Disable font size controls when the option to style all headings is selected. */
 	let hasFontSizeEnabled = supports.includes( 'fontSize' );
@@ -223,6 +237,12 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
 		hasTextTransform,
 		resetTextTransform,
 	] = useStyleWithReset( prefix + 'typography.textTransform', name );
+	const [
+		textDecoration,
+		setTextDecoration,
+		hasTextDecoration,
+		resetTextDecoration,
+	] = useStyleWithReset( prefix + 'typography.textDecoration', name );
 
 	const resetAll = () => {
 		resetFontFamily();
@@ -344,6 +364,22 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
 						isBlock
 						size="__unstable-large"
 						__nextHasNoMarginBottom
+					/>
+				</ToolsPanelItem>
+			) }
+			{ hasTextDecorationControl && (
+				<ToolsPanelItem
+					className="single-column"
+					label={ __( 'Text decoration' ) }
+					hasValue={ hasTextDecoration }
+					onDeselect={ resetTextDecoration }
+					isShownByDefault
+				>
+					<TextDecorationControl
+						value={ textDecoration }
+						onChange={ setTextDecoration }
+						size="__unstable-large"
+						__unstableInputWidth="auto"
 					/>
 				</ToolsPanelItem>
 			) }
