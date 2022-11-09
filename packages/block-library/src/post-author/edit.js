@@ -13,14 +13,21 @@ import {
 	RichText,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { PanelBody, SelectControl, ToggleControl } from '@wordpress/components';
+import {
+	ComboboxControl,
+	PanelBody,
+	SelectControl,
+	ToggleControl,
+} from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 
+const minimumUsersForCombobox = 25;
+
 const AUTHORS_QUERY = {
 	who: 'authors',
-	per_page: -1,
+	per_page: 100,
 };
 
 function PostAuthorEdit( {
@@ -70,34 +77,46 @@ function PostAuthorEdit( {
 		} ),
 	} );
 
+	const authorOptions = authors?.length
+		? authors.map( ( { id, name } ) => {
+				return {
+					value: id,
+					label: name,
+				};
+		  } )
+		: [];
+
+	const handleSelect = ( nextAuthorId ) => {
+		editEntityRecord( 'postType', postType, postId, {
+			author: nextAuthorId,
+		} );
+	};
+
+	const showCombobox = authorOptions.length >= minimumUsersForCombobox;
+
 	return (
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					{ !! postId &&
 						! isDescendentOfQueryLoop &&
-						!! authors?.length && (
+						authorOptions.length &&
+						( ( showCombobox && (
+							<ComboboxControl
+								label={ __( 'Author' ) }
+								options={ authorOptions }
+								value={ authorId }
+								onChange={ handleSelect }
+								allowReset={ false }
+							/>
+						) ) || (
 							<SelectControl
 								label={ __( 'Author' ) }
 								value={ authorId }
-								options={ authors.map( ( { id, name } ) => {
-									return {
-										value: id,
-										label: name,
-									};
-								} ) }
-								onChange={ ( nextAuthorId ) => {
-									editEntityRecord(
-										'postType',
-										postType,
-										postId,
-										{
-											author: nextAuthorId,
-										}
-									);
-								} }
+								options={ authorOptions }
+								onChange={ handleSelect }
 							/>
-						) }
+						) ) }
 					<ToggleControl
 						label={ __( 'Show avatar' ) }
 						checked={ showAvatar }
