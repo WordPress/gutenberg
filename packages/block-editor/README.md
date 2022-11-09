@@ -400,10 +400,9 @@ _Returns_
 Computes a fluid font-size value that uses clamp(). A minimum and maxinmum
 font size OR a single font size can be specified.
 
-If a single font size is specified, it is scaled down by
-minimumFontSizeFactor to arrive at the minimum font size.
-
-The incoming `fontSize` value is used for the maximum font size value.
+If a single font size is specified, it is scaled up and down by
+minimumFontSizeFactor and maximumFontSizeFactor to arrive at the minimum and
+maximum sizes.
 
 _Usage_
 

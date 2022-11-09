@@ -67,14 +67,14 @@ describe( 'getComputedFluidTypographyValue()', () => {
 		);
 	} );
 
-	it( 'should return a fluid font size and apply lower bound when given a min and max font size factor', () => {
+	it( 'should return a fluid font size when given a min and max font size factor', () => {
 		const fluidTypographyValues = getComputedFluidTypographyValue( {
 			fontSize: '30px',
 			minimumFontSizeFactor: '0.5',
 			maximumFontSizeFactor: '2',
 		} );
 		expect( fluidTypographyValues ).toBe(
-			'clamp(16px, 1rem + ((1vw - 7.68px) * 1.683), 30px)'
+			'clamp(15px, 0.938rem + ((1vw - 7.68px) * 1.803), 30px)'
 		);
 	} );
 

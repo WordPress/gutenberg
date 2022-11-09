@@ -466,10 +466,10 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 
 			'returns value when size is equal to lower bounds and no fluid min/max set' => array(
 				'font_size'                   => array(
-					'size' => '16px',
+					'size' => '14px',
 				),
 				'should_use_fluid_typography' => true,
-				'expected_output'             => '16px',
+				'expected_output'             => '14px',
 			),
 
 			'returns clamp value with different min max units' => array(
@@ -529,7 +529,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'expected_output'             => 'clamp(12px, 0.75rem + ((1vw - 7.68px) * 0.962), 20px)',
 			),
 
-			'should apply lower bound test when only fluid max is set' => array(
+			'should not apply lower bound test when only fluid max is set' => array(
 				'font_size'                   => array(
 					'size'  => '0.875rem',
 					'fluid' => array(
@@ -537,7 +537,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 					),
 				),
 				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(1rem, 1rem + ((1vw - 0.48rem) * 36.538), 20rem)',
+				'expected_output'             => 'clamp(0.875rem, 0.875rem + ((1vw - 0.48rem) * 36.779), 20rem)',
 			),
 
 			'returns clamp value when min and max font sizes are equal' => array(
@@ -698,7 +698,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'block_content'               => '<p class="has-medium-font-size" style="    font-size:   20px   ;    ">A paragraph inside a group</p>',
 				'font_size_value'             => '20px',
 				'should_use_fluid_typography' => true,
-				'expected_output'             => '<p class="has-medium-font-size" style="    font-size:clamp(16px, 1rem + ((1vw - 7.68px) * 0.481), 20px);    ">A paragraph inside a group</p>',
+				'expected_output'             => '<p class="has-medium-font-size" style="    font-size:clamp(15px, 0.938rem + ((1vw - 7.68px) * 0.601), 20px);    ">A paragraph inside a group</p>',
 			),
 			'return_content_with_first_match_replace_only' => array(
 				'block_content'               => "<div class=\"wp-block-group\" style=\"font-size:1.5em\"> \n \n<p style=\"font-size:1.5em\">A paragraph inside a group</p></div>",

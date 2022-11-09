@@ -215,12 +215,12 @@ describe( 'typography utils', () => {
 				message:
 					'returns value when size is equal to lower bounds and no fluid min/max set',
 				preset: {
-					size: '16px',
+					size: '14px',
 				},
 				typographySettings: {
 					fluid: true,
 				},
-				expected: '16px',
+				expected: '14px',
 			},
 
 			{
@@ -304,7 +304,7 @@ describe( 'typography utils', () => {
 
 			{
 				message:
-					'should apply lower bound test when only fluid max is set',
+					'should not apply lower bound test when only fluid max is set',
 				preset: {
 					size: '0.875rem',
 					fluid: {
@@ -315,7 +315,7 @@ describe( 'typography utils', () => {
 					fluid: true,
 				},
 				expected:
-					'clamp(1rem, 1rem + ((1vw - 0.48rem) * 36.538), 20rem)',
+					'clamp(0.875rem, 0.875rem + ((1vw - 0.48rem) * 36.779), 20rem)',
 			},
 
 			{
