@@ -137,11 +137,15 @@ function gutenberg_clean_cached_stylesheet() {
 	wp_cache_delete( 'gutenberg_global_styles', 'theme_json' );
 }
 
-function _gutenberg_clean_cached_stylesheet_upon_upgrading_active_theme( $upgrader, $options ) {
+function _gutenberg_clean_cached_stylesheet_upon_upgrading( $upgrader, $options ) {
+	if ( 'update' !== $options['action'] ) {
+		return;
+	}
+
 	if (
-		'update' === $options['action'] &&
-		'theme' === $options['type'] &&
-		array_key_exists( get_stylesheet(), $options['themes'] )
+		'core' === $options['type'] ||
+		'plugin' === $options['type'] ||
+		( 'theme' === $options['type'] && array_key_exists( get_stylesheet(), $options['themes'] ) )
 	) {
 		gutenberg_clean_cached_stylesheet();
 	}
