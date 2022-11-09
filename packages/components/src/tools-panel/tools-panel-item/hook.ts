@@ -108,11 +108,14 @@ export function useToolsPanelItem(
 	const menuGroup = isShownByDefault ? 'default' : 'optional';
 	const isMenuItemChecked = menuItems?.[ menuGroup ]?.[ label ];
 	const wasMenuItemChecked = usePrevious( isMenuItemChecked );
+	const isRegistered = menuItems?.[ menuGroup ]?.[ label ] !== undefined;
 
 	// Determine if the panel item's corresponding menu is being toggled and
 	// trigger appropriate callback if it is.
 	useEffect( () => {
-		if ( isResetting || ! hasMatchingPanel ) {
+		// We check whether this item is currently registered as items rendered
+		// via fills can persist through the parent panel being remounted.
+		if ( ! isRegistered || isResetting || ! hasMatchingPanel ) {
 			return;
 		}
 
