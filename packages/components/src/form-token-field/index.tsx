@@ -215,7 +215,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		let preventDefault = false;
 
 		switch ( event.key ) {
-			case 'Comma':
+			case ',':
 				preventDefault = handleCommaKey();
 				break;
 			default:
