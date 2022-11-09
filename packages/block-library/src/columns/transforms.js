@@ -105,6 +105,16 @@ const transforms = {
 			},
 		},
 	],
+	to: [
+		{
+			type: 'block',
+			blocks: [ '*' ],
+			transform: ( attributes, innerBlocks ) =>
+				innerBlocks
+					.map( ( innerBlock ) => innerBlock.innerBlocks )
+					.flat(),
+		},
+	],
 };
 
 export default transforms;
