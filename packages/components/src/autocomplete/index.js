@@ -220,7 +220,8 @@ function useAutocomplete( {
 		if ( filteredOptions.length === 0 ) {
 			return;
 		}
-		if ( event.defaultPrevented ) {
+
+		if ( event.defaultPrevented || event.isComposing ) {
 			return;
 		}
 		switch ( event.key ) {
