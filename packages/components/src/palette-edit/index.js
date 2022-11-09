@@ -313,6 +313,13 @@ export default function PaletteEdit( {
 		! elements[ editingElement ].slug;
 	const elementsLength = elements.length;
 	const hasElements = elementsLength > 0;
+	const editPaletteItem = ( value, collection ) => {
+		const valueIndex = collection.findIndex(
+			( item ) => item.color === value
+		);
+		setIsEditing( true );
+		setEditingElement( valueIndex );
+	};
 
 	return (
 		<PaletteEditStyles>
@@ -459,14 +466,18 @@ export default function PaletteEdit( {
 							<GradientPicker
 								__nextHasNoMargin
 								gradients={ gradients }
-								onChange={ () => {} }
+								onChange={ ( value ) =>
+									editPaletteItem( value, gradients )
+								}
 								clearable={ false }
 								disableCustomGradients={ true }
 							/>
 						) : (
 							<ColorPalette
 								colors={ colors }
-								onChange={ () => {} }
+								onChange={ ( value ) =>
+									editPaletteItem( value, colors )
+								}
 								clearable={ false }
 								disableCustomColors={ true }
 							/>
