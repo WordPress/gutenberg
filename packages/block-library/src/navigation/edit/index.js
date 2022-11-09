@@ -6,7 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useRef, Platform } from '@wordpress/element';
+import {
+	useState,
+	useEffect,
+	useRef,
+	Platform,
+	useMemo,
+} from '@wordpress/element';
 import { addQueryArgs } from '@wordpress/url';
 import {
 	__experimentalOffCanvasEditor as OffCanvasEditor,
@@ -197,9 +203,6 @@ function Navigation( {
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
 
-	const [ hasSavedUnsavedInnerBlocks, setHasSavedUnsavedInnerBlocks ] =
-		useState( false );
-
 	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] =
 		useState( false );
 
@@ -233,8 +236,16 @@ function Navigation( {
 		classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_PENDING;
 
 	// Only autofallback to published menus.
-	const fallbackNavigationMenus = navigationMenus?.filter(
-		( menu ) => menu.status === 'publish'
+	const fallbackNavigationMenus = useMemo(
+		() =>
+			navigationMenus
+				?.filter( ( menu ) => menu.status === 'publish' )
+				?.sort( ( menuA, menuB ) => {
+					const menuADate = new Date( menuA.date );
+					const menuBDate = new Date( menuB.date );
+					return menuADate.getTime() < menuBDate.getTime();
+				} ),
+		[ navigationMenus ]
 	);
 
 	// Attempt to retrieve and prioritize any existing navigation menu unless:
@@ -254,12 +265,6 @@ function Navigation( {
 			return;
 		}
 
-		fallbackNavigationMenus.sort( ( menuA, menuB ) => {
-			const menuADate = new Date( menuA.date );
-			const menuBDate = new Date( menuB.date );
-			return menuADate.getTime() < menuBDate.getTime();
-		} );
-
 		/**
 		 *  This fallback displays (both in editor and on front)
 		 *  a list of pages only if no menu (user assigned or
@@ -269,7 +274,12 @@ function Navigation( {
 		 */
 		__unstableMarkNextChangeAsNotPersistent();
 		setRef( fallbackNavigationMenus[ 0 ].id );
-	}, [ navigationMenus ] );
+	}, [
+		ref,
+		isCreatingNavigationMenu,
+		fallbackNavigationMenus,
+		hasUncontrolledInnerBlocks,
+	] );
 
 	useEffect( () => {
 		if (
@@ -680,7 +690,7 @@ function Navigation( {
 		/>
 	);
 
-	if ( hasUnsavedBlocks ) {
+	if ( hasUnsavedBlocks && ! isCreatingNavigationMenu ) {
 		return (
 			<TagName { ...blockProps }>
 				<InspectorControls>
@@ -744,24 +754,11 @@ function Navigation( {
 					overlayTextColor={ overlayTextColor }
 				>
 					<UnsavedInnerBlocks
+						createNavigationMenu={ createNavigationMenu }
 						blocks={ uncontrolledInnerBlocks }
-						clientId={ clientId }
 						templateLock={ templateLock }
 						navigationMenus={ navigationMenus }
 						hasSelection={ isSelected || isInnerBlockSelected }
-						hasSavedUnsavedInnerBlocks={
-							hasSavedUnsavedInnerBlocks
-						}
-						onSave={ ( post ) => {
-							// Set some state used as a guard to prevent the creation of multiple posts.
-							setHasSavedUnsavedInnerBlocks( true );
-							// Switch to using the wp_navigation entity.
-							setRef( post.id );
-
-							showNavigationMenuStatusNotice(
-								__( `New Navigation Menu created.` )
-							);
-						} }
 					/>
 				</ResponsiveWrapper>
 			</TagName>
