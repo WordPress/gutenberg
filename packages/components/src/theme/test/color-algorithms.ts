@@ -6,6 +6,11 @@ import { colord } from 'colord';
 /**
  * Internal dependencies
  */
+import { COLORS } from '../../utils';
+
+/**
+ * Internal dependencies
+ */
 import { generateShades, validateInputs } from '../color-algorithms';
 
 describe( 'Theme color algorithms', () => {
@@ -40,19 +45,16 @@ describe( 'Theme color algorithms', () => {
 
 	describe( 'generateShades', () => {
 		it( 'should generate the default WP shades when the default WP background/foreground colors are given', () => {
-			// These should match the colors in @wordpress/base-styles
-			const EXPECTED_VALUES = {
-				'100': '#f0f0f0',
-				'200': '#e0e0e0',
-				'300': '#dddddd',
-				'400': '#cccccc',
-				'600': '#949494',
-				'700': '#757575',
-				'800': '#2f2f2f',
-			};
-
 			const shades = generateShades( '#fff', '#1e1e1e' );
-			expect( shades ).toEqual( EXPECTED_VALUES );
+
+			Object.entries( shades ).forEach( ( [ k, color ] ) => {
+				const key = parseInt( k, 10 ) as keyof typeof shades;
+				const normalizedExpectedColor = colord(
+					COLORS.gray[ key ]
+				).toHex();
+
+				expect( color ).toBe( normalizedExpectedColor );
+			} );
 		} );
 
 		it.each( [
