@@ -234,7 +234,7 @@
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "How to use JavaScript with Gutenberg ",
+		"title": "How to use JavaScript with the Block Editor",
 		"slug": "javascript",
 		"markdown_source": "../docs/how-to-guides/javascript/README.md",
 		"parent": "how-to-guides"
