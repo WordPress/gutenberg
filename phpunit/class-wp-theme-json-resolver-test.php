@@ -309,7 +309,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
-	function test_get_user_data_from_wp_global_styles_does_not_use_uncached_queries() {
+	public function test_get_user_data_from_wp_global_styles_does_not_use_uncached_queries() {
 		// Switch to a theme that does have support.
 		switch_theme( 'block-theme' );
 		wp_set_current_user( self::$administrator_id );
