@@ -177,7 +177,10 @@ function PostTitle( _, forwardedRef ) {
 				...create( { html: title } ),
 				...selection,
 			};
-			const newValue = insert( value, create( { html: content } ) );
+			const newValue = insert(
+				value,
+				create( { html: stripHTML( content ) } )
+			);
 			onUpdate( toHTMLString( { value: newValue } ) );
 			setSelection( {
 				start: newValue.start,
