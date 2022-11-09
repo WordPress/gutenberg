@@ -146,7 +146,7 @@ function SelectedBlockPopover( {
 					__unstableCoverTarget
 					bottomClientId={ lastClientId }
 					className={ classnames(
-						'block-editor-block-list__block-popover',
+						'block-editor-block-list__block-side-inserter-popover',
 						{
 							'is-insertion-point-visible':
 								isInsertionPointVisible,
