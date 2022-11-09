@@ -236,15 +236,17 @@ function Navigation( {
 		classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_PENDING;
 
 	// Only autofallback to published menus.
-	const fallbackNavigationMenus = useMemo( () => {
-		return navigationMenus
-			?.filter( ( menu ) => menu.status === 'publish' )
-			?.sort( ( menuA, menuB ) => {
-				const menuADate = new Date( menuA.date );
-				const menuBDate = new Date( menuB.date );
-				return menuADate.getTime() < menuBDate.getTime();
-			} );
-	}, [ navigationMenus ] );
+	const fallbackNavigationMenus = useMemo(
+		() =>
+			navigationMenus
+				?.filter( ( menu ) => menu.status === 'publish' )
+				?.sort( ( menuA, menuB ) => {
+					const menuADate = new Date( menuA.date );
+					const menuBDate = new Date( menuB.date );
+					return menuADate.getTime() < menuBDate.getTime();
+				} ),
+		[ navigationMenus ]
+	);
 
 	// Attempt to retrieve and prioritize any existing navigation menu unless:
 	// - the are uncontrolled inner blocks already present in the block.
