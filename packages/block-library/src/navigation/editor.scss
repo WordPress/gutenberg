@@ -649,6 +649,7 @@ body.editor-styles-wrapper
 	flex: 0 1 auto;
 	overflow: hidden;
 	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .wp-block-navigation__navigation-selector-button--createnew {
