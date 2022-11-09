@@ -106,9 +106,7 @@ function useHasTextDecorationControl( name, element ) {
 	// This is an exception for link elements.
 	// We shouldn't allow other blocks or elements to set textDecoration
 	// because this will be inherited by their children.
-	if ( ! name && element === 'link' ) {
-		return true;
-	}
+	return ! name && element === 'link';
 }
 
 function useStyleWithReset( path, blockName ) {
