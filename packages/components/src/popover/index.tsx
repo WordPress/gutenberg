@@ -431,7 +431,7 @@ const UnforwardedPopover = (
 			// Reference and root documents are the same.
 			referenceOwnerDocument === document ||
 			// Reference and floating are in the same document.
-			referenceOwnerDocument === refs?.floating?.current?.ownerDocument ||
+			referenceOwnerDocument === refs.floating.current?.ownerDocument ||
 			// The reference's document has no view (i.e. window)
 			// or frame element (ie. it's not an iframe).
 			! referenceOwnerDocument?.defaultView?.frameElement
@@ -453,7 +453,7 @@ const UnforwardedPopover = (
 		return () => {
 			defaultView.removeEventListener( 'resize', updateFrameOffset );
 		};
-	}, [ referenceOwnerDocument, update ] );
+	}, [ referenceOwnerDocument, update, refs.floating ] );
 
 	const mergedFloatingRef = useMergeRefs( [
 		floating,
