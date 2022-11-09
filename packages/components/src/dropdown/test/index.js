@@ -1,98 +1,68 @@
 /**
  * External dependencies
  */
-import { fireEvent, render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
  */
-import Dropdown from '../';
-
-function getButtonElement( container ) {
-	return container.querySelector( 'button' );
-}
-function getOpenCloseButton( container, selector ) {
-	return container.querySelector( selector );
-}
+import Dropdown from '..';
 
 describe( 'Dropdown', () => {
-	function expectPopoverVisible( container, value ) {
-		const popover = container.querySelector( '.components-popover' );
-		if ( value ) {
-			expect( popover ).toBeTruthy();
-		} else {
-			expect( popover ).toBeFalsy();
-		}
-	}
-
-	it( 'should toggle the dropdown properly', () => {
-		const expectButtonExpanded = ( container, expanded ) => {
-			expect( container.querySelectorAll( 'button' ) ).toHaveLength( 1 );
-			expect( getButtonElement( container ) ).toHaveAttribute(
-				'aria-expanded',
-				expanded.toString()
-			);
-		};
-
-		const {
-			container: { firstChild: dropdownContainer },
-		} = render(
+	it( 'should toggle the dropdown properly', async () => {
+		render(
 			<Dropdown
-				className="container"
-				contentClassName="content"
 				renderToggle={ ( { isOpen, onToggle } ) => (
 					<button aria-expanded={ isOpen } onClick={ onToggle }>
-						Toggleee
+						Toggle
 					</button>
 				) }
-				renderContent={ () => <span>test</span> }
+				renderContent={ () => 'Content' }
 			/>
 		);
 
-		expectButtonExpanded( dropdownContainer, false );
-		expectPopoverVisible( dropdownContainer, false );
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
+		const button = screen.getByRole( 'button' );
 
-		const button = getButtonElement( dropdownContainer );
-		fireEvent.click( button );
+		expect( screen.queryByText( 'Content' ) ).not.toBeInTheDocument();
+		expect( button ).toBeInTheDocument();
+		expect( button ).toHaveAttribute( 'aria-expanded', 'false' );
 
-		expectButtonExpanded( dropdownContainer, true );
-		expectPopoverVisible( dropdownContainer, true );
+		await user.click( button );
+		expect( button ).toHaveAttribute( 'aria-expanded', 'true' );
+		expect( screen.getByText( 'Content' ) ).toBeInTheDocument();
 	} );
 
-	it( 'should close the dropdown when calling onClose', () => {
-		const {
-			container: { firstChild: dropdownContainer },
-		} = render(
+	it( 'should close the dropdown when calling onClose', async () => {
+		render(
 			<Dropdown
-				className="container"
-				contentClassName="content"
-				renderToggle={ ( { isOpen, onToggle, onClose } ) => [
-					<button
-						key="open"
-						className="open"
-						aria-expanded={ isOpen }
-						onClick={ onToggle }
-					>
-						Toggleee
-					</button>,
-					<button key="close" className="close" onClick={ onClose }>
-						closee
-					</button>,
-				] }
-				renderContent={ () => null }
+				renderToggle={ ( { isOpen, onToggle, onClose } ) => (
+					<>
+						<button aria-expanded={ isOpen } onClick={ onToggle }>
+							Toggle
+						</button>
+						<button onClick={ onClose }>Close</button>
+					</>
+				) }
+				renderContent={ () => 'Content' }
 			/>
 		);
 
-		expectPopoverVisible( dropdownContainer, false );
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
+		const openButton = screen.getByRole( 'button', { name: 'Toggle' } );
+		const closeButton = screen.getByRole( 'button', { name: 'Close' } );
 
-		const openButton = getOpenCloseButton( dropdownContainer, '.open' );
-		fireEvent.click( openButton );
+		expect( screen.queryByText( 'Content' ) ).not.toBeInTheDocument();
 
-		expectPopoverVisible( dropdownContainer, true );
+		await user.click( openButton );
+		expect( screen.getByText( 'Content' ) ).toBeInTheDocument();
 
-		const closeButton = getOpenCloseButton( dropdownContainer, '.close' );
-		fireEvent.click( closeButton );
-
-		expectPopoverVisible( dropdownContainer, false );
+		await user.click( closeButton );
+		expect( screen.queryByText( 'Content' ) ).not.toBeInTheDocument();
 	} );
 } );
