@@ -25,6 +25,16 @@ export const InputWithSlider = ( {
 	onChange,
 	value,
 }: InputWithSliderProps ) => {
+	const onNumberControlChange = ( newValue: number | string ) => {
+		if ( newValue === '' ) {
+			return onChange( 0 );
+		}
+		if ( typeof newValue === 'string' ) {
+			return onChange( parseInt( newValue, 10 ) );
+		}
+		onChange( newValue );
+	};
+
 	return (
 		<HStack spacing={ 4 }>
 			<NumberControlWrapper
@@ -34,7 +44,7 @@ export const InputWithSlider = ( {
 				hideLabelFromVision
 				value={ value }
 				// @ts-expect-error TODO: Resolve discrepancy in NumberControl
-				onChange={ onChange }
+				onChange={ onNumberControlChange }
 				prefix={
 					<Spacer
 						as={ Text }
