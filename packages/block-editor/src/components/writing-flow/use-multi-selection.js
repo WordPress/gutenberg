@@ -69,12 +69,6 @@ export default function useMultiSelection() {
 				return;
 			}
 
-			// Allow cross contentEditable selection by temporarily making
-			// all content editable. We can't rely on using the store and
-			// React because re-rending happens too slowly. We need to be
-			// able to select across instances immediately.
-			node.contentEditable = true;
-
 			// For some browsers, like Safari, it is important that focus
 			// happens BEFORE selection removal.
 			node.focus();

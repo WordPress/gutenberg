@@ -28,7 +28,6 @@ export default function useClickSelection() {
 
 				if ( event.shiftKey ) {
 					if ( startClientId !== clickedClientId ) {
-						node.contentEditable = true;
 						// Firefox doesn't automatically move focus.
 						node.focus();
 					}

@@ -72,7 +72,6 @@ function findDepth( a, b ) {
  * @param {boolean}     value `contentEditable` value (true or false)
  */
 function setContentEditableWrapper( node, value ) {
-	node.contentEditable = value;
 	// Firefox doesn't automatically move focus.
 	if ( value ) node.focus();
 }

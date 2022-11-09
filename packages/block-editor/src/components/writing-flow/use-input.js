@@ -50,7 +50,6 @@ export default function useInput() {
 			}
 
 			if ( event.keyCode === ENTER ) {
-				node.contentEditable = false;
 				event.preventDefault();
 				if ( __unstableIsFullySelected() ) {
 					replaceBlocks(
@@ -64,7 +63,6 @@ export default function useInput() {
 				event.keyCode === BACKSPACE ||
 				event.keyCode === DELETE
 			) {
-				node.contentEditable = false;
 				event.preventDefault();
 				if ( __unstableIsFullySelected() ) {
 					removeBlocks( getSelectedBlockClientIds() );
@@ -79,7 +77,6 @@ export default function useInput() {
 				event.key.length === 1 &&
 				! ( event.metaKey || event.ctrlKey )
 			) {
-				node.contentEditable = false;
 				if ( __unstableIsSelectionMergeable() ) {
 					__unstableDeleteSelection( event.keyCode === DELETE );
 				} else {
@@ -99,8 +96,6 @@ export default function useInput() {
 				return;
 			}
 
-			node.contentEditable = false;
-
 			if ( __unstableIsSelectionMergeable() ) {
 				__unstableDeleteSelection();
 			} else {
@@ -112,13 +107,42 @@ export default function useInput() {
 			}
 		}
 
+		function onInput( event ) {
+			if ( ! event.isTrusted ) {
+				event.stopImmediatePropagation();
+				return;
+			}
+
+			const { ownerDocument } = node;
+			const { defaultView } = ownerDocument;
+			const prototype = Object.getPrototypeOf( event );
+			const constructorName = prototype.constructor.name;
+			const Constructor = window[ constructorName ];
+			const { anchorNode } = defaultView.getSelection();
+
+			const init = {};
+
+			for ( const key in event ) {
+				init[ key ] = event[ key ];
+			}
+
+			const newEvent = new Constructor( event.type, init );
+			const cancelled = ! anchorNode.dispatchEvent( newEvent );
+
+			if ( cancelled ) {
+				event.preventDefault();
+			}
+		}
+
 		node.addEventListener( 'beforeinput', onBeforeInput );
 		node.addEventListener( 'keydown', onKeyDown );
 		node.addEventListener( 'compositionstart', onCompositionStart );
+		node.addEventListener( 'input', onInput );
 		return () => {
 			node.removeEventListener( 'beforeinput', onBeforeInput );
 			node.removeEventListener( 'keydown', onKeyDown );
 			node.removeEventListener( 'compositionstart', onCompositionStart );
+			node.removeEventListener( 'input', onInput );
 		};
 	}, [] );
 }

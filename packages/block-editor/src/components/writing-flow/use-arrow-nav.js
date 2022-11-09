@@ -253,7 +253,6 @@ export default function useArrowNav() {
 					isClosestTabbableABlock( target, isReverse ) &&
 					isNavEdge( target, isReverse )
 				) {
-					node.contentEditable = true;
 					// Firefox doesn't automatically move focus.
 					node.focus();
 				}
