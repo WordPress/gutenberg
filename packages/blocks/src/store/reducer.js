@@ -105,7 +105,7 @@ export function blockTypes( state = {}, action ) {
 }
 
 /**
- * Reducer managing the block style variations.
+ * Reducer managing the block styles.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
