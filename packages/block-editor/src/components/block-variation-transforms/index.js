@@ -6,6 +6,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import {
 	Button,
 	DropdownMenu,
+	Flex,
 	MenuGroup,
 	MenuItemsChoice,
 	__experimentalToggleGroupControl as ToggleGroupControl,
@@ -105,35 +106,37 @@ function VariationsToggleGroupControl( {
 } ) {
 	return (
 		<fieldset className={ className }>
-			<ToggleGroupControl
-				label={ __( 'Transform to variation' ) }
-				value={ selectedValue }
-				isBlock
-				hideLabelFromVision
-				showTooltip
-				onChange={ ( variation ) => {
-					onSelectVariation( variation );
-				} }
-				size="__unstable-large"
-			>
-				{ variations.map( ( variation ) => (
-					<ToggleGroupControlOptionIcon
-						key={ variation.name }
-						icon={ variation.icon }
-						value={ variation.name }
-						aria-label={ variation.title }
-						label={
-							selectedValue === variation.name
-								? variation.title
-								: sprintf(
-										/* translators: %s: Name of the block variation */
-										__( 'Transform to %s' ),
-										variation.title
-								  )
-						}
-					/>
-				) ) }
-			</ToggleGroupControl>
+			<Flex>
+				<ToggleGroupControl
+					label={ __( 'Transform to variation' ) }
+					value={ selectedValue }
+					isBlock
+					hideLabelFromVision
+					showTooltip
+					onChange={ ( variation ) => {
+						onSelectVariation( variation );
+					} }
+					size="__unstable-large"
+				>
+					{ variations.map( ( variation ) => (
+						<ToggleGroupControlOptionIcon
+							key={ variation.name }
+							icon={ variation.icon }
+							value={ variation.name }
+							aria-label={ variation.title }
+							label={
+								selectedValue === variation.name
+									? variation.title
+									: sprintf(
+											/* translators: %s: Name of the block variation */
+											__( 'Transform to %s' ),
+											variation.title
+									  )
+							}
+						/>
+					) ) }
+				</ToggleGroupControl>
+			</Flex>
 		</fieldset>
 	);
 }
@@ -184,6 +187,8 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	// Skip rendering if there are no variations
 	if ( ! variations?.length ) return null;
 
+	const baseClass = 'block-editor-block-variation-transforms';
+
 	// Show buttons if there are more than 5 variations because the ToggleGroupControl does not wrap
 	const showButtons = variations.length > 5;
 
@@ -191,15 +196,11 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 		? VariationsButtons
 		: VariationsToggleGroupControl;
 
-	const className = showButtons
-		? 'block-editor-block-variation-transforms buttons'
-		: 'block-editor-block-variation-transforms toggle-group-control';
-
 	const Component = hasUniqueIcons ? ButtonComponent : VariationsDropdown;
 
 	return (
 		<Component
-			className={ className }
+			className={ baseClass }
 			onSelectVariation={ onSelectVariation }
 			selectedValue={ selectedValue }
 			variations={ variations }
