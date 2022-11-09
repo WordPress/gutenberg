@@ -41,6 +41,7 @@ function ScreenThemeFontFamilies( { setThemeFontSelected } ) {
 			>
 				{ fontFamilies.map( ( family ) => {
 					const fontFace = {
+						name: family.name,
 						fontFamily: family.fontFamily,
 						fontStyle: 'normal',
 						fontWeight: '400',
@@ -49,21 +50,29 @@ function ScreenThemeFontFamilies( { setThemeFontSelected } ) {
 						<FontFaceItem
 							key={ family.fontFamily }
 							fontFace={ fontFace }
-							title={ <strong>{ family.fontFamily }</strong> }
+							title={
+								<strong>
+									{ fontFace.name || fontFace.fontFamily }
+								</strong>
+							}
 							actionTrigger={
-								<Tooltip text={ __( 'View font variants' ) }>
-									<NavigatorButton
-										path="/typography/font-families/theme-font-faces"
-										onClick={ () => {
-											handleClick( family );
-										} }
+								family.fontFace?.length && (
+									<Tooltip
+										text={ __( 'View font variants' ) }
 									>
-										<Icon
-											icon={ chevronRight }
-											size={ 15 }
-										/>
-									</NavigatorButton>
-								</Tooltip>
+										<NavigatorButton
+											path="/typography/font-families/theme-font-faces"
+											onClick={ () => {
+												handleClick( family );
+											} }
+										>
+											<Icon
+												icon={ chevronRight }
+												size={ 15 }
+											/>
+										</NavigatorButton>
+									</Tooltip>
+								)
 							}
 						/>
 					);

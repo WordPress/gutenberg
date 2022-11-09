@@ -27,9 +27,12 @@ function ScreenThemeFontFacesList( { themeFontSelected: font } ) {
 					gap: '1rem',
 				} }
 			>
-				<Subtitle>{ font.fontFamily + __( ' variants:' ) }</Subtitle>
+				<Subtitle>
+					{ ( font.name || font.fontFamily ) + __( ' variants:' ) }
+				</Subtitle>
 
 				{ font &&
+					font.fontFace &&
 					font.fontFace.map( ( fontFace, i ) => {
 						return (
 							<FontFaceItem

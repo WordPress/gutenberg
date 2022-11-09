@@ -49,7 +49,9 @@ function FontFaceItem( { title, fontFace, actionTrigger } ) {
 				<HStack justify="space-between">
 					<Text>
 						{ title ||
-							`${ fontFace.fontFamily } ${ fontFace.fontStyle } ${ fontFace.fontWeight }` }
+							`${ fontFace.name || fontFace.fontFamily } ${
+								fontFace.fontStyle
+							} ${ fontFace.fontWeight }` }
 					</Text>
 					{ actionTrigger && <FlexItem>{ actionTrigger }</FlexItem> }
 				</HStack>

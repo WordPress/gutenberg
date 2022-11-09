@@ -11,8 +11,36 @@ import { Tooltip, Button } from '@wordpress/components';
 import ScreenHeader from './header';
 import FontFaceItem from './font-face-item';
 import Subtitle from './subtitle';
+// import { useSetting } from './hooks';
 
 function ScreenGoogleFontFacesList( { googleFontSelected: font } ) {
+	// const [ fontFamilies, setFontFamilies ] = useSetting( 'typography.fontFamilies' );
+
+	// console.log("fontSettings", fontFamilies, setFontFamilies);
+
+	const handleAddFontFace =
+		(/* fontFamilyName, fontWeight, fontStyle, url */) => {
+			// console.log(fontFamilyName, fontWeight, fontStyle);
+			// console.log( 'add font face' );
+			// const newFontFamily = {
+			//     fontFamily: fontFamilyName,
+			//     name: fontFamilyName,
+			//     slug: fontFamilyName.toLowerCase().replace( ' ', '-' ),
+			//     fontFace: [
+			//         {
+			//             fontFamily: fontFamilyName,
+			//             fontStyle: fontStyle,
+			//             fontWeight: fontWeight,
+			//         }
+			//     ]
+			// }
+			// setFontFamilies( [ ...fontFamilies, newFontFamily ] );
+			// setTimeout( () => {
+			//     const [ fontFamilies, setFontFamilies ] = useSetting( 'typography.fontFamilies' );
+			//     console.log('new font Families', fontFamilies);
+			// }, 1000 );
+		};
+
 	return (
 		<>
 			<ScreenHeader
@@ -57,7 +85,16 @@ function ScreenGoogleFontFacesList( { googleFontSelected: font } ) {
 										text={ __( 'Add font face' ) }
 										delay={ 0 }
 									>
-										<Button style={ { padding: '0 8px' } }>
+										<Button
+											style={ { padding: '0 8px' } }
+											onClick={ () =>
+												handleAddFontFace(
+													fontFace.fontFamily,
+													fontFace.fontWeight,
+													fontFace.fontStyle
+												)
+											}
+										>
 											<Icon
 												icon={ plusCircle }
 												size={ 20 }
