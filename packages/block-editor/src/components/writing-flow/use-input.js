@@ -109,7 +109,6 @@ export default function useInput() {
 
 		function onInput( event ) {
 			if ( ! event.isTrusted ) {
-				event.stopImmediatePropagation();
 				return;
 			}
 
@@ -132,23 +131,24 @@ export default function useInput() {
 
 			const newEvent = new Constructor( event.type, init );
 			const cancelled = ! anchorElement.dispatchEvent( newEvent );
+			event.stopImmediatePropagation();
 
 			if ( cancelled ) {
 				event.preventDefault();
 			}
 		}
 
+		node.addEventListener( 'input', onInput );
+		node.addEventListener( 'keydown', onInput );
 		node.addEventListener( 'beforeinput', onBeforeInput );
 		node.addEventListener( 'keydown', onKeyDown );
 		node.addEventListener( 'compositionstart', onCompositionStart );
-		node.addEventListener( 'input', onInput );
-		node.addEventListener( 'keydown', onInput );
 		return () => {
+			node.removeEventListener( 'input', onInput );
+			node.removeEventListener( 'keydown', onInput );
 			node.removeEventListener( 'beforeinput', onBeforeInput );
 			node.removeEventListener( 'keydown', onKeyDown );
 			node.removeEventListener( 'compositionstart', onCompositionStart );
-			node.removeEventListener( 'input', onInput );
-			node.removeEventListener( 'keydown', onInput );
 		};
 	}, [] );
 }

@@ -47,7 +47,9 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 		return;
 	}
 
-	container.focus();
+	if ( ! container.ownerDocument.activeElement?.contains( container ) ) {
+		container.focus();
+	}
 
 	if ( isInputOrTextArea( container ) ) {
 		// The element may not support selection setting.
@@ -66,8 +68,19 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 		return;
 	}
 
-	if ( ! container.isContentEditable ) {
+	if (
+		! container.isContentEditable &&
+		! container.closest( '[contenteditable]' )
+	) {
 		return;
+	}
+
+	const parentEditable = /** @type {HTMLElement} */ (
+		container.closest( '[contenteditable="true"]' )
+	);
+
+	if ( parentEditable ) {
+		parentEditable.contentEditable = 'false';
 	}
 
 	let range = getRange( container, isReverse, x );
@@ -89,6 +102,10 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 		) {
 			return;
 		}
+	}
+
+	if ( parentEditable ) {
+		parentEditable.contentEditable = 'true';
 	}
 
 	const { ownerDocument } = container;
