@@ -8,14 +8,10 @@ import classnames from 'classnames';
  */
 import { __experimentalListView as ListView } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
-import {
-	useFocusOnMount,
-	useFocusReturn,
-	useMergeRefs,
-} from '@wordpress/compose';
+import { useFocusReturn } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
-import { useRef, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
@@ -30,7 +26,6 @@ import ListViewOutline from './list-view-outline';
 export default function ListViewSidebar() {
 	const { setIsListViewOpened } = useDispatch( editPostStore );
 
-	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 	const headerFocusReturnRef = useFocusReturn();
 	const contentFocusReturnRef = useFocusReturn();
 
@@ -45,6 +40,22 @@ export default function ListViewSidebar() {
 
 	// This ref refers to the sidebar as a whole.
 	const sidebarRef = useRef();
+
+	// Callback function to focus the list view or list view tab based on which is available at the time.
+	function handleListViewFocus() {
+		// Find tabbables based on the attached sidebar ref.
+		const listViewTabbables = focus.tabbable.find( sidebarRef.current );
+		// Either focus the list view or the list view tab. Must have a fallback because the list view does not render when there are no blocks. If list view is available, need to skip close, list view, and outline tabs. If list view is not available, need to skip close button.
+		const listViewFocusLocation =
+			listViewTabbables[ 3 ] || listViewTabbables[ 1 ];
+		listViewFocusLocation.focus();
+	}
+
+	// Handles focus for list view when sidebar mounts.
+	useEffect( () => {
+		handleListViewFocus();
+	}, [] );
+
 	// This only fires when the sidebar is open because of the conditional rendering. It is the same shortcut to open but that is defined as a global shortcut and only fires when the sidebar is closed.
 	useShortcut( 'core/edit-post/toggle-list-view', () => {
 		// If the sidebar has focus, it is safe to close.
@@ -56,12 +67,7 @@ export default function ListViewSidebar() {
 			setIsListViewOpened( false );
 			// If the list view does not have focus, we should move focus to it.
 		} else if ( tab === 'list-view' ) {
-			// Find tabbables based on the attached sidebar ref.
-			const listViewTabbables = focus.tabbable.find( sidebarRef.current );
-			// Either focus the list view or the list view tab. Must have a fallback because the list view does not render when there are no blocks.
-			const listViewFocusLocation =
-				listViewTabbables[ 3 ] || listViewTabbables[ 1 ];
-			listViewFocusLocation.focus();
+			handleListViewFocus();
 			// If the outline does not have focus, we should move focus to it.
 		} else if ( tab === 'outline' ) {
 			// Find the 3rd tabbable based on the attached sidebar ref. This is to skip over the close button, list view tab button, and landing on outline tab button since there is nothing else to focus after.
@@ -118,10 +124,7 @@ export default function ListViewSidebar() {
 				</ul>
 			</div>
 			<div
-				ref={ useMergeRefs( [
-					contentFocusReturnRef,
-					focusOnMountRef,
-				] ) }
+				ref={ contentFocusReturnRef }
 				className="edit-post-editor__list-view-container"
 			>
 				{ tab === 'list-view' && (
