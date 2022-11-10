@@ -129,7 +129,7 @@ export default function Layout() {
 								style={ { flexGrow: '1' } }
 								transition={ {
 									type: 'tween',
-									duration: disableMotion ? 0 : 0.3,
+									duration: disableMotion ? 0 : 0.5,
 								} }
 							>
 								<Header />
@@ -138,11 +138,25 @@ export default function Layout() {
 					</AnimatePresence>
 				</div>
 
-				{ showSidebar && (
-					<div className="edit-site-layout__sidebar">
-						<Sidebar />
-					</div>
-				) }
+				<AnimatePresence>
+					{ showSidebar && (
+						<motion.div
+							exit={ {
+								left: 0,
+								top: 60,
+								position: 'fixed',
+								opacity: 0,
+							} }
+							transition={ {
+								type: 'tween',
+								duration: disableMotion ? 0 : 0.5,
+							} }
+							className="edit-site-layout__sidebar"
+						>
+							<Sidebar />
+						</motion.div>
+					) }
+				</AnimatePresence>
 
 				{ showCanvas && (
 					<div
@@ -158,7 +172,7 @@ export default function Layout() {
 							className="edit-site-layout__canvas"
 							transition={ {
 								type: 'tween',
-								duration: disableMotion ? 0 : 0.3,
+								duration: disableMotion ? 0 : 0.5,
 							} }
 						>
 							<ErrorBoundary>
