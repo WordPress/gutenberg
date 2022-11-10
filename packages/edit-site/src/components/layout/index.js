@@ -162,14 +162,27 @@ export default function Layout() {
 					<div
 						className="edit-site-layout__canvas-container"
 						style={ {
-							paddingTop: isFullCanvas ? 0 : canvasPadding,
-							paddingRight: isFullCanvas ? 0 : canvasPadding,
-							paddingBottom: isFullCanvas ? 0 : canvasPadding,
+							paddingTop:
+								isFullCanvas || isEditorPage
+									? 0
+									: canvasPadding,
+							paddingRight:
+								isFullCanvas || isEditorPage
+									? 0
+									: canvasPadding,
+							paddingBottom:
+								isFullCanvas || isEditorPage
+									? 0
+									: canvasPadding,
 						} }
 					>
 						<motion.div
 							layout
 							className="edit-site-layout__canvas"
+							animate={ {
+								scale:
+									! isFullCanvas && isEditorPage ? 0.95 : 1,
+							} }
 							transition={ {
 								type: 'tween',
 								duration: disableMotion ? 0 : 0.5,
