@@ -12,8 +12,8 @@ _It is largely inspired by [create-react-app](https://create-react-app.dev/docs/
 
 - [Quick start](#quick-start)
 - [Usage](#usage)
-    - [`slug`](#slug)
     - [Interactive Mode](#interactive-mode)
+    - [`slug`](#slug)
     - [`options`](#options)
 - [Available Commands](#available-commands)
 - [External Project Templates](#external-project-templates)
