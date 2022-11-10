@@ -52,14 +52,14 @@ $ npx @wordpress/create-block [options] [slug]
 
 ### Interactive Mode
 
-When no `[slug]` is provided, the script will run in interactive mode and will start prompting for the input required (`slug`, title, namespace...) to scaffold the project.
+When no `slug` is provided, the script will run in interactive mode and will start prompting for the input required (`slug`, title, namespace...) to scaffold the project.
 
 
 ### `slug`
 
-The use of `[slug]` is optional. 
+The use of `slug` is optional. 
 
-When provided it triggers the _quick mode_,  where it is used:
+When provided it triggers the _quick mode_, where this `slug` is used:
 - as the block slug (required for its identification)
 - as the output location (folder name) for scaffolded files
 - as the name of the WordPress plugin. 
