@@ -317,17 +317,21 @@ export function ColorEdit( props ) {
 		[ userGradientPalette, themeGradientPalette, defaultGradientPalette ]
 	);
 	const areCustomSolidsEnabled = useSetting( 'color.custom' );
+	const areDefaultSolidsEnabled = useSetting( 'color.defaultPalette' );
 	const areCustomGradientsEnabled = useSetting( 'color.customGradient' );
+	const areDefaultGradientsEnabled = useSetting( 'color.defaultGradient' );
 	const isBackgroundEnabled = useSetting( 'color.background' );
 	const isLinkEnabled = useSetting( 'color.link' );
 	const isTextEnabled = useSetting( 'color.text' );
 
 	const solidsEnabled =
-		areCustomSolidsEnabled || ! themePalette || themePalette?.length > 0;
+		areDefaultSolidsEnabled ||
+		areCustomSolidsEnabled ||
+		themePalette?.length > 0;
 
 	const gradientsEnabled =
+		areDefaultGradientsEnabled ||
 		areCustomGradientsEnabled ||
-		! themeGradientPalette ||
 		themeGradientPalette?.length > 0;
 
 	// Shouldn't be needed but right now the ColorGradientsPanel
