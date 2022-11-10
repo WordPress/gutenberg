@@ -191,7 +191,6 @@ const BlockEditButton = ( { label, clientId } ) => {
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 	const [ convertModalOpen, setConvertModalOpen ] = useState( false );
 	const { totalPages } = usePageData();
-	const allowConvertToLinks = totalPages <= MAX_PAGE_COUNT;
 
 	const block = useSelect(
 		( select ) => {
@@ -202,10 +201,11 @@ const BlockEditButton = ( { label, clientId } ) => {
 
 	const onClick = () => {
 		toggleBlockHighlight( clientId, true );
-		if ( 'core/page-list' === block.name ) {
-			setConvertModalOpen( ! convertModalOpen );
-		}
+		setConvertModalOpen( ! convertModalOpen );
 	};
+
+	const allowConvertToLinks =
+		'core/page-list' === block.name && totalPages <= MAX_PAGE_COUNT;
 
 	return (
 		<>
