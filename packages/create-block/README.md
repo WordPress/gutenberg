@@ -4,9 +4,9 @@ Create Block is an **officially supported tool for scaffolding a WordPress plugi
 
 _It is largely inspired by [create-react-app](https://create-react-app.dev/docs/getting-started). Major kudos to [@gaearon](https://github.com/gaearon), the whole Facebook team, and the React community._
 
-> **Blocks are the fundamental elements of modern WordPress sites**. Introduced in WordPress 5.0, they allow page and post builder-like functionality to every up-to-date WordPress website.
+> **Blocks are the fundamental elements of modern WordPress sites**. Introduced in [WordPress 5.0](https://wordpress.org/news/2018/12/bebo/), they allow [page and post builder-like functionality](https://wordpress.org/gutenberg/) to every up-to-date WordPress website.
 
-> _At the [Gutenberg HandBook you can learn more about Block API](https://developer.wordpress.org/block-editor/developers/block-api/block-registration/)._
+> _Learn more about the [Block API at the Gutenberg HandBook](https://developer.wordpress.org/block-editor/developers/block-api/block-registration/)._
 
 ## Table of Contents 
 
