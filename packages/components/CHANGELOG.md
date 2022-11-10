@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-<<<<<<< HEAD
-=======
 ### Breaking Changes
 
 -   `Popover`: The deprecated `range` and `__unstableShift` props have been removed ([#45195](https://github.com/WordPress/gutenberg/pull/45195)).
@@ -20,7 +18,6 @@
 
 -   `FontSizePicker`: Improved slider design when `withSlider` is set ([#44598](https://github.com/WordPress/gutenberg/pull/44598)).
 
->>>>>>> 00e632aff9 (Fix popover deprecations (#45195))
 ### Bug Fix
 
 -   `FontSizePicker`: Ensure that fluid font size presets appear correctly in the UI controls ([#44791](https://github.com/WordPress/gutenberg/pull/44791))
