@@ -54,9 +54,9 @@ export function useAnchor( { editableContentElement, value, settings = {} } ) {
 			return {
 				ownerDocument: range.startContainer.ownerDocument,
 				getBoundingClientRect() {
-					return ! selectionWithinEditableContentElement
-						? editableContentElement.getBoundingClientRect()
-						: range.getBoundingClientRect();
+					return selectionWithinEditableContentElement
+						? range.getBoundingClientRect()
+						: editableContentElement.getBoundingClientRect();
 				},
 			};
 		}
