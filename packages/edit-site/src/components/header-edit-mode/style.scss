@@ -8,9 +8,7 @@ $header-toolbar-min-width: 335px;
 	box-sizing: border-box;
 	width: 100%;
 	justify-content: space-between;
-
-	// Leave room for the site editor toggle.
-	padding-left: $header-height;
+	border-bottom: $border-width solid $gray-200;
 
 	.edit-site-header-edit-mode__start {
 		display: flex;

@@ -1,51 +1,67 @@
 .edit-site-layout {
+	min-height: 100%;
 	background: $gray-900;
 	color: $white;
-	min-height: 100%;
 	display: flex;
+	flex-direction: column;
+	@include break-small {
+		display: grid;
+		grid-template-columns: 320px 1fr;
+		grid-template-rows: auto 1fr;
+		grid-template-areas:
+			"header canvas"
+			"sidebar canvas";
+
+		&.is-full-canvas {
+			grid-template-areas:
+				"header header"
+				"canvas canvas";
+		}
+	}
+}
+
+.edit-site-layout__header {
+	grid-area: header;
+	height: $header-height;
+	display: flex;
+
+	.edit-site-layout.is-full-canvas & {
+		background: $white;
+		color: $gray-900;
+	}
 }
 
 .edit-site-layout__logo {
-	position: fixed;
-	top: 0;
-	left: 0;
-	z-index: z-index(".edit-site-layout__logo");
 	align-items: center;
 	height: $header-height;
 	display: flex;
 	justify-content: space-between;
-
-	.edit-site-layout:not(.is-full-canvas) & {
-		width: 100%;
-
-		@include break-small {
-			width: auto;
-		}
-	}
 
 	.components-button {
 		color: currentColor;
 	}
 }
 
-.edit-site-layout__canvas-container {
-	flex-grow: 1;
-	position: relative;
+.edit-site-layout__sidebar {
+	grid-area: sidebar;
+	overflow: hidden;
 }
 
-.edit-site-layout__sidebar {
-	overflow: hidden;
+.edit-site-layout__canvas-container {
+	grid-area: canvas;
+	position: relative;
+	flex-grow: 1;
 }
 
 .edit-site-layout__canvas {
 	color: $gray-900;
+	background: $white;
 	position: absolute;
 	top: 0;
 	right: 0;
 	bottom: 0;
 	left: 0;
 	box-shadow: $shadow-modal;
-	background: $white;
 
 	@include break-small {
 		top: $canvas-padding;
@@ -77,6 +93,7 @@
 }
 
 .edit-site-layout__view-mode-toggle.components-button {
+	position: relative;
 	background: $gray-900;
 	color: $white;
 	height: calc(100% + #{$border-width});
