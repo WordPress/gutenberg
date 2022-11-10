@@ -12,7 +12,7 @@
  * @return {JSX.Element} Element
  */
 
-function Dashicon( { icon, className, size = 20, ...extraProps } ) {
+function Dashicon( { icon, className, size = 20, style = {}, ...extraProps } ) {
 	const iconClass = [
 		'dashicon',
 		'dashicons',
@@ -23,8 +23,10 @@ function Dashicon( { icon, className, size = 20, ...extraProps } ) {
 		.join( ' ' );
 
 	// For retro-compatibility reasons (for example if people are overriding icon size with CSS), we add inline styles just if the size is different to the default
-	const style =
-		20 !== size
+	const sizeStyles =
+		// using `!=` to catch both 20 and "20"
+		// eslint-disable-next-line eqeqeq
+		20 != size
 			? {
 					fontSize: `${ size }px`,
 					width: `${ size }px`,
@@ -32,7 +34,12 @@ function Dashicon( { icon, className, size = 20, ...extraProps } ) {
 			  }
 			: {};
 
-	return <span className={ iconClass } style={ style } { ...extraProps } />;
+	const styles = {
+		...sizeStyles,
+		...style,
+	};
+
+	return <span className={ iconClass } style={ styles } { ...extraProps } />;
 }
 
 export default Dashicon;
