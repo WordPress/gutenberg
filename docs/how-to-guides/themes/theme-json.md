@@ -206,6 +206,7 @@ The settings section has the following structure:
 			"customFontSize": true,
 			"lineHeight": false,
 			"dropCap": true,
+			"fluid": false,
 			"fontStyle": true,
 			"fontWeight": true,
 			"letterSpacing": true,
@@ -278,6 +279,7 @@ The settings section has the following structure:
 		"typography": {
 			"customFontSize": true,
 			"dropCap": true,
+			"fluid": false,
 			"fontFamilies": [],
 			"fontSizes": [],
 			"fontStyle": true,
