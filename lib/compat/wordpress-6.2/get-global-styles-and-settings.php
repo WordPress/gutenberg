@@ -59,14 +59,14 @@ if ( ! function_exists( '_wp_theme_has_theme_json_clean_cache_upon_upgrading_act
 	 * Private function to clean the cache used by wp_theme_has_theme_json method.
 	 *
 	 * @param WP_Upgrader $upgrader Instance of WP_Upgrader class.
-	 * @param array $options Metadata that identifies the data that is updated.
+	 * @param array       $options Metadata that identifies the data that is updated.
 	 */
 	function _wp_theme_has_theme_json_clean_cache_upon_upgrading_active_theme( $upgrader, $options ) {
 		// The cache only needs cleaning when the active theme was updated.
 		if (
-			'update' === $options[ 'action' ] &&
-			'theme' === $options[ 'type' ] &&
-			array_key_exists( get_stylesheet(), $options[ 'themes' ] )
+			'update' === $options['action'] &&
+			'theme' === $options['type'] &&
+			array_key_exists( get_stylesheet(), $options['themes'] )
 		) {
 			wp_theme_has_theme_json_clean_cache();
 		}
