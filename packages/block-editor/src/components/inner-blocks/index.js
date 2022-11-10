@@ -150,6 +150,7 @@ const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md
  */
 export function useInnerBlocksProps( props = {}, options = {} ) {
+	const { __unstableDisableDropZone } = options;
 	const { clientId } = useBlockEditContext();
 	const isSmallScreen = useViewportMatch( 'medium', '<' );
 	const { __experimentalCaptureToolbars, hasOverlay } = useSelect(
@@ -185,11 +186,13 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		[ clientId, isSmallScreen ]
 	);
 
+	const blockDropZoneRef = useBlockDropZone( {
+		rootClientId: clientId,
+	} );
+
 	const ref = useMergeRefs( [
 		props.ref,
-		useBlockDropZone( {
-			rootClientId: clientId,
-		} ),
+		__unstableDisableDropZone ? null : blockDropZoneRef,
 	] );
 
 	const innerBlocksProps = {
