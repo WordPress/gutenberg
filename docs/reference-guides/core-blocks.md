@@ -248,7 +248,7 @@ The content inside the details is hidden until the details are expanded. ([Sourc
 
 -	**Name:** core/details-content
 -	**Category:** theme
--	**Supports:** align, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~multiple~~
 -	**Attributes:** 
 
 ## Details Summary
@@ -257,7 +257,7 @@ Clicking on the summary will show or hide the content inside the details. ([Sour
 
 -	**Name:** core/details-summary
 -	**Category:** theme
--	**Supports:** align, color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align, color (background, gradients, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~multiple~~
 -	**Attributes:** level, summary
 
 ## Embed
