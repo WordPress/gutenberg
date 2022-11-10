@@ -9,7 +9,7 @@
 	"description": "The content inside the details is hidden until the details are expanded.",
 	"textdomain": "default",
 	"supports": {
-		"align": true,
+		"align": false,
 		"color": {
 			"gradients": true,
 			"link": true,
@@ -26,7 +26,9 @@
 			"style": true
 		},
 		"html": false,
+		"lock": false,
 		"multiple": false,
+		"reusable": false,
 		"spacing": {
 			"margin": true,
 			"padding": true

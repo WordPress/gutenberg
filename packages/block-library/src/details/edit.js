@@ -19,6 +19,7 @@ function DetailsBlock( { attributes, setAttributes, clientId } ) {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: TEMPLATE,
 		template: TEMPLATE,
+		templateLock: 'all',
 	} );
 
 	// Check if either the block or the inner blocks are selected.

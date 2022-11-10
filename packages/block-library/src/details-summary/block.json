@@ -20,7 +20,7 @@
 		}
 	},
 	"supports": {
-		"align": true,
+		"align": false,
 		"color": {
 			"gradients": true,
 			"__experimentalDefaultControls": {
@@ -35,7 +35,9 @@
 			"style": true
 		},
 		"html": false,
+		"lock": false,
 		"multiple": false,
+		"reusable": false,
 		"spacing": {
 			"margin": true,
 			"padding": true
