@@ -28,12 +28,12 @@ describe( 'Dropdown', () => {
 		const button = screen.getByRole( 'button' );
 
 		expect( screen.queryByText( 'Content' ) ).not.toBeInTheDocument();
-		expect( button ).toBeInTheDocument();
+		expect( button ).toBeVisible();
 		expect( button ).toHaveAttribute( 'aria-expanded', 'false' );
 
 		await user.click( button );
 		expect( button ).toHaveAttribute( 'aria-expanded', 'true' );
-		expect( screen.getByText( 'Content' ) ).toBeInTheDocument();
+		expect( screen.getByText( 'Content' ) ).toBeVisible();
 	} );
 
 	it( 'should close the dropdown when calling onClose', async () => {
@@ -60,7 +60,7 @@ describe( 'Dropdown', () => {
 		expect( screen.queryByText( 'Content' ) ).not.toBeInTheDocument();
 
 		await user.click( openButton );
-		expect( screen.getByText( 'Content' ) ).toBeInTheDocument();
+		expect( screen.getByText( 'Content' ) ).toBeVisible();
 
 		await user.click( closeButton );
 		expect( screen.queryByText( 'Content' ) ).not.toBeInTheDocument();
