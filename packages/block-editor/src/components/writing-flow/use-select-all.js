@@ -25,14 +25,28 @@ export default function useSelectAll() {
 
 			const selectedClientIds = getSelectedBlockClientIds();
 
+			event.preventDefault();
+
+			const { ownerDocument } = node;
+			const { defaultView } = ownerDocument;
+			const { anchorNode } = defaultView.getSelection();
+			const anchorElement =
+				anchorNode.nodeType === anchorNode.ELEMENT_NODE
+					? anchorNode
+					: anchorNode.parentElement;
+			const selectedContentEditable =
+				anchorElement.closest( '[contenteditable]' );
+
 			if (
 				selectedClientIds.length < 2 &&
-				! isEntirelySelected( event.target )
+				! isEntirelySelected( selectedContentEditable )
 			) {
+				defaultView.getSelection().removeAllRanges();
+				const range = ownerDocument.createRange();
+				range.selectNodeContents( selectedContentEditable );
+				defaultView.getSelection().addRange( range );
 				return;
 			}
-
-			event.preventDefault();
 
 			const [ firstSelectedClientId ] = selectedClientIds;
 			const rootClientId = getBlockRootClientId( firstSelectedClientId );

@@ -66,17 +66,6 @@ function findDepth( a, b ) {
 }
 
 /**
- * Sets the `contenteditable` wrapper element to `value`.
- *
- * @param {HTMLElement} node  Block element.
- * @param {boolean}     value `contentEditable` value (true or false)
- */
-function setContentEditableWrapper( node, value ) {
-	// Firefox doesn't automatically move focus.
-	if ( value ) node.focus();
-}
-
-/**
  * Sets a multi-selection based on the native selection across blocks.
  */
 export default function useSelectionObserver() {
@@ -104,7 +93,6 @@ export default function useSelectionObserver() {
 				// For now we check if the event is a `mouse` event.
 				const isClickShift = event.shiftKey && event.type === 'mouseup';
 				if ( selection.isCollapsed && ! isClickShift ) {
-					setContentEditableWrapper( node, false );
 					return;
 				}
 
@@ -144,7 +132,6 @@ export default function useSelectionObserver() {
 					startClientId === undefined &&
 					endClientId === undefined
 				) {
-					setContentEditableWrapper( node, false );
 					return;
 				}
 

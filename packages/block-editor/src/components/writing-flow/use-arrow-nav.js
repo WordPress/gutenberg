@@ -17,7 +17,7 @@ import { useRefEffect } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { getBlockClientId, isInSameBlock } from '../../utils/dom';
+import { isInSameBlock } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
 
 /**
@@ -157,15 +157,6 @@ export default function useArrowNav() {
 			verticalRect = null;
 		}
 
-		function isClosestTabbableABlock( target, isReverse ) {
-			const closestTabbable = getClosestTabbable(
-				target,
-				isReverse,
-				node
-			);
-			return closestTabbable && getBlockClientId( closestTabbable );
-		}
-
 		function onKeyDown( event ) {
 			const { keyCode, target, shiftKey, ctrlKey, altKey, metaKey } =
 				event;
@@ -178,7 +169,6 @@ export default function useArrowNav() {
 			const isVertical = isUp || isDown;
 			const isNav = isHorizontal || isVertical;
 			const hasModifier = shiftKey || ctrlKey || altKey || metaKey;
-			const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
 			const { ownerDocument } = node;
 			const { defaultView } = ownerDocument;
 
@@ -243,20 +233,16 @@ export default function useArrowNav() {
 				return;
 			}
 
+			if ( shiftKey ) {
+				return;
+			}
+
 			// In the case of RTL scripts, right means previous and left means
 			// next, which is the exact reverse of LTR.
 			const isReverseDir = isRTL( target ) ? ! isReverse : isReverse;
 			const { keepCaretInsideBlock } = getSettings();
 
-			if ( shiftKey ) {
-				if (
-					isClosestTabbableABlock( target, isReverse ) &&
-					isNavEdge( target, isReverse )
-				) {
-					// Firefox doesn't automatically move focus.
-					node.focus();
-				}
-			} else if (
+			if (
 				isVertical &&
 				isVerticalEdge( target, isReverse ) &&
 				// When Alt is pressed, only intercept if the caret is also at

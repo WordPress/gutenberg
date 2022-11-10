@@ -78,9 +78,18 @@ export function useFocusFirstElement( clientId ) {
 		}
 
 		const { ownerDocument } = ref.current;
+		const { defaultView } = ownerDocument;
+		const { anchorNode } = defaultView.getSelection();
+		const anchorElement =
+			anchorNode?.nodeType === anchorNode?.ELEMENT_NODE
+				? anchorNode
+				: anchorNode.parentElement;
 
 		// Do not focus the block if it already contains the active element.
-		if ( isInsideRootBlock( ref.current, ownerDocument.activeElement ) ) {
+		if (
+			anchorElement &&
+			isInsideRootBlock( ref.current, anchorElement )
+		) {
 			return;
 		}
 

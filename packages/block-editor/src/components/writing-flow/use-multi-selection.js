@@ -69,10 +69,6 @@ export default function useMultiSelection() {
 				return;
 			}
 
-			// For some browsers, like Safari, it is important that focus
-			// happens BEFORE selection removal.
-			node.focus();
-
 			defaultView.getSelection().removeAllRanges();
 		},
 		[

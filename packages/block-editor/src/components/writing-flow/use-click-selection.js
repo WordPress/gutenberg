@@ -23,15 +23,9 @@ export default function useClickSelection() {
 					return;
 				}
 
-				const startClientId = getBlockSelectionStart();
 				const clickedClientId = getBlockClientId( event.target );
 
-				if ( event.shiftKey ) {
-					if ( startClientId !== clickedClientId ) {
-						// Firefox doesn't automatically move focus.
-						node.focus();
-					}
-				} else if ( hasMultiSelection() ) {
+				if ( ! event.shiftKey && hasMultiSelection() ) {
 					// Allow user to escape out of a multi-selection to a
 					// singular selection of a block via click. This is handled
 					// here since focus handling excludes blocks when there is

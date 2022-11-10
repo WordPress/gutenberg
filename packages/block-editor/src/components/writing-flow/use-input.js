@@ -142,11 +142,13 @@ export default function useInput() {
 		node.addEventListener( 'keydown', onKeyDown );
 		node.addEventListener( 'compositionstart', onCompositionStart );
 		node.addEventListener( 'input', onInput );
+		node.addEventListener( 'keydown', onInput );
 		return () => {
 			node.removeEventListener( 'beforeinput', onBeforeInput );
 			node.removeEventListener( 'keydown', onKeyDown );
 			node.removeEventListener( 'compositionstart', onCompositionStart );
 			node.removeEventListener( 'input', onInput );
+			node.removeEventListener( 'keydown', onInput );
 		};
 	}, [] );
 }

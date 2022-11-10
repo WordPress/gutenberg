@@ -10,17 +10,6 @@ import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 
 /**
- * Sets the `contenteditable` wrapper element to `value`.
- *
- * @param {HTMLElement} node  Block element.
- * @param {boolean}     value `contentEditable` value (true or false)
- */
-function setContentEditableWrapper( node, value ) {
-	// Firefox doesn't automatically move focus.
-	if ( value ) node.focus();
-}
-
-/**
  * Sets a multi-selection based on the native selection across blocks.
  */
 export default function useDragSelection() {
@@ -47,13 +36,6 @@ export default function useDragSelection() {
 					if ( hasMultiSelection() ) {
 						return;
 					}
-
-					// If the selection is complete (on mouse up), and no
-					// multiple blocks have been selected, set focus back to the
-					// anchor element. if the anchor element contains the
-					// selection. Additionally, the contentEditable wrapper can
-					// now be disabled again.
-					setContentEditableWrapper( node, false );
 
 					const selection = defaultView.getSelection();
 
@@ -102,12 +84,6 @@ export default function useDragSelection() {
 				// `mouseleave` (from a block). The selection ends when
 				// `mouseup` happens anywhere in the window.
 				defaultView.addEventListener( 'mouseup', onMouseUp );
-
-				// Allow cross contentEditable selection by temporarily making
-				// all content editable. We can't rely on using the store and
-				// React because re-rending happens too slowly. We need to be
-				// able to select across instances immediately.
-				setContentEditableWrapper( node, true );
 			}
 
 			node.addEventListener( 'mouseout', onMouseLeave );
