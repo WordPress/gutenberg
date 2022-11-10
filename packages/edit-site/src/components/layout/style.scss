@@ -24,11 +24,6 @@
 	grid-area: header;
 	height: $header-height;
 	display: flex;
-
-	.edit-site-layout.is-full-canvas & {
-		background: $white;
-		color: $gray-900;
-	}
 }
 
 .edit-site-layout__logo {
