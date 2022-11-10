@@ -1,7 +1,4 @@
 .editor-post-taxonomies__hierarchical-terms-list {
-	max-height: 14em;
-	overflow: auto;
-
 	// Extra left padding prevents checkbox focus borders from being cut off.
 	margin-left: -$border-width * 4 - $border-width-focus;
 	padding-left: $border-width * 4 + $border-width-focus;
@@ -52,5 +49,18 @@
 
 	.components-button {
 		font-size: 12px;
+	}
+}
+
+.components-form-token-field__remove-token {
+	margin-left: $grid-unit-05;
+	display: flex;
+	align-items: center;
+	flex-direction: row;
+	align-content: center;
+
+	.components-form-token-field__remove-token-button {
+		padding: 0;
+		height: 1.5em;
 	}
 }

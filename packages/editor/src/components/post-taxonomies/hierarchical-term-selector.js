@@ -6,17 +6,17 @@ import { find, get, unescape as unescapeString } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, _n, _x, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import {
 	Button,
 	CheckboxControl,
+	ComboboxControl,
 	TextControl,
 	TreeSelect,
 	withFilters,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useDebounce } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
 
@@ -37,9 +37,19 @@ const DEFAULT_QUERY = {
 	context: 'view',
 };
 
-const MIN_TERMS_COUNT_FOR_FILTER = 8;
-
 const EMPTY_ARRAY = [];
+
+const RemovableCategory = ( { onRemove, children } ) => (
+	<span className="components-form-token-field__remove-token">
+		{ children }
+		<Button
+			icon="no-alt"
+			label={ __( 'Remove category' ) }
+			onClick={ onRemove }
+			className="components-form-token-field__remove-token-button"
+		/>
+	</span>
+);
 
 /**
  * Sort Terms by Selected.
@@ -160,9 +170,6 @@ export function HierarchicalTermSelector( { slug } ) {
 	 */
 	const [ formParent, setFormParent ] = useState( '' );
 	const [ showForm, setShowForm ] = useState( false );
-	const [ filterValue, setFilterValue ] = useState( '' );
-	const [ filteredTermsTree, setFilteredTermsTree ] = useState( [] );
-	const debouncedSpeak = useDebounce( speak, 500 );
 
 	const {
 		hasCreateAction,
@@ -251,11 +258,15 @@ export function HierarchicalTermSelector( { slug } ) {
 	};
 
 	/**
-	 * Handler for checking term.
+	 * Handler for checking term with added support to clear items if termId does not exists.
 	 *
 	 * @param {number} termId
 	 */
 	const onChange = ( termId ) => {
+		if ( ! find( availableTerms, { id: termId } ) ) {
+			onUpdateTerms( [] );
+			return;
+		}
 		const hasTerm = terms.includes( termId );
 		const newTerms = hasTerm
 			? terms.filter( ( id ) => id !== termId )
@@ -322,60 +333,6 @@ export function HierarchicalTermSelector( { slug } ) {
 		onUpdateTerms( [ ...terms, newTerm.id ] );
 	};
 
-	const setFilter = ( value ) => {
-		const newFilteredTermsTree = availableTermsTree
-			.map( getFilterMatcher( value ) )
-			.filter( ( term ) => term );
-		const getResultCount = ( termsTree ) => {
-			let count = 0;
-			for ( let i = 0; i < termsTree.length; i++ ) {
-				count++;
-				if ( undefined !== termsTree[ i ].children ) {
-					count += getResultCount( termsTree[ i ].children );
-				}
-			}
-			return count;
-		};
-
-		setFilterValue( value );
-		setFilteredTermsTree( newFilteredTermsTree );
-
-		const resultCount = getResultCount( newFilteredTermsTree );
-		const resultsFoundMessage = sprintf(
-			/* translators: %d: number of results */
-			_n( '%d result found.', '%d results found.', resultCount ),
-			resultCount
-		);
-
-		debouncedSpeak( resultsFoundMessage, 'assertive' );
-	};
-
-	const renderTerms = ( renderedTerms ) => {
-		return renderedTerms.map( ( term ) => {
-			return (
-				<div
-					key={ term.id }
-					className="editor-post-taxonomies__hierarchical-terms-choice"
-				>
-					<CheckboxControl
-						__nextHasNoMarginBottom
-						checked={ terms.indexOf( term.id ) !== -1 }
-						onChange={ () => {
-							const termId = parseInt( term.id, 10 );
-							onChange( termId );
-						} }
-						label={ unescapeString( term.name ) }
-					/>
-					{ !! term.children.length && (
-						<div className="editor-post-taxonomies__hierarchical-terms-subchoices">
-							{ renderTerms( term.children ) }
-						</div>
-					) }
-				</div>
-			);
-		} );
-	};
-
 	const labelWithFallback = (
 		labelProperty,
 		fallbackIsCategory,
@@ -409,27 +366,86 @@ export function HierarchicalTermSelector( { slug } ) {
 		__( 'Search Terms' )
 	);
 	const groupLabel = get( taxonomy, [ 'name' ], __( 'Terms' ) );
-	const showFilter = availableTerms.length >= MIN_TERMS_COUNT_FOR_FILTER;
+
+	//Flats the terms tree into a list of terms starting with parents and ending with children.
+	const listify = ( tree, list = [] ) => {
+		for ( let i = 0; i < tree.length; i++ ) {
+			list.push( tree[ i ] );
+			if ( undefined !== tree[ i ].children ) {
+				listify( tree[ i ].children, list );
+			}
+		}
+		return list;
+	};
+	const flatTreeAvaiableTerms = listify( availableTermsTree );
+
+	const renderTermWithLevelAsMargin = ( term ) => {
+		const margin = term.level * 16;
+		return (
+			<div
+				key={ term.id }
+				className="editor-post-taxonomies__hierarchical-terms-choice"
+				style={ { marginLeft: margin } }
+			>
+				<CheckboxControl
+					__nextHasNoMarginBottom
+					checked={ terms.indexOf( term.id ) !== -1 }
+					onChange={ () => {
+						const termId = parseInt( term.id, 10 );
+						onChange( termId );
+					} }
+					label={ unescapeString( term.name ) }
+				/>
+			</div>
+		);
+	};
+
+	const TermsComboboxSelector = () => {
+		return (
+			<ComboboxControl
+				help={ __(
+					'Select a term from the list or type to filter the list.'
+				) }
+				label={ filterLabel }
+				value={ terms }
+				allowReset
+				options={ flatTreeAvaiableTerms.map( ( term ) => ( {
+					value: term.id,
+					label: term.name,
+					...term,
+				} ) ) }
+				onChange={ onChange }
+				__experimentalRenderItem={ ( { item } ) => {
+					return renderTermWithLevelAsMargin( item );
+				} }
+			/>
+		);
+	};
+
+	const getTermNameById = ( id ) => {
+		const foundTerm = flatTreeAvaiableTerms.find(
+			( term ) => term.id === id
+		);
+		return foundTerm ? foundTerm.name : '';
+	};
 
 	return (
 		<>
-			{ showFilter && (
-				<TextControl
-					className="editor-post-taxonomies__hierarchical-terms-filter"
-					label={ filterLabel }
-					value={ filterValue }
-					onChange={ setFilter }
-				/>
-			) }
 			<div
 				className="editor-post-taxonomies__hierarchical-terms-list"
 				tabIndex="0"
 				role="group"
 				aria-label={ groupLabel }
 			>
-				{ renderTerms(
-					'' !== filterValue ? filteredTermsTree : availableTermsTree
-				) }
+				<TermsComboboxSelector />
+				{ terms.map( ( termId ) => (
+					<RemovableCategory
+						onRemove={ () => onChange( termId ) }
+						key={ termId }
+					>
+						{ getTermNameById( termId ) }
+					</RemovableCategory>
+				) ) }
 			</div>
 			{ ! loading && hasCreateAction && (
 				<Button
