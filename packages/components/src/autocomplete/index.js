@@ -14,6 +14,15 @@ import {
 	useRef,
 	useMemo,
 } from '@wordpress/element';
+import {
+	ENTER,
+	ESCAPE,
+	UP,
+	DOWN,
+	LEFT,
+	RIGHT,
+	BACKSPACE,
+} from '@wordpress/keycodes';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import {
 	useInstanceId,
@@ -212,7 +221,7 @@ function useAutocomplete( {
 	}
 
 	function handleKeyDown( event ) {
-		backspacing.current = event.code === 'Backspace';
+		backspacing.current = event.keyCode === BACKSPACE;
 
 		if ( ! autocompleter ) {
 			return;
@@ -223,8 +232,8 @@ function useAutocomplete( {
 		if ( event.defaultPrevented ) {
 			return;
 		}
-		switch ( event.code ) {
-			case 'ArrowUp':
+		switch ( event.keyCode ) {
+			case UP:
 				setSelectedIndex(
 					( selectedIndex === 0
 						? filteredOptions.length
@@ -232,24 +241,24 @@ function useAutocomplete( {
 				);
 				break;
 
-			case 'ArrowDown':
+			case DOWN:
 				setSelectedIndex(
 					( selectedIndex + 1 ) % filteredOptions.length
 				);
 				break;
 
-			case 'Escape':
+			case ESCAPE:
 				setAutocompleter( null );
 				setAutocompleterUI( null );
 				event.preventDefault();
 				break;
 
-			case 'Enter':
+			case ENTER:
 				select( filteredOptions[ selectedIndex ] );
 				break;
 
-			case 'ArrowLeft':
-			case 'ArrowRight':
+			case LEFT:
+			case RIGHT:
 				reset();
 				return;
 
@@ -257,7 +266,7 @@ function useAutocomplete( {
 				return;
 		}
 
-		// Any handled key should prevent original behavior. This relies on
+		// Any handled keycode should prevent original behavior. This relies on
 		// the early return in the default case.
 		event.preventDefault();
 	}
