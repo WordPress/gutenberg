@@ -656,7 +656,7 @@ export const hasChildBlocksWithInserterSupport = ( blockName ) => {
 };
 
 /**
- * Registers a new block style variation for the given block.
+ * Registers a new block style for the given block.
  *
  * For more information on connecting the styles with CSS [the official documentation](/docs/reference-guides/block-api/block-styles.md#styles)
  *
@@ -691,7 +691,7 @@ export const registerBlockStyle = ( blockName, styleVariation ) => {
 };
 
 /**
- * Unregisters a block style variation for the given block.
+ * Unregisters a block style for the given block.
  *
  * @param {string} blockName          Name of block (example: “core/latest-posts”).
  * @param {string} styleVariationName Name of class applied to the block.

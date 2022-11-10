@@ -19,6 +19,7 @@ import { Root } from './styles/angle-picker-control-styles';
 import { space } from '../ui/utils/space';
 import { Text } from '../text';
 import { Spacer } from '../spacer';
+import { COLORS } from '../utils/colors-values';
 
 export default function AnglePickerControl( {
 	/** Start opting into the new margin-free styles that will become the default in a future version. */
@@ -70,7 +71,7 @@ export default function AnglePickerControl( {
 							marginBottom={ 0 }
 							marginRight={ space( 3 ) }
 							style={ {
-								color: 'var( --wp-admin-theme-color )',
+								color: COLORS.ui.theme,
 							} }
 						>
 							°
