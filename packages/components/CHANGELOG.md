@@ -9,6 +9,7 @@
 ### Bug Fix
 
 -   `Autocomplete`: Fix unexpected block insertion during IME composition ([#45510](https://github.com/WordPress/gutenberg/pull/45510)).
+-   `Icon`: Making size prop work for icon components using dash icon strings ([#45593](https://github.com/WordPress/gutenberg/pull/45593))
 
 ## 22.0.0 (2022-11-02)
 
