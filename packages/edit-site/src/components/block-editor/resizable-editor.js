@@ -100,11 +100,7 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 			} }
 		>
 			<Iframe
-				scale={
-					( isZoomOutMode && 0.45 ) ||
-					( canvasMode === 'view' && 0.8 ) ||
-					undefined
-				}
+				scale={ ( isZoomOutMode && 0.45 ) || undefined }
 				frameSize={ isZoomOutMode ? 100 : undefined }
 				style={ isResizingEnabled ? {} : deviceStyles }
 				head={
