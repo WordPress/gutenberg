@@ -24,8 +24,14 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$post_ID             = $block->context['postId'];
-	$more_text           = ! empty( $attributes['moreText'] ) ? '<a class="wp-block-post-excerpt__more-link" href="' . esc_url( get_the_permalink( $post_ID ) ) . '" aria-label="' . esc_attr__( "Post ID: " . $post_ID ) . '">' . wp_kses_post( $attributes['moreText'] ) . '<span class="screen-reader-text">'. get_the_title( $post_ID ) . '</span></a>' : '';
+	$post_ID            = $block->context['postId'];
+	$post_title         = get_the_title( $post_ID );
+	$screen_reader_text = sprintf(
+		/* translators: %s is either the post title or post ID to describe the link for screen readers. */
+		__( ': %s' ),
+		'' !== $post_title ? $post_title : __( 'untitled post ' ) . $post_ID
+	);
+	$more_text           = ! empty( $attributes['moreText'] ) ? '<a class="wp-block-post-excerpt__more-link" href="' . esc_url( get_the_permalink( $post_ID ) ) . '">' . wp_kses_post( $attributes['moreText'] ) . '<span class="screen-reader-text">' . $screen_reader_text . '</span></a>' : '';
 	$filter_excerpt_more = function( $more ) use ( $more_text ) {
 		return empty( $more_text ) ? $more : '';
 	};
