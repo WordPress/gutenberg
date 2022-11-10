@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -33,7 +33,9 @@ describe( 'Dropdown', () => {
 
 		await user.click( button );
 		expect( button ).toHaveAttribute( 'aria-expanded', 'true' );
-		expect( screen.getByText( 'Content' ) ).toBeVisible();
+		await waitFor( () => {
+			expect( screen.getByText( 'Content' ) ).toBeVisible();
+		} );
 	} );
 
 	it( 'should close the dropdown when calling onClose', async () => {
@@ -60,7 +62,9 @@ describe( 'Dropdown', () => {
 		expect( screen.queryByText( 'Content' ) ).not.toBeInTheDocument();
 
 		await user.click( openButton );
-		expect( screen.getByText( 'Content' ) ).toBeVisible();
+		await waitFor( () => {
+			expect( screen.getByText( 'Content' ) ).toBeVisible();
+		} );
 
 		await user.click( closeButton );
 		expect( screen.queryByText( 'Content' ) ).not.toBeInTheDocument();
