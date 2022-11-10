@@ -31,7 +31,10 @@ describe( 'Dropdown', () => {
 		expect( button ).toBeVisible();
 
 		await user.click( button );
-		expect( button ).toHaveAttribute( 'aria-expanded', 'true' );
+
+		expect(
+			screen.getByRole( 'button', { expanded: true } )
+		).toBeVisible();
 		await waitFor( () => {
 			expect( screen.getByText( 'Content' ) ).toBeVisible();
 		} );
