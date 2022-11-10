@@ -8,7 +8,6 @@ import classnames from 'classnames';
  */
 import { useCallback, useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
-import { store as coreStore } from '@wordpress/core-data';
 import {
 	ToolSelector,
 	__experimentalPreviewOptions as PreviewOptions,
