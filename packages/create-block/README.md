@@ -4,7 +4,9 @@ Create Block is an **officially supported tool for scaffolding a WordPress plugi
 
 _It is largely inspired by [create-react-app](https://create-react-app.dev/docs/getting-started). Major kudos to [@gaearon](https://github.com/gaearon), the whole Facebook team, and the React community._
 
-> Blocks are the fundamental element of the WordPress block editor. They are the primary way in which plugins can register their functionality and extend the editor's capabilities. _Visit the [Gutenberg handbook](https://developer.wordpress.org/block-editor/developers/block-api/block-registration/) to learn more about Block API._
+> **Blocks are the fundamental elements of modern WordPress sites**. Introduced in WordPress 5.0, they allow page and post builder-like functionality to every up-to-date WordPress website.
+
+> _At the [Gutenberg HandBook you can learn more about Block API](https://developer.wordpress.org/block-editor/developers/block-api/block-registration/)._
 
 ## Table of Contents 
 
@@ -44,24 +46,25 @@ $ npx @wordpress/create-block [options] [slug]
 
 ![Demo](https://user-images.githubusercontent.com/699132/103872910-4de15f00-50cf-11eb-8c74-67ca91a8c1a4.gif)
 
-> When you scaffold a block, you must provide at least a `slug` name, the `namespace` which usually corresponds to either the `theme` or `plugin` name. In most cases, we recommended pairing blocks with WordPress plugins rather than themes, because only using plugin ensures that all blocks still work when your theme changes.
+> The name for a block is a unique string that identifies a block. Block Names are structured as `namespace`/`slug`, where namespace is the name of your plugin or theme.
+
+> In most cases, we recommended pairing blocks with WordPress plugins rather than themes, because only using plugin ensures that all blocks still work when your theme changes.
+
+### Interactive Mode
+
+When no `[slug]` is provided, the script will run in interactive mode and will start prompting for the input required (`slug`, title, namespace...) to scaffold the project.
 
 
 ### `slug`
 
 The use of `[slug]` is optional. 
 
-When provided, it triggers the _quick mode_ where it is used:
+When provided it triggers the _quick mode_,  where it is used:
 - as the block slug (required for its identification)
 - as the output location (folder name) for scaffolded files
 - as the name of the WordPress plugin. 
 
 The rest of the configuration is set to all default values unless overridden with some options listed below.
-
-### Interactive Mode
-
-When no `[slug]` is provided, the script will run in interactive mode and will start prompting for the input required to scaffold the project.
-
 
 ### `options`
 
@@ -120,7 +123,7 @@ $ npx @wordpress/create-block --no-plugin
 ```
 #### `--wp-env`
 
-With this argument, the `create-block` package will add to the generated plugin the configuration and the script to run [`wp-env` package](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/) within the plugin. This will allow you to easily set up a local WordPress environment for building and testing the generated plugin. 
+With this argument, the `create-block` package will add to the generated plugin the configuration and the script to run [`wp-env` package](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/) within the plugin. This will allow you to easily set up a local WordPress environment (via Docker) for building and testing the generated plugin. 
 
 ```bash
 $ npx @wordpress/create-block --wp-env
