@@ -297,11 +297,15 @@ describe( 'FormTokenField', () => {
 			// Press backspace to remove the last token ("mango")
 			input.focus();
 			triggerBackspace( input );
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
+			expect( onChangeSpy ).toHaveBeenLastCalledWith( [ 'banana' ] );
 			expectTokensToBeInTheDocument( [ 'banana' ] );
 			expectTokensNotToBeInTheDocument( [ 'mango' ] );
 
 			// Press backspace to remove the last token ("banana")
 			triggerBackspace( input );
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 2 );
+			expect( onChangeSpy ).toHaveBeenLastCalledWith( [] );
 			expectTokensNotToBeInTheDocument( [ 'banana', 'mango' ] );
 		} );
 
@@ -404,9 +408,7 @@ describe( 'FormTokenField', () => {
 
 			// Add 'guava' token by typing it and pressing enter to tokenize it.
 			await user.type( input, 'guava' );
-			fireEvent.keyDown( input, {
-				keyCode: ENTER,
-			} );
+			triggerEnter( input );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'papaya', 'guava' ] );
 			expectTokensToBeInTheDocument( [ 'papaya', 'guava' ] );
@@ -414,9 +416,7 @@ describe( 'FormTokenField', () => {
 			// Try to add a 'papaya' token by typing it and pressing enter to tokenize it,
 			// but the token won't be added because it already exists.
 			await user.type( input, 'papaya' );
-			fireEvent.keyDown( input, {
-				keyCode: ENTER,
-			} );
+			triggerEnter( input );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expectTokensToBeInTheDocument( [ 'papaya', 'guava' ] );
 		} );
@@ -904,7 +904,6 @@ describe( 'FormTokenField', () => {
 			).toHaveLength( 0 );
 
 			// Pressing the down arrow will select "Salmon"
-			await user.keyboard( '[ArrowDown]' );
 			triggerArrowDown( input );
 
 			expect(
@@ -935,7 +934,6 @@ describe( 'FormTokenField', () => {
 			).toHaveAccessibleName( 'Carnation' );
 
 			// Pressing enter will add "Carnation" as a token and close the suggestion list
-			await user.keyboard( '[Enter]' );
 			triggerEnter( input );
 
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
