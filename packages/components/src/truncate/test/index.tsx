@@ -11,7 +11,7 @@ import { Truncate } from '..';
 describe( 'props', () => {
 	test( 'should render correctly', () => {
 		render( <Truncate>Lorem ipsum.</Truncate> );
-		expect( screen.getByText( 'Lorem ipsum.' ) ).toBeInTheDocument();
+		expect( screen.getByText( 'Lorem ipsum.' ) ).toBeVisible();
 	} );
 
 	test( 'should render limit', () => {
@@ -20,7 +20,7 @@ describe( 'props', () => {
 				Lorem ipsum.
 			</Truncate>
 		);
-		expect( screen.getByText( 'L…' ) ).toBeInTheDocument();
+		expect( screen.getByText( 'L…' ) ).toBeVisible();
 	} );
 
 	test( 'should render custom ellipsis', () => {
@@ -29,7 +29,7 @@ describe( 'props', () => {
 				Lorem ipsum.
 			</Truncate>
 		);
-		expect( screen.getByText( 'Lorem!!!' ) ).toBeInTheDocument();
+		expect( screen.getByText( 'Lorem!!!' ) ).toBeVisible();
 	} );
 
 	test( 'should render custom ellipsizeMode', () => {
@@ -38,6 +38,6 @@ describe( 'props', () => {
 				Lorem ipsum.
 			</Truncate>
 		);
-		expect( screen.getByText( 'Lo!!!m.' ) ).toBeInTheDocument();
+		expect( screen.getByText( 'Lo!!!m.' ) ).toBeVisible();
 	} );
 } );
