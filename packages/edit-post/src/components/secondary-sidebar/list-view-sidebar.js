@@ -43,8 +43,6 @@ export default function ListViewSidebar() {
 
 	const [ tab, setTab ] = useState( 'list-view' );
 
-	// This ref refers to the list view only.
-	const listViewRef = useRef();
 	// This ref refers to the sidebar as a whole.
 	const sidebarRef = useRef();
 	// This only fires when the sidebar is open because of the conditional rendering. It is the same shortcut to open but that is defined as a global shortcut and only fires when the sidebar is closed.
@@ -58,8 +56,12 @@ export default function ListViewSidebar() {
 			setIsListViewOpened( false );
 			// If the list view does not have focus, we should move focus to it.
 		} else if ( tab === 'list-view' ) {
-			// Find the 1st tabbable based on the attached list view ref.
-			focus.tabbable.find( listViewRef.current )[ 0 ].focus();
+			// Find tabbables based on the attached sidebar ref.
+			const listViewTabbables = focus.tabbable.find( sidebarRef.current );
+			// Either focus the list view or the list view tab. Must have a fallback because the list view does not render when there are no blocks.
+			const listViewFocusLocation =
+				listViewTabbables[ 3 ] || listViewTabbables[ 1 ];
+			listViewFocusLocation.focus();
 			// If the outline does not have focus, we should move focus to it.
 		} else if ( tab === 'outline' ) {
 			// Find the 3rd tabbable based on the attached sidebar ref. This is to skip over the close button, list view tab button, and landing on outline tab button since there is nothing else to focus after.
@@ -119,7 +121,6 @@ export default function ListViewSidebar() {
 				ref={ useMergeRefs( [
 					contentFocusReturnRef,
 					focusOnMountRef,
-					listViewRef,
 				] ) }
 				className="edit-post-editor__list-view-container"
 			>
