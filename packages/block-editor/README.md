@@ -428,7 +428,6 @@ _Parameters_
 -   _args.minimumFontSize_ `?string`: Minimum font size for any clamp() calculation. Optional.
 -   _args.scaleFactor_ `?number`: A scale factor to determine how fast a font scales within boundaries. Optional.
 -   _args.minimumFontSizeFactor_ `?number`: How much to scale defaultFontSize by to derive minimumFontSize. Optional.
--   _args.maximumFontSizeFactor_ `?number`: How much to scale defaultFontSize by to derive maximumFontSize. Optional.
 
 _Returns_
 
