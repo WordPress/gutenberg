@@ -25,11 +25,10 @@ describe( 'Dropdown', () => {
 		const user = userEvent.setup( {
 			advanceTimers: jest.advanceTimersByTime,
 		} );
-		const button = screen.getByRole( 'button' );
+		const button = screen.getByRole( 'button', { expanded: false } );
 
 		expect( screen.queryByText( 'Content' ) ).not.toBeInTheDocument();
 		expect( button ).toBeVisible();
-		expect( button ).toHaveAttribute( 'aria-expanded', 'false' );
 
 		await user.click( button );
 		expect( button ).toHaveAttribute( 'aria-expanded', 'true' );
