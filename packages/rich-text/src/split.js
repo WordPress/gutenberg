@@ -56,7 +56,8 @@ export function split( { formats, replacements, text, start, end }, string ) {
 
 function splitAtSelection(
 	{ formats, replacements, text, start, end },
-	startIndex = start
+	startIndex = start,
+	endIndex = end
 ) {
 	if ( start === undefined || end === undefined ) {
 		return;
@@ -68,9 +69,9 @@ function splitAtSelection(
 		text: text.slice( 0, startIndex ),
 	};
 	const after = {
-		formats: formats.slice( startIndex ),
-		replacements: replacements.slice( startIndex ),
-		text: text.slice( startIndex ),
+		formats: formats.slice( endIndex ),
+		replacements: replacements.slice( endIndex ),
+		text: text.slice( endIndex ),
 		start: 0,
 		end: 0,
 	};
