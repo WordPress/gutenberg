@@ -46,12 +46,21 @@ if ( ! function_exists( 'wp_theme_has_theme_json' ) ) {
 }
 
 if ( ! function_exists( 'wp_theme_has_theme_json_clean_cache' ) ) {
+	/**
+	 * Function to clean the cache used by wp_theme_has_theme_json method.
+	 */
 	function wp_theme_has_theme_json_clean_cache() {
 		wp_cache_delete( 'wp_theme_has_theme_json', 'theme_json' );
 	}
 }
 
 if ( ! function_exists( '_wp_theme_has_theme_json_clean_cache_upon_upgrading_active_theme' ) ) {
+	/**
+	 * Private function to clean the cache used by wp_theme_has_theme_json method.
+	 *
+	 * @param WP_Upgrader $upgrader Instance of WP_Upgrader class.
+	 * @param array $options Metadata that identifies the data that is updated.
+	 */
 	function _wp_theme_has_theme_json_clean_cache_upon_upgrading_active_theme( $upgrader, $options ) {
 		// The cache only needs cleaning when the active theme was updated.
 		if (
