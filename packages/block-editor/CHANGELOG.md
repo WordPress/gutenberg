@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   `BlockLockModal`: Move Icon component out of CheckboxControl label ([#45535](https://github.com/WordPress/gutenberg/pull/45535))
+
 ## 10.4.0 (2022-11-02)
 
 ### Bug Fix
