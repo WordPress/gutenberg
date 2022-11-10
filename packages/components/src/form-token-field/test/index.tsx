@@ -2,12 +2,27 @@
  * External dependencies
  */
 import {
+	fireEvent,
 	render,
 	screen,
 	within,
 	getDefaultNormalizer,
 	waitFor,
 } from '@testing-library/react';
+
+/**
+ * WordPress dependencies
+ */
+import {
+	BACKSPACE,
+	ENTER,
+	UP,
+	DOWN,
+	LEFT,
+	RIGHT,
+	DELETE,
+	ESCAPE,
+} from '@wordpress/keycodes';
 import userEvent from '@testing-library/user-event';
 import type { ComponentProps } from 'react';
 
@@ -20,6 +35,54 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import FormTokenField from '../';
+
+function triggerEnter( element: Element ) {
+	fireEvent.keyDown( element, {
+		keyCode: ENTER,
+	} );
+}
+
+function triggerBackspace( element: Element ) {
+	fireEvent.keyDown( element, {
+		keyCode: BACKSPACE,
+	} );
+}
+
+function triggerArrowRight( element: Element ) {
+	fireEvent.keyDown( element, {
+		keyCode: RIGHT,
+	} );
+}
+
+function triggerArrowLeft( element: Element ) {
+	fireEvent.keyDown( element, {
+		keyCode: LEFT,
+	} );
+}
+
+function triggerArrowUp( element: Element ) {
+	fireEvent.keyDown( element, {
+		keyCode: UP,
+	} );
+}
+
+function triggerArrowDown( element: Element ) {
+	fireEvent.keyDown( element, {
+		keyCode: DOWN,
+	} );
+}
+
+function triggerDelete( element: Element ) {
+	fireEvent.keyDown( element, {
+		keyCode: DELETE,
+	} );
+}
+
+function triggerEscape( element: Element ) {
+	fireEvent.keyDown( element, {
+		keyCode: ESCAPE,
+	} );
+}
 
 const FormTokenFieldWithState = ( {
 	onChange,
@@ -118,13 +181,15 @@ describe( 'FormTokenField', () => {
 			const input = screen.getByRole( 'combobox' );
 
 			// Add 'apple' token by typing it and pressing enter to tokenize it.
-			await user.type( input, 'apple[Enter]' );
+			await user.type( input, 'apple' );
+			triggerEnter( input );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'apple' ] );
 			expectTokensToBeInTheDocument( [ 'apple' ] );
 
 			// Add 'pear' token by typing it and pressing enter to tokenize it.
-			await user.type( input, 'pear[Enter]' );
+			await user.type( input, 'pear' );
+			triggerEnter( input );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 2 );
 			expect( onChangeSpy ).toHaveBeenLastCalledWith( [
 				'apple',
@@ -165,7 +230,8 @@ describe( 'FormTokenField', () => {
 			const input = screen.getByRole( 'combobox' );
 
 			// Add 'dragon fruit' token by typing it and pressing enter to tokenize it.
-			await user.type( input, 'dragon fruit[Enter]' );
+			await user.type( input, 'dragon fruit' );
+			triggerEnter( input );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'dragon fruit' ] );
 			expectTokensToBeInTheDocument( [ 'dragon fruit' ] );
@@ -179,7 +245,8 @@ describe( 'FormTokenField', () => {
 
 			// Add 'dragon fruit' token by typing it and pressing enter to tokenize it,
 			// this time two separate tokens should be added
-			await user.type( input, 'dragon fruit[Enter]' );
+			await user.type( input, 'dragon fruit' );
+			triggerEnter( input );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 3 );
 			expect( onChangeSpy ).toHaveBeenNthCalledWith( 2, [
 				'dragon fruit',
@@ -216,10 +283,6 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should remove the last token when pressing the backspace key', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
-
 			const onChangeSpy = jest.fn();
 
 			render(
@@ -232,14 +295,15 @@ describe( 'FormTokenField', () => {
 			const input = screen.getByRole( 'combobox' );
 
 			// Press backspace to remove the last token ("mango")
-			await user.type( input, '[Backspace]' );
+			input.focus();
+			triggerBackspace( input );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expect( onChangeSpy ).toHaveBeenLastCalledWith( [ 'banana' ] );
 			expectTokensToBeInTheDocument( [ 'banana' ] );
 			expectTokensNotToBeInTheDocument( [ 'mango' ] );
 
 			// Press backspace to remove the last token ("banana")
-			await user.type( input, '[Backspace]' );
+			triggerBackspace( input );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 2 );
 			expect( onChangeSpy ).toHaveBeenLastCalledWith( [] );
 			expectTokensNotToBeInTheDocument( [ 'banana', 'mango' ] );
@@ -343,23 +407,21 @@ describe( 'FormTokenField', () => {
 			const input = screen.getByRole( 'combobox' );
 
 			// Add 'guava' token by typing it and pressing enter to tokenize it.
-			await user.type( input, 'guava[Enter]' );
+			await user.type( input, 'guava' );
+			triggerEnter( input );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'papaya', 'guava' ] );
 			expectTokensToBeInTheDocument( [ 'papaya', 'guava' ] );
 
 			// Try to add a 'papaya' token by typing it and pressing enter to tokenize it,
 			// but the token won't be added because it already exists.
-			await user.type( input, 'papaya[Enter]' );
+			await user.type( input, 'papaya' );
+			triggerEnter( input );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expectTokensToBeInTheDocument( [ 'papaya', 'guava' ] );
 		} );
 
 		it( 'should not add a new token if the text input is blank', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
-
 			const onChangeSpy = jest.fn();
 
 			render(
@@ -372,7 +434,9 @@ describe( 'FormTokenField', () => {
 			const input = screen.getByRole( 'combobox' );
 
 			// Press enter on an empty input, no token gets added
-			await user.type( input, '[Enter]' );
+			input.focus();
+			triggerEnter( input );
+
 			expect( onChangeSpy ).not.toHaveBeenCalled();
 			expectTokensToBeInTheDocument( [ 'melon' ] );
 		} );
@@ -381,7 +445,6 @@ describe( 'FormTokenField', () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
-
 			const onChangeSpy = jest.fn();
 
 			render(
@@ -402,12 +465,14 @@ describe( 'FormTokenField', () => {
 
 			// Press "delete" to delete the token in front of the cursor, but since
 			// there's no token in front of the cursor, nothing happens
-			await user.type( input, '[Delete]' );
+			input.focus();
+			triggerDelete( input );
 
 			// Pressing the right arrow doesn't move the cursor because there are no
 			// tokens in front of it, and therefore pressing "delete" yields the same
 			// result as before — no tokens are deleted.
-			await user.type( input, '[ArrowRight][Delete]' );
+			triggerArrowRight( input );
+			triggerDelete( input );
 
 			// Proof that so far, all keyboard interactions didn't delete any tokens.
 			expect( onChangeSpy ).not.toHaveBeenCalled();
@@ -421,10 +486,12 @@ describe( 'FormTokenField', () => {
 			// Press the left arrow 4 times, moving cursor between the "kiwi" and
 			// "peach" tokens. Pressing the "delete" key will delete the "peach"
 			// token, since it's in front of the cursor.
-			await user.type(
-				input,
-				'[ArrowLeft][ArrowLeft][ArrowLeft][ArrowLeft][Delete]'
-			);
+			triggerArrowLeft( input );
+			triggerArrowLeft( input );
+			triggerArrowLeft( input );
+			triggerArrowLeft( input );
+			triggerDelete( input );
+
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expect( onChangeSpy ).toHaveBeenCalledWith( [
 				'peach',
@@ -440,20 +507,21 @@ describe( 'FormTokenField', () => {
 
 			// Press backspace to delete the token before the cursor, but since
 			// there's no token before the cursor, nothing happens
-			await user.type( input, '[Backspace]' );
+			triggerBackspace( input );
 
 			// Pressing the left arrow doesn't move the cursor because there are no
 			// tokens before it, and therefore pressing backspace yields the same
 			// result as before — no tokens are deleted.
-			await user.type( input, '[ArrowLeft][Backspace]' );
-
+			triggerArrowLeft( input );
+			triggerBackspace( input );
 			// Proof that pressing backspace hasn't caused any further token deletion.
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 
 			// Press the right arrow, moving cursor between the "kiwi" and
 			// "nectarine" tokens. Pressing the "delete" key will delete the "nectarine"
 			// token, since it's in front of the cursor.
-			await user.type( input, '[ArrowRight][Delete]' );
+			triggerArrowRight( input );
+			triggerDelete( input );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 2 );
 			expect( onChangeSpy ).toHaveBeenCalledWith( [
 				'peach',
@@ -464,7 +532,8 @@ describe( 'FormTokenField', () => {
 
 			// Add 'starfruit' token while the cursor is in between the "peach" and
 			// "coconut" tokens.
-			await user.type( input, 'starfruit[Enter]' );
+			await user.type( input, 'starfruit' );
+			triggerEnter( input );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 3 );
 			expect( onChangeSpy ).toHaveBeenCalledWith( [
 				'peach',
@@ -619,7 +688,8 @@ describe( 'FormTokenField', () => {
 			const input = screen.getByRole( 'combobox' );
 
 			// Add 'blueberry' token. The placeholder text should not be shown anymore
-			await user.type( input, 'blueberry[Enter]' );
+			await user.type( input, 'blueberry' );
+			triggerEnter( input );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'blueberry' ] );
 			expectTokensToBeInTheDocument( [ 'blueberry' ] );
@@ -646,7 +716,8 @@ describe( 'FormTokenField', () => {
 			const input = screen.getByRole( 'combobox' );
 
 			// Add 'عربى' token by typing it and pressing enter to tokenize it.
-			await user.type( input, 'عربى[Enter]' );
+			await user.type( input, 'عربى' );
+			triggerEnter( input );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expect( onChangeSpy ).toHaveBeenCalledWith( [
 				'français',
@@ -833,7 +904,7 @@ describe( 'FormTokenField', () => {
 			).toHaveLength( 0 );
 
 			// Pressing the down arrow will select "Salmon"
-			await user.keyboard( '[ArrowDown]' );
+			triggerArrowDown( input );
 
 			expect(
 				within( suggestionList ).getByRole( 'option', {
@@ -843,7 +914,7 @@ describe( 'FormTokenField', () => {
 
 			// Pressing the up arrow will select "Neon" (the selection wraps around
 			// the list)
-			await user.keyboard( '[ArrowUp]' );
+			triggerArrowUp( input );
 
 			expect(
 				within( suggestionList ).getByRole( 'option', {
@@ -853,7 +924,8 @@ describe( 'FormTokenField', () => {
 
 			// Pressing the down arrow twice will select "Carnation" (the selection
 			// wraps around the list)
-			await user.keyboard( '[ArrowDown][ArrowDown]' );
+			triggerArrowDown( input );
+			triggerArrowDown( input );
 
 			expect(
 				within( suggestionList ).getByRole( 'option', {
@@ -862,7 +934,7 @@ describe( 'FormTokenField', () => {
 			).toHaveAccessibleName( 'Carnation' );
 
 			// Pressing enter will add "Carnation" as a token and close the suggestion list
-			await user.keyboard( '[Enter]' );
+			triggerEnter( input );
 
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'Carnation' ] );
@@ -972,7 +1044,7 @@ describe( 'FormTokenField', () => {
 			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
 
 			// Pressing the ESC key will close the suggestion list
-			await user.keyboard( '[Escape]' );
+			triggerEscape( input );
 
 			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 			expect( onChangeSpy ).not.toHaveBeenCalled();
@@ -1174,8 +1246,10 @@ describe( 'FormTokenField', () => {
 				/>
 			);
 
+			const input = screen.getByRole( 'combobox' );
+
 			// Type "woo". Matching suggestion will be "Wood"
-			await user.type( screen.getByRole( 'combobox' ), 'woo' );
+			await user.type( input, 'woo' );
 
 			// The `__experimentalRenderItem` only affects the rendered suggestion,
 			// but doesn't change the underlying data `value`, nor the value
@@ -1184,7 +1258,8 @@ describe( 'FormTokenField', () => {
 				'Suggestion: Wood',
 			] );
 
-			await user.keyboard( '[ArrowDown][Enter]' );
+			triggerArrowDown( input );
+			triggerEnter( input );
 
 			expectTokensToBeInTheDocument( [ 'Wood' ] );
 		} );
@@ -1213,7 +1288,8 @@ describe( 'FormTokenField', () => {
 
 			const input = screen.getByRole( 'combobox' );
 
-			await user.type( input, 'Italy[Enter]' );
+			await user.type( input, 'Italy' );
+			triggerEnter( input );
 
 			expect( onChangeSpy ).not.toHaveBeenCalled();
 
@@ -1318,12 +1394,13 @@ describe( 'FormTokenField', () => {
 			const input = screen.getByRole( 'combobox' );
 
 			// Press enter on an empty input, no token gets added
-			await user.type( input, '[Enter]' );
+			triggerEnter( input );
 			expect( onChangeSpy ).not.toHaveBeenCalled();
 			expectTokensToBeInTheDocument( [ 'potato' ] );
 
 			// Add the "carrot" token - white space gets trimmed
-			await user.type( input, '  carrot   [Enter]' );
+			await user.type( input, '  carrot   ' );
+			triggerEnter( input );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expect( onChangeSpy ).toHaveBeenCalledWith( [
 				'potato',
@@ -1333,12 +1410,14 @@ describe( 'FormTokenField', () => {
 
 			// Press enter on an input containing a duplicate token but surrounded by
 			// white space, no token gets added
-			await user.type( input, '  potato   [Enter]' );
+			await user.type( input, '  potato   ' );
+			triggerEnter( input );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expectTokensToBeInTheDocument( [ 'potato', 'carrot' ] );
 
 			// Press enter on an input containing only spaces, no token gets added
-			await user.type( input, '    [Enter]' );
+			await user.type( input, '    ' );
+			triggerEnter( input );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expectTokensToBeInTheDocument( [ 'potato', 'carrot' ] );
 
@@ -1353,7 +1432,8 @@ describe( 'FormTokenField', () => {
 			// If a custom `saveTransform` function is passed, it will be the new
 			// function's duty to trim the whitespace if necessary.
 			await user.clear( input );
-			await user.type( input, '  parnsnip   [Enter]' );
+			await user.type( input, '  parnsnip   ' );
+			triggerEnter( input );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 2 );
 			expect( onChangeSpy ).toHaveBeenCalledWith( [
 				'potato',
@@ -1413,7 +1493,8 @@ describe( 'FormTokenField', () => {
 			// The saveTransform function will change its value to "medium jacket"
 			// when tokenizing it, thus affecting both the onChange callback and
 			// the text rendered in the document.
-			await user.type( input, 'small jacket[Enter]' );
+			await user.type( input, 'small jacket' );
+			triggerEnter( input );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expect( onChangeSpy ).toHaveBeenCalledWith( [
 				'small trousers',
@@ -1464,7 +1545,8 @@ describe( 'FormTokenField', () => {
 
 			// Selecting the suggestion will add the transformed value as a token,
 			// since the `saveTransform` function will be applied before tokenizing.
-			await user.keyboard( '[ArrowDown][Enter]' );
+			triggerArrowDown( input );
+			triggerEnter( input );
 
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expect( onChangeSpy ).toHaveBeenLastCalledWith( [ 'Free food' ] );
@@ -1511,7 +1593,8 @@ describe( 'FormTokenField', () => {
 			// The displayTransform function will change its displayed value to
 			// "light red", but the onChange callback will still receive "dark red" as
 			// part of the component's new value.
-			await user.type( input, 'dark red[Enter]' );
+			await user.type( input, 'dark red' );
+			triggerEnter( input );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expect( onChangeSpy ).toHaveBeenCalledWith( [
 				'dark blue',
@@ -1560,7 +1643,8 @@ describe( 'FormTokenField', () => {
 				'cold tea',
 			] );
 
-			await user.keyboard( '[ArrowDown][Enter]' );
+			triggerArrowDown( input );
+			triggerEnter( input );
 
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expect( onChangeSpy ).toHaveBeenLastCalledWith( [ 'Hot coffee' ] );
@@ -1642,7 +1726,8 @@ describe( 'FormTokenField', () => {
 			const input = screen.getByRole( 'combobox' );
 
 			// Add 'cherry' token by typing it and pressing enter to tokenize it.
-			await user.type( input, 'cherry[Enter]' );
+			await user.type( input, 'cherry' );
+			triggerEnter( input );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'cherry' ] );
 			expectTokensToBeInTheDocument( [ 'cherry' ] );
@@ -1659,14 +1744,16 @@ describe( 'FormTokenField', () => {
 			// Note that the any token added before is still around, even if it
 			// wouldn't pass the newly added validation — this is because the
 			// validation happens when the input\'s value gets tokenized.
-			await user.type( input, 'cranberry[Enter]' );
+			await user.type( input, 'cranberry' );
+			triggerEnter( input );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expectTokensToBeInTheDocument( [ 'cherry' ] );
 			expectTokensNotToBeInTheDocument( [ 'cranberry' ] );
 
 			// Retry, this time with capital letter. The value should be added.
 			await user.clear( input );
-			await user.type( input, 'Cranberry[Enter]' );
+			await user.type( input, 'Cranberry' );
+			triggerEnter( input );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 2 );
 			expectTokensToBeInTheDocument( [ 'cherry', 'Cranberry' ] );
 		} );
@@ -1694,7 +1781,8 @@ describe( 'FormTokenField', () => {
 
 			// Try to add the 'hexagon' token, but because the number of tokens already
 			// matches `maxLength`, the token won't be added.
-			await user.type( input, 'hexagon[Enter]' );
+			await user.type( input, 'hexagon' );
+			triggerEnter( input );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 0 );
 			expectTokensToBeInTheDocument( [ 'square', 'triangle', 'circle' ] );
 			expectTokensNotToBeInTheDocument( [ 'hexagon' ] );
@@ -1702,7 +1790,7 @@ describe( 'FormTokenField', () => {
 			// Delete the last token ("circle"), in order to make space for the
 			// hexagon token
 			await user.clear( input );
-			await user.keyboard( '[Backspace]' );
+			triggerBackspace( input );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expect( onChangeSpy ).toHaveBeenLastCalledWith( [
 				'square',
@@ -1714,7 +1802,8 @@ describe( 'FormTokenField', () => {
 			// Try to add the 'hexagon' token again. This time, the token will be
 			// added because the current number of tokens is below the `maxLength`
 			// threshold.
-			await user.type( input, 'hexagon[Enter]' );
+			await user.type( input, 'hexagon' );
+			triggerEnter( input );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 2 );
 			expect( onChangeSpy ).toHaveBeenLastCalledWith( [
 				'square',
@@ -1756,7 +1845,12 @@ describe( 'FormTokenField', () => {
 
 			const input = screen.getByRole( 'combobox' );
 
-			await user.type( input, 'cube[Enter]sphere[Enter]cylinder[Enter]' );
+			await user.type( input, 'cube' );
+			triggerEnter( input );
+			await user.type( input, 'sphere' );
+			triggerEnter( input );
+			await user.type( input, 'cylinder' );
+			triggerEnter( input );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 3 );
 			expect( onChangeSpy ).toHaveBeenLastCalledWith( [
 				'cube',
@@ -1780,7 +1874,8 @@ describe( 'FormTokenField', () => {
 
 			// Try to add the 'pyramid' token, but because the number of tokens already
 			// exceeds `maxLength`, the token won't be added.
-			await user.type( input, 'pyramid[Enter]' );
+			await user.type( input, 'pyramid' );
+			triggerEnter( input );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 3 );
 			expectTokensToBeInTheDocument( [ 'cube', 'sphere', 'cylinder' ] );
 			expectTokensNotToBeInTheDocument( [ 'pyramid' ] );
@@ -1802,7 +1897,8 @@ describe( 'FormTokenField', () => {
 			const input = screen.getByRole( 'combobox' );
 
 			// Add 'sun' token by typing it and pressing enter to tokenize it.
-			await user.type( input, 'sun[Enter]' );
+			await user.type( input, 'sun' );
+			triggerEnter( input );
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'sun' ] );
 			expectTokensToBeInTheDocument( [ 'sun' ] );
@@ -1876,7 +1972,8 @@ describe( 'FormTokenField', () => {
 			const input = screen.getByRole( 'combobox' );
 
 			// Add 'cat' token, check that the aria-live region has been updated.
-			await user.type( input, 'cat[Enter]' );
+			await user.type( input, 'cat' );
+			triggerEnter( input );
 
 			expect( screen.getByText( defaultMessages.added ) ).toHaveAttribute(
 				'aria-live',
@@ -1894,7 +1991,8 @@ describe( 'FormTokenField', () => {
 			const input = screen.getByRole( 'combobox' );
 
 			// Add 'dog' token, check that the aria-live region has been updated.
-			await user.type( input, 'dog[Enter]' );
+			await user.type( input, 'dog' );
+			triggerEnter( input );
 
 			expect( screen.getByText( customMessages.added ) ).toHaveAttribute(
 				'aria-live',
@@ -1903,16 +2001,13 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should announce to assistive technology the removal of a token', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
-
 			render( <FormTokenFieldWithState initialValue={ [ 'horse' ] } /> );
 
 			const input = screen.getByRole( 'combobox' );
 
 			// Delete "horse" token
-			await user.type( input, '[Backspace]' );
+			input.focus();
+			triggerBackspace( input );
 
 			expect(
 				screen.getByText( defaultMessages.removed )
@@ -1920,10 +2015,6 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should announce to assistive technology the removal of a token with a custom message', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
-
 			render(
 				<FormTokenFieldWithState
 					initialValue={ [ 'donkey' ] }
@@ -1934,7 +2025,8 @@ describe( 'FormTokenField', () => {
 			const input = screen.getByRole( 'combobox' );
 
 			// Delete "donkey" token
-			await user.type( input, '[Backspace]' );
+			input.focus();
+			triggerBackspace( input );
 
 			expect(
 				screen.getByText( customMessages.removed )
@@ -1956,7 +2048,8 @@ describe( 'FormTokenField', () => {
 
 			// Try to add "eagle" token, which won't be added because of the
 			// __experimentalValidateInput prop.
-			await user.type( input, 'eagle[Enter]' );
+			await user.type( input, 'eagle' );
+			triggerEnter( input );
 
 			expect(
 				screen.getByText( defaultMessages.__experimentalInvalid )
@@ -1979,7 +2072,8 @@ describe( 'FormTokenField', () => {
 
 			// Try to add "crocodile" token, which won't be added because of the
 			// __experimentalValidateInput prop.
-			await user.type( input, 'crocodile[Enter]' );
+			await user.type( input, 'crocodile' );
+			triggerEnter( input );
 
 			expect(
 				screen.getByText( customMessages.__experimentalInvalid )
@@ -2085,7 +2179,7 @@ describe( 'FormTokenField', () => {
 
 			// Select the "Pine" suggestion
 			await user.click( input );
-			await user.keyboard( '[ArrowDown]' );
+			triggerArrowDown( input );
 
 			const pineSuggestion = within( suggestionList ).getByRole(
 				'option',
@@ -2115,7 +2209,7 @@ describe( 'FormTokenField', () => {
 			);
 
 			// Add the suggestion, which hides the list
-			await user.keyboard( '[Enter]' );
+			triggerEnter( input );
 
 			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 

@@ -11,6 +11,17 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useDebounce, useInstanceId, usePrevious } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
+import {
+	BACKSPACE,
+	ENTER,
+	UP,
+	DOWN,
+	LEFT,
+	RIGHT,
+	SPACE,
+	DELETE,
+	ESCAPE,
+} from '@wordpress/keycodes';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
@@ -172,34 +183,34 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		if ( event.defaultPrevented ) {
 			return;
 		}
-		switch ( event.code ) {
-			case 'Backspace':
+		switch ( event.keyCode ) {
+			case BACKSPACE:
 				preventDefault = handleDeleteKey( deleteTokenBeforeInput );
 				break;
-			case 'Enter':
+			case ENTER:
 				preventDefault = addCurrentToken();
 				break;
-			case 'ArrowLeft':
+			case LEFT:
 				preventDefault = handleLeftArrowKey();
 				break;
-			case 'ArrowUp':
+			case UP:
 				preventDefault = handleUpArrowKey();
 				break;
-			case 'ArrowRight':
+			case RIGHT:
 				preventDefault = handleRightArrowKey();
 				break;
-			case 'ArrowDown':
+			case DOWN:
 				preventDefault = handleDownArrowKey();
 				break;
-			case 'Delete':
+			case DELETE:
 				preventDefault = handleDeleteKey( deleteTokenAfterInput );
 				break;
-			case 'Space':
+			case SPACE:
 				if ( tokenizeOnSpace ) {
 					preventDefault = addCurrentToken();
 				}
 				break;
-			case 'Escape':
+			case ESCAPE:
 				preventDefault = handleEscapeKey( event );
 				break;
 			default:
