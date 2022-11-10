@@ -8,9 +8,13 @@ import { render, screen } from '@testing-library/react';
  */
 import { useBaseField } from '../index';
 import { View } from '../../view';
+import type { WordPressComponentProps } from '../../ui/context';
+import type { BaseFieldProps } from '../types';
 
-const TestField = ( props ) => {
-	return <View { ...useBaseField( props ) } />;
+const TestField = (
+	props: Omit< WordPressComponentProps< BaseFieldProps, 'div' >, 'children' >
+) => {
+	return <View { ...useBaseField( { ...props, children: '' } ) } />;
 };
 
 describe( 'base field', () => {
@@ -62,10 +66,14 @@ describe( 'base field', () => {
 			// wrap this in a component so that `useContext` calls don't fail inside the hook
 			// assertions will still run as normal when we `render` the component :)
 			const Component = () => {
-				const disabled = Symbol.for( 'disabled' );
-				const defaultValue = Symbol.for( 'defaultValue' );
+				const disabled = true;
+				const defaultValue = 'Lorem ipsum';
 
-				const result = useBaseField( { disabled, defaultValue } );
+				const result = useBaseField( {
+					disabled,
+					defaultValue,
+					children: '',
+				} );
 
 				expect( result.disabled ).toBe( disabled );
 				expect( result.defaultValue ).toBe( defaultValue );
