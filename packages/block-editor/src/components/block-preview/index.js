@@ -20,8 +20,9 @@ import { BlockListItems } from '../block-list';
 
 export function BlockPreview( {
 	blocks,
-	__experimentalPadding = 0,
 	viewportWidth = 1200,
+	__experimentalScale,
+	__experimentalPadding = 0,
 	__experimentalMinHeight,
 	__experimentalStyles = [],
 } ) {
@@ -44,6 +45,7 @@ export function BlockPreview( {
 		<BlockEditorProvider value={ renderedBlocks } settings={ settings }>
 			<AutoHeightBlockPreview
 				viewportWidth={ viewportWidth }
+				__experimentalScale={ __experimentalScale }
 				__experimentalPadding={ __experimentalPadding }
 				__experimentalMinHeight={ __experimentalMinHeight }
 				__experimentalStyles={ __experimentalStyles }

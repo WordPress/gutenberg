@@ -91,6 +91,8 @@ export const settings = {
 				},
 			],
 		},
+		defaultPadding: '1rem',
+		scale: 0.65,
 	},
 	transforms,
 	edit,

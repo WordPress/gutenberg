@@ -179,7 +179,7 @@ attributes: {
 
 -   **Type:** `Object`
 
-Example provides structured example data for the block. This data is used to construct a preview for the block to be shown in the Inspector Help Panel when the user mouses over the block.
+Example provides structured example data for the block. This data is used to construct a preview for the block to be shown in the Inspector Help Panel when the user mouses over the block and in the Styles panel when the block is selected.
 
 The data provided in the example object should match the attributes defined. For example:
 
@@ -216,7 +216,7 @@ example: {
 },
 ```
 
-It's also possible to define the width of the preview container in pixels via `viewportWidth`. For example:
+It's also possible to define the width of the preview container in pixels via `viewportWidth` or via `scale` to set width of the block relative to the preview container. For example:
 
 ```js
 example: {
@@ -224,6 +224,26 @@ example: {
 		cover: 'https://example.com/image.jpg',
 	},
 	viewportWidth: 800
+},
+```
+
+```js
+example: {
+	attributes: {
+		cover: 'https://example.com/image.jpg',
+	},
+	scale: 0.8
+},
+```
+
+It's possible to set padding for the block in the preview container via `defaultPadding`. For example:
+
+```js
+example: {
+	attributes: {
+		cover: 'https://example.com/image.jpg',
+	},
+	defaultPadding: '8px 16px'
 },
 ```
 

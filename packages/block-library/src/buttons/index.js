@@ -31,6 +31,7 @@ export const settings = {
 				attributes: { text: __( 'Contact us' ) },
 			},
 		],
+		defaultPadding: '1rem',
 	},
 	deprecated,
 	transforms,

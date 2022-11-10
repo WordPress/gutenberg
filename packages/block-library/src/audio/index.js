@@ -23,6 +23,7 @@ export const settings = {
 		attributes: {
 			src: 'https://upload.wikimedia.org/wikipedia/commons/d/dd/Armstrong_Small_Step.ogg',
 		},
+		scale: 0.75,
 	},
 	transforms,
 	deprecated,

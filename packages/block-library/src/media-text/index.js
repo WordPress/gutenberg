@@ -43,6 +43,7 @@ export const settings = {
 				},
 			},
 		],
+		defaultPadding: '1rem',
 	},
 	transforms,
 	edit,

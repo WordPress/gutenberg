@@ -23,6 +23,7 @@ const MAX_HEIGHT = 2000;
 function ScaledBlockPreview( {
 	viewportWidth,
 	containerWidth,
+	__experimentalScale,
 	__experimentalPadding,
 	__experimentalMinHeight,
 	__experimentalStyles,
@@ -65,7 +66,14 @@ function ScaledBlockPreview( {
 	// Initialize on render instead of module top level, to avoid circular dependency issues.
 	MemoizedBlockList = MemoizedBlockList || pure( BlockList );
 
+	viewportWidth = viewportWidth / ( __experimentalScale || 1 );
 	const scale = containerWidth / viewportWidth;
+
+	const padding =
+		typeof __experimentalPadding === 'string'
+			? __experimentalPadding
+			: `${ __experimentalPadding }px`;
+
 	return (
 		<Disabled
 			className="block-editor-block-preview__content"
@@ -89,12 +97,23 @@ function ScaledBlockPreview( {
 					);
 					documentElement.style.position = 'absolute';
 					documentElement.style.width = '100%';
-					bodyElement.style.padding = __experimentalPadding + 'px';
+					documentElement.style.minHeight = '100%';
+					bodyElement.style.padding = padding;
 
 					// Necessary for contentResizeListener to work.
 					bodyElement.style.boxSizing = 'border-box';
 					bodyElement.style.position = 'absolute';
 					bodyElement.style.width = '100%';
+					bodyElement.style.minHeight = `${ __experimentalMinHeight }px`;
+
+					if ( __experimentalAlign || __experimentalJustify ) {
+						bodyElement.style.display = 'flex';
+						bodyElement.style.flexDirection = 'column';
+						bodyElement.style.alignItems =
+							__experimentalJustify || 'flex-start';
+						bodyElement.style.justifyContent =
+							__experimentalAlign || 'flex-start';
+					}
 				}, [] ) }
 				aria-hidden
 				tabIndex={ -1 }
