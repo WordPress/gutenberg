@@ -398,9 +398,7 @@ export default function PaletteEdit( {
 													} }
 													className="components-palette-edit__menu-button"
 												>
-													{ isGradient
-														? __( 'Edit gradients' )
-														: __( 'Edit colors' ) }
+													{ __( 'List view' ) }
 												</Button>
 											) }
 											{ ! canOnlyChangeValues && (
