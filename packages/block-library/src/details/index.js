@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { chevronDown as icon } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -16,6 +17,17 @@ export { metadata, name };
 
 export const settings = {
 	icon,
+	example: {
+		innerBlocks: [
+			{
+				name: 'core/details-summary',
+				attributes: { summary: __( 'Details' ) },
+			},
+			{
+				name: 'core/details-content',
+			},
+		],
+	},
 	save,
 	edit,
 };
