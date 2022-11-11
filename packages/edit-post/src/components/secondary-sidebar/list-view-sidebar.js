@@ -41,19 +41,32 @@ export default function ListViewSidebar() {
 	// This ref refers to the sidebar as a whole.
 	const sidebarRef = useRef();
 
-	// Callback function to focus the list view or list view tab based on which is available at the time.
-	function handleListViewFocus() {
+	/*
+	 * Callback function to handle list view or outline focus.
+	 *
+	 * @param {string} currentTab The current tab. Either list view or outline.
+	 *
+	 * @return void
+	 */
+	function handleSidebarFocus( currentTab ) {
 		// Find tabbables based on the attached sidebar ref.
-		const listViewTabbables = focus.tabbable.find( sidebarRef.current );
-		// Either focus the list view or the list view tab. Must have a fallback because the list view does not render when there are no blocks. If list view is available, need to skip close, list view, and outline tabs. If list view is not available, need to skip close button.
-		const listViewFocusLocation =
-			listViewTabbables[ 3 ] || listViewTabbables[ 1 ];
-		listViewFocusLocation.focus();
+		const sidebarTabbables = focus.tabbable.find( sidebarRef.current );
+		// List view tab is selected.
+		if ( currentTab === 'list-view' ) {
+			// Either focus the list view or the list view tab. Must have a fallback because the list view does not render when there are no blocks. If list view is available, need to skip close, list view, and outline tabs. If list view is not available, need to skip close button.
+			const listViewFocusLocation =
+				sidebarTabbables[ 3 ] || sidebarTabbables[ 1 ];
+			listViewFocusLocation.focus();
+			// Outline tab is selected.
+		} else {
+			// Find the 3rd tabbable based on the attached sidebar ref. This is to skip over the close button, list view tab button, and landing on outline tab button since there is nothing else to focus after.
+			sidebarTabbables[ 2 ].focus();
+		}
 	}
 
 	// Handles focus for list view when sidebar mounts.
 	useEffect( () => {
-		handleListViewFocus();
+		handleSidebarFocus( 'list-view' );
 	}, [] );
 
 	// This only fires when the sidebar is open because of the conditional rendering. It is the same shortcut to open but that is defined as a global shortcut and only fires when the sidebar is closed.
@@ -65,13 +78,9 @@ export default function ListViewSidebar() {
 			)
 		) {
 			setIsListViewOpened( false );
-			// If the list view does not have focus, we should move focus to it.
-		} else if ( tab === 'list-view' ) {
-			handleListViewFocus();
-			// If the outline does not have focus, we should move focus to it.
-		} else if ( tab === 'outline' ) {
-			// Find the 3rd tabbable based on the attached sidebar ref. This is to skip over the close button, list view tab button, and landing on outline tab button since there is nothing else to focus after.
-			focus.tabbable.find( sidebarRef.current )[ 2 ].focus();
+			// If the list view or outline does not have focus, focus should be moved to it.
+		} else {
+			handleSidebarFocus( tab );
 		}
 	} );
 
