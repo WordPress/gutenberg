@@ -90,9 +90,30 @@ Instead of writing the assertions in comments, we can try directly writing them 
 
 The assertions are more readable and explicit. You can add additional assertions or split existing ones into multiple ones to highlight their importance. Whether to keep the comments is up to you, but it's usually fine to omit them when the code is already readable without them.
 
+## Snapshot variants
+
+Due to the lack of inline snapshots in Playwright, some migrated tests are using string assertions (`toBe`) to simulate similar effects without having to create dozens of snapshot files.
+
+```js
+expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:paragraph -->
+<p>Paragraph</p>
+<!-- /wp:paragraph -->` );
+```
+
+We can consider this pattern as a variant of snapshot testing, and we should follow the same rule when writing them. It's often better to rewrite them using `editor.getBlocks` or other methods to make explicit assertions.
+
+```js
+const blocks = await editor.getBlocks();
+expect( blocks ).toHaveLength( 0 );
+expect( blocks[ 0 ] ).toMatchObject( {
+	name: 'core/paragraph',
+	attributes: { content: 'Paragraph' },
+} );
+```
+
 ## What about test coverage?
 
-Comparing the explicit assertions to snapshot testing, we're definitely losing some test coverage in this test. Snapshot testing is still useful when we want to assert the full serialized content of the block. Fortunately, though, some tests in the integration test already asserts the [full content](https://github.com/WordPress/gutenberg/blob/trunk/test/integration/fixtures/blocks/README.md) of each core block. They run in Node.js, making them way faster than repeating the same test in Playwright. Running 273 test cases in my machine only costs about 5.7 seconds. These sorts of tests work great at the unit or integration level, and we can run them much faster without losing test coverage.
+Comparing the explicit assertions to snapshot testing, we're definitely losing some test coverage in this test. Snapshot testing is still useful when we want to assert the full serialized content of the block. Fortunately, though, some tests in the integration test already assert the [full content](https://github.com/WordPress/gutenberg/blob/trunk/test/integration/fixtures/blocks/README.md) of each core block. They run in Node.js, making them way faster than repeating the same test in Playwright. Running 273 test cases in my machine only costs about 5.7 seconds. These sorts of tests work great at the unit or integration level, and we can run them much faster without losing test coverage.
 
 ## Best practices
 
