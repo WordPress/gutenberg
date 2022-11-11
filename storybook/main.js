@@ -1,7 +1,7 @@
 const stories = [
 	process.env.NODE_ENV !== 'test' && './stories/**/*.@(js|tsx|mdx)',
 	'../packages/block-editor/src/**/stories/*.@(js|tsx|mdx)',
-	'../packages/components/src/**/stories/index.@(js|tsx|mdx)',
+	'../packages/components/src/**/stories/*.@(js|tsx|mdx)',
 	'../packages/icons/src/**/stories/*.@(js|tsx|mdx)',
 ].filter( Boolean );
 
