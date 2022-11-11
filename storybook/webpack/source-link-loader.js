@@ -8,6 +8,8 @@ const REPO_ROOT = path.resolve( __dirname, '../../' );
 
 /**
  * Adds a `sourceLink` parameter to the story metadata, based on the file path.
+ *
+ * @see https://storybook.js.org/addons/storybook-source-link
  */
 function addSourceLinkPlugin() {
 	return {
