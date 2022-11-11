@@ -42,7 +42,7 @@ jobs:
               # PR head branch tip. This means that with a depth=2 shallow fetch we
               # get both commits we want to compare: generally `trunk` by itself at
               # `$GITHUB_SHA~1` and then `trunk` with the PR merged in at `$GITHUB_SHA`.
-              run: ./bin/plugin/cli.js perf $GITHUB_SHA $GITHUB_SHA~1 --tests-branch $GITHUB_SHA
+              run: ./bin/plugin/cli.js perf --test-merge $GITHUB_SHA --tests-branch $GITHUB_SHA
 
             - name: Compare performance with current WordPress Core and previous Gutenberg versions
               if: github.event_name == 'release'

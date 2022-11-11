@@ -95,6 +95,10 @@ program
 	.alias( 'perf' )
 	.option( ...ciOption )
 	.option(
+		'--test-merge <ref>',
+		'Compare the performance of this commit against its first parent.'
+	)
+	.option(
 		'--rounds <count>',
 		'Run each test suite this many times for each branch; results are summarized, default = 1'
 	)
