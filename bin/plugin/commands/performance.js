@@ -211,8 +211,13 @@ async function runPerformanceTests( branches, options ) {
 	const baseDirectory = getRandomTemporaryPath();
 	fs.mkdirSync( baseDirectory, { recursive: true } );
 
-	if ( localCloneAt ) {
+	if ( localCloneAt && fs.existsSync( path.join( localCloneAt, '.git' ) ) ) {
+		log( '\n>> Cloning local repo' );
 		runShellScript( `cp -R ${ localCloneAt } ${ baseDirectory }` );
+	} else if ( localCloneAt ) {
+		log( '\n>> [No `git` repo found at local clone path]' );
+	} else {
+		log( '\n>> [No local clone path set]' );
 	}
 
 	// @ts-ignore
