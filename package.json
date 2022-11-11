@@ -107,7 +107,6 @@
 		"@storybook/addon-controls": "6.5.7",
 		"@storybook/addon-docs": "6.5.7",
 		"@storybook/addon-knobs": "6.2.9",
-		"@storybook/addon-storysource": "6.5.7",
 		"@storybook/addon-toolbars": "6.5.7",
 		"@storybook/addon-viewport": "6.5.7",
 		"@storybook/builder-webpack5": "6.5.7",

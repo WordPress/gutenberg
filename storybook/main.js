@@ -19,7 +19,6 @@ module.exports = {
 		},
 		'@storybook/addon-controls',
 		'@storybook/addon-knobs', // Deprecated, new stories should use addon-controls.
-		'@storybook/addon-storysource',
 		'@storybook/addon-viewport',
 		'@storybook/addon-a11y',
 		'@storybook/addon-toolbars',
