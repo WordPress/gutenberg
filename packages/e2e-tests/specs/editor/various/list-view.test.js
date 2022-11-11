@@ -384,7 +384,7 @@ describe( 'List view', () => {
 		await pressKeyWithModifier( 'shift', 'Tab' );
 		await pressKeyWithModifier( 'shift', 'Tab' );
 		await expect( await getActiveElementLabel() ).toEqual(
-			'Close List View Sidebar'
+			'Close Document Overview Sidebar'
 		);
 
 		// Close the list view sidebar.
