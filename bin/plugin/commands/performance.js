@@ -72,6 +72,33 @@ const config = require( '../config' );
  * @property {number=} maxListViewOpen      Max time to open list view.
  */
 
+class Timer {
+	constructor() {
+		this.start = process.hrtime();
+	}
+
+	humanSpan() {
+		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+		const [ s, ns ] = process.hrtime( this.start );
+		this.start = process.hrtime();
+
+		if ( s > 3600 ) {
+			// prettier-ignore
+			return `${ Math.floor( s / 3600 ) }h ${ Math.floor( ( s % 3600 ) / 60 ) }m`;
+		}
+
+		if ( s > 60 ) {
+			return `${ Math.floor( s / 60 ) }m ${ Math.floor( s % 60 ) }`;
+		}
+
+		if ( s > 1 ) {
+			return `${ Math.floor( s + ns / 1e9 ) }s`;
+		}
+
+		return `${ Math.floor( s * 1000 + ns / 1e6 ) }ms`;
+	}
+}
+
 /**
  * Computes the average number from an array numbers.
  *
@@ -176,6 +203,15 @@ async function runTestSuite( testSuite, performanceTestDirectory ) {
  */
 async function runPerformanceTests( branches, options ) {
 	const runningInCI = !! process.env.CI || !! options.ci;
+	const timer = new Timer();
+	const lgt = ( /** @type {(string | Timer)[]} */ ...args ) =>
+		console.log(
+			args
+				.map( ( arg ) =>
+					'string' === typeof arg ? arg : arg.humanSpan()
+				)
+				.join( '' )
+		);
 
 	// The default value doesn't work because commander provides an array.
 	if ( branches.length === 0 ) {
@@ -237,15 +273,18 @@ async function runPerformanceTests( branches, options ) {
 			.raw( 'checkout', options.testsBranch );
 	}
 
+	lgt( '       (took ', timer, ')' );
 	log( '    >> Installing dependencies and building packages' );
 	await runShellScript(
 		'npm ci && npm run build:packages',
 		performanceTestDirectory
 	);
+	lgt( '       (took ', timer, ')' );
 	log( '    >> Creating the environment folders' );
 	await runShellScript( 'mkdir -p ' + rootDirectory + '/envs' );
 
 	// 2- Preparing the environment directories per branch.
+	lgt( '       (took ', timer, ')' );
 	log( '\n>> Preparing an environment directory per branch' );
 	const branchDirectories = {};
 	for ( const branch of branches ) {
@@ -305,6 +344,8 @@ async function runPerformanceTests( branches, options ) {
 				'utf8'
 			);
 		}
+
+		lgt( '       (branch took ', timer, ')' );
 	}
 
 	// 3- Printing the used folders.
@@ -341,16 +382,19 @@ async function runPerformanceTests( branches, options ) {
 					'../../tests/node_modules/.bin/wp-env start',
 					environmentDirectory
 				);
+				lgt( '           (took ', timer, ')' );
 				log( '        >> Running the test.' );
 				rawResults[ i ][ branch ] = await runTestSuite(
 					testSuite,
 					performanceTestDirectory
 				);
+				lgt( '           (took ', timer, ')' );
 				log( '        >> Stopping the environment' );
 				await runShellScript(
 					'../../tests/node_modules/.bin/wp-env stop',
 					environmentDirectory
 				);
+				lgt( '           (took ', timer, ')' );
 			}
 		}
 
