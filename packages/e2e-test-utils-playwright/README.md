@@ -6,7 +6,7 @@ _It works properly with the minimum version of Gutenberg `9.2.0` or the minimum 
 
 ## Installation
 
-Install the module
+Install the module - Note: Not yet public
 
 ```bash
 npm install @wordpress/e2e-test-utils-playwright --save-dev
