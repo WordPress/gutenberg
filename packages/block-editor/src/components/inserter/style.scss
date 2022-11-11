@@ -279,10 +279,9 @@ $block-inserter-tabs-height: 44px;
 	padding: $grid-unit-20;
 	overflow-y: auto;
 	height: 100%;
-}
-
-.block-editor-inserter__patterns-fill-space {
-	flex-grow: 1;
+	div[role="listitem"]:last-child {
+		margin-top: auto;
+	}
 }
 
 .block-editor-inserter__patterns-category-panel {
