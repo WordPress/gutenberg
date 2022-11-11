@@ -22,6 +22,8 @@ jobs:
 
         steps:
             - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+              with:
+                  fetch-depth: 2
 
             - name: Use desired version of NodeJS
               uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
@@ -35,7 +37,12 @@ jobs:
 
             - name: Compare performance with trunk
               if: github.event_name == 'pull_request'
-              run: ./bin/plugin/cli.js perf $GITHUB_SHA trunk --tests-branch $GITHUB_SHA
+              # $GITHUB_SHA refers to the merge branch of a PR; it's a merge commit
+              # whose two parents are first the target branch tip, and second the
+              # PR head branch tip. This means that with a depth=2 shallow fetch we
+              # get both commits we want to compare: generally `trunk` by itself at
+              # `$GITHUB_SHA~1` and then `trunk` with the PR merged in at `$GITHUB_SHA`.
+              run: ./bin/plugin/cli.js perf $GITHUB_SHA $GITHUB_SHA~1 --tests-branch $GITHUB_SHA
 
             - name: Compare performance with current WordPress Core and previous Gutenberg versions
               if: github.event_name == 'release'
