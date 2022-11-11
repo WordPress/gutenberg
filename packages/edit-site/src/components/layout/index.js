@@ -15,7 +15,7 @@ import {
 import { useReducedMotion, useViewportMatch } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -63,10 +63,6 @@ export default function Layout() {
 			setIsMobileCanvasVisible( false );
 		}
 	}, [ canvasMode, isMobileViewport ] );
-	const initialRendering = useRef( true );
-	useEffect( () => {
-		initialRendering.current = false;
-	}, [] );
 
 	return (
 		<>
