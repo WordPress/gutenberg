@@ -136,18 +136,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 							<li className="block-editor-block-lock-modal__checklist-item">
 								<CheckboxControl
 									__nextHasNoMarginBottom
-									label={
-										<>
-											{ __( 'Restrict editing' ) }
-											<Icon
-												icon={
-													lock.edit
-														? lockIcon
-														: unlockIcon
-												}
-											/>
-										</>
-									}
+									label={ __( 'Restrict editing' ) }
 									checked={ !! lock.edit }
 									onChange={ ( edit ) =>
 										setLock( ( prevLock ) => ( {
@@ -156,23 +145,16 @@ export default function BlockLockModal( { clientId, onClose } ) {
 										} ) )
 									}
 								/>
+								<Icon
+									className="block-editor-block-lock-modal__lock-icon"
+									icon={ lock.edit ? lockIcon : unlockIcon }
+								/>
 							</li>
 						) }
 						<li className="block-editor-block-lock-modal__checklist-item">
 							<CheckboxControl
 								__nextHasNoMarginBottom
-								label={
-									<>
-										{ __( 'Disable movement' ) }
-										<Icon
-											icon={
-												lock.move
-													? lockIcon
-													: unlockIcon
-											}
-										/>
-									</>
-								}
+								label={ __( 'Disable movement' ) }
 								checked={ lock.move }
 								onChange={ ( move ) =>
 									setLock( ( prevLock ) => ( {
@@ -181,22 +163,15 @@ export default function BlockLockModal( { clientId, onClose } ) {
 									} ) )
 								}
 							/>
+							<Icon
+								className="block-editor-block-lock-modal__lock-icon"
+								icon={ lock.move ? lockIcon : unlockIcon }
+							/>
 						</li>
 						<li className="block-editor-block-lock-modal__checklist-item">
 							<CheckboxControl
 								__nextHasNoMarginBottom
-								label={
-									<>
-										{ __( 'Prevent removal' ) }
-										<Icon
-											icon={
-												lock.remove
-													? lockIcon
-													: unlockIcon
-											}
-										/>
-									</>
-								}
+								label={ __( 'Prevent removal' ) }
 								checked={ lock.remove }
 								onChange={ ( remove ) =>
 									setLock( ( prevLock ) => ( {
@@ -204,6 +179,10 @@ export default function BlockLockModal( { clientId, onClose } ) {
 										remove,
 									} ) )
 								}
+							/>
+							<Icon
+								className="block-editor-block-lock-modal__lock-icon"
+								icon={ lock.remove ? lockIcon : unlockIcon }
 							/>
 						</li>
 					</ul>

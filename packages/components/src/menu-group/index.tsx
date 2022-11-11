@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * External dependencies
  */
@@ -10,7 +9,27 @@ import classnames from 'classnames';
 import { Children } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 
-export function MenuGroup( props ) {
+/**
+ * Internal dependencies
+ */
+import type { MenuGroupProps } from './types';
+
+/**
+ * `MenuGroup` wraps a series of related `MenuItem` components into a common
+ * section.
+ *
+ * ```jsx
+ * import { MenuGroup, MenuItem } from '@wordpress/components';
+ *
+ * const MyMenuGroup = () => (
+ *   <MenuGroup label="Settings">
+ *     <MenuItem>Setting 1</MenuItem>
+ *     <MenuItem>Setting 2</MenuItem>
+ *   </MenuGroup>
+ * );
+ * ```
+ */
+export function MenuGroup( props: MenuGroupProps ) {
 	const { children, className = '', label, hideSeparator } = props;
 	const instanceId = useInstanceId( MenuGroup );
 
@@ -34,7 +53,7 @@ export function MenuGroup( props ) {
 					{ label }
 				</div>
 			) }
-			<div role="group" aria-labelledby={ label ? labelId : null }>
+			<div role="group" aria-labelledby={ label ? labelId : undefined }>
 				{ children }
 			</div>
 		</div>

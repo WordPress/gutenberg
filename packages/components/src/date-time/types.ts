@@ -1,8 +1,3 @@
-/**
- * External dependencies
- */
-import type { Moment } from 'moment';
-
 export type TimePickerProps = {
 	/**
 	 * The initial current time the time picker should render.
@@ -28,20 +23,6 @@ export type DatePickerEvent = {
 	 * The date of the event.
 	 */
 	date: Date;
-};
-
-export type DatePickerDayProps = {
-	/**
-	 * The day to display.
-	 */
-	day: Moment;
-
-	/**
-	 * List of events to show on this day.
-	 *
-	 * @default []
-	 */
-	events?: DatePickerEvent[];
 };
 
 export type DatePickerProps = {
