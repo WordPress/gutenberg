@@ -134,11 +134,28 @@ export default function Layout() {
 					</AnimatePresence>
 				</div>
 
-				{ showSidebar && (
-					<div className="edit-site-layout__sidebar">
-						<Sidebar />
-					</div>
-				) }
+				<AnimatePresence initial={ false }>
+					{ showSidebar && (
+						<motion.div
+							initial={ {
+								opacity: 0,
+							} }
+							animate={ {
+								opacity: 1,
+							} }
+							exit={ {
+								opacity: 0,
+							} }
+							transition={ {
+								type: 'tween',
+								duration: disableMotion ? 0 : 0.5,
+							} }
+							className="edit-site-layout__sidebar"
+						>
+							<Sidebar />
+						</motion.div>
+					) }
+				</AnimatePresence>
 
 				{ showCanvas && (
 					<div

@@ -39,7 +39,14 @@
 
 .edit-site-layout__sidebar {
 	grid-area: sidebar;
-	overflow: hidden;
+
+	// This is only necessary for the exit animation
+	.edit-site-layout.is-full-canvas & {
+		grid-area: header;
+		position: absolute;
+		z-index: 10000;
+		top: 60px;
+	}
 }
 
 .edit-site-layout__canvas-container {
