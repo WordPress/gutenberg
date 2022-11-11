@@ -22,6 +22,18 @@ jobs:
 
         steps:
             - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+              with:
+                  fetch-depth: 2
+
+            - name: Cancel on merge conflicts (target ref is not current target branch tip)
+              if: github.event_name == 'pull_request'
+              run: |
+                  git fetch origin $GITHUB_BASE_REF
+                  if [ $(git rev-parse origin/$GITHUB_BASE_REF) == $(git rev-parse HEAD~1) ]; then
+                    env true
+                  else
+                    env false
+                  fi
 
             - name: Use desired version of NodeJS
               uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
