@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -33,6 +33,10 @@ function TestWrapper() {
 }
 
 describe( 'General media replace flow', () => {
+	afterEach( () => {
+		cleanup();
+	} );
+
 	it( 'renders successfully', () => {
 		render( <TestWrapper /> );
 
