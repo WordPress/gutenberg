@@ -442,7 +442,8 @@ $block-inserter-tabs-height: 44px;
 	}
 
 	&__list {
-		margin-left: $sidebar-width - $grid-unit-40;
+		margin-left: $sidebar-width;
+		padding: $grid-unit-30 0 $grid-unit-40;
 	}
 
 	.block-editor-block-patterns-list {
