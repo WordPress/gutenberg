@@ -64,7 +64,7 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 	add_settings_field(
-	'gutenberg-color-randomizer',
+		'gutenberg-color-randomizer',
 		__( 'Color randomizer ', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
