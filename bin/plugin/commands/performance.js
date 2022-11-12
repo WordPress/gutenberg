@@ -1,7 +1,9 @@
 /**
  * External dependencies
  */
+const cluster = require( 'cluster' );
 const fs = require( 'fs' );
+const os = require( 'os' );
 const path = require( 'path' );
 const { mapValues, kebabCase } = require( 'lodash' );
 const SimpleGit = require( 'simple-git' );
@@ -176,6 +178,25 @@ async function runTestSuite( testSuite, performanceTestDirectory ) {
  */
 async function runPerformanceTests( branches, options ) {
 	const runningInCI = !! process.env.CI || !! options.ci;
+	let worker;
+
+	if ( cluster.isMaster ) {
+		worker = cluster.fork();
+	} else {
+		// eslint-disable-next-line no-restricted-syntax
+		const threadId = Math.random();
+		const reportCpuUsage = () => {
+			const [ s, ns ] = process.hrtime();
+			log(
+				'*****' +
+					JSON.stringify( [ threadId, s + ns / 1e9, os.cpus() ] )
+			);
+
+			setTimeout( reportCpuUsage, 60 * 1000 );
+		};
+
+		reportCpuUsage();
+	}
 
 	// The default value doesn't work because commander provides an array.
 	if ( branches.length === 0 ) {
@@ -461,6 +482,8 @@ async function runPerformanceTests( branches, options ) {
 			JSON.stringify( results[ testSuite ], null, 2 )
 		);
 	}
+
+	worker?.kill();
 }
 
 module.exports = {
