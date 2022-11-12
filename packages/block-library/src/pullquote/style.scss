@@ -11,6 +11,10 @@
 		color: inherit;
 	}
 
+	blockquote {
+		margin: 0;
+	}
+
 	&.alignleft,
 	&.alignright {
 		max-width: $content-width * 0.5;
