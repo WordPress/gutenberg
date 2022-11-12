@@ -170,7 +170,11 @@ function NavigationMenuSelector( {
 					: 'wp-block-navigation__navigation-selector'
 			}
 			label={ selectorLabel }
-			text={ isOffCanvasNavigationEditorEnabled ? '' : selectorLabel }
+			text={
+				<span className="wp-block-navigation__navigation-selector-button__label">
+					{ isOffCanvasNavigationEditorEnabled ? '' : selectorLabel }
+				</span>
+			}
 			icon={ isOffCanvasNavigationEditorEnabled ? moreVertical : null }
 			toggleProps={
 				isOffCanvasNavigationEditorEnabled

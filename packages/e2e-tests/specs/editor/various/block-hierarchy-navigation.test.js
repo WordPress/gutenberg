@@ -49,7 +49,9 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.type( 'First column' );
 
 		// Navigate to the columns blocks.
-		await page.click( '.edit-post-header-toolbar__list-view-toggle' );
+		await page.click(
+			'.edit-post-header-toolbar__document-overview-toggle'
+		);
 
 		const firstColumnsBlockMenuItem = (
 			await getListViewBlocks( 'Columns' )
@@ -183,7 +185,9 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.click( '.editor-post-title' );
 
 		// Try selecting the group block using the Outline.
-		await page.click( '.edit-post-header-toolbar__list-view-toggle' );
+		await page.click(
+			'.edit-post-header-toolbar__document-overview-toggle'
+		);
 		const groupMenuItem = ( await getListViewBlocks( 'Group' ) )[ 0 ];
 		await groupMenuItem.click();
 
