@@ -60,6 +60,7 @@ class WP_Webfonts {
 	public function init() {
 		// Register default providers.
 		$this->register_provider( 'local', 'WP_Webfonts_Provider_Local' );
+		$this->register_provider( 'remote', 'WP_Webfonts_Provider_Remote' );
 
 		// Register callback to generate and enqueue styles.
 		if ( did_action( 'wp_enqueue_scripts' ) ) {
