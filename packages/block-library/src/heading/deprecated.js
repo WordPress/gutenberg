@@ -64,6 +64,40 @@ const migrateTextAlign = ( attributes ) => {
 };
 
 const deprecated = [
+	// Version where the heading level attribute is a number, not a string.
+	{
+		supports: {
+			align: [ 'wide', 'full' ],
+			anchor: true,
+			className: false,
+			color: { link: true },
+			fontSize: true,
+			lineHeight: true,
+			__experimentalSelector: {
+				'core/heading/h1': 'h1',
+				'core/heading/h2': 'h2',
+				'core/heading/h3': 'h3',
+				'core/heading/h4': 'h4',
+				'core/heading/h5': 'h5',
+				'core/heading/h6': 'h6',
+			},
+			__unstablePasteTextInline: true,
+		},
+		attributes: blockAttributes,
+		migrate: migrateTextAlign,
+		save( { attributes } ) {
+			const { textAlign, content, level } = attributes;
+			const TagName = 'h' + level;
+			const className = classnames( {
+				[ `has-text-align-${ textAlign }` ]: textAlign,
+			} );
+			return (
+				<TagName { ...useBlockProps.save( { className } ) }>
+					<RichText.Content value={ content } />
+				</TagName>
+			);
+		},
+	},
 	{
 		supports: {
 			align: [ 'wide', 'full' ],

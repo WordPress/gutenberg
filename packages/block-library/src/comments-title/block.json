@@ -21,8 +21,8 @@
 			"default": true
 		},
 		"level": {
-			"type": "number",
-			"default": 2
+			"type": "string",
+			"default": "h2"
 		}
 	},
 	"supports": {

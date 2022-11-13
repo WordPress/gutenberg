@@ -15,15 +15,13 @@ import {
 	InspectorControls,
 	BlockControls,
 	useBlockProps,
+	TagSelectionDropdown,
 } from '@wordpress/block-editor';
 import { ToggleControl, PanelBody } from '@wordpress/components';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
 
-/**
- * Internal dependencies
- */
-import LevelControl from './level-toolbar';
+const DEFAULT_TAGS = [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p' ];
 
 export default function SiteTitleEdit( {
 	attributes,
@@ -51,7 +49,7 @@ export default function SiteTitleEdit( {
 		} );
 	}
 
-	const TagName = level === 0 ? 'p' : `h${ level }`;
+	const TagName = level;
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
@@ -95,8 +93,9 @@ export default function SiteTitleEdit( {
 	return (
 		<>
 			<BlockControls group="block">
-				<LevelControl
-					level={ level }
+				<TagSelectionDropdown
+					tags={ DEFAULT_TAGS }
+					selectedTag={ level }
 					onChange={ ( newLevel ) =>
 						setAttributes( { level: newLevel } )
 					}

@@ -12,6 +12,7 @@ import {
 	useBlockProps,
 	InspectorControls,
 	store as blockEditorStore,
+	TagSelectionDropdown,
 } from '@wordpress/block-editor';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useEntityProp } from '@wordpress/core-data';
@@ -21,17 +22,12 @@ import { useSelect } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
-/**
- * Internal dependencies
- */
-import HeadingLevelDropdown from '../heading/heading-level-dropdown';
-
 export default function Edit( {
 	attributes: { textAlign, showPostTitle, showCommentsCount, level },
 	setAttributes,
 	context: { postType, postId },
 } ) {
-	const TagName = 'h' + level;
+	const TagName = level;
 	const [ commentsCount, setCommentsCount ] = useState();
 	const [ rawTitle ] = useEntityProp( 'postType', postType, 'title', postId );
 	const isSiteEditor = typeof postId === 'undefined';
@@ -97,8 +93,8 @@ export default function Edit( {
 					setAttributes( { textAlign: newAlign } )
 				}
 			/>
-			<HeadingLevelDropdown
-				selectedLevel={ level }
+			<TagSelectionDropdown
+				selectedTag={ level }
 				onChange={ ( newLevel ) =>
 					setAttributes( { level: newLevel } )
 				}

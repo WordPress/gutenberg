@@ -16,12 +16,12 @@ import {
 	RichText,
 	useBlockProps,
 	store as blockEditorStore,
+	TagSelectionDropdown,
 } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import HeadingLevelDropdown from './heading-level-dropdown';
 import { generateAnchor, setAnchor } from './autogenerate-anchors';
 
 function HeadingEdit( {
@@ -33,7 +33,7 @@ function HeadingEdit( {
 	clientId,
 } ) {
 	const { textAlign, content, level, placeholder, anchor } = attributes;
-	const tagName = 'h' + level;
+	const tagName = level;
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
@@ -91,8 +91,8 @@ function HeadingEdit( {
 	return (
 		<>
 			<BlockControls group="block">
-				<HeadingLevelDropdown
-					selectedLevel={ level }
+				<TagSelectionDropdown
+					selectedTag={ level }
 					onChange={ ( newLevel ) =>
 						setAttributes( { level: newLevel } )
 					}

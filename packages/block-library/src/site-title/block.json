@@ -8,8 +8,8 @@
 	"textdomain": "default",
 	"attributes": {
 		"level": {
-			"type": "number",
-			"default": 1
+			"type": "string",
+			"default": "h1"
 		},
 		"textAlign": {
 			"type": "string"

@@ -10,7 +10,7 @@ import { RichText, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const { textAlign, content, level } = attributes;
-	const TagName = 'h' + level;
+	const TagName = level;
 
 	const className = classnames( {
 		[ `has-text-align-${ textAlign }` ]: textAlign,

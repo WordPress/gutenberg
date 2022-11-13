@@ -14,8 +14,8 @@
 			"type": "string"
 		},
 		"level": {
-			"type": "number",
-			"default": 1
+			"type": "string",
+			"default": "h1"
 		},
 		"showPrefix": {
 			"type": "boolean",

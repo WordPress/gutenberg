@@ -12,14 +12,10 @@ import {
 	InspectorControls,
 	useBlockProps,
 	Warning,
+	TagSelectionDropdown,
 } from '@wordpress/block-editor';
 import { ToggleControl, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 
 const SUPPORTED_TYPES = [ 'archive', 'search' ];
 
@@ -27,7 +23,7 @@ export default function QueryTitleEdit( {
 	attributes: { type, level, textAlign, showPrefix, showSearchTerm },
 	setAttributes,
 } ) {
-	const TagName = `h${ level }`;
+	const TagName = level;
 	const blockProps = useBlockProps( {
 		className: classnames( 'wp-block-query-title__placeholder', {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
@@ -95,8 +91,8 @@ export default function QueryTitleEdit( {
 	return (
 		<>
 			<BlockControls group="block">
-				<HeadingLevelDropdown
-					selectedLevel={ level }
+				<TagSelectionDropdown
+					selectedTag={ level }
 					onChange={ ( newLevel ) =>
 						setAttributes( { level: newLevel } )
 					}

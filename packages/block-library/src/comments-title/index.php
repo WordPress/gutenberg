@@ -27,7 +27,7 @@ function render_block_core_comments_title( $attributes ) {
 	$post_title = sprintf( __( '&#8220;%s&#8221;' ), get_the_title() );
 	$tag_name   = 'h2';
 	if ( isset( $attributes['level'] ) ) {
-		$tag_name = 'h' . $attributes['level'];
+		$tag_name = $attributes['level'];
 	}
 
 	if ( '0' === $comments_count ) {
