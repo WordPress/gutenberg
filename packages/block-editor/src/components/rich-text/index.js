@@ -358,6 +358,17 @@ function RichTextWrapper(
 
 	function onFocus() {
 		anchorRef.current?.focus();
+
+		// if ( anchorRef.current ) {
+		// 	const parentEditable =
+		// 		anchorRef.current.parentElement?.closest( '[contenteditable]' );
+
+		// 	if ( parentEditable ) {
+		// 		parentEditable.focus();
+		// 	} else {
+		// 		anchorRef.current.focus();
+		// 	}
+		// }
 	}
 
 	const TagName = tagName;
@@ -441,8 +452,6 @@ function RichTextWrapper(
 					useFirefoxCompat(),
 					anchorRef,
 				] ) }
-				contentEditable={ true }
-				suppressContentEditableWarning={ true }
 				className={ classnames(
 					'block-editor-rich-text__editable',
 					props.className,

@@ -118,6 +118,11 @@ export default function useInput() {
 			const constructorName = prototype.constructor.name;
 			const Constructor = window[ constructorName ];
 			const { anchorNode } = defaultView.getSelection();
+
+			if ( ! anchorNode ) {
+				return;
+			}
+
 			const anchorElement =
 				anchorNode.nodeType === anchorNode.ELEMENT_NODE
 					? anchorNode
@@ -138,14 +143,20 @@ export default function useInput() {
 			}
 		}
 
-		node.addEventListener( 'input', onInput );
-		node.addEventListener( 'keydown', onInput );
+		const events = [ 'input', 'keydown', 'focus' ];
+
+		events.forEach( ( eventType ) => {
+			node.addEventListener( eventType, onInput );
+		} );
+
 		node.addEventListener( 'beforeinput', onBeforeInput );
 		node.addEventListener( 'keydown', onKeyDown );
 		node.addEventListener( 'compositionstart', onCompositionStart );
 		return () => {
-			node.removeEventListener( 'input', onInput );
-			node.removeEventListener( 'keydown', onInput );
+			events.forEach( ( eventType ) => {
+				node.removeEventListener( eventType, onInput );
+			} );
+
 			node.removeEventListener( 'beforeinput', onBeforeInput );
 			node.removeEventListener( 'keydown', onKeyDown );
 			node.removeEventListener( 'compositionstart', onCompositionStart );
