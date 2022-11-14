@@ -38,7 +38,6 @@ import { store as editSiteStore } from '../../store';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
 import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
 import useTitle from '../routes/use-title';
-import HeaderViewMode from '../header-view-mode';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor content landmark region. */
@@ -167,7 +166,6 @@ export default function Editor() {
 
 	return (
 		<>
-			{ isViewMode && <HeaderViewMode /> }
 			{ isEditMode && <WelcomeGuide /> }
 			<KeyboardShortcuts.Register />
 			<SidebarComplementaryAreaFills />

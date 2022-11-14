@@ -99,6 +99,17 @@ export default function Layout() {
 									<SiteIconAndTitle />
 								</Button>
 							) }
+							{ ! isFullCanvas && (
+								<Button
+									className="edit-site-layout__edit-button"
+									label={ __( 'Open the editor' ) }
+									onClick={ () => {
+										__unstableSetCanvasMode( 'edit' );
+									} }
+								>
+									{ __( 'Edit' ) }
+								</Button>
+							) }
 
 							{ canvasMode === 'view' && isMobileViewport && (
 								<Button
