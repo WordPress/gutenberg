@@ -148,7 +148,7 @@ export default function useInput() {
 			}
 		}
 
-		const events = [ 'input', 'keydown' ];
+		const events = [ 'beforeinput', 'input', 'keydown' ];
 
 		events.forEach( ( eventType ) => {
 			node.addEventListener( eventType, onInput );
