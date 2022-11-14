@@ -201,6 +201,7 @@ function UnforwardedModal(
 						<div
 							className="components-modal__container"
 							tabIndex={ 0 }
+							role="region"
 						>
 							{ children }
 						</div>

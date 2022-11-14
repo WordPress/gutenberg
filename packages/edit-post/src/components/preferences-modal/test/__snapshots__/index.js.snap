@@ -93,6 +93,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
     </div>
     <div
       class="components-modal__container"
+      role="region"
       tabindex="0"
     >
       <div
@@ -702,6 +703,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
     </div>
     <div
       class="components-modal__container"
+      role="region"
       tabindex="0"
     >
       <div
