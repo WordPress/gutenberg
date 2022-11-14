@@ -17,6 +17,7 @@ import {
 	BlockTools,
 	__unstableBlockToolbarLastItem,
 	__unstableBlockSettingsMenuFirstItem,
+	__unstableUseClipboardHandler as useClipboardHandler,
 	__unstableUseTypingObserver as useTypingObserver,
 	BlockEditorKeyboardShortcuts,
 	store as blockEditorStore,
@@ -150,7 +151,11 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		toggleComplementaryArea( editSiteStore.name, NAVIGATION_SIDEBAR_NAME );
 	}, [ isNavigationSidebarOpen ] );
 	const contentRef = useRef();
-	const mergedRefs = useMergeRefs( [ contentRef, useTypingObserver() ] );
+	const mergedRefs = useMergeRefs( [
+		contentRef,
+		useClipboardHandler(),
+		useTypingObserver(),
+	] );
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 
