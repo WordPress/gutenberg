@@ -46,21 +46,20 @@ export default function Layout() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const [ isMobileCanvasVisible, setIsMobileCanvasVisible ] =
 		useState( false );
-	const isFullCanvas = isEditorPage && canvasMode === 'edit';
 	const canvasPadding = isMobileViewport ? 0 : 24;
 	const showSidebar =
 		( isMobileViewport && ! isMobileCanvasVisible ) ||
-		( ! isMobileViewport && ! isFullCanvas );
+		( ! isMobileViewport && ( canvasMode === 'view' || ! isEditorPage ) );
 	const showCanvas =
 		( isMobileViewport && isMobileCanvasVisible ) || ! isMobileViewport;
-	const showLogo =
-		( isMobileViewport && ! isMobileCanvasVisible ) ||
-		! isMobileViewport ||
-		canvasMode === 'edit';
 	// Ideally this effect could be removed if we move the "isMobileCanvasVisible" into the store.
 	useEffect( () => {
 		if ( canvasMode === 'view' && isMobileViewport ) {
 			setIsMobileCanvasVisible( false );
+		}
+
+		if ( canvasMode === 'edit' && isMobileViewport ) {
+			setIsMobileCanvasVisible( true );
 		}
 	}, [ canvasMode, isMobileViewport ] );
 
@@ -68,38 +67,44 @@ export default function Layout() {
 		<>
 			<div
 				className={ classnames( 'edit-site-layout', {
-					'is-full-canvas': isFullCanvas,
+					'is-full-canvas': isEditorPage && canvasMode === 'edit',
 				} ) }
 			>
 				<div className="edit-site-layout__header">
-					{ showLogo && (
-						<div className="edit-site-layout__logo">
-							{ isFullCanvas && (
-								<Button
-									className="edit-site-layout__view-mode-toggle"
-									label={ __( 'Open Navigation Sidebar' ) }
-									onClick={ () => {
-										clearSelectedBlock();
-										__unstableSetCanvasMode( 'view' );
-									} }
-								>
-									<SiteIconAndTitle
-										className="edit-site-layout__view-mode-toggle-icon"
-										showTitle={ false }
-									/>
-								</Button>
-							) }
-							{ ! isFullCanvas && (
-								<Button
-									href="index.php"
-									aria-label={ __(
-										'Go back to the dashboard'
-									) }
-								>
-									<SiteIconAndTitle />
-								</Button>
-							) }
-							{ ! isFullCanvas && (
+					<div className="edit-site-layout__logo">
+						{ ( ( ! isMobileViewport && canvasMode === 'view' ) ||
+							( isMobileViewport &&
+								! isMobileCanvasVisible ) ) && (
+							<Button
+								href="index.php"
+								aria-label={ __( 'Go back to the dashboard' ) }
+							>
+								<SiteIconAndTitle />
+							</Button>
+						) }
+						{ ( ( isMobileViewport && isMobileCanvasVisible ) ||
+							( ! isMobileViewport &&
+								canvasMode === 'edit' ) ) && (
+							<Button
+								className="edit-site-layout__view-mode-toggle"
+								label={ __( 'Open Navigation Sidebar' ) }
+								onClick={ () => {
+									clearSelectedBlock();
+									setIsMobileCanvasVisible( false );
+									__unstableSetCanvasMode( 'view' );
+								} }
+							>
+								<SiteIconAndTitle
+									className="edit-site-layout__view-mode-toggle-icon"
+									showTitle={ false }
+								/>
+							</Button>
+						) }
+						{ isEditorPage &&
+							( ( ! isMobileViewport && canvasMode === 'view' ) ||
+								( isMobileViewport &&
+									canvasMode === 'view' &&
+									isMobileCanvasVisible ) ) && (
 								<Button
 									className="edit-site-layout__edit-button"
 									label={ __( 'Open the editor' ) }
@@ -111,19 +116,18 @@ export default function Layout() {
 								</Button>
 							) }
 
-							{ canvasMode === 'view' && isMobileViewport && (
-								<Button
-									onClick={ () =>
-										setIsMobileCanvasVisible( true )
-									}
-								>
-									{ __( 'View Editor' ) }
-								</Button>
-							) }
-						</div>
-					) }
+						{ isMobileViewport && ! isMobileCanvasVisible && (
+							<Button
+								onClick={ () =>
+									setIsMobileCanvasVisible( true )
+								}
+							>
+								{ __( 'View Editor' ) }
+							</Button>
+						) }
+					</div>
 					<AnimatePresence>
-						{ isFullCanvas && (
+						{ isEditorPage && canvasMode === 'edit' && (
 							<motion.div
 								initial={ { y: -60 } }
 								animate={ { y: 0 } }
@@ -172,18 +176,9 @@ export default function Layout() {
 					<div
 						className="edit-site-layout__canvas-container"
 						style={ {
-							paddingTop:
-								isFullCanvas || isEditorPage
-									? 0
-									: canvasPadding,
-							paddingRight:
-								isFullCanvas || isEditorPage
-									? 0
-									: canvasPadding,
-							paddingBottom:
-								isFullCanvas || isEditorPage
-									? 0
-									: canvasPadding,
+							paddingTop: isEditorPage ? 0 : canvasPadding,
+							paddingRight: isEditorPage ? 0 : canvasPadding,
+							paddingBottom: isEditorPage ? 0 : canvasPadding,
 						} }
 					>
 						<motion.div
@@ -191,7 +186,11 @@ export default function Layout() {
 							className="edit-site-layout__canvas"
 							animate={ {
 								scale:
-									! isFullCanvas && isEditorPage ? 0.95 : 1,
+									isEditorPage &&
+									canvasMode === 'view' &&
+									! isMobileViewport
+										? 0.95
+										: 1,
 							} }
 							transition={ {
 								type: 'tween',
