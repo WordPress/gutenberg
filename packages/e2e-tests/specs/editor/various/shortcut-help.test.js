@@ -44,4 +44,22 @@ describe( 'keyboard shortcut help modal', () => {
 		);
 		expect( shortcutHelpModalElements ).toHaveLength( 0 );
 	} );
+
+	it( 'should contain tabindex on modal content div to improve compatibility with scrolling in browsers', async () => {
+		await clickOnMoreMenuItem( 'Keyboard shortcuts' );
+		const shortcutHelpModalElements = await page.$$(
+			'.edit-post-keyboard-shortcut-help-modal'
+		);
+		expect( shortcutHelpModalElements ).toHaveLength( 1 );
+
+		// Confirm content container had tabinde to allow scrolling and navigation from begining of content
+		// Similiar requirement to enter panel: https://www.w3.org/WAI/ARIA/apg/example-index/tabs/tabs-automatic.html#accessibilityfeatures
+		const findTabIndex = await page.evaluate(
+			() =>
+				document
+					.querySelector( 'div.components-modal__container' )
+					.getAttribute( 'tabindex' ) === '0'
+		);
+		expect( findTabIndex ).toBe( true );
+	} );
 } );

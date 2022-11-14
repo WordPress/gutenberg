@@ -118,6 +118,14 @@
 	}
 }
 
+// Modal container allows keyboard focus for scrolling
+.components-modal__container {
+	&:focus {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		outline: 3px solid #0000;
+	}
+}
+
 // Modal contents.
 .components-modal__content {
 	flex: 1;
