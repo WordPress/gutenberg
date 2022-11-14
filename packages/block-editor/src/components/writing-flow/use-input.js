@@ -123,10 +123,11 @@ export default function useInput() {
 				return;
 			}
 
-			const anchorElement =
+			const anchorElement = (
 				anchorNode.nodeType === anchorNode.ELEMENT_NODE
 					? anchorNode
-					: anchorNode.parentElement;
+					: anchorNode.parentElement
+			 ).closest( '[contenteditable]' );
 
 			const init = {};
 
@@ -152,6 +153,7 @@ export default function useInput() {
 		node.addEventListener( 'beforeinput', onBeforeInput );
 		node.addEventListener( 'keydown', onKeyDown );
 		node.addEventListener( 'compositionstart', onCompositionStart );
+
 		return () => {
 			events.forEach( ( eventType ) => {
 				node.removeEventListener( eventType, onInput );
