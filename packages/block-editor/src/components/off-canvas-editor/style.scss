@@ -1,0 +1,397 @@
+.block-editor-list-view-tree {
+	width: 100%;
+	border-collapse: collapse;
+	padding: 0;
+	margin: 0;
+
+	// Move upwards when in modal.
+	.components-modal__content & {
+		margin: (-$grid-unit-15) (-$grid-unit-15 * 0.5) 0;
+		width: calc(100% + #{ $grid-unit-15 });
+	}
+}
+
+.block-editor-list-view-leaf {
+	// Use position relative for row animation.
+	position: relative;
+
+	// The background has to be applied to the td, not tr, or border-radius won't work.
+	&.is-selected td {
+		background: var(--wp-admin-theme-color);
+	}
+	&.is-selected .block-editor-list-view-block-contents,
+	&.is-selected .components-button.has-icon {
+		color: $white;
+	}
+	&.is-selected .block-editor-list-view-block-contents {
+		// Hide selection styles while a user is dragging blocks/files etc.
+		.is-dragging-components-draggable & {
+			background: none;
+			color: $gray-900;
+		}
+	}
+	&.is-selected .block-editor-list-view-block-contents:focus {
+		&::after {
+			box-shadow:
+				inset 0 0 0 1px $white,
+				0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		}
+	}
+	&.is-selected .block-editor-list-view-block__menu:focus {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $white;
+	}
+
+	&.is-dragging {
+		display: none;
+	}
+
+	// Border radius for corners of the selected item.
+	&.is-first-selected td:first-child {
+		border-top-left-radius: $radius-block-ui;
+	}
+	&.is-first-selected td:last-child {
+		border-top-right-radius: $radius-block-ui;
+	}
+	&.is-last-selected td:first-child {
+		border-bottom-left-radius: $radius-block-ui;
+	}
+	&.is-last-selected td:last-child {
+		border-bottom-right-radius: $radius-block-ui;
+	}
+	&.is-branch-selected:not(.is-selected) {
+		// Lighten a CSS variable without introducing a new SASS variable
+		background:
+			linear-gradient(transparentize($white, 0.1), transparentize($white, 0.1)),
+			linear-gradient(var(--wp-admin-theme-color), var(--wp-admin-theme-color));
+	}
+	&.is-branch-selected.is-first-selected td:first-child {
+		border-top-left-radius: $radius-block-ui;
+	}
+	&.is-branch-selected.is-first-selected td:last-child {
+		border-top-right-radius: $radius-block-ui;
+	}
+	&[aria-expanded="false"] {
+		&.is-branch-selected.is-first-selected td:first-child {
+			border-top-left-radius: $radius-block-ui;
+		}
+		&.is-branch-selected.is-first-selected td:last-child {
+			border-top-right-radius: $radius-block-ui;
+		}
+		&.is-branch-selected.is-last-selected td:first-child {
+			border-bottom-left-radius: $radius-block-ui;
+		}
+		&.is-branch-selected.is-last-selected td:last-child {
+			border-bottom-right-radius: $radius-block-ui;
+		}
+	}
+	&.is-branch-selected:not(.is-selected) td {
+		border-radius: 0;
+	}
+
+
+	// List View renders a fixed number of items and relies on each item having a fixed height of 36px.
+	// If this value changes, we should also change the itemHeight value set in useFixedWindowList.
+	// See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
+	.block-editor-list-view-block-contents {
+		display: flex;
+		align-items: center;
+		width: 100%;
+		height: auto;
+		padding: ($grid-unit-15 * 0.5) $grid-unit-05 ($grid-unit-15 * 0.5) 0;
+		text-align: left;
+		color: $gray-900;
+		border-radius: $radius-block-ui;
+		position: relative;
+		white-space: nowrap;
+
+		&.is-dropping-before::before {
+			content: "";
+			position: absolute;
+			pointer-events: none;
+			transition: border-color 0.1s linear, border-style 0.1s linear, box-shadow 0.1s linear;
+			top: -2px;
+			right: 0;
+			left: 0;
+			border-top: 4px solid var(--wp-admin-theme-color);
+		}
+
+		.components-modal__content & {
+			padding-left: 0;
+			padding-right: 0;
+		}
+	}
+
+	.block-editor-list-view-block-contents:focus {
+		box-shadow: none;
+
+		&::after {
+			content: "";
+			position: absolute;
+			top: 0;
+			right: -(24px + 5px); // Icon size + padding.
+			bottom: 0;
+			left: 0;
+			border-radius: inherit;
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			z-index: 2;
+			pointer-events: none;
+
+			// Hide focus styles while a user is dragging blocks/files etc.
+			.is-dragging-components-draggable & {
+				box-shadow: none;
+			}
+		}
+	}
+	// Fix focus styling width when one row has fewer cells.
+	&.has-single-cell .block-editor-list-view-block-contents:focus::after {
+		right: 0;
+	}
+
+	.block-editor-list-view-block__menu:focus {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		z-index: 1;
+
+		// Hide focus styles while a user is dragging blocks/files etc.
+		.is-dragging-components-draggable & {
+			box-shadow: none;
+		}
+	}
+
+	&.is-visible .block-editor-list-view-block-contents {
+		opacity: 1;
+		@include edit-post__fade-in-animation;
+	}
+
+	.block-editor-block-icon {
+		align-self: flex-start;
+		margin-right: $grid-unit-10;
+		width: $icon-size;
+	}
+
+	.block-editor-list-view-block__menu-cell,
+	.block-editor-list-view-block__mover-cell,
+	.block-editor-list-view-block__contents-cell {
+		padding-top: 0;
+		padding-bottom: 0;
+	}
+
+	.block-editor-list-view-block__menu-cell,
+	.block-editor-list-view-block__mover-cell {
+		line-height: 0;
+		width: $button-size;
+		vertical-align: middle;
+		@include reduce-motion("transition");
+
+		> * {
+			opacity: 0;
+		}
+
+		// Show on hover, visible, and show above to keep the hit area size.
+		&:hover,
+		&.is-visible {
+			position: relative;
+			z-index: 1;
+
+			> * {
+				opacity: 1;
+				@include edit-post__fade-in-animation;
+			}
+		}
+
+		&,
+		.components-button.has-icon {
+			width: 24px;
+			min-width: 24px;
+			padding: 0;
+		}
+	}
+
+	.block-editor-list-view-block__menu-cell {
+		padding-right: $grid-unit-05;
+
+		.components-button.has-icon {
+			height: 24px;
+		}
+	}
+
+	.block-editor-list-view-block__mover-cell-alignment-wrapper {
+		display: flex;
+		height: 100%;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	// Keep the tap target large but the focus target small.
+	.block-editor-block-mover-button {
+		position: relative;
+		width: $button-size;
+		height: $button-size-small;
+
+		// Position the icon.
+		svg {
+			position: relative;
+			height: $button-size-small;
+		}
+
+		&.is-up-button {
+			margin-top: -$grid-unit-15 * 0.5;
+			align-items: flex-end;
+			svg {
+				bottom: -$grid-unit-05;
+			}
+		}
+
+		&.is-down-button {
+			margin-bottom: -$grid-unit-15 * 0.5;
+			align-items: flex-start;
+			svg {
+				top: -$grid-unit-05;
+			}
+		}
+
+		// Tweak size and position of focus ring.
+		&::before {
+			height: 16px;
+			min-width: 100%;
+			left: 0;
+			right: 0;
+		}
+	}
+
+	.block-editor-inserter__toggle {
+		background: $gray-900;
+		color: $white;
+		height: $grid-unit-30;
+		margin: 6px 6px 6px 1px;
+		min-width: $grid-unit-30;
+
+		&:active {
+			color: $white;
+		}
+	}
+
+	.block-editor-list-view-block-select-button__label-wrapper {
+		min-width: 120px;
+	}
+
+	.block-editor-list-view-block-select-button__title {
+		flex: 1;
+		position: relative;
+
+		.components-truncate {
+			position: absolute;
+			width: 100%;
+			transform: translateY(-50%);
+		}
+	}
+
+	.block-editor-list-view-block-select-button__anchor-wrapper {
+		position: relative;
+		max-width: min(110px, 40%);
+		width: 100%;
+	}
+
+	.block-editor-list-view-block-select-button__anchor {
+		position: absolute;
+		right: 0;
+		transform: translateY(-50%);
+		background: rgba($black, 0.1);
+		border-radius: $radius-block-ui;
+		padding: 2px 6px;
+		max-width: 100%;
+		box-sizing: border-box;
+	}
+
+	&.is-selected .block-editor-list-view-block-select-button__anchor {
+		background: rgba($black, 0.3);
+	}
+
+	.block-editor-list-view-block-select-button__lock {
+		line-height: 0;
+		width: 24px;
+		min-width: 24px;
+		margin-left: auto;
+		padding: 0;
+		vertical-align: middle;
+	}
+}
+
+.block-editor-list-view-block-select-button__description,
+.block-editor-list-view-appender__description {
+	display: none;
+}
+
+.block-editor-list-view-block__contents-cell,
+.block-editor-list-view-appender__cell {
+	.block-editor-list-view-block__contents-container,
+	.block-editor-list-view-appender__container {
+		display: flex;
+	}
+}
+
+// Chevron container metrics.
+.block-editor-list-view__expander {
+	height: $icon-size;
+	margin-left: $grid-unit-05;
+	width: $icon-size;
+}
+
+// First level of indentation is aria-level 2, max indent is 8.
+// Indent is a full icon size, plus 4px which optically aligns child icons to the text label above.
+$block-navigation-max-indent: 8;
+.block-editor-list-view-leaf[aria-level] .block-editor-list-view__expander {
+	margin-left: ( $icon-size ) * $block-navigation-max-indent + 4 * ( $block-navigation-max-indent - 1 );
+}
+
+.block-editor-list-view-leaf:not([aria-level="1"]) {
+	.block-editor-list-view__expander {
+		margin-right: 4px;
+	}
+}
+
+@for $i from 0 to $block-navigation-max-indent {
+	.block-editor-list-view-leaf[aria-level="#{ $i + 1 }"] .block-editor-list-view__expander {
+		@if $i - 1 >= 0 {
+			margin-left: ( $icon-size * $i ) + 4 * ($i - 1);
+		}
+		@else {
+			margin-left: ( $icon-size * $i );
+		}
+	}
+}
+
+.block-editor-list-view-leaf .block-editor-list-view__expander {
+	visibility: hidden;
+}
+
+// Point downwards when open.
+.block-editor-list-view-leaf[aria-expanded="true"] .block-editor-list-view__expander svg {
+	visibility: visible;
+	transition: transform 0.2s ease;
+	transform: rotate(90deg);
+	@include reduce-motion("transition");
+}
+
+// Point rightwards when closed
+.block-editor-list-view-leaf[aria-expanded="false"] .block-editor-list-view__expander svg {
+	visibility: visible;
+	transform: rotate(0deg);
+	transition: transform 0.2s ease;
+	@include reduce-motion("transition");
+}
+
+.block-editor-list-view-drop-indicator {
+	pointer-events: none;
+
+	.block-editor-list-view-drop-indicator__line {
+		background: var(--wp-admin-theme-color);
+		height: $border-width;
+	}
+}
+
+.block-editor-list-view-placeholder {
+	padding: 0;
+	margin: 0;
+	height: 36px;
+}
+
