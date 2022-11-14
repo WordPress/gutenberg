@@ -6,6 +6,7 @@ export {
 	Polygon,
 	Rect,
 	G,
+	Line,
 	HorizontalRule,
 	BlockQuotation,
 } from '@wordpress/primitives';
@@ -16,7 +17,7 @@ export {
 	default as Animate,
 	getAnimateClassName as __unstableGetAnimateClassName,
 } from './animate';
-export { __unstableMotion, __unstableAnimatePresence } from './animation';
+export { __unstableMotion } from './animation';
 export { default as AnglePickerControl } from './angle-picker-control';
 export {
 	default as Autocomplete,
@@ -125,8 +126,9 @@ export { default as PanelHeader } from './panel/header';
 export { default as PanelRow } from './panel/row';
 export { default as Placeholder } from './placeholder';
 export { default as Popover } from './popover';
+export { positionToPlacement as __experimentalPopoverPositionToPlacement } from './popover/utils';
 export { default as QueryControls } from './query-controls';
-export { default as __experimentalRadio } from './radio';
+export { default as __experimentalRadio } from './radio-group/radio';
 export { default as __experimentalRadioGroup } from './radio-group';
 export { default as RadioControl } from './radio-control';
 export { default as RangeControl } from './range-control';
@@ -146,6 +148,7 @@ export { Text as __experimentalText } from './text';
 export { default as TextControl } from './text-control';
 export { default as TextareaControl } from './textarea-control';
 export { default as TextHighlight } from './text-highlight';
+export { default as __experimentalTheme } from './theme';
 export { default as Tip } from './tip';
 export { default as ToggleControl } from './toggle-control';
 export {

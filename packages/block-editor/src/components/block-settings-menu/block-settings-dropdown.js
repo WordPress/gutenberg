@@ -1,12 +1,11 @@
 /**
- * External dependencies
- */
-import { castArray } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { getBlockType, serialize } from '@wordpress/blocks';
+import {
+	getBlockType,
+	serialize,
+	store as blocksStore,
+} from '@wordpress/blocks';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { moreVertical } from '@wordpress/icons';
@@ -37,7 +36,7 @@ const noop = () => {};
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
 	position: 'bottom right',
-	isAlternate: true,
+	variant: 'toolbar',
 };
 
 function CopyMenuItem( { blocks, onCopy } ) {
@@ -54,12 +53,14 @@ export function BlockSettingsDropdown( {
 	__unstableDisplayLocation,
 	...props
 } ) {
-	const blockClientIds = castArray( clientIds );
+	const blockClientIds = Array.isArray( clientIds )
+		? clientIds
+		: [ clientIds ];
 	const count = blockClientIds.length;
 	const firstBlockClientId = blockClientIds[ 0 ];
 	const {
 		firstParentClientId,
-		hasReducedUI,
+		isDistractionFree,
 		onlyBlock,
 		parentBlockType,
 		previousBlockClientId,
@@ -70,22 +71,32 @@ export function BlockSettingsDropdown( {
 			const {
 				getBlockCount,
 				getBlockName,
-				getBlockParents,
+				getBlockRootClientId,
 				getPreviousBlockClientId,
 				getNextBlockClientId,
 				getSelectedBlockClientIds,
 				getSettings,
+				getBlockAttributes,
 			} = select( blockEditorStore );
 
-			const parents = getBlockParents( firstBlockClientId );
-			const _firstParentClientId = parents[ parents.length - 1 ];
-			const parentBlockName = getBlockName( _firstParentClientId );
+			const { getActiveBlockVariation } = select( blocksStore );
+
+			const _firstParentClientId =
+				getBlockRootClientId( firstBlockClientId );
+			const parentBlockName =
+				_firstParentClientId && getBlockName( _firstParentClientId );
 
 			return {
 				firstParentClientId: _firstParentClientId,
-				hasReducedUI: getSettings().hasReducedUI,
-				onlyBlock: 1 === getBlockCount(),
-				parentBlockType: getBlockType( parentBlockName ),
+				isDistractionFree: getSettings().isDistractionFree,
+				onlyBlock: 1 === getBlockCount( _firstParentClientId ),
+				parentBlockType:
+					_firstParentClientId &&
+					( getActiveBlockVariation(
+						parentBlockName,
+						getBlockAttributes( _firstParentClientId )
+					) ||
+						getBlockType( parentBlockName ) ),
 				previousBlockClientId:
 					getPreviousBlockClientId( firstBlockClientId ),
 				nextBlockClientId: getNextBlockClientId( firstBlockClientId ),
@@ -171,7 +182,7 @@ export function BlockSettingsDropdown( {
 	const { gestures: showParentOutlineGestures } = useShowMoversGestures( {
 		ref: selectParentButtonRef,
 		onChange( isFocused ) {
-			if ( isFocused && hasReducedUI ) {
+			if ( isFocused && isDistractionFree ) {
 				return;
 			}
 			toggleBlockHighlight( firstParentClientId, isFocused );
@@ -210,7 +221,7 @@ export function BlockSettingsDropdown( {
 								<__unstableBlockSettingsMenuFirstItem.Slot
 									fillProps={ { onClose } }
 								/>
-								{ firstParentClientId !== undefined && (
+								{ !! firstParentClientId && (
 									<MenuItem
 										{ ...showParentOutlineGestures }
 										ref={ selectParentButtonRef }

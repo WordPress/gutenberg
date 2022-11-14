@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/jest-preset-default",
-	"version": "9.1.0",
+	"version": "10.2.0",
 	"description": "Default Jest preset for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -36,8 +36,8 @@
 	"peerDependencies": {
 		"@babel/core": ">=7",
 		"jest": ">=27",
-		"react": "^17.0.0",
-		"react-dom": "^17.0.0"
+		"react": ">=17",
+		"react-dom": ">=17"
 	},
 	"publishConfig": {
 		"access": "public"

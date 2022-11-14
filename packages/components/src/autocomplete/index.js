@@ -212,7 +212,7 @@ function useAutocomplete( {
 	}
 
 	function handleKeyDown( event ) {
-		backspacing.current = event.code === 'Backspace';
+		backspacing.current = event.key === 'Backspace';
 
 		if ( ! autocompleter ) {
 			return;
@@ -223,7 +223,7 @@ function useAutocomplete( {
 		if ( event.defaultPrevented ) {
 			return;
 		}
-		switch ( event.code ) {
+		switch ( event.key ) {
 			case 'ArrowUp':
 				setSelectedIndex(
 					( selectedIndex === 0

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { create, act } from 'react-test-renderer';
+import { render } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -12,20 +12,16 @@ const noop = () => {};
 
 describe( 'ColorPaletteControl', () => {
 	it( 'matches the snapshot', async () => {
-		let root;
+		const { container } = render(
+			<ColorPaletteControl
+				label="Test Color"
+				value="#f00"
+				colors={ [ { color: '#f00', name: 'red' } ] }
+				disableCustomColors={ false }
+				onChange={ noop }
+			/>
+		);
 
-		await act( async () => {
-			root = create(
-				<ColorPaletteControl
-					label="Test Color"
-					value="#f00"
-					colors={ [ { color: '#f00', name: 'red' } ] }
-					disableCustomColors={ false }
-					onChange={ noop }
-				/>
-			);
-		} );
-
-		expect( root.toJSON() ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 } );

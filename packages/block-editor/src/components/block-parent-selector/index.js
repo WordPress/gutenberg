@@ -24,7 +24,7 @@ import { store as blockEditorStore } from '../../store';
 export default function BlockParentSelector() {
 	const { selectBlock, toggleBlockHighlight } =
 		useDispatch( blockEditorStore );
-	const { firstParentClientId, shouldHide, hasReducedUI } = useSelect(
+	const { firstParentClientId, shouldHide, isDistractionFree } = useSelect(
 		( select ) => {
 			const {
 				getBlockName,
@@ -46,7 +46,7 @@ export default function BlockParentSelector() {
 					'__experimentalParentSelector',
 					true
 				),
-				hasReducedUI: settings.hasReducedUI,
+				isDistractionFree: settings.isDistractionFree,
 			};
 		},
 		[]
@@ -59,7 +59,7 @@ export default function BlockParentSelector() {
 	const { gestures: showMoversGestures } = useShowMoversGestures( {
 		ref: nodeRef,
 		onChange( isFocused ) {
-			if ( isFocused && hasReducedUI ) {
+			if ( isFocused && isDistractionFree ) {
 				return;
 			}
 			toggleBlockHighlight( firstParentClientId, isFocused );

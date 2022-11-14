@@ -1,14 +1,12 @@
 /**
  * External dependencies
  */
-import { pickBy, isEmpty, mapValues, get, setWith, clone, every } from 'lodash';
+import { isEmpty, mapValues, get, setWith, clone } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
-
-const identity = ( x ) => x;
 
 /**
  * Removed falsy values from nested object.
@@ -24,9 +22,10 @@ export const cleanEmptyObject = ( object ) => {
 	) {
 		return object;
 	}
-	const cleanedNestedObjects = pickBy(
-		mapValues( object, cleanEmptyObject ),
-		identity
+	const cleanedNestedObjects = Object.fromEntries(
+		Object.entries( mapValues( object, cleanEmptyObject ) ).filter(
+			( [ , value ] ) => Boolean( value )
+		)
 	);
 	return isEmpty( cleanedNestedObjects ) ? undefined : cleanedNestedObjects;
 };
@@ -44,7 +43,11 @@ export function transformStyles(
 	results
 ) {
 	// If there are no active supports return early.
-	if ( every( activeSupports, ( isActive ) => ! isActive ) ) {
+	if (
+		Object.values( activeSupports ?? {} ).every(
+			( isActive ) => ! isActive
+		)
+	) {
 		return result;
 	}
 	// If the condition verifies we are probably in the presence of a wrapping transform

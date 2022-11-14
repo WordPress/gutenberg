@@ -221,7 +221,7 @@ function ButtonEdit( props ) {
 			</BlockControls>
 			{ isSelected && ( isEditingURL || isURLSet ) && (
 				<Popover
-					position="bottom center"
+					placement="bottom"
 					onClose={ () => {
 						setIsEditingURL( false );
 						richTextRef.current?.focus();

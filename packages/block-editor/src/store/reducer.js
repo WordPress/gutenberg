@@ -1,15 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	reduce,
-	omit,
-	without,
-	mapValues,
-	isEqual,
-	isEmpty,
-	omitBy,
-} from 'lodash';
+import { omit, mapValues, isEqual, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -425,15 +417,15 @@ const withBlockTree =
 				break;
 			}
 			case 'SAVE_REUSABLE_BLOCK_SUCCESS': {
-				const updatedBlockUids = Object.keys(
-					omitBy( newState.attributes, ( attributes, clientId ) => {
+				const updatedBlockUids = Object.entries( newState.attributes )
+					.filter( ( [ clientId, attributes ] ) => {
 						return (
-							newState.byClientId[ clientId ].name !==
-								'core/block' ||
-							attributes.ref !== action.updatedId
+							newState.byClientId[ clientId ].name ===
+								'core/block' &&
+							attributes.ref === action.updatedId
 						);
 					} )
-				);
+					.map( ( [ clientId ] ) => clientId );
 
 				newState.tree = updateParentInnerBlocksInTree(
 					newState,
@@ -691,30 +683,22 @@ const withReplaceInnerBlocks = ( reducer ) => ( state, action ) => {
 		// will be deleted entirely from its entity.
 		stateAfterInsert.order = {
 			...stateAfterInsert.order,
-			...reduce(
-				nestedControllers,
-				( result, value, key ) => {
-					if ( state.order[ key ] ) {
-						result[ key ] = state.order[ key ];
-					}
-					return result;
-				},
-				{}
-			),
+			...Object.keys( nestedControllers ).reduce( ( result, key ) => {
+				if ( state.order[ key ] ) {
+					result[ key ] = state.order[ key ];
+				}
+				return result;
+			}, {} ),
 		};
 		stateAfterInsert.tree = {
 			...stateAfterInsert.tree,
-			...reduce(
-				nestedControllers,
-				( result, value, _key ) => {
-					const key = `controlled||${ _key }`;
-					if ( state.tree[ key ] ) {
-						result[ key ] = state.tree[ key ];
-					}
-					return result;
-				},
-				{}
-			),
+			...Object.keys( nestedControllers ).reduce( ( result, _key ) => {
+				const key = `controlled||${ _key }`;
+				if ( state.tree[ key ] ) {
+					result[ key ] = state.tree[ key ];
+				}
+				return result;
+			}, {} ),
 		};
 	}
 	return stateAfterInsert;
@@ -881,24 +865,22 @@ export const blocks = pipe(
 				const next = action.clientIds.reduce(
 					( accumulator, id ) => ( {
 						...accumulator,
-						[ id ]: reduce(
+						[ id ]: Object.entries(
 							action.uniqueByBlock
 								? action.attributes[ id ]
-								: action.attributes,
-							( result, value, key ) => {
-								// Consider as updates only changed values.
-								if ( value !== result[ key ] ) {
-									result = getMutateSafeObject(
-										state[ id ],
-										result
-									);
-									result[ key ] = value;
-								}
+								: action.attributes ?? {}
+						).reduce( ( result, [ key, value ] ) => {
+							// Consider as updates only changed values.
+							if ( value !== result[ key ] ) {
+								result = getMutateSafeObject(
+									state[ id ],
+									result
+								);
+								result[ key ] = value;
+							}
 
-								return result;
-							},
-							state[ id ]
-						),
+							return result;
+						}, state[ id ] ),
 					} ),
 					{}
 				);
@@ -987,10 +969,10 @@ export const blocks = pipe(
 				// Moving from a parent block to another.
 				return {
 					...state,
-					[ fromRootClientId ]: without(
-						state[ fromRootClientId ],
-						...clientIds
-					),
+					[ fromRootClientId ]:
+						state[ fromRootClientId ]?.filter(
+							( id ) => ! clientIds.includes( id )
+						) ?? [],
 					[ toRootClientId ]: insertAt(
 						state[ toRootClientId ],
 						clientIds,
@@ -1064,8 +1046,7 @@ export const blocks = pipe(
 					} ),
 					( nextState ) =>
 						mapValues( nextState, ( subState ) =>
-							reduce(
-								subState,
+							Object.values( subState ).reduce(
 								( result, clientId ) => {
 									if ( clientId === clientIds[ 0 ] ) {
 										return [
@@ -1095,8 +1076,13 @@ export const blocks = pipe(
 
 					// Remove deleted blocks from other blocks' orderings.
 					( nextState ) =>
-						mapValues( nextState, ( subState ) =>
-							without( subState, ...action.removedClientIds )
+						mapValues(
+							nextState,
+							( subState ) =>
+								subState?.filter(
+									( id ) =>
+										! action.removedClientIds.includes( id )
+								) ?? []
 						),
 				] )( state );
 		}
@@ -1162,6 +1148,26 @@ export const blocks = pipe(
 		return state;
 	},
 } );
+
+/**
+ * Reducer returning visibility status of block interface.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function isBlockInterfaceHidden( state = false, action ) {
+	switch ( action.type ) {
+		case 'HIDE_BLOCK_INTERFACE':
+			return true;
+
+		case 'SHOW_BLOCK_INTERFACE':
+			return false;
+	}
+
+	return state;
+}
 
 /**
  * Reducer returning typing state.
@@ -1475,9 +1481,19 @@ export function blocksMode( state = {}, action ) {
  */
 export function insertionPoint( state = null, action ) {
 	switch ( action.type ) {
-		case 'SHOW_INSERTION_POINT':
-			const { rootClientId, index, __unstableWithInserter } = action;
-			return { rootClientId, index, __unstableWithInserter };
+		case 'SHOW_INSERTION_POINT': {
+			const { rootClientId, index, __unstableWithInserter, operation } =
+				action;
+			const nextState = {
+				rootClientId,
+				index,
+				__unstableWithInserter,
+				operation,
+			};
+
+			// Bail out updates if the states are the same.
+			return isEqual( state, nextState ) ? state : nextState;
+		}
 
 		case 'HIDE_INSERTION_POINT':
 			return null;
@@ -1802,6 +1818,7 @@ export function temporarilyEditingAsBlocks( state = '', action ) {
 export default combineReducers( {
 	blocks,
 	isTyping,
+	isBlockInterfaceHidden,
 	draggedBlocks,
 	selection,
 	isMultiSelecting,

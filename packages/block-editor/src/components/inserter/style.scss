@@ -22,13 +22,12 @@ $block-inserter-tabs-height: 44px;
 	flex-direction: column;
 	height: 100%;
 	gap: $grid-unit-20;
-	width: auto;
-	@include break-medium {
-		width: $block-inserter-width;
-	}
-
 	&.show-as-tabs {
 		gap: 0;
+	}
+
+	@include break-medium {
+		width: $block-inserter-width;
 	}
 }
 
@@ -148,10 +147,6 @@ $block-inserter-tabs-height: 44px;
 	padding: $grid-unit-20 $grid-unit-20 0;
 }
 
-.block-editor-inserter__panel-header-patterns {
-	padding: $grid-unit-20 $grid-unit-20 0;
-}
-
 .block-editor-inserter__panel-content {
 	padding: $grid-unit-20;
 }
@@ -232,6 +227,92 @@ $block-inserter-tabs-height: 44px;
 
 	.block-editor-block-card__title {
 		font-size: $default-font-size;
+	}
+}
+
+.block-editor-inserter__patterns-explore-button.components-button {
+	padding: $grid-unit-20;
+	justify-content: center;
+	margin-top: $grid-unit-20;
+	width: 100%;
+}
+
+.block-editor-inserter__patterns-selected-category.block-editor-inserter__patterns-selected-category {
+	color: var(--wp-admin-theme-color);
+	position: relative;
+
+	.components-flex-item {
+		filter: brightness(0.95);
+	}
+
+	svg {
+		fill: var(--wp-admin-theme-color);
+	}
+
+	&::after {
+		content: "";
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		border-radius: $radius-block-ui;
+		opacity: 0.04;
+		background: var(--wp-admin-theme-color);
+	}
+}
+
+.block-editor-inserter__block-patterns-tabs-container {
+	height: 100%;
+	nav {
+		height: 100%;
+	}
+}
+
+.block-editor-inserter__block-patterns-tabs {
+	display: flex;
+	flex-direction: column;
+	padding: $grid-unit-20;
+	overflow-y: auto;
+	height: 100%;
+}
+
+.block-editor-inserter__patterns-fill-space {
+	flex-grow: 1;
+}
+
+.block-editor-inserter__patterns-category-panel {
+	background: $gray-100;
+	border-left: $border-width solid $gray-200;
+	border-right: $border-width solid $gray-200;
+	position: absolute;
+	padding: $grid-unit-40 $grid-unit-30;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	overflow-y: auto;
+	scrollbar-gutter: stable both-edges;
+
+	@include break-medium {
+		left: 100%;
+		display: block;
+		width: 300px;
+	}
+
+	.block-editor-block-patterns-list {
+		margin-top: $grid-unit-30;
+	}
+
+	.block-editor-block-preview__container {
+		box-shadow: 0 15px 25px rgb(0 0 0 / 7%);
+		&:hover {
+			box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
+		}
+	}
+
+	.block-editor-block-patterns-list__item-title {
+		display: none;
 	}
 }
 
@@ -387,4 +468,8 @@ $block-inserter-tabs-height: 44px;
 			max-height: 800px;
 		}
 	}
+}
+
+.block-editor-inserter__patterns-category-panel-title {
+	font-size: calc(1.25 * 13px);
 }

@@ -93,7 +93,7 @@ function Snackbar(
 		}, NOTICE_TIMEOUT );
 
 		return () => clearTimeout( timeoutHandle );
-	}, [ onDismiss, onRemove ] );
+	}, [ onDismiss, onRemove, explicitDismiss ] );
 
 	const classes = classnames( className, 'components-snackbar', {
 		'components-snackbar-explicit-dismiss': !! explicitDismiss,

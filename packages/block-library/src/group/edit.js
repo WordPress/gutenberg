@@ -35,7 +35,12 @@ const htmlElementMessages = {
 	),
 };
 
-function GroupEdit( { attributes, setAttributes, clientId } ) {
+function GroupEdit( {
+	attributes,
+	setAttributes,
+	clientId,
+	__unstableLayoutClassNames: layoutClassNames,
+} ) {
 	const { hasInnerBlocks, themeSupportsLayout } = useSelect(
 		( select ) => {
 			const { getBlock, getSettings } = select( blockEditorStore );
@@ -53,9 +58,11 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 		? { ...defaultLayout, ...layout, type: 'default' }
 		: { ...defaultLayout, ...layout };
 	const { type = 'default' } = usedLayout;
-	const layoutSupportEnabled = themeSupportsLayout || type !== 'default';
+	const layoutSupportEnabled = themeSupportsLayout || type === 'flex';
 
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		className: ! layoutSupportEnabled ? layoutClassNames : null,
+	} );
 
 	const innerBlocksProps = useInnerBlocksProps(
 		layoutSupportEnabled
@@ -67,6 +74,7 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 				? undefined
 				: InnerBlocks.ButtonBlockAppender,
 			__experimentalLayout: layoutSupportEnabled ? usedLayout : undefined,
+			__unstableDisableLayoutClassNames: ! layoutSupportEnabled,
 		}
 	);
 

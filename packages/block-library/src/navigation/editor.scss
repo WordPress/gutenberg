@@ -261,10 +261,6 @@ $color-control-label-height: 20px;
 	}
 }
 
-.wp-block-navigation-placeholder .components-spinner {
-	margin-top: 0;
-}
-
 // Unselected state.
 .wp-block-navigation-placeholder__preview {
 	display: flex;
@@ -291,6 +287,7 @@ $color-control-label-height: 20px;
 		bottom: 0;
 		left: 0;
 		pointer-events: none;
+		border: $border-width dashed currentColor;
 		@include placeholder-style();
 
 		// Inherit border radius from style variations.
@@ -564,6 +561,10 @@ body.editor-styles-wrapper
 // room when block is selected and has focus outline.
 .wp-block-navigation .components-spinner {
 	padding: $grid-unit-10 $grid-unit-15;
+}
+
+.wp-block-navigation .wp-block-navigation__uncontrolled-inner-blocks-loading-indicator {
+	margin-top: 0;
 }
 
 @keyframes fadeouthalf {

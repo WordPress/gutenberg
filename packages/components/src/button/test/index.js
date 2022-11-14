@@ -27,7 +27,7 @@ describe( 'Button', () => {
 			expect( button ).not.toHaveClass( 'is-large' );
 			expect( button ).not.toHaveClass( 'is-primary' );
 			expect( button ).not.toHaveClass( 'is-pressed' );
-			expect( button ).not.toHaveAttribute( 'disabled' );
+			expect( button ).toBeEnabled();
 			expect( button ).not.toHaveAttribute( 'aria-disabled' );
 			expect( button ).toHaveAttribute( 'type', 'button' );
 		} );
@@ -114,16 +114,14 @@ describe( 'Button', () => {
 		it( 'should add a disabled prop to the button', () => {
 			render( <Button disabled /> );
 
-			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
-				'disabled'
-			);
+			expect( screen.getByRole( 'button' ) ).toBeDisabled();
 		} );
 
 		it( 'should add only aria-disabled attribute when disabled and isFocusable are true', () => {
 			render( <Button disabled __experimentalIsFocusable /> );
 			const button = screen.getByRole( 'button' );
 
-			expect( button ).not.toHaveAttribute( 'disabled' );
+			expect( button ).toBeEnabled();
 			expect( button ).toHaveAttribute( 'aria-disabled' );
 		} );
 

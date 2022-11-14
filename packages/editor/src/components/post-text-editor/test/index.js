@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import { act, create } from 'react-test-renderer';
-import Textarea from 'react-autosize-textarea';
+import { act, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
@@ -38,6 +38,8 @@ jest.mock( '@wordpress/data/src/components/use-dispatch', () => {
 	};
 } );
 
+jest.useRealTimers();
+
 describe( 'PostTextEditor', () => {
 	beforeEach( () => {
 		useSelect.mockImplementation( () => 'Hello World' );
@@ -47,132 +49,110 @@ describe( 'PostTextEditor', () => {
 	} );
 
 	it( 'should render via the value from useSelect', () => {
-		let wrapper;
+		render( <PostTextEditor /> );
 
-		act( () => {
-			wrapper = create( <PostTextEditor /> );
-		} );
-
-		const textarea = wrapper.root.findByType( Textarea );
-		expect( textarea.props.value ).toBe( 'Hello World' );
+		expect( screen.getByLabelText( 'Type text or HTML' ) ).toHaveValue(
+			'Hello World'
+		);
 	} );
 
-	it( 'should render via the state value when edits made', () => {
-		let wrapper;
+	it( 'should render via the state value when edits made', async () => {
+		const user = userEvent.setup();
+		render( <PostTextEditor /> );
 
-		act( () => {
-			wrapper = create( <PostTextEditor /> );
-		} );
+		const textarea = screen.getByLabelText( 'Type text or HTML' );
 
-		const textarea = wrapper.root.findByType( Textarea );
+		await user.clear( textarea );
+		await user.type( textarea, 'Hello Chicken' );
 
-		act( () =>
-			textarea.props.onChange( { target: { value: 'Hello Chicken' } } )
-		);
-
-		expect( textarea.props.value ).toBe( 'Hello Chicken' );
+		expect( textarea ).toHaveValue( 'Hello Chicken' );
 		expect( mockEditPost ).toHaveBeenCalledWith( {
 			content: 'Hello Chicken',
 		} );
 	} );
 
-	it( 'should render via the state value when edits made, even if prop value changes', () => {
-		let wrapper;
+	it( 'should render via the state value when edits made, even if prop value changes', async () => {
+		const user = userEvent.setup();
+		const { rerender } = render( <PostTextEditor /> );
 
-		act( () => {
-			wrapper = create( <PostTextEditor /> );
-		} );
+		const textarea = screen.getByLabelText( 'Type text or HTML' );
 
-		const textarea = wrapper.root.findByType( Textarea );
-
-		act( () =>
-			textarea.props.onChange( { target: { value: 'Hello Chicken' } } )
-		);
+		await user.clear( textarea );
+		await user.type( textarea, 'Hello Chicken' );
 
 		useSelect.mockImplementation( () => 'Goodbye World' );
 
-		act( () => {
-			wrapper.update( <PostTextEditor /> );
-		} );
+		rerender( <PostTextEditor /> );
 
-		expect( textarea.props.value ).toBe( 'Hello Chicken' );
+		expect( textarea ).toHaveValue( 'Hello Chicken' );
 		expect( mockEditPost ).toHaveBeenCalledWith( {
 			content: 'Hello Chicken',
 		} );
 	} );
 
-	it( 'should render via the state value when edits made, even if prop value changes and state value empty', () => {
-		let wrapper;
+	it( 'should render via the state value when edits made, even if prop value changes and state value empty', async () => {
+		const user = userEvent.setup();
+		const { rerender } = render( <PostTextEditor /> );
 
-		act( () => {
-			wrapper = create( <PostTextEditor /> );
-		} );
+		const textarea = screen.getByLabelText( 'Type text or HTML' );
 
-		const textarea = wrapper.root.findByType( Textarea );
-		act( () => textarea.props.onChange( { target: { value: '' } } ) );
+		await user.clear( textarea );
 
 		useSelect.mockImplementation( () => 'Goodbye World' );
 
-		act( () => {
-			wrapper.update( <PostTextEditor /> );
-		} );
+		rerender( <PostTextEditor /> );
 
-		expect( textarea.props.value ).toBe( '' );
+		expect( textarea ).toHaveValue( '' );
 		expect( mockEditPost ).toHaveBeenCalledWith( {
 			content: '',
 		} );
 	} );
 
-	it( 'calls onPersist after changes made and user stops editing', () => {
-		let wrapper;
+	it( 'calls onPersist after changes made and user stops editing', async () => {
+		const user = userEvent.setup();
+		render( <PostTextEditor /> );
 
+		const textarea = screen.getByLabelText( 'Type text or HTML' );
+
+		await user.clear( textarea );
+
+		// Stop editing.
 		act( () => {
-			wrapper = create( <PostTextEditor /> );
+			textarea.blur();
 		} );
-
-		const textarea = wrapper.root.findByType( Textarea );
-
-		act( () => textarea.props.onChange( { target: { value: '' } } ) );
-		act( () => textarea.props.onBlur() );
 
 		expect( mockResetEditorBlocks ).toHaveBeenCalledWith( [] );
 	} );
 
 	it( 'does not call onPersist after user stops editing without changes', () => {
-		let wrapper;
+		render( <PostTextEditor /> );
 
-		act( () => {
-			wrapper = create( <PostTextEditor /> );
-		} );
-
-		const textarea = wrapper.root.findByType( Textarea );
-		act( () => textarea.props.onBlur() );
+		// Stop editing.
+		screen.getByLabelText( 'Type text or HTML' ).blur();
 
 		expect( mockResetEditorBlocks ).not.toHaveBeenCalled();
 	} );
 
-	it( 'resets to prop value after user stops editing', () => {
+	it( 'resets to prop value after user stops editing', async () => {
 		// This isn't the most realistic case, since typically we'd assume the
 		// parent renderer to pass the value as it had received onPersist. The
 		// test here is more an edge case to stress that it's intentionally
 		// differentiating between state and prop values.
-		let wrapper;
+		const user = userEvent.setup();
+		const { rerender } = render( <PostTextEditor /> );
 
-		act( () => {
-			wrapper = create( <PostTextEditor /> );
-		} );
+		const textarea = screen.getByLabelText( 'Type text or HTML' );
 
-		const textarea = wrapper.root.findByType( Textarea );
-		act( () => textarea.props.onChange( { target: { value: '' } } ) );
+		await user.clear( textarea );
 
 		useSelect.mockImplementation( () => 'Goodbye World' );
 
+		rerender( <PostTextEditor /> );
+
 		act( () => {
-			wrapper.update( <PostTextEditor /> );
+			textarea.blur();
 		} );
 
-		act( () => textarea.props.onBlur() );
-
-		expect( textarea.props.value ).toBe( 'Goodbye World' );
+		expect( textarea ).toHaveValue( 'Goodbye World' );
 	} );
 } );

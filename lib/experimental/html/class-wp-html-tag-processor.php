@@ -55,7 +55,7 @@
  * no argument is provided then it will find the next HTML tag,
  * regardless of what kind it is.
  *
- * If you want to _find whatever the next tag is_
+ * If you want to _find whatever the next tag is_:
  * ```php
  *     $tags->next_tag();
  * ```
@@ -445,7 +445,7 @@ class WP_HTML_Tag_Processor {
 
 		$at = $this->parsed_bytes;
 
-		while ( true ) {
+		while ( false !== $at && $at < $doc_length ) {
 			$at = strpos( $this->html, '</', $at );
 
 			// If we have no possible tag closer then fail.
@@ -494,6 +494,8 @@ class WP_HTML_Tag_Processor {
 				return;
 			}
 		}
+
+		return false;
 	}
 
 	/**
@@ -507,7 +509,7 @@ class WP_HTML_Tag_Processor {
 		$doc_length = strlen( $html );
 		$at         = $this->parsed_bytes;
 
-		while ( $at < $doc_length ) {
+		while ( false !== $at && $at < $doc_length ) {
 			$at += strcspn( $html, '-<', $at );
 
 			/*
@@ -613,6 +615,8 @@ class WP_HTML_Tag_Processor {
 
 			++$at;
 		}
+
+		return false;
 	}
 
 	/**
@@ -623,10 +627,11 @@ class WP_HTML_Tag_Processor {
 	private function parse_next_tag() {
 		$this->after_tag();
 
-		$html = $this->html;
-		$at   = $this->parsed_bytes;
+		$html       = $this->html;
+		$doc_length = strlen( $html );
+		$at         = $this->parsed_bytes;
 
-		while ( true ) {
+		while ( false !== $at && $at < $doc_length ) {
 			$at = strpos( $html, '<', $at );
 			if ( false === $at ) {
 				return false;
@@ -663,7 +668,12 @@ class WP_HTML_Tag_Processor {
 					'-' === $html[ $at + 2 ] &&
 					'-' === $html[ $at + 3 ]
 				) {
-					$at = strpos( $html, '-->', $at + 4 ) + 3;
+					$closer_at = strpos( $html, '-->', $at + 4 );
+					if ( false === $closer_at ) {
+						return false;
+					}
+
+					$at = $closer_at + 3;
 					continue;
 				}
 
@@ -680,7 +690,12 @@ class WP_HTML_Tag_Processor {
 					'A' === $html[ $at + 7 ] &&
 					'[' === $html[ $at + 8 ]
 				) {
-					$at = strpos( $html, ']]>', $at + 9 ) + 3;
+					$closer_at = strpos( $html, ']]>', $at + 9 );
+					if ( false === $closer_at ) {
+						return false;
+					}
+
+					$at = $closer_at + 3;
 					continue;
 				}
 
@@ -699,7 +714,12 @@ class WP_HTML_Tag_Processor {
 					'P' === strtoupper( $html[ $at + 7 ] ) &&
 					'E' === strtoupper( $html[ $at + 8 ] )
 				) {
-					$at = strpos( $html, '>', $at + 9 ) + 1;
+					$closer_at = strpos( $html, '>', $at + 9 );
+					if ( false === $closer_at ) {
+						return false;
+					}
+
+					$at = $closer_at + 1;
 					continue;
 				}
 
@@ -716,12 +736,19 @@ class WP_HTML_Tag_Processor {
 			 * https://html.spec.whatwg.org/multipage/parsing.html#tag-open-state
 			 */
 			if ( '?' === $html[ $at + 1 ] ) {
-				$at = strpos( $html, '>', $at + 2 ) + 1;
+				$closer_at = strpos( $html, '>', $at + 2 );
+				if ( false === $closer_at ) {
+					return false;
+				}
+
+				$at = $closer_at + 1;
 				continue;
 			}
 
 			++$at;
 		}
+
+		return false;
 	}
 
 	/**
@@ -910,7 +937,8 @@ class WP_HTML_Tag_Processor {
 		$modified = false;
 
 		// Remove unwanted classes by only copying the new ones.
-		while ( $at < strlen( $existing_class ) ) {
+		$existing_class_length = strlen( $existing_class );
+		while ( $at < $existing_class_length ) {
 			// Skip to the first non-whitespace character.
 			$ws_at     = $at;
 			$ws_length = strspn( $existing_class, " \t\f\r\n", $ws_at );
@@ -1266,13 +1294,24 @@ class WP_HTML_Tag_Processor {
 
 	/**
 	 * Returns the string representation of the HTML Tag Processor.
-	 * It closes the HTML Tag Processor and prevents further lookups and modifications.
+	 *
+	 * @since 6.2.0
+	 * @see get_updated_html
+	 *
+	 * @return string The processed HTML.
+	 */
+	public function __toString() {
+		return $this->get_updated_html();
+	}
+
+	/**
+	 * Returns the string representation of the HTML Tag Processor.
 	 *
 	 * @since 6.2.0
 	 *
 	 * @return string The processed HTML.
 	 */
-	public function __toString() {
+	public function get_updated_html() {
 		// Short-circuit if there are no updates to apply.
 		if ( ! count( $this->classname_updates ) && ! count( $this->attribute_updates ) ) {
 			return $this->updated_html . substr( $this->html, $this->updated_bytes );

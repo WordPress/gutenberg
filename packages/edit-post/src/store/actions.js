@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { castArray, reduce, without } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -295,9 +290,11 @@ export const showBlockTypes =
 				.select( preferencesStore )
 				.get( 'core/edit-post', 'hiddenBlockTypes' ) ?? [];
 
-		const newBlockNames = without(
-			existingBlockNames,
-			...castArray( blockNames )
+		const newBlockNames = existingBlockNames.filter(
+			( type ) =>
+				! (
+					Array.isArray( blockNames ) ? blockNames : [ blockNames ]
+				 ).includes( type )
 		);
 
 		registry
@@ -320,7 +317,7 @@ export const hideBlockTypes =
 
 		const mergedBlockNames = new Set( [
 			...existingBlockNames,
-			...castArray( blockNames ),
+			...( Array.isArray( blockNames ) ? blockNames : [ blockNames ] ),
 		] );
 
 		registry
@@ -331,18 +328,16 @@ export const hideBlockTypes =
 	};
 
 /**
- * Returns an action object used in signaling
- * what Meta boxes are available in which location.
+ * Stores info about which Meta boxes are available in which location.
  *
  * @param {Object} metaBoxesPerLocation Meta boxes per location.
  */
-export const setAvailableMetaBoxesPerLocation =
-	( metaBoxesPerLocation ) =>
-	( { dispatch } ) =>
-		dispatch( {
-			type: 'SET_META_BOXES_PER_LOCATIONS',
-			metaBoxesPerLocation,
-		} );
+export function setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
+	return {
+		type: 'SET_META_BOXES_PER_LOCATIONS',
+		metaBoxesPerLocation,
+	};
+}
 
 /**
  * Update a metabox.
@@ -385,16 +380,12 @@ export const requestMetaBoxUpdates =
 		];
 
 		// Merge all form data objects into a single one.
-		const formData = reduce(
-			formDataToMerge,
-			( memo, currentFormData ) => {
-				for ( const [ key, value ] of currentFormData ) {
-					memo.append( key, value );
-				}
-				return memo;
-			},
-			new window.FormData()
-		);
+		const formData = formDataToMerge.reduce( ( memo, currentFormData ) => {
+			for ( const [ key, value ] of currentFormData ) {
+				memo.append( key, value );
+			}
+			return memo;
+		}, new window.FormData() );
 		additionalData.forEach( ( [ key, value ] ) =>
 			formData.append( key, value )
 		);
@@ -567,7 +558,6 @@ export const initializeMetaBoxes =
 		let wasAutosavingPost = registry
 			.select( editorStore )
 			.isAutosavingPost();
-		const hasMetaBoxes = select.hasMetaBoxes();
 
 		// Save metaboxes when performing a full save on the post.
 		registry.subscribe( async () => {
@@ -576,17 +566,12 @@ export const initializeMetaBoxes =
 				.select( editorStore )
 				.isAutosavingPost();
 
-			// Save metaboxes on save completion, except for autosaves that are not a post preview.
-			//
-			// Meta boxes are initialized once at page load. It is not necessary to
-			// account for updates on each state change.
-			//
-			// See: https://github.com/WordPress/WordPress/blob/5.1.1/wp-admin/includes/post.php#L2307-L2309.
+			// Save metaboxes on save completion, except for autosaves.
 			const shouldTriggerMetaboxesSave =
-				hasMetaBoxes &&
 				wasSavingPost &&
+				! wasAutosavingPost &&
 				! isSavingPost &&
-				! wasAutosavingPost;
+				select.hasMetaBoxes();
 
 			// Save current state for next inspection.
 			wasSavingPost = isSavingPost;

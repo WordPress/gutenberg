@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 5.5.0 (2022-11-02)
+
+## 5.4.0 (2022-10-19)
+
+## 5.3.0 (2022-10-05)
+
 ### New features
 
 -   Added Autocomplete Component e2e test suite. [#42905](https://github.com/WordPress/gutenberg/pull/42905).

@@ -38,6 +38,7 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
   -webkit-justify-content: space-between;
   justify-content: space-between;
   height: 100%;
+  box-sizing: border-box;
   position: relative;
   border-radius: 2px;
   padding-top: 0;
@@ -309,6 +310,7 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
   -webkit-justify-content: space-between;
   justify-content: space-between;
   height: 100%;
+  box-sizing: border-box;
   position: relative;
   border-radius: 2px;
   padding-top: 0;
@@ -590,6 +592,7 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
   -webkit-justify-content: space-between;
   justify-content: space-between;
   height: 100%;
+  box-sizing: border-box;
   position: relative;
   border-radius: 2px;
   padding-top: 0;
@@ -883,6 +886,7 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
   -webkit-justify-content: space-between;
   justify-content: space-between;
   height: 100%;
+  box-sizing: border-box;
   position: relative;
   border-radius: 2px;
   padding-top: 0;
