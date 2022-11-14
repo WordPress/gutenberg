@@ -55,6 +55,7 @@
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
 		"classnames": "^2.3.1",
+		"colord": "^2.9.2",
 		"downloadjs": "^1.4.7",
 		"history": "^5.1.0",
 		"lodash": "^4.17.21",

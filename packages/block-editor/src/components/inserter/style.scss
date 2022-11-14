@@ -174,9 +174,13 @@ $block-inserter-tabs-height: 44px;
 	text-align: right;
 }
 
+.block-editor-inserter__manage-reusable-blocks-container {
+	margin: auto $grid-unit-20 $grid-unit-20;
+}
+
 .block-editor-inserter__manage-reusable-blocks {
-	display: inline-block;
-	margin: $grid-unit-20;
+	justify-content: center;
+	width: 100%;
 }
 
 .block-editor-inserter__no-results {
@@ -341,10 +345,6 @@ $block-inserter-tabs-height: 44px;
 	position: relative; // prevents overscroll when block library is open
 }
 
-.block-editor-inserter__manage-reusable-blocks-container {
-	padding: $grid-unit-20;
-}
-
 .block-editor-inserter__quick-inserter {
 	width: 100%;
 
@@ -442,7 +442,8 @@ $block-inserter-tabs-height: 44px;
 	}
 
 	&__list {
-		margin-left: $sidebar-width - $grid-unit-40;
+		margin-left: $sidebar-width;
+		padding: $grid-unit-30 0 $grid-unit-40;
 	}
 
 	.block-editor-block-patterns-list {
