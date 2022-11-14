@@ -38,7 +38,7 @@ it( 'can be split at the end', async () => {
 } );
 ```
 
-The developer's intention is a bit more readable, but it still feels disconnected from the test. You might be tempted to try [inline snapshots](https://jestjs.io/docs/snapshot-testing#inline-snapshots), which does solve the issue of having to jump around files, but it's still not self-documented nor explicit. We can do better.
+The developer's intention is a bit more readable, but it still feels disconnected from the test. You might be tempted to try [inline snapshots](https://jestjs.io/docs/snapshot-testing#inline-snapshots), which do solve the issue of having to jump around files, but they're still not self-documented nor explicit. We can do better.
 
 ## The solution
 
@@ -88,7 +88,7 @@ Instead of writing the assertions in comments, we can try directly writing them 
 }
 ```
 
-The assertions are more readable and explicit. You can add additional assertions or split existing ones into multiple ones to highlight their importance. Whether to keep the comments is up to you, but it's usually fine to omit them when the code is already readable without them.
+These assertions are more readable and explicit. You can add additional assertions or split existing ones into multiple ones to highlight their importance. Whether to keep the comments is up to you, but it's usually fine to omit them when the code is already readable without them.
 
 ## Snapshot variants
 
