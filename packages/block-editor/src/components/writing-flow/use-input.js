@@ -129,6 +129,10 @@ export default function useInput() {
 					: anchorNode.parentElement
 			 ).closest( '[contenteditable]' );
 
+			if ( ! anchorElement ) {
+				return;
+			}
+
 			const init = {};
 
 			for ( const key in event ) {
