@@ -37,6 +37,11 @@
 	}
 }
 
+.edit-site-layout__edit-button {
+	background: $gray-800;
+	color: $white;
+}
+
 .edit-site-layout__sidebar {
 	grid-area: sidebar;
 
