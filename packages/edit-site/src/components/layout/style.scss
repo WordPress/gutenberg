@@ -90,6 +90,34 @@
 		bottom: 0;
 		border-radius: 0;
 	}
+
+	.edit-site-layout:not(.is-full-canvas) & {
+		overflow: hidden;
+	}
+}
+
+.edit-site-layout__canvas-masked {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+
+	.edit-site-layout.is-editor & {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100vw;
+		height: 100vh;
+	}
+
+	.edit-site-layout.is-editor:not(.is-full-canvas) & {
+		position: absolute;
+		top: -100vh * 0.1;
+		left: -180px;
+		width: 100vw;
+		height: 100vh;
+	}
 }
 
 // This shouldn't be necessary (we should have a way to say that a skeletton is relative

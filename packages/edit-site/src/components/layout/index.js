@@ -68,6 +68,7 @@ export default function Layout() {
 			<div
 				className={ classnames( 'edit-site-layout', {
 					'is-full-canvas': isEditorPage && canvasMode === 'edit',
+					'is-editor': isEditorPage,
 				} ) }
 			>
 				<div className="edit-site-layout__header">
@@ -184,23 +185,32 @@ export default function Layout() {
 						<motion.div
 							layout
 							className="edit-site-layout__canvas"
-							animate={ {
-								scale:
-									isEditorPage &&
-									canvasMode === 'view' &&
-									! isMobileViewport
-										? 0.95
-										: 1,
-							} }
 							transition={ {
 								type: 'tween',
 								duration: disableMotion ? 0 : 0.5,
 							} }
 						>
-							<ErrorBoundary>
-								{ isEditorPage && <Editor /> }
-								{ isListPage && <ListPage /> }
-							</ErrorBoundary>
+							<motion.div
+								layout="position"
+								animate={ {
+									scale:
+										isEditorPage &&
+										canvasMode === 'view' &&
+										! isMobileViewport
+											? 0.8
+											: 1,
+								} }
+								transition={ {
+									type: 'tween',
+									duration: disableMotion ? 0 : 0.5,
+								} }
+								className="edit-site-layout__canvas-masked"
+							>
+								<ErrorBoundary>
+									{ isEditorPage && <Editor /> }
+									{ isListPage && <ListPage /> }
+								</ErrorBoundary>
+							</motion.div>
 						</motion.div>
 					</div>
 				) }
