@@ -33,7 +33,6 @@ export const CircleRoot = styled.div`
 	box-sizing: border-box;
 	cursor: grab;
 	height: ${ CIRCLE_SIZE }px;
-	overflow: hidden;
 	width: ${ CIRCLE_SIZE }px;
 `;
 
@@ -42,9 +41,14 @@ export const CircleIndicatorWrapper = styled.div`
 	position: relative;
 	width: 100%;
 	height: 100%;
+	border-radius: 50%;
 
 	:focus-visible {
 		outline: none;
+	}
+
+	:active {
+		outline: ${ COLORS.ui.themeDark10 } auto 1px;
 	}
 `;
 
