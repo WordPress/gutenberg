@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import type { CSSProperties, MouseEventHandler, ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
 /**
  * Internal dependencies
  */
-import type { PopoverProps } from '../popover/types';
+import type { DropdownProps } from '../dropdown/types';
 
 export type ColorObject = {
 	name: string;
@@ -38,14 +38,8 @@ export type MultiplePalettesProps = PaletteProps & {
 };
 
 // TODO: should extend `Dropdown`'s props once it gets refactored to TypeScript
-export type CustomColorPickerDropdownProps = {
+export type CustomColorPickerDropdownProps = DropdownProps & {
 	isRenderedInSidebar: boolean;
-	renderContent: () => ReactNode;
-	popoverProps?: Omit< PopoverProps, 'children' >;
-	renderToggle: ( props: {
-		isOpen: boolean;
-		onToggle: MouseEventHandler< HTMLButtonElement >;
-	} ) => ReactNode;
 };
 
 export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {

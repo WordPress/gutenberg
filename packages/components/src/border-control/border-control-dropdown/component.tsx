@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { CSSProperties } from 'react';
+import type { CSSProperties, MouseEvent } from 'react';
 
 /**
  * WordPress dependencies
@@ -19,7 +19,8 @@ import ColorPalette from '../../color-palette';
 import Dropdown from '../../dropdown';
 import { HStack } from '../../h-stack';
 import { VStack } from '../../v-stack';
-import { contextConnect, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../ui/context';
+import { contextConnectWithoutRef } from '../../ui/context/context-connect';
 import { useBorderControlDropdown } from './hook';
 import { StyledLabel } from '../../base-control/styles/base-control-styles';
 import DropdownContentWrapper from '../../dropdown/dropdown-content-wrapper';
@@ -27,7 +28,6 @@ import DropdownContentWrapper from '../../dropdown/dropdown-content-wrapper';
 import type { ColorObject, PaletteObject } from '../../color-palette/types';
 import type { ColorProps, DropdownProps } from '../types';
 
-const noop = () => undefined;
 const getColorObject = (
 	colorValue: CSSProperties[ 'borderColor' ],
 	colors: ColorProps[ 'colors' ] | undefined,
@@ -122,8 +122,7 @@ const getToggleAriaLabel = (
 };
 
 const BorderControlDropdown = (
-	props: WordPressComponentProps< DropdownProps, 'div' >,
-	forwardedRef: React.ForwardedRef< any >
+	props: WordPressComponentProps< DropdownProps, 'div' >
 ) => {
 	const {
 		__experimentalHasMultipleOrigins,
@@ -165,7 +164,11 @@ const BorderControlDropdown = (
 		? 'bottom left'
 		: undefined;
 
-	const renderToggle = ( { onToggle = noop } ) => (
+	const renderToggle = ( {
+		onToggle,
+	}: {
+		onToggle: ( event: MouseEvent< HTMLButtonElement > ) => void;
+	} ) => (
 		<Button
 			onClick={ onToggle }
 			variant="tertiary"
@@ -247,12 +250,11 @@ const BorderControlDropdown = (
 				...__unstablePopoverProps,
 			} }
 			{ ...otherProps }
-			ref={ forwardedRef }
 		/>
 	);
 };
 
-const ConnectedBorderControlDropdown = contextConnect(
+const ConnectedBorderControlDropdown = contextConnectWithoutRef(
 	BorderControlDropdown,
 	'BorderControlDropdown'
 );

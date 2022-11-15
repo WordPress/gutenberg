@@ -1,11 +1,16 @@
 /**
+ * External dependencies
+ */
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
+
+/**
  * Internal dependencies
  */
-import Dropdown from '../';
+import Dropdown from '..';
 import Button from '../../button';
 import { DropdownContentWrapper } from '../dropdown-content-wrapper';
 
-export default {
+const meta: ComponentMeta< typeof Dropdown > = {
 	title: 'Components/Dropdown',
 	component: Dropdown,
 	subcomponents: { DropdownContentWrapper },
@@ -23,7 +28,9 @@ export default {
 	},
 };
 
-const Template = ( args ) => {
+export default meta;
+
+const Template: ComponentStory< typeof Dropdown > = ( args ) => {
 	return (
 		<div style={ { height: 150 } }>
 			<Dropdown { ...args } />
@@ -34,7 +41,13 @@ const Template = ( args ) => {
 export const Default = Template.bind( {} );
 Default.args = {
 	position: 'bottom right',
-	renderToggle: ( { isOpen, onToggle } ) => (
+	renderToggle: ( {
+		isOpen,
+		onToggle,
+	}: {
+		isOpen?: boolean;
+		onToggle?: () => void;
+	} ) => (
 		<Button onClick={ onToggle } aria-expanded={ isOpen } isPrimary>
 			Open dropdown
 		</Button>

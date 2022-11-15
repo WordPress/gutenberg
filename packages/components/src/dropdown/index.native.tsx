@@ -3,9 +3,18 @@
  */
 import { Component } from '@wordpress/element';
 
-class Dropdown extends Component {
-	constructor() {
-		super( ...arguments );
+/**
+ * Internal dependencies
+ */
+import type { DropdownProps } from './types';
+
+type DropdownState = {
+	isOpen: boolean;
+};
+
+class Dropdown extends Component< DropdownProps, DropdownState > {
+	constructor( args: DropdownProps ) {
+		super( args );
 
 		this.toggle = this.toggle.bind( this );
 		this.close = this.close.bind( this );
@@ -23,7 +32,7 @@ class Dropdown extends Component {
 		}
 	}
 
-	componentDidUpdate( prevProps, prevState ) {
+	componentDidUpdate( _prevProps: DropdownProps, prevState: DropdownState ) {
 		const { isOpen } = this.state;
 		const { onToggle } = this.props;
 		if ( prevState.isOpen !== isOpen && onToggle ) {
