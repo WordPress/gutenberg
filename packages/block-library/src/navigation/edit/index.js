@@ -690,6 +690,9 @@ function Navigation( {
 		/>
 	);
 
+	const isManageMenusButtonDisabled =
+		! hasManagePermissions || ! hasResolvedNavigationMenus;
+
 	if ( hasUnsavedBlocks && ! isCreatingNavigationMenu ) {
 		return (
 			<TagName { ...blockProps }>
@@ -725,7 +728,9 @@ function Navigation( {
 								<WrappedNavigationMenuSelector
 									currentMenuId={ ref }
 								/>
-								<ManageMenusButton disabled={ ! hasManagePermissions || ! hasResolvedNavigationMenus } />
+								<ManageMenusButton
+									disabled={ isManageMenusButtonDisabled }
+								/>
 							</>
 						) }
 					</PanelBody>
@@ -787,7 +792,9 @@ function Navigation( {
 								<WrappedNavigationMenuSelector
 									currentMenuId={ null }
 								/>
-								<ManageMenusButton disabled={ ! hasManagePermissions || ! hasResolvedNavigationMenus } />
+								<ManageMenusButton
+									disabled={ isManageMenusButtonDisabled }
+								/>
 							</>
 						) }
 					</PanelBody>
@@ -898,7 +905,9 @@ function Navigation( {
 								<WrappedNavigationMenuSelector
 									currentMenuId={ ref }
 								/>
-								<ManageMenusButton disabled={ ! hasManagePermissions || ! hasResolvedNavigationMenus } />
+								<ManageMenusButton
+									disabled={ isManageMenusButtonDisabled }
+								/>
 							</>
 						) }
 					</PanelBody>
@@ -928,7 +937,10 @@ function Navigation( {
 								/>
 							) }
 						{ isOffCanvasNavigationEditorEnabled && (
-							<ManageMenusButton disabled={ ! hasManagePermissions || ! hasResolvedNavigationMenus } className="wp-block-navigation-manage-menus-button" />
+							<ManageMenusButton
+								disabled={ isManageMenusButtonDisabled }
+								className="wp-block-navigation-manage-menus-button"
+							/>
 						) }
 					</InspectorControls>
 				) }
