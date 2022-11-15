@@ -9,7 +9,7 @@ import type { ReactNode } from 'react';
 import type { PopoverProps } from '../popover/types';
 import type { WordPressComponentProps } from '../ui/context';
 
-export type RenderProps = {
+export type EmbeddedComponentProps = {
 	isOpen: boolean;
 	onToggle: () => void;
 	onClose: () => void;
@@ -93,7 +93,7 @@ export type DropdownProps = {
 	 * A callback invoked to render the content of the dropdown menu.
 	 * Its first argument is the same as the `renderToggle` prop.
 	 */
-	renderContent: ( props: RenderProps ) => ReactNode;
+	renderContent: ( props: EmbeddedComponentProps ) => ReactNode;
 
 	/**
 	 * A callback invoked to render the Dropdown Toggle Button.
@@ -106,5 +106,5 @@ export type DropdownProps = {
 	 * from open to closed and vice versa
 	 * onClose: A function that closes the menu if invoked
 	 */
-	renderToggle: ( props: RenderProps ) => ReactNode;
+	renderToggle: ( props: EmbeddedComponentProps ) => ReactNode;
 };

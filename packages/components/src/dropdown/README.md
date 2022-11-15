@@ -97,20 +97,20 @@ The direction in which the popover should open relative to its parent node. Spec
 -   Required: No
 -   Default: `"top center"`
 
-### `renderContent`: `{ isOpen: boolean; onToggle: () => void; onClose: () => void; }: ReactNode`
+### `renderContent`: `( props: EmbeddedComponentProps ) => ReactNode`
 
-A callback invoked to render the content of the dropdown menu. Its first argument is the same as the `renderToggle` prop.
+A callback invoked to render the content of the dropdown menu.
+
+`isOpen`: whether the dropdown menu is opened or not
+`onToggle`: A function switching the dropdown menu's state from open to closed and vice versa
+`onClose`: A function that closes the menu if invoked
 
 -   Required: Yes
 
-### `renderToggle`: `{ isOpen: boolean; onToggle: () => void; onClose: () => void; }: ReactNode`
+### `renderToggle`: `( props: EmbeddedComponentProps ) => ReactNode`
 
 A callback invoked to render the Dropdown Toggle Button.
 
+ Its props are the same as the `renderContent` props.
+
 -   Required: Yes
-
-The first argument of the callback is an object containing the following properties:
-
--   `isOpen`: whether the dropdown menu is opened or not
--   `onToggle`: A function switching the dropdown menu's state from open to closed and vice versa
--   `onClose`: A function that closes the menu if invoked
