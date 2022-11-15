@@ -25,8 +25,8 @@ class Gutenberg_REST_Pattern_Directory_Controller_6_2 extends Gutenberg_REST_Pat
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_pattern_categories' ),
 					'permission_callback' => array( $this, 'get_items_permissions_check' ),
-				)
-			),
+				),
+			)
 		);
 
 		parent::register_routes();
@@ -73,8 +73,8 @@ class Gutenberg_REST_Pattern_Directory_Controller_6_2 extends Gutenberg_REST_Pat
 					'pattern_directory_api_failed',
 					sprintf(
 						/* translators: %s: Support forums URL. */
-						__( 'An unexpected error occurred. Something may be wrong with WordPress.org or this server&#8217;s configuration. If you continue to have problems, please try the <a href="%s">support forums</a>.' ),
-						__( 'https://wordpress.org/support/forums/' )
+						__( 'An unexpected error occurred. Something may be wrong with WordPress.org or this server&#8217;s configuration. If you continue to have problems, please try the <a href="%s">support forums</a>.', 'gutenberg' ),
+						__( 'https://wordpress.org/support/forums/', 'gutenberg' )
 					),
 					array(
 						'response' => wp_remote_retrieve_body( $wporg_response ),
@@ -117,14 +117,14 @@ class Gutenberg_REST_Pattern_Directory_Controller_6_2 extends Gutenberg_REST_Pat
 	 * @param WP_REST_Request $request Request object.
 	 * @return WP_REST_Response
 	 */
-	public function prepare_pattern_category_for_response( $item , $request) {
-		$prepared_pattern_category = array(
+	public function prepare_pattern_category_for_response( $item, $request ) {
+		$raw_pattern_category = array(
 			'id'   => absint( $item->id ),
 			'name' => sanitize_text_field( $item->name ),
-			'slug' => sanitize_text_field( $item->slug )
+			'slug' => sanitize_text_field( $item->slug ),
 		);
 
-		$prepared_pattern = $this->add_additional_fields_to_object( $prepared_pattern_category, $request );
+		$prepared_pattern_category = $this->add_additional_fields_to_object( $raw_pattern_category, $request );
 
 		return new WP_REST_Response( $prepared_pattern_category );
 	}

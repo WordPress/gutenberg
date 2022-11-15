@@ -100,7 +100,14 @@ class WP_REST_Pattern_Directory_Controller_Test extends WP_Test_REST_Controller_
 			static::$controller->prepare_pattern_category_for_response( $raw_categories[0], new WP_REST_Request() )
 		);
 
-		$this->assertArrayNotHasKey( 'description', $prepared_category );
+		$this->assertSame(
+			array(
+				'id'   => 3,
+				'name' => 'Columns',
+				'slug' => 'columns',
+			),
+			$prepared_category
+		);
 	}
 
 
