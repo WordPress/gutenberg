@@ -24,6 +24,9 @@ const NOTICE_TIMEOUT = 10000;
 /**
  * Custom hook which announces the message with the given politeness, if a
  * valid message is provided.
+ *
+ * @param  message    Message to announce.
+ * @param  politeness Politeness to announce.
  */
 function useSpokenMessage(
 	message: SnackbarProps[ 'spokenMessage' ],
