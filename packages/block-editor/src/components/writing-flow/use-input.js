@@ -108,7 +108,7 @@ export default function useInput() {
 		}
 
 		function onInput( event ) {
-			if ( ! event.isTrusted ) {
+			if ( event.__unstableRedirect === true ) {
 				return;
 			}
 
@@ -140,6 +140,7 @@ export default function useInput() {
 			}
 
 			const newEvent = new Constructor( event.type, init );
+			newEvent.__unstableRedirect = true;
 			const cancelled = ! anchorElement.dispatchEvent( newEvent );
 			event.stopImmediatePropagation();
 
@@ -148,7 +149,14 @@ export default function useInput() {
 			}
 		}
 
-		const events = [ 'beforeinput', 'input', 'keydown' ];
+		const events = [
+			'beforeinput',
+			'input',
+			'compositionstart',
+			'compositionend',
+			'compositionupdate',
+			'keydown',
+		];
 
 		events.forEach( ( eventType ) => {
 			node.addEventListener( eventType, onInput );
