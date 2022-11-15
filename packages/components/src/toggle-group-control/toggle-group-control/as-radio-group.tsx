@@ -61,13 +61,16 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 		if ( previousValue !== radio.state ) {
 			onChange( radio.state );
 		}
-	}, [ radio.state ] );
+	}, [ radio.state, previousValue, onChange ] );
 
 	// Sync incoming value with radio.state.
 	useUpdateEffect( () => {
 		if ( value !== radio.state ) {
 			radio.setState( value );
 		}
+		// disable reason: Adding `radio` to the dependency array causes an extra render.
+		// Memoizing it doesn't look easily doable, so we're disabling the rule for now.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ value ] );
 
 	return (
