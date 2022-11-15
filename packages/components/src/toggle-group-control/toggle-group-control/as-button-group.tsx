@@ -12,7 +12,7 @@ import {
 	usePrevious,
 	useResizeObserver,
 } from '@wordpress/compose';
-import { forwardRef, useRef, useState } from '@wordpress/element';
+import { forwardRef, useRef, useState, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -47,11 +47,14 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 		'toggle-group-control-as-button-group'
 	).toString();
 	const [ selectedValue, setSelectedValue ] = useState( value );
-	const groupContext = {
-		baseId,
-		state: selectedValue,
-		setState: setSelectedValue,
-	};
+	const groupContext = useMemo(
+		() => ( {
+			baseId,
+			state: selectedValue,
+			setState: setSelectedValue,
+		} ),
+		[ baseId, selectedValue ]
+	);
 	const previousValue = usePrevious( value );
 
 	// Propagate groupContext.state change.
@@ -61,14 +64,14 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 		if ( previousValue !== groupContext.state ) {
 			onChange( groupContext.state );
 		}
-	}, [ groupContext.state ] );
+	}, [ groupContext.state, previousValue, onChange ] );
 
 	// Sync incoming value with groupContext.state.
 	useUpdateEffect( () => {
 		if ( value !== groupContext.state ) {
 			groupContext.setState( value );
 		}
-	}, [ value ] );
+	}, [ value, groupContext ] );
 
 	return (
 		<ToggleGroupControlContext.Provider
