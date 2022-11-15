@@ -93,14 +93,15 @@ export function Placeholder< IconProps = unknown >(
 				<Icon icon={ icon } />
 				{ label }
 			</div>
-			<fieldset className={ fieldsetClasses }>
-				{ !! instructions && (
-					<legend className="components-placeholder__instructions">
-						{ instructions }
-					</legend>
-				) }
-				{ children }
-			</fieldset>
+			{ !! instructions && (
+				<div
+					className="components-placeholder__instructions"
+					role="status"
+				>
+					{ instructions }
+				</div>
+			) }
+			<div className={ fieldsetClasses }>{ children }</div>
 		</div>
 	);
 }

@@ -51,7 +51,7 @@ describe( 'Placeholder', () => {
 	} );
 
 	describe( 'basic rendering', () => {
-		it( 'should by default render label section and fieldset.', () => {
+		it( 'should by default render label section and content section.', () => {
 			render( <Placeholder /> );
 			const placeholder = getPlaceholder();
 
@@ -74,9 +74,11 @@ describe( 'Placeholder', () => {
 			);
 			expect( placeholderInstructions ).not.toBeInTheDocument();
 
-			// Test for empty fieldset.
-			const placeholderFieldset =
-				within( placeholder ).getByRole( 'group' );
+			// Test for empty content. When the content is empty,
+			// the only way to query the div is with `querySelector`
+			const placeholderFieldset = placeholder.querySelector(
+				'.components-placeholder__fieldset'
+			);
 			expect( placeholderFieldset ).toBeInTheDocument();
 			expect( placeholderFieldset ).toBeEmptyDOMElement();
 		} );
@@ -104,27 +106,25 @@ describe( 'Placeholder', () => {
 			expect( placeholderLabel ).toBeInTheDocument();
 		} );
 
-		it( 'should display a fieldset from the children property', () => {
-			const content = 'Fieldset';
+		it( 'should display content from the children property', () => {
+			const content = 'Placeholder content';
 			render( <Placeholder>{ content }</Placeholder> );
-			const placeholderFieldset = screen.getByRole( 'group' );
+			const placeholder = screen.getByText( content );
 
-			expect( placeholderFieldset ).toBeInTheDocument();
-			expect( placeholderFieldset ).toHaveTextContent( content );
+			expect( placeholder ).toBeInTheDocument();
+			expect( placeholder ).toHaveTextContent( content );
 		} );
 
-		it( 'should display a legend if instructions are passed', () => {
+		it( 'should display instructions when provided', () => {
 			const instructions = 'Choose an option.';
 			render(
 				<Placeholder instructions={ instructions }>
-					<div>Fieldset</div>
+					<div>Placeholder content</div>
 				</Placeholder>
 			);
-			const captionedFieldset = screen.getByRole( 'group', {
-				name: instructions,
-			} );
+			const instructionsContainer = screen.getByRole( 'status' );
 
-			expect( captionedFieldset ).toBeInTheDocument();
+			expect( instructionsContainer ).toBeInTheDocument();
 		} );
 
 		it( 'should add an additional className to the top container', () => {
