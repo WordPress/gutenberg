@@ -67,7 +67,7 @@ The icon to render in the snackbar.
 -   Required: No
 -   Default: `null`
 
-#### `listRef`: `MutableRefObject< HTMLDivElement >`
+#### `listRef`: `MutableRefObject< HTMLDivElement | null >`
 
 A ref to the list that contains the snackbar.
 
