@@ -40,6 +40,7 @@ const DEFAULT_MINIMUM_FONT_SIZE_LIMIT = '14px';
  * @param {?string}       args.minimumFontSize       Minimum font size for any clamp() calculation. Optional.
  * @param {?number}       args.scaleFactor           A scale factor to determine how fast a font scales within boundaries. Optional.
  * @param {?number}       args.minimumFontSizeFactor How much to scale defaultFontSize by to derive minimumFontSize. Optional.
+ * @param {?string}       args.minimumFontSizeLimit  The smallest a calculated font size may be. Optional.
  *
  * @return {string|null} A font-size value using clamp().
  */

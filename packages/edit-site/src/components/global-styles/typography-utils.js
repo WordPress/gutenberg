@@ -30,7 +30,7 @@ import { getComputedFluidTypographyValue } from '@wordpress/block-editor';
  * @property {?string}         maxViewPortWidth  Maximum size up to which type will have fluidity. Optional if size is specified.
  * @property {?number}         scaleFactor       A scale factor to determine how fast a font scales within boundaries. Optional.
  * @property {?number}         minFontSizeFactor How much to scale defaultFontSize by to derive minimumFontSize. Optional.
- * @property {?number}         maxFontSizeFactor How much to scale defaultFontSize by to derive maximumFontSize. Optional.
+ * @property {?string}         minFontSize       The smallest a calculated font size may be. Optional.
  */
 
 /**
@@ -55,8 +55,8 @@ export function getTypographyFontSizeValue( preset, typographySettings ) {
 	}
 
 	if (
-		false === typographySettings?.fluid ||
-		( !! typographySettings?.fluid &&
+		true !== typographySettings?.fluid ||
+		( typeof typographySettings?.fluid === 'object' &&
 			Object.keys( typographySettings.fluid ).length === 0 )
 	) {
 		return defaultSize;
@@ -80,7 +80,7 @@ export function getTypographyFontSizeValue( preset, typographySettings ) {
 		maximumViewPortWidth: fluidTypographySettings?.maxViewPortWidth,
 		scaleFactor: fluidTypographySettings?.scaleFactor,
 		minimumFontSizeFactor: fluidTypographySettings?.minViewPortWidth,
-		maximumFontSizeFactor: fluidTypographySettings?.maxFontSizeFactor,
+		minimumFontSizeLimit: fluidTypographySettings?.minFontSize,
 	} );
 
 	if ( !! fluidFontSizeValue ) {
