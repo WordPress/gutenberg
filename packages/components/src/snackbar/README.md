@@ -40,7 +40,7 @@ const MySnackbarNotice = () => (
 
 The following props are used to control the display of the component.
 
-#### `actions`: `Action[]`
+#### `actions`: `NoticeAction[]`
 
 An array of action objects. Each member object should contain a `label` and either a `url` link string or `onClick` callback function.
 
