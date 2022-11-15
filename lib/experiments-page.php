@@ -52,6 +52,29 @@ function gutenberg_initialize_experiments_settings() {
 			'id'    => 'gutenberg-zoomed-out-view',
 		)
 	);
+	add_settings_field(
+		'gutenberg-off-canvas-navigation-editor',
+		__( 'Off canvas navigation editor ', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Test a new "off canvas" editor for navigation block using the block inspector and a tree view of the current menu', 'gutenberg' ),
+			'id'    => 'gutenberg-off-canvas-navigation-editor',
+		)
+	);
+	add_settings_field(
+		'gutenberg-color-randomizer',
+		__( 'Color randomizer ', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Test the Global Styles color randomizer; a utility that lets you mix the current color palette pseudo-randomly.', 'gutenberg' ),
+			'id'    => 'gutenberg-color-randomizer',
+		)
+	);
+
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'

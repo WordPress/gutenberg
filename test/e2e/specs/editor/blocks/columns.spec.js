@@ -21,7 +21,7 @@ test.describe( 'Columns', () => {
 		await page.locator( '[aria-label="Two columns; equal split"]' ).click();
 
 		// Open List view toggle
-		await page.locator( 'role=button[name="List View"i]' ).click();
+		await page.locator( 'role=button[name="Document Overview"i]' ).click();
 
 		// block column add
 		await page

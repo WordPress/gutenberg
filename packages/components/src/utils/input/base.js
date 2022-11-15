@@ -19,10 +19,10 @@ export const inputStyleNeutral = css`
 `;
 
 export const inputStyleFocus = css`
-	border-color: var( --wp-admin-theme-color );
+	border-color: ${ COLORS.ui.theme };
 	box-shadow: 0 0 0
 		calc( ${ CONFIG.borderWidthFocus } - ${ CONFIG.borderWidth } )
-		var( --wp-admin-theme-color );
+		${ COLORS.ui.theme };
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;

@@ -17,6 +17,7 @@ import {
 } from '@wordpress/components';
 import { useDebounce } from '@wordpress/compose';
 import { useEntityRecords } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -50,7 +51,10 @@ function SuggestionListItem( {
 			}
 		>
 			<span className={ `${ baseCssClass }__title` }>
-				<TextHighlight text={ suggestion.name } highlight={ search } />
+				<TextHighlight
+					text={ decodeEntities( suggestion.name ) }
+					highlight={ search }
+				/>
 			</span>
 			{ suggestion.link && (
 				<span className={ `${ baseCssClass }__info` }>
