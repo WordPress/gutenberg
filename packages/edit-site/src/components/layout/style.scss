@@ -72,8 +72,8 @@
 
 	@include break-small {
 		top: $canvas-padding;
-		left: 0;
 		bottom: $canvas-padding;
+		width: calc(100% - #{$canvas-padding});
 		border-radius: $radius-block-ui * 4;
 
 		// Not sure why this is necessary.
@@ -85,8 +85,8 @@
 
 	.edit-site-layout.is-full-canvas & {
 		top: 0;
-		left: 0;
 		bottom: 0;
+		width: 100%;
 		border-radius: 0;
 	}
 }

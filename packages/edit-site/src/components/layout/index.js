@@ -70,6 +70,8 @@ export default function Layout() {
 			setIsMobileCanvasVisible( true );
 		}
 	}, [ canvasMode, isMobileViewport ] );
+	const showFrame =
+		! isEditorPage || ( canvasMode === 'view' && ! isMobileViewport );
 
 	return (
 		<>
@@ -189,47 +191,35 @@ export default function Layout() {
 					<div
 						className="edit-site-layout__canvas-container"
 						style={ {
-							paddingTop: isEditorPage ? 0 : canvasPadding,
-							paddingRight: isEditorPage ? 0 : canvasPadding,
-							paddingBottom: isEditorPage ? 0 : canvasPadding,
+							paddingTop: showFrame ? canvasPadding : 0,
+							paddingBottom: showFrame ? canvasPadding : 0,
 						} }
 					>
 						{ canvasResizer }
-						<motion.div
-							layout="position"
-							className="edit-site-layout__canvas"
-							animate={ {
-								scale:
-									isEditorPage &&
-									canvasMode === 'view' &&
-									! isMobileViewport
-										? 0.95
-										: 1,
-								width:
-									isEditorPage &&
-									canvasMode === 'view' &&
-									! isMobileViewport
-										? canvasSize.width
+						{ !! canvasSize.width && (
+							<motion.div
+								initial={ false }
+								layout="position"
+								className="edit-site-layout__canvas"
+								animate={ {
+									width: showFrame
+										? canvasSize.width - canvasPadding
 										: fullSize.width,
-								bottom:
-									isEditorPage &&
-									canvasMode === 'view' &&
-									! isMobileViewport
-										? canvasPadding
-										: 0,
-							} }
-							transition={ {
-								type: 'tween',
-								duration: disableMotion
-									? 0
-									: ANIMATION_DURATION,
-							} }
-						>
-							<ErrorBoundary>
-								{ isEditorPage && <Editor /> }
-								{ isListPage && <ListPage /> }
-							</ErrorBoundary>
-						</motion.div>
+									bottom: showFrame ? canvasPadding : 0,
+								} }
+								transition={ {
+									type: 'tween',
+									duration: disableMotion
+										? 0
+										: ANIMATION_DURATION,
+								} }
+							>
+								<ErrorBoundary>
+									{ isEditorPage && <Editor /> }
+									{ isListPage && <ListPage /> }
+								</ErrorBoundary>
+							</motion.div>
+						) }
 					</div>
 				) }
 			</div>
