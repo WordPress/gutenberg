@@ -3,7 +3,6 @@
  */
 import { addQueryArgs } from '@wordpress/url';
 import { Button } from '@wordpress/components';
-import { memo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 const ManageMenusButton = ( { className = '', disabled } ) => (
@@ -19,4 +18,4 @@ const ManageMenusButton = ( { className = '', disabled } ) => (
 	</Button>
 );
 
-export default memo( ManageMenusButton );
+export default ManageMenusButton;
