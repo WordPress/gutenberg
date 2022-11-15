@@ -18,12 +18,8 @@ import {
 	useResizeObserver,
 	useMergeRefs,
 	useRefEffect,
-	useReducedMotion,
 } from '@wordpress/compose';
-import {
-	__experimentalStyleProvider as StyleProvider,
-	__unstableMotion as motion,
-} from '@wordpress/components';
+import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -204,7 +200,6 @@ function Iframe(
 	},
 	ref
 ) {
-	const disableMotion = useReducedMotion();
 	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
@@ -321,12 +316,7 @@ function Iframe(
 	return (
 		<>
 			{ tabIndex >= 0 && before }
-			<motion.iframe
-				layout
-				transition={ {
-					type: 'tween',
-					duration: disableMotion ? 0 : 0.5,
-				} }
+			<iframe
 				{ ...props }
 				ref={ useMergeRefs( [ ref, setRef ] ) }
 				tabIndex={ tabIndex }
@@ -388,7 +378,7 @@ function Iframe(
 						</>,
 						iframeDocument.documentElement
 					) }
-			</motion.iframe>
+			</iframe>
 			{ tabIndex >= 0 && after }
 		</>
 	);

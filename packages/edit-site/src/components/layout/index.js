@@ -12,7 +12,11 @@ import {
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
-import { useReducedMotion, useViewportMatch } from '@wordpress/compose';
+import {
+	useReducedMotion,
+	useViewportMatch,
+	useResizeObserver,
+} from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
@@ -29,6 +33,8 @@ import { useLocation } from '../routes';
 import getIsListPage from '../../utils/get-is-list-page';
 import SiteIconAndTitle from '../site-icon-and-title';
 import Header from '../header-edit-mode';
+
+const ANIMATION_DURATION = 0.5;
 
 export default function Layout() {
 	const { params } = useLocation();
@@ -53,6 +59,8 @@ export default function Layout() {
 	const showCanvas =
 		( isMobileViewport && isMobileCanvasVisible ) || ! isMobileViewport;
 	// Ideally this effect could be removed if we move the "isMobileCanvasVisible" into the store.
+	const [ canvasResizer, canvasSize ] = useResizeObserver();
+	const [ fullResizer, fullSize ] = useResizeObserver();
 	useEffect( () => {
 		if ( canvasMode === 'view' && isMobileViewport ) {
 			setIsMobileCanvasVisible( false );
@@ -65,6 +73,7 @@ export default function Layout() {
 
 	return (
 		<>
+			{ fullResizer }
 			<div
 				className={ classnames( 'edit-site-layout', {
 					'is-full-canvas': isEditorPage && canvasMode === 'edit',
@@ -140,7 +149,9 @@ export default function Layout() {
 								style={ { flexGrow: '1' } }
 								transition={ {
 									type: 'tween',
-									duration: disableMotion ? 0 : 0.5,
+									duration: disableMotion
+										? 0
+										: ANIMATION_DURATION,
 								} }
 							>
 								<Header />
@@ -163,7 +174,9 @@ export default function Layout() {
 							} }
 							transition={ {
 								type: 'tween',
-								duration: disableMotion ? 0 : 0.5,
+								duration: disableMotion
+									? 0
+									: ANIMATION_DURATION,
 							} }
 							className="edit-site-layout__sidebar"
 						>
@@ -181,8 +194,9 @@ export default function Layout() {
 							paddingBottom: isEditorPage ? 0 : canvasPadding,
 						} }
 					>
+						{ canvasResizer }
 						<motion.div
-							layout
+							layout="position"
 							className="edit-site-layout__canvas"
 							animate={ {
 								scale:
@@ -191,10 +205,24 @@ export default function Layout() {
 									! isMobileViewport
 										? 0.95
 										: 1,
+								width:
+									isEditorPage &&
+									canvasMode === 'view' &&
+									! isMobileViewport
+										? canvasSize.width
+										: fullSize.width,
+								bottom:
+									isEditorPage &&
+									canvasMode === 'view' &&
+									! isMobileViewport
+										? canvasPadding
+										: 0,
 							} }
 							transition={ {
 								type: 'tween',
-								duration: disableMotion ? 0 : 0.5,
+								duration: disableMotion
+									? 0
+									: ANIMATION_DURATION,
 							} }
 						>
 							<ErrorBoundary>

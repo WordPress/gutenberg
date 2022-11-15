@@ -65,14 +65,14 @@
 	background: $white;
 	position: absolute;
 	top: 0;
-	right: 0;
-	bottom: 0;
 	left: 0;
+	bottom: 0;
+	width: 100%;
 	box-shadow: $shadow-modal;
 
 	@include break-small {
 		top: $canvas-padding;
-		right: $canvas-padding;
+		left: 0;
 		bottom: $canvas-padding;
 		border-radius: $radius-block-ui * 4;
 
@@ -86,7 +86,6 @@
 	.edit-site-layout.is-full-canvas & {
 		top: 0;
 		left: 0;
-		right: 0;
 		bottom: 0;
 		border-radius: 0;
 	}
