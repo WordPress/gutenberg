@@ -41,15 +41,15 @@ class Gutenberg_REST_Pattern_Directory_Controller_6_2 extends Gutenberg_REST_Pat
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_pattern_categories( $request ) {
-		$api_url       = 'http://api.wordpress.org/patterns/1.0/?categories';
-		$transient_key = 'wp_remote_block_pattern_categories_' . md5( $api_url );
-
+		$query_args    = array( 'locale' => get_user_locale() );
+		$transient_key = 'wp_remote_block_pattern_categories_' . md5( serialize( $query_args ) );
 		/**
 		 * Use network-wide transient to improve performance. The locale is the only site
 		 * configuration that affects the response, and it's included in the transient key.
 		 */
 		$raw_pattern_categories = get_site_transient( $transient_key );
 		if ( ! $raw_pattern_categories ) {
+			$api_url = 'http://api.wordpress.org/patterns/1.0/?categories&' . build_query( $query_args );
 			if ( wp_http_supports( array( 'ssl' ) ) ) {
 				$api_url = set_url_scheme( $api_url, 'https' );
 			}
