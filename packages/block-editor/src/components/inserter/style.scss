@@ -279,6 +279,7 @@ $block-inserter-tabs-height: 44px;
 	padding: $grid-unit-20;
 	overflow-y: auto;
 	height: 100%;
+	// Push the listitem wrapping the "explore" button to the bottom of the panel.
 	div[role="listitem"]:last-child {
 		margin-top: auto;
 	}
