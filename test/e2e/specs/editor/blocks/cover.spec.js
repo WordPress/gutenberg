@@ -179,6 +179,8 @@ test.describe( 'Cover', () => {
 			coordinatesResizeButton.x,
 			coordinatesResizeButton.y
 		);
+
+		// Resize the block by at least 100px.
 		await page
 			.locator( '.components-resizable-box__handle-bottom' )
 			.hover();
