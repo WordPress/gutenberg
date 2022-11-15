@@ -655,6 +655,19 @@ function Navigation( {
 		</InspectorControls>
 	);
 
+	const ManageMenusButton = ( { buttonClassName = '' } ) => (
+		<Button
+			variant="link"
+			disabled={ ! hasManagePermissions || ! hasResolvedNavigationMenus }
+			className={ buttonClassName }
+			href={ addQueryArgs( 'edit.php', {
+				post_type: 'wp_navigation',
+			} ) }
+		>
+			{ __( 'Manage menus' ) }
+		</Button>
+	);
+
 	// If the block has inner blocks, but no menu id, then these blocks are either:
 	// - inserted via a pattern.
 	// - inserted directly via Code View (or otherwise).
@@ -725,18 +738,7 @@ function Navigation( {
 								<WrappedNavigationMenuSelector
 									currentMenuId={ ref }
 								/>
-								<Button
-									variant="link"
-									disabled={
-										! hasManagePermissions ||
-										! hasResolvedNavigationMenus
-									}
-									href={ addQueryArgs( 'edit.php', {
-										post_type: 'wp_navigation',
-									} ) }
-								>
-									{ __( 'Manage menus' ) }
-								</Button>
+								<ManageMenusButton />
 							</>
 						) }
 					</PanelBody>
@@ -798,18 +800,7 @@ function Navigation( {
 								<WrappedNavigationMenuSelector
 									currentMenuId={ null }
 								/>
-								<Button
-									variant="link"
-									disabled={
-										! hasManagePermissions ||
-										! hasResolvedNavigationMenus
-									}
-									href={ addQueryArgs( 'edit.php', {
-										post_type: 'wp_navigation',
-									} ) }
-								>
-									{ __( 'Manage menus' ) }
-								</Button>
+								<ManageMenusButton />
 							</>
 						) }
 					</PanelBody>
@@ -920,18 +911,7 @@ function Navigation( {
 								<WrappedNavigationMenuSelector
 									currentMenuId={ ref }
 								/>
-								<Button
-									variant="link"
-									disabled={
-										! hasManagePermissions ||
-										! hasResolvedNavigationMenus
-									}
-									href={ addQueryArgs( 'edit.php', {
-										post_type: 'wp_navigation',
-									} ) }
-								>
-									{ __( 'Manage menus' ) }
-								</Button>
+								<ManageMenusButton />
 							</>
 						) }
 					</PanelBody>
@@ -961,19 +941,7 @@ function Navigation( {
 								/>
 							) }
 						{ isOffCanvasNavigationEditorEnabled && (
-							<Button
-								variant="link"
-								className="wp-block-navigation-manage-menus-button"
-								disabled={
-									! hasManagePermissions ||
-									! hasResolvedNavigationMenus
-								}
-								href={ addQueryArgs( 'edit.php', {
-									post_type: 'wp_navigation',
-								} ) }
-							>
-								{ __( 'Manage menus' ) }
-							</Button>
+							<ManageMenusButton className="wp-block-navigation-manage-menus-button" />
 						) }
 					</InspectorControls>
 				) }
