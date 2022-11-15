@@ -614,15 +614,20 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	 */
 	public function data_generate_block_supports_font_size_fixtures() {
 		return array(
-			'default_return_value'               => array(
+			'returns value when fluid typography is not active'          => array(
 				'font_size_value'             => '50px',
 				'should_use_fluid_typography' => false,
 				'expected_output'             => 'font-size:50px;',
 			),
-			'return_value_with_fluid_typography' => array(
+			'returns clamp value using custom fluid config'              => array(
 				'font_size_value'             => '50px',
 				'should_use_fluid_typography' => true,
-				'expected_output'             => 'font-size:clamp(37.5px, 2.344rem + ((1vw - 7.68px) * 1.502), 50px);',
+				'expected_output'             => 'font-size:clamp(40px, 2.5rem + ((1vw - 10px) * 2), 50px);',
+			),
+			'returns value when font size <= custom min font size bound' => array(
+				'font_size_value'             => '15px',
+				'should_use_fluid_typography' => true,
+				'expected_output'             => 'font-size:15px;',
 			),
 		);
 	}
@@ -680,7 +685,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'block_content'               => '<h2 class="has-vivid-red-background-color has-background has-link-color" style="margin-top:var(--wp--preset--spacing--60);font-size:4rem;font-style:normal;font-weight:600;letter-spacing:29px;text-decoration:underline;text-transform:capitalize">This is a heading</h2>',
 				'font_size_value'             => '4rem',
 				'should_use_fluid_typography' => true,
-				'expected_output'             => '<h2 class="has-vivid-red-background-color has-background has-link-color" style="margin-top:var(--wp--preset--spacing--60);font-size:clamp(3rem, 3rem + ((1vw - 0.48rem) * 1.923), 4rem);font-style:normal;font-weight:600;letter-spacing:29px;text-decoration:underline;text-transform:capitalize">This is a heading</h2>',
+				'expected_output'             => '<h2 class="has-vivid-red-background-color has-background has-link-color" style="margin-top:var(--wp--preset--spacing--60);font-size:clamp(3.2rem, 3.2rem + ((1vw - 0.625rem) * 2.56), 4rem);font-style:normal;font-weight:600;letter-spacing:29px;text-decoration:underline;text-transform:capitalize">This is a heading</h2>',
 			),
 			'return_content_if_no_inline_font_size_found'  => array(
 				'block_content'               => '<p class="has-medium-font-size" style="font-style:normal;font-weight:600;letter-spacing:29px;">A paragraph inside a group</p>',
@@ -698,13 +703,13 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'block_content'               => '<p class="has-medium-font-size" style="    font-size:   20px   ;    ">A paragraph inside a group</p>',
 				'font_size_value'             => '20px',
 				'should_use_fluid_typography' => true,
-				'expected_output'             => '<p class="has-medium-font-size" style="    font-size:clamp(15px, 0.938rem + ((1vw - 7.68px) * 0.601), 20px);    ">A paragraph inside a group</p>',
+				'expected_output'             => '<p class="has-medium-font-size" style="    font-size:clamp(16px, 1rem + ((1vw - 10px) * 0.8), 20px);    ">A paragraph inside a group</p>',
 			),
 			'return_content_with_first_match_replace_only' => array(
 				'block_content'               => "<div class=\"wp-block-group\" style=\"font-size:1.5em\"> \n \n<p style=\"font-size:1.5em\">A paragraph inside a group</p></div>",
 				'font_size_value'             => '1.5em',
 				'should_use_fluid_typography' => true,
-				'expected_output'             => "<div class=\"wp-block-group\" style=\"font-size:clamp(1.125em, 1.125rem + ((1vw - 0.48em) * 0.721), 1.5em);\"> \n \n<p style=\"font-size:1.5em\">A paragraph inside a group</p></div>",
+				'expected_output'             => "<div class=\"wp-block-group\" style=\"font-size:clamp(1.2em, 1.2rem + ((1vw - 0.625em) * 0.96), 1.5em);\"> \n \n<p style=\"font-size:1.5em\">A paragraph inside a group</p></div>",
 			),
 		);
 	}

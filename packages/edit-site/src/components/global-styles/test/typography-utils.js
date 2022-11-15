@@ -7,7 +7,8 @@ describe( 'typography utils', () => {
 	describe( 'getTypographyFontSizeValue', () => {
 		[
 			{
-				message: 'returns value when fluid typography is deactivated',
+				message:
+					'should return value when fluid typography is not active',
 				preset: {
 					size: '28px',
 				},
@@ -16,7 +17,7 @@ describe( 'typography utils', () => {
 			},
 
 			{
-				message: 'returns value where font size is 0',
+				message: 'should return value where font size is 0',
 				preset: {
 					size: 0,
 				},
@@ -25,7 +26,7 @@ describe( 'typography utils', () => {
 			},
 
 			{
-				message: "returns value where font size is '0'",
+				message: "should return value where font size is '0'",
 				preset: {
 					size: '0',
 				},
@@ -34,7 +35,7 @@ describe( 'typography utils', () => {
 			},
 
 			{
-				message: 'returns value where `size` is `null`.',
+				message: 'should return value where `size` is `null`.',
 				preset: {
 					size: null,
 				},
@@ -43,7 +44,7 @@ describe( 'typography utils', () => {
 			},
 
 			{
-				message: 'returns value when fluid is `false`',
+				message: 'should return value when fluid is `false`',
 				preset: {
 					size: '28px',
 					fluid: false,
@@ -55,7 +56,7 @@ describe( 'typography utils', () => {
 			},
 
 			{
-				message: 'returns already clamped value',
+				message: 'should return already clamped value',
 				preset: {
 					size: 'clamp(21px, 1.313rem + ((1vw - 7.68px) * 2.524), 42px)',
 					fluid: false,
@@ -68,7 +69,7 @@ describe( 'typography utils', () => {
 			},
 
 			{
-				message: 'returns value with unsupported unit',
+				message: 'should return value with unsupported unit',
 				preset: {
 					size: '1000%',
 					fluid: false,
@@ -80,7 +81,7 @@ describe( 'typography utils', () => {
 			},
 
 			{
-				message: 'returns clamp value with rem min and max units',
+				message: 'should return clamp value with rem min and max units',
 				preset: {
 					size: '1.75rem',
 				},
@@ -92,7 +93,7 @@ describe( 'typography utils', () => {
 			},
 
 			{
-				message: 'returns clamp value with eem min and max units',
+				message: 'should return clamp value with eem min and max units',
 				preset: {
 					size: '1.75em',
 				},
@@ -104,7 +105,7 @@ describe( 'typography utils', () => {
 			},
 
 			{
-				message: 'returns clamp value for floats',
+				message: 'should return clamp value for floats',
 				preset: {
 					size: '100.175px',
 				},
@@ -116,7 +117,8 @@ describe( 'typography utils', () => {
 			},
 
 			{
-				message: 'coerces integer to `px` and returns clamp value',
+				message:
+					'should coerce integer to `px` and returns clamp value',
 				preset: {
 					size: 33,
 					fluid: true,
@@ -129,7 +131,7 @@ describe( 'typography utils', () => {
 			},
 
 			{
-				message: 'coerces float to `px` and returns clamp value',
+				message: 'should coerce float to `px` and returns clamp value',
 				preset: {
 					size: 100.23,
 					fluid: true,
@@ -142,7 +144,8 @@ describe( 'typography utils', () => {
 			},
 
 			{
-				message: 'returns clamp value when `fluid` is empty array',
+				message:
+					'should return clamp value when `fluid` is empty array',
 				preset: {
 					size: '28px',
 					fluid: [],
@@ -155,7 +158,7 @@ describe( 'typography utils', () => {
 			},
 
 			{
-				message: 'returns clamp value when `fluid` is `null`',
+				message: 'should return clamp value when `fluid` is `null`',
 				preset: {
 					size: '28px',
 					fluid: null,
@@ -169,7 +172,7 @@ describe( 'typography utils', () => {
 
 			{
 				message:
-					'returns clamp value if min font size is greater than max',
+					'should return clamp value if min font size is greater than max',
 				preset: {
 					size: '3rem',
 					fluid: {
@@ -185,7 +188,7 @@ describe( 'typography utils', () => {
 			},
 
 			{
-				message: 'returns value with invalid min/max fluid units',
+				message: 'should return value with invalid min/max fluid units',
 				preset: {
 					size: '10em',
 					fluid: {
@@ -201,7 +204,7 @@ describe( 'typography utils', () => {
 
 			{
 				message:
-					'returns value when size is < lower bounds and no fluid min/max set',
+					'should return value when size is < lower bounds and no fluid min/max set',
 				preset: {
 					size: '3px',
 				},
@@ -213,7 +216,7 @@ describe( 'typography utils', () => {
 
 			{
 				message:
-					'returns value when size is equal to lower bounds and no fluid min/max set',
+					'should return value when size is equal to lower bounds and no fluid min/max set',
 				preset: {
 					size: '14px',
 				},
@@ -224,7 +227,8 @@ describe( 'typography utils', () => {
 			},
 
 			{
-				message: 'returns clamp value with different min max units',
+				message:
+					'should return clamp value with different min max units',
 				preset: {
 					size: '28px',
 					fluid: {
@@ -240,7 +244,8 @@ describe( 'typography utils', () => {
 			},
 
 			{
-				message: 'returns clamp value where no fluid max size is set',
+				message:
+					'should return clamp value where no fluid max size is set',
 				preset: {
 					size: '28px',
 					fluid: {
@@ -255,7 +260,8 @@ describe( 'typography utils', () => {
 			},
 
 			{
-				message: 'returns clamp value where no fluid min size is set',
+				message:
+					'should return clamp value where no fluid min size is set',
 				preset: {
 					size: '28px',
 					fluid: {
@@ -320,7 +326,7 @@ describe( 'typography utils', () => {
 
 			{
 				message:
-					'returns clamp value when min and max font sizes are equal',
+					'should return clamp value when min and max font sizes are equal',
 				preset: {
 					size: '4rem',
 					fluid: {
@@ -333,8 +339,44 @@ describe( 'typography utils', () => {
 				},
 				expected: 'clamp(30px, 1.875rem + ((1vw - 7.68px) * 1), 30px)',
 			},
+
+			// Equivalent custom config PHP unit tests in `test_should_covert_font_sizes_to_fluid_values()`.
+			{
+				message: 'should return clamp value using custom fluid config',
+				preset: {
+					size: '50px',
+				},
+				typographySettings: {
+					fluid: {
+						minViewPortWidth: '1000px',
+						maxViewPortWidth: '2000px',
+						scaleFactor: 2,
+						minFontSizeFactor: 0.8,
+						minFontSize: '16px',
+					},
+				},
+				expected: 'clamp(40px, 2.5rem + ((1vw - 10px) * 2), 50px)',
+			},
+
+			{
+				message:
+					'should return value when font size <= custom min font size bound',
+				preset: {
+					size: '15px',
+				},
+				typographySettings: {
+					fluid: {
+						minViewPortWidth: '1000px',
+						maxViewPortWidth: '2000px',
+						scaleFactor: 2,
+						minFontSizeFactor: 0.8,
+						minFontSize: '16px',
+					},
+				},
+				expected: '15px',
+			},
 		].forEach( ( { message, preset, typographySettings, expected } ) => {
-			it( `should ${ message }`, () => {
+			it( `${ message }`, () => {
 				expect(
 					getTypographyFontSizeValue( preset, typographySettings )
 				).toBe( expected );

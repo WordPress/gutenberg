@@ -451,20 +451,24 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 
 	// Checks if fluid font sizes are activated.
 	$typography_settings         = gutenberg_get_global_settings( array( 'typography' ) );
-	$should_use_fluid_typography = isset( $typography_settings['fluid'] ) && ! empty( $typography_settings['fluid'] ) ? true : $should_use_fluid_typography;
+	$should_use_fluid_typography
+		= isset( $typography_settings['fluid'] ) &&
+		( true === $typography_settings['fluid'] || is_array( $typography_settings['fluid'] ) ) ?
+		true :
+		$should_use_fluid_typography;
 
 	if ( ! $should_use_fluid_typography ) {
 		return $preset['size'];
 	}
 
-	$fluid_settings = is_array( $typography_settings['fluid'] ) ? $typography_settings['fluid'] : array();
+	$fluid_settings = isset( $typography_settings['fluid'] ) && is_array( $typography_settings['fluid'] ) ? $typography_settings['fluid'] : array();
 
 	// Defaults.
 	$default_maximum_viewport_width   = isset( $fluid_settings['maxViewPortWidth'] ) ? $fluid_settings['maxViewPortWidth'] : '1600px';
 	$default_minimum_viewport_width   = isset( $fluid_settings['minViewPortWidth'] ) ? $fluid_settings['minViewPortWidth'] : '768px';
 	$default_minimum_font_size_factor = isset( $fluid_settings['minFontSizeFactor'] ) && is_numeric( $fluid_settings['minFontSizeFactor'] ) ? $fluid_settings['minFontSizeFactor'] : 0.75;
 	$default_scale_factor             = isset( $fluid_settings['scaleFactor'] ) && is_numeric( $fluid_settings['scaleFactor'] ) ? $fluid_settings['scaleFactor'] : 1;
-	$global_minimum_font_size         = isset( $fluid_settings['minFontSize'] ) && is_numeric( $fluid_settings['minFontSize'] ) ? $fluid_settings['minFontSize'] : '14px';
+	$global_minimum_font_size         = isset( $fluid_settings['minFontSize'] ) ? $fluid_settings['minFontSize'] : '14px';
 
 	// Font sizes.
 	$fluid_font_size_settings = isset( $preset['fluid'] ) ? $preset['fluid'] : null;
@@ -517,7 +521,6 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 	 */
 	if ( ! $minimum_font_size_raw ) {
 		$calculated_minimum_font_size = round( $preferred_size['value'] * $default_minimum_font_size_factor, 3 );
-
 		// Only use calculated min font size if it's > $minimum_font_size_limit value.
 		if ( ! empty( $minimum_font_size_limit ) && $calculated_minimum_font_size <= $minimum_font_size_limit['value'] ) {
 			$minimum_font_size_raw = $minimum_font_size_limit['value'] . $minimum_font_size_limit['unit'];

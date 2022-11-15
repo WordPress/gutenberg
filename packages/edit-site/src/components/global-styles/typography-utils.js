@@ -55,7 +55,7 @@ export function getTypographyFontSizeValue( preset, typographySettings ) {
 	}
 
 	if (
-		true !== typographySettings?.fluid ||
+		! typographySettings?.fluid ||
 		( typeof typographySettings?.fluid === 'object' &&
 			Object.keys( typographySettings.fluid ).length === 0 )
 	) {
@@ -79,7 +79,7 @@ export function getTypographyFontSizeValue( preset, typographySettings ) {
 		minimumViewPortWidth: fluidTypographySettings?.minViewPortWidth,
 		maximumViewPortWidth: fluidTypographySettings?.maxViewPortWidth,
 		scaleFactor: fluidTypographySettings?.scaleFactor,
-		minimumFontSizeFactor: fluidTypographySettings?.minViewPortWidth,
+		minimumFontSizeFactor: fluidTypographySettings?.minFontSizeFactor,
 		minimumFontSizeLimit: fluidTypographySettings?.minFontSize,
 	} );
 
