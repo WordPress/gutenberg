@@ -4,8 +4,7 @@
 import classNames from 'classnames';
 
 export default function save( { attributes } ) {
-	const { type, name, label, inlineLabel, required, placeholder } =
-		attributes;
+	const { type, name, label, inlineLabel, required } = attributes;
 
 	return (
 		<>
@@ -55,7 +54,6 @@ export default function save( { attributes } ) {
 						name={ name || label }
 						required={ required }
 						aria-required={ required }
-						placeholder={ placeholder || undefined }
 					/>
 				</label>
 				/* eslint-enable jsx-a11y/label-has-associated-control */

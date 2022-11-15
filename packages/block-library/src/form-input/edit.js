@@ -26,8 +26,7 @@ import { useRef } from '@wordpress/element';
 import { INPUT_TYPES } from './utils';
 
 function InputFieldBlock( { attributes, setAttributes } ) {
-	const { type, name, label, inlineLabel, required, placeholder } =
-		attributes;
+	const { type, name, label, inlineLabel, required } = attributes;
 	const blockProps = useBlockProps();
 	const ref = useRef();
 
@@ -186,21 +185,11 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 						__unstableAllowPrefixTransformations
 					/>
 					<input
-						type={ type }
 						className="wp-block-form-input"
-						aria-label={ __( 'Optional placeholder text' ) }
-						// We hide the placeholder field's placeholder when there is a value. This
-						// stops screen readers from reading the placeholder field's placeholder
-						// which is confusing.
-						placeholder={
-							placeholder
-								? undefined
-								: __( 'Optional placeholder…' )
-						}
-						value={ placeholder }
-						onChange={ ( event ) =>
-							setAttributes( { placeholder: event.target.value } )
-						}
+						type={ type }
+						name={ name }
+						disabled="true"
+						required={ required }
 						aria-required={ required }
 					/>
 				</label>

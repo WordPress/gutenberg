@@ -32,12 +32,6 @@
 			"selector": ".wp-block-form-input",
 			"source": "attribute",
 			"attribute": "required"
-		},
-		"placeholder": {
-			"type": "string",
-			"selector": ".wp-block-form-input",
-			"source": "attribute",
-			"attribute": "placeholder"
 		}
 	},
 	"style": [ "wp-block-form-input", "wp-block-buttons", "wp-block-button" ]
