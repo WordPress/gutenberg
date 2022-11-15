@@ -68,7 +68,6 @@ import useConvertClassicToBlockMenu, {
 import useCreateNavigationMenu from './use-create-navigation-menu';
 import { useInnerBlocks } from './use-inner-blocks';
 import { detectColors } from './utils';
-import ManageMenusButton from './manage-menus-button';
 
 function Navigation( {
 	attributes,
@@ -687,11 +686,11 @@ function Navigation( {
 			createNavigationMenuIsError={ createNavigationMenuIsError }
 			/* translators: %s: The name of a menu. */
 			actionLabel={ __( "Switch to '%s'" ) }
+			canManageMenus={
+				hasManagePermissions && hasResolvedNavigationMenus
+			}
 		/>
 	);
-
-	const isManageMenusButtonDisabled =
-		! hasManagePermissions || ! hasResolvedNavigationMenus;
 
 	if ( hasUnsavedBlocks && ! isCreatingNavigationMenu ) {
 		return (
@@ -727,9 +726,6 @@ function Navigation( {
 							<>
 								<WrappedNavigationMenuSelector
 									currentMenuId={ ref }
-								/>
-								<ManageMenusButton
-									disabled={ isManageMenusButtonDisabled }
 								/>
 							</>
 						) }
@@ -791,9 +787,6 @@ function Navigation( {
 							<>
 								<WrappedNavigationMenuSelector
 									currentMenuId={ null }
-								/>
-								<ManageMenusButton
-									disabled={ isManageMenusButtonDisabled }
 								/>
 							</>
 						) }
@@ -905,9 +898,6 @@ function Navigation( {
 								<WrappedNavigationMenuSelector
 									currentMenuId={ ref }
 								/>
-								<ManageMenusButton
-									disabled={ isManageMenusButtonDisabled }
-								/>
 							</>
 						) }
 					</PanelBody>
@@ -936,12 +926,6 @@ function Navigation( {
 									} }
 								/>
 							) }
-						{ isOffCanvasNavigationEditorEnabled && (
-							<ManageMenusButton
-								disabled={ isManageMenusButtonDisabled }
-								className="wp-block-navigation-manage-menus-button"
-							/>
-						) }
 					</InspectorControls>
 				) }
 

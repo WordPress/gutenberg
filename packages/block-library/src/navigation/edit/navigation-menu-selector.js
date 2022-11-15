@@ -14,6 +14,7 @@ import { Icon, chevronUp, chevronDown, moreVertical } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useEffect, useMemo, useState } from '@wordpress/element';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -30,6 +31,7 @@ function NavigationMenuSelector( {
 	createNavigationMenuIsSuccess,
 	createNavigationMenuIsError,
 	toggleProps = {},
+	canManageMenus,
 } ) {
 	const isOffCanvasNavigationEditorEnabled =
 		window?.__experimentalEnableOffCanvasNavigationEditor === true;
@@ -234,6 +236,14 @@ function NavigationMenuSelector( {
 								} }
 							>
 								{ __( 'Create new menu' ) }
+							</MenuItem>
+							<MenuItem
+								disabled={ ! canManageMenus }
+								href={ addQueryArgs( 'edit.php', {
+									post_type: 'wp_navigation',
+								} ) }
+							>
+								{ __( 'Manage menus' ) }
 							</MenuItem>
 						</MenuGroup>
 					) }
