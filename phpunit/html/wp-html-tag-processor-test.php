@@ -1,29 +1,10 @@
 <?php
 /**
  * Unit tests covering WP_HTML_Tag_Processor functionality.
- * This file takes about 100ms to run because it does not load
- * any WordPress libraries:
- *
- * ```
- * ./vendor/bin/phpunit --no-configuration ./phpunit/html/wp-html-tag-processor-test.php
- * ```
- *
- * Put all new WP_HTML_Tag_Processor tests here, and only add new cases to
- * wp-html-tag-processor-test-wp.php when they cannot run without WordPress.
  *
  * @package WordPress
  * @subpackage HTML
  */
-
-if ( ! function_exists( 'esc_attr' ) ) {
-	function esc_attr( $string ) {
-		return htmlspecialchars( $string, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401, 'utf-8', false );
-	}
-}
-
-if ( ! class_exists( 'WP_UnitTestCase' ) ) {
-	abstract class WP_UnitTestCase extends \PHPUnit\Framework\TestCase {}
-}
 
 require_once __DIR__ . '/../../lib/experimental/html/index.php';
 
@@ -32,7 +13,7 @@ require_once __DIR__ . '/../../lib/experimental/html/index.php';
  *
  * @coversDefaultClass WP_HTML_Tag_Processor
  */
-class WP_HTML_Tag_Processor_Standalone_Test extends WP_UnitTestCase {
+class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	const HTML_SIMPLE       = '<div id="first"><span id="second">Text</span></div>';
 	const HTML_WITH_CLASSES = '<div class="main with-border" id="first"><span class="not-main bold with-border" id="second">Text</span></div>';
 	const HTML_MALFORMED    = '<div><span class="d-md-none" Notifications</span><span class="d-none d-md-inline">Back to notifications</span></div>';
@@ -951,7 +932,7 @@ HTML;
 	public function test_next_tag_ignores_the_contents_of_a_rcdata_tag( $rcdata_then_div, $rcdata_tag ) {
 		$p = new WP_HTML_Tag_Processor( $rcdata_then_div );
 		$p->next_tag();
-		$this->assertSame( $rcdata_tag, $p->get_tag(), "The first found tag was not '$rcdata_tag'" );
+		$this->assertSame( strtoupper( $rcdata_tag ), $p->get_tag(), "The first found tag was not '$rcdata_tag'" );
 		$p->next_tag();
 		$this->assertSame( 'DIV', $p->get_tag(), "The second found tag was not 'div'" );
 	}
