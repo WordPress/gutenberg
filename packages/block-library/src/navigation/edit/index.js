@@ -13,7 +13,6 @@ import {
 	Platform,
 	useMemo,
 } from '@wordpress/element';
-import { addQueryArgs } from '@wordpress/url';
 import {
 	__experimentalOffCanvasEditor as OffCanvasEditor,
 	InspectorControls,
@@ -69,6 +68,7 @@ import useConvertClassicToBlockMenu, {
 import useCreateNavigationMenu from './use-create-navigation-menu';
 import { useInnerBlocks } from './use-inner-blocks';
 import { detectColors } from './utils';
+import ManageMenusButton from './manage-menus-button';
 
 function Navigation( {
 	attributes,
@@ -655,19 +655,6 @@ function Navigation( {
 		</InspectorControls>
 	);
 
-	const ManageMenusButton = ( { buttonClassName = '' } ) => (
-		<Button
-			variant="link"
-			disabled={ ! hasManagePermissions || ! hasResolvedNavigationMenus }
-			className={ buttonClassName }
-			href={ addQueryArgs( 'edit.php', {
-				post_type: 'wp_navigation',
-			} ) }
-		>
-			{ __( 'Manage menus' ) }
-		</Button>
-	);
-
 	// If the block has inner blocks, but no menu id, then these blocks are either:
 	// - inserted via a pattern.
 	// - inserted directly via Code View (or otherwise).
@@ -738,7 +725,7 @@ function Navigation( {
 								<WrappedNavigationMenuSelector
 									currentMenuId={ ref }
 								/>
-								<ManageMenusButton />
+								<ManageMenusButton disabled={ ! hasManagePermissions || ! hasResolvedNavigationMenus } />
 							</>
 						) }
 					</PanelBody>
@@ -800,7 +787,7 @@ function Navigation( {
 								<WrappedNavigationMenuSelector
 									currentMenuId={ null }
 								/>
-								<ManageMenusButton />
+								<ManageMenusButton disabled={ ! hasManagePermissions || ! hasResolvedNavigationMenus } />
 							</>
 						) }
 					</PanelBody>
@@ -911,7 +898,7 @@ function Navigation( {
 								<WrappedNavigationMenuSelector
 									currentMenuId={ ref }
 								/>
-								<ManageMenusButton />
+								<ManageMenusButton disabled={ ! hasManagePermissions || ! hasResolvedNavigationMenus } />
 							</>
 						) }
 					</PanelBody>
@@ -941,7 +928,7 @@ function Navigation( {
 								/>
 							) }
 						{ isOffCanvasNavigationEditorEnabled && (
-							<ManageMenusButton className="wp-block-navigation-manage-menus-button" />
+							<ManageMenusButton disabled={ ! hasManagePermissions || ! hasResolvedNavigationMenus } className="wp-block-navigation-manage-menus-button" />
 						) }
 					</InspectorControls>
 				) }
