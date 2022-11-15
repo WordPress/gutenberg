@@ -69,6 +69,7 @@ import useCreateNavigationMenu from './use-create-navigation-menu';
 import { useInnerBlocks } from './use-inner-blocks';
 import { detectColors } from './utils';
 import ManageMenusButton from './manage-menus-button';
+import EditMenuToolbarButton from './edit-menu-toolbar-button';
 
 function Navigation( {
 	attributes,
@@ -736,6 +737,7 @@ function Navigation( {
 					</PanelBody>
 				</InspectorControls>
 				{ stylingInspectorControls }
+				<EditMenuToolbarButton />
 				<ResponsiveWrapper
 					id={ clientId }
 					onToggle={ setResponsiveMenuVisibility }
@@ -799,6 +801,7 @@ function Navigation( {
 						) }
 					</PanelBody>
 				</InspectorControls>
+				<EditMenuToolbarButton />
 				<Warning>
 					{ __(
 						'Navigation menu has been deleted or is unavailable. '
@@ -953,6 +956,7 @@ function Navigation( {
 
 				{ ! isLoading && (
 					<TagName { ...blockProps }>
+						<EditMenuToolbarButton />
 						<ResponsiveWrapper
 							id={ clientId }
 							onToggle={ setResponsiveMenuVisibility }
