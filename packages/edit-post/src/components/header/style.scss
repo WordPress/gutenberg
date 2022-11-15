@@ -146,15 +146,10 @@
 		}
 	}
 
-	// The post saved state button has a custom label only on small breakpoint
-	.editor-post-save-draft.editor-post-save-draft {
+	.editor-post-save-draft.editor-post-save-draft,
+	.editor-post-saved-state.editor-post-saved-state {
 		&::after {
 			content: none;
-		}
-		@include break-small {
-			&::after {
-				content: attr(aria-label);
-			}
 		}
 	}
 }
