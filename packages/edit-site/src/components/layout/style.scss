@@ -58,6 +58,7 @@
 	grid-area: canvas;
 	position: relative;
 	flex-grow: 1;
+	z-index: 1;
 }
 
 .edit-site-layout__canvas {
@@ -68,7 +69,7 @@
 	left: 0;
 	bottom: 0;
 	width: 100%;
-	box-shadow: $shadow-modal;
+	box-shadow: 0 20px 20px rgba($black, 0.9);
 
 	@include break-small {
 		top: $canvas-padding;

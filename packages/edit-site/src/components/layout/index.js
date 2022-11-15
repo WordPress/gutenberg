@@ -34,7 +34,7 @@ import getIsListPage from '../../utils/get-is-list-page';
 import SiteIconAndTitle from '../site-icon-and-title';
 import Header from '../header-edit-mode';
 
-const ANIMATION_DURATION = 0.5;
+const ANIMATION_DURATION = 3.3;
 
 export default function Layout() {
 	const { params } = useLocation();
@@ -154,6 +154,7 @@ export default function Layout() {
 									duration: disableMotion
 										? 0
 										: ANIMATION_DURATION,
+									ease: 'easeOut',
 								} }
 							>
 								<Header />
@@ -179,6 +180,7 @@ export default function Layout() {
 								duration: disableMotion
 									? 0
 									: ANIMATION_DURATION,
+								ease: 'easeOut',
 							} }
 							className="edit-site-layout__sidebar"
 						>
@@ -212,6 +214,7 @@ export default function Layout() {
 									duration: disableMotion
 										? 0
 										: ANIMATION_DURATION,
+									ease: 'easeOut',
 								} }
 							>
 								<ErrorBoundary>
