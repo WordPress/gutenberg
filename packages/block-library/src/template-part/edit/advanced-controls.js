@@ -57,6 +57,9 @@ export function TemplatePartAdvancedControls( {
 					/>
 
 					<ToggleGroupControl
+						help={ __(
+							'The area of a page that this block should occupy.'
+						) }
 						label={ __( 'Area' ) }
 						onChange={ setArea }
 						value={ area }
