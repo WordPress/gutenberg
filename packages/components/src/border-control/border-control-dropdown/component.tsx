@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { CSSProperties, MouseEvent } from 'react';
+import type { CSSProperties } from 'react';
 
 /**
  * WordPress dependencies
@@ -164,11 +164,7 @@ const BorderControlDropdown = (
 		? 'bottom left'
 		: undefined;
 
-	const renderToggle = ( {
-		onToggle,
-	}: {
-		onToggle: ( event: MouseEvent< HTMLButtonElement > ) => void;
-	} ) => (
+	const renderToggle = ( { onToggle }: { onToggle: () => void } ) => (
 		<Button
 			onClick={ onToggle }
 			variant="tertiary"

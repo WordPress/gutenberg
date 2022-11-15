@@ -19,7 +19,7 @@ function getButtonElement( container: HTMLElement ) {
 function getOpenCloseButton( container: HTMLElement, selector: string ) {
 	const button = container.querySelector( selector );
 	if ( ! button ) {
-		fail( 'Could not find the open close button' );
+		fail( 'Could not find the button' );
 	}
 
 	return button;
