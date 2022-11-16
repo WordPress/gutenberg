@@ -60,6 +60,7 @@ class URLInput extends Component {
 
 		this.suggestionNodes = [];
 
+		this.suggestionsRequest = null;
 		this.isUpdatingSuggestions = false;
 
 		this.state = {
@@ -123,7 +124,7 @@ class URLInput extends Component {
 
 	componentWillUnmount() {
 		this.suggestionsRequest?.cancel?.();
-		delete this.suggestionsRequest;
+		this.suggestionsRequest = null;
 	}
 
 	bindSuggestionNode( index ) {
@@ -166,6 +167,9 @@ class URLInput extends Component {
 			! isInitialSuggestions &&
 			( value.length < 2 || ( ! handleURLSuggestions && isURL( value ) ) )
 		) {
+			this.suggestionsRequest?.cancel?.();
+			this.suggestionsRequest = null;
+
 			this.setState( {
 				showSuggestions: false,
 				selectedSuggestion: null,
@@ -223,12 +227,14 @@ class URLInput extends Component {
 				this.isUpdatingSuggestions = false;
 			} )
 			.catch( () => {
-				if ( this.suggestionsRequest === request ) {
-					this.setState( {
-						loading: false,
-					} );
-					this.isUpdatingSuggestions = false;
+				if ( this.suggestionsRequest !== request ) {
+					return;
 				}
+
+				this.setState( {
+					loading: false,
+				} );
+				this.isUpdatingSuggestions = false;
 			} );
 
 		// Note that this assignment is handled *before* the async search request
