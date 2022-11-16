@@ -237,12 +237,7 @@ class URLInput extends Component {
 	}
 
 	onChange( event ) {
-		const inputValue = event.target.value;
-
-		this.props.onChange( inputValue );
-		if ( ! this.props.disableSuggestions ) {
-			this.updateSuggestions( inputValue );
-		}
+		this.props.onChange( event.target.value );
 	}
 
 	onFocus() {
