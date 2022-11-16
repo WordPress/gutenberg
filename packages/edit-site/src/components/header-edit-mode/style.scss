@@ -10,7 +10,7 @@ $header-toolbar-min-width: 335px;
 	justify-content: space-between;
 
 	body.is-fullscreen-mode & {
-		padding-left: 60px;
+		padding-left: $wp-logo-width;
 		transition: padding-left 20ms linear;
 		transition-delay: 80ms;
 		@include reduce-motion("transition");
