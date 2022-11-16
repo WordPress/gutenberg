@@ -213,7 +213,7 @@ function renderCommitComment( {
 	runURL: string;
 } ) {
 	return `<!-- ${ FLAKY_TESTS_REPORT_COMMENT_TOKEN } -->
-**Flaky test${ reportedIssues.length > 1 ? 's' : '' } detected.**
+**Flaky tests detected.**
 Some tests passed with failed attempts. The failures may not be related to this commit but are still reported for visibility. See [the documentation](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/testing-overview.md#flaky-tests) for more information.
 
 🔍  Workflow run URL: ${ runURL }
