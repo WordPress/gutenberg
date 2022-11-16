@@ -100,11 +100,6 @@ export default function ConvertToLinksModal( { onClose, clientId } ) {
 					'This menu is automatically kept in sync with pages on your site. You can manage the menu yourself by clicking customize below.'
 				) }
 			</p>
-			<p>
-				{ __(
-					'Tip: If you want to return to a managed menu, simply add a new menu item and pick the Pages List block.'
-				) }
-			</p>
 			<div className="wp-block-page-list-modal-buttons">
 				<Button variant="tertiary" onClick={ onClose }>
 					{ __( 'Cancel' ) }
