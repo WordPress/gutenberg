@@ -39,6 +39,12 @@ $header-toolbar-min-width: 335px;
 		// subsequently truncate child text, we set an explicit min-width.
 		// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
 		min-width: 0;
+
+		body.is-fullscreen-mode & {
+			// Offset center column by the width of the WordPress icon to
+			// ensure this column is correctly centered in fullscreen mode.
+			margin-left: calc(-1 * #{$wp-logo-width});
+		}
 	}
 }
 
