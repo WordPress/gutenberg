@@ -21,14 +21,15 @@ import { Text } from '../text';
 import { Spacer } from '../spacer';
 import { COLORS } from '../utils/colors-values';
 
+import type { AnglePickerControlProps } from './types';
+
 export default function AnglePickerControl( {
-	/** Start opting into the new margin-free styles that will become the default in a future version. */
 	__nextHasNoMarginBottom = false,
 	className,
 	label = __( 'Angle' ),
 	onChange,
 	value,
-} ) {
+}: AnglePickerControlProps ) {
 	if ( ! __nextHasNoMarginBottom ) {
 		deprecated(
 			'Bottom margin styles for wp.components.AnglePickerControl',
