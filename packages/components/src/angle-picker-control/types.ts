@@ -10,7 +10,6 @@ export type AnglePickerControlProps = {
 	 * @default false
 	 */
 	__nextHasNoMarginBottom?: boolean;
-	className?: string;
 	label?: string;
 	onChange?: ( value: number ) => void;
 	value?: number;

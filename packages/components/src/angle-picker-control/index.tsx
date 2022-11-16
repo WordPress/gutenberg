@@ -1,12 +1,14 @@
 /**
  * External dependencies
  */
+import type { ForwardedRef } from 'react';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
+import { forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -21,15 +23,22 @@ import { Text } from '../text';
 import { Spacer } from '../spacer';
 import { COLORS } from '../utils/colors-values';
 
+import type { WordPressComponentProps } from '../ui/context';
 import type { AnglePickerControlProps } from './types';
 
-export function AnglePickerControl( {
-	__nextHasNoMarginBottom = false,
-	className,
-	label = __( 'Angle' ),
-	onChange,
-	value,
-}: AnglePickerControlProps ) {
+function UnforwardedAnglePickerControl(
+	props: WordPressComponentProps< AnglePickerControlProps, 'div' >,
+	ref: ForwardedRef< any >
+) {
+	const {
+		__nextHasNoMarginBottom = false,
+		className,
+		label = __( 'Angle' ),
+		onChange,
+		value,
+		...restProps
+	} = props;
+
 	if ( ! __nextHasNoMarginBottom ) {
 		deprecated(
 			'Bottom margin styles for wp.components.AnglePickerControl',
@@ -53,6 +62,8 @@ export function AnglePickerControl( {
 
 	return (
 		<Root
+			{ ...restProps }
+			ref={ ref }
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 			className={ classes }
 			gap={ 4 }
@@ -97,5 +108,7 @@ export function AnglePickerControl( {
 		</Root>
 	);
 }
+
+export const AnglePickerControl = forwardRef( UnforwardedAnglePickerControl );
 
 export default AnglePickerControl;
