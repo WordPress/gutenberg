@@ -59,7 +59,7 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	public function test_get_tag_returns_open_tag_name() {
 		$p = new WP_HTML_Tag_Processor( '<div>Test</div>' );
 		$this->assertTrue( $p->next_tag( 'div' ), 'Querying an existing tag did not return true' );
-		$this->assertSame( 'div', $p->get_tag(), 'Accessing an existing tag name did not return "div"' );
+		$this->assertSame( 'DIV', $p->get_tag(), 'Accessing an existing tag name did not return "div"' );
 	}
 
 	/**
@@ -759,7 +759,7 @@ HTML;
 	public function test_unclosed_script_tag_should_not_cause_an_infinite_loop() {
 		$p = new WP_HTML_Tag_Processor( '<script>' );
 		$p->next_tag();
-		$this->assertSame( 'script', $p->get_tag() );
+		$this->assertSame( 'SCRIPT', $p->get_tag() );
 		$p->next_tag();
 	}
 
@@ -773,9 +773,9 @@ HTML;
 	public function test_next_tag_ignores_the_contents_of_a_script_tag( $script_then_div ) {
 		$p = new WP_HTML_Tag_Processor( $script_then_div );
 		$p->next_tag();
-		$this->assertSame( 'script', $p->get_tag(), 'The first found tag was not "script"' );
+		$this->assertSame( 'SCRIPT', $p->get_tag(), 'The first found tag was not "script"' );
 		$p->next_tag();
-		$this->assertSame( 'div', $p->get_tag(), 'The second found tag was not "∂iv"' );
+		$this->assertSame( 'DIV', $p->get_tag(), 'The second found tag was not "∂iv"' );
 	}
 
 	/**
@@ -850,9 +850,9 @@ HTML;
 	public function test_next_tag_ignores_the_contents_of_a_rcdata_tag( $rcdata_then_div, $rcdata_tag ) {
 		$p = new WP_HTML_Tag_Processor( $rcdata_then_div );
 		$p->next_tag();
-		$this->assertSame( $rcdata_tag, $p->get_tag(), "The first found tag was not '$rcdata_tag'" );
+		$this->assertSame( strtoupper( $rcdata_tag ), $p->get_tag(), "The first found tag was not '$rcdata_tag'" );
 		$p->next_tag();
-		$this->assertSame( 'div', $p->get_tag(), "The second found tag was not 'div'" );
+		$this->assertSame( 'DIV', $p->get_tag(), "The second found tag was not 'div'" );
 	}
 
 	/**

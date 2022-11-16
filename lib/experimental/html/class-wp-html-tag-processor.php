@@ -397,6 +397,10 @@ class WP_HTML_Tag_Processor {
 		$already_found = 0;
 
 		do {
+			if ( $this->parsed_bytes >= strlen( $this->html ) ) {
+				return false;
+			}
+
 			/*
 			 * Unfortunately we can't try to search for only the tag name we want because that might
 			 * lead us to skip over other tags and lose track of our place. So we need to search for
@@ -419,10 +423,15 @@ class WP_HTML_Tag_Processor {
 			if ( 's' === $t || 'S' === $t || 't' === $t || 'T' === $t ) {
 				$tag_name = $this->get_tag();
 
-				if ( 'SCRIPT' === $tag_name ) {
-					$this->skip_script_data();
-				} elseif ( 'TEXTAREA' === $tag_name || 'TITLE' === $tag_name ) {
-					$this->skip_rcdata( $tag_name );
+				if ( 'SCRIPT' === $tag_name && ! $this->skip_script_data() ) {
+					$this->parsed_bytes = strlen( $this->html );
+					return false;
+				} elseif (
+					( 'TEXTAREA' === $tag_name || 'TITLE' === $tag_name ) &&
+					! $this->skip_rcdata( $tag_name )
+				) {
+					$this->parsed_bytes = strlen( $this->html );
+					return false;
 				}
 			}
 		} while ( $already_found < $this->sought_match_offset );
@@ -449,9 +458,9 @@ class WP_HTML_Tag_Processor {
 			$at = strpos( $this->html, '</', $at );
 
 			// If we have no possible tag closer then fail.
-			if ( false === $at || ( $at + $tag_length ) > $doc_length ) {
+			if ( false === $at || ( $at + $tag_length ) >= $doc_length ) {
 				$this->parsed_bytes = $doc_length;
-				return;
+				return false;
 			}
 
 			$at += 2;
@@ -488,10 +497,13 @@ class WP_HTML_Tag_Processor {
 
 			$this->skip_tag_closer_attributes();
 			$at = $this->parsed_bytes;
+			if ( $at >= strlen( $this->html ) ) {
+				return false;
+			}
 
 			if ( '>' === $html[ $at ] || '/' === $html[ $at ] ) {
 				++$this->parsed_bytes;
-				return;
+				return true;
 			}
 		}
 
@@ -586,6 +598,9 @@ class WP_HTML_Tag_Processor {
 			 * We also have to make sure we terminate the script tag opener/closer
 			 * to avoid making partial matches on strings like `<script123`.
 			 */
+			if ( $at + 6 >= $doc_length ) {
+				continue;
+			}
 			$at += 6;
 			$c   = $html[ $at ];
 			if ( ' ' !== $c && "\t" !== $c && "\r" !== $c && "\n" !== $c && '/' !== $c && '>' !== $c ) {
@@ -607,9 +622,13 @@ class WP_HTML_Tag_Processor {
 				$this->parsed_bytes = $at;
 				$this->skip_tag_closer_attributes();
 
+				if ( $this->parsed_bytes >= $doc_length ) {
+					return false;
+				}
+
 				if ( '>' === $html[ $this->parsed_bytes ] ) {
 					++$this->parsed_bytes;
-					return;
+					return true;
 				}
 			}
 
@@ -656,6 +675,13 @@ class WP_HTML_Tag_Processor {
 				$this->tag_name_starts_at = $at;
 				$this->parsed_bytes       = $at + $this->tag_name_length;
 				return true;
+			}
+
+			// If we didn't find a tag opener, and we can't be
+			// transitioning into different markup states, then
+			// we can abort because there aren't any more tags.
+			if ( $at + 1 >= strlen( $html ) ) {
+				return false;
 			}
 
 			// <! transitions to markup declaration open state
@@ -782,6 +808,9 @@ class WP_HTML_Tag_Processor {
 	private function parse_next_attribute( $context = 'tag-opener' ) {
 		// Skip whitespace and slashes.
 		$this->parsed_bytes += strspn( $this->html, " \t\f\r\n/", $this->parsed_bytes );
+		if ( $this->parsed_bytes >= strlen( $this->html ) ) {
+			return false;
+		}
 
 		/*
 		 * Treat the equal sign ("=") as a part of the attribute name if it is the
@@ -793,20 +822,29 @@ class WP_HTML_Tag_Processor {
 			: strcspn( $this->html, "=/> \t\f\r\n", $this->parsed_bytes );
 
 		// No attribute, just tag closer.
-		if ( 0 === $name_length ) {
+		if ( 0 === $name_length || $this->parsed_bytes + $name_length >= strlen( $this->html ) ) {
 			return false;
 		}
 
 		$attribute_start     = $this->parsed_bytes;
 		$attribute_name      = substr( $this->html, $attribute_start, $name_length );
 		$this->parsed_bytes += $name_length;
+		if ( $this->parsed_bytes >= strlen( $this->html ) ) {
+			return false;
+		}
 
 		$this->skip_whitespace();
+		if ( $this->parsed_bytes >= strlen( $this->html ) ) {
+			return false;
+		}
 
 		$has_value = '=' === $this->html[ $this->parsed_bytes ];
 		if ( $has_value ) {
 			++$this->parsed_bytes;
 			$this->skip_whitespace();
+			if ( $this->parsed_bytes >= strlen( $this->html ) ) {
+				return false;
+			}
 
 			switch ( $this->html[ $this->parsed_bytes ] ) {
 				case "'":
@@ -828,6 +866,10 @@ class WP_HTML_Tag_Processor {
 			$value_start   = $this->parsed_bytes;
 			$value_length  = 0;
 			$attribute_end = $attribute_start + $name_length;
+		}
+
+		if ( $attribute_end >= strlen( $this->html ) ) {
+			return false;
 		}
 
 		if ( 'tag-opener' !== $context ) {
