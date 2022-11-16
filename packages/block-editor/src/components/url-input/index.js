@@ -66,6 +66,7 @@ class URLInput extends Component {
 			suggestions: [],
 			showSuggestions: false,
 			isUpdatingSuggestions: false,
+			suggestionsValue: null,
 			selectedSuggestion: null,
 			suggestionsListboxId: '',
 			suggestionOptionIdPrefix: '',
@@ -172,6 +173,7 @@ class URLInput extends Component {
 			this.setState( {
 				suggestions: [],
 				showSuggestions: false,
+				suggestionsValue: value,
 				selectedSuggestion: null,
 				loading: false,
 			} );
@@ -201,6 +203,7 @@ class URLInput extends Component {
 				this.setState( {
 					suggestions,
 					isUpdatingSuggestions: false,
+					suggestionsValue: value,
 					loading: false,
 					showSuggestions: !! suggestions.length,
 				} );
@@ -486,13 +489,12 @@ class URLInput extends Component {
 		const {
 			className,
 			__experimentalRenderSuggestions: renderSuggestions,
-			value = '',
-			__experimentalShowInitialSuggestions = false,
 		} = this.props;
 
 		const {
 			showSuggestions,
 			suggestions,
+			suggestionsValue,
 			selectedSuggestion,
 			suggestionsListboxId,
 			suggestionOptionIdPrefix,
@@ -527,9 +529,8 @@ class URLInput extends Component {
 				buildSuggestionItemProps,
 				isLoading: loading,
 				handleSuggestionClick: this.handleOnClick,
-				isInitialSuggestions:
-					__experimentalShowInitialSuggestions &&
-					! ( value && value.length ),
+				isInitialSuggestions: ! suggestionsValue?.length,
+				currentInputValue: suggestionsValue,
 			} );
 		}
 
