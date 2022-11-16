@@ -9,9 +9,15 @@ Users can choose an angle in a visual UI with the mouse by dragging an angle ind
 import { useState } from '@wordpress/element';
 import { AnglePickerControl } from '@wordpress/components';
 
-const MyAnglePicker = () => {
+function Example() {
 	const [ angle, setAngle ] = useState();
-	return <AnglePickerControl value={ angle } onChange={ setAngle } __nextHasNoMarginBottom />;
+	return (
+		<AnglePickerControl
+			value={ angle }
+			onChange={ setAngle }
+			__nextHasNoMarginBottom
+		/>
+	);
 };
 ```
 
