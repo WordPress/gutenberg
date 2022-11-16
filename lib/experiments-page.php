@@ -63,6 +63,18 @@ function gutenberg_initialize_experiments_settings() {
 			'id'    => 'gutenberg-off-canvas-navigation-editor',
 		)
 	);
+	add_settings_field(
+		'gutenberg-color-randomizer',
+		__( 'Color randomizer ', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Test the Global Styles color randomizer; a utility that lets you mix the current color palette pseudo-randomly.', 'gutenberg' ),
+			'id'    => 'gutenberg-color-randomizer',
+		)
+	);
+
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'

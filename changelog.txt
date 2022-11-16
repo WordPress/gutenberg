@@ -1,5 +1,16 @@
 == Changelog ==
 
+= 14.5.1 =
+
+
+
+## Changelog
+
+### Bug Fixes
+
+- Fix: Prevent infinite loop in Tag Processor in certain truncated documents (https://github.com/WordPress/gutenberg/pull/45537)
+
+
 = 14.5.0 =
 
 ## Changelog

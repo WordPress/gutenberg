@@ -13,7 +13,6 @@ import {
 	Platform,
 	useMemo,
 } from '@wordpress/element';
-import { addQueryArgs } from '@wordpress/url';
 import {
 	__experimentalOffCanvasEditor as OffCanvasEditor,
 	InspectorControls,
@@ -69,6 +68,7 @@ import useConvertClassicToBlockMenu, {
 import useCreateNavigationMenu from './use-create-navigation-menu';
 import { useInnerBlocks } from './use-inner-blocks';
 import { detectColors } from './utils';
+import ManageMenusButton from './manage-menus-button';
 
 function Navigation( {
 	attributes,
@@ -690,6 +690,9 @@ function Navigation( {
 		/>
 	);
 
+	const isManageMenusButtonDisabled =
+		! hasManagePermissions || ! hasResolvedNavigationMenus;
+
 	if ( hasUnsavedBlocks && ! isCreatingNavigationMenu ) {
 		return (
 			<TagName { ...blockProps }>
@@ -725,18 +728,9 @@ function Navigation( {
 								<WrappedNavigationMenuSelector
 									currentMenuId={ ref }
 								/>
-								<Button
-									variant="link"
-									disabled={
-										! hasManagePermissions ||
-										! hasResolvedNavigationMenus
-									}
-									href={ addQueryArgs( 'edit.php', {
-										post_type: 'wp_navigation',
-									} ) }
-								>
-									{ __( 'Manage menus' ) }
-								</Button>
+								<ManageMenusButton
+									disabled={ isManageMenusButtonDisabled }
+								/>
 							</>
 						) }
 					</PanelBody>
@@ -798,18 +792,9 @@ function Navigation( {
 								<WrappedNavigationMenuSelector
 									currentMenuId={ null }
 								/>
-								<Button
-									variant="link"
-									disabled={
-										! hasManagePermissions ||
-										! hasResolvedNavigationMenus
-									}
-									href={ addQueryArgs( 'edit.php', {
-										post_type: 'wp_navigation',
-									} ) }
-								>
-									{ __( 'Manage menus' ) }
-								</Button>
+								<ManageMenusButton
+									disabled={ isManageMenusButtonDisabled }
+								/>
 							</>
 						) }
 					</PanelBody>
@@ -920,18 +905,9 @@ function Navigation( {
 								<WrappedNavigationMenuSelector
 									currentMenuId={ ref }
 								/>
-								<Button
-									variant="link"
-									disabled={
-										! hasManagePermissions ||
-										! hasResolvedNavigationMenus
-									}
-									href={ addQueryArgs( 'edit.php', {
-										post_type: 'wp_navigation',
-									} ) }
-								>
-									{ __( 'Manage menus' ) }
-								</Button>
+								<ManageMenusButton
+									disabled={ isManageMenusButtonDisabled }
+								/>
 							</>
 						) }
 					</PanelBody>
@@ -961,19 +937,10 @@ function Navigation( {
 								/>
 							) }
 						{ isOffCanvasNavigationEditorEnabled && (
-							<Button
-								variant="link"
+							<ManageMenusButton
+								disabled={ isManageMenusButtonDisabled }
 								className="wp-block-navigation-manage-menus-button"
-								disabled={
-									! hasManagePermissions ||
-									! hasResolvedNavigationMenus
-								}
-								href={ addQueryArgs( 'edit.php', {
-									post_type: 'wp_navigation',
-								} ) }
-							>
-								{ __( 'Manage menus' ) }
-							</Button>
+							/>
 						) }
 					</InspectorControls>
 				) }

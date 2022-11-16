@@ -323,6 +323,13 @@ module.exports = {
 			},
 		},
 		{
+			files: [ 'packages/components/src/**/*.[tj]s?(x)' ],
+			excludedFiles: [ ...developmentFiles ],
+			rules: {
+				'react-hooks/exhaustive-deps': 'error',
+			},
+		},
+		{
 			files: [ 'packages/jest*/**/*.js', '**/test/**/*.js' ],
 			excludedFiles: [ 'test/e2e/**/*.js' ],
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-unit' ],

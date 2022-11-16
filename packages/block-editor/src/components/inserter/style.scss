@@ -175,7 +175,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__manage-reusable-blocks-container {
-	margin: $grid-unit-20;
+	margin: auto $grid-unit-20 $grid-unit-20;
 }
 
 .block-editor-inserter__manage-reusable-blocks {
@@ -442,7 +442,8 @@ $block-inserter-tabs-height: 44px;
 	}
 
 	&__list {
-		margin-left: $sidebar-width - $grid-unit-40;
+		margin-left: $sidebar-width;
+		padding: $grid-unit-30 0 $grid-unit-40;
 	}
 
 	.block-editor-block-patterns-list {

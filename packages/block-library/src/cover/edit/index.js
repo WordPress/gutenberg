@@ -188,7 +188,9 @@ function CoverEdit( {
 			className: 'wp-block-cover__inner-container',
 		},
 		{
-			template: innerBlocksTemplate,
+			// Avoid template sync when the `templateLock` value is `all` or `contentOnly`.
+			// See: https://github.com/WordPress/gutenberg/pull/45632
+			template: ! hasInnerBlocks ? innerBlocksTemplate : undefined,
 			templateInsertUpdatesSelection: true,
 			allowedBlocks,
 			templateLock,
