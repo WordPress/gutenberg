@@ -77,7 +77,7 @@ class WP_Get_Global_Stylesheet_Test extends WP_UnitTestCase {
 	}
 
 	public function test_global_styles_user_cpt_change_invalidates_cached_stylesheet() {
-		add_filter( 'global_stylesheet_can_use_cache', '__return_true' );
+		add_filter( 'wp_get_global_stylesheet_can_use_cache', '__return_true' );
 		switch_theme( 'block-theme' );
 		wp_set_current_user( self::$administrator_id );
 
@@ -93,6 +93,6 @@ class WP_Get_Global_Stylesheet_Test extends WP_UnitTestCase {
 
 		$styles = gutenberg_get_global_stylesheet();
 		$this->assertStringContainsString( 'background-color: hotpink;', $styles );
-		remove_filter( 'global_stylesheet_can_use_cache', '__return_true' );
+		remove_filter( 'wp_get_global_stylesheet_can_use_cache', '__return_true' );
 	}
 }

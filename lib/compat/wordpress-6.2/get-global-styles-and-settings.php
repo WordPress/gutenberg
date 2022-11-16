@@ -65,7 +65,7 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 	 * @param boolean $can_use_cached Whether the cached global stylesheet can be used.
 	 */
 	$can_use_cached = apply_filters(
-		'global_stylesheet_can_use_cache',
+		'wp_get_global_stylesheet_can_use_cache',
 		( empty( $types ) ) &&
 		// Ignore cache when `WP_DEBUG` is enabled, so it doesn't interfere with the theme developers workflow.
 		( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG )
