@@ -2,40 +2,15 @@
  * WordPress dependencies
  */
 import { Modal } from '@wordpress/components';
-import { useState, useEffect } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import apiFetch from '@wordpress/api-fetch';
-import { useDebounce } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import PatternExplorerSidebar from './sidebar';
 import PatternList from './patterns-list';
-
-function usePatternDirectoryCategories() {
-	const [ categories, setCategories ] = useState( [] );
-	useEffect( () => {
-		apiFetch( {
-			path: '/wp/v2/pattern-directory/categories',
-		} ).then( ( fetchedCategories ) => {
-			setCategories( fetchedCategories );
-		} );
-	}, [] );
-	return categories;
-}
-
-function useDebouncedInput() {
-	const [ input, setInput ] = useState( '' );
-	const [ debounced, setter ] = useState( '' );
-	const setDebounced = useDebounce( setter, 250 );
-	useEffect( () => {
-		if ( debounced !== input ) {
-			setDebounced( input );
-		}
-	}, [ debounced, input ] );
-	return [ input, setInput, debounced ];
-}
+import { usePatternDirectoryCategories, useDebouncedInput } from './hooks';
 
 function PatternsExplorer() {
 	const categories = usePatternDirectoryCategories();

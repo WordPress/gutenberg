@@ -13,7 +13,7 @@ import { speak } from '@wordpress/a11y';
 /**
  * Internal dependencies
  */
-import usePatternsFromDirectory from './use-patterns-from-directory';
+import { usePatternsFromDirectory } from './hooks';
 import BlockPatternsList from '../../block-patterns-list';
 import InserterNoResults from '../no-results';
 import useInsertionPoint from '../hooks/use-insertion-point';
