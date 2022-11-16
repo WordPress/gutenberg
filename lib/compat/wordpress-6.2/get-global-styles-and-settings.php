@@ -138,6 +138,9 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 if ( ! function_exists( '_wp_theme_clean_theme_json_cached_data_upon_upgrading' ) ) {
 	/**
 	 * Clean theme.json related cached data after an upgrade.
+	 *
+	 * @param WP_Upgrader $upgrader WP_Upgrader instance.
+	 * @param array       $options  Array of bulk item update data.
 	 */
 	function _wp_theme_clean_theme_json_cached_data_upon_upgrading( $upgrader, $options ) {
 		if ( 'update' !== $options['action'] ) {
