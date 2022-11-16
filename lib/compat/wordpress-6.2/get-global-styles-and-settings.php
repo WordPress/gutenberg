@@ -70,8 +70,8 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 		// Ignore cache when `WP_DEBUG` is enabled, so it doesn't interfere with the theme developers workflow.
 		( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG )
 	);
-	$cache_key      = 'gutenberg_get_global_stylesheet';
-	$cache_group    = 'theme_json';
+	$cache_key   = 'gutenberg_get_global_stylesheet';
+	$cache_group = 'theme_json';
 	if ( $can_use_cached ) {
 		$cached = wp_cache_get( $cache_key, $cache_group );
 		if ( $cached ) {
