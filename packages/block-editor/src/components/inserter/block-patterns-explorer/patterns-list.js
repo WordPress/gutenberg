@@ -1,21 +1,24 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useEffect } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { _n, sprintf } from '@wordpress/i18n';
 import { useDebounce, useAsyncList } from '@wordpress/compose';
-import { __experimentalHeading as Heading } from '@wordpress/components';
+import {
+	__experimentalHeading as Heading,
+	Spinner,
+} from '@wordpress/components';
 import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
+import usePatternsFromDirectory from './use-patterns-from-directory';
 import BlockPatternsList from '../../block-patterns-list';
 import InserterNoResults from '../no-results';
 import useInsertionPoint from '../hooks/use-insertion-point';
 import usePatternsState from '../hooks/use-patterns-state';
 import InserterListbox from '../../inserter-listbox';
-import { searchItems } from '../search-items';
 
 const INITIAL_INSERTER_RESULTS = 2;
 
@@ -43,46 +46,29 @@ function PatternsListHeader( { filterValue, filteredBlockPatternsLength } ) {
 	);
 }
 
-function PatternList( { filterValue, selectedCategory, patternCategories } ) {
+function PatternList( { filterValue, selectedCategory } ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
 		shouldFocusBlock: true,
 	} );
-	const [ allPatterns, , onSelectBlockPattern ] = usePatternsState(
+	const [ , , onSelectBlockPattern ] = usePatternsState(
 		onInsertBlocks,
 		destinationRootClientId
 	);
-	const registeredPatternCategories = useMemo(
-		() =>
-			patternCategories.map(
-				( patternCategory ) => patternCategory.name
-			),
-		[ patternCategories ]
-	);
-
-	const filteredBlockPatterns = useMemo( () => {
-		if ( ! filterValue ) {
-			return allPatterns.filter( ( pattern ) =>
-				selectedCategory === 'uncategorized'
-					? ! pattern.categories?.length ||
-					  pattern.categories.every(
-							( category ) =>
-								! registeredPatternCategories.includes(
-									category
-								)
-					  )
-					: pattern.categories?.includes( selectedCategory )
-			);
-		}
-		return searchItems( allPatterns, filterValue );
-	}, [ filterValue, selectedCategory, allPatterns ] );
+	const options = {};
+	if ( !! filterValue ) {
+		options.search = filterValue;
+	} else if ( selectedCategory ) {
+		options.category = selectedCategory;
+	}
+	const [ allPatterns, isLoading ] = usePatternsFromDirectory( options );
 
 	// Announce search results on change.
 	useEffect( () => {
 		if ( ! filterValue ) {
 			return;
 		}
-		const count = filteredBlockPatterns.length;
+		const count = allPatterns.length;
 		const resultsFoundMessage = sprintf(
 			/* translators: %d: number of results. */
 			_n( '%d result found.', '%d results found.', count ),
@@ -91,25 +77,31 @@ function PatternList( { filterValue, selectedCategory, patternCategories } ) {
 		debouncedSpeak( resultsFoundMessage );
 	}, [ filterValue, debouncedSpeak ] );
 
-	const currentShownPatterns = useAsyncList( filteredBlockPatterns, {
+	const currentShownPatterns = useAsyncList( allPatterns, {
 		step: INITIAL_INSERTER_RESULTS,
 	} );
 
-	const hasItems = !! filteredBlockPatterns?.length;
+	const hasItems = !! allPatterns.length;
+	const baseCssClass = 'block-editor-block-patterns-explorer__list';
 	return (
-		<div className="block-editor-block-patterns-explorer__list">
+		<div className={ baseCssClass }>
 			{ hasItems && (
 				<PatternsListHeader
 					filterValue={ filterValue }
-					filteredBlockPatternsLength={ filteredBlockPatterns.length }
+					filteredBlockPatternsLength={ allPatterns.length }
 				/>
 			) }
 			<InserterListbox>
-				{ ! hasItems && <InserterNoResults /> }
-				{ hasItems && (
+				{ isLoading && (
+					<div className={ `${ baseCssClass }__spinner` }>
+						<Spinner />
+					</div>
+				) }
+				{ ! isLoading && ! hasItems && <InserterNoResults /> }
+				{ ! isLoading && hasItems && (
 					<BlockPatternsList
 						shownPatterns={ currentShownPatterns }
-						blockPatterns={ filteredBlockPatterns }
+						blockPatterns={ allPatterns }
 						onClickPattern={ onSelectBlockPattern }
 						isDraggable={ false }
 					/>

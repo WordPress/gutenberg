@@ -6,24 +6,25 @@ import { __ } from '@wordpress/i18n';
 
 function PatternCategoriesList( {
 	selectedCategory,
-	patternCategories,
+	categories,
 	onClickCategory,
 } ) {
 	const baseClassName = 'block-editor-block-patterns-explorer__sidebar';
+	// TODO: check about localization of the category name.
 	return (
 		<div className={ `${ baseClassName }__categories-list` }>
-			{ patternCategories.map( ( { name, label } ) => {
+			{ categories.map( ( { id, name, slug } ) => {
 				return (
 					<Button
-						key={ name }
-						label={ label }
+						key={ slug }
+						label={ name }
 						className={ `${ baseClassName }__categories-list__item` }
-						isPressed={ selectedCategory === name }
+						isPressed={ selectedCategory === id }
 						onClick={ () => {
-							onClickCategory( name );
+							onClickCategory( id );
 						} }
 					>
-						{ label }
+						{ name }
 					</Button>
 				);
 			} ) }
@@ -48,7 +49,7 @@ function PatternsExplorerSearch( { filterValue, setFilterValue } ) {
 
 function PatternExplorerSidebar( {
 	selectedCategory,
-	patternCategories,
+	categories,
 	onClickCategory,
 	filterValue,
 	setFilterValue,
@@ -63,7 +64,7 @@ function PatternExplorerSidebar( {
 			{ ! filterValue && (
 				<PatternCategoriesList
 					selectedCategory={ selectedCategory }
-					patternCategories={ patternCategories }
+					categories={ categories }
 					onClickCategory={ onClickCategory }
 				/>
 			) }

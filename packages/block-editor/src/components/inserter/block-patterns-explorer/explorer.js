@@ -2,8 +2,10 @@
  * WordPress dependencies
  */
 import { Modal } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import apiFetch from '@wordpress/api-fetch';
+import { useDebounce } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -11,24 +13,47 @@ import { __ } from '@wordpress/i18n';
 import PatternExplorerSidebar from './sidebar';
 import PatternList from './patterns-list';
 
-function PatternsExplorer( { initialCategory, patternCategories } ) {
-	const [ filterValue, setFilterValue ] = useState( '' );
-	const [ selectedCategory, setSelectedCategory ] = useState(
-		initialCategory?.name
-	);
+function usePatternDirectoryCategories() {
+	const [ categories, setCategories ] = useState( [] );
+	useEffect( () => {
+		apiFetch( {
+			path: '/wp/v2/pattern-directory/categories',
+		} ).then( ( fetchedCategories ) => {
+			setCategories( fetchedCategories );
+		} );
+	}, [] );
+	return categories;
+}
+
+function useDebouncedInput() {
+	const [ input, setInput ] = useState( '' );
+	const [ debounced, setter ] = useState( '' );
+	const setDebounced = useDebounce( setter, 250 );
+	useEffect( () => {
+		if ( debounced !== input ) {
+			setDebounced( input );
+		}
+	}, [ debounced, input ] );
+	return [ input, setInput, debounced ];
+}
+
+function PatternsExplorer() {
+	const categories = usePatternDirectoryCategories();
+	const [ search, setSearch, debouncedSearch ] = useDebouncedInput();
+	const [ selectedCategory, setSelectedCategory ] = useState();
 	return (
 		<div className="block-editor-block-patterns-explorer">
 			<PatternExplorerSidebar
 				selectedCategory={ selectedCategory }
-				patternCategories={ patternCategories }
+				categories={ categories }
 				onClickCategory={ setSelectedCategory }
-				filterValue={ filterValue }
-				setFilterValue={ setFilterValue }
+				filterValue={ search }
+				setFilterValue={ setSearch }
 			/>
 			<PatternList
-				filterValue={ filterValue }
+				filterValue={ debouncedSearch }
 				selectedCategory={ selectedCategory }
-				patternCategories={ patternCategories }
+				patternCategories={ categories }
 			/>
 		</div>
 	);
@@ -37,7 +62,7 @@ function PatternsExplorer( { initialCategory, patternCategories } ) {
 function PatternsExplorerModal( { onModalClose, ...restProps } ) {
 	return (
 		<Modal
-			title={ __( 'Patterns' ) }
+			title={ __( 'Pattern Directory' ) }
 			closeLabel={ __( 'Close' ) }
 			onRequestClose={ onModalClose }
 			isFullScreen
