@@ -26,10 +26,6 @@ if ( ! function_exists( 'wp_theme_has_theme_json' ) ) {
 		 * with the $found parameter which apparently had some issues in some implementations
 		 * https://developer.wordpress.org/reference/functions/wp_cache_get/
 		 */
-		if ( ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) &&
-			( 0 === $theme_has_support || 1 === $theme_has_support ) ) {
-			return (bool) $theme_has_support;
-		}
 
 		// Has the own theme a theme.json?
 		$theme_has_support = is_readable( get_stylesheet_directory() . '/theme.json' ) ? 1 : 0;
