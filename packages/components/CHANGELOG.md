@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 22.1.0 (2022-11-16)
+
 ### Enhancements
 
 -   `ColorPalette`, `BorderBox`, `BorderBoxControl`: polish and DRY prop types, add default values ([#45463](https://github.com/WordPress/gutenberg/pull/45463)).
