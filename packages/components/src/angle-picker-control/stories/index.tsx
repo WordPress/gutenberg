@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import AnglePickerControl from '../';
+import AnglePickerControl from '..';
 
 export default {
 	title: 'Components/AnglePickerControl',
