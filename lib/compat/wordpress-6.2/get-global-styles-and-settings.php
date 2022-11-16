@@ -139,7 +139,6 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
  */
 function gutenberg_get_global_stylesheet_clean_cache() {
 	wp_cache_delete( 'gutenberg_get_global_stylesheet', 'theme_json' );
-	WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
 }
 
 /**
