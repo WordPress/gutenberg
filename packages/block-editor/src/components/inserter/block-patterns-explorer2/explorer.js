@@ -22,7 +22,6 @@ function usePatternDirectoryCategories() {
 			setCategories( fetchedCategories );
 		} );
 	}, [] );
-	// TODO: check about custom sorting of categories.
 	return categories;
 }
 

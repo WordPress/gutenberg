@@ -10,11 +10,11 @@ import {
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { parse } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
+import parsePattern from './parse-pattern';
 import BlockPreview from '../block-preview';
 import InserterDraggableBlocks from '../inserter-draggable-blocks';
 
@@ -34,11 +34,9 @@ function BlockPattern( {
 } ) {
 	const { viewportWidth } = pattern;
 	let { blocks } = pattern;
-	// Fallback for patterns fro PD, that haven't been parsed.
+	// Fallback for patterns from Pattern Directory, that haven't been pre-parsed.
 	if ( ! blocks ) {
-		blocks = parse( pattern.content, {
-			__unstableSkipMigrationLogs: true,
-		} );
+		blocks = parsePattern( pattern );
 	}
 	const descriptionId = useInstanceId(
 		BlockPattern,

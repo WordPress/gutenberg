@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useEffect, useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { _n, sprintf } from '@wordpress/i18n';
 import { useDebounce, useAsyncList } from '@wordpress/compose';
 import { __experimentalHeading as Heading } from '@wordpress/components';
@@ -17,7 +17,6 @@ import InserterNoResults from '../no-results';
 import useInsertionPoint from '../hooks/use-insertion-point';
 import usePatternsState from '../hooks/use-patterns-state';
 import InserterListbox from '../../inserter-listbox';
-import { searchItems } from '../search-items';
 
 const INITIAL_INSERTER_RESULTS = 2;
 
@@ -83,7 +82,7 @@ function usePatternsFromDirectory( options = {} ) {
 	return patterns;
 }
 
-function PatternList( { filterValue, selectedCategory, patternCategories } ) {
+function PatternList( { filterValue, selectedCategory } ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
 		shouldFocusBlock: true,
