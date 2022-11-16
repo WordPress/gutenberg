@@ -433,11 +433,11 @@ Display a list of all pages. ([Source](https://github.com/WordPress/gutenberg/tr
 
 ## Page List Item
 
-Display a page inside a Page List block. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/page-list-item))
+Display a list of all pages. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/page-list-item))
 
 -	**Name:** core/page-list-item
 -	**Category:** design
--	**Supports:** ~~html~~, ~~reusable~~
+-	**Supports:** ~~html~~, ~~lock~~, ~~reusable~~
 -	**Attributes:** hasChildren, id, label, link, title
 
 ## Paragraph
