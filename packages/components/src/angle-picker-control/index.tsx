@@ -46,7 +46,7 @@ export default function AnglePickerControl( {
 			unprocessedValue !== undefined && unprocessedValue !== ''
 				? parseInt( unprocessedValue, 10 )
 				: 0;
-		onChange( inputValue );
+		onChange?.( inputValue );
 	};
 
 	const classes = classnames( 'components-angle-picker-control', className );

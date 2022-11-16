@@ -55,7 +55,10 @@ function AngleCircle( {
 		// Input control needs to lose focus and by preventDefault above, it doesn't.
 		( event.target as HTMLDivElement | null )?.focus();
 
-		if ( angleCircleCenter.current !== undefined ) {
+		if (
+			angleCircleCenter.current !== undefined &&
+			onChange !== undefined
+		) {
 			const { x: centerX, y: centerY } = angleCircleCenter.current;
 			onChange(
 				getAngle( centerX, centerY, event.clientX, event.clientY )

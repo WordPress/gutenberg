@@ -12,11 +12,11 @@ export type AnglePickerControlProps = {
 	__nextHasNoMarginBottom?: boolean;
 	className?: string;
 	label?: string;
-	onChange: ( value: number ) => void;
-	value: number;
+	onChange?: ( value: number ) => void;
+	value?: number;
 };
 
 export type AngleCircleProps = Pick<
 	AnglePickerControlProps,
 	'value' | 'onChange'
-> & {};
+>;
