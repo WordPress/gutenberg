@@ -3,16 +3,18 @@
  */
 import { edit } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-import { useMemo, useState } from '@wordpress/element';
+import { useRef, useMemo, useState, useEffect } from '@wordpress/element';
 import { Button, Modal } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEntityRecords } from '@wordpress/core-data';
 import { createBlock as create } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+/**
+ * External dependencies
+ */
 // import InspectorControls from '../../components/inspector-controls';
 
 // copied from packages/block-library/src/page-list/edit.js
@@ -22,17 +24,40 @@ import { store as blockEditorStore } from '../../store';
 const MAX_PAGE_COUNT = 100;
 
 const usePageData = () => {
-	const { records: pages, hasResolved: hasResolvedPages } = useEntityRecords(
-		'postType',
-		'page',
-		{
-			orderby: 'menu_order',
-			order: 'asc',
-			_fields: [ 'id', 'link', 'parent', 'title', 'menu_order' ],
-			per_page: -1,
-			context: 'view',
-		}
-	);
+	const isMounted = useRef();
+	const [ pages, setPages ] = useState();
+
+	useEffect( () => {
+		isMounted.current = true;
+
+		return () => ( isMounted.current = false );
+	}, [] );
+
+	// 1. Grab editor settings
+	// 2. Call the selector when we need it
+	const { fetchPages } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+
+		return {
+			fetchPages: getSettings().__experimentalFetchPageEntities,
+		};
+	}, [] ); // empty array is required to avoid invalidating fetchPages
+
+	useEffect( () => {
+		( async () => {
+			// If `__experimentalFetchPageEntities` is not defined in block editor settings,
+			// do not attempt to fetch Pages.
+			if ( ! fetchPages || ! isMounted.current ) {
+				return;
+			}
+
+			debugger;
+
+			const pagesResult = await fetchPages();
+			setPages( pagesResult );
+			// Todo: handle errors with catch
+		} )();
+	}, [ fetchPages ] );
 
 	return useMemo( () => {
 		// TODO: Once the REST API supports passing multiple values to
@@ -55,11 +80,11 @@ const usePageData = () => {
 		}, new Map() );
 
 		return {
+			pages, // necessary for access outside the hook
 			pagesByParentId,
-			hasResolvedPages,
 			totalPages: pages?.length ?? null,
 		};
-	}, [ pages, hasResolvedPages ] );
+	}, [ pages ] );
 };
 
 // copied from convert-to-links-modal.js
@@ -127,20 +152,8 @@ const convertSelectedBlockToNavigationLinks =
 		replaceBlock( clientId, navigationLinks );
 	};
 
-const ConvertToLinksModal = ( { onClose, clientId } ) => {
-	const { records: pages, hasResolved: pagesFinished } = useEntityRecords(
-		'postType',
-		'page',
-		{
-			per_page: MAX_PAGE_COUNT,
-			_fields: PAGE_FIELDS,
-			// TODO: When https://core.trac.wordpress.org/ticket/39037 REST API support for multiple orderby
-			// values is resolved, update 'orderby' to [ 'menu_order', 'post_title' ] to provide a consistent
-			// sort.
-			orderby: 'menu_order',
-			order: 'asc',
-		}
-	);
+const ConvertToLinksModal = ( { onClose, clientId, pages } ) => {
+	const hasPages = !! pages?.length;
 
 	const { replaceBlock } = useDispatch( blockEditorStore );
 
@@ -168,7 +181,7 @@ const ConvertToLinksModal = ( { onClose, clientId } ) => {
 				</Button>
 				<Button
 					variant="primary"
-					disabled={ ! pagesFinished }
+					disabled={ ! hasPages }
 					onClick={ convertSelectedBlockToNavigationLinks( {
 						pages,
 						replaceBlock,
@@ -183,14 +196,10 @@ const ConvertToLinksModal = ( { onClose, clientId } ) => {
 	);
 };
 
-// const BlockEditPanel = () => {
-// 	return <div>Block Edit Panel</div>;
-// };
-
 const BlockEditButton = ( { label, clientId } ) => {
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 	const [ convertModalOpen, setConvertModalOpen ] = useState( false );
-	const { totalPages } = usePageData();
+	const { pages, totalPages } = usePageData();
 
 	const block = useSelect(
 		( select ) => {
@@ -213,6 +222,7 @@ const BlockEditButton = ( { label, clientId } ) => {
 				<ConvertToLinksModal
 					onClose={ () => setConvertModalOpen( false ) }
 					clientId={ clientId }
+					pages={ pages }
 				/>
 			) }
 			{ allowConvertToLinks && (
