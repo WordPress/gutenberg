@@ -14,11 +14,6 @@
  * @return string Returns the featured image for the current post.
  */
 function render_block_core_post_featured_image( $attributes, $content, $block ) {
-	if ( ! isset( $block->context['postId'] ) ) {
-		return '';
-	}
-	$post_ID = $block->context['postId'];
-
 	// Check is needed for backward compatibility with third-party plugins
 	// that might rely on the `in_the_loop` check; calling `the_post` sets it to true.
 	if ( ! in_the_loop() && have_posts() ) {
