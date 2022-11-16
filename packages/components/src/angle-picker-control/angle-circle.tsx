@@ -85,7 +85,6 @@ function AngleCircle( {
 	}, [ isDragging ] );
 
 	return (
-		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		<CircleRoot
 			ref={ angleCircleRef }
 			onMouseDown={ startDrag }
@@ -103,7 +102,6 @@ function AngleCircle( {
 				<CircleIndicator className="components-angle-picker-control__angle-circle-indicator" />
 			</CircleIndicatorWrapper>
 		</CircleRoot>
-		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	);
 }
 
