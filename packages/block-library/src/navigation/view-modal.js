@@ -27,7 +27,7 @@ function navigationToggleModal( modal ) {
 	htmlElement.classList.toggle( 'has-modal-open' );
 }
 
-function isLinkToAnchorOnSamePage( node ) {
+function isLinkToAnchorOnCurrentPage( node ) {
 	return (
 		node.hash &&
 		node.protocol === window.location.protocol &&
@@ -52,7 +52,7 @@ window.addEventListener( 'load', () => {
 	navigationLinks.forEach( function ( link ) {
 		// Ignore non-anchor links and anchor links which open on a new tab.
 		if (
-			! isLinkToAnchorOnSamePage( link ) ||
+			! isLinkToAnchorOnCurrentPage( link ) ||
 			link.attributes?.target === '_blank'
 		) {
 			return;
