@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Button,
+	__experimentalHStack as HStack,
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
@@ -58,6 +59,17 @@ export default function Layout() {
 		( ! isMobileViewport && ( canvasMode === 'view' || ! isEditorPage ) );
 	const showCanvas =
 		( isMobileViewport && isMobileCanvasVisible ) || ! isMobileViewport;
+	const showFrame =
+		! isEditorPage || ( canvasMode === 'view' && ! isMobileViewport );
+	const showEditButton =
+		isEditorPage &&
+		( ( ! isMobileViewport && canvasMode === 'view' ) ||
+			( isMobileViewport &&
+				canvasMode === 'view' &&
+				isMobileCanvasVisible ) );
+	const isBackToDashboardButton =
+		( ! isMobileViewport && canvasMode === 'view' ) ||
+		( isMobileViewport && ! isMobileCanvasVisible );
 	// Ideally this effect could be removed if we move the "isMobileCanvasVisible" into the store.
 	const [ canvasResizer, canvasSize ] = useResizeObserver();
 	const [ fullResizer, fullSize ] = useResizeObserver();
@@ -70,8 +82,19 @@ export default function Layout() {
 			setIsMobileCanvasVisible( true );
 		}
 	}, [ canvasMode, isMobileViewport ] );
-	const showFrame =
-		! isEditorPage || ( canvasMode === 'view' && ! isMobileViewport );
+	const siteIconButtonProps = isBackToDashboardButton
+		? {
+				href: 'index.php',
+				'aria-label': __( 'Go back to the dashboard' ),
+		  }
+		: {
+				label: __( 'Open Navigation Sidebar' ),
+				onClick: () => {
+					clearSelectedBlock();
+					setIsMobileCanvasVisible( false );
+					__unstableSetCanvasMode( 'view' );
+				},
+		  };
 
 	return (
 		<>
@@ -83,55 +106,61 @@ export default function Layout() {
 			>
 				<div className="edit-site-layout__header">
 					<div className="edit-site-layout__logo">
-						{ ( ( ! isMobileViewport && canvasMode === 'view' ) ||
-							( isMobileViewport &&
-								! isMobileCanvasVisible ) ) && (
-							<Button
-								href="index.php"
-								aria-label={ __( 'Go back to the dashboard' ) }
-							>
-								<SiteIconAndTitle />
-							</Button>
-						) }
-						{ ( ( isMobileViewport && isMobileCanvasVisible ) ||
-							( ! isMobileViewport &&
-								canvasMode === 'edit' ) ) && (
-							<Button
-								className="edit-site-layout__view-mode-toggle"
-								label={ __( 'Open Navigation Sidebar' ) }
-								onClick={ () => {
-									clearSelectedBlock();
-									setIsMobileCanvasVisible( false );
-									__unstableSetCanvasMode( 'view' );
-								} }
-							>
-								<SiteIconAndTitle
-									className="edit-site-layout__view-mode-toggle-icon"
-									showTitle={ false }
-								/>
-							</Button>
-						) }
-						{ isEditorPage &&
-							( ( ! isMobileViewport && canvasMode === 'view' ) ||
-								( isMobileViewport &&
-									canvasMode === 'view' &&
-									isMobileCanvasVisible ) ) && (
-								<Button
-									className="edit-site-layout__edit-button"
-									label={ __( 'Open the editor' ) }
-									onClick={ () => {
-										__unstableSetCanvasMode( 'edit' );
+						<Button
+							{ ...siteIconButtonProps }
+							className="edit-site-layout__view-mode-toggle"
+						>
+							<SiteIconAndTitle
+								className="edit-site-layout__view-mode-toggle-icon"
+								showTitle={ false }
+							/>
+						</Button>
+						<AnimatePresence initial={ false }>
+							{ ( isBackToDashboardButton || showEditButton ) && (
+								<motion.div
+									initial={ { opacity: 0 } }
+									exit={ { opacity: 0 } }
+									animate={ { opacity: 1 } }
+									style={ {
+										position: 'absolute',
+										left: 60,
 									} }
 								>
-									{ __( 'Edit' ) }
-								</Button>
+									<HStack>
+										{ isBackToDashboardButton && (
+											<Button { ...siteIconButtonProps }>
+												<SiteIconAndTitle
+													showIcon={ false }
+												/>
+											</Button>
+										) }
+
+										{ showEditButton && (
+											<Button
+												className="edit-site-layout__edit-button"
+												label={ __(
+													'Open the editor'
+												) }
+												onClick={ () => {
+													__unstableSetCanvasMode(
+														'edit'
+													);
+												} }
+											>
+												{ __( 'Edit' ) }
+											</Button>
+										) }
+									</HStack>
+								</motion.div>
 							) }
+						</AnimatePresence>
 
 						{ isMobileViewport && ! isMobileCanvasVisible && (
 							<Button
 								onClick={ () =>
 									setIsMobileCanvasVisible( true )
 								}
+								style={ { position: 'fixed', right: 0 } }
 							>
 								{ __( 'View Editor' ) }
 							</Button>
