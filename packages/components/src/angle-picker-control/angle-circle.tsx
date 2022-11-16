@@ -13,10 +13,14 @@ import {
 	CircleIndicator,
 } from './styles/angle-picker-control-styles';
 
-function AngleCircle( { value, onChange, ...props } ) {
-	const angleCircleRef = useRef();
-	const angleCircleCenter = useRef();
-	const previousCursorValue = useRef();
+import type { WordPressComponentProps } from '../ui/context';
+import type { AngleCircleProps } from './types';
+
+function AngleCircle( {
+	value,
+	onChange,
+	...props
+}: WordPressComponentProps< AngleCircleProps, 'div' > ) {
 
 	const setAngleCircleCenter = () => {
 		const rect = angleCircleRef.current.getBoundingClientRect();

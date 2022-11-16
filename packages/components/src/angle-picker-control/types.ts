@@ -15,3 +15,8 @@ export type AnglePickerControlProps = {
 	onChange: ( value: number ) => void;
 	value: number;
 };
+
+export type AngleCircleProps = Pick<
+	AnglePickerControlProps,
+	'value' | 'onChange'
+> & {};
