@@ -79,7 +79,7 @@ function AngleCircle( {
 			}
 			document.body.style.cursor = 'grabbing';
 		} else {
-			document.body.style.cursor = previousCursorValue.current || null;
+			document.body.style.cursor = previousCursorValue.current || '';
 			previousCursorValue.current = undefined;
 		}
 	}, [ isDragging ] );
