@@ -56,29 +56,4 @@
 		outline: 4px solid $components-color-accent;
 		outline-offset: -4px;
 	}
-
-	// Edit site Navigation Drawer.
-	.interface-interface-skeleton__drawer {
-		z-index: z-index(".edit-site-navigation-toggle");
-
-		.interface-navigable-region__stacker,
-		.edit-site-navigation-toggle {
-			outline: inherit;
-			outline-offset: inherit;
-		}
-
-		.edit-site-navigation-toggle.is-open {
-			outline: none;
-		}
-
-		.edit-site-navigation-toggle__button {
-			z-index: -1;
-		}
-	}
-}
-
-// Fixes for edge cases.
-// Edit site Drawer.
-.interface-interface-skeleton__drawer .interface-navigable-region__stacker {
-	height: 100%;
 }
