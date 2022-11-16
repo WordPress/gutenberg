@@ -65,7 +65,7 @@ if ( ! function_exists( '_wp_theme_has_theme_json_clean_cache_upon_upgrading_act
 		if (
 			'update' === $options['action'] &&
 			'theme' === $options['type'] &&
-			isset( $options['themes'][ get_stylesheet() ]  )
+			isset( $options['themes'][ get_stylesheet() ] )
 		) {
 			wp_theme_has_theme_json_clean_cache();
 		}
