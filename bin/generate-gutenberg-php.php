@@ -7,18 +7,37 @@
  * @package gutenberg-build
  */
 
-
 /**
  * Prints `define` statements for the production version of `gutenberg.php`
  * (the plugin entry point).
  */
 class Gutenberg_Header_File_Generator {
+	/**
+	 * Resource to a file stream.
+	 *
+	 * @var resource
+	 */
 	private $file;
 
+	/**
+	 * Gutenberg version.
+	 *
+	 * @var string|null
+	 */
 	private $version;
 
+	/**
+	 * Defines if the current line is inside a defines block.
+	 *
+	 * @var bool
+	 */
 	private $inside_defines_block;
 
+	/**
+	 * Constructor.
+	 *
+	 * @param string $path Absolute file path to gutenberg.php.
+	 */
 	public function __construct( $path ) {
 		$this->file = fopen( $path, 'r' );
 
@@ -26,7 +45,10 @@ class Gutenberg_Header_File_Generator {
 		$this->inside_defines_block = false;
 	}
 
-	public function print_header() {
+	/**
+	 * Prints the header file.
+	 */
+	public function print_header_file() {
 		while ( true ) {
 			$line = fgets( $this->file );
 			if ( false === $line ) {
@@ -46,7 +68,7 @@ class Gutenberg_Header_File_Generator {
 				case '### BEGIN AUTO-GENERATED DEFINES':
 					$this->inside_defines_block = true;
 					echo $line;
-					$this->print_production_defines();
+					$this->print_version_information();
 					break;
 
 				case '### END AUTO-GENERATED DEFINES':
@@ -63,7 +85,10 @@ class Gutenberg_Header_File_Generator {
 		}
 	}
 
-	private function print_production_defines() {
+	/**
+	 * Prints plugin header.
+	 */
+	private function print_version_information() {
 		echo "define( 'GUTENBERG_VERSION', '{$this->version}' );\n";
 
 		$git_commit = trim( shell_exec( 'git rev-parse HEAD' ) );
@@ -71,10 +96,13 @@ class Gutenberg_Header_File_Generator {
 		echo "define( 'GUTENBERG_GIT_COMMIT', '{$git_commit}' );\n";
 	}
 
+	/**
+	 * Destructor.
+	 */
 	public function __destruct() {
 		fclose( $this->file );
 	}
 }
 
 $gutenberg_header_generator = new Gutenberg_Header_File_Generator( dirname( __DIR__ ) . '/gutenberg.php' );
-$gutenberg_header_generator->print_header();
+$gutenberg_header_generator->print_header_file();
