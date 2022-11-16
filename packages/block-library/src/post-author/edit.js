@@ -103,6 +103,7 @@ function PostAuthorEdit( {
 						authorOptions.length &&
 						( ( showCombobox && (
 							<ComboboxControl
+								__nextHasNoMarginBottom
 								label={ __( 'Author' ) }
 								options={ authorOptions }
 								value={ authorId }
