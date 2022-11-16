@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch, resolveSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback, useMemo, useRef, Fragment } from '@wordpress/element';
 import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
 import {
@@ -122,27 +122,15 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		[ settingsBlockPatternCategories, restBlockPatternCategories ]
 	);
 
-	const fetchPagesEntities = async ( options = {} ) =>
-		resolveSelect( coreStore ).getEntityRecords(
-			'postType',
-			'page',
-			options
-		);
-	// const { fetchPagesEntities } = useSelect( ( select ) => {
-	// 	const { getEntityRecords } = select( coreStore );
+	const { fetchPagesEntities } = useSelect( ( select ) => {
+		const { getEntityRecords } = select( coreStore );
 
-	// 	return {
-	// 		fetchPagesEntities: ( options = {} ) => {
-	// 			return getEntityRecords( 'postType', 'page', {
-	// 				orderby: 'menu_order',
-	// 				order: 'asc',
-	// 				_fields: [ 'id', 'link', 'parent', 'title', 'menu_order' ],
-	// 				per_page: -1,
-	// 				context: 'view',
-	// 			} );
-	// 		},
-	// 	};
-	// } );
+		return {
+			fetchPagesEntities: ( options = {} ) => {
+				return getEntityRecords( 'postType', 'page', options );
+			},
+		};
+	}, [] );
 
 	const settings = useMemo( () => {
 		const {
