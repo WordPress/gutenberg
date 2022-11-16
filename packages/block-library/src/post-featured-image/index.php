@@ -17,7 +17,6 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	if ( ! isset( $block->context['postId'] ) ) {
 		return '';
 	}
-	$post_ID = $block->context['postId'];
 
 	// Check is needed for backward compatibility with third-party plugins
 	// that might rely on the `in_the_loop` check; calling `the_post` sets it to true.
@@ -31,7 +30,7 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	$overlay_markup = get_block_core_post_featured_image_overlay_element_markup( $attributes );
 
 	if ( $is_link ) {
-		$attr['alt'] = trim( strip_tags( get_the_title( $post_ID ) ) );
+		$attr['alt'] = trim( strip_tags( get_the_title() ) );
 	}
 
 	if ( ! empty( $attributes['height'] ) ) {
@@ -42,7 +41,7 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 		$attr['style'] = empty( $attr['style'] ) ? $extra_styles : $attr['style'] . $extra_styles;
 	}
 
-	$featured_image = get_the_post_thumbnail( $post_ID, $size_slug, $attr );
+	$featured_image = get_the_post_thumbnail( null, $size_slug, $attr );
 	if ( ! $featured_image ) {
 		return '';
 	}
@@ -51,7 +50,7 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 		$rel            = ! empty( $attributes['rel'] ) ? 'rel="' . esc_attr( $attributes['rel'] ) . '"' : '';
 		$featured_image = sprintf(
 			'<a href="%1$s" target="%2$s" %3$s>%4$s%5$s</a>',
-			get_the_permalink( $post_ID ),
+			get_the_permalink(),
 			esc_attr( $link_target ),
 			$rel,
 			$featured_image,
