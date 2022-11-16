@@ -34,7 +34,7 @@ import getIsListPage from '../../utils/get-is-list-page';
 import SiteIconAndTitle from '../site-icon-and-title';
 import Header from '../header-edit-mode';
 
-const ANIMATION_DURATION = 3.3;
+const ANIMATION_DURATION = 0.5;
 
 export default function Layout() {
 	const { params } = useLocation();
@@ -203,12 +203,6 @@ export default function Layout() {
 								initial={ false }
 								layout="position"
 								className="edit-site-layout__canvas"
-								animate={ {
-									width: showFrame
-										? canvasSize.width - canvasPadding
-										: fullSize.width,
-									bottom: showFrame ? canvasPadding : 0,
-								} }
 								transition={ {
 									type: 'tween',
 									duration: disableMotion
@@ -217,10 +211,32 @@ export default function Layout() {
 									ease: 'easeOut',
 								} }
 							>
-								<ErrorBoundary>
-									{ isEditorPage && <Editor /> }
-									{ isListPage && <ListPage /> }
-								</ErrorBoundary>
+								<motion.div
+									style={ {
+										position: 'absolute',
+										top: 0,
+										left: 0,
+										bottom: 0,
+									} }
+									initial={ false }
+									animate={ {
+										width: showFrame
+											? canvasSize.width - canvasPadding
+											: fullSize.width,
+									} }
+									transition={ {
+										type: 'tween',
+										duration: disableMotion
+											? 0
+											: ANIMATION_DURATION,
+										ease: 'easeOut',
+									} }
+								>
+									<ErrorBoundary>
+										{ isEditorPage && <Editor /> }
+										{ isListPage && <ListPage /> }
+									</ErrorBoundary>
+								</motion.div>
 							</motion.div>
 						) }
 					</div>

@@ -62,8 +62,6 @@
 }
 
 .edit-site-layout__canvas {
-	color: $gray-900;
-	background: $white;
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -71,17 +69,24 @@
 	width: 100%;
 	box-shadow: 0 20px 20px rgba($black, 0.9);
 
+	& > div {
+		color: $gray-900;
+		background: $white;
+	}
 	@include break-small {
 		top: $canvas-padding;
 		bottom: $canvas-padding;
 		width: calc(100% - #{$canvas-padding});
-		border-radius: $radius-block-ui * 4;
 
-		// Not sure why this is necessary.
-		.edit-site-layout:not(.is-full-canvas) & .edit-site-visual-editor__editor-canvas,
-		.edit-site-layout:not(.is-full-canvas) & .interface-interface-skeleton__content {
+		& > div {
 			border-radius: $radius-block-ui * 4;
+			// Not sure why this is necessary.
+			.edit-site-layout:not(.is-full-canvas) & .edit-site-visual-editor__editor-canvas,
+			.edit-site-layout:not(.is-full-canvas) & .interface-interface-skeleton__content {
+				border-radius: $radius-block-ui * 4;
+			}
 		}
+
 	}
 
 	.edit-site-layout.is-full-canvas & {
