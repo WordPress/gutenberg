@@ -11,6 +11,7 @@ if ( ! function_exists( '_register_remote_theme_patterns' ) ) {
 	 * `theme.json` file.
 	 */
 	function _register_remote_theme_patterns() {
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
 		if ( ! apply_filters( 'should_load_remote_block_patterns', true ) ) {
 			return;
 		}
