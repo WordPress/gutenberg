@@ -503,6 +503,10 @@ class URLInput extends Component {
 			loading,
 		} = this.state;
 
+		if ( ! showSuggestions || suggestions.length === 0 ) {
+			return null;
+		}
+
 		const suggestionsListProps = {
 			id: suggestionsListboxId,
 			ref: this.autocompleteRef,
@@ -519,11 +523,7 @@ class URLInput extends Component {
 			};
 		};
 
-		if (
-			isFunction( renderSuggestions ) &&
-			showSuggestions &&
-			!! suggestions.length
-		) {
+		if ( isFunction( renderSuggestions ) ) {
 			return renderSuggestions( {
 				suggestions,
 				selectedSuggestion,
@@ -537,46 +537,33 @@ class URLInput extends Component {
 			} );
 		}
 
-		if (
-			! isFunction( renderSuggestions ) &&
-			showSuggestions &&
-			!! suggestions.length
-		) {
-			return (
-				<Popover placement="bottom" focusOnMount={ false }>
-					<div
-						{ ...suggestionsListProps }
-						className={ classnames(
-							'block-editor-url-input__suggestions',
-							`${ className }__suggestions`
-						) }
-					>
-						{ suggestions.map( ( suggestion, index ) => (
-							<Button
-								{ ...buildSuggestionItemProps(
-									suggestion,
-									index
-								) }
-								key={ suggestion.id }
-								className={ classnames(
-									'block-editor-url-input__suggestion',
-									{
-										'is-selected':
-											index === selectedSuggestion,
-									}
-								) }
-								onClick={ () =>
-									this.handleOnClick( suggestion )
+		return (
+			<Popover placement="bottom" focusOnMount={ false }>
+				<div
+					{ ...suggestionsListProps }
+					className={ classnames(
+						'block-editor-url-input__suggestions',
+						`${ className }__suggestions`
+					) }
+				>
+					{ suggestions.map( ( suggestion, index ) => (
+						<Button
+							{ ...buildSuggestionItemProps( suggestion, index ) }
+							key={ suggestion.id }
+							className={ classnames(
+								'block-editor-url-input__suggestion',
+								{
+									'is-selected': index === selectedSuggestion,
 								}
-							>
-								{ suggestion.title }
-							</Button>
-						) ) }
-					</div>
-				</Popover>
-			);
-		}
-		return null;
+							) }
+							onClick={ () => this.handleOnClick( suggestion ) }
+						>
+							{ suggestion.title }
+						</Button>
+					) ) }
+				</div>
+			</Popover>
+		);
 	}
 }
 
