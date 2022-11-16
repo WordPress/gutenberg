@@ -171,6 +171,7 @@ class URLInput extends Component {
 			this.suggestionsRequest = null;
 
 			this.setState( {
+				suggestions: [],
 				showSuggestions: false,
 				selectedSuggestion: null,
 				loading: false,
