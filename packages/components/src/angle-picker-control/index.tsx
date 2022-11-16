@@ -41,9 +41,11 @@ export default function AnglePickerControl( {
 		);
 	}
 
-	const handleOnNumberChange = ( unprocessedValue ) => {
+	const handleOnNumberChange = ( unprocessedValue: string | undefined ) => {
 		const inputValue =
-			unprocessedValue !== '' ? parseInt( unprocessedValue, 10 ) : 0;
+			unprocessedValue !== undefined && unprocessedValue !== ''
+				? parseInt( unprocessedValue, 10 )
+				: 0;
 		onChange( inputValue );
 	};
 
