@@ -70,7 +70,7 @@ function SinglePalette( {
 					}
 					style={ { backgroundColor: color, color } }
 					onClick={
-						isSelected ? clearColor : () => onChange( color )
+						isSelected ? clearColor : () => onChange( color, index )
 					}
 					aria-label={
 						name
@@ -118,7 +118,9 @@ function MultiplePalettes( {
 						<SinglePalette
 							clearColor={ clearColor }
 							colors={ colorPalette }
-							onChange={ onChange }
+							onChange={ ( newColor ) =>
+								onChange( newColor, index )
+							}
 							value={ value }
 							actions={
 								colors.length === index + 1 ? actions : null

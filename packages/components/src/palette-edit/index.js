@@ -89,6 +89,50 @@ export function getNameForPosition( elements, slugPrefix ) {
 	);
 }
 
+function ColorPickerPopover( {
+	isGradient,
+	element,
+	onChange,
+	onClose = () => {},
+} ) {
+	return (
+		<Popover
+			placement="left-start"
+			offset={ 20 }
+			className="components-palette-edit__popover"
+			onClose={ onClose }
+		>
+			{ ! isGradient && (
+				<ColorPicker
+					color={ element.color }
+					enableAlpha
+					onChange={ ( newColor ) =>
+						onChange( {
+							...element,
+							color: newColor,
+						} )
+					}
+				/>
+			) }
+			{ isGradient && (
+				<div className="components-palette-edit__popover-gradient-picker">
+					<CustomGradientPicker
+						__nextHasNoMargin
+						__experimentalIsRenderedInSidebar
+						value={ element.gradient }
+						onChange={ ( newGradient ) =>
+							onChange( {
+								...element,
+								gradient: newGradient,
+							} )
+						}
+					/>
+				</div>
+			) }
+		</Popover>
+	);
+}
+
 function Option( {
 	canOnlyChangeValues,
 	element,
@@ -155,39 +199,11 @@ function Option( {
 				) }
 			</HStack>
 			{ isEditing && (
-				<Popover
-					placement="left-start"
-					offset={ 20 }
-					className="components-palette-edit__popover"
-				>
-					{ ! isGradient && (
-						<ColorPicker
-							color={ value }
-							enableAlpha
-							onChange={ ( newColor ) =>
-								onChange( {
-									...element,
-									color: newColor,
-								} )
-							}
-						/>
-					) }
-					{ isGradient && (
-						<div className="components-palette-edit__popover-gradient-picker">
-							<CustomGradientPicker
-								__nextHasNoMargin
-								__experimentalIsRenderedInSidebar
-								value={ value }
-								onChange={ ( newGradient ) =>
-									onChange( {
-										...element,
-										gradient: newGradient,
-									} )
-								}
-							/>
-						</div>
-					) }
-				</Popover>
+				<ColorPickerPopover
+					isGradient={ isGradient }
+					onChange={ onChange }
+					element={ element }
+				/>
 			) }
 		</PaletteItem>
 	);
@@ -313,13 +329,7 @@ export default function PaletteEdit( {
 		! elements[ editingElement ].slug;
 	const elementsLength = elements.length;
 	const hasElements = elementsLength > 0;
-	const editPaletteItem = ( value, collection ) => {
-		const valueIndex = collection.findIndex(
-			( item ) => item.color === value
-		);
-		setIsEditing( true );
-		setEditingElement( valueIndex );
-	};
+	const debounceOnChange = useDebounce( onChange, 100 );
 
 	return (
 		<PaletteEditStyles>
@@ -398,7 +408,7 @@ export default function PaletteEdit( {
 													} }
 													className="components-palette-edit__menu-button"
 												>
-													{ __( 'List view' ) }
+													{ __( 'Show details' ) }
 												</Button>
 											) }
 											{ ! canOnlyChangeValues && (
@@ -459,13 +469,34 @@ export default function PaletteEdit( {
 							isGradient={ isGradient }
 						/>
 					) }
+					{ ! isEditing && editingElement !== null && (
+						<ColorPickerPopover
+							isGradient={ isGradient }
+							onClose={ () => setEditingElement( null ) }
+							onChange={ ( newElement ) => {
+								debounceOnChange(
+									elements.map(
+										( currentElement, currentIndex ) => {
+											if (
+												currentIndex === editingElement
+											) {
+												return newElement;
+											}
+											return currentElement;
+										}
+									)
+								);
+							} }
+							element={ elements[ editingElement ] }
+						/>
+					) }
 					{ ! isEditing &&
 						( isGradient ? (
 							<GradientPicker
 								__nextHasNoMargin
 								gradients={ gradients }
-								onChange={ ( value ) =>
-									editPaletteItem( value, gradients )
+								onChange={ ( value, index ) =>
+									setEditingElement( index )
 								}
 								clearable={ false }
 								disableCustomGradients={ true }
@@ -473,8 +504,8 @@ export default function PaletteEdit( {
 						) : (
 							<ColorPalette
 								colors={ colors }
-								onChange={ ( value ) =>
-									editPaletteItem( value, colors )
+								onChange={ ( value, index ) =>
+									setEditingElement( index )
 								}
 								clearable={ false }
 								disableCustomColors={ true }
