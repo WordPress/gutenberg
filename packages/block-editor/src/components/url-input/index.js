@@ -133,14 +133,10 @@ class URLInput extends Component {
 	}
 
 	shouldShowInitialSuggestions() {
-		const { suggestions } = this.state;
 		const { __experimentalShowInitialSuggestions = false, value } =
 			this.props;
 		return (
-			! this.isUpdatingSuggestions &&
-			__experimentalShowInitialSuggestions &&
-			! ( value && value.length ) &&
-			! ( suggestions && suggestions.length )
+			__experimentalShowInitialSuggestions && ! ( value && value.length )
 		);
 	}
 
