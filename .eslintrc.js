@@ -144,6 +144,7 @@ module.exports = {
 							'partial',
 							'partialRight',
 							'random',
+							'reduce',
 							'reject',
 							'repeat',
 							'reverse',
@@ -322,17 +323,24 @@ module.exports = {
 			},
 		},
 		{
+			files: [ 'packages/components/src/**/*.[tj]s?(x)' ],
+			excludedFiles: [ ...developmentFiles ],
+			rules: {
+				'react-hooks/exhaustive-deps': 'error',
+			},
+		},
+		{
 			files: [ 'packages/jest*/**/*.js', '**/test/**/*.js' ],
 			excludedFiles: [ 'test/e2e/**/*.js' ],
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-unit' ],
 		},
 		{
-			files: [ '**/test/**/*.js' ],
+			files: [ '**/test/**/*.[tj]s?(x)' ],
 			excludedFiles: [
-				'**/*.@(android|ios|native).js',
-				'packages/react-native-*/**/*.js',
-				'test/native/**/*.js',
-				'test/e2e/**/*.[tj]s',
+				'**/*.@(android|ios|native).[tj]s?(x)',
+				'packages/react-native-*/**/*.[tj]s?(x)',
+				'test/native/**/*.[tj]s?(x)',
+				'test/e2e/**/*.[tj]s?(x)',
 			],
 			extends: [
 				'plugin:jest-dom/recommended',

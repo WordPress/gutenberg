@@ -19,10 +19,14 @@ export function useBorderControlDropdown(
 	const {
 		border,
 		className,
-		colors,
+		colors = [],
+		enableAlpha = false,
+		enableStyle = true,
 		onChange,
 		previousStyleSelection,
 		size = 'default',
+		__experimentalHasMultipleOrigins = false,
+		__experimentalIsRenderedInSidebar = false,
 		...otherProps
 	} = useContextSystem( props, 'BorderControlDropdown' );
 
@@ -81,6 +85,8 @@ export function useBorderControlDropdown(
 		border,
 		className: classes,
 		colors,
+		enableAlpha,
+		enableStyle,
 		indicatorClassName,
 		indicatorWrapperClassName,
 		onColorChange,
@@ -89,5 +95,7 @@ export function useBorderControlDropdown(
 		popoverContentClassName,
 		popoverControlsClassName,
 		resetButtonClassName,
+		__experimentalHasMultipleOrigins,
+		__experimentalIsRenderedInSidebar,
 	};
 }

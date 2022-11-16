@@ -223,7 +223,10 @@ describe( 'Order of block keyboard navigation', () => {
 	it( 'allows the block wrapper to gain focus for a group block instead of the first element', async () => {
 		// Insert a group block.
 		await insertBlock( 'Group' );
-
+		// Select the default, selected Group layout from the variation picker.
+		await page.click(
+			'button[aria-label="Group: Gather blocks in a container."]'
+		);
 		// If active label matches, that means focus did not change from group block wrapper.
 		await expect( await getActiveLabel() ).toBe( 'Block: Group' );
 	} );

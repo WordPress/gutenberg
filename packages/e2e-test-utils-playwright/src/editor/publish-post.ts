@@ -12,7 +12,7 @@ import type { Editor } from './index';
 export async function publishPost( this: Editor ) {
 	await this.page.click( 'role=button[name="Publish"i]' );
 	const publishEditorPanel = this.page.locator(
-		'role=region[name="Publish editor"i]'
+		'role=region[name="Editor publish"i]'
 	);
 
 	const isPublishEditorVisible = await publishEditorPanel.isVisible();

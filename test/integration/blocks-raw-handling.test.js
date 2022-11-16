@@ -376,6 +376,7 @@ describe( 'Blocks raw handling', () => {
 			'nested-divs',
 			'apple',
 			'google-docs',
+			'google-docs-list-only',
 			'google-docs-table',
 			'google-docs-table-with-comments',
 			'google-docs-with-comments',

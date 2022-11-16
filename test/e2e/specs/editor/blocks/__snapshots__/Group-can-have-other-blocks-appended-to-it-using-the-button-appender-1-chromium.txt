@@ -1,4 +1,4 @@
-<!-- wp:group -->
+<!-- wp:group {"layout":{"type":"constrained"}} -->
 <div class="wp-block-group"><!-- wp:paragraph -->
 <p>Group Block with a Paragraph</p>
 <!-- /wp:paragraph --></div>

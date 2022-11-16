@@ -11,14 +11,15 @@ import { CONFIG, COLORS, reduceMotion } from '../../utils';
 import type { ToggleGroupControlProps } from '../types';
 
 export const ToggleGroupControl = ( {
+	isBlock,
 	isDeselectable,
 	size,
-}: {
-	isDeselectable?: boolean;
+}: Pick< ToggleGroupControlProps, 'isBlock' | 'isDeselectable' > & {
 	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
 } ) => css`
 	background: ${ COLORS.ui.background };
 	border: 1px solid transparent;
+	border-radius: ${ CONFIG.controlBorderRadius };
 	display: inline-flex;
 	min-width: 0;
 	padding: 2px;
@@ -27,24 +28,29 @@ export const ToggleGroupControl = ( {
 	${ reduceMotion( 'transition' ) }
 
 	${ toggleGroupControlSize( size ) }
-	${ ! isDeselectable && enclosingBorder }
+	${ ! isDeselectable && enclosingBorders( isBlock ) }
 `;
 
-const enclosingBorder = css`
-	border-color: ${ COLORS.ui.border };
-	border-radius: ${ CONFIG.controlBorderRadius };
+const enclosingBorders = ( isBlock: ToggleGroupControlProps[ 'isBlock' ] ) => {
+	const enclosingBorder = css`
+		border-color: ${ COLORS.ui.border };
+	`;
 
-	&:hover {
-		border-color: ${ COLORS.ui.borderHover };
-	}
+	return css`
+		${ isBlock && enclosingBorder }
 
-	&:focus-within {
-		border-color: ${ COLORS.ui.borderFocus };
-		box-shadow: ${ CONFIG.controlBoxShadowFocus };
-		outline: none;
-		z-index: 1;
-	}
-`;
+		&:hover {
+			border-color: ${ COLORS.ui.borderHover };
+		}
+
+		&:focus-within {
+			border-color: ${ COLORS.ui.borderFocus };
+			box-shadow: ${ CONFIG.controlBoxShadowFocus };
+			outline: none;
+			z-index: 1;
+		}
+	`;
+};
 
 export const toggleGroupControlSize = (
 	size: NonNullable< ToggleGroupControlProps[ 'size' ] >

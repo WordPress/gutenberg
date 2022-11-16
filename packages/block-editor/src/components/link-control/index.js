@@ -20,6 +20,7 @@ import LinkControlSettingsDrawer from './settings-drawer';
 import LinkControlSearchInput from './search-input';
 import LinkPreview from './link-preview';
 import useCreatePage from './use-create-page';
+import useInternalInputValue from './use-internal-input-value';
 import { ViewerFill } from './viewer-slot';
 import { DEFAULT_LINK_SETTINGS } from './constants';
 
@@ -132,22 +133,19 @@ function LinkControl( {
 	const isMounting = useRef( true );
 	const wrapperNode = useRef();
 	const textInputRef = useRef();
+	const isEndingEditWithFocus = useRef( false );
 
-	const [ internalInputValue, setInternalInputValue ] = useState(
-		value?.url || ''
-	);
-	const [ internalTextValue, setInternalTextValue ] = useState(
-		value?.title || ''
-	);
-	const currentInputValue = propInputValue || internalInputValue;
+	const [ internalUrlInputValue, setInternalUrlInputValue ] =
+		useInternalInputValue( value?.url || '' );
+
+	const [ internalTextInputValue, setInternalTextInputValue ] =
+		useInternalInputValue( value?.title || '' );
+
 	const [ isEditingLink, setIsEditingLink ] = useState(
 		forceIsEditingLink !== undefined
 			? forceIsEditingLink
 			: ! value || ! value.url
 	);
-	const isEndingEditWithFocus = useRef( false );
-
-	const currentInputIsEmpty = ! currentInputValue?.trim()?.length;
 
 	const { createPage, isCreatingPage, errorMessage } =
 		useCreatePage( createSuggestion );
@@ -191,53 +189,35 @@ function LinkControl( {
 		isEndingEditWithFocus.current = false;
 	}, [ isEditingLink, isCreatingPage ] );
 
-	useEffect( () => {
-		/**
-		 * If the value's `text` property changes then sync this
-		 * back up with state.
-		 */
-		if ( value?.title && value.title !== internalTextValue ) {
-			setInternalTextValue( value.title );
-		}
-
-		/**
-		 * Update the state value internalInputValue if the url value changes
-		 * for example when clicking on another anchor
-		 */
-		if ( value?.url ) {
-			setInternalInputValue( value.url );
-		}
-	}, [ value ] );
-
 	/**
 	 * Cancels editing state and marks that focus may need to be restored after
 	 * the next render, if focus was within the wrapper when editing finished.
 	 */
-	function stopEditing() {
+	const stopEditing = () => {
 		isEndingEditWithFocus.current = !! wrapperNode.current?.contains(
 			wrapperNode.current.ownerDocument.activeElement
 		);
 
 		setIsEditingLink( false );
-	}
+	};
 
 	const handleSelectSuggestion = ( updatedValue ) => {
 		onChange( {
 			...updatedValue,
-			title: internalTextValue || updatedValue?.title,
+			title: internalTextInputValue || updatedValue?.title,
 		} );
 		stopEditing();
 	};
 
 	const handleSubmit = () => {
 		if (
-			currentInputValue !== value?.url ||
-			internalTextValue !== value?.title
+			currentUrlInputValue !== value?.url ||
+			internalTextInputValue !== value?.title
 		) {
 			onChange( {
 				...value,
-				url: currentInputValue,
-				title: internalTextValue,
+				url: currentUrlInputValue,
+				title: internalTextInputValue,
 			} );
 		}
 		stopEditing();
@@ -253,6 +233,10 @@ function LinkControl( {
 			handleSubmit();
 		}
 	};
+
+	const currentUrlInputValue = propInputValue || internalUrlInputValue;
+
+	const currentInputIsEmpty = ! currentUrlInputValue?.trim()?.length;
 
 	const shownUnlinkControl =
 		onRemove && value && ! isEditingLink && ! isCreatingPage;
@@ -289,8 +273,8 @@ function LinkControl( {
 								ref={ textInputRef }
 								className="block-editor-link-control__field block-editor-link-control__text-content"
 								label="Text"
-								value={ internalTextValue }
-								onChange={ setInternalTextValue }
+								value={ internalTextInputValue }
+								onChange={ setInternalTextInputValue }
 								onKeyDown={ handleSubmitWithEnter }
 							/>
 						) }
@@ -299,10 +283,10 @@ function LinkControl( {
 							currentLink={ value }
 							className="block-editor-link-control__field block-editor-link-control__search-input"
 							placeholder={ searchInputPlaceholder }
-							value={ currentInputValue }
+							value={ currentUrlInputValue }
 							withCreateSuggestion={ withCreateSuggestion }
 							onCreateSuggestion={ createPage }
-							onChange={ setInternalInputValue }
+							onChange={ setInternalUrlInputValue }
 							onSelect={ handleSelectSuggestion }
 							showInitialSuggestions={ showInitialSuggestions }
 							allowDirectEntry={ ! noDirectEntry }
