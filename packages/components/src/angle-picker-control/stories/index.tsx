@@ -34,7 +34,7 @@ const AnglePickerWithState: ComponentStory< typeof AnglePickerControl > = ( {
 	onChange,
 	...args
 } ) => {
-	const [ angle, setAngle ] = useState< number >();
+	const [ angle, setAngle ] = useState< number >( 0 );
 
 	const handleChange = ( newValue: number ) => {
 		setAngle( newValue );
