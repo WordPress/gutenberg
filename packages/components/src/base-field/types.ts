@@ -1,13 +1,9 @@
 /**
- * External dependencies
+ * Internal dependencies
  */
-import type { ReactNode } from 'react';
+import type { FlexProps } from '../flex/types';
 
-export type BaseFieldProps = {
-	/**
-	 * The children elements.
-	 */
-	children: ReactNode;
+export type BaseFieldProps = FlexProps & {
 	/**
 	 * Whether the field is disabled.
 	 */
