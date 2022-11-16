@@ -123,6 +123,7 @@ function gutenberg_navigation_init( $hook ) {
 	wp_enqueue_style( 'wp-edit-navigation' );
 	wp_enqueue_script( 'wp-format-library' );
 	wp_enqueue_style( 'wp-format-library' );
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
 	do_action( 'enqueue_block_editor_assets' );
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_navigation_init' );
