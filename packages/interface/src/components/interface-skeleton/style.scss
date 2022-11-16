@@ -135,6 +135,10 @@ html.interface-interface-skeleton__html-container {
 }
 
 .interface-interface-skeleton__secondary-sidebar {
+	.interface-navigable-region__stacker {
+		height: 100%;
+	}
+
 	@include break-medium() {
 		border-right: $border-width solid $gray-200;
 	}
