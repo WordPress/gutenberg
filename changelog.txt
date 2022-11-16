@@ -1,5 +1,22 @@
 == Changelog ==
 
+= 14.5.2 =
+
+
+
+## Changelog
+
+### Bug Fixes
+
+- Tag Processor: Prevent bugs from pre-PHP8 strspn/strcspn behavior. ([45822](https://github.com/WordPress/gutenberg/pull/45822))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@dmsnell
+
+
 = 14.5.1 =
 
 
