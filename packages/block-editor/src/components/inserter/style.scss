@@ -421,6 +421,8 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-block-patterns-explorer {
+	height: 100%;
+
 	&__sidebar {
 		position: absolute;
 		top: $header-height + $grid-unit-20;
@@ -448,8 +450,16 @@ $block-inserter-tabs-height: 44px;
 	}
 
 	&__list {
+		height: 100%;
 		margin-left: $sidebar-width;
 		padding: $grid-unit-30 0 $grid-unit-40;
+
+		&__spinner {
+			height: 100%;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
 	}
 
 	.block-editor-block-patterns-list {
