@@ -731,7 +731,6 @@ function Navigation( {
 						<ManageMenusButton
 							disabled={ isManageMenusButtonDisabled }
 						/>
-
 					</>
 				) }
 			</PanelBody>
