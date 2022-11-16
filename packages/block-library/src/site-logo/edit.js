@@ -530,7 +530,12 @@ export default function LogoEdit( {
 	const label = __( 'Add a site logo' );
 
 	return (
-		<div { ...blockProps }>
+		<div
+			{ ...blockProps }
+			style={ {
+				width,
+			} }
+		>
 			{ controls }
 			{ !! logoUrl && logoImage }
 			{ ! logoUrl && ! canUserEdit && (
