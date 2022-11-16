@@ -68,7 +68,7 @@ class Gutenberg_Header_File_Generator {
 				case '### BEGIN AUTO-GENERATED DEFINES':
 					$this->inside_defines_block = true;
 					echo $line;
-					$this->print_version_information();
+					$this->print_version();
 					break;
 
 				case '### END AUTO-GENERATED DEFINES':
@@ -88,7 +88,7 @@ class Gutenberg_Header_File_Generator {
 	/**
 	 * Prints plugin header.
 	 */
-	private function print_version_information() {
+	private function print_version() {
 		echo "define( 'GUTENBERG_VERSION', '{$this->version}' );\n";
 
 		$git_commit = trim( shell_exec( 'git rev-parse HEAD' ) );

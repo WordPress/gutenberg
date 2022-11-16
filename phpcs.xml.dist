@@ -90,6 +90,7 @@
 	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
 		<exclude-pattern>./packages/block-serialization-default-parser/parser.php</exclude-pattern>
 		<exclude-pattern>/phpunit/*</exclude-pattern>
+		<exclude-pattern>./bin/generate-gutenberg-php.php</exclude-pattern>
 	</rule>
 
 	<!-- Exclude PHPUnit tests from file and class name sniffs (for Core parity). -->
