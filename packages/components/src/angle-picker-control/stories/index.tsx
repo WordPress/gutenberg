@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
+
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -6,20 +11,42 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import AnglePickerControl from '..';
+import { AnglePickerControl } from '..';
 
-export default {
+const meta: ComponentMeta< typeof AnglePickerControl > = {
 	title: 'Components/AnglePickerControl',
 	component: AnglePickerControl,
 	argTypes: {
-		label: { control: { type: 'text' } },
+		value: { control: { type: null } },
+	},
+	parameters: {
+		actions: { argTypesRegex: '^on.*' },
+		controls: {
+			expanded: true,
+		},
+		docs: { source: { state: 'open' } },
 	},
 };
 
-const AnglePickerWithState = ( args ) => {
-	const [ angle, setAngle ] = useState();
+export default meta;
+
+const AnglePickerWithState: ComponentStory< typeof AnglePickerControl > = ( {
+	onChange,
+	...args
+} ) => {
+	const [ angle, setAngle ] = useState< number >();
+
+	const handleChange = ( newValue: number ) => {
+		setAngle( newValue );
+		onChange?.( newValue );
+	};
+
 	return (
-		<AnglePickerControl { ...args } value={ angle } onChange={ setAngle } />
+		<AnglePickerControl
+			{ ...args }
+			value={ angle }
+			onChange={ handleChange }
+		/>
 	);
 };
 

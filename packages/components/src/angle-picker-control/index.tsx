@@ -23,7 +23,7 @@ import { COLORS } from '../utils/colors-values';
 
 import type { AnglePickerControlProps } from './types';
 
-export default function AnglePickerControl( {
+export function AnglePickerControl( {
 	__nextHasNoMarginBottom = false,
 	className,
 	label = __( 'Angle' ),
@@ -97,3 +97,5 @@ export default function AnglePickerControl( {
 		</Root>
 	);
 }
+
+export default AnglePickerControl;
