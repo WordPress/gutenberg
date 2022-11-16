@@ -834,6 +834,11 @@ class WP_HTML_Tag_Processor {
 			return true;
 		}
 
+		// Continue parsing if no attribute name. No point in storing something as ''/false.
+		if ( ! is_string( $attribute_name ) || strlen( $attribute_name ) === 0 ) {
+			return true;
+		}
+		
 		// If an attribute is listed many times, only use the first declaration and ignore the rest.
 		if ( ! array_key_exists( $attribute_name, $this->attributes ) ) {
 			$this->attributes[ $attribute_name ] = new WP_HTML_Attribute_Token(
