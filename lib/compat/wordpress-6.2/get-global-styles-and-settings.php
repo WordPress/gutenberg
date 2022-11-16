@@ -57,14 +57,18 @@ if ( ! function_exists( 'wp_theme_clean_theme_json_cached_data' ) ) {
  * @return string Stylesheet.
  */
 function gutenberg_get_global_stylesheet( $types = array() ) {
-	// Return cached value if it can be used and exists.
-	// It's cached by theme to make sure that theme switching clears the cache.
-	$can_use_cached = (
+	/**
+	 * Filters whether the cached global stylesheet can be used.
+	 *
+	 * @since 14.6.0
+	 *
+	 * @param boolean $can_use_cached Whether the cached global stylesheet can be used.
+	 */
+	$can_use_cached = apply_filters(
+		'global_stylesheet_can_use_cache',
 		( empty( $types ) ) &&
 		( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) &&
-		( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) &&
-		( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) &&
-		! is_admin()
+		( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG )
 	);
 	$cache_key      = 'gutenberg_get_global_stylesheet';
 	$cache_group    = 'theme_json';
