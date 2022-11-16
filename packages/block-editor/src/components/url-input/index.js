@@ -61,13 +61,12 @@ class URLInput extends Component {
 		this.suggestionNodes = [];
 
 		this.suggestionsRequest = null;
-		this.isUpdatingSuggestions = false;
 
 		this.state = {
 			suggestions: [],
 			showSuggestions: false,
+			isUpdatingSuggestions: false,
 			selectedSuggestion: null,
-
 			suggestionsListboxId: '',
 			suggestionOptionIdPrefix: '',
 		};
@@ -104,7 +103,7 @@ class URLInput extends Component {
 		if (
 			prevProps.value !== value &&
 			! this.props.disableSuggestions &&
-			! this.isUpdatingSuggestions
+			! this.state.isUpdatingSuggestions
 		) {
 			if ( value?.length ) {
 				// If the new value is not empty we need to update with suggestions for it.
@@ -180,9 +179,8 @@ class URLInput extends Component {
 			return;
 		}
 
-		this.isUpdatingSuggestions = true;
-
 		this.setState( {
+			isUpdatingSuggestions: true,
 			selectedSuggestion: null,
 			loading: true,
 		} );
@@ -202,6 +200,7 @@ class URLInput extends Component {
 
 				this.setState( {
 					suggestions,
+					isUpdatingSuggestions: false,
 					loading: false,
 					showSuggestions: !! suggestions.length,
 				} );
@@ -225,7 +224,6 @@ class URLInput extends Component {
 						'assertive'
 					);
 				}
-				this.isUpdatingSuggestions = false;
 			} )
 			.catch( () => {
 				if ( this.suggestionsRequest !== request ) {
@@ -233,9 +231,9 @@ class URLInput extends Component {
 				}
 
 				this.setState( {
+					isUpdatingSuggestions: false,
 					loading: false,
 				} );
-				this.isUpdatingSuggestions = false;
 			} );
 
 		// Note that this assignment is handled *before* the async search request
@@ -256,7 +254,7 @@ class URLInput extends Component {
 		if (
 			value &&
 			! disableSuggestions &&
-			! this.isUpdatingSuggestions &&
+			! this.state.isUpdatingSuggestions &&
 			! ( suggestions && suggestions.length )
 		) {
 			// Ensure the suggestions are updated with the current input value.
