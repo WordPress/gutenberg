@@ -60,27 +60,26 @@ class URLInput extends Component {
 
 		this.suggestionNodes = [];
 
-		this.isUpdatingSuggestions = false;
-
 		this.state = {
-			suggestions: [],
 			showSuggestions: false,
+			suggestions: [],
+			isUpdatingSuggestions: false,
+			isInitialSuggestions: false,
 			selectedSuggestion: null,
-
 			suggestionsListboxId: '',
 			suggestionOptionIdPrefix: '',
 		};
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { showSuggestions, selectedSuggestion } = this.state;
+		const { selectedSuggestion } = this.state;
 		const { value, __experimentalShowInitialSuggestions = false } =
 			this.props;
 
 		// Only have to worry about scrolling selected suggestion into view
 		// when already expanded.
 		if (
-			showSuggestions &&
+			this.state.showSuggestions &&
 			selectedSuggestion !== null &&
 			this.suggestionNodes[ selectedSuggestion ] &&
 			! this.scrollingIntoView
@@ -103,7 +102,7 @@ class URLInput extends Component {
 		if (
 			prevProps.value !== value &&
 			! this.props.disableSuggestions &&
-			! this.isUpdatingSuggestions
+			! this.state.isUpdatingSuggestions
 		) {
 			if ( value?.length ) {
 				// If the new value is not empty we need to update with suggestions for it.
@@ -123,7 +122,7 @@ class URLInput extends Component {
 
 	componentWillUnmount() {
 		this.suggestionsRequest?.cancel?.();
-		delete this.suggestionsRequest;
+		this.suggestionsRequest = null;
 	}
 
 	bindSuggestionNode( index ) {
@@ -133,14 +132,10 @@ class URLInput extends Component {
 	}
 
 	shouldShowInitialSuggestions() {
-		const { suggestions } = this.state;
 		const { __experimentalShowInitialSuggestions = false, value } =
 			this.props;
 		return (
-			! this.isUpdatingSuggestions &&
-			__experimentalShowInitialSuggestions &&
-			! ( value && value.length ) &&
-			! ( suggestions && suggestions.length )
+			__experimentalShowInitialSuggestions && ! ( value && value.length )
 		);
 	}
 
@@ -170,8 +165,12 @@ class URLInput extends Component {
 			! isInitialSuggestions &&
 			( value.length < 2 || ( ! handleURLSuggestions && isURL( value ) ) )
 		) {
+			this.suggestionsRequest = null;
+
 			this.setState( {
+				suggestions: [],
 				showSuggestions: false,
+				isInitialSuggestions,
 				selectedSuggestion: null,
 				loading: false,
 			} );
@@ -179,9 +178,8 @@ class URLInput extends Component {
 			return;
 		}
 
-		this.isUpdatingSuggestions = true;
-
 		this.setState( {
+			isUpdatingSuggestions: true,
 			selectedSuggestion: null,
 			loading: true,
 		} );
@@ -201,6 +199,8 @@ class URLInput extends Component {
 
 				this.setState( {
 					suggestions,
+					isUpdatingSuggestions: false,
+					isInitialSuggestions,
 					loading: false,
 					showSuggestions: !! suggestions.length,
 				} );
@@ -224,15 +224,16 @@ class URLInput extends Component {
 						'assertive'
 					);
 				}
-				this.isUpdatingSuggestions = false;
 			} )
 			.catch( () => {
-				if ( this.suggestionsRequest === request ) {
-					this.setState( {
-						loading: false,
-					} );
-					this.isUpdatingSuggestions = false;
+				if ( this.suggestionsRequest !== request ) {
+					return;
 				}
+
+				this.setState( {
+					isUpdatingSuggestions: false,
+					loading: false,
+				} );
 			} );
 
 		// Note that this assignment is handled *before* the async search request
@@ -244,9 +245,6 @@ class URLInput extends Component {
 		const inputValue = event.target.value;
 
 		this.props.onChange( inputValue );
-		if ( ! this.props.disableSuggestions ) {
-			this.updateSuggestions( inputValue );
-		}
 	}
 
 	onFocus() {
@@ -258,7 +256,7 @@ class URLInput extends Component {
 		if (
 			value &&
 			! disableSuggestions &&
-			! this.isUpdatingSuggestions &&
+			! this.state.isUpdatingSuggestions &&
 			! ( suggestions && suggestions.length )
 		) {
 			// Ensure the suggestions are updated with the current input value.
@@ -490,18 +488,21 @@ class URLInput extends Component {
 		const {
 			className,
 			__experimentalRenderSuggestions: renderSuggestions,
-			value = '',
-			__experimentalShowInitialSuggestions = false,
 		} = this.props;
 
 		const {
 			showSuggestions,
 			suggestions,
+			isInitialSuggestions,
 			selectedSuggestion,
 			suggestionsListboxId,
 			suggestionOptionIdPrefix,
 			loading,
 		} = this.state;
+
+		if ( ! showSuggestions || suggestions.length === 0 ) {
+			return null;
+		}
 
 		const suggestionsListProps = {
 			id: suggestionsListboxId,
@@ -519,11 +520,7 @@ class URLInput extends Component {
 			};
 		};
 
-		if (
-			isFunction( renderSuggestions ) &&
-			showSuggestions &&
-			!! suggestions.length
-		) {
+		if ( isFunction( renderSuggestions ) ) {
 			return renderSuggestions( {
 				suggestions,
 				selectedSuggestion,
@@ -531,52 +528,37 @@ class URLInput extends Component {
 				buildSuggestionItemProps,
 				isLoading: loading,
 				handleSuggestionClick: this.handleOnClick,
-				isInitialSuggestions:
-					__experimentalShowInitialSuggestions &&
-					! ( value && value.length ),
+				isInitialSuggestions,
 			} );
 		}
 
-		if (
-			! isFunction( renderSuggestions ) &&
-			showSuggestions &&
-			!! suggestions.length
-		) {
-			return (
-				<Popover placement="bottom" focusOnMount={ false }>
-					<div
-						{ ...suggestionsListProps }
-						className={ classnames(
-							'block-editor-url-input__suggestions',
-							`${ className }__suggestions`
-						) }
-					>
-						{ suggestions.map( ( suggestion, index ) => (
-							<Button
-								{ ...buildSuggestionItemProps(
-									suggestion,
-									index
-								) }
-								key={ suggestion.id }
-								className={ classnames(
-									'block-editor-url-input__suggestion',
-									{
-										'is-selected':
-											index === selectedSuggestion,
-									}
-								) }
-								onClick={ () =>
-									this.handleOnClick( suggestion )
+		return (
+			<Popover placement="bottom" focusOnMount={ false }>
+				<div
+					{ ...suggestionsListProps }
+					className={ classnames(
+						'block-editor-url-input__suggestions',
+						`${ className }__suggestions`
+					) }
+				>
+					{ suggestions.map( ( suggestion, index ) => (
+						<Button
+							{ ...buildSuggestionItemProps( suggestion, index ) }
+							key={ suggestion.id }
+							className={ classnames(
+								'block-editor-url-input__suggestion',
+								{
+									'is-selected': index === selectedSuggestion,
 								}
-							>
-								{ suggestion.title }
-							</Button>
-						) ) }
-					</div>
-				</Popover>
-			);
-		}
-		return null;
+							) }
+							onClick={ () => this.handleOnClick( suggestion ) }
+						>
+							{ suggestion.title }
+						</Button>
+					) ) }
+				</div>
+			</Popover>
+		);
 	}
 }
 
