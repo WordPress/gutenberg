@@ -24,6 +24,15 @@ $preview-image-height: 140px;
 	}
 }
 
+// When Link control is being used is the settings sidebar it doesn't cause
+// scrolling and will fit it with the max width still being the same.
+.interface-interface-skeleton__sidebar {
+    .block-editor-link-control {
+        min-width: 100%;
+        max-width: $modal-min-width;
+    }
+}
+
 // Provides positioning context for reset button. Without this then when an
 // error notice is displayed the input's reset button is incorrectly positioned.
 .block-editor-link-control__search-input-wrapper {
