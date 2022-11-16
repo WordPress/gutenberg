@@ -3,7 +3,7 @@
  */
 import { edit } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-import { useRef, useMemo, useState, useEffect } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { Button, Modal } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { createBlock as create } from '@wordpress/blocks';
@@ -24,40 +24,21 @@ import { store as blockEditorStore } from '../../store';
 const MAX_PAGE_COUNT = 100;
 
 const usePageData = () => {
-	const isMounted = useRef();
-	const [ pages, setPages ] = useState();
-
-	useEffect( () => {
-		isMounted.current = true;
-
-		return () => ( isMounted.current = false );
-	}, [] );
-
 	// 1. Grab editor settings
 	// 2. Call the selector when we need it
-	const { fetchPages } = useSelect( ( select ) => {
+	const { pages } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 
 		return {
-			fetchPages: getSettings().__experimentalFetchPageEntities,
+			pages: getSettings().__experimentalFetchPageEntities( {
+				orderby: 'menu_order',
+				order: 'asc',
+				_fields: [ 'id', 'link', 'parent', 'title', 'menu_order' ],
+				per_page: -1,
+				context: 'view',
+			} ),
 		};
-	}, [] ); // empty array is required to avoid invalidating fetchPages
-
-	useEffect( () => {
-		( async () => {
-			// If `__experimentalFetchPageEntities` is not defined in block editor settings,
-			// do not attempt to fetch Pages.
-			if ( ! fetchPages || ! isMounted.current ) {
-				return;
-			}
-
-			debugger;
-
-			const pagesResult = await fetchPages();
-			setPages( pagesResult );
-			// Todo: handle errors with catch
-		} )();
-	}, [ fetchPages ] );
+	}, [] );
 
 	return useMemo( () => {
 		// TODO: Once the REST API supports passing multiple values to
@@ -91,12 +72,11 @@ const usePageData = () => {
 /**
  * WordPress dependencies
  */
-const PAGE_FIELDS = [ 'id', 'title', 'link', 'type', 'parent' ];
 
 const convertSelectedBlockToNavigationLinks =
 	( { pages, clientId, replaceBlock, createBlock } ) =>
 	() => {
-		if ( ! pages ) {
+		if ( ! pages?.length ) {
 			return;
 		}
 
