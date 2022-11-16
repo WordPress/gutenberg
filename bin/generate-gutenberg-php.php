@@ -12,23 +12,21 @@
  * Prints `define` statements for the production version of `gutenberg.php`
  * (the plugin entry point).
  */
-class Gutenberg_Header_File_Generator
-{
+class Gutenberg_Header_File_Generator {
 	private $file;
 
 	private $version;
 
 	private $inside_defines_block;
 
-	public function __construct($path) {
+	public function __construct( $path ) {
 		$this->file = fopen( $path, 'r' );
 
 		$this->version              = null;
 		$this->inside_defines_block = false;
 	}
 
-	public function print_header()
-	{
+	public function print_header() {
 		while ( true ) {
 			$line = fgets( $this->file );
 			if ( false === $line ) {
@@ -73,8 +71,7 @@ class Gutenberg_Header_File_Generator
 		echo "define( 'GUTENBERG_GIT_COMMIT', '{$git_commit}' );\n";
 	}
 
-	public function __destruct()
-	{
+	public function __destruct() {
 		fclose( $this->file );
 	}
 }
