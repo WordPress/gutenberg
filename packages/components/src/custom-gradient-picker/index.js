@@ -53,7 +53,7 @@ const GradientAnglePicker = ( { gradientAST, hasGradient, onChange } ) => {
 		<AnglePickerControl
 			__nextHasNoMarginBottom
 			onChange={ onAngleChange }
-			labelPosition="top"
+			// What should we pass here instead of `''` ?
 			value={ hasGradient ? angle : '' }
 		/>
 	);
