@@ -42,9 +42,12 @@ export default function Layout() {
 	const { params } = useLocation();
 	const isListPage = getIsListPage( params );
 	const isEditorPage = ! isListPage;
-	const { canvasMode } = useSelect(
+	const { canvasMode, dashboardLink } = useSelect(
 		( select ) => ( {
 			canvasMode: select( editSiteStore ).__unstableGetCanvasMode(),
+			dashboardLink:
+				select( editSiteStore ).getSettings()
+					.__experimentalDashboardLink,
 		} ),
 		[]
 	);
@@ -84,7 +87,7 @@ export default function Layout() {
 	}, [ canvasMode, isMobileViewport ] );
 	const siteIconButtonProps = isBackToDashboardButton
 		? {
-				href: 'index.php',
+				href: dashboardLink || 'index.php',
 				'aria-label': __( 'Go back to the dashboard' ),
 		  }
 		: {
@@ -132,11 +135,9 @@ export default function Layout() {
 								>
 									<HStack>
 										{ isBackToDashboardButton && (
-											<Button { ...siteIconButtonProps }>
-												<SiteIconAndTitle
-													showIcon={ false }
-												/>
-											</Button>
+											<SiteIconAndTitle
+												showIcon={ false }
+											/>
 										) }
 
 										{ showEditButton && (
