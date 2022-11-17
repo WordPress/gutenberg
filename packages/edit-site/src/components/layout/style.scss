@@ -45,12 +45,17 @@
 .edit-site-layout__sidebar {
 	grid-area: sidebar;
 	z-index: 1;
+	padding-top: $grid-unit-80;
 
 	// This is only necessary for the exit animation
 	.edit-site-layout.is-full-canvas & {
-		grid-area: header;
-		position: absolute;
-		top: 60px;
+		display: none;
+		@include break-small {
+			display: block;
+			grid-area: header;
+			position: absolute;
+			top: 60px;
+		}
 	}
 }
 

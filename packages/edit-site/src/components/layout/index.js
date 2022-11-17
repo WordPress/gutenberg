@@ -63,10 +63,9 @@ export default function Layout() {
 		! isEditorPage || ( canvasMode === 'view' && ! isMobileViewport );
 	const showEditButton =
 		isEditorPage &&
-		( ( ! isMobileViewport && canvasMode === 'view' ) ||
-			( isMobileViewport &&
-				canvasMode === 'view' &&
-				isMobileCanvasVisible ) );
+		isMobileViewport &&
+		canvasMode === 'view' &&
+		isMobileCanvasVisible;
 	const isBackToDashboardButton =
 		( ! isMobileViewport && canvasMode === 'view' ) ||
 		( isMobileViewport && ! isMobileCanvasVisible );
@@ -101,7 +100,11 @@ export default function Layout() {
 			{ fullResizer }
 			<div
 				className={ classnames( 'edit-site-layout', {
-					'is-full-canvas': isEditorPage && canvasMode === 'edit',
+					'is-full-canvas':
+						( isEditorPage &&
+							canvasMode === 'edit' &&
+							! isMobileViewport ) ||
+						isMobileCanvasVisible,
 				} ) }
 			>
 				<div className="edit-site-layout__header">
