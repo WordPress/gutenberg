@@ -3,6 +3,11 @@
  */
 import type { ReactNode } from 'react';
 
+/**
+ * Internal dependencies
+ */
+import type { IconType } from '../icon';
+
 type Tab = {
 	/**
 	 * The key of the tab.
@@ -18,11 +23,14 @@ type Tab = {
 	className?: string;
 } & Record< any, any >;
 
-export type TabButtonProps = {
+export type TabButtonProps< IconProps = unknown > = {
 	children: ReactNode;
 	className?: string;
+	icon?: IconType< IconProps >;
+	label?: string;
 	onClick: ( event: MouseEvent ) => void;
 	selected: boolean;
+	showTooltip?: boolean;
 	tabId: string;
 };
 
