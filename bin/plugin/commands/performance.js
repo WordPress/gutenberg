@@ -18,6 +18,9 @@ const {
 } = require( '../lib/utils' );
 const config = require( '../config' );
 
+/** @typedef {string} GitRevision git <rev> as passed to commands such as `git rev-list`. */
+/** @typedef {string} FilePath    normal file path. */
+
 /**
  * @typedef WPPerformanceCommandOptions
  *
@@ -172,16 +175,16 @@ async function runTestSuite( testSuite, performanceTestDirectory ) {
 /**
  * Runs the performances tests on an array of branches and output the result.
  *
- * @param {string[]}                    branches Branches to compare
- * @param {WPPerformanceCommandOptions} options  Command options.
+ * @param {string[]}                    revs    Indicates which git revisions to test, e.g. `trunk`, `v14.5.0`, or `eb3faf6ffac`.
+ * @param {WPPerformanceCommandOptions} options Command options.
  */
-async function runPerformanceTests( branches, options ) {
+async function runPerformanceTests( revs, options ) {
 	const runningInCI = !! process.env.CI || !! options.ci;
 	const TEST_ROUNDS = options.rounds || 1;
 
 	// The default value doesn't work because commander provides an array.
-	if ( branches.length === 0 ) {
-		branches = [ 'trunk' ];
+	if ( revs.length === 0 ) {
+		revs = [ 'trunk' ];
 	}
 
 	log(
@@ -197,100 +200,98 @@ async function runPerformanceTests( branches, options ) {
 
 	// 1- Preparing the tests directory.
 	log( '\n>> Preparing the tests directories' );
-	log( '    >> Cloning the repository' );
 
-	/**
-	 * @type {string[]} git refs against which to run tests;
-	 *                  could be commit SHA, branch name, tag, etc...
-	 */
-	if ( branches.length < 2 ) {
-		throw new Error( `Need at least two git refs to run` );
+	if ( revs.length < 2 ) {
+		throw new Error( `Need at least two git revisions to test` );
 	}
 
-	const baseDirectory = getRandomTemporaryPath();
-	fs.mkdirSync( baseDirectory, { recursive: true } );
+	const basePath = getRandomTemporaryPath();
+	fs.mkdirSync( basePath, { recursive: true } );
 
-	// @ts-ignore
-	const git = SimpleGit( baseDirectory );
-	await git
-		.raw( 'init' )
-		.raw( 'remote', 'add', 'origin', config.gitRepositoryURL );
-
-	for ( const branch of branches ) {
-		await git.raw( 'fetch', '--depth=1', 'origin', branch );
+	log( '    >> Initializing the repository' );
+	log( `      >> Fetching ${ revs.length } revisions for testing` );
+	const refSpecs = [];
+	for ( const rev of revs ) {
+		log( `      >> - ${ formats.success( rev ) }` );
+		refSpecs.push( `+${ rev }:branch-${ rev }` );
 	}
-
-	await git.raw( 'checkout', branches[ 0 ] );
-
-	const rootDirectory = getRandomTemporaryPath();
-	const performanceTestDirectory = rootDirectory + '/tests';
-	await runShellScript( 'mkdir -p ' + rootDirectory );
-	await runShellScript(
-		'cp -R ' + baseDirectory + ' ' + performanceTestDirectory
-	);
 
 	if ( !! options.testsBranch ) {
-		const branchName = formats.success( options.testsBranch );
-		log( `    >> Fetching the test-runner branch: ${ branchName }` );
+		const revName = formats.success( options.testsBranch );
+		log( `      >> - ${ revName } (holds tests runners)` );
+		refSpecs.push( `+${ options.testsBranch }:tests-branch` );
+	}
 
+	// @ts-ignore
+	const git = SimpleGit( basePath );
+	await git
+		.raw( 'init' )
+		.raw( 'remote', 'add', 'origin', config.gitRepositoryURL )
+		.raw(
+			'fetch',
+			'--no-auto-maintenance',
+			'--no-tags',
+			'--depth=1',
+			'origin',
+			...refSpecs
+		)
+		.raw( 'checkout', `branch-${ revs[ 0 ] }` );
+
+	const rootPath = getRandomTemporaryPath();
+	const testsPath = `${ rootPath }/tests`;
+	await runShellScript( `mkdir -p ${ rootPath }` );
+	await runShellScript( `cp -R ${ basePath } ${ testsPath }` );
+
+	if ( !! options.testsBranch ) {
 		// @ts-ignore
-		await SimpleGit( performanceTestDirectory )
-			.raw( 'fetch', '--depth=1', 'origin', options.testsBranch )
-			.raw( 'checkout', options.testsBranch );
+		await SimpleGit( testsPath ).raw( 'checkout', 'tests-branch' );
 	}
 
 	log( '    >> Installing dependencies and building packages' );
-	await runShellScript(
-		'npm ci && node ./bin/packages/build.js',
-		performanceTestDirectory
-	);
+	await runShellScript( 'npm ci && node ./bin/packages/build.js', testsPath );
 	log( '    >> Creating the environment folders' );
-	await runShellScript( 'mkdir -p ' + rootDirectory + '/envs' );
+	await runShellScript( `mkdir -p ${ rootPath }/envs` );
 
 	// 2- Preparing the environment directories per branch.
-	log( '\n>> Preparing an environment directory per branch' );
-	const branchDirectories = {};
-	for ( const branch of branches ) {
-		log( `    >> Branch: ${ branch }` );
-		const environmentDirectory =
-			rootDirectory + '/envs/' + kebabCase( branch );
-		// @ts-ignore
-		branchDirectories[ branch ] = environmentDirectory;
-		const buildPath = `${ environmentDirectory }/plugin`;
-		await runShellScript( 'mkdir ' + environmentDirectory );
-		await runShellScript( `cp -R ${ baseDirectory } ${ buildPath }` );
+	log( '\n>> Preparing an environment directory per revision' );
+	/**
+	 * Maps a revision to its build path.
+	 *
+	 * @type {Record<GitRevision, FilePath>}
+	 */
+	const revPaths = {};
+	for ( const rev of revs ) {
+		log( `    >> Revision: ${ rev }` );
+		const envPath = `${ rootPath }/envs/${ kebabCase( rev ) }`;
+		revPaths[ rev ] = envPath;
+		const buildPath = `${ envPath }/plugin`;
+		await runShellScript( `mkdir ${ envPath }` );
+		await runShellScript( `cp -R ${ basePath } ${ buildPath }` );
 
-		const fancyBranch = formats.success( branch );
+		const fancyRev = formats.success( rev );
+		log( `        >> Checking out revision ${ fancyRev }` );
 
-		if ( branch === options.testsBranch ) {
-			log(
-				`        >> Re-using the testing branch for ${ fancyBranch }`
-			);
-			await runShellScript(
-				`cp -R ${ performanceTestDirectory } ${ buildPath }`
-			);
+		if ( rev === options.testsBranch ) {
+			log( `        >> Reusing the tests revision for ${ fancyRev }` );
+			await runShellScript( `cp -R ${ testsPath } ${ buildPath }` );
 		} else {
-			log( `        >> Fetching the ${ fancyBranch } branch` );
 			// @ts-ignore
-			await SimpleGit( buildPath ).reset( 'hard' ).checkout( branch );
+			await SimpleGit( buildPath )
+				.reset( 'hard' )
+				.checkout( `branch-${ rev }` );
 
-			log( `        >> Building the ${ fancyBranch } branch` );
+			log( `        >> Building revision ${ fancyRev }` );
 			await runShellScript(
 				'npm ci && node ./bin/packages/build.js',
 				buildPath
 			);
 		}
 
-		await runShellScript(
-			'cp ' +
-				path.resolve(
-					performanceTestDirectory,
-					'bin/plugin/utils/.wp-env.performance.json'
-				) +
-				' ' +
-				environmentDirectory +
-				'/.wp-env.json'
+		const perfJson = path.resolve(
+			testsPath,
+			'bin/plugin/utils/.wp-env.performance.json'
 		);
+		await runShellScript( `cp ${ perfJson } ${ envPath }/.wp-env.json` );
 
 		if ( options.wpVersion ) {
 			// In order to match the topology of ZIP files at wp.org, remap .0
@@ -313,7 +314,7 @@ async function runPerformanceTests( branches, options ) {
 			//         "core": "https://wordpress.org/wordpress-$VERSION.zip",
 			//         ...
 			//     }
-			const confPath = `${ environmentDirectory }/.wp-env.json`;
+			const confPath = `${ envPath }/.wp-env.json`;
 			const conf = { ...readJSONFile( confPath ), core: zipUrl };
 			await fs.writeFileSync(
 				confPath,
@@ -324,14 +325,10 @@ async function runPerformanceTests( branches, options ) {
 	}
 
 	// 3- Printing the used folders.
-	log(
-		'\n>> Perf Tests Directory : ' +
-			formats.success( performanceTestDirectory )
-	);
-	for ( const branch of branches ) {
-		// @ts-ignore
-		const envPath = formats.success( branchDirectories[ branch ] );
-		log( `>> Environment Directory (${ branch }) : ${ envPath }` );
+	log( '\n>> Perf Tests Directory : ' + formats.success( testsPath ) );
+	for ( const rev of revs ) {
+		const envPath = formats.success( revPaths[ rev ] );
+		log( `>> Environment Directory (${ rev }) : ${ envPath }` );
 	}
 
 	// 4- Running the tests.
@@ -339,105 +336,100 @@ async function runPerformanceTests( branches, options ) {
 
 	const testSuites = [ 'post-editor', 'site-editor' ];
 
-	/** @type {Record<string,Record<string, WPPerformanceResults>>} */
+	/** @type {Record<string,Record<GitRevision, WPPerformanceResults>>} */
 	const results = {};
 	for ( const testSuite of testSuites ) {
 		results[ testSuite ] = {};
-		/** @type {Array<Record<string, WPPerformanceResults>>} */
+		/** @type {Array<Record<GitRevision, WPPerformanceResults>>} */
 		const rawResults = [];
 		// Alternate three times between branches.
 		for ( let i = 0; i < TEST_ROUNDS; i++ ) {
 			rawResults[ i ] = {};
-			for ( const branch of branches ) {
-				// @ts-ignore
-				const environmentDirectory = branchDirectories[ branch ];
-				log( `    >> Branch: ${ branch }, Suite: ${ testSuite }` );
+			for ( const rev of revs ) {
+				const envPath = revPaths[ rev ];
+				log( `    >> Branch: ${ rev }, Suite: ${ testSuite }` );
 				log( '        >> Starting the environment.' );
 				await runShellScript(
 					'../../tests/node_modules/.bin/wp-env start',
-					environmentDirectory
+					envPath
 				);
 				log( '        >> Running the test.' );
-				rawResults[ i ][ branch ] = await runTestSuite(
+				rawResults[ i ][ rev ] = await runTestSuite(
 					testSuite,
-					performanceTestDirectory
+					testsPath
 				);
 				log( '        >> Stopping the environment' );
 				await runShellScript(
 					'../../tests/node_modules/.bin/wp-env stop',
-					environmentDirectory
+					envPath
 				);
 			}
 		}
 
 		// Computing medians.
-		for ( const branch of branches ) {
+		for ( const rev of revs ) {
 			const medians = mapValues(
 				{
 					serverResponse: rawResults.map(
-						( r ) => r[ branch ].serverResponse
+						( r ) => r[ rev ].serverResponse
 					),
-					firstPaint: rawResults.map(
-						( r ) => r[ branch ].firstPaint
-					),
+					firstPaint: rawResults.map( ( r ) => r[ rev ].firstPaint ),
 					domContentLoaded: rawResults.map(
-						( r ) => r[ branch ].domContentLoaded
+						( r ) => r[ rev ].domContentLoaded
 					),
-					loaded: rawResults.map( ( r ) => r[ branch ].loaded ),
+					loaded: rawResults.map( ( r ) => r[ rev ].loaded ),
 					firstContentfulPaint: rawResults.map(
-						( r ) => r[ branch ].firstContentfulPaint
+						( r ) => r[ rev ].firstContentfulPaint
 					),
-					firstBlock: rawResults.map(
-						( r ) => r[ branch ].firstBlock
-					),
-					type: rawResults.map( ( r ) => r[ branch ].type ),
-					minType: rawResults.map( ( r ) => r[ branch ].minType ),
-					maxType: rawResults.map( ( r ) => r[ branch ].maxType ),
-					focus: rawResults.map( ( r ) => r[ branch ].focus ),
-					minFocus: rawResults.map( ( r ) => r[ branch ].minFocus ),
-					maxFocus: rawResults.map( ( r ) => r[ branch ].maxFocus ),
+					firstBlock: rawResults.map( ( r ) => r[ rev ].firstBlock ),
+					type: rawResults.map( ( r ) => r[ rev ].type ),
+					minType: rawResults.map( ( r ) => r[ rev ].minType ),
+					maxType: rawResults.map( ( r ) => r[ rev ].maxType ),
+					focus: rawResults.map( ( r ) => r[ rev ].focus ),
+					minFocus: rawResults.map( ( r ) => r[ rev ].minFocus ),
+					maxFocus: rawResults.map( ( r ) => r[ rev ].maxFocus ),
 					inserterOpen: rawResults.map(
-						( r ) => r[ branch ].inserterOpen
+						( r ) => r[ rev ].inserterOpen
 					),
 					minInserterOpen: rawResults.map(
-						( r ) => r[ branch ].minInserterOpen
+						( r ) => r[ rev ].minInserterOpen
 					),
 					maxInserterOpen: rawResults.map(
-						( r ) => r[ branch ].maxInserterOpen
+						( r ) => r[ rev ].maxInserterOpen
 					),
 					inserterSearch: rawResults.map(
-						( r ) => r[ branch ].inserterSearch
+						( r ) => r[ rev ].inserterSearch
 					),
 					minInserterSearch: rawResults.map(
-						( r ) => r[ branch ].minInserterSearch
+						( r ) => r[ rev ].minInserterSearch
 					),
 					maxInserterSearch: rawResults.map(
-						( r ) => r[ branch ].maxInserterSearch
+						( r ) => r[ rev ].maxInserterSearch
 					),
 					inserterHover: rawResults.map(
-						( r ) => r[ branch ].inserterHover
+						( r ) => r[ rev ].inserterHover
 					),
 					minInserterHover: rawResults.map(
-						( r ) => r[ branch ].minInserterHover
+						( r ) => r[ rev ].minInserterHover
 					),
 					maxInserterHover: rawResults.map(
-						( r ) => r[ branch ].maxInserterHover
+						( r ) => r[ rev ].maxInserterHover
 					),
 					listViewOpen: rawResults.map(
-						( r ) => r[ branch ].listViewOpen
+						( r ) => r[ rev ].listViewOpen
 					),
 					minListViewOpen: rawResults.map(
-						( r ) => r[ branch ].minListViewOpen
+						( r ) => r[ rev ].minListViewOpen
 					),
 					maxListViewOpen: rawResults.map(
-						( r ) => r[ branch ].maxListViewOpen
+						( r ) => r[ rev ].maxListViewOpen
 					),
 				},
 				median
 			);
 
 			// Format results as times.
-			results[ testSuite ][ branch ] = mapValues( medians, formatTime );
+			results[ testSuite ][ rev ] = mapValues( medians, formatTime );
 		}
 	}
 

@@ -99,8 +99,8 @@ program
 		'Run each test suite this many times for each branch; results are summarized, default = 1'
 	)
 	.option(
-		'--tests-branch <branch>',
-		"Use this branch's performance test files"
+		'--tests-branch <rev>',
+		"Use this revision's performance test files"
 	)
 	.option(
 		'--wp-version <version>',
