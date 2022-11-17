@@ -12,7 +12,7 @@ import {
 	deleteAllTemplates,
 	activateTheme,
 	visitSiteEditor,
-	toggleCanvasMode,
+	enterEditMode,
 	clickOnMoreMenuItem,
 } from '@wordpress/e2e-test-utils';
 
@@ -42,7 +42,7 @@ describe( 'Site Editor Templates Export', () => {
 
 	beforeEach( async () => {
 		await visitSiteEditor();
-		await toggleCanvasMode();
+		await enterEditMode();
 	} );
 
 	it( 'clicking export should download emptytheme.zip file', async () => {

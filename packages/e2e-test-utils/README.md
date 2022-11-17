@@ -316,6 +316,10 @@ _Returns_
 
 -   `Promise`: Promise resolving once the sidebar is opened.
 
+### enterEditMode
+
+Enters edit mode.
+
 ### findSidebarPanelToggleButtonWithTitle
 
 Finds a sidebar panel with the provided title.
@@ -790,10 +794,6 @@ running the test is not already the admin user).
 
 Switches the current user to whichever user we should be
 running the tests as (if we're not already that user).
-
-### toggleCanvasMode
-
-Switch between edit and view mode.
 
 ### toggleGlobalBlockInserter
 

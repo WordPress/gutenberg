@@ -18,7 +18,7 @@ test.describe( 'Block list view', () => {
 			postType: 'wp_template',
 		} );
 
-		await siteEditor.toggleCanvasMode();
+		await siteEditor.enterEditMode();
 
 		// Should display the Preview button.
 		await expect(
@@ -34,7 +34,7 @@ test.describe( 'Block list view', () => {
 
 		await page.reload();
 
-		await siteEditor.toggleCanvasMode();
+		await siteEditor.enterEditMode();
 
 		// Should display the Preview button.
 		await expect(

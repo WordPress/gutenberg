@@ -1,8 +1,8 @@
 /**
- * Toggles the site editor mode.
+ * Enters the site editor edit mode.
  *
  * @this {import('.').SiteEditor}
  */
-export async function toggleCanvasMode() {
-	await this.page.click( '.edit-site-header__toggle' );
+export async function enterEditMode() {
+	await this.page.click( '.edit-site-layout__edit-button' );
 }

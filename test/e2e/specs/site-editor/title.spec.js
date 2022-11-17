@@ -22,7 +22,7 @@ test.describe( 'Site editor title', () => {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
 		} );
-		await siteEditor.toggleCanvasMode();
+		await siteEditor.enterEditMode();
 		const title = await page.locator(
 			'role=region[name="Editor top bar"i] >> role=heading[level=1]'
 		);
@@ -40,7 +40,7 @@ test.describe( 'Site editor title', () => {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
 		} );
-		await siteEditor.toggleCanvasMode();
+		await siteEditor.enterEditMode();
 		const title = await page.locator(
 			'role=region[name="Editor top bar"i] >> role=heading[level=1]'
 		);
@@ -57,7 +57,7 @@ test.describe( 'Site editor title', () => {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
 		} );
-		await siteEditor.toggleCanvasMode();
+		await siteEditor.enterEditMode();
 		// Select the header template part via list view.
 		await page.click( 'role=button[name="List View"i]' );
 		const listView = await page.locator(

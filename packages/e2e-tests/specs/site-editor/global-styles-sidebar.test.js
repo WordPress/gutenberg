@@ -5,7 +5,7 @@ import {
 	deleteAllTemplates,
 	activateTheme,
 	visitSiteEditor,
-	toggleCanvasMode,
+	enterEditMode,
 	toggleGlobalStyles,
 	openGlobalStylesPanel,
 } from '@wordpress/e2e-test-utils';
@@ -27,7 +27,7 @@ describe( 'Global styles sidebar', () => {
 	} );
 	beforeEach( async () => {
 		await visitSiteEditor();
-		await toggleCanvasMode();
+		await enterEditMode();
 	} );
 	describe( 'blocks list', () => {
 		it( 'should filter results properly', async () => {

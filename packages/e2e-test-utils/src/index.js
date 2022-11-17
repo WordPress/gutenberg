@@ -107,7 +107,7 @@ export {
 	getCurrentSiteEditorContent,
 	visitSiteEditor,
 	toggleGlobalStyles,
-	toggleCanvasMode,
+	enterEditMode,
 	openGlobalStylesPanel,
 	openPreviousGlobalStylesPanel,
 } from './site-editor';

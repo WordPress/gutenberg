@@ -163,14 +163,14 @@ export async function openPreviousGlobalStylesPanel() {
 }
 
 /**
- * Switch between edit and view mode.
+ * Enters edit mode.
  */
-export async function toggleCanvasMode() {
-	const editSiteToggle = await page.$( '.edit-site-header__toggle' );
+export async function enterEditMode() {
+	const editSiteToggle = await page.$( '.edit-site-layout__edit-button' );
 	// This check is necessary for the performance tests in old branches
 	// where the site editor toggle was not implemented yet.
 	if ( ! editSiteToggle ) {
 		return;
 	}
-	await page.click( '.edit-site-header__toggle' );
+	await page.click( '.edit-site-layout__edit-button' );
 }

@@ -8,7 +8,7 @@ import {
 	selectBlockByClientId,
 	insertBlock,
 	visitSiteEditor,
-	toggleCanvasMode,
+	enterEditMode,
 } from '@wordpress/e2e-test-utils';
 
 async function toggleSidebar() {
@@ -50,7 +50,7 @@ describe( 'Settings sidebar', () => {
 	} );
 	beforeEach( async () => {
 		await visitSiteEditor();
-		await toggleCanvasMode();
+		await enterEditMode();
 	} );
 
 	describe( 'Template tab', () => {
@@ -70,7 +70,7 @@ describe( 'Settings sidebar', () => {
 				postId: 'emptytheme//singular',
 				postType: 'wp_template',
 			} );
-			await toggleCanvasMode();
+			await enterEditMode();
 			const templateCardAfterNavigation = await getTemplateCard();
 
 			expect( templateCardBeforeNavigation ).toMatchObject( {

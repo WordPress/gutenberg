@@ -6,7 +6,7 @@ import type { Page } from '@playwright/test';
 /**
  * Internal dependencies
  */
-import { toggleCanvasMode } from './toggle-canvas-mode';
+import { enterEditMode } from './toggle-canvas-mode';
 
 type AdminConstructorProps = {
 	page: Page;
@@ -19,5 +19,5 @@ export class SiteEditor {
 		this.page = page;
 	}
 
-	toggleCanvasMode = toggleCanvasMode.bind( this );
+	enterEditMode = enterEditMode.bind( this );
 }

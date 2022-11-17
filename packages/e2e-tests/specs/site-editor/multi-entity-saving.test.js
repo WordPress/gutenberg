@@ -13,7 +13,7 @@ import {
 	clickButton,
 	createReusableBlock,
 	visitSiteEditor,
-	toggleCanvasMode,
+	enterEditMode,
 	deleteAllTemplates,
 } from '@wordpress/e2e-test-utils';
 
@@ -266,7 +266,7 @@ describe( 'Multi-entity save flow', () => {
 				postType: 'wp_template',
 			} );
 
-			await toggleCanvasMode();
+			await enterEditMode();
 
 			// Select the header template part via list view.
 			await page.click( '.edit-site-header-edit-mode__list-view-toggle' );
@@ -305,7 +305,7 @@ describe( 'Multi-entity save flow', () => {
 				postType: 'wp_template',
 			} );
 
-			await toggleCanvasMode();
+			await enterEditMode();
 
 			// Insert a paragraph at the bottom.
 			await insertBlock( 'Paragraph' );
