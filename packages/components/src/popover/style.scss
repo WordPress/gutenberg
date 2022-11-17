@@ -29,6 +29,15 @@ $arrow-triangle-base-size: 14px;
 		box-shadow: none;
 	}
 
+	// A style that gives the popover no visible ui.
+	.is-unstyled & {
+		background: none;
+		border: none;
+		border-radius: 0;
+		outline: none;
+		box-shadow: none;
+	}
+
 	.components-popover.is-expanded & {
 		position: static;
 		height: calc(100% - #{ $panel-header-height });

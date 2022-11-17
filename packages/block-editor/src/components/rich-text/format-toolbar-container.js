@@ -42,7 +42,7 @@ function InlineSelectionToolbar( {
 function InlineToolbar( { popoverAnchor } ) {
 	return (
 		<Popover
-			position="top center"
+			placement="top"
 			focusOnMount={ false }
 			anchor={ popoverAnchor }
 			className="block-editor-rich-text__inline-format-toolbar"

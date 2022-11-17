@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mergeWith, pickBy, isEmpty, mapValues } from 'lodash';
+import { mergeWith, isEmpty, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -14,8 +14,6 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { GlobalStylesContext } from './context';
-
-const identity = ( x ) => x;
 
 function mergeTreesCustomizer( _, srcValue ) {
 	// We only pass as arrays the presets,
@@ -38,9 +36,10 @@ const cleanEmptyObject = ( object ) => {
 	) {
 		return object;
 	}
-	const cleanedNestedObjects = pickBy(
-		mapValues( object, cleanEmptyObject ),
-		identity
+	const cleanedNestedObjects = Object.fromEntries(
+		Object.entries( mapValues( object, cleanEmptyObject ) ).filter(
+			( [ , value ] ) => Boolean( value )
+		)
 	);
 	return isEmpty( cleanedNestedObjects ) ? undefined : cleanedNestedObjects;
 };

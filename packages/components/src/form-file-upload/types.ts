@@ -55,9 +55,10 @@ export type FormFileUploadProps = {
 	/**
 	 * Optional callback function used to render the UI.
 	 *
-	 * If passed, the component does not render any UI and calls this function to render it.
-	 * This function receives an object with the property `openFileDialog`.
-	 * The property is a function that when called opens the browser window to upload files.
+	 * If passed, the component does not render the default UI (a button) and
+	 * calls this function to render it. The function receives an object with
+	 * property `openFileDialog`, a function that, when called, opens the browser
+	 * native file upload modal window.
 	 */
-	render?: ( arg: { openFileDialog: () => void } ) => void;
+	render?: ( arg: { openFileDialog: () => void } ) => ReactNode;
 };

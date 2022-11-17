@@ -127,7 +127,6 @@ Whether the button is disabled. If `true`, this will force a `button` element to
 
 -   Type: `Boolean`
 -   Required: No
--   Default: `false`
 
 #### href
 
@@ -135,7 +134,6 @@ If provided, renders `a` instead of `button`.
 
 -   Type: `String`
 -   Required: No
--   Default: `undefined`
 
 #### variant
 
@@ -143,7 +141,6 @@ Specifies the button's style. The accepted values are `'primary'` (the primary b
 
 -   Type: `String`
 -   Required: No
--   Default: `undefined`
 
 #### isDestructive
 
@@ -151,7 +148,6 @@ Renders a red text-based button style to indicate destructive behavior.
 
 -   Type: `Boolean`
 -   Required: No
--   Default: `false`
 
 #### isSmall
 
@@ -159,7 +155,6 @@ Decreases the size of the button.
 
 -   Type: `Boolean`
 -   Required: No
--   Default: `false`
 
 #### isPressed
 
@@ -167,7 +162,6 @@ Renders a pressed button style.
 
 -   Type: `Boolean`
 -   Required: No
--   Default: `false`
 
 #### isBusy
 
@@ -175,7 +169,6 @@ Indicates activity while a action is being performed.
 
 -   Type: `Boolean`
 -   Required: No
--   Default: `false`
 
 #### focus
 
@@ -183,7 +176,6 @@ Whether the button is focused.
 
 -   Type: `Boolean`
 -   Required: No
--   Default: `false`
 
 #### target
 
@@ -205,15 +197,13 @@ If provided, renders an [Icon](/packages/components/src/icon/README.md) componen
 
 -   Type: `String|Function|WPComponent|null`
 -   Required: No
--   Default: `null`
 
 #### iconSize
 
-If provided with `icon`, sets the icon size.
+If provided with `icon`, sets the icon size. Please refer to the [Icon](/packages/components/src/icon/README.md) component for more details regarding the default value of its `size` prop.
 
 -   Type: `Number`
 -   Required: No
--   Default: `20 when a Dashicon is rendered, 24 for all other icons.`
 
 #### iconPosition
 
@@ -236,15 +226,13 @@ If provided, renders a [Tooltip](/packages/components/src/tooltip/README.md) com
 
 -   Type: `Boolean`
 -   Required: No
--   Default: `false`
 
 #### tooltipPosition
 
-If provided with`showTooltip`, sets the position of the tooltip.
+If provided with`showTooltip`, sets the position of the tooltip. Please refer to the [Tooltip](/packages/components/src/tooltip/README.md) component for more details regarding the defaults.
 
 -   Type: `String`
 -   Require: No
--   Default:`top center`
 
 #### shortcut
 
@@ -252,7 +240,6 @@ If provided with `showTooltip`, appends the Shortcut label to the tooltip conten
 
 -   Type: `String|Object`
 -   Required: No
--   Default: `undefined`
 
 #### label
 

@@ -192,7 +192,7 @@ A `suggestion` should have the following shape:
 	)}
 />
 ```
-### renderControlBottom 
+### renderControlBottom
 
 -   Type: `Function`
 -   Required: No
@@ -338,7 +338,7 @@ See the [createSuggestion](#createSuggestion) section of this file to learn more
 <LinkControlSearchInput
     renderSuggestions={( { suggestions } ) => {
         return (
-            <Popover focusOnMount={ false } position="bottom">
+            <Popover focusOnMount={ false } placement="bottom">
                 <ul>
                     { suggestions.map( () => ( <li key={ `${ suggestion.id }-${ suggestion.type }` }>{ suggestion.title }</li> ) ) }
                 </ul>
@@ -352,7 +352,7 @@ See the [createSuggestion](#createSuggestion) section of this file to learn more
 <LinkControlSearchInput
     renderSuggestions={( suggestionsProps ) => {
         return (
-            <Popover focusOnMount={ false } position="bottom">
+            <Popover focusOnMount={ false } placement="bottom">
                 <LinkControlSearchResults { ...suggestionsProps } />
             </Popover>
         );

@@ -80,7 +80,7 @@ const PopoverWithAnchor = ( args: PopoverProps ) => {
 	);
 };
 
-export const Default: ComponentStory< typeof Popover > = ( args ) => {
+const Template: ComponentStory< typeof Popover > = ( args ) => {
 	const [ isVisible, setIsVisible ] = useState( false );
 	const toggleVisible = () => {
 		setIsVisible( ( state ) => ! state );
@@ -114,6 +114,8 @@ export const Default: ComponentStory< typeof Popover > = ( args ) => {
 		</div>
 	);
 };
+
+export const Default: ComponentStory< typeof Popover > = Template.bind( {} );
 Default.args = {
 	children: (
 		<div style={ { width: '280px', whiteSpace: 'normal' } }>
@@ -123,6 +125,32 @@ Default.args = {
 			aliquip ex ea commodo consequat.
 		</div>
 	),
+};
+
+export const Toolbar: ComponentStory< typeof Popover > = Template.bind( {} );
+Toolbar.args = {
+	children: (
+		<div style={ { width: '280px', whiteSpace: 'normal' } }>
+			Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+			eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+			ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+			aliquip ex ea commodo consequat.
+		</div>
+	),
+	variant: 'toolbar',
+};
+
+export const Unstyled: ComponentStory< typeof Popover > = Template.bind( {} );
+Unstyled.args = {
+	children: (
+		<div style={ { width: '280px', whiteSpace: 'normal' } }>
+			Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+			eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+			ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+			aliquip ex ea commodo consequat.
+		</div>
+	),
+	variant: 'unstyled',
 };
 
 export const AllPlacements: ComponentStory< typeof Popover > = ( {

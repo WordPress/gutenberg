@@ -94,20 +94,25 @@ function ListViewBranch( props ) {
 		shouldShowInnerBlocks = true,
 	} = props;
 
-	const isContentLocked = useSelect(
+	const canParentExpand = useSelect(
 		( select ) => {
-			return !! (
-				parentId &&
+			if ( ! parentId ) {
+				return true;
+			}
+
+			const isContentLocked =
 				select( blockEditorStore ).getTemplateLock( parentId ) ===
-					'contentOnly'
-			);
+				'contentOnly';
+			const canEdit = select( blockEditorStore ).canEditBlock( parentId );
+
+			return isContentLocked ? false : canEdit;
 		},
 		[ parentId ]
 	);
 
 	const { expandedState, draggedClientIds } = useListViewContext();
 
-	if ( isContentLocked ) {
+	if ( ! canParentExpand ) {
 		return null;
 	}
 

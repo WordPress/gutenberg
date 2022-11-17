@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 3.20.0 (2022-11-16)
+
+## 3.19.0 (2022-11-02)
+
+## 3.18.0 (2022-10-19)
+
 ### Feature
 
 -   Add `skipBlockSupportAttributes` props to prevent duplication of styles in the block wrapper and the `ServerSideRender` components. [#44491](https://github.com/WordPress/gutenberg/pull/44491)

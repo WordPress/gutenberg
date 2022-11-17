@@ -229,6 +229,9 @@ function PaletteEditListView( {
 				onChange( newElements.length ? newElements : undefined );
 			}
 		};
+		// Disable reason: adding the missing dependency here would cause breaking changes that will require
+		// a heavier refactor to avoid. See https://github.com/WordPress/gutenberg/pull/43911
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
 	const debounceOnChange = useDebounce( onChange, 100 );

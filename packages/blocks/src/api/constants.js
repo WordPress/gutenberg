@@ -175,6 +175,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		},
 		useEngine: true,
 	},
+	minHeight: {
+		value: [ 'dimensions', 'minHeight' ],
+		support: [ 'dimensions', 'minHeight' ],
+		useEngine: true,
+	},
 	padding: {
 		value: [ 'spacing', 'padding' ],
 		support: [ 'spacing', 'padding' ],

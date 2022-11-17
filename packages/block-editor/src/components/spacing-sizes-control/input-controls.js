@@ -11,6 +11,8 @@ export default function BoxInputControls( {
 	spacingSizes,
 	type,
 	minimumCustomValue,
+	onMouseOver,
+	onMouseOut,
 } ) {
 	// Filter sides if custom configuration provided, maintaining default order.
 	const filteredSides = sides?.length
@@ -38,6 +40,8 @@ export default function BoxInputControls( {
 						spacingSizes={ spacingSizes }
 						type={ type }
 						minimumCustomValue={ minimumCustomValue }
+						onMouseOver={ onMouseOver }
+						onMouseOut={ onMouseOut }
 					/>
 				);
 			} ) }

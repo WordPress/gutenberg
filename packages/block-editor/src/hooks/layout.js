@@ -9,11 +9,7 @@ import { kebabCase } from 'lodash';
  */
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
-import {
-	getBlockDefaultClassName,
-	getBlockSupport,
-	hasBlockSupport,
-} from '@wordpress/blocks';
+import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import {
 	Button,
@@ -366,9 +362,8 @@ export const withLayoutStyles = createHigherOrderComponent(
 		const layoutClasses = hasLayoutBlockSupport
 			? useLayoutClasses( block )
 			: null;
-		const selector = `.${ getBlockDefaultClassName(
-			name
-		) }.wp-container-${ id }`;
+		// Higher specificity to override defaults from theme.json.
+		const selector = `.wp-container-${ id }.wp-container-${ id }`;
 		const blockGapSupport = useSetting( 'spacing.blockGap' );
 		const hasBlockGapSupport = blockGapSupport !== null;
 
@@ -390,8 +385,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 		}
 
 		// Attach a `wp-container-` id-based class name as well as a layout class name such as `is-layout-flex`.
-		const className = classnames(
-			props?.className,
+		const layoutClassNames = classnames(
 			{
 				[ `wp-container-${ id }` ]: shouldRenderLayoutStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
 			},
@@ -413,7 +407,10 @@ export const withLayoutStyles = createHigherOrderComponent(
 						/>,
 						element
 					) }
-				<BlockListBlock { ...props } className={ className } />
+				<BlockListBlock
+					{ ...props }
+					__unstableLayoutClassNames={ layoutClassNames }
+				/>
 			</>
 		);
 	}

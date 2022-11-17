@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { castArray } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -118,14 +113,11 @@ function useInsertionPoint( {
 					meta
 				);
 			}
+			const blockLength = Array.isArray( blocks ) ? blocks.length : 1;
 			const message = sprintf(
 				// translators: %d: the name of the block that has been added
-				_n(
-					'%d block added.',
-					'%d blocks added.',
-					castArray( blocks ).length
-				),
-				castArray( blocks ).length
+				_n( '%d block added.', '%d blocks added.', blockLength ),
+				blockLength
 			);
 			speak( message );
 

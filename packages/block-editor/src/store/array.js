@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { castArray } from 'lodash';
-
-/**
  * Insert one or multiple elements into a given position of an array.
  *
  * @param {Array}  array    Source array.
@@ -15,7 +10,7 @@ import { castArray } from 'lodash';
 export function insertAt( array, elements, index ) {
 	return [
 		...array.slice( 0, index ),
-		...castArray( elements ),
+		...( Array.isArray( elements ) ? elements : [ elements ] ),
 		...array.slice( index ),
 	];
 }

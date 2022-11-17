@@ -24,7 +24,7 @@
 	height: 100%;
 	width: 100%;
 	display: flex;
-	background-color: var(--wp-admin-theme-color);
+	background-color: $components-color-accent;
 	align-items: center;
 	justify-content: center;
 	z-index: z-index(".components-drop-zone__content");

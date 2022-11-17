@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get, some, unescape as unescapeString, without } from 'lodash';
+import { find, get, unescape as unescapeString } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -258,7 +258,7 @@ export function HierarchicalTermSelector( { slug } ) {
 	const onChange = ( termId ) => {
 		const hasTerm = terms.includes( termId );
 		const newTerms = hasTerm
-			? without( terms, termId )
+			? terms.filter( ( id ) => id !== termId )
 			: [ ...terms, termId ];
 		onUpdateTerms( newTerms );
 	};
@@ -290,7 +290,7 @@ export function HierarchicalTermSelector( { slug } ) {
 		const existingTerm = findTerm( availableTerms, formParent, formName );
 		if ( existingTerm ) {
 			// If the term we are adding exists but is not selected select it.
-			if ( ! some( terms, ( term ) => term === existingTerm.id ) ) {
+			if ( ! terms.some( ( term ) => term === existingTerm.id ) ) {
 				onUpdateTerms( [ ...terms, existingTerm.id ] );
 			}
 
@@ -358,6 +358,7 @@ export function HierarchicalTermSelector( { slug } ) {
 					className="editor-post-taxonomies__hierarchical-terms-choice"
 				>
 					<CheckboxControl
+						__nextHasNoMarginBottom
 						checked={ terms.indexOf( term.id ) !== -1 }
 						onChange={ () => {
 							const termId = parseInt( term.id, 10 );

@@ -139,7 +139,7 @@ export function useToolsPanel(
 			} );
 			return items;
 		} );
-	}, [ generateMenuItems, panelItems, setMenuItems ] );
+	}, [ panelItems, setMenuItems ] );
 
 	// Force a menu item to be checked.
 	// This is intended for use with default panel items. They are displayed
@@ -255,13 +255,7 @@ export function useToolsPanel(
 			shouldReset: true,
 		} );
 		setMenuItems( resetMenuItems );
-	}, [
-		generateMenuItems,
-		isResetting.current,
-		panelItems,
-		resetAll,
-		setMenuItems,
-	] );
+	}, [ panelItems, resetAll, setMenuItems ] );
 
 	// Assist ItemGroup styling when there are potentially hidden placeholder
 	// items by identifying first & last items that are toggled on for display.
@@ -300,7 +294,6 @@ export function useToolsPanel(
 			deregisterPanelItem,
 			firstDisplayedItem,
 			flagItemCustomization,
-			isResetting.current,
 			lastDisplayedItem,
 			menuItems,
 			panelId,

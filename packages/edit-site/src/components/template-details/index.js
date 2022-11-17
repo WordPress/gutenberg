@@ -11,6 +11,7 @@ import {
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -65,7 +66,7 @@ export default function TemplateDetails( { template, onClose } ) {
 						className="edit-site-template-details__title"
 						as="p"
 					>
-						{ title }
+						{ decodeEntities( title ) }
 					</Text>
 				) }
 
@@ -75,7 +76,7 @@ export default function TemplateDetails( { template, onClose } ) {
 						className="edit-site-template-details__description"
 						as="p"
 					>
-						{ description }
+						{ decodeEntities( description ) }
 					</Text>
 				) }
 			</VStack>

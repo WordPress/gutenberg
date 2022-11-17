@@ -150,7 +150,10 @@ const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md
  */
 export function useInnerBlocksProps( props = {}, options = {} ) {
-	const { clientId } = useBlockEditContext();
+	const { __unstableDisableLayoutClassNames, __unstableDisableDropZone } =
+		options;
+	const { clientId, __unstableLayoutClassNames: layoutClassNames = '' } =
+		useBlockEditContext();
 	const isSmallScreen = useViewportMatch( 'medium', '<' );
 	const { __experimentalCaptureToolbars, hasOverlay } = useSelect(
 		( select ) => {
@@ -185,11 +188,13 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		[ clientId, isSmallScreen ]
 	);
 
+	const blockDropZoneRef = useBlockDropZone( {
+		rootClientId: clientId,
+	} );
+
 	const ref = useMergeRefs( [
 		props.ref,
-		useBlockDropZone( {
-			rootClientId: clientId,
-		} ),
+		__unstableDisableDropZone ? null : blockDropZoneRef,
 	] );
 
 	const innerBlocksProps = {
@@ -200,12 +205,14 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		innerBlocksProps.value && innerBlocksProps.onChange
 			? ControlledInnerBlocks
 			: UncontrolledInnerBlocks;
+
 	return {
 		...props,
 		ref,
 		className: classnames(
 			props.className,
 			'block-editor-block-list__layout',
+			__unstableDisableLayoutClassNames ? '' : layoutClassNames,
 			{
 				'has-overlay': hasOverlay,
 			}

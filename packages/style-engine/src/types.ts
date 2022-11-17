@@ -38,6 +38,9 @@ export interface Style {
 		bottom?: BorderIndividualStyles< 'bottom' >;
 		left?: BorderIndividualStyles< 'left' >;
 	};
+	dimensions?: {
+		minHeight?: CSSProperties[ 'minHeight' ];
+	};
 	spacing?: {
 		margin?: CSSProperties[ 'margin' ] | Box< 'margin' >;
 		padding?: CSSProperties[ 'padding' ] | Box< 'padding' >;

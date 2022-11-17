@@ -33,7 +33,7 @@ describe( '<SocialLinkEdit/>', () => {
 
 		// Act
 		fireEvent.press(
-			await waitFor( () => subject.getByA11yLabel( 'Add block' ) )
+			await waitFor( () => subject.getByLabelText( 'Add block' ) )
 		);
 		fireEvent.changeText(
 			await waitFor( () =>
@@ -43,13 +43,13 @@ describe( '<SocialLinkEdit/>', () => {
 		);
 		fireEvent.press(
 			await waitFor( () =>
-				subject.getByA11yLabel( 'Social Icons block' )
+				subject.getByLabelText( 'Social Icons block' )
 			)
 		);
 		fireEvent(
 			await waitFor( () =>
 				within(
-					subject.getByA11yLabel( /Social Icons Block. Row 1/ )
+					subject.getByLabelText( /Social Icons Block. Row 1/ )
 				).getByTestId( 'block-list-wrapper' )
 			),
 			'layout',
@@ -59,22 +59,22 @@ describe( '<SocialLinkEdit/>', () => {
 		// Assert
 		expect(
 			await waitFor( () =>
-				subject.getByA11yLabel( /WordPress social icon/ )
+				subject.getByLabelText( /WordPress social icon/ )
 			)
 		).toBeDefined();
 		expect(
 			await waitFor( () =>
-				subject.getByA11yLabel( /Facebook social icon/ )
+				subject.getByLabelText( /Facebook social icon/ )
 			)
 		).toBeDefined();
 		expect(
 			await waitFor( () =>
-				subject.getByA11yLabel( /Twitter social icon/ )
+				subject.getByLabelText( /Twitter social icon/ )
 			)
 		).toBeDefined();
 		expect(
 			await waitFor( () =>
-				subject.getByA11yLabel( /Instagram social icon/ )
+				subject.getByLabelText( /Instagram social icon/ )
 			)
 		).toBeDefined();
 	} );
@@ -90,7 +90,7 @@ describe( '<SocialLinkEdit/>', () => {
 
 		// Act
 		fireEvent.press(
-			await waitFor( () => subject.getByA11yLabel( 'Add block' ) )
+			await waitFor( () => subject.getByLabelText( 'Add block' ) )
 		);
 		fireEvent.changeText(
 			await waitFor( () =>
@@ -100,13 +100,13 @@ describe( '<SocialLinkEdit/>', () => {
 		);
 		fireEvent.press(
 			await waitFor( () =>
-				subject.getByA11yLabel( 'Social Icons block' )
+				subject.getByLabelText( 'Social Icons block' )
 			)
 		);
 		fireEvent(
 			await waitFor( () =>
 				within(
-					subject.getByA11yLabel( /Social Icons Block. Row 1/ )
+					subject.getByLabelText( /Social Icons Block. Row 1/ )
 				).getByTestId( 'block-list-wrapper' )
 			),
 			'layout',

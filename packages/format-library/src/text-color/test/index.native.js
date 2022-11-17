@@ -32,48 +32,48 @@ afterAll( () => {
 
 describe( 'Text color', () => {
 	it( 'shows the text color formatting button in the toolbar', async () => {
-		const { getByA11yLabel } = await initializeEditor();
+		const { getByLabelText } = await initializeEditor();
 
 		// Wait for the editor placeholder
 		const paragraphPlaceholder = await waitFor( () =>
-			getByA11yLabel( 'Add paragraph block' )
+			getByLabelText( 'Add paragraph block' )
 		);
 		expect( paragraphPlaceholder ).toBeDefined();
 		fireEvent.press( paragraphPlaceholder );
 
 		// Wait for the block to be created
 		const paragraphBlock = await waitFor( () =>
-			getByA11yLabel( /Paragraph Block\. Row 1/ )
+			getByLabelText( /Paragraph Block\. Row 1/ )
 		);
 		expect( paragraphBlock ).toBeDefined();
 
 		// Look for the highlight text color button
 		const textColorButton = await waitFor( () =>
-			getByA11yLabel( 'Text color' )
+			getByLabelText( 'Text color' )
 		);
 		expect( textColorButton ).toBeDefined();
 	} );
 
 	it( 'allows toggling the highlight color feature to type new text', async () => {
-		const { getByA11yLabel, getByTestId, getByA11yHint } =
+		const { getByLabelText, getByTestId, getByA11yHint } =
 			await initializeEditor();
 
 		// Wait for the editor placeholder
 		const paragraphPlaceholder = await waitFor( () =>
-			getByA11yLabel( 'Add paragraph block' )
+			getByLabelText( 'Add paragraph block' )
 		);
 		expect( paragraphPlaceholder ).toBeDefined();
 		fireEvent.press( paragraphPlaceholder );
 
 		// Wait for the block to be created
 		const paragraphBlock = await waitFor( () =>
-			getByA11yLabel( /Paragraph Block\. Row 1/ )
+			getByLabelText( /Paragraph Block\. Row 1/ )
 		);
 		expect( paragraphBlock ).toBeDefined();
 
 		// Look for the highlight text color button
 		const textColorButton = await waitFor( () =>
-			getByA11yLabel( 'Text color' )
+			getByLabelText( 'Text color' )
 		);
 		expect( textColorButton ).toBeDefined();
 		fireEvent.press( textColorButton );
@@ -94,7 +94,7 @@ describe( 'Text color', () => {
 
 	it( 'allows toggling the highlight color feature to selected text', async () => {
 		const {
-			getByA11yLabel,
+			getByLabelText,
 			getByTestId,
 			getByPlaceholderText,
 			getByA11yHint,
@@ -103,14 +103,14 @@ describe( 'Text color', () => {
 
 		// Wait for the editor placeholder
 		const paragraphPlaceholder = await waitFor( () =>
-			getByA11yLabel( 'Add paragraph block' )
+			getByLabelText( 'Add paragraph block' )
 		);
 		expect( paragraphPlaceholder ).toBeDefined();
 		fireEvent.press( paragraphPlaceholder );
 
 		// Wait for the block to be created
 		const paragraphBlock = await waitFor( () =>
-			getByA11yLabel( /Paragraph Block\. Row 1/ )
+			getByLabelText( /Paragraph Block\. Row 1/ )
 		);
 		expect( paragraphBlock ).toBeDefined();
 
@@ -126,7 +126,7 @@ describe( 'Text color', () => {
 
 		// Look for the highlight text color button
 		const textColorButton = await waitFor( () =>
-			getByA11yLabel( 'Text color' )
+			getByLabelText( 'Text color' )
 		);
 		expect( textColorButton ).toBeDefined();
 		fireEvent.press( textColorButton );
@@ -146,13 +146,13 @@ describe( 'Text color', () => {
 	} );
 
 	it( 'creates a paragraph block with the text color format', async () => {
-		const { getByA11yLabel } = await initializeEditor( {
+		const { getByLabelText } = await initializeEditor( {
 			initialHtml: TEXT_WITH_COLOR,
 		} );
 
 		// Wait for the block to be created
 		const paragraphBlock = await waitFor( () =>
-			getByA11yLabel( /Paragraph Block\. Row 1/ )
+			getByLabelText( /Paragraph Block\. Row 1/ )
 		);
 		expect( paragraphBlock ).toBeDefined();
 

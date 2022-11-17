@@ -1,3 +1,5 @@
+/* eslint-disable testing-library/render-result-naming-convention */
+
 /**
  * WordPress dependencies
  */
@@ -102,3 +104,5 @@ describe( 'InnerBlocks', () => {
 		expect( serialize( block ) ).toMatchSnapshot();
 	} );
 } );
+
+/* eslint-enable testing-library/render-result-naming-convention */

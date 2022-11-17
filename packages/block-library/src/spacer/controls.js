@@ -4,7 +4,6 @@
 import { __ } from '@wordpress/i18n';
 import { InspectorControls, useSetting } from '@wordpress/block-editor';
 import {
-	BaseControl,
 	PanelBody,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalUnitControl as UnitControl,
@@ -51,17 +50,16 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 	].join( '' );
 
 	return (
-		<BaseControl label={ label } id={ inputId }>
-			<UnitControl
-				id={ inputId }
-				isResetValueOnUnitChange
-				min={ MIN_SPACER_SIZE }
-				onChange={ handleOnChange }
-				style={ { maxWidth: 80 } }
-				value={ computedValue }
-				units={ units }
-			/>
-		</BaseControl>
+		<UnitControl
+			label={ label }
+			id={ inputId }
+			isResetValueOnUnitChange
+			min={ MIN_SPACER_SIZE }
+			onChange={ handleOnChange }
+			__unstableInputWidth={ '80px' }
+			value={ computedValue }
+			units={ units }
+		/>
 	);
 }
 

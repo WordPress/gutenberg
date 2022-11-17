@@ -59,7 +59,7 @@ test.describe( 'Paragraph', () => {
 			await requestUtils.deleteAllMedia();
 		} );
 
-		test( 'should allow dropping an image on en empty paragraph block', async ( {
+		test( 'should allow dropping an image on an empty paragraph block', async ( {
 			editor,
 			page,
 			pageUtils,
@@ -95,7 +95,7 @@ test.describe( 'Paragraph', () => {
 			);
 		} );
 
-		test( 'should allow dropping blocks on en empty paragraph block', async ( {
+		test( 'should allow dropping blocks on an empty paragraph block', async ( {
 			editor,
 			page,
 			draggingUtils,
@@ -131,7 +131,7 @@ test.describe( 'Paragraph', () => {
 <!-- /wp:heading -->` );
 		} );
 
-		test( 'should allow dropping HTML on en empty paragraph block', async ( {
+		test( 'should allow dropping HTML on an empty paragraph block', async ( {
 			editor,
 			page,
 			draggingUtils,

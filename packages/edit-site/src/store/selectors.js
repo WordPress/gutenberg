@@ -321,6 +321,17 @@ export function isListViewOpened( state ) {
 }
 
 /**
+ * Returns the current opened/closed state of the save panel.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} True if the save panel should be open; false if closed.
+ */
+export function isSaveViewOpened( state ) {
+	return state.saveViewPanel;
+}
+
+/**
  * Returns the template parts and their blocks for the current edited template.
  *
  * @param {Object} state Global application state.

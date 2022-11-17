@@ -62,8 +62,6 @@ function UnforwardedTextControl(
 /**
  * TextControl components let users enter and edit text.
  *
- *
- * @example
  * ```jsx
  * import { TextControl } from '@wordpress/components';
  * import { useState } from '@wordpress/element';

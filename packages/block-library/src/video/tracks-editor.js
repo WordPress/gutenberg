@@ -7,11 +7,9 @@ import {
 	MenuItem,
 	FormFileUpload,
 	MenuGroup,
+	ToolbarGroup,
 	ToolbarButton,
 	Dropdown,
-	SVG,
-	Rect,
-	Path,
 	Button,
 	TextControl,
 	SelectControl,
@@ -37,23 +35,6 @@ const KIND_OPTIONS = [
 	{ label: __( 'Chapters' ), value: 'chapters' },
 	{ label: __( 'Metadata' ), value: 'metadata' },
 ];
-
-const captionIcon = (
-	<SVG width="18" height="14" viewBox="0 0 18 14" role="img" fill="none">
-		<Rect
-			x="0.75"
-			y="0.75"
-			width="16.5"
-			height="12.5"
-			rx="1.25"
-			stroke="black"
-			strokeWidth="1.5"
-			fill="none"
-		/>
-		<Path d="M3 7H15" stroke="black" strokeWidth="1.5" />
-		<Path d="M3 10L15 10" stroke="black" strokeWidth="1.5" />
-	</SVG>
-);
 
 function TrackList( { tracks, onEditPress } ) {
 	let content;
@@ -200,14 +181,17 @@ export default function TracksEditor( { tracks = [], onChange } ) {
 		<Dropdown
 			contentClassName="block-library-video-tracks-editor"
 			renderToggle={ ( { isOpen, onToggle } ) => (
-				<ToolbarButton
-					label={ __( 'Text tracks' ) }
-					showTooltip
-					aria-expanded={ isOpen }
-					aria-haspopup="true"
-					onClick={ onToggle }
-					icon={ captionIcon }
-				/>
+				<ToolbarGroup>
+					<ToolbarButton
+						label={ __( 'Text tracks' ) }
+						showTooltip
+						aria-expanded={ isOpen }
+						aria-haspopup="true"
+						onClick={ onToggle }
+					>
+						{ __( 'Text tracks' ) }
+					</ToolbarButton>
+				</ToolbarGroup>
 			) }
 			renderContent={ () => {
 				if ( trackBeingEdited !== null ) {

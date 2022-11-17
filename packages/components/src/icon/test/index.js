@@ -32,6 +32,16 @@ describe( 'Icon', () => {
 		);
 	} );
 
+	it( 'renders a dashicon with custom size', () => {
+		render(
+			<Icon data-testid={ testId } icon="format-image" size={ 10 } />
+		);
+
+		expect( screen.getByTestId( testId ) ).toHaveStyle( 'width:10px' );
+		expect( screen.getByTestId( testId ) ).toHaveStyle( 'height:10px' );
+		expect( screen.getByTestId( testId ) ).toHaveStyle( 'font-size:10px' );
+	} );
+
 	it( 'renders a function', () => {
 		render( <Icon icon={ () => <span data-testid={ testId } /> } /> );
 

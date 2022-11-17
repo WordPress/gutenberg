@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { some, castArray } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
@@ -30,10 +25,9 @@ import { store as editorStore } from '../../store';
 export function PostTypeSupportCheck( { postType, children, supportKeys } ) {
 	let isSupported = true;
 	if ( postType ) {
-		isSupported = some(
-			castArray( supportKeys ),
-			( key ) => !! postType.supports[ key ]
-		);
+		isSupported = (
+			Array.isArray( supportKeys ) ? supportKeys : [ supportKeys ]
+		 ).some( ( key ) => !! postType.supports[ key ] );
 	}
 
 	if ( ! isSupported ) {

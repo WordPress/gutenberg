@@ -9,15 +9,13 @@ import { render, screen } from '@testing-library/react';
 import { Divider } from '..';
 
 describe( 'props', () => {
-	beforeEach( () => {
-		render( <Divider /> );
-	} );
-
 	test( 'should render correctly', () => {
+		render( <Divider /> );
 		expect( screen.getByRole( 'separator' ) ).toMatchSnapshot();
 	} );
 
 	test( 'should render marginStart', () => {
+		render( <Divider /> );
 		render( <Divider marginStart={ 5 } /> );
 
 		const dividers = screen.getAllByRole( 'separator' );
@@ -25,6 +23,7 @@ describe( 'props', () => {
 	} );
 
 	test( 'should render marginEnd', () => {
+		render( <Divider /> );
 		render( <Divider marginEnd={ 5 } /> );
 
 		const dividers = screen.getAllByRole( 'separator' );
@@ -32,6 +31,7 @@ describe( 'props', () => {
 	} );
 
 	test( 'should render margin', () => {
+		render( <Divider /> );
 		render( <Divider margin={ 7 } /> );
 
 		const dividers = screen.getAllByRole( 'separator' );

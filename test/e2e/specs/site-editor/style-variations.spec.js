@@ -100,7 +100,7 @@ test.describe( 'Global styles variations', () => {
 
 		await expect(
 			page.locator( 'css=.components-font-size-picker__header__hint' )
-		).toHaveText( 'Medium(px)' );
+		).toHaveText( 'Medium' );
 	} );
 
 	test( 'should apply custom colors and font sizes in a variation', async ( {
@@ -141,7 +141,7 @@ test.describe( 'Global styles variations', () => {
 		//  we could provide accessible attributes to the source code in packages/components/src/font-size-picker/index.js.
 		await expect(
 			page.locator( 'css=.components-font-size-picker__header__hint' )
-		).toHaveText( '(Custom)' );
+		).toHaveText( 'Custom' );
 
 		await expect(
 			page.locator( 'role=spinbutton[name="Custom"i]' )

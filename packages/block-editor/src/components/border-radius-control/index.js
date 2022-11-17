@@ -113,6 +113,7 @@ export default function BorderRadiusControl( { onChange, values } ) {
 							withInputField={ false }
 							onChange={ handleSliderChange }
 							step={ step }
+							__nextHasNoMarginBottom
 						/>
 					</>
 				) : (

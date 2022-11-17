@@ -7,12 +7,14 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { forwardRef, useEffect } from '@wordpress/element';
-import {
-	__unstableUseNavigateRegions as useNavigateRegions,
-	__unstableMotion as motion,
-} from '@wordpress/components';
+import { __unstableUseNavigateRegions as useNavigateRegions } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import NavigableRegion from '../navigable-region';
 
 function useHTMLClass( className ) {
 	useEffect( () => {
@@ -89,39 +91,35 @@ function InterfaceSkeleton(
 			) }
 		>
 			{ !! drawer && (
-				<div
+				<NavigableRegion
 					className="interface-interface-skeleton__drawer"
-					role="region"
-					aria-label={ mergedLabels.drawer }
-					tabIndex="-1"
+					ariaLabel={ mergedLabels.drawer }
 				>
 					{ drawer }
-				</div>
+				</NavigableRegion>
 			) }
 			<div className="interface-interface-skeleton__editor">
 				{ !! header && isDistractionFree && (
-					<motion.div
-						initial={ isDistractionFree ? 'hidden' : 'hover' }
-						whileHover="hover"
-						variants={ headerVariants }
-						transition={ { type: 'tween', delay: 0.8 } }
+					<NavigableRegion
 						className="interface-interface-skeleton__header"
-						role="region"
 						aria-label={ mergedLabels.header }
-						tabIndex="-1"
+						motionProps={ {
+							initial: isDistractionFree ? 'hidden' : 'hover',
+							whileHover: 'hover',
+							variants: headerVariants,
+							transition: { type: 'tween', delay: 0.8 },
+						} }
 					>
 						{ header }
-					</motion.div>
+					</NavigableRegion>
 				) }
 				{ !! header && ! isDistractionFree && (
-					<div
+					<NavigableRegion
 						className="interface-interface-skeleton__header"
-						role="region"
-						aria-label={ mergedLabels.header }
-						tabIndex="-1"
+						ariaLabel={ mergedLabels.header }
 					>
 						{ header }
-					</div>
+					</NavigableRegion>
 				) }
 				{ isDistractionFree && (
 					<div className="interface-interface-skeleton__header">
@@ -130,59 +128,49 @@ function InterfaceSkeleton(
 				) }
 				<div className="interface-interface-skeleton__body">
 					{ !! secondarySidebar && (
-						<div
+						<NavigableRegion
 							className="interface-interface-skeleton__secondary-sidebar"
-							role="region"
-							aria-label={ mergedLabels.secondarySidebar }
-							tabIndex="-1"
+							ariaLabel={ mergedLabels.secondarySidebar }
 						>
 							{ secondarySidebar }
-						</div>
+						</NavigableRegion>
 					) }
 					{ !! notices && (
 						<div className="interface-interface-skeleton__notices">
 							{ notices }
 						</div>
 					) }
-					<div
+					<NavigableRegion
 						className="interface-interface-skeleton__content"
-						role="region"
-						aria-label={ mergedLabels.body }
-						tabIndex="-1"
+						ariaLabel={ mergedLabels.body }
 					>
 						{ content }
-					</div>
+					</NavigableRegion>
 					{ !! sidebar && (
-						<div
+						<NavigableRegion
 							className="interface-interface-skeleton__sidebar"
-							role="region"
-							aria-label={ mergedLabels.sidebar }
-							tabIndex="-1"
+							ariaLabel={ mergedLabels.sidebar }
 						>
 							{ sidebar }
-						</div>
+						</NavigableRegion>
 					) }
 					{ !! actions && (
-						<div
+						<NavigableRegion
 							className="interface-interface-skeleton__actions"
-							role="region"
-							aria-label={ mergedLabels.actions }
-							tabIndex="-1"
+							ariaLabel={ mergedLabels.actions }
 						>
 							{ actions }
-						</div>
+						</NavigableRegion>
 					) }
 				</div>
 			</div>
 			{ !! footer && (
-				<div
+				<NavigableRegion
 					className="interface-interface-skeleton__footer"
-					role="region"
-					aria-label={ mergedLabels.footer }
-					tabIndex="-1"
+					ariaLabel={ mergedLabels.footer }
 				>
 					{ footer }
-				</div>
+				</NavigableRegion>
 			) }
 		</div>
 	);

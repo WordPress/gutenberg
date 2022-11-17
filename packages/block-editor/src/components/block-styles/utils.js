@@ -11,7 +11,7 @@ import { _x } from '@wordpress/i18n';
 /**
  * Returns the active style from the given className.
  *
- * @param {Array}  styles    Block style variations.
+ * @param {Array}  styles    Block styles.
  * @param {string} className Class name
  *
  * @return {Object?} The active style.
@@ -59,7 +59,7 @@ export function replaceActiveStyle( className, activeStyle, newStyle ) {
  * act as a fallback for when there is no active style applied to a block. The default item also serves
  * as a switch on the frontend to deactivate non-default styles.
  *
- * @param {Array} styles Block style variations.
+ * @param {Array} styles Block styles.
  *
  * @return {Array<Object?>}        The style collection.
  */
@@ -83,7 +83,7 @@ export function getRenderedStyles( styles ) {
 /**
  * Returns a style object from a collection of styles where that style object is the default block style.
  *
- * @param {Array} styles Block style variations.
+ * @param {Array} styles Block styles.
  *
  * @return {Object?}        The default style object, if found.
  */

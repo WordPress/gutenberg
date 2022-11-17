@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, includes } from 'lodash';
+import { filter } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -38,7 +38,7 @@ function BlockManager( {
 			hasBlockSupport( blockType, 'inserter', true ) &&
 			( ! search || isMatchingSearchTerm( blockType, search ) ) &&
 			( ! blockType.parent ||
-				includes( blockType.parent, 'core/post-content' ) )
+				blockType.parent.includes( 'core/post-content' ) )
 	);
 
 	// Announce search results on change

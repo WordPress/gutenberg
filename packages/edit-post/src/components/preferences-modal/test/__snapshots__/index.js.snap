@@ -253,7 +253,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                     class="components-toggle-control__label"
                     for="inspector-toggle-control-1"
                   >
-                    Distraction Free
+                    Distraction free
                   </label>
                 </div>
               </div>
@@ -508,6 +508,11 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
 }
 
 .emotion-2 {
+  overflow-x: auto;
+  max-height: 100%;
+}
+
+.emotion-3 {
   background-color: #fff;
   color: #1e1e1e;
   position: relative;
@@ -517,47 +522,47 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
   border-radius: calc(2px - 1px);
 }
 
-.emotion-4 {
+.emotion-5 {
   height: 100%;
 }
 
-.emotion-6 {
+.emotion-7 {
   box-sizing: border-box;
   height: auto;
   max-height: 100%;
   padding: calc(4px * 4);
 }
 
-.emotion-6:first-of-type {
+.emotion-7:first-of-type {
   border-top-left-radius: calc(2px - 1px);
   border-top-right-radius: calc(2px - 1px);
 }
 
-.emotion-6:last-of-type {
+.emotion-7:last-of-type {
   border-bottom-left-radius: calc(2px - 1px);
   border-bottom-right-radius: calc(2px - 1px);
 }
 
-.emotion-8 {
+.emotion-9 {
   border-radius: 2px;
 }
 
-.emotion-8>*:first-of-type>* {
+.emotion-9>*:first-of-type>* {
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
 }
 
-.emotion-8>*:last-of-type>* {
+.emotion-9>*:last-of-type>* {
   border-bottom-left-radius: 2px;
   border-bottom-right-radius: 2px;
 }
 
-.emotion-10 {
+.emotion-11 {
   width: 100%;
   display: block;
 }
 
-.emotion-12 {
+.emotion-13 {
   -webkit-appearance: none;
   -moz-appearance: none;
   -ms-appearance: none;
@@ -565,7 +570,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
   border: 1px solid transparent;
   cursor: pointer;
   background: none;
-  text-align: left;
+  text-align: start;
   padding: calc((36px - calc(13px * 1.2) - 2px) / 2) 12px;
   width: 100%;
   display: block;
@@ -574,18 +579,18 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
   border-radius: 2px;
 }
 
-.emotion-12:hover {
-  color: var( --wp-admin-theme-color, #007cba);
+.emotion-13:hover {
+  color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
 }
 
-.emotion-12:focus {
+.emotion-13:focus {
   background-color: transparent;
-  color: var( --wp-admin-theme-color, #007cba);
-  border-color: var( --wp-admin-theme-color, #007cba);
+  color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
   outline: 3px solid transparent;
 }
 
-.emotion-14 {
+.emotion-15 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -604,11 +609,11 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
   width: 100%;
 }
 
-.emotion-14>* {
+.emotion-15>* {
   min-width: 0;
 }
 
-.emotion-16 {
+.emotion-17 {
   display: block;
   max-height: 100%;
   max-width: 100%;
@@ -616,14 +621,14 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
   min-width: 0;
 }
 
-.emotion-18 {
+.emotion-19 {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.emotion-46 {
+.emotion-47 {
   background: transparent;
   display: block;
   margin: 0!important;
@@ -643,7 +648,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
 }
 
 @media ( prefers-reduced-motion: reduce ) {
-  .emotion-46 {
+  .emotion-47 {
     transition-duration: 0ms;
   }
 }
@@ -696,52 +701,52 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
       data-wp-component="NavigatorProvider"
     >
       <div
-        class="components-navigator-screen"
+        class="emotion-2 components-navigator-screen"
         data-wp-c16t="true"
         data-wp-component="NavigatorScreen"
         style="opacity: 0; transform: translateX(50px) translateZ(0);"
       >
         <div
-          class="components-surface components-card emotion-2 emotion-1"
+          class="components-surface components-card emotion-3 emotion-1"
           data-wp-c16t="true"
           data-wp-component="Card"
         >
           <div
-            class="emotion-4 emotion-1"
+            class="emotion-5 emotion-1"
           >
             <div
-              class="components-card__body components-card-body emotion-6 emotion-1"
+              class="components-card__body components-card-body emotion-7 emotion-1"
               data-wp-c16t="true"
               data-wp-component="CardBody"
             >
               <div
-                class="components-item-group emotion-8 emotion-1"
+                class="components-item-group emotion-9 emotion-1"
                 data-wp-c16t="true"
                 data-wp-component="ItemGroup"
                 role="list"
               >
                 <div
-                  class="emotion-10"
+                  class="emotion-11"
                   role="listitem"
                 >
                   <button
-                    class="components-item components-navigator-button emotion-1 emotion-12 emotion-1"
+                    class="components-item components-navigator-button emotion-1 emotion-13 emotion-1"
                     data-wp-c16t="true"
                     data-wp-component="NavigatorButton"
                     id="general"
                   >
                     <div
-                      class="components-flex components-h-stack emotion-14 emotion-1"
+                      class="components-flex components-h-stack emotion-15 emotion-1"
                       data-wp-c16t="true"
                       data-wp-component="HStack"
                     >
                       <div
-                        class="components-flex-item emotion-16 emotion-1"
+                        class="components-flex-item emotion-17 emotion-1"
                         data-wp-c16t="true"
                         data-wp-component="FlexItem"
                       >
                         <span
-                          class="components-truncate emotion-18 emotion-1"
+                          class="components-truncate emotion-19 emotion-1"
                           data-wp-c16t="true"
                           data-wp-component="Truncate"
                         >
@@ -749,7 +754,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                         </span>
                       </div>
                       <div
-                        class="components-flex-item emotion-16 emotion-1"
+                        class="components-flex-item emotion-17 emotion-1"
                         data-wp-c16t="true"
                         data-wp-component="FlexItem"
                       >
@@ -770,27 +775,27 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                   </button>
                 </div>
                 <div
-                  class="emotion-10"
+                  class="emotion-11"
                   role="listitem"
                 >
                   <button
-                    class="components-item components-navigator-button emotion-1 emotion-12 emotion-1"
+                    class="components-item components-navigator-button emotion-1 emotion-13 emotion-1"
                     data-wp-c16t="true"
                     data-wp-component="NavigatorButton"
                     id="blocks"
                   >
                     <div
-                      class="components-flex components-h-stack emotion-14 emotion-1"
+                      class="components-flex components-h-stack emotion-15 emotion-1"
                       data-wp-c16t="true"
                       data-wp-component="HStack"
                     >
                       <div
-                        class="components-flex-item emotion-16 emotion-1"
+                        class="components-flex-item emotion-17 emotion-1"
                         data-wp-c16t="true"
                         data-wp-component="FlexItem"
                       >
                         <span
-                          class="components-truncate emotion-18 emotion-1"
+                          class="components-truncate emotion-19 emotion-1"
                           data-wp-c16t="true"
                           data-wp-component="Truncate"
                         >
@@ -798,7 +803,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                         </span>
                       </div>
                       <div
-                        class="components-flex-item emotion-16 emotion-1"
+                        class="components-flex-item emotion-17 emotion-1"
                         data-wp-c16t="true"
                         data-wp-component="FlexItem"
                       >
@@ -819,27 +824,27 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                   </button>
                 </div>
                 <div
-                  class="emotion-10"
+                  class="emotion-11"
                   role="listitem"
                 >
                   <button
-                    class="components-item components-navigator-button emotion-1 emotion-12 emotion-1"
+                    class="components-item components-navigator-button emotion-1 emotion-13 emotion-1"
                     data-wp-c16t="true"
                     data-wp-component="NavigatorButton"
                     id="panels"
                   >
                     <div
-                      class="components-flex components-h-stack emotion-14 emotion-1"
+                      class="components-flex components-h-stack emotion-15 emotion-1"
                       data-wp-c16t="true"
                       data-wp-component="HStack"
                     >
                       <div
-                        class="components-flex-item emotion-16 emotion-1"
+                        class="components-flex-item emotion-17 emotion-1"
                         data-wp-c16t="true"
                         data-wp-component="FlexItem"
                       >
                         <span
-                          class="components-truncate emotion-18 emotion-1"
+                          class="components-truncate emotion-19 emotion-1"
                           data-wp-c16t="true"
                           data-wp-component="Truncate"
                         >
@@ -847,7 +852,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                         </span>
                       </div>
                       <div
-                        class="components-flex-item emotion-16 emotion-1"
+                        class="components-flex-item emotion-17 emotion-1"
                         data-wp-c16t="true"
                         data-wp-component="FlexItem"
                       >
@@ -872,13 +877,13 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
           </div>
           <div
             aria-hidden="true"
-            class="components-elevation emotion-46 emotion-1"
+            class="components-elevation emotion-47 emotion-1"
             data-wp-c16t="true"
             data-wp-component="Elevation"
           />
           <div
             aria-hidden="true"
-            class="components-elevation emotion-46 emotion-1"
+            class="components-elevation emotion-47 emotion-1"
             data-wp-c16t="true"
             data-wp-component="Elevation"
           />

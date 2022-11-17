@@ -85,7 +85,7 @@ function gutenberg_get_global_styles_svg_filters() {
 		}
 	}
 
-	$supports_theme_json = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
+	$supports_theme_json = wp_theme_has_theme_json();
 
 	$origins = array( 'default', 'theme', 'custom' );
 	if ( ! $supports_theme_json ) {

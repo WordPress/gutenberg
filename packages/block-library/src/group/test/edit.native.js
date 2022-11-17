@@ -79,14 +79,14 @@ describe( 'Group block', () => {
 		const screen = await initializeEditor( {
 			initialHtml: NESTED_GROUP_BLOCK,
 		} );
-		const { getByA11yLabel } = screen;
+		const { getByLabelText } = screen;
 
 		// Get block
 		let groupBlock = await getBlock( screen, 'Group' );
 		fireEvent.press( groupBlock );
 
 		// Get Ungroup button
-		let ungroupButton = getByA11yLabel( /Ungroup/ );
+		let ungroupButton = getByLabelText( /Ungroup/ );
 		fireEvent.press( ungroupButton );
 
 		// Press Group block again
@@ -94,7 +94,7 @@ describe( 'Group block', () => {
 		fireEvent.press( groupBlock );
 
 		// Ungroup last block
-		ungroupButton = getByA11yLabel( /Ungroup/ );
+		ungroupButton = getByLabelText( /Ungroup/ );
 		fireEvent.press( ungroupButton );
 
 		expect( getEditorHtml() ).toMatchSnapshot();

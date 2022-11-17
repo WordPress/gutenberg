@@ -116,7 +116,6 @@ export default {
 					) }
 				</p>
 				<ToggleGroupControl
-					__experimentalIsBorderless
 					label={ __( 'Justification' ) }
 					value={ justifyContent }
 					onChange={ onJustificationChange }

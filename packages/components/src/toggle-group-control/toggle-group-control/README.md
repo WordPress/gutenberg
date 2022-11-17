@@ -50,9 +50,16 @@ Determines if segments should be rendered with equal widths.
 -   Required: No
 -   Default: `false`
 
+### `isDeselectable`: `boolean`
+
+Whether an option can be deselected by clicking it again.
+
+-   Required: No
+-   Default: `false`
+
 ### `isBlock`: `boolean`
 
-Renders `ToggleGroupControl` as a (CSS) block element.
+Renders `ToggleGroupControl` as a (CSS) block element, spanning the entire width of the available space. This is the recommended style when the options are text-based and not icons.
 
 -   Required: No
 -   Default: `false`

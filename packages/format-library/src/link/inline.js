@@ -230,7 +230,7 @@ function InlineLinkUI( {
 			anchor={ popoverAnchor }
 			focusOnMount={ focusOnMount.current }
 			onClose={ stopAddingLink }
-			position="bottom center"
+			placement="bottom"
 			shift
 		>
 			<LinkControl

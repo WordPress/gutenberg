@@ -28,10 +28,10 @@ afterAll( () => {
 
 describe( 'Spacer block', () => {
 	it( 'inserts block', async () => {
-		const { getByA11yLabel, getByTestId, getByText } =
+		const { getByLabelText, getByTestId, getByText } =
 			await initializeEditor();
 
-		fireEvent.press( getByA11yLabel( 'Add block' ) );
+		fireEvent.press( getByLabelText( 'Add block' ) );
 
 		const blockList = getByTestId( 'InserterUI-Blocks' );
 		// onScroll event used to force the FlatList to render all items
@@ -45,7 +45,7 @@ describe( 'Spacer block', () => {
 
 		fireEvent.press( await waitFor( () => getByText( 'Spacer' ) ) );
 
-		expect( getByA11yLabel( /Spacer Block\. Row 1/ ) ).toBeVisible();
+		expect( getByLabelText( /Spacer Block\. Row 1/ ) ).toBeVisible();
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
@@ -53,17 +53,17 @@ describe( 'Spacer block', () => {
 		const initialHtml = `<!-- wp:spacer -->
 		<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
 		<!-- /wp:spacer -->`;
-		const { getByA11yLabel, getByDisplayValue, getByTestId, getByText } =
+		const { getByLabelText, getByDisplayValue, getByTestId, getByText } =
 			await initializeEditor( {
 				initialHtml,
 			} );
 
 		// Select Spacer block
-		const spacerBlock = getByA11yLabel( /Spacer Block\. Row 1/ );
+		const spacerBlock = getByLabelText( /Spacer Block\. Row 1/ );
 		fireEvent.press( spacerBlock );
 
 		// Open block settings
-		fireEvent.press( getByA11yLabel( 'Open Settings' ) );
+		fireEvent.press( getByLabelText( 'Open Settings' ) );
 		await waitFor(
 			() => getByTestId( 'block-settings-modal' ).props.isVisible
 		);
@@ -80,17 +80,17 @@ describe( 'Spacer block', () => {
 		const initialHtml = `<!-- wp:spacer -->
 		<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
 		<!-- /wp:spacer -->`;
-		const { getByA11yLabel, getByDisplayValue, getByTestId, getByText } =
+		const { getByLabelText, getByDisplayValue, getByTestId, getByText } =
 			await initializeEditor( {
 				initialHtml,
 			} );
 
 		// Select Spacer block
-		const spacerBlock = getByA11yLabel( /Spacer Block\. Row 1/ );
+		const spacerBlock = getByLabelText( /Spacer Block\. Row 1/ );
 		fireEvent.press( spacerBlock );
 
 		// Open block settings
-		fireEvent.press( getByA11yLabel( 'Open Settings' ) );
+		fireEvent.press( getByLabelText( 'Open Settings' ) );
 		await waitFor(
 			() => getByTestId( 'block-settings-modal' ).props.isVisible
 		);
@@ -111,23 +111,23 @@ describe( 'Spacer block', () => {
 		const initialHtml = `<!-- wp:spacer -->
 		<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
 		<!-- /wp:spacer -->`;
-		const { getByA11yLabel, getByTestId } = await initializeEditor( {
+		const { getByLabelText, getByTestId } = await initializeEditor( {
 			initialHtml,
 		} );
 
 		// Select Spacer block
-		const spacerBlock = getByA11yLabel( /Spacer Block\. Row 1/ );
+		const spacerBlock = getByLabelText( /Spacer Block\. Row 1/ );
 		fireEvent.press( spacerBlock );
 
 		// Open block settings
-		fireEvent.press( getByA11yLabel( 'Open Settings' ) );
+		fireEvent.press( getByLabelText( 'Open Settings' ) );
 		await waitFor(
 			() => getByTestId( 'block-settings-modal' ).props.isVisible
 		);
 
 		// Increment height
 		fireEvent(
-			getByA11yLabel( /Height\. Value is 100 Pixels \(px\)/ ),
+			getByLabelText( /Height\. Value is 100 Pixels \(px\)/ ),
 			'accessibilityAction',
 			{
 				nativeEvent: { actionName: 'increment' },
@@ -141,23 +141,23 @@ describe( 'Spacer block', () => {
 		const initialHtml = `<!-- wp:spacer -->
 		<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
 		<!-- /wp:spacer -->`;
-		const { getByA11yLabel, getByTestId } = await initializeEditor( {
+		const { getByLabelText, getByTestId } = await initializeEditor( {
 			initialHtml,
 		} );
 
 		// Select Spacer block
-		const spacerBlock = getByA11yLabel( /Spacer Block\. Row 1/ );
+		const spacerBlock = getByLabelText( /Spacer Block\. Row 1/ );
 		fireEvent.press( spacerBlock );
 
 		// Open block settings
-		fireEvent.press( getByA11yLabel( 'Open Settings' ) );
+		fireEvent.press( getByLabelText( 'Open Settings' ) );
 		await waitFor(
 			() => getByTestId( 'block-settings-modal' ).props.isVisible
 		);
 
 		// Increment height
 		fireEvent(
-			getByA11yLabel( /Height\. Value is 100 Pixels \(px\)/ ),
+			getByLabelText( /Height\. Value is 100 Pixels \(px\)/ ),
 			'accessibilityAction',
 			{
 				nativeEvent: { actionName: 'decrement' },

@@ -821,6 +821,76 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
             </kbd>
           </div>
         </li>
+        <li
+          class="edit-post-keyboard-shortcut-help-modal__shortcut"
+        >
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-description"
+          >
+            Convert the current heading to a paragraph.
+          </div>
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-term"
+          >
+            <kbd
+              aria-label="Shift + Alt + 0"
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+            >
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Shift
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Alt
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                0
+              </kbd>
+            </kbd>
+          </div>
+        </li>
+        <li
+          class="edit-post-keyboard-shortcut-help-modal__shortcut"
+        >
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-description"
+          >
+            Convert the current paragraph or heading to a heading of level 1 to 6.
+          </div>
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-term"
+          >
+            <kbd
+              aria-label="Shift + Alt + 1 6"
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+            >
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Shift
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Alt
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                1-6
+              </kbd>
+            </kbd>
+          </div>
+        </li>
       </ul>
     </section>
   </div>

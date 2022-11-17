@@ -58,6 +58,16 @@ target 'GutenbergDemo' do
         end
       end
     end
+		### End workaround for https://github.com/facebook/react-native/issues/31034
+
+		### Begin workaround: https://github.com/CocoaPods/CocoaPods/issues/8891#issuecomment-1201465446
+		installer.pods_project.targets.each do |target|
+			if target.respond_to?(:product_type) and target.product_type == "com.apple.product-type.bundle"
+				target.build_configurations.each do |config|
+						config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+				end
+			end
+		end
+		### End workaround: https://github.com/CocoaPods/CocoaPods/issues/8891#issuecomment-1201465446
   end
-  ### End workaround for https://github.com/facebook/react-native/issues/31034
 end

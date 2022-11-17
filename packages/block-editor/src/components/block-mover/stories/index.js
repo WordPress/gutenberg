@@ -70,7 +70,7 @@ function BlockMoverStory() {
 			</Toolbar>
 
 			<p style={ { marginTop: 36 } }>
-				But it can also accomodate horizontal blocks.
+				But it can also accommodate horizontal blocks.
 			</p>
 			<Toolbar label="Block Mover">
 				<BlockMover

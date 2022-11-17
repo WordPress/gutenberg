@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { kebabCase, reduce } from 'lodash';
+import { kebabCase } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -83,18 +83,14 @@ const withEditorColorPalette = () =>
  * @return {WPComponent} The component that can be used as a HOC.
  */
 function createColorHOC( colorTypes, withColorPalette ) {
-	const colorMap = reduce(
-		colorTypes,
-		( colorObject, colorType ) => {
-			return {
-				...colorObject,
-				...( typeof colorType === 'string'
-					? { [ colorType ]: kebabCase( colorType ) }
-					: colorType ),
-			};
-		},
-		{}
-	);
+	const colorMap = colorTypes.reduce( ( colorObject, colorType ) => {
+		return {
+			...colorObject,
+			...( typeof colorType === 'string'
+				? { [ colorType ]: kebabCase( colorType ) }
+				: colorType ),
+		};
+	}, {} );
 
 	return compose( [
 		withColorPalette,
@@ -118,13 +114,8 @@ function createColorHOC( colorTypes, withColorPalette ) {
 				}
 
 				createSetters() {
-					return reduce(
-						colorMap,
-						(
-							settersAccumulator,
-							colorContext,
-							colorAttributeName
-						) => {
+					return Object.keys( colorMap ).reduce(
+						( settersAccumulator, colorAttributeName ) => {
 							const upperFirstColorAttributeName =
 								upperFirst( colorAttributeName );
 							const customColorAttributeName = `custom${ upperFirstColorAttributeName }`;
@@ -163,9 +154,8 @@ function createColorHOC( colorTypes, withColorPalette ) {
 					{ attributes, colors },
 					previousState
 				) {
-					return reduce(
-						colorMap,
-						( newState, colorContext, colorAttributeName ) => {
+					return Object.entries( colorMap ).reduce(
+						( newState, [ colorAttributeName, colorContext ] ) => {
 							const colorObject = getColorObjectByAttributeValues(
 								colors,
 								attributes[ colorAttributeName ],

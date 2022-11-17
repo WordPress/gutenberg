@@ -11,6 +11,9 @@ import AnglePickerControl from '../';
 export default {
 	title: 'Components/AnglePickerControl',
 	component: AnglePickerControl,
+	argTypes: {
+		label: { control: { type: 'text' } },
+	},
 };
 
 const AnglePickerWithState = ( args ) => {

@@ -116,7 +116,7 @@ export default function EditPostPreferencesModal() {
 								help={ __(
 									'Reduce visual distractions by hiding the toolbar and other elements to focus on writing.'
 								) }
-								label={ __( 'Distraction Free' ) }
+								label={ __( 'Distraction free' ) }
 							/>
 							<EnableFeature
 								featureName="focusMode"

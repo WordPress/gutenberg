@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
+import { useState, useRef, useCallback } from '@wordpress/element';
 import { ResizableBox } from '@wordpress/components';
 import {
 	__experimentalUseResizeCanvas as useResizeCanvas,
@@ -11,18 +11,13 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, useResizeObserver } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
 import ResizeHandle from './resize-handle';
-
-const DEFAULT_STYLES = {
-	width: '100%',
-	height: '100%',
-};
 
 // Removes the inline styles in the drag handles.
 const HANDLE_STYLES_OVERRIDE = {
@@ -38,6 +33,7 @@ const HANDLE_STYLES_OVERRIDE = {
 };
 
 function ResizableEditor( { enableResizing, settings, children, ...props } ) {
+	const [ resizeObserver, sizes ] = useResizeObserver();
 	const { deviceType, isZoomOutMode } = useSelect(
 		( select ) => ( {
 			deviceType:
@@ -49,60 +45,21 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 		[]
 	);
 	const deviceStyles = useResizeCanvas( deviceType );
-	const [ width, setWidth ] = useState( DEFAULT_STYLES.width );
-	const [ height, setHeight ] = useState( DEFAULT_STYLES.height );
+	const [ width, setWidth ] = useState( '100%' );
 	const iframeRef = useRef();
 	const mouseMoveTypingResetRef = useMouseMoveTypingReset();
 	const ref = useMergeRefs( [ iframeRef, mouseMoveTypingResetRef ] );
-
-	useEffect(
-		function autoResizeIframeHeight() {
-			if ( ! iframeRef.current || ! enableResizing ) {
-				return;
-			}
-
-			const iframe = iframeRef.current;
-
-			function setFrameHeight() {
-				setHeight( iframe.contentDocument.body.scrollHeight );
-			}
-
-			let resizeObserver;
-
-			function registerObserver() {
-				resizeObserver?.disconnect();
-
-				resizeObserver = new iframe.contentWindow.ResizeObserver(
-					setFrameHeight
-				);
-
-				// Observe the body, since the `html` element seems to always
-				// have a height of `100%`.
-				resizeObserver.observe( iframe.contentDocument.body );
-				setFrameHeight();
-			}
-
-			iframe.addEventListener( 'load', registerObserver );
-
-			return () => {
-				resizeObserver?.disconnect();
-				iframe.removeEventListener( 'load', registerObserver );
-			};
-		},
-		[ enableResizing, iframeRef.current ]
-	);
 
 	const resizeWidthBy = useCallback( ( deltaPixels ) => {
 		if ( iframeRef.current ) {
 			setWidth( iframeRef.current.offsetWidth + deltaPixels );
 		}
 	}, [] );
-
 	return (
 		<ResizableBox
 			size={ {
-				width,
-				height,
+				width: enableResizing ? width : '100%',
+				height: enableResizing && sizes.height ? sizes.height : '100%',
 			} }
 			onResizeStop={ ( event, direction, element ) => {
 				setWidth( element.style.width );
@@ -141,21 +98,18 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 		>
 			<Iframe
 				isZoomedOut={ isZoomOutMode }
-				style={ enableResizing ? { height } : deviceStyles }
+				style={ enableResizing ? {} : deviceStyles }
 				head={
 					<>
 						<EditorStyles styles={ settings.styles } />
 						<style>{
 							// Forming a "block formatting context" to prevent margin collapsing.
 							// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
-							`.is-root-container { display: flow-root; }`
+							`.is-root-container { display: flow-root; }
+							body { position: relative; }`
 						}</style>
 						{ enableResizing && (
 							<style>
-								{
-									// Force the <html> and <body>'s heights to fit the content.
-									`html, body { height: -moz-fit-content !important; height: fit-content !important; min-height: 0 !important; }`
-								}
 								{
 									// Some themes will have `min-height: 100vh` for the root container,
 									// which isn't a requirement in auto resize mode.
@@ -173,6 +127,7 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 			>
 				{ /* Filters need to be rendered before children to avoid Safari rendering issues. */ }
 				{ settings.svgFilters }
+				{ resizeObserver }
 				{ children }
 			</Iframe>
 		</ResizableBox>

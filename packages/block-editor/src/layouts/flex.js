@@ -10,7 +10,14 @@ import {
 	arrowRight,
 	arrowDown,
 } from '@wordpress/icons';
-import { Button, ToggleControl, Flex, FlexItem } from '@wordpress/components';
+import {
+	Button,
+	ToggleControl,
+	Flex,
+	FlexItem,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -257,7 +264,7 @@ function FlexLayoutJustifyContentControl( {
 				onChange={ onJustificationChange }
 				popoverProps={ {
 					position: 'bottom right',
-					isAlternate: true,
+					variant: 'toolbar',
 				} }
 			/>
 		);
@@ -289,22 +296,23 @@ function FlexLayoutJustifyContentControl( {
 	}
 
 	return (
-		<fieldset className="block-editor-hooks__flex-layout-justification-controls">
-			<legend>{ __( 'Justification' ) }</legend>
-			<div>
-				{ justificationOptions.map( ( { value, icon, label } ) => {
-					return (
-						<Button
-							key={ value }
-							label={ label }
-							icon={ icon }
-							isPressed={ justifyContent === value }
-							onClick={ () => onJustificationChange( value ) }
-						/>
-					);
-				} ) }
-			</div>
-		</fieldset>
+		<ToggleGroupControl
+			label={ __( 'Justification' ) }
+			value={ justifyContent }
+			onChange={ onJustificationChange }
+			className="block-editor-hooks__flex-layout-justification-controls"
+		>
+			{ justificationOptions.map( ( { value, icon, label } ) => {
+				return (
+					<ToggleGroupControlOptionIcon
+						key={ value }
+						value={ value }
+						icon={ icon }
+						label={ label }
+					/>
+				);
+			} ) }
+		</ToggleGroupControl>
 	);
 }
 
@@ -327,30 +335,27 @@ function FlexWrapControl( { layout, onChange } ) {
 function OrientationControl( { layout, onChange } ) {
 	const { orientation = 'horizontal' } = layout;
 	return (
-		<fieldset className="block-editor-hooks__flex-layout-orientation-controls">
-			<legend>{ __( 'Orientation' ) }</legend>
-			<Button
-				label={ __( 'Horizontal' ) }
+		<ToggleGroupControl
+			className="block-editor-hooks__flex-layout-orientation-controls"
+			label={ __( 'Orientation' ) }
+			value={ orientation }
+			onChange={ ( value ) =>
+				onChange( {
+					...layout,
+					orientation: value,
+				} )
+			}
+		>
+			<ToggleGroupControlOptionIcon
 				icon={ arrowRight }
-				isPressed={ orientation === 'horizontal' }
-				onClick={ () =>
-					onChange( {
-						...layout,
-						orientation: 'horizontal',
-					} )
-				}
+				value={ 'horizontal' }
+				label={ __( 'Horizontal' ) }
 			/>
-			<Button
-				label={ __( 'Vertical' ) }
+			<ToggleGroupControlOptionIcon
 				icon={ arrowDown }
-				isPressed={ orientation === 'vertical' }
-				onClick={ () =>
-					onChange( {
-						...layout,
-						orientation: 'vertical',
-					} )
-				}
+				value={ 'vertical' }
+				label={ __( 'Vertical' ) }
 			/>
-		</fieldset>
+		</ToggleGroupControl>
 	);
 }

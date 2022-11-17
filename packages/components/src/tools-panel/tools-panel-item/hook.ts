@@ -42,8 +42,11 @@ export function useToolsPanelItem(
 		__experimentalLastVisibleItemClass,
 	} = useToolsPanelContext();
 
-	const hasValueCallback = useCallback( hasValue, [ panelId ] );
-	const resetAllFilterCallback = useCallback( resetAllFilter, [ panelId ] );
+	const hasValueCallback = useCallback( hasValue, [ panelId, hasValue ] );
+	const resetAllFilterCallback = useCallback( resetAllFilter, [
+		panelId,
+		resetAllFilter,
+	] );
 	const previousPanelId = usePrevious( currentPanelId );
 
 	const hasMatchingPanel =
@@ -79,6 +82,8 @@ export function useToolsPanelItem(
 		panelId,
 		previousPanelId,
 		resetAllFilterCallback,
+		registerPanelItem,
+		deregisterPanelItem,
 	] );
 
 	const isValueSet = hasValue();
@@ -90,18 +95,28 @@ export function useToolsPanelItem(
 		if ( isShownByDefault && isValueSet && ! wasValueSet ) {
 			flagItemCustomization( label );
 		}
-	}, [ isValueSet, wasValueSet, isShownByDefault, label ] );
+	}, [
+		isValueSet,
+		wasValueSet,
+		isShownByDefault,
+		label,
+		flagItemCustomization,
+	] );
 
 	// Note: `label` is used as a key when building menu item state in
 	// `ToolsPanel`.
 	const menuGroup = isShownByDefault ? 'default' : 'optional';
 	const isMenuItemChecked = menuItems?.[ menuGroup ]?.[ label ];
 	const wasMenuItemChecked = usePrevious( isMenuItemChecked );
+	const isRegistered = menuItems?.[ menuGroup ]?.[ label ] !== undefined;
 
 	// Determine if the panel item's corresponding menu is being toggled and
 	// trigger appropriate callback if it is.
 	useEffect( () => {
-		if ( isResetting || ! hasMatchingPanel ) {
+		// We check whether this item is currently registered as items rendered
+		// via fills can persist through the parent panel being remounted.
+		// See: https://github.com/WordPress/gutenberg/pull/45673
+		if ( ! isRegistered || isResetting || ! hasMatchingPanel ) {
 			return;
 		}
 
@@ -115,9 +130,12 @@ export function useToolsPanelItem(
 	}, [
 		hasMatchingPanel,
 		isMenuItemChecked,
+		isRegistered,
 		isResetting,
 		isValueSet,
 		wasMenuItemChecked,
+		onSelect,
+		onDeselect,
 	] );
 
 	// The item is shown if it is a default control regardless of whether it
@@ -153,6 +171,7 @@ export function useToolsPanelItem(
 		lastDisplayedItem,
 		__experimentalFirstVisibleItemClass,
 		__experimentalLastVisibleItemClass,
+		label,
 	] );
 
 	return {

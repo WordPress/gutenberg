@@ -59,7 +59,7 @@ function ListViewBlock( {
 	const [ isHovered, setIsHovered ] = useState( false );
 	const { clientId } = block;
 
-	const { isLocked, isContentLocked } = useBlockLock( clientId );
+	const { isLocked, isContentLocked, canEdit } = useBlockLock( clientId );
 	const forceSelectionContentLock = useSelect(
 		( select ) => {
 			if ( isSelected ) {
@@ -76,6 +76,7 @@ function ListViewBlock( {
 		[ isContentLocked, clientId, isSelected ]
 	);
 
+	const canExpand = isContentLocked ? false : canEdit;
 	const isFirstSelectedBlock =
 		forceSelectionContentLock ||
 		( isSelected && selectedClientIds[ 0 ] === clientId );
@@ -229,7 +230,7 @@ function ListViewBlock( {
 			path={ path }
 			id={ `list-view-block-${ clientId }` }
 			data-block={ clientId }
-			isExpanded={ isContentLocked ? undefined : isExpanded }
+			isExpanded={ canExpand ? isExpanded : undefined }
 			aria-selected={ !! isSelected || forceSelectionContentLock }
 		>
 			<TreeGridCell
@@ -238,7 +239,7 @@ function ListViewBlock( {
 				ref={ cellRef }
 				aria-label={ blockAriaLabel }
 				aria-selected={ !! isSelected || forceSelectionContentLock }
-				aria-expanded={ isContentLocked ? undefined : isExpanded }
+				aria-expanded={ canExpand ? isExpanded : undefined }
 				aria-describedby={ descriptionId }
 			>
 				{ ( { ref, tabIndex, onFocus } ) => (

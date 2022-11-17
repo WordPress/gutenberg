@@ -30,7 +30,7 @@ describe( 'props', () => {
 			</ContextSystemProvider>
 		);
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
 	test( 'should render context props', () => {
@@ -60,7 +60,7 @@ describe( 'props', () => {
 			</ContextSystemProvider>
 		);
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 		expect( container.firstChild.innerHTML ).toContain( 'Code is Poetry' );
 	} );
 
@@ -98,7 +98,7 @@ describe( 'props', () => {
 			</>
 		);
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 
 		const el = container.querySelector( '.test-component' );
 

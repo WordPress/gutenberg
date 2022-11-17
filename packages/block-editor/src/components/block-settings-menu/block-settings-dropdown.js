@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { castArray } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -41,7 +36,7 @@ const noop = () => {};
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
 	position: 'bottom right',
-	isAlternate: true,
+	variant: 'toolbar',
 };
 
 function CopyMenuItem( { blocks, onCopy } ) {
@@ -58,7 +53,9 @@ export function BlockSettingsDropdown( {
 	__unstableDisplayLocation,
 	...props
 } ) {
-	const blockClientIds = castArray( clientIds );
+	const blockClientIds = Array.isArray( clientIds )
+		? clientIds
+		: [ clientIds ];
 	const count = blockClientIds.length;
 	const firstBlockClientId = blockClientIds[ 0 ];
 	const {

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, rawHandler } from '@wordpress/blocks';
 
 export function createListBlockFromDOMElement( listElement ) {
 	const listAttributes = {
@@ -70,15 +70,7 @@ export function migrateToListV2( attributes ) {
 		list.setAttribute( 'type', type );
 	}
 
-	const listBlock = createListBlockFromDOMElement( list );
+	const [ listBlock ] = rawHandler( { HTML: list.outerHTML } );
 
-	const { values: omittedValues, ...restAttributes } = attributes;
-
-	return [
-		{
-			...restAttributes,
-			...listBlock.attributes,
-		},
-		listBlock.innerBlocks,
-	];
+	return [ listBlock.attributes, listBlock.innerBlocks ];
 }

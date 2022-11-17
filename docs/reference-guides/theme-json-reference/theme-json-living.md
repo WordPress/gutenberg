@@ -73,6 +73,16 @@ Settings related to colors.
 
 ---
 
+### dimensions
+
+Settings related to dimensions.
+
+| Property  | Type   | Default | Props  |
+| ---       | ---    | ---    |---   |
+| minHeight | boolean | false |  |
+
+---
+
 ### layout
 
 Settings related to layout.

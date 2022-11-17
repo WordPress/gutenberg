@@ -399,6 +399,11 @@ describe( 'Multi-block selection', () => {
 		);
 		await page.keyboard.press( 'Enter' );
 
+		// Select the default, selected Group layout from the variation picker.
+		await page.click(
+			'button[aria-label="Group: Gather blocks in a container."]'
+		);
+
 		const groupAppender = await page.waitForSelector(
 			'.block-editor-button-block-appender'
 		);

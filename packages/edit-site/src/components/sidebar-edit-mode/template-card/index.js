@@ -5,6 +5,7 @@ import { useSelect } from '@wordpress/data';
 import { Icon } from '@wordpress/components';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -42,12 +43,12 @@ export default function TemplateCard() {
 			<div className="edit-site-template-card__content">
 				<div className="edit-site-template-card__header">
 					<h2 className="edit-site-template-card__title">
-						{ title }
+						{ decodeEntities( title ) }
 					</h2>
 					<TemplateActions template={ template } />
 				</div>
 				<div className="edit-site-template-card__description">
-					{ description }
+					{ decodeEntities( description ) }
 				</div>
 				<TemplateAreas />
 			</div>

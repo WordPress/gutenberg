@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { fireEvent, render } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -42,12 +42,12 @@ describe( 'BlockSelectionClearer component', () => {
 			clearSelectedBlock: mockClearSelectedBlock,
 		} ) );
 
-		const { queryByRole } = render(
+		render(
 			<BlockSelectionClearer>
 				<button>Not a block</button>
 			</BlockSelectionClearer>
 		);
-		const button = queryByRole( 'button' );
+		const button = screen.getByRole( 'button' );
 		fireEvent.mouseDown( button.parentElement );
 
 		expect( mockClearSelectedBlock ).toBeCalled();
@@ -63,12 +63,12 @@ describe( 'BlockSelectionClearer component', () => {
 			clearSelectedBlock: mockClearSelectedBlock,
 		} ) );
 
-		const { queryByRole } = render(
+		render(
 			<BlockSelectionClearer>
 				<button>Not a block</button>
 			</BlockSelectionClearer>
 		);
-		const button = queryByRole( 'button' );
+		const button = screen.getByRole( 'button' );
 		fireEvent.mouseDown( button.parentElement );
 
 		expect( mockClearSelectedBlock ).toBeCalled();
@@ -81,12 +81,12 @@ describe( 'BlockSelectionClearer component', () => {
 			clearSelectedBlock: mockClearSelectedBlock,
 		} ) );
 
-		const { queryByRole } = render(
+		render(
 			<BlockSelectionClearer>
 				<button>Not a block</button>
 			</BlockSelectionClearer>
 		);
-		const button = queryByRole( 'button' );
+		const button = screen.getByRole( 'button' );
 		fireEvent.mouseDown( button.parentElement );
 
 		expect( mockClearSelectedBlock ).not.toBeCalled();
@@ -105,12 +105,12 @@ describe( 'BlockSelectionClearer component', () => {
 			clearSelectedBlock: mockClearSelectedBlock,
 		} ) );
 
-		const { queryByRole } = render(
+		render(
 			<BlockSelectionClearer>
 				<button>Not a block</button>
 			</BlockSelectionClearer>
 		);
-		const button = queryByRole( 'button' );
+		const button = screen.getByRole( 'button' );
 		fireEvent.mouseDown( button.parentElement );
 
 		expect( mockClearSelectedBlock ).not.toBeCalled();

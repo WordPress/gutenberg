@@ -44,7 +44,7 @@ const createSuggestionTestCase = ( code, output ) => ( {
 		{
 			suggestions: [
 				{
-					desc: 'Replace literal with store definition. Import store if neccessary.',
+					desc: 'Replace literal with store definition. Import store if necessary.',
 					output,
 				},
 			],

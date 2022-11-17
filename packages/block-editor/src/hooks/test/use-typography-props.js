@@ -42,7 +42,7 @@ describe( 'getTypographyClassesAndStyles', () => {
 			style: {
 				letterSpacing: '22px',
 				fontSize:
-					'clamp(1.5rem, 1.5rem + ((1vw - 0.48rem) * 2.885), 3rem)',
+					'clamp(1.5rem, 1.5rem + ((1vw - 0.48rem) * 0.962), 2rem)',
 				textTransform: 'uppercase',
 			},
 		} );

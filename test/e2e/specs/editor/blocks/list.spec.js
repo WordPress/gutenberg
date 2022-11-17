@@ -1231,4 +1231,28 @@ test.describe( 'List', () => {
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	test( 'selects all transformed output', async ( { editor, page } ) => {
+		await editor.insertBlock( {
+			name: 'core/list',
+			innerBlocks: [
+				{ name: 'core/list-item', attributes: { content: '1' } },
+				{ name: 'core/list-item', attributes: { content: '2' } },
+			],
+		} );
+
+		await editor.selectBlocks(
+			page.locator( 'role=document[name="Block: List"i]' )
+		);
+
+		await page.getByRole( 'button', { name: 'List' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Paragraph' } ).click();
+
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+
+		await page.getByRole( 'button', { name: 'Paragraph' } ).click();
+		await page.getByRole( 'menuitem', { name: 'List' } ).click();
+
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );

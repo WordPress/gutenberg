@@ -52,6 +52,47 @@ export default function PageListEdit( { context, clientId } ) {
 		style: { ...context.style?.color },
 	} );
 
+	const getBlockContent = () => {
+		if ( ! hasResolvedPages ) {
+			return (
+				<div { ...blockProps }>
+					<Spinner />
+				</div>
+			);
+		}
+
+		if ( totalPages === null ) {
+			return (
+				<div { ...blockProps }>
+					<Notice status={ 'warning' } isDismissible={ false }>
+						{ __( 'Page List: Cannot retrieve Pages.' ) }
+					</Notice>
+				</div>
+			);
+		}
+
+		if ( totalPages === 0 ) {
+			return (
+				<div { ...blockProps }>
+					<Notice status={ 'info' } isDismissible={ false }>
+						{ __( 'Page List: Cannot retrieve Pages.' ) }
+					</Notice>
+				</div>
+			);
+		}
+
+		if ( totalPages > 0 ) {
+			return (
+				<ul { ...blockProps }>
+					<PageItems
+						context={ context }
+						pagesByParentId={ pagesByParentId }
+					/>
+				</ul>
+			);
+		}
+	};
+
 	return (
 		<>
 			{ allowConvertToLinks && (
@@ -67,35 +108,8 @@ export default function PageListEdit( { context, clientId } ) {
 					clientId={ clientId }
 				/>
 			) }
-			{ ! hasResolvedPages && (
-				<div { ...blockProps }>
-					<Spinner />
-				</div>
-			) }
 
-			{ hasResolvedPages && totalPages === null && (
-				<div { ...blockProps }>
-					<Notice status={ 'warning' } isDismissible={ false }>
-						{ __( 'Page List: Cannot retrieve Pages.' ) }
-					</Notice>
-				</div>
-			) }
-
-			{ totalPages === 0 && (
-				<div { ...blockProps }>
-					<Notice status={ 'info' } isDismissible={ false }>
-						{ __( 'Page List: Cannot retrieve Pages.' ) }
-					</Notice>
-				</div>
-			) }
-			{ totalPages > 0 && (
-				<ul { ...blockProps }>
-					<PageItems
-						context={ context }
-						pagesByParentId={ pagesByParentId }
-					/>
-				</ul>
-			) }
+			{ getBlockContent() }
 		</>
 	);
 }

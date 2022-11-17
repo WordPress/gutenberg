@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
@@ -424,5 +425,54 @@ describe( 'NumberControl', () => {
 
 			expect( input.value ).toBe( '4' );
 		} );
+	} );
+
+	describe( 'custom spin buttons', () => {
+		test.each( [ undefined, 'none', 'native' ] )(
+			'should not appear when spinControls = %s',
+			( spinControls ) => {
+				render( <NumberControl spinControls={ spinControls } /> );
+				expect(
+					screen.queryByLabelText( 'Increment' )
+				).not.toBeInTheDocument();
+				expect(
+					screen.queryByLabelText( 'Decrement' )
+				).not.toBeInTheDocument();
+			}
+		);
+
+		test.each( [
+			[ 'up', '1', {} ],
+			[ 'up', '2', { value: '1' } ],
+			[ 'up', '12', { value: '10', step: '2' } ],
+			[ 'up', '10', { value: '10', max: '10' } ],
+			[ 'down', '-1', {} ],
+			[ 'down', '1', { value: '2' } ],
+			[ 'down', '10', { value: '12', step: '2' } ],
+			[ 'down', '10', { value: '10', min: '10' } ],
+		] )(
+			'should spin %s to %s when props = %o',
+			async ( direction, expectedValue, props ) => {
+				const user = userEvent.setup( {
+					advanceTimers: jest.advanceTimersByTime,
+				} );
+				const onChange = jest.fn();
+				render(
+					<NumberControl
+						{ ...props }
+						spinControls="custom"
+						onChange={ onChange }
+					/>
+				);
+				await user.click(
+					screen.getByLabelText(
+						direction === 'up' ? 'Increment' : 'Decrement'
+					)
+				);
+				expect( onChange ).toHaveBeenCalledWith( expectedValue, {
+					event: expect.anything(),
+				} );
+			}
+		);
 	} );
 } );

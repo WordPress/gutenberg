@@ -281,7 +281,7 @@ export function deleteColumn( state, { columnIndex } ) {
 }
 
 /**
- * Toggles the existance of a section.
+ * Toggles the existence of a section.
  *
  * @param {Object} state       Current table state.
  * @param {string} sectionName Name of the section to toggle.

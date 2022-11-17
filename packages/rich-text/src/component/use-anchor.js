@@ -45,13 +45,18 @@ export function useAnchor( { editableContentElement, value, settings = {} } ) {
 			return;
 		}
 
+		const selectionWithinEditableContentElement =
+			editableContentElement?.contains( selection?.anchorNode );
+
 		const range = selection.getRangeAt( 0 );
 
 		if ( ! activeFormat ) {
 			return {
 				ownerDocument: range.startContainer.ownerDocument,
 				getBoundingClientRect() {
-					return range.getBoundingClientRect();
+					return selectionWithinEditableContentElement
+						? range.getBoundingClientRect()
+						: editableContentElement.getBoundingClientRect();
 				},
 			};
 		}

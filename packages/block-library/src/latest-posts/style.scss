@@ -1,4 +1,7 @@
 .wp-block-latest-posts {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+
 	&.alignleft {
 		/*rtl:ignore*/
 		margin-right: 2em;

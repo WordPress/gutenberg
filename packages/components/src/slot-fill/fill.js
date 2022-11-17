@@ -20,8 +20,12 @@ function FillComponent( { name, children, registerFill, unregisterFill } ) {
 	} );
 
 	useLayoutEffect( () => {
-		registerFill( name, ref.current );
-		return () => unregisterFill( name, ref.current );
+		const refValue = ref.current;
+		registerFill( name, refValue );
+		return () => unregisterFill( name, refValue );
+		// Ignore reason: the useLayoutEffects here are written to fire at specific times, and introducing new dependencies could cause unexpected changes in behavior.
+		// We'll leave them as-is until a more detailed investigation/refactor can be performed.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
 	useLayoutEffect( () => {
@@ -29,6 +33,9 @@ function FillComponent( { name, children, registerFill, unregisterFill } ) {
 		if ( slot ) {
 			slot.forceUpdate();
 		}
+		// Ignore reason: the useLayoutEffects here are written to fire at specific times, and introducing new dependencies could cause unexpected changes in behavior.
+		// We'll leave them as-is until a more detailed investigation/refactor can be performed.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ children ] );
 
 	useLayoutEffect( () => {
@@ -39,6 +46,9 @@ function FillComponent( { name, children, registerFill, unregisterFill } ) {
 		unregisterFill( ref.current.name, ref.current );
 		ref.current.name = name;
 		registerFill( name, ref.current );
+		// Ignore reason: the useLayoutEffects here are written to fire at specific times, and introducing new dependencies could cause unexpected changes in behavior.
+		// We'll leave them as-is until a more detailed investigation/refactor can be performed.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ name ] );
 
 	if ( ! slot || ! slot.node ) {

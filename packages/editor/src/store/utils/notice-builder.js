@@ -11,7 +11,7 @@ import { SAVE_POST_NOTICE_ID, TRASH_POST_NOTICE_ID } from '../constants';
 /**
  * External dependencies
  */
-import { get, includes } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * Builds the arguments for a success notification dispatch.
@@ -34,8 +34,8 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
 	}
 
 	const publishStatus = [ 'publish', 'private', 'future' ];
-	const isPublished = includes( publishStatus, previousPost.status );
-	const willPublish = includes( publishStatus, post.status );
+	const isPublished = publishStatus.includes( previousPost.status );
+	const willPublish = publishStatus.includes( post.status );
 
 	let noticeMessage;
 	let shouldShowLink = get( postType, [ 'viewable' ], false );

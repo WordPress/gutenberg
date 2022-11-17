@@ -20,6 +20,7 @@ import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import {
 	getBlockType,
 	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
+	switchToBlockType,
 } from '@wordpress/blocks';
 import { useSetting } from '@wordpress/block-editor';
 
@@ -41,7 +42,7 @@ function BlockForType( {
 	getBlockWidth,
 	insertBlocksAfter,
 	isSelected,
-	mergeBlocks,
+	onMerge,
 	name,
 	onBlockFocus,
 	onChange,
@@ -87,7 +88,7 @@ function BlockForType( {
 				onFocus={ onBlockFocus }
 				onReplace={ onReplace }
 				insertBlocksAfter={ insertBlocksAfter }
-				mergeBlocks={ mergeBlocks }
+				mergeBlocks={ onMerge }
 				// Block level styles.
 				wrapperProps={ wrapperProps }
 				// Inherited styles merged with block level styles.
@@ -407,31 +408,144 @@ export default compose( [
 			),
 		};
 	} ),
-	withDispatch( ( dispatch, ownProps, { select } ) => {
+	withDispatch( ( dispatch, ownProps, registry ) => {
 		const {
 			insertBlocks,
 			mergeBlocks,
 			replaceBlocks,
 			selectBlock,
 			updateBlockAttributes,
+			moveBlocksToPosition,
+			removeBlock,
 		} = dispatch( blockEditorStore );
 
 		return {
-			mergeBlocks( forward ) {
-				const { clientId } = ownProps;
-				const { getPreviousBlockClientId, getNextBlockClientId } =
-					select( blockEditorStore );
+			onMerge( forward ) {
+				const { clientId, rootClientId } = ownProps;
+				const {
+					getPreviousBlockClientId,
+					getNextBlockClientId,
+					getBlock,
+					getBlockAttributes,
+					getBlockName,
+					getBlockOrder,
+				} = registry.select( blockEditorStore );
 
+				// For `Delete` or forward merge, we should do the exact same thing
+				// as `Backspace`, but from the other block.
 				if ( forward ) {
+					if ( rootClientId ) {
+						const nextRootClientId =
+							getNextBlockClientId( rootClientId );
+
+						if ( nextRootClientId ) {
+							// If there is a block that follows with the same parent
+							// block name and the same attributes, merge the inner
+							// blocks.
+							if (
+								getBlockName( rootClientId ) ===
+								getBlockName( nextRootClientId )
+							) {
+								const rootAttributes =
+									getBlockAttributes( rootClientId );
+								const previousRootAttributes =
+									getBlockAttributes( nextRootClientId );
+
+								if (
+									Object.keys( rootAttributes ).every(
+										( key ) =>
+											rootAttributes[ key ] ===
+											previousRootAttributes[ key ]
+									)
+								) {
+									registry.batch( () => {
+										moveBlocksToPosition(
+											getBlockOrder( nextRootClientId ),
+											nextRootClientId,
+											rootClientId
+										);
+										removeBlock( nextRootClientId, false );
+									} );
+									return;
+								}
+							} else {
+								mergeBlocks( rootClientId, nextRootClientId );
+								return;
+							}
+						}
+					}
+
 					const nextBlockClientId = getNextBlockClientId( clientId );
-					if ( nextBlockClientId ) {
+
+					if ( ! nextBlockClientId ) {
+						return;
+					}
+
+					// Check if it's possibile to "unwrap" the following block
+					// before trying to merge.
+					const replacement = switchToBlockType(
+						getBlock( nextBlockClientId ),
+						'*'
+					);
+
+					if ( replacement && replacement.length ) {
+						replaceBlocks( nextBlockClientId, replacement );
+					} else {
 						mergeBlocks( clientId, nextBlockClientId );
 					}
 				} else {
 					const previousBlockClientId =
 						getPreviousBlockClientId( clientId );
+
 					if ( previousBlockClientId ) {
 						mergeBlocks( previousBlockClientId, clientId );
+					} else if ( rootClientId ) {
+						const previousRootClientId =
+							getPreviousBlockClientId( rootClientId );
+
+						// If there is a preceding block with the same parent block
+						// name and the same attributes, merge the inner blocks.
+						if (
+							previousRootClientId &&
+							getBlockName( rootClientId ) ===
+								getBlockName( previousRootClientId )
+						) {
+							const rootAttributes =
+								getBlockAttributes( rootClientId );
+							const previousRootAttributes =
+								getBlockAttributes( previousRootClientId );
+
+							if (
+								Object.keys( rootAttributes ).every(
+									( key ) =>
+										rootAttributes[ key ] ===
+										previousRootAttributes[ key ]
+								)
+							) {
+								registry.batch( () => {
+									moveBlocksToPosition(
+										getBlockOrder( rootClientId ),
+										rootClientId,
+										previousRootClientId
+									);
+									removeBlock( rootClientId, false );
+								} );
+								return;
+							}
+						}
+
+						// Attempt to "unwrap" the block contents when there's no
+						// preceding block to merge with.
+						const replacement = switchToBlockType(
+							getBlock( rootClientId ),
+							'*'
+						);
+						if ( replacement && replacement.length ) {
+							registry.batch( () => {
+								replaceBlocks( rootClientId, replacement );
+								selectBlock( replacement[ 0 ].clientId, 0 );
+							} );
+						}
 					}
 				}
 			},

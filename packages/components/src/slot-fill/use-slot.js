@@ -26,6 +26,9 @@ const useSlot = ( name ) => {
 		} );
 
 		return unsubscribe;
+		// Ignore reason: Modifying this dep array could introduce unexpected changes in behavior,
+		// so we'll leave it as=is until the hook can be properly refactored for exhaustive-deps.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ name ] );
 
 	return slot;

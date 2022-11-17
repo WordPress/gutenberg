@@ -180,7 +180,7 @@ export function TimePicker( {
 			min={ 1 }
 			max={ 31 }
 			required
-			hideHTMLArrows
+			spinControls="none"
 			isPressEnterToChange
 			isDragEnabled={ false }
 			isShiftStepEnabled={ false }
@@ -246,7 +246,7 @@ export function TimePicker( {
 							min={ is12Hour ? 1 : 0 }
 							max={ is12Hour ? 12 : 23 }
 							required
-							hideHTMLArrows
+							spinControls="none"
 							isPressEnterToChange
 							isDragEnabled={ false }
 							isShiftStepEnabled={ false }
@@ -273,7 +273,7 @@ export function TimePicker( {
 							min={ 0 }
 							max={ 59 }
 							required
-							hideHTMLArrows
+							spinControls="none"
 							isPressEnterToChange
 							isDragEnabled={ false }
 							isShiftStepEnabled={ false }
@@ -344,7 +344,7 @@ export function TimePicker( {
 						min={ 1 }
 						max={ 9999 }
 						required
-						hideHTMLArrows
+						spinControls="none"
 						isPressEnterToChange
 						isDragEnabled={ false }
 						isShiftStepEnabled={ false }

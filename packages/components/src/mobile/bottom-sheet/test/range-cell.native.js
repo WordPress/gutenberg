@@ -33,7 +33,7 @@ afterAll( () => {
 
 it( 'allows modifying units via a11y actions', async () => {
 	const mockOpenUnitPicker = jest.fn();
-	const { getByA11yLabel } = render(
+	const { getByLabelText } = render(
 		<RangeCell
 			label="Opacity"
 			minimumValue={ 0 }
@@ -44,7 +44,7 @@ it( 'allows modifying units via a11y actions', async () => {
 		/>
 	);
 
-	const opacityControl = getByA11yLabel( /Opacity/ );
+	const opacityControl = getByLabelText( /Opacity/ );
 	fireEvent( opacityControl, 'accessibilityAction', {
 		nativeEvent: { actionName: 'activate' },
 	} );
@@ -54,7 +54,7 @@ it( 'allows modifying units via a11y actions', async () => {
 
 describe( 'when range lacks an adjustable unit', () => {
 	it( 'disallows modifying units via a11y actions', async () => {
-		const { getByA11yLabel } = render(
+		const { getByLabelText } = render(
 			<RangeCell
 				label="Opacity"
 				minimumValue={ 0 }
@@ -64,7 +64,7 @@ describe( 'when range lacks an adjustable unit', () => {
 			/>
 		);
 
-		const opacityControl = getByA11yLabel( /Opacity/ );
+		const opacityControl = getByLabelText( /Opacity/ );
 		const { onAccessibilityAction } = opacityControl.props;
 		expect( () =>
 			onAccessibilityAction( { nativeEvent: { actionName: 'activate' } } )

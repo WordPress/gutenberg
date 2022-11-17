@@ -99,6 +99,7 @@ const LineHeightControl = ( {
 				step={ STEP }
 				value={ value }
 				min={ 0 }
+				spinControls="custom"
 			/>
 		</div>
 	);

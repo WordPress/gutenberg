@@ -16,6 +16,7 @@ export function PostSticky( { onUpdateSticky, postSticky = false } ) {
 	return (
 		<PostStickyCheck>
 			<CheckboxControl
+				__nextHasNoMarginBottom
 				label={ __( 'Stick to the top of the blog' ) }
 				checked={ postSticky }
 				onChange={ () => onUpdateSticky( ! postSticky ) }

@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { escape as escapeString, find, get } from 'lodash';
+import { find, get } from 'lodash';
+import escapeHtml from 'escape-html';
 
 /**
  * WordPress dependencies
@@ -55,7 +56,7 @@ const termNamesToIds = ( names, terms ) => {
 
 // Tries to create a term or fetch it if it already exists.
 function findOrCreateTerm( termName, restBase, namespace ) {
-	const escapedTermName = escapeString( termName );
+	const escapedTermName = escapeHtml( termName );
 
 	return apiFetch( {
 		path: `/${ namespace }/${ restBase }`,

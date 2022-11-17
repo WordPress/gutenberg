@@ -1,3 +1,5 @@
+/* eslint-disable testing-library/render-result-naming-convention */
+
 /**
  * WordPress dependencies
  */
@@ -137,3 +139,5 @@ describe( 'fromDOM', () => {
 		] );
 	} );
 } );
+
+/* eslint-enable testing-library/render-result-naming-convention */

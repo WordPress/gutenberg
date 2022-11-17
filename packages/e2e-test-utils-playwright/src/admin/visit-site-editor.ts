@@ -38,13 +38,10 @@ export async function visitSiteEditor(
 
 	if ( skipWelcomeGuide ) {
 		await this.page.evaluate( () => {
-			// TODO, type `window.wp`.
-			// @ts-ignore
 			window.wp.data
 				.dispatch( 'core/preferences' )
 				.set( 'core/edit-site', 'welcomeGuide', false );
 
-			// @ts-ignore
 			window.wp.data
 				.dispatch( 'core/preferences' )
 				.toggle( 'core/edit-site', 'welcomeGuideStyles', false );

@@ -37,7 +37,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 
 	// WordPress 6.0 compat.
 	require_once __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-global-styles-controller.php';
-	require_once __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-pattern-directory-controller.php';
+	require_once __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-pattern-directory-controller-6-0.php';
 	require_once __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-edit-site-export-controller.php';
 	if ( ! class_exists( 'WP_REST_Block_Pattern_Categories_Controller' ) ) {
 		require_once __DIR__ . '/compat/wordpress-6.0/class-wp-rest-block-pattern-categories-controller.php';
@@ -48,6 +48,12 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/compat/wordpress-6.1/class-gutenberg-rest-block-patterns-controller.php';
 	require_once __DIR__ . '/compat/wordpress-6.1/class-gutenberg-rest-templates-controller.php';
 	require_once __DIR__ . '/compat/wordpress-6.1/rest-api.php';
+
+	// WordPress 6.2 compat.
+	require_once __DIR__ . '/compat/wordpress-6.2/class-gutenberg-rest-block-pattern-categories-controller.php';
+	require_once __DIR__ . '/compat/wordpress-6.2/class-gutenberg-rest-pattern-directory-controller-6-2.php';
+	require_once __DIR__ . '/compat/wordpress-6.2/rest-api.php';
+	require_once __DIR__ . '/compat/wordpress-6.2/block-patterns.php';
 
 	// Experimental.
 	if ( ! class_exists( 'WP_Rest_Customizer_Nonces' ) ) {
@@ -97,6 +103,10 @@ require __DIR__ . '/compat/wordpress-6.1/theme.php';
 
 // WordPress 6.2 compat.
 require __DIR__ . '/compat/wordpress-6.2/script-loader.php';
+require __DIR__ . '/compat/wordpress-6.2/get-global-styles-and-settings.php';
+require __DIR__ . '/compat/wordpress-6.2/default-filters.php';
+require __DIR__ . '/compat/wordpress-6.2/class-wp-theme-json-resolver-6-2.php';
+require __DIR__ . '/compat/wordpress-6.2/class-wp-theme-json-6-2.php';
 
 // Experimental features.
 remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WP 6.0's stopgap handler for Webfonts API.

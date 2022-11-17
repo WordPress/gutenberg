@@ -71,12 +71,12 @@ function gutenberg_block_type_metadata_view_script( $settings, $metadata ) {
 		! isset( $metadata['viewScript'] ) ||
 		! empty( $settings['view_script'] ) ||
 		! isset( $metadata['file'] ) ||
-		! str_starts_with( $metadata['file'], gutenberg_dir_path() )
+		! str_starts_with( $metadata['file'], wp_normalize_path( gutenberg_dir_path() ) )
 	) {
 		return $settings;
 	}
 
-	$view_script_path = realpath( dirname( $metadata['file'] ) . '/' . remove_block_asset_path_prefix( $metadata['viewScript'] ) );
+	$view_script_path = wp_normalize_path( realpath( dirname( $metadata['file'] ) . '/' . remove_block_asset_path_prefix( $metadata['viewScript'] ) ) );
 
 	if ( file_exists( $view_script_path ) ) {
 		$view_script_id     = str_replace( array( '.min.js', '.js' ), '', basename( remove_block_asset_path_prefix( $metadata['viewScript'] ) ) );
@@ -90,7 +90,7 @@ function gutenberg_block_type_metadata_view_script( $settings, $metadata ) {
 		$view_script_version      = isset( $view_asset['version'] ) ? $view_asset['version'] : false;
 		$result                   = wp_register_script(
 			$view_script_handle,
-			gutenberg_url( str_replace( gutenberg_dir_path(), '', $view_script_path ) ),
+			gutenberg_url( str_replace( wp_normalize_path( gutenberg_dir_path() ), '', $view_script_path ) ),
 			$view_script_dependencies,
 			$view_script_version
 		);

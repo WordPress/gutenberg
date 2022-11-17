@@ -111,7 +111,7 @@ const LinkControlSearchInput = forwardRef(
 				allowDirectEntry ||
 				( suggestion && Object.keys( suggestion ).length >= 1 )
 			) {
-				const { id, url, ...restLinkProps } = currentLink;
+				const { id, url, ...restLinkProps } = currentLink ?? {};
 				onSelect(
 					// Some direct entries don't have types or IDs, and we still need to clear the previous ones.
 					{ ...restLinkProps, ...suggestion },

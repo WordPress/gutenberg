@@ -97,7 +97,7 @@ describe( 'TreeGrid', () => {
 			);
 
 			screen.getByText( 'Row 1' ).focus();
-			const row1Element = screen.getByText( 'Row 1' ).closest( 'tr' );
+			const row1Element = screen.getByRole( 'row', { name: 'Row 1' } );
 
 			fireEvent.keyDown( screen.getByText( 'Row 1' ), {
 				key: 'ArrowRight',
@@ -149,7 +149,7 @@ describe( 'TreeGrid', () => {
 			);
 
 			screen.getByText( 'Row 1' ).focus();
-			const row1Element = screen.getByText( 'Row 1' ).closest( 'tr' );
+			const row1Element = screen.getByRole( 'row', { name: 'Row 1' } );
 
 			fireEvent.keyDown( screen.getByText( 'Row 1' ), {
 				key: 'ArrowLeft',
@@ -188,8 +188,8 @@ describe( 'TreeGrid', () => {
 
 			screen.getByText( 'Row 2' ).focus();
 
-			const row2Element = screen.getByText( 'Row 2' ).closest( 'tr' );
-			const row3Element = screen.getByText( 'Row 3' ).closest( 'tr' );
+			const row2Element = screen.getByRole( 'row', { name: 'Row 2' } );
+			const row3Element = screen.getByRole( 'row', { name: 'Row 3' } );
 
 			fireEvent.keyDown( screen.getByText( 'Row 2' ), {
 				key: 'ArrowDown',
@@ -210,8 +210,8 @@ describe( 'TreeGrid', () => {
 
 			screen.getByText( 'Row 1' ).focus();
 
-			const row1Element = screen.getByText( 'Row 1' ).closest( 'tr' );
-			const row3Element = screen.getByText( 'Row 3' ).closest( 'tr' );
+			const row1Element = screen.getByRole( 'row', { name: 'Row 1' } );
+			const row3Element = screen.getByRole( 'row', { name: 'Row 3' } );
 
 			fireEvent.keyDown( screen.getByText( 'Row 1' ), {
 				key: 'End',
@@ -232,8 +232,8 @@ describe( 'TreeGrid', () => {
 
 			screen.getByText( 'Row 2' ).focus();
 
-			const row2Element = screen.getByText( 'Row 2' ).closest( 'tr' );
-			const row1Element = screen.getByText( 'Row 1' ).closest( 'tr' );
+			const row2Element = screen.getByRole( 'row', { name: 'Row 2' } );
+			const row1Element = screen.getByRole( 'row', { name: 'Row 1' } );
 
 			fireEvent.keyDown( screen.getByText( 'Row 2' ), {
 				key: 'ArrowUp',
@@ -254,8 +254,8 @@ describe( 'TreeGrid', () => {
 
 			screen.getByText( 'Row 3' ).focus();
 
-			const row3Element = screen.getByText( 'Row 3' ).closest( 'tr' );
-			const row1Element = screen.getByText( 'Row 1' ).closest( 'tr' );
+			const row3Element = screen.getByRole( 'row', { name: 'Row 3' } );
+			const row1Element = screen.getByRole( 'row', { name: 'Row 1' } );
 
 			fireEvent.keyDown( screen.getByText( 'Row 3' ), {
 				key: 'Home',
@@ -276,8 +276,8 @@ describe( 'TreeGrid', () => {
 
 			screen.getByText( 'Row 2' ).focus();
 
-			const row2Element = screen.getByText( 'Row 2' ).closest( 'tr' );
-			const row1Element = screen.getByText( 'Row 1' ).closest( 'tr' );
+			const row2Element = screen.getByRole( 'row', { name: 'Row 2' } );
+			const row1Element = screen.getByRole( 'row', { name: 'Row 1' } );
 
 			fireEvent.keyDown( screen.getByText( 'Row 2' ), {
 				key: 'ArrowUp',

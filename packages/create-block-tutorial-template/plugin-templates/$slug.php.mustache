@@ -8,7 +8,7 @@
  * Description:       {{description}}
 {{/description}}
  * Version:           {{version}}
- * Requires at least: 5.9
+ * Requires at least: 6.1
  * Requires PHP:      7.0
 {{#author}}
  * Author:            {{author}}
@@ -38,33 +38,6 @@
  * @see https://developer.wordpress.org/reference/functions/register_block_type/
  */
 function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
-	{{#isStaticVariant}}
 	register_block_type( __DIR__ . '/build' );
-	{{/isStaticVariant}}
-	{{#isDynamicVariant}}
-	register_block_type(
-		__DIR__ . '/build',
-		array(
-			'render_callback' => '{{namespaceSnakeCase}}_{{slugSnakeCase}}_render_callback',
-		)
-	);
-	{{/isDynamicVariant}}
 }
 add_action( 'init', '{{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init' );
-{{#isDynamicVariant}}
-
-/**
- * Render callback function.
- *
- * @param array    $attributes The block attributes.
- * @param string   $content    The block content.
- * @param WP_Block $block      Block instance.
- *
- * @return string The rendered output.
- */
-function {{namespaceSnakeCase}}_{{slugSnakeCase}}_render_callback( $atts, $content, $block ) {
-	ob_start();
-	require plugin_dir_path( __FILE__ ) . 'build/template.php';
-	return ob_get_clean();
-}
-{{/isDynamicVariant}}

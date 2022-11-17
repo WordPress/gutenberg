@@ -543,7 +543,7 @@ class URLInput extends Component {
 			!! suggestions.length
 		) {
 			return (
-				<Popover position="bottom" focusOnMount={ false }>
+				<Popover placement="bottom" focusOnMount={ false }>
 					<div
 						{ ...suggestionsListProps }
 						className={ classnames(
