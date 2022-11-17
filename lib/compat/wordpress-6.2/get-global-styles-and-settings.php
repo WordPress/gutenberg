@@ -57,6 +57,10 @@ if ( ! function_exists( '_wp_theme_has_theme_json_clean_cache_upon_upgrading_act
 	/**
 	 * Private function to clean the cache used by wp_theme_has_theme_json method.
 	 *
+	 * It is hooked into the `upgrader_process_complete` action.
+	 *
+	 * @see default-filters.php
+	 *
 	 * @param WP_Upgrader $upgrader Instance of WP_Upgrader class.
 	 * @param array       $options Metadata that identifies the data that is updated.
 	 */
