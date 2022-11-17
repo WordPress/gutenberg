@@ -155,7 +155,8 @@ function _gutenberg_get_global_stylesheet_clean_cache_upon_upgrading( $upgrader,
 	if (
 		'core' === $options['type'] ||
 		'plugin' === $options['type'] ||
-		( 'theme' === $options['type'] && array_key_exists( get_stylesheet(), $options['themes'] ) )
+		// Clean cache only if the active theme was updated.
+		( 'theme' === $options['type'] && ( isset( $options['themes'][ get_stylesheet() ] ) || isset( $options['themes'][ get_template() ] ) ) )
 	) {
 		gutenberg_get_global_stylesheet_clean_cache();
 	}
