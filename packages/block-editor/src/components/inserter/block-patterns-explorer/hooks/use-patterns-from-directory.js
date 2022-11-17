@@ -13,7 +13,8 @@ export default function usePatternsFromDirectory( options = {} ) {
 	const [ patterns, setPatterns ] = useState( [] );
 	const isLoading = useRef();
 	useEffect( () => {
-		if ( ! Object.keys( options ).length ) {
+		// Request only if we perform a search or select a category.
+		if ( ! [ options.search, options.category ].filter( Boolean ).length ) {
 			return;
 		}
 		const key = JSON.stringify( options );
@@ -52,6 +53,11 @@ export default function usePatternsFromDirectory( options = {} ) {
 				}
 			} );
 		return () => abortController.current?.abort?.();
-	}, [ options.search, options.category, options.per_page ] );
+	}, [
+		options.search,
+		options.category,
+		options.allowed_blocks,
+		options.per_page,
+	] );
 	return [ patterns, isLoading.current ];
 }

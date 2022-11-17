@@ -89,6 +89,12 @@ function gutenberg_pattern_directory_collection_params_6_2( $query_params ) {
 		),
 	);
 
+	$query_params['allowed_blocks'] = array(
+		'description'       => __( 'A comma delimited list of the blocks that a pattern can contain.', 'gutenberg' ),
+		'type'              => 'string',
+		'sanitize_callback' => 'sanitize_text_field',
+	);
+
 	return $query_params;
 }
 add_filter( 'rest_pattern_directory_collection_params', 'gutenberg_pattern_directory_collection_params_6_2' );

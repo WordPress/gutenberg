@@ -9,10 +9,12 @@ import {
 	Spinner,
 } from '@wordpress/components';
 import { speak } from '@wordpress/a11y';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
+import { store as blockEditorStore } from '../../../store';
 import { usePatternsFromDirectory } from './hooks';
 import BlockPatternsList from '../../block-patterns-list';
 import InserterNoResults from '../no-results';
@@ -55,7 +57,18 @@ function PatternList( { filterValue, selectedCategory } ) {
 		onInsertBlocks,
 		destinationRootClientId
 	);
-	const options = {};
+	// We need to send the allowedBlocks based on the destination
+	// root clientId in Pattern Directory request.
+	const allowedBlocks = useSelect(
+		( select ) =>
+			select( blockEditorStore ).__getAllowedCoreBlockNames(
+				destinationRootClientId
+			),
+		[ destinationRootClientId ]
+	);
+	const options = {
+		allowed_blocks: allowedBlocks.join( ',' ),
+	};
 	if ( !! filterValue ) {
 		options.search = filterValue;
 	} else if ( selectedCategory ) {

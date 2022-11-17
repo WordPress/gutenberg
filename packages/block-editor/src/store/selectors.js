@@ -2030,6 +2030,42 @@ export const getInserterItems = createSelector(
 );
 
 /**
+ * Determines the blocks that are allowed to be inserted into the
+ * editor, based on the provided rootClient id.
+ *
+ * For now it includes only static core blocks and doesn't include
+ * any block variations.
+ *
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {string[]} Array of allowed block names, stripped of their namespace prefix(`core/`).
+ */
+export const __getAllowedCoreBlockNames = createSelector(
+	( state, rootClientId = null ) => {
+		const corePrefix = 'core/';
+		return getBlockTypes()
+			.filter(
+				( blockType ) =>
+					blockType.name.startsWith( corePrefix ) &&
+					canIncludeBlockTypeInInserter(
+						state,
+						blockType,
+						rootClientId
+					)
+			)
+			.map( ( { name } ) => name.substring( corePrefix.length ) );
+	},
+	( state, rootClientId ) => [
+		state.blockListSettings[ rootClientId ],
+		state.blocks.byClientId,
+		state.settings.allowedBlockTypes,
+		state.settings.templateLock,
+		getBlockTypes(),
+	]
+);
+
+/**
  * Determines the items that appear in the available block transforms list.
  *
  * Each item object contains what's necessary to display a menu item in the
