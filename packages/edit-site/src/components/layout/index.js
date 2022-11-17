@@ -174,17 +174,16 @@ export default function Layout() {
 					<AnimatePresence>
 						{ isEditorPage && canvasMode === 'edit' && (
 							<NavigableRegion
-								motionProps={ {
-									initial: { y: -60 },
-									animate: { y: 0 },
-									exit: { y: -60 },
-									transition: {
-										type: 'tween',
-										duration: disableMotion
-											? 0
-											: ANIMATION_DURATION,
-										ease: 'easeOut',
-									},
+								as={ motion.div }
+								initial={ { y: -60 } }
+								animate={ { y: 0 } }
+								edit={ { y: -60 } }
+								transition={ {
+									type: 'tween',
+									duration: disableMotion
+										? 0
+										: ANIMATION_DURATION,
+									ease: 'easeOut',
 								} }
 								className="edit-site-layout__editor-header"
 								ariaLabel={ __( 'Editor top bar' ) }
