@@ -28,9 +28,11 @@ class Tests_Blocks_Render_Post_Title extends WP_UnitTestCase {
 
 	/**
 	 * Setup method.
+	 *
+	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
 	 */
-	public static function wpSetUpBeforeClass() {
-		self::$post = self::factory()->post->create_and_get( array( 'post_title' => 'Post title block Unit Test' ) );
+	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
+		self::$post = $factory->post->create_and_get( array( 'post_title' => 'Post title block Unit Test' ) );
 
 		self::$attributes = array(
 			'textAlign'  => '',
