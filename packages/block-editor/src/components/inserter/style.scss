@@ -279,10 +279,10 @@ $block-inserter-tabs-height: 44px;
 	padding: $grid-unit-20;
 	overflow-y: auto;
 	height: 100%;
-}
-
-.block-editor-inserter__patterns-fill-space {
-	flex-grow: 1;
+	// Push the listitem wrapping the "explore" button to the bottom of the panel.
+	div[role="listitem"]:last-child {
+		margin-top: auto;
+	}
 }
 
 .block-editor-inserter__patterns-category-panel {
@@ -442,7 +442,8 @@ $block-inserter-tabs-height: 44px;
 	}
 
 	&__list {
-		margin-left: $sidebar-width - $grid-unit-40;
+		margin-left: $sidebar-width;
+		padding: $grid-unit-30 0 $grid-unit-40;
 	}
 
 	.block-editor-block-patterns-list {

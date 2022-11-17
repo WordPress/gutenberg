@@ -215,12 +215,6 @@ function BlockPatternsTabs( {
 									</HStack>
 								</Item>
 							) ) }
-
-							<div
-								role="presentation"
-								className="block-editor-inserter__patterns-fill-space"
-							/>
-
 							<div role="listitem">
 								<Button
 									className="block-editor-inserter__patterns-explore-button"

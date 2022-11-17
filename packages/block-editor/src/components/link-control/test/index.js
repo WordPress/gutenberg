@@ -186,8 +186,7 @@ describe( 'Basic rendering', () => {
 		const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
 
 		// Simulate searching for a term.
-		searchInput.focus();
-		await user.keyboard( searchTerm );
+		await user.type( searchInput, searchTerm );
 
 		expect( screen.queryByText( '://' ) ).not.toBeInTheDocument();
 	} );
@@ -328,8 +327,7 @@ describe( 'Searching for a link', () => {
 		const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
 
 		// Simulate searching for a term.
-		searchInput.focus();
-		await user.keyboard( searchTerm );
+		await user.type( searchInput, searchTerm );
 
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 		await eventLoopTick();
@@ -364,8 +362,7 @@ describe( 'Searching for a link', () => {
 		const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
 
 		// Simulate searching for a term.
-		searchInput.focus();
-		await user.keyboard( searchTerm );
+		await user.type( searchInput, searchTerm );
 
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 		await eventLoopTick();
@@ -406,8 +403,7 @@ describe( 'Searching for a link', () => {
 		const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
 
 		// Simulate searching for a term.
-		searchInput.focus();
-		await user.keyboard( searchTerm );
+		await user.type( searchInput, searchTerm );
 
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 		await eventLoopTick();
@@ -447,8 +443,7 @@ describe( 'Searching for a link', () => {
 		const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
 
 		// Simulate searching for a term.
-		searchInput.focus();
-		await user.keyboard( 'anything' );
+		await user.type( searchInput, 'anything' );
 
 		const searchResultsField = screen.queryByRole( 'listbox' );
 
@@ -472,8 +467,7 @@ describe( 'Searching for a link', () => {
 			const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
 
 			// Simulate searching for a term.
-			searchInput.focus();
-			await user.keyboard( searchTerm );
+			await user.type( searchInput, searchTerm );
 
 			// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 			await eventLoopTick();
@@ -510,8 +504,7 @@ describe( 'Searching for a link', () => {
 		const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
 
 		// Simulate searching for a term.
-		searchInput.focus();
-		await user.keyboard( 'couldbeurlorentitysearchterm' );
+		await user.type( searchInput, 'couldbeurlorentitysearchterm' );
 
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 		await eventLoopTick();
@@ -544,8 +537,7 @@ describe( 'Manual link entry', () => {
 			const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
 
 			// Simulate searching for a term.
-			searchInput.focus();
-			await user.keyboard( searchTerm );
+			await user.type( searchInput, searchTerm );
 
 			// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 			await eventLoopTick();
@@ -591,13 +583,12 @@ describe( 'Manual link entry', () => {
 				expect( submitButton ).toBeDisabled();
 				expect( submitButton ).toBeVisible();
 
-				searchInput.focus();
 				if ( searchString.length ) {
 					// Simulate searching for a term.
-					await user.keyboard( searchString );
+					await user.type( searchInput, searchString );
 				} else {
 					// Simulate clearing the search term.
-					await userEvent.clear( searchInput );
+					await user.clear( searchInput );
 				}
 
 				// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
@@ -637,13 +628,12 @@ describe( 'Manual link entry', () => {
 				expect( submitButton ).toBeVisible();
 
 				// Simulate searching for a term.
-				searchInput.focus();
 				if ( searchString.length ) {
 					// Simulate searching for a term.
-					await user.keyboard( searchString );
+					await user.type( searchInput, searchString );
 				} else {
 					// Simulate clearing the search term.
-					await userEvent.clear( searchInput );
+					await user.clear( searchInput );
 				}
 
 				// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
@@ -681,8 +671,7 @@ describe( 'Manual link entry', () => {
 				} );
 
 				// Simulate searching for a term.
-				searchInput.focus();
-				await user.keyboard( searchTerm );
+				await user.type( searchInput, searchTerm );
 
 				// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 				await eventLoopTick();
@@ -796,8 +785,7 @@ describe( 'Default search suggestions', () => {
 		searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
 
 		// Simulate searching for a term.
-		searchInput.focus();
-		await user.keyboard( searchTerm );
+		await user.type( searchInput, searchTerm );
 
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 		await eventLoopTick();
@@ -911,8 +899,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
 
 			// Simulate searching for a term.
-			searchInput.focus();
-			await user.keyboard( entityNameText );
+			await user.type( searchInput, entityNameText );
 
 			await eventLoopTick();
 
@@ -983,8 +970,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
 
 		// Simulate searching for a term.
-		searchInput.focus();
-		await user.keyboard( 'Some new page to create' );
+		await user.type( searchInput, 'Some new page to create' );
 
 		await eventLoopTick();
 
@@ -1039,8 +1025,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
 
 		// Simulate searching for a term.
-		searchInput.focus();
-		await user.keyboard( entityNameText );
+		await user.type( searchInput, entityNameText );
 
 		await eventLoopTick();
 
@@ -1049,18 +1034,16 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 				name: /Search results for.*/,
 			} )
 		).getAllByRole( 'option' );
-		const createButton = Array.from( searchResultElements ).filter(
-			( result ) => result.innerHTML.includes( 'Create:' )
-		)[ 0 ];
+		const createButton = searchResultElements.find( ( result ) =>
+			result.innerHTML.includes( 'Create:' )
+		);
 
 		// Step down into the search results, highlighting the first result item.
 		triggerArrowDown( searchInput );
 
-		createButton.focus();
-		await user.keyboard( '[Enter]' );
+		await user.click( createButton );
 
-		searchInput.focus();
-		await user.keyboard( '[Enter]' );
+		await user.type( searchInput, '[Enter]' );
 
 		await eventLoopTick();
 
@@ -1088,8 +1071,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
 
 		// Simulate searching for a term.
-		searchInput.focus();
-		await user.keyboard( entityNameText );
+		await user.type( searchInput, entityNameText );
 
 		await eventLoopTick();
 
@@ -1167,8 +1149,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 				} );
 
 				// Simulate searching for a term.
-				searchInput.focus();
-				await user.keyboard( inputText );
+				await user.type( searchInput, inputText );
 
 				await eventLoopTick();
 
@@ -1205,8 +1186,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
 
 			// Simulate searching for a term.
-			searchInput.focus();
-			await user.keyboard( searchText );
+			await user.type( searchInput, searchText );
 
 			await eventLoopTick();
 
@@ -1340,8 +1320,7 @@ describe( 'Selecting links', () => {
 				} );
 
 				// Simulate searching for a term.
-				searchInput.focus();
-				await user.keyboard( searchTerm );
+				await user.type( searchInput, searchTerm );
 
 				// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 				await eventLoopTick();
@@ -1406,8 +1385,7 @@ describe( 'Selecting links', () => {
 				} );
 
 				// Simulate searching for a term.
-				searchInput.focus();
-				await user.keyboard( searchTerm );
+				await user.type( searchInput, searchTerm );
 
 				// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 				await eventLoopTick();
@@ -1626,8 +1604,7 @@ describe( 'Post types', () => {
 		const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
 
 		// Simulate searching for a term.
-		searchInput.focus();
-		await user.keyboard( searchTerm );
+		await user.type( searchInput, searchTerm );
 
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 		await eventLoopTick();
@@ -1657,8 +1634,7 @@ describe( 'Post types', () => {
 			const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
 
 			// Simulate searching for a term.
-			searchInput.focus();
-			await user.keyboard( searchTerm );
+			await user.type( searchInput, searchTerm );
 
 			// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 			await eventLoopTick();
@@ -2050,8 +2026,7 @@ describe( 'Controlling link title text', () => {
 
 		const textInput = screen.queryByRole( 'textbox', { name: 'Text' } );
 
-		textInput.focus();
-		await userEvent.clear( textInput );
+		await user.clear( textInput );
 		await user.keyboard( textValue );
 
 		expect( textInput ).toHaveValue( textValue );
@@ -2087,8 +2062,7 @@ describe( 'Controlling link title text', () => {
 
 		expect( textInput ).toBeVisible();
 
-		textInput.focus();
-		await userEvent.clear( textInput );
+		await user.clear( textInput );
 		await user.keyboard( textValue );
 
 		// Attempt to submit the empty search value in the input.
