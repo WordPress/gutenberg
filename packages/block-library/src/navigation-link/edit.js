@@ -12,10 +12,7 @@ import { createBlock, switchToBlockType } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Button,
-	PanelBody,
 	Popover,
-	TextControl,
-	TextareaControl,
 	ToolbarButton,
 	Tooltip,
 	ToolbarGroup,
@@ -26,7 +23,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import {
 	BlockControls,
 	BlockIcon,
-	InspectorControls,
 	RichText,
 	__experimentalLinkControl as LinkControl,
 	useBlockProps,
@@ -54,6 +50,7 @@ import { useMergeRefs } from '@wordpress/compose';
  * Internal dependencies
  */
 import { name } from './block.json';
+import NavigationChildInspectorControls from '../navigation/edit/child-inspector-controls';
 
 /**
  * A React hook to determine if it's dragging within the target element.
@@ -714,44 +711,7 @@ export default function NavigationLinkEdit( {
 					) }
 				</ToolbarGroup>
 			</BlockControls>
-			<InspectorControls>
-				<PanelBody title={ __( 'Link settings' ) }>
-					<TextControl
-						value={ url || '' }
-						onChange={ ( urlValue ) => {
-							setAttributes( { url: urlValue } );
-						} }
-						label={ __( 'URL' ) }
-						autoComplete="off"
-					/>
-					<TextareaControl
-						value={ description || '' }
-						onChange={ ( descriptionValue ) => {
-							setAttributes( { description: descriptionValue } );
-						} }
-						label={ __( 'Description' ) }
-						help={ __(
-							'The description will be displayed in the menu if the current theme supports it.'
-						) }
-					/>
-					<TextControl
-						value={ title || '' }
-						onChange={ ( titleValue ) => {
-							setAttributes( { title: titleValue } );
-						} }
-						label={ __( 'Link title' ) }
-						autoComplete="off"
-					/>
-					<TextControl
-						value={ rel || '' }
-						onChange={ ( relValue ) => {
-							setAttributes( { rel: relValue } );
-						} }
-						label={ __( 'Link rel' ) }
-						autoComplete="off"
-					/>
-				</PanelBody>
-			</InspectorControls>
+			<NavigationChildInspectorControls setAttributes={ setAttributes } url={ url } description={ description } title={ title } rel={ rel } />
 			<div { ...blockProps }>
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
 				<a className={ classes }>

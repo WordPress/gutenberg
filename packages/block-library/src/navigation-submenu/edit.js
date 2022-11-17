@@ -9,10 +9,7 @@ import escapeHtml from 'escape-html';
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	PanelBody,
 	Popover,
-	TextControl,
-	TextareaControl,
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
@@ -22,7 +19,6 @@ import {
 	BlockControls,
 	InnerBlocks,
 	useInnerBlocksProps,
-	InspectorControls,
 	RichText,
 	__experimentalLinkControl as LinkControl,
 	useBlockProps,
@@ -52,6 +48,7 @@ import { useMergeRefs } from '@wordpress/compose';
  */
 import { ItemSubmenuIcon } from './icons';
 import { name } from './block.json';
+import NavigationChildInspectorControls from '../navigation/edit/child-inspector-controls';
 
 const ALLOWED_BLOCKS = [ 'core/navigation-link', 'core/navigation-submenu' ];
 
@@ -568,46 +565,7 @@ export default function NavigationSubmenuEdit( {
 					/>
 				</ToolbarGroup>
 			</BlockControls>
-			<InspectorControls>
-				<PanelBody title={ __( 'Link settings' ) }>
-					<TextControl
-						value={ url || '' }
-						onChange={ ( urlValue ) => {
-							setAttributes( { url: urlValue } );
-						} }
-						label={ __( 'URL' ) }
-						autoComplete="off"
-					/>
-					<TextareaControl
-						value={ description || '' }
-						onChange={ ( descriptionValue ) => {
-							setAttributes( {
-								description: descriptionValue,
-							} );
-						} }
-						label={ __( 'Description' ) }
-						help={ __(
-							'The description will be displayed in the menu if the current theme supports it.'
-						) }
-					/>
-					<TextControl
-						value={ title || '' }
-						onChange={ ( titleValue ) => {
-							setAttributes( { title: titleValue } );
-						} }
-						label={ __( 'Link title' ) }
-						autoComplete="off"
-					/>
-					<TextControl
-						value={ rel || '' }
-						onChange={ ( relValue ) => {
-							setAttributes( { rel: relValue } );
-						} }
-						label={ __( 'Link rel' ) }
-						autoComplete="off"
-					/>
-				</PanelBody>
-			</InspectorControls>
+			<NavigationChildInspectorControls setAttributes={ setAttributes } url={ url } description={ description } title={ title } rel={ rel } />
 			<div { ...blockProps }>
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
 				<ParentElement className="wp-block-navigation-item__content">
