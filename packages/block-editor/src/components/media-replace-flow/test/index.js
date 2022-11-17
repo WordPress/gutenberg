@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -32,6 +32,19 @@ function TestWrapper() {
 	);
 }
 
+/**
+ * Returns the first found popover element up the DOM tree.
+ *
+ * @param {HTMLElement} element Element to start with.
+ * @return {HTMLElement|null} Popover element, or `null` if not found.`
+ */
+function getWrappingPopoverElement( element ) {
+	if ( element.classList.contains( 'components-popover' ) ) {
+		return element;
+	}
+	return getWrappingPopoverElement( element.parentElement );
+}
+
 describe( 'General media replace flow', () => {
 	it( 'renders successfully', () => {
 		render( <TestWrapper /> );
@@ -57,11 +70,23 @@ describe( 'General media replace flow', () => {
 				name: 'Replace',
 			} )
 		);
-
 		const uploadMenu = screen.getByRole( 'menu' );
 
 		expect( uploadMenu ).toBeInTheDocument();
 		expect( uploadMenu ).not.toBeVisible();
+
+		/**
+		 * The popover will be displayed and positioned with a slight delay,
+		 * so we're opting to wait until that happens.
+		 */
+		await waitFor( () =>
+			expect( getWrappingPopoverElement( uploadMenu ) ).toHaveStyle( {
+				top: '13px',
+				left: '0',
+			} )
+		);
+
+		expect( uploadMenu ).toBeVisible();
 	} );
 
 	it( 'displays media URL', async () => {
@@ -76,6 +101,16 @@ describe( 'General media replace flow', () => {
 				expanded: false,
 				name: 'Replace',
 			} )
+		);
+
+		/**
+		 * The popover will be displayed and positioned with a slight delay,
+		 * so we're opting to wait until that happens.
+		 */
+		await waitFor( () =>
+			expect(
+				getWrappingPopoverElement( screen.getByRole( 'menu' ) )
+			).toHaveStyle( { top: '13px', left: '0' } )
 		);
 
 		expect(
@@ -97,6 +132,16 @@ describe( 'General media replace flow', () => {
 				expanded: false,
 				name: 'Replace',
 			} )
+		);
+
+		/**
+		 * The popover will be displayed and positioned with a slight delay,
+		 * so we're opting to wait until that happens.
+		 */
+		await waitFor( () =>
+			expect(
+				getWrappingPopoverElement( screen.getByRole( 'menu' ) )
+			).toHaveStyle( { top: '13px', left: '0' } )
 		);
 
 		await user.click(
