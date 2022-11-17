@@ -9,8 +9,8 @@ import classnames from 'classnames';
 import {
 	InspectorControls,
 	BlockControls,
-	InnerBlocks,
 	useBlockProps,
+	useInnerBlocksProps,
 	getColorClassName,
 } from '@wordpress/block-editor';
 import {
@@ -90,7 +90,12 @@ export default function PageListEdit( {
 		}, [] );
 	};
 
-	const pagesTemplate = makeBlockTemplate( parentPageID );
+	const pagesTemplate = useMemo( makeBlockTemplate, [ pagesByParentId ] );
+
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		template: pagesTemplate,
+		templateLock: 'all',
+	} );
 
 	const getBlockContent = () => {
 		if ( ! hasResolvedPages ) {
@@ -122,14 +127,7 @@ export default function PageListEdit( {
 		}
 
 		if ( totalPages > 0 ) {
-			return (
-				<ul { ...blockProps }>
-					<InnerBlocks
-						template={ pagesTemplate }
-						templateLock="all"
-					/>
-				</ul>
-			);
+			return <ul { ...innerBlocksProps }></ul>;
 		}
 	};
 
