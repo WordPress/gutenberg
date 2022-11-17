@@ -693,48 +693,54 @@ function Navigation( {
 	const isManageMenusButtonDisabled =
 		! hasManagePermissions || ! hasResolvedNavigationMenus;
 
+	const MenuInspectorControls = ( { currentMenuId = null } ) => (
+		<InspectorControls>
+			<PanelBody
+				title={
+					isOffCanvasNavigationEditorEnabled ? null : __( 'Menu' )
+				}
+			>
+				{ isOffCanvasNavigationEditorEnabled ? (
+					<>
+						<HStack className="wp-block-navigation-off-canvas-editor__header">
+							<Heading
+								className="wp-block-navigation-off-canvas-editor__title"
+								level={ 2 }
+							>
+								{ __( 'Menu' ) }
+							</Heading>
+							<WrappedNavigationMenuSelector
+								currentMenuId={ currentMenuId }
+							/>
+						</HStack>
+						{ currentMenuId && isNavigationMenuMissing ? (
+							<p>{ __( 'Select or create a menu' ) }</p>
+						) : (
+							<OffCanvasEditor
+								blocks={ innerBlocks }
+								isExpanded={ true }
+								selectBlockInCanvas={ false }
+							/>
+						) }
+					</>
+				) : (
+					<>
+						<WrappedNavigationMenuSelector
+							currentMenuId={ currentMenuId }
+						/>
+						<ManageMenusButton
+							disabled={ isManageMenusButtonDisabled }
+						/>
+					</>
+				) }
+			</PanelBody>
+		</InspectorControls>
+	);
+
 	if ( hasUnsavedBlocks && ! isCreatingNavigationMenu ) {
 		return (
 			<TagName { ...blockProps }>
-				<InspectorControls>
-					<PanelBody
-						title={
-							isOffCanvasNavigationEditorEnabled
-								? null
-								: __( 'Menu' )
-						}
-					>
-						{ isOffCanvasNavigationEditorEnabled ? (
-							<>
-								<HStack className="wp-block-navigation-off-canvas-editor__header">
-									<Heading
-										className="wp-block-navigation-off-canvas-editor__title"
-										level={ 2 }
-									>
-										{ __( 'Menu' ) }
-									</Heading>
-									<WrappedNavigationMenuSelector
-										currentMenuId={ ref }
-									/>
-								</HStack>
-								<OffCanvasEditor
-									blocks={ innerBlocks }
-									isExpanded={ true }
-									selectBlockInCanvas={ false }
-								/>
-							</>
-						) : (
-							<>
-								<WrappedNavigationMenuSelector
-									currentMenuId={ ref }
-								/>
-								<ManageMenusButton
-									disabled={ isManageMenusButtonDisabled }
-								/>
-							</>
-						) }
-					</PanelBody>
-				</InspectorControls>
+				<MenuInspectorControls currentMenuId={ ref } />
 				{ stylingInspectorControls }
 				<ResponsiveWrapper
 					id={ clientId }
@@ -764,41 +770,7 @@ function Navigation( {
 	if ( ref && isNavigationMenuMissing ) {
 		return (
 			<TagName { ...blockProps }>
-				<InspectorControls>
-					<PanelBody
-						title={
-							isOffCanvasNavigationEditorEnabled
-								? null
-								: __( 'Menu' )
-						}
-					>
-						{ isOffCanvasNavigationEditorEnabled ? (
-							<>
-								<HStack className="wp-block-navigation-off-canvas-editor__header">
-									<Heading
-										className="wp-block-navigation-off-canvas-editor__title"
-										level={ 2 }
-									>
-										{ __( 'Menu' ) }
-									</Heading>
-									<WrappedNavigationMenuSelector
-										currentMenuId={ null }
-									/>
-								</HStack>
-								<p>Select or create a menu</p>
-							</>
-						) : (
-							<>
-								<WrappedNavigationMenuSelector
-									currentMenuId={ null }
-								/>
-								<ManageMenusButton
-									disabled={ isManageMenusButtonDisabled }
-								/>
-							</>
-						) }
-					</PanelBody>
-				</InspectorControls>
+				<MenuInspectorControls />
 				<Warning>
 					{ __(
 						'Navigation menu has been deleted or is unavailable. '
@@ -873,45 +845,7 @@ function Navigation( {
 	return (
 		<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
 			<RecursionProvider uniqueId={ recursionId }>
-				<InspectorControls>
-					<PanelBody
-						title={
-							isOffCanvasNavigationEditorEnabled
-								? null
-								: __( 'Menu' )
-						}
-					>
-						{ isOffCanvasNavigationEditorEnabled ? (
-							<>
-								<HStack className="wp-block-navigation-off-canvas-editor__header">
-									<Heading
-										className="wp-block-navigation-off-canvas-editor__title"
-										level={ 2 }
-									>
-										{ __( 'Menu' ) }
-									</Heading>
-									<WrappedNavigationMenuSelector
-										currentMenuId={ ref }
-									/>
-								</HStack>
-								<OffCanvasEditor
-									blocks={ innerBlocks }
-									isExpanded={ true }
-									selectBlockInCanvas={ false }
-								/>
-							</>
-						) : (
-							<>
-								<WrappedNavigationMenuSelector
-									currentMenuId={ ref }
-								/>
-								<ManageMenusButton
-									disabled={ isManageMenusButtonDisabled }
-								/>
-							</>
-						) }
-					</PanelBody>
-				</InspectorControls>
+				<MenuInspectorControls currentMenuId={ ref } />
 				{ stylingInspectorControls }
 				{ isEntityAvailable && (
 					<InspectorControls __experimentalGroup="advanced">
