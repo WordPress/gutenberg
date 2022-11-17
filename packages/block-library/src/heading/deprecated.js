@@ -11,6 +11,7 @@ import {
 	RichText,
 	useBlockProps,
 } from '@wordpress/block-editor';
+import { compose } from '@wordpress/compose';
 
 const blockSupports = {
 	className: false,
@@ -63,6 +64,14 @@ const migrateTextAlign = ( attributes ) => {
 		: attributes;
 };
 
+// Migrate the old level attribute (number) to the corresponding HTML tag (string).
+const migrateLevel = ( attributes ) => {
+	return {
+		...attributes,
+		level: 'h' + attributes.level,
+	};
+};
+
 const deprecated = [
 	// Version where the heading level attribute is a number, not a string.
 	{
@@ -84,7 +93,7 @@ const deprecated = [
 			__unstablePasteTextInline: true,
 		},
 		attributes: blockAttributes,
-		migrate: migrateTextAlign,
+		migrate: compose( migrateLevel, migrateTextAlign ),
 		save( { attributes } ) {
 			const { textAlign, content, level } = attributes;
 			const TagName = 'h' + level;
