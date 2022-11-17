@@ -15,9 +15,6 @@ import {
 	Button,
 	ButtonGroup,
 	ToggleControl,
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-	__experimentalUnitControl as UnitControl,
 	PanelBody,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -131,16 +128,8 @@ export function useLayoutStyles( block = {}, selector ) {
 	return css;
 }
 
-function LayoutPanel( {
-	setAttributes,
-	attributes,
-	name: blockName,
-	__unstableParentLayout: parentLayout,
-} ) {
-	const { layout, style = {} } = attributes;
-	const { layout: childLayout = {} } = style;
-	const { selfStretch, flexSize } = childLayout;
-	const { type: parentLayoutType = 'default' } = parentLayout;
+function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
+	const { layout } = attributes;
 
 	const defaultThemeLayout = useSetting( 'layout' );
 	const themeSupportsLayout = useSelect( ( select ) => {
@@ -160,7 +149,7 @@ function LayoutPanel( {
 		default: defaultBlockLayout,
 	} = layoutBlockSupport;
 
-	if ( ! allowEditing && parentLayoutType !== 'flex' ) {
+	if ( ! allowEditing ) {
 		return null;
 	}
 
@@ -208,123 +197,61 @@ function LayoutPanel( {
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Layout' ) }>
-					{ allowEditing && (
+					{ showInheritToggle && (
 						<>
-							{ showInheritToggle && (
-								<>
-									<ToggleControl
-										className="block-editor-hooks__toggle-control"
-										label={ __(
-											'Inner blocks use content width'
-										) }
-										checked={
-											layoutType?.name ===
-												'constrained' ||
-											hasContentSizeOrLegacySettings
-										}
-										onChange={ () =>
-											setAttributes( {
-												layout: {
-													type:
-														layoutType?.name ===
-															'constrained' ||
-														hasContentSizeOrLegacySettings
-															? 'default'
-															: 'constrained',
-												},
-											} )
-										}
-										help={
-											layoutType?.name ===
-												'constrained' ||
-											hasContentSizeOrLegacySettings
-												? __(
-														'Nested blocks use content width with options for full and wide widths.'
-												  )
-												: __(
-														'Nested blocks will fill the width of this container. Toggle to constrain.'
-												  )
-										}
-									/>
-								</>
-							) }
-
-							{ ! inherit && allowSwitching && (
-								<LayoutTypeSwitcher
-									type={ type }
-									onChange={ onChangeType }
-								/>
-							) }
-
-							{ layoutType && layoutType.name !== 'default' && (
-								<layoutType.inspectorControls
-									layout={ usedLayout }
-									onChange={ onChangeLayout }
-									layoutBlockSupport={ layoutBlockSupport }
-								/>
-							) }
-							{ constrainedType &&
-								displayControlsForLegacyLayouts && (
-									<constrainedType.inspectorControls
-										layout={ usedLayout }
-										onChange={ onChangeLayout }
-										layoutBlockSupport={
-											layoutBlockSupport
-										}
-									/>
-								) }
+							<ToggleControl
+								className="block-editor-hooks__toggle-control"
+								label={ __( 'Inner blocks use content width' ) }
+								checked={
+									layoutType?.name === 'constrained' ||
+									hasContentSizeOrLegacySettings
+								}
+								onChange={ () =>
+									setAttributes( {
+										layout: {
+											type:
+												layoutType?.name ===
+													'constrained' ||
+												hasContentSizeOrLegacySettings
+													? 'default'
+													: 'constrained',
+										},
+									} )
+								}
+								help={
+									layoutType?.name === 'constrained' ||
+									hasContentSizeOrLegacySettings
+										? __(
+												'Nested blocks use content width with options for full and wide widths.'
+										  )
+										: __(
+												'Nested blocks will fill the width of this container. Toggle to constrain.'
+										  )
+								}
+							/>
 						</>
 					) }
-					{ parentLayoutType === 'flex' && (
-						<>
-							<ToggleGroupControl
-								label={ __( 'Relative size' ) }
-								value={ selfStretch || 'hug' }
-								onChange={ ( value ) => {
-									setAttributes( {
-										style: {
-											layout: {
-												...childLayout,
-												selfStretch: value,
-											},
-										},
-									} );
-								} }
-								isBlock={ true }
-							>
-								<ToggleGroupControlOption
-									key={ 'hug' }
-									value={ 'hug' }
-									label={ __( 'Hug' ) }
-								/>
-								<ToggleGroupControlOption
-									key={ 'fill' }
-									value={ 'fill' }
-									label={ __( 'Fill' ) }
-								/>
-								<ToggleGroupControlOption
-									key={ 'fixed' }
-									value={ 'fixed' }
-									label={ __( 'Fixed' ) }
-								/>
-							</ToggleGroupControl>
-							{ selfStretch === 'fixed' && (
-								<UnitControl
-									onChange={ ( value ) => {
-										setAttributes( {
-											style: {
-												...style,
-												layout: {
-													...childLayout,
-													flexSize: value,
-												},
-											},
-										} );
-									} }
-									value={ flexSize }
-								/>
-							) }
-						</>
+
+					{ ! inherit && allowSwitching && (
+						<LayoutTypeSwitcher
+							type={ type }
+							onChange={ onChangeType }
+						/>
+					) }
+
+					{ layoutType && layoutType.name !== 'default' && (
+						<layoutType.inspectorControls
+							layout={ usedLayout }
+							onChange={ onChangeLayout }
+							layoutBlockSupport={ layoutBlockSupport }
+						/>
+					) }
+					{ constrainedType && displayControlsForLegacyLayouts && (
+						<constrainedType.inspectorControls
+							layout={ usedLayout }
+							onChange={ onChangeLayout }
+							layoutBlockSupport={ layoutBlockSupport }
+						/>
 					) }
 				</PanelBody>
 			</InspectorControls>
@@ -389,18 +316,14 @@ export function addAttribute( settings ) {
  */
 export const withInspectorControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const { name: blockName, __unstableParentLayout: parentLayout } = props;
+		const { name: blockName } = props;
 		const supportLayout = hasBlockSupport(
 			blockName,
 			layoutBlockSupportKey
 		);
 
-		const { type = 'default' } = parentLayout;
-
 		return [
-			( type === 'flex' || supportLayout ) && (
-				<LayoutPanel key="layout" { ...props } />
-			),
+			supportLayout && <LayoutPanel key="layout" { ...props } />,
 			<BlockEdit key="edit" { ...props } />,
 		];
 	},
@@ -524,6 +447,7 @@ export const withChildLayoutStyles = createHigherOrderComponent(
 			css += `${ selector } {
 				flex-shrink: 0;
 				flex-basis: ${ flexSize };
+				box-sizing: border-box;
 			}`;
 		} else if ( selfStretch === 'fill' ) {
 			css += `${ selector } {

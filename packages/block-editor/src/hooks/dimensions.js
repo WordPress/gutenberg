@@ -46,6 +46,14 @@ import {
 	resetPadding,
 	useIsPaddingDisabled,
 } from './padding';
+import {
+	ChildLayoutEdit,
+	hasChildLayoutSupport,
+	hasChildLayoutValue,
+	resetChildLayout,
+	useIsChildLayoutDisabled,
+	childLayoutOrientation,
+} from './child-layout';
 import useSetting from '../components/use-setting';
 import { store as blockEditorStore } from '../store';
 
@@ -85,8 +93,9 @@ export function DimensionsPanel( props ) {
 	const isPaddingDisabled = useIsPaddingDisabled( props );
 	const isMarginDisabled = useIsMarginDisabled( props );
 	const isMinHeightDisabled = useIsMinHeightDisabled( props );
+	const isChildLayoutDisabled = useIsChildLayoutDisabled( props );
 	const isDisabled = useIsDimensionsDisabled( props );
-	const isSupported = hasDimensionsSupport( props.name );
+	const isSupported = hasDimensionsSupport( props );
 	const spacingSizes = useSetting( 'spacing.spacingSizes' );
 	const paddingMouseOver = useVisualizerMouseOver();
 	const marginMouseOver = useVisualizerMouseOver();
@@ -120,6 +129,8 @@ export function DimensionsPanel( props ) {
 	const spacingClassnames = classnames( {
 		'tools-panel-item-spacing': spacingSizes && spacingSizes.length > 0,
 	} );
+
+	const { __unstableParentLayout: parentLayout } = props;
 
 	return (
 		<>
@@ -198,6 +209,21 @@ export function DimensionsPanel( props ) {
 						<MinHeightEdit { ...props } />
 					</ToolsPanelItem>
 				) }
+				{ ! isChildLayoutDisabled && (
+					<ToolsPanelItem
+						hasValue={ () => hasChildLayoutValue( props ) }
+						label={ childLayoutOrientation( parentLayout ) }
+						onDeselect={ () => resetChildLayout( props ) }
+						resetAllFilter={ createResetAllFilter(
+							'selfStretch',
+							'layout'
+						) }
+						isShownByDefault={ false }
+						panelId={ props.clientId }
+					>
+						<ChildLayoutEdit { ...props } />
+					</ToolsPanelItem>
+				) }
 			</InspectorControls>
 			{ ! isPaddingDisabled && (
 				<PaddingVisualizer
@@ -218,20 +244,23 @@ export function DimensionsPanel( props ) {
 /**
  * Determine whether there is dimensions related block support.
  *
- * @param {string} blockName Block name.
+ * @param {Object} props Block props.
  *
  * @return {boolean} Whether there is support.
  */
-export function hasDimensionsSupport( blockName ) {
+export function hasDimensionsSupport( props ) {
 	if ( Platform.OS !== 'web' ) {
 		return false;
 	}
+
+	const { name: blockName } = props;
 
 	return (
 		hasGapSupport( blockName ) ||
 		hasMinHeightSupport( blockName ) ||
 		hasPaddingSupport( blockName ) ||
-		hasMarginSupport( blockName )
+		hasMarginSupport( blockName ) ||
+		hasChildLayoutSupport( props )
 	);
 }
 
