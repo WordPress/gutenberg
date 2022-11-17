@@ -21,6 +21,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
+import { NavigableRegion } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -171,26 +172,24 @@ export default function Layout() {
 					</div>
 					<AnimatePresence>
 						{ isEditorPage && canvasMode === 'edit' && (
-							<motion.div
-								initial={ { y: -60 } }
-								animate={ { y: 0 } }
-								exit={ {
-									y: -60,
-									position: 'fixed',
-									right: 0,
-									left: 60,
+							<NavigableRegion
+								motionProps={ {
+									initial: { y: -60 },
+									animate: { y: 0 },
+									exit: { y: -60 },
+									transition: {
+										type: 'tween',
+										duration: disableMotion
+											? 0
+											: ANIMATION_DURATION,
+										ease: 'easeOut',
+									},
 								} }
-								style={ { flexGrow: '1' } }
-								transition={ {
-									type: 'tween',
-									duration: disableMotion
-										? 0
-										: ANIMATION_DURATION,
-									ease: 'easeOut',
-								} }
+								className="edit-site-layout__editor-header"
+								ariaLabel={ __( 'Editor top bar' ) }
 							>
 								<Header />
-							</motion.div>
+							</NavigableRegion>
 						) }
 					</AnimatePresence>
 				</div>

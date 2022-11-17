@@ -59,6 +59,17 @@
 	}
 }
 
+.edit-site-layout__editor-header {
+	flex-grow: 1;
+
+	// This is only necessary for the exit animation
+	.edit-site-layout:not(.is-full-canvas) & {
+		position: fixed;
+		left: 60px;
+		right: 0;
+	}
+}
+
 .edit-site-layout__canvas-container {
 	grid-area: canvas;
 	position: relative;
