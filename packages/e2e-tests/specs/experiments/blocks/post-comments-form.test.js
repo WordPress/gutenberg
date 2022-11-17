@@ -6,6 +6,7 @@ import {
 	activateTheme,
 	setOption,
 	visitSiteEditor,
+	enterEditMode,
 	deleteAllTemplates,
 	canvas,
 } from '@wordpress/e2e-test-utils';
@@ -29,6 +30,7 @@ describe( 'Post Comments Form', () => {
 			await expect( page ).toClick( '.components-heading > a', {
 				text: /singular/i,
 			} );
+			await enterEditMode();
 
 			// Insert post comments form
 			await insertBlock( 'Post Comments Form' );
