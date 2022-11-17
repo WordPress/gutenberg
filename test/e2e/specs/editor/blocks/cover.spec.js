@@ -150,7 +150,9 @@ test.describe( 'Cover', () => {
 			.click();
 
 		// Open the block list viewer and select child paragraph within the cover block.
-		await page.locator( '[aria-label="List View"]' ).click();
+		await page
+			.locator( 'button.edit-post-header-toolbar__list-view-toggle' )
+			.click();
 		await page
 			.locator(
 				'[aria-label="Block navigation structure"] [aria-label="Cover link"]'
