@@ -28,6 +28,11 @@ import { listView } from '@wordpress/icons';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as interfaceStore } from '@wordpress/interface';
+import {
+	getBlockType,
+	getBlockFromExample,
+	createBlock,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -45,6 +50,62 @@ const LAYOUT = {
 	// At the root level of the site editor, no alignments should be allowed.
 	alignments: [],
 };
+
+/* @TEST */
+
+function getGlobalStylesPreviewBlocks() {
+	const group = getBlockType( 'core/group' );
+	const heading = getBlockType( 'core/heading' );
+	const paragraph = getBlockType( 'core/paragraph' );
+	const image = getBlockType( 'core/image' );
+
+	if (
+		! group?.name ||
+		! heading?.name ||
+		! paragraph?.name ||
+		! image?.name
+	) {
+		return null;
+	}
+
+	const headings = [ 1, 2, 3, 4, 5, 6 ].map( ( level ) =>
+		createBlock( heading?.name, {
+			content: `Heading H${ level }`,
+			level,
+		} )
+	);
+
+	const paragraphBlock = getBlockFromExample( paragraph?.name, {
+		attributes: paragraph?.example?.attributes,
+		innerBlocks: paragraph?.example?.innerBlocks,
+	} );
+
+	const imageBlock = getBlockFromExample( image?.name, {
+		attributes: image?.example?.attributes,
+		innerBlocks: image?.example?.innerBlocks,
+	} );
+
+	// const headingBlock = createBlock(
+	// 	heading?.name,
+	// 	heading?.example?.attributes,
+	// 	heading?.example?.innerBlocks
+	// );
+	// const paragraphBlock = createBlock(
+	// 	paragraph?.name,
+	// 	paragraph?.example?.attributes,
+	// 	paragraph?.example?.innerBlocks
+	// );
+
+	const blocks = createBlock( group?.name, group?.example?.attributes, [
+		...headings,
+		paragraphBlock,
+		imageBlock,
+	] );
+
+	return [ blocks ];
+}
+
+/* @TEST */
 
 const NAVIGATION_SIDEBAR_NAME = 'edit-site/navigation-menu';
 
@@ -73,7 +134,6 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		},
 		[ setIsInserterOpen ]
 	);
-
 	const settingsBlockPatterns =
 		storedSettings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
 		storedSettings.__experimentalBlockPatterns; // WP 5.9
@@ -181,11 +241,16 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	if ( process.env.IS_GUTENBERG_PLUGIN ) {
 		MaybeNavMenuSidebarToggle = NavMenuSidebarToggle;
 	}
+const isGlobalStylesPreviewOn = false;
 
 	return (
 		<BlockEditorProvider
 			settings={ settings }
-			value={ blocks }
+			value={
+				isGlobalStylesPreviewOn
+					? getGlobalStylesPreviewBlocks()
+					: blocks
+			}
 			onInput={ onInput }
 			onChange={ onChange }
 			useSubRegistry={ false }
