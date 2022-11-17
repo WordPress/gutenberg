@@ -2039,22 +2039,21 @@ export const getInserterItems = createSelector(
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional root client ID of block list.
  *
- * @return {string[]} Array of allowed block names, stripped of their namespace prefix(`core/`).
+ * @return {string[]} Array of allowed core block names.
  */
 export const __getAllowedCoreBlockNames = createSelector(
 	( state, rootClientId = null ) => {
-		const corePrefix = 'core/';
 		return getBlockTypes()
 			.filter(
 				( blockType ) =>
-					blockType.name.startsWith( corePrefix ) &&
+					blockType.name.startsWith( 'core/' ) &&
 					canIncludeBlockTypeInInserter(
 						state,
 						blockType,
 						rootClientId
 					)
 			)
-			.map( ( { name } ) => name.substring( corePrefix.length ) );
+			.map( ( { name } ) => name );
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
