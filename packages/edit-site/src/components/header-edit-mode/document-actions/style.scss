@@ -53,6 +53,7 @@
 		opacity: 0;
 		padding: 0;
 		transition: all ease 0.2s;
+		filter: brightness(0.95);
 		background: rgba(var(--wp-block-synced-color--rgb), 0.3);
 		border-radius: 2px;
 		@include reduce-motion(transition);
