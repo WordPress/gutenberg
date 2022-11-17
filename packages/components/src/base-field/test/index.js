@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -14,36 +14,46 @@ const TestField = ( props ) => {
 };
 
 describe( 'base field', () => {
-	let base;
-
-	beforeEach( () => {
-		base = render( <TestField /> ).container;
-	} );
-
 	it( 'should render correctly', () => {
-		expect( base.firstChild ).toMatchSnapshot();
+		const { container } = render( <TestField /> );
+		expect( container ).toMatchSnapshot();
 	} );
 
 	describe( 'props', () => {
 		it( 'should render error styles', () => {
-			const { container } = render( <TestField hasError /> );
-			expect( container.firstChild ).toMatchStyleDiffSnapshot(
-				base.firstChild
+			render(
+				<>
+					<TestField data-testid="base-field" />
+					<TestField hasError data-testid="base-field-error" />
+				</>
 			);
+			expect(
+				screen.getByTestId( 'base-field-error' )
+			).toMatchStyleDiffSnapshot( screen.getByTestId( 'base-field' ) );
 		} );
 
 		it( 'should render inline styles', () => {
-			const { container } = render( <TestField isInline /> );
-			expect( container.firstChild ).toMatchStyleDiffSnapshot(
-				base.firstChild
+			render(
+				<>
+					<TestField data-testid="base-field" />
+					<TestField isInline data-testid="base-field-inline" />
+				</>
 			);
+			expect(
+				screen.getByTestId( 'base-field-inline' )
+			).toMatchStyleDiffSnapshot( screen.getByTestId( 'base-field' ) );
 		} );
 
 		it( 'should render subtle styles', () => {
-			const { container } = render( <TestField isSubtle /> );
-			expect( container.firstChild ).toMatchStyleDiffSnapshot(
-				base.firstChild
+			render(
+				<>
+					<TestField data-testid="base-field" />
+					<TestField isSubtle data-testid="base-field-subtle" />
+				</>
 			);
+			expect(
+				screen.getByTestId( 'base-field-subtle' )
+			).toMatchStyleDiffSnapshot( screen.getByTestId( 'base-field' ) );
 		} );
 	} );
 

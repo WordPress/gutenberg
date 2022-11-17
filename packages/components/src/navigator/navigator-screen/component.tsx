@@ -4,12 +4,13 @@
 import type { ForwardedRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { motion, MotionProps } from 'framer-motion';
+import { css } from '@emotion/react';
 
 /**
  * WordPress dependencies
  */
 import { focus } from '@wordpress/dom';
-import { useContext, useEffect, useRef } from '@wordpress/element';
+import { useContext, useEffect, useMemo, useRef } from '@wordpress/element';
 import {
 	useReducedMotion,
 	useMergeRefs,
@@ -26,6 +27,7 @@ import {
 	useContextSystem,
 	WordPressComponentProps,
 } from '../../ui/context';
+import { useCx } from '../../utils/hooks/use-cx';
 import { View } from '../../view';
 import { NavigatorContext } from '../context';
 import type { NavigatorScreenProps } from '../types';
@@ -58,6 +60,27 @@ function UnconnectedNavigatorScreen(
 
 	const previousLocation = usePrevious( location );
 
+	const cx = useCx();
+	const classes = useMemo(
+		() =>
+			cx(
+				css( {
+					// Ensures horizontal overflow is visually accessible.
+					overflowX: 'auto',
+					// In case the root has a height, it should not be exceeded.
+					maxHeight: '100%',
+				} ),
+				className
+			),
+		[ className, cx ]
+	);
+
+	const locationRef = useRef( location );
+
+	useEffect( () => {
+		locationRef.current = location;
+	}, [ location ] );
+
 	// Focus restoration
 	const isInitialLocation = location.isInitial && ! location.isBack;
 	useEffect( () => {
@@ -70,7 +93,7 @@ function UnconnectedNavigatorScreen(
 			isInitialLocation ||
 			! isMatch ||
 			! wrapperRef.current ||
-			location.hasRestoredFocus
+			locationRef.current.hasRestoredFocus
 		) {
 			return;
 		}
@@ -102,12 +125,11 @@ function UnconnectedNavigatorScreen(
 			elementToFocus = firstTabbable ?? wrapperRef.current;
 		}
 
-		location.hasRestoredFocus = true;
+		locationRef.current.hasRestoredFocus = true;
 		elementToFocus.focus();
 	}, [
 		isInitialLocation,
 		isMatch,
-		location.hasRestoredFocus,
 		location.isBack,
 		previousLocation?.focusTargetSelector,
 	] );
@@ -122,7 +144,7 @@ function UnconnectedNavigatorScreen(
 		return (
 			<View
 				ref={ mergedWrapperRef }
-				className={ className }
+				className={ classes }
 				{ ...otherProps }
 			>
 				{ children }
@@ -168,7 +190,7 @@ function UnconnectedNavigatorScreen(
 	return (
 		<motion.div
 			ref={ mergedWrapperRef }
-			className={ className }
+			className={ classes }
 			{ ...otherProps }
 			{ ...animatedProps }
 		>

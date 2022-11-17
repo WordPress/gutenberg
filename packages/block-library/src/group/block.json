@@ -41,6 +41,9 @@
 				"blockGap": true
 			}
 		},
+		"dimensions": {
+			"minHeight": true
+		},
 		"__experimentalBorder": {
 			"color": true,
 			"radius": true,

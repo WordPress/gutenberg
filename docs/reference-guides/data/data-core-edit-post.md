@@ -433,8 +433,7 @@ Update a metabox.
 
 ### setAvailableMetaBoxesPerLocation
 
-Returns an action object used in signaling
-what Meta boxes are available in which location.
+Stores info about which Meta boxes are available in which location.
 
 _Parameters_
 

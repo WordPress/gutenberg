@@ -40,36 +40,32 @@ const meta: ComponentMeta< typeof Card > = {
 
 export default meta;
 
-const Template: ComponentStory< typeof Card > = ( args ) => {
-	return (
-		<div style={ { maxWidth: '280px' } }>
-			<Card { ...args }>
-				<CardHeader>
-					<Heading>CardHeader</Heading>
-				</CardHeader>
-				<CardBody>
-					<Text>CardBody</Text>
-				</CardBody>
-				<CardBody>
-					<Text>CardBody (before CardDivider)</Text>
-				</CardBody>
-				<CardDivider />
-				<CardBody>
-					<Text>CardBody (after CardDivider)</Text>
-				</CardBody>
-				<CardMedia>
-					<img
-						alt="Card Media"
-						src="https://images.unsplash.com/photo-1566125882500-87e10f726cdc?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1867&q=80"
-					/>
-				</CardMedia>
-				<CardFooter>
-					<Text>CardFooter</Text>
-					<Button variant="secondary">Action Button</Button>
-				</CardFooter>
-			</Card>
-		</div>
-	);
-};
+const Template: ComponentStory< typeof Card > = ( args ) => (
+	<Card { ...args }>
+		<CardHeader>
+			<Heading>CardHeader</Heading>
+		</CardHeader>
+		<CardBody>
+			<Text>CardBody</Text>
+		</CardBody>
+		<CardBody>
+			<Text>CardBody (before CardDivider)</Text>
+		</CardBody>
+		<CardDivider />
+		<CardBody>
+			<Text>CardBody (after CardDivider)</Text>
+		</CardBody>
+		<CardMedia>
+			<img
+				alt="Card Media"
+				src="https://images.unsplash.com/photo-1566125882500-87e10f726cdc?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1867&q=80"
+			/>
+		</CardMedia>
+		<CardFooter>
+			<Text>CardFooter</Text>
+			<Button variant="secondary">Action Button</Button>
+		</CardFooter>
+	</Card>
+);
 
 export const Default: ComponentStory< typeof Card > = Template.bind( {} );

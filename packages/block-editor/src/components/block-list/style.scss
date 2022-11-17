@@ -174,7 +174,7 @@
 	// With `position: static`, Safari marks a full-width selection rectangle, including margins.
 	// With `position: relative`, Safari marks an inline selection rectangle, similar to that of
 	// Blink based browsers, but it also does "crop" the marker, which can result in a small line
-	// from the preceeding paragraph showing, which is effectively the above selection bleeding in.
+	// from the preceding paragraph showing, which is effectively the above selection bleeding in.
 	// We choose relative, as that matches the multi-selection, which is limited to the block footprint.
 	position: relative;
 
@@ -290,11 +290,16 @@
 			cursor: unset;
 		}
 
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color); // Selected not focussed.
-		border-radius: $radius-block-ui;
-
-		&:focus {
-			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		&::after {
+			content: "";
+			position: absolute;
+			pointer-events: none;
+			top: $border-width;
+			left: $border-width;
+			right: $border-width;
+			bottom: $border-width;
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			border-radius: $radius-block-ui;
 		}
 	}
 }

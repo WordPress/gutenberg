@@ -16,13 +16,20 @@
  */
 class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	/**
-	 * Define which defines which pseudo selectors are enabled for
-	 * which elements.
-	 * Note: this will effect both top level and block level elements.
+	 * Defines which pseudo selectors are enabled for which elements.
+	 *
+	 * The order of the selectors should be: visited, hover, focus, active.
+	 * This is to ensure that 'visited' has the lowest specificity
+	 * and the other selectors can always overwrite it.
+	 *
+	 * See https://core.trac.wordpress.org/ticket/56928.
+	 * Note: this will affect both top-level and block-level elements.
+	 *
+	 * @since 6.1.0
 	 */
 	const VALID_ELEMENT_PSEUDO_SELECTORS = array(
-		'link'   => array( ':hover', ':focus', ':active', ':visited' ),
-		'button' => array( ':hover', ':focus', ':active', ':visited' ),
+		'link'   => array( ':visited', ':hover', ':focus', ':active' ),
+		'button' => array( ':visited', ':hover', ':focus', ':active' ),
 	);
 
 	/**
@@ -769,6 +776,51 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	}
 
 	/**
+	 * Returns a filtered declarations array if there is a separator block with only a background
+	 * style defined in theme.json by adding a color attribute to reflect the changes in the front.
+	 *
+	 * @param array $declarations List of declarations.
+	 *
+	 * @return array $declarations List of declarations filtered.
+	 */
+	private static function update_separator_declarations( $declarations ) {
+		$background_matches = array_values(
+			array_filter(
+				$declarations,
+				function( $declaration ) {
+					return 'background-color' === $declaration['name'];
+				}
+			)
+		);
+		if ( ! empty( $background_matches && isset( $background_matches[0]['value'] ) ) ) {
+			$border_color_matches = array_values(
+				array_filter(
+					$declarations,
+					function( $declaration ) {
+						return 'border-color' === $declaration['name'];
+					}
+				)
+			);
+			$text_color_matches   = array_values(
+				array_filter(
+					$declarations,
+					function( $declaration ) {
+						return 'color' === $declaration['name'];
+					}
+				)
+			);
+			if ( empty( $border_color_matches ) && empty( $text_color_matches ) ) {
+				$declarations[] = array(
+					'name'  => 'color',
+					'value' => $background_matches[0]['value'],
+				);
+			}
+		}
+
+		return $declarations;
+	}
+
+	/**
 	 * Gets the CSS rules for a particular block from theme.json.
 	 *
 	 * @param array $block_metadata Metadata about the block to get styles for.
@@ -854,6 +906,11 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 				unset( $declarations[ $index ] );
 				$declarations_duotone[] = $declaration;
 			}
+		}
+
+		// Update declarations if there are separators with only background color defined.
+		if ( '.wp-block-separator' === $selector ) {
+			$declarations = static::update_separator_declarations( $declarations );
 		}
 
 		// 2. Generate and append the rules that use the general selector.
@@ -1090,7 +1147,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 	 * @param array $styles Styles subtree.
 	 * @param array $path   Which property to process.
 	 * @param array $theme_json Theme JSON array.
-	 * @return string Style property value.
+	 * @return string|array|null Style property value.
 	 */
 	protected static function get_property_value( $styles, $path, $theme_json = null ) {
 		$value = _wp_array_get( $styles, $path );
@@ -1113,7 +1170,7 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 			}
 		}
 
-		if ( is_array( $value ) ) {
+		if ( ! $value || is_array( $value ) ) {
 			return $value;
 		}
 

@@ -3,7 +3,6 @@
  */
 import { Fragment, useMemo } from '@wordpress/element';
 import {
-	BaseControl,
 	Button,
 	ExternalLink,
 	FocalPointPicker,
@@ -73,18 +72,17 @@ function CoverHeightInput( {
 	const min = isPx ? COVER_MIN_HEIGHT : 0;
 
 	return (
-		<BaseControl label={ __( 'Minimum height of cover' ) } id={ inputId }>
-			<UnitControl
-				id={ inputId }
-				isResetValueOnUnitChange
-				min={ min }
-				onChange={ handleOnChange }
-				onUnitChange={ onUnitChange }
-				style={ { maxWidth: 80 } }
-				units={ units }
-				value={ computedValue }
-			/>
-		</BaseControl>
+		<UnitControl
+			label={ __( 'Minimum height of cover' ) }
+			id={ inputId }
+			isResetValueOnUnitChange
+			min={ min }
+			onChange={ handleOnChange }
+			onUnitChange={ onUnitChange }
+			__unstableInputWidth={ '80px' }
+			units={ units }
+			value={ computedValue }
+		/>
 	);
 }
 export default function CoverInspectorControls( {
