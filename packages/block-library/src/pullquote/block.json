@@ -70,6 +70,14 @@
 			"typography": {
 				"fontSize": "1.5em",
 				"lineHeight": "1.6"
+			},
+			"spacing": {
+				"padding": {
+					"top": "4em",
+					"right": "0",
+					"bottom": "4em",
+					"left": "0"
+				}
 			}
 		}
 	},
