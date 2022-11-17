@@ -6,8 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useResizeObserver } from '@wordpress/compose';
+import { useResizeObserver, useDebounce } from '@wordpress/compose';
 import { SVG, Path } from '@wordpress/primitives';
+import { useEffect } from '@wordpress/element';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -76,9 +78,19 @@ export function Placeholder< IconProps = unknown >(
 		modifierClassNames,
 		withIllustration ? 'has-illustration' : null
 	);
+
 	const fieldsetClasses = classnames( 'components-placeholder__fieldset', {
 		'is-column-layout': isColumnLayout,
 	} );
+
+	const debouncedSpeak = useDebounce( speak, 100 );
+
+	useEffect( () => {
+		if ( instructions ) {
+			debouncedSpeak( instructions );
+		}
+	}, [ instructions, debouncedSpeak ] );
+
 	return (
 		<div { ...additionalProps } className={ classes }>
 			{ withIllustration ? PlaceholderIllustration : null }
@@ -94,10 +106,7 @@ export function Placeholder< IconProps = unknown >(
 				{ label }
 			</div>
 			{ !! instructions && (
-				<div
-					className="components-placeholder__instructions"
-					role="status"
-				>
+				<div className="components-placeholder__instructions">
 					{ instructions }
 				</div>
 			) }
