@@ -182,6 +182,10 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 					<>
 						<InspectorControls.Slot />
 						<InspectorControls.Slot
+							__experimentalGroup="layout"
+							label={ __( 'Layout' ) }
+						/>
+						<InspectorControls.Slot
 							__experimentalGroup="color"
 							label={ __( 'Color' ) }
 							className="color-block-support-panel__inner-wrapper"
@@ -296,6 +300,10 @@ const BlockInspectorSingleBlock = ( {
 						</div>
 					) }
 					<InspectorControls.Slot />
+					<InspectorControls.Slot
+						__experimentalGroup="layout"
+						label={ __( 'Layout' ) }
+					/>
 					<InspectorControls.Slot
 						__experimentalGroup="color"
 						label={ __( 'Color' ) }

@@ -13,10 +13,9 @@ import {
 import {
 	Button,
 	ToggleControl,
-	Flex,
-	FlexItem,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 
 /**
@@ -58,6 +57,8 @@ export default {
 	name: 'flex',
 	label: __( 'Flex' ),
 	inspectorControls: function FlexLayoutInspectorControls( {
+		clientId,
+		defaultControls,
 		layout = {},
 		onChange,
 		layoutBlockSupport = {},
@@ -65,23 +66,79 @@ export default {
 		const { allowOrientation = true } = layoutBlockSupport;
 		return (
 			<>
-				<Flex>
-					<FlexItem>
-						<FlexLayoutJustifyContentControl
+				<ToolsPanelItem
+					className="single-column"
+					hasValue={ () => layout?.justifyContent }
+					label={ __( 'Justification' ) }
+					onDeselect={ () =>
+						onChange( {
+							...layout,
+							justifyContent: undefined,
+						} )
+					}
+					isShownByDefault={ defaultControls?.justifyContent }
+					resetAllFilter={ ( newAttributes ) => ( {
+						...newAttributes,
+						layout: {
+							...newAttributes?.layout,
+							justifyContent: undefined,
+						},
+					} ) }
+					panelId={ clientId }
+				>
+					<FlexLayoutJustifyContentControl
+						layout={ layout }
+						onChange={ onChange }
+					/>
+				</ToolsPanelItem>
+				{ allowOrientation && (
+					<ToolsPanelItem
+						className="single-column"
+						hasValue={ () => layout?.orientation }
+						label={ __( 'Orientation' ) }
+						onDeselect={ () =>
+							onChange( {
+								...layout,
+								orientation: undefined,
+							} )
+						}
+						isShownByDefault={ defaultControls?.orientation }
+						resetAllFilter={ ( newAttributes ) => ( {
+							...newAttributes,
+							layout: {
+								...newAttributes?.layout,
+								orientation: undefined,
+							},
+						} ) }
+						panelId={ clientId }
+					>
+						<OrientationControl
 							layout={ layout }
 							onChange={ onChange }
 						/>
-					</FlexItem>
-					<FlexItem>
-						{ allowOrientation && (
-							<OrientationControl
-								layout={ layout }
-								onChange={ onChange }
-							/>
-						) }
-					</FlexItem>
-				</Flex>
-				<FlexWrapControl layout={ layout } onChange={ onChange } />
+					</ToolsPanelItem>
+				) }
+				<ToolsPanelItem
+					hasValue={ () => layout?.flexWrap }
+					label={ __( 'Wrap' ) }
+					onDeselect={ () =>
+						onChange( {
+							...layout,
+							flexWrap: undefined,
+						} )
+					}
+					isShownByDefault={ defaultControls?.flexWrap }
+					resetAllFilter={ ( newAttributes ) => ( {
+						...newAttributes,
+						layout: {
+							...newAttributes?.layout,
+							flexWrap: undefined,
+						},
+					} ) }
+					panelId={ clientId }
+				>
+					<FlexWrapControl layout={ layout } onChange={ onChange } />
+				</ToolsPanelItem>
 			</>
 		);
 	},

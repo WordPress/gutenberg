@@ -6,6 +6,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
@@ -30,6 +31,8 @@ export default {
 	name: 'constrained',
 	label: __( 'Constrained' ),
 	inspectorControls: function DefaultLayoutInspectorControls( {
+		clientId,
+		defaultControls = {},
 		layout,
 		onChange,
 	} ) {
@@ -68,69 +71,113 @@ export default {
 		} );
 		return (
 			<>
-				<div className="block-editor-hooks__layout-controls">
-					<div className="block-editor-hooks__layout-controls-unit">
-						<UnitControl
-							label={ __( 'Content' ) }
-							labelPosition="top"
-							__unstableInputWidth="80px"
-							value={ contentSize || wideSize || '' }
-							onChange={ ( nextWidth ) => {
-								nextWidth =
-									0 > parseFloat( nextWidth )
-										? '0'
-										: nextWidth;
-								onChange( {
-									...layout,
-									contentSize: nextWidth,
-								} );
-							} }
-							units={ units }
-						/>
-						<Icon icon={ positionCenter } />
-					</div>
-					<div className="block-editor-hooks__layout-controls-unit">
-						<UnitControl
-							label={ __( 'Wide' ) }
-							labelPosition="top"
-							__unstableInputWidth="80px"
-							value={ wideSize || contentSize || '' }
-							onChange={ ( nextWidth ) => {
-								nextWidth =
-									0 > parseFloat( nextWidth )
-										? '0'
-										: nextWidth;
-								onChange( {
-									...layout,
-									wideSize: nextWidth,
-								} );
-							} }
-							units={ units }
-						/>
-						<Icon icon={ stretchWide } />
-					</div>
-				</div>
-				<p className="block-editor-hooks__layout-controls-helptext">
-					{ __(
-						'Customize the width for all elements that are assigned to the center or wide columns.'
-					) }
-				</p>
-				<ToggleGroupControl
-					label={ __( 'Justification' ) }
-					value={ justifyContent }
-					onChange={ onJustificationChange }
-				>
-					{ justificationOptions.map( ( { value, icon, label } ) => {
-						return (
-							<ToggleGroupControlOptionIcon
-								key={ value }
-								value={ value }
-								icon={ icon }
-								label={ label }
-							/>
-						);
+				<ToolsPanelItem
+					hasValue={ () =>
+						wideSize !== undefined || contentSize !== undefined
+					}
+					label={ __( 'Content size' ) }
+					onDeselect={ () =>
+						onChange( {
+							...layout,
+							contentSize: undefined,
+							wideSize: undefined,
+						} )
+					}
+					isShownByDefault={
+						defaultControls?.contentSize ||
+						defaultControls?.wideSize
+					}
+					resetAllFilter={ ( newAttributes ) => ( {
+						...newAttributes,
+						layout: {
+							...newAttributes?.layout,
+							contentSize: undefined,
+							wideSize: undefined,
+						},
 					} ) }
-				</ToggleGroupControl>
+					panelId={ clientId }
+				>
+					<div className="block-editor-hooks__layout-controls">
+						<div className="block-editor-hooks__layout-controls-unit">
+							<UnitControl
+								label={ __( 'Content' ) }
+								labelPosition="top"
+								__unstableInputWidth="80px"
+								value={ contentSize || wideSize || '' }
+								onChange={ ( nextWidth ) => {
+									nextWidth =
+										0 > parseFloat( nextWidth )
+											? '0'
+											: nextWidth;
+									onChange( {
+										...layout,
+										contentSize: nextWidth,
+									} );
+								} }
+								units={ units }
+							/>
+							<Icon icon={ positionCenter } />
+						</div>
+						<div className="block-editor-hooks__layout-controls-unit">
+							<UnitControl
+								label={ __( 'Wide' ) }
+								labelPosition="top"
+								__unstableInputWidth="80px"
+								value={ wideSize || contentSize || '' }
+								onChange={ ( nextWidth ) => {
+									nextWidth =
+										0 > parseFloat( nextWidth )
+											? '0'
+											: nextWidth;
+									onChange( {
+										...layout,
+										wideSize: nextWidth,
+									} );
+								} }
+								units={ units }
+							/>
+							<Icon icon={ stretchWide } />
+						</div>
+					</div>
+					<p className="block-editor-hooks__layout-controls-helptext">
+						{ __(
+							'Customize the width for all elements that are assigned to the center or wide columns.'
+						) }
+					</p>
+				</ToolsPanelItem>
+				<ToolsPanelItem
+					hasValue={ () => justifyContent !== undefined }
+					label={ __( 'Justification' ) }
+					onDeselect={ () => onJustificationChange( undefined ) }
+					isShownByDefault={ defaultControls?.justifyContent }
+					resetAllFilter={ ( newAttributes ) => ( {
+						...newAttributes,
+						layout: {
+							...newAttributes?.layout,
+							justifyContent: undefined,
+						},
+					} ) }
+					panelId={ clientId }
+				>
+					<ToggleGroupControl
+						label={ __( 'Justification' ) }
+						value={ justifyContent }
+						onChange={ onJustificationChange }
+					>
+						{ justificationOptions.map(
+							( { value, icon, label } ) => {
+								return (
+									<ToggleGroupControlOptionIcon
+										key={ value }
+										value={ value }
+										icon={ icon }
+										label={ label }
+									/>
+								);
+							}
+						) }
+					</ToggleGroupControl>
+				</ToolsPanelItem>
 			</>
 		);
 	},

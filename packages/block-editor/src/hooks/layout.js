@@ -15,7 +15,7 @@ import {
 	Button,
 	ButtonGroup,
 	ToggleControl,
-	PanelBody,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useContext, createPortal } from '@wordpress/element';
@@ -29,8 +29,9 @@ import useSetting from '../components/use-setting';
 import { LayoutStyle } from '../components/block-list/layout';
 import BlockList from '../components/block-list';
 import { getLayoutType, getLayoutTypes } from '../layouts';
+import { hasContentLayoutValue, resetContentLayout } from './content-layout';
 
-const layoutBlockSupportKey = '__experimentalLayout';
+export const LAYOUT_SUPPORT_KEY = '__experimentalLayout';
 
 /**
  * Generates the utility classnames for the given block's layout attributes.
@@ -51,7 +52,7 @@ export function useLayoutClasses( block = {} ) {
 	const { layout } = attributes;
 
 	const { default: defaultBlockLayout } =
-		getBlockSupport( name, layoutBlockSupportKey ) || {};
+		getBlockSupport( name, LAYOUT_SUPPORT_KEY ) || {};
 	const usedLayout =
 		layout?.inherit || layout?.contentSize || layout?.wideSize
 			? { ...layout, type: 'constrained' }
@@ -128,8 +129,10 @@ export function useLayoutStyles( block = {}, selector ) {
 	return css;
 }
 
-function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
+function LayoutPanel( props ) {
+	const { clientId, setAttributes, attributes, name: blockName } = props;
 	const { layout } = attributes;
+
 	const defaultThemeLayout = useSetting( 'layout' );
 	const themeSupportsLayout = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -138,7 +141,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 
 	const layoutBlockSupport = getBlockSupport(
 		blockName,
-		layoutBlockSupportKey,
+		LAYOUT_SUPPORT_KEY,
 		{}
 	);
 	const {
@@ -192,67 +195,87 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	const onChangeLayout = ( newLayout ) =>
 		setAttributes( { layout: newLayout } );
 
+	const defaultControls = getBlockSupport( blockName, [
+		LAYOUT_SUPPORT_KEY,
+		'__experimentalDefaultControls',
+	] );
+
 	return (
 		<>
-			<InspectorControls>
-				<PanelBody title={ __( 'Layout' ) }>
-					{ showInheritToggle && (
-						<>
-							<ToggleControl
-								className="block-editor-hooks__toggle-control"
-								label={ __( 'Inner blocks use content width' ) }
-								checked={
-									layoutType?.name === 'constrained' ||
-									hasContentSizeOrLegacySettings
-								}
-								onChange={ () =>
-									setAttributes( {
-										layout: {
-											type:
-												layoutType?.name ===
-													'constrained' ||
-												hasContentSizeOrLegacySettings
-													? 'default'
-													: 'constrained',
-										},
-									} )
-								}
-								help={
-									layoutType?.name === 'constrained' ||
-									hasContentSizeOrLegacySettings
-										? __(
-												'Nested blocks use content width with options for full and wide widths.'
-										  )
-										: __(
-												'Nested blocks will fill the width of this container. Toggle to constrain.'
-										  )
-								}
-							/>
-						</>
-					) }
+			<InspectorControls __experimentalGroup="layout">
+				{ showInheritToggle && (
+					<ToolsPanelItem
+						label={ __( 'Content layout' ) }
+						hasValue={ () => hasContentLayoutValue( props ) }
+						onDeselect={ () => resetContentLayout( props ) }
+						isShownByDefault={ true }
+						resetAllFilter={ ( newAttributes ) => ( {
+							...newAttributes,
+							layout: {
+								...newAttributes.layout,
+								type: undefined,
+							},
+						} ) }
+						panelId={ clientId }
+					>
+						<ToggleControl
+							className="block-editor-hooks__toggle-control"
+							label={ __( 'Inner blocks use content width' ) }
+							checked={
+								layoutType?.name === 'constrained' ||
+								hasContentSizeOrLegacySettings
+							}
+							onChange={ () =>
+								setAttributes( {
+									layout: {
+										type:
+											layoutType?.name ===
+												'constrained' ||
+											hasContentSizeOrLegacySettings
+												? 'default'
+												: 'constrained',
+									},
+								} )
+							}
+							help={
+								layoutType?.name === 'constrained' ||
+								hasContentSizeOrLegacySettings
+									? __(
+											'Nested blocks use content width with options for full and wide widths.'
+									  )
+									: __(
+											'Nested blocks will fill the width of this container. Toggle to constrain.'
+									  )
+							}
+						/>
+					</ToolsPanelItem>
+				) }
 
-					{ ! inherit && allowSwitching && (
-						<LayoutTypeSwitcher
-							type={ type }
-							onChange={ onChangeType }
-						/>
-					) }
+				{ ! inherit && allowSwitching && (
+					<LayoutTypeSwitcher
+						type={ type }
+						onChange={ onChangeType }
+					/>
+				) }
 
-					{ layoutType && layoutType.name !== 'default' && (
-						<layoutType.inspectorControls
-							layout={ usedLayout }
-							onChange={ onChangeLayout }
-							layoutBlockSupport={ layoutBlockSupport }
-						/>
-					) }
-					{ constrainedType && displayControlsForLegacyLayouts && (
-						<constrainedType.inspectorControls
-							layout={ usedLayout }
-							onChange={ onChangeLayout }
-							layoutBlockSupport={ layoutBlockSupport }
-						/>
-					) }
-				</PanelBody>
+				{ layoutType && layoutType.name !== 'default' && (
+					<layoutType.inspectorControls
+						clientId={ clientId }
+						defaultControls={ defaultControls }
+						layout={ usedLayout }
+						onChange={ onChangeLayout }
+						layoutBlockSupport={ layoutBlockSupport }
+					/>
+				) }
+				{ constrainedType && displayControlsForLegacyLayouts && (
+					<constrainedType.inspectorControls
+						clientId={ clientId }
+						defaultControls={ defaultControls }
+						layout={ usedLayout }
+						onChange={ onChangeLayout }
+						layoutBlockSupport={ layoutBlockSupport }
+					/>
+				) }
 			</InspectorControls>
 			{ ! inherit && layoutType && (
 				<layoutType.toolBarControls
@@ -294,7 +317,7 @@ export function addAttribute( settings ) {
 	if ( 'type' in ( settings.attributes?.layout ?? {} ) ) {
 		return settings;
 	}
-	if ( hasBlockSupport( settings, layoutBlockSupportKey ) ) {
+	if ( hasBlockSupport( settings, LAYOUT_SUPPORT_KEY ) ) {
 		settings.attributes = {
 			...settings.attributes,
 			layout: {
@@ -316,10 +339,7 @@ export function addAttribute( settings ) {
 export const withInspectorControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const { name: blockName } = props;
-		const supportLayout = hasBlockSupport(
-			blockName,
-			layoutBlockSupportKey
-		);
+		const supportLayout = hasBlockSupport( blockName, LAYOUT_SUPPORT_KEY );
 
 		return [
 			supportLayout && <LayoutPanel key="layout" { ...props } />,
@@ -341,7 +361,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 		const { name, attributes, block } = props;
 		const hasLayoutBlockSupport = hasBlockSupport(
 			name,
-			layoutBlockSupportKey
+			LAYOUT_SUPPORT_KEY
 		);
 		const disableLayoutStyles = useSelect( ( select ) => {
 			const { getSettings } = select( blockEditorStore );
@@ -354,7 +374,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 		const element = useContext( BlockList.__unstableElementContext );
 		const { layout } = attributes;
 		const { default: defaultBlockLayout } =
-			getBlockSupport( name, layoutBlockSupportKey ) || {};
+			getBlockSupport( name, LAYOUT_SUPPORT_KEY ) || {};
 		const usedLayout =
 			layout?.inherit || layout?.contentSize || layout?.wideSize
 				? { ...layout, type: 'constrained' }
