@@ -16,13 +16,15 @@
 	position: relative;
 
 	// The background has to be applied to the td, not tr, or border-radius won't work.
-	&.is-selected td {
+	&.is-selected:not(.is-synced-branch) td {
 		background: var(--wp-admin-theme-color);
 	}
-	&.is-selected.is-synced td {
+	&.is-selected.is-synced td,
+	&.is-selected.is-synced-branch td {
 		background: var(--wp-block-synced-color);
 	}
-	&.is-synced .block-editor-list-view-block-contents .block-editor-block-icon {
+	&.is-synced:not(.is-selected) .block-editor-list-view-block-contents .block-editor-block-icon,
+	&.is-synced-branch:not(.is-selected) .block-editor-list-view-block-contents .block-editor-block-icon {
 		color: var(--wp-block-synced-color);
 	}
 	&.is-selected .block-editor-list-view-block-contents,
@@ -36,14 +38,15 @@
 			color: $gray-900;
 		}
 	}
-	&.is-selected .block-editor-list-view-block-contents:focus {
+	&.is-selected:not(.is-synced-branch) .block-editor-list-view-block-contents:focus {
 		&::after {
 			box-shadow:
 				inset 0 0 0 1px $white,
 				0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		}
 	}
-	&.is-selected.is-synced .block-editor-list-view-block-contents:focus {
+	&.is-selected.is-synced .block-editor-list-view-block-contents:focus,
+	&.is-selected.is-synced-branch .block-editor-list-view-block-contents:focus {
 		&::after {
 			box-shadow:
 				inset 0 0 0 1px $white,
