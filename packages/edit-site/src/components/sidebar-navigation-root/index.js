@@ -20,9 +20,12 @@ import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { useLocation } from '../routes';
 import { store as editSiteStore } from '../../store';
+import getIsListPage from '../../utils/get-is-list-page';
 
 export default function SidebarNavigationRoot() {
 	const { params } = useLocation();
+	const isListPage = getIsListPage( params );
+	const isEditorPage = ! isListPage;
 	const templatesLink = useLink( {
 		postType: 'wp_template',
 		postId: undefined,
@@ -44,7 +47,7 @@ export default function SidebarNavigationRoot() {
 				title={
 					<HStack>
 						<div>{ __( 'Design' ) }</div>
-						{ ! isMobileViewport && (
+						{ ! isMobileViewport && isEditorPage && (
 							<Button
 								className="edit-site-layout__edit-button"
 								label={ __( 'Open the editor' ) }
