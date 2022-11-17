@@ -2,12 +2,15 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `TabPanel`: Add ability to set icon only tab buttons ([#45005](https://github.com/WordPress/gutenberg/pull/45005)).
+
 ## 22.1.0 (2022-11-16)
 
 ### Enhancements
 
 -   `ColorPalette`, `BorderBox`, `BorderBoxControl`: polish and DRY prop types, add default values ([#45463](https://github.com/WordPress/gutenberg/pull/45463)).
--   `TabPanel`: Add ability to set icon only tab buttons ([#45005](https://github.com/WordPress/gutenberg/pull/45005)).
 
 ### Bug Fix
 
