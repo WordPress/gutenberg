@@ -27,12 +27,11 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 
 	$is_link        = isset( $attributes['isLink'] ) && $attributes['isLink'];
 	$size_slug      = isset( $attributes['sizeSlug'] ) ? $attributes['sizeSlug'] : 'post-thumbnail';
-	$post_title     = trim( strip_tags( get_the_title( $post_ID ) ) );
 	$attr           = get_block_core_post_featured_image_border_attributes( $attributes );
 	$overlay_markup = get_block_core_post_featured_image_overlay_element_markup( $attributes );
 
 	if ( $is_link ) {
-		$attr['alt'] = $post_title;
+		$attr['alt'] = trim( strip_tags( get_the_title( $post_ID ) ) );
 	}
 
 	if ( ! empty( $attributes['height'] ) ) {
