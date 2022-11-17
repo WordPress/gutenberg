@@ -53,9 +53,7 @@
 		opacity: 0;
 		padding: 0;
 		transition: all ease 0.2s;
-		background:
-			linear-gradient(transparentize($white, 0.1), transparentize($white, 0.1)),
-			linear-gradient(var(--wp-block-synced-color), var(--wp-block-synced-color));
+		background: rgba(var(--wp-block-synced-color--rgb), 0.04);
 		border-radius: 2px;
 		@include reduce-motion(transition);
 
