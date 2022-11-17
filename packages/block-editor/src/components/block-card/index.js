@@ -34,7 +34,7 @@ function BlockCard( {
 			{ isOffCanvasNavigationEditorEnabled && parentBlockClientId && (
 				<Button
 					onClick={ handleBackButton }
-					label={ __( 'Navigate to the previous view' ) }
+					label={ __( 'Navigate to parent block' ) }
 					style={
 						// TODO: This style override is also used in ToolsPanelHeader.
 						// It should be supported out-of-the-box by Button.
