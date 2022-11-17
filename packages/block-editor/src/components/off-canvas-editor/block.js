@@ -6,10 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { hasBlockSupport } from '@wordpress/blocks';
+import { createBlock, hasBlockSupport } from '@wordpress/blocks';
 import {
 	__experimentalTreeGridCell as TreeGridCell,
 	__experimentalTreeGridItem as TreeGridItem,
+	MenuItem,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { moreVertical } from '@wordpress/icons';
@@ -59,7 +60,7 @@ function ListViewBlock( {
 } ) {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
-	const { clientId } = block;
+	const { clientId, attributes } = block;
 
 	const { isLocked, isContentLocked } = useBlockLock( clientId );
 	const forceSelectionContentLock = useSelect(
@@ -86,7 +87,8 @@ function ListViewBlock( {
 		( isSelected &&
 			selectedClientIds[ selectedClientIds.length - 1 ] === clientId );
 
-	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
+	const { replaceBlock, toggleBlockHighlight } =
+		useDispatch( blockEditorStore );
 
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const blockName = useSelect(
@@ -355,7 +357,29 @@ function ListViewBlock( {
 								} }
 								disableOpenOnArrowDown
 								__experimentalSelectBlock={ updateSelection }
-							/>
+							>
+								{ ( { onClose } ) => (
+									<MenuItem
+										onClick={ () => {
+											const newLink = createBlock(
+												'core/navigation-link'
+											);
+											const newSubmenu = createBlock(
+												'core/navigation-submenu',
+												attributes,
+												[ newLink ]
+											);
+											replaceBlock(
+												clientId,
+												newSubmenu
+											);
+											onClose();
+										} }
+									>
+										{ __( 'Add a submenu item' ) }
+									</MenuItem>
+								) }
+							</BlockSettingsDropdown>
 						) }
 					</TreeGridCell>
 				</>
