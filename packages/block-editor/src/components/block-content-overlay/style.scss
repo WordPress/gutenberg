@@ -26,7 +26,9 @@
 	&.is-reusable:hover:not(.is-dragging-blocks)::before,
 	&.wp-block-template-part:hover:not(.is-dragging-blocks)::before {
 		filter: brightness(0.95);
-		background: rgba(var(--wp-block-synced-color--rgb), 0.3);
+		background:
+			linear-gradient(transparentize($white, 0.1), transparentize($white, 0.1)),
+			linear-gradient(var(--wp-block-synced-color), var(--wp-block-synced-color));
 		box-shadow: 0 0 0 $border-width var(--wp-block-synced-color) inset;
 	}
 

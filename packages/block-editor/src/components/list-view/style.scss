@@ -71,11 +71,17 @@
 	&.is-last-selected td:last-child {
 		border-bottom-right-radius: $radius-block-ui;
 	}
-	&.is-branch-selected:not(.is-selected) {
+	&.is-branch-selected:not(.is-selected):not(.is-synced-branch) {
 		// Lighten a CSS variable without introducing a new SASS variable
 		background:
 			linear-gradient(transparentize($white, 0.1), transparentize($white, 0.1)),
 			linear-gradient(var(--wp-admin-theme-color), var(--wp-admin-theme-color));
+	}
+	&.is-synced-branch:not(.is-selected) {
+		// Lighten a CSS variable without introducing a new SASS variable
+		background:
+			linear-gradient(transparentize($white, 0.1), transparentize($white, 0.1)),
+			linear-gradient(var(--wp-block-synced-color), var(--wp-block-synced-color));
 	}
 	&.is-branch-selected.is-first-selected td:first-child {
 		border-top-left-radius: $radius-block-ui;
