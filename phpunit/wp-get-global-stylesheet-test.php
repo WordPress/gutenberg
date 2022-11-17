@@ -82,7 +82,7 @@ class WP_Get_Global_Stylesheet_Test extends WP_UnitTestCase {
 		wp_set_current_user( self::$administrator_id );
 
 		$styles = gutenberg_get_global_stylesheet();
-		$this->assertStringNotContainsString( 'hotpink', $styles );
+		$this->assertStringNotContainsString( 'background-color: hotpink;', $styles );
 
 		$user_cpt                                = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( wp_get_theme(), true );
 		$config                                  = json_decode( $user_cpt['post_content'], true );
