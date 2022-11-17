@@ -9,6 +9,8 @@ import { map, groupBy, orderBy } from 'lodash';
 import { __, _x } from '@wordpress/i18n';
 import { useMemo, useEffect } from '@wordpress/element';
 import { pipe, useAsyncList } from '@wordpress/compose';
+import { addQueryArgs } from '@wordpress/url';
+import { Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -54,10 +56,7 @@ export function BlockTypesTab( {
 
 	const itemsPerCategory = useMemo( () => {
 		return pipe(
-			( itemList ) =>
-				itemList.filter(
-					( item ) => item.category && item.category !== 'reusable'
-				),
+			( itemList ) => itemList.filter( ( item ) => item.category ),
 			( itemList ) => groupBy( itemList, 'category' )
 		)( items );
 	}, [ items ] );
@@ -129,6 +128,19 @@ export function BlockTypesTab( {
 								onHover={ onHover }
 								label={ category.title }
 							/>
+							{ category.slug === 'reusable' && (
+								<div className="block-editor-inserter__manage-reusable-blocks-container">
+									<Button
+										className="block-editor-inserter__manage-reusable-blocks"
+										variant="secondary"
+										href={ addQueryArgs( 'edit.php', {
+											post_type: 'wp_block',
+										} ) }
+									>
+										{ __( 'Manage Reusable blocks' ) }
+									</Button>
+								</div>
+							) }
 						</InserterPanel>
 					);
 				} ) }

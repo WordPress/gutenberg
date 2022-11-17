@@ -15,26 +15,29 @@ import {
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { SegmentedControl } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
+import { store as blockEditorStore } from '../../store';
 import BlockTypesTab from './block-types-tab';
 import ReusableBlocksTab from './reusable-blocks-tab';
 import styles from './style.scss';
 
 const TAB_ANIMATION_DURATION = 250;
 
-function InserterTabs( {
-	listProps,
-	onSelect,
-	rootClientId,
-	showReusableBlocks,
-	tabIndex,
-} ) {
+function InserterTabs( { listProps, onSelect, rootClientId, tabIndex } ) {
 	const tabAnimation = useRef( new Animated.Value( 0 ) ).current;
 	const lastScrollEvents = useRef( [] ).current;
 	const [ wrapperWidth, setWrapperWidth ] = useState( 0 );
+
+	const showReusableBlocks = useSelect(
+		( select ) =>
+			!! select( blockEditorStore ).getSettings()
+				.__experimentalReusableBlocks?.length,
+		[ rootClientId ]
+	);
 
 	function onScroll( event ) {
 		lastScrollEvents[ tabIndex ] = event.nativeEvent;

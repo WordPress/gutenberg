@@ -15,16 +15,10 @@ const patternsTab = {
 	/* translators: Patterns tab title in the block inserter. */
 	title: __( 'Patterns' ),
 };
-const reusableBlocksTab = {
-	name: 'reusable',
-	/* translators: Reusable blocks tab title in the block inserter. */
-	title: __( 'Reusable' ),
-};
 
 function InserterTabs( {
 	children,
 	showPatterns = false,
-	showReusableBlocks = false,
 	onSelect,
 	prioritizePatterns,
 } ) {
@@ -37,19 +31,8 @@ function InserterTabs( {
 		if ( ! prioritizePatterns && showPatterns ) {
 			tempTabs.push( patternsTab );
 		}
-		if ( showReusableBlocks ) {
-			tempTabs.push( reusableBlocksTab );
-		}
-
 		return tempTabs;
-	}, [
-		prioritizePatterns,
-		blocksTab,
-		showPatterns,
-		patternsTab,
-		showReusableBlocks,
-		reusableBlocksTab,
-	] );
+	}, [ prioritizePatterns, blocksTab, showPatterns, patternsTab ] );
 
 	return (
 		<TabPanel

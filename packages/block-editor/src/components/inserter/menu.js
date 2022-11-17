@@ -27,7 +27,6 @@ import BlockTypesTab from './block-types-tab';
 import BlockPatternsTabs, {
 	BlockPatternsCategoryDialog,
 } from './block-patterns-tab';
-import ReusableBlocksTab from './reusable-blocks-tab';
 import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import InserterTabs from './tabs';
@@ -64,18 +63,14 @@ function InserterMenu(
 			insertionIndex: __experimentalInsertionIndex,
 			shouldFocusBlock,
 		} );
-	const { showPatterns, hasReusableBlocks } = useSelect(
+	const showPatterns = useSelect(
 		( select ) => {
-			const { __experimentalGetAllowedPatterns, getSettings } =
+			const { __experimentalGetAllowedPatterns } =
 				select( blockEditorStore );
 
-			return {
-				showPatterns: !! __experimentalGetAllowedPatterns(
-					destinationRootClientId
-				).length,
-				hasReusableBlocks:
-					!! getSettings().__experimentalReusableBlocks?.length,
-			};
+			return !! __experimentalGetAllowedPatterns(
+				destinationRootClientId
+			).length;
 		},
 		[ destinationRootClientId ]
 	);
@@ -159,17 +154,6 @@ function InserterMenu(
 		]
 	);
 
-	const reusableBlocksTab = useMemo(
-		() => (
-			<ReusableBlocksTab
-				rootClientId={ destinationRootClientId }
-				onInsert={ onInsert }
-				onHover={ onHover }
-			/>
-		),
-		[ destinationRootClientId, onInsert, onHover ]
-	);
-
 	const getCurrentTab = useCallback(
 		( tab ) => {
 			if ( tab.name === 'blocks' ) {
@@ -177,9 +161,8 @@ function InserterMenu(
 			} else if ( tab.name === 'patterns' ) {
 				return patternsTab;
 			}
-			return reusableBlocksTab;
 		},
-		[ blocksTab, patternsTab, reusableBlocksTab ]
+		[ blocksTab, patternsTab ]
 	);
 
 	const searchRef = useRef();
@@ -191,7 +174,7 @@ function InserterMenu(
 
 	const showPatternPanel =
 		selectedTab === 'patterns' && ! filterValue && selectedPatternCategory;
-	const showAsTabs = ! filterValue && ( showPatterns || hasReusableBlocks );
+	const showAsTabs = ! filterValue && showPatterns;
 
 	return (
 		<div className="block-editor-inserter__menu">
@@ -231,7 +214,6 @@ function InserterMenu(
 				{ showAsTabs && (
 					<InserterTabs
 						showPatterns={ showPatterns }
-						showReusableBlocks={ hasReusableBlocks }
 						prioritizePatterns={ prioritizePatterns }
 						onSelect={ setSelectedTab }
 					>
