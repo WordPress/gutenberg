@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { cleanup, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -33,12 +33,8 @@ function TestWrapper() {
 }
 
 describe( 'General media replace flow', () => {
-	afterEach( () => {
-		cleanup();
-	} );
-
 	it( 'renders successfully', () => {
-		render( <TestWrapper /> );
+		const { unmount } = render( <TestWrapper /> );
 
 		expect(
 			screen.getByRole( 'button', {
@@ -46,6 +42,10 @@ describe( 'General media replace flow', () => {
 				name: 'Replace',
 			} )
 		).toBeVisible();
+
+		// Unmount the UI synchronously so that any async effects, like the on-mount focus
+		// that shows and positions a tooltip, are cancelled right away and never run.
+		unmount();
 	} );
 
 	it( 'renders replace menu', async () => {
@@ -53,7 +53,7 @@ describe( 'General media replace flow', () => {
 			advanceTimers: jest.advanceTimersByTime,
 		} );
 
-		render( <TestWrapper /> );
+		const { unmount } = render( <TestWrapper /> );
 
 		await user.click(
 			screen.getByRole( 'button', {
@@ -66,6 +66,10 @@ describe( 'General media replace flow', () => {
 
 		expect( uploadMenu ).toBeInTheDocument();
 		expect( uploadMenu ).not.toBeVisible();
+
+		// Unmount the UI synchronously so that any async effects, like the on-mount focus
+		// that shows and positions a tooltip, are cancelled right away and never run.
+		unmount();
 	} );
 
 	it( 'displays media URL', async () => {
@@ -73,7 +77,7 @@ describe( 'General media replace flow', () => {
 			advanceTimers: jest.advanceTimersByTime,
 		} );
 
-		render( <TestWrapper /> );
+		const { unmount } = render( <TestWrapper /> );
 
 		await user.click(
 			screen.getByRole( 'button', {
@@ -87,6 +91,10 @@ describe( 'General media replace flow', () => {
 				name: 'example.media (opens in a new tab)',
 			} )
 		).toHaveAttribute( 'href', 'https://example.media' );
+
+		// Unmount the UI synchronously so that any async effects, like the on-mount focus
+		// that shows and positions a tooltip, are cancelled right away and never run.
+		unmount();
 	} );
 
 	it( 'edits media URL', async () => {
@@ -94,7 +102,7 @@ describe( 'General media replace flow', () => {
 			advanceTimers: jest.advanceTimersByTime,
 		} );
 
-		render( <TestWrapper /> );
+		const { unmount } = render( <TestWrapper /> );
 
 		await user.click(
 			screen.getByRole( 'button', {
@@ -128,5 +136,9 @@ describe( 'General media replace flow', () => {
 				name: 'new.example.media (opens in a new tab)',
 			} )
 		).toHaveAttribute( 'href', 'https://new.example.media' );
+
+		// Unmount the UI synchronously so that any async effects, like the on-mount focus
+		// that shows and positions a tooltip, are cancelled right away and never run.
+		unmount();
 	} );
 } );
