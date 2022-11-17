@@ -56,8 +56,8 @@ class WP_Theme_JSON_Resolver_6_0 extends WP_Theme_JSON_Resolver {
 		}
 
 		$options  = wp_parse_args( $options, array( 'with_supports' => true ) );
-		$wp_theme = wp_get_theme();
 		if ( null === static::$theme ) {
+			$wp_theme        = wp_get_theme();
 			$theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json' ) );
 			$theme_json_data = static::translate( $theme_json_data, $wp_theme->get( 'TextDomain' ) );
 			static::$theme   = new WP_Theme_JSON_Gutenberg( $theme_json_data );
