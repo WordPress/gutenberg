@@ -260,23 +260,12 @@ async function runPerformanceTests( branches, options ) {
 		await runShellScript( 'mkdir ' + environmentDirectory );
 		await runShellScript( `cp -R ${ baseDirectory } ${ buildPath }` );
 
-		const fancyBranch = formats.success( branch );
+		log( `        >> Fetching the ${ formats.success( branch ) } branch` );
+		// @ts-ignore
+		await SimpleGit( buildPath ).reset( 'hard' ).checkout( branch );
 
-		if ( branch === options.testsBranch ) {
-			log(
-				`        >> Re-using the testing branch for ${ fancyBranch }`
-			);
-			await runShellScript(
-				`cp -R ${ performanceTestDirectory } ${ buildPath }`
-			);
-		} else {
-			log( `        >> Fetching the ${ fancyBranch } branch` );
-			// @ts-ignore
-			await SimpleGit( buildPath ).reset( 'hard' ).checkout( branch );
-
-			log( `        >> Building the ${ fancyBranch } branch` );
-			await runShellScript( 'npm ci && npm run build', buildPath );
-		}
+		log( `        >> Building the ${ formats.success( branch ) } branch` );
+		await runShellScript( 'npm ci && npm run build', buildPath );
 
 		await runShellScript(
 			'cp ' +
