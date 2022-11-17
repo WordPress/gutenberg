@@ -341,7 +341,7 @@ export default function PaletteEdit( {
 				setIsEditing( true );
 			}
 		},
-		[ isGradient ]
+		[ isGradient, elements ]
 	);
 
 	return (
