@@ -512,6 +512,9 @@ export default function LogoEdit( {
 				className={ placeholderClassName }
 				preview={ logoImage }
 				withIllustration={ true }
+				style={ {
+					width,
+				} }
 			>
 				{ content }
 			</Placeholder>
@@ -530,12 +533,7 @@ export default function LogoEdit( {
 	const label = __( 'Add a site logo' );
 
 	return (
-		<div
-			{ ...blockProps }
-			style={ {
-				width,
-			} }
-		>
+		<div { ...blockProps }>
 			{ controls }
 			{ !! logoUrl && logoImage }
 			{ ! logoUrl && ! canUserEdit && (
