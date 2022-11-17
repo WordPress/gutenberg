@@ -568,6 +568,7 @@ export default function NavigationSubmenuEdit( {
 					/>
 				</ToolbarGroup>
 			</BlockControls>
+			{ /* Warning, this duplicated in packages/block-library/src/navigation-link/edit.js */ }
 			<InspectorControls>
 				<PanelBody title={ __( 'Link settings' ) }>
 					<TextControl
