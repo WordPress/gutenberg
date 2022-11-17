@@ -6,7 +6,7 @@ import { kebabCase } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useState, useRef, useEffect } from '@wordpress/element';
+import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { lineSolid, moreVertical, plus } from '@wordpress/icons';
 import {
@@ -330,6 +330,19 @@ export default function PaletteEdit( {
 	const elementsLength = elements.length;
 	const hasElements = elementsLength > 0;
 	const debounceOnChange = useDebounce( onChange, 100 );
+	const onSelectPaletteItem = useCallback(
+		( value, newEditingElementIndex ) => {
+			const selectedElement = elements[ newEditingElementIndex ];
+			const key = isGradient ? 'gradient' : 'color';
+			// Ensures that the index returned matches a known element value.
+			if ( !! selectedElement && selectedElement[ key ] === value ) {
+				setEditingElement( newEditingElementIndex );
+			} else {
+				setIsEditing( true );
+			}
+		},
+		[ isGradient ]
+	);
 
 	return (
 		<PaletteEditStyles>
@@ -495,18 +508,14 @@ export default function PaletteEdit( {
 							<GradientPicker
 								__nextHasNoMargin
 								gradients={ gradients }
-								onChange={ ( value, index ) =>
-									setEditingElement( index )
-								}
+								onChange={ onSelectPaletteItem }
 								clearable={ false }
 								disableCustomGradients={ true }
 							/>
 						) : (
 							<ColorPalette
 								colors={ colors }
-								onChange={ ( value, index ) =>
-									setEditingElement( index )
-								}
+								onChange={ onSelectPaletteItem }
 								clearable={ false }
 								disableCustomColors={ true }
 							/>
