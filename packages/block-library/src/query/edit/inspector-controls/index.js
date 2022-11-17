@@ -179,84 +179,98 @@ export default function QueryInspectorControls( {
 					</PanelBody>
 				</InspectorControls>
 			) }
-			{ ! inherit && (
-				<InspectorControls>
-					<ToolsPanel
-						className="block-library-query-toolspanel__filters"
-						label={ __( 'Filters' ) }
-						resetAll={ () => {
-							setQuery( {
-								author: '',
-								parents: [],
-								search: '',
-								taxQuery: null,
-							} );
-							setQuerySearch( '' );
-						} }
-					>
-						{ !! taxonomies?.length &&
-							isControlAllowed( allowedControls, 'taxQuery' ) && (
+			{ ! inherit &&
+				( isControlAllowed( allowedControls, 'taxQuery' ) ||
+					isControlAllowed( allowedControls, 'author' ) ||
+					isControlAllowed( allowedControls, 'search' ) ||
+					isControlAllowed( allowedControls, 'parents' ) ) && (
+					<InspectorControls>
+						<ToolsPanel
+							className="block-library-query-toolspanel__filters"
+							label={ __( 'Filters' ) }
+							resetAll={ () => {
+								setQuery( {
+									author: '',
+									parents: [],
+									search: '',
+									taxQuery: null,
+								} );
+								setQuerySearch( '' );
+							} }
+						>
+							{ !! taxonomies?.length &&
+								isControlAllowed(
+									allowedControls,
+									'taxQuery'
+								) && (
+									<ToolsPanelItem
+										label={ __( 'Taxonomies' ) }
+										hasValue={ () =>
+											Object.values(
+												taxQuery || {}
+											).some(
+												( terms ) => !! terms.length
+											)
+										}
+										onDeselect={ () =>
+											setQuery( { taxQuery: null } )
+										}
+									>
+										<TaxonomyControls
+											onChange={ setQuery }
+											query={ query }
+										/>
+									</ToolsPanelItem>
+								) }
+							{ isControlAllowed( allowedControls, 'author' ) && (
 								<ToolsPanelItem
-									label={ __( 'Taxonomies' ) }
-									hasValue={ () =>
-										Object.values( taxQuery || {} ).some(
-											( terms ) => !! terms.length
-										)
-									}
+									hasValue={ () => !! authorIds }
+									label={ __( 'Authors' ) }
 									onDeselect={ () =>
-										setQuery( { taxQuery: null } )
+										setQuery( { author: '' } )
 									}
 								>
-									<TaxonomyControls
+									<AuthorControl
+										value={ authorIds }
 										onChange={ setQuery }
-										query={ query }
 									/>
 								</ToolsPanelItem>
 							) }
-						{ isControlAllowed( allowedControls, 'author' ) && (
-							<ToolsPanelItem
-								hasValue={ () => !! authorIds }
-								label={ __( 'Authors' ) }
-								onDeselect={ () => setQuery( { author: '' } ) }
-							>
-								<AuthorControl
-									value={ authorIds }
-									onChange={ setQuery }
-								/>
-							</ToolsPanelItem>
-						) }
-						{ isControlAllowed( allowedControls, 'search' ) && (
-							<ToolsPanelItem
-								hasValue={ () => !! querySearch }
-								label={ __( 'Keyword' ) }
-								onDeselect={ () => setQuerySearch( '' ) }
-							>
-								<TextControl
+							{ isControlAllowed( allowedControls, 'search' ) && (
+								<ToolsPanelItem
+									hasValue={ () => !! querySearch }
 									label={ __( 'Keyword' ) }
-									value={ querySearch }
-									onChange={ setQuerySearch }
-								/>
-							</ToolsPanelItem>
-						) }
-						{ isPostTypeHierarchical &&
-							isControlAllowed( allowedControls, 'parents' ) && (
-								<ToolsPanelItem
-									hasValue={ () => !! parents?.length }
-									label={ __( 'Parents' ) }
-									onDeselect={ () =>
-										setQuery( { parents: [] } )
-									}
+									onDeselect={ () => setQuerySearch( '' ) }
 								>
-									<ParentControl
-										parents={ parents }
-										postType={ postType }
-										onChange={ setQuery }
+									<TextControl
+										label={ __( 'Keyword' ) }
+										value={ querySearch }
+										onChange={ setQuerySearch }
 									/>
 								</ToolsPanelItem>
 							) }
-					</ToolsPanel>
-				</InspectorControls>
-			) }
+							{ isPostTypeHierarchical &&
+								isControlAllowed(
+									allowedControls,
+									'parents'
+								) && (
+									<ToolsPanelItem
+										hasValue={ () => !! parents?.length }
+										label={ __( 'Parents' ) }
+										onDeselect={ () =>
+											setQuery( { parents: [] } )
+										}
+									>
+										<ParentControl
+											parents={ parents }
+											postType={ postType }
+											onChange={ setQuery }
+										/>
+									</ToolsPanelItem>
+								) }
+						</ToolsPanel>
+					</InspectorControls>
+				) }
 		</>
 	);
 }
