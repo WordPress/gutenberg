@@ -64,6 +64,11 @@ function render_block_core_search( $attributes ) {
 		);
 	}
 
+	// Check array attributes place holder value isset or not
+	if( empty( $attributes['placeholder'] ) ) {
+		$attributes['placeholder'] = 'Optional placeholder…';
+	}
+
 	if ( $show_input ) {
 		$input_classes = array( 'wp-block-search__input' );
 		if ( $is_button_inside ) {
