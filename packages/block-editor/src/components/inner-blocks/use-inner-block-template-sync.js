@@ -42,7 +42,8 @@ export default function useInnerBlockTemplateSync(
 ) {
 	const { getSelectedBlocksInitialCaretPosition, isBlockSelected } =
 		useSelect( blockEditorStore );
-	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
+	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 	const innerBlocks = useSelect(
 		( select ) => select( blockEditorStore ).getBlocks( clientId ),
 		[ clientId ]
@@ -81,6 +82,7 @@ export default function useInnerBlockTemplateSync(
 			);
 
 			if ( ! isEqual( nextBlocks, currentInnerBlocks ) ) {
+				__unstableMarkNextChangeAsNotPersistent();
 				replaceInnerBlocks(
 					clientId,
 					nextBlocks,
