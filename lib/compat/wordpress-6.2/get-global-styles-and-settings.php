@@ -60,8 +60,6 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 	/**
 	 * Filters whether the cached global stylesheet can be used.
 	 *
-	 * @since 6.2.0
-	 *
 	 * @param boolean $can_use_cached Whether the cached global stylesheet can be used.
 	 */
 	$can_use_cached = apply_filters(
@@ -136,8 +134,6 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 
 /**
  * Clean the cache used by the `gutenberg_get_global_stylesheet` function.
- *
- * @since 6.2.0
  */
 function gutenberg_get_global_stylesheet_clean_cache() {
 	wp_cache_delete( 'gutenberg_get_global_stylesheet', 'theme_json' );
@@ -148,7 +144,6 @@ function gutenberg_get_global_stylesheet_clean_cache() {
  *
  * It is hooked into the `upgrader_process_complete` action.
  *
- * @since 6.2.0
  * @see default-filters.php
  *
  * @param WP_Upgrader $upgrader WP_Upgrader instance.

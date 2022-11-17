@@ -37,7 +37,6 @@ class WP_Theme_JSON_Resolver_6_2 extends WP_Theme_JSON_Resolver_6_1 {
 	 *
 	 * It is hooked into the `upgrader_process_complete` action.
 	 *
-	 * @since 6.2.0
 	 * @see default-filters.php
 	 *
 	 * @param WP_Upgrader $upgrader WP_Upgrader instance.
