@@ -101,6 +101,7 @@ require __DIR__ . '/compat/wordpress-6.1/template-parts-screen.php';
 require __DIR__ . '/compat/wordpress-6.1/theme.php';
 
 // WordPress 6.2 compat.
+require __DIR__ . '/compat/wordpress-6.2/additional-filters.php';
 require __DIR__ . '/compat/wordpress-6.2/script-loader.php';
 require __DIR__ . '/compat/wordpress-6.2/get-global-styles-and-settings.php';
 require __DIR__ . '/compat/wordpress-6.2/default-filters.php';
