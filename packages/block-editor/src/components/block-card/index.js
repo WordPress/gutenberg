@@ -26,9 +26,12 @@ function BlockCard( {
 		( { title, icon, description } = blockType );
 	}
 
+	const isOffCanvasNavigationEditorEnabled =
+		window?.__experimentalEnableOffCanvasNavigationEditor === true;
+
 	return (
 		<div className="block-editor-block-card">
-			{ parentBlockClientId && (
+			{ isOffCanvasNavigationEditorEnabled && parentBlockClientId && (
 				<Button
 					onClick={ handleBackButton }
 					label={ __( 'Navigate to the previous view' ) }
