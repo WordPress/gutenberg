@@ -36,13 +36,13 @@ Label to use for the angle picker.
 
 The current value of the input. The value represents an angle in degrees and should be a value between 0 and 360.
 
--   Required: Yes
+-   Required: No
 
 ### `onChange`: `( value: number ) => void`
 
 A function that receives the new value of the input.
 
--   Required: Yes
+-   Required: No
 
 ### `__nextHasNoMarginBottom`: `boolean`
 

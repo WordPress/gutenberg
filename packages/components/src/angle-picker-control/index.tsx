@@ -51,6 +51,10 @@ function UnforwardedAnglePickerControl(
 	}
 
 	const handleOnNumberChange = ( unprocessedValue: string | undefined ) => {
+		if ( onChange === undefined ) {
+			return;
+		}
+
 		const inputValue =
 			unprocessedValue !== undefined && unprocessedValue !== ''
 				? parseInt( unprocessedValue, 10 )
