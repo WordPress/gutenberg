@@ -125,6 +125,9 @@ $block-inserter-tabs-height: 44px;
 		.components-tab-panel__tabs-item {
 			flex-grow: 1;
 			margin-bottom: -$border-width;
+			&[id$="reusable"] {
+				flex-grow: inherit;
+			}
 		}
 	}
 

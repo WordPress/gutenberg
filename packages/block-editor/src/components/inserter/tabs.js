@@ -1,9 +1,15 @@
 /**
  * WordPress dependencies
  */
+import { symbol as reusableBlockIcon } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
 import { TabPanel } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import BlockIcon from '../block-icon';
 
 const blocksTab = {
 	name: 'blocks',
@@ -17,8 +23,7 @@ const patternsTab = {
 };
 const reusableBlocksTab = {
 	name: 'reusable',
-	/* translators: Reusable blocks tab title in the block inserter. */
-	title: __( 'Reusable' ),
+	title: <BlockIcon icon={ reusableBlockIcon } />,
 };
 
 function InserterTabs( {
