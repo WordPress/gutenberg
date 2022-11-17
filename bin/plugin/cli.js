@@ -95,10 +95,6 @@ program
 	.alias( 'perf' )
 	.option( ...ciOption )
 	.option(
-		'--rounds <count>',
-		'Run each test suite this many times for each branch; results are summarized, default = 1'
-	)
-	.option(
 		'--tests-branch <branch>',
 		"Use this branch's performance test files"
 	)
