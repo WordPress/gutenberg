@@ -60,7 +60,7 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 	/**
 	 * Filters whether the cached global stylesheet can be used.
 	 *
-	 * @since 14.6.0
+	 * @since 6.2.0
 	 *
 	 * @param boolean $can_use_cached Whether the cached global stylesheet can be used.
 	 */
