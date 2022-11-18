@@ -69,9 +69,6 @@ describe( 'General media replace flow', () => {
 		);
 		const uploadMenu = screen.getByRole( 'menu' );
 
-		expect( uploadMenu ).toBeInTheDocument();
-		expect( uploadMenu ).not.toBeVisible();
-
 		// The popover will be positioned with a slight delay.
 		await waitFor( () =>
 			expect( getWrappingPopoverElement( uploadMenu ) ).toHaveStyle( {
@@ -79,6 +76,8 @@ describe( 'General media replace flow', () => {
 				left: '0',
 			} )
 		);
+
+		expect( uploadMenu ).toBeVisible();
 	} );
 
 	it( 'displays media URL', async () => {
