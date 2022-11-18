@@ -241,7 +241,7 @@ async function runPerformanceTests( branches, options ) {
 
 	log( '    >> Installing dependencies and building packages' );
 	await runShellScript(
-		'npm ci && npm run build:packages',
+		'npm ci && node ./bin/packages/build.js',
 		performanceTestDirectory
 	);
 	log( '    >> Creating the environment folders' );
@@ -260,12 +260,26 @@ async function runPerformanceTests( branches, options ) {
 		await runShellScript( 'mkdir ' + environmentDirectory );
 		await runShellScript( `cp -R ${ baseDirectory } ${ buildPath }` );
 
-		log( `        >> Fetching the ${ formats.success( branch ) } branch` );
-		// @ts-ignore
-		await SimpleGit( buildPath ).reset( 'hard' ).checkout( branch );
+		const fancyBranch = formats.success( branch );
 
-		log( `        >> Building the ${ formats.success( branch ) } branch` );
-		await runShellScript( 'npm ci && npm run build', buildPath );
+		if ( branch === options.testsBranch ) {
+			log(
+				`        >> Re-using the testing branch for ${ fancyBranch }`
+			);
+			await runShellScript(
+				`cp -R ${ performanceTestDirectory } ${ buildPath }`
+			);
+		} else {
+			log( `        >> Fetching the ${ fancyBranch } branch` );
+			// @ts-ignore
+			await SimpleGit( buildPath ).reset( 'hard' ).checkout( branch );
+
+			log( `        >> Building the ${ fancyBranch } branch` );
+			await runShellScript(
+				'npm ci && node ./bin/packages/build.js',
+				buildPath
+			);
+		}
 
 		await runShellScript(
 			'cp ' +
