@@ -51,8 +51,8 @@ function CopyMenuItem( { blocks, onCopy } ) {
 	return <MenuItem ref={ ref }>{ copyMenuItemLabel }</MenuItem>;
 }
 
-function DuplicateMenuItem( { onClose, onDuplicate } ) {
-	const { __experimentalSelectBlock, shortcuts } =
+function DuplicateMenuItem( { onClose } ) {
+	const { __experimentalSelectBlock, shortcuts, onDuplicate, canDuplicate } =
 		useContext( BlockSettingsContext );
 
 	const updateSelectionAfterDuplicate = useCallback(
@@ -66,6 +66,11 @@ function DuplicateMenuItem( { onClose, onDuplicate } ) {
 			: noop,
 		[ __experimentalSelectBlock ]
 	);
+
+	if ( ! canDuplicate ) {
+		return null;
+	}
+
 	return (
 		<MenuItem
 			onClick={ pipe(
@@ -348,14 +353,6 @@ export function BlockSettingsDropdown( {
 	);
 	const removeBlockLabel = count === 1 ? label : __( 'Remove blocks' );
 
-	// Todo: memoize this
-	const blockSettingsActionsContextValue = {
-		__experimentalSelectBlock,
-		shortcuts,
-		blockClientIds,
-		selectedBlockClientIds,
-	};
-
 	const {
 		canDuplicate,
 		canInsertDefaultBlock,
@@ -372,6 +369,16 @@ export function BlockSettingsDropdown( {
 		clientIds: blockClientIds,
 		__experimentalUpdateSelection: ! __experimentalSelectBlock,
 	} );
+
+	// Todo: memoize this
+	const blockSettingsActionsContextValue = {
+		__experimentalSelectBlock,
+		shortcuts,
+		blockClientIds,
+		selectedBlockClientIds,
+		canDuplicate,
+		onDuplicate,
+	};
 
 	return (
 		<BlockSettingsContext.Provider
@@ -397,12 +404,9 @@ export function BlockSettingsDropdown( {
 							<HTMLConvertMenuItem />
 
 							<CopyMenuItem blocks={ blocks } onCopy={ onCopy } />
-							{ canDuplicate && (
-								<DuplicateMenuItem
-									onClose={ onClose }
-									onDuplicate={ onDuplicate }
-								></DuplicateMenuItem>
-							) }
+
+							<DuplicateMenuItem onClose={ onClose } />
+
 							{ canInsertDefaultBlock && (
 								<>
 									<InsertBeforeMenuItem
