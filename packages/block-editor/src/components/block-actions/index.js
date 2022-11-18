@@ -14,9 +14,8 @@ import {
 import { useNotifyCopy } from '../copy-handler';
 import { store as blockEditorStore } from '../../store';
 
-export default function BlockActions( {
+export function useBlockActions( {
 	clientIds,
-	children,
 	__experimentalUpdateSelection: updateSelection,
 } ) {
 	const {
@@ -61,7 +60,7 @@ export default function BlockActions( {
 
 	const notifyCopy = useNotifyCopy();
 
-	return children( {
+	return {
 		canDuplicate,
 		canInsertDefaultBlock,
 		canMove,
@@ -128,5 +127,18 @@ export default function BlockActions( {
 			}
 			notifyCopy( 'copy', selectedBlockClientIds );
 		},
+	};
+}
+
+export default function BlockActions( {
+	clientIds,
+	children,
+	__experimentalUpdateSelection,
+} ) {
+	const actions = useBlockActions( {
+		clientIds,
+		__experimentalUpdateSelection,
 	} );
+
+	return children( actions );
 }
