@@ -541,6 +541,13 @@ export default function NavigationSubmenuEdit( {
 		replaceBlock( clientId, newLinkBlock );
 	}
 
+	useEffect( () => {
+		// If block is empty, transform to Navigation Link.
+		if ( ! hasChildren ) {
+			transformToLink();
+		}
+	} );
+
 	const canConvertToLink =
 		! selectedBlockHasChildren || onlyDescendantIsEmptyLink;
 
