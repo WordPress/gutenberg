@@ -66,6 +66,7 @@ const interfaceLabels = {
 function Layout( { styles } ) {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
+	const isLargeViewport = useViewportMatch( 'large' );
 	const { openGeneralSidebar, closeGeneralSidebar, setIsInserterOpened } =
 		useDispatch( editPostStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -116,7 +117,8 @@ function Layout( { styles } ) {
 			showIconLabels:
 				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
 			isDistractionFree:
-				select( editPostStore ).isFeatureActive( 'distractionFree' ),
+				select( editPostStore ).isFeatureActive( 'distractionFree' ) &&
+				isLargeViewport,
 			showBlockBreadcrumbs: select( editPostStore ).isFeatureActive(
 				'showBlockBreadcrumbs'
 			),
