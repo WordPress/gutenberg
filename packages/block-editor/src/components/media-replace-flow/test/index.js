@@ -72,10 +72,7 @@ describe( 'General media replace flow', () => {
 		expect( uploadMenu ).toBeInTheDocument();
 		expect( uploadMenu ).not.toBeVisible();
 
-		/**
-		 * The popover will be displayed and positioned with a slight delay,
-		 * so we're opting to wait until that happens.
-		 */
+		// The popover will be positioned with a slight delay.
 		await waitFor( () =>
 			expect( getWrappingPopoverElement( uploadMenu ) ).toHaveStyle( {
 				top: '13px',
@@ -100,10 +97,7 @@ describe( 'General media replace flow', () => {
 			} )
 		);
 
-		/**
-		 * The popover will be displayed and positioned with a slight delay,
-		 * so we're opting to wait until that happens.
-		 */
+		// The popover will be positioned with a slight delay.
 		await waitFor( () =>
 			expect(
 				getWrappingPopoverElement( screen.getByRole( 'menu' ) )
@@ -131,10 +125,7 @@ describe( 'General media replace flow', () => {
 			} )
 		);
 
-		/**
-		 * The popover will be displayed and positioned with a slight delay,
-		 * so we're opting to wait until that happens.
-		 */
+		// The popover will be positioned with a slight delay.
 		await waitFor( () =>
 			expect(
 				getWrappingPopoverElement( screen.getByRole( 'menu' ) )
