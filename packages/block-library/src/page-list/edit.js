@@ -17,6 +17,7 @@ import {
 	ToolbarButton,
 	Spinner,
 	Notice,
+	ComboboxControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState, memo } from '@wordpress/element';
@@ -33,7 +34,12 @@ import { ItemSubmenuIcon } from '../navigation-link/icons';
 // Performance of Navigation Links is not good past this value.
 const MAX_PAGE_COUNT = 100;
 
-export default function PageListEdit( { context, clientId, attributes } ) {
+export default function PageListEdit( {
+	context,
+	clientId,
+	attributes,
+	setAttributes,
+} ) {
 	const { rootPageID } = attributes;
 	const { pagesByParentId, totalPages, hasResolvedPages } = usePageData();
 
@@ -101,10 +107,34 @@ export default function PageListEdit( { context, clientId, attributes } ) {
 		}
 	};
 
+	const useRootOptions = () => {
+		const [ pages ] = useGetPages();
+		return pages?.reduce( ( accumulator, page ) => {
+			accumulator.push( {
+				value: page.id,
+				label: page.title.rendered,
+			} );
+			return accumulator;
+		}, [] );
+	};
+
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Root page' ) }></PanelBody>
+				<PanelBody>
+					<ComboboxControl
+						className="editor-page-attributes__parent"
+						label={ __( 'Root page' ) }
+						value={ rootPageID }
+						options={ useRootOptions() }
+						onChange={ ( value ) =>
+							setAttributes( { rootPageID: value ?? 0 } )
+						}
+						help={ __(
+							'Setting a page here will restrict the block to show only the children of that'
+						) }
+					/>
+				</PanelBody>
 			</InspectorControls>
 			{ allowConvertToLinks && (
 				<BlockControls group="other">
@@ -140,7 +170,7 @@ function useFrontPageId() {
 	}, [] );
 }
 
-function usePageData( pageId = 0 ) {
+function useGetPages() {
 	const { records: pages, hasResolved: hasResolvedPages } = useEntityRecords(
 		'postType',
 		'page',
@@ -152,6 +182,12 @@ function usePageData( pageId = 0 ) {
 			context: 'view',
 		}
 	);
+
+	return [ pages, hasResolvedPages ];
+}
+
+function usePageData( pageId = 0 ) {
+	const [ pages, hasResolvedPages ] = useGetPages();
 
 	return useMemo( () => {
 		// TODO: Once the REST API supports passing multiple values to
