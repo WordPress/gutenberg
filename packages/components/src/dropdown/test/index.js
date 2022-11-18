@@ -8,18 +8,13 @@ import { fireEvent, render, screen } from '@testing-library/react';
  */
 import Dropdown from '../';
 
-function getButtonElement( container ) {
-	return container.querySelector( 'button' );
-}
 function getOpenCloseButton( container, selector ) {
 	return container.querySelector( selector );
 }
 
 describe( 'Dropdown', () => {
 	it( 'should toggle the dropdown properly', () => {
-		const {
-			container: { firstChild: dropdownContainer },
-		} = render(
+		render(
 			<Dropdown
 				className="container"
 				contentClassName="content"
@@ -33,12 +28,11 @@ describe( 'Dropdown', () => {
 			/>
 		);
 
-		expect(
-			screen.getByRole( 'button', { expanded: false } )
-		).toBeVisible();
+		const button = screen.getByRole( 'button', { expanded: false } );
+
+		expect( button ).toBeVisible();
 		expect( screen.queryByTestId( 'popover' ) ).not.toBeInTheDocument();
 
-		const button = getButtonElement( dropdownContainer );
 		fireEvent.click( button );
 
 		expect(
