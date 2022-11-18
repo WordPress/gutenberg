@@ -1023,15 +1023,15 @@
 					"properties": {
 						"background": {
 							"description": "Sets the `background-color` CSS property.",
-							"type": "string"
+							"type": [ "string", "object" ]
 						},
 						"gradient": {
 							"description": "Sets the `background` CSS property.",
-							"type": "string"
+							"type": [ "string", "object" ]
 						},
 						"text": {
 							"description": "Sets the `color` CSS property.",
-							"type": "string"
+							"type": [ "string", "object" ]
 						}
 					},
 					"additionalProperties": false
