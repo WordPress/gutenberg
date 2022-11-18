@@ -107,7 +107,7 @@ function UnconnectedToggleGroupControl(
  *
  * function Example() {
  *   return (
- *     <ToggleGroupControl label="my label" value="vertical" isBlock>
+ *     <ToggleGroupControl label="my label" value="vertical">
  *       <ToggleGroupControlOption value="horizontal" label="Horizontal" />
  *       <ToggleGroupControlOption value="vertical" label="Vertical" />
  *     </ToggleGroupControl>
