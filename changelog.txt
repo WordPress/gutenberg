@@ -1,5 +1,22 @@
 == Changelog ==
 
+= 14.5.4 =
+
+## Changelog
+
+### Fixes
+
+#### Global Styles
+- Fix the `upgrader_process_complete` hook for `wp_theme_has_theme_json`. ([45881](https://github.com/WordPress/gutenberg/pull/45881))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@oandregal
+
+
+
 = 14.5.3 =
 
 
