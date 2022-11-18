@@ -192,7 +192,7 @@ Notice that we have also disabled the `postType` control. When the user selects 
 Because our plugin uses custom attributes that we need to query, we want to add our own controls to allow the users to select those instead of the ones we have just disabled from the core inspector controls. We can do this via a [React HOC](https://reactjs.org/docs/higher-order-components.html) hooked into a [block filter](https://developer.wordpress.org/block-editor/reference-guides/filters/block-filters/), like so:
 
 ```jsx
-const { InspectorControls } = wp.blockEditor;
+import { InspectorControls } from '@wordpress/block-editor';
 
 export const withBookQueryControls = ( BlockEdit ) => ( props ) => {
 	// We only want to add these controls if it is our variation,
