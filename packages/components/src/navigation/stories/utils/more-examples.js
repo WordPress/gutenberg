@@ -7,10 +7,10 @@ import { Icon, wordpress, home } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import Navigation from '..';
-import NavigationGroup from '../group';
-import NavigationItem from '../item';
-import NavigationMenu from '../menu';
+import Navigation from '../..';
+import NavigationGroup from '../../group';
+import NavigationItem from '../../item';
+import NavigationMenu from '../../menu';
 
 export function MoreExamplesStory() {
 	const [ activeItem, setActiveItem ] = useState( 'child-1' );
