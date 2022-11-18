@@ -61,8 +61,9 @@ import {
 	textColor,
 } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as editPostStore } from '@wordpress/edit-post';
 import { store as noticesStore } from '@wordpress/notices';
+// eslint-disable-next-line no-restricted-imports
+import { store as editPostStore } from '@wordpress/edit-post';
 
 /**
  * Internal dependencies
