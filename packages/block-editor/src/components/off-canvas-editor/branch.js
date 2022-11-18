@@ -10,6 +10,7 @@ import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import ListViewBlock from './block';
 import { useListViewContext } from './context';
 import { isClientIdSelected } from './utils';
+import ButtonBlockAppender from '../button-block-appender';
 import { store as blockEditorStore } from '../../store';
 
 /**
@@ -195,6 +196,9 @@ function ListViewBranch( props ) {
 								isExpanded={ isExpanded }
 								selectBlockInCanvas={ selectBlockInCanvas }
 							/>
+						) }
+						{ clientId && (
+							<ButtonBlockAppender rootClientId={ clientId } />
 						) }
 					</AsyncModeProvider>
 				);
