@@ -194,6 +194,7 @@ function gutenberg_template_parts_screen_init( $hook ) {
 	}
 
 	/** This action is documented in wp-admin/edit-form-blocks.php */
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 	do_action( 'enqueue_block_editor_assets' );
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_template_parts_screen_init' );
