@@ -20,7 +20,6 @@ jobs:
             matrix:
                 native-test-name: [gutenberg-editor-initial-html]
                 api-level: [29]
-                target: [default]
 
         steps:
             - name: checkout
