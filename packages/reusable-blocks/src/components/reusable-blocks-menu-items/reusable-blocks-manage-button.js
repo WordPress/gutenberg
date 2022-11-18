@@ -39,6 +39,11 @@ function ReusableBlocksManageButton( { clientId } ) {
 		[ clientId ]
 	);
 
+	const innerBlockCount = useSelect(
+		( select ) => select( blockEditorStore ).getBlockCount( clientId ),
+		[ clientId ]
+	);
+
 	const { __experimentalConvertBlockToStatic: convertBlockToStatic } =
 		useDispatch( reusableBlocksStore );
 
@@ -55,7 +60,9 @@ function ReusableBlocksManageButton( { clientId } ) {
 			</MenuItem>
 			{ canRemove && (
 				<MenuItem onClick={ () => convertBlockToStatic( clientId ) }>
-					{ __( 'Convert to regular blocks' ) }
+					{ innerBlockCount > 1
+						? __( 'Convert to regular blocks' )
+						: __( 'Convert to regular block' ) }
 				</MenuItem>
 			) }
 		</BlockSettingsMenuControls>

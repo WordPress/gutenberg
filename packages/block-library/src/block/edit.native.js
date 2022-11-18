@@ -100,6 +100,11 @@ export default function ReusableBlockEdit( {
 		[ ref, clientId ]
 	);
 
+	const innerBlockCount = useSelect(
+		( select ) => select( blockEditorStore ).getBlockCount( clientId ),
+		[ clientId ]
+	);
+
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { __experimentalConvertBlockToStatic: convertBlockToStatic } =
 		useDispatch( reusableBlocksStore );
@@ -162,12 +167,20 @@ export default function ReusableBlockEdit( {
 						{ infoTitle }
 					</Text>
 					<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
-						{ __(
-							'Alternatively, you can detach and edit these blocks separately by tapping “Convert to regular blocks”.'
-						) }
+						{ innerBlockCount > 1
+							? __(
+									'Alternatively, you can detach and edit these blocks separately by tapping “Convert to regular blocks”.'
+							  )
+							: __(
+									'Alternatively, you can detach and edit this block separately by tapping “Convert to regular block”.'
+							  ) }
 					</Text>
 					<TextControl
-						label={ __( 'Convert to regular blocks' ) }
+						label={
+							innerBlockCount > 1
+								? __( 'Convert to regular blocks' )
+								: __( 'Convert to regular block' )
+						}
 						separatorType="topFullWidth"
 						onPress={ onConvertToRegularBlocks }
 						labelStyle={ actionButtonStyle }

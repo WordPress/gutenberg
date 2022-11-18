@@ -44,6 +44,11 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 		[ clientId ]
 	);
 
+	const innerBlockCount = useSelect(
+		( select ) => select( blockEditorStore ).getBlockCount( clientId ),
+		[ clientId ]
+	);
+
 	const { __experimentalConvertBlockToStatic: convertBlockToStatic } =
 		useDispatch( reusableBlocksStore );
 
@@ -109,7 +114,11 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 					<ToolbarGroup>
 						<ToolbarButton
 							onClick={ () => convertBlockToStatic( clientId ) }
-							label={ __( 'Convert to regular blocks' ) }
+							label={
+								innerBlockCount > 1
+									? __( 'Convert to regular blocks' )
+									: __( 'Convert to regular block' )
+							}
 							icon={ ungroup }
 							showTooltip
 						/>
