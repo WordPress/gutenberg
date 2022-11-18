@@ -46,6 +46,9 @@ function getWrappingPopoverElement( element ) {
  * Asserts that the specified popover has already been positioned.
  * Necessary because it will be positioned a bit later after it's displayed.
  *
+ * We're intentionally not using `.toHaveStyle()` because we want to be
+ * less specific and avoid specific values for better test flexibility.
+ *
  * @async
  *
  * @param {HTMLElement} popover Popover element.
