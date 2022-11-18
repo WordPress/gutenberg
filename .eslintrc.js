@@ -144,6 +144,7 @@ module.exports = {
 							'partial',
 							'partialRight',
 							'random',
+							'reduce',
 							'reject',
 							'repeat',
 							'reverse',
@@ -319,6 +320,13 @@ module.exports = {
 						} ),
 					},
 				],
+			},
+		},
+		{
+			files: [ 'packages/components/src/**/*.[tj]s?(x)' ],
+			excludedFiles: [ ...developmentFiles ],
+			rules: {
+				'react-hooks/exhaustive-deps': 'error',
 			},
 		},
 		{

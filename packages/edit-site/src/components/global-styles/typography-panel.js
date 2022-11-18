@@ -7,6 +7,7 @@ import {
 	__experimentalFontAppearanceControl as FontAppearanceControl,
 	__experimentalLetterSpacingControl as LetterSpacingControl,
 	__experimentalTextTransformControl as TextTransformControl,
+	__experimentalTextDecorationControl as TextDecorationControl,
 } from '@wordpress/block-editor';
 import {
 	FontSizePicker,
@@ -19,7 +20,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { getSupportedGlobalStylesPanels, useSetting, useStyle } from './hooks';
-import { getTypographyFontSizeValue } from './typography-utils';
 
 export function useHasTypographyPanel( name ) {
 	const hasFontFamily = useHasFontFamilyControl( name );
@@ -102,12 +102,39 @@ function useHasTextTransformControl( name, element ) {
 	return supports.includes( 'textTransform' );
 }
 
+function useHasTextDecorationControl( name, element ) {
+	// This is an exception for link elements.
+	// We shouldn't allow other blocks or elements to set textDecoration
+	// because this will be inherited by their children.
+	return ! name && element === 'link';
+}
+
 function useStyleWithReset( path, blockName ) {
 	const [ style, setStyle ] = useStyle( path, blockName );
 	const [ userStyle ] = useStyle( path, blockName, 'user' );
 	const hasStyle = () => !! userStyle;
 	const resetStyle = () => setStyle( undefined );
 	return [ style, setStyle, hasStyle, resetStyle ];
+}
+
+function useFontSizeWithReset( path, blockName ) {
+	const [ fontSize, setStyleCallback ] = useStyle( path, blockName );
+	const [ userStyle ] = useStyle( path, blockName, 'user' );
+	const hasFontSize = () => !! userStyle;
+	const resetFontSize = () => setStyleCallback( undefined );
+	const setFontSize = ( newValue, metadata ) => {
+		if ( !! metadata?.slug ) {
+			newValue = `var:preset|font-size|${ metadata?.slug }`;
+		}
+		setStyleCallback( newValue );
+	};
+
+	return {
+		fontSize,
+		setFontSize,
+		hasFontSize,
+		resetFontSize,
+	};
 }
 
 function useFontAppearance( prefix, name ) {
@@ -152,18 +179,7 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
 	} else if ( element && element !== 'text' ) {
 		prefix = `elements.${ element }.`;
 	}
-	const [ fluidTypography ] = useSetting( 'typography.fluid', name );
 	const [ fontSizes ] = useSetting( 'typography.fontSizes', name );
-
-	// Convert static font size values to fluid font sizes if fluidTypography is activated.
-	const fontSizesWithFluidValues = fontSizes.map( ( font ) => {
-		if ( !! fluidTypography ) {
-			font.size = getTypographyFontSizeValue( font, {
-				fluid: fluidTypography,
-			} );
-		}
-		return font;
-	} );
 
 	const disableCustomFontSizes = ! useSetting(
 		'typography.customFontSize',
@@ -182,6 +198,10 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
 	const appearanceControlLabel = useAppearanceControlLabel( name );
 	const hasLetterSpacingControl = useHasLetterSpacingControl( name, element );
 	const hasTextTransformControl = useHasTextTransformControl( name, element );
+	const hasTextDecorationControl = useHasTextDecorationControl(
+		name,
+		element
+	);
 
 	/* Disable font size controls when the option to style all headings is selected. */
 	let hasFontSizeEnabled = supports.includes( 'fontSize' );
@@ -191,8 +211,8 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
 
 	const [ fontFamily, setFontFamily, hasFontFamily, resetFontFamily ] =
 		useStyleWithReset( prefix + 'typography.fontFamily', name );
-	const [ fontSize, setFontSize, hasFontSize, resetFontSize ] =
-		useStyleWithReset( prefix + 'typography.fontSize', name );
+	const { fontSize, setFontSize, hasFontSize, resetFontSize } =
+		useFontSizeWithReset( prefix + 'typography.fontSize', name );
 	const {
 		fontStyle,
 		setFontStyle,
@@ -215,6 +235,12 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
 		hasTextTransform,
 		resetTextTransform,
 	] = useStyleWithReset( prefix + 'typography.textTransform', name );
+	const [
+		textDecoration,
+		setTextDecoration,
+		hasTextDecoration,
+		resetTextDecoration,
+	] = useStyleWithReset( prefix + 'typography.textDecoration', name );
 
 	const resetAll = () => {
 		resetFontFamily();
@@ -253,7 +279,7 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
 					<FontSizePicker
 						value={ fontSize }
 						onChange={ setFontSize }
-						fontSizes={ fontSizesWithFluidValues }
+						fontSizes={ fontSizes }
 						disableCustomFontSizes={ disableCustomFontSizes }
 						withReset={ false }
 						withSlider
@@ -336,6 +362,22 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
 						isBlock
 						size="__unstable-large"
 						__nextHasNoMarginBottom
+					/>
+				</ToolsPanelItem>
+			) }
+			{ hasTextDecorationControl && (
+				<ToolsPanelItem
+					className="single-column"
+					label={ __( 'Text decoration' ) }
+					hasValue={ hasTextDecoration }
+					onDeselect={ resetTextDecoration }
+					isShownByDefault
+				>
+					<TextDecorationControl
+						value={ textDecoration }
+						onChange={ setTextDecoration }
+						size="__unstable-large"
+						__unstableInputWidth="auto"
 					/>
 				</ToolsPanelItem>
 			) }

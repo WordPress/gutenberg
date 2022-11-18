@@ -253,7 +253,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
                     class="components-toggle-control__label"
                     for="inspector-toggle-control-1"
                   >
-                    Distraction Free
+                    Distraction free
                   </label>
                 </div>
               </div>
@@ -580,13 +580,13 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
 }
 
 .emotion-13:hover {
-  color: var( --wp-admin-theme-color, #007cba);
+  color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
 }
 
 .emotion-13:focus {
   background-color: transparent;
-  color: var( --wp-admin-theme-color, #007cba);
-  border-color: var( --wp-admin-theme-color, #007cba);
+  color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
   outline: 3px solid transparent;
 }
 

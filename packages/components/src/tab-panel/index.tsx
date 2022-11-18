@@ -7,7 +7,7 @@ import { find } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useCallback } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 
 /**
@@ -85,10 +85,13 @@ export function TabPanel( {
 	const instanceId = useInstanceId( TabPanel, 'tab-panel' );
 	const [ selected, setSelected ] = useState< string >();
 
-	const handleTabSelection = ( tabKey: string ) => {
-		setSelected( tabKey );
-		onSelect?.( tabKey );
-	};
+	const handleTabSelection = useCallback(
+		( tabKey: string ) => {
+			setSelected( tabKey );
+			onSelect?.( tabKey );
+		},
+		[ onSelect ]
+	);
 
 	const onNavigate = ( _childIndex: number, child: HTMLButtonElement ) => {
 		child.click();
@@ -100,7 +103,7 @@ export function TabPanel( {
 		if ( ! selectedTab?.name && tabs.length > 0 ) {
 			handleTabSelection( initialTabName || tabs[ 0 ].name );
 		}
-	}, [ tabs, selectedTab?.name, initialTabName ] );
+	}, [ tabs, selectedTab?.name, initialTabName, handleTabSelection ] );
 
 	return (
 		<div className={ className }>
@@ -124,8 +127,11 @@ export function TabPanel( {
 						selected={ tab.name === selected }
 						key={ tab.name }
 						onClick={ () => handleTabSelection( tab.name ) }
+						label={ tab.icon && tab.title }
+						icon={ tab.icon }
+						showTooltip={ !! tab.icon }
 					>
-						{ tab.title }
+						{ ! tab.icon && tab.title }
 					</TabButton>
 				) ) }
 			</NavigableMenu>

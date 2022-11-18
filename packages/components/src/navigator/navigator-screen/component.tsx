@@ -75,6 +75,12 @@ function UnconnectedNavigatorScreen(
 		[ className, cx ]
 	);
 
+	const locationRef = useRef( location );
+
+	useEffect( () => {
+		locationRef.current = location;
+	}, [ location ] );
+
 	// Focus restoration
 	const isInitialLocation = location.isInitial && ! location.isBack;
 	useEffect( () => {
@@ -87,7 +93,7 @@ function UnconnectedNavigatorScreen(
 			isInitialLocation ||
 			! isMatch ||
 			! wrapperRef.current ||
-			location.hasRestoredFocus
+			locationRef.current.hasRestoredFocus
 		) {
 			return;
 		}
@@ -119,12 +125,11 @@ function UnconnectedNavigatorScreen(
 			elementToFocus = firstTabbable ?? wrapperRef.current;
 		}
 
-		location.hasRestoredFocus = true;
+		locationRef.current.hasRestoredFocus = true;
 		elementToFocus.focus();
 	}, [
 		isInitialLocation,
 		isMatch,
-		location.hasRestoredFocus,
 		location.isBack,
 		previousLocation?.focusTargetSelector,
 	] );
