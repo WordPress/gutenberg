@@ -43,7 +43,7 @@ describe( 'Dropdown', () => {
 			expect( screen.getByTestId( 'popover' ) ).toBeVisible()
 		);
 
-		// Cleanup remaining effects, like the popover positioning
+		// Cleanup remaining effects, like the delayed popover positioning
 		unmount();
 	} );
 
