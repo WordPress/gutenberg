@@ -24,7 +24,7 @@ import { pipe, useCopyToClipboard } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import BlockActions from '../block-actions';
+import { useBlockActions } from '../block-actions';
 import BlockIcon from '../block-icon';
 import BlockModeToggle from './block-mode-toggle';
 import BlockHTMLConvertButton from './block-html-convert-button';
@@ -319,130 +319,121 @@ export function BlockSettingsDropdown( {
 	const parentBlockIsSelected =
 		selectedBlockClientIds?.includes( firstParentClientId );
 
-	// memoize blockSettingsActionsContextValue to avoid unnecessary rerenders
+	// Todo: memoize this
 	const blockSettingsActionsContextValue = {
 		__experimentalSelectBlock,
 		shortcuts,
 		blockClientIds,
 	};
 
+	const {
+		canDuplicate,
+		canInsertDefaultBlock,
+		canMove,
+		canRemove,
+		onDuplicate,
+		onInsertAfter,
+		onInsertBefore,
+		onRemove,
+		onCopy,
+		onMoveTo,
+		blocks,
+	} = useBlockActions( {
+		clientIds: blockClientIds,
+		__experimentalUpdateSelection: ! __experimentalSelectBlock,
+	} );
+
 	return (
 		<BlockSettingsContext.Provider
 			value={ blockSettingsActionsContextValue }
 		>
-			<BlockActions
-				clientIds={ clientIds }
-				__experimentalUpdateSelection={ ! __experimentalSelectBlock }
+			<DropdownMenu
+				icon={ moreVertical }
+				label={ __( 'Options' ) }
+				className="block-editor-block-settings-menu"
+				popoverProps={ POPOVER_PROPS }
+				noIcons
+				{ ...props }
 			>
-				{ ( {
-					canDuplicate,
-					canInsertDefaultBlock,
-					canMove,
-					canRemove,
-					onDuplicate,
-					onInsertAfter,
-					onInsertBefore,
-					onRemove,
-					onCopy,
-					onMoveTo,
-					blocks,
-				} ) => (
-					<DropdownMenu
-						icon={ moreVertical }
-						label={ __( 'Options' ) }
-						className="block-editor-block-settings-menu"
-						popoverProps={ POPOVER_PROPS }
-						noIcons
-						{ ...props }
-					>
-						{ ( { onClose } ) => (
-							<>
-								<MenuGroup>
-									<__unstableBlockSettingsMenuFirstItem.Slot
-										fillProps={ { onClose } }
-									/>
-									{ ! parentBlockIsSelected &&
-										!! firstParentClientId && (
-											<SelectParentMenuItem
-												firstParentClientId={
-													firstParentClientId
-												}
-												parentBlockType={
-													parentBlockType
-												}
-												selectBlock={ selectBlock }
-												selectParentButtonRef={
-													selectParentButtonRef
-												}
-												showParentOutlineGestures={
-													showParentOutlineGestures
-												}
-											/>
-										) }
-
-									<HTMLConvertMenuItem />
-
-									<CopyMenuItem
-										blocks={ blocks }
-										onCopy={ onCopy }
-									/>
-									{ canDuplicate && (
-										<DuplicateMenuItem
-											onClose={ onClose }
-											onDuplicate={ onDuplicate }
-										></DuplicateMenuItem>
-									) }
-									{ canInsertDefaultBlock && (
-										<>
-											<InsertBeforeMenuItem
-												onClose={ onClose }
-												onInsertBefore={
-													onInsertBefore
-												}
-											></InsertBeforeMenuItem>
-											<InsertAfterMenuItem
-												onClose={ onClose }
-												onInsertAfter={ onInsertAfter }
-											></InsertAfterMenuItem>
-										</>
-									) }
-									{ canMove && ! onlyBlock && (
-										<MoveMenuItem
-											onClose={ onClose }
-											onMoveTo={ onMoveTo }
-										></MoveMenuItem>
-									) }
-
-									<BlockModeMenuItem onClose={ onClose } />
-								</MenuGroup>
-								<BlockSettingsMenuControls.Slot
-									fillProps={ { onClose } }
-									clientIds={ clientIds }
-									__unstableDisplayLocation={
-										__unstableDisplayLocation
-									}
-								/>
-								{ typeof children === 'function'
-									? children( { onClose } )
-									: Children.map( ( child ) =>
-											cloneElement( child, { onClose } )
-									  ) }
-								{ canRemove && (
-									<RemoveMenuItem
-										// Todo: extract updateSelectionAfterRemove props requirements to a shared context provider.
-										updateSelectionAfterRemove={
-											updateSelectionAfterRemove
+				{ ( { onClose } ) => (
+					<>
+						<MenuGroup>
+							<__unstableBlockSettingsMenuFirstItem.Slot
+								fillProps={ { onClose } }
+							/>
+							{ ! parentBlockIsSelected &&
+								!! firstParentClientId && (
+									<SelectParentMenuItem
+										firstParentClientId={
+											firstParentClientId
 										}
-										label={ removeBlockLabel }
-										onClose={ onClose }
-										onRemove={ onRemove }
-									></RemoveMenuItem>
+										parentBlockType={ parentBlockType }
+										selectBlock={ selectBlock }
+										selectParentButtonRef={
+											selectParentButtonRef
+										}
+										showParentOutlineGestures={
+											showParentOutlineGestures
+										}
+									/>
 								) }
-							</>
+
+							<HTMLConvertMenuItem />
+
+							<CopyMenuItem blocks={ blocks } onCopy={ onCopy } />
+							{ canDuplicate && (
+								<DuplicateMenuItem
+									onClose={ onClose }
+									onDuplicate={ onDuplicate }
+								></DuplicateMenuItem>
+							) }
+							{ canInsertDefaultBlock && (
+								<>
+									<InsertBeforeMenuItem
+										onClose={ onClose }
+										onInsertBefore={ onInsertBefore }
+									></InsertBeforeMenuItem>
+									<InsertAfterMenuItem
+										onClose={ onClose }
+										onInsertAfter={ onInsertAfter }
+									></InsertAfterMenuItem>
+								</>
+							) }
+							{ canMove && ! onlyBlock && (
+								<MoveMenuItem
+									onClose={ onClose }
+									onMoveTo={ onMoveTo }
+								></MoveMenuItem>
+							) }
+
+							<BlockModeMenuItem onClose={ onClose } />
+						</MenuGroup>
+						<BlockSettingsMenuControls.Slot
+							fillProps={ { onClose } }
+							clientIds={ clientIds }
+							__unstableDisplayLocation={
+								__unstableDisplayLocation
+							}
+						/>
+						{ typeof children === 'function'
+							? children( { onClose } )
+							: Children.map( ( child ) =>
+									cloneElement( child, { onClose } )
+							  ) }
+						{ canRemove && (
+							<RemoveMenuItem
+								// Todo: extract updateSelectionAfterRemove props requirements to a shared context provider.
+								updateSelectionAfterRemove={
+									updateSelectionAfterRemove
+								}
+								label={ removeBlockLabel }
+								onClose={ onClose }
+								onRemove={ onRemove }
+							></RemoveMenuItem>
 						) }
-					</DropdownMenu>
+					</>
 				) }
-			</BlockActions>
+			</DropdownMenu>
 		</BlockSettingsContext.Provider>
 	);
 }
