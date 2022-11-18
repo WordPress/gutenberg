@@ -355,7 +355,6 @@ export function BlockSettingsDropdown( {
 	__experimentalSelectBlock,
 	children,
 	__unstableDisplayLocation,
-	children: blockSettingsDropDownChildren,
 	...props
 } ) {
 	const blockClientIds = Array.isArray( clientIds )
@@ -468,8 +467,12 @@ export function BlockSettingsDropdown( {
 				{ ...props }
 			>
 				{ ( { onClose } ) => {
-					if ( blockSettingsDropDownChildren ) {
-						return blockSettingsDropDownChildren;
+					// Todo: how to make onClose part of the context?
+
+					if ( children ) {
+						return Children.map( children, ( child ) =>
+							cloneElement( child, { onClose } )
+						);
 					}
 
 					return (
