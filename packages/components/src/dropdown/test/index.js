@@ -9,10 +9,6 @@ import userEvent from '@testing-library/user-event';
  */
 import Dropdown from '../';
 
-function getOpenCloseButton( container, selector ) {
-	return container.querySelector( selector );
-}
-
 describe( 'Dropdown', () => {
 	it( 'should toggle the dropdown properly', async () => {
 		const user = userEvent.setup( {
@@ -55,9 +51,7 @@ describe( 'Dropdown', () => {
 		const user = userEvent.setup( {
 			advanceTimers: jest.advanceTimersByTime,
 		} );
-		const {
-			container: { firstChild: dropdownContainer },
-		} = render(
+		render(
 			<Dropdown
 				className="container"
 				contentClassName="content"
@@ -81,14 +75,14 @@ describe( 'Dropdown', () => {
 
 		expect( screen.queryByTestId( 'popover' ) ).not.toBeInTheDocument();
 
-		const openButton = getOpenCloseButton( dropdownContainer, '.open' );
+		const openButton = screen.getByRole( 'button', { name: 'Toggle' } );
 		await user.click( openButton );
 
 		await waitFor( () =>
 			expect( screen.getByTestId( 'popover' ) ).toBeVisible()
 		);
 
-		const closeButton = getOpenCloseButton( dropdownContainer, '.close' );
+		const closeButton = screen.getByRole( 'button', { name: 'close' } );
 		await user.click( closeButton );
 
 		expect( screen.queryByTestId( 'popover' ) ).not.toBeInTheDocument();
