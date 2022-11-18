@@ -14,6 +14,8 @@
  * @return string Returns the featured image for the current post.
  */
 function render_block_core_post_featured_image( $attributes, $content, $block ) {
+	// While postId is not used in this function, we should keep this guard to
+	// make sure the block is rendered in the correct context.
 	if ( ! isset( $block->context['postId'] ) ) {
 		return '';
 	}

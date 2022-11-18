@@ -15,6 +15,12 @@
  * @return string Returns the filtered post title for the current post wrapped inside "h1" tags.
  */
 function render_block_core_post_title( $attributes, $content, $block ) {
+	// While postId is not used in this function, we should keep this guard to
+	// make sure the block is rendered in the correct context.
+	if ( ! isset( $block->context['postId'] ) ) {
+		return '';
+	}
+
 	$title = get_the_title();
 
 	if ( ! $title ) {
