@@ -77,7 +77,7 @@ export default function ReusableBlockEdit( {
 		styles.spinnerDark
 	);
 
-	const { hasResolved, isEditing, isMissing } = useSelect(
+	const { hasResolved, isEditing, isMissing, innerBlockCount } = useSelect(
 		( select ) => {
 			const persistedBlock = select( coreStore ).getEntityRecord(
 				'postType',
@@ -88,6 +88,9 @@ export default function ReusableBlockEdit( {
 				'getEntityRecord',
 				[ 'postType', 'wp_block', ref ]
 			);
+
+			const { getBlockCount } = select( blockEditorStore );
+
 			return {
 				hasResolved: hasResolvedBlock,
 				isEditing:
@@ -95,14 +98,10 @@ export default function ReusableBlockEdit( {
 						reusableBlocksStore
 					).__experimentalIsEditingReusableBlock( clientId ),
 				isMissing: hasResolvedBlock && ! persistedBlock,
+				innerBlockCount: getBlockCount( clientId ),
 			};
 		},
 		[ ref, clientId ]
-	);
-
-	const innerBlockCount = useSelect(
-		( select ) => select( blockEditorStore ).getBlockCount( clientId ),
-		[ clientId ]
 	);
 
 	const { createSuccessNotice } = useDispatch( noticesStore );

@@ -39,13 +39,15 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	);
 	const isMissing = hasResolved && ! record;
 
-	const canRemove = useSelect(
-		( select ) => select( blockEditorStore ).canRemoveBlock( clientId ),
-		[ clientId ]
-	);
-
-	const innerBlockCount = useSelect(
-		( select ) => select( blockEditorStore ).getBlockCount( clientId ),
+	const { canRemove, innerBlockCount } = useSelect(
+		( select ) => {
+			const { canRemoveBlock, getBlockCount } =
+				select( blockEditorStore );
+			return {
+				canRemove: canRemoveBlock( clientId ),
+				innerBlockCount: getBlockCount( clientId ),
+			};
+		},
 		[ clientId ]
 	);
 
