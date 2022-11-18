@@ -81,7 +81,6 @@ Default.args = {
 		{ value: 'right', label: 'Right' },
 		{ value: 'justify', label: 'Justify' },
 	].map( mapPropsToOptionComponent ),
-	isBlock: true,
 	label: 'Label',
 };
 
