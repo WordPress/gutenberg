@@ -194,8 +194,13 @@ function SelectParentMenuItem() {
 	);
 }
 
-function InsertBeforeMenuItem( { onClose, onInsertBefore } ) {
-	const { shortcuts } = useContext( BlockSettingsContext );
+function InsertBeforeMenuItem( { onClose } ) {
+	const { shortcuts, onInsertBefore, canInsertDefaultBlock } =
+		useContext( BlockSettingsContext );
+
+	if ( ! canInsertDefaultBlock ) {
+		return null;
+	}
 
 	return (
 		<MenuItem
@@ -207,8 +212,14 @@ function InsertBeforeMenuItem( { onClose, onInsertBefore } ) {
 	);
 }
 
-function InsertAfterMenuItem( { onClose, onInsertAfter } ) {
-	const { shortcuts } = useContext( BlockSettingsContext );
+function InsertAfterMenuItem( { onClose } ) {
+	const { shortcuts, onInsertAfter, canInsertDefaultBlock } =
+		useContext( BlockSettingsContext );
+
+	if ( ! canInsertDefaultBlock ) {
+		return null;
+	}
+
 	return (
 		<MenuItem
 			onClick={ pipe( onClose, onInsertAfter ) }
@@ -408,6 +419,9 @@ export function BlockSettingsDropdown( {
 		onCopy,
 		onMoveTo,
 		canMove,
+		canInsertDefaultBlock,
+		onInsertBefore,
+		onInsertAfter,
 	};
 
 	return (
@@ -437,18 +451,9 @@ export function BlockSettingsDropdown( {
 
 							<DuplicateMenuItem onClose={ onClose } />
 
-							{ canInsertDefaultBlock && (
-								<>
-									<InsertBeforeMenuItem
-										onClose={ onClose }
-										onInsertBefore={ onInsertBefore }
-									></InsertBeforeMenuItem>
-									<InsertAfterMenuItem
-										onClose={ onClose }
-										onInsertAfter={ onInsertAfter }
-									></InsertAfterMenuItem>
-								</>
-							) }
+							<InsertBeforeMenuItem onClose={ onClose } />
+
+							<InsertAfterMenuItem onClose={ onClose } />
 
 							<MoveMenuItem onClose={ onClose } />
 
