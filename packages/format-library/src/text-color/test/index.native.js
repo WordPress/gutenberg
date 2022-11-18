@@ -6,6 +6,8 @@ import {
 	initializeEditor,
 	fireEvent,
 	waitFor,
+	addBlock,
+	getBlock,
 } from 'test/helpers';
 
 /**
@@ -32,19 +34,14 @@ afterAll( () => {
 
 describe( 'Text color', () => {
 	it( 'shows the text color formatting button in the toolbar', async () => {
-		const { getByLabelText } = await initializeEditor();
+		const screen = await initializeEditor();
+		const { getByLabelText } = screen;
 
-		// Wait for the editor placeholder
-		const paragraphPlaceholder = await waitFor( () =>
-			getByLabelText( 'Add paragraph block' )
-		);
-		expect( paragraphPlaceholder ).toBeDefined();
-		fireEvent.press( paragraphPlaceholder );
+		// Create Paragraph block
+		await addBlock( screen, 'Paragraph' );
 
 		// Wait for the block to be created
-		const paragraphBlock = await waitFor( () =>
-			getByLabelText( /Paragraph Block\. Row 1/ )
-		);
+		const paragraphBlock = await getBlock( screen, 'Paragraph' );
 		expect( paragraphBlock ).toBeDefined();
 
 		// Look for the highlight text color button
@@ -55,20 +52,14 @@ describe( 'Text color', () => {
 	} );
 
 	it( 'allows toggling the highlight color feature to type new text', async () => {
-		const { getByLabelText, getByTestId, getByA11yHint } =
-			await initializeEditor();
+		const screen = await initializeEditor();
+		const { getByLabelText, getByTestId, getByA11yHint } = screen;
 
-		// Wait for the editor placeholder
-		const paragraphPlaceholder = await waitFor( () =>
-			getByLabelText( 'Add paragraph block' )
-		);
-		expect( paragraphPlaceholder ).toBeDefined();
-		fireEvent.press( paragraphPlaceholder );
+		// Create Paragraph block
+		await addBlock( screen, 'Paragraph' );
 
 		// Wait for the block to be created
-		const paragraphBlock = await waitFor( () =>
-			getByLabelText( /Paragraph Block\. Row 1/ )
-		);
+		const paragraphBlock = await getBlock( screen, 'Paragraph' );
 		expect( paragraphBlock ).toBeDefined();
 
 		// Look for the highlight text color button
@@ -93,25 +84,20 @@ describe( 'Text color', () => {
 	} );
 
 	it( 'allows toggling the highlight color feature to selected text', async () => {
+		const screen = await initializeEditor();
 		const {
 			getByLabelText,
 			getByTestId,
 			getByPlaceholderText,
 			getByA11yHint,
-		} = await initializeEditor();
+		} = screen;
 		const text = 'Hello this is a test';
 
-		// Wait for the editor placeholder
-		const paragraphPlaceholder = await waitFor( () =>
-			getByLabelText( 'Add paragraph block' )
-		);
-		expect( paragraphPlaceholder ).toBeDefined();
-		fireEvent.press( paragraphPlaceholder );
+		// Create Paragraph block
+		await addBlock( screen, 'Paragraph' );
 
 		// Wait for the block to be created
-		const paragraphBlock = await waitFor( () =>
-			getByLabelText( /Paragraph Block\. Row 1/ )
-		);
+		const paragraphBlock = await getBlock( screen, 'Paragraph' );
 		expect( paragraphBlock ).toBeDefined();
 
 		// Update TextInput value
@@ -146,14 +132,12 @@ describe( 'Text color', () => {
 	} );
 
 	it( 'creates a paragraph block with the text color format', async () => {
-		const { getByLabelText } = await initializeEditor( {
+		const screen = await initializeEditor( {
 			initialHtml: TEXT_WITH_COLOR,
 		} );
 
 		// Wait for the block to be created
-		const paragraphBlock = await waitFor( () =>
-			getByLabelText( /Paragraph Block\. Row 1/ )
-		);
+		const paragraphBlock = await getBlock( screen, 'Paragraph' );
 		expect( paragraphBlock ).toBeDefined();
 
 		expect( getEditorHtml() ).toMatchSnapshot();

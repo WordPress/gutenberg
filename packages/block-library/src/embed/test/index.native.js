@@ -259,9 +259,13 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
+			await waitFor( () =>
+				editor.findByTestId( 'block-settings-modal' )
+			);
 			const blockSettingsModal = await editor.findByTestId(
 				'block-settings-modal'
 			);
+
 			// Get Twitter link field.
 			const twitterLinkField = within(
 				blockSettingsModal
@@ -292,6 +296,9 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
+			await waitFor( () =>
+				editor.findByTestId( 'block-settings-modal' )
+			);
 			const blockSettingsModal = await editor.findByTestId(
 				'block-settings-modal'
 			);
@@ -351,6 +358,9 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
+			await waitFor( () =>
+				editor.findByTestId( 'block-settings-modal' )
+			);
 			const blockSettingsModal = await editor.findByTestId(
 				'block-settings-modal'
 			);
@@ -387,6 +397,9 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
+			await waitFor( () =>
+				editor.findByTestId( 'block-settings-modal' )
+			);
 			const blockSettingsModal = await editor.findByTestId(
 				'block-settings-modal'
 			);
@@ -699,6 +712,9 @@ describe( 'Embed block', () => {
 			fireEvent.press( editor.getByText( 'More options' ) );
 			fireEvent.press( editor.getByText( 'Retry' ) );
 
+			await waitFor( () =>
+				editor.findByTestId( 'block-settings-modal' )
+			);
 			const blockSettingsModal = await editor.findByTestId(
 				'block-settings-modal'
 			);
@@ -786,6 +802,9 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
+			await waitFor( () =>
+				editor.findByTestId( 'block-settings-modal' )
+			);
 			const blockSettingsModal = await editor.findByTestId(
 				'block-settings-modal'
 			);

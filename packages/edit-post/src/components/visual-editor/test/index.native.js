@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { initializeEditor, fireEvent } from 'test/helpers';
+import { initializeEditor, fireEvent, getBlock } from 'test/helpers';
 
 /**
  * WordPress dependencies
@@ -38,7 +38,8 @@ describe( 'when title is focused', () => {
 		} );
 
 		// Focus first block
-		fireEvent.press( screen.getByLabelText( /Paragraph Block. Row 1/ ) );
+		const paragraphBlock = await getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
 
 		// Focus title
 		fireEvent(
@@ -50,13 +51,18 @@ describe( 'when title is focused', () => {
 		fireEvent.press( screen.getByLabelText( 'Add block' ) );
 		fireEvent.press( screen.getByText( 'Heading' ) );
 
-		expect( screen.getByLabelText( /Heading Block. Row 1/ ) ).toBeDefined();
-		expect(
-			screen.getByLabelText( /Paragraph Block. Row 2/ )
-		).toBeDefined();
-		expect(
-			screen.getByLabelText( /Paragraph Block. Row 3/ )
-		).toBeDefined();
+		const headingBlock = await getBlock( screen, 'Heading' );
+		expect( headingBlock ).toBeDefined();
+
+		const secondParagraphBlock = await getBlock( screen, 'Paragraph', {
+			rowIndex: 2,
+		} );
+		expect( secondParagraphBlock ).toBeDefined();
+
+		const thirdParagraphBlock = await getBlock( screen, 'Paragraph', {
+			rowIndex: 3,
+		} );
+		expect( thirdParagraphBlock ).toBeDefined();
 	} );
 } );
 
@@ -67,7 +73,8 @@ describe( 'when title is no longer focused', () => {
 		} );
 
 		// Focus first block
-		fireEvent.press( screen.getByLabelText( /Paragraph Block. Row 1/ ) );
+		const paragraphBlock = await getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
 
 		// Focus title
 		fireEvent(
@@ -76,18 +83,21 @@ describe( 'when title is no longer focused', () => {
 		);
 
 		// Focus last block
-		fireEvent.press( screen.getByLabelText( /Paragraph Block. Row 2/ ) );
+		const secondParagraphBlock = await getBlock( screen, 'Paragraph', {
+			rowIndex: 2,
+		} );
+		fireEvent.press( secondParagraphBlock );
 
 		// Add new Heading block
 		fireEvent.press( screen.getByLabelText( 'Add block' ) );
 		fireEvent.press( screen.getByText( 'Heading' ) );
 
-		expect(
-			screen.getByLabelText( /Paragraph Block. Row 1/ )
-		).toBeDefined();
-		expect(
-			screen.getByLabelText( /Paragraph Block. Row 2/ )
-		).toBeDefined();
-		expect( screen.getByLabelText( /Heading Block. Row 3/ ) ).toBeDefined();
+		expect( paragraphBlock ).toBeDefined();
+		expect( secondParagraphBlock ).toBeDefined();
+
+		const headingBlock = await getBlock( screen, 'Heading', {
+			rowIndex: 3,
+		} );
+		expect( headingBlock ).toBeDefined();
 	} );
 } );
