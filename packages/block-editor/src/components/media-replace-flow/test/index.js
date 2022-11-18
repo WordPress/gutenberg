@@ -103,15 +103,13 @@ describe( 'General media replace flow', () => {
 			} )
 		);
 
-		await popoverIsPositioned(
-			getWrappingPopoverElement( screen.getByRole( 'menu' ) )
-		);
+		const link = screen.getByRole( 'link', {
+			name: 'example.media (opens in a new tab)',
+		} );
 
-		expect(
-			screen.getByRole( 'link', {
-				name: 'example.media (opens in a new tab)',
-			} )
-		).toHaveAttribute( 'href', 'https://example.media' );
+		await popoverIsPositioned( getWrappingPopoverElement( link ) );
+
+		expect( link ).toHaveAttribute( 'href', 'https://example.media' );
 	} );
 
 	it( 'edits media URL', async () => {
@@ -129,7 +127,11 @@ describe( 'General media replace flow', () => {
 		);
 
 		await popoverIsPositioned(
-			getWrappingPopoverElement( screen.getByRole( 'menu' ) )
+			getWrappingPopoverElement(
+				screen.getByRole( 'link', {
+					name: 'example.media (opens in a new tab)',
+				} )
+			)
 		);
 
 		await user.click(
