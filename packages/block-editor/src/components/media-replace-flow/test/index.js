@@ -36,7 +36,7 @@ function TestWrapper() {
  * Returns the first found popover element up the DOM tree.
  *
  * @param {HTMLElement} element Element to start with.
- * @return {HTMLElement|null} Popover element, or `null` if not found.`
+ * @return {HTMLElement|null} Popover element, or `null` if not found.
  */
 function getWrappingPopoverElement( element ) {
 	if ( element.classList.contains( 'components-popover' ) ) {
