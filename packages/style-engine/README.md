@@ -88,7 +88,7 @@ array(
 */
 ```
 
-The default block style support definitions can be extended by passing metadata in the options. 
+The default block style support definitions can be extended by passing metadata in the options.
 
 ```php
 $block_attributes =  array(
