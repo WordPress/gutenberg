@@ -1041,12 +1041,7 @@
 								{ "type": "string" },
 								{ "type": "object" }
 							],
-							"properties": {
-								"ref": {
-									"description": "A reference to another property value. e.g. `styles.color.text`",
-									"type": "string"
-								}
-							},
+							"$ref": "#/definitions/stylesProperties/properties/color/properties/background/properties",
 							"additionalProperties": false
 						},
 						"text": {
@@ -1055,12 +1050,7 @@
 								{ "type": "string" },
 								{ "type": "object" }
 							],
-							"properties": {
-								"ref": {
-									"description": "A reference to another property value. e.g. `styles.color.text`",
-									"type": "string"
-								}
-							},
+							"$ref": "#/definitions/stylesProperties/properties/color/properties/background/properties",
 							"additionalProperties": false
 						}
 					},
