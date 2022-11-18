@@ -44,7 +44,9 @@ const POPOVER_PROPS = {
 const BlockSettingsContext = createContext();
 BlockSettingsContext.displayName = 'BlockSettingsContext';
 
-function CopyMenuItem( { blocks, onCopy } ) {
+function CopyMenuItem() {
+	const { blocks, onCopy } = useContext( BlockSettingsContext );
+
 	const ref = useCopyToClipboard( () => serialize( blocks ), onCopy );
 	const copyMenuItemLabel =
 		blocks.length > 1 ? __( 'Copy blocks' ) : __( 'Copy block' );
@@ -376,8 +378,10 @@ export function BlockSettingsDropdown( {
 		shortcuts,
 		blockClientIds,
 		selectedBlockClientIds,
+		blocks,
 		canDuplicate,
 		onDuplicate,
+		onCopy,
 	};
 
 	return (
@@ -403,7 +407,7 @@ export function BlockSettingsDropdown( {
 
 							<HTMLConvertMenuItem />
 
-							<CopyMenuItem blocks={ blocks } onCopy={ onCopy } />
+							<CopyMenuItem />
 
 							<DuplicateMenuItem onClose={ onClose } />
 
