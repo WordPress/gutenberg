@@ -35,9 +35,11 @@ class Tests_Blocks_Render_Post_Excerpt extends WP_UnitTestCase {
 
 	/**
 	 * Setup method.
+	 *
+	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
 	 */
-	public static function wpSetUpBeforeClass() {
-		self::$post_empty = self::factory()->post->create_and_get(
+	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
+		self::$post_empty = $factory->post->create_and_get(
 			array(
 				'post_title'   => 'Post Expert block Unit Test',
 				'post_excerpt' => '',
@@ -45,7 +47,7 @@ class Tests_Blocks_Render_Post_Excerpt extends WP_UnitTestCase {
 			)
 		);
 
-		self::$post = self::factory()->post->create_and_get(
+		self::$post = $factory->post->create_and_get(
 			array(
 				'post_title'   => 'Post Expert block Unit Test',
 				'post_excerpt' => 'Post Expert content',
