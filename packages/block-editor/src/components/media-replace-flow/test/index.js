@@ -89,7 +89,7 @@ describe( 'General media replace flow', () => {
 
 		await popoverIsPositioned( getWrappingPopoverElement( uploadMenu ) );
 
-		expect( uploadMenu ).toBeVisible();
+		await waitFor( () => expect( uploadMenu ).toBeVisible() );
 	} );
 
 	it( 'displays media URL', async () => {
