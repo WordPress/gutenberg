@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   `TabPanel`: Add ability to set icon only tab buttons ([#45005](https://github.com/WordPress/gutenberg/pull/45005)).
+-   `ToggleGroupControl`: remove `isBlock` override in default Storybook args ([#45890](https://github.com/WordPress/gutenberg/pull/45890)).
 
 ## 22.1.0 (2022-11-16)
 
