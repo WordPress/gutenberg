@@ -39,10 +39,7 @@ function TestWrapper() {
  * @return {HTMLElement|null} Popover element, or `null` if not found.
  */
 function getWrappingPopoverElement( element ) {
-	if ( element.classList.contains( 'components-popover' ) ) {
-		return element;
-	}
-	return getWrappingPopoverElement( element.parentElement );
+	return element.closest( '.components-popover' );
 }
 
 describe( 'General media replace flow', () => {
