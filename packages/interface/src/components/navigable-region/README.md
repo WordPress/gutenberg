@@ -29,7 +29,7 @@ A meaningful name for the ARIA landmark region.
 
 ### as
 
-The component used as the root of the region. Defaults to the `div` element.
+The component used as the root of the region. Defaults to a `div` element.
 
 -   Type: `Component`
 -   Required: no
