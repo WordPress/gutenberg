@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -13,7 +14,10 @@ function getOpenCloseButton( container, selector ) {
 }
 
 describe( 'Dropdown', () => {
-	it( 'should toggle the dropdown properly', () => {
+	it( 'should toggle the dropdown properly', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
 		render(
 			<Dropdown
 				className="container"
@@ -33,7 +37,7 @@ describe( 'Dropdown', () => {
 		expect( button ).toBeVisible();
 		expect( screen.queryByTestId( 'popover' ) ).not.toBeInTheDocument();
 
-		fireEvent.click( button );
+		await user.click( button );
 
 		expect(
 			screen.getByRole( 'button', { expanded: true } )
@@ -41,7 +45,10 @@ describe( 'Dropdown', () => {
 		expect( screen.getByTestId( 'popover' ) ).toBeVisible();
 	} );
 
-	it( 'should close the dropdown when calling onClose', () => {
+	it( 'should close the dropdown when calling onClose', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
 		const {
 			container: { firstChild: dropdownContainer },
 		} = render(
@@ -68,12 +75,12 @@ describe( 'Dropdown', () => {
 		expect( screen.queryByTestId( 'popover' ) ).not.toBeInTheDocument();
 
 		const openButton = getOpenCloseButton( dropdownContainer, '.open' );
-		fireEvent.click( openButton );
+		await user.click( openButton );
 
 		expect( screen.getByTestId( 'popover' ) ).toBeVisible();
 
 		const closeButton = getOpenCloseButton( dropdownContainer, '.close' );
-		fireEvent.click( closeButton );
+		await user.click( closeButton );
 
 		expect( screen.queryByTestId( 'popover' ) ).not.toBeInTheDocument();
 	} );
