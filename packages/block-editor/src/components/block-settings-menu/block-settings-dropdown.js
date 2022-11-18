@@ -160,6 +160,29 @@ function MoveMenuItem( { onClose, onMoveTo } ) {
 	);
 }
 
+function HTMLConvertMenuItem() {
+	const { blockClientIds } = useContext( BlockSettingsContext );
+	const firstBlockClientId = blockClientIds[ 0 ];
+
+	if ( blockClientIds?.length !== 1 ) {
+		return;
+	}
+	return <BlockHTMLConvertButton clientId={ firstBlockClientId } />;
+}
+
+function BlockModeMenuItem( { onClose } ) {
+	const { blockClientIds } = useContext( BlockSettingsContext );
+	const firstBlockClientId = blockClientIds[ 0 ];
+
+	if ( blockClientIds?.length !== 1 ) {
+		return;
+	}
+
+	return (
+		<BlockModeToggle clientId={ firstBlockClientId } onToggle={ onClose } />
+	);
+}
+
 export function BlockSettingsDropdown( {
 	clientIds,
 	__experimentalSelectBlock,
@@ -296,10 +319,11 @@ export function BlockSettingsDropdown( {
 	const parentBlockIsSelected =
 		selectedBlockClientIds?.includes( firstParentClientId );
 
-	// Generate a context object for the BlockSettingsDropdown
+	// memoize blockSettingsActionsContextValue to avoid unnecessary rerenders
 	const blockSettingsActionsContextValue = {
 		__experimentalSelectBlock,
 		shortcuts,
+		blockClientIds,
 	};
 
 	return (
@@ -355,11 +379,9 @@ export function BlockSettingsDropdown( {
 												}
 											/>
 										) }
-									{ count === 1 && (
-										<BlockHTMLConvertButton
-											clientId={ firstBlockClientId }
-										/>
-									) }
+
+									<HTMLConvertMenuItem />
+
 									<CopyMenuItem
 										blocks={ blocks }
 										onCopy={ onCopy }
@@ -390,12 +412,8 @@ export function BlockSettingsDropdown( {
 											onMoveTo={ onMoveTo }
 										></MoveMenuItem>
 									) }
-									{ count === 1 && (
-										<BlockModeToggle
-											clientId={ firstBlockClientId }
-											onToggle={ onClose }
-										/>
-									) }
+
+									<BlockModeMenuItem onClose={ onClose } />
 								</MenuGroup>
 								<BlockSettingsMenuControls.Slot
 									fillProps={ { onClose } }
