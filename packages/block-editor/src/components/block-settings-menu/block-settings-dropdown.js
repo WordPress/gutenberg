@@ -123,6 +123,28 @@ function SelectParentMenuItem( {
 	);
 }
 
+function InsertBeforeMenuItem( { onClose, onInsertBefore, shortcut } ) {
+	return (
+		<MenuItem
+			onClick={ pipe( onClose, onInsertBefore ) }
+			shortcut={ shortcut }
+		>
+			{ __( 'Insert before' ) }
+		</MenuItem>
+	);
+}
+
+function InsertAfterMenuItem( { onClose, onInsertAfter, shortcut } ) {
+	return (
+		<MenuItem
+			onClick={ pipe( onClose, onInsertAfter ) }
+			shortcut={ shortcut }
+		>
+			{ __( 'Insert after' ) }
+		</MenuItem>
+	);
+}
+
 export function BlockSettingsDropdown( {
 	clientIds,
 	__experimentalSelectBlock,
@@ -328,24 +350,16 @@ export function BlockSettingsDropdown( {
 								) }
 								{ canInsertDefaultBlock && (
 									<>
-										<MenuItem
-											onClick={ pipe(
-												onClose,
-												onInsertBefore
-											) }
+										<InsertBeforeMenuItem
 											shortcut={ shortcuts.insertBefore }
-										>
-											{ __( 'Insert before' ) }
-										</MenuItem>
-										<MenuItem
-											onClick={ pipe(
-												onClose,
-												onInsertAfter
-											) }
+											onClose={ onClose }
+											onInsertBefore={ onInsertBefore }
+										></InsertBeforeMenuItem>
+										<InsertAfterMenuItem
 											shortcut={ shortcuts.insertAfter }
-										>
-											{ __( 'Insert after' ) }
-										</MenuItem>
+											onClose={ onClose }
+											onInsertAfter={ onInsertAfter }
+										></InsertAfterMenuItem>
 									</>
 								) }
 								{ canMove && ! onlyBlock && (
