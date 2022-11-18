@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -18,7 +18,7 @@ describe( 'Dropdown', () => {
 		const user = userEvent.setup( {
 			advanceTimers: jest.advanceTimersByTime,
 		} );
-		render(
+		const { unmount } = render(
 			<Dropdown
 				className="container"
 				contentClassName="content"
@@ -42,7 +42,13 @@ describe( 'Dropdown', () => {
 		expect(
 			screen.getByRole( 'button', { expanded: true } )
 		).toBeVisible();
-		expect( screen.getByTestId( 'popover' ) ).toBeVisible();
+
+		await waitFor( () =>
+			expect( screen.getByTestId( 'popover' ) ).toBeVisible()
+		);
+
+		// Cleanup remaining effects, like the popover positioning
+		unmount();
 	} );
 
 	it( 'should close the dropdown when calling onClose', async () => {
@@ -69,6 +75,7 @@ describe( 'Dropdown', () => {
 					</button>,
 				] }
 				renderContent={ () => null }
+				popoverProps={ { 'data-testid': 'popover' } }
 			/>
 		);
 
@@ -77,7 +84,9 @@ describe( 'Dropdown', () => {
 		const openButton = getOpenCloseButton( dropdownContainer, '.open' );
 		await user.click( openButton );
 
-		expect( screen.getByTestId( 'popover' ) ).toBeVisible();
+		await waitFor( () =>
+			expect( screen.getByTestId( 'popover' ) ).toBeVisible()
+		);
 
 		const closeButton = getOpenCloseButton( dropdownContainer, '.close' );
 		await user.click( closeButton );
