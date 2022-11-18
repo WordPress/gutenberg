@@ -42,6 +42,21 @@ function getWrappingPopoverElement( element ) {
 	return element.closest( '.components-popover' );
 }
 
+/**
+ * Asserts that the specified popover has already been positioned.
+ * Necessary because it will be positioned a bit later after it's displayed.
+ *
+ * @async
+ *
+ * @param {HTMLElement} popover Popover element.
+ */
+async function popoverIsPositioned( popover ) {
+	/* eslint-disable jest-dom/prefer-to-have-style */
+	await waitFor( () => expect( popover.style.top ).not.toBe( '' ) );
+	await waitFor( () => expect( popover.style.left ).not.toBe( '' ) );
+	/* eslint-enable jest-dom/prefer-to-have-style */
+}
+
 describe( 'General media replace flow', () => {
 	it( 'renders successfully', () => {
 		render( <TestWrapper /> );
@@ -69,13 +84,7 @@ describe( 'General media replace flow', () => {
 		);
 		const uploadMenu = screen.getByRole( 'menu' );
 
-		// The popover will be positioned with a slight delay.
-		await waitFor( () =>
-			expect( getWrappingPopoverElement( uploadMenu ) ).toHaveStyle( {
-				top: '13px',
-				left: '0',
-			} )
-		);
+		await popoverIsPositioned( getWrappingPopoverElement( uploadMenu ) );
 
 		expect( uploadMenu ).toBeVisible();
 	} );
@@ -94,11 +103,8 @@ describe( 'General media replace flow', () => {
 			} )
 		);
 
-		// The popover will be positioned with a slight delay.
-		await waitFor( () =>
-			expect(
-				getWrappingPopoverElement( screen.getByRole( 'menu' ) )
-			).toHaveStyle( { top: '13px', left: '0' } )
+		await popoverIsPositioned(
+			getWrappingPopoverElement( screen.getByRole( 'menu' ) )
 		);
 
 		expect(
@@ -122,11 +128,8 @@ describe( 'General media replace flow', () => {
 			} )
 		);
 
-		// The popover will be positioned with a slight delay.
-		await waitFor( () =>
-			expect(
-				getWrappingPopoverElement( screen.getByRole( 'menu' ) )
-			).toHaveStyle( { top: '13px', left: '0' } )
+		await popoverIsPositioned(
+			getWrappingPopoverElement( screen.getByRole( 'menu' ) )
 		);
 
 		await user.click(
