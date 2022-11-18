@@ -100,6 +100,29 @@ function RemoveMenuItem( {
 	);
 }
 
+function SelectParentMenuItem( {
+	showParentOutlineGestures,
+	selectParentButtonRef,
+	selectBlock,
+	firstParentClientId,
+	parentBlockType,
+} ) {
+	return (
+		<MenuItem
+			{ ...showParentOutlineGestures }
+			ref={ selectParentButtonRef }
+			icon={ <BlockIcon icon={ parentBlockType.icon } /> }
+			onClick={ () => selectBlock( firstParentClientId ) }
+		>
+			{ sprintf(
+				/* translators: %s: Name of the block's parent. */
+				__( 'Select parent block (%s)' ),
+				parentBlockType.title
+			) }
+		</MenuItem>
+	);
+}
+
 export function BlockSettingsDropdown( {
 	clientIds,
 	__experimentalSelectBlock,
@@ -270,30 +293,19 @@ export function BlockSettingsDropdown( {
 								/>
 								{ ! parentBlockIsSelected &&
 									!! firstParentClientId && (
-										<MenuItem
-											{ ...showParentOutlineGestures }
-											ref={ selectParentButtonRef }
-											icon={
-												<BlockIcon
-													icon={
-														parentBlockType.icon
-													}
-												/>
+										<SelectParentMenuItem
+											firstParentClientId={
+												firstParentClientId
 											}
-											onClick={ () =>
-												selectBlock(
-													firstParentClientId
-												)
+											parentBlockType={ parentBlockType }
+											selectBlock={ selectBlock }
+											selectParentButtonRef={
+												selectParentButtonRef
 											}
-										>
-											{ sprintf(
-												/* translators: %s: Name of the block's parent. */
-												__(
-													'Select parent block (%s)'
-												),
-												parentBlockType.title
-											) }
-										</MenuItem>
+											showParentOutlineGestures={
+												showParentOutlineGestures
+											}
+										/>
 									) }
 								{ count === 1 && (
 									<BlockHTMLConvertButton
