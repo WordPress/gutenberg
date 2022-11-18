@@ -17,14 +17,6 @@ function getOpenCloseButton( container, selector ) {
 
 describe( 'Dropdown', () => {
 	it( 'should toggle the dropdown properly', () => {
-		const expectButtonExpanded = ( container, expanded ) => {
-			expect( container.querySelectorAll( 'button' ) ).toHaveLength( 1 );
-			expect( getButtonElement( container ) ).toHaveAttribute(
-				'aria-expanded',
-				expanded.toString()
-			);
-		};
-
 		const {
 			container: { firstChild: dropdownContainer },
 		} = render(
@@ -41,13 +33,17 @@ describe( 'Dropdown', () => {
 			/>
 		);
 
-		expectButtonExpanded( dropdownContainer, false );
+		expect(
+			screen.getByRole( 'button', { expanded: false } )
+		).toBeVisible();
 		expect( screen.queryByTestId( 'popover' ) ).not.toBeInTheDocument();
 
 		const button = getButtonElement( dropdownContainer );
 		fireEvent.click( button );
 
-		expectButtonExpanded( dropdownContainer, true );
+		expect(
+			screen.getByRole( 'button', { expanded: true } )
+		).toBeVisible();
 		expect( screen.getByTestId( 'popover' ) ).toBeVisible();
 	} );
 
