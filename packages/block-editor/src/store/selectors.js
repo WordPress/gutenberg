@@ -2033,6 +2033,13 @@ export const getInserterItems = createSelector(
  * Determines the blocks that are allowed to be inserted into the
  * editor, based on the provided rootClient id.
  *
+ * This selector also returns the block type names that cannot be
+ * inserterd directly, based on the provided rootClientId, but have
+ * an `ancestor` or `parent` relationship with a block that can be inserted.
+ * An example is the `core/list-item` which can only be insertered into a
+ * `core/list` block, so if the `core/list` block is allowed, the `core/list-item`
+ * can be inserted as well afterwards.
+ *
  * For now it includes only static core blocks and doesn't include
  * any block variations.
  *
@@ -2043,17 +2050,55 @@ export const getInserterItems = createSelector(
  */
 export const __getAllowedCoreBlockNames = createSelector(
 	( state, rootClientId = null ) => {
-		return getBlockTypes()
-			.filter(
-				( blockType ) =>
-					blockType.name.startsWith( 'core/' ) &&
-					canIncludeBlockTypeInInserter(
-						state,
-						blockType,
-						rootClientId
-					)
-			)
+		const blockTypes = getBlockTypes();
+		// First we need to filter out all the non core blocks and keep track of
+		// the blocks that cannot be inserted based on the provided rootClientId.
+		const { allowedBlocks, restBlocks } = blockTypes.reduce(
+			( accumulator, blockType ) => {
+				// Discard non core blocks.
+				if ( ! blockType.name.startsWith( 'core/' ) ) {
+					return accumulator;
+				}
+				const canInsert = canIncludeBlockTypeInInserter(
+					state,
+					blockType,
+					rootClientId
+				);
+				accumulator[ canInsert ? 'allowedBlocks' : 'restBlocks' ].push(
+					blockType
+				);
+				return accumulator;
+			},
+			{ allowedBlocks: [], restBlocks: [] }
+		);
+		const allowedBlockNames = allowedBlocks.map( ( { name } ) => name );
+		// Check the remaining blocks if they have an `ancestor` or `parent`
+		// relationship with a block that is allowed to be inserted.
+		const { allowedBlockTypes } = getSettings( state );
+		const allowedInnerBlocksNames = restBlocks
+			.filter( ( blockType ) => {
+				// Block editor settings can be modified programmatically, so
+				// we need to check if the block type is allowed to be inserted.
+				// This allowes us to filter out blocks that have the wanted
+				// relationship(`parent` or `ancestor`) but are not allowed.
+				const isBlockAllowedInEditor = checkAllowList(
+					allowedBlockTypes,
+					blockType.name,
+					true
+				);
+				if ( ! isBlockAllowedInEditor ) {
+					return false;
+				}
+				const parentIsAllowed = blockType.parent?.some( ( parent ) =>
+					allowedBlockNames.includes( parent )
+				);
+				const ancestorIsAllowed = blockType.ancestor?.some(
+					( ancestor ) => allowedBlockNames.includes( ancestor )
+				);
+				return parentIsAllowed || ancestorIsAllowed;
+			}, [] )
 			.map( ( { name } ) => name );
+		return [ ...allowedBlockNames, ...allowedInnerBlocksNames ];
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],

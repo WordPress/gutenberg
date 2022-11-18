@@ -1153,6 +1153,13 @@ _Returns_
 Determines the blocks that are allowed to be inserted into the
 editor, based on the provided rootClient id.
 
+This selector also returns the block type names that cannot be
+inserterd directly, based on the provided rootClientId, but have
+an `ancestor` or `parent` relationship with a block that can be inserted.
+An example is the `core/list-item` which can only be insertered into a
+`core/list` block, so if the `core/list` block is allowed, the `core/list-item`
+can be inserted as well afterwards.
+
 For now it includes only static core blocks and doesn't include
 any block variations.
 
