@@ -41,11 +41,21 @@ const POPOVER_PROPS = {
 	variant: 'toolbar',
 };
 
-const BlockSettingsContext = createContext();
-BlockSettingsContext.displayName = 'BlockSettingsContext';
+const BlockSettingsDropdownContext = createContext();
+BlockSettingsDropdownContext.displayName = 'BlockSettingsDropdownContext';
+
+export function useBlockSettingsContext() {
+	const context = useContext( BlockSettingsDropdownContext );
+	if ( ! context ) {
+		throw new Error(
+			`BlockSettingsDropdown compound components cannot be rendered outside the BlockSettingsDropdown component`
+		);
+	}
+	return context;
+}
 
 function CopyMenuItem() {
-	const { blocks, onCopy } = useContext( BlockSettingsContext );
+	const { blocks, onCopy } = useBlockSettingsContext();
 
 	const ref = useCopyToClipboard( () => serialize( blocks ), onCopy );
 	const copyMenuItemLabel =
@@ -55,7 +65,7 @@ function CopyMenuItem() {
 
 function DuplicateMenuItem( { onClose } ) {
 	const { __experimentalSelectBlock, shortcuts, onDuplicate, canDuplicate } =
-		useContext( BlockSettingsContext );
+		useBlockSettingsContext();
 
 	const updateSelectionAfterDuplicate = useCallback(
 		__experimentalSelectBlock
@@ -97,7 +107,7 @@ function RemoveMenuItem( { onClose } ) {
 		previousBlockClientId,
 		nextBlockClientId,
 		selectedBlockClientIds,
-	} = useContext( BlockSettingsContext );
+	} = useBlockSettingsContext();
 
 	const firstBlockClientId = blockClientIds[ 0 ];
 
@@ -163,8 +173,9 @@ function RemoveMenuItem( { onClose } ) {
 }
 
 function SelectParentMenuItem() {
-	const { shortcuts, blockClientIds, selectedBlockClientIds } =
-		useContext( BlockSettingsContext );
+	const { shortcuts, blockClientIds, selectedBlockClientIds } = useContext(
+		BlockSettingsDropdownContext
+	);
 
 	const firstBlockClientId = blockClientIds[ 0 ];
 
@@ -246,8 +257,9 @@ function SelectParentMenuItem() {
 }
 
 function InsertBeforeMenuItem( { onClose } ) {
-	const { shortcuts, onInsertBefore, canInsertDefaultBlock } =
-		useContext( BlockSettingsContext );
+	const { shortcuts, onInsertBefore, canInsertDefaultBlock } = useContext(
+		BlockSettingsDropdownContext
+	);
 
 	if ( ! canInsertDefaultBlock ) {
 		return null;
@@ -264,8 +276,9 @@ function InsertBeforeMenuItem( { onClose } ) {
 }
 
 function InsertAfterMenuItem( { onClose } ) {
-	const { shortcuts, onInsertAfter, canInsertDefaultBlock } =
-		useContext( BlockSettingsContext );
+	const { shortcuts, onInsertAfter, canInsertDefaultBlock } = useContext(
+		BlockSettingsDropdownContext
+	);
 
 	if ( ! canInsertDefaultBlock ) {
 		return null;
@@ -282,8 +295,9 @@ function InsertAfterMenuItem( { onClose } ) {
 }
 
 function MoveMenuItem( { onClose } ) {
-	const { onMoveTo, canMove, blockClientIds } =
-		useContext( BlockSettingsContext );
+	const { onMoveTo, canMove, blockClientIds } = useContext(
+		BlockSettingsDropdownContext
+	);
 
 	const firstBlockClientId = blockClientIds[ 0 ];
 
@@ -314,7 +328,7 @@ function MoveMenuItem( { onClose } ) {
 }
 
 function HTMLConvertMenuItem() {
-	const { blockClientIds } = useContext( BlockSettingsContext );
+	const { blockClientIds } = useBlockSettingsContext();
 	const firstBlockClientId = blockClientIds[ 0 ];
 
 	if ( blockClientIds?.length !== 1 ) {
@@ -324,7 +338,7 @@ function HTMLConvertMenuItem() {
 }
 
 function BlockModeMenuItem( { onClose } ) {
-	const { blockClientIds } = useContext( BlockSettingsContext );
+	const { blockClientIds } = useBlockSettingsContext();
 	const firstBlockClientId = blockClientIds[ 0 ];
 
 	if ( blockClientIds?.length !== 1 ) {
@@ -442,7 +456,7 @@ export function BlockSettingsDropdown( {
 	};
 
 	return (
-		<BlockSettingsContext.Provider
+		<BlockSettingsDropdownContext.Provider
 			value={ blockSettingsActionsContextValue }
 		>
 			<DropdownMenu
@@ -454,7 +468,7 @@ export function BlockSettingsDropdown( {
 				{ ...props }
 			>
 				{ ( { onClose } ) => {
-					if ( blockSettingsDropDownChildren?.length ) {
+					if ( blockSettingsDropDownChildren ) {
 						return blockSettingsDropDownChildren;
 					}
 
@@ -499,7 +513,7 @@ export function BlockSettingsDropdown( {
 					);
 				} }
 			</DropdownMenu>
-		</BlockSettingsContext.Provider>
+		</BlockSettingsDropdownContext.Provider>
 	);
 }
 
