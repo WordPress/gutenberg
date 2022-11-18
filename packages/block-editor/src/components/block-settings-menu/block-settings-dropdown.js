@@ -121,33 +121,37 @@ function SelectParentMenuItem() {
 		useDispatch( blockEditorStore );
 
 	const { isDistractionFree, firstParentClientId, parentBlockType } =
-		useSelect( ( select ) => {
-			const {
-				getSettings,
-				getBlockAttributes,
-				getBlockRootClientId,
-				getBlockName,
-			} = select( blockEditorStore );
+		useSelect(
+			( select ) => {
+				const {
+					getSettings,
+					getBlockAttributes,
+					getBlockRootClientId,
+					getBlockName,
+				} = select( blockEditorStore );
 
-			const { getActiveBlockVariation } = select( blocksStore );
+				const { getActiveBlockVariation } = select( blocksStore );
 
-			const _firstParentClientId =
-				getBlockRootClientId( firstBlockClientId );
-			const parentBlockName =
-				_firstParentClientId && getBlockName( _firstParentClientId );
-
-			return {
-				isDistractionFree: getSettings().isDistractionFree,
-				firstParentClientId: _firstParentClientId,
-				parentBlockType:
+				const _firstParentClientId =
+					getBlockRootClientId( firstBlockClientId );
+				const parentBlockName =
 					_firstParentClientId &&
-					( getActiveBlockVariation(
-						parentBlockName,
-						getBlockAttributes( _firstParentClientId )
-					) ||
-						getBlockType( parentBlockName ) ),
-			};
-		}, [] );
+					getBlockName( _firstParentClientId );
+
+				return {
+					isDistractionFree: getSettings().isDistractionFree,
+					firstParentClientId: _firstParentClientId,
+					parentBlockType:
+						_firstParentClientId &&
+						( getActiveBlockVariation(
+							parentBlockName,
+							getBlockAttributes( _firstParentClientId )
+						) ||
+							getBlockType( parentBlockName ) ),
+				};
+			},
+			[ firstBlockClientId ]
+		);
 
 	// Allows highlighting the parent block outline when focusing or hovering
 	// the parent block selector within the child.
@@ -215,7 +219,31 @@ function InsertAfterMenuItem( { onClose, onInsertAfter } ) {
 	);
 }
 
-function MoveMenuItem( { onClose, onMoveTo } ) {
+function MoveMenuItem( { onClose } ) {
+	const { onMoveTo, canMove, blockClientIds } =
+		useContext( BlockSettingsContext );
+
+	const firstBlockClientId = blockClientIds[ 0 ];
+
+	const { onlyBlock } = useSelect(
+		( select ) => {
+			const { getBlockCount, getBlockRootClientId } =
+				select( blockEditorStore );
+
+			const _firstParentClientId =
+				getBlockRootClientId( firstBlockClientId );
+
+			return {
+				onlyBlock: 1 === getBlockCount( _firstParentClientId ),
+			};
+		},
+		[ firstBlockClientId ]
+	);
+
+	if ( ! canMove || onlyBlock ) {
+		return null;
+	}
+
 	return (
 		<MenuItem onClick={ pipe( onClose, onMoveTo ) }>
 			{ __( 'Move to' ) }
@@ -258,47 +286,43 @@ export function BlockSettingsDropdown( {
 		: [ clientIds ];
 	const count = blockClientIds.length;
 	const firstBlockClientId = blockClientIds[ 0 ];
-	const {
-		onlyBlock,
-		previousBlockClientId,
-		nextBlockClientId,
-		selectedBlockClientIds,
-	} = useSelect(
-		( select ) => {
-			const {
-				getBlockCount,
-				getBlockName,
-				getBlockRootClientId,
-				getPreviousBlockClientId,
-				getNextBlockClientId,
-				getSelectedBlockClientIds,
-				getBlockAttributes,
-			} = select( blockEditorStore );
+	const { previousBlockClientId, nextBlockClientId, selectedBlockClientIds } =
+		useSelect(
+			( select ) => {
+				const {
+					getBlockName,
+					getBlockRootClientId,
+					getPreviousBlockClientId,
+					getNextBlockClientId,
+					getSelectedBlockClientIds,
+					getBlockAttributes,
+				} = select( blockEditorStore );
 
-			const { getActiveBlockVariation } = select( blocksStore );
+				const { getActiveBlockVariation } = select( blocksStore );
 
-			const _firstParentClientId =
-				getBlockRootClientId( firstBlockClientId );
-			const parentBlockName =
-				_firstParentClientId && getBlockName( _firstParentClientId );
-
-			return {
-				onlyBlock: 1 === getBlockCount( _firstParentClientId ),
-				parentBlockType:
+				const _firstParentClientId =
+					getBlockRootClientId( firstBlockClientId );
+				const parentBlockName =
 					_firstParentClientId &&
-					( getActiveBlockVariation(
-						parentBlockName,
-						getBlockAttributes( _firstParentClientId )
-					) ||
-						getBlockType( parentBlockName ) ),
-				previousBlockClientId:
-					getPreviousBlockClientId( firstBlockClientId ),
-				nextBlockClientId: getNextBlockClientId( firstBlockClientId ),
-				selectedBlockClientIds: getSelectedBlockClientIds(),
-			};
-		},
-		[ firstBlockClientId ]
-	);
+					getBlockName( _firstParentClientId );
+
+				return {
+					parentBlockType:
+						_firstParentClientId &&
+						( getActiveBlockVariation(
+							parentBlockName,
+							getBlockAttributes( _firstParentClientId )
+						) ||
+							getBlockType( parentBlockName ) ),
+					previousBlockClientId:
+						getPreviousBlockClientId( firstBlockClientId ),
+					nextBlockClientId:
+						getNextBlockClientId( firstBlockClientId ),
+					selectedBlockClientIds: getSelectedBlockClientIds(),
+				};
+			},
+			[ firstBlockClientId ]
+		);
 
 	const shortcuts = useSelect( ( select ) => {
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
@@ -382,6 +406,8 @@ export function BlockSettingsDropdown( {
 		canDuplicate,
 		onDuplicate,
 		onCopy,
+		onMoveTo,
+		canMove,
 	};
 
 	return (
@@ -423,12 +449,8 @@ export function BlockSettingsDropdown( {
 									></InsertAfterMenuItem>
 								</>
 							) }
-							{ canMove && ! onlyBlock && (
-								<MoveMenuItem
-									onClose={ onClose }
-									onMoveTo={ onMoveTo }
-								></MoveMenuItem>
-							) }
+
+							<MoveMenuItem onClose={ onClose } />
 
 							<BlockModeMenuItem onClose={ onClose } />
 						</MenuGroup>
