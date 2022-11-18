@@ -79,8 +79,6 @@ describe( 'General media replace flow', () => {
 				left: '0',
 			} )
 		);
-
-		expect( uploadMenu ).toBeVisible();
 	} );
 
 	it( 'displays media URL', async () => {
