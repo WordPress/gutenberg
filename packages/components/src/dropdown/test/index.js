@@ -24,7 +24,7 @@ describe( 'Dropdown', () => {
 				contentClassName="content"
 				renderToggle={ ( { isOpen, onToggle } ) => (
 					<button aria-expanded={ isOpen } onClick={ onToggle }>
-						Toggleee
+						Toggle
 					</button>
 				) }
 				renderContent={ () => <span>test</span> }
@@ -68,10 +68,10 @@ describe( 'Dropdown', () => {
 						aria-expanded={ isOpen }
 						onClick={ onToggle }
 					>
-						Toggleee
+						Toggle
 					</button>,
 					<button key="close" className="close" onClick={ onClose }>
-						closee
+						close
 					</button>,
 				] }
 				renderContent={ () => null }
