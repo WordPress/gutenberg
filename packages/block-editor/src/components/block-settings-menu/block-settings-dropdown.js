@@ -341,6 +341,7 @@ export function BlockSettingsDropdown( {
 	__experimentalSelectBlock,
 	children,
 	__unstableDisplayLocation,
+	children: blockSettingsDropDownChildren,
 	...props
 } ) {
 	const blockClientIds = Array.isArray( clientIds )
@@ -421,8 +422,8 @@ export function BlockSettingsDropdown( {
 
 	// Todo: memoize this
 	const blockSettingsActionsContextValue = {
-		__experimentalSelectBlock,
-		shortcuts,
+		__experimentalSelectBlock, // todo: should this be renamed to something more logically boolean?
+		shortcuts, // can we omit from context and access directly from shortcuts store?
 		blockClientIds,
 		selectedBlockClientIds,
 		previousBlockClientId,
@@ -452,45 +453,51 @@ export function BlockSettingsDropdown( {
 				noIcons
 				{ ...props }
 			>
-				{ ( { onClose } ) => (
-					<>
-						<MenuGroup>
-							<__unstableBlockSettingsMenuFirstItem.Slot
+				{ ( { onClose } ) => {
+					if ( blockSettingsDropDownChildren?.length ) {
+						return blockSettingsDropDownChildren;
+					}
+
+					return (
+						<>
+							<MenuGroup>
+								<__unstableBlockSettingsMenuFirstItem.Slot
+									fillProps={ { onClose } }
+								/>
+
+								<SelectParentMenuItem />
+
+								<HTMLConvertMenuItem />
+
+								<CopyMenuItem />
+
+								<DuplicateMenuItem onClose={ onClose } />
+
+								<InsertBeforeMenuItem onClose={ onClose } />
+
+								<InsertAfterMenuItem onClose={ onClose } />
+
+								<MoveMenuItem onClose={ onClose } />
+
+								<BlockModeMenuItem onClose={ onClose } />
+							</MenuGroup>
+							<BlockSettingsMenuControls.Slot
 								fillProps={ { onClose } }
+								clientIds={ clientIds }
+								__unstableDisplayLocation={
+									__unstableDisplayLocation
+								}
 							/>
+							{ typeof children === 'function'
+								? children( { onClose } )
+								: Children.map( ( child ) =>
+										cloneElement( child, { onClose } )
+								  ) }
 
-							<SelectParentMenuItem />
-
-							<HTMLConvertMenuItem />
-
-							<CopyMenuItem />
-
-							<DuplicateMenuItem onClose={ onClose } />
-
-							<InsertBeforeMenuItem onClose={ onClose } />
-
-							<InsertAfterMenuItem onClose={ onClose } />
-
-							<MoveMenuItem onClose={ onClose } />
-
-							<BlockModeMenuItem onClose={ onClose } />
-						</MenuGroup>
-						<BlockSettingsMenuControls.Slot
-							fillProps={ { onClose } }
-							clientIds={ clientIds }
-							__unstableDisplayLocation={
-								__unstableDisplayLocation
-							}
-						/>
-						{ typeof children === 'function'
-							? children( { onClose } )
-							: Children.map( ( child ) =>
-									cloneElement( child, { onClose } )
-							  ) }
-
-						<RemoveMenuItem onClose={ onClose } />
-					</>
-				) }
+							<RemoveMenuItem onClose={ onClose } />
+						</>
+					);
+				} }
 			</DropdownMenu>
 		</BlockSettingsContext.Provider>
 	);
