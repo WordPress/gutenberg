@@ -7,6 +7,8 @@ import {
 	pasteHandler,
 	store as blocksStore,
 	createBlock,
+	findTransform,
+	getBlockTransforms,
 } from '@wordpress/blocks';
 import {
 	documentHasSelection,
@@ -201,13 +203,30 @@ export function useClipboardHandler() {
 					__experimentalCanUserUseUnfilteredHTML:
 						canUserUseUnfilteredHTML,
 				} = getSettings();
-				const { plainText, html } = getPasteEventData( event );
-				const blocks = pasteHandler( {
-					HTML: html,
-					plainText,
-					mode: 'BLOCKS',
-					canUserUseUnfilteredHTML,
-				} );
+				const { plainText, html, files } = getPasteEventData( event );
+				let blocks = [];
+
+				if ( files.length ) {
+					const transformation = findTransform(
+						getBlockTransforms( 'from' ),
+						( transform ) =>
+							transform.type === 'files' &&
+							transform.isMatch( files )
+					);
+
+					if ( ! transformation ) {
+						return;
+					}
+
+					blocks = transformation.transform( files );
+				} else {
+					blocks = pasteHandler( {
+						HTML: html,
+						plainText,
+						mode: 'BLOCKS',
+						canUserUseUnfilteredHTML,
+					} );
+				}
 
 				replaceBlocks(
 					selectedBlockClientIds,
