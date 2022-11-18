@@ -145,6 +145,14 @@ function InsertAfterMenuItem( { onClose, onInsertAfter, shortcut } ) {
 	);
 }
 
+function MoveMenuItem( { onClose, onMoveTo } ) {
+	return (
+		<MenuItem onClick={ pipe( onClose, onMoveTo ) }>
+			{ __( 'Move to' ) }
+		</MenuItem>
+	);
+}
+
 export function BlockSettingsDropdown( {
 	clientIds,
 	__experimentalSelectBlock,
@@ -363,11 +371,10 @@ export function BlockSettingsDropdown( {
 									</>
 								) }
 								{ canMove && ! onlyBlock && (
-									<MenuItem
-										onClick={ pipe( onClose, onMoveTo ) }
-									>
-										{ __( 'Move to' ) }
-									</MenuItem>
+									<MoveMenuItem
+										onClose={ onClose }
+										onMoveTo={ onMoveTo }
+									></MoveMenuItem>
 								) }
 								{ count === 1 && (
 									<BlockModeToggle
