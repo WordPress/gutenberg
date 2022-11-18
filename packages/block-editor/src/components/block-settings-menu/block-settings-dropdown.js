@@ -46,6 +46,37 @@ function CopyMenuItem( { blocks, onCopy } ) {
 	return <MenuItem ref={ ref }>{ copyMenuItemLabel }</MenuItem>;
 }
 
+function DuplicateMenuItem( {
+	onClose,
+	onDuplicate,
+	shortcut,
+	__experimentalSelectBlock,
+} ) {
+	const updateSelectionAfterDuplicate = useCallback(
+		__experimentalSelectBlock
+			? async ( clientIdsPromise ) => {
+					const ids = await clientIdsPromise;
+					if ( ids && ids[ 0 ] ) {
+						__experimentalSelectBlock( ids[ 0 ] );
+					}
+			  }
+			: noop,
+		[ __experimentalSelectBlock ]
+	);
+	return (
+		<MenuItem
+			onClick={ pipe(
+				onClose,
+				onDuplicate,
+				updateSelectionAfterDuplicate
+			) }
+			shortcut={ shortcut }
+		>
+			{ __( 'Duplicate' ) }
+		</MenuItem>
+	);
+}
+
 export function BlockSettingsDropdown( {
 	clientIds,
 	__experimentalSelectBlock,
@@ -124,18 +155,6 @@ export function BlockSettingsDropdown( {
 
 	const { selectBlock, toggleBlockHighlight } =
 		useDispatch( blockEditorStore );
-
-	const updateSelectionAfterDuplicate = useCallback(
-		__experimentalSelectBlock
-			? async ( clientIdsPromise ) => {
-					const ids = await clientIdsPromise;
-					if ( ids && ids[ 0 ] ) {
-						__experimentalSelectBlock( ids[ 0 ] );
-					}
-			  }
-			: noop,
-		[ __experimentalSelectBlock ]
-	);
 
 	const blockTitle = useBlockDisplayTitle( {
 		clientId: firstBlockClientId,
@@ -263,16 +282,14 @@ export function BlockSettingsDropdown( {
 									onCopy={ onCopy }
 								/>
 								{ canDuplicate && (
-									<MenuItem
-										onClick={ pipe(
-											onClose,
-											onDuplicate,
-											updateSelectionAfterDuplicate
-										) }
+									<DuplicateMenuItem
 										shortcut={ shortcuts.duplicate }
-									>
-										{ __( 'Duplicate' ) }
-									</MenuItem>
+										__experimentalSelectBlock={
+											__experimentalSelectBlock
+										}
+										onClose={ onClose }
+										onDuplicate={ onDuplicate }
+									></DuplicateMenuItem>
 								) }
 								{ canInsertDefaultBlock && (
 									<>
