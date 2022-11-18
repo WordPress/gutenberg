@@ -42,7 +42,7 @@ const POPOVER_PROPS = {
 };
 
 const BlockSettingsContext = createContext();
-BlockSettingsContext.displayName = 'TogglBlockSettingsContexteContext';
+BlockSettingsContext.displayName = 'BlockSettingsContext';
 
 function CopyMenuItem( { blocks, onCopy } ) {
 	const ref = useCopyToClipboard( () => serialize( blocks ), onCopy );
@@ -104,19 +104,75 @@ function RemoveMenuItem( {
 	);
 }
 
-function SelectParentMenuItem( {
-	showParentOutlineGestures,
-	selectParentButtonRef,
-	selectBlock,
-	firstParentClientId,
-	parentBlockType,
-} ) {
+function SelectParentMenuItem() {
+	const { shortcuts, blockClientIds, selectedBlockClientIds } =
+		useContext( BlockSettingsContext );
+
+	const firstBlockClientId = blockClientIds[ 0 ];
+
+	const { selectBlock, toggleBlockHighlight } =
+		useDispatch( blockEditorStore );
+
+	const { isDistractionFree, firstParentClientId, parentBlockType } =
+		useSelect( ( select ) => {
+			const {
+				getSettings,
+				getBlockAttributes,
+				getBlockRootClientId,
+				getBlockName,
+			} = select( blockEditorStore );
+
+			const { getActiveBlockVariation } = select( blocksStore );
+
+			const _firstParentClientId =
+				getBlockRootClientId( firstBlockClientId );
+			const parentBlockName =
+				_firstParentClientId && getBlockName( _firstParentClientId );
+
+			return {
+				isDistractionFree: getSettings().isDistractionFree,
+				firstParentClientId: _firstParentClientId,
+				parentBlockType:
+					_firstParentClientId &&
+					( getActiveBlockVariation(
+						parentBlockName,
+						getBlockAttributes( _firstParentClientId )
+					) ||
+						getBlockType( parentBlockName ) ),
+			};
+		}, [] );
+
+	// Allows highlighting the parent block outline when focusing or hovering
+	// the parent block selector within the child.
+	const selectParentButtonRef = useRef();
+	const { gestures: showParentOutlineGestures } = useShowMoversGestures( {
+		ref: selectParentButtonRef,
+		onChange( isFocused ) {
+			if ( isFocused && isDistractionFree ) {
+				return;
+			}
+			toggleBlockHighlight( firstParentClientId, isFocused );
+		},
+	} );
+
+	// This can occur when the selected block (the parent)
+	// displays child blocks within a List View.
+	const parentBlockIsSelected =
+		selectedBlockClientIds?.includes( firstParentClientId );
+
+	if ( ! firstParentClientId || parentBlockIsSelected ) {
+		return null;
+	}
+
 	return (
 		<MenuItem
-			{ ...showParentOutlineGestures }
 			ref={ selectParentButtonRef }
 			icon={ <BlockIcon icon={ parentBlockType.icon } /> }
-			onClick={ () => selectBlock( firstParentClientId ) }
+			onClick={ () => {
+				selectBlock( firstParentClientId );
+			} }
+			shortcut={ shortcuts.selectParent }
+			{ ...showParentOutlineGestures }
 		>
 			{ sprintf(
 				/* translators: %s: Name of the block's parent. */
@@ -165,7 +221,7 @@ function HTMLConvertMenuItem() {
 	const firstBlockClientId = blockClientIds[ 0 ];
 
 	if ( blockClientIds?.length !== 1 ) {
-		return;
+		return null;
 	}
 	return <BlockHTMLConvertButton clientId={ firstBlockClientId } />;
 }
@@ -175,7 +231,7 @@ function BlockModeMenuItem( { onClose } ) {
 	const firstBlockClientId = blockClientIds[ 0 ];
 
 	if ( blockClientIds?.length !== 1 ) {
-		return;
+		return null;
 	}
 
 	return (
@@ -196,10 +252,7 @@ export function BlockSettingsDropdown( {
 	const count = blockClientIds.length;
 	const firstBlockClientId = blockClientIds[ 0 ];
 	const {
-		firstParentClientId,
-		isDistractionFree,
 		onlyBlock,
-		parentBlockType,
 		previousBlockClientId,
 		nextBlockClientId,
 		selectedBlockClientIds,
@@ -212,7 +265,6 @@ export function BlockSettingsDropdown( {
 				getPreviousBlockClientId,
 				getNextBlockClientId,
 				getSelectedBlockClientIds,
-				getSettings,
 				getBlockAttributes,
 			} = select( blockEditorStore );
 
@@ -224,8 +276,6 @@ export function BlockSettingsDropdown( {
 				_firstParentClientId && getBlockName( _firstParentClientId );
 
 			return {
-				firstParentClientId: _firstParentClientId,
-				isDistractionFree: getSettings().isDistractionFree,
 				onlyBlock: 1 === getBlockCount( _firstParentClientId ),
 				parentBlockType:
 					_firstParentClientId &&
@@ -258,9 +308,6 @@ export function BlockSettingsDropdown( {
 			),
 		};
 	}, [] );
-
-	const { selectBlock, toggleBlockHighlight } =
-		useDispatch( blockEditorStore );
 
 	const blockTitle = useBlockDisplayTitle( {
 		clientId: firstBlockClientId,
@@ -301,29 +348,12 @@ export function BlockSettingsDropdown( {
 	);
 	const removeBlockLabel = count === 1 ? label : __( 'Remove blocks' );
 
-	// Allows highlighting the parent block outline when focusing or hovering
-	// the parent block selector within the child.
-	const selectParentButtonRef = useRef();
-	const { gestures: showParentOutlineGestures } = useShowMoversGestures( {
-		ref: selectParentButtonRef,
-		onChange( isFocused ) {
-			if ( isFocused && isDistractionFree ) {
-				return;
-			}
-			toggleBlockHighlight( firstParentClientId, isFocused );
-		},
-	} );
-
-	// This can occur when the selected block (the parent)
-	// displays child blocks within a List View.
-	const parentBlockIsSelected =
-		selectedBlockClientIds?.includes( firstParentClientId );
-
 	// Todo: memoize this
 	const blockSettingsActionsContextValue = {
 		__experimentalSelectBlock,
 		shortcuts,
 		blockClientIds,
+		selectedBlockClientIds,
 	};
 
 	const {
@@ -361,22 +391,8 @@ export function BlockSettingsDropdown( {
 							<__unstableBlockSettingsMenuFirstItem.Slot
 								fillProps={ { onClose } }
 							/>
-							{ ! parentBlockIsSelected &&
-								!! firstParentClientId && (
-									<SelectParentMenuItem
-										firstParentClientId={
-											firstParentClientId
-										}
-										parentBlockType={ parentBlockType }
-										selectBlock={ selectBlock }
-										selectParentButtonRef={
-											selectParentButtonRef
-										}
-										showParentOutlineGestures={
-											showParentOutlineGestures
-										}
-									/>
-								) }
+
+							<SelectParentMenuItem />
 
 							<HTMLConvertMenuItem />
 
