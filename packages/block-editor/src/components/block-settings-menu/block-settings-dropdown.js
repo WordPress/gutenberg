@@ -77,6 +77,29 @@ function DuplicateMenuItem( {
 	);
 }
 
+function RemoveMenuItem( {
+	onClose,
+	onRemove,
+	updateSelectionAfterRemove,
+	shortcut,
+	label,
+} ) {
+	return (
+		<MenuGroup>
+			<MenuItem
+				onClick={ pipe(
+					onClose,
+					onRemove,
+					updateSelectionAfterRemove
+				) }
+				shortcut={ shortcut }
+			>
+				{ label }
+			</MenuItem>
+		</MenuGroup>
+	);
+}
+
 export function BlockSettingsDropdown( {
 	clientIds,
 	__experimentalSelectBlock,
@@ -340,18 +363,16 @@ export function BlockSettingsDropdown( {
 										cloneElement( child, { onClose } )
 								  ) }
 							{ canRemove && (
-								<MenuGroup>
-									<MenuItem
-										onClick={ pipe(
-											onClose,
-											onRemove,
-											updateSelectionAfterRemove
-										) }
-										shortcut={ shortcuts.remove }
-									>
-										{ removeBlockLabel }
-									</MenuItem>
-								</MenuGroup>
+								<RemoveMenuItem
+									shortcut={ shortcuts.remove }
+									// Todo: extract updateSelectionAfterRemove props requirements to a shared context provider.
+									updateSelectionAfterRemove={
+										updateSelectionAfterRemove
+									}
+									label={ removeBlockLabel }
+									onClose={ onClose }
+									onRemove={ onRemove }
+								></RemoveMenuItem>
 							) }
 						</>
 					) }
