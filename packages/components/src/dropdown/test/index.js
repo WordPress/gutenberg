@@ -75,15 +75,13 @@ describe( 'Dropdown', () => {
 
 		expect( screen.queryByTestId( 'popover' ) ).not.toBeInTheDocument();
 
-		const openButton = screen.getByRole( 'button', { name: 'Toggle' } );
-		await user.click( openButton );
+		await user.click( screen.getByRole( 'button', { name: 'Toggle' } ) );
 
 		await waitFor( () =>
 			expect( screen.getByTestId( 'popover' ) ).toBeVisible()
 		);
 
-		const closeButton = screen.getByRole( 'button', { name: 'close' } );
-		await user.click( closeButton );
+		await user.click( screen.getByRole( 'button', { name: 'close' } ) );
 
 		expect( screen.queryByTestId( 'popover' ) ).not.toBeInTheDocument();
 	} );
