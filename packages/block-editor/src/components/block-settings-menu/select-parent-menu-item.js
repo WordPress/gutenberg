@@ -6,6 +6,8 @@ import { MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useRef, useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+
 /**
  * Internal dependencies
  */
@@ -15,7 +17,7 @@ import { useShowMoversGestures } from '../block-toolbar/utils';
 import { BlockSettingsDropdownContext } from './block-settings-dropdown';
 
 export function SelectParentMenuItem() {
-	const { shortcuts, blockClientIds, selectedBlockClientIds } = useContext(
+	const { blockClientIds, selectedBlockClientIds } = useContext(
 		BlockSettingsDropdownContext
 	);
 
@@ -23,6 +25,15 @@ export function SelectParentMenuItem() {
 
 	const { selectBlock, toggleBlockHighlight } =
 		useDispatch( blockEditorStore );
+
+	const { selectParent } = useSelect( ( select ) => {
+		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
+		return {
+			selectParent: getShortcutRepresentation(
+				'core/block-editor/select-parent'
+			),
+		};
+	}, [] );
 
 	const { isDistractionFree, firstParentClientId, parentBlockType } =
 		useSelect(
@@ -86,7 +97,7 @@ export function SelectParentMenuItem() {
 			onClick={ () => {
 				selectBlock( firstParentClientId );
 			} }
-			shortcut={ shortcuts.selectParent }
+			shortcut={ selectParent }
 			{ ...showParentOutlineGestures }
 		>
 			{ sprintf(

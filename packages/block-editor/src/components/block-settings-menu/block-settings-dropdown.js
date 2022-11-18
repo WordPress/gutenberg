@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { getBlockType, store as blocksStore } from '@wordpress/blocks';
-import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
+import { DropdownMenu, MenuGroup } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { moreVertical } from '@wordpress/icons';
 import {
@@ -12,8 +12,6 @@ import {
 	useContext,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { pipe } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -30,6 +28,7 @@ import { InsertBeforeMenuItem } from './insert-before-menu-item';
 import { MoveMenuItem } from './move-menu-item';
 import { HTMLConvertMenuItem } from './html-convert-menu-item';
 import { BlockModeMenuItem } from './block-mode-menu-item';
+import { InsertAfterMenuItem } from './insert-after-menu-item';
 
 export const noop = () => {};
 const POPOVER_PROPS = {
@@ -49,25 +48,6 @@ export function useBlockSettingsContext() {
 		);
 	}
 	return context;
-}
-
-function InsertAfterMenuItem( { onClose } ) {
-	const { shortcuts, onInsertAfter, canInsertDefaultBlock } = useContext(
-		BlockSettingsDropdownContext
-	);
-
-	if ( ! canInsertDefaultBlock ) {
-		return null;
-	}
-
-	return (
-		<MenuItem
-			onClick={ pipe( onClose, onInsertAfter ) }
-			shortcut={ shortcuts.insertAfter }
-		>
-			{ __( 'Insert after' ) }
-		</MenuItem>
-	);
 }
 
 export function BlockSettingsDropdown( {
@@ -120,22 +100,6 @@ export function BlockSettingsDropdown( {
 			[ firstBlockClientId ]
 		);
 
-	const shortcuts = useSelect( ( select ) => {
-		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
-		return {
-			duplicate: getShortcutRepresentation(
-				'core/block-editor/duplicate'
-			),
-			remove: getShortcutRepresentation( 'core/block-editor/remove' ),
-			insertAfter: getShortcutRepresentation(
-				'core/block-editor/insert-after'
-			),
-			insertBefore: getShortcutRepresentation(
-				'core/block-editor/insert-before'
-			),
-		};
-	}, [] );
-
 	const {
 		canDuplicate,
 		canInsertDefaultBlock,
@@ -156,7 +120,6 @@ export function BlockSettingsDropdown( {
 	// Todo: memoize this
 	const blockSettingsActionsContextValue = {
 		__experimentalSelectBlock, // todo: should this be renamed to something more logically boolean?
-		shortcuts, // can we omit from context and access directly from shortcuts store?
 		blockClientIds,
 		selectedBlockClientIds,
 		previousBlockClientId,

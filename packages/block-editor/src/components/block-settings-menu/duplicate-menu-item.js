@@ -5,14 +5,26 @@ import { MenuItem } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { pipe } from '@wordpress/compose';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { useSelect } from '@wordpress/data';
+
 /**
  * Internal dependencies
  */
 import { useBlockSettingsContext, noop } from './block-settings-dropdown';
 
 export function DuplicateMenuItem( { onClose } ) {
-	const { __experimentalSelectBlock, shortcuts, onDuplicate, canDuplicate } =
+	const { __experimentalSelectBlock, onDuplicate, canDuplicate } =
 		useBlockSettingsContext();
+
+	const { duplicate } = useSelect( ( select ) => {
+		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
+		return {
+			duplicate: getShortcutRepresentation(
+				'core/block-editor/duplicate'
+			),
+		};
+	}, [] );
 
 	const updateSelectionAfterDuplicate = useCallback(
 		__experimentalSelectBlock
@@ -37,7 +49,7 @@ export function DuplicateMenuItem( { onClose } ) {
 				onDuplicate,
 				updateSelectionAfterDuplicate
 			) }
-			shortcut={ shortcuts.duplicate }
+			shortcut={ duplicate }
 		>
 			{ __( 'Duplicate' ) }
 		</MenuItem>

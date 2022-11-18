@@ -5,6 +5,9 @@ import { MenuGroup, MenuItem } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { pipe } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+
 /**
  * Internal dependencies
  */
@@ -13,7 +16,6 @@ import { useBlockSettingsContext, noop } from './block-settings-dropdown';
 
 export function RemoveMenuItem( { onClose } ) {
 	const {
-		shortcuts,
 		onRemove,
 		canRemove,
 		blockClientIds,
@@ -22,6 +24,13 @@ export function RemoveMenuItem( { onClose } ) {
 		nextBlockClientId,
 		selectedBlockClientIds,
 	} = useBlockSettingsContext();
+
+	const { remove } = useSelect( ( select ) => {
+		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
+		return {
+			remove: getShortcutRepresentation( 'core/block-editor/remove' ),
+		};
+	}, [] );
 
 	const firstBlockClientId = blockClientIds[ 0 ];
 
@@ -78,7 +87,7 @@ export function RemoveMenuItem( { onClose } ) {
 					onRemove,
 					updateSelectionAfterRemove
 				) }
-				shortcut={ shortcuts.remove }
+				shortcut={ remove }
 			>
 				{ removeBlockLabel }
 			</MenuItem>
