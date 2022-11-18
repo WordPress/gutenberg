@@ -367,7 +367,12 @@ function ListViewBlock( {
 											const newSubmenu = createBlock(
 												'core/navigation-submenu',
 												attributes,
-												[ newLink ]
+												block.innerBlocks
+													? [
+															...block.innerBlocks,
+															newLink,
+													  ]
+													: [ newLink ]
 											);
 											replaceBlock(
 												clientId,
