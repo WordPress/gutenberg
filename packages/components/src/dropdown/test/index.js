@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { fireEvent, render } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -16,15 +16,6 @@ function getOpenCloseButton( container, selector ) {
 }
 
 describe( 'Dropdown', () => {
-	function expectPopoverVisible( container, value ) {
-		const popover = container.querySelector( '.components-popover' );
-		if ( value ) {
-			expect( popover ).toBeTruthy();
-		} else {
-			expect( popover ).toBeFalsy();
-		}
-	}
-
 	it( 'should toggle the dropdown properly', () => {
 		const expectButtonExpanded = ( container, expanded ) => {
 			expect( container.querySelectorAll( 'button' ) ).toHaveLength( 1 );
@@ -46,17 +37,18 @@ describe( 'Dropdown', () => {
 					</button>
 				) }
 				renderContent={ () => <span>test</span> }
+				popoverProps={ { 'data-testid': 'popover' } }
 			/>
 		);
 
 		expectButtonExpanded( dropdownContainer, false );
-		expectPopoverVisible( dropdownContainer, false );
+		expect( screen.queryByTestId( 'popover' ) ).not.toBeInTheDocument();
 
 		const button = getButtonElement( dropdownContainer );
 		fireEvent.click( button );
 
 		expectButtonExpanded( dropdownContainer, true );
-		expectPopoverVisible( dropdownContainer, true );
+		expect( screen.getByTestId( 'popover' ) ).toBeVisible();
 	} );
 
 	it( 'should close the dropdown when calling onClose', () => {
@@ -83,16 +75,16 @@ describe( 'Dropdown', () => {
 			/>
 		);
 
-		expectPopoverVisible( dropdownContainer, false );
+		expect( screen.queryByTestId( 'popover' ) ).not.toBeInTheDocument();
 
 		const openButton = getOpenCloseButton( dropdownContainer, '.open' );
 		fireEvent.click( openButton );
 
-		expectPopoverVisible( dropdownContainer, true );
+		expect( screen.getByTestId( 'popover' ) ).toBeVisible();
 
 		const closeButton = getOpenCloseButton( dropdownContainer, '.close' );
 		fireEvent.click( closeButton );
 
-		expectPopoverVisible( dropdownContainer, false );
+		expect( screen.queryByTestId( 'popover' ) ).not.toBeInTheDocument();
 	} );
 } );
