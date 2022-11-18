@@ -69,6 +69,9 @@ function render_block_core_search( $attributes ) {
 		if ( $is_button_inside ) {
 			$input_classes[] = $border_color_classes;
 		}
+		if ( ! $is_button_inside && ! empty( $border_color_classes ) ) {
+			$input_classes[]  = $border_color_classes;
+		}
 		if ( ! empty( $typography_classes ) ) {
 			$input_classes[] = $typography_classes;
 		}
