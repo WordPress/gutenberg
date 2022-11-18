@@ -87,13 +87,64 @@ function DuplicateMenuItem( { onClose } ) {
 	);
 }
 
-function RemoveMenuItem( {
-	onClose,
-	onRemove,
-	updateSelectionAfterRemove,
-	label,
-} ) {
-	const { shortcuts } = useContext( BlockSettingsContext );
+function RemoveMenuItem( { onClose } ) {
+	const {
+		shortcuts,
+		onRemove,
+		canRemove,
+		blockClientIds,
+		__experimentalSelectBlock,
+		previousBlockClientId,
+		nextBlockClientId,
+		selectedBlockClientIds,
+	} = useContext( BlockSettingsContext );
+
+	const firstBlockClientId = blockClientIds[ 0 ];
+
+	const blockTitle = useBlockDisplayTitle( {
+		clientId: firstBlockClientId,
+		maximumLength: 25,
+	} );
+
+	const label = sprintf(
+		/* translators: %s: block name */
+		__( 'Remove %s' ),
+		blockTitle
+	);
+	const removeBlockLabel =
+		blockClientIds?.length === 1 ? label : __( 'Remove blocks' );
+
+	const updateSelectionAfterRemove = useCallback(
+		__experimentalSelectBlock
+			? () => {
+					const blockToSelect =
+						previousBlockClientId || nextBlockClientId;
+
+					if (
+						blockToSelect &&
+						// From the block options dropdown, it's possible to remove a block that is not selected,
+						// in this case, it's not necessary to update the selection since the selected block wasn't removed.
+						selectedBlockClientIds.includes( firstBlockClientId ) &&
+						// Don't update selection when next/prev block also is in the selection ( and gets removed ),
+						// In case someone selects all blocks and removes them at once.
+						! selectedBlockClientIds.includes( blockToSelect )
+					) {
+						__experimentalSelectBlock( blockToSelect );
+					}
+			  }
+			: noop,
+		[
+			__experimentalSelectBlock,
+			previousBlockClientId,
+			nextBlockClientId,
+			selectedBlockClientIds,
+			firstBlockClientId,
+		]
+	);
+
+	if ( ! canRemove ) {
+		return null;
+	}
 
 	return (
 		<MenuGroup>
@@ -105,7 +156,7 @@ function RemoveMenuItem( {
 				) }
 				shortcut={ shortcuts.remove }
 			>
-				{ label }
+				{ removeBlockLabel }
 			</MenuItem>
 		</MenuGroup>
 	);
@@ -295,7 +346,7 @@ export function BlockSettingsDropdown( {
 	const blockClientIds = Array.isArray( clientIds )
 		? clientIds
 		: [ clientIds ];
-	const count = blockClientIds.length;
+
 	const firstBlockClientId = blockClientIds[ 0 ];
 	const { previousBlockClientId, nextBlockClientId, selectedBlockClientIds } =
 		useSelect(
@@ -351,45 +402,6 @@ export function BlockSettingsDropdown( {
 		};
 	}, [] );
 
-	const blockTitle = useBlockDisplayTitle( {
-		clientId: firstBlockClientId,
-		maximumLength: 25,
-	} );
-
-	const updateSelectionAfterRemove = useCallback(
-		__experimentalSelectBlock
-			? () => {
-					const blockToSelect =
-						previousBlockClientId || nextBlockClientId;
-
-					if (
-						blockToSelect &&
-						// From the block options dropdown, it's possible to remove a block that is not selected,
-						// in this case, it's not necessary to update the selection since the selected block wasn't removed.
-						selectedBlockClientIds.includes( firstBlockClientId ) &&
-						// Don't update selection when next/prev block also is in the selection ( and gets removed ),
-						// In case someone selects all blocks and removes them at once.
-						! selectedBlockClientIds.includes( blockToSelect )
-					) {
-						__experimentalSelectBlock( blockToSelect );
-					}
-			  }
-			: noop,
-		[
-			__experimentalSelectBlock,
-			previousBlockClientId,
-			nextBlockClientId,
-			selectedBlockClientIds,
-		]
-	);
-
-	const label = sprintf(
-		/* translators: %s: block name */
-		__( 'Remove %s' ),
-		blockTitle
-	);
-	const removeBlockLabel = count === 1 ? label : __( 'Remove blocks' );
-
 	const {
 		canDuplicate,
 		canInsertDefaultBlock,
@@ -413,6 +425,8 @@ export function BlockSettingsDropdown( {
 		shortcuts,
 		blockClientIds,
 		selectedBlockClientIds,
+		previousBlockClientId,
+		nextBlockClientId,
 		blocks,
 		canDuplicate,
 		onDuplicate,
@@ -422,6 +436,8 @@ export function BlockSettingsDropdown( {
 		canInsertDefaultBlock,
 		onInsertBefore,
 		onInsertAfter,
+		canRemove,
+		onRemove,
 	};
 
 	return (
@@ -471,17 +487,8 @@ export function BlockSettingsDropdown( {
 							: Children.map( ( child ) =>
 									cloneElement( child, { onClose } )
 							  ) }
-						{ canRemove && (
-							<RemoveMenuItem
-								// Todo: extract updateSelectionAfterRemove props requirements to a shared context provider.
-								updateSelectionAfterRemove={
-									updateSelectionAfterRemove
-								}
-								label={ removeBlockLabel }
-								onClose={ onClose }
-								onRemove={ onRemove }
-							></RemoveMenuItem>
-						) }
+
+						<RemoveMenuItem onClose={ onClose } />
 					</>
 				) }
 			</DropdownMenu>
