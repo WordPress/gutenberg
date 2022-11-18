@@ -10,11 +10,11 @@ import { __ } from '@wordpress/i18n';
 import InspectorControls from '../inspector-controls';
 import InspectorControlsGroups from '../inspector-controls/groups';
 
-// This tab restricts the blocks that may render to it via the whitelist below.
-const whitelist = [ 'core/navigation' ];
+// This tab restricts the blocks that may render to it via the allowlist below.
+const allowlist = [ 'core/navigation' ];
 
 export const useIsListViewDisabled = ( blockName ) => {
-	return ! whitelist.includes( blockName );
+	return ! allowlist.includes( blockName );
 };
 
 const ListViewTab = ( { blockName, hasSingleBlockSelection } ) => {
@@ -22,7 +22,7 @@ const ListViewTab = ( { blockName, hasSingleBlockSelection } ) => {
 	const fills = useSlotFills( list.Slot.__unstableName ) || [];
 
 	// Unlike other tabs the List View is much more niche. As such it will be
-	// omitted if the current block isn't in the whitelist.
+	// omitted if the current block isn't in the allowlist.
 	if ( useIsListViewDisabled( blockName ) ) {
 		return;
 	}
