@@ -65,7 +65,6 @@
 		"src/query-controls",
 		"src/responsive-wrapper",
 		"src/sandbox",
-		"src/snackbar",
 		"src/toolbar",
 		"src/toolbar-button",
 		"src/toolbar-context",

@@ -7,7 +7,10 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { forwardRef, useEffect } from '@wordpress/element';
-import { __unstableUseNavigateRegions as useNavigateRegions } from '@wordpress/components';
+import {
+	__unstableUseNavigateRegions as useNavigateRegions,
+	__unstableMotion as motion,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs } from '@wordpress/compose';
 
@@ -101,14 +104,13 @@ function InterfaceSkeleton(
 			<div className="interface-interface-skeleton__editor">
 				{ !! header && isDistractionFree && (
 					<NavigableRegion
+						as={ motion.div }
 						className="interface-interface-skeleton__header"
 						aria-label={ mergedLabels.header }
-						motionProps={ {
-							initial: isDistractionFree ? 'hidden' : 'hover',
-							whileHover: 'hover',
-							variants: headerVariants,
-							transition: { type: 'tween', delay: 0.8 },
-						} }
+						initial={ isDistractionFree ? 'hidden' : 'hover' }
+						whileHover="hover"
+						variants={ headerVariants }
+						transition={ { type: 'tween', delay: 0.8 } }
 					>
 						{ header }
 					</NavigableRegion>

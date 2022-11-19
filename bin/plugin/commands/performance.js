@@ -22,6 +22,7 @@ const config = require( '../config' );
  * @typedef WPPerformanceCommandOptions
  *
  * @property {boolean=} ci          Run on CI.
+ * @property {number=}  rounds      Run each test suite this many times for each branch.
  * @property {string=}  testsBranch The branch whose performance test files will be used for testing.
  * @property {string=}  wpVersion   The WordPress version to be used as the base install for testing.
  */
@@ -176,6 +177,7 @@ async function runTestSuite( testSuite, performanceTestDirectory ) {
  */
 async function runPerformanceTests( branches, options ) {
 	const runningInCI = !! process.env.CI || !! options.ci;
+	const TEST_ROUNDS = options.rounds || 1;
 
 	// The default value doesn't work because commander provides an array.
 	if ( branches.length === 0 ) {
@@ -239,7 +241,7 @@ async function runPerformanceTests( branches, options ) {
 
 	log( '    >> Installing dependencies and building packages' );
 	await runShellScript(
-		'npm ci && npm run build:packages',
+		'npm ci && node ./bin/packages/build.js',
 		performanceTestDirectory
 	);
 	log( '    >> Creating the environment folders' );
@@ -258,12 +260,26 @@ async function runPerformanceTests( branches, options ) {
 		await runShellScript( 'mkdir ' + environmentDirectory );
 		await runShellScript( `cp -R ${ baseDirectory } ${ buildPath }` );
 
-		log( `        >> Fetching the ${ formats.success( branch ) } branch` );
-		// @ts-ignore
-		await SimpleGit( buildPath ).reset( 'hard' ).checkout( branch );
+		const fancyBranch = formats.success( branch );
 
-		log( `        >> Building the ${ formats.success( branch ) } branch` );
-		await runShellScript( 'npm ci && npm run build', buildPath );
+		if ( branch === options.testsBranch ) {
+			log(
+				`        >> Re-using the testing branch for ${ fancyBranch }`
+			);
+			await runShellScript(
+				`cp -R ${ performanceTestDirectory } ${ buildPath }`
+			);
+		} else {
+			log( `        >> Fetching the ${ fancyBranch } branch` );
+			// @ts-ignore
+			await SimpleGit( buildPath ).reset( 'hard' ).checkout( branch );
+
+			log( `        >> Building the ${ fancyBranch } branch` );
+			await runShellScript(
+				'npm ci && node ./bin/packages/build.js',
+				buildPath
+			);
+		}
 
 		await runShellScript(
 			'cp ' +
@@ -330,7 +346,7 @@ async function runPerformanceTests( branches, options ) {
 		/** @type {Array<Record<string, WPPerformanceResults>>} */
 		const rawResults = [];
 		// Alternate three times between branches.
-		for ( let i = 0; i < 3; i++ ) {
+		for ( let i = 0; i < TEST_ROUNDS; i++ ) {
 			rawResults[ i ] = {};
 			for ( const branch of branches ) {
 				// @ts-ignore
