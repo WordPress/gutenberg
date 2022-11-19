@@ -307,6 +307,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 			) }
 			{ mediaUrl && (
 				<RangeControl
+					__nextHasNoMarginBottom
 					label={ __( 'Media width' ) }
 					value={ temporaryMediaWidth || mediaWidth }
 					onChange={ commitWidthChange }
