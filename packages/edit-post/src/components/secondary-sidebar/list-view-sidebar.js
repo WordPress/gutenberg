@@ -87,7 +87,6 @@ export default function ListViewSidebar() {
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
-<<<<<<< HEAD
 			aria-label={ __( 'Document Overview' ) }
 			className="edit-post-editor__document-overview-panel"
 			onKeyDown={ closeOnEscape }
