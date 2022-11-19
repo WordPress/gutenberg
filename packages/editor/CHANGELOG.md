@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added filter `entitiesSavedStates.siteEditsAsEntities.title` to allow developers to modify label output.
+
 ## 12.21.0 (2022-11-16)
 
 ## 12.20.0 (2022-11-02)

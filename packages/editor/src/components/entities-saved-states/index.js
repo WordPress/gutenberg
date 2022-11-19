@@ -14,6 +14,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
 import { store as noticesStore } from '@wordpress/notices';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -57,7 +58,11 @@ export default function EntitiesSavedStates( { close } ) {
 			siteEditsAsEntities.push( {
 				kind: 'root',
 				name: 'site',
-				title: TRANSLATED_SITE_PROPERTIES[ property ] || property,
+				title: applyFilters(
+					'entitiesSavedStates.siteEditsAsEntities.title',
+					TRANSLATED_SITE_PROPERTIES[ property ] || property,
+					property
+				),
 				property,
 			} );
 		}
