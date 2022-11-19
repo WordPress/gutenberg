@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Updated `isEditedPostSaveable` to return `true` when the post was edited (is "dirty") regardless of whether the editor is empty (has no blocks). Previously you could not save after removing the final block.
+- Updated `isEditedPostSaveable` to return `true` when the post was edited (is "dirty") regardless of whether the editor is empty (has no blocks). Previously you could not save after removing the final block ([#45917](https://github.com/WordPress/gutenberg/pull/45917)).
 
 ## 12.21.0 (2022-11-16)
 
