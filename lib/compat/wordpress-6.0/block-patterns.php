@@ -10,8 +10,9 @@ if ( ! function_exists( '_register_remote_theme_patterns' ) ) {
 	 * Registers patterns from Pattern Directory provided by a theme's
 	 * `theme.json` file.
 	 */
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
 	function _register_remote_theme_patterns() {
-		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		if ( ! apply_filters( 'should_load_remote_block_patterns', true ) ) {
 			return;
 		}

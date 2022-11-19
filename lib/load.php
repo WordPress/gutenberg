@@ -9,6 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound
 define( 'IS_GUTENBERG_PLUGIN', true );
 
 require_once __DIR__ . '/init.php';

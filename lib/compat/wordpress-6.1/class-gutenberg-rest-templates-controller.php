@@ -206,6 +206,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Templates_Controller {
 
 		$post = get_post( $template->wp_id );
 		/** This action is documented in wp-includes/rest-api/endpoints/class-wp-rest-posts-controller.php */
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		do_action( "rest_after_insert_{$this->post_type}", $post, $request, false );
 
 		wp_after_insert_post( $post, $update, $post_before );
