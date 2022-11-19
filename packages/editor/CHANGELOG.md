@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Added filter `entitiesSavedStates.siteEditsAsEntities.title` to allow developers to modify label output.
+- Added filter `entitiesSavedStates.siteEditsAsEntities.title` to allow developers to modify title output ([#45918](https://github.com/WordPress/gutenberg/pull/45918)).
 
 ## 12.21.0 (2022-11-16)
 
