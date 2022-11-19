@@ -493,7 +493,8 @@ export function isEditedPostSaveable( state ) {
 	return (
 		!! getEditedPostAttribute( state, 'title' ) ||
 		!! getEditedPostAttribute( state, 'excerpt' ) ||
-		! isEditedPostEmpty( state ) ||
+		// Post is not saveable if empty, unless it's "dirty" (has edits).
+		! ( isEditedPostEmpty( state ) && ! isEditedPostDirty( state ) ) ||
 		Platform.OS === 'native'
 	);
 }

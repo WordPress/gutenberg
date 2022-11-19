@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Updated `isEditedPostSaveable` to return `true` when the post was edited (is "dirty") regardless of whether the editor is empty (has no blocks). Previously you could not save after removing the final block.
+
 ## 12.21.0 (2022-11-16)
 
 ## 12.20.0 (2022-11-02)
