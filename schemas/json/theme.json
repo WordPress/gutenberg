@@ -188,6 +188,22 @@
 				}
 			}
 		},
+		"settingsPropertiesDimensions": {
+			"properties": {
+				"dimensions": {
+					"description": "Settings related to dimensions.",
+					"type": "object",
+					"properties": {
+						"minHeight": {
+							"description": "Allow users to set custom minimum height.",
+							"type": "boolean",
+							"default": false
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
 		"settingsPropertiesLayout": {
 			"type": "object",
 			"properties": {
@@ -269,7 +285,7 @@
 							}
 						},
 						"spacingScale": {
-							"description": "Space size presets for the space size selector.\nGenerates a custom property (`--wp--preset--space-size--{slug}`) per preset value.",
+							"description": "Settings to auto-generate space size presets for the space size selector.\nGenerates a custom property (`--wp--preset--space-size--{slug}`) per preset value.",
 							"type": "object",
 							"properties": {
 								"operator": {
@@ -463,7 +479,8 @@
 														"auto",
 														"block",
 														"fallback",
-														"swap"
+														"swap",
+														"optional"
 													]
 												},
 												"src": {
@@ -485,12 +502,12 @@
 													"description": "CSS font-stretch value.",
 													"type": "string"
 												},
-												"ascendOverride": {
-													"description": "CSS ascend-override value.",
+												"ascentOverride": {
+													"description": "CSS ascent-override value.",
 													"type": "string"
 												},
-												"descendOverride": {
-													"description": "CSS descend-override value.",
+												"descentOverride": {
+													"description": "CSS descent-override value.",
 													"type": "string"
 												},
 												"fontVariant": {
@@ -1019,29 +1036,6 @@
 					},
 					"additionalProperties": false
 				},
-				"outline": {
-					"description": "Outline styles.",
-					"type": "object",
-					"properties": {
-						"color": {
-							"description": "Sets the `outline-color` CSS property.",
-							"type": "string"
-						},
-						"offset": {
-							"description": "Sets the `outline-offset` CSS property.",
-							"type": "string"
-						},
-						"style": {
-							"description": "Sets the `outline-style` CSS property.",
-							"type": "string"
-						},
-						"width": {
-							"description": "Sets the `outline-width` CSS property.",
-							"type": "string"
-						}
-					},
-					"additionalProperties": false
-				},
 				"spacing": {
 					"description": "Spacing styles.",
 					"type": "object",
@@ -1152,6 +1146,29 @@
 				"shadow": {
 					"description": "Box shadow styles.",
 					"type": "string"
+				},
+				"outline": {
+					"description": "Outline styles.",
+					"type": "object",
+					"properties": {
+						"color": {
+							"description": "Sets the `outline-color` CSS property.",
+							"type": "string"
+						},
+						"offset": {
+							"description": "Sets the `outline-offset` CSS property.",
+							"type": "string"
+						},
+						"style": {
+							"description": "Sets the `outline-style` CSS property.",
+							"type": "string"
+						},
+						"width": {
+							"description": "Sets the `outline-width` CSS property.",
+							"type": "string"
+						}
+					},
+					"additionalProperties": false
 				}
 			}
 		},
@@ -1168,7 +1185,8 @@
 						"spacing": {},
 						"typography": {},
 						"filter": {},
-						"shadow": {}
+						"shadow": {},
+						"outline": {}
 					},
 					"additionalProperties": false
 				}
@@ -1188,8 +1206,8 @@
 								"border": {},
 								"color": {},
 								"filter": {},
-								"outline": {},
 								"shadow": {},
+								"outline": {},
 								"spacing": {},
 								"typography": {},
 								":hover": {
@@ -1199,6 +1217,9 @@
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								},
 								":active": {
+									"$ref": "#/definitions/stylesPropertiesComplete"
+								},
+								":visited": {
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								}
 							},
@@ -1225,6 +1246,9 @@
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								},
 								":active": {
+									"$ref": "#/definitions/stylesPropertiesComplete"
+								},
+								":visited": {
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								}
 							},
@@ -1534,6 +1558,9 @@
 						"color": {},
 						"spacing": {},
 						"typography": {},
+						"filter": {},
+						"shadow": {},
+						"outline": {},
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
 						}
@@ -1553,6 +1580,10 @@
 			"description": "Version of theme.json to use.",
 			"type": "integer",
 			"enum": [ 2 ]
+		},
+		"title": {
+			"type": "string",
+			"description": "Title of the global styles variation. If not defined, the file name will be used."
 		},
 		"settings": {
 			"description": "Settings for the block editor and individual blocks. These include things like:\n- Which customization options should be available to the user. \n- The default colors, font sizes... available to the user. \n- CSS custom properties and class names used in styles.\n- And the default layout of the editor (widths and available alignments).",
@@ -1596,6 +1627,8 @@
 						"spacing": {},
 						"typography": {},
 						"filter": {},
+						"shadow": {},
+						"outline": {},
 						"elements": {
 							"description": "Styles defined on a per-element basis using the element's selector.",
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"

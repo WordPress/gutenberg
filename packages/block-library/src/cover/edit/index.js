@@ -131,13 +131,7 @@ function CoverEdit( {
 		createErrorNotice( message, { type: 'snackbar' } );
 	};
 
-	const mediaElement = useRef();
-	const isCoverDark = useCoverIsDark(
-		url,
-		dimRatio,
-		overlayColor.color,
-		mediaElement
-	);
+	const isCoverDark = useCoverIsDark( url, dimRatio, overlayColor.color );
 
 	useEffect( () => {
 		// This side-effect should not create an undo level.
@@ -194,13 +188,16 @@ function CoverEdit( {
 			className: 'wp-block-cover__inner-container',
 		},
 		{
-			template: innerBlocksTemplate,
+			// Avoid template sync when the `templateLock` value is `all` or `contentOnly`.
+			// See: https://github.com/WordPress/gutenberg/pull/45632
+			template: ! hasInnerBlocks ? innerBlocksTemplate : undefined,
 			templateInsertUpdatesSelection: true,
 			allowedBlocks,
 			templateLock,
 		}
 	);
 
+	const mediaElement = useRef();
 	const currentSettings = {
 		isVideoBackground,
 		isImageBackground,

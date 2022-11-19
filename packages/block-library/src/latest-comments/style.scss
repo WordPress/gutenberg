@@ -4,6 +4,9 @@ ol.wp-block-latest-comments {
 	// Due to low specificity this will be safely overriden
 	// by default wp-block layout styles in the Post/Site editor
 	margin-left: 0;
+
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
 }
 
 // Higher specificity - target list via wrapper.

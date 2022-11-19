@@ -8,8 +8,10 @@ import {
 	__experimentalZStack as ZStack,
 	__experimentalVStack as VStack,
 	ColorIndicator,
+	Button,
 } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
+import { shuffle } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
 
 /**
@@ -17,7 +19,7 @@ import { useMemo } from '@wordpress/element';
  */
 import Subtitle from './subtitle';
 import { NavigationButtonAsItem } from './navigation-button';
-import { useSetting } from './hooks';
+import { useColorRandomizer, useSetting } from './hooks';
 import ColorIndicatorWrapper from './color-indicator-wrapper';
 
 const EMPTY_COLORS = [];
@@ -31,6 +33,9 @@ function Palette( { name } ) {
 		'color.defaultPalette',
 		name
 	);
+
+	const [ randomizeThemeColors ] = useColorRandomizer();
+
 	const colors = useMemo(
 		() => [
 			...( customColors || EMPTY_COLORS ),
@@ -68,16 +73,29 @@ function Palette( { name } ) {
 						}
 					>
 						<ZStack isLayered={ false } offset={ -8 }>
-							{ colors.slice( 0, 5 ).map( ( { color } ) => (
-								<ColorIndicatorWrapper key={ color }>
-									<ColorIndicator colorValue={ color } />
-								</ColorIndicatorWrapper>
-							) ) }
+							{ colors
+								.slice( 0, 5 )
+								.map( ( { color }, index ) => (
+									<ColorIndicatorWrapper
+										key={ `${ color }-${ index }` }
+									>
+										<ColorIndicator colorValue={ color } />
+									</ColorIndicatorWrapper>
+								) ) }
 						</ZStack>
 						<FlexItem>{ paletteButtonText }</FlexItem>
 					</HStack>
 				</NavigationButtonAsItem>
 			</ItemGroup>
+			{ randomizeThemeColors && (
+				<Button
+					variant="secondary"
+					icon={ shuffle }
+					onClick={ randomizeThemeColors }
+				>
+					{ __( 'Randomize colors' ) }
+				</Button>
+			) }
 		</VStack>
 	);
 }

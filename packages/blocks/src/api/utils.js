@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { every, reduce } from 'lodash';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
@@ -57,10 +56,8 @@ export function isUnmodifiedDefaultBlock( block ) {
 	const newDefaultBlock = isUnmodifiedDefaultBlock.block;
 	const blockType = getBlockType( defaultBlockName );
 
-	return every(
-		blockType?.attributes,
-		( value, key ) =>
-			newDefaultBlock.attributes[ key ] === block.attributes[ key ]
+	return Object.keys( blockType?.attributes ?? {} ).every(
+		( key ) => newDefaultBlock.attributes[ key ] === block.attributes[ key ]
 	);
 }
 
@@ -259,9 +256,8 @@ export function __experimentalSanitizeBlockAttributes( name, attributes ) {
 		throw new Error( `Block type '${ name }' is not registered.` );
 	}
 
-	return reduce(
-		blockType.attributes,
-		( accumulator, schema, key ) => {
+	return Object.entries( blockType.attributes ).reduce(
+		( accumulator, [ key, schema ] ) => {
 			const value = attributes[ key ];
 
 			if ( undefined !== value ) {

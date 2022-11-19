@@ -9,11 +9,7 @@ import { kebabCase } from 'lodash';
  */
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
-import {
-	getBlockDefaultClassName,
-	getBlockSupport,
-	hasBlockSupport,
-} from '@wordpress/blocks';
+import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import {
 	Button,
@@ -37,56 +33,99 @@ import { getLayoutType, getLayoutTypes } from '../layouts';
 const layoutBlockSupportKey = '__experimentalLayout';
 
 /**
- * Generates the utility classnames for the given blocks layout attributes.
- * This method was primarily added to reintroduce classnames that were removed
- * in the 5.9 release (https://github.com/WordPress/gutenberg/issues/38719), rather
- * than providing an extensive list of all possible layout classes. The plan is to
- * have the style engine generate a more extensive list of utility classnames which
- * will then replace this method.
+ * Generates the utility classnames for the given block's layout attributes.
  *
- * @param { Object } layout            Layout object.
- * @param { Object } layoutDefinitions An object containing layout definitions, stored in theme.json.
+ * @param { Object } block Block object.
  *
  * @return { Array } Array of CSS classname strings.
  */
-function useLayoutClasses( layout, layoutDefinitions ) {
+export function useLayoutClasses( block = {} ) {
 	const rootPaddingAlignment = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().__experimentalFeatures
 			?.useRootPaddingAwareAlignments;
 	}, [] );
+	const globalLayoutSettings = useSetting( 'layout' ) || {};
+
+	const { attributes = {}, name } = block;
+	const { layout } = attributes;
+
+	const { default: defaultBlockLayout } =
+		getBlockSupport( name, layoutBlockSupportKey ) || {};
+	const usedLayout =
+		layout?.inherit || layout?.contentSize || layout?.wideSize
+			? { ...layout, type: 'constrained' }
+			: layout || defaultBlockLayout || {};
+
 	const layoutClassnames = [];
 
-	if ( layoutDefinitions?.[ layout?.type || 'default' ]?.className ) {
+	if (
+		globalLayoutSettings?.definitions?.[ usedLayout?.type || 'default' ]
+			?.className
+	) {
 		layoutClassnames.push(
-			layoutDefinitions?.[ layout?.type || 'default' ]?.className
+			globalLayoutSettings?.definitions?.[ usedLayout?.type || 'default' ]
+				?.className
 		);
 	}
 
 	if (
-		( layout?.inherit ||
-			layout?.contentSize ||
-			layout?.type === 'constrained' ) &&
+		( usedLayout?.inherit ||
+			usedLayout?.contentSize ||
+			usedLayout?.type === 'constrained' ) &&
 		rootPaddingAlignment
 	) {
 		layoutClassnames.push( 'has-global-padding' );
 	}
 
-	if ( layout?.orientation ) {
-		layoutClassnames.push( `is-${ kebabCase( layout.orientation ) }` );
+	if ( usedLayout?.orientation ) {
+		layoutClassnames.push( `is-${ kebabCase( usedLayout.orientation ) }` );
 	}
 
-	if ( layout?.justifyContent ) {
+	if ( usedLayout?.justifyContent ) {
 		layoutClassnames.push(
-			`is-content-justification-${ kebabCase( layout.justifyContent ) }`
+			`is-content-justification-${ kebabCase(
+				usedLayout.justifyContent
+			) }`
 		);
 	}
 
-	if ( layout?.flexWrap && layout.flexWrap === 'nowrap' ) {
+	if ( usedLayout?.flexWrap && usedLayout.flexWrap === 'nowrap' ) {
 		layoutClassnames.push( 'is-nowrap' );
 	}
 
 	return layoutClassnames;
+}
+
+/**
+ * Generates a CSS rule with the given block's layout styles.
+ *
+ * @param { Object } block    Block object.
+ * @param { string } selector A selector to use in generating the CSS rule.
+ *
+ * @return { string } CSS rule.
+ */
+export function useLayoutStyles( block = {}, selector ) {
+	const { attributes = {}, name } = block;
+	const { layout = {}, style = {} } = attributes;
+	// Update type for blocks using legacy layouts.
+	const usedLayout =
+		layout?.inherit || layout?.contentSize || layout?.wideSize
+			? { ...layout, type: 'constrained' }
+			: layout || {};
+	const fullLayoutType = getLayoutType( usedLayout?.type || 'default' );
+	const globalLayoutSettings = useSetting( 'layout' ) || {};
+	const blockGapSupport = useSetting( 'spacing.blockGap' );
+	const hasBlockGapSupport = blockGapSupport !== null;
+	const css = fullLayoutType?.getLayoutStyle?.( {
+		blockName: name,
+		selector,
+		layout,
+		layoutDefinitions: globalLayoutSettings?.definitions,
+		style,
+		hasBlockGapSupport,
+	} );
+	return css;
 }
 
 function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
@@ -299,7 +338,7 @@ export const withInspectorControls = createHigherOrderComponent(
  */
 export const withLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const { name, attributes } = props;
+		const { name, attributes, block } = props;
 		const hasLayoutBlockSupport = hasBlockSupport(
 			name,
 			layoutBlockSupportKey
@@ -321,11 +360,10 @@ export const withLayoutStyles = createHigherOrderComponent(
 				? { ...layout, type: 'constrained' }
 				: layout || defaultBlockLayout || {};
 		const layoutClasses = hasLayoutBlockSupport
-			? useLayoutClasses( usedLayout, defaultThemeLayout?.definitions )
+			? useLayoutClasses( block )
 			: null;
-		const selector = `.${ getBlockDefaultClassName(
-			name
-		) }.wp-container-${ id }`;
+		// Higher specificity to override defaults from theme.json.
+		const selector = `.wp-container-${ id }.wp-container-${ id }`;
 		const blockGapSupport = useSetting( 'spacing.blockGap' );
 		const hasBlockGapSupport = blockGapSupport !== null;
 
@@ -347,8 +385,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 		}
 
 		// Attach a `wp-container-` id-based class name as well as a layout class name such as `is-layout-flex`.
-		const className = classnames(
-			props?.className,
+		const layoutClassNames = classnames(
 			{
 				[ `wp-container-${ id }` ]: shouldRenderLayoutStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
 			},
@@ -370,7 +407,10 @@ export const withLayoutStyles = createHigherOrderComponent(
 						/>,
 						element
 					) }
-				<BlockListBlock { ...props } className={ className } />
+				<BlockListBlock
+					{ ...props }
+					__unstableLayoutClassNames={ layoutClassNames }
+				/>
 			</>
 		);
 	}

@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 6.19.0 (2022-11-16)
+
+### Enhancement
+
+-   ` BlockTypesChecklist`: Move BlockIcon component out of CheckboxControl label ([#45535](https://github.com/WordPress/gutenberg/pull/45535))
+
+## 6.18.0 (2022-11-02)
+
+## 6.17.0 (2022-10-19)
+
+## 6.16.0 (2022-10-05)
+
 ## 6.15.0 (2022-09-21)
 
 ## 6.14.0 (2022-09-13)

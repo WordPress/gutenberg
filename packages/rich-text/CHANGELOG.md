@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 5.20.0 (2022-11-16)
+
+## 5.19.0 (2022-11-02)
+
+### Deprecations
+
+-   Update deprecation message for the `useAnchorRef` hook ([#45195](https://github.com/WordPress/gutenberg/pull/45195)).
+
+## 5.18.0 (2022-10-19)
+
+## 5.17.0 (2022-10-05)
+
 ## 5.16.0 (2022-09-21)
 
 ### Deprecations

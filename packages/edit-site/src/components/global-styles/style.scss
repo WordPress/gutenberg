@@ -11,7 +11,7 @@
 	display: block;
 }
 
-.edit-site-typography-panel__preview {
+.edit-site-typography-preview {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -19,6 +19,7 @@
 	margin-bottom: $grid-unit-20;
 	background: $gray-100;
 	border-radius: $radius-block-ui;
+	overflow: hidden;
 }
 
 .edit-site-typography-panel__full-width-control {
@@ -97,7 +98,7 @@
 	}
 
 	&:focus .edit-site-global-styles-variations_item-preview {
-		border: var(--wp-admin-theme-color) $border-width solid;
+		border: var(--wp-admin-theme-color) var(--wp-admin-border-width-focus) solid;
 	}
 }
 

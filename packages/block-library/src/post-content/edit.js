@@ -46,7 +46,9 @@ function EditableContent( { layout, context = {} } ) {
 		return getSettings()?.supportsLayout;
 	}, [] );
 	const defaultLayout = useSetting( 'layout' ) || {};
-	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
+	const usedLayout = ! layout?.type
+		? { ...defaultLayout, ...layout, type: 'default' }
+		: { ...defaultLayout, ...layout };
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		postType,
@@ -82,8 +84,8 @@ function Content( props ) {
 	);
 }
 
-function Placeholder() {
-	const blockProps = useBlockProps();
+function Placeholder( { layoutClassNames } ) {
+	const blockProps = useBlockProps( { className: layoutClassNames } );
 	return (
 		<div { ...blockProps }>
 			<p>
@@ -116,7 +118,11 @@ function RecursionError() {
 	);
 }
 
-export default function PostContentEdit( { context, attributes } ) {
+export default function PostContentEdit( {
+	context,
+	attributes,
+	__unstableLayoutClassNames: layoutClassNames,
+} ) {
 	const { postId: contextPostId, postType: contextPostType } = context;
 	const { layout = {} } = attributes;
 	const hasAlreadyRendered = useHasRecursion( contextPostId );
@@ -130,7 +136,7 @@ export default function PostContentEdit( { context, attributes } ) {
 			{ contextPostId && contextPostType ? (
 				<Content context={ context } layout={ layout } />
 			) : (
-				<Placeholder />
+				<Placeholder layoutClassNames={ layoutClassNames } />
 			) }
 		</RecursionProvider>
 	);

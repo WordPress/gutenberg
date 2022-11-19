@@ -226,7 +226,7 @@ function BlockPopoverInbetween( {
 			forcePopoverRecompute
 		);
 		return () => {
-			previousElement.ownerDocument.defaultView.removeEventListener(
+			previousElement.ownerDocument.defaultView?.removeEventListener(
 				'resize',
 				forcePopoverRecompute
 			);
@@ -268,6 +268,7 @@ function BlockPopoverInbetween( {
 			resize={ false }
 			flip={ false }
 			placement="bottom-start"
+			variant="unstyled"
 		>
 			<div
 				className="block-editor-block-popover__inbetween-container"

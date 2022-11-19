@@ -14,6 +14,10 @@ test.describe( 'Writing Flow', () => {
 		await admin.createNewPost();
 	} );
 
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
+	} );
+
 	test( 'Should navigate inner blocks with arrow keys', async ( {
 		editor,
 		page,
@@ -700,7 +704,7 @@ test.describe( 'Writing Flow', () => {
 		const x = paragraphRect.x + ( 2 * paragraphRect.width ) / 3;
 		const y = paragraphRect.y + paragraphRect.height + 1;
 
-		// The typing observer requires two mouse moves to dectect and actual
+		// The typing observer requires two mouse moves to detect an actual
 		// move.
 		await page.mouse.move( x - 1, y - 1 );
 		await page.mouse.move( x, y );

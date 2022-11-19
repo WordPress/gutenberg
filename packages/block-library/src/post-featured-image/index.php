@@ -19,14 +19,19 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	}
 	$post_ID = $block->context['postId'];
 
+	// Check is needed for backward compatibility with third-party plugins
+	// that might rely on the `in_the_loop` check; calling `the_post` sets it to true.
+	if ( ! in_the_loop() && have_posts() ) {
+		the_post();
+	}
+
 	$is_link        = isset( $attributes['isLink'] ) && $attributes['isLink'];
 	$size_slug      = isset( $attributes['sizeSlug'] ) ? $attributes['sizeSlug'] : 'post-thumbnail';
-	$post_title     = trim( strip_tags( get_the_title( $post_ID ) ) );
 	$attr           = get_block_core_post_featured_image_border_attributes( $attributes );
 	$overlay_markup = get_block_core_post_featured_image_overlay_element_markup( $attributes );
 
 	if ( $is_link ) {
-		$attr['alt'] = $post_title;
+		$attr['alt'] = trim( strip_tags( get_the_title( $post_ID ) ) );
 	}
 
 	if ( ! empty( $attributes['height'] ) ) {
@@ -76,16 +81,25 @@ function get_block_core_post_featured_image_overlay_element_markup( $attributes 
 	$has_custom_gradient = isset( $attributes['customGradient'] ) && $attributes['customGradient'];
 	$has_solid_overlay   = isset( $attributes['overlayColor'] ) && $attributes['overlayColor'];
 	$has_custom_overlay  = isset( $attributes['customOverlayColor'] ) && $attributes['customOverlayColor'];
-	$class_names         = array(
-		'wp-block-post-featured-image__overlay',
-	);
-	$styles_properties   = array();
+	$class_names         = array( 'wp-block-post-featured-image__overlay' );
+	$styles              = array();
 
 	if ( ! $has_dim_background ) {
 		return '';
 	}
 
-	// Generate required classes for the element.
+	// Apply border classes and styles.
+	$border_attributes = get_block_core_post_featured_image_border_attributes( $attributes );
+
+	if ( ! empty( $border_attributes['class'] ) ) {
+		$class_names[] = $border_attributes['class'];
+	}
+
+	if ( ! empty( $border_attributes['style'] ) ) {
+		$styles[] = $border_attributes['style'];
+	}
+
+	// Apply overlay and gradient classes.
 	if ( $has_dim_background ) {
 		$class_names[] = 'has-background-dim';
 		$class_names[] = "has-background-dim-{$attributes['dimRatio']}";
@@ -103,35 +117,20 @@ function get_block_core_post_featured_image_overlay_element_markup( $attributes 
 		$class_names[] = "has-{$attributes['gradient']}-gradient-background";
 	}
 
-	// Generate required CSS properties and their values.
-	if ( ! empty( $attributes['style']['border']['radius'] ) ) {
-		$styles_properties['border-radius'] = $attributes['style']['border']['radius'];
-	}
-
-	if ( ! empty( $attributes['style']['border']['width'] ) ) {
-		$styles_properties['border-width'] = $attributes['style']['border']['width'];
-	}
-
+	// Apply background styles.
 	if ( $has_custom_gradient ) {
-		$styles_properties['background-image'] = $attributes['customGradient'];
+		$styles[] = sprintf( 'background-image: %s;', $attributes['customGradient'] );
 	}
 
 	if ( $has_custom_overlay ) {
-		$styles_properties['background-color'] = $attributes['customOverlayColor'];
-	}
-
-	$styles = '';
-
-	foreach ( $styles_properties as $style_attribute => $style_attribute_value ) {
-		$styles .= "{$style_attribute}: $style_attribute_value; ";
+		$styles[] = sprintf( 'background-color: %s;', $attributes['customOverlayColor'] );
 	}
 
 	return sprintf(
 		'<span class="%s" style="%s" aria-hidden="true"></span>',
 		esc_attr( implode( ' ', $class_names ) ),
-		esc_attr( trim( $styles ) )
+		esc_attr( safecss_filter_attr( implode( ' ', $styles ) ) )
 	);
-
 }
 
 /**

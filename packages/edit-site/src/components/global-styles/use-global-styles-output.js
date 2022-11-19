@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, isEmpty, kebabCase, pickBy, reduce, set } from 'lodash';
+import { get, isEmpty, kebabCase, pickBy, set } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,6 +24,7 @@ import {
  * Internal dependencies
  */
 import { PRESET_METADATA, ROOT_BLOCK_SELECTOR, scopeSelector } from './utils';
+import { getTypographyFontSizeValue } from './typography-utils';
 import { GlobalStylesContext } from './context';
 import { useSetting } from './hooks';
 
@@ -60,8 +61,7 @@ function compileStyleValue( uncompiledValue ) {
  * @return {Array<Object>} An array of style declarations.
  */
 function getPresetsDeclarations( blockPresets = {}, mergedSettings ) {
-	return reduce(
-		PRESET_METADATA,
+	return PRESET_METADATA.reduce(
 		( declarations, { path, valueKey, valueFunc, cssVarInfix } ) => {
 			const presetByOrigin = get( blockPresets, path, [] );
 			[ 'default', 'theme', 'custom' ].forEach( ( origin ) => {
@@ -101,8 +101,7 @@ function getPresetsDeclarations( blockPresets = {}, mergedSettings ) {
  * @return {string} CSS declarations for the preset classes.
  */
 function getPresetsClasses( blockSelector, blockPresets = {} ) {
-	return reduce(
-		PRESET_METADATA,
+	return PRESET_METADATA.reduce(
 		( declarations, { path, cssVarInfix, classes } ) => {
 			if ( ! classes ) {
 				return declarations;
@@ -192,9 +191,11 @@ export function getStylesDeclarations(
 	tree = {}
 ) {
 	const isRoot = ROOT_BLOCK_SELECTOR === selector;
-	const output = reduce(
-		STYLE_PROPERTY,
-		( declarations, { value, properties, useEngine, rootOnly }, key ) => {
+	const output = Object.entries( STYLE_PROPERTY ).reduce(
+		(
+			declarations,
+			[ key, { value, properties, useEngine, rootOnly } ]
+		) => {
 			if ( rootOnly && ! isRoot ) {
 				return declarations;
 			}
@@ -274,6 +275,21 @@ export function getStylesDeclarations(
 			if ( ! ruleValue || !! ruleValue?.ref ) {
 				return;
 			}
+		}
+
+		// Calculate fluid typography rules where available.
+		if ( cssProperty === 'font-size' ) {
+			/*
+			 * getTypographyFontSizeValue() will check
+			 * if fluid typography has been activated and also
+			 * whether the incoming value can be converted to a fluid value.
+			 * Values that already have a "clamp()" function will not pass the test,
+			 * and therefore the original $value will be returned.
+			 */
+			ruleValue = getTypographyFontSizeValue(
+				{ size: ruleValue },
+				tree?.settings?.typography
+			);
 		}
 
 		output.push( `${ cssProperty }: ${ ruleValue }` );
@@ -434,9 +450,16 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 
 	const pickStyleKeys = ( treeToPickFrom ) =>
 		pickBy( treeToPickFrom, ( value, key ) =>
-			[ 'border', 'color', 'spacing', 'typography', 'filter' ].includes(
-				key
-			)
+			[
+				'border',
+				'color',
+				'dimensions',
+				'spacing',
+				'typography',
+				'filter',
+				'outline',
+				'shadow',
+			].includes( key )
 		);
 
 	// Top-level.
@@ -605,12 +628,12 @@ export const toStyles = (
 	}
 
 	if ( useRootPaddingAlign ) {
-		ruleset += `padding-right: 0; padding-left: 0; padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom) } 
-			.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); } 
-			.has-global-padding :where(.has-global-padding) { padding-right: 0; padding-left: 0; } 
-			.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); } 
-			.has-global-padding :where(.has-global-padding) > .alignfull { margin-right: 0; margin-left: 0; } 
-			.has-global-padding > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); } 
+		ruleset += `padding-right: 0; padding-left: 0; padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom) }
+			.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }
+			.has-global-padding :where(.has-global-padding) { padding-right: 0; padding-left: 0; }
+			.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }
+			.has-global-padding :where(.has-global-padding) > .alignfull { margin-right: 0; margin-left: 0; }
+			.has-global-padding > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }
 			.has-global-padding :where(.has-global-padding) > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: 0; padding-left: 0;`;
 	}
 
@@ -823,8 +846,44 @@ export const getBlockSelectors = ( blockTypes ) => {
 	return result;
 };
 
+/**
+ * If there is a separator block whose color is defined in theme.json via background,
+ * update the separator color to the same value by using border color.
+ *
+ * @param {Object} config Theme.json configuration file object.
+ * @return {Object} configTheme.json configuration file object updated.
+ */
+function updateConfigWithSeparator( config ) {
+	const needsSeparatorStyleUpdate =
+		config.styles?.blocks[ 'core/separator' ] &&
+		config.styles?.blocks[ 'core/separator' ].color?.background &&
+		! config.styles?.blocks[ 'core/separator' ].color?.text &&
+		! config.styles?.blocks[ 'core/separator' ].border?.color;
+	if ( needsSeparatorStyleUpdate ) {
+		return {
+			...config,
+			styles: {
+				...config.styles,
+				blocks: {
+					...config.styles.blocks,
+					'core/separator': {
+						...config.styles.blocks[ 'core/separator' ],
+						color: {
+							...config.styles.blocks[ 'core/separator' ].color,
+							text: config.styles?.blocks[ 'core/separator' ]
+								.color.background,
+						},
+					},
+				},
+			},
+		};
+	}
+	return config;
+}
+
 export function useGlobalStylesOutput() {
-	const { merged: mergedConfig } = useContext( GlobalStylesContext );
+	let { merged: mergedConfig } = useContext( GlobalStylesContext );
+
 	const [ blockGap ] = useSetting( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGap !== null;
 	const hasFallbackGapSupport = ! hasBlockGapSupport; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback styles support.
@@ -837,7 +896,7 @@ export function useGlobalStylesOutput() {
 		if ( ! mergedConfig?.styles || ! mergedConfig?.settings ) {
 			return [];
 		}
-
+		mergedConfig = updateConfigWithSeparator( mergedConfig );
 		const blockSelectors = getBlockSelectors( getBlockTypes() );
 		const customProperties = toCustomProperties(
 			mergedConfig,

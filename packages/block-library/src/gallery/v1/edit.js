@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { every, filter, find, get, isEmpty, map, reduce, some } from 'lodash';
+import { filter, find, get, isEmpty, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -98,34 +98,29 @@ function GalleryEdit( props ) {
 
 	const resizedImages = useMemo( () => {
 		if ( isSelected ) {
-			return reduce(
-				attributes.ids,
+			return ( attributes.ids ?? [] ).reduce(
 				( currentResizedImages, id ) => {
 					if ( ! id ) {
 						return currentResizedImages;
 					}
 					const image = getMedia( id );
-					const sizes = reduce(
-						imageSizes,
-						( currentSizes, size ) => {
-							const defaultUrl = get( image, [
-								'sizes',
-								size.slug,
-								'url',
-							] );
-							const mediaDetailsUrl = get( image, [
-								'media_details',
-								'sizes',
-								size.slug,
-								'source_url',
-							] );
-							return {
-								...currentSizes,
-								[ size.slug ]: defaultUrl || mediaDetailsUrl,
-							};
-						},
-						{}
-					);
+					const sizes = imageSizes.reduce( ( currentSizes, size ) => {
+						const defaultUrl = get( image, [
+							'sizes',
+							size.slug,
+							'url',
+						] );
+						const mediaDetailsUrl = get( image, [
+							'media_details',
+							'sizes',
+							size.slug,
+							'source_url',
+						] );
+						return {
+							...currentSizes,
+							[ size.slug ]: defaultUrl || mediaDetailsUrl,
+						};
+					}, {} );
 					return {
 						...currentResizedImages,
 						[ parseInt( id, 10 ) ]: sizes,
@@ -302,9 +297,10 @@ function GalleryEdit( props ) {
 	}
 
 	function getImagesSizeOptions() {
+		const resizedImageSizes = Object.values( resizedImages );
 		return map(
 			filter( imageSizes, ( { slug } ) =>
-				some( resizedImages, ( sizes ) => sizes[ slug ] )
+				resizedImageSizes.some( ( sizes ) => sizes[ slug ] )
 			),
 			( { name, slug } ) => ( { value: slug, label: name } )
 		);
@@ -333,7 +329,7 @@ function GalleryEdit( props ) {
 			Platform.OS === 'web' &&
 			images &&
 			images.length > 0 &&
-			every( images, ( { url } ) => isBlobURL( url ) )
+			images.every( ( { url } ) => isBlobURL( url ) )
 		) {
 			const filesList = map( images, ( { url } ) => getBlobByURL( url ) );
 			images.forEach( ( { url } ) => revokeBlobURL( url ) );

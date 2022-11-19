@@ -15,9 +15,9 @@ import { waitFor } from './wait-for';
  * @param {string}                                            blockName Name of the block to be inserted as shown in the block picker.
  */
 export const addBlock = async ( screen, blockName ) => {
-	const { getByA11yLabel, getByTestId, getByText } = screen;
+	const { getByLabelText, getByTestId, getByText } = screen;
 
-	fireEvent.press( getByA11yLabel( 'Add block' ) );
+	fireEvent.press( getByLabelText( 'Add block' ) );
 
 	const blockList = getByTestId( 'InserterUI-Blocks' );
 	// onScroll event used to force the FlatList to render all items

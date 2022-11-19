@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escape, without } from 'lodash';
+import escapeHtml from 'escape-html';
 
 /**
  * WordPress dependencies
@@ -248,8 +248,8 @@ export const updateNavigationLinkBlockAttributes = (
 		normalizedTitle !== normalizedURL &&
 		originalLabel !== title;
 	const label = escapeTitle
-		? escape( title )
-		: originalLabel || escape( normalizedURL );
+		? escapeHtml( title )
+		: originalLabel || escapeHtml( normalizedURL );
 
 	// In https://github.com/WordPress/gutenberg/pull/24670 we decided to use "tag" in favor of "post_tag"
 	const type = newType === 'post_tag' ? 'tag' : newType.replace( '-', '_' );
@@ -486,7 +486,9 @@ export default function NavigationSubmenuEdit( {
 	const innerBlocksColors = getColors( context, true );
 
 	const allowedBlocks = isAtMaxNesting
-		? without( ALLOWED_BLOCKS, 'core/navigation-submenu' )
+		? ALLOWED_BLOCKS.filter(
+				( blockName ) => blockName !== 'core/navigation-submenu'
+		  )
 		: ALLOWED_BLOCKS;
 
 	const innerBlocksProps = useInnerBlocksProps(
@@ -566,8 +568,17 @@ export default function NavigationSubmenuEdit( {
 					/>
 				</ToolbarGroup>
 			</BlockControls>
+			{ /* Warning, this duplicated in packages/block-library/src/navigation-link/edit.js */ }
 			<InspectorControls>
 				<PanelBody title={ __( 'Link settings' ) }>
+					<TextControl
+						value={ url || '' }
+						onChange={ ( urlValue ) => {
+							setAttributes( { url: urlValue } );
+						} }
+						label={ __( 'URL' ) }
+						autoComplete="off"
+					/>
 					<TextareaControl
 						value={ description || '' }
 						onChange={ ( descriptionValue ) => {
@@ -631,7 +642,7 @@ export default function NavigationSubmenuEdit( {
 					}
 					{ ! openSubmenusOnClick && isLinkOpen && (
 						<Popover
-							position="bottom center"
+							placement="bottom"
 							onClose={ () => setIsLinkOpen( false ) }
 							anchor={ popoverAnchor }
 							shift

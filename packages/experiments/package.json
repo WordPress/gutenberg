@@ -1,7 +1,7 @@
 {
-	"name": "@wordpress/dependency-injection",
-	"version": "0.0.1",
-	"description": "Dependency Injection container for WordPress.",
+	"name": "@wordpress/experiments",
+	"version": "0.4.0",
+	"description": "Internal experimental APIs for WordPress core.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
@@ -10,11 +10,11 @@
 		"dom",
 		"utils"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/dependency-injection/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/experiments/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
-		"directory": "packages/injection"
+		"directory": "packages/experiments"
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"

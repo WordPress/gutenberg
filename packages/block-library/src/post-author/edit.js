@@ -13,10 +13,22 @@ import {
 	RichText,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { PanelBody, SelectControl, ToggleControl } from '@wordpress/components';
+import {
+	ComboboxControl,
+	PanelBody,
+	SelectControl,
+	ToggleControl,
+} from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
+
+const minimumUsersForCombobox = 25;
+
+const AUTHORS_QUERY = {
+	who: 'authors',
+	per_page: 100,
+};
 
 function PostAuthorEdit( {
 	isSelected,
@@ -38,7 +50,7 @@ function PostAuthorEdit( {
 			return {
 				authorId: _authorId,
 				authorDetails: _authorId ? getUser( _authorId ) : null,
-				authors: getUsers( { who: 'authors' } ),
+				authors: getUsers( AUTHORS_QUERY ),
 			};
 		},
 		[ postType, postId ]
@@ -46,9 +58,10 @@ function PostAuthorEdit( {
 
 	const { editEntityRecord } = useDispatch( coreStore );
 
-	const { textAlign, showAvatar, showBio, byline } = attributes;
-
+	const { textAlign, showAvatar, showBio, byline, isLink, linkTarget } =
+		attributes;
 	const avatarSizes = [];
+	const authorName = authorDetails?.name || __( 'Post Author' );
 	if ( authorDetails ) {
 		Object.keys( authorDetails.avatar_urls ).forEach( ( size ) => {
 			avatarSizes.push( {
@@ -64,34 +77,46 @@ function PostAuthorEdit( {
 		} ),
 	} );
 
+	const authorOptions = authors?.length
+		? authors.map( ( { id, name } ) => {
+				return {
+					value: id,
+					label: name,
+				};
+		  } )
+		: [];
+
+	const handleSelect = ( nextAuthorId ) => {
+		editEntityRecord( 'postType', postType, postId, {
+			author: nextAuthorId,
+		} );
+	};
+
+	const showCombobox = authorOptions.length >= minimumUsersForCombobox;
+
 	return (
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					{ !! postId &&
 						! isDescendentOfQueryLoop &&
-						!! authors?.length && (
+						authorOptions.length &&
+						( ( showCombobox && (
+							<ComboboxControl
+								label={ __( 'Author' ) }
+								options={ authorOptions }
+								value={ authorId }
+								onChange={ handleSelect }
+								allowReset={ false }
+							/>
+						) ) || (
 							<SelectControl
 								label={ __( 'Author' ) }
 								value={ authorId }
-								options={ authors.map( ( { id, name } ) => {
-									return {
-										value: id,
-										label: name,
-									};
-								} ) }
-								onChange={ ( nextAuthorId ) => {
-									editEntityRecord(
-										'postType',
-										postType,
-										postId,
-										{
-											author: nextAuthorId,
-										}
-									);
-								} }
+								options={ authorOptions }
+								onChange={ handleSelect }
 							/>
-						) }
+						) ) }
 					<ToggleControl
 						label={ __( 'Show avatar' ) }
 						checked={ showAvatar }
@@ -118,6 +143,22 @@ function PostAuthorEdit( {
 							setAttributes( { showBio: ! showBio } )
 						}
 					/>
+					<ToggleControl
+						label={ __( 'Link author name to author page' ) }
+						checked={ isLink }
+						onChange={ () => setAttributes( { isLink: ! isLink } ) }
+					/>
+					{ isLink && (
+						<ToggleControl
+							label={ __( 'Open in new tab' ) }
+							onChange={ ( value ) =>
+								setAttributes( {
+									linkTarget: value ? '_blank' : '_self',
+								} )
+							}
+							checked={ linkTarget === '_blank' }
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
 
@@ -158,7 +199,16 @@ function PostAuthorEdit( {
 						/>
 					) }
 					<p className="wp-block-post-author__name">
-						{ authorDetails?.name || __( 'Post Author' ) }
+						{ isLink ? (
+							<a
+								href="#post-author-pseudo-link"
+								onClick={ ( event ) => event.preventDefault() }
+							>
+								{ authorName }
+							</a>
+						) : (
+							authorName
+						) }
 					</p>
 					{ showBio && (
 						<p

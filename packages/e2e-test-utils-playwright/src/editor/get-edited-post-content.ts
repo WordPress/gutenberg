@@ -12,7 +12,6 @@ import type { Editor } from './index';
  */
 export async function getEditedPostContent( this: Editor ) {
 	return await this.page.evaluate( () =>
-		// @ts-ignore (Reason: wp isn't typed)
 		window.wp.data.select( 'core/editor' ).getEditedPostContent()
 	);
 }

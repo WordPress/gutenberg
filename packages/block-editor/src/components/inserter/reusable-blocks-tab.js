@@ -4,6 +4,7 @@
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
+import { Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -59,14 +60,15 @@ export function ReusableBlocksTab( { rootClientId, onInsert, onHover } ) {
 				rootClientId={ rootClientId }
 			/>
 			<div className="block-editor-inserter__manage-reusable-blocks-container">
-				<a
+				<Button
 					className="block-editor-inserter__manage-reusable-blocks"
+					variant="secondary"
 					href={ addQueryArgs( 'edit.php', {
 						post_type: 'wp_block',
 					} ) }
 				>
 					{ __( 'Manage Reusable blocks' ) }
-				</a>
+				</Button>
 			</div>
 		</>
 	);

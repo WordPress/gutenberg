@@ -28,7 +28,7 @@
 }
 
 .edit-post-header__settings,
-.edit-site-header__actions {
+.edit-site-header-edit-mode__actions {
 	@include break-small () {
 		.editor-post-preview {
 			display: none;

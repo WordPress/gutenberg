@@ -44,6 +44,7 @@ const {
 	isBlockMultiSelected,
 	isFirstMultiSelectedBlock,
 	getBlockMode,
+	__experimentalIsBlockInterfaceHidden: isBlockInterfaceHidden,
 	isTyping,
 	isDraggingBlocks,
 	getDraggedBlockClientIds,
@@ -1937,6 +1938,24 @@ describe( 'selectors', () => {
 			};
 
 			expect( getBlockMode( state, 123 ) ).toEqual( 'html' );
+		} );
+	} );
+
+	describe( 'isBlockInterfaceHidden', () => {
+		it( 'should return the true if toggled true in state', () => {
+			const state = {
+				isBlockInterfaceHidden: true,
+			};
+
+			expect( isBlockInterfaceHidden( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if toggled false in state', () => {
+			const state = {
+				isBlockInterfaceHidden: false,
+			};
+
+			expect( isBlockInterfaceHidden( state ) ).toBe( false );
 		} );
 	} );
 
@@ -3995,7 +4014,7 @@ describe( 'selectors', () => {
 } );
 
 describe( 'getInserterItems with core blocks prioritization', () => {
-	// This test is in a seperate `describe` because all other tests register
+	// This test is in a separate `describe` because all other tests register
 	// some test `core` blocks and interfere with the purpose of the specific test.
 	// This tests the functionality to ensure core blocks are prioritized in the
 	// returned results, because third party blocks can be registered earlier than

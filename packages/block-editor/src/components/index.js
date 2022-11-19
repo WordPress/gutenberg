@@ -73,6 +73,7 @@ export { default as __experimentalLinkControlSearchResults } from './link-contro
 export { default as __experimentalLinkControlSearchItem } from './link-control/search-item';
 export { default as LineHeightControl } from './line-height-control';
 export { default as __experimentalListView } from './list-view';
+export { default as __experimentalOffCanvasEditor } from './off-canvas-editor';
 export { default as MediaReplaceFlow } from './media-replace-flow';
 export { default as MediaPlaceholder } from './media-placeholder';
 export { default as MediaUpload } from './media-upload';
@@ -155,7 +156,6 @@ export {
 export { default as __experimentalBlockPatternsList } from './block-patterns-list';
 export { default as __experimentalPublishDateTimePicker } from './publish-date-time-picker';
 export { default as __experimentalInspectorPopoverHeader } from './inspector-popover-header';
-export { default as __experimentalUseOnBlockDrop } from './use-on-block-drop';
 
 /*
  * State Related Components

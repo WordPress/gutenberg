@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { includes, map, without } from 'lodash';
+import { map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -37,7 +37,7 @@ function BlockManagerCategory( { title, blockTypes } ) {
 			return blockTypes;
 		}
 		return blockTypes.filter( ( { name } ) => {
-			return includes( defaultAllowedBlockTypes || [], name );
+			return defaultAllowedBlockTypes?.includes( name );
 		} );
 	}, [ defaultAllowedBlockTypes, blockTypes ] );
 	const { showBlockTypes, hideBlockTypes } = useDispatch( editPostStore );
@@ -64,23 +64,14 @@ function BlockManagerCategory( { title, blockTypes } ) {
 		return null;
 	}
 
-	const checkedBlockNames = without(
-		map( filteredBlockTypes, 'name' ),
-		...hiddenBlockTypes
+	const checkedBlockNames = map( filteredBlockTypes, 'name' ).filter(
+		( type ) => ! hiddenBlockTypes.includes( type )
 	);
 
 	const titleId = 'edit-post-block-manager__category-title-' + instanceId;
 
 	const isAllChecked = checkedBlockNames.length === filteredBlockTypes.length;
-
-	let ariaChecked;
-	if ( isAllChecked ) {
-		ariaChecked = 'true';
-	} else if ( checkedBlockNames.length > 0 ) {
-		ariaChecked = 'mixed';
-	} else {
-		ariaChecked = 'false';
-	}
+	const isIndeterminate = ! isAllChecked && checkedBlockNames.length > 0;
 
 	return (
 		<div
@@ -89,10 +80,11 @@ function BlockManagerCategory( { title, blockTypes } ) {
 			className="edit-post-block-manager__category"
 		>
 			<CheckboxControl
+				__nextHasNoMarginBottom
 				checked={ isAllChecked }
 				onChange={ toggleAllVisible }
 				className="edit-post-block-manager__category-title"
-				aria-checked={ ariaChecked }
+				indeterminate={ isIndeterminate }
 				label={ <span id={ titleId }>{ title }</span> }
 			/>
 			<BlockTypesChecklist
