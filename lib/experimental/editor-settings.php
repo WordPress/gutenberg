@@ -36,6 +36,7 @@ function gutenberg_initialize_editor( $editor_name, $editor_script_handle, $sett
 	 *
 	 * @param string[] $preload_paths Array of paths to preload.
 	 */
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
 	$preload_paths = apply_filters( "{$editor_name}_preload_paths", $settings['preload_paths'] );
 
 	$preload_data = array_reduce(
