@@ -30,7 +30,7 @@ describe( 'Dropdown', () => {
 		const button = screen.getByRole( 'button', { expanded: false } );
 
 		expect( button ).toBeVisible();
-		expect( screen.queryByText( 'text' ) ).not.toBeInTheDocument();
+		expect( screen.queryByText( 'test' ) ).not.toBeInTheDocument();
 
 		await user.click( button );
 
