@@ -120,6 +120,7 @@ An array of objects containing the following properties:
 -   `name`: `(string)` Defines the key for the tab.
 -   `title`:`(string)` Defines the translated text for the tab.
 -   `className`:`(string)` Optional. Defines the class to put on the tab.
+-   `icon`:`(ReactNode)` Optional. When set, displays the icon in place of the tab title. The title is then rendered as an aria-label and tooltip.
 
 > > **Note:** Other fields may be added to the object and accessed from the child function if desired.
 

@@ -3,7 +3,7 @@
  *
  * @property {import('./types').IconKey} icon        Icon name
  * @property {string}                    [className] Class name
- * @property {number}                    [size] Size of the icon
+ * @property {number}                    [size]      Size of the icon
  */
 /** @typedef {import('react').ComponentPropsWithoutRef<'span'> & OwnProps} Props */
 

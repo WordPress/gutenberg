@@ -1,85 +1,57 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, within } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
  */
 import Dropdown from '..';
 
-function getButtonElement( container: HTMLElement ) {
-	const button = container?.querySelector( 'button' );
-	if ( ! button ) {
-		fail( 'Could not find the button' );
-	}
-
-	return button;
-}
-function getOpenCloseButton( container: HTMLElement, selector: string ) {
-	const button = container.querySelector( selector );
-	if ( ! button ) {
-		fail( 'Could not find the open-close button' );
-	}
-
-	return button;
-}
-
 describe( 'Dropdown', () => {
-	function expectPopoverVisible( container: ChildNode, value: boolean ) {
-		const popover = container.contains(
-			document.querySelector( '.components-popover' )
-		);
-		if ( value ) {
-			expect( popover ).toBeTruthy();
-		} else {
-			expect( popover ).toBeFalsy();
-		}
-	}
-
-	it( 'should toggle the dropdown properly', () => {
-		const expectButtonExpanded = (
-			container: HTMLElement,
-			expanded: boolean
-		) => {
-			expect(
-				within( container ).getByRole( 'button' )
-			).toBeInTheDocument();
-			expect( getButtonElement( container ) ).toHaveAttribute(
-				'aria-expanded',
-				expanded.toString()
-			);
-		};
-
-		const { container } = render(
+	it( 'should toggle the dropdown properly', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
+		const { unmount } = render(
 			<Dropdown
 				className="container"
 				contentClassName="content"
 				renderToggle={ ( { isOpen, onToggle } ) => (
 					<button aria-expanded={ isOpen } onClick={ onToggle }>
-						Toggleee
+						Toggle
 					</button>
 				) }
 				renderContent={ () => <span>test</span> }
+				headerTitle="header"
 			/>
 		);
 
-		if ( ! container ) {
-			fail( 'Did not find the dropdown container' );
-		}
+		const button = screen.getByRole( 'button', { expanded: false } );
 
-		expectButtonExpanded( container, false );
-		expectPopoverVisible( container, false );
+		expect( button ).toBeVisible();
+		expect( screen.queryByTitle( 'header' ) ).not.toBeInTheDocument();
 
-		const button = getButtonElement( container );
-		fireEvent.click( button );
+		await user.click( button );
 
-		expectButtonExpanded( container, true );
-		expectPopoverVisible( container, true );
+		expect(
+			screen.getByRole( 'button', { expanded: true } )
+		).toBeVisible();
+
+		await waitFor( () =>
+			expect( screen.getByTitle( 'header' ) ).toBeVisible()
+		);
+
+		// Cleanup remaining effects, like the delayed popover positioning
+		unmount();
 	} );
 
-	it( 'should close the dropdown when calling onClose', () => {
-		const { container } = render(
+	it( 'should close the dropdown when calling onClose', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
+		render(
 			<Dropdown
 				className="container"
 				contentClassName="content"
@@ -90,30 +62,27 @@ describe( 'Dropdown', () => {
 						aria-expanded={ isOpen }
 						onClick={ onToggle }
 					>
-						Toggleee
+						Toggle
 					</button>,
 					<button key="close" className="close" onClick={ onClose }>
-						closee
+						close
 					</button>,
 				] }
 				renderContent={ () => null }
+				headerTitle="header"
 			/>
 		);
 
-		if ( ! container ) {
-			fail( 'Did not find the dropdown container' );
-		}
+		expect( screen.queryByTitle( 'header' ) ).not.toBeInTheDocument();
 
-		expectPopoverVisible( container, false );
+		await user.click( screen.getByRole( 'button', { name: 'Toggle' } ) );
 
-		const openButton = getOpenCloseButton( container, '.open' );
-		fireEvent.click( openButton );
+		await waitFor( () =>
+			expect( screen.getByTitle( 'header' ) ).toBeVisible()
+		);
 
-		expectPopoverVisible( container, true );
+		await user.click( screen.getByRole( 'button', { name: 'close' } ) );
 
-		const closeButton = getOpenCloseButton( container, '.close' );
-		fireEvent.click( closeButton );
-
-		expectPopoverVisible( container, false );
+		expect( screen.queryByTitle( 'header' ) ).not.toBeInTheDocument();
 	} );
 } );

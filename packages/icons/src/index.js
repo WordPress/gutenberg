@@ -66,6 +66,8 @@ export { default as currencyPound } from './library/currency-pound';
 export { default as customPostType } from './library/custom-post-type';
 export { default as desktop } from './library/desktop';
 export { default as dragHandle } from './library/drag-handle';
+export { default as drawerLeft } from './library/drawer-left';
+export { default as drawerRight } from './library/drawer-right';
 export { default as download } from './library/download';
 export { default as edit } from './library/edit';
 export { default as external } from './library/external';
