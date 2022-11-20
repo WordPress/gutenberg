@@ -1815,6 +1815,13 @@ export function temporarilyEditingAsBlocks( state = '', action ) {
 	return state;
 }
 
+export function globalStylesPreviewPageVisibility( state = false, action ) {
+	if ( action.type === 'SET_GLOBAL_STYLES_PREVIEW_PAGE_VISIBILITY' ) {
+		return action.globalStylesPreviewPageVisibility;
+	}
+	return state;
+}
+
 export default combineReducers( {
 	blocks,
 	isTyping,
@@ -1838,4 +1845,5 @@ export default combineReducers( {
 	lastBlockInserted,
 	temporarilyEditingAsBlocks,
 	blockVisibility,
+	globalStylesPreviewPageVisibility,
 } );

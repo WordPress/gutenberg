@@ -26,7 +26,7 @@ import { useMergeRefs, useViewportMatch } from '@wordpress/compose';
 import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
 import { listView } from '@wordpress/icons';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as interfaceStore } from '@wordpress/interface';
 import {
 	getBlockType,
@@ -56,34 +56,34 @@ const LAYOUT = {
 function getGlobalStylesPreviewBlocks() {
 	const group = getBlockType( 'core/group' );
 	const heading = getBlockType( 'core/heading' );
-	const paragraph = getBlockType( 'core/paragraph' );
-	const image = getBlockType( 'core/image' );
+	const columns = getBlockType( 'core/columns' );
+	const separator = getBlockType( 'core/separator' );
 
 	if (
 		! group?.name ||
 		! heading?.name ||
-		! paragraph?.name ||
-		! image?.name
+		! columns?.name ||
+		! separator?.name
 	) {
 		return null;
 	}
 
 	const headings = [ 1, 2, 3, 4, 5, 6 ].map( ( level ) =>
 		createBlock( heading?.name, {
-			content: `Heading H${ level }`,
+			content: sprintf(
+				/* translators: %s: The number to indicate a heading level, e.g., '1' in H1. */
+				__( 'Heading H%s' ),
+				level
+			),
 			level,
 		} )
 	);
 
-	const paragraphBlock = getBlockFromExample( paragraph?.name, {
-		attributes: paragraph?.example?.attributes,
-		innerBlocks: paragraph?.example?.innerBlocks,
-	} );
-
-	const imageBlock = getBlockFromExample( image?.name, {
-		attributes: image?.example?.attributes,
-		innerBlocks: image?.example?.innerBlocks,
-	} );
+	const columnsBlock = getBlockFromExample( columns?.name, columns?.example );
+	const separatorBlock = getBlockFromExample(
+		separator?.name,
+		separator?.example
+	);
 
 	// const headingBlock = createBlock(
 	// 	heading?.name,
@@ -96,10 +96,15 @@ function getGlobalStylesPreviewBlocks() {
 	// 	paragraph?.example?.innerBlocks
 	// );
 
-	const blocks = createBlock( group?.name, group?.example?.attributes, [
+	const blocks = createBlock( group?.name, {}, [
 		...headings,
-		paragraphBlock,
-		imageBlock,
+		separatorBlock,
+		createBlock( heading?.name, {
+			content: __( 'Columns block' ),
+			level: 2,
+		} ),
+		columnsBlock,
+		separatorBlock,
 	] );
 
 	return [ blocks ];
@@ -116,11 +121,16 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		templateId,
 		page,
 		isNavigationSidebarOpen,
+		isZoomOutMode,
+		isGlobalStylesPreviewPageVisible,
 	} = useSelect(
 		( select ) => {
 			const { getSettings, getEditedPostType, getEditedPostId, getPage } =
 				select( editSiteStore );
-
+			const {
+				__unstableGetEditorMode,
+				__unstableIsGlobalStylesPreviewPageVisible,
+			} = select( blockEditorStore );
 			return {
 				storedSettings: getSettings( setIsInserterOpen ),
 				templateType: getEditedPostType(),
@@ -130,6 +140,9 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 					select( interfaceStore ).getActiveComplementaryArea(
 						editSiteStore.name
 					) === NAVIGATION_SIDEBAR_NAME,
+				isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+				isGlobalStylesPreviewPageVisible:
+					__unstableIsGlobalStylesPreviewPageVisible() === true,
 			};
 		},
 		[ setIsInserterOpen ]
@@ -241,13 +254,12 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	if ( process.env.IS_GUTENBERG_PLUGIN ) {
 		MaybeNavMenuSidebarToggle = NavMenuSidebarToggle;
 	}
-const isGlobalStylesPreviewOn = false;
 
 	return (
 		<BlockEditorProvider
 			settings={ settings }
 			value={
-				isGlobalStylesPreviewOn
+				isGlobalStylesPreviewPageVisible && isZoomOutMode
 					? getGlobalStylesPreviewBlocks()
 					: blocks
 			}

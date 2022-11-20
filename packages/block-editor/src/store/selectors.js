@@ -27,6 +27,7 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import { mapRichTextSettings } from './utils';
+import {globalStylesPreviewPageVisibility} from "./reducer";
 
 /**
  * A block selection object.
@@ -2772,4 +2773,8 @@ export function __unstableIsWithinBlockOverlay( state, clientId ) {
 		parent = state.blocks.parents[ parent ];
 	}
 	return false;
+}
+
+export function __unstableIsGlobalStylesPreviewPageVisible( state ) {
+	return state.globalStylesPreviewPageVisibility;
 }

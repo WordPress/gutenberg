@@ -1748,3 +1748,12 @@ export function __unstableSetTemporarilyEditingAsBlocks(
 		temporarilyEditingAsBlocks,
 	};
 }
+
+export function __unstableSetGlobalStylesPreviewPageVisibility(
+	globalStylesPreviewPageVisibility
+) {
+	return {
+		type: 'SET_GLOBAL_STYLES_PREVIEW_PAGE_VISIBILITY',
+		globalStylesPreviewPageVisibility,
+	};
+}
