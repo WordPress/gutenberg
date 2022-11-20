@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+const cluster = require( 'cluster' );
 const fs = require( 'fs' );
 const path = require( 'path' );
 const { mapValues, kebabCase } = require( 'lodash' );
@@ -341,104 +342,155 @@ async function runPerformanceTests( branches, options ) {
 
 	/** @type {Record<string,Record<string, WPPerformanceResults>>} */
 	const results = {};
-	for ( const testSuite of testSuites ) {
-		results[ testSuite ] = {};
-		/** @type {Array<Record<string, WPPerformanceResults>>} */
-		const rawResults = [];
-		// Alternate three times between branches.
-		for ( let i = 0; i < TEST_ROUNDS; i++ ) {
-			rawResults[ i ] = {};
+
+	const waiters = [];
+	// @ts-ignore
+	if ( cluster.isPrimary ) {
+		for ( const testSuite of testSuites ) {
+			results[ testSuite ] = {};
+			/** @type {Array<Record<string, WPPerformanceResults>>} */
+			const rawResults = [];
+			// Alternate three times between branches.
+			for ( let i = 0; i < TEST_ROUNDS; i++ ) {
+				rawResults[ i ] = {};
+				for ( const branch of branches ) {
+					waiters.push(
+						new Promise( ( resolve ) => {
+							const worker = cluster.fork();
+
+							worker.send( {
+								GB_TEST_SUITE: testSuite,
+								GB_BRANCH: branch,
+								// @ts-ignore
+								GB_ENV_PATH: branchDirectories[ branch ],
+								GB_PERF_TESTS_PATH: performanceTestDirectory,
+							} );
+
+							worker.on( 'message', ( message ) => {
+								rawResults[ i ][ branch ] = message.rawResults;
+								// @ts-ignore
+								resolve();
+							} );
+						} )
+					);
+				}
+			}
+
+			await Promise.all( waiters );
+			log( `Results are in: ${ JSON.stringify( results ) }` );
+
+			// Computing medians.
 			for ( const branch of branches ) {
-				// @ts-ignore
-				const environmentDirectory = branchDirectories[ branch ];
-				log( `    >> Branch: ${ branch }, Suite: ${ testSuite }` );
-				log( '        >> Starting the environment.' );
-				await runShellScript(
-					'../../tests/node_modules/.bin/wp-env start',
-					environmentDirectory
+				const medians = mapValues(
+					{
+						serverResponse: rawResults.map(
+							( r ) => r[ branch ].serverResponse
+						),
+						firstPaint: rawResults.map(
+							( r ) => r[ branch ].firstPaint
+						),
+						domContentLoaded: rawResults.map(
+							( r ) => r[ branch ].domContentLoaded
+						),
+						loaded: rawResults.map( ( r ) => r[ branch ].loaded ),
+						firstContentfulPaint: rawResults.map(
+							( r ) => r[ branch ].firstContentfulPaint
+						),
+						firstBlock: rawResults.map(
+							( r ) => r[ branch ].firstBlock
+						),
+						type: rawResults.map( ( r ) => r[ branch ].type ),
+						minType: rawResults.map( ( r ) => r[ branch ].minType ),
+						maxType: rawResults.map( ( r ) => r[ branch ].maxType ),
+						focus: rawResults.map( ( r ) => r[ branch ].focus ),
+						minFocus: rawResults.map(
+							( r ) => r[ branch ].minFocus
+						),
+						maxFocus: rawResults.map(
+							( r ) => r[ branch ].maxFocus
+						),
+						inserterOpen: rawResults.map(
+							( r ) => r[ branch ].inserterOpen
+						),
+						minInserterOpen: rawResults.map(
+							( r ) => r[ branch ].minInserterOpen
+						),
+						maxInserterOpen: rawResults.map(
+							( r ) => r[ branch ].maxInserterOpen
+						),
+						inserterSearch: rawResults.map(
+							( r ) => r[ branch ].inserterSearch
+						),
+						minInserterSearch: rawResults.map(
+							( r ) => r[ branch ].minInserterSearch
+						),
+						maxInserterSearch: rawResults.map(
+							( r ) => r[ branch ].maxInserterSearch
+						),
+						inserterHover: rawResults.map(
+							( r ) => r[ branch ].inserterHover
+						),
+						minInserterHover: rawResults.map(
+							( r ) => r[ branch ].minInserterHover
+						),
+						maxInserterHover: rawResults.map(
+							( r ) => r[ branch ].maxInserterHover
+						),
+						listViewOpen: rawResults.map(
+							( r ) => r[ branch ].listViewOpen
+						),
+						minListViewOpen: rawResults.map(
+							( r ) => r[ branch ].minListViewOpen
+						),
+						maxListViewOpen: rawResults.map(
+							( r ) => r[ branch ].maxListViewOpen
+						),
+					},
+					median
 				);
-				log( '        >> Running the test.' );
-				rawResults[ i ][ branch ] = await runTestSuite(
-					testSuite,
-					performanceTestDirectory
-				);
-				log( '        >> Stopping the environment' );
-				await runShellScript(
-					'../../tests/node_modules/.bin/wp-env stop',
-					environmentDirectory
+
+				// Format results as times.
+				results[ testSuite ][ branch ] = mapValues(
+					medians,
+					formatTime
 				);
 			}
 		}
-
-		// Computing medians.
-		for ( const branch of branches ) {
-			const medians = mapValues(
-				{
-					serverResponse: rawResults.map(
-						( r ) => r[ branch ].serverResponse
-					),
-					firstPaint: rawResults.map(
-						( r ) => r[ branch ].firstPaint
-					),
-					domContentLoaded: rawResults.map(
-						( r ) => r[ branch ].domContentLoaded
-					),
-					loaded: rawResults.map( ( r ) => r[ branch ].loaded ),
-					firstContentfulPaint: rawResults.map(
-						( r ) => r[ branch ].firstContentfulPaint
-					),
-					firstBlock: rawResults.map(
-						( r ) => r[ branch ].firstBlock
-					),
-					type: rawResults.map( ( r ) => r[ branch ].type ),
-					minType: rawResults.map( ( r ) => r[ branch ].minType ),
-					maxType: rawResults.map( ( r ) => r[ branch ].maxType ),
-					focus: rawResults.map( ( r ) => r[ branch ].focus ),
-					minFocus: rawResults.map( ( r ) => r[ branch ].minFocus ),
-					maxFocus: rawResults.map( ( r ) => r[ branch ].maxFocus ),
-					inserterOpen: rawResults.map(
-						( r ) => r[ branch ].inserterOpen
-					),
-					minInserterOpen: rawResults.map(
-						( r ) => r[ branch ].minInserterOpen
-					),
-					maxInserterOpen: rawResults.map(
-						( r ) => r[ branch ].maxInserterOpen
-					),
-					inserterSearch: rawResults.map(
-						( r ) => r[ branch ].inserterSearch
-					),
-					minInserterSearch: rawResults.map(
-						( r ) => r[ branch ].minInserterSearch
-					),
-					maxInserterSearch: rawResults.map(
-						( r ) => r[ branch ].maxInserterSearch
-					),
-					inserterHover: rawResults.map(
-						( r ) => r[ branch ].inserterHover
-					),
-					minInserterHover: rawResults.map(
-						( r ) => r[ branch ].minInserterHover
-					),
-					maxInserterHover: rawResults.map(
-						( r ) => r[ branch ].maxInserterHover
-					),
-					listViewOpen: rawResults.map(
-						( r ) => r[ branch ].listViewOpen
-					),
-					minListViewOpen: rawResults.map(
-						( r ) => r[ branch ].minListViewOpen
-					),
-					maxListViewOpen: rawResults.map(
-						( r ) => r[ branch ].maxListViewOpen
-					),
-				},
-				median
+	} else {
+		await new Promise( ( resolve ) => {
+			process.on(
+				'message',
+				async ( {
+					GB_TEST_SUITE: testSuite,
+					GB_BRANCH: branch,
+					GB_ENV_PATH: environmentDirectory,
+				} ) => {
+					// @ts-ignore
+					log( `    >> Branch: ${ branch }, Suite: ${ testSuite }` );
+					log( '        >> Starting the environment.' );
+					await runShellScript(
+						'../../tests/node_modules/.bin/wp-env start',
+						environmentDirectory
+					);
+					log( '        >> Running the test.' );
+					const rawResults = await runTestSuite(
+						// @ts-ignore
+						testSuite,
+						performanceTestDirectory
+					);
+					log( '        >> Stopping the environment' );
+					await runShellScript(
+						'../../tests/node_modules/.bin/wp-env stop',
+						environmentDirectory
+					);
+					// @ts-ignore
+					process.send( { rawResults } );
+					// @ts-ignore
+					resolve();
+					process.exit();
+				}
 			);
-
-			// Format results as times.
-			results[ testSuite ][ branch ] = mapValues( medians, formatTime );
-		}
+		} );
 	}
 
 	// 5- Formatting the results.
