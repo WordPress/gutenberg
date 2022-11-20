@@ -1,3 +1,14 @@
+/**
+ * External dependencies
+ */
+import type { ComponentPropsWithoutRef } from 'react';
+
+export type DashiconProps = {
+	icon: IconKey;
+	className?: string;
+	size?: number;
+} & ComponentPropsWithoutRef< 'span' >;
+
 export type IconKey =
 	| 'admin-appearance'
 	| 'admin-collapse'

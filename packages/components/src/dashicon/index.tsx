@@ -8,11 +8,22 @@
 /** @typedef {import('react').ComponentPropsWithoutRef<'span'> & OwnProps} Props */
 
 /**
+ * Internal dependencies
+ */
+import type { DashiconProps } from './types';
+
+/**
  * @param {Props} props
  * @return {JSX.Element} Element
  */
 
-function Dashicon( { icon, className, size = 20, style = {}, ...extraProps } ) {
+function Dashicon( {
+	icon,
+	className,
+	size = 20,
+	style = {},
+	...extraProps
+}: DashiconProps ) {
 	const iconClass = [
 		'dashicon',
 		'dashicons',
