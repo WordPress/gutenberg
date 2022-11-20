@@ -24,14 +24,13 @@ describe( 'Dropdown', () => {
 					</button>
 				) }
 				renderContent={ () => <span>test</span> }
-				headerTitle="header"
 			/>
 		);
 
 		const button = screen.getByRole( 'button', { expanded: false } );
 
 		expect( button ).toBeVisible();
-		expect( screen.queryByTitle( 'header' ) ).not.toBeInTheDocument();
+		expect( screen.queryByText( 'text' ) ).not.toBeInTheDocument();
 
 		await user.click( button );
 
@@ -40,7 +39,7 @@ describe( 'Dropdown', () => {
 		).toBeVisible();
 
 		await waitFor( () =>
-			expect( screen.getByTitle( 'header' ) ).toBeVisible()
+			expect( screen.queryByText( 'test' ) ).toBeVisible()
 		);
 
 		// Cleanup remaining effects, like the delayed popover positioning
@@ -68,21 +67,20 @@ describe( 'Dropdown', () => {
 						close
 					</button>,
 				] }
-				renderContent={ () => null }
-				headerTitle="header"
+				renderContent={ () => <span>test</span> }
 			/>
 		);
 
-		expect( screen.queryByTitle( 'header' ) ).not.toBeInTheDocument();
+		expect( screen.queryByText( 'test' ) ).not.toBeInTheDocument();
 
 		await user.click( screen.getByRole( 'button', { name: 'Toggle' } ) );
 
 		await waitFor( () =>
-			expect( screen.getByTitle( 'header' ) ).toBeVisible()
+			expect( screen.getByText( 'test' ) ).toBeVisible()
 		);
 
 		await user.click( screen.getByRole( 'button', { name: 'close' } ) );
 
-		expect( screen.queryByTitle( 'header' ) ).not.toBeInTheDocument();
+		expect( screen.queryByText( 'test' ) ).not.toBeInTheDocument();
 	} );
 } );
