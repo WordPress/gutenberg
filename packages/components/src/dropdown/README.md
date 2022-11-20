@@ -82,7 +82,7 @@ The callback receives a boolean as a parameter. If `true`, the popover will open
 
 -   Required: No
 
-### `popoverProps`: `WordPressComponentProps< PopoverProps, 'div', false >`
+### `popoverProps`: `WordPressComponentProps< Omit< PopoverProps, 'children' >, 'div', false >`
 
 Properties of popoverProps object will be passed as props to the `Popover` component.
 
@@ -97,7 +97,7 @@ The direction in which the popover should open relative to its parent node. Spec
 -   Required: No
 -   Default: `"top center"`
 
-### `renderContent`: `( props: EmbeddedComponentProps ) => ReactNode`
+### `renderContent`: `( props: CallbackProps ) => ReactNode`
 
 A callback invoked to render the content of the dropdown menu.
 
@@ -107,10 +107,10 @@ A callback invoked to render the content of the dropdown menu.
 
 -   Required: Yes
 
-### `renderToggle`: `( props: EmbeddedComponentProps ) => ReactNode`
+### `renderToggle`: `( props: CallbackProps ) => ReactNode`
 
 A callback invoked to render the Dropdown Toggle Button.
 
- Its props are the same as the `renderContent` props.
+Its props are the same as the `renderContent` props.
 
 -   Required: Yes

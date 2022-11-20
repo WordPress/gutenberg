@@ -74,7 +74,7 @@ export function Dropdown( {
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ fallbackPopoverAnchor, setFallbackPopoverAnchor ] =
-		useState( null );
+		useState< HTMLDivElement | null >( null );
 	const containerRef = useRef< HTMLDivElement | null >( null );
 	const [ isOpen, setIsOpen ] = useObservableState( false, onToggle );
 
