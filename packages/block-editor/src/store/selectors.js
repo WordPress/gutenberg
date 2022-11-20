@@ -26,7 +26,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import { mapRichTextSettings } from './utils';
+import { mapRichTextSettings, getAvailableNestedBlocks } from './utils';
 import { orderBy } from '../utils/sorting';
 
 /**
@@ -2046,59 +2046,61 @@ export const getInserterItems = createSelector(
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional root client ID of block list.
  *
- * @return {string[]} Array of allowed core block names.
+ * @return {string[]} Array of allowed core block names or `['true']` if all blocks are allowed.
  */
 export const __getAllowedCoreBlockNames = createSelector(
 	( state, rootClientId = null ) => {
-		const blockTypes = getBlockTypes();
-		// First we need to filter out all the non core blocks and keep track of
-		// the blocks that cannot be inserted based on the provided rootClientId.
-		const { allowedBlocks, restBlocks } = blockTypes.reduce(
-			( accumulator, blockType ) => {
-				// Discard non core blocks.
-				if ( ! blockType.name.startsWith( 'core/' ) ) {
-					return accumulator;
-				}
-				const canInsert = canIncludeBlockTypeInInserter(
-					state,
+		// We have to filter the blocks using parts of the logic of `canIncludeBlockTypeInInserter`,
+		// with the main difference that we don't check the parent/ancestor relationship.
+		// We also discard non core blocks. This is needed to determine in the end if all
+		// available core blocks can be inserted, so we can just send a flag indicating this.
+		const allCoreBlockTypes = getBlockTypes().filter(
+			( blockType ) =>
+				blockType.name.startsWith( 'core/' ) &&
+				hasBlockSupport( blockType, 'inserter', true ) &&
+				// This filter is used and documented in `canInsertBlockTypeUnmemoized` selector.
+				// We also need to apply this here, as is an ad-hoc solution that we also need
+				// to take into account for the first filtering of available core blocks.
+				applyFilters(
+					'blockEditor.__unstableCanInsertBlockType',
+					true,
 					blockType,
-					rootClientId
-				);
-				accumulator[ canInsert ? 'allowedBlocks' : 'restBlocks' ].push(
-					blockType
-				);
-				return accumulator;
-			},
-			{ allowedBlocks: [], restBlocks: [] }
+					rootClientId,
+					{
+						getBlock: getBlock.bind( null, state ),
+						getBlockParentsByBlockName:
+							getBlockParentsByBlockName.bind( null, state ),
+					}
+				)
 		);
-		const allowedBlockNames = allowedBlocks.map( ( { name } ) => name );
-		// Check the remaining blocks if they have an `ancestor` or `parent`
-		// relationship with a block that is allowed to be inserted.
-		const { allowedBlockTypes } = getSettings( state );
-		const allowedInnerBlocksNames = restBlocks
-			.filter( ( blockType ) => {
-				// Block editor settings can be modified programmatically, so
-				// we need to check if the block type is allowed to be inserted.
-				// This allowes us to filter out blocks that have the wanted
-				// relationship(`parent` or `ancestor`) but are not allowed.
-				const isBlockAllowedInEditor = checkAllowList(
-					allowedBlockTypes,
-					blockType.name,
-					true
-				);
-				if ( ! isBlockAllowedInEditor ) {
-					return false;
-				}
-				const parentIsAllowed = blockType.parent?.some( ( parent ) =>
-					allowedBlockNames.includes( parent )
-				);
-				const ancestorIsAllowed = blockType.ancestor?.some(
-					( ancestor ) => allowedBlockNames.includes( ancestor )
-				);
-				return parentIsAllowed || ancestorIsAllowed;
-			}, [] )
+		// Keep track of the blocks that cannot be inserted based on the provided rootClientId.
+		const allowedBlockNames = allCoreBlockTypes
+			.filter( ( blockType ) =>
+				canInsertBlockTypeUnmemoized( state, blockType, rootClientId )
+			)
 			.map( ( { name } ) => name );
-		return [ ...allowedBlockNames, ...allowedInnerBlocksNames ];
+		// We need to get all the blocks that cannot be inserted directly, but their parent/ancestor
+		// relationship allowes it and they are allowed based on the block editor settings.
+		const availableNestedBlocks = getAvailableNestedBlocks(
+			allCoreBlockTypes,
+			allowedBlockNames
+		);
+		const { allowedBlockTypes: editorAllowedBlockTypes } =
+			getSettings( state );
+		const allowedNestedBlocks = availableNestedBlocks.filter(
+			( blockName ) =>
+				checkAllowList( editorAllowedBlockTypes, blockName, true )
+		);
+		const allowedBlocksWithNestedBlocks = [
+			...new Set( [ ...allowedBlockNames, ...allowedNestedBlocks ] ),
+		];
+		// If all core blocks can be inserted, just return `all` to indicate this.
+		if (
+			allowedBlocksWithNestedBlocks.length === allCoreBlockTypes.length
+		) {
+			return [ 'all' ];
+		}
+		return allowedBlocksWithNestedBlocks;
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
