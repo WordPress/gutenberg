@@ -40,6 +40,16 @@ export function hasContentLayoutValue( props ) {
 }
 
 /**
+ * Checks if there is a current layout type set.
+ *
+ * @param {Object} props Block props.
+ * @return {boolean} Whether or not the block has a minHeight value set.
+ */
+export function hasLayoutTypeValue( props ) {
+	return props.attributes.layout?.type !== undefined;
+}
+
+/**
  * Resets the content layout block support attributes.
  *
  * @param {Object} props               Block props.

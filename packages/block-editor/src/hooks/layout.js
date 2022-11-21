@@ -29,7 +29,11 @@ import useSetting from '../components/use-setting';
 import { LayoutStyle } from '../components/block-list/layout';
 import BlockList from '../components/block-list';
 import { getLayoutType, getLayoutTypes } from '../layouts';
-import { hasContentLayoutValue, resetContentLayout } from './content-layout';
+import {
+	hasContentLayoutValue,
+	hasLayoutTypeValue,
+	resetContentLayout,
+} from './content-layout';
 
 export const LAYOUT_SUPPORT_KEY = '__experimentalLayout';
 
@@ -252,10 +256,25 @@ function LayoutPanel( props ) {
 				) }
 
 				{ ! inherit && allowSwitching && (
-					<LayoutTypeSwitcher
-						type={ type }
-						onChange={ onChangeType }
-					/>
+					<ToolsPanelItem
+						label={ __( 'Layout type' ) }
+						hasValue={ () => hasLayoutTypeValue( props ) }
+						onDeselect={ () => resetContentLayout( props ) }
+						isShownByDefault={ true }
+						resetAllFilter={ ( newAttributes ) => ( {
+							...newAttributes,
+							layout: {
+								...newAttributes.layout,
+								type: undefined,
+							},
+						} ) }
+						panelId={ clientId }
+					>
+						<LayoutTypeSwitcher
+							type={ type }
+							onChange={ onChangeType }
+						/>
+					</ToolsPanelItem>
 				) }
 
 				{ layoutType && layoutType.name !== 'default' && (

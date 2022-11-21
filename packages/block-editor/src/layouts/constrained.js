@@ -7,6 +7,7 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
@@ -97,53 +98,55 @@ export default {
 					} ) }
 					panelId={ clientId }
 				>
-					<div className="block-editor-hooks__layout-controls">
-						<div className="block-editor-hooks__layout-controls-unit">
-							<UnitControl
-								label={ __( 'Content' ) }
-								labelPosition="top"
-								__unstableInputWidth="80px"
-								value={ contentSize || wideSize || '' }
-								onChange={ ( nextWidth ) => {
-									nextWidth =
-										0 > parseFloat( nextWidth )
-											? '0'
-											: nextWidth;
-									onChange( {
-										...layout,
-										contentSize: nextWidth,
-									} );
-								} }
-								units={ units }
-							/>
-							<Icon icon={ positionCenter } />
+					<VStack spacing={ 1 }>
+						<div className="block-editor-hooks__layout-controls">
+							<div className="block-editor-hooks__layout-controls-unit">
+								<UnitControl
+									label={ __( 'Content' ) }
+									labelPosition="top"
+									__unstableInputWidth="80px"
+									value={ contentSize || wideSize || '' }
+									onChange={ ( nextWidth ) => {
+										nextWidth =
+											0 > parseFloat( nextWidth )
+												? '0'
+												: nextWidth;
+										onChange( {
+											...layout,
+											contentSize: nextWidth,
+										} );
+									} }
+									units={ units }
+								/>
+								<Icon icon={ positionCenter } />
+							</div>
+							<div className="block-editor-hooks__layout-controls-unit">
+								<UnitControl
+									label={ __( 'Wide' ) }
+									labelPosition="top"
+									__unstableInputWidth="80px"
+									value={ wideSize || contentSize || '' }
+									onChange={ ( nextWidth ) => {
+										nextWidth =
+											0 > parseFloat( nextWidth )
+												? '0'
+												: nextWidth;
+										onChange( {
+											...layout,
+											wideSize: nextWidth,
+										} );
+									} }
+									units={ units }
+								/>
+								<Icon icon={ stretchWide } />
+							</div>
 						</div>
-						<div className="block-editor-hooks__layout-controls-unit">
-							<UnitControl
-								label={ __( 'Wide' ) }
-								labelPosition="top"
-								__unstableInputWidth="80px"
-								value={ wideSize || contentSize || '' }
-								onChange={ ( nextWidth ) => {
-									nextWidth =
-										0 > parseFloat( nextWidth )
-											? '0'
-											: nextWidth;
-									onChange( {
-										...layout,
-										wideSize: nextWidth,
-									} );
-								} }
-								units={ units }
-							/>
-							<Icon icon={ stretchWide } />
-						</div>
-					</div>
-					<p className="block-editor-hooks__layout-controls-helptext">
-						{ __(
-							'Customize the width for all elements that are assigned to the center or wide columns.'
-						) }
-					</p>
+						<p className="block-editor-hooks__layout-controls-helptext">
+							{ __(
+								'Customize the width for all elements that are assigned to the center or wide columns.'
+							) }
+						</p>
+					</VStack>
 				</ToolsPanelItem>
 				<ToolsPanelItem
 					hasValue={ () => justifyContent !== undefined }
