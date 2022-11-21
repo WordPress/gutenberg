@@ -13,16 +13,15 @@ import {
  * Internal dependencies
  */
 import useSetting from '../components/use-setting';
-import PositionAreaControl from '../components/position-area-control';
 import { LAYOUT_SUPPORT_KEY } from './layout';
 import { cleanEmptyObject } from './utils';
 
 const POSITION_OPTIONS = [
 	{
-		key: 'normal',
-		label: __( 'Normal' ),
+		key: 'default',
+		label: __( 'Default' ),
 		value: '',
-		name: __( 'Normal' ),
+		name: __( 'Default' ),
 	},
 	{
 		key: 'sticky',
@@ -132,29 +131,6 @@ export function useIsPositionDisabled( { name: blockName } = {} ) {
 }
 
 /**
- * From a style.layout object, find the first side with a value.
- *
- * This allows inferring the selected area based on the presence of a value for one of
- * the four sides, `top`, `bottom`, `right`, and `left.
- *
- * @param {Object} styleLayout An object that can contain `top`, `bottom`, `right`, and `left` keys.
- * @return {?string} The side with a value.
- */
-function getFirstActiveAreaValue( styleLayout ) {
-	if ( ! styleLayout ) {
-		return;
-	}
-	const foundSide = Object.entries( styleLayout ).find(
-		( [ key, value ] ) =>
-			POSITION_SIDES.includes( key ) && value !== undefined
-	);
-
-	if ( foundSide ) {
-		return foundSide[ 0 ];
-	}
-}
-
-/**
  * Inspector control panel containing the padding related configuration
  *
  * @param {Object} props
@@ -171,46 +147,21 @@ export function PositionEdit( props ) {
 		return null;
 	}
 
-	const onChangeSide = ( next ) => {
-		if ( next !== undefined && ! POSITION_SIDES.includes( next ) ) {
-			return;
-		}
-
+	const onChangeType = ( next ) => {
 		// For now, use a hard-coded `0px` value for the position.
 		// `0px` is preferred over `0` as it can be used in `calc()` functions.
 		// In the future, it could be useful to allow for an offset value.
-		const newValue = '0px';
+		const placementValue = '0px';
 
-		const newSides = {
-			top: undefined,
-			right: undefined,
-			bottom: undefined,
-			left: undefined,
-		};
-
-		if ( next !== undefined ) {
-			newSides[ next ] = newValue;
-		}
-
-		const newStyle = {
-			...style,
-			layout: {
-				...style?.layout,
-				...newSides,
-			},
-		};
-
-		setAttributes( {
-			style: cleanEmptyObject( newStyle ),
-		} );
-	};
-
-	const onChangeType = ( next ) => {
 		const newStyle = {
 			...style,
 			layout: {
 				...style?.layout,
 				position: next,
+				top:
+					next === 'sticky' || next === 'fixed'
+						? placementValue
+						: undefined,
 			},
 		};
 
@@ -219,22 +170,13 @@ export function PositionEdit( props ) {
 		} );
 	};
 
-	const areaValue = getFirstActiveAreaValue( style?.layout );
-
 	return Platform.select( {
 		web: (
 			<>
-				<PositionAreaControl
-					help={ __(
-						'The area of a page that this block should occupy'
-					) }
-					onChange={ onChangeSide }
-					value={ areaValue }
-				/>
 				<ToggleGroupControl
 					label={ __( 'Position' ) }
 					help={ __(
-						"Lock this block to an area of the page so it doesn't scroll with page content"
+						'Stick this block to the top of its container. It will scroll with the page.'
 					) }
 					value={ style?.layout?.position || '' }
 					onChange={ ( newValue ) => {
