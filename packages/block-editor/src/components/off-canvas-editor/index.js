@@ -16,6 +16,7 @@ import {
 	forwardRef,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -108,9 +109,9 @@ function __ExperimentalOffCanvasEditor(
 		setExpandedState,
 	} );
 	const selectEditorBlock = useCallback(
-		( event, clientId ) => {
-			updateBlockSelection( event, clientId );
-			setSelectedTreeId( clientId );
+		( event, _clientId ) => {
+			updateBlockSelection( event, _clientId );
+			setSelectedTreeId( _clientId );
 		},
 		[ setSelectedTreeId, updateBlockSelection ]
 	);
@@ -132,20 +133,20 @@ function __ExperimentalOffCanvasEditor(
 	);
 
 	const expand = useCallback(
-		( clientId ) => {
-			if ( ! clientId ) {
+		( _clientId ) => {
+			if ( ! _clientId ) {
 				return;
 			}
-			setExpandedState( { type: 'expand', clientIds: [ clientId ] } );
+			setExpandedState( { type: 'expand', clientIds: [ _clientId ] } );
 		},
 		[ setExpandedState ]
 	);
 	const collapse = useCallback(
-		( clientId ) => {
-			if ( ! clientId ) {
+		( _clientId ) => {
+			if ( ! _clientId ) {
 				return;
 			}
-			setExpandedState( { type: 'collapse', clientIds: [ clientId ] } );
+			setExpandedState( { type: 'collapse', clientIds: [ _clientId ] } );
 		},
 		[ setExpandedState ]
 	);
@@ -217,11 +218,51 @@ function __ExperimentalOffCanvasEditor(
 					<BlockListAppender
 						tagName="td"
 						rootClientId={ clientId }
-						renderAppender={ ButtonBlockAppender }
+						renderAppender={ () => (
+							<OffCanvasEditorAppender
+								rootClientId={ clientId }
+							/>
+						) }
 					/>
 				</tr>
 			</TreeGrid>
 		</AsyncModeProvider>
 	);
 }
+
+function OffCanvasEditorAppender( { rootClientId } ) {
+	const { hideInserter } = useSelect(
+		( select ) => {
+			const {
+				canInsertBlockType,
+				getTemplateLock,
+				getSelectedBlockClientId,
+				__unstableGetEditorMode,
+			} = select( blockEditorStore );
+
+			return {
+				hideInserter:
+					!! getTemplateLock( rootClientId ) ||
+					__unstableGetEditorMode() === 'zoom-out',
+				canInsertDefaultBlock: canInsertBlockType(
+					getDefaultBlockName(),
+					rootClientId
+				),
+				selectedBlockClientId: getSelectedBlockClientId(),
+			};
+		},
+		[ rootClientId ]
+	);
+
+	if ( hideInserter ) {
+		return null;
+	}
+
+	return (
+		<ButtonBlockAppender className="xist-appender__toggle">
+			{ __( 'Add Menu Item' ) }
+		</ButtonBlockAppender>
+	);
+}
+
 export default forwardRef( __ExperimentalOffCanvasEditor );

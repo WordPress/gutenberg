@@ -18,7 +18,7 @@ import deprecated from '@wordpress/deprecated';
 import Inserter from '../inserter';
 
 function ButtonBlockAppender(
-	{ rootClientId, className, onFocus, tabIndex },
+	{ rootClientId, className, onFocus, tabIndex, children },
 	ref
 ) {
 	return (
@@ -67,6 +67,7 @@ function ButtonBlockAppender(
 							<VisuallyHidden as="span">{ label }</VisuallyHidden>
 						) }
 						<Icon icon={ plus } />
+						{ children }
 					</Button>
 				);
 
