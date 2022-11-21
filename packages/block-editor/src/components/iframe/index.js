@@ -344,22 +344,17 @@ function Iframe(
 									BODY_CLASS_NAME,
 									...bodyClasses
 								) }
-								style={
-									scale || frameSize
-										? {
-												// This is the remaining percentage from the scaling down
-												// of the iframe body(`scale(0.45)`). We also need to subtract
-												// the body's bottom margin.
-												marginBottom: `-${
-													contentHeight *
-														( 1 - scale ) -
-													frameSize
-												}px`,
-												marginTop: frameSize,
-												transform: `scale( ${ scale } )`,
-										  }
-										: {}
-								}
+								style={ {
+									// This is the remaining percentage from the scaling down
+									// of the iframe body(`scale(0.45)`). We also need to subtract
+									// the body's bottom margin.
+									marginBottom: `-${
+										contentHeight * ( 1 - scale ) -
+										frameSize
+									}px`,
+									marginTop: frameSize,
+									transform: `scale( ${ scale } )`,
+								} }
 							>
 								{ contentResizeListener }
 								{ /*
