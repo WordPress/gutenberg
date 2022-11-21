@@ -13,6 +13,17 @@ import { __ } from '@wordpress/i18n';
  */
 import useSetting from '../components/use-setting';
 
+function helpText( selfStretch ) {
+	switch ( selfStretch ) {
+		case 'fill':
+			return __( 'Stretch to fill available space.' );
+		case 'fixed':
+			return __( 'Specify a fixed width.' );
+		default:
+			return __( 'Fit contents.' );
+	}
+}
+
 /**
  * Inspector control panel containing the child layout related configuration
  *
@@ -36,7 +47,8 @@ export function ChildLayoutEdit( {
 		<>
 			<ToggleGroupControl
 				label={ childLayoutOrientation( parentLayout ) }
-				value={ selfStretch || 'hug' }
+				value={ selfStretch || 'fit' }
+				help={ helpText( selfStretch ) }
 				onChange={ ( value ) => {
 					setAttributes( {
 						style: {
@@ -51,9 +63,9 @@ export function ChildLayoutEdit( {
 				isBlock={ true }
 			>
 				<ToggleGroupControlOption
-					key={ 'hug' }
-					value={ 'hug' }
-					label={ __( 'Hug' ) }
+					key={ 'fit' }
+					value={ 'fit' }
+					label={ __( 'Fit' ) }
 				/>
 				<ToggleGroupControlOption
 					key={ 'fill' }
