@@ -1025,33 +1025,33 @@
 							"description": "Sets the `background-color` CSS property.",
 							"oneOf": [
 								{ "type": "string" },
-								{ "type": "object" }
-							],
-							"properties": {
-								"ref": {
-									"description": "A reference to another property value. e.g. `styles.color.text`",
-									"type": "string"
+								{
+									"type": "object",
+									"properties": {
+										"ref": {
+											"description": "A reference to another property value. e.g. `styles.color.text`",
+											"type": "string"
+										}
+									},
+									"additionalProperties": false
 								}
-							},
-							"additionalProperties": false
+							]
 						},
 						"gradient": {
 							"description": "Sets the `background` CSS property.",
 							"oneOf": [
-								{ "type": "string" },
-								{ "type": "object" }
-							],
-							"$ref": "#/definitions/stylesProperties/properties/color/properties/background/properties",
-							"additionalProperties": false
+								{
+									"$ref": "#/definitions/stylesProperties/properties/color/properties/background/properties/oneOf"
+								}
+							]
 						},
 						"text": {
 							"description": "Sets the `color` CSS property.",
 							"oneOf": [
-								{ "type": "string" },
-								{ "type": "object" }
-							],
-							"$ref": "#/definitions/stylesProperties/properties/color/properties/background/properties",
-							"additionalProperties": false
+								{
+									"$ref": "#/definitions/stylesProperties/properties/color/properties/background/properties/oneOf"
+								}
+							]
 						}
 					},
 					"additionalProperties": false
