@@ -74,7 +74,7 @@ function BlockForType( {
 		JSON.stringify( wrapperProps.style ),
 		JSON.stringify(
 			Object.fromEntries(
-				Object.entries( attributes ).filter( ( [ key ] ) =>
+				Object.entries( attributes ?? {} ).filter( ( [ key ] ) =>
 					GlobalStylesContext.BLOCK_STYLE_ATTRIBUTES.includes( key )
 				)
 			)
