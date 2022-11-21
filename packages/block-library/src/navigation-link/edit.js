@@ -32,6 +32,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	getColorClassName,
+	useInnerBlocksProps,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP, safeDecodeURI } from '@wordpress/url';
 import {
@@ -527,7 +528,9 @@ export default function NavigationLinkEdit( {
 		const newSubmenu = createBlock(
 			'core/navigation-submenu',
 			attributes,
-			innerBlocks
+			innerBlocks.length > 0
+				? innerBlocks
+				: [ createBlock( 'core/navigation-link' ) ]
 		);
 		replaceBlock( clientId, newSubmenu );
 	}
@@ -540,11 +543,14 @@ export default function NavigationLinkEdit( {
 		if ( ! url ) {
 			setIsLinkOpen( true );
 		}
+	}, [ url ] );
+
+	useEffect( () => {
 		// If block has inner blocks, transform to Submenu.
 		if ( hasChildren ) {
 			transformToSubmenu();
 		}
-	}, [] );
+	}, [ hasChildren ] );
 
 	/**
 	 * The hook shouldn't be necessary but due to a focus loss happening
@@ -673,6 +679,20 @@ export default function NavigationLinkEdit( {
 			backgroundColor: ! backgroundColor && customBackgroundColor,
 		},
 		onKeyDown,
+	} );
+
+	const ALLOWED_BLOCKS = [
+		'core/navigation-link',
+		'core/navigation-submenu',
+	];
+	const DEFAULT_BLOCK = {
+		name: 'core/navigation-link',
+	};
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		allowedBlocks: ALLOWED_BLOCKS,
+		__experimentalDefaultBlock: DEFAULT_BLOCK,
+		__experimentalDirectInsert: true,
+		renderAppender: false,
 	} );
 
 	if ( ! url || isInvalid || isDraft ) {
@@ -915,6 +935,7 @@ export default function NavigationLinkEdit( {
 						</Popover>
 					) }
 				</a>
+				<div { ...innerBlocksProps } />
 			</div>
 		</Fragment>
 	);
