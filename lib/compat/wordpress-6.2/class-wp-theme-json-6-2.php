@@ -216,4 +216,185 @@ class WP_Theme_JSON_6_2 extends WP_Theme_JSON_6_1 {
 			'textTransform'  => null,
 		),
 	);
+
+	/**
+	 * Get the CSS layout rules for a particular block from theme.json layout definitions.
+	 *
+	 * @param array $block_metadata Metadata about the block to get styles for.
+	 *
+	 * @return string Layout styles for the block.
+	 */
+	protected function get_layout_styles( $block_metadata ) {
+		$block_rules = '';
+		$block_type  = null;
+
+		// Skip outputting layout styles if explicitly disabled.
+		if ( current_theme_supports( 'disable-layout-styles' ) ) {
+			return $block_rules;
+		}
+
+		if ( isset( $block_metadata['name'] ) ) {
+			$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_metadata['name'] );
+			if ( ! block_has_support( $block_type, array( '__experimentalLayout' ), false ) ) {
+				return $block_rules;
+			}
+		}
+
+		$selector                 = isset( $block_metadata['selector'] ) ? $block_metadata['selector'] : '';
+		$has_block_gap_support    = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'blockGap' ) ) !== null;
+		$has_fallback_gap_support = ! $has_block_gap_support; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback gap styles support.
+		$node                     = _wp_array_get( $this->theme_json, $block_metadata['path'], array() );
+		$layout_definitions       = _wp_array_get( $this->theme_json, array( 'settings', 'layout', 'definitions' ), array() );
+		$layout_selector_pattern  = '/^[a-zA-Z0-9\-\.\ *+>:\(\)]*$/'; // Allow alphanumeric classnames, spaces, wildcard, sibling, child combinator and pseudo class selectors.
+
+		// Gap styles will only be output if the theme has block gap support, or supports a fallback gap.
+		// Default layout gap styles will be skipped for themes that do not explicitly opt-in to blockGap with a `true` or `false` value.
+		if ( $has_block_gap_support || $has_fallback_gap_support ) {
+			$block_gap_value = null;
+			// Use a fallback gap value if block gap support is not available.
+			if ( ! $has_block_gap_support ) {
+				$block_gap_value = static::ROOT_BLOCK_SELECTOR === $selector ? '0.5em' : null;
+				if ( ! empty( $block_type ) ) {
+					$block_gap_value = _wp_array_get( $block_type->supports, array( 'spacing', 'blockGap', '__experimentalDefault' ), null );
+				}
+			} else {
+				$block_gap_value = static::get_property_value( $node, array( 'spacing', 'blockGap' ) );
+			}
+
+			// Support split row / column values and concatenate to a shorthand value.
+			if ( is_array( $block_gap_value ) ) {
+				if ( isset( $block_gap_value['top'] ) && isset( $block_gap_value['left'] ) ) {
+					$gap_row         = static::get_property_value( $node, array( 'spacing', 'blockGap', 'top' ) );
+					$gap_column      = static::get_property_value( $node, array( 'spacing', 'blockGap', 'left' ) );
+					$block_gap_value = $gap_row === $gap_column ? $gap_row : $gap_row . ' ' . $gap_column;
+				} else {
+					// Skip outputting gap value if not all sides are provided.
+					$block_gap_value = null;
+				}
+			}
+
+			// If the block should have custom gap, add the gap styles.
+			if ( null !== $block_gap_value && false !== $block_gap_value && '' !== $block_gap_value ) {
+				foreach ( $layout_definitions as $layout_definition_key => $layout_definition ) {
+					// Allow outputting fallback gap styles for flex layout type when block gap support isn't available.
+					if ( ! $has_block_gap_support && 'flex' !== $layout_definition_key ) {
+						continue;
+					}
+
+					$class_name    = sanitize_title( _wp_array_get( $layout_definition, array( 'className' ), false ) );
+					$spacing_rules = _wp_array_get( $layout_definition, array( 'spacingStyles' ), array() );
+
+					if (
+						! empty( $class_name ) &&
+						! empty( $spacing_rules )
+					) {
+						foreach ( $spacing_rules as $spacing_rule ) {
+							$declarations = array();
+							if (
+								isset( $spacing_rule['selector'] ) &&
+								preg_match( $layout_selector_pattern, $spacing_rule['selector'] ) &&
+								! empty( $spacing_rule['rules'] )
+							) {
+								// Iterate over each of the styling rules and substitute non-string values such as `null` with the real `blockGap` value.
+								foreach ( $spacing_rule['rules'] as $css_property => $css_value ) {
+									$current_css_value = is_string( $css_value ) ? $css_value : $block_gap_value;
+									if ( static::is_safe_css_declaration( $css_property, $current_css_value ) ) {
+										$declarations[] = array(
+											'name'  => $css_property,
+											'value' => $current_css_value,
+										);
+									}
+								}
+
+								if ( ! $has_block_gap_support ) {
+									// For fallback gap styles, use lower specificity, to ensure styles do not unintentionally override theme styles.
+									$format          = static::ROOT_BLOCK_SELECTOR === $selector ? ':where(.%2$s%3$s)' : ':where(%1$s.%2$s%3$s)';
+									$layout_selector = sprintf(
+										$format,
+										$selector,
+										$class_name,
+										$spacing_rule['selector']
+									);
+								} else {
+									$format          = static::ROOT_BLOCK_SELECTOR === $selector ? '.%2$s%3$s' : '%s.%s%s';
+									$layout_selector = sprintf(
+										$format,
+										$selector,
+										$class_name,
+										$spacing_rule['selector']
+									);
+								}
+								$block_rules .= static::to_ruleset( $layout_selector, $declarations );
+							}
+						}
+					}
+				}
+			}
+		}
+
+		// Output base styles.
+		if (
+			static::ROOT_BLOCK_SELECTOR === $selector
+		) {
+			$valid_display_modes = array( 'block', 'flex', 'grid' );
+			foreach ( $layout_definitions as $layout_definition ) {
+				$class_name       = sanitize_title( _wp_array_get( $layout_definition, array( 'className' ), false ) );
+				$base_style_rules = _wp_array_get( $layout_definition, array( 'baseStyles' ), array() );
+
+				if (
+					! empty( $class_name ) &&
+					! empty( $base_style_rules )
+				) {
+					// Output display mode. This requires special handling as `display` is not exposed in `safe_style_css_filter`.
+					if (
+						! empty( $layout_definition['displayMode'] ) &&
+						is_string( $layout_definition['displayMode'] ) &&
+						in_array( $layout_definition['displayMode'], $valid_display_modes, true )
+					) {
+						$layout_selector = sprintf(
+							'%s .%s',
+							$selector,
+							$class_name
+						);
+						$block_rules    .= static::to_ruleset(
+							$layout_selector,
+							array(
+								array(
+									'name'  => 'display',
+									'value' => $layout_definition['displayMode'],
+								),
+							)
+						);
+					}
+
+					foreach ( $base_style_rules as $base_style_rule ) {
+						$declarations = array();
+
+						if (
+							isset( $base_style_rule['selector'] ) &&
+							preg_match( $layout_selector_pattern, $base_style_rule['selector'] ) &&
+							! empty( $base_style_rule['rules'] )
+						) {
+							foreach ( $base_style_rule['rules'] as $css_property => $css_value ) {
+								if ( static::is_safe_css_declaration( $css_property, $css_value ) ) {
+									$declarations[] = array(
+										'name'  => $css_property,
+										'value' => $css_value,
+									);
+								}
+							}
+
+							$layout_selector = sprintf(
+								'.%s%s',
+								$class_name,
+								$base_style_rule['selector']
+							);
+							$block_rules    .= static::to_ruleset( $layout_selector, $declarations );
+						}
+					}
+				}
+			}
+		}
+		return $block_rules;
+	}
 }
