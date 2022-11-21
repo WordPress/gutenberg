@@ -149,6 +149,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 
 	return {
 		tabIndex: 0,
+		contentEditable: false,
 		...wrapperProps,
 		...props,
 		ref: mergedRefs,

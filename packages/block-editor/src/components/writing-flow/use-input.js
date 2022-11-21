@@ -112,6 +112,10 @@ export default function useInput() {
 				return;
 			}
 
+			if ( event.target !== node ) {
+				return;
+			}
+
 			const { ownerDocument } = node;
 			const { defaultView } = ownerDocument;
 			const prototype = Object.getPrototypeOf( event );

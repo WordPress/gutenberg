@@ -30,14 +30,6 @@ export function useFocusHandler( clientId ) {
 			 * @param {FocusEvent} event Focus event.
 			 */
 			function onFocus( event ) {
-				// When the whole editor is editable, let writing flow handle
-				// selection.
-				if (
-					node.parentElement.closest( '[contenteditable="true"]' )
-				) {
-					return;
-				}
-
 				// Check synchronously because a non-selected block might be
 				// getting data through `useSelect` asynchronously.
 				if ( isBlockSelected( clientId ) ) {
