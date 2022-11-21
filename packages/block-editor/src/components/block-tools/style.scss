@@ -112,6 +112,25 @@
 		.block-editor-block-toolbar .components-toolbar {
 			border-right-color: $gray-200;
 		}
+
+		&.is-bottom {
+			margin-top: auto;
+			border-top: $border-width solid $gray-200;
+			border-bottom: none;
+		}
+	}
+}
+
+.block-editor-block-contextual-toolbar-wrapper {
+	z-index: z-index(".block-editor-block-popover");
+	position: fixed;
+	top: 0;
+	display: flex;
+	flex-direction: column;
+	pointer-events: none;
+
+	> * {
+		pointer-events: all;
 	}
 }
 
