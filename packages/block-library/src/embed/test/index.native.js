@@ -121,27 +121,34 @@ const MOST_USED_PROVIDERS = embed.settings.variations.filter( ( { name } ) =>
 
 // Return specified mocked responses for the oembed endpoint.
 const mockEmbedResponses = ( mockedResponses ) => {
-	fetchRequest.mockImplementation( ( { path } ) => {
-		if ( path.startsWith( '/wp/v2/themes' ) ) {
-			return Promise.resolve( [
-				{ theme_supports: { 'responsive-embeds': true } },
-			] );
-		}
-
-		if ( path.startsWith( '/wp/v2/block-patterns/categories' ) ) {
-			return Promise.resolve( [] );
-		}
-
+	fetchRequest.mockImplementation( async ( req ) => {
 		const matchedEmbedResponse = mockedResponses.find(
 			( mockedResponse ) =>
-				path ===
+				req.path ===
 				`/oembed/1.0/proxy?url=${ encodeURIComponent(
 					mockedResponse.url
 				) }`
 		);
-		return Promise.resolve( matchedEmbedResponse || {} );
+
+		return matchedEmbedResponse || mockOtherResponses( req );
 	} );
 };
+
+async function mockOtherResponses( { path } ) {
+	if ( path.startsWith( '/wp/v2/themes' ) ) {
+		return [ { theme_supports: { 'responsive-embeds': true } } ];
+	}
+
+	if ( path.startsWith( '/wp/v2/block-patterns/patterns' ) ) {
+		return [];
+	}
+
+	if ( path.startsWith( '/wp/v2/block-patterns/categories' ) ) {
+		return [];
+	}
+
+	return {};
+}
 
 const insertEmbedBlock = async ( blockTitle = 'Embed' ) => {
 	const editor = await initializeEditor( { initialHtml: '' } );
@@ -674,21 +681,16 @@ describe( 'Embed block', () => {
 			// Return bad response for the first request to oembed endpoint
 			// and success response for the rest of requests.
 			let isFirstEmbedRequest = true;
-			fetchRequest.mockImplementation( ( { path } ) => {
-				let response = {};
-				const isEmbedRequest = path.startsWith( '/oembed/1.0/proxy' );
-				if ( isEmbedRequest ) {
+			fetchRequest.mockImplementation( async ( req ) => {
+				if ( req.path.startsWith( '/oembed/1.0/proxy' ) ) {
 					if ( isFirstEmbedRequest ) {
 						isFirstEmbedRequest = false;
-						response = MOCK_BAD_WORDPRESS_RESPONSE;
-					} else {
-						response = RICH_TEXT_EMBED_SUCCESS_RESPONSE;
+						return MOCK_BAD_WORDPRESS_RESPONSE;
 					}
+					return RICH_TEXT_EMBED_SUCCESS_RESPONSE;
 				}
-				if ( path.startsWith( '/wp/v2/block-patterns/categories' ) ) {
-					response = [];
-				}
-				return Promise.resolve( response );
+
+				return mockOtherResponses( req );
 			} );
 
 			const editor = await initializeWithEmbedBlock(
@@ -713,14 +715,12 @@ describe( 'Embed block', () => {
 
 		it( 'converts to link if preview request failed', async () => {
 			// Return bad response for requests to oembed endpoint.
-			fetchRequest.mockImplementation( ( { path } ) => {
-				if ( path.startsWith( '/wp/v2/block-patterns/categories' ) ) {
-					return Promise.resolve( [] );
+			fetchRequest.mockImplementation( async ( req ) => {
+				if ( req.path.startsWith( '/oembed/1.0/proxy' ) ) {
+					return MOCK_BAD_WORDPRESS_RESPONSE;
 				}
-				const isEmbedRequest = path.startsWith( '/oembed/1.0/proxy' );
-				return Promise.resolve(
-					isEmbedRequest ? MOCK_BAD_WORDPRESS_RESPONSE : {}
-				);
+
+				return mockOtherResponses( req );
 			} );
 
 			const editor = await initializeWithEmbedBlock(
@@ -745,23 +745,20 @@ describe( 'Embed block', () => {
 			const successURL = 'https://twitter.com/notnownikki';
 
 			// Return bad response for WordPress URL and success for Twitter URL.
-			fetchRequest.mockImplementation( ( { path } ) => {
+			fetchRequest.mockImplementation( async ( req ) => {
 				const matchesPath = ( url ) =>
-					path ===
+					req.path ===
 					`/oembed/1.0/proxy?url=${ encodeURIComponent( url ) }`;
 
-				let response = {};
 				if ( matchesPath( failURL ) ) {
-					response = MOCK_BAD_WORDPRESS_RESPONSE;
-				} else if ( matchesPath( successURL ) ) {
-					response = RICH_TEXT_EMBED_SUCCESS_RESPONSE;
-				} else if (
-					path.startsWith( '/wp/v2/block-patterns/categories' )
-				) {
-					response = [];
+					return MOCK_BAD_WORDPRESS_RESPONSE;
 				}
 
-				return Promise.resolve( response );
+				if ( matchesPath( successURL ) ) {
+					return RICH_TEXT_EMBED_SUCCESS_RESPONSE;
+				}
+
+				return mockOtherResponses( req );
 			} );
 
 			const editor = await initializeWithEmbedBlock( WP_EMBED_HTML );
@@ -1040,12 +1037,12 @@ describe( 'Embed block', () => {
 
 	it( 'displays cannot embed on the placeholder if preview data is null', async () => {
 		// Return null response for requests to oembed endpoint.
-		fetchRequest.mockImplementation( ( { path } ) => {
-			if ( path.startsWith( '/wp/v2/block-patterns/categories' ) ) {
-				return Promise.resolve( [] );
+		fetchRequest.mockImplementation( async ( req ) => {
+			if ( req.path.startsWith( '/oembed/1.0/proxy' ) ) {
+				return EMBED_NULL_RESPONSE;
 			}
-			const isEmbedRequest = path.startsWith( '/oembed/1.0/proxy' );
-			return Promise.resolve( isEmbedRequest ? EMBED_NULL_RESPONSE : {} );
+
+			return mockOtherResponses( req );
 		} );
 
 		const { getByText } = await initializeWithEmbedBlock(
