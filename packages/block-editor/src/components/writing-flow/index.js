@@ -7,9 +7,10 @@ import classNames from 'classnames';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { forwardRef } from '@wordpress/element';
+import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -30,6 +31,18 @@ export function useWritingFlow() {
 		( select ) => select( blockEditorStore ).hasMultiSelection(),
 		[]
 	);
+	const selectedBlockTitle = useSelect( ( select ) => {
+		const { getSelectedBlockClientId, getBlockName, getBlockAttributes } =
+			select( blockEditorStore );
+		const clientId = getSelectedBlockClientId();
+		if ( ! clientId ) return;
+		const blockName = getBlockName( clientId );
+		const blockType = getBlockType( blockName );
+		const attributes = getBlockAttributes( clientId );
+		const { getActiveBlockVariation } = select( blocksStore );
+		const match = getActiveBlockVariation( blockName, attributes );
+		return match?.title || blockType?.title;
+	}, [] );
 
 	return [
 		before,
@@ -47,22 +60,29 @@ export function useWritingFlow() {
 					node.tabIndex = -1;
 					node.contentEditable = true;
 
+					const label = selectedBlockTitle
+						? // translators: %s: Type of block (i.e. Text, Image etc)
+						  sprintf( __( 'Block: %s' ), selectedBlockTitle )
+						: '';
+
+					node.setAttribute(
+						'aria-label',
+						hasMultiSelection
+							? __( 'Multiple selected blocks' )
+							: label
+					);
+
 					if ( ! hasMultiSelection ) {
 						return;
 					}
 
 					node.classList.add( 'has-multi-selection' );
-					node.setAttribute(
-						'aria-label',
-						__( 'Multiple selected blocks' )
-					);
 
 					return () => {
 						node.classList.remove( 'has-multi-selection' );
-						node.removeAttribute( 'aria-label' );
 					};
 				},
-				[ hasMultiSelection ]
+				[ hasMultiSelection, selectedBlockTitle ]
 			),
 		] ),
 		after,

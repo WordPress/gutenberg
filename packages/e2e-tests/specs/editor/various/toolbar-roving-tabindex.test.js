@@ -68,7 +68,7 @@ describe( 'Toolbar roving tabindex', () => {
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Paragraph' );
 		await testBlockToolbarKeyboardNavigation(
-			'Paragraph block',
+			'Block: Paragraph',
 			'Paragraph'
 		);
 		await wrapCurrentBlockWithGroup( 'Paragraph' );

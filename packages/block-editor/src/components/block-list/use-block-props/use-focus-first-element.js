@@ -93,6 +93,13 @@ export function useFocusFirstElement( clientId ) {
 			return;
 		}
 
+		if (
+			ownerDocument.activeElement &&
+			isInsideRootBlock( ref.current, ownerDocument.activeElement )
+		) {
+			return;
+		}
+
 		// Find all tabbables within node.
 		const textInputs = focus.tabbable
 			.find( ref.current )
