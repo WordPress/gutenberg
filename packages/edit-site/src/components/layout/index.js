@@ -33,8 +33,9 @@ import ErrorBoundary from '../error-boundary';
 import { store as editSiteStore } from '../../store';
 import { useLocation } from '../routes';
 import getIsListPage from '../../utils/get-is-list-page';
-import SiteIconAndTitle from '../site-icon-and-title';
 import Header from '../header-edit-mode';
+import SiteIcon from '../site-icon';
+import SiteTitle from '../site-title';
 
 const ANIMATION_DURATION = 0.5;
 
@@ -117,10 +118,7 @@ export default function Layout() {
 							{ ...siteIconButtonProps }
 							className="edit-site-layout__view-mode-toggle"
 						>
-							<SiteIconAndTitle
-								className="edit-site-layout__view-mode-toggle-icon"
-								showTitle={ false }
-							/>
+							<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
 						</Button>
 						<AnimatePresence initial={ false }>
 							{ ( isBackToDashboardButton || showEditButton ) && (
@@ -135,9 +133,7 @@ export default function Layout() {
 								>
 									<HStack>
 										{ isBackToDashboardButton && (
-											<SiteIconAndTitle
-												showIcon={ false }
-											/>
+											<SiteTitle />
 										) }
 
 										{ showEditButton && (
