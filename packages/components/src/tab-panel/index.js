@@ -9,7 +9,7 @@ import { partial, noop, find } from 'lodash';
  */
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
-import { DOWN } from '@wordpress/keycodes';
+import { DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -35,12 +35,13 @@ export default function TabPanel( {
 	children,
 	tabs,
 	initialTabName,
-	orientation = 'horizontal',
+	orientation = 'vertical',
 	activeClass = 'is-active',
 	onSelect = noop,
 } ) {
 	const instanceId = useInstanceId( TabPanel, 'tab-panel' );
 	const [ selected, setSelected ] = useState( null );
+	const [ direction, setDirection ] = useState( null );
 
 	const handleClick = ( tabKey ) => {
 		setSelected( tabKey );
@@ -51,15 +52,28 @@ export default function TabPanel( {
 		child.click();
 	};
 	const onKeyDown = ( evt ) => {
-		// TODO: check orientation
-		if ( evt.keyCode === DOWN ) {
+		const hKey = direction === 'rtl' ? LEFT : RIGHT;
+		const key = orientation === 'vertical' ? hKey : DOWN;
+
+		if ( evt.keyCode === key ) {
 			panelRef.current?.focus();
 		}
 	};
 
+	const tabRef = useRef();
 	const panelRef = useRef();
 	const selectedTab = find( tabs, { name: selected } );
 	const selectedId = `${ instanceId }-${ selectedTab?.name ?? 'none' }`;
+
+	useEffect( () => {
+		if ( tabRef.current ) {
+			const dir = window.getComputedStyle( tabRef.current ).direction;
+
+			if ( dir ) {
+				setDirection( dir );
+			}
+		}
+	}, [ tabRef ] );
 
 	useEffect( () => {
 		const newSelectedTab = find( tabs, { name: selected } );
@@ -78,6 +92,7 @@ export default function TabPanel( {
 				onNavigate={ onNavigate }
 				className="components-tab-panel__tabs"
 				onKeyDown={ onKeyDown }
+				ref={ tabRef }
 			>
 				{ tabs.map( ( tab ) => (
 					<TabButton
