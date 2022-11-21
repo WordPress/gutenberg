@@ -89,7 +89,6 @@
 				<element value="_gutenberg"/>
 			</property>
 		</properties>
-		<exclude-pattern>packages/*</exclude-pattern>
 		<exclude-pattern>phpunit/*</exclude-pattern>
 	</rule>
 
@@ -97,30 +96,42 @@
 		<exclude-pattern>lib/compat/*</exclude-pattern>
 		<exclude-pattern>lib/experimental/*</exclude-pattern>
 		<exclude-pattern>bin/generate-gutenberg-php.php</exclude-pattern>
+		<exclude-pattern>packages/*</exclude-pattern>
 	</rule>
 
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound">
 		<exclude-pattern>lib/compat/*</exclude-pattern>
 		<exclude-pattern>lib/experimental/*</exclude-pattern>
 		<exclude-pattern>bin/generate-gutenberg-php.php</exclude-pattern>
+		<exclude-pattern>packages/*</exclude-pattern>
 	</rule>
 
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.ForbiddenPrefixPassed">
 		<exclude-pattern>lib/compat/*</exclude-pattern>
 		<exclude-pattern>lib/experimental/*</exclude-pattern>
 		<exclude-pattern>bin/generate-gutenberg-php.php</exclude-pattern>
+		<exclude-pattern>packages/*</exclude-pattern>
 	</rule>
 
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound">
 		<exclude-pattern>lib/compat/*</exclude-pattern>
 		<exclude-pattern>lib/experimental/*</exclude-pattern>
 		<exclude-pattern>bin/generate-gutenberg-php.php</exclude-pattern>
+		<exclude-pattern>packages/*</exclude-pattern>
 	</rule>
 
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound">
 		<exclude-pattern>lib/compat/*</exclude-pattern>
 		<exclude-pattern>lib/experimental/*</exclude-pattern>
 		<exclude-pattern>bin/generate-gutenberg-php.php</exclude-pattern>
+		<exclude-pattern>packages/*</exclude-pattern>
+	</rule>
+
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound">
+		<exclude-pattern>lib/compat/*</exclude-pattern>
+		<exclude-pattern>lib/experimental/*</exclude-pattern>
+		<exclude-pattern>bin/generate-gutenberg-php.php</exclude-pattern>
+		<exclude-pattern>packages/*</exclude-pattern>
 	</rule>
 
 	<!--
