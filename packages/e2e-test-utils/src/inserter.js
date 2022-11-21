@@ -93,8 +93,7 @@ async function focusSelectedBlock() {
 async function waitForInserterCloseAndContentFocus() {
 	await canvas().waitForFunction(
 		() =>
-			document.activeElement.closest( '.block-editor-writing-flow' ) !==
-			null
+			document.activeElement.closest( '.editor-styles-wrapper' ) !== null
 	);
 }
 

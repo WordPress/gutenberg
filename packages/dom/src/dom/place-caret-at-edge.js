@@ -57,6 +57,8 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 			return;
 		}
 
+		container.focus();
+
 		if ( isReverse ) {
 			container.selectionStart = container.value.length;
 			container.selectionEnd = container.value.length;
