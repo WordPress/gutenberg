@@ -25,7 +25,7 @@ const CUSTOM_VALUE_SETTINGS = {
 	vw: { max: 100, steps: 1 },
 	vh: { max: 100, steps: 1 },
 	em: { max: 50, steps: 0.1 },
-	rm: { max: 50, steps: 0.1 },
+	rem: { max: 50, steps: 0.1 },
 };
 
 export default function HeightControl( {
