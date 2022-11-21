@@ -63,6 +63,7 @@ const MenuInspectorControls = ( {
 	innerBlocks,
 	isManageMenusButtonDisabled,
 	onCreateNew,
+	hasNavigationMenuResolved,
 } ) => {
 	const isOffCanvasNavigationEditorEnabled =
 		window?.__experimentalEnableOffCanvasNavigationEditor === true;
@@ -100,9 +101,11 @@ const MenuInspectorControls = ( {
 								}
 							/>
 						</HStack>
-						{ currentMenuId && isNavigationMenuMissing ? (
+						{ currentMenuId && isNavigationMenuMissing && (
 							<p>{ __( 'Select or create a menu' ) }</p>
-						) : (
+						) }
+
+						{ currentMenuId && hasNavigationMenuResolved && (
 							<OffCanvasEditor
 								clientId={ clientId }
 								blocks={ innerBlocks }

@@ -679,6 +679,7 @@ function Navigation( {
 					innerBlocks={ innerBlocks }
 					isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
 					onCreateNew={ createUntitledEmptyNavigationMenu }
+					hasNavigationMenuResolved={ isNavigationMenuResolved }
 				/>
 				{ stylingInspectorControls }
 				<ResponsiveWrapper
@@ -721,6 +722,7 @@ function Navigation( {
 					innerBlocks={ innerBlocks }
 					isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
 					onCreateNew={ createUntitledEmptyNavigationMenu }
+					hasNavigationMenuResolved={ isNavigationMenuResolved }
 				/>
 				<Warning>
 					{ __(
@@ -809,6 +811,7 @@ function Navigation( {
 					innerBlocks={ innerBlocks }
 					isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
 					onCreateNew={ createUntitledEmptyNavigationMenu }
+					hasNavigationMenuResolved={ isNavigationMenuResolved }
 				/>
 				{ stylingInspectorControls }
 				{ isEntityAvailable && (
