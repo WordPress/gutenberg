@@ -45,7 +45,7 @@ export default function SidebarNavigationRoot() {
 		<VStack spacing={ 6 }>
 			<SidebarNavigationTitle
 				title={
-					<HStack>
+					<HStack style={ { minHeight: 36 } }>
 						<div>{ __( 'Design' ) }</div>
 						{ ! isMobileViewport && isEditorPage && (
 							<Button
