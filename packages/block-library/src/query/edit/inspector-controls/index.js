@@ -24,6 +24,7 @@ import AuthorControl from './author-control';
 import ParentControl from './parent-control';
 import { TaxonomyControls } from './taxonomy-controls';
 import StickyControl from './sticky-control';
+import CreateNewPostLink from './create-new-post-link';
 import {
 	usePostTypes,
 	useIsPostTypeHierarchical,
@@ -32,11 +33,8 @@ import {
 	useTaxonomies,
 } from '../../utils';
 
-export default function QueryInspectorControls( {
-	attributes,
-	setQuery,
-	setDisplayLayout,
-} ) {
+export default function QueryInspectorControls( props ) {
+	const { attributes, setQuery, setDisplayLayout } = props;
 	const { query, displayLayout } = attributes;
 	const {
 		order,
@@ -112,6 +110,9 @@ export default function QueryInspectorControls( {
 		showStickyControl;
 	return (
 		<>
+			<InspectorControls __experimentalGroup="info">
+				<CreateNewPostLink { ...props } />
+			</InspectorControls>
 			{ showSettingsPanel && (
 				<InspectorControls>
 					<PanelBody title={ __( 'Settings' ) }>
