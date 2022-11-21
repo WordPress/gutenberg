@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { View, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
-import { pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -74,7 +73,11 @@ function BlockForType( {
 		// Thanks to the JSON.stringify we check if the value is the same instead of reference.
 		JSON.stringify( wrapperProps.style ),
 		JSON.stringify(
-			pick( attributes, GlobalStylesContext.BLOCK_STYLE_ATTRIBUTES )
+			Object.fromEntries(
+				Object.entries( attributes ).filter( ( [ key ] ) =>
+					GlobalStylesContext.BLOCK_STYLE_ATTRIBUTES.includes( key )
+				)
+			)
 		),
 	] );
 
