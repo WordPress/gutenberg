@@ -135,6 +135,22 @@ This option is useful only when the `combineAssets` option is enabled. It allows
 
 Pass `useDefaults: false` to disable the default request handling.
 
+##### `bundledPackages`
+
+-   Type: `array<string>`
+-   Default: `[ '@wordpress/icons', '@wordpress/interface' ]`
+
+The list of dependencies to exclude from externalizing. The packages listed here will not reach `requestToExternal` callback.
+You can provide a new or extend that list with
+```javascript
+new DependencyExtractionWebpackPlugin( {
+	bundledPackages: [
+		...DependencyExtractionWebpackPlugin.bundledPackages,
+		'@wordpress/components'
+	]
+} )
+```
+
 ##### `injectPolyfill`
 
 -   Type: boolean

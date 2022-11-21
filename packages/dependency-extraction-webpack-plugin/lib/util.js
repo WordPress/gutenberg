@@ -38,10 +38,6 @@ function defaultRequestToExternal( request ) {
 		return 'ReactRefreshRuntime';
 	}
 
-	if ( BUNDLED_PACKAGES.includes( request ) ) {
-		return undefined;
-	}
-
 	if ( request.startsWith( WORDPRESS_NAMESPACE ) ) {
 		return [
 			'wp',
@@ -93,6 +89,7 @@ function camelCaseDash( string ) {
 }
 
 module.exports = {
+	BUNDLED_PACKAGES,
 	camelCaseDash,
 	defaultRequestToExternal,
 	defaultRequestToHandle,

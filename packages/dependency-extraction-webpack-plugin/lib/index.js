@@ -13,6 +13,7 @@ const { createHash } = webpack.util;
  * Internal dependencies
  */
 const {
+	BUNDLED_PACKAGES,
 	defaultRequestToExternal,
 	defaultRequestToHandle,
 } = require( './util' );
@@ -23,6 +24,7 @@ class DependencyExtractionWebpackPlugin {
 	constructor( options ) {
 		this.options = Object.assign(
 			{
+				bundledPackages: this.constructor.bundledPackages,
 				combineAssets: false,
 				combinedOutputFile: null,
 				externalizedReport: false,
@@ -53,6 +55,9 @@ class DependencyExtractionWebpackPlugin {
 	}
 
 	externalizeWpDeps( _context, request, callback ) {
+		if ( this.options.bundledPackages.includes( request ) ) {
+			return callback();
+		}
 		let externalRequest;
 
 		// Handle via options.requestToExternal first.
@@ -276,5 +281,11 @@ class DependencyExtractionWebpackPlugin {
 		}
 	}
 }
+
+// Define a static member in the eslint's ES supported way.
+/**
+ * Set of packages to be bundled regardless of `requestToExternal` result.
+ */
+DependencyExtractionWebpackPlugin.bundledPackages = BUNDLED_PACKAGES;
 
 module.exports = DependencyExtractionWebpackPlugin;
