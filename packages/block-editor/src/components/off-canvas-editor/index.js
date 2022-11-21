@@ -16,7 +16,6 @@ import {
 	forwardRef,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -233,35 +232,11 @@ function __ExperimentalOffCanvasEditor(
 }
 
 function OffCanvasEditorAppender( { rootClientId } ) {
-	const { hideInserter } = useSelect(
-		( select ) => {
-			const {
-				canInsertBlockType,
-				getTemplateLock,
-				getSelectedBlockClientId,
-				__unstableGetEditorMode,
-			} = select( blockEditorStore );
-
-			return {
-				hideInserter:
-					!! getTemplateLock( rootClientId ) ||
-					__unstableGetEditorMode() === 'zoom-out',
-				canInsertDefaultBlock: canInsertBlockType(
-					getDefaultBlockName(),
-					rootClientId
-				),
-				selectedBlockClientId: getSelectedBlockClientId(),
-			};
-		},
-		[ rootClientId ]
-	);
-
-	if ( hideInserter ) {
-		return null;
-	}
-
 	return (
-		<ButtonBlockAppender className="offcanvas-editor__list-appender__toggle">
+		<ButtonBlockAppender
+			className="offcanvas-editor__list-appender__toggle"
+			rootClientId={ rootClientId }
+		>
 			{ __( 'Add Menu Item' ) }
 		</ButtonBlockAppender>
 	);
