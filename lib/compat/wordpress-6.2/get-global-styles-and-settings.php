@@ -20,13 +20,17 @@ if ( ! function_exists( 'wp_theme_has_theme_json' ) ) {
 		$theme_has_support = wp_cache_get( $cache_key, $cache_group );
 
 		/**
-		 * $theme_has_support is stored as a int in the cache.
+		 * $theme_has_support is stored as an int in the cache.
 		 *
 		 * The reason not to store it as a boolean is to avoid working
 		 * with the $found parameter which apparently had some issues in some implementations
 		 * https://developer.wordpress.org/reference/functions/wp_cache_get/
 		 */
-		if ( 0 === $theme_has_support || 1 === $theme_has_support ) {
+		if (
+			// Ignore cache when `WP_DEBUG` is enabled, so it doesn't interfere with the theme developers workflow.
+			( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) &&
+			( 0 === $theme_has_support || 1 === $theme_has_support )
+		) {
 			return (bool) $theme_has_support;
 		}
 

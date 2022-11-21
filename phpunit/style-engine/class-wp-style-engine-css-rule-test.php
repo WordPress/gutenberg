@@ -9,6 +9,7 @@
 /**
  * Tests for registering, storing and generating CSS rules.
  *
+ * @group style-engine
  * @coversDefaultClass WP_Style_Engine_CSS_Rule_Gutenberg
  */
 class WP_Style_Engine_CSS_Rule_Test extends WP_UnitTestCase {

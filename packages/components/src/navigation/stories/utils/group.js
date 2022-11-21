@@ -6,10 +6,10 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Navigation from '..';
-import NavigationItem from '../item';
-import NavigationMenu from '../menu';
-import NavigationGroup from '../group';
+import Navigation from '../..';
+import NavigationItem from '../../item';
+import NavigationMenu from '../../menu';
+import NavigationGroup from '../../group';
 
 export function GroupStory() {
 	const [ activeItem, setActiveItem ] = useState( 'item-1' );
