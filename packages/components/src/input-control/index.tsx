@@ -18,6 +18,7 @@ import InputField from './input-field';
 import type { InputControlProps } from './types';
 import { space } from '../ui/utils/space';
 import { useDraft } from './utils';
+import { StyledHelp } from '../base-control/styles/base-control-styles';
 
 const noop = () => {};
 
@@ -35,6 +36,7 @@ export function UnforwardedInputControl(
 		__unstableInputWidth,
 		className,
 		disabled = false,
+		help,
 		hideLabelFromVision = false,
 		id: idProp,
 		isPressEnterToChange = false,
@@ -56,6 +58,7 @@ export function UnforwardedInputControl(
 
 	const id = useUniqueId( idProp );
 	const classes = classNames( 'components-input-control', className );
+	const helpTextId = `${ id }__help`;
 
 	const draftHookProps = useDraft( {
 		value,
@@ -64,42 +67,49 @@ export function UnforwardedInputControl(
 	} );
 
 	return (
-		<InputBase
-			__next36pxDefaultSize={ __next36pxDefaultSize }
-			__unstableInputWidth={ __unstableInputWidth }
-			className={ classes }
-			disabled={ disabled }
-			gap={ 3 }
-			hideLabelFromVision={ hideLabelFromVision }
-			id={ id }
-			isFocused={ isFocused }
-			justify="left"
-			label={ label }
-			labelPosition={ labelPosition }
-			prefix={ prefix }
-			size={ size }
-			style={ style }
-			suffix={ suffix }
-		>
-			<InputField
-				{ ...props }
+		<div className={ classes }>
+			<InputBase
 				__next36pxDefaultSize={ __next36pxDefaultSize }
-				className="components-input-control__input"
+				__unstableInputWidth={ __unstableInputWidth }
 				disabled={ disabled }
+				gap={ 3 }
+				hideLabelFromVision={ hideLabelFromVision }
 				id={ id }
 				isFocused={ isFocused }
-				isPressEnterToChange={ isPressEnterToChange }
-				onKeyDown={ onKeyDown }
-				onValidate={ onValidate }
-				paddingInlineStart={ prefix ? space( 2 ) : undefined }
-				paddingInlineEnd={ suffix ? space( 2 ) : undefined }
-				ref={ ref }
-				setIsFocused={ setIsFocused }
+				justify="left"
+				label={ label }
+				labelPosition={ labelPosition }
+				prefix={ prefix }
 				size={ size }
-				stateReducer={ stateReducer }
-				{ ...draftHookProps }
-			/>
-		</InputBase>
+				style={ style }
+				suffix={ suffix }
+			>
+				<InputField
+					{ ...props }
+					__next36pxDefaultSize={ __next36pxDefaultSize }
+					aria-describedby={ !! help ? helpTextId : undefined }
+					className="components-input-control__input"
+					disabled={ disabled }
+					id={ id }
+					isFocused={ isFocused }
+					isPressEnterToChange={ isPressEnterToChange }
+					onKeyDown={ onKeyDown }
+					onValidate={ onValidate }
+					paddingInlineStart={ prefix ? space( 2 ) : undefined }
+					paddingInlineEnd={ suffix ? space( 2 ) : undefined }
+					ref={ ref }
+					setIsFocused={ setIsFocused }
+					size={ size }
+					stateReducer={ stateReducer }
+					{ ...draftHookProps }
+				/>
+			</InputBase>
+			{ !! help && (
+				<StyledHelp id={ helpTextId } __nextHasNoMarginBottom>
+					{ help }
+				</StyledHelp>
+			) }
+		</div>
 	);
 }
 

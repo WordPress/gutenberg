@@ -50,6 +50,13 @@ describe( 'InputControl', () => {
 
 			expect( input ).toBeInTheDocument();
 		} );
+
+		it( 'should render help text as description', () => {
+			render( <InputControl help="My help text" /> );
+			expect(
+				screen.getByRole( 'textbox', { description: 'My help text' } )
+			).toBeInTheDocument();
+		} );
 	} );
 
 	describe( 'Ensurance of focus for number inputs', () => {

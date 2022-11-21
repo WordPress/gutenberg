@@ -191,6 +191,10 @@ export interface InputControlProps
 			| 'paddingInlineEnd'
 		> {
 	__unstableStateReducer?: InputFieldProps[ 'stateReducer' ];
+	/**
+	 * An additional description for the control.
+	 */
+	help?: string;
 }
 
 export interface InputControlLabelProps {
