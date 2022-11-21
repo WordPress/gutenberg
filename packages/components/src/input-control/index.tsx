@@ -18,7 +18,7 @@ import InputField from './input-field';
 import type { InputControlProps } from './types';
 import { space } from '../ui/utils/space';
 import { useDraft } from './utils';
-import { StyledHelp } from '../base-control/styles/base-control-styles';
+import BaseControl from '../base-control';
 
 const noop = () => {};
 
@@ -58,7 +58,6 @@ export function UnforwardedInputControl(
 
 	const id = useUniqueId( idProp );
 	const classes = classNames( 'components-input-control', className );
-	const helpTextId = `${ id }__help`;
 
 	const draftHookProps = useDraft( {
 		value,
@@ -67,7 +66,12 @@ export function UnforwardedInputControl(
 	} );
 
 	return (
-		<div className={ classes }>
+		<BaseControl
+			className={ classes }
+			help={ help }
+			id={ id }
+			__nextHasNoMarginBottom
+		>
 			<InputBase
 				__next36pxDefaultSize={ __next36pxDefaultSize }
 				__unstableInputWidth={ __unstableInputWidth }
@@ -87,7 +91,7 @@ export function UnforwardedInputControl(
 				<InputField
 					{ ...props }
 					__next36pxDefaultSize={ __next36pxDefaultSize }
-					aria-describedby={ !! help ? helpTextId : undefined }
+					aria-describedby={ !! help ? `${ id }__help` : undefined }
 					className="components-input-control__input"
 					disabled={ disabled }
 					id={ id }
@@ -104,12 +108,7 @@ export function UnforwardedInputControl(
 					{ ...draftHookProps }
 				/>
 			</InputBase>
-			{ !! help && (
-				<StyledHelp id={ helpTextId } __nextHasNoMarginBottom>
-					{ help }
-				</StyledHelp>
-			) }
-		</div>
+		</BaseControl>
 	);
 }
 
