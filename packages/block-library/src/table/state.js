@@ -1,9 +1,7 @@
 /**
  * External dependencies
  */
-import { get, mapValues, pick } from 'lodash';
-
-const INHERITED_COLUMN_ATTRIBUTES = [ 'align' ];
+import { get, mapValues } from 'lodash';
 
 /**
  * Creates a table state.
@@ -78,7 +76,8 @@ export function updateSelectedCell( state, selection, updateCell ) {
 		return state;
 	}
 
-	const tableSections = pick( state, [ 'head', 'body', 'foot' ] );
+	const { head, body, foot } = state;
+	const tableSections = { head, body, foot };
 	const { sectionName: selectionSectionName, rowIndex: selectionRowIndex } =
 		selection;
 
@@ -174,10 +173,10 @@ export function insertRow( state, { sectionName, rowIndex, columnCount } ) {
 							[ 'cells', index ],
 							{}
 						);
-						const inheritedAttributes = pick(
-							firstCellInColumn,
-							INHERITED_COLUMN_ATTRIBUTES
-						);
+
+						const inheritedAttributes = {
+							align: firstCellInColumn.align,
+						};
 
 						return {
 							...inheritedAttributes,
@@ -220,7 +219,8 @@ export function deleteRow( state, { sectionName, rowIndex } ) {
  * @return {Object} New table state.
  */
 export function insertColumn( state, { columnIndex } ) {
-	const tableSections = pick( state, [ 'head', 'body', 'foot' ] );
+	const { head, body, foot } = state;
+	const tableSections = { head, body, foot };
 
 	return mapValues( tableSections, ( section, sectionName ) => {
 		// Bail early if the table section is empty.
@@ -259,7 +259,8 @@ export function insertColumn( state, { columnIndex } ) {
  * @return {Object} New table state.
  */
 export function deleteColumn( state, { columnIndex } ) {
-	const tableSections = pick( state, [ 'head', 'body', 'foot' ] );
+	const { head, body, foot } = state;
+	const tableSections = { head, body, foot };
 
 	return mapValues( tableSections, ( section ) => {
 		// Bail early if the table section is empty.

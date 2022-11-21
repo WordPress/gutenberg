@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -85,9 +84,11 @@ const SiteLogo = ( {
 			'root',
 			'__unstableBase'
 		);
+		const blockEditorSettings = getSettings();
 		return {
 			title: siteEntities?.name,
-			...pick( getSettings(), [ 'imageEditing', 'maxWidth' ] ),
+			imageEditing: blockEditorSettings.imageEditing,
+			maxWidth: blockEditorSettings.maxWidth,
 		};
 	}, [] );
 
@@ -120,9 +121,10 @@ const SiteLogo = ( {
 			src={ logoUrl }
 			alt={ alt }
 			onLoad={ ( event ) => {
-				setNaturalSize(
-					pick( event.target, [ 'naturalWidth', 'naturalHeight' ] )
-				);
+				setNaturalSize( {
+					naturalWidth: event.target.naturalWidth,
+					naturalHeight: event.target.naturalHeight,
+				} );
 			} }
 		/>
 	);
