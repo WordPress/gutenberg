@@ -18,17 +18,12 @@ jobs:
               with:
                   ref: trunk
 
-            - name: Use desired version of NodeJS
-              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
-              with:
-                  node-version-file: '.nvmrc'
-                  cache: npm
+            - name: Setup Node and install dependencies
+              uses: ./.github/setup-node
 
-            - name: Npm install and build
+            - name: Npm build
               # TODO: We don't have to build the entire project, just the action itself.
-              run: |
-                  npm ci
-                  npm run build:packages
+              run: npm run build:packages
 
             - name: Report flaky tests
               uses: ./packages/report-flaky-tests

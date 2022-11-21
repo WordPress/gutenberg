@@ -31,19 +31,16 @@ jobs:
         steps:
             - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
 
-            - name: Use desired version of NodeJS
-              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+            - name: Setup Node and install dependencies
+              uses: ./.github/setup-node
               with:
                   node-version: ${{ matrix.node }}
-                  cache: npm
 
-            - name: Npm install and build
+            - name: Npm build
               # It's not necessary to run the full build, since Jest can interpret
               # source files with `babel-jest`. Some packages have their own custom
               # build tasks, however. These must be run.
-              run: |
-                  npm ci
-                  npx lerna run build
+              run: npx lerna run build
 
             - name: Running the tests
               run: npm run test:unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
@@ -59,16 +56,11 @@ jobs:
         steps:
             - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
 
-            - name: Use desired version of NodeJS
-              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
-              with:
-                  node-version-file: '.nvmrc'
-                  cache: npm
+            - name: Setup Node and install dependencies
+              uses: ./.github/setup-node
 
-            - name: Npm install and build
-              run: |
-                  npm ci
-                  npm run build
+            - name: Npm build
+              run: npm run build
 
             - name: Install WordPress
               run: |
@@ -93,19 +85,14 @@ jobs:
         steps:
             - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
 
-            - name: Use desired version of NodeJS
-              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
-              with:
-                  node-version-file: '.nvmrc'
-                  cache: npm
+            - name: Setup Node and install dependencies
+              uses: ./.github/setup-node
 
-            - name: Npm install and build
+            - name: Npm build
               # It's not necessary to run the full build, since Jest can interpret
               # source files with `babel-jest`. Some packages have their own custom
               # build tasks, however. These must be run.
-              run: |
-                  npm ci
-                  npx lerna run build
+              run: npx lerna run build
 
             - name: Running the tests
               run: npm run native test -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"

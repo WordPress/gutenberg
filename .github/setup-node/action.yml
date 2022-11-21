@@ -1,0 +1,56 @@
+name: 'Setup Node'
+description: 'Setup node and install dependencies with caching support'
+inputs:
+    node-version:
+        description: 'Optional node version to pass to setup-node'
+        required: false
+        type: string
+
+    should-rebuild:
+        description: 'Whether to rebuild the dependencies after --ignore-scripts'
+        default: false
+        required: false
+        type: boolean
+
+runs:
+    using: 'composite'
+    steps:
+        - name: Use desired version of NodeJS from input
+          if: ${{ inputs.node-version != '' }}
+          uses: actions/setup-node@v3
+          with:
+              node-version: ${{ inputs.node-version }}
+              cache: npm
+
+        - name: Use desired version of NodeJS from .nvmrc
+          if: ${{ inputs.node-version == '' }}
+          uses: actions/setup-node@v3
+          with:
+              node-version-file: '.nvmrc'
+              cache: npm
+
+        - name: Get the node version
+          id: node-version
+          run: echo "NODE_VERSION=$(node -v)" >> $GITHUB_OUTPUT
+          shell: bash
+
+        - name: Cache node_modules
+          id: cache-node_modules
+          uses: actions/cache@v3
+          with:
+              path: '**/node_modules'
+              key: node_modules-${{ runner.os }}-${{ steps.node-version.outputs.NODE_VERSION }}-${{ hashFiles('package-lock.json') }}
+
+        - name: Npm install
+          if: ${{ steps.cache-node_modules.outputs.cache-hit != 'true' }}
+          run: npm ci --ignore-scripts
+          shell: bash
+
+        - name: Rebuild dependencies
+          if: ${{ inputs.should-rebuild == 'true' }}
+          run: npm rebuild
+          shell: bash
+
+        - name: Post-install
+          run: npm run postinstall
+          shell: bash
