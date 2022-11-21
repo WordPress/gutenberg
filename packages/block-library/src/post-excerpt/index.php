@@ -19,7 +19,7 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	}
 
 	/*
-	* The purpose of the excerpt length setting is to limit the length of both 
+	* The purpose of the excerpt length setting is to limit the length of both
 	* autmatically generated and user-created excerpts.
 	* Because the excerpt_length filter only applies to auto generated excerpts,
 	* wp_trim_words is used instead.

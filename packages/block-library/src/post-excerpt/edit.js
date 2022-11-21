@@ -17,7 +17,8 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { PanelBody, ToggleControl, RangeControl } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { sprintf, __, _x } from '@wordpress/i18n';
+import { count as wordCount } from '@wordpress/wordcount';
 
 /**
  * Internal dependencies
@@ -100,6 +101,14 @@ export default function PostExcerptEditor( {
 		'is-inline': ! showMoreOnNewLine,
 	} );
 
+	/*
+	 * translators: If your word count is based on single characters (e.g. East Asian characters),
+	 * enter 'characters_excluding_spaces' or 'characters_including_spaces'. Otherwise, enter 'words'.
+	 * Do not translate into your own language.
+	 */
+	const wordCountType = _x( 'words', 'Word count type. Do not translate!' );
+	const currentWordCount = wordCount( rawExcerpt, wordCountType );
+
 	const excerptContent = isEditable ? (
 		<RichText
 			className={ excerptClassName }
@@ -166,6 +175,20 @@ export default function PostExcerptEditor( {
 				) : (
 					readMoreLink
 				) }
+				{ isSelected &&
+					excerptLength &&
+					currentWordCount > excerptLength && (
+						<Warning>
+							{ sprintf(
+								/* translators: 1: Number of words entered, 2: Number of words allowed. */
+								__(
+									'The custom excerpt uses %1$s of %2$s words.'
+								),
+								currentWordCount,
+								excerptLength
+							) }
+						</Warning>
+					) }
 			</div>
 		</>
 	);
