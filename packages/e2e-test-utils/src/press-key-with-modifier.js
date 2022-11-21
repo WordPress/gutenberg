@@ -125,16 +125,18 @@ async function emulateClipboard( type ) {
 		}
 
 		const { anchorNode } = selection;
+		let anchorElement;
 
 		if ( ! anchorNode ) {
-			return;
+			anchorElement = document.activeElement;
+		} else {
+			anchorElement =
+				anchorNode.nodeType === anchorNode.ELEMENT_NODE
+					? anchorNode
+					: anchorNode.parentElement;
+			anchorElement =
+				anchorElement.closest( '[contenteditable]' ) || anchorElement;
 		}
-
-		const anchorElement = (
-			anchorNode.nodeType === anchorNode.ELEMENT_NODE
-				? anchorNode
-				: anchorNode.parentElement
-		 ).closest( '[contenteditable]' );
 
 		if ( ! anchorElement ) {
 			return;
