@@ -40,7 +40,7 @@ export default function PageListEdit( {
 	attributes,
 	setAttributes,
 } ) {
-	const { rootPageID } = attributes;
+	const { parentPageID } = attributes;
 	const { pagesByParentId, totalPages, hasResolvedPages } = usePageData();
 
 	const isNavigationChild = 'showSubmenuIcon' in context;
@@ -99,7 +99,7 @@ export default function PageListEdit( {
 				<ul { ...blockProps }>
 					<PageItems
 						context={ context }
-						parentId={ rootPageID }
+						parentId={ parentPageID }
 						pagesByParentId={ pagesByParentId }
 					/>
 				</ul>
@@ -107,7 +107,7 @@ export default function PageListEdit( {
 		}
 	};
 
-	const useRootOptions = () => {
+	const useParentOptions = () => {
 		const [ pages ] = useGetPages();
 		return pages?.reduce( ( accumulator, page ) => {
 			accumulator.push( {
@@ -124,14 +124,14 @@ export default function PageListEdit( {
 				<PanelBody>
 					<ComboboxControl
 						className="editor-page-attributes__parent"
-						label={ __( 'Root page' ) }
-						value={ rootPageID }
-						options={ useRootOptions() }
+						label={ __( 'Parent page' ) }
+						value={ parentPageID }
+						options={ useParentOptions() }
 						onChange={ ( value ) =>
-							setAttributes( { rootPageID: value ?? 0 } )
+							setAttributes( { parentPageID: value ?? 0 } )
 						}
 						help={ __(
-							'Setting a page here will restrict the block to show only the children of that'
+							'Choose a page to show only its subpages.'
 						) }
 					/>
 				</PanelBody>

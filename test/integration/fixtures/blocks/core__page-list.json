@@ -2,7 +2,9 @@
 	{
 		"name": "core/page-list",
 		"isValid": true,
-		"attributes": {},
+		"attributes": {
+			"rootPageID": 0
+		},
 		"innerBlocks": []
 	}
 ]

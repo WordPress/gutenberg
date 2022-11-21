@@ -252,7 +252,7 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	static $block_id = 0;
 	++$block_id;
 
-	$rootPageID = $attributes['rootPageID'];
+	$parentPageID = $attributes['parentPageID'];
 
 	$all_pages = get_pages(
 		array(
@@ -308,9 +308,9 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 
 	$nested_pages = block_core_page_list_nest_pages( $top_level_pages, $pages_with_children );
 
-	if( $rootPageID !== 0 ) {
+	if( $parentPageID !== 0 ) {
 		$nested_pages = block_core_page_list_nest_pages(
-			$pages_with_children[ $rootPageID ],
+			$pages_with_children[ $parentPageID ],
 			$pages_with_children
 		);
 	}
