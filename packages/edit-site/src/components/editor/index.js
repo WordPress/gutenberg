@@ -226,30 +226,36 @@ export default function Editor() {
 									)
 								}
 								actions={
-									<>
-										{ isSaveViewOpen ? (
-											<EntitiesSavedStates
-												close={ () =>
-													setIsSaveViewOpened( false )
-												}
-											/>
-										) : (
-											<div className="edit-site-editor__toggle-save-panel">
-												<Button
-													variant="secondary"
-													className="edit-site-editor__toggle-save-panel-button"
-													onClick={ () =>
+									isEditMode && (
+										<>
+											{ isSaveViewOpen ? (
+												<EntitiesSavedStates
+													close={ () =>
 														setIsSaveViewOpened(
-															true
+															false
 														)
 													}
-													aria-expanded={ false }
-												>
-													{ __( 'Open save panel' ) }
-												</Button>
-											</div>
-										) }
-									</>
+												/>
+											) : (
+												<div className="edit-site-editor__toggle-save-panel">
+													<Button
+														variant="secondary"
+														className="edit-site-editor__toggle-save-panel-button"
+														onClick={ () =>
+															setIsSaveViewOpened(
+																true
+															)
+														}
+														aria-expanded={ false }
+													>
+														{ __(
+															'Open save panel'
+														) }
+													</Button>
+												</div>
+											) }
+										</>
+									)
 								}
 								footer={
 									showBlockBreakcrumb && (
