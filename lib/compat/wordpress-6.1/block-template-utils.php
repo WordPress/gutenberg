@@ -175,7 +175,6 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 	 * }
 	 * @param array $template_type wp_template or wp_template_part.
 	 */
-	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 	return apply_filters( 'get_block_templates', $query_result, $query, $template_type );
 }
 
@@ -200,7 +199,6 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	 * @param string $id Template unique identifier (example: theme_slug//template_slug).
 	 * @param array  $template_type wp_template or wp_template_part.
 	 */
-	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 	$block_template = apply_filters( 'pre_get_block_template', null, $id, $template_type );
 	if ( ! is_null( $block_template ) ) {
 		return $block_template;
@@ -247,7 +245,6 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	 * @param string $id Template unique identifier (example: theme_slug//template_slug).
 	 * @param array  $template_type wp_template or wp_template_part.
 	 */
-	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 	return apply_filters( 'get_block_template', $block_template, $id, $template_type );
 }
 
