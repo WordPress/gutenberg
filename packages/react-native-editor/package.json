@@ -24,7 +24,7 @@
 	},
 	"engines": {
 		"node": ">=12",
-		"npm": ">=6.9"
+		"npm": ">=8"
 	},
 	"main": "src/index.js",
 	"react-native": "src/index",

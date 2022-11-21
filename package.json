@@ -16,7 +16,7 @@
 	},
 	"engines": {
 		"node": ">=14.0.0",
-		"npm": ">=6.9.0 <7"
+		"npm": ">=8.19.2 <9"
 	},
 	"config": {
 		"IS_GUTENBERG_PLUGIN": true
