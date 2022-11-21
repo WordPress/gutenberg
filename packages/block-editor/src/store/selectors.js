@@ -2046,7 +2046,7 @@ export const getInserterItems = createSelector(
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional root client ID of block list.
  *
- * @return {string[]} Array of allowed core block names or `['true']` if all blocks are allowed.
+ * @return {string[]|boolean} Array of allowed core block names or `true` if all blocks are allowed.
  */
 export const __getAllowedCoreBlockNames = createSelector(
 	( state, rootClientId = null ) => {
@@ -2076,7 +2076,7 @@ export const __getAllowedCoreBlockNames = createSelector(
 		// Keep track of the blocks that cannot be inserted based on the provided rootClientId.
 		const allowedBlockNames = allCoreBlockTypes
 			.filter( ( blockType ) =>
-				canInsertBlockTypeUnmemoized( state, blockType, rootClientId )
+				canIncludeBlockTypeInInserter( state, blockType, rootClientId )
 			)
 			.map( ( { name } ) => name );
 		// We need to get all the blocks that cannot be inserted directly, but their parent/ancestor
@@ -2098,7 +2098,7 @@ export const __getAllowedCoreBlockNames = createSelector(
 		if (
 			allowedBlocksWithNestedBlocks.length === allCoreBlockTypes.length
 		) {
-			return [ 'all' ];
+			return true;
 		}
 		allowedBlocksWithNestedBlocks.sort();
 		return allowedBlocksWithNestedBlocks;
