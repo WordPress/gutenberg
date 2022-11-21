@@ -86,7 +86,6 @@
 		<properties>
 			<property name="prefixes" type="array">
 				<element value="gutenberg"/>
-				<element value="wp"/>
 				<element value="_gutenberg"/>
 			</property>
 		</properties>
@@ -97,26 +96,31 @@
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound">
 		<exclude-pattern>lib/compat/*</exclude-pattern>
 		<exclude-pattern>lib/experimental/*</exclude-pattern>
+		<exclude-pattern>bin/generate-gutenberg-php.php</exclude-pattern>
 	</rule>
 
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound">
 		<exclude-pattern>lib/compat/*</exclude-pattern>
 		<exclude-pattern>lib/experimental/*</exclude-pattern>
+		<exclude-pattern>bin/generate-gutenberg-php.php</exclude-pattern>
 	</rule>
 
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.ForbiddenPrefixPassed">
 		<exclude-pattern>lib/compat/*</exclude-pattern>
 		<exclude-pattern>lib/experimental/*</exclude-pattern>
+		<exclude-pattern>bin/generate-gutenberg-php.php</exclude-pattern>
 	</rule>
 
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound">
 		<exclude-pattern>lib/compat/*</exclude-pattern>
 		<exclude-pattern>lib/experimental/*</exclude-pattern>
+		<exclude-pattern>bin/generate-gutenberg-php.php</exclude-pattern>
 	</rule>
 
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound">
 		<exclude-pattern>lib/compat/*</exclude-pattern>
 		<exclude-pattern>lib/experimental/*</exclude-pattern>
+		<exclude-pattern>bin/generate-gutenberg-php.php</exclude-pattern>
 	</rule>
 
 	<!--

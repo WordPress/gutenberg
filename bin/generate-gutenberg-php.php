@@ -7,102 +7,56 @@
  * @package gutenberg-build
  */
 
+$f = fopen( dirname( __DIR__ ) . '/gutenberg.php', 'r' );
+
+$plugin_version = null;
+$inside_defines = false;
+
 /**
  * Prints `define` statements for the production version of `gutenberg.php`
  * (the plugin entry point).
  */
-class Gutenberg_Header_File_Generator {
-	/**
-	 * Resource to a file stream.
-	 *
-	 * @var resource
-	 */
-	private $file;
+function print_production_defines() {
+	global $plugin_version;
 
-	/**
-	 * Gutenberg version.
-	 *
-	 * @var string|null
-	 */
-	private $version;
+	echo "define( 'GUTENBERG_VERSION', '$plugin_version' );\n";
 
-	/**
-	 * Defines if the current line is inside a defines block.
-	 *
-	 * @var bool
-	 */
-	private $inside_defines_block;
+	$git_commit = trim( shell_exec( 'git rev-parse HEAD' ) );
 
-	/**
-	 * Constructor.
-	 *
-	 * @param string $path Absolute file path to gutenberg.php.
-	 */
-	public function __construct( $path ) {
-		$this->file = fopen( $path, 'r' );
+	echo "define( 'GUTENBERG_GIT_COMMIT', '$git_commit' );\n";
+}
 
-		$this->version              = null;
-		$this->inside_defines_block = false;
+while ( true ) {
+	$line = fgets( $f );
+	if ( false === $line ) {
+		break;
 	}
 
-	/**
-	 * Prints the header file.
-	 */
-	public function print_header_file() {
-		while ( true ) {
-			$line = fgets( $this->file );
-			if ( false === $line ) {
-				break;
-			}
-
-			$matches = array();
-
-			if (
-					! $this->version &&
-					preg_match( '@^\s*\*\s*Version:\s*([0-9.]+)@', $line, $matches )
-			) {
-				$this->version = $matches[1];
-			}
-
-			switch ( trim( $line ) ) {
-				case '### BEGIN AUTO-GENERATED DEFINES':
-					$this->inside_defines_block = true;
-					echo $line;
-					$this->print_version();
-					break;
-
-				case '### END AUTO-GENERATED DEFINES':
-					$this->inside_defines_block = false;
-					echo $line;
-					break;
-
-				default:
-					if ( ! $this->inside_defines_block ) {
-						echo $line;
-					}
-					break;
-			}
-		}
+	if (
+		! $plugin_version &&
+		preg_match( '@^\s*\*\s*Version:\s*([0-9.]+)@', $line, $matches )
+	) {
+		$plugin_version = $matches[1];
 	}
 
-	/**
-	 * Prints plugin header.
-	 */
-	private function print_version() {
-		echo "define( 'GUTENBERG_VERSION', '{$this->version}' );\n";
+	switch ( trim( $line ) ) {
+		case '### BEGIN AUTO-GENERATED DEFINES':
+			$inside_defines = true;
+			echo $line;
+			print_production_defines();
+			break;
 
-		$git_commit = trim( shell_exec( 'git rev-parse HEAD' ) );
+		case '### END AUTO-GENERATED DEFINES':
+			$inside_defines = false;
+			echo $line;
+			break;
 
-		echo "define( 'GUTENBERG_GIT_COMMIT', '{$git_commit}' );\n";
-	}
-
-	/**
-	 * Destructor.
-	 */
-	public function __destruct() {
-		fclose( $this->file );
+		default:
+			if ( ! $inside_defines ) {
+				echo $line;
+			}
+			break;
 	}
 }
 
-$gutenberg_header_generator = new Gutenberg_Header_File_Generator( dirname( __DIR__ ) . '/gutenberg.php' );
-$gutenberg_header_generator->print_header_file();
+fclose( $f );
