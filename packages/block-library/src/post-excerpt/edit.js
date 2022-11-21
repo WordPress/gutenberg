@@ -112,14 +112,7 @@ export default function PostExcerptEditor( {
 					.join( ' ' ) ||
 				( isSelected ? '' : __( 'No post excerpt found' ) )
 			}
-			onChange={
-				( ( value ) => {
-					setAttributes( {
-						excerptLength: value.split( ' ' ).length,
-					} );
-				},
-				setExcerpt )
-			}
+			onChange={ setExcerpt }
 			tagName="p"
 		/>
 	) : (
