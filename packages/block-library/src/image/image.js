@@ -135,13 +135,16 @@ export default function Image( {
 				} = select( blockEditorStore );
 
 				const rootClientId = getBlockRootClientId( clientId );
-				const blockEditorSettings = getSettings();
-				const settings = {
-					imageEditing: blockEditorSettings.imageEditing,
-					imageSizes: blockEditorSettings.imageSizes,
-					maxWidth: blockEditorSettings.maxWidth,
-					mediaUpload: blockEditorSettings.mediaUpload,
-				};
+				const settings = Object.fromEntries(
+					Object.entries( getSettings() ).filter( ( [ key ] ) =>
+						[
+							'imageEditing',
+							'imageSizes',
+							'maxWidth',
+							'mediaUpload',
+						].includes( key )
+					)
+				);
 
 				return {
 					...settings,

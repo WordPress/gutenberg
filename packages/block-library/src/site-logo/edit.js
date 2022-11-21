@@ -84,11 +84,13 @@ const SiteLogo = ( {
 			'root',
 			'__unstableBase'
 		);
-		const blockEditorSettings = getSettings();
 		return {
 			title: siteEntities?.name,
-			imageEditing: blockEditorSettings.imageEditing,
-			maxWidth: blockEditorSettings.maxWidth,
+			...Object.fromEntries(
+				Object.entries( getSettings() ).filter( ( [ key ] ) =>
+					[ 'imageEditing', 'maxWidth' ].includes( key )
+				)
+			),
 		};
 	}, [] );
 
@@ -121,10 +123,13 @@ const SiteLogo = ( {
 			src={ logoUrl }
 			alt={ alt }
 			onLoad={ ( event ) => {
-				setNaturalSize( {
-					naturalWidth: event.target.naturalWidth,
-					naturalHeight: event.target.naturalHeight,
-				} );
+				setNaturalSize(
+					Object.fromEntries(
+						Object.entries( event.target ).filter( ( [ key ] ) =>
+							[ 'naturalWidth', 'naturalHeight' ].includes( key )
+						)
+					)
+				);
 			} }
 		/>
 	);

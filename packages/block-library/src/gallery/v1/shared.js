@@ -4,8 +4,11 @@
 import { get } from 'lodash';
 
 export const pickRelevantMediaFiles = ( image, sizeSlug = 'large' ) => {
-	const { alt, id, link, caption } = image;
-	const imageProps = { alt, id, link, caption };
+	const imageProps = Object.fromEntries(
+		Object.entries( image ).filter( ( [ key ] ) =>
+			[ 'alt', 'id', 'link', 'caption' ].includes( key )
+		)
+	);
 
 	imageProps.url =
 		get( image, [ 'sizes', sizeSlug, 'url' ] ) ||
