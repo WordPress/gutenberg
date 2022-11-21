@@ -523,6 +523,7 @@ export const switchEditorMode =
 export const __unstableSetCanvasMode =
 	( mode ) =>
 	( { registry, dispatch } ) => {
+		registry.dispatch( blockEditorStore ).__unstableSetEditorMode( 'edit' );
 		dispatch( {
 			type: 'SET_CANVAS_MODE',
 			mode,
