@@ -104,6 +104,7 @@ const MenuInspectorControls = ( {
 							<p>{ __( 'Select or create a menu' ) }</p>
 						) : (
 							<OffCanvasEditor
+								clientId={ clientId }
 								blocks={ innerBlocks }
 								isExpanded={ true }
 								selectBlockInCanvas={ false }

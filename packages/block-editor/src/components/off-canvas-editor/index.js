@@ -28,6 +28,7 @@ import useListViewClientIds from './use-list-view-client-ids';
 import useListViewDropZone from './use-list-view-drop-zone';
 import useListViewExpandSelectedItem from './use-list-view-expand-selected-item';
 import { store as blockEditorStore } from '../../store';
+import Inserter from '../inserter';
 
 const expanded = ( state, action ) => {
 	if ( Array.isArray( action.clientIds ) ) {
@@ -56,6 +57,7 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
  * @param {boolean} props.showBlockMovers     Flag to enable block movers
  * @param {boolean} props.isExpanded          Flag to determine whether nested levels are expanded by default.
  * @param {boolean} props.selectBlockInCanvas Flag to determine whether the list view should be a block selection mechanism,.
+ * @param {string}  props.clientId            Client ID of the root navigation block.
  * @param {Object}  ref                       Forwarded ref
  */
 function __ExperimentalOffCanvasEditor(
@@ -65,6 +67,7 @@ function __ExperimentalOffCanvasEditor(
 		showBlockMovers = false,
 		isExpanded = false,
 		selectBlockInCanvas = true,
+		clientId,
 	},
 	ref
 ) {
@@ -104,9 +107,9 @@ function __ExperimentalOffCanvasEditor(
 		setExpandedState,
 	} );
 	const selectEditorBlock = useCallback(
-		( event, clientId ) => {
-			updateBlockSelection( event, clientId );
-			setSelectedTreeId( clientId );
+		( event, _clientId ) => {
+			updateBlockSelection( event, _clientId );
+			setSelectedTreeId( _clientId );
 		},
 		[ setSelectedTreeId, updateBlockSelection ]
 	);
@@ -128,20 +131,20 @@ function __ExperimentalOffCanvasEditor(
 	);
 
 	const expand = useCallback(
-		( clientId ) => {
-			if ( ! clientId ) {
+		( _clientId ) => {
+			if ( ! _clientId ) {
 				return;
 			}
-			setExpandedState( { type: 'expand', clientIds: [ clientId ] } );
+			setExpandedState( { type: 'expand', clientIds: [ _clientId ] } );
 		},
 		[ setExpandedState ]
 	);
 	const collapse = useCallback(
-		( clientId ) => {
-			if ( ! clientId ) {
+		( _clientId ) => {
+			if ( ! _clientId ) {
 				return;
 			}
-			setExpandedState( { type: 'collapse', clientIds: [ clientId ] } );
+			setExpandedState( { type: 'collapse', clientIds: [ _clientId ] } );
 		},
 		[ setExpandedState ]
 	);
@@ -208,9 +211,48 @@ function __ExperimentalOffCanvasEditor(
 						shouldShowInnerBlocks={ shouldShowInnerBlocks }
 						selectBlockInCanvas={ selectBlockInCanvas }
 					/>
+					<tr>
+						<td>
+							<OffCanvasEditorAppender
+								rootClientId={ clientId }
+							/>
+						</td>
+					</tr>
 				</ListViewContext.Provider>
 			</TreeGrid>
 		</AsyncModeProvider>
 	);
 }
+
+function OffCanvasEditorAppender( { rootClientId } ) {
+	const { hideInserter } = useSelect(
+		( select ) => {
+			const { getTemplateLock, __unstableGetEditorMode } =
+				select( blockEditorStore );
+
+			return {
+				hideInserter:
+					!! getTemplateLock( rootClientId ) ||
+					__unstableGetEditorMode() === 'zoom-out',
+			};
+		},
+		[ rootClientId ]
+	);
+
+	if ( hideInserter ) {
+		return null;
+	}
+
+	return (
+		<div className="offcanvas-editor__appender">
+			<Inserter
+				rootClientId={ rootClientId }
+				position="bottom right"
+				isAppender
+				__experimentalIsQuick
+			/>
+		</div>
+	);
+}
+
 export default forwardRef( __ExperimentalOffCanvasEditor );

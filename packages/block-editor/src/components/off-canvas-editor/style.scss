@@ -1,17 +1,15 @@
-.offcanvas-editor__list-appender__toggle {
-	flex-direction: row;
-	justify-content: flex-start;
-	border: 0;
-	box-shadow: none;
-	margin-left: 24px;
-	margin-top: $grid-unit-10; // List View block SVG icon size.
-
-	&.components-button.components-button {
-		padding: 0;
-	}
+.offcanvas-editor__appender .block-editor-inserter__toggle {
+	background-color: #1e1e1e;
+	color: #fff;
+	margin: $grid-unit-10 0 0 28px;
+	border-radius: 2px;
+	height: 24px;
+	min-width: 24px;
+	padding: 0;
 
 	&:hover,
 	&:focus {
-		box-shadow: none;
+		background: var(--wp-admin-theme-color);
+		color: #fff;
 	}
 }
