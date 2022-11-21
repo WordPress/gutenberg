@@ -82,11 +82,6 @@ export function updateSelectedCell( state, selection, updateCell ) {
 		selection;
 
 	return mapValues( tableSections, ( section, sectionName ) => {
-		// Bail early if the table section is empty.
-		if ( isEmptyTableSection( section ) ) {
-			return section;
-		}
-
 		if ( selectionSectionName && selectionSectionName !== sectionName ) {
 			return section;
 		}
