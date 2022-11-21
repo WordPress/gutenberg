@@ -14,7 +14,7 @@ export function defaultColumnsNumber( imageCount ) {
 
 export const pickRelevantMediaFiles = ( image, sizeSlug = 'large' ) => {
 	const imageProps = Object.fromEntries(
-		Object.entries( image ).filter( ( [ key ] ) =>
+		Object.entries( image ?? {} ).filter( ( [ key ] ) =>
 			[ 'alt', 'id', 'link' ].includes( key )
 		)
 	);

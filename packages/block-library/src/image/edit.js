@@ -59,7 +59,7 @@ import {
 
 export const pickRelevantMediaFiles = ( image, size ) => {
 	const imageProps = Object.fromEntries(
-		Object.entries( image ).filter( ( [ key ] ) =>
+		Object.entries( image ?? {} ).filter( ( [ key ] ) =>
 			[ 'alt', 'id', 'link', 'caption' ].includes( key )
 		)
 	);

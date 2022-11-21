@@ -5,7 +5,7 @@ import { get } from 'lodash';
 
 export const pickRelevantMediaFiles = ( image, sizeSlug = 'large' ) => {
 	const imageProps = Object.fromEntries(
-		Object.entries( image ).filter( ( [ key ] ) =>
+		Object.entries( image ?? {} ).filter( ( [ key ] ) =>
 			[ 'alt', 'id', 'link', 'caption' ].includes( key )
 		)
 	);
