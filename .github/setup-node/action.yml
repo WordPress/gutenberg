@@ -47,6 +47,8 @@ runs:
           shell: bash
 
         - name: Rebuild dependencies
+          # Comparing against strings is necessary because of a known bug in composite actions.
+          # See https://github.com/actions/runner/issues/1483#issuecomment-1279933184
           if: ${{ inputs.should-rebuild == 'true' }}
           run: npm rebuild
           shell: bash
