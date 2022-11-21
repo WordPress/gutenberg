@@ -10,6 +10,7 @@
  *
  * @since 6.3.0
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound
 function the_gutenberg_experiments() {
 	?>
 	<div
