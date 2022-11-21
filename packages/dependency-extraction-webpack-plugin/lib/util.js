@@ -1,5 +1,5 @@
 const WORDPRESS_NAMESPACE = '@wordpress/';
-const BUNDLED_PACKAGES = [ '@wordpress/icons', '@wordpress/interface' ];
+const EXCLUDED_EXTERNALS = [ '@wordpress/icons', '@wordpress/interface' ];
 
 /**
  * Default request to global transformation
@@ -89,7 +89,7 @@ function camelCaseDash( string ) {
 }
 
 module.exports = {
-	BUNDLED_PACKAGES,
+	EXCLUDED_EXTERNALS,
 	camelCaseDash,
 	defaultRequestToExternal,
 	defaultRequestToHandle,

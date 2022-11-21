@@ -4,9 +4,9 @@
 const DependencyExtractionWebpackPlugin = require( '../lib/index' );
 
 describe( 'DependencyExtractionWebpackPlugin', () => {
-	test( 'should have .bundledPackages static property', () => {
+	test( 'should have .excludedExternals static property', () => {
 		expect( DependencyExtractionWebpackPlugin ).toHaveProperty(
-			'bundledPackages',
+			'excludedExternals',
 			[ '@wordpress/icons', '@wordpress/interface' ]
 		);
 	} );

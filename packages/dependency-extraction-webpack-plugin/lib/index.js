@@ -13,7 +13,7 @@ const { createHash } = webpack.util;
  * Internal dependencies
  */
 const {
-	BUNDLED_PACKAGES,
+	EXCLUDED_EXTERNALS,
 	defaultRequestToExternal,
 	defaultRequestToHandle,
 } = require( './util' );
@@ -24,7 +24,7 @@ class DependencyExtractionWebpackPlugin {
 	constructor( options ) {
 		this.options = Object.assign(
 			{
-				bundledPackages: this.constructor.bundledPackages,
+				excludedExternals: this.constructor.excludedExternals,
 				combineAssets: false,
 				combinedOutputFile: null,
 				externalizedReport: false,
@@ -55,7 +55,7 @@ class DependencyExtractionWebpackPlugin {
 	}
 
 	externalizeWpDeps( _context, request, callback ) {
-		if ( this.options.bundledPackages.includes( request ) ) {
+		if ( this.options.excludedExternals.includes( request ) ) {
 			return callback();
 		}
 		let externalRequest;
@@ -286,6 +286,6 @@ class DependencyExtractionWebpackPlugin {
 /**
  * Set of packages to be bundled regardless of `requestToExternal` result.
  */
-DependencyExtractionWebpackPlugin.bundledPackages = BUNDLED_PACKAGES;
+DependencyExtractionWebpackPlugin.excludedExternals = EXCLUDED_EXTERNALS;
 
 module.exports = DependencyExtractionWebpackPlugin;

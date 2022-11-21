@@ -9,7 +9,7 @@ module.exports = {
 	},
 	plugins: [
 		new DependencyExtractionWebpackPlugin( {
-			bundledPackages: [ 'lodash' ],
+			excludedExternals: [ 'lodash' ],
 		} ),
 	],
 };
