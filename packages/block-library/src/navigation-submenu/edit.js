@@ -546,7 +546,7 @@ export default function NavigationSubmenuEdit( {
 		if ( ! hasChildren ) {
 			transformToLink();
 		}
-	} );
+	}, [ hasChildren ] );
 
 	const canConvertToLink =
 		! selectedBlockHasChildren || onlyDescendantIsEmptyLink;

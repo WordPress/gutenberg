@@ -543,11 +543,14 @@ export default function NavigationLinkEdit( {
 		if ( ! url ) {
 			setIsLinkOpen( true );
 		}
+	}, [ url ] );
+
+	useEffect( () => {
 		// If block has inner blocks, transform to Submenu.
 		if ( hasChildren ) {
 			transformToSubmenu();
 		}
-	} );
+	}, [ hasChildren ] );
 
 	/**
 	 * The hook shouldn't be necessary but due to a focus loss happening
