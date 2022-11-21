@@ -29,6 +29,7 @@ import { requestPreview } from '@wordpress/react-native-bridge';
  */
 import * as paragraph from '../../paragraph';
 import * as embed from '..';
+import { WebView } from 'react-native-webview';
 
 // Override modal mock to prevent unmounting it when is not visible.
 // This is required to be able to trigger onClose and onDismiss events when
@@ -266,6 +267,11 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
+			// Wait until the WebView with the rich preview appears
+			await waitFor( () => editor.UNSAFE_getByType( WebView ) );
+			// Wait until responsiveness settings appear, driven by `theme_supports.responsive-embeds`
+			await editor.findByText( 'Media settings' );
+
 			const blockSettingsModal = await editor.findByTestId(
 				'block-settings-modal'
 			);
@@ -298,6 +304,9 @@ describe( 'Embed block', () => {
 			// Dismiss the edit URL modal.
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
+
+			await waitFor( () => editor.UNSAFE_getByType( WebView ) );
+			await editor.findByText( 'Media settings' );
 
 			const blockSettingsModal = await editor.findByTestId(
 				'block-settings-modal'
@@ -358,6 +367,9 @@ describe( 'Embed block', () => {
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
 
+			await waitFor( () => editor.UNSAFE_getByType( WebView ) );
+			await editor.findByText( 'Media settings' );
+
 			const blockSettingsModal = await editor.findByTestId(
 				'block-settings-modal'
 			);
@@ -393,6 +405,9 @@ describe( 'Embed block', () => {
 			// Dismiss the edit URL modal.
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
+
+			await waitFor( () => editor.UNSAFE_getByType( WebView ) );
+			await editor.findByText( 'Media settings' );
 
 			const blockSettingsModal = await editor.findByTestId(
 				'block-settings-modal'
@@ -464,6 +479,9 @@ describe( 'Embed block', () => {
 			// Dismiss the Block Settings modal.
 			fireEvent( blockSettingsModal, 'backdropPress' );
 			fireEvent( blockSettingsModal, MODAL_DISMISS_EVENT );
+
+			await waitFor( () => editor.UNSAFE_getByType( WebView ) );
+			await editor.findByText( 'Media settings' );
 
 			// Get YouTube link field.
 			const youtubeLinkField = await within(
@@ -697,9 +715,14 @@ describe( 'Embed block', () => {
 				RICH_TEXT_EMBED_HTML
 			);
 
+			await editor.findByText( 'Unable to embed media' );
+
 			// Retry request.
 			fireEvent.press( editor.getByText( 'More options' ) );
 			fireEvent.press( editor.getByText( 'Retry' ) );
+
+			await waitFor( () => editor.UNSAFE_getByType( WebView ) );
+			await editor.findByText( 'Media settings' );
 
 			const blockSettingsModal = await editor.findByTestId(
 				'block-settings-modal'
@@ -782,6 +805,8 @@ describe( 'Embed block', () => {
 			);
 			fireEvent( embedEditURLModal, 'backdropPress' );
 			fireEvent( embedEditURLModal, MODAL_DISMISS_EVENT );
+
+			await waitFor( () => editor.UNSAFE_getByType( WebView ) );
 
 			const blockSettingsModal = await editor.findByTestId(
 				'block-settings-modal'
@@ -879,6 +904,10 @@ describe( 'Embed block', () => {
 			);
 
 			expect( embedBlock ).toBeDefined();
+
+			await waitFor( () => editor.UNSAFE_getByType( WebView ) );
+			await editor.findByText( 'Media settings' );
+
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 
