@@ -35,7 +35,7 @@ export default function TabPanel( {
 	children,
 	tabs,
 	initialTabName,
-	orientation = 'vertical',
+	orientation = 'horizontal',
 	activeClass = 'is-active',
 	onSelect = noop,
 } ) {
