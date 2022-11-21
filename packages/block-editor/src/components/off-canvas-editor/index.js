@@ -28,6 +28,8 @@ import useListViewClientIds from './use-list-view-client-ids';
 import useListViewDropZone from './use-list-view-drop-zone';
 import useListViewExpandSelectedItem from './use-list-view-expand-selected-item';
 import { store as blockEditorStore } from '../../store';
+import BlockListAppender from '../block-list-appender';
+import ButtonBlockAppender from '../button-block-appender';
 
 const expanded = ( state, action ) => {
 	if ( Array.isArray( action.clientIds ) ) {
@@ -52,6 +54,7 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
  *
  * @param {Object}  props                     Components props.
  * @param {string}  props.id                  An HTML element id for the root element of ListView.
+ * @param {string}  props.clientId            Client ID of the root navigation block.
  * @param {Array}   props.blocks              Custom subset of block client IDs to be used instead of the default hierarchy.
  * @param {boolean} props.showBlockMovers     Flag to enable block movers
  * @param {boolean} props.isExpanded          Flag to determine whether nested levels are expanded by default.
@@ -61,6 +64,7 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
 function __ExperimentalOffCanvasEditor(
 	{
 		id,
+		clientId,
 		blocks,
 		showBlockMovers = false,
 		isExpanded = false,
@@ -209,6 +213,13 @@ function __ExperimentalOffCanvasEditor(
 						selectBlockInCanvas={ selectBlockInCanvas }
 					/>
 				</ListViewContext.Provider>
+				<tr>
+					<BlockListAppender
+						tagName="td"
+						rootClientId={ clientId }
+						renderAppender={ ButtonBlockAppender }
+					/>
+				</tr>
 			</TreeGrid>
 		</AsyncModeProvider>
 	);

@@ -197,9 +197,6 @@ function ListViewBranch( props ) {
 								selectBlockInCanvas={ selectBlockInCanvas }
 							/>
 						) }
-						{ clientId && (
-							<ButtonBlockAppender rootClientId={ clientId } />
-						) }
 					</AsyncModeProvider>
 				);
 			} ) }
