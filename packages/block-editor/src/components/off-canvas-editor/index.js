@@ -188,44 +188,46 @@ function __ExperimentalOffCanvasEditor(
 
 	return (
 		<AsyncModeProvider value={ true }>
-			<ListViewDropIndicator
-				listViewRef={ elementRef }
-				blockDropTarget={ blockDropTarget }
-			/>
-			<TreeGrid
-				id={ id }
-				className="block-editor-list-view-tree"
-				aria-label={ __( 'Block navigation structure' ) }
-				ref={ treeGridRef }
-				onCollapseRow={ collapseRow }
-				onExpandRow={ expandRow }
-				onFocusRow={ focusRow }
-				applicationAriaLabel={ __( 'Block navigation structure' ) }
-			>
-				<ListViewContext.Provider value={ contextValue }>
-					<ListViewBranch
-						blocks={ clientIdsTree }
-						selectBlock={ selectEditorBlock }
-						showBlockMovers={ showBlockMovers }
-						fixedListWindow={ fixedListWindow }
-						selectedClientIds={ selectedClientIds }
-						isExpanded={ isExpanded }
-						shouldShowInnerBlocks={ shouldShowInnerBlocks }
-						selectBlockInCanvas={ selectBlockInCanvas }
-					/>
-				</ListViewContext.Provider>
-				<tr>
-					<BlockListAppender
-						tagName="td"
-						rootClientId={ clientId }
-						renderAppender={ () => (
-							<OffCanvasEditorAppender
-								rootClientId={ clientId }
-							/>
-						) }
-					/>
-				</tr>
-			</TreeGrid>
+			<div className="offcanvas-editor">
+				<ListViewDropIndicator
+					listViewRef={ elementRef }
+					blockDropTarget={ blockDropTarget }
+				/>
+				<TreeGrid
+					id={ id }
+					className="block-editor-list-view-tree"
+					aria-label={ __( 'Block navigation structure' ) }
+					ref={ treeGridRef }
+					onCollapseRow={ collapseRow }
+					onExpandRow={ expandRow }
+					onFocusRow={ focusRow }
+					applicationAriaLabel={ __( 'Block navigation structure' ) }
+				>
+					<ListViewContext.Provider value={ contextValue }>
+						<ListViewBranch
+							blocks={ clientIdsTree }
+							selectBlock={ selectEditorBlock }
+							showBlockMovers={ showBlockMovers }
+							fixedListWindow={ fixedListWindow }
+							selectedClientIds={ selectedClientIds }
+							isExpanded={ isExpanded }
+							shouldShowInnerBlocks={ shouldShowInnerBlocks }
+							selectBlockInCanvas={ selectBlockInCanvas }
+						/>
+					</ListViewContext.Provider>
+					<tr>
+						<BlockListAppender
+							tagName="td"
+							rootClientId={ clientId }
+							renderAppender={ () => (
+								<OffCanvasEditorAppender
+									rootClientId={ clientId }
+								/>
+							) }
+						/>
+					</tr>
+				</TreeGrid>
+			</div>
 		</AsyncModeProvider>
 	);
 }
@@ -259,7 +261,7 @@ function OffCanvasEditorAppender( { rootClientId } ) {
 	}
 
 	return (
-		<ButtonBlockAppender className="xist-appender__toggle">
+		<ButtonBlockAppender className="offcanvas-editor__list-appender__toggle">
 			{ __( 'Add Menu Item' ) }
 		</ButtonBlockAppender>
 	);
