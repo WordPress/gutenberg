@@ -1024,7 +1024,6 @@
 						"background": {
 							"description": "Sets the `background-color` CSS property.",
 							"oneOf": [
-								{ "type": "string" },
 								{
 									"type": "object",
 									"properties": {
@@ -1034,14 +1033,15 @@
 										}
 									},
 									"additionalProperties": false
-								}
+								},
+								{ "type": "string" }
 							]
 						},
 						"gradient": {
 							"description": "Sets the `background` CSS property.",
 							"oneOf": [
 								{
-									"$ref": "#/definitions/stylesProperties/properties/color/properties/background/properties/oneOf"
+									"$ref": "#/definitions/stylesProperties/properties/color/properties/background/oneOf"
 								}
 							]
 						},
@@ -1049,7 +1049,7 @@
 							"description": "Sets the `color` CSS property.",
 							"oneOf": [
 								{
-									"$ref": "#/definitions/stylesProperties/properties/color/properties/background/properties/oneOf"
+									"$ref": "#/definitions/stylesProperties/properties/color/properties/background/oneOf"
 								}
 							]
 						}
