@@ -276,7 +276,6 @@ function gutenberg_build_query_vars_from_query_block( $block, $page ) {
 	 * @param WP_Block $block Block instance.
 	 * @param int      $page  Current query's page.
 	 */
-	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 	return apply_filters( 'query_loop_block_query_vars', $query, $block, $page );
 }
 

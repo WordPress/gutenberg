@@ -126,7 +126,6 @@ function gutenberg_output_block_nav_menu_item( $item_output, $item, $depth, $arg
 	if ( 'block' === $item->type ) {
 		$item_output = $args->before;
 		/** This filter is documented in wp-includes/post-template.php */
-		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		$item_output .= apply_filters( 'the_content', $item->content );
 		$item_output .= $args->after;
 	}

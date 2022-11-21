@@ -69,7 +69,6 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 	 * }
 	 * @param array $template_type wp_template or wp_template_part.
 	 */
-	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 	$templates = apply_filters( 'pre_get_block_templates', null, $query, $template_type );
 	if ( ! is_null( $templates ) ) {
 		return $templates;
