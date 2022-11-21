@@ -6,7 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/components';
+import {
+	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
 import { Platform, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getBlockSupport } from '@wordpress/blocks';
@@ -210,7 +213,9 @@ export function DimensionsPanel( props ) {
 					</ToolsPanelItem>
 				) }
 				{ ! isChildLayoutDisabled && (
-					<ToolsPanelItem
+					<VStack
+						as={ ToolsPanelItem }
+						spacing={ 2 }
 						hasValue={ () => hasChildLayoutValue( props ) }
 						label={ childLayoutOrientation( parentLayout ) }
 						onDeselect={ () => resetChildLayout( props ) }
@@ -222,7 +227,7 @@ export function DimensionsPanel( props ) {
 						panelId={ props.clientId }
 					>
 						<ChildLayoutEdit { ...props } />
-					</ToolsPanelItem>
+					</VStack>
 				) }
 			</InspectorControls>
 			{ ! isPaddingDisabled && (

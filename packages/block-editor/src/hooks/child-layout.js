@@ -35,7 +35,6 @@ export function ChildLayoutEdit( {
 	return (
 		<>
 			<ToggleGroupControl
-				style={ { marginBottom: '8px' } }
 				label={ childLayoutOrientation( parentLayout ) }
 				value={ selfStretch || 'hug' }
 				onChange={ ( value ) => {
@@ -69,7 +68,7 @@ export function ChildLayoutEdit( {
 			</ToggleGroupControl>
 			{ selfStretch === 'fixed' && (
 				<UnitControl
-					style={ { height: '36px' } }
+					style={ { height: 'auto' } }
 					onChange={ ( value ) => {
 						setAttributes( {
 							style: {
