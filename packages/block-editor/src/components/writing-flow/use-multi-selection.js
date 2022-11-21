@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRefEffect } from '@wordpress/compose';
+import { useEffect, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -39,45 +39,40 @@ export default function useMultiSelection() {
 		isFullSelection,
 	} = useSelect( selector, [] );
 
+	const ref = useRef();
+
 	/**
 	 * When the component updates, and there is multi selection, we need to
 	 * select the entire block contents.
 	 */
-	return useRefEffect(
-		( node ) => {
-			const { ownerDocument } = node;
-			const { defaultView } = ownerDocument;
+	useEffect( () => {
+		// Allow initialPosition to bypass focus behavior. This is useful
+		// for the list view or other areas where we don't want to transfer
+		// focus to the editor canvas.
+		if ( initialPosition === undefined || initialPosition === null ) {
+			return;
+		}
 
-			// Allow initialPosition to bypass focus behavior. This is useful
-			// for the list view or other areas where we don't want to transfer
-			// focus to the editor canvas.
-			if ( initialPosition === undefined || initialPosition === null ) {
-				return;
-			}
+		if ( ! hasMultiSelection || isMultiSelecting ) {
+			return;
+		}
 
-			if ( ! hasMultiSelection || isMultiSelecting ) {
-				return;
-			}
+		const { length } = multiSelectedBlockClientIds;
 
-			const { length } = multiSelectedBlockClientIds;
+		if ( length < 2 ) {
+			return;
+		}
 
-			if ( length < 2 ) {
-				return;
-			}
+		if ( ! isFullSelection ) {
+		}
+	}, [
+		hasMultiSelection,
+		isMultiSelecting,
+		multiSelectedBlockClientIds,
+		selectedBlockClientId,
+		initialPosition,
+		isFullSelection,
+	] );
 
-			if ( ! isFullSelection ) {
-				return;
-			}
-
-			defaultView.getSelection().removeAllRanges();
-		},
-		[
-			hasMultiSelection,
-			isMultiSelecting,
-			multiSelectedBlockClientIds,
-			selectedBlockClientId,
-			initialPosition,
-			isFullSelection,
-		]
-	);
+	return ref;
 }
