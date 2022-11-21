@@ -7,6 +7,15 @@
 			"createTheme": "https://developer.wordpress.org/block-editor/how-to-guides/themes/create-block-theme/",
 			"reference": "https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-json/"
 		},
+		"refComplete": {
+			"type": "object",
+			"properties": {
+				"ref": {
+					"description": "A reference to another property value. e.g. `styles.color.text`",
+					"type": "string"
+				}
+			}
+		},
 		"settingsPropertiesAppearanceTools": {
 			"type": "object",
 			"properties": {
@@ -1025,23 +1034,21 @@
 							"description": "Sets the `background-color` CSS property.",
 							"oneOf": [
 								{
-									"type": "object",
-									"properties": {
-										"ref": {
-											"description": "A reference to another property value. e.g. `styles.color.text`",
-											"type": "string"
-										}
-									},
-									"additionalProperties": false
+									"type": "string"
 								},
-								{ "type": "string" }
+								{
+									"$ref": "#/definitions/refComplete"
+								}
 							]
 						},
 						"gradient": {
 							"description": "Sets the `background` CSS property.",
 							"oneOf": [
 								{
-									"$ref": "#/definitions/stylesProperties/properties/color/properties/background/oneOf"
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
 								}
 							]
 						},
@@ -1049,7 +1056,10 @@
 							"description": "Sets the `color` CSS property.",
 							"oneOf": [
 								{
-									"$ref": "#/definitions/stylesProperties/properties/color/properties/background/oneOf"
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
 								}
 							]
 						}
