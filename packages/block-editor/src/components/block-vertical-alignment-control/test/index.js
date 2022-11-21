@@ -45,7 +45,7 @@ describe( 'BlockVerticalAlignmentUI', () => {
 			advanceTimers: jest.advanceTimersByTime,
 		} );
 
-		render(
+		const { unmount } = render(
 			<BlockVerticalAlignmentUI
 				isToolbar
 				value={ alignment }
@@ -70,6 +70,9 @@ describe( 'BlockVerticalAlignmentUI', () => {
 				name: /^Align \w+$/,
 			} )
 		).toHaveLength( 3 );
+
+		// Cancel running effects, like delayed dropdown menu popover positioning.
+		unmount();
 	} );
 
 	it( 'should call onChange with undefined, when the control is already active', async () => {
