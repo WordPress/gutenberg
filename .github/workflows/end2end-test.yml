@@ -29,16 +29,11 @@ jobs:
         steps:
             - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
 
-            - name: Use desired version of NodeJS
-              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
-              with:
-                  node-version-file: '.nvmrc'
-                  cache: npm
+            - name: Setup Node and install dependencies
+              uses: ./.github/setup-node
 
-            - name: Npm install and build
-              run: |
-                  npm ci
-                  npm run build
+            - name: Npm build
+              run: npm run build
 
             - name: Install WordPress
               run: |
@@ -78,16 +73,11 @@ jobs:
         steps:
             - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
 
-            - name: Use desired version of NodeJS
-              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
-              with:
-                  node-version-file: '.nvmrc'
-                  cache: npm
+            - name: Setup Node and install dependencies
+              uses: ./.github/setup-node
 
-            - name: Npm install and build
-              run: |
-                  npm ci
-                  npm run build
+            - name: Npm build
+              run: npm run build
 
             - name: Install Playwright dependencies
               run: |
@@ -137,19 +127,14 @@ jobs:
                   name: flaky-tests-report
                   path: flaky-tests
 
-            - name: Use desired version of NodeJS
+            - name: Setup Node and install dependencies
               if: ${{ steps.download_artifact.outcome == 'success' }}
-              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
-              with:
-                  node-version-file: '.nvmrc'
-                  cache: npm
+              uses: ./.github/setup-node
 
-            - name: Npm install and build
+            - name: Npm build
               if: ${{ steps.download_artifact.outcome == 'success' }}
               # TODO: We don't have to build the entire project, just the action itself.
-              run: |
-                  npm ci
-                  npm run build:packages
+              run: npm run build:packages
 
             - name: Report flaky tests
               if: ${{ steps.download_artifact.outcome == 'success' }}

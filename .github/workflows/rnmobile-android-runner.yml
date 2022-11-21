@@ -31,13 +31,10 @@ jobs:
                   distribution: 'temurin'
                   java-version: '11'
 
-            - name: Use desired version of NodeJS
-              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
+            - name: Setup Node and install dependencies
+              uses: ./.github/setup-node
               with:
-                  node-version-file: '.nvmrc'
-                  cache: npm
-
-            - run: npm ci
+                  should-rebuild: true
 
             - name: Gradle cache
               uses: gradle/gradle-build-action@3fbe033aaae657f011f88f29be9e65ed26bd29ef # v2.3.3
