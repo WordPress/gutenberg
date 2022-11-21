@@ -6,11 +6,11 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Navigation from '..';
-import NavigationGroup from '../group';
-import NavigationItem from '../item';
-import NavigationMenu from '../menu';
-import { normalizedSearch } from '../utils';
+import Navigation from '../..';
+import NavigationGroup from '../../group';
+import NavigationItem from '../../item';
+import NavigationMenu from '../../menu';
+import { normalizedSearch } from '../../utils';
 
 const searchItems = [
 	{ item: 'foo', title: 'Foo' },

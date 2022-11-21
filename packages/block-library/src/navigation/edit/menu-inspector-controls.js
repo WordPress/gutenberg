@@ -66,9 +66,12 @@ const MenuInspectorControls = ( {
 } ) => {
 	const isOffCanvasNavigationEditorEnabled =
 		window?.__experimentalEnableOffCanvasNavigationEditor === true;
+	const menuControlsSlot = window?.__experimentalEnableBlockInspectorTabs
+		? 'list'
+		: undefined;
 
 	return (
-		<InspectorControls>
+		<InspectorControls __experimentalGroup={ menuControlsSlot }>
 			<PanelBody
 				title={
 					isOffCanvasNavigationEditorEnabled ? null : __( 'Menu' )
