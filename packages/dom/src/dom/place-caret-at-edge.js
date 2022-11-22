@@ -107,21 +107,17 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 		parentEditable.contentEditable = 'true';
 	}
 
-	// const { commonAncestorContainer } = range;
-	// let parentElement;
+	const { commonAncestorContainer } = range;
+	let parentElement;
 
-	// if (
-	// 	commonAncestorContainer.nodeType ===
-	// 	commonAncestorContainer.ELEMENT_NODE
-	// ) {
-	// 	parentElement = /** @type {HTMLElement} */ ( commonAncestorContainer );
-	// } else {
-	// 	parentElement = commonAncestorContainer.parentElement;
-	// }
-
-	// if ( parentElement?.closest( '[contenteditable]' ) !== container ) {
-	// 	return;
-	// }
+	if (
+		commonAncestorContainer.nodeType ===
+		commonAncestorContainer.ELEMENT_NODE
+	) {
+		parentElement = /** @type {HTMLElement} */ ( commonAncestorContainer );
+	} else {
+		parentElement = commonAncestorContainer.parentElement;
+	}
 
 	const { ownerDocument } = container;
 	const { defaultView } = ownerDocument;
@@ -129,5 +125,11 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 	const selection = defaultView.getSelection();
 	assertIsDefined( selection, 'selection' );
 	selection.removeAllRanges();
+
+	if ( parentElement?.closest( '[contenteditable]' ) !== container ) {
+		container.focus();
+		return;
+	}
+
 	selection.addRange( range );
 }

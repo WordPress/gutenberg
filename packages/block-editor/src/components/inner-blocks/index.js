@@ -197,8 +197,6 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	} );
 
 	const ref = useMergeRefs( [
-		props.ref,
-		__unstableDisableDropZone ? null : blockDropZoneRef,
 		useRefEffect( ( node ) => {
 			function onInput( event ) {
 				if ( event.__unstableRedirect === true ) {
@@ -278,6 +276,8 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		// 		node.removeEventListener( 'keydown', onKeyDown );
 		// 	};
 		// }, [] ),
+		props.ref,
+		__unstableDisableDropZone ? null : blockDropZoneRef,
 	] );
 
 	const innerBlocksProps = {
