@@ -34,15 +34,16 @@ describe( 'BoxControl', () => {
 			const input = screen.getByRole( 'textbox', {
 				name: 'Box Control',
 			} );
-			const select = screen.getByRole( 'combobox', {
-				name: 'Select unit',
-			} );
 
 			await user.type( input, '100%' );
 			await user.keyboard( '{Enter}' );
 
 			expect( input ).toHaveValue( '100' );
-			expect( select ).toHaveValue( '%' );
+			expect(
+				screen.getByRole( 'combobox', {
+					name: 'Select unit',
+				} )
+			).toHaveValue( '%' );
 		} );
 	} );
 
@@ -60,7 +61,6 @@ describe( 'BoxControl', () => {
 			const select = screen.getByRole( 'combobox', {
 				name: 'Select unit',
 			} );
-			const reset = screen.getByRole( 'button', { name: 'Reset' } );
 
 			await user.type( input, '100px' );
 			await user.keyboard( '{Enter}' );
@@ -68,7 +68,7 @@ describe( 'BoxControl', () => {
 			expect( input ).toHaveValue( '100' );
 			expect( select ).toHaveValue( 'px' );
 
-			await user.click( reset );
+			await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
 
 			expect( input ).toHaveValue( '' );
 			expect( select ).toHaveValue( 'px' );
@@ -97,7 +97,6 @@ describe( 'BoxControl', () => {
 			const select = screen.getByRole( 'combobox', {
 				name: 'Select unit',
 			} );
-			const reset = screen.getByRole( 'button', { name: 'Reset' } );
 
 			await user.type( input, '100px' );
 			await user.keyboard( '{Enter}' );
@@ -105,7 +104,7 @@ describe( 'BoxControl', () => {
 			expect( input ).toHaveValue( '100' );
 			expect( select ).toHaveValue( 'px' );
 
-			await user.click( reset );
+			await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
 
 			expect( input ).toHaveValue( '' );
 			expect( select ).toHaveValue( 'px' );
@@ -141,7 +140,6 @@ describe( 'BoxControl', () => {
 			const select = screen.getByRole( 'combobox', {
 				name: 'Select unit',
 			} );
-			const reset = screen.getByRole( 'button', { name: 'Reset' } );
 
 			await user.type( input, '100px' );
 			await user.keyboard( '{Enter}' );
@@ -149,7 +147,7 @@ describe( 'BoxControl', () => {
 			expect( input ).toHaveValue( '100' );
 			expect( select ).toHaveValue( 'px' );
 
-			await user.click( reset );
+			await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
 
 			expect( input ).toHaveValue( '' );
 			expect( select ).toHaveValue( 'px' );
@@ -166,13 +164,12 @@ describe( 'BoxControl', () => {
 			const input = screen.getByLabelText( 'Box Control', {
 				selector: 'input',
 			} );
-			const unitSelect = screen.getByLabelText( 'Select unit' );
 
 			await user.type( input, '100%' );
 			await user.keyboard( '{Enter}' );
 
 			expect( input ).toHaveValue( '100' );
-			expect( unitSelect ).toHaveValue( '%' );
+			expect( screen.getByLabelText( 'Select unit' ) ).toHaveValue( '%' );
 
 			await user.clear( input );
 			expect( input ).toHaveValue( '' );
@@ -204,18 +201,17 @@ describe( 'BoxControl', () => {
 				/>
 			);
 
-			const unlink = screen.getByLabelText( /Unlink sides/ );
-
-			await user.click( unlink );
+			await user.click( screen.getByLabelText( /Unlink sides/ ) );
 
 			const input = screen.getByLabelText( /Top/ );
-			const select = screen.getAllByLabelText( /Select unit/ )[ 0 ];
 
 			await user.type( input, '100px' );
 			await user.keyboard( '{Enter}' );
 
 			expect( input ).toHaveValue( '100' );
-			expect( select ).toHaveValue( 'px' );
+			expect(
+				screen.getAllByLabelText( /Select unit/ )[ 0 ]
+			).toHaveValue( 'px' );
 
 			expect( state ).toEqual( {
 				top: '100px',
@@ -240,18 +236,17 @@ describe( 'BoxControl', () => {
 				/>
 			);
 
-			const unlink = screen.getByLabelText( /Unlink sides/ );
-
-			await user.click( unlink );
+			await user.click( screen.getByLabelText( /Unlink sides/ ) );
 
 			const input = screen.getByLabelText( /Vertical/ );
-			const select = screen.getAllByLabelText( /Select unit/ )[ 0 ];
 
 			await user.type( input, '100px' );
 			await user.keyboard( '{Enter}' );
 
 			expect( input ).toHaveValue( '100' );
-			expect( select ).toHaveValue( 'px' );
+			expect(
+				screen.getAllByLabelText( /Select unit/ )[ 0 ]
+			).toHaveValue( 'px' );
 
 			expect( state ).toEqual( {
 				top: '100px',
@@ -272,17 +267,18 @@ describe( 'BoxControl', () => {
 			render( <BoxControl /> );
 
 			// Make unit selection on all input control.
-			const allUnitSelect = screen.getByRole( 'combobox', {
-				name: 'Select unit',
-			} );
-			await user.selectOptions( allUnitSelect, [ 'em' ] );
+			await user.selectOptions(
+				screen.getByRole( 'combobox', {
+					name: 'Select unit',
+				} ),
+				[ 'em' ]
+			);
 
 			// Unlink the controls.
 			await user.click( screen.getByLabelText( /Unlink sides/ ) );
 
 			// Confirm that each individual control has the selected unit
-			const unlinkedSelects = screen.getAllByDisplayValue( 'em' );
-			expect( unlinkedSelects.length ).toEqual( 4 );
+			expect( screen.getAllByDisplayValue( 'em' ).length ).toEqual( 4 );
 		} );
 
 		it( 'should use individual side attribute unit when available', async () => {
@@ -294,26 +290,24 @@ describe( 'BoxControl', () => {
 			const { rerender } = render( <BoxControl /> );
 
 			// Make unit selection on all input control.
-			const allUnitSelect = screen.getByRole( 'combobox', {
-				name: 'Select unit',
-			} );
-			await user.selectOptions( allUnitSelect, [ 'vw' ] );
+			await user.selectOptions(
+				screen.getByRole( 'combobox', {
+					name: 'Select unit',
+				} ),
+				[ 'vw' ]
+			);
 
 			// Unlink the controls.
 			await user.click( screen.getByLabelText( /Unlink sides/ ) );
 
 			// Confirm that each individual control has the selected unit
-			const unlinkedSelects = screen.getAllByDisplayValue( 'vw' );
-			expect( unlinkedSelects.length ).toEqual( 4 );
+			expect( screen.getAllByDisplayValue( 'vw' ).length ).toEqual( 4 );
 
 			// Rerender with individual side value & confirm unit is selected.
 			rerender( <BoxControl values={ { top: '2.5em' } } /> );
 
-			const topSelect = screen.getByDisplayValue( 'em' );
-			const otherSelects = screen.getAllByDisplayValue( 'vw' );
-
-			expect( topSelect ).toBeInTheDocument();
-			expect( otherSelects.length ).toEqual( 3 );
+			expect( screen.getByDisplayValue( 'em' ) ).toBeInTheDocument();
+			expect( screen.getAllByDisplayValue( 'vw' ).length ).toEqual( 3 );
 		} );
 	} );
 
@@ -326,11 +320,12 @@ describe( 'BoxControl', () => {
 
 			render( <BoxControl onChange={ setState } /> );
 
-			const input = screen.getByRole( 'textbox', {
-				name: 'Box Control',
-			} );
-
-			await user.type( input, '7.5rem' );
+			await user.type(
+				screen.getByRole( 'textbox', {
+					name: 'Box Control',
+				} ),
+				'7.5rem'
+			);
 			await user.keyboard( '{Enter}' );
 
 			expect( setState ).toHaveBeenCalledWith( {
@@ -349,10 +344,12 @@ describe( 'BoxControl', () => {
 
 			render( <BoxControl onChange={ setState } /> );
 
-			const allUnitSelect = screen.getByRole( 'combobox', {
-				name: 'Select unit',
-			} );
-			await user.selectOptions( allUnitSelect, 'rem' );
+			await user.selectOptions(
+				screen.getByRole( 'combobox', {
+					name: 'Select unit',
+				} ),
+				'rem'
+			);
 
 			expect( setState ).toHaveBeenCalledWith( {
 				top: undefined,
