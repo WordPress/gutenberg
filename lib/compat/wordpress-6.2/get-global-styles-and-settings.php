@@ -189,7 +189,7 @@ function _gutenberg_get_global_stylesheet_clean_cache_upon_upgrading( $upgrader,
 	}
 }
 
-/*
+/**
  * Function to get the settings resulting of merging core, theme, and user data.
  *
  * @param array $path    Path to the specific setting to retrieve. Optional.
@@ -210,10 +210,17 @@ function gutenberg_get_global_settings( $path = array(), $context = array() ) {
 	if ( ! empty( $context['block_name'] ) ) {
 		$path = array_merge( array( 'blocks', $context['block_name'] ), $path );
 	}
+
 	$origin = 'custom';
-	if ( isset( $context['origin'] ) && 'base' === $context['origin'] ) {
+	if ( ! wp_theme_has_theme_json() ) {
+		// For themes with no theme.json skip querying the database for user data (custom origin).
 		$origin = 'theme';
+	} elseif ( isset( $context['origin'] ) && 'base' === $context['origin'] ) {
+		$origin = 'theme';
+	} elseif ( isset( $context['origin'] ) && 'all' === $context['all'] ) {
+		$origin = 'custom';
 	}
+
 	$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin )->get_settings();
 	return _wp_array_get( $settings, $path, $settings );
 }
