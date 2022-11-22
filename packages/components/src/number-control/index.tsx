@@ -113,34 +113,42 @@ function UnforwardedNumberControl(
 		( state, action ) => {
 			const nextState = { ...state };
 
-			const { type, payload } = action;
-			const event = payload.event;
 			const currentValue = nextState.value;
 
 			/**
 			 * Handles custom UP and DOWN Keyboard events
 			 */
 			if (
-				type === inputControlActionTypes.PRESS_UP ||
-				type === inputControlActionTypes.PRESS_DOWN
+				action.type === inputControlActionTypes.PRESS_UP ||
+				action.type === inputControlActionTypes.PRESS_DOWN
 			) {
+				const actionEvent = (
+					action as inputControlActionTypes.KeyEventAction
+				 ).payload.event;
 				// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
 				nextState.value = spinValue(
 					currentValue,
-					type === inputControlActionTypes.PRESS_UP ? 'up' : 'down',
-					event as KeyboardEvent | undefined
+					action.type === inputControlActionTypes.PRESS_UP
+						? 'up'
+						: 'down',
+					actionEvent as KeyboardEvent | undefined
 				);
 			}
 
 			/**
 			 * Handles drag to update events
 			 */
-			if ( type === inputControlActionTypes.DRAG && isDragEnabled ) {
-				// @ts-expect-error TODO: See if reducer actions can be typed better
-				const [ x, y ] = payload.delta;
-				// @ts-expect-error TODO: See if reducer actions can be typed better
-				// `shiftKey` comes via the `useDrag` hook
-				const enableShift = payload.shiftKey && isShiftStepEnabled;
+			if (
+				action.type === inputControlActionTypes.DRAG &&
+				isDragEnabled
+			) {
+				const dragPayload = (
+					action as inputControlActionTypes.DragAction
+				 ).payload;
+				const [ x, y ] = dragPayload.delta;
+
+				// `shiftKey` comes via the `useDrqg` hook
+				const enableShift = dragPayload.shiftKey && isShiftStepEnabled;
 				const computedStep = computeStep( {
 					shiftStep: ensureNumber( shiftStep ),
 					enableShift,
@@ -189,8 +197,8 @@ function UnforwardedNumberControl(
 			 * Handles commit (ENTER key press or blur)
 			 */
 			if (
-				type === inputControlActionTypes.PRESS_ENTER ||
-				type === inputControlActionTypes.COMMIT
+				action.type === inputControlActionTypes.PRESS_ENTER ||
+				action.type === inputControlActionTypes.COMMIT
 			) {
 				const applyEmptyValue =
 					required === false && currentValue === '';
