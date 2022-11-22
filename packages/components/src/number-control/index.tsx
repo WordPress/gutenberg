@@ -59,6 +59,8 @@ function UnforwardedNumberControl(
 		spinControls = 'none';
 	}
 
+	const shiftStepAsNumber = ensureNumber( shiftStep );
+
 	const inputRef = useRef< HTMLInputElement >();
 	const mergedRef = useMergeRefs( [ inputRef, forwardedRef ] );
 
@@ -86,7 +88,7 @@ function UnforwardedNumberControl(
 		event?.preventDefault();
 		const enableShift = event?.shiftKey && isShiftStepEnabled;
 		const computedStep = computeStep( {
-			shiftStep: ensureNumber( shiftStep ),
+			shiftStep: shiftStepAsNumber,
 			enableShift,
 			baseStep,
 		} );
@@ -150,7 +152,7 @@ function UnforwardedNumberControl(
 				// `shiftKey` comes via the `useDrqg` hook
 				const enableShift = dragPayload.shiftKey && isShiftStepEnabled;
 				const computedStep = computeStep( {
-					shiftStep: ensureNumber( shiftStep ),
+					shiftStep: shiftStepAsNumber,
 					enableShift,
 					baseStep,
 				} );
