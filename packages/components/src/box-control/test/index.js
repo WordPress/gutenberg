@@ -19,7 +19,6 @@ const setupUser = () =>
 		advanceTimers: jest.advanceTimersByTime,
 	} );
 
-const getSelect = () => screen.getByLabelText( 'Select unit' );
 const getReset = () => screen.getByText( /Reset/ );
 
 describe( 'BoxControl', () => {
@@ -38,7 +37,9 @@ describe( 'BoxControl', () => {
 			const input = screen.getByRole( 'textbox', {
 				name: 'Box Control',
 			} );
-			const select = getSelect();
+			const select = screen.getByRole( 'combobox', {
+				name: 'Select unit',
+			} );
 
 			await user.type( input, '100%' );
 			await user.keyboard( '{Enter}' );
@@ -55,7 +56,9 @@ describe( 'BoxControl', () => {
 			const input = screen.getByRole( 'textbox', {
 				name: 'Box Control',
 			} );
-			const select = getSelect();
+			const select = screen.getByRole( 'combobox', {
+				name: 'Select unit',
+			} );
 			const reset = getReset();
 
 			await user.type( input, '100px' );
@@ -86,7 +89,9 @@ describe( 'BoxControl', () => {
 			const input = screen.getByRole( 'textbox', {
 				name: 'Box Control',
 			} );
-			const select = getSelect();
+			const select = screen.getByRole( 'combobox', {
+				name: 'Select unit',
+			} );
 			const reset = getReset();
 
 			await user.type( input, '100px' );
@@ -124,7 +129,9 @@ describe( 'BoxControl', () => {
 			const input = screen.getByRole( 'textbox', {
 				name: 'Box Control',
 			} );
-			const select = getSelect();
+			const select = screen.getByRole( 'combobox', {
+				name: 'Select unit',
+			} );
 			const reset = getReset();
 
 			await user.type( input, '100px' );
@@ -243,7 +250,9 @@ describe( 'BoxControl', () => {
 			const user = setupUser();
 
 			// Make unit selection on all input control.
-			const allUnitSelect = getSelect();
+			const allUnitSelect = screen.getByRole( 'combobox', {
+				name: 'Select unit',
+			} );
 			await user.selectOptions( allUnitSelect, [ 'em' ] );
 
 			// Unlink the controls.
@@ -260,7 +269,9 @@ describe( 'BoxControl', () => {
 			const user = setupUser();
 
 			// Make unit selection on all input control.
-			const allUnitSelect = getSelect();
+			const allUnitSelect = screen.getByRole( 'combobox', {
+				name: 'Select unit',
+			} );
 			await user.selectOptions( allUnitSelect, [ 'vw' ] );
 
 			// Unlink the controls.
@@ -308,7 +319,9 @@ describe( 'BoxControl', () => {
 			render( <BoxControl onChange={ setState } /> );
 			const user = setupUser();
 
-			const allUnitSelect = getSelect();
+			const allUnitSelect = screen.getByRole( 'combobox', {
+				name: 'Select unit',
+			} );
 			await user.selectOptions( allUnitSelect, 'rem' );
 
 			expect( setState ).toHaveBeenCalledWith( {
