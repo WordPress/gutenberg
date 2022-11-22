@@ -19,7 +19,7 @@ import deprecated from '@wordpress/deprecated';
 import { Input, SpinButton } from './styles/number-control-styles';
 import * as inputControlActionTypes from '../input-control/reducer/actions';
 import { add, subtract, roundClamp } from '../utils/math';
-import { ensureNumber, isValueEmpty } from '../utils/values';
+import { ensureNumber, ensureString, isValueEmpty } from '../utils/values';
 import type { WordPressComponentProps } from '../ui/context/wordpress-component';
 import type { NumberControlProps } from './types';
 import { HStack } from '../h-stack';
@@ -59,6 +59,9 @@ function UnforwardedNumberControl(
 		spinControls = 'none';
 	}
 
+	// TODO: check if `valueProp` is `number`, add deprecation notice
+	const valuePropAsString =
+		valueProp !== undefined ? ensureString( valueProp ) : undefined;
 	const shiftStepAsNumber = ensureNumber( shiftStep );
 
 	const inputRef = useRef< HTMLInputElement >();
@@ -218,14 +221,17 @@ function UnforwardedNumberControl(
 	const buildSpinButtonClickHandler =
 		( direction: 'up' | 'down' ) =>
 		( event: MouseEvent< HTMLButtonElement > ) =>
-			onChange?.( String( spinValue( valueProp, direction, event ) ), {
-				// Set event.target to the <input> so that consumers can use
-				// e.g. event.target.validity.
-				event: {
-					...event,
-					target: inputRef.current!,
-				},
-			} );
+			onChange?.(
+				String( spinValue( valuePropAsString, direction, event ) ),
+				{
+					// Set event.target to the <input> so that consumers can use
+					// e.g. event.target.validity.
+					event: {
+						...event,
+						target: inputRef.current!,
+					},
+				}
+			);
 
 	return (
 		<Input
@@ -243,8 +249,7 @@ function UnforwardedNumberControl(
 			required={ required }
 			step={ step }
 			type={ typeProp }
-			// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
-			value={ valueProp }
+			value={ valuePropAsString }
 			__unstableStateReducer={ ( state, action ) => {
 				const baseState = numberControlStateReducer( state, action );
 				return stateReducerProp?.( baseState, action ) ?? baseState;
