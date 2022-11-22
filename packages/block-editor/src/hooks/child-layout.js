@@ -25,7 +25,7 @@ function helpText( selfStretch ) {
 }
 
 /**
- * Inspector control panel containing the child layout related configuration
+ * Inspector controls containing the child layout related configuration.
  *
  * @param {Object} props                        Block props.
  * @param {Object} props.attributes             Block attributes.
