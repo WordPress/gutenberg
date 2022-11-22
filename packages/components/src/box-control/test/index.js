@@ -19,8 +19,6 @@ const setupUser = () =>
 		advanceTimers: jest.advanceTimersByTime,
 	} );
 
-const getReset = () => screen.getByText( /Reset/ );
-
 describe( 'BoxControl', () => {
 	describe( 'Basic rendering', () => {
 		it( 'should render', () => {
@@ -59,7 +57,7 @@ describe( 'BoxControl', () => {
 			const select = screen.getByRole( 'combobox', {
 				name: 'Select unit',
 			} );
-			const reset = getReset();
+			const reset = screen.getByRole( 'button', { name: 'Reset' } );
 
 			await user.type( input, '100px' );
 			await user.keyboard( '{Enter}' );
@@ -92,7 +90,7 @@ describe( 'BoxControl', () => {
 			const select = screen.getByRole( 'combobox', {
 				name: 'Select unit',
 			} );
-			const reset = getReset();
+			const reset = screen.getByRole( 'button', { name: 'Reset' } );
 
 			await user.type( input, '100px' );
 			await user.keyboard( '{Enter}' );
@@ -132,7 +130,7 @@ describe( 'BoxControl', () => {
 			const select = screen.getByRole( 'combobox', {
 				name: 'Select unit',
 			} );
-			const reset = getReset();
+			const reset = screen.getByRole( 'button', { name: 'Reset' } );
 
 			await user.type( input, '100px' );
 			await user.keyboard( '{Enter}' );
