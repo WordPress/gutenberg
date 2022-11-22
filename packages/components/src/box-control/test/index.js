@@ -19,8 +19,6 @@ const setupUser = () =>
 		advanceTimers: jest.advanceTimersByTime,
 	} );
 
-const getInput = () =>
-	screen.getByLabelText( 'Box Control', { selector: 'input' } );
 const getSelect = () => screen.getByLabelText( 'Select unit' );
 const getReset = () => screen.getByText( /Reset/ );
 
@@ -37,7 +35,9 @@ describe( 'BoxControl', () => {
 		it( 'should update values when interacting with input', async () => {
 			const user = setupUser();
 			render( <BoxControl /> );
-			const input = getInput();
+			const input = screen.getByRole( 'textbox', {
+				name: 'Box Control',
+			} );
 			const select = getSelect();
 
 			await user.type( input, '100%' );
@@ -52,7 +52,9 @@ describe( 'BoxControl', () => {
 		it( 'should reset values when clicking Reset', async () => {
 			const user = setupUser();
 			render( <BoxControl /> );
-			const input = getInput();
+			const input = screen.getByRole( 'textbox', {
+				name: 'Box Control',
+			} );
 			const select = getSelect();
 			const reset = getReset();
 
@@ -81,7 +83,9 @@ describe( 'BoxControl', () => {
 			};
 			const user = setupUser();
 			render( <Example /> );
-			const input = getInput();
+			const input = screen.getByRole( 'textbox', {
+				name: 'Box Control',
+			} );
 			const select = getSelect();
 			const reset = getReset();
 
@@ -117,7 +121,9 @@ describe( 'BoxControl', () => {
 			};
 			const user = setupUser();
 			render( <Example /> );
-			const input = getInput();
+			const input = screen.getByRole( 'textbox', {
+				name: 'Box Control',
+			} );
 			const select = getSelect();
 			const reset = getReset();
 
@@ -281,7 +287,9 @@ describe( 'BoxControl', () => {
 
 			render( <BoxControl onChange={ setState } /> );
 			const user = setupUser();
-			const input = getInput();
+			const input = screen.getByRole( 'textbox', {
+				name: 'Box Control',
+			} );
 
 			await user.type( input, '7.5rem' );
 			await user.keyboard( '{Enter}' );
