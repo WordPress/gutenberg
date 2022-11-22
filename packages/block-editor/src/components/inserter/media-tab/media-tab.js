@@ -85,11 +85,6 @@ function MediaTab( {
 									</HStack>
 								</Item>
 							) ) }
-
-							<div
-								role="presentation"
-								className={ `${ baseCssClass }__fill-space` }
-							/>
 							<div role="listitem">
 								<MediaUploadCheck>
 									<MediaUpload

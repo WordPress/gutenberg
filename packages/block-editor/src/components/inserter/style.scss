@@ -503,8 +503,9 @@ $block-inserter-tabs-height: 44px;
 	overflow-y: auto;
 	height: 100%;
 
-	&__fill-space {
-		flex-grow: 1;
+	// Push the listitem wrapping the "open media library" button to the bottom of the panel.
+	div[role="listitem"]:last-child {
+		margin-top: auto;
 	}
 
 	&__media-category {
