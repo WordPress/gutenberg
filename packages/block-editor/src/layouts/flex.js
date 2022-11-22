@@ -67,7 +67,6 @@ export default {
 		return (
 			<>
 				<ToolsPanelItem
-					className="single-column"
 					hasValue={ () => layout?.justifyContent }
 					label={ __( 'Justification' ) }
 					onDeselect={ () =>
@@ -93,7 +92,6 @@ export default {
 				</ToolsPanelItem>
 				{ allowOrientation && (
 					<ToolsPanelItem
-						className="single-column"
 						hasValue={ () => layout?.orientation }
 						label={ __( 'Orientation' ) }
 						onDeselect={ () =>
