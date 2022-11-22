@@ -113,8 +113,6 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 						}
 						data-empty={ label ? false : true }
 						placeholder={ __( 'Type the label for this input' ) }
-						__unstableEmbedURLOnPaste
-						__unstableAllowPrefixTransformations
 					/>
 					<textarea
 						className="wp-block-form-input"
@@ -149,8 +147,6 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 								placeholder={ __(
 									'Type the label for this input'
 								) }
-								__unstableEmbedURLOnPaste
-								__unstableAllowPrefixTransformations
 							/>
 						</button>
 					</div>
@@ -172,14 +168,11 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 						onChange={ ( newLabel ) =>
 							setAttributes( { label: newLabel } )
 						}
-						ref={ ref.current }
 						aria-label={
 							label ? __( 'Label' ) : __( 'Empty label' )
 						}
 						data-empty={ label ? false : true }
 						placeholder={ __( 'Type the label for this input' ) }
-						__unstableEmbedURLOnPaste
-						__unstableAllowPrefixTransformations
 					/>
 					<input
 						className="wp-block-form-input"
