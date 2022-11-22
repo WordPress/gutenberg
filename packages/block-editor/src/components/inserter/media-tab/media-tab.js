@@ -29,7 +29,7 @@ import { MediaCategoryPanel } from './media-panel';
 import MediaUploadCheck from '../../media-upload/check';
 import MediaUpload from '../../media-upload';
 import { useMediaCategories } from './hooks';
-import { getBlocksFromMedia } from './utils';
+import { getBlockFromMedia } from './utils';
 
 function MediaTab( {
 	rootClientId,
@@ -45,7 +45,7 @@ function MediaTab( {
 			if ( ! media?.url ) {
 				return;
 			}
-			onInsert( getBlocksFromMedia( media, media.type ) );
+			onInsert( getBlockFromMedia( media, media.type ) );
 		},
 		[ onInsert ]
 	);

@@ -3,7 +3,7 @@
  */
 import { createBlock } from '@wordpress/blocks';
 
-export function getBlocksFromMedia( media, mediaType ) {
+export function getBlockFromMedia( media, mediaType ) {
 	// Add the common attributes between the different media types.
 	const attributes = {
 		id: media.id,

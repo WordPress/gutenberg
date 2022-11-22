@@ -9,18 +9,19 @@ import {
 	Tooltip,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useCallback } from '@wordpress/element';
+import { cloneBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import InserterDraggableBlocks from '../../inserter-draggable-blocks';
 import BlockPreview from '../../block-preview';
-import { getBlocksFromMedia } from './utils';
+import { getBlockFromMedia } from './utils';
 
 function MediaPreview( { media, onClick, composite, mediaType } ) {
 	const blocks = useMemo(
-		() => getBlocksFromMedia( media, mediaType ),
+		() => getBlockFromMedia( media, mediaType ),
 		[ media, mediaType ]
 	);
 	const title = media.title?.rendered || media.title;
@@ -64,6 +65,12 @@ function MediaList( {
 	label = __( 'Media List' ),
 } ) {
 	const composite = useCompositeState();
+	const onPreviewClick = useCallback(
+		( block ) => {
+			onClick( cloneBlock( block ) );
+		},
+		[ onClick ]
+	);
 	return (
 		<Composite
 			{ ...composite }
@@ -76,7 +83,7 @@ function MediaList( {
 					key={ media.id }
 					media={ media }
 					mediaType={ mediaType }
-					onClick={ onClick }
+					onClick={ onPreviewClick }
 					composite={ composite }
 				/>
 			) ) }
