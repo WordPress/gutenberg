@@ -14,11 +14,6 @@ import { useState } from '@wordpress/element';
  */
 import BoxControl from '../';
 
-const setupUser = () =>
-	userEvent.setup( {
-		advanceTimers: jest.advanceTimersByTime,
-	} );
-
 describe( 'BoxControl', () => {
 	describe( 'Basic rendering', () => {
 		it( 'should render', () => {
@@ -30,7 +25,9 @@ describe( 'BoxControl', () => {
 		} );
 
 		it( 'should update values when interacting with input', async () => {
-			const user = setupUser();
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
 			render( <BoxControl /> );
 			const input = screen.getByRole( 'textbox', {
 				name: 'Box Control',
@@ -49,7 +46,9 @@ describe( 'BoxControl', () => {
 
 	describe( 'Reset', () => {
 		it( 'should reset values when clicking Reset', async () => {
-			const user = setupUser();
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
 			render( <BoxControl /> );
 			const input = screen.getByRole( 'textbox', {
 				name: 'Box Control',
@@ -72,6 +71,9 @@ describe( 'BoxControl', () => {
 		} );
 
 		it( 'should reset values when clicking Reset, if controlled', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
 			const Example = () => {
 				const [ state, setState ] = useState();
 
@@ -82,7 +84,6 @@ describe( 'BoxControl', () => {
 					/>
 				);
 			};
-			const user = setupUser();
 			render( <Example /> );
 			const input = screen.getByRole( 'textbox', {
 				name: 'Box Control',
@@ -105,6 +106,9 @@ describe( 'BoxControl', () => {
 		} );
 
 		it( 'should reset values when clicking Reset, if controlled <-> uncontrolled state changes', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
 			const Example = () => {
 				const [ state, setState ] = useState();
 
@@ -122,7 +126,6 @@ describe( 'BoxControl', () => {
 					/>
 				);
 			};
-			const user = setupUser();
 			render( <Example /> );
 			const input = screen.getByRole( 'textbox', {
 				name: 'Box Control',
@@ -145,7 +148,9 @@ describe( 'BoxControl', () => {
 		} );
 
 		it( 'should persist cleared value when focus changes', async () => {
-			const user = setupUser();
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
 			const spyChange = jest.fn();
 			render( <BoxControl onChange={ ( v ) => spyChange( v ) } /> );
 			const input = screen.getByLabelText( 'Box Control', {
@@ -176,6 +181,9 @@ describe( 'BoxControl', () => {
 
 	describe( 'Unlinked sides', () => {
 		it( 'should update a single side value when unlinked', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
 			let state = {};
 			const setState = ( newState ) => ( state = newState );
 
@@ -185,7 +193,6 @@ describe( 'BoxControl', () => {
 					onChange={ ( next ) => setState( next ) }
 				/>
 			);
-			const user = setupUser();
 			const unlink = screen.getByLabelText( /Unlink sides/ );
 
 			await user.click( unlink );
@@ -208,6 +215,9 @@ describe( 'BoxControl', () => {
 		} );
 
 		it( 'should update a whole axis when value is changed when unlinked', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
 			let state = {};
 			const setState = ( newState ) => ( state = newState );
 
@@ -218,7 +228,6 @@ describe( 'BoxControl', () => {
 					splitOnAxis={ true }
 				/>
 			);
-			const user = setupUser();
 			const unlink = screen.getByLabelText( /Unlink sides/ );
 
 			await user.click( unlink );
@@ -243,9 +252,12 @@ describe( 'BoxControl', () => {
 
 	describe( 'Unit selections', () => {
 		it( 'should update unlinked controls unit selection based on all input control', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
 			// Render control.
 			render( <BoxControl /> );
-			const user = setupUser();
 
 			// Make unit selection on all input control.
 			const allUnitSelect = screen.getByRole( 'combobox', {
@@ -262,9 +274,12 @@ describe( 'BoxControl', () => {
 		} );
 
 		it( 'should use individual side attribute unit when available', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
 			// Render control.
 			const { rerender } = render( <BoxControl /> );
-			const user = setupUser();
 
 			// Make unit selection on all input control.
 			const allUnitSelect = screen.getByRole( 'combobox', {
@@ -292,10 +307,13 @@ describe( 'BoxControl', () => {
 
 	describe( 'onChange updates', () => {
 		it( 'should call onChange when values contain more than just CSS units', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
 			const setState = jest.fn();
 
 			render( <BoxControl onChange={ setState } /> );
-			const user = setupUser();
 			const input = screen.getByRole( 'textbox', {
 				name: 'Box Control',
 			} );
@@ -312,10 +330,12 @@ describe( 'BoxControl', () => {
 		} );
 
 		it( 'should not pass invalid CSS unit only values to onChange', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
 			const setState = jest.fn();
 
 			render( <BoxControl onChange={ setState } /> );
-			const user = setupUser();
 
 			const allUnitSelect = screen.getByRole( 'combobox', {
 				name: 'Select unit',
