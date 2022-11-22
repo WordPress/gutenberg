@@ -213,10 +213,10 @@ function gutenberg_get_global_settings( $path = array(), $context = array() ) {
 
 	// This is the default value when no origin is provided or when it is 'all'.
 	$origin = 'custom';
-	if ( ! wp_theme_has_theme_json() ) {
-		// For themes with no theme.json skip querying the database for user data (custom origin).
-		$origin = 'theme';
-	} elseif ( isset( $context['origin'] ) && 'base' === $context['origin'] ) {
+	if (
+		! wp_theme_has_theme_json() ||
+		( isset( $context['origin'] ) && 'base' === $context['origin'] )
+	) {
 		$origin = 'theme';
 	}
 
