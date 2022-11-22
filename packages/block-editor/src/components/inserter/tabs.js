@@ -45,11 +45,11 @@ function InserterTabs( {
 		if ( ! prioritizePatterns && showPatterns ) {
 			tempTabs.push( patternsTab );
 		}
-		if ( showReusableBlocks ) {
-			tempTabs.push( reusableBlocksTab );
-		}
 		if ( showMedia ) {
 			tempTabs.push( mediaTab );
+		}
+		if ( showReusableBlocks ) {
+			tempTabs.push( reusableBlocksTab );
 		}
 		return tempTabs;
 	}, [
