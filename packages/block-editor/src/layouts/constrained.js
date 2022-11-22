@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	ToggleControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalUnitControl as UnitControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
@@ -35,8 +36,24 @@ export default {
 		clientId,
 		defaultControls = {},
 		layout,
+		layoutBlockSupport,
 		onChange,
 	} ) {
+		const defaultThemeLayout = useSetting( 'layout' );
+		const { allowInheriting = true } = layoutBlockSupport;
+
+		// Only show the inherit toggle if it's supported,
+		// a default theme layout is set (e.g. one that provides `contentSize` and/or `wideSize` values),
+		// and either the default / flow or the constrained layout type is in use, as the toggle switches from one to the other.
+		const showInheritToggle = !! (
+			allowInheriting &&
+			!! defaultThemeLayout &&
+			( ! layout?.type ||
+				layout?.type === 'default' ||
+				layout?.type === 'constrained' ||
+				layout?.inherit )
+		);
+
 		const { wideSize, contentSize, justifyContent } = layout;
 		const onJustificationChange = ( value ) => {
 			onChange( {
@@ -70,84 +87,105 @@ export default {
 				'vw',
 			],
 		} );
+
 		return (
 			<>
-				<ToolsPanelItem
-					hasValue={ () =>
-						wideSize !== undefined || contentSize !== undefined
-					}
-					label={ __( 'Content size' ) }
-					onDeselect={ () =>
-						onChange( {
-							...layout,
-							contentSize: undefined,
-							wideSize: undefined,
-						} )
-					}
-					isShownByDefault={
-						defaultControls?.contentSize ||
-						defaultControls?.wideSize
-					}
-					resetAllFilter={ ( newAttributes ) => ( {
-						...newAttributes,
-						layout: {
-							...newAttributes?.layout,
-							contentSize: undefined,
-							wideSize: undefined,
-						},
-					} ) }
-					panelId={ clientId }
-				>
-					<VStack spacing={ 1 }>
-						<div className="block-editor-hooks__layout-controls">
-							<div className="block-editor-hooks__layout-controls-unit">
-								<UnitControl
-									label={ __( 'Content' ) }
-									labelPosition="top"
-									__unstableInputWidth="80px"
-									value={ contentSize || wideSize || '' }
-									onChange={ ( nextWidth ) => {
-										nextWidth =
-											0 > parseFloat( nextWidth )
-												? '0'
-												: nextWidth;
-										onChange( {
-											...layout,
-											contentSize: nextWidth,
-										} );
-									} }
-									units={ units }
-								/>
-								<Icon icon={ positionCenter } />
+				{ showInheritToggle && (
+					<ToolsPanelItem
+						label={ __( 'Content layout' ) }
+						hasValue={ () =>
+							!! layout?.type ||
+							wideSize !== undefined ||
+							contentSize !== undefined
+						}
+						onDeselect={ () =>
+							onChange( {
+								...layout,
+								type: undefined,
+								contentSize: undefined,
+								wideSize: undefined,
+							} )
+						}
+						isShownByDefault={
+							( defaultControls?.contentLayout ?? true ) ||
+							defaultControls?.contentSize ||
+							defaultControls?.wideSize
+						}
+						resetAllFilter={ ( newAttributes ) => ( {
+							...newAttributes,
+							layout: {
+								...newAttributes.layout,
+								type: undefined,
+								contentSize: undefined,
+								wideSize: undefined,
+							},
+						} ) }
+						panelId={ clientId }
+					>
+						<VStack spacing={ 2 }>
+							<ToggleControl
+								className="block-editor-hooks__toggle-control"
+								label={ __( 'Inner blocks use content width' ) }
+								checked={ true }
+								onChange={ () =>
+									onChange( {
+										type: 'default',
+									} )
+								}
+								help={ __(
+									'Nested blocks use content width with options for full and wide widths.'
+								) }
+							/>
+							<div className="block-editor-hooks__layout-controls">
+								<div className="block-editor-hooks__layout-controls-unit">
+									<UnitControl
+										label={ __( 'Content' ) }
+										labelPosition="top"
+										__unstableInputWidth="80px"
+										value={ contentSize || wideSize || '' }
+										onChange={ ( nextWidth ) => {
+											nextWidth =
+												0 > parseFloat( nextWidth )
+													? '0'
+													: nextWidth;
+											onChange( {
+												...layout,
+												contentSize: nextWidth,
+											} );
+										} }
+										units={ units }
+									/>
+									<Icon icon={ positionCenter } />
+								</div>
+								<div className="block-editor-hooks__layout-controls-unit">
+									<UnitControl
+										label={ __( 'Wide' ) }
+										labelPosition="top"
+										__unstableInputWidth="80px"
+										value={ wideSize || contentSize || '' }
+										onChange={ ( nextWidth ) => {
+											nextWidth =
+												0 > parseFloat( nextWidth )
+													? '0'
+													: nextWidth;
+											onChange( {
+												...layout,
+												wideSize: nextWidth,
+											} );
+										} }
+										units={ units }
+									/>
+									<Icon icon={ stretchWide } />
+								</div>
 							</div>
-							<div className="block-editor-hooks__layout-controls-unit">
-								<UnitControl
-									label={ __( 'Wide' ) }
-									labelPosition="top"
-									__unstableInputWidth="80px"
-									value={ wideSize || contentSize || '' }
-									onChange={ ( nextWidth ) => {
-										nextWidth =
-											0 > parseFloat( nextWidth )
-												? '0'
-												: nextWidth;
-										onChange( {
-											...layout,
-											wideSize: nextWidth,
-										} );
-									} }
-									units={ units }
-								/>
-								<Icon icon={ stretchWide } />
-							</div>
-						</div>
-						<p className="block-editor-hooks__layout-controls-helptext">
-							{ __(
-								'Customize the width for all elements that are assigned to the center or wide columns.'
-							) }
-						</p>
-					</VStack>
-				</ToolsPanelItem>
+							<p className="block-editor-hooks__layout-controls-helptext">
+								{ __(
+									'Customize the width for all elements that are assigned to the center or wide columns.'
+								) }
+							</p>
+						</VStack>
+					</ToolsPanelItem>
+				) }
 				<ToolsPanelItem
 					hasValue={ () => justifyContent !== undefined }
 					label={ __( 'Justification' ) }

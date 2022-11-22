@@ -14,7 +14,6 @@ import { useSelect } from '@wordpress/data';
 import {
 	Button,
 	ButtonGroup,
-	ToggleControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -29,11 +28,6 @@ import useSetting from '../components/use-setting';
 import { LayoutStyle } from '../components/block-list/layout';
 import BlockList from '../components/block-list';
 import { getLayoutType, getLayoutTypes } from '../layouts';
-import {
-	hasContentLayoutValue,
-	hasLayoutTypeValue,
-	resetContentLayout,
-} from './content-layout';
 
 export const LAYOUT_SUPPORT_KEY = '__experimentalLayout';
 
@@ -137,7 +131,6 @@ function LayoutPanel( props ) {
 	const { clientId, setAttributes, attributes, name: blockName } = props;
 	const { layout } = attributes;
 
-	const defaultThemeLayout = useSetting( 'layout' );
 	const themeSupportsLayout = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().supportsLayout;
@@ -151,25 +144,12 @@ function LayoutPanel( props ) {
 	const {
 		allowSwitching,
 		allowEditing = true,
-		allowInheriting = true,
 		default: defaultBlockLayout,
 	} = layoutBlockSupport;
 
 	if ( ! allowEditing ) {
 		return null;
 	}
-
-	// Only show the inherit toggle if it's supported,
-	// a default theme layout is set (e.g. one that provides `contentSize` and/or `wideSize` values),
-	// and either the default / flow or the constrained layout type is in use, as the toggle switches from one to the other.
-	const showInheritToggle = !! (
-		allowInheriting &&
-		!! defaultThemeLayout &&
-		( ! layout?.type ||
-			layout?.type === 'default' ||
-			layout?.type === 'constrained' ||
-			layout?.inherit )
-	);
 
 	const usedLayout = layout || defaultBlockLayout || {};
 	const {
@@ -188,11 +168,12 @@ function LayoutPanel( props ) {
 	) {
 		return null;
 	}
-	const layoutType = getLayoutType( type );
-	const constrainedType = getLayoutType( 'constrained' );
+
 	const displayControlsForLegacyLayouts =
 		! usedLayout.type && ( contentSize || inherit );
-	const hasContentSizeOrLegacySettings = !! inherit || !! contentSize;
+	const layoutType = getLayoutType(
+		displayControlsForLegacyLayouts ? 'constrained' : type
+	);
 
 	const onChangeType = ( newType ) =>
 		setAttributes( { layout: { type: newType } } );
@@ -207,59 +188,13 @@ function LayoutPanel( props ) {
 	return (
 		<>
 			<InspectorControls __experimentalGroup="layout">
-				{ showInheritToggle && (
-					<ToolsPanelItem
-						label={ __( 'Content layout' ) }
-						hasValue={ () => hasContentLayoutValue( props ) }
-						onDeselect={ () => resetContentLayout( props ) }
-						isShownByDefault={ true }
-						resetAllFilter={ ( newAttributes ) => ( {
-							...newAttributes,
-							layout: {
-								...newAttributes.layout,
-								type: undefined,
-							},
-						} ) }
-						panelId={ clientId }
-					>
-						<ToggleControl
-							className="block-editor-hooks__toggle-control"
-							label={ __( 'Inner blocks use content width' ) }
-							checked={
-								layoutType?.name === 'constrained' ||
-								hasContentSizeOrLegacySettings
-							}
-							onChange={ () =>
-								setAttributes( {
-									layout: {
-										type:
-											layoutType?.name ===
-												'constrained' ||
-											hasContentSizeOrLegacySettings
-												? 'default'
-												: 'constrained',
-									},
-								} )
-							}
-							help={
-								layoutType?.name === 'constrained' ||
-								hasContentSizeOrLegacySettings
-									? __(
-											'Nested blocks use content width with options for full and wide widths.'
-									  )
-									: __(
-											'Nested blocks will fill the width of this container. Toggle to constrain.'
-									  )
-							}
-						/>
-					</ToolsPanelItem>
-				) }
-
 				{ ! inherit && allowSwitching && (
 					<ToolsPanelItem
 						label={ __( 'Layout type' ) }
-						hasValue={ () => hasLayoutTypeValue( props ) }
-						onDeselect={ () => resetContentLayout( props ) }
+						hasValue={ () => layout?.type !== undefined }
+						onDeselect={ () =>
+							onChangeLayout( { ...layout, type: undefined } )
+						}
 						isShownByDefault={ true }
 						resetAllFilter={ ( newAttributes ) => ( {
 							...newAttributes,
@@ -277,7 +212,7 @@ function LayoutPanel( props ) {
 					</ToolsPanelItem>
 				) }
 
-				{ layoutType && layoutType.name !== 'default' && (
+				{ layoutType && (
 					<layoutType.inspectorControls
 						clientId={ clientId }
 						defaultControls={ defaultControls }
@@ -286,17 +221,8 @@ function LayoutPanel( props ) {
 						layoutBlockSupport={ layoutBlockSupport }
 					/>
 				) }
-				{ constrainedType && displayControlsForLegacyLayouts && (
-					<constrainedType.inspectorControls
-						clientId={ clientId }
-						defaultControls={ defaultControls }
-						layout={ usedLayout }
-						onChange={ onChangeLayout }
-						layoutBlockSupport={ layoutBlockSupport }
-					/>
-				) }
 			</InspectorControls>
-			{ ! inherit && layoutType && (
+			{ layoutType && (
 				<layoutType.toolBarControls
 					layout={ usedLayout }
 					onChange={ onChangeLayout }
