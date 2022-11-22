@@ -25,8 +25,6 @@ import type { NumberControlProps } from './types';
 import { HStack } from '../h-stack';
 import { Spacer } from '../spacer';
 
-const noop = () => {};
-
 function UnforwardedNumberControl(
 	{
 		__unstableStateReducer: stateReducerProp,
@@ -46,7 +44,7 @@ function UnforwardedNumberControl(
 		value: valueProp,
 		size = 'default',
 		suffix,
-		onChange = noop,
+		onChange,
 		...props
 	}: WordPressComponentProps< NumberControlProps, 'input', false >,
 	forwardedRef: ForwardedRef< any >
@@ -199,7 +197,7 @@ function UnforwardedNumberControl(
 	const buildSpinButtonClickHandler =
 		( direction: 'up' | 'down' ) =>
 		( event: MouseEvent< HTMLButtonElement > ) =>
-			onChange( String( spinValue( valueProp, direction, event ) ), {
+			onChange?.( String( spinValue( valueProp, direction, event ) ), {
 				// Set event.target to the <input> so that consumers can use
 				// e.g. event.target.validity.
 				event: {
