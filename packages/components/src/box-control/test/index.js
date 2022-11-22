@@ -278,7 +278,7 @@ describe( 'BoxControl', () => {
 			await user.click( screen.getByLabelText( /Unlink sides/ ) );
 
 			// Confirm that each individual control has the selected unit
-			expect( screen.getAllByDisplayValue( 'em' ).length ).toEqual( 4 );
+			expect( screen.getAllByDisplayValue( 'em' ) ).toHaveLength( 4 );
 		} );
 
 		it( 'should use individual side attribute unit when available', async () => {
@@ -301,13 +301,13 @@ describe( 'BoxControl', () => {
 			await user.click( screen.getByLabelText( /Unlink sides/ ) );
 
 			// Confirm that each individual control has the selected unit
-			expect( screen.getAllByDisplayValue( 'vw' ).length ).toEqual( 4 );
+			expect( screen.getAllByDisplayValue( 'vw' ) ).toHaveLength( 4 );
 
 			// Rerender with individual side value & confirm unit is selected.
 			rerender( <BoxControl values={ { top: '2.5em' } } /> );
 
 			expect( screen.getByDisplayValue( 'em' ) ).toBeInTheDocument();
-			expect( screen.getAllByDisplayValue( 'vw' ).length ).toEqual( 3 );
+			expect( screen.getAllByDisplayValue( 'vw' ) ).toHaveLength( 3 );
 		} );
 	} );
 
