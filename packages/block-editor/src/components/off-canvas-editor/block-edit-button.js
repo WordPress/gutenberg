@@ -15,8 +15,6 @@ import { store as blockEditorStore } from '../../store';
 /**
  * External dependencies
  */
-// import InspectorControls from '../../components/inspector-controls';
-
 // copied from packages/block-library/src/page-list/edit.js
 
 // We only show the edit option when page count is <= MAX_PAGE_COUNT
@@ -69,10 +67,6 @@ const usePageData = () => {
 };
 
 // copied from convert-to-links-modal.js
-/**
- * WordPress dependencies
- */
-
 const convertSelectedBlockToNavigationLinks =
 	( { pages, clientId, replaceBlock, createBlock } ) =>
 	() => {
@@ -141,18 +135,13 @@ const ConvertToLinksModal = ( { onClose, clientId, pages } ) => {
 		<Modal
 			closeLabel={ __( 'Close' ) }
 			onRequestClose={ onClose }
-			title={ __( 'Convert to links' ) }
+			title={ __( 'Customize this menu' ) }
 			className={ 'wp-block-page-list-modal' }
 			aria={ { describedby: 'wp-block-page-list-modal__description' } }
 		>
 			<p id={ 'wp-block-page-list-modal__description' }>
 				{ __(
-					'To edit this navigation menu, convert it to single page links. This allows you to add, re-order, remove items, or edit their labels.'
-				) }
-			</p>
-			<p>
-				{ __(
-					"Note: if you add new pages to your site, you'll need to add them to your navigation menu."
+					'This menu is automatically kept in sync with pages on your site. You can manage the menu yourself by clicking customize below.'
 				) }
 			</p>
 			<div className="wp-block-page-list-modal-buttons">
@@ -169,7 +158,7 @@ const ConvertToLinksModal = ( { onClose, clientId, pages } ) => {
 						createBlock: create,
 					} ) }
 				>
-					{ __( 'Convert' ) }
+					{ __( 'Customize' ) }
 				</Button>
 			</div>
 		</Modal>
