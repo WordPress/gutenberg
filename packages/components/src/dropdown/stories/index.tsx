@@ -38,7 +38,7 @@ const Template: ComponentStory< typeof Dropdown > = ( args ) => {
 	);
 };
 
-export const Default = Template.bind( {} );
+export const Default: ComponentStory< typeof Dropdown > = Template.bind( {} );
 Default.args = {
 	position: 'bottom right',
 	renderToggle: ( {
@@ -59,7 +59,9 @@ Default.args = {
  * To apply more padding to the dropdown content, use the provided `<DropdownContentWrapper>`
  * convenience wrapper. A `paddingSize` of `"medium"` is suitable for relatively larger dropdowns (default is `"small"`).
  */
-export const WithMorePadding = Template.bind( {} );
+export const WithMorePadding: ComponentStory< typeof Dropdown > = Template.bind(
+	{}
+);
 WithMorePadding.args = {
 	...Default.args,
 	renderContent: () => (
@@ -74,7 +76,9 @@ WithMorePadding.args = {
  * with a `paddingSize` of `"none"`. This can also serve as a clean foundation to add arbitrary
  * paddings, for example when child components already have padding on their own.
  */
-export const WithNoPadding = Template.bind( {} );
+export const WithNoPadding: ComponentStory< typeof Dropdown > = Template.bind(
+	{}
+);
 WithNoPadding.args = {
 	...Default.args,
 	renderContent: () => (
