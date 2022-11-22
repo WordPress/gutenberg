@@ -18,6 +18,9 @@ export default function useInput() {
 	const {
 		__unstableIsFullySelected,
 		getSelectedBlockClientIds,
+		getSelectedBlockClientId,
+		getBlockRootClientId,
+		getBlockIndex,
 		__unstableIsSelectionMergeable,
 		hasMultiSelection,
 	} = useSelect( blockEditorStore );
@@ -27,6 +30,8 @@ export default function useInput() {
 		removeBlocks,
 		__unstableDeleteSelection,
 		__unstableExpandSelection,
+		insertDefaultBlock,
+		removeBlock,
 	} = useDispatch( blockEditorStore );
 
 	return useRefEffect( ( node ) => {
@@ -46,6 +51,34 @@ export default function useInput() {
 			}
 
 			if ( ! hasMultiSelection() ) {
+				const { keyCode, target } = event;
+
+				if (
+					keyCode !== ENTER &&
+					keyCode !== BACKSPACE &&
+					keyCode !== DELETE
+				) {
+					return;
+				}
+
+				if ( target !== node ) {
+					return;
+				}
+
+				const clientId = getSelectedBlockClientId();
+
+				event.preventDefault();
+
+				if ( keyCode === ENTER ) {
+					insertDefaultBlock(
+						{},
+						getBlockRootClientId( clientId ),
+						getBlockIndex( clientId ) + 1
+					);
+				} else {
+					removeBlock( clientId );
+				}
+
 				return;
 			}
 
@@ -166,6 +199,15 @@ export default function useInput() {
 			node.addEventListener( eventType, onInput );
 		} );
 
+		// function onFocusOut( event ) {
+		// 	if ( event.relatedTarget === null ) {
+		// 		// The focus is lost, put it on the wrapper.
+		// 		node.focus();
+		// 	}
+		// }
+
+		// node.addEventListener( 'focusout', onFocusOut );
+
 		node.addEventListener( 'beforeinput', onBeforeInput );
 		node.addEventListener( 'keydown', onKeyDown );
 		node.addEventListener( 'compositionstart', onCompositionStart );
@@ -174,6 +216,8 @@ export default function useInput() {
 			events.forEach( ( eventType ) => {
 				node.removeEventListener( eventType, onInput );
 			} );
+
+			// node.removeEventListener( 'focusout', onFocusOut );
 
 			node.removeEventListener( 'beforeinput', onBeforeInput );
 			node.removeEventListener( 'keydown', onKeyDown );

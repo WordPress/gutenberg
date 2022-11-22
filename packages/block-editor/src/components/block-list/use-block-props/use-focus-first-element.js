@@ -113,6 +113,17 @@ export function useFocusFirstElement( clientId ) {
 			textInputs[ isReverse ? textInputs.length - 1 : 0 ] || ref.current;
 
 		if ( ! isInsideRootBlock( ref.current, target ) ) {
+			selection.removeAllRanges();
+			let editor = ref.current;
+
+			// Ensure editor has focus.
+			while ( editor.parentElement?.closest( '[contenteditable]' ) ) {
+				editor = /** @type {HTMLElement} */ (
+					editor.parentElement.closest( '[contenteditable]' )
+				);
+			}
+
+			editor.focus();
 			return;
 		}
 
