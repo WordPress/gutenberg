@@ -83,7 +83,7 @@ export default function HeightControl( {
 	};
 
 	return (
-		<fieldset className="component-height-control">
+		<fieldset className="block-editor-height-control">
 			<BaseControl.VisualLabel as="legend">
 				{ label }
 			</BaseControl.VisualLabel>
@@ -113,6 +113,7 @@ export default function HeightControl( {
 							}
 							withInputField={ false }
 							onChange={ handleSliderChange }
+							__nextHasNoMarginBottom
 						/>
 					</Spacer>
 				</FlexItem>
