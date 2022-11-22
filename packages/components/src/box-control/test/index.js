@@ -16,7 +16,7 @@ import BoxControl from '../';
 
 describe( 'BoxControl', () => {
 	describe( 'Basic rendering', () => {
-		it( 'should render', () => {
+		it( 'should render a box control input', () => {
 			render( <BoxControl /> );
 
 			expect(

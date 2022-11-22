@@ -348,7 +348,7 @@ module.exports = {
 			],
 			rules: {
 				'testing-library/no-container': 'off',
-				'testing-library/no-node-access': 'off',
+				//'testing-library/no-node-access': 'off',
 			},
 		},
 		{
