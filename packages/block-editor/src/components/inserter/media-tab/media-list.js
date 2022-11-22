@@ -9,6 +9,7 @@ import {
 	Tooltip,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -18,7 +19,10 @@ import BlockPreview from '../../block-preview';
 import { getBlocksFromMedia } from './utils';
 
 function MediaPreview( { media, onClick, composite, mediaType } ) {
-	const blocks = getBlocksFromMedia( media, mediaType );
+	const blocks = useMemo(
+		() => getBlocksFromMedia( media, mediaType ),
+		[ media, mediaType ]
+	);
 	const title = media.title?.rendered || media.title;
 	const baseCssClass = 'block-editor-inserter__media-list';
 	return (
