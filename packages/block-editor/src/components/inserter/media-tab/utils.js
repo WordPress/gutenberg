@@ -9,8 +9,8 @@ export function getBlockFromMedia( media, mediaType ) {
 		id: media.id,
 	};
 	// Some props are named differently between the Media REST API and Media Library API.
-	// For example `source_url` is used in the former and `url` is used in the latter..
-	const caption = media.caption?.rendered || media.caption;
+	// For example `source_url` is used in the former and `url` is used in the latter.
+	const caption = media.caption?.raw || media.caption;
 	if ( caption && typeof caption === 'string' ) {
 		attributes.caption = caption;
 	}
