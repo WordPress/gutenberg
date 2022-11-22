@@ -24,6 +24,7 @@ import type { WordPressComponentProps } from '../ui/context/wordpress-component'
 import type { NumberControlProps } from './types';
 import { HStack } from '../h-stack';
 import { Spacer } from '../spacer';
+import { computeStep } from './utils';
 
 function UnforwardedNumberControl(
 	{
@@ -83,15 +84,22 @@ function UnforwardedNumberControl(
 		event: KeyboardEvent | MouseEvent | undefined
 	) => {
 		event?.preventDefault();
-		const shift = event?.shiftKey && isShiftStepEnabled;
-		const delta = shift ? ensureNumber( shiftStep ) * baseStep : baseStep;
+		const enableShift = event?.shiftKey && isShiftStepEnabled;
+		const computedStep = computeStep( {
+			shiftStep: ensureNumber( shiftStep ),
+			enableShift,
+			baseStep,
+		} );
 		let nextValue = isValueEmpty( value ) ? baseValue : value;
 		if ( direction === 'up' ) {
-			nextValue = add( nextValue, delta );
+			nextValue = add( nextValue, computedStep );
 		} else if ( direction === 'down' ) {
-			nextValue = subtract( nextValue, delta );
+			nextValue = subtract( nextValue, computedStep );
 		}
-		return constrainValue( nextValue, shift ? delta : undefined );
+		return constrainValue(
+			nextValue,
+			enableShift ? computedStep : undefined
+		);
 	};
 
 	/**
@@ -131,10 +139,13 @@ function UnforwardedNumberControl(
 				// @ts-expect-error TODO: See if reducer actions can be typed better
 				const [ x, y ] = payload.delta;
 				// @ts-expect-error TODO: See if reducer actions can be typed better
+				// `shiftKey` comes via the `useDrag` hook
 				const enableShift = payload.shiftKey && isShiftStepEnabled;
-				const modifier = enableShift
-					? ensureNumber( shiftStep ) * baseStep
-					: baseStep;
+				const computedStep = computeStep( {
+					shiftStep: ensureNumber( shiftStep ),
+					enableShift,
+					baseStep,
+				} );
 
 				let directionModifier;
 				let delta;
@@ -163,13 +174,13 @@ function UnforwardedNumberControl(
 
 				if ( delta !== 0 ) {
 					delta = Math.ceil( Math.abs( delta ) ) * Math.sign( delta );
-					const distance = delta * modifier * directionModifier;
+					const distance = delta * computedStep * directionModifier;
 
 					// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
 					nextState.value = constrainValue(
 						// @ts-expect-error TODO: Investigate if it's ok for currentValue to be undefined
 						add( currentValue, distance ),
-						enableShift ? modifier : undefined
+						enableShift ? computedStep : undefined
 					);
 				}
 			}
