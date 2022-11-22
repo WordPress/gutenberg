@@ -101,24 +101,61 @@ export default function PostExcerptEditor( {
 		'is-inline': ! showMoreOnNewLine,
 	} );
 
-	/*
+	/**
 	 * translators: If your word count is based on single characters (e.g. East Asian characters),
 	 * enter 'characters_excluding_spaces' or 'characters_including_spaces'. Otherwise, enter 'words'.
 	 * Do not translate into your own language.
 	 */
 	const wordCountType = _x( 'words', 'Word count type. Do not translate!' );
+
 	const currentWordCount = wordCount( rawExcerpt, wordCountType );
+
+	/**
+	 * The excerpt length setting needs to be applied to both
+	 * the raw and the rendered excerpt depending on which is being used.
+	 */
+	const rawOrRenderedExcerpt = !! renderedExcerpt
+		? strippedRenderedExcerpt
+		: rawExcerpt;
+
+	let trimmedExcerpt = '';
+	if ( wordCountType === 'words' ) {
+		trimmedExcerpt = rawOrRenderedExcerpt
+			.trim()
+			.split( ' ', excerptLength )
+			.join( ' ' );
+	} else if ( wordCountType === 'characters_excluding_spaces' ) {
+		/*
+		 * 1. Split the excerpt at the character limit,
+		 * then join the substrings back into one string.
+		 * 2. Count the number of spaces in the excerpt
+		 * by comparing the lengths of the string with and without spaces.
+		 * 3. Add the number to the length of the visible excerpt,
+		 * so that the spaces are excluded from the word count.
+		 */
+		const excerptWithSpaces = rawOrRenderedExcerpt
+			.trim()
+			.split( '', excerptLength )
+			.join( '' );
+
+		const numberOfSpaces =
+			excerptWithSpaces.length -
+			excerptWithSpaces.replaceAll( ' ', '' ).length;
+
+		trimmedExcerpt = rawOrRenderedExcerpt
+			.trim()
+			.split( '', excerptLength + numberOfSpaces )
+			.join( '' );
+	} else if ( wordCountType === 'characters_including_spaces' ) {
+		trimmedExcerpt = rawOrRenderedExcerpt.trim().split( '', excerptLength );
+	}
 
 	const excerptContent = isEditable ? (
 		<RichText
 			className={ excerptClassName }
 			aria-label={ __( 'Post excerpt text' ) }
 			value={
-				rawExcerpt.trim().split( ' ', excerptLength ).join( ' ' ) ||
-				strippedRenderedExcerpt
-					.trim()
-					.split( ' ', excerptLength )
-					.join( ' ' ) ||
+				trimmedExcerpt ||
 				( isSelected ? '' : __( 'No post excerpt found' ) )
 			}
 			onChange={ setExcerpt }
@@ -126,10 +163,7 @@ export default function PostExcerptEditor( {
 		/>
 	) : (
 		<p className={ excerptClassName }>
-			{ strippedRenderedExcerpt
-				.trim()
-				.split( ' ', excerptLength )
-				.join( ' ' ) || __( 'No post excerpt found' ) }
+			{ trimmedExcerpt || __( 'No post excerpt found' ) }
 		</p>
 	);
 	return (
