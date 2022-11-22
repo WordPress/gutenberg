@@ -25,9 +25,11 @@ module.exports = {
 		'@storybook/addon-actions',
 		'storybook-source-link',
 	],
+	framework: '@storybook/react',
 	features: {
 		babelModeV7: true,
 		emotionAlias: false,
+		storyStoreV7: true,
 	},
 	// Workaround:
 	// https://github.com/storybookjs/storybook/issues/12270

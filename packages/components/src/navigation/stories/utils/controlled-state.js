@@ -7,9 +7,9 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Navigation from '..';
-import NavigationItem from '../item';
-import NavigationMenu from '../menu';
+import Navigation from '../..';
+import NavigationItem from '../../item';
+import NavigationMenu from '../../menu';
 
 export function ControlledStateStory() {
 	const [ activeItem, setActiveItem ] = useState( 'item-1' );

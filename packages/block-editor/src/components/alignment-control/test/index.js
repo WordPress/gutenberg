@@ -52,7 +52,7 @@ describe( 'AlignmentUI', () => {
 			advanceTimers: jest.advanceTimersByTime,
 		} );
 
-		render(
+		const { unmount } = render(
 			<AlignmentUI
 				isToolbar
 				value={ alignment }
@@ -77,6 +77,9 @@ describe( 'AlignmentUI', () => {
 				name: /^Align text \w+$/,
 			} )
 		).toHaveLength( 3 );
+
+		// Cancel running effects, like delayed dropdown menu popover positioning.
+		unmount();
 	} );
 
 	test( 'should call on change with undefined when a control is already active', async () => {
