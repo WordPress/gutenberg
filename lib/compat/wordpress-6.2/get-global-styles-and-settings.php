@@ -208,7 +208,11 @@ function _gutenberg_get_global_stylesheet_clean_cache_upon_upgrading( $upgrader,
  */
 function gutenberg_get_global_settings( $path = array(), $context = array() ) {
 	if ( ! empty( $context['block_name'] ) ) {
-		$path = array_merge( array( 'blocks', $context['block_name'] ), $path );
+		$new_path = array( 'blocks', $context['block_name'] );
+		foreach( $path as $subpath ) {
+			$new_path[] = $subpath;
+		}
+		$path = $new_path;
 	}
 
 	// This is the default value when no origin is provided or when it is 'all'.
