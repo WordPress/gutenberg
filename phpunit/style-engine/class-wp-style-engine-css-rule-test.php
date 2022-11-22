@@ -156,7 +156,7 @@ class WP_Style_Engine_CSS_Rule_Test extends WP_UnitTestCase {
 		);
 		$css_declarations   = new WP_Style_Engine_CSS_Declarations_Gutenberg( $input_declarations );
 		$css_rule           = new WP_Style_Engine_CSS_Rule_Gutenberg( $selector, $css_declarations );
-		$expected           = '.poirot,.poirot:active,#miss-marple > .st-mary-mead{margin-left:0;font-family:Detective Sans;}';
+		$expected           = '.poirot, .poirot:active, #miss-marple > .st-mary-mead {margin-left:0;font-family:Detective Sans;}';
 
 		$this->assertSame( $expected, $css_rule->get_css(), 'Return value should be not prettified.' );
 
