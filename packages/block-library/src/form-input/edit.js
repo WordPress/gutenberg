@@ -100,7 +100,6 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 					} ) }
 				>
 					<RichText
-						identifier="label"
 						tagName="div"
 						className="wp-block-form-input-label__content"
 						{ ...blockProps }
@@ -136,7 +135,6 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 							disabled="true"
 						>
 							<RichText
-								identifier="label"
 								tagName="div"
 								{ ...blockProps }
 								value={ label }
@@ -167,7 +165,6 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 					} ) }
 				>
 					<RichText
-						identifier="label"
 						tagName="span"
 						className="wp-block-form-input-label__content"
 						{ ...blockProps }
