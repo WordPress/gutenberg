@@ -27,10 +27,11 @@ const getReset = () => screen.getByText( /Reset/ );
 describe( 'BoxControl', () => {
 	describe( 'Basic rendering', () => {
 		it( 'should render', () => {
-			const { container } = render( <BoxControl /> );
-			const input = container.querySelector( 'input' );
+			render( <BoxControl /> );
 
-			expect( input ).toBeTruthy();
+			expect(
+				screen.getByRole( 'textbox', { name: 'Box Control' } )
+			).toBeVisible();
 		} );
 
 		it( 'should update values when interacting with input', async () => {
