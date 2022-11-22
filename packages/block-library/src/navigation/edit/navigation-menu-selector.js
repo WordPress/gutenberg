@@ -20,6 +20,7 @@ import { useEffect, useMemo, useState } from '@wordpress/element';
  */
 import useNavigationMenu from '../use-navigation-menu';
 import useNavigationEntities from '../use-navigation-entities';
+import useMoreNavigationMenu from './use-more-navigation-menu';
 
 function NavigationMenuSelector( {
 	currentMenuId,
@@ -59,6 +60,8 @@ function NavigationMenuSelector( {
 		'wp_navigation',
 		'title'
 	);
+
+	const displayMoreNavigationMenu = useMoreNavigationMenu();
 
 	const shouldEnableMenuSelector =
 		( canSwitchNavigationMenu || canUserCreateNavigationMenu ) &&
@@ -143,7 +146,7 @@ function NavigationMenuSelector( {
 		},
 	};
 
-	if ( ! hasNavigationMenus && ! hasClassicMenus ) {
+	if ( ! displayMoreNavigationMenu ) {
 		return (
 			<Button
 				className="wp-block-navigation__navigation-selector-button--createnew"

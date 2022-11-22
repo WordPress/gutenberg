@@ -17,6 +17,7 @@ import { __ } from '@wordpress/i18n';
  */
 import ManageMenusButton from './manage-menus-button';
 import NavigationMenuSelector from './navigation-menu-selector';
+import useMoreNavigationMenu from './use-more-navigation-menu';
 
 const WrappedNavigationMenuSelector = ( {
 	clientId,
@@ -70,6 +71,36 @@ const MenuInspectorControls = ( {
 		? 'list'
 		: undefined;
 
+	const displayMoreNavigationMenu = useMoreNavigationMenu();
+
+	let headingContent = (
+		<>
+			<Heading
+				className="wp-block-navigation-off-canvas-editor__title"
+				level={ 2 }
+			>
+				{ __( 'Menu' ) }
+			</Heading>
+			<WrappedNavigationMenuSelector
+				clientId={ clientId }
+				currentMenuId={ currentMenuId }
+				handleUpdateMenu={ handleUpdateMenu }
+				convertClassicMenu={ convertClassicMenu }
+				onCreateNew={ onCreateNew }
+				createNavigationMenuIsSuccess={ createNavigationMenuIsSuccess }
+				createNavigationMenuIsError={ createNavigationMenuIsError }
+			/>
+		</>
+	);
+
+	if ( displayMoreNavigationMenu ) {
+		headingContent = (
+			<HStack className="wp-block-navigation-off-canvas-editor__header">
+				{ headingContent }
+			</HStack>
+		);
+	}
+
 	return (
 		<InspectorControls __experimentalGroup={ menuControlsSlot }>
 			<PanelBody
@@ -79,27 +110,7 @@ const MenuInspectorControls = ( {
 			>
 				{ isOffCanvasNavigationEditorEnabled ? (
 					<>
-						<HStack className="wp-block-navigation-off-canvas-editor__header">
-							<Heading
-								className="wp-block-navigation-off-canvas-editor__title"
-								level={ 2 }
-							>
-								{ __( 'Menu' ) }
-							</Heading>
-							<WrappedNavigationMenuSelector
-								clientId={ clientId }
-								currentMenuId={ currentMenuId }
-								handleUpdateMenu={ handleUpdateMenu }
-								convertClassicMenu={ convertClassicMenu }
-								onCreateNew={ onCreateNew }
-								createNavigationMenuIsSuccess={
-									createNavigationMenuIsSuccess
-								}
-								createNavigationMenuIsError={
-									createNavigationMenuIsError
-								}
-							/>
-						</HStack>
+						{ headingContent }
 						{ currentMenuId && isNavigationMenuMissing ? (
 							<p>{ __( 'Select or create a menu' ) }</p>
 						) : (
