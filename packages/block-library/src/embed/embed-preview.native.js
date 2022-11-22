@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { TouchableWithoutFeedback } from 'react-native';
-import { isEmpty } from 'lodash';
 import classnames from 'classnames/dedupe';
 
 /**
@@ -52,7 +51,7 @@ const EmbedPreview = ( {
 		styles[ `embed-preview__sandbox--align-${ align }` ];
 
 	function accessibilityLabelCreator( caption ) {
-		return isEmpty( caption )
+		return ! caption
 			? /* translators: accessibility text. Empty Embed caption. */
 			  __( 'Embed caption. Empty' )
 			: sprintf(
