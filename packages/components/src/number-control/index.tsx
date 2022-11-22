@@ -70,13 +70,10 @@ function UnforwardedNumberControl(
 	const isStepAny = step === 'any';
 	const baseStep = isStepAny ? 1 : ensureNumber( step );
 	const baseValue = roundClamp( 0, min, max, baseStep );
-	const constrainValue = (
-		value: number | string,
-		stepOverride?: number
-	) => {
+	const constrainValue = ( value: number, stepOverride?: number ) => {
 		// When step is "any" clamp the value, otherwise round and clamp it.
 		return isStepAny
-			? Math.min( max, Math.max( min, ensureNumber( value ) ) )
+			? Math.min( max, Math.max( min, value ) )
 			: roundClamp( value, min, max, stepOverride ?? baseStep );
 	};
 
@@ -84,7 +81,7 @@ function UnforwardedNumberControl(
 	const classes = classNames( 'components-number-control', className );
 
 	const spinValue = (
-		value: string | number | undefined,
+		valueToSpin: number,
 		direction: 'up' | 'down',
 		event: KeyboardEvent | MouseEvent | undefined
 	) => {
@@ -95,12 +92,10 @@ function UnforwardedNumberControl(
 			enableShift,
 			baseStep,
 		} );
-		let nextValue = isValueEmpty( value ) ? baseValue : value;
-		if ( direction === 'up' ) {
-			nextValue = add( nextValue, computedStep );
-		} else if ( direction === 'down' ) {
-			nextValue = subtract( nextValue, computedStep );
-		}
+		const nextValue =
+			direction === 'up'
+				? add( valueToSpin, computedStep )
+				: subtract( valueToSpin, computedStep );
 		return constrainValue(
 			nextValue,
 			enableShift ? computedStep : undefined
@@ -130,13 +125,18 @@ function UnforwardedNumberControl(
 				const actionEvent = (
 					action as inputControlActionTypes.KeyEventAction
 				 ).payload.event;
-				// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
-				nextState.value = spinValue(
-					currentValue,
-					action.type === inputControlActionTypes.PRESS_UP
-						? 'up'
-						: 'down',
-					actionEvent as KeyboardEvent | undefined
+				const valueToSpin = isValueEmpty( currentValue )
+					? baseValue
+					: ensureNumber( currentValue );
+
+				nextState.value = ensureString(
+					spinValue(
+						valueToSpin,
+						action.type === inputControlActionTypes.PRESS_UP
+							? 'up'
+							: 'down',
+						actionEvent as KeyboardEvent | undefined
+					)
 				);
 			}
 
@@ -189,11 +189,12 @@ function UnforwardedNumberControl(
 					delta = Math.ceil( Math.abs( delta ) ) * Math.sign( delta );
 					const distance = delta * computedStep * directionModifier;
 
-					// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
-					nextState.value = constrainValue(
-						// @ts-expect-error TODO: Investigate if it's ok for currentValue to be undefined
-						add( currentValue, distance ),
-						enableShift ? computedStep : undefined
+					nextState.value = ensureString(
+						constrainValue(
+							// @ts-expect-error TODO: Investigate if it's ok for currentValue to be undefined
+							add( currentValue, distance ),
+							enableShift ? computedStep : undefined
+						)
 					);
 				}
 			}
@@ -220,9 +221,13 @@ function UnforwardedNumberControl(
 
 	const buildSpinButtonClickHandler =
 		( direction: 'up' | 'down' ) =>
-		( event: MouseEvent< HTMLButtonElement > ) =>
-			onChange?.(
-				String( spinValue( valuePropAsString, direction, event ) ),
+		( event: MouseEvent< HTMLButtonElement > ) => {
+			const valueToSpin = isValueEmpty( valuePropAsString )
+				? baseValue
+				: ensureNumber( valuePropAsString );
+
+			return onChange?.(
+				ensureString( spinValue( valueToSpin, direction, event ) ),
 				{
 					// Set event.target to the <input> so that consumers can use
 					// e.g. event.target.validity.
@@ -232,6 +237,7 @@ function UnforwardedNumberControl(
 					},
 				}
 			);
+		};
 
 	return (
 		<Input
