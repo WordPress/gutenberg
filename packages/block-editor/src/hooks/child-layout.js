@@ -110,7 +110,7 @@ export function ChildLayoutEdit( {
  * @return {boolean}     Whether there is support.
  */
 export function hasChildLayoutSupport( {
-	__unstableParentLayout: parentLayout,
+	__unstableParentLayout: parentLayout = {},
 } ) {
 	const {
 		type: parentLayoutType = 'default',
