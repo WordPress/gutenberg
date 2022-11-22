@@ -30,6 +30,7 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 		attributes;
 	const blockProps = useBlockProps();
 	const ref = useRef();
+	const TagName = type === 'textarea' ? 'textarea' : 'input';
 
 	if ( ref.current ) {
 		ref.current.focus();
@@ -93,37 +94,6 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 				</InspectorControls>
 			) }
 
-			{ type === 'textarea' && (
-				<div
-					className={ classNames( 'wp-block-form-input-label', {
-						'is-label-inline': inlineLabel,
-					} ) }
-				>
-					<RichText
-						tagName="div"
-						className="wp-block-form-input-label__content"
-						{ ...blockProps }
-						value={ label }
-						onChange={ ( newLabel ) =>
-							setAttributes( { label: newLabel } )
-						}
-						ref={ ref.current }
-						aria-label={
-							label ? __( 'Label' ) : __( 'Empty label' )
-						}
-						data-empty={ label ? false : true }
-						placeholder={ __( 'Type the label for this input' ) }
-					/>
-					<textarea
-						className="wp-block-form-input"
-						disabled="true"
-						name={ name }
-						required={ required }
-						aria-required={ required }
-					/>
-				</div>
-			) }
-
 			{ type === 'submit' && (
 				<div className="wp-block-buttons">
 					<div className="wp-block-button">
@@ -152,7 +122,7 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 				</div>
 			) }
 
-			{ type !== 'textarea' && type !== 'submit' && (
+			{ type !== 'submit' && (
 				<div
 					className={ classNames( 'wp-block-form-input-label', {
 						'is-label-inline': inlineLabel,
@@ -172,7 +142,7 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 						data-empty={ label ? false : true }
 						placeholder={ __( 'Type the label for this input' ) }
 					/>
-					<input
+					<TagName
 						type={ type }
 						className="wp-block-form-input"
 						aria-label={ __( 'Optional placeholder text' ) }
