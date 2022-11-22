@@ -7,7 +7,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import { useEffect, useRef, useCallback } from '@wordpress/element';
-import { store as blocksStore } from '@wordpress/blocks';
+import { store as blocksStore, getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -47,6 +47,36 @@ function StopEditingAsBlocksOnOutsideSelect( {
 	return null;
 }
 
+function filterBlocksForShuffle( blocks ) {
+	return flattenBlocks( blocks ).filter( ( block ) => {
+		const blockType = getBlockType( block.name );
+
+		return blockType.category !== 'design';
+	} );
+}
+
+function compareFilteredBlocks( sourceBlocks, targetBlocks ) {
+	if ( sourceBlocks.length !== targetBlocks.length ) {
+		return false;
+	}
+
+	const targetBlockNames = {};
+	for ( const targetBlock of targetBlocks ) {
+		targetBlockNames[ targetBlock.name ] ??= 0;
+		targetBlockNames[ targetBlock.name ] += 1;
+	}
+
+	for ( const sourceBlock of sourceBlocks ) {
+		if ( ! targetBlockNames[ sourceBlock.name ] ) {
+			return false;
+		}
+
+		targetBlockNames[ sourceBlock.name ] -= 1;
+	}
+
+	return true;
+}
+
 function ShufflePatternsToolbarItem( { clientId } ) {
 	// TODO: Probably worth to add this to blocks' selectors.
 	const getFlattenContentBlocks = useSelect( ( select ) => {
@@ -71,6 +101,7 @@ function ShufflePatternsToolbarItem( { clientId } ) {
 		( select ) => {
 			const blocks =
 				select( blockEditorStore ).getBlocksByClientId( clientId );
+			const filteredBlocks = filterBlocksForShuffle( blocks );
 			const _contentBlocks = getFlattenContentBlocks( blocks );
 			const allPatterns =
 				select( blockEditorStore ).__experimentalGetAllowedPatterns();
@@ -79,17 +110,12 @@ function ShufflePatternsToolbarItem( { clientId } ) {
 				contentBlocks: _contentBlocks,
 				patterns: allPatterns
 					.filter( ( pattern ) => {
-						const patternContentBlocks = getFlattenContentBlocks(
+						const filteredPatternBlocks = filterBlocksForShuffle(
 							pattern.blocks
 						);
-						return (
-							patternContentBlocks.length ===
-								_contentBlocks.length &&
-							_contentBlocks.every(
-								( block, index ) =>
-									block.name ===
-									patternContentBlocks[ index ].name
-							)
+						return compareFilteredBlocks(
+							filteredBlocks,
+							filteredPatternBlocks
 						);
 					} )
 					.filter(
