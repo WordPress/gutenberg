@@ -209,6 +209,8 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	return {
 		...props,
 		ref,
+		contentEditable: true,
+		suppressContentEditableWarning: true,
 		className: classnames(
 			props.className,
 			'block-editor-block-list__layout',
