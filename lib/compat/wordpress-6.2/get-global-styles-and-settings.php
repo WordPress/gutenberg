@@ -211,14 +211,13 @@ function gutenberg_get_global_settings( $path = array(), $context = array() ) {
 		$path = array_merge( array( 'blocks', $context['block_name'] ), $path );
 	}
 
+	// This is the default value when no origin is provided or when it is 'all'.
 	$origin = 'custom';
 	if ( ! wp_theme_has_theme_json() ) {
 		// For themes with no theme.json skip querying the database for user data (custom origin).
 		$origin = 'theme';
 	} elseif ( isset( $context['origin'] ) && 'base' === $context['origin'] ) {
 		$origin = 'theme';
-	} elseif ( isset( $context['origin'] ) && 'all' === $context['all'] ) {
-		$origin = 'custom';
 	}
 
 	$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin )->get_settings();
