@@ -189,10 +189,13 @@ function UnforwardedNumberControl(
 					delta = Math.ceil( Math.abs( delta ) ) * Math.sign( delta );
 					const distance = delta * computedStep * directionModifier;
 
+					const valueToConstrain = isValueEmpty( currentValue )
+						? baseValue
+						: ensureNumber( currentValue );
+
 					nextState.value = ensureString(
 						constrainValue(
-							// @ts-expect-error TODO: Investigate if it's ok for currentValue to be undefined
-							add( currentValue, distance ),
+							add( valueToConstrain, distance ),
 							enableShift ? computedStep : undefined
 						)
 					);
@@ -207,13 +210,14 @@ function UnforwardedNumberControl(
 				action.type === inputControlActionTypes.COMMIT
 			) {
 				const applyEmptyValue =
-					required === false && currentValue === '';
+					currentValue === undefined ||
+					( required === false && currentValue === '' );
 
-				// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
 				nextState.value = applyEmptyValue
-					? currentValue
-					: // @ts-expect-error TODO: Investigate if it's ok for currentValue to be undefined
-					  constrainValue( currentValue );
+					? ''
+					: ensureString(
+							constrainValue( ensureNumber( currentValue ) )
+					  );
 			}
 
 			return nextState;
