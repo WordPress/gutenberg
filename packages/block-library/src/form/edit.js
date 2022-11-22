@@ -16,6 +16,7 @@ const ALLOWED_BLOCKS = [
 	'core/paragraph',
 	'core/heading',
 	'core/form-input',
+	'core/form-submit-button',
 	'core/columns',
 	'core/group',
 ];
@@ -52,13 +53,7 @@ const TEMPLATE = [
 			required: true,
 		},
 	],
-	[
-		'core/form-input',
-		{
-			type: 'submit',
-			label: __( 'Submit' ),
-		},
-	],
+	[ 'core/form-submit-button', {} ],
 ];
 
 const Edit = ( { attributes, setAttributes, clientId } ) => {

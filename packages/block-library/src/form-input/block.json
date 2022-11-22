@@ -19,7 +19,7 @@
 		"label": {
 			"type": "string",
 			"default": "Label",
-			"selector": ".wp-block-form-input-label__content,button",
+			"selector": ".wp-block-form-input-label__content",
 			"source": "html"
 		},
 		"inlineLabel": {
@@ -40,5 +40,5 @@
 			"attribute": "placeholder"
 		}
 	},
-	"style": [ "wp-block-form-input", "wp-block-buttons", "wp-block-button" ]
+	"style": [ "wp-block-form-input" ]
 }
