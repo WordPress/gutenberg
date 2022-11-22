@@ -107,9 +107,9 @@ function __ExperimentalOffCanvasEditor(
 		setExpandedState,
 	} );
 	const selectEditorBlock = useCallback(
-		( event, _clientId ) => {
-			updateBlockSelection( event, _clientId );
-			setSelectedTreeId( _clientId );
+		( event, blockClientId ) => {
+			updateBlockSelection( event, blockClientId );
+			setSelectedTreeId( blockClientId );
 		},
 		[ setSelectedTreeId, updateBlockSelection ]
 	);
@@ -131,20 +131,26 @@ function __ExperimentalOffCanvasEditor(
 	);
 
 	const expand = useCallback(
-		( _clientId ) => {
-			if ( ! _clientId ) {
+		( blockClientId ) => {
+			if ( ! blockClientId ) {
 				return;
 			}
-			setExpandedState( { type: 'expand', clientIds: [ _clientId ] } );
+			setExpandedState( {
+				type: 'expand',
+				clientIds: [ blockClientId ],
+			} );
 		},
 		[ setExpandedState ]
 	);
 	const collapse = useCallback(
-		( _clientId ) => {
-			if ( ! _clientId ) {
+		( blockClientId ) => {
+			if ( ! blockClientId ) {
 				return;
 			}
-			setExpandedState( { type: 'collapse', clientIds: [ _clientId ] } );
+			setExpandedState( {
+				type: 'collapse',
+				clientIds: [ blockClientId ],
+			} );
 		},
 		[ setExpandedState ]
 	);
