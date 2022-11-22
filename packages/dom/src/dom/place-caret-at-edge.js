@@ -47,13 +47,15 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 		return;
 	}
 
+	let editor = container;
+
 	if ( ! container.ownerDocument.activeElement?.contains( container ) ) {
-		while ( container.parentElement?.closest( '[contenteditable]' ) ) {
-			container = /** @type {HTMLElement} */ (
-				container.parentElement.closest( '[contenteditable]' )
+		while ( editor.parentElement?.closest( '[contenteditable]' ) ) {
+			editor = /** @type {HTMLElement} */ (
+				editor.parentElement.closest( '[contenteditable]' )
 			);
 		}
-		container.focus();
+		editor.focus();
 	}
 
 	if ( isInputOrTextArea( container ) ) {
