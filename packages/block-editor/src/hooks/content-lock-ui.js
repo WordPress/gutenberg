@@ -7,7 +7,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import { useEffect, useRef, useCallback } from '@wordpress/element';
-import { store as blocksStore, getBlockType } from '@wordpress/blocks';
+import { store as blocksStore, hasBlockSupport } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -48,11 +48,9 @@ function StopEditingAsBlocksOnOutsideSelect( {
 }
 
 function filterBlocksForShuffle( blocks ) {
-	return flattenBlocks( blocks ).filter( ( block ) => {
-		const blockType = getBlockType( block.name );
-
-		return blockType.category !== 'design';
-	} );
+	return flattenBlocks( blocks ).filter(
+		( block ) => ! hasBlockSupport( block.name, '__experimentalLayout' )
+	);
 }
 
 function compareFilteredBlocks( sourceBlocks, targetBlocks ) {
