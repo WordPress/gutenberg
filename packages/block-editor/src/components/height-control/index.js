@@ -19,13 +19,13 @@ import { __ } from '@wordpress/i18n';
  */
 import useSetting from '../use-setting';
 
-const CUSTOM_VALUE_SETTINGS = {
-	px: { max: 1000, steps: 1 },
-	'%': { max: 100, steps: 1 },
-	vw: { max: 100, steps: 1 },
-	vh: { max: 100, steps: 1 },
-	em: { max: 50, steps: 0.1 },
-	rem: { max: 50, steps: 0.1 },
+const RANGE_CONTROL_CUSTOM_SETTINGS = {
+	px: { max: 1000, step: 1 },
+	'%': { max: 100, step: 1 },
+	vw: { max: 100, step: 1 },
+	vh: { max: 100, step: 1 },
+	em: { max: 50, step: 0.1 },
+	rem: { max: 50, step: 0.1 },
 };
 
 export default function HeightControl( {
@@ -50,10 +50,36 @@ export default function HeightControl( {
 		useMemo(
 			() => parseQuantityAndUnitFromRawValue( value ),
 			[ value ]
-		)[ 1 ] || units[ 0 ].value;
+		)[ 1 ] ||
+		units[ 0 ]?.value ||
+		'px';
 
 	const handleSliderChange = ( next ) => {
 		onChange( [ next, selectedUnit ].join( '' ) );
+	};
+
+	const handleUnitChange = ( newUnit ) => {
+		// Attempt to smooth over differences between currentUnit and newUnit.
+		// This should slightly improve the experience of switching between unit types.
+		const [ currentValue, currentUnit ] =
+			parseQuantityAndUnitFromRawValue( value );
+
+		if ( [ 'em', 'rem' ].includes( newUnit ) && currentUnit === 'px' ) {
+			// Convert pixel value to an approximate of the new unit, assuming a root size of 16px.
+			onChange( ( currentValue / 16 ).toFixed( 2 ) + newUnit );
+		} else if (
+			[ 'em', 'rem' ].includes( currentUnit ) &&
+			newUnit === 'px'
+		) {
+			// Convert to pixel value assuming a root size of 16px.
+			onChange( Math.round( currentValue * 16 ) + newUnit );
+		} else if (
+			[ 'vh', 'vw', '%' ].includes( newUnit ) &&
+			currentValue > 100
+		) {
+			// When converting to `vh`, `vw`, or `%` units, cap the new value at 100.
+			onChange( 100 + newUnit );
+		}
 	};
 
 	return (
@@ -67,6 +93,7 @@ export default function HeightControl( {
 						value={ value }
 						units={ units }
 						onChange={ onChange }
+						onUnitChange={ handleUnitChange }
 						min={ 0 }
 						size={ '__unstable-large' }
 					/>
@@ -77,11 +104,12 @@ export default function HeightControl( {
 							value={ customRangeValue }
 							min={ 0 }
 							max={
-								CUSTOM_VALUE_SETTINGS[ selectedUnit ]?.max ?? 10
+								RANGE_CONTROL_CUSTOM_SETTINGS[ selectedUnit ]
+									?.max ?? 100
 							}
 							step={
-								CUSTOM_VALUE_SETTINGS[ selectedUnit ]?.steps ??
-								0.1
+								RANGE_CONTROL_CUSTOM_SETTINGS[ selectedUnit ]
+									?.step ?? 0.1
 							}
 							withInputField={ false }
 							onChange={ handleSliderChange }
