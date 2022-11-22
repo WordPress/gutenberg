@@ -113,8 +113,6 @@ export function useFocusFirstElement( clientId ) {
 			textInputs[ isReverse ? textInputs.length - 1 : 0 ] || ref.current;
 
 		if ( ! isInsideRootBlock( ref.current, target ) ) {
-			selection.removeAllRanges();
-			ref.current.focus();
 			return;
 		}
 

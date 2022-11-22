@@ -142,6 +142,7 @@ export default function useArrowNav() {
 	const {
 		getMultiSelectedBlocksStartClientId,
 		getMultiSelectedBlocksEndClientId,
+		getSelectedBlockClientId,
 		getSettings,
 		hasMultiSelection,
 		__unstableIsFullySelected,
@@ -158,8 +159,8 @@ export default function useArrowNav() {
 		}
 
 		function onKeyDown( event ) {
-			const { keyCode, target, shiftKey, ctrlKey, altKey, metaKey } =
-				event;
+			const { keyCode, shiftKey, ctrlKey, altKey, metaKey } = event;
+			let { target } = event;
 			const isUp = keyCode === UP;
 			const isDown = keyCode === DOWN;
 			const isLeft = keyCode === LEFT;
@@ -202,6 +203,12 @@ export default function useArrowNav() {
 				}
 
 				return;
+			}
+
+			const clientId = getSelectedBlockClientId();
+
+			if ( target === node && clientId ) {
+				target = ownerDocument.getElementById( 'block-' + clientId );
 			}
 
 			// When presing any key other than up or down, the initial vertical

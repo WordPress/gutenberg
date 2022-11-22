@@ -48,6 +48,11 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 	}
 
 	if ( ! container.ownerDocument.activeElement?.contains( container ) ) {
+		while ( container.parentElement?.closest( '[contenteditable]' ) ) {
+			container = /** @type {HTMLElement} */ (
+				container.parentElement.closest( '[contenteditable]' )
+			);
+		}
 		container.focus();
 	}
 
@@ -127,7 +132,9 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 	selection.removeAllRanges();
 
 	if ( parentElement?.closest( '[contenteditable]' ) !== container ) {
-		container.focus();
+		container.dispatchEvent(
+			new defaultView.FocusEvent( 'focusin', { bubbles: true } )
+		);
 		return;
 	}
 
