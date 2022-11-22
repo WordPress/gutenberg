@@ -53,7 +53,10 @@ export function useEventHandlers( clientId ) {
 					return;
 				}
 
-				if ( target !== node ) {
+				if (
+					target !== node ||
+					target.ownerDocument.activeElement !== node
+				) {
 					return;
 				}
 
