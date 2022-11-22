@@ -50,12 +50,14 @@ export function ChildLayoutEdit( {
 				value={ selfStretch || 'fit' }
 				help={ helpText( selfStretch ) }
 				onChange={ ( value ) => {
+					const newFlexSize = value !== 'fixed' ? null : flexSize;
 					setAttributes( {
 						style: {
 							...style,
 							layout: {
 								...childLayout,
 								selfStretch: value,
+								flexSize: newFlexSize,
 							},
 						},
 					} );
