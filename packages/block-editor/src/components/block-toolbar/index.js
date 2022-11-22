@@ -117,13 +117,10 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 	const isSynced =
 		isReusableBlock( blockType ) || isTemplatePart( blockType );
 
-	const classes = classnames(
-		'block-editor-block-toolbar',
-		shouldShowMovers && 'is-showing-movers',
-		{
-			'is-synced': isSynced,
-		}
-	);
+	const classes = classnames( 'block-editor-block-toolbar', {
+		'is-showing-movers': shouldShowMovers,
+		'is-synced': isSynced,
+	} );
 
 	return (
 		<div className={ classes }>
