@@ -3,7 +3,7 @@
 		"name": "core/page-list",
 		"isValid": true,
 		"attributes": {
-			"rootPageID": 0
+			"parentPageID": 0
 		},
 		"innerBlocks": []
 	}
