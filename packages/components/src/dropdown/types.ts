@@ -74,17 +74,7 @@ export type DropdownProps = {
 	 * e.g.: the ability to have the popover without an arrow.
 	 */
 	popoverProps?: WordPressComponentProps<
-		Omit<
-			PopoverProps,
-			| 'children'
-			| 'position'
-			| 'onClose'
-			| 'onFocusOutside'
-			| 'expandOnMobile'
-			| 'headerTitle'
-			| 'focusOnMount'
-			| 'offset'
-		>,
+		Omit< PopoverProps, keyof DropdownProps | 'children' >,
 		'div',
 		false
 	>;

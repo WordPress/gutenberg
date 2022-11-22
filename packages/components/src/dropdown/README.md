@@ -82,7 +82,7 @@ The callback receives a boolean as a parameter. If `true`, the popover will open
 
 -   Required: No
 
-### `popoverProps`: `WordPressComponentProps< Omit< PopoverProps, 'children' >, 'div', false >`
+### `popoverProps`: `WordPressComponentProps< Omit< PopoverProps, keyof DropdownProps | 'children' > 'div', false	>`
 
 Properties of popoverProps object will be passed as props to the `Popover` component.
 

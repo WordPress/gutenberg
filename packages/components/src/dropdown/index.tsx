@@ -23,7 +23,7 @@ function useObservableState(
 	const [ state, setState ] = useState( initialState );
 	return [
 		state,
-		( value: boolean ) => {
+		( value ) => {
 			setState( value );
 			if ( onStateChange ) {
 				onStateChange( value );
