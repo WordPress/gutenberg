@@ -1,14 +1,4 @@
-.edit-site-new-template-dropdown {
-	.components-dropdown-menu__toggle {
-		padding: 6px 12px;
-	}
 
-	.edit-site-new-template-dropdown__popover {
-		@include break-small() {
-			min-width: 300px;
-		}
-	}
-}
 
 .edit-site-custom-template-modal {
 	&__contents {
@@ -175,5 +165,22 @@
 		align-items: center;
 		justify-content: center;
 		height: 100%;
+	}
+}
+
+.edit-site-add-new-template-modal_side-menu .components-panel__body {
+	border: none;
+}
+
+.edit-site-add-new-template__tab-panel .components-tab-panel__tabs-item {
+	border-radius: $radius-block-ui;
+	font-weight: 400;
+	&.is-active {
+		background: $gray-100;
+		box-shadow: none;
+		font-weight: 500;
+	}
+	&:focus:not(:disabled) {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 	}
 }

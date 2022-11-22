@@ -8,6 +8,7 @@ import {
 	MenuGroup,
 	MenuItem,
 	NavigableMenu,
+	Button,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
@@ -34,7 +35,11 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
+/**
+ * Internal dependencies
+ */
 import AddCustomTemplateModal from './add-custom-template-modal';
+import TemplateActionsLoadingScreen from './template-actions-loading-screen';
 import {
 	useExistingTemplates,
 	useDefaultTemplateTypes,
@@ -44,7 +49,7 @@ import {
 	usePostTypeArchiveMenuItems,
 } from './utils';
 import AddCustomGenericTemplateModal from './add-custom-generic-template-modal';
-import TemplateActionsLoadingScreen from './template-actions-loading-screen';
+import AddNewTemplateModal from './add-new-template-modal';
 import { useHistory } from '../routes';
 import { store as editSiteStore } from '../../store';
 
@@ -80,6 +85,8 @@ const TEMPLATE_ICONS = {
 };
 
 export default function NewTemplate( { postType } ) {
+	const [ showAddNewTemplateModal, setShowAddNewTemplateModal ] =
+		useState( false );
 	const [ showCustomTemplateModal, setShowCustomTemplateModal ] =
 		useState( false );
 	const [
@@ -169,6 +176,7 @@ export default function NewTemplate( { postType } ) {
 	if ( ! missingTemplates.length ) {
 		return null;
 	}
+	console.log({ missingTemplates });
 	return (
 		<>
 			<DropdownMenu
@@ -240,6 +248,13 @@ export default function NewTemplate( { postType } ) {
 					</>
 				) }
 			</DropdownMenu>
+			<Button
+				className="edit-site-new-template-button"
+				onClick={ () => setShowAddNewTemplateModal( true ) }
+				variant="primary"
+			>
+				{ __( 'Add New' ) }
+			</Button>
 			{ showCustomTemplateModal && (
 				<AddCustomTemplateModal
 					onClose={ () => setShowCustomTemplateModal( false ) }
@@ -255,6 +270,11 @@ export default function NewTemplate( { postType } ) {
 					isCreatingTemplate={ isCreatingTemplate }
 				/>
 			) }
+			{ showAddNewTemplateModal && (
+				<AddNewTemplateModal
+					onClose={ () => setShowAddNewTemplateModal( false ) }
+				/>
+			) }
 		</>
 	);
 }
@@ -265,6 +285,7 @@ function useMissingTemplates(
 ) {
 	const existingTemplates = useExistingTemplates();
 	const defaultTemplateTypes = useDefaultTemplateTypes();
+	console.log({defaultTemplateTypes});
 	const existingTemplateSlugs = ( existingTemplates || [] ).map(
 		( { slug } ) => slug
 	);
@@ -282,6 +303,7 @@ function useMissingTemplates(
 	// info (title, description, etc.) is preserved in the
 	// used hooks.
 	const enhancedMissingDefaultTemplateTypes = [ ...missingDefaultTemplates ];
+	console.log({enhancedMissingDefaultTemplateTypes, missingDefaultTemplates});
 	const { defaultTaxonomiesMenuItems, taxonomiesMenuItems } =
 		useTaxonomiesMenuItems( onClickMenuItem );
 	const { defaultPostTypesMenuItems, postTypesMenuItems } =
@@ -317,6 +339,7 @@ function useMissingTemplates(
 			DEFAULT_TEMPLATE_SLUGS.indexOf( template2.slug )
 		);
 	} );
+	console.log({enhancedMissingDefaultTemplateTypes});
 	const missingTemplates = [
 		...enhancedMissingDefaultTemplateTypes,
 		...usePostTypeArchiveMenuItems(),
