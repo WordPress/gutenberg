@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-// import { useInstanceId } from '@wordpress/compose';
 import {
 	__unstableComposite as Composite,
 	__unstableUseCompositeState as useCompositeState,
@@ -49,6 +48,7 @@ function MediaPreview( { media, onClick, composite, mediaType } ) {
 							<BlockPreview
 								blocks={ blocks }
 								viewportWidth={ 400 }
+								__unstableIframeContentStyles="figure{margin:0;}"
 							/>
 						</CompositeItem>
 					</Tooltip>
