@@ -307,7 +307,8 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	$css_classes     = trim( implode( ' ', $classes ) );
 
 	$nested_pages = block_core_page_list_nest_pages( $top_level_pages, $pages_with_children );
-	if ( 0 < $parent_page_id ) {
+
+	if ( 0 !== $parent_page_id ) {
 		$nested_pages = block_core_page_list_nest_pages(
 			$pages_with_children[ $parent_page_id ],
 			$pages_with_children
