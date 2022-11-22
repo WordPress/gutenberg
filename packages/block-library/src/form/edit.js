@@ -3,11 +3,14 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
+	InnerBlocks,
 	useBlockProps,
 	useInnerBlocksProps,
 	InspectorControls,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { PanelBody, TextControl } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 
 const ALLOWED_BLOCKS = [
 	'core/paragraph',
@@ -58,13 +61,27 @@ const TEMPLATE = [
 	],
 ];
 
-const Edit = ( { attributes, setAttributes } ) => {
+const Edit = ( { attributes, setAttributes, clientId } ) => {
 	const { formId } = attributes;
 	const blockProps = useBlockProps();
+
+	const { hasInnerBlocks } = useSelect(
+		( select ) => {
+			const { getBlock } = select( blockEditorStore );
+			const block = getBlock( clientId );
+			return {
+				hasInnerBlocks: !! ( block && block.innerBlocks.length ),
+			};
+		},
+		[ clientId ]
+	);
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
 		template: TEMPLATE,
+		renderAppender: hasInnerBlocks
+			? undefined
+			: InnerBlocks.ButtonBlockAppender,
 	} );
 
 	return (
