@@ -28,7 +28,9 @@ describe( 'BoxControl', () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
+
 			render( <BoxControl /> );
+
 			const input = screen.getByRole( 'textbox', {
 				name: 'Box Control',
 			} );
@@ -49,7 +51,9 @@ describe( 'BoxControl', () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
+
 			render( <BoxControl /> );
+
 			const input = screen.getByRole( 'textbox', {
 				name: 'Box Control',
 			} );
@@ -84,7 +88,9 @@ describe( 'BoxControl', () => {
 					/>
 				);
 			};
+
 			render( <Example /> );
+
 			const input = screen.getByRole( 'textbox', {
 				name: 'Box Control',
 			} );
@@ -126,7 +132,9 @@ describe( 'BoxControl', () => {
 					/>
 				);
 			};
+
 			render( <Example /> );
+
 			const input = screen.getByRole( 'textbox', {
 				name: 'Box Control',
 			} );
@@ -152,7 +160,9 @@ describe( 'BoxControl', () => {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
 			const spyChange = jest.fn();
+
 			render( <BoxControl onChange={ ( v ) => spyChange( v ) } /> );
+
 			const input = screen.getByLabelText( 'Box Control', {
 				selector: 'input',
 			} );
@@ -193,6 +203,7 @@ describe( 'BoxControl', () => {
 					onChange={ ( next ) => setState( next ) }
 				/>
 			);
+
 			const unlink = screen.getByLabelText( /Unlink sides/ );
 
 			await user.click( unlink );
@@ -228,6 +239,7 @@ describe( 'BoxControl', () => {
 					splitOnAxis={ true }
 				/>
 			);
+
 			const unlink = screen.getByLabelText( /Unlink sides/ );
 
 			await user.click( unlink );
@@ -310,10 +322,10 @@ describe( 'BoxControl', () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
-
 			const setState = jest.fn();
 
 			render( <BoxControl onChange={ setState } /> );
+
 			const input = screen.getByRole( 'textbox', {
 				name: 'Box Control',
 			} );
