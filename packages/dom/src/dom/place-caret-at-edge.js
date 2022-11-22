@@ -107,6 +107,22 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 		parentEditable.contentEditable = 'true';
 	}
 
+	// const { commonAncestorContainer } = range;
+	// let parentElement;
+
+	// if (
+	// 	commonAncestorContainer.nodeType ===
+	// 	commonAncestorContainer.ELEMENT_NODE
+	// ) {
+	// 	parentElement = /** @type {HTMLElement} */ ( commonAncestorContainer );
+	// } else {
+	// 	parentElement = commonAncestorContainer.parentElement;
+	// }
+
+	// if ( parentElement?.closest( '[contenteditable]' ) !== container ) {
+	// 	return;
+	// }
+
 	const { ownerDocument } = container;
 	const { defaultView } = ownerDocument;
 	assertIsDefined( defaultView, 'defaultView' );

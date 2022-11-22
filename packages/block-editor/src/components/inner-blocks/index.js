@@ -195,6 +195,19 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	const ref = useMergeRefs( [
 		props.ref,
 		__unstableDisableDropZone ? null : blockDropZoneRef,
+		// useRefEffect( ( node ) => {
+		// 	function onKeyDown( event ) {
+		// 		if (
+		// 			event.target === event.target.ownerDocument.activeElement
+		// 		) {
+		// 			event.preventDefault();
+		// 		}
+		// 	}
+		// 	node.addEventListener( 'keydown', onKeyDown );
+		// 	return () => {
+		// 		node.removeEventListener( 'keydown', onKeyDown );
+		// 	};
+		// }, [] ),
 	] );
 
 	const innerBlocksProps = {

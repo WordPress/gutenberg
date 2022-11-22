@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { isTextField } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
@@ -54,7 +53,7 @@ export function useEventHandlers( clientId ) {
 					return;
 				}
 
-				if ( target !== node || isTextField( target ) ) {
+				if ( target !== node ) {
 					return;
 				}
 
