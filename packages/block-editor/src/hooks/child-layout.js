@@ -46,6 +46,7 @@ export function ChildLayoutEdit( {
 	return (
 		<>
 			<ToggleGroupControl
+				size={ '__unstable-large' }
 				label={ childLayoutOrientation( parentLayout ) }
 				value={ selfStretch || 'fit' }
 				help={ helpText( selfStretch ) }
@@ -82,6 +83,7 @@ export function ChildLayoutEdit( {
 			</ToggleGroupControl>
 			{ selfStretch === 'fixed' && (
 				<UnitControl
+					size={ '__unstable-large' }
 					style={ { height: 'auto' } }
 					onChange={ ( value ) => {
 						setAttributes( {
