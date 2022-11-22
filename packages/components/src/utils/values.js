@@ -121,8 +121,6 @@ export const numberToString = ( value ) => {
 /**
  * Regardless of the input being a string or a number, returns a number.
  *
- * Returns `undefined` in case the string is `undefined` or not a valid numeric value.
- *
  * @param {string | number} value
  * @return {number} The parsed number.
  */
@@ -133,10 +131,8 @@ export const ensureNumber = ( value ) => {
 /**
  * Regardless of the input being a string or a number, returns a number.
  *
- * Returns `undefined` in case the string is `undefined` or not a valid numeric value.
- *
  * @param {string | number} value
- * @return {string} The converted string, or `undefined` in case the input is `undefined` or `NaN`.
+ * @return {string} The converted string.
  */
 export const ensureString = ( value ) => {
 	return typeof value === 'string' ? value : numberToString( value );
