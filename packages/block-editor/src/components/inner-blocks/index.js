@@ -6,7 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
+import {
+	useViewportMatch,
+	useMergeRefs,
+	useRefEffect,
+} from '@wordpress/compose';
 import { forwardRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
@@ -195,6 +199,72 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	const ref = useMergeRefs( [
 		props.ref,
 		__unstableDisableDropZone ? null : blockDropZoneRef,
+		useRefEffect( ( node ) => {
+			function onInput( event ) {
+				if ( event.__unstableRedirect === true ) {
+					return;
+				}
+
+				if ( event.target !== node ) {
+					return;
+				}
+
+				const { ownerDocument } = node;
+				const { defaultView } = ownerDocument;
+				const prototype = Object.getPrototypeOf( event );
+				const constructorName = prototype.constructor.name;
+				const Constructor = window[ constructorName ];
+				const { anchorNode } = defaultView.getSelection();
+
+				if ( ! anchorNode ) {
+					return;
+				}
+
+				const anchorElement = (
+					anchorNode.nodeType === anchorNode.ELEMENT_NODE
+						? anchorNode
+						: anchorNode.parentElement
+				 ).closest( '[contenteditable]' );
+
+				if ( ! anchorElement ) {
+					return;
+				}
+
+				const init = {};
+
+				for ( const key in event ) {
+					init[ key ] = event[ key ];
+				}
+
+				const newEvent = new Constructor( event.type, init );
+				newEvent.__unstableRedirect = true;
+				const cancelled = ! anchorElement.dispatchEvent( newEvent );
+				event.stopImmediatePropagation();
+
+				if ( cancelled ) {
+					event.preventDefault();
+				}
+			}
+
+			const events = [
+				'beforeinput',
+				'input',
+				'compositionstart',
+				'compositionend',
+				'compositionupdate',
+				'keydown',
+			];
+
+			events.forEach( ( eventType ) => {
+				node.addEventListener( eventType, onInput );
+			} );
+
+			return () => {
+				events.forEach( ( eventType ) => {
+					node.removeEventListener( eventType, onInput );
+				} );
+			};
+		}, [] ),
 		// useRefEffect( ( node ) => {
 		// 	function onKeyDown( event ) {
 		// 		if (
