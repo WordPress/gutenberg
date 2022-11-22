@@ -8,7 +8,7 @@
 	"keywords": [ "menu", "navigation" ],
 	"textdomain": "default",
 	"attributes": {
-		"rootPageID": {
+		"parentPageID": {
 			"type": "integer",
 			"default": 0
 		}
