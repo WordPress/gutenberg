@@ -1,1 +1,17 @@
-//Styles for off-canvas editor, remove this line when you add some css to this file!
+.offcanvas-editor__list-appender__toggle {
+	flex-direction: row;
+	justify-content: flex-start;
+	border: 0;
+	box-shadow: none;
+	margin-left: 24px;
+	margin-top: $grid-unit-10; // List View block SVG icon size.
+
+	&.components-button.components-button {
+		padding: 0;
+	}
+
+	&:hover,
+	&:focus {
+		box-shadow: none;
+	}
+}
