@@ -579,6 +579,14 @@ export default function NavigationSubmenuEdit( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Link settings' ) }>
 					<TextControl
+						value={ label || '' }
+						onChange={ ( labelValue ) => {
+							setAttributes( { label: labelValue } );
+						} }
+						label={ __( 'Label' ) }
+						autoComplete="off"
+					/>
+					<TextControl
 						value={ url || '' }
 						onChange={ ( urlValue ) => {
 							setAttributes( { url: urlValue } );
