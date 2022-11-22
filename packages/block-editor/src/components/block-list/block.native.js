@@ -33,6 +33,7 @@ import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from '../block-mobile-toolbar';
 import { store as blockEditorStore } from '../../store';
 import BlockDraggable from '../block-draggable';
+import { useLayout } from './layout';
 
 const emptyArray = [];
 function BlockForType( {
@@ -78,6 +79,8 @@ function BlockForType( {
 		),
 	] );
 
+	const parentLayout = useLayout();
+
 	return (
 		<GlobalStylesContext.Provider value={ mergedStyle }>
 			<BlockEdit
@@ -99,6 +102,7 @@ function BlockForType( {
 				onDeleteBlock={ onDeleteBlock }
 				blockWidth={ blockWidth }
 				parentBlockAlignment={ parentBlockAlignment }
+				__unstableParentLayout={ parentLayout }
 			/>
 			<View onLayout={ getBlockWidth } />
 		</GlobalStylesContext.Provider>
