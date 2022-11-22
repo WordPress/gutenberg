@@ -6,7 +6,6 @@ import {
 	MenuItem,
 	MenuItemsChoice,
 	DropdownMenu,
-	Button,
 	VisuallyHidden,
 } from '@wordpress/components';
 import { useEntityProp } from '@wordpress/core-data';
@@ -142,25 +141,6 @@ function NavigationMenuSelector( {
 			setIsPressed( ! isPressed );
 		},
 	};
-
-	if ( ! hasNavigationMenus && ! hasClassicMenus ) {
-		return (
-			<Button
-				className="wp-block-navigation__navigation-selector-button--createnew"
-				isBusy={ ! enableOptions }
-				disabled={ ! enableOptions }
-				__experimentalIsFocusable
-				onClick={ () => {
-					onCreateNew();
-					setIsCreatingMenu( true );
-					setSelectorLabel( __( 'Loading …' ) );
-					setEnableOptions( false );
-				} }
-			>
-				{ __( 'Create new menu' ) }
-			</Button>
-		);
-	}
 
 	return (
 		<DropdownMenu

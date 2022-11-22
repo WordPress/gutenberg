@@ -17,6 +17,8 @@ import { __ } from '@wordpress/i18n';
  */
 import ManageMenusButton from './manage-menus-button';
 import NavigationMenuSelector from './navigation-menu-selector';
+import useMoreNavigationMenu from './use-more-navigation-menu';
+import CreateNewMenuButton from './create-new-menu-button';
 
 const WrappedNavigationMenuSelector = ( {
 	clientId,
@@ -70,6 +72,8 @@ const MenuInspectorControls = ( {
 		? 'list'
 		: undefined;
 
+	const displayMoreNavigationMenu = useMoreNavigationMenu();
+
 	return (
 		<InspectorControls __experimentalGroup={ menuControlsSlot }>
 			<PanelBody
@@ -86,6 +90,38 @@ const MenuInspectorControls = ( {
 							>
 								{ __( 'Menu' ) }
 							</Heading>
+							{ displayMoreNavigationMenu && (
+								<WrappedNavigationMenuSelector
+									clientId={ clientId }
+									currentMenuId={ currentMenuId }
+									handleUpdateMenu={ handleUpdateMenu }
+									convertClassicMenu={ convertClassicMenu }
+									onCreateNew={ onCreateNew }
+									createNavigationMenuIsSuccess={
+										createNavigationMenuIsSuccess
+									}
+									createNavigationMenuIsError={
+										createNavigationMenuIsError
+									}
+								/>
+							) }
+						</HStack>
+						{ ! displayMoreNavigationMenu && (
+							<CreateNewMenuButton onCreateNew={ onCreateNew } />
+						) }
+						{ currentMenuId && isNavigationMenuMissing ? (
+							<p>{ __( 'Select or create a menu' ) }</p>
+						) : (
+							<OffCanvasEditor
+								blocks={ innerBlocks }
+								isExpanded={ true }
+								selectBlockInCanvas={ false }
+							/>
+						) }
+					</>
+				) : (
+					<>
+						{ displayMoreNavigationMenu ? (
 							<WrappedNavigationMenuSelector
 								clientId={ clientId }
 								currentMenuId={ currentMenuId }
@@ -99,32 +135,9 @@ const MenuInspectorControls = ( {
 									createNavigationMenuIsError
 								}
 							/>
-						</HStack>
-						{ currentMenuId && isNavigationMenuMissing ? (
-							<p>{ __( 'Select or create a menu' ) }</p>
 						) : (
-							<OffCanvasEditor
-								blocks={ innerBlocks }
-								isExpanded={ true }
-								selectBlockInCanvas={ false }
-							/>
+							<CreateNewMenuButton onCreateNew={ onCreateNew } />
 						) }
-					</>
-				) : (
-					<>
-						<WrappedNavigationMenuSelector
-							clientId={ clientId }
-							currentMenuId={ currentMenuId }
-							handleUpdateMenu={ handleUpdateMenu }
-							convertClassicMenu={ convertClassicMenu }
-							onCreateNew={ onCreateNew }
-							createNavigationMenuIsSuccess={
-								createNavigationMenuIsSuccess
-							}
-							createNavigationMenuIsError={
-								createNavigationMenuIsError
-							}
-						/>
 						<ManageMenusButton
 							disabled={ isManageMenusButtonDisabled }
 						/>
