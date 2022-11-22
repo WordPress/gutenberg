@@ -5,7 +5,11 @@ import {
 	useMergeRefs,
 	__experimentalUseFixedWindowList as useFixedWindowList,
 } from '@wordpress/compose';
-import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
+import {
+	__experimentalTreeGrid as TreeGrid,
+	__experimentalTreeGridRow as TreeGridRow,
+	__experimentalTreeGridCell as TreeGridCell,
+} from '@wordpress/components';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import {
 	useCallback,
@@ -217,48 +221,55 @@ function __ExperimentalOffCanvasEditor(
 						shouldShowInnerBlocks={ shouldShowInnerBlocks }
 						selectBlockInCanvas={ selectBlockInCanvas }
 					/>
-					<tr>
-						<td>
-							<OffCanvasEditorAppender
-								rootClientId={ clientId }
-							/>
-						</td>
-					</tr>
+					<TreeGridRow>
+						<TreeGridCell>
+							{ ( props ) => (
+								<OffCanvasEditorAppender
+									{ ...props }
+									rootClientId={ clientId }
+								/>
+							) }
+						</TreeGridCell>
+					</TreeGridRow>
 				</ListViewContext.Provider>
 			</TreeGrid>
 		</AsyncModeProvider>
 	);
 }
 
-function OffCanvasEditorAppender( { rootClientId } ) {
-	const { hideInserter } = useSelect(
-		( select ) => {
-			const { getTemplateLock, __unstableGetEditorMode } =
-				select( blockEditorStore );
+const OffCanvasEditorAppender = forwardRef(
+	( { rootClientId, ...props }, ref ) => {
+		const { hideInserter } = useSelect(
+			( select ) => {
+				const { getTemplateLock, __unstableGetEditorMode } =
+					select( blockEditorStore );
 
-			return {
-				hideInserter:
-					!! getTemplateLock( rootClientId ) ||
-					__unstableGetEditorMode() === 'zoom-out',
-			};
-		},
-		[ rootClientId ]
-	);
+				return {
+					hideInserter:
+						!! getTemplateLock( rootClientId ) ||
+						__unstableGetEditorMode() === 'zoom-out',
+				};
+			},
+			[ rootClientId ]
+		);
 
-	if ( hideInserter ) {
-		return null;
+		if ( hideInserter ) {
+			return null;
+		}
+
+		return (
+			<div className="offcanvas-editor__appender">
+				<Inserter
+					ref={ ref }
+					rootClientId={ rootClientId }
+					position="bottom right"
+					isAppender
+					__experimentalIsQuick
+					{ ...props }
+				/>
+			</div>
+		);
 	}
-
-	return (
-		<div className="offcanvas-editor__appender">
-			<Inserter
-				rootClientId={ rootClientId }
-				position="bottom right"
-				isAppender
-				__experimentalIsQuick
-			/>
-		</div>
-	);
-}
+);
 
 export default forwardRef( __ExperimentalOffCanvasEditor );
