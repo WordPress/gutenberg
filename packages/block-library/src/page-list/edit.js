@@ -7,11 +7,18 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
+	InspectorControls,
 	BlockControls,
 	useBlockProps,
 	getColorClassName,
 } from '@wordpress/block-editor';
-import { ToolbarButton, Spinner, Notice } from '@wordpress/components';
+import {
+	PanelBody,
+	ToolbarButton,
+	Spinner,
+	Notice,
+	ComboboxControl,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState, memo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -27,7 +34,13 @@ import { ItemSubmenuIcon } from '../navigation-link/icons';
 // Performance of Navigation Links is not good past this value.
 const MAX_PAGE_COUNT = 100;
 
-export default function PageListEdit( { context, clientId } ) {
+export default function PageListEdit( {
+	context,
+	clientId,
+	attributes,
+	setAttributes,
+} ) {
+	const { parentPageID } = attributes;
 	const { pagesByParentId, totalPages, hasResolvedPages } = usePageData();
 
 	const isNavigationChild = 'showSubmenuIcon' in context;
@@ -86,6 +99,7 @@ export default function PageListEdit( { context, clientId } ) {
 				<ul { ...blockProps }>
 					<PageItems
 						context={ context }
+						parentId={ parentPageID }
 						pagesByParentId={ pagesByParentId }
 					/>
 				</ul>
@@ -93,8 +107,35 @@ export default function PageListEdit( { context, clientId } ) {
 		}
 	};
 
+	const useParentOptions = () => {
+		const [ pages ] = useGetPages();
+		return pages?.reduce( ( accumulator, page ) => {
+			accumulator.push( {
+				value: page.id,
+				label: page.title.rendered,
+			} );
+			return accumulator;
+		}, [] );
+	};
+
 	return (
 		<>
+			<InspectorControls>
+				<PanelBody>
+					<ComboboxControl
+						className="editor-page-attributes__parent"
+						label={ __( 'Parent page' ) }
+						value={ parentPageID }
+						options={ useParentOptions() }
+						onChange={ ( value ) =>
+							setAttributes( { parentPageID: value ?? 0 } )
+						}
+						help={ __(
+							'Choose a page to show only its subpages.'
+						) }
+					/>
+				</PanelBody>
+			</InspectorControls>
 			{ allowConvertToLinks && (
 				<BlockControls group="other">
 					<ToolbarButton title={ __( 'Edit' ) } onClick={ openModal }>
@@ -129,7 +170,7 @@ function useFrontPageId() {
 	}, [] );
 }
 
-function usePageData() {
+function useGetPages() {
 	const { records: pages, hasResolved: hasResolvedPages } = useEntityRecords(
 		'postType',
 		'page',
@@ -142,10 +183,21 @@ function usePageData() {
 		}
 	);
 
+	return [ pages, hasResolvedPages ];
+}
+
+function usePageData( pageId = 0 ) {
+	const [ pages, hasResolvedPages ] = useGetPages();
+
 	return useMemo( () => {
 		// TODO: Once the REST API supports passing multiple values to
 		// 'orderby', this can be removed.
 		// https://core.trac.wordpress.org/ticket/39037
+
+		if ( pageId !== 0 ) {
+			return pages.find( ( page ) => page.id === pageId );
+		}
+
 		const sortedPages = [ ...( pages ?? [] ) ].sort( ( a, b ) => {
 			if ( a.menu_order === b.menu_order ) {
 				return a.title.rendered.localeCompare( b.title.rendered );
@@ -167,7 +219,7 @@ function usePageData() {
 			hasResolvedPages,
 			totalPages: pages?.length ?? null,
 		};
-	}, [ pages, hasResolvedPages ] );
+	}, [ pageId, pages, hasResolvedPages ] );
 }
 
 const PageItems = memo( function PageItems( {
@@ -176,7 +228,10 @@ const PageItems = memo( function PageItems( {
 	parentId = 0,
 	depth = 0,
 } ) {
-	const pages = pagesByParentId.get( parentId );
+	const parentPage = usePageData( parentId );
+	const pages = pagesByParentId.get( parentId )
+		? pagesByParentId.get( parentId )
+		: [ parentPage ];
 	const frontPageId = useFrontPageId();
 
 	if ( ! pages?.length ) {
