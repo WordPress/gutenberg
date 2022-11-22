@@ -57,14 +57,14 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 					onChange={ setSearch }
 					value={ search }
 					label={ sprintf(
-						/* translators: %s: Name of the media category(ex. 'Images, Videos'). */
+						/* translators: %s: Name of the media category(ex. 'images, videos'). */
 						__( 'Search %s' ),
-						category.label
+						category.label.toLocaleLowerCase()
 					) }
 					placeholder={ sprintf(
-						/* translators: %s: Name of the media category(ex. 'Images, Videos'). */
+						/* translators: %s: Name of the media category(ex. 'images, videos'). */
 						__( 'Search %s' ),
-						category.label
+						category.label.toLocaleLowerCase()
 					) }
 				/>
 			) }

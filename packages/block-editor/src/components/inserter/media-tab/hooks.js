@@ -32,19 +32,13 @@ export function useMediaResults( options = {} ) {
 	useEffect( () => {
 		( async () => {
 			setResults();
-			try {
-				const _media = await settings?.__unstableFetchMedia( options );
-				if ( _media ) setResults( _media );
-			} catch ( error ) {
-				// TODO: handle this
-				throw error;
-			}
+			const _media = await settings?.__unstableFetchMedia( options );
+			if ( _media ) setResults( _media );
 		} )();
 	}, [ ...Object.values( options ) ] );
 	return results;
 }
 
-// TODO: Need to think of the props.. :)
 const MEDIA_CATEGORIES = [
 	{ label: __( 'Images' ), name: 'images', mediaType: 'image' },
 	{ label: __( 'Videos' ), name: 'videos', mediaType: 'video' },
@@ -77,8 +71,8 @@ export function useMediaCategories( rootClientId ) {
 		);
 	useEffect( () => {
 		( async () => {
-			// If `__unstableFetchMedia` is not defined in block editor settings,
-			// do not set any media categories.
+			// If `__unstableFetchMedia` is not defined in block
+			// editor settings, do not set any media categories.
 			if ( ! fetchMedia ) return;
 			const query = {
 				context: 'view',
@@ -86,18 +80,9 @@ export function useMediaCategories( rootClientId ) {
 				_fields: [ 'id' ],
 			};
 			const [ image, video, audio ] = await Promise.all( [
-				fetchMedia( {
-					...query,
-					media_type: 'image',
-				} ),
-				fetchMedia( {
-					...query,
-					media_type: 'video',
-				} ),
-				fetchMedia( {
-					...query,
-					media_type: 'audio',
-				} ),
+				fetchMedia( { ...query, media_type: 'image' } ),
+				fetchMedia( { ...query, media_type: 'video' } ),
+				fetchMedia( { ...query, media_type: 'audio' } ),
 			] );
 			const showImage = canInsertImage && !! image.length;
 			const showVideo = canInsertVideo && !! video.length;

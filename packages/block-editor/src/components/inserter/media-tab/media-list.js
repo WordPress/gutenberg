@@ -6,6 +6,7 @@ import {
 	__unstableComposite as Composite,
 	__unstableUseCompositeState as useCompositeState,
 	__unstableCompositeItem as CompositeItem,
+	Tooltip,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -18,14 +19,8 @@ import { getBlocksFromMedia } from './utils';
 
 function MediaPreview( { media, onClick, composite, mediaType } ) {
 	const blocks = getBlocksFromMedia( media, mediaType );
-	// TODO: we have to set a max height for previews as the image can be very tall.
-	// Probably a fixed-max height for all(?).
 	const title = media.title?.rendered || media.title;
 	const baseCssClass = 'block-editor-inserter__media-list';
-	// const descriptionId = useInstanceId(
-	// 	MediaPreview,
-	// 	`${ baseCssClass }__item-description`
-	// );
 	return (
 		<InserterDraggableBlocks isEnabled={ true } blocks={ [ blocks ] }>
 			{ ( { draggable, onDragStart, onDragEnd } ) => (
@@ -35,27 +30,23 @@ function MediaPreview( { media, onClick, composite, mediaType } ) {
 					onDragStart={ onDragStart }
 					onDragEnd={ onDragEnd }
 				>
-					<CompositeItem
-						role="option"
-						as="div"
-						{ ...composite }
-						className={ `${ baseCssClass }__item` }
-						onClick={ () => {
-							onClick( blocks );
-						} }
-						aria-label={ title }
-						// aria-describedby={}
-					>
-						<BlockPreview blocks={ blocks } viewportWidth={ 400 } />
-						<div className={ `${ baseCssClass }__item-title` }>
-							{ title }
-						</div>
-						{ /* { !! description && (
-							<VisuallyHidden id={ descriptionId }>
-								{ description }
-							</VisuallyHidden>
-						) } */ }
-					</CompositeItem>
+					<Tooltip text={ title }>
+						<CompositeItem
+							role="option"
+							as="div"
+							{ ...composite }
+							className={ `${ baseCssClass }__item` }
+							onClick={ () => {
+								onClick( blocks );
+							} }
+							aria-label={ title }
+						>
+							<BlockPreview
+								blocks={ blocks }
+								viewportWidth={ 400 }
+							/>
+						</CompositeItem>
+					</Tooltip>
 				</div>
 			) }
 		</InserterDraggableBlocks>
