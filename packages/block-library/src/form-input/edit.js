@@ -94,8 +94,7 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 			) }
 
 			{ type === 'textarea' && (
-				/* eslint-disable jsx-a11y/label-has-associated-control */
-				<label
+				<div
 					className={ classNames( 'wp-block-form-input-label', {
 						'is-label-inline': inlineLabel,
 					} ) }
@@ -122,8 +121,7 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 						required={ required }
 						aria-required={ required }
 					/>
-				</label>
-				/* eslint-enable jsx-a11y/label-has-associated-control */
+				</div>
 			) }
 
 			{ type === 'submit' && (
@@ -155,8 +153,7 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 			) }
 
 			{ type !== 'textarea' && type !== 'submit' && (
-				/* eslint-disable jsx-a11y/label-has-associated-control */
-				<label
+				<div
 					className={ classNames( 'wp-block-form-input-label', {
 						'is-label-inline': inlineLabel,
 					} ) }
@@ -193,8 +190,7 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 						}
 						aria-required={ required }
 					/>
-				</label>
-				/* eslint-enable jsx-a11y/label-has-associated-control */
+				</div>
 			) }
 		</>
 	);
