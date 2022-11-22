@@ -37,7 +37,7 @@ export default {
 		layout,
 		onChange,
 	} ) {
-		const { wideSize, contentSize, justifyContent = 'center' } = layout;
+		const { wideSize, contentSize, justifyContent } = layout;
 		const onJustificationChange = ( value ) => {
 			onChange( {
 				...layout,
@@ -164,7 +164,7 @@ export default {
 				>
 					<ToggleGroupControl
 						label={ __( 'Justification' ) }
-						value={ justifyContent }
+						value={ justifyContent || 'center' }
 						onChange={ onJustificationChange }
 					>
 						{ justificationOptions.map(
