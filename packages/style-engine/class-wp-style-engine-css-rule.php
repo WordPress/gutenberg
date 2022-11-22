@@ -114,8 +114,8 @@ class WP_Style_Engine_CSS_Rule {
 		$suffix              = $should_prettify ? "\n" : '';
 		$spacer              = $should_prettify ? ' ' : '';
 		// Trims any multiple selectors strings.
-		$selector_trimmed = implode( ',', array_map( 'trim', explode( ',', $this->get_selector() ) ) );
-		$selector         = $should_prettify ? str_replace( array( ',' ), ",\n", $selector_trimmed ) : $selector_trimmed;
+		$selector         = $should_prettify ? implode( ',', array_map( 'trim', explode( ',', $this->get_selector() ) ) ) : $this->get_selector();
+		$selector         = $should_prettify ? str_replace( array( ',' ), ",\n", $selector ) : $selector;
 		$css_declarations = $this->declarations->get_declarations_string( $should_prettify, $declarations_indent );
 
 		if ( empty( $css_declarations ) ) {
