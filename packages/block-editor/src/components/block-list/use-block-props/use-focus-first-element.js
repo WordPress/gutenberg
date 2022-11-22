@@ -79,7 +79,8 @@ export function useFocusFirstElement( clientId ) {
 
 		const { ownerDocument } = ref.current;
 		const { defaultView } = ownerDocument;
-		const { anchorNode } = defaultView.getSelection();
+		const selection = defaultView.getSelection();
+		const { anchorNode } = selection;
 		const anchorElement =
 			anchorNode?.nodeType === anchorNode?.ELEMENT_NODE
 				? anchorNode
@@ -112,6 +113,7 @@ export function useFocusFirstElement( clientId ) {
 			textInputs[ isReverse ? textInputs.length - 1 : 0 ] || ref.current;
 
 		if ( ! isInsideRootBlock( ref.current, target ) ) {
+			selection.removeAllRanges();
 			ref.current.focus();
 			return;
 		}

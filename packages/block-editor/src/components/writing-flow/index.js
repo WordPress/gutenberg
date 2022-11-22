@@ -47,8 +47,8 @@ export function useWritingFlow() {
 	return [
 		before,
 		useMergeRefs( [
-			ref,
 			useInput(),
+			ref,
 			useDragSelection(),
 			useSelectionObserver(),
 			useClickSelection(),

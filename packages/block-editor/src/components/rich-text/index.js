@@ -406,8 +406,8 @@ function RichTextWrapper(
 				{ ...props }
 				{ ...autocompleteProps }
 				ref={ useMergeRefs( [
-					forwardedRef,
 					autocompleteProps.ref,
+					forwardedRef,
 					props.ref,
 					richTextRef,
 					useBeforeInputRules( { value, onChange } ),
