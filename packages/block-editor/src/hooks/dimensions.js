@@ -281,9 +281,14 @@ const useIsDimensionsDisabled = ( props = {} ) => {
 	const minHeightDisabled = useIsMinHeightDisabled( props );
 	const paddingDisabled = useIsPaddingDisabled( props );
 	const marginDisabled = useIsMarginDisabled( props );
+	const childLayoutDisabled = useIsChildLayoutDisabled( props );
 
 	return (
-		gapDisabled && minHeightDisabled && paddingDisabled && marginDisabled
+		gapDisabled &&
+		minHeightDisabled &&
+		paddingDisabled &&
+		marginDisabled &&
+		childLayoutDisabled
 	);
 };
 
