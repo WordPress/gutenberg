@@ -161,15 +161,19 @@ describe( 'BoxControl', () => {
 
 			render( <BoxControl onChange={ ( v ) => spyChange( v ) } /> );
 
-			const input = screen.getByLabelText( 'Box Control', {
-				selector: 'input',
+			const input = screen.getByRole( 'textbox', {
+				name: 'Box Control',
 			} );
 
 			await user.type( input, '100%' );
 			await user.keyboard( '{Enter}' );
 
 			expect( input ).toHaveValue( '100' );
-			expect( screen.getByLabelText( 'Select unit' ) ).toHaveValue( '%' );
+			expect(
+				screen.getByRole( 'combobox', {
+					name: 'Select unit',
+				} )
+			).toHaveValue( '%' );
 
 			await user.clear( input );
 			expect( input ).toHaveValue( '' );
@@ -201,16 +205,20 @@ describe( 'BoxControl', () => {
 				/>
 			);
 
-			await user.click( screen.getByLabelText( /Unlink sides/ ) );
+			await user.click(
+				screen.getByRole( 'button', { name: 'Unlink sides' } )
+			);
 
-			const input = screen.getByLabelText( /Top/ );
+			const input = screen.getByRole( 'textbox', { name: 'Top' } );
 
 			await user.type( input, '100px' );
 			await user.keyboard( '{Enter}' );
 
 			expect( input ).toHaveValue( '100' );
 			expect(
-				screen.getAllByLabelText( /Select unit/ )[ 0 ]
+				screen.getAllByRole( 'combobox', {
+					name: 'Select unit',
+				} )[ 0 ]
 			).toHaveValue( 'px' );
 
 			expect( state ).toEqual( {
@@ -236,16 +244,22 @@ describe( 'BoxControl', () => {
 				/>
 			);
 
-			await user.click( screen.getByLabelText( /Unlink sides/ ) );
+			await user.click(
+				screen.getByRole( 'button', { name: 'Unlink sides' } )
+			);
 
-			const input = screen.getByLabelText( /Vertical/ );
+			const input = screen.getByRole( 'textbox', {
+				name: 'Vertical',
+			} );
 
 			await user.type( input, '100px' );
 			await user.keyboard( '{Enter}' );
 
 			expect( input ).toHaveValue( '100' );
 			expect(
-				screen.getAllByLabelText( /Select unit/ )[ 0 ]
+				screen.getAllByRole( 'combobox', {
+					name: 'Select unit',
+				} )[ 0 ]
 			).toHaveValue( 'px' );
 
 			expect( state ).toEqual( {
@@ -275,10 +289,21 @@ describe( 'BoxControl', () => {
 			);
 
 			// Unlink the controls.
-			await user.click( screen.getByLabelText( /Unlink sides/ ) );
+			await user.click(
+				screen.getByRole( 'button', { name: 'Unlink sides' } )
+			);
+
+			const controls = screen.getAllByRole( 'combobox', {
+				name: 'Select unit',
+			} );
+
+			// Confirm we have exactly 4 controls.
+			expect( controls ).toHaveLength( 4 );
 
 			// Confirm that each individual control has the selected unit
-			expect( screen.getAllByDisplayValue( 'em' ) ).toHaveLength( 4 );
+			controls.forEach( ( control ) => {
+				expect( control ).toHaveValue( 'em' );
+			} );
 		} );
 
 		it( 'should use individual side attribute unit when available', async () => {
@@ -298,16 +323,37 @@ describe( 'BoxControl', () => {
 			);
 
 			// Unlink the controls.
-			await user.click( screen.getByLabelText( /Unlink sides/ ) );
+			await user.click(
+				screen.getByRole( 'button', { name: 'Unlink sides' } )
+			);
+
+			const controls = screen.getAllByRole( 'combobox', {
+				name: 'Select unit',
+			} );
+
+			// Confirm we have exactly 4 controls.
+			expect( controls ).toHaveLength( 4 );
 
 			// Confirm that each individual control has the selected unit
-			expect( screen.getAllByDisplayValue( 'vw' ) ).toHaveLength( 4 );
+			controls.forEach( ( control ) => {
+				expect( control ).toHaveValue( 'vw' );
+			} );
 
 			// Rerender with individual side value & confirm unit is selected.
 			rerender( <BoxControl values={ { top: '2.5em' } } /> );
 
-			expect( screen.getByDisplayValue( 'em' ) ).toBeInTheDocument();
-			expect( screen.getAllByDisplayValue( 'vw' ) ).toHaveLength( 3 );
+			const rerenderedControls = screen.getAllByRole( 'combobox', {
+				name: 'Select unit',
+			} );
+
+			// Confirm we have exactly 4 controls.
+			expect( rerenderedControls ).toHaveLength( 4 );
+
+			// Confirm that each individual control has the right selected unit
+			rerenderedControls.forEach( ( control, index ) => {
+				const expected = index === 0 ? 'em' : 'vw';
+				expect( control ).toHaveValue( expected );
+			} );
 		} );
 	} );
 
