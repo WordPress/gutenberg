@@ -260,6 +260,7 @@ export default compose( [
 					allowedBlockType,
 					directInsertBlock,
 					onSelectOrClose,
+					selectBlockOnInsert,
 				} = ownProps;
 
 				if ( ! hasSingleBlockType && ! directInsertBlock ) {
@@ -370,7 +371,12 @@ export default compose( [
 					blockToInsert = createBlock( allowedBlockType.name );
 				}
 
-				insertBlock( blockToInsert, getInsertionIndex(), rootClientId );
+				insertBlock(
+					blockToInsert,
+					getInsertionIndex(),
+					rootClientId,
+					selectBlockOnInsert
+				);
 
 				if ( onSelectOrClose ) {
 					onSelectOrClose();
