@@ -39,6 +39,7 @@ export const Appender = forwardRef( ( props, ref ) => {
 				position="bottom right"
 				isAppender
 				__experimentalIsQuick
+				selectBlockOnInsert={ false }
 				{ ...props }
 			/>
 		</div>
