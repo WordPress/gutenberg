@@ -49,10 +49,10 @@ export function useFocusHandler( clientId ) {
 				selectBlock( clientId );
 			}
 
-			node.addEventListener( 'focusin', onFocus );
+			node.addEventListener( 'click', onFocus );
 
 			return () => {
-				node.removeEventListener( 'focusin', onFocus );
+				node.removeEventListener( 'click', onFocus );
 			};
 		},
 		[ isBlockSelected, selectBlock ]

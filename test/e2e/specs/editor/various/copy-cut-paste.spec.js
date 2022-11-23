@@ -39,8 +39,7 @@ test.describe( 'Copy/cut/paste', () => {
 		await pageUtils.pressKeyWithModifier( 'primary', 'x' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowRight' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
