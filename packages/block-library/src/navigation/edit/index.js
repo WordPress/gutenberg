@@ -667,7 +667,6 @@ function Navigation( {
 		return (
 			<TagName { ...blockProps }>
 				<MenuInspectorControls
-					clientId={ clientId }
 					convertClassicMenu={ convertClassicMenu }
 					createNavigationMenuIsSuccess={
 						createNavigationMenuIsSuccess
@@ -710,7 +709,6 @@ function Navigation( {
 		return (
 			<TagName { ...blockProps }>
 				<MenuInspectorControls
-					clientId={ clientId }
 					convertClassicMenu={ convertClassicMenu }
 					createNavigationMenuIsSuccess={
 						createNavigationMenuIsSuccess
@@ -797,7 +795,6 @@ function Navigation( {
 		<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
 			<RecursionProvider uniqueId={ recursionId }>
 				<MenuInspectorControls
-					clientId={ clientId }
 					convertClassicMenu={ convertClassicMenu }
 					createNavigationMenuIsSuccess={
 						createNavigationMenuIsSuccess
