@@ -88,13 +88,13 @@ describe( 'NumberControl', () => {
 			await user.type( input, '1' );
 
 			// Before blurring, the value is still un-clamped
-			expect( input.value ).toBe( '1' );
+			expect( input ).toHaveValue( 1 );
 
 			// Blur the input
 			await user.keyboard( '[Tab]' );
 
 			// After blur, value is clamped
-			expect( input.value ).toBe( '4' );
+			expect( input ).toHaveValue( 4 );
 
 			// After the blur, the `onChange` callback fires asynchronously.
 			await waitFor( () => {
@@ -135,11 +135,11 @@ describe( 'NumberControl', () => {
 			await user.clear( input );
 			await user.type( input, '14' );
 
-			expect( input.value ).toBe( '14' );
+			expect( input ).toHaveValue( 14 );
 
 			await user.keyboard( '[Enter]' );
 
-			expect( input.value ).toBe( '10' );
+			expect( input ).toHaveValue( 10 );
 
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 4 );
 
@@ -172,7 +172,7 @@ describe( 'NumberControl', () => {
 			 * This is zero because the value has been adjusted to
 			 * respect the min/max range of the input.
 			 */
-			expect( input.value ).toBe( '0' );
+			expect( input ).toHaveValue( 0 );
 		} );
 
 		it( 'should clamp value within range on blur', async () => {
@@ -187,14 +187,14 @@ describe( 'NumberControl', () => {
 			await user.type( input, '41' );
 
 			// Before blurring, the value is still un-clamped
-			expect( input.value ).toBe( '41' );
+			expect( input ).toHaveValue( 41 );
 
 			// Blur the input
 			// (TODO: user different ways to blur input to make tests more resilient)
 			await user.keyboard( '[Tab]' );
 
 			// After blur, value is clamped
-			expect( input.value ).toBe( '10' );
+			expect( input ).toHaveValue( 10 );
 		} );
 
 		// TODO: understand why this fails with user event
@@ -210,7 +210,7 @@ describe( 'NumberControl', () => {
 			await user.type( input, '10 abc' );
 			await user.keyboard( '[Enter]' );
 
-			expect( input.value ).toBe( '0' );
+			expect( input ).toHaveValue( 0 );
 		} );
 
 		// TODO: understand why this fails with user event
@@ -226,7 +226,10 @@ describe( 'NumberControl', () => {
 			await user.type( input, '10 abc' );
 			await user.keyboard( '[Enter]' );
 
-			expect( input.value ).toBe( '' );
+			// React Testing Library associated `null` to empty string types for
+			// numeric `input` elements
+			// (see https://github.com/testing-library/jest-dom/blob/v5.16.5/src/utils.js#L191-L192)
+			expect( input ).toHaveValue( null );
 		} );
 
 		it( 'should accept empty string on ENTER keypress for optional field', async () => {
@@ -240,7 +243,10 @@ describe( 'NumberControl', () => {
 			await user.clear( input );
 			await user.keyboard( '[Enter]' );
 
-			expect( input.value ).toBe( '' );
+			// React Testing Library associated `null` to empty string types for
+			// numeric `input` elements
+			// (see https://github.com/testing-library/jest-dom/blob/v5.16.5/src/utils.js#L191-L192)
+			expect( input ).toHaveValue( null );
 		} );
 
 		it( 'should not enforce numerical value for empty string when required is omitted', async () => {
@@ -254,7 +260,10 @@ describe( 'NumberControl', () => {
 			await user.clear( input );
 			await user.keyboard( '[Enter]' );
 
-			expect( input.value ).toBe( '' );
+			// React Testing Library associated `null` to empty string types for
+			// numeric `input` elements
+			// (see https://github.com/testing-library/jest-dom/blob/v5.16.5/src/utils.js#L191-L192)
+			expect( input ).toHaveValue( null );
 		} );
 
 		it( 'should enforce numerical value for empty string when required', async () => {
@@ -268,7 +277,7 @@ describe( 'NumberControl', () => {
 			await user.clear( input );
 			await user.keyboard( '[Enter]' );
 
-			expect( input.value ).toBe( '0' );
+			expect( input ).toHaveValue( 0 );
 		} );
 	} );
 
@@ -300,7 +309,7 @@ describe( 'NumberControl', () => {
 			await user.click( input );
 			await user.keyboard( '[ArrowUp]' );
 
-			expect( input.value ).toBe( '6' );
+			expect( input ).toHaveValue( 6 );
 		} );
 
 		it( 'should increment from a negative value', async () => {
@@ -314,7 +323,7 @@ describe( 'NumberControl', () => {
 			await user.click( input );
 			await user.keyboard( '[ArrowUp]' );
 
-			expect( input.value ).toBe( '-4' );
+			expect( input ).toHaveValue( -4 );
 		} );
 
 		it( 'should increment while preserving the decimal value when `step` is “any”', async () => {
@@ -328,7 +337,7 @@ describe( 'NumberControl', () => {
 			await user.click( input );
 			await user.keyboard( '[ArrowUp]' );
 
-			expect( input.value ).toBe( '867.5309' );
+			expect( input ).toHaveValue( 867.5309 );
 		} );
 
 		it( 'should increment by shiftStep on key UP + shift press', async () => {
@@ -342,7 +351,7 @@ describe( 'NumberControl', () => {
 			await user.click( input );
 			await user.keyboard( '{Shift>}[ArrowUp]{/Shift}' );
 
-			expect( input.value ).toBe( '20' );
+			expect( input ).toHaveValue( 20 );
 		} );
 
 		it( 'should increment by shiftStep while preserving the decimal value when `step` is “any”', async () => {
@@ -356,7 +365,7 @@ describe( 'NumberControl', () => {
 			await user.click( input );
 			await user.keyboard( '{Shift>}[ArrowUp]{/Shift}' );
 
-			expect( input.value ).toBe( '867.5309' );
+			expect( input ).toHaveValue( 867.5309 );
 		} );
 
 		it( 'should increment by custom shiftStep on key UP + shift press', async () => {
@@ -370,7 +379,7 @@ describe( 'NumberControl', () => {
 			await user.click( input );
 			await user.keyboard( '{Shift>}[ArrowUp]{/Shift}' );
 
-			expect( input.value ).toBe( '100' );
+			expect( input ).toHaveValue( 100 );
 		} );
 
 		it( 'should increment but be limited by max on shiftStep', async () => {
@@ -390,7 +399,7 @@ describe( 'NumberControl', () => {
 			await user.click( input );
 			await user.keyboard( '{Shift>}[ArrowUp]{/Shift}' );
 
-			expect( input.value ).toBe( '99' );
+			expect( input ).toHaveValue( 99 );
 		} );
 
 		it( 'should not increment by shiftStep if disabled', async () => {
@@ -410,7 +419,7 @@ describe( 'NumberControl', () => {
 			await user.click( input );
 			await user.keyboard( '{Shift>}[ArrowUp]{/Shift}' );
 
-			expect( input.value ).toBe( '6' );
+			expect( input ).toHaveValue( 6 );
 		} );
 	} );
 
@@ -441,7 +450,7 @@ describe( 'NumberControl', () => {
 			await user.click( input );
 			await user.keyboard( '[ArrowDown]' );
 
-			expect( input.value ).toBe( '4' );
+			expect( input ).toHaveValue( 4 );
 		} );
 
 		it( 'should decrement from a negative value', async () => {
@@ -455,7 +464,7 @@ describe( 'NumberControl', () => {
 			await user.click( input );
 			await user.keyboard( '[ArrowDown]' );
 
-			expect( input.value ).toBe( '-6' );
+			expect( input ).toHaveValue( -6 );
 		} );
 
 		it( 'should decrement while preserving the decimal value when `step` is “any”', async () => {
@@ -469,7 +478,7 @@ describe( 'NumberControl', () => {
 			await user.click( input );
 			await user.keyboard( '[ArrowDown]' );
 
-			expect( input.value ).toBe( '867.5309' );
+			expect( input ).toHaveValue( 867.5309 );
 		} );
 
 		it( 'should decrement by shiftStep on key DOWN + shift press', async () => {
@@ -483,7 +492,7 @@ describe( 'NumberControl', () => {
 			await user.click( input );
 			await user.keyboard( '{Shift>}[ArrowDown]{/Shift}' );
 
-			expect( input.value ).toBe( '0' );
+			expect( input ).toHaveValue( 0 );
 		} );
 
 		it( 'should decrement by shiftStep while preserving the decimal value when `step` is “any”', async () => {
@@ -497,7 +506,7 @@ describe( 'NumberControl', () => {
 			await user.click( input );
 			await user.keyboard( '{Shift>}[ArrowDown]{/Shift}' );
 
-			expect( input.value ).toBe( '867.5309' );
+			expect( input ).toHaveValue( 867.5309 );
 		} );
 
 		it( 'should decrement by custom shiftStep on key DOWN + shift press', async () => {
@@ -511,7 +520,7 @@ describe( 'NumberControl', () => {
 			await user.click( input );
 			await user.keyboard( '{Shift>}[ArrowDown]{/Shift}' );
 
-			expect( input.value ).toBe( '-100' );
+			expect( input ).toHaveValue( -100 );
 		} );
 
 		it( 'should decrement but be limited by min on shiftStep', async () => {
@@ -531,7 +540,7 @@ describe( 'NumberControl', () => {
 			await user.click( input );
 			await user.keyboard( '{Shift>}[ArrowDown]{/Shift}' );
 
-			expect( input.value ).toBe( '4' );
+			expect( input ).toHaveValue( 4 );
 		} );
 
 		it( 'should not decrement by shiftStep if disabled', async () => {
@@ -551,7 +560,7 @@ describe( 'NumberControl', () => {
 			await user.click( input );
 			await user.keyboard( '{Shift>}[ArrowDown]{/Shift}' );
 
-			expect( input.value ).toBe( '4' );
+			expect( input ).toHaveValue( 4 );
 		} );
 	} );
 
