@@ -198,7 +198,7 @@ function __ExperimentalOffCanvasEditor(
 				listViewRef={ elementRef }
 				blockDropTarget={ blockDropTarget }
 			/>
-			<div className="offcanvas-editor-list-view-tree-wrapper">
+			<div className="offcanvas-editor-list-view-tree">
 				<TreeGrid
 					id={ id }
 					className="block-editor-list-view-tree"
