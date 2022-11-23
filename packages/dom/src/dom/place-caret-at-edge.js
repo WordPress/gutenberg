@@ -132,7 +132,7 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 
 	if ( parentElement?.closest( '[contenteditable]' ) !== container ) {
 		container.dispatchEvent(
-			new defaultView.FocusEvent( 'focusin', { bubbles: true } )
+			new defaultView.MouseEvent( 'click', { bubbles: true } )
 		);
 		return;
 	}
