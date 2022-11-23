@@ -17,7 +17,7 @@ import { __ } from '@wordpress/i18n';
  */
 import ManageMenusButton from './manage-menus-button';
 import NavigationMenuSelector from './navigation-menu-selector';
-import useMoreNavigationMenu from './use-more-navigation-menu';
+import useHasClassicOrNavigationMenus from './use-has-classic-or-navigation-menus';
 import CreateNewMenuButton from './create-new-menu-button';
 
 const WrappedNavigationMenuSelector = ( {
@@ -72,7 +72,7 @@ const MenuInspectorControls = ( {
 		? 'list'
 		: undefined;
 
-	const displayMoreNavigationMenu = useMoreNavigationMenu();
+	const hasClassicOrNavigationMenus = useHasClassicOrNavigationMenus();
 
 	return (
 		<InspectorControls __experimentalGroup={ menuControlsSlot }>
@@ -90,25 +90,20 @@ const MenuInspectorControls = ( {
 							>
 								{ __( 'Menu' ) }
 							</Heading>
-							{ displayMoreNavigationMenu && (
-								<WrappedNavigationMenuSelector
-									clientId={ clientId }
-									currentMenuId={ currentMenuId }
-									handleUpdateMenu={ handleUpdateMenu }
-									convertClassicMenu={ convertClassicMenu }
-									onCreateNew={ onCreateNew }
-									createNavigationMenuIsSuccess={
-										createNavigationMenuIsSuccess
-									}
-									createNavigationMenuIsError={
-										createNavigationMenuIsError
-									}
-								/>
-							) }
+							<WrappedNavigationMenuSelector
+								clientId={ clientId }
+								currentMenuId={ currentMenuId }
+								handleUpdateMenu={ handleUpdateMenu }
+								convertClassicMenu={ convertClassicMenu }
+								onCreateNew={ onCreateNew }
+								createNavigationMenuIsSuccess={
+									createNavigationMenuIsSuccess
+								}
+								createNavigationMenuIsError={
+									createNavigationMenuIsError
+								}
+							/>
 						</HStack>
-						{ ! displayMoreNavigationMenu && (
-							<CreateNewMenuButton onCreateNew={ onCreateNew } />
-						) }
 						{ currentMenuId && isNavigationMenuMissing ? (
 							<p>{ __( 'Select or create a menu' ) }</p>
 						) : (
@@ -121,7 +116,7 @@ const MenuInspectorControls = ( {
 					</>
 				) : (
 					<>
-						{ displayMoreNavigationMenu ? (
+						{ hasClassicOrNavigationMenus ? (
 							<WrappedNavigationMenuSelector
 								clientId={ clientId }
 								currentMenuId={ currentMenuId }
