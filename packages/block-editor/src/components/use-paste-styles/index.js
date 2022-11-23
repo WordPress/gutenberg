@@ -37,30 +37,35 @@ function looksLikeBlocks( text ) {
 }
 
 /**
+ * Style attributes are attributes being added in `block-editor/src/hooks/*`.
+ * (Except for some unrelated to style like `anchor` or `settings`.)
+ * They generally represent the default block supports.
+ */
+const STYLE_ATTRIBUTES = [
+	'align',
+	'borderColor',
+	'backgroundColor',
+	'textColor',
+	'gradient',
+	'className',
+	'fontFamily',
+	'fontSize',
+	'layout',
+	'style',
+];
+
+/**
  * Get the "style attributes" from a given block.
- * A "style attribute" is an attribute that doesn't have `__experimentalRole` of `content`.
  *
  * @param {WPBlock} block The input block.
  * @return {Object} the filtered attributes object.
  */
 function getStyleAttributes( block ) {
-	const blockType = getBlockType( block.name );
-	const attributes = {};
-	for ( const [ attribute, attributeType ] of Object.entries(
-		blockType.attributes
-	) ) {
-		// Mark every attribute that isn't "content" as a style attribute.
-		if ( attributeType.__experimentalRole !== 'content' ) {
-			// Apply all attributes even when they are undefined to allow overriding styles.
-			attributes[ attribute ] = Object.hasOwn(
-				block.attributes,
-				attribute
-			)
-				? block.attributes[ attribute ]
-				: attributeType.default;
-		}
-	}
-	return attributes;
+	// Override attributes that are not present in the block to their defaults.
+	return STYLE_ATTRIBUTES.reduce( ( attributes, attributeKey ) => {
+		attributes[ attributeKey ] = block.attributes[ attributeKey ];
+		return attributes;
+	}, {} );
 }
 
 /**
