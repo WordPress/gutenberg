@@ -6,7 +6,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { upload } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { isBlobURL } from '@wordpress/blob';
 
 /**
@@ -48,7 +48,6 @@ function Image( block ) {
 }
 
 export default function PostFormatPanel() {
-	const [ blobUrls, setBlobUrls ] = useState( [] );
 	const [ isUploading, setIsUploading ] = useState( false );
 	const externalImages = useSelect( ( select ) => {
 		const { getEditorBlocks } = select( editorStore );
@@ -66,36 +65,17 @@ export default function PostFormatPanel() {
 
 		return getSettings().mediaUpload;
 	}, [] );
+
+	if ( ! externalImages.length ) {
+		return null;
+	}
+
 	const panelBodyTitle = [
 		__( 'Suggestion:' ),
 		<span className="editor-post-publish-panel__link" key="label">
 			{ __( 'External media' ) }
 		</span>,
 	];
-
-	useEffect( () => {
-		externalImages.forEach( ( image ) => {
-			if ( ! blobUrls[ image.attributes.url ] ) {
-				window
-					.fetch(
-						`${
-							window.ajaxurl
-						}?action=gutenberg_fetch_media&url=${ encodeURIComponent(
-							image.attributes.url
-						) }`
-					)
-					.then( ( response ) => response.blob() )
-					.then( ( blob ) =>
-						setBlobUrls( ( blobs ) => [
-							...blobs,
-							{ clientId: image.clientId, blob },
-						] )
-					)
-					// Do nothing, cannot upload.
-					.catch( () => {} );
-			}
-		} );
-	}, [ externalImages ] );
 
 	function uploadImages() {
 		setIsUploading( true );
@@ -148,7 +128,7 @@ export default function PostFormatPanel() {
 			<div
 				style={ {
 					display: 'inline-flex',
-					flexWrap: 'wrap',
+					'flex-wrap': 'wrap',
 					gap: '8px',
 				} }
 			>
