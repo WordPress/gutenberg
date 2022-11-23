@@ -170,10 +170,10 @@ describe( 'ColorPalette', () => {
 		).toBeVisible();
 	} );
 
-	it( 'should show the clear button even when `colors` is an empty array', () => {
+	it( 'should show the clear button by default', () => {
 		const onChange = jest.fn();
 
-		const { rerender } = render(
+		render(
 			<ColorPalette
 				colors={ EXAMPLE_COLORS }
 				value={ INITIAL_COLOR }
@@ -184,14 +184,12 @@ describe( 'ColorPalette', () => {
 		expect(
 			screen.getByRole( 'button', { name: 'Clear' } )
 		).toBeInTheDocument();
+	} );
 
-		rerender(
-			<ColorPalette
-				colors={ [] }
-				value={ INITIAL_COLOR }
-				onChange={ onChange }
-			/>
-		);
+	it( 'should show the clear button even when `colors` is an empty array', () => {
+		const onChange = jest.fn();
+
+		render( <ColorPalette colors={ [] } onChange={ onChange } /> );
 
 		expect(
 			screen.getByRole( 'button', { name: 'Clear' } )
