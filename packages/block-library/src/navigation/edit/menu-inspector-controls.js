@@ -15,10 +15,11 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import CreateNewMenuButton from './create-new-menu-button';
 import ManageMenusButton from './manage-menus-button';
 import NavigationMenuSelector from './navigation-menu-selector';
-import useHasClassicOrNavigationMenus from './use-has-classic-or-navigation-menus';
-import CreateNewMenuButton from './create-new-menu-button';
+import useNavigationMenu from '../use-navigation-menu';
+import useNavigationEntities from '../use-navigation-entities';
 
 const WrappedNavigationMenuSelector = ( {
 	clientId,
@@ -72,7 +73,11 @@ const MenuInspectorControls = ( {
 		? 'list'
 		: undefined;
 
-	const hasClassicOrNavigationMenus = useHasClassicOrNavigationMenus();
+	const { menus: classicMenus } = useNavigationEntities();
+	const { navigationMenus } = useNavigationMenu();
+	const hasNavigationMenus = !! navigationMenus?.length;
+	const hasClassicMenus = !! classicMenus?.length;
+	const hasClassicOrNavigationMenus = hasClassicMenus || hasNavigationMenus;
 
 	return (
 		<InspectorControls __experimentalGroup={ menuControlsSlot }>
