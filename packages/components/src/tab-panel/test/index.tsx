@@ -34,7 +34,23 @@ const TABS = [
 
 const getSelectedTab = () => screen.getByRole( 'tab', { selected: true } );
 
+const originalGetClientRects = window.HTMLElement.prototype.getClientRects;
+
 describe( 'TabPanel', () => {
+	beforeAll( () => {
+		// Mocking `getClientRects()` is necessary to pass a check performed by
+		// the `focus.tabbable.find()` and by the `focus.focusable.find()` functions
+		// from the `@wordpress/dom` package.
+		// @ts-expect-error We're not trying to comply to the DOM spec, only mocking
+		window.HTMLElement.prototype.getClientRects = function () {
+			return [ 'trick-jsdom-into-having-size-for-element-rect' ];
+		};
+	} );
+
+	afterAll( () => {
+		window.HTMLElement.prototype.getClientRects = originalGetClientRects;
+	} );
+
 	it( 'should render a tabpanel, and clicking should change tabs', async () => {
 		const user = setupUser();
 		const panelRenderFunction = jest.fn();
