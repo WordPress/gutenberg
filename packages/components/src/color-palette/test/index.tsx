@@ -17,7 +17,7 @@ describe( 'ColorPalette', () => {
 	];
 	const currentColor = '#f00';
 
-	test( 'should render a dynamic toolbar of colors', () => {
+	it( 'should render a dynamic toolbar of colors', () => {
 		const onChange = jest.fn();
 
 		const { container } = render(
@@ -31,7 +31,7 @@ describe( 'ColorPalette', () => {
 		expect( container ).toMatchSnapshot();
 	} );
 
-	test( 'should render three color button options', () => {
+	it( 'should render three color button options', () => {
 		const onChange = jest.fn();
 
 		render(
@@ -47,7 +47,7 @@ describe( 'ColorPalette', () => {
 		).toHaveLength( 3 );
 	} );
 
-	test( 'should call onClick on an active button with undefined', async () => {
+	it( 'should call onClick on an active button with undefined', async () => {
 		const user = userEvent.setup( {
 			advanceTimers: jest.advanceTimersByTime,
 		} );
@@ -69,7 +69,7 @@ describe( 'ColorPalette', () => {
 		expect( onChange ).toHaveBeenCalledWith( undefined );
 	} );
 
-	test( 'should call onClick on an inactive button', async () => {
+	it( 'should call onClick on an inactive button', async () => {
 		const user = userEvent.setup( {
 			advanceTimers: jest.advanceTimersByTime,
 		} );
@@ -94,7 +94,7 @@ describe( 'ColorPalette', () => {
 		expect( onChange ).toHaveBeenCalledWith( '#fff', 1 );
 	} );
 
-	test( 'should call onClick with undefined, when the clearButton onClick is triggered', async () => {
+	it( 'should call onClick with undefined, when the clearButton onClick is triggered', async () => {
 		const user = userEvent.setup( {
 			advanceTimers: jest.advanceTimersByTime,
 		} );
@@ -114,7 +114,7 @@ describe( 'ColorPalette', () => {
 		expect( onChange ).toHaveBeenCalledWith( undefined );
 	} );
 
-	test( 'should allow disabling custom color picker', () => {
+	it( 'should allow disabling custom color picker', () => {
 		const onChange = jest.fn();
 
 		const { container } = render(
@@ -129,7 +129,7 @@ describe( 'ColorPalette', () => {
 		expect( container ).toMatchSnapshot();
 	} );
 
-	test( 'should render dropdown and its content', async () => {
+	it( 'should render dropdown and its content', async () => {
 		const user = userEvent.setup( {
 			advanceTimers: jest.advanceTimersByTime,
 		} );
