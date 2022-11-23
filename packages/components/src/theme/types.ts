@@ -17,7 +17,7 @@ export type ThemeInputValues = {
 	/**
 	 * The background color.
 	 *
-	 * If a component explicitly has a background, it will be use this color.
+	 * If a component explicitly has a background, it will be this color.
 	 * Otherwise, this color will simply be used to determine what the foreground colors should be.
 	 * The actual background color will need to be set on the component's container element.
 	 *
