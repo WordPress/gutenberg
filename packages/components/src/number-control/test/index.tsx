@@ -13,20 +13,17 @@ import { UP, DOWN, ENTER } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import BaseNumberControl from '../';
+import NumberControl from '..';
+import type { NumberControlProps } from '../types';
 
 const getInput = () => screen.getByTestId( 'input' );
 
 const fireKeyDown = ( data ) =>
 	fireEvent.keyDown( document.activeElement || document.body, data );
 
-const NumberControl = ( props ) => (
-	<BaseNumberControl { ...props } data-testid="input" />
-);
-
-function StatefulNumberControl( props ) {
+function StatefulNumberControl( props: NumberControlProps ) {
 	const [ value, setValue ] = useState( props.value );
-	const handleOnChange = ( v ) => setValue( v );
+	const handleOnChange = ( v: string | undefined ) => setValue( v );
 
 	return (
 		<NumberControl
