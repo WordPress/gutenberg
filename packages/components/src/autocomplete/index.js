@@ -417,6 +417,7 @@ function useAutocomplete( {
 export function useAutocompleteProps( options ) {
 	const [ isVisible, setIsVisible ] = useState( false );
 	const ref = useRef();
+	const recordAfterInput = useRef();
 	const onKeyDownRef = useRef();
 	const { popover, listBoxId, activeId, onKeyDown } = useAutocomplete( {
 		...options,
@@ -424,61 +425,37 @@ export function useAutocompleteProps( options ) {
 	} );
 	onKeyDownRef.current = onKeyDown;
 
+	useEffect( () => {
+		if ( isVisible ) {
+			if ( ! recordAfterInput.current ) {
+				recordAfterInput.current = options.record;
+			} else if (
+				recordAfterInput.current.start !== options.record.start ||
+				recordAfterInput.current.end !== options.record.end
+			) {
+				setIsVisible( false );
+				recordAfterInput.current = null;
+			}
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ options.record ] );
+
 	const mergedRefs = useMergeRefs( [
 		ref,
 		useRefEffect( ( element ) => {
-			const { ownerDocument } = element;
-			const { defaultView } = ownerDocument;
-			const selection = defaultView.getSelection();
-			let selectionAfterInput = null;
-
 			function _onKeyDown( event ) {
 				onKeyDownRef.current( event );
 			}
 			function _onInput() {
 				// Only show auto complete UI if the user is inputting text.
 				setIsVisible( true );
-				// Save the current selection to check if it has changed after
-				// the input event.
-				selectionAfterInput =
-					selection.rangeCount > 0 ? selection.getRangeAt( 0 ) : null;
-			}
-			function _onSelectionChange() {
-				function isRangeEqual( a, b ) {
-					return (
-						a.startContainer === b.startContainer &&
-						a.startOffset === b.startOffset &&
-						a.endContainer === b.endContainer &&
-						a.endOffset === b.endOffset
-					);
-				}
-
-				// If the selection has changed, hide the auto complete UI.
-				if (
-					selectionAfterInput &&
-					selection.rangeCount > 0 &&
-					! isRangeEqual(
-						selectionAfterInput,
-						selection.getRangeAt( 0 )
-					)
-				) {
-					setIsVisible( false );
-					selectionAfterInput = null;
-				}
+				recordAfterInput.current = null;
 			}
 			element.addEventListener( 'keydown', _onKeyDown );
 			element.addEventListener( 'input', _onInput );
-			element.ownerDocument.addEventListener(
-				'selectionchange',
-				_onSelectionChange
-			);
 			return () => {
 				element.removeEventListener( 'keydown', _onKeyDown );
 				element.removeEventListener( 'input', _onInput );
-				element.ownerDocument.removeEventListener(
-					'selectionchange',
-					_onSelectionChange
-				);
 			};
 		}, [] ),
 	] );
