@@ -31,7 +31,7 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 		ref.current.focus();
 	}
 
-	return (
+	const controls = (
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Input settings' ) }>
@@ -70,6 +70,12 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 					) }
 				/>
 			</InspectorControls>
+		</>
+	);
+
+	return (
+		<div { ...blockProps }>
+			{ controls }
 			<div
 				className={ classNames( 'wp-block-form-input__label', {
 					'is-label-inline': inlineLabel,
@@ -78,7 +84,6 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 				<RichText
 					tagName="span"
 					className="wp-block-form-input__label-content"
-					{ ...blockProps }
 					value={ label }
 					onChange={ ( newLabel ) =>
 						setAttributes( { label: newLabel } )
@@ -113,7 +118,7 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 					} }
 				/>
 			</div>
-		</>
+		</div>
 	);
 }
 
