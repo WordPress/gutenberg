@@ -683,6 +683,18 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#registerStore>
 
+### TagSelectionDropdown
+
+Dropdown for selecting a HTML tag.
+
+_Parameters_
+
+-   _props_ `WPTagSelectionDropdownProps`: Component props.
+
+_Returns_
+
+-   `WPComponent`: The toolbar.
+
 ### ToolSelector
 
 Undocumented declaration.
