@@ -19,7 +19,6 @@ import ManageMenusButton from './manage-menus-button';
 import NavigationMenuSelector from './navigation-menu-selector';
 
 const WrappedNavigationMenuSelector = ( {
-	clientId,
 	currentMenuId,
 	handleUpdateMenu,
 	convertClassicMenu,
@@ -29,7 +28,6 @@ const WrappedNavigationMenuSelector = ( {
 } ) => (
 	<NavigationMenuSelector
 		currentMenuId={ currentMenuId }
-		clientId={ clientId }
 		onSelectNavigationMenu={ ( menuId ) => {
 			handleUpdateMenu( menuId );
 		} }
@@ -53,7 +51,6 @@ const WrappedNavigationMenuSelector = ( {
 	/>
 );
 const MenuInspectorControls = ( {
-	clientId,
 	convertClassicMenu,
 	createNavigationMenuIsSuccess,
 	createNavigationMenuIsError,
@@ -87,7 +84,6 @@ const MenuInspectorControls = ( {
 								{ __( 'Menu' ) }
 							</Heading>
 							<WrappedNavigationMenuSelector
-								clientId={ clientId }
 								currentMenuId={ currentMenuId }
 								handleUpdateMenu={ handleUpdateMenu }
 								convertClassicMenu={ convertClassicMenu }
@@ -113,7 +109,6 @@ const MenuInspectorControls = ( {
 				) : (
 					<>
 						<WrappedNavigationMenuSelector
-							clientId={ clientId }
 							currentMenuId={ currentMenuId }
 							handleUpdateMenu={ handleUpdateMenu }
 							convertClassicMenu={ convertClassicMenu }
