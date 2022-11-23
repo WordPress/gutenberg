@@ -14,11 +14,13 @@ import { store as blockEditorStore } from '../../store';
 
 /**
  * Determine if the copied text looks like serialized blocks or not.
+ * Since plain text will always get parsed into a freeform block,
+ * we check that if the parsed blocks is anything other than that.
  *
  * @param {string} text The copied text.
  * @return {boolean} True if the text looks like serialized blocks, false otherwise.
  */
-function looksLikeBlocks( text ) {
+function hasSerializedBlocks( text ) {
 	try {
 		const blocks = parse( text, {
 			__unstableSkipMigrationLogs: true,
@@ -137,7 +139,7 @@ export default function usePasteStyles() {
 			}
 
 			// Abort if the copied text is empty or doesn't look like serialized blocks.
-			if ( ! html || ! looksLikeBlocks( html ) ) {
+			if ( ! html || ! hasSerializedBlocks( html ) ) {
 				createWarningNotice(
 					__( "The copied data doesn't appear to be blocks." ),
 					{
