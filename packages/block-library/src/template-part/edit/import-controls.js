@@ -4,8 +4,7 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { useSelect, useRegistry } from '@wordpress/data';
-import { InspectorControls } from '@wordpress/block-editor';
-import { Button, PanelBody, SelectControl } from '@wordpress/components';
+import { Button, SelectControl } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -90,27 +89,21 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 	}
 
 	return (
-		<InspectorControls>
-			<PanelBody title={ __( 'Import widget area' ) }>
-				<form onSubmit={ createFromWidgets }>
-					<SelectControl
-						label={ __( 'Widget areas' ) }
-						value={ selectedSidebar }
-						options={ options }
-						onChange={ ( value ) => setSelectedSidebar( value ) }
-						hideLabelFromVision
-						__next36pxDefaultSize
-					/>
-					<Button
-						variant="primary"
-						type="submit"
-						isBusy={ isBusy }
-						aria-disabled={ isBusy || ! selectedSidebar }
-					>
-						{ __( 'Import' ) }
-					</Button>
-				</form>
-			</PanelBody>
-		</InspectorControls>
+		<form onSubmit={ createFromWidgets }>
+			<SelectControl
+				label={ __( 'Import widget area' ) }
+				value={ selectedSidebar }
+				options={ options }
+				onChange={ ( value ) => setSelectedSidebar( value ) }
+			/>
+			<Button
+				variant="primary"
+				type="submit"
+				isBusy={ isBusy }
+				aria-disabled={ isBusy || ! selectedSidebar }
+			>
+				{ __( 'Import' ) }
+			</Button>
+		</form>
 	);
 }
