@@ -47,17 +47,6 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 		return;
 	}
 
-	let editor = container;
-
-	if ( ! container.ownerDocument.activeElement?.contains( container ) ) {
-		while ( editor.parentElement?.closest( '[contenteditable]' ) ) {
-			editor = /** @type {HTMLElement} */ (
-				editor.parentElement.closest( '[contenteditable]' )
-			);
-		}
-		editor.focus();
-	}
-
 	if ( isInputOrTextArea( container ) ) {
 		// The element may not support selection setting.
 		if ( typeof container.selectionStart !== 'number' ) {
@@ -83,6 +72,15 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 		}
 		return;
 	}
+
+	let editor = container;
+
+	while ( editor.parentElement?.closest( '[contenteditable]' ) ) {
+		editor = /** @type {HTMLElement} */ (
+			editor.parentElement.closest( '[contenteditable]' )
+		);
+	}
+	editor.focus();
 
 	const parentEditable = /** @type {HTMLElement} */ (
 		container.closest( '[contenteditable="true"]' )
