@@ -190,8 +190,7 @@ describe( 'NumberControl', () => {
 			expect( input ).toHaveValue( 41 );
 
 			// Blur the input
-			// (TODO: user different ways to blur input to make tests more resilient)
-			await user.keyboard( '[Tab]' );
+			await user.click( document.body );
 
 			// After blur, value is clamped
 			expect( input ).toHaveValue( 10 );
