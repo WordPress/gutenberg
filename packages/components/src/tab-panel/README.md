@@ -143,6 +143,14 @@ The name of the tab to be selected upon mounting of component. If this prop is n
 -   Required: No
 -   Default: none
 
+#### hasManualTabActivation
+
+When `true`, enables manual tab activation. Defaults to automatic tab activation when `false`. See the [official W3C docs](https://www.w3.org/WAI/ARIA/apg/patterns/tabpanel/) for more info.
+
+-   Type: `boolean`
+-   Required: No
+-   Default: `false`
+
 #### children
 
 A function which renders the tabviews given the selected tab. The function is passed the active tab object as an argument as defined the tabs prop.
