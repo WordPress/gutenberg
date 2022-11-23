@@ -14,7 +14,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useCreateTemplatePartFromBlocks } from './utils/hooks';
 import { transformWidgetToBlock } from './utils/transformers';
 
-export function TemplateParetImportControls( { area, setAttributes } ) {
+export function TemplatePartImportControls( { area, setAttributes } ) {
 	const [ selectedSidebar, setSelectedSidebar ] = useState( '' );
 	const [ isBusy, setIsBusy ] = useState( false );
 
