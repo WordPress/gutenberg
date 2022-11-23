@@ -19,7 +19,7 @@ function ContextMenu( { name, parentMenu = '' } ) {
 	const hasColorPanel = useHasColorPanel( name );
 	const hasBorderPanel = useHasBorderPanel( name );
 	const hasDimensionsPanel = useHasDimensionsPanel( name );
-	const hasLayoutPanel = hasBorderPanel || hasDimensionsPanel;
+	const hasLayoutPanel = hasDimensionsPanel;
 
 	return (
 		<ItemGroup>
@@ -39,6 +39,15 @@ function ContextMenu( { name, parentMenu = '' } ) {
 					aria-label={ __( 'Colors styles' ) }
 				>
 					{ __( 'Colors' ) }
+				</NavigationButtonAsItem>
+			) }
+			{ hasBorderPanel && (
+				<NavigationButtonAsItem
+					icon={ layout }
+					path={ parentMenu + '/effects' }
+					aria-label={ __( 'Border styles' ) }
+				>
+					{ __( 'Border' ) }
 				</NavigationButtonAsItem>
 			) }
 			{ hasLayoutPanel && (
