@@ -353,7 +353,8 @@ function StylePanels( props ) {
 	 * push typography[ feature ] only, and not all styles for one.
 	 * Also some styles use presets, which we can't keep track of individually. It's up to the style itself to deal with it.
 	 * @TODO:
-	 *  - Think about how we should update global styles live in the post editor (prerequisite). Because of this, I think we should start in the side editor.
+	 *  - Think about how we should update global styles live in the post editor (prerequisite).
+	 *    Because of this, I think we should start in the side editor and use an exported `GlobalStylesContext` here.
 	 *  - Deal with presets, e.g., pass `var:preset|...` as the value where appropriate.
 	 *  - Deal with "sides", so we need to parse border-top-radius... ???
 	 *  - Validate the constraints, e.g., we should only push styles that are possible to edit in theme.json/global styles.
