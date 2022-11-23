@@ -102,6 +102,7 @@ export function PaddingEdit( props ) {
 		setAttributes,
 		onMouseOver,
 		onMouseOut,
+		setBlockGlobalStyles,
 	} = props;
 
 	const spacingSizes = useSetting( 'spacing.spacingSizes' );
@@ -135,6 +136,11 @@ export function PaddingEdit( props ) {
 		setAttributes( {
 			style: cleanEmptyObject( newStyle ),
 		} );
+
+		setBlockGlobalStyles(
+			'spacing.padding ',
+			cleanEmptyObject( newStyle )
+		);
 	};
 
 	return Platform.select( {

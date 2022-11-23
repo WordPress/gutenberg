@@ -108,6 +108,7 @@ function addEditProps( settings ) {
 export function FontFamilyEdit( {
 	setAttributes,
 	attributes: { fontFamily },
+	setBlockGlobalStyles,
 } ) {
 	const fontFamilies = useSetting( 'typography.fontFamilies' );
 
@@ -124,6 +125,10 @@ export function FontFamilyEdit( {
 		setAttributes( {
 			fontFamily: predefinedFontFamily?.slug,
 		} );
+		setBlockGlobalStyles(
+			'typography.fontFamily',
+			`var:preset|font-family|${ predefinedFontFamily?.slug }`
+		);
 	}
 
 	return (

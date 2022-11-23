@@ -290,7 +290,7 @@ const getLinkColorFromAttributeValue = ( colors, value ) => {
  * @return {WPElement} Color edit element.
  */
 export function ColorEdit( props ) {
-	const { name: blockName, attributes } = props;
+	const { name: blockName, attributes, setBlockGlobalStyles } = props;
 	// Some color settings have a special handling for deprecated flags in `useSetting`,
 	// so we can't unwrap them by doing const { ... } = useSetting('color')
 	// until https://github.com/WordPress/gutenberg/issues/37094 is fixed.
@@ -393,6 +393,11 @@ export function ColorEdit( props ) {
 			...localAttributes.current,
 			...newAttributes,
 		};
+
+		setBlockGlobalStyles(
+			`color.${ name }`,
+			colorObject?.slug ? `var:preset|color|${ colorObject.slug }` : value
+		);
 	};
 
 	const onChangeGradient = ( value ) => {

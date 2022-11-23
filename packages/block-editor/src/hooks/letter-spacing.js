@@ -27,6 +27,7 @@ export function LetterSpacingEdit( props ) {
 	const {
 		attributes: { style },
 		setAttributes,
+		setBlockGlobalStyles,
 	} = props;
 
 	function onChange( newSpacing ) {
@@ -39,6 +40,7 @@ export function LetterSpacingEdit( props ) {
 				},
 			} ),
 		} );
+		setBlockGlobalStyles( 'typography.letterSpacing', newSpacing );
 	}
 
 	return (

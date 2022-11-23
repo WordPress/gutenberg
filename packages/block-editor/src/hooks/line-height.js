@@ -2,14 +2,13 @@
  * WordPress dependencies
  */
 import { hasBlockSupport } from '@wordpress/blocks';
-import { useContext } from '@wordpress/element';
+
 /**
  * Internal dependencies
  */
 import LineHeightControl from '../components/line-height-control';
 import { cleanEmptyObject } from './utils';
 import useSetting from '../components/use-setting';
-import BlockGlobalStylesContext from '../components/block-global-styles/context';
 
 export const LINE_HEIGHT_SUPPORT_KEY = 'typography.lineHeight';
 
@@ -24,16 +23,9 @@ export function LineHeightEdit( props ) {
 	const {
 		attributes: { style },
 		setAttributes,
+		setBlockGlobalStyles,
 	} = props;
-	const {
-		base: baseBlockStyles,
-		user: userBlockStyles,
-		merged: mergedBlockStyles,
-		setUserBlockStyles,
-	} = useContext( BlockGlobalStylesContext );
-console.log( 'mergedBlockStyles', mergedBlockStyles );
-console.log( 'userBlockStyles', userBlockStyles );
-console.log( 'baseBlockStyles', baseBlockStyles );
+
 	const onChange = ( newLineHeightValue ) => {
 		const newStyle = {
 			...style,
@@ -42,17 +34,7 @@ console.log( 'baseBlockStyles', baseBlockStyles );
 				lineHeight: newLineHeightValue,
 			},
 		};
-		setUserBlockStyles( ( currentStyles ) => {
-			console.log( 'newStyle', newStyle );
-			console.log( 'currentStyles', currentStyles );
-			return {
-				...currentStyles,
-				typography: {
-					...currentStyles?.typography,
-					lineHeight: newLineHeightValue,
-				},
-			};
-		} );
+		setBlockGlobalStyles( LINE_HEIGHT_SUPPORT_KEY, newLineHeightValue );
 		setAttributes( { style: cleanEmptyObject( newStyle ) } );
 	};
 	return (

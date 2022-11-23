@@ -157,7 +157,7 @@ function getColorSlugFromVariable( value ) {
 }
 
 export function BorderPanel( props ) {
-	const { attributes, clientId, setAttributes } = props;
+	const { attributes, clientId, setAttributes, setBlockGlobalStyles } = props;
 	const { style } = attributes;
 	const { colors } = useMultipleOriginColorsAndGradients();
 
@@ -249,6 +249,12 @@ export function BorderPanel( props ) {
 		setAttributes( {
 			style: newStyle,
 			borderColor: newBorderColor,
+		} );
+
+		// @TODO check if this will overwrite existing, saved global styles.
+		setBlockGlobalStyles( 'border', {
+			radius: style?.border?.radius,
+			...newBorderStyles,
 		} );
 	};
 

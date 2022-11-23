@@ -103,6 +103,7 @@ export function MarginEdit( props ) {
 		setAttributes,
 		onMouseOver,
 		onMouseOut,
+		setBlockGlobalStyles,
 	} = props;
 
 	const spacingSizes = useSetting( 'spacing.spacingSizes' );
@@ -136,6 +137,8 @@ export function MarginEdit( props ) {
 		setAttributes( {
 			style: cleanEmptyObject( newStyle ),
 		} );
+
+		setBlockGlobalStyles( 'spacing.margin ', cleanEmptyObject( newStyle ) );
 	};
 
 	return Platform.select( {

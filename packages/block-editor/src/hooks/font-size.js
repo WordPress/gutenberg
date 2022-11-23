@@ -118,6 +118,7 @@ export function FontSizeEdit( props ) {
 	const {
 		attributes: { fontSize, style },
 		setAttributes,
+		setBlockGlobalStyles,
 	} = props;
 	const fontSizes = useSetting( 'typography.fontSizes' );
 
@@ -134,6 +135,11 @@ export function FontSizeEdit( props ) {
 			} ),
 			fontSize: fontSizeSlug,
 		} );
+
+		setBlockGlobalStyles(
+			FONT_SIZE_SUPPORT_KEY,
+			fontSizeSlug ? `var:preset|font-size|${ fontSizeSlug }` : value
+		);
 	};
 
 	const fontSizeObject = getFontSize(
