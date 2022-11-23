@@ -37,10 +37,11 @@ function Image( block ) {
 			alt={ block.attributes.alt }
 			src={ block.attributes.url }
 			style={ {
-				width: '30px',
-				height: '30px',
+				width: '36px',
+				height: '36px',
 				objectFit: 'cover',
-				margin: '5px',
+				borderRadius: '2px',
+				cursor: 'pointer',
 			} }
 		/>
 	);
@@ -68,7 +69,7 @@ export default function PostFormatPanel() {
 	const panelBodyTitle = [
 		__( 'Suggestion:' ),
 		<span className="editor-post-publish-panel__link" key="label">
-			{ __( 'Upload external media' ) }
+			{ __( 'External media' ) }
 		</span>,
 	];
 
@@ -131,25 +132,44 @@ export default function PostFormatPanel() {
 
 	return (
 		<PanelBody initialOpen={ true } title={ panelBodyTitle }>
-			<div>
+			<p>
+				{ __(
+					'There are some external images in the post. You can upload them to the media library.'
+				) }
+			</p>
+			<div
+				style={ {
+					display: 'inline-flex',
+					'flex-wrap': 'wrap',
+					gap: '8px',
+				} }
+			>
 				{ blobUrls.map( ( { clientId: _clientId } ) => {
 					const image = externalImages.find(
 						( { clientId } ) => clientId === _clientId
 					);
 					return <Image key={ _clientId } { ...image } />;
 				} ) }
+				<Button
+					icon={ upload }
+					variant="secondary"
+					onClick={ uploadImages }
+				>
+					{ __( 'Upload all' ) }
+				</Button>
 			</div>
-			<Button
-				icon={ upload }
-				variant="secondary"
-				onClick={ uploadImages }
-			>
-				{ __( 'Upload All' ) }
-			</Button>
+
 			{ isUploading && <Spinner /> }
-			<hr />
-			<p>{ __( 'Some images can only be uploaded manually.' ) }</p>
-			<div>
+			<p>
+				{ __( 'The following images can only be uploaded manually.' ) }
+			</p>
+			<div
+				style={ {
+					display: 'inline-flex',
+					'flex-wrap': 'wrap',
+					gap: '8px',
+				} }
+			>
 				{ nonUploadableImages.map( ( image ) => (
 					<Image key={ image.clientId } { ...image } />
 				) ) }
