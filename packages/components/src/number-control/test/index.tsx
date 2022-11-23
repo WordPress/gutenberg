@@ -38,12 +38,12 @@ describe( 'NumberControl', () => {
 	describe( 'Basic rendering', () => {
 		it( 'should render', () => {
 			render( <NumberControl /> );
-			expect( getInput() ).not.toBeNull();
+			expect( getInput() ).toBeInTheDocument();
 		} );
 
 		it( 'should render custom className', () => {
 			render( <NumberControl className="hello" /> );
-			expect( getInput() ).toBeTruthy();
+			expect( getInput() ).toBeInTheDocument();
 		} );
 	} );
 
