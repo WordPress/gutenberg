@@ -70,4 +70,14 @@ export type TabPanelProps = {
 	 * Array of tab objects. Each tab object should contain at least a `name` and a `title`.
 	 */
 	tabs: Tab[];
+	/**
+	 * When `true`, enables manual tab activation. Defaults to automatic tab
+	 * activation.
+	 *
+	 * @default false
+	 *
+	 * @see https://www.w3.org/WAI/ARIA/apg/example-index/tabs/tabs-automatic.html
+	 * @see https://www.w3.org/WAI/ARIA/apg/example-index/tabs/tabs-manual.html
+	 */
+	hasManualTabActivation?: boolean;
 };
