@@ -16,3 +16,13 @@
 	max-width: 100%;
 	overflow-x: auto;
 }
+
+.block-editor-list-view-block__menu-cell:last-child {
+	padding-right: 0;
+}
+
+.block-editor-list-view-leaf {
+	.block-editor-block-icon {
+		margin-right: 4px;
+	}
+}
