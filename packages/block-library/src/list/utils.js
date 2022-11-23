@@ -56,7 +56,8 @@ export function createListBlockFromDOMElement( listElement ) {
 }
 
 export function migrateToListV2( attributes ) {
-	const { values, start, reversed, ordered, type } = attributes;
+	const { values, start, reversed, ordered, type, ...othorAttrs } =
+		attributes;
 
 	const list = document.createElement( ordered ? 'ol' : 'ul' );
 	list.innerHTML = values;
@@ -72,5 +73,8 @@ export function migrateToListV2( attributes ) {
 
 	const [ listBlock ] = rawHandler( { HTML: list.outerHTML } );
 
-	return [ listBlock.attributes, listBlock.innerBlocks ];
+	return [
+		{ ...othorAttrs, ...listBlock.attributes },
+		listBlock.innerBlocks,
+	];
 }
