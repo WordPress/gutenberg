@@ -47,7 +47,7 @@ export async function deleteAllTemplates( type ) {
 			);
 		}
 
-		if ( ! response.deleted ) {
+		if ( ! response?.deleted ) {
 			// Disable reason - the error provides valuable feedback about issues with tests.
 			// eslint-disable-next-line no-console
 			console.warn(
