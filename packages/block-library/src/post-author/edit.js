@@ -62,7 +62,7 @@ function PostAuthorEdit( {
 		attributes;
 	const avatarSizes = [];
 	const authorName = authorDetails?.name || __( 'Post Author' );
-	if ( authorDetails ) {
+	if ( authorDetails?.avatar_urls ) {
 		Object.keys( authorDetails.avatar_urls ).forEach( ( size ) => {
 			avatarSizes.push( {
 				value: size,
@@ -172,7 +172,7 @@ function PostAuthorEdit( {
 			</BlockControls>
 
 			<div { ...blockProps }>
-				{ showAvatar && authorDetails && (
+				{ showAvatar && authorDetails?.avatar_urls && (
 					<div className="wp-block-post-author__avatar">
 						<img
 							width={ attributes.avatarSize }
