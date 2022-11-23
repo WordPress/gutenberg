@@ -77,7 +77,13 @@ export default function PostFormatPanel() {
 		externalImages.forEach( ( image ) => {
 			if ( ! blobUrls[ image.attributes.url ] ) {
 				window
-					.fetch( image.attributes.url )
+					.fetch(
+						`${
+							window.ajaxurl
+						}?action=gutenberg_fetch_media&url=${ encodeURIComponent(
+							image.attributes.url
+						) }`
+					)
 					.then( ( response ) => response.blob() )
 					.then( ( blob ) =>
 						setBlobUrls( ( blobs ) => [
@@ -91,40 +97,42 @@ export default function PostFormatPanel() {
 		} );
 	}, [ externalImages ] );
 
-	const nonUploadableImages = externalImages.filter(
-		( image ) =>
-			! blobUrls.find( ( { clientId } ) => image.clientId === clientId )
-	);
-
 	function uploadImages() {
 		setIsUploading( true );
 		Promise.all(
-			blobUrls.map( ( { clientId, blob } ) => {
-				return new Promise( ( resolve, reject ) => {
-					mediaUpload( {
-						filesList: [ blob ],
-						onFileChange: ( [ media ] ) => {
-							if ( isBlobURL( media.url ) ) {
-								return;
-							}
+			externalImages.map( ( image ) =>
+				window
+					.fetch(
+						`${
+							window.ajaxurl
+						}?action=gutenberg_fetch_media&url=${ encodeURIComponent(
+							image.attributes.url
+						) }`
+					)
+					.then( ( response ) => response.blob() )
+					.then(
+						( blob ) =>
+							new Promise( ( resolve, reject ) => {
+								mediaUpload( {
+									filesList: [ blob ],
+									onFileChange: ( [ media ] ) => {
+										if ( isBlobURL( media.url ) ) {
+											return;
+										}
 
-							setBlobUrls( ( blobs ) =>
-								blobs.filter(
-									( { clientId: id } ) => id !== clientId
-								)
-							);
-							updateBlockAttributes( clientId, {
-								id: media.id,
-								url: media.url,
-							} );
-							resolve();
-						},
-						onError() {
-							reject();
-						},
-					} );
-				} );
-			} )
+										updateBlockAttributes( image.clientId, {
+											id: media.id,
+											url: media.url,
+										} );
+										resolve();
+									},
+									onError() {
+										reject();
+									},
+								} );
+							} )
+					)
+			)
 		).then( () => {
 			setIsUploading( false );
 		} );
@@ -140,16 +148,15 @@ export default function PostFormatPanel() {
 			<div
 				style={ {
 					display: 'inline-flex',
-					'flex-wrap': 'wrap',
+					flexWrap: 'wrap',
 					gap: '8px',
 				} }
 			>
-				{ blobUrls.map( ( { clientId: _clientId } ) => {
-					const image = externalImages.find(
-						( { clientId } ) => clientId === _clientId
-					);
-					return <Image key={ _clientId } { ...image } />;
+				{ externalImages.map( ( image ) => {
+					return <Image key={ image.clientId } { ...image } />;
 				} ) }
+			</div>
+			<p>
 				<Button
 					icon={ upload }
 					variant="secondary"
@@ -157,23 +164,8 @@ export default function PostFormatPanel() {
 				>
 					{ __( 'Upload all' ) }
 				</Button>
-			</div>
-
-			{ isUploading && <Spinner /> }
-			<p>
-				{ __( 'The following images can only be uploaded manually.' ) }
+				{ isUploading && <Spinner /> }
 			</p>
-			<div
-				style={ {
-					display: 'inline-flex',
-					'flex-wrap': 'wrap',
-					gap: '8px',
-				} }
-			>
-				{ nonUploadableImages.map( ( image ) => (
-					<Image key={ image.clientId } { ...image } />
-				) ) }
-			</div>
 		</PanelBody>
 	);
 }
