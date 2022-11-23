@@ -138,7 +138,7 @@ export function PaddingEdit( props ) {
 		} );
 
 		setBlockGlobalStyles(
-			'spacing.padding ',
+			'spacing.padding',
 			cleanEmptyObject( newStyle )
 		);
 	};
