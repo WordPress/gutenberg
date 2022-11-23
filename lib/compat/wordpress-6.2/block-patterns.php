@@ -26,7 +26,7 @@ function gutenberg_register_core_block_patterns_and_categories() {
 		'columns',
 		array(
 			'label'       => _x( 'Columns', 'Block pattern category', 'gutenberg' ),
-			'description' => __( 'Multi column patterns with more complex layouts.', 'gutenberg' ),
+			'description' => __( 'Multi-column patterns with more complex layouts.', 'gutenberg' ),
 		)
 	);
 	register_block_pattern_category(
