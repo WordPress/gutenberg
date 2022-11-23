@@ -16,13 +16,10 @@ describe( 'ColorPalette', () => {
 		{ name: 'blue', color: '#00f' },
 	];
 	const currentColor = '#f00';
-	const onChange = jest.fn();
-
-	beforeEach( () => {
-		onChange.mockClear();
-	} );
 
 	test( 'should render a dynamic toolbar of colors', () => {
+		const onChange = jest.fn();
+
 		const { container } = render(
 			<ColorPalette
 				colors={ colors }
@@ -35,6 +32,8 @@ describe( 'ColorPalette', () => {
 	} );
 
 	test( 'should render three color button options', () => {
+		const onChange = jest.fn();
+
 		render(
 			<ColorPalette
 				colors={ colors }
@@ -52,6 +51,7 @@ describe( 'ColorPalette', () => {
 		const user = userEvent.setup( {
 			advanceTimers: jest.advanceTimersByTime,
 		} );
+		const onChange = jest.fn();
 
 		render(
 			<ColorPalette
@@ -73,6 +73,7 @@ describe( 'ColorPalette', () => {
 		const user = userEvent.setup( {
 			advanceTimers: jest.advanceTimersByTime,
 		} );
+		const onChange = jest.fn();
 
 		render(
 			<ColorPalette
@@ -97,6 +98,7 @@ describe( 'ColorPalette', () => {
 		const user = userEvent.setup( {
 			advanceTimers: jest.advanceTimersByTime,
 		} );
+		const onChange = jest.fn();
 
 		render(
 			<ColorPalette
@@ -113,6 +115,8 @@ describe( 'ColorPalette', () => {
 	} );
 
 	test( 'should allow disabling custom color picker', () => {
+		const onChange = jest.fn();
+
 		const { container } = render(
 			<ColorPalette
 				colors={ colors }
@@ -129,6 +133,7 @@ describe( 'ColorPalette', () => {
 		const user = userEvent.setup( {
 			advanceTimers: jest.advanceTimersByTime,
 		} );
+		const onChange = jest.fn();
 
 		render(
 			<ColorPalette
