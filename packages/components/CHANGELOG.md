@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   `TabPanel`: Add ability to set icon only tab buttons ([#45005](https://github.com/WordPress/gutenberg/pull/45005)).
+-   `DateTimePicker`: Remove deprecated `__nextRemoveHelpButton` and `__nextRemoveResetButton` ([#45999](https://github.com/WordPress/gutenberg/pull/45999)).
 
 ## 22.1.0 (2022-11-16)
 
