@@ -16,7 +16,7 @@ import { UP, DOWN, ENTER } from '@wordpress/keycodes';
 import NumberControl from '..';
 import type { NumberControlProps } from '../types';
 
-const getInput = () => screen.getByTestId( 'input' );
+const getInput = () => screen.getByRole( 'spinbutton' ) as HTMLInputElement;
 
 const fireKeyDown = ( data ) =>
 	fireEvent.keyDown( document.activeElement || document.body, data );
