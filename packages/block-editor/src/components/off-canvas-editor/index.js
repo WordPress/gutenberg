@@ -32,7 +32,7 @@ import useListViewClientIds from './use-list-view-client-ids';
 import useListViewDropZone from './use-list-view-drop-zone';
 import useListViewExpandSelectedItem from './use-list-view-expand-selected-item';
 import { store as blockEditorStore } from '../../store';
-import Inserter from '../inserter';
+import { Appender } from './appender';
 
 const expanded = ( state, action ) => {
 	if ( Array.isArray( action.clientIds ) ) {
@@ -224,7 +224,7 @@ function __ExperimentalOffCanvasEditor(
 					<TreeGridRow>
 						<TreeGridCell>
 							{ ( props ) => (
-								<OffCanvasEditorAppender
+								<Appender
 									{ ...props }
 									rootClientId={ clientId }
 								/>
@@ -236,40 +236,5 @@ function __ExperimentalOffCanvasEditor(
 		</AsyncModeProvider>
 	);
 }
-
-const OffCanvasEditorAppender = forwardRef(
-	( { rootClientId, ...props }, ref ) => {
-		const { hideInserter } = useSelect(
-			( select ) => {
-				const { getTemplateLock, __unstableGetEditorMode } =
-					select( blockEditorStore );
-
-				return {
-					hideInserter:
-						!! getTemplateLock( rootClientId ) ||
-						__unstableGetEditorMode() === 'zoom-out',
-				};
-			},
-			[ rootClientId ]
-		);
-
-		if ( hideInserter ) {
-			return null;
-		}
-
-		return (
-			<div className="offcanvas-editor__appender">
-				<Inserter
-					ref={ ref }
-					rootClientId={ rootClientId }
-					position="bottom right"
-					isAppender
-					__experimentalIsQuick
-					{ ...props }
-				/>
-			</div>
-		);
-	}
-);
 
 export default forwardRef( __ExperimentalOffCanvasEditor );
