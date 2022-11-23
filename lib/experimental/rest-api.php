@@ -115,7 +115,7 @@ add_filter( 'get_sample_permalink', 'gutenberg_auto_draft_get_sample_permalink',
 add_action( 'wp_ajax_gutenberg_fetch_media', 'gutenberg_fetch_media' );
 
 function gutenberg_fetch_media() {
-	$response = wp_remote_get( $_GET['url'] );
+	$response = wp_safe_remote_get( $_GET['url'] );
 	header( 'Content-Type: ' . $response['headers']['content-type'] );
 	echo wp_remote_retrieve_body( $response );
 	wp_die();
