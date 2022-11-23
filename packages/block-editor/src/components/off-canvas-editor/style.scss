@@ -22,6 +22,8 @@
 }
 
 .block-editor-list-view-leaf {
+	display: block;
+	max-width: $sidebar-width - (2 * $grid-unit-20);
 	.block-editor-block-icon {
 		margin-right: 4px;
 	}
