@@ -197,8 +197,7 @@ describe( 'NumberControl', () => {
 			expect( input ).toHaveValue( 10 );
 		} );
 
-		// TODO: understand why this fails with user event
-		it.skip( 'should parse to number value on ENTER keypress when required', async () => {
+		it( 'should parse to number value on ENTER keypress when required', async () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
@@ -207,14 +206,13 @@ describe( 'NumberControl', () => {
 
 			const input = getInput();
 			await user.clear( input );
-			await user.type( input, '10 abc' );
+			await user.type( input, 'abc' );
 			await user.keyboard( '[Enter]' );
 
 			expect( input ).toHaveValue( 0 );
 		} );
 
-		// TODO: understand why this fails with user event
-		it.skip( 'should parse to empty string on ENTER keypress when not required', async () => {
+		it( 'should parse to empty string on ENTER keypress when not required', async () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
@@ -223,7 +221,7 @@ describe( 'NumberControl', () => {
 
 			const input = getInput();
 			await user.clear( input );
-			await user.type( input, '10 abc' );
+			await user.type( input, 'abc' );
 			await user.keyboard( '[Enter]' );
 
 			// React Testing Library associated `null` to empty string types for
