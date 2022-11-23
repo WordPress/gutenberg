@@ -64,6 +64,8 @@ export default function useSelectAll() {
 				return;
 			}
 
+			node.ownerDocument.defaultView.getSelection().removeAllRanges();
+
 			multiSelect(
 				blockClientIds[ 0 ],
 				blockClientIds[ blockClientIds.length - 1 ]

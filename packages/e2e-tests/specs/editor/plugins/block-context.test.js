@@ -29,7 +29,7 @@ describe( 'Block context', () => {
 		// Inserting the context provider block should select the first inner
 		// block of the template. Verify the contents of the consumer.
 		let innerBlockText = await page.evaluate(
-			() => document.activeElement.textContent
+			() => document.querySelector( '.is-selected' ).textContent
 		);
 		expect( innerBlockText ).toBe( 'The record ID is: 0' );
 
@@ -40,7 +40,7 @@ describe( 'Block context', () => {
 		// Verify propagated context changes.
 		await page.keyboard.press( 'ArrowDown' );
 		innerBlockText = await page.evaluate(
-			() => document.activeElement.textContent
+			() => document.querySelector( '.is-selected' ).textContent
 		);
 		expect( innerBlockText ).toBe( 'The record ID is: 123' );
 	} );

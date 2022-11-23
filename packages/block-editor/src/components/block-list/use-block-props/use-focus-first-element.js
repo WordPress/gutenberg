@@ -91,6 +91,16 @@ export function useFocusFirstElement( clientId ) {
 			anchorElement &&
 			isInsideRootBlock( ref.current, anchorElement )
 		) {
+			let editor = ref.current;
+
+			// Ensure editor has focus.
+			while ( editor.parentElement?.closest( '[contenteditable]' ) ) {
+				editor = /** @type {HTMLElement} */ (
+					editor.parentElement.closest( '[contenteditable]' )
+				);
+			}
+
+			editor.focus();
 			return;
 		}
 

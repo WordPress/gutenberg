@@ -65,6 +65,8 @@ export default function useMultiSelection() {
 
 		if ( ! isFullSelection ) {
 		}
+
+		// ref.current.ownerDocument.defaultView.getSelection().removeAllRanges();
 	}, [
 		hasMultiSelection,
 		isMultiSelecting,
