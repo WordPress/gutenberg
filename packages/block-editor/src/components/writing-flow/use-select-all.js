@@ -30,22 +30,25 @@ export default function useSelectAll() {
 			const { ownerDocument } = node;
 			const { defaultView } = ownerDocument;
 			const { anchorNode } = defaultView.getSelection();
-			const anchorElement =
-				anchorNode.nodeType === anchorNode.ELEMENT_NODE
-					? anchorNode
-					: anchorNode.parentElement;
-			const selectedContentEditable =
-				anchorElement.closest( '[contenteditable]' );
 
-			if (
-				selectedClientIds.length < 2 &&
-				! isEntirelySelected( selectedContentEditable )
-			) {
-				defaultView.getSelection().removeAllRanges();
-				const range = ownerDocument.createRange();
-				range.selectNodeContents( selectedContentEditable );
-				defaultView.getSelection().addRange( range );
-				return;
+			if ( anchorNode ) {
+				const anchorElement =
+					anchorNode.nodeType === anchorNode.ELEMENT_NODE
+						? anchorNode
+						: anchorNode.parentElement;
+				const selectedContentEditable =
+					anchorElement.closest( '[contenteditable]' );
+
+				if (
+					selectedClientIds.length < 2 &&
+					! isEntirelySelected( selectedContentEditable )
+				) {
+					defaultView.getSelection().removeAllRanges();
+					const range = ownerDocument.createRange();
+					range.selectNodeContents( selectedContentEditable );
+					defaultView.getSelection().addRange( range );
+					return;
+				}
 			}
 
 			const [ firstSelectedClientId ] = selectedClientIds;

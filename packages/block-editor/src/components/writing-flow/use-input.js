@@ -149,6 +149,10 @@ export default function useInput() {
 				return;
 			}
 
+			if ( hasMultiSelection() ) {
+				return;
+			}
+
 			const { ownerDocument } = node;
 			const { defaultView } = ownerDocument;
 			const prototype = Object.getPrototypeOf( event );

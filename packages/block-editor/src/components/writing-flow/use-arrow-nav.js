@@ -207,8 +207,18 @@ export default function useArrowNav() {
 
 			const clientId = getSelectedBlockClientId();
 
-			if ( target === node && clientId ) {
-				target = ownerDocument.getElementById( 'block-' + clientId );
+			if ( clientId ) {
+				const block = ownerDocument.getElementById(
+					'block-' + clientId
+				);
+
+				if ( target === node ) {
+					target = block;
+				}
+
+				if ( ! block.contains( target ) ) {
+					target = block;
+				}
 			}
 
 			// When presing any key other than up or down, the initial vertical

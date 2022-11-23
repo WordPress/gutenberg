@@ -50,6 +50,11 @@ export default function isEdge( container, isReverse, onlyVertical = false ) {
 		return true;
 	}
 
+	// Out of bounds.
+	if ( ! container.contains( selection.anchorNode ) ) {
+		return true;
+	}
+
 	const range = selection.getRangeAt( 0 );
 	const collapsedRange = range.cloneRange();
 	const isForward = isSelectionForward( selection );
