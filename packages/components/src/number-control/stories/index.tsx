@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
+
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -6,9 +11,9 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import NumberControl from '../';
+import NumberControl from '..';
 
-export default {
+const meta: ComponentMeta< typeof NumberControl > = {
 	title: 'Components (Experimental)/NumberControl',
 	component: NumberControl,
 	argTypes: {
@@ -21,8 +26,13 @@ export default {
 	},
 };
 
-function Template( { onChange, ...props } ) {
-	const [ value, setValue ] = useState( '0' );
+export default meta;
+
+const Template: ComponentStory< typeof NumberControl > = ( {
+	onChange,
+	...props
+} ) => {
+	const [ value, setValue ] = useState< string | undefined >( '0' );
 	const [ isValidValue, setIsValidValue ] = useState( true );
 
 	return (
@@ -32,14 +42,17 @@ function Template( { onChange, ...props } ) {
 				value={ value }
 				onChange={ ( v, extra ) => {
 					setValue( v );
-					setIsValidValue( extra.event.target.validity.valid );
-					onChange( v, extra );
+					setIsValidValue(
+						( extra.event.target as HTMLInputElement ).validity
+							.valid
+					);
+					onChange?.( v, extra );
 				} }
 			/>
 			<p>Is valid? { isValidValue ? 'Yes' : 'No' }</p>
 		</>
 	);
-}
+};
 
 export const Default = Template.bind( {} );
 Default.args = {
