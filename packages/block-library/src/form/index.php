@@ -55,10 +55,12 @@ function render_block_core_form( $attributes, $content, $block ) {
 	$processed_content->set_attribute( 'action', esc_attr( $action ) );
 	$processed_content->set_attribute( 'method', esc_attr( $method ) );
 
-	// Inject a hidden input with the block form-ID.
+	$nonce_field = wp_nonce_field( 'wp-block-form', '_wpnonce', true, false );
+
+	// Inject a hidden input with the nonce to strengthen security form-ID.
 	return str_replace(
 		'</form>',
-		'<input type="hidden" name="block-form-id" value="' . esc_attr( $form_id ) . '" /><form>',
+		$nonce_field . '</form>',
 		$processed_content->get_updated_html()
 	);
 }
@@ -85,16 +87,22 @@ add_action( 'init', 'register_block_core_form' );
  * Then add your own action by creating a function and hooking it to the 'wp' action.
  */
 function submit_core_form_block() {
-	if ( ! isset( $_POST['block-form-id'] ) ) {
+
+	$has_valid_nonce = wp_verify_nonce( $_POST['_wpnonce'], 'wp-block-form' );
+	if ( ! $has_valid_nonce ) {
 		return;
 	}
+
+	$referer = wp_get_referer();
 	$content = sprintf(
 		/* translators: %s: The request URI. */
 		__( 'Form submission from %1$s', 'gutenberg' ) . '</br>',
-		esc_url( get_site_url() . $_SERVER['REQUEST_URI'] )
+		'<a href="' . esc_url( $referer ) . '">' . esc_url( $referer ) . '</a>'
 	);
+
+	$skip_fields = array( '_wpnonce', '_wp_http_referer' );
 	foreach ( $_POST as $key => $value ) {
-		if ( 'block-form-id' === $key ) {
+		if ( in_array( $key, $skip_fields, true ) ) {
 			continue;
 		}
 		$content .= $key . ': ' . $value . '</br>';
