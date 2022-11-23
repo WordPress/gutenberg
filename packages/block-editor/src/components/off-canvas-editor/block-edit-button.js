@@ -177,13 +177,13 @@ const BlockEditButton = ( { label, clientId } ) => {
 		[ clientId ]
 	);
 
-	const onClick = () => {
-		toggleBlockHighlight( clientId, true );
-		setConvertModalOpen( ! convertModalOpen );
-	};
-
 	const allowConvertToLinks =
 		'core/page-list' === block.name && totalPages <= MAX_PAGE_COUNT;
+
+	const onClick = () => {
+		toggleBlockHighlight( clientId, true );
+		if ( allowConvertToLinks ) setConvertModalOpen( ! convertModalOpen );
+	};
 
 	return (
 		<>
@@ -194,9 +194,7 @@ const BlockEditButton = ( { label, clientId } ) => {
 					pages={ pages }
 				/>
 			) }
-			{ allowConvertToLinks && (
-				<Button icon={ edit } label={ label } onClick={ onClick } />
-			) }
+			<Button icon={ edit } label={ label } onClick={ onClick } />
 		</>
 	);
 };
