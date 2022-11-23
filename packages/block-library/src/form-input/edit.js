@@ -11,18 +11,22 @@ import {
 	InspectorControls,
 	RichText,
 	useBlockProps,
+	__experimentalUseBorderProps as useBorderProps,
+	__experimentalUseColorProps as useColorProps,
 } from '@wordpress/block-editor';
 import { PanelBody, TextControl, CheckboxControl } from '@wordpress/components';
 
 import { useRef } from '@wordpress/element';
 
-function InputFieldBlock( { attributes, setAttributes } ) {
+function InputFieldBlock( { attributes, setAttributes, className } ) {
 	const { type, name, label, inlineLabel, required, placeholder } =
 		attributes;
 	const blockProps = useBlockProps();
 	const ref = useRef();
 	const TagName = type === 'textarea' ? 'textarea' : 'input';
 
+	const borderProps = useBorderProps( attributes );
+	const colorProps = useColorProps( attributes );
 	if ( ref.current ) {
 		ref.current.focus();
 	}
@@ -67,16 +71,13 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 				/>
 			</InspectorControls>
 			<div
-				className={ classNames(
-					'wp-block-form-input-wrapper wp-block-form-input-label',
-					{
-						'is-label-inline': inlineLabel,
-					}
-				) }
+				className={ classNames( 'wp-block-form-input__label', {
+					'is-label-inline': inlineLabel,
+				} ) }
 			>
 				<RichText
 					tagName="span"
-					className="wp-block-form-input-label__content"
+					className="wp-block-form-input__label-content"
 					{ ...blockProps }
 					value={ label }
 					onChange={ ( newLabel ) =>
@@ -88,7 +89,12 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 				/>
 				<TagName
 					type={ type }
-					className="wp-block-form-input"
+					className={ classNames(
+						className,
+						'wp-block-form-input__input',
+						colorProps.className,
+						borderProps.className
+					) }
 					aria-label={ __( 'Optional placeholder text' ) }
 					// We hide the placeholder field's placeholder when there is a value. This
 					// stops screen readers from reading the placeholder field's placeholder
@@ -101,6 +107,10 @@ function InputFieldBlock( { attributes, setAttributes } ) {
 						setAttributes( { placeholder: event.target.value } )
 					}
 					aria-required={ required }
+					style={ {
+						...borderProps.style,
+						...colorProps.style,
+					} }
 				/>
 			</div>
 		</>

@@ -1,4 +1,4 @@
-.wp-block-form-input-label {
+.wp-block-form-input__label {
 	width: 100%;
 	display: flex;
 	flex-direction: column;
@@ -11,12 +11,11 @@
 	}
 }
 
-.wp-block-form-input-label__content {
+.wp-block-form-input__label-content {
 	width: fit-content;
 }
 
-input.wp-block-form-input,
-textarea.wp-block-form-input {
+.wp-block-form-input__input {
 	padding: 0.5em;
 	border: 1px solid currentColor;
 	opacity: 0.75;
@@ -30,6 +29,6 @@ textarea.wp-block-form-input {
 	}
 }
 
-textarea.wp-block-form-input {
+textarea.wp-block-form-input__input {
 	min-height: 10em;
 }
