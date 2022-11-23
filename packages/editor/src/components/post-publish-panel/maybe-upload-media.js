@@ -135,17 +135,15 @@ export default function PostFormatPanel() {
 				{ externalImages.map( ( image ) => {
 					return <Image key={ image.clientId } { ...image } />;
 				} ) }
-			</div>
-			<p>
 				<Button
 					icon={ upload }
-					variant="secondary"
+					variant="primary"
 					onClick={ uploadImages }
 				>
 					{ __( 'Upload all' ) }
 				</Button>
-				{ isUploading && <Spinner /> }
-			</p>
+			</div>
+			{ isUploading && <Spinner /> }
 		</PanelBody>
 	);
 }
