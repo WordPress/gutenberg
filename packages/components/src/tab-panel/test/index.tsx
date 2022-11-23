@@ -210,4 +210,98 @@ describe( 'TabPanel', () => {
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
 		} );
 	} );
+
+	describe( 'tab activation', () => {
+		it( 'defaults to automatic tab activation', async () => {
+			const user = setupUser();
+			const mockOnSelect = jest.fn();
+
+			render(
+				<TabPanel
+					tabs={ TABS }
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+				/>
+			);
+
+			// onSelect gets called on the initial render.
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+
+			// Click on Alpha, make sure Alpha is selected
+			await user.click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+
+			// Navigate forward with arrow keys,
+			// make sure Beta is selected automatically.
+			await user.keyboard( '[ArrowRight]' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
+
+			// Navigate forward with arrow keys,
+			// make sure Gamma (last tab) is selected automatically.
+			await user.keyboard( '[ArrowRight]' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 4 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
+
+			// Navigate forward with arrow keys,
+			// make sure Alpha (first tab) is selected automatically.
+			await user.keyboard( '[ArrowRight]' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 5 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+
+			// Navigate backwards with arrow keys,
+			// make sure Gamma (last tab) is selected automatically
+			await user.keyboard( '[ArrowLeft]' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 6 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
+		} );
+
+		it( 'switches to manual tab activation when the `hasManualTabActivation` prop is set to `true`', async () => {
+			const user = setupUser();
+			const mockOnSelect = jest.fn();
+
+			render(
+				<TabPanel
+					tabs={ TABS }
+					children={ () => undefined }
+					onSelect={ mockOnSelect }
+					hasManualTabActivation={ true }
+				/>
+			);
+
+			// onSelect gets called on the initial render.
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+
+			// Click on Alpha, make sure Alpha is selected
+			await user.click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+
+			// Navigate forward with arrow keys.
+			// Make sure Beta is focused, but that the tab selection happens only when
+			// pressing the spacebar or the enter key.
+			await user.keyboard( '[ArrowRight]' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
+			expect( screen.getByRole( 'tab', { name: 'Beta' } ) ).toHaveFocus();
+			await user.keyboard( '[Enter]' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
+
+			// Navigate forward with arrow keys.
+			// Make sure Gamma (last tab) is focused, but that the tab selection
+			// happens only when pressing the spacebar or the enter key.
+			await user.keyboard( '[ArrowRight]' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
+			expect(
+				screen.getByRole( 'tab', { name: 'Gamma' } )
+			).toHaveFocus();
+			await user.keyboard( '[Space]' );
+			expect( mockOnSelect ).toHaveBeenCalledTimes( 4 );
+			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
+
+			// No need to test the "wrap-around" behavior, as it's being tested in the
+			// "automatic tab activation" test above.
+		} );
+	} );
 } );
