@@ -61,7 +61,6 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
  * @param {boolean} props.showBlockMovers     Flag to enable block movers
  * @param {boolean} props.isExpanded          Flag to determine whether nested levels are expanded by default.
  * @param {boolean} props.selectBlockInCanvas Flag to determine whether the list view should be a block selection mechanism,.
- * @param {string}  props.clientId            Client ID of the root navigation block.
  * @param {Object}  ref                       Forwarded ref
  */
 function __ExperimentalOffCanvasEditor(
@@ -71,7 +70,6 @@ function __ExperimentalOffCanvasEditor(
 		showBlockMovers = false,
 		isExpanded = false,
 		selectBlockInCanvas = true,
-		clientId,
 	},
 	ref
 ) {
@@ -229,10 +227,7 @@ function __ExperimentalOffCanvasEditor(
 					>
 						<TreeGridCell>
 							{ ( treeGridCellProps ) => (
-								<Appender
-									{ ...treeGridCellProps }
-									rootClientId={ clientId }
-								/>
+								<Appender { ...treeGridCellProps } />
 							) }
 						</TreeGridCell>
 					</TreeGridRow>

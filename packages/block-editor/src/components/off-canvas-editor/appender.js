@@ -9,20 +9,23 @@ import { forwardRef } from '@wordpress/element';
 import { store as blockEditorStore } from '../../store';
 import Inserter from '../inserter';
 
-export const Appender = forwardRef( ( { rootClientId, ...props }, ref ) => {
-	const { hideInserter } = useSelect(
-		( select ) => {
-			const { getTemplateLock, __unstableGetEditorMode } =
-				select( blockEditorStore );
+export const Appender = forwardRef( ( props, ref ) => {
+	const { hideInserter, clientId } = useSelect( ( select ) => {
+		const {
+			getTemplateLock,
+			__unstableGetEditorMode,
+			getSelectedBlockClientId,
+		} = select( blockEditorStore );
 
-			return {
-				hideInserter:
-					!! getTemplateLock( rootClientId ) ||
-					__unstableGetEditorMode() === 'zoom-out',
-			};
-		},
-		[ rootClientId ]
-	);
+		const _clientId = getSelectedBlockClientId();
+
+		return {
+			clientId: getSelectedBlockClientId(),
+			hideInserter:
+				!! getTemplateLock( _clientId ) ||
+				__unstableGetEditorMode() === 'zoom-out',
+		};
+	}, [] );
 
 	if ( hideInserter ) {
 		return null;
@@ -32,7 +35,7 @@ export const Appender = forwardRef( ( { rootClientId, ...props }, ref ) => {
 		<div className="offcanvas-editor__appender">
 			<Inserter
 				ref={ ref }
-				rootClientId={ rootClientId }
+				rootClientId={ clientId }
 				position="bottom right"
 				isAppender
 				__experimentalIsQuick
