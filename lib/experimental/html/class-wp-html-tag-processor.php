@@ -180,6 +180,7 @@
  * @since 6.2.0
  */
 class WP_HTML_Tag_Processor {
+	const MAX_BOOKMARKS = 10;
 
 	/**
 	 * The HTML document to parse.
@@ -362,6 +363,15 @@ class WP_HTML_Tag_Processor {
 	 */
 	private $classname_updates = array();
 
+	/**
+	 * Tracks a semantic location in the original HTML that shuffles
+	 * with the updates applied to the document.
+	 *
+	 * @since 6.2.0
+	 * @var array
+	 */
+	private $bookmarks = array();
+
 	const ADD_CLASS    = true;
 	const REMOVE_CLASS = false;
 	const SKIP_CLASS   = null;
@@ -478,6 +488,34 @@ class WP_HTML_Tag_Processor {
 
 		return true;
 	}
+
+
+	public function set_bookmark( $name ) {
+		if ( null === $this->tag_name_starts_at ) {
+			return false;
+		}
+
+		if ( ! array_key_exists( $name, $this->bookmarks ) && count( $this->bookmarks ) > self::MAX_BOOKMARKS ) {
+			return false;
+		}
+
+		$this->bookmarks[ $name ] = new WP_HTML_Text_Replacement(
+			$this->tag_name_starts_at - 1,
+			$this->tag_ends_at,
+			''
+		);
+	}
+
+
+	public function release_bookmark( $name ) {
+		if ( ! array_key_exists( $name, $this->bookmarks ) ) {
+			return false;
+		}
+
+		unset( $this->bookmarks[ $name ] );
+		return true;
+	}
+
 
 	/**
 	 * Skips the contents of the title and textarea tags until an appropriate
@@ -1102,6 +1140,25 @@ class WP_HTML_Tag_Processor {
 			$this->updated_html .= substr( $this->html, $this->updated_bytes, $diff->start - $this->updated_bytes );
 			$this->updated_html .= $diff->text;
 			$this->updated_bytes = $diff->end;
+
+			foreach ( $this->bookmarks as $name => &$position ) {
+				$update_head = $position->start >= $diff->start;
+				$update_tail = $position->end   >= $diff->start;
+
+				if ( ! $update_head && ! $update_tail ) {
+					continue;
+				}
+
+				$delta = strlen( $diff->text ) - ( $diff->end - $diff->start );
+
+				if ( $update_head ) {
+					$position->start += $delta;
+				}
+
+				if ( $update_tail ) {
+					$position->start += $delta;
+				}
+			}
 		}
 
 		$this->attribute_updates = array();
