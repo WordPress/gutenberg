@@ -22,7 +22,10 @@ import ToggleGroupControlBackdrop from './toggle-group-control-backdrop';
 import ToggleGroupControlContext from '../context';
 import { useUpdateEffect } from '../../utils/hooks';
 import type { WordPressComponentProps } from '../../ui/context';
-import type { ToggleGroupControlMainControlProps } from '../types';
+import type {
+	ToggleGroupControlMainControlProps,
+	ToggleGroupControlContextProps,
+} from '../types';
 
 function UnforwardedToggleGroupControlAsButtonGroup(
 	{
@@ -47,41 +50,37 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 		'toggle-group-control-as-button-group'
 	).toString();
 	const [ selectedValue, setSelectedValue ] = useState( value );
-	const groupContext = useMemo(
+	const previousValue = usePrevious( value );
+
+	// Propagate selectedValue change.
+	useUpdateEffect( () => {
+		// Avoid calling onChange if selectedValue changed
+		// from incoming value.
+		if ( previousValue !== selectedValue ) {
+			onChange( selectedValue );
+		}
+	}, [ selectedValue, previousValue, onChange ] );
+
+	// Sync incoming value with selectedValue.
+	useUpdateEffect( () => {
+		if ( previousValue !== value ) {
+			setSelectedValue( value );
+		}
+	}, [ value, previousValue ] );
+	// Expose selectedValue getter/setter via context
+	const groupContext: ToggleGroupControlContextProps = useMemo(
 		() => ( {
 			baseId,
 			state: selectedValue,
 			setState: setSelectedValue,
+			isBlock: ! isAdaptiveWidth,
+			isDeselectable: true,
+			size,
 		} ),
-		[ baseId, selectedValue ]
+		[ baseId, selectedValue, isAdaptiveWidth, size ]
 	);
-	const previousValue = usePrevious( value );
-
-	// Propagate groupContext.state change.
-	useUpdateEffect( () => {
-		// Avoid calling onChange if groupContext state changed
-		// from incoming value.
-		if ( previousValue !== groupContext.state ) {
-			onChange( groupContext.state );
-		}
-	}, [ groupContext.state, previousValue, onChange ] );
-
-	// Sync incoming value with groupContext.state.
-	useUpdateEffect( () => {
-		if ( value !== groupContext.state ) {
-			groupContext.setState( value );
-		}
-	}, [ value, groupContext ] );
-
 	return (
-		<ToggleGroupControlContext.Provider
-			value={ {
-				...groupContext,
-				isBlock: ! isAdaptiveWidth,
-				isDeselectable: true,
-				size,
-			} }
-		>
+		<ToggleGroupControlContext.Provider value={ groupContext }>
 			<View
 				aria-label={ label }
 				{ ...otherProps }
