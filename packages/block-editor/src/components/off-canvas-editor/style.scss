@@ -14,20 +14,13 @@
 	}
 }
 
-.offcanvas-editor-list-view-tree {
+.offcanvas-editor-list-view-tree-wrapper {
 	max-width: 100%;
 	overflow-x: auto;
-	
-	.block-editor-list-view-block__menu-cell:last-child {
-		padding-right: 0;
-	}
+}
 
-	.block-editor-list-view-leaf {
-		display: block;
-		max-width: $sidebar-width - (2 * $grid-unit-20);
-		
-		.block-editor-block-icon {
-			margin-right: 4px;
-		}
-	}
+.offcanvas-editor-list-view-leaf {
+	display: block;
+	// sidebar width - tab panel padding
+	max-width: $sidebar-width - (2 * $grid-unit-20);
 }
