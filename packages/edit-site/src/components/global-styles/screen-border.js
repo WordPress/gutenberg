@@ -9,7 +9,7 @@ import { __ } from '@wordpress/i18n';
 import ScreenHeader from './header';
 import BorderPanel, { useHasBorderPanel } from './border-panel';
 
-function ScreenEffects( { name } ) {
+function ScreenBorder( { name } ) {
 	const hasBorderPanel = useHasBorderPanel( name );
 
 	return (
@@ -20,4 +20,4 @@ function ScreenEffects( { name } ) {
 	);
 }
 
-export default ScreenEffects;
+export default ScreenBorder;

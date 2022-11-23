@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
-import { typography, color, layout } from '@wordpress/icons';
+import { typography, border, color, layout } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -43,8 +43,8 @@ function ContextMenu( { name, parentMenu = '' } ) {
 			) }
 			{ hasBorderPanel && (
 				<NavigationButtonAsItem
-					icon={ layout }
-					path={ parentMenu + '/effects' }
+					icon={ border }
+					path={ parentMenu + '/border' }
 					aria-label={ __( 'Border styles' ) }
 				>
 					{ __( 'Border' ) }

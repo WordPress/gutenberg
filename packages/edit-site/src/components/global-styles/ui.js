@@ -24,7 +24,7 @@ import ScreenHeadingColor from './screen-heading-color';
 import ScreenButtonColor from './screen-button-color';
 import ScreenLayout from './screen-layout';
 import ScreenStyleVariations from './screen-style-variations';
-import ScreenEffects from './screen-effects';
+import ScreenBorder from './screen-border';
 
 function GlobalStylesNavigationScreen( { className, ...props } ) {
 	return (
@@ -109,8 +109,8 @@ function ContextScreens( { name } ) {
 				<ScreenButtonColor name={ name } />
 			</GlobalStylesNavigationScreen>
 
-			<GlobalStylesNavigationScreen path={ parentMenu + '/effects' }>
-				<ScreenEffects name={ name } />
+			<GlobalStylesNavigationScreen path={ parentMenu + '/border' }>
+				<ScreenBorder name={ name } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/layout' }>
