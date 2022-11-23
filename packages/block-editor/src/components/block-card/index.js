@@ -22,7 +22,7 @@ function BlockCard( {
 	blockType,
 	parentBlockClientId,
 	handleBackButton,
-	isSynced,
+	className,
 } ) {
 	if ( blockType ) {
 		deprecated( '`blockType` property in `BlockCard component`', {
@@ -36,11 +36,7 @@ function BlockCard( {
 		window?.__experimentalEnableOffCanvasNavigationEditor === true;
 
 	return (
-		<div
-			className={ classnames( 'block-editor-block-card', {
-				'is-synced': isSynced,
-			} ) }
-		>
+		<div className={ classnames( 'block-editor-block-card', className ) }>
 			{ isOffCanvasNavigationEditorEnabled && parentBlockClientId && (
 				<Button
 					onClick={ handleBackButton }
