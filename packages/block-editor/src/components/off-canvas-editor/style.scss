@@ -12,7 +12,9 @@
 		background: var(--wp-admin-theme-color);
 		color: #fff;
 	}
-.offcanvas-editor-list-view-tree-wrapper {
+}
+
+.offcanvas-editor-list-view-tree{
 	max-width: 100%;
 	overflow-x: auto;
 	.block-editor-list-view-block__menu-cell:last-child {
