@@ -20,7 +20,8 @@
 			"type": "string",
 			"default": "Label",
 			"selector": ".wp-block-form-input__label-content",
-			"source": "html"
+			"source": "html",
+			"__experimentalRole": "content"
 		},
 		"inlineLabel": {
 			"type": "boolean",
@@ -37,7 +38,8 @@
 			"type": "string",
 			"selector": ".wp-block-form-input__input",
 			"source": "attribute",
-			"attribute": "placeholder"
+			"attribute": "placeholder",
+			"__experimentalRole": "content"
 		}
 	},
 	"supports": {
