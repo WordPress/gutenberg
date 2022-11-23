@@ -20,7 +20,7 @@ import {
 	useBlockProps,
 	useSetting,
 } from '@wordpress/block-editor';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getBlockSupport } from '@wordpress/blocks';
 import { formatLtr } from '@wordpress/icons';
 
 /**
@@ -77,6 +77,11 @@ function ParagraphBlock( {
 		helpText = __( 'Toggle to show a large initial letter.' );
 	}
 
+	const defaultTypographyControls = getBlockSupport( name, [
+		'typography',
+		'__experimentalDefaultControls',
+	] );
+
 	return (
 		<>
 			<BlockControls group="block">
@@ -106,6 +111,7 @@ function ParagraphBlock( {
 						onDeselect={ () =>
 							setAttributes( { dropCap: undefined } )
 						}
+						isShownByDefault={ defaultTypographyControls?.dropCap }
 						resetAllFilter={ () => ( { dropCap: undefined } ) }
 						panelId={ clientId }
 					>
