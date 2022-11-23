@@ -102,7 +102,11 @@ describe( 'NumberControl', () => {
 					min={ 1 }
 					max={ 10 }
 					onChange={ ( v, extra ) =>
-						spy( v, extra.event.target.validity.valid )
+						spy(
+							v,
+							( extra.event.target as HTMLInputElement ).validity
+								.valid
+						)
 					}
 				/>
 			);
@@ -425,7 +429,11 @@ describe( 'NumberControl', () => {
 	} );
 
 	describe( 'custom spin buttons', () => {
-		test.each( [ undefined, 'none', 'native' ] )(
+		test.each( [
+			undefined,
+			'none',
+			'native',
+		] as NumberControlProps[ 'spinControls' ][] )(
 			'should not appear when spinControls = %s',
 			( spinControls ) => {
 				render( <NumberControl spinControls={ spinControls } /> );
@@ -442,11 +450,11 @@ describe( 'NumberControl', () => {
 			[ 'up', '1', {} ],
 			[ 'up', '2', { value: '1' } ],
 			[ 'up', '12', { value: '10', step: '2' } ],
-			[ 'up', '10', { value: '10', max: '10' } ],
+			[ 'up', '10', { value: '10', max: 10 } ],
 			[ 'down', '-1', {} ],
 			[ 'down', '1', { value: '2' } ],
 			[ 'down', '10', { value: '12', step: '2' } ],
-			[ 'down', '10', { value: '10', min: '10' } ],
+			[ 'down', '10', { value: '10', min: 10 } ],
 		] )(
 			'should spin %s to %s when props = %o',
 			async ( direction, expectedValue, props ) => {
