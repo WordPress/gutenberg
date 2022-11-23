@@ -221,11 +221,16 @@ function __ExperimentalOffCanvasEditor(
 						shouldShowInnerBlocks={ shouldShowInnerBlocks }
 						selectBlockInCanvas={ selectBlockInCanvas }
 					/>
-					<TreeGridRow>
+					<TreeGridRow
+						level={ 1 }
+						setSize={ 1 }
+						positionInSet={ 1 }
+						isExpanded={ true }
+					>
 						<TreeGridCell>
-							{ ( props ) => (
+							{ ( treeGridCellProps ) => (
 								<Appender
-									{ ...props }
+									{ ...treeGridCellProps }
 									rootClientId={ clientId }
 								/>
 							) }
