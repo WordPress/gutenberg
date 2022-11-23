@@ -138,7 +138,7 @@ export function MarginEdit( props ) {
 			style: cleanEmptyObject( newStyle ),
 		} );
 
-		setBlockGlobalStyles( 'spacing.margin ', cleanEmptyObject( newStyle ) );
+		setBlockGlobalStyles( 'spacing.margin', cleanEmptyObject( newStyle ) );
 	};
 
 	return Platform.select( {
