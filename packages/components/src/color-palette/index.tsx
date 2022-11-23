@@ -84,10 +84,6 @@ function SinglePalette( {
 		} );
 	}, [ colors, value, onChange, clearColor ] );
 
-	if ( colors.length === 0 ) {
-		return null;
-	}
-
 	return (
 		<CircularOptionPicker
 			className={ className }
