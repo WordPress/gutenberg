@@ -7,6 +7,7 @@ import classNames from 'classnames';
  * WordPress dependencies
  */
 import {
+	RichText,
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 } from '@wordpress/block-editor';
@@ -37,7 +38,9 @@ export default function save( { attributes } ) {
 				'is-label-inline': inlineLabel,
 			} ) }
 		>
-			<div className="wp-block-form-input__label-content">{ label }</div>
+			<div className="wp-block-form-input__label-content">
+				<RichText.Content value={ label } />
+			</div>
 			<TagName
 				className={ inputClasses }
 				type={ type }
