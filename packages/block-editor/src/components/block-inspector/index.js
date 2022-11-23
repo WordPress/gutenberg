@@ -32,6 +32,7 @@ import BlockStyles from '../block-styles';
 import DefaultStylePicker from '../default-style-picker';
 import { default as InspectorControls } from '../inspector-controls';
 import { default as InspectorControlsTabs } from '../inspector-controls-tabs';
+import useInspectorControlsTabs from '../inspector-controls-tabs/use-inspector-controls-tabs';
 import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel';
 
 function useContentBlocks( blockTypes, block ) {
@@ -170,14 +171,17 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 		};
 	}, [] );
 
-	const showTabs = window?.__experimentalEnableBlockInspectorTabs;
+	const availableTabs = useInspectorControlsTabs( blockType?.name );
+	const showTabs =
+		window?.__experimentalEnableBlockInspectorTabs &&
+		availableTabs.length > 1;
 
 	if ( count > 1 ) {
 		return (
 			<div className="block-editor-block-inspector">
 				<MultiSelectionInspector />
 				{ showTabs ? (
-					<InspectorControlsTabs />
+					<InspectorControlsTabs tabs={ availableTabs } />
 				) : (
 					<>
 						<InspectorControls.Slot />
@@ -246,7 +250,10 @@ const BlockInspectorSingleBlock = ( {
 	blockName,
 	parentBlockClientId,
 } ) => {
-	const showTabs = window?.__experimentalEnableBlockInspectorTabs;
+	const availableTabs = useInspectorControlsTabs( blockName );
+	const showTabs =
+		window?.__experimentalEnableBlockInspectorTabs &&
+		availableTabs.length > 1;
 
 	const hasBlockStyles = useSelect(
 		( select ) => {
@@ -275,6 +282,7 @@ const BlockInspectorSingleBlock = ( {
 					hasBlockStyles={ hasBlockStyles }
 					clientId={ clientId }
 					blockName={ blockName }
+					tabs={ availableTabs }
 				/>
 			) }
 			{ ! showTabs && (

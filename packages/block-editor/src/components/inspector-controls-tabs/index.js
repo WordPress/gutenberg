@@ -9,26 +9,20 @@ import { TabPanel } from '@wordpress/components';
 import { TAB_SETTINGS, TAB_APPEARANCE, TAB_LIST_VIEW } from './utils';
 import AppearanceTab from './appearance-tab';
 import SettingsTab from './settings-tab';
-import { default as ListViewTab, useIsListViewDisabled } from './list-view-tab';
-
-const defaultTabs = [ TAB_APPEARANCE, TAB_SETTINGS ];
-const tabsWithListView = [ TAB_LIST_VIEW, TAB_APPEARANCE, TAB_SETTINGS ];
+import InspectorControls from '../inspector-controls';
 
 export default function InspectorControlsTabs( {
 	blockName,
 	clientId,
 	hasBlockStyles,
+	tabs,
 } ) {
-	const tabs = useIsListViewDisabled( blockName )
-		? defaultTabs
-		: tabsWithListView;
-
 	return (
 		<TabPanel className="block-editor-block-inspector__tabs" tabs={ tabs }>
 			{ ( tab ) => {
 				if ( tab.name === TAB_SETTINGS.name ) {
 					return (
-						<SettingsTab hasSingleBlockSelection={ !! blockName } />
+						<SettingsTab showAdvancedControls={ !! blockName } />
 					);
 				}
 
@@ -38,17 +32,13 @@ export default function InspectorControlsTabs( {
 							blockName={ blockName }
 							clientId={ clientId }
 							hasBlockStyles={ hasBlockStyles }
-							hasSingleBlockSelection={ !! blockName }
 						/>
 					);
 				}
 
 				if ( tab.name === TAB_LIST_VIEW.name ) {
 					return (
-						<ListViewTab
-							blockName={ blockName }
-							hasSingleBlockSelection={ !! blockName }
-						/>
+						<InspectorControls.Slot __experimentalGroup="list" />
 					);
 				}
 			} }
