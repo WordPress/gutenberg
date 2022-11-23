@@ -14,6 +14,18 @@ import { useState } from '@wordpress/element';
  */
 import BoxControl from '../';
 
+const Example = ( extraProps ) => {
+	const [ state, setState ] = useState();
+
+	return (
+		<BoxControl
+			values={ state }
+			onChange={ ( next ) => setState( next ) }
+			{ ...extraProps }
+		/>
+	);
+};
+
 describe( 'BoxControl', () => {
 	describe( 'Basic rendering', () => {
 		it( 'should render a box control input', () => {
@@ -78,16 +90,6 @@ describe( 'BoxControl', () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
-			const Example = () => {
-				const [ state, setState ] = useState();
-
-				return (
-					<BoxControl
-						values={ state }
-						onChange={ ( next ) => setState( next ) }
-					/>
-				);
-			};
 
 			render( <Example /> );
 
@@ -114,23 +116,6 @@ describe( 'BoxControl', () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
-			const Example = () => {
-				const [ state, setState ] = useState();
-
-				return (
-					<BoxControl
-						values={ state }
-						onChange={ ( next ) => {
-							if ( next.top ) {
-								setState( next );
-							} else {
-								// This reverts it to being uncontrolled.
-								setState( undefined );
-							}
-						} }
-					/>
-				);
-			};
 
 			render( <Example /> );
 
@@ -195,79 +180,70 @@ describe( 'BoxControl', () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
-			let state = {};
-			const setState = ( newState ) => ( state = newState );
 
-			render(
-				<BoxControl
-					values={ state }
-					onChange={ ( next ) => setState( next ) }
-				/>
-			);
+			render( <Example /> );
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Unlink sides' } )
 			);
 
-			const input = screen.getByRole( 'textbox', { name: 'Top' } );
-
-			await user.type( input, '100px' );
+			await user.type(
+				screen.getByRole( 'textbox', { name: 'Top' } ),
+				'100px'
+			);
 			await user.keyboard( '{Enter}' );
 
-			expect( input ).toHaveValue( '100' );
 			expect(
-				screen.getAllByRole( 'combobox', {
-					name: 'Select unit',
-				} )[ 0 ]
-			).toHaveValue( 'px' );
+				screen.getByRole( 'textbox', { name: 'Top' } )
+			).toHaveValue( '100' );
+			expect(
+				screen.getByRole( 'textbox', { name: 'Right' } )
+			).not.toHaveValue();
+			expect(
+				screen.getByRole( 'textbox', { name: 'Bottom' } )
+			).not.toHaveValue();
+			expect(
+				screen.getByRole( 'textbox', { name: 'Left' } )
+			).not.toHaveValue();
 
-			expect( state ).toEqual( {
-				top: '100px',
-				right: undefined,
-				bottom: undefined,
-				left: undefined,
-			} );
+			screen
+				.getAllByRole( 'combobox', { name: 'Select unit' } )
+				.forEach( ( combobox ) => {
+					expect( combobox ).toHaveValue( 'px' );
+				} );
 		} );
 
 		it( 'should update a whole axis when value is changed when unlinked', async () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
-			let state = {};
-			const setState = ( newState ) => ( state = newState );
 
-			render(
-				<BoxControl
-					values={ state }
-					onChange={ ( next ) => setState( next ) }
-					splitOnAxis={ true }
-				/>
-			);
+			render( <Example splitOnAxis /> );
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Unlink sides' } )
 			);
 
-			const input = screen.getByRole( 'textbox', {
-				name: 'Vertical',
-			} );
-
-			await user.type( input, '100px' );
+			await user.type(
+				screen.getByRole( 'textbox', {
+					name: 'Vertical',
+				} ),
+				'100px'
+			);
 			await user.keyboard( '{Enter}' );
 
-			expect( input ).toHaveValue( '100' );
 			expect(
-				screen.getAllByRole( 'combobox', {
-					name: 'Select unit',
-				} )[ 0 ]
-			).toHaveValue( 'px' );
+				screen.getByRole( 'textbox', { name: 'Vertical' } )
+			).toHaveValue( '100' );
+			expect(
+				screen.getByRole( 'textbox', { name: 'Horizontal' } )
+			).not.toHaveValue();
 
-			expect( state ).toEqual( {
-				top: '100px',
-				right: undefined,
-				bottom: '100px',
-				left: undefined,
-			} );
+			screen
+				.getAllByRole( 'combobox', { name: 'Select unit' } )
+				.forEach( ( combobox ) => {
+					expect( combobox ).toHaveValue( 'px' );
+				} );
 		} );
 	} );
 
