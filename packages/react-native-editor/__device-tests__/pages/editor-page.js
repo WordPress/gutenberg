@@ -758,6 +758,21 @@ class EditorPage {
 		return await waitForVisible( this.driver, blockLocator );
 	}
 
+	async getUnsupportedBlockWebViewSaveButton() {
+		const saveButtonLocator = isAndroid()
+			? '//android.widget.TextView[@content-desc="Save"]'
+			: '(//XCUIElementTypeButton[@name="Save"])[2]';
+
+		return await waitForVisible( this.driver, saveButtonLocator );
+	}
+
+	async setNetworkConnection( connection = 4 ) {
+		// 4 = Data only
+		if ( isAndroid() ) {
+			return await this.driver.setNetworkConnection( connection );
+		}
+	}
+
 	async stopDriver() {
 		await stopDriver( this.driver );
 	}

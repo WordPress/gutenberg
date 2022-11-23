@@ -4,6 +4,11 @@
 import testData from './helpers/test-data';
 
 describe( 'Gutenberg Editor Unsupported Block Editor Tests', () => {
+	beforeAll( async () => {
+		// Needed to prevent issues with the WebView on Android
+		await editorPage.setNetworkConnection();
+	} );
+
 	it( 'should be able to open the unsupported block web view editor', async () => {
 		await editorPage.setHtmlContent( testData.unsupportedBlockHtml );
 
@@ -17,7 +22,8 @@ describe( 'Gutenberg Editor Unsupported Block Editor Tests', () => {
 			await editorPage.getUnsupportedBlockBottomSheetEditButton();
 		await editButton.click();
 
-		const webView = await editorPage.getUnsupportedBlockWebView();
-		await expect( webView ).toBeTruthy();
+		const webViewSaveButton =
+			await editorPage.getUnsupportedBlockWebViewSaveButton();
+		await expect( webViewSaveButton ).toBeTruthy();
 	} );
 } );
