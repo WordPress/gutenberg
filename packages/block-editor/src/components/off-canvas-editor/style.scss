@@ -1,1 +1,15 @@
-//Styles for off-canvas editor, remove this line when you add some css to this file!
+.offcanvas-editor__appender .block-editor-inserter__toggle {
+	background-color: #1e1e1e;
+	color: #fff;
+	margin: $grid-unit-10 0 0 28px;
+	border-radius: 2px;
+	height: 24px;
+	min-width: 24px;
+	padding: 0;
+
+	&:hover,
+	&:focus {
+		background: var(--wp-admin-theme-color);
+		color: #fff;
+	}
+}
