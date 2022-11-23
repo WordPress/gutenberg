@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
@@ -17,6 +22,7 @@ function BlockCard( {
 	blockType,
 	parentBlockClientId,
 	handleBackButton,
+	isSynced,
 } ) {
 	if ( blockType ) {
 		deprecated( '`blockType` property in `BlockCard component`', {
@@ -30,7 +36,11 @@ function BlockCard( {
 		window?.__experimentalEnableOffCanvasNavigationEditor === true;
 
 	return (
-		<div className="block-editor-block-card">
+		<div
+			className={ classnames( 'block-editor-block-card', {
+				'is-synced': isSynced,
+			} ) }
+		>
 			{ isOffCanvasNavigationEditorEnabled && parentBlockClientId && (
 				<Button
 					onClick={ handleBackButton }
