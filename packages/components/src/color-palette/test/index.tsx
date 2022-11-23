@@ -9,21 +9,21 @@ import userEvent from '@testing-library/user-event';
  */
 import ColorPalette from '..';
 
-describe( 'ColorPalette', () => {
-	const colors = [
-		{ name: 'red', color: '#f00' },
-		{ name: 'white', color: '#fff' },
-		{ name: 'blue', color: '#00f' },
-	];
-	const currentColor = '#f00';
+const EXAMPLE_COLORS = [
+	{ name: 'red', color: '#f00' },
+	{ name: 'green', color: '#0f0' },
+	{ name: 'blue', color: '#00f' },
+];
+const INITIAL_COLOR = EXAMPLE_COLORS[ 0 ].color;
 
+describe( 'ColorPalette', () => {
 	it( 'should render a dynamic toolbar of colors', () => {
 		const onChange = jest.fn();
 
 		const { container } = render(
 			<ColorPalette
-				colors={ colors }
-				value={ currentColor }
+				colors={ EXAMPLE_COLORS }
+				value={ INITIAL_COLOR }
 				onChange={ onChange }
 			/>
 		);
@@ -36,8 +36,8 @@ describe( 'ColorPalette', () => {
 
 		render(
 			<ColorPalette
-				colors={ colors }
-				value={ currentColor }
+				colors={ EXAMPLE_COLORS }
+				value={ INITIAL_COLOR }
 				onChange={ onChange }
 			/>
 		);
@@ -55,8 +55,8 @@ describe( 'ColorPalette', () => {
 
 		render(
 			<ColorPalette
-				colors={ colors }
-				value={ currentColor }
+				colors={ EXAMPLE_COLORS }
+				value={ INITIAL_COLOR }
 				onChange={ onChange }
 			/>
 		);
@@ -77,12 +77,14 @@ describe( 'ColorPalette', () => {
 
 		render(
 			<ColorPalette
-				colors={ colors }
-				value={ currentColor }
+				colors={ EXAMPLE_COLORS }
+				value={ INITIAL_COLOR }
 				onChange={ onChange }
 			/>
 		);
 
+		// Click the first unpressed button
+		// (i.e. a button representing a color that is not the current color)
 		await user.click(
 			screen.getAllByRole( 'button', {
 				name: /^Color:/,
@@ -90,8 +92,9 @@ describe( 'ColorPalette', () => {
 			} )[ 0 ]
 		);
 
+		// Expect the green color to have been selected
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
-		expect( onChange ).toHaveBeenCalledWith( '#fff', 1 );
+		expect( onChange ).toHaveBeenCalledWith( EXAMPLE_COLORS[ 1 ].color, 1 );
 	} );
 
 	it( 'should call onClick with undefined, when the clearButton onClick is triggered', async () => {
@@ -102,8 +105,8 @@ describe( 'ColorPalette', () => {
 
 		render(
 			<ColorPalette
-				colors={ colors }
-				value={ currentColor }
+				colors={ EXAMPLE_COLORS }
+				value={ INITIAL_COLOR }
 				onChange={ onChange }
 			/>
 		);
@@ -119,9 +122,9 @@ describe( 'ColorPalette', () => {
 
 		const { container } = render(
 			<ColorPalette
-				colors={ colors }
+				colors={ EXAMPLE_COLORS }
 				disableCustomColors
-				value={ currentColor }
+				value={ INITIAL_COLOR }
 				onChange={ onChange }
 			/>
 		);
@@ -137,8 +140,8 @@ describe( 'ColorPalette', () => {
 
 		render(
 			<ColorPalette
-				colors={ colors }
-				value={ currentColor }
+				colors={ EXAMPLE_COLORS }
+				value={ INITIAL_COLOR }
 				onChange={ onChange }
 			/>
 		);
@@ -158,11 +161,11 @@ describe( 'ColorPalette', () => {
 		expect( dropdownButton ).toBeVisible();
 
 		expect(
-			within( dropdownButton ).getByText( colors[ 0 ].name )
+			within( dropdownButton ).getByText( EXAMPLE_COLORS[ 0 ].name )
 		).toBeVisible();
 		expect(
 			within( dropdownButton ).getByText(
-				colors[ 0 ].color.replace( '#', '' )
+				EXAMPLE_COLORS[ 0 ].color.replace( '#', '' )
 			)
 		).toBeVisible();
 	} );
