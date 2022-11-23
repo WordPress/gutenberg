@@ -82,12 +82,8 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 	}
 	editor.focus();
 
-	const parentEditable = /** @type {HTMLElement} */ (
-		container.closest( '[contenteditable="true"]' )
-	);
-
-	if ( parentEditable ) {
-		parentEditable.contentEditable = 'false';
+	if ( editor !== container ) {
+		editor.contentEditable = 'false';
 	}
 
 	let range = getRange( container, isReverse, x );
@@ -111,8 +107,8 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 		}
 	}
 
-	if ( parentEditable ) {
-		parentEditable.contentEditable = 'true';
+	if ( editor !== container ) {
+		editor.contentEditable = 'true';
 	}
 
 	const { commonAncestorContainer } = range;
