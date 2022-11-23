@@ -50,7 +50,7 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 		}
 
 		return [
-			{ value: '', label: __( 'Select sidebar' ) },
+			{ value: '', label: __( 'Select widget area' ) },
 			...sidebarOptions,
 		];
 	}, [ sidebars ] );
@@ -91,10 +91,10 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 
 	return (
 		<InspectorControls>
-			<PanelBody title={ __( 'Import' ) }>
+			<PanelBody title={ __( 'Import widget area' ) }>
 				<form onSubmit={ createFromWidgets }>
 					<SelectControl
-						label={ __( 'Sidebars' ) }
+						label={ __( 'Widget areas' ) }
 						value={ selectedSidebar }
 						options={ options }
 						onChange={ ( value ) => setSelectedSidebar( value ) }
