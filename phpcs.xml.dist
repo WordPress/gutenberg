@@ -87,6 +87,7 @@
 			<property name="prefixes" type="array">
 				<element value="gutenberg"/>
 				<element value="_gutenberg"/>
+				<element value="wp_"/>
 			</property>
 		</properties>
 		<exclude-pattern>phpunit/*</exclude-pattern>
