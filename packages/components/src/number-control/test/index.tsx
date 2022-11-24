@@ -199,7 +199,7 @@ describe( 'NumberControl', () => {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
 
-			render( <NumberControl value={ 5 } required={ true } /> );
+			render( <NumberControl value={ 5 } required /> );
 
 			const input = screen.getByRole( 'spinbutton' );
 			await user.clear( input );
@@ -266,7 +266,7 @@ describe( 'NumberControl', () => {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
 
-			render( <NumberControl value={ 5 } required={ true } /> );
+			render( <NumberControl value={ 5 } required /> );
 
 			const input = screen.getByRole( 'spinbutton' );
 			await user.clear( input );
