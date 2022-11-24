@@ -1,7 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { PanelBody, Button, Spinner } from '@wordpress/components';
+import {
+	PanelBody,
+	Button,
+	Spinner,
+	__unstableMotion as motion,
+	__unstableAnimatePresence as AnimatePresence,
+} from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { upload } from '@wordpress/icons';
@@ -29,13 +35,15 @@ function Image( block ) {
 	const { selectBlock } = useDispatch( blockEditorStore );
 	return (
 		// eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
-		<img
+		<motion.img
 			onClick={ () => {
 				selectBlock( block.clientId );
 			} }
 			key={ block.clientId }
 			alt={ block.attributes.alt }
 			src={ block.attributes.url }
+			animate={ { opacity: 1 } }
+			exit={ { opacity: 0, scale: 0 } }
 			style={ {
 				width: '36px',
 				height: '36px',
@@ -43,6 +51,7 @@ function Image( block ) {
 				borderRadius: '2px',
 				cursor: 'pointer',
 			} }
+			whileHover={ { scale: 1.08 } }
 		/>
 	);
 }
@@ -132,9 +141,11 @@ export default function PostFormatPanel() {
 					gap: '8px',
 				} }
 			>
-				{ externalImages.map( ( image ) => {
-					return <Image key={ image.clientId } { ...image } />;
-				} ) }
+				<AnimatePresence>
+					{ externalImages.map( ( image ) => {
+						return <Image key={ image.clientId } { ...image } />;
+					} ) }
+				</AnimatePresence>
 				<Button
 					icon={ upload }
 					variant="primary"
