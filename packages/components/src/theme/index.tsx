@@ -49,7 +49,7 @@ function Theme( {
 				),
 				className
 			),
-		[ accent, background, className ]
+		[ accent, background, className, cx ]
 	);
 
 	return <Wrapper className={ classes } { ...props } />;
