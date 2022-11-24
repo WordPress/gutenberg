@@ -193,10 +193,10 @@ export default function Editor() {
 										<GlobalStylesRenderer />
 
 										<div
+											className="edit-site-editor__container"
 											inert={
 												isViewMode ? 'true' : undefined
 											}
-											style={ { height: '100%' } }
 										>
 											<EditorNotices />
 											{ showVisualEditor &&
