@@ -30,6 +30,10 @@ export function useFocusHandler( clientId ) {
 			 * @param {FocusEvent} event Focus event.
 			 */
 			function onFocus( event ) {
+				if ( event.shiftKey ) {
+					return;
+				}
+
 				// Check synchronously because a non-selected block might be
 				// getting data through `useSelect` asynchronously.
 				if ( isBlockSelected( clientId ) ) {
