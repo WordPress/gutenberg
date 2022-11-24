@@ -32,6 +32,7 @@
 @import "./components/date-format-picker/style.scss";
 @import "./components/duotone-control/style.scss";
 @import "./components/font-appearance-control/style.scss";
+@import "./components/height-control/style.scss";
 @import "./components/image-size-control/style.scss";
 @import "./components/inner-blocks/style.scss";
 @import "./components/inserter-list-item/style.scss";
@@ -64,5 +65,8 @@
 @import "./components/inserter/style.scss";
 @import "./components/preview-options/style.scss";
 @import "./components/spacing-sizes-control/style.scss";
+
+// Experiments.
+@import "./components/off-canvas-editor/style.scss";
 
 @include wordpress-admin-schemes();

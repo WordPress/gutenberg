@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, filter, isEmpty, map, pick } from 'lodash';
+import { get, filter, isEmpty, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -135,12 +135,16 @@ export default function Image( {
 				} = select( blockEditorStore );
 
 				const rootClientId = getBlockRootClientId( clientId );
-				const settings = pick( getSettings(), [
-					'imageEditing',
-					'imageSizes',
-					'maxWidth',
-					'mediaUpload',
-				] );
+				const settings = Object.fromEntries(
+					Object.entries( getSettings() ).filter( ( [ key ] ) =>
+						[
+							'imageEditing',
+							'imageSizes',
+							'maxWidth',
+							'mediaUpload',
+						].includes( key )
+					)
+				);
 
 				return {
 					...settings,

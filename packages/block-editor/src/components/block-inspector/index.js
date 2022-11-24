@@ -9,9 +9,8 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import {
-	PanelBody,
-	__experimentalUseSlotFills as useSlotFills,
 	FlexItem,
+	PanelBody,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	Button,
@@ -24,20 +23,19 @@ import { useMemo, useCallback } from '@wordpress/element';
  */
 import SkipToSelectedBlock from '../skip-to-selected-block';
 import BlockCard from '../block-card';
-import {
-	default as InspectorControls,
-	InspectorAdvancedControls,
-} from '../inspector-controls';
-import BlockStyles from '../block-styles';
 import MultiSelectionInspector from '../multi-selection-inspector';
-import DefaultStylePicker from '../default-style-picker';
 import BlockVariationTransforms from '../block-variation-transforms';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
+import BlockStyles from '../block-styles';
+import DefaultStylePicker from '../default-style-picker';
+import { default as InspectorControls } from '../inspector-controls';
+import { default as InspectorControlsTabs } from '../inspector-controls-tabs';
+import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel';
 
 function useContentBlocks( blockTypes, block ) {
-	const contenBlocksObjectAux = useMemo( () => {
+	const contentBlocksObjectAux = useMemo( () => {
 		return blockTypes.reduce( ( result, blockType ) => {
 			if (
 				blockType.name !== 'core/list-item' &&
@@ -53,7 +51,7 @@ function useContentBlocks( blockTypes, block ) {
 	}, [ blockTypes ] );
 	const isContentBlock = useCallback(
 		( blockName ) => {
-			return !! contenBlocksObjectAux[ blockName ];
+			return !! contentBlocksObjectAux[ blockName ];
 		},
 		[ blockTypes ]
 	);
@@ -108,7 +106,10 @@ function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
 	const contentBlocks = useContentBlocks( blockTypes, block );
 	return (
 		<div className="block-editor-block-inspector">
-			<BlockCard { ...blockInformation } />
+			<BlockCard
+				{ ...blockInformation }
+				className={ blockInformation.isSynced && 'is-synced' }
+			/>
 			<BlockVariationTransforms blockClientId={ topLevelLockedBlock } />
 			<VStack
 				spacing={ 1 }
@@ -138,6 +139,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 		selectedBlockClientId,
 		blockType,
 		topLevelLockedBlock,
+		parentBlockClientId,
 	} = useSelect( ( select ) => {
 		const {
 			getSelectedBlockClientId,
@@ -145,6 +147,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			getBlockName,
 			__unstableGetContentLockingParent,
 			getTemplateLock,
+			getBlockParents,
 		} = select( blockEditorStore );
 
 		const _selectedBlockClientId = getSelectedBlockClientId();
@@ -163,31 +166,43 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 				( getTemplateLock( _selectedBlockClientId ) === 'contentOnly'
 					? _selectedBlockClientId
 					: undefined ),
+			parentBlockClientId: getBlockParents(
+				_selectedBlockClientId,
+				true
+			)[ 0 ],
 		};
 	}, [] );
+
+	const showTabs = window?.__experimentalEnableBlockInspectorTabs;
 
 	if ( count > 1 ) {
 		return (
 			<div className="block-editor-block-inspector">
 				<MultiSelectionInspector />
-				<InspectorControls.Slot />
-				<InspectorControls.Slot
-					__experimentalGroup="color"
-					label={ __( 'Color' ) }
-					className="color-block-support-panel__inner-wrapper"
-				/>
-				<InspectorControls.Slot
-					__experimentalGroup="typography"
-					label={ __( 'Typography' ) }
-				/>
-				<InspectorControls.Slot
-					__experimentalGroup="dimensions"
-					label={ __( 'Dimensions' ) }
-				/>
-				<InspectorControls.Slot
-					__experimentalGroup="border"
-					label={ __( 'Border' ) }
-				/>
+				{ showTabs ? (
+					<InspectorControlsTabs />
+				) : (
+					<>
+						<InspectorControls.Slot />
+						<InspectorControls.Slot
+							__experimentalGroup="color"
+							label={ __( 'Color' ) }
+							className="color-block-support-panel__inner-wrapper"
+						/>
+						<InspectorControls.Slot
+							__experimentalGroup="typography"
+							label={ __( 'Typography' ) }
+						/>
+						<InspectorControls.Slot
+							__experimentalGroup="dimensions"
+							label={ __( 'Dimensions' ) }
+						/>
+						<InspectorControls.Slot
+							__experimentalGroup="border"
+							label={ __( 'Border' ) }
+						/>
+					</>
+				) }
 			</div>
 		);
 	}
@@ -224,11 +239,18 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 		<BlockInspectorSingleBlock
 			clientId={ selectedBlockClientId }
 			blockName={ blockType.name }
+			parentBlockClientId={ parentBlockClientId }
 		/>
 	);
 };
 
-const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
+const BlockInspectorSingleBlock = ( {
+	clientId,
+	blockName,
+	parentBlockClientId,
+} ) => {
+	const showTabs = window?.__experimentalEnableBlockInspectorTabs;
+
 	const hasBlockStyles = useSelect(
 		( select ) => {
 			const { getBlockStyles } = select( blocksStore );
@@ -238,64 +260,70 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 		[ blockName ]
 	);
 	const blockInformation = useBlockDisplayInformation( clientId );
+
+	const { selectBlock } = useDispatch( blockEditorStore );
+
 	return (
 		<div className="block-editor-block-inspector">
-			<BlockCard { ...blockInformation } />
+			<BlockCard
+				{ ...blockInformation }
+				className={ blockInformation.isSynced && 'is-synced' }
+				parentBlockClientId={ parentBlockClientId }
+				handleBackButton={ () => {
+					selectBlock( parentBlockClientId );
+				} }
+			/>
 			<BlockVariationTransforms blockClientId={ clientId } />
-			{ hasBlockStyles && (
-				<div>
-					<PanelBody title={ __( 'Styles' ) }>
-						<BlockStyles clientId={ clientId } />
-						{ hasBlockSupport(
-							blockName,
-							'defaultStylePicker',
-							true
-						) && <DefaultStylePicker blockName={ blockName } /> }
-					</PanelBody>
-				</div>
+			{ showTabs && (
+				<InspectorControlsTabs
+					hasBlockStyles={ hasBlockStyles }
+					clientId={ clientId }
+					blockName={ blockName }
+				/>
 			) }
-			<InspectorControls.Slot />
-			<InspectorControls.Slot
-				__experimentalGroup="color"
-				label={ __( 'Color' ) }
-				className="color-block-support-panel__inner-wrapper"
-			/>
-			<InspectorControls.Slot
-				__experimentalGroup="typography"
-				label={ __( 'Typography' ) }
-			/>
-			<InspectorControls.Slot
-				__experimentalGroup="dimensions"
-				label={ __( 'Dimensions' ) }
-			/>
-			<InspectorControls.Slot
-				__experimentalGroup="border"
-				label={ __( 'Border' ) }
-			/>
-			<div>
-				<AdvancedControls />
-			</div>
+			{ ! showTabs && (
+				<>
+					{ hasBlockStyles && (
+						<div>
+							<PanelBody title={ __( 'Styles' ) }>
+								<BlockStyles clientId={ clientId } />
+								{ hasBlockSupport(
+									blockName,
+									'defaultStylePicker',
+									true
+								) && (
+									<DefaultStylePicker
+										blockName={ blockName }
+									/>
+								) }
+							</PanelBody>
+						</div>
+					) }
+					<InspectorControls.Slot />
+					<InspectorControls.Slot
+						__experimentalGroup="color"
+						label={ __( 'Color' ) }
+						className="color-block-support-panel__inner-wrapper"
+					/>
+					<InspectorControls.Slot
+						__experimentalGroup="typography"
+						label={ __( 'Typography' ) }
+					/>
+					<InspectorControls.Slot
+						__experimentalGroup="dimensions"
+						label={ __( 'Dimensions' ) }
+					/>
+					<InspectorControls.Slot
+						__experimentalGroup="border"
+						label={ __( 'Border' ) }
+					/>
+					<div>
+						<AdvancedControls />
+					</div>
+				</>
+			) }
 			<SkipToSelectedBlock key="back" />
 		</div>
-	);
-};
-
-const AdvancedControls = () => {
-	const fills = useSlotFills( InspectorAdvancedControls.slotName );
-	const hasFills = Boolean( fills && fills.length );
-
-	if ( ! hasFills ) {
-		return null;
-	}
-
-	return (
-		<PanelBody
-			className="block-editor-block-inspector__advanced"
-			title={ __( 'Advanced' ) }
-			initialOpen={ false }
-		>
-			<InspectorControls.Slot __experimentalGroup="advanced" />
-		</PanelBody>
 	);
 };
 

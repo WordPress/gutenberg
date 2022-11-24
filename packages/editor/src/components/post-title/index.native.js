@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { View } from 'react-native';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -80,7 +79,7 @@ class PostTitle extends Component {
 
 	getTitle( title, postType ) {
 		if ( 'page' === postType ) {
-			return isEmpty( title )
+			return ! title
 				? /* translators: accessibility text. empty page title. */
 				  __( 'Page title. Empty' )
 				: sprintf(
@@ -90,7 +89,7 @@ class PostTitle extends Component {
 				  );
 		}
 
-		return isEmpty( title )
+		return ! title
 			? /* translators: accessibility text. empty post title. */
 			  __( 'Post title. Empty' )
 			: sprintf(

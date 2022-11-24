@@ -182,7 +182,6 @@ export function DimensionsPanel( props ) {
 				) }
 				{ ! isMinHeightDisabled && (
 					<ToolsPanelItem
-						className="single-column"
 						hasValue={ () => hasMinHeightValue( props ) }
 						label={ __( 'Min. height' ) }
 						onDeselect={ () => resetMinHeight( props ) }

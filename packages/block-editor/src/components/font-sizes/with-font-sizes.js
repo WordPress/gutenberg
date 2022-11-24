@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, pickBy, reduce } from 'lodash';
+import { find, pickBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -43,8 +43,7 @@ export default ( ...fontSizeNames ) => {
 	 * and the value is the custom font size attribute name.
 	 * Custom font size is automatically compted by appending custom followed by the font size attribute name in with the first letter capitalized.
 	 */
-	const fontSizeAttributeNames = reduce(
-		fontSizeNames,
+	const fontSizeAttributeNames = fontSizeNames.reduce(
 		( fontSizeAttributeNamesAccumulator, fontSizeAttributeName ) => {
 			fontSizeAttributeNamesAccumulator[
 				fontSizeAttributeName
@@ -81,12 +80,13 @@ export default ( ...fontSizeNames ) => {
 					}
 
 					createSetters() {
-						return reduce(
-							fontSizeAttributeNames,
+						return Object.entries( fontSizeAttributeNames ).reduce(
 							(
 								settersAccumulator,
-								customFontSizeAttributeName,
-								fontSizeAttributeName
+								[
+									fontSizeAttributeName,
+									customFontSizeAttributeName,
+								]
 							) => {
 								const upperFirstFontSizeAttributeName =
 									upperFirst( fontSizeAttributeName );
@@ -159,15 +159,18 @@ export default ( ...fontSizeNames ) => {
 							return null;
 						}
 
-						const newState = reduce(
+						const newState = Object.entries(
 							pickBy(
 								fontSizeAttributeNames,
 								didAttributesChange
-							),
+							)
+						).reduce(
 							(
 								newStateAccumulator,
-								customFontSizeAttributeName,
-								fontSizeAttributeName
+								[
+									fontSizeAttributeName,
+									customFontSizeAttributeName,
+								]
 							) => {
 								const fontSizeAttributeValue =
 									attributes[ fontSizeAttributeName ];
