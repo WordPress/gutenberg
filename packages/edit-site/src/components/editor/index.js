@@ -5,6 +5,7 @@ import { useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Button, Notice } from '@wordpress/components';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
+import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	BlockContextProvider,
 	BlockBreadcrumb,
@@ -69,6 +70,7 @@ export default function Editor() {
 		isSaveViewOpen,
 		previousShortcut,
 		nextShortcut,
+		showIconLabels,
 	} = useSelect( ( select ) => {
 		const {
 			getEditedPostType,
@@ -119,6 +121,10 @@ export default function Editor() {
 			),
 			nextShortcut: getAllShortcutKeyCombinations(
 				'core/edit-site/next-region'
+			),
+			showIconLabels: select( preferencesStore ).get(
+				'core/edit-site',
+				'showIconLabels'
 			),
 		};
 	}, [] );
@@ -178,6 +184,9 @@ export default function Editor() {
 					<GlobalStylesProvider>
 						<BlockContextProvider value={ blockContext }>
 							<InterfaceSkeleton
+								className={
+									showIconLabels && 'show-icon-labels'
+								}
 								notices={ isEditMode && <EditorSnackbars /> }
 								content={
 									<>
