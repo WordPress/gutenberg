@@ -12,7 +12,7 @@ import BlockStyles from '../block-styles';
 import DefaultStylePicker from '../default-style-picker';
 import InspectorControls from '../inspector-controls';
 
-const AppearanceTab = ( { blockName, clientId, hasBlockStyles } ) => {
+const StylesTab = ( { blockName, clientId, hasBlockStyles } ) => {
 	return (
 		<>
 			{ hasBlockStyles && (
@@ -48,4 +48,4 @@ const AppearanceTab = ( { blockName, clientId, hasBlockStyles } ) => {
 	);
 };
 
-export default AppearanceTab;
+export default StylesTab;

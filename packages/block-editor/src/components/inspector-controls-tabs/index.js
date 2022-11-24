@@ -6,9 +6,9 @@ import { TabPanel } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { TAB_SETTINGS, TAB_APPEARANCE, TAB_LIST_VIEW } from './utils';
-import AppearanceTab from './appearance-tab';
+import { TAB_SETTINGS, TAB_STYLES, TAB_LIST_VIEW } from './utils';
 import SettingsTab from './settings-tab';
+import StylesTab from './styles-tab';
 import InspectorControls from '../inspector-controls';
 import useIsListViewTabDisabled from './use-is-list-view-tab-disabled';
 
@@ -20,7 +20,7 @@ export default function InspectorControlsTabs( {
 } ) {
 	// The tabs panel will mount before fills are rendered to the list view
 	// slot. This means the list view tab isn't initially included in the
-	// available tabs so the panel defaults selection to the appearance tab
+	// available tabs so the panel defaults selection to the styles tab
 	// which at the time is the first tab. This check allows blocks known to
 	// include the list view tab to set it as the tab selected by default.
 	const initialTabName = ! useIsListViewTabDisabled( blockName )
@@ -41,9 +41,9 @@ export default function InspectorControlsTabs( {
 					);
 				}
 
-				if ( tab.name === TAB_APPEARANCE.name ) {
+				if ( tab.name === TAB_STYLES.name ) {
 					return (
-						<AppearanceTab
+						<StylesTab
 							blockName={ blockName }
 							clientId={ clientId }
 							hasBlockStyles={ hasBlockStyles }
