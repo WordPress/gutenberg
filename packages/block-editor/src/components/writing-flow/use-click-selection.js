@@ -9,11 +9,16 @@ import { useRefEffect } from '@wordpress/compose';
  */
 import { store as blockEditorStore } from '../../store';
 import { getBlockClientId } from '../../utils/dom';
+import { findDepth } from './use-selection-observer';
 
 export default function useClickSelection() {
-	const { selectBlock } = useDispatch( blockEditorStore );
-	const { isSelectionEnabled, getBlockSelectionStart, hasMultiSelection } =
-		useSelect( blockEditorStore );
+	const { selectBlock, multiSelect } = useDispatch( blockEditorStore );
+	const {
+		isSelectionEnabled,
+		getBlockSelectionStart,
+		hasMultiSelection,
+		getBlockParents,
+	} = useSelect( blockEditorStore );
 	return useRefEffect(
 		( node ) => {
 			function onMouseDown( event ) {
@@ -25,7 +30,29 @@ export default function useClickSelection() {
 
 				const clickedClientId = getBlockClientId( event.target );
 
-				if ( ! event.shiftKey && hasMultiSelection() ) {
+				if ( event.shiftKey ) {
+					const startClientId = getBlockSelectionStart();
+					const { ownerDocument } = event.target;
+					const { defaultView } = ownerDocument;
+
+					if (
+						startClientId &&
+						! defaultView.getSelection().rangeCount
+					) {
+						const startPath = [
+							...getBlockParents( startClientId ),
+							startClientId,
+						];
+						const endPath = [
+							...getBlockParents( clickedClientId ),
+							clickedClientId,
+						];
+						const depth = findDepth( startPath, endPath );
+
+						multiSelect( startPath[ depth ], endPath[ depth ] );
+						event.preventDefault();
+					}
+				} else if ( hasMultiSelection() ) {
 					// Allow user to escape out of a multi-selection to a
 					// singular selection of a block via click. This is handled
 					// here since focus handling excludes blocks when there is

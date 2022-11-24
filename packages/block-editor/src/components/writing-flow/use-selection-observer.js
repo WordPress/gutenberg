@@ -55,7 +55,7 @@ function extractSelectionEndNode( selection ) {
 	return focusNode.childNodes[ focusOffset ];
 }
 
-function findDepth( a, b ) {
+export function findDepth( a, b ) {
 	let depth = 0;
 
 	while ( a[ depth ] === b[ depth ] ) {

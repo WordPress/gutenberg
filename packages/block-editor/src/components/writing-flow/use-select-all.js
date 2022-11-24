@@ -12,9 +12,14 @@ import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 
 export default function useSelectAll() {
-	const { getBlockOrder, getSelectedBlockClientIds, getBlockRootClientId } =
-		useSelect( blockEditorStore );
-	const { multiSelect, selectBlock } = useDispatch( blockEditorStore );
+	const {
+		getBlockOrder,
+		getSelectedBlockClientIds,
+		getBlockRootClientId,
+		isNavigationMode,
+	} = useSelect( blockEditorStore );
+	const { multiSelect, selectBlock, setNavigationMode } =
+		useDispatch( blockEditorStore );
 	const isMatch = useShortcutEventMatch();
 
 	return useRefEffect( ( node ) => {
@@ -68,6 +73,10 @@ export default function useSelectAll() {
 			}
 
 			node.ownerDocument.defaultView.getSelection().removeAllRanges();
+
+			if ( isNavigationMode() ) {
+				setNavigationMode( false );
+			}
 
 			multiSelect(
 				blockClientIds[ 0 ],

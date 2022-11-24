@@ -538,31 +538,6 @@ describe( 'Multi-block selection', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'should clear selection when clicking next to blocks', async () => {
-		await clickBlockAppender();
-		await page.keyboard.type( '1' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( '2' );
-		await pressKeyWithModifier( 'shift', 'ArrowUp' );
-		await testNativeSelection();
-		expect( await getSelectedFlatIndices() ).toEqual( [ 1, 2 ] );
-		const paragraph = await page.$( '[data-type="core/paragraph"]' );
-		const rect = await paragraph.boundingBox();
-		const coord = {
-			x: rect.x - 1,
-			y: rect.y + rect.height / 2,
-		};
-
-		await page.mouse.click( coord.x, coord.y );
-
-		// Wait for blocks to have updated asynchronously.
-		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
-		await testNativeSelection();
-		expect( await getSelectedFlatIndices() ).toEqual( [] );
-
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
 	it( 'should place the caret at the end of last pasted paragraph (paste to empty editor)', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'first paragraph' );
