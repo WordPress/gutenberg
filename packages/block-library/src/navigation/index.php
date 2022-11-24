@@ -262,8 +262,8 @@ function block_core_navigation_get_classic_menu_fallback() {
 
 		// Attempts to return the menu assigned to location `primary` (a convention many classic themes follow).
 		$locations = get_nav_menu_locations();
-		if ( isset( $locations[ 'primary' ] ) ) {
-			return wp_get_nav_menu_object( $locations[ 'primary' ] );
+		if ( isset( $locations['primary'] ) ) {
+			return wp_get_nav_menu_object( $locations['primary'] );
 		}
 
 		// Otherwise return the most first classic menu.
