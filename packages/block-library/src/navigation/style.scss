@@ -655,6 +655,14 @@ button.wp-block-navigation-item__content {
 .wp-block-navigation__responsive-container-open {
 	display: flex;
 
+	// When set to collapse into a text button, it should inherit the parent font.
+	// This needs specificity to override inherited properties by the button element and component.
+	&.wp-block-navigation__responsive-container-open.wp-block-navigation__responsive-container-open {
+		font-family: inherit;
+		font-weight: inherit;
+		font-size: inherit;
+	}
+
 	&:not(.always-shown) {
 		@include break-small {
 			display: none;
@@ -668,6 +676,14 @@ button.wp-block-navigation-item__content {
 	top: 0;
 	right: 0;
 	z-index: 2; // Needs to be above the modal z index itself.
+
+	// When set to collapse into a text button, it should inherit the parent font.
+	// This needs specificity to override inherited properties by the button element and component.
+	&.wp-block-navigation__responsive-container-close.wp-block-navigation__responsive-container-close {
+		font-family: inherit;
+		font-weight: inherit;
+		font-size: inherit;
+	}
 }
 
 // The menu adds wrapping containers.

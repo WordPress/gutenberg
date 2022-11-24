@@ -125,6 +125,12 @@ $block-inserter-tabs-height: 44px;
 		.components-tab-panel__tabs-item {
 			flex-grow: 1;
 			margin-bottom: -$border-width;
+			&[id$="reusable"] {
+				flex-grow: inherit;
+				// These are to align the `reusable` icon with the search icon.
+				padding-left: $grid-unit-20;
+				padding-right: $grid-unit-20;
+			}
 		}
 	}
 
@@ -174,9 +180,13 @@ $block-inserter-tabs-height: 44px;
 	text-align: right;
 }
 
+.block-editor-inserter__manage-reusable-blocks-container {
+	margin: auto $grid-unit-20 $grid-unit-20;
+}
+
 .block-editor-inserter__manage-reusable-blocks {
-	display: inline-block;
-	margin: $grid-unit-20;
+	justify-content: center;
+	width: 100%;
 }
 
 .block-editor-inserter__no-results {
@@ -275,10 +285,10 @@ $block-inserter-tabs-height: 44px;
 	padding: $grid-unit-20;
 	overflow-y: auto;
 	height: 100%;
-}
-
-.block-editor-inserter__patterns-fill-space {
-	flex-grow: 1;
+	// Push the listitem wrapping the "explore" button to the bottom of the panel.
+	div[role="listitem"]:last-child {
+		margin-top: auto;
+	}
 }
 
 .block-editor-inserter__patterns-category-panel {
@@ -339,10 +349,6 @@ $block-inserter-tabs-height: 44px;
 	padding: $grid-unit-20;
 	flex-shrink: 0;
 	position: relative; // prevents overscroll when block library is open
-}
-
-.block-editor-inserter__manage-reusable-blocks-container {
-	padding: $grid-unit-20;
 }
 
 .block-editor-inserter__quick-inserter {
@@ -442,7 +448,8 @@ $block-inserter-tabs-height: 44px;
 	}
 
 	&__list {
-		margin-left: $sidebar-width - $grid-unit-40;
+		margin-left: $sidebar-width;
+		padding: $grid-unit-30 0 $grid-unit-40;
 	}
 
 	.block-editor-block-patterns-list {

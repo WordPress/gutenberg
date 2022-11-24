@@ -107,4 +107,5 @@ export const parameters = {
 			],
 		},
 	},
+	sourceLinkPrefix: 'https://github.com/WordPress/gutenberg/blob/trunk/',
 };

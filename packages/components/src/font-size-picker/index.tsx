@@ -173,7 +173,13 @@ const UnforwardedFontSizePicker = (
 									onChange?.( undefined );
 								} else {
 									onChange?.(
-										hasUnits ? newValue : Number( newValue )
+										hasUnits
+											? newValue
+											: Number( newValue ),
+										fontSizes.find(
+											( fontSize ) =>
+												fontSize.size === newValue
+										)
 									);
 								}
 							} }
@@ -193,7 +199,11 @@ const UnforwardedFontSizePicker = (
 								onChange?.( undefined );
 							} else {
 								onChange?.(
-									hasUnits ? newValue : Number( newValue )
+									hasUnits ? newValue : Number( newValue ),
+									fontSizes.find(
+										( fontSize ) =>
+											fontSize.size === newValue
+									)
 								);
 							}
 						} }

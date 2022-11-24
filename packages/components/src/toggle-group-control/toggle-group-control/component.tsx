@@ -50,7 +50,7 @@ function UnconnectedToggleGroupControl(
 	const classes = useMemo(
 		() =>
 			cx(
-				styles.ToggleGroupControl( { isDeselectable, size } ),
+				styles.ToggleGroupControl( { isBlock, isDeselectable, size } ),
 				isBlock && styles.block,
 				className
 			),

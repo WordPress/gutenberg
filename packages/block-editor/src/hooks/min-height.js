@@ -2,16 +2,13 @@
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
-import {
-	__experimentalUseCustomUnits as useCustomUnits,
-	__experimentalUnitControl as UnitControl,
-} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import useSetting from '../components/use-setting';
+import HeightControl from '../components/height-control';
 import { DIMENSIONS_SUPPORT_KEY } from './dimensions';
 import { cleanEmptyObject } from './utils';
 
@@ -81,17 +78,6 @@ export function MinHeightEdit( props ) {
 		setAttributes,
 	} = props;
 
-	const units = useCustomUnits( {
-		availableUnits: useSetting( 'dimensions.units' ) || [
-			'%',
-			'px',
-			'em',
-			'rem',
-			'vh',
-			'vw',
-		],
-	} );
-
 	if ( useIsMinHeightDisabled( props ) ) {
 		return null;
 	}
@@ -109,13 +95,10 @@ export function MinHeightEdit( props ) {
 	};
 
 	return (
-		<UnitControl
+		<HeightControl
 			label={ __( 'Min. height' ) }
 			value={ style?.dimensions?.minHeight }
-			units={ units }
 			onChange={ onChange }
-			min={ 0 }
-			size={ '__unstable-large' }
 		/>
 	);
 }

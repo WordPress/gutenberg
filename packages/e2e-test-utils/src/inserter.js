@@ -142,12 +142,12 @@ export async function searchForReusableBlock( searchTerm ) {
 	// fetched. They aren't fetched until an inserter is used or the post
 	// already contains reusable blocks, so wait for the tab to appear.
 	await page.waitForXPath(
-		'//div[contains(@class, "block-editor-inserter__tabs")]//button[text()="Reusable"]'
+		'//div[contains(@class, "block-editor-inserter__tabs")]//button[@aria-label="Reusable"]'
 	);
 
 	// Select the reusable blocks tab.
 	const tab = await page.waitForXPath(
-		'//div[contains(@class, "block-editor-inserter__tabs")]//button[text()="Reusable"]'
+		'//div[contains(@class, "block-editor-inserter__tabs")]//button[@aria-label="Reusable"]'
 	);
 	await tab.click();
 	await page.waitForSelector( INSERTER_SEARCH_SELECTOR );
