@@ -15,12 +15,8 @@ import { store as blockEditorStore } from '../../store';
 
 const layouts = {
 	group: { type: 'constrained' },
-	row: { type: 'flex', flexWrap: 'nowrap', allowSizingOnChildren: true },
-	stack: {
-		type: 'flex',
-		orientation: 'vertical',
-		allowSizingOnChildren: true,
-	},
+	row: { type: 'flex', flexWrap: 'nowrap' },
+	stack: { type: 'flex', orientation: 'vertical' },
 };
 
 function BlockGroupToolbar() {

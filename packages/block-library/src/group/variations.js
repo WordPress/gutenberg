@@ -23,13 +23,7 @@ const variations = [
 		name: 'group-row',
 		title: _x( 'Row', 'single horizontal line' ),
 		description: __( 'Arrange blocks horizontally.' ),
-		attributes: {
-			layout: {
-				type: 'flex',
-				flexWrap: 'nowrap',
-				allowSizingOnChildren: true,
-			},
-		},
+		attributes: { layout: { type: 'flex', flexWrap: 'nowrap' } },
 		scope: [ 'block', 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) =>
 			blockAttributes.layout?.type === 'flex' &&
@@ -41,13 +35,7 @@ const variations = [
 		name: 'group-stack',
 		title: __( 'Stack' ),
 		description: __( 'Arrange blocks vertically.' ),
-		attributes: {
-			layout: {
-				type: 'flex',
-				orientation: 'vertical',
-				allowSizingOnChildren: true,
-			},
-		},
+		attributes: { layout: { type: 'flex', orientation: 'vertical' } },
 		scope: [ 'block', 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) =>
 			blockAttributes.layout?.type === 'flex' &&
