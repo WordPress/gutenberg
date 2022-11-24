@@ -379,7 +379,9 @@ export default compose( [
 				);
 
 				if ( onSelectOrClose ) {
-					onSelectOrClose();
+					onSelectOrClose( {
+						insertedBlock: blockToInsert,
+					} );
 				}
 
 				const message = sprintf(
