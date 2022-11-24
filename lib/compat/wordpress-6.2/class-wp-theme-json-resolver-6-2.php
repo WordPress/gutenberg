@@ -110,6 +110,7 @@ class WP_Theme_JSON_Resolver_6_2 extends WP_Theme_JSON_Resolver_6_1 {
 		}
 
 		$result->merge( static::get_user_data() );
+		$result->set_spacing_sizes();
 		return $result;
 	}
 }
