@@ -96,7 +96,16 @@ function MediaTab( {
 										allowedTypes={ ALLOWED_MEDIA_TYPES }
 										render={ ( { open } ) => (
 											<Button
-												onClick={ open }
+												onClick={ ( event ) => {
+													// Safari doesn't not emit a focus event on button elements when
+													// clicked and we need to manually focus the button here.
+													// The reason is that core's Media Library modal explicitly triggers a
+													// focus event and therefore a `blur` event is triggered on a different
+													// element, which doesn't contain the `data-unstable-ignore-focus-outside`
+													// attribute making the Inserter dialog to close.
+													event.target.focus();
+													open();
+												} }
 												className="block-editor-inserter__media-library-button"
 												variant="secondary"
 												data-unstable-ignore-focus-outside
