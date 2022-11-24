@@ -88,7 +88,7 @@ add_action( 'init', 'register_block_core_form' );
  */
 function submit_core_form_block() {
 
-	$has_valid_nonce = wp_verify_nonce( $_POST['_wpnonce'], 'wp-block-form' );
+	$has_valid_nonce = ! empty( $_POST['_wpnonce'] ) && wp_verify_nonce( $_POST['_wpnonce'], 'wp-block-form' );
 	if ( ! $has_valid_nonce ) {
 		return;
 	}
