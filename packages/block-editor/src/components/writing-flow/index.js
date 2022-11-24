@@ -7,10 +7,9 @@ import classNames from 'classnames';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { forwardRef } from '@wordpress/element';
-import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -31,18 +30,10 @@ export function useWritingFlow() {
 		( select ) => select( blockEditorStore ).hasMultiSelection(),
 		[]
 	);
-	const selectedBlockTitle = useSelect( ( select ) => {
-		const { getSelectedBlockClientId, getBlockName, getBlockAttributes } =
-			select( blockEditorStore );
-		const clientId = getSelectedBlockClientId();
-		if ( ! clientId ) return;
-		const blockName = getBlockName( clientId );
-		const blockType = getBlockType( blockName );
-		const attributes = getBlockAttributes( clientId );
-		const { getActiveBlockVariation } = select( blocksStore );
-		const match = getActiveBlockVariation( blockName, attributes );
-		return match?.title || blockType?.title;
-	}, [] );
+	const selectedClientId = useSelect(
+		( select ) => select( blockEditorStore ).getSelectedBlockClientId(),
+		[]
+	);
 
 	return [
 		before,
@@ -60,29 +51,72 @@ export function useWritingFlow() {
 					node.tabIndex = -1;
 					node.contentEditable = true;
 
-					const label = selectedBlockTitle
-						? // translators: %s: Type of block (i.e. Text, Image etc)
-						  sprintf( __( 'Block: %s' ), selectedBlockTitle )
-						: '';
-
-					node.setAttribute(
-						'aria-label',
-						hasMultiSelection
-							? __( 'Multiple selected blocks' )
-							: label
-					);
-
 					if ( ! hasMultiSelection ) {
 						return;
 					}
 
+					node.setAttribute(
+						'aria-label',
+						__( 'Multiple selected blocks' )
+					);
 					node.classList.add( 'has-multi-selection' );
 
 					return () => {
 						node.classList.remove( 'has-multi-selection' );
 					};
 				},
-				[ hasMultiSelection, selectedBlockTitle ]
+				[ hasMultiSelection ]
+			),
+			useRefEffect(
+				( node ) => {
+					if ( ! selectedClientId ) return;
+
+					const { ownerDocument } = node;
+					const { defaultView } = ownerDocument;
+					const selection = defaultView.getSelection();
+
+					const blockElement = ownerDocument.getElementById(
+						'block-' + selectedClientId
+					);
+					const blockLabel =
+						blockElement.getAttribute( 'aria-label' );
+
+					node.setAttribute( 'aria-label', blockLabel );
+
+					function onSelectionChange() {
+						const { anchorNode } = selection;
+						let innerLabel = blockLabel;
+
+						if ( anchorNode ) {
+							const anchorElement =
+								anchorNode.nodeType === anchorNode.ELEMENT_NODE
+									? anchorNode
+									: anchorNode.parentElement;
+							const anchorLabel =
+								anchorElement?.closest( '[aria-label]' );
+
+							if ( anchorLabel ) {
+								innerLabel =
+									anchorLabel.getAttribute( 'aria-label' );
+							}
+						}
+
+						node.setAttribute( 'aria-label', innerLabel );
+					}
+
+					ownerDocument.addEventListener(
+						'selectionchange',
+						onSelectionChange
+					);
+
+					return () => {
+						ownerDocument.removeEventListener(
+							'selectionchange',
+							onSelectionChange
+						);
+					};
+				},
+				[ selectedClientId ]
 			),
 		] ),
 		after,
