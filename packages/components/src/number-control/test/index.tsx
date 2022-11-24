@@ -145,7 +145,7 @@ describe( 'NumberControl', () => {
 
 			// First call: clear value
 			expect( onChangeSpy ).toHaveBeenNthCalledWith( 1, '', true );
-			// Second call: invalid, unclamped value
+			// Second call: valid, unclamped value
 			expect( onChangeSpy ).toHaveBeenNthCalledWith( 2, '1', true );
 			// Third call: invalid, unclamped value
 			expect( onChangeSpy ).toHaveBeenNthCalledWith( 3, '14', false );
