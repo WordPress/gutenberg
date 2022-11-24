@@ -75,7 +75,7 @@ export default function PostFormatPanel() {
 		return getSettings().mediaUpload;
 	}, [] );
 
-	if ( ! externalImages.length ) {
+	if ( ! mediaUpload || ! externalImages.length ) {
 		return null;
 	}
 
