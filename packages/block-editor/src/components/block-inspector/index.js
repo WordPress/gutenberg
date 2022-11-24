@@ -17,6 +17,7 @@ import {
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo, useCallback } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -169,9 +170,12 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 	}, [] );
 
 	const availableTabs = useInspectorControlsTabs( blockType?.name );
-	const showTabs =
+	const showTabs = applyFilters(
+		'editor.BlockInspector.showTabs',
+		blockType?.name,
 		window?.__experimentalEnableBlockInspectorTabs &&
-		availableTabs.length > 1;
+			availableTabs.length > 1
+	);
 
 	if ( count > 1 ) {
 		return (
@@ -243,10 +247,12 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 
 const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 	const availableTabs = useInspectorControlsTabs( blockName );
-	const showTabs =
+	const showTabs = applyFilters(
+		'editor.BlockInspector.showTabs',
+		blockName,
 		window?.__experimentalEnableBlockInspectorTabs &&
-		availableTabs.length > 1;
-
+			availableTabs.length > 1
+	);
 	const hasBlockStyles = useSelect(
 		( select ) => {
 			const { getBlockStyles } = select( blocksStore );
