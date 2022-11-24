@@ -120,7 +120,7 @@ export function LinkUI( props ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 
 	async function handleCreate( pageTitle ) {
-		const postType = props.type || 'page';
+		const postType = props.linkAttributes.type || 'page';
 
 		const page = await saveEntityRecord( 'postType', postType, {
 			title: pageTitle,
@@ -157,14 +157,14 @@ export function LinkUI( props ) {
 				hasTextControl
 				hasRichPreviews
 				className="wp-block-navigation-link__inline-link-input"
-				value={ props.linkValue }
+				value={ props.value }
 				showInitialSuggestions={ true }
 				withCreateSuggestion={ props.hasCreateSuggestion }
 				createSuggestion={ handleCreate }
 				createSuggestionButtonText={ ( searchTerm ) => {
 					let format;
 
-					if ( props.type === 'post' ) {
+					if ( props.linkAttributes.type === 'post' ) {
 						/* translators: %s: search term. */
 						format = __( 'Create draft post: <mark>%s</mark>' );
 					} else {
@@ -179,16 +179,16 @@ export function LinkUI( props ) {
 						}
 					);
 				} }
-				noDirectEntry={ !! props.type }
-				noURLSuggestion={ !! props.type }
+				noDirectEntry={ !! props.linkAttributes.type }
+				noURLSuggestion={ !! props.linkAttributes.type }
 				suggestionsQuery={ getSuggestionsQuery(
-					props.type,
-					props.kind
+					props.linkAttributes.type,
+					props.linkAttributes.kind
 				) }
 				onChange={ props.onChange }
 				onRemove={ props.onRemove }
 				renderControlBottom={
-					! props.url
+					! props.linkAttributes.url
 						? () => (
 								<LinkControlTransforms
 									clientId={ props.clientId }

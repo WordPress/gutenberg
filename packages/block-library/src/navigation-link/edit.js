@@ -655,10 +655,8 @@ export default function NavigationLinkEdit( {
 					{ isLinkOpen && (
 						<LinkUI
 							clientId={ clientId }
-							type={ type }
-							url={ url }
-							kind={ kind }
-							linkValue={ link }
+							value={ link }
+							linkAttributes={ { type, url, kind } }
 							onClose={ () => setIsLinkOpen( false ) }
 							anchor={ popoverAnchor }
 							hasCreateSuggestion={ userCanCreate }
