@@ -7,10 +7,9 @@ import { unescape } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createBlock, switchToBlockType } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	Button,
 	PanelBody,
 	TextControl,
 	TextareaControl,
@@ -23,7 +22,6 @@ import { displayShortcut, isKeyboardEvent, ENTER } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
-	BlockIcon,
 	InspectorControls,
 	RichText,
 	useBlockProps,
@@ -257,76 +255,6 @@ function navStripHTML( html ) {
 	const doc = document.implementation.createHTMLDocument( '' );
 	doc.body.innerHTML = html;
 	return doc.body.textContent || '';
-}
-
-/**
- * Add transforms to Link Control
- */
-
-export function LinkControlTransforms( { clientId } ) {
-	const { getBlock, blockTransforms } = useSelect(
-		( select ) => {
-			const {
-				getBlock: _getBlock,
-				getBlockRootClientId,
-				getBlockTransformItems,
-			} = select( blockEditorStore );
-
-			return {
-				getBlock: _getBlock,
-				blockTransforms: getBlockTransformItems(
-					_getBlock( clientId ),
-					getBlockRootClientId( clientId )
-				),
-			};
-		},
-		[ clientId ]
-	);
-
-	const { replaceBlock } = useDispatch( blockEditorStore );
-
-	const featuredBlocks = [
-		'core/site-logo',
-		'core/social-links',
-		'core/search',
-	];
-	const transforms = blockTransforms.filter( ( item ) => {
-		return featuredBlocks.includes( item.name );
-	} );
-
-	if ( ! transforms?.length ) {
-		return null;
-	}
-
-	return (
-		<div className="link-control-transform">
-			<h3 className="link-control-transform__subheading">
-				{ __( 'Transform' ) }
-			</h3>
-			<div className="link-control-transform__items">
-				{ transforms.map( ( item, index ) => {
-					return (
-						<Button
-							key={ `transform-${ index }` }
-							onClick={ () =>
-								replaceBlock(
-									clientId,
-									switchToBlockType(
-										getBlock( clientId ),
-										item.name
-									)
-								)
-							}
-							className="link-control-transform__item"
-						>
-							<BlockIcon icon={ item.icon } />
-							{ item.title }
-						</Button>
-					);
-				} ) }
-			</div>
-		</div>
-	);
 }
 
 export default function NavigationLinkEdit( {

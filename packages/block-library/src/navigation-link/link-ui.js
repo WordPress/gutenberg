@@ -1,18 +1,94 @@
 /**
  * WordPress dependencies
  */
-import { Popover } from '@wordpress/components';
+import { Popover, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { __experimentalLinkControl as LinkControl } from '@wordpress/block-editor';
+import {
+	__experimentalLinkControl as LinkControl,
+	BlockIcon,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { createInterpolateElement } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-
+import { switchToBlockType } from '@wordpress/blocks';
+import { useSelect, useDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { getSuggestionsQuery, LinkControlTransforms } from './edit';
+import { getSuggestionsQuery } from './edit';
+
+/**
+ * Add transforms to Link Control
+ *
+ * @param {Object} props					Component props.
+ * @param {string} props.clientId			Block client ID.
+ */
+function LinkControlTransforms( { clientId } ) {
+	const { getBlock, blockTransforms } = useSelect(
+		( select ) => {
+			const {
+				getBlock: _getBlock,
+				getBlockRootClientId,
+				getBlockTransformItems,
+			} = select( blockEditorStore );
+
+			return {
+				getBlock: _getBlock,
+				blockTransforms: getBlockTransformItems(
+					_getBlock( clientId ),
+					getBlockRootClientId( clientId )
+				),
+			};
+		},
+		[ clientId ]
+	);
+
+	const { replaceBlock } = useDispatch( blockEditorStore );
+
+	const featuredBlocks = [
+		'core/site-logo',
+		'core/social-links',
+		'core/search',
+	];
+	const transforms = blockTransforms.filter( ( item ) => {
+		return featuredBlocks.includes( item.name );
+	} );
+
+	if ( ! transforms?.length ) {
+		return null;
+	}
+
+	return (
+		<div className="link-control-transform">
+			<h3 className="link-control-transform__subheading">
+				{ __( 'Transform' ) }
+			</h3>
+			<div className="link-control-transform__items">
+				{ transforms.map( ( item, index ) => {
+					return (
+						<Button
+							key={ `transform-${ index }` }
+							onClick={ () =>
+								replaceBlock(
+									clientId,
+									switchToBlockType(
+										getBlock( clientId ),
+										item.name
+									)
+								)
+							}
+							className="link-control-transform__item"
+						>
+							<BlockIcon icon={ item.icon } />
+							{ item.title }
+						</Button>
+					);
+				} ) }
+			</div>
+		</div>
+	);
+}
 
 export function LinkUI( props ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
