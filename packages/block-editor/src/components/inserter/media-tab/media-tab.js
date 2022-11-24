@@ -97,7 +97,7 @@ function MediaTab( {
 										render={ ( { open } ) => (
 											<Button
 												onClick={ ( event ) => {
-													// Safari doesn't not emit a focus event on button elements when
+													// Safari doesn't emit a focus event on button elements when
 													// clicked and we need to manually focus the button here.
 													// The reason is that core's Media Library modal explicitly triggers a
 													// focus event and therefore a `blur` event is triggered on a different
