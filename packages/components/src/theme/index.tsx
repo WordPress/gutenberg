@@ -1,10 +1,16 @@
 /**
+ * WordPress dependencies
+ */
+import { useMemo } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import type { ThemeProps } from './types';
 import type { WordPressComponentProps } from '../ui/context';
-import { Wrapper } from './styles';
+import { colorVariables, Wrapper } from './styles';
 import { generateThemeVariables } from './color-algorithms';
+import { useCx } from '../utils';
 
 /**
  * `Theme` allows defining theme variables for components in the `@wordpress/components` package.
@@ -31,11 +37,22 @@ import { generateThemeVariables } from './color-algorithms';
 function Theme( {
 	accent,
 	background,
+	className,
 	...props
 }: WordPressComponentProps< ThemeProps, 'div', true > ) {
-	const themeVariables = generateThemeVariables( { accent, background } );
+	const cx = useCx();
+	const classes = useMemo(
+		() =>
+			cx(
+				...colorVariables(
+					generateThemeVariables( { accent, background } )
+				),
+				className
+			),
+		[ accent, background, className ]
+	);
 
-	return <Wrapper { ...themeVariables } { ...props } />;
+	return <Wrapper className={ classes } { ...props } />;
 }
 
 export default Theme;

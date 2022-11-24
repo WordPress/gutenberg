@@ -9,7 +9,7 @@ import { css } from '@emotion/react';
  */
 import type { ThemeOutputValues } from './types';
 
-const colorVariables = ( { colors }: ThemeOutputValues ) => {
+export const colorVariables = ( { colors }: ThemeOutputValues ) => {
 	const shades = Object.entries( colors.gray || {} )
 		.map( ( [ k, v ] ) => `--wp-components-color-gray-${ k }: ${ v };` )
 		.join( '' );
@@ -30,6 +30,4 @@ const colorVariables = ( { colors }: ThemeOutputValues ) => {
 	];
 };
 
-export const Wrapper = styled.div< ThemeOutputValues >`
-	${ colorVariables }
-`;
+export const Wrapper = styled.div``;
