@@ -120,7 +120,7 @@ export default function PostFormatPanel() {
 							} )
 					)
 			)
-		).then( () => {
+		).finally( () => {
 			setIsUploading( false );
 		} );
 	}
@@ -144,15 +144,18 @@ export default function PostFormatPanel() {
 						return <Image key={ image.clientId } { ...image } />;
 					} ) }
 				</AnimatePresence>
-				<Button
-					icon={ upload }
-					variant="primary"
-					onClick={ uploadImages }
-				>
-					{ __( 'Upload all' ) }
-				</Button>
+				{ isUploading ? (
+					<Spinner />
+				) : (
+					<Button
+						icon={ upload }
+						variant="primary"
+						onClick={ uploadImages }
+					>
+						{ __( 'Upload all' ) }
+					</Button>
+				) }
 			</div>
-			{ isUploading && <Spinner /> }
 		</PanelBody>
 	);
 }
