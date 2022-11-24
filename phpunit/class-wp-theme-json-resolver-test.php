@@ -363,31 +363,33 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	 * @covers WP_Theme_JSON_Resolver::get_merged_data
 	 */
 	public function test_get_merged_data_returns_origin_default() {
-		switch_theme( 'block-theme' ); // make sure there is data from the theme origin
-		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( 'default' )->get_settings();
-		$this->assertTrue( isset( $settings['color']['palette']['default'] ) );
-		$this->assertFalse( isset( $settings['color']['palette']['theme'] ) );
-		$this->assertFalse( isset( $settings['color']['palette']['custom'] ) );
-	}
+		// Make sure there is data from the blocks origin.
+		register_block_type(
+			'my/block-with-styles',
+			array(
+				'api_version' => 2,
+				'attributes'  => array(
+					'borderColor' => array(
+						'type' => 'string',
+					),
+					'style'       => array(
+						'type' => 'object',
+					),
+				),
+				'supports'    => array(
+					'__experimentalStyle' => array(
+						'typography' => array(
+							'fontSize' => '42rem',
+						),
+					),
+				),
+			),
+		);
 
-	/**
-	 * @covers WP_Theme_JSON_Resolver::get_merged_data
-	 */
-	public function test_get_merged_data_returns_origin_theme() {
-		switch_theme( 'block-theme' ); // make sure there is data from the theme origin
-		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( 'theme' )->get_settings();
-		$this->assertTrue( isset( $settings['color']['palette']['default'] ) );
-		$this->assertTrue( isset( $settings['color']['palette']['theme'] ) );
-		$this->assertFalse( isset( $settings['color']['palette']['custom'] ) );
-	}
+		// Make sure there is data from the theme origin.
+		switch_theme( 'block-theme' );
 
-	/**
-	 * @covers WP_Theme_JSON_Resolver::get_merged_data
-	 */
-	public function test_get_merged_data_returns_origin_custom() {
-		switch_theme( 'block-theme' ); // make sure there is data from the theme origin
-
-		// start saving user data
+		// Make sure there is data from the user origin.
 		wp_set_current_user( self::$administrator_id );
 		$user_cpt = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( wp_get_theme(), true );
 		$config = json_decode( $user_cpt['post_content'], true );
@@ -400,12 +402,177 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		);
 		$user_cpt['post_content'] = wp_json_encode( $config );
 		wp_update_post( $user_cpt, true, false );
-		// end saving user data
 
-		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_settings();
-		$this->assertTrue( isset( $settings['color']['palette']['default'] ) );
-		$this->assertTrue( isset( $settings['color']['palette']['theme'] ) );
-		$this->assertTrue( isset( $settings['color']['palette']['custom'] ) );
+		$theme_json = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( 'default' );
+		$settings   = $theme_json->get_settings();
+		$styles     = $theme_json->get_styles_block_nodes();
+		$this->assertTrue( isset( $settings['color']['palette']['default'] ), 'core palette is present' );
+		$this->assertFalse( isset( $styles[4] ) , 'block styles are not present' );
+		$this->assertFalse( isset( $settings['color']['palette']['theme'] ), 'theme palette is not present' );
+		$this->assertFalse( isset( $settings['color']['palette']['custom'] ), 'user palette is not present' );
+		unregister_block_type( 'my/block-with-styles' );
+	}
+
+	/**
+	 * @covers WP_Theme_JSON_Resolver::get_merged_data
+	 */
+	public function test_get_merged_data_returns_origin_blocks() {
+		// Make sure there is data from the blocks origin.
+		register_block_type(
+			'my/block-with-styles',
+			array(
+				'api_version' => 2,
+				'attributes'  => array(
+					'borderColor' => array(
+						'type' => 'string',
+					),
+					'style'       => array(
+						'type' => 'object',
+					),
+				),
+				'supports'    => array(
+					'__experimentalStyle' => array(
+						'typography' => array(
+							'fontSize' => '42rem',
+						),
+					),
+				),
+			),
+		);
+
+		// Make sure there is data from the theme origin.
+		switch_theme( 'block-theme' );
+
+		// Make sure there is data from the user origin.
+		wp_set_current_user( self::$administrator_id );
+		$user_cpt = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( wp_get_theme(), true );
+		$config = json_decode( $user_cpt['post_content'], true );
+		$config['settings']['color']['palette']['custom'] = array(
+			array(
+				'color' => 'hotpink',
+				'name'  => 'My color',
+				'slug'  => 'my-color'
+			)
+		);
+		$user_cpt['post_content'] = wp_json_encode( $config );
+		wp_update_post( $user_cpt, true, false );
+
+		$theme_json = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( 'blocks' );
+		$settings   = $theme_json->get_settings();
+		$styles     = $theme_json->get_styles_block_nodes();
+		$this->assertTrue( isset( $settings['color']['palette']['default'] ), 'core palette is present' );
+		$this->assertSame( $styles[4]['name'], 'my/block-with-styles' , 'block styles are present' );
+		$this->assertFalse( isset( $settings['color']['palette']['theme'] ), 'theme palette is not present' );
+		$this->assertFalse( isset( $settings['color']['palette']['custom'] ), 'user palette is not present' );
+		unregister_block_type( 'my/block-with-styles' );
+	}
+
+	/**
+	 * @covers WP_Theme_JSON_Resolver::get_merged_data
+	 */
+	public function test_get_merged_data_returns_origin_theme() {
+		// Make sure there is data from the blocks origin.
+		register_block_type(
+			'my/block-with-styles',
+			array(
+				'api_version' => 2,
+				'attributes'  => array(
+					'borderColor' => array(
+						'type' => 'string',
+					),
+					'style'       => array(
+						'type' => 'object',
+					),
+				),
+				'supports'    => array(
+					'__experimentalStyle' => array(
+						'typography' => array(
+							'fontSize' => '42rem',
+						),
+					),
+				),
+			),
+		);
+
+		// Make sure there is data from the theme origin.
+		switch_theme( 'block-theme' );
+
+		// Make sure there is data from the user origin.
+		wp_set_current_user( self::$administrator_id );
+		$user_cpt = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( wp_get_theme(), true );
+		$config = json_decode( $user_cpt['post_content'], true );
+		$config['settings']['color']['palette']['custom'] = array(
+			array(
+				'color' => 'hotpink',
+				'name'  => 'My color',
+				'slug'  => 'my-color'
+			)
+		);
+		$user_cpt['post_content'] = wp_json_encode( $config );
+		wp_update_post( $user_cpt, true, false );
+
+		$theme_json = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( 'theme' );
+		$settings   = $theme_json->get_settings();
+		$styles     = $theme_json->get_styles_block_nodes();
+		$this->assertTrue( isset( $settings['color']['palette']['default'] ), 'core palette is present' );
+		$this->assertSame( $styles[4]['name'], 'my/block-with-styles' , 'block styles are present' );
+		$this->assertTrue( isset( $settings['color']['palette']['theme'] ), 'theme palette is present' );
+		$this->assertFalse( isset( $settings['color']['palette']['custom'] ), 'user palette is not present' );
+		unregister_block_type( 'my/block-with-styles' );
+	}
+
+	/**
+	 * @covers WP_Theme_JSON_Resolver::get_merged_data
+	 */
+	public function test_get_merged_data_returns_origin_custom() {
+		// Make sure there is data from the blocks origin.
+		register_block_type(
+			'my/block-with-styles',
+			array(
+				'api_version' => 2,
+				'attributes'  => array(
+					'borderColor' => array(
+						'type' => 'string',
+					),
+					'style'       => array(
+						'type' => 'object',
+					),
+				),
+				'supports'    => array(
+					'__experimentalStyle' => array(
+						'typography' => array(
+							'fontSize' => '42rem',
+						),
+					),
+				),
+			),
+		);
+
+		// Make sure there is data from the theme origin.
+		switch_theme( 'block-theme' );
+
+		// Make sure there is data from the user origin.
+		wp_set_current_user( self::$administrator_id );
+		$user_cpt = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( wp_get_theme(), true );
+		$config = json_decode( $user_cpt['post_content'], true );
+		$config['settings']['color']['palette']['custom'] = array(
+			array(
+				'color' => 'hotpink',
+				'name'  => 'My color',
+				'slug'  => 'my-color'
+			)
+		);
+		$user_cpt['post_content'] = wp_json_encode( $config );
+		wp_update_post( $user_cpt, true, false );
+
+		$theme_json = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
+		$settings   = $theme_json->get_settings();
+		$styles     = $theme_json->get_styles_block_nodes();
+		$this->assertTrue( isset( $settings['color']['palette']['default'] ), 'core palette is present' );
+		$this->assertSame( $styles[4]['name'], 'my/block-with-styles' , 'block styles are present' );
+		$this->assertTrue( isset( $settings['color']['palette']['theme'] ), 'theme palette is present' );
+		$this->assertTrue( isset( $settings['color']['palette']['custom'] ), 'user palette is present' );
+		unregister_block_type( 'my/block-with-styles' );
 	}
 
 }
