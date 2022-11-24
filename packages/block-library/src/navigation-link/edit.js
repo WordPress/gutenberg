@@ -12,7 +12,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Button,
 	PanelBody,
-	Popover,
 	TextControl,
 	TextareaControl,
 	ToolbarButton,
@@ -21,40 +20,33 @@ import {
 	KeyboardShortcuts,
 } from '@wordpress/components';
 import { displayShortcut, isKeyboardEvent, ENTER } from '@wordpress/keycodes';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
 	BlockIcon,
 	InspectorControls,
 	RichText,
-	__experimentalLinkControl as LinkControl,
 	useBlockProps,
 	store as blockEditorStore,
 	getColorClassName,
 	useInnerBlocksProps,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
-import {
-	Fragment,
-	useState,
-	useEffect,
-	useRef,
-	createInterpolateElement,
-} from '@wordpress/element';
+import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import {
 	store as coreStore,
 	useResourcePermissions,
 } from '@wordpress/core-data';
-import { decodeEntities } from '@wordpress/html-entities';
+
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { name } from './block.json';
-import { updateAttributes } from './update-attributes';
+import { LinkUI } from './link-ui';
 
 /**
  * A React hook to determine if it's dragging within the target element.
@@ -115,7 +107,7 @@ const useIsDraggingWithin = ( elementRef ) => {
  * @param {string} kind Link block's entity of kind (post-type|taxonomy)
  * @return {{ type?: string, subtype?: string }} Search query params.
  */
-function getSuggestionsQuery( type, kind ) {
+export function getSuggestionsQuery( type, kind ) {
 	switch ( type ) {
 		case 'post':
 		case 'page':
@@ -270,7 +262,7 @@ function navStripHTML( html ) {
  * Add transforms to Link Control
  */
 
-function LinkControlTransforms( { clientId, replace } ) {
+export function LinkControlTransforms( { clientId, replace } ) {
 	const { getBlock, blockTransforms } = useSelect(
 		( select ) => {
 			const {
@@ -364,7 +356,7 @@ export default function NavigationLinkEdit( {
 		opensInNewTab,
 		title: label && navStripHTML( label ), // don't allow HTML to display inside the <LinkControl>
 	};
-	const { saveEntityRecord } = useDispatch( coreStore );
+
 	const { replaceBlock, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
@@ -520,33 +512,6 @@ export default function NavigationLinkEdit( {
 		userCanCreate = pagesPermissions.canCreate;
 	} else if ( type === 'post' ) {
 		userCanCreate = postsPermissions.canCreate;
-	}
-
-	async function handleCreate( pageTitle ) {
-		const postType = type || 'page';
-
-		const page = await saveEntityRecord( 'postType', postType, {
-			title: pageTitle,
-			status: 'draft',
-		} );
-
-		return {
-			id: page.id,
-			type: postType,
-			// Make `title` property consistent with that in `fetchLinkSuggestions` where the `rendered` title (containing HTML entities)
-			// is also being decoded. By being consistent in both locations we avoid having to branch in the rendering output code.
-			// Ideally in the future we will update both APIs to utilise the "raw" form of the title which is better suited to edit contexts.
-			// e.g.
-			// - title.raw = "Yes & No"
-			// - title.rendered = "Yes &#038; No"
-			// - decodeEntities( title.rendered ) = "Yes & No"
-			// See:
-			// - https://github.com/WordPress/gutenberg/pull/41063
-			// - https://github.com/WordPress/gutenberg/blob/a1e1fdc0e6278457e9f4fc0b31ac6d2095f5450b/packages/core-data/src/fetch/__experimental-fetch-link-suggestions.js#L212-L218
-			title: decodeEntities( page.title.rendered ),
-			url: page.link,
-			kind: 'post-type',
-		};
 	}
 
 	const {
@@ -787,64 +752,20 @@ export default function NavigationLinkEdit( {
 						</>
 					) }
 					{ isLinkOpen && (
-						<Popover
-							placement="bottom"
-							onClose={ () => setIsLinkOpen( false ) }
-							anchor={ popoverAnchor }
-							shift
-						>
-							<LinkControl
-								hasTextControl
-								hasRichPreviews
-								className="wp-block-navigation-link__inline-link-input"
-								value={ link }
-								showInitialSuggestions={ true }
-								withCreateSuggestion={ userCanCreate }
-								createSuggestion={ handleCreate }
-								createSuggestionButtonText={ ( searchTerm ) => {
-									let format;
-									if ( type === 'post' ) {
-										/* translators: %s: search term. */
-										format = __(
-											'Create draft post: <mark>%s</mark>'
-										);
-									} else {
-										/* translators: %s: search term. */
-										format = __(
-											'Create draft page: <mark>%s</mark>'
-										);
-									}
-									return createInterpolateElement(
-										sprintf( format, searchTerm ),
-										{ mark: <mark /> }
-									);
-								} }
-								noDirectEntry={ !! type }
-								noURLSuggestion={ !! type }
-								suggestionsQuery={ getSuggestionsQuery(
-									type,
-									kind
-								) }
-								onChange={ ( updatedValue ) =>
-									updateAttributes(
-										updatedValue,
-										setAttributes,
-										attributes
-									)
-								}
-								onRemove={ removeLink }
-								renderControlBottom={
-									! url
-										? () => (
-												<LinkControlTransforms
-													clientId={ clientId }
-													replace={ replaceBlock }
-												/>
-										  )
-										: null
-								}
-							/>
-						</Popover>
+						<LinkUI
+							attributes={ attributes }
+							setAttributes={ setAttributes }
+							clientId={ clientId }
+							type={ type }
+							url={ url }
+							kind={ kind }
+							link={ link }
+							replaceBlock={ replaceBlock }
+							setIsLinkOpen={ setIsLinkOpen }
+							popoverAnchor={ popoverAnchor }
+							userCanCreate={ userCanCreate }
+							onRemove={ removeLink }
+						></LinkUI>
 					) }
 				</a>
 				<div { ...innerBlocksProps } />
