@@ -262,7 +262,7 @@ function navStripHTML( html ) {
  * Add transforms to Link Control
  */
 
-export function LinkControlTransforms( { clientId, replace } ) {
+export function LinkControlTransforms( { clientId } ) {
 	const { getBlock, blockTransforms } = useSelect(
 		( select ) => {
 			const {
@@ -281,6 +281,8 @@ export function LinkControlTransforms( { clientId, replace } ) {
 		},
 		[ clientId ]
 	);
+
+	const { replaceBlock } = useDispatch( blockEditorStore );
 
 	const featuredBlocks = [
 		'core/site-logo',
@@ -306,7 +308,7 @@ export function LinkControlTransforms( { clientId, replace } ) {
 						<Button
 							key={ `transform-${ index }` }
 							onClick={ () =>
-								replace(
+								replaceBlock(
 									clientId,
 									switchToBlockType(
 										getBlock( clientId ),
@@ -760,7 +762,6 @@ export default function NavigationLinkEdit( {
 							url={ url }
 							kind={ kind }
 							linkValue={ link }
-							replaceBlock={ replaceBlock }
 							setIsLinkOpen={ setIsLinkOpen }
 							popoverAnchor={ popoverAnchor }
 							hasCreateSuggestion={ userCanCreate }

@@ -97,7 +97,6 @@ export function LinkUI( props ) {
 						? () => (
 								<LinkControlTransforms
 									clientId={ props.clientId }
-									replace={ props.replaceBlock }
 								/>
 						  )
 						: null
