@@ -238,6 +238,35 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @covers next_tag
+	 * @covers is_tag_closer
+	 */
+	public function test_next_tag_should_stop_on_closers_only_when_requested() {
+		$p = new WP_HTML_Tag_Processor( '<div><img /></div>' );
+		$this->assertTrue( $p->next_tag( array( 'tag_name' => 'div' ) ), 'Did not find desired tag opener' );
+		$this->assertFalse( $p->next_tag( array( 'tag_name' => 'div' ) ), 'Visited an unwanted tag, a tag closer' );
+
+		$p = new WP_HTML_Tag_Processor( '<div><img /></div>' );
+		$p->next_tag(
+			array(
+				'tag_name'    => 'div',
+				'tag_closers' => 'visit',
+			)
+		);
+		$this->assertFalse( $p->is_tag_closer(), 'Indicated a tag opener is a tag closer' );
+		$this->assertTrue(
+			$p->next_tag(
+				array(
+					'tag_name'    => 'div',
+					'tag_closers' => 'visit',
+				)
+			),
+			'Did not stop at desired tag closer'
+		);
+		$this->assertTrue( $p->is_tag_closer(), 'Indicated a tag closer is a tag opener' );
+	}
+
+	/**
 	 * @ticket 56299
 	 *
 	 * @covers next_tag
@@ -250,6 +279,33 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 		$p->set_attribute( 'id', 'primary' );
 		$this->assertSame(
 			self::HTML_SIMPLE,
+			$p->get_updated_html(),
+			'Calling get_updated_html after updating a non-existing tag returned an HTML that was different from the original HTML'
+		);
+	}
+
+	public function test_attribute_ops_on_tag_closer_do_not_change_the_markup() {
+		$p = new WP_HTML_Tag_Processor( '<div id=3></div invalid-id=4>' );
+		$p->next_tag(
+			array(
+				'tag_name'    => 'div',
+				'tag_closers' => 'visit',
+			)
+		);
+		$this->assertFalse( $p->is_tag_closer(), 'Skipped tag opener' );
+		$p->next_tag(
+			array(
+				'tag_name'    => 'div',
+				'tag_closers' => 'visit',
+			)
+		);
+		$this->assertTrue( $p->is_tag_closer(), 'Skipped tag closer' );
+		$this->assertFalse( $p->set_attribute( 'id', 'test' ), "Allowed setting an attribute on a tag closer when it shouldn't have" );
+		$this->assertFalse( $p->remove_attribute( 'invalid-id' ), "Allowed removing an attribute on a tag closer when it shouldn't have" );
+		$this->assertFalse( $p->add_class( 'sneaky' ), "Allowed adding a class on a tag closer when it shouldn't have" );
+		$this->assertFalse( $p->remove_class( 'not-appearing-in-this-test' ), "Allowed removing a class on a tag closer when it shouldn't have" );
+		$this->assertSame(
+			'<div id=3></div invalid-id=4>',
 			$p->get_updated_html(),
 			'Calling get_updated_html after updating a non-existing tag returned an HTML that was different from the original HTML'
 		);

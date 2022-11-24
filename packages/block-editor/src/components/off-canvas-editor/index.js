@@ -5,7 +5,11 @@ import {
 	useMergeRefs,
 	__experimentalUseFixedWindowList as useFixedWindowList,
 } from '@wordpress/compose';
-import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
+import {
+	__experimentalTreeGrid as TreeGrid,
+	__experimentalTreeGridRow as TreeGridRow,
+	__experimentalTreeGridCell as TreeGridCell,
+} from '@wordpress/components';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import {
 	useCallback,
@@ -28,6 +32,7 @@ import useListViewClientIds from './use-list-view-client-ids';
 import useListViewDropZone from './use-list-view-drop-zone';
 import useListViewExpandSelectedItem from './use-list-view-expand-selected-item';
 import { store as blockEditorStore } from '../../store';
+import { Appender } from './appender';
 
 const expanded = ( state, action ) => {
 	if ( Array.isArray( action.clientIds ) ) {
@@ -104,9 +109,9 @@ function __ExperimentalOffCanvasEditor(
 		setExpandedState,
 	} );
 	const selectEditorBlock = useCallback(
-		( event, clientId ) => {
-			updateBlockSelection( event, clientId );
-			setSelectedTreeId( clientId );
+		( event, blockClientId ) => {
+			updateBlockSelection( event, blockClientId );
+			setSelectedTreeId( blockClientId );
 		},
 		[ setSelectedTreeId, updateBlockSelection ]
 	);
@@ -128,20 +133,26 @@ function __ExperimentalOffCanvasEditor(
 	);
 
 	const expand = useCallback(
-		( clientId ) => {
-			if ( ! clientId ) {
+		( blockClientId ) => {
+			if ( ! blockClientId ) {
 				return;
 			}
-			setExpandedState( { type: 'expand', clientIds: [ clientId ] } );
+			setExpandedState( {
+				type: 'expand',
+				clientIds: [ blockClientId ],
+			} );
 		},
 		[ setExpandedState ]
 	);
 	const collapse = useCallback(
-		( clientId ) => {
-			if ( ! clientId ) {
+		( blockClientId ) => {
+			if ( ! blockClientId ) {
 				return;
 			}
-			setExpandedState( { type: 'collapse', clientIds: [ clientId ] } );
+			setExpandedState( {
+				type: 'collapse',
+				clientIds: [ blockClientId ],
+			} );
 		},
 		[ setExpandedState ]
 	);
@@ -208,9 +219,22 @@ function __ExperimentalOffCanvasEditor(
 						shouldShowInnerBlocks={ shouldShowInnerBlocks }
 						selectBlockInCanvas={ selectBlockInCanvas }
 					/>
+					<TreeGridRow
+						level={ 1 }
+						setSize={ 1 }
+						positionInSet={ 1 }
+						isExpanded={ true }
+					>
+						<TreeGridCell>
+							{ ( treeGridCellProps ) => (
+								<Appender { ...treeGridCellProps } />
+							) }
+						</TreeGridCell>
+					</TreeGridRow>
 				</ListViewContext.Provider>
 			</TreeGrid>
 		</AsyncModeProvider>
 	);
 }
+
 export default forwardRef( __ExperimentalOffCanvasEditor );

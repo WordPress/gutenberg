@@ -106,7 +106,10 @@ function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
 	const contentBlocks = useContentBlocks( blockTypes, block );
 	return (
 		<div className="block-editor-block-inspector">
-			<BlockCard { ...blockInformation } />
+			<BlockCard
+				{ ...blockInformation }
+				className={ blockInformation.isSynced && 'is-synced' }
+			/>
 			<BlockVariationTransforms blockClientId={ topLevelLockedBlock } />
 			<VStack
 				spacing={ 1 }
@@ -136,6 +139,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 		selectedBlockClientId,
 		blockType,
 		topLevelLockedBlock,
+		parentBlockClientId,
 	} = useSelect( ( select ) => {
 		const {
 			getSelectedBlockClientId,
@@ -143,6 +147,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			getBlockName,
 			__unstableGetContentLockingParent,
 			getTemplateLock,
+			getBlockParents,
 		} = select( blockEditorStore );
 
 		const _selectedBlockClientId = getSelectedBlockClientId();
@@ -161,6 +166,10 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 				( getTemplateLock( _selectedBlockClientId ) === 'contentOnly'
 					? _selectedBlockClientId
 					: undefined ),
+			parentBlockClientId: getBlockParents(
+				_selectedBlockClientId,
+				true
+			)[ 0 ],
 		};
 	}, [] );
 
@@ -230,11 +239,16 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 		<BlockInspectorSingleBlock
 			clientId={ selectedBlockClientId }
 			blockName={ blockType.name }
+			parentBlockClientId={ parentBlockClientId }
 		/>
 	);
 };
 
-const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
+const BlockInspectorSingleBlock = ( {
+	clientId,
+	blockName,
+	parentBlockClientId,
+} ) => {
 	const showTabs = window?.__experimentalEnableBlockInspectorTabs;
 
 	const hasBlockStyles = useSelect(
@@ -247,9 +261,18 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 	);
 	const blockInformation = useBlockDisplayInformation( clientId );
 
+	const { selectBlock } = useDispatch( blockEditorStore );
+
 	return (
 		<div className="block-editor-block-inspector">
-			<BlockCard { ...blockInformation } />
+			<BlockCard
+				{ ...blockInformation }
+				className={ blockInformation.isSynced && 'is-synced' }
+				parentBlockClientId={ parentBlockClientId }
+				handleBackButton={ () => {
+					selectBlock( parentBlockClientId );
+				} }
+			/>
 			<BlockVariationTransforms blockClientId={ clientId } />
 			{ showTabs && (
 				<InspectorControlsTabs

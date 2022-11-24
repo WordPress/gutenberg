@@ -9,6 +9,7 @@
 /**
  * Tests for compiling and rendering styles from a store of CSS rules.
  *
+ * @group style-engine
  * @coversDefaultClass WP_Style_Engine_Processor_Gutenberg
  */
 class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {

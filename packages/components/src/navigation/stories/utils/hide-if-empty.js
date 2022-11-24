@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import Navigation from '..';
-import NavigationItem from '../item';
-import NavigationMenu from '../menu';
+import Navigation from '../..';
+import NavigationItem from '../../item';
+import NavigationMenu from '../../menu';
 
 export function HideIfEmptyStory() {
 	return (

@@ -12,17 +12,20 @@ import { useContext, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Button from '../../button';
-import ColorIndicator from '../../color-indicator';
-import ColorPalette from '../../color-palette';
-import Dropdown from '../../dropdown';
-import Panel from '../../panel';
-import { FlexItem } from '../../flex';
-import { HStack } from '../../h-stack';
-import { Item, ItemGroup } from '../../item-group';
-import { ToolsPanel, ToolsPanelItem, ToolsPanelContext } from '..';
-import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
-import { useCx } from '../../utils';
+import Button from '../../../button';
+import ColorIndicator from '../../../color-indicator';
+import ColorPalette from '../../../color-palette';
+import Dropdown from '../../../dropdown';
+import Panel from '../../../panel';
+import { FlexItem } from '../../../flex';
+import { HStack } from '../../../h-stack';
+import { Item, ItemGroup } from '../../../item-group';
+import { ToolsPanel, ToolsPanelItem, ToolsPanelContext } from '../..';
+import {
+	createSlotFill,
+	Provider as SlotFillProvider,
+} from '../../../slot-fill';
+import { useCx } from '../../../utils';
 
 // Available border colors.
 const colors = [

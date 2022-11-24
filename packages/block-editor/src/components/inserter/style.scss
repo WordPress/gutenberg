@@ -125,6 +125,12 @@ $block-inserter-tabs-height: 44px;
 		.components-tab-panel__tabs-item {
 			flex-grow: 1;
 			margin-bottom: -$border-width;
+			&[id$="reusable"] {
+				flex-grow: inherit;
+				// These are to align the `reusable` icon with the search icon.
+				padding-left: $grid-unit-20;
+				padding-right: $grid-unit-20;
+			}
 		}
 	}
 
