@@ -34,10 +34,18 @@ function flattenBlocks( blocks ) {
 function Image( block ) {
 	const { selectBlock } = useDispatch( blockEditorStore );
 	return (
-		// eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
 		<motion.img
+			tabIndex={ 0 }
+			role="button"
+			aria-label={ __( 'Select image block.' ) }
 			onClick={ () => {
 				selectBlock( block.clientId );
+			} }
+			onKeyDown={ ( event ) => {
+				if ( event.key === 'Enter' || event.key === ' ' ) {
+					selectBlock( block.clientId );
+					event.preventDefault();
+				}
 			} }
 			key={ block.clientId }
 			alt={ block.attributes.alt }
