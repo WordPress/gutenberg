@@ -13,3 +13,14 @@
 		color: #fff;
 	}
 }
+
+.offcanvas-editor-list-view-tree-wrapper {
+	max-width: 100%;
+	overflow-x: auto;
+}
+
+.offcanvas-editor-list-view-leaf {
+	display: block;
+	// sidebar width - tab panel padding
+	max-width: $sidebar-width - (2 * $grid-unit-20);
+}
