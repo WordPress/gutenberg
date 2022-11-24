@@ -118,7 +118,8 @@ function Navigation( {
 
 	// Preload classic menus, so that they don't suddenly pop-in when viewing
 	// the Select Menu dropdown.
-	const { menus: classicMenus } = useNavigationEntities();
+	const { menus: classicMenus, menuLocations: menuLocations } =
+		useNavigationEntities();
 
 	const [ showNavigationMenuStatusNotice, hideNavigationMenuStatusNotice ] =
 		useNavigationNotice( {
@@ -284,18 +285,34 @@ function Navigation( {
 			! hasResolvedNavigationMenus ||
 			isConvertingClassicMenu ||
 			fallbackNavigationMenus?.length > 0 ||
-			classicMenus?.length !== 1
+			! classicMenus?.length
 		) {
 			return;
 		}
 
 		// If there's non fallback navigation menus and
-		// only one classic menu then create a new navigation menu based on it.
-		convertClassicMenu(
-			classicMenus[ 0 ].id,
-			classicMenus[ 0 ].name,
-			'publish'
+		// a classic menu with a location set to primary,
+		// then create a new navigation menu based on it.
+		// Otherwise, use the first classic menu.
+		const hasPrimaryMenuLocation = menuLocations.filter(
+			( location ) => location.name === 'primary'
+		).length;
+		const primaryMenus = classicMenus.filter( ( classicMenu ) =>
+			classicMenu.locations.includes( 'primary' )
 		);
+		if ( hasPrimaryMenuLocation && primaryMenus.length ) {
+			convertClassicMenu(
+				primaryMenus[ 0 ].id,
+				primaryMenus[ 0 ].name,
+				'publish'
+			);
+		} else {
+			convertClassicMenu(
+				classicMenus[ 0 ].id,
+				classicMenus[ 0 ].name,
+				'publish'
+			);
+		}
 	}, [ hasResolvedNavigationMenus ] );
 
 	const navRef = useRef();
