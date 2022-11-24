@@ -15,8 +15,6 @@ import { useState } from '@wordpress/element';
 import NumberControl from '..';
 import type { NumberControlProps } from '../types';
 
-const getInput = () => screen.getByRole( 'spinbutton' ) as HTMLInputElement;
-
 function StatefulNumberControl( props: NumberControlProps ) {
 	const [ value, setValue ] = useState( props.value );
 	const handleOnChange = ( v: string | undefined ) => setValue( v );
@@ -34,12 +32,12 @@ describe( 'NumberControl', () => {
 	describe( 'Basic rendering', () => {
 		it( 'should render', () => {
 			render( <NumberControl /> );
-			expect( getInput() ).toBeVisible();
+			expect( screen.getByRole( 'spinbutton' ) ).toBeVisible();
 		} );
 
 		it( 'should render custom className', () => {
 			render( <NumberControl className="hello" /> );
-			expect( getInput() ).toBeVisible();
+			expect( screen.getByRole( 'spinbutton' ) ).toBeVisible();
 		} );
 	} );
 
@@ -54,7 +52,7 @@ describe( 'NumberControl', () => {
 				<NumberControl value={ 5 } onChange={ ( v ) => spy( v ) } />
 			);
 
-			const input = getInput();
+			const input = screen.getByRole( 'spinbutton' );
 			await user.clear( input );
 			await user.type( input, '10' );
 
@@ -82,7 +80,7 @@ describe( 'NumberControl', () => {
 				/>
 			);
 
-			const input = getInput();
+			const input = screen.getByRole( 'spinbutton' );
 
 			await user.clear( input );
 			await user.type( input, '1' );
@@ -130,7 +128,7 @@ describe( 'NumberControl', () => {
 				/>
 			);
 
-			const input = getInput();
+			const input = screen.getByRole( 'spinbutton' );
 
 			await user.clear( input );
 			await user.type( input, '14' );
@@ -162,7 +160,7 @@ describe( 'NumberControl', () => {
 
 			render( <NumberControl value={ 5 } min={ 0 } max={ 10 } /> );
 
-			const input = getInput();
+			const input = screen.getByRole( 'spinbutton' );
 
 			await user.clear( input );
 			await user.type( input, '-100' );
@@ -182,7 +180,7 @@ describe( 'NumberControl', () => {
 
 			render( <NumberControl value={ 5 } min={ 0 } max={ 10 } /> );
 
-			const input = getInput();
+			const input = screen.getByRole( 'spinbutton' );
 			await user.clear( input );
 			await user.type( input, '41' );
 
@@ -203,7 +201,7 @@ describe( 'NumberControl', () => {
 
 			render( <NumberControl value={ 5 } required={ true } /> );
 
-			const input = getInput();
+			const input = screen.getByRole( 'spinbutton' );
 			await user.clear( input );
 			await user.type( input, 'abc' );
 			await user.keyboard( '[Enter]' );
@@ -218,7 +216,7 @@ describe( 'NumberControl', () => {
 
 			render( <NumberControl value={ 5 } required={ false } /> );
 
-			const input = getInput();
+			const input = screen.getByRole( 'spinbutton' );
 			await user.clear( input );
 			await user.type( input, 'abc' );
 			await user.keyboard( '[Enter]' );
@@ -236,7 +234,7 @@ describe( 'NumberControl', () => {
 
 			render( <NumberControl value={ 5 } required={ false } /> );
 
-			const input = getInput();
+			const input = screen.getByRole( 'spinbutton' );
 			await user.clear( input );
 			await user.keyboard( '[Enter]' );
 
@@ -253,7 +251,7 @@ describe( 'NumberControl', () => {
 
 			render( <NumberControl value={ 5 } /> );
 
-			const input = getInput();
+			const input = screen.getByRole( 'spinbutton' );
 			await user.clear( input );
 			await user.keyboard( '[Enter]' );
 
@@ -270,7 +268,7 @@ describe( 'NumberControl', () => {
 
 			render( <NumberControl value={ 5 } required={ true } /> );
 
-			const input = getInput();
+			const input = screen.getByRole( 'spinbutton' );
 			await user.clear( input );
 			await user.keyboard( '[Enter]' );
 
@@ -288,7 +286,7 @@ describe( 'NumberControl', () => {
 
 			render( <StatefulNumberControl value={ 5 } onKeyDown={ spy } /> );
 
-			const input = getInput();
+			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
 			await user.keyboard( '[ArrowUp]' );
 
@@ -302,7 +300,7 @@ describe( 'NumberControl', () => {
 
 			render( <StatefulNumberControl value={ 5 } /> );
 
-			const input = getInput();
+			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
 			await user.keyboard( '[ArrowUp]' );
 
@@ -316,7 +314,7 @@ describe( 'NumberControl', () => {
 
 			render( <StatefulNumberControl value={ -5 } /> );
 
-			const input = getInput();
+			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
 			await user.keyboard( '[ArrowUp]' );
 
@@ -330,7 +328,7 @@ describe( 'NumberControl', () => {
 
 			render( <StatefulNumberControl value={ 866.5309 } step="any" /> );
 
-			const input = getInput();
+			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
 			await user.keyboard( '[ArrowUp]' );
 
@@ -344,7 +342,7 @@ describe( 'NumberControl', () => {
 
 			render( <StatefulNumberControl value={ 5 } shiftStep={ 10 } /> );
 
-			const input = getInput();
+			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
 			await user.keyboard( '{Shift>}[ArrowUp]{/Shift}' );
 
@@ -358,7 +356,7 @@ describe( 'NumberControl', () => {
 
 			render( <StatefulNumberControl value={ 857.5309 } step="any" /> );
 
-			const input = getInput();
+			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
 			await user.keyboard( '{Shift>}[ArrowUp]{/Shift}' );
 
@@ -372,7 +370,7 @@ describe( 'NumberControl', () => {
 
 			render( <StatefulNumberControl value={ 5 } shiftStep={ 100 } /> );
 
-			const input = getInput();
+			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
 			await user.keyboard( '{Shift>}[ArrowUp]{/Shift}' );
 
@@ -392,7 +390,7 @@ describe( 'NumberControl', () => {
 				/>
 			);
 
-			const input = getInput();
+			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
 			await user.keyboard( '{Shift>}[ArrowUp]{/Shift}' );
 
@@ -412,7 +410,7 @@ describe( 'NumberControl', () => {
 				/>
 			);
 
-			const input = getInput();
+			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
 			await user.keyboard( '{Shift>}[ArrowUp]{/Shift}' );
 
@@ -429,7 +427,7 @@ describe( 'NumberControl', () => {
 
 			render( <StatefulNumberControl value={ 5 } onKeyDown={ spy } /> );
 
-			const input = getInput();
+			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
 			await user.keyboard( '[ArrowDown]' );
 
@@ -443,7 +441,7 @@ describe( 'NumberControl', () => {
 
 			render( <StatefulNumberControl value={ 5 } /> );
 
-			const input = getInput();
+			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
 			await user.keyboard( '[ArrowDown]' );
 
@@ -457,7 +455,7 @@ describe( 'NumberControl', () => {
 
 			render( <StatefulNumberControl value={ -5 } /> );
 
-			const input = getInput();
+			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
 			await user.keyboard( '[ArrowDown]' );
 
@@ -471,7 +469,7 @@ describe( 'NumberControl', () => {
 
 			render( <StatefulNumberControl value={ 868.5309 } step="any" /> );
 
-			const input = getInput();
+			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
 			await user.keyboard( '[ArrowDown]' );
 
@@ -485,7 +483,7 @@ describe( 'NumberControl', () => {
 
 			render( <StatefulNumberControl value={ 5 } /> );
 
-			const input = getInput();
+			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
 			await user.keyboard( '{Shift>}[ArrowDown]{/Shift}' );
 
@@ -499,7 +497,7 @@ describe( 'NumberControl', () => {
 
 			render( <StatefulNumberControl value={ 877.5309 } step="any" /> );
 
-			const input = getInput();
+			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
 			await user.keyboard( '{Shift>}[ArrowDown]{/Shift}' );
 
@@ -513,7 +511,7 @@ describe( 'NumberControl', () => {
 
 			render( <StatefulNumberControl value={ 5 } shiftStep={ 100 } /> );
 
-			const input = getInput();
+			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
 			await user.keyboard( '{Shift>}[ArrowDown]{/Shift}' );
 
@@ -533,7 +531,7 @@ describe( 'NumberControl', () => {
 				/>
 			);
 
-			const input = getInput();
+			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
 			await user.keyboard( '{Shift>}[ArrowDown]{/Shift}' );
 
@@ -553,7 +551,7 @@ describe( 'NumberControl', () => {
 				/>
 			);
 
-			const input = getInput();
+			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
 			await user.keyboard( '{Shift>}[ArrowDown]{/Shift}' );
 
