@@ -663,7 +663,7 @@ export default function NavigationLinkEdit( {
 							anchor={ popoverAnchor }
 							hasCreateSuggestion={ userCanCreate }
 							onRemove={ removeLink }
-							updateAttributes={ ( updatedValue ) => {
+							onChange={ ( updatedValue ) => {
 								updateAttributes(
 									updatedValue,
 									setAttributes,

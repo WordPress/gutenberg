@@ -185,7 +185,7 @@ export function LinkUI( props ) {
 					props.type,
 					props.kind
 				) }
-				onChange={ props.updateAttributes }
+				onChange={ props.onChange }
 				onRemove={ props.onRemove }
 				renderControlBottom={
 					! props.url
