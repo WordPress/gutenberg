@@ -106,7 +106,10 @@ function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
 	const contentBlocks = useContentBlocks( blockTypes, block );
 	return (
 		<div className="block-editor-block-inspector">
-			<BlockCard { ...blockInformation } />
+			<BlockCard
+				{ ...blockInformation }
+				className={ blockInformation.isSynced && 'is-synced' }
+			/>
 			<BlockVariationTransforms blockClientId={ topLevelLockedBlock } />
 			<VStack
 				spacing={ 1 }
@@ -264,6 +267,7 @@ const BlockInspectorSingleBlock = ( {
 		<div className="block-editor-block-inspector">
 			<BlockCard
 				{ ...blockInformation }
+				className={ blockInformation.isSynced && 'is-synced' }
 				parentBlockClientId={ parentBlockClientId }
 				handleBackButton={ () => {
 					selectBlock( parentBlockClientId );
