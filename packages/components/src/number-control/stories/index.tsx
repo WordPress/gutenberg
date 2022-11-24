@@ -24,6 +24,10 @@ const meta: ComponentMeta< typeof NumberControl > = {
 		type: { control: { type: 'text' } },
 		value: { control: null },
 	},
+	parameters: {
+		controls: { expanded: true },
+		docs: { source: { state: 'open' } },
+	},
 };
 
 export default meta;
