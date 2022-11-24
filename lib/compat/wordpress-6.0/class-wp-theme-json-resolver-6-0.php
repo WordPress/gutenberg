@@ -55,7 +55,7 @@ class WP_Theme_JSON_Resolver_6_0 extends WP_Theme_JSON_Resolver {
 			_deprecated_argument( __METHOD__, '5.9' );
 		}
 
-		$options  = wp_parse_args( $options, array( 'with_supports' => true ) );
+		$options = wp_parse_args( $options, array( 'with_supports' => true ) );
 		if ( null === static::$theme ) {
 			$wp_theme        = wp_get_theme();
 			$theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json' ) );
