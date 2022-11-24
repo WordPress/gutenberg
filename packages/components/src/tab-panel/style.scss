@@ -55,8 +55,8 @@
 	&:focus::after {
 		left: $grid-unit-20;
 		right: $grid-unit-20;
-		height: calc(2 * var(--wp-admin-border-width-focus));
-		border-radius: calc(2 * var(--wp-admin-border-width-focus));
+		height: $radius-block-ui;
+		border-radius: $radius-block-ui $radius-block-ui 0 0;
 	}
 
 	&.is-active {
