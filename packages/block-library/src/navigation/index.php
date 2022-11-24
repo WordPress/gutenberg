@@ -416,6 +416,7 @@ function block_core_navigation_get_fallback_blocks() {
 	$fallback_blocks = $registry->is_registered( 'core/page-list' ) ? $page_list_fallback : array();
 
 	// Default to a list of Pages.
+
 	$navigation_post = block_core_navigation_get_most_recently_published_navigation();
 
 	// If there are no navigation posts then try to find a classic menu
