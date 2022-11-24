@@ -379,22 +379,22 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-			),
+			)
 		);
 	}
 
 	public function register_user_data() {
 		wp_set_current_user( self::$administrator_id );
 		$user_cpt = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( wp_get_theme(), true );
-		$config = json_decode( $user_cpt['post_content'], true );
+		$config   = json_decode( $user_cpt['post_content'], true );
 		$config['settings']['color']['palette']['custom'] = array(
 			array(
 				'color' => 'hotpink',
 				'name'  => 'My color',
-				'slug'  => 'my-color'
-			)
+				'slug'  => 'my-color',
+			),
 		);
-		$user_cpt['post_content'] = wp_json_encode( $config );
+		$user_cpt['post_content']                         = wp_json_encode( $config );
 		wp_update_post( $user_cpt, true, false );
 	}
 
@@ -415,10 +415,13 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$settings   = $theme_json->get_settings();
 		$styles     = $theme_json->get_styles_block_nodes();
 		$this->assertTrue( isset( $settings['color']['palette']['default'] ), 'core palette is present' );
-		$block_styles = array_filter( $styles, function( $element ) {
-			return isset( $element['name'] ) && $element['name'] === 'my/block-with-styles';
-		} );
-		$this->assertTrue( count( $block_styles ) === 0 , 'block styles are not present' );
+		$block_styles = array_filter(
+			$styles,
+			function( $element ) {
+				return isset( $element['name'] ) && 'my/block-with-styles' === $element['name'];
+			}
+		);
+		$this->assertTrue( count( $block_styles ) === 0, 'block styles are not present' );
 		$this->assertFalse( isset( $settings['color']['palette']['theme'] ), 'theme palette is not present' );
 		$this->assertFalse( isset( $settings['color']['palette']['custom'] ), 'user palette is not present' );
 
@@ -442,10 +445,13 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$settings   = $theme_json->get_settings();
 		$styles     = $theme_json->get_styles_block_nodes();
 		$this->assertTrue( isset( $settings['color']['palette']['default'] ), 'core palette is present' );
-		$block_styles = array_filter( $styles, function( $element ) {
-			return isset( $element['name'] ) && $element['name'] === 'my/block-with-styles';
-		} );
-		$this->assertTrue( count( $block_styles ) === 1 , 'block styles are present' );
+		$block_styles = array_filter(
+			$styles,
+			function( $element ) {
+				return isset( $element['name'] ) && 'my/block-with-styles' === $element['name'];
+			}
+		);
+		$this->assertTrue( count( $block_styles ) === 1, 'block styles are present' );
 		$this->assertFalse( isset( $settings['color']['palette']['theme'] ), 'theme palette is not present' );
 		$this->assertFalse( isset( $settings['color']['palette']['custom'] ), 'user palette is not present' );
 
@@ -469,10 +475,13 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$settings   = $theme_json->get_settings();
 		$styles     = $theme_json->get_styles_block_nodes();
 		$this->assertTrue( isset( $settings['color']['palette']['default'] ), 'core palette is present' );
-		$block_styles = array_filter( $styles, function( $element ) {
-			return isset( $element['name'] ) && $element['name'] === 'my/block-with-styles';
-		} );
-		$this->assertTrue( count( $block_styles ) === 1 , 'block styles are present' );
+		$block_styles = array_filter(
+			$styles,
+			function( $element ) {
+				return isset( $element['name'] ) && 'my/block-with-styles' === $element['name'];
+			}
+		);
+		$this->assertTrue( count( $block_styles ) === 1, 'block styles are present' );
 		$this->assertTrue( isset( $settings['color']['palette']['theme'] ), 'theme palette is present' );
 		$this->assertFalse( isset( $settings['color']['palette']['custom'] ), 'user palette is not present' );
 
@@ -496,10 +505,13 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$settings   = $theme_json->get_settings();
 		$styles     = $theme_json->get_styles_block_nodes();
 		$this->assertTrue( isset( $settings['color']['palette']['default'] ), 'core palette is present' );
-		$block_styles = array_filter( $styles, function( $element ) {
-			return isset( $element['name'] ) && $element['name'] === 'my/block-with-styles';
-		} );
-		$this->assertTrue( count( $block_styles ) === 1 , 'block styles are present' );
+		$block_styles = array_filter(
+			$styles,
+			function( $element ) {
+				return isset( $element['name'] ) && 'my/block-with-styles' === $element['name'];
+			}
+		);
+		$this->assertTrue( count( $block_styles ) === 1, 'block styles are present' );
 		$this->assertTrue( isset( $settings['color']['palette']['theme'] ), 'theme palette is present' );
 		$this->assertTrue( isset( $settings['color']['palette']['custom'] ), 'user palette is present' );
 
