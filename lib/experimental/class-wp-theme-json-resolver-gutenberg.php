@@ -75,7 +75,7 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_2 {
 		$global_style_query = new WP_Query();
 		$recent_posts       = $global_style_query->query( $args );
 		if ( count( $recent_posts ) === 1 ) {
-			$user_cpt = $recent_posts[0];
+			$user_cpt = get_object_vars( $recent_posts[0] );
 		} elseif ( $create_post ) {
 			$cpt_post_id = wp_insert_post(
 				array(
@@ -91,11 +91,8 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_2 {
 				true
 			);
 			if ( ! is_wp_error( $cpt_post_id ) ) {
-				$user_cpt = get_post( $cpt_post_id );
+				$user_cpt = get_object_vars( get_post( $cpt_post_id ) );
 			}
-		}
-		if ( $user_cpt instanceof WP_Post ) {
-			$user_cpt = get_object_vars( $user_cpt );
 		}
 
 		return $user_cpt;
