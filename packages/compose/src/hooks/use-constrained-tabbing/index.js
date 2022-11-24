@@ -32,9 +32,6 @@ import useRefEffect from '../use-ref-effect';
  */
 function useConstrainedTabbing() {
 	return useRefEffect( ( /** @type {HTMLElement} */ node ) => {
-		/** @type {number|undefined} */
-		let timeoutId;
-
 		function onKeyDown( /** @type {KeyboardEvent} */ event ) {
 			const { keyCode, shiftKey, target } = event;
 
@@ -72,7 +69,6 @@ function useConstrainedTabbing() {
 		node.addEventListener( 'keydown', onKeyDown );
 		return () => {
 			node.removeEventListener( 'keydown', onKeyDown );
-			clearTimeout( timeoutId );
 		};
 	}, [] );
 }
