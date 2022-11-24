@@ -56,9 +56,9 @@ export function LinkUI( props ) {
 				hasTextControl
 				hasRichPreviews
 				className="wp-block-navigation-link__inline-link-input"
-				value={ props.link }
+				value={ props.linkValue }
 				showInitialSuggestions={ true }
-				withCreateSuggestion={ props.userCanCreate }
+				withCreateSuggestion={ props.hasCreateSuggestion }
 				createSuggestion={ handleCreate }
 				createSuggestionButtonText={ ( searchTerm ) => {
 					let format;

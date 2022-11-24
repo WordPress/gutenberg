@@ -759,11 +759,11 @@ export default function NavigationLinkEdit( {
 							type={ type }
 							url={ url }
 							kind={ kind }
-							link={ link }
+							linkValue={ link }
 							replaceBlock={ replaceBlock }
 							setIsLinkOpen={ setIsLinkOpen }
 							popoverAnchor={ popoverAnchor }
-							userCanCreate={ userCanCreate }
+							hasCreateSuggestion={ userCanCreate }
 							onRemove={ removeLink }
 						></LinkUI>
 					) }
