@@ -56,10 +56,6 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 		];
 	}, [ sidebars ] );
 
-	if ( ! options.length ) {
-		return null;
-	}
-
 	async function createFromWidgets( event ) {
 		event.preventDefault();
 
@@ -98,6 +94,7 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 					value={ selectedSidebar }
 					options={ options }
 					onChange={ ( value ) => setSelectedSidebar( value ) }
+					disabled={ ! options.length }
 					__next36pxDefaultSize
 					__nextHasNoMarginBottom
 				/>
