@@ -1,3 +1,5 @@
+// This tab style CSS is duplicated verbatim in
+// /packages/components/src/tab-panel/style.scss
 .components-button.edit-post-sidebar__panel-tab {
 	position: relative;
 	border-radius: 0;
@@ -6,12 +8,11 @@
 	border: none;
 	box-shadow: none;
 	cursor: pointer;
-	display: inline-block;
 	padding: 3px $grid-unit-20; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
 	margin-left: 0;
 	font-weight: 500;
 
-	&:focus {
+	&:focus:not(:disabled) {
 		position: relative;
 		z-index: z-index(".edit-post-sidebar__panel-tab.is-active");
 		box-shadow: none;
