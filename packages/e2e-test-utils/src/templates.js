@@ -46,14 +46,5 @@ export async function deleteAllTemplates( type ) {
 				responseError
 			);
 		}
-
-		if ( ! response?.deleted ) {
-			// Disable reason - the error provides valuable feedback about issues with tests.
-			// eslint-disable-next-line no-console
-			console.warn(
-				`deleteAllTemplates failed to delete template (id: ${ template.wp_id }) with the following response`,
-				response
-			);
-		}
 	}
 }
