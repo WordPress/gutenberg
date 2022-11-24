@@ -31,10 +31,8 @@ export async function deleteAllTemplates( type ) {
 			continue;
 		}
 
-		let response;
-
 		try {
-			response = await rest( {
+			await rest( {
 				path: `${ path }/${ template.id }?force=true`,
 				method: 'DELETE',
 			} );
