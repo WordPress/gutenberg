@@ -39,7 +39,7 @@ import SiteTitle from '../site-title';
 
 const ANIMATION_DURATION = 0.5;
 
-export default function Layout() {
+export default function Layout( { onError } ) {
 	const { params } = useLocation();
 	const isListPage = getIsListPage( params );
 	const isEditorPage = ! isListPage;
@@ -259,7 +259,7 @@ export default function Layout() {
 										ease: 'easeOut',
 									} }
 								>
-									<ErrorBoundary>
+									<ErrorBoundary onError={ onError }>
 										{ isEditorPage && <Editor /> }
 										{ isListPage && <ListPage /> }
 									</ErrorBoundary>
