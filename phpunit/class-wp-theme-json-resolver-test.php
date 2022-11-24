@@ -358,4 +358,54 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$user_cpt = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( $theme );
 		$this->assertEmpty( $user_cpt, 'User CPT is expected to be empty.' );
 	}
+
+	/**
+	 * @covers WP_Theme_JSON_Resolver::get_merged_data
+	 */
+	public function test_get_merged_data_returns_origin_default() {
+		switch_theme( 'block-theme' ); // make sure there is data from the theme origin
+		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( 'default' )->get_settings();
+		$this->assertTrue( isset( $settings['color']['palette']['default'] ) );
+		$this->assertFalse( isset( $settings['color']['palette']['theme'] ) );
+		$this->assertFalse( isset( $settings['color']['palette']['custom'] ) );
+	}
+
+	/**
+	 * @covers WP_Theme_JSON_Resolver::get_merged_data
+	 */
+	public function test_get_merged_data_returns_origin_theme() {
+		switch_theme( 'block-theme' ); // make sure there is data from the theme origin
+		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( 'theme' )->get_settings();
+		$this->assertTrue( isset( $settings['color']['palette']['default'] ) );
+		$this->assertTrue( isset( $settings['color']['palette']['theme'] ) );
+		$this->assertFalse( isset( $settings['color']['palette']['custom'] ) );
+	}
+
+	/**
+	 * @covers WP_Theme_JSON_Resolver::get_merged_data
+	 */
+	public function test_get_merged_data_returns_origin_custom() {
+		switch_theme( 'block-theme' ); // make sure there is data from the theme origin
+
+		// start saving user data
+		wp_set_current_user( self::$administrator_id );
+		$user_cpt = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( wp_get_theme(), true );
+		$config = json_decode( $user_cpt['post_content'], true );
+		$config['settings']['color']['palette']['custom'] = array(
+			array(
+				'color' => 'hotpink',
+				'name'  => 'My color',
+				'slug'  => 'my-color'
+			)
+		);
+		$user_cpt['post_content'] = wp_json_encode( $config );
+		wp_update_post( $user_cpt, true, false );
+		// end saving user data
+
+		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_settings();
+		$this->assertTrue( isset( $settings['color']['palette']['default'] ) );
+		$this->assertTrue( isset( $settings['color']['palette']['theme'] ) );
+		$this->assertTrue( isset( $settings['color']['palette']['custom'] ) );
+	}
+
 }
