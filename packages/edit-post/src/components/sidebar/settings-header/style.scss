@@ -21,30 +21,32 @@
 	&::after {
 		content: "";
 		position: absolute;
-		top: 0;
 		right: 0;
 		bottom: 0;
 		left: 0;
 		pointer-events: none;
 
-		// Animation
-		transition: all 0.2s linear;
-		@include reduce-motion("transition");
+		// Draw the indicator.
+		background: var(--wp-admin-theme-color);
+		height: calc(0 * var(--wp-admin-border-width-focus));
+		border-radius: 0;
 
-		// The transparent shadow ensures no jumpiness when focus animates on an active tab.
-		box-shadow: inset 0 calc(0 * var(--wp-admin-border-width-focus)) 0 0 var(--wp-admin-theme-color);
+		// Animation
+		transition: all 0.1s linear;
+		@include reduce-motion("transition");
 	}
 
 	// Active.
 	&.is-active::after {
-		box-shadow: inset 0 calc(-1 * var(--wp-admin-border-width-focus)) 0 0 var(--wp-admin-theme-color);
+		height: calc(1 * var(--wp-admin-border-width-focus));
 	}
 
 	// Focus.
 	&:focus::after {
-		box-shadow: inset 0 calc(-2 * var(--wp-admin-border-width-focus)) 0 0 var(--wp-admin-theme-color);
 		left: $grid-unit-20;
 		right: $grid-unit-20;
+		height: calc(2 * var(--wp-admin-border-width-focus));
+		border-radius: calc(2 * var(--wp-admin-border-width-focus));
 	}
 
 	&.is-active {
