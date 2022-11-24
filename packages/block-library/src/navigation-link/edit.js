@@ -762,11 +762,11 @@ export default function NavigationLinkEdit( {
 							url={ url }
 							kind={ kind }
 							linkValue={ link }
-							setIsLinkOpen={ setIsLinkOpen }
-							popoverAnchor={ popoverAnchor }
+							onClose={ () => setIsLinkOpen( false ) }
+							anchor={ popoverAnchor }
 							hasCreateSuggestion={ userCanCreate }
 							onRemove={ removeLink }
-						></LinkUI>
+						/>
 					) }
 				</a>
 				<div { ...innerBlocksProps } />

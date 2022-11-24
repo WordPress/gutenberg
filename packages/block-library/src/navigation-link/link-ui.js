@@ -48,8 +48,8 @@ export function LinkUI( props ) {
 	return (
 		<Popover
 			placement="bottom"
-			onClose={ () => props.setIsLinkOpen( false ) }
-			anchor={ props.popoverAnchor }
+			onClose={ props.onClose }
+			anchor={ props.anchor }
 			shift
 		>
 			<LinkControl
