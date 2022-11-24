@@ -4,7 +4,13 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { useSelect, useRegistry } from '@wordpress/data';
-import { Button, SelectControl } from '@wordpress/components';
+import {
+	Button,
+	Flex,
+	FlexBlock,
+	FlexItem,
+	SelectControl,
+} from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -85,21 +91,32 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 	}
 
 	return (
-		<form onSubmit={ createFromWidgets }>
-			<SelectControl
-				label={ __( 'Import widget area' ) }
-				value={ selectedSidebar }
-				options={ options }
-				onChange={ ( value ) => setSelectedSidebar( value ) }
-			/>
-			<Button
-				variant="primary"
-				type="submit"
-				isBusy={ isBusy }
-				aria-disabled={ isBusy || ! selectedSidebar }
+		<Flex as="form" onSubmit={ createFromWidgets }>
+			<FlexBlock>
+				<SelectControl
+					label={ __( 'Import widget area' ) }
+					value={ selectedSidebar }
+					options={ options }
+					onChange={ ( value ) => setSelectedSidebar( value ) }
+					__next36pxDefaultSize
+					__nextHasNoMarginBottom
+				/>
+			</FlexBlock>
+			<FlexItem
+				style={ {
+					marginBottom: '8px',
+					marginTop: 'auto',
+				} }
 			>
-				{ __( 'Import' ) }
-			</Button>
-		</form>
+				<Button
+					variant="primary"
+					type="submit"
+					isBusy={ isBusy }
+					aria-disabled={ isBusy || ! selectedSidebar }
+				>
+					{ __( 'Import' ) }
+				</Button>
+			</FlexItem>
+		</Flex>
 	);
 }
