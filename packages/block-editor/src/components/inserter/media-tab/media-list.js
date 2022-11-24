@@ -15,18 +15,17 @@ import { cloneBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import InserterDraggableBlocks from '../../inserter-draggable-blocks';
-import BlockPreview from '../../block-preview';
-import { getBlockFromMedia } from './utils';
+import { getBlockAndPreviewFromMedia } from './utils';
 
 function MediaPreview( { media, onClick, composite, mediaType } ) {
-	const blocks = useMemo(
-		() => getBlockFromMedia( media, mediaType ),
+	const [ block, preview ] = useMemo(
+		() => getBlockAndPreviewFromMedia( media, mediaType ),
 		[ media, mediaType ]
 	);
 	const title = media.title?.rendered || media.title;
 	const baseCssClass = 'block-editor-inserter__media-list';
 	return (
-		<InserterDraggableBlocks isEnabled={ true } blocks={ [ blocks ] }>
+		<InserterDraggableBlocks isEnabled={ true } blocks={ [ block ] }>
 			{ ( { draggable, onDragStart, onDragEnd } ) => (
 				<div
 					className={ `${ baseCssClass }__list-item` }
@@ -41,15 +40,15 @@ function MediaPreview( { media, onClick, composite, mediaType } ) {
 							{ ...composite }
 							className={ `${ baseCssClass }__item` }
 							onClick={ () => {
-								onClick( blocks );
+								onClick( block );
 							} }
 							aria-label={ title }
 						>
-							<BlockPreview
-								blocks={ blocks }
-								viewportWidth={ 400 }
-								__unstableIframeContentStyles="figure{margin:0;}"
-							/>
+							<div
+								className={ `${ baseCssClass }__item-preview` }
+							>
+								{ preview }
+							</div>
 						</CompositeItem>
 					</Tooltip>
 				</div>

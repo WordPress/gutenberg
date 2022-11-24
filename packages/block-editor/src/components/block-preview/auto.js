@@ -25,7 +25,6 @@ function ScaledBlockPreview( {
 	containerWidth,
 	__experimentalPadding,
 	__experimentalMinHeight,
-	__unstableIframeContentStyles,
 } ) {
 	const [ contentResizeListener, { height: contentHeight } ] =
 		useResizeObserver();
@@ -40,12 +39,8 @@ function ScaledBlockPreview( {
 
 	// Avoid scrollbars for pattern previews.
 	const editorStyles = useMemo( () => {
-		if ( ! styles && ! __unstableIframeContentStyles ) {
-			return;
-		}
-		let _editorStyles = [];
 		if ( styles ) {
-			_editorStyles = [
+			return [
 				...styles,
 				{
 					css: 'body{height:auto;overflow:hidden;}',
@@ -53,11 +48,9 @@ function ScaledBlockPreview( {
 				},
 			];
 		}
-		if ( __unstableIframeContentStyles ) {
-			_editorStyles.push( { css: __unstableIframeContentStyles } );
-		}
-		return _editorStyles;
-	}, [ styles, __unstableIframeContentStyles ] );
+
+		return styles;
+	}, [ styles ] );
 
 	const svgFilters = useMemo( () => {
 		return [ ...( duotone?.default ?? [] ), ...( duotone?.theme ?? [] ) ];

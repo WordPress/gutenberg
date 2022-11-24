@@ -29,7 +29,9 @@ import { MediaCategoryPanel } from './media-panel';
 import MediaUploadCheck from '../../media-upload/check';
 import MediaUpload from '../../media-upload';
 import { useMediaCategories } from './hooks';
-import { getBlockFromMedia } from './utils';
+import { getBlockAndPreviewFromMedia } from './utils';
+
+const ALLOWED_MEDIA_TYPES = [ 'image', 'video', 'audio' ];
 
 function MediaTab( {
 	rootClientId,
@@ -45,7 +47,8 @@ function MediaTab( {
 			if ( ! media?.url ) {
 				return;
 			}
-			onInsert( getBlockFromMedia( media, media.type ) );
+			const [ block ] = getBlockAndPreviewFromMedia( media, media.type );
+			onInsert( block );
 		},
 		[ onInsert ]
 	);
@@ -90,6 +93,7 @@ function MediaTab( {
 									<MediaUpload
 										multiple={ false }
 										onSelect={ onSelectMedia }
+										allowedTypes={ ALLOWED_MEDIA_TYPES }
 										render={ ( { open } ) => (
 											<Button
 												onClick={ open }
