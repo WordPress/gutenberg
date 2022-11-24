@@ -155,8 +155,15 @@ export default function useFocusOutside(
 		// would be when we load modals that are not React components and
 		// therefore don't exist in the React tree. An example is opening
 		// the Media Library modal from another dialog.
+		// This attribute should contain a selector of the related target
+		// we want to ignore, because we still need to trigger the blur event
+		// on all other cases.
+		const ignoreForRelatedTarget = event.target.getAttribute(
+			'data-unstable-ignore-focus-outside-for-relatedtarget'
+		);
 		if (
-			event.target.hasAttribute( 'data-unstable-ignore-focus-outside' )
+			ignoreForRelatedTarget &&
+			event.relatedTarget?.closest( ignoreForRelatedTarget )
 		) {
 			return;
 		}
