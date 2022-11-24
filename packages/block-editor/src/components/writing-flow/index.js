@@ -79,7 +79,7 @@ export function useWritingFlow() {
 						'block-' + selectedClientId
 					);
 					const blockLabel =
-						blockElement.getAttribute( 'aria-label' );
+						blockElement?.getAttribute( 'aria-label' );
 
 					node.setAttribute( 'aria-label', blockLabel );
 
