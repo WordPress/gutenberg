@@ -1,4 +1,5 @@
 .components-button.edit-post-sidebar__panel-tab {
+	position: relative;
 	border-radius: 0;
 	height: $grid-unit-60;
 	background: transparent;
@@ -6,27 +7,47 @@
 	box-shadow: none;
 	cursor: pointer;
 	display: inline-block;
-	padding: 3px 15px; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
+	padding: 3px $grid-unit-20; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
 	margin-left: 0;
 	font-weight: 500;
 
-	// This pseudo-element "duplicates" the tab label and sets the text to bold.
-	// This ensures that the tab doesn't change width when selected.
-	// See: https://github.com/WordPress/gutenberg/pull/9793
+	&:focus {
+		position: relative;
+		z-index: z-index(".edit-post-sidebar__panel-tab.is-active");
+		box-shadow: none;
+	}
+
+	// Tab indicator
 	&::after {
-		content: attr(data-label);
-		display: block;
-		font-weight: 600;
-		height: 0;
-		overflow: hidden;
-		speak: none;
-		visibility: hidden;
+		content: "";
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		pointer-events: none;
+
+		// Animation
+		transition: all 0.2s linear;
+		@include reduce-motion("transition");
+
+		// The transparent shadow ensures no jumpiness when focus animates on an active tab.
+		box-shadow: inset 0 calc(0 * var(--wp-admin-border-width-focus)) 0 0 var(--wp-admin-theme-color);
+	}
+
+	// Active.
+	&.is-active::after {
+		box-shadow: inset 0 calc(-1 * var(--wp-admin-border-width-focus)) 0 0 var(--wp-admin-theme-color);
+	}
+
+	// Focus.
+	&:focus::after {
+		box-shadow: inset 0 calc(-2 * var(--wp-admin-border-width-focus)) 0 0 var(--wp-admin-theme-color);
+		left: $grid-unit-20;
+		right: $grid-unit-20;
 	}
 
 	&.is-active {
-		// The transparent shadow ensures no jumpiness when focus animates on an active tab.
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) transparent, inset 0 0 -$border-width-tab 0 0 var(--wp-admin-theme-color);
-		position: relative;
 		z-index: z-index(".edit-post-sidebar__panel-tab.is-active");
 
 		// This border appears in Windows High Contrast mode instead of the box-shadow.
@@ -37,17 +58,8 @@
 			bottom: 1px;
 			right: 0;
 			left: 0;
-			border-bottom: $border-width-tab solid transparent;
+			border-bottom: 3px solid transparent;
+			z-index: z-index(".edit-post-sidebar__panel-tab.is-active");
 		}
-	}
-
-	&:focus {
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-		position: relative;
-		z-index: z-index(".edit-post-sidebar__panel-tab.is-active");
-	}
-
-	&.is-active:focus {
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 -#{$border-width-tab * 2} 0 0 var(--wp-admin-theme-color);
 	}
 }

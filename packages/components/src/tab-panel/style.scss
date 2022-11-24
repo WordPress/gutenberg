@@ -20,18 +20,6 @@
 	transition: box-shadow 0.1s linear;
 	box-sizing: border-box;
 
-	// This pseudo-element "duplicates" the tab label and sets the text to bold.
-	// This ensures that the tab doesn't change width when selected.
-	// See: https://github.com/WordPress/gutenberg/pull/9793
-	&::after {
-		content: attr(data-label);
-		display: block;
-		height: 0;
-		overflow: hidden;
-		speak: none;
-		visibility: hidden;
-	}
-
 	&:focus:not(:disabled) {
 		box-shadow: inset 0 var(--wp-admin-border-width-focus) $components-color-accent;
 	}
