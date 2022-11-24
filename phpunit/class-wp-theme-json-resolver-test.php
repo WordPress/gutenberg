@@ -415,7 +415,10 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$settings   = $theme_json->get_settings();
 		$styles     = $theme_json->get_styles_block_nodes();
 		$this->assertTrue( isset( $settings['color']['palette']['default'] ), 'core palette is present' );
-		$this->assertFalse( isset( $styles[4] ) , 'block styles are not present' );
+		$block_styles = array_filter( $styles, function( $element ) {
+			return isset( $element['name'] ) && $element['name'] === 'my/block-with-styles';
+		} );
+		$this->assertTrue( count( $block_styles ) === 0 , 'block styles are not present' );
 		$this->assertFalse( isset( $settings['color']['palette']['theme'] ), 'theme palette is not present' );
 		$this->assertFalse( isset( $settings['color']['palette']['custom'] ), 'user palette is not present' );
 
@@ -439,7 +442,10 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$settings   = $theme_json->get_settings();
 		$styles     = $theme_json->get_styles_block_nodes();
 		$this->assertTrue( isset( $settings['color']['palette']['default'] ), 'core palette is present' );
-		$this->assertSame( $styles[4]['name'], 'my/block-with-styles' , 'block styles are present' );
+		$block_styles = array_filter( $styles, function( $element ) {
+			return isset( $element['name'] ) && $element['name'] === 'my/block-with-styles';
+		} );
+		$this->assertTrue( count( $block_styles ) === 1 , 'block styles are present' );
 		$this->assertFalse( isset( $settings['color']['palette']['theme'] ), 'theme palette is not present' );
 		$this->assertFalse( isset( $settings['color']['palette']['custom'] ), 'user palette is not present' );
 
@@ -463,7 +469,10 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$settings   = $theme_json->get_settings();
 		$styles     = $theme_json->get_styles_block_nodes();
 		$this->assertTrue( isset( $settings['color']['palette']['default'] ), 'core palette is present' );
-		$this->assertSame( $styles[4]['name'], 'my/block-with-styles' , 'block styles are present' );
+		$block_styles = array_filter( $styles, function( $element ) {
+			return isset( $element['name'] ) && $element['name'] === 'my/block-with-styles';
+		} );
+		$this->assertTrue( count( $block_styles ) === 1 , 'block styles are present' );
 		$this->assertTrue( isset( $settings['color']['palette']['theme'] ), 'theme palette is present' );
 		$this->assertFalse( isset( $settings['color']['palette']['custom'] ), 'user palette is not present' );
 
@@ -487,7 +496,10 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$settings   = $theme_json->get_settings();
 		$styles     = $theme_json->get_styles_block_nodes();
 		$this->assertTrue( isset( $settings['color']['palette']['default'] ), 'core palette is present' );
-		$this->assertSame( $styles[4]['name'], 'my/block-with-styles' , 'block styles are present' );
+		$block_styles = array_filter( $styles, function( $element ) {
+			return isset( $element['name'] ) && $element['name'] === 'my/block-with-styles';
+		} );
+		$this->assertTrue( count( $block_styles ) === 1 , 'block styles are present' );
 		$this->assertTrue( isset( $settings['color']['palette']['theme'] ), 'theme palette is present' );
 		$this->assertTrue( isset( $settings['color']['palette']['custom'] ), 'user palette is present' );
 
