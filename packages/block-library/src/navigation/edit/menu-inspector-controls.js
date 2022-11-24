@@ -27,22 +27,9 @@ const WrappedNavigationMenuSelector = ( {
 	createNavigationMenuIsError,
 } ) => (
 	<NavigationMenuSelector
+		convertClassicMenu={ convertClassicMenu }
 		currentMenuId={ currentMenuId }
-		onSelectNavigationMenu={ ( menuId ) => {
-			handleUpdateMenu( menuId );
-		} }
-		onSelectClassicMenu={ async ( classicMenu ) => {
-			const navMenu = await convertClassicMenu(
-				classicMenu.id,
-				classicMenu.name,
-				'draft'
-			);
-			if ( navMenu ) {
-				handleUpdateMenu( navMenu.id, {
-					focusNavigationBlock: true,
-				} );
-			}
-		} }
+		handleUpdateMenu={ handleUpdateMenu }
 		onCreateNew={ onCreateNew }
 		createNavigationMenuIsSuccess={ createNavigationMenuIsSuccess }
 		createNavigationMenuIsError={ createNavigationMenuIsError }

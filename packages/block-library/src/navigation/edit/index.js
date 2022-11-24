@@ -767,24 +767,11 @@ function Navigation( {
 					currentMenuId={ ref }
 					clientId={ clientId }
 					canUserCreateNavigationMenu={ canUserCreateNavigationMenu }
+					convertClassicMenu={ convertClassicMenu }
+					handleUpdateMenu={ handleUpdateMenu }
 					isResolvingCanUserCreateNavigationMenu={
 						isResolvingCanUserCreateNavigationMenu
 					}
-					onSelectNavigationMenu={ ( menuId ) => {
-						handleUpdateMenu( menuId );
-					} }
-					onSelectClassicMenu={ async ( classicMenu ) => {
-						const navMenu = await convertClassicMenu(
-							classicMenu.id,
-							classicMenu.name,
-							'draft'
-						);
-						if ( navMenu ) {
-							handleUpdateMenu( navMenu.id, {
-								focusNavigationBlock: true,
-							} );
-						}
-					} }
 					onCreateEmpty={ createUntitledEmptyNavigationMenu }
 				/>
 			</TagName>

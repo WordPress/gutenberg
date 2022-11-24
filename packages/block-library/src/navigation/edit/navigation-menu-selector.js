@@ -22,9 +22,9 @@ import useNavigationMenu from '../use-navigation-menu';
 import useNavigationEntities from '../use-navigation-entities';
 
 function NavigationMenuSelector( {
+	convertClassicMenu,
 	currentMenuId,
-	onSelectNavigationMenu,
-	onSelectClassicMenu,
+	handleUpdateMenu,
 	onCreateNew,
 	actionLabel,
 	createNavigationMenuIsSuccess,
@@ -59,6 +59,19 @@ function NavigationMenuSelector( {
 		'wp_navigation',
 		'title'
 	);
+
+	const onSelectClassicMenu = async ( classicMenu ) => {
+		const navMenu = await convertClassicMenu(
+			classicMenu.id,
+			classicMenu.name,
+			'draft'
+		);
+		if ( navMenu ) {
+			handleUpdateMenu( navMenu.id, {
+				focusNavigationBlock: true,
+			} );
+		}
+	};
 
 	const shouldEnableMenuSelector =
 		( canSwitchNavigationMenu || canUserCreateNavigationMenu ) &&
@@ -98,6 +111,10 @@ function NavigationMenuSelector( {
 	const noBlockMenus = ! hasNavigationMenus && hasResolvedNavigationMenus;
 	const menuUnavailable =
 		hasResolvedNavigationMenus && currentMenuId === null;
+
+	const onSelectNavigationMenu = ( menuId ) => {
+		handleUpdateMenu( menuId );
+	};
 
 	useEffect( () => {
 		if ( ! hasResolvedNavigationMenus ) {
