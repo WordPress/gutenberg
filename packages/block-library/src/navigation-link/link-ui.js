@@ -13,7 +13,6 @@ import { decodeEntities } from '@wordpress/html-entities';
  * Internal dependencies
  */
 import { getSuggestionsQuery, LinkControlTransforms } from './edit';
-import { updateAttributes } from './update-attributes';
 
 export function LinkUI( props ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
@@ -84,13 +83,7 @@ export function LinkUI( props ) {
 					props.type,
 					props.kind
 				) }
-				onChange={ ( updatedValue ) =>
-					updateAttributes(
-						updatedValue,
-						props.setAttributes,
-						props.attributes
-					)
-				}
+				onChange={ props.updateAttributes }
 				onRemove={ props.onRemove }
 				renderControlBottom={
 					! props.url

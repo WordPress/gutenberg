@@ -47,6 +47,7 @@ import { useMergeRefs } from '@wordpress/compose';
  */
 import { name } from './block.json';
 import { LinkUI } from './link-ui';
+import { updateAttributes } from './update-attributes';
 
 /**
  * A React hook to determine if it's dragging within the target element.
@@ -755,8 +756,6 @@ export default function NavigationLinkEdit( {
 					) }
 					{ isLinkOpen && (
 						<LinkUI
-							attributes={ attributes }
-							setAttributes={ setAttributes }
 							clientId={ clientId }
 							type={ type }
 							url={ url }
@@ -766,6 +765,13 @@ export default function NavigationLinkEdit( {
 							anchor={ popoverAnchor }
 							hasCreateSuggestion={ userCanCreate }
 							onRemove={ removeLink }
+							updateAttributes={ ( updatedValue ) => {
+								updateAttributes(
+									updatedValue,
+									setAttributes,
+									attributes
+								);
+							} }
 						/>
 					) }
 				</a>
