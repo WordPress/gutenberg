@@ -183,13 +183,8 @@ export default function Image( {
 		}
 
 		window
-			.fetch(
-				`${
-					window.ajaxurl
-				}?action=gutenberg_fetch_media&url=${ encodeURIComponent(
-					url
-				) }`
-			)
+			// Avoid cache, which seems to help avoid CORS problems.
+			.fetch( url.includes( '?' ) ? url : url + '?' )
 			.then( ( response ) => response.blob() )
 			.then( ( blob ) => setExternalBlob( blob ) )
 			// Do nothing, cannot upload.

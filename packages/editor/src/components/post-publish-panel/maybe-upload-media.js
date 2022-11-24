@@ -92,11 +92,9 @@ export default function PostFormatPanel() {
 			externalImages.map( ( image ) =>
 				window
 					.fetch(
-						`${
-							window.ajaxurl
-						}?action=gutenberg_fetch_media&url=${ encodeURIComponent(
-							image.attributes.url
-						) }`
+						image.attributes.url.includes( '?' )
+							? image.attributes.url
+							: image.attributes.url + '?'
 					)
 					.then( ( response ) => response.blob() )
 					.then(
@@ -137,7 +135,7 @@ export default function PostFormatPanel() {
 			<div
 				style={ {
 					display: 'inline-flex',
-					'flex-wrap': 'wrap',
+					flexWrap: 'wrap',
 					gap: '8px',
 				} }
 			>
