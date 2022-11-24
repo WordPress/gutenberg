@@ -18,6 +18,7 @@ import {
 	__unstablePresetDuotoneFilter as PresetDuotoneFilter,
 	__experimentalGetGapCSSValue as getGapCSSValue,
 	store as blockEditorStore,
+	BlockGlobalStylesContext,
 } from '@wordpress/block-editor';
 
 /**
@@ -883,7 +884,10 @@ function updateConfigWithSeparator( config ) {
 
 export function useGlobalStylesOutput() {
 	let { merged: mergedConfig } = useContext( GlobalStylesContext );
-
+	const { merged: mergedBlockStyles } = useContext(
+		BlockGlobalStylesContext
+	);
+	console.log( 'mergedBlockStyles', mergedBlockStyles );
 	const [ blockGap ] = useSetting( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGap !== null;
 	const hasFallbackGapSupport = ! hasBlockGapSupport; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback styles support.

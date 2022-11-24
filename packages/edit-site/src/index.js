@@ -15,7 +15,7 @@ import {
 import { store as editorStore } from '@wordpress/editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { addFilter } from '@wordpress/hooks';
+import { addFilter, removeFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -117,6 +117,10 @@ export function initializeEditor( id, settings ) {
 
 	reinitializeEditor( target, settings );
 }
+
+// Removes the block supports edit controls added in packages/block-editor/src/hooks/style.js,
+// so that we can register another in packages/edit-site/src/hooks/block-supports-styles.js.
+removeFilter( 'editor.BlockEdit', 'core/style/with-block-controls' );
 
 export { default as PluginSidebar } from './components/sidebar-edit-mode/plugin-sidebar';
 export { default as PluginSidebarMoreMenuItem } from './components/header-edit-mode/plugin-sidebar-more-menu-item';

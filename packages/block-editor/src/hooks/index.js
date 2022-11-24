@@ -27,3 +27,7 @@ export { getSpacingClassesAndStyles } from './use-spacing-props';
 export { getTypographyClassesAndStyles } from './use-typography-props';
 export { getGapCSSValue } from './gap';
 export { useCachedTruthy } from './use-cached-truthy';
+export { BORDER_SUPPORT_KEY, BorderPanel } from './border';
+export { COLOR_SUPPORT_KEY, ColorEdit } from './color';
+export { TypographyPanel, TYPOGRAPHY_SUPPORT_KEY } from './typography';
+export { SPACING_SUPPORT_KEY, DimensionsPanel } from './dimensions';

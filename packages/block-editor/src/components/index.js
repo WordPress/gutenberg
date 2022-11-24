@@ -157,7 +157,7 @@ export {
 export { default as __experimentalBlockPatternsList } from './block-patterns-list';
 export { default as __experimentalPublishDateTimePicker } from './publish-date-time-picker';
 export { default as __experimentalInspectorPopoverHeader } from './inspector-popover-header';
-
+export { default as useDisplayBlockControls } from './use-display-block-controls';
 /*
  * State Related Components
  */

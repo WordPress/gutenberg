@@ -8,8 +8,9 @@ import shadow from './shadow';
 import outline from './outline';
 import spacing from './spacing';
 import typography from './typography';
+import { getCSSVarFromStyleValue } from './utils';
 
-export const styleDefinitions = [
+const styleDefinitions = [
 	...border,
 	...color,
 	...dimensions,
@@ -18,3 +19,5 @@ export const styleDefinitions = [
 	...typography,
 	...shadow,
 ];
+
+export { getCSSVarFromStyleValue, styleDefinitions };

@@ -12,7 +12,7 @@ import type {
 	GeneratedCSSRule,
 	StyleDefinition,
 } from './types';
-import { styleDefinitions } from './styles';
+import { styleDefinitions, getCSSVarFromStyleValue } from './styles';
 
 /**
  * Generates a stylesheet for a given style object and selector.
@@ -78,3 +78,6 @@ export function getCSSRules(
 
 	return rules;
 }
+
+/* Styles utility functions */
+export { getCSSVarFromStyleValue };

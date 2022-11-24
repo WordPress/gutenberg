@@ -129,6 +129,7 @@ export function GapEdit( props ) {
 		attributes: { style },
 		name: blockName,
 		setAttributes,
+		setBlockGlobalStyles,
 	} = props;
 
 	const spacingSizes = useSetting( 'spacing.spacingSizes' );
@@ -174,6 +175,11 @@ export function GapEdit( props ) {
 		setAttributes( {
 			style: cleanEmptyObject( newStyle ),
 		} );
+
+		setBlockGlobalStyles(
+			'spacing.blockGap',
+			cleanEmptyObject( newStyle )
+		);
 
 		// In Safari, changing the `gap` CSS value on its own will not trigger the layout
 		// to be recalculated / re-rendered. To force the updated gap to re-render, here

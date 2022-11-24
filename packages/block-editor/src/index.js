@@ -14,6 +14,10 @@ export {
 	useCachedTruthy,
 	useLayoutClasses as __experimentaluseLayoutClasses,
 	useLayoutStyles as __experimentaluseLayoutStyles,
+	ColorEdit,
+	TypographyPanel,
+	BorderPanel,
+	DimensionsPanel,
 } from './hooks';
 export * from './components';
 export * from './elements';

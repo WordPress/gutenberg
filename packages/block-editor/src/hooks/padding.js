@@ -137,10 +137,7 @@ export function PaddingEdit( props ) {
 			style: cleanEmptyObject( newStyle ),
 		} );
 
-		setBlockGlobalStyles(
-			'spacing.padding',
-			cleanEmptyObject( newStyle )
-		);
+		setBlockGlobalStyles( 'spacing.padding', cleanEmptyObject( newStyle ) );
 	};
 
 	return Platform.select( {

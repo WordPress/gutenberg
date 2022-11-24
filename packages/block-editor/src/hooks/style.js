@@ -425,14 +425,12 @@ export const withBlockControls = createHigherOrderComponent(
 		const shouldDisplayControls = useDisplayBlockControls();
 
 		return (
-			<>
+			<BlockGlobalStylesProvider>
 				{ shouldDisplayControls && (
-					<BlockGlobalStylesProvider>
-						<StylePanels { ...props } />
-					</BlockGlobalStylesProvider>
+					<StylePanels { ...props } />
 				) }
 				<BlockEdit { ...props } />
-			</>
+			</BlockGlobalStylesProvider>
 		);
 	},
 	'withToolbarControls'

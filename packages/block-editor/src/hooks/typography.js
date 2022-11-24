@@ -1,4 +1,4 @@
-/**
+	/**
  * WordPress dependencies
  */
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
