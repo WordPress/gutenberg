@@ -63,10 +63,12 @@ export const setTemplate =
 	( templateId, templateSlug ) =>
 	async ( { dispatch, registry } ) => {
 		if ( ! templateSlug ) {
-			const template = await registry
-				.resolveSelect( coreStore )
-				.getEntityRecord( 'postType', 'wp_template', templateId );
-			templateSlug = template?.slug;
+			try {
+				const template = await registry
+					.resolveSelect( coreStore )
+					.getEntityRecord( 'postType', 'wp_template', templateId );
+				templateSlug = template?.slug;
+			} catch ( error ) {}
 		}
 
 		dispatch( {
