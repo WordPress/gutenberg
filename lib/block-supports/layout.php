@@ -368,7 +368,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$content = new WP_HTML_Tag_Processor( $block_content );
 		$content->next_tag();
 		$content->add_class( implode( ' ', $outer_class_names ) );
-		return $content;
+		return (string) $content;
 	}
 
 	$block_gap              = gutenberg_get_global_settings( array( 'spacing', 'blockGap' ) );
