@@ -246,9 +246,17 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 				</ResizableEditor>
 				<__unstableBlockSettingsMenuFirstItem>
 					{ ( { onClose } ) => (
-						<BlockInspectorButton onClick={ onClose } />
+						<__unstableBlockNameContext.Consumer>
+							{ ( blockName ) =>
+								blockName !== 'core/navigation-link' &&
+								blockName !== 'core/navigation-submenu' && (
+									<BlockInspectorButton onClick={ onClose } />
+								)
+							}
+						</__unstableBlockNameContext.Consumer>
 					) }
 				</__unstableBlockSettingsMenuFirstItem>
+
 				<__unstableBlockToolbarLastItem>
 					<__unstableBlockNameContext.Consumer>
 						{ ( blockName ) =>

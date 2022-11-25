@@ -30,6 +30,7 @@ import {
 	__experimentalRecursionProvider as RecursionProvider,
 	__experimentaluseLayoutClasses as useLayoutClasses,
 	__experimentaluseLayoutStyles as useLayoutStyles,
+	__unstableBlockNameContext,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useMemo } from '@wordpress/element';
 import { Button, __unstableMotion as motion } from '@wordpress/components';
@@ -398,7 +399,14 @@ export default function VisualEditor( { styles } ) {
 			</motion.div>
 			<__unstableBlockSettingsMenuFirstItem>
 				{ ( { onClose } ) => (
-					<BlockInspectorButton onClick={ onClose } />
+					<__unstableBlockNameContext.Consumer>
+						{ ( blockName ) =>
+							blockName !== 'core/navigation-link' &&
+							blockName !== 'core/navigation-submenu' && (
+								<BlockInspectorButton onClick={ onClose } />
+							)
+						}
+					</__unstableBlockNameContext.Consumer>
 				) }
 			</__unstableBlockSettingsMenuFirstItem>
 		</BlockTools>
