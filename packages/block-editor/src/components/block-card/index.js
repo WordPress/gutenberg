@@ -30,11 +30,12 @@ function BlockCard( { title, icon, description, blockType, className } ) {
 	const isOffCanvasNavigationEditorEnabled =
 		window?.__experimentalEnableOffCanvasNavigationEditor === true;
 
-	const { closestControllingBlockClientId } = useSelect( ( select ) => {
+	const { closestControllingBlock } = useSelect( ( select ) => {
 		const {
 			getSelectedBlockClientId,
 			getBlockParents,
 			areInnerBlocksControlled,
+			getBlock,
 		} = select( blockEditorStore );
 
 		const _selectedBlockClientId = getSelectedBlockClientId();
@@ -42,13 +43,17 @@ function BlockCard( { title, icon, description, blockType, className } ) {
 		const blockParents = getBlockParents( _selectedBlockClientId, true );
 
 		// Find the first parent that is controlling its inner blocks.
-		const _closestControllingBlockClientId = blockParents.find(
+		const closestControllingBlockClientId = blockParents.find(
 			( parentBlockClientId ) =>
 				areInnerBlocksControlled( parentBlockClientId )
 		);
 
+		const _closestControllingBlock = getBlock(
+			closestControllingBlockClientId
+		);
+
 		return {
-			closestControllingBlockClientId: _closestControllingBlockClientId,
+			closestControllingBlock: _closestControllingBlock,
 		};
 	}, [] );
 
@@ -59,16 +64,18 @@ function BlockCard( { title, icon, description, blockType, className } ) {
 	// Currently limited to the offcanvas experiment but may be opened up to all
 	// blocks which meet the criteria in future.
 	const showBackButton =
-		isOffCanvasNavigationEditorEnabled && closestControllingBlockClientId;
+		isOffCanvasNavigationEditorEnabled &&
+		closestControllingBlock?.name !== 'core/template-part' &&
+		closestControllingBlock?.name !== 'core/block';
 
 	return (
 		<div className={ classnames( 'block-editor-block-card', className ) }>
 			{ showBackButton && (
 				<Button
 					onClick={ () =>
-						selectBlock( closestControllingBlockClientId )
+						selectBlock( closestControllingBlock?.clientId )
 					}
-					label={ __( 'Go to parent Navigation block' ) }
+					label={ __( 'Go to controlling block' ) }
 					style={
 						// TODO: This style override is also used in ToolsPanelHeader.
 						// It should be supported out-of-the-box by Button.
