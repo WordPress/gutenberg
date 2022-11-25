@@ -31,4 +31,39 @@ class WP_HTML_Tag_Processor_Rewind_Test {
 			$p->get_updated_html()
 		);
 	}
+
+	public function test_updates_bookmark_for_changes_after_both_sides() {
+		$p = new WP_HTML_Tag_Processor( '<div>First</div><div>Second</div>' );
+		$p->next_tag();
+		$p->set_bookmark( 'first' );
+		$p->next_tag();
+		$p->add_class( 'second' );
+
+		$p->rewind( 'first' );
+		$p->add_class( 'first' );
+
+		$this->assertEquals(
+			'<div class="first">First</div><div class="second">Second</div>',
+			$p->get_updated_html()
+		);
+	}
+
+	public function test_updates_bookmark_for_changes_before_both_sides() {
+		$p = new WP_HTML_Tag_Processor( '<div>First</div><div>Second</div>' );
+		$p->next_tag();
+		$p->set_bookmark( 'first' );
+		$p->next_tag();
+		$p->set_bookmark( 'second' );
+
+		$p->rewind( 'first' );
+		$p->add_class( 'first' );
+
+		$p->rewind( 'second' );
+		$p->add_class( 'second' );
+
+		$this->assertEquals(
+			'<div class="first">First</div><div class="second">Second</div>',
+			$p->get_updated_html()
+		);
+	}
 }
