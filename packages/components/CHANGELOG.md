@@ -6,6 +6,9 @@
 
 -   `TabPanel`: Add ability to set icon only tab buttons ([#45005](https://github.com/WordPress/gutenberg/pull/45005)).
 
+### Internal
+-   `LinkedButton`: remove unnecessary `span` tag ([#46063](https://github.com/WordPress/gutenberg/pull/46063))
+
 ## 22.1.0 (2022-11-16)
 
 ### Enhancements
