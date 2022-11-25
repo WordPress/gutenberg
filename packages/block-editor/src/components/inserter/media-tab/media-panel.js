@@ -37,7 +37,7 @@ export function MediaCategoryDialog( { rootClientId, onInsert, category } ) {
 
 export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 	const [ search, setSearch, debouncedSearch ] = useDebouncedInput();
-	const results = useMediaResults( {
+	const mediaList = useMediaResults( {
 		per_page: !! debouncedSearch ? 20 : INITIAL_MEDIA_ITEMS_PER_PAGE,
 		media_type: category.mediaType,
 		search: debouncedSearch,
@@ -61,19 +61,19 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 					category.label.toLocaleLowerCase()
 				) }
 			/>
-			{ ! results && (
+			{ ! mediaList && (
 				<div className={ `${ baseCssClass }-spinner` }>
 					<Spinner />
 				</div>
 			) }
-			{ Array.isArray( results ) && ! results.length && (
+			{ Array.isArray( mediaList ) && ! mediaList.length && (
 				<InserterNoResults />
 			) }
-			{ !! results?.length && (
+			{ !! mediaList?.length && (
 				<MediaList
 					rootClientId={ rootClientId }
 					onClick={ onInsert }
-					results={ results }
+					mediaList={ mediaList }
 					mediaType={ category.mediaType }
 				/>
 			) }

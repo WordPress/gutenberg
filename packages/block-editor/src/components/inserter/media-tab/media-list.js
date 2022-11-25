@@ -58,7 +58,7 @@ function MediaPreview( { media, onClick, composite, mediaType } ) {
 }
 
 function MediaList( {
-	results,
+	mediaList,
 	mediaType,
 	onClick,
 	label = __( 'Media List' ),
@@ -77,7 +77,7 @@ function MediaList( {
 			className="block-editor-inserter__media-list"
 			aria-label={ label }
 		>
-			{ results.map( ( media ) => (
+			{ mediaList.map( ( media ) => (
 				<MediaPreview
 					key={ media.id }
 					media={ media }

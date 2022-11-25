@@ -216,7 +216,8 @@ function InserterMenu(
 
 	const showPatternPanel =
 		selectedTab === 'patterns' && ! filterValue && selectedPatternCategory;
-	const showAsTabs = ! filterValue && ( showPatterns || hasReusableBlocks );
+	const showAsTabs =
+		! filterValue && ( showPatterns || hasReusableBlocks || showMedia );
 	const showMediaPanel =
 		selectedTab === 'media' && ! filterValue && selectedMediaCategory;
 	return (
