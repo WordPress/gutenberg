@@ -176,7 +176,7 @@ export default function NewTemplate( { postType } ) {
 	if ( ! missingTemplates.length ) {
 		return null;
 	}
-	console.log({ missingTemplates });
+	console.log( { missingTemplates } );
 	return (
 		<>
 			<DropdownMenu
@@ -272,6 +272,7 @@ export default function NewTemplate( { postType } ) {
 			) }
 			{ showAddNewTemplateModal && (
 				<AddNewTemplateModal
+					missingTemplates={ missingTemplates }
 					onClose={ () => setShowAddNewTemplateModal( false ) }
 				/>
 			) }
@@ -279,13 +280,10 @@ export default function NewTemplate( { postType } ) {
 	);
 }
 
-function useMissingTemplates(
-	setEntityForSuggestions,
-	setShowCustomTemplateModal
-) {
+function useMissingTemplates() {
 	const existingTemplates = useExistingTemplates();
 	const defaultTemplateTypes = useDefaultTemplateTypes();
-	console.log({defaultTemplateTypes});
+	console.log( { defaultTemplateTypes } );
 	const existingTemplateSlugs = ( existingTemplates || [] ).map(
 		( { slug } ) => slug
 	);
@@ -294,22 +292,21 @@ function useMissingTemplates(
 			DEFAULT_TEMPLATE_SLUGS.includes( template.slug ) &&
 			! existingTemplateSlugs.includes( template.slug )
 	);
-	const onClickMenuItem = ( _entityForSuggestions ) => {
-		setShowCustomTemplateModal( true );
-		setEntityForSuggestions( _entityForSuggestions );
-	};
 	// We need to replace existing default template types with
 	// the create specific template functionality. The original
 	// info (title, description, etc.) is preserved in the
 	// used hooks.
 	const enhancedMissingDefaultTemplateTypes = [ ...missingDefaultTemplates ];
-	console.log({enhancedMissingDefaultTemplateTypes, missingDefaultTemplates});
+	console.log( {
+		enhancedMissingDefaultTemplateTypes,
+		missingDefaultTemplates,
+	} );
 	const { defaultTaxonomiesMenuItems, taxonomiesMenuItems } =
-		useTaxonomiesMenuItems( onClickMenuItem );
+		useTaxonomiesMenuItems();
 	const { defaultPostTypesMenuItems, postTypesMenuItems } =
-		usePostTypeMenuItems( onClickMenuItem );
+		usePostTypeMenuItems();
 
-	const authorMenuItem = useAuthorMenuItem( onClickMenuItem );
+	const authorMenuItem = useAuthorMenuItem();
 	[
 		...defaultTaxonomiesMenuItems,
 		...defaultPostTypesMenuItems,
@@ -339,7 +336,7 @@ function useMissingTemplates(
 			DEFAULT_TEMPLATE_SLUGS.indexOf( template2.slug )
 		);
 	} );
-	console.log({enhancedMissingDefaultTemplateTypes});
+	console.log( { enhancedMissingDefaultTemplateTypes } );
 	const missingTemplates = [
 		...enhancedMissingDefaultTemplateTypes,
 		...usePostTypeArchiveMenuItems(),

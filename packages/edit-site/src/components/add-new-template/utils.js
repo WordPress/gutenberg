@@ -164,7 +164,7 @@ export function usePostTypeArchiveMenuItems() {
 	);
 }
 
-export const usePostTypeMenuItems = ( onClickMenuItem ) => {
+export const usePostTypeMenuItems = () => {
 	const publicPostTypes = usePublicPostTypes();
 	const existingTemplates = useExistingTemplates();
 	const defaultTemplateTypes = useDefaultTemplateTypes();
@@ -236,40 +236,36 @@ export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 				  };
 			const hasEntities = postTypesInfo?.[ slug ]?.hasEntities;
 			// We have a different template creation flow only if they have entities.
-			if ( hasEntities ) {
-				menuItem.onClick = ( template ) => {
-					onClickMenuItem( {
-						type: 'postType',
-						slug,
-						config: {
-							recordNamePath: 'title.rendered',
-							queryArgs: ( { search } ) => {
-								return {
-									_fields: 'id,title,slug,link',
-									orderBy: search ? 'relevance' : 'modified',
-									exclude:
-										postTypesInfo[ slug ]
-											.existingEntitiesIds,
-								};
-							},
-							getSpecificTemplate: ( suggestion ) => {
-								const templateSlug = `${ templatePrefixes[ slug ] }-${ suggestion.slug }`;
-								return {
-									title: templateSlug,
-									slug: templateSlug,
-									templatePrefix: templatePrefixes[ slug ],
-								};
-							},
-						},
-						labels,
-						hasGeneralTemplate,
-						template,
-					} );
-				};
-			}
+
 			// We don't need to add the menu item if there are no
 			// entities and the general template exists.
 			if ( ! hasGeneralTemplate || hasEntities ) {
+				menuItem.entityForSugestions = {
+					type: 'postType',
+					slug,
+					config: {
+						recordNamePath: 'title.rendered',
+						queryArgs: ( { search } ) => {
+							return {
+								_fields: 'id,title,slug,link',
+								orderBy: search ? 'relevance' : 'modified',
+								exclude:
+									postTypesInfo[ slug ].existingEntitiesIds,
+							};
+						},
+						getSpecificTemplate: ( suggestion ) => {
+							const templateSlug = `${ templatePrefixes[ slug ] }-${ suggestion.slug }`;
+							return {
+								title: templateSlug,
+								slug: templateSlug,
+								templatePrefix: templatePrefixes[ slug ],
+							};
+						},
+					},
+					labels,
+					hasGeneralTemplate,
+					hasEntities,
+				};
 				accumulator.push( menuItem );
 			}
 			return accumulator;
@@ -297,7 +293,7 @@ export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 	return postTypesMenuItems;
 };
 
-export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
+export const useTaxonomiesMenuItems = () => {
 	const publicTaxonomies = usePublicTaxonomies();
 	const existingTemplates = useExistingTemplates();
 	const defaultTemplateTypes = useDefaultTemplateTypes();
@@ -381,42 +377,38 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 						templatePrefix: templatePrefixes[ slug ],
 				  };
 			const hasEntities = taxonomiesInfo?.[ slug ]?.hasEntities;
-			// We have a different template creation flow only if they have entities.
-			if ( hasEntities ) {
-				menuItem.onClick = ( template ) => {
-					onClickMenuItem( {
-						type: 'taxonomy',
-						slug,
-						config: {
-							queryArgs: ( { search } ) => {
-								return {
-									_fields: 'id,name,slug,link',
-									orderBy: search ? 'name' : 'count',
-									exclude:
-										taxonomiesInfo[ slug ]
-											.existingEntitiesIds,
-								};
-							},
-							getSpecificTemplate: ( suggestion ) => {
-								const templateSlug = `${ templatePrefixes[ slug ] }-${ suggestion.slug }`;
-								return {
-									title: templateSlug,
-									slug: templateSlug,
-									templatePrefix: templatePrefixes[ slug ],
-								};
-							},
-						},
-						labels,
-						hasGeneralTemplate,
-						template,
-					} );
-				};
-			}
+
 			// We don't need to add the menu item if there are no
 			// entities and the general template exists.
 			if ( ! hasGeneralTemplate || hasEntities ) {
+				menuItem.entityForSugestions = {
+					type: 'taxonomy',
+					slug,
+					config: {
+						queryArgs: ( { search } ) => {
+							return {
+								_fields: 'id,name,slug,link',
+								orderBy: search ? 'name' : 'count',
+								exclude:
+									taxonomiesInfo[ slug ].existingEntitiesIds,
+							};
+						},
+						getSpecificTemplate: ( suggestion ) => {
+							const templateSlug = `${ templatePrefixes[ slug ] }-${ suggestion.slug }`;
+							return {
+								title: templateSlug,
+								slug: templateSlug,
+								templatePrefix: templatePrefixes[ slug ],
+							};
+						},
+					},
+					labels,
+					hasGeneralTemplate,
+					hasEntities,
+				};
 				accumulator.push( menuItem );
 			}
+
 			return accumulator;
 		},
 		[]
@@ -444,7 +436,7 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 
 const USE_AUTHOR_MENU_ITEM_TEMPLATE_PREFIX = { user: 'author' };
 const USE_AUTHOR_MENU_ITEM_QUERY_PARAMETERS = { user: { who: 'authors' } };
-export function useAuthorMenuItem( onClickMenuItem ) {
+export function useAuthorMenuItem() {
 	const existingTemplates = useExistingTemplates();
 	const defaultTemplateTypes = useDefaultTemplateTypes();
 	const authorInfo = useEntitiesInfo(
@@ -469,40 +461,36 @@ export function useAuthorMenuItem( onClickMenuItem ) {
 	);
 	if ( authorInfo.user?.hasEntities ) {
 		authorMenuItem = { ...authorMenuItem, templatePrefix: 'author' };
-		authorMenuItem.onClick = ( template ) => {
-			onClickMenuItem( {
-				type: 'root',
-				slug: 'user',
-				config: {
-					queryArgs: ( { search } ) => {
-						return {
-							_fields: 'id,name,slug,link',
-							orderBy: search ? 'name' : 'registered_date',
-							exclude: authorInfo.user.existingEntitiesIds,
-							who: 'authors',
-						};
-					},
-					getSpecificTemplate: ( suggestion ) => {
-						const templateSlug = `author-${ suggestion.slug }`;
-						return {
-							title: templateSlug,
-							slug: templateSlug,
-							templatePrefix: 'author',
-						};
-					},
+		authorMenuItem.entityForSugestions = {
+			type: 'root',
+			slug: 'user',
+			config: {
+				queryArgs: ( { search } ) => {
+					return {
+						_fields: 'id,name,slug,link',
+						orderBy: search ? 'name' : 'registered_date',
+						exclude: authorInfo.user.existingEntitiesIds,
+						who: 'authors',
+					};
 				},
-				labels: {
-					singular_name: __( 'Author' ),
-					search_items: __( 'Search Authors' ),
-					not_found: __( 'No authors found.' ),
-					all_items: __( 'All Authors' ),
+				getSpecificTemplate: ( suggestion ) => {
+					const templateSlug = `author-${ suggestion.slug }`;
+					return {
+						title: templateSlug,
+						slug: templateSlug,
+						templatePrefix: 'author',
+					};
 				},
-				hasGeneralTemplate,
-				template,
-			} );
+			},
+			labels: {
+				singular_name: __( 'Author' ),
+				search_items: __( 'Search Authors' ),
+				not_found: __( 'No authors found.' ),
+				all_items: __( 'All Authors' ),
+			},
+			hasGeneralTemplate,
+			hasEntities: authorInfo.user?.hasEntities,
 		};
-	}
-	if ( ! hasGeneralTemplate || authorInfo.user?.hasEntities ) {
 		return authorMenuItem;
 	}
 }

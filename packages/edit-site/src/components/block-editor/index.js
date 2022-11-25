@@ -7,12 +7,8 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback, useMemo, useRef, Fragment } from '@wordpress/element';
-import {
-	useEntityBlockEditor,
-	__experimentalFetchMedia as fetchMedia,
-	store as coreStore,
-} from '@wordpress/core-data';
+import { useCallback, useRef, Fragment } from '@wordpress/element';
+import { useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	BlockList,
 	BlockEditorProvider,
@@ -43,6 +39,7 @@ import { store as editSiteStore } from '../../store';
 import BlockInspectorButton from './block-inspector-button';
 import BackButton from './back-button';
 import ResizableEditor from './resizable-editor';
+import useBlockEditorSettings from './use-block-editor-settings';
 
 const LAYOUT = {
 	type: 'default',
@@ -53,93 +50,24 @@ const LAYOUT = {
 const NAVIGATION_SIDEBAR_NAME = 'edit-site/navigation-menu';
 
 export default function BlockEditor( { setIsInserterOpen } ) {
-	const {
-		storedSettings,
-		templateType,
-		templateId,
-		page,
-		isNavigationSidebarOpen,
-	} = useSelect(
-		( select ) => {
-			const { getSettings, getEditedPostType, getEditedPostId, getPage } =
-				select( editSiteStore );
+	const { templateType, templateId, page, isNavigationSidebarOpen } =
+		useSelect(
+			( select ) => {
+				const { getEditedPostType, getEditedPostId, getPage } =
+					select( editSiteStore );
 
-			return {
-				storedSettings: getSettings( setIsInserterOpen ),
-				templateType: getEditedPostType(),
-				templateId: getEditedPostId(),
-				page: getPage(),
-				isNavigationSidebarOpen:
-					select( interfaceStore ).getActiveComplementaryArea(
-						editSiteStore.name
-					) === NAVIGATION_SIDEBAR_NAME,
-			};
-		},
-		[ setIsInserterOpen ]
-	);
-
-	const settingsBlockPatterns =
-		storedSettings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
-		storedSettings.__experimentalBlockPatterns; // WP 5.9
-	const settingsBlockPatternCategories =
-		storedSettings.__experimentalAdditionalBlockPatternCategories ?? // WP 6.0
-		storedSettings.__experimentalBlockPatternCategories; // WP 5.9
-
-	const { restBlockPatterns, restBlockPatternCategories } = useSelect(
-		( select ) => ( {
-			restBlockPatterns: select( coreStore ).getBlockPatterns(),
-			restBlockPatternCategories:
-				select( coreStore ).getBlockPatternCategories(),
-		} ),
-		[]
-	);
-
-	const blockPatterns = useMemo(
-		() =>
-			[
-				...( settingsBlockPatterns || [] ),
-				...( restBlockPatterns || [] ),
-			]
-				.filter(
-					( x, index, arr ) =>
-						index === arr.findIndex( ( y ) => x.name === y.name )
-				)
-				.filter( ( { postTypes } ) => {
-					return (
-						! postTypes ||
-						( Array.isArray( postTypes ) &&
-							postTypes.includes( templateType ) )
-					);
-				} ),
-		[ settingsBlockPatterns, restBlockPatterns, templateType ]
-	);
-
-	const blockPatternCategories = useMemo(
-		() =>
-			[
-				...( settingsBlockPatternCategories || [] ),
-				...( restBlockPatternCategories || [] ),
-			].filter(
-				( x, index, arr ) =>
-					index === arr.findIndex( ( y ) => x.name === y.name )
-			),
-		[ settingsBlockPatternCategories, restBlockPatternCategories ]
-	);
-
-	const settings = useMemo( () => {
-		const {
-			__experimentalAdditionalBlockPatterns,
-			__experimentalAdditionalBlockPatternCategories,
-			...restStoredSettings
-		} = storedSettings;
-
-		return {
-			...restStoredSettings,
-			__unstableFetchMedia: fetchMedia,
-			__experimentalBlockPatterns: blockPatterns,
-			__experimentalBlockPatternCategories: blockPatternCategories,
-		};
-	}, [ storedSettings, blockPatterns, blockPatternCategories ] );
+				return {
+					templateType: getEditedPostType(),
+					templateId: getEditedPostId(),
+					page: getPage(),
+					isNavigationSidebarOpen:
+						select( interfaceStore ).getActiveComplementaryArea(
+							editSiteStore.name
+						) === NAVIGATION_SIDEBAR_NAME,
+				};
+			},
+			[ setIsInserterOpen ]
+		);
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
@@ -158,6 +86,11 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const mergedRefs = useMergeRefs( [ contentRef, useTypingObserver() ] );
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
+
+	const settings = useBlockEditorSettings( {
+		templateType,
+		setIsInserterOpen,
+	} );
 
 	const isTemplatePart = templateType === 'wp_template_part';
 	const hasBlocks = blocks.length !== 0;
