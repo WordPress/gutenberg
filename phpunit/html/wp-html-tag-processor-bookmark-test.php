@@ -108,4 +108,32 @@ class WP_HTML_Tag_Processor_Bookmark_Test extends WP_UnitTestCase {
 			$p->get_updated_html()
 		);
 	}
+
+	public function test_replaces_inside_contents() {
+		$p = new WP_HTML_Tag_Processor( '<div class="outer">Before<div class="inner">Inside</div>After</div>' );
+		$p->next_tag( [ 'class_name' => 'inner' ] );
+		$p->set_bookmark( 'start' );
+		$p->next_tag( [ 'tag_name' => 'div', 'tag_closers' => 'visit' ] );
+		$p->set_bookmark( 'end' );
+		$p->dangerously_replace( 'start', 'end', '--', 'inside' );
+
+		$this->assertEquals(
+			'<div class="outer">Before<div class="inner">--</div>After</div>',
+			$p->get_updated_html()
+		);
+	}
+
+	public function test_replaces_outside_contents() {
+		$p = new WP_HTML_Tag_Processor( '<div class="outer">Before<div class="inner">Inside</div>After</div>' );
+		$p->next_tag( [ 'class_name' => 'inner' ] );
+		$p->set_bookmark( 'start' );
+		$p->next_tag( [ 'tag_name' => 'div', 'tag_closers' => 'visit' ] );
+		$p->set_bookmark( 'end' );
+		$p->dangerously_replace( 'start', 'end', '--' );
+
+		$this->assertEquals(
+			'<div class="outer">Before--After</div>',
+			$p->get_updated_html()
+		);
+	}
 }

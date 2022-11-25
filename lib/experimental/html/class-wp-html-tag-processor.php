@@ -1202,6 +1202,17 @@ class WP_HTML_Tag_Processor {
 		return $this->next_tag();
 	}
 
+	public function dangerously_replace( $start_bookmark, $end_bookmark, $text, $region = 'outside' ) {
+		$start = $this->bookmarks[ $start_bookmark ];
+		$start = 'outside' === $region ? $start->start : $start->end + 1;
+
+		$end = $this->bookmarks[ $end_bookmark ];
+		$end = 'outside' === $region ? $end->end + 1 : $end->start - 1;
+
+		$this->attribute_updates[] = new WP_HTML_Text_Replacement( $start, $end, $text );
+		$this->apply_attributes_updates();
+	}
+
 	/**
 	 * Sort function to arrange objects with a start property in ascending order.
 	 *
