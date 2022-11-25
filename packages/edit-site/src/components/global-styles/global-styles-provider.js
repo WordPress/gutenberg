@@ -45,22 +45,35 @@ const cleanEmptyObject = ( object ) => {
 };
 
 function useGlobalStylesUserConfig() {
-	const { globalStylesId, settings, styles } = useSelect( ( select ) => {
-		const _globalStylesId =
-			select( coreStore ).__experimentalGetCurrentGlobalStylesId();
-		const record = _globalStylesId
-			? select( coreStore ).getEditedEntityRecord(
-					'root',
-					'globalStyles',
-					_globalStylesId
-			  )
-			: undefined;
-		return {
-			globalStylesId: _globalStylesId,
-			settings: record?.settings,
-			styles: record?.styles,
-		};
-	}, [] );
+	const { globalStylesId, hasGlobalStyles, settings, styles } = useSelect(
+		( select ) => {
+			const { getEditedEntityRecord, getEntityRecords } =
+				select( coreStore );
+			const _globalStylesId =
+				select( coreStore ).__experimentalGetCurrentGlobalStylesId();
+			const record = _globalStylesId
+				? getEditedEntityRecord(
+						'root',
+						'globalStyles',
+						_globalStylesId
+				  )
+				: undefined;
+			const activeThemes = getEntityRecords( 'root', 'theme', {
+				status: 'active',
+			} );
+
+			return {
+				globalStylesId: _globalStylesId,
+				hasGlobalStyles:
+					!! activeThemes?.[ 0 ]?._links?.[
+						'wp:user-global-styles'
+					] ?? false,
+				settings: record?.settings,
+				styles: record?.styles,
+			};
+		},
+		[]
+	);
 
 	const { getEditedEntityRecord } = useSelect( coreStore );
 	const { editEntityRecord } = useDispatch( coreStore );
@@ -91,7 +104,10 @@ function useGlobalStylesUserConfig() {
 		[ globalStylesId ]
 	);
 
-	return [ !! settings || !! styles, config, setConfig ];
+	// Mark config loaded and ready if the theme has no global user styles.
+	const isReady = hasGlobalStyles ? !! settings || !! styles : true;
+
+	return [ isReady, config, setConfig ];
 }
 
 function useGlobalStylesBaseConfig() {
