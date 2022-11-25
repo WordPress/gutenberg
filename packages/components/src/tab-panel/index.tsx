@@ -96,7 +96,7 @@ export function TabPanel( {
 
 	// Simulate a click on the newly focused tab, which causes the component
 	// to show the `tab-panel` associated with the clicked tab.
-	const activeTabAutomatically = (
+	const activateTabAutomatically = (
 		_childIndex: number,
 		child: HTMLButtonElement
 	) => {
@@ -116,7 +116,9 @@ export function TabPanel( {
 			<NavigableMenu
 				role="tablist"
 				orientation={ orientation }
-				onNavigate={ selectOnMove ? activeTabAutomatically : undefined }
+				onNavigate={
+					selectOnMove ? activateTabAutomatically : undefined
+				}
 				className="components-tab-panel__tabs"
 			>
 				{ tabs.map( ( tab ) => (
