@@ -20,29 +20,16 @@ import NavigationMenuSelector from './navigation-menu-selector';
 
 const WrappedNavigationMenuSelector = ( {
 	currentMenuId,
-	handleUpdateMenu,
-	convertClassicMenu,
 	onCreateNew,
 	createNavigationMenuIsSuccess,
 	createNavigationMenuIsError,
+	onSelectClassicMenu,
+	onSelectNavigationMenu,
 } ) => (
 	<NavigationMenuSelector
 		currentMenuId={ currentMenuId }
-		onSelectNavigationMenu={ ( menuId ) => {
-			handleUpdateMenu( menuId );
-		} }
-		onSelectClassicMenu={ async ( classicMenu ) => {
-			const navMenu = await convertClassicMenu(
-				classicMenu.id,
-				classicMenu.name,
-				'draft'
-			);
-			if ( navMenu ) {
-				handleUpdateMenu( navMenu.id, {
-					focusNavigationBlock: true,
-				} );
-			}
-		} }
+		onSelectNavigationMenu={ onSelectNavigationMenu }
+		onSelectClassicMenu={ onSelectClassicMenu }
 		onCreateNew={ onCreateNew }
 		createNavigationMenuIsSuccess={ createNavigationMenuIsSuccess }
 		createNavigationMenuIsError={ createNavigationMenuIsError }
@@ -51,15 +38,15 @@ const WrappedNavigationMenuSelector = ( {
 	/>
 );
 const MenuInspectorControls = ( {
-	convertClassicMenu,
 	createNavigationMenuIsSuccess,
 	createNavigationMenuIsError,
 	currentMenuId = null,
-	handleUpdateMenu,
 	isNavigationMenuMissing,
 	innerBlocks,
 	isManageMenusButtonDisabled,
 	onCreateNew,
+	onSelectClassicMenu,
+	onSelectNavigationMenu,
 } ) => {
 	const isOffCanvasNavigationEditorEnabled =
 		window?.__experimentalEnableOffCanvasNavigationEditor === true;
@@ -85,8 +72,10 @@ const MenuInspectorControls = ( {
 							</Heading>
 							<WrappedNavigationMenuSelector
 								currentMenuId={ currentMenuId }
-								handleUpdateMenu={ handleUpdateMenu }
-								convertClassicMenu={ convertClassicMenu }
+								onSelectClassicMenu={ onSelectClassicMenu }
+								onSelectNavigationMenu={
+									onSelectNavigationMenu
+								}
 								onCreateNew={ onCreateNew }
 								createNavigationMenuIsSuccess={
 									createNavigationMenuIsSuccess
@@ -110,8 +99,8 @@ const MenuInspectorControls = ( {
 					<>
 						<WrappedNavigationMenuSelector
 							currentMenuId={ currentMenuId }
-							handleUpdateMenu={ handleUpdateMenu }
-							convertClassicMenu={ convertClassicMenu }
+							onSelectClassicMenu={ onSelectClassicMenu }
+							onSelectNavigationMenu={ onSelectNavigationMenu }
 							onCreateNew={ onCreateNew }
 							createNavigationMenuIsSuccess={
 								createNavigationMenuIsSuccess
