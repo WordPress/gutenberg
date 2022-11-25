@@ -31,6 +31,17 @@ export const Appender = forwardRef( ( props, ref ) => {
 		};
 	}, [] );
 
+	const { insertedBlockAttributes } = useSelect(
+		( select ) => {
+			const { getBlockAttributes } = select( blockEditorStore );
+
+			return {
+				insertedBlockAttributes: getBlockAttributes( insertedBlock ),
+			};
+		},
+		[ insertedBlock ]
+	);
+
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const setAttributes =
@@ -42,25 +53,25 @@ export const Appender = forwardRef( ( props, ref ) => {
 
 	if ( insertedBlock ) {
 		const link = {
-			url: insertedBlock.attributes.url,
-			opensInNewTab: insertedBlock.attributes.target === '_blank',
+			url: insertedBlockAttributes.url,
+			opensInNewTab: insertedBlockAttributes.target === '_blank',
 		};
 		maybeLinkUI = (
 			<LinkUI
-				clientId={ insertedBlock.clientId }
+				clientId={ insertedBlock }
 				value={ link }
 				linkAttributes={ {
-					type: insertedBlock.attributes.type,
-					url: insertedBlock.attributes.url,
-					kind: insertedBlock.attributes.kind,
+					type: insertedBlockAttributes.type,
+					url: insertedBlockAttributes.url,
+					kind: insertedBlockAttributes.kind,
 				} }
 				onClose={ () => setInsertedBlock( null ) }
 				hasCreateSuggestion={ false }
 				onChange={ ( updatedValue ) => {
 					updateAttributes(
 						updatedValue,
-						setAttributes( insertedBlock.clientId ),
-						insertedBlock.attributes
+						setAttributes( insertedBlock ),
+						insertedBlockAttributes
 					);
 				} }
 			/>
@@ -80,8 +91,8 @@ export const Appender = forwardRef( ( props, ref ) => {
 				position="bottom right"
 				isAppender={ true }
 				selectBlockOnInsert={ false }
-				onSelectOrClose={ ( { insertedBlock: _insertedBlock } ) => {
-					setInsertedBlock( _insertedBlock );
+				onSelectOrClose={ ( { insertedBlockId } ) => {
+					setInsertedBlock( insertedBlockId );
 				} }
 				{ ...props }
 			/>

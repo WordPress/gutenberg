@@ -380,7 +380,7 @@ export default compose( [
 
 				if ( onSelectOrClose ) {
 					onSelectOrClose( {
-						insertedBlock: blockToInsert,
+						insertedBlockId: blockToInsert?.clientId,
 					} );
 				}
 
