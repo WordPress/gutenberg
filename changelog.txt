@@ -1,5 +1,26 @@
 == Changelog ==
 
+= 14.6.1 =
+
+## Changelog
+
+### Fixes
+
+#### Global Styles
+- Fix the `upgrader_process_complete` hook for `wp_theme_has_theme_json`. ([45881](https://github.com/WordPress/gutenberg/pull/45881))
+- Update `wp_theme_has_theme_json` to use `WP_Object_Cache`. ([45543](https://github.com/WordPress/gutenberg/pull/45543))
+
+### Bug Fixes
+- Tag Processor: Prevent bugs from pre-PHP8 strspn/strcspn behavior. ([45822](https://github.com/WordPress/gutenberg/pull/45822))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@oandregal @dmsnell
+
+
+
 = 14.6.0 =
 
 ## Changelog
