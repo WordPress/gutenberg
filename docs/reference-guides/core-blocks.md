@@ -431,6 +431,15 @@ Display a list of all pages. ([Source](https://github.com/WordPress/gutenberg/tr
 -	**Supports:** ~~html~~, ~~reusable~~
 -	**Attributes:** parentPageID
 
+## Page List Item
+
+Displays a page inside a list of all pages. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/page-list-item))
+
+-	**Name:** core/page-list-item
+-	**Category:** widgets
+-	**Supports:** ~~html~~, ~~inserter~~, ~~lock~~, ~~reusable~~
+-	**Attributes:** hasChildren, id, label, link, title
+
 ## Paragraph
 
 Start with the basic building block of all narrative. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/paragraph))
