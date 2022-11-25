@@ -1184,7 +1184,7 @@ class WP_HTML_Tag_Processor {
 	 * @return bool
 	 * @throws Exception Throws on invalid bookmark name if WP_DEBUG set.
 	 */
-	public function rewind( $bookmark_name ) {
+	public function seek( $bookmark_name ) {
 		if ( ! array_key_exists( $bookmark_name, $this->bookmarks ) ) {
 			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 				throw new Exception( 'Invalid bookmark name' );

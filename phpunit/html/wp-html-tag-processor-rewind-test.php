@@ -21,9 +21,9 @@ class WP_HTML_Tag_Processor_Rewind_Test {
 		$p->next_tag( 'li' );
 		$p->set_bookmark( 'second li' );
 		$p->set_attribute( 'foo-2', 'bar-2' );
-		$p->rewind( 'first li' );
+		$p->seek( 'first li' );
 		$p->set_attribute( 'foo-1', 'bar-1' );
-		$p->rewind( 'second li' );
+		$p->seek( 'second li' );
 		$p->next_tag( 'li' );
 		$p->set_attribute( 'foo-3', 'bar-3' );
 		$this->assertEquals(
@@ -39,7 +39,7 @@ class WP_HTML_Tag_Processor_Rewind_Test {
 		$p->next_tag();
 		$p->add_class( 'second' );
 
-		$p->rewind( 'first' );
+		$p->seek( 'first' );
 		$p->add_class( 'first' );
 
 		$this->assertEquals(
@@ -55,10 +55,10 @@ class WP_HTML_Tag_Processor_Rewind_Test {
 		$p->next_tag();
 		$p->set_bookmark( 'second' );
 
-		$p->rewind( 'first' );
+		$p->seek( 'first' );
 		$p->add_class( 'first' );
 
-		$p->rewind( 'second' );
+		$p->seek( 'second' );
 		$p->add_class( 'second' );
 
 		$this->assertEquals(
