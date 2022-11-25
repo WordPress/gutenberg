@@ -370,7 +370,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	 * @param bool   $core_palette      Whether the core palette is present.
 	 * @param string $core_palette_text Message.
 	 * @param string $block_styles      Whether the block styles are present.
-	 * @param string $block_styles_text Message
+	 * @param string $block_styles_text Message.
 	 * @param bool   $theme_palette      Whether the theme palette is present.
 	 * @param string $theme_palette_text Message.
 	 * @param bool   $user_palette      Whether the user palette is present.
@@ -452,7 +452,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 				'user_palette'       => false,
 				'user_palette_text'  => 'User palette should not be present',
 			),
-			'origin_blocks' => array(
+			'origin_blocks'  => array(
 				'origin'             => 'blocks',
 				'core_palette'       => true,
 				'core_palette_text'  => 'Core palette must be present',
@@ -463,7 +463,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 				'user_palette'       => false,
 				'user_palette_text'  => 'User palette should not be present',
 			),
-			'origin_theme' => array(
+			'origin_theme'   => array(
 				'origin'             => 'theme',
 				'core_palette'       => true,
 				'core_palette_text'  => 'Core palette must be present',
@@ -474,7 +474,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 				'user_palette'       => false,
 				'user_palette_text'  => 'User palette should not be present',
 			),
-			'origin_custom' => array(
+			'origin_custom'  => array(
 				'origin'             => 'custom',
 				'core_palette'       => true,
 				'core_palette_text'  => 'Core palette must be present',
