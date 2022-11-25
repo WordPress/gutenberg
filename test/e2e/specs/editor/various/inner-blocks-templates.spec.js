@@ -33,14 +33,14 @@ test.describe( 'Inner blocks templates', () => {
 		);
 
 		// The block template content appears asynchronously, so wait for it.
-		await blockWithTemplateContent.waitFor();
+		await expect( blockWithTemplateContent ).toBeVisible();
 
 		// Publish the post, then reload.
 		await editor.publishPost();
 		await page.reload();
 
 		// Wait for the block that was inserted to appear with its templated content.
-		await blockWithTemplateContent.waitFor();
+		await expect( blockWithTemplateContent ).toBeVisible();
 
 		// The template resolution shouldn't cause the post to be dirty.
 		const editorTopBar = page.locator(
