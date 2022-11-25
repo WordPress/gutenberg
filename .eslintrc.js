@@ -143,6 +143,7 @@ module.exports = {
 							'overEvery',
 							'partial',
 							'partialRight',
+							'pick',
 							'random',
 							'reduce',
 							'reject',
