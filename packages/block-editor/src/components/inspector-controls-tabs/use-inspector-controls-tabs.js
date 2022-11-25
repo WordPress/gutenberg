@@ -9,7 +9,7 @@ import { __experimentalUseSlotFills as useSlotFills } from '@wordpress/component
 import InspectorControlsGroups from '../inspector-controls/groups';
 import useIsListViewTabDisabled from './use-is-list-view-tab-disabled';
 import { InspectorAdvancedControls } from '../inspector-controls';
-import { TAB_LIST_VIEW, TAB_SETTINGS, TAB_APPEARANCE } from './utils';
+import { TAB_LIST_VIEW, TAB_SETTINGS, TAB_STYLES } from './utils';
 
 export default function useInspectorControlsTabs( blockName ) {
 	const tabs = [];
@@ -30,17 +30,17 @@ export default function useInspectorControlsTabs( blockName ) {
 		tabs.push( TAB_LIST_VIEW );
 	}
 
-	// Appearance Tab: Add this tab if there are any fills for block supports
+	// Styles Tab: Add this tab if there are any fills for block supports
 	// e.g. border, color, spacing, typography, etc.
-	const appearanceFills = [
+	const styleFills = [
 		...( useSlotFills( borderGroup.Slot.__unstableName ) || [] ),
 		...( useSlotFills( colorGroup.Slot.__unstableName ) || [] ),
 		...( useSlotFills( dimensionsGroup.Slot.__unstableName ) || [] ),
 		...( useSlotFills( typographyGroup.Slot.__unstableName ) || [] ),
 	];
 
-	if ( appearanceFills.length ) {
-		tabs.push( TAB_APPEARANCE );
+	if ( styleFills.length ) {
+		tabs.push( TAB_STYLES );
 	}
 
 	// Settings Tab: If there are any fills for the general InspectorControls
