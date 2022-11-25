@@ -359,45 +359,6 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEmpty( $user_cpt, 'User CPT is expected to be empty.' );
 	}
 
-	private function register_block_data( $block_name ) {
-		register_block_type(
-			$block_name,
-			array(
-				'api_version' => 2,
-				'attributes'  => array(
-					'borderColor' => array(
-						'type' => 'string',
-					),
-					'style'       => array(
-						'type' => 'object',
-					),
-				),
-				'supports'    => array(
-					'__experimentalStyle' => array(
-						'typography' => array(
-							'fontSize' => '42rem',
-						),
-					),
-				),
-			)
-		);
-	}
-
-	private function register_user_data() {
-		wp_set_current_user( self::$administrator_id );
-		$user_cpt = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( wp_get_theme(), true );
-		$config   = json_decode( $user_cpt['post_content'], true );
-		$config['settings']['color']['palette']['custom'] = array(
-			array(
-				'color' => 'hotpink',
-				'name'  => 'My color',
-				'slug'  => 'my-color',
-			),
-		);
-		$user_cpt['post_content']                         = wp_json_encode( $config );
-		wp_update_post( $user_cpt, true, false );
-	}
-
 	/**
 	 * Test that get_merged_data returns the data merged up to the proper origin.
 	 *
@@ -417,13 +378,44 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	 */
 	public function test_get_merged_data_returns_origin( $origin, $core_palette, $core_palette_text, $block_styles, $block_styles_text, $theme_palette, $theme_palette_text, $user_palette, $user_palette_text ) {
 		// Make sure there is data from the blocks origin.
-		$this->register_block_data( 'my/block-with-styles' );
+		register_block_type(
+			'my/block-with-styles',
+			array(
+				'api_version' => 2,
+				'attributes'  => array(
+					'borderColor' => array(
+						'type' => 'string',
+					),
+					'style'       => array(
+						'type' => 'object',
+					),
+				),
+				'supports'    => array(
+					'__experimentalStyle' => array(
+						'typography' => array(
+							'fontSize' => '42rem',
+						),
+					),
+				),
+			)
+		);
 
 		// Make sure there is data from the theme origin.
 		switch_theme( 'block-theme' );
 
 		// Make sure there is data from the user origin.
-		$this->register_user_data();
+		wp_set_current_user( self::$administrator_id );
+		$user_cpt = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( wp_get_theme(), true );
+		$config   = json_decode( $user_cpt['post_content'], true );
+		$config['settings']['color']['palette']['custom'] = array(
+			array(
+				'color' => 'hotpink',
+				'name'  => 'My color',
+				'slug'  => 'my-color',
+			),
+		);
+		$user_cpt['post_content']                         = wp_json_encode( $config );
+		wp_update_post( $user_cpt, true, false );
 
 		$theme_json = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin );
 		$settings   = $theme_json->get_settings();
