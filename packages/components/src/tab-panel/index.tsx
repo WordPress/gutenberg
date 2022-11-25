@@ -77,7 +77,7 @@ export function TabPanel( {
 	className,
 	children,
 	tabs,
-	hasManualTabActivation = false,
+	selectOnMove = true,
 	initialTabName,
 	orientation = 'horizontal',
 	activeClass = 'is-active',
@@ -116,9 +116,7 @@ export function TabPanel( {
 			<NavigableMenu
 				role="tablist"
 				orientation={ orientation }
-				onNavigate={
-					hasManualTabActivation ? undefined : activeTabAutomatically
-				}
+				onNavigate={ selectOnMove ? activeTabAutomatically : undefined }
 				className="components-tab-panel__tabs"
 			>
 				{ tabs.map( ( tab ) => (

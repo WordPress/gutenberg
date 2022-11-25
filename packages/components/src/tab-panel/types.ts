@@ -71,12 +71,14 @@ export type TabPanelProps = {
 	 */
 	tabs: Tab[];
 	/**
-	 * When `true`, enables manual tab activation. Defaults to automatic tab
-	 * activation when `false`. See the official W3C docs for more info.
+	 * When `true`, the tab will selected when receiving focus (automatic tab
+	 * activation). When `false`, the tab will be selected only when clicked
+	 * (manual tab activation). See the official W3C docs for more info.
+	 * .
 	 *
-	 * @default false
+	 * @default true
 	 *
 	 * @see https://www.w3.org/WAI/ARIA/apg/patterns/tabpanel/
 	 */
-	hasManualTabActivation?: boolean;
+	selectOnMove?: boolean;
 };

@@ -257,7 +257,7 @@ describe( 'TabPanel', () => {
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
 		} );
 
-		it( 'switches to manual tab activation when the `hasManualTabActivation` prop is set to `true`', async () => {
+		it( 'switches to manual tab activation when the `selectOnMove` prop is set to `false`', async () => {
 			const user = setupUser();
 			const mockOnSelect = jest.fn();
 
@@ -266,7 +266,7 @@ describe( 'TabPanel', () => {
 					tabs={ TABS }
 					children={ () => undefined }
 					onSelect={ mockOnSelect }
-					hasManualTabActivation={ true }
+					selectOnMove={ false }
 				/>
 			);
 
