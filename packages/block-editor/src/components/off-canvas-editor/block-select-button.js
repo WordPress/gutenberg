@@ -12,7 +12,7 @@ import {
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
-import { Icon, lock } from '@wordpress/icons';
+import { Icon, lock, customLink } from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
 
 /**
@@ -27,7 +27,7 @@ import { useBlockLock } from '../block-lock';
 function ListViewBlockSelectButton(
 	{
 		className,
-		block: { clientId },
+		block,
 		onClick,
 		onToggleExpanded,
 		tabIndex,
@@ -38,6 +38,7 @@ function ListViewBlockSelectButton(
 	},
 	ref
 ) {
+	const { clientId } = block;
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const blockTitle = useBlockDisplayTitle( {
 		clientId,
@@ -58,6 +59,13 @@ function ListViewBlockSelectButton(
 		if ( event.keyCode === ENTER || event.keyCode === SPACE ) {
 			onClick( event );
 		}
+	}
+
+	// This is a very annoying kind of exception.
+	// Maybe we need to have a config that allows blocks
+	// to have a different icon in the list view?
+	if ( block.name === 'core/navigation-submenu' ) {
+		blockInformation.icon = customLink;
 	}
 
 	return (
