@@ -20,7 +20,7 @@ export const settings = {
 	icon,
 	example: {
 		attributes: { buttonText: __( 'Search' ), label: __( 'Search' ) },
-		scale: 0.75,
+		viewportWidth: 400,
 	},
 	variations,
 	edit,

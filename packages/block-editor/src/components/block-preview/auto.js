@@ -23,7 +23,6 @@ const MAX_HEIGHT = 2000;
 function ScaledBlockPreview( {
 	viewportWidth,
 	containerWidth,
-	__experimentalScale,
 	__experimentalPadding,
 	__experimentalMinHeight,
 	__experimentalStyles,
@@ -66,7 +65,6 @@ function ScaledBlockPreview( {
 	// Initialize on render instead of module top level, to avoid circular dependency issues.
 	MemoizedBlockList = MemoizedBlockList || pure( BlockList );
 
-	viewportWidth = viewportWidth / ( __experimentalScale || 1 );
 	const scale = containerWidth / viewportWidth;
 
 	const padding =

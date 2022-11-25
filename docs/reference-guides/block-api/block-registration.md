@@ -216,7 +216,7 @@ example: {
 },
 ```
 
-It's also possible to define the width of the preview container in pixels via `viewportWidth` or via `scale` to set width of the block relative to the preview container. For example:
+It's also possible to define the width of the preview container in pixels via `viewportWidth`. For example:
 
 ```js
 example: {
@@ -224,15 +224,6 @@ example: {
 		cover: 'https://example.com/image.jpg',
 	},
 	viewportWidth: 800
-},
-```
-
-```js
-example: {
-	attributes: {
-		cover: 'https://example.com/image.jpg',
-	},
-	scale: 0.8
 },
 ```
 

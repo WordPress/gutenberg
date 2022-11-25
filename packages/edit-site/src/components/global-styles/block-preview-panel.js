@@ -11,16 +11,15 @@ const BlockPreviewPanel = ( { name } ) => {
 		containerResizeListener,
 		{ width: containerWidth, height: containerHeight },
 	] = useResizeObserver();
-	const padding = blockExample?.defaultPadding || '0 1rem';
-	const scale = blockExample?.scale;
+	const padding = blockExample?.defaultPadding || 0;
+	const viewportWidth = blockExample?.viewportWidth || containerWidth;
 
 	return ! blockExample ? null : (
 		<div className="edit-site-global-styles__block-preview-panel">
 			{ containerResizeListener }
 
 			<BlockPreview
-				viewportWidth={ containerWidth }
-				__experimentalScale={ scale }
+				viewportWidth={ viewportWidth }
 				__experimentalPadding={ padding }
 				__experimentalMinHeight={ containerHeight }
 				__experimentalAlign={ 'center' }
