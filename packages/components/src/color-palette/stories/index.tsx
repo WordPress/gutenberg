@@ -43,20 +43,7 @@ const Template: ComponentStory< typeof ColorPalette > = ( {
 	onChange,
 	...args
 } ) => {
-	let initialColor;
-	if ( args.color?.length ) {
-		const asColorObject = ( args.colors as ColorObject[] )?.[ 0 ].color;
-		let asPaletteObject;
-
-		if ( ( args.colors as PaletteObject[] )[ 0 ].colors?.length ) {
-			asPaletteObject = ( args.colors as PaletteObject[] )[ 0 ]
-				.colors[ 0 ].color;
-		}
-
-		initialColor = asColorObject || asPaletteObject;
-	}
-
-	const [ color, setColor ] = useState< string | undefined >( initialColor );
+	const [ color, setColor ] = useState< string | undefined >();
 
 	return (
 		<SlotFillProvider>
