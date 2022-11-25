@@ -13,7 +13,7 @@ require_once __DIR__ . '/../../lib/experimental/html/index.php';
  *
  * @coversDefaultClass WP_HTML_Tag_Processor
  */
-class WP_HTML_Tag_Processor_Rewind_Test extends WP_UnitTestCase {
+class WP_HTML_Tag_Processor_Bookmark_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 *
