@@ -20,11 +20,12 @@ import {
 	__experimentalUseHasRecursion as useHasRecursion,
 	store as blockEditorStore,
 	withColors,
-	PanelColorSettings,
 	ContrastChecker,
 	getColorClassName,
 	Warning,
+	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
+	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 
@@ -512,144 +513,157 @@ function Navigation( {
 		} );
 	}, [ isDraftNavigationMenu, navigationMenu ] );
 
+	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 	const stylingInspectorControls = (
-		<InspectorControls>
-			{ hasSubmenuIndicatorSetting && (
-				<PanelBody title={ __( 'Display' ) }>
-					{ isResponsive && (
-						<>
-							<Button
-								className={ overlayMenuPreviewClasses }
-								onClick={ () => {
-									setOverlayMenuPreview(
-										! overlayMenuPreview
-									);
-								} }
-							>
-								{ hasIcon && (
-									<>
-										<OverlayMenuIcon icon={ icon } />
-										<Icon icon={ close } />
-									</>
+		<>
+			<InspectorControls>
+				{ hasSubmenuIndicatorSetting && (
+					<PanelBody title={ __( 'Display' ) }>
+						{ isResponsive && (
+							<>
+								<Button
+									className={ overlayMenuPreviewClasses }
+									onClick={ () => {
+										setOverlayMenuPreview(
+											! overlayMenuPreview
+										);
+									} }
+								>
+									{ hasIcon && (
+										<>
+											<OverlayMenuIcon icon={ icon } />
+											<Icon icon={ close } />
+										</>
+									) }
+									{ ! hasIcon && (
+										<>
+											<span>{ __( 'Menu' ) }</span>
+											<span>{ __( 'Close' ) }</span>
+										</>
+									) }
+								</Button>
+								{ overlayMenuPreview && (
+									<OverlayMenuPreview
+										setAttributes={ setAttributes }
+										hasIcon={ hasIcon }
+										icon={ icon }
+									/>
 								) }
-								{ ! hasIcon && (
-									<>
-										<span>{ __( 'Menu' ) }</span>
-										<span>{ __( 'Close' ) }</span>
-									</>
-								) }
-							</Button>
-							{ overlayMenuPreview && (
-								<OverlayMenuPreview
-									setAttributes={ setAttributes }
-									hasIcon={ hasIcon }
-									icon={ icon }
-								/>
-							) }
-						</>
-					) }
-					<h3>{ __( 'Overlay Menu' ) }</h3>
-					<ToggleGroupControl
-						label={ __( 'Configure overlay menu' ) }
-						value={ overlayMenu }
-						help={ __(
-							'Collapses the navigation options in a menu icon opening an overlay.'
+							</>
 						) }
-						onChange={ ( value ) =>
-							setAttributes( { overlayMenu: value } )
-						}
-						isBlock
-						hideLabelFromVision
-					>
-						<ToggleGroupControlOption
-							value="never"
-							label={ __( 'Off' ) }
-						/>
-						<ToggleGroupControlOption
-							value="mobile"
-							label={ __( 'Mobile' ) }
-						/>
-						<ToggleGroupControlOption
-							value="always"
-							label={ __( 'Always' ) }
-						/>
-					</ToggleGroupControl>
-					{ hasSubmenus && (
-						<>
-							<h3>{ __( 'Submenus' ) }</h3>
-							<ToggleControl
-								checked={ openSubmenusOnClick }
-								onChange={ ( value ) => {
-									setAttributes( {
-										openSubmenusOnClick: value,
-										...( value && {
-											showSubmenuIcon: true,
-										} ), // Make sure arrows are shown when we toggle this on.
-									} );
-								} }
-								label={ __( 'Open on click' ) }
+						<h3>{ __( 'Overlay Menu' ) }</h3>
+						<ToggleGroupControl
+							label={ __( 'Configure overlay menu' ) }
+							value={ overlayMenu }
+							help={ __(
+								'Collapses the navigation options in a menu icon opening an overlay.'
+							) }
+							onChange={ ( value ) =>
+								setAttributes( { overlayMenu: value } )
+							}
+							isBlock
+							hideLabelFromVision
+						>
+							<ToggleGroupControlOption
+								value="never"
+								label={ __( 'Off' ) }
 							/>
+							<ToggleGroupControlOption
+								value="mobile"
+								label={ __( 'Mobile' ) }
+							/>
+							<ToggleGroupControlOption
+								value="always"
+								label={ __( 'Always' ) }
+							/>
+						</ToggleGroupControl>
+						{ hasSubmenus && (
+							<>
+								<h3>{ __( 'Submenus' ) }</h3>
+								<ToggleControl
+									checked={ openSubmenusOnClick }
+									onChange={ ( value ) => {
+										setAttributes( {
+											openSubmenusOnClick: value,
+											...( value && {
+												showSubmenuIcon: true,
+											} ), // Make sure arrows are shown when we toggle this on.
+										} );
+									} }
+									label={ __( 'Open on click' ) }
+								/>
 
-							<ToggleControl
-								checked={ showSubmenuIcon }
-								onChange={ ( value ) => {
-									setAttributes( {
-										showSubmenuIcon: value,
-									} );
-								} }
-								disabled={ attributes.openSubmenusOnClick }
-								label={ __( 'Show arrow' ) }
-							/>
-						</>
-					) }
-				</PanelBody>
-			) }
-			{ hasColorSettings && (
-				<PanelColorSettings
-					__experimentalHasMultipleOrigins
-					__experimentalIsRenderedInSidebar
-					title={ __( 'Color' ) }
-					initialOpen={ false }
-					colorSettings={ [
-						{
-							value: textColor.color,
-							onChange: setTextColor,
-							label: __( 'Text' ),
-						},
-						{
-							value: backgroundColor.color,
-							onChange: setBackgroundColor,
-							label: __( 'Background' ),
-						},
-						{
-							value: overlayTextColor.color,
-							onChange: setOverlayTextColor,
-							label: __( 'Submenu & overlay text' ),
-						},
-						{
-							value: overlayBackgroundColor.color,
-							onChange: setOverlayBackgroundColor,
-							label: __( 'Submenu & overlay background' ),
-						},
-					] }
-				>
-					{ enableContrastChecking && (
-						<>
-							<ContrastChecker
-								backgroundColor={ detectedBackgroundColor }
-								textColor={ detectedColor }
-							/>
-							<ContrastChecker
-								backgroundColor={
-									detectedOverlayBackgroundColor
-								}
-								textColor={ detectedOverlayColor }
-							/>
-						</>
-					) }
-				</PanelColorSettings>
-			) }
-		</InspectorControls>
+								<ToggleControl
+									checked={ showSubmenuIcon }
+									onChange={ ( value ) => {
+										setAttributes( {
+											showSubmenuIcon: value,
+										} );
+									} }
+									disabled={ attributes.openSubmenusOnClick }
+									label={ __( 'Show arrow' ) }
+								/>
+							</>
+						) }
+					</PanelBody>
+				) }
+			</InspectorControls>
+			<InspectorControls __experimentalGroup="color">
+				{ hasColorSettings && (
+					<>
+						<ColorGradientSettingsDropdown
+							__experimentalHasMultipleOrigins
+							__experimentalIsRenderedInSidebar
+							settings={ [
+								{
+									colorValue: textColor.color,
+									label: __( 'Text' ),
+									onColorChange: setTextColor,
+									resetAllFilter: () => setTextColor(),
+								},
+								{
+									colorValue: backgroundColor.color,
+									label: __( 'Background' ),
+									onColorChange: setBackgroundColor,
+									resetAllFilter: () => setBackgroundColor(),
+								},
+								{
+									colorValue: overlayTextColor.color,
+									label: __( 'Submenu & overlay text' ),
+									onColorChange: setOverlayTextColor,
+									resetAllFilter: () => setOverlayTextColor(),
+								},
+								{
+									colorValue: overlayBackgroundColor.color,
+									label: __( 'Submenu & overlay background' ),
+									onColorChange: setOverlayBackgroundColor,
+									resetAllFilter: () =>
+										setOverlayBackgroundColor(),
+								},
+							] }
+							panelId={ clientId }
+							{ ...colorGradientSettings }
+							gradients={ [] }
+							disableCustomGradients={ true }
+						/>
+						{ enableContrastChecking && (
+							<>
+								<ContrastChecker
+									backgroundColor={ detectedBackgroundColor }
+									textColor={ detectedColor }
+								/>
+								<ContrastChecker
+									backgroundColor={
+										detectedOverlayBackgroundColor
+									}
+									textColor={ detectedOverlayColor }
+								/>
+							</>
+						) }
+					</>
+				) }
+			</InspectorControls>
+		</>
 	);
 
 	// If the block has inner blocks, but no menu id, then these blocks are either:
