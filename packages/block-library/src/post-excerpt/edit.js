@@ -20,6 +20,7 @@ import { PanelBody, ToggleControl, RangeControl } from '@wordpress/components';
 import { sprintf, __, _x } from '@wordpress/i18n';
 import { count as wordCount } from '@wordpress/wordcount';
 import { speak } from '@wordpress/a11y';
+import { useDebounce } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -35,6 +36,7 @@ export default function PostExcerptEditor( {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
 	const isEditable = userCanEdit && ! isDescendentOfQueryLoop;
+	const debouncedSpeak = useDebounce( speak, 3000 );
 	const [
 		rawExcerpt,
 		setExcerpt,
@@ -226,7 +228,9 @@ export default function PostExcerptEditor( {
 				{ isSelected && wordCountMessage && (
 					<Warning>{ wordCountMessage }</Warning>
 				) }
-				{ isSelected && wordCountMessage && speak( wordCountMessage ) }
+				{ isSelected &&
+					wordCountMessage &&
+					debouncedSpeak( wordCountMessage ) }
 				{ ! showMoreOnNewLine && ' ' }
 				{ showMoreOnNewLine ? (
 					<p className="wp-block-post-excerpt__more-text">
