@@ -129,6 +129,7 @@ function ScreenBlockList() {
 				) }
 			/>
 			<SearchControl
+				__nextHasNoMarginBottom
 				className="edit-site-block-types-search"
 				onChange={ setFilterValue }
 				value={ filterValue }

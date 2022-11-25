@@ -52,10 +52,15 @@
 	}
 }
 
-.edit-site-global-styles-header__description,
-.edit-site-block-types-search {
+.edit-site-global-styles-header__description {
 	padding: 0 $grid-unit-20;
 }
+
+.edit-site-block-types-search {
+	margin-bottom: $grid-unit-10;
+	padding: 0 $grid-unit-20;
+}
+
 
 .edit-site-global-styles-subtitle {
 	// Need to override the too specific styles for complementary areas.
