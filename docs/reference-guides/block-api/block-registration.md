@@ -227,17 +227,6 @@ example: {
 },
 ```
 
-It's possible to set padding for the block in the preview container via `defaultPadding`. For example:
-
-```js
-example: {
-	attributes: {
-		cover: 'https://example.com/image.jpg',
-	},
-	defaultPadding: '8px 16px'
-},
-```
-
 #### variations (optional)
 
 -   **Type:** `Object[]`

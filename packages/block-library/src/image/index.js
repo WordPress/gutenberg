@@ -27,7 +27,6 @@ export const settings = {
 			// translators: Caption accompanying an image of the Mont Blanc, which serves as an example for the Image block.
 			caption: __( 'Mont Blanc appears—still, snowy, and serene.' ),
 		},
-		defaultPadding: '1rem',
 	},
 	__experimentalLabel( attributes, { context } ) {
 		if ( context === 'accessibility' ) {

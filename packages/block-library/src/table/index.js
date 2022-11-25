@@ -92,7 +92,6 @@ export const settings = {
 			],
 		},
 		viewportWidth: 450,
-		defaultPadding: '1rem',
 	},
 	transforms,
 	edit,

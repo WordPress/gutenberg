@@ -26,7 +26,6 @@ export const settings = {
 			// translators: Caption accompanying a video of the wood thrush singing, which serves as an example for the Video block.
 			caption: __( 'Wood thrush singing in Central Park, NYC.' ),
 		},
-		defaultPadding: '1rem',
 	},
 	transforms,
 	deprecated,

@@ -11,7 +11,6 @@ const BlockPreviewPanel = ( { name } ) => {
 		containerResizeListener,
 		{ width: containerWidth, height: containerHeight },
 	] = useResizeObserver();
-	const padding = blockExample?.defaultPadding || 0;
 	const viewportWidth = blockExample?.viewportWidth || containerWidth;
 
 	return ! blockExample ? null : (
@@ -20,10 +19,7 @@ const BlockPreviewPanel = ( { name } ) => {
 
 			<BlockPreview
 				viewportWidth={ viewportWidth }
-				__experimentalPadding={ padding }
 				__experimentalMinHeight={ containerHeight }
-				__experimentalAlign={ 'center' }
-				__experimentalJustify={ 'center' }
 				blocks={ getBlockFromExample( name, blockExample ) }
 			/>
 		</div>

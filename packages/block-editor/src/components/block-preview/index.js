@@ -20,8 +20,8 @@ import { BlockListItems } from '../block-list';
 
 export function BlockPreview( {
 	blocks,
-	viewportWidth = 1200,
 	__experimentalPadding = 0,
+	viewportWidth = 1200,
 	__experimentalMinHeight,
 	__experimentalStyles = [],
 } ) {

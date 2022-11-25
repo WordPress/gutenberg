@@ -29,7 +29,6 @@ export const settings = {
 				),
 			citation: __( 'Matt Mullenweg' ),
 		},
-		defaultPadding: '1rem',
 	},
 	transforms,
 	edit,

@@ -66,12 +66,6 @@ function ScaledBlockPreview( {
 	MemoizedBlockList = MemoizedBlockList || pure( BlockList );
 
 	const scale = containerWidth / viewportWidth;
-
-	const padding =
-		typeof __experimentalPadding === 'string'
-			? __experimentalPadding
-			: `${ __experimentalPadding }px`;
-
 	return (
 		<Disabled
 			className="block-editor-block-preview__content"
@@ -95,23 +89,12 @@ function ScaledBlockPreview( {
 					);
 					documentElement.style.position = 'absolute';
 					documentElement.style.width = '100%';
-					documentElement.style.minHeight = '100%';
-					bodyElement.style.padding = padding;
+					bodyElement.style.padding = __experimentalPadding + 'px';
 
 					// Necessary for contentResizeListener to work.
 					bodyElement.style.boxSizing = 'border-box';
 					bodyElement.style.position = 'absolute';
 					bodyElement.style.width = '100%';
-					bodyElement.style.minHeight = `${ __experimentalMinHeight }px`;
-
-					if ( __experimentalAlign || __experimentalJustify ) {
-						bodyElement.style.display = 'flex';
-						bodyElement.style.flexDirection = 'column';
-						bodyElement.style.alignItems =
-							__experimentalJustify || 'flex-start';
-						bodyElement.style.justifyContent =
-							__experimentalAlign || 'flex-start';
-					}
 				}, [] ) }
 				aria-hidden
 				tabIndex={ -1 }
