@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, omit, filter, mapValues } from 'lodash';
+import { map, omit, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -233,7 +233,7 @@ const queries = ( state = {}, action ) => {
 
 			return mapValues( state, ( contextQueries ) => {
 				return mapValues( contextQueries, ( queryItems ) => {
-					return filter( queryItems, ( queryId ) => {
+					return queryItems.filter( ( queryId ) => {
 						return ! removedItems[ queryId ];
 					} );
 				} );
