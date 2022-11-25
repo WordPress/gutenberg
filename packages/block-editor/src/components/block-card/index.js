@@ -30,15 +30,16 @@ function BlockCard( { title, icon, description, blockType, className } ) {
 	const isOffCanvasNavigationEditorEnabled =
 		window?.__experimentalEnableOffCanvasNavigationEditor === true;
 
-	const { parentBlockClientId } = useSelect( ( select ) => {
-		const { getSelectedBlockClientId, getBlockParents } =
+	const { parentNavBlockClientId } = useSelect( ( select ) => {
+		const { getSelectedBlockClientId, getBlockParentsByBlockName } =
 			select( blockEditorStore );
 
 		const _selectedBlockClientId = getSelectedBlockClientId();
 
 		return {
-			parentBlockClientId: getBlockParents(
+			parentNavBlockClientId: getBlockParentsByBlockName(
 				_selectedBlockClientId,
+				'core/navigation',
 				true
 			)[ 0 ],
 		};
@@ -48,10 +49,10 @@ function BlockCard( { title, icon, description, blockType, className } ) {
 
 	return (
 		<div className={ classnames( 'block-editor-block-card', className ) }>
-			{ isOffCanvasNavigationEditorEnabled && parentBlockClientId && (
+			{ isOffCanvasNavigationEditorEnabled && parentNavBlockClientId && (
 				<Button
-					onClick={ () => selectBlock( parentBlockClientId ) }
-					label={ __( 'Navigate to parent block' ) }
+					onClick={ () => selectBlock( parentNavBlockClientId ) }
+					label={ __( 'Go to parent Navigation block' ) }
 					style={
 						// TODO: This style override is also used in ToolsPanelHeader.
 						// It should be supported out-of-the-box by Button.
