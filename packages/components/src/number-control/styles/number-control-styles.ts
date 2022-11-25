@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * External dependencies
  */
@@ -12,8 +11,9 @@ import InputControl from '../../input-control';
 import { COLORS } from '../../utils';
 import Button from '../../button';
 import { space } from '../../ui/utils/space';
+import type { NumberControlProps } from '../types';
 
-const htmlArrowStyles = ( { hideHTMLArrows } ) => {
+const htmlArrowStyles = ( { hideHTMLArrows }: { hideHTMLArrows: boolean } ) => {
 	if ( ! hideHTMLArrows ) {
 		return ``;
 	}
@@ -35,7 +35,9 @@ export const Input = styled( InputControl )`
 	${ htmlArrowStyles };
 `;
 
-const spinButtonSizeStyles = ( { size } ) => {
+const spinButtonSizeStyles = ( {
+	size,
+}: Pick< NumberControlProps, 'size' > ) => {
 	if ( size !== 'small' ) {
 		return ``;
 	}
