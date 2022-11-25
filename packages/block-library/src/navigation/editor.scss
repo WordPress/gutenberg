@@ -429,7 +429,8 @@ $color-control-label-height: 20px;
 // These needs extra specificity in the editor.
 .wp-block-navigation__responsive-container:not(.is-menu-open) {
 	.components-button.wp-block-navigation__responsive-container-close {
-		@include break-small {
+		// @include break-small {
+		&.is-mobile-breakpoint {
 			display: none;
 		}
 	}
@@ -444,21 +445,26 @@ $color-control-label-height: 20px;
 		$admin-bar-height-big + $header-height + $block-toolbar-height +
 		$border-width;
 
-	@include break-medium() {
+	// @include break-medium() {
+	&.is-mobile-breakpoint {
 		top: $admin-bar-height + $header-height + $border-width;
 	}
 
+
 	// Navigation sidebar rules.
-	@include break-medium() {
+	// @include break-medium() {
+	&.is-mobile-breakpoint {
 		left: $admin-sidebar-width-collapsed;
 	}
+
 	@include break-large() {
 		left: $admin-sidebar-width;
 	}
 }
 
 .has-fixed-toolbar .wp-block-navigation__responsive-container.is-menu-open {
-	@include break-medium() {
+	// @include break-medium() {
+	&.is-mobile-breakpoint {
 		top:
 			$admin-bar-height + $header-height + $block-toolbar-height +
 			$border-width;
@@ -484,13 +490,15 @@ $color-control-label-height: 20px;
 			$admin-bar-height-big + $header-height + $block-toolbar-height +
 			$border-width;
 
-		@include break-medium() {
+		// @include break-medium() {
+		&.is-mobile-breakpoint {
 			top: $header-height + $border-width;
 		}
 	}
 
 	.has-fixed-toolbar .wp-block-navigation__responsive-container.is-menu-open {
-		@include break-medium() {
+		// @include break-medium() {
+		&.is-mobile-breakpoint {
 			top: $header-height + $block-toolbar-height + $border-width;
 		}
 	}
