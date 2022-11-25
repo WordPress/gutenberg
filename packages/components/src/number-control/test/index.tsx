@@ -606,7 +606,10 @@ describe( 'NumberControl', () => {
 					)
 				);
 				expect( onChange ).toHaveBeenCalledWith( expectedValue, {
-					event: expect.anything(),
+					event: expect.objectContaining( {
+						target: expect.any( HTMLInputElement ),
+						type: expect.any( String ),
+					} ),
 				} );
 			}
 		);
