@@ -490,6 +490,12 @@ class WP_HTML_Tag_Processor {
 	}
 
 
+	/**
+	 * Sets a bookmark in the HTML document.
+	 *
+	 * @param string $name Identifies this particular bookmark.
+	 * @return false|void
+	 */
 	public function set_bookmark( $name ) {
 		if ( null === $this->tag_name_starts_at ) {
 			return false;
@@ -507,7 +513,14 @@ class WP_HTML_Tag_Processor {
 	}
 
 
+	/**
+	 * Removes a bookmark once it's not necessary anymore.
+	 *
+	 * @param string $name Name of the bookmark to remove.
+	 * @return bool
+	 */
 	public function release_bookmark( $name ) {
+
 		if ( ! array_key_exists( $name, $this->bookmarks ) ) {
 			return false;
 		}
@@ -1141,9 +1154,9 @@ class WP_HTML_Tag_Processor {
 			$this->updated_html .= $diff->text;
 			$this->updated_bytes = $diff->end;
 
-			foreach ( $this->bookmarks as $name => &$position ) {
+			foreach ( $this->bookmarks as &$position ) {
 				$update_head = $position->start >= $diff->start;
-				$update_tail = $position->end   >= $diff->start;
+				$update_tail = $position->end >= $diff->start;
 
 				if ( ! $update_head && ! $update_tail ) {
 					continue;
@@ -1156,12 +1169,37 @@ class WP_HTML_Tag_Processor {
 				}
 
 				if ( $update_tail ) {
-					$position->start += $delta;
+					$position->end += $delta;
 				}
 			}
 		}
 
 		$this->attribute_updates = array();
+	}
+
+	/**
+	 * Move the current pointer in the Tag Processor to a given bookmark's location.
+	 *
+	 * @param string $bookmark_name Name of bookmark to which to rewind.
+	 * @return bool
+	 * @throws Exception Throws on invalid bookmark name if WP_DEBUG set.
+	 */
+	public function rewind( $bookmark_name ) {
+		if ( ! array_key_exists( $bookmark_name, $this->bookmarks ) ) {
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				throw new Exception( 'Invalid bookmark name' );
+			}
+			return false;
+		}
+
+		// Apply all the updates.
+		$this->apply_string_diffs();
+
+		$start               = $this->bookmarks[ $bookmark_name ]->start;
+		$this->parsed_bytes  = $start;
+		$this->updated_bytes = $start;
+		$this->updated_html  = substr( $this->html, 0, $this->parsed_bytes );
+		return $this->next_tag();
 	}
 
 	/**
@@ -1473,6 +1511,15 @@ class WP_HTML_Tag_Processor {
 			return $this->updated_html . substr( $this->html, $this->updated_bytes );
 		}
 
+		return $this->apply_string_diffs();
+	}
+
+	/**
+	 * I just ripped out the part I need to call in the rewind().
+	 *
+	 * @TODO separate it more cleanly.
+	 */
+	private function apply_string_diffs() {
 		/*
 		 * Parsing is in progress – let's apply the attribute updates without moving on to the next tag.
 		 *
