@@ -75,6 +75,11 @@
 			z-index: -1;
 		}
 	}
+
+	// Fix for Safari bug where the focus style is not visible on the content area.
+	.interface-interface-skeleton__content:focus {
+		z-index: initial;
+	}
 }
 
 // Fixes for edge cases.
