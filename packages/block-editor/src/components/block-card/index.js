@@ -30,28 +30,44 @@ function BlockCard( { title, icon, description, blockType, className } ) {
 	const isOffCanvasNavigationEditorEnabled =
 		window?.__experimentalEnableOffCanvasNavigationEditor === true;
 
-	const { parentNavBlockClientId } = useSelect( ( select ) => {
-		const { getSelectedBlockClientId, getBlockParentsByBlockName } =
-			select( blockEditorStore );
+	const { closestControllingBlockClientId } = useSelect( ( select ) => {
+		const {
+			getSelectedBlockClientId,
+			getBlockParents,
+			areInnerBlocksControlled,
+		} = select( blockEditorStore );
 
 		const _selectedBlockClientId = getSelectedBlockClientId();
 
+		const blockParents = getBlockParents( _selectedBlockClientId, true );
+
+		// Find the first parent that is controlling its inner blocks.
+		const _closestControllingBlockClientId = blockParents.find(
+			( parentBlockClientId ) =>
+				areInnerBlocksControlled( parentBlockClientId )
+		);
+
 		return {
-			parentNavBlockClientId: getBlockParentsByBlockName(
-				_selectedBlockClientId,
-				'core/navigation',
-				true
-			)[ 0 ],
+			closestControllingBlockClientId: _closestControllingBlockClientId,
 		};
 	}, [] );
 
 	const { selectBlock } = useDispatch( blockEditorStore );
 
+	// If the selected block is being controlled then show a back button which
+	// allows jumping immediately up to the controlling ancestor block.
+	// Currently limited to the offcanvas experiment but may be opened up to all
+	// blocks which meet the criteria in future.
+	const showBackButton =
+		isOffCanvasNavigationEditorEnabled && closestControllingBlockClientId;
+
 	return (
 		<div className={ classnames( 'block-editor-block-card', className ) }>
-			{ isOffCanvasNavigationEditorEnabled && parentNavBlockClientId && (
+			{ showBackButton && (
 				<Button
-					onClick={ () => selectBlock( parentNavBlockClientId ) }
+					onClick={ () =>
+						selectBlock( closestControllingBlockClientId )
+					}
 					label={ __( 'Go to parent Navigation block' ) }
 					style={
 						// TODO: This style override is also used in ToolsPanelHeader.
