@@ -226,6 +226,8 @@ export function BlockSettingsDropdown( {
 								<__unstableBlockSettingsMenuFirstItem.Slot
 									fillProps={ { onClose } }
 								/>
+							</MenuGroup>
+							<MenuGroup>
 								{ ! parentBlockIsSelected &&
 									!! firstParentClientId && (
 										<MenuItem

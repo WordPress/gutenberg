@@ -40,6 +40,7 @@ import { getBlockPositionDescription } from './utils';
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { useBlockLock } from '../block-lock';
+import __unstableBlockSettingsMenuFirstItem from '../block-settings-menu/block-settings-menu-first-item';
 
 function ListViewBlock( {
 	block,
@@ -359,30 +360,32 @@ function ListViewBlock( {
 								__experimentalSelectBlock={ updateSelection }
 							>
 								{ ( { onClose } ) => (
-									<MenuItem
-										onClick={ () => {
-											const newLink = createBlock(
-												'core/navigation-link'
-											);
-											const newSubmenu = createBlock(
-												'core/navigation-submenu',
-												attributes,
-												block.innerBlocks
-													? [
-															...block.innerBlocks,
-															newLink,
-													  ]
-													: [ newLink ]
-											);
-											replaceBlock(
-												clientId,
-												newSubmenu
-											);
-											onClose();
-										} }
-									>
-										{ __( 'Add a submenu item' ) }
-									</MenuItem>
+									<__unstableBlockSettingsMenuFirstItem>
+										<MenuItem
+											onClick={ () => {
+												const newLink = createBlock(
+													'core/navigation-link'
+												);
+												const newSubmenu = createBlock(
+													'core/navigation-submenu',
+													attributes,
+													block.innerBlocks
+														? [
+																...block.innerBlocks,
+																newLink,
+														  ]
+														: [ newLink ]
+												);
+												replaceBlock(
+													clientId,
+													newSubmenu
+												);
+												onClose();
+											} }
+										>
+											{ __( 'Add a submenu item' ) }
+										</MenuItem>
+									</__unstableBlockSettingsMenuFirstItem>
 								) }
 							</BlockSettingsDropdown>
 						) }
