@@ -3,7 +3,7 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.describe( 'templates', () => {
+test.describe( 'Post type templates', () => {
 	test.describe( 'Using a CPT with a predefined template', () => {
 		test.beforeAll( async ( { requestUtils } ) => {
 			await requestUtils.activatePlugin(
