@@ -19,6 +19,7 @@ import {
 import { PanelBody, ToggleControl, RangeControl } from '@wordpress/components';
 import { sprintf, __, _x } from '@wordpress/i18n';
 import { count as wordCount } from '@wordpress/wordcount';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -150,6 +151,27 @@ export default function PostExcerptEditor( {
 		trimmedExcerpt = rawOrRenderedExcerpt.trim().split( '', excerptLength );
 	}
 
+	/**
+	 * Show a warning if the word count is same as,
+	 * 5 words lower, or larger than the excerpt length value.
+	 */
+	let wordCountMessage = null;
+	if (
+		excerptLength === currentWordCount ||
+		( excerptLength > currentWordCount &&
+			excerptLength - currentWordCount <= 5 )
+	) {
+		wordCountMessage = sprintf(
+			/* translators: 1: Number of words entered, 2: Number of words allowed. */
+			__( '%1$s / %2$s' ),
+			currentWordCount,
+			excerptLength
+		);
+	} else if ( currentWordCount > excerptLength ) {
+		// If the word count exceeds the excerpt length, show a warning with a negative value.
+		// Convert the value to a string so that it can be used in speak().
+		wordCountMessage = String( excerptLength - currentWordCount );
+	}
 	const excerptContent = isEditable ? (
 		<RichText
 			className={ excerptClassName }
@@ -201,6 +223,10 @@ export default function PostExcerptEditor( {
 			</InspectorControls>
 			<div { ...blockProps }>
 				{ excerptContent }
+				{ isSelected && wordCountMessage && (
+					<Warning>{ wordCountMessage }</Warning>
+				) }
+				{ isSelected && wordCountMessage && speak( wordCountMessage ) }
 				{ ! showMoreOnNewLine && ' ' }
 				{ showMoreOnNewLine ? (
 					<p className="wp-block-post-excerpt__more-text">
@@ -209,20 +235,6 @@ export default function PostExcerptEditor( {
 				) : (
 					readMoreLink
 				) }
-				{ isSelected &&
-					excerptLength &&
-					currentWordCount > excerptLength && (
-						<Warning>
-							{ sprintf(
-								/* translators: 1: Number of words entered, 2: Number of words allowed. */
-								__(
-									'The custom excerpt uses %1$s of %2$s words.'
-								),
-								currentWordCount,
-								excerptLength
-							) }
-						</Warning>
-					) }
 			</div>
 		</>
 	);
