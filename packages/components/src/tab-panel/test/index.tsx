@@ -34,10 +34,11 @@ const TABS = [
 
 const getSelectedTab = () => screen.getByRole( 'tab', { selected: true } );
 
-const originalGetClientRects = window.HTMLElement.prototype.getClientRects;
+let originalGetClientRects: () => DOMRectList;
 
 describe( 'TabPanel', () => {
 	beforeAll( () => {
+		originalGetClientRects = window.HTMLElement.prototype.getClientRects;
 		// Mocking `getClientRects()` is necessary to pass a check performed by
 		// the `focus.tabbable.find()` and by the `focus.focusable.find()` functions
 		// from the `@wordpress/dom` package.
