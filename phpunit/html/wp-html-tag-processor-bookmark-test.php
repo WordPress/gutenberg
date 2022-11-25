@@ -237,4 +237,32 @@ class WP_HTML_Tag_Processor_Bookmark_Test extends WP_UnitTestCase {
 			$p->get_updated_html()
 		);
 	}
+
+	public function test_can_write_dangerous_functions_to_replace_inner_html() {
+		$replace_inner_html = function ( WP_HTML_Tag_Processor $p, $html ) {
+			$tag = $p->get_tag();
+			$p->set_bookmark( '__start_of_node' );
+
+			$depth = 1;
+			while ( $depth > 0 && $p->next_tag( [ 'tag_name' => $tag, 'tag_closers' => 'visit' ] ) ) {
+				$depth += $p->is_tag_closer() ? -1 : 1;
+
+				if ( $depth === 0 ) {
+					$p->set_bookmark( '__end_of_node' );
+					break;
+				}
+			}
+
+			$p->dangerously_replace( '__start_of_node', '__end_of_node', $html, 'inner' );
+		};
+
+		$p = new WP_HTML_Tag_Processor( '<div><h1>Unwrapping HTML</h1><div class="wrapper"><p>Blah blah</p><div class="wrapper"><img></div></div><div class="wrapper">untouched</div></div>' );
+		$p->next_tag( [ 'class_name' => 'wrapper' ] );
+
+		$replace_inner_html( $p, '<strong>Weee!</strong>' );
+		$this->assertEquals(
+			'<div><h1>Unwrapping HTML</h1><div class="wrapper"><strong>Weee!</strong></div><div class="wrapper">untouched</div></div>',
+			$p->get_updated_html()
+		);
+	}
 }
