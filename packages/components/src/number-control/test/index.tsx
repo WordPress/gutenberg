@@ -194,7 +194,7 @@ describe( 'NumberControl', () => {
 			expect( input ).toHaveValue( 10 );
 		} );
 
-		it( 'should parse to number value on ENTER keypress when required', async () => {
+		it( 'should parse non-numeric values to a number on ENTER keypress when required', async () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
@@ -209,7 +209,7 @@ describe( 'NumberControl', () => {
 			expect( input ).toHaveValue( 0 );
 		} );
 
-		it( 'should parse to empty string on ENTER keypress when not required', async () => {
+		it( 'should parse non-numeric values to empty string on ENTER keypress when not required', async () => {
 			const user = userEvent.setup( {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
@@ -221,6 +221,9 @@ describe( 'NumberControl', () => {
 			await user.type( input, 'abc' );
 			await user.keyboard( '[Enter]' );
 
+			// Note: the `input` field may still visually show the invalid input,
+			// while internally parsing the value as an empty string.
+			//
 			// React Testing Library associates `null` to empty string types for
 			// numeric `input` elements
 			// (see https://github.com/testing-library/jest-dom/blob/v5.16.5/src/utils.js#L191-L192)
@@ -238,7 +241,7 @@ describe( 'NumberControl', () => {
 			await user.clear( input );
 			await user.keyboard( '[Enter]' );
 
-			// React Testing Library associated `null` to empty string types for
+			// React Testing Library associates `null` to empty string types for
 			// numeric `input` elements
 			// (see https://github.com/testing-library/jest-dom/blob/v5.16.5/src/utils.js#L191-L192)
 			expect( input ).toHaveValue( null );
