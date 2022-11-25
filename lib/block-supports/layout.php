@@ -370,17 +370,25 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		return (string) $content;
 	}
 
-	$block_gap              = gutenberg_get_global_settings( array( 'spacing', 'blockGap' ) );
-	$global_layout_settings = gutenberg_get_global_settings( array( 'layout' ) );
-	$has_block_gap_support  = isset( $block_gap ) ? null !== $block_gap : false;
+	static $static_information_computed   = false;
+	static $has_block_gap_support         = false;
+	static $global_layout_settings        = null;
+	static $root_padding_aware_alignments = false;
+	if ( ! $static_information_computed ) {
+		$global_settings               = gutenberg_get_global_settings();
+		$block_gap                     = _wp_array_get( $global_settings, array( 'spacing', 'blockGap' ), $global_settings );
+		$has_block_gap_support         = isset( $block_gap );
+		$global_layout_settings        = _wp_array_get( $global_settings, array( 'layout' ), $global_settings );
+		$root_padding_aware_alignments = _wp_array_get( $global_settings, array( 'useRootPaddingAwareAlignments' ), $global_settings );
+		$static_information_computed   = true;
+	}
+
 	$default_block_layout   = _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
 	$used_layout            = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : $default_block_layout;
 
-	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] ) {
-		if ( ! $global_layout_settings ) {
+	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] && ! $global_layout_settings ) {
 			return $block_content;
 		}
-	}
 
 	$class_names        = array();
 	$layout_definitions = _wp_array_get( $global_layout_settings, array( 'definitions' ), array() );
@@ -393,7 +401,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	}
 
 	if (
-		gutenberg_get_global_settings( array( 'useRootPaddingAwareAlignments' ) ) &&
+		$root_padding_aware_alignments &&
 		isset( $used_layout['type'] ) &&
 		'constrained' === $used_layout['type']
 	) {
