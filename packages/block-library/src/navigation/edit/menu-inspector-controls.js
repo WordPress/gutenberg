@@ -18,25 +18,6 @@ import { __ } from '@wordpress/i18n';
 import ManageMenusButton from './manage-menus-button';
 import NavigationMenuSelector from './navigation-menu-selector';
 
-const WrappedNavigationMenuSelector = ( {
-	currentMenuId,
-	onCreateNew,
-	createNavigationMenuIsSuccess,
-	createNavigationMenuIsError,
-	onSelectClassicMenu,
-	onSelectNavigationMenu,
-} ) => (
-	<NavigationMenuSelector
-		currentMenuId={ currentMenuId }
-		onSelectNavigationMenu={ onSelectNavigationMenu }
-		onSelectClassicMenu={ onSelectClassicMenu }
-		onCreateNew={ onCreateNew }
-		createNavigationMenuIsSuccess={ createNavigationMenuIsSuccess }
-		createNavigationMenuIsError={ createNavigationMenuIsError }
-		/* translators: %s: The name of a menu. */
-		actionLabel={ __( "Switch to '%s'" ) }
-	/>
-);
 const MenuInspectorControls = ( {
 	createNavigationMenuIsSuccess,
 	createNavigationMenuIsError,
@@ -53,6 +34,8 @@ const MenuInspectorControls = ( {
 	const menuControlsSlot = window?.__experimentalEnableBlockInspectorTabs
 		? 'list'
 		: undefined;
+	/* translators: %s: The name of a menu. */
+	const actionLabel = __( "Switch to '%s'" );
 
 	return (
 		<InspectorControls __experimentalGroup={ menuControlsSlot }>
@@ -70,7 +53,7 @@ const MenuInspectorControls = ( {
 							>
 								{ __( 'Menu' ) }
 							</Heading>
-							<WrappedNavigationMenuSelector
+							<NavigationMenuSelector
 								currentMenuId={ currentMenuId }
 								onSelectClassicMenu={ onSelectClassicMenu }
 								onSelectNavigationMenu={
@@ -83,6 +66,7 @@ const MenuInspectorControls = ( {
 								createNavigationMenuIsError={
 									createNavigationMenuIsError
 								}
+								actionLabel={ actionLabel }
 							/>
 						</HStack>
 						{ currentMenuId && isNavigationMenuMissing ? (
@@ -97,7 +81,7 @@ const MenuInspectorControls = ( {
 					</>
 				) : (
 					<>
-						<WrappedNavigationMenuSelector
+						<NavigationMenuSelector
 							currentMenuId={ currentMenuId }
 							onSelectClassicMenu={ onSelectClassicMenu }
 							onSelectNavigationMenu={ onSelectNavigationMenu }
@@ -108,6 +92,7 @@ const MenuInspectorControls = ( {
 							createNavigationMenuIsError={
 								createNavigationMenuIsError
 							}
+							actionLabel={ actionLabel }
 						/>
 						<ManageMenusButton
 							disabled={ isManageMenusButtonDisabled }
