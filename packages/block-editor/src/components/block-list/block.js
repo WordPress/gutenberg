@@ -354,6 +354,15 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 				canInsertBlockType,
 			} = registry.select( blockEditorStore );
 
+			/**
+			 * Moves the block with clientId up one level. If the block type
+			 * cannot be inserted at the new location, it will be attempted to
+			 * convert to the default block type.
+			 *
+			 * @param {string}  _clientId       The block to move.
+			 * @param {boolean} changeSelection Whether to change the selection
+			 *                                  to the moved block.
+			 */
 			function moveFirstItemUp( _clientId, changeSelection = true ) {
 				const targetRootClientId = getBlockRootClientId( _clientId );
 				const blockOrder = getBlockOrder( _clientId );
