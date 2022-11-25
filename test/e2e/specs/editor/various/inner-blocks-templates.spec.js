@@ -28,16 +28,19 @@ test.describe( 'Inner blocks templates', () => {
 			name: 'test/test-inner-blocks-async-template',
 		} );
 
+		const blockWithTemplateContent = page.locator(
+			'role=document[name="Block: Test Inner Blocks Async Template"i] >> text=OneTwo'
+		);
+
+		// The block template content appears asynchronously, so wait for it.
+		await blockWithTemplateContent.waitFor();
+
 		// Publish the post, then reload.
 		await editor.publishPost();
 		await page.reload();
 
 		// Wait for the block that was inserted to appear with its templated content.
-		await page
-			.locator(
-				'role=document[name="Block: Test Inner Blocks Async Template"i] >> text=OneTwo'
-			)
-			.waitFor();
+		await blockWithTemplateContent.waitFor();
 
 		// The template resolution shouldn't cause the post to be dirty.
 		const editorTopBar = page.locator(

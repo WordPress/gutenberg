@@ -196,9 +196,8 @@
 
 			edit: InnerBlocksAsyncTemplateEdit,
 
-			save() {
-				return el( InnerBlocks.Content );
-			},
+			// Purposely do not save inner blocks so that it's possible to test template resolution.
+			save() {},
 		}
 	);
 } )();
