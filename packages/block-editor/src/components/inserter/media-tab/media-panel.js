@@ -4,7 +4,6 @@
 import { useRef, useEffect } from '@wordpress/element';
 import { Spinner, SearchControl } from '@wordpress/components';
 import { focus } from '@wordpress/dom';
-import { useAsyncList } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -15,7 +14,6 @@ import { useMediaResults, useDebouncedInput } from './hooks';
 import InserterNoResults from '../no-results';
 
 const INITIAL_MEDIA_ITEMS_PER_PAGE = 10;
-const EMPTY_ARRAY = [];
 
 export function MediaCategoryDialog( { rootClientId, onInsert, category } ) {
 	const container = useRef();
@@ -45,29 +43,24 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 		search: debouncedSearch,
 		orderBy: !! debouncedSearch ? 'relevance' : 'date',
 	} );
-	const shownResults = useAsyncList( results || EMPTY_ARRAY, {
-		step: 3,
-	} );
 	const baseCssClass = 'block-editor-inserter__media-panel';
 	return (
 		<div className={ baseCssClass }>
-			{ shownResults !== undefined && (
-				<SearchControl
-					className={ `${ baseCssClass }-search` }
-					onChange={ setSearch }
-					value={ search }
-					label={ sprintf(
-						/* translators: %s: Name of the media category(ex. 'images, videos'). */
-						__( 'Search %s' ),
-						category.label.toLocaleLowerCase()
-					) }
-					placeholder={ sprintf(
-						/* translators: %s: Name of the media category(ex. 'images, videos'). */
-						__( 'Search %s' ),
-						category.label.toLocaleLowerCase()
-					) }
-				/>
-			) }
+			<SearchControl
+				className={ `${ baseCssClass }-search` }
+				onChange={ setSearch }
+				value={ search }
+				label={ sprintf(
+					/* translators: %s: Name of the media category(ex. 'images, videos'). */
+					__( 'Search %s' ),
+					category.label.toLocaleLowerCase()
+				) }
+				placeholder={ sprintf(
+					/* translators: %s: Name of the media category(ex. 'images, videos'). */
+					__( 'Search %s' ),
+					category.label.toLocaleLowerCase()
+				) }
+			/>
 			{ ! results && (
 				<div className={ `${ baseCssClass }-spinner` }>
 					<Spinner />
@@ -76,11 +69,11 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 			{ Array.isArray( results ) && ! results.length && (
 				<InserterNoResults />
 			) }
-			{ !! shownResults?.length && (
+			{ !! results?.length && (
 				<MediaList
 					rootClientId={ rootClientId }
 					onClick={ onInsert }
-					results={ shownResults }
+					results={ results }
 					mediaType={ category.mediaType }
 				/>
 			) }
