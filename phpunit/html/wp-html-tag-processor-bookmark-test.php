@@ -109,13 +109,13 @@ class WP_HTML_Tag_Processor_Bookmark_Test extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_replaces_inside_contents() {
+	public function test_replaces_inner_contents() {
 		$p = new WP_HTML_Tag_Processor( '<div class="outer">Before<div class="inner">Inside</div>After</div>' );
 		$p->next_tag( [ 'class_name' => 'inner' ] );
 		$p->set_bookmark( 'start' );
 		$p->next_tag( [ 'tag_name' => 'div', 'tag_closers' => 'visit' ] );
 		$p->set_bookmark( 'end' );
-		$p->dangerously_replace( 'start', 'end', '--', 'inside' );
+		$p->dangerously_replace( 'start', 'end', '--', 'inner' );
 
 		$this->assertEquals(
 			'<div class="outer">Before<div class="inner">--</div>After</div>',
@@ -133,6 +133,107 @@ class WP_HTML_Tag_Processor_Bookmark_Test extends WP_UnitTestCase {
 
 		$this->assertEquals(
 			'<div class="outer">Before--After</div>',
+			$p->get_updated_html()
+		);
+	}
+
+	public function test_replaces_single_token() {
+		$p = new WP_HTML_Tag_Processor( 'This is an <img> tag.' );
+		$p->next_tag();
+		$p->set_bookmark( 'image' );
+		$p->dangerously_replace( 'image', 'image', '(image)' );
+
+		$this->assertEquals(
+			'This is an (image) tag.',
+			$p->get_updated_html()
+		);
+	}
+
+	public function test_does_nothing_when_replacing_inner_of_single_token() {
+		$p = new WP_HTML_Tag_Processor( 'This is an <img> tag.' );
+		$p->next_tag();
+		$p->set_bookmark( 'image' );
+		$p->dangerously_replace( 'image', 'image', '(image)', 'inner' );
+
+		$this->assertEquals(
+			'This is an <img> tag.',
+			$p->get_updated_html()
+		);
+	}
+
+	public function test_does_nothing_when_given_twisted_bookmarks() {
+		$p = new WP_HTML_Tag_Processor( '<div><span></span></div>' );
+		$p->next_tag();
+		$p->set_bookmark( 'first' );
+		$p->next_tag();
+		$p->set_bookmark( 'second' );
+		$p->dangerously_replace( 'second', 'first', '--' );
+
+		$this->assertEquals(
+			'<div><span></span></div>',
+			$p->get_updated_html()
+		);
+	}
+
+	public function test_bookmarks_deactive_when_bookmarked_token_disappears() {
+		$p = new WP_HTML_Tag_Processor( '<div>Before<div>Inside</div>After</div>' );
+		$p->next_tag();
+		$p->set_bookmark( 'first' );
+		$p->next_tag();
+		$p->set_bookmark( 'inner_start' );
+		$p->next_tag( [ 'tag_closers' => 'visit' ] );
+		$p->set_bookmark( 'inner_end' );
+		$p->dangerously_replace( 'first', 'inner_end', '' );
+
+		$this->expectException( Exception::class );
+		$p->seek( 'inner_start' );
+
+		$p->set_attribute( 'wonky', true );
+
+		$this->assertEquals(
+			'After</div>',
+			$p->get_updated_html()
+		);
+	}
+
+	public function test_gets_inner_content() {
+		$p = new WP_HTML_Tag_Processor( '<div>Before<div>Inside</div>After</div>' );
+		$p->next_tag();
+		$p->set_bookmark( 'start' );
+		$p->next_tag( [ 'tag_closers' => 'visit', 'match_offset' => 3 ] );
+		$p->set_bookmark( 'end' );
+
+		$this->assertEquals(
+			'Before<div>Inside</div>After',
+			$p->dangerously_get_contents( 'start', 'end', 'inner' )
+		);
+	}
+
+	public function test_gets_outer_content() {
+		$p = new WP_HTML_Tag_Processor( '<div>Before<div class="start">Inside</div>After</div>' );
+		$p->next_tag( [ 'class_name' => 'start' ] );
+		$p->set_bookmark( 'start' );
+		$p->next_tag( [ 'tag_closers' => 'visit' ] );
+		$p->set_bookmark( 'end' );
+
+		$this->assertEquals(
+			'<div class="start">Inside</div>',
+			$p->dangerously_get_contents( 'start', 'end' )
+		);
+	}
+
+	public function test_can_replace_parent_with_children() {
+		$p = new WP_HTML_Tag_Processor( '<div><h1>Unwrapping HTML</h1><div class="wrapper"><p>Blah blah</p><img></div></div>' );
+		$p->next_tag( [ 'class_name' => 'wrapper' ] );
+		$p->set_bookmark( 'start' );
+		$p->next_tag( [ 'tag_name' => 'div', 'tag_closers' => 'visit' ] );
+		$p->set_bookmark( 'end' );
+
+		$inner_html = $p->dangerously_get_contents( 'start', 'end', 'inner' );
+		$p->dangerously_replace( 'start', 'end', $inner_html, 'outer' );
+
+		$this->assertEquals(
+			'<div><h1>Unwrapping HTML</h1><p>Blah blah</p><img></div>',
 			$p->get_updated_html()
 		);
 	}

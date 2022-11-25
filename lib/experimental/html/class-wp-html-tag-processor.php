@@ -1154,11 +1154,24 @@ class WP_HTML_Tag_Processor {
 			$this->updated_html .= $diff->text;
 			$this->updated_bytes = $diff->end;
 
-			foreach ( $this->bookmarks as &$position ) {
+			foreach ( $this->bookmarks as $name => &$position ) {
 				$update_head = $position->start >= $diff->start;
 				$update_tail = $position->end >= $diff->start;
 
 				if ( ! $update_head && ! $update_tail ) {
+					continue;
+				}
+
+				/*
+				 * If a change is made that encompasses an entire bookmark then we
+				 * have to remove the bookmark as the semantic place it pointed to
+				 * no longer exists. It could seem like we can let it remain as
+				 * long as we haven't removed the text, but if the text is different
+				 * then the place likely doesn't exist at all either and we need to
+				 * start over.
+				 */
+				if ( $diff->start <= $position->start && $diff->end >= $position->end ) {
+					unset( $this->bookmarks[ $name ] );
 					continue;
 				}
 
@@ -1202,12 +1215,48 @@ class WP_HTML_Tag_Processor {
 		return $this->next_tag();
 	}
 
-	public function dangerously_replace( $start_bookmark, $end_bookmark, $text, $region = 'outside' ) {
-		$start = $this->bookmarks[ $start_bookmark ];
-		$start = 'outside' === $region ? $start->start : $start->end + 1;
+	public function dangerously_get_contents( $start_bookmark, $end_bookmark, $region = 'outer' ) {
+		if (
+			empty( $start_bookmark ) ||
+			empty( $end_bookmark ) ||
+			! isset( $this->bookmarks[ $start_bookmark ], $this->bookmarks[ $end_bookmark ] ) ||
+			( $start_bookmark === $end_bookmark && $region !== 'outer' )
+		) {
+			return false;
+		}
 
-		$end = $this->bookmarks[ $end_bookmark ];
-		$end = 'outside' === $region ? $end->end + 1 : $end->start - 1;
+		$start = $this->bookmarks[ $start_bookmark ];
+		$end   = $this->bookmarks[ $end_bookmark ];
+
+		if ( $start->start > $end->start || $start->end > $end->end ) {
+			return false;
+		}
+
+		$start = 'outer' === $region ? $start->start : $start->end + 1;
+		$end   = 'outer' === $region ? $end->end + 1 : $end->start - 1;
+
+		return substr( $this->html, $start, $end - $start );
+	}
+
+	public function dangerously_replace( $start_bookmark, $end_bookmark, $text, $region = 'outer' ) {
+		if (
+			empty( $start_bookmark ) ||
+			empty( $end_bookmark ) ||
+			! isset( $this->bookmarks[ $start_bookmark ], $this->bookmarks[ $end_bookmark ] ) ||
+			( $start_bookmark === $end_bookmark && $region !== 'outer' )
+		) {
+			return false;
+		}
+
+		$start = $this->bookmarks[ $start_bookmark ];
+		$end   = $this->bookmarks[ $end_bookmark ];
+
+		if ( $start->start > $end->start || $start->end > $end->end ) {
+			return false;
+		}
+
+		$start = 'outer' === $region ? $start->start : $start->end + 1;
+		$end   = 'outer' === $region ? $end->end + 1 : $end->start - 1;
 
 		$this->attribute_updates[] = new WP_HTML_Text_Replacement( $start, $end, $text );
 		$this->apply_attributes_updates();
