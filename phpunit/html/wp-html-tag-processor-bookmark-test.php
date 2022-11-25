@@ -254,6 +254,8 @@ class WP_HTML_Tag_Processor_Bookmark_Test extends WP_UnitTestCase {
 			}
 
 			$p->dangerously_replace( '__start_of_node', '__end_of_node', $html, 'inner' );
+			$p->release_bookmark( '__start_of_node' );
+			$p->release_bookmark( '__end_of_node' );
 		};
 
 		$p = new WP_HTML_Tag_Processor( '<div><h1>Unwrapping HTML</h1><div class="wrapper"><p>Blah blah</p><div class="wrapper"><img></div></div><div class="wrapper">untouched</div></div>' );
