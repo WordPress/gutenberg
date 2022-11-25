@@ -65,6 +65,32 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_2 {
 		if ( ! $settings['with_supports'] ) {
 			return static::$theme;
 		}
+		
+		$editor_settings = array(
+			'disableCustomColors'    => get_theme_support( 'disable-custom-colors' ),
+			'disableCustomFontSizes' => get_theme_support( 'disable-custom-font-sizes' ),
+			'disableCustomGradients' => get_theme_support( 'disable-custom-gradients' ),
+			'disableLayoutStyles'    => get_theme_support( 'disable-layout-styles' ),
+			'enableCustomLineHeight' => get_theme_support( 'custom-line-height' ),
+			'enableCustomSpacing'    => get_theme_support( 'custom-spacing' ),
+			'enableCustomUnits'      => get_theme_support( 'custom-units' ),
+		);
+
+		// Theme settings.
+		$color_palette = current( (array) get_theme_support( 'editor-color-palette' ) );
+		if ( false !== $color_palette ) {
+			$editor_settings['colors'] = $color_palette;
+		}
+
+		$font_sizes = current( (array) get_theme_support( 'editor-font-sizes' ) );
+		if ( false !== $font_sizes ) {
+			$editor_settings['fontSizes'] = $font_sizes;
+		}
+
+		$gradient_presets = current( (array) get_theme_support( 'editor-gradient-presets' ) );
+		if ( false !== $gradient_presets ) {
+			$editor_settings['gradients'] = $gradient_presets;
+		}
 
 		/*
 		 * We want the presets and settings declared in theme.json
@@ -72,7 +98,7 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_2 {
 		 * So we take theme supports, transform it to theme.json shape
 		 * and merge the static::$theme upon that.
 		 */
-		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( get_default_block_editor_settings() );
+		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( $editor_settings );
 		if ( ! wp_theme_has_theme_json() ) {
 			if ( ! isset( $theme_support_data['settings']['color'] ) ) {
 				$theme_support_data['settings']['color'] = array();
