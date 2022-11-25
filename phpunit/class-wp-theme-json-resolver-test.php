@@ -383,7 +383,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
-	public function register_user_data() {
+	private function register_user_data() {
 		wp_set_current_user( self::$administrator_id );
 		$user_cpt = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( wp_get_theme(), true );
 		$config   = json_decode( $user_cpt['post_content'], true );
@@ -403,13 +403,13 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	 */
 	public function test_get_merged_data_returns_origin_default() {
 		// Make sure there is data from the blocks origin.
-		self::register_block_data( 'my/block-with-styles' );
+		$this->register_block_data( 'my/block-with-styles' );
 
 		// Make sure there is data from the theme origin.
 		switch_theme( 'block-theme' );
 
 		// Make sure there is data from the user origin.
-		self::register_user_data();
+		$this->register_user_data();
 
 		$theme_json = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( 'default' );
 		$settings   = $theme_json->get_settings();
@@ -417,7 +417,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertTrue( isset( $settings['color']['palette']['default'] ), 'core palette is present' );
 		$block_styles = array_filter(
 			$styles,
-			function( $element ) {
+			static function( $element ) {
 				return isset( $element['name'] ) && 'my/block-with-styles' === $element['name'];
 			}
 		);
@@ -433,25 +433,25 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	 */
 	public function test_get_merged_data_returns_origin_blocks() {
 		// Make sure there is data from the blocks origin.
-		self::register_block_data( 'my/block-with-styles' );
+		$this->register_block_data( 'my/block-with-styles' );
 
 		// Make sure there is data from the theme origin.
 		switch_theme( 'block-theme' );
 
 		// Make sure there is data from the user origin.
-		self::register_user_data();
+		$this->register_user_data();
 
 		$theme_json = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( 'blocks' );
 		$settings   = $theme_json->get_settings();
 		$styles     = $theme_json->get_styles_block_nodes();
-		$this->assertTrue( isset( $settings['color']['palette']['default'] ), 'core palette is present' );
+		$this->assertTrue( isset( $settings['color']['palette']['default'] ), 'core palette must be present' );
 		$block_styles = array_filter(
 			$styles,
-			function( $element ) {
+			static function( $element ) {
 				return isset( $element['name'] ) && 'my/block-with-styles' === $element['name'];
 			}
 		);
-		$this->assertTrue( count( $block_styles ) === 1, 'block styles are present' );
+		$this->assertTrue( count( $block_styles ) === 1, 'block styles must be defined' );
 		$this->assertFalse( isset( $settings['color']['palette']['theme'] ), 'theme palette is not present' );
 		$this->assertFalse( isset( $settings['color']['palette']['custom'] ), 'user palette is not present' );
 
@@ -463,26 +463,26 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	 */
 	public function test_get_merged_data_returns_origin_theme() {
 		// Make sure there is data from the blocks origin.
-		self::register_block_data( 'my/block-with-styles' );
+		$this::register_block_data( 'my/block-with-styles' );
 
 		// Make sure there is data from the theme origin.
 		switch_theme( 'block-theme' );
 
 		// Make sure there is data from the user origin.
-		self::register_user_data();
+		$this->register_user_data();
 
 		$theme_json = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( 'theme' );
 		$settings   = $theme_json->get_settings();
 		$styles     = $theme_json->get_styles_block_nodes();
-		$this->assertTrue( isset( $settings['color']['palette']['default'] ), 'core palette is present' );
+		$this->assertTrue( isset( $settings['color']['palette']['default'] ), 'core palette must be defined' );
 		$block_styles = array_filter(
 			$styles,
-			function( $element ) {
+			static function( $element ) {
 				return isset( $element['name'] ) && 'my/block-with-styles' === $element['name'];
 			}
 		);
 		$this->assertTrue( count( $block_styles ) === 1, 'block styles are present' );
-		$this->assertTrue( isset( $settings['color']['palette']['theme'] ), 'theme palette is present' );
+		$this->assertTrue( isset( $settings['color']['palette']['theme'] ), 'theme palette must be defined' );
 		$this->assertFalse( isset( $settings['color']['palette']['custom'] ), 'user palette is not present' );
 
 		unregister_block_type( 'my/block-with-styles' );
@@ -493,27 +493,27 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	 */
 	public function test_get_merged_data_returns_origin_custom() {
 		// Make sure there is data from the blocks origin.
-		self::register_block_data( 'my/block-with-styles' );
+		$this->register_block_data( 'my/block-with-styles' );
 
 		// Make sure there is data from the theme origin.
 		switch_theme( 'block-theme' );
 
 		// Make sure there is data from the user origin.
-		self::register_user_data();
+		$this->register_user_data();
 
 		$theme_json = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
 		$settings   = $theme_json->get_settings();
 		$styles     = $theme_json->get_styles_block_nodes();
-		$this->assertTrue( isset( $settings['color']['palette']['default'] ), 'core palette is present' );
+		$this->assertTrue( isset( $settings['color']['palette']['default'] ), 'core palette isn\'t defined' );
 		$block_styles = array_filter(
 			$styles,
-			function( $element ) {
+			static function( $element ) {
 				return isset( $element['name'] ) && 'my/block-with-styles' === $element['name'];
 			}
 		);
 		$this->assertTrue( count( $block_styles ) === 1, 'block styles are present' );
 		$this->assertTrue( isset( $settings['color']['palette']['theme'] ), 'theme palette is present' );
-		$this->assertTrue( isset( $settings['color']['palette']['custom'] ), 'user palette is present' );
+		$this->assertTrue( isset( $settings['color']['palette']['custom'] ), 'user palette isn\'t defined' );
 
 		unregister_block_type( 'my/block-with-styles' );
 	}
