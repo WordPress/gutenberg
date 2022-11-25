@@ -221,24 +221,7 @@ describe( 'NumberControl', () => {
 			await user.type( input, 'abc' );
 			await user.keyboard( '[Enter]' );
 
-			// React Testing Library associated `null` to empty string types for
-			// numeric `input` elements
-			// (see https://github.com/testing-library/jest-dom/blob/v5.16.5/src/utils.js#L191-L192)
-			expect( input ).toHaveValue( null );
-		} );
-
-		it( 'should accept empty string on ENTER keypress for optional field', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
-
-			render( <NumberControl value={ 5 } required={ false } /> );
-
-			const input = screen.getByRole( 'spinbutton' );
-			await user.clear( input );
-			await user.keyboard( '[Enter]' );
-
-			// React Testing Library associated `null` to empty string types for
+			// React Testing Library associates `null` to empty string types for
 			// numeric `input` elements
 			// (see https://github.com/testing-library/jest-dom/blob/v5.16.5/src/utils.js#L191-L192)
 			expect( input ).toHaveValue( null );
