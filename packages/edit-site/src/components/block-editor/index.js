@@ -135,7 +135,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 
 		return {
 			...restStoredSettings,
-			__unstableFetchMedia: ( _settings ) => fetchMedia( _settings ),
+			__unstableFetchMedia: fetchMedia,
 			__experimentalBlockPatterns: blockPatterns,
 			__experimentalBlockPatternCategories: blockPatternCategories,
 		};

@@ -35,7 +35,7 @@ export function useMediaResults( options = {} ) {
 			const _media = await settings?.__unstableFetchMedia( options );
 			if ( _media ) setResults( _media );
 		} )();
-	}, [ ...Object.values( options ) ] );
+	}, Object.values( options ) );
 	return results;
 }
 

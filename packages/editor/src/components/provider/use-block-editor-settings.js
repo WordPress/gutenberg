@@ -186,7 +186,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				fetchLinkSuggestions( search, searchOptions, settings ),
 			// TODO: We should find a proper way to consolidate similar cases
 			// like reusable blocks, fetch entities, etc.
-			__unstableFetchMedia: ( _settings ) => fetchMedia( _settings ),
+			__unstableFetchMedia: fetchMedia,
 			__experimentalFetchRichUrlData: fetchUrlData,
 			__experimentalCanUserUseUnfilteredHTML: canUseUnfilteredHTML,
 			__experimentalUndo: undo,
