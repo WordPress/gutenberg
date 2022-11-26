@@ -15,7 +15,6 @@ import { useState } from '@wordpress/element';
 import ColorPalette from '..';
 import Popover from '../../popover';
 import { Provider as SlotFillProvider } from '../../slot-fill';
-import type { ColorObject, PaletteObject } from '../types';
 
 const meta: ComponentMeta< typeof ColorPalette > = {
 	title: 'Components/ColorPalette',
@@ -43,10 +42,7 @@ const Template: ComponentStory< typeof ColorPalette > = ( {
 	onChange,
 	...args
 } ) => {
-	const firstColor =
-		( args.colors as ColorObject[] )[ 0 ].color ||
-		( args.colors as PaletteObject[] )[ 0 ].colors[ 0 ].color;
-	const [ color, setColor ] = useState< string | undefined >( firstColor );
+	const [ color, setColor ] = useState< string | undefined >();
 
 	return (
 		<SlotFillProvider>
