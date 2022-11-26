@@ -135,6 +135,12 @@ export type PopoverProps = {
 	 */
 	shift?: boolean;
 	/**
+	 * Sets the type of CSS position property to use.
+	 *
+	 * @default 'absolute'
+	 */
+	strategy?: 'absolute' | 'fixed';
+	/**
 	 * Specifies the popover's style.
 	 *
 	 * Leave undefined for the default style. Other values are:

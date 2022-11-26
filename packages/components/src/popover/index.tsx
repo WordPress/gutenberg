@@ -181,6 +181,7 @@ const UnforwardedPopover = (
 		resize = true,
 		shift = false,
 		variant,
+		strategy: strategyProp = 'absolute',
 
 		// Deprecated props
 		__unstableForcePosition,
@@ -362,6 +363,7 @@ const UnforwardedPopover = (
 		middlewareData: { arrow: arrowData },
 	} = useFloating( {
 		placement: normalizedPlacementFromProps,
+		strategy: strategyProp,
 		middleware,
 		whileElementsMounted: ( referenceParam, floatingParam, updateParam ) =>
 			autoUpdate( referenceParam, floatingParam, updateParam, {
