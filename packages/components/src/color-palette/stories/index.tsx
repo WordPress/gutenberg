@@ -15,7 +15,6 @@ import { useState } from '@wordpress/element';
 import ColorPalette from '..';
 import Popover from '../../popover';
 import { Provider as SlotFillProvider } from '../../slot-fill';
-import type { ColorObject, PaletteObject } from '../types';
 
 const meta: ComponentMeta< typeof ColorPalette > = {
 	title: 'Components/ColorPalette',
