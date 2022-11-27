@@ -23,12 +23,14 @@ export function generateThemeVariables(
 ): ThemeOutputValues {
 	validateInputs( inputs );
 
-	return {
-		colors: {
-			...generateAccentDependentColors( inputs.accent ),
-			...generateBackgroundDependentColors( inputs.background ),
-		},
+	const generatedColors = {
+		...generateAccentDependentColors( inputs.accent ),
+		...generateBackgroundDependentColors( inputs.background ),
 	};
+
+	warnContrastIssues( checkContrasts( inputs, generatedColors ) );
+
+	return { colors: generatedColors };
 }
 
 export function validateInputs( inputs: ThemeInputValues ) {
@@ -39,26 +41,36 @@ export function validateInputs( inputs: ThemeInputValues ) {
 			);
 		}
 	}
+}
 
-	if ( inputs.background ) {
-		if (
-			! colord( inputs.background ).isReadable(
-				inputs.accent || COLORS.ui.theme
-			)
-		) {
-			warning(
-				`wp.components.Theme: The background color provided ("${ inputs.background }") does not have sufficient contrast against the accent color ("${ inputs.accent }").`
-			);
-		}
+export function checkContrasts(
+	inputs: ThemeInputValues,
+	outputs: ThemeOutputValues[ 'colors' ]
+) {
+	const background = inputs.background || COLORS.white;
+	const accent = inputs.accent || '#007cba';
+	const foreground = outputs.foreground || COLORS.gray[ 900 ];
+	const gray = outputs.gray || COLORS.gray;
 
-		if (
-			! colord( inputs.background ).isReadable(
-				getForegroundForColor( inputs.background )
-			)
-		) {
-			warning(
-				`wp.components.Theme: The background color provided ("${ inputs.background }") does not have sufficient contrast against the standard foreground colors.`
-			);
+	return {
+		accent: colord( background ).isReadable( accent )
+			? undefined
+			: `wp.components.Theme: The background color ("${ background }") does not have sufficient contrast against the accent color ("${ accent }").`,
+		foreground: colord( background ).isReadable( foreground )
+			? undefined
+			: `wp.components.Theme: The background color provided ("${ background }") does not have sufficient contrast against the standard foreground colors.`,
+		grays:
+			colord( background ).contrast( gray[ 600 ] ) >= 3 &&
+			colord( background ).contrast( gray[ 700 ] ) >= 4.5
+				? undefined
+				: `wp.components.Theme: The background color provided ("${ background }") cannot generate a set of grayscale foreground colors with sufficient contrast. Try adjusting the color to be lighter or darker.`,
+	};
+}
+
+function warnContrastIssues( issues: ReturnType< typeof checkContrasts > ) {
+	for ( const error of Object.values( issues ) ) {
+		if ( error ) {
+			warning( error );
 		}
 	}
 }

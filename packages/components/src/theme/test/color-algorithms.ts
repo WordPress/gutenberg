@@ -11,35 +11,59 @@ import { COLORS } from '../../utils';
 /**
  * Internal dependencies
  */
-import { generateShades, validateInputs } from '../color-algorithms';
+import { generateShades, generateThemeVariables } from '../color-algorithms';
 
 describe( 'Theme color algorithms', () => {
-	describe( 'validateInputs', () => {
+	describe( 'generateThemeVariables', () => {
 		it( 'should allow explicitly undefined values', () => {
-			validateInputs( { accent: undefined, background: undefined } );
+			generateThemeVariables( {
+				accent: undefined,
+				background: undefined,
+			} );
 			expect( console ).not.toHaveWarned();
 		} );
 
-		it( 'should warn if accent color is not readable against background', () => {
-			validateInputs( { background: '#eee' } );
-			expect( console ).not.toHaveWarned();
-
-			validateInputs( { accent: '#000', background: '#fff' } );
-			expect( console ).not.toHaveWarned();
-
-			validateInputs( { accent: '#111', background: '#000' } );
+		it( 'should warn if invalid colors are passed', () => {
+			generateThemeVariables( { accent: 'var(--invalid)' } );
 			expect( console ).toHaveWarned();
-
-			validateInputs( { background: '#000' } );
-			expect( console ).toHaveWarned();
-
-			// eslint-disable-next-line no-console
-			expect( console.warn ).toHaveBeenCalledTimes( 2 );
 		} );
 
 		it( 'should warn if standard foreground colors are not readable against background', () => {
-			validateInputs( { background: '#777' } );
-			expect( console ).toHaveWarned();
+			generateThemeVariables( { background: '#777' } );
+			expect( console ).toHaveWarnedWith(
+				'wp.components.Theme: The background color provided ("#777") does not have sufficient contrast against the standard foreground colors.'
+			);
+		} );
+
+		it( 'should warn if accent color is not readable against background', () => {
+			generateThemeVariables( { background: '#fefefe' } );
+			expect( console ).not.toHaveWarned();
+
+			generateThemeVariables( {
+				accent: '#000',
+				background: '#fff',
+			} );
+			expect( console ).not.toHaveWarned();
+
+			generateThemeVariables( {
+				accent: '#111',
+				background: '#000',
+			} );
+			expect( console ).toHaveWarnedWith(
+				'wp.components.Theme: The background color ("#000") does not have sufficient contrast against the accent color ("#111").'
+			);
+
+			generateThemeVariables( { background: '#eee' } );
+			expect( console ).toHaveWarnedWith(
+				'wp.components.Theme: The background color ("#eee") does not have sufficient contrast against the accent color ("#007cba").'
+			);
+		} );
+
+		it( 'should warn if a readable grayscale cannot be generated', () => {
+			generateThemeVariables( { background: '#ddd' } );
+			expect( console ).toHaveWarnedWith(
+				'wp.components.Theme: The background color provided ("#ddd") cannot generate a set of grayscale foreground colors with sufficient contrast. Try adjusting the color to be lighter or darker.'
+			);
 		} );
 	} );
 
