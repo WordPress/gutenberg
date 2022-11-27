@@ -43,31 +43,31 @@ function gutenberg_initialize_experiments_settings() {
 
 	add_settings_field(
 		'gutenberg-zoomed-out-view',
-		__( 'Zoomed out view ', 'gutenberg' ),
+		__( 'Zoomed out view', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test a new zoomed out view on the site editor (Warning: The new feature is not ready. You may experience UX issues that are being addressed)', 'gutenberg' ),
+			'label' => __( 'Test a new zoomed out view on the site editor (Warning: The new feature is not ready. You may experience UX issues that are being addressed).', 'gutenberg' ),
 			'id'    => 'gutenberg-zoomed-out-view',
 		)
 	);
 
 	add_settings_field(
 		'gutenberg-off-canvas-navigation-editor',
-		__( 'Off canvas navigation editor ', 'gutenberg' ),
+		__( 'Off canvas navigation editor', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test a new "off canvas" editor for navigation block using the block inspector and a tree view of the current menu', 'gutenberg' ),
+			'label' => __( 'Test a new "off canvas" editor for navigation block using the block inspector and a tree view of the current menu.', 'gutenberg' ),
 			'id'    => 'gutenberg-off-canvas-navigation-editor',
 		)
 	);
 
 	add_settings_field(
 		'gutenberg-color-randomizer',
-		__( 'Color randomizer ', 'gutenberg' ),
+		__( 'Color randomizer', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
@@ -79,12 +79,12 @@ function gutenberg_initialize_experiments_settings() {
 
 	add_settings_field(
 		'gutenberg-block-inspector-tabs',
-		__( 'Block inspector tabs ', 'gutenberg' ),
+		__( 'Block inspector tabs', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test a new block inspector view splitting settings and appearance controls into tabs', 'gutenberg' ),
+			'label' => __( 'Test a new block inspector view splitting settings and appearance controls into tabs.', 'gutenberg' ),
 			'id'    => 'gutenberg-block-inspector-tabs',
 		)
 	);
