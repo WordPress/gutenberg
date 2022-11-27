@@ -13,27 +13,12 @@ import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-
 
 const TOOLBAR_MARGIN = 12;
 
-const COMMON_PROPS = {
+// By default the toolbar sets the `shift` prop and flip properties.
+// If there is enough room, then once the block scrolls past the top of the screen,
+// then the toolbar is flipped to the bottom.
+const DEFAULT_PROPS = {
 	placement: 'top-start',
 	strategy: 'fixed',
-};
-
-// By default the toolbar sets the `shift` prop. If the user scrolls the page
-// down the toolbar will stay on screen by adopting a sticky position at the
-// top of the viewport.
-const DEFAULT_PROPS = {
-	...COMMON_PROPS,
-	flip: true,
-	shift: true,
-};
-
-// When there isn't enough height between the top of the block and the editor
-// canvas, the `shift` prop is set to `false`, as it will cause the block to be
-// obscured. The `flip` behavior is enabled, which positions the toolbar below
-// the block. This only happens if the block is smaller than the viewport, as
-// otherwise the toolbar will be off-screen.
-const RESTRICTED_HEIGHT_PROPS = {
-	...COMMON_PROPS,
 	flip: true,
 	shift: true,
 };
@@ -53,17 +38,11 @@ function getProps( contentElement, selectedBlockElement, toolbarHeight ) {
 	}
 
 	const blockRect = selectedBlockElement.getBoundingClientRect();
-	const contentRect = contentElement.getBoundingClientRect();
 
 	// The document element's clientHeight represents the viewport height.
 	const viewportHeight =
 		contentElement.ownerDocument.documentElement.clientHeight;
 
-	// The calculation for the following adds the two `top` values together.
-	// If an element is positioned higher than the viewport, then its `top` value will be
-	// negative, so using an addition ensures that the values are calculated appropriately.
-	const hasSpaceForToolbarAbove =
-		blockRect.top + contentRect.top > toolbarHeight;
 	const isBlockTallerThanViewport =
 		blockRect.height > viewportHeight - toolbarHeight;
 
@@ -75,16 +54,8 @@ function getProps( contentElement, selectedBlockElement, toolbarHeight ) {
 		};
 	}
 
-	if ( hasSpaceForToolbarAbove ) {
-		return {
-			...DEFAULT_PROPS,
-			flip: { padding: toolbarHeight },
-			shift: { padding: toolbarHeight - TOOLBAR_MARGIN },
-		};
-	}
-
 	return {
-		...RESTRICTED_HEIGHT_PROPS,
+		...DEFAULT_PROPS,
 		flip: { padding: toolbarHeight },
 		shift: { padding: toolbarHeight - TOOLBAR_MARGIN },
 	};
