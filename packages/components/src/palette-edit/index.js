@@ -89,7 +89,7 @@ export function getNameForPosition( elements, slugPrefix ) {
 	);
 }
 
-function ColorPickerPopover( {
+export function ColorPickerPopover( {
 	isGradient,
 	element,
 	onChange,
@@ -101,6 +101,11 @@ function ColorPickerPopover( {
 			offset={ 20 }
 			className="components-palette-edit__popover"
 			onClose={ onClose }
+			aria-label={
+				! isGradient
+					? __( 'Select a new color' )
+					: __( 'Select a new gradient' )
+			}
 		>
 			{ ! isGradient && (
 				<ColorPicker
