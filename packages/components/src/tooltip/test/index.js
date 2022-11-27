@@ -276,5 +276,39 @@ describe( 'Tooltip', () => {
 			// Tooltip won't show, since the mouse has left the anchor
 			expect( screen.queryByText( 'Help text' ) ).not.toBeInTheDocument();
 		} );
+
+		it( 'should render the shortcut display text when a string is passed as the shortcut', async () => {
+			render(
+				<Tooltip text="Help text" shortcut="shortcut text">
+					<button>Hover Me!</button>
+				</Tooltip>
+			);
+
+			const button = screen.getByRole( 'button', { name: 'Hover Me!' } );
+			button.focus();
+
+			expect( screen.getByText( 'shortcut text' ) ).toBeInTheDocument();
+		} );
+
+		it( 'should render the shortcut display text and aria-label when an object is passed as the shortcut with the correct properties', async () => {
+			render(
+				<Tooltip
+					text="Help text"
+					shortcut={ {
+						display: 'shortcut text',
+						ariaLabel: 'shortcut label',
+					} }
+				>
+					<button>Hover Me!</button>
+				</Tooltip>
+			);
+
+			const button = screen.getByRole( 'button', { name: 'Hover Me!' } );
+			button.focus();
+
+			expect(
+				screen.getByLabelText( 'shortcut label' )
+			).toHaveTextContent( 'shortcut text' );
+		} );
 	} );
 } );
