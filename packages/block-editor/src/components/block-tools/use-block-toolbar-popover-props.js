@@ -11,6 +11,8 @@ import { useCallback, useLayoutEffect, useState } from '@wordpress/element';
 import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 
+const TOOLBAR_MARGIN = 12;
+
 const COMMON_PROPS = {
 	placement: 'top-start',
 	strategy: 'fixed',
@@ -21,7 +23,7 @@ const COMMON_PROPS = {
 // top of the viewport.
 const DEFAULT_PROPS = {
 	...COMMON_PROPS,
-	flip: false,
+	flip: true,
 	shift: true,
 };
 
@@ -33,7 +35,7 @@ const DEFAULT_PROPS = {
 const RESTRICTED_HEIGHT_PROPS = {
 	...COMMON_PROPS,
 	flip: true,
-	shift: false,
+	shift: true,
 };
 
 /**
@@ -61,15 +63,31 @@ function getProps( contentElement, selectedBlockElement, toolbarHeight ) {
 	// If an element is positioned higher than the viewport, then its `top` value will be
 	// negative, so using an addition ensures that the values are calculated appropriately.
 	const hasSpaceForToolbarAbove =
-		blockRect.top + contentRect.top > toolbarHeight; // TODO: Do we need to flip earlier?
+		blockRect.top + contentRect.top > toolbarHeight;
 	const isBlockTallerThanViewport =
 		blockRect.height > viewportHeight - toolbarHeight;
 
-	if ( hasSpaceForToolbarAbove || isBlockTallerThanViewport ) {
-		return DEFAULT_PROPS;
+	if ( isBlockTallerThanViewport ) {
+		return {
+			...DEFAULT_PROPS,
+			flip: false,
+			shift: { padding: toolbarHeight - TOOLBAR_MARGIN },
+		};
 	}
 
-	return RESTRICTED_HEIGHT_PROPS;
+	if ( hasSpaceForToolbarAbove ) {
+		return {
+			...DEFAULT_PROPS,
+			flip: { padding: toolbarHeight },
+			shift: { padding: toolbarHeight - TOOLBAR_MARGIN },
+		};
+	}
+
+	return {
+		...RESTRICTED_HEIGHT_PROPS,
+		flip: { padding: toolbarHeight },
+		shift: { padding: toolbarHeight - TOOLBAR_MARGIN },
+	};
 }
 
 /**

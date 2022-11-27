@@ -26,6 +26,14 @@ export type VirtualElement = Pick< Element, 'getBoundingClientRect' > & {
 	ownerDocument?: Document;
 };
 
+export type FlipProps = {
+	padding?: number;
+};
+
+export type ShiftProps = {
+	padding?: number;
+};
+
 export type PopoverProps = {
 	/**
 	 * The name of the Slot in which the popover should be rendered. It should
@@ -67,7 +75,7 @@ export type PopoverProps = {
 	 *
 	 * @default true
 	 */
-	flip?: boolean;
+	flip?: FlipProps | boolean;
 	/**
 	 * By default, the _first tabbable element_ in the popover will receive focus
 	 * when it mounts. This is the same as setting this prop to `"firstElement"`.
@@ -133,7 +141,7 @@ export type PopoverProps = {
 	 *
 	 * @default false
 	 */
-	shift?: boolean;
+	shift?: ShiftProps | boolean;
 	/**
 	 * Sets the type of CSS position property to use.
 	 *

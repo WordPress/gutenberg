@@ -292,7 +292,14 @@ const UnforwardedPopover = (
 			},
 		},
 		offsetMiddleware( offsetProp ),
-		computedFlipProp ? flipMiddleware() : undefined,
+		computedFlipProp
+			? flipMiddleware( {
+					padding:
+						typeof computedFlipProp === 'object'
+							? computedFlipProp?.padding
+							: undefined,
+			  } )
+			: undefined,
 		computedResizeProp
 			? size( {
 					apply( sizeProps ) {
@@ -315,7 +322,7 @@ const UnforwardedPopover = (
 			? shiftMiddleware( {
 					crossAxis: true,
 					limiter: customLimitShift(),
-					padding: 1, // Necessary to avoid flickering at the edge of the viewport.
+					padding: typeof shift === 'object' ? shift?.padding : 1, // Necessary to avoid flickering at the edge of the viewport.
 			  } )
 			: undefined,
 		arrow( { element: arrowRef } ),
