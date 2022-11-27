@@ -31,7 +31,7 @@ exports[`Blocks raw handling pasteHandler should strip windows data 1`] = `
 exports[`Blocks raw handling should correctly handle quotes with mixed content 1`] = `
 "<!-- wp:quote -->
 <blockquote class=\\"wp-block-quote\\"><!-- wp:heading {\\"level\\":1} -->
-<h1>chicken</h1>
+<h1 class="wp-block-heading">chicken</h1>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
@@ -98,7 +98,7 @@ exports[`rawHandler should convert HTML post to blocks with minimal content chan
 
 <!-- wp:quote -->
 <blockquote class=\\"wp-block-quote\\"><!-- wp:heading {\\"level\\":1} -->
-<h1>Heading</h1>
+<h1 class="wp-block-heading">Heading</h1>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->

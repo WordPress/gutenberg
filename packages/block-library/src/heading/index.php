@@ -23,7 +23,7 @@ function block_core_heading_render( $attributes, $content ) {
 	if ( ! $content ) {
 		return $content;
 	}
-	
+
 	$p = new WP_HTML_Tag_Processor( $content );
 
 	$header_tags = array( 'H1', 'H2', 'H3', 'H4', 'H5', 'H6' );

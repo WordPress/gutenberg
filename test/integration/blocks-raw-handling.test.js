@@ -336,7 +336,7 @@ describe( 'Blocks raw handling', () => {
 	it( 'should correctly handle quotes with mixed content', () => {
 		const filtered = serialize(
 			pasteHandler( {
-				HTML: '<blockquote><h1>chicken</h1><p>ribs</p></blockquote>',
+				HTML: '<blockquote><h1 class="wp-block-heading">chicken</h1><p>ribs</p></blockquote>',
 				mode: 'AUTO',
 			} )
 		);
