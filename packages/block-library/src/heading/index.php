@@ -23,46 +23,17 @@ function block_core_heading_render( $attributes, $content ) {
 	if ( ! $content ) {
 		return $content;
 	}
-	// $pattern matches the opening tag of the heading element .
-	$pattern = '/
-        ^(\s*)                               # Any leading whitespace.
-        <(?<tag_name>
-            h[1-6]                           # The opening tag...
-            (?=\s|>)                         # ...followed by a whitespace or >
-                                             # ?= means a "lookahead"
-        )
-        (?<before_class>                     # Any attributes prior to "class"
-            [^>]*?                           # Non-greedy match of any character except ">"
-        )
-        (?:\s+                               # Until we find the class attribute, if any
-            class=(?P<quote>[\'"])           # The quote character
-            (?<class_name>.*?)               # Non-greedy match of any character
-            (\k{quote})                      # Until we find that quote character again
-            (?<after_class>[^>]*?)           # The rest of the tag
-        )?
-        >                                    # The closing tag
-    /xm';
+	
+	$p = new WP_HTML_Tag_Processor( $content );
 
-	return preg_replace_callback(
-		$pattern,
-		function ( $matches ) {
-			// Parse the existing class names.
-			$current_class_attr = ! empty( $matches['class_name'] ) ? $matches['class_name'] : '';
+	$header_tags = array( 'H1', 'H2', 'H3', 'H4', 'H5', 'H6' );
+	while ( $p->next_tag() ) {
+		if ( in_array( $p->get_tag(), $header_tags, true ) ) {
+			$p->add_class( 'wp-block-heading' );
+		}
+	}
 
-			// If wp-block-heading is already included, there's no need to add it again.
-			$class_to_add = 'wp-block-heading';
-			if ( preg_match( "/\b$class_to_add\b/", $current_class_attr ) ) {
-				return $matches[0];
-			}
-
-			// Otherwise, let's replace the existing opening tag with a new one.
-			$new_class_attr = trim( "$current_class_attr $class_to_add" );
-			$quote          = ! empty( $matches['quote'] ) ? $matches['quote'] : '"';
-
-			return "<{$matches['tag_name']}{$matches['before_class']} class={$quote}{$new_class_attr}{$quote}{$matches['after_class']}>";
-		},
-		$content
-	);
+	return $p->get_updated_html();
 }
 
 /**
