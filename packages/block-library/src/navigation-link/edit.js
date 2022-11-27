@@ -2,18 +2,15 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import escapeHtml from 'escape-html';
 import { unescape } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { createBlock, switchToBlockType } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	Button,
 	PanelBody,
-	Popover,
 	TextControl,
 	TextareaControl,
 	ToolbarButton,
@@ -22,38 +19,33 @@ import {
 	KeyboardShortcuts,
 } from '@wordpress/components';
 import { displayShortcut, isKeyboardEvent, ENTER } from '@wordpress/keycodes';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
-	BlockIcon,
 	InspectorControls,
 	RichText,
-	__experimentalLinkControl as LinkControl,
 	useBlockProps,
 	store as blockEditorStore,
 	getColorClassName,
+	useInnerBlocksProps,
 } from '@wordpress/block-editor';
-import { isURL, prependHTTP, safeDecodeURI } from '@wordpress/url';
-import {
-	Fragment,
-	useState,
-	useEffect,
-	useRef,
-	createInterpolateElement,
-} from '@wordpress/element';
+import { isURL, prependHTTP } from '@wordpress/url';
+import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import {
 	store as coreStore,
 	useResourcePermissions,
 } from '@wordpress/core-data';
-import { decodeEntities } from '@wordpress/html-entities';
+
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { name } from './block.json';
+import { LinkUI } from './link-ui';
+import { updateAttributes } from './update-attributes';
 
 /**
  * A React hook to determine if it's dragging within the target element.
@@ -105,36 +97,6 @@ const useIsDraggingWithin = ( elementRef ) => {
 
 	return isDraggingWithin;
 };
-
-/**
- * Given the Link block's type attribute, return the query params to give to
- * /wp/v2/search.
- *
- * @param {string} type Link block's type attribute.
- * @param {string} kind Link block's entity of kind (post-type|taxonomy)
- * @return {{ type?: string, subtype?: string }} Search query params.
- */
-function getSuggestionsQuery( type, kind ) {
-	switch ( type ) {
-		case 'post':
-		case 'page':
-			return { type: 'post', subtype: type };
-		case 'category':
-			return { type: 'term', subtype: 'category' };
-		case 'tag':
-			return { type: 'term', subtype: 'post_tag' };
-		case 'post_format':
-			return { type: 'post-format' };
-		default:
-			if ( kind === 'taxonomy' ) {
-				return { type: 'term', subtype: type };
-			}
-			if ( kind === 'post-type' ) {
-				return { type: 'post', subtype: type };
-			}
-			return {};
-	}
-}
 
 /**
  * Determine the colors for a menu.
@@ -190,102 +152,6 @@ function getColors( context, isSubMenu ) {
 
 	return colors;
 }
-
-/**
- * @typedef {'post-type'|'custom'|'taxonomy'|'post-type-archive'} WPNavigationLinkKind
- */
-
-/**
- * Navigation Link Block Attributes
- *
- * @typedef {Object} WPNavigationLinkBlockAttributes
- *
- * @property {string}               [label]         Link text.
- * @property {WPNavigationLinkKind} [kind]          Kind is used to differentiate between term and post ids to check post draft status.
- * @property {string}               [type]          The type such as post, page, tag, category and other custom types.
- * @property {string}               [rel]           The relationship of the linked URL.
- * @property {number}               [id]            A post or term id.
- * @property {boolean}              [opensInNewTab] Sets link target to _blank when true.
- * @property {string}               [url]           Link href.
- * @property {string}               [title]         Link title attribute.
- */
-
-/**
- * Link Control onChange handler that updates block attributes when a setting is changed.
- *
- * @param {Object}                          updatedValue    New block attributes to update.
- * @param {Function}                        setAttributes   Block attribute update function.
- * @param {WPNavigationLinkBlockAttributes} blockAttributes Current block attributes.
- *
- */
-export const updateNavigationLinkBlockAttributes = (
-	updatedValue = {},
-	setAttributes,
-	blockAttributes = {}
-) => {
-	const {
-		label: originalLabel = '',
-		kind: originalKind = '',
-		type: originalType = '',
-	} = blockAttributes;
-
-	const {
-		title: newLabel = '', // the title of any provided Post.
-		url: newUrl = '',
-
-		opensInNewTab,
-		id,
-		kind: newKind = originalKind,
-		type: newType = originalType,
-	} = updatedValue;
-
-	const newLabelWithoutHttp = newLabel.replace( /http(s?):\/\//gi, '' );
-	const newUrlWithoutHttp = newUrl.replace( /http(s?):\/\//gi, '' );
-
-	const useNewLabel =
-		newLabel &&
-		newLabel !== originalLabel &&
-		// LinkControl without the title field relies
-		// on the check below. Specifically, it assumes that
-		// the URL is the same as a title.
-		// This logic a) looks suspicious and b) should really
-		// live in the LinkControl and not here. It's a great
-		// candidate for future refactoring.
-		newLabelWithoutHttp !== newUrlWithoutHttp;
-
-	// Unfortunately this causes the escaping model to be inverted.
-	// The escaped content is stored in the block attributes (and ultimately in the database),
-	// and then the raw data is "recovered" when outputting into the DOM.
-	// It would be preferable to store the **raw** data in the block attributes and escape it in JS.
-	// Why? Because there isn't one way to escape data. Depending on the context, you need to do
-	// different transforms. It doesn't make sense to me to choose one of them for the purposes of storage.
-	// See also:
-	// - https://github.com/WordPress/gutenberg/pull/41063
-	// - https://github.com/WordPress/gutenberg/pull/18617.
-	const label = useNewLabel
-		? escapeHtml( newLabel )
-		: originalLabel || escapeHtml( newUrlWithoutHttp );
-
-	// In https://github.com/WordPress/gutenberg/pull/24670 we decided to use "tag" in favor of "post_tag"
-	const type = newType === 'post_tag' ? 'tag' : newType.replace( '-', '_' );
-
-	const isBuiltInType =
-		[ 'post', 'page', 'tag', 'category' ].indexOf( type ) > -1;
-
-	const isCustomLink =
-		( ! newKind && ! isBuiltInType ) || newKind === 'custom';
-	const kind = isCustomLink ? 'custom' : newKind;
-
-	setAttributes( {
-		// Passed `url` may already be encoded. To prevent double encoding, decodeURI is executed to revert to the original string.
-		...( newUrl && { url: encodeURI( safeDecodeURI( newUrl ) ) } ),
-		...( label && { label } ),
-		...( undefined !== opensInNewTab && { opensInNewTab } ),
-		...( id && Number.isInteger( id ) && { id } ),
-		...( kind && { kind } ),
-		...( type && type !== 'URL' && { type } ),
-	} );
-};
 
 const useIsInvalidLink = ( kind, type, id ) => {
 	const isPostType =
@@ -361,74 +227,6 @@ function navStripHTML( html ) {
 	return doc.body.textContent || '';
 }
 
-/**
- * Add transforms to Link Control
- */
-
-function LinkControlTransforms( { clientId, replace } ) {
-	const { getBlock, blockTransforms } = useSelect(
-		( select ) => {
-			const {
-				getBlock: _getBlock,
-				getBlockRootClientId,
-				getBlockTransformItems,
-			} = select( blockEditorStore );
-
-			return {
-				getBlock: _getBlock,
-				blockTransforms: getBlockTransformItems(
-					_getBlock( clientId ),
-					getBlockRootClientId( clientId )
-				),
-			};
-		},
-		[ clientId ]
-	);
-
-	const featuredBlocks = [
-		'core/site-logo',
-		'core/social-links',
-		'core/search',
-	];
-	const transforms = blockTransforms.filter( ( item ) => {
-		return featuredBlocks.includes( item.name );
-	} );
-
-	if ( ! transforms?.length ) {
-		return null;
-	}
-
-	return (
-		<div className="link-control-transform">
-			<h3 className="link-control-transform__subheading">
-				{ __( 'Transform' ) }
-			</h3>
-			<div className="link-control-transform__items">
-				{ transforms.map( ( item, index ) => {
-					return (
-						<Button
-							key={ `transform-${ index }` }
-							onClick={ () =>
-								replace(
-									clientId,
-									switchToBlockType(
-										getBlock( clientId ),
-										item.name
-									)
-								)
-							}
-							className="link-control-transform__item"
-						>
-							<BlockIcon icon={ item.icon } />
-							{ item.title }
-						</Button>
-					);
-				} ) }
-			</div>
-		</div>
-	);
-}
-
 export default function NavigationLinkEdit( {
 	attributes,
 	isSelected,
@@ -459,7 +257,7 @@ export default function NavigationLinkEdit( {
 		opensInNewTab,
 		title: label && navStripHTML( label ), // don't allow HTML to display inside the <LinkControl>
 	};
-	const { saveEntityRecord } = useDispatch( coreStore );
+
 	const { replaceBlock, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
@@ -527,7 +325,9 @@ export default function NavigationLinkEdit( {
 		const newSubmenu = createBlock(
 			'core/navigation-submenu',
 			attributes,
-			innerBlocks
+			innerBlocks.length > 0
+				? innerBlocks
+				: [ createBlock( 'core/navigation-link' ) ]
 		);
 		replaceBlock( clientId, newSubmenu );
 	}
@@ -540,11 +340,14 @@ export default function NavigationLinkEdit( {
 		if ( ! url ) {
 			setIsLinkOpen( true );
 		}
+	}, [ url ] );
+
+	useEffect( () => {
 		// If block has inner blocks, transform to Submenu.
 		if ( hasChildren ) {
 			transformToSubmenu();
 		}
-	}, [] );
+	}, [ hasChildren ] );
 
 	/**
 	 * The hook shouldn't be necessary but due to a focus loss happening
@@ -612,33 +415,6 @@ export default function NavigationLinkEdit( {
 		userCanCreate = postsPermissions.canCreate;
 	}
 
-	async function handleCreate( pageTitle ) {
-		const postType = type || 'page';
-
-		const page = await saveEntityRecord( 'postType', postType, {
-			title: pageTitle,
-			status: 'draft',
-		} );
-
-		return {
-			id: page.id,
-			type: postType,
-			// Make `title` property consistent with that in `fetchLinkSuggestions` where the `rendered` title (containing HTML entities)
-			// is also being decoded. By being consistent in both locations we avoid having to branch in the rendering output code.
-			// Ideally in the future we will update both APIs to utilise the "raw" form of the title which is better suited to edit contexts.
-			// e.g.
-			// - title.raw = "Yes & No"
-			// - title.rendered = "Yes &#038; No"
-			// - decodeEntities( title.rendered ) = "Yes & No"
-			// See:
-			// - https://github.com/WordPress/gutenberg/pull/41063
-			// - https://github.com/WordPress/gutenberg/blob/a1e1fdc0e6278457e9f4fc0b31ac6d2095f5450b/packages/core-data/src/fetch/__experimental-fetch-link-suggestions.js#L212-L218
-			title: decodeEntities( page.title.rendered ),
-			url: page.link,
-			kind: 'post-type',
-		};
-	}
-
 	const {
 		textColor,
 		customTextColor,
@@ -673,6 +449,20 @@ export default function NavigationLinkEdit( {
 			backgroundColor: ! backgroundColor && customBackgroundColor,
 		},
 		onKeyDown,
+	} );
+
+	const ALLOWED_BLOCKS = [
+		'core/navigation-link',
+		'core/navigation-submenu',
+	];
+	const DEFAULT_BLOCK = {
+		name: 'core/navigation-link',
+	};
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		allowedBlocks: ALLOWED_BLOCKS,
+		__experimentalDefaultBlock: DEFAULT_BLOCK,
+		__experimentalDirectInsert: true,
+		renderAppender: false,
 	} );
 
 	if ( ! url || isInvalid || isDraft ) {
@@ -714,8 +504,25 @@ export default function NavigationLinkEdit( {
 					) }
 				</ToolbarGroup>
 			</BlockControls>
+			{ /* Warning, this duplicated in packages/block-library/src/navigation-submenu/edit.js */ }
 			<InspectorControls>
 				<PanelBody title={ __( 'Link settings' ) }>
+					<TextControl
+						value={ label || '' }
+						onChange={ ( labelValue ) => {
+							setAttributes( { label: labelValue } );
+						} }
+						label={ __( 'Label' ) }
+						autoComplete="off"
+					/>
+					<TextControl
+						value={ url || '' }
+						onChange={ ( urlValue ) => {
+							setAttributes( { url: urlValue } );
+						} }
+						label={ __( 'URL' ) }
+						autoComplete="off"
+					/>
 					<TextareaControl
 						value={ description || '' }
 						onChange={ ( descriptionValue ) => {
@@ -830,7 +637,7 @@ export default function NavigationLinkEdit( {
 													// Ideally they would be stored in a raw, unescaped form.
 													// Unescape is used here to "recover" the escaped characters
 													// so they display without encoding.
-													// See `updateNavigationLinkBlockAttributes` for more details.
+													// See `updateAttributes` for more details.
 													`${ unescape(
 														label
 													) } ${ placeholderText }`.trim()
@@ -846,66 +653,25 @@ export default function NavigationLinkEdit( {
 						</>
 					) }
 					{ isLinkOpen && (
-						<Popover
-							placement="bottom"
+						<LinkUI
+							clientId={ clientId }
+							value={ link }
+							linkAttributes={ { type, url, kind } }
 							onClose={ () => setIsLinkOpen( false ) }
 							anchor={ popoverAnchor }
-							shift
-						>
-							<LinkControl
-								hasTextControl
-								hasRichPreviews
-								className="wp-block-navigation-link__inline-link-input"
-								value={ link }
-								showInitialSuggestions={ true }
-								withCreateSuggestion={ userCanCreate }
-								createSuggestion={ handleCreate }
-								createSuggestionButtonText={ ( searchTerm ) => {
-									let format;
-									if ( type === 'post' ) {
-										/* translators: %s: search term. */
-										format = __(
-											'Create draft post: <mark>%s</mark>'
-										);
-									} else {
-										/* translators: %s: search term. */
-										format = __(
-											'Create draft page: <mark>%s</mark>'
-										);
-									}
-									return createInterpolateElement(
-										sprintf( format, searchTerm ),
-										{ mark: <mark /> }
-									);
-								} }
-								noDirectEntry={ !! type }
-								noURLSuggestion={ !! type }
-								suggestionsQuery={ getSuggestionsQuery(
-									type,
-									kind
-								) }
-								onChange={ ( updatedValue ) =>
-									updateNavigationLinkBlockAttributes(
-										updatedValue,
-										setAttributes,
-										attributes
-									)
-								}
-								onRemove={ removeLink }
-								renderControlBottom={
-									! url
-										? () => (
-												<LinkControlTransforms
-													clientId={ clientId }
-													replace={ replaceBlock }
-												/>
-										  )
-										: null
-								}
-							/>
-						</Popover>
+							hasCreateSuggestion={ userCanCreate }
+							onRemove={ removeLink }
+							onChange={ ( updatedValue ) => {
+								updateAttributes(
+									updatedValue,
+									setAttributes,
+									attributes
+								);
+							} }
+						/>
 					) }
 				</a>
+				<div { ...innerBlocksProps } />
 			</div>
 		</Fragment>
 	);

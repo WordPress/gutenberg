@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { TouchableWithoutFeedback } from 'react-native';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -228,7 +227,7 @@ function AudioEdit( {
 				<BlockCaption
 					accessible={ true }
 					accessibilityLabelCreator={ ( caption ) =>
-						isEmpty( caption )
+						! caption
 							? /* translators: accessibility text. Empty Audio caption. */
 							  __( 'Audio caption. Empty' )
 							: sprintf(

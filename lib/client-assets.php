@@ -193,7 +193,7 @@ function gutenberg_override_style( $styles, $handle, $src, $deps = array(), $ver
 function gutenberg_register_packages_scripts( $scripts ) {
 	// When in production, use the plugin's version as the default asset version;
 	// else (for development or test) default to use the current time.
-	$default_version = defined( 'GUTENBERG_VERSION' ) && ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? GUTENBERG_VERSION : time();
+	$default_version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
 
 	foreach ( glob( gutenberg_dir_path() . 'build/*/index.min.js' ) as $path ) {
 		// Prefix `wp-` to package directory to get script handle.
@@ -249,7 +249,7 @@ add_action( 'wp_default_scripts', 'gutenberg_register_packages_scripts' );
 function gutenberg_register_packages_styles( $styles ) {
 	// When in production, use the plugin's version as the asset version;
 	// else (for development or test) default to use the current time.
-	$version = defined( 'GUTENBERG_VERSION' ) && ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? GUTENBERG_VERSION : time();
+	$version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
 
 	// Editor Styles.
 	gutenberg_override_style(
@@ -486,7 +486,7 @@ function gutenberg_enqueue_stored_styles( $options = array() ) {
 	$style_tag_id             = 'core';
 	foreach ( $core_styles_keys as $style_key ) {
 		// Adds comment if code is prettified to identify core styles sections in debugging.
-		$should_prettify = isset( $options['prettify'] ) ? true === $options['prettify'] : defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG;
+		$should_prettify = isset( $options['prettify'] ) ? true === $options['prettify'] : SCRIPT_DEBUG;
 		if ( $should_prettify ) {
 			$compiled_core_stylesheet .= "/**\n * Core styles: $style_key\n */\n";
 		}

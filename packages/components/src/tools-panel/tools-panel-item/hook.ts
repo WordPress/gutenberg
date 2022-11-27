@@ -130,6 +130,7 @@ export function useToolsPanelItem(
 	}, [
 		hasMatchingPanel,
 		isMenuItemChecked,
+		isRegistered,
 		isResetting,
 		isValueSet,
 		wasMenuItemChecked,
