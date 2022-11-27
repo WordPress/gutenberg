@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, within } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -152,6 +152,8 @@ describe( 'ColorPalette', () => {
 				expanded: false,
 			} )
 		);
+
+		await act( () => Promise.resolve() );
 
 		const dropdownButton = screen.getByRole( 'button', {
 			name: /^Custom color picker/,
