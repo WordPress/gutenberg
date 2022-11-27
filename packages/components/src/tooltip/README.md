@@ -46,7 +46,7 @@ The tooltip text to show on focus or hover.
 -   Type: `String`
 -   Required: No
 
-### `shortcut`
+### shortcut
 
 -   Type: `string` or `object`
 -   Required: No
