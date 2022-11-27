@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { View, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
-import { pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -33,6 +32,7 @@ import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from '../block-mobile-toolbar';
 import { store as blockEditorStore } from '../../store';
 import BlockDraggable from '../block-draggable';
+import { useLayout } from './layout';
 
 const emptyArray = [];
 function BlockForType( {
@@ -74,9 +74,15 @@ function BlockForType( {
 		// Thanks to the JSON.stringify we check if the value is the same instead of reference.
 		JSON.stringify( wrapperProps.style ),
 		JSON.stringify(
-			pick( attributes, GlobalStylesContext.BLOCK_STYLE_ATTRIBUTES )
+			Object.fromEntries(
+				Object.entries( attributes ?? {} ).filter( ( [ key ] ) =>
+					GlobalStylesContext.BLOCK_STYLE_ATTRIBUTES.includes( key )
+				)
+			)
 		),
 	] );
+
+	const parentLayout = useLayout();
 
 	return (
 		<GlobalStylesContext.Provider value={ mergedStyle }>
@@ -99,6 +105,7 @@ function BlockForType( {
 				onDeleteBlock={ onDeleteBlock }
 				blockWidth={ blockWidth }
 				parentBlockAlignment={ parentBlockAlignment }
+				__unstableParentLayout={ parentLayout }
 			/>
 			<View onLayout={ getBlockWidth } />
 		</GlobalStylesContext.Provider>

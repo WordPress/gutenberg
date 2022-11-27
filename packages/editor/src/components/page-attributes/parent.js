@@ -158,6 +158,7 @@ export function PageAttributesParent() {
 
 	return (
 		<ComboboxControl
+			__nextHasNoMarginBottom
 			className="editor-page-attributes__parent"
 			label={ parentPageLabel }
 			value={ parentPostId }

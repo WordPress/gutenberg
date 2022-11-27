@@ -125,6 +125,12 @@ $block-inserter-tabs-height: 44px;
 		.components-tab-panel__tabs-item {
 			flex-grow: 1;
 			margin-bottom: -$border-width;
+			&[id$="reusable"] {
+				flex-grow: inherit;
+				// These are to align the `reusable` icon with the search icon.
+				padding-left: $grid-unit-20;
+				padding-right: $grid-unit-20;
+			}
 		}
 	}
 
@@ -174,9 +180,13 @@ $block-inserter-tabs-height: 44px;
 	text-align: right;
 }
 
+.block-editor-inserter__manage-reusable-blocks-container {
+	margin: auto $grid-unit-20 $grid-unit-20;
+}
+
 .block-editor-inserter__manage-reusable-blocks {
-	display: inline-block;
-	margin: $grid-unit-20;
+	justify-content: center;
+	width: 100%;
 }
 
 .block-editor-inserter__no-results {
@@ -275,10 +285,10 @@ $block-inserter-tabs-height: 44px;
 	padding: $grid-unit-20;
 	overflow-y: auto;
 	height: 100%;
-}
-
-.block-editor-inserter__patterns-fill-space {
-	flex-grow: 1;
+	// Push the listitem wrapping the "explore" button to the bottom of the panel.
+	div[role="listitem"]:last-child {
+		margin-top: auto;
+	}
 }
 
 .block-editor-inserter__patterns-category-panel {
@@ -339,10 +349,6 @@ $block-inserter-tabs-height: 44px;
 	padding: $grid-unit-20;
 	flex-shrink: 0;
 	position: relative; // prevents overscroll when block library is open
-}
-
-.block-editor-inserter__manage-reusable-blocks-container {
-	padding: $grid-unit-20;
 }
 
 .block-editor-inserter__quick-inserter {
@@ -442,7 +448,8 @@ $block-inserter-tabs-height: 44px;
 	}
 
 	&__list {
-		margin-left: $sidebar-width - $grid-unit-40;
+		margin-left: $sidebar-width;
+		padding: $grid-unit-30 0 $grid-unit-40;
 	}
 
 	.block-editor-block-patterns-list {
@@ -472,4 +479,152 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__patterns-category-panel-title {
 	font-size: calc(1.25 * 13px);
+}
+
+.block-editor-inserter__media-tabs-container {
+	height: 100%;
+
+	nav {
+		height: 100%;
+	}
+
+	.block-editor-inserter__media-library-button {
+		padding: $grid-unit-20;
+		justify-content: center;
+		margin-top: $grid-unit-20;
+		width: 100%;
+	}
+}
+
+.block-editor-inserter__media-tabs {
+	display: flex;
+	flex-direction: column;
+	padding: $grid-unit-20;
+	overflow-y: auto;
+	height: 100%;
+
+	// Push the listitem wrapping the "open media library" button to the bottom of the panel.
+	div[role="listitem"]:last-child {
+		margin-top: auto;
+	}
+
+	&__media-category {
+		&.is-selected {
+			color: var(--wp-admin-theme-color);
+			position: relative;
+
+			.components-flex-item {
+				filter: brightness(0.95);
+			}
+
+			svg {
+				fill: var(--wp-admin-theme-color);
+			}
+
+			&::after {
+				content: "";
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				border-radius: $radius-block-ui;
+				opacity: 0.04;
+				background: var(--wp-admin-theme-color);
+			}
+		}
+	}
+}
+
+.block-editor-inserter__media-dialog {
+	background: $gray-100;
+	border-left: $border-width solid $gray-200;
+	border-right: $border-width solid $gray-200;
+	position: absolute;
+	padding: $grid-unit-20 $grid-unit-30;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	overflow-y: auto;
+	scrollbar-gutter: stable both-edges;
+
+	@include break-medium {
+		left: 100%;
+		display: block;
+		width: 300px;
+	}
+
+	.block-editor-block-preview__container {
+		box-shadow: 0 15px 25px rgb(0 0 0 / 7%);
+		&:hover {
+			box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
+		}
+	}
+
+	.block-editor-inserter__media-panel {
+		height: 100%;
+
+		&-title {
+			font-size: calc(1.25 * 13px);
+		}
+
+		&-spinner {
+			height: 100%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		&-search {
+			&.components-search-control {
+				input[type="search"].components-search-control__input {
+					background: $white;
+				}
+			}
+		}
+	}
+}
+
+.block-editor-inserter__media-list {
+	margin-top: $grid-unit-20;
+	&__list-item {
+		cursor: pointer;
+		margin-bottom: $grid-unit-30;
+
+		&.is-placeholder {
+			min-height: 100px;
+		}
+
+		&[draggable="true"] .block-editor-block-preview__container {
+			cursor: grab;
+		}
+	}
+
+	&__item {
+		height: 100%;
+
+		&-preview {
+			display: flex;
+			align-items: center;
+			overflow: hidden;
+			border-radius: 4px;
+
+			> * {
+				margin: 0 auto;
+				max-width: 100%;
+			}
+		}
+
+		&:hover &-preview {
+			box-shadow: 0 0 0 2px var(--wp-admin-theme-color);
+		}
+
+		&:focus &-preview {
+			box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+			// Windows High Contrast mode will show this outline, but not the box-shadow.
+			outline: 2px solid transparent;
+		}
+	}
 }

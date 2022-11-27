@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useInnerBlocksProps } from '@wordpress/block-editor';
-import { Disabled, Spinner } from '@wordpress/components';
+import { Disabled } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useContext, useEffect, useRef, useMemo } from '@wordpress/element';
@@ -11,7 +11,6 @@ import { useContext, useEffect, useRef, useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import useNavigationMenu from '../use-navigation-menu';
-import useCreateNavigationMenu from './use-create-navigation-menu';
 
 const EMPTY_OBJECT = {};
 const DRAFT_MENU_PARAMS = [
@@ -38,9 +37,8 @@ const ALLOWED_BLOCKS = [
 
 export default function UnsavedInnerBlocks( {
 	blocks,
-	clientId,
-	hasSavedUnsavedInnerBlocks,
-	onSave,
+	createNavigationMenu,
+
 	hasSelection,
 } ) {
 	const originalBlocks = useRef();
@@ -75,7 +73,6 @@ export default function UnsavedInnerBlocks( {
 	// The block will be disabled in a block preview, use this as a way of
 	// avoiding the side-effects of this component for block previews.
 	const isDisabled = useContext( Disabled.Context );
-	const savingLock = useRef( false );
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{
@@ -121,9 +118,6 @@ export default function UnsavedInnerBlocks( {
 
 	const { hasResolvedNavigationMenus, navigationMenus } = useNavigationMenu();
 
-	const { create: createNavigationMenu } =
-		useCreateNavigationMenu( clientId );
-
 	// Automatically save the uncontrolled blocks.
 	useEffect( () => {
 		// The block will be disabled when used in a BlockPreview.
@@ -140,9 +134,7 @@ export default function UnsavedInnerBlocks( {
 		// which is an indication they want to start editing.
 		if (
 			isDisabled ||
-			hasSavedUnsavedInnerBlocks ||
 			isSaving ||
-			savingLock.current ||
 			! hasResolvedDraftNavigationMenus ||
 			! hasResolvedNavigationMenus ||
 			! hasSelection ||
@@ -151,11 +143,7 @@ export default function UnsavedInnerBlocks( {
 			return;
 		}
 
-		savingLock.current = true;
-		createNavigationMenu( null, blocks ).then( ( menu ) => {
-			onSave( menu );
-			savingLock.current = false;
-		} );
+		createNavigationMenu( null, blocks );
 	}, [
 		isDisabled,
 		isSaving,
@@ -170,17 +158,5 @@ export default function UnsavedInnerBlocks( {
 
 	const Wrapper = isSaving ? Disabled : 'div';
 
-	return (
-		<>
-			{ isSaving ? (
-				<Spinner
-					className={
-						'wp-block-navigation__uncontrolled-inner-blocks-loading-indicator'
-					}
-				/>
-			) : (
-				<Wrapper { ...innerBlocksProps } />
-			) }
-		</>
-	);
+	return <Wrapper { ...innerBlocksProps } />;
 }

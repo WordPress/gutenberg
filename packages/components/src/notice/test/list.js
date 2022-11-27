@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -10,11 +10,14 @@ import NoticeList from '../list';
 
 describe( 'NoticeList', () => {
 	it( 'should merge className', () => {
-		const { container } = render(
-			<NoticeList notices={ [] } className="is-ok" />
+		render(
+			<NoticeList notices={ [] } className="is-ok">
+				List of notices
+			</NoticeList>
 		);
 
-		expect( container.firstChild ).toHaveClass( 'is-ok' );
-		expect( container.firstChild ).toHaveClass( 'components-notice-list' );
+		const noticeList = screen.getByText( 'List of notices' );
+		expect( noticeList ).toHaveClass( 'is-ok' );
+		expect( noticeList ).toHaveClass( 'components-notice-list' );
 	} );
 } );

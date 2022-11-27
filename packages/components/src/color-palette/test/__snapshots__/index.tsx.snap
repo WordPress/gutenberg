@@ -63,10 +63,10 @@ exports[`ColorPalette should allow disabling custom color picker 1`] = `
           class="components-circular-option-picker__option-wrapper"
         >
           <button
-            aria-label="Color: white"
+            aria-label="Color: green"
             aria-pressed="false"
             class="components-button components-circular-option-picker__option"
-            style="background-color: rgb(255, 255, 255); color: rgb(255, 255, 255);"
+            style="background-color: rgb(0, 255, 0); color: rgb(0, 255, 0);"
             type="button"
           />
         </div>
@@ -235,10 +235,10 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
           class="components-circular-option-picker__option-wrapper"
         >
           <button
-            aria-label="Color: white"
+            aria-label="Color: green"
             aria-pressed="false"
             class="components-button components-circular-option-picker__option"
-            style="background-color: rgb(255, 255, 255); color: rgb(255, 255, 255);"
+            style="background-color: rgb(0, 255, 0); color: rgb(0, 255, 0);"
             type="button"
           />
         </div>

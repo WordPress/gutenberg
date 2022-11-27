@@ -32,9 +32,6 @@ import useRefEffect from '../use-ref-effect';
  */
 function useConstrainedTabbing() {
 	return useRefEffect( ( /** @type {HTMLElement} */ node ) => {
-		/** @type {number|undefined} */
-		let timeoutId;
-
 		function onKeyDown( /** @type {KeyboardEvent} */ event ) {
 			const { keyCode, shiftKey, target } = event;
 
@@ -62,15 +59,16 @@ function useConstrainedTabbing() {
 
 			trap.tabIndex = -1;
 			node[ domAction ]( trap );
+
+			// Remove itself when the trap loses focus.
+			trap.addEventListener( 'blur', () => node.removeChild( trap ) );
+
 			trap.focus();
-			// Remove after the browser moves focus to the next element.
-			timeoutId = setTimeout( () => node.removeChild( trap ) );
 		}
 
 		node.addEventListener( 'keydown', onKeyDown );
 		return () => {
 			node.removeEventListener( 'keydown', onKeyDown );
-			clearTimeout( timeoutId );
 		};
 	}, [] );
 }

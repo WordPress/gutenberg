@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { pick } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Platform, useMemo } from '@wordpress/element';
@@ -12,6 +7,7 @@ import {
 	store as coreStore,
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 	__experimentalFetchUrlData as fetchUrlData,
+	__experimentalFetchMedia as fetchMedia,
 } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 
@@ -133,56 +129,63 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 
 	return useMemo(
 		() => ( {
-			...pick( settings, [
-				'__experimentalBlockDirectory',
-				'__experimentalDiscussionSettings',
-				'__experimentalFeatures',
-				'__experimentalPreferredStyleVariations',
-				'__experimentalSetIsInserterOpened',
-				'__unstableGalleryWithImageBlocks',
-				'alignWide',
-				'allowedBlockTypes',
-				'bodyPlaceholder',
-				'canLockBlocks',
-				'codeEditingEnabled',
-				'colors',
-				'disableCustomColors',
-				'disableCustomFontSizes',
-				'disableCustomSpacingSizes',
-				'disableCustomGradients',
-				'disableLayoutStyles',
-				'enableCustomLineHeight',
-				'enableCustomSpacing',
-				'enableCustomUnits',
-				'focusMode',
-				'fontSizes',
-				'gradients',
-				'generateAnchors',
-				'hasFixedToolbar',
-				'isDistractionFree',
-				'hasInlineToolbar',
-				'imageDefaultSize',
-				'imageDimensions',
-				'imageEditing',
-				'imageSizes',
-				'isRTL',
-				'keepCaretInsideBlock',
-				'maxWidth',
-				'onUpdateDefaultBlockStyles',
-				'styles',
-				'template',
-				'templateLock',
-				'titlePlaceholder',
-				'supportsLayout',
-				'widgetTypesToHideFromLegacyWidgetBlock',
-				'__unstableResolvedAssets',
-			] ),
+			...Object.fromEntries(
+				Object.entries( settings ).filter( ( [ key ] ) =>
+					[
+						'__experimentalBlockDirectory',
+						'__experimentalDiscussionSettings',
+						'__experimentalFeatures',
+						'__experimentalPreferredStyleVariations',
+						'__experimentalSetIsInserterOpened',
+						'__unstableGalleryWithImageBlocks',
+						'alignWide',
+						'allowedBlockTypes',
+						'bodyPlaceholder',
+						'canLockBlocks',
+						'codeEditingEnabled',
+						'colors',
+						'disableCustomColors',
+						'disableCustomFontSizes',
+						'disableCustomSpacingSizes',
+						'disableCustomGradients',
+						'disableLayoutStyles',
+						'enableCustomLineHeight',
+						'enableCustomSpacing',
+						'enableCustomUnits',
+						'focusMode',
+						'fontSizes',
+						'gradients',
+						'generateAnchors',
+						'hasFixedToolbar',
+						'isDistractionFree',
+						'hasInlineToolbar',
+						'imageDefaultSize',
+						'imageDimensions',
+						'imageEditing',
+						'imageSizes',
+						'isRTL',
+						'keepCaretInsideBlock',
+						'maxWidth',
+						'onUpdateDefaultBlockStyles',
+						'styles',
+						'template',
+						'templateLock',
+						'titlePlaceholder',
+						'supportsLayout',
+						'widgetTypesToHideFromLegacyWidgetBlock',
+						'__unstableResolvedAssets',
+					].includes( key )
+				)
+			),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalBlockPatterns: blockPatterns,
 			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
+			// TODO: We should find a proper way to consolidate similar cases
+			// like reusable blocks, fetch entities, etc.
+			__unstableFetchMedia: fetchMedia,
 			__experimentalFetchRichUrlData: fetchUrlData,
 			__experimentalCanUserUseUnfilteredHTML: canUseUnfilteredHTML,
 			__experimentalUndo: undo,

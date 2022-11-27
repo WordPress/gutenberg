@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -32,6 +32,34 @@ function TestWrapper() {
 	);
 }
 
+/**
+ * Returns the first found popover element up the DOM tree.
+ *
+ * @param {HTMLElement} element Element to start with.
+ * @return {HTMLElement|null} Popover element, or `null` if not found.
+ */
+function getWrappingPopoverElement( element ) {
+	return element.closest( '.components-popover' );
+}
+
+/**
+ * Asserts that the specified popover has already been positioned.
+ * Necessary because it will be positioned a bit later after it's displayed.
+ *
+ * We're intentionally not using `.toHaveStyle()` because we want to be
+ * less specific and avoid specific values for better test flexibility.
+ *
+ * @async
+ *
+ * @param {HTMLElement} popover Popover element.
+ */
+async function popoverIsPositioned( popover ) {
+	/* eslint-disable jest-dom/prefer-to-have-style */
+	await waitFor( () => expect( popover.style.top ).not.toBe( '' ) );
+	await waitFor( () => expect( popover.style.left ).not.toBe( '' ) );
+	/* eslint-enable jest-dom/prefer-to-have-style */
+}
+
 describe( 'General media replace flow', () => {
 	it( 'renders successfully', () => {
 		render( <TestWrapper /> );
@@ -57,11 +85,11 @@ describe( 'General media replace flow', () => {
 				name: 'Replace',
 			} )
 		);
-
 		const uploadMenu = screen.getByRole( 'menu' );
 
-		expect( uploadMenu ).toBeInTheDocument();
-		expect( uploadMenu ).not.toBeVisible();
+		await popoverIsPositioned( getWrappingPopoverElement( uploadMenu ) );
+
+		await waitFor( () => expect( uploadMenu ).toBeVisible() );
 	} );
 
 	it( 'displays media URL', async () => {
@@ -78,11 +106,13 @@ describe( 'General media replace flow', () => {
 			} )
 		);
 
-		expect(
-			screen.getByRole( 'link', {
-				name: 'example.media (opens in a new tab)',
-			} )
-		).toHaveAttribute( 'href', 'https://example.media' );
+		const link = screen.getByRole( 'link', {
+			name: 'example.media (opens in a new tab)',
+		} );
+
+		await popoverIsPositioned( getWrappingPopoverElement( link ) );
+
+		expect( link ).toHaveAttribute( 'href', 'https://example.media' );
 	} );
 
 	it( 'edits media URL', async () => {
@@ -97,6 +127,14 @@ describe( 'General media replace flow', () => {
 				expanded: false,
 				name: 'Replace',
 			} )
+		);
+
+		await popoverIsPositioned(
+			getWrappingPopoverElement(
+				screen.getByRole( 'link', {
+					name: 'example.media (opens in a new tab)',
+				} )
+			)
 		);
 
 		await user.click(

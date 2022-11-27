@@ -50,8 +50,8 @@ Prompt visitors to take action with a button-style link. ([Source](https://githu
 
 -	**Name:** core/button
 -	**Category:** design
--	**Supports:** align, anchor, color (background, gradients, text), spacing (padding), typography (fontSize, lineHeight), ~~alignWide~~, ~~reusable~~
--	**Attributes:** backgroundColor, gradient, linkTarget, placeholder, rel, text, textColor, title, url, width
+-	**Supports:** anchor, color (background, gradients, text), spacing (padding), typography (fontSize, lineHeight), ~~alignWide~~, ~~align~~, ~~reusable~~
+-	**Attributes:** backgroundColor, gradient, linkTarget, placeholder, rel, text, textAlign, textColor, title, url, width
 
 ## Buttons
 
@@ -329,7 +329,7 @@ Display a list of your most recent posts. ([Source](https://github.com/WordPress
 
 -	**Name:** core/latest-posts
 -	**Category:** widgets
--	**Supports:** align, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** addLinkToFeaturedImage, categories, columns, displayAuthor, displayFeaturedImage, displayPostContent, displayPostContentRadio, displayPostDate, excerptLength, featuredImageAlign, featuredImageSizeHeight, featuredImageSizeSlug, featuredImageSizeWidth, order, orderBy, postLayout, postsToShow, selectedAuthor
 
 ## List
@@ -429,7 +429,16 @@ Display a list of all pages. ([Source](https://github.com/WordPress/gutenberg/tr
 -	**Name:** core/page-list
 -	**Category:** widgets
 -	**Supports:** ~~html~~, ~~reusable~~
--	**Attributes:**
+-	**Attributes:** parentPageID
+
+## Page List Item
+
+Displays a page inside a list of all pages. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/page-list-item))
+
+-	**Name:** core/page-list-item
+-	**Category:** widgets
+-	**Supports:** ~~html~~, ~~inserter~~, ~~lock~~, ~~reusable~~
+-	**Attributes:** hasChildren, id, label, link, title
 
 ## Paragraph
 
