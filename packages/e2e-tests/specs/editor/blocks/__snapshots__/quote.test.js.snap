@@ -45,7 +45,7 @@ exports[`Quote can be converted to paragraphs and renders only one paragraph for
 exports[`Quote can be created by converting a heading 1`] = `
 "<!-- wp:quote -->
 <blockquote class=\\"wp-block-quote\\"><!-- wp:heading -->
-<h2 class="wp-block-heading">test</h2>
+<h2 class=\\"wp-block-heading\\">test</h2>
 <!-- /wp:heading --></blockquote>
 <!-- /wp:quote -->"
 `;
