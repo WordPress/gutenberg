@@ -29,7 +29,7 @@
 	"supports": {
 		"align": [ "wide", "full" ],
 		"anchor": true,
-		"className": false,
+		"className": true,
 		"color": {
 			"gradients": true,
 			"link": true,

@@ -235,7 +235,7 @@ test.describe( 'Widgets Customizer', () => {
 			'sidebar-1'
 		);
 		await requestUtils.addWidgetBlock(
-			`<!-- wp:heading -->\n<h2>First Heading</h2>\n<!-- /wp:heading -->`,
+			`<!-- wp:heading -->\n<h2 class="wp-block-heading">First Heading</h2>\n<!-- /wp:heading -->`,
 			'sidebar-1'
 		);
 

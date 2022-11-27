@@ -5,9 +5,9 @@
 			"textColor": "accent"
 		},
 		"innerBlocks": [],
-		"innerHTML": "\n<h2 class=\"has-accent-color has-text-color\">Text</h2>\n",
+		"innerHTML": "\n<h2 class=\"wp-block-heading has-accent-color has-text-color\">Text</h2>\n",
 		"innerContent": [
-			"\n<h2 class=\"has-accent-color has-text-color\">Text</h2>\n"
+			"\n<h2 class=\"wp-block-heading has-accent-color has-text-color\">Text</h2>\n"
 		]
 	}
 ]

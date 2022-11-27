@@ -1,5 +1,5 @@
 <!-- wp:heading -->
-<h2>Heading</h2>
+<h2 class="wp-block-heading">Heading</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
