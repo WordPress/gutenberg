@@ -46,11 +46,11 @@ class Render_Block_Heading_Test extends WP_UnitTestCase {
 			),
 			'should handle single quotes'                => array(
 				"<h2 class='is-align-right'>Hello World</h2>",
-				"<h2 class='is-align-right wp-block-heading'>Hello World</h2>",
+				'<h2 class="is-align-right wp-block-heading">Hello World</h2>',
 			),
 			'should handle single quotes with double quotes inside' => array(
 				"<h2 class='\" is-align-right'>Hello World</h2>",
-				"<h2 class='\" is-align-right wp-block-heading'>Hello World</h2>",
+				"<h2 class=\"&quot; is-align-right wp-block-heading">Hello World</h2>',
 			),
 			'should not add a class name even when it is already defined' => array(
 				'<h2 class="is-align-right wp-block-heading">Hello World</h2>',
@@ -58,7 +58,7 @@ class Render_Block_Heading_Test extends WP_UnitTestCase {
 			),
 			'should add a class name even when there are other HTML attributes present' => array(
 				'<h2 style="display: block">Hello World</h2>',
-				'<h2 style="display: block" class="wp-block-heading">Hello World</h2>',
+				'<h2 class="wp-block-heading" style="display: block">Hello World</h2>',
 			),
 			'should add a class name even when the class attribute is already defined and has many entries' => array(
 				'<h2 class="is-align-right custom   classes">Hello World</h2>',
