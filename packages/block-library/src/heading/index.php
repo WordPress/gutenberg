@@ -30,6 +30,7 @@ function block_core_heading_render( $attributes, $content ) {
 	while ( $p->next_tag() ) {
 		if ( in_array( $p->get_tag(), $header_tags, true ) ) {
 			$p->add_class( 'wp-block-heading' );
+			break;
 		}
 	}
 
