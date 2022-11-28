@@ -58,6 +58,11 @@
 			display: none;
 		}
 	}
+
+	.edit-post-header-toolbar__center .components-button.has-icon::after {
+		content: none;
+	}
+
 }
 
 // Reduced UI.
