@@ -138,7 +138,9 @@ test.describe( 'Paragraph', () => {
 		} ) => {
 			await editor.insertBlock( { name: 'core/paragraph' } );
 
-			await draggingUtils.simulateDraggingHTML( '<h2 class="wp-block-heading">My Heading</h2>' );
+			await draggingUtils.simulateDraggingHTML(
+				'<h2 class="wp-block-heading">My Heading</h2>'
+			);
 
 			const emptyParagraph = page.locator(
 				'[data-type="core/paragraph"][data-empty="true"]'
