@@ -27,8 +27,8 @@ exports.iosServer = {
 exports.android = {
 	browserName: '',
 	platformName: 'Android',
-	platformVersion: '11.0',
-	deviceName: 'Google Pixel 3 XL GoogleAPI Emulator',
+	platformVersion: '12.0',
+	deviceName: 'Android GoogleAPI Emulator',
 	automationName: 'UiAutomator2',
 	os: 'Android',
 	appPackage: 'com.gutenberg',
