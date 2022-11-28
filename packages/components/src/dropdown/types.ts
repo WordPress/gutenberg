@@ -9,7 +9,7 @@ import type { ReactNode } from 'react';
 import type { PopoverProps } from '../popover/types';
 import type { WordPressComponentProps } from '../ui/context';
 
-type CallbackProps = {
+export type CallbackProps = {
 	isOpen: boolean;
 	onToggle: () => void;
 	onClose: () => void;
