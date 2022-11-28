@@ -118,8 +118,7 @@ function Navigation( {
 
 	// Preload classic menus, so that they don't suddenly pop-in when viewing
 	// the Select Menu dropdown.
-	const { menus: classicMenus, menuLocations: menuLocations } =
-		useNavigationEntities();
+	const { menus: classicMenus } = useNavigationEntities();
 
 	const [ showNavigationMenuStatusNotice, hideNavigationMenuStatusNotice ] =
 		useNavigationNotice( {
@@ -291,16 +290,15 @@ function Navigation( {
 		}
 
 		// If there's non fallback navigation menus and
-		// a classic menu with a location set to primary,
+		// a classic menu with a `primary` location or slug,
 		// then create a new navigation menu based on it.
 		// Otherwise, use the first classic menu.
-		const hasPrimaryMenuLocation = menuLocations.filter(
-			( location ) => location.name === 'primary'
-		).length;
-		const primaryMenus = classicMenus.filter( ( classicMenu ) =>
-			classicMenu.locations.includes( 'primary' )
+		const primaryMenus = classicMenus.filter(
+			( classicMenu ) =>
+				classicMenu.locations.includes( 'primary' ) ||
+				classicMenu.slug.indexOf( 'primary' ) !== -1
 		);
-		if ( hasPrimaryMenuLocation && primaryMenus.length ) {
+		if ( primaryMenus.length ) {
 			convertClassicMenu(
 				primaryMenus[ 0 ].id,
 				primaryMenus[ 0 ].name,

@@ -260,13 +260,23 @@ function block_core_navigation_get_classic_menu_fallback() {
 	if ( $classic_nav_menus && ! is_wp_error( $classic_nav_menus ) ) {
 		// Handles simple use case where user has a classic menu and switches to a block theme.
 
-		// Attempts to return the menu assigned to location `primary` (a convention many classic themes follow).
+		// Returns the menu assigned to location `primary`.
 		$locations = get_nav_menu_locations();
 		if ( isset( $locations['primary'] ) ) {
-			return wp_get_nav_menu_object( $locations['primary'] );
+			$primary_menu = wp_get_nav_menu_object( $locations['primary'] );
+			if ( $primary_menu ) {
+				return $primary_menu;
+			}
 		}
 
-		// Otherwise return the most first classic menu.
+		// Returns a menu if it contains `primary` in its name/slug.
+		foreach ($classic_nav_menus as $classic_nav_menu) {
+			if ( str_contains( $classic_nav_menu->slug, 'primary' ) ) {
+				return $classic_nav_menu;
+			}
+		}
+
+		// Otherwise return the most recently created classic menu.
 		return $classic_nav_menus[0];
 	}
 }
