@@ -3,7 +3,7 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
-import { useSelect, useRegistry } from '@wordpress/data';
+import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import {
 	Button,
 	Flex,
@@ -11,13 +11,18 @@ import {
 	FlexItem,
 	SelectControl,
 } from '@wordpress/components';
+import { switchToBlockType } from '@wordpress/blocks';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
 import { useCreateTemplatePartFromBlocks } from './utils/hooks';
 import { transformWidgetToBlock } from './utils/transformers';
+
+const WILDCARD_TRANSFORMS = [ 'core/columns', 'core/group' ];
 
 export function TemplatePartImportControls( { area, setAttributes } ) {
 	const [ selectedSidebar, setSelectedSidebar ] = useState( '' );
@@ -30,6 +35,8 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 			_fields: 'id,name,description,status,widgets',
 		} );
 	}, [] );
+	const { getBlockTransformItems } = useSelect( blockEditorStore );
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const createFromBlocks = useCreateTemplatePartFromBlocks(
 		area,
@@ -75,13 +82,47 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 			sidebar: sidebar.value,
 			_embed: 'about',
 		} );
-		const blocks = widgets.map( transformWidgetToBlock );
+
+		const skippedWidgets = new Set();
+		const blocks = widgets.flatMap( ( widget ) => {
+			const block = transformWidgetToBlock( widget );
+
+			if ( block.name !== 'core/legacy-widget' ) {
+				return block;
+			}
+
+			const transforms = getBlockTransformItems( block ).filter(
+				( item ) => ! WILDCARD_TRANSFORMS.includes( item.name )
+			);
+
+			// Skip the block if we have no matching transformations.
+			if ( ! transforms.length ) {
+				skippedWidgets.add( widget.id_base );
+				return [];
+			}
+
+			// Try transforming the Legacy Widget into a first matching block.
+			return switchToBlockType( block, transforms[ 0 ].name );
+		} );
 
 		await createFromBlocks(
 			blocks,
 			/* translators: %s: name of the widget area */
 			sprintf( __( 'Widget area: %s' ), sidebar.label )
 		);
+
+		if ( skippedWidgets.size ) {
+			createErrorNotice(
+				sprintf(
+					/* translators: %s: the list of widgets */
+					__( 'Unable to import the following widgets: %s.' ),
+					Array.from( skippedWidgets ).join( ', ' )
+				),
+				{
+					type: 'snackbar',
+				}
+			);
+		}
 
 		setIsBusy( false );
 	}
