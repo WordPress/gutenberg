@@ -71,7 +71,7 @@ export type TabPanelProps = {
 	 */
 	tabs: Tab[];
 	/**
-	 * When `true`, the tab will selected when receiving focus (automatic tab
+	 * When `true`, the tab will be selected when receiving focus (automatic tab
 	 * activation). When `false`, the tab will be selected only when clicked
 	 * (manual tab activation). See the official W3C docs for more info.
 	 * .
