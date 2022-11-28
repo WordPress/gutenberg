@@ -7,7 +7,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import deprecated from '@wordpress/deprecated';
 import { forwardRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 
@@ -40,16 +39,6 @@ function useDeprecatedProps( {
 	}
 
 	if ( isSecondary ) {
-		computedVariant ??= 'secondary';
-	}
-
-	if ( isDefault ) {
-		deprecated( 'Button isDefault prop', {
-			since: '5.4',
-			alternative: 'variant="secondary"',
-			version: '6.2',
-		} );
-
 		computedVariant ??= 'secondary';
 	}
 

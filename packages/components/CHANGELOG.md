@@ -14,6 +14,12 @@
 
 -   NumberControl: refactor styles/tests/stories to TypeScript, replace fireEvent with user-event ([#45990](https://github.com/WordPress/gutenberg/pull/45990)).
 
+### Breaking changes
+
+-   Remove the deprecated IconButton component.
+-   Remove the deprecated unit prop from the UnitControl component.
+-   Remove the deprecated isDefault prop from the Button component.
+
 ## 22.1.0 (2022-11-16)
 
 ### Enhancements

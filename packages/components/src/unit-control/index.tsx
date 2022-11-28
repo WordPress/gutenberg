@@ -12,7 +12,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import deprecated from '@wordpress/deprecated';
 import { forwardRef, useMemo, useRef, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -25,7 +24,7 @@ import { ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
 import {
 	CSS_UNITS,
-	getParsedQuantityAndUnit,
+	parseQuantityAndUnitFromRawValue,
 	getUnitsWithCurrentUnit,
 	getValidParsedQuantityAndUnit,
 } from './utils';
@@ -56,37 +55,27 @@ function UnforwardedUnitControl(
 		onChange: onChangeProp,
 		onUnitChange,
 		size = 'default',
-		unit: unitProp,
 		units: unitsProp = CSS_UNITS,
 		value: valueProp,
 		onBlur: onBlurProp,
 		...props
 	} = unitControlProps;
 
-	if ( 'unit' in unitControlProps ) {
-		deprecated( 'UnitControl unit prop', {
-			since: '5.6',
-			hint: 'The unit should be provided within the `value` prop.',
-			version: '6.2',
-		} );
-	}
-
 	// The `value` prop, in theory, should not be `null`, but the following line
 	// ensures it fallback to `undefined` in case a consumer of `UnitControl`
 	// still passes `null` as a `value`.
 	const nonNullValueProp = valueProp ?? undefined;
 	const units = useMemo(
-		() => getUnitsWithCurrentUnit( nonNullValueProp, unitProp, unitsProp ),
-		[ nonNullValueProp, unitProp, unitsProp ]
+		() => getUnitsWithCurrentUnit( nonNullValueProp, unitsProp ),
+		[ nonNullValueProp, unitsProp ]
 	);
-	const [ parsedQuantity, parsedUnit ] = getParsedQuantityAndUnit(
+	const [ parsedQuantity, parsedUnit ] = parseQuantityAndUnitFromRawValue(
 		nonNullValueProp,
-		unitProp,
 		units
 	);
 
 	const [ unit, setUnit ] = useControlledState< string | undefined >(
-		units.length === 1 ? units[ 0 ].value : unitProp,
+		units.length === 1 ? units[ 0 ].value : undefined,
 		{
 			initial: parsedUnit,
 			fallback: '',
