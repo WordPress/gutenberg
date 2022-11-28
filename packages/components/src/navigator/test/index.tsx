@@ -15,6 +15,7 @@ import { useState } from '@wordpress/element';
  */
 import {
 	NavigatorProvider,
+	NavigatorContainer,
 	NavigatorScreen,
 	NavigatorButton,
 	NavigatorBackButton,
@@ -146,73 +147,75 @@ const MyNavigation = ( {
 	return (
 		<>
 			<NavigatorProvider initialPath={ initialPath }>
-				<NavigatorScreen path={ PATHS.HOME }>
-					<p>{ SCREEN_TEXT.home }</p>
-					<CustomNavigatorButton
-						path={ PATHS.NOT_FOUND }
-						onClick={ onNavigatorButtonClick }
-					>
-						{ BUTTON_TEXT.toNonExistingScreen }
-					</CustomNavigatorButton>
-					<CustomNavigatorButton
-						path={ PATHS.CHILD }
-						onClick={ onNavigatorButtonClick }
-					>
-						{ BUTTON_TEXT.toChildScreen }
-					</CustomNavigatorButton>
-					<CustomNavigatorButton
-						path={ PATHS.INVALID_HTML_ATTRIBUTE }
-						onClick={ onNavigatorButtonClick }
-					>
-						{ BUTTON_TEXT.toInvalidHtmlPathScreen }
-					</CustomNavigatorButton>
-				</NavigatorScreen>
+				<NavigatorContainer>
+					<NavigatorScreen path={ PATHS.HOME }>
+						<p>{ SCREEN_TEXT.home }</p>
+						<CustomNavigatorButton
+							path={ PATHS.NOT_FOUND }
+							onClick={ onNavigatorButtonClick }
+						>
+							{ BUTTON_TEXT.toNonExistingScreen }
+						</CustomNavigatorButton>
+						<CustomNavigatorButton
+							path={ PATHS.CHILD }
+							onClick={ onNavigatorButtonClick }
+						>
+							{ BUTTON_TEXT.toChildScreen }
+						</CustomNavigatorButton>
+						<CustomNavigatorButton
+							path={ PATHS.INVALID_HTML_ATTRIBUTE }
+							onClick={ onNavigatorButtonClick }
+						>
+							{ BUTTON_TEXT.toInvalidHtmlPathScreen }
+						</CustomNavigatorButton>
+					</NavigatorScreen>
 
-				<NavigatorScreen path={ PATHS.CHILD }>
-					<p>{ SCREEN_TEXT.child }</p>
-					<CustomNavigatorButtonWithFocusRestoration
-						path={ PATHS.NESTED }
-						onClick={ onNavigatorButtonClick }
-					>
-						{ BUTTON_TEXT.toNestedScreen }
-					</CustomNavigatorButtonWithFocusRestoration>
-					<CustomNavigatorBackButton
-						onClick={ onNavigatorButtonClick }
-					>
-						{ BUTTON_TEXT.back }
-					</CustomNavigatorBackButton>
+					<NavigatorScreen path={ PATHS.CHILD }>
+						<p>{ SCREEN_TEXT.child }</p>
+						<CustomNavigatorButtonWithFocusRestoration
+							path={ PATHS.NESTED }
+							onClick={ onNavigatorButtonClick }
+						>
+							{ BUTTON_TEXT.toNestedScreen }
+						</CustomNavigatorButtonWithFocusRestoration>
+						<CustomNavigatorBackButton
+							onClick={ onNavigatorButtonClick }
+						>
+							{ BUTTON_TEXT.back }
+						</CustomNavigatorBackButton>
 
-					<label htmlFor="test-input-inner">Inner input</label>
-					<input
-						name="test-input-inner"
-						// eslint-disable-next-line no-restricted-syntax
-						id="test-input-inner"
-						onChange={ ( e ) => {
-							setInnerInputValue( e.target.value );
-						} }
-						value={ innerInputValue }
-					/>
-				</NavigatorScreen>
+						<label htmlFor="test-input-inner">Inner input</label>
+						<input
+							name="test-input-inner"
+							// eslint-disable-next-line no-restricted-syntax
+							id="test-input-inner"
+							onChange={ ( e ) => {
+								setInnerInputValue( e.target.value );
+							} }
+							value={ innerInputValue }
+						/>
+					</NavigatorScreen>
 
-				<NavigatorScreen path={ PATHS.NESTED }>
-					<p>{ SCREEN_TEXT.nested }</p>
-					<CustomNavigatorBackButton
-						onClick={ onNavigatorButtonClick }
-					>
-						{ BUTTON_TEXT.back }
-					</CustomNavigatorBackButton>
-				</NavigatorScreen>
+					<NavigatorScreen path={ PATHS.NESTED }>
+						<p>{ SCREEN_TEXT.nested }</p>
+						<CustomNavigatorBackButton
+							onClick={ onNavigatorButtonClick }
+						>
+							{ BUTTON_TEXT.back }
+						</CustomNavigatorBackButton>
+					</NavigatorScreen>
 
-				<NavigatorScreen path={ PATHS.INVALID_HTML_ATTRIBUTE }>
-					<p>{ SCREEN_TEXT.invalidHtmlPath }</p>
-					<CustomNavigatorBackButton
-						onClick={ onNavigatorButtonClick }
-					>
-						{ BUTTON_TEXT.back }
-					</CustomNavigatorBackButton>
-				</NavigatorScreen>
+					<NavigatorScreen path={ PATHS.INVALID_HTML_ATTRIBUTE }>
+						<p>{ SCREEN_TEXT.invalidHtmlPath }</p>
+						<CustomNavigatorBackButton
+							onClick={ onNavigatorButtonClick }
+						>
+							{ BUTTON_TEXT.back }
+						</CustomNavigatorBackButton>
+					</NavigatorScreen>
 
-				{ /* A `NavigatorScreen` with `path={ PATHS.NOT_FOUND }` is purposefully not included. */ }
+					{ /* A `NavigatorScreen` with `path={ PATHS.NOT_FOUND }` is purposefully not included. */ }
+				</NavigatorContainer>
 			</NavigatorProvider>
 
 			<label htmlFor="test-input-outer">Outer input</label>

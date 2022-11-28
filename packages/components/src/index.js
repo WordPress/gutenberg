@@ -112,6 +112,7 @@ export { default as __experimentalNavigationItem } from './navigation/item';
 export { default as __experimentalNavigationMenu } from './navigation/menu';
 export {
 	NavigatorProvider as __experimentalNavigatorProvider,
+	NavigatorContainer as __experimentalNavigatorContainer,
 	NavigatorScreen as __experimentalNavigatorScreen,
 	NavigatorButton as __experimentalNavigatorButton,
 	NavigatorBackButton as __experimentalNavigatorBackButton,

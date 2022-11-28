@@ -34,6 +34,13 @@ export type NavigatorProviderProps = {
 	children: ReactNode;
 };
 
+export type NavigatorContainerProps = {
+	/**
+	 * The children elements.
+	 */
+	children: ReactNode;
+};
+
 export type NavigatorScreenProps = {
 	/**
 	 * The screen's path, matched against the current path stored in the navigator.

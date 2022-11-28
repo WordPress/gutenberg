@@ -12,6 +12,7 @@ import { HStack } from '../../h-stack';
 import Dropdown from '../../dropdown';
 import {
 	NavigatorProvider,
+	NavigatorContainer,
 	NavigatorScreen,
 	NavigatorButton,
 	NavigatorBackButton,
@@ -22,7 +23,6 @@ const meta: ComponentMeta< typeof NavigatorProvider > = {
 	title: 'Components (Experimental)/Navigator',
 	subcomponents: { NavigatorScreen, NavigatorButton, NavigatorBackButton },
 	argTypes: {
-		as: { control: { type: null } },
 		children: { control: { type: null } },
 		initialPath: { control: { type: null } },
 	},
@@ -37,135 +37,139 @@ const Template: ComponentStory< typeof NavigatorProvider > = ( {
 	style,
 	...props
 } ) => (
-	<NavigatorProvider
-		style={ { ...style, height: '100vh', maxHeight: '450px' } }
-		{ ...props }
-	>
-		<NavigatorScreen path="/">
-			<Card>
-				<CardBody>
-					<p>This is the home screen.</p>
+	<NavigatorProvider { ...props }>
+		<NavigatorContainer
+			style={ { ...style, height: '100vh', maxHeight: '450px' } }
+		>
+			<NavigatorScreen path="/">
+				<Card>
+					<CardBody>
+						<p>This is the home screen.</p>
 
-					<HStack justify="flex-start" wrap>
-						<NavigatorButton variant="secondary" path="/child">
-							Navigate to child screen.
-						</NavigatorButton>
+						<HStack justify="flex-start" wrap>
+							<NavigatorButton variant="secondary" path="/child">
+								Navigate to child screen.
+							</NavigatorButton>
 
-						<NavigatorButton
-							variant="secondary"
-							path="/overflow-child"
-						>
-							Navigate to screen with horizontal overflow.
-						</NavigatorButton>
+							<NavigatorButton
+								variant="secondary"
+								path="/overflow-child"
+							>
+								Navigate to screen with horizontal overflow.
+							</NavigatorButton>
 
-						<NavigatorButton variant="secondary" path="/stickies">
-							Navigate to screen with sticky content.
-						</NavigatorButton>
+							<NavigatorButton
+								variant="secondary"
+								path="/stickies"
+							>
+								Navigate to screen with sticky content.
+							</NavigatorButton>
 
-						<Dropdown
-							renderToggle={ ( {
-								isOpen,
-								onToggle,
-							}: {
-								// TODO: remove once `Dropdown` is refactored to TypeScript
-								isOpen: boolean;
-								onToggle: () => void;
-							} ) => (
-								<Button
-									onClick={ onToggle }
-									aria-expanded={ isOpen }
-									variant="primary"
-								>
-									Open test dialog
-								</Button>
-							) }
-							renderContent={ () => (
-								<Card>
-									<CardHeader>Go</CardHeader>
-									<CardBody>Stuff</CardBody>
-								</Card>
-							) }
-						/>
-					</HStack>
-				</CardBody>
-			</Card>
-		</NavigatorScreen>
+							<Dropdown
+								renderToggle={ ( {
+									isOpen,
+									onToggle,
+								}: {
+									// TODO: remove once `Dropdown` is refactored to TypeScript
+									isOpen: boolean;
+									onToggle: () => void;
+								} ) => (
+									<Button
+										onClick={ onToggle }
+										aria-expanded={ isOpen }
+										variant="primary"
+									>
+										Open test dialog
+									</Button>
+								) }
+								renderContent={ () => (
+									<Card>
+										<CardHeader>Go</CardHeader>
+										<CardBody>Stuff</CardBody>
+									</Card>
+								) }
+							/>
+						</HStack>
+					</CardBody>
+				</Card>
+			</NavigatorScreen>
 
-		<NavigatorScreen path="/child">
-			<Card>
-				<CardBody>
-					<p>This is the child screen.</p>
-					<NavigatorBackButton variant="secondary">
-						Go back
-					</NavigatorBackButton>
-				</CardBody>
-			</Card>
-		</NavigatorScreen>
+			<NavigatorScreen path="/child">
+				<Card>
+					<CardBody>
+						<p>This is the child screen.</p>
+						<NavigatorBackButton variant="secondary">
+							Go back
+						</NavigatorBackButton>
+					</CardBody>
+				</Card>
+			</NavigatorScreen>
 
-		<NavigatorScreen path="/overflow-child">
-			<Card>
-				<CardBody>
-					<NavigatorBackButton variant="secondary">
-						Go back
-					</NavigatorBackButton>
-					<div
-						style={ {
-							display: 'inline-block',
-							background: 'papayawhip',
-						} }
-					>
-						<span
+			<NavigatorScreen path="/overflow-child">
+				<Card>
+					<CardBody>
+						<NavigatorBackButton variant="secondary">
+							Go back
+						</NavigatorBackButton>
+						<div
 							style={ {
-								color: 'palevioletred',
-								whiteSpace: 'nowrap',
-								fontSize: '42vw',
+								display: 'inline-block',
+								background: 'papayawhip',
 							} }
 						>
-							¯\_(ツ)_/¯
-						</span>
-					</div>
-				</CardBody>
-			</Card>
-		</NavigatorScreen>
+							<span
+								style={ {
+									color: 'palevioletred',
+									whiteSpace: 'nowrap',
+									fontSize: '42vw',
+								} }
+							>
+								¯\_(ツ)_/¯
+							</span>
+						</div>
+					</CardBody>
+				</Card>
+			</NavigatorScreen>
 
-		<NavigatorScreen path="/stickies">
-			<Card>
-				<CardHeader style={ getStickyStyles( { zIndex: 2 } ) }>
-					<NavigatorBackButton variant="secondary">
-						Go back
-					</NavigatorBackButton>
-				</CardHeader>
-				<CardBody>
-					<div
+			<NavigatorScreen path="/stickies">
+				<Card>
+					<CardHeader style={ getStickyStyles( { zIndex: 2 } ) }>
+						<NavigatorBackButton variant="secondary">
+							Go back
+						</NavigatorBackButton>
+					</CardHeader>
+					<CardBody>
+						<div
+							style={ getStickyStyles( {
+								top: 69,
+								bgColor: 'peachpuff',
+							} ) }
+						>
+							<h2>A wild sticky element appears</h2>
+						</div>
+						<MetaphorIpsum quantity={ 3 } />
+					</CardBody>
+					<CardBody>
+						<div
+							style={ getStickyStyles( {
+								top: 69,
+								bgColor: 'paleturquoise',
+							} ) }
+						>
+							<h2>Another wild sticky element appears</h2>
+						</div>
+						<MetaphorIpsum quantity={ 3 } />
+					</CardBody>
+					<CardFooter
 						style={ getStickyStyles( {
-							top: 69,
-							bgColor: 'peachpuff',
+							bgColor: 'mistyrose',
 						} ) }
 					>
-						<h2>A wild sticky element appears</h2>
-					</div>
-					<MetaphorIpsum quantity={ 3 } />
-				</CardBody>
-				<CardBody>
-					<div
-						style={ getStickyStyles( {
-							top: 69,
-							bgColor: 'paleturquoise',
-						} ) }
-					>
-						<h2>Another wild sticky element appears</h2>
-					</div>
-					<MetaphorIpsum quantity={ 3 } />
-				</CardBody>
-				<CardFooter
-					style={ getStickyStyles( {
-						bgColor: 'mistyrose',
-					} ) }
-				>
-					<Button variant="primary">Primary noop</Button>
-				</CardFooter>
-			</Card>
-		</NavigatorScreen>
+						<Button variant="primary">Primary noop</Button>
+					</CardFooter>
+				</Card>
+			</NavigatorScreen>
+		</NavigatorContainer>
 	</NavigatorProvider>
 );
 

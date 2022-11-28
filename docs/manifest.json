@@ -1056,6 +1056,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "NavigatorContainer",
+		"slug": "navigator-container",
+		"markdown_source": "../packages/components/src/navigator/navigator-container/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "NavigatorProvider",
 		"slug": "navigator-provider",
 		"markdown_source": "../packages/components/src/navigator/navigator-provider/README.md",

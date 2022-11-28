@@ -1,4 +1,5 @@
 export { NavigatorProvider } from './navigator-provider';
+export { NavigatorContainer } from './navigator-container';
 export { NavigatorScreen } from './navigator-screen';
 export { NavigatorButton } from './navigator-button';
 export { NavigatorBackButton } from './navigator-back-button';
