@@ -98,7 +98,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
-<h2></h2>
+<h2 class="wp-block-heading"></h2>
 <!-- /wp:heading -->` );
 	} );
 
