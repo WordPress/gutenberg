@@ -7,33 +7,42 @@ This package acts as a "dealer" that only allows WordPress packages to use the e
 Each package needs to start by registering itself:
 
 ```js
-const { register } =
-	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
-		'<CONSENT STRING>',  // See index.js, this may change without notice.
-		'@wordpress/blocks'
-	);
+const { lock, unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
+	'<CONSENT STRING>', // See index.js, this may change without notice.
+	'@wordpress/blocks'
+);
 ```
 
 The function name communicates that plugins are not supposed to use it. To make double and triple sure, the first argument must be that exact consent string, and the second argument must be a known `@wordpress` package that hasn't opted in yet – otherwise an error is thrown.
 
-Expose a new `__experimental` API as follows:
+The `lock` and `unlock` API may be used as follows:
 
 ```js
-export const __experiments = register( { __unstableGetInnerBlocksProps } )
-```
+// In the package exposing the experimental APIs:
+const { lock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
+	'<CONSENT STRING>', // See index.js, this may change without notice.
+	'@wordpress/blocks'
+);
+export const __experiments = {};
+lock( __experiments, {
+	privateFunction() {
+		console.log( 'I am a private function!' );
+	},
+} );
 
-Consume the registered `__experimental` APIs as follows:
+// In the package consuming the experimental APIs:
+const { unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
+	'<CONSENT STRING>', // See index.js, this may change without notice.
+	'@wordpress/block-editor'
+);
+console.log( __experiments.privateFunction );
+// undefined
 
-```js
-// In the @wordpress/block-editor package:
-import { __experiments as blocksExperiments } from '@wordpress/blocks';
-const { unlock } =
-	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
-		'<CONSENT STRING>',  // See index.js
-		'@wordpress/block-editor'
-	);
+console.log( unlock( __experiments ).privateFunction );
+// Function
 
-const { __unstableGetInnerBlocksProps } = unlock( blocksExperiments );
+unlock( __experiments ).privateFunction();
+// "I am a private function!"
 ```
 
 All new experimental APIs should be shipped as **private** using this method.
@@ -42,10 +51,10 @@ The **public** experimental APIs that have already been shipped in a stable Word
 
 A determined developer who would want to use the private experimental APIs at all costs would have to:
 
-* Realize a private importing system exists
-* Read the code where the risks would be spelled out in capital letters
-* Explicitly type out he or she is aware of the consequences
-* Pretend to register a `@wordpress` package (and trigger an error as soon as the real package is loaded)
+-   Realize a private importing system exists
+-   Read the code where the risks would be spelled out in capital letters
+-   Explicitly type out he or she is aware of the consequences
+-   Pretend to register a `@wordpress` package (and trigger an error as soon as the real package is loaded)
 
 Dangerously opting in to using these APIs by theme and plugin developers is not recommended. Furthermore, the WordPress Core philosophy to strive to maintain backward compatibility for third-party developers **does not apply** to experimental APIs registered via this package.
 
