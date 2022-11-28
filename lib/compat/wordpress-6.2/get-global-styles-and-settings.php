@@ -25,22 +25,22 @@ if ( ! function_exists( 'wp_theme_has_theme_json' ) ) {
 		 * The reason not to store it as a boolean is to avoid working
 		 * with the $found parameter which apparently had some issues in some implementations
 		 * https://developer.wordpress.org/reference/functions/wp_cache_get/
+		 *
+		 * Ignore cache when `WP_DEBUG` is enabled, so it doesn't interfere with the theme developers workflow.
 		 */
-		if (
-			// Ignore cache when `WP_DEBUG` is enabled, so it doesn't interfere with the theme developers workflow.
-			( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) &&
-			( 0 === $theme_has_support || 1 === $theme_has_support )
-		) {
+		if ( ! WP_DEBUG && is_int( $theme_has_support ) ) {
 			return (bool) $theme_has_support;
 		}
 
 		// Has the own theme a theme.json?
-		$theme_has_support = is_readable( get_stylesheet_directory() . '/theme.json' ) ? 1 : 0;
+		$theme_has_support = is_readable( get_stylesheet_directory() . '/theme.json' );
 
 		// Look up the parent if the child does not have a theme.json.
-		if ( 0 === $theme_has_support ) {
-			$theme_has_support = is_readable( get_template_directory() . '/theme.json' ) ? 1 : 0;
+		if ( ! $theme_has_support ) {
+			$theme_has_support = is_readable( get_template_directory() . '/theme.json' );
 		}
+
+		$theme_has_support = $theme_has_support ? 1 : 0;
 
 		wp_cache_set( $cache_key, $theme_has_support, $cache_group );
 
@@ -92,7 +92,7 @@ if ( ! function_exists( '_wp_theme_has_theme_json_clean_cache_upon_upgrading_act
  */
 function gutenberg_get_global_stylesheet( $types = array() ) {
 	// Ignore cache when `WP_DEBUG` is enabled, so it doesn't interfere with the theme developers workflow.
-	$can_use_cached = empty( $types ) && ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG );
+	$can_use_cached = empty( $types ) && ! WP_DEBUG;
 	$cache_key      = 'gutenberg_get_global_stylesheet';
 	$cache_group    = 'theme_json';
 	if ( $can_use_cached ) {

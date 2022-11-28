@@ -56,16 +56,16 @@ class WP_Theme_JSON_Resolver_6_0 extends WP_Theme_JSON_Resolver {
 		}
 
 		$options = wp_parse_args( $options, array( 'with_supports' => true ) );
-
 		if ( null === static::$theme ) {
+			$wp_theme        = wp_get_theme();
 			$theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json' ) );
-			$theme_json_data = static::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
+			$theme_json_data = static::translate( $theme_json_data, $wp_theme->get( 'TextDomain' ) );
 			static::$theme   = new WP_Theme_JSON_Gutenberg( $theme_json_data );
 
-			if ( wp_get_theme()->parent() ) {
+			if ( $wp_theme->parent() ) {
 				// Get parent theme.json.
 				$parent_theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json', true ) );
-				$parent_theme_json_data = static::translate( $parent_theme_json_data, wp_get_theme()->parent()->get( 'TextDomain' ) );
+				$parent_theme_json_data = static::translate( $parent_theme_json_data, $wp_theme->parent()->get( 'TextDomain' ) );
 				$parent_theme           = new WP_Theme_JSON_Gutenberg( $parent_theme_json_data );
 
 				// Merge the child theme.json into the parent theme.json.
