@@ -13,6 +13,7 @@ import {
 	__experimentalItem as Item,
 	__experimentalHStack as HStack,
 	__experimentalNavigatorProvider as NavigatorProvider,
+	__experimentalNavigatorContainer as NavigatorContainer,
 	__experimentalNavigatorScreen as NavigatorScreen,
 	__experimentalNavigatorButton as NavigatorButton,
 	__experimentalNavigatorBackButton as NavigatorBackButton,
@@ -134,47 +135,51 @@ function MediaTab( {
 function MediaTabNavigation( { onInsert, rootClientId, mediaCategories } ) {
 	return (
 		<NavigatorProvider initialPath="/">
-			<NavigatorScreen path="/">
-				<ItemGroup>
-					{ mediaCategories.map( ( category ) => (
-						<NavigatorButton
-							key={ category.name }
-							path={ `/category/${ category.name }` }
-							as={ Item }
-							isAction
-						>
-							<HStack>
-								<FlexBlock>{ category.label }</FlexBlock>
-								<Icon
-									icon={
-										isRTL() ? chevronLeft : chevronRight
-									}
-								/>
-							</HStack>
-						</NavigatorButton>
-					) ) }
-				</ItemGroup>
-			</NavigatorScreen>
-			{ mediaCategories.map( ( category ) => (
-				<NavigatorScreen
-					key={ category.name }
-					path={ `/category/${ category.name }` }
-				>
-					<NavigatorBackButton
-						className="rigatonious"
-						icon={ isRTL() ? chevronRight : chevronLeft }
-						isSmall
-						aria-label={ __( 'Navigate to the categories list' ) }
-					>
-						{ __( 'Back' ) }
-					</NavigatorBackButton>
-					<MediaCategoryPanel
-						rootClientId={ rootClientId }
-						onInsert={ onInsert }
-						category={ category }
-					/>
+			<NavigatorContainer>
+				<NavigatorScreen path="/">
+					<ItemGroup>
+						{ mediaCategories.map( ( category ) => (
+							<NavigatorButton
+								key={ category.name }
+								path={ `/category/${ category.name }` }
+								as={ Item }
+								isAction
+							>
+								<HStack>
+									<FlexBlock>{ category.label }</FlexBlock>
+									<Icon
+										icon={
+											isRTL() ? chevronLeft : chevronRight
+										}
+									/>
+								</HStack>
+							</NavigatorButton>
+						) ) }
+					</ItemGroup>
 				</NavigatorScreen>
-			) ) }
+				{ mediaCategories.map( ( category ) => (
+					<NavigatorScreen
+						key={ category.name }
+						path={ `/category/${ category.name }` }
+					>
+						<NavigatorBackButton
+							className="rigatonious"
+							icon={ isRTL() ? chevronRight : chevronLeft }
+							isSmall
+							aria-label={ __(
+								'Navigate to the categories list'
+							) }
+						>
+							{ __( 'Back' ) }
+						</NavigatorBackButton>
+						<MediaCategoryPanel
+							rootClientId={ rootClientId }
+							onInsert={ onInsert }
+							category={ category }
+						/>
+					</NavigatorScreen>
+				) ) }
+			</NavigatorContainer>
 		</NavigatorProvider>
 	);
 }

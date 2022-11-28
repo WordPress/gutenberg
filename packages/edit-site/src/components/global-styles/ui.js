@@ -3,6 +3,7 @@
  */
 import {
 	__experimentalNavigatorProvider as NavigatorProvider,
+	__experimentalNavigatorContainer as NavigatorContainer,
 	__experimentalNavigatorScreen as NavigatorScreen,
 } from '@wordpress/components';
 import { getBlockTypes } from '@wordpress/blocks';
@@ -123,35 +124,37 @@ function GlobalStylesUI() {
 			className="edit-site-global-styles-sidebar__navigator-provider"
 			initialPath="/"
 		>
-			<GlobalStylesNavigationScreen path="/">
-				<ScreenRoot />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen path="/variations">
-				<ScreenStyleVariations />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen path="/blocks">
-				<ScreenBlockList />
-			</GlobalStylesNavigationScreen>
-
-			{ blocks.map( ( block ) => (
-				<GlobalStylesNavigationScreen
-					key={ 'menu-block-' + block.name }
-					path={ '/blocks/' + block.name }
-				>
-					<ScreenBlock name={ block.name } />
+			<NavigatorContainer>
+				<GlobalStylesNavigationScreen path="/">
+					<ScreenRoot />
 				</GlobalStylesNavigationScreen>
-			) ) }
 
-			<ContextScreens />
+				<GlobalStylesNavigationScreen path="/variations">
+					<ScreenStyleVariations />
+				</GlobalStylesNavigationScreen>
 
-			{ blocks.map( ( block ) => (
-				<ContextScreens
-					key={ 'screens-block-' + block.name }
-					name={ block.name }
-				/>
-			) ) }
+				<GlobalStylesNavigationScreen path="/blocks">
+					<ScreenBlockList />
+				</GlobalStylesNavigationScreen>
+
+				{ blocks.map( ( block ) => (
+					<GlobalStylesNavigationScreen
+						key={ 'menu-block-' + block.name }
+						path={ '/blocks/' + block.name }
+					>
+						<ScreenBlock name={ block.name } />
+					</GlobalStylesNavigationScreen>
+				) ) }
+
+				<ContextScreens />
+
+				{ blocks.map( ( block ) => (
+					<ContextScreens
+						key={ 'screens-block-' + block.name }
+						name={ block.name }
+					/>
+				) ) }
+			</NavigatorContainer>
 		</NavigatorProvider>
 	);
 }

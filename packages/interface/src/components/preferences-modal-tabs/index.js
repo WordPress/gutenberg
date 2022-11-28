@@ -4,6 +4,7 @@
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	__experimentalNavigatorProvider as NavigatorProvider,
+	__experimentalNavigatorContainer as NavigatorContainer,
 	__experimentalNavigatorScreen as NavigatorScreen,
 	__experimentalNavigatorButton as NavigatorButton,
 	__experimentalNavigatorBackButton as NavigatorBackButton,
@@ -80,74 +81,76 @@ export default function PreferencesModalTabs( { sections } ) {
 				initialPath="/"
 				className="interface-preferences__provider"
 			>
-				<NavigatorScreen path="/">
-					<Card isBorderless size="small">
-						<CardBody>
-							<ItemGroup>
-								{ tabs.map( ( tab ) => {
-									return (
-										<NavigatorButton
-											key={ tab.name }
-											path={ tab.name }
-											as={ Item }
-											isAction
+				<NavigatorContainer>
+					<NavigatorScreen path="/">
+						<Card isBorderless size="small">
+							<CardBody>
+								<ItemGroup>
+									{ tabs.map( ( tab ) => {
+										return (
+											<NavigatorButton
+												key={ tab.name }
+												path={ tab.name }
+												as={ Item }
+												isAction
+											>
+												<HStack justify="space-between">
+													<FlexItem>
+														<Truncate>
+															{ tab.title }
+														</Truncate>
+													</FlexItem>
+													<FlexItem>
+														<Icon
+															icon={
+																isRTL()
+																	? chevronLeft
+																	: chevronRight
+															}
+														/>
+													</FlexItem>
+												</HStack>
+											</NavigatorButton>
+										);
+									} ) }
+								</ItemGroup>
+							</CardBody>
+						</Card>
+					</NavigatorScreen>
+					{ sections.length &&
+						sections.map( ( section ) => {
+							return (
+								<NavigatorScreen
+									key={ `${ section.name }-menu` }
+									path={ section.name }
+								>
+									<Card isBorderless size="large">
+										<CardHeader
+											isBorderless={ false }
+											justify="left"
+											size="small"
+											gap="6"
 										>
-											<HStack justify="space-between">
-												<FlexItem>
-													<Truncate>
-														{ tab.title }
-													</Truncate>
-												</FlexItem>
-												<FlexItem>
-													<Icon
-														icon={
-															isRTL()
-																? chevronLeft
-																: chevronRight
-														}
-													/>
-												</FlexItem>
-											</HStack>
-										</NavigatorButton>
-									);
-								} ) }
-							</ItemGroup>
-						</CardBody>
-					</Card>
-				</NavigatorScreen>
-				{ sections.length &&
-					sections.map( ( section ) => {
-						return (
-							<NavigatorScreen
-								key={ `${ section.name }-menu` }
-								path={ section.name }
-							>
-								<Card isBorderless size="large">
-									<CardHeader
-										isBorderless={ false }
-										justify="left"
-										size="small"
-										gap="6"
-									>
-										<NavigatorBackButton
-											icon={
-												isRTL()
-													? chevronRight
-													: chevronLeft
-											}
-											aria-label={ __(
-												'Navigate to the previous view'
-											) }
-										/>
-										<Text size="16">
-											{ section.tabLabel }
-										</Text>
-									</CardHeader>
-									<CardBody>{ section.content }</CardBody>
-								</Card>
-							</NavigatorScreen>
-						);
-					} ) }
+											<NavigatorBackButton
+												icon={
+													isRTL()
+														? chevronRight
+														: chevronLeft
+												}
+												aria-label={ __(
+													'Navigate to the previous view'
+												) }
+											/>
+											<Text size="16">
+												{ section.tabLabel }
+											</Text>
+										</CardHeader>
+										<CardBody>{ section.content }</CardBody>
+									</Card>
+								</NavigatorScreen>
+							);
+						} ) }
+				</NavigatorContainer>
 			</NavigatorProvider>
 		);
 	}

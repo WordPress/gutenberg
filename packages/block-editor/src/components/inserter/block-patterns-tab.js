@@ -15,6 +15,7 @@ import {
 	__experimentalItem as Item,
 	__experimentalHStack as HStack,
 	__experimentalNavigatorProvider as NavigatorProvider,
+	__experimentalNavigatorContainer as NavigatorContainer,
 	__experimentalNavigatorScreen as NavigatorScreen,
 	__experimentalNavigatorButton as NavigatorButton,
 	__experimentalNavigatorBackButton as NavigatorBackButton,
@@ -252,47 +253,51 @@ function BlockPatternsTabNavigation( { onInsert, rootClientId } ) {
 
 	return (
 		<NavigatorProvider initialPath="/">
-			<NavigatorScreen path="/">
-				<ItemGroup>
-					{ categories.map( ( category ) => (
-						<NavigatorButton
-							key={ category.name }
-							path={ `/category/${ category.name }` }
-							as={ Item }
-							isAction
-						>
-							<HStack>
-								<FlexBlock>{ category.label }</FlexBlock>
-								<Icon
-									icon={
-										isRTL() ? chevronLeft : chevronRight
-									}
-								/>
-							</HStack>
-						</NavigatorButton>
-					) ) }
-				</ItemGroup>
-			</NavigatorScreen>
-
-			{ categories.map( ( category ) => (
-				<NavigatorScreen
-					key={ category.name }
-					path={ `/category/${ category.name }` }
-				>
-					<NavigatorBackButton
-						icon={ isRTL() ? chevronRight : chevronLeft }
-						isSmall
-						aria-label={ __( 'Navigate to the categories list' ) }
-					>
-						{ __( 'Back' ) }
-					</NavigatorBackButton>
-					<BlockPatternsCategoryPanel
-						category={ category }
-						rootClientId={ rootClientId }
-						onInsert={ onInsert }
-					/>
+			<NavigatorContainer>
+				<NavigatorScreen path="/">
+					<ItemGroup>
+						{ categories.map( ( category ) => (
+							<NavigatorButton
+								key={ category.name }
+								path={ `/category/${ category.name }` }
+								as={ Item }
+								isAction
+							>
+								<HStack>
+									<FlexBlock>{ category.label }</FlexBlock>
+									<Icon
+										icon={
+											isRTL() ? chevronLeft : chevronRight
+										}
+									/>
+								</HStack>
+							</NavigatorButton>
+						) ) }
+					</ItemGroup>
 				</NavigatorScreen>
-			) ) }
+
+				{ categories.map( ( category ) => (
+					<NavigatorScreen
+						key={ category.name }
+						path={ `/category/${ category.name }` }
+					>
+						<NavigatorBackButton
+							icon={ isRTL() ? chevronRight : chevronLeft }
+							isSmall
+							aria-label={ __(
+								'Navigate to the categories list'
+							) }
+						>
+							{ __( 'Back' ) }
+						</NavigatorBackButton>
+						<BlockPatternsCategoryPanel
+							category={ category }
+							rootClientId={ rootClientId }
+							onInsert={ onInsert }
+						/>
+					</NavigatorScreen>
+				) ) }
+			</NavigatorContainer>
 		</NavigatorProvider>
 	);
 }
