@@ -84,16 +84,16 @@ export const __dangerousOptInToUnstableAPIsOnlyForCoreModules = (
 			} );
 		},
 		unlock( object ) {
-			const { id, lazyDecorator } = getLockingConfig( object );
+			const { id, onFirstUnlock } = getLockingConfig( object );
 
-			const entry = lockedData.get( id );
-			if ( ! entry ) {
-				return null;
-			}
+			const lockedEntry = lockedData.get( id ) || {
+				privateData: null,
+				decorated: false,
+			};
 
-			let { privateData, decorated } = entry;
-			if ( lazyDecorator && ! decorated ) {
-				privateData = lazyDecorator( privateData );
+			let { privateData, decorated } = lockedEntry;
+			if ( onFirstUnlock && ! decorated ) {
+				privateData = onFirstUnlock( privateData );
 				lockedData.set( id, {
 					privateData,
 					decorated: true,
@@ -125,7 +125,7 @@ function getLockingConfig( object ) {
 
 export function configureExperiment( object, config ) {
 	const id = getExperimentId( object );
-	const { lazyDecorator, ...rest } = config;
+	const { onFirstUnlock, ...rest } = config;
 	if ( Object.entries( rest ).length ) {
 		throw new Error(
 			`Unknown options provided to configureLockingBehavior: ${ Object.keys(
