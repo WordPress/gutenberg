@@ -149,11 +149,11 @@ export default function createReduxStore( key, options ) {
 			actions[ experimentId ] = storeExperimentId;
 			configureExperiment( actions, {
 				lazyDecorator: ( storeExperiment ) => {
-					if ( ! storeExperiment.actions ) {
+					if ( ! storeExperiment?.actions ) {
 						throw new Error(
 							`Tried to unlock experimental actions on the ${ key } store where ` +
-								`no experimental actions were defined. Did you forget to prefix them with ` +
-								`"actions" in your lock( store, { actions: { ... } } call?`
+								`no experimental actions were defined. Did you forget to call ` +
+								`registerPrivateActions()?`
 						);
 					}
 					return mapActions( storeExperiment.actions, store );
@@ -182,11 +182,11 @@ export default function createReduxStore( key, options ) {
 			selectors[ experimentId ] = storeExperimentId;
 			configureExperiment( selectors, {
 				lazyDecorator: ( storeExperiment ) => {
-					if ( ! storeExperiment.selectors ) {
+					if ( ! storeExperiment?.selectors ) {
 						throw new Error(
 							`Tried to unlock experimental selectors on the ${ key } store where ` +
-								`no experimental selectors were defined. Did you forget to prefix them with ` +
-								`"selectors" in your lock( store, { selectors: { ... } } call?`
+								`no experimental selectors were defined. Did you forget to call ` +
+								`registerPrivateSelectors()?`
 						);
 					}
 					return mapSelectors(
