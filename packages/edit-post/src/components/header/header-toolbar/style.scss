@@ -110,3 +110,15 @@
 .show-icon-labels .edit-post-header-toolbar__left > * + * {
 	margin-left: $grid-unit-10;
 }
+
+.edit-post-header-toolbar__center {
+	flex-grow: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.edit-post-header-toolbar__title-dropdown > .components-popover__content {
+	min-width: 240px;
+	padding: 16px;
+}

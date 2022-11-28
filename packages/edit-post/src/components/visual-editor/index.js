@@ -8,7 +8,6 @@ import classnames from 'classnames';
  */
 import {
 	VisualEditorGlobalKeyboardShortcuts,
-	PostTitle,
 	store as editorStore,
 } from '@wordpress/editor';
 import {
@@ -376,9 +375,7 @@ export default function VisualEditor( { styles } ) {
 									}
 								) }
 								contentEditable={ false }
-							>
-								<PostTitle ref={ titleRef } />
-							</div>
+							></div>
 						) }
 						<RecursionProvider
 							blockName={ wrapperBlockName }

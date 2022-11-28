@@ -14,10 +14,18 @@ import {
 	EditorHistoryUndo,
 	store as editorStore,
 } from '@wordpress/editor';
-import { Button, ToolbarItem } from '@wordpress/components';
-import { listView, plus } from '@wordpress/icons';
+import {
+	Button,
+	ToolbarItem,
+	Dropdown,
+	VisuallyHidden,
+	TextControl,
+	__experimentalText as Text,
+} from '@wordpress/components';
+import { chevronDown, listView, plus } from '@wordpress/icons';
 import { useRef, useCallback } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -30,9 +38,12 @@ const preventDefault = ( event ) => {
 
 function HeaderToolbar() {
 	const inserterButton = useRef();
+	const centerToolbar = useRef();
+	const { editPost } = useDispatch( editorStore );
 	const { setIsInserterOpened, setIsListViewOpened } =
 		useDispatch( editPostStore );
 	const {
+		title,
 		isInserterEnabled,
 		isInserterOpened,
 		isTextModeEnabled,
@@ -42,12 +53,14 @@ function HeaderToolbar() {
 	} = useSelect( ( select ) => {
 		const { hasInserterItems, getBlockRootClientId, getBlockSelectionEnd } =
 			select( blockEditorStore );
-		const { getEditorSettings } = select( editorStore );
+		const { getEditedPostAttribute, getEditorSettings } =
+			select( editorStore );
 		const { getEditorMode, isFeatureActive, isListViewOpened } =
 			select( editPostStore );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 
 		return {
+			title: getEditedPostAttribute( 'title' ),
 			// This setting (richEditingEnabled) should not live in the block editor's setting.
 			isInserterEnabled:
 				getEditorMode() === 'visual' &&
@@ -151,6 +164,46 @@ function HeaderToolbar() {
 						{ overflowItems }
 					</>
 				) }
+			</div>
+			<div
+				className="edit-post-header-toolbar__center"
+				ref={ centerToolbar }
+			>
+				<Text size="body" as="h1" limit={ 24 }>
+					<VisuallyHidden as="span">
+						{ __( 'Editing: ' ) }
+					</VisuallyHidden>
+					{ title !== ''
+						? decodeEntities( title )
+						: __( '(Untitled Document)' ) }
+				</Text>
+				<Dropdown
+					popoverProps={ {
+						anchor: centerToolbar.current,
+					} }
+					position="bottom center"
+					renderToggle={ ( { isOpen, onToggle } ) => (
+						<Button
+							icon={ chevronDown }
+							aria-expanded={ isOpen }
+							aria-haspopup="true"
+							onClick={ onToggle }
+							label={ __( 'Edit document details' ) }
+						>
+							{ showIconLabels && __( 'Details' ) }
+						</Button>
+					) }
+					contentClassName="edit-post-header-toolbar__title-dropdown"
+					renderContent={ () => (
+						<TextControl
+							label={ __( 'Title' ) }
+							value={ title }
+							onChange={ ( newTitle ) =>
+								editPost( { title: newTitle } )
+							}
+						/>
+					) }
+				/>
 			</div>
 		</NavigableToolbar>
 	);

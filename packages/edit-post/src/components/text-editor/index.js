@@ -3,7 +3,6 @@
  */
 import {
 	PostTextEditor,
-	PostTitle,
 	TextEditorGlobalKeyboardShortcuts,
 	store as editorStore,
 } from '@wordpress/editor';
@@ -39,7 +38,6 @@ export default function TextEditor() {
 				</div>
 			) }
 			<div className="edit-post-text-editor__body">
-				<PostTitle />
 				<PostTextEditor />
 			</div>
 		</div>
