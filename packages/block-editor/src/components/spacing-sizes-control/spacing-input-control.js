@@ -308,6 +308,8 @@ export default function SpacingInputControl( {
 					size={ '__unstable-large' }
 					onMouseOver={ onMouseOver }
 					onMouseOut={ onMouseOut }
+					onFocus={ onMouseOver }
+					onBlur={ onMouseOut }
 				/>
 			) }
 		</>
