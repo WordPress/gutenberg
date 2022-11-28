@@ -175,7 +175,28 @@ describe( 'advanced lock() and unlock()', () => {
 		expect( unlock( object2 ) ).toBe( 'sh' );
 	} );
 
-	it( 'Should call the lazy decorator specified bia configureExperiment() on the first unlock()', () => {
+	it( 'Should pass the locked data through onFirstUnlock (specified via configureExperiment()) on the first unlock()', () => {
+		const object = {};
+		configureExperiment( object, {
+			onFirstUnlock( secretString ) {
+				return `Decorated: ${ secretString }`;
+			},
+		} );
+		lock( object, 'sh' );
+		expect( unlock( object ) ).toBe( 'Decorated: sh' );
+	} );
+
+	it( 'Should pass null through onFirstUnlock (specified via configureExperiment()) if there is no private data available on the first unlock()', () => {
+		const object = {};
+		configureExperiment( object, {
+			onFirstUnlock( secretString ) {
+				return `Decorated: ${ secretString }`;
+			},
+		} );
+		expect( unlock( object ) ).toBe( 'Decorated: null' );
+	} );
+
+	it( 'Should pass the locked data through onFirstUnlock (specified via configureExperiment()) on the first unlock() – when experimentId is specified', () => {
 		const thisExperimentId = makeExperimentId();
 		const object1 = {
 			[ experimentId ]: thisExperimentId,
@@ -184,7 +205,7 @@ describe( 'advanced lock() and unlock()', () => {
 			[ experimentId ]: thisExperimentId,
 		};
 		configureExperiment( object2, {
-			lazyDecorator( secretString ) {
+			onFirstUnlock( secretString ) {
 				return `Decorated: ${ secretString }`;
 			},
 		} );
