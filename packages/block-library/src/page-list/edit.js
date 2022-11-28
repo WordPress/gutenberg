@@ -64,7 +64,7 @@ export default function PageListEdit( {
 		style: { ...context.style?.color },
 	} );
 
-	const makeBlockTemplate = ( parentId = 0 ) => {
+	const makeBlockTemplate = ( parentId = parentPageID ) => {
 		const pages = pagesByParentId.get( parentId );
 
 		if ( ! pages?.length ) {
@@ -90,7 +90,10 @@ export default function PageListEdit( {
 		}, [] );
 	};
 
-	const pagesTemplate = useMemo( makeBlockTemplate, [ pagesByParentId ] );
+	const pagesTemplate = useMemo( makeBlockTemplate, [
+		parentPageID,
+		pagesByParentId,
+	] );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: pagesTemplate,
