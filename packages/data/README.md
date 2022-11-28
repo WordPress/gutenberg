@@ -508,6 +508,26 @@ _Returns_
 
 -   `Object`: Object containing the action creators.
 
+### experiments
+
+The experimental APIs exposed by the `@wordpress/data` package.
+Only available to core packages. These APIs are not stable and may
+change without notice. Do not use outside of core.
+
+_Usage_
+
+```js
+import { unlock } from '../experiments';
+import { experiments as dataExperiments } from '@wordpress/data';
+const { registerPrivateSelectors } = unlock( dataExperiments );
+
+import { store as blockEditorStore } from './store';
+import { __unstableSelectionHasUnmergeableBlock } from './store/selectors';
+registerPrivateSelectors( store, {
+	__experimentalHasContentRoleAttribute,
+} );
+```
+
 ### plugins
 
 Object of available plugins to use with a registry.
