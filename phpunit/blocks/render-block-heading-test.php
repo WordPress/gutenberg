@@ -13,6 +13,7 @@
  */
 class Render_Block_Heading_Test extends WP_UnitTestCase {
 
+
 	/**
 	 * @covers ::gutenberg_block_core_heading_render
 	 * @dataProvider add_css_class_test_examples
@@ -50,7 +51,7 @@ class Render_Block_Heading_Test extends WP_UnitTestCase {
 			),
 			'should handle single quotes with double quotes inside' => array(
 				"<h2 class='\" is-align-right'>Hello World</h2>",
-				"<h2 class=\"&quot; is-align-right wp-block-heading">Hello World</h2>',
+				'<h2 class="&quot; is-align-right wp-block-heading">Hello World</h2>',
 			),
 			'should not add a class name even when it is already defined' => array(
 				'<h2 class="is-align-right wp-block-heading">Hello World</h2>',
@@ -82,5 +83,4 @@ class Render_Block_Heading_Test extends WP_UnitTestCase {
 			),
 		);
 	}
-
 }
