@@ -1,4 +1,3 @@
-
 // Note: this file is copied directly from packages/block-library/src/navigation-link/link-ui.js
 
 /**
