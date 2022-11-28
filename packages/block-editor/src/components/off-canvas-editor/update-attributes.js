@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { escapeHtml } from '@wordpress/escape-html';
+import { escapeHTML } from '@wordpress/escape-html';
 import { safeDecodeURI } from '@wordpress/url';
 
 /**
@@ -74,8 +74,8 @@ export const updateAttributes = (
 	// - https://github.com/WordPress/gutenberg/pull/41063
 	// - https://github.com/WordPress/gutenberg/pull/18617.
 	const label = useNewLabel
-		? escapeHtml( newLabel )
-		: originalLabel || escapeHtml( newUrlWithoutHttp );
+		? escapeHTML( newLabel )
+		: originalLabel || escapeHTML( newUrlWithoutHttp );
 
 	// In https://github.com/WordPress/gutenberg/pull/24670 we decided to use "tag" in favor of "post_tag"
 	const type = newType === 'post_tag' ? 'tag' : newType.replace( '-', '_' );
