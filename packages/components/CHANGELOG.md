@@ -14,6 +14,10 @@
 
 -   `TabPanel`: Add ability to set icon only tab buttons ([#45005](https://github.com/WordPress/gutenberg/pull/45005)).
 
+### Experimental
+
+-   `TextControl`: Restrict `type` prop to `email`, `number`, `password`, `tel`, `text`, `search` or `url` ([#45433](https://github.com/WordPress/gutenberg/pull/45433/)).
+
 ### Internal
 
 -   `LinkedButton`: remove unnecessary `span` tag ([#46063](https://github.com/WordPress/gutenberg/pull/46063))
