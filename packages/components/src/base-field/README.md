@@ -49,15 +49,18 @@ Whether the field is disabled.
 Renders an error style around the component.
 
 -   Required: No
+-   Default: `false`
 
 ### `isInline`: `boolean`
 
 Renders a component that can be inlined in some text.
 
 -   Required: No
+-   Default: `false`
 
 ### `isSubtle`: `boolean`
 
 Renders a subtle variant of the component.
 
 -   Required: No
+-   Default: `false`
