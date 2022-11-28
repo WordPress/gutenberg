@@ -28,7 +28,7 @@ exports.android = {
 	browserName: '',
 	platformName: 'Android',
 	platformVersion: '12.0',
-	deviceName: 'Android GoogleAPI Emulator',
+	deviceName: 'Google Pixel 5 GoogleAPI Emulator',
 	automationName: 'UiAutomator2',
 	os: 'Android',
 	appPackage: 'com.gutenberg',
