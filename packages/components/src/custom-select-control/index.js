@@ -107,11 +107,16 @@ export default function CustomSelectControl( props ) {
 
 	function handleOnFocus( e ) {
 		setIsFocused( true );
-		onFocus( e );
+		if ( typeof onFocus === 'function' ) {
+			onFocus( e );
+		}
 	}
+
 	function handleOnBlur( e ) {
 		setIsFocused( false );
-		onBlur( e );
+		if ( typeof onBlur === 'function' ) {
+			onBlur( e );
+		}
 	}
 
 	if ( ! __nextUnconstrainedWidth ) {
