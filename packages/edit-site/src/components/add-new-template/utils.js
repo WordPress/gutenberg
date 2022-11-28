@@ -442,6 +442,33 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 	return taxonomiesMenuItems;
 };
 
+export function useProductAttributeMenuItem() {
+	const productAttributeTemplateSlug = 'taxonomy-product_attribute';
+	const defaultTemplateTypes = useDefaultTemplateTypes();
+
+	const existingTemplates = useExistingTemplates();
+	if ( templateExists( existingTemplates, productAttributeTemplateSlug ) ) {
+		return null;
+	}
+
+	const productAttributeMenuItem = defaultTemplateTypes?.find(
+		( { slug } ) => slug === productAttributeTemplateSlug
+	);
+
+	return {
+		...productAttributeMenuItem,
+		icon: blockMeta,
+	};
+}
+
+const templateExists = ( existingTemplates, templateSlug ) => {
+	const existingTemplateSlugs = ( existingTemplates || [] ).map(
+		( { slug } ) => slug
+	);
+
+	return existingTemplateSlugs?.includes( templateSlug );
+};
+
 const USE_AUTHOR_MENU_ITEM_TEMPLATE_PREFIX = { user: 'author' };
 const USE_AUTHOR_MENU_ITEM_QUERY_PARAMETERS = { user: { who: 'authors' } };
 export function useAuthorMenuItem( onClickMenuItem ) {

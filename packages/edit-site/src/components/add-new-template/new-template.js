@@ -42,6 +42,7 @@ import {
 	usePostTypeMenuItems,
 	useAuthorMenuItem,
 	usePostTypeArchiveMenuItems,
+	useProductAttributeMenuItem,
 } from './utils';
 import AddCustomGenericTemplateModal from './add-custom-generic-template-modal';
 import TemplateActionsLoadingScreen from './template-actions-loading-screen';
@@ -288,10 +289,12 @@ function useMissingTemplates(
 		usePostTypeMenuItems( onClickMenuItem );
 
 	const authorMenuItem = useAuthorMenuItem( onClickMenuItem );
+	const productAttributesMenuItem = useProductAttributeMenuItem();
 	[
 		...defaultTaxonomiesMenuItems,
 		...defaultPostTypesMenuItems,
 		authorMenuItem,
+		productAttributesMenuItem,
 	].forEach( ( menuItem ) => {
 		if ( ! menuItem ) {
 			return;
