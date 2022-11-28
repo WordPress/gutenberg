@@ -5,8 +5,8 @@
  * @param {Object}   sourceNode The AST node to search from.
  * @param {Function} predicate  A predicate invoked for each parent.
  *
- * @return {?Object } The first encountered parent node where the predicate
- *                    returns a truthy value.
+ * @return {Object|undefined} The first encountered parent node where the predicate
+ *                            returns a truthy value.
  */
 function findParent( sourceNode, predicate ) {
 	if ( ! sourceNode.parent ) {

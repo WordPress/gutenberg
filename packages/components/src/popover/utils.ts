@@ -143,8 +143,8 @@ export const placementToMotionAnimationProps = (
  *
  * @param  document The iframe's owner document.
  *
- * @return The offset of the document's frame element, or undefined if the
- * document has no frame element.
+ * @return {Object|undefined} The offset of the document's frame element, or undefined if the
+ *                            document has no frame element.
  */
 export const getFrameOffset = (
 	document?: Document

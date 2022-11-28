@@ -75,7 +75,7 @@ export function getPresetValueFromCustomValue( value, spacingSizes ) {
  *
  * @param {string} value Value to convert.
  *
- * @return {string} CSS var string for given spacing preset value.
+ * @return {string|undefined} CSS var string for given spacing preset value.
  */
 export function getSpacingPresetCssVar( value ) {
 	if ( ! value ) {
@@ -96,7 +96,7 @@ export function getSpacingPresetCssVar( value ) {
  *
  * @param {string} value Value to extract slug from.
  *
- * @return {number} The int value of the slug from given spacing preset.
+ * @return {number|undefined} The int value of the slug from given spacing preset.
  */
 export function getSpacingPresetSlug( value ) {
 	if ( ! value ) {
