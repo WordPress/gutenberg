@@ -77,11 +77,8 @@ export default function PreferencesModalTabs( { sections } ) {
 		);
 	} else {
 		modalContent = (
-			<NavigatorProvider
-				initialPath="/"
-				className="interface-preferences__provider"
-			>
-				<NavigatorContainer>
+			<NavigatorProvider initialPath="/">
+				<NavigatorContainer className="interface-preferences__provider">
 					<NavigatorScreen path="/">
 						<Card isBorderless size="small">
 							<CardBody>

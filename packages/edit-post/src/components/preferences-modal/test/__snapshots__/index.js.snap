@@ -696,9 +696,9 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
       </button>
     </div>
     <div
-      class="components-navigator-provider interface-preferences__provider emotion-0 emotion-1"
+      class="components-navigator-container interface-preferences__provider emotion-0 emotion-1"
       data-wp-c16t="true"
-      data-wp-component="NavigatorProvider"
+      data-wp-component="NavigatorContainer"
     >
       <div
         class="emotion-2 components-navigator-screen"

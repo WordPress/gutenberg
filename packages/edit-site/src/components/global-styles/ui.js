@@ -120,11 +120,8 @@ function GlobalStylesUI() {
 	const blocks = getBlockTypes();
 
 	return (
-		<NavigatorProvider
-			className="edit-site-global-styles-sidebar__navigator-provider"
-			initialPath="/"
-		>
-			<NavigatorContainer>
+		<NavigatorProvider initialPath="/">
+			<NavigatorContainer className="edit-site-global-styles-sidebar__navigator-provider">
 				<GlobalStylesNavigationScreen path="/">
 					<ScreenRoot />
 				</GlobalStylesNavigationScreen>
