@@ -1,6 +1,13 @@
 /**
- * Internal module to expose extra utilities to the unit tests but not to
- * any consumers of this package.
+ * wordpress/experimental – the utilities to enable private cross-package
+ * exports of experimental APIs.
+ *
+ * This "implementation.js" file is needed for the sake of the unit tests. It
+ * exports more than the public API of the package to aid in testing.
+ */
+
+/**
+ * The list of core modules allowed to opt-in to the experimental APIs.
  */
 const CORE_MODULES_USING_EXPERIMENTS = [
 	'@wordpress/data',
@@ -8,22 +15,11 @@ const CORE_MODULES_USING_EXPERIMENTS = [
 	'@wordpress/block-editor',
 ];
 
-export function allowCoreModule( name ) {
-	CORE_MODULES_USING_EXPERIMENTS.push( name );
-}
-
-export function resetAllowedCoreModules() {
-	while ( CORE_MODULES_USING_EXPERIMENTS.length ) {
-		CORE_MODULES_USING_EXPERIMENTS.pop();
-	}
-}
-
-const registeredExperiments = {};
-export function resetRegisteredExperiments() {
-	for ( const key in registeredExperiments ) {
-		delete registeredExperiments[ key ];
-	}
-}
+/**
+ * A list of core modules that already opted-in to
+ * the experiments package.
+ */
+const registeredExperiments = [];
 
 /*
  * Warning for theme and plugin developers.
@@ -55,7 +51,7 @@ export const __dangerousOptInToUnstableAPIsOnlyForCoreModules = (
 				'your product will inevitably break on one of the next WordPress releases.'
 		);
 	}
-	if ( moduleName in registeredExperiments ) {
+	if ( registeredExperiments.includes( moduleName ) ) {
 		throw new Error(
 			`You tried to opt-in to unstable APIs as a module "${ moduleName }" which is already registered. ` +
 				'This feature is only for JavaScript modules shipped with WordPress core. ' +
@@ -73,38 +69,109 @@ export const __dangerousOptInToUnstableAPIsOnlyForCoreModules = (
 				'your product will inevitably break on the next WordPress release.'
 		);
 	}
-	registeredExperiments[ moduleName ] = true;
+	registeredExperiments.push( moduleName );
 
 	return {
-		lock( object, privateData ) {
-			const { id } = getLockingConfig( object );
-			lockedData.set( id, {
-				privateData,
-				decorated: false,
-			} );
-		},
-		unlock( object ) {
-			const { id, onFirstUnlock } = getLockingConfig( object );
-
-			const lockedEntry = lockedData.get( id ) || {
-				privateData: null,
-				decorated: false,
-			};
-
-			let { privateData, decorated } = lockedEntry;
-			if ( onFirstUnlock && ! decorated ) {
-				privateData = onFirstUnlock( privateData );
-				lockedData.set( id, {
-					privateData,
-					decorated: true,
-				} );
-			}
-			return privateData;
-		},
+		lock,
+		unlock,
 	};
 };
 
+/**
+ * Binds private data to an object.
+ * It does not alter the passed object in any way, only
+ * registers it in an internal map of private data.
+ *
+ * The private data can't be accessed by any other means
+ * than the `unlock` function.
+ *
+ * @example
+ * ```js
+ * const object = {};
+ * const privateData = { a: 1 };
+ * lock( object, privateData );
+ *
+ * object
+ * // {}
+ *
+ * unlock( object );
+ * // { a: 1 }
+ * ```
+ *
+ * @param {Object|Function} object      The object to bind the private data to.
+ * @param {any}             privateData The private data to bind to the object.
+ */
+function lock( object, privateData ) {
+	const { id } = getLockingConfig( object );
+	lockedData.set( id, {
+		privateData,
+		decorated: false,
+	} );
+}
+
+/**
+ * Unlocks the private data bound to an object.
+ *
+ * It does not alter the passed object in any way, only
+ * returns the private data paired with it using the `lock()`
+ * function.
+ *
+ * @example
+ * ```js
+ * const object = {};
+ * const privateData = { a: 1 };
+ * lock( object, privateData );
+ *
+ * object
+ * // {}
+ *
+ * unlock( object );
+ * // { a: 1 }
+ * ```
+ *
+ * @param {any} object The object to unlock the private data from.
+ * @return {any} The private data bound to the object.
+ */
+function unlock( object ) {
+	const { id, onFirstUnlock } = getLockingConfig( object );
+
+	const lockedEntry = lockedData.get( id ) || {
+		privateData: null,
+		decorated: false,
+	};
+
+	let { privateData, decorated } = lockedEntry;
+	if ( onFirstUnlock && ! decorated ) {
+		privateData = onFirstUnlock( privateData );
+		lockedData.set( id, {
+			privateData,
+			decorated: true,
+		} );
+	}
+	return privateData;
+}
+
 const lockedData = new WeakMap();
+/**
+ * Use this symbol to tell `lock()` and `unlock()` that
+ * the private data should be paired with a custom object.
+ *
+ * @example
+ * ```js
+ * const customExperimentId = {};
+ * const object1 = { [ experimentId ]: customExperimentId }
+ * const object2 = { [ experimentId ]: customExperimentId }
+ * ;
+ * const privateData = { a: 1 };
+ * lock( object1, privateData );
+ *
+ * unlock( object1 );
+ * // { a: 1 }
+ *
+ * unlock( object2 );
+ * // { a: 1 }
+ * ```
+ */
 export const experimentId = Symbol( 'Experiments' );
 export const isExperimentsConfig = Symbol( 'ExperimentsConfig' );
 
@@ -123,6 +190,30 @@ function getLockingConfig( object ) {
 	};
 }
 
+/**
+ * Configure the unlocking process.
+ *
+ * @example
+ * ```js
+ * const object = {}
+ * configureExperiment( object, {
+ *     onFirstUnlock: ( temperature ) => temperature * 2
+ * } );
+ *
+ * lock(object, 2);
+ *
+ * unlock( object );
+ * // 4
+ *
+ * unlock( object );
+ * // 4
+ * ```
+ *
+ * @param {any}      object                 The locked object.
+ * @param {Object}   config                 The unlocking config.
+ * @param {Function} [config.onFirstUnlock] A function to run on the unlocked data when `unlock()`
+ *                                          is called for the first time.
+ */
 export function configureExperiment( object, config ) {
 	const id = getExperimentId( object );
 	const { onFirstUnlock, ...rest } = config;
@@ -144,6 +235,45 @@ function getExperimentId( object ) {
 	return getLockingConfig( object ).id;
 }
 
+/**
+ * Returns a new unique object that can be used in conjunction
+ * with `experimentId` as an experiment ID for `lock()` and `unlock()`.
+ *
+ * @see experimentId
+ *
+ * @return {Object} A new unique object.
+ */
 export function makeExperimentId() {
 	return {};
+}
+
+// Unit tests utilities:
+
+/**
+ * Private function to allow the unit tests to allow
+ * a mock module to access the experimental APIs.
+ *
+ * @param {string} name The name of the module.
+ */
+export function allowCoreModule( name ) {
+	CORE_MODULES_USING_EXPERIMENTS.push( name );
+}
+
+/**
+ * Private function to allow the unit tests to set
+ * a custom list of allowed modules.
+ */
+export function resetAllowedCoreModules() {
+	while ( CORE_MODULES_USING_EXPERIMENTS.length ) {
+		CORE_MODULES_USING_EXPERIMENTS.pop();
+	}
+}
+/**
+ * Private function to allow the unit tests to reset
+ * the list of registered experiments.
+ */
+export function resetRegisteredExperiments() {
+	while ( registeredExperiments.length ) {
+		registeredExperiments.pop();
+	}
 }
