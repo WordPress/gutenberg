@@ -12,7 +12,7 @@ import {
 	usePrevious,
 	useResizeObserver,
 } from '@wordpress/compose';
-import { forwardRef, useRef, useState, useMemo } from '@wordpress/element';
+import { forwardRef, useRef, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -20,7 +20,7 @@ import { forwardRef, useRef, useState, useMemo } from '@wordpress/element';
 import { View } from '../../view';
 import ToggleGroupControlBackdrop from './toggle-group-control-backdrop';
 import ToggleGroupControlContext from '../context';
-import { useUpdateEffect } from '../../utils/hooks';
+import { useControlledValue } from '../../utils/hooks';
 import type { WordPressComponentProps } from '../../ui/context';
 import type {
 	ToggleGroupControlMainControlProps,
@@ -49,35 +49,25 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 		ToggleGroupControlAsButtonGroup,
 		'toggle-group-control-as-button-group'
 	).toString();
-	const [ selectedValue, setSelectedValue ] = useState( value );
 	const previousValue = usePrevious( value );
-
-	// Propagate selectedValue change.
-	useUpdateEffect( () => {
-		// Avoid calling onChange if selectedValue changed
-		// from incoming value.
-		if ( previousValue !== selectedValue ) {
-			onChange( selectedValue );
-		}
-	}, [ selectedValue, previousValue, onChange ] );
-
-	// Sync incoming value with selectedValue.
-	useUpdateEffect( () => {
-		if ( previousValue !== value ) {
-			setSelectedValue( value );
-		}
-	}, [ value, previousValue ] );
+	const [ selectedValue, setSelectedValue ] = useControlledValue( {
+		defaultValue: previousValue,
+		onChange,
+		value,
+	} );
 	// Expose selectedValue getter/setter via context
 	const groupContext: ToggleGroupControlContextProps = useMemo(
 		() => ( {
 			baseId,
 			state: selectedValue,
-			setState: setSelectedValue,
+			setState: setSelectedValue as React.Dispatch<
+				React.SetStateAction< string | number | undefined >
+			>,
 			isBlock: ! isAdaptiveWidth,
 			isDeselectable: true,
 			size,
 		} ),
-		[ baseId, selectedValue, isAdaptiveWidth, size ]
+		[ baseId, selectedValue, setSelectedValue, isAdaptiveWidth, size ]
 	);
 	return (
 		<ToggleGroupControlContext.Provider value={ groupContext }>
