@@ -1,11 +1,7 @@
 /**
- * External dependencies
- */
-import escapeHtml from 'escape-html';
-
-/**
  * WordPress dependencies
  */
+import { escapeHtml } from '@wordpress/escape-html';
 import { safeDecodeURI } from '@wordpress/url';
 
 /**
