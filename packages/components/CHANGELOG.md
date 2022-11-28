@@ -2,9 +2,17 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   `ColorPalette`: show "Clear" button even when colors array is empty ([#46001](https://github.com/WordPress/gutenberg/pull/46001)).
+
 ### Enhancements
 
 -   `TabPanel`: Add ability to set icon only tab buttons ([#45005](https://github.com/WordPress/gutenberg/pull/45005)).
+
+### Internal
+
+-   NumberControl: refactor styles/tests/stories to TypeScript, replace fireEvent with user-event ([#45990](https://github.com/WordPress/gutenberg/pull/45990)).
 
 ## 22.1.0 (2022-11-16)
 

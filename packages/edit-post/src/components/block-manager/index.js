@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { filter } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { store as blocksStore } from '@wordpress/blocks';
@@ -92,15 +87,15 @@ function BlockManager( {
 					<BlockManagerCategory
 						key={ category.slug }
 						title={ category.title }
-						blockTypes={ filter( blockTypes, {
-							category: category.slug,
-						} ) }
+						blockTypes={ blockTypes.filter(
+							( blockType ) =>
+								blockType.category === category.slug
+						) }
 					/>
 				) ) }
 				<BlockManagerCategory
 					title={ __( 'Uncategorized' ) }
-					blockTypes={ filter(
-						blockTypes,
+					blockTypes={ blockTypes.filter(
 						( { category } ) => ! category
 					) }
 				/>

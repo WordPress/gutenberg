@@ -173,7 +173,7 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Global_Styles_Cont
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function get_theme_item( $request ) {
-		if ( wp_get_theme()->get_stylesheet() !== $request['stylesheet'] ) {
+		if ( get_stylesheet() !== $request['stylesheet'] ) {
 			// This endpoint only supports the active theme for now.
 			return new WP_Error(
 				'rest_theme_not_found',
@@ -213,7 +213,7 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Global_Styles_Cont
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function get_theme_items( $request ) {
-		if ( wp_get_theme()->get_stylesheet() !== $request['stylesheet'] ) {
+		if ( get_stylesheet() !== $request['stylesheet'] ) {
 			// This endpoint only supports the active theme for now.
 			return new WP_Error(
 				'rest_theme_not_found',
