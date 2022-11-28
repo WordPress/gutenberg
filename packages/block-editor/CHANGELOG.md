@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancement
+
+- `URLInput`: the `renderSuggestions` callback prop now receives `currentInputValue` as a new parameter ([45806](https://github.com/WordPress/gutenberg/pull/45806)).
+
 ## 10.5.0 (2022-11-16)
 
 ### Enhancement

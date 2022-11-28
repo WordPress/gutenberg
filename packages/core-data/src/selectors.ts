@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { set, map, find, get, filter } from 'lodash';
+import { set, map, find, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -183,7 +183,7 @@ export function getEntitiesByKind( state: State, kind: string ): Array< any > {
  * @return Array of entities with config matching kind.
  */
 export function getEntitiesConfig( state: State, kind: string ): Array< any > {
-	return filter( state.entities.config, { kind } );
+	return state.entities.config.filter( ( entity ) => entity.kind === kind );
 }
 
 /**
