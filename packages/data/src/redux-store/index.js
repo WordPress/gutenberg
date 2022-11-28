@@ -148,7 +148,7 @@ export default function createReduxStore( key, options ) {
 			);
 			actions[ experimentId ] = storeExperimentId;
 			configureExperiment( actions, {
-				lazyDecorator: ( storeExperiment ) => {
+				onFirstUnlock: ( storeExperiment ) => {
 					if ( ! storeExperiment?.actions ) {
 						throw new Error(
 							`Tried to unlock experimental actions on the ${ key } store where ` +
@@ -181,7 +181,7 @@ export default function createReduxStore( key, options ) {
 			);
 			selectors[ experimentId ] = storeExperimentId;
 			configureExperiment( selectors, {
-				lazyDecorator: ( storeExperiment ) => {
+				onFirstUnlock: ( storeExperiment ) => {
 					if ( ! storeExperiment?.selectors ) {
 						throw new Error(
 							`Tried to unlock experimental selectors on the ${ key } store where ` +

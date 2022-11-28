@@ -17,13 +17,8 @@ export function registerPrivateActions( store, actions ) {
 	lock( store, { actions } );
 }
 
-export function privateOf( selectorsOrActions ) {
-	return unlock( selectorsOrActions );
-}
-
 export const experiments = {};
 lock( experiments, {
 	registerPrivateSelectors,
 	registerPrivateActions,
-	privateOf,
 } );

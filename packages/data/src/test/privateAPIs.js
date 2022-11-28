@@ -8,7 +8,7 @@ import { experiments as dataExperiments, unlock } from '../experiments';
 /**
  * WordPress dependencies
  */
-const { registerPrivateSelectors, registerPrivateActions, privateOf } =
+const { registerPrivateSelectors, registerPrivateActions } =
 	unlock( dataExperiments );
 
 beforeEach( () => {
@@ -69,13 +69,11 @@ describe( 'Private data APIs', () => {
 			expect( publicSelectors.getPrivatePrice ).toEqual( undefined );
 		} );
 
-		it( 'should make private selectors available via privateOf()', () => {
+		it( 'should make private selectors available via unlock()', () => {
 			const groceryStore = createStore();
 			registerPrivateSelectors( groceryStore, { getPrivatePrice } );
 
-			const privateSelectors = privateOf(
-				registry.select( groceryStore )
-			);
+			const privateSelectors = unlock( registry.select( groceryStore ) );
 			expect( privateSelectors.getPrivatePrice ).toEqual(
 				expect.any( Function )
 			);
@@ -85,19 +83,17 @@ describe( 'Private data APIs', () => {
 			const groceryStore = createStore();
 			registerPrivateSelectors( groceryStore, { getPrivatePrice } );
 
-			const privateSelectors = privateOf(
-				registry.select( groceryStore )
-			);
+			const privateSelectors = unlock( registry.select( groceryStore ) );
 			expect( privateSelectors.getPrivatePrice() ).toEqual( 800 );
 		} );
 
-		it( 'should throw a clear error when no private selectors are found in the privateOf() call', () => {
+		it( 'should throw a clear error when no private selectors are found in the unlock() call', () => {
 			const groceryStore = createStore();
 
 			// Forgot to wrap the `getPrivatePrice` in a { selectors: {} } object.
 
 			expect( () =>
-				privateOf( registry.select( groceryStore ) )
+				unlock( registry.select( groceryStore ) )
 			).toThrowError( /no experimental selectors were defined/ );
 		} );
 	} );
@@ -157,14 +153,12 @@ describe( 'Private data APIs', () => {
 			expect( publicActions.setPrivatePrice ).toEqual( undefined );
 		} );
 
-		it( 'should make private actions available via privateOf)', () => {
+		it( 'should make private actions available via unlock)', () => {
 			const groceryStore = createStore();
 			registerPrivateActions( groceryStore, {
 				setPrivatePrice,
 			} );
-			const privateActions = privateOf(
-				registry.dispatch( groceryStore )
-			);
+			const privateActions = unlock( registry.dispatch( groceryStore ) );
 			expect( privateActions.setPrivatePrice ).toEqual(
 				expect.any( Function )
 			);
@@ -175,9 +169,7 @@ describe( 'Private data APIs', () => {
 			registerPrivateActions( groceryStore, {
 				setPrivatePrice,
 			} );
-			const privateActions = privateOf(
-				registry.dispatch( groceryStore )
-			);
+			const privateActions = unlock( registry.dispatch( groceryStore ) );
 			privateActions.setPrivatePrice( 400 );
 			expect( registry.select( groceryStore ).getPrivatePrice() ).toEqual(
 				400
@@ -193,21 +185,19 @@ describe( 'Private data APIs', () => {
 						dispatch( { type: 'SET_PRIVATE_PRICE', price } );
 					},
 			} );
-			const privateActions = privateOf(
-				registry.dispatch( groceryStore )
-			);
+			const privateActions = unlock( registry.dispatch( groceryStore ) );
 			privateActions.setPrivatePriceThunk( 100 );
 			expect( registry.select( groceryStore ).getPrivatePrice() ).toEqual(
 				100
 			);
 		} );
 
-		it( 'should throw a clear error when no private actions are found in the privateOf() call', () => {
+		it( 'should throw a clear error when no private actions are found in the unlock() call', () => {
 			const groceryStore = createStore();
 			// Forgot to wrap the `setPrivatePrice` in an { actions: {} } object.
 
 			expect( () =>
-				privateOf( registry.dispatch( groceryStore ) )
+				unlock( registry.dispatch( groceryStore ) )
 			).toThrowError( /no experimental actions were defined/ );
 		} );
 	} );
