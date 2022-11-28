@@ -92,7 +92,7 @@ if ( ! function_exists( '_wp_theme_has_theme_json_clean_cache_upon_upgrading_act
  */
 function gutenberg_get_global_stylesheet( $types = array() ) {
 	// Ignore cache when `WP_DEBUG` is enabled, so it doesn't interfere with the theme developers workflow.
-	$can_use_cached = empty( $types ) && ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG );
+	$can_use_cached = empty( $types ) && ! WP_DEBUG;
 	$cache_key      = 'gutenberg_get_global_stylesheet';
 	$cache_group    = 'theme_json';
 	if ( $can_use_cached ) {

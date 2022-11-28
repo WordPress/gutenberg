@@ -40,7 +40,7 @@ import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
 import { useBlockProps } from './use-block-props';
 import { store as blockEditorStore } from '../../store';
-
+import { useLayout } from './layout';
 export const BlockListBlockContext = createContext();
 
 /**
@@ -130,6 +130,8 @@ function BlockListBlock( {
 	const { removeBlock } = useDispatch( blockEditorStore );
 	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
 
+	const parentLayout = useLayout();
+
 	// We wrap the BlockEdit component in a div that hides it when editing in
 	// HTML mode. This allows us to render all of the ancillary pieces
 	// (InspectorControls, etc.) which are inside `BlockEdit` but not
@@ -148,6 +150,7 @@ function BlockListBlock( {
 			isSelectionEnabled={ isSelectionEnabled }
 			toggleSelection={ toggleSelection }
 			__unstableLayoutClassNames={ layoutClassNames }
+			__unstableParentLayout={ parentLayout }
 		/>
 	);
 

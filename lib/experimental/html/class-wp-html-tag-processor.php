@@ -1265,7 +1265,7 @@ class WP_HTML_Tag_Processor {
 			']~Ssu',
 			$name
 		) ) {
-			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			if ( WP_DEBUG ) {
 				throw new Exception( 'Invalid attribute name' );
 			}
 

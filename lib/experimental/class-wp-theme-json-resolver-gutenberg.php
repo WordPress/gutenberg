@@ -35,8 +35,9 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_2 {
 
 		// When backporting to core, remove the instanceof Gutenberg class check, as it is only required for the Gutenberg plugin.
 		if ( null === static::$theme || ! static::$theme instanceof WP_Theme_JSON_Gutenberg ) {
+			$wp_theme        = wp_get_theme();
 			$theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json' ) );
-			$theme_json_data = static::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
+			$theme_json_data = static::translate( $theme_json_data, $wp_theme->get( 'TextDomain' ) );
 			$theme_json_data = gutenberg_add_registered_webfonts_to_theme_json( $theme_json_data );
 
 			/**
@@ -48,10 +49,10 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_2 {
 			$theme_json_data = $theme_json->get_data();
 			static::$theme   = new WP_Theme_JSON_Gutenberg( $theme_json_data );
 
-			if ( wp_get_theme()->parent() ) {
+			if ( $wp_theme->parent() ) {
 				// Get parent theme.json.
 				$parent_theme_json_data = static::read_json_file( static::get_file_path_from_theme( 'theme.json', true ) );
-				$parent_theme_json_data = static::translate( $parent_theme_json_data, wp_get_theme()->parent()->get( 'TextDomain' ) );
+				$parent_theme_json_data = static::translate( $parent_theme_json_data, $wp_theme->parent()->get( 'TextDomain' ) );
 				$parent_theme_json_data = gutenberg_add_registered_webfonts_to_theme_json( $parent_theme_json_data );
 				$parent_theme           = new WP_Theme_JSON_Gutenberg( $parent_theme_json_data );
 
@@ -164,47 +165,4 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_2 {
 		return $array;
 	}
 
-	/**
-	 * Returns the data merged from multiple origins.
-	 *
-	 * There are three sources of data (origins) for a site:
-	 * default, theme, and custom. The custom's has higher priority
-	 * than the theme's, and the theme's higher than default's.
-	 *
-	 * Unlike the getters {@link get_core_data},
-	 * {@link get_theme_data}, and {@link get_user_data},
-	 * this method returns data after it has been merged
-	 * with the previous origins. This means that if the same piece of data
-	 * is declared in different origins (user, theme, and core),
-	 * the last origin overrides the previous.
-	 *
-	 * For example, if the user has set a background color
-	 * for the paragraph block, and the theme has done it as well,
-	 * the user preference wins.
-	 *
-	 * @since 5.8.0
-	 * @since 5.9.0 Added user data, removed the `$settings` parameter,
-	 *              added the `$origin` parameter.
-	 *
-	 * @param string $origin Optional. To what level should we merge data.
-	 *                       Valid values are 'theme' or 'custom'. Default 'custom'.
-	 * @return WP_Theme_JSON
-	 */
-	public static function get_merged_data( $origin = 'custom' ) {
-		if ( is_array( $origin ) ) {
-			_deprecated_argument( __FUNCTION__, '5.9' );
-		}
-
-		$result = new WP_Theme_JSON_Gutenberg();
-		$result->merge( static::get_core_data() );
-		$result->merge( static::get_block_data() );
-		$result->merge( static::get_theme_data() );
-		if ( 'custom' === $origin ) {
-			$result->merge( static::get_user_data() );
-		}
-		// Generate the default spacing sizes presets.
-		$result->set_spacing_sizes();
-
-		return $result;
-	}
 }
