@@ -188,6 +188,7 @@ function HeaderToolbar() {
 							aria-expanded={ isOpen }
 							aria-haspopup="true"
 							onClick={ onToggle }
+							variant={ showIconLabels ? 'tertiary' : undefined }
 							label={ __( 'Edit document details' ) }
 						>
 							{ showIconLabels && __( 'Details' ) }
