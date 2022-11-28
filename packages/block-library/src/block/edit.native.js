@@ -126,11 +126,16 @@ export default function ReusableBlockEdit( {
 	}
 
 	const onConvertToRegularBlocks = useCallback( () => {
+		const successNotice =
+			innerBlockCount > 1
+				? 'converted to regular blocks'
+				: 'converted to regular block';
 		createSuccessNotice(
 			sprintf(
 				/* translators: %s: name of the reusable block */
-				__( '%s converted to regular blocks' ),
-				title
+				__( '%1$s %2$s' ),
+				title,
+				successNotice
 			)
 		);
 

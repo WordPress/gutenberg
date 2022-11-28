@@ -199,11 +199,16 @@ const BlockActionsMenu = ( {
 					: __( 'Convert to regular block' ),
 			value: 'convertToRegularBlocksOption',
 			onSelect: () => {
+				const successNotice =
+					innerBlockCount > 1
+						? 'converted to regular blocks'
+						: 'converted to regular block';
 				createSuccessNotice(
 					sprintf(
 						/* translators: %s: name of the reusable block */
-						__( '%s converted to regular blocks' ),
-						reusableBlock?.title?.raw || blockTitle
+						__( '%1$s %2$s' ),
+						reusableBlock?.title?.raw || blockTitle,
+						successNotice
 					)
 				);
 				convertToRegularBlocks();
