@@ -120,10 +120,9 @@ describe( 'ToggleGroupControl', () => {
 		);
 
 		await waitFor( () =>
-			expect( getWrappingPopoverElement( tooltip ) ).toHaveStyle( {
-				top: '0px',
-				left: '0px',
-			} )
+			expect(
+				getWrappingPopoverElement( tooltip )
+			).toBePositionedPopover()
 		);
 
 		expect( tooltip ).toBeVisible();
