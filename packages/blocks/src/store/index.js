@@ -1,11 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	createReduxStore,
-	register,
-	experiments as dataExperiments,
-} from '@wordpress/data';
+import { createReduxStore, register } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -15,7 +11,7 @@ import * as selectors from './selectors';
 import * as actions from './actions';
 import { STORE_NAME } from './constants';
 
-import { unlock } from '../experiments';
+import { registerPrivateSelectors } from '../experiments';
 const { __experimentalHasContentRoleAttribute, ...stableSelectors } = selectors;
 
 /**
@@ -31,7 +27,6 @@ export const store = createReduxStore( STORE_NAME, {
 	actions,
 } );
 
-const { registerPrivateSelectors } = unlock( dataExperiments );
 registerPrivateSelectors( store, { __experimentalHasContentRoleAttribute } );
 
 register( store );
