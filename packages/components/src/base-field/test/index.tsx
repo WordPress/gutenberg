@@ -8,12 +8,9 @@ import { render, screen } from '@testing-library/react';
  */
 import { useBaseField } from '../index';
 import { View } from '../../view';
-import type { WordPressComponentProps } from '../../ui/context';
 import type { BaseFieldProps } from '../types';
 
-const TestField = (
-	props: Omit< WordPressComponentProps< BaseFieldProps, 'div' >, 'children' >
-) => {
+const TestField = ( props: Omit< BaseFieldProps, 'children' > ) => {
 	return <View { ...useBaseField( { ...props, children: '' } ) } />;
 };
 
