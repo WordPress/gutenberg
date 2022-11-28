@@ -2,6 +2,7 @@ $arrow-triangle-base-size: 14px;
 
 .components-popover {
 	z-index: z-index(".components-popover");
+	will-change: transform;
 
 	&.is-expanded {
 		position: fixed;

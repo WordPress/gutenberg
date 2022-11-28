@@ -488,8 +488,10 @@ const UnforwardedPopover = (
 					? undefined
 					: {
 							position: strategy,
-							left: Number.isNaN( x ) ? 0 : x ?? undefined,
-							top: Number.isNaN( y ) ? 0 : y ?? undefined,
+							top: 0,
+							left: 0,
+							x: x || undefined,
+							y: y || undefined,
 					  }
 			}
 		>
