@@ -54,7 +54,8 @@ export const Appender = forwardRef( ( props, ref ) => {
 	if ( insertedBlock ) {
 		const link = {
 			url: insertedBlockAttributes.url,
-			opensInNewTab: insertedBlockAttributes.target === '_blank',
+			opensInNewTab: insertedBlockAttributes.opensInNewTab,
+			title: insertedBlockAttributes.label,
 		};
 		maybeLinkUI = (
 			<LinkUI
