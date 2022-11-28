@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, find, filter, orderBy } from 'lodash';
+import { map, find, orderBy } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -509,24 +509,20 @@ export const getBlockParentsByBlockName = createSelector(
 	( state, clientId, blockName, ascending = false ) => {
 		const parents = getBlockParents( state, clientId, ascending );
 		return map(
-			filter(
-				map( parents, ( id ) => ( {
-					id,
-					name: getBlockName( state, id ),
-				} ) ),
-				( { name } ) => {
-					if ( Array.isArray( blockName ) ) {
-						return blockName.includes( name );
-					}
-					return name === blockName;
+			map( parents, ( id ) => ( {
+				id,
+				name: getBlockName( state, id ),
+			} ) ).filter( ( { name } ) => {
+				if ( Array.isArray( blockName ) ) {
+					return blockName.includes( name );
 				}
-			),
+				return name === blockName;
+			} ),
 			( { id } ) => id
 		);
 	},
 	( state ) => [ state.blocks.parents ]
 );
-
 /**
  * Given a block client ID, returns the root of the hierarchy from which the block is nested, return the block itself for root level blocks.
  *
@@ -2167,7 +2163,7 @@ export const __experimentalGetAllowedBlocks = createSelector(
 			return;
 		}
 
-		return filter( getBlockTypes(), ( blockType ) =>
+		return getBlockTypes().filter( ( blockType ) =>
 			canIncludeBlockTypeInInserter( state, blockType, rootClientId )
 		);
 	},
@@ -2292,8 +2288,7 @@ const getAllAllowedPatterns = createSelector(
 export const __experimentalGetAllowedPatterns = createSelector(
 	( state, rootClientId = null ) => {
 		const availableParsedPatterns = getAllAllowedPatterns( state );
-		const patternsAllowed = filter(
-			availableParsedPatterns,
+		const patternsAllowed = availableParsedPatterns.filter(
 			( { blocks } ) =>
 				blocks.every( ( { name } ) =>
 					canInsertBlockType( state, name, rootClientId )
