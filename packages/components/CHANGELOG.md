@@ -12,6 +12,7 @@
 
 ### Internal
 
+-   `LinkedButton`: remove unnecessary `span` tag ([#46063](https://github.com/WordPress/gutenberg/pull/46063))
 -   NumberControl: refactor styles/tests/stories to TypeScript, replace fireEvent with user-event ([#45990](https://github.com/WordPress/gutenberg/pull/45990)).
 
 ## 22.1.0 (2022-11-16)
