@@ -1118,7 +1118,7 @@ export function getAutosaves(
  * @param  postId   The id of the parent post.
  * @param  authorId The id of the author.
  *
- * @return The autosave for the post and author.
+ * @return {Object|undefined} The autosave for the post and author.
  */
 export function getAutosave< EntityRecord extends ET.EntityRecord< any > >(
 	state: State,

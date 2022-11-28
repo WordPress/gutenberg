@@ -89,7 +89,7 @@ function useVisualizerMouseOver() {
  *
  * @param {Object} props Block props.
  *
- * @return {WPElement} Inspector controls for dimensions and spacing support features.
+ * @return {?WPElement} Inspector controls for dimensions and spacing support features.
  */
 export function DimensionsPanel( props ) {
 	const isGapDisabled = useIsGapDisabled( props );
@@ -301,7 +301,7 @@ const useIsDimensionsDisabled = ( props = {} ) => {
  * @param {string} blockName Block name.
  * @param {string} feature   The feature custom sides relate to e.g. padding or margins.
  *
- * @return {?string[]} Strings representing the custom sides available.
+ * @return {string[]|undefined} Strings representing the custom sides available.
  */
 export function useCustomSides( blockName, feature ) {
 	const support = getBlockSupport( blockName, SPACING_SUPPORT_KEY );

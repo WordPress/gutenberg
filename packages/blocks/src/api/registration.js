@@ -253,8 +253,8 @@ function getBlockSettingsFromMetadata( { textdomain, ...metadata } ) {
  * } );
  * ```
  *
- * @return {?WPBlockType} The block, if it has been successfully registered;
- *                    otherwise `undefined`.
+ * @return {WPBlockType|undefined} The block, if it has been successfully registered;
+ *                                 otherwise `undefined`.
  */
 export function registerBlockType( blockNameOrMetadata, settings ) {
 	const name = isObject( blockNameOrMetadata )
@@ -424,8 +424,8 @@ export function unregisterBlockCollection( namespace ) {
  * };
  * ```
  *
- * @return {?WPBlockType} The previous block value, if it has been successfully
- *                    unregistered; otherwise `undefined`.
+ * @return {WPBlockType|undefined} The previous block value, if it has been successfully
+ *                                 unregistered; otherwise `undefined`.
  */
 export function unregisterBlockType( name ) {
 	const oldBlock = select( blocksStore ).getBlockType( name );

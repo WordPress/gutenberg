@@ -243,7 +243,7 @@ _Parameters_
 
 _Returns_
 
--   `EntityRecord | undefined`: The autosave for the post and author.
+-   `Object|undefined`: The autosave for the post and author.
 
 ### getAutosaves
 
