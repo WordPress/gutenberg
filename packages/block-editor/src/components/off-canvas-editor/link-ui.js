@@ -12,11 +12,9 @@ import { useSelect, useDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import {
-	__experimentalLinkControl as LinkControl,
-	BlockIcon,
-	store as blockEditorStore,
-} from '../../';
+import { store as blockEditorStore } from '../../store';
+import LinkControl from '../link-control';
+import BlockIcon from '../block-icon';
 
 /**
  * Given the Link block's type attribute, return the query params to give to
