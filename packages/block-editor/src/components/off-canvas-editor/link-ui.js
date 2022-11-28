@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 import { Popover, Button } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
-import { createInterpolateElement } from '@wordpress/element';
-import { store as coreStore } from '@wordpress/core-data';
-import { decodeEntities } from '@wordpress/html-entities';
+import { __ } from '@wordpress/i18n';
 import { switchToBlockType } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 
@@ -55,9 +52,6 @@ export function getSuggestionsQuery( type, kind ) {
  * @param {string} props.clientId Block client ID.
  */
 function LinkControlTransforms( { clientId } ) {
-	if ( ! clientId ) {
-		return null;
-	}
 	const { getBlock, blockTransforms } = useSelect(
 		( select ) => {
 			const {
@@ -84,11 +78,16 @@ function LinkControlTransforms( { clientId } ) {
 		'core/social-links',
 		'core/search',
 	];
+
 	const transforms = blockTransforms.filter( ( item ) => {
 		return featuredBlocks.includes( item?.name );
 	} );
 
 	if ( ! transforms?.length ) {
+		return null;
+	}
+
+	if ( ! clientId ) {
 		return null;
 	}
 
@@ -124,35 +123,6 @@ function LinkControlTransforms( { clientId } ) {
 }
 
 export function LinkUI( props ) {
-	const { saveEntityRecord } = useDispatch( coreStore );
-
-	async function handleCreate( pageTitle ) {
-		const postType = props?.linkAttributes?.type || 'page';
-
-		const page = await saveEntityRecord( 'postType', postType, {
-			title: pageTitle,
-			status: 'draft',
-		} );
-
-		return {
-			id: page.id,
-			type: postType,
-			// Make `title` property consistent with that in `fetchLinkSuggestions` where the `rendered` title (containing HTML entities)
-			// is also being decoded. By being consistent in both locations we avoid having to branch in the rendering output code.
-			// Ideally in the future we will update both APIs to utilise the "raw" form of the title which is better suited to edit contexts.
-			// e.g.
-			// - title.raw = "Yes & No"
-			// - title.rendered = "Yes &#038; No"
-			// - decodeEntities( title.rendered ) = "Yes & No"
-			// See:
-			// - https://github.com/WordPress/gutenberg/pull/41063
-			// - https://github.com/WordPress/gutenberg/blob/a1e1fdc0e6278457e9f4fc0b31ac6d2095f5450b/packages/core-data/src/fetch/__experimental-fetch-link-suggestions.js#L212-L218
-			title: decodeEntities( page.title.rendered ),
-			url: page.link,
-			kind: 'post-type',
-		};
-	}
-
 	return (
 		<Popover
 			placement="bottom"
@@ -167,25 +137,6 @@ export function LinkUI( props ) {
 				value={ props?.value }
 				showInitialSuggestions={ true }
 				withCreateSuggestion={ props?.hasCreateSuggestion }
-				createSuggestion={ handleCreate }
-				createSuggestionButtonText={ ( searchTerm ) => {
-					let format;
-
-					if ( props?.linkAttributes.type === 'post' ) {
-						/* translators: %s: search term. */
-						format = __( 'Create draft post: <mark>%s</mark>' );
-					} else {
-						/* translators: %s: search term. */
-						format = __( 'Create draft page: <mark>%s</mark>' );
-					}
-
-					return createInterpolateElement(
-						sprintf( format, searchTerm ),
-						{
-							mark: <mark />,
-						}
-					);
-				} }
 				noDirectEntry={ !! props?.linkAttributes?.type }
 				noURLSuggestion={ !! props?.linkAttributes?.type }
 				suggestionsQuery={ getSuggestionsQuery(
