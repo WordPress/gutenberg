@@ -60,6 +60,7 @@ function UnforwardedUnitControl(
 		units: unitsProp = CSS_UNITS,
 		value: valueProp,
 		onBlur: onBlurProp,
+		onFocus: onFocusProp,
 		...props
 	} = unitControlProps;
 
@@ -244,6 +245,9 @@ function UnforwardedUnitControl(
 			unit={ unit }
 			units={ units }
 			onBlur={ onBlurProp }
+			onFocus={
+				onFocusProp as unknown as FocusEventHandler< HTMLSelectElement >
+			}
 		/>
 	) : null;
 
@@ -269,6 +273,7 @@ function UnforwardedUnitControl(
 			isPressEnterToChange={ isPressEnterToChange }
 			label={ label }
 			onBlur={ handleOnBlur }
+			onFocus={ onFocusProp }
 			onKeyDown={ handleOnKeyDown }
 			onChange={ handleOnQuantityChange }
 			ref={ forwardedRef }

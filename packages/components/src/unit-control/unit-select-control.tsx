@@ -16,6 +16,7 @@ export default function UnitSelectControl( {
 	className,
 	isUnitSelectTabbable: isTabbable = true,
 	onChange,
+	onFocus,
 	size = 'default',
 	unit = 'px',
 	units = CSS_UNITS,
