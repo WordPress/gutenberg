@@ -65,6 +65,11 @@ export function UnforwardedInputControl(
 		onChange,
 	} );
 
+	// ARIA descriptions can only contain plain text, so fall back to aria-details if not.
+	const helpPropName =
+		typeof help === 'string' ? 'aria-describedby' : 'aria-details';
+	const helpProp = !! help ? { [ helpPropName ]: `${ id }__help` } : {};
+
 	return (
 		<BaseControl
 			className={ classes }
@@ -90,8 +95,8 @@ export function UnforwardedInputControl(
 			>
 				<InputField
 					{ ...props }
+					{ ...helpProp }
 					__next36pxDefaultSize={ __next36pxDefaultSize }
-					aria-describedby={ !! help ? `${ id }__help` : undefined }
 					className="components-input-control__input"
 					disabled={ disabled }
 					id={ id }

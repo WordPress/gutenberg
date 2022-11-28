@@ -57,6 +57,17 @@ describe( 'InputControl', () => {
 				screen.getByRole( 'textbox', { description: 'My help text' } )
 			).toBeInTheDocument();
 		} );
+
+		it( 'should render help as aria-details when not plain text', () => {
+			render( <InputControl help={ <a href="/foo">My help text</a> } /> );
+
+			const input = screen.getByRole( 'textbox' );
+			const help = screen.getByRole( 'link', { name: 'My help text' } );
+
+			expect(
+				help.closest( `#${ input.getAttribute( 'aria-details' ) }` )
+			).toBeVisible();
+		} );
 	} );
 
 	describe( 'Ensurance of focus for number inputs', () => {
