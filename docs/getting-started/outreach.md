@@ -28,6 +28,9 @@ You can view this [Index of Gutenberg related posts](https://make.wordpress.org/
 -   [With Gutenberg, what happens to my Custom Fields?](https://riad.blog/2017/12/11/with-gutenberg-what-happens-to-my-custom-fields/), Riad Benguella (December 2017)
 -   [One thousand and one ways to extend Gutenberg today](https://riad.blog/2017/10/16/one-thousand-and-one-way-to-extend-gutenberg-today/), Riad Benguella (October 2017)
 -   [Gutenberg Plugin Boilerplate](https://github.com/ahmadawais/Gutenberg-Boilerplate/), Ahmad Awais (August 2017)
+-   [Block Theme Generator for WordPress](https://themegen-preview.vercel.app/?mc_cid=f9f237db21&mc_eid=6107ad11e7)
+-   [WP Theme Scaffold](https://github.com/rareview/wp-theme-scaffold)
+-   [Gutenberg Examples](https://github.com/WordPress/gutenberg-examples) - Examples for extending Gutenberg with plugins which create blocks.
 
 ### Community Contribution
 
@@ -37,8 +40,9 @@ You can view this [Index of Gutenberg related posts](https://make.wordpress.org/
 -   [WordPress Gutenberg Developer’s Guide](https://awhitepixel.com/guides/wordpress-gutenberg-developers-guide/), A White Pixel (2020)
 -   [Gutenberg Block Library](https://editorblockswp.com/library), Danny Cooper (August 2018)
 -   [A zero-configuration developer toolkit for building WordPress Gutenberg block plugins](https://ahmadawais.com/create-guten-block-toolkit/), Ahmad Awais (January 2018)
--   [Contributing to Gutenberg Without Code](https://wordimpress.com/a-pot-stirrer-amongst-chefs-contributing-to-gutenberg-without-code/), Kevin Hoffman (August 2017)
 -   [Testing Flow in Gutenberg: Instructions for how to contribute to usability testing](https://make.wordpress.org/test/2017/11/22/testing-flow-in-gutenberg/), Anna Harrison (November 2017)
+-   [Custom Gutenberg Block Development](https://kinsta.com/academy/course/gutenberg-block-development/) (October 2022)
+-   [Building Custom Gutenberg Blocks: The Definitive Block Development Tutorial](https://kinsta.com/blog/gutenberg-blocks/), Carlo Daniele (November 2022)
 
 ### Article Compilations
 
@@ -46,7 +50,6 @@ You can view this [Index of Gutenberg related posts](https://make.wordpress.org/
 -   [Theme Shaper posts about Block Themes](https://themeshaper.com/tag/block-based-themes/), various authors (2020-2021)
 -   [Gutenberg Times Updates](https://gutenbergtimes.com/category/updates/), Birgit Pauli-Haack
 -   [Curated Collection of Gutenberg Articles, Plugins, Blocks, Tutorials, etc](http://gutenberghub.com/), Munir Kamal
--   [Gutenberg articles on ManageWP.org](https://managewp.org/search?q=gutenberg)
 
 ## Talks
 
@@ -56,7 +59,6 @@ Talks given about Gutenberg, including slides and videos as they are available.
 
 -   [Growing JavaScript Skills with WordPress](https://gziolo.pl/2019/07/15/growing-javascript-skills-with-wordpress/) at JavaScript for WordPress conference (July 2019)
 -   [The new core WordPress editor](http://kimb.me/talk-bigwp-london-new-core-wordpress-editor/) at BigWP London (May 2017)
--   [Gutenberg Notes](http://haiku2.com/2017/09/bend-wordpress-meetup-gutenberg-notes/) at Bend WordPress Meetup (September 2017)
 -   [Gutenberg and the Future of Content in WordPress](https://www.slideshare.net/andrewmduthie/gutenberg-and-the-future-of-content-in-wordpress) (September 2017)
 -   [Head first into Gutenberg](https://speakerdeck.com/prtksxna/head-first-into-gutenberg) at the [WordPress Goa Meet-up](https://www.meetup.com/WordPressGoa/events/245275573/) (December 2017)
 -   [Gutenberg : vers une approche plus fine du contenu](https://imathi.eu/2018/02/16/gutenberg-vers-une-approche-plus-fine-du-contenu/) at [WP Paris](https://wpparis.fr/) (February 2018)
@@ -76,6 +78,9 @@ Talks given about Gutenberg, including slides and videos as they are available.
 -   [Anatomy of a block: Gutenberg design patterns](https://wordpress.tv/2018/07/08/tammie-lister-anatomy-of-a-block-gutenberg-design-patterns/), Tammie Lister (July 2018)
 -   [State of the Word 2017 Gutenberg Demo](https://youtu.be/XOY3ZUO6P0k?t=2100), Matt Mullenweg with demo by Matías Ventura Bausero (December 2017)
 -   [Gutenberg is Coming (Don’t Be Afraid)](https://training.ithemes.com/webinar/gutenberg-is-coming-dont-be-afraid/), iThemes Training (September 2017)
+-   [Converting a Shortcode into a Block](https://learn.wordpress.org/tutorial/converting-a-shortcode-into-a-block/), Jonathoan Bossenger
+-   [Using the create-block Tool](https://learn.wordpress.org/tutorial/using-the-create-block-tool/), Jonathoan Bossenger
+-   [Ryan Welcher Codes](https://www.youtube.com/@RyanWelcherCodes), Ryan Welcher Codes - YouTube Channel
 
 ## Learn WordPress Courses
 
@@ -84,3 +89,4 @@ You can access all courses [here](https://learn.wordpress.org/).
 -   [Registering Block Patterns](https://learn.wordpress.org/workshop/registering-block-patterns/), Daisy Olsen (January 2021)
 -   [Intro to Gutenberg Block Development](https://learn.wordpress.org/workshop/intro-to-gutenberg-block-development/), Jonathan Bossenger (August 2020)
 -   [Intro to Publishing with the Block Editor](https://learn.wordpress.org/workshop/intro-to-publishing-with-the-block-editor/), Erica Varlese (August 2020)
+-   [Introduction to Block Development: Build your first custom block](https://learn.wordpress.org/course/introduction-to-block-development-build-your-first-custom-block/)(October 2022)
