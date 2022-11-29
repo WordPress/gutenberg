@@ -12,9 +12,7 @@ import { createBlock as create } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-/**
- * External dependencies
- */
+
 // copied from packages/block-library/src/page-list/edit.js
 
 // We only show the edit option when page count is <= MAX_PAGE_COUNT
@@ -166,7 +164,7 @@ const ConvertToLinksModal = ( { onClose, clientId, pages } ) => {
 };
 
 const BlockEditButton = ( { label, clientId } ) => {
-	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
+	const { selectBlock } = useDispatch( blockEditorStore );
 	const [ convertModalOpen, setConvertModalOpen ] = useState( false );
 	const { pages, totalPages } = usePageData();
 
@@ -181,8 +179,11 @@ const BlockEditButton = ( { label, clientId } ) => {
 		'core/page-list' === block.name && totalPages <= MAX_PAGE_COUNT;
 
 	const onClick = () => {
-		toggleBlockHighlight( clientId, true );
-		if ( allowConvertToLinks ) setConvertModalOpen( ! convertModalOpen );
+		if ( allowConvertToLinks ) {
+			setConvertModalOpen( ! convertModalOpen );
+		} else {
+			selectBlock( clientId );
+		}
 	};
 
 	return (
