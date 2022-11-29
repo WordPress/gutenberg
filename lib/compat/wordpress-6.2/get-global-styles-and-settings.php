@@ -211,4 +211,4 @@ function _gutenberg_clean_theme_json_caches() {
 function _gutenberg_add_non_persistent_theme_json_cache_group() {
 	wp_cache_add_non_persistent_groups( 'theme_json' );
 }
-add_action( 'init', '_gutenberg_add_non_persistent_theme_json_cache_group' );
+add_action( 'plugins_loaded', '_gutenberg_add_non_persistent_theme_json_cache_group' );
