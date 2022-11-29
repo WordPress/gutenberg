@@ -71,7 +71,7 @@
 		&[aria-disabled="true"],
 		&[aria-disabled="true"]:enabled, // This catches a situation where a Button is aria-disabled, but not disabled.
 		&[aria-disabled="true"]:active:enabled {
-			// TODO: This needs to be accent-inverted
+			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
 			color: rgba($white, 0.4);
 			background: $components-color-accent;
 			border-color: $components-color-accent;
@@ -127,7 +127,7 @@
 		&:disabled,
 		&[aria-disabled="true"],
 		&[aria-disabled="true"]:hover {
-			// TODO: Emotion?
+			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
 			color: lighten($gray-700, 5%);
 			background: lighten($gray-300, 5%);
 			transform: none;
@@ -240,11 +240,11 @@
 		animation: components-button__busy-animation 2500ms infinite linear;
 		opacity: 1;
 		background-size: 100px 100%;
-		// TODO: Emotion?
 		// Disable reason: This function call looks nicer when each argument is on its own line.
 		/* stylelint-disable */
 		background-image: linear-gradient(
 			-45deg,
+			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
 			darken($white, 2%) 33%,
 			darken($white, 12%) 33%,
 			darken($white, 12%) 70%,
