@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import {
-	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalUnitControl as UnitControl,
@@ -43,7 +42,7 @@ export function ChildLayoutEdit( {
 } ) {
 	const { style = {} } = attributes;
 	const { layout: childLayout = {} } = style;
-	const { selfStretch, flexSize, breakOutOfLayout = false } = childLayout;
+	const { selfStretch, flexSize } = childLayout;
 
 	useEffect( () => {
 		if ( selfStretch === 'fixed' && ! flexSize ) {
@@ -98,39 +97,22 @@ export function ChildLayoutEdit( {
 				/>
 			</ToggleGroupControl>
 			{ selfStretch === 'fixed' && (
-				<>
-					<UnitControl
-						size={ '__unstable-large' }
-						style={ { height: 'auto' } }
-						onChange={ ( value ) => {
-							setAttributes( {
-								style: {
-									...style,
-									layout: {
-										...childLayout,
-										flexSize: value,
-									},
+				<UnitControl
+					size={ '__unstable-large' }
+					style={ { height: 'auto' } }
+					onChange={ ( value ) => {
+						setAttributes( {
+							style: {
+								...style,
+								layout: {
+									...childLayout,
+									flexSize: value,
 								},
-							} );
-						} }
-						value={ flexSize }
-					/>
-					<ToggleControl
-						label={ __( 'Allow block to break out of layout' ) }
-						onChange={ ( value ) => {
-							setAttributes( {
-								style: {
-									...style,
-									layout: {
-										...childLayout,
-										breakOutOfLayout: value,
-									},
-								},
-							} );
-						} }
-						checked={ breakOutOfLayout }
-					/>
-				</>
+							},
+						} );
+					} }
+					value={ flexSize }
+				/>
 			) }
 		</>
 	);
