@@ -145,6 +145,7 @@ function ListViewBlock( {
 
 	const { isTreeGridMounted, expand, collapse } = useListViewContext();
 
+	const isEditable = block.name !== 'core/page-list-item';
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
 	const moverCellClassName = classnames(
@@ -331,10 +332,14 @@ function ListViewBlock( {
 						}
 					>
 						{ () => (
-							<BlockEditButton
-								label={ editAriaLabel }
-								clientId={ clientId }
-							/>
+							<>
+								{ isEditable && (
+									<BlockEditButton
+										label={ editAriaLabel }
+										clientId={ clientId }
+									/>
+								) }
+							</>
 						) }
 					</TreeGridCell>
 					<TreeGridCell
