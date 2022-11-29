@@ -51,9 +51,11 @@ if ( ! function_exists( 'wp_theme_has_theme_json' ) ) {
 if ( ! function_exists( 'wp_theme_has_theme_json_clean_cache' ) ) {
 	/**
 	 * Function to clean the cache used by wp_theme_has_theme_json method.
+	 *
+	 * Not to backport to core. Delete it instead.
 	 */
 	function wp_theme_has_theme_json_clean_cache() {
-		wp_cache_delete( 'wp_theme_has_theme_json', 'theme_json' );
+		_deprecated_function( __METHOD__, '14.7' );
 	}
 }
 
@@ -136,9 +138,11 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 
 /**
  * Clean the cache used by the `gutenberg_get_global_stylesheet` function.
+ *
+ * Not to backport to core. Delete it instead.
  */
 function gutenberg_get_global_stylesheet_clean_cache() {
-	wp_cache_delete( 'gutenberg_get_global_stylesheet', 'theme_json' );
+	_deprecated_function( __METHOD__, '14.7' );
 }
 
 /**
@@ -178,6 +182,18 @@ function gutenberg_get_global_settings( $path = array(), $context = array() ) {
 
 	$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin )->get_settings();
 	return _wp_array_get( $settings, $path, $settings );
+}
+
+/**
+ * Private function to clean the caches used by gutenberg_get_global_settings method.
+ *
+ * @access private
+ */
+function _gutenberg_clean_theme_json_caches() {
+	wp_cache_delete( 'wp_theme_has_theme_json', 'theme_json' );
+	wp_cache_delete( 'gutenberg_get_global_stylesheet', 'theme_json' );
+	wp_cache_delete( 'gutenberg_get_global_settings_theme', 'theme_json' );
+	WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
 }
 
 /**
