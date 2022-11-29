@@ -8,6 +8,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,14 +24,6 @@ function helpText( selfStretch ) {
 		default:
 			return __( 'Fit contents.' );
 	}
-}
-
-function checkSelfStretchForInvalidValues( selfStretch, flexSize ) {
-	if ( selfStretch === 'fixed' && ! flexSize ) {
-		// If there's no defined size we shouldn't keep the fixed setting.
-		return 'fit';
-	}
-	return selfStretch;
 }
 
 /**
@@ -52,18 +45,27 @@ export function ChildLayoutEdit( {
 	const { layout: childLayout = {} } = style;
 	const { selfStretch, flexSize, breakOutOfLayout = false } = childLayout;
 
-	const validatedSelfStretch = checkSelfStretchForInvalidValues(
-		selfStretch,
-		flexSize
-	);
+	useEffect( () => {
+		if ( selfStretch === 'fixed' && ! flexSize ) {
+			setAttributes( {
+				style: {
+					...style,
+					layout: {
+						...childLayout,
+						selfStretch: 'fit',
+					},
+				},
+			} );
+		}
+	}, [] );
 
 	return (
 		<>
 			<ToggleGroupControl
 				size={ '__unstable-large' }
 				label={ childLayoutOrientation( parentLayout ) }
-				value={ validatedSelfStretch || 'fit' }
-				help={ helpText( validatedSelfStretch ) }
+				value={ selfStretch || 'fit' }
+				help={ helpText( selfStretch ) }
 				onChange={ ( value ) => {
 					const newFlexSize = value !== 'fixed' ? null : flexSize;
 					setAttributes( {
@@ -95,7 +97,7 @@ export function ChildLayoutEdit( {
 					label={ __( 'Fixed' ) }
 				/>
 			</ToggleGroupControl>
-			{ validatedSelfStretch === 'fixed' && (
+			{ selfStretch === 'fixed' && (
 				<>
 					<UnitControl
 						size={ '__unstable-large' }
