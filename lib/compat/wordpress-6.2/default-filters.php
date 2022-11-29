@@ -17,9 +17,7 @@
  * @package gutenberg
  */
 
-add_action( 'activated_plugin', 'gutenberg_get_global_stylesheet_clean_cache' );
 add_action( 'activated_plugin', array( 'WP_Theme_JSON_Resolver_Gutenberg', 'clean_cached_data' ) );
-add_action( 'deactivated_plugin', 'gutenberg_get_global_stylesheet_clean_cache' );
 add_action( 'deactivated_plugin', array( 'WP_Theme_JSON_Resolver_Gutenberg', 'clean_cached_data' ) );
 add_action( 'save_post_wp_global_styles', 'gutenberg_get_global_stylesheet_clean_cache' );
 add_action( 'save_post_wp_global_styles', array( 'WP_Theme_JSON_Resolver_Gutenberg', 'clean_cached_data' ) );
