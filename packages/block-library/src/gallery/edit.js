@@ -217,9 +217,17 @@ function GalleryEdit( props ) {
 	}
 
 	function isValidFileType( file ) {
+		// It's necessary to retrieve the media type from the raw image data for uploaded images on native.
+		const image =
+			Platform.isNative && file.id
+				? find( imageData, { id: file.id } )
+				: null;
+
+		const mediaTypeSelector = image ? image?.media_type : file.type;
+
 		return (
 			ALLOWED_MEDIA_TYPES.some(
-				( mediaType ) => file.type?.indexOf( mediaType ) === 0
+				( mediaType ) => mediaTypeSelector?.indexOf( mediaType ) === 0
 			) || file.url?.indexOf( 'blob:' ) === 0
 		);
 	}
