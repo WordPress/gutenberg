@@ -101,6 +101,7 @@ module.exports = {
 							'escapeRegExp',
 							'every',
 							'extend',
+							'filter',
 							'findIndex',
 							'findKey',
 							'findLast',
