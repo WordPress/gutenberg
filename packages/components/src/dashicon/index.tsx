@@ -10,12 +10,8 @@
 /**
  * Internal dependencies
  */
+import type { WordPressComponentProps } from '../ui/context';
 import type { DashiconProps } from './types';
-
-/**
- * @param {Props} props
- * @return {JSX.Element} Element
- */
 
 function Dashicon( {
 	icon,
@@ -23,7 +19,7 @@ function Dashicon( {
 	size = 20,
 	style = {},
 	...extraProps
-}: DashiconProps ) {
+}: WordPressComponentProps< DashiconProps, 'span', false > ) {
 	const iconClass = [
 		'dashicon',
 		'dashicons',
