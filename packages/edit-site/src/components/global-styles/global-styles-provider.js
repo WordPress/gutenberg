@@ -45,9 +45,9 @@ const cleanEmptyObject = ( object ) => {
 };
 
 function useGlobalStylesUserConfig() {
-	const { globalStylesId, hasGlobalStyles, settings, styles } = useSelect(
+	const { globalStylesId, isReady, settings, styles } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, getEntityRecords } =
+			const { getEditedEntityRecord, hasFinishedResolution } =
 				select( coreStore );
 			const _globalStylesId =
 				select( coreStore ).__experimentalGetCurrentGlobalStylesId();
@@ -58,16 +58,25 @@ function useGlobalStylesUserConfig() {
 						_globalStylesId
 				  )
 				: undefined;
-			const activeThemes = getEntityRecords( 'root', 'theme', {
-				status: 'active',
-			} );
+
+			let hasResolved = false;
+			if (
+				hasFinishedResolution(
+					'__experimentalGetCurrentGlobalStylesId'
+				)
+			) {
+				hasResolved = _globalStylesId
+					? hasFinishedResolution( 'getEditedEntityRecord', [
+							'root',
+							'globalStyles',
+							_globalStylesId,
+					  ] )
+					: true;
+			}
 
 			return {
 				globalStylesId: _globalStylesId,
-				hasGlobalStyles:
-					!! activeThemes?.[ 0 ]?._links?.[
-						'wp:user-global-styles'
-					] ?? false,
+				isReady: hasResolved,
 				settings: record?.settings,
 				styles: record?.styles,
 			};
@@ -103,9 +112,6 @@ function useGlobalStylesUserConfig() {
 		},
 		[ globalStylesId ]
 	);
-
-	// Mark config loaded and ready if the theme has no global user styles.
-	const isReady = hasGlobalStyles ? !! settings || !! styles : true;
 
 	return [ isReady, config, setConfig ];
 }
