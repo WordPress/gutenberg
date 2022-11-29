@@ -18,6 +18,7 @@ import './layout';
 import './content-lock-ui';
 import './metadata';
 import './metadata-name';
+import './position';
 
 export { useCustomSides } from './dimensions';
 export { useLayoutClasses, useLayoutStyles } from './layout';

@@ -330,7 +330,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *              and `typography`, and renamed others according to the new schema.
 	 * @since 6.0.0 Added `color.defaultDuotone`.
 	 * @since 6.1.0 Added `layout.definitions` and `useRootPaddingAwareAlignments`.
-	 * @since 6.2.0 Added `dimensions.minHeight`.
+	 * @since 6.2.0 Added `dimensions.minHeight`, `position.fixed` and `position.sticky`.
 	 * @var array
 	 */
 	const VALID_SETTINGS = array(
@@ -368,6 +368,10 @@ class WP_Theme_JSON_Gutenberg {
 			'contentSize' => null,
 			'definitions' => null,
 			'wideSize'    => null,
+		),
+		'position'                      => array(
+			'fixed'  => null,
+			'sticky' => null,
 		),
 		'spacing'                       => array(
 			'customSpacingSize' => null,
@@ -536,6 +540,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * Options that settings.appearanceTools enables.
 	 *
 	 * @since 6.0.0
+	 * @since 6.2.0 Added `position.fixed` and `position.sticky`.
 	 * @var array
 	 */
 	const APPEARANCE_TOOLS_OPT_INS = array(
@@ -545,6 +550,8 @@ class WP_Theme_JSON_Gutenberg {
 		array( 'border', 'width' ),
 		array( 'color', 'link' ),
 		array( 'dimensions', 'minHeight' ),
+		array( 'position', 'fixed' ),
+		array( 'position', 'sticky' ),
 		array( 'spacing', 'blockGap' ),
 		array( 'spacing', 'margin' ),
 		array( 'spacing', 'padding' ),
