@@ -16,6 +16,7 @@ import {
 } from '@wordpress/element';
 import { VisuallyHidden, SearchControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useDebounce } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -49,9 +50,15 @@ function InserterMenu(
 	},
 	ref
 ) {
+	// Used for the search field only.
 	const [ filterValue, setFilterValue ] = useState(
 		__experimentalFilterValue
 	);
+	// Used for the rest of the inserter, debounced for performance reasons.
+	const [ delayedFilterValue, setDelayedFilterValue ] = useState(
+		__experimentalFilterValue
+	);
+	const debouncedSetFilterValue = useDebounce( setDelayedFilterValue, 100 );
 	const [ hoveredItem, setHoveredItem ] = useState( null );
 	const [ selectedPatternCategory, setSelectedPatternCategory ] =
 		useState( null );
@@ -141,7 +148,7 @@ function InserterMenu(
 			destinationRootClientId,
 			onInsert,
 			onHover,
-			filterValue,
+			delayedFilterValue,
 			showMostUsedBlocks,
 			showInserterHelpPanel,
 		]
@@ -215,11 +222,16 @@ function InserterMenu(
 	} ) );
 
 	const showPatternPanel =
-		selectedTab === 'patterns' && ! filterValue && selectedPatternCategory;
+		selectedTab === 'patterns' &&
+		! delayedFilterValue &&
+		selectedPatternCategory;
 	const showAsTabs =
-		! filterValue && ( showPatterns || hasReusableBlocks || showMedia );
+		! delayedFilterValue &&
+		( showPatterns || hasReusableBlocks || showMedia );
 	const showMediaPanel =
-		selectedTab === 'media' && ! filterValue && selectedMediaCategory;
+		selectedTab === 'media' &&
+		! delayedFilterValue &&
+		selectedMediaCategory;
 	return (
 		<div className="block-editor-inserter__menu">
 			<div
@@ -232,6 +244,7 @@ function InserterMenu(
 					className="block-editor-inserter__search"
 					onChange={ ( value ) => {
 						if ( hoveredItem ) setHoveredItem( null );
+						debouncedSetFilterValue( value );
 						setFilterValue( value );
 					} }
 					value={ filterValue }
@@ -239,10 +252,10 @@ function InserterMenu(
 					placeholder={ __( 'Search' ) }
 					ref={ searchRef }
 				/>
-				{ !! filterValue && (
+				{ !! delayedFilterValue && (
 					<div className="block-editor-inserter__no-tab-container">
 						<InserterSearchResults
-							filterValue={ filterValue }
+							filterValue={ delayedFilterValue }
 							onSelect={ onSelect }
 							onHover={ onHover }
 							rootClientId={ rootClientId }
@@ -267,7 +280,7 @@ function InserterMenu(
 						{ getCurrentTab }
 					</InserterTabs>
 				) }
-				{ ! filterValue && ! showAsTabs && (
+				{ ! delayedFilterValue && ! showAsTabs && (
 					<div className="block-editor-inserter__no-tab-container">
 						{ blocksTab }
 					</div>
