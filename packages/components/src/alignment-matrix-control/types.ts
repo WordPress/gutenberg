@@ -47,7 +47,6 @@ export type AlignmentMatrixControlIconProps = Pick<
 	disablePointerEvents?: boolean;
 	size?: number;
 };
-
 export type AlignmentMatrixControlCellProps = {
 	isActive?: boolean;
 	value: NonNullable< AlignmentMatrixControlProps[ 'value' ] >;
