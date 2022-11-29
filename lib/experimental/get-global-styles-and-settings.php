@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * API to interact with global settings & styles.
+ *
+ * @package gutenberg
+ */
 
 /**
  * Repeated logic from `get_default_block_editor_settings` function. When implemented into core,
@@ -7,7 +11,7 @@
  *
  * @return array
  */
-function gutenberg_get_block_theme_supports(){
+function gutenberg_get_block_theme_supports() {
 	$theme_settings = array(
 		'disableCustomColors'    => get_theme_support( 'disable-custom-colors' ),
 		'disableCustomFontSizes' => get_theme_support( 'disable-custom-font-sizes' ),
