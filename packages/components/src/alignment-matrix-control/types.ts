@@ -52,3 +52,17 @@ export type AlignmentMatrixControlCellProps = {
 	isActive?: boolean;
 	value: NonNullable< AlignmentMatrixControlProps[ 'value' ] >;
 };
+
+export type AlignmentMatrixControlCellProps = {
+	isActive: boolean;
+	value:
+		| 'top left'
+		| 'top center'
+		| 'top right'
+		| 'center left'
+		| 'center center'
+		| 'center right'
+		| 'bottom left'
+		| 'bottom center'
+		| 'bottom right';
+};
