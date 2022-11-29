@@ -57,29 +57,6 @@ if ( ! function_exists( 'wp_theme_has_theme_json_clean_cache' ) ) {
 	}
 }
 
-if ( ! function_exists( '_wp_theme_has_theme_json_clean_cache_upon_upgrading_active_theme' ) ) {
-	/**
-	 * Private function to clean the cache used by wp_theme_has_theme_json method.
-	 *
-	 * It is hooked into the `upgrader_process_complete` action.
-	 *
-	 * @see default-filters.php
-	 *
-	 * @param WP_Upgrader $upgrader Instance of WP_Upgrader class.
-	 * @param array       $options Metadata that identifies the data that is updated.
-	 */
-	function _wp_theme_has_theme_json_clean_cache_upon_upgrading_active_theme( $upgrader, $options ) {
-		// The cache only needs cleaning when the active theme was updated.
-		if (
-			'update' === $options['action'] &&
-			'theme' === $options['type'] &&
-			( isset( $options['themes'][ get_stylesheet() ] ) || isset( $options['themes'][ get_template() ] ) )
-		) {
-			wp_theme_has_theme_json_clean_cache();
-		}
-	}
-}
-
 /**
  * Returns the stylesheet resulting of merging core, theme, and user data.
  *
@@ -162,31 +139,6 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
  */
 function gutenberg_get_global_stylesheet_clean_cache() {
 	wp_cache_delete( 'gutenberg_get_global_stylesheet', 'theme_json' );
-}
-
-/**
- * Private function to clean the cache used by the `gutenberg_get_global_stylesheet` function after an upgrade.
- *
- * It is hooked into the `upgrader_process_complete` action.
- *
- * @see default-filters.php
- *
- * @param WP_Upgrader $upgrader WP_Upgrader instance.
- * @param array       $options  Array of bulk item update data.
- */
-function _gutenberg_get_global_stylesheet_clean_cache_upon_upgrading( $upgrader, $options ) {
-	if ( 'update' !== $options['action'] ) {
-		return;
-	}
-
-	if (
-		'core' === $options['type'] ||
-		'plugin' === $options['type'] ||
-		// Clean cache only if the active theme was updated.
-		( 'theme' === $options['type'] && ( isset( $options['themes'][ get_stylesheet() ] ) || isset( $options['themes'][ get_template() ] ) ) )
-	) {
-		gutenberg_get_global_stylesheet_clean_cache();
-	}
 }
 
 /**
