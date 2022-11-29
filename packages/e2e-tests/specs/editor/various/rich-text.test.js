@@ -512,10 +512,14 @@ describe( 'RichText', () => {
 		// firing `compositionend`.
 		// See https://github.com/puppeteer/puppeteer/issues/4981.
 		await page.evaluate( () => {
-			document.activeElement.textContent = '`a`';
+			const paragraph = document.querySelector(
+				'[data-type="core/paragraph"]'
+			);
+			paragraph.textContent = '`a`';
 			const selection = window.getSelection();
-			selection.selectAllChildren( document.activeElement );
+			selection.selectAllChildren( paragraph );
 			selection.collapseToEnd();
+
 			document.activeElement.dispatchEvent(
 				new CompositionEvent( 'compositionend' )
 			);

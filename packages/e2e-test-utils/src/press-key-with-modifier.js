@@ -103,10 +103,11 @@ export async function setClipboardData( { plainText = '', html = '' } ) {
 
 async function emulateClipboard( type ) {
 	await page.evaluate( ( _type ) => {
+		const selection = window.getSelection();
+
 		if ( _type !== 'paste' ) {
 			window._clipboardData = new DataTransfer();
 
-			const selection = window.getSelection();
 			const plainText = selection.toString();
 			let html = plainText;
 
@@ -123,7 +124,25 @@ async function emulateClipboard( type ) {
 			window._clipboardData.setData( 'text/html', html );
 		}
 
-		document.activeElement.dispatchEvent(
+		const { anchorNode } = selection;
+		let anchorElement;
+
+		if ( ! anchorNode ) {
+			anchorElement = document.activeElement;
+		} else {
+			anchorElement =
+				anchorNode.nodeType === anchorNode.ELEMENT_NODE
+					? anchorNode
+					: anchorNode.parentElement;
+			anchorElement =
+				anchorElement.closest( '[contenteditable]' ) || anchorElement;
+		}
+
+		if ( ! anchorElement ) {
+			return;
+		}
+
+		anchorElement.dispatchEvent(
 			new ClipboardEvent( _type, {
 				bubbles: true,
 				cancelable: true,

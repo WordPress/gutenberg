@@ -12,9 +12,14 @@ import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 
 export default function useSelectAll() {
-	const { getBlockOrder, getSelectedBlockClientIds, getBlockRootClientId } =
-		useSelect( blockEditorStore );
-	const { multiSelect, selectBlock } = useDispatch( blockEditorStore );
+	const {
+		getBlockOrder,
+		getSelectedBlockClientIds,
+		getBlockRootClientId,
+		isNavigationMode,
+	} = useSelect( blockEditorStore );
+	const { multiSelect, selectBlock, setNavigationMode } =
+		useDispatch( blockEditorStore );
 	const isMatch = useShortcutEventMatch();
 
 	return useRefEffect( ( node ) => {
@@ -25,14 +30,31 @@ export default function useSelectAll() {
 
 			const selectedClientIds = getSelectedBlockClientIds();
 
-			if (
-				selectedClientIds.length < 2 &&
-				! isEntirelySelected( event.target )
-			) {
-				return;
-			}
-
 			event.preventDefault();
+
+			const { ownerDocument } = node;
+			const { defaultView } = ownerDocument;
+			const { anchorNode } = defaultView.getSelection();
+
+			if ( anchorNode ) {
+				const anchorElement =
+					anchorNode.nodeType === anchorNode.ELEMENT_NODE
+						? anchorNode
+						: anchorNode.parentElement;
+				const selectedContentEditable =
+					anchorElement.closest( '[contenteditable]' );
+
+				if (
+					selectedClientIds.length < 2 &&
+					! isEntirelySelected( selectedContentEditable )
+				) {
+					defaultView.getSelection().removeAllRanges();
+					const range = ownerDocument.createRange();
+					range.selectNodeContents( selectedContentEditable );
+					defaultView.getSelection().addRange( range );
+					return;
+				}
+			}
 
 			const [ firstSelectedClientId ] = selectedClientIds;
 			const rootClientId = getBlockRootClientId( firstSelectedClientId );
@@ -48,6 +70,12 @@ export default function useSelectAll() {
 					selectBlock( rootClientId );
 				}
 				return;
+			}
+
+			node.ownerDocument.defaultView.getSelection().removeAllRanges();
+
+			if ( isNavigationMode() ) {
+				setNavigationMode( false );
 			}
 
 			multiSelect(

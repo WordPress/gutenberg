@@ -30,11 +30,7 @@ export function useFocusHandler( clientId ) {
 			 * @param {FocusEvent} event Focus event.
 			 */
 			function onFocus( event ) {
-				// When the whole editor is editable, let writing flow handle
-				// selection.
-				if (
-					node.parentElement.closest( '[contenteditable="true"]' )
-				) {
+				if ( event.shiftKey ) {
 					return;
 				}
 
@@ -57,10 +53,10 @@ export function useFocusHandler( clientId ) {
 				selectBlock( clientId );
 			}
 
-			node.addEventListener( 'focusin', onFocus );
+			node.addEventListener( 'click', onFocus );
 
 			return () => {
-				node.removeEventListener( 'focusin', onFocus );
+				node.removeEventListener( 'click', onFocus );
 			};
 		},
 		[ isBlockSelected, selectBlock ]

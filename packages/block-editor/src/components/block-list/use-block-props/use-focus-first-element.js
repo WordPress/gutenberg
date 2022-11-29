@@ -78,9 +78,36 @@ export function useFocusFirstElement( clientId ) {
 		}
 
 		const { ownerDocument } = ref.current;
+		const { defaultView } = ownerDocument;
+		const selection = defaultView.getSelection();
+		const { anchorNode } = selection;
+		const anchorElement =
+			anchorNode?.nodeType === anchorNode?.ELEMENT_NODE
+				? anchorNode
+				: anchorNode.parentElement;
 
 		// Do not focus the block if it already contains the active element.
-		if ( isInsideRootBlock( ref.current, ownerDocument.activeElement ) ) {
+		if (
+			anchorElement &&
+			isInsideRootBlock( ref.current, anchorElement )
+		) {
+			let editor = ref.current;
+
+			// Ensure editor has focus.
+			while ( editor.parentElement?.closest( '[contenteditable]' ) ) {
+				editor = /** @type {HTMLElement} */ (
+					editor.parentElement.closest( '[contenteditable]' )
+				);
+			}
+
+			editor.focus();
+			return;
+		}
+
+		if (
+			ownerDocument.activeElement &&
+			isInsideRootBlock( ref.current, ownerDocument.activeElement )
+		) {
 			return;
 		}
 
@@ -96,12 +123,22 @@ export function useFocusFirstElement( clientId ) {
 			textInputs[ isReverse ? textInputs.length - 1 : 0 ] || ref.current;
 
 		if ( ! isInsideRootBlock( ref.current, target ) ) {
-			ref.current.focus();
+			selection.removeAllRanges();
+			let editor = ref.current;
+
+			// Ensure editor has focus.
+			while ( editor.parentElement?.closest( '[contenteditable]' ) ) {
+				editor = /** @type {HTMLElement} */ (
+					editor.parentElement.closest( '[contenteditable]' )
+				);
+			}
+
+			editor.focus();
 			return;
 		}
 
 		// Check to see if element is focussable before a generic caret insert.
-		if ( ! ref.current.getAttribute( 'contenteditable' ) ) {
+		if ( ref.current.getAttribute( 'contenteditable' ) !== 'true' ) {
 			const focusElement = focus.tabbable.findNext( ref.current );
 			// Make sure focusElement is valid, contained in the same block, and a form field.
 			if (

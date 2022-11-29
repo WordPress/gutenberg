@@ -46,6 +46,7 @@ async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
 	clipboardDataHolder = await page.evaluate(
 		( [ _type, _clipboardData ] ) => {
 			const clipboardDataTransfer = new DataTransfer();
+			const selection = window.getSelection()!;
 
 			if ( _type === 'paste' ) {
 				clipboardDataTransfer.setData(
@@ -57,7 +58,6 @@ async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
 					_clipboardData.html
 				);
 			} else {
-				const selection = window.getSelection()!;
 				const plainText = selection.toString();
 				let html = plainText;
 				if ( selection.rangeCount ) {
@@ -74,7 +74,23 @@ async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
 				clipboardDataTransfer.setData( 'text/html', html );
 			}
 
-			document.activeElement?.dispatchEvent(
+			const { anchorNode } = selection;
+			let anchorElement;
+
+			if ( ! anchorNode ) {
+				anchorElement = document.activeElement;
+			} else {
+				anchorElement = (
+					anchorNode.nodeType === anchorNode.ELEMENT_NODE
+						? anchorNode
+						: anchorNode.parentElement
+				 ) as Element;
+				anchorElement =
+					anchorElement?.closest( '[contenteditable]' ) ||
+					anchorElement;
+			}
+
+			anchorElement?.dispatchEvent(
 				new ClipboardEvent( _type, {
 					bubbles: true,
 					cancelable: true,

@@ -30,12 +30,16 @@ export function useWritingFlow() {
 		( select ) => select( blockEditorStore ).hasMultiSelection(),
 		[]
 	);
+	const selectedClientId = useSelect(
+		( select ) => select( blockEditorStore ).getSelectedBlockClientId(),
+		[]
+	);
 
 	return [
 		before,
 		useMergeRefs( [
-			ref,
 			useInput(),
+			ref,
 			useDragSelection(),
 			useSelectionObserver(),
 			useClickSelection(),
@@ -45,24 +49,74 @@ export function useWritingFlow() {
 			useRefEffect(
 				( node ) => {
 					node.tabIndex = -1;
-					node.contentEditable = hasMultiSelection;
+					node.contentEditable = true;
 
 					if ( ! hasMultiSelection ) {
 						return;
 					}
 
-					node.classList.add( 'has-multi-selection' );
 					node.setAttribute(
 						'aria-label',
 						__( 'Multiple selected blocks' )
 					);
+					node.classList.add( 'has-multi-selection' );
 
 					return () => {
 						node.classList.remove( 'has-multi-selection' );
-						node.removeAttribute( 'aria-label' );
 					};
 				},
 				[ hasMultiSelection ]
+			),
+			useRefEffect(
+				( node ) => {
+					if ( ! selectedClientId ) return;
+
+					const { ownerDocument } = node;
+					const { defaultView } = ownerDocument;
+					const selection = defaultView.getSelection();
+
+					const blockElement = ownerDocument.getElementById(
+						'block-' + selectedClientId
+					);
+					const blockLabel =
+						blockElement?.getAttribute( 'aria-label' );
+
+					node.setAttribute( 'aria-label', blockLabel );
+
+					function onSelectionChange() {
+						const { anchorNode } = selection;
+						let innerLabel = blockLabel;
+
+						if ( anchorNode ) {
+							const anchorElement =
+								anchorNode.nodeType === anchorNode.ELEMENT_NODE
+									? anchorNode
+									: anchorNode.parentElement;
+							const anchorLabel =
+								anchorElement?.closest( '[aria-label]' );
+
+							if ( anchorLabel ) {
+								innerLabel =
+									anchorLabel.getAttribute( 'aria-label' );
+							}
+						}
+
+						node.setAttribute( 'aria-label', innerLabel );
+					}
+
+					ownerDocument.addEventListener(
+						'selectionchange',
+						onSelectionChange
+					);
+
+					return () => {
+						ownerDocument.removeEventListener(
+							'selectionchange',
+							onSelectionChange
+						);
+					};
+				},
+				[ selectedClientId ]
 			),
 		] ),
 		after,

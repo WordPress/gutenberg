@@ -47,13 +47,13 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 		return;
 	}
 
-	container.focus();
-
 	if ( isInputOrTextArea( container ) ) {
 		// The element may not support selection setting.
 		if ( typeof container.selectionStart !== 'number' ) {
 			return;
 		}
+
+		container.focus();
 
 		if ( isReverse ) {
 			container.selectionStart = container.value.length;
@@ -66,8 +66,24 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 		return;
 	}
 
-	if ( ! container.isContentEditable ) {
+	if ( container.getAttribute( 'contenteditable' ) !== 'true' ) {
+		if ( ! container.isContentEditable ) {
+			container.focus();
+		}
 		return;
+	}
+
+	let editor = container;
+
+	while ( editor.parentElement?.closest( '[contenteditable]' ) ) {
+		editor = /** @type {HTMLElement} */ (
+			editor.parentElement.closest( '[contenteditable]' )
+		);
+	}
+	editor.focus();
+
+	if ( editor !== container ) {
+		editor.contentEditable = 'false';
 	}
 
 	let range = getRange( container, isReverse, x );
@@ -91,11 +107,35 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 		}
 	}
 
+	if ( editor !== container ) {
+		editor.contentEditable = 'true';
+	}
+
+	const { commonAncestorContainer } = range;
+	let parentElement;
+
+	if (
+		commonAncestorContainer.nodeType ===
+		commonAncestorContainer.ELEMENT_NODE
+	) {
+		parentElement = /** @type {HTMLElement} */ ( commonAncestorContainer );
+	} else {
+		parentElement = commonAncestorContainer.parentElement;
+	}
+
 	const { ownerDocument } = container;
 	const { defaultView } = ownerDocument;
 	assertIsDefined( defaultView, 'defaultView' );
 	const selection = defaultView.getSelection();
 	assertIsDefined( selection, 'selection' );
 	selection.removeAllRanges();
+
+	if ( parentElement?.closest( '[contenteditable]' ) !== container ) {
+		container.dispatchEvent(
+			new defaultView.MouseEvent( 'click', { bubbles: true } )
+		);
+		return;
+	}
+
 	selection.addRange( range );
 }

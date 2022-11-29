@@ -317,9 +317,7 @@ test.describe( 'splitting and merging blocks', () => {
 		expect( await editor.getEditedPostContent() ).toBe( '' );
 
 		// And focus is retained:
-		await expect(
-			page.locator( 'role=document[name=/Empty block/i]' )
-		).toBeFocused();
+		await expect( page.locator( '.editor-styles-wrapper' ) ).toBeFocused();
 	} );
 
 	test( 'should undo split in one go', async ( {

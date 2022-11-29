@@ -47,7 +47,12 @@ export default function isEdge( container, isReverse, onlyVertical = false ) {
 	const selection = defaultView.getSelection();
 
 	if ( ! selection || ! selection.rangeCount ) {
-		return false;
+		return true;
+	}
+
+	// Out of bounds.
+	if ( ! container.contains( selection.anchorNode ) ) {
+		return true;
 	}
 
 	const range = selection.getRangeAt( 0 );

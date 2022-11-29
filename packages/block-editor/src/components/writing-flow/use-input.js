@@ -18,6 +18,9 @@ export default function useInput() {
 	const {
 		__unstableIsFullySelected,
 		getSelectedBlockClientIds,
+		getSelectedBlockClientId,
+		getBlockRootClientId,
+		getBlockIndex,
 		__unstableIsSelectionMergeable,
 		hasMultiSelection,
 	} = useSelect( blockEditorStore );
@@ -27,6 +30,8 @@ export default function useInput() {
 		removeBlocks,
 		__unstableDeleteSelection,
 		__unstableExpandSelection,
+		insertDefaultBlock,
+		removeBlock,
 	} = useDispatch( blockEditorStore );
 
 	return useRefEffect( ( node ) => {
@@ -46,11 +51,38 @@ export default function useInput() {
 			}
 
 			if ( ! hasMultiSelection() ) {
+				const { keyCode, target } = event;
+
+				if (
+					keyCode !== ENTER &&
+					keyCode !== BACKSPACE &&
+					keyCode !== DELETE
+				) {
+					return;
+				}
+
+				if ( target !== node ) {
+					return;
+				}
+
+				const clientId = getSelectedBlockClientId();
+
+				event.preventDefault();
+
+				if ( keyCode === ENTER ) {
+					insertDefaultBlock(
+						{},
+						getBlockRootClientId( clientId ),
+						getBlockIndex( clientId ) + 1
+					);
+				} else {
+					removeBlock( clientId );
+				}
+
 				return;
 			}
 
 			if ( event.keyCode === ENTER ) {
-				node.contentEditable = false;
 				event.preventDefault();
 				if ( __unstableIsFullySelected() ) {
 					replaceBlocks(
@@ -64,7 +96,6 @@ export default function useInput() {
 				event.keyCode === BACKSPACE ||
 				event.keyCode === DELETE
 			) {
-				node.contentEditable = false;
 				event.preventDefault();
 				if ( __unstableIsFullySelected() ) {
 					removeBlocks( getSelectedBlockClientIds() );
@@ -79,7 +110,6 @@ export default function useInput() {
 				event.key.length === 1 &&
 				! ( event.metaKey || event.ctrlKey )
 			) {
-				node.contentEditable = false;
 				if ( __unstableIsSelectionMergeable() ) {
 					__unstableDeleteSelection( event.keyCode === DELETE );
 				} else {
@@ -99,8 +129,6 @@ export default function useInput() {
 				return;
 			}
 
-			node.contentEditable = false;
-
 			if ( __unstableIsSelectionMergeable() ) {
 				__unstableDeleteSelection();
 			} else {
@@ -112,10 +140,89 @@ export default function useInput() {
 			}
 		}
 
+		function onInput( event ) {
+			if ( event.__unstableRedirect === true ) {
+				return;
+			}
+
+			if ( event.target !== node ) {
+				return;
+			}
+
+			if ( hasMultiSelection() ) {
+				return;
+			}
+
+			const { ownerDocument } = node;
+			const { defaultView } = ownerDocument;
+			const prototype = Object.getPrototypeOf( event );
+			const constructorName = prototype.constructor.name;
+			const Constructor = window[ constructorName ];
+			const { anchorNode } = defaultView.getSelection();
+
+			if ( ! anchorNode ) {
+				return;
+			}
+
+			const anchorElement = (
+				anchorNode.nodeType === anchorNode.ELEMENT_NODE
+					? anchorNode
+					: anchorNode.parentElement
+			 ).closest( '[contenteditable]' );
+
+			if ( ! anchorElement ) {
+				return;
+			}
+
+			const init = {};
+
+			for ( const key in event ) {
+				init[ key ] = event[ key ];
+			}
+
+			const newEvent = new Constructor( event.type, init );
+			newEvent.__unstableRedirect = true;
+			const cancelled = ! anchorElement.dispatchEvent( newEvent );
+			event.stopImmediatePropagation();
+
+			if ( cancelled ) {
+				event.preventDefault();
+			}
+		}
+
+		const events = [
+			'beforeinput',
+			'input',
+			'compositionstart',
+			'compositionend',
+			'compositionupdate',
+			'keydown',
+		];
+
+		events.forEach( ( eventType ) => {
+			node.addEventListener( eventType, onInput );
+		} );
+
+		// function onFocusOut( event ) {
+		// 	if ( event.relatedTarget === null ) {
+		// 		// The focus is lost, put it on the wrapper.
+		// 		node.focus();
+		// 	}
+		// }
+
+		// node.addEventListener( 'focusout', onFocusOut );
+
 		node.addEventListener( 'beforeinput', onBeforeInput );
 		node.addEventListener( 'keydown', onKeyDown );
 		node.addEventListener( 'compositionstart', onCompositionStart );
+
 		return () => {
+			events.forEach( ( eventType ) => {
+				node.removeEventListener( eventType, onInput );
+			} );
+
+			// node.removeEventListener( 'focusout', onFocusOut );
+
 			node.removeEventListener( 'beforeinput', onBeforeInput );
 			node.removeEventListener( 'keydown', onKeyDown );
 			node.removeEventListener( 'compositionstart', onCompositionStart );

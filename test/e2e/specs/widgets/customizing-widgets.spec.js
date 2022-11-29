@@ -259,11 +259,15 @@ test.describe( 'Widgets Customizer', () => {
 		const firstParagraphBlock = page.locator(
 			'role=document[name="Paragraph block"i] >> text="First Paragraph"'
 		);
-		await expect( firstParagraphBlock ).toBeFocused();
+		await expect(
+			await firstParagraphBlock.getAttribute( 'class' )
+		).toContain( 'is-selected' );
 
 		// Expect to focus on a already focused widget.
 		await editParagraphWidget.click();
-		await expect( firstParagraphBlock ).toBeFocused();
+		await expect(
+			await firstParagraphBlock.getAttribute( 'class' )
+		).toContain( 'is-selected' );
 
 		const headingWidget = previewFrame.locator(
 			'.widget:has-text("First Heading")'
@@ -277,7 +281,9 @@ test.describe( 'Widgets Customizer', () => {
 		const headingBlock = page.locator(
 			'role=document[name="Block: Heading"i] >> text="First Heading"'
 		);
-		await expect( headingBlock ).toBeFocused();
+		await expect( await headingBlock.getAttribute( 'class' ) ).toContain(
+			'is-selected'
+		);
 	} );
 
 	test( 'should clear block selection', async ( {

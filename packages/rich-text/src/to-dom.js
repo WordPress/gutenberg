@@ -290,8 +290,6 @@ export function applySelection( { startPath, endPath }, current ) {
 	range.setStart( startContainer, startOffset );
 	range.setEnd( endContainer, endOffset );
 
-	const { activeElement } = ownerDocument;
-
 	if ( selection.rangeCount > 0 ) {
 		// If the to be added range and the live range are the same, there's no
 		// need to remove the live range and add the equivalent range.
@@ -303,18 +301,4 @@ export function applySelection( { startPath, endPath }, current ) {
 	}
 
 	selection.addRange( range );
-
-	// This function is not intended to cause a shift in focus. Since the above
-	// selection manipulations may shift focus, ensure that focus is restored to
-	// its previous state.
-	if ( activeElement !== ownerDocument.activeElement ) {
-		// The `instanceof` checks protect against edge cases where the focused
-		// element is not of the interface HTMLElement (does not have a `focus`
-		// or `blur` property).
-		//
-		// See: https://github.com/Microsoft/TypeScript/issues/5901#issuecomment-431649653
-		if ( activeElement instanceof defaultView.HTMLElement ) {
-			activeElement.focus();
-		}
-	}
 }
