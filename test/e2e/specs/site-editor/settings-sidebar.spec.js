@@ -76,6 +76,45 @@ test.describe( 'Settings sidebar', () => {
 		);
 		await expect( elements ).toContainText( 'Block' );
 	} );
+
+	test( 'should switch to block tab if we select a block, when Template is selected', async ( {
+		page,
+		editor,
+	} ) => {
+		await page.click(
+			'.edit-site-header-edit-mode__actions button[aria-label="Settings"]'
+		);
+		const element = page.locator(
+			'.edit-site-sidebar-edit-mode__panel-tab.is-active'
+		);
+		await expect( element ).not.toBeNull();
+		// By inserting the block is also selected.
+		await editor.insertBlock( { name: 'core/heading' } );
+
+		const elements = page.locator(
+			'.edit-site-sidebar-edit-mode__panel-tab.is-active'
+		);
+		await expect( elements ).not.toBeNull();
+	} );
+	test( 'should switch to Template tab when a block was selected and we select the Template', async ( {
+		page,
+		siteBarFunction,
+		editor,
+	} ) => {
+		await editor.insertBlock( { name: 'core/heading' } );
+		await siteBarFunction.toggleSidebar();
+		const element = page.locator(
+			'.edit-site-sidebar-edit-mode__panel-tab.is-active'
+		);
+		await expect( element ).toContainText( 'Block' );
+		await page.evaluate( () => {
+			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
+		} );
+		const elements = page.locator(
+			'.edit-site-sidebar-edit-mode__panel-tab.is-active'
+		);
+		await expect( elements ).toContainText( 'Template' );
+	} );
 } );
 
 class Sitebar {
@@ -111,9 +150,5 @@ class Sitebar {
 			title: await locator1.evaluate( ( node ) => node.innerText ),
 			description: await locator2.evaluate( ( node ) => node.innerText ),
 		};
-	}
-	async getActiveTabLabel() {
-		const locator3 = this.page.locator( '.edit-site-template-card__title' );
-		return await locator3.evaluate( ( node ) => node.innerText );
 	}
 }
