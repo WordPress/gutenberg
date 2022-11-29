@@ -18,6 +18,8 @@ import { Composite, CompositeGroup, useCompositeState } from '../composite';
 import { Root, Row } from './styles/alignment-matrix-control-styles';
 import AlignmentMatrixControlIcon from './icon';
 import { GRID, getItemId } from './utils';
+import type { WordPressComponentProps } from '../ui/context';
+import type { AlignmentMatrixControlProps } from './types';
 
 const noop = () => {};
 
@@ -39,7 +41,7 @@ export default function AlignmentMatrixControl( {
 	onChange = noop,
 	width = 92,
 	...props
-} ) {
+}: WordPressComponentProps< AlignmentMatrixControlProps, 'div', false > ) {
 	const [ immutableDefaultValue ] = useState( value ?? defaultValue );
 	const baseId = useBaseId( id );
 	const initialCurrentId = getItemId( baseId, immutableDefaultValue );
