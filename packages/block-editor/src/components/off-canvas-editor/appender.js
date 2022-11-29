@@ -74,6 +74,7 @@ export const Appender = forwardRef( ( props, ref ) => {
 						setAttributes( insertedBlock ),
 						insertedBlockAttributes
 					);
+					setInsertedBlock( null );
 				} }
 			/>
 		);
