@@ -291,15 +291,7 @@ describe( 'Tooltip', () => {
 			const button = screen.getByRole( 'button', { name: 'Hover Me!' } );
 			await user.hover( button );
 
-			// Tooltip with the shortcut text hasn't appeared yet
-			expect(
-				screen.queryByText( 'shortcut text' )
-			).not.toBeInTheDocument();
-
-			act( () => jest.advanceTimersByTime( TOOLTIP_DELAY ) );
-
-			// Tooltip with the shortcut text shows after the delay
-			expect( screen.getByText( 'shortcut text' ) ).toBeVisible();
+			expect( await screen.findByText( 'shortcut text' ) ).toBeVisible();
 		} );
 
 		it( 'should render the shortcut display text and aria-label when an object is passed as the shortcut with the correct properties', async () => {
@@ -322,16 +314,8 @@ describe( 'Tooltip', () => {
 			const button = screen.getByRole( 'button', { name: 'Hover Me!' } );
 			await user.hover( button );
 
-			// Tooltip with the shortcut text hasn't appeared yet
 			expect(
-				screen.queryByText( 'shortcut text' )
-			).not.toBeInTheDocument();
-
-			act( () => jest.advanceTimersByTime( TOOLTIP_DELAY ) );
-
-			// Tooltip with the shortcut text shows after the delay
-			expect(
-				screen.getByLabelText( 'shortcut label' )
+				await screen.findByLabelText( 'shortcut label' )
 			).toHaveTextContent( 'shortcut text' );
 		} );
 	} );
