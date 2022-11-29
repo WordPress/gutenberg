@@ -12,6 +12,8 @@ import {
 	Cell,
 	Point,
 } from './styles/alignment-matrix-control-icon-styles';
+import type { AlignmentMatrixControlIconProps } from './types';
+import type { WordPressComponentProps } from '../ui/context';
 
 const BASE_SIZE = 24;
 
@@ -22,7 +24,7 @@ export default function AlignmentMatrixControlIcon( {
 	style = {},
 	value = 'center',
 	...props
-} ) {
+}: WordPressComponentProps< AlignmentMatrixControlIconProps, 'div', false > ) {
 	const alignIndex = getAlignmentIndex( value );
 	const scale = ( size / BASE_SIZE ).toFixed( 2 );
 
@@ -35,16 +37,16 @@ export default function AlignmentMatrixControlIcon( {
 		...style,
 		transform: `scale(${ scale })`,
 	};
+	const iconProps = {
+		className: classes,
+		disablePointerEvents,
+		role: 'presentation',
+		size,
+		style: styles,
+	};
 
 	return (
-		<Root
-			{ ...props }
-			className={ classes }
-			disablePointerEvents={ disablePointerEvents }
-			role="presentation"
-			size={ size }
-			style={ styles }
-		>
+		<Root { ...props } { ...iconProps }>
 			{ ALIGNMENTS.map( ( align, index ) => {
 				const isActive = alignIndex === index;
 
