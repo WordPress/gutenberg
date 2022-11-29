@@ -16,7 +16,10 @@ export type BaseControlProps = {
 	 */
 	id?: string;
 	/**
-	 * If this property is added, a help text will be generated using help property as the content.
+	 * Additional description for the control.
+	 *
+	 * It is preferable to use plain text for `help`, as it can be accessibly associated with the control using `aria-describedby`.
+	 * When the `help` contains links, or otherwise non-plain text content, it will be associated with the control using `aria-details`.
 	 */
 	help?: ReactNode;
 	/**
