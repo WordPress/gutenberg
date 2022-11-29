@@ -64,6 +64,78 @@ const migrateTextAlign = ( attributes ) => {
 };
 
 const deprecated = [
+	// This deprecation covers the serialization of the `wp-block-heading` class
+	// into the block's markup after className support was enabled.
+	{
+		supports: {
+			align: [ 'wide', 'full' ],
+			anchor: true,
+			className: false,
+			color: {
+				gradients: true,
+				link: true,
+				__experimentalDefaultControls: {
+					background: true,
+					text: true,
+				},
+			},
+			spacing: {
+				margin: true,
+				padding: true,
+			},
+			typography: {
+				fontSize: true,
+				lineHeight: true,
+				__experimentalFontFamily: true,
+				__experimentalFontStyle: true,
+				__experimentalFontWeight: true,
+				__experimentalLetterSpacing: true,
+				__experimentalTextTransform: true,
+				__experimentalTextDecoration: true,
+				__experimentalDefaultControls: {
+					fontSize: true,
+					fontAppearance: true,
+					textTransform: true,
+				},
+			},
+			__experimentalSelector: 'h1,h2,h3,h4,h5,h6',
+			__unstablePasteTextInline: true,
+			__experimentalSlashInserter: true,
+		},
+		attributes: {
+			textAlign: {
+				type: 'string',
+			},
+			content: {
+				type: 'string',
+				source: 'html',
+				selector: 'h1,h2,h3,h4,h5,h6',
+				default: '',
+				__experimentalRole: 'content',
+			},
+			level: {
+				type: 'number',
+				default: 2,
+			},
+			placeholder: {
+				type: 'string',
+			},
+		},
+		save( { attributes } ) {
+			const { textAlign, content, level } = attributes;
+			const TagName = 'h' + level;
+
+			const className = classnames( {
+				[ `has-text-align-${ textAlign }` ]: textAlign,
+			} );
+
+			return (
+				<TagName { ...useBlockProps.save( { className } ) }>
+					<RichText.Content value={ content } />
+				</TagName>
+			);
+		},
+	},
 	{
 		supports: {
 			align: [ 'wide', 'full' ],
