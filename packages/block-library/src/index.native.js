@@ -194,6 +194,20 @@ addFilter(
 	}
 );
 
+// Deprecation of Gallery V1
+function galleryCheck( galleryBlock, blocksFlags ) {
+	const { galleryWithImageBlocks } = blocksFlags;
+
+	if (
+		typeof galleryWithImageBlocks === 'boolean' &&
+		! galleryWithImageBlocks
+	) {
+		// Mark the Gallery block as unsupported for users using <=5.8 or without the Gutenberg plugin
+		return null;
+	}
+	return galleryBlock;
+}
+
 /**
  * Function to register core blocks provided by the block editor.
  *
@@ -203,8 +217,10 @@ addFilter(
  *
  * registerCoreBlocks();
  * ```
+ * @param {Object} [blocksFlags] Experimental flags
+ *
  */
-export const registerCoreBlocks = () => {
+export const registerCoreBlocks = ( blocksFlags ) => {
 	// When adding new blocks to this list please also consider updating /src/block-support/supported-blocks.json in the Gutenberg-Mobile repo
 	[
 		paragraph,
@@ -221,7 +237,7 @@ export const registerCoreBlocks = () => {
 		quote,
 		mediaText,
 		preformatted,
-		gallery,
+		galleryCheck( gallery, blocksFlags ),
 		columns,
 		column,
 		group,

@@ -60,8 +60,11 @@ const gutenbergSetup = () => {
 const setupInitHooks = () => {
 	addAction( 'native.pre-render', 'core/react-native-editor', ( props ) => {
 		const capabilities = props.capabilities ?? {};
+		const blocksFlags = {
+			galleryWithImageBlocks: props?.galleryWithImageBlocks,
+		};
 
-		registerBlocks();
+		registerBlocks( blocksFlags );
 
 		// Unregister non-supported blocks by capabilities
 		if (
@@ -119,12 +122,12 @@ const setupInitHooks = () => {
 };
 
 let blocksRegistered = false;
-const registerBlocks = () => {
+const registerBlocks = ( blocksFlags ) => {
 	if ( blocksRegistered ) {
 		return;
 	}
 
-	registerCoreBlocks();
+	registerCoreBlocks( blocksFlags );
 
 	blocksRegistered = true;
 };

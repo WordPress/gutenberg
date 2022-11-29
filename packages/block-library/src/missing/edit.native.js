@@ -35,6 +35,10 @@ import styles from './style.scss';
 // Blocks that can't be edited through the Unsupported block editor identified by their name.
 const UBE_INCOMPATIBLE_BLOCKS = [ 'core/block' ];
 const I18N_BLOCK_SCHEMA_TITLE = 'block title';
+const CUSTOM_BLOCK_TITLES = {
+	/* translators: Unsupported block alert title. %s: The localized block name */
+	Gallery: __( "'%s' needs an updated version of WordPress" ),
+};
 
 export class UnsupportedBlockEdit extends Component {
 	constructor( props ) {
@@ -120,6 +124,15 @@ export class UnsupportedBlockEdit extends Component {
 		}
 	}
 
+	getSheetTitle( blockTitle ) {
+		if ( CUSTOM_BLOCK_TITLES[ blockTitle ] ) {
+			return CUSTOM_BLOCK_TITLES[ blockTitle ];
+		}
+
+		/* translators: Missing block alert title. %s: The localized block name */
+		return __( "'%s' is not fully-supported" );
+	}
+
 	renderSheet( blockTitle, blockName ) {
 		const {
 			getStylesFromColorScheme,
@@ -146,8 +159,7 @@ export class UnsupportedBlockEdit extends Component {
 			styles.infoSheetIconDark
 		);
 
-		/* translators: Missing block alert title. %s: The localized block name */
-		const titleFormat = __( "'%s' is not fully-supported" );
+		const titleFormat = this.getSheetTitle( blockTitle );
 		const infoTitle = sprintf( titleFormat, blockTitle );
 		const missingBlockDetail = applyFilters(
 			'native.missing_block_detail',

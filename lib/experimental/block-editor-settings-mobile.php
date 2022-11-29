@@ -31,6 +31,8 @@ function gutenberg_get_block_editor_settings_mobile( $settings ) {
 		$settings['__experimentalEnableQuoteBlockV2'] = true;
 		// To tell mobile that the site uses list v2 (inner blocks).
 		$settings['__experimentalEnableListBlockV2'] = true;
+		// To tell mobile if it should mark the Gallery block as Unsupported for older versions of WordPress
+		$settings['__unstableGalleryWithImageBlocks'] = is_wp_version_compatible( '5.9' );
 	}
 
 	return $settings;
