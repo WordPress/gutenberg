@@ -196,7 +196,7 @@ addFilter(
 
 // Deprecation of Gallery V1
 function galleryCheck( galleryBlock, blocksFlags ) {
-	const { galleryWithImageBlocks } = blocksFlags;
+	const { galleryWithImageBlocks } = blocksFlags || {};
 
 	if (
 		typeof galleryWithImageBlocks === 'boolean' &&
