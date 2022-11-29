@@ -34,7 +34,8 @@ exports.android = {
 	appPackage: 'com.gutenberg',
 	appActivity: 'com.gutenberg.MainActivity',
 	deviceOrientation: 'portrait',
-	appiumVersion: '1.22.0',
+	appiumVersion: '1.22.1',
 	app: undefined,
 	disableWindowAnimation: true,
+	newCommandTimeout: 120,
 };
