@@ -96,7 +96,10 @@ export default function PageListEdit( {
 		}, [] );
 	};
 
-	const blockList = getBlockList();
+	const blockList = useMemo( getBlockList, [
+		pagesByParentId,
+		parentPageID,
+	] );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps );
 
@@ -165,7 +168,7 @@ export default function PageListEdit( {
 		if ( blockList ) {
 			replaceInnerBlocks( clientId, blockList );
 		}
-	}, [ clientId, parentPageID, hasResolvedPages ] );
+	}, [ clientId, blockList ] );
 
 	return (
 		<>
