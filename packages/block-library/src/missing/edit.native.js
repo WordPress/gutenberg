@@ -35,9 +35,12 @@ import styles from './style.scss';
 // Blocks that can't be edited through the Unsupported block editor identified by their name.
 const UBE_INCOMPATIBLE_BLOCKS = [ 'core/block' ];
 const I18N_BLOCK_SCHEMA_TITLE = 'block title';
-const CUSTOM_BLOCK_TITLES = {
-	/* translators: Unsupported block alert title. %s: The localized block name */
-	Gallery: __( "'%s' needs an updated version of WordPress" ),
+const CUSTOM_UNSUPPORTED_BLOCK_MESSAGE = {
+	Gallery: {
+		/* translators: Unsupported block alert title. %s: The localized block name */
+		title: __( "'%s' needs an updated version of WordPress" ),
+		description: __( 'Please update to version 5.9 or above' ),
+	},
 };
 
 export class UnsupportedBlockEdit extends Component {
@@ -125,12 +128,23 @@ export class UnsupportedBlockEdit extends Component {
 	}
 
 	getSheetTitle( blockTitle ) {
-		if ( CUSTOM_BLOCK_TITLES[ blockTitle ] ) {
-			return CUSTOM_BLOCK_TITLES[ blockTitle ];
+		if ( CUSTOM_UNSUPPORTED_BLOCK_MESSAGE[ blockTitle ] ) {
+			return CUSTOM_UNSUPPORTED_BLOCK_MESSAGE[ blockTitle ]?.title;
 		}
 
 		/* translators: Missing block alert title. %s: The localized block name */
 		return __( "'%s' is not fully-supported" );
+	}
+
+	getSheetDescription( blockTitle ) {
+		if ( CUSTOM_UNSUPPORTED_BLOCK_MESSAGE[ blockTitle ] ) {
+			return CUSTOM_UNSUPPORTED_BLOCK_MESSAGE[ blockTitle ]?.description;
+		}
+
+		return applyFilters(
+			'native.missing_block_detail',
+			__( 'We are working hard to add more blocks with each release.' )
+		);
 	}
 
 	renderSheet( blockTitle, blockName ) {
@@ -161,10 +175,7 @@ export class UnsupportedBlockEdit extends Component {
 
 		const titleFormat = this.getSheetTitle( blockTitle );
 		const infoTitle = sprintf( titleFormat, blockTitle );
-		const missingBlockDetail = applyFilters(
-			'native.missing_block_detail',
-			__( 'We are working hard to add more blocks with each release.' )
-		);
+		const missingBlockDetail = this.getSheetDescription( blockTitle );
 		const missingBlockActionButton = applyFilters(
 			'native.missing_block_action_button',
 			__( 'Edit using web editor' )
