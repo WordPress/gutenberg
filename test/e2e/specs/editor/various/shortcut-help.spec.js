@@ -20,7 +20,7 @@ test.describe( 'keyboard shortcut help modal', () => {
 			.click();
 		//await editor.clickBlockOptionsMenuItem('Keyboard shortcuts');
 		const shortcutHelpModalElements = await page.locator(
-			'.edit-post-keyboard-shortcut-help-modal'
+			'role=dialog[name="Keyboard shortcuts"]'
 		);
 		await expect( shortcutHelpModalElements ).toHaveCount( 1 );
 	} );
@@ -33,11 +33,9 @@ test.describe( 'keyboard shortcut help modal', () => {
 		await page
 			.locator( 'role=menuitem[name="Keyboard shortcuts ⌃⌥H"]' )
 			.click();
-		await page
-			.locator( '.components-modal__header .components-button' )
-			.click();
+		await page.locator( 'role=button[name="Close"]' ).click();
 		const shortcutHelpModalElements = await page.locator(
-			'.edit-post-keyboard-shortcut-help-modal'
+			'role=dialog[name="Keyboard shortcuts"]'
 		);
 		await expect( shortcutHelpModalElements ).toHaveCount( 0 );
 	} );
@@ -51,12 +49,10 @@ test.describe( 'keyboard shortcut help modal', () => {
 		await page
 			.locator( 'role=menuitem[name="Keyboard shortcuts ⌃⌥H"]' )
 			.click();
-		await page
-			.locator( '.components-modal__header .components-button' )
-			.click();
+		await page.locator( 'role=button[name="Close"]' ).click();
 		await pageUtils.pressKeyWithModifier( 'access', 'h' );
 		const shortcutHelpModalElements = await page.locator(
-			'.edit-post-keyboard-shortcut-help-modal'
+			'role=dialog[name="Keyboard shortcuts"]'
 		);
 		await expect( shortcutHelpModalElements ).toHaveCount( 1 );
 	} );
@@ -70,13 +66,11 @@ test.describe( 'keyboard shortcut help modal', () => {
 		await page
 			.locator( 'role=menuitem[name="Keyboard shortcuts ⌃⌥H"]' )
 			.click();
-		await page
-			.locator( '.components-modal__header .components-button' )
-			.click();
+		await page.locator( 'role=button[name="Close"]' ).click();
 		await pageUtils.pressKeyWithModifier( 'access', 'h' );
 		await pageUtils.pressKeyWithModifier( 'access', 'h' );
 		const shortcutHelpModalElements = await page.locator(
-			'.edit-post-keyboard-shortcut-help-modal'
+			'role=dialog[name="Keyboard shortcuts"]'
 		);
 		await expect( shortcutHelpModalElements ).toHaveCount( 0 );
 	} );
