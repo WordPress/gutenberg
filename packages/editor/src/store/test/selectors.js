@@ -61,7 +61,7 @@ selectorNames.forEach( ( name ) => {
 					};
 				}
 
-				return edits;
+				return edits ?? {};
 			},
 
 			hasEditsForEntityRecord() {
@@ -1226,6 +1226,7 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						blocks: {
+							isDirty: false,
 							value: [],
 						},
 						edits: {},
@@ -1336,6 +1337,7 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						blocks: {
+							isDirty: false,
 							value: [
 								{
 									clientId: 123,
@@ -1363,6 +1365,7 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						blocks: {
+							isDirty: false,
 							value: [
 								{
 									clientId: 123,
