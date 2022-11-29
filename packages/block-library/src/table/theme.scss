@@ -13,8 +13,4 @@
 	th {
 		word-break: normal;
 	}
-
-	figcaption {
-		@include caption-style-theme();
-	}
 }

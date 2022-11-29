@@ -18,6 +18,13 @@
 		padding: 0.5em;
 	}
 
+	// Match caption styles across front end and editor
+	figcaption {
+		@include caption-style-theme();
+
+		color: inherit;
+	}
+
 	// Fixed layout toggle
 	.has-fixed-layout {
 		table-layout: fixed;
