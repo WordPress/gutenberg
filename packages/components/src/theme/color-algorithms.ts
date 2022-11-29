@@ -33,7 +33,7 @@ export function generateThemeVariables(
 	return { colors: generatedColors };
 }
 
-export function validateInputs( inputs: ThemeInputValues ) {
+function validateInputs( inputs: ThemeInputValues ) {
 	for ( const [ key, value ] of Object.entries( inputs ) ) {
 		if ( typeof value !== 'undefined' && ! colord( value ).isValid() ) {
 			warning(
@@ -55,22 +55,22 @@ export function checkContrasts(
 	return {
 		accent: colord( background ).isReadable( accent )
 			? undefined
-			: `wp.components.Theme: The background color ("${ background }") does not have sufficient contrast against the accent color ("${ accent }").`,
+			: `The background color ("${ background }") does not have sufficient contrast against the accent color ("${ accent }").`,
 		foreground: colord( background ).isReadable( foreground )
 			? undefined
-			: `wp.components.Theme: The background color provided ("${ background }") does not have sufficient contrast against the standard foreground colors.`,
+			: `The background color provided ("${ background }") does not have sufficient contrast against the standard foreground colors.`,
 		grays:
 			colord( background ).contrast( gray[ 600 ] ) >= 3 &&
 			colord( background ).contrast( gray[ 700 ] ) >= 4.5
 				? undefined
-				: `wp.components.Theme: The background color provided ("${ background }") cannot generate a set of grayscale foreground colors with sufficient contrast. Try adjusting the color to be lighter or darker.`,
+				: `The background color provided ("${ background }") cannot generate a set of grayscale foreground colors with sufficient contrast. Try adjusting the color to be lighter or darker.`,
 	};
 }
 
 function warnContrastIssues( issues: ReturnType< typeof checkContrasts > ) {
 	for ( const error of Object.values( issues ) ) {
 		if ( error ) {
-			warning( error );
+			warning( 'wp.components.Theme: ' + error );
 		}
 	}
 }

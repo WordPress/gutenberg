@@ -8,7 +8,7 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
  */
 import Theme from '../index';
 import Button from '../../button';
-import { generateThemeVariables } from '../color-algorithms';
+import { generateThemeVariables, checkContrasts } from '../color-algorithms';
 import { HStack } from '../../h-stack';
 
 const meta: ComponentMeta< typeof Theme > = {
@@ -58,6 +58,9 @@ export const ColorScheme: ComponentStory< typeof Theme > = ( {
 } ) => {
 	const { colors } = generateThemeVariables( { accent, background } );
 	const { gray, ...otherColors } = colors;
+	const contrastIssues = Object.entries(
+		checkContrasts( { accent, background }, colors )
+	).filter( ( [ _, error ] ) => !! error );
 
 	const Chip = ( { color, name }: { color: string; name: string } ) => (
 		<HStack justify="flex-start">
@@ -85,6 +88,16 @@ export const ColorScheme: ComponentStory< typeof Theme > = ( {
 						key={ key }
 					/>
 				)
+			) }
+			{ contrastIssues.length && (
+				<>
+					<h2>Contrast issues</h2>
+					<ul>
+						{ contrastIssues.map( ( [ key, error ] ) => (
+							<li key={ key }>{ error }</li>
+						) ) }
+					</ul>
+				</>
 			) }
 		</>
 	);
