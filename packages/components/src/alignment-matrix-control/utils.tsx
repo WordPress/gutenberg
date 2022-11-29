@@ -2,8 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+/**
+ * Internal dependencies
+ */
+import type { AlignmentMatrixControlValue } from './types';
 
-export const GRID = [
+export const GRID: AlignmentMatrixControlValue[][] = [
 	[ 'top left', 'top center', 'top right' ],
 	[ 'center left', 'center center', 'center right' ],
 	[ 'bottom left', 'bottom center', 'bottom right' ],
@@ -63,7 +67,7 @@ export function getAlignmentIndex(
 	alignment: string = 'center'
 ): number | undefined {
 	const item = transformValue( alignment ).replace( '-', ' ' );
-	const index = ALIGNMENTS.indexOf( item );
+	const index = ALIGNMENTS.indexOf( item as AlignmentMatrixControlValue );
 
 	return index > -1 ? index : undefined;
 }

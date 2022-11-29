@@ -19,11 +19,14 @@ import { Root, Row } from './styles/alignment-matrix-control-styles';
 import AlignmentMatrixControlIcon from './icon';
 import { GRID, getItemId } from './utils';
 import type { WordPressComponentProps } from '../ui/context';
-import type { AlignmentMatrixControlProps } from './types';
+import type {
+	AlignmentMatrixControlProps,
+	AlignmentMatrixControlValue,
+} from './types';
 
 const noop = () => {};
 
-function useBaseId( id ) {
+function useBaseId( id: string | undefined ) {
 	const instanceId = useInstanceId(
 		AlignmentMatrixControl,
 		'alignment-matrix-control'
@@ -52,7 +55,7 @@ export default function AlignmentMatrixControl( {
 		rtl: isRTL(),
 	} );
 
-	const handleOnChange = ( nextValue ) => {
+	const handleOnChange = ( nextValue: AlignmentMatrixControlValue ) => {
 		onChange( nextValue );
 	};
 
