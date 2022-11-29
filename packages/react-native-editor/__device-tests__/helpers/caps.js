@@ -38,4 +38,5 @@ exports.android = {
 	app: undefined,
 	disableWindowAnimation: true,
 	newCommandTimeout: 120,
+	adbExecTimeout: 60000,
 };
