@@ -15,6 +15,14 @@
  */
 class Gutenberg_REST_Block_Patterns_Controller_6_2 extends Gutenberg_REST_Block_Patterns_Controller_6_1 {
 	/**
+	 * Defines whether remote patterns should be loaded.
+	 *
+	 * @since 6.0.0
+	 * @var bool
+	 */
+	private $remote_patterns_loaded;
+
+	/**
 	 * An array that maps old categories names to new ones.
 	 *
 	 * @since 6.2.0

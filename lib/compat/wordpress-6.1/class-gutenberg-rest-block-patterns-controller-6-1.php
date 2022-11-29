@@ -1,6 +1,6 @@
 <?php
 /**
- * REST API: Gutenberg_REST_Block_Patterns_Controller class
+ * REST API: Gutenberg_REST_Block_Patterns_Controller_6_1 class
  *
  * @package    Gutenberg
  * @subpackage REST_API
