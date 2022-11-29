@@ -137,15 +137,6 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 }
 
 /**
- * Clean the cache used by the `gutenberg_get_global_stylesheet` function.
- *
- * Not to backport to core. Delete it instead.
- */
-function gutenberg_get_global_stylesheet_clean_cache() {
-	_deprecated_function( __METHOD__, '14.7' );
-}
-
-/**
  * Function to get the settings resulting of merging core, theme, and user data.
  *
  * @param array $path    Path to the specific setting to retrieve. Optional.
