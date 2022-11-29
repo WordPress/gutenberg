@@ -145,7 +145,12 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalFetchPageEntities: fetchPagesEntities,
 		};
-	}, [ storedSettings, blockPatterns, blockPatternCategories ] );
+	}, [
+		storedSettings,
+		blockPatterns,
+		blockPatternCategories,
+		fetchPagesEntities,
+	] );
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
