@@ -18,6 +18,7 @@ class Gutenberg_REST_Custom_CSS_Controller extends WP_REST_Controller {
 	 */
 	public function __construct() {
 		$this->namespace = 'wp/v2';
+
 		/*
 		 * The rest base is different from the name of the post type,
 		 * since it uses wp_get_custom_css().
@@ -55,11 +56,9 @@ class Gutenberg_REST_Custom_CSS_Controller extends WP_REST_Controller {
 	/**
 	 * Retrieves the custom CSS
 	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 *
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
 	 */
-	public function get_items( $request ) {
+	public function get_items() {
 		$data = wp_get_custom_css();
 
 		return rest_ensure_response( $data );
@@ -67,6 +66,7 @@ class Gutenberg_REST_Custom_CSS_Controller extends WP_REST_Controller {
 
 	/**
 	 * Update custom CSS
+	 *
 	 * @see https://developer.wordpress.org/reference/functions/wp_update_custom_css_post
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
@@ -103,19 +103,19 @@ class Gutenberg_REST_Custom_CSS_Controller extends WP_REST_Controller {
 			'title'      => 'custom_css',
 			'type'       => 'object',
 			'properties' => array(
-				'id'       => array(
+				'id'      => array(
 					'description' => __( 'ID of the custom CSS.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'view', 'edit' ),
 					'readonly'    => true,
 				),
-				'theme'        => array(
+				'theme'   => array(
 					'description' => __( 'The theme slug.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'view', 'edit' ),
 					'readonly'    => true,
 				),
-				'content'        => array(
+				'content' => array(
 					'description' => __( 'The custom CSS provided by the user.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'view', 'edit' ),
