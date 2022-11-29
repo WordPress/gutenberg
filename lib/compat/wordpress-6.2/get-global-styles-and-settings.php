@@ -227,3 +227,29 @@ function gutenberg_get_global_settings( $path = array(), $context = array() ) {
 	$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin )->get_settings();
 	return _wp_array_get( $settings, $path, $settings );
 }
+
+/**
+ * Tell the cache mechanisms not to persist theme.json data across requests.
+ * The data stored under this cache group:
+ *
+ * - wp_theme_has_theme_json
+ * - gutenberg_get_global_stylesheet
+ *
+ * There is some hooks consumers can use to modify parts
+ * of the theme.json logic.
+ * See https://make.wordpress.org/core/2022/10/10/filters-for-theme-json-data/
+ *
+ * The rationale to make this cache group non persistent is to make sure derived data
+ * from theme.json is always fresh from the potential modifications done via hooks
+ * that can use dynamic data (modify the stylesheet depending on some option,
+ * or settings depending on user permissions, etc.).
+ *
+ * A different alternative considered was to invalidate the cache upon certain
+ * events such as options add/update/delete, user meta, etc.
+ * It was judged not enough, hence this approach.
+ * See https://github.com/WordPress/gutenberg/pull/45372
+ */
+function _gutenberg_add_non_persistent_theme_json_cache_group() {
+	wp_cache_add_non_persistent_groups( 'theme_json' );
+}
+add_action( 'init', '_gutenberg_add_non_persistent_theme_json_cache_group' );
