@@ -84,17 +84,10 @@ class Gutenberg_REST_Block_Patterns_Controller_6_2 extends Gutenberg_REST_Block_
 	 */
 	protected function migrate_pattern_categories( $pattern ) {
 		if ( isset( $pattern['categories'] ) && is_array( $pattern['categories'] ) ) {
-			$old_categories = array_intersect( $pattern['categories'], array_keys( static::$categories_migration ) );
-			if ( ! empty( $old_categories ) ) {
-				$pattern['categories'] = array_merge(
-					array_diff( $pattern['categories'], $old_categories ),
-					array_map(
-						function( $category ) {
-							return static::$categories_migration[ $category ];
-						},
-						$old_categories
-					)
-				);
+			foreach ( $pattern['categories'] as $i => $category ) {
+				if ( array_key_exists( $category, static::$categories_migration ) ) {
+					$pattern['categories'][ $i ] = static::$categories_migration[ $category ];
+				}
 			}
 		}
 		return $pattern;
