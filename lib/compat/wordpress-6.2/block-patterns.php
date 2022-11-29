@@ -122,13 +122,6 @@ function gutenberg_register_core_block_patterns_and_categories() {
 			'description' => __( 'Display your latest posts in lists, grids or other layouts.', 'gutenberg' ),
 		)
 	);
-	register_block_pattern_category(
-		'products',
-		array(
-			'label'       => _x( 'Products', 'Block pattern category', 'gutenberg' ),
-			'description' => __( 'Display your store’s products in lists, grids or other layouts.', 'gutenberg' ),
-		)
-	);
 	// Site building pattern categories.
 	register_block_pattern_category(
 		'footer',
@@ -142,55 +135,6 @@ function gutenberg_register_core_block_patterns_and_categories() {
 		array(
 			'label'       => _x( 'Headers', 'Block pattern category', 'gutenberg' ),
 			'description' => __( 'A variety of header designs displaying your site title and navigation.', 'gutenberg' ),
-		)
-	);
-	register_block_pattern_category(
-		'post-content',
-		array(
-			'label'       => _x( 'Post Content', 'Block pattern category', 'gutenberg' ),
-			'description' => __( 'Your post and page content.', 'gutenberg' ),
-		)
-	);
-	register_block_pattern_category(
-		'comments',
-		array(
-			'label'       => _x( 'Comments', 'Block pattern category', 'gutenberg' ),
-			'description' => __( 'Different ways of displaying your post or page\'s comments.', 'gutenberg' ),
-		)
-	);
-	register_block_pattern_category(
-		'pagination',
-		array(
-			'label'       => _x( 'Pagination', 'Block pattern category', 'gutenberg' ),
-			'description' => __( 'A variety of designs for navigating your posts.', 'gutenberg' ),
-		)
-	);
-	register_block_pattern_category(
-		'comment-pagination',
-		array(
-			'label'       => _x( 'Comment Pagination', 'Block pattern category', 'gutenberg' ),
-			'description' => __( 'A variety of designs to browse through a big list of comments.', 'gutenberg' ),
-		)
-	);
-	register_block_pattern_category(
-		'archive-headings',
-		array(
-			'label'       => _x( 'Archive Headings', 'Block pattern category', 'gutenberg' ),
-			'description' => __( 'A variety of designs for your archive heading.', 'gutenberg' ),
-		)
-	);
-	register_block_pattern_category(
-		'404',
-		array(
-			'label'       => _x( '404', 'Block pattern category', 'gutenberg' ),
-			'description' => __( 'A variety of designs for when a page cannot be found.', 'gutenberg' ),
-		)
-	);
-	register_block_pattern_category(
-		'search',
-		array(
-			'label'       => _x( 'Search', 'Block pattern category', 'gutenberg' ),
-			'description' => __( 'Different layouts to display search results.', 'gutenberg' ),
 		)
 	);
 }
