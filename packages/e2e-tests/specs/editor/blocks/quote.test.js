@@ -187,11 +187,13 @@ describe( 'Quote', () => {
 		await page.keyboard.press( 'Backspace' );
 
 		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
-		"<!-- wp:quote -->
-		<blockquote class=\\"wp-block-quote\\"><!-- wp:paragraph -->
+		"<!-- wp:paragraph -->
 		<p>1</p>
-		<!-- /wp:paragraph --><cite>2</cite></blockquote>
-		<!-- /wp:quote -->"
+		<!-- /wp:paragraph -->
+
+		<!-- wp:paragraph -->
+		<p>2</p>
+		<!-- /wp:paragraph -->"
 	` );
 	} );
 } );
