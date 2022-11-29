@@ -15,14 +15,6 @@
  */
 class Gutenberg_REST_Block_Patterns_Controller_6_2 extends Gutenberg_REST_Block_Patterns_Controller_6_1 {
 	/**
-	 * Defines whether remote patterns should be loaded.
-	 *
-	 * @since 6.0.0
-	 * @var bool
-	 */
-	private $remote_patterns_loaded;
-
-	/**
 	 * An array that maps old categories names to new ones.
 	 *
 	 * @since 6.2.0
@@ -82,17 +74,28 @@ class Gutenberg_REST_Block_Patterns_Controller_6_2 extends Gutenberg_REST_Block_
 		return rest_ensure_response( $response );
 	}
 
-	protected static function migrate_pattern_categories( $pattern ) {
+	/**
+	 * Migrates old pattern categories to new ones.
+	 *
+	 * @since 6.2.0
+	 *
+	 * @param array $pattern Raw pattern as registered, before any changes.
+	 * @return array Migrated pattern.
+	 */
+	protected function migrate_pattern_categories( $pattern ) {
 		if ( isset( $pattern['categories'] ) && is_array( $pattern['categories'] ) ) {
-			$new_categories = array();
-			foreach ( $pattern['categories'] as $category ) {
-				if ( isset( static::$categories_migration[ $category ] ) ) {
-					$new_categories[] = static::$categories_migration[ $category ];
-				} else {
-					$new_categories[] = $category;
-				}
+			$old_categories = array_intersect( $pattern['categories'], array_keys( static::$categories_migration ) );
+			if ( ! empty( $old_categories ) ) {
+				$pattern['categories'] = array_merge(
+					array_diff( $pattern['categories'], $old_categories ),
+					array_map(
+						function( $category ) {
+							return static::$categories_migration[ $category ];
+						},
+						$old_categories
+					)
+				);
 			}
-			$pattern['categories'] = $new_categories;
 		}
 		return $pattern;
 	}
