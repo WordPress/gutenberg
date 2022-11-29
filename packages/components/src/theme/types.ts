@@ -8,7 +8,7 @@ export type ThemeInputValues = {
 	 * The accent color (used by components as the primary color).
 	 *
 	 * If an accent color is not defined, the default fallback value is the original
-	 * WP Admin main theme color. No all valid CSS color syntaxes are supported —
+	 * WP Admin main theme color. Not all valid CSS color syntaxes are supported —
 	 * in particular, keywords (like `'currentcolor'`, `'inherit'`, `'initial'`,
 	 * `'revert'`, `'unset'`...) and CSS custom properties (e.g.
 	 * `var(--my-custom-property)`) are _not_ supported values for this property.
@@ -22,7 +22,7 @@ export type ThemeInputValues = {
 	 * The actual background color will need to be set on the component's container element.
 	 *
 	 * If a background color is not defined, the default fallback value is #fff.
-	 * No all valid CSS color syntaxes are supported —
+	 * Not all valid CSS color syntaxes are supported —
 	 * in particular, keywords (like `'currentcolor'`, `'inherit'`, `'initial'`,
 	 * `'revert'`, `'unset'`...) and CSS custom properties (e.g.
 	 * `var(--my-custom-property)`) are _not_ supported values for this property.
