@@ -397,7 +397,7 @@ describe( 'Searching for a link', () => {
 		const user = userEvent.setup();
 		const searchTerm = '   Hello    ';
 
-		const { container } = render( <LinkControl /> );
+		render( <LinkControl /> );
 
 		// Search Input UI.
 		const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
@@ -408,11 +408,16 @@ describe( 'Searching for a link', () => {
 		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
 		await eventLoopTick();
 
-		const searchResultTextHighlightElements = Array.from(
-			container.querySelectorAll(
-				'[role="listbox"] button[role="option"] mark'
-			)
-		);
+		const searchResults = within(
+			screen.getByRole( 'listbox', {
+				name: /Search results for.*/,
+			} )
+		).getAllByRole( 'option' );
+
+		const searchResultTextHighlightElements = Array.from( searchResults )
+			.map( ( result ) => result.querySelector( 'mark' ) )
+			.flat()
+			.filter( Boolean );
 
 		const invalidResults = searchResultTextHighlightElements.find(
 			( mark ) => mark.innerHTML !== 'Hello'
