@@ -38,6 +38,7 @@ import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
 import { store as editSiteStore } from '../../store';
+import { useHasStyleBook } from '../style-book';
 
 const preventDefault = ( event ) => {
 	event.preventDefault();
@@ -113,6 +114,8 @@ export default function HeaderEditMode() {
 		[ setIsListViewOpened, isListViewOpen ]
 	);
 
+	const hasStyleBook = useHasStyleBook();
+
 	const isFocusMode = templateType === 'wp_template_part';
 
 	/* translators: button label text should, if possible, be under 16 characters. */
@@ -145,7 +148,7 @@ export default function HeaderEditMode() {
 						isPressed={ isInserterOpen }
 						onMouseDown={ preventDefault }
 						onClick={ openInserter }
-						disabled={ ! isVisualMode }
+						disabled={ ! isVisualMode || hasStyleBook }
 						icon={ plus }
 						label={ showIconLabels ? shortLabel : longLabel }
 						showTooltip={ ! showIconLabels }
@@ -158,7 +161,7 @@ export default function HeaderEditMode() {
 								variant={
 									showIconLabels ? 'tertiary' : undefined
 								}
-								disabled={ ! isVisualMode }
+								disabled={ ! isVisualMode || hasStyleBook }
 							/>
 							<ToolbarItem
 								as={ UndoButton }
@@ -166,6 +169,7 @@ export default function HeaderEditMode() {
 								variant={
 									showIconLabels ? 'tertiary' : undefined
 								}
+								disabled={ hasStyleBook }
 							/>
 							<ToolbarItem
 								as={ RedoButton }
@@ -173,11 +177,16 @@ export default function HeaderEditMode() {
 								variant={
 									showIconLabels ? 'tertiary' : undefined
 								}
+								disabled={ hasStyleBook }
 							/>
 							<ToolbarItem
 								as={ Button }
 								className="edit-site-header-edit-mode__list-view-toggle"
-								disabled={ ! isVisualMode && isZoomedOutView }
+								disabled={
+									! isVisualMode ||
+									isZoomedOutView ||
+									hasStyleBook
+								}
 								icon={ listView }
 								isPressed={ isListViewOpen }
 								/* translators: button label text should, if possible, be under 16 characters. */
@@ -205,6 +214,7 @@ export default function HeaderEditMode() {
 												: 'zoom-out'
 										);
 									} }
+									disabled={ hasStyleBook }
 								/>
 							) }
 						</>
@@ -213,12 +223,12 @@ export default function HeaderEditMode() {
 			</NavigableToolbar>
 
 			<div className="edit-site-header-edit-mode__center">
-				<DocumentActions />
+				{ hasStyleBook ? __( 'Style Book' ) : <DocumentActions /> }
 			</div>
 
 			<div className="edit-site-header-edit-mode__end">
 				<div className="edit-site-header-edit-mode__actions">
-					{ ! isFocusMode && (
+					{ ! isFocusMode && ! hasStyleBook && (
 						<div
 							className={ classnames(
 								'edit-site-header-edit-mode__preview-options',

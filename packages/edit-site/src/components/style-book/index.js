@@ -7,7 +7,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button, TabPanel, createSlotFill } from '@wordpress/components';
+import {
+	Button,
+	TabPanel,
+	createSlotFill,
+	__experimentalUseSlotFills as useSlotFills,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
 	getCategories,
@@ -24,8 +29,9 @@ import { useResizeObserver } from '@wordpress/compose';
  */
 import { useStyle } from '../global-styles';
 
+const SLOT_FILL_NAME = 'EditSiteStyleBook';
 const { Slot: StyleBookSlot, Fill: StyleBookFill } =
-	createSlotFill( 'EditSiteStyleBook' );
+	createSlotFill( SLOT_FILL_NAME );
 
 function getExamples() {
 	// Use our own example for the Heading block so that we can show multiple
@@ -155,7 +161,11 @@ function Example( { title, blocks, isSelected, onClick } ) {
 		</button>
 	);
 }
+function useHasStyleBook() {
+	const fills = useSlotFills( SLOT_FILL_NAME );
+	return !! fills?.length;
+}
 
 StyleBook.Slot = StyleBookSlot;
-
 export default StyleBook;
+export { useHasStyleBook };
