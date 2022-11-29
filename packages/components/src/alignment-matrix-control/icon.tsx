@@ -37,6 +37,13 @@ function AlignmentMatrixControlIcon( {
 		...style,
 		transform: `scale(${ scale })`,
 	};
+	const iconProps = {
+		className: classes,
+		disablePointerEvents,
+		role: 'presentation',
+		size,
+		style: styles,
+	};
 
 	return (
 		<Root
