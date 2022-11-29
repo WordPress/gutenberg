@@ -26,6 +26,10 @@ function ScaledBlockPreview( {
 	__experimentalPadding,
 	__experimentalMinHeight,
 } ) {
+	if ( ! viewportWidth ) {
+		viewportWidth = containerWidth;
+	}
+
 	const [ contentResizeListener, { height: contentHeight } ] =
 		useResizeObserver();
 	const { styles, assets, duotone } = useSelect( ( select ) => {
