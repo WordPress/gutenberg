@@ -427,7 +427,7 @@ export const withChildLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { attributes } = props;
 		const { style: { layout = {} } = {} } = attributes;
-		const { selfStretch, flexSize } = layout;
+		const { selfStretch, flexSize, breakOutOfLayout } = layout;
 		const hasChildLayout = selfStretch || flexSize;
 		const disableLayoutStyles = useSelect( ( select ) => {
 			const { getSettings } = select( blockEditorStore );
@@ -443,8 +443,9 @@ export const withChildLayoutStyles = createHigherOrderComponent(
 		let css = '';
 
 		if ( selfStretch === 'fixed' && flexSize ) {
+			const hasShrink = !! breakOutOfLayout;
 			css += `${ selector } {
-				flex-shrink: 0;
+				flex-shrink: ${ hasShrink ? 0 : 1 };
 				flex-basis: ${ flexSize };
 				box-sizing: border-box;
 			}`;

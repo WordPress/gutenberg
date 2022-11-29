@@ -334,10 +334,11 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$child_layout_styles = array();
 
 		if ( 'fixed' === $block['attrs']['style']['layout']['selfStretch'] && isset( $block['attrs']['style']['layout']['flexSize'] ) ) {
+			$has_shrink            = isset( $block['attrs']['style']['layout']['breakOutOfLayout'] ) && $block['attrs']['style']['layout']['breakOutOfLayout'];
 			$child_layout_styles[] = array(
 				'selector'     => ".$container_content_class",
 				'declarations' => array(
-					'flex-shrink' => '0',
+					'flex-shrink' => $has_shrink ? '0' : '1',
 					'flex-basis'  => $block['attrs']['style']['layout']['flexSize'],
 					'box-sizing'  => 'border-box',
 				),

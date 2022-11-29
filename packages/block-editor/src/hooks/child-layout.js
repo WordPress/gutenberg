@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalUnitControl as UnitControl,
@@ -24,6 +25,14 @@ function helpText( selfStretch ) {
 	}
 }
 
+function checkSelfStretchForInvalidValues( selfStretch, flexSize ) {
+	if ( selfStretch === 'fixed' && ! flexSize ) {
+		// If there's no defined size we shouldn't keep the fixed setting.
+		return 'fit';
+	}
+	return selfStretch;
+}
+
 /**
  * Inspector controls containing the child layout related configuration.
  *
@@ -41,15 +50,20 @@ export function ChildLayoutEdit( {
 } ) {
 	const { style = {} } = attributes;
 	const { layout: childLayout = {} } = style;
-	const { selfStretch, flexSize } = childLayout;
+	const { selfStretch, flexSize, breakOutOfLayout = false } = childLayout;
+
+	const validatedSelfStretch = checkSelfStretchForInvalidValues(
+		selfStretch,
+		flexSize
+	);
 
 	return (
 		<>
 			<ToggleGroupControl
 				size={ '__unstable-large' }
 				label={ childLayoutOrientation( parentLayout ) }
-				value={ selfStretch || 'fit' }
-				help={ helpText( selfStretch ) }
+				value={ validatedSelfStretch || 'fit' }
+				help={ helpText( validatedSelfStretch ) }
 				onChange={ ( value ) => {
 					const newFlexSize = value !== 'fixed' ? null : flexSize;
 					setAttributes( {
@@ -81,23 +95,40 @@ export function ChildLayoutEdit( {
 					label={ __( 'Fixed' ) }
 				/>
 			</ToggleGroupControl>
-			{ selfStretch === 'fixed' && (
-				<UnitControl
-					size={ '__unstable-large' }
-					style={ { height: 'auto' } }
-					onChange={ ( value ) => {
-						setAttributes( {
-							style: {
-								...style,
-								layout: {
-									...childLayout,
-									flexSize: value,
+			{ validatedSelfStretch === 'fixed' && (
+				<>
+					<UnitControl
+						size={ '__unstable-large' }
+						style={ { height: 'auto' } }
+						onChange={ ( value ) => {
+							setAttributes( {
+								style: {
+									...style,
+									layout: {
+										...childLayout,
+										flexSize: value,
+									},
 								},
-							},
-						} );
-					} }
-					value={ flexSize }
-				/>
+							} );
+						} }
+						value={ flexSize }
+					/>
+					<ToggleControl
+						label={ __( 'Allow block to break out of layout' ) }
+						onChange={ ( value ) => {
+							setAttributes( {
+								style: {
+									...style,
+									layout: {
+										...childLayout,
+										breakOutOfLayout: value,
+									},
+								},
+							} );
+						} }
+						checked={ breakOutOfLayout }
+					/>
+				</>
 			) }
 		</>
 	);
