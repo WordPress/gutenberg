@@ -198,7 +198,13 @@ function UnforwardedModal(
 								) }
 							</div>
 						) }
-						{ children }
+						<div
+							className="components-modal__container"
+							tabIndex={ 0 }
+							role="region"
+						>
+							{ children }
+						</div>
 					</div>
 				</div>
 			</StyleProvider>
