@@ -92,3 +92,12 @@ function gutenberg_pattern_directory_collection_params_6_2( $query_params ) {
 	return $query_params;
 }
 add_filter( 'rest_pattern_directory_collection_params', 'gutenberg_pattern_directory_collection_params_6_2' );
+
+/**
+ * Registers the custom CSS REST API routes.
+ */
+function gutenberg_register_gutenberg_rest_custom_css() {
+	$custom_css = new Gutenberg_REST_Custom_CSS_Controller();
+	$custom_css->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_gutenberg_rest_custom_css' );

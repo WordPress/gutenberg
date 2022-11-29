@@ -1,6 +1,6 @@
 <?php
 /**
- * REST API: WP_REST_Custom_CSS_Controller class
+ * REST API: Gutenberg_REST_Custom_CSS_Controller class
  *
  * @package    WordPress
  * @subpackage REST_API
@@ -11,7 +11,7 @@
  *
  * @see WP_REST_Controller
  */
-class WP_REST_Custom_CSS_Controller extends WP_REST_Controller {
+class Gutenberg_REST_Custom_CSS_Controller extends WP_REST_Controller {
 
 	/**
 	 * Constructs the controller.

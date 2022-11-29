@@ -97,13 +97,4 @@ function gutenberg_update_custom_css_rest( $args, $post_type ) {
 	}
 	return $args;
 }
-add_filter( 'register_post_type_args', 'gutenberg_update_custom_css_rest', 10, 2 );
-
-/**
- * Registers the custom CSS REST API routes.
- */
-function gutenberg_register_gutenberg_rest_custom_css() {
-	$custom_css = new WP_REST_Custom_CSS_Controller();
-	$custom_css->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_gutenberg_rest_custom_css', 100 );
+// add_filter( 'register_post_type_args', 'gutenberg_update_custom_css_rest', 10, 2 );
