@@ -508,7 +508,7 @@ export default function NavigationLinkEdit( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Link settings' ) }>
 					<TextControl
-						value={ label || '' }
+						value={ label ? navStripHTML( label ) : '' }
 						onChange={ ( labelValue ) => {
 							setAttributes( { label: labelValue } );
 						} }
