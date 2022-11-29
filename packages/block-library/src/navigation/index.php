@@ -269,9 +269,9 @@ function block_core_navigation_get_classic_menu_fallback() {
 			}
 		}
 
-		// Returns a menu if it contains `primary` in its name/slug.
+		// Returns a menu if `primary` is its slug.
 		foreach ( $classic_nav_menus as $classic_nav_menu ) {
-			if ( str_contains( $classic_nav_menu->slug, 'primary' ) ) {
+			if ( 'primary' === $classic_nav_menu->slug ) {
 				return $classic_nav_menu;
 			}
 		}

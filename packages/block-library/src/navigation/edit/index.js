@@ -296,9 +296,20 @@ function Navigation( {
 		const primaryMenus = classicMenus.filter(
 			( classicMenu ) =>
 				classicMenu.locations.includes( 'primary' ) ||
-				classicMenu.slug.indexOf( 'primary' ) !== -1
+				classicMenu.slug === 'primary'
 		);
+
 		if ( primaryMenus.length ) {
+			// Sort by location to allow the menu assigned to primary location to take precedence.
+			primaryMenus.sort( ( a, b ) => {
+				if ( a.locations < b.locations ) {
+					return 1;
+				}
+				if ( a.locations > b.locations ) {
+					return -1;
+				}
+				return 0;
+			} );
 			convertClassicMenu(
 				primaryMenus[ 0 ].id,
 				primaryMenus[ 0 ].name,
