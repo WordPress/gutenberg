@@ -298,6 +298,7 @@ const SiteLogo = ( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<RangeControl
+						__nextHasNoMarginBottom
 						label={ __( 'Image width' ) }
 						onChange={ ( newWidth ) =>
 							setAttributes( { width: newWidth } )
