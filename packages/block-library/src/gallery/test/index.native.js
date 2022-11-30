@@ -9,7 +9,6 @@ import {
 	getEditorHtml,
 	initializeEditor,
 	openBlockSettings,
-	setupCoreBlocks,
 	setupMediaPicker,
 	setupMediaUpload,
 	triggerBlockListLayout,
@@ -20,6 +19,8 @@ import {
  * WordPress dependencies
  */
 import { Platform } from '@wordpress/element';
+import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
+import { registerCoreBlocks } from '@wordpress/block-library';
 import {
 	getOtherMediaOptions,
 	requestImageFailedRetryDialog,
@@ -57,9 +58,19 @@ const media = [
 	},
 ];
 
-setupCoreBlocks();
-
 describe( 'Gallery block', () => {
+	beforeAll( () => {
+		// Register all core blocks
+		registerCoreBlocks();
+	} );
+
+	afterAll( () => {
+		// Clean up registered blocks
+		getBlockTypes().forEach( ( block ) => {
+			unregisterBlockType( block.name );
+		} );
+	} );
+
 	it( 'inserts block', async () => {
 		const screen = await addGalleryBlock();
 
@@ -615,6 +626,42 @@ describe( 'Gallery block', () => {
 
 		// Disable crop images setting
 		fireEvent.press( getByText( 'Crop images' ) );
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+} );
+
+describe( 'Gallery block V1 deprecation', () => {
+	beforeAll( () => {
+		// Register all core blocks
+		registerCoreBlocks( {
+			galleryWithImageBlocks: false,
+		} );
+	} );
+
+	afterAll( () => {
+		// Clean up registered blocks
+		getBlockTypes().forEach( ( block ) => {
+			unregisterBlockType( block.name );
+		} );
+	} );
+
+	it( 'shows the Gallery block as Unsupported if the flag galleryWithImageBlocks is set to false', async () => {
+		// Initialize with a gallery that contains one item
+		const screen = await initializeEditor( {
+			initialHtml: `<!-- wp:gallery {"ids":[13,15],"linkTo":"none"} -->
+			<figure class="wp-block-gallery columns-2 is-cropped">
+			<ul class="blocks-gallery-grid"><li class="blocks-gallery-item">
+			<figure><img src="https://test-site.files.wordpress.com/local-image-1.jpeg" data-id="13" class="wp-image-13"/>
+			</figure></li><li class="blocks-gallery-item"><figure>
+			<img src="https://test-site.files.wordpress.com/local-image-2.jpeg" data-id="15" class="wp-image-15"/>
+			</figure></li></ul></figure>
+			<!-- /wp:gallery -->`,
+		} );
+
+		// Get block
+		const unsupportedBlock = await getBlock( screen, 'Unsupported' );
+		expect( unsupportedBlock ).toBeVisible();
+
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 } );
