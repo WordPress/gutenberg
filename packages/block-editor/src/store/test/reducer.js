@@ -1816,6 +1816,39 @@ describe( 'state', () => {
 					);
 				} );
 
+				it( 'should not updated equal attributes', () => {
+					const original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									clientId: 'kumquat',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						} )
+					);
+					const state = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: {
+							updated: true,
+						},
+					} );
+					const updatedState = blocks( state, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: {
+							updated: true,
+						},
+					} );
+
+					expect( state.attributes.get( 'kumquat' ) ).toBe(
+						updatedState.attributes.get( 'kumquat' )
+					);
+				} );
+
 				it( 'should return with attribute block updates when attributes are unique by block', () => {
 					const original = deepFreeze(
 						blocks( undefined, {

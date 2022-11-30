@@ -848,6 +848,7 @@ export const blocks = pipe(
 					return state;
 				}
 
+				let hasChange = false;
 				const newState = new Map( state );
 				for ( const clientId of action.clientIds ) {
 					const updatedAttributeEntries = Object.entries(
@@ -858,16 +859,26 @@ export const blocks = pipe(
 					if ( updatedAttributeEntries.length === 0 ) {
 						continue;
 					}
-					const newAttributes = {
-						...state.get( clientId ),
-					};
+					hasChange = true;
+					let hasUpdatedAttributes = false;
+					const existingAttributes = state.get( clientId );
+					const newAttributes = {};
 					updatedAttributeEntries.forEach( ( [ key, value ] ) => {
-						newAttributes[ key ] = value;
+						if ( existingAttributes[ key ] !== value ) {
+							hasUpdatedAttributes = true;
+							newAttributes[ key ] = value;
+						}
 					} );
-					newState.set( clientId, newAttributes );
+					hasChange = hasChange || hasUpdatedAttributes;
+					if ( hasUpdatedAttributes ) {
+						newState.set( clientId, {
+							...existingAttributes,
+							...newAttributes,
+						} );
+					}
 				}
 
-				return newState;
+				return hasChange ? newState : state;
 			}
 
 			case 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN': {
