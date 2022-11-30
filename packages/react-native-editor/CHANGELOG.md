@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [**] Prevent error message from unneccesarily firing when uploading to Gallery block [#46175]
 
 ## 1.85.0
 -   [*] [iOS] Fixed iOS Voice Control support within Image block captions. [#44850]
