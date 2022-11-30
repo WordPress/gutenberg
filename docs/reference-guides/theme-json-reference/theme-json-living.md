@@ -145,14 +145,14 @@ Border styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
-| color | string, object |  |
-| radius | string, object |  |
-| style | string, object |  |
-| width | string, object |  |
-| top | string, object | color, style, width |
-| right | string, object | color, style, width |
-| bottom | string, object | color, style, width |
-| left | string, object | color, style, width |
+| color | undefined |  |
+| radius | undefined |  |
+| style | undefined |  |
+| width | undefined |  |
+| top | object | color, style, width |
+| right | object | color, style, width |
+| bottom | object | color, style, width |
+| left | object | color, style, width |
 
 ---
 
@@ -162,9 +162,9 @@ Color styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
-| background | string, object |  |
-| gradient | string, object |  |
-| text | string, object |  |
+| background | undefined |  |
+| gradient | undefined |  |
+| text | undefined |  |
 
 ---
 
@@ -174,7 +174,7 @@ Spacing styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
-| blockGap | string, object |  |
+| blockGap | undefined |  |
 | margin | object | bottom, left, right, top |
 | padding | object | bottom, left, right, top |
 
@@ -186,14 +186,14 @@ Typography styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
-| fontFamily | string, object |  |
-| fontSize | string, object |  |
-| fontStyle | string, object |  |
-| fontWeight | string, object |  |
-| letterSpacing | string, object |  |
-| lineHeight | string, object |  |
-| textDecoration | string, object |  |
-| textTransform | string, object |  |
+| fontFamily | undefined |  |
+| fontSize | undefined |  |
+| fontStyle | undefined |  |
+| fontWeight | undefined |  |
+| letterSpacing | undefined |  |
+| lineHeight | undefined |  |
+| textDecoration | undefined |  |
+| textTransform | undefined |  |
 
 ---
 
@@ -203,7 +203,7 @@ CSS and SVG filter styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
-| duotone | string, object |  |
+| duotone | undefined |  |
 
 ---
 
@@ -220,10 +220,10 @@ Outline styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
-| color | string, object |  |
-| offset | string, object |  |
-| style | string, object |  |
-| width | string, object |  |
+| color | undefined |  |
+| offset | undefined |  |
+| style | undefined |  |
+| width | undefined |  |
 
 ---
 
