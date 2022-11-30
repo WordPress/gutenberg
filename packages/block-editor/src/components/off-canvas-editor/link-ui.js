@@ -124,10 +124,11 @@ function LinkControlTransforms( { clientId } ) {
 }
 
 export function LinkUI( props ) {
+	const { label, url, opensInNewTab, type, kind } = props.link;
 	const link = {
-		url: props.link.url,
-		opensInNewTab: props.link.opensInNewTab,
-		title: props.link.label && stripHTML( props.link.label ),
+		url,
+		opensInNewTab,
+		title: label && stripHTML( label ),
 	};
 
 	return (
@@ -144,16 +145,13 @@ export function LinkUI( props ) {
 				value={ link }
 				showInitialSuggestions={ true }
 				withCreateSuggestion={ props.hasCreateSuggestion }
-				noDirectEntry={ !! props.link?.type }
-				noURLSuggestion={ !! props.link?.type }
-				suggestionsQuery={ getSuggestionsQuery(
-					props.link?.type,
-					props.link?.kind
-				) }
+				noDirectEntry={ !! type }
+				noURLSuggestion={ !! type }
+				suggestionsQuery={ getSuggestionsQuery( type, kind ) }
 				onChange={ props.onChange }
 				onRemove={ props.onRemove }
 				renderControlBottom={
-					! props.link?.url
+					! url
 						? () => (
 								<LinkControlTransforms
 									clientId={ props.clientId }
