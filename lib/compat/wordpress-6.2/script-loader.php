@@ -66,11 +66,14 @@ function gutenberg_enqueue_block_support_styles( $style, $priority = 10 ) {
 
 /**
  * Sets the content assets for the block editor.
+ *
+ * Note for core merge: see inline comment on what's been updated.
  */
 function gutenberg_resolve_assets_override() {
 	global $pagenow;
 
 	$script_handles = array();
+	// Note for core merge: only 'wp-edit-blocks' should be in this array.
 	$style_handles  = array(
 		'wp-edit-blocks',
 	);
