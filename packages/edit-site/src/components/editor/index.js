@@ -191,32 +191,23 @@ export default function Editor() {
 								content={
 									<>
 										<GlobalStylesRenderer />
-
-										<div
-											className="edit-site-editor__container"
-											inert={
-												isViewMode ? 'true' : undefined
-											}
-										>
-											<EditorNotices />
-											{ showVisualEditor &&
-												editedPost && <BlockEditor /> }
-											{ editorMode === 'text' &&
-												editedPost && <CodeEditor /> }
-											{ hasLoadedPost && ! editedPost && (
-												<Notice
-													status="warning"
-													isDismissible={ false }
-												>
-													{ __(
-														"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
-													) }
-												</Notice>
-											) }
-											{ isEditMode && (
-												<KeyboardShortcuts />
-											) }
-										</div>
+										<EditorNotices />
+										{ showVisualEditor && editedPost && (
+											<BlockEditor />
+										) }
+										{ editorMode === 'text' &&
+											editedPost && <CodeEditor /> }
+										{ hasLoadedPost && ! editedPost && (
+											<Notice
+												status="warning"
+												isDismissible={ false }
+											>
+												{ __(
+													"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
+												) }
+											</Notice>
+										) }
+										{ isEditMode && <KeyboardShortcuts /> }
 									</>
 								}
 								secondarySidebar={

@@ -196,6 +196,7 @@ function Iframe(
 		assets,
 		scale = 1,
 		frameSize = 0,
+		readonly,
 		...props
 	},
 	ref
@@ -355,6 +356,7 @@ function Iframe(
 									marginTop: frameSize,
 									transform: `scale( ${ scale } )`,
 								} }
+								inert={ readonly ? 'true' : undefined }
 							>
 								{ contentResizeListener }
 								{ /*

@@ -127,6 +127,7 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 				ref={ ref }
 				name="editor-canvas"
 				className="edit-site-visual-editor__editor-canvas"
+				readonly={ canvasMode === 'view' }
 				{ ...props }
 			>
 				{ /* Filters need to be rendered before children to avoid Safari rendering issues. */ }
