@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
+
+/**
  * WordPress dependencies
  */
 import { useEffect, useState } from '@wordpress/element';
@@ -7,11 +12,12 @@ import { Icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import AlignmentMatrixControl from '../';
+import AlignmentMatrixControl from '..';
 import { ALIGNMENTS } from '../utils';
 import { HStack } from '../../h-stack';
+import type { AlignmentMatrixControlProps } from '../types';
 
-export default {
+const meta: ComponentMeta< typeof AlignmentMatrixControl > = {
 	title: 'Components (Experimental)/AlignmentMatrixControl',
 	component: AlignmentMatrixControl,
 	subcomponents: {
@@ -29,9 +35,15 @@ export default {
 		docs: { source: { state: 'open' } },
 	},
 };
+export default meta;
 
-const Template = ( { defaultValue, onChange, ...props } ) => {
-	const [ value, setValue ] = useState();
+const Template: ComponentStory< typeof AlignmentMatrixControl > = ( {
+	defaultValue,
+	onChange,
+	...props
+} ) => {
+	const [ value, setValue ] =
+		useState< AlignmentMatrixControlProps[ 'value' ] >();
 
 	// Convenience handler for Canvas view so changes are reflected
 	useEffect( () => {
@@ -43,7 +55,7 @@ const Template = ( { defaultValue, onChange, ...props } ) => {
 			{ ...props }
 			onChange={ ( ...changeArgs ) => {
 				setValue( ...changeArgs );
-				onChange( ...changeArgs );
+				onChange?.( ...changeArgs );
 			} }
 			value={ value }
 		/>
