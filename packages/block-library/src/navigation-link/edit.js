@@ -654,6 +654,7 @@ export default function NavigationLinkEdit( {
 					) }
 					{ isLinkOpen && (
 						<LinkUI
+							className="wp-block-navigation-link__inline-link-input"
 							clientId={ clientId }
 							value={ link }
 							linkAttributes={ { type, url, kind } }

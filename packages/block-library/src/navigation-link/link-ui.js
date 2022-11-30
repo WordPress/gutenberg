@@ -156,7 +156,7 @@ export function LinkUI( props ) {
 			<LinkControl
 				hasTextControl
 				hasRichPreviews
-				className="wp-block-navigation-link__inline-link-input"
+				className={ props.className }
 				value={ props.value }
 				showInitialSuggestions={ true }
 				withCreateSuggestion={ props.hasCreateSuggestion }
