@@ -23,9 +23,6 @@ export type BaseControlProps = {
 	 *
 	 * It is preferable to use plain text for `help`, as it can be accessibly associated with the control using `aria-describedby`.
 	 * When the `help` contains links, or otherwise non-plain text content, it will be associated with the control using `aria-details`.
-	 *
-	 * The recommended way is to use the `useBaseControlProps` hook, which takes care of setting an appropriate `aria-describedby` or
-	 * `aria-details` based on the auto-generated unique `id` and the `help` value type.
 	 */
 	help?: ReactNode;
 	/**
