@@ -26,6 +26,7 @@ import { StyledLabel } from '../../base-control/styles/base-control-styles';
 import DropdownContentWrapper from '../../dropdown/dropdown-content-wrapper';
 
 import type { ColorObject, PaletteObject } from '../../color-palette/types';
+import type { DropdownProps as DropdownComponentProps } from '../../dropdown/types';
 import type { ColorProps, DropdownProps } from '../types';
 
 const getColorObject = (
@@ -164,7 +165,9 @@ const BorderControlDropdown = (
 		? 'bottom left'
 		: undefined;
 
-	const renderToggle = ( { onToggle }: { onToggle: () => void } ) => (
+	const renderToggle: DropdownComponentProps[ 'renderToggle' ] = ( {
+		onToggle,
+	} ) => (
 		<Button
 			onClick={ onToggle }
 			variant="tertiary"
@@ -182,8 +185,9 @@ const BorderControlDropdown = (
 		</Button>
 	);
 
-	// TODO: update types once Dropdown component is refactored to TypeScript.
-	const renderContent = ( { onClose }: { onClose: () => void } ) => (
+	const renderContent: DropdownComponentProps[ 'renderContent' ] = ( {
+		onClose,
+	} ) => (
 		<>
 			<DropdownContentWrapper paddingSize="medium">
 				<VStack className={ popoverControlsClassName } spacing={ 6 }>
