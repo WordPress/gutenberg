@@ -252,6 +252,7 @@ export default function SpacingInputControl( {
 						withInputField={ false }
 						onChange={ handleCustomValueSliderChange }
 						className="components-spacing-sizes-control__custom-value-range"
+						__nextHasNoMarginBottom
 					/>
 				</>
 			) }
