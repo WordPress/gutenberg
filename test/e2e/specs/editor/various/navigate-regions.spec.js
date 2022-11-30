@@ -19,13 +19,16 @@ test.describe( 'Navigate regions', () => {
 			attributes: { content: 'Dummy text' },
 		} );
 
+		// Make sure the Settings sidebar is opened.
+		await editor.openDocumentSettingsSidebar();
+
+		// Navigate to the top bar region.
 		await page.keyboard.press( 'Control+`' );
 
 		await expect(
 			page.locator( '.interface-interface-skeleton' )
 		).toHaveClass( /is-focusing-regions/ );
 
-		// Check the Navigate regions focus style on the editor top bar region.
 		const editorTopBar = page.locator(
 			'role=region[name="Editor top bar"i]'
 		);
@@ -35,9 +38,9 @@ test.describe( 'Navigate regions', () => {
 		await expect( editorTopBar ).toHaveCSS( 'outline-width', '4px' );
 		await expect( editorTopBar ).toHaveScreenshot();
 
+		// Navigate to the content region.
 		await page.keyboard.press( 'Control+`' );
 
-		// Check the Navigate regions focus style on the editor content region.
 		const editorContent = page.locator(
 			'role=region[name="Editor content"i]'
 		);
@@ -47,9 +50,9 @@ test.describe( 'Navigate regions', () => {
 		await expect( editorContent ).toHaveCSS( 'outline-width', '4px' );
 		await expect( editorContent ).toHaveScreenshot();
 
+		// Navigate to the settings region when it's opened.
 		await page.keyboard.press( 'Control+`' );
 
-		// Check the Navigate regions focus style on the editor settings region.
 		const editorSettings = page.locator(
 			'role=region[name="Editor settings"i]'
 		);
@@ -59,9 +62,9 @@ test.describe( 'Navigate regions', () => {
 		await expect( editorSettings ).toHaveCSS( 'outline-width', '4px' );
 		await expect( editorSettings ).toHaveScreenshot();
 
+		// Navigate to the publish region.
 		await page.keyboard.press( 'Control+`' );
 
-		// Check the Navigate regions focus style on the editor publish region.
 		const editorPublish = page.locator(
 			'role=region[name="Editor publish"i]'
 		);
@@ -77,9 +80,9 @@ test.describe( 'Navigate regions', () => {
 		await expect( editorPublishPanel ).toHaveCSS( 'outline-width', '4px' );
 		await expect( editorPublishPanel ).toHaveScreenshot();
 
+		// Navigate to the footer region.
 		await page.keyboard.press( 'Control+`' );
 
-		// Check the Navigate regions focus style on the editor footer region.
 		const editorFooter = page.locator(
 			'role=region[name="Editor footer"i]'
 		);
@@ -89,8 +92,8 @@ test.describe( 'Navigate regions', () => {
 		await expect( editorFooter ).toHaveCSS( 'outline-width', '4px' );
 		await expect( editorFooter ).toHaveScreenshot();
 
-		// Check the Navigate regions focus style on the editor document overview region.
-		// Open List view toggle
+		// Navigate to the Document overview region.
+		// Open the Document overview.
 		await page.locator( 'role=button[name="Document Overview"i]' ).click();
 
 		await pageUtils.pressKeyTimes( 'Control+`', 2 );
@@ -109,5 +112,34 @@ test.describe( 'Navigate regions', () => {
 			'4px'
 		);
 		await expect( editorDocumentOverview ).toHaveScreenshot();
+
+		// Close the Document overview.
+		await page.locator( 'role=button[name="Document Overview"i]' ).click();
+
+		// Close the settings region.
+		await page
+			.locator(
+				'role=region[name="Editor top bar"i] >> role=button[name="Settings"i]'
+			)
+			.click();
+
+		// Navigate to the settings region whene it's closed.
+		await pageUtils.pressKeyTimes( 'Control+`', 3 );
+
+		const editorSettingsPanel = page.locator(
+			'role=region[name="Editor settings"i] >> .edit-post-layout__toggle-sidebar-panel'
+		);
+
+		await expect( editorSettings ).toBeFocused();
+		await expect( editorSettingsPanel ).toHaveCSS(
+			'outline-style',
+			'solid'
+		);
+		await expect( editorSettingsPanel ).toHaveCSS( 'outline-width', '4px' );
+
+		await expect( editorSettingsPanel ).toHaveScreenshot();
+
+		// Make sure to leave the Settings sidebar opened.
+		await editor.openDocumentSettingsSidebar();
 	} );
 } );
