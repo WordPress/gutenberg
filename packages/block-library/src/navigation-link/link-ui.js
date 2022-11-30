@@ -47,8 +47,8 @@ export function getSuggestionsQuery( type, kind ) {
 /**
  * Add transforms to Link Control
  *
- * @param {Object} props					Component props.
- * @param {string} props.clientId			Block client ID.
+ * @param {Object} props          Component props.
+ * @param {string} props.clientId Block client ID.
  */
 function LinkControlTransforms( { clientId } ) {
 	const { getBlock, blockTransforms } = useSelect(

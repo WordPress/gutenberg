@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { filter } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useEffect } from '@wordpress/element';
@@ -30,10 +25,9 @@ function useGlobalStylesRenderer() {
 		}
 
 		const currentStoreSettings = getSettings();
-		const nonGlobalStyles = filter(
-			currentStoreSettings.styles,
-			( style ) => ! style.isGlobalStyles
-		);
+		const nonGlobalStyles = Object.values(
+			currentStoreSettings.styles ?? []
+		).filter( ( style ) => ! style.isGlobalStyles );
 		updateSettings( {
 			...currentStoreSettings,
 			styles: [ ...nonGlobalStyles, ...styles ],

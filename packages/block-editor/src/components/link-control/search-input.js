@@ -81,7 +81,6 @@ const LinkControlSearchInput = forwardRef(
 				...props,
 				instanceId,
 				withCreateSuggestion,
-				currentInputValue: value,
 				createSuggestionButtonText,
 				suggestionsQuery,
 				handleSuggestionClick: ( suggestion ) => {

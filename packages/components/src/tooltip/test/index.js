@@ -37,7 +37,7 @@ describe( 'Tooltip', () => {
 
 			expect(
 				screen.getByRole( 'button', { name: 'Hover Me!' } )
-			).toBeInTheDocument();
+			).toBeVisible();
 			expect( screen.queryByText( 'Help text' ) ).not.toBeInTheDocument();
 		} );
 
@@ -51,7 +51,7 @@ describe( 'Tooltip', () => {
 			);
 
 			const button = screen.getByRole( 'button', { name: 'Hover Me!' } );
-			expect( button ).toBeInTheDocument();
+			expect( button ).toBeVisible();
 
 			// Before focus, the tooltip is not shown.
 			expect( screen.queryByText( 'Help text' ) ).not.toBeInTheDocument();
@@ -59,7 +59,7 @@ describe( 'Tooltip', () => {
 			button.focus();
 
 			// Tooltip is shown after focusing the anchor.
-			expect( screen.getByText( 'Help text' ) ).toBeInTheDocument();
+			expect( screen.getByText( 'Help text' ) ).toBeVisible();
 			expect( mockOnFocus ).toHaveBeenCalledWith(
 				expect.objectContaining( {
 					type: 'focus',
@@ -79,7 +79,7 @@ describe( 'Tooltip', () => {
 			);
 
 			const button = screen.getByRole( 'button', { name: 'Hover Me!' } );
-			expect( button ).toBeInTheDocument();
+			expect( button ).toBeVisible();
 
 			await user.hover( button );
 
@@ -89,7 +89,7 @@ describe( 'Tooltip', () => {
 			act( () => jest.advanceTimersByTime( TOOLTIP_DELAY ) );
 
 			// Tooltip shows after the delay
-			expect( screen.getByText( 'Help text' ) ).toBeInTheDocument();
+			expect( screen.getByText( 'Help text' ) ).toBeVisible();
 		} );
 
 		it( 'should not show tooltip on focus as result of mouse click', async () => {
@@ -105,7 +105,7 @@ describe( 'Tooltip', () => {
 			);
 
 			const button = screen.getByRole( 'button', { text: 'Hover Me!' } );
-			expect( button ).toBeInTheDocument();
+			expect( button ).toBeVisible();
 
 			await user.click( button );
 
@@ -144,7 +144,7 @@ describe( 'Tooltip', () => {
 			);
 
 			const button = screen.getByRole( 'button', { name: 'Hover Me!' } );
-			expect( button ).toBeInTheDocument();
+			expect( button ).toBeVisible();
 
 			await user.hover( button );
 
@@ -161,7 +161,7 @@ describe( 'Tooltip', () => {
 			act( () => jest.advanceTimersByTime( TEST_DELAY - TOOLTIP_DELAY ) );
 
 			// Tooltip shows after TEST_DELAY time
-			expect( screen.getByText( 'Help text' ) ).toBeInTheDocument();
+			expect( screen.getByText( 'Help text' ) ).toBeVisible();
 
 			expect( mockOnFocus ).not.toHaveBeenCalled();
 		} );
@@ -178,7 +178,7 @@ describe( 'Tooltip', () => {
 			);
 
 			const button = screen.getByRole( 'button', { name: 'Click me' } );
-			expect( button ).toBeInTheDocument();
+			expect( button ).toBeVisible();
 			expect( button ).toBeDisabled();
 
 			// Note: this is testing for implementation details,
@@ -200,7 +200,7 @@ describe( 'Tooltip', () => {
 			// Tooltip shows after the delay
 			expect(
 				screen.getByText( 'Show helpful text here' )
-			).toBeInTheDocument();
+			).toBeVisible();
 		} );
 
 		it( 'should not emit events back to children when they are disabled', async () => {
@@ -275,6 +275,48 @@ describe( 'Tooltip', () => {
 
 			// Tooltip won't show, since the mouse has left the anchor
 			expect( screen.queryByText( 'Help text' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'should render the shortcut display text when a string is passed as the shortcut', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			render(
+				<Tooltip text="Help text" shortcut="shortcut text">
+					<button>Hover Me!</button>
+				</Tooltip>
+			);
+
+			const button = screen.getByRole( 'button', { name: 'Hover Me!' } );
+			await user.hover( button );
+
+			expect( await screen.findByText( 'shortcut text' ) ).toBeVisible();
+		} );
+
+		it( 'should render the shortcut display text and aria-label when an object is passed as the shortcut with the correct properties', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			render(
+				<Tooltip
+					text="Help text"
+					shortcut={ {
+						display: 'shortcut text',
+						ariaLabel: 'shortcut label',
+					} }
+				>
+					<button>Hover Me!</button>
+				</Tooltip>
+			);
+
+			const button = screen.getByRole( 'button', { name: 'Hover Me!' } );
+			await user.hover( button );
+
+			expect(
+				await screen.findByLabelText( 'shortcut label' )
+			).toHaveTextContent( 'shortcut text' );
 		} );
 	} );
 } );
