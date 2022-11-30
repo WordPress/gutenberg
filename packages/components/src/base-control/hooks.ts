@@ -9,11 +9,18 @@ import { useInstanceId } from '@wordpress/compose';
 import BaseControl from '.';
 import type { BaseControlProps } from './types';
 
-export function useBaseControlProps( {
-	help,
-	id: preferredId,
-	...restProps
-}: Omit< BaseControlProps, 'children' > ) {
+/**
+ * Generate props for the `BaseControl` and the inner control itself.
+ *
+ * Namely, it takes care of generating a unique `id`, properly associating it with the `label` and `help` elements.
+ *
+ * @param  props
+ */
+export function useBaseControlProps(
+	props: Omit< BaseControlProps, 'children' >
+) {
+	const { help, id: preferredId, ...restProps } = props;
+
 	const uniqueId = useInstanceId(
 		BaseControl,
 		'wp-components-base-control',
