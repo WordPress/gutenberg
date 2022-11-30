@@ -70,6 +70,7 @@ describe( 'Theme', () => {
 				'--wp-components-color-accent': '#123abc',
 				'--wp-components-color-accent-darker-10': '#0e2c8d',
 				'--wp-components-color-accent-darker-20': '#091d5f',
+				'--wp-components-color-accent-inverted': '#fff',
 			} );
 		} );
 	} );
