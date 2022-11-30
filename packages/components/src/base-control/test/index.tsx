@@ -10,22 +10,11 @@ import BaseControl from '..';
 import { useBaseControlProps } from '../hooks';
 import type { BaseControlProps } from '../types';
 
-const MyBaseControl = ( {
-	id,
-	help,
-	...props
-}: Omit< BaseControlProps, 'children' > ) => {
-	const { baseControlProps, controlProps } = useBaseControlProps( {
-		help,
-		preferredId: id,
-	} );
+const MyBaseControl = ( props: Omit< BaseControlProps, 'children' > ) => {
+	const { baseControlProps, controlProps } = useBaseControlProps( props );
 
 	return (
-		<BaseControl
-			{ ...props }
-			{ ...baseControlProps }
-			__nextHasNoMarginBottom={ true }
-		>
+		<BaseControl { ...baseControlProps } __nextHasNoMarginBottom={ true }>
 			<textarea { ...controlProps } />
 		</BaseControl>
 	);
