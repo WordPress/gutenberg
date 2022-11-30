@@ -110,6 +110,9 @@ export async function searchForBlock( searchTerm ) {
 	await page.focus( INSERTER_SEARCH_SELECTOR );
 	await pressKeyWithModifier( 'primary', 'a' );
 	await page.keyboard.type( searchTerm );
+	// Inserter search results are debounced, let's wait a bit after typing.
+	// eslint-disable-next-line no-restricted-syntax
+	await page.waitForTimeout( 200 );
 }
 
 /**
