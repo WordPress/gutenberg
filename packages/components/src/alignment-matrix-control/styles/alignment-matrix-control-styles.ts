@@ -81,9 +81,7 @@ export const pointBase = (
 	`;
 };
 
-export const Point = styled.span<
-	Pick< AlignmentMatrixControlCellProps, 'isActive' >
->`
+export const Point = styled.span`
 	height: 6px;
 	width: 6px;
 	${ pointBase }
