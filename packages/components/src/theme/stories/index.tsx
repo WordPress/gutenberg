@@ -89,7 +89,7 @@ export const ColorScheme: ComponentStory< typeof Theme > = ( {
 					/>
 				)
 			) }
-			{ contrastIssues.length && (
+			{ !! contrastIssues.length && (
 				<>
 					<h2>Contrast issues</h2>
 					<ul>
