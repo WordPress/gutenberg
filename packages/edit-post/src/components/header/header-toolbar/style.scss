@@ -59,10 +59,6 @@
 		}
 	}
 
-	.edit-post-header-toolbar__center .components-button.has-icon::after {
-		content: none;
-	}
-
 }
 
 // Reduced UI.
@@ -121,9 +117,18 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-}
 
-.edit-post-header-toolbar__title-dropdown > .components-popover__content {
-	min-width: 240px;
-	padding: 16px;
+	.components-base-control {
+		width: 50%;
+
+		.css-10urnh1-StyledField-deprecatedMarginField {
+			margin-bottom: 0;
+
+			.components-text-control__input {
+				text-align: center;
+			}
+		}
+
+	}
+
 }
