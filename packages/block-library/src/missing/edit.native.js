@@ -127,18 +127,18 @@ export class UnsupportedBlockEdit extends Component {
 		}
 	}
 
-	getSheetTitle( blockTitle ) {
-		if ( CUSTOM_UNSUPPORTED_BLOCK_MESSAGE[ blockTitle ] ) {
-			return CUSTOM_UNSUPPORTED_BLOCK_MESSAGE[ blockTitle ]?.title;
+	getSheetTitle( blockName ) {
+		if ( CUSTOM_UNSUPPORTED_BLOCK_MESSAGE[ blockName ] ) {
+			return CUSTOM_UNSUPPORTED_BLOCK_MESSAGE[ blockName ]?.title;
 		}
 
 		/* translators: Missing block alert title. %s: The localized block name */
 		return __( "'%s' is not fully-supported" );
 	}
 
-	getSheetDescription( blockTitle ) {
-		if ( CUSTOM_UNSUPPORTED_BLOCK_MESSAGE[ blockTitle ] ) {
-			return CUSTOM_UNSUPPORTED_BLOCK_MESSAGE[ blockTitle ]?.description;
+	getSheetDescription( blockName ) {
+		if ( CUSTOM_UNSUPPORTED_BLOCK_MESSAGE[ blockName ] ) {
+			return CUSTOM_UNSUPPORTED_BLOCK_MESSAGE[ blockName ]?.description;
 		}
 
 		return applyFilters(
