@@ -37,16 +37,15 @@ export default function AlignmentMatrixControlIcon( {
 		...style,
 		transform: `scale(${ scale })`,
 	};
-	const iconProps = {
-		className: classes,
-		disablePointerEvents,
-		role: 'presentation',
-		size,
-		style: styles,
-	};
 
 	return (
-		<Root { ...props } { ...iconProps }>
+		<Root
+			{ ...props }
+			className={ classes }
+			disablePointerEvents={ disablePointerEvents }
+			role="presentation"
+			style={ styles }
+		>
 			{ ALIGNMENTS.map( ( align, index ) => {
 				const isActive = alignIndex === index;
 
