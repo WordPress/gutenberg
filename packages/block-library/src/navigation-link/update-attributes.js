@@ -1,12 +1,8 @@
 /**
- * External dependencies
- */
-import escapeHtml from 'escape-html';
-
-/**
  * WordPress dependencies
  */
 import { safeDecodeURI } from '@wordpress/url';
+import { escapeHTML } from '@wordpress/escape-html';
 
 /**
  * @typedef {'post-type'|'custom'|'taxonomy'|'post-type-archive'} WPNavigationLinkKind
@@ -78,8 +74,8 @@ export const updateAttributes = (
 	// - https://github.com/WordPress/gutenberg/pull/41063
 	// - https://github.com/WordPress/gutenberg/pull/18617.
 	const label = useNewLabel
-		? escapeHtml( newLabel )
-		: originalLabel || escapeHtml( newUrlWithoutHttp );
+		? escapeHTML( newLabel )
+		: originalLabel || escapeHTML( newUrlWithoutHttp );
 
 	// In https://github.com/WordPress/gutenberg/pull/24670 we decided to use "tag" in favor of "post_tag"
 	const type = newType === 'post_tag' ? 'tag' : newType.replace( '-', '_' );
