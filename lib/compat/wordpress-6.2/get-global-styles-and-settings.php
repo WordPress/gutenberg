@@ -171,7 +171,15 @@ function gutenberg_get_global_settings( $path = array(), $context = array() ) {
 		$origin = 'theme';
 	}
 
-	$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin )->get_settings();
+	$cache_group = 'theme_json';
+	$cache_key   = 'gutenberg_get_global_settings_' . $origin;
+	$settings    = wp_cache_get( $cache_key, $cache_group );
+
+	if ( false === $settings || WP_DEBUG ) {
+		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin )->get_settings();
+		wp_cache_set( $cache_key, $settings, $cache_group );
+	}
+
 	return _wp_array_get( $settings, $path, $settings );
 }
 
@@ -183,6 +191,7 @@ function gutenberg_get_global_settings( $path = array(), $context = array() ) {
 function _gutenberg_clean_theme_json_caches() {
 	wp_cache_delete( 'wp_theme_has_theme_json', 'theme_json' );
 	wp_cache_delete( 'gutenberg_get_global_stylesheet', 'theme_json' );
+	wp_cache_delete( 'gutenberg_get_global_settings_custom', 'theme_json' );
 	wp_cache_delete( 'gutenberg_get_global_settings_theme', 'theme_json' );
 	WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
 }
@@ -192,6 +201,7 @@ function _gutenberg_clean_theme_json_caches() {
  * The data stored under this cache group:
  *
  * - wp_theme_has_theme_json
+ * - gutenberg_get_global_settings
  * - gutenberg_get_global_stylesheet
  *
  * There is some hooks consumers can use to modify parts
