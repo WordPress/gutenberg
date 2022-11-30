@@ -1,3 +1,7 @@
+//TODO:
+// - cross check types with README.md
+// - add JSDoc to main component props in types.ts
+
 export type AlignmentMatrixControlValue =
 	| 'top left'
 	| 'top center'
@@ -11,11 +15,17 @@ export type AlignmentMatrixControlValue =
 	| 'bottom right';
 
 export type AlignmentMatrixControlProps = {
-	label: string;
+	/**
+	 * Accessible label. If provided, sets the `aria-label` attribute of the
+	 * underlying <Composite/> component.
+	 *
+	 * @default 'Alignment Matrix Control'
+	 */
+	label?: string;
 	defaultValue?: AlignmentMatrixControlValue;
-	value: AlignmentMatrixControlValue;
-	onChange: ( newValue: AlignmentMatrixControlValue ) => void;
-	width: number;
+	value?: AlignmentMatrixControlValue;
+	onChange?: ( newValue: AlignmentMatrixControlValue ) => void;
+	width?: number;
 };
 
 export type AlignmentMatrixControlIconProps = Pick<
@@ -26,9 +36,7 @@ export type AlignmentMatrixControlIconProps = Pick<
 	size: number;
 };
 
-export type AlignmentMatrixControlCellProps = Pick<
-	AlignmentMatrixControlProps,
-	'value'
-> & {
+export type AlignmentMatrixControlCellProps = {
 	isActive: boolean;
+	value: NonNullable< AlignmentMatrixControlProps[ 'value' ] >;
 };
