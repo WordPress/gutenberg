@@ -10,8 +10,6 @@ export type AlignmentMatrixControlValue =
 	| 'bottom right';
 
 export type AlignmentMatrixControlProps = {
-	className: string;
-	id?: string | undefined;
 	label: string;
 	defaultValue?: string;
 	value: AlignmentMatrixControlValue;
@@ -20,12 +18,9 @@ export type AlignmentMatrixControlProps = {
 };
 
 export type AlignmentMatrixControlIconProps = {
-	className: string;
 	disablePointerEvents?: boolean;
 	size: number;
-	style: {};
 	value: AlignmentMatrixControlValue;
-	props: {};
 };
 export type AlignmentMatrixControlCellProps = {
 	isActive: boolean;
