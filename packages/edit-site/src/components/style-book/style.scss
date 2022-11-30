@@ -22,14 +22,22 @@
 	top: $grid-unit-10;
 }
 
-.edit-site-style-book__tab-panel .components-tab-panel__tab-content {
-	bottom: 0;
-	left: 0;
-	overflow: auto;
-	padding: $grid-unit-40;
-	position: absolute;
-	right: 0;
-	top: $grid-unit-60; // Height of tabs.
+.edit-site-style-book__tab-panel {
+	.components-tab-panel__tabs {
+		margin-right: $button-size + $grid-unit-10;
+		overflow: auto;
+	}
+
+	.components-tab-panel__tab-content {
+		border-top: 1px solid $gray-400;
+		bottom: 0;
+		left: 0;
+		overflow: auto;
+		padding: $grid-unit-40;
+		position: absolute;
+		right: 0;
+		top: $grid-unit-60; // Height of tabs.
+	}
 }
 
 .edit-site-style-book__examples {
