@@ -41,7 +41,7 @@ function AlignmentMatrixControlIcon( {
 		className: classes,
 		disablePointerEvents,
 		role: 'presentation',
-		// size, TODO: check if this is needed
+		size,
 		style: styles,
 	};
 
