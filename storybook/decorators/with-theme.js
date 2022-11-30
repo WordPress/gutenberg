@@ -39,7 +39,7 @@ const BackgroundColorWrapper = styled.div`
 	${ backgroundStyles }
 `;
 
-const Notice = styled.small`
+const BackgroundIndicator = styled.small`
 	display: block;
 	opacity: 0.3;
 	margin-top: 20px;
@@ -47,6 +47,13 @@ const Notice = styled.small`
 	color: var( --wp-components-color-foreground );
 	text-transform: uppercase;
 	text-align: end;
+`;
+
+const Notice = styled.small`
+	display: block;
+	margin-top: 20px;
+	font-size: 12px;
+	color: var( --wp-components-color-foreground );
 `;
 
 /**
@@ -57,12 +64,28 @@ export const WithTheme = ( Story, context ) => {
 	const selectedTheme = themes[ context.globals.componentsTheme ];
 	const selectedBackground = selectedTheme.background;
 
+	if ( context.componentId === 'components-experimental-theme' ) {
+		return (
+			<>
+				<Story />
+				{ context.globals.componentsTheme !== 'default' && (
+					<Notice>
+						The Theme toolbar addon is disabled for this story. Use
+						Controls to change the values.
+					</Notice>
+				) }
+			</>
+		);
+	}
+
 	return (
 		<BackgroundColorWrapper background={ selectedBackground }>
 			<Theme { ...themes[ context.globals.componentsTheme ] }>
 				<Story { ...context } />
 				{ selectedBackground && (
-					<Notice>Themed background { selectedBackground }</Notice>
+					<BackgroundIndicator>
+						Themed background { selectedBackground }
+					</BackgroundIndicator>
 				) }
 			</Theme>
 		</BackgroundColorWrapper>
