@@ -3,6 +3,7 @@
 /**
  * WordPress dependencies
  */
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { Popover, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { switchToBlockType } from '@wordpress/blocks';
@@ -80,7 +81,7 @@ function LinkControlTransforms( { clientId } ) {
 	];
 
 	const transforms = blockTransforms.filter( ( item ) => {
-		return featuredBlocks.includes( item?.name );
+		return featuredBlocks.includes( item.name );
 	} );
 
 	if ( ! transforms?.length ) {
@@ -126,14 +127,14 @@ export function LinkUI( props ) {
 	const link = {
 		url: props.link.url,
 		opensInNewTab: props.link.opensInNewTab,
-		title: props.link.label,
+		title: props.link.label && stripHTML( props.link.label ),
 	};
 
 	return (
 		<Popover
 			placement="bottom"
-			onClose={ props?.onClose }
-			anchor={ props?.anchor }
+			onClose={ props.onClose }
+			anchor={ props.anchor }
 			shift
 		>
 			<LinkControl
@@ -142,7 +143,7 @@ export function LinkUI( props ) {
 				className={ props.className }
 				value={ link }
 				showInitialSuggestions={ true }
-				withCreateSuggestion={ props?.hasCreateSuggestion }
+				withCreateSuggestion={ props.hasCreateSuggestion }
 				noDirectEntry={ !! props.link?.type }
 				noURLSuggestion={ !! props.link?.type }
 				suggestionsQuery={ getSuggestionsQuery(
@@ -155,7 +156,7 @@ export function LinkUI( props ) {
 					! props.link?.url
 						? () => (
 								<LinkControlTransforms
-									clientId={ props?.clientId }
+									clientId={ props.clientId }
 								/>
 						  )
 						: null
