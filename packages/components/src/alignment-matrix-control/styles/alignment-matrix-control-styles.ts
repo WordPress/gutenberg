@@ -9,7 +9,7 @@ import { css } from '@emotion/react';
  */
 import { COLORS, reduceMotion } from '../../utils';
 import type {
-	AlignmentMatrixControlIconProps,
+	AlignmentMatrixControlProps,
 	AlignmentMatrixControlCellProps,
 } from '../types';
 
@@ -31,9 +31,9 @@ const rootSize = ( { size = 92 } ) => {
 	`;
 };
 
-export const Root = styled.div<
-	Pick< AlignmentMatrixControlIconProps, 'size' >
->`
+export const Root = styled.div< {
+	size: AlignmentMatrixControlProps[ 'width' ];
+} >`
 	${ rootBase };
 
 	border: 1px solid transparent;
