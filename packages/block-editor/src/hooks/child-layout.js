@@ -84,7 +84,6 @@ export function ChildLayoutEdit( {
 			{ selfStretch === 'fixed' && (
 				<UnitControl
 					size={ '__unstable-large' }
-					style={ { height: 'auto' } }
 					onChange={ ( value ) => {
 						setAttributes( {
 							style: {
