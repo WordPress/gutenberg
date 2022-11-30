@@ -3,6 +3,7 @@ export type AlignmentMatrixControlValue =
 	| 'top center'
 	| 'top right'
 	| 'center left'
+	| 'center'
 	| 'center center'
 	| 'center right'
 	| 'bottom left'
