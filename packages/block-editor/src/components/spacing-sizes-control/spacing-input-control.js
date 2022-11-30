@@ -222,6 +222,8 @@ export default function SpacingInputControl( {
 					<UnitControl
 						onMouseOver={ onMouseOver }
 						onMouseOut={ onMouseOut }
+						onFocus={ onMouseOver }
+						onBlur={ onMouseOut }
 						onChange={ ( newSize ) =>
 							onChange( getNewCustomValue( newSize ) )
 						}
@@ -239,6 +241,8 @@ export default function SpacingInputControl( {
 					<RangeControl
 						onMouseOver={ onMouseOver }
 						onMouseOut={ onMouseOut }
+						onFocus={ onMouseOver }
+						onBlur={ onMouseOut }
 						value={ customRangeValue }
 						min={ 0 }
 						max={ CUSTOM_VALUE_SETTINGS[ selectedUnit ]?.max ?? 10 }
@@ -278,6 +282,8 @@ export default function SpacingInputControl( {
 					label={ ariaLabel }
 					hideLabelFromVision={ true }
 					__nextHasNoMarginBottom={ true }
+					onFocus={ onMouseOver }
+					onBlur={ onMouseOut }
 				/>
 			) }
 			{ ! showRangeControl && ! showCustomValueControl && (
@@ -303,6 +309,8 @@ export default function SpacingInputControl( {
 					size={ '__unstable-large' }
 					onMouseOver={ onMouseOver }
 					onMouseOut={ onMouseOut }
+					onFocus={ onMouseOver }
+					onBlur={ onMouseOut }
 				/>
 			) }
 		</>
