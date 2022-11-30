@@ -1,3 +1,7 @@
+//TODO:
+// - cross check types with README.md
+// - add JSDoc to main component props in types.ts
+
 export type AlignmentMatrixControlValue =
 	| 'top left'
 	| 'top center'
