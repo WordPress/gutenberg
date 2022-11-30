@@ -111,7 +111,13 @@ describe( 'UnitControl', () => {
 				<UnitControl className="hello" />
 			);
 
-			expect( withoutClassName ).toMatchDiffSnapshot( withClassName );
+			expect(
+				withoutClassName.querySelector( '.components-unit-control' )
+			).not.toHaveClass( 'hello' );
+			expect(
+				// eslint-disable-next-line testing-library/no-container
+				withClassName.querySelector( '.components-unit-control' )
+			).toHaveClass( 'hello' );
 		} );
 
 		it( 'should not render select, if units are disabled', () => {
