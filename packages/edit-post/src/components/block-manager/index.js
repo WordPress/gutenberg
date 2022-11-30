@@ -66,6 +66,7 @@ function BlockManager( {
 				</div>
 			) }
 			<SearchControl
+				__nextHasNoMarginBottom
 				label={ __( 'Search for a block' ) }
 				placeholder={ __( 'Search for a block' ) }
 				value={ search }
