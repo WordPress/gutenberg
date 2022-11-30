@@ -82,7 +82,7 @@ const countReducer =
 function ListViewBranch( props ) {
 	const {
 		blocks,
-		selectBlock,
+		selectBlock = () => {},
 		showBlockMovers,
 		selectedClientIds,
 		level = 1,
@@ -214,9 +214,5 @@ function ListViewBranch( props ) {
 		</>
 	);
 }
-
-ListViewBranch.defaultProps = {
-	selectBlock: () => {},
-};
 
 export default memo( ListViewBranch );
