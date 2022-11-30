@@ -1,10 +1,3 @@
-/**
- * WordPress dependencies
- */
-/**
- * Internal dependencies
- */
-
 const tableContentPasteSchema = ( { phrasingContentSchema } ) => ( {
 	tr: {
 		allowEmpty: true,
