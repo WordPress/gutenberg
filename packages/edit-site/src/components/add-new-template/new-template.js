@@ -289,12 +289,10 @@ function useMissingTemplates(
 		usePostTypeMenuItems( onClickMenuItem );
 
 	const authorMenuItem = useAuthorMenuItem( onClickMenuItem );
-	const productAttributesMenuItem = useProductAttributeMenuItem();
 	[
 		...defaultTaxonomiesMenuItems,
 		...defaultPostTypesMenuItems,
 		authorMenuItem,
-		productAttributesMenuItem,
 	].forEach( ( menuItem ) => {
 		if ( ! menuItem ) {
 			return;
@@ -325,6 +323,7 @@ function useMissingTemplates(
 		...usePostTypeArchiveMenuItems(),
 		...postTypesMenuItems,
 		...taxonomiesMenuItems,
+		useProductAttributeMenuItem(),
 	];
 	return missingTemplates;
 }
