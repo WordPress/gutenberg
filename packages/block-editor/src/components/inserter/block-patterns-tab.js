@@ -175,16 +175,6 @@ function BlockPatternsTabs( {
 	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
 	const categories = usePatternsCategories();
 	const isMobile = useViewportMatch( 'medium', '<' );
-	const getBlockPatternsCategoryPanel = useCallback(
-		( category ) => (
-			<BlockPatternsCategoryPanel
-				onInsert={ onInsert }
-				rootClientId={ rootClientId }
-				category={ category }
-			/>
-		),
-		[ onInsert, rootClientId ]
-	);
 	return (
 		<>
 			{ ! isMobile && (
@@ -238,7 +228,13 @@ function BlockPatternsTabs( {
 			) }
 			{ isMobile && (
 				<MobileTabNavigation categories={ categories }>
-					{ getBlockPatternsCategoryPanel }
+					{ ( category ) => (
+						<BlockPatternsCategoryPanel
+							onInsert={ onInsert }
+							rootClientId={ rootClientId }
+							category={ category }
+						/>
+					) }
 				</MobileTabNavigation>
 			) }
 			{ showPatternsExplorer && (

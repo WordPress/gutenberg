@@ -49,16 +49,6 @@ function MediaTab( {
 		},
 		[ onInsert ]
 	);
-	const getMediaCategoryPanel = useCallback(
-		( category ) => (
-			<MediaCategoryPanel
-				onInsert={ onInsert }
-				rootClientId={ rootClientId }
-				category={ category }
-			/>
-		),
-		[ onInsert, rootClientId ]
-	);
 	return (
 		<>
 			{ ! isMobile && (
@@ -129,7 +119,13 @@ function MediaTab( {
 			) }
 			{ isMobile && (
 				<MobileTabNavigation categories={ mediaCategories }>
-					{ getMediaCategoryPanel }
+					{ ( category ) => (
+						<MediaCategoryPanel
+							onInsert={ onInsert }
+							rootClientId={ rootClientId }
+							category={ category }
+						/>
+					) }
 				</MobileTabNavigation>
 			) }
 		</>
