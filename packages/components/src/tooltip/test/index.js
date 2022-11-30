@@ -184,6 +184,7 @@ describe( 'Tooltip', () => {
 			// Note: this is testing for implementation details,
 			// but couldn't find a better way.
 			const buttonRect = button.getBoundingClientRect();
+			// eslint-disable-next-line testing-library/no-container
 			const eventCatcher = container.querySelector( '.event-catcher' );
 			const eventCatcherRect = eventCatcher.getBoundingClientRect();
 			expect( buttonRect ).toEqual( eventCatcherRect );
@@ -217,8 +218,8 @@ describe( 'Tooltip', () => {
 				</Tooltip>
 			);
 
-			const eventCatcher =
-				container.getElementsByClassName( 'event-catcher' )[ 0 ];
+			// eslint-disable-next-line testing-library/no-container
+			const eventCatcher = container.querySelector( '.event-catcher' );
 			await user.click( eventCatcher );
 			expect( onClickMock ).not.toHaveBeenCalled();
 		} );

@@ -48,9 +48,11 @@ describe( 'RangeControl', () => {
 				/>
 			);
 
+			// eslint-disable-next-line testing-library/no-container
 			const beforeIcon = container.querySelector(
 				'.dashicons-format-image'
 			);
+			// eslint-disable-next-line testing-library/no-container
 			const afterIcon = container.querySelector(
 				'.dashicons-format-video'
 			);
