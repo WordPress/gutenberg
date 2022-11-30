@@ -98,6 +98,7 @@ const Overlay = ( {
 					panelId={ clientId }
 				>
 					<RangeControl
+						__nextHasNoMarginBottom
 						label={ __( 'Overlay opacity' ) }
 						value={ dimRatio }
 						onChange={ ( newDimRatio ) =>

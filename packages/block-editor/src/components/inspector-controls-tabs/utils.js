@@ -11,10 +11,10 @@ export const TAB_SETTINGS = {
 	className: 'block-editor-block-inspector__tab-item',
 };
 
-export const TAB_APPEARANCE = {
-	name: 'appearance',
-	title: 'Appearance',
-	value: 'appearance',
+export const TAB_STYLES = {
+	name: 'styles',
+	title: 'Styles',
+	value: 'styles',
 	icon: styles,
 	className: 'block-editor-block-inspector__tab-item',
 };

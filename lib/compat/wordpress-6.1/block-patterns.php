@@ -51,13 +51,12 @@ function gutenberg_register_theme_block_patterns() {
 	 * Register patterns for the active theme. If the theme is a child theme,
 	 * let it override any patterns from the parent theme that shares the same slug.
 	 */
-	$themes     = array();
-	$stylesheet = get_stylesheet();
-	$template   = get_template();
-	if ( $stylesheet !== $template ) {
-		$themes[] = wp_get_theme( $stylesheet );
+	$themes   = array();
+	$wp_theme = wp_get_theme();
+	if ( $wp_theme->parent() ) {
+		$themes[] = $wp_theme->parent();
 	}
-	$themes[] = wp_get_theme( $template );
+	$themes[] = $wp_theme;
 
 	foreach ( $themes as $theme ) {
 		$dirpath = $theme->get_stylesheet_directory() . '/patterns/';

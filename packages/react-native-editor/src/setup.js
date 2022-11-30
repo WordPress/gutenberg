@@ -9,8 +9,9 @@ import { I18nManager, LogBox } from 'react-native';
 import { unregisterBlockType, getBlockType } from '@wordpress/blocks';
 import { addAction, addFilter } from '@wordpress/hooks';
 import * as wpData from '@wordpress/data';
-import { initializeEditor } from '@wordpress/edit-post';
 import { registerCoreBlocks } from '@wordpress/block-library';
+// eslint-disable-next-line no-restricted-imports
+import { initializeEditor } from '@wordpress/edit-post';
 
 /**
  * Internal dependencies

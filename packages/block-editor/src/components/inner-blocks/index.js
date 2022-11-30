@@ -10,6 +10,7 @@ import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
 import { forwardRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
+	getBlockSupport,
 	getBlockType,
 	store as blocksStore,
 	__unstableGetInnerBlocksProps as getInnerBlocksProps,
@@ -74,26 +75,32 @@ function UncontrolledInnerBlocks( props ) {
 		templateInsertUpdatesSelection
 	);
 
-	const context = useSelect(
+	const { context, name } = useSelect(
 		( select ) => {
 			const block = select( blockEditorStore ).getBlock( clientId );
 
 			// This check is here to avoid the Redux zombie bug where a child subscription
 			// is called before a parent, causing potential JS errors when the child has been removed.
 			if ( ! block ) {
-				return;
+				return {};
 			}
 
 			const blockType = getBlockType( block.name );
 
 			if ( ! blockType || ! blockType.providesContext ) {
-				return;
+				return {};
 			}
 
-			return getBlockContext( block.attributes, blockType );
+			return {
+				context: getBlockContext( block.attributes, blockType ),
+				name: block.name,
+			};
 		},
 		[ clientId ]
 	);
+
+	const { allowSizingOnChildren = false } =
+		getBlockSupport( name, '__experimentalLayout' ) || {};
 
 	// This component needs to always be synchronous as it's the one changing
 	// the async mode depending on the block selection.
@@ -103,7 +110,10 @@ function UncontrolledInnerBlocks( props ) {
 				rootClientId={ clientId }
 				renderAppender={ renderAppender }
 				__experimentalAppenderTagName={ __experimentalAppenderTagName }
-				__experimentalLayout={ __experimentalLayout }
+				__experimentalLayout={ {
+					...__experimentalLayout,
+					allowSizingOnChildren,
+				} }
 				wrapperRef={ wrapperRef }
 				placeholder={ placeholder }
 			/>

@@ -58,6 +58,7 @@ import {
 } from '@wordpress/element';
 import { cover as icon, replace, image, warning } from '@wordpress/icons';
 import { getProtocol } from '@wordpress/url';
+// eslint-disable-next-line no-restricted-imports
 import { store as editPostStore } from '@wordpress/edit-post';
 
 /**

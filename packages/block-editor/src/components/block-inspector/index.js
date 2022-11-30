@@ -32,6 +32,7 @@ import BlockStyles from '../block-styles';
 import DefaultStylePicker from '../default-style-picker';
 import { default as InspectorControls } from '../inspector-controls';
 import { default as InspectorControlsTabs } from '../inspector-controls-tabs';
+import useInspectorControlsTabs from '../inspector-controls-tabs/use-inspector-controls-tabs';
 import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel';
 
 function useContentBlocks( blockTypes, block ) {
@@ -139,7 +140,6 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 		selectedBlockClientId,
 		blockType,
 		topLevelLockedBlock,
-		parentBlockClientId,
 	} = useSelect( ( select ) => {
 		const {
 			getSelectedBlockClientId,
@@ -147,7 +147,6 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			getBlockName,
 			__unstableGetContentLockingParent,
 			getTemplateLock,
-			getBlockParents,
 		} = select( blockEditorStore );
 
 		const _selectedBlockClientId = getSelectedBlockClientId();
@@ -166,21 +165,20 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 				( getTemplateLock( _selectedBlockClientId ) === 'contentOnly'
 					? _selectedBlockClientId
 					: undefined ),
-			parentBlockClientId: getBlockParents(
-				_selectedBlockClientId,
-				true
-			)[ 0 ],
 		};
 	}, [] );
 
-	const showTabs = window?.__experimentalEnableBlockInspectorTabs;
+	const availableTabs = useInspectorControlsTabs( blockType?.name );
+	const showTabs =
+		window?.__experimentalEnableBlockInspectorTabs &&
+		availableTabs.length > 1;
 
 	if ( count > 1 ) {
 		return (
 			<div className="block-editor-block-inspector">
 				<MultiSelectionInspector />
 				{ showTabs ? (
-					<InspectorControlsTabs />
+					<InspectorControlsTabs tabs={ availableTabs } />
 				) : (
 					<>
 						<InspectorControls.Slot />
@@ -239,17 +237,15 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 		<BlockInspectorSingleBlock
 			clientId={ selectedBlockClientId }
 			blockName={ blockType.name }
-			parentBlockClientId={ parentBlockClientId }
 		/>
 	);
 };
 
-const BlockInspectorSingleBlock = ( {
-	clientId,
-	blockName,
-	parentBlockClientId,
-} ) => {
-	const showTabs = window?.__experimentalEnableBlockInspectorTabs;
+const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
+	const availableTabs = useInspectorControlsTabs( blockName );
+	const showTabs =
+		window?.__experimentalEnableBlockInspectorTabs &&
+		availableTabs.length > 1;
 
 	const hasBlockStyles = useSelect(
 		( select ) => {
@@ -261,17 +257,11 @@ const BlockInspectorSingleBlock = ( {
 	);
 	const blockInformation = useBlockDisplayInformation( clientId );
 
-	const { selectBlock } = useDispatch( blockEditorStore );
-
 	return (
 		<div className="block-editor-block-inspector">
 			<BlockCard
 				{ ...blockInformation }
 				className={ blockInformation.isSynced && 'is-synced' }
-				parentBlockClientId={ parentBlockClientId }
-				handleBackButton={ () => {
-					selectBlock( parentBlockClientId );
-				} }
 			/>
 			<BlockVariationTransforms blockClientId={ clientId } />
 			{ showTabs && (
@@ -279,6 +269,7 @@ const BlockInspectorSingleBlock = ( {
 					hasBlockStyles={ hasBlockStyles }
 					clientId={ clientId }
 					blockName={ blockName }
+					tabs={ availableTabs }
 				/>
 			) }
 			{ ! showTabs && (

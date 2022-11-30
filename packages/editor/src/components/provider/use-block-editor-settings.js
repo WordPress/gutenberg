@@ -7,6 +7,7 @@ import {
 	store as coreStore,
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 	__experimentalFetchUrlData as fetchUrlData,
+	__experimentalFetchMedia as fetchMedia,
 } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 
@@ -15,6 +16,8 @@ import { __ } from '@wordpress/i18n';
  */
 import { mediaUpload } from '../../utils';
 import { store as editorStore } from '../../store';
+
+const EMPTY_BLOCKS_LIST = [];
 
 /**
  * React hook used to compute the block editor settings to use for the post editor.
@@ -50,7 +53,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 						'wp_block',
 						{ per_page: -1 }
 				  )
-				: [], // Reusable blocks are fetched in the native version of this hook.
+				: EMPTY_BLOCKS_LIST, // Reusable blocks are fetched in the native version of this hook.
 			hasUploadPermissions: canUser( 'create', 'media' ) ?? true,
 			userCanCreatePages: canUser( 'create', 'pages' ),
 			pageOnFront: siteSettings?.page_on_front,
@@ -182,6 +185,9 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
+			// TODO: We should find a proper way to consolidate similar cases
+			// like reusable blocks, fetch entities, etc.
+			__unstableFetchMedia: fetchMedia,
 			__experimentalFetchRichUrlData: fetchUrlData,
 			__experimentalCanUserUseUnfilteredHTML: canUseUnfilteredHTML,
 			__experimentalUndo: undo,
