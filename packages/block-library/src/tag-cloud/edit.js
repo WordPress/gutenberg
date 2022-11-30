@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, filter } from 'lodash';
+import { map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -69,7 +69,7 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 			disabled: true,
 		};
 		const taxonomyOptions = map(
-			filter( taxonomies, 'show_cloud' ),
+			taxonomies?.filter( ( tax ) => !! tax.show_cloud ),
 			( item ) => {
 				return {
 					value: item.slug,

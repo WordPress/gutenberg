@@ -77,6 +77,7 @@ export function TabPanel( {
 	className,
 	children,
 	tabs,
+	selectOnMove = true,
 	initialTabName,
 	orientation = 'horizontal',
 	activeClass = 'is-active',
@@ -93,7 +94,12 @@ export function TabPanel( {
 		[ onSelect ]
 	);
 
-	const onNavigate = ( _childIndex: number, child: HTMLButtonElement ) => {
+	// Simulate a click on the newly focused tab, which causes the component
+	// to show the `tab-panel` associated with the clicked tab.
+	const activateTabAutomatically = (
+		_childIndex: number,
+		child: HTMLButtonElement
+	) => {
 		child.click();
 	};
 	const selectedTab = find( tabs, { name: selected } );
@@ -110,7 +116,9 @@ export function TabPanel( {
 			<NavigableMenu
 				role="tablist"
 				orientation={ orientation }
-				onNavigate={ onNavigate }
+				onNavigate={
+					selectOnMove ? activateTabAutomatically : undefined
+				}
 				className="components-tab-panel__tabs"
 			>
 				{ tabs.map( ( tab ) => (
@@ -127,8 +135,11 @@ export function TabPanel( {
 						selected={ tab.name === selected }
 						key={ tab.name }
 						onClick={ () => handleTabSelection( tab.name ) }
+						label={ tab.icon && tab.title }
+						icon={ tab.icon }
+						showTooltip={ !! tab.icon }
 					>
-						{ tab.title }
+						{ ! tab.icon && tab.title }
 					</TabButton>
 				) ) }
 			</NavigableMenu>

@@ -28,21 +28,13 @@ describe( 'Theme', () => {
 	describe( 'accent color', () => {
 		it( 'it does not define the accent color (and its variations) as a CSS variable when the `accent` prop is undefined', () => {
 			render(
-				<Theme>
+				<Theme data-testid="theme">
 					<MyThemableComponent>Inner</MyThemableComponent>
 				</Theme>
 			);
 
-			const inner = screen.getByText( 'Inner' );
-
-			if ( inner?.parentElement === null ) {
-				throw new Error(
-					'Somehow the `Theme` component does not render a DOM element?'
-				);
-			}
-
 			const innerElementStyles = window.getComputedStyle(
-				inner?.parentElement
+				screen.getByTestId( 'theme' )
 			);
 
 			expect(
@@ -66,14 +58,12 @@ describe( 'Theme', () => {
 
 		it( 'it defines the accent color (and its variations) as a CSS variable', () => {
 			render(
-				<Theme accent="#123abc">
+				<Theme accent="#123abc" data-testid="theme">
 					<MyThemableComponent>Inner</MyThemableComponent>
 				</Theme>
 			);
 
-			const inner = screen.getByText( 'Inner' );
-
-			expect( inner?.parentElement ).toHaveStyle( {
+			expect( screen.getByTestId( 'theme' ) ).toHaveStyle( {
 				'--wp-components-color-accent': '#123abc',
 				'--wp-components-color-accent-darker-10': '#0e2c8d',
 				'--wp-components-color-accent-darker-20': '#091d5f',

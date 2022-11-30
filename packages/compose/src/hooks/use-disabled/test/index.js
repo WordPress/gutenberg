@@ -21,7 +21,7 @@ describe( 'useDisabled', () => {
 			<form ref={ ref }>
 				<input />
 				<a href="https://wordpress.org/">A link</a>
-				<p contentEditable={ true } tabIndex="0"></p>
+				<p role="document" contentEditable={ true } tabIndex="0"></p>
 				{ showButton && <button>Button</button> }
 			</form>
 		);
@@ -33,11 +33,11 @@ describe( 'useDisabled', () => {
 	}
 
 	it( 'will disable all fields', () => {
-		const { container } = render( <DisabledComponent /> );
+		render( <DisabledComponent /> );
 
 		const input = screen.getByRole( 'textbox' );
 		const link = screen.getByRole( 'link' );
-		const p = container.querySelector( 'p' );
+		const p = screen.getByRole( 'document' );
 
 		expect( input ).toHaveAttribute( 'inert', 'true' );
 		expect( link ).toHaveAttribute( 'inert', 'true' );

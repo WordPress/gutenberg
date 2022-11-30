@@ -37,8 +37,8 @@
 		"src/**/*.ios.js",
 		"src/**/*.native.js",
 		"src/**/react-native-*",
-		"src/**/stories/**.js", // only exclude js files, tsx files should be checked
-		"src/**/test/**.js", // only exclude js files, ts{x} files should be checked
+		"src/**/stories/**/*.js", // only exclude js files, tsx files should be checked
+		"src/**/test/**/*.js", // only exclude js files, ts{x} files should be checked
 		"src/index.js",
 		"src/alignment-matrix-control",
 		"src/angle-picker-control",
@@ -65,7 +65,6 @@
 		"src/query-controls",
 		"src/responsive-wrapper",
 		"src/sandbox",
-		"src/snackbar",
 		"src/toolbar",
 		"src/toolbar-button",
 		"src/toolbar-context",

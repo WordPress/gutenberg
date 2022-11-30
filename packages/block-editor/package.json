@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-editor",
-	"version": "10.4.0",
+	"version": "10.5.0",
 	"description": "Generic block editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -44,6 +44,7 @@
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
+		"@wordpress/escape-html": "file:../escape-html",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",

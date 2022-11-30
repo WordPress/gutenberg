@@ -150,6 +150,8 @@ The method for point releases is nearly identical to the main Plugin release pro
 
 The point release should only contain the _specific commits_ required. To do this you should checkout the previous _minor_ stable (i.e. non-RC) release branch (e.g. `release/12.5`) locally and then cherry pick any commits that you require into that branch.
 
+_IMPORTANT:_ If an RC already exists for a new version, you _need_ to cherry-pick the same commits in the respective release branch, as they will not be included automatically. E.g.: If you're about to release a new point-release for 12.5 and just cherry-picked into `release/12.5`, but 12.6.0-rc.1 is already out, then you need to cherry-pick the same commits into the `release/12.6` branch, or they won't be included in subsequent releases for 12.6!
+
 The cherry-picking process can be automated with the [`npm run cherry-pick` script](/docs/contributors/code/auto-cherry-picking.md).
 
 You must also ensure that all PRs being included are assigned to the Github Milestone on which the point release is based. Bear in mind, that when PRs are _merged_ they are automatically assigned a milestone for the next _stable_ release. Therefore you will need to go back through each PR in Github and re-assign the Milestone.
