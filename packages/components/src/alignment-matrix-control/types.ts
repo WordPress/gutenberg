@@ -12,18 +12,23 @@ export type AlignmentMatrixControlValue =
 
 export type AlignmentMatrixControlProps = {
 	label: string;
-	defaultValue?: string;
+	defaultValue?: AlignmentMatrixControlValue;
 	value: AlignmentMatrixControlValue;
 	onChange: ( newValue: AlignmentMatrixControlValue ) => void;
 	width: number;
 };
 
-export type AlignmentMatrixControlIconProps = {
+export type AlignmentMatrixControlIconProps = Pick<
+	AlignmentMatrixControlProps,
+	'value'
+> & {
 	disablePointerEvents?: boolean;
 	size: number;
-	value: AlignmentMatrixControlValue;
 };
-export type AlignmentMatrixControlCellProps = {
+
+export type AlignmentMatrixControlCellProps = Pick<
+	AlignmentMatrixControlProps,
+	'value'
+> & {
 	isActive: boolean;
-	value: AlignmentMatrixControlValue;
 };
