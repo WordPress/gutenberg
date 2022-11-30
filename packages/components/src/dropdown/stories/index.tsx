@@ -27,6 +27,12 @@ const meta: ComponentMeta< typeof Dropdown > = {
 		renderContent: { control: { type: null } },
 		renderToggle: { control: { type: null } },
 	},
+	parameters: {
+		controls: {
+			expanded: true,
+		},
+		docs: { source: { state: 'open' } },
+	},
 };
 export default meta;
 
