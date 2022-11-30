@@ -1,7 +1,3 @@
-//TODO:
-// - cross check types with README.md
-// - add JSDoc to main component props in types.ts
-
 export type AlignmentMatrixControlValue =
 	| 'top left'
 	| 'top center'
@@ -22,9 +18,21 @@ export type AlignmentMatrixControlProps = {
 	 * @default 'Alignment Matrix Control'
 	 */
 	label?: string;
+	/**
+	 * If provided, sets the default alignment value.
+	 */
 	defaultValue?: AlignmentMatrixControlValue;
+	/**
+	 * The current alignment value.
+	 */
 	value?: AlignmentMatrixControlValue;
+	/**
+	 * A function that receives the updated alignment value.
+	 */
 	onChange?: ( newValue: AlignmentMatrixControlValue ) => void;
+	/**
+	 * If provided, sets the width of the wrapper <Composite/> component.
+	 */
 	width?: number;
 };
 
