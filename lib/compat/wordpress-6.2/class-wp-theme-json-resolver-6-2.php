@@ -23,7 +23,6 @@ class WP_Theme_JSON_Resolver_6_2 extends WP_Theme_JSON_Resolver_6_1 {
 	 *
 	 * This can also create and return a new draft custom post type.
 	 *
-	 *
 	 * @param WP_Theme $theme              The theme object. If empty, it
 	 *                                     defaults to the active theme.
 	 * @param bool     $create_post        Optional. Whether a new custom post
@@ -53,7 +52,7 @@ class WP_Theme_JSON_Resolver_6_2 extends WP_Theme_JSON_Resolver_6_1 {
 		$user_cpt         = array();
 		$post_type_filter = 'wp_global_styles';
 		$stylesheet       = $theme->get_stylesheet();
-		$args = array(
+		$args             = array(
 			'posts_per_page'         => 1,
 			'orderby'                => 'date',
 			'order'                  => 'desc',
