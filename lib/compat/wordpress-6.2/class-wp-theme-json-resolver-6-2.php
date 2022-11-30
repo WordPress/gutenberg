@@ -83,7 +83,7 @@ class WP_Theme_JSON_Resolver_6_2 extends WP_Theme_JSON_Resolver_6_1 {
 		 * So we take theme supports, transform it to theme.json shape
 		 * and merge the static::$theme upon that.
 		 */
-		$theme_support_data = WP_Theme_JSON::get_from_editor_settings( gutenberg_get_block_theme_supports() );
+		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( gutenberg_get_block_theme_supports() );
 		if ( ! wp_theme_has_support() ) {
 			if ( ! isset( $theme_support_data['settings']['color'] ) ) {
 				$theme_support_data['settings']['color'] = array();
