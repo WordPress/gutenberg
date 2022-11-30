@@ -859,7 +859,6 @@ export const blocks = pipe(
 					if ( updatedAttributeEntries.length === 0 ) {
 						continue;
 					}
-					hasChange = true;
 					let hasUpdatedAttributes = false;
 					const existingAttributes = state.get( clientId );
 					const newAttributes = {};
