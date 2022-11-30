@@ -116,11 +116,27 @@ function LinkControlTransforms( { clientId } ) {
 	);
 }
 
+/**
+ * Removes HTML from a given string.
+ * Note the does not provide XSS protection or otherwise attempt
+ * to filter strings with malicious intent.
+ *
+ * See also: https://github.com/WordPress/gutenberg/pull/35539
+ *
+ * @param {string} html the string from which HTML should be removed.
+ * @return {string} the "cleaned" string.
+ */
+function navStripHTML( html ) {
+	const doc = document.implementation.createHTMLDocument( '' );
+	doc.body.innerHTML = html;
+	return doc.body.textContent || '';
+}
+
 export function LinkUI( props ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 
 	async function handleCreate( pageTitle ) {
-		const postType = props.linkAttributes.type || 'page';
+		const postType = props.link.type || 'page';
 
 		const page = await saveEntityRecord( 'postType', postType, {
 			title: pageTitle,
@@ -146,6 +162,12 @@ export function LinkUI( props ) {
 		};
 	}
 
+	const link = {
+		url: props.link.url,
+		opensInNewTab: props.link.opensInNewTab,
+		title: props.link.label && navStripHTML( props.link.label ),
+	};
+
 	return (
 		<Popover
 			placement="bottom"
@@ -157,14 +179,14 @@ export function LinkUI( props ) {
 				hasTextControl
 				hasRichPreviews
 				className={ props.className }
-				value={ props.value }
+				value={ link }
 				showInitialSuggestions={ true }
 				withCreateSuggestion={ props.hasCreateSuggestion }
 				createSuggestion={ handleCreate }
 				createSuggestionButtonText={ ( searchTerm ) => {
 					let format;
 
-					if ( props.linkAttributes.type === 'post' ) {
+					if ( props.link.type === 'post' ) {
 						/* translators: %s: search term. */
 						format = __( 'Create draft post: <mark>%s</mark>' );
 					} else {
@@ -179,16 +201,16 @@ export function LinkUI( props ) {
 						}
 					);
 				} }
-				noDirectEntry={ !! props.linkAttributes.type }
-				noURLSuggestion={ !! props.linkAttributes.type }
+				noDirectEntry={ !! props.link.type }
+				noURLSuggestion={ !! props.link.type }
 				suggestionsQuery={ getSuggestionsQuery(
-					props.linkAttributes.type,
-					props.linkAttributes.kind
+					props.link.type,
+					props.link.kind
 				) }
 				onChange={ props.onChange }
 				onRemove={ props.onRemove }
 				renderControlBottom={
-					! props.linkAttributes.url
+					! props.link.url
 						? () => (
 								<LinkControlTransforms
 									clientId={ props.clientId }
