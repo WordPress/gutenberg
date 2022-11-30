@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { AccessibilityInfo, Image } from 'react-native';
+import { Image } from 'react-native';
 import {
 	getEditorHtml,
 	initializeEditor,
@@ -90,10 +90,6 @@ beforeAll( () => {
 	const getSizeSpy = jest.spyOn( Image, 'getSize' );
 	getSizeSpy.mockImplementation( ( _url, callback ) => callback( 300, 200 ) );
 
-	AccessibilityInfo.isScreenReaderEnabled.mockResolvedValue(
-		Promise.resolve( true )
-	);
-
 	// Register required blocks.
 	paragraph.init();
 	cover.init();
@@ -103,7 +99,6 @@ beforeAll( () => {
 afterAll( () => {
 	// Restore mocks.
 	Image.getSize.mockRestore();
-	AccessibilityInfo.isScreenReaderEnabled.mockReset();
 
 	// Clean up registered blocks.
 	unregisterBlockType( paragraph.name );
