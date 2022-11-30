@@ -11,18 +11,19 @@ import { getListContentSchema } from '../list/transforms';
 
 const tableContentPasteSchema = ( { phrasingContentSchema } ) => ( {
 	// lists are allowed on paste but will be transformed to simple content
-	// by transformContent below. See test/transform.js
+	// by transformContent below. 
 	tr: {
 		allowEmpty: true,
 		children: {
 			th: {
 				allowEmpty: true,
 				children: getListContentSchema( { phrasingContentSchema } ),
-				attributes: [ 'scope' ],
+				attributes: [ 'scope', 'colspan' ],
 			},
 			td: {
 				allowEmpty: true,
 				children: getListContentSchema( { phrasingContentSchema } ),
+				attributes: [ 'colspan' ],
 			},
 		},
 	},
