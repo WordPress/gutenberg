@@ -11,6 +11,18 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import {
+	hasAlignSupport,
+	hasBorderSupport,
+	hasBackgroundColorSupport,
+	hasTextColorSupport,
+	hasGradientSupport,
+	hasCustomClassNameSupport,
+	hasFontFamilySupport,
+	hasFontSizeSupport,
+	hasLayoutSupport,
+	hasStyleSupport,
+} from '../../hooks/supports';
 
 /**
  * Determine if the copied text looks like serialized blocks or not.
@@ -43,31 +55,39 @@ function hasSerializedBlocks( text ) {
  * (Except for some unrelated to style like `anchor` or `settings`.)
  * They generally represent the default block supports.
  */
-const STYLE_ATTRIBUTES = [
-	'align',
-	'borderColor',
-	'backgroundColor',
-	'textColor',
-	'gradient',
-	'className',
-	'fontFamily',
-	'fontSize',
-	'layout',
-	'style',
-];
+const STYLE_ATTRIBUTES = {
+	align: hasAlignSupport,
+	borderColor: ( nameOrType ) => hasBorderSupport( nameOrType, 'color' ),
+	backgroundColor: hasBackgroundColorSupport,
+	textColor: hasTextColorSupport,
+	gradient: hasGradientSupport,
+	className: hasCustomClassNameSupport,
+	fontFamily: hasFontFamilySupport,
+	fontSize: hasFontSizeSupport,
+	layout: hasLayoutSupport,
+	style: hasStyleSupport,
+};
 
 /**
- * Get the "style attributes" from a given block.
+ * Get the "style attributes" from a given block to a target block.
  *
- * @param {WPBlock} block The input block.
+ * @param {WPBlock} sourceBlock The source block.
+ * @param {WPBlock} targetBlock The target block.
  * @return {Object} the filtered attributes object.
  */
-function getStyleAttributes( block ) {
-	// Override attributes that are not present in the block to their defaults.
-	return STYLE_ATTRIBUTES.reduce( ( attributes, attributeKey ) => {
-		attributes[ attributeKey ] = block.attributes[ attributeKey ];
-		return attributes;
-	}, {} );
+function getStyleAttributes( sourceBlock, targetBlock ) {
+	return Object.entries( STYLE_ATTRIBUTES ).reduce(
+		( attributes, [ attributeKey, hasSupport ] ) => {
+			// Only apply the attribute if both blocks support it.
+			if ( hasSupport( sourceBlock.name ) && hasSupport( targetBlock ) ) {
+				// Override attributes that are not present in the block to their defaults.
+				attributes[ attributeKey ] =
+					sourceBlock.attributes[ attributeKey ];
+			}
+			return attributes;
+		},
+		{}
+	);
 }
 
 /**
@@ -89,7 +109,7 @@ function recursivelyUpdateBlockAttributes(
 	) {
 		updateBlockAttributes(
 			targetBlocks[ index ].clientId,
-			getStyleAttributes( sourceBlocks[ index ] )
+			getStyleAttributes( sourceBlocks[ index ], targetBlocks[ index ] )
 		);
 
 		recursivelyUpdateBlockAttributes(
