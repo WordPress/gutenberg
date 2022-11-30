@@ -18,13 +18,6 @@
 		padding: 0.5em;
 	}
 
-	// Match caption styles across front end and editor
-	figcaption {
-		color: inherit;
-		font-size: max(13px, 80%);
-		text-align: center;
-	}
-
 	// Fixed layout toggle
 	.has-fixed-layout {
 		table-layout: fixed;
