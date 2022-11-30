@@ -20,7 +20,7 @@ export default function Cell( {
 	isActive = false,
 	value,
 	...props
-}: WordPressComponentProps< AlignmentMatrixControlCellProps, 'div', false > ) {
+}: WordPressComponentProps< AlignmentMatrixControlCellProps, 'span', false > ) {
 	const tooltipText = ALIGNMENT_LABEL[ value ];
 
 	return (

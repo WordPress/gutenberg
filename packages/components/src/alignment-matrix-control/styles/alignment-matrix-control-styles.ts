@@ -8,6 +8,10 @@ import { css } from '@emotion/react';
  * Internal dependencies
  */
 import { COLORS, reduceMotion } from '../../utils';
+import type {
+	AlignmentMatrixControlIconProps,
+	AlignmentMatrixControlCellProps,
+} from '../types';
 
 export const rootBase = () => {
 	return css`
@@ -27,7 +31,9 @@ const rootSize = ( { size = 92 } ) => {
 	`;
 };
 
-export const Root = styled.div`
+export const Root = styled.div<
+	Pick< AlignmentMatrixControlIconProps, 'size' >
+>`
 	${ rootBase };
 
 	border: 1px solid transparent;
@@ -43,7 +49,9 @@ export const Row = styled.div`
 	grid-template-columns: repeat( 3, 1fr );
 `;
 
-const pointActive = ( { isActive } ) => {
+const pointActive = ( {
+	isActive,
+}: Pick< AlignmentMatrixControlCellProps, 'isActive' > ) => {
 	const boxShadow = isActive ? `0 0 0 2px ${ COLORS.gray[ 900 ] }` : null;
 	const pointColor = isActive ? COLORS.gray[ 900 ] : COLORS.gray[ 400 ];
 	const pointColorHover = isActive ? COLORS.gray[ 900 ] : COLORS.ui.theme;
@@ -58,7 +66,9 @@ const pointActive = ( { isActive } ) => {
 	`;
 };
 
-export const pointBase = ( props ) => {
+export const pointBase = (
+	props: Pick< AlignmentMatrixControlCellProps, 'isActive' >
+) => {
 	return css`
 		background: currentColor;
 		box-sizing: border-box;
@@ -71,7 +81,9 @@ export const pointBase = ( props ) => {
 	`;
 };
 
-export const Point = styled.span`
+export const Point = styled.span<
+	Pick< AlignmentMatrixControlCellProps, 'isActive' >
+>`
 	height: 6px;
 	width: 6px;
 	${ pointBase }
