@@ -26,7 +26,7 @@ import type {
 
 const noop = () => {};
 
-function useBaseId( id: string | undefined ) {
+function useBaseId( id?: string ) {
 	const instanceId = useInstanceId(
 		AlignmentMatrixControl,
 		'alignment-matrix-control'
