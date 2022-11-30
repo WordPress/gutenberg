@@ -217,13 +217,15 @@ function GalleryEdit( props ) {
 	}
 
 	function isValidFileType( file ) {
-		// It's necessary to retrieve the media type from the raw image data for uploaded images on native.
-		const image =
+		// It's necessary to retrieve the media type from the raw image data for already-uploaded images on native.
+		const nativeBlockData =
 			Platform.isNative && file.id
 				? find( imageData, { id: file.id } )
 				: null;
 
-		const mediaTypeSelector = image ? image?.media_type : file.type;
+		const mediaTypeSelector = nativeBlockData
+			? nativeBlockData?.media_type
+			: file.type;
 
 		return (
 			ALLOWED_MEDIA_TYPES.some(
