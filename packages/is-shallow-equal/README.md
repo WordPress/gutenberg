@@ -33,14 +33,14 @@ Shallow comparison differs from deep comparison by the fact that it compares mem
 
 ```js
 import isShallowEqual from '@wordpress/is-shallow-equal';
-import { isEqual } from 'lodash'; // deep comparison
+import fastDeepEqual from 'fast-deep-equal/es6'; // deep comparison
 
 let object = { a: 1 };
 
 isShallowEqual( [ { a: 1 } ], [ { a: 1 } ] );
 // ⇒ false
 
-isEqual( [ { a: 1 } ], [ { a: 1 } ] );
+fastDeepEqual( [ { a: 1 } ], [ { a: 1 } ] );
 // ⇒ true
 
 isShallowEqual( [ object ], [ object ] );

@@ -119,6 +119,7 @@ module.exports = {
 							'invoke',
 							'isArray',
 							'isBoolean',
+							'isEqual',
 							'isFinite',
 							'isFunction',
 							'isMatch',
