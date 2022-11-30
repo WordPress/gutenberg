@@ -331,16 +331,15 @@ function ListViewBlock( {
 							!! isSelected || forceSelectionContentLock
 						}
 					>
-						{ () => (
-							<>
-								{ isEditable && (
-									<BlockEditButton
-										label={ editAriaLabel }
-										clientId={ clientId }
-									/>
-								) }
-							</>
-						) }
+						{ ( props ) =>
+							isEditable && (
+								<BlockEditButton
+									{ ...props }
+									label={ editAriaLabel }
+									clientId={ clientId }
+								/>
+							)
+						}
 					</TreeGridCell>
 					<TreeGridCell
 						className={ listViewBlockSettingsClassName }
