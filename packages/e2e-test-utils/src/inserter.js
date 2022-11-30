@@ -99,10 +99,11 @@ async function waitForInserterCloseAndContentFocus() {
 	);
 }
 
+/**
+ * Wait for the inserter search to yield results because that input is debounced.
+ */
 async function waitForInserterSearch() {
-	// Inserter search results are debounced, let's wait a bit after typing.
-	// eslint-disable-next-line no-restricted-syntax
-	await page.waitForTimeout( 200 );
+	await page.waitForSelector( '.block-editor-inserter__no-tab-container' );
 }
 
 /**
