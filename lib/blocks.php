@@ -357,8 +357,13 @@ add_action( 'init', 'gutenberg_register_legacy_social_link_blocks' );
  * Ensures there's a `wp-block-<block name>` CSS class in the
  * rendered markup of every block with supports.className
  * set to true.
- * 
+ *
  * @since 6.2.0
+ *
+ * @param  string $block_content Rendered block content.
+ * @param  array  $parsed_block  The block being rendered.
+ * @param  object $block         Block object.
+ * @return string                Updated block content.
  */
 function gutenberg_add_default_class_name_to_rendered_block_markup( $block_content, $parsed_block, $block ) {
 	if ( ! $block_content ) {
