@@ -10,20 +10,30 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { styles, moreVertical, seen } from '@wordpress/icons';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import DefaultSidebar from './default-sidebar';
 import { GlobalStylesUI, useGlobalStylesReset } from '../global-styles';
+import { store as editSiteStore } from '../../store';
 
 export default function GlobalStylesSidebar() {
 	const [ canReset, onReset ] = useGlobalStylesReset();
 	const { toggle } = useDispatch( preferencesStore );
 	const [ isStyleBookOpened, setIsStyleBookOpened ] = useState( false );
+	const editorMode = useSelect(
+		( select ) => select( editSiteStore ).getEditorMode(),
+		[]
+	);
+	useEffect( () => {
+		if ( editorMode !== 'visual' ) {
+			setIsStyleBookOpened( false );
+		}
+	}, [ editorMode ] );
 	return (
 		<DefaultSidebar
 			className="edit-site-global-styles-sidebar"
@@ -46,6 +56,7 @@ export default function GlobalStylesSidebar() {
 									: __( 'Open Style Book' )
 							}
 							isPressed={ isStyleBookOpened }
+							disabled={ editorMode !== 'visual' }
 							onClick={ () => {
 								setIsStyleBookOpened( ! isStyleBookOpened );
 							} }
