@@ -122,7 +122,6 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
   display: -ms-flexbox;
   display: flex;
   font-family: inherit;
-  height: 100%;
   -webkit-box-pack: center;
   -ms-flex-pack: center;
   -webkit-justify-content: center;
@@ -140,6 +139,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
   user-select: none;
   width: 100%;
   z-index: 2;
+  height: 30px;
   color: #1e1e1e;
   width: 30px;
   padding-left: 0;
@@ -194,7 +194,6 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
   display: -ms-flexbox;
   display: flex;
   font-family: inherit;
-  height: 100%;
   -webkit-box-pack: center;
   -ms-flex-pack: center;
   -webkit-justify-content: center;
@@ -212,6 +211,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
   user-select: none;
   width: 100%;
   z-index: 2;
+  height: 30px;
   color: #1e1e1e;
   width: 30px;
   padding-left: 0;
@@ -439,7 +439,6 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
   display: -ms-flexbox;
   display: flex;
   font-family: inherit;
-  height: 100%;
   -webkit-box-pack: center;
   -ms-flex-pack: center;
   -webkit-justify-content: center;
@@ -457,6 +456,7 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
   user-select: none;
   width: 100%;
   z-index: 2;
+  height: 30px;
 }
 
 @media ( prefers-reduced-motion: reduce ) {

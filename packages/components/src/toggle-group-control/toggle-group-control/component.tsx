@@ -92,12 +92,11 @@ function UnconnectedToggleGroupControl(
  * `ToggleGroupControlOption` component.
  *
  * This component is intended for selecting a single persistent value from a set of options,
- * similar to a how a radio button group would work. If you simply want a toggle to switch between views,
- * use a `TabPanel` instead.
+ * similar to a how a radio button group would work.
  *
- * Only use this control when you know for sure the labels of items inside won't
- * wrap. For items with longer labels, you can consider a `SelectControl` or a
- * `CustomSelectControl` component instead.
+ * - If you want to select multiple options, use `ToggleMultipleGroupControl` instead.
+ * - If you simply want a toggle to switch between views, use a `TabPanel` instead.
+ * - Only use this control when you know for sure the labels of items inside won't wrap. For items with longer labels, you can consider a `SelectControl` or a `CustomSelectControl` component instead.
  *
  * ```jsx
  * import {
