@@ -35,9 +35,7 @@
 	},
 	"peerDependencies": {
 		"@babel/core": ">=7",
-		"jest": ">=27",
-		"react": ">=18",
-		"react-dom": ">=18"
+		"jest": ">=27"
 	},
 	"publishConfig": {
 		"access": "public"
