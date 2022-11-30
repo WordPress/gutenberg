@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const {
+	test,
+	expect,
+	Editor,
+} = require( '@wordpress/e2e-test-utils-playwright' );
 
 /**
  * @typedef {import('@playwright/test').Page} Page
@@ -11,6 +15,9 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 test.use( {
 	commentsBlockUtils: async ( { page, admin, requestUtils }, use ) => {
 		await use( new CommentsBlockUtils( { page, admin, requestUtils } ) );
+	},
+	editor: async ( { page }, use ) => {
+		await use( new Editor( { page, hasIframe: true } ) );
 	},
 } );
 
@@ -45,14 +52,15 @@ test.describe( 'Comments', () => {
 	test( 'We show no results message if there are no comments', async ( {
 		admin,
 		editor,
-		page,
 		requestUtils,
 	} ) => {
 		await requestUtils.deleteAllComments();
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/comments' } );
 		await expect(
-			page.locator( 'role=document[name="Block: Comment Template"i]' )
+			editor.canvas.locator(
+				'role=document[name="Block: Comment Template"i]'
+			)
 		).toContainText( 'No results found.' );
 	} );
 
@@ -153,7 +161,9 @@ test.describe( 'Comments', () => {
 			attributes: { legacy: true, textColor: 'vivid-purple' },
 		} );
 
-		const block = page.locator( 'role=document[name="Block: Comments"i]' );
+		const block = editor.canvas.locator(
+			'role=document[name="Block: Comments"i]'
+		);
 		const warning = block.locator( '.block-editor-warning' );
 		const placeholder = block.locator(
 			'.wp-block-comments__legacy-placeholder'
@@ -301,8 +311,12 @@ test.describe( 'Post Comments', () => {
 		await commentsBlockUtils.hideWelcomeGuide();
 
 		// Check that the Post Comments block has been replaced with Comments.
-		await expect( page.locator( '.wp-block-post-comments' ) ).toBeHidden();
-		await expect( page.locator( '.wp-block-comments' ) ).toBeVisible();
+		await expect(
+			editor.canvas.locator( '.wp-block-post-comments' )
+		).toBeHidden();
+		await expect(
+			editor.canvas.locator( '.wp-block-comments' )
+		).toBeVisible();
 
 		// Check the block definition has changed.
 		const content = await editor.getEditedPostContent();
