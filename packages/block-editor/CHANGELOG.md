@@ -2,7 +2,11 @@
 
 ## Unreleased
 
-### Enhancement
+### Breaking Changes
+
+-   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
+
+### Enhancements
 
 - `URLInput`: the `renderSuggestions` callback prop now receives `currentInputValue` as a new parameter ([45806](https://github.com/WordPress/gutenberg/pull/45806)).
 
