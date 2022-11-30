@@ -13,7 +13,7 @@ import {
 	createSlotFill,
 	__experimentalUseSlotFills as useSlotFills,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	getCategories,
 	getBlockTypes,
@@ -102,7 +102,7 @@ function StyleBook( { isSelected, onSelect, onClose } ) {
 	);
 	return (
 		<StyleBookFill>
-			<div
+			<section
 				className={ classnames( 'edit-site-style-book', {
 					'is-wide': sizes.width > 600,
 					'has-dark-background':
@@ -112,6 +112,7 @@ function StyleBook( { isSelected, onSelect, onClose } ) {
 				style={ {
 					background: backgroundColor,
 				} }
+				aria-label={ __( 'Style Book' ) }
 			>
 				{ resizeObserver }
 				<Button
@@ -133,7 +134,7 @@ function StyleBook( { isSelected, onSelect, onClose } ) {
 						/>
 					) }
 				</TabPanel>
-			</div>
+			</section>
 		</StyleBookFill>
 	);
 }
@@ -161,9 +162,14 @@ const Example = memo( ( { title, blocks, isSelected, onClick } ) => (
 		className={ classnames( 'edit-site-style-book__example', {
 			'is-selected': isSelected,
 		} ) }
+		aria-label={ sprintf(
+			// translators: %s: Title of a block, e.g. Heading.
+			__( 'Open %s styles in Styles panel' ),
+			title
+		) }
 		onClick={ onClick }
 	>
-		<h3 className="edit-site-style-book__example-title">{ title }</h3>
+		<span className="edit-site-style-book__example-title">{ title }</span>
 		<div className="edit-site-style-book__example-preview">
 			<BlockPreview
 				blocks={ blocks }
