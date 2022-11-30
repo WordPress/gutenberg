@@ -47,7 +47,6 @@ The following contributors merged PRs in this release:
 -   FocalPointPicker: Update the design of the focal point handle. ([45053](https://github.com/WordPress/gutenberg/pull/45053))
 -   FontSizePicker: Update hint text to match the design. ([44966](https://github.com/WordPress/gutenberg/pull/44966))
 -   CheckboxControl: Move icons out of labels. ([45535](https://github.com/WordPress/gutenberg/pull/45535))
--   RangeControl: remove margin overrides and add new opt-in prop. ([45985](https://github.com/WordPress/gutenberg/pull/45985))
 
 #### Block Editor
 
