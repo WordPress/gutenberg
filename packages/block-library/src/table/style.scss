@@ -20,9 +20,9 @@
 
 	// Match caption styles across front end and editor
 	figcaption {
-		@include caption-style-theme();
-
 		color: inherit;
+		font-size: max(13px, 70%);
+		text-align: center;
 	}
 
 	// Fixed layout toggle
