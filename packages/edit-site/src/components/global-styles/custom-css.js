@@ -6,57 +6,44 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import apiFetch from '@wordpress/api-fetch';
-import { useEffect, useState, useContext, createPortal } from '@wordpress/element';
-import { TextareaControl } from '@wordpress/components';
+import { useContext, createPortal, useState } from '@wordpress/element';
+import { TextareaControl, Button } from '@wordpress/components';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { BlockList } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
-/*
-function CustomCSSValue() {
-	const [ customCSS, getCustomCSS ] = useState();
-
-	useEffect( () => {
-		apiFetch( {
-			path: '/wp/v2/customcss',
-		} ).then( ( res ) => {
-			getCustomCSS( res );
-		} );
-	}, [] );
-
-	return customCSS;
-}
-*/
 function CustomCSSControl() {
-	const [ newCSS, updateCustomCSS ] = useState();
-	const [ customCSS, getCustomCSS ] = useState();
+	const [ updatedCSS, updateCSS ] = useState();
+	const customCSS = useSelect( ( select ) => {
+		const { getEntityRecord } = select( coreStore );
+		return getEntityRecord( 'postType', 'custom_css' )?.post_content;
+	} );
 
-	useEffect( () => {
-		apiFetch( {
-			path: '/wp/v2/customcss',
-		} ).then( ( res ) => {
-			getCustomCSS( res );
+	const { saveEntityRecord } = useDispatch( coreStore );
+
+	function updateCustomCSS() {
+		saveEntityRecord( 'postType', 'custom_css', {
+			custom_css: updatedCSS,
 		} );
-	}, [] );
-	/*
-	 useEffect( () => {
-		 apiFetch( {
-			 path: '/wp/v2/customcss',
-			 method: 'PUT', //PUT should be used for updating resources.
-			 data: { post_cotent: newCSS },
-		 } ).then( ( res ) => {
-			 console.log( res );
-		 } );
-	 }, [] );
-	 */
+	}
 
 	return (
-		<TextareaControl
-			value={ customCSS }
-			onChange={ ( value ) => updateCustomCSS( value ) }
-		/>
+		<>
+			<TextareaControl
+				value={ updatedCSS || customCSS }
+				onChange={ ( value ) => updateCSS( value ) }
+			/>
+			<Button
+				isPrimary
+				onClick={ () => updateCustomCSS() }
+				label={ __( 'Update' ) }
+			>
+				{ __( 'Update' ) }
+			</Button>
+		</>
 	);
 }
 
@@ -82,7 +69,8 @@ const withCustomCSS = createHigherOrderComponent(
 
 		return (
 			<>
-				{ element && createPortal( <style>{ __( ' *{border:3px solid purple;}' ) }</style>, element ) }
+				{ element &&
+					createPortal( <style>{ __( ' *{}' ) }</style>, element ) }
 				<BlockListBlock { ...props } className={ className } />
 			</>
 		);

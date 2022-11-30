@@ -47,6 +47,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/compat/wordpress-6.2/class-gutenberg-rest-custom-css-controller.php';
 	require_once __DIR__ . '/compat/wordpress-6.2/rest-api.php';
 	require_once __DIR__ . '/compat/wordpress-6.2/block-patterns.php';
+	require_once __DIR__ . '/compat/wordpress-6.2/custom-css-custom-post-type.php';
 
 	// Experimental.
 	if ( ! class_exists( 'WP_Rest_Customizer_Nonces' ) ) {

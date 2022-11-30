@@ -11,7 +11,7 @@
  *
  * @see WP_REST_Controller
  */
-class Gutenberg_REST_Custom_CSS_Controller extends WP_REST_Controller {
+class Gutenberg_REST_Custom_CSS_Controller extends WP_REST_Posts_Controller {
 
 	/**
 	 * Constructs the controller.
@@ -23,7 +23,7 @@ class Gutenberg_REST_Custom_CSS_Controller extends WP_REST_Controller {
 		 * The rest base is different from the name of the post type,
 		 * since it uses wp_get_custom_css().
 		 */
-		$this->rest_base = 'customcss';
+		$this->rest_base = 'custom_css';
 	}
 
 	/**
@@ -61,7 +61,7 @@ class Gutenberg_REST_Custom_CSS_Controller extends WP_REST_Controller {
 	public function get_items() {
 		$data = wp_get_custom_css();
 
-		return rest_ensure_response( $data );
+		return rest_ensure_response( array('post_content' => $data ) );
 	}
 
 	/**
@@ -72,7 +72,8 @@ class Gutenberg_REST_Custom_CSS_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function update_item( $request ) {
-		$data = wp_update_custom_css_post( $request );
+		$new_data = $request->get_json_params();
+		$data = wp_update_custom_css_post( $new_data['custom_css'] );
 
 		return rest_ensure_response( $data );
 	}
