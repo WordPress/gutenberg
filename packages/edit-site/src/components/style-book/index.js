@@ -156,7 +156,17 @@ function Example( { title, blocks, isSelected, onClick } ) {
 		>
 			<h3 className="edit-site-style-book__example-title">{ title }</h3>
 			<div className="edit-site-style-book__example-preview">
-				<BlockPreview blocks={ blocks } viewportWidth={ 0 } />
+				<BlockPreview
+					blocks={ blocks }
+					viewportWidth={ 0 }
+					__experimentalStyles={ [
+						{
+							css:
+								'.wp-block:first-child { margin-top: 0; }' +
+								'.wp-block:last-child { margin-bottom: 0; }',
+						},
+					] }
+				/>
 			</div>
 		</button>
 	);

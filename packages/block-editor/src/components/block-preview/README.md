@@ -36,3 +36,20 @@ Set `viewportWidth` to `0` to make the viewport the same width as the container.
 -   **Default** `undefined`
 
 Padding for the preview container body.
+
+### `__experimentalStyles`
+
+List of additional editor styles to load into the preview iframe. Each object
+should contain a `css` attribute. See `EditorStyles` for more info.
+
+```jsx
+<BlockPreview
+    blocks={ blocks }
+	__experimentalStyles={ [
+		{ css: '.wp-block { margin: 16px; }' },
+	] }
+/>
+```
+
+-   **Type** `Int`
+-   **Default** `[]`
