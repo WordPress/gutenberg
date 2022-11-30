@@ -7,11 +7,11 @@ import {
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
+import { __unstableUseBlockElement as useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 import useSetting from '../components/use-setting';
 
 function helpText( selfStretch ) {
@@ -29,6 +29,7 @@ function helpText( selfStretch ) {
  * Inspector controls containing the child layout related configuration.
  *
  * @param {Object} props                        Block props.
+ * @param {string} props.clientId               Block client id.
  * @param {Object} props.attributes             Block attributes.
  * @param {Object} props.setAttributes          Function to set block attributes.
  * @param {Object} props.__unstableParentLayout
@@ -36,6 +37,7 @@ function helpText( selfStretch ) {
  * @return {WPElement} child layout edit element.
  */
 export function ChildLayoutEdit( {
+	clientId,
 	attributes,
 	setAttributes,
 	__unstableParentLayout: parentLayout,
@@ -44,19 +46,12 @@ export function ChildLayoutEdit( {
 	const { layout: childLayout = {} } = style;
 	const { selfStretch, flexSize } = childLayout;
 
-	useEffect( () => {
-		if ( selfStretch === 'fixed' && ! flexSize ) {
-			setAttributes( {
-				style: {
-					...style,
-					layout: {
-						...childLayout,
-						selfStretch: 'fit',
-					},
-				},
-			} );
-		}
-	}, [] );
+	const blockElement = useBlockElement( clientId );
+	const { orientation = 'horizontal' } = parentLayout;
+	const blockSize =
+		orientation === 'horizontal'
+			? `${ blockElement?.offsetWidth }px`
+			: `${ blockElement?.offsetHeight }px`;
 
 	return (
 		<>
@@ -66,7 +61,9 @@ export function ChildLayoutEdit( {
 				value={ selfStretch || 'fit' }
 				help={ helpText( selfStretch ) }
 				onChange={ ( value ) => {
-					const newFlexSize = value !== 'fixed' ? null : flexSize;
+					const defaultFlexSize = flexSize || blockSize;
+					const newFlexSize =
+						value !== 'fixed' ? null : defaultFlexSize;
 					setAttributes( {
 						style: {
 							...style,
@@ -111,7 +108,7 @@ export function ChildLayoutEdit( {
 							},
 						} );
 					} }
-					value={ flexSize }
+					value={ flexSize || blockSize }
 				/>
 			) }
 		</>
