@@ -74,7 +74,7 @@ function gutenberg_resolve_assets_override() {
 
 	$script_handles = array();
 	// Note for core merge: only 'wp-edit-blocks' should be in this array.
-	$style_handles  = array(
+	$style_handles = array(
 		'wp-edit-blocks',
 	);
 
