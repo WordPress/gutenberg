@@ -16,7 +16,6 @@ import {
 } from '@wordpress/element';
 import { VisuallyHidden, SearchControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useDebounce } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -31,6 +30,7 @@ import BlockPatternsTabs, {
 import ReusableBlocksTab from './reusable-blocks-tab';
 import { MediaTab, MediaCategoryDialog, useMediaCategories } from './media-tab';
 import InserterSearchResults from './search-results';
+import useDebouncedInput from './hooks/use-debounced-input';
 import useInsertionPoint from './hooks/use-insertion-point';
 import InserterTabs from './tabs';
 import { store as blockEditorStore } from '../../store';
@@ -50,15 +50,8 @@ function InserterMenu(
 	},
 	ref
 ) {
-	// Used for the search field only.
-	const [ filterValue, setFilterValue ] = useState(
-		__experimentalFilterValue
-	);
-	// Used for the rest of the inserter, debounced for performance reasons.
-	const [ delayedFilterValue, setDelayedFilterValue ] = useState(
-		__experimentalFilterValue
-	);
-	const debouncedSetFilterValue = useDebounce( setDelayedFilterValue, 100 );
+	const [ filterValue, setFilterValue, delayedFilterValue ] =
+		useDebouncedInput( __experimentalFilterValue );
 	const [ hoveredItem, setHoveredItem ] = useState( null );
 	const [ selectedPatternCategory, setSelectedPatternCategory ] =
 		useState( null );
@@ -244,7 +237,6 @@ function InserterMenu(
 					className="block-editor-inserter__search"
 					onChange={ ( value ) => {
 						if ( hoveredItem ) setHoveredItem( null );
-						debouncedSetFilterValue( value );
 						setFilterValue( value );
 					} }
 					value={ filterValue }
