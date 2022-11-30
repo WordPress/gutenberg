@@ -1,39 +1,47 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { TextareaControl, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
+import { useEntityRecord } from '@wordpress/core-data';
 
 function CustomCSSControl() {
-	const [ updatedCSS, updateCSS ] = useState();
-	const customCSS = useSelect( ( select ) => {
-		const { getEntityRecord } = select( coreStore );
-		return getEntityRecord( 'postType', 'custom_css' )?.post_content;
-	} );
+	const [ customCSS, updateCSS ] = useState();
+	const { record, hasResolved, edit, save } = useEntityRecord(
+		'postType',
+		'custom_css'
+	);
 
-	const { saveEntityRecord } = useDispatch( coreStore );
+	useEffect( () => {
+		if ( hasResolved ) {
+			updateCSS( record?.post_content );
+		}
+	}, [ hasResolved, record ] );
 
 	function updateCustomCSS() {
-		saveEntityRecord( 'postType', 'custom_css', {
-			custom_css: updatedCSS,
+		edit( {
+			custom_css: customCSS,
 		} );
+		save();
+	}
+
+	if ( ! hasResolved ) {
+		return __( 'Loading' );
 	}
 
 	return (
 		<>
 			<TextareaControl
-				value={ updatedCSS || customCSS }
+				value={ customCSS }
 				onChange={ ( value ) => updateCSS( value ) }
 			/>
 			<Button
 				isPrimary
 				onClick={ () => updateCustomCSS() }
-				label={ __( 'Update' ) }
+				label={ __( 'Save' ) }
 			>
-				{ __( 'Update' ) }
+				{ __( 'Save' ) }
 			</Button>
 		</>
 	);
