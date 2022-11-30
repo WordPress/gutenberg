@@ -36,7 +36,7 @@ import styles from './style.scss';
 const UBE_INCOMPATIBLE_BLOCKS = [ 'core/block' ];
 const I18N_BLOCK_SCHEMA_TITLE = 'block title';
 const CUSTOM_UNSUPPORTED_BLOCK_MESSAGE = {
-	Gallery: {
+	'core/gallery': {
 		/* translators: Unsupported block alert title. %s: The localized block name */
 		title: __( "'%s' needs an updated version of WordPress" ),
 		description: __( 'Please update to version 5.9 or above' ),
@@ -173,9 +173,9 @@ export class UnsupportedBlockEdit extends Component {
 			styles.infoSheetIconDark
 		);
 
-		const titleFormat = this.getSheetTitle( blockTitle );
+		const titleFormat = this.getSheetTitle( blockName );
 		const infoTitle = sprintf( titleFormat, blockTitle );
-		const missingBlockDetail = this.getSheetDescription( blockTitle );
+		const missingBlockDetail = this.getSheetDescription( blockName );
 		const missingBlockActionButton = applyFilters(
 			'native.missing_block_action_button',
 			__( 'Edit using web editor' )
