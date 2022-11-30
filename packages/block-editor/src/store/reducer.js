@@ -836,7 +836,7 @@ export const blocks = pipe(
 
 				const newState = new Map( state );
 				newState.set( action.clientId, {
-					...state[ action.clientId ],
+					...state.get( action.clientId ),
 					...action.updates.attributes,
 				} );
 				return newState;
