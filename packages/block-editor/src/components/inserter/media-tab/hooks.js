@@ -4,24 +4,11 @@
 import { __ } from '@wordpress/i18n';
 import { useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { useDebounce } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../../store';
-
-export function useDebouncedInput() {
-	const [ input, setInput ] = useState( '' );
-	const [ debounced, setter ] = useState( '' );
-	const setDebounced = useDebounce( setter, 250 );
-	useEffect( () => {
-		if ( debounced !== input ) {
-			setDebounced( input );
-		}
-	}, [ debounced, input ] );
-	return [ input, setInput, debounced ];
-}
 
 export function useMediaResults( options = {} ) {
 	const [ results, setResults ] = useState();
