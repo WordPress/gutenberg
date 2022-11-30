@@ -17,6 +17,8 @@ import {
 } from './styles/base-control-styles';
 import type { WordPressComponentProps } from '../ui/context';
 
+export { useBaseControlProps } from './hooks';
+
 /**
  * `BaseControl` is a component used to generate labels and help text for components handling user inputs.
  *
