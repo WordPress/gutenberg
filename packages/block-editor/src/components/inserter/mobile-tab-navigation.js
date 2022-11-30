@@ -17,7 +17,6 @@ import {
 	FlexBlock,
 } from '@wordpress/components';
 import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
-import { Children, cloneElement } from '@wordpress/element';
 
 function ScreenHeader( { title } ) {
 	return (
@@ -78,9 +77,7 @@ export default function MobileTabNavigation( { categories, children } ) {
 					path={ `/category/${ category.name }` }
 				>
 					<ScreenHeader title={ __( 'Back' ) } />
-					{ Children.map( children, ( child ) =>
-						cloneElement( child, { category } )
-					) }
+					{ children( category ) }
 				</NavigatorScreen>
 			) ) }
 		</NavigatorProvider>
