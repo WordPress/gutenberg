@@ -23,6 +23,7 @@ import {
 import { BlockPreview } from '@wordpress/block-editor';
 import { closeSmall } from '@wordpress/icons';
 import { useResizeObserver } from '@wordpress/compose';
+import { useMemo, memo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -83,7 +84,22 @@ function StyleBook( { isSelected, onSelect, onClose } ) {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const [ backgroundColor ] = useStyle( 'color.background' );
 	const backgroundColord = colord( backgroundColor );
-	const examples = getExamples();
+	const examples = useMemo( getExamples, [] );
+	const tabs = useMemo(
+		() =>
+			getCategories()
+				.filter( ( category ) =>
+					examples.some(
+						( example ) => example.category === category.slug
+					)
+				)
+				.map( ( category ) => ( {
+					name: category.slug,
+					title: category.title,
+					icon: category.icon,
+				} ) ),
+		[ examples ]
+	);
 	return (
 		<StyleBookFill>
 			<div
@@ -106,39 +122,15 @@ function StyleBook( { isSelected, onSelect, onClose } ) {
 				/>
 				<TabPanel
 					className="edit-site-style-book__tab-panel"
-					tabs={ getCategories()
-						.filter( ( category ) =>
-							examples.some(
-								( example ) =>
-									example.category === category.slug
-							)
-						)
-						.map( ( category ) => ( {
-							name: category.slug,
-							title: category.title,
-							icon: category.icon,
-						} ) ) }
+					tabs={ tabs }
 				>
 					{ ( tab ) => (
-						<div className="edit-site-style-book__examples">
-							{ examples
-								.filter(
-									( example ) => example.category === tab.name
-								)
-								.map( ( example ) => (
-									<Example
-										key={ example.name }
-										title={ example.title }
-										blocks={ example.blocks }
-										isSelected={ isSelected(
-											example.name
-										) }
-										onClick={ () => {
-											onSelect( example.name );
-										} }
-									/>
-								) ) }
-						</div>
+						<Examples
+							examples={ examples }
+							category={ tab.name }
+							isSelected={ isSelected }
+							onSelect={ onSelect }
+						/>
 					) }
 				</TabPanel>
 			</div>
@@ -146,31 +138,48 @@ function StyleBook( { isSelected, onSelect, onClose } ) {
 	);
 }
 
-function Example( { title, blocks, isSelected, onClick } ) {
-	return (
-		<button
-			className={ classnames( 'edit-site-style-book__example', {
-				'is-selected': isSelected,
-			} ) }
-			onClick={ onClick }
-		>
-			<h3 className="edit-site-style-book__example-title">{ title }</h3>
-			<div className="edit-site-style-book__example-preview">
-				<BlockPreview
-					blocks={ blocks }
-					viewportWidth={ 0 }
-					__experimentalStyles={ [
-						{
-							css:
-								'.wp-block:first-child { margin-top: 0; }' +
-								'.wp-block:last-child { margin-bottom: 0; }',
-						},
-					] }
+const Examples = memo( ( { examples, category, isSelected, onSelect } ) => (
+	<div className="edit-site-style-book__examples">
+		{ examples
+			.filter( ( example ) => example.category === category )
+			.map( ( example ) => (
+				<Example
+					key={ example.name }
+					title={ example.title }
+					blocks={ example.blocks }
+					isSelected={ isSelected( example.name ) }
+					onClick={ () => {
+						onSelect( example.name );
+					} }
 				/>
-			</div>
-		</button>
-	);
-}
+			) ) }
+	</div>
+) );
+
+const Example = memo( ( { title, blocks, isSelected, onClick } ) => (
+	<button
+		className={ classnames( 'edit-site-style-book__example', {
+			'is-selected': isSelected,
+		} ) }
+		onClick={ onClick }
+	>
+		<h3 className="edit-site-style-book__example-title">{ title }</h3>
+		<div className="edit-site-style-book__example-preview">
+			<BlockPreview
+				blocks={ blocks }
+				viewportWidth={ 0 }
+				__experimentalStyles={ [
+					{
+						css:
+							'.wp-block:first-child { margin-top: 0; }' +
+							'.wp-block:last-child { margin-bottom: 0; }',
+					},
+				] }
+			/>
+		</div>
+	</button>
+) );
+
 function useHasStyleBook() {
 	const fills = useSlotFills( SLOT_FILL_NAME );
 	return !! fills?.length;
