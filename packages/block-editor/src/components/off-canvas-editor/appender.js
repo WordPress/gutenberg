@@ -52,20 +52,10 @@ export const Appender = forwardRef( ( props, ref ) => {
 	let maybeLinkUI;
 
 	if ( insertedBlock ) {
-		const link = {
-			url: insertedBlockAttributes.url,
-			opensInNewTab: insertedBlockAttributes.opensInNewTab,
-			title: insertedBlockAttributes.label,
-		};
 		maybeLinkUI = (
 			<LinkUI
 				clientId={ insertedBlock }
-				value={ link }
-				linkAttributes={ {
-					type: insertedBlockAttributes.type,
-					url: insertedBlockAttributes.url,
-					kind: insertedBlockAttributes.kind,
-				} }
+				link={ insertedBlockAttributes }
 				onClose={ () => setInsertedBlock( null ) }
 				hasCreateSuggestion={ false }
 				onChange={ ( updatedValue ) => {

@@ -123,6 +123,12 @@ function LinkControlTransforms( { clientId } ) {
 }
 
 export function LinkUI( props ) {
+	const link = {
+		url: props.link.url,
+		opensInNewTab: props.link.opensInNewTab,
+		title: props.link.label,
+	};
+
 	return (
 		<Popover
 			placement="bottom"
@@ -131,22 +137,22 @@ export function LinkUI( props ) {
 			shift
 		>
 			<LinkControl
-				className={ props.className }
 				hasTextControl
 				hasRichPreviews
-				value={ props?.value }
+				className={ props.className }
+				value={ link }
 				showInitialSuggestions={ true }
 				withCreateSuggestion={ props?.hasCreateSuggestion }
-				noDirectEntry={ !! props?.linkAttributes?.type }
-				noURLSuggestion={ !! props?.linkAttributes?.type }
+				noDirectEntry={ !! props.link?.type }
+				noURLSuggestion={ !! props.link?.type }
 				suggestionsQuery={ getSuggestionsQuery(
-					props?.linkAttributes?.type,
-					props?.linkAttributes?.kind
+					props.link?.type,
+					props.link?.kind
 				) }
 				onChange={ props.onChange }
 				onRemove={ props.onRemove }
 				renderControlBottom={
-					! props?.linkAttributes?.url
+					! props.link?.url
 						? () => (
 								<LinkControlTransforms
 									clientId={ props?.clientId }
