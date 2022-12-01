@@ -43,10 +43,11 @@ function InterfaceSkeleton(
 		secondarySidebar,
 		notices,
 		content,
-		drawer,
 		actions,
 		labels,
 		className,
+		// Todo: does this need to be a prop.
+		// Can we use a dependency to keyboard-shortcuts directly?
 		shortcuts,
 	},
 	ref
@@ -56,8 +57,6 @@ function InterfaceSkeleton(
 	useHTMLClass( 'interface-interface-skeleton__html-container' );
 
 	const defaultLabels = {
-		/* translators: accessibility text for the nav bar landmark region. */
-		drawer: __( 'Drawer' ),
 		/* translators: accessibility text for the top bar landmark region. */
 		header: __( 'Header' ),
 		/* translators: accessibility text for the content landmark region. */
@@ -93,14 +92,6 @@ function InterfaceSkeleton(
 				!! footer && 'has-footer'
 			) }
 		>
-			{ !! drawer && (
-				<NavigableRegion
-					className="interface-interface-skeleton__drawer"
-					ariaLabel={ mergedLabels.drawer }
-				>
-					{ drawer }
-				</NavigableRegion>
-			) }
 			<div className="interface-interface-skeleton__editor">
 				{ !! header && isDistractionFree && (
 					<NavigableRegion
