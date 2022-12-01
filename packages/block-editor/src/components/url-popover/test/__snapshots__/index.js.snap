@@ -5,11 +5,12 @@ exports[`URLPopover matches the snapshot in its default state 1`] = `
   <span>
     <div
       class="components-popover block-editor-url-popover"
-      style="position: absolute; opacity: 0; transform: translateY(-2em) scale(0) translateZ(0); transform-origin: 50% 0% 0;"
+      style="position: absolute; left: 0px; top: 0px;"
       tabindex="-1"
     >
       <div
         class="components-popover__content"
+        style="max-height: 0px; overflow: auto;"
       >
         <div
           class="block-editor-url-popover__input-container"
@@ -52,7 +53,7 @@ exports[`URLPopover matches the snapshot when the settings are toggled open 1`] 
   <span>
     <div
       class="components-popover block-editor-url-popover"
-      style="position: absolute; opacity: 0; transform: translateY(-2em) scale(0) translateZ(0); transform-origin: 50% 0% 0; left: 0px; top: 0px;"
+      style="position: absolute; left: 0px; top: 0px;"
       tabindex="-1"
     >
       <div
@@ -107,11 +108,12 @@ exports[`URLPopover matches the snapshot when there are no settings 1`] = `
   <span>
     <div
       class="components-popover block-editor-url-popover"
-      style="position: absolute; opacity: 0; transform: translateY(-2em) scale(0) translateZ(0); transform-origin: 50% 0% 0;"
+      style="position: absolute; left: 0px; top: 0px;"
       tabindex="-1"
     >
       <div
         class="components-popover__content"
+        style="max-height: 0px; overflow: auto;"
       >
         <div
           class="block-editor-url-popover__input-container"
