@@ -284,18 +284,44 @@ function Navigation( {
 			! hasResolvedNavigationMenus ||
 			isConvertingClassicMenu ||
 			fallbackNavigationMenus?.length > 0 ||
-			classicMenus?.length !== 1
+			! classicMenus?.length
 		) {
 			return;
 		}
 
 		// If there's non fallback navigation menus and
-		// only one classic menu then create a new navigation menu based on it.
-		convertClassicMenu(
-			classicMenus[ 0 ].id,
-			classicMenus[ 0 ].name,
-			'publish'
+		// a classic menu with a `primary` location or slug,
+		// then create a new navigation menu based on it.
+		// Otherwise, use the first classic menu.
+		const primaryMenus = classicMenus.filter(
+			( classicMenu ) =>
+				classicMenu.locations.includes( 'primary' ) ||
+				classicMenu.slug === 'primary'
 		);
+
+		if ( primaryMenus.length ) {
+			// Sort by location to allow the menu assigned to primary location to take precedence.
+			primaryMenus.sort( ( a, b ) => {
+				if ( a.locations < b.locations ) {
+					return 1;
+				}
+				if ( a.locations > b.locations ) {
+					return -1;
+				}
+				return 0;
+			} );
+			convertClassicMenu(
+				primaryMenus[ 0 ].id,
+				primaryMenus[ 0 ].name,
+				'publish'
+			);
+		} else {
+			convertClassicMenu(
+				classicMenus[ 0 ].id,
+				classicMenus[ 0 ].name,
+				'publish'
+			);
+		}
 	}, [ hasResolvedNavigationMenus ] );
 
 	const navRef = useRef();
