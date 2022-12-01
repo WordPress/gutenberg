@@ -666,7 +666,7 @@ export default function NavigationSubmenuEdit( {
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
 								hasTextControl
-								showInitialSuggestions={ true }
+								showInitialSuggestions
 								withCreateSuggestion={ userCanCreate }
 								createSuggestion={ handleCreate }
 								createSuggestionButtonText={ ( searchTerm ) => {
