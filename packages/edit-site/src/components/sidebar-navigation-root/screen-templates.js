@@ -4,13 +4,17 @@
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalVStack as VStack,
+	__experimentalVStack as HStack,
 	__experimentalNavigatorScreen as NavigatorScreen,
 	__experimentalNavigatorBackButton as NavigatorBackButton,
+	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { layout } from '@wordpress/icons';
+import { useDispatch } from '@wordpress/data';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -18,6 +22,9 @@ import { decodeEntities } from '@wordpress/html-entities';
 import SidebarNavigationTitle from '../sidebar-navigation-title';
 import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
+import { useLocation } from '../routes';
+import { store as editSiteStore } from '../../store';
+import getIsListPage from '../../utils/get-is-list-page';
 
 const Item = ( { item } ) => {
 	const linkInfo = useLink( item.params );
@@ -32,6 +39,12 @@ const Item = ( { item } ) => {
 };
 
 export default function SidebarNavigationScreenTemplates() {
+	const { params } = useLocation();
+	const { __unstableSetCanvasMode } = useDispatch( editSiteStore );
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const isListPage = getIsListPage( params );
+	const isEditorPage = ! isListPage;
+
 	const { records: templates, isResolving: isLoading } = useEntityRecords(
 		'postType',
 		'wp_template',
@@ -72,7 +85,22 @@ export default function SidebarNavigationScreenTemplates() {
 				<NavigatorBackButton
 					as={ SidebarNavigationTitle }
 					parentTitle={ __( 'Design' ) }
-					title={ __( 'Templates' ) }
+					title={
+						<HStack style={ { minHeight: 36 } }>
+							<div>{ __( 'Templates' ) }</div>
+							{ ! isMobileViewport && isEditorPage && (
+								<Button
+									className="edit-site-layout__edit-button"
+									label={ __( 'Open the editor' ) }
+									onClick={ () => {
+										__unstableSetCanvasMode( 'edit' );
+									} }
+								>
+									{ __( 'Edit' ) }
+								</Button>
+							) }
+						</HStack>
+					}
 				/>
 				<nav className="edit-site-sidebar-navigation-root">
 					<ItemGroup>
