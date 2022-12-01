@@ -3,7 +3,6 @@
  */
 import { useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEntityRecord } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -20,9 +19,6 @@ function useGlobalStylesRenderer() {
 	const { getSettings } = useSelect( editSiteStore );
 	const { updateSettings } = useDispatch( editSiteStore );
 
-	const { record } = useEntityRecord( 'postType', 'custom_css' );
-	const customCSS = record?.post_content;
-
 	useEffect( () => {
 		if ( ! styles || ! settings ) {
 			return;
@@ -34,15 +30,11 @@ function useGlobalStylesRenderer() {
 		).filter( ( style ) => ! style.isGlobalStyles );
 		updateSettings( {
 			...currentStoreSettings,
-			styles: [
-				...nonGlobalStyles,
-				...styles,
-				{ css: customCSS, isGlobalStyles: false },
-			],
+			styles: [ ...nonGlobalStyles, ...styles ],
 			svgFilters,
 			__experimentalFeatures: settings,
 		} );
-	}, [ styles, settings, customCSS ] );
+	}, [ styles, settings ] );
 }
 
 export function GlobalStylesRenderer() {
