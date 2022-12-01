@@ -2333,7 +2333,7 @@ export const __experimentalGetPatternsByBlockTypes = createSelector(
 			)
 		);
 	},
-	( state, rootClientId ) => [
+	( state, blockNames, rootClientId ) => [
 		...__experimentalGetAllowedPatterns.getDependants(
 			state,
 			rootClientId
@@ -2394,7 +2394,7 @@ export const __experimentalGetPatternTransformItems = createSelector(
 			rootClientId
 		);
 	},
-	( state, rootClientId ) => [
+	( state, blocks, rootClientId ) => [
 		...__experimentalGetPatternsByBlockTypes.getDependants(
 			state,
 			rootClientId
