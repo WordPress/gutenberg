@@ -153,7 +153,6 @@ test.describe( 'Comments', () => {
 	test( 'A button allows the block to switch from legacy mode to editable mode', async ( {
 		admin,
 		editor,
-		page,
 	} ) => {
 		await admin.createNewPost();
 		await editor.insertBlock( {
@@ -173,7 +172,9 @@ test.describe( 'Comments', () => {
 		await expect( warning ).toBeVisible();
 		await expect( placeholder ).toBeVisible();
 
-		await page.click( 'role=button[name="Switch to editable mode"i]' );
+		await editor.canvas.click(
+			'role=button[name="Switch to editable mode"i]'
+		);
 
 		const commentTemplate = block.locator(
 			'role=document[name="Block: Comment Template"i]'
