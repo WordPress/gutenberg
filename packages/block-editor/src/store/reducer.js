@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { omit, mapValues, isEqual, isEmpty } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
+import { omit, mapValues, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -121,7 +122,7 @@ function getFlattenedBlockAttributes( blocks ) {
  * @return {boolean} Whether the two objects have the same keys.
  */
 export function hasSameKeys( a, b ) {
-	return isEqual( Object.keys( a ), Object.keys( b ) );
+	return fastDeepEqual( Object.keys( a ), Object.keys( b ) );
 }
 
 /**
@@ -139,7 +140,7 @@ export function isUpdatingSameBlockAttribute( action, lastAction ) {
 		action.type === 'UPDATE_BLOCK_ATTRIBUTES' &&
 		lastAction !== undefined &&
 		lastAction.type === 'UPDATE_BLOCK_ATTRIBUTES' &&
-		isEqual( action.clientIds, lastAction.clientIds ) &&
+		fastDeepEqual( action.clientIds, lastAction.clientIds ) &&
 		hasSameKeys( action.attributes, lastAction.attributes )
 	);
 }
@@ -1518,7 +1519,7 @@ export function insertionPoint( state = null, action ) {
 			};
 
 			// Bail out updates if the states are the same.
-			return isEqual( state, nextState ) ? state : nextState;
+			return fastDeepEqual( state, nextState ) ? state : nextState;
 		}
 
 		case 'HIDE_INSERTION_POINT':
@@ -1643,7 +1644,7 @@ export const blockListSettings = ( state = {}, action ) => {
 				return state;
 			}
 
-			if ( isEqual( state[ clientId ], action.settings ) ) {
+			if ( fastDeepEqual( state[ clientId ], action.settings ) ) {
 				return state;
 			}
 

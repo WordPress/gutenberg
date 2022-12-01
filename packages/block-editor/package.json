@@ -65,6 +65,7 @@
 		"colord": "^2.7.0",
 		"diff": "^4.0.2",
 		"dom-scroll-into-view": "^1.2.1",
+		"fast-deep-equal": "^3.1.3",
 		"inherits": "^2.0.3",
 		"lodash": "^4.17.21",
 		"react-autosize-textarea": "^7.1.0",
