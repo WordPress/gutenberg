@@ -1,13 +1,12 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { act, render } from '@testing-library/react';
 
 /**
  * WordPress dependencies
  */
 import { addFilter, removeAllFilters, removeFilter } from '@wordpress/hooks';
-import { act } from 'react-test-renderer';
 
 /**
  * Internal dependencies
