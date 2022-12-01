@@ -6,6 +6,7 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	__experimentalNavigatorScreen as NavigatorScreen,
+	__experimentalNavigatorButton as NavigatorButton,
 	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -29,7 +30,7 @@ export default function SidebarNavigationScreenMain() {
 	const isEditorPage = ! isListPage;
 	const templatesLink = useLink( {
 		postType: 'wp_template',
-		postId: undefined,
+		postId: 'twentytwentythree//index', // TODO: retrieve current theme
 	} );
 	const templatePartsLink = useLink( {
 		postType: 'wp_template_part',
@@ -66,7 +67,9 @@ export default function SidebarNavigationScreenMain() {
 
 				<nav className="edit-site-sidebar-navigation-root">
 					<ItemGroup>
-						<SidebarNavigationItem
+						<NavigatorButton
+							as={ SidebarNavigationItem }
+							path="/templates"
 							{ ...templatesLink }
 							icon={ layout }
 							aria-current={
@@ -74,7 +77,7 @@ export default function SidebarNavigationScreenMain() {
 							}
 						>
 							{ __( 'Templates' ) }
-						</SidebarNavigationItem>
+						</NavigatorButton>
 						<SidebarNavigationItem
 							{ ...templatePartsLink }
 							icon={ symbolFilled }
