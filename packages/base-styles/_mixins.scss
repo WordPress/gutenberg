@@ -131,7 +131,7 @@
 	box-shadow: 0 0 0 transparent;
 	transition: box-shadow 0.1s linear;
 	border-radius: $radius-block-ui;
-	border: $border-width solid $gray-700;
+	border: $border-width solid $gray-600;
 	@include reduce-motion("transition");
 }
 
