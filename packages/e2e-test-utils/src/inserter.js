@@ -136,6 +136,7 @@ export async function searchForPattern( searchTerm ) {
 	await page.focus( INSERTER_SEARCH_SELECTOR );
 	await pressKeyWithModifier( 'primary', 'a' );
 	await page.keyboard.type( searchTerm );
+	await waitForInserterSearch();
 }
 
 /**
