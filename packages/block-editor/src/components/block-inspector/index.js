@@ -16,7 +16,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMemo, useCallback } from '@wordpress/element';
+import { useMemo, useCallback, useRef, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -257,8 +257,35 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 	);
 	const blockInformation = useBlockDisplayInformation( clientId );
 
+	const inspectorElement = useRef();
+	const {
+		__experimentalHideBlockInterface: hideBlockInterface,
+		__experimentalShowBlockInterface: showBlockInterface,
+	} = useDispatch( blockEditorStore );
+
+	function handleOnFocus() {
+		hideBlockInterface();
+	}
+	function handleOnBlur() {
+		showBlockInterface();
+	}
+	useEffect( () => {
+		inspectorElement?.current?.addEventListener( 'focusin', handleOnFocus );
+		inspectorElement?.current?.addEventListener( 'focusout', handleOnBlur );
+		return () => {
+			inspectorElement?.current?.removeEventListener(
+				'focusin',
+				handleOnFocus
+			);
+			inspectorElement?.current?.removeEventListener(
+				'focusout',
+				handleOnBlur
+			);
+		};
+	}, [ inspectorElement.current ] );
+
 	return (
-		<div className="block-editor-block-inspector">
+		<div className="block-editor-block-inspector" ref={ inspectorElement }>
 			<BlockCard
 				{ ...blockInformation }
 				className={ blockInformation.isSynced && 'is-synced' }
