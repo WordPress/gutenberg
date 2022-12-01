@@ -775,6 +775,9 @@ export const blocks = pipe(
 	withIgnoredBlockChange,
 	withResetControlledBlocks
 )( {
+	// The state is using a Map instead of a plain object for performance reasons.
+	// You can run the "./test/performance.js" unit test to check the impact
+	// code changes can have on this reducer.
 	byClientId( state = new Map(), action ) {
 		switch ( action.type ) {
 			case 'RECEIVE_BLOCKS':
