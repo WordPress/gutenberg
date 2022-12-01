@@ -1215,6 +1215,7 @@
 								"outline": {},
 								"spacing": {},
 								"typography": {},
+								"css": {},
 								":hover": {
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								},
@@ -1566,6 +1567,7 @@
 						"filter": {},
 						"shadow": {},
 						"outline": {},
+						"css": {},
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
 						}
