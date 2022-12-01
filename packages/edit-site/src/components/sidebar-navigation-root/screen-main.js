@@ -70,6 +70,7 @@ export default function SidebarNavigationScreenMain() {
 						<NavigatorButton
 							as={ SidebarNavigationItem }
 							path="/templates"
+							withChevron={ true }
 							{ ...templatesLink }
 							icon={ layout }
 							aria-current={
