@@ -545,7 +545,7 @@ SPEC CHECKSUMS:
   FBReactNativeSpec: 2ff441cbe6e58c1778d8a5cf3311831a6a8c0809
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: 3d02b25ca00c2d456734d0bcff864cbc62f6ae1a
-  Gutenberg: 679b22d555fd313a708d7a27d88bc8c22ef06d0a
+  Gutenberg: 3030a119b01cbfa29925327398a7cfaa63c9bfc7
   libwebp: 60305b2e989864154bd9be3d772730f08fc6a59c
   RCT-Folly: b9d9fe1fc70114b751c076104e52f3b1b5e5a95a
   RCTRequired: bd9d2ab0fda10171fcbcf9ba61a7df4dc15a28f4
@@ -561,13 +561,13 @@ SPEC CHECKSUMS:
   React-jsiexecutor: a27badbbdbc0ff781813370736a2d1c7261181d4
   React-jsinspector: 8a3d3f5dcd23a91e8c80b1bf0e96902cd1dca999
   React-logger: 1088859f145b8f6dd0d3ed051a647ef0e3e80fad
-  react-native-blur: 8cd9b4a8007166ad643f4dff914c3fddd2ff5b9a
+  react-native-blur: 3e9c8e8e9f7d17fa1b94e1a0ae9fd816675f5382
   react-native-get-random-values: b6fb85e7169b9822976793e467458c151c3e8b69
   react-native-keyboard-aware-scroll-view: 0bc6c2dfe9056935a40dc1a70e764b7a1bbf6568
   react-native-safe-area: c9cf765aa2dd96159476a99633e7d462ce5bb94f
   react-native-safe-area-context: f0906bf8bc9835ac9a9d3f97e8bde2a997d8da79
   react-native-slider: a433f1c13c5da3c17a587351bff7371f65cc9a07
-  react-native-video: 9eb4495687cac8bd313b716d2c25062ca74b6013
+  react-native-video: cc1982bfac4d256fb56302642d968b6e72ffbeb7
   react-native-webview: 193d233c29eacce1f42ca2637dab7ba79c25a6de
   React-perflogger: cb386fd44c97ec7f8199c04c12b22066b0f2e1e0
   React-RCTActionSheet: f803a85e46cf5b4066c2ac5e122447f918e9c6e5
@@ -588,7 +588,7 @@ SPEC CHECKSUMS:
   RNReanimated: 8b189a09da0345d84b33b8cde57a57f8ed847352
   RNScreens: 953633729a42e23ad0c93574d676b361e3335e8b
   RNSVG: 36a7359c428dcb7c6bce1cc546fbfebe069809b0
-  RNTAztecView: 89e6deac4c52300f6416702f49b8f402097d4e3e
+  RNTAztecView: 0d144de38c612c41953b2222f6facdcdae67fca8
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
   WordPress-Aztec-iOS: 7d11d598f14c82c727c08b56bd35fbeb7dafb504
