@@ -35,11 +35,6 @@
 	}
 }
 
-// Hide inserter from previews.
-.block-editor-block-preview__content-iframe .block-list-appender {
-	display: none;
-}
-
 .block-editor-block-preview__live-content {
 	* {
 		pointer-events: none;

@@ -3,7 +3,7 @@
  */
 import { edit } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-import { useMemo, useState } from '@wordpress/element';
+import { forwardRef, useMemo, useState } from '@wordpress/element';
 import { Button, Modal } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { createBlock as create } from '@wordpress/blocks';
@@ -163,7 +163,10 @@ const ConvertToLinksModal = ( { onClose, clientId, pages } ) => {
 	);
 };
 
-const BlockEditButton = ( { label, clientId } ) => {
+export default forwardRef( function BlockEditButton(
+	{ clientId, ...props },
+	ref
+) {
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const [ convertModalOpen, setConvertModalOpen ] = useState( false );
 	const { pages, totalPages } = usePageData();
@@ -195,9 +198,12 @@ const BlockEditButton = ( { label, clientId } ) => {
 					pages={ pages }
 				/>
 			) }
-			<Button icon={ edit } label={ label } onClick={ onClick } />
+			<Button
+				{ ...props }
+				ref={ ref }
+				icon={ edit }
+				onClick={ onClick }
+			/>
 		</>
 	);
-};
-
-export default BlockEditButton;
+} );

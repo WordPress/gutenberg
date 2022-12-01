@@ -8,7 +8,11 @@ import classnames from 'classnames';
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback, useMemo, useRef, Fragment } from '@wordpress/element';
-import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
+import {
+	useEntityBlockEditor,
+	__experimentalFetchMedia as fetchMedia,
+	store as coreStore,
+} from '@wordpress/core-data';
 import {
 	BlockList,
 	BlockEditorProvider,
@@ -141,6 +145,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 
 		return {
 			...restStoredSettings,
+			__unstableFetchMedia: fetchMedia,
 			__experimentalBlockPatterns: blockPatterns,
 			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalFetchPageEntities: fetchPagesEntities,
