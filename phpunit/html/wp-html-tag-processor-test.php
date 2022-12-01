@@ -1094,6 +1094,102 @@ HTML;
 		);
 	}
 
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @dataProvider data_has_class
+	 * @covers has_class
+	 */
+	public function test_has_class_checks_whether_a_css_class_is_found_in_the_class_attribute( $html_input, $is_found ) {
+		$p = new WP_HTML_Tag_Processor( $html_input );
+		$p->next_tag();
+		if ( $is_found ) {
+			$this->assertTrue( $p->has_class( 'is-foo' ) );
+		} else {
+			$this->assertFalse( $p->has_class( 'is-foo' ) );
+		}
+	}
+
+	/**
+	 * Data provider for test_updates_when_malformed_tag().
+	 *
+	 * @return array {
+	 *     @type array {
+	 *         @type string $html_input  The HTML snippet where the first element will be tested for the presence of a is-foo CSS class.
+	 *         @type boolean $is_found   Whether the is-foo CSS class should be found.
+	 *     }
+	 * }
+	 */
+	public function data_has_class() {
+		$examples                                  = array();
+		$examples['A single class name, matching'] = array(
+			'<div class="is-foo"></div>',
+			true,
+		);
+
+		$examples['A single class names, non-matching'] = array(
+			'<div class="is-bar"></div>',
+			false,
+		);
+
+		$examples['Two class name, match class at the start boundary'] = array(
+			'<div class="is-foo is-bar"></div>',
+			true,
+		);
+
+		$examples['Two class name, match class at the end boundary'] = array(
+			'<div class="is-foo is-bar"></div>',
+			true,
+		);
+
+		$examples['Two class names, none matching'] = array(
+			'<div class="is-bar is-none"></div>',
+			false,
+		);
+
+		$examples['A single class name, non-matching, is-foo in the class name'] = array(
+			'<div class="is-foo-bar"></div>',
+			false,
+		);
+
+		$examples['Two class names, non-matching, is-foo in the class name at the start boundary'] = array(
+			'<div class="is-foo-bar is-bar"></div>',
+			false,
+		);
+
+		$examples['Two class names, non-matching, is-foo in the class name at the end boundary'] = array(
+			'<div class="is-bar is-foo-bar"></div>',
+			false,
+		);
+
+		$examples['Two class names, non-matching, separated by a tab character'] = array(
+			"<div class='is-bar\tis-foo-bar'></div>",
+			false,
+		);
+
+		$examples['Two class names, matching, separated by a tab character'] = array(
+			"<div class='is-bar\tis-foo'></div>",
+			true,
+		);
+
+		$examples['Three class names, matching, using \\t and \\r as class separators'] = array(
+			"<div class='is-bar\tis-foo\ris-another-class'></div>",
+			true,
+		);
+
+		$examples['Three class names, matching, using \\f and \\n as class separators'] = array(
+			"<div class='is-bar\tis-foo\ris-another-class'></div>",
+			true,
+		);
+
+		$examples['Three class names, matching, using a space and \\r as class separators'] = array(
+			"<div class='is-bar is-foo\ris-another-class'></div>",
+			true,
+		);
+		return $examples;
+	}
+
 	/**
 	 * @ticket 56299
 	 *

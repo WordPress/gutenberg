@@ -1358,6 +1358,38 @@ class WP_HTML_Tag_Processor {
 	}
 
 	/**
+	 * Checks whether the currently matched tag has a specified CSS class.
+	 *
+	 * Example:
+	 * ```php
+	 *     $tags = new WP_HTML_Tag_Processor( '<a class="button bold"></a>' );
+	 *     $tags->next_tag();
+	 *
+	 *     $tags->has_class( 'bold' );
+	 *     // true
+	 *
+	 *     $tags->has_class( 'not-bold' );
+	 *     // false
+	 * ```
+	 *
+	 * @since 6.2.0
+	 *
+	 * @param string $sought_class_name The class name to test for.
+	 */
+	public function has_class( $sought_class_name ) {
+		if ( $this->is_closing_tag ) {
+			return false;
+		}
+
+		$classes = $this->get_attribute( 'class' );
+		if ( null === $classes ) {
+			return false;
+		}
+
+		return $this->string_contains_a_class_name( $sought_class_name, $classes );
+	}
+
+	/**
 	 * Adds a new class name to the currently matched tag.
 	 *
 	 * @since 6.2.0
@@ -1557,60 +1589,96 @@ class WP_HTML_Tag_Processor {
 
 		// Do we match a byte-for-byte (case-sensitive and encoding-form-sensitive) class name?
 		if ( $needs_class_name ) {
-			$class_start = $this->attributes['class']->value_starts_at;
-			$class_end   = $class_start + $this->attributes['class']->value_length;
-			$class_at    = $class_start;
-
-			/*
-			 * We're going to have to jump through potential matches here because
-			 * it's possible that we have classes containing the class name we're
-			 * looking for. For instance, if we are looking for "even" we don't
-			 * want to be confused when we come to the class "not-even." This is
-			 * secured by ensuring that we find our sought-after class and that
-			 * it's surrounded on both sides by proper boundaries.
-			 *
-			 * See https://html.spec.whatwg.org/#attributes-3
-			 * See https://html.spec.whatwg.org/#space-separated-tokens
-			 */
-			while (
-				// phpcs:ignore WordPress.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition
-				false !== ( $class_at = strpos( $this->html, $this->sought_class_name, $class_at ) ) &&
-				$class_at < $class_end
-			) {
-				/*
-				 * Verify this class starts at a boundary. If it were at 0 we'd be at
-				 * the start of the string and that would be fine, otherwise we have
-				 * to start at a place where the preceding character is whitespace.
-				 */
-				if ( $class_at > $class_start ) {
-					$character = $this->html[ $class_at - 1 ];
-
-					if ( ' ' !== $character && "\t" !== $character && "\f" !== $character && "\r" !== $character && "\n" !== $character ) {
-						$class_at += strlen( $this->sought_class_name );
-						continue;
-					}
-				}
-
-				/*
-				 * Similarly, verify this class ends at a boundary as well. Here we
-				 * can end at the very end of the string value, otherwise we have
-				 * to end at a place where the next character is whitespace.
-				 */
-				if ( $class_at + strlen( $this->sought_class_name ) < $class_end ) {
-					$character = $this->html[ $class_at + strlen( $this->sought_class_name ) ];
-
-					if ( ' ' !== $character && "\t" !== $character && "\f" !== $character && "\r" !== $character && "\n" !== $character ) {
-						$class_at += strlen( $this->sought_class_name );
-						continue;
-					}
-				}
-
-				return true;
-			}
-
-			return false;
+			return $this->string_contains_a_class_name(
+				$this->sought_class_name,
+				$this->html,
+				$this->attributes['class']->value_starts_at,
+				$this->attributes['class']->value_starts_at + $this->attributes['class']->value_length
+			);
 		}
 
 		return true;
 	}
+
+	/**
+	 * Tests whether the HTML class attribute contains a given CSS class name.
+	 *
+	 * Example:
+	 * ```php
+	 *     $this->string_contains_a_class_name( 'bold', 'button bold' );
+	 *     // true
+	 *
+	 *     $this->string_contains_a_class_name( 'italic', 'button bold' );
+	 *     // false
+	 *
+	 *     $this->string_contains_a_class_name( 'bold', '<a class="button bold"></a>', 10, 21 );
+	 *     // true
+	 *
+	 *     $this->string_contains_a_class_name( 'a', '<a class="button bold"></a>', 10, 21 );
+	 *     // false
+	 * ```
+	 *
+	 * @param string $sought_class_name The class name to test for.
+	 * @param string $lookup_string     The string to search in. This could be just the value of an HTML
+	 *                                  class" attribute, or an entire HTML markup if the $start_lookup_at
+	 *                                  and $end_lookup_at arguments are used.
+	 * @param string $start_lookup_at   Optional. The string offset to consider as a start of the HTML "class"
+	 *                                  attribute value. Default: 0.
+	 * @param string $end_lookup_at     Optional. The string offset to consider as an end of the HTML "class"
+	 *                                  attribute value. Defaults to the length of $class_attribute_value.
+	 */
+	private function string_contains_a_class_name( $sought_class_name, $lookup_string, $start_lookup_at = 0, $end_lookup_at = null ) {
+		/*
+		 * We're going to have to jump through potential matches here because
+		 * it's possible that we have classes containing the class name we're
+		 * looking for. For instance, if we are looking for "even" we don't
+		 * want to be confused when we come to the class "not-even." This is
+		 * secured by ensuring that we find our sought-after class and that
+		 * it's surrounded on both sides by proper boundaries.
+		 *
+		 * See https://html.spec.whatwg.org/#attributes-3
+		 * See https://html.spec.whatwg.org/#space-separated-tokens
+		 */
+		$class_at    = $start_lookup_at;
+		$class_start = $start_lookup_at;
+		$class_end   = null === $end_lookup_at ? strlen( $lookup_string ) : $end_lookup_at;
+		while (
+			// phpcs:ignore WordPress.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition
+			false !== ( $class_at = strpos( $lookup_string, $sought_class_name, $class_at ) ) &&
+			$class_at < $class_end
+		) {
+			/*
+			 * Verify this class starts at a boundary. If it were at 0 we'd be at
+			 * the start of the string and that would be fine, otherwise we have
+			 * to start at a place where the preceding character is whitespace.
+			 */
+			if ( $class_at > $class_start ) {
+				$character = $lookup_string[ $class_at - 1 ];
+
+				if ( ' ' !== $character && "\t" !== $character && "\f" !== $character && "\r" !== $character && "\n" !== $character ) {
+					$class_at += strlen( $sought_class_name );
+					continue;
+				}
+			}
+
+			/*
+			 * Similarly, verify this class ends at a boundary as well. Here we
+			 * can end at the very end of the string value, otherwise we have
+			 * to end at a place where the next character is whitespace.
+			 */
+			if ( $class_at + strlen( $sought_class_name ) < $class_end ) {
+				$character = $lookup_string[ $class_at + strlen( $sought_class_name ) ];
+
+				if ( ' ' !== $character && "\t" !== $character && "\f" !== $character && "\r" !== $character && "\n" !== $character ) {
+					$class_at += strlen( $sought_class_name );
+					continue;
+				}
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
 }
