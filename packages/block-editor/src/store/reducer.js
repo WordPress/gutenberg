@@ -73,16 +73,16 @@ function mapBlockParents( blocks, rootClientId = '' ) {
  * @param {Array}    blocks    Blocks to flatten.
  * @param {Function} transform Transforming function to be applied to each block.
  *
- * @return {Object} Flattened object.
+ * @return {Array} Flattened object.
  */
 function flattenBlocks( blocks, transform = identity ) {
-	const result = {};
+	const result = [];
 
 	const stack = [ ...blocks ];
 	while ( stack.length ) {
 		const { innerBlocks, ...block } = stack.shift();
 		stack.push( ...innerBlocks );
-		result[ block.clientId ] = transform( block );
+		result.push( [ block.clientId, transform( block ) ] );
 	}
 
 	return result;
@@ -95,7 +95,7 @@ function flattenBlocks( blocks, transform = identity ) {
  *
  * @param {Array} blocks Blocks to flatten.
  *
- * @return {Object} Flattened block attributes object.
+ * @return {Array} Flattened block attributes object.
  */
 function getFlattenedBlocksWithoutAttributes( blocks ) {
 	return flattenBlocks( blocks, ( block ) => omit( block, 'attributes' ) );
@@ -108,7 +108,7 @@ function getFlattenedBlocksWithoutAttributes( blocks ) {
  *
  * @param {Array} blocks Blocks to flatten.
  *
- * @return {Object} Flattened block attributes object.
+ * @return {Array} Flattened block attributes object.
  */
 function getFlattenedBlockAttributes( blocks ) {
 	return flattenBlocks( blocks, ( block ) => block.attributes );
@@ -595,13 +595,9 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 		const newState = {
 			...state,
 			byClientId: new Map(
-				Object.entries(
-					getFlattenedBlocksWithoutAttributes( action.blocks )
-				)
+				getFlattenedBlocksWithoutAttributes( action.blocks )
 			),
-			attributes: new Map(
-				Object.entries( getFlattenedBlockAttributes( action.blocks ) )
-			),
+			attributes: new Map( getFlattenedBlockAttributes( action.blocks ) ),
 			order: mapBlockOrder( action.blocks ),
 			parents: mapBlockParents( action.blocks ),
 			controlledInnerBlocks: {},
@@ -784,11 +780,11 @@ export const blocks = pipe(
 			case 'RECEIVE_BLOCKS':
 			case 'INSERT_BLOCKS': {
 				const newState = new Map( state );
-				Object.entries(
-					getFlattenedBlocksWithoutAttributes( action.blocks )
-				).forEach( ( [ key, value ] ) => {
-					newState.set( key, value );
-				} );
+				getFlattenedBlocksWithoutAttributes( action.blocks ).forEach(
+					( [ key, value ] ) => {
+						newState.set( key, value );
+					}
+				);
 				return newState;
 			}
 			case 'UPDATE_BLOCK': {
@@ -820,11 +816,12 @@ export const blocks = pipe(
 				action.replacedClientIds.forEach( ( clientId ) => {
 					newState.delete( clientId );
 				} );
-				Object.entries(
-					getFlattenedBlocksWithoutAttributes( action.blocks )
-				).forEach( ( [ key, value ] ) => {
-					newState.set( key, value );
-				} );
+
+				getFlattenedBlocksWithoutAttributes( action.blocks ).forEach(
+					( [ key, value ] ) => {
+						newState.set( key, value );
+					}
+				);
 				return newState;
 			}
 
@@ -848,11 +845,11 @@ export const blocks = pipe(
 			case 'RECEIVE_BLOCKS':
 			case 'INSERT_BLOCKS': {
 				const newState = new Map( state );
-				Object.entries(
-					getFlattenedBlockAttributes( action.blocks )
-				).forEach( ( [ key, value ] ) => {
-					newState.set( key, value );
-				} );
+				getFlattenedBlockAttributes( action.blocks ).forEach(
+					( [ key, value ] ) => {
+						newState.set( key, value );
+					}
+				);
 				return newState;
 			}
 
@@ -920,11 +917,11 @@ export const blocks = pipe(
 				action.replacedClientIds.forEach( ( clientId ) => {
 					newState.delete( clientId );
 				} );
-				Object.entries(
-					getFlattenedBlockAttributes( action.blocks )
-				).forEach( ( [ key, value ] ) => {
-					newState.set( key, value );
-				} );
+				getFlattenedBlockAttributes( action.blocks ).forEach(
+					( [ key, value ] ) => {
+						newState.set( key, value );
+					}
+				);
 				return newState;
 			}
 
