@@ -47,21 +47,7 @@ import AddCustomGenericTemplateModal from './add-custom-generic-template-modal';
 import TemplateActionsLoadingScreen from './template-actions-loading-screen';
 import { useHistory } from '../routes';
 import { store as editSiteStore } from '../../store';
-
-const DEFAULT_TEMPLATE_SLUGS = [
-	'front-page',
-	'single',
-	'page',
-	'index',
-	'archive',
-	'author',
-	'category',
-	'date',
-	'tag',
-	'taxonomy',
-	'search',
-	'404',
-];
+import { applyFilters } from '@wordpress/hooks';
 
 const TEMPLATE_ICONS = {
 	'front-page': home,
@@ -263,6 +249,24 @@ function useMissingTemplates(
 	setEntityForSuggestions,
 	setShowCustomTemplateModal
 ) {
+	const DEFAULT_TEMPLATE_SLUGS = applyFilters(
+		'newTemplate.defaultTemplateSlugs',
+		[
+			'front-page',
+			'single',
+			'page',
+			'index',
+			'archive',
+			'author',
+			'category',
+			'date',
+			'tag',
+			'taxonomy',
+			'search',
+			'404',
+		]
+	);
+
 	const existingTemplates = useExistingTemplates();
 	const defaultTemplateTypes = useDefaultTemplateTypes();
 	const existingTemplateSlugs = ( existingTemplates || [] ).map(
