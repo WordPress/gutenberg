@@ -180,6 +180,25 @@
  * @since 6.2.0
  */
 class WP_HTML_Tag_Processor {
+	/**
+	 * The maximum number of bookmarks allowed to exist at
+	 * any given time.
+	 *
+	 * @see set_bookmark();
+	 * @since 6.2.0
+	 * @var int
+	 */
+	const MAX_BOOKMARKS = 10;
+
+	/**
+	 * Maximum number of times seek() can be called.
+	 * Prevents accidental infinite loops.
+	 *
+	 * @see seek()
+	 * @since 6.2.0
+	 * @var int
+	 */
+	const MAX_SEEK_OPS = 1000;
 
 	/**
 	 * The HTML document to parse.
@@ -349,11 +368,11 @@ class WP_HTML_Tag_Processor {
 	 *
 	 * Example:
 	 * <code>
-	 *     // Add the `WP-block-group` class, remove the `WP-group` class.
-	 *     $class_changes = [
+	 *     // Add the `wp-block-group` class, remove the `wp-group` class.
+	 *     $classname_updates = [
 	 *         // Indexed by a comparable class name
-	 *         'wp-block-group' => new WP_Class_Name_Operation( 'WP-block-group', WP_Class_Name_Operation::ADD ),
-	 *         'wp-group'       => new WP_Class_Name_Operation( 'WP-group', WP_Class_Name_Operation::REMOVE )
+	 *         'wp-block-group' => WP_HTML_Tag_Processor::ADD_CLASS,
+	 *         'wp-group'       => WP_HTML_Tag_Processor::REMOVE_CLASS
 	 *     ];
 	 * </code>
 	 *
@@ -361,6 +380,15 @@ class WP_HTML_Tag_Processor {
 	 * @var bool[]
 	 */
 	private $classname_updates = array();
+
+	/**
+	 * Tracks a semantic location in the original HTML which
+	 * shifts with updates as they are applied to the document.
+	 *
+	 * @since 6.2.0
+	 * @var WP_HTML_Span[]
+	 */
+	private $bookmarks = array();
 
 	const ADD_CLASS    = true;
 	const REMOVE_CLASS = false;
@@ -395,6 +423,16 @@ class WP_HTML_Tag_Processor {
 	 * @var WP_HTML_Text_Replacement[]
 	 */
 	private $attribute_updates = array();
+
+	/**
+	 * Tracks how many times we've performed a `seek()`
+	 * so that we can prevent accidental infinite loops.
+	 *
+	 * @see seek
+	 * @since 6.2.0
+	 * @var int
+	 */
+	private $seek_count = 0;
 
 	/**
 	 * Constructor.
@@ -478,6 +516,123 @@ class WP_HTML_Tag_Processor {
 
 		return true;
 	}
+
+
+	/**
+	 * Sets a bookmark in the HTML document.
+	 *
+	 * Bookmarks represent specific places or tokens in the HTML
+	 * document, such as a tag opener or closer. When applying
+	 * edits to a document, such as setting an attribute, the
+	 * text offsets of that token may shift; the bookmark is
+	 * kept updated with those shifts and remains stable unless
+	 * the entire span of text in which the token sits is removed.
+	 *
+	 * Release bookmarks when they are no longer needed.
+	 *
+	 * Example:
+	 * ```
+	 *     <main><h2>Surprising fact you may not know!</h2></main>
+	 *           ^  ^
+	 *            \-|-- this `H2` opener bookmark tracks the token
+	 *
+	 *     <main class="clickbait"><h2>Surprising fact you may no…
+	 *                             ^  ^
+	 *                              \-|-- it shifts with edits
+	 * ```
+	 *
+	 * Bookmarks provide the ability to seek to a previously-scanned
+	 * place in the HTML document. This avoids the need to re-scan
+	 * the entire thing.
+	 *
+	 * Example:
+	 * ```
+	 *     <ul><li>One</li><li>Two</li><li>Three</li></ul>
+	 *                                 ^^^^
+	 *                                 want to note this last item
+	 *
+	 *     $p = new WP_HTML_Tag_Processor( $html );
+	 *     $in_list = false;
+	 *     while ( $p->next_tag( [ 'tag_closers' => $in_list ? 'visit' : 'skip' ] ) ) {
+	 *         if ( 'UL' === $p->get_tag() ) {
+	 *             if ( $p->is_tag_closer() ) {
+	 *                 $in_list = false;
+	 *                 $p->set_bookmark( 'resume' );
+	 *                 if ( $p->seek( 'last-li' ) ) {
+	 *                     $p->add_class( 'last-li' );
+	 *                 }
+	 *                 $p->seek( 'resume' );
+	 *                 $p->release_bookmark( 'last-li' );
+	 *                 $p->release_bookmark( 'resume' );
+	 *             } else {
+	 *                 $in_list = true;
+	 *             }
+	 *         }
+	 *
+	 *         if ( 'LI' === $p->get_tag() ) {
+	 *             $p->set_bookmark( 'last-li' );
+	 *         }
+	 *     }
+	 * ```
+	 *
+	 * Because bookmarks maintain their position they don't
+	 * expose any internal offsets for the HTML document
+	 * and can't be used with normal string functions.
+	 *
+	 * Because bookmarks allocate memory and require processing
+	 * for every applied update they are limited and require
+	 * a name. They should not be created inside a loop.
+	 *
+	 * Bookmarks are a powerful tool to enable complicated behavior;
+	 * consider double-checking that you need this tool if you are
+	 * reaching for it, as inappropriate use could lead to broken
+	 * HTML structure or unwanted processing overhead.
+	 *
+	 * @param string $name Identifies this particular bookmark.
+	 * @return false|void
+	 * @throws Exception Throws on invalid bookmark name if WP_DEBUG set.
+	 */
+	public function set_bookmark( $name ) {
+		if ( null === $this->tag_name_starts_at ) {
+			return false;
+		}
+
+		if ( ! array_key_exists( $name, $this->bookmarks ) && count( $this->bookmarks ) >= self::MAX_BOOKMARKS ) {
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				throw new Exception( "Tried to jump to a non-existent HTML bookmark {$name}." );
+			}
+			return false;
+		}
+
+		$this->bookmarks[ $name ] = new WP_HTML_Span(
+			$this->tag_name_starts_at - 1,
+			$this->tag_ends_at
+		);
+
+		return true;
+	}
+
+
+	/**
+	 * Removes a bookmark if you no longer need to use it.
+	 *
+	 * Releasing a bookmark frees up the small performance
+	 * overhead they require, mainly in the form of compute
+	 * costs when modifying the document.
+	 *
+	 * @param string $name Name of the bookmark to remove.
+	 * @return bool
+	 */
+	public function release_bookmark( $name ) {
+		if ( ! array_key_exists( $name, $this->bookmarks ) ) {
+			return false;
+		}
+
+		unset( $this->bookmarks[ $name ] );
+
+		return true;
+	}
+
 
 	/**
 	 * Skips the contents of the title and textarea tags until an appropriate
@@ -1104,7 +1259,75 @@ class WP_HTML_Tag_Processor {
 			$this->updated_bytes = $diff->end;
 		}
 
+		foreach ( $this->bookmarks as $bookmark ) {
+			/**
+			 * As we loop through $this->attribute_updates, we keep comparing
+			 * $bookmark->start and $bookmark->end to $diff->start. We can't
+			 * change it and still expect the correct result, so let's accumulate
+			 * the deltas separately and apply them all at once after the loop.
+			 */
+			$head_delta = 0;
+			$tail_delta = 0;
+
+			foreach ( $this->attribute_updates as $diff ) {
+				$update_head = $bookmark->start >= $diff->start;
+				$update_tail = $bookmark->end >= $diff->start;
+
+				if ( ! $update_head && ! $update_tail ) {
+					break;
+				}
+
+				$delta = strlen( $diff->text ) - ( $diff->end - $diff->start );
+
+				if ( $update_head ) {
+					$head_delta += $delta;
+				}
+
+				if ( $update_tail ) {
+					$tail_delta += $delta;
+				}
+			}
+
+			$bookmark->start += $head_delta;
+			$bookmark->end   += $tail_delta;
+		}
+
 		$this->attribute_updates = array();
+	}
+
+	/**
+	 * Move the current pointer in the Tag Processor to a given bookmark's location.
+	 *
+	 * In order to prevent accidental infinite loops, there's a
+	 * maximum limit on the number of times seek() can be called.
+	 *
+	 * @param string $bookmark_name Jump to the place in the document identified by this bookmark name.
+	 * @return bool
+	 * @throws Exception Throws on invalid bookmark name if WP_DEBUG set.
+	 */
+	public function seek( $bookmark_name ) {
+		if ( ! array_key_exists( $bookmark_name, $this->bookmarks ) ) {
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				throw new Exception( 'Invalid bookmark name' );
+			}
+			return false;
+		}
+
+		if ( ++$this->seek_count > self::MAX_SEEK_OPS ) {
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				throw new Exception( 'Too many calls to seek() - this can lead to performance issues.' );
+			}
+			return false;
+		}
+
+		// Flush out any pending updates to the document.
+		$this->get_updated_html();
+
+		// Point this tag processor before the sought tag opener and consume it.
+		$this->parsed_bytes  = $this->bookmarks[ $bookmark_name ]->start;
+		$this->updated_bytes = $this->parsed_bytes;
+		$this->updated_html  = substr( $this->html, 0, $this->updated_bytes );
+		return $this->next_tag();
 	}
 
 	/**
@@ -1411,47 +1634,31 @@ class WP_HTML_Tag_Processor {
 	 * @return string The processed HTML.
 	 */
 	public function get_updated_html() {
-		// Short-circuit if there are no updates to apply.
+		// Short-circuit if there are no new updates to apply.
 		if ( ! count( $this->classname_updates ) && ! count( $this->attribute_updates ) ) {
 			return $this->updated_html . substr( $this->html, $this->updated_bytes );
 		}
 
-		/*
-		 * Parsing is in progress – let's apply the attribute updates without moving on to the next tag.
-		 *
-		 * In practice:
-		 * 1. Apply the attributes updates to the original HTML
-		 * 2. Replace the original HTML with the updated HTML
-		 * 3. Point this tag processor to the current tag name's end in that updated HTML
-		 */
+		// Otherwise: apply the updates, rewind before the current tag, and parse it again.
+		$delta_between_updated_html_end_and_current_tag_end = substr(
+			$this->html,
+			$this->updated_bytes,
+			$this->tag_name_starts_at + $this->tag_name_length - $this->updated_bytes
+		);
+		$updated_html_up_to_current_tag_name_end            = $this->updated_html . $delta_between_updated_html_end_and_current_tag_end;
 
-		// Find tag name's end in the updated markup.
-		$markup_updated_up_to_a_tag_name_end = $this->updated_html . substr( $this->html, $this->updated_bytes, $this->tag_name_starts_at + $this->tag_name_length - $this->updated_bytes );
-		$updated_tag_name_ends_at            = strlen( $markup_updated_up_to_a_tag_name_end );
-		$updated_tag_name_starts_at          = $updated_tag_name_ends_at - $this->tag_name_length;
-
-		// Apply attributes updates.
-		$this->updated_html  = $markup_updated_up_to_a_tag_name_end;
-		$this->updated_bytes = $this->tag_name_starts_at + $this->tag_name_length;
+		// 1. Apply the attributes updates to the original HTML
 		$this->class_name_updates_to_attributes_updates();
 		$this->apply_attributes_updates();
 
-		// Replace $this->html with the updated markup.
-		$this->html = $this->updated_html . substr( $this->html, $this->updated_bytes );
+		// 2. Replace the original HTML with the updated HTML
+		$this->html          = $this->updated_html . substr( $this->html, $this->updated_bytes );
+		$this->updated_html  = $updated_html_up_to_current_tag_name_end;
+		$this->updated_bytes = strlen( $this->updated_html );
 
-		// Rewind this processor to the tag name's end.
-		$this->tag_name_starts_at = $updated_tag_name_starts_at;
-		$this->parsed_bytes       = $updated_tag_name_ends_at;
-
-		// Restore the previous version of the updated_html as we are not finished with the current_tag yet.
-		$this->updated_html  = $markup_updated_up_to_a_tag_name_end;
-		$this->updated_bytes = $updated_tag_name_ends_at;
-
-		// Parse the attributes in the updated markup.
-		$this->attributes = array();
-		while ( $this->parse_next_attribute() ) {
-			continue;
-		}
+		// 3. Point this tag processor at the original tag opener and consume it
+		$this->parsed_bytes = strlen( $updated_html_up_to_current_tag_name_end ) - $this->tag_name_length - 2;
+		$this->next_tag();
 
 		return $this->html;
 	}
