@@ -63,9 +63,15 @@ export default function UnsavedInnerBlocks( {
 		blocks?.length &&
 		blocks[ 0 ]?.name === 'core/page-list'
 	) {
-		// ignore changes to inner blocks
-		// track changes to attributes changing
-
+		// If the blocks are a page list, we need to ignore
+		// inner blocks and compare remaining attributes only.
+		// Why? Because Page List block dynamically sets its
+		// child inner blocks async following a REST API request.
+		// This means that the inner blocks are empty when the
+		// block is first inserted, and then populated later once
+		// the REST API request resolves. This causes the original
+		// check to always return dirty as the inner blocks change.
+		// This is a workaround for this specific scenario.
 		const originalPageListBlock = originalBlocks.current[ 0 ];
 		const currentPageListBlock = blocks[ 0 ];
 
