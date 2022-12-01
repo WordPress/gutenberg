@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { act, render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -19,8 +19,6 @@ describe( 'DotTip', () => {
 			</DotTip>
 		);
 
-		await act( () => Promise.resolve() );
-
 		expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
 	} );
 
@@ -31,9 +29,11 @@ describe( 'DotTip', () => {
 			</DotTip>
 		);
 
-		await act( () => Promise.resolve() );
+		const dialog = screen.getByRole( 'dialog' );
 
-		expect( screen.getByRole( 'dialog' ) ).toMatchSnapshot();
+		await waitFor( () => expect( dialog ).toBePositionedPopover() );
+
+		expect( dialog ).toMatchSnapshot();
 	} );
 
 	it( 'should call onDismiss when the dismiss button is clicked', async () => {
@@ -48,7 +48,9 @@ describe( 'DotTip', () => {
 			</DotTip>
 		);
 
-		await act( () => Promise.resolve() );
+		const dialog = screen.getByRole( 'dialog' );
+
+		await waitFor( () => expect( dialog ).toBePositionedPopover() );
 
 		await user.click( screen.getByRole( 'button', { name: 'Got it' } ) );
 
@@ -67,7 +69,9 @@ describe( 'DotTip', () => {
 			</DotTip>
 		);
 
-		await act( () => Promise.resolve() );
+		const dialog = screen.getByRole( 'dialog' );
+
+		await waitFor( () => expect( dialog ).toBePositionedPopover() );
 
 		await user.click(
 			screen.getByRole( 'button', { name: 'Disable tips' } )
