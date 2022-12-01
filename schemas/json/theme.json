@@ -1169,6 +1169,10 @@
 						}
 					},
 					"additionalProperties": false
+				},
+				"css": {
+					"description": "Sets custom CSS.",
+					"type": "string"
 				}
 			}
 		},
@@ -1186,7 +1190,8 @@
 						"typography": {},
 						"filter": {},
 						"shadow": {},
-						"outline": {}
+						"outline": {},
+						"css": {}
 					},
 					"additionalProperties": false
 				}
@@ -1629,6 +1634,7 @@
 						"filter": {},
 						"shadow": {},
 						"outline": {},
+						"css": {},
 						"elements": {
 							"description": "Styles defined on a per-element basis using the element's selector.",
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
