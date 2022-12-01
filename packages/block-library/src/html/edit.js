@@ -7,17 +7,27 @@ import {
 	BlockControls,
 	PlainText,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { ToolbarButton, Disabled, ToolbarGroup } from '@wordpress/components';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { rawHandler, serialize } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import Preview from './preview';
 
-export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
+export default function HTMLEdit( {
+	attributes,
+	setAttributes,
+	isSelected,
+	clientId,
+} ) {
 	const [ isPreview, setIsPreview ] = useState();
 	const isDisabled = useContext( Disabled.Context );
+	const { replaceBlocks } = useDispatch( blockEditorStore );
+	const { getBlock } = useSelect( blockEditorStore );
 
 	function switchToPreview() {
 		setIsPreview( true );
@@ -44,6 +54,20 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 						onClick={ switchToPreview }
 					>
 						{ __( 'Preview' ) }
+					</ToolbarButton>
+				</ToolbarGroup>
+				<ToolbarGroup>
+					<ToolbarButton
+						onClick={ () =>
+							replaceBlocks(
+								clientId,
+								rawHandler( {
+									HTML: serialize( getBlock( clientId ) ),
+								} )
+							)
+						}
+					>
+						{ __( 'Convert to blocks' ) }
 					</ToolbarButton>
 				</ToolbarGroup>
 			</BlockControls>

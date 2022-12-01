@@ -25,7 +25,6 @@ import { pipe, useCopyToClipboard } from '@wordpress/compose';
 import BlockActions from '../block-actions';
 import BlockIcon from '../block-icon';
 import BlockModeToggle from './block-mode-toggle';
-import BlockHTMLConvertButton from './block-html-convert-button';
 import __unstableBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
 import { store as blockEditorStore } from '../../store';
@@ -253,11 +252,6 @@ export function BlockSettingsDropdown( {
 											) }
 										</MenuItem>
 									) }
-								{ count === 1 && (
-									<BlockHTMLConvertButton
-										clientId={ firstBlockClientId }
-									/>
-								) }
 								<CopyMenuItem
 									blocks={ blocks }
 									onCopy={ onCopy }
