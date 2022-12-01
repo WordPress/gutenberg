@@ -60,7 +60,7 @@ export default function UnsavedInnerBlocks( {
 
 	if (
 		originalBlocks.current &&
-		blocks?.length &&
+		blocks?.length === 1 &&
 		blocks[ 0 ]?.name === 'core/page-list'
 	) {
 		// If the blocks are a page list, we need to ignore
