@@ -29,4 +29,27 @@ describe( 'performance', () => {
 
 		expect( updatedState ).toBeDefined();
 	} );
+
+	it( 'should replace blocks (Enter in paragraphs)', () => {
+		const updatedState = reducer( preparedState, {
+			type: 'REPLACE_BLOCKS',
+			clientIds: [ 'block-10' ],
+			blocks: [
+				{
+					clientId: `block-10`,
+					attributes: { content: `paragraph 10` },
+					innerBlocks: [],
+				},
+				{
+					clientId: `block-10-2`,
+					attributes: { content: '' },
+					innerBlocks: [],
+				},
+			],
+			indexToSelect: 10,
+			initialPosition: 0,
+		} );
+
+		expect( updatedState ).toBeDefined();
+	} );
 } );
