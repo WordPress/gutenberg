@@ -1,28 +1,22 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
-import { TextareaControl, Button } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { TextareaControl } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import { useStyle } from './hooks';
 
 function CustomCSSControl() {
-	const [ customCSS, updateCSS ] = useState();
-
-	function updateCustomCSS() {}
+	const [ customCSS, setCustomCSS ] = useStyle( 'css' );
 
 	return (
 		<>
 			<TextareaControl
 				value={ customCSS }
-				onChange={ ( value ) => updateCSS( value ) }
+				onChange={ ( value ) => setCustomCSS( value ) }
 			/>
-			<Button
-				isPrimary
-				onClick={ () => updateCustomCSS() }
-				label={ __( 'Save' ) }
-			>
-				{ __( 'Save' ) }
-			</Button>
 		</>
 	);
 }

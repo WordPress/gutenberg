@@ -194,6 +194,7 @@ class WP_Theme_JSON_6_2 extends WP_Theme_JSON_6_1 {
 	 * @since 6.1.0 Added new side properties for `border`,
 	 *              added new property `shadow`,
 	 *              updated `blockGap` to be allowed at any level.
+	 * @since 6.2.0 Added new property `css`.
 	 * @var array
 	 */
 	const VALID_STYLES = array(
@@ -234,6 +235,7 @@ class WP_Theme_JSON_6_2 extends WP_Theme_JSON_6_1 {
 			'textDecoration' => null,
 			'textTransform'  => null,
 		),
+		'css'        => null,
 	);
 
 	/**

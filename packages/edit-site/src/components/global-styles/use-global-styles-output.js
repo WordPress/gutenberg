@@ -26,7 +26,7 @@ import {
 import { PRESET_METADATA, ROOT_BLOCK_SELECTOR, scopeSelector } from './utils';
 import { getTypographyFontSizeValue } from './typography-utils';
 import { GlobalStylesContext } from './context';
-import { useSetting } from './hooks';
+import { useSetting, useStyle } from './hooks';
 
 // List of block support features that can have their related styles
 // generated under their own feature level selector rather than the block's.
@@ -891,7 +891,7 @@ export function useGlobalStylesOutput() {
 		const { getSettings } = select( blockEditorStore );
 		return !! getSettings().disableLayoutStyles;
 	} );
-
+	const [ customCSS ] = useStyle( 'css' );
 	return useMemo( () => {
 		if ( ! mergedConfig?.styles || ! mergedConfig?.settings ) {
 			return [];
@@ -917,6 +917,10 @@ export function useGlobalStylesOutput() {
 			},
 			{
 				css: globalStyles,
+				isGlobalStyles: true,
+			},
+			{
+				css: customCSS,
 				isGlobalStyles: true,
 			},
 		];
