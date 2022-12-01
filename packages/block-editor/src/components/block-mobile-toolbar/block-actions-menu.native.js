@@ -293,6 +293,8 @@ const BlockActionsMenu = ( {
 	);
 };
 
+const EMPTY_BLOCK_LIST = [];
+
 export default compose(
 	withSelect( ( select, { clientIds } ) => {
 		const {
@@ -345,8 +347,8 @@ export default compose(
 			? getBlocksByClientId( selectedBlockClientId )[ 0 ]
 			: undefined;
 		const selectedBlockPossibleTransformations = selectedBlock
-			? getBlockTransformItems( [ selectedBlock ], rootClientId )
-			: [];
+			? getBlockTransformItems( selectedBlock, rootClientId )
+			: EMPTY_BLOCK_LIST;
 
 		const isReusableBlockType = block ? isReusableBlock( block ) : false;
 		const reusableBlock = isReusableBlockType
