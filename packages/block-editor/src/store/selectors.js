@@ -134,7 +134,7 @@ export function getBlock( state, clientId ) {
 		return null;
 	}
 
-	return state.blocks.tree[ clientId ];
+	return state.blocks.tree.get( clientId );
 }
 
 export const __unstableGetBlockWithoutInnerBlocks = createSelector(
@@ -169,7 +169,7 @@ export function getBlocks( state, rootClientId ) {
 		! rootClientId || ! areInnerBlocksControlled( state, rootClientId )
 			? rootClientId || ''
 			: 'controlled||' + rootClientId;
-	return state.blocks.tree[ treeKey ]?.innerBlocks || EMPTY_ARRAY;
+	return state.blocks.tree.get( treeKey )?.innerBlocks || EMPTY_ARRAY;
 }
 
 /**
@@ -320,7 +320,7 @@ export const getBlocksByClientId = createSelector(
 	( state, clientIds ) =>
 		map(
 			Array.isArray( clientIds ) ? clientIds : [ clientIds ],
-			( clientId ) => state.blocks.tree[ clientId ]
+			( clientId ) => state.blocks.tree.get( clientId )
 		)
 );
 
@@ -2208,7 +2208,7 @@ export const __experimentalGetDirectInsertBlock = createSelector(
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
-		state.blocks.tree[ rootClientId ],
+		state.blocks.tree.get( rootClientId ),
 	]
 );
 
