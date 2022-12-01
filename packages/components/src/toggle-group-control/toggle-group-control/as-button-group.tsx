@@ -60,9 +60,7 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 		() => ( {
 			baseId,
 			state: selectedValue,
-			setState: setSelectedValue as React.Dispatch<
-				React.SetStateAction< string | number | undefined >
-			>,
+			setState: setSelectedValue,
 			isBlock: ! isAdaptiveWidth,
 			isDeselectable: true,
 			size,
