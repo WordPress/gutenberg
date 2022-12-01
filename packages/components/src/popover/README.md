@@ -171,6 +171,8 @@ Used to customize the header text shown when the popover is toggled to fullscree
 
 ### `isAlternate`: `boolean`
 
+_Note: this prop is deprecated. Please use the `variant` prop with the `'toolbar'` values instead._
+
 Used to enable a different visual style for the popover.
 
 -   Required: No
@@ -212,8 +214,7 @@ Possible values:
 - `yAxis`: `'top' | 'middle' | 'bottom'`
 - `xAxis`: `'left' | 'center' | 'right'`
 - `corner`: `'top' | 'right' | 'bottom' | 'left'`
-
-
+<!-- Break into two separate lists using an HTML comment -->
 -   Required: No
 
 ### `resize`: `boolean`
@@ -222,3 +223,13 @@ Adjusts the size of the popover to prevent its contents from going out of view w
 
 -   Required: No
 -   Default: `true`
+
+### `variant`: `'toolbar' | 'unstyled'`
+
+Specifies the popover's style.
+
+Leave undefined for the default style. Possible values are:
+-   `unstyled`:  The popover is essentially without any visible style, it has no background, border, outline or drop shadow, but the popover contents are still displayed.
+-   `toolbar`: A style that has no elevation, but a high contrast with other elements. This matches the style of the [`Toolbar` component](/packages/components/toolbar/README.md).
+<!-- Break into two separate lists using an HTML comment -->
+-   Required: No

@@ -6,29 +6,48 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { createBlock } from '@wordpress/blocks';
 import {
+	InspectorControls,
 	BlockControls,
 	useBlockProps,
+	useInnerBlocksProps,
 	getColorClassName,
+	store as blockEditorStore,
+	Warning,
 } from '@wordpress/block-editor';
-import { ToolbarButton, Spinner, Notice } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { useMemo, useState, memo } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
-import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
+import {
+	PanelBody,
+	ToolbarButton,
+	Spinner,
+	Notice,
+	ComboboxControl,
+} from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
+import { useMemo, useState, useEffect } from '@wordpress/element';
+import { useEntityRecords } from '@wordpress/core-data';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import ConvertToLinksModal from './convert-to-links-modal';
-import { ItemSubmenuIcon } from '../navigation-link/icons';
 
 // We only show the edit option when page count is <= MAX_PAGE_COUNT
 // Performance of Navigation Links is not good past this value.
 const MAX_PAGE_COUNT = 100;
 
-export default function PageListEdit( { context, clientId } ) {
+export default function PageListEdit( {
+	context,
+	clientId,
+	attributes,
+	setAttributes,
+} ) {
+	const { parentPageID } = attributes;
+	const [ pages ] = useGetPages();
 	const { pagesByParentId, totalPages, hasResolvedPages } = usePageData();
+	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
 	const isNavigationChild = 'showSubmenuIcon' in context;
 	const allowConvertToLinks =
@@ -51,6 +70,38 @@ export default function PageListEdit( { context, clientId } ) {
 		} ),
 		style: { ...context.style?.color },
 	} );
+
+	const getBlockList = ( parentId = parentPageID ) => {
+		const childPages = pagesByParentId.get( parentId );
+
+		if ( ! childPages?.length ) {
+			return [];
+		}
+
+		return childPages.reduce( ( template, page ) => {
+			const hasChildren = pagesByParentId.has( page.id );
+			const pageProps = {
+				id: page.id,
+				label: page.title?.rendered,
+				title: page.title?.rendered,
+				link: page.url,
+				hasChildren,
+			};
+			let item = null;
+			const children = getBlockList( page.id );
+			item = createBlock( 'core/page-list-item', pageProps, children );
+			template.push( item );
+
+			return template;
+		}, [] );
+	};
+
+	const blockList = useMemo( getBlockList, [
+		pagesByParentId,
+		parentPageID,
+	] );
+
+	const innerBlocksProps = useInnerBlocksProps( blockProps );
 
 	const getBlockContent = () => {
 		if ( ! hasResolvedPages ) {
@@ -81,20 +132,62 @@ export default function PageListEdit( { context, clientId } ) {
 			);
 		}
 
-		if ( totalPages > 0 ) {
+		if ( blockList.length === 0 ) {
+			const parentPageDetails =
+				pages && pages.find( ( page ) => page.id === parentPageID );
 			return (
-				<ul { ...blockProps }>
-					<PageItems
-						context={ context }
-						pagesByParentId={ pagesByParentId }
-					/>
-				</ul>
+				<div { ...blockProps }>
+					<Warning>
+						{ sprintf(
+							// translators: %s: Page title.
+							__( '"%s" page has no children.' ),
+							parentPageDetails.title.rendered
+						) }
+					</Warning>
+				</div>
 			);
+		}
+
+		if ( totalPages > 0 ) {
+			return <ul { ...innerBlocksProps }></ul>;
 		}
 	};
 
+	const useParentOptions = () => {
+		return pages?.reduce( ( accumulator, page ) => {
+			accumulator.push( {
+				value: page.id,
+				label: page.title.rendered,
+			} );
+			return accumulator;
+		}, [] );
+	};
+
+	useEffect( () => {
+		__unstableMarkNextChangeAsNotPersistent();
+		if ( blockList ) {
+			replaceInnerBlocks( clientId, blockList );
+		}
+	}, [ clientId, blockList ] );
+
 	return (
 		<>
+			<InspectorControls>
+				<PanelBody>
+					<ComboboxControl
+						className="editor-page-attributes__parent"
+						label={ __( 'Parent page' ) }
+						value={ parentPageID }
+						options={ useParentOptions() }
+						onChange={ ( value ) =>
+							setAttributes( { parentPageID: value ?? 0 } )
+						}
+						help={ __(
+							'Choose a page to show only its subpages.'
+						) }
+					/>
+				</PanelBody>
+			</InspectorControls>
 			{ allowConvertToLinks && (
 				<BlockControls group="other">
 					<ToolbarButton title={ __( 'Edit' ) } onClick={ openModal }>
@@ -114,22 +207,7 @@ export default function PageListEdit( { context, clientId } ) {
 	);
 }
 
-function useFrontPageId() {
-	return useSelect( ( select ) => {
-		const canReadSettings = select( coreStore ).canUser(
-			'read',
-			'settings'
-		);
-		if ( ! canReadSettings ) {
-			return undefined;
-		}
-
-		const site = select( coreStore ).getEntityRecord( 'root', 'site' );
-		return site?.show_on_front === 'page' && site?.page_on_front;
-	}, [] );
-}
-
-function usePageData() {
+function useGetPages() {
 	const { records: pages, hasResolved: hasResolvedPages } = useEntityRecords(
 		'postType',
 		'page',
@@ -142,10 +220,17 @@ function usePageData() {
 		}
 	);
 
+	return [ pages, hasResolvedPages ];
+}
+
+function usePageData( pageId = 0 ) {
+	const [ pages, hasResolvedPages ] = useGetPages();
+
 	return useMemo( () => {
 		// TODO: Once the REST API supports passing multiple values to
 		// 'orderby', this can be removed.
 		// https://core.trac.wordpress.org/ticket/39037
+
 		const sortedPages = [ ...( pages ?? [] ) ].sort( ( a, b ) => {
 			if ( a.menu_order === b.menu_order ) {
 				return a.title.rendered.localeCompare( b.title.rendered );
@@ -167,91 +252,5 @@ function usePageData() {
 			hasResolvedPages,
 			totalPages: pages?.length ?? null,
 		};
-	}, [ pages, hasResolvedPages ] );
+	}, [ pageId, pages, hasResolvedPages ] );
 }
-
-const PageItems = memo( function PageItems( {
-	context,
-	pagesByParentId,
-	parentId = 0,
-	depth = 0,
-} ) {
-	const pages = pagesByParentId.get( parentId );
-	const frontPageId = useFrontPageId();
-
-	if ( ! pages?.length ) {
-		return [];
-	}
-
-	return pages.map( ( page ) => {
-		const hasChildren = pagesByParentId.has( page.id );
-		const isNavigationChild = 'showSubmenuIcon' in context;
-		return (
-			<li
-				key={ page.id }
-				className={ classnames( 'wp-block-pages-list__item', {
-					'has-child': hasChildren,
-					'wp-block-navigation-item': isNavigationChild,
-					'open-on-click': context.openSubmenusOnClick,
-					'open-on-hover-click':
-						! context.openSubmenusOnClick &&
-						context.showSubmenuIcon,
-					'menu-item-home': page.id === frontPageId,
-				} ) }
-			>
-				{ hasChildren && context.openSubmenusOnClick ? (
-					<>
-						<button
-							className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle"
-							aria-expanded="false"
-						>
-							{ page.title?.rendered }
-						</button>
-						<span className="wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon">
-							<ItemSubmenuIcon />
-						</span>
-					</>
-				) : (
-					<a
-						className={ classnames(
-							'wp-block-pages-list__item__link',
-							{
-								'wp-block-navigation-item__content':
-									isNavigationChild,
-							}
-						) }
-						href={ page.link }
-					>
-						{ page.title?.rendered }
-					</a>
-				) }
-				{ hasChildren && (
-					<>
-						{ ! context.openSubmenusOnClick &&
-							context.showSubmenuIcon && (
-								<button
-									className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon"
-									aria-expanded="false"
-								>
-									<ItemSubmenuIcon />
-								</button>
-							) }
-						<ul
-							className={ classnames( 'submenu-container', {
-								'wp-block-navigation__submenu-container':
-									isNavigationChild,
-							} ) }
-						>
-							<PageItems
-								context={ context }
-								pagesByParentId={ pagesByParentId }
-								parentId={ page.id }
-								depth={ depth + 1 }
-							/>
-						</ul>
-					</>
-				) }
-			</li>
-		);
-	} );
-} );

@@ -7,7 +7,6 @@ $z-layers: (
 	".block-editor-block-switcher__arrow": 1,
 	".block-editor-block-list__block {core/image aligned wide or fullwide}": 20,
 	".block-library-classic__toolbar": 31, // When scrolled to top this toolbar needs to sit over block-editor-block-toolbar
-	".block-editor-block-list__layout .reusable-block-indicator": 1,
 	".block-editor-block-list__block-selection-button": 22,
 	".components-form-toggle__input": 1,
 	".edit-post-text-editor__toolbar": 1,
@@ -187,6 +186,8 @@ $z-layers: (
 
 	// Appear under the topbar.
 	".customize-widgets__block-toolbar": 7,
+
+	".is-focusing-regions [role='region']:focus .interface-navigable-region__stacker": -1,
 );
 
 @function z-index( $key ) {

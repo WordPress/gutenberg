@@ -692,7 +692,7 @@ _Parameters_
 
 ### registerBlockStyle
 
-Registers a new block style variation for the given block.
+Registers a new block style for the given block.
 
 For more information on connecting the styles with CSS [the official documentation](/docs/reference-guides/block-api/block-styles.md#styles)
 
@@ -970,7 +970,7 @@ _Returns_
 
 ### unregisterBlockStyle
 
-Unregisters a block style variation for the given block.
+Unregisters a block style for the given block.
 
 _Usage_
 

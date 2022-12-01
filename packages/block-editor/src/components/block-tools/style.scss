@@ -42,7 +42,16 @@
 	left: calc(50% - #{$button-size-small * 0.5});
 }
 
+.block-editor-block-list__block-side-inserter-popover .components-popover__content > div {
+	pointer-events: none;
+
+	> * {
+		pointer-events: all;
+	}
+}
+
 // Sibling inserter / "inbetweenserter".
+.block-editor-block-list__empty-block-inserter,
 .block-editor-default-block-appender,
 .block-editor-block-list__insertion-point-inserter {
 	.block-editor-inserter__toggle.components-button.has-icon {
@@ -166,6 +175,12 @@
 		&:active {
 			color: $white;
 		}
+
+		// Make sure the button has no hover style when it's disabled.
+		&[aria-disabled="true"]:hover {
+			color: $white;
+		}
+
 		display: flex;
 	}
 	.block-selection-button_select-button.components-button {

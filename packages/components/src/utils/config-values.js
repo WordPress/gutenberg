@@ -33,7 +33,6 @@ const TOGGLE_GROUP_CONTROL_PROPS = {
 	toggleGroupControlBackdropBackgroundColor:
 		CONTROL_PROPS.controlSurfaceColor,
 	toggleGroupControlBackdropBorderColor: COLORS.ui.border,
-	toggleGroupControlBackdropBoxShadow: 'transparent',
 	toggleGroupControlButtonColorActive: CONTROL_PROPS.controlBackgroundColor,
 };
 

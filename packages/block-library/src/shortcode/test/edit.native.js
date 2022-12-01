@@ -28,10 +28,10 @@ afterAll( () => {
 
 describe( 'Shortcode block', () => {
 	it( 'inserts block', async () => {
-		const { getByA11yLabel, getByTestId, getByText } =
+		const { getByLabelText, getByTestId, getByText } =
 			await initializeEditor();
 
-		fireEvent.press( getByA11yLabel( 'Add block' ) );
+		fireEvent.press( getByLabelText( 'Add block' ) );
 
 		const blockList = getByTestId( 'InserterUI-Blocks' );
 		// onScroll event used to force the FlatList to render all items
@@ -45,17 +45,17 @@ describe( 'Shortcode block', () => {
 
 		fireEvent.press( await waitFor( () => getByText( 'Shortcode' ) ) );
 
-		expect( getByA11yLabel( /Shortcode Block\. Row 1/ ) ).toBeVisible();
+		expect( getByLabelText( /Shortcode Block\. Row 1/ ) ).toBeVisible();
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
 	it( 'edits content', async () => {
-		const { getByA11yLabel, getByPlaceholderText } = await initializeEditor(
+		const { getByLabelText, getByPlaceholderText } = await initializeEditor(
 			{
 				initialHtml: '<!-- wp:shortcode /-->',
 			}
 		);
-		const shortcodeBlock = getByA11yLabel( /Shortcode Block\. Row 1/ );
+		const shortcodeBlock = getByLabelText( /Shortcode Block\. Row 1/ );
 		fireEvent.press( shortcodeBlock );
 
 		const textField = getByPlaceholderText( 'Add a shortcode…' );

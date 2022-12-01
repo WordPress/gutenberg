@@ -385,8 +385,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 		}
 
 		// Attach a `wp-container-` id-based class name as well as a layout class name such as `is-layout-flex`.
-		const className = classnames(
-			props?.className,
+		const layoutClassNames = classnames(
 			{
 				[ `wp-container-${ id }` ]: shouldRenderLayoutStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
 			},
@@ -410,8 +409,64 @@ export const withLayoutStyles = createHigherOrderComponent(
 					) }
 				<BlockListBlock
 					{ ...props }
-					__unstableLayoutClassNames={ className }
+					__unstableLayoutClassNames={ layoutClassNames }
 				/>
+			</>
+		);
+	}
+);
+
+/**
+ * Override the default block element to add the child layout styles.
+ *
+ * @param {Function} BlockListBlock Original component.
+ *
+ * @return {Function} Wrapped component.
+ */
+export const withChildLayoutStyles = createHigherOrderComponent(
+	( BlockListBlock ) => ( props ) => {
+		const { attributes } = props;
+		const { style: { layout = {} } = {} } = attributes;
+		const { selfStretch, flexSize } = layout;
+		const hasChildLayout = selfStretch || flexSize;
+		const disableLayoutStyles = useSelect( ( select ) => {
+			const { getSettings } = select( blockEditorStore );
+			return !! getSettings().disableLayoutStyles;
+		} );
+		const shouldRenderChildLayoutStyles =
+			hasChildLayout && ! disableLayoutStyles;
+
+		const element = useContext( BlockList.__unstableElementContext );
+		const id = useInstanceId( BlockListBlock );
+		const selector = `.wp-container-content-${ id }`;
+
+		let css = '';
+
+		if ( selfStretch === 'fixed' && flexSize ) {
+			css += `${ selector } {
+				flex-shrink: 0;
+				flex-basis: ${ flexSize };
+				box-sizing: border-box;
+			}`;
+		} else if ( selfStretch === 'fill' ) {
+			css += `${ selector } {
+				flex-grow: 1;
+			}`;
+		}
+
+		// Attach a `wp-container-content` id-based classname.
+		const className = classnames( props?.className, {
+			[ `wp-container-content-${ id }` ]:
+				shouldRenderChildLayoutStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
+		} );
+
+		return (
+			<>
+				{ shouldRenderChildLayoutStyles &&
+					element &&
+					!! css &&
+					createPortal( <style>{ css }</style>, element ) }
+				<BlockListBlock { ...props } className={ className } />
 			</>
 		);
 	}
@@ -426,6 +481,11 @@ addFilter(
 	'editor.BlockListBlock',
 	'core/editor/layout/with-layout-styles',
 	withLayoutStyles
+);
+addFilter(
+	'editor.BlockListBlock',
+	'core/editor/layout/with-child-layout-styles',
+	withChildLayoutStyles
 );
 addFilter(
 	'editor.BlockEdit',

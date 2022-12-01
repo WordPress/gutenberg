@@ -28,7 +28,6 @@ import {
  * Internal dependencies
  */
 import { useLink } from '../../routes/link';
-import MainDashboardButton from '../../main-dashboard-button';
 import { store as editSiteStore } from '../../../store';
 
 const SITE_EDITOR_KEY = 'site-editor';
@@ -40,23 +39,32 @@ function NavLink( { params, replace, ...props } ) {
 }
 
 const NavigationPanel = ( { activeItem } ) => {
-	const { homeTemplate, isNavigationOpen, isTemplatePartsMode, siteTitle } =
-		useSelect( ( select ) => {
-			const { getEntityRecord } = select( coreDataStore );
-			const { getSettings, isNavigationOpened } = select( editSiteStore );
+	const {
+		homeTemplate,
+		isNavigationOpen,
+		isTemplatePartsMode,
+		siteTitle,
+		dashboardLink,
+	} = useSelect( ( select ) => {
+		const { getEntityRecord } = select( coreDataStore );
+		const { getSettings, isNavigationOpened } = select( editSiteStore );
 
-			const siteData =
-				getEntityRecord( 'root', '__unstableBase', undefined ) || {};
-			const { supportsTemplatePartsMode, __unstableHomeTemplate } =
-				getSettings();
+		const siteData =
+			getEntityRecord( 'root', '__unstableBase', undefined ) || {};
+		const {
+			supportsTemplatePartsMode,
+			__unstableHomeTemplate,
+			__experimentalDashboardLink,
+		} = getSettings();
 
-			return {
-				siteTitle: siteData.name,
-				homeTemplate: __unstableHomeTemplate,
-				isNavigationOpen: isNavigationOpened(),
-				isTemplatePartsMode: !! supportsTemplatePartsMode,
-			};
-		}, [] );
+		return {
+			siteTitle: siteData.name,
+			homeTemplate: __unstableHomeTemplate,
+			dashboardLink: __experimentalDashboardLink,
+			isNavigationOpen: isNavigationOpened(),
+			isTemplatePartsMode: !! supportsTemplatePartsMode,
+		};
+	}, [] );
 	const { setIsNavigationPanelOpened } = useDispatch( editSiteStore );
 
 	const closeOnEscape = ( event ) => {
@@ -82,13 +90,11 @@ const NavigationPanel = ( { activeItem } ) => {
 				</div>
 				<div className="edit-site-navigation-panel__scroll-container">
 					<Navigation activeItem={ activeItem }>
-						<MainDashboardButton.Slot>
-							<NavigationBackButton
-								backButtonLabel={ __( 'Dashboard' ) }
-								className="edit-site-navigation-panel__back-to-dashboard"
-								href="index.php"
-							/>
-						</MainDashboardButton.Slot>
+						<NavigationBackButton
+							backButtonLabel={ __( 'Dashboard' ) }
+							className="edit-site-navigation-panel__back-to-dashboard"
+							href={ dashboardLink ?? 'index.php' }
+						/>
 
 						<NavigationMenu>
 							<NavigationGroup title={ __( 'Editor' ) }>

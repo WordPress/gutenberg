@@ -31,12 +31,14 @@ const ALERT = {
 
 // Matches @wordpress/base-styles
 const ADMIN = {
-	theme: 'var( --wp-admin-theme-color, #007cba)',
-	themeDark10: 'var( --wp-admin-theme-color-darker-10, #006ba1)',
+	theme: 'var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba))',
+	themeDark10:
+		'var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #006ba1))',
 };
 
 const UI = {
 	theme: ADMIN.theme,
+	themeDark10: ADMIN.themeDark10,
 	background: white,
 	backgroundDisabled: GRAY[ 100 ],
 	border: GRAY[ 700 ],

@@ -19,6 +19,7 @@ import {
 	hasSameKeys,
 	isUpdatingSameBlockAttribute,
 	blocks,
+	isBlockInterfaceHidden,
 	isTyping,
 	draggedBlocks,
 	selection,
@@ -221,12 +222,14 @@ describe( 'state', () => {
 							isValid: true,
 						},
 					},
-					attributes: {
-						chicken: {},
-						'chicken-child': {
-							attr: true,
-						},
-					},
+					attributes: new Map(
+						Object.entries( {
+							chicken: {},
+							'chicken-child': {
+								attr: true,
+							},
+						} )
+					),
 					order: {
 						'': [ 'chicken' ],
 						chicken: [ 'chicken-child' ],
@@ -275,13 +278,15 @@ describe( 'state', () => {
 							isValid: true,
 						},
 					},
-					attributes: {
-						chicken: {},
-						[ newChildBlockId ]: {
-							attr: false,
-							attr2: 'perfect',
-						},
-					},
+					attributes: new Map(
+						Object.entries( {
+							chicken: {},
+							[ newChildBlockId ]: {
+								attr: false,
+								attr2: 'perfect',
+							},
+						} )
+					),
 					order: {
 						'': [ 'chicken' ],
 						chicken: [ newChildBlockId ],
@@ -307,9 +312,11 @@ describe( 'state', () => {
 							isValid: true,
 						},
 					},
-					attributes: {
-						chicken: {},
-					},
+					attributes: new Map(
+						Object.entries( {
+							chicken: {},
+						} )
+					),
 					order: {
 						'': [ 'chicken' ],
 						chicken: [],
@@ -357,13 +364,15 @@ describe( 'state', () => {
 							isValid: true,
 						},
 					},
-					attributes: {
-						chicken: {},
-						[ newChildBlockId ]: {
-							attr: false,
-							attr2: 'perfect',
-						},
-					},
+					attributes: new Map(
+						Object.entries( {
+							chicken: {},
+							[ newChildBlockId ]: {
+								attr: false,
+								attr2: 'perfect',
+							},
+						} )
+					),
 					order: {
 						'': [ 'chicken' ],
 						chicken: [ newChildBlockId ],
@@ -415,15 +424,17 @@ describe( 'state', () => {
 							isValid: true,
 						},
 					},
-					attributes: {
-						chicken: {},
-						'chicken-child': {
-							attr: true,
-						},
-						'chicken-child-2': {
-							attr2: 'ok',
-						},
-					},
+					attributes: new Map(
+						Object.entries( {
+							chicken: {},
+							'chicken-child': {
+								attr: true,
+							},
+							'chicken-child-2': {
+								attr2: 'ok',
+							},
+						} )
+					),
 					order: {
 						'': [ 'chicken' ],
 						chicken: [ 'chicken-child', 'chicken-child-2' ],
@@ -491,20 +502,22 @@ describe( 'state', () => {
 							isValid: true,
 						},
 					},
-					attributes: {
-						chicken: {},
-						[ newChildBlockId1 ]: {
-							attr: false,
-							attr2: 'perfect',
-						},
-						[ newChildBlockId2 ]: {
-							attr: true,
-							attr2: 'not-perfect',
-						},
-						[ newChildBlockId3 ]: {
-							attr2: 'hello',
-						},
-					},
+					attributes: new Map(
+						Object.entries( {
+							chicken: {},
+							[ newChildBlockId1 ]: {
+								attr: false,
+								attr2: 'perfect',
+							},
+							[ newChildBlockId2 ]: {
+								attr: true,
+								attr2: 'not-perfect',
+							},
+							[ newChildBlockId3 ]: {
+								attr2: 'hello',
+							},
+						} )
+					),
 					order: {
 						'': [ 'chicken' ],
 						chicken: [
@@ -568,11 +581,13 @@ describe( 'state', () => {
 							isValid: true,
 						},
 					},
-					attributes: {
-						chicken: {},
-						'chicken-child': {},
-						'chicken-grand-child': {},
-					},
+					attributes: new Map(
+						Object.entries( {
+							chicken: {},
+							'chicken-child': {},
+							'chicken-grand-child': {},
+						} )
+					),
 					order: {
 						'': [ 'chicken' ],
 						chicken: [ 'chicken-child' ],
@@ -618,10 +633,12 @@ describe( 'state', () => {
 							isValid: true,
 						},
 					},
-					attributes: {
-						chicken: {},
-						[ newChildBlockId ]: {},
-					},
+					attributes: new Map(
+						Object.entries( {
+							chicken: {},
+							[ newChildBlockId ]: {},
+						} )
+					),
 					order: {
 						'': [ 'chicken' ],
 						chicken: [ newChildBlockId ],
@@ -646,7 +663,7 @@ describe( 'state', () => {
 
 			expect( state ).toEqual( {
 				byClientId: {},
-				attributes: {},
+				attributes: new Map(),
 				order: {},
 				parents: {},
 				isPersistentChange: true,
@@ -1018,7 +1035,7 @@ describe( 'state', () => {
 				isValid: true,
 			} );
 
-			expect( state.attributes.chicken ).toEqual( {
+			expect( state.attributes.get( 'chicken' ) ).toEqual( {
 				content: 'ribs',
 			} );
 			expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe(
@@ -1063,7 +1080,7 @@ describe( 'state', () => {
 				isValid: false,
 			} );
 
-			expect( state.attributes.chicken ).toEqual( {
+			expect( state.attributes.get( 'chicken' ) ).toEqual( {
 				ref: 3,
 			} );
 
@@ -1426,7 +1443,7 @@ describe( 'state', () => {
 					name: 'core/test-block',
 				},
 			} );
-			expect( state.attributes ).toEqual( {
+			expect( Object.fromEntries( state.attributes ) ).toEqual( {
 				ribs: {},
 			} );
 			expect( state.tree[ '' ].innerBlocks ).toHaveLength( 1 );
@@ -1473,7 +1490,7 @@ describe( 'state', () => {
 					name: 'core/test-block',
 				},
 			} );
-			expect( state.attributes ).toEqual( {
+			expect( Object.fromEntries( state.attributes ) ).toEqual( {
 				ribs: {},
 			} );
 		} );
@@ -1794,7 +1811,42 @@ describe( 'state', () => {
 						},
 					} );
 
-					expect( state.attributes.kumquat.updated ).toBe( true );
+					expect( state.attributes.get( 'kumquat' ).updated ).toBe(
+						true
+					);
+				} );
+
+				it( 'should not updated equal attributes', () => {
+					const original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									clientId: 'kumquat',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						} )
+					);
+					const state = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: {
+							updated: true,
+						},
+					} );
+					const updatedState = blocks( state, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: {
+							updated: true,
+						},
+					} );
+
+					expect( state.attributes.get( 'kumquat' ) ).toBe(
+						updatedState.attributes.get( 'kumquat' )
+					);
 				} );
 
 				it( 'should return with attribute block updates when attributes are unique by block', () => {
@@ -1819,7 +1871,9 @@ describe( 'state', () => {
 						uniqueByBlock: true,
 					} );
 
-					expect( state.attributes.kumquat.updated ).toBe( true );
+					expect( state.attributes.get( 'kumquat' ).updated ).toBe(
+						true
+					);
 				} );
 
 				it( 'should accumulate attribute block updates', () => {
@@ -1845,7 +1899,7 @@ describe( 'state', () => {
 						},
 					} );
 
-					expect( state.attributes.kumquat ).toEqual( {
+					expect( state.attributes.get( 'kumquat' ) ).toEqual( {
 						updated: true,
 						moreUpdated: true,
 					} );
@@ -1893,6 +1947,27 @@ describe( 'state', () => {
 					} );
 
 					expect( state.attributes ).toBe( state.attributes );
+				} );
+
+				it( 'should handle undefined attributes', () => {
+					const original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									clientId: 'kumquat',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						} )
+					);
+					const state = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+					} );
+
+					expect( state.attributes.get( 'kumquat' ) ).toEqual( {} );
 				} );
 			} );
 
@@ -2250,6 +2325,24 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toBe( null );
+		} );
+	} );
+
+	describe( 'isBlockInterfaceHidden()', () => {
+		it( 'should set the hide block interface flag to true', () => {
+			const state = isBlockInterfaceHidden( false, {
+				type: 'HIDE_BLOCK_INTERFACE',
+			} );
+
+			expect( state ).toBe( true );
+		} );
+
+		it( 'should set the hide block interface flag to false', () => {
+			const state = isBlockInterfaceHidden( false, {
+				type: 'SHOW_BLOCK_INTERFACE',
+			} );
+
+			expect( state ).toBe( false );
 		} );
 	} );
 

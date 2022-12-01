@@ -8,6 +8,7 @@ import classnames from 'classnames';
  */
 import { useCallback, useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
+import { store as coreStore } from '@wordpress/core-data';
 import {
 	ToolSelector,
 	__experimentalPreviewOptions as PreviewOptions,
@@ -50,8 +51,8 @@ export default function Header( { showIconLabels } ) {
 		isListViewOpen,
 		listViewShortcut,
 		isVisualMode,
-		settings,
 		blockEditorMode,
+		homeUrl,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -59,12 +60,15 @@ export default function Header( { showIconLabels } ) {
 			isInserterOpened,
 			isListViewOpened,
 			getEditorMode,
-			getSettings,
 		} = select( editSiteStore );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 
 		const postType = getEditedPostType();
+
+		const {
+			getUnstableBase, // Site index.
+		} = select( coreStore );
 
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
@@ -75,8 +79,8 @@ export default function Header( { showIconLabels } ) {
 				'core/edit-site/toggle-list-view'
 			),
 			isVisualMode: getEditorMode() === 'visual',
-			settings: getSettings(),
 			blockEditorMode: __unstableGetEditorMode(),
+			homeUrl: getUnstableBase()?.home,
 		};
 	}, [] );
 
@@ -218,7 +222,7 @@ export default function Header( { showIconLabels } ) {
 							>
 								<MenuGroup>
 									<MenuItem
-										href={ settings?.siteUrl }
+										href={ homeUrl }
 										target="_blank"
 										icon={ external }
 									>

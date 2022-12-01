@@ -101,6 +101,7 @@ module.exports = {
 							'escapeRegExp',
 							'every',
 							'extend',
+							'filter',
 							'findIndex',
 							'findKey',
 							'findLast',
@@ -143,12 +144,15 @@ module.exports = {
 							'overEvery',
 							'partial',
 							'partialRight',
+							'pick',
 							'random',
+							'reduce',
 							'reject',
 							'repeat',
 							'reverse',
 							'size',
 							'snakeCase',
+							'some',
 							'sortBy',
 							'startCase',
 							'startsWith',
@@ -197,6 +201,26 @@ module.exports = {
 						name: '@emotion/css',
 						message:
 							'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support. As a replacement for the `cx` function, please use the `useCx` hook defined in `@wordpress/components` instead.',
+					},
+					{
+						name: '@wordpress/edit-post',
+						message:
+							"edit-post is a WordPress top level package that shouldn't be imported into other packages",
+					},
+					{
+						name: '@wordpress/edit-site',
+						message:
+							"edit-site is a WordPress top level package that shouldn't be imported into other packages",
+					},
+					{
+						name: '@wordpress/edit-widgets',
+						message:
+							"edit-widgets is a WordPress top level package that shouldn't be imported into other packages",
+					},
+					{
+						name: '@wordpress/edit-navigation',
+						message:
+							"edit-navigation is a WordPress top level package that shouldn't be imported into other packages",
 					},
 				],
 			},
@@ -321,23 +345,30 @@ module.exports = {
 			},
 		},
 		{
+			files: [ 'packages/components/src/**/*.[tj]s?(x)' ],
+			excludedFiles: [ ...developmentFiles ],
+			rules: {
+				'react-hooks/exhaustive-deps': 'error',
+			},
+		},
+		{
 			files: [ 'packages/jest*/**/*.js', '**/test/**/*.js' ],
 			excludedFiles: [ 'test/e2e/**/*.js' ],
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-unit' ],
 		},
 		{
-			files: [ '**/test/**/*.js' ],
+			files: [ '**/test/**/*.[tj]s?(x)' ],
 			excludedFiles: [
-				'**/*.@(android|ios|native).js',
-				'packages/react-native-*/**/*.js',
-				'test/native/**/*.js',
+				'**/*.@(android|ios|native).[tj]s?(x)',
+				'packages/react-native-*/**/*.[tj]s?(x)',
+				'test/native/**/*.[tj]s?(x)',
+				'test/e2e/**/*.[tj]s?(x)',
 			],
 			extends: [
 				'plugin:jest-dom/recommended',
 				'plugin:testing-library/react',
 			],
 			rules: {
-				'testing-library/no-container': 'off',
 				'testing-library/no-node-access': 'off',
 			},
 		},

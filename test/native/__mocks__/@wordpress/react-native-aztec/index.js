@@ -9,9 +9,11 @@ import { omit } from 'lodash';
  */
 import { forwardRef, useImperativeHandle, useRef } from '@wordpress/element';
 
-// Preserve the mock of AztecInputState to be exported with the AztecView mock.
+// Preserve the mock of AztecInputState and AztecKeyCodes to be exported with the AztecView mock.
 const AztecInputState = jest.requireActual( '@wordpress/react-native-aztec' )
 	.default.InputState;
+const AztecKeyCodes = jest.requireActual( '@wordpress/react-native-aztec' )
+	.default.KeyCodes;
 
 const UNSUPPORTED_PROPS = [ 'style' ];
 
@@ -50,5 +52,6 @@ const RCTAztecView = ( { accessibilityLabel, text, ...rest }, ref ) => {
 
 const AztecView = forwardRef( RCTAztecView );
 AztecView.InputState = AztecInputState;
+AztecView.KeyCodes = AztecKeyCodes;
 
 export default AztecView;

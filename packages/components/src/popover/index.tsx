@@ -169,7 +169,6 @@ const UnforwardedPopover = (
 		children,
 		className,
 		noArrow = true,
-		isAlternate,
 		position,
 		placement: placementProp = 'bottom-start',
 		offset: offsetProp = 0,
@@ -181,12 +180,14 @@ const UnforwardedPopover = (
 		flip = true,
 		resize = true,
 		shift = false,
+		variant,
 
 		// Deprecated props
 		__unstableForcePosition,
 		anchorRef,
 		anchorRect,
 		getAnchorRect,
+		isAlternate,
 
 		// Rest
 		...contentProps
@@ -195,7 +196,7 @@ const UnforwardedPopover = (
 	let computedFlipProp = flip;
 	let computedResizeProp = resize;
 	if ( __unstableForcePosition !== undefined ) {
-		deprecated( '`__unstableForcePosition` prop wp.components.Popover', {
+		deprecated( '`__unstableForcePosition` prop in wp.components.Popover', {
 			since: '6.1',
 			version: '6.3',
 			alternative: '`flip={ false }` and  `resize={ false }`',
@@ -225,6 +226,14 @@ const UnforwardedPopover = (
 		deprecated( '`getAnchorRect` prop in wp.components.Popover', {
 			since: '6.1',
 			alternative: '`anchor` prop',
+		} );
+	}
+
+	const computedVariant = isAlternate ? 'toolbar' : variant;
+	if ( isAlternate !== undefined ) {
+		deprecated( '`isAlternate` prop in wp.components.Popover', {
+			since: '6.2',
+			alternative: "`variant` prop with the `'toolbar'` value",
 		} );
 	}
 
@@ -370,6 +379,17 @@ const UnforwardedPopover = (
 
 	// When any of the possible anchor "sources" change,
 	// recompute the reference element (real or virtual) and its owner document.
+
+	const anchorRefTop = ( anchorRef as PopoverAnchorRefTopBottom | undefined )
+		?.top;
+	const anchorRefBottom = (
+		anchorRef as PopoverAnchorRefTopBottom | undefined
+	 )?.bottom;
+	const anchorRefStartContainer = ( anchorRef as Range | undefined )
+		?.startContainer;
+	const anchorRefCurrent = ( anchorRef as PopoverAnchorRefReference )
+		?.current;
+
 	useLayoutEffect( () => {
 		const resultingReferenceOwnerDoc = getReferenceOwnerDocument( {
 			anchor,
@@ -392,11 +412,11 @@ const UnforwardedPopover = (
 		setReferenceOwnerDocument( resultingReferenceOwnerDoc );
 	}, [
 		anchor,
-		anchorRef as Element | undefined,
-		( anchorRef as PopoverAnchorRefTopBottom | undefined )?.top,
-		( anchorRef as PopoverAnchorRefTopBottom | undefined )?.bottom,
-		( anchorRef as Range | undefined )?.startContainer,
-		( anchorRef as PopoverAnchorRefReference )?.current,
+		anchorRef,
+		anchorRefTop,
+		anchorRefBottom,
+		anchorRefStartContainer,
+		anchorRefCurrent,
 		anchorRect,
 		getAnchorRect,
 		fallbackReferenceElement,
@@ -411,7 +431,7 @@ const UnforwardedPopover = (
 			// Reference and root documents are the same.
 			referenceOwnerDocument === document ||
 			// Reference and floating are in the same document.
-			referenceOwnerDocument === refs?.floating?.current?.ownerDocument ||
+			referenceOwnerDocument === refs.floating.current?.ownerDocument ||
 			// The reference's document has no view (i.e. window)
 			// or frame element (ie. it's not an iframe).
 			! referenceOwnerDocument?.defaultView?.frameElement
@@ -433,7 +453,7 @@ const UnforwardedPopover = (
 		return () => {
 			defaultView.removeEventListener( 'resize', updateFrameOffset );
 		};
-	}, [ referenceOwnerDocument, update ] );
+	}, [ referenceOwnerDocument, update, refs.floating ] );
 
 	const mergedFloatingRef = useMergeRefs( [
 		floating,
@@ -452,7 +472,12 @@ const UnforwardedPopover = (
 			placement={ computedPlacement }
 			className={ classnames( 'components-popover', className, {
 				'is-expanded': isExpanded,
-				'is-alternate': isAlternate,
+				// Use the 'alternate' classname for 'toolbar' variant for back compat.
+				[ `is-${
+					computedVariant === 'toolbar'
+						? 'alternate'
+						: computedVariant
+				}` ]: computedVariant,
 			} ) }
 			{ ...contentProps }
 			ref={ mergedFloatingRef }

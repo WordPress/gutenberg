@@ -17,7 +17,7 @@ export const getInnerBlock = (
 	blockName,
 	{ rowIndex = 1 } = {}
 ) => {
-	return within( parentBlock ).getByA11yLabel(
+	return within( parentBlock ).getByLabelText(
 		new RegExp( `${ blockName } Block\\. Row ${ rowIndex }` )
 	);
 };

@@ -38,24 +38,24 @@ describe( 'when title is focused', () => {
 		} );
 
 		// Focus first block
-		fireEvent.press( screen.getByA11yLabel( /Paragraph Block. Row 1/ ) );
+		fireEvent.press( screen.getByLabelText( /Paragraph Block. Row 1/ ) );
 
 		// Focus title
 		fireEvent(
-			screen.getAllByA11yLabel( 'Post title. test' )[ 0 ],
+			screen.getAllByLabelText( 'Post title. test' )[ 0 ],
 			'select'
 		);
 
 		// Add new Heading block
-		fireEvent.press( screen.getByA11yLabel( 'Add block' ) );
+		fireEvent.press( screen.getByLabelText( 'Add block' ) );
 		fireEvent.press( screen.getByText( 'Heading' ) );
 
-		expect( screen.getByA11yLabel( /Heading Block. Row 1/ ) ).toBeDefined();
+		expect( screen.getByLabelText( /Heading Block. Row 1/ ) ).toBeDefined();
 		expect(
-			screen.getByA11yLabel( /Paragraph Block. Row 2/ )
+			screen.getByLabelText( /Paragraph Block. Row 2/ )
 		).toBeDefined();
 		expect(
-			screen.getByA11yLabel( /Paragraph Block. Row 3/ )
+			screen.getByLabelText( /Paragraph Block. Row 3/ )
 		).toBeDefined();
 	} );
 } );
@@ -67,27 +67,27 @@ describe( 'when title is no longer focused', () => {
 		} );
 
 		// Focus first block
-		fireEvent.press( screen.getByA11yLabel( /Paragraph Block. Row 1/ ) );
+		fireEvent.press( screen.getByLabelText( /Paragraph Block. Row 1/ ) );
 
 		// Focus title
 		fireEvent(
-			screen.getAllByA11yLabel( 'Post title. test' )[ 0 ],
+			screen.getAllByLabelText( 'Post title. test' )[ 0 ],
 			'select'
 		);
 
 		// Focus last block
-		fireEvent.press( screen.getByA11yLabel( /Paragraph Block. Row 2/ ) );
+		fireEvent.press( screen.getByLabelText( /Paragraph Block. Row 2/ ) );
 
 		// Add new Heading block
-		fireEvent.press( screen.getByA11yLabel( 'Add block' ) );
+		fireEvent.press( screen.getByLabelText( 'Add block' ) );
 		fireEvent.press( screen.getByText( 'Heading' ) );
 
 		expect(
-			screen.getByA11yLabel( /Paragraph Block. Row 1/ )
+			screen.getByLabelText( /Paragraph Block. Row 1/ )
 		).toBeDefined();
 		expect(
-			screen.getByA11yLabel( /Paragraph Block. Row 2/ )
+			screen.getByLabelText( /Paragraph Block. Row 2/ )
 		).toBeDefined();
-		expect( screen.getByA11yLabel( /Heading Block. Row 3/ ) ).toBeDefined();
+		expect( screen.getByLabelText( /Heading Block. Row 3/ ) ).toBeDefined();
 	} );
 } );
