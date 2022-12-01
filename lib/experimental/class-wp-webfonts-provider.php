@@ -53,13 +53,15 @@ abstract class WP_Webfonts_Provider {
 	protected $webfonts = array();
 
 	/**
-	 * Font-face style tag's attribute(s).
+	 * Array of Font-face style tag's attribute(s)
+	 * where the key is the attribute name and the
+	 * value is its value.
 	 *
 	 * @since X.X.X
 	 *
-	 * @var string
+	 * @var string[]
 	 */
-	protected $style_tag_atts = '';
+	protected $style_tag_atts = array();
 
 	/**
 	 * Sets this provider's webfonts property.
@@ -108,6 +110,23 @@ abstract class WP_Webfonts_Provider {
 	 * @return string The style element.
 	 */
 	protected function get_style_element() {
-		return "<style id='wp-webfonts-{$this->id}'{$this->style_tag_atts}>\n%s\n</style>\n";
+		$attributes = $this->generate_style_element_attributes();
+
+		return "<style id='wp-webfonts-{$this->id}'{$attributes}>\n%s\n</style>\n";
+	}
+
+	/**
+	 * Gets the defined <style> element's attributes.
+	 *
+	 * @since X.X.X
+	 *
+	 * @return string A string of attribute=value when defined, else, empty string.
+	 */
+	private function generate_style_element_attributes() {
+		$attributes = '';
+		foreach ( $this->style_tag_atts as $name => $value ) {
+			$attributes .= " {$name}='{$value}'";
+		}
+		return $attributes;
 	}
 }

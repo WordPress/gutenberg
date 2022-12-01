@@ -46,7 +46,7 @@ class WP_Webfonts_Provider_Local extends WP_Webfonts_Provider {
 			&&
 			function_exists( 'current_theme_supports' ) && ! current_theme_supports( 'html5', 'style' )
 		) {
-			$this->style_tag_atts = " type='text/css'";
+			$this->style_tag_atts = array( 'type' => 'text/css' );
 		}
 	}
 
