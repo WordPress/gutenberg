@@ -665,6 +665,7 @@ export default function NavigationSubmenuEdit( {
 							<LinkControl
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
+								hasTextControl
 								showInitialSuggestions={ true }
 								withCreateSuggestion={ userCanCreate }
 								createSuggestion={ handleCreate }
