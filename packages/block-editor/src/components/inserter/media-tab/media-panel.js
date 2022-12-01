@@ -11,7 +11,7 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import MediaList from './media-list';
 import useDebouncedInput from '../hooks/use-debounced-input';
-import { useMediaResults } from './hooks';
+import { useMediaResults } from './hooks/use-media-results';
 import InserterNoResults from '../no-results';
 
 const INITIAL_MEDIA_ITEMS_PER_PAGE = 10;
@@ -38,10 +38,12 @@ export function MediaCategoryDialog( { rootClientId, onInsert, category } ) {
 
 export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 	const [ search, setSearch, debouncedSearch ] = useDebouncedInput();
-	const mediaList = useMediaResults( {
+	// TODO: here we'll need the request/response interfaces and see where to
+	// differentiate between internal and external media sources.
+	const mediaList = useMediaResults( category, {
 		per_page: !! debouncedSearch ? 20 : INITIAL_MEDIA_ITEMS_PER_PAGE,
-		media_type: category.mediaType,
 		search: debouncedSearch,
+		// Check how to handle conditions like this in an abstraction..
 		orderBy: !! debouncedSearch ? 'relevance' : 'date',
 	} );
 	const baseCssClass = 'block-editor-inserter__media-panel';

@@ -22,6 +22,7 @@ function MediaPreview( { media, onClick, composite, mediaType } ) {
 		() => getBlockAndPreviewFromMedia( media, mediaType ),
 		[ media, mediaType ]
 	);
+	// TODO: Media titles can be very long, we should truncate them somehow(try css first..).
 	const title = media.title?.rendered || media.title;
 	const baseCssClass = 'block-editor-inserter__media-list';
 	return (
@@ -77,9 +78,9 @@ function MediaList( {
 			className="block-editor-inserter__media-list"
 			aria-label={ label }
 		>
-			{ mediaList.map( ( media ) => (
+			{ mediaList.map( ( media, index ) => (
 				<MediaPreview
-					key={ media.id }
+					key={ media.id || index }
 					media={ media }
 					mediaType={ mediaType }
 					onClick={ onPreviewClick }
