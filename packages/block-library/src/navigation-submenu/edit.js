@@ -284,6 +284,7 @@ export default function NavigationSubmenuEdit( {
 	const { label, type, opensInNewTab, url, description, rel, title, kind } =
 		attributes;
 	const link = {
+		title: label,
 		url,
 		opensInNewTab,
 	};
