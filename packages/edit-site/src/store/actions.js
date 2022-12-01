@@ -63,10 +63,12 @@ export const setTemplate =
 	( templateId, templateSlug ) =>
 	async ( { dispatch, registry } ) => {
 		if ( ! templateSlug ) {
-			const template = await registry
-				.resolveSelect( coreStore )
-				.getEntityRecord( 'postType', 'wp_template', templateId );
-			templateSlug = template?.slug;
+			try {
+				const template = await registry
+					.resolveSelect( coreStore )
+					.getEntityRecord( 'postType', 'wp_template', templateId );
+				templateSlug = template?.slug;
+			} catch ( error ) {}
 		}
 
 		dispatch( {
@@ -238,40 +240,45 @@ export const setPage =
 /**
  * Action that sets the active navigation panel menu.
  *
- * @param {string} menu Menu prop of active menu.
+ * @deprecated
  *
  * @return {Object} Action object.
  */
-export function setNavigationPanelActiveMenu( menu ) {
-	return {
-		type: 'SET_NAVIGATION_PANEL_ACTIVE_MENU',
-		menu,
-	};
+export function setNavigationPanelActiveMenu() {
+	deprecated( "dispatch( 'core/edit-site' ).setNavigationPanelActiveMenu", {
+		since: '6.2',
+		version: '6.4',
+	} );
+
+	return { type: 'NOTHING' };
 }
 
 /**
  * Opens the navigation panel and sets its active menu at the same time.
  *
- * @param {string} menu Identifies the menu to open.
+ * @deprecated
  */
-export function openNavigationPanelToMenu( menu ) {
-	return {
-		type: 'OPEN_NAVIGATION_PANEL_TO_MENU',
-		menu,
-	};
+export function openNavigationPanelToMenu() {
+	deprecated( "dispatch( 'core/edit-site' ).openNavigationPanelToMenu", {
+		since: '6.2',
+		version: '6.4',
+	} );
+
+	return { type: 'NOTHING' };
 }
 
 /**
  * Sets whether the navigation panel should be open.
  *
- * @param {boolean} isOpen If true, opens the nav panel. If false, closes it. It
- *                         does not toggle the state, but sets it directly.
+ * @deprecated
  */
-export function setIsNavigationPanelOpened( isOpen ) {
-	return {
-		type: 'SET_IS_NAVIGATION_PANEL_OPENED',
-		isOpen,
-	};
+export function setIsNavigationPanelOpened() {
+	deprecated( "dispatch( 'core/edit-site' ).setIsNavigationPanelOpened", {
+		since: '6.2',
+		version: '6.4',
+	} );
+
+	return { type: 'NOTHING' };
 }
 
 /**
@@ -507,5 +514,29 @@ export const switchEditorMode =
 			speak( __( 'Visual editor selected' ), 'assertive' );
 		} else if ( mode === 'mosaic' ) {
 			speak( __( 'Mosaic view selected' ), 'assertive' );
+		}
+	};
+
+/**
+ * Action that switches the canvas mode.
+ *
+ * @param {?string} mode Canvas mode.
+ */
+export const __unstableSetCanvasMode =
+	( mode ) =>
+	( { registry, dispatch } ) => {
+		registry.dispatch( blockEditorStore ).__unstableSetEditorMode( 'edit' );
+		dispatch( {
+			type: 'SET_CANVAS_MODE',
+			mode,
+		} );
+		// Check if the block list view should be open by default.
+		if (
+			mode === 'edit' &&
+			registry
+				.select( preferencesStore )
+				.get( 'core/edit-site', 'showListViewByDefault' )
+		) {
+			dispatch.setIsListViewOpened( true );
 		}
 	};
