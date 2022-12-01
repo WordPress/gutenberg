@@ -6,14 +6,16 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
-import {
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-} from '@wordpress/components';
+import { BaseControl, CustomSelectControl } from '@wordpress/components';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
-import { useContext, createPortal, Platform } from '@wordpress/element';
+import {
+	useContext,
+	useMemo,
+	createPortal,
+	Platform,
+} from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 
 /**
@@ -26,20 +28,36 @@ import { cleanEmptyObject } from './utils';
 
 const POSITION_SUPPORT_KEY = 'position';
 
-const POSITION_OPTIONS = [
-	{
-		key: 'default',
-		label: __( 'Default' ),
-		value: '',
-		name: __( 'Default' ),
-	},
-	{
-		key: 'sticky',
-		label: __( 'Sticky' ),
-		value: 'sticky',
-		name: __( 'Sticky' ),
-	},
-];
+const OPTION_CLASSNAME =
+	'block-editor-hooks__position-selection__select-control__option';
+
+const DEFAULT_OPTION = {
+	key: 'static',
+	value: '',
+	name: __( 'Static' ),
+	className: OPTION_CLASSNAME,
+	__experimentalHint: __( 'The default position' ),
+};
+
+const STICKY_OPTION = {
+	key: 'sticky',
+	value: 'sticky',
+	name: __( 'Sticky' ),
+	className: OPTION_CLASSNAME,
+	__experimentalHint: __(
+		'The block will scroll with the document but stick instead of exiting the viewport'
+	),
+};
+
+const FIXED_OPTION = {
+	key: 'fixed',
+	value: 'fixed',
+	name: __( 'Fixed' ),
+	className: OPTION_CLASSNAME,
+	__experimentalHint: __(
+		'The block will not move when the page is scrolled'
+	),
+};
 
 const POSITION_SIDES = [ 'top', 'right', 'bottom', 'left' ];
 const VALID_POSITION_TYPES = [ 'sticky', 'fixed' ];
@@ -77,6 +95,30 @@ export function getPositionCSS( { selector, style } ) {
 	output += `}`;
 
 	return output;
+}
+
+/**
+ * Determines if there is sticky position support.
+ *
+ * @param {string|Object} blockType Block name or Block Type object.
+ *
+ * @return {boolean} Whether there is support.
+ */
+export function hasStickyPositionSupport( blockType ) {
+	const support = getBlockSupport( blockType, POSITION_SUPPORT_KEY );
+	return !! ( true === support || support?.sticky );
+}
+
+/**
+ * Determines if there is fixed position support.
+ *
+ * @param {string|Object} blockType Block name or Block Type object.
+ *
+ * @return {boolean} Whether there is support.
+ */
+export function hasFixedPositionSupport( blockType ) {
+	const support = getBlockSupport( blockType, POSITION_SUPPORT_KEY );
+	return !! ( true === support || support?.fixed );
 }
 
 /**
@@ -152,8 +194,23 @@ export function useIsPositionDisabled( { name: blockName } = {} ) {
 export function PositionEdit( props ) {
 	const {
 		attributes: { style = {} },
+		name: blockName,
 		setAttributes,
 	} = props;
+
+	const allowFixed = hasFixedPositionSupport( blockName );
+	const allowSticky = hasStickyPositionSupport( blockName );
+
+	const options = useMemo( () => {
+		const availableOptions = [ DEFAULT_OPTION ];
+		if ( allowSticky ) {
+			availableOptions.push( STICKY_OPTION );
+		}
+		if ( allowFixed ) {
+			availableOptions.push( FIXED_OPTION );
+		}
+		return availableOptions;
+	}, [ allowFixed, allowSticky ] );
 
 	if ( useIsPositionDisabled( props ) ) {
 		return null;
@@ -182,30 +239,34 @@ export function PositionEdit( props ) {
 		} );
 	};
 
+	const value = style?.position?.type;
+	const selectedOption = value
+		? options.find( ( option ) => option.value === value )
+		: DEFAULT_OPTION;
+
 	return Platform.select( {
 		web: (
 			<>
-				<ToggleGroupControl
-					label={ __( 'Position' ) }
-					help={ __(
-						'Stick this block to the top of its container. It will scroll with the page.'
-					) }
-					value={ style?.position?.type || '' }
-					onChange={ ( newValue ) => {
-						onChangeType( newValue );
-					} }
-					isBlock
-				>
-					{ POSITION_OPTIONS.map( ( option ) => (
-						<ToggleGroupControlOption
-							key={ option.key }
-							value={ option.value }
-							label={ option.label }
-							aria-label={ option.name }
-							showTooltip={ true }
-						/>
-					) ) }
-				</ToggleGroupControl>
+				<BaseControl className="block-editor-hooks__position-selection">
+					<CustomSelectControl
+						__nextUnconstrainedWidth
+						__next36pxDefaultSize
+						className="block-editor-hooks__position-selection__select-control"
+						label={ __( 'Position' ) }
+						describedBy={ sprintf(
+							// translators: %s: Currently selected font size.
+							__( 'Currently selected position: %s' ),
+							selectedOption.name
+						) }
+						options={ options }
+						value={ selectedOption }
+						__experimentalShowSelectedHint
+						onChange={ ( { selectedItem } ) => {
+							onChangeType( selectedItem.value );
+						} }
+						size={ '__unstable-large' }
+					/>
+				</BaseControl>
 			</>
 		),
 		native: null,
