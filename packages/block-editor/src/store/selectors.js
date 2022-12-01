@@ -2107,7 +2107,7 @@ export const getBlockTransformItems = createSelector(
 			'desc'
 		);
 	},
-	( state, rootClientId ) => [
+	( state, blocks, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
 		state.blocks.byClientId,
 		state.preferences.insertUsage,
