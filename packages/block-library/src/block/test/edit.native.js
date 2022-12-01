@@ -23,7 +23,7 @@ const getMockedReusableBlock = ( id ) => ( {
 	content: {
 		raw: `
     <!-- wp:heading -->
-    <h2>First Reusable block</h2>
+    <h2 class="wp-block-heading">First Reusable block</h2>
     <!-- /wp:heading -->
 
     <!-- wp:paragraph -->
