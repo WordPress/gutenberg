@@ -9,7 +9,7 @@ import { create, split, toHTMLString } from '@wordpress/rich-text';
  */
 import { createListBlockFromDOMElement } from './utils';
 
-function getListContentSchema( { phrasingContentSchema } ) {
+export function getListContentSchema( { phrasingContentSchema } ) {
 	const listContentSchema = {
 		...phrasingContentSchema,
 		ul: {},

@@ -1,3 +1,8 @@
+// eslint-disable-next-line jsdoc/check-tag-names
+/**
+ * @jest-environment jsdom
+ */
+
 /**
  * External dependencies
  */
@@ -379,6 +384,7 @@ describe( 'Blocks raw handling', () => {
 			'google-docs-list-only',
 			'google-docs-table',
 			'google-docs-table-with-comments',
+			'google-docs-table-with-lists',
 			'google-docs-with-comments',
 			'ms-word',
 			'ms-word-styled',
