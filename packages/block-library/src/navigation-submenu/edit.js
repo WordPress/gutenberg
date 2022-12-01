@@ -37,7 +37,10 @@ import {
 	useRef,
 	createInterpolateElement,
 } from '@wordpress/element';
-import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
+import {
+	placeCaretAtHorizontalEdge,
+	__unstableStripHTML as stripHTML,
+} from '@wordpress/dom';
 import { link as linkIcon, removeSubmenu } from '@wordpress/icons';
 import {
 	useResourcePermissions,
@@ -284,7 +287,7 @@ export default function NavigationSubmenuEdit( {
 	const { label, type, opensInNewTab, url, description, rel, title, kind } =
 		attributes;
 	const link = {
-		title: label,
+		title: label && stripHTML( label ),
 		url,
 		opensInNewTab,
 	};
