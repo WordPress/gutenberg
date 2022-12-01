@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -15,12 +15,21 @@ import { copy } from '@wordpress/icons';
  * Internal dependencies
  */
 import { BlockSwitcher, BlockSwitcherDropdownMenu } from '../';
-import { act } from 'react-test-renderer';
 
 jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
 jest.mock( '../../block-title/use-block-display-title', () =>
 	jest.fn().mockReturnValue( 'Block Name' )
 );
+
+/**
+ * Returns the first found popover element up the DOM tree.
+ *
+ * @param {HTMLElement} element Element to start with.
+ * @return {HTMLElement|null} Popover element, or `null` if not found.
+ */
+function getWrappingPopoverElement( element ) {
+	return element.closest( '.components-popover' );
+}
 
 describe( 'BlockSwitcher', () => {
 	test( 'should not render block switcher without blocks', () => {
@@ -211,7 +220,18 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 				} ),
 				'[ArrowDown]'
 			);
-			await act( () => Promise.resolve() );
+
+			const menu = screen.getByRole( 'menu', {
+				name: 'Block Name',
+			} );
+
+			expect( menu ).not.toBeVisible();
+
+			await waitFor( () =>
+				expect(
+					getWrappingPopoverElement( menu )
+				).toBePositionedPopover()
+			);
 
 			expect(
 				screen.getByRole( 'button', {
@@ -220,11 +240,8 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 				} )
 			).toBeVisible();
 
-			const menu = screen.getByRole( 'menu', {
-				name: 'Block Name',
-			} );
 			expect( menu ).toBeInTheDocument();
-			expect( menu ).not.toBeVisible();
+			expect( menu ).toBeVisible();
 		} );
 
 		test( 'should simulate a click event, which should call onToggle.', async () => {
@@ -254,7 +271,18 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 					expanded: false,
 				} )
 			);
-			await act( () => Promise.resolve() );
+
+			const menu = screen.getByRole( 'menu', {
+				name: 'Block Name',
+			} );
+
+			expect( menu ).not.toBeVisible();
+
+			await waitFor( () =>
+				expect(
+					getWrappingPopoverElement( menu )
+				).toBePositionedPopover()
+			);
 
 			expect(
 				screen.getByRole( 'button', {
@@ -263,11 +291,7 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 				} )
 			).toBeVisible();
 
-			const menu = screen.getByRole( 'menu', {
-				name: 'Block Name',
-			} );
-			expect( menu ).toBeInTheDocument();
-			expect( menu ).not.toBeVisible();
+			expect( menu ).toBeVisible();
 		} );
 
 		test( 'should create the transform items for the chosen block.', async () => {
@@ -285,14 +309,19 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 					expanded: false,
 				} )
 			);
-			await act( () => Promise.resolve() );
+
+			const menu = screen.getByRole( 'menu', {
+				name: 'Block Name',
+			} );
+
+			await waitFor( () =>
+				expect(
+					getWrappingPopoverElement( menu )
+				).toBePositionedPopover()
+			);
 
 			expect(
-				within(
-					screen.getByRole( 'menu', {
-						name: 'Block Name',
-					} )
-				).getByRole( 'menuitem' )
+				within( menu ).getByRole( 'menuitem' )
 			).toBeInTheDocument();
 		} );
 	} );
