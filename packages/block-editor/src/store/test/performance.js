@@ -52,4 +52,14 @@ describe( 'performance', () => {
 
 		expect( updatedState ).toBeDefined();
 	} );
+
+	it( 'should move blocks', () => {
+		const updatedState = reducer( preparedState, {
+			type: 'MOVE_BLOCKS_DOWN',
+			clientIds: [ 'block-10' ],
+			rootClientId: '',
+		} );
+
+		expect( updatedState ).toBeDefined();
+	} );
 } );
