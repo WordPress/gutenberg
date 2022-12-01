@@ -257,10 +257,26 @@ function block_core_navigation_get_classic_menu_fallback() {
 	$classic_nav_menus = wp_get_nav_menus();
 
 	// If menus exist.
-	if ( $classic_nav_menus && ! is_wp_error( $classic_nav_menus ) && count( $classic_nav_menus ) === 1 ) {
-		// Use the first classic menu only. Handles simple use case where user has a single
-		// classic menu and switches to a block theme. In future this maybe expanded to
-		// determine the most appropriate classic menu to be used based on location.
+	if ( $classic_nav_menus && ! is_wp_error( $classic_nav_menus ) ) {
+		// Handles simple use case where user has a classic menu and switches to a block theme.
+
+		// Returns the menu assigned to location `primary`.
+		$locations = get_nav_menu_locations();
+		if ( isset( $locations['primary'] ) ) {
+			$primary_menu = wp_get_nav_menu_object( $locations['primary'] );
+			if ( $primary_menu ) {
+				return $primary_menu;
+			}
+		}
+
+		// Returns a menu if `primary` is its slug.
+		foreach ( $classic_nav_menus as $classic_nav_menu ) {
+			if ( 'primary' === $classic_nav_menu->slug ) {
+				return $classic_nav_menu;
+			}
+		}
+
+		// Otherwise return the most recently created classic menu.
 		return $classic_nav_menus[0];
 	}
 }
