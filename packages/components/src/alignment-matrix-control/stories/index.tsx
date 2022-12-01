@@ -13,7 +13,6 @@ import { Icon } from '@wordpress/icons';
  * Internal dependencies
  */
 import AlignmentMatrixControl from '..';
-import { ALIGNMENTS } from '../utils';
 import { HStack } from '../../h-stack';
 import type { AlignmentMatrixControlProps } from '../types';
 
@@ -24,10 +23,7 @@ const meta: ComponentMeta< typeof AlignmentMatrixControl > = {
 		'AlignmentMatrixControl.Icon': AlignmentMatrixControl.Icon,
 	},
 	argTypes: {
-		defaultValue: { options: ALIGNMENTS },
 		onChange: { action: 'onChange', control: { type: null } },
-		label: { control: { type: 'text' } },
-		width: { control: { type: 'number' } },
 		value: { control: { type: null } },
 	},
 	parameters: {
