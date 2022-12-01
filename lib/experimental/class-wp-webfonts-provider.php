@@ -35,6 +35,15 @@ if ( class_exists( 'WP_Webfonts_Provider' ) ) {
 abstract class WP_Webfonts_Provider {
 
 	/**
+	 * The provider's unique ID.
+	 *
+	 * @since X.X.X
+	 *
+	 * @var string
+	 */
+	protected $id = '';
+
+	/**
 	 * Webfonts to be processed.
 	 *
 	 * @since X.X.X
@@ -42,6 +51,15 @@ abstract class WP_Webfonts_Provider {
 	 * @var array[]
 	 */
 	protected $webfonts = array();
+
+	/**
+	 * Font-face style tag's attribute(s).
+	 *
+	 * @since X.X.X
+	 *
+	 * @var string
+	 */
+	protected $style_tag_atts = '';
 
 	/**
 	 * Sets this provider's webfonts property.
@@ -58,6 +76,18 @@ abstract class WP_Webfonts_Provider {
 	}
 
 	/**
+	 * Prints the generated styles.
+	 *
+	 * @since X.X.X
+	 */
+	public function print_styles() {
+		printf(
+			$this->get_style_element(),
+			$this->get_css()
+		);
+	}
+
+	/**
 	 * Gets the `@font-face` CSS for the provider's webfonts.
 	 *
 	 * This method is where the provider does it processing to build the
@@ -71,11 +101,13 @@ abstract class WP_Webfonts_Provider {
 	abstract public function get_css();
 
 	/**
-	 * Prints the generated styles.
+	 * Gets the `<style>` element for wrapping the `@font-face` CSS.
 	 *
 	 * @since X.X.X
+	 *
+	 * @return string The style element.
 	 */
-	public function print_styles() {
-		echo $this->get_css();
+	protected function get_style_element() {
+		return "<style id='wp-webfonts-{$this->id}'{$this->style_tag_atts}>\n%s\n</style>\n";
 	}
 }

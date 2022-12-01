@@ -63,7 +63,7 @@ class Tests_Webfonts_WpWebfontsProviderLocal extends WP_UnitTestCase {
 	/**
 	 * @covers WP_Webfonts_Provider_Local::get_css
 	 *
-	 * @dataProvider data_get_css
+	 * @dataProvider data_get_css_print_styles
 	 *
 	 * @param array  $webfonts Prepared webfonts (to store in WP_Webfonts_Provider_Local::$webfonts property).
 	 * @param string $expected Expected CSS.
@@ -72,7 +72,24 @@ class Tests_Webfonts_WpWebfontsProviderLocal extends WP_UnitTestCase {
 		$property = $this->get_webfonts_property();
 		$property->setValue( $this->provider, $webfonts );
 
-		$this->assertSame( $expected, $this->provider->get_css() );
+		$this->assertSame( $expected['font-face-css'], $this->provider->get_css() );
+	}
+
+	/**
+	 * @covers WP_Webfonts_Provider_Local::print_styles
+	 *
+	 * @dataProvider data_get_css_print_styles
+	 *
+	 * @param array  $webfonts Prepared webfonts (to store in WP_Webfonts_Provider_Local::$webfonts property).
+	 * @param string $expected Expected CSS.
+	 */
+	public function test_print_styles( array $webfonts, $expected ) {
+		$property = $this->get_webfonts_property();
+		$property->setValue( $this->provider, $webfonts );
+
+		$expected_output = sprintf( $expected['style-element'], $expected['font-face-css'] );
+		$this->expectOutputString( $expected_output );
+		$this->provider->print_styles();
 	}
 
 	/**
@@ -80,7 +97,7 @@ class Tests_Webfonts_WpWebfontsProviderLocal extends WP_UnitTestCase {
 	 *
 	 * @return array
 	 */
-	public function data_get_css() {
+	public function data_get_css_print_styles() {
 		return array(
 			'truetype format' => array(
 				'webfonts' => array(
@@ -92,13 +109,13 @@ class Tests_Webfonts_WpWebfontsProviderLocal extends WP_UnitTestCase {
 						'src'         => 'http://example.org/assets/fonts/OpenSans-Italic-VariableFont_wdth,wght.ttf',
 					),
 				),
-				'expected' => <<<CSS
-<style id='wp-webfonts-local' type='text/css'>
+				'expected' => array(
+					'style-element' => "<style id='wp-webfonts-local' type='text/css'>\n%s\n</style>\n",
+					'font-face-css' => <<<CSS
 @font-face{font-family:"Open Sans";font-style:italic;font-weight:bold;src:local("Open Sans"), url('http://example.org/assets/fonts/OpenSans-Italic-VariableFont_wdth,wght.ttf') format('truetype');}
-</style>
-
 CSS
-			,
+					,
+				),
 			),
 			'woff2 format'    => array(
 				'webfonts' => array(
@@ -119,13 +136,14 @@ CSS
 						'src'          => 'http://example.org/assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2',
 					),
 				),
-				'expected' => <<<CSS
-<style id='wp-webfonts-local' type='text/css'>
+				'expected' => array(
+					'style-element' => "<style id='wp-webfonts-local' type='text/css'>\n%s\n</style>\n",
+					'font-face-css' => <<<CSS
 @font-face{font-family:"Source Serif Pro";font-style:normal;font-weight:200 900;font-stretch:normal;src:local("Source Serif Pro"), url('http://example.org/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2') format('woff2');}@font-face{font-family:"Source Serif Pro";font-style:italic;font-weight:200 900;font-stretch:normal;src:local("Source Serif Pro"), url('http://example.org/assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2') format('woff2');}
-</style>
-
 CSS
-			,
+
+					,
+				),
 			),
 		);
 	}

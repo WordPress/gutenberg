@@ -8,15 +8,20 @@ class Mock_Provider extends WP_Webfonts_Provider {
 	 */
 	protected $id = 'mock';
 
-	/**
-	 * CSS to print.
-	 *
-	 * @var string
-	 */
-	public $css = '<mock id="wp-webfonts-mock" attr="some-attr">%s</mock>\n';
-
 	public function get_css() {
 		$handles = array_keys( $this->webfonts );
+		return implode( '; ', $handles );
 		return sprintf( $this->css, implode( '; ', $handles ) );
+	}
+
+	/**
+	 * Gets the `<style>` element for wrapping the `@font-face` CSS.
+	 *
+	 * @since X.X.X
+	 *
+	 * @return string The style element.
+	 */
+	protected function get_style_element() {
+		return '<mock id="wp-webfonts-mock" attr="some-attr">%s</mock>\n';
 	}
 }
