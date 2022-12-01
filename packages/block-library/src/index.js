@@ -27,7 +27,6 @@ import * as button from './button';
 import * as buttons from './buttons';
 import * as calendar from './calendar';
 import * as categories from './categories';
-import * as classic from './freeform';
 import * as code from './code';
 import * as column from './column';
 import * as columns from './columns';
@@ -139,7 +138,6 @@ const getAllBlocks = () =>
 		buttons,
 		calendar,
 		categories,
-		...( window.wp && window.wp.oldEditor ? [ classic ] : [] ), // Only add the classic block in WP Context.
 		code,
 		column,
 		columns,
@@ -257,9 +255,7 @@ export const registerCoreBlocks = (
 	blocks.forEach( ( { init } ) => init() );
 
 	setDefaultBlockName( paragraph.name );
-	if ( window.wp && window.wp.oldEditor ) {
-		setFreeformContentHandlerName( classic.name );
-	}
+	setFreeformContentHandlerName( html.name );
 	setUnregisteredTypeHandlerName( missing.name );
 	setGroupingBlockName( group.name );
 };

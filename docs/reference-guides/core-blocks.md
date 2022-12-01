@@ -251,15 +251,6 @@ Add a link to a downloadable file. ([Source](https://github.com/WordPress/gutenb
 -	**Supports:** align, anchor
 -	**Attributes:** displayPreview, downloadButtonText, fileId, fileName, href, id, previewHeight, showDownloadButton, textLinkHref, textLinkTarget
 
-## Classic
-
-Use the classic WordPress editor. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/freeform))
-
--	**Name:** core/freeform
--	**Category:** text
--	**Supports:** ~~className~~, ~~customClassName~~, ~~reusable~~
--	**Attributes:** content
-
 ## Gallery
 
 Display multiple images in a rich gallery. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/gallery))
