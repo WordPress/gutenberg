@@ -807,6 +807,9 @@
 				"core/quote": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
+				"core/read-more": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
 				"core/rss": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
