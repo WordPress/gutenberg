@@ -35,7 +35,27 @@ function useBaseId( id?: string ) {
 	return id || instanceId;
 }
 
-export default function AlignmentMatrixControl( {
+/**
+ *
+ * AlignmentMatrixControl components enable adjustments to horizontal and vertical alignments for UI.
+ *
+ * ```jsx
+ * import { __experimentalAlignmentMatrixControl as AlignmentMatrixControl } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const Example = () => {
+ * 	const [ alignment, setAlignment ] = useState( 'center center' );
+ *
+ * 	return (
+ * 		<AlignmentMatrixControl
+ * 			value={ alignment }
+ * 			onChange={ ( newAlignment ) => setAlignment( newAlignment ) }
+ * 		/>
+ * 	);
+ * };
+ * ```
+ */
+export function AlignmentMatrixControl( {
 	className,
 	id,
 	label = __( 'Alignment Matrix Control' ),
@@ -112,3 +132,5 @@ export default function AlignmentMatrixControl( {
 }
 
 AlignmentMatrixControl.Icon = AlignmentMatrixControlIcon;
+
+export default AlignmentMatrixControl;
