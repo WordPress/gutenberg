@@ -27,7 +27,7 @@ export const ALIGNMENT_LABEL: Record< AlignmentMatrixControlValue, string > = {
 	'bottom right': __( 'Bottom Right' ),
 };
 
-const checkIsValidAlighment = (
+const checkIsValidAlignment = (
 	value: string
 ): value is AlignmentMatrixControlValue => {
 	return value in ALIGNMENT_LABEL;
@@ -77,7 +77,7 @@ export function getAlignmentIndex(
 	alignment: AlignmentMatrixControlValue = 'center'
 ) {
 	const item = transformValue( alignment ).replace( '-', ' ' );
-	if ( ! checkIsValidAlighment( item ) ) return;
+	if ( ! checkIsValidAlignment( item ) ) return;
 	const index = ALIGNMENTS.indexOf( item );
 
 	return index > -1 ? index : undefined;
