@@ -16,6 +16,7 @@
  * @access private
  */
 class WP_Theme_JSON_Resolver_6_2 extends WP_Theme_JSON_Resolver_6_1 {
+
 	/**
 	 * Returns the custom post type that contains the user's origin config
 	 * for the active theme or a void array if none are found.

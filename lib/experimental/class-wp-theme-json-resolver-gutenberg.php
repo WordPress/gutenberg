@@ -47,11 +47,9 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_2 {
 			/**
 			 * Filters the data provided by the theme for global styles and settings.
 			 *
-			 * @since 6.1.0
-			 *
-			 * @param WP_Theme_JSON_Data Class to access and update the underlying data.
+			 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 			 */
-			$theme_json      = apply_filters( 'wp_theme_json_data_theme', new WP_Theme_JSON_Data( $theme_json_data, 'theme' ) );
+			$theme_json      = apply_filters( 'wp_theme_json_data_theme', new WP_Theme_JSON_Data_Gutenberg( $theme_json_data, 'theme' ) );
 			$theme_json_data = $theme_json->get_data();
 			static::$theme   = new WP_Theme_JSON_Gutenberg( $theme_json_data );
 
@@ -84,7 +82,7 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_2 {
 		 * and merge the static::$theme upon that.
 		 */
 		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( gutenberg_get_legacy_theme_supports_for_theme_json() );
-		if ( ! wp_theme_has_support() ) {
+		if ( ! wp_theme_has_theme_json() ) {
 			if ( ! isset( $theme_support_data['settings']['color'] ) ) {
 				$theme_support_data['settings']['color'] = array();
 			}
@@ -111,11 +109,18 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_2 {
 
 			// Classic themes without a theme.json don't support global duotone.
 			$theme_support_data['settings']['color']['defaultDuotone'] = false;
+
+			// Allow themes to enable appearance tools via theme_support.
+			if ( current_theme_supports( 'appearance-tools' ) ) {
+				$theme_support_data['settings']['appearanceTools'] = true;
+			}
 		}
 		$with_theme_supports = new WP_Theme_JSON_Gutenberg( $theme_support_data );
 		$with_theme_supports->merge( static::$theme );
+
 		return $with_theme_supports;
 	}
+
 	/**
 	 * Gets the styles for blocks from the block.json file.
 	 *

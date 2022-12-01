@@ -183,7 +183,7 @@ function gutenberg_get_global_settings( $path = array(), $context = array() ) {
 	return _wp_array_get( $settings, $path, $settings );
 }
 
-/*
+/**
  * Private function to clean the caches used by gutenberg_get_global_settings method.
  *
  * @access private
