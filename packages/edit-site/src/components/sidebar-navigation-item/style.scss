@@ -1,0 +1,9 @@
+.edit-site-sidebar-navigation-item.components-item {
+	color: $gray-600;
+
+	&:hover,
+	&:focus,
+	&[aria-current] {
+		color: $white;
+	}
+}

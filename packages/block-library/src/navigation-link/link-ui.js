@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { Popover, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
@@ -85,6 +86,10 @@ function LinkControlTransforms( { clientId } ) {
 		return null;
 	}
 
+	if ( ! clientId ) {
+		return null;
+	}
+
 	return (
 		<div className="link-control-transform">
 			<h3 className="link-control-transform__subheading">
@@ -114,22 +119,6 @@ function LinkControlTransforms( { clientId } ) {
 			</div>
 		</div>
 	);
-}
-
-/**
- * Removes HTML from a given string.
- * Note the does not provide XSS protection or otherwise attempt
- * to filter strings with malicious intent.
- *
- * See also: https://github.com/WordPress/gutenberg/pull/35539
- *
- * @param {string} html the string from which HTML should be removed.
- * @return {string} the "cleaned" string.
- */
-function navStripHTML( html ) {
-	const doc = document.implementation.createHTMLDocument( '' );
-	doc.body.innerHTML = html;
-	return doc.body.textContent || '';
 }
 
 export function LinkUI( props ) {
@@ -162,10 +151,11 @@ export function LinkUI( props ) {
 		};
 	}
 
+	const { label, url, opensInNewTab, type, kind } = props.link;
 	const link = {
-		url: props.link.url,
-		opensInNewTab: props.link.opensInNewTab,
-		title: props.link.label && navStripHTML( props.link.label ),
+		url,
+		opensInNewTab,
+		title: label && stripHTML( label ),
 	};
 
 	return (
@@ -186,7 +176,7 @@ export function LinkUI( props ) {
 				createSuggestionButtonText={ ( searchTerm ) => {
 					let format;
 
-					if ( props.link.type === 'post' ) {
+					if ( type === 'post' ) {
 						/* translators: %s: search term. */
 						format = __( 'Create draft post: <mark>%s</mark>' );
 					} else {
@@ -201,16 +191,13 @@ export function LinkUI( props ) {
 						}
 					);
 				} }
-				noDirectEntry={ !! props.link.type }
-				noURLSuggestion={ !! props.link.type }
-				suggestionsQuery={ getSuggestionsQuery(
-					props.link.type,
-					props.link.kind
-				) }
+				noDirectEntry={ !! type }
+				noURLSuggestion={ !! type }
+				suggestionsQuery={ getSuggestionsQuery( type, kind ) }
 				onChange={ props.onChange }
 				onRemove={ props.onRemove }
 				renderControlBottom={
-					! props.link.url
+					! url
 						? () => (
 								<LinkControlTransforms
 									clientId={ props.clientId }

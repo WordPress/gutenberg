@@ -88,6 +88,36 @@ const INNER_BLOCKS_TEMPLATE = [
 	],
 ];
 
+function useIsScreenReaderEnabled() {
+	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] =
+		useState( false );
+
+	useEffect( () => {
+		let mounted = true;
+
+		const changeListener = AccessibilityInfo.addEventListener(
+			'screenReaderChanged',
+			( enabled ) => setIsScreenReaderEnabled( enabled )
+		);
+
+		AccessibilityInfo.isScreenReaderEnabled().then(
+			( screenReaderEnabled ) => {
+				if ( mounted && screenReaderEnabled ) {
+					setIsScreenReaderEnabled( screenReaderEnabled );
+				}
+			}
+		);
+
+		return () => {
+			mounted = false;
+
+			changeListener.remove();
+		};
+	}, [] );
+
+	return isScreenReaderEnabled;
+}
+
 const Cover = ( {
 	attributes,
 	getStylesFromColorScheme,
@@ -118,29 +148,11 @@ const Cover = ( {
 		overlayColor,
 		isDark,
 	} = attributes;
-	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] =
-		useState( false );
+	const isScreenReaderEnabled = useIsScreenReaderEnabled();
 
 	useEffect( () => {
-		let isCurrent = true;
-
 		// Sync with local media store.
 		mediaUploadSync();
-		const a11yInfoChangeSubscription = AccessibilityInfo.addEventListener(
-			'screenReaderChanged',
-			setIsScreenReaderEnabled
-		);
-
-		AccessibilityInfo.isScreenReaderEnabled().then( () => {
-			if ( isCurrent ) {
-				setIsScreenReaderEnabled();
-			}
-		} );
-
-		return () => {
-			isCurrent = false;
-			a11yInfoChangeSubscription.remove();
-		};
 	}, [] );
 
 	const convertedMinHeight = useConvertUnitToMobile(

@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { omit, mapValues, isEqual, isEmpty } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
+import { omit, mapValues, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -121,7 +122,7 @@ function getFlattenedBlockAttributes( blocks ) {
  * @return {boolean} Whether the two objects have the same keys.
  */
 export function hasSameKeys( a, b ) {
-	return isEqual( Object.keys( a ), Object.keys( b ) );
+	return fastDeepEqual( Object.keys( a ), Object.keys( b ) );
 }
 
 /**
@@ -139,7 +140,7 @@ export function isUpdatingSameBlockAttribute( action, lastAction ) {
 		action.type === 'UPDATE_BLOCK_ATTRIBUTES' &&
 		lastAction !== undefined &&
 		lastAction.type === 'UPDATE_BLOCK_ATTRIBUTES' &&
-		isEqual( action.clientIds, lastAction.clientIds ) &&
+		fastDeepEqual( action.clientIds, lastAction.clientIds ) &&
 		hasSameKeys( action.attributes, lastAction.attributes )
 	);
 }
@@ -159,7 +160,7 @@ function buildBlockTree( state, blocks ) {
 	}
 	for ( const block of flattenedBlocks ) {
 		result[ block.clientId ] = Object.assign( result[ block.clientId ], {
-			...state.byClientId[ block.clientId ],
+			...state.byClientId.get( block.clientId ),
 			attributes: state.attributes.get( block.clientId ),
 			innerBlocks: block.innerBlocks.map(
 				( subBlock ) => result[ subBlock.clientId ]
@@ -263,7 +264,7 @@ const withBlockTree =
 						...newState.tree,
 						[ action.clientId ]: {
 							...newState.tree[ action.clientId ],
-							...newState.byClientId[ action.clientId ],
+							...newState.byClientId.get( action.clientId ),
 							attributes: newState.attributes.get(
 								action.clientId
 							),
@@ -328,7 +329,9 @@ const withBlockTree =
 					if (
 						state.parents[ clientId ] !== undefined &&
 						( state.parents[ clientId ] === '' ||
-							newState.byClientId[ state.parents[ clientId ] ] )
+							newState.byClientId.get(
+								state.parents[ clientId ]
+							) )
 					) {
 						parentsOfRemovedBlocks.push(
 							state.parents[ clientId ]
@@ -349,7 +352,9 @@ const withBlockTree =
 					if (
 						state.parents[ clientId ] !== undefined &&
 						( state.parents[ clientId ] === '' ||
-							newState.byClientId[ state.parents[ clientId ] ] )
+							newState.byClientId.get(
+								state.parents[ clientId ]
+							) )
 					) {
 						parentsOfRemovedBlocks.push(
 							state.parents[ clientId ]
@@ -405,7 +410,8 @@ const withBlockTree =
 				const updatedBlockUids = [];
 				newState.attributes.forEach( ( attributes, clientId ) => {
 					if (
-						newState.byClientId[ clientId ].name === 'core/block' &&
+						newState.byClientId.get( clientId ).name ===
+							'core/block' &&
 						attributes.ref === action.updatedId
 					) {
 						updatedBlockUids.push( clientId );
@@ -418,7 +424,7 @@ const withBlockTree =
 						...newState.tree,
 						...updatedBlockUids.reduce( ( result, clientId ) => {
 							result[ clientId ] = {
-								...newState.byClientId[ clientId ],
+								...newState.byClientId.get( clientId ),
 								attributes: newState.attributes.get( clientId ),
 								innerBlocks:
 									newState.tree[ clientId ].innerBlocks,
@@ -586,7 +592,11 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 	if ( action.type === 'RESET_BLOCKS' ) {
 		const newState = {
 			...state,
-			byClientId: getFlattenedBlocksWithoutAttributes( action.blocks ),
+			byClientId: new Map(
+				Object.entries(
+					getFlattenedBlocksWithoutAttributes( action.blocks )
+				)
+			),
 			attributes: new Map(
 				Object.entries( getFlattenedBlockAttributes( action.blocks ) )
 			),
@@ -713,7 +723,7 @@ const withSaveReusableBlock = ( reducer ) => ( state, action ) => {
 		state = { ...state };
 		state.attributes = new Map( state.attributes );
 		state.attributes.forEach( ( attributes, clientId ) => {
-			const { name } = state.byClientId[ clientId ];
+			const { name } = state.byClientId.get( clientId );
 			if ( name === 'core/block' && attributes.ref === id ) {
 				state.attributes.set( clientId, {
 					...attributes,
@@ -766,18 +776,24 @@ export const blocks = pipe(
 	withIgnoredBlockChange,
 	withResetControlledBlocks
 )( {
-	byClientId( state = {}, action ) {
+	// The state is using a Map instead of a plain object for performance reasons.
+	// You can run the "./test/performance.js" unit test to check the impact
+	// code changes can have on this reducer.
+	byClientId( state = new Map(), action ) {
 		switch ( action.type ) {
 			case 'RECEIVE_BLOCKS':
-			case 'INSERT_BLOCKS':
-				return {
-					...state,
-					...getFlattenedBlocksWithoutAttributes( action.blocks ),
-				};
-
-			case 'UPDATE_BLOCK':
+			case 'INSERT_BLOCKS': {
+				const newState = new Map( state );
+				Object.entries(
+					getFlattenedBlocksWithoutAttributes( action.blocks )
+				).forEach( ( [ key, value ] ) => {
+					newState.set( key, value );
+				} );
+				return newState;
+			}
+			case 'UPDATE_BLOCK': {
 				// Ignore updates if block isn't known.
-				if ( ! state[ action.clientId ] ) {
+				if ( ! state.has( action.clientId ) ) {
 					return state;
 				}
 
@@ -787,31 +803,46 @@ export const blocks = pipe(
 					return state;
 				}
 
-				return {
-					...state,
-					[ action.clientId ]: {
-						...state[ action.clientId ],
-						...changes,
-					},
-				};
+				const newState = new Map( state );
+				newState.set( action.clientId, {
+					...state.get( action.clientId ),
+					...changes,
+				} );
+				return newState;
+			}
 
-			case 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN':
+			case 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN': {
 				if ( ! action.blocks ) {
 					return state;
 				}
 
-				return {
-					...omit( state, action.replacedClientIds ),
-					...getFlattenedBlocksWithoutAttributes( action.blocks ),
-				};
+				const newState = new Map( state );
+				action.replacedClientIds.forEach( ( clientId ) => {
+					newState.delete( clientId );
+				} );
+				Object.entries(
+					getFlattenedBlocksWithoutAttributes( action.blocks )
+				).forEach( ( [ key, value ] ) => {
+					newState.set( key, value );
+				} );
+				return newState;
+			}
 
-			case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN':
-				return omit( state, action.removedClientIds );
+			case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN': {
+				const newState = new Map( state );
+				action.removedClientIds.forEach( ( clientId ) => {
+					newState.delete( clientId );
+				} );
+				return newState;
+			}
 		}
 
 		return state;
 	},
 
+	// The state is using a Map instead of a plain object for performance reasons.
+	// You can run the "./test/performance.js" unit test to check the impact
+	// code changes can have on this reducer.
 	attributes( state = new Map(), action ) {
 		switch ( action.type ) {
 			case 'RECEIVE_BLOCKS':
@@ -1488,7 +1519,7 @@ export function insertionPoint( state = null, action ) {
 			};
 
 			// Bail out updates if the states are the same.
-			return isEqual( state, nextState ) ? state : nextState;
+			return fastDeepEqual( state, nextState ) ? state : nextState;
 		}
 
 		case 'HIDE_INSERTION_POINT':
@@ -1613,7 +1644,7 @@ export const blockListSettings = ( state = {}, action ) => {
 				return state;
 			}
 
-			if ( isEqual( state[ clientId ], action.settings ) ) {
+			if ( fastDeepEqual( state[ clientId ], action.settings ) ) {
 				return state;
 			}
 

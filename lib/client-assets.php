@@ -251,6 +251,15 @@ function gutenberg_register_packages_styles( $styles ) {
 	// else (for development or test) default to use the current time.
 	$version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
 
+	gutenberg_override_style(
+		$styles,
+		'wp-block-editor-content',
+		gutenberg_url( 'build/block-editor/content.css' ),
+		array(),
+		$version
+	);
+	$styles->add_data( 'wp-block-editor-content', 'rtl', 'replace' );
+
 	// Editor Styles.
 	gutenberg_override_style(
 		$styles,
@@ -315,6 +324,9 @@ function gutenberg_register_packages_styles( $styles ) {
 		'wp-reset-editor-styles',
 		'wp-block-library',
 		'wp-reusable-blocks',
+		// Until #37466, we can't specifically add them as editor styles yet,
+		// so we must hard-code it here as a dependency.
+		'wp-block-editor-content',
 	);
 
 	// Only load the default layout and margin styles for themes without theme.json file.

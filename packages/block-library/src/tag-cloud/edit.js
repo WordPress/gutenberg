@@ -124,6 +124,7 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 					}
 				/>
 				<RangeControl
+					__nextHasNoMarginBottom
 					label={ __( 'Number of tags' ) }
 					value={ numberOfTags }
 					onChange={ ( value ) =>

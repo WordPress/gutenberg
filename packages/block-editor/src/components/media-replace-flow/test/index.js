@@ -42,24 +42,6 @@ function getWrappingPopoverElement( element ) {
 	return element.closest( '.components-popover' );
 }
 
-/**
- * Asserts that the specified popover has already been positioned.
- * Necessary because it will be positioned a bit later after it's displayed.
- *
- * We're intentionally not using `.toHaveStyle()` because we want to be
- * less specific and avoid specific values for better test flexibility.
- *
- * @async
- *
- * @param {HTMLElement} popover Popover element.
- */
-async function popoverIsPositioned( popover ) {
-	/* eslint-disable jest-dom/prefer-to-have-style */
-	await waitFor( () => expect( popover.style.top ).not.toBe( '' ) );
-	await waitFor( () => expect( popover.style.left ).not.toBe( '' ) );
-	/* eslint-enable jest-dom/prefer-to-have-style */
-}
-
 describe( 'General media replace flow', () => {
 	it( 'renders successfully', () => {
 		render( <TestWrapper /> );
@@ -87,7 +69,11 @@ describe( 'General media replace flow', () => {
 		);
 		const uploadMenu = screen.getByRole( 'menu' );
 
-		await popoverIsPositioned( getWrappingPopoverElement( uploadMenu ) );
+		await waitFor( () =>
+			expect(
+				getWrappingPopoverElement( uploadMenu )
+			).toBePositionedPopover()
+		);
 
 		await waitFor( () => expect( uploadMenu ).toBeVisible() );
 	} );
@@ -110,7 +96,9 @@ describe( 'General media replace flow', () => {
 			name: 'example.media (opens in a new tab)',
 		} );
 
-		await popoverIsPositioned( getWrappingPopoverElement( link ) );
+		await waitFor( () =>
+			expect( getWrappingPopoverElement( link ) ).toBePositionedPopover()
+		);
 
 		expect( link ).toHaveAttribute( 'href', 'https://example.media' );
 	} );
@@ -129,12 +117,14 @@ describe( 'General media replace flow', () => {
 			} )
 		);
 
-		await popoverIsPositioned(
-			getWrappingPopoverElement(
-				screen.getByRole( 'link', {
-					name: 'example.media (opens in a new tab)',
-				} )
-			)
+		await waitFor( () =>
+			expect(
+				getWrappingPopoverElement(
+					screen.getByRole( 'link', {
+						name: 'example.media (opens in a new tab)',
+					} )
+				)
+			).toBePositionedPopover()
 		);
 
 		await user.click(

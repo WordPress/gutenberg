@@ -65,7 +65,7 @@ const EMPTY_ARRAY = [];
  * @return {string} Block name.
  */
 export function getBlockName( state, clientId ) {
-	const block = state.blocks.byClientId[ clientId ];
+	const block = state.blocks.byClientId.get( clientId );
 	const socialLinkName = 'core/social-link';
 
 	if ( Platform.OS !== 'web' && block?.name === socialLinkName ) {
@@ -86,7 +86,7 @@ export function getBlockName( state, clientId ) {
  * @return {boolean} Is Valid.
  */
 export function isBlockValid( state, clientId ) {
-	const block = state.blocks.byClientId[ clientId ];
+	const block = state.blocks.byClientId.get( clientId );
 	return !! block && block.isValid;
 }
 
@@ -100,7 +100,7 @@ export function isBlockValid( state, clientId ) {
  * @return {Object?} Block attributes.
  */
 export function getBlockAttributes( state, clientId ) {
-	const block = state.blocks.byClientId[ clientId ];
+	const block = state.blocks.byClientId.get( clientId );
 	if ( ! block ) {
 		return null;
 	}
@@ -130,8 +130,7 @@ export function getBlockAttributes( state, clientId ) {
  * @return {Object} Parsed block object.
  */
 export function getBlock( state, clientId ) {
-	const block = state.blocks.byClientId[ clientId ];
-	if ( ! block ) {
+	if ( ! state.blocks.byClientId.has( clientId ) ) {
 		return null;
 	}
 
@@ -140,18 +139,17 @@ export function getBlock( state, clientId ) {
 
 export const __unstableGetBlockWithoutInnerBlocks = createSelector(
 	( state, clientId ) => {
-		const block = state.blocks.byClientId[ clientId ];
-		if ( ! block ) {
+		if ( ! state.blocks.byClientId.has( clientId ) ) {
 			return null;
 		}
 
 		return {
-			...block,
+			...state.blocks.byClientId.get( clientId ),
 			attributes: getBlockAttributes( state, clientId ),
 		};
 	},
 	( state, clientId ) => [
-		state.blocks.byClientId[ clientId ],
+		state.blocks.byClientId.get( clientId ),
 		state.blocks.attributes.get( clientId ),
 	]
 );
@@ -274,7 +272,7 @@ export const getGlobalBlockCount = createSelector(
 			return clientIds.length;
 		}
 		return clientIds.reduce( ( accumulator, clientId ) => {
-			const block = state.blocks.byClientId[ clientId ];
+			const block = state.blocks.byClientId.get( clientId );
 			return block.name === blockName ? accumulator + 1 : accumulator;
 		}, 0 );
 	},
@@ -296,7 +294,7 @@ export const __experimentalGetGlobalBlocksByName = createSelector(
 		}
 		const clientIds = getClientIdsWithDescendants( state );
 		const foundBlocks = clientIds.filter( ( clientId ) => {
-			const block = state.blocks.byClientId[ clientId ];
+			const block = state.blocks.byClientId.get( clientId );
 			return block.name === blockName;
 		} );
 		return foundBlocks.length > 0 ? foundBlocks : EMPTY_ARRAY;
@@ -1594,7 +1592,7 @@ export const canInsertBlockType = createSelector(
 	canInsertBlockTypeUnmemoized,
 	( state, blockName, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
-		state.blocks.byClientId[ rootClientId ],
+		state.blocks.byClientId.get( rootClientId ),
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 	]
@@ -2107,7 +2105,7 @@ export const getBlockTransformItems = createSelector(
 			'desc'
 		);
 	},
-	( state, rootClientId ) => [
+	( state, blocks, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
 		state.blocks.byClientId,
 		state.preferences.insertUsage,
@@ -2302,7 +2300,7 @@ export const __experimentalGetAllowedPatterns = createSelector(
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 		state.blockListSettings[ rootClientId ],
-		state.blocks.byClientId[ rootClientId ],
+		state.blocks.byClientId.get( rootClientId ),
 	]
 );
 
@@ -2335,7 +2333,7 @@ export const __experimentalGetPatternsByBlockTypes = createSelector(
 			)
 		);
 	},
-	( state, rootClientId ) => [
+	( state, blockNames, rootClientId ) => [
 		...__experimentalGetAllowedPatterns.getDependants(
 			state,
 			rootClientId
@@ -2396,7 +2394,7 @@ export const __experimentalGetPatternTransformItems = createSelector(
 			rootClientId
 		);
 	},
-	( state, rootClientId ) => [
+	( state, blocks, rootClientId ) => [
 		...__experimentalGetPatternsByBlockTypes.getDependants(
 			state,
 			rootClientId

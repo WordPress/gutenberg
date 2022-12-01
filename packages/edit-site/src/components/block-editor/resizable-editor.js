@@ -34,10 +34,11 @@ const HANDLE_STYLES_OVERRIDE = {
 
 function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 	const [ resizeObserver, sizes ] = useResizeObserver();
-	const { deviceType, isZoomOutMode } = useSelect(
+	const { deviceType, isZoomOutMode, canvasMode } = useSelect(
 		( select ) => ( {
 			deviceType:
 				select( editSiteStore ).__experimentalGetPreviewDeviceType(),
+			canvasMode: select( editSiteStore ).__unstableGetCanvasMode(),
 			isZoomOutMode:
 				select( blockEditorStore ).__unstableGetEditorMode() ===
 				'zoom-out',
@@ -49,17 +50,19 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 	const iframeRef = useRef();
 	const mouseMoveTypingResetRef = useMouseMoveTypingReset();
 	const ref = useMergeRefs( [ iframeRef, mouseMoveTypingResetRef ] );
-
+	const isResizingEnabled = enableResizing && canvasMode !== 'view';
 	const resizeWidthBy = useCallback( ( deltaPixels ) => {
 		if ( iframeRef.current ) {
 			setWidth( iframeRef.current.offsetWidth + deltaPixels );
 		}
 	}, [] );
+
 	return (
 		<ResizableBox
 			size={ {
-				width: enableResizing ? width : '100%',
-				height: enableResizing && sizes.height ? sizes.height : '100%',
+				width: isResizingEnabled ? width : '100%',
+				height:
+					isResizingEnabled && sizes.height ? sizes.height : '100%',
 			} }
 			onResizeStop={ ( event, direction, element ) => {
 				setWidth( element.style.width );
@@ -68,10 +71,10 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 			maxWidth="100%"
 			maxHeight="100%"
 			enable={ {
-				right: enableResizing,
-				left: enableResizing,
+				right: isResizingEnabled,
+				left: isResizingEnabled,
 			} }
-			showHandle={ enableResizing }
+			showHandle={ isResizingEnabled }
 			// The editor is centered horizontally, resizing it only
 			// moves half the distance. Hence double the ratio to correctly
 			// align the cursor to the resizer handle.
@@ -97,8 +100,9 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 			} }
 		>
 			<Iframe
-				isZoomedOut={ isZoomOutMode }
-				style={ enableResizing ? {} : deviceStyles }
+				scale={ ( isZoomOutMode && 0.45 ) || undefined }
+				frameSize={ isZoomOutMode ? 100 : undefined }
+				style={ isResizingEnabled ? {} : deviceStyles }
 				head={
 					<>
 						<EditorStyles styles={ settings.styles } />
@@ -108,7 +112,7 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 							`.is-root-container { display: flow-root; }
 							body { position: relative; }`
 						}</style>
-						{ enableResizing && (
+						{ isResizingEnabled && (
 							<style>
 								{
 									// Some themes will have `min-height: 100vh` for the root container,
@@ -123,6 +127,7 @@ function ResizableEditor( { enableResizing, settings, children, ...props } ) {
 				ref={ ref }
 				name="editor-canvas"
 				className="edit-site-visual-editor__editor-canvas"
+				readonly={ canvasMode === 'view' }
 				{ ...props }
 			>
 				{ /* Filters need to be rendered before children to avoid Safari rendering issues. */ }

@@ -266,6 +266,7 @@ export default function CoverInspectorControls( {
 					panelId={ clientId }
 				>
 					<RangeControl
+						__nextHasNoMarginBottom
 						label={ __( 'Overlay opacity' ) }
 						value={ dimRatio }
 						onChange={ ( newDimRation ) =>

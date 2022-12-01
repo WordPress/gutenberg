@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, within, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -15,6 +15,10 @@ const EXAMPLE_COLORS = [
 	{ name: 'blue', color: '#00f' },
 ];
 const INITIAL_COLOR = EXAMPLE_COLORS[ 0 ].color;
+
+function getWrappingPopoverElement( element: HTMLElement ) {
+	return element.closest( '.components-popover' );
+}
 
 describe( 'ColorPalette', () => {
 	it( 'should render a dynamic toolbar of colors', () => {
@@ -163,11 +167,21 @@ describe( 'ColorPalette', () => {
 		expect(
 			within( dropdownButton ).getByText( EXAMPLE_COLORS[ 0 ].name )
 		).toBeVisible();
+
 		expect(
 			within( dropdownButton ).getByText(
 				EXAMPLE_COLORS[ 0 ].color.replace( '#', '' )
 			)
 		).toBeVisible();
+
+		// Check that the popover with custom color input has appeared.
+		const dropdownColorInput = screen.getByLabelText( 'Hex color' );
+
+		await waitFor( () =>
+			expect(
+				getWrappingPopoverElement( dropdownColorInput )
+			).toBePositionedPopover()
+		);
 	} );
 
 	it( 'should show the clear button by default', () => {
