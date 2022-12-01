@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isEqual } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useInnerBlocksProps } from '@wordpress/block-editor';
@@ -51,14 +56,46 @@ export default function UnsavedInnerBlocks( {
 		}
 	}, [ blocks ] );
 
-	// If the current inner blocks object is different in any way
-	// from the original inner blocks from the post content then the
-	// user has made changes to the inner blocks. At this point the inner
-	// blocks can be considered "dirty".
-	// We also make sure the current innerBlocks had a chance to be set.
-	const innerBlocksAreDirty =
-		!! originalBlocks.current && blocks !== originalBlocks.current;
+	let innerBlocksAreDirty = false;
 
+	if (
+		originalBlocks.current &&
+		blocks?.length &&
+		blocks[ 0 ]?.name === 'core/page-list'
+	) {
+		// ignore changes to inner blocks
+		// track changes to attributes changing
+
+		const originalPageListBlock = originalBlocks.current[ 0 ];
+		const currentPageListBlock = blocks[ 0 ];
+
+		const {
+			innerBlocks: discardedOriginalInnerBlocks,
+			...originalPageListBlockWithoutInnerBlocks
+		} = originalPageListBlock;
+
+		const {
+			innerBlocks: discardedCurrentInnerBlocks,
+			...currentPageListBlockWithoutInnerBlocks
+		} = currentPageListBlock;
+
+		innerBlocksAreDirty = ! isEqual(
+			originalPageListBlockWithoutInnerBlocks,
+			currentPageListBlockWithoutInnerBlocks
+		);
+	} else {
+		// If the current inner blocks object is different in any way
+		// from the original inner blocks from the post content then the
+		// user has made changes to the inner blocks. At this point the inner
+		// blocks can be considered "dirty".
+		// We also make sure the current innerBlocks had a chance to be set.
+		innerBlocksAreDirty =
+			!! originalBlocks.current && blocks !== originalBlocks.current;
+	}
+
+	// if ( innerBlocksAreDirty ) {
+	// 	debugger;
+	// }
 	const shouldDirectInsert = useMemo(
 		() =>
 			blocks.every(
