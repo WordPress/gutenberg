@@ -8,7 +8,7 @@ function toBePositionedPopover( element ) {
 	const pass = element.style.top !== '' && element.style.left !== '';
 	return {
 		pass,
-		message: `Received element is ${ pass ? '' : 'not ' } positioned`,
+		message: () => `Received element is ${ pass ? '' : 'not ' }positioned`,
 	};
 }
 
