@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, within } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -30,14 +30,14 @@ describe( 'AlignmentMatrixControl', () => {
 
 		it.each( alignments )(
 			'should change value on %s cell click',
-			( alignment ) => {
+			async ( alignment ) => {
 				const spy = jest.fn();
 
 				render(
 					<AlignmentMatrixControl value="center" onChange={ spy } />
 				);
 
-				getCell( alignment ).focus();
+				await act( () => getCell( alignment ).focus() );
 
 				expect( spy ).toHaveBeenCalledWith( alignment );
 			}

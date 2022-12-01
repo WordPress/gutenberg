@@ -7,6 +7,7 @@ import { render } from '@testing-library/react';
  * WordPress dependencies
  */
 import { addFilter, removeAllFilters, removeFilter } from '@wordpress/hooks';
+import { act } from 'react-test-renderer';
 
 /**
  * Internal dependencies
@@ -64,11 +65,7 @@ describe( 'withFilters', () => {
 	} );
 
 	it( 'should not re-render component when new filter added before component was mounted', () => {
-		const spy = jest.fn();
-		const SpiedComponent = () => {
-			spy();
-			return <div>Spied component</div>;
-		};
+		const SpiedComponent = jest.fn( () => <div>Spied component</div> );
 		addFilter(
 			hookName,
 			'test/enhanced-component-spy-1',
@@ -87,109 +84,103 @@ describe( 'withFilters', () => {
 
 		jest.runAllTimers();
 
-		expect( spy ).toHaveBeenCalledTimes( 1 );
+		expect( SpiedComponent ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it( 'should re-render component once when new filter added after component was mounted', () => {
-		const spy = jest.fn();
-		const SpiedComponent = () => {
-			spy();
-			return <div>Spied component</div>;
-		};
+	it( 'should re-render component once when new filter added after component was mounted', async () => {
+		const SpiedComponent = jest.fn( () => <div>Spied component</div> );
 		const EnhancedComponent = withFilters( hookName )( SpiedComponent );
 
 		const { container } = render( <EnhancedComponent /> );
 
-		spy.mockClear();
-		addFilter(
-			hookName,
-			'test/enhanced-component-spy-1',
-			( FilteredComponent ) => () =>
-				(
-					<blockquote>
-						<FilteredComponent />
-					</blockquote>
-				)
-		);
-		jest.runAllTimers();
+		SpiedComponent.mockClear();
 
-		expect( spy ).toHaveBeenCalledTimes( 1 );
+		await act( () => {
+			addFilter(
+				hookName,
+				'test/enhanced-component-spy-1',
+				( FilteredComponent ) => () =>
+					(
+						<blockquote>
+							<FilteredComponent />
+						</blockquote>
+					)
+			);
+			jest.runAllTimers();
+		} );
+
+		expect( SpiedComponent ).toHaveBeenCalledTimes( 1 );
 		expect( container ).toMatchSnapshot();
 	} );
 
-	it( 'should re-render component once when two filters added in the same animation frame', () => {
-		const spy = jest.fn();
-		const SpiedComponent = () => {
-			spy();
-			return <div>Spied component</div>;
-		};
+	it( 'should re-render component once when two filters added in the same animation frame', async () => {
+		const SpiedComponent = jest.fn( () => <div>Spied component</div> );
 		const EnhancedComponent = withFilters( hookName )( SpiedComponent );
 
 		const { container } = render( <EnhancedComponent /> );
 
-		spy.mockClear();
+		SpiedComponent.mockClear();
 
-		addFilter(
-			hookName,
-			'test/enhanced-component-spy-1',
-			( FilteredComponent ) => () =>
-				(
-					<blockquote>
-						<FilteredComponent />
-					</blockquote>
-				)
-		);
-		addFilter(
-			hookName,
-			'test/enhanced-component-spy-2',
-			( FilteredComponent ) => () =>
-				(
-					<section>
-						<FilteredComponent />
-					</section>
-				)
-		);
-		jest.runAllTimers();
+		await act( () => {
+			addFilter(
+				hookName,
+				'test/enhanced-component-spy-1',
+				( FilteredComponent ) => () =>
+					(
+						<blockquote>
+							<FilteredComponent />
+						</blockquote>
+					)
+			);
+			addFilter(
+				hookName,
+				'test/enhanced-component-spy-2',
+				( FilteredComponent ) => () =>
+					(
+						<section>
+							<FilteredComponent />
+						</section>
+					)
+			);
+			jest.runAllTimers();
+		} );
 
-		expect( spy ).toHaveBeenCalledTimes( 1 );
+		expect( SpiedComponent ).toHaveBeenCalledTimes( 1 );
 		expect( container ).toMatchSnapshot();
 	} );
 
-	it( 'should re-render component twice when new filter added and removed in two different animation frames', () => {
-		const spy = jest.fn();
-		const SpiedComponent = () => {
-			spy();
-			return <div>Spied component</div>;
-		};
+	it( 'should re-render component twice when new filter added and removed in two different animation frames', async () => {
+		const SpiedComponent = jest.fn( () => <div>Spied component</div> );
 		const EnhancedComponent = withFilters( hookName )( SpiedComponent );
 		const { container } = render( <EnhancedComponent /> );
 
-		spy.mockClear();
-		addFilter(
-			hookName,
-			'test/enhanced-component-spy',
-			( FilteredComponent ) => () =>
-				(
-					<div>
-						<FilteredComponent />
-					</div>
-				)
-		);
-		jest.runAllTimers();
+		SpiedComponent.mockClear();
 
-		removeFilter( hookName, 'test/enhanced-component-spy' );
-		jest.runAllTimers();
+		await act( () => {
+			addFilter(
+				hookName,
+				'test/enhanced-component-spy',
+				( FilteredComponent ) => () =>
+					(
+						<div>
+							<FilteredComponent />
+						</div>
+					)
+			);
+			jest.runAllTimers();
+		} );
 
-		expect( spy ).toHaveBeenCalledTimes( 2 );
+		await act( () => {
+			removeFilter( hookName, 'test/enhanced-component-spy' );
+			jest.runAllTimers();
+		} );
+
+		expect( SpiedComponent ).toHaveBeenCalledTimes( 2 );
 		expect( container ).toMatchSnapshot();
 	} );
 
-	it( 'should re-render both components once each when one filter added', () => {
-		const spy = jest.fn();
-		const SpiedComponent = () => {
-			spy();
-			return <div>Spied component</div>;
-		};
+	it( 'should re-render both components once each when one filter added', async () => {
+		const SpiedComponent = jest.fn( () => <div>Spied component</div> );
 		const EnhancedComponent = withFilters( hookName )( SpiedComponent );
 
 		const CombinedComponents = () => (
@@ -200,20 +191,23 @@ describe( 'withFilters', () => {
 		);
 		const { container } = render( <CombinedComponents /> );
 
-		spy.mockClear();
-		addFilter(
-			hookName,
-			'test/enhanced-component-spy-1',
-			( FilteredComponent ) => () =>
-				(
-					<blockquote>
-						<FilteredComponent />
-					</blockquote>
-				)
-		);
-		jest.runAllTimers();
+		SpiedComponent.mockClear();
 
-		expect( spy ).toHaveBeenCalledTimes( 2 );
+		await act( () => {
+			addFilter(
+				hookName,
+				'test/enhanced-component-spy-1',
+				( FilteredComponent ) => () =>
+					(
+						<blockquote>
+							<FilteredComponent />
+						</blockquote>
+					)
+			);
+			jest.runAllTimers();
+		} );
+
+		expect( SpiedComponent ).toHaveBeenCalledTimes( 2 );
 		expect( container ).toMatchSnapshot();
 	} );
 } );
