@@ -155,7 +155,7 @@ export function LinkUI( props ) {
 	const link = {
 		url,
 		opensInNewTab,
-		title: label && stripHTML( label ),
+		title: label,
 	};
 
 	return (

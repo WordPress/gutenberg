@@ -10,7 +10,8 @@ import { Button, Spinner, Notice, TextControl } from '@wordpress/components';
 import { keyboardReturn } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
-import { focus } from '@wordpress/dom';
+import { focus, __unstableStripHTML as stripHTML } from '@wordpress/dom';
+
 import { ENTER } from '@wordpress/keycodes';
 
 /**
@@ -274,7 +275,7 @@ function LinkControl( {
 								ref={ textInputRef }
 								className="block-editor-link-control__field block-editor-link-control__text-content"
 								label="Text"
-								value={ internalTextInputValue }
+								value={ stripHTML( internalTextInputValue ) }
 								onChange={ setInternalTextInputValue }
 								onKeyDown={ handleSubmitWithEnter }
 							/>
