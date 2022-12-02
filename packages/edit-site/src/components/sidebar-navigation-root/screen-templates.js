@@ -4,7 +4,7 @@
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalVStack as VStack,
-	__experimentalVStack as HStack,
+	__experimentalHStack as HStack,
 	__experimentalNavigatorScreen as NavigatorScreen,
 	__experimentalNavigatorBackButton as NavigatorBackButton,
 	Button,
