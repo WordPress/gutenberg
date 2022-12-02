@@ -18,22 +18,16 @@ test.describe( 'Style Book', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test( 'should disable toolbar butons when open', async ( {
-		admin,
-		styleBook,
-		page,
-	} ) => {
-		await admin.visitSiteEditor( {
-			postId: 'emptytheme//index',
-			postType: 'wp_template',
-		} );
-
+	test.beforeEach( async ( { admin, siteEditor, styleBook, page } ) => {
+		await admin.visitSiteEditor();
+		await siteEditor.enterEditMode();
 		await styleBook.open();
-
 		await expect(
 			page.locator( 'role=region[name="Style Book"i]' )
 		).toBeVisible();
+	} );
 
+	test( 'should disable toolbar butons when open', async ( { page } ) => {
 		await expect(
 			page.locator( 'role=button[name="Toggle block inserter"i]' )
 		).not.toBeVisible();
@@ -54,22 +48,7 @@ test.describe( 'Style Book', () => {
 		).not.toBeVisible();
 	} );
 
-	test( 'should have tabs containing block examples', async ( {
-		admin,
-		styleBook,
-		page,
-	} ) => {
-		await admin.visitSiteEditor( {
-			postId: 'emptytheme//index',
-			postType: 'wp_template',
-		} );
-
-		await styleBook.open();
-
-		await expect(
-			page.locator( 'role=region[name="Style Book"i]' )
-		).toBeVisible();
-
+	test( 'should have tabs containing block examples', async ( { page } ) => {
 		await expect( page.locator( 'role=tab[name="Text"i]' ) ).toBeVisible();
 		await expect( page.locator( 'role=tab[name="Media"i]' ) ).toBeVisible();
 		await expect(
@@ -106,21 +85,8 @@ test.describe( 'Style Book', () => {
 	} );
 
 	test( 'should open correct Global Styles panel when example is clicked', async ( {
-		admin,
-		styleBook,
 		page,
 	} ) => {
-		await admin.visitSiteEditor( {
-			postId: 'emptytheme//index',
-			postType: 'wp_template',
-		} );
-
-		await styleBook.open();
-
-		await expect(
-			page.locator( 'role=region[name="Style Book"i]' )
-		).toBeVisible();
-
 		await page.click(
 			'role=button[name="Open Headings styles in Styles panel"i]'
 		);
@@ -132,22 +98,7 @@ test.describe( 'Style Book', () => {
 		).toBeVisible();
 	} );
 
-	test( 'should disappear when closed', async ( {
-		admin,
-		styleBook,
-		page,
-	} ) => {
-		await admin.visitSiteEditor( {
-			postId: 'emptytheme//index',
-			postType: 'wp_template',
-		} );
-
-		await styleBook.open();
-
-		await expect(
-			page.locator( 'role=region[name="Style Book"i]' )
-		).toBeVisible();
-
+	test( 'should disappear when closed', async ( { page } ) => {
 		await page.click(
 			'role=region[name="Style Book"i] >> role=button[name="Close Style Book"i]'
 		);
