@@ -921,7 +921,7 @@ export function useGlobalStylesOutput() {
 				isGlobalStyles: true,
 			},
 			{
-				css: customCSS,
+				css: customCSS ?? '',
 				isGlobalStyles: true,
 			},
 		];
