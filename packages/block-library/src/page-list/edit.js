@@ -105,6 +105,7 @@ export default function PageListEdit( {
 		allowedBlocks: [ 'core/page-list-item' ],
 		renderAppender: false,
 		__unstableDisableDropZone: true,
+		templateLock: 'all',
 	} );
 
 	const getBlockContent = () => {
