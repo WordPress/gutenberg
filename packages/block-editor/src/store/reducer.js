@@ -289,7 +289,7 @@ const withBlockTree =
 						attributes: newState.attributes.get( clientId ),
 					} );
 				} );
-				newState.tree = updateParentInnerBlocksInTree(
+				updateParentInnerBlocksInTree(
 					newState,
 					action.clientIds,
 					false
