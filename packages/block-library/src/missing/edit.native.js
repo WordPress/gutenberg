@@ -151,7 +151,8 @@ export class UnsupportedBlockEdit extends Component {
 		const infoTitle = sprintf( titleFormat, blockTitle );
 		const missingBlockDetail = applyFilters(
 			'native.missing_block_detail',
-			__( 'We are working hard to add more blocks with each release.' )
+			__( 'We are working hard to add more blocks with each release.' ),
+			blockName
 		);
 		const missingBlockActionButton = applyFilters(
 			'native.missing_block_action_button',
