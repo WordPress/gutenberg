@@ -305,7 +305,8 @@ function Navigation( {
 				if ( a.locations < b.locations ) {
 					return 1;
 				}
-				if ( a.locations > b.locations ) {
+				// If no locations are assigned, we compare the term_id to determine and sort by the most recently created.
+				else if ( a.locations > b.locations || a.term_id < b.term_id ) {
 					return -1;
 				}
 				return 0;

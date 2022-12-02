@@ -277,6 +277,7 @@ function block_core_navigation_get_classic_menu_fallback() {
 		}
 
 		// Otherwise return the most recently created classic menu.
+		usort( $classic_nav_menus, fn( $a, $b) => $b->term_id - $a->term_id );
 		return $classic_nav_menus[0];
 	}
 }
