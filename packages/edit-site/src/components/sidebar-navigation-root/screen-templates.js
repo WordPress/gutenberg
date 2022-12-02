@@ -76,6 +76,11 @@ export default function SidebarNavigationScreenTemplates() {
 			children: decodeEntities(
 				template.title?.rendered || template.slug
 			),
+			'aria-current':
+				params.postType === 'wp_template' &&
+				params.postId === template.id
+					? 'page'
+					: undefined,
 		} ) );
 	}
 
