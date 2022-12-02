@@ -26,4 +26,24 @@ describe( 'orderBy', () => {
 		const expected = [ { x: 3 }, { x: 2 }, { x: 1 } ];
 		expect( orderBy( input, 'x', 'desc' ) ).toEqual( expected );
 	} );
+
+	it( 'should maintain original order of equal items', () => {
+		const a = { x: 1, a: 1 };
+		const b = { x: 1, b: 2 };
+		const c = { x: 0 };
+		const d = { x: 1, b: 4 };
+		const input = [ a, b, c, d ];
+		const expected = [ c, a, b, d ];
+		expect( orderBy( input, 'x' ) ).toEqual( expected );
+	} );
+
+	it( 'should maintain original order of equal items in descencing order', () => {
+		const a = { x: 1, a: 1 };
+		const b = { x: 1, b: 2 };
+		const c = { x: 0 };
+		const d = { x: 1, b: 4 };
+		const input = [ a, b, c, d ];
+		const expected = [ a, b, d, c ];
+		expect( orderBy( input, 'x', 'desc' ) ).toEqual( expected );
+	} );
 } );

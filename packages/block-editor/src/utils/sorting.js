@@ -1,10 +1,12 @@
 /**
- * Recursive sorting criteria function.
+ * Recursive stable sorting criteria function.
  *
  * @param {string|Function|Array} criteria Field(s) to sort by.
+ * @param {Array}                 items    Items to sort.
+ * @param {string}                order    Order, 'asc' or 'desc'.
  * @return {Function} Comparison function to be used in a `.sort()`.
  */
-const sortBy = ( criteria ) => {
+const sortBy = ( criteria, items, order ) => {
 	return ( a, b ) => {
 		let cmpA, cmpB;
 
@@ -17,8 +19,18 @@ const sortBy = ( criteria ) => {
 		}
 
 		if ( cmpA > cmpB ) {
-			return 1;
+			return order === 'asc' ? 1 : -1;
 		} else if ( cmpB > cmpA ) {
+			return order === 'asc' ? -1 : 1;
+		}
+
+		const orderA = items.findIndex( ( item ) => item === a );
+		const orderB = items.findIndex( ( item ) => item === b );
+
+		// Stable sort: maintaining original array order
+		if ( orderA > orderB ) {
+			return 1;
+		} else if ( orderB > orderA ) {
 			return -1;
 		}
 
@@ -30,6 +42,7 @@ const sortBy = ( criteria ) => {
  * Order items by a certain key.
  * Supports decorator functions that allow complex picking of a comparison field.
  * Sorts in ascending order by default, but supports descending as well.
+ * Stable sort - maintains original order of equal items.
  *
  * @param {Array}           items    Items to order.
  * @param {string|Function} criteria Field to order by.
@@ -37,10 +50,5 @@ const sortBy = ( criteria ) => {
  * @return {Array} Sorted items.
  */
 export function orderBy( items, criteria, order = 'asc' ) {
-	const result = items.concat().sort( sortBy( criteria ) );
-
-	if ( order === 'desc' ) {
-		return result.reverse();
-	}
-	return result;
+	return items.concat().sort( sortBy( criteria, items, order ) );
 }
