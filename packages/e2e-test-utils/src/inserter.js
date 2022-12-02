@@ -105,7 +105,8 @@ async function waitForInserterCloseAndContentFocus() {
 async function waitForInserterSearch() {
 	try {
 		await page.waitForSelector(
-			'.block-editor-inserter__no-tab-container'
+			'.block-editor-inserter__no-tab-container',
+			{ timeout: 2000 }
 		);
 	} catch ( e ) {
 		// This selector doesn't exist in older versions, so let's just continue.
