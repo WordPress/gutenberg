@@ -15,7 +15,7 @@ import {
  */
 import ScreenHeader from './header';
 import { NavigationButtonAsItem } from './navigation-button';
-import { useStyle, useSetting } from './hooks';
+import { useStyle, useFontFamilies } from './hooks';
 import Subtitle from './subtitle';
 import TypographyPanel from './typography-panel';
 
@@ -34,8 +34,9 @@ function AddFontFamilyItem() {
 }
 
 function FontFamilies( { parentMenu } ) {
-	const [ fontFamilies ] = useSetting( 'typography.fontFamilies' );
-	const count = fontFamilies
+	const { fontFamilies } = useFontFamilies();
+
+	const count = Array.isArray( fontFamilies )
 		? fontFamilies.filter( ( font ) => !! font.slug ).length
 		: 0;
 
@@ -129,13 +130,9 @@ function ScreenTypography( { name } ) {
 			{ ! name && (
 				<div className="edit-site-global-styles-screen-typography">
 					<VStack spacing={ 3 }>
-						<Subtitle>{ __( 'Theme Font Families' ) }</Subtitle>
+						<Subtitle>{ __( 'Font Families' ) }</Subtitle>
 						<ItemGroup isBordered isSeparated>
 							<FontFamilies parentMenu={ parentMenu } />
-						</ItemGroup>
-
-						<Subtitle>{ __( 'Global Font Families' ) }</Subtitle>
-						<ItemGroup isBordered isSeparated>
 							<AddFontFamilyItem />
 						</ItemGroup>
 

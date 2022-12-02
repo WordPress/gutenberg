@@ -24,7 +24,7 @@ function FontFaceItem( { title, fontFace, actionTrigger } ) {
 				document.fonts.add( loadedFace );
 			} );
 		}
-	}, [ fontFace ] );
+	}, [] );
 
 	const headContainerStyles = {
 		padding: '8px 16px',

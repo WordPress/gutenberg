@@ -128,7 +128,7 @@ function FontFamilyScreens() {
 		<>
 			<GlobalStylesNavigationScreen path={ '/typography/font-families/' }>
 				<ScreenAddFontFamily
-					setGoogleFontSelected={ setGoogleFontSelected }
+					setGoogleFontSelected={ setGoogleFontSelected }				
 				/>
 			</GlobalStylesNavigationScreen>
 

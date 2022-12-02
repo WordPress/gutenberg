@@ -14,10 +14,10 @@ import { Icon, chevronRight } from '@wordpress/icons';
  */
 import ScreenHeader from './header';
 import FontFaceItem from './font-face-item';
-import { useSetting } from './hooks';
+import { useFontFamilies } from './hooks';
 
 function ScreenThemeFontFamilies( { setThemeFontSelected } ) {
-	const [ fontFamilies ] = useSetting( 'typography.fontFamilies' );
+	const { fontFamilies } = useFontFamilies();
 
 	const handleClick = ( family ) => {
 		setThemeFontSelected( family );

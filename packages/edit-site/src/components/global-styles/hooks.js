@@ -323,3 +323,74 @@ export function useGradientsPerOrigin( name ) {
 		return result;
 	}, [ customGradients, themeGradients, defaultGradients ] );
 }
+
+
+
+export function useFontFamilies() {
+	const [ fontFamilies = [], setFontFamilies ] = useSetting( 'typography.fontFamilies' );
+
+	const getFontSlug = ( content ) => {
+		// Get the slug.
+		return (
+			content
+				// Convert anything that's not a letter or number to a hyphen.
+				.replace( /[^\p{L}\p{N}]+/gu, '-' )
+				// Convert to lowercase
+				.toLowerCase()
+				// Remove any remaining leading or trailing hyphens.
+				.replace( /(^-+)|(-+$)/g, '' )
+		);
+	};
+
+	const handleAddFontFace = ( fontFamilyName, fontWeight, fontStyle, url ) => {
+
+			const newFaceSlug = getFontSlug( fontFamilyName );
+			const existingFamilyIndex = fontFamilies.findIndex( ( { slug } ) => slug === getFontSlug( newFaceSlug ) );
+			
+			const existingFace = existingFamilyIndex !== -1
+				? fontFamilies[ existingFamilyIndex ]?.fontFace?.find( ( { fontWeight : weight, fontStyle : style } ) => weight === fontWeight && style === fontStyle )
+				: null;
+
+			if ( existingFace ) {
+				throw new Error( __( 'Font face already exists.' ) );
+			}
+
+			const newFace = {
+				fontFamily: fontFamilyName,
+				fontStyle: fontStyle,
+				fontWeight: fontWeight,
+				src: [ url ],
+				shouldBeDownloaded: true,
+			};
+
+			if ( existingFamilyIndex !== -1 ) {
+				// deep	copy
+				const updatedFontFamilies = JSON.parse( JSON.stringify( fontFamilies ) );
+				if( Array.isArray( fontFamilies[ existingFamilyIndex ].fontFace ) ) {
+					updatedFontFamilies[ existingFamilyIndex ].fontFace = [ ...updatedFontFamilies[ existingFamilyIndex ].fontFace, newFace ];
+				} else {
+					updatedFontFamilies[ existingFamilyIndex ].fontFace = [ newFace ];
+				}
+				setFontFamilies( updatedFontFamilies );
+			} else {
+				const newFamily = {
+					fontFamily: fontFamilyName,
+					name: fontFamilyName,
+					slug: newFaceSlug,
+					fontFace: [ newFace ],
+				}
+				setFontFamilies( [ ...fontFamilies, newFamily ] );
+			}
+	};
+
+	const handleRemoveFontFace = ( fontFamilyName, fontWeight, fontStyle ) => {
+		const updatedFontFamilies = JSON.parse( JSON.stringify( fontFamilies ) );
+		const newFaceSlug = getFontSlug( fontFamilyName );
+		const existingFamilyIndex = fontFamilies.findIndex( ( { slug } ) => slug === getFontSlug( newFaceSlug ) );
+		const updatedFamily = updatedFontFamilies[ existingFamilyIndex ];
+		updatedFamily.fontFace = updatedFamily.fontFace.filter( ( { fontWeight : weight, fontStyle : style } ) => weight !== fontWeight || style !== fontStyle );
+		setFontFamilies( updatedFontFamilies );
+	}
+
+	return { fontFamilies, handleAddFontFace, handleRemoveFontFace, getFontSlug };
+} 
