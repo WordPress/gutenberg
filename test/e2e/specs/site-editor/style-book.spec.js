@@ -36,16 +36,16 @@ test.describe( 'Style Book', () => {
 
 		await expect(
 			page.locator( 'role=button[name="Toggle block inserter"i]' )
-		).toHaveAttribute( 'aria-disabled', 'true' );
+		).not.toBeVisible();
 		await expect(
 			page.locator( 'role=button[name="Tools"i]' )
-		).toHaveAttribute( 'aria-disabled', 'true' );
+		).not.toBeVisible();
 		await expect(
 			page.locator( 'role=button[name="Undo"i]' )
-		).toHaveAttribute( 'aria-disabled', 'true' );
+		).not.toBeVisible();
 		await expect(
 			page.locator( 'role=button[name="Redo"i]' )
-		).toHaveAttribute( 'aria-disabled', 'true' );
+		).not.toBeVisible();
 		await expect(
 			page.locator( 'role=button[name="Show template details"i]' )
 		).not.toBeVisible();
