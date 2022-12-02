@@ -29,7 +29,7 @@ registerBlockType( metadata.name, {
 } );
 ```
 
-The first parameter in the **registerBlockType** function is the block name, this should match exactly to the `name` property in the `block.json` file. By importing the metadata from `block.json` and referencing the `name` property in the first parameter we ensure that they will match, and continue to match even if the name is changed in `block.json`.
+The first parameter in the **registerBlockType** function is the block name, this should match exactly to the `name` property in the `block.json` file. By importing the metadata from `block.json` and referencing the `name` property in the first parameter we ensure that they will match, and continue to match even if the name is subsecquently changed in `block.json`.
 
 The second parameter to the function is the block object. See the [block registration documentation](/docs/reference-guides/block-api/block-registration.md) for full details.
 
