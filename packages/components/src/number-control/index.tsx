@@ -152,7 +152,7 @@ function UnforwardedNumberControl(
 				 ).payload;
 				const [ x, y ] = dragPayload.delta;
 
-				// `shiftKey` comes via the `useDrqg` hook
+				// `shiftKey` comes via the `useDrag` hook
 				const enableShift = dragPayload.shiftKey && isShiftStepEnabled;
 				const computedStep = computeStep( {
 					shiftStep: shiftStepAsNumber,
