@@ -59,7 +59,10 @@ function UnforwardedNumberControl(
 		spinControls = 'none';
 	}
 
-	// TODO: check if `valueProp` is `number`, add deprecation notice
+	if ( typeof valueProp === 'number' ) {
+		// TODO: deprecate `value` as a `number`
+	}
+
 	const valuePropAsString =
 		valueProp !== undefined ? ensureString( valueProp ) : undefined;
 	const shiftStepAsNumber = ensureNumber( shiftStep );
