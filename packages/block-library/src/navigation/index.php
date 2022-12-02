@@ -384,10 +384,11 @@ function block_core_navigation_get_most_recently_published_navigation() {
 }
 
 /**
- * Recursively filter out blocks from the block list that are considered invalid inside Navigation.
- * This list includes:
+ * Recursively filter out blocks from the block list that are not whitelisted.
+ * This list of exclusions includes:
  * - The Navigation block itself (results in recursion).
  * - empty "null" blocks from the block list.
+ * - other blocks that are not yet handled.
  *
  * Note: 'parse_blocks' includes a null block with '\n\n' as the content when
  * it encounters whitespace. This is not a bug but rather how the parser
@@ -397,10 +398,23 @@ function block_core_navigation_get_most_recently_published_navigation() {
  * @return array the filtered parsed blocks.
  */
 function block_core_navigation_filter_out_invalid_blocks( $parsed_blocks ) {
+
+	$allowed_blocks = array(
+		'core/navigation-link',
+		'core/search',
+		'core/social-links',
+		'core/page-list',
+		'core/spacer',
+		'core/home-link',
+		'core/site-title',
+		'core/site-logo',
+		'core/navigation-submenu',
+	);
+
 	$filtered = array_reduce(
 		$parsed_blocks,
-		function( $carry, $block ) {
-			if ( isset( $block['blockName'] ) && 'core/navigation' !== $block['blockName'] ) {
+		function( $carry, $block ) use ( $allowed_blocks ) {
+			if ( isset( $block['blockName'] ) && in_array( $block['blockName'], $allowed_blocks, true ) ) {
 				if ( $block['innerBlocks'] ) {
 					$block['innerBlocks'] = block_core_navigation_filter_out_invalid_blocks( $block['innerBlocks'] );
 				}
