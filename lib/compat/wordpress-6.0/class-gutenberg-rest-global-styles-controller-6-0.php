@@ -1,6 +1,6 @@
 <?php
 /**
- * REST API: Gutenberg_REST_Global_Styles_Controller class
+ * REST API: Gutenberg_REST_Global_Styles_Controller_6_0 class
  *
  * @package    Gutenberg
  * @subpackage REST_API
@@ -9,7 +9,7 @@
 /**
  * Base Global Styles REST API Controller.
  */
-class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Global_Styles_Controller {
+class Gutenberg_REST_Global_Styles_Controller_6_0 extends WP_REST_Global_Styles_Controller {
 	/**
 	 * Registers the controllers routes.
 	 *
@@ -58,54 +58,6 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Global_Styles_Cont
 		}
 
 		return true;
-	}
-
-	/**
-	 * Prepares a single global styles config for update.
-	 *
-	 * @since 5.9.0
-	 *
-	 * @param WP_REST_Request $request Request object.
-	 * @return stdClass Changes to pass to wp_update_post.
-	 */
-	protected function prepare_item_for_database( $request ) {
-		$changes         = new stdClass();
-		$changes->ID     = $request['id'];
-		$post            = get_post( $request['id'] );
-		$existing_config = array();
-		if ( $post ) {
-			$existing_config     = json_decode( $post->post_content, true );
-			$json_decoding_error = json_last_error();
-			if ( JSON_ERROR_NONE !== $json_decoding_error || ! isset( $existing_config['isGlobalStylesUserThemeJSON'] ) ||
-				! $existing_config['isGlobalStylesUserThemeJSON'] ) {
-				$existing_config = array();
-			}
-		}
-		if ( isset( $request['styles'] ) || isset( $request['settings'] ) ) {
-			$config = array();
-			if ( isset( $request['styles'] ) ) {
-				$config['styles'] = $request['styles'];
-			} elseif ( isset( $existing_config['styles'] ) ) {
-				$config['styles'] = $existing_config['styles'];
-			}
-			if ( isset( $request['settings'] ) ) {
-				$config['settings'] = $request['settings'];
-			} elseif ( isset( $existing_config['settings'] ) ) {
-				$config['settings'] = $existing_config['settings'];
-			}
-			$config['isGlobalStylesUserThemeJSON'] = true;
-			$config['version']                     = WP_Theme_JSON_Gutenberg::LATEST_SCHEMA;
-			$changes->post_content                 = wp_json_encode( $config );
-		}
-		// Post title.
-		if ( isset( $request['title'] ) ) {
-			if ( is_string( $request['title'] ) ) {
-				$changes->post_title = $request['title'];
-			} elseif ( ! empty( $request['title']['raw'] ) ) {
-				$changes->post_title = $request['title']['raw'];
-			}
-		}
-		return $changes;
 	}
 
 	/**
