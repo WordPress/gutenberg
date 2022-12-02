@@ -123,21 +123,10 @@ export default function useSetting( path ) {
 				return undefined;
 			}
 
-			let result;
-
-			// 1. Take settings from the block instance or its ancestors.
-			// Start from the current block and work our way up the ancestors.
-			const candidates = [
-				clientId,
-				...select( blockEditorStore ).getBlockParents(
-					clientId,
-					/* ascending */ true
-				),
-			];
-
-			result = applyFilters(
+			// 0. Allow third-parties to filter into the block's settings at runtime.
+			let result = applyFilters(
 				'blockEditor.useSetting.before',
-				result,
+				undefined,
 				path,
 				clientId,
 				blockName
@@ -148,6 +137,16 @@ export default function useSetting( path ) {
 			}
 
 			const normalizedPath = removeCustomPrefixes( path );
+
+			// 1. Take settings from the block instance or its ancestors.
+			// Start from the current block and work our way up the ancestors.
+			const candidates = [
+				clientId,
+				...select( blockEditorStore ).getBlockParents(
+					clientId,
+					/* ascending */ true
+				),
+			];
 
 			for ( const candidateClientId of candidates ) {
 				const candidateBlockName =
