@@ -27,6 +27,8 @@ const noop = () => {};
 
 const {
 	clearSelectedBlock,
+	__experimentalDisableBlockInspectorTabs: disableBlockInspectorTabs,
+	__experimentalEnableBlockInspectorTabs: enableBlockInspectorTabs,
 	__experimentalHideBlockInterface: hideBlockInterface,
 	insertBlock,
 	insertBlocks,
@@ -40,6 +42,7 @@ const {
 	replaceInnerBlocks,
 	resetBlocks,
 	selectBlock,
+	__experimentalSetDefaultBlockInspectorTab: setDefaultBlockInspectorTab,
 	__experimentalShowBlockInterface: showBlockInterface,
 	showInsertionPoint,
 	startMultiSelect,
@@ -789,6 +792,48 @@ describe( 'actions', () => {
 		it( 'should return the SHOW_BLOCK_INTERFACE action', () => {
 			expect( showBlockInterface() ).toEqual( {
 				type: 'SHOW_BLOCK_INTERFACE',
+			} );
+		} );
+	} );
+
+	describe( 'enableBlockInspectorTabs', () => {
+		it( 'should return the ENABLE_BLOCK_INSPECTOR_TABS action', () => {
+			expect( enableBlockInspectorTabs() ).toEqual( {
+				type: 'ENABLE_BLOCK_INSPECTOR_TABS',
+			} );
+		} );
+
+		it( 'should return the ENABLE_BLOCK_INSPECTOR_TABS action for specific block', () => {
+			expect( enableBlockInspectorTabs( 'core/foo' ) ).toEqual( {
+				type: 'ENABLE_BLOCK_INSPECTOR_TABS',
+				blockName: 'core/foo',
+			} );
+		} );
+	} );
+
+	describe( 'disableBlockInspectorTabs', () => {
+		it( 'should return the DISABLE_BLOCK_INSPECTOR_TABS action', () => {
+			expect( disableBlockInspectorTabs() ).toEqual( {
+				type: 'DISABLE_BLOCK_INSPECTOR_TABS',
+			} );
+		} );
+
+		it( 'should return the DISABLE_BLOCK_INSPECTOR_TABSDISABLE_BLOCK_INSPECTOR_TABS action for specific block', () => {
+			expect( disableBlockInspectorTabs( 'core/foo' ) ).toEqual( {
+				type: 'DISABLE_BLOCK_INSPECTOR_TABS',
+				blockName: 'core/foo',
+			} );
+		} );
+	} );
+
+	describe( 'setDefaultBlockInspectorTab', () => {
+		it( 'should return SET_DEFAULT_BLOCK_INSPECTOR_TAB action', () => {
+			expect(
+				setDefaultBlockInspectorTab( 'core/foo', 'settings' )
+			).toEqual( {
+				type: 'SET_DEFAULT_BLOCK_INSPECTOR_TAB',
+				blockName: 'core/foo',
+				defaultTab: 'settings',
 			} );
 		} );
 	} );

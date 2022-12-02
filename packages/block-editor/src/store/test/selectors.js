@@ -73,6 +73,8 @@ const {
 	__experimentalGetPatternTransformItems,
 	wasBlockJustInserted,
 	__experimentalGetGlobalBlocksByName,
+	__experimentalAreBlockInspectorTabsEnabled: areBlockInspectorTabsEnabled,
+	__experimentalGetDefaultBlockInspectorTab: getDefaultBlockInspectorTab,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -2081,6 +2083,67 @@ describe( 'selectors', () => {
 			};
 
 			expect( isBlockInterfaceHidden( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'areBlockInspectorTabsEnabled', () => {
+		it( 'should not provide default if not set in state', () => {
+			const state = {};
+
+			expect( areBlockInspectorTabsEnabled( state ) ).toBe( undefined );
+		} );
+
+		it( 'should return true when toggled true in state', () => {
+			const state = {
+				blockInspectorTabs: { enabled: true },
+			};
+
+			expect( areBlockInspectorTabsEnabled( state ) ).toBe( true );
+		} );
+
+		it( 'should return false when toggled false in state', () => {
+			const state = {
+				blockInspectorTabs: { enabled: false },
+			};
+
+			expect( areBlockInspectorTabsEnabled( state ) ).toBe( false );
+		} );
+
+		it( 'should return block specific override for tabs display', () => {
+			const state = {
+				blockInspectorTabs: {
+					enable: false,
+					'core/block': { enabled: true },
+				},
+			};
+
+			expect( areBlockInspectorTabsEnabled( state, 'core/block' ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'should fallback to default value when block not specifically set', () => {
+			const state = {
+				blockInspectorTabs: { enabled: true },
+			};
+
+			expect( areBlockInspectorTabsEnabled( state, 'core/block' ) ).toBe(
+				true
+			);
+		} );
+	} );
+
+	describe( 'getDefaultBlockInspectorTab', () => {
+		it( 'should return default tab for block when set', () => {
+			const state = {
+				blockInspectorTabs: {
+					'core/block': { defaultTab: 'settings' },
+				},
+			};
+
+			expect( getDefaultBlockInspectorTab( state, 'core/block' ) ).toBe(
+				'settings'
+			);
 		} );
 	} );
 

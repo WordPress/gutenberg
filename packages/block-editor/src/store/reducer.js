@@ -1842,6 +1842,55 @@ export function temporarilyEditingAsBlocks( state = '', action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the current configuration for block inspector tabs.
+ *
+ * @param {Object} state  Current configuration state for block inspector tabs.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function blockInspectorTabs( state = {}, action ) {
+	switch ( action.type ) {
+		case 'ENABLE_BLOCK_INSPECTOR_TABS':
+			if ( ! action.blockName ) {
+				return { ...state, enabled: true };
+			}
+
+			return {
+				...state,
+				[ action.blockName ]: {
+					...state?.[ action.blockName ],
+					enabled: true,
+				},
+			};
+
+		case 'DISABLE_BLOCK_INSPECTOR_TABS':
+			if ( ! action.blockName ) {
+				return { ...state, enabled: false };
+			}
+
+			return {
+				...state,
+				[ action.blockName ]: {
+					...state?.[ action.blockName ],
+					enabled: false,
+				},
+			};
+
+		case 'SET_DEFAULT_BLOCK_INSPECTOR_TAB':
+			return {
+				...state,
+				[ action.blockName ]: {
+					...state?.[ action.blockName ],
+					defaultTab: action.defaultTab,
+				},
+			};
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	blocks,
 	isTyping,
@@ -1865,4 +1914,5 @@ export default combineReducers( {
 	lastBlockInserted,
 	temporarilyEditingAsBlocks,
 	blockVisibility,
+	blockInspectorTabs,
 } );

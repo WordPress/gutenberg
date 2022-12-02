@@ -1748,3 +1748,46 @@ export function __unstableSetTemporarilyEditingAsBlocks(
 		temporarilyEditingAsBlocks,
 	};
 }
+
+/**
+ * Action used to enable display of block inspector tabs overriding the
+ * Gutenberg block inspector tabs experiment setting.
+ *
+ * @param {?string} blockName The block's name.
+ */
+export function __experimentalEnableBlockInspectorTabs( blockName ) {
+	return {
+		type: 'ENABLE_BLOCK_INSPECTOR_TABS',
+		blockName,
+	};
+}
+
+/**
+ * Action used to disable display of block inspector tabs overriding the
+ * Gutenberg block inspector tabs experiment setting.
+ *
+ * @param {?string} blockName The block's name.
+ */
+export function __experimentalDisableBlockInspectorTabs( blockName ) {
+	return {
+		type: 'DISABLE_BLOCK_INSPECTOR_TABS',
+		blockName,
+	};
+}
+
+/**
+ * Action to set default tab for a specific block type.
+ *
+ * @param {string} blockName  The block's name.
+ * @param {string} defaultTab Name of tab to display by default.
+ */
+export function __experimentalSetDefaultBlockInspectorTab(
+	blockName,
+	defaultTab
+) {
+	return {
+		type: 'SET_DEFAULT_BLOCK_INSPECTOR_TAB',
+		blockName,
+		defaultTab,
+	};
+}

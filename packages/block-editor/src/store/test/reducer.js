@@ -32,6 +32,7 @@ import {
 	blockListSettings,
 	lastBlockAttributesChange,
 	lastBlockInserted,
+	blockInspectorTabs,
 } from '../reducer';
 
 const noop = () => {};
@@ -2357,6 +2358,78 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toBe( false );
+		} );
+	} );
+
+	describe( 'blockInspectorTabs()', () => {
+		it( 'should enable inspector tabs for all blocks', () => {
+			const state = blockInspectorTabs(
+				{ enabled: false },
+				{ type: 'ENABLE_BLOCK_INSPECTOR_TABS' }
+			);
+
+			expect( state ).toEqual( { enabled: true } );
+		} );
+
+		it( 'should enable inspector tabs for a single block', () => {
+			const state = blockInspectorTabs(
+				{ enabled: false },
+				{
+					type: 'ENABLE_BLOCK_INSPECTOR_TABS',
+					blockName: 'core/block',
+				}
+			);
+
+			expect( state ).toEqual( {
+				enabled: false,
+				'core/block': { enabled: true },
+			} );
+		} );
+
+		it( 'should disable inspector tabs for all blocks', () => {
+			const state = blockInspectorTabs(
+				{ enabled: true },
+				{ type: 'DISABLE_BLOCK_INSPECTOR_TABS' }
+			);
+
+			expect( state ).toEqual( { enabled: false } );
+		} );
+
+		it( 'should disable inspector tabs for a single block', () => {
+			const state = blockInspectorTabs(
+				{ enabled: true },
+				{
+					type: 'DISABLE_BLOCK_INSPECTOR_TABS',
+					blockName: 'core/block',
+				}
+			);
+
+			expect( state ).toEqual( {
+				enabled: true,
+				'core/block': { enabled: false },
+			} );
+		} );
+
+		it( 'should set the default inspector tab for a single block', () => {
+			const state = blockInspectorTabs(
+				{
+					enabled: false,
+					'core/block': { enabled: true },
+				},
+				{
+					type: 'SET_DEFAULT_BLOCK_INSPECTOR_TAB',
+					blockName: 'core/block',
+					defaultTab: 'settings',
+				}
+			);
+
+			expect( state ).toEqual( {
+				enabled: false,
+				'core/block': {
+					enabled: true,
+					defaultTab: 'settings',
+				},
+			} );
 		} );
 	} );
 

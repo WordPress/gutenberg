@@ -2766,3 +2766,30 @@ export function __unstableIsWithinBlockOverlay( state, clientId ) {
 	}
 	return false;
 }
+
+/**
+ * Returns true if the block inspector should display tabs, false otherwise.
+ *
+ * @param {Object}  state     Global application state.
+ * @param {?string} blockName The block type name.
+ *
+ * @return {boolean} Whether block inspector tabs should be shown or not.
+ */
+export function __experimentalAreBlockInspectorTabsEnabled( state, blockName ) {
+	const enabled = state.blockInspectorTabs?.[ blockName ]?.enabled;
+
+	return enabled === undefined ? state.blockInspectorTabs?.enabled : enabled;
+}
+
+/**
+ * Retrieves the default block inspector tab's name for the block type, if
+ * available.
+ *
+ * @param {Object} state     Global application state.
+ * @param {string} blockName The block type name.
+ *
+ * @return {string|undefined} The name of the default block inspector tab if set.
+ */
+export function __experimentalGetDefaultBlockInspectorTab( state, blockName ) {
+	return state.blockInspectorTabs?.[ blockName ]?.defaultTab;
+}
