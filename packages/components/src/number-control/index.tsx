@@ -18,13 +18,13 @@ import deprecated from '@wordpress/deprecated';
  */
 import { Input, SpinButton } from './styles/number-control-styles';
 import * as inputControlActionTypes from '../input-control/reducer/actions';
-import { add, subtract, roundClamp } from '../utils/math';
+import { add, roundClamp } from '../utils/math';
 import { ensureNumber, ensureString, isValueEmpty } from '../utils/values';
 import type { WordPressComponentProps } from '../ui/context/wordpress-component';
 import type { NumberControlProps } from './types';
 import { HStack } from '../h-stack';
 import { Spacer } from '../spacer';
-import { computeStep } from './utils';
+import { computeStep, constrainValue, spinValue } from './utils';
 
 function UnforwardedNumberControl(
 	{
@@ -70,37 +70,9 @@ function UnforwardedNumberControl(
 	const isStepAny = step === 'any';
 	const baseStep = isStepAny ? 1 : ensureNumber( step );
 	const baseValue = roundClamp( 0, min, max, baseStep );
-	const constrainValue = ( value: number, stepOverride?: number ) => {
-		// When step is "any" clamp the value, otherwise round and clamp it.
-		return isStepAny
-			? Math.min( max, Math.max( min, value ) )
-			: roundClamp( value, min, max, stepOverride ?? baseStep );
-	};
 
 	const autoComplete = typeProp === 'number' ? 'off' : undefined;
 	const classes = classNames( 'components-number-control', className );
-
-	const spinValue = (
-		valueToSpin: number,
-		direction: 'up' | 'down',
-		event: KeyboardEvent | MouseEvent | undefined
-	) => {
-		event?.preventDefault();
-		const enableShift = event?.shiftKey && isShiftStepEnabled;
-		const computedStep = computeStep( {
-			shiftStep: shiftStepAsNumber,
-			enableShift,
-			baseStep,
-		} );
-		const nextValue =
-			direction === 'up'
-				? add( valueToSpin, computedStep )
-				: subtract( valueToSpin, computedStep );
-		return constrainValue(
-			nextValue,
-			enableShift ? computedStep : undefined
-		);
-	};
 
 	/**
 	 * "Middleware" function that intercepts updates from InputControl.
@@ -130,13 +102,20 @@ function UnforwardedNumberControl(
 					: ensureNumber( currentValue );
 
 				nextState.value = ensureString(
-					spinValue(
-						valueToSpin,
-						action.type === inputControlActionTypes.PRESS_UP
-							? 'up'
-							: 'down',
-						actionEvent as KeyboardEvent | undefined
-					)
+					spinValue( {
+						value: valueToSpin,
+						direction:
+							action.type === inputControlActionTypes.PRESS_UP
+								? 'up'
+								: 'down',
+						event: actionEvent as KeyboardEvent,
+						isShiftStepEnabled,
+						shiftStep: shiftStepAsNumber,
+						baseStep,
+						isStepAny,
+						max,
+						min,
+					} )
 				);
 			}
 
@@ -194,10 +173,16 @@ function UnforwardedNumberControl(
 						: ensureNumber( currentValue );
 
 					nextState.value = ensureString(
-						constrainValue(
-							add( valueToConstrain, distance ),
-							enableShift ? computedStep : undefined
-						)
+						constrainValue( {
+							value: add( valueToConstrain, distance ),
+							isStepAny,
+							min,
+							max,
+							baseStep,
+							stepOverride: enableShift
+								? computedStep
+								: undefined,
+						} )
 					);
 				}
 			}
@@ -216,7 +201,13 @@ function UnforwardedNumberControl(
 				nextState.value = applyEmptyValue
 					? ''
 					: ensureString(
-							constrainValue( ensureNumber( currentValue ) )
+							constrainValue( {
+								value: ensureNumber( currentValue ),
+								isStepAny,
+								min,
+								max,
+								baseStep,
+							} )
 					  );
 			}
 
@@ -231,7 +222,19 @@ function UnforwardedNumberControl(
 				: ensureNumber( valuePropAsString );
 
 			return onChange?.(
-				ensureString( spinValue( valueToSpin, direction, event ) ),
+				ensureString(
+					spinValue( {
+						value: valueToSpin,
+						direction,
+						event,
+						isShiftStepEnabled,
+						shiftStep: shiftStepAsNumber,
+						baseStep,
+						isStepAny,
+						min,
+						max,
+					} )
+				),
 				{
 					// Set event.target to the <input> so that consumers can use
 					// e.g. event.target.validity.
