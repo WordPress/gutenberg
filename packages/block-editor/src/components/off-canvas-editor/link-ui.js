@@ -3,7 +3,6 @@
 /**
  * WordPress dependencies
  */
-import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { Popover, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { switchToBlockType } from '@wordpress/blocks';
