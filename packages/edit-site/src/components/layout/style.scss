@@ -75,10 +75,6 @@
 	position: relative;
 	flex-grow: 1;
 	z-index: 2;
-
-	.edit-site-layout:not(.is-full-canvas) & {
-		padding-top: $grid-unit-10;
-	}
 }
 
 .edit-site-layout__canvas {
@@ -118,13 +114,18 @@
 
 	.edit-site-layout.is-editor-page:not(.is-full-canvas) & {
 		@include break-small {
-			top: $button-size + $grid-unit-20;
+			top: $header-height;
 		}
 	}
 }
 
 .edit-site-layout__canvas-header {
 	padding-right: $canvas-padding;
+	height: $header-height;
+}
+
+.edit-site-layout__edit-button-canvas-header {
+	height: 32px;
 }
 
 // This shouldn't be necessary (we should have a way to say that a skeletton is relative

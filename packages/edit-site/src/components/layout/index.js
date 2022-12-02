@@ -228,6 +228,7 @@ export default function Layout( { onError } ) {
 									alignment="right"
 								>
 									<Button
+										className="edit-site-layout__edit-button-canvas-header"
 										isPrimary
 										label={ __( 'Open the editor' ) }
 										onClick={ () => {
