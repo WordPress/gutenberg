@@ -106,7 +106,7 @@ export function TabPanel( {
 	const selectedId = `${ instanceId }-${ selectedTab?.name ?? 'none' }`;
 
 	useEffect( () => {
-		if ( ! selectedTab?.name && tabs.length > 0 ) {
+		if ( tabs.length > 0 ) {
 			handleTabSelection( initialTabName || tabs[ 0 ].name );
 		}
 	}, [ tabs, selectedTab?.name, initialTabName, handleTabSelection ] );
