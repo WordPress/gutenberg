@@ -79,7 +79,7 @@ describe( 'PaletteEdit', () => {
 		slugPrefix: '',
 	};
 
-	it( 'opens color selector for color palettes', async () => {
+	it( 'opens color selector for color palettes', () => {
 		render( <PaletteEdit { ...defaultProps } /> );
 		fireEvent.click( screen.getByLabelText( 'Color: Base' ) );
 		expect( screen.getByLabelText( 'Hex color' ) ).toBeInTheDocument();
