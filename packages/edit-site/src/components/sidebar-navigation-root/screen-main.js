@@ -38,8 +38,7 @@ export default function SidebarNavigationScreenMain() {
 	} );
 	const { __unstableSetCanvasMode } = useDispatch( editSiteStore );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const isTemplatesPage =
-		params.postType === 'wp_template' && ! params.postId;
+	const isTemplatesPage = params.postType === 'wp_template';
 	const isTemplatePartsPage =
 		params.postType === 'wp_template_part' && ! params.postId;
 
