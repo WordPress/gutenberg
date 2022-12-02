@@ -367,7 +367,7 @@ describe( 'List block', () => {
 		` );
 	} );
 
-	it( 'unwraps list items when attempting to merge with non-list block', async () => {
+	it( 'unwraps first item when attempting to merge with non-list block', async () => {
 		const initialHtml = `<!-- wp:paragraph -->
 		<p>A quick brown fox.</p>
 		<!-- /wp:paragraph -->
@@ -406,14 +406,16 @@ describe( 'List block', () => {
 		"<!-- wp:paragraph -->
 		<p>A quick brown fox.</p>
 		<!-- /wp:paragraph -->
-
+		
 		<!-- wp:paragraph -->
 		<p>One</p>
 		<!-- /wp:paragraph -->
-
-		<!-- wp:paragraph -->
-		<p>Two</p>
-		<!-- /wp:paragraph -->"
+		
+		<!-- wp:list -->
+		<ul><!-- wp:list-item -->
+		<li>Two</li>
+		<!-- /wp:list-item --></ul>
+		<!-- /wp:list -->"
 	` );
 	} );
 } );
