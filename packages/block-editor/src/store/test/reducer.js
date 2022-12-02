@@ -232,11 +232,13 @@ describe( 'state', () => {
 							},
 						} )
 					),
-					order: {
-						'': [ 'chicken' ],
-						chicken: [ 'chicken-child' ],
-						'chicken-child': [],
-					},
+					order: new Map(
+						Object.entries( {
+							'': [ 'chicken' ],
+							chicken: [ 'chicken-child' ],
+							'chicken-child': [],
+						} )
+					),
 					parents: {
 						chicken: '',
 						'chicken-child': 'chicken',
@@ -291,11 +293,13 @@ describe( 'state', () => {
 							},
 						} )
 					),
-					order: {
-						'': [ 'chicken' ],
-						chicken: [ newChildBlockId ],
-						[ newChildBlockId ]: [],
-					},
+					order: new Map(
+						Object.entries( {
+							'': [ 'chicken' ],
+							chicken: [ newChildBlockId ],
+							[ newChildBlockId ]: [],
+						} )
+					),
 					parents: {
 						[ newChildBlockId ]: 'chicken',
 						chicken: '',
@@ -323,10 +327,12 @@ describe( 'state', () => {
 							chicken: {},
 						} )
 					),
-					order: {
-						'': [ 'chicken' ],
-						chicken: [],
-					},
+					order: new Map(
+						Object.entries( {
+							'': [ 'chicken' ],
+							chicken: [],
+						} )
+					),
 					parents: {
 						chicken: '',
 					},
@@ -381,11 +387,13 @@ describe( 'state', () => {
 							},
 						} )
 					),
-					order: {
-						'': [ 'chicken' ],
-						chicken: [ newChildBlockId ],
-						[ newChildBlockId ]: [],
-					},
+					order: new Map(
+						Object.entries( {
+							'': [ 'chicken' ],
+							chicken: [ newChildBlockId ],
+							[ newChildBlockId ]: [],
+						} )
+					),
 					parents: {
 						[ newChildBlockId ]: 'chicken',
 						chicken: '',
@@ -445,12 +453,14 @@ describe( 'state', () => {
 							},
 						} )
 					),
-					order: {
-						'': [ 'chicken' ],
-						chicken: [ 'chicken-child', 'chicken-child-2' ],
-						'chicken-child': [],
-						'chicken-child-2': [],
-					},
+					order: new Map(
+						Object.entries( {
+							'': [ 'chicken' ],
+							chicken: [ 'chicken-child', 'chicken-child-2' ],
+							'chicken-child': [],
+							'chicken-child-2': [],
+						} )
+					),
 					parents: {
 						chicken: '',
 						'chicken-child': 'chicken',
@@ -530,17 +540,19 @@ describe( 'state', () => {
 							},
 						} )
 					),
-					order: {
-						'': [ 'chicken' ],
-						chicken: [
-							newChildBlockId1,
-							newChildBlockId2,
-							newChildBlockId3,
-						],
-						[ newChildBlockId1 ]: [],
-						[ newChildBlockId2 ]: [],
-						[ newChildBlockId3 ]: [],
-					},
+					order: new Map(
+						Object.entries( {
+							'': [ 'chicken' ],
+							chicken: [
+								newChildBlockId1,
+								newChildBlockId2,
+								newChildBlockId3,
+							],
+							[ newChildBlockId1 ]: [],
+							[ newChildBlockId2 ]: [],
+							[ newChildBlockId3 ]: [],
+						} )
+					),
 					parents: {
 						chicken: '',
 						[ newChildBlockId1 ]: 'chicken',
@@ -602,12 +614,14 @@ describe( 'state', () => {
 							'chicken-grand-child': {},
 						} )
 					),
-					order: {
-						'': [ 'chicken' ],
-						chicken: [ 'chicken-child' ],
-						'chicken-child': [ 'chicken-grand-child' ],
-						'chicken-grand-child': [],
-					},
+					order: new Map(
+						Object.entries( {
+							'': [ 'chicken' ],
+							chicken: [ 'chicken-child' ],
+							'chicken-child': [ 'chicken-grand-child' ],
+							'chicken-grand-child': [],
+						} )
+					),
 					parents: {
 						chicken: '',
 						'chicken-child': 'chicken',
@@ -655,11 +669,13 @@ describe( 'state', () => {
 							[ newChildBlockId ]: {},
 						} )
 					),
-					order: {
-						'': [ 'chicken' ],
-						chicken: [ newChildBlockId ],
-						[ newChildBlockId ]: [],
-					},
+					order: new Map(
+						Object.entries( {
+							'': [ 'chicken' ],
+							chicken: [ newChildBlockId ],
+							[ newChildBlockId ]: [],
+						} )
+					),
 					parents: {
 						chicken: '',
 						[ newChildBlockId ]: 'chicken',
@@ -680,7 +696,7 @@ describe( 'state', () => {
 			expect( state ).toEqual( {
 				byClientId: new Map(),
 				attributes: new Map(),
-				order: {},
+				order: new Map(),
 				parents: {},
 				isPersistentChange: true,
 				isIgnoredChange: false,
@@ -700,7 +716,7 @@ describe( 'state', () => {
 				expect( state.byClientId.get( 'bananas' ).clientId ).toBe(
 					'bananas'
 				);
-				expect( state.order ).toEqual( {
+				expect( Object.fromEntries( state.order ) ).toEqual( {
 					'': [ 'bananas' ],
 					bananas: [],
 				} );
@@ -729,7 +745,7 @@ describe( 'state', () => {
 			} );
 
 			expect( state.byClientId.size ).toBe( 2 );
-			expect( state.order ).toEqual( {
+			expect( Object.fromEntries( state.order ) ).toEqual( {
 				'': [ 'bananas' ],
 				apples: [],
 				bananas: [ 'apples' ],
@@ -761,7 +777,7 @@ describe( 'state', () => {
 
 			expect( state.byClientId.size ).toBe( 2 );
 			expect( state.byClientId.get( 'ribs' ).clientId ).toBe( 'ribs' );
-			expect( state.order ).toEqual( {
+			expect( Object.fromEntries( state.order ) ).toEqual( {
 				'': [ 'chicken', 'ribs' ],
 				chicken: [],
 				ribs: [],
@@ -808,7 +824,7 @@ describe( 'state', () => {
 				'core/freeform'
 			);
 			expect( state.byClientId.get( 'wings' ).clientId ).toBe( 'wings' );
-			expect( state.order ).toEqual( {
+			expect( Object.fromEntries( state.order ) ).toEqual( {
 				'': [ 'wings' ],
 				wings: [],
 			} );
@@ -879,7 +895,7 @@ describe( 'state', () => {
 			} );
 
 			expect( state.byClientId.size ).toBe( 1 );
-			expect( state.order ).toEqual( {
+			expect( Object.fromEntries( state.order ) ).toEqual( {
 				'': [ 'wings' ],
 				wings: [],
 			} );
@@ -913,7 +929,7 @@ describe( 'state', () => {
 				blocks: [ replacementBlock ],
 			} );
 
-			expect( state.order ).toEqual( {
+			expect( Object.fromEntries( state.order ) ).toEqual( {
 				'': [ wrapperBlock.clientId ],
 				[ wrapperBlock.clientId ]: [ replacementBlock.clientId ],
 				[ replacementBlock.clientId ]: [],
@@ -970,7 +986,7 @@ describe( 'state', () => {
 			expect( replacedState.byClientId.get( 'chicken' ).clientId ).toBe(
 				'chicken'
 			);
-			expect( replacedState.order ).toEqual( {
+			expect( Object.fromEntries( replacedState.order ) ).toEqual( {
 				'': [ 'chicken' ],
 				chicken: [],
 			} );
@@ -1005,7 +1021,7 @@ describe( 'state', () => {
 				blocks: [ replacementNestedBlock ],
 			} );
 
-			expect( replacedNestedState.order ).toEqual( {
+			expect( Object.fromEntries( replacedNestedState.order ) ).toEqual( {
 				'': [ wrapperBlock.clientId ],
 				[ wrapperBlock.clientId ]: [ replacementNestedBlock.clientId ],
 				[ replacementNestedBlock.clientId ]: [],
@@ -1133,7 +1149,7 @@ describe( 'state', () => {
 				clientIds: [ 'ribs' ],
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [ 'ribs', 'chicken' ] );
+			expect( state.order.get( '' ) ).toEqual( [ 'ribs', 'chicken' ] );
 			expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe( state.tree.ribs );
 			expect( state.tree[ '' ].innerBlocks[ 1 ] ).toBe(
 				state.tree.chicken
@@ -1158,7 +1174,7 @@ describe( 'state', () => {
 				rootClientId: wrapperBlock.clientId,
 			} );
 
-			expect( state.order ).toEqual( {
+			expect( Object.fromEntries( state.order ) ).toEqual( {
 				'': [ wrapperBlock.clientId ],
 				[ wrapperBlock.clientId ]: [
 					movedBlock.clientId,
@@ -1208,7 +1224,7 @@ describe( 'state', () => {
 				clientIds: [ 'ribs', 'veggies' ],
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [
+			expect( state.order.get( '' ) ).toEqual( [
 				'ribs',
 				'veggies',
 				'chicken',
@@ -1234,7 +1250,7 @@ describe( 'state', () => {
 				rootClientId: wrapperBlock.clientId,
 			} );
 
-			expect( state.order ).toEqual( {
+			expect( Object.fromEntries( state.order ) ).toEqual( {
 				'': [ wrapperBlock.clientId ],
 				[ wrapperBlock.clientId ]: [
 					movedBlockA.clientId,
@@ -1296,7 +1312,7 @@ describe( 'state', () => {
 				clientIds: [ 'chicken' ],
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [ 'ribs', 'chicken' ] );
+			expect( state.order.get( '' ) ).toEqual( [ 'ribs', 'chicken' ] );
 		} );
 
 		it( 'should move the nested block down', () => {
@@ -1316,7 +1332,7 @@ describe( 'state', () => {
 				rootClientId: wrapperBlock.clientId,
 			} );
 
-			expect( state.order ).toEqual( {
+			expect( Object.fromEntries( state.order ) ).toEqual( {
 				'': [ wrapperBlock.clientId ],
 				[ wrapperBlock.clientId ]: [
 					siblingBlock.clientId,
@@ -1356,7 +1372,7 @@ describe( 'state', () => {
 				clientIds: [ 'chicken', 'ribs' ],
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [
+			expect( state.order.get( '' ) ).toEqual( [
 				'veggies',
 				'chicken',
 				'ribs',
@@ -1382,7 +1398,7 @@ describe( 'state', () => {
 				rootClientId: wrapperBlock.clientId,
 			} );
 
-			expect( state.order ).toEqual( {
+			expect( Object.fromEntries( state.order ) ).toEqual( {
 				'': [ wrapperBlock.clientId ],
 				[ wrapperBlock.clientId ]: [
 					siblingBlock.clientId,
@@ -1444,8 +1460,10 @@ describe( 'state', () => {
 				clientIds: [ 'chicken' ],
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [ 'ribs' ] );
-			expect( state.order ).not.toHaveProperty( 'chicken' );
+			expect( state.order.get( '' ) ).toEqual( [ 'ribs' ] );
+			expect( Object.fromEntries( state.order ) ).not.toHaveProperty(
+				'chicken'
+			);
 			expect( state.parents ).toEqual( {
 				ribs: '',
 			} );
@@ -1490,9 +1508,13 @@ describe( 'state', () => {
 				clientIds: [ 'chicken', 'veggies' ],
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [ 'ribs' ] );
-			expect( state.order ).not.toHaveProperty( 'chicken' );
-			expect( state.order ).not.toHaveProperty( 'veggies' );
+			expect( state.order.get( '' ) ).toEqual( [ 'ribs' ] );
+			expect( Object.fromEntries( state.order ) ).not.toHaveProperty(
+				'chicken'
+			);
+			expect( Object.fromEntries( state.order ) ).not.toHaveProperty(
+				'veggies'
+			);
 			expect( state.parents ).toEqual( {
 				ribs: '',
 			} );
@@ -1525,7 +1547,7 @@ describe( 'state', () => {
 			} );
 
 			expect( state.byClientId ).toEqual( new Map() );
-			expect( state.order ).toEqual( {
+			expect( Object.fromEntries( state.order ) ).toEqual( {
 				'': [],
 			} );
 			expect( state.parents ).toEqual( {} );
@@ -1563,7 +1585,7 @@ describe( 'state', () => {
 			} );
 
 			expect( state.byClientId.size ).toBe( 3 );
-			expect( state.order[ '' ] ).toEqual( [
+			expect( state.order.get( '' ) ).toEqual( [
 				'kumquat',
 				'persimmon',
 				'loquat',
@@ -1600,7 +1622,7 @@ describe( 'state', () => {
 				index: 0,
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [
+			expect( state.order.get( '' ) ).toEqual( [
 				'ribs',
 				'chicken',
 				'veggies',
@@ -1637,7 +1659,7 @@ describe( 'state', () => {
 				index: 2,
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [
+			expect( state.order.get( '' ) ).toEqual( [
 				'chicken',
 				'veggies',
 				'ribs',
@@ -1674,7 +1696,7 @@ describe( 'state', () => {
 				index: 1,
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [
+			expect( state.order.get( '' ) ).toEqual( [
 				'chicken',
 				'ribs',
 				'veggies',
@@ -1711,7 +1733,7 @@ describe( 'state', () => {
 				index: 0,
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [
+			expect( state.order.get( '' ) ).toEqual( [
 				'ribs',
 				'veggies',
 				'chicken',
@@ -1750,8 +1772,11 @@ describe( 'state', () => {
 				index: 0,
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [ 'chicken' ] );
-			expect( state.order.chicken ).toEqual( [ 'ribs', 'veggies' ] );
+			expect( state.order.get( '' ) ).toEqual( [ 'chicken' ] );
+			expect( state.order.get( 'chicken' ) ).toEqual( [
+				'ribs',
+				'veggies',
+			] );
 		} );
 
 		describe( 'blocks', () => {
@@ -2200,12 +2225,14 @@ describe( 'state', () => {
 								},
 							} )
 						),
-						order: {
-							'': [ 'group-id' ],
-							'group-id': [ 'reusable-id' ],
-							'reusable-id': [ 'paragraph-id' ],
-							'paragraph-id': [],
-						},
+						order: new Map(
+							Object.entries( {
+								'': [ 'group-id' ],
+								'group-id': [ 'reusable-id' ],
+								'reusable-id': [ 'paragraph-id' ],
+								'paragraph-id': [],
+							} )
+						),
 						controlledInnerBlocks: {
 							'reusable-id': true,
 						},
@@ -2298,8 +2325,10 @@ describe( 'state', () => {
 						updateSelection: false,
 					};
 					const state = blocks( initialState, action );
-					expect( state.order ).toEqual(
-						expect.objectContaining( initialState.order )
+					expect( Object.fromEntries( state.order ) ).toEqual(
+						expect.objectContaining(
+							Object.fromEntries( initialState.order )
+						)
 					);
 					expect( state.tree ).toEqual(
 						expect.objectContaining( initialState.tree )
