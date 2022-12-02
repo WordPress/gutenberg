@@ -110,6 +110,7 @@ export default function Layout( { onError } ) {
 							canvasMode === 'edit' &&
 							! isMobileViewport ) ||
 						isMobileCanvasVisible,
+					'is-editor-page': isEditorPage,
 				} ) }
 			>
 				<div className="edit-site-layout__header">
@@ -217,14 +218,26 @@ export default function Layout( { onError } ) {
 				</AnimatePresence>
 
 				{ showCanvas && (
-					<div
-						className="edit-site-layout__canvas-container"
-						style={ {
-							paddingTop: showFrame ? canvasPadding : 0,
-							paddingBottom: showFrame ? canvasPadding : 0,
-						} }
-					>
+					<div className="edit-site-layout__canvas-container">
 						{ canvasResizer }
+						{ isEditorPage &&
+							canvasMode === 'view' &&
+							! isMobileViewport && (
+								<HStack
+									className="edit-site-layout__canvas-header"
+									alignment="right"
+								>
+									<Button
+										isPrimary
+										label={ __( 'Open the editor' ) }
+										onClick={ () => {
+											__unstableSetCanvasMode( 'edit' );
+										} }
+									>
+										{ __( 'Edit' ) }
+									</Button>
+								</HStack>
+							) }
 						{ !! canvasSize.width && (
 							<motion.div
 								initial={ false }
