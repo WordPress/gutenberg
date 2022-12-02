@@ -37,7 +37,10 @@ import {
 	useRef,
 	createInterpolateElement,
 } from '@wordpress/element';
-import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
+import {
+	placeCaretAtHorizontalEdge,
+	__unstableStripHTML as stripHTML,
+} from '@wordpress/dom';
 import { link as linkIcon, removeSubmenu } from '@wordpress/icons';
 import {
 	useResourcePermissions,
@@ -284,6 +287,7 @@ export default function NavigationSubmenuEdit( {
 	const { label, type, opensInNewTab, url, description, rel, title, kind } =
 		attributes;
 	const link = {
+		title: label && stripHTML( label ),
 		url,
 		opensInNewTab,
 	};
@@ -665,7 +669,8 @@ export default function NavigationSubmenuEdit( {
 							<LinkControl
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
-								showInitialSuggestions={ true }
+								hasTextControl
+								showInitialSuggestions
 								withCreateSuggestion={ userCanCreate }
 								createSuggestion={ handleCreate }
 								createSuggestionButtonText={ ( searchTerm ) => {
