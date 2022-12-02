@@ -54,15 +54,18 @@ function mapBlockOrder( blocks, rootClientId = '' ) {
  * @return {Object} Block order map object.
  */
 function mapBlockParents( blocks, rootClientId = '' ) {
-	return blocks.reduce(
-		( result, block ) =>
-			Object.assign(
-				result,
-				{ [ block.clientId ]: rootClientId },
-				mapBlockParents( block.innerBlocks, block.clientId )
-			),
-		{}
-	);
+	const result = [];
+	const stack = [ [ rootClientId, blocks ] ];
+	while ( stack.length ) {
+		const [ parent, currentBlocks ] = stack.shift();
+		currentBlocks.forEach( ( { innerBlocks, ...block } ) => {
+			result.push( [ block.clientId, parent ] );
+			if ( innerBlocks?.length ) {
+				stack.push( [ block.clientId, innerBlocks ] );
+			}
+		} );
+	}
+	return result;
 }
 
 /**
@@ -73,16 +76,16 @@ function mapBlockParents( blocks, rootClientId = '' ) {
  * @param {Array}    blocks    Blocks to flatten.
  * @param {Function} transform Transforming function to be applied to each block.
  *
- * @return {Object} Flattened object.
+ * @return {Array} Flattened object.
  */
 function flattenBlocks( blocks, transform = identity ) {
-	const result = {};
+	const result = [];
 
 	const stack = [ ...blocks ];
 	while ( stack.length ) {
 		const { innerBlocks, ...block } = stack.shift();
 		stack.push( ...innerBlocks );
-		result[ block.clientId ] = transform( block );
+		result.push( [ block.clientId, transform( block ) ] );
 	}
 
 	return result;
@@ -95,7 +98,7 @@ function flattenBlocks( blocks, transform = identity ) {
  *
  * @param {Array} blocks Blocks to flatten.
  *
- * @return {Object} Flattened block attributes object.
+ * @return {Array} Flattened block attributes object.
  */
 function getFlattenedBlocksWithoutAttributes( blocks ) {
 	return flattenBlocks( blocks, ( block ) => omit( block, 'attributes' ) );
@@ -108,7 +111,7 @@ function getFlattenedBlocksWithoutAttributes( blocks ) {
  *
  * @param {Array} blocks Blocks to flatten.
  *
- * @return {Object} Flattened block attributes object.
+ * @return {Array} Flattened block attributes object.
  */
 function getFlattenedBlockAttributes( blocks ) {
 	return flattenBlocks( blocks, ( block ) => block.attributes );
@@ -184,7 +187,7 @@ function updateParentInnerBlocksInTree(
 	for ( const clientId of updatedClientIds ) {
 		let current = updateChildrenOfUpdatedClientIds
 			? clientId
-			: state.parents[ clientId ];
+			: state.parents.get( clientId );
 		do {
 			if ( state.controlledInnerBlocks[ current ] ) {
 				// Should stop on controlled blocks.
@@ -194,7 +197,7 @@ function updateParentInnerBlocksInTree(
 			} else {
 				// Else continue traversing up through parents.
 				uncontrolledParents.add( current );
-				current = state.parents[ current ];
+				current = state.parents.get( current );
 			}
 		} while ( current !== undefined );
 	}
@@ -329,14 +332,14 @@ const withBlockTree =
 				const parentsOfRemovedBlocks = [];
 				for ( const clientId of action.clientIds ) {
 					if (
-						state.parents[ clientId ] !== undefined &&
-						( state.parents[ clientId ] === '' ||
+						state.parents.get( clientId ) !== undefined &&
+						( state.parents.get( clientId ) === '' ||
 							newState.byClientId.get(
-								state.parents[ clientId ]
+								state.parents.get( clientId )
 							) )
 					) {
 						parentsOfRemovedBlocks.push(
-							state.parents[ clientId ]
+							state.parents.get( clientId )
 						);
 					}
 				}
@@ -352,14 +355,14 @@ const withBlockTree =
 				const parentsOfRemovedBlocks = [];
 				for ( const clientId of action.clientIds ) {
 					if (
-						state.parents[ clientId ] !== undefined &&
-						( state.parents[ clientId ] === '' ||
+						state.parents.get( clientId ) !== undefined &&
+						( state.parents.get( clientId ) === '' ||
 							newState.byClientId.get(
-								state.parents[ clientId ]
+								state.parents.get( clientId )
 							) )
 					) {
 						parentsOfRemovedBlocks.push(
-							state.parents[ clientId ]
+							state.parents.get( clientId )
 						);
 					}
 				}
@@ -595,15 +598,11 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 		const newState = {
 			...state,
 			byClientId: new Map(
-				Object.entries(
-					getFlattenedBlocksWithoutAttributes( action.blocks )
-				)
+				getFlattenedBlocksWithoutAttributes( action.blocks )
 			),
-			attributes: new Map(
-				Object.entries( getFlattenedBlockAttributes( action.blocks ) )
-			),
+			attributes: new Map( getFlattenedBlockAttributes( action.blocks ) ),
 			order: mapBlockOrder( action.blocks ),
-			parents: mapBlockParents( action.blocks ),
+			parents: new Map( mapBlockParents( action.blocks ) ),
 			controlledInnerBlocks: {},
 		};
 
@@ -784,11 +783,11 @@ export const blocks = pipe(
 			case 'RECEIVE_BLOCKS':
 			case 'INSERT_BLOCKS': {
 				const newState = new Map( state );
-				Object.entries(
-					getFlattenedBlocksWithoutAttributes( action.blocks )
-				).forEach( ( [ key, value ] ) => {
-					newState.set( key, value );
-				} );
+				getFlattenedBlocksWithoutAttributes( action.blocks ).forEach(
+					( [ key, value ] ) => {
+						newState.set( key, value );
+					}
+				);
 				return newState;
 			}
 			case 'UPDATE_BLOCK': {
@@ -820,11 +819,12 @@ export const blocks = pipe(
 				action.replacedClientIds.forEach( ( clientId ) => {
 					newState.delete( clientId );
 				} );
-				Object.entries(
-					getFlattenedBlocksWithoutAttributes( action.blocks )
-				).forEach( ( [ key, value ] ) => {
-					newState.set( key, value );
-				} );
+
+				getFlattenedBlocksWithoutAttributes( action.blocks ).forEach(
+					( [ key, value ] ) => {
+						newState.set( key, value );
+					}
+				);
 				return newState;
 			}
 
@@ -848,11 +848,11 @@ export const blocks = pipe(
 			case 'RECEIVE_BLOCKS':
 			case 'INSERT_BLOCKS': {
 				const newState = new Map( state );
-				Object.entries(
-					getFlattenedBlockAttributes( action.blocks )
-				).forEach( ( [ key, value ] ) => {
-					newState.set( key, value );
-				} );
+				getFlattenedBlockAttributes( action.blocks ).forEach(
+					( [ key, value ] ) => {
+						newState.set( key, value );
+					}
+				);
 				return newState;
 			}
 
@@ -920,11 +920,11 @@ export const blocks = pipe(
 				action.replacedClientIds.forEach( ( clientId ) => {
 					newState.delete( clientId );
 				} );
-				Object.entries(
-					getFlattenedBlockAttributes( action.blocks )
-				).forEach( ( [ key, value ] ) => {
-					newState.set( key, value );
-				} );
+				getFlattenedBlockAttributes( action.blocks ).forEach(
+					( [ key, value ] ) => {
+						newState.set( key, value );
+					}
+				);
 				return newState;
 			}
 
@@ -1132,44 +1132,55 @@ export const blocks = pipe(
 
 	// While technically redundant data as the inverse of `order`, it serves as
 	// an optimization for the selectors which derive the ancestry of a block.
-	parents( state = {}, action ) {
+	parents( state = new Map(), action ) {
 		switch ( action.type ) {
-			case 'RECEIVE_BLOCKS':
-				return {
-					...state,
-					...mapBlockParents( action.blocks ),
-				};
-
-			case 'INSERT_BLOCKS':
-				return {
-					...state,
-					...mapBlockParents(
-						action.blocks,
-						action.rootClientId || ''
-					),
-				};
-
+			case 'RECEIVE_BLOCKS': {
+				const newState = new Map( state );
+				mapBlockParents( action.blocks ).forEach(
+					( [ key, value ] ) => {
+						newState.set( key, value );
+					}
+				);
+				return newState;
+			}
+			case 'INSERT_BLOCKS': {
+				const newState = new Map( state );
+				mapBlockParents(
+					action.blocks,
+					action.rootClientId || ''
+				).forEach( ( [ key, value ] ) => {
+					newState.set( key, value );
+				} );
+				return newState;
+			}
 			case 'MOVE_BLOCKS_TO_POSITION': {
-				return {
-					...state,
-					...action.clientIds.reduce( ( accumulator, id ) => {
-						accumulator[ id ] = action.toRootClientId || '';
-						return accumulator;
-					}, {} ),
-				};
+				const newState = new Map( state );
+				action.clientIds.forEach( ( id ) => {
+					newState.set( id, action.toRootClientId || '' );
+				} );
+				return newState;
 			}
 
-			case 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN':
-				return {
-					...omit( state, action.replacedClientIds ),
-					...mapBlockParents(
-						action.blocks,
-						state[ action.clientIds[ 0 ] ]
-					),
-				};
-
-			case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN':
-				return omit( state, action.removedClientIds );
+			case 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN': {
+				const newState = new Map( state );
+				action.replacedClientIds.forEach( ( clientId ) => {
+					newState.delete( clientId );
+				} );
+				mapBlockParents(
+					action.blocks,
+					state.get( action.clientIds[ 0 ] )
+				).forEach( ( [ key, value ] ) => {
+					newState.set( key, value );
+				} );
+				return newState;
+			}
+			case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN': {
+				const newState = new Map( state );
+				action.removedClientIds.forEach( ( clientId ) => {
+					newState.delete( clientId );
+				} );
+				return newState;
+			}
 		}
 
 		return state;

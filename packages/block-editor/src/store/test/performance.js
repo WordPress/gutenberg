@@ -13,9 +13,15 @@ describe( 'performance', () => {
 			innerBlocks: [],
 		} );
 	}
-	const preparedState = reducer( state, {
-		type: 'RESET_BLOCKS',
-		blocks,
+
+	let preparedState;
+
+	it( 'should reset blocks', () => {
+		preparedState = reducer( state, {
+			type: 'RESET_BLOCKS',
+			blocks,
+		} );
+		expect( preparedState ).toBeDefined();
 	} );
 
 	it( 'should update blocks', () => {
