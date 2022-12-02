@@ -119,6 +119,7 @@ export default function SidebarNavigationScreenTemplates() {
 						postType: 'wp_template',
 						postId: undefined,
 					} ) }
+					style={ { textAlign: 'center' } }
 					children={ __( 'Manage all templates' ) }
 				/>
 			</VStack>
