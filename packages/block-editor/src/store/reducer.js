@@ -1855,6 +1855,13 @@ export function temporarilyEditingAsBlocks( state = '', action ) {
 	return state;
 }
 
+export function inspectorControlsTabs( state = '', action ) {
+	if ( action.type === 'SET_INSPECTOR_CONTROLS_TAB_SELECTED_TAB' ) {
+		return action.tabName;
+	}
+	return state;
+}
+
 export default combineReducers( {
 	blocks,
 	isTyping,
@@ -1878,4 +1885,5 @@ export default combineReducers( {
 	lastBlockInserted,
 	temporarilyEditingAsBlocks,
 	blockVisibility,
+	inspectorControlsTabs,
 } );

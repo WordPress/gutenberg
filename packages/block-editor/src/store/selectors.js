@@ -2766,3 +2766,7 @@ export function __unstableIsWithinBlockOverlay( state, clientId ) {
 	}
 	return false;
 }
+
+export function __unstableGetInspectorControlsTabSelectedTab( state ) {
+	return state.inspectorControlsTabs;
+}

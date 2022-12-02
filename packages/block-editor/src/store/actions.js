@@ -1748,3 +1748,10 @@ export function __unstableSetTemporarilyEditingAsBlocks(
 		temporarilyEditingAsBlocks,
 	};
 }
+
+export function __unstableSetInspectorControlsTabSelectedTab( tabName ) {
+	return {
+		type: 'SET_INSPECTOR_CONTROLS_TAB_SELECTED_TAB',
+		tabName,
+	};
+}
