@@ -282,19 +282,23 @@ describe( 'selectors', () => {
 							123: '',
 						} )
 					),
-					tree: {
-						123: {
-							clientId: '123',
-							name: 'core/paragraph',
-							attributes: {},
-							innerBlocks: [],
-						},
-					},
+					tree: new Map(
+						Object.entries( {
+							123: {
+								clientId: '123',
+								name: 'core/paragraph',
+								attributes: {},
+								innerBlocks: [],
+							},
+						} )
+					),
 					controlledInnerBlocks: {},
 				},
 			};
 
-			expect( getBlock( state, '123' ) ).toBe( state.blocks.tree[ 123 ] );
+			expect( getBlock( state, '123' ) ).toBe(
+				state.blocks.tree.get( '123' )
+			);
 		} );
 
 		it( 'should return null if the block is not present in state', () => {
@@ -304,14 +308,16 @@ describe( 'selectors', () => {
 					attributes: new Map(),
 					order: new Map(),
 					parents: new Map(),
-					tree: {
-						123: {
-							clientId: '123',
-							name: 'core/paragraph',
-							attributes: {},
-							innerBlocks: [],
-						},
-					},
+					tree: new Map(
+						Object.entries( {
+							123: {
+								clientId: '123',
+								name: 'core/paragraph',
+								attributes: {},
+								innerBlocks: [],
+							},
+						} )
+					),
 					controlledInnerBlocks: {},
 				},
 			};
@@ -347,32 +353,34 @@ describe( 'selectors', () => {
 							23: '',
 						} )
 					),
-					tree: {
-						'': {
-							innerBlocks: [
-								{
-									clientId: '123',
-									name: 'core/paragraph',
-									attributes: {},
-									innerBlocks: [],
-								},
-								{
-									clientId: '23',
-									name: 'core/heading',
-									attributes: {},
-									innerBlocks: [],
-								},
-							],
-						},
-						123: {},
-						23: {},
-					},
+					tree: new Map(
+						Object.entries( {
+							'': {
+								innerBlocks: [
+									{
+										clientId: '123',
+										name: 'core/paragraph',
+										attributes: {},
+										innerBlocks: [],
+									},
+									{
+										clientId: '23',
+										name: 'core/heading',
+										attributes: {},
+										innerBlocks: [],
+									},
+								],
+							},
+							123: {},
+							23: {},
+						} )
+					),
 					controlledInnerBlocks: {},
 				},
 			};
 
 			expect( getBlocks( state ) ).toBe(
-				state.blocks.tree[ '' ].innerBlocks
+				state.blocks.tree.get( '' ).innerBlocks
 			);
 		} );
 	} );
@@ -1102,14 +1110,16 @@ describe( 'selectors', () => {
 							123: '',
 						} )
 					),
-					tree: {
-						23: {
-							clientId: '23',
-							name: 'core/heading',
-							attributes: {},
-							innerBlocks: [],
-						},
-					},
+					tree: new Map(
+						Object.entries( {
+							23: {
+								clientId: '23',
+								name: 'core/heading',
+								attributes: {},
+								innerBlocks: [],
+							},
+						} )
+					),
 				},
 				selection: {
 					selectionStart: {},
@@ -1148,14 +1158,16 @@ describe( 'selectors', () => {
 							23: '',
 						} )
 					),
-					tree: {
-						23: {
-							clientId: '23',
-							name: 'core/heading',
-							attributes: {},
-							innerBlocks: [],
-						},
-					},
+					tree: new Map(
+						Object.entries( {
+							23: {
+								clientId: '23',
+								name: 'core/heading',
+								attributes: {},
+								innerBlocks: [],
+							},
+						} )
+					),
 				},
 				selection: {
 					selectionStart: { clientId: '23' },
@@ -1194,14 +1206,16 @@ describe( 'selectors', () => {
 							23: '',
 						} )
 					),
-					tree: {
-						23: {
-							clientId: '23',
-							name: 'core/heading',
-							attributes: {},
-							innerBlocks: [],
-						},
-					},
+					tree: new Map(
+						Object.entries( {
+							23: {
+								clientId: '23',
+								name: 'core/heading',
+								attributes: {},
+								innerBlocks: [],
+							},
+						} )
+					),
 					controlledInnerBlocks: {},
 				},
 				selection: {
@@ -3183,11 +3197,13 @@ describe( 'selectors', () => {
 					attributes: new Map(),
 					order: new Map(),
 					parents: new Map(),
-					tree: {
-						'': {
-							innerBlocks: [],
-						},
-					},
+					tree: new Map(
+						Object.entries( {
+							'': {
+								innerBlocks: [],
+							},
+						} )
+					),
 				},
 				settings: {
 					__experimentalReusableBlocks: [
@@ -3271,20 +3287,22 @@ describe( 'selectors', () => {
 							block4: '',
 						} )
 					),
-					tree: {
-						block3: {
-							clientId: 'block3',
-							name: 'core/test-block-a',
-							attributes: {},
-							innerBlocks: [],
-						},
-						block4: {
-							clientId: 'block4',
-							name: 'core/test-block-a',
-							attributes: {},
-							innerBlocks: [],
-						},
-					},
+					tree: new Map(
+						Object.entries( {
+							block3: {
+								clientId: 'block3',
+								name: 'core/test-block-a',
+								attributes: {},
+								innerBlocks: [],
+							},
+							block4: {
+								clientId: 'block4',
+								name: 'core/test-block-a',
+								attributes: {},
+								innerBlocks: [],
+							},
+						} )
+					),
 					controlledInnerBlocks: {},
 				},
 				settings: {
@@ -3381,14 +3399,16 @@ describe( 'selectors', () => {
 							'': [ 'block1' ],
 						} )
 					),
-					tree: {
-						block1: {
-							clientId: 'block1',
-							name: 'core/test-block-b',
-							attributes: {},
-							innerBlocks: [],
-						},
-					},
+					tree: new Map(
+						Object.entries( {
+							block1: {
+								clientId: 'block1',
+								name: 'core/test-block-b',
+								attributes: {},
+								innerBlocks: [],
+							},
+						} )
+					),
 					controlledInnerBlocks: {},
 					parents: new Map(),
 				},
@@ -3619,14 +3639,16 @@ describe( 'selectors', () => {
 							'': [ 'block1' ],
 						} )
 					),
-					tree: {
-						block1: {
-							clientId: 'block1',
-							name: 'core/with-tranforms-c',
-							attributes: {},
-							innerBlocks: [],
-						},
-					},
+					tree: new Map(
+						Object.entries( {
+							block1: {
+								clientId: 'block1',
+								name: 'core/with-tranforms-c',
+								attributes: {},
+								innerBlocks: [],
+							},
+						} )
+					),
 					controlledInnerBlocks: {},
 					parents: new Map(),
 				},

@@ -245,11 +245,13 @@ describe( 'state', () => {
 							'chicken-child': 'chicken',
 						} )
 					),
-					tree: {
-						'': {},
-						chicken: {},
-						'chicken-child': {},
-					},
+					tree: new Map(
+						Object.entries( {
+							'': {},
+							chicken: {},
+							'chicken-child': {},
+						} )
+					),
 					controlledInnerBlocks: {},
 				} );
 
@@ -310,8 +312,8 @@ describe( 'state', () => {
 					),
 					controlledInnerBlocks: {},
 				} );
-				expect( state.tree.chicken ).not.toBe(
-					existingState.tree.chicken
+				expect( state.tree.get( 'chicken' ) ).not.toBe(
+					existingState.tree.get( 'chicken' )
 				);
 			} );
 
@@ -342,12 +344,14 @@ describe( 'state', () => {
 							chicken: '',
 						} )
 					),
-					tree: {
-						'': {
-							innerBlocks: [],
-						},
-						chicken: {},
-					},
+					tree: new Map(
+						Object.entries( {
+							'': {
+								innerBlocks: [],
+							},
+							chicken: {},
+						} )
+					),
 					controlledInnerBlocks: {},
 				} );
 
@@ -408,16 +412,16 @@ describe( 'state', () => {
 					),
 					controlledInnerBlocks: {},
 				} );
-				expect( state.tree.chicken ).not.toBe(
-					existingState.tree.chicken
+				expect( state.tree.get( 'chicken' ) ).not.toBe(
+					existingState.tree.get( 'chicken' )
 				);
-				expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe(
-					state.tree.chicken
+				expect( state.tree.get( '' ).innerBlocks[ 0 ] ).toBe(
+					state.tree.get( 'chicken' )
 				);
-				expect( state.tree.chicken.innerBlocks[ 0 ] ).toBe(
-					state.tree[ newChildBlockId ]
+				expect( state.tree.get( 'chicken' ).innerBlocks[ 0 ] ).toBe(
+					state.tree.get( newChildBlockId )
 				);
-				expect( state.tree[ newChildBlockId ] ).toEqual( {
+				expect( state.tree.get( newChildBlockId ) ).toEqual( {
 					clientId: newChildBlockId,
 					innerBlocks: [],
 					isValid: true,
@@ -476,7 +480,7 @@ describe( 'state', () => {
 							'chicken-child-2': 'chicken',
 						} )
 					),
-					tree: {},
+					tree: new Map(),
 					controlledInnerBlocks: {},
 				} );
 
@@ -574,19 +578,19 @@ describe( 'state', () => {
 					controlledInnerBlocks: {},
 				} );
 
-				expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe(
-					state.tree.chicken
+				expect( state.tree.get( '' ).innerBlocks[ 0 ] ).toBe(
+					state.tree.get( 'chicken' )
 				);
-				expect( state.tree.chicken.innerBlocks[ 0 ] ).toBe(
-					state.tree[ newChildBlockId1 ]
+				expect( state.tree.get( 'chicken' ).innerBlocks[ 0 ] ).toBe(
+					state.tree.get( newChildBlockId1 )
 				);
-				expect( state.tree.chicken.innerBlocks[ 1 ] ).toBe(
-					state.tree[ newChildBlockId2 ]
+				expect( state.tree.get( 'chicken' ).innerBlocks[ 1 ] ).toBe(
+					state.tree.get( newChildBlockId2 )
 				);
-				expect( state.tree.chicken.innerBlocks[ 2 ] ).toBe(
-					state.tree[ newChildBlockId3 ]
+				expect( state.tree.get( 'chicken' ).innerBlocks[ 2 ] ).toBe(
+					state.tree.get( newChildBlockId3 )
 				);
-				expect( state.tree[ newChildBlockId1 ] ).toEqual( {
+				expect( state.tree.get( newChildBlockId1 ) ).toEqual( {
 					innerBlocks: [],
 					clientId: newChildBlockId1,
 					name: 'core/test-child-block',
@@ -641,9 +645,11 @@ describe( 'state', () => {
 							'chicken-grand-child': 'chicken-child',
 						} )
 					),
-					tree: {
-						chicken: {},
-					},
+					tree: new Map(
+						Object.entries( {
+							chicken: {},
+						} )
+					),
 					controlledInnerBlocks: {},
 				} );
 
@@ -700,8 +706,8 @@ describe( 'state', () => {
 				} );
 
 				// The block object of the parent should be updated.
-				expect( state.tree.chicken ).not.toBe(
-					existingState.tree.chicken
+				expect( state.tree.get( 'chicken' ) ).not.toBe(
+					existingState.tree.get( 'chicken' )
 				);
 			} );
 		} );
@@ -716,7 +722,7 @@ describe( 'state', () => {
 				parents: new Map(),
 				isPersistentChange: true,
 				isIgnoredChange: false,
-				tree: {},
+				tree: new Map(),
 				controlledInnerBlocks: {},
 			} );
 		} );
@@ -736,12 +742,12 @@ describe( 'state', () => {
 					'': [ 'bananas' ],
 					bananas: [],
 				} );
-				expect( state.tree.bananas ).toEqual( {
+				expect( state.tree.get( 'bananas' ) ).toEqual( {
 					clientId: 'bananas',
 					innerBlocks: [],
 				} );
-				expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe(
-					state.tree.bananas
+				expect( state.tree.get( '' ).innerBlocks[ 0 ] ).toBe(
+					state.tree.get( 'bananas' )
 				);
 			} );
 		} );
@@ -799,11 +805,13 @@ describe( 'state', () => {
 				ribs: [],
 			} );
 
-			expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe(
-				state.tree.chicken
+			expect( state.tree.get( '' ).innerBlocks[ 0 ] ).toBe(
+				state.tree.get( 'chicken' )
 			);
-			expect( state.tree[ '' ].innerBlocks[ 1 ] ).toBe( state.tree.ribs );
-			expect( state.tree.chicken ).toEqual( {
+			expect( state.tree.get( '' ).innerBlocks[ 1 ] ).toBe(
+				state.tree.get( 'ribs' )
+			);
+			expect( state.tree.get( 'chicken' ) ).toEqual( {
 				clientId: 'chicken',
 				name: 'core/test-block',
 				attributes: {},
@@ -847,10 +855,10 @@ describe( 'state', () => {
 			expect( Object.fromEntries( state.parents ) ).toEqual( {
 				wings: '',
 			} );
-			expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe(
-				state.tree.wings
+			expect( state.tree.get( '' ).innerBlocks[ 0 ] ).toBe(
+				state.tree.get( 'wings' )
 			);
-			expect( state.tree.wings ).toEqual( {
+			expect( state.tree.get( 'wings' ) ).toEqual( {
 				clientId: 'wings',
 				name: 'core/freeform',
 				innerBlocks: [],
@@ -876,7 +884,7 @@ describe( 'state', () => {
 			} );
 
 			expect( state.byClientId.size ).toBe( 0 );
-			expect( state.tree[ '' ].innerBlocks ).toHaveLength( 0 );
+			expect( state.tree.get( '' ).innerBlocks ).toHaveLength( 0 );
 		} );
 
 		it( 'should replace the block and remove references to its inner blocks', () => {
@@ -918,10 +926,10 @@ describe( 'state', () => {
 			expect( Object.fromEntries( state.parents ) ).toEqual( {
 				wings: '',
 			} );
-			expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe(
-				state.tree.wings
+			expect( state.tree.get( '' ).innerBlocks[ 0 ] ).toBe(
+				state.tree.get( 'wings' )
 			);
-			expect( state.tree.wings ).toEqual( {
+			expect( state.tree.get( 'wings' ) ).toEqual( {
 				clientId: 'wings',
 				name: 'core/freeform',
 				innerBlocks: [],
@@ -956,10 +964,10 @@ describe( 'state', () => {
 				[ replacementBlock.clientId ]: wrapperBlock.clientId,
 			} );
 
-			expect( state.tree[ wrapperBlock.clientId ].innerBlocks[ 0 ] ).toBe(
-				state.tree[ replacementBlock.clientId ]
-			);
-			expect( state.tree[ replacementBlock.clientId ] ).toEqual( {
+			expect(
+				state.tree.get( wrapperBlock.clientId ).innerBlocks[ 0 ]
+			).toBe( state.tree.get( replacementBlock.clientId ) );
+			expect( state.tree.get( replacementBlock.clientId ) ).toEqual( {
 				clientId: replacementBlock.clientId,
 				name: 'core/test-block',
 				innerBlocks: [],
@@ -1006,8 +1014,8 @@ describe( 'state', () => {
 				'': [ 'chicken' ],
 				chicken: [],
 			} );
-			expect( originalState.tree.chicken ).not.toBe(
-				replacedState.tree.chicken
+			expect( originalState.tree.get( 'chicken' ) ).not.toBe(
+				replacedState.tree.get( 'chicken' )
 			);
 
 			const nestedBlock = {
@@ -1082,10 +1090,10 @@ describe( 'state', () => {
 			expect( state.attributes.get( 'chicken' ) ).toEqual( {
 				content: 'ribs',
 			} );
-			expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe(
-				state.tree.chicken
+			expect( state.tree.get( '' ).innerBlocks[ 0 ] ).toBe(
+				state.tree.get( 'chicken' )
 			);
-			expect( state.tree.chicken ).toEqual( {
+			expect( state.tree.get( 'chicken' ) ).toEqual( {
 				clientId: 'chicken',
 				name: 'core/test-block',
 				innerBlocks: [],
@@ -1128,10 +1136,10 @@ describe( 'state', () => {
 				ref: 3,
 			} );
 
-			expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe(
-				state.tree.chicken
+			expect( state.tree.get( '' ).innerBlocks[ 0 ] ).toBe(
+				state.tree.get( 'chicken' )
 			);
-			expect( state.tree.chicken ).toEqual( {
+			expect( state.tree.get( 'chicken' ) ).toEqual( {
 				clientId: 'chicken',
 				name: 'core/block',
 				isValid: false,
@@ -1166,11 +1174,15 @@ describe( 'state', () => {
 			} );
 
 			expect( state.order.get( '' ) ).toEqual( [ 'ribs', 'chicken' ] );
-			expect( state.tree[ '' ].innerBlocks[ 0 ] ).toBe( state.tree.ribs );
-			expect( state.tree[ '' ].innerBlocks[ 1 ] ).toBe(
-				state.tree.chicken
+			expect( state.tree.get( '' ).innerBlocks[ 0 ] ).toBe(
+				state.tree.get( 'ribs' )
 			);
-			expect( state.tree.chicken ).toBe( original.tree.chicken );
+			expect( state.tree.get( '' ).innerBlocks[ 1 ] ).toBe(
+				state.tree.get( 'chicken' )
+			);
+			expect( state.tree.get( 'chicken' ) ).toBe(
+				original.tree.get( 'chicken' )
+			);
 		} );
 
 		it( 'should move the nested block up', () => {
@@ -1200,14 +1212,14 @@ describe( 'state', () => {
 				[ siblingBlock.clientId ]: [],
 			} );
 
-			expect( state.tree[ wrapperBlock.clientId ].innerBlocks[ 0 ] ).toBe(
-				state.tree[ movedBlock.clientId ]
-			);
-			expect( state.tree[ wrapperBlock.clientId ].innerBlocks[ 1 ] ).toBe(
-				state.tree[ siblingBlock.clientId ]
-			);
-			expect( state.tree[ movedBlock.clientId ] ).toBe(
-				original.tree[ movedBlock.clientId ]
+			expect(
+				state.tree.get( wrapperBlock.clientId ).innerBlocks[ 0 ]
+			).toBe( state.tree.get( movedBlock.clientId ) );
+			expect(
+				state.tree.get( wrapperBlock.clientId ).innerBlocks[ 1 ]
+			).toBe( state.tree.get( siblingBlock.clientId ) );
+			expect( state.tree.get( movedBlock.clientId ) ).toBe(
+				original.tree.get( movedBlock.clientId )
 			);
 		} );
 
@@ -1492,7 +1504,7 @@ describe( 'state', () => {
 			expect( Object.fromEntries( state.attributes ) ).toEqual( {
 				ribs: {},
 			} );
-			expect( state.tree[ '' ].innerBlocks ).toHaveLength( 1 );
+			expect( state.tree.get( '' ).innerBlocks ).toHaveLength( 1 );
 		} );
 
 		it( 'should remove multiple blocks', () => {
@@ -2217,8 +2229,10 @@ describe( 'state', () => {
 					expect( state.controlledInnerBlocks.chicken ).toBe( true );
 					// The previous content of the block should be removed
 					expect( state.byClientId.child ).toBeUndefined();
-					expect( state.tree.child ).toBeUndefined();
-					expect( state.tree.chicken.innerBlocks ).toEqual( [] );
+					expect( state.tree.get( 'child' ) ).toBeUndefined();
+					expect( state.tree.get( 'chicken' ).innerBlocks ).toEqual(
+						[]
+					);
 				} );
 				it( 'should preserve the controlled blocks in state and re-attach them in other pieces of state(order, tree, etc..), when we replace inner blocks', () => {
 					const initialState = {
@@ -2259,69 +2273,71 @@ describe( 'state', () => {
 								'paragraph-id': 'reusable-id',
 							} )
 						),
-						tree: {
-							'group-id': {
-								clientId: 'group-id',
-								name: 'core/group',
-								isValid: true,
-								innerBlocks: [
-									{
-										clientId: 'reusable-id',
-										name: 'core/block',
-										isValid: true,
-										attributes: {
-											ref: 687,
-										},
-										innerBlocks: [],
-									},
-								],
-							},
-							'reusable-id': {
-								clientId: 'reusable-id',
-								name: 'core/block',
-								isValid: true,
-								attributes: {
-									ref: 687,
-								},
-								innerBlocks: [],
-							},
-							'': {
-								innerBlocks: [
-									{
-										clientId: 'group-id',
-										name: 'core/group',
-										isValid: true,
-										innerBlocks: [
-											{
-												clientId: 'reusable-id',
-												name: 'core/block',
-												isValid: true,
-												attributes: {
-													ref: 687,
-												},
-												innerBlocks: [],
+						tree: new Map(
+							Object.entries( {
+								'group-id': {
+									clientId: 'group-id',
+									name: 'core/group',
+									isValid: true,
+									innerBlocks: [
+										{
+											clientId: 'reusable-id',
+											name: 'core/block',
+											isValid: true,
+											attributes: {
+												ref: 687,
 											},
-										],
+											innerBlocks: [],
+										},
+									],
+								},
+								'reusable-id': {
+									clientId: 'reusable-id',
+									name: 'core/block',
+									isValid: true,
+									attributes: {
+										ref: 687,
 									},
-								],
-							},
-							'paragraph-id': {
-								clientId: 'paragraph-id',
-								name: 'core/paragraph',
-								isValid: true,
-								innerBlocks: [],
-							},
-							'controlled||reusable-id': {
-								innerBlocks: [
-									{
-										clientId: 'paragraph-id',
-										name: 'core/paragraph',
-										isValid: true,
-										innerBlocks: [],
-									},
-								],
-							},
-						},
+									innerBlocks: [],
+								},
+								'': {
+									innerBlocks: [
+										{
+											clientId: 'group-id',
+											name: 'core/group',
+											isValid: true,
+											innerBlocks: [
+												{
+													clientId: 'reusable-id',
+													name: 'core/block',
+													isValid: true,
+													attributes: {
+														ref: 687,
+													},
+													innerBlocks: [],
+												},
+											],
+										},
+									],
+								},
+								'paragraph-id': {
+									clientId: 'paragraph-id',
+									name: 'core/paragraph',
+									isValid: true,
+									innerBlocks: [],
+								},
+								'controlled||reusable-id': {
+									innerBlocks: [
+										{
+											clientId: 'paragraph-id',
+											name: 'core/paragraph',
+											isValid: true,
+											innerBlocks: [],
+										},
+									],
+								},
+							} )
+						),
 					};
 					// We will dispatch an action that replaces the inner
 					// blocks with the same inner blocks, which contain
@@ -2348,8 +2364,10 @@ describe( 'state', () => {
 							Object.fromEntries( initialState.order )
 						)
 					);
-					expect( state.tree ).toEqual(
-						expect.objectContaining( initialState.tree )
+					expect( Object.fromEntries( state.tree ) ).toEqual(
+						expect.objectContaining(
+							Object.fromEntries( initialState.tree )
+						)
 					);
 				} );
 			} );
