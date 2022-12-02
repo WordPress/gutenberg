@@ -206,11 +206,17 @@ export class UnsupportedBlockEdit extends Component {
 					<Text style={ [ infoTextStyle, infoTitleStyle ] }>
 						{ infoTitle }
 					</Text>
-					{ isEditableInUnsupportedBlockEditor && (
-						<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
-							{ missingBlockDetail }
-						</Text>
-					) }
+					{ isEditableInUnsupportedBlockEditor &&
+						missingBlockDetail && (
+							<Text
+								style={ [
+									infoTextStyle,
+									infoDescriptionStyle,
+								] }
+							>
+								{ missingBlockDetail }
+							</Text>
+						) }
 				</View>
 				{ ( isUnsupportedBlockEditorSupported ||
 					canEnableUnsupportedBlockEditor ) &&
