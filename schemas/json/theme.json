@@ -1171,7 +1171,7 @@
 					"additionalProperties": false
 				},
 				"css": {
-					"description": "Sets custom CSS.",
+					"description": "Sets custom CSS to apply styling not covered by other theme.json properties.",
 					"type": "string"
 				}
 			}
