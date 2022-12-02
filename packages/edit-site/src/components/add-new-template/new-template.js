@@ -250,7 +250,7 @@ function useMissingTemplates(
 	setShowCustomTemplateModal
 ) {
 	const DEFAULT_TEMPLATE_SLUGS = applyFilters(
-		'newTemplate.defaultTemplateSlugs',
+		'editSite.NewTemplate.defaultTemplateSlugs',
 		[
 			'front-page',
 			'single',
