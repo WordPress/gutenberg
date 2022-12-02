@@ -15,10 +15,15 @@ export default forwardRef( function BlockEditButton(
 	{ clientId, ...props },
 	ref
 ) {
-	const { selectBlock } = useDispatch( blockEditorStore );
+	const {
+		selectBlock,
+		__unstableSetInspectorControlsTabSelectedTab:
+			setInspectorControlsTabSelectedTab,
+	} = useDispatch( blockEditorStore );
 
 	const onClick = () => {
 		selectBlock( clientId );
+		setInspectorControlsTabSelectedTab( 'settings' );
 	};
 
 	return (
