@@ -85,7 +85,7 @@ describe( 'PaletteEdit', () => {
 		expect( screen.getByLabelText( 'Hex color' ) ).toBeInTheDocument();
 	} );
 
-	it( 'opens gradient selector for gradient palettes', () => {
+	it( 'opens gradient selector for gradient palettes', async () => {
 		const gradientProps = {
 			...defaultProps,
 			colors: undefined,
@@ -98,14 +98,17 @@ describe( 'PaletteEdit', () => {
 				},
 			],
 		};
+
 		render( <PaletteEdit { ...gradientProps } /> );
+
 		fireEvent.click(
-			screen.getByLabelText( 'Gradient: Vivid cyan blue to vivid purple' )
-		);
-		expect(
-			screen.getByLabelText(
-				'Gradient control point at position 0% with color code rgba(6,147,227,1).'
+			await screen.findByLabelText(
+				'Gradient: Vivid cyan blue to vivid purple'
 			)
-		).toBeInTheDocument();
+		);
+
+		await screen.findByLabelText(
+			'Gradient control point at position 0% with color code rgba(6,147,227,1).'
+		);
 	} );
 } );
