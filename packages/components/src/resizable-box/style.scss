@@ -54,6 +54,7 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
 	right: calc(50% - 1px);
 	transition: transform 0.1s ease-in;
 	@include reduce-motion("transition");
+	will-change: transform;
 	opacity: 0;
 }
 
