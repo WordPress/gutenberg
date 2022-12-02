@@ -609,7 +609,6 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 			// it encounters whitespace. This code strips it.
 			$compacted_blocks = block_core_navigation_filter_out_invalid_blocks( $parsed_blocks );
 
-
 			// TODO - this uses the full navigation block attributes for the
 			// context which could be refined.
 			$inner_blocks = new WP_Block_List( $compacted_blocks, $attributes );
