@@ -8,7 +8,11 @@ import classnames from 'classnames';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
-import { BaseControl, CustomSelectControl } from '@wordpress/components';
+import {
+	BaseControl,
+	CustomSelectControl,
+	PanelBody,
+} from '@wordpress/components';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import {
 	useContext,
@@ -253,6 +257,7 @@ export function PositionEdit( props ) {
 						__next36pxDefaultSize
 						className="block-editor-hooks__position-selection__select-control"
 						label={ __( 'Position' ) }
+						hideLabelFromVision
 						describedBy={ sprintf(
 							// translators: %s: Currently selected font size.
 							__( 'Currently selected position: %s' ),
@@ -290,11 +295,10 @@ export const withInspectorControls = createHigherOrderComponent(
 
 		return [
 			positionSupport && (
-				<InspectorControls
-					__experimentalGroup="advanced"
-					key="position"
-				>
-					<PositionEdit { ...props } />
+				<InspectorControls key="position">
+					<PanelBody title={ __( 'Position' ) } initialOpen={ false }>
+						<PositionEdit { ...props } />
+					</PanelBody>
 				</InspectorControls>
 			),
 			<BlockEdit key="edit" { ...props } />,
