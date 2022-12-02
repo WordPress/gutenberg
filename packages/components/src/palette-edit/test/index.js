@@ -82,9 +82,7 @@ describe( 'PaletteEdit', () => {
 	it( 'opens color selector for color palettes', async () => {
 		render( <PaletteEdit { ...defaultProps } /> );
 		fireEvent.click( screen.getByLabelText( 'Color: Base' ) );
-		expect(
-			screen.getByLabelText( 'Select a new color' )
-		).toBeInTheDocument();
+		expect( screen.getByLabelText( 'Hex color' ) ).toBeInTheDocument();
 	} );
 
 	it( 'opens gradient selector for gradient palettes', () => {
@@ -105,7 +103,9 @@ describe( 'PaletteEdit', () => {
 			screen.getByLabelText( 'Gradient: Vivid cyan blue to vivid purple' )
 		);
 		expect(
-			screen.getByLabelText( 'Select a new gradient' )
+			screen.getByLabelText(
+				'Gradient control point at position 0% with color code rgba(6,147,227,1).'
+			)
 		).toBeInTheDocument();
 	} );
 } );
