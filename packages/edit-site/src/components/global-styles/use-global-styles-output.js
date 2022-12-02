@@ -885,13 +885,14 @@ export function useGlobalStylesOutput() {
 	let { merged: mergedConfig } = useContext( GlobalStylesContext );
 
 	const [ blockGap ] = useSetting( 'spacing.blockGap' );
+	const [ customCSS ] = useStyle( 'css' );
 	const hasBlockGapSupport = blockGap !== null;
 	const hasFallbackGapSupport = ! hasBlockGapSupport; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback styles support.
 	const disableLayoutStyles = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return !! getSettings().disableLayoutStyles;
 	} );
-	const [ customCSS ] = useStyle( 'css' );
+
 	return useMemo( () => {
 		if ( ! mergedConfig?.styles || ! mergedConfig?.settings ) {
 			return [];
@@ -931,5 +932,6 @@ export function useGlobalStylesOutput() {
 		hasFallbackGapSupport,
 		mergedConfig,
 		disableLayoutStyles,
+		customCSS,
 	] );
 }
