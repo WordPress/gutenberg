@@ -398,7 +398,7 @@ function block_core_navigation_get_most_recently_published_navigation() {
  * @return array the filtered parsed blocks.
  */
 function block_core_navigation_filter_out_invalid_blocks( $parsed_blocks ) {
-
+	// This list is duplicated in /packages/block-library/src/navigation/edit/inner-blocks.js
 	$allowed_blocks = array(
 		'core/navigation-link',
 		'core/search',
