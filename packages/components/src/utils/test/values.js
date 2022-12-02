@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { isValueNumeric } from '../values';
+import { isValueNumeric, ensureString, ensureNumber } from '../values';
 
 /**
  * This works because Node 12 ships with `small-icu` instead of `full-icu`
@@ -98,4 +98,42 @@ describe( 'isValueNumeric', () => {
 			expect( isValueNumeric( '١٬٠٠٠٫a', 'ar' ) ).toBe( false );
 		} );
 	} );
+} );
+
+describe( 'ensureString', () => {
+	it.each( [
+		[ '1', '1' ],
+		[ 'abc', 'abc' ],
+		[ 2e3, '2000' ],
+		[ 42, '42' ],
+		[ -14, '-14' ],
+		[ 0, '0' ],
+		[ '0', '0' ],
+		[ '', '' ],
+		[ NaN, 'NaN' ],
+	] )(
+		'should convert `%s` (unknown) to `%s` (string)',
+		( input, expectedOutput ) => {
+			expect( ensureString( input ) ).toBe( expectedOutput );
+		}
+	);
+} );
+
+describe( 'ensureNumber', () => {
+	it.each( [
+		[ '1', 1 ],
+		[ 'abc', NaN ],
+		[ 2e3, 2000 ],
+		[ 42, 42 ],
+		[ -14, -14 ],
+		[ 0, 0 ],
+		[ '0', 0 ],
+		[ '', NaN ],
+		[ 'NaN', NaN ],
+	] )(
+		'should convert `%s` (unknown) to `%s` (string)',
+		( input, expectedOutput ) => {
+			expect( ensureNumber( input ) ).toBe( expectedOutput );
+		}
+	);
 } );
