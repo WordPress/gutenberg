@@ -103,7 +103,14 @@ async function waitForInserterCloseAndContentFocus() {
  * Wait for the inserter search to yield results because that input is debounced.
  */
 async function waitForInserterSearch() {
-	await page.waitForSelector( '.block-editor-inserter__no-tab-container' );
+	try {
+		await page.waitForSelector(
+			'.block-editor-inserter__no-tab-container',
+			{ timeout: 2000 }
+		);
+	} catch ( e ) {
+		// This selector doesn't exist in older versions, so let's just continue.
+	}
 }
 
 /**
