@@ -349,7 +349,10 @@ module.exports = {
 			files: [ 'packages/components/src/**/*.[tj]s?(x)' ],
 			excludedFiles: [ ...developmentFiles ],
 			rules: {
-				'react-hooks/exhaustive-deps': 'error',
+				'react-hooks/exhaustive-deps': [
+					'error',
+					{ additionalHooks: 'useUpdateEffect' },
+				],
 			},
 		},
 		{

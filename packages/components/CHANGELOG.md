@@ -32,6 +32,8 @@
 -   `LinkedButton`: remove unnecessary `span` tag ([#46063](https://github.com/WordPress/gutenberg/pull/46063))
 -   NumberControl: refactor styles/tests/stories to TypeScript, replace fireEvent with user-event ([#45990](https://github.com/WordPress/gutenberg/pull/45990)).
 -   `useBaseField`: Convert to TypeScript ([#45712](https://github.com/WordPress/gutenberg/pull/45712)).
+-   Add `useUpdateEffect` hook to the previously added `react-hooks/exhuastive-deps` eslint check ([#45771](https://github.com/WordPress/gutenberg/pull/45771)).
+-   `ToggleGroupControl`: Update `useUpdateEffect` usages to pass `exhaustive-deps` eslint rule ([#45771](https://github.com/WordPress/gutenberg/pull/45771)).
 
 ### Documentation
 

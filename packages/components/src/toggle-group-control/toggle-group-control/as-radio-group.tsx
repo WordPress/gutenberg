@@ -61,14 +61,17 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 		if ( previousValue !== radio.state ) {
 			onChange( radio.state );
 		}
-	}, [ radio.state ] );
+	}, [ radio.state, previousValue, onChange ] );
 
 	// Sync incoming value with radio.state.
+	const { state: radioState, setState: setRadioState } = radio;
 	useUpdateEffect( () => {
-		if ( value !== radio.state ) {
-			radio.setState( value );
+		if ( value !== radioState ) {
+			setRadioState( value );
 		}
-	}, [ value ] );
+		// setRadioState needs to be listed even if in theory it's supposed to be a
+		// stable reference — that's an ESLint limitation.
+	}, [ value, radioState, setRadioState ] );
 
 	return (
 		<ToggleGroupControlContext.Provider
