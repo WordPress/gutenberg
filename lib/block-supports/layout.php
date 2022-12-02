@@ -337,9 +337,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			$child_layout_styles[] = array(
 				'selector'     => ".$container_content_class",
 				'declarations' => array(
-					'flex-shrink' => '0',
-					'flex-basis'  => $block['attrs']['style']['layout']['flexSize'],
-					'box-sizing'  => 'border-box',
+					'flex-basis' => $block['attrs']['style']['layout']['flexSize'],
+					'box-sizing' => 'border-box',
 				),
 			);
 		} elseif ( 'fill' === $block['attrs']['style']['layout']['selfStretch'] ) {
