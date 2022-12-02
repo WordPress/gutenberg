@@ -9,7 +9,6 @@
 
 	&.has-dark-background {
 		&,
-		.edit-site-style-book__tab-panel .components-button,
 		.edit-site-style-book__example-title {
 			color: $white;
 		}
@@ -24,12 +23,11 @@
 
 .edit-site-style-book__tab-panel {
 	.components-tab-panel__tabs {
-		margin-right: $button-size + $grid-unit-10;
-		overflow: auto;
+		background: $white;
+		color: $gray-900;
 	}
 
 	.components-tab-panel__tab-content {
-		border-top: 1px solid $gray-400;
 		bottom: 0;
 		left: 0;
 		overflow: auto;
