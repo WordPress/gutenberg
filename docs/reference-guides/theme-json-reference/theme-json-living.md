@@ -229,7 +229,7 @@ Outline styles.
 
 ### css
 
-Sets custom CSS.
+Sets custom CSS to apply styling not covered by other theme.json properties.
 
 
 ---
