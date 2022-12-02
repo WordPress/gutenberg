@@ -4,8 +4,12 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Navigate regions', () => {
-	test.beforeEach( async ( { admin } ) => {
+	test.beforeEach( async ( { admin, page } ) => {
 		await admin.createNewPost();
+		// POC: Make all text transparent to ignore different font rendering on CI Ubuntu.
+		await page.addStyleTag( {
+			content: '* { color: rgba(0,0,0,0) !important; }',
+		} );
 	} );
 
 	test( 'should navigate the editor regions and show the outline focus style', async ( {
@@ -36,7 +40,10 @@ test.describe( 'Navigate regions', () => {
 		await expect( editorTopBar ).toBeFocused();
 		await expect( editorTopBar ).toHaveCSS( 'outline-style', 'solid' );
 		await expect( editorTopBar ).toHaveCSS( 'outline-width', '4px' );
-		await expect( editorTopBar ).toHaveScreenshot();
+		await expect( editorTopBar ).toHaveScreenshot( {
+			// POC: Hide some elements we're not interested to test for.
+			mask: [ editorTopBar.locator( 'role=button' ) ],
+		} );
 
 		// Navigate to the content region.
 		await page.keyboard.press( 'Control+`' );
@@ -48,7 +55,14 @@ test.describe( 'Navigate regions', () => {
 		await expect( editorContent ).toBeFocused();
 		await expect( editorContent ).toHaveCSS( 'outline-style', 'solid' );
 		await expect( editorContent ).toHaveCSS( 'outline-width', '4px' );
-		await expect( editorContent ).toHaveScreenshot();
+		await expect( editorContent ).toHaveScreenshot( {
+			// POC: Hide some elements we're not interested to test for.
+			mask: [
+				editorContent.locator( 'role=textbox' ),
+				editorContent.locator( 'role=document' ),
+				editorContent.locator( 'role=toolbar' ),
+			],
+		} );
 
 		// Navigate to the settings region when it's opened.
 		await page.keyboard.press( 'Control+`' );
@@ -78,7 +92,10 @@ test.describe( 'Navigate regions', () => {
 			'solid'
 		);
 		await expect( editorPublishPanel ).toHaveCSS( 'outline-width', '4px' );
-		await expect( editorPublishPanel ).toHaveScreenshot();
+		await expect( editorPublishPanel ).toHaveScreenshot( {
+			// POC: Hide some elements we're not interested to test for.
+			mask: [ editorPublishPanel.locator( 'role=button' ) ],
+		} );
 
 		// Navigate to the footer region.
 		await page.keyboard.press( 'Control+`' );
@@ -111,7 +128,10 @@ test.describe( 'Navigate regions', () => {
 			'outline-width',
 			'4px'
 		);
-		await expect( editorDocumentOverview ).toHaveScreenshot();
+		await expect( editorDocumentOverview ).toHaveScreenshot( {
+			// POC: Hide some elements we're not interested to test for.
+			mask: [ editorDocumentOverview.locator( 'role=treegrid' ) ],
+		} );
 
 		// Close the Document overview.
 		await page.locator( 'role=button[name="Document Overview"i]' ).click();
@@ -137,7 +157,10 @@ test.describe( 'Navigate regions', () => {
 		);
 		await expect( editorSettingsPanel ).toHaveCSS( 'outline-width', '4px' );
 
-		await expect( editorSettingsPanel ).toHaveScreenshot();
+		await expect( editorSettingsPanel ).toHaveScreenshot( {
+			// POC: Hide some elements we're not interested to test for.
+			mask: [ editorSettingsPanel.locator( 'role=button' ) ],
+		} );
 
 		// Make sure to leave the Settings sidebar opened.
 		await editor.openDocumentSettingsSidebar();
