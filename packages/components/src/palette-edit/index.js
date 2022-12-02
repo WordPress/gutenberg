@@ -89,7 +89,7 @@ export function getNameForPosition( elements, slugPrefix ) {
 	);
 }
 
-export function ColorPickerPopover( {
+function ColorPickerPopover( {
 	isGradient,
 	element,
 	onChange,
