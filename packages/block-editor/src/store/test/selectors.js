@@ -205,7 +205,7 @@ describe( 'selectors', () => {
 					byClientId: new Map(),
 					attributes: {},
 					order: new Map(),
-					parents: {},
+					parents: new Map(),
 				},
 			};
 
@@ -240,9 +240,11 @@ describe( 'selectors', () => {
 							'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': [],
 						} )
 					),
-					parents: {
-						'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': '',
-					},
+					parents: new Map(
+						Object.entries( {
+							'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': '',
+						} )
+					),
 				},
 			};
 
@@ -275,9 +277,11 @@ describe( 'selectors', () => {
 							123: [],
 						} )
 					),
-					parents: {
-						123: '',
-					},
+					parents: new Map(
+						Object.entries( {
+							123: '',
+						} )
+					),
 					tree: {
 						123: {
 							clientId: '123',
@@ -299,7 +303,7 @@ describe( 'selectors', () => {
 					byClientId: new Map(),
 					attributes: new Map(),
 					order: new Map(),
-					parents: {},
+					parents: new Map(),
 					tree: {
 						123: {
 							clientId: '123',
@@ -337,10 +341,12 @@ describe( 'selectors', () => {
 							'': [ '123', '23' ],
 						} )
 					),
-					parents: {
-						123: '',
-						23: '',
-					},
+					parents: new Map(
+						Object.entries( {
+							123: '',
+							23: '',
+						} )
+					),
 					tree: {
 						'': {
 							innerBlocks: [
@@ -375,12 +381,14 @@ describe( 'selectors', () => {
 		it( 'should return parent blocks', () => {
 			const state = {
 				blocks: {
-					parents: {
-						'client-id-01': '',
-						'client-id-02': 'client-id-01',
-						'client-id-03': 'client-id-02',
-						'client-id-04': 'client-id-03',
-					},
+					parents: new Map(
+						Object.entries( {
+							'client-id-01': '',
+							'client-id-02': 'client-id-01',
+							'client-id-03': 'client-id-02',
+							'client-id-04': 'client-id-03',
+						} )
+					),
 					byClientId: new Map(
 						Object.entries( {
 							'client-id-01': {
@@ -424,13 +432,15 @@ describe( 'selectors', () => {
 	describe( 'getBlockParentsByBlockName', () => {
 		const state = {
 			blocks: {
-				parents: {
-					'client-id-01': '',
-					'client-id-02': 'client-id-01',
-					'client-id-03': 'client-id-02',
-					'client-id-04': 'client-id-03',
-					'client-id-05': 'client-id-04',
-				},
+				parents: new Map(
+					Object.entries( {
+						'client-id-01': '',
+						'client-id-02': 'client-id-01',
+						'client-id-03': 'client-id-02',
+						'client-id-04': 'client-id-03',
+						'client-id-05': 'client-id-04',
+					} )
+				),
 				byClientId: new Map(
 					Object.entries( {
 						'client-id-01': {
@@ -612,20 +622,22 @@ describe( 'selectors', () => {
 							'uuid-28': [ 'uuid-30' ],
 						} )
 					),
-					parents: {
-						'uuid-6': '',
-						'uuid-8': '',
-						'uuid-10': '',
-						'uuid-22': '',
-						'uuid-12': 'uuid-10',
-						'uuid-14': 'uuid-10',
-						'uuid-16': 'uuid-12',
-						'uuid-18': 'uuid-14',
-						'uuid-24': 'uuid-18',
-						'uuid-26': 'uuid-24',
-						'uuid-28': 'uuid-24',
-						'uuid-30': 'uuid-28',
-					},
+					parents: new Map(
+						Object.entries( {
+							'uuid-6': '',
+							'uuid-8': '',
+							'uuid-10': '',
+							'uuid-22': '',
+							'uuid-12': 'uuid-10',
+							'uuid-14': 'uuid-10',
+							'uuid-16': 'uuid-12',
+							'uuid-18': 'uuid-14',
+							'uuid-24': 'uuid-18',
+							'uuid-26': 'uuid-24',
+							'uuid-28': 'uuid-24',
+							'uuid-30': 'uuid-28',
+						} )
+					),
 					controlledInnerBlocks: {},
 				},
 			};
@@ -750,20 +762,22 @@ describe( 'selectors', () => {
 							'uuid-28': [ 'uuid-30' ],
 						} )
 					),
-					parents: {
-						'uuid-6': '',
-						'uuid-8': '',
-						'uuid-10': '',
-						'uuid-22': '',
-						'uuid-12': 'uuid-10',
-						'uuid-14': 'uuid-10',
-						'uuid-16': 'uuid-12',
-						'uuid-18': 'uuid-14',
-						'uuid-24': 'uuid-18',
-						'uuid-26': 'uuid-24',
-						'uuid-28': 'uuid-24',
-						'uuid-30': 'uuid-28',
-					},
+					parents: new Map(
+						Object.entries( {
+							'uuid-6': '',
+							'uuid-8': '',
+							'uuid-10': '',
+							'uuid-22': '',
+							'uuid-12': 'uuid-10',
+							'uuid-14': 'uuid-10',
+							'uuid-16': 'uuid-12',
+							'uuid-18': 'uuid-14',
+							'uuid-24': 'uuid-18',
+							'uuid-26': 'uuid-24',
+							'uuid-28': 'uuid-24',
+							'uuid-30': 'uuid-28',
+						} )
+					),
 				},
 			};
 			expect( getClientIdsWithDescendants( state ) ).toEqual( [
@@ -833,11 +847,13 @@ describe( 'selectors', () => {
 							123: [ '456', '789' ],
 						} )
 					),
-					parents: {
-						123: '',
-						456: '123',
-						789: '123',
-					},
+					parents: new Map(
+						Object.entries( {
+							123: '',
+							456: '123',
+							789: '123',
+						} )
+					),
 				},
 			};
 
@@ -910,10 +926,12 @@ describe( 'selectors', () => {
 						'': [ '123', '456' ],
 					} )
 				),
-				parents: {
-					123: '',
-					456: '',
-				},
+				parents: new Map(
+					Object.entries( {
+						123: '',
+						456: '',
+					} )
+				),
 			},
 		};
 
@@ -931,7 +949,7 @@ describe( 'selectors', () => {
 					byClientId: new Map(),
 					attributes: new Map(),
 					order: new Map(),
-					parents: {},
+					parents: new Map(),
 				},
 			};
 			expect( getGlobalBlockCount( emptyState ) ).toBe( 0 );
@@ -970,13 +988,15 @@ describe( 'selectors', () => {
 						1011: [ '1415', '1213' ],
 					} )
 				),
-				parents: {
-					123: '',
-					456: '',
-					1011: '',
-					1213: '1011',
-					1415: '1011',
-				},
+				parents: new Map(
+					Object.entries( {
+						123: '',
+						456: '',
+						1011: '',
+						1213: '1011',
+						1415: '1011',
+					} )
+				),
 			},
 		};
 
@@ -1076,10 +1096,12 @@ describe( 'selectors', () => {
 							123: [],
 						} )
 					),
-					parents: {
-						23: '',
-						123: '',
-					},
+					parents: new Map(
+						Object.entries( {
+							23: '',
+							123: '',
+						} )
+					),
 					tree: {
 						23: {
 							clientId: '23',
@@ -1120,10 +1142,12 @@ describe( 'selectors', () => {
 							123: [],
 						} )
 					),
-					parents: {
-						123: '',
-						23: '',
-					},
+					parents: new Map(
+						Object.entries( {
+							123: '',
+							23: '',
+						} )
+					),
 					tree: {
 						23: {
 							clientId: '23',
@@ -1164,10 +1188,12 @@ describe( 'selectors', () => {
 							123: [],
 						} )
 					),
-					parents: {
-						123: '',
-						23: '',
-					},
+					parents: new Map(
+						Object.entries( {
+							123: '',
+							23: '',
+						} )
+					),
 					tree: {
 						23: {
 							clientId: '23',
@@ -1195,7 +1221,7 @@ describe( 'selectors', () => {
 			const state = {
 				blocks: {
 					order: new Map(),
-					parents: {},
+					parents: new Map(),
 				},
 			};
 
@@ -1211,12 +1237,14 @@ describe( 'selectors', () => {
 							123: [ '456', '56' ],
 						} )
 					),
-					parents: {
-						123: '',
-						23: '',
-						456: '123',
-						56: '123',
-					},
+					parents: new Map(
+						Object.entries( {
+							123: '',
+							23: '',
+							456: '123',
+							56: '123',
+						} )
+					),
 				},
 			};
 
@@ -1229,7 +1257,7 @@ describe( 'selectors', () => {
 			const state = {
 				blocks: {
 					order: new Map(),
-					parents: {},
+					parents: new Map(),
 				},
 			};
 
@@ -1245,12 +1273,14 @@ describe( 'selectors', () => {
 							a: [ 'c', 'd' ],
 						} )
 					),
-					parents: {
-						a: '',
-						b: '',
-						c: 'a',
-						d: 'a',
-					},
+					parents: new Map(
+						Object.entries( {
+							a: '',
+							b: '',
+							c: 'a',
+							d: 'a',
+						} )
+					),
 				},
 			};
 
@@ -1267,13 +1297,15 @@ describe( 'selectors', () => {
 							d: [ 'e' ],
 						} )
 					),
-					parents: {
-						a: '',
-						b: '',
-						c: 'a',
-						d: 'a',
-						e: 'd',
-					},
+					parents: new Map(
+						Object.entries( {
+							a: '',
+							b: '',
+							c: 'a',
+							d: 'a',
+							e: 'd',
+						} )
+					),
 				},
 			};
 
@@ -1290,10 +1322,12 @@ describe( 'selectors', () => {
 							'': [ '123', '23' ],
 						} )
 					),
-					parents: {
-						123: '',
-						23: '',
-					},
+					parents: new Map(
+						Object.entries( {
+							123: '',
+							23: '',
+						} )
+					),
 				},
 				selection: {
 					selectionStart: {},
@@ -1312,13 +1346,15 @@ describe( 'selectors', () => {
 							'': [ '5', '4', '3', '2', '1' ],
 						} )
 					),
-					parents: {
-						1: '',
-						2: '',
-						3: '',
-						4: '',
-						5: '',
-					},
+					parents: new Map(
+						Object.entries( {
+							1: '',
+							2: '',
+							3: '',
+							4: '',
+							5: '',
+						} )
+					),
 				},
 				selection: {
 					selectionStart: { clientId: '2' },
@@ -1337,13 +1373,15 @@ describe( 'selectors', () => {
 							'': [ '5', '4', '3', '2', '1' ],
 						} )
 					),
-					parents: {
-						1: '',
-						2: '',
-						3: '',
-						4: '',
-						5: '',
-					},
+					parents: new Map(
+						Object.entries( {
+							1: '',
+							2: '',
+							3: '',
+							4: '',
+							5: '',
+						} )
+					),
 				},
 				selection: {
 					selectionStart: { clientId: '2' },
@@ -1367,17 +1405,19 @@ describe( 'selectors', () => {
 							4: [ '9', '8', '7', '6' ],
 						} )
 					),
-					parents: {
-						1: '',
-						2: '',
-						3: '',
-						4: '',
-						5: '',
-						6: '4',
-						7: '4',
-						8: '4',
-						9: '4',
-					},
+					parents: new Map(
+						Object.entries( {
+							1: '',
+							2: '',
+							3: '',
+							4: '',
+							5: '',
+							6: '4',
+							7: '4',
+							8: '4',
+							9: '4',
+						} )
+					),
 				},
 				selection: {
 					selectionStart: { clientId: '7' },
@@ -1402,10 +1442,12 @@ describe( 'selectors', () => {
 							'': [ '123', '23' ],
 						} )
 					),
-					parents: {
-						23: '',
-						123: '',
-					},
+					parents: new Map(
+						Object.entries( {
+							23: '',
+							123: '',
+						} )
+					),
 				},
 				selection: {
 					selectionStart: {},
@@ -1424,13 +1466,15 @@ describe( 'selectors', () => {
 							'': [ '5', '4', '3', '2', '1' ],
 						} )
 					),
-					parents: {
-						1: '',
-						2: '',
-						3: '',
-						4: '',
-						5: '',
-					},
+					parents: new Map(
+						Object.entries( {
+							1: '',
+							2: '',
+							3: '',
+							4: '',
+							5: '',
+						} )
+					),
 				},
 				selection: {
 					selectionStart: { clientId: '2' },
@@ -1454,17 +1498,19 @@ describe( 'selectors', () => {
 							4: [ '9', '8', '7', '6' ],
 						} )
 					),
-					parents: {
-						1: '',
-						2: '',
-						3: '',
-						4: '',
-						5: '',
-						6: '4',
-						7: '4',
-						8: '4',
-						9: '4',
-					},
+					parents: new Map(
+						Object.entries( {
+							1: '',
+							2: '',
+							3: '',
+							4: '',
+							5: '',
+							6: '4',
+							7: '4',
+							8: '4',
+							9: '4',
+						} )
+					),
 				},
 				selection: {
 					selectionStart: { clientId: '7' },
@@ -1487,7 +1533,7 @@ describe( 'selectors', () => {
 					byClientId: new Map(),
 					attributes: new Map(),
 					order: new Map(),
-					parents: {},
+					parents: new Map(),
 				},
 				selection: {
 					selectionStart: {},
@@ -1558,10 +1604,12 @@ describe( 'selectors', () => {
 							'': [ '123', '23' ],
 						} )
 					),
-					parents: {
-						23: '',
-						123: '',
-					},
+					parents: new Map(
+						Object.entries( {
+							23: '',
+							123: '',
+						} )
+					),
 				},
 			};
 
@@ -1577,11 +1625,13 @@ describe( 'selectors', () => {
 							123: [ '456' ],
 						} )
 					),
-					parents: {
-						23: '',
-						123: '',
-						456: '123',
-					},
+					parents: new Map(
+						Object.entries( {
+							23: '',
+							123: '',
+							456: '123',
+						} )
+					),
 				},
 			};
 
@@ -1598,10 +1648,12 @@ describe( 'selectors', () => {
 							'': [ '123', '23' ],
 						} )
 					),
-					parents: {
-						23: '',
-						123: '',
-					},
+					parents: new Map(
+						Object.entries( {
+							23: '',
+							123: '',
+						} )
+					),
 				},
 			};
 
@@ -1617,12 +1669,14 @@ describe( 'selectors', () => {
 							123: [ '456', '56' ],
 						} )
 					),
-					parents: {
-						23: '',
-						123: '',
-						56: '123',
-						456: '123',
-					},
+					parents: new Map(
+						Object.entries( {
+							23: '',
+							123: '',
+							56: '123',
+							456: '123',
+						} )
+					),
 				},
 			};
 
@@ -1639,10 +1693,12 @@ describe( 'selectors', () => {
 							'': [ '123', '23' ],
 						} )
 					),
-					parents: {
-						23: '',
-						123: '',
-					},
+					parents: new Map(
+						Object.entries( {
+							23: '',
+							123: '',
+						} )
+					),
 				},
 			};
 
@@ -1658,12 +1714,14 @@ describe( 'selectors', () => {
 							123: [ '456', '56' ],
 						} )
 					),
-					parents: {
-						23: '',
-						123: '',
-						456: '123',
-						56: '123',
-					},
+					parents: new Map(
+						Object.entries( {
+							23: '',
+							123: '',
+							456: '123',
+							56: '123',
+						} )
+					),
 				},
 			};
 
@@ -1680,10 +1738,12 @@ describe( 'selectors', () => {
 							'': [ '123', '23' ],
 						} )
 					),
-					parents: {
-						23: '',
-						123: '',
-					},
+					parents: new Map(
+						Object.entries( {
+							23: '',
+							123: '',
+						} )
+					),
 				},
 			};
 
@@ -1699,12 +1759,14 @@ describe( 'selectors', () => {
 							123: [ '456', '56' ],
 						} )
 					),
-					parents: {
-						23: '',
-						123: '',
-						456: '123',
-						56: '123',
-					},
+					parents: new Map(
+						Object.entries( {
+							23: '',
+							123: '',
+							456: '123',
+							56: '123',
+						} )
+					),
 				},
 			};
 
@@ -1723,10 +1785,12 @@ describe( 'selectors', () => {
 							'': [ '123', '23' ],
 						} )
 					),
-					parents: {
-						23: '',
-						123: '',
-					},
+					parents: new Map(
+						Object.entries( {
+							23: '',
+							123: '',
+						} )
+					),
 				},
 			};
 
@@ -1742,12 +1806,14 @@ describe( 'selectors', () => {
 							123: [ '456', '56' ],
 						} )
 					),
-					parents: {
-						23: '',
-						123: '',
-						456: '123',
-						56: '123',
-					},
+					parents: new Map(
+						Object.entries( {
+							23: '',
+							123: '',
+							456: '123',
+							56: '123',
+						} )
+					),
 				},
 			};
 
@@ -1764,10 +1830,12 @@ describe( 'selectors', () => {
 							'': [ '123', '23' ],
 						} )
 					),
-					parents: {
-						23: '',
-						123: '',
-					},
+					parents: new Map(
+						Object.entries( {
+							23: '',
+							123: '',
+						} )
+					),
 				},
 			};
 
@@ -1783,12 +1851,14 @@ describe( 'selectors', () => {
 							123: [ '456', '56' ],
 						} )
 					),
-					parents: {
-						23: '',
-						123: '',
-						456: '123',
-						56: '123',
-					},
+					parents: new Map(
+						Object.entries( {
+							23: '',
+							123: '',
+							456: '123',
+							56: '123',
+						} )
+					),
 				},
 			};
 
@@ -1844,11 +1914,13 @@ describe( 'selectors', () => {
 							4: [ '3', '2', '1' ],
 						} )
 					),
-					parents: {
-						1: '4',
-						2: '4',
-						3: '4',
-					},
+					parents: new Map(
+						Object.entries( {
+							1: '4',
+							2: '4',
+							3: '4',
+						} )
+					),
 				},
 			};
 
@@ -1867,11 +1939,13 @@ describe( 'selectors', () => {
 							4: [ '3', '2', '1' ],
 						} )
 					),
-					parents: {
-						1: '4',
-						2: '4',
-						3: '4',
-					},
+					parents: new Map(
+						Object.entries( {
+							1: '4',
+							2: '4',
+							3: '4',
+						} )
+					),
 				},
 			};
 
@@ -1886,13 +1960,15 @@ describe( 'selectors', () => {
 							6: [ '5', '4', '3', '2', '1' ],
 						} )
 					),
-					parents: {
-						1: '6',
-						2: '6',
-						3: '6',
-						4: '6',
-						5: '6',
-					},
+					parents: new Map(
+						Object.entries( {
+							1: '6',
+							2: '6',
+							3: '6',
+							4: '6',
+							5: '6',
+						} )
+					),
 				},
 				selection: {
 					selectionStart: { clientId: '2' },
@@ -1911,12 +1987,14 @@ describe( 'selectors', () => {
 							6: [ '5', '4' ],
 						} )
 					),
-					parents: {
-						1: '3',
-						2: '3',
-						4: '6',
-						5: '6',
-					},
+					parents: new Map(
+						Object.entries( {
+							1: '3',
+							2: '3',
+							4: '6',
+							5: '6',
+						} )
+					),
 				},
 				selection: {
 					selectionStart: { clientId: '5' },
@@ -1940,13 +2018,15 @@ describe( 'selectors', () => {
 							'': [ '5', '4', '3', '2', '1' ],
 						} )
 					),
-					parents: {
-						1: '',
-						2: '',
-						3: '',
-						4: '',
-						5: '',
-					},
+					parents: new Map(
+						Object.entries( {
+							1: '',
+							2: '',
+							3: '',
+							4: '',
+							5: '',
+						} )
+					),
 				},
 			};
 
@@ -1965,13 +2045,15 @@ describe( 'selectors', () => {
 							'': [ '5', '4', '3', '2', '1' ],
 						} )
 					),
-					parents: {
-						1: '',
-						2: '',
-						3: '',
-						4: '',
-						5: '',
-					},
+					parents: new Map(
+						Object.entries( {
+							1: '',
+							2: '',
+							3: '',
+							4: '',
+							5: '',
+						} )
+					),
 				},
 			};
 
@@ -1990,13 +2072,15 @@ describe( 'selectors', () => {
 							'': [ '5', '4', '3', '2', '1' ],
 						} )
 					),
-					parents: {
-						1: '',
-						2: '',
-						3: '',
-						4: '',
-						5: '',
-					},
+					parents: new Map(
+						Object.entries( {
+							1: '',
+							2: '',
+							3: '',
+							4: '',
+							5: '',
+						} )
+					),
 				},
 			};
 
@@ -2015,13 +2099,15 @@ describe( 'selectors', () => {
 							'': [ '5', '4', '3', '2', '1' ],
 						} )
 					),
-					parents: {
-						1: '',
-						2: '',
-						3: '',
-						4: '',
-						5: '',
-					},
+					parents: new Map(
+						Object.entries( {
+							1: '',
+							2: '',
+							3: '',
+							4: '',
+							5: '',
+						} )
+					),
 				},
 			};
 
@@ -2080,13 +2166,15 @@ describe( 'selectors', () => {
 						'': [ '5', '4', '3', '2', '1' ],
 					} )
 				),
-				parents: {
-					1: '',
-					2: '',
-					3: '',
-					4: '',
-					5: '',
-				},
+				parents: new Map(
+					Object.entries( {
+						1: '',
+						2: '',
+						3: '',
+						4: '',
+						5: '',
+					} )
+				),
 			},
 			selection: {
 				selectionStart: { clientId: '2' },
@@ -2111,13 +2199,15 @@ describe( 'selectors', () => {
 						'': [ '5', '4', '3', '2', '1' ],
 					} )
 				),
-				parents: {
-					1: '',
-					2: '',
-					3: '',
-					4: '',
-					5: '',
-				},
+				parents: new Map(
+					Object.entries( {
+						1: '',
+						2: '',
+						3: '',
+						4: '',
+						5: '',
+					} )
+				),
 			},
 			selection: {
 				selectionStart: { clientId: '2' },
@@ -2244,10 +2334,12 @@ describe( 'selectors', () => {
 			const state = {
 				draggedBlocks: [ 'block-1_grandparent' ],
 				blocks: {
-					parents: {
-						'block-1': 'block-1_parent',
-						'block-1_parent': 'block-1_grandparent',
-					},
+					parents: new Map(
+						Object.entries( {
+							'block-1': 'block-1_parent',
+							'block-1_parent': 'block-1_grandparent',
+						} )
+					),
 				},
 			};
 			expect( isAncestorBeingDragged( state, 'block-1' ) ).toBe( true );
@@ -2257,10 +2349,12 @@ describe( 'selectors', () => {
 			const state = {
 				draggedBlocks: [ 'block-2_grandparent' ],
 				blocks: {
-					parents: {
-						'block-1': 'block-1_parent',
-						'block-1_parent': 'block-1_grandparent',
-					},
+					parents: new Map(
+						Object.entries( {
+							'block-1': 'block-1_parent',
+							'block-1_parent': 'block-1_grandparent',
+						} )
+					),
 				},
 			};
 			expect( isAncestorBeingDragged( state, 'block-1' ) ).toBe( false );
@@ -2270,10 +2364,12 @@ describe( 'selectors', () => {
 			const state = {
 				draggedBlocks: [],
 				blocks: {
-					parents: {
-						'block-1': 'block-1_parent',
-						'block-1_parent': 'block-1_grandparent',
-					},
+					parents: new Map(
+						Object.entries( {
+							'block-1': 'block-1_parent',
+							'block-1_parent': 'block-1_grandparent',
+						} )
+					),
 				},
 			};
 			expect( isAncestorBeingDragged( state, 'block-1' ) ).toBe( false );
@@ -2325,10 +2421,12 @@ describe( 'selectors', () => {
 							clientId2: [],
 						} )
 					),
-					parents: {
-						clientId1: '',
-						clientId2: 'clientId1',
-					},
+					parents: new Map(
+						Object.entries( {
+							clientId1: '',
+							clientId2: 'clientId1',
+						} )
+					),
 				},
 				insertionPoint: {
 					rootClientId: undefined,
@@ -2365,9 +2463,11 @@ describe( 'selectors', () => {
 							clientId1: [],
 						} )
 					),
-					parents: {
-						clientId1: '',
-					},
+					parents: new Map(
+						Object.entries( {
+							clientId1: '',
+						} )
+					),
 				},
 				insertionPoint: null,
 			};
@@ -2404,10 +2504,12 @@ describe( 'selectors', () => {
 							clientId2: [],
 						} )
 					),
-					parents: {
-						clientId1: '',
-						clientId2: 'clientId1',
-					},
+					parents: new Map(
+						Object.entries( {
+							clientId1: '',
+							clientId2: 'clientId1',
+						} )
+					),
 				},
 				insertionPoint: null,
 			};
@@ -2444,10 +2546,12 @@ describe( 'selectors', () => {
 							clientId2: [],
 						} )
 					),
-					parents: {
-						clientId1: '',
-						clientId2: '',
-					},
+					parents: new Map(
+						Object.entries( {
+							clientId1: '',
+							clientId2: '',
+						} )
+					),
 				},
 				insertionPoint: null,
 			};
@@ -2484,10 +2588,12 @@ describe( 'selectors', () => {
 							clientId2: [],
 						} )
 					),
-					parents: {
-						clientId1: '',
-						clientId2: '',
-					},
+					parents: new Map(
+						Object.entries( {
+							clientId1: '',
+							clientId2: '',
+						} )
+					),
 				},
 				insertionPoint: null,
 			};
@@ -2794,9 +2900,11 @@ describe( 'selectors', () => {
 							block2: {},
 						} )
 					),
-					parents: {
-						block2: 'block1',
-					},
+					parents: new Map(
+						Object.entries( {
+							block2: 'block1',
+						} )
+					),
 				},
 				blockListSettings: {
 					block1: {},
@@ -2830,10 +2938,12 @@ describe( 'selectors', () => {
 							block3: {},
 						} )
 					),
-					parents: {
-						block2: 'block1',
-						block3: 'block2',
-					},
+					parents: new Map(
+						Object.entries( {
+							block2: 'block1',
+							block3: 'block2',
+						} )
+					),
 				},
 				blockListSettings: {
 					block1: {},
@@ -2868,9 +2978,11 @@ describe( 'selectors', () => {
 							block3: {},
 						} )
 					),
-					parents: {
-						block3: 'block2',
-					},
+					parents: new Map(
+						Object.entries( {
+							block3: 'block2',
+						} )
+					),
 				},
 				blockListSettings: {
 					block1: {},
@@ -2905,9 +3017,11 @@ describe( 'selectors', () => {
 							block3: {},
 						} )
 					),
-					parents: {
-						block3: 'block2',
-					},
+					parents: new Map(
+						Object.entries( {
+							block3: 'block2',
+						} )
+					),
 				},
 				blockListSettings: {
 					block1: {},
@@ -2940,9 +3054,11 @@ describe( 'selectors', () => {
 							block2: {},
 						} )
 					),
-					parents: {
-						block2: 'block1',
-					},
+					parents: new Map(
+						Object.entries( {
+							block2: 'block1',
+						} )
+					),
 				},
 				blockListSettings: {
 					block1: {},
@@ -2976,9 +3092,11 @@ describe( 'selectors', () => {
 							block2: {},
 						} )
 					),
-					parents: {
-						block2: 'block1',
-					},
+					parents: new Map(
+						Object.entries( {
+							block2: 'block1',
+						} )
+					),
 				},
 				blockListSettings: {
 					block1: {},
@@ -3064,7 +3182,7 @@ describe( 'selectors', () => {
 					byClientId: new Map(),
 					attributes: new Map(),
 					order: new Map(),
-					parents: {},
+					parents: new Map(),
 					tree: {
 						'': {
 							innerBlocks: [],
@@ -3147,10 +3265,12 @@ describe( 'selectors', () => {
 							'': [ 'block3', 'block4' ],
 						} )
 					),
-					parents: {
-						block3: '',
-						block4: '',
-					},
+					parents: new Map(
+						Object.entries( {
+							block3: '',
+							block4: '',
+						} )
+					),
 					tree: {
 						block3: {
 							clientId: 'block3',
@@ -3270,7 +3390,7 @@ describe( 'selectors', () => {
 						},
 					},
 					controlledInnerBlocks: {},
-					parents: {},
+					parents: new Map(),
 				},
 				preferences: {
 					insertUsage: {},
@@ -3291,7 +3411,7 @@ describe( 'selectors', () => {
 					byClientId: new Map(),
 					attributes: new Map(),
 					order: new Map(),
-					parents: {},
+					parents: new Map(),
 					cache: {},
 				},
 				preferences: {
@@ -3386,7 +3506,7 @@ describe( 'selectors', () => {
 					byClientId: new Map(),
 					attributes: new Map(),
 					order: new Map(),
-					parents: {},
+					parents: new Map(),
 					cache: {},
 				},
 				settings: {},
@@ -3426,7 +3546,7 @@ describe( 'selectors', () => {
 					byClientId: new Map(),
 					attributes: new Map(),
 					order: new Map(),
-					parents: {},
+					parents: new Map(),
 					cache: {},
 				},
 				settings: {},
@@ -3453,10 +3573,12 @@ describe( 'selectors', () => {
 						} )
 					),
 					order: new Map(),
-					parents: {
-						block1: '',
-						block2: 'block1',
-					},
+					parents: new Map(
+						Object.entries( {
+							block1: '',
+							block2: 'block1',
+						} )
+					),
 					cache: {},
 					controlledInnerBlocks: {},
 				},
@@ -3506,7 +3628,7 @@ describe( 'selectors', () => {
 						},
 					},
 					controlledInnerBlocks: {},
-					parents: {},
+					parents: new Map(),
 				},
 				preferences: {
 					insertUsage: {},
@@ -3536,7 +3658,7 @@ describe( 'selectors', () => {
 					byClientId: new Map(),
 					attributes: new Map(),
 					order: new Map(),
-					parents: {},
+					parents: new Map(),
 					cache: {},
 				},
 				preferences: {
@@ -3762,14 +3884,16 @@ describe( 'selectors', () => {
 					b: [ 'f' ],
 				} )
 			),
-			parents: {
-				a: '',
-				b: '',
-				c: 'a',
-				d: 'a',
-				e: 'd',
-				f: 'b',
-			},
+			parents: new Map(
+				Object.entries( {
+					a: '',
+					b: '',
+					c: 'a',
+					d: 'a',
+					e: 'd',
+					f: 'b',
+				} )
+			),
 		};
 
 		it( 'should not be defined if there is no block selected', () => {
@@ -3868,13 +3992,15 @@ describe( 'selectors', () => {
 				},
 			},
 			blocks: {
-				parents: {
-					'client-id-01': '',
-					'client-id-02': 'client-id-01',
-					'client-id-03': 'client-id-02',
-					'client-id-04': 'client-id-03',
-					'client-id-05': 'client-id-03',
-				},
+				parents: new Map(
+					Object.entries( {
+						'client-id-01': '',
+						'client-id-02': 'client-id-01',
+						'client-id-03': 'client-id-02',
+						'client-id-04': 'client-id-03',
+						'client-id-05': 'client-id-03',
+					} )
+				),
 				byClientId: new Map(
 					Object.entries( {
 						'client-id-01': {
@@ -4415,7 +4541,7 @@ describe( 'getInserterItems with core blocks prioritization', () => {
 				byClientId: new Map(),
 				attributes: new Map(),
 				order: new Map(),
-				parents: {},
+				parents: new Map(),
 				cache: {},
 			},
 			settings: {},
