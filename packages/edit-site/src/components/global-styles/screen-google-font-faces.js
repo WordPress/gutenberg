@@ -13,9 +13,16 @@ import FontFaceItem from './font-face-item';
 import Subtitle from './subtitle';
 import { useFontFamilies } from './hooks';
 
-function ScreenGoogleFontFacesList({ googleFontSelected: font }) {
-	const { fontFamilies, handleAddFontFace, handleRemoveFontFace, getFontSlug } = useFontFamilies();
-	const existingFamilyIndex = fontFamilies.findIndex( ( { slug } ) => slug === getFontSlug( font.family ) );
+function ScreenGoogleFontFacesList( { googleFontSelected: font } ) {
+	const {
+		fontFamilies,
+		handleAddFontFace,
+		handleRemoveFontFace,
+		getFontSlug,
+	} = useFontFamilies();
+	const existingFamilyIndex = fontFamilies.findIndex(
+		( { slug } ) => slug === getFontSlug( font.family )
+	);
 
 	return (
 		<>
@@ -39,17 +46,19 @@ function ScreenGoogleFontFacesList({ googleFontSelected: font }) {
 
 				{ font &&
 					font.variants.map( ( variant ) => {
-
 						const style = variant.includes( 'italic' )
 							? 'italic'
 							: 'normal';
-						const weight = variant.replace( 'italic', '' ) === 'regular'
-							? '400'
-							: variant.replace( 'italic', '' );
+						const weight =
+							variant.replace( 'italic', '' ) === 'regular'
+								? '400'
+								: variant.replace( 'italic', '' );
 
-						const isExistingFace = existingFamilyIndex !== -1 &&
+						const isExistingFace =
+							existingFamilyIndex !== -1 &&
 							fontFamilies[ existingFamilyIndex ]?.fontFace?.find(
-								( { fontWeight, fontStyle } ) => fontWeight === weight && fontStyle === style
+								( { fontWeight, fontStyle } ) =>
+									fontWeight === weight && fontStyle === style
 							);
 
 						const fontFace = {
@@ -65,10 +74,10 @@ function ScreenGoogleFontFacesList({ googleFontSelected: font }) {
 								fontFace={ fontFace }
 								title={ variant }
 								actionTrigger={
-									!isExistingFace ? (
+									! isExistingFace ? (
 										<Tooltip
-										text={ __( 'Add font face' ) }
-										delay={ 0 }
+											text={ __( 'Add font face' ) }
+											delay={ 0 }
 										>
 											<Button
 												style={ { padding: '0 8px' } }
@@ -77,7 +86,7 @@ function ScreenGoogleFontFacesList({ googleFontSelected: font }) {
 														fontFace.fontFamily,
 														fontFace.fontWeight,
 														fontFace.fontStyle,
-														fontFace.url,
+														fontFace.url
 													)
 												}
 											>
@@ -90,18 +99,24 @@ function ScreenGoogleFontFacesList({ googleFontSelected: font }) {
 									) : (
 										<Tooltip
 											text={ __( 'Remove Font Face' ) }
-											delay= { 0 }
+											delay={ 0 }
 										>
 											<Button
 												style={ { padding: '0 8px' } }
-												onClick={ () => handleRemoveFontFace( font.family, weight, style ) }
+												onClick={ () =>
+													handleRemoveFontFace(
+														font.family,
+														weight,
+														style
+													)
+												}
 											>
 												<Icon
 													icon={ check }
 													size={ 20 }
 												/>
 											</Button>
-										</Tooltip>	
+										</Tooltip>
 									)
 								}
 							/>

@@ -6,7 +6,7 @@ import { get, set, isEqual } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { _x } from '@wordpress/i18n';
+import { _x, __ } from '@wordpress/i18n';
 import { useContext, useCallback, useMemo } from '@wordpress/element';
 import {
 	getBlockType,
@@ -324,10 +324,10 @@ export function useGradientsPerOrigin( name ) {
 	}, [ customGradients, themeGradients, defaultGradients ] );
 }
 
-
-
 export function useFontFamilies() {
-	const [ fontFamilies = [], setFontFamilies ] = useSetting( 'typography.fontFamilies' );
+	const [ fontFamilies = [], setFontFamilies ] = useSetting(
+		'typography.fontFamilies'
+	);
 
 	const getFontSlug = ( content ) => {
 		// Get the slug.
@@ -342,55 +342,86 @@ export function useFontFamilies() {
 		);
 	};
 
-	const handleAddFontFace = ( fontFamilyName, fontWeight, fontStyle, url ) => {
+	const handleAddFontFace = (
+		fontFamilyName,
+		fontWeight,
+		fontStyle,
+		url
+	) => {
+		const newFaceSlug = getFontSlug( fontFamilyName );
+		const existingFamilyIndex = fontFamilies.findIndex(
+			( { slug } ) => slug === getFontSlug( newFaceSlug )
+		);
 
-			const newFaceSlug = getFontSlug( fontFamilyName );
-			const existingFamilyIndex = fontFamilies.findIndex( ( { slug } ) => slug === getFontSlug( newFaceSlug ) );
-			
-			const existingFace = existingFamilyIndex !== -1
-				? fontFamilies[ existingFamilyIndex ]?.fontFace?.find( ( { fontWeight : weight, fontStyle : style } ) => weight === fontWeight && style === fontStyle )
+		const existingFace =
+			existingFamilyIndex !== -1
+				? fontFamilies[ existingFamilyIndex ]?.fontFace?.find(
+						( { fontWeight: weight, fontStyle: style } ) =>
+							weight === fontWeight && style === fontStyle
+				  )
 				: null;
 
-			if ( existingFace ) {
-				throw new Error( __( 'Font face already exists.' ) );
-			}
+		if ( existingFace ) {
+			throw new Error( __( 'Font face already exists.' ) );
+		}
 
-			const newFace = {
-				fontFamily: fontFamilyName,
-				fontStyle: fontStyle,
-				fontWeight: fontWeight,
-				src: [ url ],
-				shouldBeDownloaded: true,
-			};
+		const newFace = {
+			fontFamily: fontFamilyName,
+			fontStyle,
+			fontWeight,
+			src: [ url ],
+			shouldBeDownloaded: true,
+		};
 
-			if ( existingFamilyIndex !== -1 ) {
-				// deep	copy
-				const updatedFontFamilies = JSON.parse( JSON.stringify( fontFamilies ) );
-				if( Array.isArray( fontFamilies[ existingFamilyIndex ].fontFace ) ) {
-					updatedFontFamilies[ existingFamilyIndex ].fontFace = [ ...updatedFontFamilies[ existingFamilyIndex ].fontFace, newFace ];
-				} else {
-					updatedFontFamilies[ existingFamilyIndex ].fontFace = [ newFace ];
-				}
-				setFontFamilies( updatedFontFamilies );
+		if ( existingFamilyIndex !== -1 ) {
+			// deep	copy
+			const updatedFontFamilies = JSON.parse(
+				JSON.stringify( fontFamilies )
+			);
+			if (
+				Array.isArray( fontFamilies[ existingFamilyIndex ].fontFace )
+			) {
+				updatedFontFamilies[ existingFamilyIndex ].fontFace = [
+					...updatedFontFamilies[ existingFamilyIndex ].fontFace,
+					newFace,
+				];
 			} else {
-				const newFamily = {
-					fontFamily: fontFamilyName,
-					name: fontFamilyName,
-					slug: newFaceSlug,
-					fontFace: [ newFace ],
-				}
-				setFontFamilies( [ ...fontFamilies, newFamily ] );
+				updatedFontFamilies[ existingFamilyIndex ].fontFace = [
+					newFace,
+				];
 			}
+			setFontFamilies( updatedFontFamilies );
+		} else {
+			const newFamily = {
+				fontFamily: fontFamilyName,
+				name: fontFamilyName,
+				slug: newFaceSlug,
+				fontFace: [ newFace ],
+			};
+			setFontFamilies( [ ...fontFamilies, newFamily ] );
+		}
 	};
 
 	const handleRemoveFontFace = ( fontFamilyName, fontWeight, fontStyle ) => {
-		const updatedFontFamilies = JSON.parse( JSON.stringify( fontFamilies ) );
+		const updatedFontFamilies = JSON.parse(
+			JSON.stringify( fontFamilies )
+		);
 		const newFaceSlug = getFontSlug( fontFamilyName );
-		const existingFamilyIndex = fontFamilies.findIndex( ( { slug } ) => slug === getFontSlug( newFaceSlug ) );
+		const existingFamilyIndex = fontFamilies.findIndex(
+			( { slug } ) => slug === getFontSlug( newFaceSlug )
+		);
 		const updatedFamily = updatedFontFamilies[ existingFamilyIndex ];
-		updatedFamily.fontFace = updatedFamily.fontFace.filter( ( { fontWeight : weight, fontStyle : style } ) => weight !== fontWeight || style !== fontStyle );
+		updatedFamily.fontFace = updatedFamily.fontFace.filter(
+			( { fontWeight: weight, fontStyle: style } ) =>
+				weight !== fontWeight || style !== fontStyle
+		);
 		setFontFamilies( updatedFontFamilies );
-	}
+	};
 
-	return { fontFamilies, handleAddFontFace, handleRemoveFontFace, getFontSlug };
-} 
+	return {
+		fontFamilies,
+		handleAddFontFace,
+		handleRemoveFontFace,
+		getFontSlug,
+	};
+}
