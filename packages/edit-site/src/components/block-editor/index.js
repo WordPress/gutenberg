@@ -230,6 +230,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			<SidebarInspectorFill>
 				<BlockInspector />
 			</SidebarInspectorFill>
+			{ /* Potentially this could be a generic slot (e.g. EditorCanvas.Slot) if there are other uses for it. */ }
 			<StyleBook.Slot>
 				{ ( [ styleBook ] ) =>
 					styleBook ? (
