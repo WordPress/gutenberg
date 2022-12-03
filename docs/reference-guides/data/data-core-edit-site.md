@@ -20,16 +20,7 @@ _Returns_
 
 ### getCurrentTemplateNavigationPanelSubMenu
 
-Returns the current template or template part's corresponding
-navigation panel's sub menu, to be used with `openNavigationPanelToMenu`.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `string`: The current template or template part's sub menu.
+> **Deprecated**
 
 ### getCurrentTemplateTemplateParts
 
@@ -93,15 +84,7 @@ _Returns_
 
 ### getNavigationPanelActiveMenu
 
-Returns the active menu in the navigation panel.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `string`: Active menu.
+> **Deprecated**
 
 ### getPage
 
@@ -179,15 +162,7 @@ _Returns_
 
 ### isNavigationOpened
 
-Returns the current opened/closed state of the navigation panel.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `boolean`: True if the navigation panel should be open; false if closed.
+> **Deprecated**
 
 ### isSaveViewOpened
 
@@ -233,11 +208,9 @@ _Parameters_
 
 ### openNavigationPanelToMenu
 
+> **Deprecated**
+
 Opens the navigation panel and sets its active menu at the same time.
-
-_Parameters_
-
--   _menu_ `string`: Identifies the menu to open.
 
 ### removeTemplate
 
@@ -290,11 +263,9 @@ _Parameters_
 
 ### setIsNavigationPanelOpened
 
+> **Deprecated**
+
 Sets whether the navigation panel should be open.
-
-_Parameters_
-
--   _isOpen_ `boolean`: If true, opens the nav panel. If false, closes it. It does not toggle the state, but sets it directly.
 
 ### setIsSaveViewOpened
 
@@ -306,11 +277,9 @@ _Parameters_
 
 ### setNavigationPanelActiveMenu
 
+> **Deprecated**
+
 Action that sets the active navigation panel menu.
-
-_Parameters_
-
--   _menu_ `string`: Menu prop of active menu.
 
 _Returns_
 

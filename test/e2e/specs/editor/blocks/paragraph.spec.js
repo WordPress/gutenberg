@@ -127,7 +127,7 @@ test.describe( 'Paragraph', () => {
 
 			await expect.poll( editor.getEditedPostContent )
 				.toBe( `<!-- wp:heading -->
-<h2>My Heading</h2>
+<h2 class="wp-block-heading">My Heading</h2>
 <!-- /wp:heading -->` );
 		} );
 
@@ -138,7 +138,9 @@ test.describe( 'Paragraph', () => {
 		} ) => {
 			await editor.insertBlock( { name: 'core/paragraph' } );
 
-			await draggingUtils.simulateDraggingHTML( '<h2>My Heading</h2>' );
+			await draggingUtils.simulateDraggingHTML(
+				'<h2 class="wp-block-heading">My Heading</h2>'
+			);
 
 			const emptyParagraph = page.locator(
 				'[data-type="core/paragraph"][data-empty="true"]'
@@ -153,7 +155,7 @@ test.describe( 'Paragraph', () => {
 
 			await expect.poll( editor.getEditedPostContent )
 				.toBe( `<!-- wp:heading -->
-<h2>My Heading</h2>
+<h2 class="wp-block-heading">My Heading</h2>
 <!-- /wp:heading -->` );
 		} );
 

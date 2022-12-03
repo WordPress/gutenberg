@@ -1,23 +1,24 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
 import { Button } from '@wordpress/components';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { __, isRTL } from '@wordpress/i18n';
+import { useSelect, useDispatch } from '@wordpress/data';
+
 /**
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
+import { store as blockEditorStore } from '../../store';
 
-function BlockCard( {
-	title,
-	icon,
-	description,
-	blockType,
-	parentBlockClientId,
-	handleBackButton,
-} ) {
+function BlockCard( { title, icon, description, blockType, className } ) {
 	if ( blockType ) {
 		deprecated( '`blockType` property in `BlockCard component`', {
 			since: '5.7',
@@ -29,12 +30,29 @@ function BlockCard( {
 	const isOffCanvasNavigationEditorEnabled =
 		window?.__experimentalEnableOffCanvasNavigationEditor === true;
 
+	const { parentNavBlockClientId } = useSelect( ( select ) => {
+		const { getSelectedBlockClientId, getBlockParentsByBlockName } =
+			select( blockEditorStore );
+
+		const _selectedBlockClientId = getSelectedBlockClientId();
+
+		return {
+			parentNavBlockClientId: getBlockParentsByBlockName(
+				_selectedBlockClientId,
+				'core/navigation',
+				true
+			)[ 0 ],
+		};
+	}, [] );
+
+	const { selectBlock } = useDispatch( blockEditorStore );
+
 	return (
-		<div className="block-editor-block-card">
-			{ isOffCanvasNavigationEditorEnabled && parentBlockClientId && (
+		<div className={ classnames( 'block-editor-block-card', className ) }>
+			{ isOffCanvasNavigationEditorEnabled && parentNavBlockClientId && (
 				<Button
-					onClick={ handleBackButton }
-					label={ __( 'Navigate to parent block' ) }
+					onClick={ () => selectBlock( parentNavBlockClientId ) }
+					label={ __( 'Go to parent Navigation block' ) }
 					style={
 						// TODO: This style override is also used in ToolsPanelHeader.
 						// It should be supported out-of-the-box by Button.
