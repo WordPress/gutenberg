@@ -118,7 +118,7 @@ function gutenberg_add_registered_webfonts_to_theme_json( $data ) {
 	$get_families = static function( $families_data ) {
 		$families = array();
 		foreach ( $families_data as $family ) {
-			$families[] = WP_Webfonts::get_font_slug( $family );
+			$families[] = $family['slug'];
 		}
 
 		// Micro-optimization: Use array_flip( array_flip( $array ) )
