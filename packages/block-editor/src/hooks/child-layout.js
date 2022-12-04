@@ -7,6 +7,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -42,6 +43,20 @@ export function ChildLayoutEdit( {
 	const { style = {} } = attributes;
 	const { layout: childLayout = {} } = style;
 	const { selfStretch, flexSize } = childLayout;
+
+	useEffect( () => {
+		if ( selfStretch === 'fixed' && ! flexSize ) {
+			setAttributes( {
+				style: {
+					...style,
+					layout: {
+						...childLayout,
+						selfStretch: 'fit',
+					},
+				},
+			} );
+		}
+	}, [] );
 
 	return (
 		<>
