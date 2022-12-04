@@ -1,7 +1,9 @@
 .edit-site-style-book {
 	background: $white; // Fallback color, overriden by JavaScript.
+	border-radius: $radius-block-ui;
 	bottom: 0;
 	left: 0;
+	overflow: hidden;
 	position: absolute;
 	right: 0;
 	top: 0;
