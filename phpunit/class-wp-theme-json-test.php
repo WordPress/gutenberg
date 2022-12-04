@@ -1497,4 +1497,24 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEquals( $expected, $stylesheet );
 
 	}
+
+	public function test_get_stylesheet_handles_custom_css() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'css' => 'body { color:purple; }',
+				),
+			)
+		);
+
+		$base_styles = 'body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
+
+		$custom_css = 'body { color:purple; }';
+
+		$expected = $base_styles . $custom_css;
+
+		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
+		$this->assertEquals( $custom_css, $theme_json->get_stylesheet( array( 'customCSS' ) ) );
+	}
 }
