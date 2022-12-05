@@ -8,7 +8,7 @@
 /**
  * Registers the block pattern categories.
  */
-function gutenberg_register_core_block_patterns_and_categories() {
+function gutenberg_register_core_block_patterns_categories() {
 	register_block_pattern_category(
 		'banner',
 		array(
@@ -138,7 +138,7 @@ function gutenberg_register_core_block_patterns_and_categories() {
 		)
 	);
 }
-add_action( 'init', 'gutenberg_register_core_block_patterns_and_categories' );
+add_action( 'init', 'gutenberg_register_core_block_patterns_categories' );
 
 /**
  * Registers Gutenberg-bundled patterns, with a focus on headers and footers

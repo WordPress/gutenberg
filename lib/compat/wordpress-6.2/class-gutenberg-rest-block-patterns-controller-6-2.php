@@ -30,6 +30,8 @@ class Gutenberg_REST_Block_Patterns_Controller_6_2 extends Gutenberg_REST_Block_
 	 */
 	protected static $categories_migration = array(
 		'buttons' => 'call-to-action',
+		'columns' => 'media',
+		'text'    => 'media',
 		'query'   => 'posts',
 	);
 
