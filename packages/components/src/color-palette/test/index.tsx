@@ -142,7 +142,7 @@ describe( 'ColorPalette', () => {
 		} );
 		const onChange = jest.fn();
 
-		render(
+		const { unmount } = render(
 			<ColorPalette
 				colors={ EXAMPLE_COLORS }
 				value={ INITIAL_COLOR }
@@ -182,6 +182,9 @@ describe( 'ColorPalette', () => {
 				getWrappingPopoverElement( dropdownColorInput )
 			).toBePositionedPopover()
 		);
+
+		// Cancel any pending and currently running popover effects.
+		unmount();
 	} );
 
 	it( 'should show the clear button by default', () => {

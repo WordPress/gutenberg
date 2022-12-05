@@ -103,7 +103,7 @@ describe( 'ToggleGroupControl', () => {
 		const user = userEvent.setup( {
 			advanceTimers: jest.advanceTimersByTime,
 		} );
-		render(
+		const { unmount } = render(
 			<ToggleGroupControl label="Test Toggle Group Control">
 				{ optionsWithTooltip }
 			</ToggleGroupControl>
@@ -126,6 +126,9 @@ describe( 'ToggleGroupControl', () => {
 		);
 
 		expect( tooltip ).toBeVisible();
+
+		// Cancel any pending and currently running popover effects.
+		unmount();
 	} );
 
 	it( 'should not render tooltip', async () => {

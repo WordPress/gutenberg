@@ -48,7 +48,7 @@ describe( 'Tooltip', () => {
 		it( 'should render children with additional tooltip when focused', async () => {
 			const mockOnFocus = jest.fn();
 
-			render(
+			const { unmount } = render(
 				<Tooltip text="Help text">
 					<button onFocus={ mockOnFocus }>Hover Me!</button>
 				</Tooltip>
@@ -77,6 +77,9 @@ describe( 'Tooltip', () => {
 					getWrappingPopoverElement( tooltip )
 				).toBePositionedPopover()
 			);
+
+			// Cancel any pending and currently running popover effects.
+			unmount();
 		} );
 
 		it( 'should render children with additional tooltip when hovered', async () => {
@@ -84,7 +87,7 @@ describe( 'Tooltip', () => {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
 
-			render(
+			const { unmount } = render(
 				<Tooltip text="Help text">
 					<button>Hover Me!</button>
 				</Tooltip>
@@ -110,6 +113,9 @@ describe( 'Tooltip', () => {
 					getWrappingPopoverElement( tooltip )
 				).toBePositionedPopover()
 			);
+
+			// Cancel any pending and currently running popover effects.
+			unmount();
 		} );
 
 		it( 'should not show tooltip on focus as result of mouse click', async () => {
@@ -152,7 +158,7 @@ describe( 'Tooltip', () => {
 			const mockOnMouseEnter = jest.fn();
 			const mockOnFocus = jest.fn();
 
-			render(
+			const { unmount } = render(
 				<Tooltip text="Help text" delay={ TEST_DELAY }>
 					<button
 						onMouseEnter={ mockOnMouseEnter }
@@ -192,6 +198,9 @@ describe( 'Tooltip', () => {
 					getWrappingPopoverElement( tooltip )
 				).toBePositionedPopover()
 			);
+
+			// Cancel any pending and currently running popover effects.
+			unmount();
 		} );
 
 		it( 'should show tooltip when an element is disabled', async () => {
@@ -199,7 +208,7 @@ describe( 'Tooltip', () => {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
 
-			const { container } = render(
+			const { container, unmount } = render(
 				<Tooltip text="Show helpful text here">
 					<button disabled>Click me</button>
 				</Tooltip>
@@ -236,6 +245,9 @@ describe( 'Tooltip', () => {
 					getWrappingPopoverElement( tooltip )
 				).toBePositionedPopover()
 			);
+
+			// Cancel any pending and currently running popover effects.
+			unmount();
 		} );
 
 		it( 'should not emit events back to children when they are disabled', async () => {
@@ -317,7 +329,7 @@ describe( 'Tooltip', () => {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
 
-			render(
+			const { unmount } = render(
 				<Tooltip text="Help text" shortcut="shortcut text">
 					<button>Hover Me!</button>
 				</Tooltip>
@@ -335,6 +347,9 @@ describe( 'Tooltip', () => {
 					getWrappingPopoverElement( tooltip )
 				).toBePositionedPopover()
 			);
+
+			// Cancel any pending and currently running popover effects.
+			unmount();
 		} );
 
 		it( 'should render the shortcut display text and aria-label when an object is passed as the shortcut with the correct properties', async () => {
@@ -342,7 +357,7 @@ describe( 'Tooltip', () => {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
 
-			render(
+			const { unmount } = render(
 				<Tooltip
 					text="Help text"
 					shortcut={ {
@@ -366,6 +381,9 @@ describe( 'Tooltip', () => {
 					getWrappingPopoverElement( tooltip )
 				).toBePositionedPopover()
 			);
+
+			// Cancel any pending and currently running popover effects.
+			unmount();
 		} );
 	} );
 } );

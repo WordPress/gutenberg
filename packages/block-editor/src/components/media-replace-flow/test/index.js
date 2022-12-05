@@ -59,7 +59,7 @@ describe( 'General media replace flow', () => {
 			advanceTimers: jest.advanceTimersByTime,
 		} );
 
-		render( <TestWrapper /> );
+		const { unmount } = render( <TestWrapper /> );
 
 		await user.click(
 			screen.getByRole( 'button', {
@@ -76,6 +76,9 @@ describe( 'General media replace flow', () => {
 		);
 
 		await waitFor( () => expect( uploadMenu ).toBeVisible() );
+
+		// Cancel any pending and currently running popover effects.
+		unmount();
 	} );
 
 	it( 'displays media URL', async () => {
@@ -83,7 +86,7 @@ describe( 'General media replace flow', () => {
 			advanceTimers: jest.advanceTimersByTime,
 		} );
 
-		render( <TestWrapper /> );
+		const { unmount } = render( <TestWrapper /> );
 
 		await user.click(
 			screen.getByRole( 'button', {
@@ -101,6 +104,9 @@ describe( 'General media replace flow', () => {
 		);
 
 		expect( link ).toHaveAttribute( 'href', 'https://example.media' );
+
+		// Cancel any pending and currently running popover effects.
+		unmount();
 	} );
 
 	it( 'edits media URL', async () => {
@@ -108,7 +114,7 @@ describe( 'General media replace flow', () => {
 			advanceTimers: jest.advanceTimersByTime,
 		} );
 
-		render( <TestWrapper /> );
+		const { unmount } = render( <TestWrapper /> );
 
 		await user.click(
 			screen.getByRole( 'button', {
@@ -152,5 +158,8 @@ describe( 'General media replace flow', () => {
 				name: 'new.example.media (opens in a new tab)',
 			} )
 		).toHaveAttribute( 'href', 'https://new.example.media' );
+
+		// Cancel any pending and currently running popover effects.
+		unmount();
 	} );
 } );
