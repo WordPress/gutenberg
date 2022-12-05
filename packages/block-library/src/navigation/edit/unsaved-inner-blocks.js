@@ -99,9 +99,6 @@ export default function UnsavedInnerBlocks( {
 			!! originalBlocks.current && blocks !== originalBlocks.current;
 	}
 
-	// if ( innerBlocksAreDirty ) {
-	// 	debugger;
-	// }
 	const shouldDirectInsert = useMemo(
 		() =>
 			blocks.every(
