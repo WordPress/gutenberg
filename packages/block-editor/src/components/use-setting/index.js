@@ -123,7 +123,7 @@ export default function useSetting( path ) {
 				return undefined;
 			}
 
-			// 0. Allow third-parties to filter into the block's settings at runtime.
+			// 0. Allow third parties to filter the block's settings at runtime.
 			let result = applyFilters(
 				'blockEditor.useSetting.before',
 				undefined,
