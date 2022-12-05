@@ -378,7 +378,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$global_settings               = gutenberg_get_global_settings();
 		$block_gap                     = _wp_array_get( $global_settings, array( 'spacing', 'blockGap' ), $global_settings );
 		$has_block_gap_support         = isset( $block_gap );
-		$global_layout_settings        = _wp_array_get( $global_settings, array( 'layout' ), $global_settings );
+		$global_layout_settings        = _wp_array_get( $global_settings, array( 'layout' ), null );
 		$root_padding_aware_alignments = _wp_array_get( $global_settings, array( 'useRootPaddingAwareAlignments' ), false );
 		$static_information_computed   = true;
 	}
