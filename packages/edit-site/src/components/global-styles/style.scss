@@ -52,8 +52,12 @@
 	}
 }
 
-.edit-site-global-styles-header__description,
+.edit-site-global-styles-header__description {
+	padding: 0 $grid-unit-20;
+}
+
 .edit-site-block-types-search {
+	margin-bottom: $grid-unit-10;
 	padding: 0 $grid-unit-20;
 }
 

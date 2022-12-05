@@ -23,7 +23,7 @@ import {
 	isReusableBlock,
 } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { withDispatch, withSelect, useSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { moreHorizontalMobile } from '@wordpress/icons';
 import { useRef, useState } from '@wordpress/element';
@@ -77,6 +77,12 @@ const BlockActionsMenu = ( {
 	const isPasteEnabled =
 		clipboardBlock &&
 		canInsertBlockType( clipboardBlock.name, rootClientId );
+
+	const innerBlockCount = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlockCount( selectedBlockClientId ),
+		[ selectedBlockClientId ]
+	);
 
 	const {
 		actionTitle: {
@@ -187,13 +193,21 @@ const BlockActionsMenu = ( {
 		},
 		convertToRegularBlocks: {
 			id: 'convertToRegularBlocksOption',
-			label: __( 'Convert to regular blocks' ),
+			label:
+				innerBlockCount > 1
+					? __( 'Convert to regular blocks' )
+					: __( 'Convert to regular block' ),
 			value: 'convertToRegularBlocksOption',
 			onSelect: () => {
+				const successNotice =
+					innerBlockCount > 1
+						? /* translators: %s: name of the reusable block */
+						  __( '%s converted to regular blocks' )
+						: /* translators: %s: name of the reusable block */
+						  __( '%s converted to regular block' );
 				createSuccessNotice(
 					sprintf(
-						/* translators: %s: name of the reusable block */
-						__( '%s converted to regular blocks' ),
+						successNotice,
 						reusableBlock?.title?.raw || blockTitle
 					)
 				);
@@ -293,6 +307,8 @@ const BlockActionsMenu = ( {
 	);
 };
 
+const EMPTY_BLOCK_LIST = [];
+
 export default compose(
 	withSelect( ( select, { clientIds } ) => {
 		const {
@@ -345,8 +361,8 @@ export default compose(
 			? getBlocksByClientId( selectedBlockClientId )[ 0 ]
 			: undefined;
 		const selectedBlockPossibleTransformations = selectedBlock
-			? getBlockTransformItems( [ selectedBlock ], rootClientId )
-			: [];
+			? getBlockTransformItems( selectedBlock, rootClientId )
+			: EMPTY_BLOCK_LIST;
 
 		const isReusableBlockType = block ? isReusableBlock( block ) : false;
 		const reusableBlock = isReusableBlockType

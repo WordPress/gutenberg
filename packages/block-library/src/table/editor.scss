@@ -41,10 +41,6 @@
 		border-style: double;
 	}
 
-	figcaption {
-		@include caption-style-theme();
-	}
-
 	// This is only required in the editor to overcome the fact the editor
 	// rewrites border width styles into shorthand.
 	table.has-individual-borders {

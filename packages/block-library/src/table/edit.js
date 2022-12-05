@@ -404,7 +404,7 @@ function TableEdit( {
 				<tr key={ rowIndex }>
 					{ cells.map(
 						(
-							{ content, tag: CellTag, scope, align },
+							{ content, tag: CellTag, scope, align, colspan },
 							columnIndex
 						) => (
 							<RichText
@@ -417,6 +417,7 @@ function TableEdit( {
 									'wp-block-table__cell-content'
 								) }
 								scope={ CellTag === 'th' ? scope : undefined }
+								colSpan={ colspan }
 								value={ content }
 								onChange={ onChange }
 								unstableOnFocus={ () => {

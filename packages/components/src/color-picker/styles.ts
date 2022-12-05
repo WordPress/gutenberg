@@ -38,10 +38,6 @@ export const SelectControl = styled( InnerSelectControl )`
 export const RangeControl = styled( InnerRangeControl )`
 	flex: 1;
 	margin-right: ${ space( 2 ) };
-
-	${ StyledField } {
-		margin-bottom: 0;
-	}
 `;
 
 // Make the Hue circle picker not go out of the bar.

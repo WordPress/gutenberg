@@ -2,9 +2,40 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
+
+### New Feature
+
+-   `TabPanel`: support manual tab activation ([#46004](https://github.com/WordPress/gutenberg/pull/46004)).
+
+### Bug Fix
+
+-   `ColorPalette`: show "Clear" button even when colors array is empty ([#46001](https://github.com/WordPress/gutenberg/pull/46001)).
+
 ### Enhancements
 
 -   `TabPanel`: Add ability to set icon only tab buttons ([#45005](https://github.com/WordPress/gutenberg/pull/45005)).
+-   `InputControl`, `NumberControl`, `UnitControl`: Add `help` prop for additional description ([#45931](https://github.com/WordPress/gutenberg/pull/45931)).
+-   `BorderControl`, `ColorPicker` & `QueryControls`: Replace bottom margin overrides with `__nextHasNoMarginBottom` ([#45985](https://github.com/WordPress/gutenberg/pull/45985)).
+-   `CustomSelectControl`, `UnitControl`: Add `onFocus` and `onBlur` props ([#46096](https://github.com/WordPress/gutenberg/pull/46096)).
+-   `ResizableBox`: Prevent unnecessary paint on resize handles ([#46196](https://github.com/WordPress/gutenberg/pull/46196))
+
+### Experimental
+
+-   `TextControl`: Restrict `type` prop to `email`, `number`, `password`, `tel`, `text`, `search` or `url` ([#45433](https://github.com/WordPress/gutenberg/pull/45433/)).
+
+### Internal
+
+-   `useControlledValue`: let TypeScript infer the return type ([#46164](https://github.com/WordPress/gutenberg/pull/46164))
+-   `LinkedButton`: remove unnecessary `span` tag ([#46063](https://github.com/WordPress/gutenberg/pull/46063))
+-   NumberControl: refactor styles/tests/stories to TypeScript, replace fireEvent with user-event ([#45990](https://github.com/WordPress/gutenberg/pull/45990)).
+-   `useBaseField`: Convert to TypeScript ([#45712](https://github.com/WordPress/gutenberg/pull/45712)).
+
+### Documentation
+
+-   `Tooltip`: Add readme and unit tests for `shortcut` prop ([#46092](https://github.com/WordPress/gutenberg/pull/46092)).
 
 ## 22.1.0 (2022-11-16)
 
@@ -24,6 +55,7 @@
 -   `Icon`: Making size prop work for icon components using dash icon strings ([#45593](https://github.com/WordPress/gutenberg/pull/45593))
 -   `ToolsPanelItem`: Prevent unintended calls to onDeselect when parent panel is remounted and item is rendered via SlotFill ([#45673](https://github.com/WordPress/gutenberg/pull/45673))
 -   `ColorPicker`: Prevent all number fields from becoming "0" when one of them is an empty string ([#45649](https://github.com/WordPress/gutenberg/pull/45649)).
+-   `ToggleControl`: Fix toggle control label text overflow ([#45962](https://github.com/WordPress/gutenberg/pull/45962)).
 
 ### Internal
 
@@ -44,6 +76,7 @@
 ### Experimental
 
 -   `ToggleGroupControl`: Only show enclosing border when `isBlock` and not `isDeselectable` ([#45492](https://github.com/WordPress/gutenberg/pull/45492)).
+-   `Theme`: Add support for custom `background` color ([#45466](https://github.com/WordPress/gutenberg/pull/45466)).
 
 ## 22.0.0 (2022-11-02)
 

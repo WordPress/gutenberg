@@ -18,6 +18,86 @@
 class WP_Theme_JSON_Resolver_6_2 extends WP_Theme_JSON_Resolver_6_1 {
 
 	/**
+	 * Returns the custom post type that contains the user's origin config
+	 * for the active theme or a void array if none are found.
+	 *
+	 * This can also create and return a new draft custom post type.
+	 *
+	 * @param WP_Theme $theme              The theme object. If empty, it
+	 *                                     defaults to the active theme.
+	 * @param bool     $create_post        Optional. Whether a new custom post
+	 *                                     type should be created if none are
+	 *                                     found. Default false.
+	 * @param array    $post_status_filter Optional. Filter custom post type by
+	 *                                     post status. Default `array( 'publish' )`,
+	 *                                     so it only fetches published posts.
+	 * @return array Custom Post Type for the user's origin config.
+	 */
+	public static function get_user_data_from_wp_global_styles( $theme, $create_post = false, $post_status_filter = array( 'publish' ) ) {
+		if ( ! $theme instanceof WP_Theme ) {
+			$theme = wp_get_theme();
+		}
+
+		/*
+		 * Bail early if the theme does not support a theme.json.
+		 *
+		 * Since wp_theme_has_theme_json only supports the active
+		 * theme, the extra condition for whether $theme is the active theme is
+		 * present here.
+		 */
+		if ( $theme->get_stylesheet() === get_stylesheet() && ! wp_theme_has_theme_json() ) {
+			return array();
+		}
+
+		$user_cpt         = array();
+		$post_type_filter = 'wp_global_styles';
+		$stylesheet       = $theme->get_stylesheet();
+		$args             = array(
+			'posts_per_page'         => 1,
+			'orderby'                => 'date',
+			'order'                  => 'desc',
+			'post_type'              => $post_type_filter,
+			'post_status'            => $post_status_filter,
+			'ignore_sticky_posts'    => true,
+			'no_found_rows'          => true,
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'tax_query'              => array(
+				array(
+					'taxonomy' => 'wp_theme',
+					'field'    => 'name',
+					'terms'    => $stylesheet,
+				),
+			),
+		);
+
+		$global_style_query = new WP_Query();
+		$recent_posts       = $global_style_query->query( $args );
+		if ( count( $recent_posts ) === 1 ) {
+			$user_cpt = get_object_vars( $recent_posts[0] );
+		} elseif ( $create_post ) {
+			$cpt_post_id = wp_insert_post(
+				array(
+					'post_content' => '{"version": ' . WP_Theme_JSON::LATEST_SCHEMA . ', "isGlobalStylesUserThemeJSON": true }',
+					'post_status'  => 'publish',
+					'post_title'   => 'Custom Styles', // Do not make string translatable, see https://core.trac.wordpress.org/ticket/54518.
+					'post_type'    => $post_type_filter,
+					'post_name'    => sprintf( 'wp-global-styles-%s', urlencode( $stylesheet ) ),
+					'tax_input'    => array(
+						'wp_theme' => array( $stylesheet ),
+					),
+				),
+				true
+			);
+			if ( ! is_wp_error( $cpt_post_id ) ) {
+				$user_cpt = get_object_vars( get_post( $cpt_post_id ) );
+			}
+		}
+
+		return $user_cpt;
+	}
+
+	/**
 	 * Determines whether the active theme has a theme.json file.
 	 *
 	 * @since 5.8.0
@@ -33,28 +113,59 @@ class WP_Theme_JSON_Resolver_6_2 extends WP_Theme_JSON_Resolver_6_1 {
 	}
 
 	/**
-	 * Private method to clean the cached data after an upgrade.
+	 * Returns the data merged from multiple origins.
 	 *
-	 * It is hooked into the `upgrader_process_complete` action.
+	 * There are four sources of data (origins) for a site:
 	 *
-	 * @see default-filters.php
+	 * - default => WordPress
+	 * - blocks  => each one of the blocks provides data for itself
+	 * - theme   => the active theme
+	 * - custom  => data provided by the user
 	 *
-	 * @param WP_Upgrader $upgrader WP_Upgrader instance.
-	 * @param array       $options  Array of bulk item update data.
+	 * The custom's has higher priority than the theme's, the theme's higher than blocks',
+	 * and block's higher than default's.
+	 *
+	 * Unlike the getters
+	 * {@link https://developer.wordpress.org/reference/classes/wp_theme_json_resolver/get_core_data/ get_core_data},
+	 * {@link https://developer.wordpress.org/reference/classes/wp_theme_json_resolver/get_theme_data/ get_theme_data},
+	 * and {@link https://developer.wordpress.org/reference/classes/wp_theme_json_resolver/get_user_data/ get_user_data},
+	 * this method returns data after it has been merged with the previous origins.
+	 * This means that if the same piece of data is declared in different origins
+	 * (default, blocks, theme, custom), the last origin overrides the previous.
+	 *
+	 * For example, if the user has set a background color
+	 * for the paragraph block, and the theme has done it as well,
+	 * the user preference wins.
+	 *
+	 * @param string $origin Optional. To what level should we merge data:'default', 'blocks', 'theme' or 'custom'.
+	 *                       'custom' is used as default value as well as fallback value if the origin is unknown.
+	 *
+	 * @return WP_Theme_JSON
 	 */
-	public static function _clean_cached_data_upon_upgrading( $upgrader, $options ) {
-		if ( 'update' !== $options['action'] ) {
-			return;
+	public static function get_merged_data( $origin = 'custom' ) {
+		if ( is_array( $origin ) ) {
+			_deprecated_argument( __FUNCTION__, '5.9.0' );
 		}
 
-		if (
-			'core' === $options['type'] ||
-			'plugin' === $options['type'] ||
-			// Clean cache only if the active theme was updated.
-			( 'theme' === $options['type'] && ( isset( $options['themes'][ get_stylesheet() ] ) || isset( $options['themes'][ get_template() ] ) ) )
-		) {
-			static::clean_cached_data();
+		$result = static::get_core_data();
+		if ( 'default' === $origin ) {
+			$result->set_spacing_sizes();
+			return $result;
 		}
+
+		$result->merge( static::get_block_data() );
+		if ( 'blocks' === $origin ) {
+			return $result;
+		}
+
+		$result->merge( static::get_theme_data() );
+		if ( 'theme' === $origin ) {
+			$result->set_spacing_sizes();
+			return $result;
+		}
+
+		$result->merge( static::get_user_data() );
+		$result->set_spacing_sizes();
+		return $result;
 	}
-
 }

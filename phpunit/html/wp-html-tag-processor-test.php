@@ -1296,18 +1296,24 @@ HTML;
 		);
 
 		$examples['Multiple unclosed tags treated as a single tag'] = array(
-			'<hr id=">"code
-<hr id="value>"code
-<hr id="/>"code
-<hr id="value/>"code
-/>
-<span>test</span>',
-			'<hr foo="bar" class="firstTag" id=">"code
-<hr id="value>"code
-<hr id="/>"code
-<hr id="value/>"code
-/>
-<span class="secondTag">test</span>',
+			<<<HTML
+			<hr id=">"code
+			<hr id="value>"code
+			<hr id="/>"code
+			<hr id="value/>"code
+			/>
+			<span>test</span>
+HTML
+			,
+			<<<HTML
+			<hr foo="bar" class="firstTag" id=">"code
+			<hr id="value>"code
+			<hr id="/>"code
+			<hr id="value/>"code
+			/>
+			<span class="secondTag">test</span>
+HTML
+		,
 		);
 
 		$examples['27'] = array(

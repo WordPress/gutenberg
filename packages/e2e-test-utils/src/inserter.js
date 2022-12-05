@@ -100,6 +100,20 @@ async function waitForInserterCloseAndContentFocus() {
 }
 
 /**
+ * Wait for the inserter search to yield results because that input is debounced.
+ */
+async function waitForInserterSearch() {
+	try {
+		await page.waitForSelector(
+			'.block-editor-inserter__no-tab-container',
+			{ timeout: 2000 }
+		);
+	} catch ( e ) {
+		// This selector doesn't exist in older versions, so let's just continue.
+	}
+}
+
+/**
  * Search for block in the global inserter
  *
  * @param {string} searchTerm The text to search the inserter for.
@@ -110,6 +124,7 @@ export async function searchForBlock( searchTerm ) {
 	await page.focus( INSERTER_SEARCH_SELECTOR );
 	await pressKeyWithModifier( 'primary', 'a' );
 	await page.keyboard.type( searchTerm );
+	await waitForInserterSearch();
 }
 
 /**
@@ -128,6 +143,7 @@ export async function searchForPattern( searchTerm ) {
 	await page.focus( INSERTER_SEARCH_SELECTOR );
 	await pressKeyWithModifier( 'primary', 'a' );
 	await page.keyboard.type( searchTerm );
+	await waitForInserterSearch();
 }
 
 /**
@@ -154,6 +170,7 @@ export async function searchForReusableBlock( searchTerm ) {
 	await page.focus( INSERTER_SEARCH_SELECTOR );
 	await pressKeyWithModifier( 'primary', 'a' );
 	await page.keyboard.type( searchTerm );
+	await waitForInserterSearch();
 }
 
 /**

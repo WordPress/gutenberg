@@ -101,6 +101,7 @@ module.exports = {
 							'escapeRegExp',
 							'every',
 							'extend',
+							'filter',
 							'findIndex',
 							'findKey',
 							'findLast',
@@ -118,6 +119,7 @@ module.exports = {
 							'invoke',
 							'isArray',
 							'isBoolean',
+							'isEqual',
 							'isFinite',
 							'isFunction',
 							'isMatch',
@@ -143,6 +145,7 @@ module.exports = {
 							'overEvery',
 							'partial',
 							'partialRight',
+							'pick',
 							'random',
 							'reduce',
 							'reject',
@@ -199,6 +202,26 @@ module.exports = {
 						name: '@emotion/css',
 						message:
 							'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support. As a replacement for the `cx` function, please use the `useCx` hook defined in `@wordpress/components` instead.',
+					},
+					{
+						name: '@wordpress/edit-post',
+						message:
+							"edit-post is a WordPress top level package that shouldn't be imported into other packages",
+					},
+					{
+						name: '@wordpress/edit-site',
+						message:
+							"edit-site is a WordPress top level package that shouldn't be imported into other packages",
+					},
+					{
+						name: '@wordpress/edit-widgets',
+						message:
+							"edit-widgets is a WordPress top level package that shouldn't be imported into other packages",
+					},
+					{
+						name: '@wordpress/edit-navigation',
+						message:
+							"edit-navigation is a WordPress top level package that shouldn't be imported into other packages",
 					},
 				],
 			},
@@ -347,7 +370,6 @@ module.exports = {
 				'plugin:testing-library/react',
 			],
 			rules: {
-				'testing-library/no-container': 'off',
 				'testing-library/no-node-access': 'off',
 			},
 		},
