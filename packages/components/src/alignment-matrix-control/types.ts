@@ -20,6 +20,8 @@ export type AlignmentMatrixControlProps = {
 	label?: string;
 	/**
 	 * If provided, sets the default alignment value.
+	 *
+	 * @default 'center center'
 	 */
 	defaultValue?: AlignmentMatrixControlValue;
 	/**
@@ -32,6 +34,8 @@ export type AlignmentMatrixControlProps = {
 	onChange?: ( newValue: AlignmentMatrixControlValue ) => void;
 	/**
 	 * If provided, sets the width of the wrapper <Composite/> component.
+	 *
+	 * @default 92
 	 */
 	width?: number;
 };
