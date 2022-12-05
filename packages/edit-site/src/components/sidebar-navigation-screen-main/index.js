@@ -3,7 +3,6 @@
  */
 import {
 	__experimentalItemGroup as ItemGroup,
-	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	__experimentalNavigatorScreen as NavigatorScreen,
 	__experimentalNavigatorButton as NavigatorButton,
@@ -17,7 +16,7 @@ import { useViewportMatch } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import SidebarNavigationTitle from '../sidebar-navigation-title';
+import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { useLocation } from '../routes';
@@ -47,27 +46,24 @@ export default function SidebarNavigationScreenMain() {
 
 	return (
 		<NavigatorScreen path="/">
-			<VStack spacing={ 6 }>
-				<SidebarNavigationTitle
-					title={
-						<HStack style={ { minHeight: 36 } }>
-							<div>{ __( 'Design' ) }</div>
-							{ ! isMobileViewport && isEditorPage && (
-								<Button
-									className="edit-site-layout__edit-button"
-									label={ __( 'Open the editor' ) }
-									onClick={ () => {
-										__unstableSetCanvasMode( 'edit' );
-									} }
-								>
-									{ __( 'Edit' ) }
-								</Button>
-							) }
-						</HStack>
-					}
-				/>
-
-				<nav className="edit-site-sidebar-navigation-root">
+			<SidebarNavigationScreen
+				title={
+					<HStack style={ { minHeight: 36 } }>
+						<div>{ __( 'Design' ) }</div>
+						{ ! isMobileViewport && isEditorPage && (
+							<Button
+								className="edit-site-layout__edit-button"
+								label={ __( 'Open the editor' ) }
+								onClick={ () => {
+									__unstableSetCanvasMode( 'edit' );
+								} }
+							>
+								{ __( 'Edit' ) }
+							</Button>
+						) }
+					</HStack>
+				}
+				content={
 					<ItemGroup>
 						<NavigatorButton
 							as={ SidebarNavigationItem }
@@ -91,8 +87,8 @@ export default function SidebarNavigationScreenMain() {
 							{ __( 'Template Parts' ) }
 						</SidebarNavigationItem>
 					</ItemGroup>
-				</nav>
-			</VStack>
+				}
+			/>
 		</NavigatorScreen>
 	);
 }

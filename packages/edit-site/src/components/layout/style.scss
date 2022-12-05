@@ -46,6 +46,8 @@
 	grid-area: sidebar;
 	z-index: 1;
 	padding-top: $grid-unit-80;
+	overflow-y: auto;
+	max-height: calc(100vh - #{$header-height});
 
 	// This is only necessary for the exit animation
 	.edit-site-layout.is-full-canvas & {
