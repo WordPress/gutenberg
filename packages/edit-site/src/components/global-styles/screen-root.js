@@ -98,6 +98,38 @@ function ScreenRoot() {
 					</NavigationButtonAsItem>
 				</ItemGroup>
 			</CardBody>
+
+			<CardDivider />
+
+			<CardBody>
+				<Spacer
+					as="p"
+					paddingTop={ 2 }
+					/*
+					 * 13px matches the text inset of the NavigationButton (12px padding, plus the width of the button's border).
+					 * This is an ad hoc override for this particular instance only and should be reconsidered before making into a pattern.
+					 */
+					paddingX="13px"
+					marginBottom={ 4 }
+				>
+					{ __(
+						'Customize the appearance of your site even further with CSS.'
+					) }
+				</Spacer>
+				<ItemGroup>
+					<NavigationButtonAsItem
+						path="/css"
+						aria-label={ __( 'Additional CSS' ) }
+					>
+						<HStack justify="space-between">
+							<FlexItem>{ __( 'Custom' ) }</FlexItem>
+							<IconWithCurrentColor
+								icon={ isRTL() ? chevronLeft : chevronRight }
+							/>
+						</HStack>
+					</NavigationButtonAsItem>
+				</ItemGroup>
+			</CardBody>
 		</Card>
 	);
 }
