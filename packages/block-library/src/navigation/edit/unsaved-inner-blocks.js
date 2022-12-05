@@ -46,10 +46,10 @@ export default function UnsavedInnerBlocks( {
 	useEffect( () => {
 		// Initially store the uncontrolled inner blocks for
 		// dirty state comparison.
-		if ( ! originalBlocks?.current ) {
+		if ( ! hasSelection ) {
 			originalBlocks.current = blocks;
 		}
-	}, [ blocks ] );
+	}, [ blocks, hasSelection ] );
 
 	// If the current inner blocks object is different in any way
 	// from the original inner blocks from the post content then the
