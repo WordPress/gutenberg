@@ -23,7 +23,7 @@ export {
 	default as Autocomplete,
 	useAutocompleteProps as __unstableUseAutocompleteProps,
 } from './autocomplete';
-export { default as BaseControl } from './base-control';
+export { default as BaseControl, useBaseControlProps } from './base-control';
 export {
 	BorderBoxControl as __experimentalBorderBoxControl,
 	hasSplitBorders as __experimentalHasSplitBorders,
