@@ -186,6 +186,7 @@ export default function BorderPanel( { name } ) {
 						value={ border }
 						__experimentalHasMultipleOrigins={ true }
 						__experimentalIsRenderedInSidebar={ true }
+						size={ '__unstable-large' }
 					/>
 				</ToolsPanelItem>
 			) }

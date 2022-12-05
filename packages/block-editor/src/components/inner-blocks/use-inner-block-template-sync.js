@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
@@ -40,9 +40,10 @@ export default function useInnerBlockTemplateSync(
 	templateLock,
 	templateInsertUpdatesSelection
 ) {
-	const { getSelectedBlocksInitialCaretPosition } =
+	const { getSelectedBlocksInitialCaretPosition, isBlockSelected } =
 		useSelect( blockEditorStore );
-	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
+	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 	const innerBlocks = useSelect(
 		( select ) => select( blockEditorStore ).getBlocks( clientId ),
 		[ clientId ]
@@ -65,7 +66,7 @@ export default function useInnerBlockTemplateSync(
 				templateLock === 'all' ||
 				templateLock === 'contentOnly';
 
-			const hasTemplateChanged = ! isEqual(
+			const hasTemplateChanged = ! fastDeepEqual(
 				template,
 				existingTemplate.current
 			);
@@ -80,13 +81,15 @@ export default function useInnerBlockTemplateSync(
 				template
 			);
 
-			if ( ! isEqual( nextBlocks, currentInnerBlocks ) ) {
+			if ( ! fastDeepEqual( nextBlocks, currentInnerBlocks ) ) {
+				__unstableMarkNextChangeAsNotPersistent();
 				replaceInnerBlocks(
 					clientId,
 					nextBlocks,
 					currentInnerBlocks.length === 0 &&
 						templateInsertUpdatesSelection &&
-						nextBlocks.length !== 0,
+						nextBlocks.length !== 0 &&
+						isBlockSelected( clientId ),
 					// This ensures the "initialPosition" doesn't change when applying the template
 					// If we're supposed to focus the block, we'll focus the first inner block
 					// otherwise, we won't apply any auto-focus.

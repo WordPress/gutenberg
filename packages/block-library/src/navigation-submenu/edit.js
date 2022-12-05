@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escape, without } from 'lodash';
+import escapeHtml from 'escape-html';
 
 /**
  * WordPress dependencies
@@ -37,7 +37,10 @@ import {
 	useRef,
 	createInterpolateElement,
 } from '@wordpress/element';
-import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
+import {
+	placeCaretAtHorizontalEdge,
+	__unstableStripHTML as stripHTML,
+} from '@wordpress/dom';
 import { link as linkIcon, removeSubmenu } from '@wordpress/icons';
 import {
 	useResourcePermissions,
@@ -248,8 +251,8 @@ export const updateNavigationLinkBlockAttributes = (
 		normalizedTitle !== normalizedURL &&
 		originalLabel !== title;
 	const label = escapeTitle
-		? escape( title )
-		: originalLabel || escape( normalizedURL );
+		? escapeHtml( title )
+		: originalLabel || escapeHtml( normalizedURL );
 
 	// In https://github.com/WordPress/gutenberg/pull/24670 we decided to use "tag" in favor of "post_tag"
 	const type = newType === 'post_tag' ? 'tag' : newType.replace( '-', '_' );
@@ -284,6 +287,7 @@ export default function NavigationSubmenuEdit( {
 	const { label, type, opensInNewTab, url, description, rel, title, kind } =
 		attributes;
 	const link = {
+		title: label && stripHTML( label ),
 		url,
 		opensInNewTab,
 	};
@@ -486,7 +490,9 @@ export default function NavigationSubmenuEdit( {
 	const innerBlocksColors = getColors( context, true );
 
 	const allowedBlocks = isAtMaxNesting
-		? without( ALLOWED_BLOCKS, 'core/navigation-submenu' )
+		? ALLOWED_BLOCKS.filter(
+				( blockName ) => blockName !== 'core/navigation-submenu'
+		  )
 		: ALLOWED_BLOCKS;
 
 	const innerBlocksProps = useInnerBlocksProps(
@@ -539,6 +545,13 @@ export default function NavigationSubmenuEdit( {
 		replaceBlock( clientId, newLinkBlock );
 	}
 
+	useEffect( () => {
+		// If block is empty, transform to Navigation Link.
+		if ( ! hasChildren ) {
+			transformToLink();
+		}
+	}, [ hasChildren ] );
+
 	const canConvertToLink =
 		! selectedBlockHasChildren || onlyDescendantIsEmptyLink;
 
@@ -566,8 +579,25 @@ export default function NavigationSubmenuEdit( {
 					/>
 				</ToolbarGroup>
 			</BlockControls>
+			{ /* Warning, this duplicated in packages/block-library/src/navigation-link/edit.js */ }
 			<InspectorControls>
 				<PanelBody title={ __( 'Link settings' ) }>
+					<TextControl
+						value={ label || '' }
+						onChange={ ( labelValue ) => {
+							setAttributes( { label: labelValue } );
+						} }
+						label={ __( 'Label' ) }
+						autoComplete="off"
+					/>
+					<TextControl
+						value={ url || '' }
+						onChange={ ( urlValue ) => {
+							setAttributes( { url: urlValue } );
+						} }
+						label={ __( 'URL' ) }
+						autoComplete="off"
+					/>
 					<TextareaControl
 						value={ description || '' }
 						onChange={ ( descriptionValue ) => {
@@ -631,7 +661,7 @@ export default function NavigationSubmenuEdit( {
 					}
 					{ ! openSubmenusOnClick && isLinkOpen && (
 						<Popover
-							position="bottom center"
+							placement="bottom"
 							onClose={ () => setIsLinkOpen( false ) }
 							anchor={ popoverAnchor }
 							shift
@@ -639,7 +669,8 @@ export default function NavigationSubmenuEdit( {
 							<LinkControl
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
-								showInitialSuggestions={ true }
+								hasTextControl
+								showInitialSuggestions
 								withCreateSuggestion={ userCanCreate }
 								createSuggestion={ handleCreate }
 								createSuggestionButtonText={ ( searchTerm ) => {

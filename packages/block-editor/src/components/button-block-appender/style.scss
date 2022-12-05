@@ -35,7 +35,10 @@
 // When the appender shows up in empty container blocks, such as Group and Columns, add an extra click state.
 .block-list-appender:only-child {
 	.is-layout-constrained.block-editor-block-list__block:not(.is-selected) > &,
-	.is-layout-flow.block-editor-block-list__block:not(.is-selected) > & {
+	.is-layout-flow.block-editor-block-list__block:not(.is-selected) > &,
+	// Legacy groups have an inner container so need to be targeted separately
+	.is-layout-constrained.block-editor-block-list__block:not(.is-selected) > .wp-block-group__inner-container > &,
+	.is-layout-flow.block-editor-block-list__block:not(.is-selected) > .wp-block-group__inner-container > & {
 		pointer-events: none;
 
 		&::after {
@@ -46,6 +49,7 @@
 			bottom: 0;
 			left: 0;
 			pointer-events: none;
+			border: $border-width dashed currentColor;
 			@include placeholder-style();
 		}
 

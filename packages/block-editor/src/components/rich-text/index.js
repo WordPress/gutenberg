@@ -44,6 +44,7 @@ import { useFormatTypes } from './use-format-types';
 import { useRemoveBrowserShortcuts } from './use-remove-browser-shortcuts';
 import { useShortcuts } from './use-shortcuts';
 import { useInputEvents } from './use-input-events';
+import { useInsertReplacementText } from './use-insert-replacement-text';
 import { useFirefoxCompat } from './use-firefox-compat';
 import FormatEdit from './format-edit';
 import { getMultilineTag, getAllowedFormats } from './utils';
@@ -159,6 +160,8 @@ function RichTextWrapper(
 	// retreived from the store on merge.
 	// To do: fix this somehow.
 	const { selectionStart, selectionEnd, isSelected } = useSelect( selector );
+	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
+		useSelect( blockEditorStore );
 	const { selectionChange } = useDispatch( blockEditorStore );
 	const multilineTag = getMultilineTag( multiline );
 	const adjustedAllowedFormats = getAllowedFormats( {
@@ -195,6 +198,18 @@ function RichTextWrapper(
 			const unset = start === undefined && end === undefined;
 
 			if ( typeof start === 'number' || unset ) {
+				// If we are only setting the start (or the end below), which
+				// means a partial selection, and we're not updating a selection
+				// with the same client ID, abort. This means the selected block
+				// is a parent block.
+				if (
+					end === undefined &&
+					getBlockRootClientId( clientId ) !==
+						getBlockRootClientId( getSelectionEnd().clientId )
+				) {
+					return;
+				}
+
 				selection.start = {
 					clientId,
 					attributeKey: identifier,
@@ -203,6 +218,14 @@ function RichTextWrapper(
 			}
 
 			if ( typeof end === 'number' || unset ) {
+				if (
+					start === undefined &&
+					getBlockRootClientId( clientId ) !==
+						getBlockRootClientId( getSelectionStart().clientId )
+				) {
+					return;
+				}
+
 				selection.end = {
 					clientId,
 					attributeKey: identifier,
@@ -386,6 +409,7 @@ function RichTextWrapper(
 						onReplace,
 						selectionChange,
 					} ),
+					useInsertReplacementText(),
 					useRemoveBrowserShortcuts(),
 					useShortcuts( keyboardShortcuts ),
 					useInputEvents( inputEvents ),

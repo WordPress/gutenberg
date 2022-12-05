@@ -81,6 +81,7 @@ module.exports = {
 						importNames: [
 							'camelCase',
 							'capitalize',
+							'castArray',
 							'chunk',
 							'clamp',
 							'cloneDeep',
@@ -96,8 +97,11 @@ module.exports = {
 							'differenceWith',
 							'dropRight',
 							'each',
+							'escape',
 							'escapeRegExp',
+							'every',
 							'extend',
+							'filter',
 							'findIndex',
 							'findKey',
 							'findLast',
@@ -111,9 +115,11 @@ module.exports = {
 							'fromPairs',
 							'has',
 							'identity',
+							'includes',
 							'invoke',
 							'isArray',
 							'isBoolean',
+							'isEqual',
 							'isFinite',
 							'isFunction',
 							'isMatch',
@@ -134,16 +140,20 @@ module.exports = {
 							'negate',
 							'noop',
 							'nth',
+							'omitBy',
 							'once',
 							'overEvery',
 							'partial',
 							'partialRight',
+							'pick',
 							'random',
+							'reduce',
 							'reject',
 							'repeat',
 							'reverse',
 							'size',
 							'snakeCase',
+							'some',
 							'sortBy',
 							'startCase',
 							'startsWith',
@@ -164,6 +174,7 @@ module.exports = {
 							'uniqWith',
 							'upperFirst',
 							'values',
+							'without',
 							'words',
 							'xor',
 							'zip',
@@ -191,6 +202,26 @@ module.exports = {
 						name: '@emotion/css',
 						message:
 							'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support. As a replacement for the `cx` function, please use the `useCx` hook defined in `@wordpress/components` instead.',
+					},
+					{
+						name: '@wordpress/edit-post',
+						message:
+							"edit-post is a WordPress top level package that shouldn't be imported into other packages",
+					},
+					{
+						name: '@wordpress/edit-site',
+						message:
+							"edit-site is a WordPress top level package that shouldn't be imported into other packages",
+					},
+					{
+						name: '@wordpress/edit-widgets',
+						message:
+							"edit-widgets is a WordPress top level package that shouldn't be imported into other packages",
+					},
+					{
+						name: '@wordpress/edit-navigation',
+						message:
+							"edit-navigation is a WordPress top level package that shouldn't be imported into other packages",
 					},
 				],
 			},
@@ -315,9 +346,32 @@ module.exports = {
 			},
 		},
 		{
+			files: [ 'packages/components/src/**/*.[tj]s?(x)' ],
+			excludedFiles: [ ...developmentFiles ],
+			rules: {
+				'react-hooks/exhaustive-deps': 'error',
+			},
+		},
+		{
 			files: [ 'packages/jest*/**/*.js', '**/test/**/*.js' ],
 			excludedFiles: [ 'test/e2e/**/*.js' ],
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-unit' ],
+		},
+		{
+			files: [ '**/test/**/*.[tj]s?(x)' ],
+			excludedFiles: [
+				'**/*.@(android|ios|native).[tj]s?(x)',
+				'packages/react-native-*/**/*.[tj]s?(x)',
+				'test/native/**/*.[tj]s?(x)',
+				'test/e2e/**/*.[tj]s?(x)',
+			],
+			extends: [
+				'plugin:jest-dom/recommended',
+				'plugin:testing-library/react',
+			],
+			rules: {
+				'testing-library/no-node-access': 'off',
+			},
 		},
 		{
 			files: [ 'packages/e2e-test*/**/*.js' ],
@@ -357,7 +411,7 @@ module.exports = {
 			},
 		},
 		{
-			files: [ 'bin/**/*.js', 'packages/env/**' ],
+			files: [ 'bin/**/*.js', 'bin/**/*.mjs', 'packages/env/**' ],
 			rules: {
 				'no-console': 'off',
 			},

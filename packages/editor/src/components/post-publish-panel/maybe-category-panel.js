@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { some } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -34,7 +29,7 @@ function MaybeCategoryPanel() {
 		);
 		const postTypeSupportsCategories =
 			categoriesTaxonomy &&
-			some( categoriesTaxonomy.types, ( type ) => type === postType );
+			categoriesTaxonomy.types.some( ( type ) => type === postType );
 		const categories =
 			categoriesTaxonomy &&
 			select( editorStore ).getEditedPostAttribute(

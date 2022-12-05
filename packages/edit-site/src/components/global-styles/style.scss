@@ -19,6 +19,7 @@
 	margin-bottom: $grid-unit-20;
 	background: $gray-100;
 	border-radius: $radius-block-ui;
+	overflow: hidden;
 }
 
 .edit-site-typography-panel__full-width-control {
@@ -51,8 +52,12 @@
 	}
 }
 
-.edit-site-global-styles-header__description,
+.edit-site-global-styles-header__description {
+	padding: 0 $grid-unit-20;
+}
+
 .edit-site-block-types-search {
+	margin-bottom: $grid-unit-10;
 	padding: 0 $grid-unit-20;
 }
 
@@ -97,7 +102,7 @@
 	}
 
 	&:focus .edit-site-global-styles-variations_item-preview {
-		border: var(--wp-admin-theme-color) $border-width solid;
+		border: var(--wp-admin-theme-color) var(--wp-admin-border-width-focus) solid;
 	}
 }
 

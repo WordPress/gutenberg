@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { every, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -50,8 +50,7 @@ export const PanelColorGradientSettingsInner = ( {
 		isEmpty( gradients ) &&
 		disableCustomColors &&
 		disableCustomGradients &&
-		every(
-			settings,
+		settings?.every(
 			( setting ) =>
 				isEmpty( setting.colors ) &&
 				isEmpty( setting.gradients ) &&
@@ -137,7 +136,7 @@ const PanelColorGradientSettingsMultipleSelect = ( props ) => {
 
 const PanelColorGradientSettings = ( props ) => {
 	if (
-		every( colorsAndGradientKeys, ( key ) => props.hasOwnProperty( key ) )
+		colorsAndGradientKeys.every( ( key ) => props.hasOwnProperty( key ) )
 	) {
 		return <PanelColorGradientSettingsInner { ...props } />;
 	}

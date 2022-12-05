@@ -111,7 +111,7 @@ describe( 'PostPreviewButton', () => {
 	it( 'should not be disabled if post is saveable.', async () => {
 		render( <PostPreviewButton isSaveable postId={ 123 } /> );
 
-		expect( screen.getByRole( 'button' ) ).not.toBeDisabled();
+		expect( screen.getByRole( 'button' ) ).toBeEnabled();
 	} );
 
 	it( 'should set `href` to `previewLink` if `previewLink` is specified.', async () => {

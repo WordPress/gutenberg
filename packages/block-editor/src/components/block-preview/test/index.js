@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -98,12 +98,6 @@ describe( 'useBlockPreview', () => {
 			'Test block edit view'
 		);
 		expect( previewedBlockContents ).toBeInTheDocument();
-
-		// Test elements within block contents are disabled.
-		await waitFor( () => {
-			const button = screen.getByText( 'Button' );
-			expect( button.hasAttribute( 'disabled' ) ).toBe( true );
-		} );
 
 		// Ensure the block preview class names are merged with the component's class name.
 		expect( container.firstChild.className ).toBe(

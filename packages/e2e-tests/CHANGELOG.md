@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
+
+## 5.6.0 (2022-11-16)
+
+## 5.5.0 (2022-11-02)
+
+## 5.4.0 (2022-10-19)
+
+## 5.3.0 (2022-10-05)
+
 ### New features
 
 -   Added Autocomplete Component e2e test suite. [#42905](https://github.com/WordPress/gutenberg/pull/42905).

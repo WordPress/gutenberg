@@ -1,17 +1,12 @@
 /**
- * External dependencies
- */
-import styled from '@emotion/styled';
-
-/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+
 /**
  * Internal dependencies
  */
 import BoxControl from '../';
-import { Flex, FlexBlock } from '../../flex';
 
 export default {
 	title: 'Components (Experimental)/BoxControl',
@@ -37,19 +32,13 @@ function DemoExample( {
 	const [ values, setValues ] = useState( defaultValues );
 
 	return (
-		<Container align="top" gap={ 8 }>
-			<FlexBlock>
-				<Content>
-					<BoxControl
-						label="Padding"
-						values={ values }
-						sides={ sides }
-						onChange={ setValues }
-						splitOnAxis={ splitOnAxis }
-					/>
-				</Content>
-			</FlexBlock>
-		</Container>
+		<BoxControl
+			label="Padding"
+			values={ values }
+			sides={ sides }
+			onChange={ setValues }
+			splitOnAxis={ splitOnAxis }
+		/>
 	);
 }
 
@@ -84,11 +73,3 @@ export const axialControlsWithSingleSide = () => {
 		/>
 	);
 };
-
-const Container = styled( Flex )`
-	max-width: 780px;
-`;
-
-const Content = styled.div`
-	padding: 20px;
-`;

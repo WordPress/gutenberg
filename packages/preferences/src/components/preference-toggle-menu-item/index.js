@@ -20,6 +20,8 @@ export default function PreferenceToggleMenuItem( {
 	messageActivated,
 	messageDeactivated,
 	shortcut,
+	onToggle = () => null,
+	disabled = false,
 } ) {
 	const isActive = useSelect(
 		( select ) => !! select( preferencesStore ).get( scope, name ),
@@ -53,12 +55,14 @@ export default function PreferenceToggleMenuItem( {
 			icon={ isActive && check }
 			isSelected={ isActive }
 			onClick={ () => {
+				onToggle();
 				toggle( scope, name );
 				speakMessage();
 			} }
 			role="menuitemcheckbox"
 			info={ info }
 			shortcut={ shortcut }
+			disabled={ disabled }
 		>
 			{ label }
 		</MenuItem>

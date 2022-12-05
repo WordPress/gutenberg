@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { parse as hpqParse } from 'hpq';
-import { mapValues, castArray } from 'lodash';
+import { mapValues } from 'lodash';
 import memoize from 'memize';
 
 /**
@@ -165,7 +165,10 @@ export function getBlockAttribute(
  * @return {boolean} Whether value is valid.
  */
 export function isValidByType( value, type ) {
-	return type === undefined || isOfTypes( value, castArray( type ) );
+	return (
+		type === undefined ||
+		isOfTypes( value, Array.isArray( type ) ? type : [ type ] )
+	);
 }
 
 /**

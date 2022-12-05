@@ -49,7 +49,9 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.type( 'First column' );
 
 		// Navigate to the columns blocks.
-		await page.click( '.edit-post-header-toolbar__list-view-toggle' );
+		await page.click(
+			'.edit-post-header-toolbar__document-overview-toggle'
+		);
 
 		const firstColumnsBlockMenuItem = (
 			await getListViewBlocks( 'Columns' )
@@ -119,7 +121,7 @@ describe( 'Navigating the block hierarchy', () => {
 		// Navigate to the third column in the columns block.
 		await pressKeyWithModifier( 'ctrl', '`' );
 		await pressKeyWithModifier( 'ctrl', '`' );
-		await pressKeyTimes( 'Tab', 2 );
+		await pressKeyTimes( 'Tab', 4 );
 		await pressKeyTimes( 'ArrowDown', 4 );
 		await page.waitForSelector(
 			'.is-highlighted[aria-label="Block: Column (3 of 3)"]'
@@ -165,7 +167,10 @@ describe( 'Navigating the block hierarchy', () => {
 	it( 'should select the wrapper div for a group', async () => {
 		// Insert a group block.
 		await insertBlock( 'Group' );
-
+		// Select the default, selected Group layout from the variation picker.
+		await page.click(
+			'button[aria-label="Group: Gather blocks in a container."]'
+		);
 		// Insert some random blocks.
 		// The last block shouldn't be a textual block.
 		await page.click( '.block-list-appender .block-editor-inserter' );
@@ -183,7 +188,9 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.click( '.editor-post-title' );
 
 		// Try selecting the group block using the Outline.
-		await page.click( '.edit-post-header-toolbar__list-view-toggle' );
+		await page.click(
+			'.edit-post-header-toolbar__document-overview-toggle'
+		);
 		const groupMenuItem = ( await getListViewBlocks( 'Group' ) )[ 0 ];
 		await groupMenuItem.click();
 

@@ -185,6 +185,26 @@ All new component should be styled using [Emotion](https://emotion.sh/docs/intro
 
 Note: Instead of using Emotion's standard `cx` function, the custom [`useCx` hook](/packages/components/src/utils/hooks/use-cx.ts) should be used instead.
 
+### Themeing
+
+_Note: Themeing is an experimental feature and still being actively developed. Its APIs are an early implementation subject to drastic and breaking changes_
+
+The [`Theme` component](/packages/components/src/theme/README.md) can be used to tweak the visual appearance of the components from the `@wordpress/components` package.
+
+```jsx
+import { __experimentalTheme as Theme } from '@wordpress/components';
+
+const Example = () => {
+	return (
+		<Theme accent="red">
+			<Button variant="primary">I'm red</Button>
+			<Theme accent="blue">
+				<Button variant="primary">I'm blue</Button>
+			</Theme>
+		</Theme>
+	);
+};
+```
 
 ### Deprecating styles
 

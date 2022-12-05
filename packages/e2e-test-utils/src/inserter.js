@@ -44,11 +44,12 @@ async function isGlobalInserterOpen() {
 		// doesn't fail on older branches where we still had "Add block" as label.
 		return !! document.querySelector(
 			'.edit-post-header [aria-label="Add block"].is-pressed,' +
-				'.edit-site-header [aria-label="Add block"].is-pressed,' +
+				'.edit-site-header-edit-mode [aria-label="Add block"].is-pressed,' +
 				'.edit-post-header [aria-label="Toggle block inserter"].is-pressed,' +
 				'.edit-site-header [aria-label="Toggle block inserter"].is-pressed,' +
 				'.edit-widgets-header [aria-label="Toggle block inserter"].is-pressed,' +
-				'.edit-widgets-header [aria-label="Add block"].is-pressed'
+				'.edit-widgets-header [aria-label="Add block"].is-pressed,' +
+				'.edit-site-header-edit-mode__inserter-toggle.is-pressed'
 		);
 	} );
 }
@@ -64,7 +65,8 @@ export async function toggleGlobalBlockInserter() {
 			'.edit-post-header [aria-label="Toggle block inserter"],' +
 			'.edit-site-header [aria-label="Toggle block inserter"],' +
 			'.edit-widgets-header [aria-label="Add block"],' +
-			'.edit-widgets-header [aria-label="Toggle block inserter"]'
+			'.edit-widgets-header [aria-label="Toggle block inserter"],' +
+			'.edit-site-header-edit-mode__inserter-toggle'
 	);
 }
 
@@ -98,6 +100,20 @@ async function waitForInserterCloseAndContentFocus() {
 }
 
 /**
+ * Wait for the inserter search to yield results because that input is debounced.
+ */
+async function waitForInserterSearch() {
+	try {
+		await page.waitForSelector(
+			'.block-editor-inserter__no-tab-container',
+			{ timeout: 2000 }
+		);
+	} catch ( e ) {
+		// This selector doesn't exist in older versions, so let's just continue.
+	}
+}
+
+/**
  * Search for block in the global inserter
  *
  * @param {string} searchTerm The text to search the inserter for.
@@ -108,6 +124,7 @@ export async function searchForBlock( searchTerm ) {
 	await page.focus( INSERTER_SEARCH_SELECTOR );
 	await pressKeyWithModifier( 'primary', 'a' );
 	await page.keyboard.type( searchTerm );
+	await waitForInserterSearch();
 }
 
 /**
@@ -126,6 +143,7 @@ export async function searchForPattern( searchTerm ) {
 	await page.focus( INSERTER_SEARCH_SELECTOR );
 	await pressKeyWithModifier( 'primary', 'a' );
 	await page.keyboard.type( searchTerm );
+	await waitForInserterSearch();
 }
 
 /**
@@ -140,18 +158,19 @@ export async function searchForReusableBlock( searchTerm ) {
 	// fetched. They aren't fetched until an inserter is used or the post
 	// already contains reusable blocks, so wait for the tab to appear.
 	await page.waitForXPath(
-		'//div[contains(@class, "block-editor-inserter__tabs")]//button[text()="Reusable"]'
+		'//div[contains(@class, "block-editor-inserter__tabs")]//button[@aria-label="Reusable"]'
 	);
 
 	// Select the reusable blocks tab.
 	const tab = await page.waitForXPath(
-		'//div[contains(@class, "block-editor-inserter__tabs")]//button[text()="Reusable"]'
+		'//div[contains(@class, "block-editor-inserter__tabs")]//button[@aria-label="Reusable"]'
 	);
 	await tab.click();
 	await page.waitForSelector( INSERTER_SEARCH_SELECTOR );
 	await page.focus( INSERTER_SEARCH_SELECTOR );
 	await pressKeyWithModifier( 'primary', 'a' );
 	await page.keyboard.type( searchTerm );
+	await waitForInserterSearch();
 }
 
 /**

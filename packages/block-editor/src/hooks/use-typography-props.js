@@ -9,6 +9,7 @@ import classnames from 'classnames';
  */
 import { getInlineStyles } from './style';
 import { getFontSizeClass } from '../components/font-sizes';
+import { getComputedFluidTypographyValue } from '../components/font-sizes/fluid-utils';
 
 // This utility is intended to assist where the serialization of the typography
 // block support is being skipped for a block but the typography related CSS
@@ -18,12 +19,26 @@ import { getFontSizeClass } from '../components/font-sizes';
  * Provides the CSS class names and inline styles for a block's typography support
  * attributes.
  *
- * @param {Object} attributes Block attributes.
+ * @param {Object}  attributes            Block attributes.
+ * @param {boolean} isFluidFontSizeActive Whether the function should try to convert font sizes to fluid values.
  *
  * @return {Object} Typography block support derived CSS classes & styles.
  */
-export function getTypographyClassesAndStyles( attributes ) {
-	const typographyStyles = attributes?.style?.typography || {};
+export function getTypographyClassesAndStyles(
+	attributes,
+	isFluidFontSizeActive
+) {
+	let typographyStyles = attributes?.style?.typography || {};
+
+	if ( isFluidFontSizeActive ) {
+		typographyStyles = {
+			...typographyStyles,
+			fontSize: getComputedFluidTypographyValue( {
+				fontSize: attributes?.style?.typography?.fontSize,
+			} ),
+		};
+	}
+
 	const style = getInlineStyles( { typography: typographyStyles } );
 	const fontFamilyClassName = !! attributes?.fontFamily
 		? `has-${ kebabCase( attributes.fontFamily ) }-font-family`

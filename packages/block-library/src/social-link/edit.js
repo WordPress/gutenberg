@@ -66,7 +66,7 @@ const SocialLinkEdit = ( {
 	isSelected,
 	setAttributes,
 } ) => {
-	const { url, service, label } = attributes;
+	const { url, service, label, rel } = attributes;
 	const { showLabels, iconColorValue, iconBackgroundColorValue } = context;
 	const [ showURLPopover, setPopover ] = useState( false );
 	const classes = classNames( 'wp-social-link', 'wp-social-link-' + service, {
@@ -112,6 +112,13 @@ const SocialLinkEdit = ( {
 						/>
 					</PanelRow>
 				</PanelBody>
+			</InspectorControls>
+			<InspectorControls __experimentalGroup="advanced">
+				<TextControl
+					label={ __( 'Link rel' ) }
+					value={ rel || '' }
+					onChange={ ( value ) => setAttributes( { rel: value } ) }
+				/>
 			</InspectorControls>
 			<li { ...blockProps }>
 				<Button

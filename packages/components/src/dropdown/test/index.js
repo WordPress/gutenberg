@@ -1,67 +1,57 @@
 /**
  * External dependencies
  */
-import { fireEvent, render } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
  */
 import Dropdown from '../';
 
-function getButtonElement( container ) {
-	return container.querySelector( 'button' );
-}
-function getOpenCloseButton( container, selector ) {
-	return container.querySelector( selector );
-}
-
 describe( 'Dropdown', () => {
-	function expectPopoverVisible( container, value ) {
-		const popover = container.querySelector( '.components-popover' );
-		if ( value ) {
-			expect( popover ).toBeTruthy();
-		} else {
-			expect( popover ).toBeFalsy();
-		}
-	}
-
-	it( 'should toggle the dropdown properly', () => {
-		const expectButtonExpanded = ( container, expanded ) => {
-			expect( container.querySelectorAll( 'button' ) ).toHaveLength( 1 );
-			expect(
-				getButtonElement( container ).getAttribute( 'aria-expanded' )
-			).toBe( expanded.toString() );
-		};
-
-		const {
-			container: { firstChild: dropdownContainer },
-		} = render(
+	it( 'should toggle the dropdown properly', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
+		const { unmount } = render(
 			<Dropdown
 				className="container"
 				contentClassName="content"
 				renderToggle={ ( { isOpen, onToggle } ) => (
 					<button aria-expanded={ isOpen } onClick={ onToggle }>
-						Toggleee
+						Toggle
 					</button>
 				) }
 				renderContent={ () => <span>test</span> }
+				popoverProps={ { 'data-testid': 'popover' } }
 			/>
 		);
 
-		expectButtonExpanded( dropdownContainer, false );
-		expectPopoverVisible( dropdownContainer, false );
+		const button = screen.getByRole( 'button', { expanded: false } );
 
-		const button = getButtonElement( dropdownContainer );
-		fireEvent.click( button );
+		expect( button ).toBeVisible();
+		expect( screen.queryByTestId( 'popover' ) ).not.toBeInTheDocument();
 
-		expectButtonExpanded( dropdownContainer, true );
-		expectPopoverVisible( dropdownContainer, true );
+		await user.click( button );
+
+		expect(
+			screen.getByRole( 'button', { expanded: true } )
+		).toBeVisible();
+
+		await waitFor( () =>
+			expect( screen.getByTestId( 'popover' ) ).toBeVisible()
+		);
+
+		// Cleanup remaining effects, like the delayed popover positioning
+		unmount();
 	} );
 
-	it( 'should close the dropdown when calling onClose', () => {
-		const {
-			container: { firstChild: dropdownContainer },
-		} = render(
+	it( 'should close the dropdown when calling onClose', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
+		render(
 			<Dropdown
 				className="container"
 				contentClassName="content"
@@ -72,26 +62,27 @@ describe( 'Dropdown', () => {
 						aria-expanded={ isOpen }
 						onClick={ onToggle }
 					>
-						Toggleee
+						Toggle
 					</button>,
 					<button key="close" className="close" onClick={ onClose }>
-						closee
+						close
 					</button>,
 				] }
 				renderContent={ () => null }
+				popoverProps={ { 'data-testid': 'popover' } }
 			/>
 		);
 
-		expectPopoverVisible( dropdownContainer, false );
+		expect( screen.queryByTestId( 'popover' ) ).not.toBeInTheDocument();
 
-		const openButton = getOpenCloseButton( dropdownContainer, '.open' );
-		fireEvent.click( openButton );
+		await user.click( screen.getByRole( 'button', { name: 'Toggle' } ) );
 
-		expectPopoverVisible( dropdownContainer, true );
+		await waitFor( () =>
+			expect( screen.getByTestId( 'popover' ) ).toBeVisible()
+		);
 
-		const closeButton = getOpenCloseButton( dropdownContainer, '.close' );
-		fireEvent.click( closeButton );
+		await user.click( screen.getByRole( 'button', { name: 'close' } ) );
 
-		expectPopoverVisible( dropdownContainer, false );
+		expect( screen.queryByTestId( 'popover' ) ).not.toBeInTheDocument();
 	} );
 } );

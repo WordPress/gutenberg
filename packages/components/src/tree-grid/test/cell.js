@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import TestRenderer from 'react-test-renderer';
+import { render } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -21,7 +21,7 @@ const TestButton = forwardRef( ( { ...props }, ref ) => (
 describe( 'TreeGridCell', () => {
 	it( 'requires TreeGrid to be declared as a parent component somewhere in the component hierarchy', () => {
 		expect( () =>
-			TestRenderer.create(
+			render(
 				<TreeGridCell>
 					{ ( props ) => (
 						<TestButton className="my-button" { ...props }>
@@ -35,7 +35,7 @@ describe( 'TreeGridCell', () => {
 	} );
 
 	it( 'uses a child render function to render children', () => {
-		const renderer = TestRenderer.create(
+		const { container } = render(
 			<TreeGrid>
 				<tr>
 					<TreeGridCell>
@@ -49,6 +49,6 @@ describe( 'TreeGridCell', () => {
 			</TreeGrid>
 		);
 
-		expect( renderer.toJSON() ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 } );

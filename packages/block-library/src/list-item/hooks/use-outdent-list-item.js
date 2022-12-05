@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { castArray } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
@@ -20,12 +15,16 @@ export default function useOutdentListItem( clientId ) {
 	const registry = useRegistry();
 	const { canOutdent } = useSelect(
 		( innerSelect ) => {
-			const { getBlockRootClientId } = innerSelect( blockEditorStore );
+			const { getBlockRootClientId, getBlockName } =
+				innerSelect( blockEditorStore );
 			const grandParentId = getBlockRootClientId(
 				getBlockRootClientId( clientId )
 			);
+			const grandParentName = getBlockName( grandParentId );
+			const isListItem = grandParentName === listItemName;
+
 			return {
-				canOutdent: !! grandParentId,
+				canOutdent: isListItem,
 			};
 		},
 		[ clientId ]
@@ -57,7 +56,9 @@ export default function useOutdentListItem( clientId ) {
 	return [
 		canOutdent,
 		useCallback( ( clientIds = getSelectedBlockClientIds() ) => {
-			clientIds = castArray( clientIds );
+			if ( ! Array.isArray( clientIds ) ) {
+				clientIds = [ clientIds ];
+			}
 
 			if ( ! clientIds.length ) return;
 

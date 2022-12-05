@@ -6,7 +6,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
 import { __, _x, isRTL } from '@wordpress/i18n';
 import {
 	ToolbarButton,
@@ -21,7 +20,6 @@ import {
 	useBlockProps,
 	useSetting,
 } from '@wordpress/block-editor';
-import { useMergeRefs } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 import { formatLtr } from '@wordpress/icons';
 
@@ -29,7 +27,6 @@ import { formatLtr } from '@wordpress/icons';
  * Internal dependencies
  */
 import { useOnEnter } from './use-enter';
-import DropZone from './drop-zone';
 
 const name = 'core/paragraph';
 
@@ -62,12 +59,8 @@ function ParagraphBlock( {
 } ) {
 	const { align, content, direction, dropCap, placeholder } = attributes;
 	const isDropCapFeatureEnabled = useSetting( 'typography.dropCap' );
-	const [ paragraphElement, setParagraphElement ] = useState( null );
 	const blockProps = useBlockProps( {
-		ref: useMergeRefs( [
-			useOnEnter( { clientId, content } ),
-			setParagraphElement,
-		] ),
+		ref: useOnEnter( { clientId, content } ),
 		className: classnames( {
 			'has-drop-cap': hasDropCapDisabled( align ) ? false : dropCap,
 			[ `has-text-align-${ align }` ]: align,
@@ -129,12 +122,6 @@ function ParagraphBlock( {
 						/>
 					</ToolsPanelItem>
 				</InspectorControls>
-			) }
-			{ ! content && (
-				<DropZone
-					clientId={ clientId }
-					paragraphElement={ paragraphElement }
-				/>
 			) }
 			<RichText
 				identifier="content"

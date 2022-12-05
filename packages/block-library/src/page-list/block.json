@@ -8,8 +8,9 @@
 	"keywords": [ "menu", "navigation" ],
 	"textdomain": "default",
 	"attributes": {
-		"__unstableMaxPages": {
-			"type": "number"
+		"parentPageID": {
+			"type": "integer",
+			"default": 0
 		}
 	},
 	"usesContext": [

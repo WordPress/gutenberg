@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { create } from 'react-test-renderer';
+import { render } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -10,27 +10,26 @@ import { PostTypeSupportCheck } from '../';
 
 describe( 'PostTypeSupportCheck', () => {
 	it( 'renders its children when post type is not known', () => {
-		let postType;
-		const tree = create(
-			<PostTypeSupportCheck postType={ postType } supportKeys="title">
+		const { container } = render(
+			<PostTypeSupportCheck postType={ undefined } supportKeys="title">
 				Supported
 			</PostTypeSupportCheck>
 		);
 
-		expect( tree.toJSON() ).toBe( 'Supported' );
+		expect( container ).toHaveTextContent( 'Supported' );
 	} );
 
 	it( 'does not render its children when post type is known and not supports', () => {
 		const postType = {
 			supports: {},
 		};
-		const tree = create(
+		const { container } = render(
 			<PostTypeSupportCheck postType={ postType } supportKeys="title">
 				Supported
 			</PostTypeSupportCheck>
 		);
 
-		expect( tree.toJSON() ).toBe( null );
+		expect( container ).not.toHaveTextContent( 'Supported' );
 	} );
 
 	it( 'renders its children when post type is known and supports', () => {
@@ -39,13 +38,13 @@ describe( 'PostTypeSupportCheck', () => {
 				title: true,
 			},
 		};
-		const tree = create(
+		const { container } = render(
 			<PostTypeSupportCheck postType={ postType } supportKeys="title">
 				Supported
 			</PostTypeSupportCheck>
 		);
 
-		expect( tree.toJSON() ).toBe( 'Supported' );
+		expect( container ).toHaveTextContent( 'Supported' );
 	} );
 
 	it( 'renders its children if some of keys supported', () => {
@@ -54,7 +53,7 @@ describe( 'PostTypeSupportCheck', () => {
 				title: true,
 			},
 		};
-		const tree = create(
+		const { container } = render(
 			<PostTypeSupportCheck
 				postType={ postType }
 				supportKeys={ [ 'title', 'thumbnail' ] }
@@ -63,14 +62,14 @@ describe( 'PostTypeSupportCheck', () => {
 			</PostTypeSupportCheck>
 		);
 
-		expect( tree.toJSON() ).toBe( 'Supported' );
+		expect( container ).toHaveTextContent( 'Supported' );
 	} );
 
 	it( 'does not render its children if none of keys supported', () => {
 		const postType = {
 			supports: {},
 		};
-		const tree = create(
+		const { container } = render(
 			<PostTypeSupportCheck
 				postType={ postType }
 				supportKeys={ [ 'title', 'thumbnail' ] }
@@ -79,6 +78,6 @@ describe( 'PostTypeSupportCheck', () => {
 			</PostTypeSupportCheck>
 		);
 
-		expect( tree.toJSON() ).toBe( null );
+		expect( container ).not.toHaveTextContent( 'Supported' );
 	} );
 } );

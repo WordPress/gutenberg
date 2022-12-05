@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { isEqual, merge } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
+import { merge } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,33 +11,20 @@ import {
 	createContext,
 	useContext,
 	useRef,
-	useEffect,
 	useMemo,
 	memo,
 } from '@wordpress/element';
 import warn from '@wordpress/warning';
 
+/**
+ * Internal dependencies
+ */
+import { useUpdateEffect } from '../../utils';
+
 export const ComponentsContext = createContext(
 	/** @type {Record<string, any>} */ ( {} )
 );
 export const useComponentsContext = () => useContext( ComponentsContext );
-
-/**
- * Runs an effect only on update (i.e., ignores the first render)
- *
- * @param {import('react').EffectCallback} effect
- * @param {import('react').DependencyList} deps
- */
-function useUpdateEffect( effect, deps ) {
-	const mounted = useRef( false );
-	useEffect( () => {
-		if ( mounted.current ) {
-			return effect();
-		}
-		mounted.current = true;
-		return undefined;
-	}, deps );
-}
 
 /**
  * Consolidates incoming ContextSystem values with a (potential) parent ContextSystem value.
@@ -55,7 +43,7 @@ function useContextSystemBridge( { value } ) {
 	useUpdateEffect( () => {
 		if (
 			// Objects are equivalent.
-			isEqual( valueRef.current, value ) &&
+			fastDeepEqual( valueRef.current, value ) &&
 			// But not the same reference.
 			valueRef.current !== value
 		) {

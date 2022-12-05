@@ -123,6 +123,10 @@ function KeyboardShortcutsRegister() {
 					modifier: 'access',
 					character: 'p',
 				},
+				{
+					modifier: 'ctrlShift',
+					character: '~',
+				},
 			],
 		} );
 	}, [ registerShortcut ] );
