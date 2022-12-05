@@ -8,7 +8,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { layout } from '@wordpress/icons';
+import { layout, symbolFilled } from '@wordpress/icons';
 import { useDispatch } from '@wordpress/data';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -24,19 +24,46 @@ import { useLocation } from '../routes';
 import { store as editSiteStore } from '../../store';
 import getIsListPage from '../../utils/get-is-list-page';
 
+function omit( object, keys ) {
+	return Object.fromEntries(
+		Object.entries( object ).filter( ( [ key ] ) => ! keys.includes( key ) )
+	);
+}
+
 const Item = ( { item } ) => {
 	const linkInfo = useLink( item.params );
-	if ( item.params ) {
-		delete item.params;
-		item = {
-			...item,
-			...linkInfo,
-		};
-	}
-	return <SidebarNavigationItem { ...item } />;
+	const props = item.params
+		? { ...omit( item, 'params' ), ...linkInfo }
+		: item;
+	return <SidebarNavigationItem { ...props } />;
 };
 
-export default function SidebarNavigationScreenTemplates() {
+const config = {
+	wp_template: {
+		path: '/templates',
+		labels: {
+			title: __( 'Templates' ),
+			loading: __( 'Loading templates' ),
+			notFound: __( 'No templates found' ),
+			manage: __( 'Manage all templates' ),
+		},
+		icon: layout,
+	},
+	wp_template_part: {
+		path: '/template-parts',
+		labels: {
+			title: __( 'Template parts' ),
+			loading: __( 'Loading template parts' ),
+			notFound: __( 'No template parts found' ),
+			manage: __( 'Manage all template parts' ),
+		},
+		icon: symbolFilled,
+	},
+};
+
+export default function SidebarNavigationScreenTemplates( {
+	postType = 'wp_template',
+} ) {
 	const { params } = useLocation();
 	const { __unstableSetCanvasMode } = useDispatch( editSiteStore );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
@@ -45,7 +72,7 @@ export default function SidebarNavigationScreenTemplates() {
 
 	const { records: templates, isResolving: isLoading } = useEntityRecords(
 		'postType',
-		'wp_template',
+		postType,
 		{
 			per_page: -1,
 		}
@@ -55,40 +82,39 @@ export default function SidebarNavigationScreenTemplates() {
 	if ( isLoading ) {
 		items = [
 			{
-				children: __( 'Loading templates' ),
+				children: config[ postType ].labels.loading,
 			},
 		];
 	} else if ( ! templates && ! isLoading ) {
 		items = [
 			{
-				children: __( 'No templates found' ),
+				children: config[ postType ].labels.notFound,
 			},
 		];
 	} else {
 		items = templates?.map( ( template ) => ( {
 			params: {
-				postType: 'wp_template',
+				postType,
 				postId: template.id,
 			},
-			icon: layout,
+			icon: config[ postType ].icon,
 			children: decodeEntities(
 				template.title?.rendered || template.slug
 			),
 			'aria-current':
-				params.postType === 'wp_template' &&
-				params.postId === template.id
+				params.postType === postType && params.postId === template.id
 					? 'page'
 					: undefined,
 		} ) );
 	}
 
 	return (
-		<NavigatorScreen path="/templates">
+		<NavigatorScreen path={ config[ postType ].path }>
 			<SidebarNavigationScreen
 				parentTitle={ __( 'Design' ) }
 				title={
 					<HStack style={ { minHeight: 36 } }>
-						<div>{ __( 'Templates' ) }</div>
+						<div>{ config[ postType ].labels.title }</div>
 						{ ! isMobileViewport && isEditorPage && (
 							<Button
 								className="edit-site-layout__edit-button"
@@ -112,11 +138,11 @@ export default function SidebarNavigationScreenTemplates() {
 
 						<SidebarNavigationItem
 							{ ...useLink( {
-								postType: 'wp_template',
+								postType,
 								postId: undefined,
 							} ) }
 							style={ { textAlign: 'center' } }
-							children={ __( 'Manage all templates' ) }
+							children={ config[ postType ].labels.manage }
 						/>
 					</>
 				}

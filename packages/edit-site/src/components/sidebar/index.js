@@ -16,7 +16,8 @@ export function Sidebar() {
 			initialPath="/"
 		>
 			<SidebarNavigationScreenMain />
-			<SidebarNavigationScreenTemplates />
+			<SidebarNavigationScreenTemplates postType="wp_template" />
+			<SidebarNavigationScreenTemplates postType="wp_template_part" />
 		</NavigatorProvider>
 	);
 }
