@@ -13,7 +13,7 @@ export type AlignmentMatrixControlValue =
 export type AlignmentMatrixControlProps = {
 	/**
 	 * Accessible label. If provided, sets the `aria-label` attribute of the
-	 * underlying <Composite/> component.
+	 * underlying `grid` widget.
 	 *
 	 * @default 'Alignment Matrix Control'
 	 */
@@ -33,7 +33,7 @@ export type AlignmentMatrixControlProps = {
 	 */
 	onChange?: ( newValue: AlignmentMatrixControlValue ) => void;
 	/**
-	 * If provided, sets the width of the wrapper <Composite/> component.
+	 * If provided, sets the width of the control.
 	 *
 	 * @default 92
 	 */
