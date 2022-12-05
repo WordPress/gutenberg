@@ -370,25 +370,18 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		return (string) $content;
 	}
 
-	static $static_information_computed   = false;
-	static $has_block_gap_support         = false;
-	static $global_layout_settings        = null;
-	static $root_padding_aware_alignments = false;
-	if ( ! $static_information_computed ) {
-		$global_settings               = gutenberg_get_global_settings();
-		$block_gap                     = _wp_array_get( $global_settings, array( 'spacing', 'blockGap' ), $global_settings );
-		$has_block_gap_support         = isset( $block_gap );
-		$global_layout_settings        = _wp_array_get( $global_settings, array( 'layout' ), null );
-		$root_padding_aware_alignments = _wp_array_get( $global_settings, array( 'useRootPaddingAwareAlignments' ), false );
-		$static_information_computed   = true;
-	}
+	$global_settings               = gutenberg_get_global_settings();
+	$block_gap                     = _wp_array_get( $global_settings, array( 'spacing', 'blockGap' ), null );
+	$has_block_gap_support         = isset( $block_gap );
+	$global_layout_settings        = _wp_array_get( $global_settings, array( 'layout' ), null );
+	$root_padding_aware_alignments = _wp_array_get( $global_settings, array( 'useRootPaddingAwareAlignments' ), false );
 
-	$default_block_layout   = _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
-	$used_layout            = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : $default_block_layout;
+	$default_block_layout = _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
+	$used_layout          = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : $default_block_layout;
 
 	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] && ! $global_layout_settings ) {
 			return $block_content;
-		}
+	}
 
 	$class_names        = array();
 	$layout_definitions = _wp_array_get( $global_layout_settings, array( 'definitions' ), array() );
