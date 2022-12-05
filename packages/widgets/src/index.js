@@ -18,11 +18,15 @@ export * from './utils';
  * Note that for the block to be useful, any scripts required by a widget must
  * be loaded into the page.
  *
+ * @param {Object} settings Block settings.
  * @see https://developer.wordpress.org/block-editor/how-to-guides/widgets/legacy-widget-block/
  */
-export function registerLegacyWidgetBlock() {
-	const { metadata, settings, name } = legacyWidget;
-	registerBlockType( { name, ...metadata }, settings );
+export function registerLegacyWidgetBlock( settings = {} ) {
+	const { metadata, settings: defaultSettings, name } = legacyWidget;
+	registerBlockType(
+		{ name, ...metadata },
+		{ ...defaultSettings, ...settings }
+	);
 }
 
 /**
