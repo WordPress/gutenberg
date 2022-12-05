@@ -35,6 +35,7 @@ import { default as InspectorControls } from '../inspector-controls';
 import { default as InspectorControlsTabs } from '../inspector-controls-tabs';
 import useInspectorControlsTabs from '../inspector-controls-tabs/use-inspector-controls-tabs';
 import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel';
+import PositionControls from '../inspector-controls-tabs/position-controls-panel';
 
 function useContentBlocks( blockTypes, block ) {
 	const contentBlocksObjectAux = useMemo( () => {
@@ -377,6 +378,7 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 						__experimentalGroup="border"
 						label={ __( 'Border' ) }
 					/>
+					<PositionControls />
 					<div>
 						<AdvancedControls />
 					</div>

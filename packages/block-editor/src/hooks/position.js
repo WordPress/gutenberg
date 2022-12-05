@@ -8,11 +8,7 @@ import classnames from 'classnames';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
-import {
-	BaseControl,
-	CustomSelectControl,
-	PanelBody,
-} from '@wordpress/components';
+import { BaseControl, CustomSelectControl } from '@wordpress/components';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import {
 	useContext,
@@ -295,10 +291,11 @@ export const withInspectorControls = createHigherOrderComponent(
 
 		return [
 			positionSupport && (
-				<InspectorControls key="position">
-					<PanelBody title={ __( 'Position' ) } initialOpen={ false }>
-						<PositionEdit { ...props } />
-					</PanelBody>
+				<InspectorControls
+					key="position"
+					__experimentalGroup="position"
+				>
+					<PositionEdit { ...props } />
 				</InspectorControls>
 			),
 			<BlockEdit key="edit" { ...props } />,

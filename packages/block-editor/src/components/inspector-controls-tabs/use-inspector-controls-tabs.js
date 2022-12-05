@@ -43,6 +43,7 @@ export default function useInspectorControlsTabs( blockName ) {
 		default: defaultGroup,
 		dimensions: dimensionsGroup,
 		list: listGroup,
+		position: positionGroup,
 		typography: typographyGroup,
 	} = InspectorControlsGroups;
 
@@ -71,6 +72,7 @@ export default function useInspectorControlsTabs( blockName ) {
 	// or Advanced Controls slot, then add this tab.
 	const settingsFills = [
 		...( useSlotFills( defaultGroup.Slot.__unstableName ) || [] ),
+		...( useSlotFills( positionGroup.Slot.__unstableName ) || [] ),
 		...( useSlotFills( InspectorAdvancedControls.slotName ) || [] ),
 	];
 
