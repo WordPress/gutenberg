@@ -292,7 +292,7 @@ function Navigation( {
 		// If there's non fallback navigation menus and
 		// a classic menu with a `primary` location or slug,
 		// then create a new navigation menu based on it.
-		// Otherwise, use the first classic menu.
+		// Otherwise, use the most recently created classic menu.
 		const primaryMenus = classicMenus.filter(
 			( classicMenu ) =>
 				classicMenu.locations.includes( 'primary' ) ||
@@ -300,23 +300,20 @@ function Navigation( {
 		);
 
 		if ( primaryMenus.length ) {
-			// Sort by location to allow the menu assigned to primary location to take precedence.
-			primaryMenus.sort( ( a, b ) => {
-				if ( a.locations < b.locations ) {
-					return 1;
-				}
-				// If no locations are assigned, we compare the term_id to determine and sort by the most recently created.
-				else if ( a.locations > b.locations || a.term_id < b.term_id ) {
-					return -1;
-				}
-				return 0;
-			} );
 			convertClassicMenu(
 				primaryMenus[ 0 ].id,
 				primaryMenus[ 0 ].name,
 				'publish'
 			);
 		} else {
+			classicMenus.sort( ( a, b ) => {
+				if ( a.term_id < b.term_id ) {
+					return 1;
+				} else if ( a.term_id > b.term_id ) {
+					return -1;
+				}
+				return 0;
+			} );
 			convertClassicMenu(
 				classicMenus[ 0 ].id,
 				classicMenus[ 0 ].name,
