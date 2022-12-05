@@ -14,7 +14,12 @@ import {
 	EditorHistoryUndo,
 	store as editorStore,
 } from '@wordpress/editor';
-import { Button, ToolbarItem, TextControl } from '@wordpress/components';
+import {
+	Button,
+	ToolbarItem,
+	TextControl,
+	Tooltip,
+} from '@wordpress/components';
 import { listView, plus } from '@wordpress/icons';
 import { useRef, useCallback } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
@@ -158,13 +163,22 @@ function HeaderToolbar() {
 				) }
 			</div>
 			<div className="edit-post-header-toolbar__center">
-				<TextControl
-					value={
-						title !== '' ? decodeEntities( title ) : 'Untitled'
-					}
-					aria-label={ __( 'Edit title' ) }
-					onChange={ ( newTitle ) => editPost( { title: newTitle } ) }
-				/>
+				<Tooltip position="bottom center" text={ __( 'Edit title' ) }>
+					<div className="edit-post-header__edit-title">
+						<TextControl
+							value={
+								title !== ''
+									? decodeEntities( title )
+									: 'Untitled'
+							}
+							label={ __( 'Edit title' ) }
+							hideLabelFromVision={ true }
+							onChange={ ( newTitle ) =>
+								editPost( { title: newTitle } )
+							}
+						/>
+					</div>
+				</Tooltip>
 			</div>
 		</NavigableToolbar>
 	);
