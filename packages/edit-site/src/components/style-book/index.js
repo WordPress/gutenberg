@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { colord } from 'colord';
 import classnames from 'classnames';
 
 /**
@@ -82,8 +81,8 @@ function getExamples() {
 
 function StyleBook( { isSelected, onSelect, onClose } ) {
 	const [ resizeObserver, sizes ] = useResizeObserver();
+	const [ textColor ] = useStyle( 'color.text' );
 	const [ backgroundColor ] = useStyle( 'color.background' );
-	const backgroundColord = colord( backgroundColor );
 	const examples = useMemo( getExamples, [] );
 	const tabs = useMemo(
 		() =>
@@ -105,11 +104,9 @@ function StyleBook( { isSelected, onSelect, onClose } ) {
 			<section
 				className={ classnames( 'edit-site-style-book', {
 					'is-wide': sizes.width > 600,
-					'has-dark-background':
-						backgroundColord.luminance() <= 0.5 &&
-						backgroundColord.alpha() !== 0,
 				} ) }
 				style={ {
+					color: textColor,
 					background: backgroundColor,
 				} }
 				aria-label={ __( 'Style Book' ) }

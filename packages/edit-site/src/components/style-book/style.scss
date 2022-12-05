@@ -7,14 +7,7 @@
 	position: absolute;
 	right: 0;
 	top: 0;
-	transition: background 0.3s; // Match .block-editor-iframe__body transition.
-
-	&.has-dark-background {
-		&,
-		.edit-site-style-book__example-title {
-			color: $white;
-		}
-	}
+	transition: all 0.3s; // Match .block-editor-iframe__body transition.
 }
 
 .edit-site-style-book__close-button {
@@ -49,6 +42,7 @@
 	background: none;
 	border-radius: $radius-block-ui;
 	border: none;
+	color: inherit;
 	cursor: pointer;
 	display: flex;
 	flex-direction: column;
@@ -67,7 +61,6 @@
 }
 
 .edit-site-style-book__example-title {
-	color: $gray-700;
 	font-size: $default-font-size;
 	font-weight: 500;
 	margin: 0;
