@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, fireEvent, screen } from '@testing-library/react';
+import { act, render, fireEvent, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -68,17 +68,18 @@ describe( 'getNameForPosition', () => {
 } );
 
 describe( 'PaletteEdit', () => {
+	const defaultProps = {
+		gradients: false,
+		colors: [ { color: '#ffffff', name: 'Base', slug: 'base' } ],
+		onChange: jest.fn(),
+		paletteLabel: 'Test label',
+		emptyMessage: 'Test empty message',
+		canOnlyChangeValues: true,
+		canReset: true,
+		slugPrefix: '',
+	};
+
 	it( 'opens color selector for color palettes', () => {
-		const defaultProps = {
-			gradients: false,
-			colors: [ { color: '#ffffff', name: 'Base', slug: 'base' } ],
-			onChange: jest.fn(),
-			paletteLabel: 'Test label',
-			emptyMessage: 'Test empty message',
-			canOnlyChangeValues: true,
-			canReset: true,
-			slugPrefix: '',
-		};
 		render( <PaletteEdit { ...defaultProps } /> );
 		fireEvent.click( screen.getByLabelText( 'Color: Base' ) );
 		expect( screen.getByLabelText( 'Hex color' ) ).toBeInTheDocument();
@@ -103,13 +104,20 @@ describe( 'PaletteEdit', () => {
 		};
 		render( <PaletteEdit { ...defaultGradientProps } /> );
 
-		fireEvent.click(
-			screen.getByLabelText( 'Gradient: Vivid cyan blue to vivid purple' )
+		const paletteItem = screen.getByLabelText(
+			'Gradient: Vivid cyan blue to vivid purple'
 		);
 
-		const gradientLabel = await screen.findByLabelText(
-			'Gradient control point at position 0% with color code rgba(6,147,227,1).'
-		);
-		expect( gradientLabel ).toBeInTheDocument();
+		// eslint-disable-next-line testing-library/no-unnecessary-act
+		await act( () => {
+			fireEvent.click( paletteItem );
+			return Promise.resolve();
+		} );
+
+		expect(
+			screen.getByLabelText(
+				'Gradient control point at position 0% with color code rgba(6,147,227,1).'
+			)
+		).toBeInTheDocument();
 	} );
 } );
