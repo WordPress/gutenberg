@@ -43,7 +43,7 @@ runs:
 
         - name: Npm install
           if: ${{ steps.cache-node_modules.outputs.cache-hit != 'true' }}
-          run: npm ci --ignore-scripts
+          run: npm ci
           shell: bash
 
         - name: Rebuild dependencies
