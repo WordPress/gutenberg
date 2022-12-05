@@ -11,8 +11,10 @@ import {
 	FlexItem,
 	SelectControl,
 } from '@wordpress/components';
-import { switchToBlockType } from '@wordpress/blocks';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	switchToBlockType,
+	getPossibleBlockTransformations,
+} from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -21,8 +23,6 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import { useCreateTemplatePartFromBlocks } from './utils/hooks';
 import { transformWidgetToBlock } from './utils/transformers';
-
-const WILDCARD_TRANSFORMS = [ 'core/columns', 'core/group' ];
 
 export function TemplatePartImportControls( { area, setAttributes } ) {
 	const [ selectedSidebar, setSelectedSidebar ] = useState( '' );
@@ -35,7 +35,6 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 			_fields: 'id,name,description,status,widgets',
 		} );
 	}, [] );
-	const { getBlockTransformItems } = useSelect( blockEditorStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const createFromBlocks = useCreateTemplatePartFromBlocks(
@@ -91,9 +90,23 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 				return block;
 			}
 
-			const transforms = getBlockTransformItems( block ).filter(
-				( item ) => ! WILDCARD_TRANSFORMS.includes( item.name )
-			);
+			const transforms = getPossibleBlockTransformations( [
+				block,
+			] ).filter( ( item ) => {
+				// The block without any transformations can't be a wildcard.
+				if ( ! item.transforms ) {
+					return true;
+				}
+
+				const hasWildCardFrom = item.transforms?.from?.find(
+					( from ) => from.blocks && from.blocks.includes( '*' )
+				);
+				const hasWildCardTo = item.transforms?.to?.find(
+					( to ) => to.blocks && to.blocks.includes( '*' )
+				);
+
+				return ! hasWildCardFrom && ! hasWildCardTo;
+			} );
 
 			// Skip the block if we have no matching transformations.
 			if ( ! transforms.length ) {
