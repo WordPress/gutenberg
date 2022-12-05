@@ -44,7 +44,11 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 
 	const options = useMemo( () => {
 		const sidebarOptions = ( sidebars ?? [] )
-			.filter( ( widgetArea ) => widgetArea.widgets.length > 0 )
+			.filter(
+				( widgetArea ) =>
+					widgetArea.id !== 'wp_inactive_widgets' &&
+					widgetArea.widgets.length > 0
+			)
 			.map( ( widgetArea ) => {
 				return {
 					value: widgetArea.id,
