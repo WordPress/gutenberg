@@ -31,6 +31,7 @@ You can view this [Index of Gutenberg related posts](https://make.wordpress.org/
 -   [Block Theme Generator for WordPress](https://themegen-preview.vercel.app/?mc_cid=f9f237db21&mc_eid=6107ad11e7)
 -   [WP Theme Scaffold](https://github.com/rareview/wp-theme-scaffold)
 -   [Gutenberg Examples](https://github.com/WordPress/gutenberg-examples) - Examples for extending Gutenberg with plugins which create blocks.
+-   [Gutenberg Block Editor developer-focused tutorials](https://www.billerickson.net/category/gutenberg-block-editor/), Bill Erickson
 
 ### Community Contribution
 
@@ -41,8 +42,8 @@ You can view this [Index of Gutenberg related posts](https://make.wordpress.org/
 -   [Gutenberg Block Library](https://editorblockswp.com/library), Danny Cooper (August 2018)
 -   [A zero-configuration developer toolkit for building WordPress Gutenberg block plugins](https://ahmadawais.com/create-guten-block-toolkit/), Ahmad Awais (January 2018)
 -   [Testing Flow in Gutenberg: Instructions for how to contribute to usability testing](https://make.wordpress.org/test/2017/11/22/testing-flow-in-gutenberg/), Anna Harrison (November 2017)
--   [Custom Gutenberg Block Development](https://kinsta.com/academy/course/gutenberg-block-development/) (October 2022)
 -   [Building Custom Gutenberg Blocks: The Definitive Block Development Tutorial](https://kinsta.com/blog/gutenberg-blocks/), Carlo Daniele (November 2022)
+-   [Gutenberg Best Practices](https://gutenberg.10up.com/) - Tutorials, resources, references and example code for all things Gutenberg (by 10up)
 
 ### Article Compilations
 
@@ -83,11 +84,10 @@ Talks given about Gutenberg, including slides and videos as they are available.
 -   [Ryan Welcher Codes](https://www.youtube.com/@RyanWelcherCodes), YouTube Channel
 -   [Dave on WP](https://www.youtube.com/@DaveonWP), YouTube Channel
 
-## Learn WordPress Courses
+## Courses
 
-You can access all courses [here](https://learn.wordpress.org/).
+A wide variety of tutorials, workshops, and courses is available on the [Learn WordPress site](https://learn.wordpress.org/). Many of the resources on this page are related to block development.
 
--   [Registering Block Patterns](https://learn.wordpress.org/workshop/registering-block-patterns/), Daisy Olsen (January 2021)
--   [Intro to Gutenberg Block Development](https://learn.wordpress.org/workshop/intro-to-gutenberg-block-development/), Jonathan Bossenger (August 2020)
--   [Intro to Publishing with the Block Editor](https://learn.wordpress.org/workshop/intro-to-publishing-with-the-block-editor/), Erica Varlese (August 2020)
--   [Introduction to Block Development: Build your first custom block](https://learn.wordpress.org/course/introduction-to-block-development-build-your-first-custom-block/)(October 2022)
+-   [10up Gutenberg Training](https://gutenberg.10up.com/training/) - build and customize Gutenberg blocks
+-   [Custom Gutenberg Block Development](https://kinsta.com/academy/course/gutenberg-block-development/) (October 2022)
+
