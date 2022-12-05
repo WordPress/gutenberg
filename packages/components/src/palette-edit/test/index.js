@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { render, fireEvent, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -69,30 +68,24 @@ describe( 'getNameForPosition', () => {
 } );
 
 describe( 'PaletteEdit', () => {
-	const defaultProps = {
-		gradients: false,
-		colors: [ { color: '#ffffff', name: 'Base', slug: 'base' } ],
-		onChange: jest.fn(),
-		paletteLabel: 'Test label',
-		emptyMessage: 'Test empty message',
-		canOnlyChangeValues: true,
-		canReset: true,
-		slugPrefix: '',
-	};
-
 	it( 'opens color selector for color palettes', () => {
+		const defaultProps = {
+			gradients: false,
+			colors: [ { color: '#ffffff', name: 'Base', slug: 'base' } ],
+			onChange: jest.fn(),
+			paletteLabel: 'Test label',
+			emptyMessage: 'Test empty message',
+			canOnlyChangeValues: true,
+			canReset: true,
+			slugPrefix: '',
+		};
 		render( <PaletteEdit { ...defaultProps } /> );
 		fireEvent.click( screen.getByLabelText( 'Color: Base' ) );
 		expect( screen.getByLabelText( 'Hex color' ) ).toBeInTheDocument();
 	} );
 
 	it( 'opens gradient selector for gradient palettes', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
-		const gradientProps = {
-			...defaultProps,
-			colors: undefined,
+		const defaultGradientProps = {
 			gradients: [
 				{
 					gradient:
@@ -101,16 +94,22 @@ describe( 'PaletteEdit', () => {
 					slug: 'vivid-cyan-blue-to-vivid-purple',
 				},
 			],
+			onChange: jest.fn(),
+			paletteLabel: 'Test label',
+			emptyMessage: 'Test empty message',
+			canOnlyChangeValues: true,
+			canReset: true,
+			slugPrefix: '',
 		};
-		render( <PaletteEdit { ...gradientProps } /> );
-		await user.click(
+		render( <PaletteEdit { ...defaultGradientProps } /> );
+
+		fireEvent.click(
 			screen.getByLabelText( 'Gradient: Vivid cyan blue to vivid purple' )
 		);
 
-		expect(
-			screen.getByLabelText(
-				'Gradient control point at position 0% with color code rgba(6,147,227,1).'
-			)
-		).toBeInTheDocument();
+		const gradientLabel = await screen.findByLabelText(
+			'Gradient control point at position 0% with color code rgba(6,147,227,1).'
+		);
+		expect( gradientLabel ).toBeInTheDocument();
 	} );
 } );
