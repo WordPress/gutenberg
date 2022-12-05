@@ -90,8 +90,8 @@ export default function UnsavedInnerBlocks( {
 			currentPageListBlockWithoutInnerBlocks
 		);
 	} else {
-		// If the current inner blocks object is different in any way
-		// from the original inner blocks from the post content then the
+		// If the current inner blocks object does not display referential equality
+		// with the original inner blocks from the post content then the
 		// user has made changes to the inner blocks. At this point the inner
 		// blocks can be considered "dirty".
 		// We also make sure the current innerBlocks had a chance to be set.
