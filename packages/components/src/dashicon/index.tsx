@@ -5,14 +5,20 @@
  * @property {string}                    [className] Class name
  * @property {number}                    [size]      Size of the icon
  */
-/** @typedef {import('react').ComponentPropsWithoutRef<'span'> & OwnProps} Props */
 
 /**
- * @param {Props} props
- * @return {JSX.Element} Element
+ * Internal dependencies
  */
+import type { WordPressComponentProps } from '../ui/context';
+import type { DashiconProps } from './types';
 
-function Dashicon( { icon, className, size = 20, style = {}, ...extraProps } ) {
+function Dashicon( {
+	icon,
+	className,
+	size = 20,
+	style = {},
+	...extraProps
+}: WordPressComponentProps< DashiconProps, 'span', false > ) {
 	const iconClass = [
 		'dashicon',
 		'dashicons',
