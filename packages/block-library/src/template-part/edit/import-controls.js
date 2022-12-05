@@ -6,10 +6,10 @@ import { useMemo, useState } from '@wordpress/element';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import {
 	Button,
-	Flex,
 	FlexBlock,
 	FlexItem,
 	SelectControl,
+	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import {
 	switchToBlockType,
@@ -145,7 +145,7 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 	}
 
 	return (
-		<Flex as="form" onSubmit={ createFromWidgets }>
+		<HStack as="form" onSubmit={ createFromWidgets }>
 			<FlexBlock>
 				<SelectControl
 					label={ __( 'Import widget area' ) }
@@ -172,6 +172,6 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 					{ __( 'Import' ) }
 				</Button>
 			</FlexItem>
-		</Flex>
+		</HStack>
 	);
 }
