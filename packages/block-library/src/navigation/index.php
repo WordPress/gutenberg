@@ -275,13 +275,14 @@ function block_core_navigation_get_classic_menu_fallback() {
 				return $classic_nav_menu;
 			}
 		}
-		
+
 		// Otherwise return the most recently created classic menu.
-		usort( $classic_nav_menus, 
-			function($a, $b) {
-				if ($a->term_id < $b->term_id) {
+		usort(
+			$classic_nav_menus,
+			function( $a, $b ) {
+				if ( $a->term_id < $b->term_id ) {
 					return 1;
-				} elseif ($a->term_id > $b->term_id) {
+				} elseif ( $a->term_id > $b->term_id ) {
 					return -1;
 				} else {
 					return 0;
