@@ -5,7 +5,7 @@ import {
 	__experimentalOffCanvasEditor as OffCanvasEditor,
 	InspectorControls,
 } from '@wordpress/block-editor';
-import { PanelBody } from '@wordpress/components';
+import { PanelBody, VisuallyHidden } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -40,6 +40,11 @@ const MenuInspectorControls = ( {
 				}
 			>
 				<>
+					{ isOffCanvasNavigationEditorEnabled && (
+						<VisuallyHidden as="h2">
+							{ __( 'Menu' ) }
+						</VisuallyHidden>
+					) }
 					<NavigationMenuSelector
 						currentMenuId={ currentMenuId }
 						onSelectClassicMenu={ onSelectClassicMenu }
