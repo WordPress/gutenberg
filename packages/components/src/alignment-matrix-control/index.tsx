@@ -49,7 +49,7 @@ function useBaseId( id?: string ) {
  * 	return (
  * 		<AlignmentMatrixControl
  * 			value={ alignment }
- * 			onChange={ ( newAlignment ) => setAlignment( newAlignment ) }
+ * 			onChange={ setAlignment }
  * 		/>
  * 	);
  * };
