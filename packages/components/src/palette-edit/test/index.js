@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, fireEvent, screen } from '@testing-library/react';
+import { act, render, fireEvent, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -98,17 +98,17 @@ describe( 'PaletteEdit', () => {
 				},
 			],
 		};
-
 		render( <PaletteEdit { ...gradientProps } /> );
-
 		fireEvent.click(
-			await screen.findByLabelText(
-				'Gradient: Vivid cyan blue to vivid purple'
-			)
+			screen.getByLabelText( 'Gradient: Vivid cyan blue to vivid purple' )
 		);
 
-		await screen.findByLabelText(
-			'Gradient control point at position 0% with color code rgba(6,147,227,1).'
-		);
+		await act( () => Promise.resolve() );
+
+		expect(
+			screen.getByLabelText(
+				'Gradient control point at position 0% with color code rgba(6,147,227,1).'
+			)
+		).toBeInTheDocument();
 	} );
 } );
