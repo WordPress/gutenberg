@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { act, render, fireEvent, screen } from '@testing-library/react';
+import { render, fireEvent, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -104,18 +104,12 @@ describe( 'PaletteEdit', () => {
 		};
 		render( <PaletteEdit { ...defaultGradientProps } /> );
 
-		const paletteItem = screen.getByLabelText(
-			'Gradient: Vivid cyan blue to vivid purple'
+		fireEvent.click(
+			screen.getByLabelText( 'Gradient: Vivid cyan blue to vivid purple' )
 		);
 
-		// eslint-disable-next-line testing-library/no-unnecessary-act
-		await act( () => {
-			fireEvent.click( paletteItem );
-			return Promise.resolve();
-		} );
-
 		expect(
-			screen.getByLabelText(
+			await screen.findByLabelText(
 				'Gradient control point at position 0% with color code rgba(6,147,227,1).'
 			)
 		).toBeInTheDocument();
