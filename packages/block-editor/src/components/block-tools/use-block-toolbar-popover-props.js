@@ -111,13 +111,6 @@ export default function useBlockToolbarPopoverProps( {
 		const contentView = contentElement?.ownerDocument?.defaultView;
 		contentView?.addEventHandler?.( 'resize', updateProps );
 
-		// TODO: There must be a better way to find the scroll container for the editor than this.
-		// Unfortunately, `contentView` isn't the right element to watch for scroll events.
-		const scrollContainer = selectedBlockElement?.closest?.(
-			'.interface-interface-skeleton__content'
-		);
-		scrollContainer.addEventListener( 'scroll', updateProps );
-
 		// Update the toolbar props on block resize.
 		let resizeObserver;
 		const blockView = selectedBlockElement?.ownerDocument?.defaultView;
@@ -128,7 +121,6 @@ export default function useBlockToolbarPopoverProps( {
 
 		return () => {
 			contentView?.removeEventHandler?.( 'resize', updateProps );
-			scrollContainer?.removeEventListener?.( 'scroll', updateProps );
 
 			if ( resizeObserver ) {
 				resizeObserver.disconnect();
