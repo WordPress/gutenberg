@@ -176,6 +176,7 @@ function HeaderToolbar() {
 							onChange={ ( newTitle ) =>
 								editPost( { title: newTitle } )
 							}
+							size={ title.length }
 						/>
 					</div>
 				</Tooltip>

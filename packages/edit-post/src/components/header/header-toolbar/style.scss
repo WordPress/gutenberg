@@ -1,6 +1,7 @@
 .edit-post-header-toolbar {
 	display: inline-flex;
 	flex-grow: 1;
+	flex-basis: min-content;
 	align-items: center;
 	border: none;
 
@@ -8,7 +9,7 @@
 	.edit-post-header-toolbar__left > .components-button {
 		display: none;
 
-		@include break-small() {
+		@include break-medium() {
 			display: inline-flex;
 		}
 	}
@@ -127,8 +128,9 @@
 					text-align: center;
 					color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
 					border: none;
-					width: auto;
 					min-height: $button-size;
+					text-overflow: ellipsis;
+					max-width: 800px;
 					&:hover {
 						cursor: pointer;
 					}
@@ -138,10 +140,6 @@
 						box-shadow: none;
 						color: var(--wp--preset--color--contrast);
 						cursor: text;
-
-						@include break-xlarge() {
-							width: 400px;
-						}
 					}
 				}
 			}

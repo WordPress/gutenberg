@@ -34,6 +34,7 @@
 .edit-post-header__toolbar {
 	display: flex;
 	flex-grow: 1;
+	flex-basis: min-content;
 
 	.table-of-contents {
 		display: none;
