@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { act, render, fireEvent, screen } from '@testing-library/react';
+import { render, fireEvent, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -86,6 +87,9 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'opens gradient selector for gradient palettes', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
 		const gradientProps = {
 			...defaultProps,
 			colors: undefined,
@@ -99,11 +103,9 @@ describe( 'PaletteEdit', () => {
 			],
 		};
 		render( <PaletteEdit { ...gradientProps } /> );
-		fireEvent.click(
+		await user.click(
 			screen.getByLabelText( 'Gradient: Vivid cyan blue to vivid purple' )
 		);
-
-		await act( () => Promise.resolve() );
 
 		expect(
 			screen.getByLabelText(
