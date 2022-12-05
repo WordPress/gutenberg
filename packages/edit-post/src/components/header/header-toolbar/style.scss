@@ -119,11 +119,7 @@
 	justify-content: center;
 
 	.edit-post-header__edit-title {
-		width: 98%;
-
 		.components-base-control {
-			width: 100%;
-
 			.css-10urnh1-StyledField-deprecatedMarginField {
 				margin-bottom: 0;
 
@@ -131,11 +127,21 @@
 					text-align: center;
 					color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
 					border: none;
+					width: auto;
+					min-height: $button-size;
+					&:hover {
+						cursor: pointer;
+					}
 
 					&:focus {
-						background: #ececec;
+						background: $gray-100;
 						box-shadow: none;
 						color: var(--wp--preset--color--contrast);
+						cursor: text;
+
+						@include break-xlarge() {
+							width: 400px;
+						}
 					}
 				}
 			}
