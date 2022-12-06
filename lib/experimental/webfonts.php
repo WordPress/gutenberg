@@ -33,7 +33,7 @@ if ( ! function_exists( 'wp_register_font_family' ) ) {
 	/**
 	 * Registers a font family.
 	 *
-	 * @since 6.1.0
+	 * @since X.X.X
 	 *
 	 * @param string $font_family The font family's name or handle to register.
 	 * @return string|null The font family handle when successfully registered. Else null.
