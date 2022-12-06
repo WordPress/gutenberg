@@ -99,6 +99,30 @@ export default function PageListEdit( {
 		}, [] );
 	};
 
+	const makePagesTree = ( parentId = 0, level = 0 ) => {
+		const childPages = pagesByParentId.get( parentId );
+
+		if ( ! childPages?.length ) {
+			return [];
+		}
+
+		return childPages.reduce( ( tree, page ) => {
+			const hasChildren = pagesByParentId.has( page.id );
+			const item = {
+				value: page.id,
+				label: '— '.repeat( level ) + page.title.rendered,
+				rawName: page.title.rendered,
+			};
+			tree.push( item );
+			if ( hasChildren ) {
+				tree.push( ...makePagesTree( page.id, level + 1 ) );
+			}
+			return tree;
+		}, [] );
+	};
+
+	const pagesTree = useMemo( makePagesTree, [ pagesByParentId ] );
+
 	const blockList = useMemo( getBlockList, [
 		pagesByParentId,
 		parentPageID,
@@ -161,14 +185,6 @@ export default function PageListEdit( {
 		}
 	};
 
-	const parentOptions = pages?.reduce( ( accumulator, page ) => {
-		accumulator.push( {
-			value: page.id,
-			label: page.title.rendered,
-		} );
-		return accumulator;
-	}, [] );
-
 	useEffect( () => {
 		__unstableMarkNextChangeAsNotPersistent();
 		if ( blockList ) {
@@ -221,12 +237,12 @@ export default function PageListEdit( {
 					</PanelBody>
 				) }
 				<PanelBody>
-					{ parentOptions && (
+					{ pagesTree.length > 0 && (
 						<ComboboxControl
 							className="editor-page-attributes__parent"
 							label={ __( 'Parent page' ) }
 							value={ parentPageID }
-							options={ parentOptions }
+							options={ pagesTree }
 							onChange={ ( value ) =>
 								setAttributes( { parentPageID: value ?? 0 } )
 							}
