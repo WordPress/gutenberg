@@ -44,6 +44,7 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_2 {
 				$theme_json_data = array();
 			}
 			$theme_json_data = gutenberg_add_registered_webfonts_to_theme_json( $theme_json_data );
+			
 			/**
 			 * Filters the data provided by the theme for global styles & settings.
 			 *
