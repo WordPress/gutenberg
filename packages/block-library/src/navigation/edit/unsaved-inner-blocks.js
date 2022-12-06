@@ -91,13 +91,21 @@ export default function UnsavedInnerBlocks( {
 		}
 	}, [ blocks ] );
 
+	// If the current inner blocks is different  from the original inner blocks
+	// from the post content then then the user has made changes to the inner blocks.
+	// At this point the inner blocks can be considered "dirty".
+	// Note: referential equality is not sufficient for comparison as the inner blocks
+	// of the page list are controlled and may be updated async due to syncing with
+	// entity records. As a result we need to perform a deep equality check skipping
+	// the page list's inner blocks.
 	const innerBlocksAreDirty = ! isDeepEqual(
 		originalBlocks.current,
 		blocks,
 		( prop, x ) => {
-			// skip inner blocks of page list during comparison as they
-			// are always controlled and may be updated async due to
-			// syncing with enitiy records.
+			// Skip inner blocks of page list during comparison as they
+			// are **always** controlled and may be updated async due to
+			// syncing with enitiy records. Left unchecked this would
+			// inadvertently trigger the dirty state.
 			if ( x?.name && prop === 'innerBlocks' ) {
 				return true;
 			}
