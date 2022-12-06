@@ -72,18 +72,6 @@ function getContentBlocks( blocks, isContentBlock ) {
 	return result;
 }
 
-function getShowTabs( blockName, tabSettings = {} ) {
-	if ( tabSettings[ blockName ] !== undefined ) {
-		return tabSettings[ blockName ];
-	}
-
-	if ( tabSettings.default !== undefined ) {
-		return tabSettings.default;
-	}
-
-	return window?.__experimentalEnableBlockInspectorTabs;
-}
-
 function BlockNavigationButton( { blockTypes, block, selectedBlock } ) {
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const blockType = blockTypes.find( ( { name } ) => name === block.name );
@@ -152,7 +140,6 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 		selectedBlockClientId,
 		blockType,
 		topLevelLockedBlock,
-		tabSettings,
 	} = useSelect( ( select ) => {
 		const {
 			getSelectedBlockClientId,
@@ -160,7 +147,6 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			getBlockName,
 			__unstableGetContentLockingParent,
 			getTemplateLock,
-			getSettings,
 		} = select( blockEditorStore );
 
 		const _selectedBlockClientId = getSelectedBlockClientId();
@@ -168,14 +154,12 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			_selectedBlockClientId && getBlockName( _selectedBlockClientId );
 		const _blockType =
 			_selectedBlockName && getBlockType( _selectedBlockName );
-		const _tabSettings = getSettings().__experimentalBlockInspectorTabs;
 
 		return {
 			count: getSelectedBlockCount(),
 			selectedBlockClientId: _selectedBlockClientId,
 			selectedBlockName: _selectedBlockName,
 			blockType: _blockType,
-			tabSettings: _tabSettings,
 			topLevelLockedBlock:
 				__unstableGetContentLockingParent( _selectedBlockClientId ) ||
 				( getTemplateLock( _selectedBlockClientId ) === 'contentOnly'
@@ -185,8 +169,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 	}, [] );
 
 	const availableTabs = useInspectorControlsTabs( blockType?.name );
-	const showTabs =
-		availableTabs.length > 1 && getShowTabs( blockType?.name, tabSettings );
+	const showTabs = availableTabs.length > 1;
 
 	if ( count > 1 ) {
 		return (
@@ -257,14 +240,8 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 };
 
 const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
-	const tabSettings = useSelect( ( select ) => {
-		return select( blockEditorStore ).getSettings()
-			.__experimentalBlockInspectorTabs;
-	}, [] );
-
 	const availableTabs = useInspectorControlsTabs( blockName );
-	const showTabs =
-		availableTabs.length > 1 && getShowTabs( blockName, tabSettings );
+	const showTabs = availableTabs.length > 1;
 
 	const hasBlockStyles = useSelect(
 		( select ) => {
