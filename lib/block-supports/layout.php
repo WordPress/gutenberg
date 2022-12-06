@@ -380,7 +380,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$used_layout          = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : $default_block_layout;
 
 	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] && ! $global_layout_settings ) {
-			return $block_content;
+		return $block_content;
 	}
 
 	$class_names        = array();
