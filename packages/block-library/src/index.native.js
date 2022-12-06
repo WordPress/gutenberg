@@ -57,6 +57,7 @@ import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
 import * as tagCloud from './tag-cloud';
+import * as classic from './freeform';
 import * as group from './group';
 import * as buttons from './buttons';
 import * as socialLink from './social-link';
@@ -107,6 +108,7 @@ export const coreBlocks = [
 	textColumns,
 	verse,
 	video,
+	classic,
 	buttons,
 	socialLink,
 	socialLinks,
@@ -223,6 +225,7 @@ export const registerCoreBlocks = () => {
 		columns,
 		column,
 		group,
+		classic,
 		button,
 		spacer,
 		shortcode,
@@ -244,7 +247,7 @@ export const registerCoreBlocks = () => {
 
 	registerBlockVariations( socialLink );
 	setDefaultBlockName( paragraph.name );
-	setFreeformContentHandlerName( html.name );
+	setFreeformContentHandlerName( classic.name );
 	setUnregisteredTypeHandlerName( missing.name );
 	if ( group ) {
 		setGroupingBlockName( group.name );
