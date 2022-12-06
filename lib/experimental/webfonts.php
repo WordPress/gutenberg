@@ -70,7 +70,7 @@ if ( ! function_exists( 'wp_register_webfonts' ) ) {
 	/**
 	 * Registers a list of web fonts and variations.
 	 *
-	 * @since 6.1.0
+	 * @since X.X.X
 	 *
 	 * @param array[] $webfonts Web fonts to be registered.
 	 * @return string[] The font family handle of the registered web fonts.
