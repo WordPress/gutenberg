@@ -91,9 +91,7 @@ export default function UnsavedInnerBlocks( {
 		}
 	}, [ blocks ] );
 
-	let innerBlocksAreDirty = false;
-
-	innerBlocksAreDirty = ! isDeepEqual(
+	const innerBlocksAreDirty = ! isDeepEqual(
 		originalBlocks.current,
 		blocks,
 		( prop, x ) => {
