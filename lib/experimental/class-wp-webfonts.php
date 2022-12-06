@@ -191,7 +191,7 @@ class WP_Webfonts extends WP_Dependencies {
 	}
 
 	/**
-	 * Registers a variation to the given font family.
+	 * Add a variation to an existing family or register family if none exists.
 	 *
 	 * @since X.X.X
 	 *
