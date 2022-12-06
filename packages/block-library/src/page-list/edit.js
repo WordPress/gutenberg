@@ -195,9 +195,14 @@ export default function PageListEdit( {
 			</InspectorControls>
 			{ allowConvertToLinks && (
 				<BlockControls group="other">
-					<ToolbarButton title={ __( 'Edit' ) } onClick={ openModal }>
-						{ __( 'Edit' ) }
-					</ToolbarButton>
+					{ totalPages > 0 && (
+						<ToolbarButton
+							title={ __( 'Edit' ) }
+							onClick={ openModal }
+						>
+							{ __( 'Edit' ) }
+						</ToolbarButton>
+					) }
 				</BlockControls>
 			) }
 			{ allowConvertToLinks && isOpen && (
