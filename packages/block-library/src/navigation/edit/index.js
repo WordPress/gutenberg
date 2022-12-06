@@ -307,12 +307,7 @@ function Navigation( {
 			);
 		} else {
 			classicMenus.sort( ( a, b ) => {
-				if ( a.term_id < b.term_id ) {
-					return 1;
-				} else if ( a.term_id > b.term_id ) {
-					return -1;
-				}
-				return 0;
+				return b.id - a.id;
 			} );
 			convertClassicMenu(
 				classicMenus[ 0 ].id,
