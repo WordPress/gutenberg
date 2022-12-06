@@ -2,7 +2,7 @@ export function areBlocksDirty( originalBlocks, blocks ) {
 	return ! isDeepEqual( originalBlocks, blocks, ( prop, x ) => {
 		// Skip inner blocks of page list during comparison as they
 		// are **always** controlled and may be updated async due to
-		// syncing with enitiy records. Left unchecked this would
+		// syncing with entity records. Left unchecked this would
 		// inadvertently trigger the dirty state.
 		if ( x?.name === 'core/page-list' && prop === 'innerBlocks' ) {
 			return true;
