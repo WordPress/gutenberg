@@ -344,3 +344,26 @@ function register_block_core_navigation_link() {
 	);
 }
 add_action( 'init', 'register_block_core_navigation_link' );
+
+/**
+ * Disables the display of tabs for the Navigation Link block.
+ *
+ * @param array $settings Default editor settings.
+ * @return array Filtered editor settings.
+ */
+function gutenberg_disable_tabs_for_navigation_link_block( $settings ) {
+	$current_tab_settings = _wp_array_get(
+		$settings,
+		array( '__experimentalBlockInspectorTabs' ),
+		array()
+	);
+
+	$settings['__experimentalBlockInspectorTabs'] = array_merge(
+		$current_tab_settings,
+		array( 'core/navigation-link' => false )
+	);
+
+	return $settings;
+}
+
+add_filter( 'block_editor_settings_all', 'gutenberg_disable_tabs_for_navigation_link_block' );
