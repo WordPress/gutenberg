@@ -11,7 +11,7 @@ import {
 } from '@wordpress/block-editor';
 import { ToolbarButton, Disabled, ToolbarGroup } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { rawHandler, serialize } from '@wordpress/blocks';
+import { rawHandler, getBlockContent } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -62,7 +62,9 @@ export default function HTMLEdit( {
 							replaceBlocks(
 								clientId,
 								rawHandler( {
-									HTML: serialize( getBlock( clientId ) ),
+									HTML: getBlockContent(
+										getBlock( clientId )
+									),
 								} )
 							)
 						}
