@@ -344,7 +344,7 @@ if ( ! function_exists( 'wp_enqueue_webfonts' ) ) {
 	 * @param string[] $font_families Font family handles (array of strings).
 	 */
 	function wp_enqueue_webfonts( array $font_families ) {
-		_deprecated_function( __FUNCTION__, '6.1.0', 'wp_enqueue_webfont()' );
+		_deprecated_function( __FUNCTION__, 'X.X.X', 'wp_enqueue_webfont()' );
 
 		wp_enqueue_webfont( $font_families );
 	}
