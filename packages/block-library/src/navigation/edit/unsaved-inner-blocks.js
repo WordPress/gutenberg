@@ -91,8 +91,8 @@ export default function UnsavedInnerBlocks( {
 		}
 	}, [ blocks ] );
 
-	// If the current inner blocks is different  from the original inner blocks
-	// from the post content then then the user has made changes to the inner blocks.
+	// If the current inner blocks are different from the original inner blocks
+	// from the post content then the user has made changes to the inner blocks.
 	// At this point the inner blocks can be considered "dirty".
 	// Note: referential equality is not sufficient for comparison as the inner blocks
 	// of the page list are controlled and may be updated async due to syncing with
