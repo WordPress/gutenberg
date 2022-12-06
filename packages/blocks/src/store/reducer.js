@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, find, get, isEmpty, map, mapValues } from 'lodash';
+import { find, get, isEmpty, map, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -105,7 +105,7 @@ export function blockTypes( state = {}, action ) {
 }
 
 /**
- * Reducer managing the block style variations.
+ * Reducer managing the block styles.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
@@ -144,8 +144,11 @@ export function blockStyles( state = {}, action ) {
 		case 'REMOVE_BLOCK_STYLES':
 			return {
 				...state,
-				[ action.blockName ]: filter(
-					get( state, [ action.blockName ], [] ),
+				[ action.blockName ]: get(
+					state,
+					[ action.blockName ],
+					[]
+				).filter(
 					( style ) => action.styleNames.indexOf( style.name ) === -1
 				),
 			};
@@ -195,8 +198,11 @@ export function blockVariations( state = {}, action ) {
 		case 'REMOVE_BLOCK_VARIATIONS':
 			return {
 				...state,
-				[ action.blockName ]: filter(
-					get( state, [ action.blockName ], [] ),
+				[ action.blockName ]: get(
+					state,
+					[ action.blockName ],
+					[]
+				).filter(
 					( variation ) =>
 						action.variationNames.indexOf( variation.name ) === -1
 				),

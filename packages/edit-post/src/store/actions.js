@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { reduce } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -385,16 +380,12 @@ export const requestMetaBoxUpdates =
 		];
 
 		// Merge all form data objects into a single one.
-		const formData = reduce(
-			formDataToMerge,
-			( memo, currentFormData ) => {
-				for ( const [ key, value ] of currentFormData ) {
-					memo.append( key, value );
-				}
-				return memo;
-			},
-			new window.FormData()
-		);
+		const formData = formDataToMerge.reduce( ( memo, currentFormData ) => {
+			for ( const [ key, value ] of currentFormData ) {
+				memo.append( key, value );
+			}
+			return memo;
+		}, new window.FormData() );
 		additionalData.forEach( ( [ key, value ] ) =>
 			formData.append( key, value )
 		);

@@ -1,11 +1,11 @@
 .edit-post-editor__inserter-panel,
-.edit-post-editor__list-view-panel {
+.edit-post-editor__document-overview-panel {
 	height: 100%;
 	display: flex;
 	flex-direction: column;
 }
 
-.edit-post-editor__list-view-panel {
+.edit-post-editor__document-overview-panel {
 	// Same width as the Inserter.
 	// @see packages/block-editor/src/components/inserter/style.scss
 	// Width of the list view panel.
@@ -31,7 +31,7 @@
 	}
 }
 
-.edit-post-editor__list-view-panel-header {
+.edit-post-editor__document-overview-panel-header {
 	border-bottom: $border-width solid $gray-300;
 	display: flex;
 	justify-content: space-between;

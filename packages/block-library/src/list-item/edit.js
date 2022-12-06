@@ -67,6 +67,7 @@ export default function ListItemEdit( {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: [ 'core/list' ],
 		renderAppender: false,
+		__unstableDisableDropZone: true,
 	} );
 	const useEnterRef = useEnter( { content, clientId } );
 	const useSpaceRef = useSpace( clientId );

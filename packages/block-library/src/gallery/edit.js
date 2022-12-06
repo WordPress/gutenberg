@@ -217,9 +217,19 @@ function GalleryEdit( props ) {
 	}
 
 	function isValidFileType( file ) {
+		// It's necessary to retrieve the media type from the raw image data for already-uploaded images on native.
+		const nativeFileData =
+			Platform.isNative && file.id
+				? find( imageData, { id: file.id } )
+				: null;
+
+		const mediaTypeSelector = nativeFileData
+			? nativeFileData?.media_type
+			: file.type;
+
 		return (
 			ALLOWED_MEDIA_TYPES.some(
-				( mediaType ) => file.type?.indexOf( mediaType ) === 0
+				( mediaType ) => mediaTypeSelector?.indexOf( mediaType ) === 0
 			) || file.url?.indexOf( 'blob:' ) === 0
 		);
 	}
@@ -486,6 +496,7 @@ function GalleryEdit( props ) {
 				<PanelBody title={ __( 'Settings' ) }>
 					{ images.length > 1 && (
 						<RangeControl
+							__nextHasNoMarginBottom
 							label={ __( 'Columns' ) }
 							value={
 								columns

@@ -163,7 +163,11 @@ function NavigationMenuSelector( {
 		<DropdownMenu
 			className="wp-block-navigation__navigation-selector"
 			label={ selectorLabel }
-			text={ selectorLabel }
+			text={
+				<span className="wp-block-navigation__navigation-selector-button__label">
+					{ selectorLabel }
+				</span>
+			}
 			icon={ null }
 			toggleProps={ toggleProps }
 		>

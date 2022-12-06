@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
@@ -204,7 +204,7 @@ export default function TableOfContentsEdit( {
 				}
 			}
 
-			if ( isEqual( headings, _latestHeadings ) ) {
+			if ( fastDeepEqual( headings, _latestHeadings ) ) {
 				return null;
 			}
 			return _latestHeadings;

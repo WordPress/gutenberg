@@ -28,7 +28,7 @@ const DEFAULT_CONTROLS = [ 'top', 'center', 'bottom' ];
 const DEFAULT_CONTROL = 'top';
 
 const POPOVER_PROPS = {
-	isAlternate: true,
+	variant: 'toolbar',
 };
 
 function BlockVerticalAlignmentUI( {

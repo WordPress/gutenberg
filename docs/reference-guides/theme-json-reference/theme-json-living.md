@@ -73,6 +73,16 @@ Settings related to colors.
 
 ---
 
+### dimensions
+
+Settings related to dimensions.
+
+| Property  | Type   | Default | Props  |
+| ---       | ---    | ---    |---   |
+| minHeight | boolean | false |  |
+
+---
+
 ### layout
 
 Settings related to layout.
@@ -214,6 +224,13 @@ Outline styles.
 | offset | string |  |
 | style | string |  |
 | width | string |  |
+
+---
+
+### css
+
+Sets custom CSS to apply styling not covered by other theme.json properties.
+
 
 ---
 
