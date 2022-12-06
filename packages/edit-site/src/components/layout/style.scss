@@ -24,6 +24,7 @@
 	grid-area: header;
 	height: $header-height;
 	display: flex;
+	z-index: z-index(".edit-site-layout__header");
 }
 
 .edit-site-layout__logo {
