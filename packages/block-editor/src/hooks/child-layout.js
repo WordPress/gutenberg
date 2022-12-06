@@ -7,21 +7,26 @@ import {
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import useSetting from '../components/use-setting';
 
-function helpText( selfStretch ) {
-	switch ( selfStretch ) {
-		case 'fill':
-			return __( 'Stretch to fill available space.' );
-		case 'fixed':
-			return __( 'Specify a fixed width.' );
-		default:
-			return __( 'Fit contents.' );
+function helpText( selfStretch, parentLayout ) {
+	const { orientation = 'horizontal' } = parentLayout;
+
+	if ( selfStretch === 'fill' ) {
+		return __( 'Stretch to fill available space.' );
 	}
+	if ( selfStretch === 'fixed' ) {
+		if ( orientation === 'horizontal' ) {
+			return __( 'Specify a fixed width.' );
+		}
+		return __( 'Specify a fixed height.' );
+	}
+	return __( 'Fit contents.' );
 }
 
 /**
@@ -43,13 +48,27 @@ export function ChildLayoutEdit( {
 	const { layout: childLayout = {} } = style;
 	const { selfStretch, flexSize } = childLayout;
 
+	useEffect( () => {
+		if ( selfStretch === 'fixed' && ! flexSize ) {
+			setAttributes( {
+				style: {
+					...style,
+					layout: {
+						...childLayout,
+						selfStretch: 'fit',
+					},
+				},
+			} );
+		}
+	}, [] );
+
 	return (
 		<>
 			<ToggleGroupControl
 				size={ '__unstable-large' }
 				label={ childLayoutOrientation( parentLayout ) }
 				value={ selfStretch || 'fit' }
-				help={ helpText( selfStretch ) }
+				help={ helpText( selfStretch, parentLayout ) }
 				onChange={ ( value ) => {
 					const newFlexSize = value !== 'fixed' ? null : flexSize;
 					setAttributes( {
@@ -84,7 +103,6 @@ export function ChildLayoutEdit( {
 			{ selfStretch === 'fixed' && (
 				<UnitControl
 					size={ '__unstable-large' }
-					style={ { height: 'auto' } }
 					onChange={ ( value ) => {
 						setAttributes( {
 							style: {

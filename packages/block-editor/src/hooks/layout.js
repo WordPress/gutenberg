@@ -444,7 +444,6 @@ export const withChildLayoutStyles = createHigherOrderComponent(
 
 		if ( selfStretch === 'fixed' && flexSize ) {
 			css += `${ selector } {
-				flex-shrink: 0;
 				flex-basis: ${ flexSize };
 				box-sizing: border-box;
 			}`;

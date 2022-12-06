@@ -118,16 +118,7 @@ function gutenberg_template_parts_screen_init( $hook ) {
 		'defaultTemplatePartAreas'  => get_allowed_block_template_part_areas(),
 		'supportsLayout'            => wp_theme_has_theme_json(),
 		'supportsTemplatePartsMode' => ! wp_is_block_theme() && current_theme_supports( 'block-template-parts' ),
-		'__unstableHomeTemplate'    => gutenberg_resolve_home_template(),
 	);
-
-	/**
-	 * We don't need home template resolution when block template parts are supported.
-	 * Set the value to true to satisfy the editor initialization guard clause.
-	 */
-	if ( $custom_settings['supportsTemplatePartsMode'] ) {
-		$custom_settings['__unstableHomeTemplate'] = true;
-	}
 
 	// Add additional back-compat patterns registered by `current_screen` et al.
 	$custom_settings['__experimentalAdditionalBlockPatterns']          = WP_Block_Patterns_Registry::get_instance()->get_all_registered( true );

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -94,10 +94,7 @@ describe( 'NumberControl', () => {
 			// After blur, value is clamped
 			expect( input ).toHaveValue( 4 );
 
-			// After the blur, the `onChange` callback fires asynchronously.
-			await waitFor( () => {
-				expect( onChangeSpy ).toHaveBeenCalledTimes( 3 );
-			} );
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 3 );
 
 			// First call: clear the input
 			expect( onChangeSpy ).toHaveBeenNthCalledWith( 1, '', true );

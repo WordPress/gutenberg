@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
@@ -66,7 +66,7 @@ export default function useInnerBlockTemplateSync(
 				templateLock === 'all' ||
 				templateLock === 'contentOnly';
 
-			const hasTemplateChanged = ! isEqual(
+			const hasTemplateChanged = ! fastDeepEqual(
 				template,
 				existingTemplate.current
 			);
@@ -81,7 +81,7 @@ export default function useInnerBlockTemplateSync(
 				template
 			);
 
-			if ( ! isEqual( nextBlocks, currentInnerBlocks ) ) {
+			if ( ! fastDeepEqual( nextBlocks, currentInnerBlocks ) ) {
 				__unstableMarkNextChangeAsNotPersistent();
 				replaceInnerBlocks(
 					clientId,

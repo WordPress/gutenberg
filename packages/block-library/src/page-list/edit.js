@@ -101,7 +101,12 @@ export default function PageListEdit( {
 		parentPageID,
 	] );
 
-	const innerBlocksProps = useInnerBlocksProps( blockProps );
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		allowedBlocks: [ 'core/page-list-item' ],
+		renderAppender: false,
+		__unstableDisableDropZone: true,
+		templateLock: 'all',
+	} );
 
 	const getBlockContent = () => {
 		if ( ! hasResolvedPages ) {

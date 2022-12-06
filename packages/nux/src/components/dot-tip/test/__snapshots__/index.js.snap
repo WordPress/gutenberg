@@ -5,11 +5,12 @@ exports[`DotTip should render correctly 1`] = `
   aria-label="Editor tips"
   class="components-popover nux-dot-tip"
   role="dialog"
-  style="position: absolute; opacity: 0; transform: translateX(-2em) scale(0) translateZ(0); transform-origin: 0% 50% 0;"
+  style="position: absolute; opacity: 0; transform: translateX(-2em) scale(0) translateZ(0); transform-origin: 0% 50% 0; left: 0px; top: 0px;"
   tabindex="-1"
 >
   <div
     class="components-popover__content"
+    style="max-height: 0px; overflow: auto;"
   >
     <p>
       It looks like you’re writing a letter. Would you like help?
