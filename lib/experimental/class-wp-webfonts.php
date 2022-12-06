@@ -150,7 +150,7 @@ class WP_Webfonts extends WP_Dependencies {
 	}
 
 	/**
-	 * Removes a font family and all registered variations.
+	 * Adds a font family.
 	 *
 	 * @since X.X.X
 	 *
