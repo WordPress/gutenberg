@@ -208,7 +208,7 @@ class WP_Webfonts extends WP_Dependencies {
 			return null;
 		}
 
-		if ( '' !== $variation_handle && ! WP_Webfonts_Utils::is_defined( $variation_handle ) ) {
+		if ( ! WP_Webfonts_Utils::is_defined( $variation_handle ) ) {
 			trigger_error( 'Variant handle must be a non-empty string.' );
 			return null;
 		}
