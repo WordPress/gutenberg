@@ -64,6 +64,14 @@
 	@include break-small() {
 		gap: $grid-unit-10;
 	}
+
+	.interface-pinned-items .components-button {
+		display: none;
+
+		@include break-medium {
+			display: block;
+		}
+	}
 }
 
 .edit-post-header-preview__grouping-external {
