@@ -2,8 +2,13 @@
 	color: $gray-600;
 
 	&:hover,
-	&:focus,
+	&:focus {
+		color: $white;
+		background: $gray-800;
+	}
+
 	&[aria-current] {
 		color: $white;
+		background: $black;
 	}
 }
