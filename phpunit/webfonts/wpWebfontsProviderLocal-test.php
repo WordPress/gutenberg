@@ -22,7 +22,7 @@ class Tests_Webfonts_WpWebfontsProviderLocal extends WP_UnitTestCase {
 		$this->set_up_theme();
 	}
 
-	function tear_down() {
+	public function tear_down() {
 		// Restore the original theme directory setup.
 		$GLOBALS['wp_theme_directories'] = $this->orig_theme_dir;
 		wp_clean_themes_cache();
