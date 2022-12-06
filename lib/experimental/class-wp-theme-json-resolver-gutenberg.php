@@ -62,7 +62,6 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_2 {
 					$parent_theme_json_data = gutenberg_add_registered_webfonts_to_theme_json( $parent_theme_json_data );
 					$parent_theme           = new WP_Theme_JSON_Gutenberg( $parent_theme_json_data );
 
-
 					/*
 					 * Merge the child theme.json into the parent theme.json.
 					 * The child theme takes precedence over the parent.
