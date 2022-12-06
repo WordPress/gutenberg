@@ -22,6 +22,15 @@ describe( 'areBlocksDirty', () => {
 		).toBe( true );
 	} );
 
+	it( `should be dirty if the blocks' attributes don't match`, () => {
+		expect(
+			areBlocksDirty(
+				[ { name: 'core/paragraph' } ],
+				[ { name: 'core/paragraph', dropCap: false } ]
+			)
+		).toBe( true );
+	} );
+
 	it( `should be dirty if the blocks' inner blocks are dirty`, () => {
 		expect(
 			areBlocksDirty(
