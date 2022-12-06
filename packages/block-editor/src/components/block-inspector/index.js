@@ -258,28 +258,19 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 	const blockInformation = useBlockDisplayInformation( clientId );
 
 	const inspectorElement = useRef();
-	const {
-		__experimentalHideBlockInterface: hideBlockInterface,
-		__experimentalShowBlockInterface: showBlockInterface,
-	} = useDispatch( blockEditorStore );
+	const { __experimentalHideBlockInterface: hideBlockInterface } =
+		useDispatch( blockEditorStore );
 
 	function handleOnFocus() {
 		hideBlockInterface();
 	}
-	function handleOnBlur() {
-		showBlockInterface();
-	}
+
 	useEffect( () => {
 		inspectorElement?.current?.addEventListener( 'focusin', handleOnFocus );
-		inspectorElement?.current?.addEventListener( 'focusout', handleOnBlur );
 		return () => {
 			inspectorElement?.current?.removeEventListener(
 				'focusin',
 				handleOnFocus
-			);
-			inspectorElement?.current?.removeEventListener(
-				'focusout',
-				handleOnBlur
 			);
 		};
 	}, [ inspectorElement.current ] );
