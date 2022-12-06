@@ -339,7 +339,7 @@ if ( ! function_exists( 'wp_enqueue_webfonts' ) ) {
 	 * BACKPORT NOTE: Do not backport this function.
 	 *
 	 * @since 6.0.0
-	 * @deprecated 6.1.0 Use wp_enqueue_webfont().
+	 * @deprecated X.X.X Use wp_enqueue_webfont().
 	 *
 	 * @param string[] $font_families Font family handles (array of strings).
 	 */
