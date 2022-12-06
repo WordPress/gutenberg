@@ -39,7 +39,7 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends Gutenberg_REST_Global_
 			return $changes;
 		}
 
-		$result  = wp_update_post( wp_slash( (array) $changes ), true, false );
+		$result = wp_update_post( wp_slash( (array) $changes ), true, false );
 		if ( is_wp_error( $result ) ) {
 			return $result;
 		}
