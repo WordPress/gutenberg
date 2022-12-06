@@ -70,7 +70,8 @@ function gutenberg_enqueue_block_support_styles( $style, $priority = 10 ) {
  * Note for core merge: see inline comment on what's been updated.
  */
 function gutenberg_resolve_assets_override() {
-	global $pagenow;
+	global $pagenow, $editor_styles;
+
 
 	$script_handles = array();
 	// Note for core merge: only 'wp-edit-blocks' should be in this array.
@@ -78,7 +79,10 @@ function gutenberg_resolve_assets_override() {
 		'wp-edit-blocks',
 	);
 
-	if ( current_theme_supports( 'wp-block-styles' ) ) {
+	if (
+		current_theme_supports( 'wp-block-styles' ) &&
+		( ! is_array( $editor_styles ) || count( $editor_styles ) === 0 )
+	) {
 		$style_handles[] = 'wp-block-library-theme';
 	}
 
