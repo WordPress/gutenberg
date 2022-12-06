@@ -141,11 +141,13 @@ describe( 'Popover', () => {
 
 		describe( 'focus behavior', () => {
 			it( 'should focus the popover by default when opened', async () => {
-				await renderAsync( <Popover>Popover content</Popover> );
+				await renderAsync(
+					<Popover data-testid="popover-element">
+						Popover content
+					</Popover>
+				);
 
-				expect(
-					screen.getByText( 'Popover content' ).parentElement
-				).toHaveFocus();
+				expect( screen.getByTestId( 'popover-element' ) ).toHaveFocus();
 			} );
 
 			it( 'should allow focus-on-open behavior to be disabled', async () => {
