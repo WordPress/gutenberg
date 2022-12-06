@@ -1075,7 +1075,10 @@ describe( 'ToolsPanel', () => {
 						<ToolsPanelItem { ...altControlProps }>
 							<div>Item 1</div>
 						</ToolsPanelItem>
-						<ToolsPanelItem { ...controlProps }>
+						<ToolsPanelItem
+							{ ...controlProps }
+							data-testid="item-2"
+						>
 							<div>Item 2</div>
 						</ToolsPanelItem>
 					</ToolsPanelItems>
@@ -1083,6 +1086,7 @@ describe( 'ToolsPanel', () => {
 						<ToolsPanelItem
 							{ ...altControlProps }
 							label="Item 3"
+							data-testid="item-3"
 							isShownByDefault={ true }
 						>
 							<div>Item 3</div>
@@ -1113,8 +1117,8 @@ describe( 'ToolsPanel', () => {
 			expect( item3 ).toBeInTheDocument();
 			expect( screen.queryByText( 'Item 4' ) ).not.toBeInTheDocument();
 
-			expect( item2.parentElement ).toHaveClass( 'first' );
-			expect( item3.parentElement ).toHaveClass( 'last' );
+			expect( screen.getByTestId( 'item-2' ) ).toHaveClass( 'first' );
+			expect( screen.getByTestId( 'item-3' ) ).toHaveClass( 'last' );
 		} );
 	} );
 } );
