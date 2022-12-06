@@ -1,9 +1,9 @@
 /**
  * Recursive stable sorting comparator function.
  *
- * @param {string|Function|Array} field Field(s) to sort by.
- * @param {Array}                 items Items to sort.
- * @param {string}                order Order, 'asc' or 'desc'.
+ * @param {string|Function} field Field to sort by.
+ * @param {Array}           items Items to sort.
+ * @param {string}          order Order, 'asc' or 'desc'.
  * @return {Function} Comparison function to be used in a `.sort()`.
  */
 const comparator = ( field, items, order ) => {
