@@ -26,8 +26,3 @@ $light-gray-placeholder: rgba($white, 0.65);
 $alert-yellow: #f0b849;
 $alert-red: #cc1818;
 $alert-green: #4ab866;
-
-:root {
-	--wp-block-synced-color: #7a00df;
-	--wp-block-synced-color--rgb: #{hex-to-rgb(#7a00df)};
-}
