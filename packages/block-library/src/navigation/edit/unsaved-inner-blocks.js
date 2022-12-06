@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import fastDeepEqual from 'fast-deep-equal/es6';
-
-/**
  * WordPress dependencies
  */
 import { useInnerBlocksProps } from '@wordpress/block-editor';
@@ -40,6 +35,46 @@ const ALLOWED_BLOCKS = [
 	'core/navigation-submenu',
 ];
 
+/**
+ * Conditionally compares two candidates for deep equality.
+ * Provides an option to skip a given property of an object during comparison.
+ *
+ * @param {*}                  x          1st candidate for comparison
+ * @param {*}                  y          2nd candidate for comparison
+ * @param {Function|undefined} shouldSkip a function which can be used to skip a given property of an object.
+ * @return {boolean}                      whether the two candidates are deeply equal.
+ */
+const isDeepEqual = ( x, y, shouldSkip ) => {
+	if ( x === y ) {
+		return true;
+	} else if (
+		typeof x === 'object' &&
+		x !== null &&
+		x !== undefined &&
+		typeof y === 'object' &&
+		y !== null &&
+		y !== undefined
+	) {
+		if ( Object.keys( x ).length !== Object.keys( y ).length ) return false;
+
+		for ( const prop in x ) {
+			if ( y.hasOwnProperty( prop ) ) {
+				// Afford skipping a given property of an object.
+				if ( shouldSkip && shouldSkip( prop, x ) ) {
+					return true;
+				}
+
+				if ( ! isDeepEqual( x[ prop ], y[ prop ], shouldSkip ) )
+					return false;
+			} else return false;
+		}
+
+		return true;
+	}
+
+	return false;
+};
+
 export default function UnsavedInnerBlocks( {
 	blocks,
 	createNavigationMenu,
@@ -58,46 +93,18 @@ export default function UnsavedInnerBlocks( {
 
 	let innerBlocksAreDirty = false;
 
-	if (
-		originalBlocks.current &&
-		blocks?.length === 1 &&
-		blocks[ 0 ]?.name === 'core/page-list'
-	) {
-		// If the blocks are a page list, we need to ignore
-		// inner blocks and compare remaining attributes only.
-		// Why? Because Page List block dynamically sets its
-		// child inner blocks async following a REST API request.
-		// This means that the inner blocks are empty when the
-		// block is first inserted, and then populated later once
-		// the REST API request resolves. This causes the original
-		// check to always return dirty as the inner blocks change.
-		// This is a workaround for this specific scenario.
-		const originalPageListBlock = originalBlocks.current[ 0 ];
-		const currentPageListBlock = blocks[ 0 ];
-
-		const {
-			innerBlocks: discardedOriginalInnerBlocks,
-			...originalPageListBlockWithoutInnerBlocks
-		} = originalPageListBlock;
-
-		const {
-			innerBlocks: discardedCurrentInnerBlocks,
-			...currentPageListBlockWithoutInnerBlocks
-		} = currentPageListBlock;
-
-		innerBlocksAreDirty = ! fastDeepEqual(
-			originalPageListBlockWithoutInnerBlocks,
-			currentPageListBlockWithoutInnerBlocks
-		);
-	} else {
-		// If the current inner blocks object does not display referential equality
-		// with the original inner blocks from the post content then the
-		// user has made changes to the inner blocks. At this point the inner
-		// blocks can be considered "dirty".
-		// We also make sure the current innerBlocks had a chance to be set.
-		innerBlocksAreDirty =
-			!! originalBlocks.current && blocks !== originalBlocks.current;
-	}
+	innerBlocksAreDirty = ! isDeepEqual(
+		originalBlocks.current,
+		blocks,
+		( prop, x ) => {
+			// skip inner blocks of page list during comparison as they
+			// are always controlled and may be updated async due to
+			// syncing with enitiy records.
+			if ( x?.name && prop === 'innerBlocks' ) {
+				return true;
+			}
+		}
+	);
 
 	const shouldDirectInsert = useMemo(
 		() =>
