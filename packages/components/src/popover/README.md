@@ -125,13 +125,15 @@ Show the popover fullscreen on mobile viewports.
 
 -   Required: No
 
-### `flip`: `boolean`
+### `flip`: `FlipProps | boolean`
 
 Specifies whether the popover should flip across its axis if there isn't space for it in the normal placement.
 
 When the using a 'top' placement, the popover will switch to a 'bottom' placement. When using a 'left' placement, the popover will switch to a `right' placement.
 
 The popover will retain its alignment of 'start' or 'end' when flipping.
+
+When passed an object, the amount of padding before flipping can be set using a `padding` property.
 
 -   Required: No
 -   Default: `true`
@@ -223,6 +225,22 @@ Adjusts the size of the popover to prevent its contents from going out of view w
 
 -   Required: No
 -   Default: `true`
+
+### `shift`: `ShiftProps | boolean`
+
+Enables the popover to shift in order to stay in view when meeting the viewport edges.
+
+When passed an object, the amount of padding before shifting can be set using a `padding` property.
+
+-   Required: No
+-   Default: `true`
+
+### `strategy`: `'absolute' | 'fixed'`
+
+Sets the type of CSS position property to use for the popover.
+
+-   Required: No
+-   Default: `'absolute'`
 
 ### `variant`: `'toolbar' | 'unstyled'`
 
