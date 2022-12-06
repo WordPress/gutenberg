@@ -4,12 +4,8 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Navigate regions', () => {
-	test.beforeEach( async ( { admin, page } ) => {
+	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
-		// POC: Make all text transparent to ignore different font rendering on CI Ubuntu.
-		await page.addStyleTag( {
-			content: '* { color: rgba(0,0,0,0) !important; }',
-		} );
 	} );
 
 	test( 'should navigate the editor regions and show the outline focus style', async ( {
@@ -37,13 +33,43 @@ test.describe( 'Navigate regions', () => {
 			'role=region[name="Editor top bar"i]'
 		);
 
+		async function createMaskElement( locator, offset = 10 ) {
+			const boxData = await locator.boundingBox();
+			boxData.offset = offset;
+
+			await page.evaluate( ( maskData ) => {
+				const maskElement = document.createElement( 'div' );
+
+				document.body.appendChild( maskElement );
+
+				maskElement.id = 'x-gu-mask';
+				maskElement.style.position = 'absolute';
+				maskElement.style.backgroundColor = '#f0f';
+
+				maskElement.style.top = maskData.y + maskData.offset + 'px';
+				maskElement.style.left = maskData.x + maskData.offset + 'px';
+				maskElement.style.width =
+					maskData.width - maskData.offset * 2 + 'px';
+				maskElement.style.height =
+					maskData.height - maskData.offset * 2 + 'px';
+				maskElement.style.display = 'block';
+				maskElement.style.boxSizing = 'border-box';
+			}, boxData );
+		}
+
+		async function removeMaskElement() {
+			await page.evaluate( () =>
+				document.getElementById( 'x-gu-mask' ).remove()
+			);
+		}
+
+		createMaskElement( editorTopBar, 6 );
+
 		await expect( editorTopBar ).toBeFocused();
 		await expect( editorTopBar ).toHaveCSS( 'outline-style', 'solid' );
 		await expect( editorTopBar ).toHaveCSS( 'outline-width', '4px' );
-		await expect( editorTopBar ).toHaveScreenshot( {
-			// POC: Hide some elements we're not interested to test for.
-			mask: [ editorTopBar.locator( 'role=button' ) ],
-		} );
+		await expect( editorTopBar ).toHaveScreenshot();
+		removeMaskElement();
 
 		// Navigate to the content region.
 		await page.keyboard.press( 'Control+`' );
@@ -52,17 +78,13 @@ test.describe( 'Navigate regions', () => {
 			'role=region[name="Editor content"i]'
 		);
 
+		createMaskElement( editorContent, 6 );
+
 		await expect( editorContent ).toBeFocused();
 		await expect( editorContent ).toHaveCSS( 'outline-style', 'solid' );
 		await expect( editorContent ).toHaveCSS( 'outline-width', '4px' );
-		await expect( editorContent ).toHaveScreenshot( {
-			// POC: Hide some elements we're not interested to test for.
-			mask: [
-				editorContent.locator( 'role=textbox' ),
-				editorContent.locator( 'role=document' ),
-				editorContent.locator( 'role=toolbar' ),
-			],
-		} );
+		await expect( editorContent ).toHaveScreenshot();
+		removeMaskElement();
 
 		// Navigate to the settings region when it's opened.
 		await page.keyboard.press( 'Control+`' );
@@ -71,10 +93,13 @@ test.describe( 'Navigate regions', () => {
 			'role=region[name="Editor settings"i]'
 		);
 
+		createMaskElement( editorSettings, 6 );
+
 		await expect( editorSettings ).toBeFocused();
 		await expect( editorSettings ).toHaveCSS( 'outline-style', 'solid' );
 		await expect( editorSettings ).toHaveCSS( 'outline-width', '4px' );
 		await expect( editorSettings ).toHaveScreenshot();
+		removeMaskElement();
 
 		// Navigate to the publish region.
 		await page.keyboard.press( 'Control+`' );
@@ -86,16 +111,16 @@ test.describe( 'Navigate regions', () => {
 			'role=region[name="Editor publish"i] >> .edit-post-layout__toggle-publish-panel'
 		);
 
+		createMaskElement( editorPublishPanel, 6 );
+
 		await expect( editorPublish ).toBeFocused();
 		await expect( editorPublishPanel ).toHaveCSS(
 			'outline-style',
 			'solid'
 		);
 		await expect( editorPublishPanel ).toHaveCSS( 'outline-width', '4px' );
-		await expect( editorPublishPanel ).toHaveScreenshot( {
-			// POC: Hide some elements we're not interested to test for.
-			mask: [ editorPublishPanel.locator( 'role=button' ) ],
-		} );
+		await expect( editorPublishPanel ).toHaveScreenshot();
+		removeMaskElement();
 
 		// Navigate to the footer region.
 		await page.keyboard.press( 'Control+`' );
@@ -104,10 +129,13 @@ test.describe( 'Navigate regions', () => {
 			'role=region[name="Editor footer"i]'
 		);
 
+		createMaskElement( editorFooter, 4 );
+
 		await expect( editorFooter ).toBeFocused();
 		await expect( editorFooter ).toHaveCSS( 'outline-style', 'solid' );
 		await expect( editorFooter ).toHaveCSS( 'outline-width', '4px' );
 		await expect( editorFooter ).toHaveScreenshot();
+		removeMaskElement();
 
 		// Navigate to the Document overview region.
 		// Open the Document overview.
@@ -119,6 +147,8 @@ test.describe( 'Navigate regions', () => {
 			'role=region[name="Document Overview"i]'
 		);
 
+		createMaskElement( editorDocumentOverview, 6 );
+
 		await expect( editorDocumentOverview ).toBeFocused();
 		await expect( editorDocumentOverview ).toHaveCSS(
 			'outline-style',
@@ -128,10 +158,8 @@ test.describe( 'Navigate regions', () => {
 			'outline-width',
 			'4px'
 		);
-		await expect( editorDocumentOverview ).toHaveScreenshot( {
-			// POC: Hide some elements we're not interested to test for.
-			mask: [ editorDocumentOverview.locator( 'role=treegrid' ) ],
-		} );
+		await expect( editorDocumentOverview ).toHaveScreenshot();
+		removeMaskElement();
 
 		// Close the Document overview.
 		await page.locator( 'role=button[name="Document Overview"i]' ).click();
@@ -150,6 +178,8 @@ test.describe( 'Navigate regions', () => {
 			'role=region[name="Editor settings"i] >> .edit-post-layout__toggle-sidebar-panel'
 		);
 
+		createMaskElement( editorSettingsPanel, 6 );
+
 		await expect( editorSettings ).toBeFocused();
 		await expect( editorSettingsPanel ).toHaveCSS(
 			'outline-style',
@@ -157,10 +187,8 @@ test.describe( 'Navigate regions', () => {
 		);
 		await expect( editorSettingsPanel ).toHaveCSS( 'outline-width', '4px' );
 
-		await expect( editorSettingsPanel ).toHaveScreenshot( {
-			// POC: Hide some elements we're not interested to test for.
-			mask: [ editorSettingsPanel.locator( 'role=button' ) ],
-		} );
+		await expect( editorSettingsPanel ).toHaveScreenshot();
+		removeMaskElement();
 
 		// Make sure to leave the Settings sidebar opened.
 		await editor.openDocumentSettingsSidebar();
