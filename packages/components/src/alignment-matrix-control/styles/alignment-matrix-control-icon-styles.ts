@@ -12,6 +12,10 @@ import {
 	pointBase,
 	Cell as CellBase,
 } from './alignment-matrix-control-styles';
+import type {
+	AlignmentMatrixControlIconProps,
+	AlignmentMatrixControlCellProps,
+} from '../types';
 
 const rootSize = () => {
 	const padding = 1.5;
@@ -25,9 +29,11 @@ const rootSize = () => {
 	} );
 };
 
-const rootPointerEvents = ( { disablePointerEvents } ) => {
+const rootPointerEvents = ( {
+	disablePointerEvents,
+}: Pick< AlignmentMatrixControlIconProps, 'disablePointerEvents' > ) => {
 	return css( {
-		pointerEvents: disablePointerEvents ? 'none' : null,
+		pointerEvents: disablePointerEvents ? 'none' : undefined,
 	} );
 };
 
@@ -46,7 +52,9 @@ export const Root = styled.div`
 	${ rootPointerEvents };
 `;
 
-const pointActive = ( { isActive } ) => {
+const pointActive = ( {
+	isActive,
+}: Pick< AlignmentMatrixControlCellProps, 'isActive' > ) => {
 	const boxShadow = isActive ? `0 0 0 1px currentColor` : null;
 
 	return css`
