@@ -11,7 +11,7 @@ import { useContext, useEffect, useRef, useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import useNavigationMenu from '../use-navigation-menu';
-import { areInnerBlocksDirty } from './are-inner-blocks-dirty';
+import { areBlocksDirty } from './are-blocks-dirty';
 
 const EMPTY_OBJECT = {};
 const DRAFT_MENU_PARAMS = [
@@ -59,7 +59,7 @@ export default function UnsavedInnerBlocks( {
 	// of the page list are controlled and may be updated async due to syncing with
 	// entity records. As a result we need to perform a deep equality check skipping
 	// the page list's inner blocks.
-	const innerBlocksAreDirty = areInnerBlocksDirty(
+	const innerBlocksAreDirty = areBlocksDirty(
 		originalBlocks?.current,
 		blocks
 	);

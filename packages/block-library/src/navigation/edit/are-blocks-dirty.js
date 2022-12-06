@@ -1,4 +1,4 @@
-export function areInnerBlocksDirty( originalBlocks, blocks ) {
+export function areBlocksDirty( originalBlocks, blocks ) {
 	return ! isDeepEqual( originalBlocks, blocks, ( prop, x ) => {
 		// Skip inner blocks of page list during comparison as they
 		// are **always** controlled and may be updated async due to
