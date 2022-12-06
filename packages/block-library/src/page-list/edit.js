@@ -158,15 +158,13 @@ export default function PageListEdit( {
 		}
 	};
 
-	const useParentOptions = () => {
-		return pages?.reduce( ( accumulator, page ) => {
-			accumulator.push( {
-				value: page.id,
-				label: page.title.rendered,
-			} );
-			return accumulator;
-		}, [] );
-	};
+	const parentOptions = pages?.reduce( ( accumulator, page ) => {
+		accumulator.push( {
+			value: page.id,
+			label: page.title.rendered,
+		} );
+		return accumulator;
+	}, [] );
 
 	useEffect( () => {
 		__unstableMarkNextChangeAsNotPersistent();
@@ -179,18 +177,20 @@ export default function PageListEdit( {
 		<>
 			<InspectorControls>
 				<PanelBody>
-					<ComboboxControl
-						className="editor-page-attributes__parent"
-						label={ __( 'Parent page' ) }
-						value={ parentPageID }
-						options={ useParentOptions() }
-						onChange={ ( value ) =>
-							setAttributes( { parentPageID: value ?? 0 } )
-						}
-						help={ __(
-							'Choose a page to show only its subpages.'
-						) }
-					/>
+					{ parentOptions && (
+						<ComboboxControl
+							className="editor-page-attributes__parent"
+							label={ __( 'Parent page' ) }
+							value={ parentPageID }
+							options={ parentOptions }
+							onChange={ ( value ) =>
+								setAttributes( { parentPageID: value ?? 0 } )
+							}
+							help={ __(
+								'Choose a page to show only its subpages.'
+							) }
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
 			{ allowConvertToLinks && totalPages > 0 && (
