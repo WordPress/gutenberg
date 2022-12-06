@@ -106,7 +106,7 @@ export default function UnsavedInnerBlocks( {
 			// are **always** controlled and may be updated async due to
 			// syncing with enitiy records. Left unchecked this would
 			// inadvertently trigger the dirty state.
-			if ( x?.name && prop === 'innerBlocks' ) {
+			if ( x?.name === 'core/page-list' && prop === 'innerBlocks' ) {
 				return true;
 			}
 		}
