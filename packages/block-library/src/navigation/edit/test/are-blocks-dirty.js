@@ -58,7 +58,7 @@ describe( 'areBlocksDirty', () => {
 	} );
 
 	describe( 'Controlled Page List block specific exceptions', () => {
-		it( 'should be false if only page list inner blocks have changed', () => {
+		it( 'should be clean if only page list inner blocks have changed', () => {
 			expect(
 				areBlocksDirty(
 					[
