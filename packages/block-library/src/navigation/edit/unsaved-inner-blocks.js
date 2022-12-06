@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
@@ -85,7 +85,7 @@ export default function UnsavedInnerBlocks( {
 			...currentPageListBlockWithoutInnerBlocks
 		} = currentPageListBlock;
 
-		innerBlocksAreDirty = ! isEqual(
+		innerBlocksAreDirty = ! fastDeepEqual(
 			originalPageListBlockWithoutInnerBlocks,
 			currentPageListBlockWithoutInnerBlocks
 		);
