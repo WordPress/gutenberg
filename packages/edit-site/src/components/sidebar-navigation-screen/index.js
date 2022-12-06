@@ -21,7 +21,7 @@ export default function SidebarNavigationScreen( {
 			className="edit-site-sidebar-navigation-screen"
 			path={ path }
 		>
-			<VStack spacing={ 6 }>
+			<VStack spacing={ 2 }>
 				<HStack
 					spacing={ 4 }
 					justify="flex-start"

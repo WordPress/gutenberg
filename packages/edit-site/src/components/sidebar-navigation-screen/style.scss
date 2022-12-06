@@ -16,6 +16,8 @@
 	top: 0;
 	background: $gray-900;
 	padding-top: $grid-unit-80;
+	box-shadow: 0 $grid-unit-10 $grid-unit-20 $gray-900;
+	padding-bottom: $grid-unit-20
 }
 
 .edit-site-sidebar-navigation-screen__title {
