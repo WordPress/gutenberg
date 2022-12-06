@@ -4,7 +4,6 @@
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHStack as HStack,
-	__experimentalNavigatorScreen as NavigatorScreen,
 	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -109,44 +108,43 @@ export default function SidebarNavigationScreenTemplates( {
 	}
 
 	return (
-		<NavigatorScreen path={ config[ postType ].path }>
-			<SidebarNavigationScreen
-				parentTitle={ __( 'Design' ) }
-				title={
-					<HStack style={ { minHeight: 36 } }>
-						<div>{ config[ postType ].labels.title }</div>
-						{ ! isMobileViewport && isEditorPage && (
-							<Button
-								className="edit-site-layout__edit-button"
-								label={ __( 'Open the editor' ) }
-								onClick={ () => {
-									__unstableSetCanvasMode( 'edit' );
-								} }
-							>
-								{ __( 'Edit' ) }
-							</Button>
-						) }
-					</HStack>
-				}
-				content={
-					<>
-						<ItemGroup>
-							{ items.map( ( item, index ) => (
-								<Item item={ item } key={ index } />
-							) ) }
-						</ItemGroup>
+		<SidebarNavigationScreen
+			path={ config[ postType ].path }
+			parentTitle={ __( 'Design' ) }
+			title={
+				<HStack style={ { minHeight: 36 } }>
+					<div>{ config[ postType ].labels.title }</div>
+					{ ! isMobileViewport && isEditorPage && (
+						<Button
+							className="edit-site-layout__edit-button"
+							label={ __( 'Open the editor' ) }
+							onClick={ () => {
+								__unstableSetCanvasMode( 'edit' );
+							} }
+						>
+							{ __( 'Edit' ) }
+						</Button>
+					) }
+				</HStack>
+			}
+			content={
+				<>
+					<ItemGroup>
+						{ items.map( ( item, index ) => (
+							<Item item={ item } key={ index } />
+						) ) }
+					</ItemGroup>
 
-						<SidebarNavigationItem
-							{ ...useLink( {
-								postType,
-								postId: undefined,
-							} ) }
-							style={ { textAlign: 'center' } }
-							children={ config[ postType ].labels.manage }
-						/>
-					</>
-				}
-			/>
-		</NavigatorScreen>
+					<SidebarNavigationItem
+						{ ...useLink( {
+							postType,
+							postId: undefined,
+						} ) }
+						style={ { textAlign: 'center' } }
+						children={ config[ postType ].labels.manage }
+					/>
+				</>
+			}
+		/>
 	);
 }

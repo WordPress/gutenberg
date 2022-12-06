@@ -4,7 +4,6 @@
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHStack as HStack,
-	__experimentalNavigatorScreen as NavigatorScreen,
 	__experimentalNavigatorButton as NavigatorButton,
 	Button,
 } from '@wordpress/components';
@@ -30,45 +29,44 @@ export default function SidebarNavigationScreenMain() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 
 	return (
-		<NavigatorScreen path="/">
-			<SidebarNavigationScreen
-				title={
-					<HStack style={ { minHeight: 36 } }>
-						<div>{ __( 'Design' ) }</div>
-						{ ! isMobileViewport && isEditorPage && (
-							<Button
-								className="edit-site-layout__edit-button"
-								label={ __( 'Open the editor' ) }
-								onClick={ () => {
-									__unstableSetCanvasMode( 'edit' );
-								} }
-							>
-								{ __( 'Edit' ) }
-							</Button>
-						) }
-					</HStack>
-				}
-				content={
-					<ItemGroup>
-						<NavigatorButton
-							as={ SidebarNavigationItem }
-							path="/templates"
-							withChevron
-							icon={ layout }
+		<SidebarNavigationScreen
+			path="/"
+			title={
+				<HStack style={ { minHeight: 36 } }>
+					<div>{ __( 'Design' ) }</div>
+					{ ! isMobileViewport && isEditorPage && (
+						<Button
+							className="edit-site-layout__edit-button"
+							label={ __( 'Open the editor' ) }
+							onClick={ () => {
+								__unstableSetCanvasMode( 'edit' );
+							} }
 						>
-							{ __( 'Templates' ) }
-						</NavigatorButton>
-						<NavigatorButton
-							as={ SidebarNavigationItem }
-							path="/template-parts"
-							withChevron
-							icon={ symbolFilled }
-						>
-							{ __( 'Template Parts' ) }
-						</NavigatorButton>
-					</ItemGroup>
-				}
-			/>
-		</NavigatorScreen>
+							{ __( 'Edit' ) }
+						</Button>
+					) }
+				</HStack>
+			}
+			content={
+				<ItemGroup>
+					<NavigatorButton
+						as={ SidebarNavigationItem }
+						path="/templates"
+						withChevron
+						icon={ layout }
+					>
+						{ __( 'Templates' ) }
+					</NavigatorButton>
+					<NavigatorButton
+						as={ SidebarNavigationItem }
+						path="/template-parts"
+						withChevron
+						icon={ symbolFilled }
+					>
+						{ __( 'Template Parts' ) }
+					</NavigatorButton>
+				</ItemGroup>
+			}
+		/>
 	);
 }

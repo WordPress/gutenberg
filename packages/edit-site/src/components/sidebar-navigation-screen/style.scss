@@ -1,5 +1,21 @@
+.edit-site-sidebar-navigation-screen {
+	display: flex;
+	flex-direction: column;
+	overflow-x: unset !important;
+	position: relative;
+}
+
 .edit-site-sidebar-navigation-screen__content {
 	margin: 0 $button-size;
+	flex-grow: 1;
+	overflow-y: auto;
+}
+
+.edit-site-sidebar-navigation-screen__title-icon {
+	position: sticky;
+	top: 0;
+	background: $gray-900;
+	padding-top: $grid-unit-80;
 }
 
 .edit-site-sidebar-navigation-screen__title {

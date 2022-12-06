@@ -210,10 +210,6 @@ export default function Layout( { onError } ) {
 								ease: 'easeOut',
 							} }
 							className="edit-site-layout__sidebar"
-							style={ {
-								paddingTop: canvasPadding,
-								paddingBottom: canvasPadding,
-							} }
 						>
 							<Sidebar />
 						</motion.div>
