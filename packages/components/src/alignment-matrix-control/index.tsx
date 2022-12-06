@@ -18,10 +18,15 @@ import { Composite, CompositeGroup, useCompositeState } from '../composite';
 import { Root, Row } from './styles/alignment-matrix-control-styles';
 import AlignmentMatrixControlIcon from './icon';
 import { GRID, getItemId } from './utils';
+import type { WordPressComponentProps } from '../ui/context';
+import type {
+	AlignmentMatrixControlProps,
+	AlignmentMatrixControlValue,
+} from './types';
 
 const noop = () => {};
 
-function useBaseId( id ) {
+function useBaseId( id?: string ) {
 	const instanceId = useInstanceId(
 		AlignmentMatrixControl,
 		'alignment-matrix-control'
@@ -30,7 +35,27 @@ function useBaseId( id ) {
 	return id || instanceId;
 }
 
-export default function AlignmentMatrixControl( {
+/**
+ *
+ * AlignmentMatrixControl components enable adjustments to horizontal and vertical alignments for UI.
+ *
+ * ```jsx
+ * import { __experimentalAlignmentMatrixControl as AlignmentMatrixControl } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const Example = () => {
+ * 	const [ alignment, setAlignment ] = useState( 'center center' );
+ *
+ * 	return (
+ * 		<AlignmentMatrixControl
+ * 			value={ alignment }
+ * 			onChange={ setAlignment }
+ * 		/>
+ * 	);
+ * };
+ * ```
+ */
+export function AlignmentMatrixControl( {
 	className,
 	id,
 	label = __( 'Alignment Matrix Control' ),
@@ -39,7 +64,7 @@ export default function AlignmentMatrixControl( {
 	onChange = noop,
 	width = 92,
 	...props
-} ) {
+}: WordPressComponentProps< AlignmentMatrixControlProps, 'div', false > ) {
 	const [ immutableDefaultValue ] = useState( value ?? defaultValue );
 	const baseId = useBaseId( id );
 	const initialCurrentId = getItemId( baseId, immutableDefaultValue );
@@ -50,7 +75,7 @@ export default function AlignmentMatrixControl( {
 		rtl: isRTL(),
 	} );
 
-	const handleOnChange = ( nextValue ) => {
+	const handleOnChange = ( nextValue: AlignmentMatrixControlValue ) => {
 		onChange( nextValue );
 	};
 
@@ -107,3 +132,5 @@ export default function AlignmentMatrixControl( {
 }
 
 AlignmentMatrixControl.Icon = AlignmentMatrixControlIcon;
+
+export default AlignmentMatrixControl;

@@ -13,8 +13,14 @@ import {
 	Cell as CellView,
 	Point,
 } from './styles/alignment-matrix-control-styles';
+import type { AlignmentMatrixControlCellProps } from './types';
+import type { WordPressComponentProps } from '../ui/context';
 
-export default function Cell( { isActive = false, value, ...props } ) {
+export default function Cell( {
+	isActive = false,
+	value,
+	...props
+}: WordPressComponentProps< AlignmentMatrixControlCellProps, 'span', false > ) {
 	const tooltipText = ALIGNMENT_LABEL[ value ];
 
 	return (
