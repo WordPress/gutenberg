@@ -214,10 +214,8 @@ class WP_Webfonts extends WP_Dependencies {
 		}
 
 		// Register the font family when it does not yet exist.
-		if ( ! isset( $this->registered[ $font_family_handle ] ) ) {
-			if ( ! $this->add_font_family( $font_family_handle ) ) {
-				return null;
-			}
+		if ( ! $this->add_font_family( $font_family_handle ) ) {
+			return null;
 		}
 
 		$variation = $this->validate_variation( $variation );
