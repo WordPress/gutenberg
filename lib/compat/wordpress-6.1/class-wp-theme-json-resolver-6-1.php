@@ -50,7 +50,7 @@ class WP_Theme_JSON_Resolver_6_1 extends WP_Theme_JSON_Resolver_6_0 {
 	 * @return WP_Theme_JSON_Gutenberg Entity that holds core data.
 	 */
 	public static function get_core_data() {
-		if ( null !== static::$core ) {
+		if ( null !== static::$core && static::has_same_registered_blocks( 'core' ) ) {
 			return static::$core;
 		}
 
@@ -74,7 +74,7 @@ class WP_Theme_JSON_Resolver_6_1 extends WP_Theme_JSON_Resolver_6_0 {
 	 * @return WP_Theme_JSON_Gutenberg Entity that holds styles for user data.
 	 */
 	public static function get_user_data() {
-		if ( null !== static::$user ) {
+		if ( null !== static::$user && static::has_same_registered_blocks( 'user' ) ) {
 			return static::$user;
 		}
 
