@@ -135,8 +135,8 @@ function QueryVariationPicker( {
 							query: {
 								...nextVariation.attributes.query,
 								postType:
-									attributes.query.postType ||
-									nextVariation.attributes.query.postType,
+									nextVariation.attributes.query.postType ||
+									attributes.query.postType,
 							},
 						} );
 					}
