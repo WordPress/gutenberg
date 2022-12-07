@@ -81,8 +81,6 @@ Talks given about Gutenberg, including slides and videos as they are available.
 -   [Gutenberg is Coming (Don’t Be Afraid)](https://training.ithemes.com/webinar/gutenberg-is-coming-dont-be-afraid/), iThemes Training (September 2017)
 -   [Converting a Shortcode into a Block](https://learn.wordpress.org/tutorial/converting-a-shortcode-into-a-block/), Jonathoan Bossenger
 -   [Using the create-block Tool](https://learn.wordpress.org/tutorial/using-the-create-block-tool/), Jonathoan Bossenger
--   [Ryan Welcher Codes](https://www.youtube.com/@RyanWelcherCodes), YouTube Channel
--   [Dave on WP](https://www.youtube.com/@DaveonWP), YouTube Channel
 
 ## Courses
 
