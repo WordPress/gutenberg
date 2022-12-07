@@ -6,7 +6,9 @@ import {
 	__experimentalNavigatorScreen as NavigatorScreen,
 	__experimentalUseNavigator as useNavigator,
 } from '@wordpress/components';
-import { getBlockTypes } from '@wordpress/blocks';
+import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
+
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -25,6 +27,7 @@ import ScreenHeadingColor from './screen-heading-color';
 import ScreenButtonColor from './screen-button-color';
 import ScreenLayout from './screen-layout';
 import ScreenStyleVariations from './screen-style-variations';
+import { ScreenVariations, ScreenVariation } from './screen-variations';
 import ScreenBorder from './screen-border';
 import StyleBook from '../style-book';
 import ScreenCSS from './screen-css';
@@ -43,9 +46,28 @@ function GlobalStylesNavigationScreen( { className, ...props } ) {
 	);
 }
 
-function ContextScreens( { name } ) {
-	const parentMenu =
-		name === undefined ? '' : '/blocks/' + encodeURIComponent( name );
+function ContextScreens( { name, parentMenu = '' } ) {
+	const blockStyleVariations = useSelect(
+		( select ) => {
+			const { getBlockStyles } = select( blocksStore );
+			return getBlockStyles( name );
+		},
+		[ name ]
+	);
+
+	const BlockStylesNavigationScreens = ( { blockStyles, blockName } ) => {
+		return blockStyles.map( ( style, index ) => (
+			<GlobalStylesNavigationScreen
+				key={ index }
+				path={ parentMenu + '/variations/' + style.name }
+			>
+				<ScreenVariation
+					blockName={ blockName }
+					styleName={ style.name }
+				/>
+			</GlobalStylesNavigationScreen>
+		) );
+	};
 
 	return (
 		<>
@@ -120,6 +142,16 @@ function ContextScreens( { name } ) {
 			<GlobalStylesNavigationScreen path={ parentMenu + '/layout' }>
 				<ScreenLayout name={ name } />
 			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path={ parentMenu + '/variations' }>
+				<ScreenVariations name={ name } path={ parentMenu } />
+			</GlobalStylesNavigationScreen>
+			{ !! blockStyleVariations?.length && (
+				<BlockStylesNavigationScreens
+					blockStyles={ blockStyleVariations }
+					blockName={ name }
+				/>
+			) }
 		</>
 	);
 }
@@ -154,6 +186,9 @@ function GlobalStylesStyleBook( { onClose } ) {
 
 function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
 	const blocks = getBlockTypes();
+	const getBlockStyles = useSelect( ( select ) => {
+		return select( blocksStore ).getBlockStyles;
+	}, [] );
 	return (
 		<NavigatorProvider
 			className="edit-site-global-styles-sidebar__navigator-provider"
@@ -186,9 +221,28 @@ function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
 				<ContextScreens
 					key={ 'screens-block-' + block.name }
 					name={ block.name }
+					parentMenu={ '/blocks/' + encodeURIComponent( block.name ) }
 				/>
 			) ) }
 
+			{ blocks.map( ( block ) => {
+				const blockStyleVariations = getBlockStyles( block.name );
+				if ( ! blockStyleVariations?.length ) {
+					return null;
+				}
+				return blockStyleVariations.map( ( variation ) => (
+					<ContextScreens
+						key={ variation.name + block.name }
+						name={ block.name }
+						parentMenu={
+							'/blocks/' +
+							encodeURIComponent( block.name ) +
+							'/variations/' +
+							encodeURIComponent( variation.name )
+						}
+					/>
+				) );
+			} ) }
 			{ isStyleBookOpened && (
 				<GlobalStylesStyleBook onClose={ onCloseStyleBook } />
 			) }

@@ -12,6 +12,7 @@ import { useHasBorderPanel } from './border-panel';
 import { useHasColorPanel } from './color-utils';
 import { useHasDimensionsPanel } from './dimensions-panel';
 import { useHasTypographyPanel } from './typography-panel';
+import { useHasVariationsPanel } from './variations-panel';
 import { NavigationButtonAsItem } from './navigation-button';
 
 function ContextMenu( { name, parentMenu = '' } ) {
@@ -20,6 +21,7 @@ function ContextMenu( { name, parentMenu = '' } ) {
 	const hasBorderPanel = useHasBorderPanel( name );
 	const hasDimensionsPanel = useHasDimensionsPanel( name );
 	const hasLayoutPanel = hasDimensionsPanel;
+	const hasVariationsPanel = useHasVariationsPanel( name, parentMenu );
 
 	return (
 		<ItemGroup>
@@ -57,6 +59,15 @@ function ContextMenu( { name, parentMenu = '' } ) {
 					aria-label={ __( 'Layout styles' ) }
 				>
 					{ __( 'Layout' ) }
+				</NavigationButtonAsItem>
+			) }
+			{ hasVariationsPanel && (
+				<NavigationButtonAsItem
+					icon={ '+' }
+					path={ parentMenu + '/variations' }
+					aria-label={ __( 'Style variations' ) }
+				>
+					{ __( 'Variations' ) }
 				</NavigationButtonAsItem>
 			) }
 		</ItemGroup>
