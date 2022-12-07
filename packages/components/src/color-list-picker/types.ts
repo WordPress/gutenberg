@@ -1,5 +1,13 @@
+/**
+ * External dependencies
+ */
+import type { CSSProperties } from 'react';
+
 export type ColorListPickerProps = {
-	colors: Array< { name: string; color: string } >;
+	colors: Array< {
+		name: string;
+		color: NonNullable< CSSProperties[ 'color' ] >;
+	} >;
 	labels: Array< string >;
 	value?: Array< string >;
 	disableCustomColors?: boolean;
