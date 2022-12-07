@@ -30,9 +30,6 @@ const NavMenuSidebarToggle = () => {
 	);
 };
 
-// Conditionally include NavMenu sidebar in Plugin only.
-// Optimise for dead code elimination.
-// See https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/feature-flags.md#dead-code-elimination.
 let MaybeNavMenuSidebarToggle = Fragment;
 
 const isOffCanvasNavigationEditorEnabled =
