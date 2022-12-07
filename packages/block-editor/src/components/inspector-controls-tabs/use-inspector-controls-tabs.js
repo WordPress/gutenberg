@@ -13,6 +13,8 @@ import { InspectorAdvancedControls } from '../inspector-controls';
 import { TAB_LIST_VIEW, TAB_SETTINGS, TAB_STYLES } from './utils';
 import { store as blockEditorStore } from '../../store';
 
+const EMPTY_ARRAY = [];
+
 function getShowTabs( blockName, tabSettings = {} ) {
 	// Don't allow settings to force the display of tabs if the block inspector
 	// tabs experiment hasn't been opted into.
@@ -83,5 +85,5 @@ export default function useInspectorControlsTabs( blockName ) {
 
 	const showTabs = getShowTabs( blockName, tabSettings );
 
-	return showTabs ? tabs : [];
+	return showTabs ? tabs : EMPTY_ARRAY;
 }
