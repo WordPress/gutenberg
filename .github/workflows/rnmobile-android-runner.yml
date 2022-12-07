@@ -33,8 +33,6 @@ jobs:
 
             - name: Setup Node and install dependencies
               uses: ./.github/setup-node
-              with:
-                  should-rebuild: true
 
             - name: Gradle cache
               uses: gradle/gradle-build-action@3fbe033aaae657f011f88f29be9e65ed26bd29ef # v2.3.3
