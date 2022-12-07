@@ -22,16 +22,19 @@ import {
 	Spinner,
 	Notice,
 	ComboboxControl,
+	Button,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState, useEffect } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
-import { useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import ConvertToLinksModal from './convert-to-links-modal';
+import ConvertToLinksModal, {
+	convertSelectedBlockToNavigationLinks,
+} from './convert-to-links-modal';
 
 // We only show the edit option when page count is <= MAX_PAGE_COUNT
 // Performance of Navigation Links is not good past this value.
@@ -173,9 +176,50 @@ export default function PageListEdit( {
 		}
 	}, [ clientId, blockList ] );
 
+	const { replaceBlock, selectBlock } = useDispatch( blockEditorStore );
+
+	const { parentNavBlockClientId } = useSelect( ( select ) => {
+		const { getSelectedBlockClientId, getBlockParentsByBlockName } =
+			select( blockEditorStore );
+
+		const _selectedBlockClientId = getSelectedBlockClientId();
+
+		return {
+			parentNavBlockClientId: getBlockParentsByBlockName(
+				_selectedBlockClientId,
+				'core/navigation',
+				true
+			)[ 0 ],
+		};
+	}, [] );
+
 	return (
 		<>
 			<InspectorControls>
+				{ isNavigationChild && (
+					<PanelBody title={ __( 'Customize this menu' ) }>
+						<p id={ 'wp-block-page-list-modal__description' }>
+							{ __(
+								'This menu is automatically kept in sync with pages on your site. You can manage the menu yourself by clicking customize below.'
+							) }
+						</p>
+						<Button
+							variant="primary"
+							disabled={ ! hasResolvedPages }
+							onClick={ () => {
+								convertSelectedBlockToNavigationLinks( {
+									pages,
+									replaceBlock,
+									clientId,
+									createBlock,
+								} )();
+								selectBlock( parentNavBlockClientId );
+							} }
+						>
+							{ __( 'Customize' ) }
+						</Button>
+					</PanelBody>
+				) }
 				<PanelBody>
 					{ parentOptions && (
 						<ComboboxControl
