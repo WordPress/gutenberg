@@ -16,7 +16,12 @@ import {
 	Button,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMemo, useCallback } from '@wordpress/element';
+import { useMemo, useCallback, useEffect, useRef } from '@wordpress/element';
+
+/**
+ * External dependencies
+ */
+import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 
 /**
  * Internal dependencies
@@ -171,6 +176,49 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 	const availableTabs = useInspectorControlsTabs( blockType?.name );
 	const showTabs = availableTabs?.length > 1;
 
+	const isOffCanvasNavigationEditorEnabled =
+		window?.__experimentalEnableOffCanvasNavigationEditor === true;
+
+	const isNavBlock = blockType.name === 'core/navigation' ? true : false;
+
+	const { parentNavBlockClientId } = useSelect( ( select ) => {
+		const { getSelectedBlockClientId, getBlockParentsByBlockName } =
+			select( blockEditorStore );
+
+		const _selectedBlockClientId = getSelectedBlockClientId();
+
+		return {
+			parentNavBlockClientId: getBlockParentsByBlockName(
+				_selectedBlockClientId,
+				'core/navigation',
+				true
+			)[ 0 ],
+		};
+	}, [] );
+	const previouslySelectedBlock = useRef( null );
+	const direction = selectedBlockName === 'core/navigation' ? -500 : 500;
+
+	const controls = useAnimation();
+
+	useEffect( () => {
+		if (
+			window.previouslySelectedBlock.current === 'core/navigation' ||
+			previouslySelectedBlock.current === 'core/navigation-link' ||
+			previouslySelectedBlock.current === 'core/navigation-submenu'
+		) {
+			controls.set( {
+				x: direction,
+			} );
+			controls.start( {
+				x: 0,
+				transition: { type: 'linear' },
+			} );
+		}
+		return () => {
+			previouslySelectedBlock.current = selectedBlockName;
+		};
+	}, [ selectedBlockName ] );
+
 	if ( count > 1 ) {
 		return (
 			<div className="block-editor-block-inspector">
@@ -199,6 +247,24 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 						/>
 					</>
 				) }
+			</div>
+		);
+	}
+
+	if (
+		isOffCanvasNavigationEditorEnabled &&
+		( parentNavBlockClientId || isNavBlock )
+	) {
+		return (
+			<div>
+				<AnimatePresence>
+					<motion.div animate={ controls } exit={ { x: direction } }>
+						<BlockInspectorSingleBlock
+							clientId={ selectedBlockClientId }
+							blockName={ blockType.name }
+						/>
+					</motion.div>
+				</AnimatePresence>
 			</div>
 		);
 	}
