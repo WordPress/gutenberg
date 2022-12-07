@@ -242,7 +242,7 @@ export default function useSelect( mapSelect, deps ) {
 		onStoreChange();
 
 		const unsubscribers = listeningStores.current.map( ( storeName ) =>
-			registry.__unstableSubscribeStore( storeName, onChange )
+			registry.subscribe( onChange, storeName )
 		);
 
 		isMounted.current = true;
@@ -374,7 +374,7 @@ export function useSuspenseSelect( mapSelect, deps ) {
 		onStoreChange();
 
 		const unsubscribers = listeningStores.current.map( ( storeName ) =>
-			registry.__unstableSubscribeStore( storeName, onChange )
+			registry.subscribe( onChange, storeName )
 		);
 
 		isMounted.current = true;
