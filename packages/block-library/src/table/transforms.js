@@ -11,7 +11,7 @@ import { getListContentSchema } from '../list/transforms';
 
 const tableContentPasteSchema = ( { phrasingContentSchema } ) => ( {
 	// lists are allowed on paste but will be transformed to simple content
-	// by transformContent below. 
+	// by transformContent below.
 	tr: {
 		allowEmpty: true,
 		children: {
