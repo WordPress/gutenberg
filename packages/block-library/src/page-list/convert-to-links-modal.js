@@ -5,7 +5,7 @@ import { Button, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { useEntityRecords } from '@wordpress/core-data';
-import { createBlock as create } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
@@ -16,64 +16,62 @@ import { convertDescription } from './constants';
 const PAGE_FIELDS = [ 'id', 'title', 'link', 'type', 'parent' ];
 const MAX_PAGE_COUNT = 100;
 
-export const convertSelectedBlockToNavigationLinks =
-	( { pages, clientId, replaceBlock, createBlock } ) =>
-	() => {
-		if ( ! pages ) {
-			return;
+export const convertSelectedBlockToNavigationLinks = ( pages ) => {
+	if ( ! pages ) {
+		return;
+	}
+
+	const linkMap = {};
+	const navigationLinks = [];
+	pages.forEach( ( { id, title, link: url, type, parent } ) => {
+		// See if a placeholder exists. This is created if children appear before parents in list.
+		const innerBlocks = linkMap[ id ]?.innerBlocks ?? [];
+		linkMap[ id ] = createBlock(
+			'core/navigation-link',
+			{
+				id,
+				label: title.rendered,
+				url,
+				type,
+				kind: 'post-type',
+			},
+			innerBlocks
+		);
+
+		if ( ! parent ) {
+			navigationLinks.push( linkMap[ id ] );
+		} else {
+			if ( ! linkMap[ parent ] ) {
+				// Use a placeholder if the child appears before parent in list.
+				linkMap[ parent ] = { innerBlocks: [] };
+			}
+			const parentLinkInnerBlocks = linkMap[ parent ].innerBlocks;
+			parentLinkInnerBlocks.push( linkMap[ id ] );
 		}
+	} );
 
-		const linkMap = {};
-		const navigationLinks = [];
-		pages.forEach( ( { id, title, link: url, type, parent } ) => {
-			// See if a placeholder exists. This is created if children appear before parents in list.
-			const innerBlocks = linkMap[ id ]?.innerBlocks ?? [];
-			linkMap[ id ] = createBlock(
-				'core/navigation-link',
-				{
-					id,
-					label: title.rendered,
-					url,
-					type,
-					kind: 'post-type',
-				},
-				innerBlocks
-			);
+	// Transform all links with innerBlocks into Submenus. This can't be done
+	// sooner because page objects have no information on their children.
 
-			if ( ! parent ) {
-				navigationLinks.push( linkMap[ id ] );
-			} else {
-				if ( ! linkMap[ parent ] ) {
-					// Use a placeholder if the child appears before parent in list.
-					linkMap[ parent ] = { innerBlocks: [] };
-				}
-				const parentLinkInnerBlocks = linkMap[ parent ].innerBlocks;
-				parentLinkInnerBlocks.push( linkMap[ id ] );
+	const transformSubmenus = ( listOfLinks ) => {
+		listOfLinks.forEach( ( block, index, listOfLinksArray ) => {
+			const { attributes, innerBlocks } = block;
+			if ( innerBlocks.length !== 0 ) {
+				transformSubmenus( innerBlocks );
+				const transformedBlock = createBlock(
+					'core/navigation-submenu',
+					attributes,
+					innerBlocks
+				);
+				listOfLinksArray[ index ] = transformedBlock;
 			}
 		} );
-
-		// Transform all links with innerBlocks into Submenus. This can't be done
-		// sooner because page objects have no information on their children.
-
-		const transformSubmenus = ( listOfLinks ) => {
-			listOfLinks.forEach( ( block, index, listOfLinksArray ) => {
-				const { attributes, innerBlocks } = block;
-				if ( innerBlocks.length !== 0 ) {
-					transformSubmenus( innerBlocks );
-					const transformedBlock = createBlock(
-						'core/navigation-submenu',
-						attributes,
-						innerBlocks
-					);
-					listOfLinksArray[ index ] = transformedBlock;
-				}
-			} );
-		};
-
-		transformSubmenus( navigationLinks );
-
-		replaceBlock( clientId, navigationLinks );
 	};
+
+	transformSubmenus( navigationLinks );
+
+	return navigationLinks;
+};
 
 export default function ConvertToLinksModal( { onClose, clientId } ) {
 	const { records: pages, hasResolved: pagesFinished } = useEntityRecords(
@@ -114,7 +112,7 @@ export default function ConvertToLinksModal( { onClose, clientId } ) {
 						pages,
 						replaceBlock,
 						clientId,
-						createBlock: create,
+						createBlock,
 					} ) }
 				>
 					{ __( 'Customize' ) }

@@ -197,19 +197,22 @@ export default function PageListEdit( {
 	return (
 		<>
 			<InspectorControls>
-				{ isNavigationChild && (
+				{ isNavigationChild && pages?.length > 0 && (
 					<PanelBody title={ __( 'Customize this menu' ) }>
 						<p>{ convertDescription }</p>
 						<Button
 							variant="primary"
 							disabled={ ! hasResolvedPages }
 							onClick={ () => {
-								convertSelectedBlockToNavigationLinks( {
-									pages,
-									replaceBlock,
-									clientId,
-									createBlock,
-								} )();
+								const navigationLinks =
+									convertSelectedBlockToNavigationLinks(
+										pages
+									);
+
+								// Replace the Page List block with the Navigation Links.
+								replaceBlock( clientId, navigationLinks );
+
+								// Select the Navigation block to reveal the changes.
 								selectBlock( parentNavBlockClientId );
 							} }
 						>
