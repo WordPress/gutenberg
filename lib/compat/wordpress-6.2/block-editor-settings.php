@@ -74,7 +74,7 @@ function gutenberg_get_block_editor_settings( $settings ) {
 				'__unstableType' => 'theme',
 				'isGlobalStyles' => true,
 			);
-			$actual_css    = gutenberg_get_global_stylesheet( array( $block_classes['css'], 'customCSS' ) );
+			$actual_css    = gutenberg_get_global_stylesheet( array( $block_classes['css'], 'custom-css' ) );
 			if ( '' !== $actual_css ) {
 				$block_classes['css'] = $actual_css;
 				$new_global_styles[]  = $block_classes;

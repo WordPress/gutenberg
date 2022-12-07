@@ -288,14 +288,14 @@ class WP_Theme_JSON_6_2 extends WP_Theme_JSON_6_1 {
 	 *                         'variables': only the CSS Custom Properties for presets & custom ones.
 	 *                         'styles': only the styles section in theme.json.
 	 *                         'presets': only the classes for the presets.
-	 *                         'customCSS': only the css from global styles.css.
+	 *                         'custom-css': only the css from global styles.css.
 	 * @param array $origins A list of origins to include. By default it includes VALID_ORIGINS.
 	 * @param array $options An array of options for now used for internal purposes only (may change without notice).
 	 *                       The options currently supported are 'scope' that makes sure all style are scoped to a given selector,
 	 *                       and root_selector which overwrites and forces a given selector to be used on the root node.
 	 * @return string Stylesheet.
 	 */
-	public function get_stylesheet( $types = array( 'variables', 'styles', 'presets', 'customCSS' ), $origins = null, $options = array() ) {
+	public function get_stylesheet( $types = array( 'variables', 'styles', 'presets', 'custom-css' ), $origins = null, $options = array() ) {
 		if ( null === $origins ) {
 			$origins = static::VALID_ORIGINS;
 		}
@@ -382,7 +382,7 @@ class WP_Theme_JSON_6_2 extends WP_Theme_JSON_6_1 {
 		}
 
 		// Load the custom CSS last so it has the highest specificity.
-		if ( in_array( 'customCSS', $types, true ) ) {
+		if ( in_array( 'custom-css', $types, true ) ) {
 			$stylesheet .= _wp_array_get( $this->theme_json, array( 'styles', 'css' ) );
 		}
 
