@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -10,124 +9,140 @@ import { useSelect } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../../store';
 
-// Notes about the abstrction:
-// 1. Some external media might exceed the file size limit allowed. Check how to handle this..
-// 2. do I really need to add `type:external`? Could the abstraction work by
-// just using `__unstableFetchMedia` and move all the `fetchExternalMedia`
-// handling to that function? On the other hand it might be useful to have this here,
-// so it can be used by other extenders..
-// 3. Define a common interface for media items that makes sense for all.(ex. check order that is not supported by Openverse)
-const MEDIA_CATEGORIES = [
-	{
-		label: __( 'Images' ),
-		name: 'images',
-		mediaType: 'image',
-		defaultRequestArgs: { media_type: 'image' },
-	},
-	{
-		label: __( 'Videos' ),
-		name: 'videos',
-		mediaType: 'video',
-		defaultRequestArgs: { media_type: 'video' },
-	},
-	{
-		label: __( 'Audio' ),
-		name: 'audio',
-		mediaType: 'audio',
-		defaultRequestArgs: { media_type: 'audio' },
-	},
-	{
-		label: 'Openverse',
-		name: 'openverse',
-		mediaType: 'image',
-		type: 'external',
-		url: 'https://api.openverse.engineering/v1/images/',
-		defaultRequestArgs: {
-			mature: false,
-			excluded_source: 'flickr',
-			license: 'cc0',
-		},
-		requestMap: {
-			per_page: 'page_size',
-			search: 'q',
-		},
-		responseResults: 'results',
-		responseMap: {},
-	},
-];
-const getInternalMediaCategories = () => {
-	return MEDIA_CATEGORIES.filter( ( { type } ) => type !== 'external' );
-};
-const getExternalMediaCategories = () => {
-	return MEDIA_CATEGORIES.filter( ( { type } ) => type === 'external' );
-};
+/**
+ * Interface for media requests.
+ *
+ * @typedef {Object} InserterMediaRequest
+ * @property {number} per_page  How many items to fetch per page.
+ * @property {string} search    The search term to use for filtering the results.
+ * @property {string} [orderBy] Order by clause to sort the results.
+ */
+
+/**
+ * Interface for media responses.
+ * TODO: in progress..
+ *
+ * @typedef {Object} InserterMediaResponse
+ * @property {string} title The title of the media item.
+ */
+
+/**
+ * Fetches media items based on the provided category.
+ * Each media category is responsible for providing a `fetch` function.
+ *
+ * @param {Object}               category The media category to fetch results for.
+ * @param {InserterMediaRequest} query    The query args to use for the request.
+ * @return {InserterMediaResponse[]} The media results.
+ */
+export function useMediaResults( category, query = {} ) {
+	const [ mediaList, setMediaList ] = useState();
+	const [ isLoading, setIsLoading ] = useState( false );
+	// We need to keep track of the last request made because
+	// multiple request can be fired without knowing the order
+	// of resolution, and we need to ensure we are showing
+	// the results of the last request.
+	// In the future we could use AbortController to cancel previous
+	// requests, but we don't for now as it involves adding support
+	// for this to `core-data` package.
+	const lastRequest = useRef();
+	useEffect( () => {
+		( async () => {
+			const key = JSON.stringify( {
+				category: category.name,
+				...query,
+			} );
+			lastRequest.current = key;
+			setIsLoading( true );
+			setMediaList( [] ); // Empty the previous results.
+			const _media = await category.fetch?.( query );
+			// TODO: need to map results to InserterMediaResponse interface.
+			// It should be a responsibility of the category to provide the
+			// results based on `InserterMediaResponse` interface.
+			if ( key === lastRequest.current ) {
+				setMediaList( _media );
+				setIsLoading( false );
+			}
+		} )();
+	}, [ category.name, ...Object.values( query ) ] );
+	return { mediaList, isLoading };
+}
+
 export function useMediaCategories( rootClientId ) {
 	const [ categories, setCategories ] = useState( [] );
-	const { canInsertImage, canInsertVideo, canInsertAudio, fetchMedia } =
-		useSelect(
-			( select ) => {
-				const { canInsertBlockType, getSettings } =
-					select( blockEditorStore );
-				return {
-					fetchMedia: getSettings().__unstableFetchMedia,
-					canInsertImage: canInsertBlockType(
-						'core/image',
-						rootClientId
-					),
-					canInsertVideo: canInsertBlockType(
-						'core/video',
-						rootClientId
-					),
-					canInsertAudio: canInsertBlockType(
-						'core/audio',
-						rootClientId
-					),
-				};
-			},
-			[ rootClientId ]
-		);
+	const {
+		canInsertImage,
+		canInsertVideo,
+		canInsertAudio,
+		inserterMediaCategories,
+	} = useSelect(
+		( select ) => {
+			const { canInsertBlockType, getSettings } =
+				select( blockEditorStore );
+			return {
+				inserterMediaCategories:
+					getSettings().__unstableInserterMediaCategories,
+				canInsertImage: canInsertBlockType(
+					'core/image',
+					rootClientId
+				),
+				canInsertVideo: canInsertBlockType(
+					'core/video',
+					rootClientId
+				),
+				canInsertAudio: canInsertBlockType(
+					'core/audio',
+					rootClientId
+				),
+			};
+		},
+		[ rootClientId ]
+	);
 	useEffect( () => {
 		( async () => {
 			const _categories = [];
-			// If `__unstableFetchMedia` is not defined in block editor settings,
-			// do not show internal media categories that rely on it.
-			if ( fetchMedia ) {
-				const query = {
-					context: 'view',
-					per_page: 1,
-					_fields: [ 'id' ],
-				};
-				const [ image, video, audio ] = await Promise.all( [
-					fetchMedia( { ...query, media_type: 'image' } ),
-					fetchMedia( { ...query, media_type: 'video' } ),
-					fetchMedia( { ...query, media_type: 'audio' } ),
-				] );
-				const showImage = canInsertImage && !! image.length;
-				const showVideo = canInsertVideo && !! video.length;
-				const showAudio = canInsertAudio && !! audio.length;
-				const internalCategories = getInternalMediaCategories().filter(
-					( { mediaType } ) =>
-						( mediaType === 'image' && showImage ) ||
-						( mediaType === 'video' && showVideo ) ||
-						( mediaType === 'audio' && showAudio )
-				);
-				_categories.push( ...internalCategories );
+			// If `__unstableInserterMediaCategories` is not defined in
+			// block editor settings, do not show any media categories.
+			if ( ! inserterMediaCategories ) {
+				return;
 			}
-			// Add the eligible categories with `extenal` sources(ex. Openverse).
-			const externalMediaCategories = getExternalMediaCategories().filter(
-				( { mediaType } ) => {
-					return (
-						( mediaType === 'image' && canInsertImage ) ||
-						( mediaType === 'video' && canInsertVideo ) ||
-						( mediaType === 'audio' && canInsertAudio )
-					);
-				}
+			// Loop through categories to check if they have at least one media item.
+			const categoriesHaveMedia = new Map(
+				await Promise.all(
+					inserterMediaCategories.map( async ( category ) => {
+						// Some sources are external and we don't need to make a request.
+						if ( category.hasAvailableMedia ) {
+							return [ category.name, true ];
+						}
+						const results = await category.fetch( { per_page: 1 } );
+						return [ category.name, !! results.length ];
+					} )
+				)
 			);
-			_categories.push( ...externalMediaCategories );
+			// We need to filter out categories that don't have any media items or
+			// the corresponding block type is not allowed to be inserted, based
+			// on the category's `mediaType`.
+			const canInsertMediaType = {
+				image: canInsertImage,
+				video: canInsertVideo,
+				audio: canInsertAudio,
+			};
+			inserterMediaCategories.forEach( ( category ) => {
+				if (
+					canInsertMediaType[ category.mediaType ] &&
+					categoriesHaveMedia.get( category.name )
+				) {
+					_categories.push( category );
+				}
+			} );
 			if ( !! _categories.length ) {
 				setCategories( _categories );
 			}
 		} )();
-	}, [ canInsertImage, canInsertVideo, canInsertAudio, fetchMedia ] );
+	}, [
+		canInsertImage,
+		canInsertVideo,
+		canInsertAudio,
+		inserterMediaCategories,
+	] );
 	return categories;
 }

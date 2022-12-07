@@ -11,7 +11,7 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import MediaList from './media-list';
 import useDebouncedInput from '../hooks/use-debounced-input';
-import { useMediaResults } from './hooks/use-media-results';
+import { useMediaResults } from './hooks';
 import InserterNoResults from '../no-results';
 
 const INITIAL_MEDIA_ITEMS_PER_PAGE = 10;
@@ -38,13 +38,9 @@ export function MediaCategoryDialog( { rootClientId, onInsert, category } ) {
 
 export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 	const [ search, setSearch, debouncedSearch ] = useDebouncedInput();
-	// TODO: here we'll need the request/response interfaces and see where to
-	// differentiate between internal and external media sources.
-	const mediaList = useMediaResults( category, {
+	const { mediaList, isLoading } = useMediaResults( category, {
 		per_page: !! debouncedSearch ? 20 : INITIAL_MEDIA_ITEMS_PER_PAGE,
 		search: debouncedSearch,
-		// Check how to handle conditions like this in an abstraction..
-		orderBy: !! debouncedSearch ? 'relevance' : 'date',
 	} );
 	const baseCssClass = 'block-editor-inserter__media-panel';
 	return (
@@ -64,15 +60,13 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 					category.label.toLocaleLowerCase()
 				) }
 			/>
-			{ ! mediaList && (
+			{ isLoading && (
 				<div className={ `${ baseCssClass }-spinner` }>
 					<Spinner />
 				</div>
 			) }
-			{ Array.isArray( mediaList ) && ! mediaList.length && (
-				<InserterNoResults />
-			) }
-			{ !! mediaList?.length && (
+			{ ! isLoading && ! mediaList?.length && <InserterNoResults /> }
+			{ ! isLoading && !! mediaList?.length && (
 				<MediaList
 					rootClientId={ rootClientId }
 					onClick={ onInsert }
