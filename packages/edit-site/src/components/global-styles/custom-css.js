@@ -12,12 +12,12 @@ function CustomCSSControl() {
 	const [ customCSS, setCustomCSS ] = useStyle( 'css' );
 
 	return (
-		<>
-			<TextareaControl
-				value={ customCSS }
-				onChange={ ( value ) => setCustomCSS( value ) }
-			/>
-		</>
+		<TextareaControl
+			value={ customCSS }
+			onChange={ ( value ) => setCustomCSS( value ) }
+			rows={ 15 }
+			className="edit-site-global-styles__custom-css-input"
+		/>
 	);
 }
 

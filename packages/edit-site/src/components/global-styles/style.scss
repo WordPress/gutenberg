@@ -134,3 +134,7 @@ $block-preview-height: 150px;
 	border: $gray-200 $border-width solid;
 	border-radius: $radius-block-ui;
 }
+
+.edit-site-global-styles__custom-css-input textarea {
+	font-family: Menlo, Consolas, monaco, monospace;
+}
