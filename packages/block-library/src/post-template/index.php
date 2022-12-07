@@ -51,7 +51,7 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 		$query = clone $wp_query;
 	} else {
 		$query_args = build_query_vars_from_query_block( $block, $page );
-		$query      = new WP_Query( $query_args );
+		$query      = _gutenberg_get_cached_block_query_results( $query_args );
 	}
 
 	if ( ! $query->have_posts() ) {
