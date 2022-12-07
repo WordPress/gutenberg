@@ -52,14 +52,18 @@ test.describe( 'Navigate regions', () => {
 			);
 		}
 
+		// Make sure the Settings sidebar is opened.
+		// Note: this also moves the mouse pointer over the Settings button.
+		await editor.openDocumentSettingsSidebar();
+
+		// Move the mouse pointer away from the Settings button.
+		await page.mouse.move( 0, 0 );
+
 		// Add a paragraph block.
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'Dummy text' },
 		} );
-
-		// Make sure the Settings sidebar is opened.
-		await editor.openDocumentSettingsSidebar();
 
 		// Navigate to the top bar region.
 		await page.keyboard.press( 'Control+`' );
@@ -125,6 +129,7 @@ test.describe( 'Navigate regions', () => {
 
 		// Make sure the publish region is focused and shows the focus style.
 		await expect( editorPublish ).toBeFocused();
+
 		await expect( editorPublishPanel ).toHaveCSS(
 			'outline-style',
 			'solid'
@@ -132,6 +137,7 @@ test.describe( 'Navigate regions', () => {
 		await expect( editorPublishPanel ).toHaveCSS( 'outline-width', '4px' );
 		// Add a mask overlay and take a screenshot.
 		createMaskElement( editorPublishPanel, 6 );
+
 		await expect( editorPublishPanel ).toHaveScreenshot();
 		removeMaskElement();
 
@@ -154,6 +160,9 @@ test.describe( 'Navigate regions', () => {
 		// Navigate to the Document overview region.
 		// Open the Document overview.
 		await page.locator( 'role=button[name="Document Overview"i]' ).click();
+
+		// Move the mouse pointer away from the Document Overview button.
+		await page.mouse.move( 0, 0 );
 
 		await pageUtils.pressKeyTimes( 'Control+`', 2 );
 
@@ -179,12 +188,18 @@ test.describe( 'Navigate regions', () => {
 		// Close the Document overview.
 		await page.locator( 'role=button[name="Document Overview"i]' ).click();
 
+		// Move the mouse pointer away from the Document Overview button.
+		await page.mouse.move( 0, 0 );
+
 		// Close the settings region.
 		await page
 			.locator(
 				'role=region[name="Editor top bar"i] >> role=button[name="Settings"i]'
 			)
 			.click();
+
+		// Move the mouse pointer away from the Settings button.
+		await page.mouse.move( 0, 0 );
 
 		// Navigate to the settings region when it's closed.
 		await pageUtils.pressKeyTimes( 'Control+`', 3 );
@@ -207,5 +222,8 @@ test.describe( 'Navigate regions', () => {
 
 		// Make sure to leave the Settings sidebar opened.
 		await editor.openDocumentSettingsSidebar();
+
+		// Move the mouse pointer away from the Settings button.
+		await page.mouse.move( 0, 0 );
 	} );
 } );
