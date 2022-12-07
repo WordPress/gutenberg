@@ -108,12 +108,13 @@ export default function ConvertToLinksModal( { onClose, clientId } ) {
 				<Button
 					variant="primary"
 					disabled={ ! pagesFinished }
-					onClick={ convertSelectedBlockToNavigationLinks( {
-						pages,
-						replaceBlock,
-						clientId,
-						createBlock,
-					} ) }
+					onClick={ () => {
+						const navigationLinks =
+							convertSelectedBlockToNavigationLinks( pages );
+
+						// Replace the Page List block with the Navigation Links.
+						replaceBlock( clientId, navigationLinks );
+					} }
 				>
 					{ __( 'Customize' ) }
 				</Button>
