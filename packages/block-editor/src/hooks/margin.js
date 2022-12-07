@@ -57,11 +57,16 @@ export function hasMarginValue( props ) {
  * Resets the margin block support attributes. This can be used when disabling
  * the margin support controls for a block via a `ToolsPanel`.
  *
- * @param {Object} props               Block props.
- * @param {Object} props.attributes    Block's attributes.
- * @param {Object} props.setAttributes Function to set block's attributes.
+ * @param {Object}   props                      Block props.
+ * @param {Object}   props.attributes           Block's attributes.
+ * @param {Function} props.setAttributes        Function to set block's attributes.
+ * @param {Function} props.setBlockGlobalStyles Function to set block's global styles.
  */
-export function resetMargin( { attributes = {}, setAttributes } ) {
+export function resetMargin( {
+	attributes = {},
+	setAttributes,
+	setBlockGlobalStyles,
+} ) {
 	const { style } = attributes;
 
 	setAttributes( {
@@ -73,6 +78,7 @@ export function resetMargin( { attributes = {}, setAttributes } ) {
 			},
 		} ),
 	} );
+	setBlockGlobalStyles( 'spacing.margin', undefined );
 }
 
 /**

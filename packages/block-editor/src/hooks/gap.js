@@ -87,11 +87,16 @@ export function getGapCSSValue( blockGapValue, defaultValue = '0' ) {
  * Resets the gap block support attribute. This can be used when disabling
  * the gap support controls for a block via a progressive discovery panel.
  *
- * @param {Object} props               Block props.
- * @param {Object} props.attributes    Block's attributes.
- * @param {Object} props.setAttributes Function to set block's attributes.
+ * @param {Object}   props                      Block props.
+ * @param {Object}   props.attributes           Block's attributes.
+ * @param {Function} props.setAttributes        Function to set block's attributes.
+ * @param {Function} props.setBlockGlobalStyles Function to set block's global styles.
  */
-export function resetGap( { attributes = {}, setAttributes } ) {
+export function resetGap( {
+	attributes = {},
+	setAttributes,
+	setBlockGlobalStyles,
+} ) {
 	const { style } = attributes;
 
 	setAttributes( {
@@ -103,6 +108,7 @@ export function resetGap( { attributes = {}, setAttributes } ) {
 			},
 		},
 	} );
+	setBlockGlobalStyles( 'spacing.blockGap', undefined );
 }
 
 /**

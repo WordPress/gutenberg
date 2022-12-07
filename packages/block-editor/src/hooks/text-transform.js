@@ -28,6 +28,7 @@ export function TextTransformEdit( props ) {
 	const {
 		attributes: { style },
 		setAttributes,
+		setBlockGlobalStyles,
 	} = props;
 
 	function onChange( newTransform ) {
@@ -40,6 +41,7 @@ export function TextTransformEdit( props ) {
 				},
 			} ),
 		} );
+		setBlockGlobalStyles( 'typography.textTransform', newTransform );
 	}
 
 	return (
@@ -82,11 +84,16 @@ export function hasTextTransformValue( props ) {
  * disabling the text transform support controls for a block via a progressive
  * discovery panel.
  *
- * @param {Object} props               Block props.
- * @param {Object} props.attributes    Block's attributes.
- * @param {Object} props.setAttributes Function to set block's attributes.
+ * @param {Object}   props                      Block props.
+ * @param {Object}   props.attributes           Block's attributes.
+ * @param {Function} props.setAttributes        Function to set block's attributes.
+ * @param {Function} props.setBlockGlobalStyles Function to set block's global styles.
  */
-export function resetTextTransform( { attributes = {}, setAttributes } ) {
+export function resetTextTransform( {
+	attributes = {},
+	setAttributes,
+	setBlockGlobalStyles,
+} ) {
 	const { style } = attributes;
 
 	setAttributes( {
@@ -98,4 +105,5 @@ export function resetTextTransform( { attributes = {}, setAttributes } ) {
 			},
 		} ),
 	} );
+	setBlockGlobalStyles( 'typography.textTransform', undefined );
 }

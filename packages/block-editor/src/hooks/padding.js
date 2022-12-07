@@ -56,11 +56,16 @@ export function hasPaddingValue( props ) {
  * Resets the padding block support attributes. This can be used when disabling
  * the padding support controls for a block via a `ToolsPanel`.
  *
- * @param {Object} props               Block props.
- * @param {Object} props.attributes    Block's attributes.
- * @param {Object} props.setAttributes Function to set block's attributes.
+ * @param {Object}   props                      Block props.
+ * @param {Object}   props.attributes           Block's attributes.
+ * @param {Function}   props.setAttributes        Function to set block's attributes.
+ * @param {Function} props.setBlockGlobalStyles Function to set block's global styles.
  */
-export function resetPadding( { attributes = {}, setAttributes } ) {
+export function resetPadding( {
+	attributes = {},
+	setAttributes,
+	setBlockGlobalStyles,
+} ) {
 	const { style } = attributes;
 
 	setAttributes( {
@@ -72,6 +77,7 @@ export function resetPadding( { attributes = {}, setAttributes } ) {
 			},
 		} ),
 	} );
+	setBlockGlobalStyles( 'spacing.padding', undefined );
 }
 
 /**

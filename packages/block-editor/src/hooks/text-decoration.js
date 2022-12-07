@@ -28,6 +28,7 @@ export function TextDecorationEdit( props ) {
 	const {
 		attributes: { style },
 		setAttributes,
+		setBlockGlobalStyles,
 	} = props;
 
 	function onChange( newDecoration ) {
@@ -40,6 +41,7 @@ export function TextDecorationEdit( props ) {
 				},
 			} ),
 		} );
+		setBlockGlobalStyles( 'typography.textDecoration', newDecoration );
 	}
 
 	return (
@@ -83,11 +85,16 @@ export function hasTextDecorationValue( props ) {
  * disabling the text decoration support controls for a block via a progressive
  * discovery panel.
  *
- * @param {Object} props               Block props.
- * @param {Object} props.attributes    Block's attributes.
- * @param {Object} props.setAttributes Function to set block's attributes.
+ * @param {Object}   props                      Block props.
+ * @param {Object}   props.attributes           Block's attributes.
+ * @param {Function} props.setAttributes        Function to set block's attributes.
+ * @param {Function} props.setBlockGlobalStyles Function to set block's global styles.
  */
-export function resetTextDecoration( { attributes = {}, setAttributes } ) {
+export function resetTextDecoration( {
+	attributes = {},
+	setAttributes,
+	setBlockGlobalStyles,
+} ) {
 	const { style } = attributes;
 
 	setAttributes( {
@@ -99,4 +106,5 @@ export function resetTextDecoration( { attributes = {}, setAttributes } ) {
 			},
 		} ),
 	} );
+	setBlockGlobalStyles( 'typography.textDecoration', undefined );
 }

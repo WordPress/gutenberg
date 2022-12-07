@@ -39,9 +39,14 @@ export function hasMinHeightValue( props ) {
  *
  * @param {Object} props               Block props.
  * @param {Object} props.attributes    Block's attributes.
- * @param {Object} props.setAttributes Function to set block's attributes.
+ * @param {Function} props.setAttributes Function to set block's attributes.
+ * @param {Function} props.setBlockGlobalStyles Function to set block's global styles.
  */
-export function resetMinHeight( { attributes = {}, setAttributes } ) {
+export function resetMinHeight( {
+	attributes = {},
+	setAttributes,
+	setBlockGlobalStyles,
+} ) {
 	const { style } = attributes;
 
 	setAttributes( {
@@ -53,6 +58,7 @@ export function resetMinHeight( { attributes = {}, setAttributes } ) {
 			},
 		} ),
 	} );
+	setBlockGlobalStyles( 'dimensions.minHeight', undefined );
 }
 
 /**
@@ -76,6 +82,7 @@ export function MinHeightEdit( props ) {
 	const {
 		attributes: { style },
 		setAttributes,
+		setBlockGlobalStyles,
 	} = props;
 
 	if ( useIsMinHeightDisabled( props ) ) {
@@ -92,6 +99,7 @@ export function MinHeightEdit( props ) {
 		};
 
 		setAttributes( { style: cleanEmptyObject( newStyle ) } );
+		setBlockGlobalStyles( 'dimensions.minHeight', next );
 	};
 
 	return (
