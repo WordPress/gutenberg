@@ -38,10 +38,6 @@ export function getAllowedFormats( { allowedFormats, disableFormats } ) {
 		return getAllowedFormats.EMPTY_ARRAY;
 	}
 
-	if ( ! allowedFormats ) {
-		return;
-	}
-
 	return allowedFormats;
 }
 
