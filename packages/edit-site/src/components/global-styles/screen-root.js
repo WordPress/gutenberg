@@ -75,7 +75,8 @@ function ScreenRoot() {
 					paddingTop={ 2 }
 					/*
 					 * 13px matches the text inset of the NavigationButton (12px padding, plus the width of the button's border).
-					 * This is an ad hoc override for this particular instance only and should be reconsidered before making into a pattern.
+					 * This is an ad hoc override for this instance and the Addtional CSS option below. Other options for matching the
+					 * the nav button inset should be looked at before reusing further.
 					 */
 					paddingX="13px"
 					marginBottom={ 4 }
@@ -105,15 +106,11 @@ function ScreenRoot() {
 				<Spacer
 					as="p"
 					paddingTop={ 2 }
-					/*
-					 * 13px matches the text inset of the NavigationButton (12px padding, plus the width of the button's border).
-					 * This is an ad hoc override for this particular instance only and should be reconsidered before making into a pattern.
-					 */
 					paddingX="13px"
 					marginBottom={ 4 }
 				>
 					{ __(
-						'Customize the appearance of your site even further with CSS.'
+						'Add CSS to modify your site in ways not provided for by the existing design tools.'
 					) }
 				</Spacer>
 				<ItemGroup>
