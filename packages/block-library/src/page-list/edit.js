@@ -236,8 +236,8 @@ export default function PageListEdit( {
 						</Button>
 					</PanelBody>
 				) }
-				<PanelBody>
-					{ pagesTree.length > 0 && (
+				{ pagesTree.length > 0 && (
+					<PanelBody>
 						<ComboboxControl
 							className="editor-page-attributes__parent"
 							label={ __( 'Parent page' ) }
@@ -250,8 +250,8 @@ export default function PageListEdit( {
 								'Choose a page to show only its subpages.'
 							) }
 						/>
-					) }
-				</PanelBody>
+					</PanelBody>
+				) }
 			</InspectorControls>
 			{ allowConvertToLinks && totalPages > 0 && (
 				<BlockControls group="other">
