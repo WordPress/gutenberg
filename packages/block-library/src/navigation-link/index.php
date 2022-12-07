@@ -346,7 +346,16 @@ function register_block_core_navigation_link() {
 add_action( 'init', 'register_block_core_navigation_link' );
 
 /**
- * Disables the display of tabs for the Navigation Link block.
+ * Disables the display of block inspector tabs for the Navigation Link block.
+ *
+ * This is only a temporary measure until we have a TabPanel and mechanism that
+ * will allow the Navigation Link to programmatically select a tab when edited
+ * via a specific context.
+ *
+ * See:
+ * - https://github.com/WordPress/gutenberg/issues/45951
+ * - https://github.com/WordPress/gutenberg/pull/46321
+ * - https://github.com/WordPress/gutenberg/pull/46271
  *
  * @param array $settings Default editor settings.
  * @return array Filtered editor settings.

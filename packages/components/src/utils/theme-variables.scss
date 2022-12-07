@@ -23,3 +23,6 @@ $components-color-gray-400: var(--wp-components-color-gray-400, $gray-400);
 $components-color-gray-600: var(--wp-components-color-gray-600, $gray-600);
 $components-color-gray-700: var(--wp-components-color-gray-700, $gray-700);
 $components-color-gray-800: var(--wp-components-color-gray-800, $gray-800);
+
+// Semantic aliases (prefer these over raw gray values when applicable).
+$components-color-border: #{ $components-color-gray-600 };

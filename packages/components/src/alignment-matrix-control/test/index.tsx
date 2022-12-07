@@ -6,13 +6,13 @@ import { act, render, screen, within } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import AlignmentMatrixControl from '../';
+import AlignmentMatrixControl from '..';
 
 const getControl = () => {
 	return screen.getByRole( 'grid' );
 };
 
-const getCell = ( name ) => {
+const getCell = ( name: string ) => {
 	return within( getControl() ).getByRole( 'gridcell', { name } );
 };
 

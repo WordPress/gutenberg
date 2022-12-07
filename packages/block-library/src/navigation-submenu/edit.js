@@ -48,7 +48,7 @@ import {
 } from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
 import { createBlock } from '@wordpress/blocks';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, usePrevious } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -366,6 +366,8 @@ export default function NavigationSubmenuEdit( {
 		[ clientId ]
 	);
 
+	const prevHasChildren = usePrevious( hasChildren );
+
 	// Show the LinkControl on mount if the URL is empty
 	// ( When adding a new menu item)
 	// This can't be done in the useState call because it conflicts
@@ -546,11 +548,11 @@ export default function NavigationSubmenuEdit( {
 	}
 
 	useEffect( () => {
-		// If block is empty, transform to Navigation Link.
-		if ( ! hasChildren ) {
+		// If block becomes empty, transform to Navigation Link.
+		if ( ! hasChildren && prevHasChildren ) {
 			transformToLink();
 		}
-	}, [ hasChildren ] );
+	}, [ hasChildren, prevHasChildren ] );
 
 	const canConvertToLink =
 		! selectedBlockHasChildren || onlyDescendantIsEmptyLink;

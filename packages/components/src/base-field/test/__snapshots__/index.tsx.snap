@@ -12,7 +12,7 @@ Snapshot Diff:
       "background": "#fff",
       "border": "1px solid",
 -     "border-color": "#d94f4f",
-+     "border-color": "#757575",
++     "border-color": "#949494",
       "border-radius": "2px",
       "box-shadow": "transparent",
       "display": "flex",
@@ -28,7 +28,7 @@ Snapshot Diff:
 @@ -14,19 +14,18 @@
       "background": "#fff",
       "border": "1px solid",
-      "border-color": "#757575",
+      "border-color": "#949494",
       "border-radius": "2px",
       "box-shadow": "transparent",
 -     "display": "inline-flex",
@@ -62,7 +62,7 @@ Snapshot Diff:
       "background": "#fff",
 -     "background-color": "transparent",
       "border": "1px solid",
-      "border-color": "#757575",
+      "border-color": "#949494",
       "border-radius": "2px",
       "box-shadow": "transparent",
       "display": "flex",
@@ -89,7 +89,7 @@ exports[`base field should render correctly 1`] = `
   background: #fff;
   border-radius: 2px;
   border: 1px solid;
-  border-color: #757575;
+  border-color: #949494;
   box-shadow: transparent;
   display: -webkit-box;
   display: -webkit-flex;

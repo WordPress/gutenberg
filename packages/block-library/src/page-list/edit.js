@@ -22,16 +22,20 @@ import {
 	Spinner,
 	Notice,
 	ComboboxControl,
+	Button,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState, useEffect } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
-import { useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import ConvertToLinksModal from './convert-to-links-modal';
+import ConvertToLinksModal, {
+	convertSelectedBlockToNavigationLinks,
+} from './convert-to-links-modal';
+import { convertDescription } from './constants';
 
 // We only show the edit option when page count is <= MAX_PAGE_COUNT
 // Performance of Navigation Links is not good past this value.
@@ -158,15 +162,13 @@ export default function PageListEdit( {
 		}
 	};
 
-	const useParentOptions = () => {
-		return pages?.reduce( ( accumulator, page ) => {
-			accumulator.push( {
-				value: page.id,
-				label: page.title.rendered,
-			} );
-			return accumulator;
-		}, [] );
-	};
+	const parentOptions = pages?.reduce( ( accumulator, page ) => {
+		accumulator.push( {
+			value: page.id,
+			label: page.title.rendered,
+		} );
+		return accumulator;
+	}, [] );
 
 	useEffect( () => {
 		__unstableMarkNextChangeAsNotPersistent();
@@ -175,25 +177,64 @@ export default function PageListEdit( {
 		}
 	}, [ clientId, blockList ] );
 
+	const { replaceBlock, selectBlock } = useDispatch( blockEditorStore );
+
+	const { parentNavBlockClientId } = useSelect( ( select ) => {
+		const { getSelectedBlockClientId, getBlockParentsByBlockName } =
+			select( blockEditorStore );
+
+		const _selectedBlockClientId = getSelectedBlockClientId();
+
+		return {
+			parentNavBlockClientId: getBlockParentsByBlockName(
+				_selectedBlockClientId,
+				'core/navigation',
+				true
+			)[ 0 ],
+		};
+	}, [] );
+
 	return (
 		<>
 			<InspectorControls>
+				{ isNavigationChild && (
+					<PanelBody title={ __( 'Customize this menu' ) }>
+						<p>{ convertDescription }</p>
+						<Button
+							variant="primary"
+							disabled={ ! hasResolvedPages }
+							onClick={ () => {
+								convertSelectedBlockToNavigationLinks( {
+									pages,
+									replaceBlock,
+									clientId,
+									createBlock,
+								} )();
+								selectBlock( parentNavBlockClientId );
+							} }
+						>
+							{ __( 'Customize' ) }
+						</Button>
+					</PanelBody>
+				) }
 				<PanelBody>
-					<ComboboxControl
-						className="editor-page-attributes__parent"
-						label={ __( 'Parent page' ) }
-						value={ parentPageID }
-						options={ useParentOptions() }
-						onChange={ ( value ) =>
-							setAttributes( { parentPageID: value ?? 0 } )
-						}
-						help={ __(
-							'Choose a page to show only its subpages.'
-						) }
-					/>
+					{ parentOptions && (
+						<ComboboxControl
+							className="editor-page-attributes__parent"
+							label={ __( 'Parent page' ) }
+							value={ parentPageID }
+							options={ parentOptions }
+							onChange={ ( value ) =>
+								setAttributes( { parentPageID: value ?? 0 } )
+							}
+							help={ __(
+								'Choose a page to show only its subpages.'
+							) }
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
-			{ allowConvertToLinks && (
+			{ allowConvertToLinks && totalPages > 0 && (
 				<BlockControls group="other">
 					<ToolbarButton title={ __( 'Edit' ) } onClick={ openModal }>
 						{ __( 'Edit' ) }
