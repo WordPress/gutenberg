@@ -11,9 +11,10 @@ import {
 	__experimentalTreeGridCell as TreeGridCell,
 	__experimentalTreeGridItem as TreeGridItem,
 	MenuItem,
+	Button,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
-import { moreVertical } from '@wordpress/icons';
+import { moreVertical, edit } from '@wordpress/icons';
 import {
 	useState,
 	useRef,
@@ -34,12 +35,14 @@ import {
 } from '../block-mover/button';
 import ListViewBlockContents from './block-contents';
 import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdown';
-import BlockEditButton from './block-edit-button';
+// import BlockEditButton from './block-edit-button';
 import { useListViewContext } from './context';
 import { getBlockPositionDescription } from './utils';
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { useBlockLock } from '../block-lock';
+import usePageData from './use-page-data';
+import { ConvertToLinksModal } from './convert-to-links-modal';
 
 function ListViewBlock( {
 	block,
@@ -60,7 +63,8 @@ function ListViewBlock( {
 } ) {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
-	const { clientId, attributes } = block;
+	const [ convertModalOpen, setConvertModalOpen ] = useState( false );
+	const { clientId, attributes, name } = block;
 
 	const { isLocked, isContentLocked } = useBlockLock( clientId );
 	const forceSelectionContentLock = useSelect(
@@ -210,6 +214,22 @@ function ListViewBlock( {
 		[ clientId, expand, collapse, isExpanded ]
 	);
 
+	// We only show the edit option when page count is <= MAX_PAGE_COUNT
+	// Performance of Navigation Links is not good past this value.
+	const MAX_PAGE_COUNT = 100;
+	const { pages, totalPages } = usePageData();
+
+	const allowConvertToLinks =
+		'core/page-list' === name && totalPages <= MAX_PAGE_COUNT;
+
+	const blockEditOnClick = () => {
+		if ( allowConvertToLinks ) {
+			setConvertModalOpen( ! convertModalOpen );
+		} else {
+			selectBlock( clientId );
+		}
+	};
+
 	let colSpan;
 	if ( hasRenderedMovers ) {
 		colSpan = 2;
@@ -331,12 +351,14 @@ function ListViewBlock( {
 							!! isSelected || forceSelectionContentLock
 						}
 					>
-						{ ( props ) =>
+						{ ( { ref, tabIndex } ) =>
 							isEditable && (
-								<BlockEditButton
-									{ ...props }
+								<Button
+									icon={ edit }
 									label={ editAriaLabel }
-									clientId={ clientId }
+									ref={ ref }
+									tabIndex={ tabIndex }
+									onClick={ blockEditOnClick }
 								/>
 							)
 						}
@@ -392,6 +414,13 @@ function ListViewBlock( {
 						) }
 					</TreeGridCell>
 				</>
+			) }
+			{ convertModalOpen && (
+				<ConvertToLinksModal
+					onClose={ () => setConvertModalOpen( false ) }
+					clientId={ clientId }
+					pages={ pages }
+				/>
 			) }
 		</ListViewLeaf>
 	);
