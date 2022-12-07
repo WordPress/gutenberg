@@ -113,6 +113,16 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 
 	const { saveEntityRecord } = useDispatch( coreStore );
 
+	const { fetchPagesEntities } = useSelect( ( select ) => {
+		const { getEntityRecords } = select( coreStore );
+
+		return {
+			fetchPagesEntities: ( options = {} ) => {
+				return getEntityRecords( 'postType', 'page', options );
+			},
+		};
+	}, [] );
+
 	/**
 	 * Creates a Post entity.
 	 * This is utilised by the Link UI to allow for on-the-fly creation of Posts/Pages.
@@ -176,6 +186,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 						'supportsLayout',
 						'widgetTypesToHideFromLegacyWidgetBlock',
 						'__unstableResolvedAssets',
+						'__experimentalFetchPageEntities',
 					].includes( key )
 				)
 			),
@@ -196,6 +207,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			__experimentalUserCanCreatePages: userCanCreatePages,
 			pageOnFront,
 			__experimentalPreferPatternsOnRoot: hasTemplate,
+			__experimentalFetchPageEntities: fetchPagesEntities,
 		} ),
 		[
 			settings,
@@ -208,6 +220,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			hasTemplate,
 			userCanCreatePages,
 			pageOnFront,
+			fetchPagesEntities,
 		]
 	);
 }
