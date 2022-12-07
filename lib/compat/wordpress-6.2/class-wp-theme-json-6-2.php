@@ -295,7 +295,7 @@ class WP_Theme_JSON_6_2 extends WP_Theme_JSON_6_1 {
 	 *                       and root_selector which overwrites and forces a given selector to be used on the root node.
 	 * @return string Stylesheet.
 	 */
-	public function get_stylesheet( $types = array( 'variables', 'styles', 'presets', 'custom-css' ), $origins = null, $options = array() ) {
+	public function get_stylesheet( $types = array( 'variables', 'styles', 'presets' ), $origins = null, $options = array() ) {
 		if ( null === $origins ) {
 			$origins = static::VALID_ORIGINS;
 		}

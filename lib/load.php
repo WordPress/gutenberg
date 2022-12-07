@@ -61,6 +61,7 @@ require __DIR__ . '/experimental/editor-settings.php';
 require __DIR__ . '/compat/plugin/edit-site-routes-backwards-compat.php';
 
 // WordPress 6.1 compat.
+require __DIR__ . '/compat/wordpress-6.1/block-editor-settings.php';
 require __DIR__ . '/compat/wordpress-6.1/blocks.php';
 require __DIR__ . '/compat/wordpress-6.1/persisted-preferences.php';
 require __DIR__ . '/compat/wordpress-6.1/get-global-styles-and-settings.php';
