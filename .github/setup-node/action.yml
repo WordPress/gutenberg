@@ -23,8 +23,8 @@ runs:
               node-version-file: '.nvmrc'
               cache: npm
 
-        - name: Get the node version
-          id: node-version
+        - name: Get node and npm version
+          id: node-npm-version
           run: |
               echo "NODE_VERSION=$(node -v)" >> $GITHUB_OUTPUT
               echo "NPM_VERSION=$(npm -v)" >> $GITHUB_OUTPUT
@@ -35,7 +35,7 @@ runs:
           uses: actions/cache@v3
           with:
               path: '**/node_modules'
-              key: node_modules-${{ runner.os }}-${{ steps.node-version.outputs.NODE_VERSION }}/${{ steps.node-version.outputs.NPM_VERSION }}-${{ hashFiles('package-lock.json') }}
+              key: node_modules-${{ runner.os }}-${{ steps.node-npm-version.outputs.NODE_VERSION }}/${{ steps.node-npm-version.outputs.NPM_VERSION }}-${{ hashFiles('package-lock.json') }}
 
         - name: Npm install
           if: ${{ steps.cache-node_modules.outputs.cache-hit != 'true' }}
