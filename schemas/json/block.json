@@ -160,6 +160,7 @@
 								"attribute",
 								"text",
 								"html",
+								"raw",
 								"query",
 								"meta"
 							]
