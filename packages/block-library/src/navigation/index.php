@@ -390,45 +390,20 @@ function block_core_navigation_get_most_recently_published_navigation() {
 }
 
 /**
- * Recursively filter out blocks from the block list that are not whitelisted.
- * This list of exclusions includes:
- * - The Navigation block itself (results in recursion).
- * - empty "null" blocks from the block list.
- * - other blocks that are not yet handled.
- *
- * Note: 'parse_blocks' includes a null block with '\n\n' as the content when
+ * Filter out empty "null" blocks from the block list.
+ * 'parse_blocks' includes a null block with '\n\n' as the content when
  * it encounters whitespace. This is not a bug but rather how the parser
  * is designed.
  *
- * @param array $parsed_blocks the parsed blocks to be filtered.
- * @return array the filtered parsed blocks.
+ * @param array $parsed_blocks the parsed blocks to be normalized.
+ * @return array the normalized parsed blocks.
  */
-function block_core_navigation_filter_out_invalid_blocks( $parsed_blocks ) {
-	// This list is duplicated in /packages/block-library/src/navigation/edit/inner-blocks.js.
-	$allowed_blocks = array(
-		'core/navigation-link',
-		'core/search',
-		'core/social-links',
-		'core/page-list',
-		'core/spacer',
-		'core/home-link',
-		'core/site-title',
-		'core/site-logo',
-		'core/navigation-submenu',
-	);
-
-	$filtered = array_reduce(
+function block_core_navigation_filter_out_empty_blocks( $parsed_blocks ) {
+	$filtered = array_filter(
 		$parsed_blocks,
-		function( $carry, $block ) use ( $allowed_blocks ) {
-			if ( isset( $block['blockName'] ) && in_array( $block['blockName'], $allowed_blocks, true ) ) {
-				if ( $block['innerBlocks'] ) {
-					$block['innerBlocks'] = block_core_navigation_filter_out_invalid_blocks( $block['innerBlocks'] );
-				}
-				$carry[] = $block;
-			}
-			return $carry;
-		},
-		array()
+		function( $block ) {
+			return isset( $block['blockName'] );
+		}
 	);
 
 	// Reset keys.
@@ -468,8 +443,7 @@ function block_core_navigation_get_fallback_blocks() {
 
 	// Use the first non-empty Navigation as fallback if available.
 	if ( $navigation_post ) {
-
-		$maybe_fallback = block_core_navigation_filter_out_invalid_blocks( parse_blocks( $navigation_post->post_content ) );
+		$maybe_fallback = block_core_navigation_filter_out_empty_blocks( parse_blocks( $navigation_post->post_content ) );
 
 		// Normalizing blocks may result in an empty array of blocks if they were all `null` blocks.
 		// In this case default to the (Page List) fallback.
@@ -627,7 +601,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 			// 'parse_blocks' includes a null block with '\n\n' as the content when
 			// it encounters whitespace. This code strips it.
-			$compacted_blocks = block_core_navigation_filter_out_invalid_blocks( $parsed_blocks );
+			$compacted_blocks = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
 
 			// TODO - this uses the full navigation block attributes for the
 			// context which could be refined.
