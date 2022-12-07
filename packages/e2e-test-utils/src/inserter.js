@@ -127,6 +127,12 @@ export async function search( category, searchTerm ) {
 	await pressKeyWithModifier( 'primary', 'a' );
 	await page.keyboard.type( searchTerm );
 
+	// Wait for the default block list to disappear to prevent its items from
+	// being considered as search results.
+	await page.waitForSelector( '.block-editor-inserter__block-list', {
+		hidden: true,
+	} );
+
 	let waitForResult;
 	let waitForNoResults;
 
