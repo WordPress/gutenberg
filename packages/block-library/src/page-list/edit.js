@@ -32,9 +32,8 @@ import { useSelect, useDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import ConvertToLinksModal, {
-	convertSelectedBlockToNavigationLinks,
-} from './convert-to-links-modal';
+import ConvertToLinksModal from './convert-to-links-modal';
+import { convertToNavigationLinks } from './convert-to-navigation-links';
 import { convertDescription } from './constants';
 
 // We only show the edit option when page count is <= MAX_PAGE_COUNT
@@ -205,9 +204,7 @@ export default function PageListEdit( {
 							disabled={ ! hasResolvedPages }
 							onClick={ () => {
 								const navigationLinks =
-									convertSelectedBlockToNavigationLinks(
-										pages
-									);
+									convertToNavigationLinks( pages );
 
 								// Replace the Page List block with the Navigation Links.
 								replaceBlock( clientId, navigationLinks );
