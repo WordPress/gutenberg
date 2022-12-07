@@ -424,6 +424,9 @@ function block_core_navigation_filter_out_invalid_blocks( $parsed_blocks ) {
 			if ( isset( $block['blockName'] ) && in_array( $block['blockName'], $allowed_blocks, true ) ) {
 				if ( $block['innerBlocks'] ) {
 					$block['innerBlocks'] = block_core_navigation_filter_out_invalid_blocks( $block['innerBlocks'] );
+					if ( empty( $block['innerBlocks'] ) ) {
+						$block['innerContent'] = array( implode( $block['innerContent'] ) );
+					}
 				}
 				$carry[] = $block;
 			}
