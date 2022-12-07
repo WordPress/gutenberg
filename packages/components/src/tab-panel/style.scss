@@ -23,7 +23,6 @@
 
 	&:focus:not(:disabled) {
 		position: relative;
-		z-index: z-index(".edit-post-sidebar__panel-tab.is-active");
 		box-shadow: none;
 	}
 
@@ -31,7 +30,6 @@
 	&::after {
 		content: "";
 		position: absolute;
-		z-index: z-index(".edit-post-sidebar__panel-tab.is-active");
 		right: 0;
 		bottom: 0;
 		left: 0;
