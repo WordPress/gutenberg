@@ -172,15 +172,17 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			<ToolbarButton
 				className="components-toolbar__control"
 				label={ __( 'Open navigation list view' ) }
-				onClick={ () => enableComplementaryArea( 'core/edit-site', 'edit-site/block-inspector' ) }
+				onClick={ () =>
+					enableComplementaryArea(
+						'core/edit-site',
+						'edit-site/block-inspector'
+					)
+				}
 				icon={ listView }
 			/>
 		</ToolbarGroup>
 	);
 
-	// Conditionally include NavMenu sidebar in Plugin only.
-	// Optimise for dead code elimination.
-	// See https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/feature-flags.md#dead-code-elimination.
 	let MaybeNavMenuSidebarToggle = Fragment;
 	const isOffCanvasNavigationEditorEnabled =
 		window?.__experimentalEnableOffCanvasNavigationEditor === true;
