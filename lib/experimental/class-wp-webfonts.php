@@ -188,6 +188,11 @@ class WP_Webfonts {
 			}
 		}
 
+		// If the font-family is a comma-separated list (example: "Inter, sans-serif" ), use just the first font.
+		if ( strpos($to_convert, ",") !== false ) {
+			$to_convert = explode(",", $to_convert)[0];
+		}
+
 		return sanitize_title( $to_convert );
 	}
 
