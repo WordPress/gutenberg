@@ -127,7 +127,8 @@ const getStylePropertiesMarkup = ( struct ) => {
 			props[ key ].type === 'object'
 				? keys( props[ key ].properties ).sort().join( ', ' )
 				: '';
-		markup += `| ${ key } | ${ props[ key ].type } | ${ ps } |\n`;
+		const type = formatType( props[ key ] );
+		markup += `| ${ key } | ${ type } | ${ ps } |\n`;
 	} );
 
 	return markup;
@@ -159,6 +160,23 @@ ${ markupFn( data ) }
 };
 
 let autogen = '';
+
+/**
+ * Format list of types.
+ *
+ * @param {Object} prop
+ * @return {string} type
+ */
+const formatType = ( prop ) => {
+	let type = prop.type || '';
+
+	if ( prop.hasOwnProperty( 'anyOf' ) || prop.hasOwnProperty( 'oneOf' ) ) {
+		const types = prop.anyOf || prop.oneOf;
+		type = types.map( ( item ) => item.type ).join( ', ' );
+	}
+
+	return type;
+};
 
 // Settings
 const settings = Object.entries( themejson.definitions )
