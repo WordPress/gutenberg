@@ -35,6 +35,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import ConvertToLinksModal, {
 	convertSelectedBlockToNavigationLinks,
 } from './convert-to-links-modal';
+import { convertDescription } from './constants';
 
 // We only show the edit option when page count is <= MAX_PAGE_COUNT
 // Performance of Navigation Links is not good past this value.
@@ -198,11 +199,7 @@ export default function PageListEdit( {
 			<InspectorControls>
 				{ isNavigationChild && (
 					<PanelBody title={ __( 'Customize this menu' ) }>
-						<p id={ 'wp-block-page-list-modal__description' }>
-							{ __(
-								'This menu is automatically kept in sync with pages on your site. You can manage the menu yourself by clicking customize below.'
-							) }
-						</p>
+						<p>{ convertDescription }</p>
 						<Button
 							variant="primary"
 							disabled={ ! hasResolvedPages }

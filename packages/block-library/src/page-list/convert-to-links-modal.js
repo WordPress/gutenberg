@@ -8,6 +8,11 @@ import { useEntityRecords } from '@wordpress/core-data';
 import { createBlock as create } from '@wordpress/blocks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
+/**
+ * Internal dependencies
+ */
+import { convertDescription } from './constants';
+
 const PAGE_FIELDS = [ 'id', 'title', 'link', 'type', 'parent' ];
 const MAX_PAGE_COUNT = 100;
 
@@ -96,9 +101,7 @@ export default function ConvertToLinksModal( { onClose, clientId } ) {
 			aria={ { describedby: 'wp-block-page-list-modal__description' } }
 		>
 			<p id={ 'wp-block-page-list-modal__description' }>
-				{ __(
-					'This menu is automatically kept in sync with pages on your site. You can manage the menu yourself by clicking customize below.'
-				) }
+				{ convertDescription }
 			</p>
 			<div className="wp-block-page-list-modal-buttons">
 				<Button variant="tertiary" onClick={ onClose }>
