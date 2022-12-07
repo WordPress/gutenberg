@@ -1,6 +1,6 @@
 == Changelog ==
 
-= 14.7.0-rc.1 =
+= 14.7.0 =
 
 
 
@@ -12,18 +12,18 @@
 - Style engine: Trim multiple selector strings. ([45873](https://github.com/WordPress/gutenberg/pull/45873))
 
 #### Block Library
-- Add a starting page for page list block's hierarchy. ([45861](https://github.com/WordPress/gutenberg/pull/45861))
-- Clarify explanation of how 'Convert to Links' works in Page List block. ([45394](https://github.com/WordPress/gutenberg/pull/45394))
-- Colorize template parts and  Reusable blocks. ([45473](https://github.com/WordPress/gutenberg/pull/45473))
-- Enable page list to expand in list view. ([45776](https://github.com/WordPress/gutenberg/pull/45776))
-- Fix for navigation anchor links to close modal. ([45829](https://github.com/WordPress/gutenberg/pull/45829))
+- Heading Block: Add a wp-block-heading CSS class. ([42122](https://github.com/WordPress/gutenberg/pull/42122))
+- Nav Block: Clarify explanation of how 'Convert to Links' works in Page List block. ([45394](https://github.com/WordPress/gutenberg/pull/45394))
+- Nav Block: Add label field to navigation link and navigation submenu. ([45964](https://github.com/WordPress/gutenberg/pull/45964))
+- Nav Block: Add link URL to the navigation submenu inspector controls. ([45816](https://github.com/WordPress/gutenberg/pull/45816))
+- Nav Block: Fix for navigation anchor links to close modal. ([45829](https://github.com/WordPress/gutenberg/pull/45829))
+- Template Part Block: Colorize template parts and Reusable blocks. ([45473](https://github.com/WordPress/gutenberg/pull/45473))
 - List: Allow pasting pre/code. ([45016](https://github.com/WordPress/gutenberg/pull/45016))
-- Navigation: Add label field to navigation link and navigation submenu. ([45964](https://github.com/WordPress/gutenberg/pull/45964))
-- Navigation: Add link URL to the navigation submenu inspector controls. ([45816](https://github.com/WordPress/gutenberg/pull/45816))
-- Navigation: Hide the create new menu button if the experiment is enabled. ([46019](https://github.com/WordPress/gutenberg/pull/46019))
+- Page List: Enable page list to expand in list view. ([45776](https://github.com/WordPress/gutenberg/pull/45776))
+- Page List: Add a starting page for page list block's hierarchy. ([45861](https://github.com/WordPress/gutenberg/pull/45861))
 - Page List Item: Hide edit button. ([46163](https://github.com/WordPress/gutenberg/pull/46163))
 - Site Logo: Apply width to logo container in editor. ([45821](https://github.com/WordPress/gutenberg/pull/45821))
-- Support `colspan` attribute in `table` HTML, including when pasting. ([45981](https://github.com/WordPress/gutenberg/pull/45981))
+- Table Block: Support colspan attribute in table HTML, including when pasting. ([45981](https://github.com/WordPress/gutenberg/pull/45981))
 
 #### Components
 - Add themeable background color. ([45466](https://github.com/WordPress/gutenberg/pull/45466))
@@ -47,11 +47,9 @@
 
 #### Design Tools
 - Min Height: Add height control component with slider. ([45875](https://github.com/WordPress/gutenberg/pull/45875))
-- Nav Block: Move color controls to support panel. ([46049](https://github.com/WordPress/gutenberg/pull/46049))
 - Spacing: Make  visualiser appear on focus. ([46096](https://github.com/WordPress/gutenberg/pull/46096))
 
 #### Block Editor
-- Enable easier drag and drop for navigation building. ([45906](https://github.com/WordPress/gutenberg/pull/45906))
 - [Inserter]: Replace text in `Reusable` tab with an icon. ([45851](https://github.com/WordPress/gutenberg/pull/45851))
 - [Inserter]: Update pattern explorer button css. ([45735](https://github.com/WordPress/gutenberg/pull/45735))
 - [Inserter]: Add media tab. ([44918](https://github.com/WordPress/gutenberg/pull/44918))
@@ -69,9 +67,6 @@
 #### Layout
 - Add Layout controls to children of Flex layout blocks. ([45364](https://github.com/WordPress/gutenberg/pull/45364))
 
-#### Global Styles
-- [Heading block] Add a wp-block-heading CSS class. ([42122](https://github.com/WordPress/gutenberg/pull/42122))
-
 
 ### Bug Fixes
 
@@ -79,16 +74,13 @@
 - Disable distraction free prefference effects on small viewports. ([45591](https://github.com/WordPress/gutenberg/pull/45591))
 
 #### Block Library
-- Fixed a bug that List block attributes were reset in 6.1.1. ([46000](https://github.com/WordPress/gutenberg/pull/46000))
+- List Block: Fixed a bug that List block attributes were reset in 6.1.1. ([46000](https://github.com/WordPress/gutenberg/pull/46000))
 - Gallery: Use unbound query when fetching image details. ([46143](https://github.com/WordPress/gutenberg/pull/46143))
 - Heading: Add block classname deprecation. ([46138](https://github.com/WordPress/gutenberg/pull/46138))
 - Page List: If no parent page is set, still render all children. ([45967](https://github.com/WordPress/gutenberg/pull/45967))
 - Page List: Render the children correctly in the editor. ([46165](https://github.com/WordPress/gutenberg/pull/46165))
 - Post Author: Avoid errors when the user avatars are disabled. ([45989](https://github.com/WordPress/gutenberg/pull/45989))
-
-#### Testing
-- Fix Quote block's unwrap end-to-end test. ([46168](https://github.com/WordPress/gutenberg/pull/46168))
-- Remove 'response.deleted' check. ([45992](https://github.com/WordPress/gutenberg/pull/45992))
+- Nav Block: Navigation menu doesn't appear when hamburger clicked on. ([45773](https://github.com/WordPress/gutenberg/pull/45773))
 
 #### Block Editor
 - Fix broken Link Control hook. ([46113](https://github.com/WordPress/gutenberg/pull/46113))
@@ -109,9 +101,6 @@
 
 #### CSS & Styling
 - Fix the editor area height. ([45799](https://github.com/WordPress/gutenberg/pull/45799))
-
-#### Plugin
-- Navigation menu doesn't appear when hamburger clicked on. ([45773](https://github.com/WordPress/gutenberg/pull/45773))
 
 #### Full Site Editing
 - Ensure post-featured-image block is in_the_loop() for BC with core and plugins, and to fix lazy-loading. ([45534](https://github.com/WordPress/gutenberg/pull/45534))
@@ -147,12 +136,15 @@
 ### Experiments
 
 #### Block Library
-- Add basic edit button UI to Nav block offcanvas editor. ([45815](https://github.com/WordPress/gutenberg/pull/45815))
-- Add submenu menu item to list view. ([45794](https://github.com/WordPress/gutenberg/pull/45794))
-- Alternative: Add inserter to Nav block offcanvas experiment. ([45947](https://github.com/WordPress/gutenberg/pull/45947))
-- Display inserter popover in offcanvas UI. ([46013](https://github.com/WordPress/gutenberg/pull/46013))
-- List View - Stop child item selecting a parent which is already selected. ([45860](https://github.com/WordPress/gutenberg/pull/45860))
-- Nav offcanvas editor: Add simple back button to inspector controls. ([45852](https://github.com/WordPress/gutenberg/pull/45852))
+- Nav Block: Add basic edit button UI to Nav block offcanvas editor. ([45815](https://github.com/WordPress/gutenberg/pull/45815))
+- Nav Block: Add submenu menu item to list view. ([45794](https://github.com/WordPress/gutenberg/pull/45794))
+- Nav Block: Alternative: Add inserter to Nav block offcanvas experiment. ([45947](https://github.com/WordPress/gutenberg/pull/45947))
+- Nav Block: Display inserter popover in offcanvas UI. ([46013](https://github.com/WordPress/gutenberg/pull/46013))
+- Nav Block: List View - Stop child item selecting a parent which is already selected. ([45860](https://github.com/WordPress/gutenberg/pull/45860))
+- Nav Block: Add simple back button to inspector controls. ([45852](https://github.com/WordPress/gutenberg/pull/45852))
+- Nav Block: Move color controls to support panel. ([46049](https://github.com/WordPress/gutenberg/pull/46049))
+- Nav Block: Enable easier drag and drop for navigation building. ([45906](https://github.com/WordPress/gutenberg/pull/45906))
+- Nav Block: Hide the create new menu button if the experiment is enabled. ([46019](https://github.com/WordPress/gutenberg/pull/46019))
 - Navigation List view: Fix incorect class. ([46129](https://github.com/WordPress/gutenberg/pull/46129))
 - Navigation List view: Include offcanvas specific styles. ([45963](https://github.com/WordPress/gutenberg/pull/45963))
 - Navigation List view: Scroll horizontally when table overflows. ([45966](https://github.com/WordPress/gutenberg/pull/45966))
@@ -226,7 +218,14 @@
 #### Full Site Editing
 - Block editor: Separate content styles for the iframe. ([44298](https://github.com/WordPress/gutenberg/pull/44298))
 
+### Tools
+
+#### Build Tooling
+- Bump caniuse-lite version. ([46093](https://github.com/WordPress/gutenberg/pull/46093))
+
 #### Testing
+- Fix Quote block's unwrap end-to-end test. ([46168](https://github.com/WordPress/gutenberg/pull/46168))
+- Remove 'response.deleted' check. ([45992](https://github.com/WordPress/gutenberg/pull/45992))
 - Warning: Fix ESLint warnings in tests. ([46033](https://github.com/WordPress/gutenberg/pull/46033))
 - ESLint: Enable `testing-library/no-container` rule. ([46160](https://github.com/WordPress/gutenberg/pull/46160))
 - Element: Fix `no-node-access` in `createInterpolateElement`. ([45894](https://github.com/WordPress/gutenberg/pull/45894))
@@ -236,12 +235,6 @@
 - Block Editor: Wait for popover positioning in `MediaReplaceFlow` tests. ([45863](https://github.com/WordPress/gutenberg/pull/45863))
 - Compose: Fix 'no-container' violations in 'useDisabled' tests. ([45797](https://github.com/WordPress/gutenberg/pull/45797))
 - Compose: Fix ESLint violations in `withGlobalEvents` tests. ([46012](https://github.com/WordPress/gutenberg/pull/46012))
-
-### Tools
-
-#### Build Tooling
-- Bump caniuse-lite version. ([46093](https://github.com/WordPress/gutenberg/pull/46093))
-
 
 ## First time contributors
 
