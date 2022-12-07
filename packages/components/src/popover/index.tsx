@@ -472,6 +472,7 @@ const UnforwardedPopover = (
 			placement={ computedPlacement }
 			className={ classnames( 'components-popover', className, {
 				'is-expanded': isExpanded,
+				'is-positioned': x !== null && y !== null,
 				// Use the 'alternate' classname for 'toolbar' variant for back compat.
 				[ `is-${
 					computedVariant === 'toolbar'
