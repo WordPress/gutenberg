@@ -35,3 +35,8 @@ phpunit-watcher.yml
 .tool-versions
 test/storybook-playwright/test-results
 test/storybook-playwright/specs/__snapshots__
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/.gitignore
+/.idea/gutenberg.iml
+/.idea/modules.xml
+/.idea/vcs.xml
