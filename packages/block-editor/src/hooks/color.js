@@ -96,46 +96,62 @@ const clearColorFromStyles = ( path, style ) =>
 /**
  * Clears text color related properties from supplied attributes.
  *
- * @param {Object} attributes Block attributes.
+ * @param {Object}   attributes                 Block attributes.
+ * @param {Object}   root0
+ * @param {Function} root0.setBlockGlobalStyles A function to set global style for a block.
  * @return {Object} Update block attributes with text color properties omitted.
  */
-const resetAllTextFilter = ( attributes ) => ( {
-	textColor: undefined,
-	style: clearColorFromStyles( [ 'color', 'text' ], attributes.style ),
-} );
+const resetAllTextFilter = ( attributes, { setBlockGlobalStyles } ) => {
+	setBlockGlobalStyles( 'color.text', undefined );
+	return {
+		textColor: undefined,
+		style: clearColorFromStyles( [ 'color', 'text' ], attributes.style ),
+	};
+};
 
 /**
  * Clears link color related properties from supplied attributes.
  *
- * @param {Object} attributes Block attributes.
+ * @param {Object}   attributes                 Block attributes.
+ * @param {Object}   root0
+ * @param {Function} root0.setBlockGlobalStyles A function to set global style for a block.
  * @return {Object} Update block attributes with link color properties omitted.
  */
-const resetAllLinkFilter = ( attributes ) => ( {
-	style: clearColorFromStyles(
-		[ 'elements', 'link', 'color', 'text' ],
-		attributes.style
-	),
-} );
+const resetAllLinkFilter = ( attributes, { setBlockGlobalStyles } ) => {
+	setBlockGlobalStyles( 'elements.link.color.text', undefined );
+	return {
+		style: clearColorFromStyles(
+			[ 'elements', 'link', 'color', 'text' ],
+			attributes.style
+		),
+	};
+};
 
 /**
  * Clears all background color related properties including gradients from
  * supplied block attributes.
  *
- * @param {Object} attributes Block attributes.
+ * @param {Object}   attributes                 Block attributes.
+ * @param {Object}   root0
+ * @param {Function} root0.setBlockGlobalStyles A function to set global style for a block
  * @return {Object} Block attributes with background and gradient omitted.
  */
-const clearBackgroundAndGradient = ( attributes ) => ( {
-	backgroundColor: undefined,
-	gradient: undefined,
-	style: {
-		...attributes.style,
-		color: {
-			...attributes.style?.color,
-			background: undefined,
-			gradient: undefined,
+const clearBackgroundAndGradient = ( attributes, { setBlockGlobalStyles } ) => {
+	setBlockGlobalStyles( 'color.background', undefined );
+	setBlockGlobalStyles( 'color.gradient', undefined );
+	return {
+		backgroundColor: undefined,
+		gradient: undefined,
+		style: {
+			...attributes.style,
+			color: {
+				...attributes.style?.color,
+				background: undefined,
+				gradient: undefined,
+			},
 		},
-	},
-} );
+	};
+};
 
 /**
  * Filters registered block settings, extending attributes to include
@@ -429,6 +445,10 @@ export function ColorEdit( props ) {
 			};
 		}
 		props.setAttributes( newAttributes );
+		setBlockGlobalStyles(
+			'color.gradient',
+			slug ? `var:preset|gradient|${ slug }` : value
+		);
 		localAttributes.current = {
 			...localAttributes.current,
 			...newAttributes,
@@ -449,6 +469,7 @@ export function ColorEdit( props ) {
 			)
 		);
 		props.setAttributes( { style: newStyle } );
+		setBlockGlobalStyles( 'elements.link.color.text', newLinkColorValue );
 		localAttributes.current = {
 			...localAttributes.current,
 			...{ style: newStyle },
@@ -492,7 +513,9 @@ export function ColorEdit( props ) {
 									style?.color?.text
 								).color,
 								isShownByDefault: defaultColorControls?.text,
-								resetAllFilter: resetAllTextFilter,
+								resetAllFilter: ( newAttributes ) => {
+									resetAllTextFilter( newAttributes, props );
+								},
 							},
 					  ]
 					: [] ),
@@ -514,7 +537,12 @@ export function ColorEdit( props ) {
 									: undefined,
 								isShownByDefault:
 									defaultColorControls?.background,
-								resetAllFilter: clearBackgroundAndGradient,
+								resetAllFilter: ( newAttributes ) => {
+									clearBackgroundAndGradient(
+										newAttributes,
+										props
+									);
+								},
 							},
 					  ]
 					: [] ),
@@ -530,7 +558,9 @@ export function ColorEdit( props ) {
 								clearable:
 									!! style?.elements?.link?.color?.text,
 								isShownByDefault: defaultColorControls?.link,
-								resetAllFilter: resetAllLinkFilter,
+								resetAllFilter: ( newAttributes ) => {
+									resetAllLinkFilter( newAttributes, props );
+								},
 							},
 					  ]
 					: [] ),

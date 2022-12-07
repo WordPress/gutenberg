@@ -179,11 +179,16 @@ export function hasFontSizeValue( props ) {
  * disabling the font size support controls for a block via a progressive
  * discovery panel.
  *
- * @param {Object} props               Block props.
- * @param {Object} props.attributes    Block's attributes.
- * @param {Object} props.setAttributes Function to set block's attributes.
+ * @param {Object} props                      Block props.
+ * @param {Object} props.attributes           Block's attributes.
+ * @param {Object} props.setAttributes        Function to set block's attributes.
+ * @param {Object} props.setBlockGlobalStyles Function to set block's global styles.
  */
-export function resetFontSize( { attributes = {}, setAttributes } ) {
+export function resetFontSize( {
+	attributes = {},
+	setAttributes,
+	setBlockGlobalStyles,
+} ) {
 	const { style } = attributes;
 
 	setAttributes( {
@@ -196,6 +201,7 @@ export function resetFontSize( { attributes = {}, setAttributes } ) {
 			},
 		} ),
 	} );
+	setBlockGlobalStyles( 'typography.fontSize', undefined );
 }
 
 /**

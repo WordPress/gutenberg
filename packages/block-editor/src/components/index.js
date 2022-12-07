@@ -164,5 +164,3 @@ export { default as useDisplayBlockControls } from './use-display-block-controls
 
 export { default as BlockEditorProvider } from './provider';
 export { default as useSetting } from './use-setting';
-export { default as BlockGlobalStylesProvider } from './block-global-styles/provider';
-export { default as BlockGlobalStylesContext } from './block-global-styles/context';

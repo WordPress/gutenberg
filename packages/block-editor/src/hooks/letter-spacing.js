@@ -84,11 +84,16 @@ export function hasLetterSpacingValue( props ) {
  * disabling the letter spacing support controls for a block via a progressive
  * discovery panel.
  *
- * @param {Object} props               Block props.
- * @param {Object} props.attributes    Block's attributes.
- * @param {Object} props.setAttributes Function to set block's attributes.
+ * @param {Object}   props                      Block props.
+ * @param {Object}   props.attributes           Block's attributes.
+ * @param {Function} props.setAttributes        Function to set block's attributes.
+ * @param {Function} props.setBlockGlobalStyles Function to set block's global styles.
  */
-export function resetLetterSpacing( { attributes = {}, setAttributes } ) {
+export function resetLetterSpacing( {
+	attributes = {},
+	setAttributes,
+	setBlockGlobalStyles,
+} ) {
 	const { style } = attributes;
 
 	setAttributes( {
@@ -100,4 +105,5 @@ export function resetLetterSpacing( { attributes = {}, setAttributes } ) {
 			},
 		} ),
 	} );
+	setBlockGlobalStyles( 'typography.letterSpacing', undefined );
 }

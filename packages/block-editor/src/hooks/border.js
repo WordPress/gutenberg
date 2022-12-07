@@ -43,29 +43,41 @@ const hasBorderValue = ( props ) => {
 
 // The border color, style, and width are omitted so they get undefined. The
 // border radius is separate and must retain its selection.
-const resetBorder = ( { attributes = {}, setAttributes } ) => {
+const resetBorder = ( {
+	attributes = {},
+	setAttributes,
+	setBlockGlobalStyles,
+} ) => {
 	const { style } = attributes;
+	const border = cleanEmptyObject( {
+		radius: style?.border?.radius,
+	} );
 	setAttributes( {
 		borderColor: undefined,
 		style: {
 			...style,
-			border: cleanEmptyObject( {
-				radius: style?.border?.radius,
-			} ),
+			border,
 		},
 	} );
+
+	setBlockGlobalStyles( 'border', border );
 };
 
-const resetBorderFilter = ( newAttributes ) => ( {
-	...newAttributes,
-	borderColor: undefined,
-	style: {
-		...newAttributes.style,
-		border: {
-			radius: newAttributes.style?.border?.radius,
+const resetBorderFilter = ( newAttributes, { setBlockGlobalStyles } ) => {
+	setBlockGlobalStyles( 'border', {
+		radius: newAttributes.style?.border?.radius,
+	} );
+	return {
+		...newAttributes,
+		borderColor: undefined,
+		style: {
+			...newAttributes.style,
+			border: {
+				radius: newAttributes.style?.border?.radius,
+			},
 		},
-	},
-} );
+	};
+};
 
 const getColorByProperty = ( colors, property, value ) => {
 	let matchedColor;
@@ -255,6 +267,9 @@ export function BorderPanel( props ) {
 		setBlockGlobalStyles( 'border', {
 			radius: style?.border?.radius,
 			...newBorderStyles,
+			color: newBorderColor
+				? `var:preset|color|${ newBorderColor }`
+				: newBorderStyles.color,
 		} );
 	};
 
@@ -268,7 +283,9 @@ export function BorderPanel( props ) {
 					label={ __( 'Border' ) }
 					onDeselect={ () => resetBorder( props ) }
 					isShownByDefault={ showBorderByDefault }
-					resetAllFilter={ resetBorderFilter }
+					resetAllFilter={ ( newAttributes ) =>
+						resetBorderFilter( newAttributes, props )
+					}
 					panelId={ clientId }
 				>
 					<BorderBoxControl

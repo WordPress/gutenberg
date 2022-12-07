@@ -2,17 +2,11 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { set } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import {
-	useContext,
-	useMemo,
-	createPortal,
-	useState,
-} from '@wordpress/element';
+import { useContext, useMemo, createPortal } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import {
 	getBlockSupport,
@@ -21,7 +15,6 @@ import {
 } from '@wordpress/blocks';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { getCSSRules, compileCSS } from '@wordpress/style-engine';
-import { Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -41,9 +34,6 @@ import {
 } from './dimensions';
 import useDisplayBlockControls from '../components/use-display-block-controls';
 import { shouldSkipSerialization } from './utils';
-import BlockGlobalStylesProvider from '../components/block-global-styles/provider';
-import BlockGlobalStylesContext from '../components/block-global-styles/context';
-import { InspectorControls } from '../components';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
@@ -347,67 +337,16 @@ export function addEditProps( settings ) {
 }
 
 function StylePanels( props ) {
-	/*
-	 * Why pass down a callback to every possible block supports style?
-	 * Good question. Well, it's because we might need to make thing granular later, e.g.,
-	 * push typography[ feature ] only, and not all styles for one.
-	 * Also some styles use presets, which we can't keep track of individually. It's up to the style itself to deal with it.
-	 * @TODO:
-	 *  - Think about how we should update global styles live in the post editor (prerequisite).
-	 *    Because of this, I think we should start in the side editor and use an exported `GlobalStylesContext` here.
-	 *  - Deal with presets, e.g., pass `var:preset|...` as the value where appropriate.
-	 *  - Deal with "sides", so we need to parse border-top-radius... ???
-	 *  - Validate the constraints, e.g., we should only push styles that are possible to edit in theme.json/global styles.
-	 *  - Decide how to deal with individual changes, e.g., preserving any global styles when we're only changing border color (and not radius).
-	 */
-	const { merged: mergedBlockStyles, setUserBlockStyles } = useContext(
-		BlockGlobalStylesContext
-	);
-	const [ shouldPushToGlobalStyles, setShouldPushToGlobalStyles ] =
-		useState( false );
 	const newProps = {
 		...props,
-		setBlockGlobalStyles: ( path, newValue ) => {
-			console.log( 'path, newValue', path, newValue );
-			if ( ! shouldPushToGlobalStyles ) {
-				return;
-			}
-			setUserBlockStyles( ( currentStyles ) => {
-				// Deep clone `mergedBlockStyles` to avoid mutating it later.
-				// Why use mergedBlockStyles?
-				const newCurrentStyles = JSON.parse(
-					JSON.stringify( mergedBlockStyles )
-				);
-				console.log( 'currentStyles', currentStyles );
-				set( newCurrentStyles, path, newValue );
-				return newCurrentStyles;
-			} );
-		},
+		setBlockGlobalStyles: () => {},
 	};
-
 	return (
 		<>
 			<ColorEdit { ...newProps } />
 			<TypographyPanel { ...newProps } />
 			<BorderPanel { ...newProps } />
 			<DimensionsPanel { ...newProps } />
-			<InspectorControls __experimentalGroup="advanced">
-				<Button
-					variant={
-						! shouldPushToGlobalStyles
-							? 'primary'
-							: 'secondary'
-					}
-					isPressed={ shouldPushToGlobalStyles }
-					onClick={ () => {
-						setShouldPushToGlobalStyles(
-							! shouldPushToGlobalStyles
-						);
-					} }
-				>
-					{ 'Push changes to Global Styles' }
-				</Button>
-			</InspectorControls>
 		</>
 	);
 }
@@ -425,12 +364,14 @@ export const withBlockControls = createHigherOrderComponent(
 		const shouldDisplayControls = useDisplayBlockControls();
 
 		return (
-			<BlockGlobalStylesProvider>
+			<>
 				{ shouldDisplayControls && (
-					<StylePanels { ...props } />
+					<>
+						<StylePanels { ...props } />
+					</>
 				) }
 				<BlockEdit { ...props } />
-			</BlockGlobalStylesProvider>
+			</>
 		);
 	},
 	'withToolbarControls'
@@ -479,7 +420,7 @@ const withElementsStyles = createHigherOrderComponent(
 						// The .editor-styles-wrapper selector is required on elements styles. As it is
 						// added to all other editor styles, not providing it causes reset and global
 						// styles to override element styles because of higher specificity.
-						selector: `editor-styles-wrapper .${ blockElementsContainerIdentifier } ${ ELEMENTS[ elementName ] }`,
+						selector: `.editor-styles-wrapper .${ blockElementsContainerIdentifier } ${ ELEMENTS[ elementName ] }`,
 					} );
 					if ( !! cssRule ) {
 						elementCssRules.push( cssRule );

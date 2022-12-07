@@ -16,6 +16,7 @@ export function BorderRadiusEdit( props ) {
 	const {
 		attributes: { style },
 		setAttributes,
+		setBlockGlobalStyles,
 	} = props;
 
 	const onChange = ( newRadius ) => {
@@ -28,6 +29,7 @@ export function BorderRadiusEdit( props ) {
 		} );
 
 		setAttributes( { style: newStyle } );
+		setBlockGlobalStyles( 'border.radius', newRadius );
 	};
 
 	return (
@@ -60,11 +62,17 @@ export function hasBorderRadiusValue( props ) {
  * disabling the border radius support controls for a block via a progressive
  * discovery panel.
  *
- * @param {Object} props               Block props.
- * @param {Object} props.attributes    Block's attributes.
- * @param {Object} props.setAttributes Function to set block's attributes.
+ * @param {Object} props                      Block props.
+ * @param {Object} props.attributes           Block's attributes.
+ * @param {Function} props.setAttributes        Function to set block's attributes.
+ * @param {Function} props.setBlockGlobalStyles Function to set block's global styles.
  */
-export function resetBorderRadius( { attributes = {}, setAttributes } ) {
+export function resetBorderRadius( {
+	attributes = {},
+	setAttributes,
+	setBlockGlobalStyles,
+} ) {
 	const { style } = attributes;
 	setAttributes( { style: removeBorderAttribute( style, 'radius' ) } );
+	setBlockGlobalStyles( 'border.radius', undefined );
 }

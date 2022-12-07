@@ -173,11 +173,13 @@ export function hasFontFamilyValue( props ) {
  * disabling the font family support controls for a block via a progressive
  * discovery panel.
  *
- * @param {Object} props               Block props.
- * @param {Object} props.setAttributes Function to set block's attributes.
+ * @param {Object} props                        Block props.
+ * @param {Function} props.setAttributes        Function to set block's attributes.
+ * @param {Function} props.setBlockGlobalStyles Function to set block's global styles.
  */
-export function resetFontFamily( { setAttributes } ) {
+export function resetFontFamily( { setAttributes, setBlockGlobalStyles } ) {
 	setAttributes( { fontFamily: undefined } );
+	setBlockGlobalStyles( 'typography.fontFamily', undefined );
 }
 
 addFilter(
