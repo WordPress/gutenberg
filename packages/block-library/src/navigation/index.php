@@ -409,6 +409,7 @@ function block_core_navigation_filter_out_invalid_blocks( $parsed_blocks ) {
 		'core/navigation-link',
 		'core/search',
 		'core/social-links',
+		'core/social-link',
 		'core/page-list',
 		'core/spacer',
 		'core/home-link',
