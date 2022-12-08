@@ -74,7 +74,7 @@ A callback invoked when the popover should be closed.
 
 -   Required: No
 
-### `onToggle`: `() => void`
+### `onToggle`: `( willOpen: boolean ) => void`
 
 A callback invoked when the state of the popover changes from open to closed and vice versa.
 
@@ -82,7 +82,7 @@ The callback receives a boolean as a parameter. If `true`, the popover will open
 
 -   Required: No
 
-### `popoverProps`: `WordPressComponentProps< Omit< PopoverProps, keyof DropdownProps | 'children' > 'div', false	>`
+### `popoverProps`: `WordPressComponentProps< Omit< PopoverProps, 'children' > 'div', false	>`
 
 Properties of popoverProps object will be passed as props to the `Popover` component.
 
