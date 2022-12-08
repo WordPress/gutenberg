@@ -617,11 +617,11 @@ $block-inserter-tabs-height: 44px;
 			}
 		}
 
-		&:hover &-preview {
+		&:hover .block-editor-inserter__media-list__item-preview {
 			box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
 		}
 
-		&:focus &-preview {
+		&:focus .block-editor-inserter__media-list__item-preview {
 			box-shadow: inset 0 0 0 2px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 
 			// Windows High Contrast mode will show this outline, but not the box-shadow.

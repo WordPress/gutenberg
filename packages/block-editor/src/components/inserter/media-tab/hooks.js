@@ -10,20 +10,26 @@ import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../../store';
 
 /**
- * Interface for media requests.
+ * Interface for inserter media requests.
  *
  * @typedef {Object} InserterMediaRequest
- * @property {number} per_page  How many items to fetch per page.
- * @property {string} search    The search term to use for filtering the results.
- * @property {string} [orderBy] Order by clause to sort the results.
+ * @property {number} per_page How many items to fetch per page.
+ * @property {string} search   The search term to use for filtering the results.
  */
 
 /**
- * Interface for media responses.
- * TODO: in progress..
+ * Interface for inserter media responses. Any media resource should
+ * map their response to this interface, in order to create the core
+ * WordPress media blocks(image, video, audio).
  *
- * @typedef {Object} InserterMediaResponse
- * @property {string} title The title of the media item.
+ * @typedef {Object} InserterMediaItem
+ * @property {string}        title      The title of the media item.
+ * @property {string}        src        The source url of the media item.
+ * @property {number}        [id]       The WordPress id of the media item.
+ * @property {number|string} [sourceId] The id of the media item from external source.
+ * @property {string}        [alt]      The alt text of the media item.
+ * @property {string}        [caption]  The caption of the media item.
+ *
  */
 
 /**
@@ -32,7 +38,7 @@ import { store as blockEditorStore } from '../../../store';
  *
  * @param {Object}               category The media category to fetch results for.
  * @param {InserterMediaRequest} query    The query args to use for the request.
- * @return {InserterMediaResponse[]} The media results.
+ * @return {InserterMediaItem[]} The media results.
  */
 export function useMediaResults( category, query = {} ) {
 	const [ mediaList, setMediaList ] = useState();
@@ -55,9 +61,6 @@ export function useMediaResults( category, query = {} ) {
 			setIsLoading( true );
 			setMediaList( [] ); // Empty the previous results.
 			const _media = await category.fetch?.( query );
-			// TODO: need to map results to InserterMediaResponse interface.
-			// It should be a responsibility of the category to provide the
-			// results based on `InserterMediaResponse` interface.
 			if ( key === lastRequest.current ) {
 				setMediaList( _media );
 				setIsLoading( false );

@@ -5,19 +5,23 @@ import { createBlock } from '@wordpress/blocks';
 
 const mediaTypeTag = { image: 'img', video: 'video', audio: 'audio' };
 
+/** @typedef {import('./hooks').InserterMediaItem} InserterMediaItem */
+
+/**
+ * Creates a block and a preview element from a media object.
+ *
+ * @param {InserterMediaItem} media     The media object to create the block from.
+ * @param {string}            mediaType The media type to create the block for( 'image', 'video', 'audio')
+ * @return {[WPBlock, JSX.Element]} An array containing the block and the preview element.
+ */
 export function getBlockAndPreviewFromMedia( media, mediaType ) {
 	// Add the common attributes between the different media types.
 	const attributes = {
-		id: media.id,
+		id: media.id || undefined,
+		caption: media.caption || undefined,
 	};
-	// Some props are named differently between the Media REST API and Media Library API.
-	// For example `source_url` is used in the former and `url` is used in the latter.
-	const mediaSrc = media.source_url || media.url;
-	const alt = media.alt_text || media.alt || undefined;
-	const caption = media.caption?.raw || media.caption;
-	if ( caption && typeof caption === 'string' ) {
-		attributes.caption = caption;
-	}
+	const mediaSrc = media.url;
+	const alt = media.alt || undefined;
 	if ( mediaType === 'image' ) {
 		attributes.url = mediaSrc;
 		attributes.alt = alt;
