@@ -140,6 +140,11 @@ export default function PostFormatPanel() {
 					'There are some external images in the post. You can upload them to the media library.'
 				) }
 			</p>
+			<p>
+				{ __(
+					'Images from different domains may not always load correctly, load slowly, or be removed unexpectedly.'
+				) }
+			</p>
 			<div
 				style={ {
 					display: 'inline-flex',
