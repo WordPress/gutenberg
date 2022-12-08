@@ -95,7 +95,7 @@ class Gutenberg_REST_Block_Form_Submit_Controller extends WP_REST_Controller {
 			'<a href="' . esc_url( $params['_wp_http_referer'] ) . '">' . esc_url( $params['_wp_http_referer'] ) . '</a>'
 		);
 
-		$skip_fields = array( 'wp_rest', '_wp_http_referer' );
+		$skip_fields = array( 'wp_rest', '_wp_http_referer', 'rest_route' );
 		foreach ( $params as $key => $value ) {
 			if ( in_array( $key, $skip_fields, true ) ) {
 				continue;
