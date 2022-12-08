@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import escapeHtml from 'escape-html';
 
 /**
  * WordPress dependencies
@@ -10,42 +9,28 @@ import escapeHtml from 'escape-html';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	PanelBody,
-	Popover,
 	TextControl,
 	TextareaControl,
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
 	InnerBlocks,
 	useInnerBlocksProps,
 	InspectorControls,
 	RichText,
-	__experimentalLinkControl as LinkControl,
 	useBlockProps,
 	store as blockEditorStore,
 	getColorClassName,
 } from '@wordpress/block-editor';
-import { isURL, prependHTTP, safeDecodeURI } from '@wordpress/url';
-import {
-	Fragment,
-	useState,
-	useEffect,
-	useRef,
-	createInterpolateElement,
-} from '@wordpress/element';
-import {
-	placeCaretAtHorizontalEdge,
-	__unstableStripHTML as stripHTML,
-} from '@wordpress/dom';
+import { isURL, prependHTTP } from '@wordpress/url';
+import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
+import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { link as linkIcon, removeSubmenu } from '@wordpress/icons';
-import {
-	useResourcePermissions,
-	store as coreStore,
-} from '@wordpress/core-data';
+import { useResourcePermissions } from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
 import { createBlock } from '@wordpress/blocks';
 import { useMergeRefs, usePrevious } from '@wordpress/compose';
@@ -55,6 +40,8 @@ import { useMergeRefs, usePrevious } from '@wordpress/compose';
  */
 import { ItemSubmenuIcon } from './icons';
 import { name } from './block.json';
+import { LinkUI } from '../navigation-link/link-ui';
+import { updateAttributes } from '../navigation-link/update-attributes';
 
 const ALLOWED_BLOCKS = [ 'core/navigation-link', 'core/navigation-submenu' ];
 
@@ -112,36 +99,6 @@ const useIsDraggingWithin = ( elementRef ) => {
 
 	return isDraggingWithin;
 };
-
-/**
- * Given the Link block's type attribute, return the query params to give to
- * /wp/v2/search.
- *
- * @param {string} type Link block's type attribute.
- * @param {string} kind Link block's entity of kind (post-type|taxonomy)
- * @return {{ type?: string, subtype?: string }} Search query params.
- */
-function getSuggestionsQuery( type, kind ) {
-	switch ( type ) {
-		case 'post':
-		case 'page':
-			return { type: 'post', subtype: type };
-		case 'category':
-			return { type: 'term', subtype: 'category' };
-		case 'tag':
-			return { type: 'term', subtype: 'post_tag' };
-		case 'post_format':
-			return { type: 'post-format' };
-		default:
-			if ( kind === 'taxonomy' ) {
-				return { type: 'term', subtype: type };
-			}
-			if ( kind === 'post-type' ) {
-				return { type: 'post', subtype: type };
-			}
-			return {};
-	}
-}
 
 /**
  * Determine the colors for a menu.
@@ -217,64 +174,6 @@ function getColors( context, isSubMenu ) {
  * @property {string}               [title]         Link title attribute.
  */
 
-/**
- * Link Control onChange handler that updates block attributes when a setting is changed.
- *
- * @param {Object}                          updatedValue    New block attributes to update.
- * @param {Function}                        setAttributes   Block attribute update function.
- * @param {WPNavigationLinkBlockAttributes} blockAttributes Current block attributes.
- *
- */
-export const updateNavigationLinkBlockAttributes = (
-	updatedValue = {},
-	setAttributes,
-	blockAttributes = {}
-) => {
-	const {
-		label: originalLabel = '',
-		kind: originalKind = '',
-		type: originalType = '',
-	} = blockAttributes;
-	const {
-		title = '',
-		url = '',
-		opensInNewTab,
-		id,
-		kind: newKind = originalKind,
-		type: newType = originalType,
-	} = updatedValue;
-
-	const normalizedTitle = title.replace( /http(s?):\/\//gi, '' );
-	const normalizedURL = url.replace( /http(s?):\/\//gi, '' );
-	const escapeTitle =
-		title !== '' &&
-		normalizedTitle !== normalizedURL &&
-		originalLabel !== title;
-	const label = escapeTitle
-		? escapeHtml( title )
-		: originalLabel || escapeHtml( normalizedURL );
-
-	// In https://github.com/WordPress/gutenberg/pull/24670 we decided to use "tag" in favor of "post_tag"
-	const type = newType === 'post_tag' ? 'tag' : newType.replace( '-', '_' );
-
-	const isBuiltInType =
-		[ 'post', 'page', 'tag', 'category' ].indexOf( type ) > -1;
-
-	const isCustomLink =
-		( ! newKind && ! isBuiltInType ) || newKind === 'custom';
-	const kind = isCustomLink ? 'custom' : newKind;
-
-	setAttributes( {
-		// Passed `url` may already be encoded. To prevent double encoding, decodeURI is executed to revert to the original string.
-		...( url && { url: encodeURI( safeDecodeURI( url ) ) } ),
-		...( label && { label } ),
-		...( undefined !== opensInNewTab && { opensInNewTab } ),
-		...( id && Number.isInteger( id ) && { id } ),
-		...( kind && { kind } ),
-		...( type && type !== 'URL' && { type } ),
-	} );
-};
-
 export default function NavigationSubmenuEdit( {
 	attributes,
 	isSelected,
@@ -284,15 +183,9 @@ export default function NavigationSubmenuEdit( {
 	context,
 	clientId,
 } ) {
-	const { label, type, opensInNewTab, url, description, rel, title, kind } =
-		attributes;
-	const link = {
-		title: label && stripHTML( label ),
-		url,
-		opensInNewTab,
-	};
+	const { label, type, url, description, rel, title } = attributes;
+
 	const { showSubmenuIcon, maxNestingLevel, openSubmenusOnClick } = context;
-	const { saveEntityRecord } = useDispatch( coreStore );
 
 	const { __unstableMarkNextChangeAsNotPersistent, replaceBlock } =
 		useDispatch( blockEditorStore );
@@ -435,23 +328,6 @@ export default function NavigationSubmenuEdit( {
 		userCanCreate = pagesPermissions.canCreate;
 	} else if ( type === 'post' ) {
 		userCanCreate = postsPermissions.canCreate;
-	}
-
-	async function handleCreate( pageTitle ) {
-		const postType = type || 'page';
-
-		const page = await saveEntityRecord( 'postType', postType, {
-			title: pageTitle,
-			status: 'draft',
-		} );
-
-		return {
-			id: page.id,
-			type: postType,
-			title: page.title.rendered,
-			url: page.link,
-			kind: 'post-type',
-		};
 	}
 
 	const {
@@ -662,56 +538,25 @@ export default function NavigationSubmenuEdit( {
 						/>
 					}
 					{ ! openSubmenusOnClick && isLinkOpen && (
-						<Popover
-							placement="bottom"
+						<LinkUI
+							className="wp-block-navigation-link__inline-link-input"
+							clientId={ clientId }
+							link={ attributes }
 							onClose={ () => setIsLinkOpen( false ) }
 							anchor={ popoverAnchor }
-							shift
-						>
-							<LinkControl
-								className="wp-block-navigation-link__inline-link-input"
-								value={ link }
-								hasTextControl
-								showInitialSuggestions
-								withCreateSuggestion={ userCanCreate }
-								createSuggestion={ handleCreate }
-								createSuggestionButtonText={ ( searchTerm ) => {
-									let format;
-									if ( type === 'post' ) {
-										/* translators: %s: search term. */
-										format = __(
-											'Create draft post: <mark>%s</mark>'
-										);
-									} else {
-										/* translators: %s: search term. */
-										format = __(
-											'Create draft page: <mark>%s</mark>'
-										);
-									}
-									return createInterpolateElement(
-										sprintf( format, searchTerm ),
-										{ mark: <mark /> }
-									);
-								} }
-								noDirectEntry={ !! type }
-								noURLSuggestion={ !! type }
-								suggestionsQuery={ getSuggestionsQuery(
-									type,
-									kind
-								) }
-								onChange={ ( updatedValue ) =>
-									updateNavigationLinkBlockAttributes(
-										updatedValue,
-										setAttributes,
-										attributes
-									)
-								}
-								onRemove={ () => {
-									setAttributes( { url: '' } );
-									speak( __( 'Link removed.' ), 'assertive' );
-								} }
-							/>
-						</Popover>
+							hasCreateSuggestion={ userCanCreate }
+							onRemove={ () => {
+								setAttributes( { url: '' } );
+								speak( __( 'Link removed.' ), 'assertive' );
+							} }
+							onChange={ ( updatedValue ) => {
+								updateAttributes(
+									updatedValue,
+									setAttributes,
+									attributes
+								);
+							} }
+						/>
 					) }
 				</ParentElement>
 				{ ( showSubmenuIcon || openSubmenusOnClick ) && (
