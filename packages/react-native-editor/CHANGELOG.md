@@ -10,6 +10,9 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.86.0
+-   [**] Upgrade React Native to 0.69.4 [#43485]
 -   [**] Prevent error message from unneccesarily firing when uploading to Gallery block [#46175]
 
 ## 1.85.0
