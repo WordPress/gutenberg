@@ -70,9 +70,9 @@ function BlockCard( { title, icon, description, blockType, className } ) {
 			<div className="block-editor-block-card__content">
 				<h2 className="block-editor-block-card__title">{ title }</h2>
 				{ isSynced && (
-					<div className="block-editor-block-card__sync-status">
-						<span>Synced</span>
-					</div>
+					<span className="block-editor-block-card__sync-status">
+						Synced
+					</span>
 				) }
 				<span className="block-editor-block-card__description">
 					{ description }
