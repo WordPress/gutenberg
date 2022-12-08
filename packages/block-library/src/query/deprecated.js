@@ -31,11 +31,8 @@ const migrateToTaxQuery = ( attributes ) => {
 	};
 };
 
-const colorSupportedInnerBlocks = [
-	'core/post-template',
-	'core/query-pagination',
-	'core/query-no-results',
-];
+const hasSingleInnerGroupBlock = ( innerBlocks = [] ) =>
+	innerBlocks.length === 1 && innerBlocks[ 0 ].name === 'core/group';
 
 const deprecated = [
 	// Version with color support prior to moving it to the PostTemplate block.
@@ -122,6 +119,7 @@ const deprecated = [
 				return [ attributes, innerBlocks ];
 			}
 
+			// Clean color values from style attribute object.
 			if ( style ) {
 				newAttributes.style = cleanEmptyObject( {
 					...style,
@@ -133,21 +131,20 @@ const deprecated = [
 				} );
 			}
 
-			// Apply the color styles and attributes to the inner PostTemplate,
-			// Query Pagination, and Query No Results blocks.
-			const updatedInnerBlocks = innerBlocks.map( ( innerBlock ) => {
-				if ( ! colorSupportedInnerBlocks.includes( innerBlock.name ) ) {
-					return innerBlock;
-				}
+			// If the inner blocks are already wrapped in a single group
+			// block, add the color support styles to that group block.
+			if ( hasSingleInnerGroupBlock( innerBlocks ) ) {
+				const groupBlock = innerBlocks[ 0 ];
 
+				// Create new styles for the group block.
 				const hasStyles =
 					style?.color ||
 					style?.elements?.link ||
-					innerBlock.attributes.style;
+					groupBlock.attributes.style;
 
 				const newStyles = hasStyles
 					? cleanEmptyObject( {
-							...innerBlock.attributes.style,
+							...groupBlock.attributes.style,
 							color: style?.color,
 							elements: style?.elements?.link
 								? { link: style?.elements?.link }
@@ -155,20 +152,42 @@ const deprecated = [
 					  } )
 					: undefined;
 
-				return createBlock(
-					innerBlock.name,
+				// Create a new Group block from the original.
+				const updatedGroupBlock = createBlock(
+					'core/group',
 					{
-						...innerBlock.attributes,
+						...groupBlock.attributes,
 						backgroundColor,
 						gradient,
 						textColor,
 						style: newStyles,
 					},
-					innerBlock.innerBlocks
+					groupBlock.innerBlocks
 				);
-			} );
 
-			return [ newAttributes, updatedInnerBlocks ];
+				return [ newAttributes, [ updatedGroupBlock ] ];
+			}
+
+			// When we don't have a single wrapping group block for the inner
+			// blocks, wrap the current inner blocks in a group applying the
+			// color styles to that.
+			const newGroupBlock = createBlock(
+				'core/group',
+				{
+					backgroundColor,
+					gradient,
+					textColor,
+					style: cleanEmptyObject( {
+						color: style?.color,
+						elements: style?.elements?.link
+							? { link: style?.elements?.link }
+							: undefined,
+					} ),
+				},
+				innerBlocks
+			);
+
+			return [ newAttributes, [ newGroupBlock ] ];
 		},
 		save( { attributes: { tagName: Tag = 'div' } } ) {
 			const blockProps = useBlockProps.save();
