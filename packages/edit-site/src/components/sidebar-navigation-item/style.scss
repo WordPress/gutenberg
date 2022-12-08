@@ -5,6 +5,7 @@
 	&:focus {
 		color: $white;
 		background: $gray-800;
+		border-width: $border-width-tab;
 	}
 
 	&[aria-current] {
