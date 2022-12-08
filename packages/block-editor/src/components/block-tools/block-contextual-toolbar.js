@@ -18,8 +18,8 @@ import BlockToolbar from '../block-toolbar';
 import { store as blockEditorStore } from '../../store';
 
 function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
-	const { blockClientIds, blockType, hasParents, showParentSelector } =
-		useSelect( ( select ) => {
+	const { blockType, hasParents, showParentSelector } = useSelect(
+		( select ) => {
 			const {
 				getBlockName,
 				getBlockParents,
@@ -35,7 +35,6 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 			const parentBlockType = getBlockType( parentBlockName );
 
 			return {
-				blockClientIds: selectedBlockClientIds,
 				blockType:
 					selectedBlockClientId &&
 					getBlockType( getBlockName( selectedBlockClientId ) ),
@@ -52,16 +51,14 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 						selectedBlockClientId
 					),
 			};
-		}, [] );
+		},
+		[]
+	);
 
 	if ( blockType ) {
 		if ( ! hasBlockSupport( blockType, '__experimentalToolbar', true ) ) {
 			return null;
 		}
-	}
-
-	if ( blockClientIds.length === 0 ) {
-		return null;
 	}
 
 	// Shifts the toolbar to make room for the parent block selector.

@@ -180,6 +180,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		canvasMode !== 'view' &&
 		// Disable resizing in mobile viewport.
 		! isMobileViewport;
+	const isViewMode = canvasMode === 'view';
 
 	const NavMenuSidebarToggle = () => (
 		<ToolbarGroup>
@@ -243,6 +244,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 						<BlockTools
 							className={ classnames( 'edit-site-visual-editor', {
 								'is-focus-mode': isTemplatePart || !! styleBook,
+								'is-view-mode': isViewMode,
 							} ) }
 							__unstableContentRef={ contentRef }
 							onClick={ ( event ) => {
