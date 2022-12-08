@@ -7,7 +7,6 @@ import {
 	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { layout, symbolFilled } from '@wordpress/icons';
 import { useDispatch } from '@wordpress/data';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -46,7 +45,6 @@ const config = {
 			notFound: __( 'No templates found' ),
 			manage: __( 'Manage all templates' ),
 		},
-		icon: layout,
 	},
 	wp_template_part: {
 		path: '/template-parts',
@@ -56,7 +54,6 @@ const config = {
 			notFound: __( 'No template parts found' ),
 			manage: __( 'Manage all template parts' ),
 		},
-		icon: symbolFilled,
 	},
 };
 
@@ -96,7 +93,6 @@ export default function SidebarNavigationScreenTemplates( {
 				postType,
 				postId: template.id,
 			},
-			icon: config[ postType ].icon,
 			children: decodeEntities(
 				template.title?.rendered || template.slug
 			),
