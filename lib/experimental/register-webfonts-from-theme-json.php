@@ -152,7 +152,8 @@ function gutenberg_add_registered_webfonts_to_theme_json( $data ) {
 
 	foreach ( $to_add as $slug ) {
 		$font_faces_for_family = $font_families_registered[ $slug ];
-		$family_name           = $font_faces_for_family[0]['font-family'];
+		$font_family           = $font_faces_for_family[0]['font-family'];
+		$name           = ! empty( $font_faces_for_family[0]['name'] ) ? $font_faces_for_family[0]['name'] : $font_faces_for_family[0]['font-family'];
 		$font_faces            = array();
 
 		foreach ( $font_faces_for_family as $font_face ) {
@@ -164,8 +165,8 @@ function gutenberg_add_registered_webfonts_to_theme_json( $data ) {
 		}
 
 		$data['settings']['typography']['fontFamilies'][] = array(
-			'fontFamily' => str_contains( $family_name, ' ' ) ? "'{$family_name}'" : $family_name,
-			'name'       => $family_name,
+			'fontFamily' => str_contains( $font_family, ' ' ) ? "'{$font_family}'" : $font_family,
+			'name'       => $name,
 			'slug'       => $slug,
 			'fontFace'   => $font_faces,
 		);

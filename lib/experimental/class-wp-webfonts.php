@@ -205,6 +205,7 @@ class WP_Webfonts {
 			$webfont,
 			array(
 				'provider'     => 'local',
+				'name'         => '',
 				'font-family'  => '',
 				'font-style'   => 'normal',
 				'font-weight'  => '400',
@@ -215,6 +216,12 @@ class WP_Webfonts {
 		// Check the font-family.
 		if ( empty( $webfont['font-family'] ) || ! is_string( $webfont['font-family'] ) ) {
 			trigger_error( __( 'Webfont font family must be a non-empty string.', 'gutenberg' ) );
+			return false;
+		}
+
+		// Check the name.
+		if ( isset( $webfont['name'] ) && ! is_string( $webfont['name'] ) ) {
+			trigger_error( __( 'Webfont name must be a string.', 'gutenberg' ) );
 			return false;
 		}
 
@@ -260,6 +267,7 @@ class WP_Webfonts {
 			'font-feature-settings',
 			'font-variation-settings',
 			'line-gap-override',
+			'name',
 			'size-adjust',
 			'src',
 			'unicode-range',
