@@ -282,6 +282,10 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-vertical-alignment-control/README.md>
 
+### BorderPanel
+
+Undocumented declaration.
+
 ### ButtonBlockAppender
 
 _Related_
@@ -293,6 +297,18 @@ _Related_
 > **Deprecated**
 
 Use `ButtonBlockAppender` instead.
+
+### ColorEdit
+
+Inspector control panel containing the color related configuration
+
+_Parameters_
+
+-   _props_ `Object`:
+
+_Returns_
+
+-   `WPElement`: Color edit element.
 
 ### ColorPalette
 
@@ -347,6 +363,18 @@ _Returns_
 ### DefaultBlockAppender
 
 Undocumented declaration.
+
+### DimensionsPanel
+
+Inspector controls for dimensions support.
+
+_Parameters_
+
+-   _props_ `Object`: Block props.
+
+_Returns_
+
+-   `WPElement`: Inspector controls for dimensions and spacing support features.
 
 ### FontSizePicker
 
@@ -706,6 +734,10 @@ Ensures that the text selection keeps the same vertical distance from the
 viewport during keyboard events within this component. The vertical distance
 can vary. It is the last clicked or scrolled to position.
 
+### TypographyPanel
+
+Undocumented declaration.
+
 ### URLInput
 
 _Related_
@@ -786,6 +818,10 @@ _Parameters_
 _Returns_
 
 -   `any`: value
+
+### useDisplayBlockControls
+
+Undocumented declaration.
 
 ### useInnerBlocksProps
 

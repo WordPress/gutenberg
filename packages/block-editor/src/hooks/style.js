@@ -339,6 +339,7 @@ export function addEditProps( settings ) {
 function StylePanels( props ) {
 	const newProps = {
 		...props,
+		// Assign a noop value for method that only appears in site editor.
 		setBlockGlobalStyles: () => {},
 	};
 	return (

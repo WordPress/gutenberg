@@ -17,7 +17,7 @@ import {
 	useDisplayBlockControls,
 	InspectorControls,
 } from '@wordpress/block-editor';
-import { Button, PanelBody } from '@wordpress/components';
+import { ToggleControl } from '@wordpress/components';
 import { getCSSVarFromStyleValue } from '@wordpress/style-engine';
 import { __ } from '@wordpress/i18n';
 
@@ -46,7 +46,11 @@ export const withEditBlockControls = createHigherOrderComponent(
 					const newUserConfig = JSON.parse(
 						JSON.stringify( currentConfig )
 					);
-					set( newUserConfig, fullPath, getCSSVarFromStyleValue( newValue ) );
+					set(
+						newUserConfig,
+						fullPath,
+						getCSSVarFromStyleValue( newValue )
+					);
 					return newUserConfig;
 				} );
 			},
@@ -61,30 +65,26 @@ export const withEditBlockControls = createHigherOrderComponent(
 						<BorderPanel { ...blockSupportControlProps } />
 						<DimensionsPanel { ...blockSupportControlProps } />
 						<InspectorControls __experimentalGroup="advanced">
-							<PanelBody
-								title={ __( 'Apply styles to all blocks' ) }
-							>
-								<Button
-									variant={
-										! shouldPushToGlobalStyles
-											? 'primary'
-											: 'secondary'
-									}
-									isPressed={ shouldPushToGlobalStyles }
-									onClick={ () => {
-										setShouldPushToGlobalStyles(
-											! shouldPushToGlobalStyles
-										);
-									} }
-								>
-									{ shouldPushToGlobalStyles ? __( 'Do not apply changes' ) : __( 'Apply changes' ) }
-								</Button>
-								<p>
-									{ __(
-										"When activated, all changes to this block's styles will be applied to all blocks of this type. Note that only typography, dimensions, color and border styles will be copied."
-									) }
-								</p>
-							</PanelBody>
+							<ToggleControl
+								checked={ shouldPushToGlobalStyles }
+								onChange={ () => {
+									setShouldPushToGlobalStyles(
+										( state ) => ! state
+									);
+								} }
+								label={
+									shouldPushToGlobalStyles
+										? __( 'Apply styles to all blocks' )
+										: __(
+												'Do not apply styles to all blocks'
+										  )
+								}
+								type="checkbox"
+								size="small"
+								help={ __(
+									"When activated, all changes to this block's styles will be applied to all blocks of this type. Note that only typography, dimensions, color and border styles will be copied."
+								) }
+							/>
 						</InspectorControls>
 					</>
 				) }

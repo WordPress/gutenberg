@@ -1,10 +1,9 @@
-	/**
+/**
  * WordPress dependencies
  */
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
 
 /**
  * Internal dependencies
@@ -100,16 +99,26 @@ export function TypographyPanel( props ) {
 		'__experimentalDefaultControls',
 	] );
 
-	const createResetAllFilter = ( attribute ) => ( newAttributes ) => ( {
-		...newAttributes,
-		style: {
-			...newAttributes.style,
-			typography: {
-				...newAttributes.style?.typography,
-				[ attribute ]: undefined,
-			},
-		},
-	} );
+	const createResetAllFilter =
+		( styleProperty, customAttribute ) => ( newAttributes ) => {
+			props?.setBlockGlobalStyles(
+				`typography.${ styleProperty }`,
+				undefined
+			);
+			return {
+				...newAttributes,
+				...( !! customAttribute && { [ customAttribute ]: undefined } ),
+				style: {
+					...newAttributes.style,
+					typography: {
+						...newAttributes.style?.typography,
+						...( !! styleProperty && {
+							[ styleProperty ]: undefined,
+						} ),
+					},
+				},
+			};
+		};
 
 	return (
 		<InspectorControls __experimentalGroup="typography">
@@ -119,10 +128,10 @@ export function TypographyPanel( props ) {
 					label={ __( 'Font family' ) }
 					onDeselect={ () => resetFontFamily( props ) }
 					isShownByDefault={ defaultControls?.fontFamily }
-					resetAllFilter={ ( newAttributes ) => ( {
-						...newAttributes,
-						fontFamily: undefined,
-					} ) }
+					resetAllFilter={ createResetAllFilter(
+						'fontFamily',
+						'fontFamily'
+					) }
 					panelId={ clientId }
 				>
 					<FontFamilyEdit { ...props } />
@@ -135,17 +144,10 @@ export function TypographyPanel( props ) {
 					label={ __( 'Font size' ) }
 					onDeselect={ () => resetFontSize( props ) }
 					isShownByDefault={ defaultControls?.fontSize }
-					resetAllFilter={ ( newAttributes ) => ( {
-						...newAttributes,
-						fontSize: undefined,
-						style: {
-							...newAttributes.style,
-							typography: {
-								...newAttributes.style?.typography,
-								fontSize: undefined,
-							},
-						},
-					} ) }
+					resetAllFilter={ createResetAllFilter(
+						'fontSize',
+						'fontSize'
+					) }
 					panelId={ clientId }
 				>
 					<FontSizeEdit { ...props } />
@@ -161,17 +163,27 @@ export function TypographyPanel( props ) {
 					) }
 					onDeselect={ () => resetFontAppearance( props ) }
 					isShownByDefault={ defaultControls?.fontAppearance }
-					resetAllFilter={ ( newAttributes ) => ( {
-						...newAttributes,
-						style: {
-							...newAttributes.style,
-							typography: {
-								...newAttributes.style?.typography,
-								fontStyle: undefined,
-								fontWeight: undefined,
+					resetAllFilter={ ( newAttributes ) => {
+						props.setBlockGlobalStyles(
+							'typography.fontStyle',
+							undefined
+						);
+						props.setBlockGlobalStyles(
+							'typography.fontWeight',
+							undefined
+						);
+						return {
+							...newAttributes,
+							style: {
+								...newAttributes.style,
+								typography: {
+									...newAttributes.style?.typography,
+									fontStyle: undefined,
+									fontWeight: undefined,
+								},
 							},
-						},
-					} ) }
+						};
+					} }
 					panelId={ clientId }
 				>
 					<FontAppearanceEdit { ...props } />

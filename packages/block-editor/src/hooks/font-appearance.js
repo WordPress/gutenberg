@@ -31,6 +31,7 @@ export function FontAppearanceEdit( props ) {
 	const {
 		attributes: { style },
 		setAttributes,
+		setBlockGlobalStyles,
 	} = props;
 
 	const hasFontStyles = ! useIsFontStyleDisabled( props );
@@ -47,6 +48,8 @@ export function FontAppearanceEdit( props ) {
 				},
 			} ),
 		} );
+		setBlockGlobalStyles( 'typography.fontStyle', newStyles.fontStyle );
+		setBlockGlobalStyles( 'typography.fontWeight', newStyles.fontWeight );
 	};
 
 	const fontStyle = style?.typography?.fontStyle;
@@ -126,11 +129,16 @@ export function hasFontAppearanceValue( props ) {
  * when disabling the font appearance support controls for a block via a
  * progressive discovery panel.
  *
- * @param {Object} props               Block props.
- * @param {Object} props.attributes    Block's attributes.
- * @param {Object} props.setAttributes Function to set block's attributes.
+ * @param {Object}   props                      Block props.
+ * @param {Object}   props.attributes           Block's attributes.
+ * @param {Function} props.setAttributes        Function to set block's attributes.
+ * @param {Function} props.setBlockGlobalStyles Function to set block's global styles.
  */
-export function resetFontAppearance( { attributes = {}, setAttributes } ) {
+export function resetFontAppearance( {
+	attributes = {},
+	setAttributes,
+	setBlockGlobalStyles,
+} ) {
 	const { style } = attributes;
 
 	setAttributes( {
@@ -143,4 +151,6 @@ export function resetFontAppearance( { attributes = {}, setAttributes } ) {
 			},
 		} ),
 	} );
+	setBlockGlobalStyles( 'typography.fontStyle', undefined );
+	setBlockGlobalStyles( 'typography.fontWeight', undefined );
 }
