@@ -81,3 +81,4 @@ function gutenberg_override_core_kses_init_filters() {
 
 }
 add_action( 'init', 'gutenberg_override_core_kses_init_filters' );
+add_action( 'set_current_user', 'gutenberg_override_core_kses_init_filters' );
