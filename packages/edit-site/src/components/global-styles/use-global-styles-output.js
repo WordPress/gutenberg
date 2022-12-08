@@ -26,7 +26,7 @@ import {
 import { PRESET_METADATA, ROOT_BLOCK_SELECTOR, scopeSelector } from './utils';
 import { getTypographyFontSizeValue } from './typography-utils';
 import { GlobalStylesContext } from './context';
-import { useSetting, useStyle } from './hooks';
+import { useSetting } from './hooks';
 
 // List of block support features that can have their related styles
 // generated under their own feature level selector rather than the block's.
@@ -885,7 +885,6 @@ export function useGlobalStylesOutput() {
 	let { merged: mergedConfig } = useContext( GlobalStylesContext );
 
 	const [ blockGap ] = useSetting( 'spacing.blockGap' );
-	const [ customCSS ] = useStyle( 'css' );
 	const hasBlockGapSupport = blockGap !== null;
 	const hasFallbackGapSupport = ! hasBlockGapSupport; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback styles support.
 	const disableLayoutStyles = useSelect( ( select ) => {
@@ -922,12 +921,12 @@ export function useGlobalStylesOutput() {
 			},
 			// Load custom CSS in own stylesheet so that any invalid CSS entered in the input won't break all the global styles in the editor.
 			{
-				css: customCSS,
+				css: mergedConfig.styles.css ?? '',
 				isGlobalStyles: true,
 			},
 		];
 
-		return [ stylesheets, mergedConfig.settings, filters, customCSS ];
+		return [ stylesheets, mergedConfig.settings, filters ];
 	}, [
 		hasBlockGapSupport,
 		hasFallbackGapSupport,
