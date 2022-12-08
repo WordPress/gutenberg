@@ -9,6 +9,6 @@
 
 	&[aria-current] {
 		color: $white;
-		background: $black;
+		background: var(--wp-admin-theme-color);
 	}
 }

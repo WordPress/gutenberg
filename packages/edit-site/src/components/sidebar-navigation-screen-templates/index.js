@@ -129,16 +129,20 @@ export default function SidebarNavigationScreenTemplates( {
 						{ items.map( ( item, index ) => (
 							<Item item={ item } key={ index } />
 						) ) }
-					</ItemGroup>
 
-					<SidebarNavigationItem
-						{ ...useLink( {
-							postType,
-							postId: undefined,
-						} ) }
-						style={ { textAlign: 'center' } }
-						children={ config[ postType ].labels.manage }
-					/>
+						<SidebarNavigationItem
+							{ ...useLink( {
+								postType,
+								postId: undefined,
+							} ) }
+							aria-current={
+								params.postType === postType && ! params.postId
+									? 'page'
+									: undefined
+							}
+							children={ config[ postType ].labels.manage }
+						/>
+					</ItemGroup>
 				</>
 			}
 		/>
