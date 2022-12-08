@@ -16,6 +16,11 @@ import {
 import { Button, Placeholder } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import { useScopedBlockVariations } from '../utils';
+
 export default function QueryPlaceholder( {
 	attributes,
 	clientId,
@@ -104,10 +109,7 @@ function QueryVariationPicker( {
 	icon,
 	label,
 } ) {
-	const variations = useSelect(
-		( select ) => select( blocksStore ).getBlockVariations( name, 'block' ),
-		[ name ]
-	);
+	const scopeVariations = useScopedBlockVariations( name, attributes );
 	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 	const blockProps = useBlockProps();
 	return (
@@ -115,24 +117,25 @@ function QueryVariationPicker( {
 			<__experimentalBlockVariationPicker
 				icon={ icon }
 				label={ label }
-				variations={ variations }
-				onSelect={ ( nextVariation ) => {
-					if ( nextVariation.attributes ) {
+				variations={ scopeVariations }
+				onSelect={ ( variation ) => {
+					if ( variation.attributes ) {
 						setAttributes( {
-							...nextVariation.attributes,
+							...variation.attributes,
 							query: {
-								...nextVariation.attributes.query,
+								...variation.attributes.query,
 								postType:
 									attributes.query.postType ||
-									nextVariation.attributes.query.postType,
+									variation.attributes.query.postType,
 							},
+							namespace: attributes.namespace,
 						} );
 					}
-					if ( nextVariation.innerBlocks ) {
+					if ( variation.innerBlocks ) {
 						replaceInnerBlocks(
 							clientId,
 							createBlocksFromInnerBlocksTemplate(
-								nextVariation.innerBlocks
+								variation.innerBlocks
 							),
 							false
 						);

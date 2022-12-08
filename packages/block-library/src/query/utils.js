@@ -18,6 +18,8 @@ import { cloneBlock, store as blocksStore } from '@wordpress/blocks';
  */
 import { name as queryLoopName } from './block.json';
 
+/** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
+
 /**
  * @typedef IHasNameAndId
  * @property {string|number} id   The entity's id.
@@ -237,7 +239,6 @@ export function useBlockNameForPatterns( clientId, attributes ) {
 				queryLoopName,
 				attributes
 			)?.name,
-
 		[ attributes ]
 	);
 	const blockName = `${ queryLoopName }/${ activeVariationName }`;
@@ -259,4 +260,62 @@ export function useBlockNameForPatterns( clientId, attributes ) {
 		[ clientId, activeVariationName ]
 	);
 	return activeVariationPatterns?.length ? blockName : queryLoopName;
+}
+
+/**
+ * Helper hook that determines if there is an active variation of the block
+ * and if there are available specific scoped `block` variations connected with
+ * this variation.
+ *
+ * If there are, these variations are going to be the only ones suggested
+ * to the user in setup flow when clicking to `start blank`, without including
+ * the default ones for Query Loop.
+ *
+ * If there are no such scoped `block` variations, the default ones for Query
+ * Loop are going to be suggested.
+ *
+ * The way we determine such variations is with the convention that they have the `namespace`
+ * attribute defined with the `name` of the variation they want to be connected to.
+ * For example, if we have a `Query Loop` scoped `inserter` variation with the name `products`,
+ * we can connect a scoped `block` variation by setting its `namespace` attribute to `products`.
+ * If the user selects this variation, the `namespace` attribute will be overridden by the
+ * main `inserter` variation.
+ *
+ * @param {string} name       The block's name.
+ * @param {Object} attributes The block's attributes.
+ * @return {WPBlockVariation[]} The block variations to be suggested in setup flow, when clicking to `start blank`.
+ */
+export function useScopedBlockVariations( name, attributes ) {
+	const { activeVariationName, blockVariations } = useSelect(
+		( select ) => {
+			const { getActiveBlockVariation, getBlockVariations } =
+				select( blocksStore );
+			return {
+				activeVariationName: getActiveBlockVariation(
+					queryLoopName,
+					attributes
+				)?.name,
+				blockVariations: getBlockVariations( name, 'block' ),
+			};
+		},
+		[ name, attributes ]
+	);
+	const variations = useMemo( () => {
+		// Filter out the variations that have defined a `namespace` attribute,
+		// which means they are 'connected' to a specific variation of the block.
+		const filterOutConnectedVariationsFn = ( variation ) =>
+			! variation.attributes?.namespace;
+		if ( ! activeVariationName ) {
+			return blockVariations.filter( filterOutConnectedVariationsFn );
+		}
+		const connectedVariations = blockVariations.filter(
+			( variation ) =>
+				variation.attributes?.namespace === activeVariationName
+		);
+		if ( !! connectedVariations.length ) {
+			return connectedVariations;
+		}
+		return blockVariations.filter( filterOutConnectedVariationsFn );
+	}, [ activeVariationName, blockVariations ] );
+	return variations;
 }
