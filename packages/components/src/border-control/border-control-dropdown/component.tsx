@@ -19,14 +19,13 @@ import ColorPalette from '../../color-palette';
 import Dropdown from '../../dropdown';
 import { HStack } from '../../h-stack';
 import { VStack } from '../../v-stack';
-import { contextConnectWithoutRef } from '../../ui/context/context-connect';
+import { contextConnect, WordPressComponentProps } from '../../ui/context';
 import { useBorderControlDropdown } from './hook';
 import { StyledLabel } from '../../base-control/styles/base-control-styles';
 import DropdownContentWrapper from '../../dropdown/dropdown-content-wrapper';
 
 import type { ColorObject, PaletteObject } from '../../color-palette/types';
 import type { DropdownProps as DropdownComponentProps } from '../../dropdown/types';
-import type { WordPressComponentProps } from '../../ui/context';
 import type { ColorProps, DropdownProps } from '../types';
 
 const getColorObject = (
@@ -123,7 +122,8 @@ const getToggleAriaLabel = (
 };
 
 const BorderControlDropdown = (
-	props: WordPressComponentProps< DropdownProps, 'div' >
+	props: WordPressComponentProps< DropdownProps, 'div' >,
+	forwardedRef: React.ForwardedRef< any >
 ) => {
 	const {
 		__experimentalHasMultipleOrigins,
@@ -250,11 +250,12 @@ const BorderControlDropdown = (
 				...__unstablePopoverProps,
 			} }
 			{ ...otherProps }
+			ref={ forwardedRef }
 		/>
 	);
 };
 
-const ConnectedBorderControlDropdown = contextConnectWithoutRef(
+const ConnectedBorderControlDropdown = contextConnect(
 	BorderControlDropdown,
 	'BorderControlDropdown'
 );
