@@ -16,12 +16,15 @@
  * @return WP_Query
  */
 function _gutenberg_get_cached_block_query_results( $query_args ) {
-	$cache_key = 'query_results_' . md5( wp_json_encode( $query_args ) );
-	$results   = wp_cache_get( $cache_key, 'block-queries' );
-	if ( false === $results ) {
-		$query   = new WP_Query( $query_args );
-		$results = $query->posts;
-		wp_cache_set( $cache_key, $results, 'block-queries' );
+	// Use a static var to cache the results of the query.
+	static $cached_queries = array();
+	// Use a hash of the query args as the cache key.
+	$cache_key = md5( wp_json_encode( $query_args ) );
+
+	// If the query hasn't been cached, run it and cache the results.
+	if ( empty( $cached_queries[ $cache_key ] ) ) {
+		$query                        = new WP_Query( $query_args );
+		$cached_queries[ $cache_key ] = $query;
 	}
-	return $results;
+	return $cached_queries[ $cache_key ];
 }
