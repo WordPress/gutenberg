@@ -672,6 +672,18 @@ _Returns_
 
 -   `Promise<ElementHandle|null>`: The handle of block to be inserted or null if nothing was found.
 
+### searchForBlockDirectoryBlock
+
+Searches for a Block Directory block via the global inserter.
+
+_Parameters_
+
+-   _searchTerm_ `string`: The text to search the inserter for.
+
+_Returns_
+
+-   `Promise<ElementHandle|null>`: The handle of the Block Directory block to be inserted or null if nothing was found.
+
 ### searchForPattern
 
 Searches for a pattern via the global inserter.
