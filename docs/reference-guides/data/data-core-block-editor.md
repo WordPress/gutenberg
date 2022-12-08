@@ -801,7 +801,7 @@ _Parameters_
 
 _Returns_
 
--   `?string`: Block Template Lock
+-   `string|false`: Block Template Lock
 
 ### hasBlockMovingClientId
 
