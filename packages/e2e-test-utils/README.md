@@ -455,41 +455,36 @@ _Returns_
 
 ### insertBlock
 
-Opens the inserter, searches for the given term, then selects the first
-result that appears. It then waits briefly for the block list to update.
+Inserts a block matching a given search term via the global inserter.
 
 _Parameters_
 
--   _searchTerm_ `string`: The text to search the inserter for.
+-   _searchTerm_ `string`: The text to search the blocks for.
 
 ### insertBlockDirectoryBlock
 
-Opens the inserter, searches for the given block, then selects the
-first result that appears from the block directory. It then waits briefly for the block list to
-update.
+Inserts a Block Directory block matching a given search term via the global
+inserter.
 
 _Parameters_
 
--   _searchTerm_ `string`: The text to search the inserter for.
+-   _searchTerm_ `string`: The text to search the Block Directory blocks for.
 
 ### insertPattern
 
-Opens the inserter, searches for the given pattern, then selects the first
-result that appears. It then waits briefly for the block list to update.
+Inserts a pattern matching a given search term via the global inserter.
 
 _Parameters_
 
--   _searchTerm_ `string`: The text to search the inserter for.
+-   _searchTerm_ `string`: The text to search the patterns for.
 
 ### insertReusableBlock
 
-Opens the inserter, searches for the given reusable block, then selects the
-first result that appears. It then waits briefly for the block list to
-update.
+Inserts a reusable block matching a given search term via the global inserter.
 
 _Parameters_
 
--   _searchTerm_ `string`: The text to search the inserter for.
+-   _searchTerm_ `string`: The text to search the reusable blocks for.
 
 ### installPlugin
 
@@ -667,27 +662,39 @@ _Returns_
 
 ### searchForBlock
 
-Search for block in the global inserter
+Searches for a block via the global inserter.
 
 _Parameters_
 
 -   _searchTerm_ `string`: The text to search the inserter for.
+
+_Returns_
+
+-   `Promise<ElementHandle|null>`: The handle of block to be inserted or null if nothing was found.
 
 ### searchForPattern
 
-Search for pattern in the global inserter
+Searches for a pattern via the global inserter.
 
 _Parameters_
 
 -   _searchTerm_ `string`: The text to search the inserter for.
+
+_Returns_
+
+-   `Promise<ElementHandle|null>`: The handle of the pattern to be inserted or null if nothing was found.
 
 ### searchForReusableBlock
 
-Search for reusable block in the global inserter.
+Searches for a reusable block via the global inserter.
 
 _Parameters_
 
 -   _searchTerm_ `string`: The text to search the inserter for.
+
+_Returns_
+
+-   `Promise<ElementHandle|null>`: The handle of the reusable block to be inserted or null if nothing was found.
 
 ### selectBlockByClientId
 

@@ -147,17 +147,17 @@ async function waitForInserterCloseAndContentFocus() {
 }
 
 /**
- * Searches the global inserter for an entity matching given category and term.
- * If nothing is found, null will be returned.
+ * Searches for an entity matching given category and term via the global
+ * inserter. If nothing is found, null will be returned.
  *
  * Available categories: Blocks, Patterns, Reusable and Block Directory.
  *
  * @param {string} category   The category to search within.
  * @param {string} searchTerm The text to search the inserter for.
- * @return {Promise<ElementHandle|null>} The handle of the element to be
- * inserted or null if nothing was found.
+ * @return {Promise<ElementHandle|null>} The handle of the element to be inserted or
+ * null if nothing was found.
  */
-async function searchGlobalInserter( category, searchTerm ) {
+export async function searchGlobalInserter( category, searchTerm ) {
 	await openGlobalBlockInserter();
 	await page.waitForSelector( INSERTER_SEARCH_SELECTOR );
 	await page.focus( INSERTER_SEARCH_SELECTOR );
@@ -213,16 +213,16 @@ async function searchGlobalInserter( category, searchTerm ) {
 }
 
 /**
- * Inserts the entity matching given category and term via the global inserter.
- * If the entity is not instantly available in the inserted, a search will be
- * performed. If the search returns no results, an error will be thrown.
+ * Inserts an entity matching given category and term via the global inserter.
+ * If the entity is not instantly available in the open inserter, a search will
+ * be performed. If the search returns no results, an error will be thrown.
  *
  * Available categories: Blocks, Patterns, Reusable and Block Directory.
  *
  * @param {string} category   The category to insert from.
  * @param {string} searchTerm The text to search the inserter for.
  */
-async function insertFromGlobalInserter( category, searchTerm ) {
+export async function insertFromGlobalInserter( category, searchTerm ) {
 	await openGlobalBlockInserter();
 	await selectGlobalInserterTab( category );
 
@@ -271,7 +271,7 @@ async function insertFromGlobalInserter( category, searchTerm ) {
 }
 
 /**
- * Search for a block via the global inserter.
+ * Searches for a block via the global inserter.
  *
  * @param {string} searchTerm The text to search the inserter for.
  * @return {Promise<ElementHandle|null>} The handle of block to be
@@ -282,7 +282,7 @@ export async function searchForBlock( searchTerm ) {
 }
 
 /**
- * Search for a pattern via the global inserter.
+ * Searches for a pattern via the global inserter.
  *
  * @param {string} searchTerm The text to search the inserter for.
  * @return {Promise<ElementHandle|null>} The handle of the pattern to be
@@ -293,7 +293,7 @@ export async function searchForPattern( searchTerm ) {
 }
 
 /**
- * Search for a reusable block via the global inserter.
+ * Searches for a reusable block via the global inserter.
  *
  * @param {string} searchTerm The text to search the inserter for.
  * @return {Promise<ElementHandle|null>} The handle of the reusable block to be
@@ -304,7 +304,7 @@ export async function searchForReusableBlock( searchTerm ) {
 }
 
 /**
- * Search for a Block Directory block via the global inserter.
+ * Searches for a Block Directory block via the global inserter.
  *
  * @param {string} searchTerm The text to search the inserter for.
  * @return {Promise<ElementHandle|null>} The handle of the Block Directory block
@@ -315,7 +315,7 @@ export async function searchForBlockDirectoryBlock( searchTerm ) {
 }
 
 /**
- * Insert a block matching a given search term via the global inserter.
+ * Inserts a block matching a given search term via the global inserter.
  *
  * @param {string} searchTerm The text to search the blocks for.
  */
@@ -324,7 +324,7 @@ export async function insertBlock( searchTerm ) {
 }
 
 /**
- * Insert a pattern matching a given search term via the global inserter.
+ * Inserts a pattern matching a given search term via the global inserter.
  *
  * @param {string} searchTerm The text to search the patterns for.
  */
@@ -333,7 +333,7 @@ export async function insertPattern( searchTerm ) {
 }
 
 /**
- * Insert a reusable block matching a given search term via the global inserter.
+ * Inserts a reusable block matching a given search term via the global inserter.
  *
  * @param {string} searchTerm The text to search the reusable blocks for.
  */
@@ -342,7 +342,7 @@ export async function insertReusableBlock( searchTerm ) {
 }
 
 /**
- * Insert a Block Directory block matching a given search term via the global
+ * Inserts a Block Directory block matching a given search term via the global
  * inserter.
  *
  * @param {string} searchTerm The text to search the Block Directory blocks for.
