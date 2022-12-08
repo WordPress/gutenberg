@@ -79,7 +79,10 @@ function getStyleAttributes( sourceBlock, targetBlock ) {
 	return Object.entries( STYLE_ATTRIBUTES ).reduce(
 		( attributes, [ attributeKey, hasSupport ] ) => {
 			// Only apply the attribute if both blocks support it.
-			if ( hasSupport( sourceBlock.name ) && hasSupport( targetBlock ) ) {
+			if (
+				hasSupport( sourceBlock.name ) &&
+				hasSupport( targetBlock.name )
+			) {
 				// Override attributes that are not present in the block to their defaults.
 				attributes[ attributeKey ] =
 					sourceBlock.attributes[ attributeKey ];
