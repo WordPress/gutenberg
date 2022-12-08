@@ -10,6 +10,7 @@ import {
 	FlexItem,
 	SelectControl,
 	__experimentalHStack as HStack,
+	__experimentalSpacer as Spacer,
 } from '@wordpress/components';
 import {
 	switchToBlockType,
@@ -145,33 +146,35 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 	}
 
 	return (
-		<HStack as="form" onSubmit={ createFromWidgets }>
-			<FlexBlock>
-				<SelectControl
-					label={ __( 'Import widget area' ) }
-					value={ selectedSidebar }
-					options={ options }
-					onChange={ ( value ) => setSelectedSidebar( value ) }
-					disabled={ ! options.length }
-					__next36pxDefaultSize
-					__nextHasNoMarginBottom
-				/>
-			</FlexBlock>
-			<FlexItem
-				style={ {
-					marginBottom: '8px',
-					marginTop: 'auto',
-				} }
-			>
-				<Button
-					variant="primary"
-					type="submit"
-					isBusy={ isBusy }
-					aria-disabled={ isBusy || ! selectedSidebar }
+		<Spacer marginBottom="4">
+			<HStack as="form" onSubmit={ createFromWidgets }>
+				<FlexBlock>
+					<SelectControl
+						label={ __( 'Import widget area' ) }
+						value={ selectedSidebar }
+						options={ options }
+						onChange={ ( value ) => setSelectedSidebar( value ) }
+						disabled={ ! options.length }
+						__next36pxDefaultSize
+						__nextHasNoMarginBottom
+					/>
+				</FlexBlock>
+				<FlexItem
+					style={ {
+						marginBottom: '8px',
+						marginTop: 'auto',
+					} }
 				>
-					{ __( 'Import' ) }
-				</Button>
-			</FlexItem>
-		</HStack>
+					<Button
+						variant="primary"
+						type="submit"
+						isBusy={ isBusy }
+						aria-disabled={ isBusy || ! selectedSidebar }
+					>
+						{ __( 'Import' ) }
+					</Button>
+				</FlexItem>
+			</HStack>
+		</Spacer>
 	);
 }
