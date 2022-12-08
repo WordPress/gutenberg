@@ -112,7 +112,9 @@ function UncontrolledInnerBlocks( props ) {
 				__experimentalAppenderTagName={ __experimentalAppenderTagName }
 				__experimentalLayout={ {
 					...__experimentalLayout,
-					allowSizingOnChildren,
+					...( allowSizingOnChildren && {
+						allowSizingOnChildren: true,
+					} ),
 				} }
 				wrapperRef={ wrapperRef }
 				placeholder={ placeholder }

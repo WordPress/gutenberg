@@ -130,7 +130,7 @@ function BlockListBlock( {
 	const { removeBlock } = useDispatch( blockEditorStore );
 	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
 
-	const parentLayout = useLayout();
+	const parentLayout = useLayout() || {};
 
 	// We wrap the BlockEdit component in a div that hides it when editing in
 	// HTML mode. This allows us to render all of the ancillary pieces
@@ -150,7 +150,9 @@ function BlockListBlock( {
 			isSelectionEnabled={ isSelectionEnabled }
 			toggleSelection={ toggleSelection }
 			__unstableLayoutClassNames={ layoutClassNames }
-			__unstableParentLayout={ parentLayout }
+			__unstableParentLayout={
+				Object.keys( parentLayout ).length ? parentLayout : undefined
+			}
 		/>
 	);
 
