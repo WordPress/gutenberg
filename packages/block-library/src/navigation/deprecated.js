@@ -52,6 +52,8 @@ const migrateWithLayout = ( attributes ) => {
 };
 
 const v6 = {
+	// `__unstableLocation` was removed in Gutenberg 14.8.
+	// Please remove this attribute if / when another deprecated version of this block is required.
 	attributes: {
 		navigationMenuId: {
 			type: 'number',
