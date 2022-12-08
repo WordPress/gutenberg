@@ -856,3 +856,23 @@ function block_core_navigation_typographic_presets_backcompatibility( $parsed_bl
 }
 
 add_filter( 'render_block_data', 'block_core_navigation_typographic_presets_backcompatibility' );
+
+function gutenberg_enable_animation_for_navigation_inspector( $settings ) {
+	$current_tab_settings = _wp_array_get(
+		$settings,
+		array( '__experimentalBlockInspectorAnimation' ),
+		array()
+	);
+
+	$settings['__experimentalBlockInspectorAnimation'] = array_merge(
+		$current_tab_settings,
+		array( 'core/navigation' => array(
+			'enterDirection' => 'leftToRight',
+			'exitDirection' => 'rightToLeft'
+		) )
+	);
+
+	return $settings;
+}
+
+add_filter( 'block_editor_settings_all', 'gutenberg_enable_animation_for_navigation_inspector' );

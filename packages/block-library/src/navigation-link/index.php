@@ -376,3 +376,23 @@ function gutenberg_disable_tabs_for_navigation_link_block( $settings ) {
 }
 
 add_filter( 'block_editor_settings_all', 'gutenberg_disable_tabs_for_navigation_link_block' );
+
+function gutenberg_enable_animation_for_navigation_link_inspector( $settings ) {
+	$current_tab_settings = _wp_array_get(
+		$settings,
+		array( '__experimentalBlockInspectorAnimation' ),
+		array()
+	);
+
+	$settings['__experimentalBlockInspectorAnimation'] = array_merge(
+		$current_tab_settings,
+		array( 'core/navigation-link' => array(
+			'enterDirection' => 'rightToLeft',
+			'exitDirection' => 'leftToRight'
+		) )
+	);
+
+	return $settings;
+}
+
+add_filter( 'block_editor_settings_all', 'gutenberg_enable_animation_for_navigation_link_inspector' );
