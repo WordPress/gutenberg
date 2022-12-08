@@ -94,7 +94,7 @@ function applyAllFallbackStyles( border ) {
 	return applyFallbackStyle( border );
 }
 
-export default function BorderPanel( { name } ) {
+export default function BorderPanel( { name, variationPath = '' } ) {
 	// To better reflect if the user has customized a value we need to
 	// ensure the style value being checked is from the `user` origin.
 	const [ userBorderStyles ] = useStyle( 'border', name, 'user' );
@@ -108,7 +108,7 @@ export default function BorderPanel( { name } ) {
 	// Border radius.
 	const showBorderRadius = useHasBorderRadiusControl( name );
 	const [ borderRadiusValues, setBorderRadius ] = useStyle(
-		'border.radius',
+		`${ variationPath }border.radius`,
 		name
 	);
 	const hasBorderRadius = () => {

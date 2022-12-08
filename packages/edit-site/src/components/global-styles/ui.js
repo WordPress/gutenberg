@@ -47,6 +47,14 @@ function GlobalStylesNavigationScreen( { className, ...props } ) {
 }
 
 function ContextScreens( { name, parentMenu = '' } ) {
+	const hasVariationPath = parentMenu.search( 'variations' );
+	const variationPath =
+		hasVariationPath !== -1
+			? parentMenu
+					.substring( hasVariationPath )
+					.replace( '/', '.' )
+					.concat( '', '.' )
+			: '';
 	const blockStyleVariations = useSelect(
 		( select ) => {
 			const { getBlockStyles } = select( blocksStore );
@@ -136,7 +144,7 @@ function ContextScreens( { name, parentMenu = '' } ) {
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/border' }>
-				<ScreenBorder name={ name } />
+				<ScreenBorder name={ name } variationPath={ variationPath } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/layout' }>

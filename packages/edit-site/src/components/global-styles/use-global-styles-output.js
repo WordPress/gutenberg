@@ -10,6 +10,7 @@ import {
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
 	getBlockTypes,
+	store as blocksStore,
 } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { useContext, useMemo } from '@wordpress/element';
@@ -802,7 +803,7 @@ export function toSvgFilters( tree, blockSelectors ) {
 	} );
 }
 
-export const getBlockSelectors = ( blockTypes ) => {
+export const getBlockSelectors = ( blockTypes, getBlockStyles ) => {
 	const result = {};
 	blockTypes.forEach( ( blockType ) => {
 		const name = blockType.name;
@@ -814,6 +815,13 @@ export const getBlockSelectors = ( blockTypes ) => {
 		const hasLayoutSupport = !! blockType?.supports?.__experimentalLayout;
 		const fallbackGapValue =
 			blockType?.supports?.spacing?.blockGap?.__experimentalDefault;
+
+		const blockStyleVariations = getBlockStyles( name );
+		const styleVariationSelectors = {};
+		blockStyleVariations.forEach( ( variation ) => {
+			const styleVariationSelector = `${ selector } is-style-${ variation.name }`;
+			styleVariationSelectors[ variation.name ] = styleVariationSelector;
+		} );
 
 		// For each block support feature add any custom selectors.
 		const featureSelectors = {};
@@ -840,6 +848,10 @@ export const getBlockSelectors = ( blockTypes ) => {
 			hasLayoutSupport,
 			name,
 			selector,
+			styleVariationSelectors: Object.keys( styleVariationSelectors )
+				.length
+				? styleVariationSelectors
+				: undefined,
 		};
 	} );
 
@@ -892,12 +904,19 @@ export function useGlobalStylesOutput() {
 		return !! getSettings().disableLayoutStyles;
 	} );
 
+	const getBlockStyles = useSelect( ( select ) => {
+		return select( blocksStore ).getBlockStyles;
+	}, [] );
+
 	return useMemo( () => {
 		if ( ! mergedConfig?.styles || ! mergedConfig?.settings ) {
 			return [];
 		}
 		mergedConfig = updateConfigWithSeparator( mergedConfig );
-		const blockSelectors = getBlockSelectors( getBlockTypes() );
+		const blockSelectors = getBlockSelectors(
+			getBlockTypes(),
+			getBlockStyles
+		);
 		const customProperties = toCustomProperties(
 			mergedConfig,
 			blockSelectors
@@ -909,6 +928,7 @@ export function useGlobalStylesOutput() {
 			hasFallbackGapSupport,
 			disableLayoutStyles
 		);
+
 		const filters = toSvgFilters( mergedConfig, blockSelectors );
 		const stylesheets = [
 			{
