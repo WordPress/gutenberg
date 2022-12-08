@@ -137,12 +137,7 @@ export default function PostFormatPanel() {
 		<PanelBody initialOpen={ true } title={ panelBodyTitle }>
 			<p>
 				{ __(
-					'There are some external images in the post. You can upload them to the media library.'
-				) }
-			</p>
-			<p>
-				{ __(
-					'Images from different domains may not always load correctly, load slowly, or be removed unexpectedly.'
+					'There are some external images in the post which can be uploaded to the media library. Images coming from different domains may not always display correctly, load slowly for visitors, or be removed unexpectedly.'
 				) }
 			</p>
 			<div
