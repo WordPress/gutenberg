@@ -511,6 +511,7 @@ function block_core_navigation_from_block_get_post_ids( $block ) {
 function render_block_core_navigation( $attributes, $content, $block ) {
 
 	static $seen_menu_names = array();
+	static $seen_ref = array();
 
 	// Flag used to indicate whether the rendered output is considered to be
 	// a fallback (i.e. the block has no menu associated with it).
@@ -581,6 +582,11 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	// Load inner blocks from the navigation post.
 	if ( array_key_exists( 'ref', $attributes ) ) {
+		if ( in_array( $attributes['ref'], $seen_ref, true ) ) {
+			return '';
+		}
+		$seen_ref[] = $attributes['ref'];
+
 		$navigation_post = get_post( $attributes['ref'] );
 		if ( ! isset( $navigation_post ) ) {
 			return '';
