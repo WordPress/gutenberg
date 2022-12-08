@@ -147,6 +147,7 @@ export default function SidebarNavigationScreenTemplates( {
 						) ) }
 
 						<SidebarNavigationItem
+							className="edit-site-sidebar-navigation-screen-templates__see-all"
 							{ ...useLink( {
 								postType,
 								postId: undefined,
