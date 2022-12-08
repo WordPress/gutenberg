@@ -1,5 +1,23 @@
 == Changelog ==
 
+= 14.7.1 =
+
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Layout
+- Only pass parentLayout to block edit if not empty. ([46390](https://github.com/WordPress/gutenberg/pull/46390))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@tellthemachines
+
+
 = 14.7.0 =
 
 
