@@ -110,7 +110,7 @@ function ScreenRoot() {
 					marginBottom={ 4 }
 				>
 					{ __(
-						'Add CSS to modify your site in ways not provided for by the existing design tools.'
+						'Add CSS beyond the styles offered by the existing design tools.'
 					) }
 				</Spacer>
 				<ItemGroup>
