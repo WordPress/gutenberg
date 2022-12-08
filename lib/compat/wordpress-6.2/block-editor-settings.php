@@ -19,7 +19,7 @@ function gutenberg_get_block_editor_settings_6_2( $settings ) {
 		isset( $_GET['context'] ) &&
 		'mobile' === $_GET['context']
 	) {
-		return;
+		return $settings;
 	}
 
 	if ( wp_theme_has_theme_json() ) {
