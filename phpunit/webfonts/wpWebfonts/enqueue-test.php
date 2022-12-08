@@ -27,7 +27,7 @@ class Tests_Webfonts_WpWebfonts_Enqueue extends WP_Webfonts_TestCase {
 		$wp_webfonts->enqueue( $handles );
 
 		$this->assertSame( $expected, $this->get_queued_before_register( $wp_webfonts ), 'Handles should be added to before registered queue' );
-		$this->assertEmpty( $this->queue, 'Handles should not be added to the enqueue queue when not registered' );
+		$this->assertEmpty( $wp_webfonts->queue, 'Handles should not be added to the enqueue queue when not registered' );
 	}
 
 	/**
