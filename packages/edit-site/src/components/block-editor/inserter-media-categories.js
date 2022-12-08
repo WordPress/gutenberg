@@ -9,12 +9,18 @@ import { resolveSelect } from '@wordpress/data';
  */
 import { store as coreStore } from '@wordpress/core-data';
 
-const coreMediaFetch = async ( query = {} ) =>
-	resolveSelect( coreStore ).getMediaItems( {
+const coreMediaFetch = async ( query = {} ) => {
+	const mediaItems = await resolveSelect( coreStore ).getMediaItems( {
 		...query,
-		context: 'view',
 		orderBy: !! query?.search ? 'relevance' : 'date',
 	} );
+	return mediaItems.map( ( mediaItem ) => ( {
+		...mediaItem,
+		alt: mediaItem.alt_text,
+		url: mediaItem.source_url,
+		caption: mediaItem.caption?.raw,
+	} ) );
+};
 
 const inserterMediaCategories = [
 	{
@@ -66,12 +72,11 @@ const inserterMediaCategories = [
 			const response = await window.fetch( url );
 			const jsonResponse = await response.json();
 			const results = jsonResponse.results;
-			// For any external media we need to delete the `id` property if exists.
-			// TODO: we'll probably need this for reporting purposes though...
-			return results.map( ( result ) => {
-				delete result.id;
-				return result;
-			} );
+			return results.map( ( result ) => ( {
+				...result,
+				sourceId: result.id,
+				id: undefined,
+			} ) );
 		},
 		hasAvailableMedia: true,
 	},
