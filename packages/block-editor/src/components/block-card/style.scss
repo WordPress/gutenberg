@@ -18,14 +18,17 @@
 }
 
 .block-editor-block-card__sync-status {
-	display: block;
-	color: #fff;
-	background-color: var(--wp-block-synced-color);
-	padding: 3px 6px;
 	margin-block-start: $grid-unit-05;
 	margin-block-end: $grid-unit-15;
-	font-size: 0.9em;
-	border-radius: $radius-block-ui;
+
+	span {
+		display: inline-block;
+		color: #fff;
+		background-color: var(--wp-block-synced-color);
+		padding: 3px 6px;
+		font-size: 0.9em;
+		border-radius: $radius-block-ui;
+	}
 }
 
 .block-editor-block-card__description {
