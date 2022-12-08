@@ -25,14 +25,6 @@ class WP_Theme_JSON_Data_Gutenberg {
 	private $origin = '';
 
 	/**
-	 * Container for data coming from the blocks.
-	 *
-	 * @since 6.1.0
-	 * @var WP_Theme_JSON
-	 */
-	protected static $blocks = null;
-
-	/**
 	 * Constructor.
 	 *
 	 * @param array  $data   Array following the theme.json specification.
