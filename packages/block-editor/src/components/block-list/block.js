@@ -103,6 +103,7 @@ function BlockListBlock( {
 		isContentBlock,
 		isContentLocking,
 		isTemporarilyEditingAsBlocks,
+		isSyncedBlock,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -110,9 +111,13 @@ function BlockListBlock( {
 				__unstableGetContentLockingParent,
 				getTemplateLock,
 				__unstableGetTemporarilyEditingAsBlocks,
+				areInnerBlocksControlled,
 			} = select( blockEditorStore );
 			const _hasContentLockedParent =
 				!! __unstableGetContentLockingParent( clientId );
+
+			const _isSyncedBlock = areInnerBlocksControlled( clientId );
+
 			return {
 				themeSupportsLayout: getSettings().supportsLayout,
 				isContentBlock:
@@ -125,6 +130,7 @@ function BlockListBlock( {
 					! _hasContentLockedParent,
 				isTemporarilyEditingAsBlocks:
 					__unstableGetTemporarilyEditingAsBlocks() === clientId,
+				isSyncedBlock: _isSyncedBlock,
 			};
 		},
 		[ name, clientId ]
@@ -153,6 +159,7 @@ function BlockListBlock( {
 			toggleSelection={ toggleSelection }
 			__unstableLayoutClassNames={ layoutClassNames }
 			__unstableParentLayout={ parentLayout }
+			__unstableIsSyncedBlock={ isSyncedBlock }
 		/>
 	);
 
@@ -236,6 +243,7 @@ function BlockListBlock( {
 				'is-content-locked-temporarily-editing-as-blocks':
 					isTemporarilyEditingAsBlocks,
 				'is-content-block': hasContentLockedParent && isContentBlock,
+				'is-synced': isSyncedBlock,
 			},
 			dataAlign && themeSupportsLayout && `align${ dataAlign }`,
 			className
