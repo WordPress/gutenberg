@@ -15,7 +15,7 @@
  *
  * @access private
  */
-class WP_Theme_JSON_Resolver_6_1 extends WP_Theme_JSON_Resolver_6_0 {
+class WP_Theme_JSON_Resolver_6_1 extends WP_Theme_JSON_Resolver {
 
 	/**
 	 * Container for data coming from core.

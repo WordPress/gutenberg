@@ -32,9 +32,8 @@ import { useSelect, useDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import ConvertToLinksModal, {
-	convertSelectedBlockToNavigationLinks,
-} from './convert-to-links-modal';
+import ConvertToLinksModal from './convert-to-links-modal';
+import { convertToNavigationLinks } from './convert-to-navigation-links';
 import { convertDescription } from './constants';
 
 // We only show the edit option when page count is <= MAX_PAGE_COUNT
@@ -100,6 +99,30 @@ export default function PageListEdit( {
 		}, [] );
 	};
 
+	const makePagesTree = ( parentId = 0, level = 0 ) => {
+		const childPages = pagesByParentId.get( parentId );
+
+		if ( ! childPages?.length ) {
+			return [];
+		}
+
+		return childPages.reduce( ( tree, page ) => {
+			const hasChildren = pagesByParentId.has( page.id );
+			const item = {
+				value: page.id,
+				label: '— '.repeat( level ) + page.title.rendered,
+				rawName: page.title.rendered,
+			};
+			tree.push( item );
+			if ( hasChildren ) {
+				tree.push( ...makePagesTree( page.id, level + 1 ) );
+			}
+			return tree;
+		}, [] );
+	};
+
+	const pagesTree = useMemo( makePagesTree, [ pagesByParentId ] );
+
 	const blockList = useMemo( getBlockList, [
 		pagesByParentId,
 		parentPageID,
@@ -162,14 +185,6 @@ export default function PageListEdit( {
 		}
 	};
 
-	const parentOptions = pages?.reduce( ( accumulator, page ) => {
-		accumulator.push( {
-			value: page.id,
-			label: page.title.rendered,
-		} );
-		return accumulator;
-	}, [] );
-
 	useEffect( () => {
 		__unstableMarkNextChangeAsNotPersistent();
 		if ( blockList ) {
@@ -197,19 +212,20 @@ export default function PageListEdit( {
 	return (
 		<>
 			<InspectorControls>
-				{ isNavigationChild && (
+				{ isNavigationChild && pages?.length > 0 && (
 					<PanelBody title={ __( 'Customize this menu' ) }>
 						<p>{ convertDescription }</p>
 						<Button
 							variant="primary"
 							disabled={ ! hasResolvedPages }
 							onClick={ () => {
-								convertSelectedBlockToNavigationLinks( {
-									pages,
-									replaceBlock,
-									clientId,
-									createBlock,
-								} )();
+								const navigationLinks =
+									convertToNavigationLinks( pages );
+
+								// Replace the Page List block with the Navigation Links.
+								replaceBlock( clientId, navigationLinks );
+
+								// Select the Navigation block to reveal the changes.
 								selectBlock( parentNavBlockClientId );
 							} }
 						>
@@ -217,13 +233,13 @@ export default function PageListEdit( {
 						</Button>
 					</PanelBody>
 				) }
-				<PanelBody>
-					{ parentOptions && (
+				{ pagesTree.length > 0 && (
+					<PanelBody>
 						<ComboboxControl
 							className="editor-page-attributes__parent"
 							label={ __( 'Parent page' ) }
 							value={ parentPageID }
-							options={ parentOptions }
+							options={ pagesTree }
 							onChange={ ( value ) =>
 								setAttributes( { parentPageID: value ?? 0 } )
 							}
@@ -231,8 +247,8 @@ export default function PageListEdit( {
 								'Choose a page to show only its subpages.'
 							) }
 						/>
-					) }
-				</PanelBody>
+					</PanelBody>
+				) }
 			</InspectorControls>
 			{ allowConvertToLinks && totalPages > 0 && (
 				<BlockControls group="other">

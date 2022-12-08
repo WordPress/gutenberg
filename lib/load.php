@@ -35,15 +35,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-block-editor-settings-controller.php';
 	}
 
-	// WordPress 6.0 compat.
-	require_once __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-global-styles-controller.php';
-	require_once __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-pattern-directory-controller-6-0.php';
-	require_once __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-edit-site-export-controller.php';
-	if ( ! class_exists( 'WP_REST_Block_Pattern_Categories_Controller' ) ) {
-		require_once __DIR__ . '/compat/wordpress-6.0/class-wp-rest-block-pattern-categories-controller.php';
-	}
-	require_once __DIR__ . '/compat/wordpress-6.0/rest-api.php';
-
 	// WordPress 6.1 compat.
 	require_once __DIR__ . '/compat/wordpress-6.1/class-gutenberg-rest-block-patterns-controller.php';
 	require_once __DIR__ . '/compat/wordpress-6.1/class-gutenberg-rest-templates-controller.php';
@@ -66,23 +57,6 @@ require __DIR__ . '/experimental/editor-settings.php';
 
 // Gutenberg plugin compat.
 require __DIR__ . '/compat/plugin/edit-site-routes-backwards-compat.php';
-
-// WordPress 6.0 compat.
-require __DIR__ . '/compat/wordpress-6.0/block-gallery.php';
-require __DIR__ . '/compat/wordpress-6.0/block-editor-settings.php';
-require __DIR__ . '/compat/wordpress-6.0/get-global-styles-and-settings.php';
-require __DIR__ . '/compat/wordpress-6.0/render-svg-filters.php';
-require __DIR__ . '/compat/wordpress-6.0/post-lock.php';
-require __DIR__ . '/compat/wordpress-6.0/blocks.php';
-require __DIR__ . '/compat/wordpress-6.0/block-template-utils.php';
-require __DIR__ . '/compat/wordpress-6.0/functions.php';
-require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-6-0.php';
-require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-resolver-6-0.php';
-require __DIR__ . '/compat/wordpress-6.0/block-patterns.php';
-require __DIR__ . '/compat/wordpress-6.0/site-editor.php';
-require __DIR__ . '/compat/wordpress-6.0/edit-form-blocks.php';
-require __DIR__ . '/compat/wordpress-6.0/block-patterns-update.php';
-require __DIR__ . '/compat/wordpress-6.0/client-assets.php';
 
 // WordPress 6.1 compat.
 require __DIR__ . '/compat/wordpress-6.1/blocks.php';

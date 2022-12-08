@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, find, orderBy } from 'lodash';
+import { map, find } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -27,6 +27,7 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import { mapRichTextSettings } from './utils';
+import { orderBy } from '../utils/sorting';
 
 /**
  * A block selection object.
@@ -1425,19 +1426,14 @@ export function getTemplate( state ) {
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional block root client ID.
  *
- * @return {?string} Block Template Lock
+ * @return {string|false} Block Template Lock
  */
 export function getTemplateLock( state, rootClientId ) {
 	if ( ! rootClientId ) {
-		return state.settings.templateLock;
+		return state.settings.templateLock ?? false;
 	}
 
-	const blockListSettings = getBlockListSettings( state, rootClientId );
-	if ( ! blockListSettings ) {
-		return undefined;
-	}
-
-	return blockListSettings.templateLock;
+	return getBlockListSettings( state, rootClientId )?.templateLock ?? false;
 }
 
 const checkAllowList = ( list, item, defaultResult = null ) => {

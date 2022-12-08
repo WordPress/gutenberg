@@ -108,6 +108,7 @@ const restrictedImports = [
 			'nth',
 			'omitBy',
 			'once',
+			'orderby',
 			'overEvery',
 			'partial',
 			'partialRight',
