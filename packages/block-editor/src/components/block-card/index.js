@@ -30,9 +30,12 @@ function BlockCard( { title, icon, description, blockType, className } ) {
 	const isOffCanvasNavigationEditorEnabled =
 		window?.__experimentalEnableOffCanvasNavigationEditor === true;
 
-	const { parentNavBlockClientId } = useSelect( ( select ) => {
-		const { getSelectedBlockClientId, getBlockParentsByBlockName } =
-			select( blockEditorStore );
+	const { parentNavBlockClientId, isSynced } = useSelect( ( select ) => {
+		const {
+			getSelectedBlockClientId,
+			getBlockParentsByBlockName,
+			areInnerBlocksControlled,
+		} = select( blockEditorStore );
 
 		const _selectedBlockClientId = getSelectedBlockClientId();
 
@@ -42,6 +45,7 @@ function BlockCard( { title, icon, description, blockType, className } ) {
 				'core/navigation',
 				true
 			)[ 0 ],
+			isSynced: areInnerBlocksControlled( _selectedBlockClientId ),
 		};
 	}, [] );
 
@@ -65,6 +69,11 @@ function BlockCard( { title, icon, description, blockType, className } ) {
 			<BlockIcon icon={ icon } showColors />
 			<div className="block-editor-block-card__content">
 				<h2 className="block-editor-block-card__title">{ title }</h2>
+				{ isSynced && (
+					<span className="block-editor-block-card__sync-status">
+						Synced
+					</span>
+				) }
 				<span className="block-editor-block-card__description">
 					{ description }
 				</span>
