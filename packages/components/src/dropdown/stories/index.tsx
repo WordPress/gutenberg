@@ -9,7 +9,6 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
 import Dropdown from '..';
 import Button from '../../button';
 import { DropdownContentWrapper } from '../dropdown-content-wrapper';
-import type { CallbackProps } from '../types';
 
 const meta: ComponentMeta< typeof Dropdown > = {
 	title: 'Components/Dropdown',
@@ -47,7 +46,7 @@ const Template: ComponentStory< typeof Dropdown > = ( args ) => {
 export const Default: ComponentStory< typeof Dropdown > = Template.bind( {} );
 Default.args = {
 	position: 'bottom right',
-	renderToggle: ( { isOpen, onToggle }: CallbackProps ) => (
+	renderToggle: ( { isOpen, onToggle } ) => (
 		<Button onClick={ onToggle } aria-expanded={ isOpen } isPrimary>
 			Open dropdown
 		</Button>
