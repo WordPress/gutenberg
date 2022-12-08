@@ -9,7 +9,7 @@
 /**
  * Base Global Styles REST API Controller.
  */
-class Gutenberg_REST_Global_Styles_Controller extends Gutenberg_REST_Global_Styles_Controller_6_0 {
+class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Global_Styles_Controller {
 
 	protected function download_font_face ( $font_face ) {
 		// Download font asset in temp folder

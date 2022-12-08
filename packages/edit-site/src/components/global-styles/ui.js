@@ -4,6 +4,7 @@
 import {
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
+	__experimentalUseNavigator as useNavigator,
 } from '@wordpress/components';
 import { getBlockTypes } from '@wordpress/blocks';
 import { useState } from '@wordpress/element';
@@ -29,6 +30,8 @@ import ScreenAddFontFamily from './screen-add-font-family';
 import ScreenGoogleFontFacesList from './screen-google-font-faces';
 import ScreenThemeFontFamilies from './screen-theme-font-families';
 import ScreenThemeFontFacesList from './screen-theme-font-faces';
+import ScreenBorder from './screen-border';
+import StyleBook from '../style-book';
 
 function GlobalStylesNavigationScreen( { className, ...props } ) {
 	return (
@@ -113,6 +116,10 @@ function ContextScreens( { name } ) {
 				<ScreenButtonColor name={ name } />
 			</GlobalStylesNavigationScreen>
 
+			<GlobalStylesNavigationScreen path={ parentMenu + '/border' }>
+				<ScreenBorder name={ name } />
+			</GlobalStylesNavigationScreen>
+
 			<GlobalStylesNavigationScreen path={ parentMenu + '/layout' }>
 				<ScreenLayout name={ name } />
 			</GlobalStylesNavigationScreen>
@@ -159,9 +166,23 @@ function FontFamilyScreens() {
 	);
 }
 
-function GlobalStylesUI() {
-	const blocks = getBlockTypes();
+function GlobalStylesStyleBook( { onClose } ) {
+	const navigator = useNavigator();
+	return (
+		<StyleBook
+			isSelected={ ( blockName ) =>
+				navigator.location.path.startsWith( '/blocks/' + blockName )
+			}
+			onSelect={ ( blockName ) =>
+				navigator.goTo( '/blocks/' + blockName )
+			}
+			onClose={ onClose }
+		/>
+	);
+}
 
+function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
+	const blocks = getBlockTypes();
 	return (
 		<NavigatorProvider
 			className="edit-site-global-styles-sidebar__navigator-provider"
@@ -197,6 +218,10 @@ function GlobalStylesUI() {
 					name={ block.name }
 				/>
 			) ) }
+
+			{ isStyleBookOpened && (
+				<GlobalStylesStyleBook onClose={ onCloseStyleBook } />
+			) }
 		</NavigatorProvider>
 	);
 }

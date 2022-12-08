@@ -81,7 +81,8 @@ describe( 'Image Block', () => {
 		// We must await the image fetch via `getMedia`
 		await act( () => apiFetchPromise );
 
-		fireEvent.press( screen.getByLabelText( /Image Block/ ) );
+		const [ imageBlock ] = screen.getAllByLabelText( /Image Block/ );
+		fireEvent.press( imageBlock );
 		// Awaiting navigation event seemingly required due to React Navigation bug
 		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
@@ -107,7 +108,8 @@ describe( 'Image Block', () => {
 		// We must await the image fetch via `getMedia`
 		await act( () => apiFetchPromise );
 
-		fireEvent.press( screen.getByLabelText( /Image Block/ ) );
+		const [ imageBlock ] = screen.getAllByLabelText( /Image Block/ );
+		fireEvent.press( imageBlock );
 		// Awaiting navigation event seemingly required due to React Navigation bug
 		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
@@ -133,7 +135,8 @@ describe( 'Image Block', () => {
 		// We must await the image fetch via `getMedia`
 		await act( () => apiFetchPromise );
 
-		fireEvent.press( screen.getByLabelText( /Image Block/ ) );
+		const [ imageBlock ] = screen.getAllByLabelText( /Image Block/ );
+		fireEvent.press( imageBlock );
 		// Awaiting navigation event seemingly required due to React Navigation bug
 		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
@@ -169,7 +172,8 @@ describe( 'Image Block', () => {
 		// We must await the image fetch via `getMedia`
 		await act( () => apiFetchPromise );
 
-		fireEvent.press( screen.getByLabelText( /Image Block/ ) );
+		const [ imageBlock ] = screen.getAllByLabelText( /Image Block/ );
+		fireEvent.press( imageBlock );
 		// Awaiting navigation event seemingly required due to React Navigation bug
 		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
@@ -177,7 +181,7 @@ describe( 'Image Block', () => {
 		);
 		fireEvent.press( screen.getByText( 'None' ) );
 		fireEvent.press( screen.getByText( 'Media File' ) );
-		await waitFor( () => screen.getByText( 'Custom URL' ) );
+		await screen.findByText( 'Custom URL' );
 		fireEvent.press( screen.getByText( 'Custom URL' ) );
 		// Await asynchronous fetch of clipboard
 		await act( () => clipboardPromise );
@@ -186,8 +190,7 @@ describe( 'Image Block', () => {
 			'wordpress.org'
 		);
 		fireEvent.press( screen.getByLabelText( 'Apply' ) );
-		await waitFor( () => screen.getByText( 'Custom URL' ) );
-		fireEvent.press( screen.getByText( 'Custom URL' ) );
+		fireEvent.press( await screen.findByText( 'Custom URL' ) );
 		// Await asynchronous fetch of clipboard
 		await act( () => clipboardPromise );
 		fireEvent.press( screen.getByText( 'Media File' ) );
@@ -211,7 +214,8 @@ describe( 'Image Block', () => {
 		// We must await the image fetch via `getMedia`
 		await act( () => apiFetchPromise );
 
-		fireEvent.press( screen.getByLabelText( /Image Block/ ) );
+		const [ imageBlock ] = screen.getAllByLabelText( /Image Block/ );
+		fireEvent.press( imageBlock );
 		// Awaiting navigation event seemingly required due to React Navigation bug
 		// https://github.com/react-navigation/react-navigation/issues/9701
 		await act( () =>
@@ -235,7 +239,7 @@ describe( 'Image Block', () => {
 		// We must await the image fetch via `getMedia`
 		await act( () => apiFetchPromise );
 
-		const imageBlock = screen.getByLabelText( /Image Block/ );
+		const [ imageBlock ] = screen.getAllByLabelText( /Image Block/ );
 		fireEvent.press( imageBlock );
 
 		const settingsButton = screen.getByLabelText( 'Open Settings' );
@@ -266,7 +270,7 @@ describe( 'Image Block', () => {
 		// We must await the image fetch via `getMedia`
 		await act( () => apiFetchPromise );
 
-		const imageBlock = screen.getByLabelText( /Image Block/ );
+		const [ imageBlock ] = screen.getAllByLabelText( /Image Block/ );
 		fireEvent.press( imageBlock );
 
 		const settingsButton = screen.getByLabelText( 'Open Settings' );

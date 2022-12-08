@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, find, get, isEmpty, map } from 'lodash';
+import { find, get, isEmpty, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -195,7 +195,7 @@ function GalleryEdit( props ) {
 
 	function onRemoveImage( index ) {
 		return () => {
-			const newImages = filter( images, ( img, i ) => index !== i );
+			const newImages = images.filter( ( img, i ) => index !== i );
 			setSelectedImage();
 			setAttributes( {
 				images: newImages,
@@ -299,7 +299,7 @@ function GalleryEdit( props ) {
 	function getImagesSizeOptions() {
 		const resizedImageSizes = Object.values( resizedImages );
 		return map(
-			filter( imageSizes, ( { slug } ) =>
+			imageSizes.filter( ( { slug } ) =>
 				resizedImageSizes.some( ( sizes ) => sizes[ slug ] )
 			),
 			( { name, slug } ) => ( { value: slug, label: name } )
@@ -403,6 +403,7 @@ function GalleryEdit( props ) {
 				<PanelBody title={ __( 'Settings' ) }>
 					{ images.length > 1 && (
 						<RangeControl
+							__nextHasNoMarginBottom
 							label={ __( 'Columns' ) }
 							value={ columns }
 							onChange={ setColumnsNumber }

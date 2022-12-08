@@ -17,6 +17,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { useHistory } from '../routes';
+import { store as editSiteStore } from '../../store';
 import CreateTemplatePartModal from '../create-template-part-modal';
 
 export default function NewTemplatePart( { postType } ) {
@@ -24,6 +25,7 @@ export default function NewTemplatePart( { postType } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord } = useDispatch( coreStore );
+	const { __unstableSetCanvasMode } = useDispatch( editSiteStore );
 
 	async function createTemplatePart( { title, area } ) {
 		if ( ! title ) {
@@ -53,6 +55,9 @@ export default function NewTemplatePart( { postType } ) {
 			);
 
 			setIsModalOpen( false );
+
+			// Switch to edit mode.
+			__unstableSetCanvasMode( 'edit' );
 
 			// Navigate to the created template part editor.
 			history.push( {

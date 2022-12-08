@@ -42,16 +42,13 @@ describe( '<SocialLinkEdit/>', () => {
 			'social icons'
 		);
 		fireEvent.press(
-			await waitFor( () =>
-				subject.getByLabelText( 'Social Icons block' )
-			)
+			await subject.findByLabelText( 'Social Icons block' )
+		);
+		const [ socialIconsBlock ] = subject.getAllByLabelText(
+			/Social Icons Block. Row 1/
 		);
 		fireEvent(
-			await waitFor( () =>
-				within(
-					subject.getByLabelText( /Social Icons Block. Row 1/ )
-				).getByTestId( 'block-list-wrapper' )
-			),
+			within( socialIconsBlock ).getByTestId( 'block-list-wrapper' ),
 			'layout',
 			{ nativeEvent: { layout: { width: 100 } } }
 		);
@@ -99,16 +96,13 @@ describe( '<SocialLinkEdit/>', () => {
 			'social icons'
 		);
 		fireEvent.press(
-			await waitFor( () =>
-				subject.getByLabelText( 'Social Icons block' )
-			)
+			await subject.findByLabelText( 'Social Icons block' )
+		);
+		const [ socialIconsBlock ] = subject.getAllByLabelText(
+			/Social Icons Block. Row 1/
 		);
 		fireEvent(
-			await waitFor( () =>
-				within(
-					subject.getByLabelText( /Social Icons Block. Row 1/ )
-				).getByTestId( 'block-list-wrapper' )
-			),
+			within( socialIconsBlock ).getByTestId( 'block-list-wrapper' ),
 			'layout',
 			{ nativeEvent: { layout: { width: 100 } } }
 		);

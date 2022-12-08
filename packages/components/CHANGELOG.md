@@ -2,25 +2,90 @@
 
 ## Unreleased
 
-### Enhancements
+### Breaking Changes
 
--   `ColorPalette`, `BorderBox`, `BorderBoxControl`: polish and DRY prop types, add default values ([#45463](https://github.com/WordPress/gutenberg/pull/45463)).
+-   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
+
+### New Feature
+
+-   `TabPanel`: support manual tab activation ([#46004](https://github.com/WordPress/gutenberg/pull/46004)).
+-   `BaseControl`: Add `useBaseControlProps` hook to help generate id-releated props ([#46170](https://github.com/WordPress/gutenberg/pull/46170)).
 
 ### Bug Fix
 
--   `Autocomplete`: Fix unexpected block insertion during IME composition ([#45510](https://github.com/WordPress/gutenberg/pull/45510)).
+-   `ColorPalette`: show "Clear" button even when colors array is empty ([#46001](https://github.com/WordPress/gutenberg/pull/46001)).
+-   `InputControl`: Fix internal `Flex` wrapper usage that could add an unintended `height: 100%` ([#46213](https://github.com/WordPress/gutenberg/pull/46213)).
+
+### Enhancements
+
+-   `TabPanel`: Simplify tab-focus style. ([#46276](https://github.com/WordPress/gutenberg/pull/46276)).
+-   `TabPanel`: Add ability to set icon only tab buttons ([#45005](https://github.com/WordPress/gutenberg/pull/45005)).
+-   `InputControl`, `NumberControl`, `UnitControl`: Add `help` prop for additional description ([#45931](https://github.com/WordPress/gutenberg/pull/45931)).
+-   `BorderControl`, `ColorPicker` & `QueryControls`: Replace bottom margin overrides with `__nextHasNoMarginBottom` ([#45985](https://github.com/WordPress/gutenberg/pull/45985)).
+-   `CustomSelectControl`, `UnitControl`: Add `onFocus` and `onBlur` props ([#46096](https://github.com/WordPress/gutenberg/pull/46096)).
+-   `ResizableBox`: Prevent unnecessary paint on resize handles ([#46196](https://github.com/WordPress/gutenberg/pull/46196)).
+-   `Popover`: Prevent unnecessary paint caused by using outline ([#46201](https://github.com/WordPress/gutenberg/pull/46201)).
+-   `PaletteEdit`: Global styles: add onChange actions to color palette items [#45681](https://github.com/WordPress/gutenberg/pull/45681).
+-   Lighten the border color on control components ([#46252](https://github.com/WordPress/gutenberg/pull/46252)).
+
+### Experimental
+
+-   `TextControl`: Restrict `type` prop to `email`, `number`, `password`, `tel`, `text`, `search` or `url` ([#45433](https://github.com/WordPress/gutenberg/pull/45433/)).
 
 ### Internal
 
+-   `useControlledValue`: let TypeScript infer the return type ([#46164](https://github.com/WordPress/gutenberg/pull/46164)).
+-   `LinkedButton`: remove unnecessary `span` tag ([#46063](https://github.com/WordPress/gutenberg/pull/46063)).
+-   NumberControl: refactor styles/tests/stories to TypeScript, replace fireEvent with user-event ([#45990](https://github.com/WordPress/gutenberg/pull/45990)).
+-   `useBaseField`: Convert to TypeScript ([#45712](https://github.com/WordPress/gutenberg/pull/45712)).
+-   `Dashicon`: Convert to TypeScript ([#45924](https://github.com/WordPress/gutenberg/pull/45924)).
+-   `PaletteEdit`: add follow up changelog for #45681 and tests [#46095](https://github.com/WordPress/gutenberg/pull/46095).
+-   `AlignmentMatrixControl`: Convert to TypeScript ([#46162](https://github.com/WordPress/gutenberg/pull/46162)).
+
+### Documentation
+
+-   `Tooltip`: Add readme and unit tests for `shortcut` prop ([#46092](https://github.com/WordPress/gutenberg/pull/46092)).
+
+## 22.1.0 (2022-11-16)
+
+### Enhancements
+
+-   `ColorPalette`, `BorderBox`, `BorderBoxControl`: polish and DRY prop types, add default values ([#45463](https://github.com/WordPress/gutenberg/pull/45463)).
+-   `TabPanel`: Add ability to set icon only tab buttons ([#45005](https://github.com/WordPress/gutenberg/pull/45005)).
+
+### Internal
+-   `AnglePickerControl`: remove `:focus-visible' outline on `CircleOutlineWrapper` ([#45758](https://github.com/WordPress/gutenberg/pull/45758))
+
+### Bug Fix
+
+-   `FormTokenField`: Fix duplicate input in IME composition ([#45607](https://github.com/WordPress/gutenberg/pull/45607)).
+-   `Autocomplete`: Check key events more strictly in IME composition ([#45626](https://github.com/WordPress/gutenberg/pull/45626)).
+-   `Autocomplete`: Fix unexpected block insertion during IME composition ([#45510](https://github.com/WordPress/gutenberg/pull/45510)).
+-   `Icon`: Making size prop work for icon components using dash icon strings ([#45593](https://github.com/WordPress/gutenberg/pull/45593))
+-   `ToolsPanelItem`: Prevent unintended calls to onDeselect when parent panel is remounted and item is rendered via SlotFill ([#45673](https://github.com/WordPress/gutenberg/pull/45673))
+-   `ColorPicker`: Prevent all number fields from becoming "0" when one of them is an empty string ([#45649](https://github.com/WordPress/gutenberg/pull/45649)).
+-   `ToggleControl`: Fix toggle control label text overflow ([#45962](https://github.com/WordPress/gutenberg/pull/45962)).
+
+### Internal
+
+-   `ToolsPanel`: Update to fix `exhaustive-deps` eslint rule ([#45715](https://github.com/WordPress/gutenberg/pull/45715)).
 -   `PaletteEditListView`: Update to ignore `exhaustive-deps` eslint rule ([#45467](https://github.com/WordPress/gutenberg/pull/45467)).
+-   `Popover`: Update to pass `exhaustive-deps` eslint rule ([#45656](https://github.com/WordPress/gutenberg/pull/45656)).
 -   `Flex`: Update to pass `exhaustive-deps` eslint rule ([#45528](https://github.com/WordPress/gutenberg/pull/45528)).
 -   `withNotices`: Update to pass `exhaustive-deps` eslint rule ([#45530](https://github.com/WordPress/gutenberg/pull/45530)).
 -   `ItemGroup`: Update to pass `exhaustive-deps` eslint rule ([#45531](https://github.com/WordPress/gutenberg/pull/45531)).
+-   `TabPanel`: Update to pass `exhaustive-deps` eslint rule ([#45660](https://github.com/WordPress/gutenberg/pull/45660)).
+-   `NavigatorScreen`: Update to pass `exhaustive-deps` eslint rule ([#45648](https://github.com/WordPress/gutenberg/pull/45648)).
 -   `Draggable`: Convert to TypeScript ([#45471](https://github.com/WordPress/gutenberg/pull/45471)).
+-   `MenuGroup`: Convert to TypeScript ([#45617](https://github.com/WordPress/gutenberg/pull/45617)).
+-   `useCx`: fix story to satisfy the `react-hooks/exhaustive-deps` eslint rule ([#45614](https://github.com/WordPress/gutenberg/pull/45614))
+-   Activate the `react-hooks/exhuastive-deps` eslint rule for the Components package ([#41166](https://github.com/WordPress/gutenberg/pull/41166))
+-   `Snackbar`: Convert to TypeScript ([#45472](https://github.com/WordPress/gutenberg/pull/45472)).
 
 ### Experimental
 
 -   `ToggleGroupControl`: Only show enclosing border when `isBlock` and not `isDeselectable` ([#45492](https://github.com/WordPress/gutenberg/pull/45492)).
+-   `Theme`: Add support for custom `background` color ([#45466](https://github.com/WordPress/gutenberg/pull/45466)).
 
 ## 22.0.0 (2022-11-02)
 
@@ -87,6 +152,10 @@
 ### Experimental
 
 -   `NumberControl`: Replace `hideHTMLArrows` prop with `spinControls` prop. Allow custom spin controls via `spinControls="custom"` ([#45333](https://github.com/WordPress/gutenberg/pull/45333)).
+
+### Experimental
+
+-   Theming: updated Components package to utilize the new `accent` prop of the experimental `Theme` component.
 
 ## 21.3.0 (2022-10-19)
 
