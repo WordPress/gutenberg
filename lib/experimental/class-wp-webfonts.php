@@ -178,7 +178,7 @@ class WP_Webfonts {
 	 */
 	public static function get_font_slug( $to_convert ) {
 		if ( is_array( $to_convert ) ) {
-			if ( isset ( $to_convert['slug'] ) ) {
+			if ( isset( $to_convert['slug'] ) ) {
 				return $to_convert['slug'];
 			} elseif ( isset( $to_convert['font-family'] ) ) {
 				$to_convert = $to_convert['font-family'];
