@@ -18,17 +18,7 @@ const INSERTER_SEARCH_SELECTOR =
  * Opens the global block inserter.
  */
 export async function openGlobalBlockInserter() {
-	if ( await isGlobalInserterOpen() ) {
-		// If global inserter is already opened, reset to an initial state where
-		// the default (first) tab is selected.
-		const tab = await page.$(
-			'.block-editor-inserter__tabs .components-tab-panel__tabs-item:nth-of-type(1):not(.is-active)'
-		);
-
-		if ( tab ) {
-			await tab.click();
-		}
-	} else {
+	if ( ! ( await isGlobalInserterOpen() ) ) {
 		await toggleGlobalBlockInserter();
 
 		// Waiting here is necessary because sometimes the inserter takes more
@@ -82,6 +72,11 @@ export async function toggleGlobalBlockInserter() {
  * @param {string} label The label of the tab to select.
  */
 export async function selectGlobalInserterTab( label ) {
+	const tabs = await page.$( '.block-editor-inserter__tabs' );
+	if ( ! tabs ) {
+		return; // Do nothing if tabs are unavailable (e.g. for inner blocks).
+	}
+
 	const activeTab = await page.waitForSelector(
 		'.block-editor-inserter__tabs button.is-active'
 	);
@@ -229,12 +224,14 @@ export async function insertFromGlobalInserter( category, searchTerm ) {
 	let insertButton;
 
 	// Check if the block is instantly insertable...
-	if ( [ 'Blocks', 'Patterns', 'Reusable' ].includes( category ) ) {
+	try {
 		insertButton = (
 			await page.$x(
 				`//*[@role='option' and contains(., '${ searchTerm }')]`
 			)
 		 )[ 0 ];
+	} catch ( error ) {
+		// noop
 	}
 
 	// ...and if not, search for it.
