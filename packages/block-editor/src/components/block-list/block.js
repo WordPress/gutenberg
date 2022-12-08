@@ -152,7 +152,9 @@ function BlockListBlock( {
 			isSelectionEnabled={ isSelectionEnabled }
 			toggleSelection={ toggleSelection }
 			__unstableLayoutClassNames={ layoutClassNames }
-			__unstableParentLayout={ parentLayout }
+			__unstableParentLayout={
+				Object.keys( parentLayout ).length ? parentLayout : undefined
+			}
 		/>
 	);
 
