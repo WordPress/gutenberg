@@ -21,7 +21,7 @@ import { useMemo, useCallback } from '@wordpress/element';
 /**
  * External dependencies
  */
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 /**
  * Internal dependencies
@@ -228,34 +228,30 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 		const animationOrigin =
 			blockInspectorAnimationSettings &&
 			blockInspectorAnimationSettings.enterDirection === 'leftToRight'
-				? 50
-				: -50;
+				? -50
+				: 50;
 
 		return (
-			<div>
-				<AnimatePresence>
-					<motion.div
-						animate={ {
-							x: 0,
-							opacity: 1,
-							transition: {
-								ease: 'easeInOut',
-								duration: 0.14,
-							},
-						} }
-						initial={ {
-							x: animationOrigin,
-							opacity: 0,
-						} }
-						key={ selectedBlockClientId }
-					>
-						<BlockInspectorSingleBlock
-							clientId={ selectedBlockClientId }
-							blockName={ blockType.name }
-						/>
-					</motion.div>
-				</AnimatePresence>
-			</div>
+			<motion.div
+				animate={ {
+					x: 0,
+					opacity: 1,
+					transition: {
+						ease: 'easeInOut',
+						duration: 0.14,
+					},
+				} }
+				initial={ {
+					x: animationOrigin,
+					opacity: 0,
+				} }
+				key={ selectedBlockClientId }
+			>
+				<BlockInspectorSingleBlock
+					clientId={ selectedBlockClientId }
+					blockName={ blockType.name }
+				/>
+			</motion.div>
 		);
 	}
 
