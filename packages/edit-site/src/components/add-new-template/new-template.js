@@ -93,7 +93,8 @@ export default function NewTemplate( { postType } ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
-	const { setTemplate } = useDispatch( editSiteStore );
+	const { setTemplate, __unstableSetCanvasMode } =
+		useDispatch( editSiteStore );
 
 	async function createTemplate( template, isWPSuggestion = true ) {
 		if ( isCreatingTemplate ) {
@@ -132,6 +133,9 @@ export default function NewTemplate( { postType } ) {
 
 			// Set template before navigating away to avoid initial stale value.
 			setTemplate( newTemplate.id, newTemplate.slug );
+
+			// Switch to edit mode.
+			__unstableSetCanvasMode( 'edit' );
 
 			// Navigate to the created template editor.
 			history.push( {

@@ -188,6 +188,22 @@
 				}
 			}
 		},
+		"settingsPropertiesDimensions": {
+			"properties": {
+				"dimensions": {
+					"description": "Settings related to dimensions.",
+					"type": "object",
+					"properties": {
+						"minHeight": {
+							"description": "Allow users to set custom minimum height.",
+							"type": "boolean",
+							"default": false
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
 		"settingsPropertiesLayout": {
 			"type": "object",
 			"properties": {
@@ -486,12 +502,12 @@
 													"description": "CSS font-stretch value.",
 													"type": "string"
 												},
-												"ascendOverride": {
-													"description": "CSS ascend-override value.",
+												"ascentOverride": {
+													"description": "CSS ascent-override value.",
 													"type": "string"
 												},
-												"descendOverride": {
-													"description": "CSS descend-override value.",
+												"descentOverride": {
+													"description": "CSS descent-override value.",
 													"type": "string"
 												},
 												"fontVariant": {
@@ -1153,6 +1169,10 @@
 						}
 					},
 					"additionalProperties": false
+				},
+				"css": {
+					"description": "Sets custom CSS to apply styling not covered by other theme.json properties.",
+					"type": "string"
 				}
 			}
 		},
@@ -1170,7 +1190,8 @@
 						"typography": {},
 						"filter": {},
 						"shadow": {},
-						"outline": {}
+						"outline": {},
+						"css": {}
 					},
 					"additionalProperties": false
 				}
@@ -1194,6 +1215,7 @@
 								"outline": {},
 								"spacing": {},
 								"typography": {},
+								"css": {},
 								":hover": {
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								},
@@ -1201,6 +1223,9 @@
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								},
 								":active": {
+									"$ref": "#/definitions/stylesPropertiesComplete"
+								},
+								":visited": {
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								}
 							},
@@ -1227,6 +1252,9 @@
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								},
 								":active": {
+									"$ref": "#/definitions/stylesPropertiesComplete"
+								},
+								":visited": {
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								}
 							},
@@ -1539,6 +1567,7 @@
 						"filter": {},
 						"shadow": {},
 						"outline": {},
+						"css": {},
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
 						}
@@ -1607,6 +1636,7 @@
 						"filter": {},
 						"shadow": {},
 						"outline": {},
+						"css": {},
 						"elements": {
 							"description": "Styles defined on a per-element basis using the element's selector.",
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"

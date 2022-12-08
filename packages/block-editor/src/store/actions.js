@@ -1264,6 +1264,28 @@ export function toggleBlockMode( clientId ) {
 }
 
 /**
+ * Returns an action object used in signalling that the block interface, eg. toolbar, outline, etc. should be hidden.
+ *
+ * @return {Object} Action object.
+ */
+export function __experimentalHideBlockInterface() {
+	return {
+		type: 'HIDE_BLOCK_INTERFACE',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the block interface, eg. toolbar, outline, etc. should be shown.
+ *
+ * @return {Object} Action object.
+ */
+export function __experimentalShowBlockInterface() {
+	return {
+		type: 'SHOW_BLOCK_INTERFACE',
+	};
+}
+
+/**
  * Returns an action object used in signalling that the user has begun to type.
  *
  * @return {Object} Action object.
@@ -1711,6 +1733,10 @@ export function setBlockVisibility( updates ) {
 
 /**
  * Action that sets whether a block is being temporaritly edited as blocks.
+ *
+ * DO-NOT-USE in production.
+ * This action is created for internal/experimental only usage and may be
+ * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
  *
  * @param {?string} temporarilyEditingAsBlocks The block's clientId being temporaritly edited as blocks.
  */

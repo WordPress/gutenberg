@@ -1,3 +1,20 @@
+export type DashiconProps = {
+	/**
+	 * The icon name
+	 */
+	icon: IconKey;
+
+	/**
+	 * Class name
+	 */
+	className?: string;
+
+	/**
+	 * Size of the icon
+	 */
+	size?: number;
+};
+
 export type IconKey =
 	| 'admin-appearance'
 	| 'admin-collapse'

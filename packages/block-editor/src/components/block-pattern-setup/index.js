@@ -138,8 +138,9 @@ const BlockPatternSetup = ( {
 	blockName,
 	filterPatternsFn,
 	onBlockPatternSelect,
+	initialViewMode = VIEWMODES.carousel,
 } ) => {
-	const [ viewMode, setViewMode ] = useState( VIEWMODES.carousel );
+	const [ viewMode, setViewMode ] = useState( initialViewMode );
 	const [ activeSlide, setActiveSlide ] = useState( 0 );
 	const { replaceBlock } = useDispatch( blockEditorStore );
 	const patterns = usePatternsSetup( clientId, blockName, filterPatternsFn );

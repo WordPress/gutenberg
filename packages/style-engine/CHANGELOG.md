@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 1.5.0 (2022-11-16)
+
+## 1.4.0 (2022-11-02)
+
+## 1.3.0 (2022-10-19)
+
 ### Internal
 -   Style Engine: move PHP unit tests to Gutenberg [#44722](https://github.com/WordPress/gutenberg/pull/44722)
 

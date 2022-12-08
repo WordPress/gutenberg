@@ -11,7 +11,7 @@ import { Shortcut } from '..';
 describe( 'Shortcut', () => {
 	it( 'should render null when no shortcut is provided', () => {
 		const { container } = render( <Shortcut /> );
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
 	it( 'should render a span with the shortcut text', () => {

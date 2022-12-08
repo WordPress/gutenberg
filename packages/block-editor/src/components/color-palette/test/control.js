@@ -22,6 +22,6 @@ describe( 'ColorPaletteControl', () => {
 			/>
 		);
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 } );

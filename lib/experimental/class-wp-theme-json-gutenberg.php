@@ -14,7 +14,7 @@
  *
  * @access private
  */
-class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_1 {
+class WP_Theme_JSON_Gutenberg extends WP_Theme_JSON_6_2 {
 	/**
 	 * Holds block metadata extracted from block.json
 	 * to be shared among all instances so we don't

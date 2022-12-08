@@ -494,10 +494,9 @@ export const WithConditionallyRenderedControl = () => {
 	);
 };
 
-export { ToolsPanelWithItemGroupSlot } from './tools-panel-with-item-group-slot';
+export { ToolsPanelWithItemGroupSlot } from './utils/tools-panel-with-item-group-slot';
 
 const PanelWrapperView = styled.div`
-	max-width: 280px;
 	font-size: 13px;
 
 	.components-dropdown-menu__menu {

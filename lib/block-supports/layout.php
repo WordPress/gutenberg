@@ -83,7 +83,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$wide_max_width_value = $wide_size ? $wide_size : $content_size;
 
 		// Make sure there is a single CSS rule, and all tags are stripped for security.
-		// TODO: Use `safecss_filter_attr` instead - once https://core.trac.wordpress.org/ticket/46197 is patched.
+		// TODO: Use `safecss_filter_attr` instead when the minimum required WP version is >= 6.1.
 		$all_max_width_value  = wp_strip_all_tags( explode( ';', $all_max_width_value )[0] );
 		$wide_max_width_value = wp_strip_all_tags( explode( ';', $wide_max_width_value )[0] );
 
@@ -292,6 +292,23 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 }
 
 /**
+ * Gets classname from last tag in a string of HTML.
+ *
+ * @param string $html markup to be processed.
+ * @return string String of inner wrapper classnames.
+ */
+function gutenberg_get_classnames_from_last_tag( $html ) {
+	$tags            = new WP_HTML_Tag_Processor( $html );
+	$last_classnames = '';
+
+	while ( $tags->next_tag() ) {
+		$last_classnames = $tags->get_attribute( 'class' );
+	}
+
+	return (string) $last_classnames;
+}
+
+/**
  * Renders the layout config to the block wrapper.
  *
  * @param  string $block_content Rendered block content.
@@ -299,28 +316,75 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
  * @return string                Filtered block content.
  */
 function gutenberg_render_layout_support_flag( $block_content, $block ) {
-	$block_type     = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$support_layout = block_has_support( $block_type, array( '__experimentalLayout' ), false );
+	$block_type       = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	$support_layout   = block_has_support( $block_type, array( '__experimentalLayout' ), false );
+	$has_child_layout = isset( $block['attrs']['style']['layout']['selfStretch'] );
 
-	if ( ! $support_layout ) {
+	if ( ! $support_layout
+	&& ! $has_child_layout ) {
 		return $block_content;
 	}
 
-	$block_gap              = gutenberg_get_global_settings( array( 'spacing', 'blockGap' ) );
-	$global_layout_settings = gutenberg_get_global_settings( array( 'layout' ) );
-	$has_block_gap_support  = isset( $block_gap ) ? null !== $block_gap : false;
-	$default_block_layout   = _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
-	$used_layout            = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : $default_block_layout;
+	$outer_class_names = array();
 
-	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] ) {
-		if ( ! $global_layout_settings ) {
-			return $block_content;
+	if ( $has_child_layout && ( 'fixed' === $block['attrs']['style']['layout']['selfStretch'] || 'fill' === $block['attrs']['style']['layout']['selfStretch'] ) ) {
+
+		$container_content_class = wp_unique_id( 'wp-container-content-' );
+
+		$child_layout_styles = array();
+
+		if ( 'fixed' === $block['attrs']['style']['layout']['selfStretch'] && isset( $block['attrs']['style']['layout']['flexSize'] ) ) {
+			$child_layout_styles[] = array(
+				'selector'     => ".$container_content_class",
+				'declarations' => array(
+					'flex-basis' => $block['attrs']['style']['layout']['flexSize'],
+					'box-sizing' => 'border-box',
+				),
+			);
+		} elseif ( 'fill' === $block['attrs']['style']['layout']['selfStretch'] ) {
+			$child_layout_styles[] = array(
+				'selector'     => ".$container_content_class",
+				'declarations' => array(
+					'flex-grow' => '1',
+				),
+			);
 		}
+
+		gutenberg_style_engine_get_stylesheet_from_css_rules(
+			$child_layout_styles,
+			array(
+				'context'  => 'block-supports',
+				'prettify' => false,
+			)
+		);
+
+		$outer_class_names[] = $container_content_class;
+
+	}
+
+	// Return early if only child layout exists.
+	if ( ! $support_layout && ! empty( $outer_class_names ) ) {
+		$content = new WP_HTML_Tag_Processor( $block_content );
+		$content->next_tag();
+		$content->add_class( implode( ' ', $outer_class_names ) );
+		return (string) $content;
+	}
+
+	$global_settings               = gutenberg_get_global_settings();
+	$block_gap                     = _wp_array_get( $global_settings, array( 'spacing', 'blockGap' ), null );
+	$has_block_gap_support         = isset( $block_gap );
+	$global_layout_settings        = _wp_array_get( $global_settings, array( 'layout' ), null );
+	$root_padding_aware_alignments = _wp_array_get( $global_settings, array( 'useRootPaddingAwareAlignments' ), false );
+
+	$default_block_layout = _wp_array_get( $block_type->supports, array( '__experimentalLayout', 'default' ), array() );
+	$used_layout          = isset( $block['attrs']['layout'] ) ? $block['attrs']['layout'] : $default_block_layout;
+
+	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] && ! $global_layout_settings ) {
+		return $block_content;
 	}
 
 	$class_names        = array();
 	$layout_definitions = _wp_array_get( $global_layout_settings, array( 'definitions' ), array() );
-	$block_classname    = wp_get_block_default_classname( $block['blockName'] );
 	$container_class    = wp_unique_id( 'wp-container-' );
 	$layout_classname   = '';
 
@@ -330,7 +394,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	}
 
 	if (
-		gutenberg_get_global_settings( array( 'useRootPaddingAwareAlignments' ) ) &&
+		$root_padding_aware_alignments &&
 		isset( $used_layout['type'] ) &&
 		'constrained' === $used_layout['type']
 	) {
@@ -397,7 +461,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$should_skip_gap_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' );
 
 		$style = gutenberg_get_layout_style(
-			".$block_classname.$container_class",
+			".$container_class.$container_class",
 			$used_layout,
 			$has_block_gap_support,
 			$gap_value,
@@ -412,18 +476,39 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		}
 	}
 
-	/*
-	 * This assumes the hook only applies to blocks with a single wrapper.
-	 * A limitation of this hook is that nested inner blocks wrappers are not yet supported.
-	 */
-	$content = preg_replace(
-		'/' . preg_quote( 'class="', '/' ) . '/',
-		'class="' . esc_attr( implode( ' ', $class_names ) ) . ' ',
-		$block_content,
-		1
-	);
+	$content_with_outer_classnames = '';
 
-	return $content;
+	if ( ! empty( $outer_class_names ) ) {
+		$content_with_outer_classnames = new WP_HTML_Tag_Processor( $block_content );
+		$content_with_outer_classnames->next_tag();
+		foreach ( $outer_class_names as $outer_class_name ) {
+			$content_with_outer_classnames->add_class( $outer_class_name );
+		}
+
+		$content_with_outer_classnames = (string) $content_with_outer_classnames;
+	}
+
+	/**
+	* The first chunk of innerContent contains the block markup up until the inner blocks start.
+	* We want to target the opening tag of the inner blocks wrapper, which is the last tag in that chunk.
+	*/
+	$inner_content_classnames = isset( $block['innerContent'][0] ) && 'string' === gettype( $block['innerContent'][0] ) ? gutenberg_get_classnames_from_last_tag( $block['innerContent'][0] ) : '';
+
+	$content = $content_with_outer_classnames ? new WP_HTML_Tag_Processor( $content_with_outer_classnames ) : new WP_HTML_Tag_Processor( $block_content );
+
+	if ( $inner_content_classnames ) {
+		$content->next_tag( array( 'class_name' => $inner_content_classnames ) );
+		foreach ( $class_names as $class_name ) {
+			$content->add_class( $class_name );
+		}
+	} else {
+		$content->next_tag();
+		foreach ( $class_names as $class_name ) {
+			$content->add_class( $class_name );
+		}
+	}
+
+	return (string) $content;
 }
 
 // Register the block support. (overrides core one).
@@ -433,6 +518,7 @@ WP_Block_Supports::get_instance()->register(
 		'register_attribute' => 'gutenberg_register_layout_support',
 	)
 );
+
 if ( function_exists( 'wp_render_layout_support_flag' ) ) {
 	remove_filter( 'render_block', 'wp_render_layout_support_flag' );
 }
@@ -454,7 +540,7 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 		preg_quote( $tag_name, '/' )
 	);
 	if (
-		WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ||
+		wp_theme_has_theme_json() ||
 		1 === preg_match( $group_with_inner_container_regex, $block_content ) ||
 		( isset( $block['attrs']['layout']['type'] ) && 'flex' === $block['attrs']['layout']['type'] )
 	) {
@@ -519,7 +605,7 @@ function gutenberg_restore_image_outer_container( $block_content, $block ) {
 )/iUx";
 
 	if (
-		WP_Theme_JSON_Resolver::theme_has_support() ||
+		wp_theme_has_theme_json() ||
 		0 === preg_match( $image_with_align, $block_content, $matches )
 	) {
 		return $block_content;

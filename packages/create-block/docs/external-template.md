@@ -102,4 +102,5 @@ The following configurable variables are used with the template files. Template 
 -   `editorScript` (default: `'file:./index.js'`) – an editor script definition.
 -   `editorStyle` (default: `'file:./index.css'`) – an editor style definition.
 -   `style` (default: `'file:./style-index.css'`) – a frontend and editor style definition.
+-   `render` (no default) – a path to the PHP file used when rendering the block type on the server before presenting on the front end.
 -   `customBlockJSON` (no default) - allows definition of additional properties for the generated block.json file.

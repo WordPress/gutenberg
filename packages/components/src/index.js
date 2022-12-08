@@ -6,6 +6,7 @@ export {
 	Polygon,
 	Rect,
 	G,
+	Line,
 	HorizontalRule,
 	BlockQuotation,
 } from '@wordpress/primitives';
@@ -16,13 +17,13 @@ export {
 	default as Animate,
 	getAnimateClassName as __unstableGetAnimateClassName,
 } from './animate';
-export { __unstableMotion } from './animation';
+export { __unstableMotion, __unstableAnimatePresence } from './animation';
 export { default as AnglePickerControl } from './angle-picker-control';
 export {
 	default as Autocomplete,
 	useAutocompleteProps as __unstableUseAutocompleteProps,
 } from './autocomplete';
-export { default as BaseControl } from './base-control';
+export { default as BaseControl, useBaseControlProps } from './base-control';
 export {
 	BorderBoxControl as __experimentalBorderBoxControl,
 	hasSplitBorders as __experimentalHasSplitBorders,
@@ -125,8 +126,9 @@ export { default as PanelHeader } from './panel/header';
 export { default as PanelRow } from './panel/row';
 export { default as Placeholder } from './placeholder';
 export { default as Popover } from './popover';
+export { positionToPlacement as __experimentalPopoverPositionToPlacement } from './popover/utils';
 export { default as QueryControls } from './query-controls';
-export { default as __experimentalRadio } from './radio';
+export { default as __experimentalRadio } from './radio-group/radio';
 export { default as __experimentalRadioGroup } from './radio-group';
 export { default as RadioControl } from './radio-control';
 export { default as RangeControl } from './range-control';

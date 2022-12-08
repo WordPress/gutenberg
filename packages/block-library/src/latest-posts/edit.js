@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, includes, pickBy } from 'lodash';
+import { get, pickBy } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -196,7 +196,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 		} );
 		// We do nothing if the category is not selected
 		// from suggestions.
-		if ( includes( allCategories, null ) ) {
+		if ( allCategories.includes( null ) ) {
 			return false;
 		}
 		setAttributes( { categories: allCategories } );
@@ -234,6 +234,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 				{ displayPostContent &&
 					displayPostContentRadio === 'excerpt' && (
 						<RangeControl
+							__nextHasNoMarginBottom
 							label={ __( 'Max number of words in excerpt' ) }
 							value={ excerptLength }
 							onChange={ ( value ) =>
@@ -355,6 +356,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 
 				{ postLayout === 'grid' && (
 					<RangeControl
+						__nextHasNoMarginBottom
 						label={ __( 'Columns' ) }
 						value={ columns }
 						onChange={ ( value ) =>
