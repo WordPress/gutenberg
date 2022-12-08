@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { ElementHandle } from 'puppeteer-core';
+
+/**
  * Internal dependencies
  */
 import { pressKeyWithModifier } from './press-key-with-modifier';
@@ -26,8 +31,8 @@ export async function openGlobalBlockInserter() {
 	} else {
 		await toggleGlobalBlockInserter();
 
-		// Waiting here is necessary because sometimes the inserter takes more time to
-		// render than Puppeteer takes to complete the 'click' action.
+		// Waiting here is necessary because sometimes the inserter takes more
+		// time to render than Puppeteer takes to complete the 'click' action.
 		await page.waitForSelector( '.block-editor-inserter__menu' );
 	}
 }
@@ -41,7 +46,8 @@ export async function closeGlobalBlockInserter() {
 async function isGlobalInserterOpen() {
 	return await page.evaluate( () => {
 		// "Add block" selector is required to make sure performance comparison
-		// doesn't fail on older branches where we still had "Add block" as label.
+		// doesn't fail on older branches where we still had "Add block" as
+		// label.
 		return !! document.querySelector(
 			'.edit-post-header [aria-label="Add block"].is-pressed,' +
 				'.edit-site-header-edit-mode [aria-label="Add block"].is-pressed,' +
@@ -71,10 +77,50 @@ export async function toggleGlobalBlockInserter() {
 }
 
 /**
+ * Selects the global inserter tab/category, unless it's already selected.
+ *
+ * @param {string} label The label of the tab to select.
+ */
+export async function selectGlobalInserterTab( label ) {
+	const activeTab = await page.waitForSelector(
+		'.block-editor-inserter__tabs button.is-active'
+	);
+
+	const activeTabLabel = await page.evaluate(
+		( el ) => el.innerText,
+		activeTab
+	);
+
+	if ( activeTabLabel === label ) {
+		return; // Do nothing if the target tab is already active.
+	}
+
+	let labelSelector;
+
+	switch ( label ) {
+		case 'Blocks':
+		case 'Patterns':
+		case 'Media':
+			labelSelector = `. = "${ label }"`;
+			break;
+		case 'Reusable':
+			// Reusable tab label is an icon, hence the different selector.
+			labelSelector = `@aria-label = "${ label }"`;
+			break;
+	}
+
+	const targetTab = await page.waitForXPath(
+		`//div[contains(@class, "block-editor-inserter__tabs")]//button[${ labelSelector }]`
+	);
+
+	await targetTab.click();
+}
+
+/**
  * Moves focus to the selected block.
  */
 async function focusSelectedBlock() {
-	// Ideally there shouuld be a UI way to do this. (Focus the selected block)
+	// Ideally, there should be a UI way to focus the selected block.
 	await page.evaluate( () => {
 		wp.data
 			.dispatch( 'core/block-editor' )
@@ -88,7 +134,8 @@ async function focusSelectedBlock() {
 }
 
 /**
- * Retrieves the document container by css class and checks to make sure the document's active element is within it
+ * Retrieves the document container by css class and checks to make sure the
+ * document's active element is within it.
  */
 async function waitForInserterCloseAndContentFocus() {
 	await canvas().waitForFunction(
@@ -99,28 +146,18 @@ async function waitForInserterCloseAndContentFocus() {
 	);
 }
 
-// async function selectInserterTab( label ) {
-// 	let selector;
-
-// 	switch ( label ) {
-// 		case 'Blocks':
-// 		case 'Patterns':
-// 		case 'Media':
-// 			selector = `.="${ label }"`;
-// 			break;
-// 		case 'Reusable':
-// 			// Reusable tab label is an icon, hence the different selector.
-// 			selector = `@aria-label="${ label }"`;
-// 			break;
-// 	}
-
-// 	const tab = await page.waitForXPath(
-// 		`//div[contains(@class, "block-editor-inserter__tabs")]//button[${ selector }]`
-// 	);
-// 	await tab.click();
-// }
-
-export async function search( category, searchTerm ) {
+/**
+ * Searches the global inserter for an entity matching given category and term.
+ * If nothing is found, null will be returned.
+ *
+ * Available categories: Blocks, Patterns, Reusable and Block Directory.
+ *
+ * @param {string} category   The category to search within.
+ * @param {string} searchTerm The text to search the inserter for.
+ * @return {Promise<ElementHandle|null>} The handle of the element to be
+ * inserted or null if nothing was found.
+ */
+async function searchGlobalInserter( category, searchTerm ) {
 	await openGlobalBlockInserter();
 	await page.waitForSelector( INSERTER_SEARCH_SELECTOR );
 	await page.focus( INSERTER_SEARCH_SELECTOR );
@@ -128,19 +165,20 @@ export async function search( category, searchTerm ) {
 	await page.keyboard.type( searchTerm );
 
 	// Wait for the default block list to disappear to prevent its items from
-	// being considered as search results.
+	// being considered as search results. This is needed since we're debouncing
+	// search request.
 	await page.waitForSelector( '.block-editor-inserter__block-list', {
 		hidden: true,
 	} );
 
-	let waitForResult;
+	let waitForInsertElement;
 	let waitForNoResults;
 
 	switch ( category ) {
 		case 'Blocks':
 		case 'Patterns':
 		case 'Reusable': {
-			waitForResult = async () => {
+			waitForInsertElement = async () => {
 				return await page.waitForXPath(
 					`//*[@role='option' and contains(., '${ searchTerm }')]`
 				);
@@ -154,38 +192,74 @@ export async function search( category, searchTerm ) {
 			break;
 		}
 		case 'Block Directory': {
-			waitForResult = async () => {
+			waitForInsertElement = async () => {
+				// Return the first item from the Block Directory search results.
 				return await page.waitForSelector(
 					'.block-directory-downloadable-blocks-list button:first-child'
 				);
 			};
 			waitForNoResults = async () => {
-				return new Promise( ( resolve ) =>
+				// Use a soft timeout if Block Directory doesn't return anything
+				// within 5 seconds, as there's no "empty results" element being
+				// rendered when nothing is found.
+				return await new Promise( ( resolve ) =>
 					setTimeout( () => resolve( null ), 5000 )
 				);
 			};
 		}
 	}
 
-	return await Promise.race( [ waitForResult(), waitForNoResults() ] );
+	return await Promise.race( [ waitForInsertElement(), waitForNoResults() ] );
 }
 
-export async function insert( category, searchTerm ) {
-	const insertButton = await search( category, searchTerm );
+/**
+ * Inserts the entity matching given category and term via the global inserter.
+ * If the entity is not instantly available in the inserted, a search will be
+ * performed. If the search returns no results, an error will be thrown.
+ *
+ * Available categories: Blocks, Patterns, Reusable and Block Directory.
+ *
+ * @param {string} category   The category to insert from.
+ * @param {string} searchTerm The text to search the inserter for.
+ */
+async function insertFromGlobalInserter( category, searchTerm ) {
+	await openGlobalBlockInserter();
+	await selectGlobalInserterTab( category );
+
+	let insertButton;
+
+	// Check if the block is instantly insertable...
+	if ( [ 'Blocks', 'Patterns', 'Reusable' ].includes( category ) ) {
+		insertButton = (
+			await page.$x(
+				`//*[@role='option' and contains(., '${ searchTerm }')]`
+			)
+		 )[ 0 ];
+	}
+
+	// ...and if not, search for it.
+	if ( ! insertButton ) {
+		insertButton = await searchGlobalInserter( category, searchTerm );
+	}
+
+	// Throw an error if nothing was found.
 	if ( ! insertButton ) {
 		throw new Error(
-			`No results for "${ searchTerm }" search term in the ${ category } category.`
+			`Couldn't find "${ searchTerm }" in the ${ category } category.`
 		);
 	}
 
+	// Insert found entity.
 	await insertButton.click();
 
+	// Extra wait for the reusable block to be ready.
 	if ( category === 'Reusable' ) {
 		await page.waitForSelector(
 			'.block-library-block__reusable-block-container'
 		);
 	}
 
+	// Extra wait for the Block Directory block to be ready.
 	if ( category === 'Block Directory' ) {
 		await page.waitForSelector(
 			'.block-directory-downloadable-blocks-list button:first-child:not(.is-busy)'
@@ -197,73 +271,82 @@ export async function insert( category, searchTerm ) {
 }
 
 /**
- * Search for a block in the global inserter.
+ * Search for a block via the global inserter.
  *
  * @param {string} searchTerm The text to search the inserter for.
+ * @return {Promise<ElementHandle|null>} The handle of block to be
+ * inserted or null if nothing was found.
  */
 export async function searchForBlock( searchTerm ) {
-	return await search( 'Blocks', searchTerm );
+	return await searchGlobalInserter( 'Blocks', searchTerm );
 }
 
 /**
- * Search for a pattern.
+ * Search for a pattern via the global inserter.
  *
  * @param {string} searchTerm The text to search the inserter for.
+ * @return {Promise<ElementHandle|null>} The handle of the pattern to be
+ * inserted or null if nothing was found.
  */
 export async function searchForPattern( searchTerm ) {
-	return await search( 'Patterns', searchTerm );
+	return await searchGlobalInserter( 'Patterns', searchTerm );
 }
 
 /**
- * Search for a reusable block.
+ * Search for a reusable block via the global inserter.
  *
  * @param {string} searchTerm The text to search the inserter for.
+ * @return {Promise<ElementHandle|null>} The handle of the reusable block to be
+ * inserted or null if nothing was found.
  */
 export async function searchForReusableBlock( searchTerm ) {
-	return await search( 'Reusable', searchTerm );
+	return await searchGlobalInserter( 'Reusable', searchTerm );
 }
 
 /**
- * Search for a Block Directory block.
+ * Search for a Block Directory block via the global inserter.
  *
  * @param {string} searchTerm The text to search the inserter for.
+ * @return {Promise<ElementHandle|null>} The handle of the Block Directory block
+ * to be inserted or null if nothing was found.
  */
 export async function searchForBlockDirectoryBlock( searchTerm ) {
-	return await search( 'Block Directory', searchTerm );
+	return await searchGlobalInserter( 'Block Directory', searchTerm );
 }
 
 /**
- * Insert a block matching a given search term.
+ * Insert a block matching a given search term via the global inserter.
  *
- * @param {string} searchTerm The text to search the inserter for.
+ * @param {string} searchTerm The text to search the blocks for.
  */
 export async function insertBlock( searchTerm ) {
-	return await insert( 'Blocks', searchTerm );
+	await insertFromGlobalInserter( 'Blocks', searchTerm );
 }
 
 /**
- * Insert a pattern matching a given search term..
+ * Insert a pattern matching a given search term via the global inserter.
  *
- * @param {string} searchTerm The text to search the inserter for.
+ * @param {string} searchTerm The text to search the patterns for.
  */
 export async function insertPattern( searchTerm ) {
-	await insert( 'Patterns', searchTerm );
+	await insertFromGlobalInserter( 'Patterns', searchTerm );
 }
 
 /**
- * Insert a reusable block matching a given search term.
+ * Insert a reusable block matching a given search term via the global inserter.
  *
- * @param {string} searchTerm The text to search the inserter for.
+ * @param {string} searchTerm The text to search the reusable blocks for.
  */
 export async function insertReusableBlock( searchTerm ) {
-	await insert( 'Reusable', searchTerm );
+	await insertFromGlobalInserter( 'Reusable', searchTerm );
 }
 
 /**
- * Insert a Block Directory block matching a given search term.
+ * Insert a Block Directory block matching a given search term via the global
+ * inserter.
  *
- * @param {string} searchTerm The text to search the inserter for.
+ * @param {string} searchTerm The text to search the Block Directory blocks for.
  */
 export async function insertBlockDirectoryBlock( searchTerm ) {
-	return await insert( 'Block Directory', searchTerm );
+	return await insertFromGlobalInserter( 'Block Directory', searchTerm );
 }
