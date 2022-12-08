@@ -13,15 +13,6 @@
  * @return array New block editor settings.
  */
 function gutenberg_get_block_editor_settings_6_2( $settings ) {
-	if (
-		defined( 'REST_REQUEST' ) &&
-		REST_REQUEST &&
-		isset( $_GET['context'] ) &&
-		'mobile' === $_GET['context']
-	) {
-		return $settings;
-	}
-
 	if ( wp_theme_has_theme_json() ) {
 		// Add the custom CSS as separate style sheet so any invalid CSS entered by users does not break other global styles.
 		$settings['styles'][] = array(
