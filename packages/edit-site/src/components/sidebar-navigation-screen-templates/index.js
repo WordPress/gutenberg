@@ -111,7 +111,9 @@ export default function SidebarNavigationScreenTemplates( {
 				( params.postType === postType &&
 					params.postId === template.id ) ||
 				// This is a special case for the home page.
-				( editedPostId === template.id && editedPostType === postType )
+				( editedPostId === template.id &&
+					editedPostType === postType &&
+					!! params.postId )
 					? 'page'
 					: undefined,
 		} ) );
