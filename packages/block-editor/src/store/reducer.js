@@ -1630,37 +1630,37 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
  * Reducer returning an object where each key is a block client ID, its value
  * representing the settings for its nested blocks.
  *
- * @param {Object} state  Current state.
+ * @param {Map}    state  Current state.
  * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */
-export const blockListSettings = ( state = {}, action ) => {
+export const blockListSettings = ( state = new Map(), action ) => {
 	switch ( action.type ) {
 		// Even if the replaced blocks have the same client ID, our logic
 		// should correct the state.
 		case 'REPLACE_BLOCKS':
 		case 'REMOVE_BLOCKS': {
-			return omit( state, action.clientIds );
+			const newState = new Map( state );
+			for ( const clientId of action.clientIds ) {
+				newState.delete( clientId );
+			}
+			return newState;
 		}
 		case 'UPDATE_BLOCK_LIST_SETTINGS': {
-			const { clientId } = action;
-			if ( ! action.settings ) {
-				if ( state.hasOwnProperty( clientId ) ) {
-					return omit( state, clientId );
+			const entries = Array.isArray( action.clientId )
+				? action.clientId
+				: [ [ action.clientId, action.settings ] ];
+
+			const newState = new Map( state );
+			for ( const [ clientId, listSettings ] of entries ) {
+				if ( listSettings ) {
+					newState.set( clientId, listSettings );
+				} else {
+					newState.delete( clientId );
 				}
-
-				return state;
 			}
-
-			if ( fastDeepEqual( state[ clientId ], action.settings ) ) {
-				return state;
-			}
-
-			return {
-				...state,
-				[ clientId ]: action.settings,
-			};
+			return newState;
 		}
 	}
 	return state;

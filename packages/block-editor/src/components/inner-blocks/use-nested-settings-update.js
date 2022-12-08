@@ -117,15 +117,10 @@ export default function useNestedSettingsUpdate(
 				.get( registry )
 				.push( [ clientId, newSettings ] );
 			window.queueMicrotask( () => {
-				if ( pendingSettingsUpdates.get( registry )?.length ) {
-					registry.batch( () => {
-						pendingSettingsUpdates
-							.get( registry )
-							.forEach( ( args ) => {
-								updateBlockListSettings( ...args );
-							} );
-						pendingSettingsUpdates.set( registry, [] );
-					} );
+				const pendingUpdates = pendingSettingsUpdates.get( registry );
+				if ( pendingUpdates?.length ) {
+					updateBlockListSettings( pendingUpdates );
+					pendingSettingsUpdates.set( registry, [] );
 				}
 			} );
 		}
