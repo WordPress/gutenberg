@@ -32,9 +32,8 @@ import { useSelect, useDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import ConvertToLinksModal, {
-	convertSelectedBlockToNavigationLinks,
-} from './convert-to-links-modal';
+import ConvertToLinksModal from './convert-to-links-modal';
+import { convertToNavigationLinks } from './convert-to-navigation-links';
 import { convertDescription } from './constants';
 
 // We only show the edit option when page count is <= MAX_PAGE_COUNT
@@ -213,19 +212,20 @@ export default function PageListEdit( {
 	return (
 		<>
 			<InspectorControls>
-				{ isNavigationChild && (
+				{ isNavigationChild && pages?.length > 0 && (
 					<PanelBody title={ __( 'Customize this menu' ) }>
 						<p>{ convertDescription }</p>
 						<Button
 							variant="primary"
 							disabled={ ! hasResolvedPages }
 							onClick={ () => {
-								convertSelectedBlockToNavigationLinks( {
-									pages,
-									replaceBlock,
-									clientId,
-									createBlock,
-								} )();
+								const navigationLinks =
+									convertToNavigationLinks( pages );
+
+								// Replace the Page List block with the Navigation Links.
+								replaceBlock( clientId, navigationLinks );
+
+								// Select the Navigation block to reveal the changes.
 								selectBlock( parentNavBlockClientId );
 							} }
 						>
