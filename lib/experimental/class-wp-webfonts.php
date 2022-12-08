@@ -208,7 +208,8 @@ class WP_Webfonts extends WP_Dependencies {
 			return null;
 		}
 
-		if ( ! WP_Webfonts_Utils::is_defined( $variation_handle ) ) {
+		// When there is a variation handle, check it.
+		if ( '' !== $variation_handle && ! WP_Webfonts_Utils::is_defined( $variation_handle ) ) {
 			trigger_error( 'Variant handle must be a non-empty string.' );
 			return null;
 		}
@@ -225,6 +226,7 @@ class WP_Webfonts extends WP_Dependencies {
 			return null;
 		}
 
+		// When there's no variation handle, attempt to create one.
 		if ( '' === $variation_handle ) {
 			$variation_handle = WP_Webfonts_Utils::convert_variation_into_handle( $font_family_handle, $variation );
 			if ( is_null( $variation_handle ) ) {
