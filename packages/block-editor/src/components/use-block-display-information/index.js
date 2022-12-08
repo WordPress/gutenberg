@@ -16,7 +16,7 @@ import { store as blockEditorStore } from '../../store';
  *
  * @typedef {Object} WPBlockDisplayInformation
  *
- * @property {boolean} isSynced    True if is a reusable block or template part
+ * @property {boolean} isSynced    True if inner blocks are controlled.
  * @property {string}  title       Human-readable block type label.
  * @property {WPIcon}  icon        Block type icon.
  * @property {string}  description A detailed block type description.
