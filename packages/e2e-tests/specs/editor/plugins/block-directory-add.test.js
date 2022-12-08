@@ -3,7 +3,7 @@
  */
 import {
 	createNewPost,
-	searchForBlock,
+	searchForBlockDirectoryBlock,
 	insertBlockDirectoryBlock,
 	setUpResponseMocking,
 	getEditedPostContent,
@@ -142,7 +142,13 @@ const MOCK_BLOCKS_RESPONSES = [
 		// Mock the post-new page as requested via apiFetch for determining new CSS/JS assets.
 		match: ( request ) => request.url().includes( '/post-new.php' ),
 		onRequestMatch: createResponse(
-			`<html><head><script id="mock-block-js" src="${ MOCK_BLOCK1.assets[ 0 ] }"></script></head><body/></html>`,
+			`<!DOCTYPE html>
+			<html>
+			  <head>
+			    <script id="mock-block-js" src="${ MOCK_BLOCK1.assets[ 0 ] }"></script>
+			  </head>
+			  <body></body>
+			</html>`,
 			'text/html; charset=UTF-8'
 		),
 	},
@@ -178,19 +184,17 @@ describe( 'adding blocks from block directory', () => {
 		await setUpResponseMocking( MOCK_EMPTY_RESPONSES );
 
 		// Search for the block via the inserter.
-		await searchForBlock( impossibleBlockName );
+		const searchResult = await searchForBlockDirectoryBlock(
+			impossibleBlockName
+		);
 
-		const selectorContent = await page.evaluate(
-			() =>
-				document.querySelector( '.block-editor-inserter__main-area' )
-					.innerHTML
-		);
-		expect( selectorContent ).toContain(
-			'block-editor-inserter__no-results'
-		);
+		// null means no results.
+		expect( searchResult ).toBe( null );
 	} );
 
 	it( 'Should be able to add (the first) block.', async () => {
+		await page.waitForFunction( () => window.wp );
+
 		// Setup our mocks.
 		await setUpResponseMocking( MOCK_BLOCKS_RESPONSES );
 
