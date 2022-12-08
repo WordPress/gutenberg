@@ -37,7 +37,10 @@ import {
 	useRef,
 	createInterpolateElement,
 } from '@wordpress/element';
-import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
+import {
+	placeCaretAtHorizontalEdge,
+	__unstableStripHTML as stripHTML,
+} from '@wordpress/dom';
 import { link as linkIcon, removeSubmenu } from '@wordpress/icons';
 import {
 	useResourcePermissions,
@@ -45,7 +48,7 @@ import {
 } from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
 import { createBlock } from '@wordpress/blocks';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, usePrevious } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -284,6 +287,7 @@ export default function NavigationSubmenuEdit( {
 	const { label, type, opensInNewTab, url, description, rel, title, kind } =
 		attributes;
 	const link = {
+		title: label && stripHTML( label ),
 		url,
 		opensInNewTab,
 	};
@@ -361,6 +365,8 @@ export default function NavigationSubmenuEdit( {
 		},
 		[ clientId ]
 	);
+
+	const prevHasChildren = usePrevious( hasChildren );
 
 	// Show the LinkControl on mount if the URL is empty
 	// ( When adding a new menu item)
@@ -542,11 +548,11 @@ export default function NavigationSubmenuEdit( {
 	}
 
 	useEffect( () => {
-		// If block is empty, transform to Navigation Link.
-		if ( ! hasChildren ) {
+		// If block becomes empty, transform to Navigation Link.
+		if ( ! hasChildren && prevHasChildren ) {
 			transformToLink();
 		}
-	}, [ hasChildren ] );
+	}, [ hasChildren, prevHasChildren ] );
 
 	const canConvertToLink =
 		! selectedBlockHasChildren || onlyDescendantIsEmptyLink;
@@ -665,7 +671,8 @@ export default function NavigationSubmenuEdit( {
 							<LinkControl
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
-								showInitialSuggestions={ true }
+								hasTextControl
+								showInitialSuggestions
 								withCreateSuggestion={ userCanCreate }
 								createSuggestion={ handleCreate }
 								createSuggestionButtonText={ ( searchTerm ) => {

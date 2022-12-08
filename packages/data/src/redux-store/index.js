@@ -43,6 +43,15 @@ const trimUndefinedValues = ( array ) => {
 	return result;
 };
 
+// Convert Map objects to plain objects
+const mapToObject = ( key, state ) => {
+	if ( state instanceof Map ) {
+		return Object.fromEntries( state );
+	}
+
+	return state;
+};
+
 /**
  * Create a cache to track whether resolvers started running or not.
  *
@@ -256,6 +265,9 @@ function instantiateReduxStore( key, options, registry, thunkArgs ) {
 			window.__REDUX_DEVTOOLS_EXTENSION__( {
 				name: key,
 				instanceId: key,
+				serialize: {
+					replacer: mapToObject,
+				},
 			} )
 		);
 	}

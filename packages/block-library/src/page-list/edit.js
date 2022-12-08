@@ -6,12 +6,15 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { createBlock } from '@wordpress/blocks';
 import {
 	InspectorControls,
 	BlockControls,
 	useBlockProps,
 	useInnerBlocksProps,
 	getColorClassName,
+	store as blockEditorStore,
+	Warning,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -19,15 +22,20 @@ import {
 	Spinner,
 	Notice,
 	ComboboxControl,
+	Button,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { useMemo, useState } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
+import { useMemo, useState, useEffect } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import ConvertToLinksModal from './convert-to-links-modal';
+import ConvertToLinksModal, {
+	convertSelectedBlockToNavigationLinks,
+} from './convert-to-links-modal';
+import { convertDescription } from './constants';
 
 // We only show the edit option when page count is <= MAX_PAGE_COUNT
 // Performance of Navigation Links is not good past this value.
@@ -40,7 +48,10 @@ export default function PageListEdit( {
 	setAttributes,
 } ) {
 	const { parentPageID } = attributes;
+	const [ pages ] = useGetPages();
 	const { pagesByParentId, totalPages, hasResolvedPages } = usePageData();
+	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
 	const isNavigationChild = 'showSubmenuIcon' in context;
 	const allowConvertToLinks =
@@ -64,14 +75,14 @@ export default function PageListEdit( {
 		style: { ...context.style?.color },
 	} );
 
-	const makeBlockTemplate = ( parentId = 0 ) => {
-		const pages = pagesByParentId.get( parentId );
+	const getBlockList = ( parentId = parentPageID ) => {
+		const childPages = pagesByParentId.get( parentId );
 
-		if ( ! pages?.length ) {
+		if ( ! childPages?.length ) {
 			return [];
 		}
 
-		return pages.reduce( ( template, page ) => {
+		return childPages.reduce( ( template, page ) => {
 			const hasChildren = pagesByParentId.has( page.id );
 			const pageProps = {
 				id: page.id,
@@ -81,19 +92,23 @@ export default function PageListEdit( {
 				hasChildren,
 			};
 			let item = null;
-			const children = makeBlockTemplate( page.id );
-			item = [ 'core/page-list-item', pageProps, children ];
-
+			const children = getBlockList( page.id );
+			item = createBlock( 'core/page-list-item', pageProps, children );
 			template.push( item );
 
 			return template;
 		}, [] );
 	};
 
-	const pagesTemplate = useMemo( makeBlockTemplate, [ pagesByParentId ] );
+	const blockList = useMemo( getBlockList, [
+		pagesByParentId,
+		parentPageID,
+	] );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: pagesTemplate,
+		allowedBlocks: [ 'core/page-list-item' ],
+		renderAppender: false,
+		__unstableDisableDropZone: true,
 		templateLock: 'all',
 	} );
 
@@ -126,41 +141,100 @@ export default function PageListEdit( {
 			);
 		}
 
+		if ( blockList.length === 0 ) {
+			const parentPageDetails =
+				pages && pages.find( ( page ) => page.id === parentPageID );
+			return (
+				<div { ...blockProps }>
+					<Warning>
+						{ sprintf(
+							// translators: %s: Page title.
+							__( '"%s" page has no children.' ),
+							parentPageDetails.title.rendered
+						) }
+					</Warning>
+				</div>
+			);
+		}
+
 		if ( totalPages > 0 ) {
 			return <ul { ...innerBlocksProps }></ul>;
 		}
 	};
 
-	const useParentOptions = () => {
-		const [ pages ] = useGetPages();
-		return pages?.reduce( ( accumulator, page ) => {
-			accumulator.push( {
-				value: page.id,
-				label: page.title.rendered,
-			} );
-			return accumulator;
-		}, [] );
-	};
+	const parentOptions = pages?.reduce( ( accumulator, page ) => {
+		accumulator.push( {
+			value: page.id,
+			label: page.title.rendered,
+		} );
+		return accumulator;
+	}, [] );
+
+	useEffect( () => {
+		__unstableMarkNextChangeAsNotPersistent();
+		if ( blockList ) {
+			replaceInnerBlocks( clientId, blockList );
+		}
+	}, [ clientId, blockList ] );
+
+	const { replaceBlock, selectBlock } = useDispatch( blockEditorStore );
+
+	const { parentNavBlockClientId } = useSelect( ( select ) => {
+		const { getSelectedBlockClientId, getBlockParentsByBlockName } =
+			select( blockEditorStore );
+
+		const _selectedBlockClientId = getSelectedBlockClientId();
+
+		return {
+			parentNavBlockClientId: getBlockParentsByBlockName(
+				_selectedBlockClientId,
+				'core/navigation',
+				true
+			)[ 0 ],
+		};
+	}, [] );
 
 	return (
 		<>
 			<InspectorControls>
+				{ isNavigationChild && (
+					<PanelBody title={ __( 'Customize this menu' ) }>
+						<p>{ convertDescription }</p>
+						<Button
+							variant="primary"
+							disabled={ ! hasResolvedPages }
+							onClick={ () => {
+								convertSelectedBlockToNavigationLinks( {
+									pages,
+									replaceBlock,
+									clientId,
+									createBlock,
+								} )();
+								selectBlock( parentNavBlockClientId );
+							} }
+						>
+							{ __( 'Customize' ) }
+						</Button>
+					</PanelBody>
+				) }
 				<PanelBody>
-					<ComboboxControl
-						className="editor-page-attributes__parent"
-						label={ __( 'Parent page' ) }
-						value={ parentPageID }
-						options={ useParentOptions() }
-						onChange={ ( value ) =>
-							setAttributes( { parentPageID: value ?? 0 } )
-						}
-						help={ __(
-							'Choose a page to show only its subpages.'
-						) }
-					/>
+					{ parentOptions && (
+						<ComboboxControl
+							className="editor-page-attributes__parent"
+							label={ __( 'Parent page' ) }
+							value={ parentPageID }
+							options={ parentOptions }
+							onChange={ ( value ) =>
+								setAttributes( { parentPageID: value ?? 0 } )
+							}
+							help={ __(
+								'Choose a page to show only its subpages.'
+							) }
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
-			{ allowConvertToLinks && (
+			{ allowConvertToLinks && totalPages > 0 && (
 				<BlockControls group="other">
 					<ToolbarButton title={ __( 'Edit' ) } onClick={ openModal }>
 						{ __( 'Edit' ) }
@@ -202,10 +276,6 @@ function usePageData( pageId = 0 ) {
 		// TODO: Once the REST API supports passing multiple values to
 		// 'orderby', this can be removed.
 		// https://core.trac.wordpress.org/ticket/39037
-
-		if ( pageId !== 0 ) {
-			return pages.find( ( page ) => page.id === pageId );
-		}
 
 		const sortedPages = [ ...( pages ?? [] ) ].sort( ( a, b ) => {
 			if ( a.menu_order === b.menu_order ) {

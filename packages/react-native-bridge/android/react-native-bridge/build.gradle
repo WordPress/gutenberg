@@ -45,10 +45,15 @@ android {
 
 repositories {
     maven { url "https://a8c-libs.s3.amazonaws.com/android" }
-    maven { url "https://a8c-libs.s3.amazonaws.com/android/hermes-mirror" }
     maven { url "https://jitpack.io" }
     google()
-    mavenCentral()
+    mavenCentral {
+        // We don't want to fetch react-native from Maven Central as there are
+        // older versions over there.
+        content {
+            excludeGroup "com.facebook.react"
+        }
+    }
 }
 
 dependencies {
@@ -75,7 +80,6 @@ dependencies {
         exclude group: 'com.github.wordpress-mobile', module: 'react-native-reanimated'
     })
 
-
     // Published by `wordpress-mobile/react-native-libraries-publisher`
     // See the documentation for this value in `build.gradle.kts` of `wordpress-mobile/react-native-libraries-publisher`
     def reactNativeLibrariesPublisherVersion = "v1"
@@ -89,7 +93,9 @@ dependencies {
     implementation "$reactNativeLibrariesGroupId:react-native-clipboard:${extractPackageVersion(packageJson, '@react-native-clipboard/clipboard', 'dependencies')}"
     implementation "$reactNativeLibrariesGroupId:react-native-fast-image:${extractPackageVersion(packageJson, 'react-native-fast-image', 'dependencies')}"
 
-    runtimeOnly "org.wordpress-mobile:hermes-release-mirror:$rnVersion"
+    runtimeOnly("com.facebook.react:hermes-engine:$rnVersion", {
+        exclude group:'com.facebook.fbjni'
+    })
 
     if (willPublishReactNativeBridgeBinary) {
         implementation "org.wordpress-mobile.gutenberg-mobile:react-native-aztec:$reactNativeAztecVersion"

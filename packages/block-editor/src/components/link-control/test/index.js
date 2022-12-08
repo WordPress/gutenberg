@@ -1,18 +1,21 @@
 /**
  * External dependencies
  */
-import { act, fireEvent, render, screen, within } from '@testing-library/react';
+import {
+	fireEvent,
+	render,
+	screen,
+	waitFor,
+	within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
+
 /**
  * Internal dependencies
  */
@@ -22,14 +25,6 @@ import {
 	fetchFauxEntitySuggestions,
 	uniqueId,
 } from './fixtures';
-
-// Mock debounce() so that it runs instantly.
-jest.mock( '@wordpress/compose/src/utils/debounce', () => ( {
-	debounce: ( fn ) => {
-		fn.cancel = jest.fn();
-		return fn;
-	},
-} ) );
 
 const mockFetchSearchSuggestions = jest.fn();
 
@@ -57,18 +52,6 @@ jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
 } ) );
 
 jest.useRealTimers();
-
-/**
- * Wait for next tick of event loop. This is required
- * because the `fetchSearchSuggestions` Promise will
- * resolve on the next tick of the event loop (this is
- * inline with the Promise spec). As a result we need to
- * wait on this loop to "tick" before we can expect the UI
- * to have updated.
- */
-function eventLoopTick() {
-	return new Promise( ( resolve ) => setImmediate( resolve ) );
-}
 
 beforeEach( () => {
 	// Setup a DOM element as a render target.
@@ -288,6 +271,7 @@ describe( 'Basic rendering', () => {
 		it( 'should show "Unlink" button if a onRemove handler is provided', async () => {
 			const user = userEvent.setup();
 			const mockOnRemove = jest.fn();
+
 			render(
 				<LinkControl
 					value={ { url: 'https://example.com' } }
@@ -313,13 +297,12 @@ describe( 'Searching for a link', () => {
 		const searchTerm = 'Hello';
 
 		let resolver;
-
-		const fauxRequest = () =>
-			new Promise( ( resolve ) => {
-				resolver = resolve;
-			} );
-
-		mockFetchSearchSuggestions.mockImplementation( fauxRequest );
+		mockFetchSearchSuggestions.mockImplementation(
+			() =>
+				new Promise( ( resolve ) => {
+					resolver = resolve;
+				} )
+		);
 
 		render( <LinkControl /> );
 
@@ -329,32 +312,20 @@ describe( 'Searching for a link', () => {
 		// Simulate searching for a term.
 		await user.type( searchInput, searchTerm );
 
-		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
-		await eventLoopTick();
+		expect( await screen.findByRole( 'presentation' ) ).toBeVisible();
+		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 
-		const searchResultsField = screen.queryByRole( 'listbox' );
+		// make the search suggestions fetch return a response
+		resolver( fauxEntitySuggestions );
 
-		let loadingUI = screen.queryByRole( 'presentation' );
-
-		expect( searchResultsField ).not.toBeInTheDocument();
-
-		expect( loadingUI ).toBeVisible();
-
-		act( () => {
-			resolver( fauxEntitySuggestions );
-		} );
-
-		await eventLoopTick();
-
-		loadingUI = screen.queryByRole( 'presentation' );
-
-		expect( loadingUI ).not.toBeInTheDocument();
+		expect( await screen.findByRole( 'listbox' ) ).toBeVisible();
+		expect( screen.queryByRole( 'presentation' ) ).not.toBeInTheDocument();
 	} );
 
 	it( 'should display only search suggestions when current input value is not URL-like', async () => {
 		const user = userEvent.setup();
 		const searchTerm = 'Hello world';
-		const firstFauxSuggestion = fauxEntitySuggestions[ 0 ];
+		const firstSuggestion = fauxEntitySuggestions[ 0 ];
 
 		render( <LinkControl /> );
 
@@ -364,11 +335,8 @@ describe( 'Searching for a link', () => {
 		// Simulate searching for a term.
 		await user.type( searchInput, searchTerm );
 
-		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
-		await eventLoopTick();
-
 		const searchResultElements = within(
-			screen.getByRole( 'listbox', {
+			await screen.findByRole( 'listbox', {
 				name: /Search results for.*/,
 			} )
 		).getAllByRole( 'option' );
@@ -379,12 +347,12 @@ describe( 'Searching for a link', () => {
 
 		expect( searchInput ).toHaveAttribute( 'aria-expanded', 'true' );
 
-		// Sanity check that a search suggestion shows up corresponding to the data.
+		// Check that a search suggestion shows up corresponding to the data.
 		expect( searchResultElements[ 0 ] ).toHaveTextContent(
-			firstFauxSuggestion.title
+			firstSuggestion.title
 		);
 		expect( searchResultElements[ 0 ] ).toHaveTextContent(
-			firstFauxSuggestion.type
+			firstSuggestion.type
 		);
 
 		// The fallback URL suggestion should not be shown when input is not URL-like.
@@ -397,7 +365,7 @@ describe( 'Searching for a link', () => {
 		const user = userEvent.setup();
 		const searchTerm = '   Hello    ';
 
-		const { container } = render( <LinkControl /> );
+		render( <LinkControl /> );
 
 		// Search Input UI.
 		const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
@@ -405,17 +373,11 @@ describe( 'Searching for a link', () => {
 		// Simulate searching for a term.
 		await user.type( searchInput, searchTerm );
 
-		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
-		await eventLoopTick();
-
+		const searchResults = await screen.findByRole( 'listbox', {
+			name: /Search results for.*/,
+		} );
 		const searchResultTextHighlightElements = Array.from(
-			container.querySelectorAll(
-				'[role="listbox"] button[role="option"] mark'
-			)
-		);
-
-		const invalidResults = searchResultTextHighlightElements.find(
-			( mark ) => mark.innerHTML !== 'Hello'
+			searchResults.querySelectorAll( 'button[role="option"] mark' )
 		);
 
 		// Given we're mocking out the results we should always have 4 mark elements.
@@ -423,7 +385,11 @@ describe( 'Searching for a link', () => {
 
 		// Make sure there are no `mark` elements which contain anything other
 		// than the trimmed search term (ie: no whitespace).
-		expect( invalidResults ).toBeFalsy();
+		expect(
+			searchResultTextHighlightElements.every(
+				( mark ) => mark.innerHTML === 'Hello'
+			)
+		).toBe( true );
 
 		// Implementation detail test to ensure that the fetch handler is called
 		// with the trimmed search value. We do this because we are mocking out
@@ -447,9 +413,6 @@ describe( 'Searching for a link', () => {
 
 		const searchResultsField = screen.queryByRole( 'listbox' );
 
-		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
-		await eventLoopTick();
-
 		expect( searchResultsField ).not.toBeInTheDocument();
 		expect( mockFetchSearchSuggestions ).not.toHaveBeenCalled();
 	} );
@@ -469,11 +432,8 @@ describe( 'Searching for a link', () => {
 			// Simulate searching for a term.
 			await user.type( searchInput, searchTerm );
 
-			// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
-			await eventLoopTick();
-
 			const searchResultElements = within(
-				screen.getByRole( 'listbox', {
+				await screen.findByRole( 'listbox', {
 					name: /Search results for.*/,
 				} )
 			).getAllByRole( 'option' );
@@ -506,11 +466,8 @@ describe( 'Searching for a link', () => {
 		// Simulate searching for a term.
 		await user.type( searchInput, 'couldbeurlorentitysearchterm' );
 
-		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
-		await eventLoopTick();
-
 		const searchResultElements = within(
-			screen.getByRole( 'listbox', {
+			await screen.findByRole( 'listbox', {
 				name: /Search results for.*/,
 			} )
 		).getAllByRole( 'option' );
@@ -539,11 +496,8 @@ describe( 'Manual link entry', () => {
 			// Simulate searching for a term.
 			await user.type( searchInput, searchTerm );
 
-			// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
-			await eventLoopTick();
-
 			const searchResultElements = within(
-				screen.getByRole( 'listbox', {
+				await screen.findByRole( 'listbox', {
 					name: /Search results for.*/,
 				} )
 			).getByRole( 'option' );
@@ -576,7 +530,7 @@ describe( 'Manual link entry', () => {
 					name: 'URL',
 				} );
 
-				let submitButton = screen.queryByRole( 'button', {
+				let submitButton = screen.getByRole( 'button', {
 					name: 'Submit',
 				} );
 
@@ -591,13 +545,10 @@ describe( 'Manual link entry', () => {
 					await user.clear( searchInput );
 				}
 
-				// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
-				await eventLoopTick();
-
 				// Attempt to submit the empty search value in the input.
 				await user.keyboard( '[Enter]' );
 
-				submitButton = screen.queryByRole( 'button', {
+				submitButton = screen.getByRole( 'button', {
 					name: 'Submit',
 				} );
 
@@ -636,9 +587,6 @@ describe( 'Manual link entry', () => {
 					await user.clear( searchInput );
 				}
 
-				// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
-				await eventLoopTick();
-
 				// Attempt to submit the empty search value in the input.
 				await user.click( submitButton );
 
@@ -673,11 +621,8 @@ describe( 'Manual link entry', () => {
 				// Simulate searching for a term.
 				await user.type( searchInput, searchTerm );
 
-				// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
-				await eventLoopTick();
-
 				const searchResultElements = within(
-					screen.getByRole( 'listbox', {
+					await screen.findByRole( 'listbox', {
 						name: /Search results for.*/,
 					} )
 				).getByRole( 'option' );
@@ -695,14 +640,10 @@ describe( 'Manual link entry', () => {
 
 describe( 'Default search suggestions', () => {
 	it( 'should display a list of initial search suggestions when there is no search value or suggestions', async () => {
-		const expectedResultsLength = 3; // Set within `LinkControl`.
-
 		render( <LinkControl showInitialSuggestions /> );
 
-		await eventLoopTick();
-
 		expect(
-			screen.queryByRole( 'listbox', {
+			await screen.findByRole( 'listbox', {
 				name: 'Recently updated',
 			} )
 		).toBeVisible();
@@ -720,24 +661,16 @@ describe( 'Default search suggestions', () => {
 		expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
 
 		// Verify the search results already display the initial suggestions.
-		expect( screen.queryAllByRole( 'option' ) ).toHaveLength(
-			expectedResultsLength
-		);
+		// `LinkControl` internally always limits the number of initial suggestions to 3.
+		expect( screen.queryAllByRole( 'option' ) ).toHaveLength( 3 );
 	} );
 
 	it( 'should not display initial suggestions when input value is present', async () => {
 		const user = userEvent.setup();
 
-		// Render with an initial value an ensure that no initial suggestions
-		// are shown.
-		render(
-			<LinkControl
-				showInitialSuggestions
-				value={ fauxEntitySuggestions[ 0 ] }
-			/>
-		);
-
-		await eventLoopTick();
+		// Render with an initial value an ensure that no initial suggestions are shown.
+		const initialValue = fauxEntitySuggestions[ 0 ];
+		render( <LinkControl showInitialSuggestions value={ initialValue } /> );
 
 		expect( mockFetchSearchSuggestions ).not.toHaveBeenCalled();
 
@@ -747,22 +680,20 @@ describe( 'Default search suggestions', () => {
 		const currentLinkBtn = within( currentLinkUI ).getByRole( 'button', {
 			name: 'Edit',
 		} );
-
 		await user.click( currentLinkBtn );
 
 		const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
-		searchInput.focus();
+		// Search input is set to the URL value.
+		expect( searchInput ).toHaveValue( initialValue.url );
 
-		await eventLoopTick();
+		// Focus the search input to display suggestions
+		await user.click( searchInput );
 
 		const searchResultElements = within(
-			screen.getByRole( 'listbox', {
+			await screen.findByRole( 'listbox', {
 				name: /Search results for.*/,
 			} )
 		).getAllByRole( 'option' );
-
-		// Search input is set to the URL value.
-		expect( searchInput ).toHaveValue( fauxEntitySuggestions[ 0 ].url );
 
 		// It should match any url that's like ?p= and also include a URL option.
 		expect( searchResultElements ).toHaveLength( 5 );
@@ -778,61 +709,44 @@ describe( 'Default search suggestions', () => {
 
 		render( <LinkControl showInitialSuggestions /> );
 
-		let searchResultElements;
-		let searchInput;
-
 		// Search Input UI.
-		searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
+		const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
 
 		// Simulate searching for a term.
 		await user.type( searchInput, searchTerm );
 
-		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
-		await eventLoopTick();
-
 		expect( searchInput ).toHaveValue( searchTerm );
 
-		searchResultElements = within(
-			screen.getByRole( 'listbox', {
-				name: /Search results for.*/,
-			} )
-		).getAllByRole( 'option' );
+		const searchResultsList = await screen.findByRole( 'listbox', {
+			name: /Search results for.*/,
+		} );
+
+		expect( searchResultsList ).toBeVisible();
+
+		expect(
+			within( searchResultsList ).getAllByRole( 'option' )
+		).toHaveLength( 4 );
 
 		// Delete the text.
 		await userEvent.clear( searchInput );
 
-		await eventLoopTick();
-
-		searchResultElements = within(
-			screen.getByRole( 'listbox', {
-				name: 'Recently updated',
-			} )
-		).getAllByRole( 'option' );
-
-		searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
-
 		// Check the input is empty now.
 		expect( searchInput ).toHaveValue( '' );
 
-		expect(
-			screen.queryByRole( 'listbox', {
-				name: 'Recently updated',
-			} )
-		).toBeVisible();
+		const initialResultsList = await screen.findByRole( 'listbox', {
+			name: 'Recently updated',
+		} );
 
-		expect( searchResultElements ).toHaveLength( 3 );
+		expect(
+			within( initialResultsList ).getAllByRole( 'option' )
+		).toHaveLength( 3 );
 	} );
 
 	it( 'should not display initial suggestions when there are no recently updated pages/posts', async () => {
-		const noResults = [];
 		// Force API returning empty results for recently updated Pages.
-		mockFetchSearchSuggestions.mockImplementation( () =>
-			Promise.resolve( noResults )
-		);
+		mockFetchSearchSuggestions.mockImplementation( async () => [] );
 
 		render( <LinkControl showInitialSuggestions /> );
-
-		await eventLoopTick();
 
 		const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
 
@@ -864,19 +778,15 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		async ( entityNameText ) => {
 			const user = userEvent.setup();
 			let resolver;
-			let resolvedEntity;
-
 			const createSuggestion = ( title ) =>
 				new Promise( ( resolve ) => {
-					resolver = ( arg ) => {
-						resolve( arg );
-					};
-					resolvedEntity = {
-						title,
-						id: 123,
-						url: '/?p=123',
-						type: 'page',
-					};
+					resolver = () =>
+						resolve( {
+							title,
+							id: 123,
+							url: '/?p=123',
+							type: 'page',
+						} );
 				} );
 
 			const LinkControlConsumer = () => {
@@ -901,13 +811,13 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			// Simulate searching for a term.
 			await user.type( searchInput, entityNameText );
 
-			await eventLoopTick();
+			const searchResults = await screen.findByRole( 'listbox', {
+				name: /Search results for.*/,
+			} );
 
-			const searchResultElements = screen.queryAllByRole( 'option' );
-
-			const createButton = Array.from( searchResultElements ).filter(
-				( result ) => result.innerHTML.includes( 'Create:' )
-			)[ 0 ];
+			const createButton = within( searchResults ).getByRole( 'option', {
+				name: /^Create:/,
+			} );
 
 			expect( createButton ).toBeVisible();
 			expect( createButton ).toHaveTextContent( entityNameText );
@@ -915,8 +825,6 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			// No need to wait in this test because we control the Promise
 			// resolution manually via the `resolver` reference.
 			await user.click( createButton );
-
-			await eventLoopTick();
 
 			// Check for loading indicator.
 			const loadingIndicator = screen.getByText( 'Creating…' );
@@ -930,13 +838,11 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			);
 
 			// Resolve the `createSuggestion` promise.
-			await act( async () => {
-				resolver( resolvedEntity );
-			} );
+			resolver();
 
-			await eventLoopTick();
-
-			const currentLink = screen.getByLabelText( 'Currently selected' );
+			const currentLink = await screen.findByLabelText(
+				'Currently selected'
+			);
 
 			expect( currentLink ).toHaveTextContent( entityNameText );
 			expect( currentLink ).toHaveTextContent( '/?p=123' );
@@ -972,21 +878,15 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		// Simulate searching for a term.
 		await user.type( searchInput, 'Some new page to create' );
 
-		await eventLoopTick();
+		const searchResults = await screen.findByRole( 'listbox', {
+			name: /Search results for.*/,
+		} );
 
-		const searchResultElements = within(
-			screen.getByRole( 'listbox', {
-				name: /Search results for.*/,
-			} )
-		).getAllByRole( 'option' );
-
-		const createButton = Array.from( searchResultElements ).filter(
-			( result ) => result.innerHTML.includes( 'Create:' )
-		)[ 0 ];
+		const createButton = within( searchResults ).getByRole( 'option', {
+			name: /^Create:/,
+		} );
 
 		await user.click( createButton );
-
-		await eventLoopTick();
 
 		const currentLink = screen.getByLabelText( 'Currently selected' );
 
@@ -1027,28 +927,25 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		// Simulate searching for a term.
 		await user.type( searchInput, entityNameText );
 
-		await eventLoopTick();
+		const searchResults = await screen.findByRole( 'listbox', {
+			name: /Search results for.*/,
+		} );
 
-		const searchResultElements = within(
-			screen.getByRole( 'listbox', {
-				name: /Search results for.*/,
-			} )
-		).getAllByRole( 'option' );
-		const createButton = searchResultElements.find( ( result ) =>
-			result.innerHTML.includes( 'Create:' )
-		);
-
-		// Step down into the search results, highlighting the first result item.
+		// Step down into the search results, selecting the first result item.
 		triggerArrowDown( searchInput );
 
-		await user.click( createButton );
+		// Check that the create button is in the results and that it's selected
+		const createButton = within( searchResults ).getByRole( 'option', {
+			name: /^Create:/,
+			selected: true,
+		} );
+		expect( createButton ).toBeVisible();
 
-		await user.type( searchInput, '[Enter]' );
-
-		await eventLoopTick();
+		expect( searchInput ).toHaveFocus();
+		triggerEnter( searchInput );
 
 		expect(
-			screen.getByLabelText( 'Currently selected' )
+			await screen.findByLabelText( 'Currently selected' )
 		).toHaveTextContent( entityNameText );
 	} );
 
@@ -1073,17 +970,13 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		// Simulate searching for a term.
 		await user.type( searchInput, entityNameText );
 
-		await eventLoopTick();
+		const searchResults = await screen.findByRole( 'listbox', {
+			name: /Search results for.*/,
+		} );
 
-		const searchResultElements = within(
-			screen.getByRole( 'listbox', {
-				name: /Search results for.*/,
-			} )
-		).getAllByRole( 'option' );
-
-		const createButton = Array.from( searchResultElements ).filter(
-			( result ) => result.innerHTML.includes( 'Custom suggestion text' )
-		)[ 0 ];
+		const createButton = within( searchResults ).getByRole( 'option', {
+			name: /Custom suggestion text/,
+		} );
 
 		expect( createButton ).toBeVisible();
 	} );
@@ -1093,9 +986,6 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			'should not show not show an option to create an entity when "createSuggestion" handler is %s',
 			async ( handler ) => {
 				render( <LinkControl createSuggestion={ handler } /> );
-
-				// Await the initial suggestions to be fetched.
-				await eventLoopTick();
 
 				// Search Input UI.
 				const searchInput = screen.getByRole( 'combobox', {
@@ -1110,16 +1000,13 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			}
 		);
 
-		it( 'should not show not show an option to create an entity when input is empty', async () => {
+		it( 'should not show an option to create an entity when input is empty', async () => {
 			render(
 				<LinkControl
-					showInitialSuggestions={ true } // Should show even if we're not showing initial suggestions.
+					showInitialSuggestions // Should show even if we're not showing initial suggestions.
 					createSuggestion={ jest.fn() }
 				/>
 			);
-
-			// Await the initial suggestions to be fetched.
-			await eventLoopTick();
 
 			// Search Input UI.
 			const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
@@ -1151,19 +1038,15 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 				// Simulate searching for a term.
 				await user.type( searchInput, inputText );
 
-				await eventLoopTick();
+				const searchResults = await screen.findByRole( 'listbox', {
+					name: /Search results for.*/,
+				} );
 
-				const searchResultElements = within(
-					screen.getByRole( 'listbox', {
-						name: /Search results for.*/,
-					} )
-				).getAllByRole( 'option' );
-
-				const createButton = Array.from( searchResultElements ).filter(
-					( result ) => result.innerHTML.includes( 'New page' )
-				)[ 0 ];
-
-				expect( createButton ).toBeFalsy(); // Shouldn't exist!
+				const createButton = within( searchResults ).queryByRole(
+					'option',
+					{ name: /New page/ }
+				);
+				expect( createButton ).not.toBeInTheDocument(); // Shouldn't exist!
 			}
 		);
 	} );
@@ -1188,20 +1071,15 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			// Simulate searching for a term.
 			await user.type( searchInput, searchText );
 
-			await eventLoopTick();
+			const searchResults = await screen.findByRole( 'listbox', {
+				name: /Search results for.*/,
+			} );
 
-			const searchResultElements = within(
-				screen.getByRole( 'listbox', {
-					name: /Search results for.*/,
-				} )
-			).getAllByRole( 'option' );
-			const createButton = Array.from( searchResultElements ).filter(
-				( result ) => result.innerHTML.includes( 'Create:' )
-			)[ 0 ];
+			const createButton = within( searchResults ).getByRole( 'option', {
+				name: /^Create:/,
+			} );
 
 			await user.click( createButton );
-
-			await eventLoopTick();
 
 			searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
 
@@ -1322,11 +1200,8 @@ describe( 'Selecting links', () => {
 				// Simulate searching for a term.
 				await user.type( searchInput, searchTerm );
 
-				// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
-				await eventLoopTick();
-
 				const searchResultElements = within(
-					screen.getByRole( 'listbox', {
+					await screen.findByRole( 'listbox', {
 						name: /Search results for.*/,
 					} )
 				).getAllByRole( 'option' );
@@ -1387,17 +1262,15 @@ describe( 'Selecting links', () => {
 				// Simulate searching for a term.
 				await user.type( searchInput, searchTerm );
 
-				// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
-				await eventLoopTick();
+				const searchResults = await screen.findByRole( 'listbox', {
+					name: /Search results for.*/,
+				} );
 
 				// Step down into the search results, highlighting the first result item.
 				triggerArrowDown( searchInput );
 
-				const searchResultElements = within(
-					screen.getByRole( 'listbox', {
-						name: /Search results for.*/,
-					} )
-				).getAllByRole( 'option' );
+				const searchResultElements =
+					within( searchResults ).getAllByRole( 'option' );
 
 				const firstSearchSuggestion = searchResultElements[ 0 ];
 				const secondSearchSuggestion = searchResultElements[ 1 ];
@@ -1407,7 +1280,7 @@ describe( 'Selecting links', () => {
 				} );
 
 				// We should have highlighted the first item using the keyboard.
-				expect( selectedSearchResultElement ).toEqual(
+				expect( selectedSearchResultElement ).toBe(
 					firstSearchSuggestion
 				);
 
@@ -1422,7 +1295,7 @@ describe( 'Selecting links', () => {
 
 					// We should have highlighted the first item using the keyboard
 					// eslint-disable-next-line jest/no-conditional-expect
-					expect( selectedSearchResultElement ).toEqual(
+					expect( selectedSearchResultElement ).toBe(
 						secondSearchSuggestion
 					);
 
@@ -1435,7 +1308,7 @@ describe( 'Selecting links', () => {
 
 					// We should be back to highlighting the first search result again
 					// eslint-disable-next-line jest/no-conditional-expect
-					expect( selectedSearchResultElement ).toEqual(
+					expect( selectedSearchResultElement ).toBe(
 						firstSearchSuggestion
 					);
 				}
@@ -1464,10 +1337,8 @@ describe( 'Selecting links', () => {
 		it( 'should allow selection of initial search results via the keyboard', async () => {
 			render( <LinkControl showInitialSuggestions /> );
 
-			await eventLoopTick();
-
 			expect(
-				screen.queryByRole( 'listbox', {
+				await screen.findByRole( 'listbox', {
 					name: 'Recently updated',
 				} )
 			).toBeVisible();
@@ -1477,8 +1348,6 @@ describe( 'Selecting links', () => {
 
 			// Step down into the search results, highlighting the first result item.
 			triggerArrowDown( searchInput );
-
-			await eventLoopTick();
 
 			const searchResultElements = within(
 				screen.getByRole( 'listbox', {
@@ -1606,11 +1475,8 @@ describe( 'Post types', () => {
 		// Simulate searching for a term.
 		await user.type( searchInput, searchTerm );
 
-		// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
-		await eventLoopTick();
-
 		const searchResultElements = within(
-			screen.getByRole( 'listbox', {
+			await screen.findByRole( 'listbox', {
 				name: /Search results for.*/,
 			} )
 		).getAllByRole( 'option' );
@@ -1636,11 +1502,8 @@ describe( 'Post types', () => {
 			// Simulate searching for a term.
 			await user.type( searchInput, searchTerm );
 
-			// fetchFauxEntitySuggestions resolves on next "tick" of event loop.
-			await eventLoopTick();
-
 			const searchResultElements = within(
-				screen.getByRole( 'listbox', {
+				await screen.findByRole( 'listbox', {
 					name: /Search results for.*/,
 				} )
 			).getAllByRole( 'option' );
@@ -1688,11 +1551,6 @@ describe( 'Rich link previews', () => {
 
 		render( <LinkControl value={ selectedLink } /> );
 
-		// mockFetchRichUrlData resolves on next "tick" of event loop.
-		await act( async () => {
-			await eventLoopTick();
-		} );
-
 		const linkPreview = screen.getByLabelText( 'Currently selected' );
 
 		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
@@ -1714,16 +1572,9 @@ describe( 'Rich link previews', () => {
 
 		render( <LinkControl value={ selectedLink } hasRichPreviews /> );
 
-		// mockFetchRichUrlData resolves on next "tick" of event loop.
-		await act( async () => {
-			await eventLoopTick();
-		} );
-
 		const linkPreview = screen.getByLabelText( 'Currently selected' );
 
-		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
-
-		expect( isRichLinkPreview ).toBe( true );
+		await waitFor( () => expect( linkPreview ).toHaveClass( 'is-rich' ) );
 	} );
 
 	it( 'should not display placeholders for the image and description if neither is available in the data', async () => {
@@ -1738,12 +1589,9 @@ describe( 'Rich link previews', () => {
 
 		render( <LinkControl value={ selectedLink } hasRichPreviews /> );
 
-		// mockFetchRichUrlData resolves on next "tick" of event loop.
-		await act( async () => {
-			await eventLoopTick();
-		} );
-
 		const linkPreview = screen.getByLabelText( 'Currently selected' );
+
+		await waitFor( () => expect( linkPreview ).toHaveClass( 'is-rich' ) );
 
 		// Todo: refactor to use user-facing queries.
 		const hasRichImagePreview = linkPreview.querySelector(
@@ -1771,15 +1619,9 @@ describe( 'Rich link previews', () => {
 
 		render( <LinkControl value={ selectedLink } hasRichPreviews /> );
 
-		// mockFetchRichUrlData resolves on next "tick" of event loop.
-		await act( async () => {
-			await eventLoopTick();
-		} );
-
 		const linkPreview = screen.getByLabelText( 'Currently selected' );
 
-		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
-		expect( isRichLinkPreview ).toBe( true );
+		await waitFor( () => expect( linkPreview ).toHaveClass( 'is-rich' ) );
 
 		const titlePreview = screen.getByText( selectedLink.title );
 
@@ -1800,15 +1642,9 @@ describe( 'Rich link previews', () => {
 
 		render( <LinkControl value={ selectedLink } hasRichPreviews /> );
 
-		// mockFetchRichUrlData resolves on next "tick" of event loop.
-		await act( async () => {
-			await eventLoopTick();
-		} );
-
 		const linkPreview = screen.getByLabelText( 'Currently selected' );
 
-		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
-		expect( isRichLinkPreview ).toBe( true );
+		await waitFor( () => expect( linkPreview ).toHaveClass( 'is-rich' ) );
 
 		const iconPreview = linkPreview.querySelector(
 			`.block-editor-link-control__search-item-icon`
@@ -1838,16 +1674,11 @@ describe( 'Rich link previews', () => {
 
 			render( <LinkControl value={ selectedLink } hasRichPreviews /> );
 
-			// mockFetchRichUrlData resolves on next "tick" of event loop.
-			await act( async () => {
-				await eventLoopTick();
-			} );
-
 			const linkPreview = screen.getByLabelText( 'Currently selected' );
 
-			const isRichLinkPreview =
-				linkPreview.classList.contains( 'is-rich' );
-			expect( isRichLinkPreview ).toBe( true );
+			await waitFor( () =>
+				expect( linkPreview ).toHaveClass( 'is-rich' )
+			);
 
 			const missingDataItem = linkPreview.querySelector(
 				`.block-editor-link-control__search-item-${ dataItem }`
@@ -1863,23 +1694,19 @@ describe( 'Rich link previews', () => {
 	] )(
 		'should not display a rich preview when data is %s',
 		async ( _descriptor, data ) => {
-			mockFetchRichUrlData.mockImplementation( () =>
-				Promise.resolve( data )
-			);
+			mockFetchRichUrlData.mockImplementation( async () => data );
 
 			render( <LinkControl value={ selectedLink } hasRichPreviews /> );
 
-			// mockFetchRichUrlData resolves on next "tick" of event loop.
-			await act( async () => {
-				await eventLoopTick();
-			} );
-
 			const linkPreview = screen.getByLabelText( 'Currently selected' );
 
-			const isRichLinkPreview =
-				linkPreview.classList.contains( 'is-rich' );
+			expect( linkPreview ).toHaveClass( 'is-fetching' );
 
-			expect( isRichLinkPreview ).toBe( false );
+			await waitFor( () =>
+				expect( linkPreview ).not.toHaveClass( 'is-fetching' )
+			);
+
+			expect( linkPreview ).not.toHaveClass( 'is-rich' );
 		}
 	);
 
@@ -1890,19 +1717,10 @@ describe( 'Rich link previews', () => {
 
 		render( <LinkControl value={ selectedLink } hasRichPreviews /> );
 
-		// mockFetchRichUrlData resolves on next "tick" of event loop.
-		await act( async () => {
-			await eventLoopTick();
-		} );
-
 		const linkPreview = screen.getByLabelText( 'Currently selected' );
 
-		const isFetchingRichPreview =
-			linkPreview.classList.contains( 'is-fetching' );
-		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
-
-		expect( isFetchingRichPreview ).toBe( true );
-		expect( isRichLinkPreview ).toBe( false );
+		expect( linkPreview ).toHaveClass( 'is-fetching' );
+		expect( linkPreview ).not.toHaveClass( 'is-rich' );
 	} );
 
 	it( 'should remove fetching UI indicators and fallback to standard preview if request for rich preview results in an error', async () => {
@@ -1912,20 +1730,15 @@ describe( 'Rich link previews', () => {
 
 		render( <LinkControl value={ selectedLink } hasRichPreviews /> );
 
-		// mockFetchRichUrlData resolves on next "tick" of event loop.
-		await act( async () => {
-			await eventLoopTick();
-		} );
-
 		const linkPreview = screen.getByLabelText( 'Currently selected' );
 
-		const isFetchingRichPreview =
-			linkPreview.classList.contains( 'is-fetching' );
+		expect( linkPreview ).toHaveClass( 'is-fetching' );
 
-		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
+		await waitFor( () =>
+			expect( linkPreview ).not.toHaveClass( 'is-fetching' )
+		);
 
-		expect( isFetchingRichPreview ).toBe( false );
-		expect( isRichLinkPreview ).toBe( false );
+		expect( linkPreview ).not.toHaveClass( 'is-rich' );
 	} );
 
 	afterAll( () => {

@@ -40,8 +40,8 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 					<>
 						<PostVisibility />
 						<PostSchedule />
-						<PostURL />
 						<PostTemplate />
+						<PostURL />
 						<PostSticky />
 						<PostPendingStatus />
 						<PostFormat />

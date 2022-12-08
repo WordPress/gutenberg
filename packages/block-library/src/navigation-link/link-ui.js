@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { Popover, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
@@ -47,8 +48,8 @@ export function getSuggestionsQuery( type, kind ) {
 /**
  * Add transforms to Link Control
  *
- * @param {Object} props					Component props.
- * @param {string} props.clientId			Block client ID.
+ * @param {Object} props          Component props.
+ * @param {string} props.clientId Block client ID.
  */
 function LinkControlTransforms( { clientId } ) {
 	const { getBlock, blockTransforms } = useSelect(
@@ -82,6 +83,10 @@ function LinkControlTransforms( { clientId } ) {
 	} );
 
 	if ( ! transforms?.length ) {
+		return null;
+	}
+
+	if ( ! clientId ) {
 		return null;
 	}
 
@@ -120,7 +125,7 @@ export function LinkUI( props ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 
 	async function handleCreate( pageTitle ) {
-		const postType = props.linkAttributes.type || 'page';
+		const postType = props.link.type || 'page';
 
 		const page = await saveEntityRecord( 'postType', postType, {
 			title: pageTitle,
@@ -146,6 +151,13 @@ export function LinkUI( props ) {
 		};
 	}
 
+	const { label, url, opensInNewTab, type, kind } = props.link;
+	const link = {
+		url,
+		opensInNewTab,
+		title: label && stripHTML( label ),
+	};
+
 	return (
 		<Popover
 			placement="bottom"
@@ -156,15 +168,15 @@ export function LinkUI( props ) {
 			<LinkControl
 				hasTextControl
 				hasRichPreviews
-				className="wp-block-navigation-link__inline-link-input"
-				value={ props.value }
+				className={ props.className }
+				value={ link }
 				showInitialSuggestions={ true }
 				withCreateSuggestion={ props.hasCreateSuggestion }
 				createSuggestion={ handleCreate }
 				createSuggestionButtonText={ ( searchTerm ) => {
 					let format;
 
-					if ( props.linkAttributes.type === 'post' ) {
+					if ( type === 'post' ) {
 						/* translators: %s: search term. */
 						format = __( 'Create draft post: <mark>%s</mark>' );
 					} else {
@@ -179,16 +191,13 @@ export function LinkUI( props ) {
 						}
 					);
 				} }
-				noDirectEntry={ !! props.linkAttributes.type }
-				noURLSuggestion={ !! props.linkAttributes.type }
-				suggestionsQuery={ getSuggestionsQuery(
-					props.linkAttributes.type,
-					props.linkAttributes.kind
-				) }
+				noDirectEntry={ !! type }
+				noURLSuggestion={ !! type }
+				suggestionsQuery={ getSuggestionsQuery( type, kind ) }
 				onChange={ props.onChange }
 				onRemove={ props.onRemove }
 				renderControlBottom={
-					! props.linkAttributes.url
+					! url
 						? () => (
 								<LinkControlTransforms
 									clientId={ props.clientId }

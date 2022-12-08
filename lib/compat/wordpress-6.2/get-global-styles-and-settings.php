@@ -51,32 +51,11 @@ if ( ! function_exists( 'wp_theme_has_theme_json' ) ) {
 if ( ! function_exists( 'wp_theme_has_theme_json_clean_cache' ) ) {
 	/**
 	 * Function to clean the cache used by wp_theme_has_theme_json method.
+	 *
+	 * Not to backport to core. Delete it instead.
 	 */
 	function wp_theme_has_theme_json_clean_cache() {
-		wp_cache_delete( 'wp_theme_has_theme_json', 'theme_json' );
-	}
-}
-
-if ( ! function_exists( '_wp_theme_has_theme_json_clean_cache_upon_upgrading_active_theme' ) ) {
-	/**
-	 * Private function to clean the cache used by wp_theme_has_theme_json method.
-	 *
-	 * It is hooked into the `upgrader_process_complete` action.
-	 *
-	 * @see default-filters.php
-	 *
-	 * @param WP_Upgrader $upgrader Instance of WP_Upgrader class.
-	 * @param array       $options Metadata that identifies the data that is updated.
-	 */
-	function _wp_theme_has_theme_json_clean_cache_upon_upgrading_active_theme( $upgrader, $options ) {
-		// The cache only needs cleaning when the active theme was updated.
-		if (
-			'update' === $options['action'] &&
-			'theme' === $options['type'] &&
-			( isset( $options['themes'][ get_stylesheet() ] ) || isset( $options['themes'][ get_template() ] ) )
-		) {
-			wp_theme_has_theme_json_clean_cache();
-		}
+		_deprecated_function( __METHOD__, '14.7' );
 	}
 }
 
@@ -158,38 +137,6 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 }
 
 /**
- * Clean the cache used by the `gutenberg_get_global_stylesheet` function.
- */
-function gutenberg_get_global_stylesheet_clean_cache() {
-	wp_cache_delete( 'gutenberg_get_global_stylesheet', 'theme_json' );
-}
-
-/**
- * Private function to clean the cache used by the `gutenberg_get_global_stylesheet` function after an upgrade.
- *
- * It is hooked into the `upgrader_process_complete` action.
- *
- * @see default-filters.php
- *
- * @param WP_Upgrader $upgrader WP_Upgrader instance.
- * @param array       $options  Array of bulk item update data.
- */
-function _gutenberg_get_global_stylesheet_clean_cache_upon_upgrading( $upgrader, $options ) {
-	if ( 'update' !== $options['action'] ) {
-		return;
-	}
-
-	if (
-		'core' === $options['type'] ||
-		'plugin' === $options['type'] ||
-		// Clean cache only if the active theme was updated.
-		( 'theme' === $options['type'] && ( isset( $options['themes'][ get_stylesheet() ] ) || isset( $options['themes'][ get_template() ] ) ) )
-	) {
-		gutenberg_get_global_stylesheet_clean_cache();
-	}
-}
-
-/**
  * Function to get the settings resulting of merging core, theme, and user data.
  *
  * @param array $path    Path to the specific setting to retrieve. Optional.
@@ -224,6 +171,54 @@ function gutenberg_get_global_settings( $path = array(), $context = array() ) {
 		$origin = 'theme';
 	}
 
-	$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin )->get_settings();
+	$cache_group = 'theme_json';
+	$cache_key   = 'gutenberg_get_global_settings_' . $origin;
+	$settings    = wp_cache_get( $cache_key, $cache_group );
+
+	if ( false === $settings || WP_DEBUG ) {
+		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin )->get_settings();
+		wp_cache_set( $cache_key, $settings, $cache_group );
+	}
+
 	return _wp_array_get( $settings, $path, $settings );
 }
+
+/**
+ * Private function to clean the caches used by gutenberg_get_global_settings method.
+ *
+ * @access private
+ */
+function _gutenberg_clean_theme_json_caches() {
+	wp_cache_delete( 'wp_theme_has_theme_json', 'theme_json' );
+	wp_cache_delete( 'gutenberg_get_global_stylesheet', 'theme_json' );
+	wp_cache_delete( 'gutenberg_get_global_settings_custom', 'theme_json' );
+	wp_cache_delete( 'gutenberg_get_global_settings_theme', 'theme_json' );
+	WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+}
+
+/**
+ * Tell the cache mechanisms not to persist theme.json data across requests.
+ * The data stored under this cache group:
+ *
+ * - wp_theme_has_theme_json
+ * - gutenberg_get_global_settings
+ * - gutenberg_get_global_stylesheet
+ *
+ * There is some hooks consumers can use to modify parts
+ * of the theme.json logic.
+ * See https://make.wordpress.org/core/2022/10/10/filters-for-theme-json-data/
+ *
+ * The rationale to make this cache group non persistent is to make sure derived data
+ * from theme.json is always fresh from the potential modifications done via hooks
+ * that can use dynamic data (modify the stylesheet depending on some option,
+ * or settings depending on user permissions, etc.).
+ *
+ * A different alternative considered was to invalidate the cache upon certain
+ * events such as options add/update/delete, user meta, etc.
+ * It was judged not enough, hence this approach.
+ * See https://github.com/WordPress/gutenberg/pull/45372
+ */
+function _gutenberg_add_non_persistent_theme_json_cache_group() {
+	wp_cache_add_non_persistent_groups( 'theme_json' );
+}
+add_action( 'plugins_loaded', '_gutenberg_add_non_persistent_theme_json_cache_group' );

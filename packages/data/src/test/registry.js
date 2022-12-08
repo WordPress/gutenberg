@@ -719,16 +719,15 @@ describe( 'createRegistry', () => {
 			const listener2 = jest.fn();
 			// useSelect subscribes to the stores differently,
 			// This test ensures batching works in this case as well.
-			const unsubscribe = registry.__unstableSubscribeStore(
-				'myAwesomeReducer',
-				listener2
+			const unsubscribe = registry.subscribe(
+				listener2,
+				'myAwesomeReducer'
 			);
 			registry.batch( () => {
 				store.dispatch( { type: 'dummy' } );
 				store.dispatch( { type: 'dummy' } );
 			} );
 			unsubscribe();
-
 			expect( listener2 ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );

@@ -1,7 +1,6 @@
 .edit-site-list-header {
 	position: relative;
 	align-items: center;
-	background-color: $white;
 	display: flex;
 	height: $header-height;
 	box-sizing: border-box;
@@ -53,15 +52,19 @@
 			@include break-medium() {
 				padding: $grid-unit * 9;
 			}
+
+			& > .interface-navigable-region__stacker {
+				height: auto;
+			}
 		}
 	}
 }
 
 .edit-site-list-table {
-	width: 100%;
+	min-width: 100%;
 	border: $border-width solid $gray-300;
 	border-radius: 2px;
-	margin: 0;
+	margin: 0 auto;
 	overflow: hidden;
 	border-spacing: 0;
 	max-width: 960px;

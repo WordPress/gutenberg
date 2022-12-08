@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { isEqual, find } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
+import { find } from 'lodash';
 import { v4 as uuid } from 'uuid';
 
 /**
@@ -355,7 +356,9 @@ export const editEntityRecord =
 				const value = mergedEdits[ key ]
 					? { ...editedRecordValue, ...edits[ key ] }
 					: edits[ key ];
-				acc[ key ] = isEqual( recordValue, value ) ? undefined : value;
+				acc[ key ] = fastDeepEqual( recordValue, value )
+					? undefined
+					: value;
 				return acc;
 			}, {} ),
 			transientEdits,

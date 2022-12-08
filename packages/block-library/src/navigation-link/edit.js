@@ -31,13 +31,15 @@ import {
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
-import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
+import {
+	placeCaretAtHorizontalEdge,
+	__unstableStripHTML as stripHTML,
+} from '@wordpress/dom';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import {
 	store as coreStore,
 	useResourcePermissions,
 } from '@wordpress/core-data';
-
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -211,22 +213,6 @@ function getMissingText( type ) {
 	return missingText;
 }
 
-/**
- * Removes HTML from a given string.
- * Note the does not provide XSS protection or otherwise attempt
- * to filter strings with malicious intent.
- *
- * See also: https://github.com/WordPress/gutenberg/pull/35539
- *
- * @param {string} html the string from which HTML should be removed.
- * @return {string} the "cleaned" string.
- */
-function navStripHTML( html ) {
-	const doc = document.implementation.createHTMLDocument( '' );
-	doc.body.innerHTML = html;
-	return doc.body.textContent || '';
-}
-
 export default function NavigationLinkEdit( {
 	attributes,
 	isSelected,
@@ -237,26 +223,10 @@ export default function NavigationLinkEdit( {
 	context,
 	clientId,
 } ) {
-	const {
-		id,
-		label,
-		type,
-		opensInNewTab,
-		url,
-		description,
-		rel,
-		title,
-		kind,
-	} = attributes;
+	const { id, label, type, url, description, rel, title, kind } = attributes;
 
 	const [ isInvalid, isDraft ] = useIsInvalidLink( kind, type, id );
 	const { maxNestingLevel } = context;
-
-	const link = {
-		url,
-		opensInNewTab,
-		title: label && navStripHTML( label ), // don't allow HTML to display inside the <LinkControl>
-	};
 
 	const { replaceBlock, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
@@ -508,7 +478,7 @@ export default function NavigationLinkEdit( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Link settings' ) }>
 					<TextControl
-						value={ label || '' }
+						value={ label ? stripHTML( label ) : '' }
 						onChange={ ( labelValue ) => {
 							setAttributes( { label: labelValue } );
 						} }
@@ -654,9 +624,9 @@ export default function NavigationLinkEdit( {
 					) }
 					{ isLinkOpen && (
 						<LinkUI
+							className="wp-block-navigation-link__inline-link-input"
 							clientId={ clientId }
-							value={ link }
-							linkAttributes={ { type, url, kind } }
+							link={ attributes }
 							onClose={ () => setIsLinkOpen( false ) }
 							anchor={ popoverAnchor }
 							hasCreateSuggestion={ userCanCreate }
