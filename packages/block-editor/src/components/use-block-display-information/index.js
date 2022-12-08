@@ -2,11 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import {
-	store as blocksStore,
-	isReusableBlock,
-	isTemplatePart,
-} from '@wordpress/blocks';
+import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -46,8 +42,11 @@ export default function useBlockDisplayInformation( clientId ) {
 	return useSelect(
 		( select ) => {
 			if ( ! clientId ) return null;
-			const { getBlockName, getBlockAttributes } =
-				select( blockEditorStore );
+			const {
+				getBlockName,
+				getBlockAttributes,
+				areInnerBlocksControlled,
+			} = select( blockEditorStore );
 			const { getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
 			const blockName = getBlockName( clientId );
@@ -55,8 +54,7 @@ export default function useBlockDisplayInformation( clientId ) {
 			if ( ! blockType ) return null;
 			const attributes = getBlockAttributes( clientId );
 			const match = getActiveBlockVariation( blockName, attributes );
-			const isSynced =
-				isReusableBlock( blockType ) || isTemplatePart( blockType );
+			const isSynced = areInnerBlocksControlled( clientId );
 			const blockTypeInfo = {
 				isSynced,
 				title: blockType.title,

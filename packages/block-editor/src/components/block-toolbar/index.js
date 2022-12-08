@@ -9,12 +9,7 @@ import classnames from 'classnames';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
-import {
-	getBlockType,
-	hasBlockSupport,
-	isReusableBlock,
-	isTemplatePart,
-} from '@wordpress/blocks';
+import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { ToolbarGroup } from '@wordpress/components';
 
 /**
@@ -43,6 +38,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 		isValid,
 		isVisual,
 		isContentLocked,
+		isSynced,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -52,6 +48,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 			getBlockRootClientId,
 			getSettings,
 			__unstableGetContentLockingParent,
+			areInnerBlocksControlled,
 		} = select( blockEditorStore );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
@@ -76,6 +73,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 			isContentLocked: !! __unstableGetContentLockingParent(
 				selectedBlockClientId
 			),
+			isSynced: areInnerBlocksControlled( selectedBlockClientId ),
 		};
 	}, [] );
 
@@ -114,8 +112,6 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 
 	const shouldShowVisualToolbar = isValid && isVisual;
 	const isMultiToolbar = blockClientIds.length > 1;
-	const isSynced =
-		isReusableBlock( blockType ) || isTemplatePart( blockType );
 
 	const classes = classnames( 'block-editor-block-toolbar', {
 		'is-showing-movers': shouldShowMovers,
