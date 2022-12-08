@@ -7,7 +7,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useViewportMatch } from '@wordpress/compose';
@@ -66,6 +66,17 @@ export default function SidebarNavigationScreenTemplates( {
 	const isListPage = getIsListPage( params );
 	const isEditorPage = ! isListPage;
 
+	// Ideally the URL params would be enough.
+	// Loading the editor should ideally redirect to the home page
+	// instead of fetching the edited entity here.
+	const { editedPostId, editedPostType } = useSelect( ( select ) => {
+		const { getEditedPostType, getEditedPostId } = select( editSiteStore );
+		return {
+			editedPostId: getEditedPostId(),
+			editedPostType: getEditedPostType(),
+		};
+	}, [] );
+
 	const { records: templates, isResolving: isLoading } = useEntityRecords(
 		'postType',
 		postType,
@@ -97,7 +108,10 @@ export default function SidebarNavigationScreenTemplates( {
 				template.title?.rendered || template.slug
 			),
 			'aria-current':
-				params.postType === postType && params.postId === template.id
+				( params.postType === postType &&
+					params.postId === template.id ) ||
+				// This is a special case for the home page.
+				( editedPostId === template.id && editedPostType === postType )
 					? 'page'
 					: undefined,
 		} ) );
