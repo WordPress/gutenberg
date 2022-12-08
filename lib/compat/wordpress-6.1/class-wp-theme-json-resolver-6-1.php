@@ -26,6 +26,19 @@ class WP_Theme_JSON_Resolver_6_1 extends WP_Theme_JSON_Resolver_6_0 {
 	protected static $core = null;
 
 	/**
+	 * Container for keep track of registered blocks.
+	 *
+	 * @since 6.1.0
+	 * @var array
+	 */
+	protected static $blocks_cache = array(
+		'core'   => array(),
+		'blocks' => array(),
+		'theme'  => array(),
+		'user'   => array(),
+	);
+
+	/**
 	 * Given a theme.json structure modifies it in place
 	 * to update certain values by its translated strings
 	 * according to the language set by the user.
@@ -187,5 +200,36 @@ class WP_Theme_JSON_Resolver_6_1 extends WP_Theme_JSON_Resolver_6_0 {
 		}
 
 		return $user_cpt;
+	}
+
+	/**
+	 * Checks whether the registered blocks were already processed for this origin.
+	 *
+	 * @since 6.1.0
+	 *
+	 * @param string $origin Data source for which to cache the blocks.
+	 *                       Valid values are 'core', 'blocks', 'theme', and 'user'.
+	 * @return bool True on success, false otherwise.
+	 */
+	protected static function has_same_registered_blocks( $origin ) {
+		// Bail out if the origin is invalid.
+		if ( ! isset( static::$blocks_cache[ $origin ] ) ) {
+			return false;
+		}
+
+		$registry = WP_Block_Type_Registry::get_instance();
+		$blocks   = $registry->get_all_registered();
+
+		// Is there metadata for all currently registered blocks?
+		$block_diff = array_diff_key( $blocks, static::$blocks_cache[ $origin ] );
+		if ( empty( $block_diff ) ) {
+			return true;
+		}
+
+		foreach ( $blocks as $block_name => $block_type ) {
+			static::$blocks_cache[ $origin ][ $block_name ] = true;
+		}
+
+		return false;
 	}
 }
