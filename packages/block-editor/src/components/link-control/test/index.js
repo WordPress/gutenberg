@@ -1942,4 +1942,51 @@ describe( 'Component composition', () => {
 			screen.getByText( 'Currently selected link settings' )
 		).toBeInTheDocument();
 	} );
+
+	it( 'exports subcomponents easy UI composition', () => {
+		function MyCustomLinkControl() {
+			return (
+				<>
+					<LinkControl.Loading />
+
+					<LinkControl.EditControls />
+
+					<LinkControl.Preview />
+
+					<LinkControl.SettingsDrawer />
+
+					<div>Here is custom component.</div>
+				</>
+			);
+		}
+
+		render(
+			<LinkControl
+				value={ selectedLink }
+				forceIsEditingLink
+				hasTextControl
+				onChange={ mockOnChange }
+			>
+				<MyCustomLinkControl />
+			</LinkControl>
+		);
+
+		// Check for custom components.
+		expect(
+			screen.getByText( 'Here is custom component.' )
+		).toBeInTheDocument();
+
+		// Check for the default components.
+		expect(
+			screen.getByRole( 'combobox', { name: 'URL' } )
+		).toBeInTheDocument();
+
+		expect(
+			screen.getByRole( 'textbox', { name: 'Text' } )
+		).toBeInTheDocument();
+
+		expect(
+			screen.getByText( 'Currently selected link settings' )
+		).toBeInTheDocument();
+	} );
 } );
