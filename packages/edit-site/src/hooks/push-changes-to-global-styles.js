@@ -33,7 +33,7 @@ function usePushBlockStylesToUserStyles( { name, attributes, setAttributes } ) {
 		useContext( GlobalStylesContext );
 
 	return () => {
-		const { style: blockStyles } = attributes;
+		const { style: blockStyles = {} } = attributes;
 
 		let newBlockStyles = null;
 		let newUserConfig = null;
