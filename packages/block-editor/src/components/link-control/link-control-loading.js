@@ -9,7 +9,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { useLinkControlContext } from './';
 
-export function LinkControlLoading() {
+export default function LinkControlLoading() {
 	const { isLoading } = useLinkControlContext();
 
 	if ( ! isLoading ) {

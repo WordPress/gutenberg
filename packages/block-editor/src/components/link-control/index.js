@@ -9,23 +9,26 @@ import {
 	useContext,
 	useCallback,
 	createContext,
+	Children,
+	cloneElement,
 } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 
 /**
  * Internal dependencies
  */
+import useCreatePage from './use-create-page';
+import useInternalInputValue from './use-internal-input-value';
+import { ViewerFill } from './viewer-slot';
+import { DEFAULT_LINK_SETTINGS } from './constants';
+import { LinkControlDefault } from './link-control-default';
 import LinkControlSettingsDrawer from './settings-drawer';
 import LinkControlSearchInput from './search-input';
 import LinkControlTextInput from './link-control-text-input';
 import LinkPreview from './link-preview';
 import LinkControlNotice from './link-control-notice';
 import LinkControlEditControls from './link-control-edit-controls';
-import useCreatePage from './use-create-page';
-import useInternalInputValue from './use-internal-input-value';
-import { ViewerFill } from './viewer-slot';
-import { DEFAULT_LINK_SETTINGS } from './constants';
-import { LinkControlLoading } from './link-control-loading';
+import LinkControlLoading from './link-control-loading';
 
 /**
  * Default properties associated with a link control value.
@@ -142,6 +145,7 @@ function LinkControl( {
 	hasRichPreviews = false,
 	hasTextControl = false,
 	renderControlBottom = null,
+	children,
 } ) {
 	if ( withCreateSuggestion === undefined && createSuggestion ) {
 		withCreateSuggestion = true;
@@ -308,41 +312,58 @@ function LinkControl( {
 				ref={ wrapperNode }
 				className="block-editor-link-control"
 			>
-				<LinkControlLoading />
-
-				<LinkControlEditControls>
-					<LinkControlTextInput />
-
-					<LinkControlSearchInput
-						className="block-editor-link-control__field block-editor-link-control__search-input"
-						placeholder={ searchInputPlaceholder }
+				{ children ? (
+					Children.map( children, ( child ) =>
+						cloneElement( child, {
+							searchInputPlaceholder,
+							withCreateSuggestion,
+							createPage,
+							setInternalUrlInputValue,
+							handleSelectSuggestion,
+							showInitialSuggestions,
+							noDirectEntry,
+							showSuggestions,
+							suggestionsQuery,
+							noURLSuggestion,
+							createSuggestionButtonText,
+							showTextControl,
+							renderControlBottom,
+						} )
+					)
+				) : (
+					<LinkControlDefault
+						searchInputPlaceholder={ searchInputPlaceholder }
 						withCreateSuggestion={ withCreateSuggestion }
-						onCreateSuggestion={ createPage }
-						onChange={ setInternalUrlInputValue }
-						onSelect={ handleSelectSuggestion }
+						createPage={ createPage }
+						setInternalUrlInputValue={ setInternalUrlInputValue }
+						handleSelectSuggestion={ handleSelectSuggestion }
 						showInitialSuggestions={ showInitialSuggestions }
-						allowDirectEntry={ ! noDirectEntry }
+						noDirectEntry={ noDirectEntry }
 						showSuggestions={ showSuggestions }
 						suggestionsQuery={ suggestionsQuery }
-						withURLSuggestion={ ! noURLSuggestion }
+						noURLSuggestion={ noURLSuggestion }
 						createSuggestionButtonText={
 							createSuggestionButtonText
 						}
-						useLabel={ showTextControl }
+						showTextControl={ showTextControl }
+						renderControlBottom={ renderControlBottom }
 					/>
-					<LinkControlNotice />
-				</LinkControlEditControls>
-
-				<LinkPreview />
-
-				<LinkControlSettingsDrawer />
-
-				{ renderControlBottom && renderControlBottom() }
+				) }
 			</div>
 		</LinkControlContext.Provider>
 	);
 }
 
 LinkControl.ViewerFill = ViewerFill;
+
+// Sub-components.
+LinkControl.DefaultComponents = LinkControlDefault;
+LinkControl.SettingsDrawer = LinkControlSettingsDrawer;
+LinkControl.SearchInput = LinkControlSearchInput;
+LinkControl.TextInput = LinkControlTextInput;
+LinkControl.Preview = LinkPreview;
+LinkControl.Notice = LinkControlNotice;
+LinkControl.EditControls = LinkControlEditControls;
+LinkControl.Loading = LinkControlLoading;
 
 export default LinkControl;
