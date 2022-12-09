@@ -86,7 +86,7 @@ export const PRESET_METADATA = [
 	},
 ];
 
-const STYLE_PATH_TO_CSS_VAR_INFIX = {
+export const STYLE_PATH_TO_CSS_VAR_INFIX = {
 	'color.background': 'color',
 	'color.text': 'color',
 	'elements.link.color.text': 'color',
@@ -98,6 +98,15 @@ const STYLE_PATH_TO_CSS_VAR_INFIX = {
 	'color.gradient': 'gradient',
 	'typography.fontSize': 'font-size',
 	'typography.fontFamily': 'font-family',
+};
+
+// A static list of block attributes that store global style preset slugs.
+export const STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE = {
+	'color.background': 'backgroundColor',
+	'color.text': 'textColor',
+	'color.gradient': 'gradient',
+	'typography.fontSize': 'fontSize',
+	'typography.fontFamily': 'fontFamily',
 };
 
 function findInPresetsBy(

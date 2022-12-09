@@ -19,6 +19,10 @@ import { useContext } from '@wordpress/element';
  */
 import { getSupportedGlobalStylesPanels } from '../components/global-styles/hooks';
 import { GlobalStylesContext } from '../components/global-styles/context';
+import {
+	STYLE_PATH_TO_CSS_VAR_INFIX,
+	STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE,
+} from '../components/global-styles/utils';
 
 function cloneDeep( object ) {
 	return JSON.parse( JSON.stringify( object ) );
@@ -37,20 +41,29 @@ function usePushBlockStylesToUserStyles( { name, attributes, setAttributes } ) {
 		const supportedKeys = getSupportedGlobalStylesPanels( name );
 		for ( const key of supportedKeys ) {
 			const { value: valuePath } = STYLE_PROPERTY[ key ];
-
+			const presetAttributeKey = valuePath.join( '.' );
+			const presetAttributeValue =
+				attributes[
+					STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE[ presetAttributeKey ]
+				];
 			const value = get( attributes.style, valuePath );
-			if ( ! value ) {
+
+			if ( ! value && ! presetAttributeValue ) {
 				continue;
 			}
 
 			newBlockStyles ??= cloneDeep( blockStyles );
 			set( newBlockStyles, valuePath, undefined );
 
+			const pushedValue = presetAttributeValue
+				? `var:preset|${ STYLE_PATH_TO_CSS_VAR_INFIX[ presetAttributeKey ] }|${ presetAttributeValue }`
+				: value;
+
 			newUserConfig ??= cloneDeep( userConfig );
 			set(
 				newUserConfig,
 				[ 'styles', 'blocks', name, ...valuePath ],
-				value
+				pushedValue
 			);
 		}
 
@@ -72,7 +85,7 @@ const withPushChangesToGlobalStyles = createHigherOrderComponent(
 				<InspectorAdvancedControls>
 					<BaseControl
 						help={ __(
-							'Make this the default style for all Button blocks used across your site.'
+							"Apply this block's styles to all blocks of this type. Note that only typography, spacing, dimensions, color and border styles will be applied."
 						) }
 					>
 						<BaseControl.VisualLabel>
