@@ -49,9 +49,9 @@ const ALLOWED_BLOCKS = [
 	'core/page-list',
 ];
 
-// const DEFAULT_BLOCK = {
-// 	name: 'core/navigation-link',
-// };
+const DEFAULT_BLOCK = {
+	name: 'core/navigation-link',
+};
 
 /**
  * A React hook to determine if it's dragging within the target element.
@@ -401,8 +401,8 @@ export default function NavigationSubmenuEdit( {
 		},
 		{
 			allowedBlocks,
-			// __experimentalDefaultBlock: DEFAULT_BLOCK,
-			// __experimentalDirectInsert: true,
+			__experimentalDefaultBlock: DEFAULT_BLOCK,
+			__experimentalDirectInsert: true,
 
 			// Ensure block toolbar is not too far removed from item
 			// being edited.
