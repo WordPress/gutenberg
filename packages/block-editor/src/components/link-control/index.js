@@ -1,9 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Spinner } from '@wordpress/components';
 
-import { __ } from '@wordpress/i18n';
 import {
 	useRef,
 	useState,
@@ -19,7 +17,7 @@ import { focus } from '@wordpress/dom';
  */
 import LinkControlSettingsDrawer from './settings-drawer';
 import LinkControlSearchInput from './search-input';
-import LinkControlTextInput from './text-input';
+import LinkControlTextInput from './link-control-text-input';
 import LinkPreview from './link-preview';
 import LinkControlNotice from './link-control-notice';
 import LinkControlEditControls from './link-control-edit-controls';
@@ -27,6 +25,7 @@ import useCreatePage from './use-create-page';
 import useInternalInputValue from './use-internal-input-value';
 import { ViewerFill } from './viewer-slot';
 import { DEFAULT_LINK_SETTINGS } from './constants';
+import { LinkControlLoading } from './link-control-loading';
 
 /**
  * Default properties associated with a link control value.
@@ -263,11 +262,21 @@ function LinkControl( {
 
 	const shouldShowLinkPreview = value && ! isEditingLink && ! isCreatingPage;
 
+	const isLoading = isCreatingPage;
+
+	// Consumers can pass in a custom function which may return
+	// a different reference resulting in the context being
+	// invalidated causing all context consumers to re-render.
+	// Memoize the onChange callback to avoid this.
+	const memoizedOnChange = useCallback( onChange, [] );
+
 	// Todo
 	// - memoize context value
 	// - create seperate context's to avoid re-renders
 	const contextValue = {
 		value,
+		onChange: memoizedOnChange,
+		settings, // todo: consider memoizing
 		internalTextInputValue, // lift to standard state mechanic
 		setInternalTextInputValue, // lift to standard state mechanic
 		showTextControl,
@@ -277,6 +286,8 @@ function LinkControl( {
 		createPageErrorMessage, // needs extracting to generic error message
 		shouldShowEditControls,
 		shouldShowLinkPreview,
+		showSettingsDrawer,
+		isLoading,
 	};
 
 	return (
@@ -286,11 +297,7 @@ function LinkControl( {
 				ref={ wrapperNode }
 				className="block-editor-link-control"
 			>
-				{ isCreatingPage && (
-					<div className="block-editor-link-control__loading">
-						<Spinner /> { __( 'Creating' ) }…
-					</div>
-				) }
+				<LinkControlLoading />
 
 				<LinkControlEditControls
 					shouldShowEditControls={ shouldShowEditControls }
@@ -326,15 +333,8 @@ function LinkControl( {
 					onRemove={ onRemove }
 				/>
 
-				{ showSettingsDrawer && (
-					<div className="block-editor-link-control__tools">
-						<LinkControlSettingsDrawer
-							value={ value }
-							settings={ settings }
-							onChange={ onChange }
-						/>
-					</div>
-				) }
+				<LinkControlSettingsDrawer />
+
 				{ renderControlBottom && renderControlBottom() }
 			</div>
 		</LinkControlContext.Provider>

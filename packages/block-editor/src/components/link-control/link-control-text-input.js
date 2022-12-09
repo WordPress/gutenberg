@@ -8,9 +8,9 @@ import { ENTER } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import { useLinkControlContext } from './';
+import { useLinkControlContext } from '.';
 
-export default forwardRef( ( _props, ref ) => {
+const LinkControlTextInput = forwardRef( ( _props, ref ) => {
 	const {
 		showTextControl,
 		internalTextInputValue,
@@ -45,3 +45,5 @@ export default forwardRef( ( _props, ref ) => {
 		/>
 	);
 } );
+
+export default LinkControlTextInput;

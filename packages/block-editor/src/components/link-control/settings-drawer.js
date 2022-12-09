@@ -4,10 +4,21 @@
 import { __ } from '@wordpress/i18n';
 import { ToggleControl, VisuallyHidden } from '@wordpress/components';
 
+/**
+ * Internal dependencies
+ */
+import { useLinkControlContext } from './';
 const noop = () => {};
 
-const LinkControlSettingsDrawer = ( { value, onChange = noop, settings } ) => {
-	if ( ! settings || ! settings.length ) {
+const LinkControlSettingsDrawer = () => {
+	const {
+		value,
+		onChange = noop,
+		settings,
+		showSettingsDrawer,
+	} = useLinkControlContext();
+
+	if ( ! showSettingsDrawer || ! settings || ! settings.length ) {
 		return null;
 	}
 
@@ -29,12 +40,14 @@ const LinkControlSettingsDrawer = ( { value, onChange = noop, settings } ) => {
 	) );
 
 	return (
-		<fieldset className="block-editor-link-control__settings">
-			<VisuallyHidden as="legend">
-				{ __( 'Currently selected link settings' ) }
-			</VisuallyHidden>
-			{ theSettings }
-		</fieldset>
+		<div className="block-editor-link-control__tools">
+			<fieldset className="block-editor-link-control__settings">
+				<VisuallyHidden as="legend">
+					{ __( 'Currently selected link settings' ) }
+				</VisuallyHidden>
+				{ theSettings }
+			</fieldset>
+		</div>
 	);
 };
 
