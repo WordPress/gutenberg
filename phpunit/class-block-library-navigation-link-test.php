@@ -236,7 +236,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 					array(),
 					$navigation_link_block
 				),
-				'https://example.com?data=lzB%2Fzd%2FZA%3D%3D'
+				'https://example.com/?data=lzB%2Fzd%2FZA%3D%3D'
 			) !== false
 		);
 	}
