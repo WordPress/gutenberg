@@ -1,16 +1,14 @@
 /**
  * WordPress dependencies
  */
- import {
+import {
 	BlockEditorProvider,
-	BlockTools,
 	__unstableBlockToolbarLastItem,
 	__unstableBlockNameContext,
 } from '@wordpress/block-editor';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
 import { Fragment } from '@wordpress/element';
-import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
 import { __ } from '@wordpress/i18n';
 import { listView } from '@wordpress/icons';
 
@@ -42,18 +40,15 @@ if ( isOffCanvasNavigationEditorEnabled ) {
 const NavigationEditMenuItem = () => {
 	return (
 		<BlockEditorProvider>
-			<BlockTools>
-				<__unstableBlockToolbarLastItem>
-					<__unstableBlockNameContext.Consumer>
-						{ ( blockName ) =>
-							blockName === 'core/navigation' && (
-								<MaybeNavMenuSidebarToggle />
-							)
-						}
-					</__unstableBlockNameContext.Consumer>
-				</__unstableBlockToolbarLastItem>
-			</BlockTools>
-			<ReusableBlocksMenuItems />
+			<__unstableBlockToolbarLastItem>
+				<__unstableBlockNameContext.Consumer>
+					{ ( blockName ) =>
+						blockName === 'core/navigation' && (
+							<MaybeNavMenuSidebarToggle />
+						)
+					}
+				</__unstableBlockNameContext.Consumer>
+			</__unstableBlockToolbarLastItem>
 		</BlockEditorProvider>
 	);
 };
