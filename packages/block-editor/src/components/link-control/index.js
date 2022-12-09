@@ -312,7 +312,7 @@ function LinkControl( {
 				<LinkControlEditControls
 					shouldShowEditControls={ shouldShowEditControls }
 				>
-					<LinkControlTextInput />
+					<LinkControlTextInput ref={ textInputRef } />
 
 					<LinkControlSearchInput
 						className="block-editor-link-control__field block-editor-link-control__search-input"
