@@ -11,7 +11,6 @@
  *
  * @group restapi
  * @covers Gutenberg_REST_Block_Patterns_Controller_6_2
- * @group something
  */
 class Gutenberg_REST_Block_Patterns_Controller_6_2_Test extends WP_Test_REST_Controller_Testcase {
 	/**

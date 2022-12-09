@@ -58,7 +58,7 @@ class Gutenberg_REST_Block_Patterns_Controller_6_2 extends Gutenberg_REST_Block_
 	 * Retrieves all block patterns.
 	 *
 	 * @since 6.0.0
-	 * @since 6.2.0 Added migration for old pattern categories.
+	 * @since 6.2.0 Added migration for old core pattern categories to the new ones.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
@@ -84,11 +84,14 @@ class Gutenberg_REST_Block_Patterns_Controller_6_2 extends Gutenberg_REST_Block_
 	}
 
 	/**
-	 * Migrates old pattern categories to new ones.
+	 * Migrates old core pattern categories to new ones.
+	 *
+	 * Core pattern categories are being revamped and we need to handle the migration
+	 * to the new ones and ensure backwards compatibility.
 	 *
 	 * @since 6.2.0
 	 *
-	 * @param array $pattern Raw pattern as registered, before any changes.
+	 * @param array $pattern Raw pattern as registered, before applying any changes.
 	 * @return array Migrated pattern.
 	 */
 	protected function migrate_pattern_categories( $pattern ) {
