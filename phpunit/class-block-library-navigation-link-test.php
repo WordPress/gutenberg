@@ -212,6 +212,35 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_returns_link_for_decoded_link() {
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:navigation-link {"label":"My Website","url": "https://example.com/?data=lzB%252Fzd%252FZA%253D%253D"} /-->'
+		);
+		$this->assertEquals( 1, count( $parsed_blocks ) );
+
+		$navigation_link_block = new WP_Block( $parsed_blocks[0], array() );
+
+		echo(
+				render_block_core_navigation_link(
+					$navigation_link_block->attributes,
+					array(),
+					$navigation_link_block
+				)
+		);
+
+		$this->assertEquals(
+			true,
+			strpos(
+				render_block_core_navigation_link(
+					$navigation_link_block->attributes,
+					array(),
+					$navigation_link_block
+				),
+				'https://example.com?data=lzB%2Fzd%2FZA%3D%3D'
+			) !== false
+		);
+	}
+
 	public function test_returns_empty_when_custom_post_type_draft() {
 		$page_id = self::$custom_draft->ID;
 
