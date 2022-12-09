@@ -75,10 +75,13 @@ function LinkControlTransforms( { clientId } ) {
 	const { replaceBlock } = useDispatch( blockEditorStore );
 
 	const featuredBlocks = [
+		'core/page-list',
 		'core/site-logo',
 		'core/social-links',
 		'core/search',
 	];
+
+	console.log( { blockTransforms } );
 
 	const transforms = blockTransforms.filter( ( item ) => {
 		return featuredBlocks.includes( item.name );

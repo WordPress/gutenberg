@@ -1755,6 +1755,7 @@ function getInsertUsage( state, id ) {
  * @return {boolean} Whether the given block type is allowed to be shown in the inserter.
  */
 const canIncludeBlockTypeInInserter = ( state, blockType, rootClientId ) => {
+	console.log( { blockType } );
 	if ( ! hasBlockSupport( blockType, 'inserter', true ) ) {
 		return false;
 	}
@@ -1971,7 +1972,7 @@ export const getInserterItems = createSelector(
 			};
 		};
 
-		const blockTypeInserterItems = getBlockTypes()
+		const blockTypeInserterItems = getBlockTransformItems()
 			.filter( ( blockType ) =>
 				canIncludeBlockTypeInInserter( state, blockType, rootClientId )
 			)
@@ -2062,6 +2063,7 @@ export const getBlockTransformItems = createSelector(
 		const buildBlockTypeTransformItem = buildBlockTypeItem( state, {
 			buildScope: 'transform',
 		} );
+		debugger;
 		const blockTypeTransformItems = getBlockTypes()
 			.filter( ( blockType ) =>
 				canIncludeBlockTypeInInserter( state, blockType, rootClientId )
