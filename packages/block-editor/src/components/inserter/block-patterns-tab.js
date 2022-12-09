@@ -83,6 +83,7 @@ export function BlockPatternsCategoryDialog( {
 	rootClientId,
 	onInsert,
 	category,
+	showTitlesAsTooltip,
 } ) {
 	const container = useRef();
 
@@ -103,6 +104,7 @@ export function BlockPatternsCategoryDialog( {
 				rootClientId={ rootClientId }
 				onInsert={ onInsert }
 				category={ category }
+				showTitlesAsTooltip={ showTitlesAsTooltip }
 			/>
 		</div>
 	);
@@ -112,6 +114,7 @@ export function BlockPatternsCategoryPanel( {
 	rootClientId,
 	onInsert,
 	category,
+	showTitlesAsTooltip,
 } ) {
 	const [ allPatterns, , onClick ] = usePatternsState(
 		onInsert,
@@ -161,6 +164,7 @@ export function BlockPatternsCategoryPanel( {
 				orientation="vertical"
 				category={ category.label }
 				isDraggable
+				showTitlesAsTooltip={ showTitlesAsTooltip }
 			/>
 		</div>
 	);
@@ -233,6 +237,7 @@ function BlockPatternsTabs( {
 							onInsert={ onInsert }
 							rootClientId={ rootClientId }
 							category={ category }
+							showTitlesAsTooltip={ false }
 						/>
 					) }
 				</MobileTabNavigation>
