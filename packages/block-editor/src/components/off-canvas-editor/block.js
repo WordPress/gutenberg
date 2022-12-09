@@ -160,6 +160,7 @@ function ListViewBlock( {
 
 	const listViewBlockEditClassName = classnames(
 		'block-editor-list-view-block__menu-cell',
+		'block-editor-list-view-block__edit-cell',
 		{ 'is-visible': isHovered || isFirstSelectedBlock }
 	);
 

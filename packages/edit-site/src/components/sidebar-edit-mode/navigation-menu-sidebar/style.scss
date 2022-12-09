@@ -24,6 +24,13 @@
 	}
 }
 
+.edit-site-navigation-inspector.is-offcanvas-editor-disabled {
+	.offcanvas-editor__appender,
+	.block-editor-list-view-block__edit-cell {
+		display: none;
+	}
+}
+
 .edit-site-navigation-inspector__placeholder {
 	padding: $grid-unit-10;
 	margin: $grid-unit-10;

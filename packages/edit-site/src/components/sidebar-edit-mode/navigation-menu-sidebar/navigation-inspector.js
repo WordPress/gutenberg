@@ -17,6 +17,10 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import NavigationMenu from './navigation-menu';
+/**
+ * External dependencies
+ */
+import classnames from 'classnames';
 
 const NAVIGATION_MENUS_QUERY = [ { per_page: -1, status: 'publish' } ];
 
@@ -168,7 +172,13 @@ export default function NavigationInspector() {
 	}, [ isLoadingInnerBlocks, hasLoadedInnerBlocks ] );
 
 	return (
-		<div className="edit-site-navigation-inspector">
+		<div
+			className={ classnames( 'edit-site-navigation-inspector', {
+				'is-offcanvas-editor-disabled':
+					window?.__experimentalEnableOffCanvasNavigationEditor !==
+					true,
+			} ) }
+		>
 			{ hasResolvedNavigationMenus && ! hasNavigationMenus && (
 				<p className="edit-site-navigation-inspector__empty-msg">
 					{ __( 'There are no Navigation Menus.' ) }
