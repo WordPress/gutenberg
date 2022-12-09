@@ -192,6 +192,7 @@ export function getStylesDeclarations(
 	tree = {}
 ) {
 	const isRoot = ROOT_BLOCK_SELECTOR === selector;
+	// need to add logic here to take into account the styles nested in variations
 	const output = Object.entries( STYLE_PROPERTY ).reduce(
 		(
 			declarations,
@@ -485,6 +486,16 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 	Object.entries( tree.styles?.blocks ?? {} ).forEach(
 		( [ blockName, node ] ) => {
 			const blockStyles = pickStyleKeys( node );
+
+			if ( node?.variations ) {
+				const variations = {};
+				Object.keys( node.variations ).forEach( ( variation ) => {
+					variations[ variation ] = pickStyleKeys(
+						node.variations[ variation ]
+					);
+				} );
+				blockStyles.variations = variations;
+			}
 			if (
 				!! blockStyles &&
 				!! blockSelectors?.[ blockName ]?.selector
@@ -500,6 +511,8 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 					styles: blockStyles,
 					featureSelectors:
 						blockSelectors[ blockName ].featureSelectors,
+					styleVariationSelectors:
+						blockSelectors[ blockName ].styleVariationSelectors,
 				} );
 			}
 

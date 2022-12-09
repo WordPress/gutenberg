@@ -1948,6 +1948,28 @@
 						"css": {},
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
+						},
+						"variations": {
+							"outline": {
+								"border": {},
+								"color": {},
+								"spacing": {},
+								"typography": {},
+								"filter": {},
+								"shadow": {},
+								"outline": {},
+								"css": {}
+							},
+							"fill": {
+								"border": {},
+								"color": {},
+								"spacing": {},
+								"typography": {},
+								"filter": {},
+								"shadow": {},
+								"outline": {},
+								"css": {}
+							}
 						}
 					},
 					"additionalProperties": false
