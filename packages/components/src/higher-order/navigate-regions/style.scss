@@ -42,8 +42,8 @@
 		}
 	}
 
-	// Publish sidebar toggle button shown when navigating regions.
-	.interface-interface-skeleton__actions {
+	// Publish sidebar toggle button shown when navigating regions and sidebar is closed.
+	&:not(.is-sidebar-opened) .interface-interface-skeleton__actions {
 		.interface-navigable-region__stacker,
 		.edit-post-layout__toggle-publish-panel {
 			outline: inherit;
