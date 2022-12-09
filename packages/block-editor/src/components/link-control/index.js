@@ -21,7 +21,7 @@ import useCreatePage from './use-create-page';
 import useInternalInputValue from './use-internal-input-value';
 import { ViewerFill } from './viewer-slot';
 import { DEFAULT_LINK_SETTINGS } from './constants';
-import { LinkControlDefault } from './link-control-default';
+import LinkControlDefault from './link-control-default';
 import LinkControlSettingsDrawer from './settings-drawer';
 import LinkControlSearchInput from './search-input';
 import LinkControlTextInput from './link-control-text-input';

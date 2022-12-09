@@ -9,7 +9,7 @@ import LinkControlNotice from './link-control-notice';
 import LinkControlEditControls from './link-control-edit-controls';
 import LinkControlLoading from './link-control-loading';
 
-export function LinkControlDefault( {
+export default function LinkControlDefault( {
 	searchInputPlaceholder,
 	withCreateSuggestion,
 	createPage,
