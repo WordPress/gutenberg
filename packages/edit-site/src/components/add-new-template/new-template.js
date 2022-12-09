@@ -276,7 +276,7 @@ function useMissingTemplates(
 	);
 	const missingDefaultTemplates = ( defaultTemplateTypes || [] ).filter(
 		( template ) =>
-			[ ...DEFAULT_TEMPLATE_SLUGS ].includes( template.slug ) &&
+			DEFAULT_TEMPLATE_SLUGS.includes( template.slug ) &&
 			! existingTemplateSlugs.includes( template.slug )
 	);
 	const onClickMenuItem = ( _entityForSuggestions ) => {
