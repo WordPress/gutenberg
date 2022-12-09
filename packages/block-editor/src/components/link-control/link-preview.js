@@ -23,14 +23,25 @@ import { ViewerSlot } from './viewer-slot';
 import useRichUrlData from './use-rich-url-data';
 import { useLinkControlContext } from './';
 
-export default function LinkPreview( {
-	value,
-	onEditClick,
-	hasRichPreviews = false,
-	hasUnlinkControl = false,
-	onRemove,
-} ) {
-	const { shouldShowLinkPreview } = useLinkControlContext();
+export default function LinkPreviewWrapper() {
+	const { value } = useLinkControlContext();
+
+	return (
+		<LinkPreview
+			key={ value?.url } // force remount when URL changes to avoid race conditions for rich previews
+		/>
+	);
+}
+
+function LinkPreview() {
+	const {
+		value,
+		shouldShowLinkPreview,
+		hasRichPreviews = false,
+		shownUnlinkControl: hasUnlinkControl = false,
+		onRemove,
+		onEditClick,
+	} = useLinkControlContext();
 
 	// Avoid fetching if rich previews are not desired.
 	const showRichPreviews = hasRichPreviews ? value?.url : null;

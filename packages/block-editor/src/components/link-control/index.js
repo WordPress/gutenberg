@@ -245,6 +245,11 @@ function LinkControl( {
 		stopEditing();
 	}, [ currentUrlInputValue, value, internalTextInputValue ] );
 
+	const onEditClick = useCallback(
+		() => setIsEditingLink( true ),
+		[ setIsEditingLink ]
+	);
+
 	const currentInputIsEmpty = ! currentUrlInputValue?.trim()?.length;
 
 	const shownUnlinkControl =
@@ -264,11 +269,12 @@ function LinkControl( {
 
 	const isLoading = isCreatingPage;
 
-	// Consumers can pass in a custom function which may return
-	// a different reference resulting in the context being
+	// Consumers can pass in custom functions which may return
+	// a different references resulting in the context being
 	// invalidated causing all context consumers to re-render.
-	// Memoize the onChange callback to avoid this.
+	// Memoize these callbacks to avoid this.
 	const memoizedOnChange = useCallback( onChange, [] );
+	const memoizedOnRemove = useCallback( onRemove, [] );
 
 	// Todo
 	// - memoize context value
@@ -276,6 +282,7 @@ function LinkControl( {
 	const contextValue = {
 		value,
 		onChange: memoizedOnChange,
+		onRemove: memoizedOnRemove,
 		settings, // todo: consider memoizing
 		internalTextInputValue, // lift to standard state mechanic
 		setInternalTextInputValue, // lift to standard state mechanic
@@ -288,6 +295,9 @@ function LinkControl( {
 		shouldShowLinkPreview,
 		showSettingsDrawer,
 		isLoading,
+		hasRichPreviews,
+		shownUnlinkControl,
+		onEditClick,
 	};
 
 	return (
@@ -324,14 +334,7 @@ function LinkControl( {
 					<LinkControlNotice />
 				</LinkControlEditControls>
 
-				<LinkPreview
-					key={ value?.url } // force remount when URL changes to avoid race conditions for rich previews
-					value={ value }
-					onEditClick={ () => setIsEditingLink( true ) }
-					hasRichPreviews={ hasRichPreviews }
-					hasUnlinkControl={ shownUnlinkControl }
-					onRemove={ onRemove }
-				/>
+				<LinkPreview />
 
 				<LinkControlSettingsDrawer />
 
