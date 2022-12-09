@@ -3,7 +3,7 @@
 exports[`DotTip should render correctly 1`] = `
 <div
   aria-label="Editor tips"
-  class="components-popover nux-dot-tip"
+  class="components-popover nux-dot-tip is-positioned"
   role="dialog"
   style="position: absolute; opacity: 0; transform: translateX(-2em) scale(0) translateZ(0); transform-origin: 0% 50% 0; left: 0px; top: 0px;"
   tabindex="-1"
