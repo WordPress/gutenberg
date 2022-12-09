@@ -80,6 +80,22 @@ class WP_HTML_Attribute_Sourcer_Test extends WP_UnitTestCase {
 					)
 				)
 			),
+
+			array(
+				array(
+					'attributes' => array( 'url' => 'poster.pdf' ),
+					'unparsed' => array(),
+				),
+				'<a href="some-link">Some Place</a><a download href="poster.pdf">Download the poster</a><a>No Link</a>',
+				array(
+					'url' => array(
+						'type' => 'string',
+						'source' => 'attribute',
+						'attribute' => 'href',
+						'selector' => 'a[download]',
+					),
+				),
+			),
 		);
 	}
 
@@ -105,11 +121,11 @@ class WP_HTML_Attribute_Sourcer_Test extends WP_UnitTestCase {
 				array( 'type' => 'string', 'source' => 'html' ),
 			),
 			array(
-				array( 'type' => 'html', 'selector' => array( 'type' => 'element', 'identifier' => 'code' ) ),
+				array( 'type' => 'html', 'selector' => array( array( 'type' => 'element', 'identifier' => 'code' ) ) ),
 				array( 'type' => 'string', 'source' => 'html', 'selector' => 'code' ),
 			),
 			array(
-				array( 'type' => 'attribute', 'selector' => array( 'type' => 'element', 'identifier' => 'img' ), 'attribute' => 'src' ),
+				array( 'type' => 'attribute', 'selector' => array( array( 'type' => 'element', 'identifier' => 'img' ) ), 'attribute' => 'src' ),
 				array( 'type' => 'string', 'source' => 'attribute', 'selector' => 'img', 'attribute' => 'src' ),
 			),
 		);
@@ -124,9 +140,9 @@ class WP_HTML_Attribute_Sourcer_Test extends WP_UnitTestCase {
 
 	public function data_parsed_css_selectors() {
 		return array(
-			array( array( 'type' => 'element', 'identifier' => 'img' ), 'img' ),
-			array( array( 'type' => 'class', 'identifier' => 'block-group' ), '.block-group' ),
-			array( array( 'type' => 'hash', 'identifier' => 'input-form' ), '#input-form' ),
+			array( array( array( 'type' => 'element', 'identifier' => 'img' ) ), 'img' ),
+			array( array( array( 'type' => 'class', 'identifier' => 'block-group' ) ), '.block-group' ),
+			array( array( array( 'type' => 'hash', 'identifier' => 'input-form' ) ), '#input-form' ),
 		);
 	}
 

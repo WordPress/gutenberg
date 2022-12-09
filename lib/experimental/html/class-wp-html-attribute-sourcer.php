@@ -33,7 +33,7 @@
  *     video
  */
 
-require_once __DIR__ . '/class-wp-html-naive-processor.php';
+require_once __DIR__ . '/class-wp-html-processor.php';
 
 /*
  * @see PHP docs for array_is_list: user-contributed polyfill
@@ -101,7 +101,7 @@ class WP_HTML_Attribute_Sourcer {
 
 			switch ( $sourcer['type'] ) {
 				case 'html':
-					$attributes[ $name ] = self::get_inner_html( $tags );
+					$attributes[ $name ] = $tags->get_content_inside_balanced_tags();
 					continue 2;
 
 				case 'attribute':
@@ -116,98 +116,31 @@ class WP_HTML_Attribute_Sourcer {
 		);
 	}
 
-	public static function select( $selector, $html ) {
-		$tags = new WP_HTML_Naive_Processor( $html );
+	public static function select( $selectors, $html ) {
+		$tags = new WP_HTML_Processor( $html );
 
-		if ( array_is_list( $selector ) ) {
-			while ( $tags->next_tag() ) {
-				foreach ( $selector as $s ) {
-					if ( 'element' === $s['type'] && $tags->get_tag() === strtoupper( $s['identifier'] ) ) {
-						return $tags;
-					}
+		while ( $tags->next_tag() ) {
+			foreach ( $selectors as $s ) {
+				if ( ! empty( $s['has_attribute'] ) && null === $tags->get_attribute( $s['has_attribute'] ) ) {
+					continue;
+				}
 
-					// @TODO: $tags->has_class() would be _really_ handy here.
-					if ( 'class' === $s['type'] && preg_match( "~\b{$s['identifier']}\b~", $tags->get_attribute( 'class' ) ) ) {
-						return $tags;
-					}
+				if ( 'element' === $s['type'] && $tags->get_tag() === strtoupper( $s['identifier'] ) ) {
+					return $tags;
+				}
 
-					if ( 'hash' === $s['type'] && $s['identifier'] === $tags->get_attribute( 'id' ) ) {
-						return $tags;
-					}
+				// @TODO: $tags->has_class() would be _really_ handy here.
+				if ( 'class' === $s['type'] && preg_match( "~\b{$s['identifier']}\b~", $tags->get_attribute( 'class' ) ) ) {
+					return $tags;
+				}
+
+				if ( 'hash' === $s['type'] && $s['identifier'] === $tags->get_attribute( 'id' ) ) {
+					return $tags;
 				}
 			}
-
-			return null;
-		}
-
-		switch ( $selector['type'] ) {
-			case 'element':
-				$tags->next_tag( [ 'tag_name' => $selector['identifier'] ] );
-				return $tags;
-
-			case 'class':
-				$tags->next_tag( [ 'class_name' => $selector['identifier'] ] );
-				return $tags;
-
-			case 'hash':
-				while ( $tags->next_tag() ) {
-					if ( $selector['identifier'] === $tags->get_attribute( 'id' ) ) {
-						return $tags;
-					}
-				}
 		}
 
 		return null;
-	}
-
-	public static function get_inner_html( WP_HTML_Naive_Processor $tags ) {
-		$tags->set_bookmark( 'start' );
-		$tag_name = $tags->get_tag();
-		$depth = 1;
-
-		if ( self::is_void_element( $tag_name ) ) {
-			return '';
-		}
-
-		while ( $tags->next_tag( [ 'tag_closers' => 'visit' ] ) ) {
-			if ( $tags->get_tag() !== $tag_name ) {
-				continue;
-			}
-
-			if ( $tags->is_tag_closer() && $depth === 1 ) {
-				$tags->set_bookmark( 'end' );
-				break;
-			}
-
-			$depth += $tags->is_tag_closer() ? -1 : 1;
-		}
-
-		return $tags->inner_content( 'start', 'end' );
-	}
-
-	/**
-	 * @see https://html.spec.whatwg.org/#elements-2
-	 */
-	public static function is_void_element( $tag_name ) {
-		switch ( $tag_name ) {
-			case 'area':
-			case 'base':
-			case 'br':
-			case 'col':
-			case 'embed':
-			case 'hr':
-			case 'img':
-			case 'input':
-			case 'link':
-			case 'meta':
-			case 'source':
-			case 'track':
-			case 'wbr':
-				return true;
-
-			default:
-				return false;
-		}
 	}
 
 	public static function parse_definition( $definition ) {
@@ -246,72 +179,90 @@ class WP_HTML_Attribute_Sourcer {
 	}
 
 	public static function parse_selector( $s, $at = 0 ) {
-		$selectors = explode( ',', $s );
-		if ( count( $selectors ) > 1 ) {
-			$parsed = [];
+		$budget = 1000;
+		$selectors = [];
 
-			foreach ( $selectors as $selector ) {
-				$parsed[] = self::parse_selector( $selector, strspn( $selector, " \r\t\f\n" ) );
+		while ( $at < strlen( $s ) && $budget-- > 0 ) {
+			$type = 'element';
+			$attribute = null;
+
+			switch ( $s[ $at ] ) {
+				case '+':
+					// no support for adjacent sibling combinator
+					return null;
+
+				case '>':
+					// no support for child combinator
+					return null;
+
+				case '~':
+					// no support for general sibling combinator
+					return null;
+
+				case ' ':
+					// no support for descendant combinator
+					return null;
+
+				case '[':
+					/*
+					 * Only current support is for checking of presence of attributes
+					 * with a very-limited subset of allowable names, not whether the
+					 * attribute conforms to a given value or is allowed in HTML.
+					 */
+					$at++;
+					$inside_length = strspn( $s, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-", $at );
+					if ( ']' !== $s[ $at + $inside_length ] ) {
+						return null;
+					}
+
+					$attribute = substr( $s, $at, $inside_length );
+					$at += $inside_length + 1;
+
+					$selector = array_pop( $selectors );
+					$selector['has_attribute'] = $attribute;
+					$selectors[] = $selector;
+
+					continue 2;
+
+				case ',':
+					$at++;
+					$at += strspn( $s, " \t\f\r\n", $at );
+					continue 2;
+
+				case ':':
+					// no support for pseudo-selectors
+					return null;
+
+				case '#':
+					$type = 'hash';
+					$at++;
+					break;
+
+				case '.':
+					$type = 'class';
+					$at++;
+					break;
 			}
 
-			return $parsed;
+			// @TODO: Hashes don't have to start with `nmstart` so this might reject valid hash names.
+			$identifier = self::parse_css_identifier( $s, $at );
+			if ( null === $identifier ) {
+				return null;
+			}
+
+			$selector = array( 'type' => $type, 'identifier' => $identifier );
+			if ( null !== $attribute ) {
+				$selector['has_attribute'] = $selector;
+			}
+
+			$selectors[] = $selector;
+
+			$at += strlen( $identifier );
 		}
 
-		$type = 'element';
-
-		switch ( $s[ $at ] ) {
-			case '+':
-				// no support for adjacent sibling combinator
-				return null;
-
-			case '>':
-				// no support for child combinator
-				return null;
-
-			case '~':
-				// no support for general sibling combinator
-				return null;
-
-			case ' ':
-				// no support for descendant combinator
-				return null;
-
-			case '[':
-				// no support for attribute
-				return null;
-
-			case ',':
-				// we shouldn't get here because we're exploding at the start
-				// of this function; this is a bug if we're here.
-				return null;
-
-			case ':':
-				// no support for pseudo-selectors
-				return null;
-
-			case '#':
-				$type = 'hash';
-				$at++;
-				break;
-
-			case '.':
-				$type = 'class';
-				$at++;
-				break;
-		}
-
-		// @TODO: Hashes don't have to start with `nmstart` so this might reject valid hash names.
-		$identifier = self::parse_css_identifier( $s, $at );
-		if ( null === $identifier ) {
-			return null;
-		}
-
-		if ( $at + strlen( $identifier ) < strlen( $s ) ) {
-			// no support for anything more complicated than a simple selector
-			return null;
-		}
-
-		return array( 'type' => $type, 'identifier' => $identifier );
+		return $at === strlen( $s )
+			? $selectors
+			: null;
 	}
 
 	/**
