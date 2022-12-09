@@ -261,6 +261,8 @@ function LinkControl( {
 	const shouldShowEditControls =
 		( isEditingLink || ! value ) && ! isCreatingPage;
 
+	const shouldShowLinkPreview = value && ! isEditingLink && ! isCreatingPage;
+
 	// Todo
 	// - memoize context value
 	// - create seperate context's to avoid re-renders
@@ -274,6 +276,7 @@ function LinkControl( {
 		currentUrlInputValue,
 		createPageErrorMessage, // needs extracting to generic error message
 		shouldShowEditControls,
+		shouldShowLinkPreview,
 	};
 
 	return (
@@ -314,16 +317,14 @@ function LinkControl( {
 					<LinkControlNotice />
 				</LinkControlEditControls>
 
-				{ value && ! isEditingLink && ! isCreatingPage && (
-					<LinkPreview
-						key={ value?.url } // force remount when URL changes to avoid race conditions for rich previews
-						value={ value }
-						onEditClick={ () => setIsEditingLink( true ) }
-						hasRichPreviews={ hasRichPreviews }
-						hasUnlinkControl={ shownUnlinkControl }
-						onRemove={ onRemove }
-					/>
-				) }
+				<LinkPreview
+					key={ value?.url } // force remount when URL changes to avoid race conditions for rich previews
+					value={ value }
+					onEditClick={ () => setIsEditingLink( true ) }
+					hasRichPreviews={ hasRichPreviews }
+					hasUnlinkControl={ shownUnlinkControl }
+					onRemove={ onRemove }
+				/>
 
 				{ showSettingsDrawer && (
 					<div className="block-editor-link-control__tools">

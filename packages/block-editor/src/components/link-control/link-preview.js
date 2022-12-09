@@ -20,8 +20,8 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
  * Internal dependencies
  */
 import { ViewerSlot } from './viewer-slot';
-
 import useRichUrlData from './use-rich-url-data';
+import { useLinkControlContext } from './';
 
 export default function LinkPreview( {
 	value,
@@ -30,6 +30,8 @@ export default function LinkPreview( {
 	hasUnlinkControl = false,
 	onRemove,
 } ) {
+	const { shouldShowLinkPreview } = useLinkControlContext();
+
 	// Avoid fetching if rich previews are not desired.
 	const showRichPreviews = hasRichPreviews ? value?.url : null;
 
@@ -55,6 +57,10 @@ export default function LinkPreview( {
 		icon = <Icon icon={ info } size={ 32 } />;
 	} else {
 		icon = <Icon icon={ globe } />;
+	}
+
+	if ( ! shouldShowLinkPreview ) {
+		return null;
 	}
 
 	return (
