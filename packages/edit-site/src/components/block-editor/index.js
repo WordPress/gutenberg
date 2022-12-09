@@ -62,7 +62,6 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const {
 		storedSettings,
 		templateType,
-		templateId,
 		page,
 		isNavigationSidebarOpen,
 		canvasMode,
@@ -71,7 +70,6 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			const {
 				getSettings,
 				getEditedPostType,
-				getEditedPostId,
 				getPage,
 				__unstableGetCanvasMode,
 			} = select( editSiteStore );
@@ -79,7 +77,6 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			return {
 				storedSettings: getSettings( setIsInserterOpen ),
 				templateType: getEditedPostType(),
-				templateId: getEditedPostId(),
 				page: getPage(),
 				isNavigationSidebarOpen:
 					select( interfaceStore ).getActiveComplementaryArea(
@@ -257,8 +254,6 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 							<BlockEditorKeyboardShortcuts.Register />
 							<BackButton />
 							<ResizableEditor
-								// Reinitialize the editor and reset the states when the template changes.
-								key={ templateId }
 								enableResizing={ enableResizing }
 								height={ sizes.height }
 							>
