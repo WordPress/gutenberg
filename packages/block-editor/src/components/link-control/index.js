@@ -298,6 +298,7 @@ function LinkControl( {
 		hasRichPreviews,
 		shownUnlinkControl,
 		onEditClick,
+		textInputRef,
 	};
 
 	return (
@@ -309,10 +310,8 @@ function LinkControl( {
 			>
 				<LinkControlLoading />
 
-				<LinkControlEditControls
-					shouldShowEditControls={ shouldShowEditControls }
-				>
-					<LinkControlTextInput ref={ textInputRef } />
+				<LinkControlEditControls>
+					<LinkControlTextInput />
 
 					<LinkControlSearchInput
 						className="block-editor-link-control__field block-editor-link-control__search-input"

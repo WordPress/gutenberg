@@ -10,6 +10,12 @@ import { ENTER } from '@wordpress/keycodes';
  */
 import { useLinkControlContext } from '.';
 
+export default function LinkControlTextInputWrapper() {
+	const { textInputRef } = useLinkControlContext();
+
+	return <LinkControlTextInput ref={ textInputRef } />;
+}
+
 const LinkControlTextInput = forwardRef( ( _props, ref ) => {
 	const {
 		showTextControl,
@@ -45,5 +51,3 @@ const LinkControlTextInput = forwardRef( ( _props, ref ) => {
 		/>
 	);
 } );
-
-export default LinkControlTextInput;
