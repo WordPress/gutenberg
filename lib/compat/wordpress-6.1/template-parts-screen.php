@@ -103,8 +103,6 @@ function gutenberg_template_parts_screen_init( $hook ) {
 		}
 	);
 
-	$extra_template_types = apply_filters( 'extra_template_types', array() );
-
 	$indexed_template_types = array();
 	foreach ( get_default_block_template_types() as $slug => $template_type ) {
 		$template_type['slug']    = (string) $slug;
@@ -116,7 +114,6 @@ function gutenberg_template_parts_screen_init( $hook ) {
 		'siteUrl'                   => site_url(),
 		'postsPerPage'              => get_option( 'posts_per_page' ),
 		'styles'                    => get_block_editor_theme_styles(),
-		'extraTemplateTypes'        => $extra_template_types,
 		'defaultTemplateTypes'      => $indexed_template_types,
 		'defaultTemplatePartAreas'  => get_allowed_block_template_part_areas(),
 		'supportsLayout'            => wp_theme_has_theme_json(),
