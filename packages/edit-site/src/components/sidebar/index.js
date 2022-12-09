@@ -1,19 +1,23 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalVStack as VStack } from '@wordpress/components';
+import { __experimentalNavigatorProvider as NavigatorProvider } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import SidebarNavigationRoot from '../sidebar-navigation-root';
+import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
+import SidebarNavigationScreenTemplates from '../sidebar-navigation-screen-templates';
 
 export function Sidebar() {
 	return (
-		<VStack alignment="top" spacing={ 10 }>
-			<div className="edit-site-sidebar__content">
-				<SidebarNavigationRoot />
-			</div>
-		</VStack>
+		<NavigatorProvider
+			className="edit-site-sidebar__content"
+			initialPath="/"
+		>
+			<SidebarNavigationScreenMain />
+			<SidebarNavigationScreenTemplates postType="wp_template" />
+			<SidebarNavigationScreenTemplates postType="wp_template_part" />
+		</NavigatorProvider>
 	);
 }
