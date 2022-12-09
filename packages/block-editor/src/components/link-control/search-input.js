@@ -16,6 +16,7 @@ import { URLInput } from '../';
 import LinkControlSearchResults from './search-results';
 import { CREATE_TYPE } from './constants';
 import useSearchHandler from './use-search-handler';
+import { useLinkControlContext } from './';
 
 // Must be a function as otherwise URLInput will default
 // to the fetchLinkSuggestions passed in block editor settings
@@ -27,9 +28,7 @@ const noop = () => {};
 const LinkControlSearchInput = forwardRef(
 	(
 		{
-			value,
 			children,
-			currentLink = {},
 			className = null,
 			placeholder = null,
 			withCreateSuggestion = false,
@@ -50,6 +49,11 @@ const LinkControlSearchInput = forwardRef(
 		},
 		ref
 	) => {
+		// Aliasing the values to avoid confusion during
+		// refactoring of this component.
+		const { value: currentLink = {}, currentUrlInputValue: value } =
+			useLinkControlContext();
+
 		const genericSearchHandler = useSearchHandler(
 			suggestionsQuery,
 			allowDirectEntry,

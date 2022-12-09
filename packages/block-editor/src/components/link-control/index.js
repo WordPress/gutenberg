@@ -258,6 +258,9 @@ function LinkControl( {
 	// See https://github.com/WordPress/gutenberg/pull/33849/#issuecomment-932194927.
 	const showTextControl = value?.url?.trim()?.length > 0 && hasTextControl;
 
+	// Todo
+	// - memoize context value
+	// - create seperate context's to avoid re-renders
 	const contextValue = {
 		value,
 		internalTextInputValue, // lift to standard state mechanic
@@ -265,6 +268,7 @@ function LinkControl( {
 		showTextControl,
 		currentInputIsEmpty,
 		handleSubmit,
+		currentUrlInputValue,
 	};
 
 	return (
@@ -291,10 +295,8 @@ function LinkControl( {
 							<LinkControlTextInput />
 
 							<LinkControlSearchInput
-								currentLink={ value }
 								className="block-editor-link-control__field block-editor-link-control__search-input"
 								placeholder={ searchInputPlaceholder }
-								value={ currentUrlInputValue }
 								withCreateSuggestion={ withCreateSuggestion }
 								onCreateSuggestion={ createPage }
 								onChange={ setInternalUrlInputValue }
