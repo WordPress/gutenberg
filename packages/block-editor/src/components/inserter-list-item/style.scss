@@ -17,13 +17,13 @@
 						color: var(--wp-block-synced-color) !important;
 						filter: brightness(0.95);
 					}
-		
+
 					svg {
 						color: var(--wp-block-synced-color) !important;
 					}
 				}
 
-				&:after {
+				&::after {
 					background: var(--wp-block-synced-color);
 				}
 			}
