@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Spinner, Notice } from '@wordpress/components';
+import { Spinner } from '@wordpress/components';
 
 import { __ } from '@wordpress/i18n';
 import {
@@ -26,6 +26,7 @@ import LinkControlSettingsDrawer from './settings-drawer';
 import LinkControlSearchInput from './search-input';
 import LinkControlTextInput from './text-input';
 import LinkPreview from './link-preview';
+import LinkControlNotice from './link-control-notice';
 import useCreatePage from './use-create-page';
 import useInternalInputValue from './use-internal-input-value';
 import { ViewerFill } from './viewer-slot';
@@ -168,8 +169,11 @@ function LinkControl( {
 			: ! value || ! value.url
 	);
 
-	const { createPage, isCreatingPage, errorMessage } =
-		useCreatePage( createSuggestion );
+	const {
+		createPage,
+		isCreatingPage,
+		errorMessage: createPageErrorMessage,
+	} = useCreatePage( createSuggestion );
 
 	useEffect( () => {
 		if (
@@ -269,6 +273,7 @@ function LinkControl( {
 		currentInputIsEmpty,
 		handleSubmit,
 		currentUrlInputValue,
+		createPageErrorMessage, // needs extracting to generic error message
 	};
 
 	return (
@@ -314,15 +319,8 @@ function LinkControl( {
 								useLabel={ showTextControl }
 							/>
 						</div>
-						{ errorMessage && (
-							<Notice
-								className="block-editor-link-control__search-error"
-								status="error"
-								isDismissible={ false }
-							>
-								{ errorMessage }
-							</Notice>
-						) }
+
+						<LinkControlNotice />
 					</>
 				) }
 
