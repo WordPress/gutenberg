@@ -7,7 +7,7 @@ import {
 	initializeEditor,
 	render,
 	fireEvent,
-	waitFor,
+	waitForModalVisible,
 	within,
 	getBlock,
 	openBlockSettings,
@@ -185,14 +185,14 @@ describe( 'when an image is attached', () => {
 	} );
 
 	it( 'toggles a fixed background', async () => {
-		const { getByText } = render(
+		const screen = render(
 			<CoverEdit
 				attributes={ attributes }
 				setAttributes={ setAttributes }
 			/>
 		);
-		const fixedBackgroundButton = await waitFor( () =>
-			getByText( 'Fixed background' )
+		const fixedBackgroundButton = await screen.findByText(
+			'Fixed background'
 		);
 		fireEvent.press( fixedBackgroundButton );
 
@@ -256,21 +256,24 @@ describe( 'when an image is attached', () => {
 	} );
 
 	it( 'discards canceled focal point changes', async () => {
-		const { getByText, getByLabelText } = render(
+		const screen = render(
 			<CoverEdit
 				attributes={ attributes }
 				setAttributes={ setAttributes }
 			/>
 		);
-		const editFocalPointButton = await waitFor( () =>
-			getByText( 'Edit focal point' )
+		const editFocalPointButton = await screen.findByText(
+			'Edit focal point'
 		);
 		fireEvent.press( editFocalPointButton );
 		fireEvent.press(
-			getByText( ( attributes.focalPoint.x * 100 ).toString() )
+			screen.getByText( ( attributes.focalPoint.x * 100 ).toString() )
 		);
-		fireEvent.changeText( getByLabelText( 'X-Axis Position' ), '80' );
-		fireEvent.press( getByLabelText( 'Go back' ) );
+		fireEvent.changeText(
+			screen.getByLabelText( 'X-Axis Position' ),
+			'80'
+		);
+		fireEvent.press( screen.getByLabelText( 'Go back' ) );
 
 		expect( setAttributes ).not.toHaveBeenCalledWith(
 			expect.objectContaining( {
@@ -356,7 +359,7 @@ describe( 'color settings', () => {
 
 		// Wait for Block Settings to be visible.
 		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
-		await waitFor( () => blockSettingsModal.props.isVisible );
+		await waitForModalVisible( blockSettingsModal );
 
 		// Open the overlay color settings.
 		const colorOverlay = await screen.findByLabelText( 'Color. Empty' );
@@ -391,7 +394,7 @@ describe( 'color settings', () => {
 
 		// Wait for Block Settings to be visible.
 		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
-		await waitFor( () => blockSettingsModal.props.isVisible );
+		await waitForModalVisible( blockSettingsModal );
 
 		// Open the overlay color settings.
 		const colorOverlay = await screen.findByLabelText( 'Color. Empty' );
@@ -447,7 +450,7 @@ describe( 'color settings', () => {
 
 		// Wait for Block Settings to be visible.
 		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
-		await waitFor( () => blockSettingsModal.props.isVisible );
+		await waitForModalVisible( blockSettingsModal );
 
 		// Open the overlay color settings.
 		const colorOverlay = await screen.findByLabelText( 'Color. Empty' );
@@ -503,7 +506,7 @@ describe( 'color settings', () => {
 
 		// Wait for Block Settings to be visible.
 		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
-		await waitFor( () => blockSettingsModal.props.isVisible );
+		await waitForModalVisible( blockSettingsModal );
 
 		// Open the overlay color settings.
 		const colorOverlay = await screen.findByLabelText( 'Color. Empty' );

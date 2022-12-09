@@ -9,8 +9,8 @@ import {
 	openBlockSettings,
 	within,
 	getBlock,
-	waitFor,
 	dismissModal,
+	waitForModalVisible,
 } from 'test/helpers';
 
 /**
@@ -142,19 +142,17 @@ describe( 'Columns block', () => {
 
 		it( 'reaches the minimum limit of number of column blocks', async () => {
 			const screen = await initializeEditor();
-			const { getByLabelText, getByTestId } = screen;
 
 			// Add block
 			await addBlock( screen, 'Columns' );
 
 			// Wait for the variations modal to be visible
-			await waitFor(
-				() => getByTestId( 'block-variation-modal' ).props.isVisible
+			const blockVariationModal = await screen.findByTestId(
+				'block-variation-modal'
 			);
+			await waitForModalVisible( blockVariationModal );
 
 			// Select a column variation
-			const blockVariationModal = getByTestId( 'block-variation-modal' );
-			await waitFor( () => blockVariationModal.props.isVisible );
 			const threeColumnLayout =
 				within( blockVariationModal ).getByLabelText(
 					/33 \/ 33 \/ 33 block/
@@ -169,7 +167,7 @@ describe( 'Columns block', () => {
 			await openBlockSettings( screen );
 
 			// Update the number of columns by adding one
-			const columnsControl = getByLabelText( /Number of columns/ );
+			const columnsControl = screen.getByLabelText( /Number of columns/ );
 			fireEvent( columnsControl, 'accessibilityAction', {
 				nativeEvent: { actionName: 'increment' },
 			} );
@@ -274,20 +272,19 @@ describe( 'Columns block', () => {
 		const screen = await initializeEditor( {
 			initialHtml: TWO_COLUMNS_BLOCK_HTML,
 		} );
-		const { getByLabelText } = screen;
 
 		// Get block
 		const columnsBlock = await getBlock( screen, 'Columns' );
 		fireEvent.press( columnsBlock );
 
 		// Open vertical alignment menu
-		const verticalAlignmentButton = getByLabelText(
+		const verticalAlignmentButton = screen.getByLabelText(
 			/Change vertical alignment/
 		);
 		fireEvent.press( verticalAlignmentButton );
 
 		// Get Align top button
-		const verticalTopAlignmentButton = getByLabelText( /Align top/ );
+		const verticalTopAlignmentButton = screen.getByLabelText( /Align top/ );
 		fireEvent.press( verticalTopAlignmentButton );
 
 		// Get the first column
@@ -298,7 +295,8 @@ describe( 'Columns block', () => {
 		fireEvent.press( verticalAlignmentButton );
 
 		// Get Align bottom button
-		const verticalBottomAlignmentButton = getByLabelText( /Align bottom/ );
+		const verticalBottomAlignmentButton =
+			screen.getByLabelText( /Align bottom/ );
 		fireEvent.press( verticalBottomAlignmentButton );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
@@ -335,19 +333,17 @@ describe( 'Columns block', () => {
 	describe( 'when using columns percentage mechanism', () => {
 		it( "updates the slider's input value", async () => {
 			const screen = await initializeEditor();
-			const { getByLabelText, getByTestId } = screen;
 
 			// Add block
 			await addBlock( screen, 'Columns' );
 
 			// Wait for the variations modal to be visible
-			await waitFor(
-				() => getByTestId( 'block-variation-modal' ).props.isVisible
+			const blockVariationModal = await screen.findByTestId(
+				'block-variation-modal'
 			);
+			await waitForModalVisible( blockVariationModal );
 
 			// Select a column variation
-			const blockVariationModal = getByTestId( 'block-variation-modal' );
-			await waitFor( () => blockVariationModal.props.isVisible );
 			const threeColumnLayout =
 				within( blockVariationModal ).getByLabelText(
 					/33 \/ 33 \/ 33 block/
@@ -362,7 +358,7 @@ describe( 'Columns block', () => {
 			await openBlockSettings( screen );
 
 			// Get width control
-			const widthControl = getByLabelText( /Width. Value is/ );
+			const widthControl = screen.getByLabelText( /Width. Value is/ );
 			fireEvent.press( within( widthControl ).getByText( '33.3' ) );
 			const widthTextInput =
 				within( widthControl ).getByDisplayValue( '33.3' );
@@ -431,21 +427,17 @@ describe( 'Columns block', () => {
 			'sets the predefined percentages for %s',
 			async ( layout ) => {
 				const screen = await initializeEditor();
-				const { getByTestId } = screen;
 
 				// Add block
 				await addBlock( screen, 'Columns' );
 
 				// Wait for the variations modal to be visible
-				await waitFor(
-					() => getByTestId( 'block-variation-modal' ).props.isVisible
-				);
-
-				// Select a column variation
-				const blockVariationModal = getByTestId(
+				const blockVariationModal = await screen.findByTestId(
 					'block-variation-modal'
 				);
-				await waitFor( () => blockVariationModal.props.isVisible );
+				await waitForModalVisible( blockVariationModal );
+
+				// Select a column variation
 				const columnLayout =
 					within( blockVariationModal ).getByLabelText( layout );
 				fireEvent.press( columnLayout );

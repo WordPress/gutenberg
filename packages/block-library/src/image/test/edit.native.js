@@ -7,7 +7,6 @@ import {
 	initializeEditor,
 	getEditorHtml,
 	render,
-	waitFor,
 	setupApiFetch,
 } from 'test/helpers';
 import { Image } from 'react-native';
@@ -173,7 +172,7 @@ describe( 'Image Block', () => {
 			'wordpress.org'
 		);
 		fireEvent.press( screen.getByLabelText( 'Apply' ) );
-		await waitFor(
+		await act(
 			() => new Promise( ( resolve ) => setTimeout( resolve, 100 ) )
 		);
 
