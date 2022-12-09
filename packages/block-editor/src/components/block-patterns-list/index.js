@@ -98,7 +98,7 @@ function BlockPatternList( {
 	onClickPattern,
 	orientation,
 	label = __( 'Block Patterns' ),
-	isPatternTitleTooltip,
+	showTitlesAsTooltip,
 } ) {
 	const composite = useCompositeState( { orientation } );
 	return (
@@ -117,7 +117,7 @@ function BlockPatternList( {
 						onClick={ onClickPattern }
 						isDraggable={ isDraggable }
 						composite={ composite }
-						showTooltip={ isPatternTitleTooltip }
+						showTooltip={ showTitlesAsTooltip }
 					/>
 				) : (
 					<BlockPatternPlaceholder key={ pattern.name } />

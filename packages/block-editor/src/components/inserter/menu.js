@@ -293,7 +293,7 @@ function InserterMenu(
 					rootClientId={ destinationRootClientId }
 					onInsert={ onInsertPattern }
 					category={ selectedPatternCategory }
-					isPatternTitleTooltip
+					showTitlesAsTooltip
 				/>
 			) }
 		</div>
