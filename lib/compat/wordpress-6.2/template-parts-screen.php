@@ -5,7 +5,6 @@
  *
  * Note: Parts that need to be ported back should have inline comments.
  *
- * @param string $hook Current page hook.
  * @return void
  */
 function gutenberg_add_custom_settings() {
