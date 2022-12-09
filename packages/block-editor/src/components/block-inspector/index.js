@@ -21,6 +21,8 @@ import { useMemo, useCallback } from '@wordpress/element';
 /**
  * External dependencies
  */
+
+// eslint-disable-next-line no-restricted-imports
 import { motion } from 'framer-motion';
 
 /**
