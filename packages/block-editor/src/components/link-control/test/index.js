@@ -1917,7 +1917,7 @@ describe( 'Component composition', () => {
 				hasTextControl
 				onChange={ mockOnChange }
 			>
-				<MyCustomLinkControl />
+				{ () => <MyCustomLinkControl /> }
 			</LinkControl>
 		);
 
@@ -1967,7 +1967,7 @@ describe( 'Component composition', () => {
 				hasTextControl
 				onChange={ mockOnChange }
 			>
-				<MyCustomLinkControl />
+				{ () => <MyCustomLinkControl /> }
 			</LinkControl>
 		);
 

@@ -9,8 +9,6 @@ import {
 	useContext,
 	useCallback,
 	createContext,
-	Children,
-	cloneElement,
 } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 
@@ -305,6 +303,8 @@ function LinkControl( {
 		textInputRef,
 	};
 
+	const renderChildren = unwrapArray( children );
+
 	return (
 		<LinkControlContext.Provider value={ contextValue }>
 			<div
@@ -313,23 +313,21 @@ function LinkControl( {
 				className="block-editor-link-control"
 			>
 				{ children ? (
-					Children.map( children, ( child ) =>
-						cloneElement( child, {
-							searchInputPlaceholder,
-							withCreateSuggestion,
-							createPage,
-							setInternalUrlInputValue,
-							handleSelectSuggestion,
-							showInitialSuggestions,
-							noDirectEntry,
-							showSuggestions,
-							suggestionsQuery,
-							noURLSuggestion,
-							createSuggestionButtonText,
-							showTextControl,
-							renderControlBottom,
-						} )
-					)
+					renderChildren( {
+						searchInputPlaceholder,
+						withCreateSuggestion,
+						createPage,
+						setInternalUrlInputValue,
+						handleSelectSuggestion,
+						showInitialSuggestions,
+						noDirectEntry,
+						showSuggestions,
+						suggestionsQuery,
+						noURLSuggestion,
+						createSuggestionButtonText,
+						showTextControl,
+						renderControlBottom,
+					} )
 				) : (
 					<LinkControlDefault
 						searchInputPlaceholder={ searchInputPlaceholder }
@@ -367,3 +365,15 @@ LinkControl.EditControls = LinkControlEditControls;
 LinkControl.Loading = LinkControlLoading;
 
 export default LinkControl;
+
+/**
+ * Takes an argument and if it's an array, returns the first item in the array
+ * otherwise returns the argument
+ *
+ * @param {*} arg the maybe-array
+ * @return {*} the arg or it's first item
+ */
+
+function unwrapArray( arg ) {
+	return Array.isArray( arg ) ? arg[ 0 ] : arg;
+}
