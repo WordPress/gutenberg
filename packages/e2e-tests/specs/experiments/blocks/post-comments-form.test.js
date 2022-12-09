@@ -27,9 +27,10 @@ describe( 'Post Comments Form', () => {
 				'.edit-site-sidebar-navigation-item',
 				{ text: /templates/i }
 			);
-			await expect( page ).toClick( '.components-heading > a', {
-				text: /singular/i,
-			} );
+			await expect( page ).toClick(
+				'.edit-site-sidebar-navigation-item',
+				{ text: /singular/i }
+			);
 			await enterEditMode();
 
 			// Insert post comments form
