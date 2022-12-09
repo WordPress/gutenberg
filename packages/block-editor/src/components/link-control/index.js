@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { Spinner } from '@wordpress/components';
@@ -27,6 +22,7 @@ import LinkControlSearchInput from './search-input';
 import LinkControlTextInput from './text-input';
 import LinkPreview from './link-preview';
 import LinkControlNotice from './link-control-notice';
+import LinkControlEditControls from './link-control-edit-controls';
 import useCreatePage from './use-create-page';
 import useInternalInputValue from './use-internal-input-value';
 import { ViewerFill } from './viewer-slot';
@@ -262,6 +258,9 @@ function LinkControl( {
 	// See https://github.com/WordPress/gutenberg/pull/33849/#issuecomment-932194927.
 	const showTextControl = value?.url?.trim()?.length > 0 && hasTextControl;
 
+	const shouldShowEditControls =
+		( isEditingLink || ! value ) && ! isCreatingPage;
+
 	// Todo
 	// - memoize context value
 	// - create seperate context's to avoid re-renders
@@ -274,6 +273,7 @@ function LinkControl( {
 		handleSubmit,
 		currentUrlInputValue,
 		createPageErrorMessage, // needs extracting to generic error message
+		shouldShowEditControls,
 	};
 
 	return (
@@ -289,40 +289,30 @@ function LinkControl( {
 					</div>
 				) }
 
-				{ ( isEditingLink || ! value ) && ! isCreatingPage && (
-					<>
-						<div
-							className={ classnames( {
-								'block-editor-link-control__search-input-wrapper': true,
-								'has-text-control': showTextControl,
-							} ) }
-						>
-							<LinkControlTextInput />
+				<LinkControlEditControls
+					shouldShowEditControls={ shouldShowEditControls }
+				>
+					<LinkControlTextInput />
 
-							<LinkControlSearchInput
-								className="block-editor-link-control__field block-editor-link-control__search-input"
-								placeholder={ searchInputPlaceholder }
-								withCreateSuggestion={ withCreateSuggestion }
-								onCreateSuggestion={ createPage }
-								onChange={ setInternalUrlInputValue }
-								onSelect={ handleSelectSuggestion }
-								showInitialSuggestions={
-									showInitialSuggestions
-								}
-								allowDirectEntry={ ! noDirectEntry }
-								showSuggestions={ showSuggestions }
-								suggestionsQuery={ suggestionsQuery }
-								withURLSuggestion={ ! noURLSuggestion }
-								createSuggestionButtonText={
-									createSuggestionButtonText
-								}
-								useLabel={ showTextControl }
-							/>
-						</div>
-
-						<LinkControlNotice />
-					</>
-				) }
+					<LinkControlSearchInput
+						className="block-editor-link-control__field block-editor-link-control__search-input"
+						placeholder={ searchInputPlaceholder }
+						withCreateSuggestion={ withCreateSuggestion }
+						onCreateSuggestion={ createPage }
+						onChange={ setInternalUrlInputValue }
+						onSelect={ handleSelectSuggestion }
+						showInitialSuggestions={ showInitialSuggestions }
+						allowDirectEntry={ ! noDirectEntry }
+						showSuggestions={ showSuggestions }
+						suggestionsQuery={ suggestionsQuery }
+						withURLSuggestion={ ! noURLSuggestion }
+						createSuggestionButtonText={
+							createSuggestionButtonText
+						}
+						useLabel={ showTextControl }
+					/>
+					<LinkControlNotice />
+				</LinkControlEditControls>
 
 				{ value && ! isEditingLink && ! isCreatingPage && (
 					<LinkPreview
