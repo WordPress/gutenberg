@@ -6,8 +6,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button, Spinner, Notice } from '@wordpress/components';
-import { keyboardReturn } from '@wordpress/icons';
+import { Spinner, Notice } from '@wordpress/components';
+
 import { __ } from '@wordpress/i18n';
 import {
 	useRef,
@@ -312,17 +312,7 @@ function LinkControl( {
 									createSuggestionButtonText
 								}
 								useLabel={ showTextControl }
-							>
-								<div className="block-editor-link-control__search-actions">
-									<Button
-										onClick={ handleSubmit }
-										label={ __( 'Submit' ) }
-										icon={ keyboardReturn }
-										className="block-editor-link-control__search-submit"
-										disabled={ currentInputIsEmpty } // Disallow submitting empty values.
-									/>
-								</div>
-							</LinkControlSearchInput>
+							/>
 						</div>
 						{ errorMessage && (
 							<Notice

@@ -8,6 +8,8 @@ import classnames from 'classnames';
 import { useInstanceId } from '@wordpress/compose';
 import { forwardRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { keyboardReturn } from '@wordpress/icons';
+import { Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -28,7 +30,6 @@ const noop = () => {};
 const LinkControlSearchInput = forwardRef(
 	(
 		{
-			children,
 			className = null,
 			placeholder = null,
 			withCreateSuggestion = false,
@@ -51,8 +52,12 @@ const LinkControlSearchInput = forwardRef(
 	) => {
 		// Aliasing the values to avoid confusion during
 		// refactoring of this component.
-		const { value: currentLink = {}, currentUrlInputValue: value } =
-			useLinkControlContext();
+		const {
+			value: currentLink = {},
+			currentUrlInputValue: value,
+			handleSubmit,
+			currentInputIsEmpty,
+		} = useLinkControlContext();
 
 		const genericSearchHandler = useSearchHandler(
 			suggestionsQuery,
@@ -158,7 +163,15 @@ const LinkControlSearchInput = forwardRef(
 					} }
 					ref={ ref }
 				/>
-				{ children }
+				<div className="block-editor-link-control__search-actions">
+					<Button
+						onClick={ handleSubmit }
+						label={ __( 'Submit' ) }
+						icon={ keyboardReturn }
+						className="block-editor-link-control__search-submit"
+						disabled={ currentInputIsEmpty } // Disallow submitting empty values.
+					/>
+				</div>
 			</div>
 		);
 	}
