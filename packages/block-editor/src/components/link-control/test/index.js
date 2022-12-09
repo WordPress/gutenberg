@@ -1894,3 +1894,52 @@ describe( 'Controlling link title text', () => {
 		).not.toBeInTheDocument();
 	} );
 } );
+
+describe( 'Component composition', () => {
+	const selectedLink = fauxEntitySuggestions[ 0 ];
+	const mockOnChange = jest.fn();
+
+	it( 'exports a default component which provides standard UI', () => {
+		function MyCustomLinkControl() {
+			return (
+				<>
+					<p>Another component before.</p>
+					<LinkControl.DefaultComponents />
+					<p>Another component afterwards.</p>
+				</>
+			);
+		}
+
+		render(
+			<LinkControl
+				value={ selectedLink }
+				forceIsEditingLink
+				hasTextControl
+				onChange={ mockOnChange }
+			>
+				<MyCustomLinkControl />
+			</LinkControl>
+		);
+
+		// Check for custom components.
+		expect(
+			screen.getByText( 'Another component before.' )
+		).toBeInTheDocument();
+		expect(
+			screen.getByText( 'Another component afterwards.' )
+		).toBeInTheDocument();
+
+		// Check for the default components.
+		expect(
+			screen.getByRole( 'combobox', { name: 'URL' } )
+		).toBeInTheDocument();
+
+		expect(
+			screen.getByRole( 'textbox', { name: 'Text' } )
+		).toBeInTheDocument();
+
+		expect(
+			screen.getByText( 'Currently selected link settings' )
+		).toBeInTheDocument();
+	} );
+} );
