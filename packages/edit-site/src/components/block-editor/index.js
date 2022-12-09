@@ -56,19 +56,14 @@ const LAYOUT = {
 };
 
 export default function BlockEditor( { setIsInserterOpen } ) {
-	const { storedSettings, templateType, page, canvasMode } = useSelect(
+	const { storedSettings, templateType, canvasMode } = useSelect(
 		( select ) => {
-			const {
-				getSettings,
-				getEditedPostType,
-				getPage,
-				__unstableGetCanvasMode,
-			} = select( editSiteStore );
+			const { getSettings, getEditedPostType, __unstableGetCanvasMode } =
+				select( editSiteStore );
 
 			return {
 				storedSettings: getSettings( setIsInserterOpen ),
 				templateType: getEditedPostType(),
-				page: getPage(),
 				canvasMode: __unstableGetCanvasMode(),
 			};
 		},
@@ -200,11 +195,10 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 					( fillProps ) => (
 						<NavigateToLink
 							{ ...fillProps }
-							activePage={ page }
 							onActivePageChange={ setPage }
 						/>
 					),
-					[ page ]
+					[]
 				) }
 			</__experimentalLinkControl.ViewerFill>
 			<SidebarInspectorFill>
