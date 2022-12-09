@@ -59,9 +59,9 @@ export const useDefaultTemplateTypes = () => {
 		[]
 	);
 };
-export const useExtraTemplateSlugs = () => {
+export const useExtraTemplateTypes = () => {
 	return useSelect( ( select ) => {
-		return select( editorStore ).__experimentalGetExtraTemplateSlugs();
+		return select( editorStore ).__experimentalGetExtraTemplateTypes();
 	}, [] );
 };
 

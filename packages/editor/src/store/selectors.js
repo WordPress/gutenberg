@@ -1556,8 +1556,8 @@ export function __experimentalGetDefaultTemplateTypes( state ) {
  *
  * @return {Array} The template slugs.
  */
-export function __experimentalGetExtraTemplateSlugs( state ) {
-	return getEditorSettings( state )?.extraTemplateSlugs;
+export function __experimentalGetExtraTemplateTypes( state ) {
+	return getEditorSettings( state )?.extraTemplateTypes;
 }
 
 /**

@@ -42,7 +42,7 @@ import {
 	usePostTypeMenuItems,
 	useAuthorMenuItem,
 	usePostTypeArchiveMenuItems,
-	useExtraTemplateSlugs,
+	useExtraTemplateTypes,
 } from './utils';
 import AddCustomGenericTemplateModal from './add-custom-generic-template-modal';
 import TemplateActionsLoadingScreen from './template-actions-loading-screen';
@@ -270,15 +270,14 @@ function useMissingTemplates(
 ) {
 	const existingTemplates = useExistingTemplates();
 	const defaultTemplateTypes = useDefaultTemplateTypes();
-	const extraTemplateSlugs = useExtraTemplateSlugs();
+	const extraTemplateTypes = useExtraTemplateTypes();
 	const existingTemplateSlugs = ( existingTemplates || [] ).map(
 		( { slug } ) => slug
 	);
 	const missingDefaultTemplates = ( defaultTemplateTypes || [] ).filter(
 		( template ) =>
-			[ ...DEFAULT_TEMPLATE_SLUGS, ...extraTemplateSlugs ].includes(
-				template.slug
-			) && ! existingTemplateSlugs.includes( template.slug )
+			[ ...DEFAULT_TEMPLATE_SLUGS ].includes( template.slug ) &&
+			! existingTemplateSlugs.includes( template.slug )
 	);
 	const onClickMenuItem = ( _entityForSuggestions ) => {
 		setShowCustomTemplateModal( true );
@@ -329,6 +328,7 @@ function useMissingTemplates(
 		...usePostTypeArchiveMenuItems(),
 		...postTypesMenuItems,
 		...taxonomiesMenuItems,
+		...extraTemplateTypes,
 	];
 	return missingTemplates;
 }
