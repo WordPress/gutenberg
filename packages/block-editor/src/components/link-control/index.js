@@ -6,18 +6,25 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button, Spinner, Notice, TextControl } from '@wordpress/components';
+import { Button, Spinner, Notice } from '@wordpress/components';
 import { keyboardReturn } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-import { useRef, useState, useEffect } from '@wordpress/element';
+import {
+	useRef,
+	useState,
+	useEffect,
+	useContext,
+	useCallback,
+	createContext,
+} from '@wordpress/element';
 import { focus } from '@wordpress/dom';
-import { ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import LinkControlSettingsDrawer from './settings-drawer';
 import LinkControlSearchInput from './search-input';
+import LinkControlTextInput from './text-input';
 import LinkPreview from './link-preview';
 import useCreatePage from './use-create-page';
 import useInternalInputValue from './use-internal-input-value';
@@ -99,6 +106,19 @@ import { DEFAULT_LINK_SETTINGS } from './constants';
  */
 
 const noop = () => {};
+
+const LinkControlContext = createContext();
+LinkControlContext.displayName = 'LinkControlContext';
+
+export function useLinkControlContext() {
+	const context = useContext( LinkControlContext );
+	if ( ! context ) {
+		throw new Error(
+			`LinkControl compound components cannot be rendered outside the LinkControl component`
+		);
+	}
+	return context;
+}
 
 /**
  * Renders a link control. A link control is a controlled input which maintains
@@ -210,7 +230,9 @@ function LinkControl( {
 		stopEditing();
 	};
 
-	const handleSubmit = () => {
+	const currentUrlInputValue = propInputValue || internalUrlInputValue;
+
+	const handleSubmit = useCallback( () => {
 		if (
 			currentUrlInputValue !== value?.url ||
 			internalTextInputValue !== value?.title
@@ -222,20 +244,7 @@ function LinkControl( {
 			} );
 		}
 		stopEditing();
-	};
-
-	const handleSubmitWithEnter = ( event ) => {
-		const { keyCode } = event;
-		if (
-			keyCode === ENTER &&
-			! currentInputIsEmpty // Disallow submitting empty values.
-		) {
-			event.preventDefault();
-			handleSubmit();
-		}
-	};
-
-	const currentUrlInputValue = propInputValue || internalUrlInputValue;
+	}, [ currentUrlInputValue, value, internalTextInputValue ] );
 
 	const currentInputIsEmpty = ! currentUrlInputValue?.trim()?.length;
 
@@ -249,101 +258,105 @@ function LinkControl( {
 	// See https://github.com/WordPress/gutenberg/pull/33849/#issuecomment-932194927.
 	const showTextControl = value?.url?.trim()?.length > 0 && hasTextControl;
 
+	const contextValue = {
+		value,
+		internalTextInputValue, // lift to standard state mechanic
+		setInternalTextInputValue, // lift to standard state mechanic
+		showTextControl,
+		currentInputIsEmpty,
+		handleSubmit,
+	};
+
 	return (
-		<div
-			tabIndex={ -1 }
-			ref={ wrapperNode }
-			className="block-editor-link-control"
-		>
-			{ isCreatingPage && (
-				<div className="block-editor-link-control__loading">
-					<Spinner /> { __( 'Creating' ) }…
-				</div>
-			) }
-
-			{ ( isEditingLink || ! value ) && ! isCreatingPage && (
-				<>
-					<div
-						className={ classnames( {
-							'block-editor-link-control__search-input-wrapper': true,
-							'has-text-control': showTextControl,
-						} ) }
-					>
-						{ showTextControl && (
-							<TextControl
-								ref={ textInputRef }
-								className="block-editor-link-control__field block-editor-link-control__text-content"
-								label="Text"
-								value={ internalTextInputValue }
-								onChange={ setInternalTextInputValue }
-								onKeyDown={ handleSubmitWithEnter }
-							/>
-						) }
-
-						<LinkControlSearchInput
-							currentLink={ value }
-							className="block-editor-link-control__field block-editor-link-control__search-input"
-							placeholder={ searchInputPlaceholder }
-							value={ currentUrlInputValue }
-							withCreateSuggestion={ withCreateSuggestion }
-							onCreateSuggestion={ createPage }
-							onChange={ setInternalUrlInputValue }
-							onSelect={ handleSelectSuggestion }
-							showInitialSuggestions={ showInitialSuggestions }
-							allowDirectEntry={ ! noDirectEntry }
-							showSuggestions={ showSuggestions }
-							suggestionsQuery={ suggestionsQuery }
-							withURLSuggestion={ ! noURLSuggestion }
-							createSuggestionButtonText={
-								createSuggestionButtonText
-							}
-							useLabel={ showTextControl }
-						>
-							<div className="block-editor-link-control__search-actions">
-								<Button
-									onClick={ handleSubmit }
-									label={ __( 'Submit' ) }
-									icon={ keyboardReturn }
-									className="block-editor-link-control__search-submit"
-									disabled={ currentInputIsEmpty } // Disallow submitting empty values.
-								/>
-							</div>
-						</LinkControlSearchInput>
+		<LinkControlContext.Provider value={ contextValue }>
+			<div
+				tabIndex={ -1 }
+				ref={ wrapperNode }
+				className="block-editor-link-control"
+			>
+				{ isCreatingPage && (
+					<div className="block-editor-link-control__loading">
+						<Spinner /> { __( 'Creating' ) }…
 					</div>
-					{ errorMessage && (
-						<Notice
-							className="block-editor-link-control__search-error"
-							status="error"
-							isDismissible={ false }
+				) }
+
+				{ ( isEditingLink || ! value ) && ! isCreatingPage && (
+					<>
+						<div
+							className={ classnames( {
+								'block-editor-link-control__search-input-wrapper': true,
+								'has-text-control': showTextControl,
+							} ) }
 						>
-							{ errorMessage }
-						</Notice>
-					) }
-				</>
-			) }
+							<LinkControlTextInput />
 
-			{ value && ! isEditingLink && ! isCreatingPage && (
-				<LinkPreview
-					key={ value?.url } // force remount when URL changes to avoid race conditions for rich previews
-					value={ value }
-					onEditClick={ () => setIsEditingLink( true ) }
-					hasRichPreviews={ hasRichPreviews }
-					hasUnlinkControl={ shownUnlinkControl }
-					onRemove={ onRemove }
-				/>
-			) }
+							<LinkControlSearchInput
+								currentLink={ value }
+								className="block-editor-link-control__field block-editor-link-control__search-input"
+								placeholder={ searchInputPlaceholder }
+								value={ currentUrlInputValue }
+								withCreateSuggestion={ withCreateSuggestion }
+								onCreateSuggestion={ createPage }
+								onChange={ setInternalUrlInputValue }
+								onSelect={ handleSelectSuggestion }
+								showInitialSuggestions={
+									showInitialSuggestions
+								}
+								allowDirectEntry={ ! noDirectEntry }
+								showSuggestions={ showSuggestions }
+								suggestionsQuery={ suggestionsQuery }
+								withURLSuggestion={ ! noURLSuggestion }
+								createSuggestionButtonText={
+									createSuggestionButtonText
+								}
+								useLabel={ showTextControl }
+							>
+								<div className="block-editor-link-control__search-actions">
+									<Button
+										onClick={ handleSubmit }
+										label={ __( 'Submit' ) }
+										icon={ keyboardReturn }
+										className="block-editor-link-control__search-submit"
+										disabled={ currentInputIsEmpty } // Disallow submitting empty values.
+									/>
+								</div>
+							</LinkControlSearchInput>
+						</div>
+						{ errorMessage && (
+							<Notice
+								className="block-editor-link-control__search-error"
+								status="error"
+								isDismissible={ false }
+							>
+								{ errorMessage }
+							</Notice>
+						) }
+					</>
+				) }
 
-			{ showSettingsDrawer && (
-				<div className="block-editor-link-control__tools">
-					<LinkControlSettingsDrawer
+				{ value && ! isEditingLink && ! isCreatingPage && (
+					<LinkPreview
+						key={ value?.url } // force remount when URL changes to avoid race conditions for rich previews
 						value={ value }
-						settings={ settings }
-						onChange={ onChange }
+						onEditClick={ () => setIsEditingLink( true ) }
+						hasRichPreviews={ hasRichPreviews }
+						hasUnlinkControl={ shownUnlinkControl }
+						onRemove={ onRemove }
 					/>
-				</div>
-			) }
-			{ renderControlBottom && renderControlBottom() }
-		</div>
+				) }
+
+				{ showSettingsDrawer && (
+					<div className="block-editor-link-control__tools">
+						<LinkControlSettingsDrawer
+							value={ value }
+							settings={ settings }
+							onChange={ onChange }
+						/>
+					</div>
+				) }
+				{ renderControlBottom && renderControlBottom() }
+			</div>
+		</LinkControlContext.Provider>
 	);
 }
 
