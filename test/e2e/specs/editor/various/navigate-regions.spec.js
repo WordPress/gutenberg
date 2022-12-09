@@ -182,7 +182,9 @@ test.describe( 'Navigate regions', () => {
 		);
 		// Add a mask overlay and take a screenshot.
 		createMaskElement( editorDocumentOverview, 6 );
-		await expect( editorDocumentOverview ).toHaveScreenshot();
+		await expect( editorDocumentOverview ).toHaveScreenshot( {
+			maxDiffPixels: 10,
+		} );
 		removeMaskElement();
 
 		// Close the Document overview.
