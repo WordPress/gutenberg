@@ -1,5 +1,21 @@
 <?php
 
+/**
+ * @TODO: Handle self-closing foreign elements.
+ * @TODO: Detect non-normative HTML input.
+ * @TODO: Consider parsing non-normative HTML input, support adoption agency algorithm.
+ *
+ * If we support non-normative HTML we can probably handle significantly more
+ * HTML without introducing unexpected results, but I'm not sure yet if we can
+ * handle HTML the same way as the browser, because the section in HTML5 spec
+ * dealing with errors is itself "non-normative" and only issues a few examles.
+ *
+ * Not yet clear is if browsers are full of special one-off cases for "invalid"
+ * input. E.g. it's clear to me how to handle `</b></b></b>` but not clear to how
+ * handle `</p></p></p>` given that `<b>` is a formatting element but `<p>` is
+ * not, that `<p>` itself is a special element.
+ */
+
 class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 	public function next_within_balanced_tags( $query, $max_depth = 1000 ) {
 		$budget = 1000;
