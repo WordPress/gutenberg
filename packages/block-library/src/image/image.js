@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, filter, isEmpty, map, pick } from 'lodash';
+import { get, isEmpty, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -135,12 +135,16 @@ export default function Image( {
 				} = select( blockEditorStore );
 
 				const rootClientId = getBlockRootClientId( clientId );
-				const settings = pick( getSettings(), [
-					'imageEditing',
-					'imageSizes',
-					'maxWidth',
-					'mediaUpload',
-				] );
+				const settings = Object.fromEntries(
+					Object.entries( getSettings() ).filter( ( [ key ] ) =>
+						[
+							'imageEditing',
+							'imageSizes',
+							'maxWidth',
+							'mediaUpload',
+						].includes( key )
+					)
+				);
 
 				return {
 					...settings,
@@ -169,7 +173,7 @@ export default function Image( {
 		! isContentLocked &&
 		! ( isWideAligned && isLargeViewport );
 	const imageSizeOptions = map(
-		filter( imageSizes, ( { slug } ) =>
+		imageSizes.filter( ( { slug } ) =>
 			get( image, [ 'media_details', 'sizes', slug, 'source_url' ] )
 		),
 		( { name, slug } ) => ( { value: slug, label: name } )

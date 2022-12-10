@@ -1,3 +1,6 @@
+// Variables
+$block-preview-height: 150px;
+
 .edit-site-global-styles-preview {
 	display: flex;
 	align-items: center;
@@ -52,8 +55,12 @@
 	}
 }
 
-.edit-site-global-styles-header__description,
+.edit-site-global-styles-header__description {
+	padding: 0 $grid-unit-20;
+}
+
 .edit-site-block-types-search {
+	margin-bottom: $grid-unit-10;
 	padding: 0 $grid-unit-20;
 }
 
@@ -116,4 +123,13 @@
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+}
+
+.edit-site-global-styles__block-preview-panel {
+	position: relative;
+	width: 100%;
+	height: $block-preview-height + 2 * $border-width;
+	overflow: auto;
+	border: $gray-200 $border-width solid;
+	border-radius: $radius-block-ui;
 }

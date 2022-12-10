@@ -85,9 +85,14 @@ function PostTemplateToggle( { isOpen, onClick } ) {
 		if ( ! supportsTemplateMode && availableTemplates[ templateSlug ] ) {
 			return availableTemplates[ templateSlug ];
 		}
-
-		const template = select( editPostStore ).getEditedPostTemplate();
-		return template?.title ?? template?.slug;
+		const template =
+			select( coreStore ).canUser( 'create', 'templates' ) &&
+			select( editPostStore ).getEditedPostTemplate();
+		return (
+			template?.title ||
+			template?.slug ||
+			availableTemplates?.[ templateSlug ]
+		);
 	}, [] );
 
 	return (

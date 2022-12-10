@@ -252,6 +252,8 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	static $block_id = 0;
 	++$block_id;
 
+	$parent_page_id = $attributes['parentPageID'];
+
 	$all_pages = get_pages(
 		array(
 			'sort_column' => 'menu_order,post_title',
@@ -305,6 +307,13 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	$css_classes     = trim( implode( ' ', $classes ) );
 
 	$nested_pages = block_core_page_list_nest_pages( $top_level_pages, $pages_with_children );
+
+	if ( 0 !== $parent_page_id ) {
+		$nested_pages = block_core_page_list_nest_pages(
+			$pages_with_children[ $parent_page_id ],
+			$pages_with_children
+		);
+	}
 
 	$is_navigation_child = array_key_exists( 'showSubmenuIcon', $block->context );
 

@@ -67,6 +67,7 @@ import * as navigationSubmenu from './navigation-submenu';
 import * as nextpage from './nextpage';
 import * as pattern from './pattern';
 import * as pageList from './page-list';
+import * as pageListItem from './page-list-item';
 import * as paragraph from './paragraph';
 import * as postAuthor from './post-author';
 import * as postAuthorName from './post-author-name';
@@ -155,6 +156,7 @@ const getAllBlocks = () =>
 		more,
 		nextpage,
 		pageList,
+		pageListItem,
 		pattern,
 		preformatted,
 		pullquote,

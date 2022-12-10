@@ -131,7 +131,7 @@
 	box-shadow: 0 0 0 transparent;
 	transition: box-shadow 0.1s linear;
 	border-radius: $radius-block-ui;
-	border: $border-width solid $gray-700;
+	border: $border-width solid $gray-600;
 	@include reduce-motion("transition");
 }
 
@@ -549,4 +549,37 @@
 		background: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);
 	}
 	/* stylelint-enable function-comma-space-after */
+}
+
+@mixin custom-scrollbars-on-hover() {
+	visibility: hidden;
+
+	$handle-color: #757575;
+	$track-color: #1e1e1e;
+
+	// WebKit
+	&::-webkit-scrollbar {
+		width: 12px;
+		height: 12px;
+	}
+	&::-webkit-scrollbar-track {
+		background-color: $track-color;
+	}
+	&::-webkit-scrollbar-thumb {
+		background-color: $handle-color;
+		border-radius: 8px;
+		border: 3px solid transparent;
+		background-clip: padding-box;
+	}
+
+	// Firefox 109+ and Chrome 111+
+	scrollbar-color: $handle-color $track-color; // Syntax, "dark", "light", or "#handle-color #track-color"
+	scrollbar-width: thin;
+	scrollbar-gutter: stable;
+
+	&:hover,
+	&:focus,
+	& > * {
+		visibility: visible;
+	}
 }

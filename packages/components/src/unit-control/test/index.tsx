@@ -115,6 +115,7 @@ describe( 'UnitControl', () => {
 				withoutClassName.querySelector( '.components-unit-control' )
 			).not.toHaveClass( 'hello' );
 			expect(
+				// eslint-disable-next-line testing-library/no-container
 				withClassName.querySelector( '.components-unit-control' )
 			).toHaveClass( 'hello' );
 		} );
