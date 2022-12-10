@@ -1729,7 +1729,7 @@ class WP_HTML_Tag_Processor {
 	 *     @type string      $tag_closers  "visit" or "skip": whether to stop on tag closers, e.g. </div>.
 	 * }
 	 */
-	private function parse_query( $query ) {
+	protected function parse_query( $query ) {
 		if ( null !== $query && $query === $this->last_query ) {
 			return;
 		}
@@ -1776,7 +1776,7 @@ class WP_HTML_Tag_Processor {
 	 *
 	 * @return boolean
 	 */
-	private function matches() {
+	protected function matches() {
 		if ( $this->is_closing_tag && ! $this->stop_on_tag_closers ) {
 			return false;
 		}

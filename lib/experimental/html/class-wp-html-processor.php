@@ -1,6 +1,40 @@
 <?php
 
 class WP_HTML_Processor extends WP_HTML_Tag_Processor {
+	public function next_within_balanced_tags( $query, $max_depth = 1000 ) {
+		$budget = 1000;
+		if ( self::is_html_void_element( $this->get_tag() ) ) {
+			return false;
+		}
+
+		$tag_name = $this->get_tag();
+		$balanced_depth = 1;
+		$depth = 1;
+
+		while ( $this->next_tag( array( 'tag_closers' => 'visit' ) ) && $budget-- > 0 ) {
+			if ( $this->get_tag() === $tag_name && $this->is_tag_closer() && $balanced_depth === 1 ) {
+				return false;
+			}
+
+			if ( $depth <= $max_depth ) {
+				$this->parse_query( $query );
+				if ( $this->matches() ) {
+					return true;
+				}
+			}
+
+			if ( ! self::is_html_void_element( $this->get_tag() ) ) {
+				$depth += $this->is_tag_closer() ? -1 : 1;
+			}
+
+			if ( $this->get_tag() === $tag_name ) {
+				$balanced_depth += $this->is_tag_closer() ? -1 : 1;
+			}
+		}
+
+		return false;
+	}
+
 	public function get_content_inside_balanced_tags() {
 		static $start_name = null;
 		static $end_name = null;
