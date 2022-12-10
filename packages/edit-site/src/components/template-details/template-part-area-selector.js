@@ -28,6 +28,8 @@ export default function TemplatePartAreaSelector( { id } ) {
 
 	return (
 		<SelectControl
+			__nextHasNoMarginBottom
+			className="edit-site-template-details__area-select"
 			label={ __( 'Area' ) }
 			labelPosition="top"
 			options={ areaOptions }

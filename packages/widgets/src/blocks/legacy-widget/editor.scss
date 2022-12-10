@@ -164,11 +164,12 @@
 }
 
 .wp-block-legacy-widget {
-	.components-base-control {
+	.wp-block-legacy-widget__selector-container {
 		width: 100%;
 	}
-	.components-select-control__input {
-		padding: 0;
-		font-family: system-ui;
+
+	// Replaces margin on BaseControl
+	.wp-block-legacy-widget__select-widget {
+		margin-bottom: $grid-unit-10;
 	}
 }

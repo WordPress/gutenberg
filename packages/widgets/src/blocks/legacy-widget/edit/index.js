@@ -57,30 +57,32 @@ function Empty( { attributes: { id, idBase }, setAttributes } ) {
 			icon={ <BlockIcon icon={ brushIcon } /> }
 			label={ __( 'Legacy Widget' ) }
 		>
-			<WidgetTypeSelector
-				selectedId={ id ?? idBase }
-				onSelect={ ( { selectedId, isMulti } ) => {
-					if ( ! selectedId ) {
-						setAttributes( {
-							id: null,
-							idBase: null,
-							instance: null,
-						} );
-					} else if ( isMulti ) {
-						setAttributes( {
-							id: null,
-							idBase: selectedId,
-							instance: {},
-						} );
-					} else {
-						setAttributes( {
-							id: selectedId,
-							idBase: null,
-							instance: null,
-						} );
-					}
-				} }
-			/>
+			<div className="wp-block-legacy-widget__selector-container">
+				<WidgetTypeSelector
+					selectedId={ id ?? idBase }
+					onSelect={ ( { selectedId, isMulti } ) => {
+						if ( ! selectedId ) {
+							setAttributes( {
+								id: null,
+								idBase: null,
+								instance: null,
+							} );
+						} else if ( isMulti ) {
+							setAttributes( {
+								id: null,
+								idBase: selectedId,
+								instance: {},
+							} );
+						} else {
+							setAttributes( {
+								id: selectedId,
+								idBase: null,
+								instance: null,
+							} );
+						}
+					} }
+				/>
+			</div>
 		</Placeholder>
 	);
 }

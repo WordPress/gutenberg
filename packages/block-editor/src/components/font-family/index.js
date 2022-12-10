@@ -40,6 +40,7 @@ export default function FontFamilyControl( {
 	];
 	return (
 		<SelectControl
+			__nextHasNoMarginBottom
 			label={ __( 'Font' ) }
 			options={ options }
 			value={ value }

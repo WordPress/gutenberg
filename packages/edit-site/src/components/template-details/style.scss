@@ -2,6 +2,10 @@
 	.edit-site-template-details__group {
 		margin: 0;
 		padding: $grid-unit-20;
+
+		.edit-site-template-details__area-select {
+			margin-bottom: $grid-unit-10;
+		}
 	}
 
 	.edit-site-template-details__group + .edit-site-template-details__group {

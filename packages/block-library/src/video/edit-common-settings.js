@@ -74,6 +74,7 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 				checked={ !! playsInline }
 			/>
 			<SelectControl
+				__nextHasNoMarginBottom
 				label={ __( 'Preload' ) }
 				value={ preload }
 				onChange={ onChangePreload }
