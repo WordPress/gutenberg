@@ -255,13 +255,21 @@ test.describe( 'Buttons', () => {
 		await page.click( COLOR_INPUT_FIELD_SELECTOR );
 		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
 		await page.keyboard.type( 'ff0000' );
+		await page.keyboard.press( 'Escape' );
+		await page.click(
+			'role=button[name=/^Gradient control point at position 100% with color code/]'
+		);
+		await page.waitForSelector( COLOR_INPUT_FIELD_SELECTOR );
+		await page.click( COLOR_INPUT_FIELD_SELECTOR );
+		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
+		await page.keyboard.type( '00ff00' );
 
 		// Check the content.
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:buttons -->
-<div class=\"wp-block-buttons\"><!-- wp:button {\"style\":{\"color\":{\"gradient\":\"linear-gradient(135deg,rgb(255,0,0) 0%,rgb(155,81,224) 100%)\"}}} -->
-<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-background wp-element-button\" style=\"background:linear-gradient(135deg,rgb(255,0,0) 0%,rgb(155,81,224) 100%)\">Content</a></div>
+<div class=\"wp-block-buttons\"><!-- wp:button {\"style\":{\"color\":{\"gradient\":\"linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,255,0) 100%)\"}}} -->
+<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-background wp-element-button\" style=\"background:linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,255,0) 100%)\">Content</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->`
 		);
