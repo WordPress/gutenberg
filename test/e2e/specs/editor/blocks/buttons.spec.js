@@ -157,7 +157,7 @@ test.describe( 'Buttons', () => {
 		await page.click(
 			'role=region[name="Editor settings"i] >> role=button[name="Text"i]'
 		);
-		await page.click( 'role=button[name="Color: White"i]' );
+		await page.click( 'role=button[name="Color: Cyan bluish gray"i]' );
 		await page.click(
 			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
 		);
@@ -167,8 +167,8 @@ test.describe( 'Buttons', () => {
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:buttons -->
-<div class=\"wp-block-buttons\"><!-- wp:button {\"backgroundColor\":\"vivid-red\",\"textColor\":\"base\"} -->
-<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-base-color has-vivid-red-background-color has-text-color has-background wp-element-button\">Content</a></div>
+<div class=\"wp-block-buttons\"><!-- wp:button {\"backgroundColor\":\"vivid-red\",\"textColor\":\"cyan-bluish-gray\"} -->
+<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-cyan-bluish-gray-color has-vivid-red-background-color has-text-color has-background wp-element-button\">Content</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->`
 		);
