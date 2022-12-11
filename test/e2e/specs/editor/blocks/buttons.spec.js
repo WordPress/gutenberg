@@ -220,6 +220,12 @@ test.describe( 'Buttons', () => {
 			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
 		);
 		await page.click( 'role=tab[name="Gradient"i]' );
+
+		// eslint-disable-next-line no-console
+		console.log(
+			await page.innerHTML( '.components-tab-panel__tab-content' )
+		);
+
 		await page.click(
 			'role=button[name="Gradient: Vivid cyan blue to vivid purple"i]'
 		);
