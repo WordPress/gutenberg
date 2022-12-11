@@ -4,9 +4,6 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Buttons', () => {
-	const COLOR_INPUT_FIELD_SELECTOR =
-		'.components-color-picker .components-input-control__input';
-
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
@@ -174,7 +171,7 @@ test.describe( 'Buttons', () => {
 		);
 	} );
 
-	test( 'can apply custom colors', async ( { editor, page, pageUtils } ) => {
+	test( 'can apply custom colors', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/buttons' } );
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
@@ -183,17 +180,13 @@ test.describe( 'Buttons', () => {
 			'role=region[name="Editor settings"i] >> role=button[name="Text"i]'
 		);
 		await page.click( 'role=button[name="Custom color picker."i]' );
-		await page.click( COLOR_INPUT_FIELD_SELECTOR );
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
-		await page.keyboard.type( 'ff0000' );
+		await page.fill( 'role=textbox[name="Hex color"i]', 'ff0000' );
 
 		await page.click(
 			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
 		);
 		await page.click( 'role=button[name="Custom color picker."i]' );
-		await page.click( COLOR_INPUT_FIELD_SELECTOR );
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
-		await page.keyboard.type( '00ff00' );
+		await page.fill( 'role=textbox[name="Hex color"i]', '00ff00' );
 
 		// Check the content.
 		const content = await editor.getEditedPostContent();
@@ -234,7 +227,6 @@ test.describe( 'Buttons', () => {
 	test( 'can apply custom gradient background color', async ( {
 		editor,
 		page,
-		pageUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/buttons' } );
 		await page.keyboard.type( 'Content' );
@@ -247,16 +239,12 @@ test.describe( 'Buttons', () => {
 		await page.click(
 			'role=button[name=/^Gradient control point at position 0% with color code/]'
 		);
-		await page.click( COLOR_INPUT_FIELD_SELECTOR );
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
-		await page.keyboard.type( 'ff0000' );
+		await page.fill( 'role=textbox[name="Hex color"i]', 'ff0000' );
 		await page.keyboard.press( 'Escape' );
 		await page.click(
 			'role=button[name=/^Gradient control point at position 100% with color code/]'
 		);
-		await page.click( COLOR_INPUT_FIELD_SELECTOR );
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
-		await page.keyboard.type( '00ff00' );
+		await page.fill( 'role=textbox[name="Hex color"i]', '00ff00' );
 
 		// Check the content.
 		const content = await editor.getEditedPostContent();
