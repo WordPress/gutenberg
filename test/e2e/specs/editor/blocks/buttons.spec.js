@@ -183,7 +183,6 @@ test.describe( 'Buttons', () => {
 			'role=region[name="Editor settings"i] >> role=button[name="Text"i]'
 		);
 		await page.click( 'role=button[name="Custom color picker."i]' );
-		await page.waitForSelector( COLOR_INPUT_FIELD_SELECTOR );
 		await page.click( COLOR_INPUT_FIELD_SELECTOR );
 		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
 		await page.keyboard.type( 'ff0000' );
@@ -192,7 +191,6 @@ test.describe( 'Buttons', () => {
 			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
 		);
 		await page.click( 'role=button[name="Custom color picker."i]' );
-		await page.waitForSelector( COLOR_INPUT_FIELD_SELECTOR );
 		await page.click( COLOR_INPUT_FIELD_SELECTOR );
 		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
 		await page.keyboard.type( '00ff00' );
@@ -249,7 +247,6 @@ test.describe( 'Buttons', () => {
 		await page.click(
 			'role=button[name=/^Gradient control point at position 0% with color code/]'
 		);
-		await page.waitForSelector( COLOR_INPUT_FIELD_SELECTOR );
 		await page.click( COLOR_INPUT_FIELD_SELECTOR );
 		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
 		await page.keyboard.type( 'ff0000' );
@@ -257,7 +254,6 @@ test.describe( 'Buttons', () => {
 		await page.click(
 			'role=button[name=/^Gradient control point at position 100% with color code/]'
 		);
-		await page.waitForSelector( COLOR_INPUT_FIELD_SELECTOR );
 		await page.click( COLOR_INPUT_FIELD_SELECTOR );
 		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
 		await page.keyboard.type( '00ff00' );
