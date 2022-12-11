@@ -332,11 +332,6 @@ const ColumnsEditContainerWrapper = withDispatch(
 				width: value,
 			} );
 		},
-		updateBlockSettings( settings ) {
-			const { clientId } = ownProps;
-			const { updateBlockListSettings } = dispatch( blockEditorStore );
-			updateBlockListSettings( clientId, settings );
-		},
 		/**
 		 * Updates the column columnCount, including necessary revisions to child Column
 		 * blocks to grant required or redistribute available space.
