@@ -56,12 +56,7 @@ const LAYOUT = {
 };
 
 export default function BlockEditor( { setIsInserterOpen } ) {
-	const {
-		storedSettings,
-		templateType,
-		page,
-		canvasMode,
-	} = useSelect(
+	const { storedSettings, templateType, page, canvasMode } = useSelect(
 		( select ) => {
 			const {
 				getSettings,
