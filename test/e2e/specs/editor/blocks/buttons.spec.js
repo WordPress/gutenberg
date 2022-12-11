@@ -220,22 +220,14 @@ test.describe( 'Buttons', () => {
 			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
 		);
 		await page.click( 'role=tab[name="Gradient"i]' );
-
-		// eslint-disable-next-line no-console
-		console.log(
-			await page.innerHTML( '.components-tab-panel__tab-content' )
-		);
-
-		await page.click(
-			'role=button[name="Gradient: Vivid cyan blue to vivid purple"i]'
-		);
+		await page.click( 'role=button[name="Gradient: Purple to yellow"i]' );
 
 		// Check the content.
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:buttons -->
-<div class=\"wp-block-buttons\"><!-- wp:button {\"gradient\":\"vivid-cyan-blue-to-vivid-purple\"} -->
-<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-vivid-cyan-blue-to-vivid-purple-gradient-background has-background wp-element-button\">Content</a></div>
+<div class=\"wp-block-buttons\"><!-- wp:button {\"gradient\":\"purple-to-yellow\"} -->
+<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-purple-to-yellow-gradient-background has-background wp-element-button\">Content</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->`
 		);
