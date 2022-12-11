@@ -155,11 +155,11 @@ test.describe( 'Buttons', () => {
 		await editor.openDocumentSettingsSidebar();
 
 		await page.click(
-			'role=region[name="Editor settings"i] >> button:has-text("Text")'
+			'role=region[name="Editor settings"i] >> role=button[name="Text"i]'
 		);
 		await page.click( 'role=button[name="Color: White"i]' );
 		await page.click(
-			'role=region[name="Editor settings"i] >> button:has-text("Background")'
+			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
 		);
 		await page.click( 'role=button[name="Color: Vivid red"i]' );
 
@@ -180,7 +180,7 @@ test.describe( 'Buttons', () => {
 		await editor.openDocumentSettingsSidebar();
 
 		await page.click(
-			'role=region[name="Editor settings"i] >> button:has-text("Text")'
+			'role=region[name="Editor settings"i] >> role=button[name="Text"i]'
 		);
 		await page.click( 'role=button[name="Custom color picker."i]' );
 		await page.waitForSelector( COLOR_INPUT_FIELD_SELECTOR );
@@ -189,7 +189,7 @@ test.describe( 'Buttons', () => {
 		await page.keyboard.type( 'ff0000' );
 
 		await page.click(
-			'role=region[name="Editor settings"i] >> button:has-text("Background")'
+			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
 		);
 		await page.click( 'role=button[name="Custom color picker."i]' );
 		await page.waitForSelector( COLOR_INPUT_FIELD_SELECTOR );
@@ -217,7 +217,7 @@ test.describe( 'Buttons', () => {
 		await editor.openDocumentSettingsSidebar();
 
 		await page.click(
-			'role=region[name="Editor settings"i] >> button:has-text("Background")'
+			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
 		);
 		await page.click( 'role=tab[name="Gradient"i]' );
 		await page.click(
@@ -245,7 +245,7 @@ test.describe( 'Buttons', () => {
 		await editor.openDocumentSettingsSidebar();
 
 		await page.click(
-			'role=region[name="Editor settings"i] >> button:has-text("Background")'
+			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
 		);
 		await page.click( 'role=tab[name="Gradient"i]' );
 		await page.click(
