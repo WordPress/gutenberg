@@ -104,3 +104,20 @@ The following configurable variables are used with the template files. Template 
 -   `style` (default: `'file:./style-index.css'`) – a frontend and editor style definition.
 -   `render` (no default) – a path to the PHP file used when rendering the block type on the server before presenting on the front end.
 -   `customBlockJSON` (no default) - allows definition of additional properties for the generated block.json file.
+
+### Dynamic Configs
+
+Configurations can be dynamically constructed to allow for asynchronous functions.
+
+_Example:_
+
+```js
+module.exports = ( async function () {
+	const title = await getAsyncTitle();
+	return {
+		defaultValues: {
+			title,
+		},
+	};
+} )();
+```
