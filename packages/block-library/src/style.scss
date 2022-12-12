@@ -97,6 +97,25 @@
 	}
 }
 
+[data-effect="slide-from-left"][data-has-intersected="false"] {
+	transform: translateX(-200px);
+	opacity: 0;
+}
+
+[data-effect="slide-from-right"][data-has-intersected="false"] {
+	transform: translateX(200px);
+	opacity: 0;
+}
+
+[data-effect="slide-from-bottom"][data-has-intersected="false"] {
+	transform: translateY(200px);
+	opacity: 0;
+}
+
+[data-effect="fade-in"][data-has-intersected="false"] {
+	opacity: 0;
+}
+
 [data-effect="slide-from-left"][data-has-intersected="true"] {
 	animation: slideLeft 500ms;
 }
