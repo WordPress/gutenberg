@@ -56,7 +56,7 @@ function useAppender( rootClientId, CustomAppender ) {
 					__unstableGetEditorMode() === 'zoom-out',
 				isParentSelected:
 					rootClientId === selectedBlockClientId ||
-					( rootClientId === '' && ! selectedBlockClientId ),
+					( ! rootClientId && ! selectedBlockClientId ),
 			};
 		},
 		[ rootClientId ]
