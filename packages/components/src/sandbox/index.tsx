@@ -106,7 +106,7 @@ const style = `
 	}
 `;
 
-export default function Sandbox( {
+export default function SandBox( {
 	html = '',
 	title = '',
 	type,
@@ -126,7 +126,7 @@ export default function Sandbox( {
 		}
 	}
 
-	function trySandbox( forceRerender = false ) {
+	function trySandBox( forceRerender = false ) {
 		if ( ! isFrameAccessible() ) {
 			return;
 		}
@@ -187,10 +187,10 @@ export default function Sandbox( {
 	}
 
 	useEffect( () => {
-		trySandbox();
+		trySandBox();
 
-		function tryNoForceSandbox() {
-			trySandbox( false );
+		function tryNoForceSandBox() {
+			trySandBox( false );
 		}
 
 		function checkMessageForResize( event ) {
@@ -228,11 +228,11 @@ export default function Sandbox( {
 		// after reordering the containing block. See these two issues for more details:
 		// https://github.com/WordPress/gutenberg/issues/6146
 		// https://github.com/facebook/react/issues/18752
-		iframe.addEventListener( 'load', tryNoForceSandbox, false );
+		iframe.addEventListener( 'load', tryNoForceSandBox, false );
 		defaultView.addEventListener( 'message', checkMessageForResize );
 
 		return () => {
-			iframe?.removeEventListener( 'load', tryNoForceSandbox, false );
+			iframe?.removeEventListener( 'load', tryNoForceSandBox, false );
 			defaultView.addEventListener( 'message', checkMessageForResize );
 		};
 		// Ignore reason: passing `exhaustive-deps` will likely involve a more detailed refactor.
@@ -241,14 +241,14 @@ export default function Sandbox( {
 	}, [] );
 
 	useEffect( () => {
-		trySandbox();
+		trySandBox();
 		// Ignore reason: passing `exhaustive-deps` will likely involve a more detailed refactor.
 		// See https://github.com/WordPress/gutenberg/pull/44378
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ title, styles, scripts ] );
 
 	useEffect( () => {
-		trySandbox( true );
+		trySandBox( true );
 		// Ignore reason: passing `exhaustive-deps` will likely involve a more detailed refactor.
 		// See https://github.com/WordPress/gutenberg/pull/44378
 		// eslint-disable-next-line react-hooks/exhaustive-deps

@@ -1,4 +1,4 @@
-# Sandbox
+# SandBox
 
 This component provides an isolated environment for arbitrary HTML via iframes.
 
@@ -8,6 +8,6 @@ This component provides an isolated environment for arbitrary HTML via iframes.
 import { SandBox } from '@wordpress/components';
 
 const MySandBox = () => (
-	<SandBox html="<p>Content</p>" title="Sandbox" type="embed" />
+	<SandBox html="<p>Content</p>" title="SandBox" type="embed" />
 );
 ```

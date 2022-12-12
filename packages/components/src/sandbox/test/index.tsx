@@ -11,9 +11,9 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Sandbox from '..';
+import SandBox from '..';
 
-describe( 'Sandbox', () => {
+describe( 'SandBox', () => {
 	const TestWrapper = () => {
 		const [ html, setHtml ] = useState(
 			// MutationObserver implementation from JSDom does not work as intended
@@ -33,7 +33,7 @@ describe( 'Sandbox', () => {
 				<button onClick={ updateHtml } className="mock-button">
 					Mock Button
 				</button>
-				<Sandbox html={ html } title="Sandbox Title" />
+				<SandBox html={ html } title="SandBox Title" />
 			</div>
 		);
 	};
@@ -41,7 +41,7 @@ describe( 'Sandbox', () => {
 	it( 'should rerender with new emdeded content if html prop changes', () => {
 		render( <TestWrapper /> );
 
-		const iframe = screen.getByTitle( 'Sandbox Title' );
+		const iframe = screen.getByTitle( 'SandBox Title' );
 
 		let sandboxedIframe = within(
 			iframe.contentWindow.document.body
