@@ -135,12 +135,12 @@ export default function SidebarNavigationScreenTemplates( {
 								templateType={ postType }
 								toggleProps={ {
 									className:
-										'edit-site-layout__sidebar-button',
+										'edit-site-sidebar-navigation-screen-templates__add-button',
 								} }
 							/>
 							{ isEditorPage && (
 								<Button
-									className="edit-site-layout__sidebar-button edit-site-layout__edit-button"
+									className="edit-site-layout__edit-button"
 									label={ __( 'Open the editor' ) }
 									onClick={ () => {
 										__unstableSetCanvasMode( 'edit' );
