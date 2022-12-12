@@ -8,6 +8,19 @@ import { __experimentalNavigatorProvider as NavigatorProvider } from '@wordpress
  */
 import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
 import SidebarNavigationScreenTemplates from '../sidebar-navigation-screen-templates';
+import useSyncSidebarPathWithURL from '../sync-state-with-url/use-sync-sidebar-path-with-url';
+
+function SidebarScreens() {
+	useSyncSidebarPathWithURL();
+
+	return (
+		<>
+			<SidebarNavigationScreenMain />
+			<SidebarNavigationScreenTemplates postType="wp_template" />
+			<SidebarNavigationScreenTemplates postType="wp_template_part" />
+		</>
+	);
+}
 
 export function Sidebar() {
 	return (
@@ -15,9 +28,7 @@ export function Sidebar() {
 			className="edit-site-sidebar__content"
 			initialPath="/"
 		>
-			<SidebarNavigationScreenMain />
-			<SidebarNavigationScreenTemplates postType="wp_template" />
-			<SidebarNavigationScreenTemplates postType="wp_template_part" />
+			<SidebarScreens />
 		</NavigatorProvider>
 	);
 }
