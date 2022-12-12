@@ -323,7 +323,6 @@ function proceed() {
 				addFreeform();
 				return false;
 			}
-
 			// If we're not nesting then this is easy - close the block.
 			if ( 1 === stackDepth ) {
 				addBlockFromStack( startOffset );
@@ -438,7 +437,8 @@ function nextToken() {
  * @param {number} [rawLength]
  */
 function addFreeform( rawLength ) {
-	const length = rawLength ? rawLength : document.length - offset;
+	// document might be undefined
+	const length = rawLength ? rawLength : ( document?.length || 0 ) - offset;
 
 	if ( 0 === length ) {
 		return;
