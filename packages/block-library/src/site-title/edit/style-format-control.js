@@ -7,9 +7,23 @@ import { formatBold, formatItalic } from '@wordpress/icons';
 const BOLD_VALUE = '700';
 const ITALIC_VALUE = 'italic';
 
-export default function StyleFormatControl( { attributesStyle, onChange } ) {
-	const isBold = attributesStyle?.typography?.fontWeight === BOLD_VALUE;
-	const isItalic = attributesStyle?.typography?.fontStyle === ITALIC_VALUE;
+function getNewTypographyStyle( isBold, isItalic ) {
+	if ( ! isBold && ! isItalic ) {
+		return {
+			fontWeight: undefined,
+			fontStyle: undefined,
+		};
+	}
+	return {
+		fontWeight: isBold ? BOLD_VALUE : '400',
+		fontStyle: isItalic ? ITALIC_VALUE : 'normal',
+	};
+}
+
+export default function StyleFormatControl( { typographyStyle, onChange } ) {
+	const isBold = typographyStyle?.fontWeight === BOLD_VALUE;
+	const isItalic = typographyStyle?.fontStyle === ITALIC_VALUE;
+
 	return (
 		<ToolbarGroup>
 			<ToolbarButton
@@ -18,8 +32,8 @@ export default function StyleFormatControl( { attributesStyle, onChange } ) {
 				isPressed={ isBold }
 				onClick={ () => {
 					onChange( {
-						...attributesStyle?.typography,
-						fontWeight: isBold ? undefined : BOLD_VALUE,
+						...typographyStyle,
+						...getNewTypographyStyle( ! isBold, isItalic ),
 					} );
 				} }
 			/>
@@ -29,8 +43,8 @@ export default function StyleFormatControl( { attributesStyle, onChange } ) {
 				isPressed={ isItalic }
 				onClick={ () => {
 					onChange( {
-						...attributesStyle?.typography,
-						fontStyle: isItalic ? undefined : ITALIC_VALUE,
+						...typographyStyle,
+						...getNewTypographyStyle( isBold, ! isItalic ),
 					} );
 				} }
 			/>

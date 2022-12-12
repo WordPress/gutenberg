@@ -109,7 +109,7 @@ export default function SiteTitleEdit( {
 					} }
 				/>
 				<StyleFormatControl
-					attributesStyle={ style }
+					typographyStyle={ style?.typography }
 					onChange={ ( newTypography ) => {
 						setAttributes( {
 							style: { ...style, typography: newTypography },
