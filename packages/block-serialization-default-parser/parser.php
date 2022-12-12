@@ -225,6 +225,10 @@ class WP_Block_Parser {
 	 * @return array[]
 	 */
 	public function parse( $document ) {
+		if ( gettype( $document ) !== 'string' ) {
+			return [];
+		}
+
 		$this->document    = $document;
 		$this->offset      = 0;
 		$this->output      = array();

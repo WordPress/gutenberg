@@ -217,6 +217,10 @@ function Frame( block, tokenStart, tokenLength, prevOffset, leadingHtmlStart ) {
  * @return {ParsedBlock[]} A block-based representation of the input HTML.
  */
 export const parse = ( doc ) => {
+	if ( 'string' !== typeof doc ) {
+		return [];
+	}
+
 	document = doc;
 	offset = 0;
 	output = [];
@@ -437,8 +441,7 @@ function nextToken() {
  * @param {number} [rawLength]
  */
 function addFreeform( rawLength ) {
-	// document might be undefined
-	const length = rawLength ? rawLength : ( document?.length || 0 ) - offset;
+	const length = rawLength ? rawLength : document.length - offset;
 
 	if ( 0 === length ) {
 		return;
