@@ -78,13 +78,14 @@
 }
 
 @keyframes slideBottom {
-	from {
+	0% {
 		transform: translateY(200px);
-		opacity: 0;
 	}
-	to {
-		transform: translateY(0);
+	40% {
 		opacity: 1;
+	}
+	100% {
+		transform: translateY(0);
 	}
 }
 
@@ -108,7 +109,7 @@
 }
 
 [data-effect="slide-from-bottom"][data-has-intersected="false"] {
-	transform: translateY(200px);
+	transform: translateY(0);
 	opacity: 0;
 }
 
