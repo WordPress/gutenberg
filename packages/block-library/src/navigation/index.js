@@ -1,8 +1,16 @@
 /**
+ * External dependencies
+ */
+import { capitalCase } from 'change-case';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { navigation as icon } from '@wordpress/icons';
+import { store as coreDataStore } from '@wordpress/core-data';
+import { select } from '@wordpress/data';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -46,6 +54,27 @@ export const settings = {
 				},
 			},
 		],
+	},
+	__experimentalLabel: ( { ref } ) => {
+		// Attempt to find entity title if block is a template part.
+		// Require slug to request, otherwise entity is uncreated and will throw 404.
+		if ( ! ref ) {
+			return;
+		}
+
+		const entity = select( coreDataStore ).getEntityRecord(
+			'postType',
+			'wp_navigation',
+			ref
+		);
+		if ( ! entity ) {
+			return;
+		}
+
+		return (
+			decodeEntities( entity.title?.rendered ) ||
+			capitalCase( entity.slug )
+		);
 	},
 	edit,
 	save,
