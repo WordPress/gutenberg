@@ -20,11 +20,7 @@ export function addLabelCallback( settings ) {
 		return settings;
 	}
 
-	const supportsBlockNaming = hasBlockMetadataSupport(
-		settings,
-		'name',
-		false // default value
-	);
+	const supportsBlockNaming = hasBlockMetadataSupport( settings, 'name' );
 
 	// Check whether block metadata is supported before using it.
 	if ( supportsBlockNaming ) {
