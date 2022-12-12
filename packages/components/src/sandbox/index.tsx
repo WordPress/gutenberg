@@ -88,6 +88,7 @@ const observeAndResizeJS = function () {
 	window.addEventListener( 'resize', sendResize, true );
 };
 
+// TODO: These styles shouldn't be coupled with WordPress.
 const style = `
 	body {
 		margin: 0;
