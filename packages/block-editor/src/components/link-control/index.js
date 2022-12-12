@@ -103,6 +103,7 @@ import LinkControlLoading from './link-control-loading';
  */
 
 const noop = () => {};
+const STABLE_OBJECT = {};
 
 const LinkControlContext = createContext();
 LinkControlContext.displayName = 'LinkControlContext';
@@ -137,7 +138,7 @@ function LinkControl( {
 	createSuggestion,
 	withCreateSuggestion,
 	inputValue: propInputValue = '',
-	suggestionsQuery = {},
+	suggestionsQuery = STABLE_OBJECT,
 	noURLSuggestion = false,
 	createSuggestionButtonText,
 	hasRichPreviews = false,
