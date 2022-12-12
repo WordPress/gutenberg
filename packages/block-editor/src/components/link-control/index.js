@@ -223,13 +223,16 @@ function LinkControl( {
 		setIsEditingLink( false );
 	};
 
-	const handleSelectSuggestion = ( updatedValue ) => {
-		onChange( {
-			...updatedValue,
-			title: internalTextInputValue || updatedValue?.title,
-		} );
-		stopEditing();
-	};
+	const handleSelectSuggestion = useCallback(
+		( updatedValue ) => {
+			onChange( {
+				...updatedValue,
+				title: internalTextInputValue || updatedValue?.title,
+			} );
+			stopEditing();
+		},
+		[ onChange, stopEditing, internalTextInputValue ]
+	);
 
 	const currentUrlInputValue = propInputValue || internalUrlInputValue;
 
