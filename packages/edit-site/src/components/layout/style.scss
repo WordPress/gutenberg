@@ -78,6 +78,19 @@
 	position: relative;
 	flex-grow: 1;
 	z-index: 2;
+	justify-self: center;
+	width: 100%;
+
+	&.is-resizing::after {
+		// This covers the whole content which ensures mouse up triggers
+		// even if the content is "inert".
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		content: "";
+	}
 }
 
 .edit-site-layout__canvas {
@@ -173,4 +186,12 @@
 		border-radius: $radius-block-ui;
 		object-fit: cover;
 	}
+}
+
+.edit-site-layout__resize-handle-container {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: -$grid-unit-10;
+	width: $grid-unit-10;
 }

@@ -26,11 +26,7 @@ import {
 	store as blockEditorStore,
 	__unstableBlockNameContext,
 } from '@wordpress/block-editor';
-import {
-	useMergeRefs,
-	useViewportMatch,
-	useResizeObserver,
-} from '@wordpress/compose';
+import { useMergeRefs, useViewportMatch } from '@wordpress/compose';
 import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
 import { listView } from '@wordpress/icons';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
@@ -143,7 +139,6 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const mergedRefs = useMergeRefs( [ contentRef, useTypingObserver() ] );
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
-	const [ resizeObserver, sizes ] = useResizeObserver();
 
 	const isTemplatePart = templateType === 'wp_template_part';
 	const hasBlocks = blocks.length !== 0;
@@ -229,28 +224,22 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 						>
 							<BlockEditorKeyboardShortcuts.Register />
 							<BackButton />
-							<ResizableEditor
+							<EditorCanvas
 								enableResizing={ enableResizing }
-								height={ sizes.height }
+								settings={ settings }
+								contentRef={ mergedRefs }
+								readonly={ canvasMode === 'view' }
 							>
-								<EditorCanvas
-									enableResizing={ enableResizing }
-									settings={ settings }
-									contentRef={ mergedRefs }
-									readonly={ canvasMode === 'view' }
-								>
-									{ resizeObserver }
-									<BlockList
-										className="edit-site-block-editor__block-list wp-site-blocks"
-										__experimentalLayout={ LAYOUT }
-										renderAppender={
-											isTemplatePart && hasBlocks
-												? false
-												: undefined
-										}
-									/>
-								</EditorCanvas>
-							</ResizableEditor>
+								<BlockList
+									className="edit-site-block-editor__block-list wp-site-blocks"
+									__experimentalLayout={ LAYOUT }
+									renderAppender={
+										isTemplatePart && hasBlocks
+											? false
+											: undefined
+									}
+								/>
+							</EditorCanvas>
 							<__unstableBlockSettingsMenuFirstItem>
 								{ ( { onClose } ) => (
 									<BlockInspectorButton onClick={ onClose } />

@@ -38,6 +38,7 @@ import getIsListPage from '../../utils/get-is-list-page';
 import Header from '../header-edit-mode';
 import SiteIcon from '../site-icon';
 import SiteTitle from '../site-title';
+import ResizeHandle from '../resize-handle';
 import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
 
 const ANIMATION_DURATION = 0.5;
@@ -96,6 +97,8 @@ export default function Layout( { onError } ) {
 	// Ideally this effect could be removed if we move the "isMobileCanvasVisible" into the store.
 	const [ canvasResizer, canvasSize ] = useResizeObserver();
 	const [ fullResizer, fullSize ] = useResizeObserver();
+	const [ forcedWidth, setForcedWidth ] = useState( null );
+	const [ isResizing, setIsResizing ] = useState( false );
 	useEffect( () => {
 		if ( canvasMode === 'view' && isMobileViewport ) {
 			setIsMobileCanvasVisible( false );
@@ -245,13 +248,32 @@ export default function Layout( { onError } ) {
 
 				{ showCanvas && (
 					<div
-						className="edit-site-layout__canvas-container"
+						className={ classnames(
+							'edit-site-layout__canvas-container',
+							{
+								'is-resizing': isResizing,
+							}
+						) }
 						style={ {
 							paddingTop: showFrame ? canvasPadding : 0,
 							paddingBottom: showFrame ? canvasPadding : 0,
+							width: forcedWidth,
 						} }
 					>
 						{ canvasResizer }
+						{ showFrame && ! isMobileViewport && (
+							<div className="edit-site-layout__resize-handle-container">
+								<ResizeHandle
+									factor={ -1 }
+									value={ forcedWidth ?? canvasSize.width }
+									onResize={ setForcedWidth }
+									onStartResize={ () =>
+										setIsResizing( true )
+									}
+									onEndResize={ () => setIsResizing( false ) }
+								/>
+							</div>
+						) }
 						{ !! canvasSize.width && (
 							<motion.div
 								initial={ false }
