@@ -161,9 +161,11 @@ const getPluginTemplate = async ( templateName ) => {
 
 	try {
 		if ( existsSync( resolve( templateName ) ) ) {
-			return await configToTemplate( require( resolve( templateName ) ) );
+			return await configToTemplate(
+				await require( resolve( templateName ) )
+			);
 		}
-		return await configToTemplate( require( templateName ) );
+		return await configToTemplate( await require( templateName ) );
 	} catch ( error ) {
 		if ( error instanceof CLIError ) {
 			throw error;
@@ -198,7 +200,7 @@ const getPluginTemplate = async ( templateName ) => {
 
 		const { name } = npmPackageArg( templateName );
 		return await configToTemplate(
-			require( require.resolve( name, {
+			await require( require.resolve( name, {
 				paths: [ tempCwd ],
 			} ) )
 		);
