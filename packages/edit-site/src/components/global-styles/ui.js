@@ -43,7 +43,8 @@ function GlobalStylesNavigationScreen( { className, ...props } ) {
 }
 
 function ContextScreens( { name } ) {
-	const parentMenu = name === undefined ? '' : '/blocks/' + name;
+	const parentMenu =
+		name === undefined ? '' : '/blocks/' + encodeURIComponent( name );
 
 	return (
 		<>
@@ -124,14 +125,27 @@ function ContextScreens( { name } ) {
 
 function GlobalStylesStyleBook( { onClose } ) {
 	const navigator = useNavigator();
+	const { path } = navigator.location;
 	return (
 		<StyleBook
 			isSelected={ ( blockName ) =>
-				navigator.location.path.startsWith( '/blocks/' + blockName )
+				// Match '/blocks/core%2Fbutton' and
+				// '/blocks/core%2Fbutton/typography', but not
+				// '/blocks/core%2Fbuttons'.
+				path === `/blocks/${ encodeURIComponent( blockName ) }` ||
+				path.startsWith(
+					`/blocks/${ encodeURIComponent( blockName ) }/`
+				)
 			}
-			onSelect={ ( blockName ) =>
-				navigator.goTo( '/blocks/' + blockName )
-			}
+			onSelect={ ( blockName ) => {
+				// Clear navigator history by going back to the root.
+				const depth = path.match( /\//g ).length;
+				for ( let i = 0; i < depth; i++ ) {
+					navigator.goBack();
+				}
+				// Now go to the selected block.
+				navigator.goTo( '/blocks/' + encodeURIComponent( blockName ) );
+			} }
 			onClose={ onClose }
 		/>
 	);
@@ -159,7 +173,7 @@ function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
 			{ blocks.map( ( block ) => (
 				<GlobalStylesNavigationScreen
 					key={ 'menu-block-' + block.name }
-					path={ '/blocks/' + block.name }
+					path={ '/blocks/' + encodeURIComponent( block.name ) }
 				>
 					<ScreenBlock name={ block.name } />
 				</GlobalStylesNavigationScreen>
