@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { get, set } from 'lodash';
+import { capitalCase } from 'change-case';
 
 /**
  * WordPress dependencies
@@ -10,9 +11,14 @@ import { addFilter } from '@wordpress/hooks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { InspectorAdvancedControls } from '@wordpress/block-editor';
 import { BaseControl, Button } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '@wordpress/blocks';
+import { __, sprintf } from '@wordpress/i18n';
+import {
+	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
+	getBlockType,
+} from '@wordpress/blocks';
 import { useContext } from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -31,12 +37,14 @@ function cloneDeep( object ) {
 function usePushBlockStylesToUserStyles( { name, attributes, setAttributes } ) {
 	const { user: userConfig, setUserConfig } =
 		useContext( GlobalStylesContext );
+	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	return () => {
 		const { style: blockStyles = {} } = attributes;
 
 		let newBlockStyles = null;
 		let newUserConfig = null;
+		const changedKeys = [];
 
 		const supportedKeys = getSupportedGlobalStylesPanels( name );
 		for ( const key of supportedKeys ) {
@@ -65,14 +73,39 @@ function usePushBlockStylesToUserStyles( { name, attributes, setAttributes } ) {
 				[ 'styles', 'blocks', name, ...valuePath ],
 				pushedValue
 			);
+
+			changedKeys.push( key );
 		}
 
-		if ( newBlockStyles ) {
+		if ( changedKeys.length ) {
+			// TODO: Make these two calls not create an undo level since we have
+			// our own Undo functionality in the toast below. In the longer term
+			// we should use the regular undo/redo functionality. Doing this
+			// requires us to be able to create a single undo level here instead
+			// of two.
 			setAttributes( { style: newBlockStyles } );
-		}
-
-		if ( newUserConfig ) {
 			setUserConfig( () => newUserConfig );
+
+			createSuccessNotice(
+				sprintf(
+					// translators: %1$s: Title of the block e.g. 'Heading'. %2$s: List of style properties e.g. 'Color, Link Color, Font Size'.
+					__( 'Applied to all %1$s blocks: %2$s.' ),
+					getBlockType( name ).title,
+					changedKeys.map( capitalCase ).join( ', ' )
+				),
+				{
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+							onClick() {
+								setAttributes( { style: blockStyles } );
+								setUserConfig( () => userConfig );
+							},
+						},
+					],
+				}
+			);
 		}
 	};
 }
