@@ -9,6 +9,11 @@ import {
 } from '@wordpress/element';
 import { useFocusableIframe, useMergeRefs } from '@wordpress/compose';
 
+/**
+ * Internal dependencies
+ */
+import type { SandBoxProps } from './types';
+
 const observeAndResizeJS = function () {
 	const { MutationObserver } = window;
 
@@ -44,11 +49,11 @@ const observeAndResizeJS = function () {
 	// Hack: Remove viewport unit styles, as these are relative
 	// the iframe root and interfere with our mechanism for
 	// determining the unconstrained page bounds.
-	function removeViewportStyles( ruleOrNode ) {
+	function removeViewportStyles( ruleOrNode: ElementCSSInlineStyle ) {
 		if ( ruleOrNode.style ) {
-			[ 'width', 'height', 'minHeight', 'maxHeight' ].forEach( function (
-				style
-			) {
+			(
+				[ 'width', 'height', 'minHeight', 'maxHeight' ] as const
+			 ).forEach( function ( style ) {
 				if (
 					/^\\d+(vmin|vmax|vh|vw)$/.test( ruleOrNode.style[ style ] )
 				) {
@@ -113,14 +118,14 @@ export default function SandBox( {
 	styles = [],
 	scripts = [],
 	onFocus,
-} ) {
-	const ref = useRef();
+}: SandBoxProps ) {
+	const ref = useRef< HTMLIFrameElement >();
 	const [ width, setWidth ] = useState( 0 );
 	const [ height, setHeight ] = useState( 0 );
 
 	function isFrameAccessible() {
 		try {
-			return !! ref.current.contentDocument.body;
+			return !! ref.current?.contentDocument?.body;
 		} catch ( e ) {
 			return false;
 		}
@@ -131,12 +136,17 @@ export default function SandBox( {
 			return;
 		}
 
-		const { contentDocument, ownerDocument } = ref.current;
-		const { body } = contentDocument;
+		const { contentDocument, ownerDocument } =
+			ref.current as HTMLIFrameElement & {
+				contentDocument: Document;
+			};
 
 		if (
 			! forceRerender &&
-			null !== body.getAttribute( 'data-resizable-iframe-connected' )
+			null !==
+				contentDocument?.body.getAttribute(
+					'data-resizable-iframe-connected'
+				)
 		) {
 			return;
 		}
@@ -193,7 +203,7 @@ export default function SandBox( {
 			trySandBox( false );
 		}
 
-		function checkMessageForResize( event ) {
+		function checkMessageForResize( event: MessageEvent ) {
 			const iframe = ref.current;
 
 			// Verify that the mounted element is the source of the message.
@@ -221,19 +231,18 @@ export default function SandBox( {
 		}
 
 		const iframe = ref.current;
-		const { ownerDocument } = iframe;
-		const { defaultView } = ownerDocument;
+		const defaultView = iframe?.ownerDocument?.defaultView;
 
 		// This used to be registered using <iframe onLoad={} />, but it made the iframe blank
 		// after reordering the containing block. See these two issues for more details:
 		// https://github.com/WordPress/gutenberg/issues/6146
 		// https://github.com/facebook/react/issues/18752
-		iframe.addEventListener( 'load', tryNoForceSandBox, false );
-		defaultView.addEventListener( 'message', checkMessageForResize );
+		iframe?.addEventListener( 'load', tryNoForceSandBox, false );
+		defaultView?.addEventListener( 'message', checkMessageForResize );
 
 		return () => {
 			iframe?.removeEventListener( 'load', tryNoForceSandBox, false );
-			defaultView.addEventListener( 'message', checkMessageForResize );
+			defaultView?.addEventListener( 'message', checkMessageForResize );
 		};
 		// Ignore reason: passing `exhaustive-deps` will likely involve a more detailed refactor.
 		// See https://github.com/WordPress/gutenberg/pull/44378

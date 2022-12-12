@@ -41,7 +41,12 @@ describe( 'SandBox', () => {
 	it( 'should rerender with new emdeded content if html prop changes', () => {
 		render( <TestWrapper /> );
 
-		const iframe = screen.getByTitle( 'SandBox Title' );
+		const iframe =
+			screen.getByTitle< HTMLIFrameElement >( 'SandBox Title' );
+
+		if ( ! iframe.contentWindow ) {
+			throw new Error();
+		}
 
 		let sandboxedIframe = within(
 			iframe.contentWindow.document.body
