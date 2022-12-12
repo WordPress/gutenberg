@@ -138,3 +138,11 @@ $block-preview-height: 150px;
 .edit-site-global-styles__custom-css-input textarea {
 	font-family: $editor_html_font;
 }
+
+.edit-site-global-styles__custom-css-theme-css {
+	width: 100%;
+	line-break: anywhere;
+	white-space: break-spaces;
+	max-height: 200px;
+	overflow-y: scroll;
+}
