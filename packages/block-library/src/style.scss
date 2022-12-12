@@ -80,12 +80,19 @@
 @keyframes slideBottom {
 	from {
 		transform: translateY(200px);
-		opacity: 0;
 	}
 	to {
 		transform: translateY(0);
-		opacity: 1;
 	}
+}
+
+[data-effect] {
+	opacity: 0;
+	transition: opacity 500ms;
+}
+
+[data-effect][data-has-intersected="true"] {
+	opacity: 1;
 }
 
 [data-effect="slide-from-left"][data-has-intersected="true"] {
