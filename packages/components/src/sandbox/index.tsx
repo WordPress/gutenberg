@@ -112,6 +112,17 @@ const style = `
 	}
 `;
 
+/**
+ * This component provides an isolated environment for arbitrary HTML via iframes.
+ *
+ * ```jsx
+ * import { SandBox } from '@wordpress/components';
+ *
+ * const MySandBox = () => (
+ * 	<SandBox html="<p>Content</p>" title="SandBox" type="embed" />
+ * );
+ * ```
+ */
 function SandBox( {
 	html = '',
 	title = '',
