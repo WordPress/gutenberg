@@ -88,6 +88,8 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	} );
 	const isReusable = blocks.length === 1 && isReusableBlock( blocks[ 0 ] );
 	const isTemplate = blocks.length === 1 && isTemplatePart( blocks[ 0 ] );
+	const isNavigation =
+		blocks.length === 1 && blocks[ 0 ].name === 'core/navigation';
 
 	function selectForMultipleBlocks( insertedBlocks ) {
 		if ( insertedBlocks.length > 1 ) {
@@ -129,7 +131,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 					icon={
 						<>
 							<BlockIcon icon={ icon } showColors />
-							{ ( isReusable || isTemplate ) && (
+							{ ( isReusable || isTemplate || isNavigation ) && (
 								<span className="block-editor-block-switcher__toggle-text">
 									{ blockTitle }
 								</span>
@@ -183,7 +185,9 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 									className="block-editor-block-switcher__toggle"
 									showColors
 								/>
-								{ ( isReusable || isTemplate ) && (
+								{ ( isReusable ||
+									isTemplate ||
+									isNavigation ) && (
 									<span className="block-editor-block-switcher__toggle-text">
 										{ blockTitle }
 									</span>
