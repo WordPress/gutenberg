@@ -9,9 +9,9 @@ import { Notice } from '@wordpress/components';
 import { useLinkControlContext } from './';
 
 export default function LinkControlNotice() {
-	const { createPageErrorMessage } = useLinkControlContext();
+	const { errorMsg } = useLinkControlContext();
 
-	if ( ! createPageErrorMessage ) {
+	if ( ! errorMsg ) {
 		return null;
 	}
 	return (
@@ -20,7 +20,7 @@ export default function LinkControlNotice() {
 			status="error"
 			isDismissible={ false }
 		>
-			{ createPageErrorMessage }
+			{ errorMsg }
 		</Notice>
 	);
 }

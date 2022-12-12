@@ -291,7 +291,7 @@ function LinkControl( {
 		currentInputIsEmpty,
 		handleSubmit,
 		currentUrlInputValue,
-		createPageErrorMessage, // needs extracting to generic error message
+		errorMsg: createPageErrorMessage,
 		shouldShowEditControls,
 		shouldShowLinkPreview,
 		showSettingsDrawer,
