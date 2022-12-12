@@ -174,7 +174,7 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
 				),
 
-				'__experimentalBlockInspectorAnimation'       => array(
+				'__experimentalBlockInspectorAnimation'  => array(
 					'description' => __( 'Whether to enable animation when showing and hiding the block inspector.', 'gutenberg' ),
 					'type'        => 'object',
 					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),

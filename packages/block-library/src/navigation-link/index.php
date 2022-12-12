@@ -377,6 +377,16 @@ function gutenberg_disable_tabs_for_navigation_link_block( $settings ) {
 
 add_filter( 'block_editor_settings_all', 'gutenberg_disable_tabs_for_navigation_link_block' );
 
+/**
+ * Enables animation of the block inspector for the Navigation Link block.
+ *
+ * See:
+ * - https://github.com/WordPress/gutenberg/pull/46342
+ * - https://github.com/WordPress/gutenberg/issues/45884
+ *
+ * @param array $settings Default editor settings.
+ * @return array Filtered editor settings.
+ */
 function gutenberg_enable_animation_for_navigation_link_inspector( $settings ) {
 	$current_animation_settings = _wp_array_get(
 		$settings,
@@ -386,9 +396,12 @@ function gutenberg_enable_animation_for_navigation_link_inspector( $settings ) {
 
 	$settings['__experimentalBlockInspectorAnimation'] = array_merge(
 		$current_animation_settings,
-		array( 'core/navigation-link' => array(
-			'enterDirection' => 'rightToLeft'
-		) )
+		array(
+			'core/navigation-link' =>
+				array(
+					'enterDirection' => 'rightToLeft',
+				),
+		)
 	);
 
 	return $settings;

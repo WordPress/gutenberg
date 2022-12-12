@@ -14,16 +14,10 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	Button,
+	__unstableMotion as motion,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo, useCallback } from '@wordpress/element';
-
-/**
- * External dependencies
- */
-
-// eslint-disable-next-line no-restricted-imports
-import { motion } from 'framer-motion';
 
 /**
  * Internal dependencies
