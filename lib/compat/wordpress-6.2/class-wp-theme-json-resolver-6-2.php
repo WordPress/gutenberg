@@ -174,11 +174,13 @@ class WP_Theme_JSON_Resolver_6_2 extends WP_Theme_JSON_Resolver_6_1 {
 	 *
 	 * @since 6.2 Added check for the WP_Theme_JSON_Gutenberg class to prevent $user
 	 * values set in core fron overriding the new custom css values added to VALID_STYLES.
+	 * This does not need to be backported to core as the new VALID_STYLES[css] value will
+	 * be added to core with 6.2.
 	 *
 	 * @return WP_Theme_JSON_Gutenberg Entity that holds styles for user data.
 	 */
 	public static function get_user_data() {
-		if ( null !== static::$user && is_a( static::$user, 'WP_Theme_JSON_Gutenberg' ) ) {
+		if ( null !== static::$user && static::$user instanceof WP_Theme_JSON_Gutenberg ) {
 			return static::$user;
 		}
 
