@@ -264,12 +264,11 @@ function LinkControl( {
 	// See https://github.com/WordPress/gutenberg/pull/33849/#issuecomment-932194927.
 	const showTextControl = value?.url?.trim()?.length > 0 && hasTextControl;
 
-	const shouldShowEditControls =
-		( isEditingLink || ! value ) && ! isCreatingPage;
-
-	const shouldShowLinkPreview = value && ! isEditingLink && ! isCreatingPage;
-
 	const isLoading = isCreatingPage;
+
+	const shouldShowLinkPreview = value && ! isEditingLink && ! isLoading;
+
+	const shouldShowEditControls = ! shouldShowLinkPreview;
 
 	// Consumers can pass in custom functions which may return
 	// a different references resulting in the context being
