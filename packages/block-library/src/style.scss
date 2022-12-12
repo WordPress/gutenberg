@@ -80,9 +80,20 @@
 @keyframes slideBottom {
 	from {
 		transform: translateY(200px);
+		opacity: 0;
 	}
 	to {
 		transform: translateY(0);
+		opacity: 1;
+	}
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
 	}
 }
 
@@ -105,4 +116,8 @@
 
 [data-effect="slide-from-bottom"][data-has-intersected="true"] {
 	animation: slideBottom 500ms;
+}
+
+[data-effect="fade-in"][data-has-intersected="true"] {
+	animation: fadeIn 500ms;
 }

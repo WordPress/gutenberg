@@ -10,7 +10,13 @@ import {
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { arrowLeft, arrowRight, arrowUp } from '@wordpress/icons';
+import {
+	arrowLeft,
+	arrowRight,
+	arrowUp,
+	close,
+	swatch,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -32,6 +38,16 @@ const effectsOptions = [
 		label: __( 'Slide from bottom' ),
 		value: 'slide-from-bottom',
 		icon: arrowUp,
+	},
+	{
+		label: __( 'Fade in' ),
+		value: 'fade-in',
+		icon: swatch,
+	},
+	{
+		label: __( 'None' ),
+		value: undefined,
+		icon: close,
 	},
 ];
 
