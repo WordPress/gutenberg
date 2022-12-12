@@ -24,13 +24,14 @@ import { decodeEntities } from '@wordpress/html-entities';
  * Internal dependencies
  */
 import LevelControl from './level-toolbar';
+import StyleFormatControl from './style-format-control';
 
 export default function SiteTitleEdit( {
 	attributes,
 	setAttributes,
 	insertBlocksAfter,
 } ) {
-	const { level, textAlign, isLink, linkTarget } = attributes;
+	const { level, textAlign, isLink, linkTarget, style } = attributes;
 	const { canUserEdit, title } = useSelect( ( select ) => {
 		const { canUser, getEntityRecord, getEditedEntityRecord } =
 			select( coreStore );
@@ -105,6 +106,14 @@ export default function SiteTitleEdit( {
 					value={ textAlign }
 					onChange={ ( nextAlign ) => {
 						setAttributes( { textAlign: nextAlign } );
+					} }
+				/>
+				<StyleFormatControl
+					attributesStyle={ style }
+					onChange={ ( newTypography ) => {
+						setAttributes( {
+							style: { ...style, typography: newTypography },
+						} );
 					} }
 				/>
 			</BlockControls>
