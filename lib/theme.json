@@ -187,6 +187,7 @@
 			"text": true
 		},
 		"shadow": {
+			"defaultPresets": true,
 			"presets": [
 				{
 					"name": "Natural",

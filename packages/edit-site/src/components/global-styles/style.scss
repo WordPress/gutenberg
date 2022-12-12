@@ -190,3 +190,36 @@ $block-preview-height: 150px;
 	display: flex;
 	flex-direction: column;
 }
+
+.edit-site-global-styles__shadow-panel {
+	width: 230px;
+}
+
+.edit-site-global-styles__shadow-dropdown {
+	display: block;
+	padding: 0;
+
+	> button {
+		width: 100%;
+		padding: $grid-unit-10;
+
+		&.is-open {
+			background-color: $gray-100;
+		}
+	}
+}
+
+.edit-site-global-styles__shadow-indicator {
+	color: $gray-800;
+	border: $gray-200 $border-width solid;
+	border-radius: $radius-block-ui;
+	padding: $grid-unit-10;
+	cursor: pointer;
+
+	&.active,
+	&.components-button:active {
+		color: $gray-100;
+		background-color: $gray-900;
+		border-color: $gray-900;
+	}
+}
