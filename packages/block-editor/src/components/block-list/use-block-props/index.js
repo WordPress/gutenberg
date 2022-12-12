@@ -158,6 +158,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		'data-block': clientId,
 		'data-type': name,
 		'data-title': blockTitle,
+		'data-has-intersected': 'false',
 		className: classnames(
 			// The wp-block className is important for editor styles.
 			classnames( 'block-editor-block-list__block', {

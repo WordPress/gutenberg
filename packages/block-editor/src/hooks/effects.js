@@ -25,6 +25,7 @@ function addAttributes( settings ) {
 			type: 'string',
 			source: 'attribute',
 			attribute: 'data-effect',
+			selector: '[data-effect]',
 		},
 	};
 	return settings;
@@ -92,4 +93,31 @@ addFilter(
 	'blocks.getSaveContent.extraProps',
 	'core/effects/save-props',
 	addSaveProps
+);
+
+/**
+ * Filters registered block settings to expand the block edit wrapper
+ * by applying the desired styles and classnames.
+ *
+ * @param {Object} settings Original block settings.
+ *
+ * @return {Object} Filtered block settings.
+ */
+function addEditProps( settings ) {
+	const existingGetEditWrapperProps = settings.getEditWrapperProps;
+	settings.getEditWrapperProps = ( attributes ) => {
+		let props = {};
+		if ( existingGetEditWrapperProps ) {
+			props = existingGetEditWrapperProps( attributes );
+		}
+		return addSaveProps( props, settings, attributes );
+	};
+
+	return settings;
+}
+
+addFilter(
+	'blocks.registerBlockType',
+	'core/effects/addEditProps',
+	addEditProps
 );

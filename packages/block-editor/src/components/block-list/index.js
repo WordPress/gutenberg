@@ -96,6 +96,11 @@ function Root( { className, ...settings } ) {
 				pendingBlockVisibilityUpdatesPerRegistry
 					.get( registry )
 					.push( [ clientId, entry.isIntersecting ] );
+
+				entry.target.dataset.isIntersecting = entry.isIntersecting;
+				entry.target.dataset.hasIntersected =
+					entry.target.dataset.hasIntersected === 'true' ||
+					entry.isIntersecting;
 			}
 			delayedBlockVisibilityUpdates();
 		} );

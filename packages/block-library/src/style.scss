@@ -54,3 +54,50 @@
 @import "./video/style.scss";
 
 @import "common.scss";
+
+@keyframes slideLeft {
+	from {
+		transform: translateX(-200px);
+		opacity: 0;
+	}
+	to {
+		transform: translateX(0);
+		opacity: 1;
+	}
+}
+
+@keyframes slideRight {
+	from {
+		transform: translateX(200px);
+		opacity: 0;
+	}
+	to {
+		transform: translateX(0);
+		opacity: 1;
+	}
+}
+
+@keyframes slideBottom {
+	from {
+		transform: translateY(200px);
+		opacity: 0;
+	}
+	to {
+		transform: translateY(0);
+		opacity: 1;
+	}
+}
+
+[data-has-intersected="true"] {
+	[data-effect="slide-from-left"] {
+		animation: slideLeft 500ms;
+	}
+
+	[data-effect="slide-from-right"] {
+		animation: slideRight 500ms;
+	}
+
+	[data-effect="slide-from-bottom"] {
+		animation: slideBottom 500ms;
+	}
+}
