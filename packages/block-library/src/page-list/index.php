@@ -253,6 +253,7 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	++$block_id;
 
 	$parent_page_id = $attributes['parentPageID'];
+	$is_nested = $attributes['isNested'];
 
 	$all_pages = get_pages(
 		array(
@@ -321,7 +322,7 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 
 	$show_submenu_icons = array_key_exists( 'showSubmenuIcon', $block->context ) ? $block->context['showSubmenuIcon'] : false;
 
-	$wrapper_markup = '<ul %1$s>%2$s</ul>';
+	$wrapper_markup = $is_nested ? '%2$s' : '<ul %1$s>%2$s</ul>';
 
 	$items_markup = block_core_page_list_render_nested_page_list( $open_submenus_on_click, $show_submenu_icons, $is_navigation_child, $nested_pages, $active_page_ancestor_ids, $colors );
 

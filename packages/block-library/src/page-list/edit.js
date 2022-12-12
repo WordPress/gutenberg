@@ -189,7 +189,7 @@ export default function PageListEdit( {
 
 	const { replaceBlock, selectBlock } = useDispatch( blockEditorStore );
 
-	const { parentNavBlockClientId } = useSelect( ( select ) => {
+	const { parentNavBlockClientId, isNested } = useSelect( ( select ) => {
 		const { getSelectedBlockClientId, getBlockParentsByBlockName } =
 			select( blockEditorStore );
 
@@ -201,8 +201,20 @@ export default function PageListEdit( {
 				'core/navigation',
 				true
 			)[ 0 ],
+			isNested:
+				getBlockParentsByBlockName(
+					_selectedBlockClientId,
+					'core/navigation',
+					true
+				).length > 0,
 		};
 	}, [] );
+
+	useEffect( () => {
+		if ( isNested ) {
+			setAttributes( { isNested } );
+		}
+	}, [ isNested ] );
 
 	return (
 		<>
