@@ -756,6 +756,16 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'styles'  => array(
+					'blocks'  => array(
+						'core/social-links' => array(
+							'spacing' => array(
+								'blockGap' => array(
+									'top'  => '1em',
+									'left' => '2em',
+								),
+							),
+						),
+					),
 					'spacing' => array(
 						'blockGap' => '3em',
 					),
@@ -766,6 +776,16 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$expected = array(
 			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'styles'  => array(
+				'blocks'  => array(
+					'core/social-links' => array(
+						'spacing' => array(
+							'blockGap' => array(
+								'top'  => '1em',
+								'left' => '2em',
+							),
+						),
+					),
+				),
 				'spacing' => array(
 					'blockGap' => '3em',
 				),
