@@ -112,7 +112,7 @@ const style = `
 	}
 `;
 
-export default function SandBox( {
+function SandBox( {
 	html = '',
 	title = '',
 	type,
@@ -276,3 +276,5 @@ export default function SandBox( {
 		/>
 	);
 }
+
+export default SandBox;
