@@ -35,7 +35,6 @@ import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
 import { listView } from '@wordpress/icons';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -56,16 +55,8 @@ const LAYOUT = {
 	alignments: [],
 };
 
-const NAVIGATION_SIDEBAR_NAME = 'edit-site/navigation-menu';
-
 export default function BlockEditor( { setIsInserterOpen } ) {
-	const {
-		storedSettings,
-		templateType,
-		page,
-		isNavigationSidebarOpen,
-		canvasMode,
-	} = useSelect(
+	const { storedSettings, templateType, page, canvasMode } = useSelect(
 		( select ) => {
 			const {
 				getSettings,
@@ -78,10 +69,6 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 				storedSettings: getSettings( setIsInserterOpen ),
 				templateType: getEditedPostType(),
 				page: getPage(),
-				isNavigationSidebarOpen:
-					select( interfaceStore ).getActiveComplementaryArea(
-						editSiteStore.name
-					) === NAVIGATION_SIDEBAR_NAME,
 				canvasMode: __unstableGetCanvasMode(),
 			};
 		},
@@ -156,14 +143,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		templateType
 	);
 	const { setPage } = useDispatch( editSiteStore );
-	const { enableComplementaryArea, disableComplementaryArea } =
-		useDispatch( interfaceStore );
-	const toggleNavigationSidebar = useCallback( () => {
-		const toggleComplementaryArea = isNavigationSidebarOpen
-			? disableComplementaryArea
-			: enableComplementaryArea;
-		toggleComplementaryArea( editSiteStore.name, NAVIGATION_SIDEBAR_NAME );
-	}, [ isNavigationSidebarOpen ] );
+
 	const contentRef = useRef();
 	const mergedRefs = useMergeRefs( [ contentRef, useTypingObserver() ] );
 	const isMobileViewport = useViewportMatch( 'small', '<' );
@@ -179,28 +159,30 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		! isMobileViewport;
 	const isViewMode = canvasMode === 'view';
 
+	// eslint-disable-next-line @wordpress/data-no-store-string-literals
+	const { enableComplementaryArea } = useDispatch( 'core/interface' );
+
 	const NavMenuSidebarToggle = () => (
 		<ToolbarGroup>
 			<ToolbarButton
 				className="components-toolbar__control"
-				label={
-					isNavigationSidebarOpen
-						? __( 'Close list view' )
-						: __( 'Open list view' )
+				label={ __( 'Open navigation list view' ) }
+				onClick={ () =>
+					enableComplementaryArea(
+						'core/edit-site',
+						'edit-site/block-inspector'
+					)
 				}
-				onClick={ toggleNavigationSidebar }
 				icon={ listView }
-				isActive={ isNavigationSidebarOpen }
 			/>
 		</ToolbarGroup>
 	);
 
-	// Conditionally include NavMenu sidebar in Plugin only.
-	// Optimise for dead code elimination.
-	// See https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/feature-flags.md#dead-code-elimination.
 	let MaybeNavMenuSidebarToggle = Fragment;
+	const isOffCanvasNavigationEditorEnabled =
+		window?.__experimentalEnableOffCanvasNavigationEditor === true;
 
-	if ( process.env.IS_GUTENBERG_PLUGIN ) {
+	if ( isOffCanvasNavigationEditorEnabled ) {
 		MaybeNavMenuSidebarToggle = NavMenuSidebarToggle;
 	}
 
