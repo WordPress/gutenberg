@@ -160,6 +160,28 @@ describe( 'TabPanel', () => {
 		expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
 	} );
 
+	it( 'should disable the tab when `disabled` is true', () => {
+		const mockOnSelect = jest.fn();
+
+		render(
+			<TabPanel
+				tabs={ [
+					...TABS,
+					{
+						name: 'delta',
+						title: 'Delta',
+						className: 'delta-class',
+						disabled: true,
+					},
+				] }
+				children={ () => undefined }
+				onSelect={ mockOnSelect }
+			/>
+		);
+
+		expect( screen.getByRole( 'tab', { name: 'Delta' } ) ).toBeDisabled();
+	} );
+
 	describe( 'fallbacks when new tab list invalidates current selection', () => {
 		it( 'should select `initialTabName` if defined', async () => {
 			const user = setupUser();
