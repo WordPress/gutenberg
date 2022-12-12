@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { castArray, isEqual, find } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
+import { find } from 'lodash';
 import { v4 as uuid } from 'uuid';
 
 /**
@@ -33,7 +34,7 @@ import { STORE_NAME } from './name';
 export function receiveUserQuery( queryID, users ) {
 	return {
 		type: 'RECEIVE_USER_QUERY',
-		users: castArray( users ),
+		users: Array.isArray( users ) ? users : [ users ],
 		queryID,
 	};
 }
@@ -91,8 +92,11 @@ export function receiveEntityRecords(
 	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
 	// on the server.
 	if ( kind === 'postType' ) {
-		records = castArray( records ).map( ( record ) =>
-			record.status === 'auto-draft' ? { ...record, title: '' } : record
+		records = ( Array.isArray( records ) ? records : [ records ] ).map(
+			( record ) =>
+				record.status === 'auto-draft'
+					? { ...record, title: '' }
+					: record
 		);
 	}
 	let action;
@@ -352,7 +356,9 @@ export const editEntityRecord =
 				const value = mergedEdits[ key ]
 					? { ...editedRecordValue, ...edits[ key ] }
 					: edits[ key ];
-				acc[ key ] = isEqual( recordValue, value ) ? undefined : value;
+				acc[ key ] = fastDeepEqual( recordValue, value )
+					? undefined
+					: value;
 				return acc;
 			}, {} ),
 			transientEdits,
@@ -820,6 +826,6 @@ export function receiveAutosaves( postId, autosaves ) {
 	return {
 		type: 'RECEIVE_AUTOSAVES',
 		postId,
-		autosaves: castArray( autosaves ),
+		autosaves: Array.isArray( autosaves ) ? autosaves : [ autosaves ],
 	};
 }

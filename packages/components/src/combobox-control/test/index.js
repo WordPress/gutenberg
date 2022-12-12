@@ -271,7 +271,7 @@ describe.each( [
 
 		// No options are rendered if no match is found
 		await user.keyboard( unmatchedString );
-		expect( screen.queryByRole( 'option' ) ).toBeNull();
+		expect( screen.queryByRole( 'option' ) ).not.toBeInTheDocument();
 
 		// Clearing the input renders all options again
 		await user.clear( input );

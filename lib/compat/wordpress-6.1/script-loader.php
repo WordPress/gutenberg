@@ -6,37 +6,6 @@
  */
 
 /**
- * This function takes care of adding inline styles
- * in the proper place, depending on the theme in use.
- *
- * This method was added to core in 5.9.1, but with a single param ($style). The second param ($priority) was
- * added post 6.0, so the 6.1 release needs to have wp_enqueue_block_support_styles updated to include this param.
- *
- * For block themes, it's loaded in the head.
- * For classic ones, it's loaded in the body
- * because the wp_head action  happens before
- * the render_block.
- *
- * @link https://core.trac.wordpress.org/ticket/53494.
- *
- * @param string $style String containing the CSS styles to be added.
- * @param int    $priority To set the priority for the add_action.
- */
-function gutenberg_enqueue_block_support_styles( $style, $priority = 10 ) {
-	$action_hook_name = 'wp_footer';
-	if ( wp_is_block_theme() ) {
-		$action_hook_name = 'wp_head';
-	}
-	add_action(
-		$action_hook_name,
-		static function () use ( $style ) {
-			echo "<style>$style</style>\n";
-		},
-		$priority
-	);
-}
-
-/**
  * This applies a filter to the list of style nodes that comes from `get_style_nodes` in WP_Theme_JSON.
  * This particular filter removes all of the blocks from the array.
  *
@@ -89,7 +58,7 @@ function gutenberg_enqueue_global_styles() {
 	 * This removes the CSS from the global-styles stylesheet and adds it to the inline CSS for each block.
 	 * This filter has to be registered before we call gutenberg_get_global_stylesheet();
 	 */
-	add_filter( 'gutenberg_theme_json_get_style_nodes', 'gutenberg_filter_out_block_nodes', 10, 1 );
+	add_filter( 'wp_theme_json_get_style_nodes', 'gutenberg_filter_out_block_nodes', 10, 1 );
 
 	$stylesheet = gutenberg_get_global_stylesheet();
 	if ( empty( $stylesheet ) ) {

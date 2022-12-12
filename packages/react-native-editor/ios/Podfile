@@ -6,16 +6,21 @@ require_relative '../../../node_modules/@react-native-community/cli-platform-ios
 # Uncomment the next line to define a global platform for your project
 app_ios_deployment_target = Gem::Version.new('13.0')
 platform :ios, app_ios_deployment_target.version
+install! 'cocoapods', :deterministic_uuids => false
 
 target 'GutenbergDemo' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
 
   config = use_native_modules!
+
   use_react_native!(
     :path => config[:reactNativePath],
     # to enable hermes on iOS, change `false` to `true` and then install pods
-    :hermes_enabled => false
+    :hermes_enabled => false,
+    :fabric_enabled => false,
+    # An absolute path to the application root
+    :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
   target 'GutenbergDemoTests' do
@@ -58,6 +63,16 @@ target 'GutenbergDemo' do
         end
       end
     end
+		### End workaround for https://github.com/facebook/react-native/issues/31034
+
+		### Begin workaround: https://github.com/CocoaPods/CocoaPods/issues/8891#issuecomment-1201465446
+		installer.pods_project.targets.each do |target|
+			if target.respond_to?(:product_type) and target.product_type == "com.apple.product-type.bundle"
+				target.build_configurations.each do |config|
+						config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+				end
+			end
+		end
+		### End workaround: https://github.com/CocoaPods/CocoaPods/issues/8891#issuecomment-1201465446
   end
-  ### End workaround for https://github.com/facebook/react-native/issues/31034
 end

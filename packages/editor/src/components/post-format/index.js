@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, includes } from 'lodash';
+import { find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -66,7 +66,7 @@ export default function PostFormat() {
 		// Ensure current format is always in the set.
 		// The current format may not be a format supported by the theme.
 		return (
-			includes( supportedFormats, format.id ) || postFormat === format.id
+			supportedFormats?.includes( format.id ) || postFormat === format.id
 		);
 	} );
 	const suggestion = find(

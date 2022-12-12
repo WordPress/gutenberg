@@ -95,6 +95,7 @@ function ColumnsEditContainer( {
 			<InspectorControls>
 				<PanelBody>
 					<RangeControl
+						__nextHasNoMarginBottom
 						label={ __( 'Columns' ) }
 						value={ count }
 						onChange={ ( value ) => updateColumns( count, value ) }

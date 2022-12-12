@@ -66,6 +66,7 @@ const interfaceLabels = {
 function Layout( { styles } ) {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
+	const isLargeViewport = useViewportMatch( 'large' );
 	const { openGeneralSidebar, closeGeneralSidebar, setIsInserterOpened } =
 		useDispatch( editPostStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -116,7 +117,8 @@ function Layout( { styles } ) {
 			showIconLabels:
 				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
 			isDistractionFree:
-				select( editPostStore ).isFeatureActive( 'distractionFree' ),
+				select( editPostStore ).isFeatureActive( 'distractionFree' ) &&
+				isLargeViewport,
 			showBlockBreadcrumbs: select( editPostStore ).isFeatureActive(
 				'showBlockBreadcrumbs'
 			),
@@ -124,12 +126,6 @@ function Layout( { styles } ) {
 			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
 		};
 	}, [] );
-	const [ distractionFree, setDistractionFree ] =
-		useState( isDistractionFree );
-
-	useEffect( () => {
-		setDistractionFree( isDistractionFree );
-	}, [ isDistractionFree ] );
 
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
@@ -170,7 +166,7 @@ function Layout( { styles } ) {
 	);
 
 	const secondarySidebarLabel = isListViewOpened
-		? __( 'List View' )
+		? __( 'Document Overview' )
 		: __( 'Block Library' );
 
 	const secondarySidebar = () => {
@@ -207,7 +203,7 @@ function Layout( { styles } ) {
 			<EditorKeyboardShortcutsRegister />
 			<SettingsSidebar />
 			<InterfaceSkeleton
-				isDistractionFree={ distractionFree }
+				isDistractionFree={ isDistractionFree }
 				className={ className }
 				labels={ {
 					...interfaceLabels,
@@ -215,7 +211,6 @@ function Layout( { styles } ) {
 				} }
 				header={
 					<Header
-						isDistractionFree={ distractionFree }
 						setEntitiesSavedStatesCallback={
 							setEntitiesSavedStatesCallback
 						}

@@ -11,6 +11,7 @@ import {
 	__EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE,
 	hasBlockSupport,
 } from '@wordpress/blocks';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -18,7 +19,13 @@ import {
 import { useBlockEditContext } from '../block-edit';
 import { store as blockEditorStore } from '../../store';
 
-const blockedPaths = [ 'color', 'border', 'typography', 'spacing' ];
+const blockedPaths = [
+	'color',
+	'border',
+	'dimensions',
+	'typography',
+	'spacing',
+];
 
 const deprecatedFlags = {
 	'color.palette': ( settings ) => settings.colors,
@@ -116,7 +123,18 @@ export default function useSetting( path ) {
 				return undefined;
 			}
 
-			let result;
+			// 0. Allow third parties to filter the block's settings at runtime.
+			let result = applyFilters(
+				'blockEditor.useSetting.before',
+				undefined,
+				path,
+				clientId,
+				blockName
+			);
+
+			if ( undefined !== result ) {
+				return result;
+			}
 
 			const normalizedPath = removeCustomPrefixes( path );
 

@@ -24,12 +24,14 @@ import MainDashboardButton from './main-dashboard-button';
 import { store as editPostStore } from '../../store';
 import TemplateTitle from './template-title';
 
-function Header( { setEntitiesSavedStatesCallback, isDistractionFree } ) {
+function Header( { setEntitiesSavedStatesCallback } ) {
+	const isLargeViewport = useViewportMatch( 'large' );
 	const {
 		hasActiveMetaboxes,
 		isPublishSidebarOpened,
 		isSaving,
 		showIconLabels,
+		isDistractionFree,
 	} = useSelect(
 		( select ) => ( {
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
@@ -38,11 +40,12 @@ function Header( { setEntitiesSavedStatesCallback, isDistractionFree } ) {
 			isSaving: select( editPostStore ).isSavingMetaBoxes(),
 			showIconLabels:
 				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
+			isDistractionFree:
+				select( editPostStore ).isFeatureActive( 'distractionFree' ) &&
+				isLargeViewport,
 		} ),
 		[]
 	);
-
-	const isLargeViewport = useViewportMatch( 'large' );
 
 	const classes = classnames( 'edit-post-header' );
 

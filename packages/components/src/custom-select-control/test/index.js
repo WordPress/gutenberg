@@ -46,4 +46,43 @@ describe( 'CustomSelectControl', () => {
 
 		expect( onKeyDown ).toHaveBeenCalledTimes( 0 );
 	} );
+
+	it( 'does not show selected hint by default', () => {
+		render(
+			<CustomSelectControl
+				label="Custom select"
+				options={ [
+					{
+						key: 'one',
+						name: 'One',
+						__experimentalHint: 'Hint',
+					},
+				] }
+				__nextUnconstrainedWidth
+			/>
+		);
+		expect(
+			screen.getByRole( 'button', { name: 'Custom select' } )
+		).not.toHaveTextContent( 'Hint' );
+	} );
+
+	it( 'shows selected hint when __experimentalShowSelectedHint is set', () => {
+		render(
+			<CustomSelectControl
+				label="Custom select"
+				options={ [
+					{
+						key: 'one',
+						name: 'One',
+						__experimentalHint: 'Hint',
+					},
+				] }
+				__experimentalShowSelectedHint
+				__nextUnconstrainedWidth
+			/>
+		);
+		expect(
+			screen.getByRole( 'button', { name: 'Custom select' } )
+		).toHaveTextContent( 'Hint' );
+	} );
 } );

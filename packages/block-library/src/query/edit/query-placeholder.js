@@ -104,20 +104,8 @@ function QueryVariationPicker( {
 	icon,
 	label,
 } ) {
-	const { defaultVariation, scopeVariations } = useSelect(
-		( select ) => {
-			const {
-				getBlockVariations,
-				getBlockType,
-				getDefaultBlockVariation,
-			} = select( blocksStore );
-
-			return {
-				blockType: getBlockType( name ),
-				defaultVariation: getDefaultBlockVariation( name, 'block' ),
-				scopeVariations: getBlockVariations( name, 'block' ),
-			};
-		},
+	const variations = useSelect(
+		( select ) => select( blocksStore ).getBlockVariations( name, 'block' ),
 		[ name ]
 	);
 	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
@@ -127,8 +115,8 @@ function QueryVariationPicker( {
 			<__experimentalBlockVariationPicker
 				icon={ icon }
 				label={ label }
-				variations={ scopeVariations }
-				onSelect={ ( nextVariation = defaultVariation ) => {
+				variations={ variations }
+				onSelect={ ( nextVariation ) => {
 					if ( nextVariation.attributes ) {
 						setAttributes( {
 							...nextVariation.attributes,

@@ -141,7 +141,7 @@ test.describe( 'Image', () => {
 		}
 	} );
 
-	test( 'should place caret at end of caption after merging empty paragraph', async ( {
+	test( 'should place caret on caption when clicking to add one', async ( {
 		editor,
 		page,
 		imageBlockUtils,
@@ -157,7 +157,7 @@ test.describe( 'Image', () => {
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
 		);
 		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
-
+		await editor.clickBlockToolbarButton( 'Add caption' );
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Backspace' );
@@ -186,7 +186,7 @@ test.describe( 'Image', () => {
 
 		await expect( image ).toBeVisible();
 		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ) );
-
+		await editor.clickBlockToolbarButton( 'Add caption' );
 		await page.keyboard.type( '12' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'Enter' );
@@ -216,7 +216,8 @@ test.describe( 'Image', () => {
 		await expect( image ).toBeVisible();
 		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ) );
 
-		// Navigate to inline toolbar,
+		// Add caption and navigate to inline toolbar.
+		await editor.clickBlockToolbarButton( 'Add caption' );
 		await pageUtils.pressKeyWithModifier( 'shift', 'Tab' );
 		await expect(
 			await page.evaluate( () =>
@@ -516,7 +517,7 @@ test.describe( 'Image', () => {
 		);
 
 		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
-
+		await page.focus( '.wp-block-image' );
 		await pageUtils.pressKeyWithModifier( 'primary', 'z' );
 
 		// Expect an empty image block (placeholder) rather than one with a

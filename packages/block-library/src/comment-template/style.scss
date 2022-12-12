@@ -1,4 +1,6 @@
 .wp-block-comment-template {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
 	margin-bottom: 0;
 	max-width: 100%;
 	list-style: none;

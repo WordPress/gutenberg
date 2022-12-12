@@ -22,7 +22,7 @@
 	&:focus {
 		box-shadow:
 			0 0 0 1px $white,
-			0 0 0 3px var(--wp-admin-theme-color);
+			0 0 0 3px $components-color-accent;
 	}
 
 	&.components-snackbar-explicit-dismiss {
@@ -64,7 +64,7 @@
 		}
 
 		&:hover {
-			color: var(--wp-admin-theme-color);
+			color: $components-color-accent;
 		}
 	}
 }

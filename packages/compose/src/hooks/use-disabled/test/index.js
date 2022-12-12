@@ -21,7 +21,7 @@ describe( 'useDisabled', () => {
 			<form ref={ ref }>
 				<input />
 				<a href="https://wordpress.org/">A link</a>
-				<p contentEditable={ true } tabIndex="0"></p>
+				<p role="document" contentEditable={ true } tabIndex="0"></p>
 				{ showButton && <button>Button</button> }
 			</form>
 		);
@@ -33,15 +33,15 @@ describe( 'useDisabled', () => {
 	}
 
 	it( 'will disable all fields', () => {
-		const { container } = render( <DisabledComponent /> );
+		render( <DisabledComponent /> );
 
 		const input = screen.getByRole( 'textbox' );
 		const link = screen.getByRole( 'link' );
-		const p = container.querySelector( 'p' );
+		const p = screen.getByRole( 'document' );
 
-		expect( input.hasAttribute( 'inert' ) ).toBe( true );
-		expect( link.hasAttribute( 'inert' ) ).toBe( true );
-		expect( p.hasAttribute( 'inert' ) ).toBe( true );
+		expect( input ).toHaveAttribute( 'inert', 'true' );
+		expect( link ).toHaveAttribute( 'inert', 'true' );
+		expect( p ).toHaveAttribute( 'inert', 'true' );
 	} );
 
 	it( 'will disable an element rendered in an update to the component', async () => {
@@ -54,7 +54,7 @@ describe( 'useDisabled', () => {
 
 		const button = screen.getByText( 'Button' );
 		await waitFor( () => {
-			expect( button.hasAttribute( 'inert' ) ).toBe( true );
+			expect( button ).toHaveAttribute( 'inert', 'true' );
 		} );
 	} );
 } );

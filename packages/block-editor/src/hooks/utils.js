@@ -1,14 +1,12 @@
 /**
  * External dependencies
  */
-import { pickBy, isEmpty, mapValues, get, setWith, clone } from 'lodash';
+import { isEmpty, mapValues, get, setWith, clone } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
-
-const identity = ( x ) => x;
 
 /**
  * Removed falsy values from nested object.
@@ -24,9 +22,10 @@ export const cleanEmptyObject = ( object ) => {
 	) {
 		return object;
 	}
-	const cleanedNestedObjects = pickBy(
-		mapValues( object, cleanEmptyObject ),
-		identity
+	const cleanedNestedObjects = Object.fromEntries(
+		Object.entries( mapValues( object, cleanEmptyObject ) ).filter(
+			( [ , value ] ) => Boolean( value )
+		)
 	);
 	return isEmpty( cleanedNestedObjects ) ? undefined : cleanedNestedObjects;
 };

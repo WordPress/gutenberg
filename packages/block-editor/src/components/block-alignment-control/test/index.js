@@ -47,7 +47,7 @@ describe( 'BlockAlignmentUI', () => {
 			advanceTimers: jest.advanceTimersByTime,
 		} );
 
-		render(
+		const { unmount } = render(
 			<BlockAlignmentUI
 				value={ alignment }
 				onChange={ onChange }
@@ -72,6 +72,9 @@ describe( 'BlockAlignmentUI', () => {
 				name: /^Align \w+$/,
 			} )
 		).toHaveLength( 3 );
+
+		// Cancel running effects, like delayed dropdown menu popover positioning.
+		unmount();
 	} );
 
 	test( 'should call onChange with undefined, when the control is already active', async () => {

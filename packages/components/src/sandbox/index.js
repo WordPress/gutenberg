@@ -9,64 +9,79 @@ import {
 } from '@wordpress/element';
 import { useFocusableIframe, useMergeRefs } from '@wordpress/compose';
 
-const observeAndResizeJS = `
-	( function() {
-		var observer;
+const observeAndResizeJS = function () {
+	const { MutationObserver } = window;
 
-		if ( ! window.MutationObserver || ! document.body || ! window.parent ) {
-			return;
-		}
+	if ( ! MutationObserver || ! document.body || ! window.parent ) {
+		return;
+	}
 
-		function sendResize() {
-			var clientBoundingRect = document.body.getBoundingClientRect();
+	function sendResize() {
+		const clientBoundingRect = document.body.getBoundingClientRect();
 
-			window.parent.postMessage( {
+		window.parent.postMessage(
+			{
 				action: 'resize',
 				width: clientBoundingRect.width,
 				height: clientBoundingRect.height,
-			}, '*' );
+			},
+			'*'
+		);
+	}
+
+	const observer = new MutationObserver( sendResize );
+	observer.observe( document.body, {
+		attributes: true,
+		attributeOldValue: false,
+		characterData: true,
+		characterDataOldValue: false,
+		childList: true,
+		subtree: true,
+	} );
+
+	window.addEventListener( 'load', sendResize, true );
+
+	// Hack: Remove viewport unit styles, as these are relative
+	// the iframe root and interfere with our mechanism for
+	// determining the unconstrained page bounds.
+	function removeViewportStyles( ruleOrNode ) {
+		if ( ruleOrNode.style ) {
+			[ 'width', 'height', 'minHeight', 'maxHeight' ].forEach( function (
+				style
+			) {
+				if (
+					/^\\d+(vmin|vmax|vh|vw)$/.test( ruleOrNode.style[ style ] )
+				) {
+					ruleOrNode.style[ style ] = '';
+				}
+			} );
 		}
+	}
 
-		observer = new MutationObserver( sendResize );
-		observer.observe( document.body, {
-			attributes: true,
-			attributeOldValue: false,
-			characterData: true,
-			characterDataOldValue: false,
-			childList: true,
-			subtree: true
-		} );
-
-		window.addEventListener( 'load', sendResize, true );
-
-		// Hack: Remove viewport unit styles, as these are relative
-		// the iframe root and interfere with our mechanism for
-		// determining the unconstrained page bounds.
-		function removeViewportStyles( ruleOrNode ) {
-			if( ruleOrNode.style ) {
-				[ 'width', 'height', 'minHeight', 'maxHeight' ].forEach( function( style ) {
-					if ( /^\\d+(vmin|vmax|vh|vw)$/.test( ruleOrNode.style[ style ] ) ) {
-						ruleOrNode.style[ style ] = '';
-					}
-				} );
-			}
+	Array.prototype.forEach.call(
+		document.querySelectorAll( '[style]' ),
+		removeViewportStyles
+	);
+	Array.prototype.forEach.call(
+		document.styleSheets,
+		function ( stylesheet ) {
+			Array.prototype.forEach.call(
+				stylesheet.cssRules || stylesheet.rules,
+				removeViewportStyles
+			);
 		}
+	);
 
-		Array.prototype.forEach.call( document.querySelectorAll( '[style]' ), removeViewportStyles );
-		Array.prototype.forEach.call( document.styleSheets, function( stylesheet ) {
-			Array.prototype.forEach.call( stylesheet.cssRules || stylesheet.rules, removeViewportStyles );
-		} );
+	document.body.style.position = 'absolute';
+	document.body.style.width = '100%';
+	document.body.setAttribute( 'data-resizable-iframe-connected', '' );
 
-		document.body.style.position = 'absolute';
-		document.body.style.width = '100%';
-		document.body.setAttribute( 'data-resizable-iframe-connected', '' );
+	sendResize();
 
-		sendResize();
-
-		// Resize events can change the width of elements with 100% width, but we don't
-		// get an DOM mutations for that, so do the resize when the window is resized, too.
-		window.addEventListener( 'resize', sendResize, true );
-} )();`;
+	// Resize events can change the width of elements with 100% width, but we don't
+	// get an DOM mutations for that, so do the resize when the window is resized, too.
+	window.addEventListener( 'resize', sendResize, true );
+};
 
 const style = `
 	body {
@@ -153,7 +168,7 @@ export default function Sandbox( {
 					<script
 						type="text/javascript"
 						dangerouslySetInnerHTML={ {
-							__html: observeAndResizeJS,
+							__html: `(${ observeAndResizeJS.toString() })();`,
 						} }
 					/>
 					{ scripts.map( ( src ) => (

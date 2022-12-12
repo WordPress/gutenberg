@@ -49,6 +49,6 @@ describe( 'TreeGridCell', () => {
 			</TreeGrid>
 		);
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 } );

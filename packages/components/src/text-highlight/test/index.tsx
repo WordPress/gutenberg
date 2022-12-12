@@ -50,9 +50,7 @@ describe( 'TextHighlight', () => {
 			expect( highlightedEls ).toHaveLength( 2 );
 
 			highlightedEls.forEach( ( el ) => {
-				expect( el.textContent ).toEqual(
-					expect.stringContaining( highlight )
-				);
+				expect( el ).toHaveTextContent( highlight );
 			} );
 		} );
 

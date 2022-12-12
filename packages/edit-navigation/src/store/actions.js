@@ -81,7 +81,7 @@ export const saveNavigationPost =
 						__( "Unable to save: '%s'" ),
 						saveError.message
 				  )
-				: __( 'Unable to save: An error ocurred.' );
+				: __( 'Unable to save: An error occurred.' );
 			registry.dispatch( noticesStore ).createErrorNotice( errorMessage, {
 				type: 'snackbar',
 			} );

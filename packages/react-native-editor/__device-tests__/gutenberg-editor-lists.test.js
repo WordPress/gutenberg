@@ -16,7 +16,7 @@ describe( 'Gutenberg Editor tests for List block', () => {
 		// Send an Enter.
 		await editorPage.typeTextToTextBlock( listBlockElement, '\n', false );
 
-		// Instead of introducing separate conditions for local and CI environment, add this wait for Android to accomodate both environments
+		// Instead of introducing separate conditions for local and CI environment, add this wait for Android to accommodate both environments
 		await waitIfAndroid();
 
 		// Send a backspace.

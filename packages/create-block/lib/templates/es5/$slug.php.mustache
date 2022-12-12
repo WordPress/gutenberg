@@ -7,7 +7,7 @@
 {{#description}}
  * Description:       {{description}}
 {{/description}}
- * Requires at least: 5.7
+ * Requires at least: 6.1
  * Requires PHP:      7.0
  * Version:           {{version}}
 {{#author}}
@@ -70,32 +70,12 @@ function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
 	);
 
 	register_block_type(
-		'{{namespace}}/{{slug}}',
+		$dir,
 		array(
 			'editor_script' => '{{namespace}}-{{slug}}-block-editor',
 			'editor_style'  => '{{namespace}}-{{slug}}-block-editor',
 			'style'         => '{{namespace}}-{{slug}}-block',
-			{{#isDynamicVariant}}
-			'render_callback' => '{{namespaceSnakeCase}}_{{slugSnakeCase}}_render_callback',
-			{{/isDynamicVariant}}
 		)
 	);
 }
 add_action( 'init', '{{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init' );
-{{#isDynamicVariant}}
-
-/**
- * Render callback function.
- *
- * @param array    $attributes The block attributes.
- * @param string   $content    The block content.
- * @param WP_Block $block      Block instance.
- *
- * @return string The rendered output.
- */
-function {{namespaceSnakeCase}}_{{slugSnakeCase}}_render_callback( $attributes, $content, $block ) {
-	ob_start();
-	require plugin_dir_path( __FILE__ ) . '/template.php';
-	return ob_get_clean();
-}
-{{/isDynamicVariant}}
