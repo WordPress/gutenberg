@@ -11,7 +11,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Sandbox from '../';
+import Sandbox from '..';
 
 describe( 'Sandbox', () => {
 	const TestWrapper = () => {
