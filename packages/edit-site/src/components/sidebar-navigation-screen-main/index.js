@@ -32,11 +32,11 @@ export default function SidebarNavigationScreenMain() {
 		<SidebarNavigationScreen
 			path="/"
 			title={
-				<HStack style={ { minHeight: 36 } }>
+				<HStack justify="space-between" style={ { minHeight: 36 } }>
 					<div>{ __( 'Design' ) }</div>
 					{ ! isMobileViewport && isEditorPage && (
 						<Button
-							className="edit-site-layout__edit-button"
+							className="edit-site-layout__sidebar-button"
 							label={ __( 'Open the editor' ) }
 							onClick={ () => {
 								__unstableSetCanvasMode( 'edit' );

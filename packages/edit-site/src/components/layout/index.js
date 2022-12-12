@@ -138,7 +138,7 @@ export default function Layout( { onError } ) {
 
 										{ showEditButton && (
 											<Button
-												className="edit-site-layout__edit-button"
+												className="edit-site-layout__sidebar-button"
 												label={ __(
 													'Open the editor'
 												) }
