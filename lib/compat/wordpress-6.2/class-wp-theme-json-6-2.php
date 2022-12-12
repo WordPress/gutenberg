@@ -98,19 +98,19 @@ class WP_Theme_JSON_6_2 extends WP_Theme_JSON_6_1 {
 	);
 
 	/**
-	 * Inferred metadata for style properties that are not directly output.
+	 * Indirect metadata for style properties that are not directly output.
 	 *
-	 * Each element is a direct mapping from an inferred CSS property name to the
+	 * Each element is a direct mapping from a CSS property name to the
 	 * path to the value in theme.json & block attributes.
 	 *
-	 * Inferred properties are not output directly by `compute_style_properties`,
-	 * but are used elsewhere in the processing of global styles. The inferred
+	 * Indirect properties are not output directly by `compute_style_properties`,
+	 * but are used elsewhere in the processing of global styles. The indirect
 	 * property is used to validate whether or not a style value is allowed.
 	 *
 	 * @since 6.2.0
 	 * @var array
 	 */
-	const INFERRED_PROPERTIES_METADATA = array(
+	const INDIRECT_PROPERTIES_METADATA = array(
 		'gap'        => array( 'spacing', 'blockGap' ),
 		'column-gap' => array( 'spacing', 'blockGap', 'left' ),
 		'row-gap'    => array( 'spacing', 'blockGap', 'top' ),
@@ -241,7 +241,7 @@ class WP_Theme_JSON_6_2 extends WP_Theme_JSON_6_1 {
 	 * without the insecure styles.
 	 *
 	 * @since 5.9.0
-	 * @since 6.2.0 Allow inferred properties used outside of `compute_style_properties`.
+	 * @since 6.2.0 Allow indirect properties used outside of `compute_style_properties`.
 	 *
 	 * @param array $input Node to process.
 	 * @return array
@@ -263,7 +263,8 @@ class WP_Theme_JSON_6_2 extends WP_Theme_JSON_6_1 {
 			}
 		}
 
-		foreach ( static::INFERRED_PROPERTIES_METADATA as $property => $path ) {
+		// Ensure indirect properties not handled by `compute_style_properties` are allowed.
+		foreach ( static::INDIRECT_PROPERTIES_METADATA as $property => $path ) {
 			$value = _wp_array_get( $input, $path, array() );
 			if (
 				isset( $value ) &&
