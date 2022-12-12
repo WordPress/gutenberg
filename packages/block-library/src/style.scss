@@ -88,16 +88,14 @@
 	}
 }
 
-[data-has-intersected="true"] {
-	[data-effect="slide-from-left"] {
-		animation: slideLeft 500ms;
-	}
+[data-effect="slide-from-left"][data-has-intersected="true"] {
+	animation: slideLeft 500ms;
+}
 
-	[data-effect="slide-from-right"] {
-		animation: slideRight 500ms;
-	}
+[data-effect="slide-from-right"][data-has-intersected="true"] {
+	animation: slideRight 500ms;
+}
 
-	[data-effect="slide-from-bottom"] {
-		animation: slideBottom 500ms;
-	}
+[data-effect="slide-from-bottom"][data-has-intersected="true"] {
+	animation: slideBottom 500ms;
 }
