@@ -9,12 +9,17 @@ import classnames from 'classnames';
 import { cloneElement, Children } from '@wordpress/element';
 import { useResizeObserver } from '@wordpress/compose';
 
+/**
+ * Internal dependencies
+ */
+import type { ResponsiveWrapperProps } from './types';
+
 function ResponsiveWrapper( {
 	naturalWidth,
 	naturalHeight,
 	children,
 	isInline = false,
-} ) {
+}: ResponsiveWrapperProps ) {
 	const [ containerResizeListener, { width: containerWidth } ] =
 		useResizeObserver();
 	if ( Children.count( children ) !== 1 ) {
@@ -22,7 +27,7 @@ function ResponsiveWrapper( {
 	}
 	const imageStyle = {
 		paddingBottom:
-			naturalWidth < containerWidth
+			naturalWidth < ( containerWidth ?? 0 )
 				? naturalHeight
 				: ( naturalHeight / naturalWidth ) * 100 + '%',
 	};

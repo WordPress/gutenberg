@@ -62,7 +62,6 @@
 		"src/palette-edit",
 		"src/panel",
 		"src/query-controls",
-		"src/responsive-wrapper",
 		"src/sandbox",
 		"src/toolbar",
 		"src/toolbar-button",
