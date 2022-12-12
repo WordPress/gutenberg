@@ -302,6 +302,22 @@ function LinkControl( {
 		textInputRef,
 	};
 
+	const defaultComponentProps = {
+		searchInputPlaceholder,
+		withCreateSuggestion,
+		createPage,
+		setInternalUrlInputValue,
+		handleSelectSuggestion,
+		showInitialSuggestions,
+		noDirectEntry,
+		showSuggestions,
+		suggestionsQuery,
+		noURLSuggestion,
+		createSuggestionButtonText,
+		showTextControl,
+		renderControlBottom,
+	};
+
 	const renderChildren = unwrapArray( children );
 
 	return (
@@ -312,39 +328,9 @@ function LinkControl( {
 				className="block-editor-link-control"
 			>
 				{ children ? (
-					renderChildren( {
-						searchInputPlaceholder,
-						withCreateSuggestion,
-						createPage,
-						setInternalUrlInputValue,
-						handleSelectSuggestion,
-						showInitialSuggestions,
-						noDirectEntry,
-						showSuggestions,
-						suggestionsQuery,
-						noURLSuggestion,
-						createSuggestionButtonText,
-						showTextControl,
-						renderControlBottom,
-					} )
+					renderChildren( defaultComponentProps )
 				) : (
-					<LinkControlDefault
-						searchInputPlaceholder={ searchInputPlaceholder }
-						withCreateSuggestion={ withCreateSuggestion }
-						createPage={ createPage }
-						setInternalUrlInputValue={ setInternalUrlInputValue }
-						handleSelectSuggestion={ handleSelectSuggestion }
-						showInitialSuggestions={ showInitialSuggestions }
-						noDirectEntry={ noDirectEntry }
-						showSuggestions={ showSuggestions }
-						suggestionsQuery={ suggestionsQuery }
-						noURLSuggestion={ noURLSuggestion }
-						createSuggestionButtonText={
-							createSuggestionButtonText
-						}
-						showTextControl={ showTextControl }
-						renderControlBottom={ renderControlBottom }
-					/>
+					<LinkControlDefault { ...defaultComponentProps } />
 				) }
 			</div>
 		</LinkControlContext.Provider>
