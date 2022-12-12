@@ -751,6 +751,50 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
 	}
 
+	public function test_allow_indirect_properties() {
+		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks'  => array(
+						'core/social-links' => array(
+							'spacing' => array(
+								'blockGap' => array(
+									'top'  => '1em',
+									'left' => '2em',
+								),
+							),
+						),
+					),
+					'spacing' => array(
+						'blockGap' => '3em',
+					),
+				),
+			)
+		);
+
+		$expected = array(
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'styles'  => array(
+				'blocks'  => array(
+					'core/social-links' => array(
+						'spacing' => array(
+							'blockGap' => array(
+								'top'  => '1em',
+								'left' => '2em',
+							),
+						),
+					),
+				),
+				'spacing' => array(
+					'blockGap' => '3em',
+				),
+			),
+		);
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
 	public function test_remove_invalid_element_pseudo_selectors() {
 		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
 			array(
