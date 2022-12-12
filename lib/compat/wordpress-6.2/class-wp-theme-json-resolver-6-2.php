@@ -218,8 +218,8 @@ class WP_Theme_JSON_Resolver_6_2 extends WP_Theme_JSON_Resolver_6_1 {
 		 *
 		 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 		 */
-		$theme_json   = apply_filters( 'wp_theme_json_data_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'custom' ) );
-		$config       = $theme_json->get_data();
+		$theme_json = apply_filters( 'wp_theme_json_data_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'custom' ) );
+		$config     = $theme_json->get_data();
 
 		static::$user = new WP_Theme_JSON_Gutenberg( $config, 'custom' );
 

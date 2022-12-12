@@ -1508,13 +1508,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$base_styles = 'body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
-
 		$custom_css = 'body { color:purple; }';
-
-		$expected = $base_styles . $custom_css;
-
-		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
-		$this->assertEquals( $custom_css, $theme_json->get_stylesheet( array( 'customCSS' ) ) );
+		$this->assertEquals( $custom_css, $theme_json->get_stylesheet( array( 'custom-css' ) ) );
 	}
 }
