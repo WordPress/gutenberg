@@ -23,6 +23,7 @@ const TabButton = ( {
 	onClick,
 	children,
 	selected,
+	disabled,
 	...rest
 }: TabButtonProps ) => (
 	<Button
@@ -31,6 +32,7 @@ const TabButton = ( {
 		aria-selected={ selected }
 		id={ tabId }
 		onClick={ onClick }
+		disabled={ disabled }
 		{ ...rest }
 	>
 		{ children }
@@ -135,6 +137,7 @@ export function TabPanel( {
 						selected={ tab.name === selected }
 						key={ tab.name }
 						onClick={ () => handleTabSelection( tab.name ) }
+						disabled={ tab.disabled }
 						label={ tab.icon && tab.title }
 						icon={ tab.icon }
 						showTooltip={ !! tab.icon }

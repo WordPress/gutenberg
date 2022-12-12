@@ -32,6 +32,7 @@ export type TabButtonProps< IconProps = unknown > = {
 	selected: boolean;
 	showTooltip?: boolean;
 	tabId: string;
+	disabled?: boolean;
 };
 
 export type TabPanelProps = {
