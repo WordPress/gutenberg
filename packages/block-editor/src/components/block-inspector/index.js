@@ -6,6 +6,8 @@ import {
 	getBlockType,
 	getUnregisteredTypeHandlerName,
 	hasBlockSupport,
+	isReusableBlock,
+	isTemplatePart,
 	store as blocksStore,
 } from '@wordpress/blocks';
 import {
@@ -26,6 +28,7 @@ import BlockCard from '../block-card';
 import MultiSelectionInspector from '../multi-selection-inspector';
 import BlockVariationTransforms from '../block-variation-transforms';
 import useBlockDisplayInformation from '../use-block-display-information';
+import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
 import BlockStyles from '../block-styles';
@@ -103,12 +106,23 @@ function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
 		},
 		[ topLevelLockedBlock ]
 	);
-	const blockInformation = useBlockDisplayInformation( topLevelLockedBlock );
+	const { title, ...blockInformation } =
+		useBlockDisplayInformation( topLevelLockedBlock );
+	const displayTitle = useBlockDisplayTitle( {
+		clientId: topLevelLockedBlock,
+	} );
+	const isReusable = isReusableBlock( block );
+	const isTemplate = isTemplatePart( block );
+	const isNavigation = block.name === 'core/navigation';
+	const cardTitle =
+		isReusable || isTemplate || isNavigation ? displayTitle : title;
+
 	const contentBlocks = useContentBlocks( blockTypes, block );
 	return (
 		<div className="block-editor-block-inspector">
 			<BlockCard
 				{ ...blockInformation }
+				title={ cardTitle }
 				className={ blockInformation.isSynced && 'is-synced' }
 			/>
 			<BlockVariationTransforms blockClientId={ topLevelLockedBlock } />
@@ -243,20 +257,34 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 	const availableTabs = useInspectorControlsTabs( blockName );
 	const showTabs = availableTabs?.length > 1;
 
-	const hasBlockStyles = useSelect(
+	const { block, hasBlockStyles } = useSelect(
 		( select ) => {
 			const { getBlockStyles } = select( blocksStore );
+			const { getBlock } = select( blockEditorStore );
 			const blockStyles = getBlockStyles( blockName );
-			return blockStyles && blockStyles.length > 0;
+			return {
+				block: getBlock( clientId ),
+				hasBlockStyles: !! blockStyles && blockStyles.length > 0,
+			};
 		},
-		[ blockName ]
+		[ blockName, clientId ]
 	);
-	const blockInformation = useBlockDisplayInformation( clientId );
+	const { title, ...blockInformation } =
+		useBlockDisplayInformation( clientId );
+	const displayTitle = useBlockDisplayTitle( {
+		clientId,
+	} );
+	const isReusable = isReusableBlock( block );
+	const isTemplate = isTemplatePart( block );
+	const isNavigation = block.name === 'core/navigation';
+	const cardTitle =
+		isReusable || isTemplate || isNavigation ? displayTitle : title;
 
 	return (
 		<div className="block-editor-block-inspector">
 			<BlockCard
 				{ ...blockInformation }
+				title={ cardTitle }
 				className={ blockInformation.isSynced && 'is-synced' }
 			/>
 			<BlockVariationTransforms blockClientId={ clientId } />
