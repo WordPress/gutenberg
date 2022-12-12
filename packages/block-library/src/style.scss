@@ -97,15 +97,6 @@
 	}
 }
 
-[data-effect] {
-	opacity: 0;
-	transition: opacity 500ms;
-}
-
-[data-effect][data-has-intersected="true"] {
-	opacity: 1;
-}
-
 [data-effect="slide-from-left"][data-has-intersected="true"] {
 	animation: slideLeft 500ms;
 }
