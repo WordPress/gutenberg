@@ -14,6 +14,9 @@ function CustomCSSControl() {
 	const [ themeCSS ] = useStyle( 'css', null, 'base' );
 	const ignoreThemeCustomCSS = '/* IgnoreThemeCustomCSS */';
 
+	// If there is custom css from theme.json show it in the edit box
+	// so the user can selectively overwrite it, rather than have the user CSS
+	// completely overwrite the theme CSS by default.
 	const themeCustomCSS =
 		! customCSS && themeCSS
 			? `/* ${ __(
@@ -22,6 +25,8 @@ function CustomCSSControl() {
 			: undefined;
 
 	function handleOnChange( value ) {
+		// If there is theme custom CSS, but the user clears the input box then save the
+		// ignoreThemeCustomCSS string so that the theme custom CSS is not re-applied.
 		if ( themeCSS && value === '' ) {
 			setCustomCSS( ignoreThemeCustomCSS );
 			return;
