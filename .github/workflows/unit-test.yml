@@ -45,9 +45,6 @@ jobs:
                   npm ci
                   npx lerna run build
 
-            - name: Running lint check
-              run: npm run lint:php
-
             - name: Running the tests
               run: npm run test:unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
