@@ -257,23 +257,35 @@ export default function Layout( { onError } ) {
 						style={ {
 							paddingTop: showFrame ? canvasPadding : 0,
 							paddingBottom: showFrame ? canvasPadding : 0,
-							width: forcedWidth,
+							width:
+								! isMobileViewport &&
+								isEditorPage &&
+								canvasMode === 'view'
+									? forcedWidth
+									: undefined,
 						} }
 					>
 						{ canvasResizer }
-						{ showFrame && ! isMobileViewport && (
-							<div className="edit-site-layout__resize-handle-container">
-								<ResizeHandle
-									factor={ -1 }
-									value={ forcedWidth ?? canvasSize.width }
-									onResize={ setForcedWidth }
-									onStartResize={ () =>
-										setIsResizing( true )
-									}
-									onEndResize={ () => setIsResizing( false ) }
-								/>
-							</div>
-						) }
+						{ showFrame &&
+							! isMobileViewport &&
+							isEditorPage &&
+							canvasMode === 'view' && (
+								<div className="edit-site-layout__resize-handle-container">
+									<ResizeHandle
+										factor={ -1 }
+										value={
+											forcedWidth ?? canvasSize.width
+										}
+										onResize={ setForcedWidth }
+										onStartResize={ () =>
+											setIsResizing( true )
+										}
+										onEndResize={ () =>
+											setIsResizing( false )
+										}
+									/>
+								</div>
+							) }
 						{ !! canvasSize.width && (
 							<motion.div
 								initial={ false }
