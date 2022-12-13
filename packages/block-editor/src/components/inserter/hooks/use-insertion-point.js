@@ -110,7 +110,6 @@ function useInsertionPoint( {
 					destinationIndex,
 					destinationRootClientId,
 					selectBlockOnInsert,
-					false,
 					shouldFocusBlock || shouldForceFocusBlock ? 0 : null,
 					meta
 				);
