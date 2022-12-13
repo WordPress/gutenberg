@@ -1971,7 +1971,7 @@ export const getInserterItems = createSelector(
 			};
 		};
 
-		const blockTypeInserterItems = getBlockTransformItems()
+		const blockTypeInserterItems = getBlockTypes()
 			.filter( ( blockType ) =>
 				canIncludeBlockTypeInInserter( state, blockType, rootClientId )
 			)
