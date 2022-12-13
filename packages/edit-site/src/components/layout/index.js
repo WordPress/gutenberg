@@ -12,6 +12,7 @@ import {
 	__experimentalHStack as HStack,
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
+	ResizableBox,
 	__unstableUseNavigateRegions as useNavigateRegions,
 } from '@wordpress/components';
 import {
@@ -38,7 +39,7 @@ import getIsListPage from '../../utils/get-is-list-page';
 import Header from '../header-edit-mode';
 import SiteIcon from '../site-icon';
 import SiteTitle from '../site-title';
-import ResizeHandle from '../resize-handle';
+import ResizeHandle from '../block-editor/resize-handle';
 import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
 
 const ANIMATION_DURATION = 0.5;
@@ -257,61 +258,63 @@ export default function Layout( { onError } ) {
 						style={ {
 							paddingTop: showFrame ? canvasPadding : 0,
 							paddingBottom: showFrame ? canvasPadding : 0,
-							width:
-								! isMobileViewport &&
-								isEditorPage &&
-								canvasMode === 'view'
-									? forcedWidth
-									: undefined,
 						} }
 					>
 						{ canvasResizer }
-						{ showFrame &&
-							! isMobileViewport &&
-							isEditorPage &&
-							canvasMode === 'view' && (
-								<div className="edit-site-layout__resize-handle-container">
-									<ResizeHandle
-										factor={ -1 }
-										value={
-											forcedWidth ?? canvasSize.width
-										}
-										onResize={ setForcedWidth }
-										onStartResize={ () =>
-											setIsResizing( true )
-										}
-										onEndResize={ () =>
-											setIsResizing( false )
-										}
-									/>
-								</div>
-							) }
-						{ !! canvasSize.width && (
-							<motion.div
-								initial={ false }
-								layout="position"
-								className="edit-site-layout__canvas"
-								transition={ {
-									type: 'tween',
-									duration: disableMotion
-										? 0
-										: ANIMATION_DURATION,
-									ease: 'easeOut',
-								} }
-							>
+						<ResizableBox
+							size={ {
+								height: '100%',
+								width:
+									! isMobileViewport &&
+									isEditorPage &&
+									canvasMode === 'view'
+										? forcedWidth ?? '100%'
+										: '100%',
+							} }
+							className="edit-site-layout__resize-handle-container"
+							minWidth="100"
+							enable={ {
+								left:
+									! isMobileViewport &&
+									isEditorPage &&
+									canvasMode === 'view',
+							} }
+							onResizeStop={ ( _, _2, _3, delta ) => {
+								setForcedWidth(
+									parseInt(
+										( forcedWidth ?? canvasSize.width ) +
+											delta.width
+									)
+								);
+								setIsResizing( false );
+							} }
+							onResizeStart={ () => {
+								setIsResizing( true );
+							} }
+							handleComponent={ {
+								left: <ResizeHandle direction="left" />,
+							} }
+							handleClasses={ undefined }
+							handleStyles={ {
+								left: {
+									position: undefined,
+									userSelect: undefined,
+									cursor: undefined,
+									width: undefined,
+									height: undefined,
+									top: undefined,
+									right: undefined,
+									bottom: undefined,
+									left: undefined,
+								},
+							} }
+						>
+							{ canvasResizer }
+							{ !! canvasSize.width && (
 								<motion.div
-									style={ {
-										position: 'absolute',
-										top: 0,
-										left: 0,
-										bottom: 0,
-									} }
 									initial={ false }
-									animate={ {
-										width: showFrame
-											? canvasSize.width - canvasPadding
-											: fullSize.width,
-									} }
+									layout="position"
+									className="edit-site-layout__canvas"
 									transition={ {
 										type: 'tween',
 										duration: disableMotion
@@ -320,13 +323,36 @@ export default function Layout( { onError } ) {
 										ease: 'easeOut',
 									} }
 								>
-									<ErrorBoundary onError={ onError }>
-										{ isEditorPage && <Editor /> }
-										{ isListPage && <ListPage /> }
-									</ErrorBoundary>
+									<motion.div
+										style={ {
+											position: 'absolute',
+											top: 0,
+											left: 0,
+											bottom: 0,
+										} }
+										initial={ false }
+										animate={ {
+											width: showFrame
+												? canvasSize.width -
+												  canvasPadding
+												: fullSize.width,
+										} }
+										transition={ {
+											type: 'tween',
+											duration: disableMotion
+												? 0
+												: ANIMATION_DURATION,
+											ease: 'easeOut',
+										} }
+									>
+										<ErrorBoundary onError={ onError }>
+											{ isEditorPage && <Editor /> }
+											{ isListPage && <ListPage /> }
+										</ErrorBoundary>
+									</motion.div>
 								</motion.div>
-							</motion.div>
-						) }
+							) }
+						</ResizableBox>
 					</div>
 				) }
 			</div>

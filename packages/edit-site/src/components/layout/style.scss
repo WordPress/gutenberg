@@ -189,9 +189,5 @@
 }
 
 .edit-site-layout__resize-handle-container {
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: -$grid-unit-10;
-	width: $grid-unit-10;
+	margin: auto;
 }
