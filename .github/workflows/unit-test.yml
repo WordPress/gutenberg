@@ -52,10 +52,24 @@ jobs:
               run: npm run test:unit:date -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
     unit-php:
-        name: PHP
+        name: PHP - ${{ matrix.php }}
         # Runs PHP related CI jobs
         runs-on: ubuntu-latest
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        strategy:
+            matrix:
+                php:
+                    [
+                        '5.6',
+                        '7.0',
+                        '7.1',
+                        '7.2',
+                        '7.3',
+                        '7.4',
+                        '8.0',
+                        '8.1',
+                        '8.2',
+                    ]
 
         steps:
             - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
