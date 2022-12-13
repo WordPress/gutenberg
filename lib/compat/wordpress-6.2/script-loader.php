@@ -90,6 +90,7 @@ function gutenberg_resolve_assets_override() {
 	$block_registry = WP_Block_Type_Registry::get_instance();
 
 	foreach ( $block_registry->get_all_registered() as $block_type ) {
+		// In older WordPress versions, like 6.0, these properties are not defined.
 		if ( isset( $block_type->style_handles ) && isset( $block_type->editor_style_handles ) ) {
 			$style_handles = array_merge(
 				$style_handles,
