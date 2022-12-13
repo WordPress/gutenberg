@@ -11,11 +11,12 @@
 		.interface-navigable-region__stacker {
 			position: relative;
 			z-index: z-index(".is-focusing-regions [role='region']:focus .interface-navigable-region__stacker");
-			// Fix for Safari bug where the focus style is not visible on the content area.
-			// See https://github.com/WordPress/gutenberg/issues/46111
-			.interface-interface-skeleton__content & {
-				transform: translateZ(0);
-			}
+		}
+
+		// Fix for Safari bug where the focus style is not visible on the content area.
+		// See https://github.com/WordPress/gutenberg/issues/46111
+		&.interface-interface-skeleton__content .interface-navigable-region__stacker {
+			transform: translateZ(0);
 		}
 	}
 
