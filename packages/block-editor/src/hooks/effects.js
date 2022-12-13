@@ -190,13 +190,6 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 	return {
 		...extraProps,
 		'data-effect': attributes.effect ? true : undefined,
-		style: {
-			...extraProps.style,
-			animationName: attributes.effect,
-			animationDuration: attributes.effectDuration
-				? attributes.effectDuration + 's'
-				: undefined,
-		},
 	};
 }
 

@@ -237,7 +237,7 @@ class WP_Theme_JSON_6_2 extends WP_Theme_JSON_6_1 {
 			'textTransform'  => null,
 		),
 		'css'        => null,
-		'effects'    => array( 'duration' => null ),
+		'effect'     => null,
 	);
 
 	/**
