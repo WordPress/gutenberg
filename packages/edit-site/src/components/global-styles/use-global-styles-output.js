@@ -192,7 +192,6 @@ export function getStylesDeclarations(
 	tree = {}
 ) {
 	const isRoot = ROOT_BLOCK_SELECTOR === selector;
-	// need to add logic here to take into account the styles nested in variations
 	const output = Object.entries( STYLE_PROPERTY ).reduce(
 		(
 			declarations,
@@ -661,6 +660,7 @@ export const toStyles = (
 			fallbackGapValue,
 			hasLayoutSupport,
 			featureSelectors,
+			styleVariationSelectors,
 		} ) => {
 			// Process styles for block support features with custom feature level
 			// CSS selectors set.
@@ -681,6 +681,29 @@ export const toStyles = (
 									`${ featureSelector }{${ featureDeclarations.join(
 										';'
 									) } }`;
+							}
+						}
+					}
+				);
+			}
+
+			if ( styleVariationSelectors ) {
+				Object.entries( styleVariationSelectors ).forEach(
+					( [ styleVariationName, styleVariationSelector ] ) => {
+						if ( styles?.variations?.[ styleVariationName ] ) {
+							const styleVariationDeclarations =
+								getStylesDeclarations(
+									styles?.variations?.[ styleVariationName ],
+									styleVariationSelector,
+									useRootPaddingAlign,
+									tree
+								);
+							if ( !! styleVariationDeclarations.length ) {
+								ruleset =
+									ruleset +
+									`${ styleVariationSelector }{${ styleVariationDeclarations.join(
+										';'
+									) }}`;
 							}
 						}
 					}
@@ -832,7 +855,7 @@ export const getBlockSelectors = ( blockTypes, getBlockStyles ) => {
 		const blockStyleVariations = getBlockStyles( name );
 		const styleVariationSelectors = {};
 		blockStyleVariations.forEach( ( variation ) => {
-			const styleVariationSelector = `${ selector } is-style-${ variation.name }`;
+			const styleVariationSelector = `.is-style-${ variation.name }${ selector }`;
 			styleVariationSelectors[ variation.name ] = styleVariationSelector;
 		} );
 
