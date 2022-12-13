@@ -85,7 +85,7 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 	if ( empty( $types ) && ! $supports_theme_json ) {
 		$types = array( 'variables', 'presets', 'base-layout-styles' );
 	} elseif ( empty( $types ) ) {
-		$types = array( 'variables', 'styles', 'presets' );
+		$types = array( 'variables', 'styles', 'presets', 'custom-css' );
 	}
 
 	/*

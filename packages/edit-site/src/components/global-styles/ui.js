@@ -27,6 +27,7 @@ import ScreenLayout from './screen-layout';
 import ScreenStyleVariations from './screen-style-variations';
 import ScreenBorder from './screen-border';
 import StyleBook from '../style-book';
+import ScreenCSS from './screen-css';
 
 function GlobalStylesNavigationScreen( { className, ...props } ) {
 	return (
@@ -191,6 +192,9 @@ function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
 			{ isStyleBookOpened && (
 				<GlobalStylesStyleBook onClose={ onCloseStyleBook } />
 			) }
+			<GlobalStylesNavigationScreen path="/css">
+				<ScreenCSS />
+			</GlobalStylesNavigationScreen>
 		</NavigatorProvider>
 	);
 }

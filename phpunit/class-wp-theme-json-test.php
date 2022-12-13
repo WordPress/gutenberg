@@ -1497,4 +1497,18 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEquals( $expected, $stylesheet );
 
 	}
+
+	public function test_get_stylesheet_handles_custom_css() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'css' => 'body { color:purple; }',
+				),
+			)
+		);
+
+		$custom_css = 'body { color:purple; }';
+		$this->assertEquals( $custom_css, $theme_json->get_stylesheet( array( 'custom-css' ) ) );
+	}
 }
