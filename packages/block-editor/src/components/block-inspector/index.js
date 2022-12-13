@@ -177,10 +177,13 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 
 	const blockInspectorAnimationSettings = useSelect(
 		( select ) => {
-			const globalBlockInspectorAnimationSettings =
-				select( blockEditorStore ).getSettings()
-					.__experimentalBlockInspectorAnimation;
-			return globalBlockInspectorAnimationSettings[ blockType.name ];
+			if ( isOffCanvasNavigationEditorEnabled ) {
+				const globalBlockInspectorAnimationSettings =
+					select( blockEditorStore ).getSettings()
+						.__experimentalBlockInspectorAnimation;
+				return globalBlockInspectorAnimationSettings[ blockType.name ];
+			}
+			return null;
 		},
 		[ selectedBlockClientId ]
 	);
