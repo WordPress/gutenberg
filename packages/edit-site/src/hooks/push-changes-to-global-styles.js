@@ -35,6 +35,9 @@ import {
 
 function getChangesToPush( name, attributes ) {
 	return getSupportedGlobalStylesPanels( name ).flatMap( ( key ) => {
+		if ( ! STYLE_PROPERTY[ key ] ) {
+			return [];
+		}
 		const { value: path } = STYLE_PROPERTY[ key ];
 		const presetAttributeKey = path.join( '.' );
 		const presetAttributeValue =
