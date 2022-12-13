@@ -304,7 +304,7 @@ function UnforwardedColorPalette(
 						<Flex
 							as={ 'button' }
 							justify="space-between"
-							align="flex-start"
+							align="center"
 							className="components-color-palette__custom-color"
 							aria-expanded={ isOpen }
 							aria-haspopup="true"
