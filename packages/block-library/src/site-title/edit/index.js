@@ -24,7 +24,8 @@ import { decodeEntities } from '@wordpress/html-entities';
  * Internal dependencies
  */
 import LevelControl from './level-toolbar';
-import StyleFormatControl from './style-format-control';
+import BoldControl from './bold-control';
+import ItalicControl from './italic-control';
 
 export default function SiteTitleEdit( {
 	attributes,
@@ -108,13 +109,21 @@ export default function SiteTitleEdit( {
 						setAttributes( { textAlign: nextAlign } );
 					} }
 				/>
-				<StyleFormatControl
+				<BoldControl
 					typographyStyle={ style?.typography }
-					onChange={ ( newTypography ) => {
+					onChange={ ( newTypography ) =>
 						setAttributes( {
 							style: { ...style, typography: newTypography },
-						} );
-					} }
+						} )
+					}
+				/>
+				<ItalicControl
+					typographyStyle={ style?.typography }
+					onChange={ ( newTypography ) =>
+						setAttributes( {
+							style: { ...style, typography: newTypography },
+						} )
+					}
 				/>
 			</BlockControls>
 			<InspectorControls>
