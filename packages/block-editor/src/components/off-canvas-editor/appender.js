@@ -58,6 +58,14 @@ export const Appender = forwardRef( ( props, ref ) => {
 			updateBlockAttributes( _insertedBlockClientId, _updatedAttributes );
 		};
 
+	const maybeSetInsertedBlockOnInsertion = ( _insertedBlock ) => {
+		if ( ! _insertedBlock?.clientId ) {
+			return;
+		}
+
+		setInsertedBlockClientId( _insertedBlock?.clientId );
+	};
+
 	let maybeLinkUI;
 
 	if (
@@ -96,11 +104,7 @@ export const Appender = forwardRef( ( props, ref ) => {
 				position="bottom right"
 				isAppender={ true }
 				selectBlockOnInsert={ false }
-				onSelectOrClose={ ( _insertedBlock ) => {
-					if ( _insertedBlock?.clientId ) {
-						setInsertedBlockClientId( _insertedBlock?.clientId );
-					}
-				} }
+				onSelectOrClose={ maybeSetInsertedBlockOnInsertion }
 				__experimentalIsQuick
 				{ ...props }
 			/>
