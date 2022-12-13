@@ -63,6 +63,11 @@ jobs:
                   npm ci
                   npm run build
 
+            - name: Install Composer dependencies
+              uses: ramsey/composer-install@83af392bf5f031813d25e6fe4cd626cdba9a2df6 # v2.2.0
+              with:
+                  custom-cache-suffix: $(/bin/date -u --date='last Mon' "+%F")
+
             - name: Start Docker environment
               run: |
                   npm run wp-env start
