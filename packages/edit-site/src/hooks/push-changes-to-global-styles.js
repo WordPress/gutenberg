@@ -9,7 +9,10 @@ import { capitalCase } from 'change-case';
  */
 import { addFilter } from '@wordpress/hooks';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { InspectorAdvancedControls } from '@wordpress/block-editor';
+import {
+	InspectorAdvancedControls,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { BaseControl, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
@@ -62,6 +65,8 @@ function PushChangesToGlobalStylesControl( {
 	const { user: userConfig, setUserConfig } =
 		useContext( GlobalStylesContext );
 
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	const pushChanges = useCallback( () => {
@@ -79,8 +84,13 @@ function PushChangesToGlobalStylesControl( {
 			set( newUserConfig, [ 'styles', 'blocks', name, ...path ], value );
 		}
 
+		// @wordpress/core-data doesn't support editing multiple entity types in
+		// a single undo level. So for now, we disable @wordpress/core-data undo
+		// tracking and implement our own Undo button in the snackbar
+		// notification.
+		__unstableMarkNextChangeAsNotPersistent();
 		setAttributes( { style: newBlockStyles } );
-		setUserConfig( () => newUserConfig );
+		setUserConfig( () => newUserConfig, { undoIgnore: true } );
 
 		createSuccessNotice(
 			sprintf(
@@ -95,8 +105,11 @@ function PushChangesToGlobalStylesControl( {
 					{
 						label: __( 'Undo' ),
 						onClick() {
+							__unstableMarkNextChangeAsNotPersistent();
 							setAttributes( { style: blockStyles } );
-							setUserConfig( () => userConfig );
+							setUserConfig( () => userConfig, {
+								undoIgnore: true,
+							} );
 						},
 					},
 				],
