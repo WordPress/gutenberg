@@ -1,0 +1,69 @@
+name: PHPUnit Tests
+
+# Since Unit Tests are required to pass for each PR,
+# we cannot disable them for documentation-only changes.
+on:
+    pull_request:
+    push:
+        branches:
+            - trunk
+            - 'release/**'
+            - 'wp/**'
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    cancel-in-progress: true
+
+jobs:
+    unit-php:
+        name: ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }}
+        # Runs PHP related CI jobs
+        runs-on: ubuntu-latest
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        strategy:
+            matrix:
+                php:
+                    [
+                        '5.6',
+                        '7.0',
+                        '7.1',
+                        '7.2',
+                        '7.3',
+                        '7.4',
+                        '8.0',
+                        '8.1',
+                        '8.2',
+                    ]
+                multisite: [false, true]
+
+        env:
+            WP_ENV_PHP_VERSION: ${{ matrix.php }}
+
+        steps:
+            - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+
+            - name: Use desired version of NodeJS
+              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: npm
+
+            - name: Npm install and build
+              run: |
+                  npm ci
+                  npm run build
+
+            - name: Install WordPress
+              run: |
+                  npm run wp-env start
+
+            - name: Running single site unit tests
+              run: npm run test:unit:php
+              if: ${{ ! matrix.multisite }}
+
+            - name: Running multisite unit tests
+              run: npm run test:unit:php:multisite
+              if: ${{ matrix.multisite }}
