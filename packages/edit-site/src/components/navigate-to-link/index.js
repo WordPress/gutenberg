@@ -9,12 +9,7 @@ import { edit } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 
-export default function NavigateToLink( {
-	type,
-	id,
-	activePage,
-	onActivePageChange,
-} ) {
+export default function NavigateToLink( { type, id, onActivePageChange } ) {
 	const post = useSelect(
 		( select ) =>
 			type &&
@@ -27,7 +22,6 @@ export default function NavigateToLink( {
 	const onClick = useMemo( () => {
 		if ( ! post?.link ) return null;
 		const path = getPathAndQueryString( post.link );
-		if ( path === activePage?.path ) return null;
 		return () =>
 			onActivePageChange( {
 				type,
@@ -38,7 +32,7 @@ export default function NavigateToLink( {
 					postId: post.id,
 				},
 			} );
-	}, [ post, activePage?.path, onActivePageChange ] );
+	}, [ post, onActivePageChange ] );
 
 	return (
 		onClick && (

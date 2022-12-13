@@ -141,6 +141,7 @@ export default function QueryInspectorControls( {
 						{ showColumnsControl && (
 							<>
 								<RangeControl
+									__nextHasNoMarginBottom
 									label={ __( 'Columns' ) }
 									value={ displayLayout.columns }
 									onChange={ ( value ) =>

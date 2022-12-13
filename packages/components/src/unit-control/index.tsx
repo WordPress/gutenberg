@@ -6,8 +6,6 @@ import type {
 	KeyboardEvent,
 	ForwardedRef,
 	SyntheticEvent,
-	ChangeEvent,
-	PointerEvent,
 } from 'react';
 import classnames from 'classnames';
 
@@ -62,6 +60,7 @@ function UnforwardedUnitControl(
 		units: unitsProp = CSS_UNITS,
 		value: valueProp,
 		onBlur: onBlurProp,
+		onFocus: onFocusProp,
 		...props
 	} = unitControlProps;
 
@@ -115,9 +114,7 @@ function UnforwardedUnitControl(
 	const handleOnQuantityChange = (
 		nextQuantityValue: number | string | undefined,
 		changeProps: {
-			event:
-				| ChangeEvent< HTMLInputElement >
-				| PointerEvent< HTMLInputElement >;
+			event: SyntheticEvent;
 		}
 	) => {
 		if (
@@ -248,6 +245,7 @@ function UnforwardedUnitControl(
 			unit={ unit }
 			units={ units }
 			onBlur={ onBlurProp }
+			onFocus={ onFocusProp }
 		/>
 	) : null;
 
@@ -269,7 +267,7 @@ function UnforwardedUnitControl(
 			autoComplete={ autoComplete }
 			className={ classes }
 			disabled={ disabled }
-			hideHTMLArrows
+			spinControls="none"
 			isPressEnterToChange={ isPressEnterToChange }
 			label={ label }
 			onBlur={ handleOnBlur }
@@ -281,6 +279,7 @@ function UnforwardedUnitControl(
 			value={ parsedQuantity ?? '' }
 			step={ step }
 			__unstableStateReducer={ stateReducer }
+			onFocus={ onFocusProp }
 		/>
 	);
 }

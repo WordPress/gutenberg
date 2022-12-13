@@ -8,6 +8,8 @@
 
 /**
  * Tests for registering, storing and generating styles.
+ *
+ * @group style-engine
  */
 class WP_Style_Engine_Test extends WP_UnitTestCase {
 	/**
@@ -159,6 +161,21 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'margin-left'                => '2vh',
 						'margin-bottom'              => '2px',
 						'margin-right'               => '10em',
+					),
+				),
+			),
+
+			'inline_valid_dimensions_style'                => array(
+				'block_styles'    => array(
+					'dimensions' => array(
+						'minHeight' => '50vh',
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => 'min-height:50vh;',
+					'declarations' => array(
+						'min-height' => '50vh',
 					),
 				),
 			),

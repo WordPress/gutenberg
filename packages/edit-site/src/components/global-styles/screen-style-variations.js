@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import { isEqual } from 'lodash';
 import classnames from 'classnames';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
@@ -36,7 +36,10 @@ import ScreenHeader from './header';
 let uniqueId = 0;
 
 function compareVariations( a, b ) {
-	return isEqual( a.styles, b.styles ) && isEqual( a.settings, b.settings );
+	return (
+		fastDeepEqual( a.styles, b.styles ) &&
+		fastDeepEqual( a.settings, b.settings )
+	);
 }
 
 function Variation( { variation } ) {

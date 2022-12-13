@@ -34,7 +34,8 @@ Notices display at the top of the screen, below any toolbars anchored to the top
 Notices are color-coded to indicate the type of message being communicated:
 
 -   **Default** notices have **no background**.
--   **Informational** notices are **blue.**
+-   **Informational** notices are **blue** by default.
+    - If there is a parent `Theme` component with an `accent` color prop, informational notices will take on that color instead.
 -   **Success** notices are **green.**
 -   **Warning** notices are **yellow\*\***.\*\*
 -   **Error** notices are **red.**

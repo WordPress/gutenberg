@@ -58,7 +58,7 @@ const UnconnectedBorderBoxControl = (
 		onSplitChange,
 		popoverPlacement,
 		popoverOffset,
-		size = 'default',
+		size,
 		splitValue,
 		toggleLinked,
 		wrapperClassName,

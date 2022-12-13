@@ -25,10 +25,18 @@ import type { Borders, BorderSide, BorderBoxControlProps } from '../types';
 export function useBorderBoxControl(
 	props: WordPressComponentProps< BorderBoxControlProps, 'div' >
 ) {
-	const { className, onChange, value, ...otherProps } = useContextSystem(
-		props,
-		'BorderBoxControl'
-	);
+	const {
+		className,
+		colors = [],
+		onChange,
+		enableAlpha = false,
+		enableStyle = true,
+		size = 'default',
+		value,
+		__experimentalHasMultipleOrigins = false,
+		__experimentalIsRenderedInSidebar = false,
+		...otherProps
+	} = useContextSystem( props, 'BorderBoxControl' );
 
 	const mixedBorders = hasMixedBorders( value );
 	const splitBorders = hasSplitBorders( value );
@@ -114,7 +122,10 @@ export function useBorderBoxControl(
 	return {
 		...otherProps,
 		className: classes,
+		colors,
 		disableUnits: mixedBorders && ! hasWidthValue,
+		enableAlpha,
+		enableStyle,
 		hasMixedBorders: mixedBorders,
 		isLinked,
 		linkedControlClassName,
@@ -122,7 +133,10 @@ export function useBorderBoxControl(
 		onSplitChange,
 		toggleLinked,
 		linkedValue,
+		size,
 		splitValue,
 		wrapperClassName,
+		__experimentalHasMultipleOrigins,
+		__experimentalIsRenderedInSidebar,
 	};
 }

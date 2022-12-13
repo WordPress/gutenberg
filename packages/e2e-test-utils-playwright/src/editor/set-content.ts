@@ -11,10 +11,8 @@ import type { Editor } from './index';
  */
 async function setContent( this: Editor, html: string ) {
 	await this.page.evaluate( ( _html ) => {
-		// @ts-ignore (Reason: wp isn't typed).
 		const blocks = window.wp.blocks.parse( _html );
 
-		// @ts-ignore (Reason: wp isn't typed).
 		window.wp.data.dispatch( 'core/block-editor' ).resetBlocks( blocks );
 	}, html );
 }

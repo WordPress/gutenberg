@@ -1,7 +1,10 @@
 /**
  * External dependencies
  */
-import { get, set, isEqual } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
+import { get, set } from 'lodash';
+import { colord, extend } from 'colord';
+import a11yPlugin from 'colord/plugins/a11y';
 
 /**
  * WordPress dependencies
@@ -20,11 +23,14 @@ import {
 import { getValueFromVariable, getPresetVariableFromValue } from './utils';
 import { GlobalStylesContext } from './context';
 
+// Enable colord's a11y plugin.
+extend( [ a11yPlugin ] );
+
 const EMPTY_CONFIG = { settings: {}, styles: {} };
 
 export const useGlobalStylesReset = () => {
 	const { user: config, setUserConfig } = useContext( GlobalStylesContext );
-	const canReset = !! config && ! isEqual( config, EMPTY_CONFIG );
+	const canReset = !! config && ! fastDeepEqual( config, EMPTY_CONFIG );
 	return [
 		canReset,
 		useCallback(
@@ -132,7 +138,11 @@ export function useStyle( path, blockName, source = 'all' ) {
 			result = getValueFromVariable(
 				mergedConfig,
 				blockName,
-				get( userConfig, finalPath ) ?? get( baseConfig, finalPath )
+				// The stlyes.css path is allowed to be empty, so don't revert to base if undefined.
+				finalPath === 'styles.css'
+					? get( userConfig, finalPath )
+					: get( userConfig, finalPath ) ??
+							get( baseConfig, finalPath )
 			);
 			break;
 		case 'user':
@@ -322,4 +332,35 @@ export function useGradientsPerOrigin( name ) {
 		}
 		return result;
 	}, [ customGradients, themeGradients, defaultGradients ] );
+}
+
+export function useColorRandomizer( name ) {
+	const [ themeColors, setThemeColors ] = useSetting(
+		'color.palette.theme',
+		name
+	);
+
+	function randomizeColors() {
+		/* eslint-disable no-restricted-syntax */
+		const randomRotationValue = Math.floor( Math.random() * 225 );
+		/* eslint-enable no-restricted-syntax */
+
+		const newColors = themeColors.map( ( colorObject ) => {
+			const { color } = colorObject;
+			const newColor = colord( color )
+				.rotate( randomRotationValue )
+				.toHex();
+
+			return {
+				...colorObject,
+				color: newColor,
+			};
+		} );
+
+		setThemeColors( newColors );
+	}
+
+	return window.__experimentalEnableColorRandomizer
+		? [ randomizeColors ]
+		: [];
 }

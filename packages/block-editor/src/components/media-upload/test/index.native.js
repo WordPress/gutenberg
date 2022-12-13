@@ -1,3 +1,5 @@
+/* eslint jest/expect-expect: ["warn", { "assertFunctionNames": ["expect", "expect*"] }] */
+
 /**
  * External dependencies
  */

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { orderBy, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -25,6 +25,7 @@ import usePatternsState from './hooks/use-patterns-state';
 import useBlockTypesState from './hooks/use-block-types-state';
 import { searchBlockItems, searchItems } from './search-items';
 import InserterListbox from '../inserter-listbox';
+import { orderBy } from '../../utils/sorting';
 
 const INITIAL_INSERTER_RESULTS = 9;
 /**
@@ -91,7 +92,7 @@ function InserterSearchResults( {
 			return [];
 		}
 		const results = searchBlockItems(
-			orderBy( blockTypes, [ 'frecency' ], [ 'desc' ] ),
+			orderBy( blockTypes, 'frecency', 'desc' ),
 			blockTypeCategories,
 			blockTypeCollections,
 			filterValue

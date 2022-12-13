@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { map, some } from 'lodash';
+import { map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -928,7 +928,7 @@ const v2 = {
 			images.length > 0 &&
 			( ( ! ids && images ) ||
 				( ids && images && ids.length !== images.length ) ||
-				some( images, ( id, index ) => {
+				images.some( ( id, index ) => {
 					if ( ! id && ids[ index ] !== null ) {
 						return true;
 					}
