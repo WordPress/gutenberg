@@ -2690,8 +2690,8 @@ export const __unstableGetContentLockingParent = createSelector(
 	( state, clientId ) => {
 		let current = clientId;
 		let result;
-		while ( !! state.blocks.parents[ current ] ) {
-			current = state.blocks.parents[ current ];
+		while ( state.blocks.parents.has( current ) ) {
+			current = state.blocks.parents.get( current );
 			if ( getTemplateLock( state, current ) === 'contentOnly' ) {
 				result = current;
 			}
