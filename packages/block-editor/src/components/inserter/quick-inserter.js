@@ -31,6 +31,7 @@ export default function QuickInserter( {
 	clientId,
 	isAppender,
 	prioritizePatterns,
+	selectBlockOnInsert,
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
@@ -38,6 +39,7 @@ export default function QuickInserter( {
 		rootClientId,
 		clientId,
 		isAppender,
+		selectBlockOnInsert,
 	} );
 	const [ blockTypes ] = useBlockTypesState(
 		destinationRootClientId,

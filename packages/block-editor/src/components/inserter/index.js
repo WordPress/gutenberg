@@ -144,6 +144,7 @@ class Inserter extends Component {
 			__experimentalIsQuick: isQuick,
 			prioritizePatterns,
 			onSelectOrClose,
+			selectBlockOnInsert,
 		} = this.props;
 
 		if ( isQuick ) {
@@ -166,6 +167,7 @@ class Inserter extends Component {
 					clientId={ clientId }
 					isAppender={ isAppender }
 					prioritizePatterns={ prioritizePatterns }
+					selectBlockOnInsert={ selectBlockOnInsert }
 				/>
 			);
 		}

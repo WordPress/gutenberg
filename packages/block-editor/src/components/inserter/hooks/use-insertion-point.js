@@ -39,6 +39,7 @@ function useInsertionPoint( {
 	isAppender,
 	onSelect,
 	shouldFocusBlock = true,
+	selectBlockOnInsert = false,
 } ) {
 	const { getSelectedBlock } = useSelect( blockEditorStore );
 	const { destinationRootClientId, destinationIndex } = useSelect(
@@ -108,7 +109,7 @@ function useInsertionPoint( {
 					blocks,
 					destinationIndex,
 					destinationRootClientId,
-					// true,
+					selectBlockOnInsert,
 					false,
 					shouldFocusBlock || shouldForceFocusBlock ? 0 : null,
 					meta
