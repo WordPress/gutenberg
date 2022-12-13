@@ -44,7 +44,7 @@ if ( ! function_exists( 'wp_register_font_family' ) ) {
 			return null;
 		}
 
-		return wp_webfonts()->add_font_family( $handle ) ? $handle : null;
+		return wp_webfonts()->add_font_family( $handle, $font_family ) ? $handle : null; // TADDED
 	}
 }
 
@@ -91,9 +91,6 @@ if ( ! function_exists( 'wp_register_webfonts' ) ) {
 					'A deprecated web fonts array structure passed to wp_register_webfonts(). ' .
 					'Variations must be grouped and keyed by their font family.'
 				);
-				if ( ! $font_family_handle ) {
-					continue;
-				}
 
 				$font_family_handle = wp_register_webfont( $variations, $font_family_handle );
 				if ( ! $font_family_handle ) {

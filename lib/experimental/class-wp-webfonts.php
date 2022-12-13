@@ -128,14 +128,31 @@ class WP_Webfonts extends WP_Dependencies {
 	}
 
 	/**
+	 * Get the list of all registered font family handles.
+	 *
+	 * @since X.X.X
+	 *
+	 * @return string[]
+	 */
+	public function get_registered_font_families() {
+		$font_families = array();
+		foreach ( $this->registered as $handle => $obj ) {
+			if ( $obj->extra['is_font_family'] ) {
+				$font_families[] = $handle;
+			}
+		}
+		return $font_families;
+	}
+
+	/**
 	 * Get the list of all registered font families and their variations.
 	 *
 	 * @since X.X.X
 	 *
-	 * @return strings[]
+	 * @return string[]
 	 */
 	public function get_registered() {
-		return array_keys( $this->registered );
+		return $this->registered;
 	}
 
 	/**
@@ -155,9 +172,10 @@ class WP_Webfonts extends WP_Dependencies {
 	 * @since X.X.X
 	 *
 	 * @param string $font_family_handle The font family to register.
+	 * @param string $font_family_name   Optional. The font family's name.
 	 * @return bool True when registered, else false.
 	 */
-	public function add_font_family( $font_family_handle ) {
+	public function add_font_family( $font_family_handle, $font_family_name = '' ) {
 		if ( isset( $this->registered[ $font_family_handle ] ) ) {
 			return true;
 		}
@@ -166,7 +184,11 @@ class WP_Webfonts extends WP_Dependencies {
 		if ( ! $registered ) {
 			return false;
 		}
-		return $this->add_data( $font_family_handle, 'is_font_family', true );
+
+		$this->add_data( $font_family_handle, 'font-properties', array( 'font-family' => $font_family_name ) );
+		$this->add_data( $font_family_handle, 'is_font_family', true );
+
+		return true;
 	}
 
 	/**
@@ -215,8 +237,11 @@ class WP_Webfonts extends WP_Dependencies {
 		}
 
 		// Register the font family when it does not yet exist.
-		if ( ! $this->add_font_family( $font_family_handle ) ) {
-			return null;
+		if ( ! isset( $this->registered[ $font_family_handle ] ) ) {
+			$font_family = WP_Webfonts_Utils::get_font_family_from_variation( $variation );
+			if ( ! $this->add_font_family( $font_family_handle, $font_family ) ) {
+				return null;
+			}
 		}
 
 		$variation = $this->validate_variation( $variation );
@@ -673,6 +698,44 @@ class WP_Webfonts extends WP_Dependencies {
 	}
 
 	/**
+	 * Converts the font family and its variations into theme.json structural format.
+	 *
+	 * @since X.X.X
+	 *
+	 * @param string $font_family_handle Font family to convert.
+	 * @return array Webfonts in theme.json structural format.
+	 */
+	public function to_theme_json( $font_family_handle ) {
+		if ( ! isset( $this->registered[ $font_family_handle ] ) ) {
+			return array();
+		}
+
+		$font_family_name  = $this->registered[ $font_family_handle ]->extra['font-properties']['font-family'];
+		$theme_json_format = array(
+			'fontFamily' => str_contains( $font_family_name, ' ' ) ? "'{$font_family_name}'" : $font_family_name,
+			'name'       => $font_family_name,
+			'slug'       => $font_family_handle,
+			'fontFace'   => array(),
+		);
+
+		foreach ( $this->registered[ $font_family_handle ]->deps as $variation_handle ) {
+			if ( ! isset( $this->registered[ $variation_handle ] ) ) {
+				continue;
+			}
+
+			$variation_obj = $this->registered[ $variation_handle ];
+			$variation_properties = array( 'origin' => 'gutenberg_wp_webfonts_api' );
+			foreach ( $variation_obj->extra['font-properties'] as $property_name => $property_value ) {
+				$property_in_camelcase = lcfirst( str_replace( '-', '', ucwords( $property_name, '-' ) ) );
+				$variation_properties[ $property_in_camelcase ] = $property_value;
+			}
+			$theme_json_format['fontFace'][ $variation_obj->handle ] = $variation_properties;
+		}
+
+		return $theme_json_format;
+	}
+
+	/**
 	 * Gets the font slug.
 	 *
 	 * BACKPORT NOTE: Do not backport this method.
@@ -700,6 +763,11 @@ class WP_Webfonts extends WP_Dependencies {
 				_doing_it_wrong( __METHOD__, __( 'Could not determine the font family name.', 'gutenberg' ), '6.0.0' );
 				return false;
 			}
+		}
+
+		// If the font-family is a comma-separated list (example: "Inter, sans-serif" ), use just the first font.
+		if ( strpos( $to_convert, ',' ) !== false ) {
+			$to_convert = explode( ',', $to_convert )[0];
 		}
 
 		return sanitize_title( $to_convert );

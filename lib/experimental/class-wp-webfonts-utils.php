@@ -104,6 +104,10 @@ class WP_Webfonts_Utils {
 		}
 
 		if ( static::is_defined( $haystack[ $key ] ) ) {
+			// If the font-family is a comma-separated list (example: "Inter, sans-serif" ), use just the first font.
+			if ( strpos( $haystack[ $key ], ',' ) !== false ) {
+				return explode( ',', $haystack[ $key ] )[0];
+			}
 			return $haystack[ $key ];
 		}
 
