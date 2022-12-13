@@ -53,10 +53,17 @@ function usePatternsCategories() {
 				)
 			)
 			.sort( ( { name: currentName }, { name: nextName } ) => {
-				if ( ! [ currentName, nextName ].includes( 'featured' ) ) {
+				if (
+					! [ currentName, nextName ].some( ( categoryName ) =>
+						[ 'featured', 'text' ].includes( categoryName )
+					)
+				) {
 					return 0;
 				}
-				return currentName === 'featured' ? -1 : 1;
+				// Move `featured` category to the top and `text` to the bottom.
+				return currentName === 'featured' || nextName === 'text'
+					? -1
+					: 1;
 			} );
 
 		if (

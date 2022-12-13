@@ -98,6 +98,24 @@ test.describe( 'Style Book', () => {
 		).toBeVisible();
 	} );
 
+	test( 'should clear Global Styles navigator history when example is clicked', async ( {
+		page,
+	} ) => {
+		await page.click( 'role=button[name="Blocks styles"]' );
+		await page.click( 'role=button[name="Heading block styles"]' );
+		await page.click( 'role=button[name="Typography styles"]' );
+
+		await page.click(
+			'role=button[name="Open Quote styles in Styles panel"i]'
+		);
+
+		await page.click( 'role=button[name="Navigate to the previous view"]' );
+
+		await expect(
+			page.locator( 'role=button[name="Navigate to the previous view"]' )
+		).not.toBeVisible();
+	} );
+
 	test( 'should disappear when closed', async ( { page } ) => {
 		await page.click(
 			'role=region[name="Style Book"i] >> role=button[name="Close Style Book"i]'

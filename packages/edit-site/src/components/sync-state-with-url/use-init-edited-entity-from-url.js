@@ -19,6 +19,8 @@ export default function useInitEditedEntityFromURL() {
 
 	// Set correct entity on page navigation.
 	useEffect( () => {
+		// This URL scheme mean we can't open a template part with the context of a given post.
+		// Potentially posts and pages could be moved to a "context" query string instead.
 		if ( 'page' === postType || 'post' === postType ) {
 			setPage( { context: { postType, postId } } ); // Resolves correct template based on ID.
 		} else if ( 'wp_template' === postType ) {
