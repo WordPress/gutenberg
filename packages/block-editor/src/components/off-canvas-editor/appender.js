@@ -11,6 +11,11 @@ import Inserter from '../inserter';
 import { LinkUI } from './link-ui';
 import { updateAttributes } from './update-attributes';
 
+const BLOCKS_WITH_LINK_UI_SUPPORT = [
+	'core/navigation-link',
+	'core/navigation-submenu',
+];
+
 export const Appender = forwardRef( ( props, ref ) => {
 	const [ insertedBlockClientId, setInsertedBlockClientId ] = useState();
 
@@ -57,7 +62,7 @@ export const Appender = forwardRef( ( props, ref ) => {
 
 	if (
 		insertedBlockClientId &&
-		insertedBlockName === 'core/navigation-link'
+		BLOCKS_WITH_LINK_UI_SUPPORT?.includes( insertedBlockName )
 	) {
 		maybeLinkUI = (
 			<LinkUI
@@ -85,24 +90,20 @@ export const Appender = forwardRef( ( props, ref ) => {
 		<div className="offcanvas-editor__appender">
 			{ maybeLinkUI }
 
-			{ ! insertedBlockClientId && (
-				<Inserter
-					ref={ ref }
-					rootClientId={ clientId }
-					position="bottom right"
-					isAppender={ true }
-					selectBlockOnInsert={ false }
-					onSelectOrClose={ ( _insertedBlock ) => {
-						if ( _insertedBlock?.clientId ) {
-							setInsertedBlockClientId(
-								_insertedBlock?.clientId
-							);
-						}
-					} }
-					__experimentalIsQuick
-					{ ...props }
-				/>
-			) }
+			<Inserter
+				ref={ ref }
+				rootClientId={ clientId }
+				position="bottom right"
+				isAppender={ true }
+				selectBlockOnInsert={ false }
+				onSelectOrClose={ ( _insertedBlock ) => {
+					if ( _insertedBlock?.clientId ) {
+						setInsertedBlockClientId( _insertedBlock?.clientId );
+					}
+				} }
+				__experimentalIsQuick
+				{ ...props }
+			/>
 		</div>
 	);
 } );
