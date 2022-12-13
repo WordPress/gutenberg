@@ -120,6 +120,10 @@ function ContextScreens( { name } ) {
 			<GlobalStylesNavigationScreen path={ parentMenu + '/layout' }>
 				<ScreenLayout name={ name } />
 			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path={ parentMenu + '/css' }>
+				<ScreenCSS name={ name } />
+			</GlobalStylesNavigationScreen>
 		</>
 	);
 }
@@ -192,9 +196,6 @@ function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
 			{ isStyleBookOpened && (
 				<GlobalStylesStyleBook onClose={ onCloseStyleBook } />
 			) }
-			<GlobalStylesNavigationScreen path="/css">
-				<ScreenCSS />
-			</GlobalStylesNavigationScreen>
 		</NavigatorProvider>
 	);
 }

@@ -9,9 +9,13 @@ import { __ } from '@wordpress/i18n';
  */
 import { useStyle } from './hooks';
 
-function CustomCSSControl() {
-	const [ customCSS, setCustomCSS ] = useStyle( 'css' );
-	const [ themeCSS ] = useStyle( 'css', null, 'base' );
+function CustomCSSControl( { blockName } ) {
+	// If blockName is defined, we are customizing CSS at the block level:
+	// styles.blocks.blockName.css
+	const block = !! blockName ? blockName : null;
+
+	const [ customCSS, setCustomCSS ] = useStyle( 'css', block );
+	const [ themeCSS ] = useStyle( 'css', block, 'base' );
 	const ignoreThemeCustomCSS = '/* IgnoreThemeCustomCSS */';
 
 	// If there is custom css from theme.json show it in the edit box
