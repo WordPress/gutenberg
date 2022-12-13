@@ -51,7 +51,10 @@ export const Appender = forwardRef( ( props, ref ) => {
 
 	let maybeLinkUI;
 
-	if ( insertedBlock ) {
+	if (
+		insertedBlock &&
+		insertedBlockAttributes?.name === 'core/navigation-link'
+	) {
 		maybeLinkUI = (
 			<LinkUI
 				clientId={ insertedBlock }
@@ -77,17 +80,23 @@ export const Appender = forwardRef( ( props, ref ) => {
 	return (
 		<div className="offcanvas-editor__appender">
 			{ maybeLinkUI }
-			<Inserter
-				ref={ ref }
-				rootClientId={ clientId }
-				position="bottom right"
-				isAppender={ true }
-				selectBlockOnInsert={ false }
-				onSelectOrClose={ ( { insertedBlockId } ) => {
-					setInsertedBlock( insertedBlockId );
-				} }
-				{ ...props }
-			/>
+
+			{ ! insertedBlock && (
+				<Inserter
+					ref={ ref }
+					rootClientId={ clientId }
+					position="bottom right"
+					isAppender={ true }
+					selectBlockOnInsert={ false }
+					onSelectOrClose={ ( _insertedBlock ) => {
+						if ( _insertedBlock?.clientId ) {
+							setInsertedBlock( _insertedBlock?.clientId );
+						}
+					} }
+					__experimentalIsQuick
+					{ ...props }
+				/>
+			) }
 		</div>
 	);
 } );

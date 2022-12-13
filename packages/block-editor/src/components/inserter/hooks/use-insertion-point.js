@@ -108,7 +108,8 @@ function useInsertionPoint( {
 					blocks,
 					destinationIndex,
 					destinationRootClientId,
-					true,
+					// true,
+					false,
 					shouldFocusBlock || shouldForceFocusBlock ? 0 : null,
 					meta
 				);
@@ -122,7 +123,7 @@ function useInsertionPoint( {
 			speak( message );
 
 			if ( onSelect ) {
-				onSelect();
+				onSelect( blocks );
 			}
 		},
 		[

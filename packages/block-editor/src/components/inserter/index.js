@@ -143,12 +143,18 @@ class Inserter extends Component {
 			// Feel free to make them stable after a few releases.
 			__experimentalIsQuick: isQuick,
 			prioritizePatterns,
+			onSelectOrClose,
 		} = this.props;
 
 		if ( isQuick ) {
 			return (
 				<QuickInserter
-					onSelect={ () => {
+					onSelect={ ( blocks ) => {
+						const firstBlock =
+							Array.isArray( blocks ) && blocks?.length
+								? blocks[ 0 ]
+								: blocks;
+						onSelectOrClose( firstBlock );
 						onClose();
 					} }
 					rootClientId={ rootClientId }
@@ -380,7 +386,7 @@ export default compose( [
 
 				if ( onSelectOrClose ) {
 					onSelectOrClose( {
-						insertedBlockId: blockToInsert?.clientId,
+						clientId: blockToInsert?.clientId,
 					} );
 				}
 
