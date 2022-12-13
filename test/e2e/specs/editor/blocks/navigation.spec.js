@@ -41,9 +41,5 @@ test.describe(
 <!-- /wp:navigation -->`
 			);
 		} );
-
-		test( 'default to my only existing menu', async () => {} );
-		test( 'default to my most recently created menu', async () => {} );
-		test( 'default to the only existing classic menu if there are no block menus', async () => {} );
 	}
 );
