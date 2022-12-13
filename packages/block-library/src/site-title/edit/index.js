@@ -16,16 +16,17 @@ import {
 	BlockControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { ToggleControl, PanelBody } from '@wordpress/components';
+import { ToggleControl, PanelBody, ToolbarButton } from '@wordpress/components';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
+import { formatBold, formatItalic } from '@wordpress/icons';
+import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import LevelControl from './level-toolbar';
-import BoldControl from './bold-control';
-import ItalicControl from './italic-control';
+import useTypographyStyle from './use-typography-style';
 
 export default function SiteTitleEdit( {
 	attributes,
@@ -53,12 +54,27 @@ export default function SiteTitleEdit( {
 		} );
 	}
 
+	const { isBold, isItalic, toggleBold, toggleItalic } = useTypographyStyle(
+		style,
+		setAttributes
+	);
+
+	// Toggle bold and italic styles with keyboard shortcuts.
+	function onKeyDown( event ) {
+		if ( isKeyboardEvent.primary( event, 'b' ) ) {
+			toggleBold();
+		} else if ( isKeyboardEvent.primary( event, 'i' ) ) {
+			toggleItalic();
+		}
+	}
+
 	const TagName = level === 0 ? 'p' : `h${ level }`;
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 			'wp-block-site-title__placeholder': ! canUserEdit && ! title,
 		} ),
+		onKeyDown,
 	} );
 	const siteTitleContent = canUserEdit ? (
 		<TagName { ...blockProps }>
@@ -109,21 +125,19 @@ export default function SiteTitleEdit( {
 						setAttributes( { textAlign: nextAlign } );
 					} }
 				/>
-				<BoldControl
-					typographyStyle={ style?.typography }
-					onChange={ ( newTypography ) =>
-						setAttributes( {
-							style: { ...style, typography: newTypography },
-						} )
-					}
+				<ToolbarButton
+					icon={ formatBold }
+					label={ __( 'Bold' ) }
+					isPressed={ isBold }
+					onClick={ toggleBold }
+					shortcut={ displayShortcut.primary( 'b' ) }
 				/>
-				<ItalicControl
-					typographyStyle={ style?.typography }
-					onChange={ ( newTypography ) =>
-						setAttributes( {
-							style: { ...style, typography: newTypography },
-						} )
-					}
+				<ToolbarButton
+					icon={ formatItalic }
+					label={ __( 'Italic' ) }
+					isPressed={ isItalic }
+					onClick={ toggleItalic }
+					shortcut={ displayShortcut.primary( 'i' ) }
 				/>
 			</BlockControls>
 			<InspectorControls>

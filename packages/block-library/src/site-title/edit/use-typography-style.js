@@ -1,7 +1,8 @@
 const BOLD = '700';
 const ITALIC = 'italic';
 
-export default function useTypographyStyle( typographyStyle ) {
+export default function useTypographyStyle( style, setAttributes ) {
+	const typographyStyle = style?.typography;
 	const isBold = typographyStyle?.fontWeight === BOLD;
 	const isItalic = typographyStyle?.fontStyle === ITALIC;
 
@@ -17,16 +18,33 @@ export default function useTypographyStyle( typographyStyle ) {
 			fontStyle: newIsItalic ? ITALIC : 'normal',
 		};
 	}
+
+	function toggleBold() {
+		setAttributes( {
+			style: {
+				typography: {
+					...typographyStyle,
+					...getNewTypographyStyle( ! isBold, isItalic ),
+				},
+			},
+		} );
+	}
+
+	function toggleItalic() {
+		setAttributes( {
+			style: {
+				typography: {
+					...typographyStyle,
+					...getNewTypographyStyle( isBold, ! isItalic ),
+				},
+			},
+		} );
+	}
+
 	return {
 		isBold,
 		isItalic,
-		boldToggleTypography: {
-			...typographyStyle,
-			...getNewTypographyStyle( ! isBold, isItalic ),
-		},
-		italicToggleTypography: {
-			...typographyStyle,
-			...getNewTypographyStyle( isBold, ! isItalic ),
-		},
+		toggleBold,
+		toggleItalic,
 	};
 }
