@@ -25,12 +25,12 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
-import { getSupportedGlobalStylesPanels } from '../components/global-styles/hooks';
-import { GlobalStylesContext } from '../components/global-styles/context';
+import { getSupportedGlobalStylesPanels } from '../../components/global-styles/hooks';
+import { GlobalStylesContext } from '../../components/global-styles/context';
 import {
 	STYLE_PATH_TO_CSS_VAR_INFIX,
 	STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE,
-} from '../components/global-styles/utils';
+} from '../../components/global-styles/utils';
 
 function getChangesToPush( name, attributes ) {
 	return getSupportedGlobalStylesPanels( name ).flatMap( ( key ) => {
@@ -97,7 +97,7 @@ function PushChangesToGlobalStylesControl( {
 		createSuccessNotice(
 			sprintf(
 				// translators: %s: Title of the block e.g. 'Heading'.
-				__( 'Applied styles to all %s blocks.' ),
+				__( 'Pushed styles to all %s blocks.' ),
 				getBlockType( name ).title
 			),
 			{
@@ -120,8 +120,13 @@ function PushChangesToGlobalStylesControl( {
 
 	return (
 		<BaseControl
-			help={ __(
-				"Apply this block's styles to all blocks of this type. Note that only typography, spacing, dimensions, color and border styles will be applied."
+			className="edit-site-push-changes-to-global-styles-control"
+			help={ sprintf(
+				// translators: %s: Title of the block e.g. 'Heading'.
+				__(
+					'Apply this block’s typography, spacing, dimensions, and color styling to all %s blocks.'
+				),
+				getBlockType( name ).title
 			) }
 		>
 			<BaseControl.VisualLabel>
