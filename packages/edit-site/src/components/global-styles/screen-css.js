@@ -17,7 +17,7 @@ function ScreenCSS() {
 			<ScreenHeader
 				title={ __( 'CSS' ) }
 				description={ __(
-					'Add CSS beyond the styles offered by the existing design tools.'
+					'Add your own CSS to customize the appearance and layout of your site.'
 				) }
 			/>
 			<div className="edit-site-global-styles-screen-css">

@@ -49,6 +49,10 @@ function CustomCSSControl() {
 				onChange={ ( value ) => handleOnChange( value ) }
 				rows={ 15 }
 				className="edit-site-global-styles__custom-css-input"
+				spellCheck={ false }
+				help={ __(
+					"Enter your custom CSS in the textarea and preview in the editor. Changes won't take effect until you've saved the template."
+				) }
 			/>
 			{ originalThemeCustomCSS && (
 				<Panel>
