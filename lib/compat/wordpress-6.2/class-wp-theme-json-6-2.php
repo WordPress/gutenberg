@@ -383,7 +383,11 @@ class WP_Theme_JSON_6_2 extends WP_Theme_JSON_6_1 {
 
 		// Load the custom CSS last so it has the highest specificity.
 		if ( in_array( 'custom-css', $types, true ) ) {
-			$stylesheet .= _wp_array_get( $this->theme_json, array( 'styles', 'css' ) );
+			$custom_css   = _wp_array_get( $this->theme_json, array( 'styles', 'css' ) );
+			// Because we can't guarantee that the user wants to override all the themes custom CSS
+			// with their own settings we need to append the user CSS to the theme CSS.
+			$theme_styles = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( 'theme' )->theme_json;
+			$stylesheet  .= isset( $theme_styles['styles']['css'] ) ? $theme_styles['styles']['css'] . $custom_css : $custom_css;
 		}
 
 		return $stylesheet;

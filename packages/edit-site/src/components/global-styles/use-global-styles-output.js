@@ -26,7 +26,7 @@ import {
 import { PRESET_METADATA, ROOT_BLOCK_SELECTOR, scopeSelector } from './utils';
 import { getTypographyFontSizeValue } from './typography-utils';
 import { GlobalStylesContext } from './context';
-import { useSetting } from './hooks';
+import { useSetting, useStyle } from './hooks';
 
 // List of block support features that can have their related styles
 // generated under their own feature level selector rather than the block's.
@@ -884,6 +884,12 @@ function updateConfigWithSeparator( config ) {
 export function useGlobalStylesOutput() {
 	let { merged: mergedConfig } = useContext( GlobalStylesContext );
 
+	// Because we can't guarantee that the user wants to override all the themes custom CSS
+	// with their own settings we need to append the user CSS to the theme CSS.
+	const [ userCSS ] = useStyle( 'css' );
+	const [ themeCSS ] = useStyle( 'css', null, 'base' );
+	const customCSS = `${ themeCSS }${ userCSS }`;
+
 	const [ blockGap ] = useSetting( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGap !== null;
 	const hasFallbackGapSupport = ! hasBlockGapSupport; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback styles support.
@@ -921,7 +927,7 @@ export function useGlobalStylesOutput() {
 			},
 			// Load custom CSS in own stylesheet so that any invalid CSS entered in the input won't break all the global styles in the editor.
 			{
-				css: mergedConfig.styles.css ?? '',
+				css: customCSS ?? '',
 				isGlobalStyles: true,
 			},
 		];
