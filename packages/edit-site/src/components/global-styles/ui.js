@@ -28,6 +28,7 @@ import ScreenStyleVariations from './screen-style-variations';
 import ScreenBorder from './screen-border';
 import StyleBook from '../style-book';
 import ScreenCSS from './screen-css';
+import ScreenEffects from './screen-effects';
 
 function GlobalStylesNavigationScreen( { className, ...props } ) {
 	return (
@@ -119,6 +120,10 @@ function ContextScreens( { name } ) {
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/layout' }>
 				<ScreenLayout name={ name } />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path={ parentMenu + '/effects' }>
+				<ScreenEffects name={ name } />
 			</GlobalStylesNavigationScreen>
 		</>
 	);

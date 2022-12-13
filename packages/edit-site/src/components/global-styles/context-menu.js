@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
-import { typography, border, color, layout } from '@wordpress/icons';
+import { typography, border, color, layout, starEmpty } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -59,6 +59,13 @@ function ContextMenu( { name, parentMenu = '' } ) {
 					{ __( 'Layout' ) }
 				</NavigationButtonAsItem>
 			) }
+			<NavigationButtonAsItem
+				icon={ starEmpty }
+				path={ parentMenu + '/effects' }
+				aria-label={ __( 'Effects' ) }
+			>
+				{ __( 'Effects' ) }
+			</NavigationButtonAsItem>
 		</ItemGroup>
 	);
 }
