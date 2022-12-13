@@ -172,7 +172,6 @@ export default function Editor() {
 		<>
 			{ isEditMode && <WelcomeGuide /> }
 			<KeyboardShortcuts.Register />
-			<SidebarComplementaryAreaFills />
 			<EntityProvider kind="root" type="site">
 				<EntityProvider
 					kind="postType"
@@ -181,6 +180,7 @@ export default function Editor() {
 				>
 					<GlobalStylesProvider>
 						<BlockContextProvider value={ blockContext }>
+							<SidebarComplementaryAreaFills />
 							<InterfaceSkeleton
 								className={
 									showIconLabels && 'show-icon-labels'
