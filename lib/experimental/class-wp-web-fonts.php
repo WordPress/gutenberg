@@ -167,28 +167,32 @@ class WP_Web_Fonts extends WP_Webfonts {
 	}
 
 	/**
-	 * Adds a font family.
+	 * Registers a font family.
 	 *
 	 * @since X.X.X
 	 *
-	 * @param string $font_family_handle The font family to register.
-	 * @param string $font_family_name   Optional. The font family's name.
-	 * @return bool True when registered, else false.
+	 * @param string $font_family Font family name to register.
+	 * @return string|null Font family handle when registration successes. Null on failure.
 	 */
-	public function add_font_family( $font_family_handle, $font_family_name = '' ) {
+	public function add_font_family( $font_family ) {
+		$font_family_handle = WP_Webfonts_Utils::convert_font_family_into_handle( $font_family );
+		if ( ! $font_family_handle ) {
+			return null;
+		}
+
 		if ( isset( $this->registered[ $font_family_handle ] ) ) {
-			return true;
+			return $font_family_handle;
 		}
 
 		$registered = $this->add( $font_family_handle, false );
 		if ( ! $registered ) {
-			return false;
+			return null;
 		}
 
-		$this->add_data( $font_family_handle, 'font-properties', array( 'font-family' => $font_family_name ) );
+		$this->add_data( $font_family_handle, 'font-properties', array( 'font-family' => $font_family ) );
 		$this->add_data( $font_family_handle, 'is_font_family', true );
 
-		return true;
+		return $font_family_handle;
 	}
 
 	/**
@@ -723,10 +727,10 @@ class WP_Web_Fonts extends WP_Webfonts {
 				continue;
 			}
 
-			$variation_obj = $this->registered[ $variation_handle ];
+			$variation_obj        = $this->registered[ $variation_handle ];
 			$variation_properties = array( 'origin' => 'gutenberg_wp_webfonts_api' );
 			foreach ( $variation_obj->extra['font-properties'] as $property_name => $property_value ) {
-				$property_in_camelcase = lcfirst( str_replace( '-', '', ucwords( $property_name, '-' ) ) );
+				$property_in_camelcase                          = lcfirst( str_replace( '-', '', ucwords( $property_name, '-' ) ) );
 				$variation_properties[ $property_in_camelcase ] = $property_value;
 			}
 			$theme_json_format['fontFace'][ $variation_obj->handle ] = $variation_properties;

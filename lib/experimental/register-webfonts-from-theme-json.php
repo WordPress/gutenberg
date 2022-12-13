@@ -135,7 +135,7 @@ if ( ! function_exists( 'gutenberg_add_registered_webfonts_to_theme_json' ) ) {
 			$families = array();
 			foreach ( $families_data as $family ) {
 				$font_family = WP_Webfonts_Utils::get_font_family_from_variation( $family );
-				$handle 	 = WP_Webfonts_Utils::convert_font_family_into_handle( $font_family );
+				$handle      = WP_Webfonts_Utils::convert_font_family_into_handle( $font_family );
 				if ( ! empty( $handle ) ) {
 					$families[ $handle ] = true;
 				}
@@ -146,7 +146,7 @@ if ( ! function_exists( 'gutenberg_add_registered_webfonts_to_theme_json' ) ) {
 
 		// Find missing fonts that are not in the theme's theme.json.
 		$to_add = array();
-		if ( ! empty ( $font_families_registered ) ) {
+		if ( ! empty( $font_families_registered ) ) {
 			$to_add = array_diff( $font_families_registered, $get_families( $font_families_from_theme ) );
 		}
 

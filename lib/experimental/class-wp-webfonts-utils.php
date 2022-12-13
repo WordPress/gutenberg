@@ -27,7 +27,7 @@ class WP_Webfonts_Utils {
 	 * @return string|null The font family handle on success. Else, null.
 	 */
 	public static function convert_font_family_into_handle( $font_family ) {
-		if ( ! is_string( $font_family ) || empty( $font_family ) ) {
+		if ( ! self::is_defined( $font_family ) ) {
 			return null;
 		}
 
