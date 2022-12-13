@@ -18,7 +18,7 @@ class Tests_Webfonts_WpGetWebfontProviders extends WP_Webfonts_TestCase {
 
 	public function set_up() {
 		parent::set_up();
-		$this->providers_property = new ReflectionProperty( WP_Webfonts::class, 'providers' );
+		$this->providers_property = new ReflectionProperty( WP_Web_Fonts::class, 'providers' );
 		$this->providers_property->setAccessible( true );
 	}
 

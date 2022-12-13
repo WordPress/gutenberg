@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Webfonts::query() tests.
+ * WP_Web_Fonts::query() tests.
  *
  * @package    WordPress
  * @subpackage Webfonts
@@ -10,7 +10,7 @@ require_once __DIR__ . '/../wp-webfonts-testcase.php';
 
 /**
  * @group  webfonts
- * @covers WP_Webfonts::query
+ * @covers WP_Web_Fonts::query
  */
 class Tests_Webfonts_WpWebfonts_Query extends WP_Webfonts_TestCase {
 	private $wp_webfonts;
@@ -18,7 +18,7 @@ class Tests_Webfonts_WpWebfonts_Query extends WP_Webfonts_TestCase {
 	public function set_up() {
 		parent::set_up();
 
-		$this->wp_webfonts = new WP_Webfonts();
+		$this->wp_webfonts = new WP_Web_Fonts();
 	}
 
 	/**
@@ -99,7 +99,7 @@ class Tests_Webfonts_WpWebfonts_Query extends WP_Webfonts_TestCase {
 		return array(
 			'lato'             => array( 'lato' ),
 			'merriweather'     => array( 'merriweather' ),
-			'Source Serif Pro' => array( 'Source Serif Pro' ),
+			'Source Serif Pro' => array( 'source-serif-pro' ),
 		);
 	}
 
@@ -139,7 +139,7 @@ class Tests_Webfonts_WpWebfonts_Query extends WP_Webfonts_TestCase {
 	public function data_done_query() {
 		return array(
 			'merriweather'     => array( 'merriweather' ),
-			'Source Serif Pro' => array( 'Source Serif Pro' ),
+			'Source Serif Pro' => array( 'source-serif-pro' ),
 		);
 	}
 

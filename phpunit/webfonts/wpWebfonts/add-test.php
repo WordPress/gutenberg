@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Webfonts::add() tests.
+ * WP_Web_Fonts::add() tests.
  *
  * @package    WordPress
  * @subpackage Webfonts
@@ -10,7 +10,7 @@ require_once __DIR__ . '/../wp-webfonts-testcase.php';
 
 /**
  * @group  webfonts
- * @covers WP_Webfonts::add
+ * @covers WP_Web_Fonts::add
  */
 class Tests_Webfonts_WpWebfonts_Add extends WP_Webfonts_TestCase {
 
@@ -20,7 +20,7 @@ class Tests_Webfonts_WpWebfonts_Add extends WP_Webfonts_TestCase {
 	 * @param string $handle Handle to register.
 	 */
 	public function test_add( $handle ) {
-		$wp_webfonts = new WP_Webfonts();
+		$wp_webfonts = new WP_Web_Fonts();
 
 		$this->assertTrue( $wp_webfonts->add( $handle, false ), 'Registering a handle should return true' );
 		$this->assertCount( 1, $wp_webfonts->registered );

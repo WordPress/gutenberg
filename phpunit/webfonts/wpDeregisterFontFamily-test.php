@@ -12,16 +12,16 @@ require_once __DIR__ . '/wp-webfonts-testcase.php';
  * @group webfonts
  * @group remove_webfonts
  * @covers ::wp_deregister_font_family
- * @covers WP_Webfonts::remove_font_family
+ * @covers WP_Web_Fonts::remove_font_family
  */
 class Tests_Webfonts_WpDeregisterFontFamily extends WP_Webfonts_TestCase {
 
 	/**
-	 * Unit test for registering a font-family that mocks WP_Webfonts.
+	 * Unit test for registering a font-family that mocks WP_Web_Fonts.
 	 *
 	 * @dataProvider data_font_family_handles
 	 *
-	 * @param string $font_family_handle Font font handle to test.
+	 * @param string $font_family_handle Font family handle to test.
 	 */
 	public function test_unit_should_deregister( $font_family_handle ) {
 		$mock = $this->set_up_mock( 'remove_font_family' );

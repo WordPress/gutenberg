@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Webfonts::remove() tests.
+ * WP_Web_Fonts::remove() tests.
  *
  * @package    WordPress
  * @subpackage Webfonts
@@ -11,12 +11,12 @@ require_once __DIR__ . '/../wp-webfonts-testcase.php';
 /**
  * @group  webfonts
  * @group  remove_webfonts
- * @covers WP_Webfonts::remove
+ * @covers WP_Web_Fonts::remove
  */
 class Tests_Webfonts_WpWebfonts_Remove extends WP_Webfonts_TestCase {
 
 	public function test_should_not_remove_when_none_registered() {
-		$wp_webfonts = new WP_Webfonts();
+		$wp_webfonts = new WP_Web_Fonts();
 
 		$wp_webfonts->remove( array( 'handle-1', 'handle2' ) );
 
@@ -30,7 +30,7 @@ class Tests_Webfonts_WpWebfonts_Remove extends WP_Webfonts_TestCase {
 	 * @param array $expected Expected handles are running test.
 	 */
 	public function test_should_remove_when_registered( array $handles, array $expected ) {
-		$wp_webfonts             = new WP_Webfonts();
+		$wp_webfonts             = new WP_Web_Fonts();
 		$wp_webfonts->registered = $this->generate_registered_queue();
 
 		$wp_webfonts->remove( $handles );

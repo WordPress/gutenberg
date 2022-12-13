@@ -152,7 +152,7 @@ class WP_Web_Fonts extends WP_Webfonts {
 	 * @return string[]
 	 */
 	public function get_registered() {
-		return $this->registered;
+		return array_keys( $this->registered );
 	}
 
 	/**
@@ -242,8 +242,7 @@ class WP_Web_Fonts extends WP_Webfonts {
 
 		// Register the font family when it does not yet exist.
 		if ( ! isset( $this->registered[ $font_family_handle ] ) ) {
-			$font_family = WP_Webfonts_Utils::get_font_family_from_variation( $variation );
-			if ( ! $this->add_font_family( $font_family_handle, $font_family ) ) {
+			if ( ! $this->add_font_family( $font_family_handle ) ) {
 				return null;
 			}
 		}

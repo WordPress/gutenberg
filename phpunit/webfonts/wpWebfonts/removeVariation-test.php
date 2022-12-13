@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Webfonts::remove_variation() tests.
+ * WP_Web_Fonts::remove_variation() tests.
  *
  * @package    WordPress
  * @subpackage Webfonts
@@ -11,7 +11,7 @@ require_once __DIR__ . '/../wp-webfonts-testcase.php';
 /**
  * @group  webfonts
  * @group  remove_webfonts
- * @covers WP_Webfonts::remove_variation
+ * @covers WP_Web_Fonts::remove_variation
  */
 class Tests_Webfonts_WpWebfonts_RemoveVariation extends WP_Webfonts_TestCase {
 	private $wp_webfonts;
@@ -19,13 +19,13 @@ class Tests_Webfonts_WpWebfonts_RemoveVariation extends WP_Webfonts_TestCase {
 
 	public function set_up() {
 		parent::set_up();
-		$this->wp_webfonts       = new WP_Webfonts();
+		$this->wp_webfonts       = new WP_Web_Fonts();
 		$this->fonts_to_register = $this->get_registered_local_fonts();
 	}
 
 	/**
 	 * Sets up the unit test by mocking the WP_Dependencies object using stdClass and
-	 * registering each font family directly to the WP_Webfonts::$registered property
+	 * registering each font family directly to the WP_Web_Fonts::$registered property
 	 * and its variations to the mocked $deps property.
 	 */
 	private function setup_unit_test() {
@@ -34,7 +34,7 @@ class Tests_Webfonts_WpWebfonts_RemoveVariation extends WP_Webfonts_TestCase {
 
 	/**
 	 * Sets up the integration test by properly registering each font family and its variations
-	 * by using the WP_Webfonts::add() and WP_Webfonts::add_variation() methods.
+	 * by using the WP_Web_Fonts::add() and WP_Web_Fonts::add_variation() methods.
 	 */
 	private function setup_integration_test() {
 		foreach ( $this->fonts_to_register as $font_family_handle => $variations ) {
@@ -60,14 +60,15 @@ class Tests_Webfonts_WpWebfonts_RemoveVariation extends WP_Webfonts_TestCase {
 	/**
 	 * Unit test.
 	 *
-	 * @dataProvider data_remove_variations
+	 * @dataProvider data_should_do_nothing_when_variation_and_font_family_not_registered
 	 *
-	 * @param string $font_family_handle Font family for the variation.
+	 * @param string $font_family        Font family name.
+	 * @param string $font_family_handle Font family handle.
 	 * @param string $variation_handle   Variation handle to remove.
 	 */
-	public function test_unit_should_do_nothing_when_variation_and_font_family_not_registered( $font_family_handle, $variation_handle ) {
+	public function test_unit_should_do_nothing_when_variation_and_font_family_not_registered( $font_family, $font_family_handle, $variation_handle ) {
 		// Set up the test.
-		unset( $this->fonts_to_register[ $font_family_handle ] );
+		unset( $this->fonts_to_register[ $font_family ] );
 		$this->setup_unit_test();
 		$registered_queue = $this->wp_webfonts->registered;
 
@@ -81,14 +82,15 @@ class Tests_Webfonts_WpWebfonts_RemoveVariation extends WP_Webfonts_TestCase {
 	/**
 	 * Integration test.
 	 *
-	 * @dataProvider data_remove_variations
+	 * @dataProvider data_should_do_nothing_when_variation_and_font_family_not_registered
 	 *
-	 * @param string $font_family_handle Font family for the variation.
+	 * @param string $font_family        Font family name.
+	 * @param string $font_family_handle Font family handle.
 	 * @param string $variation_handle   Variation handle to remove.
 	 */
-	public function test_should_do_nothing_when_variation_and_font_family_not_registered( $font_family_handle, $variation_handle ) {
+	public function test_should_do_nothing_when_variation_and_font_family_not_registered( $font_family, $font_family_handle, $variation_handle ) {
 		// Set up the test.
-		unset( $this->fonts_to_register[ $font_family_handle ] );
+		unset( $this->fonts_to_register[ $font_family ] );
 		$this->setup_integration_test();
 		$registered_queue = $this->wp_webfonts->get_registered();
 
@@ -97,6 +99,26 @@ class Tests_Webfonts_WpWebfonts_RemoveVariation extends WP_Webfonts_TestCase {
 		$this->assertArrayNotHasKey( $font_family_handle, $this->wp_webfonts->registered, 'Font family should not be registered' );
 		$this->assertArrayNotHasKey( $variation_handle, $this->wp_webfonts->registered, 'Variant should not be registered' );
 		$this->assertSameSets( $registered_queue, $this->wp_webfonts->get_registered(), 'Registered queue should not have changed' );
+	}
+
+	/**
+	 * Data provider for testing removal of variations.
+	 *
+	 * @return array
+	 */
+	public function data_should_do_nothing_when_variation_and_font_family_not_registered() {
+		return array(
+			'Font with 1 variation'         => array(
+				'font_family'        => 'merriweather',
+				'font_family_handle' => 'merriweather',
+				'variation_handle'   => 'merriweather-200-900-normal',
+			),
+			'Font with multiple variations' => array(
+				'font_family'        => 'Source Serif Pro',
+				'font_family_handle' => 'source-serif-pro',
+				'variation_handle'   => 'Source Serif Pro-300-normal',
+			),
+		);
 	}
 
 	/**
@@ -246,7 +268,7 @@ class Tests_Webfonts_WpWebfonts_RemoveVariation extends WP_Webfonts_TestCase {
 	}
 
 	/**
-	 * Removes the variation from the WP_Webfonts::$registered queue.
+	 * Removes the variation from the WP_Web_Fonts::$registered queue.
 	 *
 	 * @param string $variation_handle The variation handle to remove.
 	 */

@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Webfonts::get_registered() tests.
+ * WP_Web_Fonts::get_registered() tests.
  *
  * @package    WordPress
  * @subpackage Webfonts
@@ -11,12 +11,12 @@ require_once __DIR__ . '/../wp-webfonts-testcase.php';
 
 /**
  * @group  webfonts
- * @covers WP_Webfonts::get_registered
+ * @covers WP_Web_Fonts::get_registered
  */
 class Tests_Webfonts_WpWebfonts_GetRegistered extends WP_Webfonts_TestCase {
 
 	public function test_should_return_empty_when_none_registered() {
-		$wp_webfonts = new WP_Webfonts();
+		$wp_webfonts = new WP_Web_Fonts();
 		$this->assertEmpty( $wp_webfonts->get_registered() );
 	}
 
@@ -28,7 +28,7 @@ class Tests_Webfonts_WpWebfonts_GetRegistered extends WP_Webfonts_TestCase {
 	 * @param array $inputs Font family(ies) and variations to register.
 	 */
 	public function test_should_return_queue_when_mocking_registered_property( array $inputs ) {
-		$wp_webfonts = new WP_Webfonts();
+		$wp_webfonts = new WP_Web_Fonts();
 		$mocks       = $this->setup_registration_mocks( $inputs, $wp_webfonts );
 		$expected    = array_keys( $mocks );
 
@@ -78,7 +78,7 @@ class Tests_Webfonts_WpWebfonts_GetRegistered extends WP_Webfonts_TestCase {
 	 * @param array  $expected    Expected results.
 	 */
 	public function test_should_return_queue_when_items_are_registered( $font_family, array $inputs, array $expected ) {
-		$wp_webfonts = new WP_Webfonts();
+		$wp_webfonts = new WP_Web_Fonts();
 
 		// Register before testing.
 		foreach ( $inputs as $handle => $variations ) {

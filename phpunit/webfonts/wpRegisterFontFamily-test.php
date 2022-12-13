@@ -27,11 +27,11 @@ class Tests_Webfonts_WpRegisterFontFamily extends WP_Webfonts_TestCase {
 		$mock->expects( $this->once() )
 			->method( 'add_font_family' )
 			->with(
-				$this->identicalTo( $expected_handle )
+				$this->identicalTo( $font_family )
 			)
 			->will( $this->returnValue( $expected_handle ) );
 
-		$this->assertSame( $expected_handle, wp_register_font_family( $font_family ), 'Font family should return true after registering' );
+		$this->assertSame( $expected_handle, wp_register_font_family( $font_family ), 'Font family handle should be returned after registering' );
 	}
 
 	/**
@@ -45,7 +45,7 @@ class Tests_Webfonts_WpRegisterFontFamily extends WP_Webfonts_TestCase {
 	 * @param string $expected_handle Expected registered handle.
 	 */
 	public function test_register( $font_family, $expected_handle ) {
-		$this->assertSame( $expected_handle, wp_register_font_family( $font_family ), 'Font family should return true after registering' );
+		$this->assertSame( $expected_handle, wp_register_font_family( $font_family ), 'Font family handle should be returned after registering' );
 		$this->assertSame( array( $expected_handle ), $this->get_registered_handles(), 'After registering, the registry should contain the font family handle' );
 	}
 
@@ -69,20 +69,6 @@ class Tests_Webfonts_WpRegisterFontFamily extends WP_Webfonts_TestCase {
 				'expected_handle' => 'source-serif-pro',
 			),
 		);
-	}
-
-	/**
-	 * Unit test for registering a font-family that mocks WP_Webfonts.
-	 *
-	 * @dataProvider data_invalid_font_family
-	 *
-	 * @param string $invalid_input Invalid input to test.
-	 */
-	public function test_unit_register_fails( $invalid_input ) {
-		$mock = $this->set_up_mock( 'add_font_family' );
-		$mock->expects( $this->never() )->method( 'add_font_family' );
-
-		$this->assertNull( wp_register_font_family( $invalid_input ), 'Registering an invalid input should return null' );
 	}
 
 	/**

@@ -54,7 +54,7 @@ class Tests_Webfonts_WpDeregisterWebfontVariation extends WP_Webfonts_TestCase {
 	public function test_mocked_setup( $font_family_handle, $variation_handle ) {
 		$this->setup_unit_test();
 
-		$this->assertArrayHasKey( $variation_handle, $this->wp_webfonts->registered, 'Variation should be in the registered queue before remval' );
+		$this->assertArrayHasKey( $variation_handle, $this->wp_webfonts->registered, 'Variation should be in the registered queue before removal' );
 		$this->assertContains( $variation_handle, $this->wp_webfonts->registered[ $font_family_handle ]->deps, 'Variation should be in its font family deps before removal' );
 	}
 
@@ -80,14 +80,15 @@ class Tests_Webfonts_WpDeregisterWebfontVariation extends WP_Webfonts_TestCase {
 	/**
 	 * Unit test.
 	 *
-	 * @dataProvider data_remove_variations
+	 * @dataProvider data_should_do_nothing
 	 *
-	 * @param string $font_family_handle Font family for the variation.
+	 * @param string $font_family        Font family name.
+	 * @param string $font_family_handle Font family handle.
 	 * @param string $variation_handle   Variation handle to remove.
 	 */
-	public function test_unit_should_do_nothing_when_variation_and_font_family_not_registered( $font_family_handle, $variation_handle ) {
+	public function test_unit_should_do_nothing_when_variation_and_font_family_not_registered( $font_family, $font_family_handle, $variation_handle ) {
 		// Set up the test.
-		unset( $this->fonts_to_register[ $font_family_handle ] );
+		unset( $this->fonts_to_register[ $font_family ] );
 		$this->setup_unit_test();
 		$registered_queue = $this->wp_webfonts->registered;
 
@@ -101,14 +102,15 @@ class Tests_Webfonts_WpDeregisterWebfontVariation extends WP_Webfonts_TestCase {
 	/**
 	 * Integration test.
 	 *
-	 * @dataProvider data_remove_variations
+	 * @dataProvider data_should_do_nothing
 	 *
-	 * @param string $font_family_handle Font family for the variation.
+	 * @param string $font_family        Font family name.
+	 * @param string $font_family_handle Font family handle.
 	 * @param string $variation_handle   Variation handle to remove.
 	 */
-	public function test_should_do_nothing_when_variation_and_font_family_not_registered( $font_family_handle, $variation_handle ) {
+	public function test_should_do_nothing_when_variation_and_font_family_not_registered( $font_family, $font_family_handle, $variation_handle ) {
 		// Set up the test.
-		unset( $this->fonts_to_register[ $font_family_handle ] );
+		unset( $this->fonts_to_register[ $font_family ] );
 		$this->setup_integration_test();
 		$registered_queue = $this->wp_webfonts->get_registered();
 
@@ -117,6 +119,26 @@ class Tests_Webfonts_WpDeregisterWebfontVariation extends WP_Webfonts_TestCase {
 		$this->assertArrayNotHasKey( $font_family_handle, $this->wp_webfonts->registered, 'Font family should not be registered' );
 		$this->assertArrayNotHasKey( $variation_handle, $this->wp_webfonts->registered, 'Variant should not be registered' );
 		$this->assertSameSets( $registered_queue, $this->wp_webfonts->get_registered(), 'Registered queue should not have changed' );
+	}
+
+	/**
+	 * Data provider for testing removal of variations.
+	 *
+	 * @return array
+	 */
+	public function data_should_do_nothing() {
+		return array(
+			'Font with 1 variation'         => array(
+				'font_family'        => 'merriweather',
+				'font_family_handle' => 'merriweather',
+				'variation_handle'   => 'merriweather-200-900-normal',
+			),
+			'Font with multiple variations' => array(
+				'font_family'        => 'Source Serif Pro',
+				'font_family_handle' => 'source-serif-pro',
+				'variation_handle'   => 'Source Serif Pro-300-normal',
+			),
+		);
 	}
 
 	/**

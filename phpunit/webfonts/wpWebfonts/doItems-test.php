@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Webfonts::do_items() tests.
+ * WP_Web_Fonts::do_items() tests.
  *
  * @package    WordPress
  * @subpackage Webfonts
@@ -12,14 +12,14 @@ require_once __DIR__ . '/../../fixtures/mock-provider.php';
 /**
  * @group  webfonts
  * @group  printwebfonts
- * @covers WP_Webfonts::do_items
+ * @covers WP_Web_Fonts::do_items
  */
 class Tests_Webfonts_WpWebfonts_DoItems extends WP_Webfonts_TestCase {
 	private $wp_webfonts;
 
 	public function set_up() {
 		parent::set_up();
-		$this->wp_webfonts = new WP_Webfonts;
+		$this->wp_webfonts = new WP_Web_Fonts;
 	}
 
 	public function test_should_not_process_when_no_providers_registered() {
@@ -27,8 +27,8 @@ class Tests_Webfonts_WpWebfonts_DoItems extends WP_Webfonts_TestCase {
 
 		$done = $this->wp_webfonts->do_items();
 
-		$this->assertSame( array(), $done, 'WP_Webfonts::do_items() should return an empty array' );
-		$this->assertSame( array(), $this->wp_webfonts->to_do, 'WP_Webfonts::$to_do should be an empty array' );
+		$this->assertSame( array(), $done, 'WP_Web_Fonts::do_items() should return an empty array' );
+		$this->assertSame( array(), $this->wp_webfonts->to_do, 'WP_Web_Fonts::$to_do should be an empty array' );
 	}
 
 	public function test_should_throw_notice_when_queue_is_empty() {
@@ -141,7 +141,7 @@ class Tests_Webfonts_WpWebfonts_DoItems extends WP_Webfonts_TestCase {
 	 */
 	public function test_should_print_handles_when_not_enqueued( $setup, $expected_done, $expected_output ) {
 		$this->setup_integrated_deps( $setup, false );
-		// Do not enqueue. Instead, pass the handles to WP_Webfonts::do_items().
+		// Do not enqueue. Instead, pass the handles to WP_Web_Fonts::do_items().
 		$handles = $setup['enqueued'];
 		$this->assertEmpty( $this->wp_webfonts->queue, 'No fonts should be enqueued' );
 

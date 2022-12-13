@@ -15,14 +15,14 @@ require_once __DIR__ . '/wp-webfonts-testcase.php';
 class Tests_Webfonts_WpWebfonts extends WP_Webfonts_TestCase {
 
 	public function test_returns_instance() {
-		$this->assertInstanceOf( WP_Webfonts::class, wp_webfonts() );
+		$this->assertInstanceOf( WP_Web_Fonts::class, wp_webfonts() );
 	}
 
 	public function test_global_set() {
 		global $wp_webfonts;
 		$this->assertNull( $wp_webfonts );
 		$instance = wp_webfonts();
-		$this->assertInstanceOf( WP_Webfonts::class, $wp_webfonts );
+		$this->assertInstanceOf( WP_Web_Fonts::class, $wp_webfonts );
 		$this->assertSame( $instance, $wp_webfonts );
 	}
 

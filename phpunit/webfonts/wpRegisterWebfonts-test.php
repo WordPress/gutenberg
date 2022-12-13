@@ -11,8 +11,8 @@ require_once __DIR__ . '/wp-webfonts-testcase.php';
 /**
  * @group  webfonts
  * @covers ::wp_register_webfonts
- * @covers WP_Webfonts::add
- * @covers WP_Webfonts::add_variation
+ * @covers WP_Web_Fonts::add
+ * @covers WP_Web_Fonts::add_variation
  */
 class Tests_Webfonts_WpRegisterWebfonts extends WP_Webfonts_TestCase {
 	use WP_Webfonts_Tests_Datasets;
@@ -152,7 +152,7 @@ class Tests_Webfonts_WpRegisterWebfonts extends WP_Webfonts_TestCase {
 					),
 				),
 				'expected' => array(
-					'wp_register_webfonts' => array( 'merriweather' => true ),
+					'wp_register_webfonts' => array( 'merriweather' ),
 					'get_registered'       => array( 'merriweather', 'merriweather-200-900-normal' ),
 				),
 			),
@@ -180,7 +180,7 @@ class Tests_Webfonts_WpRegisterWebfonts extends WP_Webfonts_TestCase {
 					),
 				),
 				'expected' => array(
-					'wp_register_webfonts' => array( 'source-serif-pro' => true ),
+					'wp_register_webfonts' => array( 'source-serif-pro' ),
 					'get_registered'       => array(
 						'source-serif-pro',
 						'source-serif-pro-300-normal',
@@ -221,16 +221,13 @@ class Tests_Webfonts_WpRegisterWebfonts extends WP_Webfonts_TestCase {
 					),
 				),
 				'expected' => array(
-					'wp_register_webfonts' => array(
-						'source-serif-pro' => true,
-						'merriweather'     => true,
-					),
+					'wp_register_webfonts' => array( 'source-serif-pro', 'merriweather' ),
 					'get_registered'       => array(
 						'source-serif-pro',
 						'source-serif-pro-300-normal',
+						'source-serif-pro-900-italic',
 						'merriweather',
 						'merriweather-200-900-normal',
-						'source-serif-pro-900-italic',
 					),
 				),
 			),

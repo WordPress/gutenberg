@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Webfonts::add_variation() tests.
+ * WP_Web_Fonts::add_variation() tests.
  *
  * @package    WordPress
  * @subpackage Webfonts
@@ -10,7 +10,7 @@ require_once __DIR__ . '/../wp-webfonts-testcase.php';
 
 /**
  * @group  webfonts
- * @covers WP_Webfonts::add_variation
+ * @covers WP_Web_Fonts::add_variation
  */
 class Tests_Webfonts_WpWebfonts_AddVariation extends WP_Webfonts_TestCase {
 
@@ -23,7 +23,7 @@ class Tests_Webfonts_WpWebfonts_AddVariation extends WP_Webfonts_TestCase {
 	 * @param string      $variation_handle   Optional. The variation's handle.
 	 */
 	public function test_should_register_variation_when_font_family_is_registered( $expected, $font_family_handle, array $variation, $variation_handle = '' ) {
-		$wp_webfonts = new WP_Webfonts();
+		$wp_webfonts = new WP_Web_Fonts();
 		$wp_webfonts->add( $font_family_handle, false );
 
 		$variation_handle = $wp_webfonts->add_variation( $font_family_handle, $variation, $variation_handle );
@@ -41,7 +41,7 @@ class Tests_Webfonts_WpWebfonts_AddVariation extends WP_Webfonts_TestCase {
 	 * @param string      $variation_handle   Optional. The variation's handle.
 	 */
 	public function test_should_not_reregister_font_family( $expected, $font_family_handle, array $variation, $variation_handle = '' ) {
-		$wp_webfonts = new WP_Webfonts();
+		$wp_webfonts = new WP_Web_Fonts();
 		$wp_webfonts->add( $font_family_handle, false );
 
 		$variation_handle = $wp_webfonts->add_variation( $font_family_handle, $variation, $variation_handle );
@@ -60,7 +60,7 @@ class Tests_Webfonts_WpWebfonts_AddVariation extends WP_Webfonts_TestCase {
 	 * @param string      $variation_handle   Optional. The variation's handle.
 	 */
 	public function test_should_not_reregister_variation( $expected, $font_family_handle, array $variation, $variation_handle = '' ) {
-		$wp_webfonts = new WP_Webfonts();
+		$wp_webfonts = new WP_Web_Fonts();
 		$wp_webfonts->add( $font_family_handle, false );
 
 		// Set up the test.
@@ -85,7 +85,7 @@ class Tests_Webfonts_WpWebfonts_AddVariation extends WP_Webfonts_TestCase {
 	 * @param string      $variation_handle   Optional. The variation's handle.
 	 */
 	public function test_should_register_font_family_and_variation( $expected, $font_family_handle, array $variation, $variation_handle = '' ) {
-		$wp_webfonts = new WP_Webfonts();
+		$wp_webfonts = new WP_Web_Fonts();
 
 		$variation_handle = $wp_webfonts->add_variation( $font_family_handle, $variation, $variation_handle );
 		$this->assertSame( $expected, $variation_handle, 'Variation should return its registered handle' );
@@ -107,7 +107,7 @@ class Tests_Webfonts_WpWebfonts_AddVariation extends WP_Webfonts_TestCase {
 		$this->expectNotice();
 		$this->expectNoticeMessage( 'Font family handle must be a non-empty string.' );
 
-		$wp_webfonts = new WP_Webfonts();
+		$wp_webfonts = new WP_Web_Fonts();
 		$wp_webfonts->add_variation( $font_family_handle, $variation );
 
 		$this->assertEmpty( $wp_webfonts->registered, 'Registered queue should be empty' );
@@ -116,7 +116,7 @@ class Tests_Webfonts_WpWebfonts_AddVariation extends WP_Webfonts_TestCase {
 
 	/**
 	 * @dataProvider data_font_family_undefined_in_variation
-	 * @dataProvider data_unable_determine_variation_handle
+	 * @dataProviders data_unable_determine_variation_handle
 	 *
 	 * @param string $font_family_handle The font family's handle for this variation.
 	 * @param array  $variation          An array of variation properties to add.
@@ -126,7 +126,7 @@ class Tests_Webfonts_WpWebfonts_AddVariation extends WP_Webfonts_TestCase {
 		$this->expectNotice();
 		$this->expectNoticeMessage( $expected_message );
 
-		$wp_webfonts = new WP_Webfonts();
+		$wp_webfonts = new WP_Web_Fonts();
 		$this->assertNull( $wp_webfonts->add_variation( $font_family_handle, $variation ) );
 	}
 
@@ -140,7 +140,7 @@ class Tests_Webfonts_WpWebfonts_AddVariation extends WP_Webfonts_TestCase {
 		$this->expectNotice();
 		$this->expectNoticeMessage( 'Variant handle could not be determined as font-weight and/or font-style are require' );
 
-		$wp_webfonts = new WP_Webfonts();
+		$wp_webfonts = new WP_Web_Fonts();
 		$wp_webfonts->add_variation( $font_family_handle, $variation );
 
 		$this->assertCount( 1, $wp_webfonts->registered );

@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Webfonts::register_provider() tests.
+ * WP_Web_Fonts::register_provider() tests.
  *
  * @package    WordPress
  * @subpackage Webfonts
@@ -11,7 +11,7 @@ require_once __DIR__ . '/../../fixtures/mock-provider.php';
 
 /**
  * @group  webfonts
- * @covers WP_Webfonts::register_provider
+ * @covers WP_Web_Fonts::register_provider
  */
 class Tests_Webfonts_WpWebfonts_RegisterProvider extends WP_Webfonts_TestCase {
 
@@ -23,8 +23,8 @@ class Tests_Webfonts_WpWebfonts_RegisterProvider extends WP_Webfonts_TestCase {
 	 * @param array  $expected    Expected providers queue.
 	 */
 	public function test_should_register_provider( $provider_id, $class, $expected ) {
-		$wp_webfonts = new WP_Webfonts();
-		$this->assertTrue( $wp_webfonts->register_provider( $provider_id, $class ), 'WP_Webfonts::register_provider() should return true' );
+		$wp_webfonts = new WP_Web_Fonts();
+		$this->assertTrue( $wp_webfonts->register_provider( $provider_id, $class ), 'WP_Web_Fonts::register_provider() should return true' );
 		$this->assertSame( $expected, $wp_webfonts->get_providers(), 'Provider "' . $provider_id . '" should be registered in providers queue' );
 	}
 
@@ -59,10 +59,10 @@ class Tests_Webfonts_WpWebfonts_RegisterProvider extends WP_Webfonts_TestCase {
 	}
 
 	public function test_should_register_mutliple_providers() {
-		$wp_webfonts = new WP_Webfonts();
+		$wp_webfonts = new WP_Web_Fonts();
 		$providers   = $this->get_provider_definitions();
 		foreach ( $providers as $provider ) {
-			$this->assertTrue( $wp_webfonts->register_provider( $provider['id'], $provider['class'] ), 'WP_Webfonts::register_provider() should return true for provider ' . $provider['id'] );
+			$this->assertTrue( $wp_webfonts->register_provider( $provider['id'], $provider['class'] ), 'WP_Web_Fonts::register_provider() should return true for provider ' . $provider['id'] );
 		}
 
 		$expected = array(
@@ -86,9 +86,9 @@ class Tests_Webfonts_WpWebfonts_RegisterProvider extends WP_Webfonts_TestCase {
 	 * @param string $class       Provider class name.
 	 */
 	public function test_should_not_register( $provider_id, $class ) {
-		$wp_webfonts = new WP_Webfonts();
+		$wp_webfonts = new WP_Web_Fonts();
 
-		$this->assertFalse( $wp_webfonts->register_provider( $provider_id, $class ), 'WP_Webfonts::register_provider() should return false' );
+		$this->assertFalse( $wp_webfonts->register_provider( $provider_id, $class ), 'WP_Web_Fonts::register_provider() should return false' );
 		$this->assertArrayNotHasKey( $provider_id, $wp_webfonts->get_providers(), 'Both local and mock providers should be registered' );
 	}
 

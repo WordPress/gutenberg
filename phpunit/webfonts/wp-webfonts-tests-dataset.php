@@ -162,7 +162,7 @@ trait WP_Webfonts_Tests_Datasets {
 				'expected_message'   => $message,
 			),
 			'font-family: null'         => array(
-				'font_family_handle' => 'Lato',
+				'font_family_handle' => 'lato',
 				'variation'          => array(
 					'provider'    => 'local',
 					'font-family' => null,
@@ -172,7 +172,7 @@ trait WP_Webfonts_Tests_Datasets {
 				'expected_message'   => $message,
 			),
 			'font-family: non string'   => array(
-				'font_family_handle' => 'Source Serif Pro',
+				'font_family_handle' => 'source-serif-pro',
 				'variation'          => array(
 					'provider'     => 'local',
 					'font-family'  => 10,
@@ -415,7 +415,7 @@ trait WP_Webfonts_Tests_Datasets {
 				'expected'    => array(),
 			),
 			'font family with multiple variations'      => array(
-				'font_family' => 'Source Serif Pro',
+				'font_family' => 'source-serif-pro',
 				'inputs'      => array(
 					'Source Serif Pro' => array(
 						'Source Serif Pro-300-normal' => array(
@@ -438,19 +438,19 @@ trait WP_Webfonts_Tests_Datasets {
 						),
 					),
 				),
-				'handles'     => array( 'Source Serif Pro', 'Source Serif Pro-300-normal', 'Source Serif Pro-900-italic' ),
+				'handles'     => array( 'source-serif-pro', 'Source Serif Pro-300-normal', 'Source Serif Pro-900-italic' ),
 				'expected'    => array(),
 			),
 			'multiple font families without variations' => array(
-				'font_family' => 'Source Serif Pro',
+				'font_family' => 'source-serif-pro',
 				'inputs'      => array(
 					'lato'             => array(),
 					'my-font'          => array(),
 					'Source Serif Pro' => array(),
 					'some other font'  => array(),
 				),
-				'handles'     => array( 'lato', 'my-font', 'Source Serif Pro', 'some other font' ),
-				'expected'    => array( 'lato', 'my-font', 'some other font' ),
+				'handles'     => array( 'lato', 'my-font', 'source-serif-pro', 'some-other-font' ),
+				'expected'    => array( 'lato', 'my-font', 'some-other-font' ),
 			),
 			'multiple font families with variations'    => array(
 				'font_family' => 'my-font',
@@ -494,7 +494,7 @@ trait WP_Webfonts_Tests_Datasets {
 				'handles'     => array(
 					'merriweather',
 					'merriweather-200-900-normal',
-					'Source Serif Pro',
+					'source-serif-pro',
 					'Source Serif Pro-300-normal',
 					'Source Serif Pro-900-italic',
 					'my-font',
@@ -503,7 +503,7 @@ trait WP_Webfonts_Tests_Datasets {
 				'expected'    => array(
 					'merriweather',
 					'merriweather-200-900-normal',
-					'Source Serif Pro',
+					'source-serif-pro',
 					'Source Serif Pro-300-normal',
 					'Source Serif Pro-900-italic',
 				),
@@ -580,7 +580,7 @@ trait WP_Webfonts_Tests_Datasets {
 				'expected'         => array(
 					'registered'       => array(
 						'merriweather',
-						'Source Serif Pro',
+						'source-serif-pro',
 						'Source Serif Pro-300-normal',
 						'Source Serif Pro-900-italic',
 					),
@@ -588,13 +588,13 @@ trait WP_Webfonts_Tests_Datasets {
 				),
 			),
 			'Font with multiple variations' => array(
-				'font_family'      => 'Source Serif Pro',
+				'font_family'      => 'source-serif-pro',
 				'variation_handle' => 'Source Serif Pro-300-normal',
 				'expected'         => array(
 					'registered'       => array(
 						'merriweather',
 						'merriweather-200-900-normal',
-						'Source Serif Pro',
+						'source-serif-pro',
 						'Source Serif Pro-900-italic',
 					),
 					'font_family_deps' => array( 'Source Serif Pro-900-italic' ),
@@ -626,12 +626,12 @@ trait WP_Webfonts_Tests_Datasets {
 				),
 			),
 			'3 font families' => array(
-				'handles'                         => array( 'merriweather', 'my-font', 'Source Serif Pro' ),
-				'expected_queue'                  => array( 'merriweather', 'my-font', 'Source Serif Pro' ),
+				'handles'                         => array( 'merriweather', 'my-font', 'source-serif-pro' ),
+				'expected_queue'                  => array( 'merriweather', 'my-font', 'source-serif-pro' ),
 				'expected_queued_before_register' => array(
 					'merriweather'     => null,
 					'my-font'          => null,
-					'Source Serif Pro' => null,
+					'source-serif-pro' => null,
 				),
 			),
 		);
@@ -760,9 +760,9 @@ trait WP_Webfonts_Tests_Datasets {
 					'provider'         => array( 'local' => $providers['local'] ),
 					'provider_handles' => array( 'local' => $local_font_handles ),
 					'registered'       => $local_fonts,
-					'enqueued'         => array( 'Source Serif Pro' ),
+					'enqueued'         => array( 'source-serif-pro' ),
 				),
-				'expected_done'   => array( 'Source Serif Pro', 'Source Serif Pro-300-normal', 'Source Serif Pro-900-italic' ),
+				'expected_done'   => array( 'source-serif-pro', 'Source Serif Pro-300-normal', 'Source Serif Pro-900-italic' ),
 				'expected_output' => sprintf(
 					"<style id='wp-webfonts-local' type='text/css'>\n%s%s\n</style>\n",
 					$font_faces['Source Serif Pro-300-normal'],
@@ -774,12 +774,12 @@ trait WP_Webfonts_Tests_Datasets {
 					'provider'         => array( 'local' => $providers['local'] ),
 					'provider_handles' => array( 'local' => $local_font_handles ),
 					'registered'       => $local_fonts,
-					'enqueued'         => array( 'merriweather', 'Source Serif Pro' ),
+					'enqueued'         => array( 'merriweather', 'source-serif-pro' ),
 				),
 				'expected_done'   => array(
 					'merriweather',
 					'merriweather-200-900-normal',
-					'Source Serif Pro',
+					'source-serif-pro',
 					'Source Serif Pro-300-normal',
 					'Source Serif Pro-900-italic',
 				),
@@ -835,11 +835,11 @@ trait WP_Webfonts_Tests_Datasets {
 				),
 			),
 			'print all local fonts when all providers registered' => array(
-				'setup'           => array_merge( $setup_all, array( 'enqueued' => array( 'merriweather', 'Source Serif Pro' ) ) ),
+				'setup'           => array_merge( $setup_all, array( 'enqueued' => array( 'merriweather', 'source-serif-pro' ) ) ),
 				'expected_done'   => array(
 					'merriweather',
 					'merriweather-200-900-normal',
-					'Source Serif Pro',
+					'source-serif-pro',
 					'Source Serif Pro-300-normal',
 					'Source Serif Pro-900-italic',
 				),

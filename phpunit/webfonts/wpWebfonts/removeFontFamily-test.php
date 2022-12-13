@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Webfonts::remove_font_family() tests.
+ * WP_Web_Fonts::remove_font_family() tests.
  *
  * @package    WordPress
  * @subpackage Webfonts
@@ -11,7 +11,7 @@ require_once __DIR__ . '/../wp-webfonts-testcase.php';
 /**
  * @group webfonts
  * @group remove_webfonts
- * @covers WP_Webfonts::remove_font_family
+ * @covers WP_Web_Fonts::remove_font_family
  */
 class Tests_Webfonts_WpWebfonts_RemoveFontFamily extends WP_Webfonts_TestCase {
 
@@ -24,7 +24,7 @@ class Tests_Webfonts_WpWebfonts_RemoveFontFamily extends WP_Webfonts_TestCase {
 	 * @param array  $expected           Array of expected handles.
 	 */
 	public function test_should_dequeue_when_mocks_registered( $font_family, array $inputs, array $registered_handles, array $expected ) {
-		$wp_webfonts = new WP_Webfonts();
+		$wp_webfonts = new WP_Web_Fonts();
 		$this->setup_registration_mocks( $inputs, $wp_webfonts );
 		// Test the before state, just to make sure.
 		$this->assertArrayHasKey( $font_family, $wp_webfonts->registered, 'Registered queue should contain the font family before remove' );
@@ -45,7 +45,7 @@ class Tests_Webfonts_WpWebfonts_RemoveFontFamily extends WP_Webfonts_TestCase {
 	 * @param array  $expected           Array of expected handles.
 	 */
 	public function test_should_bail_out_when_not_registered( $font_family, array $inputs, array $registered_handles, array $expected ) {
-		$wp_webfonts = new WP_Webfonts();
+		$wp_webfonts = new WP_Web_Fonts();
 		unset( $inputs[ $font_family ] );
 		$this->setup_registration_mocks( $inputs, $wp_webfonts );
 
@@ -66,10 +66,10 @@ class Tests_Webfonts_WpWebfonts_RemoveFontFamily extends WP_Webfonts_TestCase {
 	 * @param array  $expected           Array of expected handles.
 	 */
 	public function test_should_deregister_when_registered( $font_family, array $inputs, array $registered_handles, array $expected ) {
-		$wp_webfonts = new WP_Webfonts();
+		$wp_webfonts = new WP_Web_Fonts();
 		// Register all font families and their variations.
-		foreach ( $inputs as $handle => $variations ) {
-			$wp_webfonts->add( $handle, false );
+		foreach ( $inputs as $input_font_family => $variations ) {
+			$handle = $wp_webfonts->add_font_family( $input_font_family );
 			foreach ( $variations as $variation_handle => $variation ) {
 				if ( ! is_string( $variation_handle ) ) {
 					$variation_handle = '';

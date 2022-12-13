@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Webfonts::get_providers() tests.
+ * WP_Web_Fonts::get_providers() tests.
  *
  * @package    WordPress
  * @subpackage Webfonts
@@ -11,7 +11,7 @@ require_once __DIR__ . '/../../fixtures/mock-provider.php';
 
 /**
  * @group  webfonts
- * @covers WP_Webfonts::get_providers
+ * @covers WP_Web_Fonts::get_providers
  */
 class Tests_Webfonts_WpWebfonts_GetProviders extends WP_Webfonts_TestCase {
 	private $wp_webfonts;
@@ -19,9 +19,9 @@ class Tests_Webfonts_WpWebfonts_GetProviders extends WP_Webfonts_TestCase {
 
 	public function set_up() {
 		parent::set_up();
-		$this->wp_webfonts = new WP_Webfonts();
+		$this->wp_webfonts = new WP_Web_Fonts();
 
-		$this->providers_property = new ReflectionProperty( WP_Webfonts::class, 'providers' );
+		$this->providers_property = new ReflectionProperty( WP_Web_Fonts::class, 'providers' );
 		$this->providers_property->setAccessible( true );
 	}
 
@@ -43,7 +43,7 @@ class Tests_Webfonts_WpWebfonts_GetProviders extends WP_Webfonts_TestCase {
 	}
 
 	/**
-	 * Sets up the given providers and stores them in the `WP_Webfonts::providers` property.
+	 * Sets up the given providers and stores them in the `WP_Web_Fonts::providers` property.
 	 *
 	 * @param array $providers Array of providers to set up.
 	 */
