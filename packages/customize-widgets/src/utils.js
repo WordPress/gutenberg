@@ -102,6 +102,10 @@ export function widgetToBlock( { id, idBase, number, instance } ) {
 		...rest
 	} = instance;
 
+	if ( ! raw.content ) {
+		raw.content = '';
+	}
+
 	if ( idBase === 'block' ) {
 		const parsedBlocks = parse( raw.content, {
 			__unstableSkipAutop: true,
