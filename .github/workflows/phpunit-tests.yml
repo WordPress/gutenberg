@@ -18,12 +18,13 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-    unit-php:
-        name: ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }}
-        # Runs PHP related CI jobs
+    test-php:
+        name: ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }} on ${{ matrix.os }}
         runs-on: ubuntu-latest
+        timeout-minutes: 20
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
+            fail-fast: false
             matrix:
                 php:
                     [
@@ -37,6 +38,7 @@ jobs:
                         '8.1',
                         '8.2',
                     ]
+                os: [ubuntu-latest]
                 multisite: [false, true]
 
         env:
@@ -45,20 +47,28 @@ jobs:
         steps:
             - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
 
-            - name: Use desired version of NodeJS
+            - name: Set up Node.js
               uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
               with:
                   node-version-file: '.nvmrc'
                   cache: npm
+
+            - name: Docker debug information
+              run: |
+                  docker -v
+                  docker-compose -v
 
             - name: Npm install and build
               run: |
                   npm ci
                   npm run build
 
-            - name: Install WordPress
+            - name: Start Docker environment
               run: |
                   npm run wp-env start
+
+            - name: Log running Docker containers
+              run: docker ps -a
 
             - name: Running single site unit tests
               run: npm run test:unit:php
