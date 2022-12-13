@@ -81,8 +81,6 @@ function LinkControlTransforms( { clientId } ) {
 		'core/search',
 	];
 
-	console.log( { blockTransforms } );
-
 	const transforms = blockTransforms.filter( ( item ) => {
 		return featuredBlocks.includes( item.name );
 	} );
