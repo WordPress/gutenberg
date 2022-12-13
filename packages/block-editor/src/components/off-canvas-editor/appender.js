@@ -12,7 +12,7 @@ import { LinkUI } from './link-ui';
 import { updateAttributes } from './update-attributes';
 
 export const Appender = forwardRef( ( props, ref ) => {
-	const [ insertedBlock, setInsertedBlock ] = useState();
+	const [ insertedBlockClientId, setInsertedBlockClientId ] = useState();
 
 	const { hideInserter, clientId } = useSelect( ( select ) => {
 		const {
@@ -31,43 +31,47 @@ export const Appender = forwardRef( ( props, ref ) => {
 		};
 	}, [] );
 
-	const { insertedBlockAttributes } = useSelect(
+	const { insertedBlockAttributes, insertedBlockName } = useSelect(
 		( select ) => {
-			const { getBlockAttributes } = select( blockEditorStore );
+			const { getBlockName, getBlockAttributes } =
+				select( blockEditorStore );
 
 			return {
-				insertedBlockAttributes: getBlockAttributes( insertedBlock ),
+				insertedBlockAttributes: getBlockAttributes(
+					insertedBlockClientId
+				),
+				insertedBlockName: getBlockName( insertedBlockClientId ),
 			};
 		},
-		[ insertedBlock ]
+		[ insertedBlockClientId ]
 	);
 
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const setAttributes =
-		( insertedBlockClientId ) => ( _updatedAttributes ) => {
-			updateBlockAttributes( insertedBlockClientId, _updatedAttributes );
+		( _insertedBlockClientId ) => ( _updatedAttributes ) => {
+			updateBlockAttributes( _insertedBlockClientId, _updatedAttributes );
 		};
 
 	let maybeLinkUI;
 
 	if (
-		insertedBlock &&
-		insertedBlockAttributes?.name === 'core/navigation-link'
+		insertedBlockClientId &&
+		insertedBlockName === 'core/navigation-link'
 	) {
 		maybeLinkUI = (
 			<LinkUI
-				clientId={ insertedBlock }
+				clientId={ insertedBlockClientId }
 				link={ insertedBlockAttributes }
-				onClose={ () => setInsertedBlock( null ) }
+				onClose={ () => setInsertedBlockClientId( null ) }
 				hasCreateSuggestion={ false }
 				onChange={ ( updatedValue ) => {
 					updateAttributes(
 						updatedValue,
-						setAttributes( insertedBlock ),
+						setAttributes( insertedBlockClientId ),
 						insertedBlockAttributes
 					);
-					setInsertedBlock( null );
+					setInsertedBlockClientId( null );
 				} }
 			/>
 		);
@@ -81,7 +85,7 @@ export const Appender = forwardRef( ( props, ref ) => {
 		<div className="offcanvas-editor__appender">
 			{ maybeLinkUI }
 
-			{ ! insertedBlock && (
+			{ ! insertedBlockClientId && (
 				<Inserter
 					ref={ ref }
 					rootClientId={ clientId }
@@ -90,7 +94,9 @@ export const Appender = forwardRef( ( props, ref ) => {
 					selectBlockOnInsert={ false }
 					onSelectOrClose={ ( _insertedBlock ) => {
 						if ( _insertedBlock?.clientId ) {
-							setInsertedBlock( _insertedBlock?.clientId );
+							setInsertedBlockClientId(
+								_insertedBlock?.clientId
+							);
 						}
 					} }
 					__experimentalIsQuick

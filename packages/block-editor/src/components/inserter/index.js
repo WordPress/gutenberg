@@ -154,7 +154,12 @@ class Inserter extends Component {
 							Array.isArray( blocks ) && blocks?.length
 								? blocks[ 0 ]
 								: blocks;
-						onSelectOrClose( firstBlock );
+						if (
+							onSelectOrClose &&
+							typeof onSelectOrClose === 'function'
+						) {
+							onSelectOrClose( firstBlock );
+						}
 						onClose();
 					} }
 					rootClientId={ rootClientId }
