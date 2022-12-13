@@ -38,7 +38,12 @@ export function VariationsPanel( { name } ) {
 				<NavigationButtonAsItem
 					key={ index }
 					icon={ '+' }
-					path={ '/blocks/' + name + '/variations/' + style.name }
+					path={
+						'/blocks/' +
+						encodeURIComponent( name ) +
+						'/variations/' +
+						encodeURIComponent( style.name )
+					}
 					aria-label={ style.label }
 				>
 					{ style.label }
@@ -51,7 +56,12 @@ export function VariationsPanel( { name } ) {
 export function VariationPanel( { blockName, styleName } ) {
 	return (
 		<ContextMenu
-			parentMenu={ '/blocks/' + blockName + '/variations/' + styleName }
+			parentMenu={
+				'/blocks/' +
+				encodeURIComponent( blockName ) +
+				'/variations/' +
+				encodeURIComponent( styleName )
+			}
 			name={ blockName }
 		/>
 	);
