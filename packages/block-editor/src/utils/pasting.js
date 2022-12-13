@@ -33,7 +33,7 @@ export function getPasteEventData( { clipboardData } ) {
 		return { files };
 	}
 
-	return { html, plainText };
+	return { html, plainText, files: [] };
 }
 
 /**
