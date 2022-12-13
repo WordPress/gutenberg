@@ -17,6 +17,21 @@
 				}
 			}
 		},
+		"settingsPropertiesEffects": {
+			"type": "object",
+			"properties": {
+				"effect": {
+					"description": "Settings related to effects.",
+					"type": "object",
+					"properties": {
+						"duration": {
+							"type": "string",
+							"default": 0
+						}
+					}
+				}
+			}
+		},
 		"settingsPropertiesUseRootPaddingAwareAlignments": {
 			"properties": {
 				"useRootPaddingAwareAlignments": {
@@ -565,7 +580,8 @@
 				{ "$ref": "#/definitions/settingsPropertiesLayout" },
 				{ "$ref": "#/definitions/settingsPropertiesSpacing" },
 				{ "$ref": "#/definitions/settingsPropertiesTypography" },
-				{ "$ref": "#/definitions/settingsPropertiesCustom" }
+				{ "$ref": "#/definitions/settingsPropertiesCustom" },
+				{ "$ref": "#/definitions/settingsPropertiesEffects" }
 			]
 		},
 		"settingsPropertiesComplete": {
@@ -582,6 +598,7 @@
 						"layout": {},
 						"spacing": {},
 						"typography": {},
+						"effects": {},
 						"custom": {}
 					},
 					"additionalProperties": false
@@ -1637,6 +1654,7 @@
 						"shadow": {},
 						"outline": {},
 						"css": {},
+						"effects": {},
 						"elements": {
 							"description": "Styles defined on a per-element basis using the element's selector.",
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"

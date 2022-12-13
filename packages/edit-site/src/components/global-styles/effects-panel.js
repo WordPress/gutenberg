@@ -10,15 +10,18 @@ import { __experimentalNumberControl as NumberControl } from '@wordpress/compone
 import { useStyle } from './hooks';
 
 export default function EffectsPanel( { name } ) {
-	const [ time, setTime ] = useStyle( 'effects.time', name );
+	const [ duration, setDuration ] = useStyle( 'effects.duration', name );
 
 	return (
 		<NumberControl
 			label={ __( 'Duration (seconds)' ) }
 			step={ 0.1 }
-			value={ time || '' }
-			onChange={ ( value ) => setTime( value ) }
+			value={ duration || '' }
+			onChange={ setDuration }
 			min={ 0.1 }
+			__unstableInputWidth="120px"
+			spinControls="custom"
+			__nextHasNoMarginBottom
 		/>
 	);
 }

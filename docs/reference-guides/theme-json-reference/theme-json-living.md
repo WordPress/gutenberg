@@ -28,6 +28,16 @@ Setting that enables the following UI tools:
 
 ---
 
+### effect
+
+Settings related to effects.
+
+| Property  | Type   | Default | Props  |
+| ---       | ---    | ---    |---   |
+| duration | string | 0 |  |
+
+---
+
 ### useRootPaddingAwareAlignments
 
 _**Note:** Since WordPress 6.1._

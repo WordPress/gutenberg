@@ -6,6 +6,9 @@
 		"layout": {
 			"contentSize": "840px",
 			"wideSize": "1100px"
+		},
+		"effects": {
+			"duration": "0.5"
 		}
 	},
 	"patterns": [ "short-text-surrounded-by-round-images", "partner-logos" ]
