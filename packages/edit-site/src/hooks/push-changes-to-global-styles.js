@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { get, set } from 'lodash';
-import { capitalCase } from 'change-case';
 
 /**
  * WordPress dependencies
@@ -47,7 +46,7 @@ function getChangesToPush( name, attributes ) {
 		const value = presetAttributeValue
 			? `var:preset|${ STYLE_PATH_TO_CSS_VAR_INFIX[ presetAttributeKey ] }|${ presetAttributeValue }`
 			: get( attributes.style, path );
-		return value ? [ { key, path, value } ] : [];
+		return value ? [ { path, value } ] : [];
 	} );
 }
 
@@ -97,10 +96,9 @@ function PushChangesToGlobalStylesControl( {
 
 		createSuccessNotice(
 			sprintf(
-				// translators: %1$s: Title of the block e.g. 'Heading'. %2$s: List of style properties e.g. 'Color, Link Color, Font Size'.
-				__( 'Applied to all %1$s blocks: %2$s.' ),
-				getBlockType( name ).title,
-				changes.map( ( { key } ) => capitalCase( key ) ).join( ', ' )
+				// translators: %s: Title of the block e.g. 'Heading'.
+				__( 'Applied styles to all %s blocks.' ),
+				getBlockType( name ).title
 			),
 			{
 				type: 'snackbar',
