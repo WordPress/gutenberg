@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
+import { ToolbarButton } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 import { formatBold, formatItalic } from '@wordpress/icons';
 
 const BOLD_VALUE = '700';
@@ -23,31 +24,32 @@ function getNewTypographyStyle( isBold, isItalic ) {
 export default function StyleFormatControl( { typographyStyle, onChange } ) {
 	const isBold = typographyStyle?.fontWeight === BOLD_VALUE;
 	const isItalic = typographyStyle?.fontStyle === ITALIC_VALUE;
-
+	function onClickBold() {
+		onChange( {
+			...typographyStyle,
+			...getNewTypographyStyle( ! isBold, isItalic ),
+		} );
+	}
+	function onClickItalic() {
+		onChange( {
+			...typographyStyle,
+			...getNewTypographyStyle( isBold, ! isItalic ),
+		} );
+	}
 	return (
-		<ToolbarGroup>
+		<>
 			<ToolbarButton
 				icon={ formatBold }
-				label="Bold"
+				label={ __( 'Bold' ) }
 				isPressed={ isBold }
-				onClick={ () => {
-					onChange( {
-						...typographyStyle,
-						...getNewTypographyStyle( ! isBold, isItalic ),
-					} );
-				} }
+				onClick={ onClickBold }
 			/>
 			<ToolbarButton
 				icon={ formatItalic }
-				label="Italic"
+				label={ __( 'Italic' ) }
 				isPressed={ isItalic }
-				onClick={ () => {
-					onChange( {
-						...typographyStyle,
-						...getNewTypographyStyle( isBold, ! isItalic ),
-					} );
-				} }
+				onClick={ onClickItalic }
 			/>
-		</ToolbarGroup>
+		</>
 	);
 }
