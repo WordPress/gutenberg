@@ -92,13 +92,13 @@ function gutenberg_resolve_assets_override() {
 	foreach ( $block_registry->get_all_registered() as $block_type ) {
 		$style_handles = array_merge(
 			$style_handles,
-			$block_type->style_handles,
-			$block_type->editor_style_handles
+			is_null( $block_type->style_handles ) ? array() : $block_type->style_handles,
+			is_null( $block_type->editor_style_handles ) ? array() : $block_type->editor_style_handles
 		);
 
 		$script_handles = array_merge(
 			$script_handles,
-			$block_type->script_handles
+			is_null( $block_type->script_handles ) ? array() : $block_type->script_handles
 		);
 	}
 
