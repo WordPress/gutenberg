@@ -52,6 +52,18 @@ if ( ! function_exists( 'array_is_list' ) ) {
 	}
 }
 
+class Selector {
+	public $element = null;
+	public $class = null;
+	public $hash = null;
+	public $has_attribute = null;
+	public $then = null;
+}
+
+class ParseResult {
+	public $last_index;
+	public $selector = null;
+}
 
 class WP_HTML_Attribute_Sourcer {
 	/**
@@ -121,22 +133,32 @@ class WP_HTML_Attribute_Sourcer {
 
 		while ( $tags->next_tag() ) {
 			foreach ( $selectors as $s ) {
-				if ( ! empty( $s['has_attribute'] ) && null === $tags->get_attribute( $s['has_attribute'] ) ) {
+				if ( ! empty( $s['tag_name'] ) && strtoupper( $s['tag_name'] ) !== $tags->get_tag() ) {
 					continue;
 				}
 
-				if ( 'element' === $s['type'] && $tags->get_tag() === strtoupper( $s['identifier'] ) ) {
-					return $tags;
+				if ( ! empty( $s['class_names'] ) ) {
+					$classes = $tags->get_attribute( 'class' );
+					if ( null === $classes ) {
+						continue;
+					}
+
+					foreach ( $s['class_names'] as $class_name ) {
+						if ( ! preg_match( "~\b{$class_name}\b~", $classes ) ) {
+							continue 2;
+						}
+					}
 				}
 
-				// @TODO: $tags->has_class() would be _really_ handy here.
-				if ( 'class' === $s['type'] && preg_match( "~\b{$s['identifier']}\b~", $tags->get_attribute( 'class' ) ) ) {
-					return $tags;
+				if ( isset( $s['hash'] ) && $s['identifier'] !== $tags->get_attribute( 'id' ) ) {
+					continue;
 				}
 
-				if ( 'hash' === $s['type'] && $s['identifier'] === $tags->get_attribute( 'id' ) ) {
-					return $tags;
+				if ( isset( $s['has_attribute'] ) && null === $tags->get_attribute( $s['has_attribute'] ) ) {
+					continue;
 				}
+
+				return $tags;
 			}
 		}
 
@@ -161,13 +183,13 @@ class WP_HTML_Attribute_Sourcer {
 			return 'inner-html';
 		}
 
-		$selector = self::parse_selector( $definition['selector'] );
-		if ( null === $selector ) {
+		$selectors = self::parse_full_selector( $definition['selector'] );
+		if ( null === $selectors ) {
 			return 'unsupported';
 		}
 
 		if ( 'html' === $source ) {
-			return array( 'type' => 'html', 'selector' => $selector );
+			return array( 'type' => 'html', 'selector' => $selectors );
 		}
 
 		$attribute = self::parse_attribute( $definition['attribute'] );
@@ -175,33 +197,94 @@ class WP_HTML_Attribute_Sourcer {
 			return null;
 		}
 
-		return array( 'type' => 'attribute', 'selector' => $selector, 'attribute' => $attribute );
+		return array( 'type' => 'attribute', 'selector' => $selectors, 'attribute' => $attribute );
 	}
 
-	public static function parse_selector( $s, $at = 0 ) {
-		$budget = 1000;
+	public static function parse_full_selector( $s ) {
 		$selectors = [];
+		$at = 0;
 
-		while ( $at < strlen( $s ) && $budget-- > 0 ) {
-			$type = 'element';
-			$attribute = null;
+		while ( $at < strlen( $s ) ) {
+			$at += strspn( $s, " \f\n\r\t", $at );
+
+			list( $selector, $next_at ) = self::parse_selector( $s, $at );
+			if ( null === $selector ) {
+				return null;
+			}
+
+			$selectors[] = $selector;
+			$at = $next_at;
+
+			if ( $at < strlen( $s ) && ',' !== $s[ $at ] ) {
+				return null;
+			}
+			$at++;
+		}
+
+		return $selectors;
+	}
+
+	public static function parse_selector( $s, $at = 0, $selector = [] ) {
+		$is_first = true;
+
+		while ( $at < strlen( $s ) && ',' !== $s[ $at ] ) {
+			/*
+			 * Descendant combinators are harder to discover because we
+			 * always have to skip whitespace, but that whitespace could
+			 * be the combinator if we don't approach anything else first.
+			 */
+			$ws_length = strspn( $s, " \f\n\r\t", $at );
+			$at += $ws_length;
+
+			if ( !$is_first && $ws_length > 0 && 0 === strspn( $s[ $at ], '>+~' ) ) {
+				$at--;
+				$s[ $at ] = ' ';
+			}
+			$is_first = false;
 
 			switch ( $s[ $at ] ) {
-				case '+':
-					// no support for adjacent sibling combinator
-					return null;
-
 				case '>':
-					// no support for child combinator
-					return null;
-
+				case '+':
 				case '~':
-					// no support for general sibling combinator
-					return null;
-
 				case ' ':
-					// no support for descendant combinator
-					return null;
+					$combinator = $s[ $at ];
+					$at++;
+					$at += strspn( $s, " \f\n\r\t", $at );
+					$inner = self::parse_selector( $s, $at );
+					if ( null === $inner ) {
+						return null;
+					}
+					list( $inner_selector, $next_at ) = $inner;
+					$inner_selector['combinator'] = $combinator;
+					$selector['then'] = $inner_selector;
+					$at = $next_at;
+					break;
+
+				case '.':
+					$at++;
+					$class_name = self::parse_css_identifier( $s, $at );
+					if ( null === $class_name ) {
+						return null;
+					}
+
+					if ( ! isset( $selector['class_names'] ) ) {
+						$selector['class_names'] = array();
+					}
+					$selector['class_names'][] = $class_name;
+					$at += strlen( $class_name );
+					break;
+
+				case '#':
+					$at++;
+					// @TODO: Hashes don't have to start with `nmstart` so this might reject valid hash names.
+					$element_id = self::parse_css_identifier( $s, $at );
+					if ( null === $element_id ) {
+						return null;
+					}
+
+					$selector['hash'] = $element_id;
+					$at += strlen( $element_id );
+					break;
 
 				case '[':
 					/*
@@ -218,51 +301,21 @@ class WP_HTML_Attribute_Sourcer {
 					$attribute = substr( $s, $at, $inside_length );
 					$at += $inside_length + 1;
 
-					$selector = array_pop( $selectors );
 					$selector['has_attribute'] = $attribute;
-					$selectors[] = $selector;
-
-					continue 2;
-
-				case ',':
-					$at++;
-					$at += strspn( $s, " \t\f\r\n", $at );
-					continue 2;
-
-				case ':':
-					// no support for pseudo-selectors
-					return null;
-
-				case '#':
-					$type = 'hash';
-					$at++;
 					break;
 
-				case '.':
-					$type = 'class';
-					$at++;
-					break;
+				default:
+					$tag_name = self::parse_css_identifier( $s, $at );
+					if ( null === $tag_name ) {
+						return null;
+					}
+
+					$selector['tag_name'] = $tag_name;
+					$at += strlen( $tag_name );
 			}
-
-			// @TODO: Hashes don't have to start with `nmstart` so this might reject valid hash names.
-			$identifier = self::parse_css_identifier( $s, $at );
-			if ( null === $identifier ) {
-				return null;
-			}
-
-			$selector = array( 'type' => $type, 'identifier' => $identifier );
-			if ( null !== $attribute ) {
-				$selector['has_attribute'] = $selector;
-			}
-
-			$selectors[] = $selector;
-
-			$at += strlen( $identifier );
 		}
 
-		return $at === strlen( $s )
-			? $selectors
-			: null;
+		return [ $selector, $at ];
 	}
 
 	/**

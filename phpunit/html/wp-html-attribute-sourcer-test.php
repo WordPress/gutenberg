@@ -24,6 +24,30 @@ class WP_HTML_Attribute_Sourcer_Test extends WP_UnitTestCase {
 	public function data_sourced_attributes() {
 		return array(
 			array(
+				array( 'attributes' => array( 'link' => 'docs.html' ), 'unparsed' => array() ),
+				<<<EOF
+<main>
+	<section>Just another section</section>
+	<section><div><a href="blah">blah</a></div></section>
+	<p>Stuff</p>
+	<div><a href="blarg">blarg</a></div>
+	<section>Still another section</section>
+	<div><img><a href="image">image</a></div>
+	<section>Still another section</section>
+	<div><a href="docs.html">docs</a></div>
+</main>
+EOF,
+				array(
+					'link' => array(
+						'type' => 'string',
+						'source' => 'attribute',
+						'selector' => 'main section + div > a[href]',
+						'attribute' => 'href',
+					),
+				),
+			),
+
+			array(
 				array( 'attributes' => array( 'src' => 'image.png' ), 'unparsed' => array() ),
 				'<figure><img src="image.png"></figure>',
 				array(
@@ -113,7 +137,7 @@ class WP_HTML_Attribute_Sourcer_Test extends WP_UnitTestCase {
 				array( 'type' => 'string' ),
 			),
 			array(
-				'unsupported',
+				array( 'type' => 'attribute', 'selector' => array( array( 'tag_name' => 'div', 'then' => array( 'tag_name' => 'img', 'combinator' => '+' ) ) ), 'attribute' => 'src' ),
 				array( 'type' => 'string', 'source' => 'attribute', 'selector' => 'div + img', 'attribute' => 'src' ),
 			),
 			array(
@@ -121,11 +145,11 @@ class WP_HTML_Attribute_Sourcer_Test extends WP_UnitTestCase {
 				array( 'type' => 'string', 'source' => 'html' ),
 			),
 			array(
-				array( 'type' => 'html', 'selector' => array( array( 'type' => 'element', 'identifier' => 'code' ) ) ),
+				array( 'type' => 'html', 'selector' => array( array( 'tag_name' => 'code' ) ) ),
 				array( 'type' => 'string', 'source' => 'html', 'selector' => 'code' ),
 			),
 			array(
-				array( 'type' => 'attribute', 'selector' => array( array( 'type' => 'element', 'identifier' => 'img' ) ), 'attribute' => 'src' ),
+				array( 'type' => 'attribute', 'selector' => array( array( 'tag_name' => 'img' ) ), 'attribute' => 'src' ),
 				array( 'type' => 'string', 'source' => 'attribute', 'selector' => 'img', 'attribute' => 'src' ),
 			),
 		);
@@ -135,14 +159,117 @@ class WP_HTML_Attribute_Sourcer_Test extends WP_UnitTestCase {
 	 * @dataProvider data_parsed_css_selectors
 	 */
 	public function test_parses_css_selector( $expected, $input ) {
-		$this->assertSame($expected, WP_HTML_Attribute_Sourcer::parse_selector( $input ) );
+		$this->assertSame($expected, WP_HTML_Attribute_Sourcer::parse_full_selector( $input ) );
 	}
 
 	public function data_parsed_css_selectors() {
 		return array(
-			array( array( array( 'type' => 'element', 'identifier' => 'img' ) ), 'img' ),
-			array( array( array( 'type' => 'class', 'identifier' => 'block-group' ) ), '.block-group' ),
-			array( array( array( 'type' => 'hash', 'identifier' => 'input-form' ) ), '#input-form' ),
+			array( array( array( 'tag_name' => 'img' ) ), 'img' ),
+			array( array( array( 'class_names' => array( 'block-group' ) ) ), '.block-group' ),
+			array( array( array( 'hash' => 'input-form' ) ), '#input-form' ),
+			array(
+				array(
+					array(
+						'tag_name' => 'div',
+						'then' => array(
+							'class_names' => array( 'important' ),
+							'combinator' => '>',
+						)
+					)
+				),
+				'div > .important',
+			),
+			array(
+				array(
+					array(
+						'tag_name' => 'img',
+						'then' => array(
+							'tag_name' => 'p',
+							'combinator' => '+',
+						)
+					)
+				),
+				'img + p',
+			),
+			array(
+				array(
+					array(
+						'tag_name' => 'img',
+						'then' => array(
+							'tag_name' => 'p',
+							'combinator' => '~',
+						)
+					)
+				),
+				'img ~ p',
+			),
+			array(
+				array(
+					array(
+						'tag_name' => 'main',
+						'then' => array(
+							'tag_name' => 'section',
+							'then' => array(
+								'class_names' => array( 'title' ),
+								'combinator' => '+',
+							),
+							'combinator' => '>',
+						)
+					),
+					array( 'hash' => 'title' )
+				),
+				'main > section + .title, #title',
+			),
+			array(
+				array(
+					array(
+						'tag_name' => 'li',
+						'then' => array(
+							'tag_name' => 'em',
+							'combinator' => ' ',
+						)
+					)
+				),
+				'li em',
+			),
+			array(
+				array(
+					array(
+						'tag_name' => 'main',
+						'then' => array(
+							'tag_name' => 'section',
+							'then' => array(
+								'class_names' => array( 'title' ),
+								'combinator' => '+',
+							),
+							'combinator' => '>',
+						)
+					),
+					array(
+						'hash' => 'title',
+						'then' => array(
+							'tag_name' => 'h2',
+							'then' => array(
+								'tag_name' => 'em',
+								'then' => array(
+									'class_names' => array( 'really' ),
+									'combinator' => ' '
+								),
+								'combinator' => ' ',
+							),
+							'combinator' => '~',
+						),
+					),
+					array(
+						'class_names' => array(
+							'another',
+							'class',
+							'combined',
+						),
+					),
+				),
+				'main > section + .title, #title ~ h2 em .really, .another.class.combined',
+			)
 		);
 	}
 
@@ -150,26 +277,26 @@ class WP_HTML_Attribute_Sourcer_Test extends WP_UnitTestCase {
 	 * @dataProvider data_multi_parsed_css_selectors
 	 */
 	public function test_parses_multi_css_selectors( $expected, $input ) {
-		$this->assertSame( $expected, WP_HTML_Attribute_Sourcer::parse_selector( $input ) );
+		$this->assertSame( $expected, WP_HTML_Attribute_Sourcer::parse_full_selector( $input ) );
 	}
 
 	public function data_multi_parsed_css_selectors() {
 		return array(
 			array(
 				array(
-					array( 'type' => 'element', 'identifier' => 'img' ),
-					array( 'type' => 'class', 'identifier' => 'full-width' ),
+					array( 'tag_name' => 'img' ),
+					array( 'class_names' => array( 'full-width' ) ),
 				),
 				'img, .full-width'
 			),
 			array(
 				array(
-					array( 'type' => 'element', 'identifier' => 'h1' ),
-					array( 'type' => 'element', 'identifier' => 'h2' ),
-					array( 'type' => 'element', 'identifier' => 'h3' ),
-					array( 'type' => 'element', 'identifier' => 'h4' ),
-					array( 'type' => 'element', 'identifier' => 'h5' ),
-					array( 'type' => 'element', 'identifier' => 'h6' ),
+					array( 'tag_name' => 'h1' ),
+					array( 'tag_name' => 'h2' ),
+					array( 'tag_name' => 'h3' ),
+					array( 'tag_name' => 'h4' ),
+					array( 'tag_name' => 'h5' ),
+					array( 'tag_name' => 'h6' ),
 				),
 				'h1,h2,h3,h4,h5,h6'
 			)
