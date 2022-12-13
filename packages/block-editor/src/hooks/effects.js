@@ -120,15 +120,9 @@ function addAttributes( settings ) {
 		...settings.attributes,
 		effect: {
 			type: 'string',
-			source: 'attribute',
-			attribute: 'data-effect',
-			selector: '[data-effect]',
 		},
 		effectDuration: {
 			type: 'string',
-			source: 'attribute',
-			attribute: 'data-effect-duration',
-			selector: '[data-effect-duration]',
 		},
 	};
 	return settings;
@@ -195,8 +189,14 @@ export const withInspectorControl = createHigherOrderComponent(
 export function addSaveProps( extraProps, blockType, attributes ) {
 	return {
 		...extraProps,
-		'data-effect': attributes.effect,
-		'data-effect-duration': attributes.effectDuration,
+		'data-effect': attributes.effect ? true : undefined,
+		style: {
+			...extraProps.style,
+			animationName: attributes.effect,
+			animationDuration: attributes.effectDuration
+				? attributes.effectDuration + 's'
+				: undefined,
+		},
 	};
 }
 

@@ -55,7 +55,7 @@
 
 @import "common.scss";
 
-@keyframes slideLeft {
+@keyframes slide-from-left {
 	from {
 		transform: translateX(-200px);
 		opacity: 0;
@@ -66,7 +66,7 @@
 	}
 }
 
-@keyframes slideRight {
+@keyframes slide-from-right {
 	from {
 		transform: translateX(200px);
 		opacity: 0;
@@ -77,7 +77,7 @@
 	}
 }
 
-@keyframes slideBottom {
+@keyframes slide-from-bottom {
 	0% {
 		transform: translateY(200px);
 	}
@@ -89,7 +89,7 @@
 	}
 }
 
-@keyframes fadeIn {
+@keyframes fade-in {
 	from {
 		opacity: 0;
 	}
@@ -102,23 +102,11 @@
 	animation-duration: 0.5s;
 }
 
+[data-effect]:not([data-has-intersected="true"]) {
+	animation-name: none !important;
+}
+
 // Hide the block initially so the animation doesn't look glitchy.
 [data-effect][data-has-intersected="false"] {
 	opacity: 0;
-}
-
-[data-effect="slide-from-left"][data-has-intersected="true"] {
-	animation-name: slideLeft;
-}
-
-[data-effect="slide-from-right"][data-has-intersected="true"] {
-	animation-name: slideRight;
-}
-
-[data-effect="slide-from-bottom"][data-has-intersected="true"] {
-	animation-name: slideBottom;
-}
-
-[data-effect="fade-in"][data-has-intersected="true"] {
-	animation-name: fadeIn;
 }
