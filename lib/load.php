@@ -119,7 +119,8 @@ if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
 }
 require __DIR__ . '/experimental/class-wp-theme-json-gutenberg.php';
 require __DIR__ . '/experimental/class-wp-theme-json-resolver-gutenberg.php';
-require __DIR__ . '/experimental/class-wp-webfonts.php';
+require __DIR__ . '/experimental/class-wp-webfonts.php'; // Temporary deprecated class.
+require __DIR__ . '/experimental/class-wp-web-fonts.php';
 require __DIR__ . '/experimental/class-wp-webfonts-provider.php';
 require __DIR__ . '/experimental/class-wp-webfonts-provider-local.php';
 require __DIR__ . '/experimental/webfonts.php';

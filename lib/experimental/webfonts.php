@@ -13,15 +13,15 @@ if ( ! function_exists( 'wp_webfonts' ) ) {
 	 *
 	 * @since X.X.X
 	 *
-	 * @global WP_Webfonts $wp_webfonts
+	 * @global WP_Web_Fonts $wp_webfonts
 	 *
-	 * @return WP_Webfonts WP_Webfonts instance.
+	 * @return WP_Web_Fonts WP_Web_Fonts instance.
 	 */
 	function wp_webfonts() {
 		global $wp_webfonts;
 
-		if ( ! ( $wp_webfonts instanceof WP_Webfonts ) ) {
-			$wp_webfonts = new WP_Webfonts();
+		if ( ! ( $wp_webfonts instanceof WP_Web_Fonts ) ) {
+			$wp_webfonts = new WP_Web_Fonts();
 			$wp_webfonts->register_provider( 'local', 'WP_Webfonts_Provider_Local' );
 		}
 
@@ -78,29 +78,12 @@ if ( ! function_exists( 'wp_register_webfonts' ) ) {
 	function wp_register_webfonts( array $webfonts ) {
 		$registered = array();
 
+		// DO NOT BACKPORT THIS LINE OF CODE TO WORDPRESS CORE.
+		if ( wp_webfonts()->is_deprecated_structure( $webfonts ) ) {
+			$webfonts = wp_webfonts()->migrate_deprecated_structure( $webfonts );
+		}
+
 		foreach ( $webfonts as $font_family => $variations ) {
-			/*
-			 * Handle the deprecated web font's structure but alert developers
-			 * to modify their web font structure to group and key by font family.
-			 *
-			 * BACKPORT NOTE: Do not backport this code block.
-			*/
-			if ( ! WP_Webfonts_Utils::is_defined( $font_family ) ) {
-				$font_family_handle = _gutenberg_extract_font_family_from_deprecated_webfonts_structure(
-					$variations,
-					'A deprecated web fonts array structure passed to wp_register_webfonts(). ' .
-					'Variations must be grouped and keyed by their font family.'
-				);
-
-				$font_family_handle = wp_register_webfont( $variations, $font_family_handle );
-				if ( ! $font_family_handle ) {
-					continue;
-				}
-				$registered[ $font_family_handle ] = true;
-				continue;
-			}
-			// BACKPORT NOTE: End of the deprecated code block.
-
 			$font_family_handle = wp_register_font_family( $font_family );
 			if ( ! $font_family_handle ) {
 				continue;
@@ -345,26 +328,4 @@ if ( ! function_exists( 'wp_enqueue_webfonts' ) ) {
 
 		wp_enqueue_webfont( $font_families );
 	}
-}
-
-/**
- * Handle the deprecated web fonts structure.
- *
- * BACKPORT NOTE: Do not backport this function.
- *
- * @access private
- *
- * @param array  $webfont Web font for extracting font family.
- * @param string $message Deprecation message to throw.
- * @return string|null The font family slug if successfully registered. Else null.
- */
-function _gutenberg_extract_font_family_from_deprecated_webfonts_structure( array $webfont, $message ) {
-	trigger_error( $message, E_USER_DEPRECATED );
-
-	$font_family = WP_Webfonts_Utils::get_font_family_from_variation( $webfont );
-	if ( ! $font_family ) {
-		return null;
-	}
-
-	return WP_Webfonts_Utils::convert_font_family_into_handle( $font_family );
 }

@@ -31,6 +31,11 @@ class WP_Webfonts_Utils {
 			return null;
 		}
 
+		// If the font-family is a comma-separated list (example: "Inter, sans-serif" ), use just the first font.
+		if ( str_contains( $font_family, ',' ) ) {
+			$font_family = explode( ',', $font_family )[0];
+		}
+
 		return sanitize_title( $font_family );
 	}
 
