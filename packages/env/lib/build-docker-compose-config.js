@@ -187,7 +187,6 @@ module.exports = function buildDockerComposeConfig( config ) {
 		phpunitTag = '9' + phpunitPhpVersion;
 	}
 	const phpunitImage = `wordpressdevelop/phpunit:${ phpunitTag }`;
-	console.log( phpunitImage );
 
 	// The www-data user in wordpress:cli has a different UID (82) to the
 	// www-data user in wordpress (33). Ensure we use the wordpress www-data

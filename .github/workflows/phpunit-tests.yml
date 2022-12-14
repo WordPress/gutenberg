@@ -75,8 +75,8 @@ jobs:
             - name: Log running Docker containers
               run: docker ps -a
 
-            - name: Running lint check
-              run: npm run lint:php
+            - name: Install composer depenencies
+              run: wp-env run composer "update --no-interaction"
 
             - name: Running single site unit tests
               run: npm run test:unit:php
