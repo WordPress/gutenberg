@@ -145,7 +145,7 @@ function block_core_page_list_build_css_font_sizes( $context ) {
  *
  * @return string List markup.
  */
-function block_core_page_list_render_nested_page_list( $open_submenus_on_click, $show_submenu_icons, $is_navigation_child, $nested_pages, $active_page_ancestor_ids = array(), $colors = array(), $depth = 0 ) {
+function block_core_page_list_render_nested_page_list( $open_submenus_on_click, $show_submenu_icons, $is_navigation_child, $nested_pages, $active_page_ancestor_ids = array(), $colors = array(), $is_nested, $depth = 0 ) {
 	if ( empty( $nested_pages ) ) {
 		return;
 	}
@@ -173,7 +173,7 @@ function block_core_page_list_render_nested_page_list( $open_submenus_on_click, 
 		$navigation_child_content_class = $is_navigation_child ? ' wp-block-navigation-item__content' : '';
 
 		// If this is the first level of submenus, include the overlay colors.
-		if ( 1 === $depth && isset( $colors['overlay_css_classes'], $colors['overlay_inline_styles'] ) ) {
+		if ( ( ( 0 < $depth && ! $is_nested ) || $is_nested ) && isset( $colors['overlay_css_classes'], $colors['overlay_inline_styles'] ) ) {
 			$css_class .= ' ' . trim( implode( ' ', $colors['overlay_css_classes'] ) );
 			if ( '' !== $colors['overlay_inline_styles'] ) {
 				$style_attribute = sprintf( ' style="%s"', esc_attr( $colors['overlay_inline_styles'] ) );
@@ -212,7 +212,7 @@ function block_core_page_list_render_nested_page_list( $open_submenus_on_click, 
 			if ( $is_navigation_child ) {
 				$markup .= ' wp-block-navigation__submenu-container';
 			}
-			$markup .= '">' . block_core_page_list_render_nested_page_list( $open_submenus_on_click, $show_submenu_icons, $is_navigation_child, $page['children'], $active_page_ancestor_ids, $colors, $depth + 1 ) . '</ul>';
+			$markup .= '">' . block_core_page_list_render_nested_page_list( $open_submenus_on_click, $show_submenu_icons, $is_navigation_child, $page['children'], $active_page_ancestor_ids, $colors, $is_nested, $depth + 1 ) . '</ul>';
 		}
 		$markup .= '</li>';
 	}
@@ -324,7 +324,7 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 
 	$wrapper_markup = $is_nested ? '%2$s' : '<ul %1$s>%2$s</ul>';
 
-	$items_markup = block_core_page_list_render_nested_page_list( $open_submenus_on_click, $show_submenu_icons, $is_navigation_child, $nested_pages, $active_page_ancestor_ids, $colors );
+	$items_markup = block_core_page_list_render_nested_page_list( $open_submenus_on_click, $show_submenu_icons, $is_navigation_child, $nested_pages, $active_page_ancestor_ids, $colors, $is_nested );
 
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(

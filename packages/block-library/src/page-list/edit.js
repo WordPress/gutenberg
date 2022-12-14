@@ -189,31 +189,32 @@ export default function PageListEdit( {
 
 	const { replaceBlock, selectBlock } = useDispatch( blockEditorStore );
 
-	const { parentNavBlockClientId, isNested } = useSelect( ( select ) => {
-		const { getSelectedBlockClientId, getBlockParentsByBlockName } =
-			select( blockEditorStore );
+	const { parentNavBlockClientId, isNested } = useSelect(
+		( select ) => {
+			const { getSelectedBlockClientId, getBlockParentsByBlockName } =
+				select( blockEditorStore );
 
-		const _selectedBlockClientId = getSelectedBlockClientId();
+			const _selectedBlockClientId = getSelectedBlockClientId();
 
-		return {
-			parentNavBlockClientId: getBlockParentsByBlockName(
-				_selectedBlockClientId,
-				'core/navigation',
-				true
-			)[ 0 ],
-			isNested:
-				getBlockParentsByBlockName(
+			return {
+				parentNavBlockClientId: getBlockParentsByBlockName(
 					_selectedBlockClientId,
 					'core/navigation',
 					true
-				).length > 0,
-		};
-	}, [] );
+				)[ 0 ],
+				isNested:
+					getBlockParentsByBlockName(
+						clientId,
+						'core/navigation-submenu',
+						true
+					).length > 0,
+			};
+		},
+		[ clientId ]
+	);
 
 	useEffect( () => {
-		if ( isNested ) {
-			setAttributes( { isNested } );
-		}
+		setAttributes( { isNested } );
 	}, [ isNested ] );
 
 	return (
