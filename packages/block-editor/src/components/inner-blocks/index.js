@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
 	getBlockSupport,
@@ -102,6 +102,16 @@ function UncontrolledInnerBlocks( props ) {
 	const { allowSizingOnChildren = false } =
 		getBlockSupport( name, '__experimentalLayout' ) || {};
 
+	const layout = useMemo(
+		() => ( {
+			...__experimentalLayout,
+			...( allowSizingOnChildren && {
+				allowSizingOnChildren: true,
+			} ),
+		} ),
+		[ __experimentalLayout, allowSizingOnChildren ]
+	);
+
 	// This component needs to always be synchronous as it's the one changing
 	// the async mode depending on the block selection.
 	return (
@@ -110,12 +120,7 @@ function UncontrolledInnerBlocks( props ) {
 				rootClientId={ clientId }
 				renderAppender={ renderAppender }
 				__experimentalAppenderTagName={ __experimentalAppenderTagName }
-				__experimentalLayout={ {
-					...__experimentalLayout,
-					...( allowSizingOnChildren && {
-						allowSizingOnChildren: true,
-					} ),
-				} }
+				__experimentalLayout={ layout }
 				wrapperRef={ wrapperRef }
 				placeholder={ placeholder }
 			/>
