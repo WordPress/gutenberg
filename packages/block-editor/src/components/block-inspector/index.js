@@ -17,7 +17,7 @@ import {
 	__unstableMotion as motion,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMemo, useCallback } from '@wordpress/element';
+import { useMemo, useCallback, Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -185,7 +185,11 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			}
 			return null;
 		},
-		[ selectedBlockClientId ]
+		[
+			selectedBlockClientId,
+			isOffCanvasNavigationEditorEnabled,
+			blockType.name,
+		]
 	);
 
 	if ( count > 1 ) {
@@ -220,40 +224,6 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 		);
 	}
 
-	if (
-		isOffCanvasNavigationEditorEnabled &&
-		blockInspectorAnimationSettings
-	) {
-		const animationOrigin =
-			blockInspectorAnimationSettings &&
-			blockInspectorAnimationSettings.enterDirection === 'leftToRight'
-				? -50
-				: 50;
-
-		return (
-			<motion.div
-				animate={ {
-					x: 0,
-					opacity: 1,
-					transition: {
-						ease: 'easeInOut',
-						duration: 0.14,
-					},
-				} }
-				initial={ {
-					x: animationOrigin,
-					opacity: 0,
-				} }
-				key={ selectedBlockClientId }
-			>
-				<BlockInspectorSingleBlock
-					clientId={ selectedBlockClientId }
-					blockName={ blockType.name }
-				/>
-			</motion.div>
-		);
-	}
-
 	const isSelectedBlockUnregistered =
 		selectedBlockName === getUnregisteredTypeHandlerName();
 
@@ -282,11 +252,67 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			/>
 		);
 	}
+
 	return (
-		<BlockInspectorSingleBlock
-			clientId={ selectedBlockClientId }
-			blockName={ blockType.name }
-		/>
+		<BlockInspectorSingleBlockWrapper
+			animate={
+				isOffCanvasNavigationEditorEnabled &&
+				blockInspectorAnimationSettings
+			}
+			wrapper={ ( children ) => (
+				<AnimatedContainer
+					blockInspectorAnimationSettings={
+						blockInspectorAnimationSettings
+					}
+					selectedBlockClientId={ selectedBlockClientId }
+				>
+					{ children }
+				</AnimatedContainer>
+			) }
+		>
+			<Fragment>
+				<BlockInspectorSingleBlock
+					clientId={ selectedBlockClientId }
+					blockName={ blockType.name }
+				/>
+			</Fragment>
+		</BlockInspectorSingleBlockWrapper>
+	);
+};
+
+const BlockInspectorSingleBlockWrapper = ( { animate, wrapper, children } ) => {
+	return animate ? wrapper( children ) : children;
+};
+
+const AnimatedContainer = ( {
+	blockInspectorAnimationSettings,
+	selectedBlockClientId,
+	children,
+} ) => {
+	const animationOrigin =
+		blockInspectorAnimationSettings &&
+		blockInspectorAnimationSettings.enterDirection === 'leftToRight'
+			? -50
+			: 50;
+
+	return (
+		<motion.div
+			animate={ {
+				x: 0,
+				opacity: 1,
+				transition: {
+					ease: 'easeInOut',
+					duration: 0.14,
+				},
+			} }
+			initial={ {
+				x: animationOrigin,
+				opacity: 0,
+			} }
+			key={ selectedBlockClientId }
+		>
+			{ children }
+		</motion.div>
 	);
 };
 
