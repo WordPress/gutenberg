@@ -1587,7 +1587,7 @@ const canInsertBlockTypeUnmemoized = (
 export const canInsertBlockType = createSelector(
 	canInsertBlockTypeUnmemoized,
 	( state, blockName, rootClientId ) => [
-		state.blockListSettings[ rootClientId ],
+		state.blockListSettings.get( rootClientId ),
 		state.blocks.byClientId.get( rootClientId ),
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
@@ -2018,7 +2018,7 @@ export const getInserterItems = createSelector(
 		return [ ...sortedBlockTypes, ...reusableBlockInserterItems ];
 	},
 	( state, rootClientId ) => [
-		state.blockListSettings[ rootClientId ],
+		state.blockListSettings.get( rootClientId ),
 		state.blocks.byClientId,
 		state.blocks.order,
 		state.preferences.insertUsage,
@@ -2102,7 +2102,7 @@ export const getBlockTransformItems = createSelector(
 		);
 	},
 	( state, blocks, rootClientId ) => [
-		state.blockListSettings[ rootClientId ],
+		state.blockListSettings.get( rootClientId ),
 		state.blocks.byClientId,
 		state.preferences.insertUsage,
 		state.settings.allowedBlockTypes,
@@ -2134,7 +2134,7 @@ export const hasInserterItems = createSelector(
 		return hasReusableBlock;
 	},
 	( state, rootClientId ) => [
-		state.blockListSettings[ rootClientId ],
+		state.blockListSettings.get( rootClientId ),
 		state.blocks.byClientId,
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
@@ -2162,7 +2162,7 @@ export const __experimentalGetAllowedBlocks = createSelector(
 		);
 	},
 	( state, rootClientId ) => [
-		state.blockListSettings[ rootClientId ],
+		state.blockListSettings.get( rootClientId ),
 		state.blocks.byClientId,
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
@@ -2188,10 +2188,11 @@ export const __experimentalGetDirectInsertBlock = createSelector(
 		if ( ! rootClientId ) {
 			return;
 		}
-		const defaultBlock =
-			state.blockListSettings[ rootClientId ]?.__experimentalDefaultBlock;
-		const directInsert =
-			state.blockListSettings[ rootClientId ]?.__experimentalDirectInsert;
+
+		const settings = getBlockListSettings( state, rootClientId );
+		const defaultBlock = settings?.__experimentalDefaultBlock;
+		const directInsert = settings?.__experimentalDirectInsert;
+
 		if ( ! defaultBlock || ! directInsert ) {
 			return;
 		}
@@ -2203,7 +2204,7 @@ export const __experimentalGetDirectInsertBlock = createSelector(
 		return defaultBlock;
 	},
 	( state, rootClientId ) => [
-		state.blockListSettings[ rootClientId ],
+		state.blockListSettings.get( rootClientId ),
 		state.blocks.tree.get( rootClientId ),
 	]
 );
@@ -2295,7 +2296,7 @@ export const __experimentalGetAllowedPatterns = createSelector(
 		state.settings.__experimentalBlockPatterns,
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
-		state.blockListSettings[ rootClientId ],
+		state.blockListSettings.get( rootClientId ),
 		state.blocks.byClientId.get( rootClientId ),
 	]
 );
@@ -2407,7 +2408,7 @@ export const __experimentalGetPatternTransformItems = createSelector(
  * @return {?Object} Block settings of the block if set.
  */
 export function getBlockListSettings( state, clientId ) {
-	return state.blockListSettings[ clientId ];
+	return state.blockListSettings.get( clientId );
 }
 
 /**
@@ -2445,16 +2446,14 @@ export function isLastBlockChangePersistent( state ) {
  */
 export const __experimentalGetBlockListSettingsForBlocks = createSelector(
 	( state, clientIds = [] ) => {
-		return clientIds.reduce( ( blockListSettingsForBlocks, clientId ) => {
-			if ( ! state.blockListSettings[ clientId ] ) {
-				return blockListSettingsForBlocks;
+		const blockListSettingsForBlocks = {};
+		for ( const clientId of clientIds ) {
+			const settings = getBlockListSettings( state, clientId );
+			if ( settings ) {
+				blockListSettingsForBlocks[ clientId ] = settings;
 			}
-
-			return {
-				...blockListSettingsForBlocks,
-				[ clientId ]: state.blockListSettings[ clientId ],
-			};
-		}, {} );
+		}
+		return blockListSettingsForBlocks;
 	},
 	( state ) => [ state.blockListSettings ]
 );

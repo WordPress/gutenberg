@@ -52,13 +52,16 @@ export default function useNestedSettingsUpdate(
 
 	const { blockListSettings, parentLock } = useSelect(
 		( select ) => {
-			const rootClientId =
-				select( blockEditorStore ).getBlockRootClientId( clientId );
+			const {
+				getBlockRootClientId,
+				getBlockListSettings,
+				getTemplateLock,
+			} = select( blockEditorStore );
+
+			const rootClientId = getBlockRootClientId( clientId );
 			return {
-				blockListSettings:
-					select( blockEditorStore ).getBlockListSettings( clientId ),
-				parentLock:
-					select( blockEditorStore ).getTemplateLock( rootClientId ),
+				blockListSettings: getBlockListSettings( clientId ),
+				parentLock: getTemplateLock( rootClientId ) ?? false,
 			};
 		},
 		[ clientId ]
@@ -114,15 +117,10 @@ export default function useNestedSettingsUpdate(
 				.get( registry )
 				.push( [ clientId, newSettings ] );
 			window.queueMicrotask( () => {
-				if ( pendingSettingsUpdates.get( registry )?.length ) {
-					registry.batch( () => {
-						pendingSettingsUpdates
-							.get( registry )
-							.forEach( ( args ) => {
-								updateBlockListSettings( ...args );
-							} );
-						pendingSettingsUpdates.set( registry, [] );
-					} );
+				const pendingUpdates = pendingSettingsUpdates.get( registry );
+				if ( pendingUpdates?.length ) {
+					updateBlockListSettings( pendingUpdates );
+					pendingSettingsUpdates.set( registry, [] );
 				}
 			} );
 		}
