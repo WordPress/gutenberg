@@ -50,6 +50,7 @@ function InserterSearchResults( {
 	isDraggable = true,
 	shouldFocusBlock = true,
 	prioritizePatterns,
+	selectBlockOnInsert,
 } ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
 
@@ -60,6 +61,7 @@ function InserterSearchResults( {
 		isAppender,
 		insertionIndex: __experimentalInsertionIndex,
 		shouldFocusBlock,
+		selectBlockOnInsert,
 	} );
 	const [
 		blockTypes,
