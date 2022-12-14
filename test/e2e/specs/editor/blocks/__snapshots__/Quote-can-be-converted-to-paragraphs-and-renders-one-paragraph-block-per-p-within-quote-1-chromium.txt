@@ -1,0 +1,7 @@
+<!-- wp:paragraph -->
+<p>one</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>two</p>
+<!-- /wp:paragraph -->

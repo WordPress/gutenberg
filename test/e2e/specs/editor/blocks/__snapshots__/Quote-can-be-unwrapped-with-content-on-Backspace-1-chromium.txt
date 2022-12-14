@@ -1,0 +1,5 @@
+<!-- wp:quote -->
+<blockquote class="wp-block-quote"><!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph --><cite>2</cite></blockquote>
+<!-- /wp:quote -->

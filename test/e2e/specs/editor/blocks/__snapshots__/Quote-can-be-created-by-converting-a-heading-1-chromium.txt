@@ -1,0 +1,5 @@
+<!-- wp:quote -->
+<blockquote class="wp-block-quote"><!-- wp:heading -->
+<h2 class="wp-block-heading">test</h2>
+<!-- /wp:heading --></blockquote>
+<!-- /wp:quote -->
