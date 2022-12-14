@@ -29,6 +29,7 @@ const TabButton = ( {
 		tabIndex={ selected ? null : -1 }
 		aria-selected={ selected }
 		id={ tabId }
+		__experimentalIsFocusable
 		{ ...rest }
 	>
 		{ children }
