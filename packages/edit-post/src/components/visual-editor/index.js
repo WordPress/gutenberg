@@ -55,7 +55,13 @@ function MaybeIframe( {
 	style,
 } ) {
 	const ref = useMouseMoveTypingReset();
-
+	const { __experimentalShowBlockInterface: showBlockInterface } =
+		useDispatch( blockEditorStore );
+	function handleMouseOver( e ) {
+		if ( e?.target?.classList.contains( 'editor-styles-wrapper' ) ) {
+			showBlockInterface();
+		}
+	}
 	if ( ! shouldIframe ) {
 		return (
 			<>
@@ -65,6 +71,7 @@ function MaybeIframe( {
 					className="editor-styles-wrapper"
 					style={ { flex: '1', ...style } }
 					tabIndex={ -1 }
+					onMouseOver={ handleMouseOver }
 				>
 					{ children }
 				</WritingFlow>

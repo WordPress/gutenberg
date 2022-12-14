@@ -17,11 +17,7 @@ import { store as blockEditorStore } from '../../../store';
  */
 export function useFocusHandler( clientId ) {
 	const { isBlockSelected } = useSelect( blockEditorStore );
-	const {
-		selectBlock,
-		selectionChange,
-		__experimentalShowBlockInterface: showBlockInterface,
-	} = useDispatch( blockEditorStore );
+	const { selectBlock, selectionChange } = useDispatch( blockEditorStore );
 
 	return useRefEffect(
 		( node ) => {
@@ -34,7 +30,6 @@ export function useFocusHandler( clientId ) {
 			 * @param {FocusEvent} event Focus event.
 			 */
 			function onFocus( event ) {
-				showBlockInterface();
 				// When the whole editor is editable, let writing flow handle
 				// selection.
 				if (
