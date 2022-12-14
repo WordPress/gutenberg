@@ -854,11 +854,13 @@ export const getBlockSelectors = ( blockTypes, getBlockStyles ) => {
 
 		const blockStyleVariations = getBlockStyles( name );
 		const styleVariationSelectors = {};
-		blockStyleVariations.forEach( ( variation ) => {
-			const styleVariationSelector = `.is-style-${ variation.name }${ selector }`;
-			styleVariationSelectors[ variation.name ] = styleVariationSelector;
-		} );
-
+		if ( blockStyleVariations?.length ) {
+			blockStyleVariations.forEach( ( variation ) => {
+				const styleVariationSelector = `.is-style-${ variation.name }${ selector }`;
+				styleVariationSelectors[ variation.name ] =
+					styleVariationSelector;
+			} );
+		}
 		// For each block support feature add any custom selectors.
 		const featureSelectors = {};
 		Object.entries( BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS ).forEach(
