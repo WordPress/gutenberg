@@ -87,6 +87,7 @@ class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 		}
 
 		$content = $this->content_inside_bookmarks( $start_name, $end_name );
+		$this->seek( $start_name );
 
 		$this->release_bookmark( $start_name );
 		$this->release_bookmark( $end_name );
