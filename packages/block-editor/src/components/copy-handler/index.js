@@ -86,6 +86,7 @@ export function useClipboardHandler() {
 		__unstableIsSelectionCollapsed,
 		__unstableIsSelectionMergeable,
 		__unstableGetSelectedBlocksWithPartialSelection,
+		canInsertBlockType,
 	} = useSelect( blockEditorStore );
 	const {
 		flashBlock,
@@ -93,6 +94,7 @@ export function useClipboardHandler() {
 		replaceBlocks,
 		__unstableDeleteSelection,
 		__unstableExpandSelection,
+		insertBlocks,
 	} = useDispatch( blockEditorStore );
 	const notifyCopy = useNotifyCopy();
 
@@ -207,18 +209,23 @@ export function useClipboardHandler() {
 				let blocks = [];
 
 				if ( files.length ) {
-					const transformation = findTransform(
-						getBlockTransforms( 'from' ),
-						( transform ) =>
-							transform.type === 'files' &&
-							transform.isMatch( files )
-					);
-
-					if ( ! transformation ) {
-						return;
-					}
-
-					blocks = transformation.transform( files );
+					const fromTransforms = getBlockTransforms( 'from' );
+					blocks = files
+						.reduce( ( accumulator, file ) => {
+							const transformation = findTransform(
+								fromTransforms,
+								( transform ) =>
+									transform.type === 'files' &&
+									transform.isMatch( [ file ] )
+							);
+							if ( transformation ) {
+								accumulator.push(
+									transformation.transform( [ file ] )
+								);
+							}
+							return accumulator;
+						}, [] )
+						.flat();
 				} else {
 					blocks = pasteHandler( {
 						HTML: html,
@@ -226,6 +233,26 @@ export function useClipboardHandler() {
 						mode: 'BLOCKS',
 						canUserUseUnfilteredHTML,
 					} );
+				}
+
+				if ( selectedBlockClientIds.length === 1 ) {
+					const [ selectedBlockClientId ] = selectedBlockClientIds;
+
+					if (
+						blocks.every( ( block ) =>
+							canInsertBlockType(
+								block.name,
+								selectedBlockClientId
+							)
+						)
+					) {
+						insertBlocks(
+							blocks,
+							undefined,
+							selectedBlockClientId
+						);
+						return;
+					}
 				}
 
 				replaceBlocks(
