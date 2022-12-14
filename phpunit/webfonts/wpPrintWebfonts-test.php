@@ -78,7 +78,7 @@ class Tests_Webfonts_WpPrintWebfonts extends WP_Webfonts_TestCase {
 		$this->setup_integrated_deps( $setup, $wp_webfonts );
 
 		$this->expectOutputString( $expected_output );
-		$actual_done = $wp_webfonts->do_items();
+		$actual_done = wp_print_webfonts();
 		$this->assertSameSets( $expected_done, $actual_done, 'Printed handles should match' );
 	}
 
@@ -108,9 +108,9 @@ class Tests_Webfonts_WpPrintWebfonts extends WP_Webfonts_TestCase {
 	/**
 	 * Sets up the dependencies for integration test.
 	 *
-	 * @param array       $setup       Dependencies to set up.
-	 * @param WP_Webfonts $wp_webfonts Instance of WP_Webfonts.
-	 * @param bool        $enqueue     Whether to enqueue. Default true.
+	 * @param array        $setup       Dependencies to set up.
+	 * @param WP_Web_Fonts $wp_webfonts Instance of WP_Web_Fonts.
+	 * @param bool         $enqueue     Whether to enqueue. Default true.
 	 */
 	private function setup_integrated_deps( array $setup, $wp_webfonts, $enqueue = true ) {
 		foreach ( $setup['provider'] as $provider ) {

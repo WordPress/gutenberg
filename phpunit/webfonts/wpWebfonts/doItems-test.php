@@ -31,13 +31,6 @@ class Tests_Webfonts_WpWebfonts_DoItems extends WP_Webfonts_TestCase {
 		$this->assertSame( array(), $this->wp_webfonts->to_do, 'WP_Web_Fonts::$to_do should be an empty array' );
 	}
 
-	public function test_should_throw_notice_when_queue_is_empty() {
-		$this->expectNotice();
-		$this->expectNoticeMessage( 'No web fonts are enqueued for printing' );
-
-		$this->wp_webfonts->do_items();
-	}
-
 	/**
 	 * @dataProvider data_invalid_handles
 	 *

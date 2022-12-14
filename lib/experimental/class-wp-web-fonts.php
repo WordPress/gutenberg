@@ -430,16 +430,17 @@ class WP_Web_Fonts extends WP_Webfonts {
 	 *
 	 * @since X.X.X
 	 *
-	 * @param string|string[]|false $handles Optional. Items to be processed: queue (false),
-	 *                                       single item (string), or multiple items (array of strings).
-	 *                                       Default false.
-	 * @param int|false             $group   Optional. Group level: level (int), no group (false).
+	 * @param string|string[]|bool $handles Optional. Items to be processed: queue (false),
+	 *                                      single item (string), or multiple items (array of strings).
+	 *                                      Default false.
+	 * @param int|false            $group   Optional. Group level: level (int), no group (false).
 	 *
 	 * @return array|string[] Array of web font handles that have been processed.
 	 *                        An empty array if none were processed.
 	 */
 	public function do_items( $handles = false, $group = false ) {
-		$handles = $this->prep_handles_for_printing( $handles );
+		$handles = $this->prepare_handles_for_printing( $handles );
+
 		if ( empty( $handles ) ) {
 			return $this->done;
 		}
@@ -478,14 +479,15 @@ class WP_Web_Fonts extends WP_Webfonts {
 	 *
 	 * @since X.X.X
 	 *
-	 * @param string|string[]|bool $handles Handles to prepare.
+	 * @param string|string[]|bool $handles Optional. Handles to prepare.
+	 *                                      Default false.
 	 * @return array Array of handles.
 	 */
-	private function prep_handles_for_printing( $handles = false ) {
+	private function prepare_handles_for_printing( $handles = false ) {
 		if ( false !== $handles ) {
 			$handles = $this->validate_handles( $handles );
 			// Bail out when invalid.
-			if ( null === $handles ) {
+			if ( empty( $handles ) ) {
 				return array();
 			}
 		}
@@ -493,8 +495,6 @@ class WP_Web_Fonts extends WP_Webfonts {
 		// Use the enqueued queue.
 		if ( empty( $handles ) ) {
 			if ( empty( $this->queue ) ) {
-				trigger_error( 'No web fonts are enqueued for printing' );
-
 				return array();
 			}
 			$handles = $this->queue;
@@ -508,17 +508,12 @@ class WP_Web_Fonts extends WP_Webfonts {
 	 *
 	 * @since X.X.X
 	 *
-	 * @param mixed $handles Handle or handles to be validated.
+	 * @param string|string[] $handles Handles to prepare.
 	 * @return string[]|null Array of handles on success. Else null.
 	 */
 	private function validate_handles( $handles ) {
 		// Validate each element is a non-empty string handle.
-		$handles = array_filter(
-			(array) $handles,
-			static function( $handle ) {
-				return is_string( $handle ) && ! empty( $handle );
-			}
-		);
+		$handles = array_filter( (array) $handles, array( WP_Webfonts_Utils::class, 'is_defined' ) );
 
 		if ( empty( $handles ) ) {
 			trigger_error( 'Handles must be a non-empty string or array of non-empty strings' );
