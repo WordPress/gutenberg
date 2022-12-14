@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -102,7 +101,7 @@ export function TabPanel( {
 	) => {
 		child.click();
 	};
-	const selectedTab = find( tabs, { name: selected } );
+	const selectedTab = tabs.find( ( { name } ) => name === selected );
 	const selectedId = `${ instanceId }-${ selectedTab?.name ?? 'none' }`;
 
 	useEffect( () => {
