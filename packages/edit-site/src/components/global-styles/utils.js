@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, find } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * Internal dependencies
@@ -120,8 +120,7 @@ function findInPresetsBy(
 			for ( const origin of origins ) {
 				const presets = presetByOrigin[ origin ];
 				if ( presets ) {
-					const presetObject = find(
-						presets,
+					const presetObject = presets.find(
 						( preset ) =>
 							preset[ presetProperty ] === presetValueValue
 					);
@@ -164,7 +163,9 @@ export function getPresetVariableFromValue(
 
 	const cssVarInfix = STYLE_PATH_TO_CSS_VAR_INFIX[ variableStylePath ];
 
-	const metadata = find( PRESET_METADATA, [ 'cssVarInfix', cssVarInfix ] );
+	const metadata = PRESET_METADATA.find(
+		( data ) => data.cssVarInfix === cssVarInfix
+	);
 
 	if ( ! metadata ) {
 		// The property doesn't have preset data
@@ -196,7 +197,9 @@ function getValueFromPresetVariable(
 	variable,
 	[ presetType, slug ]
 ) {
-	const metadata = find( PRESET_METADATA, [ 'cssVarInfix', presetType ] );
+	const metadata = PRESET_METADATA.find(
+		( data ) => data.cssVarInfix === presetType
+	);
 	if ( ! metadata ) {
 		return variable;
 	}
