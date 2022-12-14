@@ -46,6 +46,7 @@ class WP_REST_Block_Pattern_Categories_Controller_Test extends WP_Test_REST_Cont
 		// Restore the original registry instance.
 		$reflection        = new ReflectionClass( 'WP_Block_Pattern_Categories_Registry' );
 		$instance_property = $reflection->getProperty( 'instance' );
+		$instance_property->setAccessible( true );
 		$instance_property->setValue( self::$original_instance_value );
 		$instance_property->setAccessible( false );
 	}
