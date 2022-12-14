@@ -145,7 +145,7 @@ function ListViewBlock( {
 
 	const { isTreeGridMounted, expand, collapse } = useListViewContext();
 
-	const isEditable = block.name !== 'core/page-list-item';
+	const isEditable = blockName !== 'core/page-list-item';
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
 	const moverCellClassName = classnames(
