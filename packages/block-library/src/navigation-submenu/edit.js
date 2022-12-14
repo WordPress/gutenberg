@@ -481,6 +481,7 @@ export default function NavigationSubmenuEdit( {
 						autoComplete="off"
 					/>
 					<TextareaControl
+						__nextHasNoMarginBottom
 						value={ description || '' }
 						onChange={ ( descriptionValue ) => {
 							setAttributes( {
