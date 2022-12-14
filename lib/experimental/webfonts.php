@@ -236,13 +236,13 @@ if ( ! function_exists( 'wp_print_webfonts' ) ) {
 	function wp_print_webfonts( $handles = false ) {
 		global $wp_webfonts;
 
-		if ( '' === $handles ) { // For 'wp_head'.
+		if ( empty( $handles ) ) {
 			$handles = false;
 		}
 
 		_wp_scripts_maybe_doing_it_wrong( __FUNCTION__ );
 
-		if ( ! ( $wp_webfonts instanceof WP_Webfonts ) ) {
+		if ( ! ( $wp_webfonts instanceof WP_Web_Fonts ) ) {
 			if ( ! $handles ) {
 				return array(); // No need to instantiate if nothing is there.
 			}
@@ -252,8 +252,8 @@ if ( ! function_exists( 'wp_print_webfonts' ) ) {
 	}
 }
 
-add_action( 'admin_print_styles', 'wp_print_webfonts' );
-add_action( 'wp_head', 'wp_print_webfonts' );
+add_action( 'admin_print_styles', 'wp_print_webfonts', 50 );
+add_action( 'wp_head', 'wp_print_webfonts', 50 );
 
 /**
  * Add webfonts mime types.
