@@ -98,18 +98,18 @@
 	}
 }
 
-// Use * to override wp-components-inline-css (not sure why it sets
+// Use !important to override wp-components-inline-css (not sure why it sets
 // animation-duration to 0s).
-*[data-effect] {
-	animation-duration: 0.5s;
+[style*="animation-name"] {
+	animation-duration: 0.5s !important;
 }
 
-[data-effect]:not([data-has-intersected="true"]) {
+[style*="animation-name"]:not([data-has-intersected="true"]) {
 	// Use important to override inline style until the block is intersected.
 	animation-name: none !important;
 }
 
 // Hide the block initially so the animation doesn't look glitchy.
-[data-effect][data-has-intersected="false"] {
+[style*="animation-name"][data-has-intersected="false"] {
 	opacity: 0;
 }

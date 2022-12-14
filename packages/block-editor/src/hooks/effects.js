@@ -143,7 +143,18 @@ function addEditProps( settings ) {
 		if ( existingGetEditWrapperProps ) {
 			props = existingGetEditWrapperProps( attributes );
 		}
-		return addSaveProps( props, settings, attributes );
+		return {
+			...props,
+			style: {
+				...props.style,
+				animationName: attributes.effect,
+				animationDuration: attributes.effectDuration
+					? // Use !important to override wp-components-inline-css (not
+					  // sure why it sets animation-duration to 0s).
+					  attributes.effectDuration + 's!important'
+					: undefined,
+			},
+		};
 	};
 
 	return settings;
@@ -175,30 +186,6 @@ export const withInspectorControl = createHigherOrderComponent(
 	},
 	'withInspectorControl'
 );
-
-/**
- * Override props assigned to save component to inject the `data-effect`
- * attribute.
- *
- * @param {Object} extraProps Additional props applied to save element.
- * @param {Object} blockType  Block type.
- * @param {Object} attributes Current block attributes.
- *
- * @return {Object} Filtered props applied to save element.
- */
-export function addSaveProps( extraProps, blockType, attributes ) {
-	return {
-		...extraProps,
-		'data-effect': attributes.effect ? true : undefined,
-		style: {
-			...extraProps.style,
-			animationName: attributes.effect,
-			animationDuration: attributes.effectDuration
-				? attributes.effectDuration + 's'
-				: undefined,
-		},
-	};
-}
 
 addFilter(
 	'blocks.registerBlockType',

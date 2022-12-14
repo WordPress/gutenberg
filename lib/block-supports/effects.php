@@ -134,7 +134,7 @@ document.querySelectorAll( '[style*=\"animation-name\"]' ).forEach( e => o.obser
 	}
 }
 
-*[style*=\"animation-name\"] {
+[style*=\"animation-name\"] {
 	animation-duration: 0.5s;
 }
 
