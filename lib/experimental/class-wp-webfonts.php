@@ -280,7 +280,7 @@ class WP_Webfonts extends WP_Dependencies {
 
 			// If font-family, add all of its variations.
 			foreach ( $obj->deps as $variation_handle ) {
-				$obj = $this->registered[ $variation_handle ];
+				$obj                           = $this->registered[ $variation_handle ];
 				$enqueued[ $variation_handle ] = $obj->extra['font-properties'];
 			}
 		}

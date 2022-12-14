@@ -99,7 +99,7 @@ require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/navigation-page.php';
 require __DIR__ . '/experimental/kses.php';
 
-// Web Fonts API
+// Web Fonts API.
 require __DIR__ . '/experimental/webfonts-deprecations.php'; // Temporary deprecated functions.
 require __DIR__ . '/experimental/class-wp-webfonts.php'; // Temporary deprecated class.
 require __DIR__ . '/experimental/class-wp-webfonts-utils.php';
