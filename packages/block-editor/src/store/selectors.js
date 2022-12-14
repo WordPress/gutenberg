@@ -2654,6 +2654,16 @@ export function wasBlockJustInserted( state, clientId, source ) {
 }
 
 /**
+ * Gets the client id of the last inserted block.
+ *
+ * @param {Object} state Global application state.
+ * @return {string|undefined} Client Id of the last inserted block.
+ */
+export function getLastInsertedBlockClientId( state ) {
+	return state?.lastBlockInserted?.clientId;
+}
+
+/**
  * Tells if the block is visible on the canvas or not.
  *
  * @param {Object} state    Global application state.
