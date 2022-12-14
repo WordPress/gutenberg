@@ -74,3 +74,79 @@ WP_Block_Supports::get_instance()->register(
 );
 
 add_filter( 'render_block', 'gutenberg_render_effects_support_flag', 10, 2 );
+
+function gutenberg_render_effects_support() {
+	// Needs to check if any blocks require animation.
+	// We need to avoid code duplication here as well, but need to find a way to
+	// load it both in the (iframed) content and front-end.
+	echo "
+<script>
+const o = new IntersectionObserver(
+	entries => entries.forEach(
+		entry => entry.target.dataset.hasIntersected =
+		entry.target.dataset.hasIntersected === 'true' ||
+		entry.isIntersecting
+	)
+);
+document.querySelectorAll( '[style*=\"animation-name\"]' ).forEach( e => o.observe( e ) );
+</script>
+<style>
+@keyframes slide-from-left {
+	from {
+		transform: translateX(-200px);
+		opacity: 0;
+	}
+	to {
+		transform: translateX(0);
+		opacity: 1;
+	}
+}
+
+@keyframes slide-from-right {
+	from {
+		transform: translateX(200px);
+		opacity: 0;
+	}
+	to {
+		transform: translateX(0);
+		opacity: 1;
+	}
+}
+
+@keyframes slide-from-bottom {
+	0% {
+		transform: translateY(200px);
+	}
+	40% {
+		opacity: 1;
+	}
+	100% {
+		transform: translateY(0);
+	}
+}
+
+@keyframes fade-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+[style*=\"animation-name\"] {
+	animation-duration: 0.5s !important;
+}
+
+[style*=\"animation-name\"]:not([data-has-intersected=\"true\"]) {
+	animation-name: none !important;
+}
+
+[style*=\"animation-name\"][data-has-intersected=\"false\"] {
+	opacity: 0;
+}
+</style>
+";
+}
+
+add_filter( 'wp_footer', 'gutenberg_render_effects_support', 10, 2 );

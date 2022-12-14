@@ -190,6 +190,13 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 	return {
 		...extraProps,
 		'data-effect': attributes.effect ? true : undefined,
+		style: {
+			...extraProps.style,
+			animationName: attributes.effect,
+			animationDuration: attributes.effectDuration
+				? attributes.effectDuration + 's'
+				: undefined,
+		},
 	};
 }
 
@@ -203,13 +210,6 @@ addFilter(
 	'core/editor/effects/with-inspector-control',
 	withInspectorControl
 );
-
-addFilter(
-	'blocks.getSaveContent.extraProps',
-	'core/effects/save-props',
-	addSaveProps
-);
-
 addFilter(
 	'blocks.registerBlockType',
 	'core/effects/addEditProps',

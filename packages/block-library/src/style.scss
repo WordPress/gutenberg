@@ -99,10 +99,13 @@
 }
 
 [data-effect] {
-	animation-duration: 0.5s;
+	// Use important to override wp-components-inline-css (not sure why it sets
+	// animation-duration to 0s).
+	animation-duration: 0.5s !important;
 }
 
 [data-effect]:not([data-has-intersected="true"]) {
+	// Use important to override inline style until the block is intersected.
 	animation-name: none !important;
 }
 
