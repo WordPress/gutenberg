@@ -20,10 +20,8 @@ import type { WordPressComponentProps } from '../ui/context';
 
 const TabButton = ( {
 	tabId,
-	onClick,
 	children,
 	selected,
-	disabled,
 	...rest
 }: TabButtonProps ) => (
 	<Button
@@ -31,8 +29,6 @@ const TabButton = ( {
 		tabIndex={ selected ? null : -1 }
 		aria-selected={ selected }
 		id={ tabId }
-		onClick={ onClick }
-		disabled={ disabled }
 		{ ...rest }
 	>
 		{ children }
