@@ -1903,9 +1903,11 @@ class WP_Theme_JSON_Gutenberg {
 
 		if ( isset( $theme_json['styles']['elements'] ) ) {
 			foreach ( self::ELEMENTS as $element => $selector ) {
-				if ( ! isset( $theme_json['styles']['elements'][ $element ] ) ) {
+				if ( ! isset( $theme_json['styles']['elements'][ $element ] ) || ! array_key_exists( $element, static::ELEMENTS ) ) {
 					continue;
 				}
+
+				// Handle element defaults.
 				$nodes[] = array(
 					'path'     => array( 'styles', 'elements', $element ),
 					'selector' => static::ELEMENTS[ $element ],
