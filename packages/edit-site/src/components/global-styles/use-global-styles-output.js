@@ -846,6 +846,18 @@ export const getBlockSelectors = ( blockTypes ) => {
 	return result;
 };
 
+export const getBlockNames = ( blockTypes ) => {
+	const result = {};
+	blockTypes.forEach( ( blockType ) => {
+		const name = blockType.name;
+		result[ name ] = {
+			name,
+		};
+	} );
+
+	return result;
+};
+
 /**
  * If there is a separator block whose color is defined in theme.json via background,
  * update the separator color to the same value by using border color.
@@ -898,6 +910,7 @@ export function useGlobalStylesOutput() {
 		}
 		mergedConfig = updateConfigWithSeparator( mergedConfig );
 		const blockSelectors = getBlockSelectors( getBlockTypes() );
+		const blockNames = getBlockNames( getBlockTypes() );
 		const customProperties = toCustomProperties(
 			mergedConfig,
 			blockSelectors
@@ -925,6 +938,23 @@ export function useGlobalStylesOutput() {
 				isGlobalStyles: true,
 			},
 		];
+
+		// WIP
+		// Loop through the blocks to check if there are custom CSS values.
+		// If there are, get the block selector and push the selector together with
+		// CSS value to the 'stylesheets' array.
+		// Below, the p selector is used so that we can test it with the paragraph block.
+		Object.entries( blockNames ).forEach( ( name ) => {
+			if ( mergedConfig.styles.blocks[ name[ 0 ] ]?.css ) {
+				stylesheets.push( {
+					css:
+						'p{ ' +
+						mergedConfig.styles.blocks[ name[ 0 ] ]?.css +
+						';}',
+					isGlobalStyles: true,
+				} );
+			}
+		} );
 
 		return [ stylesheets, mergedConfig.settings, filters ];
 	}, [
