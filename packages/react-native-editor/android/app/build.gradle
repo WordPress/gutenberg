@@ -81,9 +81,10 @@ import com.android.build.OutputFile
 project.ext.react = [
     enableHermes: true,  // clean and rebuild if changing
     cliPath: "../../../../node_modules/.bin/react-native",
+    enableVmCleanup: false
 ]
 
-apply from: "../../../../node_modules/react-native/react.gradle"
+// apply from: "../../../../node_modules/react-native/react.gradle"
 
 /**
  * Set this to true to create two separate APKs instead of one:
@@ -243,36 +244,81 @@ dependencies {
         exclude group: 'org.wordpress', module: 'utils'
     })
     implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'com.facebook.fbjni:fbjni-java-only:0.2.2'
+    implementation 'com.facebook.yoga:proguard-annotations:1.14.1'
+    implementation 'javax.inject:javax.inject:1'
+    implementation 'com.facebook.fresco:fresco:2.5.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.10'
+    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.10'
+    implementation 'com.squareup.okhttp3:okhttp-urlconnection:5.0.0-alpha.10'
+    
+    // Forcing version due to https://github.com/facebook/SoLoader/issues/94
+    // To be removed with React Native 0.70+
+    implementation("com.facebook.soloader:soloader") {
+        version {
+            strictly '0.10.4'
+        }
+    }
+
     //noinspection GradleDynamicVersion
-    implementation "com.facebook.react:react-native:${extractPackageVersion(packageJson, 'react-native', 'dependencies')}"
+    implementation("com.facebook.react:react-native:${extractPackageVersion(packageJson, 'react-native', 'dependencies')}:release@aar", {
+        // exclude group: 'com.facebook.fbjni'
+    })
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
 
-    implementation "com.github.wordpress-mobile:react-native-video:${extractPackageVersion(packageJson, 'react-native-video', 'dependencies')}"
-    implementation "com.github.wordpress-mobile:react-native-linear-gradient:${extractPackageVersion(packageJson, 'react-native-linear-gradient', 'dependencies')}"
-    implementation "com.github.wordpress-mobile:react-native-slider:${extractPackageVersion(packageJson, '@react-native-community/slider', 'dependencies')}"
-    implementation "com.github.wordpress-mobile:react-native-reanimated:${extractPackageVersion(packageJson, 'react-native-reanimated', 'dependencies')}"
-    implementation "com.github.wordpress-mobile:react-native-prompt-android:${extractPackageVersion(packageJson, 'react-native-prompt-android', 'dependencies')}"
+    implementation("com.github.wordpress-mobile:react-native-video:${extractPackageVersion(packageJson, 'react-native-video', 'dependencies')}", {
+        exclude group: 'com.facebook.react', module: 'react-native'
+    })
+    implementation("com.github.wordpress-mobile:react-native-linear-gradient:${extractPackageVersion(packageJson, 'react-native-linear-gradient', 'dependencies')}", {
+        exclude group: 'com.facebook.react', module: 'react-native'
+    })
+    implementation("com.github.wordpress-mobile:react-native-slider:${extractPackageVersion(packageJson, '@react-native-community/slider', 'dependencies')}", {
+        exclude group: 'com.facebook.react', module: 'react-native'
+    })
+    implementation("com.github.wordpress-mobile:react-native-reanimated:${extractPackageVersion(packageJson, 'react-native-reanimated', 'dependencies')}", {
+        exclude group: 'com.facebook.react', module: 'react-native'
+    })
+    implementation("com.github.wordpress-mobile:react-native-prompt-android:${extractPackageVersion(packageJson, 'react-native-prompt-android', 'dependencies')}", {
+        exclude group: 'com.facebook.react', module: 'react-native'
+    })
 
     implementation("com.github.wordpress-mobile:react-native-gesture-handler:${extractPackageVersion(packageJson, 'react-native-gesture-handler', 'dependencies')}", {
         // Remove Reanimated transitive dependency as it's already defined here
         exclude group: 'com.github.wordpress-mobile', module: 'react-native-reanimated'
+        exclude group: 'com.facebook.react', module: 'react-native'
     })
 
     // Published by `wordpress-mobile/react-native-libraries-publisher`
     // See the documentation for this value in `build.gradle.kts` of `wordpress-mobile/react-native-libraries-publisher`
     def reactNativeLibrariesPublisherVersion = "v1"
     def reactNativeLibrariesGroupId = "org.wordpress-mobile.react-native-libraries.$reactNativeLibrariesPublisherVersion"
-    implementation "$reactNativeLibrariesGroupId:react-native-get-random-values:${extractPackageVersion(packageJson, 'react-native-get-random-values', 'dependencies')}"
-    implementation "$reactNativeLibrariesGroupId:react-native-safe-area-context:${extractPackageVersion(packageJson, 'react-native-safe-area-context', 'dependencies')}"
-    implementation "$reactNativeLibrariesGroupId:react-native-screens:${extractPackageVersion(packageJson, 'react-native-screens', 'dependencies')}"
-    implementation "$reactNativeLibrariesGroupId:react-native-svg:${extractPackageVersion(packageJson, 'react-native-svg', 'dependencies')}"
-    implementation "$reactNativeLibrariesGroupId:react-native-webview:${extractPackageVersion(packageJson, 'react-native-webview', 'dependencies')}"
-    implementation "$reactNativeLibrariesGroupId:react-native-masked-view:${extractPackageVersion(packageJson, '@react-native-masked-view/masked-view', 'dependencies')}"
-    implementation "$reactNativeLibrariesGroupId:react-native-clipboard:${extractPackageVersion(packageJson, '@react-native-clipboard/clipboard', 'dependencies')}"
-    implementation "$reactNativeLibrariesGroupId:react-native-fast-image:${extractPackageVersion(packageJson, 'react-native-fast-image', 'dependencies')}"
+    implementation("$reactNativeLibrariesGroupId:react-native-get-random-values:${extractPackageVersion(packageJson, 'react-native-get-random-values', 'dependencies')}", {
+        exclude group: 'com.facebook.react', module: 'react-native'
+    })
+    implementation("$reactNativeLibrariesGroupId:react-native-safe-area-context:${extractPackageVersion(packageJson, 'react-native-safe-area-context', 'dependencies')}", {
+        exclude group: 'com.facebook.react', module: 'react-native'
+    })
+    implementation("$reactNativeLibrariesGroupId:react-native-screens:${extractPackageVersion(packageJson, 'react-native-screens', 'dependencies')}", {
+        exclude group: 'com.facebook.react', module: 'react-native'
+    })
+    implementation("$reactNativeLibrariesGroupId:react-native-svg:${extractPackageVersion(packageJson, 'react-native-svg', 'dependencies')}", {
+        exclude group: 'com.facebook.react', module: 'react-native'
+    })
+    implementation("$reactNativeLibrariesGroupId:react-native-webview:${extractPackageVersion(packageJson, 'react-native-webview', 'dependencies')}", {
+        exclude group: 'com.facebook.react', module: 'react-native'
+    })
+    implementation("$reactNativeLibrariesGroupId:react-native-masked-view:${extractPackageVersion(packageJson, '@react-native-masked-view/masked-view', 'dependencies')}", {
+        exclude group: 'com.facebook.react', module: 'react-native'
+    })
+    implementation("$reactNativeLibrariesGroupId:react-native-clipboard:${extractPackageVersion(packageJson, '@react-native-clipboard/clipboard', 'dependencies')}", {
+        exclude group: 'com.facebook.react', module: 'react-native'
+    })
+    implementation("$reactNativeLibrariesGroupId:react-native-fast-image:${extractPackageVersion(packageJson, 'react-native-fast-image', 'dependencies')}", {
+        exclude group: 'com.facebook.react', module: 'react-native'
+    })
 
-    implementation("com.facebook.react:hermes-engine:${extractPackageVersion(packageJson, 'react-native', 'dependencies')}") {
+    runtimeOnly("com.facebook.react:hermes-engine:${extractPackageVersion(packageJson, 'react-native', 'dependencies')}:release@aar") {
         exclude group:'com.facebook.fbjni'
     }
 }
