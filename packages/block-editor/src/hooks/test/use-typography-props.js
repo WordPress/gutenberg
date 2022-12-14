@@ -47,4 +47,34 @@ describe( 'getTypographyClassesAndStyles', () => {
 			},
 		} );
 	} );
+
+	it( 'should return configured fluid font size styles', () => {
+		const attributes = {
+			fontFamily: 'tofu',
+			style: {
+				typography: {
+					textDecoration: 'underline',
+					fontSize: '2rem',
+					textTransform: 'uppercase',
+				},
+			},
+		};
+		expect(
+			getTypographyClassesAndStyles( attributes, {
+				minViewPortWidth: '900px',
+				maxViewPortWidth: '1900px',
+				scaleFactor: 2,
+				minFontSizeFactor: 0.9,
+				minFontSize: '1rem',
+			} )
+		).toEqual( {
+			className: 'has-tofu-font-family',
+			style: {
+				textDecoration: 'underline',
+				fontSize:
+					'clamp(1.8rem, 1.8rem + ((1vw - 0.563rem) * 0.64), 2rem)',
+				textTransform: 'uppercase',
+			},
+		} );
+	} );
 } );
