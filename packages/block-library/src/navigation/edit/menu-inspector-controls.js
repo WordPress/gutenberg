@@ -35,7 +35,7 @@ const MenuInspectorControls = ( {
 	const actionLabel = __( "Switch to '%s'" );
 
 	// Provide a hierarchy of clientIds for the given Navigation block (clientId).
-	// This is required else the list view will display the entire block tree. 
+	// This is required else the list view will display the entire block tree.
 	const clientIdsTree = useSelect(
 		( select ) => {
 			const { __unstableGetClientIdsTree } = select( blockEditorStore );
