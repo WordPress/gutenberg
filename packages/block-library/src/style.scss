@@ -98,10 +98,10 @@
 	}
 }
 
-[data-effect] {
-	// Use important to override wp-components-inline-css (not sure why it sets
-	// animation-duration to 0s).
-	animation-duration: 0.5s !important;
+// Use * to override wp-components-inline-css (not sure why it sets
+// animation-duration to 0s).
+*[data-effect] {
+	animation-duration: 0.5s;
 }
 
 [data-effect]:not([data-has-intersected="true"]) {

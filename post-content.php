@@ -36,7 +36,7 @@
 <p><?php _e( 'Handling images and media with the utmost care is a primary focus of the new editor. Hopefully, you&#8217;ll find aspects of adding captions or going full-width with your pictures much easier and robust than before.', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:image {"align":"center"} -->
+<!-- wp:image {"align":"center","effect":"slide-from-bottom"} -->
 <div class="wp-block-image">
 	<figure class="aligncenter"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="<?php esc_attr_e( 'Beautiful landscape', 'gutenberg' ); ?>" />
 		<figcaption><?php _e( 'If your theme supports it, you&#8217;ll see the "wide" button on the image toolbar. Give it a try.', 'gutenberg' ); ?></figcaption>
@@ -98,13 +98,21 @@
 <p><?php _e( 'Blocks can be anything you need. For instance, you may want to add a subdued quote as part of the composition of your text, or you may prefer to display a giant stylized one. All of these options are available in the inserter.', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:gallery {"ids":[null,null,null],"columns":2} -->
-<figure class="wp-block-gallery columns-2 is-cropped">
-<ul class="blocks-gallery-grid">
-<li class="blocks-gallery-item"><figure><img src="https://cldup.com/n0g6ME5VKC.jpg" alt="" /></figure></li>
-<li class="blocks-gallery-item"><figure><img src="https://cldup.com/ZjESfxPI3R.jpg" alt="" /></figure></li>
-<li class="blocks-gallery-item"><figure><img src="https://cldup.com/EKNF8xD2UM.jpg" alt="" /></figure></li>
-</ul>
+<!-- wp:gallery {"columns":2,"linkTo":"none"} -->
+<figure class="wp-block-gallery has-nested-images columns-2 is-cropped">
+
+<!-- wp:image {"sizeSlug":"large","linkDestination":"none","effect":"slide-from-left"} -->
+<figure class="wp-block-image size-large"><img src="https://cldup.com/n0g6ME5VKC.jpg" alt=""/></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"sizeSlug":"large","linkDestination":"none","effect":"slide-from-right"} -->
+<figure class="wp-block-image size-large"><img src="https://cldup.com/ZjESfxPI3R.jpg" alt=""/></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"sizeSlug":"large","linkDestination":"none","effect":"slide-from-bottom"} -->
+<figure class="wp-block-image size-large"><img src="https://cldup.com/EKNF8xD2UM.jpg" alt=""/></figure>
+<!-- /wp:image -->
+
 </figure>
 <!-- /wp:gallery -->
 
@@ -120,7 +128,7 @@
 <p><?php _e( 'If you combine the new <strong>wide</strong> and <strong>full-wide</strong> alignments with galleries, you can create a very media rich layout, very quickly:', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:image {"align":"full"} -->
+<!-- wp:image {"align":"full","effect":"slide-from-bottom"} -->
 <figure class="wp-block-image alignfull"><img src="https://cldup.com/8lhI-gKnI2.jpg" alt="<?php _e( 'Accessibility is important &mdash; don&#8217;t forget image alt attribute', 'gutenberg' ); ?>" /></figure>
 <!-- /wp:image -->
 
@@ -128,12 +136,17 @@
 <p><?php _e( 'Sure, the full-wide image can be pretty big. But sometimes the image is worth it.', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:gallery {"ids":[null,null],"align":"wide"} -->
-<figure class="wp-block-gallery alignwide columns-2 is-cropped">
-<ul class="blocks-gallery-grid">
-<li class="blocks-gallery-item"><figure><img src="https://cldup.com/_rSwtEeDGD.jpg" alt="" /></figure></li>
-<li class="blocks-gallery-item"><figure><img src="https://cldup.com/L-cC3qX2DN.jpg" alt="" /></figure></li>
-</ul>
+<!-- wp:gallery {"linkTo":"none","align":"wide"} -->
+<figure class="wp-block-gallery alignwide has-nested-images columns-default is-cropped">
+
+<!-- wp:image {"sizeSlug":"large","linkDestination":"none","effect":"slide-from-left"} -->
+<figure class="wp-block-image size-large"><img src="https://cldup.com/_rSwtEeDGD.jpg" alt=""/></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"sizeSlug":"large","linkDestination":"none","effect":"slide-from-right"} -->
+<figure class="wp-block-image size-large"><img src="https://cldup.com/L-cC3qX2DN.jpg" alt=""/></figure>
+<!-- /wp:image -->
+
 </figure>
 <!-- /wp:gallery -->
 
@@ -145,7 +158,7 @@
 <p><?php _e( 'Any block can opt into these alignments. The embed block has them also, and is responsive out of the box:', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:embed {"url":"https://vimeo.com/22439234","type":"video","providerNameSlug":"vimeo","align":"wide","className":"wp-has-aspect-ratio wp-embed-aspect-16-9","responsive":true} -->
+<!-- wp:embed {"url":"https://vimeo.com/22439234","type":"video","providerNameSlug":"vimeo","align":"wide","className":"wp-has-aspect-ratio wp-embed-aspect-16-9","responsive":true,"effect":"slide-from-bottom"} -->
 <figure class="wp-block-embed-vimeo alignwide wp-block-embed is-type-video is-provider-vimeo wp-has-aspect-ratio wp-embed-aspect-16-9"><div class="wp-block-embed__wrapper">
 https://vimeo.com/22439234
 </div></figure>
@@ -173,7 +186,7 @@ https://vimeo.com/22439234
 </p>
 <!-- /wp:paragraph -->
 
-<!-- wp:button { "align": "center" } -->
+<!-- wp:button {"align": "center","effect":"fade-in","effectDuration":"2"} -->
 <div class="wp-block-button aligncenter"><a class="wp-block-button__link" href="https://github.com/WordPress/gutenberg"><?php _e( 'Help build Gutenberg', 'gutenberg' ); ?></a></div>
 <!-- /wp:button -->
 
