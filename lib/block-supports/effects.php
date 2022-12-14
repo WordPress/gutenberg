@@ -134,8 +134,8 @@ document.querySelectorAll( '[style*=\"animation-name\"]' ).forEach( e => o.obser
 	}
 }
 
-[style*=\"animation-name\"] {
-	animation-duration: 0.5s !important;
+*[style*=\"animation-name\"] {
+	animation-duration: 0.5s;
 }
 
 [style*=\"animation-name\"]:not([data-has-intersected=\"true\"]) {
