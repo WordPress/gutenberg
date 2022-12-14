@@ -1935,7 +1935,7 @@ class WP_Theme_JSON_Gutenberg {
 			return $nodes;
 		}
 
-		$block_nodes = static::get_block_nodes( $theme_json );
+		$block_nodes = static::get_block_nodes( $theme_json, $selectors );
 		foreach ( $block_nodes as $block_node ) {
 			$nodes[] = $block_node;
 		}
@@ -2007,10 +2007,11 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.1.0
 	 *
 	 * @param array $theme_json The theme.json converted to an array.
+	 * @param array $selectors  Optional list of selectors per block.
 	 * @return array The block nodes in theme.json.
 	 */
-	private static function get_block_nodes( $theme_json ) {
-		$selectors = static::get_blocks_metadata();
+	private static function get_block_nodes( $theme_json, $selectors = array() ) {
+		$selectors = empty( $selectors ) ? static::get_blocks_metadata() : $selectors;
 		$nodes     = array();
 		if ( ! isset( $theme_json['styles'] ) ) {
 			return $nodes;
