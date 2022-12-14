@@ -71,3 +71,28 @@ if ( ! function_exists( 'wp_register_webfont' ) ) {
 		return wp_webfonts()->register_webfont( $webfont );
 	}
 }
+
+if ( ! function_exists( 'wp_get_webfont_providers' ) ) {
+	/**
+	 * Gets all registered providers.
+	 *
+	 * Return an array of providers, each keyed by their unique
+	 * ID (i.e. the `$id` property in the provider's object) with
+	 * an instance of the provider (object):
+	 *     ID => provider instance
+	 *
+	 * Each provider contains the business logic for how to
+	 * process its specific font service (i.e. local or remote)
+	 * and how to generate the `@font-face` styles for its service.
+	 *
+	 * @since X.X.X
+	 * @deprecated X.X.X Use wp_webfonts()->get_providers().
+	 *
+	 * @return WP_Webfonts_Provider[] All registered providers, each keyed by their unique ID.
+	 */
+	function wp_get_webfont_providers() {
+		_deprecated_function( __FUNCTION__, 'X.X.X', 'wp_webfonts()->get_providers()' );
+
+		return wp_webfonts()->get_providers();
+	}
+}

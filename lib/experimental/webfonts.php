@@ -29,38 +29,6 @@ if ( ! function_exists( 'wp_webfonts' ) ) {
 	}
 }
 
-if ( ! function_exists( 'wp_register_font_family' ) ) {
-	/**
-	 * Registers a font family.
-	 *
-	 * @since X.X.X
-	 *
-	 * @param string $font_family Font family name to register.
-	 * @return string|null Font family handle when registration successes. Null on failure.
-	 */
-	function wp_register_font_family( $font_family ) {
-		return wp_webfonts()->add_font_family( $font_family );
-	}
-}
-
-if ( ! function_exists( 'wp_register_webfont_variation' ) ) {
-	/**
-	 * Registers a variation to the given font family.
-	 *
-	 * @since X.X.X
-	 *
-	 * @param string $font_family_handle The font family's handle for this variation.
-	 * @param array  $variation          An array of variation properties to add.
-	 * @param string $variation_handle   Optional. The variation's handle. When none is provided, the
-	 *                                   handle will be dynamically generated.
-	 *                                   Default empty string.
-	 * @return string|null Variation handle on success. Else null.
-	 */
-	function wp_register_webfont_variation( $font_family_handle, array $variation, $variation_handle = '' ) {
-		return wp_webfonts()->add_variation( $font_family_handle, $variation, $variation_handle );
-	}
-}
-
 if ( ! function_exists( 'wp_register_webfonts' ) ) {
 	/**
 	 * Registers one or more font-families and each of their variations.
@@ -88,10 +56,11 @@ if ( ! function_exists( 'wp_register_webfonts' ) ) {
 		$registered  = array();
 		$wp_webfonts = wp_webfonts();
 
-		// BACKPORT NOTE: Do not backport this line of code to Core.
+		// BACKPORT NOTE: Do not backport this code block to Core.
 		if ( $wp_webfonts->is_deprecated_structure( $webfonts ) ) {
 			$webfonts = $wp_webfonts->migrate_deprecated_structure( $webfonts );
 		}
+		// BACKPORT NOTE: end of code block.
 
 		foreach ( $webfonts as $font_family => $variations ) {
 			$font_family_handle = $wp_webfonts->add_font_family( $font_family );
@@ -196,28 +165,6 @@ if ( ! function_exists( 'wp_register_webfont_provider' ) ) {
 	 */
 	function wp_register_webfont_provider( $name, $classname ) {
 		return wp_webfonts()->register_provider( $name, $classname );
-	}
-}
-
-if ( ! function_exists( 'wp_get_webfont_providers' ) ) {
-	/**
-	 * Gets all registered providers.
-	 *
-	 * Return an array of providers, each keyed by their unique
-	 * ID (i.e. the `$id` property in the provider's object) with
-	 * an instance of the provider (object):
-	 *     ID => provider instance
-	 *
-	 * Each provider contains the business logic for how to
-	 * process its specific font service (i.e. local or remote)
-	 * and how to generate the `@font-face` styles for its service.
-	 *
-	 * @since X.X.X
-	 *
-	 * @return WP_Webfonts_Provider[] All registered providers, each keyed by their unique ID.
-	 */
-	function wp_get_webfont_providers() {
-		return wp_webfonts()->get_providers();
 	}
 }
 
