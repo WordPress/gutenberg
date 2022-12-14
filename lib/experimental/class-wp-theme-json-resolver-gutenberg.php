@@ -188,10 +188,10 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_2 {
 			$nested_json_files = iterator_to_array( new RegexIterator( $nested_files, '/^.+\.json$/i', RecursiveRegexIterator::GET_MATCH ) );
 			if ( $parent_theme_directory !== $base_directory && is_dir( $parent_theme_directory ) ) {
 				$nested_files      = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $parent_theme_directory ) );
-				$nested_json_files = array_merge( iterator_to_array( new RegexIterator( $nested_files, '/^.+\.json$/i', RecursiveRegexIterator::GET_MATCH ) ), $nested_html_files );
+				$nested_json_files = array_merge( iterator_to_array( new RegexIterator( $nested_files, '/^.+\.json$/i', RecursiveRegexIterator::GET_MATCH ) ), $nested_json_files );
 			}
-			ksort( $nested_html_files );
-			foreach ( $nested_html_files as $path => $file ) {
+			ksort( $nested_json_files );
+			foreach ( $nested_json_files as $path => $file ) {
 				$decoded_file = wp_json_file_decode( $path, array( 'associative' => true ) );
 				if ( is_array( $decoded_file ) ) {
 					$translated = static::translate( $decoded_file, wp_get_theme()->get( 'TextDomain' ) );
