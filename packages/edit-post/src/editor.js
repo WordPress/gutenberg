@@ -11,7 +11,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	EditorProvider,
 	ErrorBoundary,
-	PostLockedModal,
 	store as editorStore,
 } from '@wordpress/editor';
 import { StrictMode, useMemo } from '@wordpress/element';
@@ -199,7 +198,6 @@ function Editor( {
 							<EditorInitialization postId={ postId } />
 							<Layout styles={ styles } />
 						</ErrorBoundary>
-						<PostLockedModal />
 					</EditorProvider>
 				</SlotFillProvider>
 			</ShortcutProvider>
