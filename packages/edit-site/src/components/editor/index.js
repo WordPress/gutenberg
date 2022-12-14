@@ -31,7 +31,6 @@ import { SidebarComplementaryAreaFills } from '../sidebar-edit-mode';
 import BlockEditor from '../block-editor';
 import CodeEditor from '../code-editor';
 import KeyboardShortcuts from '../keyboard-shortcuts';
-import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
 import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
 import WelcomeGuide from '../welcome-guide';
@@ -52,9 +51,6 @@ const interfaceLabels = {
 };
 
 export default function Editor() {
-	// This ensures the edited entity id and type are initialized properly.
-	useInitEditedEntityFromURL();
-
 	const {
 		editedPostId,
 		editedPostType,
