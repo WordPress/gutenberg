@@ -179,7 +179,66 @@ describe( 'TabPanel', () => {
 			/>
 		);
 
-		expect( screen.getByRole( 'tab', { name: 'Delta' } ) ).toBeDisabled();
+		expect( screen.getByRole( 'tab', { name: 'Delta' } ) ).toHaveAttribute(
+			'aria-disabled',
+			'true'
+		);
+	} );
+
+	it( 'should select the first enabled tab when the inital tab is disabled', () => {
+		const mockOnSelect = jest.fn();
+
+		render(
+			<TabPanel
+				tabs={ [
+					{
+						name: 'alpha',
+						title: 'Alpha',
+						className: 'alpha-class',
+						disabled: true,
+					},
+					{
+						name: 'beta',
+						title: 'Beta',
+						className: 'beta-class',
+					},
+				] }
+				initialTabName="alpha"
+				children={ () => undefined }
+				onSelect={ mockOnSelect }
+			/>
+		);
+
+		expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
+	} );
+
+	it( 'should select the first enabled tab when the currently selected becomes disabled', () => {
+		const mockOnSelect = jest.fn();
+
+		const { rerender } = render(
+			<TabPanel
+				tabs={ TABS }
+				children={ () => undefined }
+				onSelect={ mockOnSelect }
+			/>
+		);
+
+		expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+
+		rerender(
+			<TabPanel
+				tabs={ TABS.map( ( tab ) => {
+					if ( tab.name === 'alpha' ) {
+						return { ...tab, disabled: true };
+					}
+					return tab;
+				} ) }
+				children={ () => undefined }
+				onSelect={ mockOnSelect }
+			/>
+		);
+
+		expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
 	} );
 
 	describe( 'fallbacks when new tab list invalidates current selection', () => {
