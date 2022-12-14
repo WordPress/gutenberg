@@ -102,6 +102,7 @@ export function widgetToBlock( { id, idBase, number, instance } ) {
 		...rest
 	} = instance;
 
+	// It's unclear why `content` is sometimes `undefined`, but it shouldn't be.
 	const rawContent = rawInstance.content || '';
 	const raw = { ...rawInstance, content: rawContent };
 
