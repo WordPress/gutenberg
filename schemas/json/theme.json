@@ -1950,17 +1950,7 @@
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
 						},
 						"variations": {
-							"outline": {
-								"border": {},
-								"color": {},
-								"spacing": {},
-								"typography": {},
-								"filter": {},
-								"shadow": {},
-								"outline": {},
-								"css": {}
-							},
-							"fill": {
+							"^[a-z-]*$": {
 								"border": {},
 								"color": {},
 								"spacing": {},
