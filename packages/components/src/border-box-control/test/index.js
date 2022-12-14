@@ -3,6 +3,7 @@
  */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { act } from 'react-test-renderer';
 
 /**
  * Internal dependencies
@@ -186,6 +187,7 @@ describe( 'BorderBoxControl', () => {
 
 			const colorButton = screen.getByLabelText( colorPickerRegex );
 			await user.click( colorButton );
+			await act( () => Promise.resolve() );
 
 			const styleLabel = screen.queryByText( 'Style' );
 			const solidButton = screen.queryByRole( 'button', {
@@ -309,7 +311,7 @@ describe( 'BorderBoxControl', () => {
 			await user.click( colorButtons[ 3 ] );
 			assertStyleOptionsMissing();
 			await user.click( colorButtons[ 3 ] );
-		}, 10000 );
+		} );
 	} );
 
 	describe( 'onChange handling', () => {

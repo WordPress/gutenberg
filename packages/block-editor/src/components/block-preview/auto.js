@@ -25,7 +25,12 @@ function ScaledBlockPreview( {
 	containerWidth,
 	__experimentalPadding,
 	__experimentalMinHeight,
+	__experimentalStyles,
 } ) {
+	if ( ! viewportWidth ) {
+		viewportWidth = containerWidth;
+	}
+
 	const [ contentResizeListener, { height: contentHeight } ] =
 		useResizeObserver();
 	const { styles, assets, duotone } = useSelect( ( select ) => {
@@ -42,6 +47,7 @@ function ScaledBlockPreview( {
 		if ( styles ) {
 			return [
 				...styles,
+				...__experimentalStyles,
 				{
 					css: 'body{height:auto;overflow:hidden;}',
 					__unstableType: 'presets',
@@ -50,7 +56,7 @@ function ScaledBlockPreview( {
 		}
 
 		return styles;
-	}, [ styles ] );
+	}, [ styles, __experimentalStyles ] );
 
 	const svgFilters = useMemo( () => {
 		return [ ...( duotone?.default ?? [] ), ...( duotone?.theme ?? [] ) ];

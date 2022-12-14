@@ -7,7 +7,12 @@
 	"description": "Display a list of all pages.",
 	"keywords": [ "menu", "navigation" ],
 	"textdomain": "default",
-	"attributes": {},
+	"attributes": {
+		"parentPageID": {
+			"type": "integer",
+			"default": 0
+		}
+	},
 	"usesContext": [
 		"textColor",
 		"customTextColor",

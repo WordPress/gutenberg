@@ -8,6 +8,8 @@
 
 /**
  * Tests for registering, storing and generating styles.
+ *
+ * @group style-engine
  */
 class WP_Style_Engine_Test extends WP_UnitTestCase {
 	/**

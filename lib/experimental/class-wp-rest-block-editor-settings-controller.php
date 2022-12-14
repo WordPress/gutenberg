@@ -168,6 +168,12 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 					'context'     => array( 'mobile' ),
 				),
 
+				'__experimentalBlockInspectorTabs'       => array(
+					'description' => __( 'Block inspector tab display overrides.', 'gutenberg' ),
+					'type'        => 'object',
+					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
+				),
+
 				'alignWide'                              => array(
 					'description' => __( 'Enable/Disable Wide/Full Alignments.', 'gutenberg' ),
 					'type'        => 'boolean',
