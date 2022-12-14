@@ -7,6 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useMergeRefs } from '@wordpress/compose';
+import { getScrollContainer } from '@wordpress/dom';
 import { Popover } from '@wordpress/components';
 import {
 	forwardRef,
@@ -74,6 +75,31 @@ function BlockPopover(
 			observer.disconnect();
 		};
 	}, [ selectedElement ] );
+
+	const scrollContainer = useMemo( () => {
+		if ( ! __unstableContentRef?.current ) {
+			return;
+		}
+		return getScrollContainer( __unstableContentRef?.current );
+	}, [ __unstableContentRef?.current ] );
+
+	useLayoutEffect( () => {
+		if ( ! scrollContainer ) {
+			return;
+		}
+
+		scrollContainer?.addEventListener?.(
+			'scroll',
+			forceRecomputePopoverDimensions
+		);
+
+		return () => {
+			scrollContainer?.removeEventHandler?.(
+				'scroll',
+				forceRecomputePopoverDimensions
+			);
+		};
+	}, [ scrollContainer ] );
 
 	const style = useMemo( () => {
 		if (
