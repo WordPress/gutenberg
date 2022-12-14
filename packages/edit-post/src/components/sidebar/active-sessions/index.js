@@ -1,15 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { Platform } from '@wordpress/element';
+import { Platform, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { Icon, Button } from '@wordpress/components';
+import { lock, unlock } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import PluginSidebarEditPost from '../plugin-sidebar';
-import { Icon, Button } from '@wordpress/components';
-import { lock, unlock } from '@wordpress/icons';
 
 const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
 	web: true,
@@ -21,14 +21,38 @@ const SettingsSidebar = () => {
 		{
 			src: 'http://0.gravatar.com/avatar/fe38d164bce79d754ab3fa1a1388d37a',
 			name: 'Ella',
-			active: true,
+			isLocked: false,
 		},
 		{
 			// Just adding a dummy image.
 			src: 'http://0.gravatar.com/avatar/a',
 			name: 'Nik',
+			isLocked: true,
 		},
 	];
+
+	useEffect( () => {
+		// - We have to send a request to the server to add the current user to
+		//   the list of active sessions. Response should be a list of all
+		//   active sessions.
+		// - When closing the page we have to send a request to the server to
+		//   remove the current user from the list of active sessions.
+		// - We need to poll the server to get the list of active sessions
+		//   regularly. We could use the heartbeat API for this for now.
+		// - When taking over the lock we have to send a request to the server
+		//   to update the post lock. We need to make sure the latest changes
+		//   are saved somehow.
+		// Details on these events on the Heartbeat API docs
+		// https://developer.wordpress.org/plugins/javascript/heartbeat-api/
+		// addAction( 'heartbeat.send', hookName, sendPostLock );
+		// addAction( 'heartbeat.tick', hookName, receivePostLock );
+		// window.addEventListener( 'beforeunload', releasePostLock );
+		// return () => {
+		// 	removeAction( 'heartbeat.send', hookName );
+		// 	removeAction( 'heartbeat.tick', hookName );
+		// 	window.removeEventListener( 'beforeunload', releasePostLock );
+		// };
+	}, [] );
 
 	return (
 		<PluginSidebarEditPost
@@ -64,7 +88,7 @@ const SettingsSidebar = () => {
 			}
 			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
 		>
-			{ activeSessions.map( ( { src, name, active } ) => (
+			{ activeSessions.map( ( { src, name, isLocked } ) => (
 				<div
 					key={ src }
 					style={ {
@@ -93,17 +117,17 @@ const SettingsSidebar = () => {
 										width: '8px',
 										height: '8px',
 										borderRadius: '50%',
-										backgroundColor: active
-											? 'green'
-											: 'gray',
+										backgroundColor: isLocked
+											? 'gray'
+											: 'green',
 										display: 'inline-block',
 									} }
 								/>
 							</strong>
 						</p>
 						<div style={ { display: 'flex' } }>
-							<Icon icon={ active ? unlock : lock } />
-							{ active && (
+							<Icon icon={ isLocked ? lock : unlock } />
+							{ ! isLocked && (
 								<Button variant="secondary" isSmall>
 									{ __( 'Take over' ) }
 								</Button>
