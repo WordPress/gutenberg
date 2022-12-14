@@ -53,15 +53,35 @@ jobs:
                   node-version-file: '.nvmrc'
                   cache: npm
 
-            - name: Docker debug information
-              run: |
-                  docker -v
-                  docker-compose -v
+            ##
+            # This allows Composer dependencies to be installed using a single step.
+            #
+            # Since the tests are currently run within the Docker containers where the PHP version varies,
+            # the same PHP version needs to be configured for the action runner machine so that the correct
+            # dependency versions are installed and cached.
+            ##
+            - name: Set up PHP
+              uses: shivammathur/setup-php@1a18b2267f80291a81ca1d33e7c851fe09e7dfc4 # v2.22.0
+              with:
+                  php-version: '${{ matrix.php }}'
+                  coverage: none
+
+            # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
+            # passing a custom cache suffix ensures that the cache is flushed at least once per week.
+            - name: Install Composer dependencies
+              uses: ramsey/composer-install@83af392bf5f031813d25e6fe4cd626cdba9a2df6 # v2.2.0
+              with:
+                  custom-cache-suffix: $(/bin/date -u --date='last Mon' "+%F")
 
             - name: Install npm dependencies
               run: |
                   npm ci
                   npm run build
+
+            - name: Docker debug information
+              run: |
+                  docker -v
+                  docker-compose -v
 
             - name: General debug information
               run: |
@@ -77,9 +97,6 @@ jobs:
               run: |
                   npm run wp-env start
 
-            - name: Install Composer dependencies
-              run: npm run wp-env run composer "install --no-interaction"
-
             - name: Log running Docker containers
               run: docker ps -a
 
@@ -89,7 +106,6 @@ jobs:
                   npm run wp-env run phpunit "php --version"
                   npm run wp-env run phpunit "php -m"
                   npm run wp-env run phpunit "php -i"
-                  npm run wp-env run composer "--version"
                   npm run wp-env run phpunit "/usr/local/bin/phpunit --version"
                   npm run wp-env run phpunit "locale -a"
 
