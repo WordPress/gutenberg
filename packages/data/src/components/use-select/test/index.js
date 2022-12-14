@@ -50,9 +50,9 @@ describe( 'useSelect', () => {
 			</RegistryProvider>
 		);
 
-		// 2 times expected
+		// 2 selectSpy calls expected
 		// - 1 for initial mount
-		// - 1 for after mount before subscription set.
+		// - 1 for the subscription effect checking if value has changed
 		expect( selectSpy ).toHaveBeenCalledTimes( 2 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 1 );
 
@@ -119,7 +119,7 @@ describe( 'useSelect', () => {
 	} );
 
 	// TODO: this might be impossible to pull off in React 18 without `useSyncExternalStore`
-	it.skip( 'avoid calling nested listener after unmounted', async () => {
+	it( 'avoid calling nested listener after unmounted', async () => {
 		registry.registerStore( 'toggler', {
 			reducer: ( state = false, action ) =>
 				action.type === 'TOGGLE' ? ! state : state,

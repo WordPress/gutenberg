@@ -12,6 +12,7 @@ import {
 	useCallback,
 	useMemo,
 	useReducer,
+	useSyncExternalStore,
 	useDebugValue,
 } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
@@ -104,7 +105,100 @@ const renderQueue = createQueue();
  * ```
  * @return {UseSelectReturn<T>} A custom react hook.
  */
+function Selecter( registry ) {
+	const NOTHING = {};
+	let lastMapSelect = NOTHING;
+	let lastMapResult = NOTHING;
+	let lastMapResultValid = false;
+
+	const NULLSCRIBER = () => {
+		lastMapResultValid = false;
+		return () => {};
+	};
+	let subscribe = NULLSCRIBER;
+
+	function createSubscriber( stores ) {
+		if ( stores.length === 0 ) {
+			return NULLSCRIBER;
+		}
+
+		return ( lis ) => {
+			lastMapResultValid = false;
+			const unsubs = stores.map( ( storeName ) => {
+				return registry.subscribe( () => {
+					lastMapResultValid = false;
+					lis();
+				}, storeName );
+			} );
+
+			return () => {
+				// The return value of the subscribe function could be undefined if the store is a custom generic store.
+				unsubs.forEach( ( unsub ) => unsub?.() );
+			};
+		};
+	}
+
+	function select( mapSelect, resub ) {
+		function getValue() {
+			if ( lastMapResultValid && mapSelect === lastMapSelect ) {
+				return lastMapResult;
+			}
+
+			const mapResult = mapSelect( registry.select, registry );
+
+			if (
+				lastMapResult === NOTHING ||
+				! isShallowEqual( lastMapResult, mapResult )
+			) {
+				lastMapResult = mapResult;
+			}
+			lastMapResultValid = true;
+
+			return lastMapResult;
+		}
+
+		if ( lastMapResultValid && mapSelect === lastMapSelect ) {
+			return { getValue, subscribe };
+		}
+
+		const listeningStores = { current: null };
+		const mapResult = registry.__unstableMarkListeningStores(
+			() => mapSelect( registry.select, registry ),
+			listeningStores
+		);
+
+		if (
+			lastMapSelect === NOTHING ||
+			( resub && mapSelect !== lastMapSelect )
+		) {
+			subscribe = createSubscriber( listeningStores.current );
+		}
+
+		if (
+			lastMapResult === NOTHING ||
+			! isShallowEqual( lastMapResult, mapResult )
+		) {
+			lastMapResult = mapResult;
+		}
+		lastMapResultValid = true;
+
+		lastMapSelect = mapSelect;
+
+		return { getValue, subscribe };
+	}
+
+	return { select };
+}
+
 export default function useSelect( mapSelect, deps ) {
+	const registry = useRegistry();
+	const selecter = useMemo( () => Selecter( registry ), [ registry ] );
+	const selector = useCallback( mapSelect, deps );
+	const { getValue, subscribe } = selecter.select( selector, !! deps );
+	return useSyncExternalStore( subscribe, getValue, getValue );
+}
+
+export function oldUseSelect( mapSelect, deps ) {
 	const hasMappingFunction = 'function' === typeof mapSelect;
 
 	// If we're recalling a store by its name or by
