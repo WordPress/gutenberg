@@ -68,15 +68,15 @@ jobs:
                   npm run wp-env start
 
             - name: Install Composer dependencies
-              run: npm run wp-env run composer update -- --no-interaction
+              run: npm run wp-env run "composer update --no-interaction"
 
             - name: Log running Docker containers
               run: docker ps -a
 
             - name: Running single site unit tests
-              run: npm run wp-env run composer /usr/local/bin/phpunit -- -c /var/www/html/wp-content/plugins/gutenberg/phpunit.xml.dist -- --verbose
+              run: npm run wp-env run phpunit "/usr/local/bin/phpunit -c /var/www/html/wp-content/plugins/gutenberg/phpunit.xml.dist --verbose"
               if: ${{ ! matrix.multisite }}
 
             - name: Running multisite unit tests
-              run: npm run wp-env run composer /usr/local/bin/phpunit -- -c /var/www/html/wp-content/plugins/gutenberg/multisite.xml.dist -- --verbose
+              run: npm run wp-env run phpunit "/usr/local/bin/phpunit -c /var/www/html/wp-content/plugins/gutenberg/multisite.xml.dist --verbose"
               if: ${{ matrix.multisite }}
