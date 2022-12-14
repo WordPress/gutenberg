@@ -58,20 +58,39 @@ jobs:
                   docker -v
                   docker-compose -v
 
-            - name: Npm install and build
+            - name: Install npm dependencies
               run: |
                   npm ci
                   npm run build
+
+            - name: General debug information
+              run: |
+                  npm --version
+                  node --version
+                  curl --version
+                  git --version
+                  svn --version
+                  composer --version
+                  locale -a
+
+            - name: Install Composer dependencies
+              run: npm run wp-env run composer "install --no-interaction"
 
             - name: Start Docker environment
               run: |
                   npm run wp-env start
 
-            - name: Install Composer dependencies
-              run: npm run wp-env run "composer update --no-interaction"
-
             - name: Log running Docker containers
               run: docker ps -a
+
+            - name: Docker container debug information
+              run: |
+                  npm run wp-env run tests-mysql "mysql --version"
+                  npm run wp-env run phpunit "php --version"
+                  npm run wp-env run phpunit "php -m"
+                  npm run wp-env run phpunit "php -i"
+                  npm run wp-env run phpunit "/usr/local/bin/phpunit --version"
+                  npm run wp-env run phpunit "locale -a"
 
             - name: Running single site unit tests
               run: npm run wp-env run phpunit "/usr/local/bin/phpunit -c /var/www/html/wp-content/plugins/gutenberg/phpunit.xml.dist --verbose"
