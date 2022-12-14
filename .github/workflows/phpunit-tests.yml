@@ -64,9 +64,7 @@ jobs:
                   npm run build
 
             - name: Install Composer dependencies
-              uses: ramsey/composer-install@83af392bf5f031813d25e6fe4cd626cdba9a2df6 # v2.2.0
-              with:
-                  custom-cache-suffix: $(/bin/date -u --date='last Mon' "+%F")
+              run: npm run wp-env run composer "update --no-interaction"
 
             - name: Start Docker environment
               run: |
@@ -74,9 +72,6 @@ jobs:
 
             - name: Log running Docker containers
               run: docker ps -a
-
-            - name: Install composer depenencies
-              run: npm run wp-env run composer "update --no-interaction"
 
             - name: Running single site unit tests
               run: wp-env run composer /usr/local/bin/phpunit -c /var/www/html/wp-content/plugins/gutenberg/phpunit.xml.dist --verbose
