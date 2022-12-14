@@ -31,6 +31,95 @@ const migrateToTaxQuery = ( attributes ) => {
 	};
 };
 
+const migrateColors = ( attributes, innerBlocks ) => {
+	// Remove color style attributes from the Query block.
+	const { style, backgroundColor, gradient, textColor, ...newAttributes } =
+		attributes;
+
+	const hasColorStyles =
+		backgroundColor ||
+		gradient ||
+		textColor ||
+		style?.color ||
+		style?.elements?.link;
+
+	// If the query block doesn't currently have any color styles,
+	// nothing needs migrating.
+	if ( ! hasColorStyles ) {
+		return [ attributes, innerBlocks ];
+	}
+
+	// Clean color values from style attribute object.
+	if ( style ) {
+		newAttributes.style = cleanEmptyObject( {
+			...style,
+			color: undefined,
+			elements: {
+				...style.elements,
+				link: undefined,
+			},
+		} );
+	}
+
+	// If the inner blocks are already wrapped in a single group
+	// block, add the color support styles to that group block.
+	if ( hasSingleInnerGroupBlock( innerBlocks ) ) {
+		const groupBlock = innerBlocks[ 0 ];
+
+		// Create new styles for the group block.
+		const hasStyles =
+			style?.color ||
+			style?.elements?.link ||
+			groupBlock.attributes.style;
+
+		const newStyles = hasStyles
+			? cleanEmptyObject( {
+					...groupBlock.attributes.style,
+					color: style?.color,
+					elements: style?.elements?.link
+						? { link: style?.elements?.link }
+						: undefined,
+			  } )
+			: undefined;
+
+		// Create a new Group block from the original.
+		const updatedGroupBlock = createBlock(
+			'core/group',
+			{
+				...groupBlock.attributes,
+				backgroundColor,
+				gradient,
+				textColor,
+				style: newStyles,
+			},
+			groupBlock.innerBlocks
+		);
+
+		return [ newAttributes, [ updatedGroupBlock ] ];
+	}
+
+	// When we don't have a single wrapping group block for the inner
+	// blocks, wrap the current inner blocks in a group applying the
+	// color styles to that.
+	const newGroupBlock = createBlock(
+		'core/group',
+		{
+			backgroundColor,
+			gradient,
+			textColor,
+			style: cleanEmptyObject( {
+				color: style?.color,
+				elements: style?.elements?.link
+					? { link: style?.elements?.link }
+					: undefined,
+			} ),
+		},
+		innerBlocks
+	);
+
+	return [ newAttributes, [ newGroupBlock ] ];
+};
+
 const hasSingleInnerGroupBlock = ( innerBlocks = [] ) =>
 	innerBlocks.length === 1 && innerBlocks[ 0 ].name === 'core/group';
 
@@ -127,7 +216,10 @@ const v2 = {
 	},
 	isEligible: ( { query: { categoryIds, tagIds } = {} } ) =>
 		categoryIds || tagIds,
-	migrate: migrateToTaxQuery,
+	migrate( attributes, innerBlocks ) {
+		const withTaxQuery = migrateToTaxQuery( attributes );
+		return migrateColors( withTaxQuery, innerBlocks );
+	},
 	save( { attributes: { tagName: Tag = 'div' } } ) {
 		const blockProps = useBlockProps.save();
 		const innerBlocksProps = useInnerBlocksProps.save( blockProps );
@@ -196,99 +288,7 @@ const v3 = {
 			style?.elements?.link
 		);
 	},
-	migrate: ( attributes, innerBlocks ) => {
-		// Remove color style attributes from the Query block.
-		const {
-			style,
-			backgroundColor,
-			gradient,
-			textColor,
-			...newAttributes
-		} = attributes;
-
-		const hasColorStyles =
-			backgroundColor ||
-			gradient ||
-			textColor ||
-			style?.color ||
-			style?.elements?.link;
-
-		// If the query block doesn't currently have any color styles,
-		// nothing needs migrating.
-		if ( ! hasColorStyles ) {
-			return [ attributes, innerBlocks ];
-		}
-
-		// Clean color values from style attribute object.
-		if ( style ) {
-			newAttributes.style = cleanEmptyObject( {
-				...style,
-				color: undefined,
-				elements: {
-					...style.elements,
-					link: undefined,
-				},
-			} );
-		}
-
-		// If the inner blocks are already wrapped in a single group
-		// block, add the color support styles to that group block.
-		if ( hasSingleInnerGroupBlock( innerBlocks ) ) {
-			const groupBlock = innerBlocks[ 0 ];
-
-			// Create new styles for the group block.
-			const hasStyles =
-				style?.color ||
-				style?.elements?.link ||
-				groupBlock.attributes.style;
-
-			const newStyles = hasStyles
-				? cleanEmptyObject( {
-						...groupBlock.attributes.style,
-						color: style?.color,
-						elements: style?.elements?.link
-							? { link: style?.elements?.link }
-							: undefined,
-				  } )
-				: undefined;
-
-			// Create a new Group block from the original.
-			const updatedGroupBlock = createBlock(
-				'core/group',
-				{
-					...groupBlock.attributes,
-					backgroundColor,
-					gradient,
-					textColor,
-					style: newStyles,
-				},
-				groupBlock.innerBlocks
-			);
-
-			return [ newAttributes, [ updatedGroupBlock ] ];
-		}
-
-		// When we don't have a single wrapping group block for the inner
-		// blocks, wrap the current inner blocks in a group applying the
-		// color styles to that.
-		const newGroupBlock = createBlock(
-			'core/group',
-			{
-				backgroundColor,
-				gradient,
-				textColor,
-				style: cleanEmptyObject( {
-					color: style?.color,
-					elements: style?.elements?.link
-						? { link: style?.elements?.link }
-						: undefined,
-				} ),
-			},
-			innerBlocks
-		);
-
-		return [ newAttributes, [ newGroupBlock ] ];
-	},
+	migrate: migrateColors,
 	save( { attributes: { tagName: Tag = 'div' } } ) {
 		const blockProps = useBlockProps.save();
 		const innerBlocksProps = useInnerBlocksProps.save( blockProps );
