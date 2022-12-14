@@ -32,6 +32,7 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/notices": "file:../notices",
+		"change-case": "^4.1.2",
 		"classnames": "^2.3.1"
 	},
 	"peerDependencies": {

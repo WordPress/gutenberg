@@ -3,6 +3,7 @@
  */
 import { createBlock } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
+import { transformWidgetToBlock, addWidgetIdToBlock } from '@wordpress/widgets';
 
 /**
  * Internal dependencies
@@ -16,7 +17,6 @@ import {
 	buildWidgetAreaPostId,
 	buildWidgetAreasPostId,
 } from './utils';
-import { transformWidgetToBlock } from './transformers';
 
 /**
  * Creates a "stub" widgets post reflecting all available widget areas. The
@@ -93,7 +93,10 @@ export const getWidgets =
 		const groupedBySidebar = {};
 
 		for ( const widget of widgets ) {
-			const block = transformWidgetToBlock( widget );
+			const block = addWidgetIdToBlock(
+				transformWidgetToBlock( widget ),
+				widget.id
+			);
 			groupedBySidebar[ widget.sidebar ] =
 				groupedBySidebar[ widget.sidebar ] || [];
 			groupedBySidebar[ widget.sidebar ].push( block );

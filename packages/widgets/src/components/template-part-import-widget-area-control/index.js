@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { paramCase } from 'change-case';
+
+/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -12,20 +17,20 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
 } from '@wordpress/components';
-import {
-	switchToBlockType,
-	getPossibleBlockTransformations,
-} from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
+import { serialize } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import { useCreateTemplatePartFromBlocks } from './utils/hooks';
-import { transformWidgetToBlock } from './utils/transformers';
+import { transformWidgetToBlock } from '../../utils';
+import legacyWidgetTransforms from '../../blocks/legacy-widget/transforms';
 
-export function TemplatePartImportControls( { area, setAttributes } ) {
+export default function TemplatePartImportWidgetAreaControl( {
+	area,
+	setAttributes,
+} ) {
 	const [ selectedSidebar, setSelectedSidebar ] = useState( '' );
 	const [ isBusy, setIsBusy ] = useState( false );
 
@@ -37,11 +42,7 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 		} );
 	}, [] );
 	const { createErrorNotice } = useDispatch( noticesStore );
-
-	const createFromBlocks = useCreateTemplatePartFromBlocks(
-		area,
-		setAttributes
-	);
+	const { saveEntityRecord } = useDispatch( coreStore );
 
 	const options = useMemo( () => {
 		const sidebarOptions = ( sidebars ?? [] )
@@ -89,45 +90,50 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 
 		const skippedWidgets = new Set();
 		const blocks = widgets.flatMap( ( widget ) => {
-			const block = transformWidgetToBlock( widget );
-
-			if ( block.name !== 'core/legacy-widget' ) {
-				return block;
+			if ( widget.id_base === 'block' ) {
+				return transformWidgetToBlock( widget );
 			}
 
-			const transforms = getPossibleBlockTransformations( [
-				block,
-			] ).filter( ( item ) => {
-				// The block without any transformations can't be a wildcard.
-				if ( ! item.transforms ) {
-					return true;
-				}
+			const attributes = {
+				idBase: widget.id_base,
+				instance: widget.instance,
+			};
 
-				const hasWildCardFrom = item.transforms?.from?.find(
-					( from ) => from.blocks && from.blocks.includes( '*' )
-				);
-				const hasWildCardTo = item.transforms?.to?.find(
-					( to ) => to.blocks && to.blocks.includes( '*' )
-				);
-
-				return ! hasWildCardFrom && ! hasWildCardTo;
-			} );
+			const transform = legacyWidgetTransforms.to.find( ( { isMatch } ) =>
+				isMatch( attributes )
+			);
 
 			// Skip the block if we have no matching transformations.
-			if ( ! transforms.length ) {
+			if ( ! transform ) {
 				skippedWidgets.add( widget.id_base );
 				return [];
 			}
 
-			// Try transforming the Legacy Widget into a first matching block.
-			return switchToBlockType( block, transforms[ 0 ].name );
+			return transform.transform( attributes );
 		} );
 
-		await createFromBlocks(
-			blocks,
+		// TODO: Is all of this necessary? Borrowed it from useCreateTemplatePartFromBlocks().
+		const title = sprintf(
 			/* translators: %s: name of the widget area */
-			sprintf( __( 'Widget area: %s' ), sidebar.label )
+			__( 'Widget area: %s' ),
+			sidebar.label
 		);
+		const record = {
+			title,
+			slug: paramCase( title ).replace( /[^\w-]+/g, '' ),
+			content: serialize( blocks ),
+			area,
+		};
+		const templatePart = await saveEntityRecord(
+			'postType',
+			'wp_template_part',
+			record
+		);
+		setAttributes( {
+			slug: templatePart.slug,
+			theme: templatePart.theme,
+			area: undefined,
+		} );
 
 		if ( skippedWidgets.size ) {
 			createErrorNotice(

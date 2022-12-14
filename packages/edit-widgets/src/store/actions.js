@@ -4,14 +4,16 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as interfaceStore } from '@wordpress/interface';
-import { getWidgetIdFromBlock } from '@wordpress/widgets';
+import {
+	getWidgetIdFromBlock,
+	transformBlockToWidget,
+} from '@wordpress/widgets';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { transformBlockToWidget } from './transformers';
 import {
 	buildWidgetAreaPostId,
 	buildWidgetAreasQuery,
