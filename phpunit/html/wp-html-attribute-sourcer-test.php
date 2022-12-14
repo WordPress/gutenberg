@@ -26,16 +26,16 @@ class WP_HTML_Attribute_Sourcer_Test extends WP_UnitTestCase {
 			array(
 				array( 'attributes' => array( 'link' => 'docs.html' ), 'unparsed' => array() ),
 				<<<EOF
-<main>
-	<section>Just another section</section>
-	<section><div><a href="blah">blah</a></div></section>
-	<p>Stuff</p>
-	<div><a href="blarg">blarg</a></div>
-	<section>Still another section</section>
-	<div><img><a href="image">image</a></div>
-	<section>Still another section</section>
-	<div><a href="docs.html">docs</a></div>
-</main>
+					<main>
+						<section>Just another section</section>
+						<section><div><a href="blah">blah</a></div></section>
+						<p>Stuff</p>
+						<div><a href="blarg">blarg</a></div>
+						<section>Still another section</section>
+						<div><img><a href="image">image</a></div>
+						<section>Still another section</section>
+						<div><a href="docs.html">docs</a></div>
+					</main>
 EOF,
 				array(
 					'link' => array(

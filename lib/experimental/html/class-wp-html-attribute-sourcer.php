@@ -128,37 +128,149 @@ class WP_HTML_Attribute_Sourcer {
 		);
 	}
 
+	public static function select_match( $tags, $s ) {
+		if ( ! empty( $s['tag_name'] ) && strtoupper( $s['tag_name'] ) !== $tags->get_tag() ) {
+			return null;
+		}
+
+		if ( ! empty( $s['class_names'] ) ) {
+			$classes = $tags->get_attribute( 'class' );
+			if ( null === $classes ) {
+				return null;
+			}
+
+			foreach ( $s['class_names'] as $class_name ) {
+				if ( ! preg_match( "~\b{$class_name}\b~", $classes ) ) {
+					return null;
+				}
+			}
+		}
+
+		if ( isset( $s['hash'] ) && $s['identifier'] !== $tags->get_attribute( 'id' ) ) {
+			return null;
+		}
+
+		if ( isset( $s['has_attribute'] ) && null === $tags->get_attribute( $s['has_attribute'] ) ) {
+			return null;
+		}
+
+		return $tags;
+	}
+
 	public static function select( $selectors, $html ) {
 		$tags = new WP_HTML_Processor( $html );
+		if ( ! $tags->next_tag() ) {
+			return null;
+		}
 
-		while ( $tags->next_tag() ) {
-			foreach ( $selectors as $s ) {
-				if ( ! empty( $s['tag_name'] ) && strtoupper( $s['tag_name'] ) !== $tags->get_tag() ) {
+		$tags->set_bookmark( 'start' );
+
+		foreach ( $selectors as $s ) {
+			$tags->seek( 'start' );
+			$max = 100;
+			while ( --$max > 0 ) {
+				$next = $s;
+
+				// This label is probably where some stack-level data should reside.
+				next:
+				// Find the next starting point
+				while ( null === self::select_match( $tags, $next ) && $tags->next_tag() ) {
 					continue;
 				}
 
-				if ( ! empty( $s['class_names'] ) ) {
-					$classes = $tags->get_attribute( 'class' );
-					if ( null === $classes ) {
+				// We're out of possible starting points
+				if ( null === self::select_match( $tags, $next ) ) {
+					continue 2;
+				}
+
+				// No further selectors, then bingo!
+				if ( ! isset( $next['then'] ) ) {
+					return $tags;
+				}
+
+				$next = $next['then'];
+
+				// Adjacent sibling must be the immediately-following element.
+				if ( '+' === $next['combinator'] ) {
+					var_dump( [
+						'msg' => "Processing adjacent sibling",
+						'html' => $html,
+						'tag' => $tags->get_tag(),
+						'selector' => $next
+					] );
+					$state = [];
+					while ( $tags->next_within_balanced_tags( $state ) ) {
 						continue;
 					}
 
-					foreach ( $s['class_names'] as $class_name ) {
-						if ( ! preg_match( "~\b{$class_name}\b~", $classes ) ) {
-							continue 2;
-						}
+					$tags->next_tag();
+					if ( null === self::select_match( $tags, $next ) ) {
+						continue;
 					}
+
+					if ( isset( $next['then'] ) ) {
+						goto next;
+					}
+
+					// @TODO: Recurse here so we can handle more than one level.
+					return $tags;
 				}
 
-				if ( isset( $s['hash'] ) && $s['identifier'] !== $tags->get_attribute( 'id' ) ) {
+				// Child must be one level into current tag.
+				if ( '>' === $next['combinator'] ) {
+					var_dump( [
+						'msg' => "Processing child",
+						'html' => $html,
+						'tag' => $tags->get_tag(),
+						'selector' => $next
+					] );
+					$state = [];
+					while ( $tags->next_within_balanced_tags( $state, null, 1 ) ) {
+						if ( null === self::select_match( $tags, $next ) ) {
+							continue;
+						}
+
+						if ( isset( $next['then'] ) ) {
+							goto next;
+						}
+
+						// @TODO: Recurse here so we can handle more than one level.
+						return $tags;
+					}
+
 					continue;
 				}
 
-				if ( isset( $s['has_attribute'] ) && null === $tags->get_attribute( $s['has_attribute'] ) ) {
+				// Descendant can be anywhere inside current tag.
+				if ( ' ' === $next['combinator'] ) {
+					var_dump( [
+						'msg' => "Processing descendant",
+						'html' => $html,
+						'tag' => $tags->get_tag(),
+						'selector' => $next
+					] );
+					$state = [];
+					while ( $tags->next_within_balanced_tags( $state ) ) {
+						if ( null === self::select_match( $tags, $next ) ) {
+							continue;
+						}
+
+						if ( isset( $next['then'] ) ) {
+							goto next;
+						}
+
+						// @TODO: Recurse here so we can handle more than one level.
+						return $tags;
+					}
+
 					continue;
 				}
 
-				return $tags;
+				// General sibling must be anything at current level.
+				if ( '~' === $next['combinator'] ) {
+					// @TODO: Support this.
+					return null;
+				}
 			}
 		}
 
