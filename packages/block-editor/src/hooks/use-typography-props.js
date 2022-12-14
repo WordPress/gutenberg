@@ -19,22 +19,29 @@ import { getComputedFluidTypographyValue } from '../components/font-sizes/fluid-
  * Provides the CSS class names and inline styles for a block's typography support
  * attributes.
  *
- * @param {Object}  attributes            Block attributes.
- * @param {boolean} isFluidFontSizeActive Whether the function should try to convert font sizes to fluid values.
+ * @param {Object}          attributes              Block attributes.
+ * @param {Object|boolean}  fluidTypographySettings If boolean, whether the function should try to convert font sizes to fluid values,
+ *                                                  otherwise an object containing theme fluid typography settings.
  *
  * @return {Object} Typography block support derived CSS classes & styles.
  */
 export function getTypographyClassesAndStyles(
 	attributes,
-	isFluidFontSizeActive
+	fluidTypographySettings = {}
 ) {
 	let typographyStyles = attributes?.style?.typography || {};
 
-	if ( isFluidFontSizeActive ) {
+	if ( !! fluidTypographySettings ) {
 		typographyStyles = {
 			...typographyStyles,
 			fontSize: getComputedFluidTypographyValue( {
 				fontSize: attributes?.style?.typography?.fontSize,
+				minimumViewPortWidth: fluidTypographySettings?.minViewPortWidth,
+				maximumViewPortWidth: fluidTypographySettings?.maxViewPortWidth,
+				scaleFactor: fluidTypographySettings?.scaleFactor,
+				minimumFontSizeFactor:
+					fluidTypographySettings?.minFontSizeFactor,
+				minimumFontSizeLimit: fluidTypographySettings?.minFontSize,
 			} ),
 		};
 	}

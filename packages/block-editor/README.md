@@ -521,7 +521,7 @@ attributes.
 _Parameters_
 
 -   _attributes_ `Object`: Block attributes.
--   _isFluidFontSizeActive_ `boolean`: Whether the function should try to convert font sizes to fluid values.
+-   _fluidTypographySettings_ `Object|boolean`: If boolean, whether the function should try to convert font sizes to fluid values, otherwise an object containing theme fluid typography settings.
 
 _Returns_
 

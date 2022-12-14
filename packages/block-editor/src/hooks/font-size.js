@@ -329,8 +329,8 @@ function addEditPropsForFluidCustomFontSizes( blockType ) {
 				?.typography?.fluid;
 
 		const fluidTypographySettings =
-			typeof fluidTypographyConfig?.fluid === 'object'
-				? fluidTypographyConfig?.fluid
+			typeof fluidTypographyConfig === 'object'
+				? fluidTypographyConfig
 				: {};
 
 		const newFontSize =
@@ -343,9 +343,9 @@ function addEditPropsForFluidCustomFontSizes( blockType ) {
 							fluidTypographySettings?.maxViewPortWidth,
 						scaleFactor: fluidTypographySettings?.scaleFactor,
 						minimumFontSizeFactor:
-							fluidTypographySettings?.minViewPortWidth,
-						maximumFontSizeFactor:
-							fluidTypographySettings?.maxFontSizeFactor,
+							fluidTypographySettings?.minFontSizeFactor,
+						minimumFontSizeLimit:
+							fluidTypographySettings?.minFontSize,
 				  } )
 				: null;
 
