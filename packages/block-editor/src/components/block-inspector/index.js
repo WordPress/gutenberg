@@ -185,11 +185,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			}
 			return null;
 		},
-		[
-			selectedBlockClientId,
-			isOffCanvasNavigationEditorEnabled,
-			blockType.name,
-		]
+		[ selectedBlockClientId, isOffCanvasNavigationEditorEnabled, blockType ]
 	);
 
 	if ( count > 1 ) {
