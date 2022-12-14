@@ -123,6 +123,7 @@ export default function QuickInserter( {
 					maxBlockTypes={ SHOWN_BLOCK_TYPES }
 					isDraggable={ false }
 					prioritizePatterns={ prioritizePatterns }
+					selectBlockOnInsert={ selectBlockOnInsert }
 				/>
 			</div>
 
