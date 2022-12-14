@@ -34,7 +34,7 @@ import {
 import { useEffect, useRef, useMemo } from '@wordpress/element';
 import { Button, __unstableMotion as motion } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, debounce } from '@wordpress/compose';
 import { arrowLeft } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { parse } from '@wordpress/blocks';
@@ -55,13 +55,24 @@ function MaybeIframe( {
 	style,
 } ) {
 	const ref = useMouseMoveTypingReset();
+	const isBlockInterfaceHidden = useSelect( ( select ) => {
+		const { __experimentalIsBlockInterfaceHidden } =
+			select( blockEditorStore );
+		return __experimentalIsBlockInterfaceHidden();
+	} );
+
 	const { __experimentalShowBlockInterface: showBlockInterface } =
 		useDispatch( blockEditorStore );
 	function handleMouseOver( e ) {
-		if ( e?.target?.classList.contains( 'editor-styles-wrapper' ) ) {
+		if (
+			isBlockInterfaceHidden &&
+			( e?.target?.classList.contains( 'editor-styles-wrapper' ) ||
+				e?.target?.classList.contains( 'is-root-container' ) )
+		) {
 			showBlockInterface();
 		}
 	}
+
 	if ( ! shouldIframe ) {
 		return (
 			<>
@@ -71,7 +82,7 @@ function MaybeIframe( {
 					className="editor-styles-wrapper"
 					style={ { flex: '1', ...style } }
 					tabIndex={ -1 }
-					onMouseOver={ handleMouseOver }
+					onMouseOver={ debounce( handleMouseOver, 200 ) }
 				>
 					{ children }
 				</WritingFlow>
