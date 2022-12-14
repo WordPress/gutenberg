@@ -173,17 +173,26 @@ export function usePasteHandler( props ) {
 				files?.length &&
 				! shouldDismissPastedFiles( files, html, plainText )
 			) {
-				const transformation = findTransform(
-					getBlockTransforms( 'from' ),
-					( transform ) =>
-						transform.type === 'files' && transform.isMatch( files )
-				);
-
-				if ( ! transformation ) {
+				const fromTransforms = getBlockTransforms( 'from' );
+				const blocks = files
+					.reduce( ( accumulator, file ) => {
+						const transformation = findTransform(
+							fromTransforms,
+							( transform ) =>
+								transform.type === 'files' &&
+								transform.isMatch( [ file ] )
+						);
+						if ( transformation ) {
+							accumulator.push(
+								transformation.transform( [ file ] )
+							);
+						}
+						return accumulator;
+					}, [] )
+					.flat();
+				if ( ! blocks.length ) {
 					return;
 				}
-
-				const blocks = transformation.transform( files );
 
 				if ( onReplace && isEmpty( value ) ) {
 					onReplace( blocks );
