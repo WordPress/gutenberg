@@ -557,22 +557,18 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	/**
 	 * Tests that custom font sizes are converted to fluid values
 	 * in inline block supports styles,
-	 * when "settings.typography.fluid" is set to `true`.
+	 * when "settings.typography.fluid" is set to `true` or contains configured values.
 	 *
 	 * @covers ::gutenberg_register_typography_support
 	 *
 	 * @dataProvider data_generate_block_supports_font_size_fixtures
 	 *
-	 * @param string $font_size_value             The block supports custom font size value.
-	 * @param bool   $should_use_fluid_typography An override to switch fluid typography "on". Can be used for unit testing.
-	 * @param string $expected_output             Expected value of style property from gutenberg_apply_typography_support().
+	 * @param string $font_size_value The block supports custom font size value.
+	 * @param string $theme_slug      A theme slug corresponding to an available test theme.
+	 * @param string $expected_output Expected value of style property from gutenberg_apply_typography_support().
 	 */
-	public function test_should_covert_font_sizes_to_fluid_values( $font_size_value, $should_use_fluid_typography, $expected_output ) {
-		if ( $should_use_fluid_typography ) {
-			switch_theme( 'block-theme-child-with-fluid-typography' );
-		} else {
-			switch_theme( 'default' );
-		}
+	public function test_should_covert_font_sizes_to_fluid_values( $font_size_value, $theme_slug, $expected_output ) {
+		switch_theme( $theme_slug );
 
 		$this->test_block_name = 'test/font-size-fluid-value';
 		register_block_type(
@@ -614,20 +610,30 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	 */
 	public function data_generate_block_supports_font_size_fixtures() {
 		return array(
-			'returns value when fluid typography is not active'          => array(
-				'font_size_value'             => '50px',
-				'should_use_fluid_typography' => false,
-				'expected_output'             => 'font-size:50px;',
+			'returns value when fluid typography is not active' => array(
+				'font_size_value' => '15px',
+				'theme_slug'      => 'default',
+				'expected_output' => 'font-size:15px;',
 			),
-			'returns clamp value using custom fluid config'              => array(
-				'font_size_value'             => '50px',
-				'should_use_fluid_typography' => true,
-				'expected_output'             => 'font-size:clamp(40px, 2.5rem + ((1vw - 10px) * 2), 50px);',
+			'returns clamp value using default config' => array(
+				'font_size_value' => '15px',
+				'theme_slug'      => 'block-theme-child-with-fluid-typography',
+				'expected_output' => 'font-size:clamp(14px, 0.875rem + ((1vw - 7.68px) * 0.12), 15px);',
+			),
+			'returns value when font size <= default min font size bound' => array(
+				'font_size_value' => '13px',
+				'theme_slug'      => 'block-theme-child-with-fluid-typography',
+				'expected_output' => 'font-size:13px;',
+			),
+			'returns clamp value using custom fluid config' => array(
+				'font_size_value' => '17px',
+				'theme_slug'      => 'block-theme-child-with-fluid-typography-config',
+				'expected_output' => 'font-size:clamp(16px, 1rem + ((1vw - 7.68px) * 0.12), 17px);',
 			),
 			'returns value when font size <= custom min font size bound' => array(
-				'font_size_value'             => '15px',
-				'should_use_fluid_typography' => true,
-				'expected_output'             => 'font-size:15px;',
+				'font_size_value' => '15px',
+				'theme_slug'      => 'block-theme-child-with-fluid-typography-config',
+				'expected_output' => 'font-size:15px;',
 			),
 		);
 	}
@@ -685,7 +691,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'block_content'               => '<h2 class="has-vivid-red-background-color has-background has-link-color" style="margin-top:var(--wp--preset--spacing--60);font-size:4rem;font-style:normal;font-weight:600;letter-spacing:29px;text-decoration:underline;text-transform:capitalize">This is a heading</h2>',
 				'font_size_value'             => '4rem',
 				'should_use_fluid_typography' => true,
-				'expected_output'             => '<h2 class="has-vivid-red-background-color has-background has-link-color" style="margin-top:var(--wp--preset--spacing--60);font-size:clamp(3.2rem, 3.2rem + ((1vw - 0.625rem) * 2.56), 4rem);font-style:normal;font-weight:600;letter-spacing:29px;text-decoration:underline;text-transform:capitalize">This is a heading</h2>',
+				'expected_output'             => '<h2 class="has-vivid-red-background-color has-background has-link-color" style="margin-top:var(--wp--preset--spacing--60);font-size:clamp(3rem, 3rem + ((1vw - 0.48rem) * 1.923), 4rem);font-style:normal;font-weight:600;letter-spacing:29px;text-decoration:underline;text-transform:capitalize">This is a heading</h2>',
 			),
 			'return_content_if_no_inline_font_size_found'  => array(
 				'block_content'               => '<p class="has-medium-font-size" style="font-style:normal;font-weight:600;letter-spacing:29px;">A paragraph inside a group</p>',
@@ -703,13 +709,13 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'block_content'               => '<p class="has-medium-font-size" style="    font-size:   20px   ;    ">A paragraph inside a group</p>',
 				'font_size_value'             => '20px',
 				'should_use_fluid_typography' => true,
-				'expected_output'             => '<p class="has-medium-font-size" style="    font-size:clamp(16px, 1rem + ((1vw - 10px) * 0.8), 20px);    ">A paragraph inside a group</p>',
+				'expected_output'             => '<p class="has-medium-font-size" style="    font-size:clamp(15px, 0.938rem + ((1vw - 7.68px) * 0.601), 20px);    ">A paragraph inside a group</p>',
 			),
 			'return_content_with_first_match_replace_only' => array(
 				'block_content'               => "<div class=\"wp-block-group\" style=\"font-size:1.5em\"> \n \n<p style=\"font-size:1.5em\">A paragraph inside a group</p></div>",
 				'font_size_value'             => '1.5em',
 				'should_use_fluid_typography' => true,
-				'expected_output'             => "<div class=\"wp-block-group\" style=\"font-size:clamp(1.2em, 1.2rem + ((1vw - 0.625em) * 0.96), 1.5em);\"> \n \n<p style=\"font-size:1.5em\">A paragraph inside a group</p></div>",
+				'expected_output'             => "<div class=\"wp-block-group\" style=\"font-size:clamp(1.125em, 1.125rem + ((1vw - 0.48em) * 0.721), 1.5em);\"> \n \n<p style=\"font-size:1.5em\">A paragraph inside a group</p></div>",
 			),
 		);
 	}

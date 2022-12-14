@@ -344,18 +344,14 @@ describe( 'typography utils', () => {
 			{
 				message: 'should return clamp value using custom fluid config',
 				preset: {
-					size: '50px',
+					size: '17px',
 				},
 				typographySettings: {
 					fluid: {
-						minViewPortWidth: '1000px',
-						maxViewPortWidth: '2000px',
-						scaleFactor: 2,
-						minFontSizeFactor: 0.8,
 						minFontSize: '16px',
 					},
 				},
-				expected: 'clamp(40px, 2.5rem + ((1vw - 10px) * 2), 50px)',
+				expected: 'clamp(16px, 1rem + ((1vw - 7.68px) * 0.12), 17px)',
 			},
 
 			{
@@ -366,10 +362,6 @@ describe( 'typography utils', () => {
 				},
 				typographySettings: {
 					fluid: {
-						minViewPortWidth: '1000px',
-						maxViewPortWidth: '2000px',
-						scaleFactor: 2,
-						minFontSizeFactor: 0.8,
 						minFontSize: '16px',
 					},
 				},

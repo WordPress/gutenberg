@@ -3,7 +3,9 @@
 	"settings": {
 		"appearanceTools": true,
 		"typography": {
-			"fluid": true
+			"fluid": {
+				"minFontSize": "16px"
+			}
 		}
 	}
 }

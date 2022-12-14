@@ -234,12 +234,8 @@
 						"blockGap": {
 							"description": "Enables `--wp--style--block-gap` to be generated from styles.spacing.blockGap.\nA value of `null` instead of `false` further disables layout styles from being generated.",
 							"oneOf": [
-								{
-									"type": "boolean"
-								},
-								{
-									"type": "null"
-								}
+								{ "type": "boolean" },
+								{ "type": "null" }
 							],
 							"default": null
 						},
@@ -362,22 +358,6 @@
 								{
 									"type": "object",
 									"properties": {
-										"maxViewPortWidth": {
-											"description": "Allow users to set custom a max viewport width in px, rem or em, used to set the maximum size boundary of a fluid font.",
-											"type": "string"
-										},
-										"minViewPortWidth": {
-											"description": "Allow users to set a custom min viewport width in px, rem or em, used to set the minimum size boundary of a fluid font",
-											"type": "string"
-										},
-										"minFontSizeFactor": {
-											"description": "Used to calculate a minimum font size from a single size value, where `fluidSize.min` is not set.",
-											"type": "number"
-										},
-										"scaleFactor": {
-											"description": "Determines the rate of font size change between the minimum and maximum font sizes. The higher the value the faster the change.",
-											"type": "number"
-										},
 										"minFontSize": {
 											"description": "Allow users to set a global minimum font size boundary in px, rem or em. Custom font sizes below this value will not be clamped, and all calculated minimum font sizes will be, a at minimum, this value.",
 											"type": "string"
@@ -594,27 +574,13 @@
 		},
 		"settingsProperties": {
 			"allOf": [
-				{
-					"$ref": "#/definitions/settingsPropertiesAppearanceTools"
-				},
-				{
-					"$ref": "#/definitions/settingsPropertiesBorder"
-				},
-				{
-					"$ref": "#/definitions/settingsPropertiesColor"
-				},
-				{
-					"$ref": "#/definitions/settingsPropertiesLayout"
-				},
-				{
-					"$ref": "#/definitions/settingsPropertiesSpacing"
-				},
-				{
-					"$ref": "#/definitions/settingsPropertiesTypography"
-				},
-				{
-					"$ref": "#/definitions/settingsPropertiesCustom"
-				}
+				{ "$ref": "#/definitions/settingsPropertiesAppearanceTools" },
+				{ "$ref": "#/definitions/settingsPropertiesBorder" },
+				{ "$ref": "#/definitions/settingsPropertiesColor" },
+				{ "$ref": "#/definitions/settingsPropertiesLayout" },
+				{ "$ref": "#/definitions/settingsPropertiesSpacing" },
+				{ "$ref": "#/definitions/settingsPropertiesTypography" },
+				{ "$ref": "#/definitions/settingsPropertiesCustom" }
 			]
 		},
 		"settingsPropertiesComplete": {
@@ -676,21 +642,13 @@
 								}
 							}
 						},
-						{
-							"$ref": "#/definitions/settingsPropertiesColor"
-						},
-						{
-							"$ref": "#/definitions/settingsPropertiesLayout"
-						},
-						{
-							"$ref": "#/definitions/settingsPropertiesSpacing"
-						},
+						{ "$ref": "#/definitions/settingsPropertiesColor" },
+						{ "$ref": "#/definitions/settingsPropertiesLayout" },
+						{ "$ref": "#/definitions/settingsPropertiesSpacing" },
 						{
 							"$ref": "#/definitions/settingsPropertiesTypography"
 						},
-						{
-							"$ref": "#/definitions/settingsPropertiesCustom"
-						}
+						{ "$ref": "#/definitions/settingsPropertiesCustom" }
 					]
 				},
 				"core/buttons": {

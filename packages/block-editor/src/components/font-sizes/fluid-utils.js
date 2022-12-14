@@ -48,19 +48,13 @@ export function getComputedFluidTypographyValue( {
 	minimumFontSize,
 	maximumFontSize,
 	fontSize,
-	minimumViewPortWidth,
-	maximumViewPortWidth,
+	minimumViewPortWidth = DEFAULT_MINIMUM_VIEWPORT_WIDTH,
+	maximumViewPortWidth = DEFAULT_MAXIMUM_VIEWPORT_WIDTH,
 	scaleFactor = DEFAULT_SCALE_FACTOR,
 	minimumFontSizeFactor = DEFAULT_MINIMUM_FONT_SIZE_FACTOR,
 	minimumFontSizeLimit,
 } ) {
-	// Defaults.
-	minimumViewPortWidth = !! getTypographyValueAndUnit( minimumViewPortWidth )
-		? minimumViewPortWidth
-		: DEFAULT_MINIMUM_VIEWPORT_WIDTH;
-	maximumViewPortWidth = !! getTypographyValueAndUnit( maximumViewPortWidth )
-		? maximumViewPortWidth
-		: DEFAULT_MAXIMUM_VIEWPORT_WIDTH;
+	// Validate incoming settings and set defaults.
 	minimumFontSizeLimit = !! getTypographyValueAndUnit( minimumFontSizeLimit )
 		? minimumFontSizeLimit
 		: DEFAULT_MINIMUM_FONT_SIZE_LIMIT;

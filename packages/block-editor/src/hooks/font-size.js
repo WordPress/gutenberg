@@ -337,13 +337,6 @@ function addEditPropsForFluidCustomFontSizes( blockType ) {
 			fontSize && !! fluidTypographyConfig
 				? getComputedFluidTypographyValue( {
 						fontSize,
-						minimumViewPortWidth:
-							fluidTypographySettings?.minViewPortWidth,
-						maximumViewPortWidth:
-							fluidTypographySettings?.maxViewPortWidth,
-						scaleFactor: fluidTypographySettings?.scaleFactor,
-						minimumFontSizeFactor:
-							fluidTypographySettings?.minFontSizeFactor,
 						minimumFontSizeLimit:
 							fluidTypographySettings?.minFontSize,
 				  } )
