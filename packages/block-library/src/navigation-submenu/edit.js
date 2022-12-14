@@ -43,7 +43,11 @@ import { name } from './block.json';
 import { LinkUI } from '../navigation-link/link-ui';
 import { updateAttributes } from '../navigation-link/update-attributes';
 
-const ALLOWED_BLOCKS = [ 'core/navigation-link', 'core/navigation-submenu' ];
+const ALLOWED_BLOCKS = [
+	'core/navigation-link',
+	'core/navigation-submenu',
+	'core/page-list',
+];
 
 const DEFAULT_BLOCK = {
 	name: 'core/navigation-link',
