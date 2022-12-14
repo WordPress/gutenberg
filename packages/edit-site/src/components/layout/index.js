@@ -177,7 +177,7 @@ export default function Layout( { onError } ) {
 								as={ motion.div }
 								initial={ { y: -60 } }
 								animate={ { y: 0 } }
-								edit={ { y: -60 } }
+								exit={ { y: -60 } }
 								transition={ {
 									type: 'tween',
 									duration: disableMotion
