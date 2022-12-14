@@ -89,7 +89,7 @@ jobs:
                   npm run wp-env run phpunit "php --version"
                   npm run wp-env run phpunit "php -m"
                   npm run wp-env run phpunit "php -i"
-                  npm run wp-env run composer "install --no-interaction"
+                  npm run wp-env run composer "--version"
                   npm run wp-env run phpunit "/usr/local/bin/phpunit --version"
                   npm run wp-env run phpunit "locale -a"
 
