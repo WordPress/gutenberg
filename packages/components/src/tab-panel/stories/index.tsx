@@ -43,6 +43,7 @@ DisabledTab.args = {
 		{
 			name: 'tab1',
 			title: 'Tab 1',
+			disabled: true,
 		},
 		{
 			name: 'tab2',
@@ -51,7 +52,6 @@ DisabledTab.args = {
 		{
 			name: 'tab3',
 			title: 'Tab 3',
-			disabled: true,
 		},
 	],
 };

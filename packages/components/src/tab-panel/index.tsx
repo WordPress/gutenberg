@@ -104,10 +104,25 @@ export function TabPanel( {
 	const selectedId = `${ instanceId }-${ selectedTab?.name ?? 'none' }`;
 
 	useEffect( () => {
-		if ( ! selectedTab?.name && tabs.length > 0 ) {
-			handleTabSelection( initialTabName || tabs[ 0 ].name );
+		const firstEnabledTab = tabs.find( ( tab ) => ! tab.disabled );
+		const initialTab = tabs.find( ( tab ) => tab.name === initialTabName );
+		if ( ! selectedTab?.name && firstEnabledTab ) {
+			handleTabSelection(
+				initialTab && ! initialTab.disabled
+					? initialTab.name
+					: firstEnabledTab.name
+			);
 		}
-	}, [ tabs, selectedTab?.name, initialTabName, handleTabSelection ] );
+		if ( selectedTab?.disabled && firstEnabledTab ) {
+			handleTabSelection( firstEnabledTab.name );
+		}
+	}, [
+		tabs,
+		selectedTab?.name,
+		selectedTab?.disabled,
+		initialTabName,
+		handleTabSelection,
+	] );
 
 	return (
 		<div className={ className }>
