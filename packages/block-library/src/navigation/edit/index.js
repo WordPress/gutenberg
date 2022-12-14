@@ -717,13 +717,13 @@ function Navigation( {
 		return (
 			<TagName { ...blockProps }>
 				<MenuInspectorControls
+					clientId={ clientId }
 					createNavigationMenuIsSuccess={
 						createNavigationMenuIsSuccess
 					}
 					createNavigationMenuIsError={ createNavigationMenuIsError }
 					currentMenuId={ ref }
 					isNavigationMenuMissing={ isNavigationMenuMissing }
-					innerBlocks={ innerBlocks }
 					isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
 					onCreateNew={ createUntitledEmptyNavigationMenu }
 					onSelectClassicMenu={ onSelectClassicMenu }
@@ -759,12 +759,12 @@ function Navigation( {
 		return (
 			<TagName { ...blockProps }>
 				<MenuInspectorControls
+					clientId={ clientId }
 					createNavigationMenuIsSuccess={
 						createNavigationMenuIsSuccess
 					}
 					createNavigationMenuIsError={ createNavigationMenuIsError }
 					isNavigationMenuMissing={ isNavigationMenuMissing }
-					innerBlocks={ innerBlocks }
 					isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
 					onCreateNew={ createUntitledEmptyNavigationMenu }
 					onSelectClassicMenu={ onSelectClassicMenu }
@@ -832,13 +832,13 @@ function Navigation( {
 		<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
 			<RecursionProvider uniqueId={ recursionId }>
 				<MenuInspectorControls
+					clientId={ clientId }
 					createNavigationMenuIsSuccess={
 						createNavigationMenuIsSuccess
 					}
 					createNavigationMenuIsError={ createNavigationMenuIsError }
 					currentMenuId={ ref }
 					isNavigationMenuMissing={ isNavigationMenuMissing }
-					innerBlocks={ innerBlocks }
 					isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
 					onCreateNew={ createUntitledEmptyNavigationMenu }
 					onSelectClassicMenu={ onSelectClassicMenu }

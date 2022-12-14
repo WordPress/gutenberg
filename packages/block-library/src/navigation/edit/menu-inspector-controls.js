@@ -4,8 +4,10 @@
 import {
 	__experimentalOffCanvasEditor as OffCanvasEditor,
 	InspectorControls,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { PanelBody, VisuallyHidden } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -15,10 +17,10 @@ import ManageMenusButton from './manage-menus-button';
 import NavigationMenuSelector from './navigation-menu-selector';
 
 const MenuInspectorControls = ( {
+	clientId,
 	createNavigationMenuIsSuccess,
 	createNavigationMenuIsError,
 	currentMenuId = null,
-	innerBlocks,
 	isManageMenusButtonDisabled,
 	onCreateNew,
 	onSelectClassicMenu,
@@ -31,6 +33,14 @@ const MenuInspectorControls = ( {
 		: undefined;
 	/* translators: %s: The name of a menu. */
 	const actionLabel = __( "Switch to '%s'" );
+
+	const clientIdsTree = useSelect(
+		( select ) => {
+			const { __unstableGetClientIdsTree } = select( blockEditorStore );
+			return __unstableGetClientIdsTree( clientId );
+		},
+		[ clientId ]
+	);
 
 	return (
 		<InspectorControls __experimentalGroup={ menuControlsSlot }>
@@ -60,7 +70,7 @@ const MenuInspectorControls = ( {
 					/>
 					{ isOffCanvasNavigationEditorEnabled ? (
 						<OffCanvasEditor
-							blocks={ innerBlocks }
+							blocks={ clientIdsTree }
 							isExpanded={ true }
 							selectBlockInCanvas={ false }
 						/>
