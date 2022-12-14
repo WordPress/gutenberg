@@ -522,7 +522,8 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		$this->theme_json    = WP_Theme_JSON_Schema::migrate( $theme_json );
-		$valid_block_names   = array_keys( static::get_blocks_metadata() );
+		$registry            = WP_Block_Type_Registry::get_instance();
+		$valid_block_names   = array_keys( $registry->get_all_registered() );
 		$valid_element_names = array_keys( static::ELEMENTS );
 		$theme_json          = static::sanitize( $this->theme_json, $valid_block_names, $valid_element_names );
 		$this->theme_json    = static::maybe_opt_in_into_settings( $theme_json );
