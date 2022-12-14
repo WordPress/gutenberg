@@ -160,7 +160,8 @@ describe( 'TabPanel', () => {
 		expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
 	} );
 
-	it( 'should disable the tab when `disabled` is true', () => {
+	it( 'should disable the tab when `disabled` is true', async () => {
+		const user = setupUser();
 		const mockOnSelect = jest.fn();
 
 		render(
@@ -183,6 +184,13 @@ describe( 'TabPanel', () => {
 			'aria-disabled',
 			'true'
 		);
+
+		// onSelect gets called on the initial render.
+		expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+
+		// onSelect should not be called since the disabled tab is highlighted, but not selected.
+		await user.keyboard( '[ArrowLeft]' );
+		expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'should select the first enabled tab when the inital tab is disabled', () => {
