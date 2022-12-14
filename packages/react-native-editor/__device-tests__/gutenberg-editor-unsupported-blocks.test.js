@@ -3,7 +3,8 @@
  */
 import testData from './helpers/test-data';
 
-describe( 'Gutenberg Editor Unsupported Block Editor Tests', () => {
+// Disabled for now see https://github.com/wordpress-mobile/gutenberg-mobile/issues/5321
+describe.skip( 'Gutenberg Editor Unsupported Block Editor Tests', () => {
 	it( 'should be able to open the unsupported block web view editor', async () => {
 		await editorPage.setHtmlContent( testData.unsupportedBlockHtml );
 
