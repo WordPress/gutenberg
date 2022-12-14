@@ -7,7 +7,10 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { forwardRef, useEffect } from '@wordpress/element';
-import { __unstableUseNavigateRegions as useNavigateRegions } from '@wordpress/components';
+import {
+	__unstableUseNavigateRegions as useNavigateRegions,
+	__unstableMotion as motion,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs } from '@wordpress/compose';
 
@@ -40,10 +43,11 @@ function InterfaceSkeleton(
 		secondarySidebar,
 		notices,
 		content,
-		drawer,
 		actions,
 		labels,
 		className,
+		// Todo: does this need to be a prop.
+		// Can we use a dependency to keyboard-shortcuts directly?
 		shortcuts,
 	},
 	ref
@@ -53,8 +57,6 @@ function InterfaceSkeleton(
 	useHTMLClass( 'interface-interface-skeleton__html-container' );
 
 	const defaultLabels = {
-		/* translators: accessibility text for the nav bar landmark region. */
-		drawer: __( 'Drawer' ),
 		/* translators: accessibility text for the top bar landmark region. */
 		header: __( 'Header' ),
 		/* translators: accessibility text for the content landmark region. */
@@ -90,25 +92,16 @@ function InterfaceSkeleton(
 				!! footer && 'has-footer'
 			) }
 		>
-			{ !! drawer && (
-				<NavigableRegion
-					className="interface-interface-skeleton__drawer"
-					ariaLabel={ mergedLabels.drawer }
-				>
-					{ drawer }
-				</NavigableRegion>
-			) }
 			<div className="interface-interface-skeleton__editor">
 				{ !! header && isDistractionFree && (
 					<NavigableRegion
+						as={ motion.div }
 						className="interface-interface-skeleton__header"
 						aria-label={ mergedLabels.header }
-						motionProps={ {
-							initial: isDistractionFree ? 'hidden' : 'hover',
-							whileHover: 'hover',
-							variants: headerVariants,
-							transition: { type: 'tween', delay: 0.8 },
-						} }
+						initial={ isDistractionFree ? 'hidden' : 'hover' }
+						whileHover="hover"
+						variants={ headerVariants }
+						transition={ { type: 'tween', delay: 0.8 } }
 					>
 						{ header }
 					</NavigableRegion>

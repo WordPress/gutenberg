@@ -14,18 +14,18 @@ import {
 	useMemo,
 } from '@wordpress/element';
 import {
-	__experimentalOffCanvasEditor as OffCanvasEditor,
 	InspectorControls,
 	useBlockProps,
 	__experimentalRecursionProvider as RecursionProvider,
 	__experimentalUseHasRecursion as useHasRecursion,
 	store as blockEditorStore,
 	withColors,
-	PanelColorSettings,
 	ContrastChecker,
 	getColorClassName,
 	Warning,
+	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
+	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 
@@ -37,8 +37,6 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	Button,
 	Spinner,
-	__experimentalHStack as HStack,
-	__experimentalHeading as Heading,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
@@ -53,7 +51,6 @@ import useNavigationEntities from '../use-navigation-entities';
 import Placeholder from './placeholder';
 import ResponsiveWrapper from './responsive-wrapper';
 import NavigationInnerBlocks from './inner-blocks';
-import NavigationMenuSelector from './navigation-menu-selector';
 import NavigationMenuNameControl from './navigation-menu-name-control';
 import UnsavedInnerBlocks from './unsaved-inner-blocks';
 import NavigationMenuDeleteControl from './navigation-menu-delete-control';
@@ -69,6 +66,7 @@ import useCreateNavigationMenu from './use-create-navigation-menu';
 import { useInnerBlocks } from './use-inner-blocks';
 import { detectColors } from './utils';
 import ManageMenusButton from './manage-menus-button';
+import MenuInspectorControls from './menu-inspector-controls';
 
 function Navigation( {
 	attributes,
@@ -286,18 +284,37 @@ function Navigation( {
 			! hasResolvedNavigationMenus ||
 			isConvertingClassicMenu ||
 			fallbackNavigationMenus?.length > 0 ||
-			classicMenus?.length !== 1
+			! classicMenus?.length
 		) {
 			return;
 		}
 
 		// If there's non fallback navigation menus and
-		// only one classic menu then create a new navigation menu based on it.
-		convertClassicMenu(
-			classicMenus[ 0 ].id,
-			classicMenus[ 0 ].name,
-			'publish'
+		// a classic menu with a `primary` location or slug,
+		// then create a new navigation menu based on it.
+		// Otherwise, use the most recently created classic menu.
+		const primaryMenus = classicMenus.filter(
+			( classicMenu ) =>
+				classicMenu.locations.includes( 'primary' ) ||
+				classicMenu.slug === 'primary'
 		);
+
+		if ( primaryMenus.length ) {
+			convertClassicMenu(
+				primaryMenus[ 0 ].id,
+				primaryMenus[ 0 ].name,
+				'publish'
+			);
+		} else {
+			classicMenus.sort( ( a, b ) => {
+				return b.id - a.id;
+			} );
+			convertClassicMenu(
+				classicMenus[ 0 ].id,
+				classicMenus[ 0 ].name,
+				'publish'
+			);
+		}
 	}, [ hasResolvedNavigationMenus ] );
 
 	const navRef = useRef();
@@ -394,6 +411,23 @@ function Navigation( {
 		if ( focusNavigationBlock ) {
 			selectBlock( clientId );
 		}
+	};
+
+	const onSelectClassicMenu = async ( classicMenu ) => {
+		const navMenu = await convertClassicMenu(
+			classicMenu.id,
+			classicMenu.name,
+			'draft'
+		);
+		if ( navMenu ) {
+			handleUpdateMenu( navMenu.id, {
+				focusNavigationBlock: true,
+			} );
+		}
+	};
+
+	const onSelectNavigationMenu = ( menuId ) => {
+		handleUpdateMenu( menuId );
 	};
 
 	useEffect( () => {
@@ -515,144 +549,157 @@ function Navigation( {
 		} );
 	}, [ isDraftNavigationMenu, navigationMenu ] );
 
+	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 	const stylingInspectorControls = (
-		<InspectorControls>
-			{ hasSubmenuIndicatorSetting && (
-				<PanelBody title={ __( 'Display' ) }>
-					{ isResponsive && (
-						<>
-							<Button
-								className={ overlayMenuPreviewClasses }
-								onClick={ () => {
-									setOverlayMenuPreview(
-										! overlayMenuPreview
-									);
-								} }
-							>
-								{ hasIcon && (
-									<>
-										<OverlayMenuIcon icon={ icon } />
-										<Icon icon={ close } />
-									</>
+		<>
+			<InspectorControls>
+				{ hasSubmenuIndicatorSetting && (
+					<PanelBody title={ __( 'Display' ) }>
+						{ isResponsive && (
+							<>
+								<Button
+									className={ overlayMenuPreviewClasses }
+									onClick={ () => {
+										setOverlayMenuPreview(
+											! overlayMenuPreview
+										);
+									} }
+								>
+									{ hasIcon && (
+										<>
+											<OverlayMenuIcon icon={ icon } />
+											<Icon icon={ close } />
+										</>
+									) }
+									{ ! hasIcon && (
+										<>
+											<span>{ __( 'Menu' ) }</span>
+											<span>{ __( 'Close' ) }</span>
+										</>
+									) }
+								</Button>
+								{ overlayMenuPreview && (
+									<OverlayMenuPreview
+										setAttributes={ setAttributes }
+										hasIcon={ hasIcon }
+										icon={ icon }
+									/>
 								) }
-								{ ! hasIcon && (
-									<>
-										<span>{ __( 'Menu' ) }</span>
-										<span>{ __( 'Close' ) }</span>
-									</>
-								) }
-							</Button>
-							{ overlayMenuPreview && (
-								<OverlayMenuPreview
-									setAttributes={ setAttributes }
-									hasIcon={ hasIcon }
-									icon={ icon }
-								/>
-							) }
-						</>
-					) }
-					<h3>{ __( 'Overlay Menu' ) }</h3>
-					<ToggleGroupControl
-						label={ __( 'Configure overlay menu' ) }
-						value={ overlayMenu }
-						help={ __(
-							'Collapses the navigation options in a menu icon opening an overlay.'
+							</>
 						) }
-						onChange={ ( value ) =>
-							setAttributes( { overlayMenu: value } )
-						}
-						isBlock
-						hideLabelFromVision
-					>
-						<ToggleGroupControlOption
-							value="never"
-							label={ __( 'Off' ) }
-						/>
-						<ToggleGroupControlOption
-							value="mobile"
-							label={ __( 'Mobile' ) }
-						/>
-						<ToggleGroupControlOption
-							value="always"
-							label={ __( 'Always' ) }
-						/>
-					</ToggleGroupControl>
-					{ hasSubmenus && (
-						<>
-							<h3>{ __( 'Submenus' ) }</h3>
-							<ToggleControl
-								checked={ openSubmenusOnClick }
-								onChange={ ( value ) => {
-									setAttributes( {
-										openSubmenusOnClick: value,
-										...( value && {
-											showSubmenuIcon: true,
-										} ), // Make sure arrows are shown when we toggle this on.
-									} );
-								} }
-								label={ __( 'Open on click' ) }
+						<h3>{ __( 'Overlay Menu' ) }</h3>
+						<ToggleGroupControl
+							label={ __( 'Configure overlay menu' ) }
+							value={ overlayMenu }
+							help={ __(
+								'Collapses the navigation options in a menu icon opening an overlay.'
+							) }
+							onChange={ ( value ) =>
+								setAttributes( { overlayMenu: value } )
+							}
+							isBlock
+							hideLabelFromVision
+						>
+							<ToggleGroupControlOption
+								value="never"
+								label={ __( 'Off' ) }
 							/>
+							<ToggleGroupControlOption
+								value="mobile"
+								label={ __( 'Mobile' ) }
+							/>
+							<ToggleGroupControlOption
+								value="always"
+								label={ __( 'Always' ) }
+							/>
+						</ToggleGroupControl>
+						{ hasSubmenus && (
+							<>
+								<h3>{ __( 'Submenus' ) }</h3>
+								<ToggleControl
+									checked={ openSubmenusOnClick }
+									onChange={ ( value ) => {
+										setAttributes( {
+											openSubmenusOnClick: value,
+											...( value && {
+												showSubmenuIcon: true,
+											} ), // Make sure arrows are shown when we toggle this on.
+										} );
+									} }
+									label={ __( 'Open on click' ) }
+								/>
 
-							<ToggleControl
-								checked={ showSubmenuIcon }
-								onChange={ ( value ) => {
-									setAttributes( {
-										showSubmenuIcon: value,
-									} );
-								} }
-								disabled={ attributes.openSubmenusOnClick }
-								label={ __( 'Show arrow' ) }
-							/>
-						</>
-					) }
-				</PanelBody>
-			) }
-			{ hasColorSettings && (
-				<PanelColorSettings
-					__experimentalHasMultipleOrigins
-					__experimentalIsRenderedInSidebar
-					title={ __( 'Color' ) }
-					initialOpen={ false }
-					colorSettings={ [
-						{
-							value: textColor.color,
-							onChange: setTextColor,
-							label: __( 'Text' ),
-						},
-						{
-							value: backgroundColor.color,
-							onChange: setBackgroundColor,
-							label: __( 'Background' ),
-						},
-						{
-							value: overlayTextColor.color,
-							onChange: setOverlayTextColor,
-							label: __( 'Submenu & overlay text' ),
-						},
-						{
-							value: overlayBackgroundColor.color,
-							onChange: setOverlayBackgroundColor,
-							label: __( 'Submenu & overlay background' ),
-						},
-					] }
-				>
-					{ enableContrastChecking && (
-						<>
-							<ContrastChecker
-								backgroundColor={ detectedBackgroundColor }
-								textColor={ detectedColor }
-							/>
-							<ContrastChecker
-								backgroundColor={
-									detectedOverlayBackgroundColor
-								}
-								textColor={ detectedOverlayColor }
-							/>
-						</>
-					) }
-				</PanelColorSettings>
-			) }
-		</InspectorControls>
+								<ToggleControl
+									checked={ showSubmenuIcon }
+									onChange={ ( value ) => {
+										setAttributes( {
+											showSubmenuIcon: value,
+										} );
+									} }
+									disabled={ attributes.openSubmenusOnClick }
+									label={ __( 'Show arrow' ) }
+								/>
+							</>
+						) }
+					</PanelBody>
+				) }
+			</InspectorControls>
+			<InspectorControls __experimentalGroup="color">
+				{ hasColorSettings && (
+					<>
+						<ColorGradientSettingsDropdown
+							__experimentalHasMultipleOrigins
+							__experimentalIsRenderedInSidebar
+							settings={ [
+								{
+									colorValue: textColor.color,
+									label: __( 'Text' ),
+									onColorChange: setTextColor,
+									resetAllFilter: () => setTextColor(),
+								},
+								{
+									colorValue: backgroundColor.color,
+									label: __( 'Background' ),
+									onColorChange: setBackgroundColor,
+									resetAllFilter: () => setBackgroundColor(),
+								},
+								{
+									colorValue: overlayTextColor.color,
+									label: __( 'Submenu & overlay text' ),
+									onColorChange: setOverlayTextColor,
+									resetAllFilter: () => setOverlayTextColor(),
+								},
+								{
+									colorValue: overlayBackgroundColor.color,
+									label: __( 'Submenu & overlay background' ),
+									onColorChange: setOverlayBackgroundColor,
+									resetAllFilter: () =>
+										setOverlayBackgroundColor(),
+								},
+							] }
+							panelId={ clientId }
+							{ ...colorGradientSettings }
+							gradients={ [] }
+							disableCustomGradients={ true }
+						/>
+						{ enableContrastChecking && (
+							<>
+								<ContrastChecker
+									backgroundColor={ detectedBackgroundColor }
+									textColor={ detectedColor }
+								/>
+								<ContrastChecker
+									backgroundColor={
+										detectedOverlayBackgroundColor
+									}
+									textColor={ detectedOverlayColor }
+								/>
+							</>
+						) }
+					</>
+				) }
+			</InspectorControls>
+		</>
 	);
 
 	// If the block has inner blocks, but no menu id, then these blocks are either:
@@ -663,78 +710,25 @@ function Navigation( {
 	// that automatically saves the menu as an entity when changes are made to the inner blocks.
 	const hasUnsavedBlocks = hasUncontrolledInnerBlocks && ! isEntityAvailable;
 
-	const WrappedNavigationMenuSelector = ( { currentMenuId } ) => (
-		<NavigationMenuSelector
-			currentMenuId={ currentMenuId }
-			clientId={ clientId }
-			onSelectNavigationMenu={ ( menuId ) => {
-				handleUpdateMenu( menuId );
-			} }
-			onSelectClassicMenu={ async ( classicMenu ) => {
-				const navMenu = await convertClassicMenu(
-					classicMenu.id,
-					classicMenu.name,
-					'draft'
-				);
-				if ( navMenu ) {
-					handleUpdateMenu( navMenu.id, {
-						focusNavigationBlock: true,
-					} );
-				}
-			} }
-			onCreateNew={ createUntitledEmptyNavigationMenu }
-			createNavigationMenuIsSuccess={ createNavigationMenuIsSuccess }
-			createNavigationMenuIsError={ createNavigationMenuIsError }
-			/* translators: %s: The name of a menu. */
-			actionLabel={ __( "Switch to '%s'" ) }
-		/>
-	);
-
 	const isManageMenusButtonDisabled =
 		! hasManagePermissions || ! hasResolvedNavigationMenus;
 
 	if ( hasUnsavedBlocks && ! isCreatingNavigationMenu ) {
 		return (
 			<TagName { ...blockProps }>
-				<InspectorControls>
-					<PanelBody
-						title={
-							isOffCanvasNavigationEditorEnabled
-								? null
-								: __( 'Menu' )
-						}
-					>
-						{ isOffCanvasNavigationEditorEnabled ? (
-							<>
-								<HStack className="wp-block-navigation-off-canvas-editor__header">
-									<Heading
-										className="wp-block-navigation-off-canvas-editor__title"
-										level={ 2 }
-									>
-										{ __( 'Menu' ) }
-									</Heading>
-									<WrappedNavigationMenuSelector
-										currentMenuId={ ref }
-									/>
-								</HStack>
-								<OffCanvasEditor
-									blocks={ innerBlocks }
-									isExpanded={ true }
-									selectBlockInCanvas={ false }
-								/>
-							</>
-						) : (
-							<>
-								<WrappedNavigationMenuSelector
-									currentMenuId={ ref }
-								/>
-								<ManageMenusButton
-									disabled={ isManageMenusButtonDisabled }
-								/>
-							</>
-						) }
-					</PanelBody>
-				</InspectorControls>
+				<MenuInspectorControls
+					createNavigationMenuIsSuccess={
+						createNavigationMenuIsSuccess
+					}
+					createNavigationMenuIsError={ createNavigationMenuIsError }
+					currentMenuId={ ref }
+					isNavigationMenuMissing={ isNavigationMenuMissing }
+					innerBlocks={ innerBlocks }
+					isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
+					onCreateNew={ createUntitledEmptyNavigationMenu }
+					onSelectClassicMenu={ onSelectClassicMenu }
+					onSelectNavigationMenu={ onSelectNavigationMenu }
+				/>
 				{ stylingInspectorControls }
 				<ResponsiveWrapper
 					id={ clientId }
@@ -764,41 +758,18 @@ function Navigation( {
 	if ( ref && isNavigationMenuMissing ) {
 		return (
 			<TagName { ...blockProps }>
-				<InspectorControls>
-					<PanelBody
-						title={
-							isOffCanvasNavigationEditorEnabled
-								? null
-								: __( 'Menu' )
-						}
-					>
-						{ isOffCanvasNavigationEditorEnabled ? (
-							<>
-								<HStack className="wp-block-navigation-off-canvas-editor__header">
-									<Heading
-										className="wp-block-navigation-off-canvas-editor__title"
-										level={ 2 }
-									>
-										{ __( 'Menu' ) }
-									</Heading>
-									<WrappedNavigationMenuSelector
-										currentMenuId={ null }
-									/>
-								</HStack>
-								<p>Select or create a menu</p>
-							</>
-						) : (
-							<>
-								<WrappedNavigationMenuSelector
-									currentMenuId={ null }
-								/>
-								<ManageMenusButton
-									disabled={ isManageMenusButtonDisabled }
-								/>
-							</>
-						) }
-					</PanelBody>
-				</InspectorControls>
+				<MenuInspectorControls
+					createNavigationMenuIsSuccess={
+						createNavigationMenuIsSuccess
+					}
+					createNavigationMenuIsError={ createNavigationMenuIsError }
+					isNavigationMenuMissing={ isNavigationMenuMissing }
+					innerBlocks={ innerBlocks }
+					isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
+					onCreateNew={ createUntitledEmptyNavigationMenu }
+					onSelectClassicMenu={ onSelectClassicMenu }
+					onSelectNavigationMenu={ onSelectNavigationMenu }
+				/>
 				<Warning>
 					{ __(
 						'Navigation menu has been deleted or is unavailable. '
@@ -849,21 +820,8 @@ function Navigation( {
 					isResolvingCanUserCreateNavigationMenu={
 						isResolvingCanUserCreateNavigationMenu
 					}
-					onSelectNavigationMenu={ ( menuId ) => {
-						handleUpdateMenu( menuId );
-					} }
-					onSelectClassicMenu={ async ( classicMenu ) => {
-						const navMenu = await convertClassicMenu(
-							classicMenu.id,
-							classicMenu.name,
-							'draft'
-						);
-						if ( navMenu ) {
-							handleUpdateMenu( navMenu.id, {
-								focusNavigationBlock: true,
-							} );
-						}
-					} }
+					onSelectNavigationMenu={ onSelectNavigationMenu }
+					onSelectClassicMenu={ onSelectClassicMenu }
 					onCreateEmpty={ createUntitledEmptyNavigationMenu }
 				/>
 			</TagName>
@@ -873,45 +831,19 @@ function Navigation( {
 	return (
 		<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
 			<RecursionProvider uniqueId={ recursionId }>
-				<InspectorControls>
-					<PanelBody
-						title={
-							isOffCanvasNavigationEditorEnabled
-								? null
-								: __( 'Menu' )
-						}
-					>
-						{ isOffCanvasNavigationEditorEnabled ? (
-							<>
-								<HStack className="wp-block-navigation-off-canvas-editor__header">
-									<Heading
-										className="wp-block-navigation-off-canvas-editor__title"
-										level={ 2 }
-									>
-										{ __( 'Menu' ) }
-									</Heading>
-									<WrappedNavigationMenuSelector
-										currentMenuId={ ref }
-									/>
-								</HStack>
-								<OffCanvasEditor
-									blocks={ innerBlocks }
-									isExpanded={ true }
-									selectBlockInCanvas={ false }
-								/>
-							</>
-						) : (
-							<>
-								<WrappedNavigationMenuSelector
-									currentMenuId={ ref }
-								/>
-								<ManageMenusButton
-									disabled={ isManageMenusButtonDisabled }
-								/>
-							</>
-						) }
-					</PanelBody>
-				</InspectorControls>
+				<MenuInspectorControls
+					createNavigationMenuIsSuccess={
+						createNavigationMenuIsSuccess
+					}
+					createNavigationMenuIsError={ createNavigationMenuIsError }
+					currentMenuId={ ref }
+					isNavigationMenuMissing={ isNavigationMenuMissing }
+					innerBlocks={ innerBlocks }
+					isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
+					onCreateNew={ createUntitledEmptyNavigationMenu }
+					onSelectClassicMenu={ onSelectClassicMenu }
+					onSelectNavigationMenu={ onSelectNavigationMenu }
+				/>
 				{ stylingInspectorControls }
 				{ isEntityAvailable && (
 					<InspectorControls __experimentalGroup="advanced">

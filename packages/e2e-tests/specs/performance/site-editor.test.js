@@ -15,6 +15,7 @@ import {
 	saveDraft,
 	insertBlock,
 	deleteAllTemplates,
+	enterEditMode,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -114,6 +115,7 @@ describe( 'Site Editor Performance', () => {
 		await canvas().waitForSelector(
 			'[data-type="core/post-content"] [data-type="core/paragraph"]'
 		);
+		await enterEditMode();
 		await canvas().click(
 			'[data-type="core/post-content"] [data-type="core/paragraph"]'
 		);
