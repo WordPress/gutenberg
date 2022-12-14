@@ -73,12 +73,12 @@ jobs:
                   composer --version
                   locale -a
 
-            - name: Install Composer dependencies
-              run: npm run wp-env run composer "install --no-interaction"
-
             - name: Start Docker environment
               run: |
                   npm run wp-env start
+
+            - name: Install Composer dependencies
+              run: npm run wp-env run composer "install --no-interaction"
 
             - name: Log running Docker containers
               run: docker ps -a
@@ -89,6 +89,7 @@ jobs:
                   npm run wp-env run phpunit "php --version"
                   npm run wp-env run phpunit "php -m"
                   npm run wp-env run phpunit "php -i"
+                  npm run wp-env run composer "install --no-interaction"
                   npm run wp-env run phpunit "/usr/local/bin/phpunit --version"
                   npm run wp-env run phpunit "locale -a"
 
