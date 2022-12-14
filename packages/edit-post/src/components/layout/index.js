@@ -44,6 +44,7 @@ import Header from '../header';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
 import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
 import SettingsSidebar from '../sidebar/settings-sidebar';
+import ActiveSessions from '../sidebar/active-sessions';
 import MetaBoxes from '../meta-boxes';
 import WelcomeGuide from '../welcome-guide';
 import ActionsPanel from './actions-panel';
@@ -202,6 +203,7 @@ function Layout( { styles } ) {
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
 			<SettingsSidebar />
+			<ActiveSessions />
 			<InterfaceSkeleton
 				isDistractionFree={ isDistractionFree }
 				className={ className }
