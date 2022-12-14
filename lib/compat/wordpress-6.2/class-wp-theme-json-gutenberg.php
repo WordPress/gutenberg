@@ -229,6 +229,10 @@ class WP_Theme_JSON_Gutenberg {
 		'margin-right'                      => array( 'spacing', 'margin', 'right' ),
 		'margin-bottom'                     => array( 'spacing', 'margin', 'bottom' ),
 		'margin-left'                       => array( 'spacing', 'margin', 'left' ),
+		'outline-color'                     => array( 'outline', 'color' ),
+		'outline-offset'                    => array( 'outline', 'offset' ),
+		'outline-style'                     => array( 'outline', 'style' ),
+		'outline-width'                     => array( 'outline', 'width' ),
 		'padding'                           => array( 'spacing', 'padding' ),
 		'padding-top'                       => array( 'spacing', 'padding', 'top' ),
 		'padding-right'                     => array( 'spacing', 'padding', 'right' ),
@@ -372,6 +376,12 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		'filter'     => array(
 			'duotone' => null,
+		),
+		'outline'    => array(
+			'color'  => null,
+			'offset' => null,
+			'style'  => null,
+			'width'  => null,
 		),
 		'shadow'     => null,
 		'spacing'    => array(
