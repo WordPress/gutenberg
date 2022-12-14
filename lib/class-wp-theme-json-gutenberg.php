@@ -909,6 +909,27 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
+	 * Processes the CSS, to apply nesting.
+	 *
+	 * @param string $css      The CSS to process.
+	 * @param string $selector The selector to nest.
+	 *
+	 * @return string The processed CSS.
+	 */
+	private function process_nested_css( $css, $selector ) {
+		$processed_css = '';
+
+		// Split CSS nested rules.
+		$parts = explode( '&', $css );
+		foreach ( $parts as $part ) {
+			$processed_css .= ( ! str_contains( $part, '{' ) )
+				? $selector . '{' . $part . '}' // If the part doesn't contain braces, it applies to the root level.
+				: $selector . $part; // Prepend the selector, which effectively replaces the "&" character.
+		}
+		return $processed_css;
+	}
+
+	/**
 	 * Returns the stylesheet that results of processing
 	 * the theme.json structure this object represents.
 	 *
@@ -1014,7 +1035,19 @@ class WP_Theme_JSON_Gutenberg {
 
 		// Load the custom CSS last so it has the highest specificity.
 		if ( in_array( 'custom-css', $types, true ) ) {
+			// Add the global styles root CSS.
 			$stylesheet .= _wp_array_get( $this->theme_json, array( 'styles', 'css' ) );
+
+			// Add the global styles block CSS.
+			if ( isset( $this->theme_json['styles']['blocks'] ) ) {
+				foreach ( $this->theme_json['styles']['blocks'] as $name => $node ) {
+					if ( _wp_array_get( $this->theme_json, array( 'styles', 'blocks', $name, 'css' ) ) ) {
+						$selector         = static::$blocks_metadata[ $name ]['selector'];
+						$custom_block_css = _wp_array_get( $this->theme_json, array( 'styles', 'blocks', $name, 'css' ) );
+						$stylesheet      .= $this->process_nested_css( $custom_block_css, $selector );
+					}
+				}
+			}
 		}
 
 		return $stylesheet;
