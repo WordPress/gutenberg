@@ -70,7 +70,7 @@ async function testNativeSelection() {
 			return;
 		}
 
-		if ( ! selection.rangeCount === 1 ) {
+		if ( selection.rangeCount !== 1 ) {
 			throw 'expected one range';
 		}
 

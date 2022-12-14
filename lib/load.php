@@ -35,25 +35,18 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-block-editor-settings-controller.php';
 	}
 
-	// WordPress 6.0 compat.
-	require_once __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-global-styles-controller.php';
-	require_once __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-pattern-directory-controller-6-0.php';
-	require_once __DIR__ . '/compat/wordpress-6.0/class-gutenberg-rest-edit-site-export-controller.php';
-	if ( ! class_exists( 'WP_REST_Block_Pattern_Categories_Controller' ) ) {
-		require_once __DIR__ . '/compat/wordpress-6.0/class-wp-rest-block-pattern-categories-controller.php';
-	}
-	require_once __DIR__ . '/compat/wordpress-6.0/rest-api.php';
-
 	// WordPress 6.1 compat.
-	require_once __DIR__ . '/compat/wordpress-6.1/class-gutenberg-rest-block-patterns-controller.php';
+	require_once __DIR__ . '/compat/wordpress-6.1/class-gutenberg-rest-block-patterns-controller-6-1.php';
 	require_once __DIR__ . '/compat/wordpress-6.1/class-gutenberg-rest-templates-controller.php';
 	require_once __DIR__ . '/compat/wordpress-6.1/rest-api.php';
 
 	// WordPress 6.2 compat.
+	require_once __DIR__ . '/compat/wordpress-6.2/class-gutenberg-rest-block-patterns-controller-6-2.php';
 	require_once __DIR__ . '/compat/wordpress-6.2/class-gutenberg-rest-block-pattern-categories-controller.php';
 	require_once __DIR__ . '/compat/wordpress-6.2/class-gutenberg-rest-pattern-directory-controller-6-2.php';
 	require_once __DIR__ . '/compat/wordpress-6.2/rest-api.php';
 	require_once __DIR__ . '/compat/wordpress-6.2/block-patterns.php';
+	require_once __DIR__ . '/compat/wordpress-6.2/class-gutenberg-rest-global-styles-controller-6-2.php';
 
 	// Experimental.
 	if ( ! class_exists( 'WP_Rest_Customizer_Nonces' ) ) {
@@ -67,26 +60,9 @@ require __DIR__ . '/experimental/editor-settings.php';
 // Gutenberg plugin compat.
 require __DIR__ . '/compat/plugin/edit-site-routes-backwards-compat.php';
 
-// WordPress 6.0 compat.
-require __DIR__ . '/compat/wordpress-6.0/block-gallery.php';
-require __DIR__ . '/compat/wordpress-6.0/block-editor-settings.php';
-require __DIR__ . '/compat/wordpress-6.0/get-global-styles-and-settings.php';
-require __DIR__ . '/compat/wordpress-6.0/render-svg-filters.php';
-require __DIR__ . '/compat/wordpress-6.0/post-lock.php';
-require __DIR__ . '/compat/wordpress-6.0/blocks.php';
-require __DIR__ . '/compat/wordpress-6.0/block-template-utils.php';
-require __DIR__ . '/compat/wordpress-6.0/functions.php';
-require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-6-0.php';
-require __DIR__ . '/compat/wordpress-6.0/class-wp-theme-json-resolver-6-0.php';
-require __DIR__ . '/compat/wordpress-6.0/block-patterns.php';
-require __DIR__ . '/compat/wordpress-6.0/site-editor.php';
-require __DIR__ . '/compat/wordpress-6.0/edit-form-blocks.php';
-require __DIR__ . '/compat/wordpress-6.0/block-patterns-update.php';
-require __DIR__ . '/compat/wordpress-6.0/client-assets.php';
-
 // WordPress 6.1 compat.
-require __DIR__ . '/compat/wordpress-6.1/blocks.php';
 require __DIR__ . '/compat/wordpress-6.1/block-editor-settings.php';
+require __DIR__ . '/compat/wordpress-6.1/blocks.php';
 require __DIR__ . '/compat/wordpress-6.1/persisted-preferences.php';
 require __DIR__ . '/compat/wordpress-6.1/get-global-styles-and-settings.php';
 require __DIR__ . '/compat/wordpress-6.1/class-wp-theme-json-data-gutenberg.php';
@@ -108,6 +84,7 @@ require __DIR__ . '/compat/wordpress-6.2/class-wp-theme-json-resolver-6-2.php';
 require __DIR__ . '/compat/wordpress-6.2/class-wp-theme-json-6-2.php';
 require __DIR__ . '/compat/wordpress-6.2/edit-form-blocks.php';
 require __DIR__ . '/compat/wordpress-6.2/site-editor.php';
+require __DIR__ . '/compat/wordpress-6.2/block-editor-settings.php';
 
 // Experimental features.
 remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WP 6.0's stopgap handler for Webfonts API.
@@ -120,6 +97,9 @@ require __DIR__ . '/experimental/class-wp-theme-json-resolver-gutenberg.php';
 require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/navigation-page.php';
+require __DIR__ . '/experimental/navigation-theme-opt-in.php';
+require __DIR__ . '/experimental/navigation-page.php';
+require __DIR__ . '/experimental/kses.php';
 
 // Web Fonts API
 require __DIR__ . '/experimental/webfonts-deprecations.php'; // Temporary deprecated functions.

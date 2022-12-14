@@ -29,6 +29,8 @@ import { moreHorizontalMobile } from '@wordpress/icons';
 import { useRef, useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
+// Disable Reason: Needs to be refactored.
+// eslint-disable-next-line no-restricted-imports
 import { store as coreStore } from '@wordpress/core-data';
 
 /**

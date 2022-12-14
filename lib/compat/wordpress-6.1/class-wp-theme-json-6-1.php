@@ -14,7 +14,7 @@
  *
  * @access private
  */
-class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
+class WP_Theme_JSON_6_1 extends WP_Theme_JSON {
 	/**
 	 * Defines which pseudo selectors are enabled for which elements.
 	 *

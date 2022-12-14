@@ -36,10 +36,14 @@ import getIsListPage from '../../utils/get-is-list-page';
 import Header from '../header-edit-mode';
 import SiteIcon from '../site-icon';
 import SiteTitle from '../site-title';
+import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
 
 const ANIMATION_DURATION = 0.5;
 
 export default function Layout( { onError } ) {
+	// This ensures the edited entity id and type are initialized properly.
+	useInitEditedEntityFromURL();
+
 	const { params } = useLocation();
 	const isListPage = getIsListPage( params );
 	const isEditorPage = ! isListPage;
@@ -173,7 +177,7 @@ export default function Layout( { onError } ) {
 								as={ motion.div }
 								initial={ { y: -60 } }
 								animate={ { y: 0 } }
-								edit={ { y: -60 } }
+								exit={ { y: -60 } }
 								transition={ {
 									type: 'tween',
 									duration: disableMotion

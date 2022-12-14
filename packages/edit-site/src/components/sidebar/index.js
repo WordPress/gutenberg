@@ -1,19 +1,34 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalVStack as VStack } from '@wordpress/components';
+import { __experimentalNavigatorProvider as NavigatorProvider } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import SidebarNavigationRoot from '../sidebar-navigation-root';
+import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
+import SidebarNavigationScreenTemplates from '../sidebar-navigation-screen-templates';
+import useSyncSidebarPathWithURL from '../sync-state-with-url/use-sync-sidebar-path-with-url';
+
+function SidebarScreens() {
+	useSyncSidebarPathWithURL();
+
+	return (
+		<>
+			<SidebarNavigationScreenMain />
+			<SidebarNavigationScreenTemplates postType="wp_template" />
+			<SidebarNavigationScreenTemplates postType="wp_template_part" />
+		</>
+	);
+}
 
 export function Sidebar() {
 	return (
-		<VStack alignment="top" spacing={ 10 }>
-			<div className="edit-site-sidebar__content">
-				<SidebarNavigationRoot />
-			</div>
-		</VStack>
+		<NavigatorProvider
+			className="edit-site-sidebar__content"
+			initialPath="/"
+		>
+			<SidebarScreens />
+		</NavigatorProvider>
 	);
 }

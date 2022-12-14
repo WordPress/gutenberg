@@ -277,6 +277,12 @@ function block_core_navigation_get_classic_menu_fallback() {
 		}
 
 		// Otherwise return the most recently created classic menu.
+		usort(
+			$classic_nav_menus,
+			function( $a, $b ) {
+				return $b->term_id - $a->term_id;
+			}
+		);
 		return $classic_nav_menus[0];
 	}
 }
@@ -384,45 +390,20 @@ function block_core_navigation_get_most_recently_published_navigation() {
 }
 
 /**
- * Recursively filter out blocks from the block list that are not whitelisted.
- * This list of exclusions includes:
- * - The Navigation block itself (results in recursion).
- * - empty "null" blocks from the block list.
- * - other blocks that are not yet handled.
- *
- * Note: 'parse_blocks' includes a null block with '\n\n' as the content when
+ * Filter out empty "null" blocks from the block list.
+ * 'parse_blocks' includes a null block with '\n\n' as the content when
  * it encounters whitespace. This is not a bug but rather how the parser
  * is designed.
  *
- * @param array $parsed_blocks the parsed blocks to be filtered.
- * @return array the filtered parsed blocks.
+ * @param array $parsed_blocks the parsed blocks to be normalized.
+ * @return array the normalized parsed blocks.
  */
-function block_core_navigation_filter_out_invalid_blocks( $parsed_blocks ) {
-	// This list is duplicated in /packages/block-library/src/navigation/edit/inner-blocks.js.
-	$allowed_blocks = array(
-		'core/navigation-link',
-		'core/search',
-		'core/social-links',
-		'core/page-list',
-		'core/spacer',
-		'core/home-link',
-		'core/site-title',
-		'core/site-logo',
-		'core/navigation-submenu',
-	);
-
-	$filtered = array_reduce(
+function block_core_navigation_filter_out_empty_blocks( $parsed_blocks ) {
+	$filtered = array_filter(
 		$parsed_blocks,
-		function( $carry, $block ) use ( $allowed_blocks ) {
-			if ( isset( $block['blockName'] ) && in_array( $block['blockName'], $allowed_blocks, true ) ) {
-				if ( $block['innerBlocks'] ) {
-					$block['innerBlocks'] = block_core_navigation_filter_out_invalid_blocks( $block['innerBlocks'] );
-				}
-				$carry[] = $block;
-			}
-			return $carry;
-		},
-		array()
+		function( $block ) {
+			return isset( $block['blockName'] );
+		}
 	);
 
 	// Reset keys.
@@ -462,8 +443,7 @@ function block_core_navigation_get_fallback_blocks() {
 
 	// Use the first non-empty Navigation as fallback if available.
 	if ( $navigation_post ) {
-
-		$maybe_fallback = block_core_navigation_filter_out_invalid_blocks( parse_blocks( $navigation_post->post_content ) );
+		$maybe_fallback = block_core_navigation_filter_out_empty_blocks( parse_blocks( $navigation_post->post_content ) );
 
 		// Normalizing blocks may result in an empty array of blocks if they were all `null` blocks.
 		// In this case default to the (Page List) fallback.
@@ -531,6 +511,7 @@ function block_core_navigation_from_block_get_post_ids( $block ) {
 function render_block_core_navigation( $attributes, $content, $block ) {
 
 	static $seen_menu_names = array();
+	static $seen_ref        = array();
 
 	// Flag used to indicate whether the rendered output is considered to be
 	// a fallback (i.e. the block has no menu associated with it).
@@ -601,6 +582,11 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	// Load inner blocks from the navigation post.
 	if ( array_key_exists( 'ref', $attributes ) ) {
+		if ( in_array( $attributes['ref'], $seen_ref, true ) ) {
+			return '';
+		}
+		$seen_ref[] = $attributes['ref'];
+
 		$navigation_post = get_post( $attributes['ref'] );
 		if ( ! isset( $navigation_post ) ) {
 			return '';
@@ -621,7 +607,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 			// 'parse_blocks' includes a null block with '\n\n' as the content when
 			// it encounters whitespace. This code strips it.
-			$compacted_blocks = block_core_navigation_filter_out_invalid_blocks( $parsed_blocks );
+			$compacted_blocks = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
 
 			// TODO - this uses the full navigation block attributes for the
 			// context which could be refined.
@@ -693,22 +679,41 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		_prime_post_caches( $post_ids, false, false );
 	}
 
+	$list_item_nav_blocks = array(
+		'core/navigation-link',
+		'core/home-link',
+		'core/site-title',
+		'core/site-logo',
+		'core/navigation-submenu',
+	);
+
+	$needs_list_item_wrapper = array(
+		'core/site-title',
+		'core/site-logo',
+	);
+
 	$inner_blocks_html = '';
 	$is_list_open      = false;
 	foreach ( $inner_blocks as $inner_block ) {
-		if ( ( 'core/navigation-link' === $inner_block->name || 'core/home-link' === $inner_block->name || 'core/site-title' === $inner_block->name || 'core/site-logo' === $inner_block->name || 'core/navigation-submenu' === $inner_block->name ) && ! $is_list_open ) {
+		$is_list_item = in_array( $inner_block->name, $list_item_nav_blocks, true );
+
+		if ( $is_list_item && ! $is_list_open ) {
 			$is_list_open       = true;
 			$inner_blocks_html .= '<ul class="wp-block-navigation__container">';
 		}
-		if ( 'core/navigation-link' !== $inner_block->name && 'core/home-link' !== $inner_block->name && 'core/site-title' !== $inner_block->name && 'core/site-logo' !== $inner_block->name && 'core/navigation-submenu' !== $inner_block->name && $is_list_open ) {
+
+		if ( ! $is_list_item && $is_list_open ) {
 			$is_list_open       = false;
 			$inner_blocks_html .= '</ul>';
 		}
+
 		$inner_block_content = $inner_block->render();
-		if ( 'core/site-title' === $inner_block->name || ( 'core/site-logo' === $inner_block->name && $inner_block_content ) ) {
-			$inner_blocks_html .= '<li class="wp-block-navigation-item">' . $inner_block_content . '</li>';
-		} else {
-			$inner_blocks_html .= $inner_block_content;
+		if ( ! empty( $inner_block_content ) ) {
+			if ( in_array( $inner_block->name, $needs_list_item_wrapper, true ) ) {
+				$inner_blocks_html .= '<li class="wp-block-navigation-item">' . $inner_block_content . '</li>';
+			} else {
+				$inner_blocks_html .= $inner_block_content;
+			}
 		}
 	}
 

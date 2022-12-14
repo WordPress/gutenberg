@@ -169,9 +169,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 	}, [] );
 
 	const availableTabs = useInspectorControlsTabs( blockType?.name );
-	const showTabs =
-		window?.__experimentalEnableBlockInspectorTabs &&
-		availableTabs.length > 1;
+	const showTabs = availableTabs?.length > 1;
 
 	if ( count > 1 ) {
 		return (
@@ -243,9 +241,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 
 const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 	const availableTabs = useInspectorControlsTabs( blockName );
-	const showTabs =
-		window?.__experimentalEnableBlockInspectorTabs &&
-		availableTabs.length > 1;
+	const showTabs = availableTabs?.length > 1;
 
 	const hasBlockStyles = useSelect(
 		( select ) => {

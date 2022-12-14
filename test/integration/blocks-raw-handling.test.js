@@ -427,10 +427,14 @@ describe( 'Blocks raw handling', () => {
 
 				expect( serialized ).toBe( output );
 
-				if ( type !== 'gutenberg' ) {
-					// eslint-disable-next-line jest/no-conditional-expect
-					expect( console ).toHaveLogged();
-				}
+				const convertedInline = pasteHandler( {
+					HTML,
+					plainText,
+					mode: 'INLINE',
+				} );
+
+				expect( convertedInline ).toMatchSnapshot();
+				expect( console ).toHaveLogged();
 			} );
 		} );
 

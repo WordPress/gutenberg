@@ -135,6 +135,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				Object.entries( settings ).filter( ( [ key ] ) =>
 					[
 						'__experimentalBlockDirectory',
+						'__experimentalBlockInspectorTabs',
 						'__experimentalDiscussionSettings',
 						'__experimentalFeatures',
 						'__experimentalPreferredStyleVariations',

@@ -424,6 +424,7 @@ export default function NavigationLinkEdit( {
 	const ALLOWED_BLOCKS = [
 		'core/navigation-link',
 		'core/navigation-submenu',
+		'core/page-list',
 	];
 	const DEFAULT_BLOCK = {
 		name: 'core/navigation-link',

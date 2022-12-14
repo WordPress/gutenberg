@@ -31,7 +31,6 @@ import { SidebarComplementaryAreaFills } from '../sidebar-edit-mode';
 import BlockEditor from '../block-editor';
 import CodeEditor from '../code-editor';
 import KeyboardShortcuts from '../keyboard-shortcuts';
-import useInitEditedEntityFromURL from '../use-init-edited-entity-from-url';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
 import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
 import WelcomeGuide from '../welcome-guide';
@@ -52,14 +51,11 @@ const interfaceLabels = {
 };
 
 export default function Editor() {
-	// This ensures the edited entity id and type are initialized properly.
-	useInitEditedEntityFromURL();
-
 	const {
 		editedPostId,
 		editedPostType,
 		editedPost,
-		page,
+		context,
 		hasLoadedPost,
 		editorMode,
 		canvasMode,
@@ -75,7 +71,7 @@ export default function Editor() {
 		const {
 			getEditedPostType,
 			getEditedPostId,
-			getPage,
+			getEditedPostContext,
 			getEditorMode,
 			__unstableGetCanvasMode,
 			isInserterOpened,
@@ -99,7 +95,7 @@ export default function Editor() {
 			editedPost: postId
 				? getEntityRecord( 'postType', postType, postId )
 				: null,
-			page: getPage(),
+			context: getEditedPostContext(),
 			hasLoadedPost: postId
 				? hasFinishedResolution( 'getEntityRecord', [
 						'postType',
@@ -128,7 +124,8 @@ export default function Editor() {
 			),
 		};
 	}, [] );
-	const { setIsSaveViewOpened, setPage } = useDispatch( editSiteStore );
+	const { setIsSaveViewOpened, setEditedPostContext } =
+		useDispatch( editSiteStore );
 
 	const isViewMode = canvasMode === 'view';
 	const isEditMode = canvasMode === 'edit';
@@ -142,23 +139,20 @@ export default function Editor() {
 		: __( 'Block Library' );
 	const blockContext = useMemo(
 		() => ( {
-			...page?.context,
+			...context,
 			queryContext: [
-				page?.context.queryContext || { page: 1 },
+				context?.queryContext || { page: 1 },
 				( newQueryContext ) =>
-					setPage( {
-						...page,
-						context: {
-							...page?.context,
-							queryContext: {
-								...page?.context.queryContext,
-								...newQueryContext,
-							},
+					setEditedPostContext( {
+						...context,
+						queryContext: {
+							...context?.queryContext,
+							...newQueryContext,
 						},
 					} ),
 			],
 		} ),
-		[ page?.context ]
+		[ context ]
 	);
 	const isReady = editedPostType !== undefined && editedPostId !== undefined;
 
@@ -174,7 +168,6 @@ export default function Editor() {
 		<>
 			{ isEditMode && <WelcomeGuide /> }
 			<KeyboardShortcuts.Register />
-			<SidebarComplementaryAreaFills />
 			<EntityProvider kind="root" type="site">
 				<EntityProvider
 					kind="postType"
@@ -183,6 +176,7 @@ export default function Editor() {
 				>
 					<GlobalStylesProvider>
 						<BlockContextProvider value={ blockContext }>
+							<SidebarComplementaryAreaFills />
 							<InterfaceSkeleton
 								className={
 									showIconLabels && 'show-icon-labels'

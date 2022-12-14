@@ -68,21 +68,13 @@ describe( 'Theme', () => {
 	describe( 'background color', () => {
 		it( 'it does not define the background color (and its dependent colors) as a CSS variable when the `background` prop is undefined', () => {
 			render(
-				<Theme>
+				<Theme data-testid="theme">
 					<MyThemableComponent>Inner</MyThemableComponent>
 				</Theme>
 			);
 
-			const inner = screen.getByText( 'Inner' );
-
-			if ( inner?.parentElement === null ) {
-				throw new Error(
-					'Somehow the `Theme` component does not render a DOM element?'
-				);
-			}
-
 			const innerElementStyles = window.getComputedStyle(
-				inner?.parentElement
+				screen.getByTestId( 'theme' )
 			);
 
 			[
@@ -101,14 +93,12 @@ describe( 'Theme', () => {
 
 		it( 'it defines the background color (and its dependent colors) as a CSS variable', () => {
 			render(
-				<Theme background="#ffffff">
+				<Theme background="#ffffff" data-testid="theme">
 					<MyThemableComponent>Inner</MyThemableComponent>
 				</Theme>
 			);
 
-			const inner = screen.getByText( 'Inner' );
-
-			expect( inner?.parentElement ).toHaveStyle( {
+			expect( screen.getByTestId( 'theme' ) ).toHaveStyle( {
 				'--wp-components-color-background': '#ffffff',
 				'--wp-components-color-foreground': '#1e1e1e',
 				'--wp-components-color-foreground-inverted': '#fff',

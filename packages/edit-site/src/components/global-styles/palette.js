@@ -49,7 +49,7 @@ function Palette( { name } ) {
 
 	const screenPath = ! name
 		? '/colors/palette'
-		: '/blocks/' + name + '/colors/palette';
+		: '/blocks/' + encodeURIComponent( name ) + '/colors/palette';
 	const paletteButtonText =
 		colors.length > 0
 			? sprintf(
