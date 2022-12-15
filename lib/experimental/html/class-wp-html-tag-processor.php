@@ -1663,7 +1663,7 @@ class WP_HTML_Tag_Processor {
 		// strpos() doesn't support negative offset values on PHP prior to version 7.1.
 		//
 		if ( 0 > $this->parsed_bytes ) {
-			$this->parsed_bytes = strlen( $this->updated_html ) - $this->parsed_bytes;
+			$this->parsed_bytes = strlen( $this->updated_html ) - abs( $this->parsed_bytes );
 		}
 
 		$this->next_tag();
