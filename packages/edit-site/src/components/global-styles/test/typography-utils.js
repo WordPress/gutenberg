@@ -340,6 +340,21 @@ describe( 'typography utils', () => {
 				expected: 'clamp(30px, 1.875rem + ((1vw - 7.68px) * 1), 30px)',
 			},
 
+			{
+				message:
+					'should use default min font size value where min font size unit in fluid config is not supported',
+				preset: {
+					size: '15px',
+				},
+				typographySettings: {
+					fluid: {
+						minFontSize: '16%',
+					},
+				},
+				expected:
+					'clamp(14px, 0.875rem + ((1vw - 7.68px) * 0.12), 15px)',
+			},
+
 			// Equivalent custom config PHP unit tests in `test_should_covert_font_sizes_to_fluid_values()`.
 			{
 				message: 'should return clamp value using custom fluid config',
