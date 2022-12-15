@@ -210,21 +210,18 @@ export default function FontAppearanceControl( props ) {
 
 	return (
 		hasStylesOrWeights && (
-			<>
-				<CustomSelectControl
-					{ ...otherProps }
-					className="components-font-appearance-control"
-					label={ label }
-					describedBy={ getDescribedBy() }
-					options={ selectOptions }
-					value={ currentSelection }
-					onChange={ ( { selectedItem } ) =>
-						onChange( selectedItem.style )
-					}
-					__nextUnconstrainedWidth
-				/>
-				<h1>yay</h1>
-			</>
+			<CustomSelectControl
+				{ ...otherProps }
+				className="components-font-appearance-control"
+				label={ label }
+				describedBy={ getDescribedBy() }
+				options={ selectOptions }
+				value={ currentSelection }
+				onChange={ ( { selectedItem } ) =>
+					onChange( selectedItem.style )
+				}
+				__nextUnconstrainedWidth
+			/>
 		)
 	);
 }
