@@ -93,19 +93,24 @@ export default function PageListItemEdit( { context, attributes } ) {
 	const innerBlocksColors = getColors( context, true );
 
 	const blockProps = useBlockProps( {
-		className: classnames( 'wp-block-pages-list__item', {
-			'has-text-color': !! (
-				innerBlocksColors.textColor || innerBlocksColors.customTextColor
-			),
-			[ `has-${ innerBlocksColors.textColor }-color` ]:
-				!! innerBlocksColors.textColor,
-			'has-background': !! (
-				innerBlocksColors.backgroundColor ||
-				innerBlocksColors.customBackgroundColor
-			),
-			[ `has-${ innerBlocksColors.backgroundColor }-background-color` ]:
-				!! innerBlocksColors.backgroundColor,
-		} ),
+		className: classnames(
+			'wp-block-pages-list__item',
+			'wp-block-navigation__submenu-container',
+			{
+				'has-text-color': !! (
+					innerBlocksColors.textColor ||
+					innerBlocksColors.customTextColor
+				),
+				[ `has-${ innerBlocksColors.textColor }-color` ]:
+					!! innerBlocksColors.textColor,
+				'has-background': !! (
+					innerBlocksColors.backgroundColor ||
+					innerBlocksColors.customBackgroundColor
+				),
+				[ `has-${ innerBlocksColors.backgroundColor }-background-color` ]:
+					!! innerBlocksColors.backgroundColor,
+			}
+		),
 		style: {
 			color: innerBlocksColors.customTextColor,
 			backgroundColor: innerBlocksColors.customBackgroundColor,
