@@ -181,7 +181,9 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 				const globalBlockInspectorAnimationSettings =
 					select( blockEditorStore ).getSettings()
 						.__experimentalBlockInspectorAnimation;
-				return globalBlockInspectorAnimationSettings[ blockType.name ];
+				return globalBlockInspectorAnimationSettings?.[
+					blockType.name
+				];
 			}
 			return null;
 		},
