@@ -1746,6 +1746,17 @@ class WP_HTML_Tag_Processor {
 		$this->updated_bytes = strlen( $this->updated_html );
 
 		// 3. Point this tag processor at the original tag opener and consume it
+<<<<<<< HEAD
+=======
+		$this->parsed_bytes = strlen( $updated_html_up_to_current_tag_name_end ) - $this->tag_name_length - 2;
+
+		// This ensures compatibility with older PHP versions.
+		// strpos() doesn't support negative offset values on PHP prior to version 7.1.
+		//
+		if ( 0 > $this->parsed_bytes ) {
+			$this->parsed_bytes = strlen( $this->updated_html ) - abs( $this->parsed_bytes );
+		}
+>>>>>>> 2a8585c8e2 (// strpos() doesn't support negative offset values on PHP prior to version 7.1.)
 
 		/*
 		 * When we get here we're at the end of the tag name, and we want to rewind to before it
