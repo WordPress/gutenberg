@@ -14,9 +14,11 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	Button,
-	__unstableMotion as motion,
+	__experimentalNavigatorProvider as NavigatorProvider,
+	__experimentalNavigatorScreen as NavigatorScreen,
+	__experimentalUseNavigator as useNavigator,
 } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, select as reduxSelect } from '@wordpress/data';
 import { useMemo, useCallback } from '@wordpress/element';
 
 /**
@@ -169,26 +171,11 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 		};
 	}, [] );
 
-	const availableTabs = useInspectorControlsTabs( blockType?.name );
-	const showTabs = availableTabs?.length > 1;
-
 	const isOffCanvasNavigationEditorEnabled =
 		window?.__experimentalEnableOffCanvasNavigationEditor === true;
 
-	const blockInspectorAnimationSettings = useSelect(
-		( select ) => {
-			if ( isOffCanvasNavigationEditorEnabled ) {
-				const globalBlockInspectorAnimationSettings =
-					select( blockEditorStore ).getSettings()
-						.__experimentalBlockInspectorAnimation;
-				return globalBlockInspectorAnimationSettings?.[
-					blockType.name
-				];
-			}
-			return null;
-		},
-		[ selectedBlockClientId, isOffCanvasNavigationEditorEnabled, blockType ]
-	);
+	const availableTabs = useInspectorControlsTabs( blockType?.name );
+	const showTabs = availableTabs?.length > 1;
 
 	if ( count > 1 ) {
 		return (
@@ -251,64 +238,25 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 		);
 	}
 
-	return (
-		<BlockInspectorSingleBlockWrapper
-			animate={
-				isOffCanvasNavigationEditorEnabled &&
-				blockInspectorAnimationSettings
-			}
-			wrapper={ ( children ) => (
-				<AnimatedContainer
-					blockInspectorAnimationSettings={
-						blockInspectorAnimationSettings
-					}
-					selectedBlockClientId={ selectedBlockClientId }
-				>
-					{ children }
-				</AnimatedContainer>
-			) }
-		>
-			<BlockInspectorSingleBlock
-				clientId={ selectedBlockClientId }
+	if (
+		isOffCanvasNavigationEditorEnabled &&
+		( blockType.name === 'core/navigation' ||
+			blockType.name === 'core/navigation-link' ||
+			blockType.name === 'core/navigation-submenu' )
+	) {
+		return (
+			<NavigationInspector
+				selectedBlockClientId={ selectedBlockClientId }
 				blockName={ blockType.name }
 			/>
-		</BlockInspectorSingleBlockWrapper>
-	);
-};
-
-const BlockInspectorSingleBlockWrapper = ( { animate, wrapper, children } ) => {
-	return animate ? wrapper( children ) : children;
-};
-
-const AnimatedContainer = ( {
-	blockInspectorAnimationSettings,
-	selectedBlockClientId,
-	children,
-} ) => {
-	const animationOrigin =
-		blockInspectorAnimationSettings &&
-		blockInspectorAnimationSettings.enterDirection === 'leftToRight'
-			? -50
-			: 50;
+		);
+	}
 
 	return (
-		<motion.div
-			animate={ {
-				x: 0,
-				opacity: 1,
-				transition: {
-					ease: 'easeInOut',
-					duration: 0.14,
-				},
-			} }
-			initial={ {
-				x: animationOrigin,
-				opacity: 0,
-			} }
-			key={ selectedBlockClientId }
-		>
-			{ children }
-		</motion.div>
+		<BlockInspectorSingleBlock
+			clientId={ selectedBlockClientId }
+			blockName={ blockType.name }
+		/>
 	);
 };
 
@@ -384,6 +332,64 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 			) }
 			<SkipToSelectedBlock key="back" />
 		</div>
+	);
+};
+
+export const NavigationInspector = ( { selectedBlockClientId, blockName } ) => {
+	let navBlockClientId;
+	const navigator = useNavigator();
+
+	if ( blockName === 'core/navigation' ) {
+		navBlockClientId = selectedBlockClientId;
+	} else if (
+		blockName === 'core/navigation-link' ||
+		blockName === 'core/navigation-submenu'
+	) {
+		navBlockClientId = reduxSelect(
+			blockEditorStore
+		).getBlockParentsByBlockName(
+			selectedBlockClientId,
+			'core/navigation',
+			true
+		)[ 0 ];
+	}
+
+	const childClientIds = reduxSelect(
+		blockEditorStore
+	).getClientIdsOfDescendants( [ navBlockClientId ] );
+
+	const childNavBlocks = childClientIds.map( ( id ) => {
+		return reduxSelect( blockEditorStore ).getBlock( id );
+	} );
+
+	// How should we use the navigator to switch between NavigatorScreens?
+	// Currently, the Block Inspector logic is wired to update based on the
+	// selectedBlockClientId, which can be modified by the Document List View,
+	// the canvas, and the off-canvas sidebar.
+
+	navigator.goTo( selectedBlockClientId );
+
+	return (
+		<NavigatorProvider initialPath="/">
+			<NavigatorScreen path="/" key={ navBlockClientId }>
+				<BlockInspectorSingleBlock
+					clientId={ navBlockClientId }
+					blockName={ 'core/navigation' }
+				/>
+			</NavigatorScreen>
+			{ childNavBlocks.map( ( childNavBlock ) => (
+				<NavigatorScreen
+					path={ childNavBlock.clientId }
+					key={ childNavBlock.clientId }
+				>
+					<BlockInspectorSingleBlock
+						clientId={ childNavBlock.clientId }
+						blockName={ childNavBlock.name }
+						key={ childNavBlock.clientId }
+					/>
+				</NavigatorScreen>
+			) ) }
+		</NavigatorProvider>
 	);
 };
 
