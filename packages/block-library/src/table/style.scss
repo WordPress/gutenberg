@@ -11,6 +11,11 @@
 		width: 100%;
 	}
 
+	tfoot {
+		font-weight: 700;
+    	text-align: inherit;
+	}
+
 	// Match default border style to default style in editor
 	td,
 	th {
