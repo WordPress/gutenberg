@@ -1657,7 +1657,14 @@ class WP_HTML_Tag_Processor {
 		$this->updated_bytes = strlen( $this->updated_html );
 
 		// 3. Point this tag processor at the original tag opener and consume it
-		$this->parsed_bytes = strlen( $updated_html_up_to_current_tag_name_end ) - $this->tag_name_length - 2;
+
+		/*
+		 * When we get here we're at the end of the tag name, and we want to rewind to before it
+		 * <p>Previous HTML<em>More HTML</em></p>
+		 *                 ^  | back up by the length of the tag name plus the opening <
+		 *                 \<-/ back up by strlen("em") + 1 ==> 3
+		 */
+		$this->parsed_bytes = strlen( $updated_html_up_to_current_tag_name_end ) - $this->tag_name_length - 1;
 		$this->next_tag();
 
 		return $this->html;
