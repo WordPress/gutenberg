@@ -38,7 +38,10 @@ function render_block_core_rss( $attributes ) {
 
 		$title = esc_html( trim( strip_tags( $item->get_title() ) ) );
 		if ( empty( $title ) ) {
-			$title = __( '(no title)' );
+			preg_match( '/^(.{0,' . $attributes['titleLength'] . '})\s/', $excerpt, $parts );
+			$title = __( $parts[1] );
+			// Excerpt will be sanitized later on
+			$excerpt = trim(substr($excerpt, strlen($title)));
 		}
 		$link = $item->get_link();
 		$link = esc_url( $link );
