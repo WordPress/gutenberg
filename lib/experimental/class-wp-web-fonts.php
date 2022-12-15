@@ -100,7 +100,16 @@ class WP_Web_Fonts extends WP_Webfonts {
 	 *
 	 * @since X.X.X
 	 *
-	 * @return WP_Webfonts_Provider[] All registered providers, each keyed by their unique ID.
+	 * @return array $providers {
+	 *     An associative array of registered providers, keyed by their unique ID.
+	 *
+	 *     @type string $provider_id => array {
+	 *         An associate array of provider's class name and fonts.
+	 *
+	 *         @type string $class   Fully qualified name of the provider's class.
+	 *         @type string[] $fonts An array of enqueued font handles for this provider.
+	 *     }
+	 * }
 	 */
 	public function get_providers() {
 		return $this->providers;

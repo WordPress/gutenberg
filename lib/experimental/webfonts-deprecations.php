@@ -10,32 +10,29 @@
  * @package    WordPress
  */
 
-if ( ! function_exists( 'wp_enqueue_webfonts' ) ) {
+if ( ! function_exists( 'wp_enqueue_webfont' ) ) {
 	/**
-	 * Enqueues a collection of font families.
+	 * Enqueue a single font family that has been registered beforehand.
 	 *
-	 * Example of how to enqueue Source Serif Pro and Roboto font families, both registered beforehand.
+	 * Example of how to enqueue Source Serif Pro font:
 	 *
 	 * <code>
-	 * wp_enqueue_webfonts(
-	 *  'Roboto',
-	 *  'Sans Serif Pro'
-	 * );
+	 * wp_enqueue_webfont( 'Source Serif Pro' );
 	 * </code>
 	 *
 	 * Font families should be enqueued from the `init` hook or later.
 	 *
-	 * BACKPORT NOTE: Do not backport this function.
-	 *
 	 * @since 6.0.0
-	 * @deprecated X.X.X Use wp_enqueue_webfont().
+	 * @deprecated X.X.X Use wp_enqueue_webfonts().
 	 *
-	 * @param string[] $font_families Font family handles (array of strings).
+	 * @param string $font_family_name The font family name to be enqueued.
+	 * @return bool True if successfully enqueued, else false.
 	 */
-	function wp_enqueue_webfonts( array $font_families ) {
-		_deprecated_function( __FUNCTION__, 'X.X.X', 'wp_enqueue_webfont()' );
+	function wp_enqueue_webfont( $font_family_name ) {
+		_deprecated_function( __FUNCTION__, 'X.X.X', 'wp_enqueue_webfonts()' );
 
-		wp_enqueue_webfont( $font_families );
+		wp_enqueue_webfonts( array( $font_family_name ) );
+		return true;
 	}
 }
 
@@ -60,15 +57,15 @@ if ( ! function_exists( 'wp_register_webfont' ) ) {
 	 * </code>
 	 *
 	 * @since 6.0.0
-	 * @deprecated X.X.X Use wp_enqueue_webfont().
+	 * @deprecated X.X.X Use wp_register_webfonts().
 	 *
 	 * @param array $webfont Webfont to be registered.
 	 * @return string|false The font family slug if successfully registered, else false.
 	 */
 	function wp_register_webfont( array $webfont ) {
-		_deprecated_function( __FUNCTION__, 'X.X.X', 'wp_register_webfont_variation()' );
+		_deprecated_function( __FUNCTION__, 'X.X.X', 'wp_register_webfonts()' );
 
-		return wp_webfonts()->register_webfont( $webfont );
+		return wp_webfonts()->register_webfont( $webfont, '', '', false );
 	}
 }
 
@@ -88,11 +85,16 @@ if ( ! function_exists( 'wp_get_webfont_providers' ) ) {
 	 * @since X.X.X
 	 * @deprecated X.X.X Use wp_webfonts()->get_providers().
 	 *
-	 * @return WP_Webfonts_Provider[] All registered providers, each keyed by their unique ID.
+	 * @return string[] All registered providers, each keyed by their unique ID.
 	 */
 	function wp_get_webfont_providers() {
 		_deprecated_function( __FUNCTION__, 'X.X.X', 'wp_webfonts()->get_providers()' );
 
-		return wp_webfonts()->get_providers();
+		$providers = array();
+		foreach ( wp_webfonts()->get_providers() as $id => $config ) {
+			$providers[ $id ] = $config['class'];
+		}
+
+		return $providers;
 	}
 }

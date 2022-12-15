@@ -37,7 +37,7 @@ class WP_Webfonts extends WP_Dependencies {
 	 */
 	public static function get_font_slug( $to_convert ) {
 		$message = is_array( $to_convert )
-			? 'Use WP_Webfonts_Utils::get_font_family_from_variation() to get the font family from an array and then WP_Webfonts_Utils::convert_font_family_into_handle() to convert the font-family name into a handle'
+			? 'Use WP_Webfonts_Utils::get l_font_family_from_variation() to get the font family from an array and then WP_Webfonts_Utils::convert_font_family_into_handle() to convert the font-family name into a handle'
 			: 'Use WP_Webfonts_Utils::convert_font_family_into_handle() to convert the font-family name into a handle';
 		_deprecated_function( __METHOD__, 'X.X.X', $message );
 
@@ -100,16 +100,19 @@ class WP_Webfonts extends WP_Dependencies {
 	 * Registers a webfont.
 	 *
 	 * @since 6.0.0
-	 * @deprecated X.X.X Use wp_register_webfont_variation().
+	 * @deprecated X.X.X Use wp_register_webfonts().
 	 *
-	 * @param array  $webfont            Web font to register.
-	 * @param string $font_family_handle Optional. Font family handle for the given variation.
-	 *                                   Default empty string.
-	 * @param string $variation_handle   Optional. Handle for the variation to register.
+	 * @param array  $webfont             Web font to register.
+	 * @param string $font_family_handle  Optional. Font family handle for the given variation.
+	 *                                    Default empty string.
+	 * @param string $variation_handle    Optional. Handle for the variation to register.
+	 * @param bool   $silence_deprecation Optional. Silences the deprecation notice. For internal use.
 	 * @return string|false The font family slug if successfully registered, else false.
 	 */
-	public function register_webfont( array $webfont, $font_family_handle = '', $variation_handle = '' ) {
-		_deprecated_function( __METHOD__, 'X.X.X', 'wp_register_webfont_variation()' );
+	public function register_webfont( array $webfont, $font_family_handle = '', $variation_handle = '', $silence_deprecation = false ) {
+		if ( ! $silence_deprecation ) {
+			_deprecated_function( __METHOD__, 'X.X.X', 'wp_register_webfonts()' );
+		}
 
 		// When font family's handle is not passed, attempt to get it from the variation.
 		if ( ! WP_Webfonts_Utils::is_defined( $font_family_handle ) ) {
@@ -132,28 +135,15 @@ class WP_Webfonts extends WP_Dependencies {
 	 * Enqueue a font-family that has been already registered.
 	 *
 	 * @since 6.0.0
-	 * @deprecated X.X.X Use wp_webfonts()->enqueue() or wp_enqueue_webfont().
+	 * @deprecated X.X.X Use wp_enqueue_webfonts().
 	 *
 	 * @param string $font_family_name The font family name to be enqueued.
 	 * @return bool True if successfully enqueued, else false.
 	 */
 	public function enqueue_webfont( $font_family_name ) {
-		_deprecated_function( __METHOD__, 'X.X.X', 'wp_webfonts()->enqueue() or wp_enqueue_webfont()' );
+		_deprecated_function( __METHOD__, 'X.X.X', 'wp_enqueue_webfonts()' );
 
-		$slug = static::_get_font_slug( $font_family_name );
-
-		if ( isset( $this->enqueued[ $slug ] ) ) {
-			return true;
-		}
-
-		if ( ! isset( $this->registered[ $slug ] ) ) {
-			/* translators: %s unique slug to identify the font family of the webfont */
-			_doing_it_wrong( __METHOD__, sprintf( __( 'The "%s" font family is not registered.', 'gutenberg' ), $slug ), '6.0.0' );
-
-			return false;
-		}
-
-		$this->enqueue( $slug );
+		wp_enqueue_webfonts( array( $font_family_name ) );
 		return true;
 	}
 
@@ -239,14 +229,29 @@ class WP_Webfonts extends WP_Dependencies {
 	 * @return array[]
 	 */
 	private function _get_registered_webfonts() {
-		$registered = array();
+		$font_families = array();
+		$registered    = array();
+
+		// Find the registered font families.
 		foreach ( $this->registered as $handle => $obj ) {
-			// Skip the font-family.
-			if ( $obj->extra['is_font_family'] ) {
+			if ( ! $obj->extra['is_font_family'] ) {
 				continue;
 			}
 
-			$registered[ $handle ] = $obj->extra['font-properties'];
+			if ( ! isset( $registered[ $handle ] ) ) {
+				$registered[ $handle ] = array();
+			}
+
+			$font_families[ $handle ] = $obj->deps;
+		}
+
+		// Build the return array structure.
+		foreach ( $font_families as $font_family_handle => $variations ) {
+			foreach ( $variations as $variation_handle ) {
+				$variation_obj = $this->registered[ $variation_handle ];
+
+				$registered[ $font_family_handle ][ $variation_handle ] = $variation_obj->extra['font-properties'];
+			}
 		}
 
 		return $registered;
