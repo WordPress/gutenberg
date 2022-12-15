@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -174,7 +173,7 @@ function GalleryEdit( props ) {
 	 */
 	function buildImageAttributes( imageAttributes ) {
 		const image = imageAttributes.id
-			? find( imageData, { id: imageAttributes.id } )
+			? imageData.find( ( { id } ) => id === imageAttributes.id )
 			: null;
 
 		let newClassName;
@@ -217,9 +216,19 @@ function GalleryEdit( props ) {
 	}
 
 	function isValidFileType( file ) {
+		// It's necessary to retrieve the media type from the raw image data for already-uploaded images on native.
+		const nativeFileData =
+			Platform.isNative && file.id
+				? imageData.find( ( { id } ) => id === file.id )
+				: null;
+
+		const mediaTypeSelector = nativeFileData
+			? nativeFileData?.media_type
+			: file.type;
+
 		return (
 			ALLOWED_MEDIA_TYPES.some(
-				( mediaType ) => file.type?.indexOf( mediaType ) === 0
+				( mediaType ) => mediaTypeSelector?.indexOf( mediaType ) === 0
 			) || file.url?.indexOf( 'blob:' ) === 0
 		);
 	}
@@ -323,7 +332,7 @@ function GalleryEdit( props ) {
 		getBlock( clientId ).innerBlocks.forEach( ( block ) => {
 			blocks.push( block.clientId );
 			const image = block.attributes.id
-				? find( imageData, { id: block.attributes.id } )
+				? imageData.find( ( { id } ) => id === block.attributes.id )
 				: null;
 			changedAttributes[ block.clientId ] = getHrefAndDestination(
 				image,
@@ -391,7 +400,7 @@ function GalleryEdit( props ) {
 		getBlock( clientId ).innerBlocks.forEach( ( block ) => {
 			blocks.push( block.clientId );
 			const image = block.attributes.id
-				? find( imageData, { id: block.attributes.id } )
+				? imageData.find( ( { id } ) => id === block.attributes.id )
 				: null;
 			changedAttributes[ block.clientId ] = getImageSizeAttributes(
 				image,
@@ -486,6 +495,7 @@ function GalleryEdit( props ) {
 				<PanelBody title={ __( 'Settings' ) }>
 					{ images.length > 1 && (
 						<RangeControl
+							__nextHasNoMarginBottom
 							label={ __( 'Columns' ) }
 							value={
 								columns

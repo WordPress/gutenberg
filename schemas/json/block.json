@@ -160,6 +160,7 @@
 								"attribute",
 								"text",
 								"html",
+								"raw",
 								"query",
 								"meta"
 							]
@@ -271,7 +272,7 @@
 						},
 						"link": {
 							"type": "boolean",
-							"description": "This property adds block controls which allow the user to set link color in a block, link color is disabled by default.\n\nLink color presets are sourced from the editor-color-palette theme support.\n\nWhen the block declares support for color.link, the attributes definition is extended to include two new attributes: linkColor and style",
+							"description": "This property adds block controls which allow the user to set link color in a block, link color is disabled by default.\n\nLink color presets are sourced from the editor-color-palette theme support.\n\nWhen the block declares support for color.link, the attributes definition is extended to include the style attribute",
 							"default": false
 						},
 						"text": {

@@ -70,4 +70,15 @@ export type TabPanelProps = {
 	 * Array of tab objects. Each tab object should contain at least a `name` and a `title`.
 	 */
 	tabs: Tab[];
+	/**
+	 * When `true`, the tab will be selected when receiving focus (automatic tab
+	 * activation). When `false`, the tab will be selected only when clicked
+	 * (manual tab activation). See the official W3C docs for more info.
+	 * .
+	 *
+	 * @default true
+	 *
+	 * @see https://www.w3.org/WAI/ARIA/apg/patterns/tabpanel/
+	 */
+	selectOnMove?: boolean;
 };

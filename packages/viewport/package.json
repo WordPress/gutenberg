@@ -30,7 +30,7 @@
 		"@wordpress/data": "file:../data"
 	},
 	"peerDependencies": {
-		"react": "^17.0.0"
+		"react": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

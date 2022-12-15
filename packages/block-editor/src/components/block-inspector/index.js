@@ -14,9 +14,10 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	Button,
+	__unstableMotion as motion,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMemo, useCallback } from '@wordpress/element';
+import { useMemo, useCallback, Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -32,6 +33,7 @@ import BlockStyles from '../block-styles';
 import DefaultStylePicker from '../default-style-picker';
 import { default as InspectorControls } from '../inspector-controls';
 import { default as InspectorControlsTabs } from '../inspector-controls-tabs';
+import useInspectorControlsTabs from '../inspector-controls-tabs/use-inspector-controls-tabs';
 import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel';
 
 function useContentBlocks( blockTypes, block ) {
@@ -139,7 +141,6 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 		selectedBlockClientId,
 		blockType,
 		topLevelLockedBlock,
-		parentBlockClientId,
 	} = useSelect( ( select ) => {
 		const {
 			getSelectedBlockClientId,
@@ -147,7 +148,6 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			getBlockName,
 			__unstableGetContentLockingParent,
 			getTemplateLock,
-			getBlockParents,
 		} = select( blockEditorStore );
 
 		const _selectedBlockClientId = getSelectedBlockClientId();
@@ -166,21 +166,34 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 				( getTemplateLock( _selectedBlockClientId ) === 'contentOnly'
 					? _selectedBlockClientId
 					: undefined ),
-			parentBlockClientId: getBlockParents(
-				_selectedBlockClientId,
-				true
-			)[ 0 ],
 		};
 	}, [] );
 
-	const showTabs = window?.__experimentalEnableBlockInspectorTabs;
+	const availableTabs = useInspectorControlsTabs( blockType?.name );
+	const showTabs = availableTabs?.length > 1;
+
+	const isOffCanvasNavigationEditorEnabled =
+		window?.__experimentalEnableOffCanvasNavigationEditor === true;
+
+	const blockInspectorAnimationSettings = useSelect(
+		( select ) => {
+			if ( isOffCanvasNavigationEditorEnabled ) {
+				const globalBlockInspectorAnimationSettings =
+					select( blockEditorStore ).getSettings()
+						.__experimentalBlockInspectorAnimation;
+				return globalBlockInspectorAnimationSettings[ blockType.name ];
+			}
+			return null;
+		},
+		[ selectedBlockClientId, isOffCanvasNavigationEditorEnabled, blockType ]
+	);
 
 	if ( count > 1 ) {
 		return (
 			<div className="block-editor-block-inspector">
 				<MultiSelectionInspector />
 				{ showTabs ? (
-					<InspectorControlsTabs />
+					<InspectorControlsTabs tabs={ availableTabs } />
 				) : (
 					<>
 						<InspectorControls.Slot />
@@ -235,21 +248,73 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			/>
 		);
 	}
+
 	return (
-		<BlockInspectorSingleBlock
-			clientId={ selectedBlockClientId }
-			blockName={ blockType.name }
-			parentBlockClientId={ parentBlockClientId }
-		/>
+		<BlockInspectorSingleBlockWrapper
+			animate={
+				isOffCanvasNavigationEditorEnabled &&
+				blockInspectorAnimationSettings
+			}
+			wrapper={ ( children ) => (
+				<AnimatedContainer
+					blockInspectorAnimationSettings={
+						blockInspectorAnimationSettings
+					}
+					selectedBlockClientId={ selectedBlockClientId }
+				>
+					{ children }
+				</AnimatedContainer>
+			) }
+		>
+			<Fragment>
+				<BlockInspectorSingleBlock
+					clientId={ selectedBlockClientId }
+					blockName={ blockType.name }
+				/>
+			</Fragment>
+		</BlockInspectorSingleBlockWrapper>
 	);
 };
 
-const BlockInspectorSingleBlock = ( {
-	clientId,
-	blockName,
-	parentBlockClientId,
+const BlockInspectorSingleBlockWrapper = ( { animate, wrapper, children } ) => {
+	return animate ? wrapper( children ) : children;
+};
+
+const AnimatedContainer = ( {
+	blockInspectorAnimationSettings,
+	selectedBlockClientId,
+	children,
 } ) => {
-	const showTabs = window?.__experimentalEnableBlockInspectorTabs;
+	const animationOrigin =
+		blockInspectorAnimationSettings &&
+		blockInspectorAnimationSettings.enterDirection === 'leftToRight'
+			? -50
+			: 50;
+
+	return (
+		<motion.div
+			animate={ {
+				x: 0,
+				opacity: 1,
+				transition: {
+					ease: 'easeInOut',
+					duration: 0.14,
+				},
+			} }
+			initial={ {
+				x: animationOrigin,
+				opacity: 0,
+			} }
+			key={ selectedBlockClientId }
+		>
+			{ children }
+		</motion.div>
+	);
+};
+
+const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
+	const availableTabs = useInspectorControlsTabs( blockName );
+	const showTabs = availableTabs?.length > 1;
 
 	const hasBlockStyles = useSelect(
 		( select ) => {
@@ -261,17 +326,11 @@ const BlockInspectorSingleBlock = ( {
 	);
 	const blockInformation = useBlockDisplayInformation( clientId );
 
-	const { selectBlock } = useDispatch( blockEditorStore );
-
 	return (
 		<div className="block-editor-block-inspector">
 			<BlockCard
 				{ ...blockInformation }
 				className={ blockInformation.isSynced && 'is-synced' }
-				parentBlockClientId={ parentBlockClientId }
-				handleBackButton={ () => {
-					selectBlock( parentBlockClientId );
-				} }
 			/>
 			<BlockVariationTransforms blockClientId={ clientId } />
 			{ showTabs && (
@@ -279,6 +338,7 @@ const BlockInspectorSingleBlock = ( {
 					hasBlockStyles={ hasBlockStyles }
 					clientId={ clientId }
 					blockName={ blockName }
+					tabs={ availableTabs }
 				/>
 			) }
 			{ ! showTabs && (

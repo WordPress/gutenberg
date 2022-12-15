@@ -43,8 +43,8 @@ function UnconnectedNavigatorProvider(
 
 	const goTo: NavigatorContextType[ 'goTo' ] = useCallback(
 		( path, options = {} ) => {
-			setLocationHistory( [
-				...locationHistory,
+			setLocationHistory( ( prevLocationHistory ) => [
+				...prevLocationHistory,
 				{
 					...options,
 					path,
@@ -53,21 +53,24 @@ function UnconnectedNavigatorProvider(
 				},
 			] );
 		},
-		[ locationHistory ]
+		[]
 	);
 
 	const goBack: NavigatorContextType[ 'goBack' ] = useCallback( () => {
-		if ( locationHistory.length > 1 ) {
-			setLocationHistory( [
-				...locationHistory.slice( 0, -2 ),
+		setLocationHistory( ( prevLocationHistory ) => {
+			if ( prevLocationHistory.length <= 1 ) {
+				return prevLocationHistory;
+			}
+			return [
+				...prevLocationHistory.slice( 0, -2 ),
 				{
-					...locationHistory[ locationHistory.length - 2 ],
+					...prevLocationHistory[ prevLocationHistory.length - 2 ],
 					isBack: true,
 					hasRestoredFocus: false,
 				},
-			] );
-		}
-	}, [ locationHistory ] );
+			];
+		} );
+	}, [] );
 
 	const navigatorContextValue: NavigatorContextType = useMemo(
 		() => ( {

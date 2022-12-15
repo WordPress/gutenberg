@@ -23,6 +23,7 @@ export function BlockPreview( {
 	__experimentalPadding = 0,
 	viewportWidth = 1200,
 	__experimentalMinHeight,
+	__experimentalStyles = [],
 } ) {
 	const originalSettings = useSelect(
 		( select ) => select( blockEditorStore ).getSettings(),
@@ -45,6 +46,7 @@ export function BlockPreview( {
 				viewportWidth={ viewportWidth }
 				__experimentalPadding={ __experimentalPadding }
 				__experimentalMinHeight={ __experimentalMinHeight }
+				__experimentalStyles={ __experimentalStyles }
 			/>
 		</BlockEditorProvider>
 	);

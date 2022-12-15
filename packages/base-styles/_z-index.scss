@@ -11,10 +11,9 @@ $z-layers: (
 	".components-form-toggle__input": 1,
 	".edit-post-text-editor__toolbar": 1,
 	".edit-site-code-editor__toolbar": 1,
-	".edit-post-sidebar__panel-tab.is-active": 1,
 
 	// These next three share a stacking context
-	".block-library-template-part__selection-search": 1, // higher sticky element
+	".block-library-template-part__selection-search": 2, // higher sticky element
 
 	// These next two share a stacking context
 	".interface-complementary-area .components-panel" : 0, // lower scrolling content
@@ -107,14 +106,6 @@ $z-layers: (
 
 	// Show interface skeleton footer above interface skeleton drawer
 	".interface-interface-skeleton__footer": 90,
-
-	// Show the navigation toggle above the skeleton header
-	".edit-site-navigation-toggle": 31,
-	// Show the navigation link above the skeleton header
-	".edit-site-navigation-link": 31,
-
-	// Show the FSE template previews above the editor and any open block toolbars
-	".edit-site-navigation-panel__preview": 32,
 
 	// Above the block list and the header.
 	".block-editor-block-popover": 31,
