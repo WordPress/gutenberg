@@ -92,6 +92,7 @@ function ListViewBranch( props ) {
 		parentId,
 		shouldShowInnerBlocks = true,
 		selectBlockInCanvas,
+		onInsertBlock,
 	} = props;
 
 	const isContentLocked = useSelect(
@@ -175,6 +176,7 @@ function ListViewBranch( props ) {
 								listPosition={ nextPosition }
 								selectedClientIds={ selectedClientIds }
 								selectBlockInCanvas={ selectBlockInCanvas }
+								onInsertBlock={ onInsertBlock }
 							/>
 						) }
 						{ ! showBlock && (
@@ -196,6 +198,7 @@ function ListViewBranch( props ) {
 								selectedClientIds={ selectedClientIds }
 								isExpanded={ isExpanded }
 								selectBlockInCanvas={ selectBlockInCanvas }
+								onInsertBlock={ onInsertBlock }
 							/>
 						) }
 					</AsyncModeProvider>

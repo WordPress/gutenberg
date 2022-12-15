@@ -10,8 +10,9 @@ import {
 	__experimentalTreeGridRow as TreeGridRow,
 	__experimentalTreeGridCell as TreeGridCell,
 } from '@wordpress/components';
-import { AsyncModeProvider, useSelect } from '@wordpress/data';
+import { AsyncModeProvider, useSelect, useDispatch } from '@wordpress/data';
 import {
+	useState,
 	useCallback,
 	useEffect,
 	useMemo,
@@ -33,6 +34,14 @@ import useListViewDropZone from './use-list-view-drop-zone';
 import useListViewExpandSelectedItem from './use-list-view-expand-selected-item';
 import { store as blockEditorStore } from '../../store';
 import { Appender } from './appender';
+
+import { LinkUI } from './link-ui';
+import { updateAttributes } from './update-attributes';
+
+const BLOCKS_WITH_LINK_UI_SUPPORT = [
+	'core/navigation-link',
+	'core/navigation-submenu',
+];
 
 const expanded = ( state, action ) => {
 	if ( Array.isArray( action.clientIds ) ) {
@@ -94,6 +103,9 @@ function __ExperimentalOffCanvasEditor(
 		},
 		[ draggedClientIds ]
 	);
+
+	const [ insertedBlockClientId, setInsertedBlockClientId ] =
+		useState( null );
 
 	const { updateBlockSelection } = useBlockSelection();
 
@@ -192,6 +204,52 @@ function __ExperimentalOffCanvasEditor(
 		[ isMounted.current, draggedClientIds, expandedState, expand, collapse ]
 	);
 
+	const { insertedBlockAttributes, insertedBlockName } = useSelect(
+		( select ) => {
+			const { getBlockName, getBlockAttributes } =
+				select( blockEditorStore );
+
+			return {
+				insertedBlockAttributes: getBlockAttributes(
+					insertedBlockClientId
+				),
+				insertedBlockName: getBlockName( insertedBlockClientId ),
+			};
+		},
+		[ insertedBlockClientId ]
+	);
+
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+
+	const setAttributes =
+		( _insertedBlockClientId ) => ( _updatedAttributes ) => {
+			updateBlockAttributes( _insertedBlockClientId, _updatedAttributes );
+		};
+
+	let maybeLinkUI;
+
+	if (
+		insertedBlockClientId &&
+		BLOCKS_WITH_LINK_UI_SUPPORT?.includes( insertedBlockName )
+	) {
+		maybeLinkUI = (
+			<LinkUI
+				clientId={ insertedBlockClientId }
+				link={ insertedBlockAttributes }
+				onClose={ () => setInsertedBlockClientId( null ) }
+				hasCreateSuggestion={ false }
+				onChange={ ( updatedValue ) => {
+					updateAttributes(
+						updatedValue,
+						setAttributes( insertedBlockClientId ),
+						insertedBlockAttributes
+					);
+					setInsertedBlockClientId( null );
+				} }
+			/>
+		);
+	}
+
 	return (
 		<AsyncModeProvider value={ true }>
 			<ListViewDropIndicator
@@ -219,6 +277,7 @@ function __ExperimentalOffCanvasEditor(
 							isExpanded={ isExpanded }
 							shouldShowInnerBlocks={ shouldShowInnerBlocks }
 							selectBlockInCanvas={ selectBlockInCanvas }
+							onInsertBlock={ setInsertedBlockClientId }
 						/>
 						<TreeGridRow
 							level={ 1 }
@@ -228,7 +287,15 @@ function __ExperimentalOffCanvasEditor(
 						>
 							<TreeGridCell>
 								{ ( treeGridCellProps ) => (
-									<Appender { ...treeGridCellProps } />
+									<>
+										{ maybeLinkUI }
+										<Appender
+											{ ...treeGridCellProps }
+											onInsertBlock={
+												setInsertedBlockClientId
+											}
+										/>
+									</>
 								) }
 							</TreeGridCell>
 							{ ! clientIdsTree.length && (
