@@ -15,6 +15,7 @@ import {
 	InspectorControls,
 	BlockControls,
 	useBlockProps,
+	__experimentalUseFontAppearanceStyles,
 } from '@wordpress/block-editor';
 import { ToggleControl, PanelBody, ToolbarButton } from '@wordpress/components';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
@@ -26,14 +27,13 @@ import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import LevelControl from './level-toolbar';
-import useTypographyStyle from './use-typography-style';
 
 export default function SiteTitleEdit( {
 	attributes,
 	setAttributes,
 	insertBlocksAfter,
 } ) {
-	const { level, textAlign, isLink, linkTarget, style } = attributes;
+	const { level, textAlign, isLink, linkTarget } = attributes;
 	const { canUserEdit, title } = useSelect( ( select ) => {
 		const { canUser, getEntityRecord, getEditedEntityRecord } =
 			select( coreStore );
@@ -54,10 +54,8 @@ export default function SiteTitleEdit( {
 		} );
 	}
 
-	const { isBold, isItalic, toggleBold, toggleItalic } = useTypographyStyle(
-		style,
-		setAttributes
-	);
+	const { isBold, isItalic, toggleBold, toggleItalic } =
+		__experimentalUseFontAppearanceStyles( { attributes, setAttributes } );
 
 	// Toggle bold and italic styles with keyboard shortcuts.
 	function onKeyDown( event ) {
