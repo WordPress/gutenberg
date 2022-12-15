@@ -950,7 +950,7 @@ export function useGlobalStylesOutput() {
 						selector +
 						'{' +
 						mergedConfig.styles.blocks[ name[ 0 ] ]?.css +
-						';}',
+						'}',
 					isGlobalStyles: true,
 				} );
 			}
