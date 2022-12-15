@@ -80,7 +80,10 @@ function ContextScreens( { name, parentMenu = '' } ) {
 	return (
 		<>
 			<GlobalStylesNavigationScreen path={ parentMenu + '/typography' }>
-				<ScreenTypography name={ name } />
+				<ScreenTypography
+					name={ name }
+					variationPath={ variationPath }
+				/>
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen
@@ -108,7 +111,7 @@ function ContextScreens( { name, parentMenu = '' } ) {
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/colors' }>
-				<ScreenColors name={ name } />
+				<ScreenColors name={ name } variationPath={ variationPath } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen

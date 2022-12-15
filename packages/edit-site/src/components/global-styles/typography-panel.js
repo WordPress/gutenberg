@@ -171,7 +171,12 @@ function useFontAppearance( prefix, name ) {
 	};
 }
 
-export default function TypographyPanel( { name, element, headingLevel } ) {
+export default function TypographyPanel( {
+	name,
+	element,
+	headingLevel,
+	variationPath = '',
+} ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	let prefix = '';
 	if ( element === 'heading' ) {
@@ -210,9 +215,15 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
 	}
 
 	const [ fontFamily, setFontFamily, hasFontFamily, resetFontFamily ] =
-		useStyleWithReset( prefix + 'typography.fontFamily', name );
+		useStyleWithReset(
+			variationPath + prefix + 'typography.fontFamily',
+			name
+		);
 	const { fontSize, setFontSize, hasFontSize, resetFontSize } =
-		useFontSizeWithReset( prefix + 'typography.fontSize', name );
+		useFontSizeWithReset(
+			variationPath + prefix + 'typography.fontSize',
+			name
+		);
 	const {
 		fontStyle,
 		setFontStyle,
@@ -220,27 +231,39 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
 		setFontWeight,
 		hasFontAppearance,
 		resetFontAppearance,
-	} = useFontAppearance( prefix, name );
+	} = useFontAppearance( variationPath + prefix, name );
 	const [ lineHeight, setLineHeight, hasLineHeight, resetLineHeight ] =
-		useStyleWithReset( prefix + 'typography.lineHeight', name );
+		useStyleWithReset(
+			variationPath + prefix + 'typography.lineHeight',
+			name
+		);
 	const [
 		letterSpacing,
 		setLetterSpacing,
 		hasLetterSpacing,
 		resetLetterSpacing,
-	] = useStyleWithReset( prefix + 'typography.letterSpacing', name );
+	] = useStyleWithReset(
+		variationPath + prefix + 'typography.letterSpacing',
+		name
+	);
 	const [
 		textTransform,
 		setTextTransform,
 		hasTextTransform,
 		resetTextTransform,
-	] = useStyleWithReset( prefix + 'typography.textTransform', name );
+	] = useStyleWithReset(
+		variationPath + prefix + 'typography.textTransform',
+		name
+	);
 	const [
 		textDecoration,
 		setTextDecoration,
 		hasTextDecoration,
 		resetTextDecoration,
-	] = useStyleWithReset( prefix + 'typography.textDecoration', name );
+	] = useStyleWithReset(
+		variationPath + prefix + 'typography.textDecoration',
+		name
+	);
 
 	const resetAll = () => {
 		resetFontFamily();
