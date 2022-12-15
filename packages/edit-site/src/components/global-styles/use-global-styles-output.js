@@ -691,6 +691,60 @@ export const toStyles = (
 				Object.entries( styleVariationSelectors ).forEach(
 					( [ styleVariationName, styleVariationSelector ] ) => {
 						if ( styles?.variations?.[ styleVariationName ] ) {
+							// If the block uses any custom selectors for block support, add those first.
+							if ( featureSelectors ) {
+								Object.entries( featureSelectors ).forEach(
+									( [ featureName, featureSelector ] ) => {
+										if (
+											styles?.variations?.[
+												styleVariationName
+											]?.[ featureName ]
+										) {
+											const featureStyles = {
+												[ featureName ]:
+													styles.variations[
+														styleVariationName
+													][ featureName ],
+											};
+											const featureDeclarations =
+												getStylesDeclarations(
+													featureStyles
+												);
+											delete styles.variations[
+												styleVariationName
+											][ featureName ];
+
+											if (
+												!! featureDeclarations.length
+											) {
+												const _featureSelectors =
+													featureSelector.split(
+														','
+													);
+												const combinedSelectors = [];
+												_featureSelectors.forEach(
+													( _featureSelector ) => {
+														combinedSelectors.push(
+															`${ styleVariationSelector.trim() }${ _featureSelector.trim() }`
+														);
+													}
+												);
+												const combinedSelectorString =
+													combinedSelectors.join(
+														', '
+													);
+
+												ruleset =
+													ruleset +
+													`${ combinedSelectorString }{${ featureDeclarations.join(
+														';'
+													) } }`;
+											}
+										}
+									}
+								);
+							}
+							// Otherwise add regular selectors.
 							const styleVariationDeclarations =
 								getStylesDeclarations(
 									styles?.variations?.[ styleVariationName ],

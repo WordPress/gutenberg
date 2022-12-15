@@ -97,8 +97,12 @@ function applyAllFallbackStyles( border ) {
 export default function BorderPanel( { name, variationPath = '' } ) {
 	// To better reflect if the user has customized a value we need to
 	// ensure the style value being checked is from the `user` origin.
-	const [ userBorderStyles ] = useStyle( 'border', name, 'user' );
-	const [ border, setBorder ] = useStyle( 'border', name );
+	const [ userBorderStyles ] = useStyle(
+		`${ variationPath }border`,
+		name,
+		'user'
+	);
+	const [ border, setBorder ] = useStyle( `${ variationPath }border`, name );
 	const colors = useColorsPerOrigin( name );
 
 	const showBorderColor = useHasBorderColorControl( name );
