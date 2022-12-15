@@ -3,11 +3,75 @@
  */
 import { __ } from '@wordpress/i18n';
 import { resolveSelect } from '@wordpress/data';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
  */
 import { store as coreStore } from '@wordpress/core-data';
+
+const getExternalLink = ( url, text ) =>
+	`<a href="${ url }" target="_blank" rel="noreferrer noopener">${ text }</a>`;
+
+const getOpenvereLicense = (
+	license,
+	licenseVersion = '', // unknown version.
+	licenseUrl
+) => {
+	let licenseName = license.trim();
+	// PDM has no abbreviation
+	if ( license !== 'pdm' ) {
+		licenseName = license.toUpperCase().replace( 'SAMPLING', 'Sampling' );
+	}
+	// If version is known, append version to the name.
+	if ( licenseVersion ) {
+		licenseName += ` ${ licenseVersion }`;
+	}
+	// For licenses other than public-domain marks, prepend 'CC' to the name.
+	const isPublicDomainMark = [ 'pdm', 'cc0' ].includes( license );
+	if ( ! isPublicDomainMark ) {
+		licenseName = `CC ${ licenseName }`;
+	}
+	if ( !! licenseUrl ) {
+		license = getExternalLink(
+			`${ licenseUrl }?ref=openverse`,
+			licenseName
+		);
+	}
+	// TODO: add translators comment.
+	const markedLicence = isPublicDomainMark
+		? __( 'is marked with' )
+		: __( 'is licensed under' );
+	return `${ markedLicence } ${ license }`;
+};
+
+const getOpenverseCaption = ( item ) => {
+	const {
+		title = __( 'This work' ), // TODO: add translators comment.
+		foreign_landing_url: foreignLandingUrl,
+		creator,
+		creator_url: creatorUrl,
+		license,
+		license_version: licenseVersion,
+		license_url: licenseUrl,
+	} = item;
+	let _title = decodeEntities( title );
+	if ( !! foreignLandingUrl ) {
+		_title = getExternalLink( foreignLandingUrl, _title );
+	}
+	const fullLicense = getOpenvereLicense(
+		license,
+		licenseVersion,
+		licenseUrl
+	);
+	let _creator = decodeEntities( creator );
+	if ( creatorUrl ) {
+		_creator = getExternalLink( creatorUrl, creator );
+	}
+	_creator = ` ${ __( 'by' ) } ${ _creator }`; // TODO: add translators comment.
+	const caption = `"${ _title }" ${ _creator } ${ fullLicense }.`;
+	return caption.replace( /\s{2}/g, ' ' );
+};
 
 const coreMediaFetch = async ( query = {} ) => {
 	const mediaItems = await resolveSelect( coreStore ).getMediaItems( {
@@ -76,6 +140,7 @@ const inserterMediaCategories = [
 				...result,
 				sourceId: result.id,
 				id: undefined,
+				caption: getOpenverseCaption( result ),
 			} ) );
 		},
 		hasAvailableMedia: true,

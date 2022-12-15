@@ -18,7 +18,7 @@ export function getBlockAndPreviewFromMedia( media, mediaType ) {
 	// Add the common attributes between the different media types.
 	const attributes = {
 		id: media.id || undefined,
-		caption: media.caption || undefined,
+		caption: media.caption || undefined, // TODO: probably check to escape for security
 	};
 	const mediaSrc = media.url;
 	const alt = media.alt || undefined;
