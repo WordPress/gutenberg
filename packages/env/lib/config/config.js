@@ -40,7 +40,6 @@ const md5 = require( '../md5' );
  * @property {Object}                    config        Mapping of wp-config.php constants to their desired values.
  * @property {Object.<string, WPSource>} mappings      Mapping of WordPress directories to local directories which should be mounted.
  * @property {string}                    phpVersion    Version of PHP to use in the environments, of the format 0.0.
- * @property {string}                    cliPhpVersion Version of PHP to use in the cli service (defined in the docker-compose.yml file).
  */
 
 /**
@@ -89,7 +88,6 @@ module.exports = async function readConfig( configPath ) {
 	const defaultConfiguration = {
 		core: null, // Indicates that the latest stable version should ultimately be used.
 		phpVersion: null,
-		cliPhpVersion: null,
 		plugins: [],
 		themes: [],
 		port: 8888,
@@ -273,16 +271,6 @@ function withOverrides( config ) {
 		process.env.WP_ENV_PHP_VERSION || config.env.development.phpVersion;
 	config.env.tests.phpVersion =
 		process.env.WP_ENV_PHP_VERSION || config.env.tests.phpVersion;
-
-	// Override CLI PHP version with environment variable.
-	config.env.development.cliPhpVersion =
-		process.env.WP_ENV_CLI_PHP_VERSION ||
-		config.env.development.cliPhpVersion ||
-		config.env.development.phpVersion;
-	config.env.tests.cliPhpVersion =
-		process.env.WP_ENV_CLI_PHP_VERSION ||
-		config.env.tests.cliPhpVersion ||
-		config.env.tests.phpVersion;
 
 	const updateEnvUrl = ( configKey ) => {
 		[ 'development', 'tests' ].forEach( ( envKey ) => {

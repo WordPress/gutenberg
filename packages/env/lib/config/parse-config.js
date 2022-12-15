@@ -37,7 +37,6 @@ module.exports = async function parseConfig( config, options ) {
 	return {
 		port: config.port,
 		phpVersion: config.phpVersion,
-		cliPhpVersion: config.cliPhpVersion,
 		coreSource: includeTestsPath(
 			await parseCoreSource( config.core, options ),
 			options
