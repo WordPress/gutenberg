@@ -44,3 +44,20 @@ export function getCommonSizeUnit( fontSizes: FontSize[] ) {
 	} );
 	return areAllSizesSameUnit ? firstUnit : null;
 }
+
+/**
+ * hasValidShortName
+ *
+ * check that the font size short name is a string with at most
+ * 3 characters length (e.g. "XXS", "XS", "S", "M", "L", "XL", "XXL")
+ *
+ * @param  shortName font size object
+ * @return boolean
+ */
+export function hasValidShortName( shortName: string | undefined ): boolean {
+	return (
+		typeof shortName === 'string' &&
+		shortName.length >= 1 &&
+		shortName.length <= 3
+	);
+}
