@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * Need:
+ *  - select( $tags, $selector_sequence )
+ *  - select_child( $tags_at_outer_tag, $selector_sequence )
+ *  - select_descendant( $tags_at_outer_tag, $selector_sequence )
+ *  - select_adjacent_sibling( $tags_at_start_tag, $selector_sequence )
+ *  - select_general_sibling( $tags_at_start_tag, $selector_sequence )
+ *  - close_n_levels( $tags_at_depth, $n_levels )
+ */
+
 /**
  * Existing Core Selectors
  *
