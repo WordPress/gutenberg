@@ -35,6 +35,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 		displayDate,
 		displayExcerpt,
 		excerptLength,
+		titleLength,
 		feedURL,
 		itemsToShow,
 	} = attributes;
@@ -149,6 +150,17 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 							required
 						/>
 					) }
+					<RangeControl
+						__nextHasNoMarginBottom
+						label={ __( 'Max number of words in title' ) }
+						value={ titleLength }
+						onChange={ ( value ) =>
+							setAttributes( { titleLength: value } )
+						}
+						min={ 10 }
+						max={ 100 }
+						required
+					/>
 					{ blockLayout === 'grid' && (
 						<RangeControl
 							__nextHasNoMarginBottom

@@ -699,7 +699,7 @@ Display entries from any RSS or Atom feed. ([Source](https://github.com/WordPres
 -	**Name:** core/rss
 -	**Category:** widgets
 -	**Supports:** align, ~~html~~
--	**Attributes:** blockLayout, columns, displayAuthor, displayDate, displayExcerpt, excerptLength, feedURL, itemsToShow
+-	**Attributes:** blockLayout, columns, displayAuthor, displayDate, displayExcerpt, excerptLength, feedURL, itemsToShow, titleLength
 
 ## Search
 
