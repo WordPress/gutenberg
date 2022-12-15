@@ -395,6 +395,10 @@
 										"description": "Kebab-case unique identifier for the font size preset.",
 										"type": "string"
 									},
+									"shortName": {
+										"description": "Short name of the font size preset. Gets used in the font size selector if fewer than 5 presets are defined.",
+										"type": "string"
+									},
 									"size": {
 										"description": "CSS font-size value, including units.",
 										"type": "string"
