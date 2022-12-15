@@ -939,16 +939,16 @@ export function useGlobalStylesOutput() {
 			},
 		];
 
-		// WIP
 		// Loop through the blocks to check if there are custom CSS values.
 		// If there are, get the block selector and push the selector together with
-		// CSS value to the 'stylesheets' array.
-		// Below, the p selector is used so that we can test it with the paragraph block.
+		// the CSS value to the 'stylesheets' array.
 		Object.entries( blockNames ).forEach( ( name ) => {
 			if ( mergedConfig.styles.blocks[ name[ 0 ] ]?.css ) {
+				const selector = blockSelectors[ name[ 0 ] ].selector;
 				stylesheets.push( {
 					css:
-						'p{ ' +
+						selector +
+						'{' +
 						mergedConfig.styles.blocks[ name[ 0 ] ]?.css +
 						';}',
 					isGlobalStyles: true,
