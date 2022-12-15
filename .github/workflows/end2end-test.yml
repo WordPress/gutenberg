@@ -19,7 +19,7 @@ jobs:
     admin:
         name: Admin - ${{ matrix.part }}
         runs-on: ubuntu-latest
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        if: ${{ github.repository == 'talldan/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
             matrix:
@@ -67,7 +67,7 @@ jobs:
     e2e-playwright:
         name: Playwright
         runs-on: ubuntu-latest
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        if: ${{ github.repository == 'talldan/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
 
