@@ -386,7 +386,7 @@ function ListViewBlock( {
 											onClose();
 										} }
 									>
-										{ __( 'Add a submenu item' ) }
+										{ __( 'Add submenu item' ) }
 									</MenuItem>
 								) }
 							</BlockSettingsDropdown>
