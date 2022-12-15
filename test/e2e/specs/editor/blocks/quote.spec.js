@@ -15,7 +15,13 @@ test.describe( 'Quote', () => {
 		await editor.insertBlock( { name: 'core/quote' } );
 		// Type content right after.
 		await page.keyboard.type( 'Quote content' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:quote -->
+<blockquote class="wp-block-quote"><!-- wp:paragraph -->
+<p>Quote content</p>
+<!-- /wp:paragraph --></blockquote>
+<!-- /wp:quote -->`
+		);
 	} );
 
 	test( 'can be created by using > at the start of a paragraph block', async ( {
@@ -28,7 +34,17 @@ test.describe( 'Quote', () => {
 		// Create a second paragraph.
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Another paragraph' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:quote -->
+<blockquote class="wp-block-quote"><!-- wp:paragraph -->
+<p>A quote</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Another paragraph</p>
+<!-- /wp:paragraph --></blockquote>
+<!-- /wp:quote -->`
+		);
 	} );
 
 	test( 'can be created by typing > in front of text of a paragraph block', async ( {
@@ -40,7 +56,13 @@ test.describe( 'Quote', () => {
 		await page.keyboard.type( 'test' );
 		await pageUtils.pressKeyTimes( 'ArrowLeft', 'test'.length );
 		await page.keyboard.type( '> ' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:quote -->
+<blockquote class="wp-block-quote"><!-- wp:paragraph -->
+<p>test</p>
+<!-- /wp:paragraph --></blockquote>
+<!-- /wp:quote -->`
+		);
 	} );
 
 	test( 'can be created by typing "/quote"', async ( { editor, page } ) => {
@@ -49,7 +71,13 @@ test.describe( 'Quote', () => {
 		await page.keyboard.type( '/quote' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'I’m a quote' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:quote -->
+<blockquote class="wp-block-quote"><!-- wp:paragraph -->
+<p>I’m a quote</p>
+<!-- /wp:paragraph --></blockquote>
+<!-- /wp:quote -->`
+		);
 	} );
 
 	test( 'can be created by converting a paragraph', async ( {
@@ -59,7 +87,13 @@ test.describe( 'Quote', () => {
 		await page.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( 'test' );
 		await editor.transformBlockTo( 'core/quote' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:quote -->
+<blockquote class="wp-block-quote"><!-- wp:paragraph -->
+<p>test</p>
+<!-- /wp:paragraph --></blockquote>
+<!-- /wp:quote -->`
+		);
 	} );
 
 	test( 'can be created by converting multiple paragraphs', async ( {
@@ -74,7 +108,17 @@ test.describe( 'Quote', () => {
 		await page.click( '[data-type="core/paragraph"] >> nth=0' );
 		await page.keyboard.up( 'Shift' );
 		await editor.transformBlockTo( 'core/quote' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:quote -->
+<blockquote class="wp-block-quote"><!-- wp:paragraph -->
+<p>one</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>two</p>
+<!-- /wp:paragraph --></blockquote>
+<!-- /wp:quote -->`
+		);
 	} );
 
 	test.describe( 'can be converted to paragraphs', () => {
@@ -90,7 +134,15 @@ test.describe( 'Quote', () => {
 			await page.keyboard.press( 'ArrowRight' );
 			// Unwrap the block.
 			await editor.transformBlockTo( '*' );
-			expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+			expect( await editor.getEditedPostContent() ).toBe(
+				`<!-- wp:paragraph -->
+<p>one</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>two</p>
+<!-- /wp:paragraph -->`
+			);
 		} );
 
 		test( 'and renders a paragraph for the cite, if it exists', async ( {
@@ -105,7 +157,19 @@ test.describe( 'Quote', () => {
 			await page.keyboard.type( 'cite' );
 			// Unwrap the block.
 			await editor.transformBlockTo( '*' );
-			expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+			expect( await editor.getEditedPostContent() ).toBe(
+				`<!-- wp:paragraph -->
+<p>one</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>two</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>cite</p>
+<!-- /wp:paragraph -->`
+			);
 		} );
 
 		test( 'and renders only one paragraph for the cite, if the quote is void', async ( {
@@ -117,7 +181,15 @@ test.describe( 'Quote', () => {
 			await page.keyboard.type( 'cite' );
 			// Unwrap the block.
 			await editor.transformBlockTo( '*' );
-			expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+			expect( await editor.getEditedPostContent() ).toBe(
+				`<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>cite</p>
+<!-- /wp:paragraph -->`
+			);
 		} );
 
 		test( 'and renders a void paragraph if both the cite and quote are void', async ( {
@@ -140,7 +212,13 @@ test.describe( 'Quote', () => {
 		await editor.insertBlock( { name: 'core/heading' } );
 		await page.keyboard.type( 'test' );
 		await editor.transformBlockTo( 'core/quote' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:quote -->
+<blockquote class="wp-block-quote"><!-- wp:heading -->
+<h2 class="wp-block-heading">test</h2>
+<!-- /wp:heading --></blockquote>
+<!-- /wp:quote -->`
+		);
 	} );
 
 	test( 'can be converted to a pullquote', async ( { editor, page } ) => {
@@ -151,7 +229,11 @@ test.describe( 'Quote', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( 'cite' );
 		await editor.transformBlockTo( 'core/pullquote' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:pullquote -->
+<figure class="wp-block-pullquote"><blockquote><p>one<br>two</p><cite>cite</cite></blockquote></figure>
+<!-- /wp:pullquote -->`
+		);
 	} );
 
 	test( 'can be split at the end', async ( { editor, page } ) => {
@@ -160,16 +242,42 @@ test.describe( 'Quote', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
 		// Expect empty paragraph outside quote block.
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:quote -->
+<blockquote class="wp-block-quote"><!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph --></blockquote>
+<!-- /wp:quote -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->`
+		);
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.type( '2' );
 		// Expect the paragraph to be merged into the quote block.
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:quote -->
+<blockquote class="wp-block-quote"><!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph --></blockquote>
+<!-- /wp:quote -->`
+		);
 	} );
 
 	test( 'can be unwrapped on Backspace', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/quote' } );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:quote -->
+<blockquote class="wp-block-quote"><!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph --></blockquote>
+<!-- /wp:quote -->`
+		);
 		await page.keyboard.press( 'Backspace' );
 		expect( await editor.getEditedPostContent() ).toBe( '' );
 	} );
@@ -183,9 +291,23 @@ test.describe( 'Quote', () => {
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( '2' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:quote -->
+<blockquote class="wp-block-quote"><!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph --><cite>2</cite></blockquote>
+<!-- /wp:quote -->`
+		);
 		await pageUtils.pressKeyTimes( 'ArrowLeft', 4 );
 		await page.keyboard.press( 'Backspace' );
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:quote -->
+<blockquote class="wp-block-quote"><cite>2</cite></blockquote>
+<!-- /wp:quote -->`
+		);
 	} );
 } );

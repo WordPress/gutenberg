@@ -1,5 +1,0 @@
-<!-- wp:quote -->
-<blockquote class="wp-block-quote"><!-- wp:paragraph -->
-<p>test</p>
-<!-- /wp:paragraph --></blockquote>
-<!-- /wp:quote -->
