@@ -380,14 +380,12 @@ function ListViewBlock( {
 												'core/navigation-submenu'
 											) {
 												const updateSelectionOnInsert = false;
+
 												insertBlock(
 													newLink,
 													block.innerBlocks.length,
 													clientId,
 													updateSelectionOnInsert
-												);
-												onInsertBlock(
-													newLink?.clientId
 												);
 											} else {
 												// Convert to a submenu if the block currently isn't one.
@@ -401,14 +399,13 @@ function ListViewBlock( {
 														  ]
 														: [ newLink ]
 												);
+
 												replaceBlock(
 													clientId,
 													newSubmenu
 												);
-												onInsertBlock(
-													newSubmenu?.clientId
-												);
 											}
+											onInsertBlock( newLink?.clientId );
 											onClose();
 										} }
 									>
