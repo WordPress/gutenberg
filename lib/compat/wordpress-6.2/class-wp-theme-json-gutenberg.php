@@ -3098,6 +3098,7 @@ class WP_Theme_JSON_Gutenberg {
 	public function set_spacing_sizes() {
 		$spacing_scale = _wp_array_get( $this->theme_json, array( 'settings', 'spacing', 'spacingScale' ), array() );
 
+		// Gutenberg didn't have the 1st isset check.
 		if ( ! isset( $spacing_scale['steps'] )
 			|| ! is_numeric( $spacing_scale['steps'] )
 			|| ! isset( $spacing_scale['mediumStep'] )
