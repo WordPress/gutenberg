@@ -94,6 +94,8 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 			)
 		)->render( array( 'dynamic' => false ) );
 
+		$block_content = apply_filters( 'post_template_block_content', $block_content, $query, $block->context['queryId'] );
+
 		// Wrap the render inner blocks in a `li` element with the appropriate post classes.
 		$post_classes = implode( ' ', get_post_class( 'wp-block-post' ) );
 		$content     .= '<li class="' . esc_attr( $post_classes ) . '">' . $block_content . '</li>';
