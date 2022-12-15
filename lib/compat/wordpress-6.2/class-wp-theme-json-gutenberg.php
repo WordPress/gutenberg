@@ -2295,6 +2295,8 @@ class WP_Theme_JSON_Gutenberg {
 			$css         .= '--wp--style--global--wide-size: ' . $wide_size . ';';
 		}
 
+		// Gutenberg didn't have the trailing whitespace.
+		// Relevant for tests?
 		$css .= ' }';
 
 		if ( $use_root_padding ) {
