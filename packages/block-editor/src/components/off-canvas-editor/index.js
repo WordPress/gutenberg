@@ -211,29 +211,9 @@ function __ExperimentalOffCanvasEditor(
 		setInsertedBlockAttributes,
 	} = useInsertedBlock( insertedBlockClientId );
 
-	let maybeLinkUI;
-
-	if (
+	const shouldShowLinkUI =
 		insertedBlockClientId &&
-		BLOCKS_WITH_LINK_UI_SUPPORT?.includes( insertedBlockName )
-	) {
-		maybeLinkUI = (
-			<LinkUI
-				clientId={ insertedBlockClientId }
-				link={ insertedBlockAttributes }
-				onClose={ () => setInsertedBlockClientId( null ) }
-				hasCreateSuggestion={ false }
-				onChange={ ( updatedValue ) => {
-					updateAttributes(
-						updatedValue,
-						setInsertedBlockAttributes,
-						insertedBlockAttributes
-					);
-					setInsertedBlockClientId( null );
-				} }
-			/>
-		);
-	}
+		BLOCKS_WITH_LINK_UI_SUPPORT?.includes( insertedBlockName );
 
 	return (
 		<AsyncModeProvider value={ true }>
@@ -273,7 +253,30 @@ function __ExperimentalOffCanvasEditor(
 							<TreeGridCell>
 								{ ( treeGridCellProps ) => (
 									<>
-										{ maybeLinkUI }
+										{ shouldShowLinkUI && (
+											<LinkUI
+												clientId={
+													insertedBlockClientId
+												}
+												link={ insertedBlockAttributes }
+												onClose={ () =>
+													setInsertedBlockClientId(
+														null
+													)
+												}
+												hasCreateSuggestion={ false }
+												onChange={ ( updatedValue ) => {
+													updateAttributes(
+														updatedValue,
+														setInsertedBlockAttributes,
+														insertedBlockAttributes
+													);
+													setInsertedBlockClientId(
+														null
+													);
+												} }
+											/>
+										) }
 										<Appender
 											{ ...treeGridCellProps }
 											onInsertBlock={
