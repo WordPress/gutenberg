@@ -1798,6 +1798,7 @@ class WP_Theme_JSON_Gutenberg {
 	protected static function get_property_value( $styles, $path, $theme_json = null ) {
 		$value = _wp_array_get( $styles, $path, '' );
 
+		// Gutenberg didn't have this check.
 		if ( '' === $value || null === $value ) {
 			// No need to process the value further.
 			return '';
