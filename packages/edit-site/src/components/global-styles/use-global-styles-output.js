@@ -939,6 +939,19 @@ export function useGlobalStylesOutput() {
 			},
 		];
 
+		const processCSSNesting = ( css, blockSelector ) => {
+			let processedCSS = '';
+
+			// Split CSS nested rules.
+			const parts = css.split( '&' );
+			parts.forEach( ( part ) => {
+				processedCSS += ! part.includes( '{' )
+					? blockSelector + '{' + part + '}' // If the part doesn't contain braces, it applies to the root level.
+					: blockSelector + part; // Prepend the selector, which effectively replaces the "&" character.
+			} );
+			return processedCSS;
+		};
+
 		// Loop through the blocks to check if there are custom CSS values.
 		// If there are, get the block selector and push the selector together with
 		// the CSS value to the 'stylesheets' array.
@@ -946,11 +959,10 @@ export function useGlobalStylesOutput() {
 			if ( mergedConfig.styles.blocks[ name[ 0 ] ]?.css ) {
 				const selector = blockSelectors[ name[ 0 ] ].selector;
 				stylesheets.push( {
-					css:
-						selector +
-						'{' +
-						mergedConfig.styles.blocks[ name[ 0 ] ]?.css +
-						'}',
+					css: processCSSNesting(
+						mergedConfig.styles.blocks[ name[ 0 ] ]?.css,
+						selector
+					),
 					isGlobalStyles: true,
 				} );
 			}
