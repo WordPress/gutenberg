@@ -7,6 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useMergeRefs } from '@wordpress/compose';
+import { getScrollContainer } from '@wordpress/dom';
 import { Popover } from '@wordpress/components';
 import {
 	forwardRef,
@@ -74,6 +75,34 @@ function BlockPopover(
 			observer.disconnect();
 		};
 	}, [ selectedElement ] );
+
+	// Get the scrollable container that the block popover appears within.
+	const scrollContainer = useMemo( () => {
+		if ( ! __unstableContentRef?.current ) {
+			return;
+		}
+		return getScrollContainer( __unstableContentRef?.current );
+	}, [ __unstableContentRef?.current ] );
+
+	// Force the block popover to re-render whenever the content area is scrolled.
+	// This ensures that the position of the popover is accurate for fixed or sticky blocks.
+	useLayoutEffect( () => {
+		if ( ! scrollContainer ) {
+			return;
+		}
+
+		scrollContainer?.addEventListener?.(
+			'scroll',
+			forceRecomputePopoverDimensions
+		);
+
+		return () => {
+			scrollContainer?.removeEventHandler?.(
+				'scroll',
+				forceRecomputePopoverDimensions
+			);
+		};
+	}, [ scrollContainer ] );
 
 	const style = useMemo( () => {
 		if (
