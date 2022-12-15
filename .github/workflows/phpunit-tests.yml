@@ -120,9 +120,9 @@ jobs:
                   npm run wp-env run phpunit "locale -a"
 
             - name: Running single site unit tests
-              run: npm run wp-env run phpunit "/usr/local/bin/phpunit -c /var/www/html/wp-content/plugins/gutenberg/phpunit.xml.dist --verbose"
+              run: npm run test:unit:php
               if: ${{ ! matrix.multisite }}
 
             - name: Running multisite unit tests
-              run: npm run wp-env run phpunit "/usr/local/bin/phpunit -c /var/www/html/wp-content/plugins/gutenberg/phpunit/multisite.xml --verbose"
+              run: npm run test:unit:php:multisite
               if: ${{ matrix.multisite }}
