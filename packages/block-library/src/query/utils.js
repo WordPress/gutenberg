@@ -275,17 +275,17 @@ export function useBlockNameForPatterns( clientId, attributes ) {
  * Loop are going to be suggested.
  *
  * The way we determine such variations is with the convention that they have the `namespace`
- * attribute defined with the `name` of the variation they want to be connected to.
+ * attribute defined as an array. This array should contain the names(`name` property) of any
+ * variations they want to be connected to.
  * For example, if we have a `Query Loop` scoped `inserter` variation with the name `products`,
- * we can connect a scoped `block` variation by setting its `namespace` attribute to `products`.
+ * we can connect a scoped `block` variation by setting its `namespace` attribute to `['products']`.
  * If the user selects this variation, the `namespace` attribute will be overridden by the
  * main `inserter` variation.
  *
- * @param {string} name       The block's name.
  * @param {Object} attributes The block's attributes.
  * @return {WPBlockVariation[]} The block variations to be suggested in setup flow, when clicking to `start blank`.
  */
-export function useScopedBlockVariations( name, attributes ) {
+export function useScopedBlockVariations( attributes ) {
 	const { activeVariationName, blockVariations } = useSelect(
 		( select ) => {
 			const { getActiveBlockVariation, getBlockVariations } =
@@ -295,27 +295,26 @@ export function useScopedBlockVariations( name, attributes ) {
 					queryLoopName,
 					attributes
 				)?.name,
-				blockVariations: getBlockVariations( name, 'block' ),
+				blockVariations: getBlockVariations( queryLoopName, 'block' ),
 			};
 		},
-		[ name, attributes ]
+		[ attributes ]
 	);
 	const variations = useMemo( () => {
 		// Filter out the variations that have defined a `namespace` attribute,
-		// which means they are 'connected' to a specific variation of the block.
-		const filterOutConnectedVariationsFn = ( variation ) =>
+		// which means they are 'connected' to specific variations of the block.
+		const isNotConnected = ( variation ) =>
 			! variation.attributes?.namespace;
 		if ( ! activeVariationName ) {
-			return blockVariations.filter( filterOutConnectedVariationsFn );
+			return blockVariations.filter( isNotConnected );
 		}
-		const connectedVariations = blockVariations.filter(
-			( variation ) =>
-				variation.attributes?.namespace === activeVariationName
+		const connectedVariations = blockVariations.filter( ( variation ) =>
+			variation.attributes?.namespace?.includes( activeVariationName )
 		);
 		if ( !! connectedVariations.length ) {
 			return connectedVariations;
 		}
-		return blockVariations.filter( filterOutConnectedVariationsFn );
+		return blockVariations.filter( isNotConnected );
 	}, [ activeVariationName, blockVariations ] );
 	return variations;
 }

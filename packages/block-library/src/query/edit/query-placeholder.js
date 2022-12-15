@@ -62,7 +62,6 @@ export default function QueryPlaceholder( {
 		return (
 			<QueryVariationPicker
 				clientId={ clientId }
-				name={ name }
 				attributes={ attributes }
 				setAttributes={ setAttributes }
 				icon={ icon }
@@ -103,13 +102,12 @@ export default function QueryPlaceholder( {
 
 function QueryVariationPicker( {
 	clientId,
-	name,
 	attributes,
 	setAttributes,
 	icon,
 	label,
 } ) {
-	const scopeVariations = useScopedBlockVariations( name, attributes );
+	const scopeVariations = useScopedBlockVariations( attributes );
 	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 	const blockProps = useBlockProps();
 	return (
