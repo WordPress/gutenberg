@@ -10,7 +10,7 @@ import {
 	__experimentalTreeGridRow as TreeGridRow,
 	__experimentalTreeGridCell as TreeGridCell,
 } from '@wordpress/components';
-import { AsyncModeProvider, useSelect, useDispatch } from '@wordpress/data';
+import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import {
 	useState,
 	useCallback,
@@ -37,6 +37,7 @@ import { Appender } from './appender';
 
 import { LinkUI } from './link-ui';
 import { updateAttributes } from './update-attributes';
+import { useInsertedBlock } from './use-inserted-block';
 
 const BLOCKS_WITH_LINK_UI_SUPPORT = [
 	'core/navigation-link',
@@ -204,27 +205,11 @@ function __ExperimentalOffCanvasEditor(
 		[ isMounted.current, draggedClientIds, expandedState, expand, collapse ]
 	);
 
-	const { insertedBlockAttributes, insertedBlockName } = useSelect(
-		( select ) => {
-			const { getBlockName, getBlockAttributes } =
-				select( blockEditorStore );
-
-			return {
-				insertedBlockAttributes: getBlockAttributes(
-					insertedBlockClientId
-				),
-				insertedBlockName: getBlockName( insertedBlockClientId ),
-			};
-		},
-		[ insertedBlockClientId ]
-	);
-
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-
-	const setAttributes =
-		( _insertedBlockClientId ) => ( _updatedAttributes ) => {
-			updateBlockAttributes( _insertedBlockClientId, _updatedAttributes );
-		};
+	const {
+		insertedBlockName,
+		insertedBlockAttributes,
+		setInsertedBlockAttributes,
+	} = useInsertedBlock( insertedBlockClientId );
 
 	let maybeLinkUI;
 
@@ -241,7 +226,7 @@ function __ExperimentalOffCanvasEditor(
 				onChange={ ( updatedValue ) => {
 					updateAttributes(
 						updatedValue,
-						setAttributes( insertedBlockClientId ),
+						setInsertedBlockAttributes,
 						insertedBlockAttributes
 					);
 					setInsertedBlockClientId( null );
