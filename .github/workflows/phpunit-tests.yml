@@ -77,7 +77,7 @@ jobs:
             # Therefore, it should be removed before running the tests.
             - name: Remove PHP 5.6 and PHP 7.0 incompatible packages
               if: ${{ matrix.php < '7.1' }}
-              run: composer remove spatie/phpunit-watcher --dev
+              run: composer remove spatie/phpunit-watcher yoast/phpunit-polyfills --dev
 
             - name: Install npm dependencies
               run: |
@@ -100,8 +100,7 @@ jobs:
                   locale -a
 
             - name: Start Docker environment
-              run: |
-                  npm run wp-env start
+              run: npm run wp-env start
 
             - name: Log running Docker containers
               run: docker ps -a
