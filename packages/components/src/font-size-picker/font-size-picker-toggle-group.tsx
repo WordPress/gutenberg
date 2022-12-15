@@ -47,8 +47,7 @@ const FontSizePickerToggleGroup = ( props: FontSizePickerToggleGroupProps ) => {
 					key={ fontSize.slug }
 					value={ fontSize.size }
 					label={
-						fontSize.shortName &&
-						hasValidShortName( fontSize.shortName )
+						hasValidShortName( fontSize?.shortName )
 							? fontSize.shortName
 							: T_SHIRT_ABBREVIATIONS[ index ]
 					}
