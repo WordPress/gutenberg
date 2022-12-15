@@ -1,9 +1,8 @@
 <?php
 /**
- * WP_Theme_JSON class
+ * WP_Theme_JSON_Gutenberg class
  *
- * @package WordPress
- * @subpackage Theme
+ * @package gutenberg
  * @since 5.8.0
  */
 
