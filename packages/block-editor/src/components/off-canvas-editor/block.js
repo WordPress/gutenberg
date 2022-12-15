@@ -98,11 +98,9 @@ function ListViewBlock( {
 	// When a block hides its toolbar it also hides the block settings menu,
 	// since that menu is part of the toolbar in the editor canvas.
 	// List View respects this by also hiding the block settings menu.
-	const showBlockActions = hasBlockSupport(
-		block.name,
-		'__experimentalToolbar',
-		true
-	);
+	const showBlockActions =
+		!! block &&
+		hasBlockSupport( block.name, '__experimentalToolbar', true );
 	const instanceId = useInstanceId( ListViewBlock );
 	const descriptionId = `list-view-block-select-button__${ instanceId }`;
 	const blockPositionDescription = getBlockPositionDescription(
@@ -144,7 +142,7 @@ function ListViewBlock( {
 
 	const { isTreeGridMounted, expand, collapse } = useListViewContext();
 
-	const isEditable = block.name !== 'core/page-list-item';
+	const isEditable = !! block && block.name !== 'core/page-list-item';
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
 	const moverCellClassName = classnames(
@@ -232,6 +230,10 @@ function ListViewBlock( {
 	const dropdownClientIds = selectedClientIds.includes( clientId )
 		? selectedClientIds
 		: [ clientId ];
+
+	if ( ! block ) {
+		return null;
+	}
 
 	return (
 		<ListViewLeaf
