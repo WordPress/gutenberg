@@ -42,7 +42,6 @@ export default function ClipboardButton( {
 	const timeoutId = useRef();
 	const ref = useCopyToClipboard( text, () => {
 		onCopy();
-		// @ts-expect-error: Should check if .current is defined, but not changing because this component is deprecated.
 		clearTimeout( timeoutId.current );
 
 		if ( onFinishCopy ) {
@@ -51,7 +50,6 @@ export default function ClipboardButton( {
 	} );
 
 	useEffect( () => {
-		// @ts-expect-error: Should check if .current is defined, but not changing because this component is deprecated.
 		clearTimeout( timeoutId.current );
 	}, [] );
 

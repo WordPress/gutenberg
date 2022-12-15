@@ -211,7 +211,7 @@ export function Draggable( {
 		// https://reactjs.org/docs/events.html#event-pooling
 		event.persist();
 
-		let timerId: number | undefined;
+		let timerId: any;
 
 		if ( onDragStart ) {
 			timerId = setTimeout( () => onDragStart( event ) );
