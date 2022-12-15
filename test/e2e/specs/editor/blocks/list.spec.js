@@ -8,6 +8,12 @@ test.describe( 'List', () => {
 		await admin.createNewPost();
 	} );
 
+	test.describe( 'Flaky test', () => {
+		test( 'should be flaky', async ( {}, testInfo ) => {
+			expect( testInfo.retry ).toBeGreaterThan( 1 );
+		} );
+	} );
+
 	test( 'can be created by using an asterisk at the start of a paragraph block', async ( {
 		editor,
 		page,
