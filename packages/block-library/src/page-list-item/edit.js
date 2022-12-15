@@ -93,7 +93,7 @@ export default function PageListItemEdit( { context, attributes } ) {
 	const innerBlocksColors = getColors( context, true );
 
 	const blockProps = useBlockProps( {
-		className: classnames( 'wp-block-page-list', {
+		className: classnames( 'wp-block-pages-list__item', {
 			'has-text-color': !! (
 				innerBlocksColors.textColor || innerBlocksColors.customTextColor
 			),
@@ -112,12 +112,7 @@ export default function PageListItemEdit( { context, attributes } ) {
 		},
 	} );
 
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: [ 'core/page-list-item' ],
-		renderAppender: false,
-		__unstableDisableDropZone: true,
-		templateLock: 'all',
-	} );
+	const innerBlocksProps = useInnerBlocksProps( blockProps );
 
 	return (
 		<li
@@ -169,9 +164,8 @@ export default function PageListItemEdit( { context, attributes } ) {
 							'wp-block-navigation__submenu-container':
 								isNavigationChild,
 						} ) }
-					>
-						<li { ...innerBlocksProps }></li>
-					</ul>
+						{ ...innerBlocksProps }
+					></ul>
 				</>
 			) }
 		</li>
