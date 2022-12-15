@@ -8,9 +8,17 @@
 		outline: 4px solid $components-color-accent;
 		outline-offset: -4px;
 
-		.interface-navigable-region__stacker {
-			position: relative;
-			z-index: z-index(".is-focusing-regions [role='region']:focus .interface-navigable-region__stacker");
+		&::after {
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			content: "";
+			pointer-events: none;
+			outline: 4px solid $components-color-accent;
+			outline-offset: -4px;
+			z-index: 9999999;
 		}
 	}
 
@@ -26,7 +34,6 @@
 
 	// Header top bar when Distraction free mode is on.
 	&.is-distraction-free .interface-interface-skeleton__header {
-		.interface-navigable-region__stacker,
 		.edit-post-header {
 			outline: inherit;
 			outline-offset: inherit;
@@ -35,7 +42,6 @@
 
 	// Sidebar toggle button shown when navigating regions.
 	.interface-interface-skeleton__sidebar {
-		.interface-navigable-region__stacker,
 		.edit-post-layout__toggle-sidebar-panel {
 			outline: inherit;
 			outline-offset: inherit;
@@ -44,7 +50,6 @@
 
 	// Publish sidebar toggle button shown when navigating regions.
 	.interface-interface-skeleton__actions {
-		.interface-navigable-region__stacker,
 		.edit-post-layout__toggle-publish-panel {
 			outline: inherit;
 			outline-offset: inherit;
@@ -56,9 +61,4 @@
 		outline: 4px solid $components-color-accent;
 		outline-offset: -4px;
 	}
-}
-
-.interface-navigable-region__stacker {
-	height: 100%;
-	width: 100%;
 }
