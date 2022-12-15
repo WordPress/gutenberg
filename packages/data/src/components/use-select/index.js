@@ -199,12 +199,30 @@ function Store( registry ) {
  */
 
 export default function useSelect( mapSelect, deps ) {
+	const staticSelectMode = typeof mapSelect !== 'function';
+	const staticSelectModeRef = useRef( staticSelectMode );
+
+	if ( staticSelectMode !== staticSelectModeRef.current ) {
+		const prevMode = staticSelectModeRef.current ? 'static' : 'mapping';
+		const nextMode = staticSelectMode ? 'static' : 'mapping';
+		throw new Error(
+			`Switching useSelect from ${ prevMode } to ${ nextMode } is not allowed`
+		);
+	}
+
 	const registry = useRegistry();
+
+	if ( staticSelectMode ) {
+		return registry.select( mapSelect );
+	}
+
+	/* eslint-disable react-hooks/rules-of-hooks */
 	const isAsync = useAsyncMode();
 	const store = useMemo( () => Store( registry ), [ registry ] );
 	const selector = useCallback( mapSelect, deps );
 	const { getValue, subscribe } = store( selector, !! deps, isAsync );
 	return useSyncExternalStore( subscribe, getValue, getValue );
+	/* eslint-enable react-hooks/rules-of-hooks */
 }
 
 export function oldUseSelect( mapSelect, deps ) {
