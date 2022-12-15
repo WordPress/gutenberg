@@ -63,17 +63,19 @@ export function useFontAppearanceStyles( { attributes = {}, setAttributes } ) {
 		} );
 	}
 
+	function onKeyDownToggleFontAppearance( event ) {
+		if ( isKeyboardEvent.primary( event, 'b' ) ) {
+			toggleBold();
+		} else if ( isKeyboardEvent.primary( event, 'i' ) ) {
+			toggleItalic();
+		}
+	}
+
 	return {
 		isBold,
 		isItalic,
 		toggleBold,
 		toggleItalic,
-		onKeyDownToggleFontAppearance: ( event ) => {
-			if ( isKeyboardEvent.primary( event, 'b' ) ) {
-				toggleBold();
-			} else if ( isKeyboardEvent.primary( event, 'i' ) ) {
-				toggleItalic();
-			}
-		},
+		onKeyDownToggleFontAppearance,
 	};
 }
