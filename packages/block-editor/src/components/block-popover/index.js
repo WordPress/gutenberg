@@ -76,6 +76,7 @@ function BlockPopover(
 		};
 	}, [ selectedElement ] );
 
+	// Get the scrollable container that the block popover appears within.
 	const scrollContainer = useMemo( () => {
 		if ( ! __unstableContentRef?.current ) {
 			return;
@@ -83,6 +84,8 @@ function BlockPopover(
 		return getScrollContainer( __unstableContentRef?.current );
 	}, [ __unstableContentRef?.current ] );
 
+	// Force the block popover to re-render whenever the content area is scrolled.
+	// This ensures that the position of the popover is accurate for fixed or sticky blocks.
 	useLayoutEffect( () => {
 		if ( ! scrollContainer ) {
 			return;
