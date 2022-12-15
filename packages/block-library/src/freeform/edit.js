@@ -7,9 +7,9 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { debounce, useRefEffect } from '@wordpress/compose';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
-import { RawHTML, useEffect, useRef, useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { ToolbarGroup } from '@wordpress/components';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE, F10, isKeyboardEvent } from '@wordpress/keycodes';
 
@@ -17,6 +17,7 @@ import { BACKSPACE, DELETE, F10, isKeyboardEvent } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import ConvertToBlocksButton from './convert-to-blocks-button';
+import ModalEdit from './modal';
 
 const { wp } = window;
 
@@ -37,15 +38,11 @@ function isTmceEmpty( editor ) {
 }
 
 export default function FreeformEdit( props ) {
-	const {
-		clientId,
-		attributes: { content },
-	} = props;
+	const { clientId } = props;
 	const canRemove = useSelect(
 		( select ) => select( blockEditorStore ).canRemoveBlock( clientId ),
 		[ clientId ]
 	);
-	const { toggleBlockMode } = useDispatch( blockEditorStore );
 	const [ isIframed, setIsIframed ] = useState( false );
 	const ref = useRefEffect( ( element ) => {
 		setIsIframed( element.ownerDocument !== document );
@@ -57,21 +54,12 @@ export default function FreeformEdit( props ) {
 				<BlockControls>
 					<ToolbarGroup>
 						<ConvertToBlocksButton clientId={ clientId } />
-						{ isIframed && (
-							<ToolbarButton
-								onClick={ () => {
-									toggleBlockMode( clientId );
-								} }
-							>
-								{ __( 'Edit as HTML' ) }
-							</ToolbarButton>
-						) }
 					</ToolbarGroup>
 				</BlockControls>
 			) }
 			<div { ...useBlockProps( { ref } ) }>
 				{ isIframed ? (
-					<RawHTML>{ content }</RawHTML>
+					<ModalEdit { ...props } />
 				) : (
 					<ClassicEdit { ...props } />
 				) }
