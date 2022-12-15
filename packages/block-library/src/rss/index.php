@@ -30,19 +30,16 @@ function render_block_core_rss( $attributes ) {
 	$rss_items  = $rss->get_items( 0, $attributes['itemsToShow'] );
 	$list_items = '';
 	foreach ( $rss_items as $item ) {
-		$excerpt = '';
-		if ( $attributes['displayExcerpt'] ) {
-			$excerpt = html_entity_decode( $item->get_description(), ENT_QUOTES, get_option( 'blog_charset' ) );
-			$excerpt = esc_attr( wp_trim_words( $excerpt, $attributes['excerptLength'], ' [&hellip;]' ) );
-		}
+		$excerpt_decoded = html_entity_decode( $item->get_description(), ENT_QUOTES, get_option( 'blog_charset' ) );
+		$excerpt_trimmed = esc_attr( wp_trim_words( $excerpt_decoded, $attributes['excerptLength'], ' [&hellip;]' ) );
 
 		$title = esc_html( trim( strip_tags( $item->get_title() ) ) );
 		if ( empty( $title ) ) {
-			preg_match( '/^(.{0,' . $attributes['titleLength'] . '})\s/', $excerpt, $parts );
+			preg_match( '/^(.{0,' . $attributes['titleLength'] . '})\s/', $excerpt_trimmed, $parts );
 			$title = __( $parts[1] );
 			// Excerpt will be sanitized later on
 			if ( $attributes['displayExcerpt'] ) {
-				$excerpt = trim(substr($excerpt, strlen($title)));
+				$excerpt_trimmed = trim(substr($excerpt_trimmed, strlen($title)));
 			}
 		}
 		$link = $item->get_link();
@@ -78,7 +75,9 @@ function render_block_core_rss( $attributes ) {
 			}
 		}
 
+		$excerpt = '';
 		if ( $attributes['displayExcerpt'] ) {
+			$excerpt = $excerpt_trimmed;
 			// Change existing [...] to [&hellip;].
 			if ( '[...]' === substr( $excerpt, -5 ) ) {
 				$excerpt = substr( $excerpt, 0, -5 ) . '[&hellip;]';
