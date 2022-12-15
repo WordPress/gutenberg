@@ -15,8 +15,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=14.0.0",
-		"npm": ">=6.9.0"
+		"node": ">=18.12.1",
+		"npm": ">=8.19.2"
 	},
 	"config": {
 		"IS_GUTENBERG_PLUGIN": true
