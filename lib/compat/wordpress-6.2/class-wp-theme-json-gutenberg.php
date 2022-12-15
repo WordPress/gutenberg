@@ -267,6 +267,25 @@ class WP_Theme_JSON_Gutenberg {
 	);
 
 	/**
+	 * Indirect metadata for style properties that are not directly output.
+	 *
+	 * Each element is a direct mapping from a CSS property name to the
+	 * path to the value in theme.json & block attributes.
+	 *
+	 * Indirect properties are not output directly by `compute_style_properties`,
+	 * but are used elsewhere in the processing of global styles. The indirect
+	 * property is used to validate whether or not a style value is allowed.
+	 *
+	 * @since 6.2.0
+	 * @var array
+	 */
+	const INDIRECT_PROPERTIES_METADATA = array(
+		'gap'        => array( 'spacing', 'blockGap' ),
+		'column-gap' => array( 'spacing', 'blockGap', 'left' ),
+		'row-gap'    => array( 'spacing', 'blockGap', 'top' ),
+	);
+
+	/**
 	 * The top-level keys a theme.json can have.
 	 *
 	 * @since 5.8.0 As `ALLOWED_TOP_LEVEL_KEYS`.
@@ -2668,88 +2687,6 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Removes insecure data from theme.json.
-	 *
-	 * @since 5.9.0
-	 *
-	 * @param array $theme_json Structure to sanitize.
-	 * @return array Sanitized structure.
-	 */
-	public static function remove_insecure_properties( $theme_json ) {
-		$sanitized = array();
-
-		$theme_json = WP_Theme_JSON_Schema::migrate( $theme_json );
-
-		$valid_block_names   = array_keys( static::get_blocks_metadata() );
-		$valid_element_names = array_keys( static::ELEMENTS );
-
-		$theme_json = static::sanitize( $theme_json, $valid_block_names, $valid_element_names );
-
-		$blocks_metadata = static::get_blocks_metadata();
-		$style_nodes     = static::get_style_nodes( $theme_json, $blocks_metadata );
-
-		foreach ( $style_nodes as $metadata ) {
-			$input = _wp_array_get( $theme_json, $metadata['path'], array() );
-			if ( empty( $input ) ) {
-				continue;
-			}
-
-			$output = static::remove_insecure_styles( $input );
-
-			/*
-			 * Get a reference to element name from path.
-			 * $metadata['path'] = array( 'styles', 'elements', 'link' );
-			 */
-			$current_element = $metadata['path'][ count( $metadata['path'] ) - 1 ];
-
-			/*
-			 * $output is stripped of pseudo selectors. Re-add and process them
-			 * or insecure styles here.
-			 */
-			// TODO: Replace array_key_exists() with isset() check once WordPress drops
-			// support for PHP 5.6. See https://core.trac.wordpress.org/ticket/57067.
-			if ( array_key_exists( $current_element, static::VALID_ELEMENT_PSEUDO_SELECTORS ) ) {
-				foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] as $pseudo_selector ) {
-					if ( isset( $input[ $pseudo_selector ] ) ) {
-						$output[ $pseudo_selector ] = static::remove_insecure_styles( $input[ $pseudo_selector ] );
-					}
-				}
-			}
-
-			if ( ! empty( $output ) ) {
-				_wp_array_set( $sanitized, $metadata['path'], $output );
-			}
-		}
-
-		$setting_nodes = static::get_setting_nodes( $theme_json );
-		foreach ( $setting_nodes as $metadata ) {
-			$input = _wp_array_get( $theme_json, $metadata['path'], array() );
-			if ( empty( $input ) ) {
-				continue;
-			}
-
-			$output = static::remove_insecure_settings( $input );
-			if ( ! empty( $output ) ) {
-				_wp_array_set( $sanitized, $metadata['path'], $output );
-			}
-		}
-
-		if ( empty( $sanitized['styles'] ) ) {
-			unset( $theme_json['styles'] );
-		} else {
-			$theme_json['styles'] = $sanitized['styles'];
-		}
-
-		if ( empty( $sanitized['settings'] ) ) {
-			unset( $theme_json['settings'] );
-		} else {
-			$theme_json['settings'] = $sanitized['settings'];
-		}
-
-		return $theme_json;
-	}
-
-	/**
 	 * Processes a setting node and returns the same node
 	 * without the insecure settings.
 	 *
@@ -2812,6 +2749,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * without the insecure styles.
 	 *
 	 * @since 5.9.0
+	 * @since 6.2.0 Allow indirect properties used outside of `compute_style_properties`.
 	 *
 	 * @param array $input Node to process.
 	 * @return array
@@ -2832,6 +2770,19 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 		}
+
+		// Ensure indirect properties not handled by `compute_style_properties` are allowed.
+		foreach ( static::INDIRECT_PROPERTIES_METADATA as $property => $path ) {
+			$value = _wp_array_get( $input, $path, array() );
+			if (
+				isset( $value ) &&
+				! is_array( $value ) &&
+				static::is_safe_css_declaration( $property, $value )
+			) {
+				_wp_array_set( $output, $path, $value );
+			}
+		}
+
 		return $output;
 	}
 
