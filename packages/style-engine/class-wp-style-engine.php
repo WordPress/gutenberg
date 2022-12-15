@@ -206,7 +206,7 @@ final class WP_Style_Engine {
 				),
 				'path'          => array( 'typography', 'lineHeight' ),
 			),
-			'textColumns' => array(
+			'textColumns'    => array(
 				'property_keys' => array(
 					'default' => 'column-count',
 				),
