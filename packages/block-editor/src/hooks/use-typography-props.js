@@ -36,17 +36,14 @@ export function getTypographyClassesAndStyles(
 		( true === fluidTypographySettings ||
 			Object.keys( fluidTypographySettings ).length !== 0 )
 	) {
+		const newFontSize =
+			getComputedFluidTypographyValue( {
+				fontSize: attributes?.style?.typography?.fontSize,
+				minimumFontSizeLimit: fluidTypographySettings?.minFontSize,
+			} ) || attributes?.style?.typography?.fontSize;
 		typographyStyles = {
 			...typographyStyles,
-			fontSize: getComputedFluidTypographyValue( {
-				fontSize: attributes?.style?.typography?.fontSize,
-				minimumViewPortWidth: fluidTypographySettings?.minViewPortWidth,
-				maximumViewPortWidth: fluidTypographySettings?.maxViewPortWidth,
-				scaleFactor: fluidTypographySettings?.scaleFactor,
-				minimumFontSizeFactor:
-					fluidTypographySettings?.minFontSizeFactor,
-				minimumFontSizeLimit: fluidTypographySettings?.minFontSize,
-			} ),
+			fontSize: newFontSize,
 		};
 	}
 

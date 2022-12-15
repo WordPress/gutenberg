@@ -61,10 +61,6 @@ describe( 'getTypographyClassesAndStyles', () => {
 		};
 		expect(
 			getTypographyClassesAndStyles( attributes, {
-				minViewPortWidth: '900px',
-				maxViewPortWidth: '1900px',
-				scaleFactor: 2,
-				minFontSizeFactor: 0.9,
 				minFontSize: '1rem',
 			} )
 		).toEqual( {
@@ -72,7 +68,7 @@ describe( 'getTypographyClassesAndStyles', () => {
 			style: {
 				textDecoration: 'underline',
 				fontSize:
-					'clamp(1.8rem, 1.8rem + ((1vw - 0.563rem) * 0.64), 2rem)',
+					'clamp(1.5rem, 1.5rem + ((1vw - 0.48rem) * 0.962), 2rem)',
 				textTransform: 'uppercase',
 			},
 		} );
