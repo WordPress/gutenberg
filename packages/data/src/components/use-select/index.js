@@ -41,6 +41,98 @@ const renderQueue = createQueue();
  */
 /** @typedef {import('../../types').MapSelect} MapSelect */
 
+function Store( registry ) {
+	const queueContext = {};
+	const NOTHING = {};
+	let lastMapSelect = NOTHING;
+	let lastMapResult = NOTHING;
+	let lastMapResultValid = false;
+	let lastIsAsync;
+	let subscribe;
+
+	function createSubscriber( stores ) {
+		return ( listener ) => {
+			lastMapResultValid = false;
+
+			const onStoreChange = () => {
+				lastMapResultValid = false;
+				listener();
+			};
+
+			const onChange = () => {
+				if ( lastIsAsync ) {
+					renderQueue.add( queueContext, onStoreChange );
+				} else {
+					onStoreChange();
+				}
+			};
+
+			const unsubs = stores.map( ( storeName ) => {
+				return registry.subscribe( onChange, storeName );
+			} );
+
+			return () => {
+				// The return value of the subscribe function could be undefined if the store is a custom generic store.
+				for ( const unsub of unsubs ) {
+					unsub?.();
+				}
+				renderQueue.cancel( queueContext );
+			};
+		};
+	}
+
+	return ( mapSelect, resub, isAsync ) => {
+		function selectValue() {
+			return mapSelect( registry.select, registry );
+		}
+
+		function updateValue( selectFromStore ) {
+			if ( lastMapResultValid && mapSelect === lastMapSelect ) {
+				return lastMapResult;
+			}
+
+			const mapResult = selectFromStore();
+
+			if (
+				lastMapResult === NOTHING ||
+				! isShallowEqual( lastMapResult, mapResult )
+			) {
+				lastMapResult = mapResult;
+			}
+			lastMapResultValid = true;
+		}
+
+		function getValue() {
+			updateValue( selectValue );
+			return lastMapResult;
+		}
+
+		if ( lastIsAsync && ! isAsync ) {
+			lastMapResultValid = false;
+			renderQueue.cancel( queueContext );
+		}
+
+		const listeningStores = { current: null };
+		updateValue( () =>
+			registry.__unstableMarkListeningStores(
+				selectValue,
+				listeningStores
+			)
+		);
+
+		if (
+			lastMapSelect === NOTHING ||
+			( resub && mapSelect !== lastMapSelect )
+		) {
+			subscribe = createSubscriber( listeningStores.current );
+		}
+		lastIsAsync = isAsync;
+		lastMapSelect = mapSelect;
+
+		return { getValue, subscribe };
+	};
+}
+
 /**
  * Custom react hook for retrieving props from registered selectors.
  *
@@ -105,98 +197,13 @@ const renderQueue = createQueue();
  * ```
  * @return {UseSelectReturn<T>} A custom react hook.
  */
-function Selecter( registry ) {
-	const queueContext = {};
-	const NOTHING = {};
-	let lastMapSelect = NOTHING;
-	let lastMapResult = NOTHING;
-	let lastMapResultValid = false;
-	let lastIsAsync;
-	let subscribe;
-
-	function createSubscriber( stores ) {
-		return ( lis ) => {
-			lastMapResultValid = false;
-
-			const onStoreChange = () => {
-				lastMapResultValid = false;
-				lis();
-			};
-
-			const onChange = () => {
-				if ( lastIsAsync ) {
-					renderQueue.add( queueContext, onStoreChange );
-				} else {
-					onStoreChange();
-				}
-			};
-
-			const unsubs = stores.map( ( storeName ) => {
-				return registry.subscribe( onChange, storeName );
-			} );
-
-			return () => {
-				// The return value of the subscribe function could be undefined if the store is a custom generic store.
-				unsubs.forEach( ( unsub ) => unsub?.() );
-				renderQueue.cancel( queueContext );
-			};
-		};
-	}
-
-	return ( mapSelect, resub, isAsync ) => {
-		function selectValue() {
-			return mapSelect( registry.select, registry );
-		}
-
-		function updateValue( selectFromStore ) {
-			if ( lastMapResultValid && mapSelect === lastMapSelect ) {
-				return lastMapResult;
-			}
-
-			const mapResult = selectFromStore();
-
-			if (
-				lastMapResult === NOTHING ||
-				! isShallowEqual( lastMapResult, mapResult )
-			) {
-				lastMapResult = mapResult;
-			}
-
-			lastMapResultValid = true;
-		}
-
-		function getValue() {
-			updateValue( selectValue );
-			return lastMapResult;
-		}
-
-		const listeningStores = { current: null };
-		updateValue( () =>
-			registry.__unstableMarkListeningStores(
-				selectValue,
-				listeningStores
-			)
-		);
-
-		if (
-			lastMapSelect === NOTHING ||
-			( resub && mapSelect !== lastMapSelect )
-		) {
-			subscribe = createSubscriber( listeningStores.current );
-		}
-		lastIsAsync = isAsync;
-		lastMapSelect = mapSelect;
-
-		return { getValue, subscribe };
-	};
-}
 
 export default function useSelect( mapSelect, deps ) {
 	const registry = useRegistry();
 	const isAsync = useAsyncMode();
-	const select = useMemo( () => Selecter( registry ), [ registry ] );
+	const store = useMemo( () => Store( registry ), [ registry ] );
 	const selector = useCallback( mapSelect, deps );
-	const { getValue, subscribe } = select( selector, !! deps, isAsync );
+	const { getValue, subscribe } = store( selector, !! deps, isAsync );
 	return useSyncExternalStore( subscribe, getValue, getValue );
 }
 
