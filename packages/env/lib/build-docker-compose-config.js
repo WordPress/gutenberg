@@ -143,12 +143,20 @@ module.exports = function buildDockerComposeConfig( config ) {
 	const developmentPorts = `\${WP_ENV_PORT:-${ config.env.development.port }}:80`;
 	const testsPorts = `\${WP_ENV_TESTS_PORT:-${ config.env.tests.port }}:80`;
 
-	// Set the WordPress, WP-CLI, PHPUnit PHP version if defined.
+	// Set the WordPress, PHPUnit PHP version if defined.
 	const developmentPhpVersion = config.env.development.phpVersion
 		? config.env.development.phpVersion
 		: '';
 	const testsPhpVersion = config.env.tests.phpVersion
 		? config.env.tests.phpVersion
+		: '';
+
+	// Set the WP-CLI PHP version if defined.
+	const developmentCliPhpVersion = config.env.development.cliPhpVersion
+		? config.env.development.cliPhpVersion
+		: '';
+	const testsCliPhpVersion = config.env.tests.cliPhpVersion
+		? config.env.tests.cliPhpVersion
 		: '';
 
 	// Set the WordPress images with the PHP version tag.
@@ -158,16 +166,17 @@ module.exports = function buildDockerComposeConfig( config ) {
 	const testsWpImage = `wordpress${
 		testsPhpVersion ? ':php' + testsPhpVersion : ''
 	}`;
+
 	// Set the WordPress CLI images with the PHP version tag.
 	const developmentWpCliImage = `wordpress:cli${
-		! developmentPhpVersion || developmentPhpVersion.length === 0
+		! developmentCliPhpVersion || developmentCliPhpVersion.length === 0
 			? ''
-			: '-php' + developmentPhpVersion
+			: '-php' + developmentCliPhpVersion
 	}`;
 	const testsWpCliImage = `wordpress:cli${
-		! testsPhpVersion || testsPhpVersion.length === 0
+		! testsCliPhpVersion || testsCliPhpVersion.length === 0
 			? ''
-			: '-php' + testsPhpVersion
+			: '-php' + testsCliPhpVersion
 	}`;
 
 	// Defaults are to use the most recent version of PHPUnit that provides
