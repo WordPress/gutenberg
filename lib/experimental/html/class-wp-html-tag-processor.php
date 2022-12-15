@@ -1658,14 +1658,6 @@ class WP_HTML_Tag_Processor {
 
 		// 3. Point this tag processor at the original tag opener and consume it
 		$this->parsed_bytes = strlen( $updated_html_up_to_current_tag_name_end ) - $this->tag_name_length - 2;
-
-		// This ensures compatibility with older PHP versions.
-		// strpos() doesn't support negative offset values on PHP prior to version 7.1.
-		//
-		if ( 0 > $this->parsed_bytes ) {
-			$this->parsed_bytes = strlen( $this->updated_html ) - abs( $this->parsed_bytes );
-		}
-
 		$this->next_tag();
 
 		return $this->html;
