@@ -151,7 +151,7 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 		if ( isset( $request['styles'] ) || isset( $request['settings'] ) ) {
 			$config = array();
 			if ( isset( $request['styles'] ) ) {
-				$config['styles']    = $request['styles'];
+				$config['styles'] = $request['styles'];
 				if ( isset( $request['styles']['css'] ) ) {
 					$validate_custom_css = $this->validate_custom_css( $request['styles']['css'] );
 					if ( is_wp_error( $validate_custom_css ) ) {
