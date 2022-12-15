@@ -77,6 +77,11 @@ export type FontSize = {
 	 * size. Used for the class generation process.
 	 */
 	slug: string;
+	/**
+	 * The `shortName` property is a string with a short label for that font
+	 * size e.g.: `S`.
+	 */
+	shortName?: string;
 };
 
 export type FontSizePickerSelectProps = Pick<
