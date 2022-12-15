@@ -2013,6 +2013,8 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return array $declarations List of declarations filtered.
 	 */
 	private static function update_separator_declarations( $declarations ) {
+		// Gutenberg and core implementation differed.
+		// https://github.com/WordPress/gutenberg/pull/44943
 		$background_color     = '';
 		$border_color_matches = false;
 		$text_color_matches   = false;
