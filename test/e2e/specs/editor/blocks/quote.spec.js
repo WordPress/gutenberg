@@ -304,6 +304,7 @@ test.describe( 'Quote', () => {
 <!-- /wp:paragraph --><cite>2</cite></blockquote>
 <!-- /wp:quote -->`
 		);
+		// Move the cursor to the start of the first paragraph of the quoted block.
 		await pageUtils.pressKeyTimes( 'ArrowLeft', 4 );
 		await page.keyboard.press( 'Backspace' );
 		expect( await editor.getEditedPostContent() ).toBe(
