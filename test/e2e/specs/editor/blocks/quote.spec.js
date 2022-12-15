@@ -8,6 +8,10 @@ test.describe( 'Quote', () => {
 		await admin.createNewPost();
 	} );
 
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
+	} );
+
 	test( 'should allow the user to type right away', async ( {
 		editor,
 		page,
