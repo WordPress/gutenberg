@@ -192,6 +192,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.1.0 Added the `border-*-color`, `border-*-width`, `border-*-style`,
 	 *              `--wp--style--root--padding-*`, and `box-shadow` properties,
 	 *              removed the `--wp--style--block-gap` property.
+	 * @since 6.2.0 Added `min-height`.
 	 * @var array
 	 */
 	const PROPERTIES_METADATA = array(
@@ -229,6 +230,7 @@ class WP_Theme_JSON_Gutenberg {
 		'margin-right'                      => array( 'spacing', 'margin', 'right' ),
 		'margin-bottom'                     => array( 'spacing', 'margin', 'bottom' ),
 		'margin-left'                       => array( 'spacing', 'margin', 'left' ),
+		'min-height'                        => array( 'dimensions', 'minHeight' ),
 		'outline-color'                     => array( 'outline', 'color' ),
 		'outline-offset'                    => array( 'outline', 'offset' ),
 		'outline-style'                     => array( 'outline', 'style' ),
@@ -291,6 +293,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *              and `typography`, and renamed others according to the new schema.
 	 * @since 6.0.0 Added `color.defaultDuotone`.
 	 * @since 6.1.0 Added `layout.definitions` and `useRootPaddingAwareAlignments`.
+	 * @since 6.2.0 Added `dimensions.minHeight`.
 	 * @var array
 	 */
 	const VALID_SETTINGS = array(
@@ -317,6 +320,9 @@ class WP_Theme_JSON_Gutenberg {
 			'text'             => null,
 		),
 		'custom'                        => null,
+		'dimensions'                    => array(
+			'minHeight' => null,
+		),
 		'layout'                        => array(
 			'contentSize' => null,
 			'definitions' => null,
@@ -356,6 +362,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.1.0 Added new side properties for `border`,
 	 *              added new property `shadow`,
 	 *              updated `blockGap` to be allowed at any level.
+	 * @since 6.2.0 Added `dimensions.minHeight`.
 	 * @var array
 	 */
 	const VALID_STYLES = array(
@@ -373,6 +380,9 @@ class WP_Theme_JSON_Gutenberg {
 			'background' => null,
 			'gradient'   => null,
 			'text'       => null,
+		),
+		'dimensions' => array(
+			'minHeight' => null,
 		),
 		'filter'     => array(
 			'duotone' => null,
@@ -492,6 +502,7 @@ class WP_Theme_JSON_Gutenberg {
 		array( 'border', 'style' ),
 		array( 'border', 'width' ),
 		array( 'color', 'link' ),
+		array( 'dimensions', 'minHeight' ),
 		array( 'spacing', 'blockGap' ),
 		array( 'spacing', 'margin' ),
 		array( 'spacing', 'padding' ),
