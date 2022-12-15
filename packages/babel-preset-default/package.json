@@ -40,7 +40,7 @@
 		"@wordpress/element": "file:../element",
 		"@wordpress/warning": "file:../warning",
 		"browserslist": "^4.17.6",
-		"core-js": "^3.19.1"
+		"core-js": "^3.26.1"
 	},
 	"publishConfig": {
 		"access": "public"
