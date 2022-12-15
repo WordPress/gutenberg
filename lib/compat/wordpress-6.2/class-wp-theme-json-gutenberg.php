@@ -1562,10 +1562,12 @@ class WP_Theme_JSON_Gutenberg {
 	 * for the presets and adds them to the $declarations array
 	 * following the format:
 	 *
-	 *     array(
-	 *       'name'  => 'property_name',
-	 *       'value' => 'property_value,
-	 *     )
+	 * ```php
+	 * array(
+	 *   'name'  => 'property_name',
+	 *   'value' => 'property_value,
+	 * )
+	 * ```
 	 *
 	 * @since 5.8.0
 	 * @since 5.9.0 Added the `$origins` parameter.
@@ -1594,10 +1596,12 @@ class WP_Theme_JSON_Gutenberg {
 	 * for the custom values and adds them to the $declarations
 	 * array following the format:
 	 *
-	 *     array(
-	 *       'name'  => 'property_name',
-	 *       'value' => 'property_value,
-	 *     )
+	 * ```php
+	 * array(
+	 *   'name'  => 'property_name',
+	 *   'value' => 'property_value,
+	 * )
+	 * ```
 	 *
 	 * @since 5.8.0
 	 *
@@ -1681,10 +1685,12 @@ class WP_Theme_JSON_Gutenberg {
 	 * Given a styles array, it extracts the style properties
 	 * and adds them to the $declarations array following the format:
 	 *
-	 *     array(
-	 *       'name'  => 'property_name',
-	 *       'value' => 'property_value,
-	 *     )
+	 * ```php
+	 * array(
+	 *   'name'  => 'property_name',
+	 *   'value' => 'property_value,
+	 * )
+	 * ```
 	 *
 	 * @since 5.8.0
 	 * @since 5.9.0 Added the `$settings` and `$properties` parameters.
@@ -1824,7 +1830,7 @@ class WP_Theme_JSON_Gutenberg {
 					'get_property_value',
 					sprintf(
 						/* translators: 1: theme.json, 2: Value name, 3: Value path, 4: Another value name. */
-						__( 'Your %1$s file uses a dynamic value (%2$s) for the path at %3$s. However, the value at %3$s is also a dynamic value (pointing to %4$s) and pointing to another dynamic value is not supported. Please update %3$s to point directly to %4$s.' ),
+						__( 'Your %1$s file uses a dynamic value (%2$s) for the path at %3$s. However, the value at %3$s is also a dynamic value (pointing to %4$s) and pointing to another dynamic value is not supported. Please update %3$s to point directly to %4$s.', 'gutenberg' ),
 						'theme.json',
 						$ref_value_string,
 						$path_string,
@@ -2015,7 +2021,7 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	private static function update_separator_declarations( $declarations ) {
 		// Gutenberg and core implementation differed.
-		// https://github.com/WordPress/gutenberg/pull/44943
+		// https://github.com/WordPress/gutenberg/pull/44943.
 		$background_color     = '';
 		$border_color_matches = false;
 		$text_color_matches   = false;
@@ -3110,7 +3116,7 @@ class WP_Theme_JSON_Gutenberg {
 			|| ! is_numeric( $spacing_scale['mediumStep'] )
 			|| ( '+' !== $spacing_scale['operator'] && '*' !== $spacing_scale['operator'] ) ) {
 			if ( ! empty( $spacing_scale ) ) {
-				trigger_error( __( 'Some of the theme.json settings.spacing.spacingScale values are invalid' ), E_USER_NOTICE );
+				trigger_error( __( 'Some of the theme.json settings.spacing.spacingScale values are invalid', 'gutenberg' ), E_USER_NOTICE );
 			}
 			return null;
 		}
@@ -3144,7 +3150,7 @@ class WP_Theme_JSON_Gutenberg {
 
 			$below_sizes[] = array(
 				/* translators: %s: Digit to indicate multiple of sizing, eg. 2X-Small. */
-				'name' => $below_midpoint_count === $steps_mid_point - 1 ? __( 'Small' ) : sprintf( __( '%sX-Small' ), (string) $x_small_count ),
+				'name' => $below_midpoint_count === $steps_mid_point - 1 ? __( 'Small', 'gutenberg' ) : sprintf( __( '%sX-Small', 'gutenberg' ), (string) $x_small_count ),
 				'slug' => (string) $slug,
 				'size' => round( $current_step, 2 ) . $unit,
 			);
@@ -3163,7 +3169,7 @@ class WP_Theme_JSON_Gutenberg {
 		$below_sizes = array_reverse( $below_sizes );
 
 		$below_sizes[] = array(
-			'name' => __( 'Medium' ),
+			'name' => __( 'Medium', 'gutenberg' ),
 			'slug' => '50',
 			'size' => $spacing_scale['mediumStep'] . $unit,
 		);
@@ -3181,7 +3187,7 @@ class WP_Theme_JSON_Gutenberg {
 
 			$above_sizes[] = array(
 				/* translators: %s: Digit to indicate multiple of sizing, eg. 2X-Large. */
-				'name' => 0 === $above_midpoint_count ? __( 'Large' ) : sprintf( __( '%sX-Large' ), (string) $x_large_count ),
+				'name' => 0 === $above_midpoint_count ? __( 'Large', 'gutenberg' ) : sprintf( __( '%sX-Large', 'gutenberg' ), (string) $x_large_count ),
 				'slug' => (string) $slug,
 				'size' => round( $current_step, 2 ) . $unit,
 			);
