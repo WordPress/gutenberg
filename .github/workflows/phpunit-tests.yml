@@ -66,14 +66,14 @@ jobs:
                   php-version: '${{ matrix.php }}'
                   coverage: none
 
-            # This step is needed to ensure that Composer installs the correct versions of packages.
+            # Ensure that Composer installs the correct versions of packages.
             - name: Override PHP version in composer.json
               run: composer config platform.php ${{ matrix.php }}
 
-            # The spatie/phpunit-watcher package is not compatible with PHP < 7.3.
-            # Therefore, it should be removed before running the tests.
-            - name: Remove PHP 5.6 and PHP 7.0 incompatible packages
-              if: ${{ matrix.php < '7.3' }}
+            # The spatie/phpunit-watcher package is not compatible with PHP < 7.2.
+            # It must be removed before running the tests.
+            - name: Remove incompatible Composer packages
+              if: ${{ matrix.php < '7.2' }}
               run: composer remove spatie/phpunit-watcher --dev --no-update
 
             # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
