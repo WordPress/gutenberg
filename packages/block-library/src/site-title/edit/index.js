@@ -21,7 +21,7 @@ import { ToggleControl, PanelBody, ToolbarButton } from '@wordpress/components';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
 import { formatBold, formatItalic } from '@wordpress/icons';
-import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
+import { displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -54,17 +54,13 @@ export default function SiteTitleEdit( {
 		} );
 	}
 
-	const { isBold, isItalic, toggleBold, toggleItalic } =
-		__experimentalUseFontAppearanceStyles( { attributes, setAttributes } );
-
-	// Toggle bold and italic styles with keyboard shortcuts.
-	function onKeyDown( event ) {
-		if ( isKeyboardEvent.primary( event, 'b' ) ) {
-			toggleBold();
-		} else if ( isKeyboardEvent.primary( event, 'i' ) ) {
-			toggleItalic();
-		}
-	}
+	const {
+		isBold,
+		isItalic,
+		toggleBold,
+		toggleItalic,
+		onKeyDownToggleFontAppearance,
+	} = __experimentalUseFontAppearanceStyles( { attributes, setAttributes } );
 
 	const TagName = level === 0 ? 'p' : `h${ level }`;
 	const blockProps = useBlockProps( {
@@ -72,7 +68,7 @@ export default function SiteTitleEdit( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 			'wp-block-site-title__placeholder': ! canUserEdit && ! title,
 		} ),
-		onKeyDown,
+		onKeyDown: onKeyDownToggleFontAppearance,
 	} );
 	const siteTitleContent = canUserEdit ? (
 		<TagName { ...blockProps }>

@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { isKeyboardEvent } from '@wordpress/keycodes';
+
+/**
  * Internal dependencies
  */
 import {
@@ -15,7 +20,8 @@ import {
  * @param {Object} props               Block props.
  * @param {Object} props.attributes    Block's attributes.
  * @param {Object} props.setAttributes Function to set block's attributes.
- * @return {Object} The bold and italic states, and functions to toggle them.
+ * @return {Object} The isBold and isItalic states, functions to toggle them
+ *                  and shortcuts listener.
  */
 export function useFontAppearanceStyles( { attributes = {}, setAttributes } ) {
 	const typographyStyle = attributes.style?.typography;
@@ -62,5 +68,12 @@ export function useFontAppearanceStyles( { attributes = {}, setAttributes } ) {
 		isItalic,
 		toggleBold,
 		toggleItalic,
+		onKeyDownToggleFontAppearance: ( event ) => {
+			if ( isKeyboardEvent.primary( event, 'b' ) ) {
+				toggleBold();
+			} else if ( isKeyboardEvent.primary( event, 'i' ) ) {
+				toggleItalic();
+			}
+		},
 	};
 }
