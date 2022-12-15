@@ -468,8 +468,8 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 	$default_minimum_viewport_width   = '768px';
 	$default_minimum_font_size_factor = 0.75;
 	$default_scale_factor             = 1;
-	$default_minimum_font_size_limit  = isset( $fluid_settings['minFontSize'] ) &&
-										! empty( gutenberg_get_typography_value_and_unit( $fluid_settings['minFontSize'] ) ) ? $fluid_settings['minFontSize'] : '14px';
+	$has_min_font_size                = isset( $fluid_settings['minFontSize'] ) && ! empty( gutenberg_get_typography_value_and_unit( $fluid_settings['minFontSize'] ) );
+	$default_minimum_font_size_limit  = $has_min_font_size ? $fluid_settings['minFontSize'] : '14px';
 
 	// Font sizes.
 	$fluid_font_size_settings = isset( $preset['fluid'] ) ? $preset['fluid'] : null;
