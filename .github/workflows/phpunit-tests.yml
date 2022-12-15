@@ -77,7 +77,7 @@ jobs:
             # passing a custom cache suffix ensures that the cache is flushed at least once per week.
             - name: Remove PHP 5.6 and PHP 7.0 incompatible packages
               if: ${{ matrix.php < '7.1'  }}
-              run: composer remove spatie/phpunit-watcher
+              run: composer remove spatie/phpunit-watcher --dev
 
             - name: Install npm dependencies
               run: |
