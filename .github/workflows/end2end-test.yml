@@ -16,8 +16,8 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-    admin:
-        name: Admin - ${{ matrix.part }}
+    e2e-puppeteer:
+        name: Puppeteer - ${{ matrix.part }}
         runs-on: ubuntu-latest
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
@@ -115,7 +115,7 @@ jobs:
 
     report-to-issues:
         name: Report to GitHub
-        needs: [admin, e2e-playwright]
+        needs: [e2e-puppeteer, e2e-playwright]
         if: ${{ always() }}
         runs-on: ubuntu-latest
         steps:
