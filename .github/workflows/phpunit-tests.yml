@@ -66,6 +66,10 @@ jobs:
                   php-version: '${{ matrix.php }}'
                   coverage: none
 
+            # This step is needed to ensure that Composer installs the correct versions of packages.
+            - name: Override PHP version in composer.json
+              run: composer config platform.php ${{ matrix.os }}
+
             # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
             # passing a custom cache suffix ensures that the cache is flushed at least once per week.
             - name: Install Composer dependencies
@@ -91,6 +95,7 @@ jobs:
 
             - name: General debug information
               run: |
+                  php --version
                   npm --version
                   node --version
                   curl --version
