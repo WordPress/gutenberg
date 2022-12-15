@@ -73,10 +73,10 @@ jobs:
               with:
                   custom-cache-suffix: $(/bin/date -u --date='last Mon' "+%F")
 
-            # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
-            # passing a custom cache suffix ensures that the cache is flushed at least once per week.
+            # The spatie/phpunit-watcher package is not compatible with PHP 5.6 and 7.0.
+            # Therefore, it should be removed before running the tests.
             - name: Remove PHP 5.6 and PHP 7.0 incompatible packages
-              if: ${{ matrix.php < '7.1'  }}
+              if: ${{ matrix.php < '7.1' }}
               run: composer remove spatie/phpunit-watcher --dev
 
             - name: Install npm dependencies
