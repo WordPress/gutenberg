@@ -368,7 +368,6 @@ function ListViewBlock( {
 											const newLink = createBlock(
 												'core/navigation-link'
 											);
-											// Convert to a submenu if the block currently isn't one.
 											if (
 												block.name ===
 												'core/navigation-submenu'
@@ -381,6 +380,7 @@ function ListViewBlock( {
 													updateSelectionOnInsert
 												);
 											} else {
+												// Convert to a submenu if the block currently isn't one.
 												const newSubmenu = createBlock(
 													'core/navigation-submenu',
 													block.attributes,
