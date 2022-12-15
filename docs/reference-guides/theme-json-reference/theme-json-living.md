@@ -125,7 +125,7 @@ Settings related to typography.
 | textDecoration | boolean | true |  |
 | textTransform | boolean | true |  |
 | dropCap | boolean | true |  |
-| fontSizes | array |  | fluid, name, size, slug |
+| fontSizes | array |  | fluid, name, shortName, size, slug |
 | fontFamilies | array |  | fontFace, fontFamily, name, slug |
 
 ---
