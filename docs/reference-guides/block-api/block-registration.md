@@ -179,7 +179,7 @@ attributes: {
 
 -   **Type:** `Object`
 
-Example provides structured example data for the block. This data is used to construct a preview for the block to be shown in the Inspector Help Panel when the user mouses over the block.
+Example provides structured example data for the block. This data is used to construct a preview for the block to be shown in the Inspector Help Panel when the user mouses over the block and in the Styles panel when the block is selected.
 
 The data provided in the example object should match the attributes defined. For example:
 

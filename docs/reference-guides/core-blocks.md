@@ -428,8 +428,8 @@ Display a list of all pages. ([Source](https://github.com/WordPress/gutenberg/tr
 
 -	**Name:** core/page-list
 -	**Category:** widgets
--	**Supports:** ~~html~~, ~~reusable~~
--	**Attributes:** parentPageID
+-	**Supports:** typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Attributes:** isNested, parentPageID
 
 ## Page List Item
 
@@ -572,7 +572,7 @@ Contains the block elements used to render a post, like the title, date, feature
 
 -	**Name:** core/post-template
 -	**Category:** theme
--	**Supports:** align, typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** align, color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** 
 
 ## Post Terms
@@ -617,7 +617,7 @@ An advanced block that allows displaying post types based on different query par
 
 -	**Name:** core/query
 -	**Category:** theme
--	**Supports:** align (full, wide), color (background, gradients, link, text), ~~html~~
+-	**Supports:** align (full, wide), ~~html~~
 -	**Attributes:** displayLayout, namespace, query, queryId, tagName
 
 ## No results

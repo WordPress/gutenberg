@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { set, map, find, get } from 'lodash';
+import { set, map, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -218,7 +218,9 @@ export function getEntityConfig(
 	kind: string,
 	name: string
 ): any {
-	return find( state.entities.config, { kind, name } );
+	return state.entities.config?.find(
+		( config ) => config.kind === kind && config.name === name
+	);
 }
 
 /**
@@ -1129,7 +1131,10 @@ export function getAutosave< EntityRecord extends ET.EntityRecord< any > >(
 	}
 
 	const autosaves = state.autosaves[ postId ];
-	return find( autosaves, { author: authorId } ) as EntityRecord | undefined;
+
+	return autosaves?.find(
+		( autosave: any ) => autosave.author === authorId
+	) as EntityRecord | undefined;
 }
 
 /**

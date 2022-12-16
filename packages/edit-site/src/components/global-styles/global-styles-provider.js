@@ -94,7 +94,7 @@ function useGlobalStylesUserConfig() {
 	}, [ settings, styles ] );
 
 	const setConfig = useCallback(
-		( callback ) => {
+		( callback, options = {} ) => {
 			const record = getEditedEntityRecord(
 				'root',
 				'globalStyles',
@@ -105,10 +105,16 @@ function useGlobalStylesUserConfig() {
 				settings: record?.settings ?? {},
 			};
 			const updatedConfig = callback( currentConfig );
-			editEntityRecord( 'root', 'globalStyles', globalStylesId, {
-				styles: cleanEmptyObject( updatedConfig.styles ) || {},
-				settings: cleanEmptyObject( updatedConfig.settings ) || {},
-			} );
+			editEntityRecord(
+				'root',
+				'globalStyles',
+				globalStylesId,
+				{
+					styles: cleanEmptyObject( updatedConfig.styles ) || {},
+					settings: cleanEmptyObject( updatedConfig.settings ) || {},
+				},
+				options
+			);
 		},
 		[ globalStylesId ]
 	);

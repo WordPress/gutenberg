@@ -34,6 +34,20 @@ _Returns_
 
 -   `Array`: Template parts and their blocks in an array.
 
+### getEditedPostContext
+
+> **Deprecated**
+
+Returns the edited post's context object.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `Object`: Page.
+
 ### getEditedPostId
 
 Returns the ID of the currently edited template or template part.
@@ -72,21 +86,15 @@ _Returns_
 
 ### getHomeTemplateId
 
-Returns the current home template ID.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `number?`: Home template ID.
+> **Deprecated**
 
 ### getNavigationPanelActiveMenu
 
 > **Deprecated**
 
 ### getPage
+
+> **Deprecated**
 
 Returns the current page object.
 
@@ -230,14 +238,21 @@ _Parameters_
 -   _options_ `[Object]`:
 -   _options.allowUndo_ `[boolean]`: Whether to allow the user to undo reverting the template. Default true.
 
-### setHomeTemplateId
+### setEditedPostContext
 
-Action that sets the home template ID to the template ID of the page resolved
-from a given path.
+Set's the current block editor context.
 
 _Parameters_
 
--   _homeTemplateId_ `number`: The template ID for the homepage.
+-   _context_ `Object`: The context object.
+
+_Returns_
+
+-   `number`: The resolved template ID for the page route.
+
+### setHomeTemplateId
+
+> **Deprecated**
 
 ### setIsInserterOpened
 

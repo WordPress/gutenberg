@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get, isEmpty, map, mapValues } from 'lodash';
+import { get, isEmpty, map, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -265,7 +265,9 @@ export function categories( state = DEFAULT_CATEGORIES, action ) {
 			if ( ! action.category || isEmpty( action.category ) ) {
 				return state;
 			}
-			const categoryToChange = find( state, [ 'slug', action.slug ] );
+			const categoryToChange = state.find(
+				( { slug } ) => slug === action.slug
+			);
 			if ( categoryToChange ) {
 				return map( state, ( category ) => {
 					if ( category.slug === action.slug ) {

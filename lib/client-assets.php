@@ -274,7 +274,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-editor',
 		gutenberg_url( 'build/editor/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-nux', 'wp-reusable-blocks' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-reusable-blocks' ),
 		$version
 	);
 	$styles->add_data( 'wp-editor', 'rtl', 'replace' );
@@ -283,7 +283,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-edit-post',
 		gutenberg_url( 'build/edit-post/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-block-library', 'wp-nux' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-block-library' ),
 		$version
 	);
 	$styles->add_data( 'wp-edit-post', 'rtl', 'replace' );
@@ -337,14 +337,7 @@ function gutenberg_register_packages_styles( $styles ) {
 	global $editor_styles;
 	if ( current_theme_supports( 'wp-block-styles' ) && ( ! is_array( $editor_styles ) || count( $editor_styles ) === 0 ) ) {
 		// Include opinionated block styles if the theme supports block styles and no $editor_styles are declared, so the editor never appears broken.
-		gutenberg_override_style(
-			$styles,
-			'wp-block-library-theme',
-			gutenberg_url( 'build/block-library/theme.css' ),
-			$wp_edit_blocks_dependencies,
-			$version
-		);
-		$styles->add_data( 'wp-block-library-theme', 'rtl', 'replace' );
+		$wp_edit_blocks_dependencies[] = 'wp-block-library-theme';
 	}
 
 	gutenberg_override_style(
@@ -376,12 +369,12 @@ function gutenberg_register_packages_styles( $styles ) {
 
 	gutenberg_override_style(
 		$styles,
-		'wp-nux',
-		gutenberg_url( 'build/nux/style.css' ),
-		array( 'wp-components' ),
+		'wp-block-library-theme',
+		gutenberg_url( 'build/block-library/theme.css' ),
+		array(),
 		$version
 	);
-	$styles->add_data( 'wp-nux', 'rtl', 'replace' );
+	$styles->add_data( 'wp-block-library-theme', 'rtl', 'replace' );
 
 	gutenberg_override_style(
 		$styles,
@@ -536,6 +529,37 @@ function gutenberg_enqueue_stored_styles( $options = array() ) {
 		}
 	}
 }
+
+/**
+ * Registers vendor JavaScript files to be used as dependencies of the editor
+ * and plugins.
+ *
+ * This function is called from a script during the plugin build process, so it
+ * should not call any WordPress PHP functions.
+ *
+ * @since 13.0
+ *
+ * @param WP_Scripts $scripts WP_Scripts instance.
+ */
+function gutenberg_register_vendor_scripts( $scripts ) {
+	$extension = SCRIPT_DEBUG ? '.js' : '.min.js';
+
+	gutenberg_override_script(
+		$scripts,
+		'react',
+		gutenberg_url( 'build/vendors/react' . $extension ),
+		// See https://github.com/pmmmwh/react-refresh-webpack-plugin/blob/main/docs/TROUBLESHOOTING.md#externalising-react.
+		SCRIPT_DEBUG ? array( 'wp-react-refresh-entry', 'wp-polyfill' ) : array( 'wp-polyfill' )
+	);
+	gutenberg_override_script(
+		$scripts,
+		'react-dom',
+		gutenberg_url( 'build/vendors/react-dom' . $extension ),
+		array( 'react' )
+	);
+}
+add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
+
 
 /*
  * Always remove the Core action hook while gutenberg_enqueue_stored_styles() exists to avoid styles being printed twice.
