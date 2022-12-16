@@ -111,7 +111,7 @@ _Parameters_
 
 ### closeGlobalBlockInserter
 
-Undocumented declaration.
+Closes the global inserter.
 
 ### closeListView
 
@@ -459,7 +459,7 @@ Inserts a block matching a given search term via the global inserter.
 
 _Parameters_
 
--   _searchTerm_ `string`: The text to search the blocks for.
+-   _searchTerm_ `string`: The term by which to find the block to insert.
 
 ### insertBlockDirectoryBlock
 
@@ -468,7 +468,7 @@ inserter.
 
 _Parameters_
 
--   _searchTerm_ `string`: The text to search the Block Directory blocks for.
+-   _searchTerm_ `string`: The term by which to find the Block Directory block to insert.
 
 ### insertPattern
 
@@ -476,15 +476,16 @@ Inserts a pattern matching a given search term via the global inserter.
 
 _Parameters_
 
--   _searchTerm_ `string`: The text to search the patterns for.
+-   _searchTerm_ `string`: The term by which to find the pattern to insert.
 
 ### insertReusableBlock
 
-Inserts a reusable block matching a given search term via the global inserter.
+Inserts a reusable block matching a given search term via the global
+inserter.
 
 _Parameters_
 
--   _searchTerm_ `string`: The text to search the reusable blocks for.
+-   _searchTerm_ `string`: The term by which to find the reusable block to insert.
 
 ### installPlugin
 
@@ -572,7 +573,7 @@ Clicks on the button in the header which opens Document Settings sidebar when it
 
 ### openGlobalBlockInserter
 
-Opens the global block inserter.
+Opens the global inserter.
 
 ### openGlobalStylesPanel
 
@@ -666,7 +667,7 @@ Searches for a block via the global inserter.
 
 _Parameters_
 
--   _searchTerm_ `string`: The text to search the inserter for.
+-   _searchTerm_ `string`: The term to search the inserter for.
 
 _Returns_
 
@@ -678,7 +679,7 @@ Searches for a Block Directory block via the global inserter.
 
 _Parameters_
 
--   _searchTerm_ `string`: The text to search the inserter for.
+-   _searchTerm_ `string`: The term to search the inserter for.
 
 _Returns_
 
@@ -690,7 +691,7 @@ Searches for a pattern via the global inserter.
 
 _Parameters_
 
--   _searchTerm_ `string`: The text to search the inserter for.
+-   _searchTerm_ `string`: The term to search the inserter for.
 
 _Returns_
 
@@ -702,7 +703,7 @@ Searches for a reusable block via the global inserter.
 
 _Parameters_
 
--   _searchTerm_ `string`: The text to search the inserter for.
+-   _searchTerm_ `string`: The term to search the inserter for.
 
 _Returns_
 
