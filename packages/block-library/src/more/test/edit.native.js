@@ -26,29 +26,16 @@ afterAll( () => {
 	} );
 } );
 
-describe( 'Verse block', () => {
+describe( 'More block', () => {
 	it( 'inserts block', async () => {
 		const screen = await initializeEditor();
 
 		// Add block
-		await addBlock( screen, 'Verse' );
+		await addBlock( screen, 'More' );
 
 		// Get block
-		const verseBlock = await getBlock( screen, 'Verse' );
-		expect( verseBlock ).toBeVisible();
-		expect( getEditorHtml() ).toMatchSnapshot();
-	} );
-
-	it( 'renders block text set as initial content', async () => {
-		const screen = await initializeEditor( {
-			initialHtml: `<!-- wp:verse -->
-			<pre class="wp-block-verse">Sample text</pre>
-			<!-- /wp:verse -->`,
-		} );
-
-		// Get block
-		const verseBlock = await getBlock( screen, 'Verse' );
-		expect( verseBlock ).toBeVisible();
+		const moreBlock = await getBlock( screen, 'More' );
+		expect( moreBlock ).toBeVisible();
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 } );
