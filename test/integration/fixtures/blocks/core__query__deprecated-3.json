@@ -76,7 +76,8 @@
 								"name": "core/post-excerpt",
 								"isValid": true,
 								"attributes": {
-									"showMoreOnNewLine": true
+									"showMoreOnNewLine": true,
+									"excerptLength": 55
 								},
 								"innerBlocks": []
 							}
