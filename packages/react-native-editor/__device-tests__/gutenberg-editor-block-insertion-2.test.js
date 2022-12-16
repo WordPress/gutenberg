@@ -10,6 +10,7 @@ import {
 	paragraphBlockEmpty,
 	separatorBlockEmpty,
 } from './helpers/test-data';
+import { waitForMediaLibrary } from './helpers/utils';
 
 describe( 'Gutenberg Editor tests for Block insertion 2', () => {
 	it( 'adds new block at the end of post', async () => {
@@ -65,13 +66,14 @@ describe( 'Gutenberg Editor tests for Block insertion 2', () => {
 
 		await editorPage.addNewBlock( blockNames.image, 'before' );
 
+		await waitForMediaLibrary( editorPage.driver );
+		await editorPage.closePicker();
+
 		const imageBlock = await editorPage.getBlockAtPosition(
 			blockNames.image,
 			2
 		);
 		expect( imageBlock ).toBeTruthy();
-
-		await editorPage.closePicker();
 
 		const expectedHtml = [
 			headerBlockEmpty,
