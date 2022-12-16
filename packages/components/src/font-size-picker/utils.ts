@@ -49,10 +49,10 @@ export function getCommonSizeUnit( fontSizes: FontSize[] ) {
  * Validate that the font size short name is a string with at most
  * 3 characters length (e.g. "XXS", "XS", "S", "M", "L", "XL", "XXL").
  *
- * @param shortName The short name to validate.
+ * @param  shortName The short name to validate.
  * @return Whether the short name is valid.
  */
-export function hasValidShortName( shortName: string | undefined ): boolean {
+export function hasValidShortName( shortName: string ): boolean {
 	return (
 		typeof shortName === 'string' &&
 		shortName.length >= 1 &&
