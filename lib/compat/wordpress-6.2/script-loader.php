@@ -79,7 +79,10 @@ function gutenberg_resolve_assets_override() {
 		'wp-edit-blocks',
 	);
 
-	if ( current_theme_supports( 'wp-block-styles' ) ) {
+	if (
+		current_theme_supports( 'wp-block-styles' ) &&
+		( ! is_array( $editor_styles ) || count( $editor_styles ) === 0 )
+	) {
 		$style_handles[] = 'wp-block-library-theme';
 	}
 
