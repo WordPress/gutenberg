@@ -51,7 +51,7 @@ function getChangesToPush( name, attributes ) {
 }
 
 function cloneDeep( object ) {
-	return JSON.parse( JSON.stringify( object ) );
+	return ! object ? {} : JSON.parse( JSON.stringify( object ) );
 }
 
 function PushChangesToGlobalStylesControl( {
