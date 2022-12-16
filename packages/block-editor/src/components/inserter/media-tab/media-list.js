@@ -80,7 +80,7 @@ function MediaList( {
 		>
 			{ mediaList.map( ( media, index ) => (
 				<MediaPreview
-					key={ media.id || index }
+					key={ media.id || media.sourceId || index }
 					media={ media }
 					mediaType={ mediaType }
 					onClick={ onPreviewClick }

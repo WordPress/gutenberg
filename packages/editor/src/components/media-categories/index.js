@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { resolveSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 
@@ -38,16 +38,24 @@ const getOpenvereLicense = (
 			licenseName
 		);
 	}
-	// TODO: add translators comment.
 	const markedLicence = isPublicDomainMark
-		? __( 'is marked with' )
-		: __( 'is licensed under' );
-	return `${ markedLicence } ${ license }`;
+		? sprintf(
+				/* translators: %s: Name of the media's license (ex. 'CC0 1.0'). */
+				__( 'is marked with %s' ),
+				license
+		  )
+		: sprintf(
+				/* translators: %s: Name of the media's license (ex. 'CC BY-ND 2.0'). */
+				__( 'is licensed under %s' ),
+				license
+		  );
+	return markedLicence;
 };
 
 const getOpenverseCaption = ( item ) => {
 	const {
-		title = __( 'This work' ), // TODO: add translators comment.
+		/* translators: Openverse default media item title in the block inserter's media list. (ex. 'This work by {creator} is marked with CC0 1.0'). */
+		title = __( 'This work' ),
 		foreign_landing_url: foreignLandingUrl,
 		creator,
 		creator_url: creatorUrl,
@@ -68,7 +76,11 @@ const getOpenverseCaption = ( item ) => {
 	if ( creatorUrl ) {
 		_creator = getExternalLink( creatorUrl, creator );
 	}
-	_creator = ` ${ __( 'by' ) } ${ _creator }`; // TODO: add translators comment.
+	_creator = sprintf(
+		/* translators: %s: Name of the media's creator. */
+		__( ' by %s' ),
+		_creator
+	);
 	const caption = `"${ _title }" ${ _creator } ${ fullLicense }.`;
 	return caption.replace( /\s{2}/g, ' ' );
 };
