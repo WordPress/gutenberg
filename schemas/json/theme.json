@@ -353,8 +353,23 @@
 							"default": true
 						},
 						"fluid": {
-							"description": "Opts into fluid typography.",
-							"type": "boolean"
+							"description": "Enables fluid typography and allows users to set global fluid typography parameters.",
+							"oneOf": [
+								{
+									"type": "object",
+									"properties": {
+										"minFontSize": {
+											"description": "Allow users to set a global minimum font size boundary in px, rem or em. Custom font sizes below this value will not be clamped, and all calculated minimum font sizes will be, a at minimum, this value.",
+											"type": "string"
+										}
+									},
+									"additionalProperties": false
+								},
+								{
+									"type": "boolean"
+								}
+							],
+							"default": false
 						},
 						"letterSpacing": {
 							"description": "Allow users to set custom letter spacing.",

@@ -73,6 +73,7 @@ const {
 	__experimentalGetPatternTransformItems,
 	wasBlockJustInserted,
 	__experimentalGetGlobalBlocksByName,
+	getLastInsertedBlockClientId,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -4663,5 +4664,25 @@ describe( '__unstableGetClientIdsTree', () => {
 				],
 			},
 		] );
+	} );
+} );
+
+describe( 'getLastInsertedBlockClientId', () => {
+	it( 'should return undefined if no blocks have been inserted', () => {
+		const state = {
+			lastBlockInserted: {},
+		};
+
+		expect( getLastInsertedBlockClientId( state ) ).toEqual( undefined );
+	} );
+
+	it( 'should return clientId if blocks have been inserted', () => {
+		const state = {
+			lastBlockInserted: {
+				clientId: '123456',
+			},
+		};
+
+		expect( getLastInsertedBlockClientId( state ) ).toEqual( '123456' );
 	} );
 } );

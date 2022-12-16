@@ -12,6 +12,7 @@ import {
 	__experimentalHStack as HStack,
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
+	__unstableUseNavigateRegions as useNavigateRegions,
 } from '@wordpress/components';
 import {
 	useReducedMotion,
@@ -22,6 +23,7 @@ import { __ } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
 import { NavigableRegion } from '@wordpress/interface';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -36,22 +38,39 @@ import getIsListPage from '../../utils/get-is-list-page';
 import Header from '../header-edit-mode';
 import SiteIcon from '../site-icon';
 import SiteTitle from '../site-title';
+import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
 
 const ANIMATION_DURATION = 0.5;
 
 export default function Layout( { onError } ) {
+	// This ensures the edited entity id and type are initialized properly.
+	useInitEditedEntityFromURL();
+
 	const { params } = useLocation();
 	const isListPage = getIsListPage( params );
 	const isEditorPage = ! isListPage;
-	const { canvasMode, dashboardLink } = useSelect(
-		( select ) => ( {
-			canvasMode: select( editSiteStore ).__unstableGetCanvasMode(),
-			dashboardLink:
-				select( editSiteStore ).getSettings()
-					.__experimentalDashboardLink,
-		} ),
-		[]
-	);
+	const { canvasMode, dashboardLink, previousShortcut, nextShortcut } =
+		useSelect( ( select ) => {
+			const { getAllShortcutKeyCombinations } = select(
+				keyboardShortcutsStore
+			);
+			const { __unstableGetCanvasMode, getSettings } =
+				select( editSiteStore );
+			return {
+				canvasMode: __unstableGetCanvasMode(),
+				dashboardLink: getSettings().__experimentalDashboardLink,
+				previousShortcut: getAllShortcutKeyCombinations(
+					'core/edit-site/previous-region'
+				),
+				nextShortcut: getAllShortcutKeyCombinations(
+					'core/edit-site/next-region'
+				),
+			};
+		}, [] );
+	const navigateRegionsProps = useNavigateRegions( {
+		previous: previousShortcut,
+		next: nextShortcut,
+	} );
 	const { __unstableSetCanvasMode } = useDispatch( editSiteStore );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const disableMotion = useReducedMotion();
@@ -104,13 +123,19 @@ export default function Layout( { onError } ) {
 		<>
 			{ fullResizer }
 			<div
-				className={ classnames( 'edit-site-layout', {
-					'is-full-canvas':
-						( isEditorPage &&
-							canvasMode === 'edit' &&
-							! isMobileViewport ) ||
-						isMobileCanvasVisible,
-				} ) }
+				{ ...navigateRegionsProps }
+				ref={ navigateRegionsProps.ref }
+				className={ classnames(
+					'edit-site-layout',
+					navigateRegionsProps.className,
+					{
+						'is-full-canvas':
+							( isEditorPage &&
+								canvasMode === 'edit' &&
+								! isMobileViewport ) ||
+							isMobileCanvasVisible,
+					}
+				) }
 			>
 				<div className="edit-site-layout__header">
 					<div className="edit-site-layout__logo">
@@ -173,7 +198,7 @@ export default function Layout( { onError } ) {
 								as={ motion.div }
 								initial={ { y: -60 } }
 								animate={ { y: 0 } }
-								edit={ { y: -60 } }
+								exit={ { y: -60 } }
 								transition={ {
 									type: 'tween',
 									duration: disableMotion
@@ -192,7 +217,8 @@ export default function Layout( { onError } ) {
 
 				<AnimatePresence initial={ false }>
 					{ showSidebar && (
-						<motion.div
+						<NavigableRegion
+							as={ motion.div }
 							initial={ {
 								opacity: 0,
 							} }
@@ -210,9 +236,10 @@ export default function Layout( { onError } ) {
 								ease: 'easeOut',
 							} }
 							className="edit-site-layout__sidebar"
+							ariaLabel={ __( 'Navigation sidebar' ) }
 						>
 							<Sidebar />
-						</motion.div>
+						</NavigableRegion>
 					) }
 				</AnimatePresence>
 

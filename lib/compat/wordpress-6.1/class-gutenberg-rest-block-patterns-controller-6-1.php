@@ -1,6 +1,6 @@
 <?php
 /**
- * REST API: Gutenberg_REST_Block_Patterns_Controller class
+ * REST API: Gutenberg_REST_Block_Patterns_Controller_6_1 class
  *
  * @package    Gutenberg
  * @subpackage REST_API
@@ -13,104 +13,12 @@
  *
  * @see WP_REST_Controller
  */
-class Gutenberg_REST_Block_Patterns_Controller extends WP_REST_Controller {
-
-	/**
-	 * Defines whether remote patterns should be loaded.
-	 *
-	 * @since 6.0.0
-	 * @var bool
-	 */
-	private $remote_patterns_loaded;
-
-	/**
-	 * Constructs the controller.
-	 *
-	 * @since 6.0.0
-	 */
-	public function __construct() {
-		$this->namespace = 'wp/v2';
-		$this->rest_base = 'block-patterns/patterns';
-	}
-
-	/**
-	 * Registers the routes for the objects of the controller.
-	 *
-	 * @since 6.0.0
-	 */
-	public function register_routes() {
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base,
-			array(
-				array(
-					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => array( $this, 'get_items' ),
-					'permission_callback' => array( $this, 'get_items_permissions_check' ),
-				),
-				'schema' => array( $this, 'get_public_item_schema' ),
-			),
-			true
-		);
-	}
-
-	/**
-	 * Checks whether a given request has permission to read block patterns.
-	 *
-	 * @since 6.0.0
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
-	 */
-	public function get_items_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-		if ( current_user_can( 'edit_posts' ) ) {
-			return true;
-		}
-
-		foreach ( get_post_types( array( 'show_in_rest' => true ), 'objects' ) as $post_type ) {
-			if ( current_user_can( $post_type->cap->edit_posts ) ) {
-				return true;
-			}
-		}
-
-		return new WP_Error(
-			'rest_cannot_view',
-			__( 'Sorry, you are not allowed to view the registered block patterns.', 'gutenberg' ),
-			array( 'status' => rest_authorization_required_code() )
-		);
-	}
-
-	/**
-	 * Retrieves all block patterns.
-	 *
-	 * @since 6.0.0
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
-	 */
-	public function get_items( $request ) {
-		if ( ! $this->remote_patterns_loaded ) {
-			// Load block patterns from w.org.
-			_load_remote_block_patterns(); // Patterns with the `core` keyword.
-			_load_remote_featured_patterns(); // Patterns in the `featured` category.
-			_register_remote_theme_patterns(); // Patterns requested by current theme.
-
-			$this->remote_patterns_loaded = true;
-		}
-
-		$response = array();
-		$patterns = WP_Block_Patterns_Registry::get_instance()->get_all_registered();
-		foreach ( $patterns as $pattern ) {
-			$prepared_pattern = $this->prepare_item_for_response( $pattern, $request );
-			$response[]       = $this->prepare_response_for_collection( $prepared_pattern );
-		}
-		return rest_ensure_response( $response );
-	}
-
+class Gutenberg_REST_Block_Patterns_Controller_6_1 extends WP_REST_Block_Patterns_Controller {
 	/**
 	 * Prepare a raw block pattern before it gets output in a REST API response.
 	 *
 	 * @since 6.0.0
+	 * @since 6.1.0 Added `postTypes` property.
 	 *
 	 * @param array           $item    Raw pattern as registered, before any changes.
 	 * @param WP_REST_Request $request Request object.
@@ -147,6 +55,7 @@ class Gutenberg_REST_Block_Patterns_Controller extends WP_REST_Controller {
 	 * Retrieves the block pattern schema, conforming to JSON Schema.
 	 *
 	 * @since 6.0.0
+	 * @since 6.1.0 Added `post_types` property.
 	 *
 	 * @return array Item schema data.
 	 */

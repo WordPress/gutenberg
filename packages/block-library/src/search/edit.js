@@ -114,10 +114,10 @@ export default function SearchEdit( {
 	}
 
 	const colorProps = useColorProps( attributes );
-	const fluidTypographyEnabled = useSetting( 'typography.fluid' );
+	const fluidTypographySettings = useSetting( 'typography.fluid' );
 	const typographyProps = useTypographyProps(
 		attributes,
-		fluidTypographyEnabled
+		fluidTypographySettings
 	);
 	const unitControlInstanceId = useInstanceId( UnitControl );
 	const unitControlInputId = `wp-block-search__width-${ unitControlInstanceId }`;
