@@ -68,6 +68,7 @@ const restrictedImports = [
 			'every',
 			'extend',
 			'filter',
+			'find',
 			'findIndex',
 			'findKey',
 			'findLast',
