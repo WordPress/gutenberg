@@ -7,7 +7,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { debounce } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { ToolbarGroup } from '@wordpress/components';
 import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -17,6 +17,7 @@ import { BACKSPACE, DELETE, F10, isKeyboardEvent } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import ConvertToBlocksButton from './convert-to-blocks-button';
+import { createBlock } from '@wordpress/blocks';
 
 const { wp } = window;
 
@@ -36,6 +37,23 @@ function isTmceEmpty( editor ) {
 	return /^\n?$/.test( body.innerText || body.textContent );
 }
 
+function useMigrateOnLoad( clientId, content ) {
+	const { getBlockCount } = useSelect( blockEditorStore );
+	const { replaceBlock } = useDispatch( blockEditorStore );
+
+	useEffect( () => {
+		// Don't migrate if it's the only block, in other words, if there's only
+		// freeform (old) content.
+		if ( getBlockCount() === 1 ) {
+			return;
+		}
+
+		const htmlBlock = createBlock( 'core/html', { content } );
+
+		replaceBlock( clientId, htmlBlock );
+	}, [] );
+}
+
 export default function ClassicEdit( {
 	clientId,
 	attributes: { content },
@@ -48,6 +66,8 @@ export default function ClassicEdit( {
 		[ clientId ]
 	);
 	const didMount = useRef( false );
+
+	useMigrateOnLoad( clientId, content );
 
 	useEffect( () => {
 		if ( ! didMount.current ) {

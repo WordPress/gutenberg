@@ -12,24 +12,31 @@ import { v4 as uuid } from 'uuid';
 import {
 	getEditedPostContent,
 	createNewPost,
-	insertBlock,
 	pressKeyWithModifier,
 	clickBlockToolbarButton,
 	saveDraft,
+	clickOnMoreMenuItem,
+	clickButton,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Classic', () => {
 	beforeEach( async () => {
 		await createNewPost();
-	} );
-
-	it( 'should be inserted', async () => {
-		await insertBlock( 'Classic' );
+		await clickOnMoreMenuItem( 'Code editor' );
+		const codeEditorInput = await page.waitForSelector(
+			'.editor-post-text-editor'
+		);
+		await codeEditorInput.click();
+		await page.keyboard.type( 'st' );
+		await clickButton( 'Exit code editor' );
 		// Wait for TinyMCE to initialise.
 		await page.waitForSelector( '.mce-content-body' );
 		// Ensure there is focus.
 		await page.focus( '.mce-content-body' );
-		await page.keyboard.type( 'test' );
+		await page.keyboard.type( 'te' );
+	} );
+
+	it( 'should be inserted', async () => {
 		// Move focus away.
 		await pressKeyWithModifier( 'shift', 'Tab' );
 
@@ -37,13 +44,6 @@ describe( 'Classic', () => {
 	} );
 
 	it( 'should insert media, convert to blocks, and undo in one step', async () => {
-		await insertBlock( 'Classic' );
-		// Wait for TinyMCE to initialise.
-		await page.waitForSelector( '.mce-content-body' );
-		// Ensure there is focus.
-		await page.focus( '.mce-content-body' );
-		await page.keyboard.type( 'test' );
-
 		// Click the image button.
 		const addMediaButton = await page.waitForSelector(
 			'div[aria-label^="Add Media"]'
@@ -115,15 +115,6 @@ describe( 'Classic', () => {
 				await page.setCacheEnabled( true );
 			}
 		};
-
-		await insertBlock( 'Classic' );
-
-		// Wait for TinyMCE to initialise.
-		await page.waitForSelector( '.mce-content-body' );
-
-		// Ensure there is focus.
-		await page.focus( '.mce-content-body' );
-		await page.keyboard.type( 'test' );
 
 		// Move focus away.
 		await pressKeyWithModifier( 'shift', 'Tab' );
