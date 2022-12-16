@@ -8,7 +8,7 @@
 
 ### New Features
 
--   Started exporting new React 18 APIs: `useSyncExternalStore`, `createRoot` and `hydrateRoot`
+-   Started exporting new React 18 APIs ([46610](https://github.com/WordPress/gutenberg/pull/46610))
 
 ## 4.20.0 (2022-11-16)
 
