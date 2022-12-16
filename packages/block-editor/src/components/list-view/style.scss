@@ -319,11 +319,16 @@
 
 	.block-editor-list-view-block-select-button__lock {
 		line-height: 0;
-		width: 24px;
+		width: 16px;
 		min-width: 24px;
+		height: 16px;
 		margin-left: auto;
 		padding: 0;
 		vertical-align: middle;
+		display: inline-flex;
+		justify-content: center;
+		align-items: center;
+		overflow: hidden;
 	}
 }
 
