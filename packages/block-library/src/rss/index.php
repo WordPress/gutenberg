@@ -41,6 +41,8 @@ function render_block_core_rss( $attributes ) {
 			if ( $attributes['displayExcerpt'] ) {
 				$excerpt_trimmed = trim(substr($excerpt_trimmed, strlen($title)));
 			}
+		} else {
+			$title = substr($title, 0, $attributes['titleLength']);
 		}
 		$link = $item->get_link();
 		$link = esc_url( $link );
