@@ -89,13 +89,9 @@ export function getColors( context, isSubMenu ) {
 	return colors;
 }
 
-export function getNavigationChildBlockProps(
-	innerBlocksColors,
-	isParentOfSelectedBlock
-) {
+export function getNavigationChildBlockProps( innerBlocksColors ) {
 	return {
 		className: classnames( 'wp-block-navigation__submenu-container', {
-			'is-parent-of-selected-block': isParentOfSelectedBlock,
 			'has-text-color': !! (
 				innerBlocksColors.textColor || innerBlocksColors.customTextColor
 			),

@@ -6,11 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	useBlockProps,
-	useInnerBlocksProps,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -38,30 +34,15 @@ function useFrontPageId() {
 	}, [] );
 }
 
-export default function PageListItemEdit( { clientId, context, attributes } ) {
+export default function PageListItemEdit( { context, attributes } ) {
 	const { id, label, link, hasChildren } = attributes;
-	const { isParentOfSelectedBlock } = useSelect(
-		( select ) => {
-			const { hasSelectedInnerBlock } = select( blockEditorStore );
-
-			return {
-				isParentOfSelectedBlock: hasSelectedInnerBlock(
-					clientId,
-					true
-				),
-			};
-		},
-		[ clientId ]
-	);
 	const isNavigationChild = 'showSubmenuIcon' in context;
 	const frontPageId = useFrontPageId();
 
 	const innerBlocksColors = getColors( context, true );
 
-	const navigationChildBlockProps = getNavigationChildBlockProps(
-		innerBlocksColors,
-		isParentOfSelectedBlock
-	);
+	const navigationChildBlockProps =
+		getNavigationChildBlockProps( innerBlocksColors );
 	const blockProps = useBlockProps( navigationChildBlockProps, {
 		className: 'wp-block-pages-list__item',
 	} );
