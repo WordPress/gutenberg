@@ -11,9 +11,12 @@
 		width: 100%;
 	}
 
+	thead {
+		border-bottom: 3px solid;
+	}
+
 	tfoot {
-		font-weight: 700;
-    	text-align: inherit;
+		border-top: 3px solid;
 	}
 
 	// Match default border style to default style in editor
