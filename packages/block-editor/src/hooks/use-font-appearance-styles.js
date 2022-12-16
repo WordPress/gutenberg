@@ -28,7 +28,7 @@ export function useFontAppearanceStyles( { attributes = {}, setAttributes } ) {
 	const isBold = typographyStyle?.fontWeight === FONT_WEIGHT_BOLD;
 	const isItalic = typographyStyle?.fontStyle === FONT_STYLE_ITALIC;
 
-	function getNewTypographyStyle( newIsBold, newIsItalic ) {
+	function getFontAppearanceStyle( newIsBold, newIsItalic ) {
 		if ( ! newIsBold && ! newIsItalic ) {
 			return {
 				fontWeight: undefined,
@@ -46,7 +46,7 @@ export function useFontAppearanceStyles( { attributes = {}, setAttributes } ) {
 			style: {
 				typography: {
 					...typographyStyle,
-					...getNewTypographyStyle( ! isBold, isItalic ),
+					...getFontAppearanceStyle( ! isBold, isItalic ),
 				},
 			},
 		} );
@@ -57,7 +57,7 @@ export function useFontAppearanceStyles( { attributes = {}, setAttributes } ) {
 			style: {
 				typography: {
 					...typographyStyle,
-					...getNewTypographyStyle( isBold, ! isItalic ),
+					...getFontAppearanceStyle( isBold, ! isItalic ),
 				},
 			},
 		} );
