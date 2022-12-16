@@ -24,6 +24,12 @@ exports[`RichText should apply multiple formats when selection is collapsed 1`] 
 <!-- /wp:paragraph -->"
 `;
 
+exports[`RichText should escape HTML on paste 1`] = `
+"<!-- wp:paragraph -->
+<p>Test &lt;img> tag</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`RichText should handle Home and End keys 1`] = `
 "<!-- wp:paragraph -->
 <p>-<strong>12</strong>+</p>
@@ -159,6 +165,16 @@ exports[`RichText should return focus when pressing formatting button 1`] = `
 exports[`RichText should run input rules after composition end 1`] = `
 "<!-- wp:paragraph -->
 <p><code>a</code></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`RichText should split rich text and escape HTML on paste 1`] = `
+"<!-- wp:paragraph -->
+<p>First line &lt;img&gt;</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Second line &lt;img&gt;.</p>
 <!-- /wp:paragraph -->"
 `;
 
