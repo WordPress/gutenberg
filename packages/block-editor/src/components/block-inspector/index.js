@@ -17,9 +17,11 @@ import {
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
 	__experimentalUseNavigator as useNavigator,
+	__experimentalNavigatorButton as NavigatorButton,
+	__experimentalNavigatorBackButton as NavigatorBackButton,
 } from '@wordpress/components';
-import { useSelect, useDispatch, select as reduxSelect } from '@wordpress/data';
-import { useMemo, useCallback } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useMemo, useCallback, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -272,6 +274,7 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 		},
 		[ blockName ]
 	);
+
 	const blockInformation = useBlockDisplayInformation( clientId );
 
 	return (
@@ -335,60 +338,87 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 	);
 };
 
-export const NavigationInspector = ( { selectedBlockClientId, blockName } ) => {
-	let navBlockClientId;
+const NavigationInspector = ( { selectedBlockClientId, blockName } ) => {
 	const navigator = useNavigator();
 
-	if ( blockName === 'core/navigation' ) {
-		navBlockClientId = selectedBlockClientId;
-	} else if (
-		blockName === 'core/navigation-link' ||
-		blockName === 'core/navigation-submenu'
-	) {
-		navBlockClientId = reduxSelect(
-			blockEditorStore
-		).getBlockParentsByBlockName(
-			selectedBlockClientId,
-			'core/navigation',
-			true
-		)[ 0 ];
-	}
+	const { navBlockClientId, childClientIds, childNavBlocks } = useSelect(
+		( select ) => {
+			const {
+				getBlockParentsByBlockName,
+				getClientIdsOfDescendants,
+				getBlock,
+			} = select( blockEditorStore );
 
-	const childClientIds = reduxSelect(
-		blockEditorStore
-	).getClientIdsOfDescendants( [ navBlockClientId ] );
+			let _navBlockClientId;
 
-	const childNavBlocks = childClientIds.map( ( id ) => {
-		return reduxSelect( blockEditorStore ).getBlock( id );
-	} );
+			if ( blockName === 'core/navigation' ) {
+				_navBlockClientId = selectedBlockClientId;
+			} else if (
+				blockName === 'core/navigation-link' ||
+				blockName === 'core/navigation-submenu'
+			) {
+				_navBlockClientId = getBlockParentsByBlockName(
+					selectedBlockClientId,
+					'core/navigation',
+					true
+				)[ 0 ];
+			}
+
+			const _childClientIds = getClientIdsOfDescendants( [
+				_navBlockClientId,
+			] );
+
+			return {
+				navBlockClientId: _navBlockClientId,
+				childClientIds: _childClientIds,
+				childNavBlocks: _childClientIds.map( ( id ) => {
+					return getBlock( id );
+				} ),
+			};
+		},
+		[ selectedBlockClientId, blockName ]
+	);
 
 	// How should we use the navigator to switch between NavigatorScreens?
 	// Currently, the Block Inspector logic is wired to update based on the
 	// selectedBlockClientId, which can be modified by the Document List View,
 	// the canvas, and the off-canvas sidebar.
-
-	navigator.goTo( selectedBlockClientId );
+	useEffect( () => {
+		navigator.goTo( `/${ selectedBlockClientId }` );
+	}, [ selectedBlockClientId ] );
 
 	return (
-		<NavigatorProvider initialPath="/">
-			<NavigatorScreen path="/" key={ navBlockClientId }>
-				<BlockInspectorSingleBlock
-					clientId={ navBlockClientId }
-					blockName={ 'core/navigation' }
-				/>
-			</NavigatorScreen>
-			{ childNavBlocks.map( ( childNavBlock ) => (
-				<NavigatorScreen
-					path={ childNavBlock.clientId }
-					key={ childNavBlock.clientId }
-				>
+		<NavigatorProvider initialPath={ `/${ selectedBlockClientId }` }>
+			<NavigatorScreen
+				path={ `/${ navBlockClientId }` }
+				key={ navBlockClientId }
+			>
+				{ selectedBlockClientId && (
 					<BlockInspectorSingleBlock
-						clientId={ childNavBlock.clientId }
-						blockName={ childNavBlock.name }
-						key={ childNavBlock.clientId }
+						clientId={ navBlockClientId }
+						blockName={ 'core/navigation' }
 					/>
-				</NavigatorScreen>
-			) ) }
+				) }
+				<NavigatorButton path={ `/${ childClientIds[ 0 ] }` }>
+					Go to Child
+				</NavigatorButton>
+			</NavigatorScreen>
+			{ childNavBlocks.map( ( childNavBlock ) => {
+				return (
+					<NavigatorScreen
+						path={ `/${ childNavBlock.clientId }` }
+						key={ childNavBlock.clientId }
+					>
+						{ selectedBlockClientId && (
+							<BlockInspectorSingleBlock
+								clientId={ childNavBlock.clientId }
+								blockName={ childNavBlock.name }
+							/>
+						) }
+						<NavigatorBackButton>Go to Parent</NavigatorBackButton>
+					</NavigatorScreen>
+				);
+			} ) }
 		</NavigatorProvider>
 	);
 };
