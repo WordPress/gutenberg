@@ -104,7 +104,7 @@ function ListViewBlockSelectButton(
 						</span>
 					) }
 					{ isLocked && (
-						<span className="block-editor-list-view-block-select-button__lock offcanvas-editor-list-view-block-select-button__lock">
+						<span className="block-editor-list-view-block-select-button__lock">
 							<Icon icon={ lock } />
 						</span>
 					) }
