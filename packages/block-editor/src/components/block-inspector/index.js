@@ -16,11 +16,10 @@ import {
 	Button,
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
-	__experimentalNavigatorButton as NavigatorButton,
-	__experimentalNavigatorBackButton as NavigatorBackButton,
+	__experimentalUseNavigator as useNavigator,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMemo, useCallback } from '@wordpress/element';
+import { useMemo, useCallback, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -246,10 +245,12 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			blockType.name === 'core/navigation-submenu' )
 	) {
 		return (
-			<NavigationInspector
-				selectedBlockClientId={ selectedBlockClientId }
-				blockName={ blockType.name }
-			/>
+			<NavigatorProvider initialPath={ `/${ selectedBlockClientId }` }>
+				<NavigationInspector
+					selectedBlockClientId={ selectedBlockClientId }
+					blockName={ blockType.name }
+				/>
+			</NavigatorProvider>
 		);
 	}
 
@@ -338,7 +339,9 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 };
 
 const NavigationInspector = ( { selectedBlockClientId, blockName } ) => {
-	const { navBlockClientId, childClientIds, childNavBlocks } = useSelect(
+	const navigator = useNavigator();
+	const { goTo } = navigator;
+	const { navBlockClientId, childNavBlocks } = useSelect(
 		( select ) => {
 			const {
 				getBlockParentsByBlockName,
@@ -367,7 +370,6 @@ const NavigationInspector = ( { selectedBlockClientId, blockName } ) => {
 
 			return {
 				navBlockClientId: _navBlockClientId,
-				childClientIds: _childClientIds,
 				childNavBlocks: _childClientIds.map( ( id ) => {
 					return getBlock( id );
 				} ),
@@ -376,8 +378,12 @@ const NavigationInspector = ( { selectedBlockClientId, blockName } ) => {
 		[ selectedBlockClientId, blockName ]
 	);
 
+	useEffect( () => {
+		goTo( `/${ selectedBlockClientId }` );
+	}, [ selectedBlockClientId ] );
+
 	return (
-		<NavigatorProvider initialPath={ `/${ selectedBlockClientId }` }>
+		<>
 			<NavigatorScreen
 				path={ `/${ navBlockClientId }` }
 				key={ navBlockClientId }
@@ -386,9 +392,6 @@ const NavigationInspector = ( { selectedBlockClientId, blockName } ) => {
 					clientId={ navBlockClientId }
 					blockName={ 'core/navigation' }
 				/>
-				<NavigatorButton path={ `/${ childClientIds[ 0 ] }` }>
-					Go to Child
-				</NavigatorButton>
 			</NavigatorScreen>
 			{ childNavBlocks.map( ( childNavBlock ) => {
 				return (
@@ -400,11 +403,10 @@ const NavigationInspector = ( { selectedBlockClientId, blockName } ) => {
 							clientId={ childNavBlock.clientId }
 							blockName={ childNavBlock.name }
 						/>
-						<NavigatorBackButton>Go to Parent</NavigatorBackButton>
 					</NavigatorScreen>
 				);
 			} ) }
-		</NavigatorProvider>
+		</>
 	);
 };
 
