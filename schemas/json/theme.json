@@ -396,8 +396,10 @@
 										"type": "string"
 									},
 									"shortName": {
-										"description": "Short name of the font size preset. Gets used in the font size selector if fewer than 5 presets are defined.",
-										"type": "string"
+										"description": "Short name of the font size preset. Needs to be between 1 and 3 characters long.",
+										"type": "string",
+										"minLength": 1,
+										"maxLength": 3
 									},
 									"size": {
 										"description": "CSS font-size value, including units.",
