@@ -36,7 +36,7 @@ import {
 import { Spacer } from '../spacer';
 import FontSizePickerSelect from './font-size-picker-select';
 import FontSizePickerToggleGroup from './font-size-picker-toggle-group';
-import { T_SHIRT_NAMES } from './constants';
+import { DEFAULT_NAMES } from './constants';
 
 const UnforwardedFontSizePicker = (
 	props: FontSizePickerProps,
@@ -86,7 +86,7 @@ const UnforwardedFontSizePicker = (
 			if ( selectedFontSize ) {
 				return (
 					selectedFontSize.name ||
-					T_SHIRT_NAMES[ fontSizes.indexOf( selectedFontSize ) ]
+					DEFAULT_NAMES[ fontSizes.indexOf( selectedFontSize ) ]
 				);
 			}
 			return '';

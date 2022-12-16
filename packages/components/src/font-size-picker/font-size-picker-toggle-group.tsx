@@ -10,7 +10,7 @@ import {
 	ToggleGroupControl,
 	ToggleGroupControlOption,
 } from '../toggle-group-control';
-import { T_SHIRT_ABBREVIATIONS, T_SHIRT_NAMES } from './constants';
+import { DEFAULT_SHORT_NAMES, DEFAULT_NAMES } from './constants';
 import { hasValidShortName } from './utils';
 import type { FontSizePickerToggleGroupProps } from './types';
 
@@ -34,9 +34,9 @@ const FontSizePickerToggleGroup = ( props: FontSizePickerToggleGroupProps ) => {
 						fontSize.shortName &&
 						hasValidShortName( fontSize.shortName )
 							? fontSize.shortName
-							: T_SHIRT_ABBREVIATIONS[ index ]
+							: DEFAULT_SHORT_NAMES[ index ]
 					}
-					aria-label={ fontSize.name || T_SHIRT_NAMES[ index ] }
+					aria-label={ fontSize.name || DEFAULT_NAMES[ index ] }
 					showTooltip
 				/>
 			) ) }
