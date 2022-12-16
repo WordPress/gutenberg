@@ -175,23 +175,33 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_2 {
 	}
 
 	/**
+	 * Adds all nested json files within a given directory to a given array.
+	 *
+	 * @param dir   $dir The directory to recursively iterate and list files of.
+	 * @param array $array The array to add to found json files to.
+	 * @return array The merged array.
+	 */
+	private static function recursively_iterate_JSON( $dir, $array ) {
+		$nested_files = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $dir ) );
+		return array_merge( $array, iterator_to_array( new RegexIterator( $nested_files, '/^.+\.json$/i', RecursiveRegexIterator::GET_MATCH ) ) );
+	}
+
+	/**
 	 * Returns the style variations defined by the theme (parent and child).
 	 *
 	 * @return array
 	 */
 	public static function get_style_variations() {
-		$variations     = array();
-		$base_directory = get_stylesheet_directory() . '/styles';
+		$variations             = array();
+		$base_directory         = get_stylesheet_directory() . '/styles';
 		$parent_theme_directory = get_template_directory() . '/styles';
 		if ( is_dir( $base_directory ) ) {
-			$nested_files      = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $base_directory ) );
-			$nested_json_files = iterator_to_array( new RegexIterator( $nested_files, '/^.+\.json$/i', RecursiveRegexIterator::GET_MATCH ) );
+			$variation_files = static::recursively_iterate_JSON( $base_directory, array() );
 			if ( $parent_theme_directory !== $base_directory && is_dir( $parent_theme_directory ) ) {
-				$nested_files      = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $parent_theme_directory ) );
-				$nested_json_files = array_merge( iterator_to_array( new RegexIterator( $nested_files, '/^.+\.json$/i', RecursiveRegexIterator::GET_MATCH ) ), $nested_json_files );
+				$variation_files = static::recursively_iterate_JSON( $parent_theme_directory, $variation_files );
 			}
-			ksort( $nested_json_files );
-			foreach ( $nested_json_files as $path => $file ) {
+			ksort( $variation_files );
+			foreach ( $variation_files as $path => $file ) {
 				$decoded_file = wp_json_file_decode( $path, array( 'associative' => true ) );
 				if ( is_array( $decoded_file ) ) {
 					$translated = static::translate( $decoded_file, wp_get_theme()->get( 'TextDomain' ) );
