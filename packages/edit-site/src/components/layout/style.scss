@@ -1,0 +1,176 @@
+.edit-site-layout {
+	min-height: 100%;
+	background: $gray-900;
+	color: $white;
+	display: flex;
+	flex-direction: column;
+	@include break-small {
+		display: grid;
+		grid-template-columns: 320px 1fr;
+		grid-template-rows: auto 1fr;
+		grid-template-areas:
+			"header canvas"
+			"sidebar canvas";
+
+		&.is-full-canvas {
+			grid-template-areas:
+				"header header"
+				"canvas canvas";
+		}
+	}
+}
+
+.edit-site-layout__header {
+	grid-area: header;
+	height: $header-height;
+	display: flex;
+}
+
+.edit-site-layout__logo {
+	align-items: center;
+	height: $header-height;
+	display: flex;
+	justify-content: space-between;
+
+	.components-button {
+		color: currentColor;
+	}
+}
+
+.edit-site-layout__edit-button {
+	background: $gray-800;
+	/* Overrides the color for all states of the button */
+	color: inherit !important;
+}
+
+.edit-site-layout__sidebar {
+	grid-area: sidebar;
+	z-index: 1;
+	overflow-y: auto;
+	max-height: calc(100vh - #{$header-height});
+	@include custom-scrollbars-on-hover;
+
+	// This is only necessary for the exit animation
+	.edit-site-layout.is-full-canvas & {
+		display: none;
+		@include break-small {
+			display: block;
+			grid-area: header;
+			position: absolute;
+			top: 60px;
+		}
+	}
+}
+
+.edit-site-layout__editor-header {
+	flex-grow: 1;
+
+	// This is only necessary for the exit animation
+	.edit-site-layout:not(.is-full-canvas) & {
+		position: fixed;
+		left: 60px;
+		right: 0;
+	}
+}
+
+.edit-site-layout__canvas-container {
+	grid-area: canvas;
+	position: relative;
+	flex-grow: 1;
+	z-index: 2;
+}
+
+.edit-site-layout__canvas {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 8px 10px -6px rgba(0, 0, 0, 0.8);
+
+	& > div {
+		color: $gray-900;
+		background: $white;
+	}
+	@include break-small {
+		top: $canvas-padding;
+		bottom: $canvas-padding;
+		width: calc(100% - #{$canvas-padding});
+
+		& > div {
+			border-radius: $radius-block-ui * 4;
+			// Not sure why this is necessary.
+			.edit-site-layout:not(.is-full-canvas) & .edit-site-visual-editor__editor-canvas,
+			.edit-site-layout:not(.is-full-canvas) & .interface-interface-skeleton__content {
+				border-radius: $radius-block-ui * 4;
+			}
+		}
+
+	}
+
+	.edit-site-layout.is-full-canvas & {
+		top: 0;
+		bottom: 0;
+		width: 100%;
+		border-radius: 0;
+	}
+}
+
+// This shouldn't be necessary (we should have a way to say that a skeletton is relative
+.edit-site-layout__canvas .interface-interface-skeleton {
+	position: relative !important;
+	min-height: 100% !important;
+}
+
+.edit-site-layout__view-mode-toggle.components-button {
+	position: relative;
+	background: $gray-900;
+	color: $white;
+	height: calc(100% + #{$border-width});
+	border-radius: 0;
+	margin-bottom: -$border-width;
+
+	&:hover,
+	&:active {
+		color: $white;
+	}
+
+	&:focus {
+		box-shadow: none;
+	}
+
+	&::before {
+		transition: box-shadow 0.1s ease;
+		@include reduce-motion("transition");
+		content: "";
+		display: block;
+		position: absolute;
+		top: 9px;
+		right: 9px;
+		bottom: 9px;
+		left: 9px;
+		border-radius: $radius-block-ui + $border-width + $border-width;
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $gray-900;
+	}
+
+	// Hover color.
+	&:hover::before {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $gray-700;
+	}
+
+	&.has-icon:hover::before {
+		box-shadow: none;
+	}
+
+	// Lightened spot color focus.
+	&:focus::before {
+		box-shadow:
+			inset 0 0 0 var(--wp-admin-border-width-focus) rgba($white, 0.1),
+			inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+	}
+
+	.edit-site-layout__view-mode-toggle-icon {
+		border-radius: $radius-block-ui;
+		object-fit: cover;
+	}
+}

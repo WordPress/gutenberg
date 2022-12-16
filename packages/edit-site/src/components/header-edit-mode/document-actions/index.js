@@ -20,7 +20,11 @@ import {
 } from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
 import { useState, useMemo } from '@wordpress/element';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	store as blockEditorStore,
+	useBlockDisplayInformation,
+	BlockIcon,
+} from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -52,10 +56,13 @@ function useSecondaryText() {
 		[]
 	);
 
+	const blockInformation = useBlockDisplayInformation( activeEntityBlockId );
+
 	if ( activeEntityBlockId ) {
 		return {
 			label: getBlockDisplayText( getBlock( activeEntityBlockId ) ),
 			isActive: true,
+			icon: blockInformation?.icon,
 		};
 	}
 
@@ -90,9 +97,10 @@ export default function DocumentActions() {
 				templateType: postType,
 			};
 		}, [] );
+
 	const entityLabel =
 		templateType === 'wp_template_part' ? 'template part' : 'template';
-	const { label } = useSecondaryText();
+	const { label, icon } = useSecondaryText();
 
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
@@ -150,13 +158,10 @@ export default function DocumentActions() {
 					</VisuallyHidden>
 					{ decodeEntities( entityTitle ) }
 				</Text>
-
-				<Text
-					size="body"
-					className="edit-site-document-actions__secondary-item"
-				>
-					{ label ?? '' }
-				</Text>
+				<div className="edit-site-document-actions__secondary-item">
+					<BlockIcon icon={ icon } showColors />
+					<Text size="body">{ label ?? '' }</Text>
+				</div>
 
 				<Dropdown
 					popoverProps={ popoverProps }

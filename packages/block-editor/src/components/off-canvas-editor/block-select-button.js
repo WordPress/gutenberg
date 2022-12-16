@@ -79,7 +79,11 @@ function ListViewBlockSelectButton(
 				aria-hidden={ true }
 			>
 				<ListViewExpander onClick={ onToggleExpanded } />
-				<BlockIcon icon={ blockInformation?.icon } showColors />
+				<BlockIcon
+					icon={ blockInformation?.icon }
+					showColors
+					context="list-view"
+				/>
 				<HStack
 					alignment="center"
 					className="block-editor-list-view-block-select-button__label-wrapper"

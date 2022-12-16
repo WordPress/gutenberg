@@ -37,9 +37,15 @@ export function getFormatType( state, name ) {
  * @return {?Object} Format type.
  */
 export function getFormatTypeForBareElement( state, bareElementTagName ) {
-	return getFormatTypes( state ).find( ( { className, tagName } ) => {
-		return className === null && bareElementTagName === tagName;
-	} );
+	const formatTypes = getFormatTypes( state );
+	return (
+		formatTypes.find( ( { className, tagName } ) => {
+			return className === null && bareElementTagName === tagName;
+		} ) ||
+		formatTypes.find( ( { className, tagName } ) => {
+			return className === null && '*' === tagName;
+		} )
+	);
 }
 
 /**

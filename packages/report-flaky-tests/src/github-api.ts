@@ -2,14 +2,13 @@
  * External dependencies
  */
 import { getOctokit } from '@actions/github';
-import * as unzipper from 'unzipper';
 import type { GitHub } from '@actions/github/lib/utils';
 import type { Endpoints } from '@octokit/types';
 
 /**
  * Internal dependencies
  */
-import type { FlakyTestResult } from './types';
+import { isReportComment } from './markdown';
 
 type Octokit = InstanceType< typeof GitHub >;
 
@@ -25,44 +24,6 @@ class GitHubAPI {
 	constructor( token: string, repo: Repo ) {
 		this.#octokit = getOctokit( token );
 		this.#repo = repo;
-	}
-
-	async downloadReportFromArtifact(
-		runID: number,
-		artifactNamePrefix: string
-	): Promise< FlakyTestResult[] | undefined > {
-		const {
-			data: { artifacts },
-		} = await this.#octokit.rest.actions.listWorkflowRunArtifacts( {
-			...this.#repo,
-			run_id: runID,
-		} );
-
-		const matchArtifact = artifacts.find( ( artifact ) =>
-			artifact.name.startsWith( artifactNamePrefix )
-		);
-
-		if ( ! matchArtifact ) {
-			return undefined;
-		}
-
-		const download = await this.#octokit.rest.actions.downloadArtifact( {
-			...this.#repo,
-			artifact_id: matchArtifact.id,
-			archive_format: 'zip',
-		} );
-
-		const { files } = await unzipper.Open.buffer(
-			Buffer.from( download.data as Buffer )
-		);
-		const fileBuffers = await Promise.all(
-			files.map( ( file ) => file.buffer() )
-		);
-		const parsedFiles = fileBuffers.map(
-			( buffer ) => JSON.parse( buffer.toString() ) as FlakyTestResult
-		);
-
-		return parsedFiles;
 	}
 
 	async fetchAllIssuesLabeledFlaky( label: string ) {
@@ -112,6 +73,37 @@ class GitHubAPI {
 		const { data } = await this.#octokit.rest.issues.create( {
 			...this.#repo,
 			...params,
+		} );
+
+		return data;
+	}
+
+	async createComment( sha: string, body: string ) {
+		const { data: comments } =
+			await this.#octokit.rest.repos.listCommentsForCommit( {
+				...this.#repo,
+				commit_sha: sha,
+			} );
+		const reportComment = comments.find( ( comment ) =>
+			isReportComment( comment.body )
+		);
+
+		if ( reportComment ) {
+			const { data } = await this.#octokit.rest.repos.updateCommitComment(
+				{
+					...this.#repo,
+					comment_id: reportComment.id,
+					body,
+				}
+			);
+
+			return data;
+		}
+
+		const { data } = await this.#octokit.rest.repos.createCommitComment( {
+			...this.#repo,
+			commit_sha: sha,
+			body,
 		} );
 
 		return data;

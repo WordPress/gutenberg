@@ -1,10 +1,15 @@
 /**
  * External dependencies
  */
-import { get, pick } from 'lodash';
+import { get } from 'lodash';
 
 export const pickRelevantMediaFiles = ( image, sizeSlug = 'large' ) => {
-	const imageProps = pick( image, [ 'alt', 'id', 'link', 'caption' ] );
+	const imageProps = Object.fromEntries(
+		Object.entries( image ?? {} ).filter( ( [ key ] ) =>
+			[ 'alt', 'id', 'link', 'caption' ].includes( key )
+		)
+	);
+
 	imageProps.url =
 		get( image, [ 'sizes', sizeSlug, 'url' ] ) ||
 		get( image, [ 'media_details', 'sizes', sizeSlug, 'source_url' ] ) ||

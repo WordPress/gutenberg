@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
+
+### Enhancements
+
+-   The `registry.subscribe` function can now subscribe to updates only from one specific store, with a new optional parameter.
+
 ## 7.6.0 (2022-11-16)
 
 ## 7.5.0 (2022-11-02)
