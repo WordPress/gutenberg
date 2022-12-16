@@ -16,12 +16,11 @@ import {
 	Button,
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
-	__experimentalUseNavigator as useNavigator,
 	__experimentalNavigatorButton as NavigatorButton,
 	__experimentalNavigatorBackButton as NavigatorBackButton,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMemo, useCallback, useEffect } from '@wordpress/element';
+import { useMemo, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -339,8 +338,6 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 };
 
 const NavigationInspector = ( { selectedBlockClientId, blockName } ) => {
-	const navigator = useNavigator();
-
 	const { navBlockClientId, childClientIds, childNavBlocks } = useSelect(
 		( select ) => {
 			const {
@@ -379,26 +376,16 @@ const NavigationInspector = ( { selectedBlockClientId, blockName } ) => {
 		[ selectedBlockClientId, blockName ]
 	);
 
-	// How should we use the navigator to switch between NavigatorScreens?
-	// Currently, the Block Inspector logic is wired to update based on the
-	// selectedBlockClientId, which can be modified by the Document List View,
-	// the canvas, and the off-canvas sidebar.
-	useEffect( () => {
-		navigator.goTo( `/${ selectedBlockClientId }` );
-	}, [ selectedBlockClientId ] );
-
 	return (
 		<NavigatorProvider initialPath={ `/${ selectedBlockClientId }` }>
 			<NavigatorScreen
 				path={ `/${ navBlockClientId }` }
 				key={ navBlockClientId }
 			>
-				{ selectedBlockClientId && (
-					<BlockInspectorSingleBlock
-						clientId={ navBlockClientId }
-						blockName={ 'core/navigation' }
-					/>
-				) }
+				<BlockInspectorSingleBlock
+					clientId={ navBlockClientId }
+					blockName={ 'core/navigation' }
+				/>
 				<NavigatorButton path={ `/${ childClientIds[ 0 ] }` }>
 					Go to Child
 				</NavigatorButton>
@@ -409,12 +396,10 @@ const NavigationInspector = ( { selectedBlockClientId, blockName } ) => {
 						path={ `/${ childNavBlock.clientId }` }
 						key={ childNavBlock.clientId }
 					>
-						{ selectedBlockClientId && (
-							<BlockInspectorSingleBlock
-								clientId={ childNavBlock.clientId }
-								blockName={ childNavBlock.name }
-							/>
-						) }
+						<BlockInspectorSingleBlock
+							clientId={ childNavBlock.clientId }
+							blockName={ childNavBlock.name }
+						/>
 						<NavigatorBackButton>Go to Parent</NavigatorBackButton>
 					</NavigatorScreen>
 				);
