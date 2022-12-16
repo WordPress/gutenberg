@@ -28,7 +28,7 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 /**
  * Internal dependencies
  */
-import { Sidebar } from '../sidebar';
+import Sidebar from '../sidebar';
 import Editor from '../editor';
 import ListPage from '../list';
 import ErrorBoundary from '../error-boundary';
