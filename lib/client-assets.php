@@ -337,15 +337,7 @@ function gutenberg_register_packages_styles( $styles ) {
 	global $editor_styles;
 	if ( current_theme_supports( 'wp-block-styles' ) && ( ! is_array( $editor_styles ) || count( $editor_styles ) === 0 ) ) {
 		// Include opinionated block styles if the theme supports block styles and no $editor_styles are declared, so the editor never appears broken.
-
-		gutenberg_override_style(
-			$styles,
-			'wp-block-library-theme',
-			gutenberg_url( 'build/block-library/theme.css' ),
-			array(),
-			$version
-		);
-		$styles->add_data( 'wp-block-library-theme', 'rtl', 'replace' );
+		$wp_edit_blocks_dependencies[] = 'wp-block-library-theme';
 	}
 
 	gutenberg_override_style(
@@ -374,6 +366,15 @@ function gutenberg_register_packages_styles( $styles ) {
 		$version
 	);
 	$styles->add_data( 'wp-edit-blocks', 'rtl', 'replace' );
+
+	gutenberg_override_style(
+		$styles,
+		'wp-block-library-theme',
+		gutenberg_url( 'build/block-library/theme.css' ),
+		array(),
+		$version
+	);
+	$styles->add_data( 'wp-block-library-theme', 'rtl', 'replace' );
 
 	gutenberg_override_style(
 		$styles,
