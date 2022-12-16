@@ -2,7 +2,6 @@
  * External dependencies
  */
 import fastDeepEqual from 'fast-deep-equal/es6';
-import { find } from 'lodash';
 import { v4 as uuid } from 'uuid';
 
 /**
@@ -256,7 +255,9 @@ export const deleteEntityRecord =
 	) =>
 	async ( { dispatch } ) => {
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
-		const entityConfig = find( configs, { kind, name } );
+		const entityConfig = configs.find(
+			( config ) => config.kind === kind && config.name === name
+		);
 		let error;
 		let deletedRecord = false;
 		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
@@ -451,7 +452,9 @@ export const saveEntityRecord =
 	) =>
 	async ( { select, resolveSelect, dispatch } ) => {
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
-		const entityConfig = find( configs, { kind, name } );
+		const entityConfig = configs.find(
+			( config ) => config.kind === kind && config.name === name
+		);
 		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
 			return;
 		}
@@ -723,7 +726,9 @@ export const saveEditedEntityRecord =
 			return;
 		}
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
-		const entityConfig = find( configs, { kind, name } );
+		const entityConfig = configs.find(
+			( config ) => config.kind === kind && config.name === name
+		);
 		if ( ! entityConfig ) {
 			return;
 		}

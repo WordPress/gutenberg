@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -21,6 +20,7 @@ import {
 	MediaPlaceholder,
 	InspectorControls,
 	useBlockProps,
+	useInnerBlocksProps,
 	BlockControls,
 	MediaReplaceFlow,
 } from '@wordpress/block-editor';
@@ -64,6 +64,7 @@ const linkOptions = [
 	},
 ];
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
+const allowedBlocks = [ 'core/image' ];
 
 const PLACEHOLDER_TEXT = Platform.isNative
 	? __( 'ADD MEDIA' )
@@ -174,7 +175,7 @@ function GalleryEdit( props ) {
 	 */
 	function buildImageAttributes( imageAttributes ) {
 		const image = imageAttributes.id
-			? find( imageData, { id: imageAttributes.id } )
+			? imageData.find( ( { id } ) => id === imageAttributes.id )
 			: null;
 
 		let newClassName;
@@ -220,7 +221,7 @@ function GalleryEdit( props ) {
 		// It's necessary to retrieve the media type from the raw image data for already-uploaded images on native.
 		const nativeFileData =
 			Platform.isNative && file.id
-				? find( imageData, { id: file.id } )
+				? imageData.find( ( { id } ) => id === file.id )
 				: null;
 
 		const mediaTypeSelector = nativeFileData
@@ -333,7 +334,7 @@ function GalleryEdit( props ) {
 		getBlock( clientId ).innerBlocks.forEach( ( block ) => {
 			blocks.push( block.clientId );
 			const image = block.attributes.id
-				? find( imageData, { id: block.attributes.id } )
+				? imageData.find( ( { id } ) => id === block.attributes.id )
 				: null;
 			changedAttributes[ block.clientId ] = getHrefAndDestination(
 				image,
@@ -401,7 +402,7 @@ function GalleryEdit( props ) {
 		getBlock( clientId ).innerBlocks.forEach( ( block ) => {
 			blocks.push( block.clientId );
 			const image = block.attributes.id
-				? find( imageData, { id: block.attributes.id } )
+				? imageData.find( ( { id } ) => id === block.attributes.id )
 				: null;
 			changedAttributes[ block.clientId ] = getImageSizeAttributes(
 				image,
@@ -484,8 +485,20 @@ function GalleryEdit( props ) {
 		className: classnames( className, 'has-nested-images' ),
 	} );
 
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		allowedBlocks,
+		orientation: 'horizontal',
+		renderAppender: false,
+		__experimentalLayout: { type: 'default', alignments: [] },
+	} );
+
 	if ( ! hasImages ) {
-		return <View { ...blockProps }>{ mediaPlaceholder }</View>;
+		return (
+			<View { ...innerBlocksProps }>
+				{ innerBlocksProps.children }
+				{ mediaPlaceholder }
+			</View>
+		);
 	}
 
 	const hasLinkTo = linkTo && linkTo !== 'none';
@@ -580,7 +593,7 @@ function GalleryEdit( props ) {
 						? mediaPlaceholder
 						: undefined
 				}
-				blockProps={ blockProps }
+				blockProps={ innerBlocksProps }
 				insertBlocksAfter={ insertBlocksAfter }
 			/>
 		</>

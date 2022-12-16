@@ -15,7 +15,6 @@ import { useMemo } from '@wordpress/element';
  */
 import PlaceholderPreview from './placeholder/placeholder-preview';
 
-// This list is duplicated in packages/block-library/src/navigation/index.php
 const ALLOWED_BLOCKS = [
 	'core/navigation-link',
 	'core/search',

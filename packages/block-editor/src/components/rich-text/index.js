@@ -368,6 +368,7 @@ function RichTextWrapper(
 						<Popover.__unstableSlotNameProvider value="__unstable-block-tools-after">
 							{ children &&
 								children( { value, onChange, onFocus } ) }
+
 							<FormatEdit
 								value={ value }
 								onChange={ onChange }
