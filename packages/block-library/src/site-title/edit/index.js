@@ -15,7 +15,7 @@ import {
 	InspectorControls,
 	BlockControls,
 	useBlockProps,
-	__experimentalUseFontAppearanceStyles,
+	__experimentalUseFontAppearanceStyles as useFontAppearanceStyles,
 } from '@wordpress/block-editor';
 import { ToggleControl, PanelBody, ToolbarButton } from '@wordpress/components';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
@@ -60,7 +60,7 @@ export default function SiteTitleEdit( {
 		toggleBold,
 		toggleItalic,
 		onKeyDownToggleFontAppearance,
-	} = __experimentalUseFontAppearanceStyles( { attributes, setAttributes } );
+	} = useFontAppearanceStyles( { attributes, setAttributes } );
 
 	const TagName = level === 0 ? 'p' : `h${ level }`;
 	const blockProps = useBlockProps( {
