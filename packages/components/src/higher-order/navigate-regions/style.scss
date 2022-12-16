@@ -4,14 +4,17 @@
 }
 
 .is-focusing-regions {
-	[role="region"]:focus {
+	[role="region"]:focus::after {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		content: "";
+		pointer-events: none;
 		outline: 4px solid $components-color-accent;
 		outline-offset: -4px;
-
-		.interface-navigable-region__stacker {
-			position: relative;
-			z-index: z-index(".is-focusing-regions [role='region']:focus .interface-navigable-region__stacker");
-		}
+		z-index: z-index(".is-focusing-regions {region} :focus::after");
 	}
 
 	// Fixes for edge cases.
@@ -25,60 +28,11 @@
 	// regardles of the CSS used on other components.
 
 	// Header top bar when Distraction free mode is on.
-	&.is-distraction-free .interface-interface-skeleton__header {
-		.interface-navigable-region__stacker,
-		.edit-post-header {
-			outline: inherit;
-			outline-offset: inherit;
-		}
-	}
-
-	// Sidebar toggle button shown when navigating regions.
-	.interface-interface-skeleton__sidebar {
-		.interface-navigable-region__stacker,
-		.edit-post-layout__toggle-sidebar-panel {
-			outline: inherit;
-			outline-offset: inherit;
-		}
-	}
-
-	// Publish sidebar toggle button shown when navigating regions.
-	.interface-interface-skeleton__actions {
-		.interface-navigable-region__stacker,
-		.edit-post-layout__toggle-publish-panel {
-			outline: inherit;
-			outline-offset: inherit;
-		}
-	}
-
-	// Publish sidebar.
-	[role="region"].interface-interface-skeleton__actions:focus  .editor-post-publish-panel {
+	&.is-distraction-free .interface-interface-skeleton__header .edit-post-header,
+	.interface-interface-skeleton__sidebar .edit-post-layout__toggle-sidebar-panel,
+	.interface-interface-skeleton__actions .edit-post-layout__toggle-publish-panel,
+	.editor-post-publish-panel {
 		outline: 4px solid $components-color-accent;
 		outline-offset: -4px;
 	}
-
-	// Edit site Navigation Drawer.
-	.interface-interface-skeleton__drawer {
-		z-index: z-index(".edit-site-navigation-toggle");
-
-		.interface-navigable-region__stacker,
-		.edit-site-navigation-toggle {
-			outline: inherit;
-			outline-offset: inherit;
-		}
-
-		.edit-site-navigation-toggle.is-open {
-			outline: none;
-		}
-
-		.edit-site-navigation-toggle__button {
-			z-index: -1;
-		}
-	}
-}
-
-// Fixes for edge cases.
-// Edit site Drawer.
-.interface-interface-skeleton__drawer .interface-navigable-region__stacker {
-	height: 100%;
 }

@@ -161,7 +161,7 @@ function VideoEdit( {
 			const embedBlock = createUpgradedEmbedBlock( {
 				attributes: { url: newSrc },
 			} );
-			if ( undefined !== embedBlock ) {
+			if ( undefined !== embedBlock && onReplace ) {
 				onReplace( embedBlock );
 				return;
 			}

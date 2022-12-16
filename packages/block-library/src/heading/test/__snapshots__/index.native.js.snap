@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Heading block inserts block 1`] = `
+"<!-- wp:heading -->
+<h2 class=\\"wp-block-heading\\"></h2>
+<!-- /wp:heading -->"
+`;

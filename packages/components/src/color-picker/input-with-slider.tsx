@@ -60,6 +60,7 @@ export const InputWithSlider = ( {
 				size="__unstable-large"
 			/>
 			<RangeControl
+				__nextHasNoMarginBottom
 				label={ label }
 				hideLabelFromVision
 				min={ min }

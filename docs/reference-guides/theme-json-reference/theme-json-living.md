@@ -119,7 +119,7 @@ Settings related to typography.
 | customFontSize | boolean | true |  |
 | fontStyle | boolean | true |  |
 | fontWeight | boolean | true |  |
-| fluid | boolean |  |  |
+| fluid | undefined | false |  |
 | letterSpacing | boolean | true |  |
 | lineHeight | boolean | false |  |
 | textDecoration | boolean | true |  |
@@ -224,6 +224,13 @@ Outline styles.
 | offset | string |  |
 | style | string |  |
 | width | string |  |
+
+---
+
+### css
+
+Sets custom CSS to apply styling not covered by other theme.json properties.
+
 
 ---
 
