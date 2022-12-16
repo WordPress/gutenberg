@@ -6,6 +6,10 @@
 
 -   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
 
+### New Features
+
+-   Started exporting new React 18 APIs: `useSyncExternalStore`, `createRoot` and `hydrateRoot`
+
 ## 4.20.0 (2022-11-16)
 
 ## 4.19.0 (2022-11-02)

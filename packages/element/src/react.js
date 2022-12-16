@@ -24,6 +24,7 @@ import {
 	useImperativeHandle,
 	useLayoutEffect,
 	useDebugValue,
+	useSyncExternalStore,
 	lazy,
 	Suspense,
 } from 'react';
@@ -184,6 +185,11 @@ export { useRef };
  * @see https://reactjs.org/docs/hooks-reference.html#usestate
  */
 export { useState };
+
+/**
+ * @see https://reactjs.org/docs/hooks-reference.html#usesyncexternalstore
+ */
+export { useSyncExternalStore };
 
 /**
  * @see https://reactjs.org/docs/react-api.html#reactlazy
