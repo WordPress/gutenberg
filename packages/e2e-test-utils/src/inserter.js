@@ -223,18 +223,20 @@ export async function insertFromGlobalInserter( category, searchTerm ) {
 
 	let insertButton;
 
-	// Check if the block is instantly insertable...
-	try {
-		insertButton = (
-			await page.$x(
-				`//*[@role='option' and contains(., '${ searchTerm }')]`
-			)
-		 )[ 0 ];
-	} catch ( error ) {
-		// noop
+	if ( [ 'Blocks', 'Reusable' ].includes( category ) ) {
+		// If it's a block, see it it's insertable without searching...
+		try {
+			insertButton = (
+				await page.$x(
+					`//*[@role='option' and contains(., '${ searchTerm }')]`
+				)
+			 )[ 0 ];
+		} catch ( error ) {
+			// noop
+		}
 	}
 
-	// ...and if not, search for it.
+	// ...and if not, perform a global search.
 	if ( ! insertButton ) {
 		insertButton = await searchGlobalInserter( category, searchTerm );
 	}
