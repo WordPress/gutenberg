@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useEffect } from '@wordpress/element';
 import {
 	AlignmentToolbar,
 	BlockControls,
@@ -17,7 +17,7 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { PanelBody, ToggleControl, RangeControl } from '@wordpress/components';
-import { sprintf, __, _x } from '@wordpress/i18n';
+import { sprintf, __, _n, _x } from '@wordpress/i18n';
 import { count as wordCount } from '@wordpress/wordcount';
 import { speak } from '@wordpress/a11y';
 import { useDebounce } from '@wordpress/compose';
@@ -36,7 +36,7 @@ export default function PostExcerptEditor( {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
 	const isEditable = userCanEdit && ! isDescendentOfQueryLoop;
-	const debouncedSpeak = useDebounce( speak, 3000 );
+	const debouncedSpeak = useDebounce( speak, 500 );
 	const [
 		rawExcerpt,
 		setExcerpt,
@@ -47,6 +47,22 @@ export default function PostExcerptEditor( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
+
+	/**
+	 * translators: If your word count is based on single characters (e.g. East Asian characters),
+	 * enter 'characters_excluding_spaces' or 'characters_including_spaces'. Otherwise, enter 'words'.
+	 * Do not translate into your own language.
+	 */
+	const wordCountType = _x( 'words', 'Word count type. Do not translate!' );
+	const currentWordCount = wordCount( rawExcerpt, wordCountType );
+
+	// Use speak() to announce the word count status when the current word count is updated.
+	useEffect( () => {
+		if ( !! speakWordCountMessage ) {
+			debouncedSpeak( speakWordCountMessage );
+		}
+	}, [ currentWordCount ] );
+
 	/**
 	 * When excerpt is editable, strip the html tags from
 	 * rendered excerpt. This will be used if the entity's
@@ -105,15 +121,6 @@ export default function PostExcerptEditor( {
 	} );
 
 	/**
-	 * translators: If your word count is based on single characters (e.g. East Asian characters),
-	 * enter 'characters_excluding_spaces' or 'characters_including_spaces'. Otherwise, enter 'words'.
-	 * Do not translate into your own language.
-	 */
-	const wordCountType = _x( 'words', 'Word count type. Do not translate!' );
-
-	const currentWordCount = wordCount( rawExcerpt, wordCountType );
-
-	/**
 	 * The excerpt length setting needs to be applied to both
 	 * the raw and the rendered excerpt depending on which is being used.
 	 */
@@ -157,7 +164,8 @@ export default function PostExcerptEditor( {
 	 * Show a warning if the word count is same as,
 	 * 5 words lower, or larger than the excerpt length value.
 	 */
-	let wordCountMessage = null;
+	let wordCountMessage,
+		speakWordCountMessage = null;
 	if (
 		excerptLength === currentWordCount ||
 		( excerptLength > currentWordCount &&
@@ -169,11 +177,26 @@ export default function PostExcerptEditor( {
 			currentWordCount,
 			excerptLength
 		);
+		speakWordCountMessage = sprintf(
+			/* translators: 1: Number of words entered, 2: Number of words allowed. */
+			__( 'The excerpt uses %1$s out of %2$s words' ),
+			currentWordCount,
+			excerptLength
+		);
 	} else if ( currentWordCount > excerptLength ) {
 		// If the word count exceeds the excerpt length, show a warning with a negative value.
-		// Convert the value to a string so that it can be used in speak().
 		wordCountMessage = String( excerptLength - currentWordCount );
+		speakWordCountMessage = sprintf(
+			/* translators: %s: Number of words that exceed the excerpt length limit */
+			_n(
+				'The excerpt is %s word longer than allowed.',
+				'The excerpt is %s words longer than allowed.',
+				currentWordCount - excerptLength
+			),
+			String( currentWordCount - excerptLength )
+		);
 	}
+
 	const excerptContent = isEditable ? (
 		<RichText
 			className={ excerptClassName }
@@ -228,9 +251,6 @@ export default function PostExcerptEditor( {
 				{ isSelected && wordCountMessage && (
 					<Warning>{ wordCountMessage }</Warning>
 				) }
-				{ isSelected &&
-					wordCountMessage &&
-					debouncedSpeak( wordCountMessage ) }
 				{ ! showMoreOnNewLine && ' ' }
 				{ showMoreOnNewLine ? (
 					<p className="wp-block-post-excerpt__more-text">
