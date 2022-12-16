@@ -773,7 +773,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		'block_core_navigation_menu_toggle_icon',
 		( isset( $attributes['icon'] ) && 'menu' === $attributes['icon'] ) ?
 			// three horizontal dashes icon
-			'<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 5v1.5h14V5H5zm0 7.8h14v-1.5H5v1.5zM5 19h14v-1.5H5V19z" /></svg>' :
+			'<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 5v1.5h14V5H5zm0 7.8h14v-1.5H5v1.5zM5 19h14v-1.5H5V19z" /></svg>' :
 			// two horizontal dashes icon
 			'<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="7.5" width="16" height="1.5" /><rect x="4" y="15" width="16" height="1.5" /></svg>'
 	);
