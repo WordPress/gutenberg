@@ -199,7 +199,7 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_2 {
 			$variation_files = static::recursively_iterate_JSON( $base_directory );
 			if ( $template_directory !== $base_directory && is_dir( $template_directory ) ) {
 				$variation_files_parent = static::recursively_iterate_JSON( $template_directory );
-				// If the child and parent variation file basename are the same, only include the child theme's
+				// If the child and parent variation file basename are the same, only include the child theme's.
 				foreach ( $variation_files_parent as $parent_path => $parent ) {
 					foreach ( $variation_files as $child_path => $child ) {
 						if ( basename( $parent_path ) === basename( $child_path ) ) {
