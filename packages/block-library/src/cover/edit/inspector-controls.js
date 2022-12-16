@@ -180,6 +180,7 @@ export default function CoverInspectorControls( {
 							isImageBackground &&
 							isImgElement && (
 								<TextareaControl
+									__nextHasNoMarginBottom
 									label={ __(
 										'Alt text (alternative text)'
 									) }
