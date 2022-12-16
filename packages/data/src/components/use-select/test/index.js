@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { act, render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { act, render, fireEvent, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -436,9 +435,7 @@ describe( 'useSelect', () => {
 			);
 		} );
 
-		it( 'captures state changes scheduled between render and effect', async () => {
-			const user = userEvent.setup();
-
+		it( 'captures state changes scheduled between render and effect', () => {
 			registry.registerStore( 'store-1', counterStore );
 
 			class ChildComponent extends Component {
@@ -487,7 +484,7 @@ describe( 'useSelect', () => {
 				</RegistryProvider>
 			);
 
-			await user.click( screen.getByText( 'triggerChildDispatch' ) );
+			fireEvent.click( screen.getByText( 'triggerChildDispatch' ) );
 
 			expect( selectCount1AndDep ).toHaveBeenCalledTimes( 3 );
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
@@ -1151,9 +1148,7 @@ describe( 'useSelect', () => {
 	} );
 
 	describe( 'static store selection mode', () => {
-		it( 'can read the current value from store', async () => {
-			const user = userEvent.setup();
-
+		it( 'can read the current value from store', () => {
 			registry.registerStore( 'testStore', {
 				reducer: ( s = 0, a ) => ( a.type === 'INC' ? s + 1 : s ),
 				actions: { inc: () => ( { type: 'INC' } ) },
@@ -1175,13 +1170,13 @@ describe( 'useSelect', () => {
 				</RegistryProvider>
 			);
 
-			await user.click( screen.getByRole( 'button' ) );
+			fireEvent.click( screen.getByRole( 'button' ) );
 			expect( record ).toHaveBeenLastCalledWith( 0 );
 
 			// no need to act() as the component doesn't react to the updates
 			registry.dispatch( 'testStore' ).inc();
 
-			await user.click( screen.getByRole( 'button' ) );
+			fireEvent.click( screen.getByRole( 'button' ) );
 			expect( record ).toHaveBeenLastCalledWith( 1 );
 		} );
 	} );
