@@ -12,6 +12,7 @@ import { store as editorStore } from '@wordpress/editor';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -51,6 +52,35 @@ function KeyboardShortcuts() {
 		setIsInserterOpened( false );
 		setIsListViewOpened( false );
 		closeGeneralSidebar();
+	};
+
+	const { replaceBlocks } = useDispatch( blockEditorStore );
+	const { getBlockName, getSelectedBlockClientId, getBlockAttributes } =
+		useSelect( blockEditorStore );
+
+	const handleTextLevelShortcut = ( event, level ) => {
+		event.preventDefault();
+		const destinationBlockName =
+			level === 0 ? 'core/paragraph' : 'core/heading';
+		const currentClientId = getSelectedBlockClientId();
+		if ( currentClientId === null ) {
+			return;
+		}
+		const blockName = getBlockName( currentClientId );
+		if ( blockName !== 'core/paragraph' && blockName !== 'core/heading' ) {
+			return;
+		}
+		const currentAttributes = getBlockAttributes( currentClientId );
+		const { content: currentContent, align: currentAlign } =
+			currentAttributes;
+		replaceBlocks(
+			currentClientId,
+			createBlock( destinationBlockName, {
+				level,
+				content: currentContent,
+				align: currentAlign,
+			} )
+		);
 	};
 
 	useEffect( () => {
@@ -149,6 +179,28 @@ function KeyboardShortcuts() {
 				character: 'h',
 			},
 		} );
+
+		registerShortcut( {
+			name: `core/block-editor/transform-heading-to-paragraph`,
+			category: 'block-library',
+			description: __( 'Transform heading to paragraph.' ),
+			keyCombination: {
+				modifier: 'access',
+				character: `0`,
+			},
+		} );
+
+		[ 1, 2, 3, 4, 5, 6 ].forEach( ( level ) => {
+			registerShortcut( {
+				name: `core/block-editor/transform-paragraph-to-heading-${ level }`,
+				category: 'block-library',
+				description: __( 'Transform paragraph to heading.' ),
+				keyCombination: {
+					modifier: 'access',
+					character: `${ level }`,
+				},
+			} );
+		} );
 	}, [] );
 
 	useShortcut(
@@ -201,6 +253,21 @@ function KeyboardShortcuts() {
 	useShortcut( 'core/edit-post/toggle-list-view', () =>
 		setIsListViewOpened( ! isListViewOpened() )
 	);
+
+	useShortcut(
+		'core/block-editor/transform-heading-to-paragraph',
+		( event ) => handleTextLevelShortcut( event, 0 )
+	);
+
+	[ 1, 2, 3, 4, 5, 6 ].forEach( ( level ) => {
+		//the loop is based off on a constant therefore
+		//the hook will execute the same way every time
+		//eslint-disable-next-line react-hooks/rules-of-hooks
+		useShortcut(
+			`core/block-editor/transform-paragraph-to-heading-${ level }`,
+			( event ) => handleTextLevelShortcut( event, level )
+		);
+	} );
 
 	return null;
 }

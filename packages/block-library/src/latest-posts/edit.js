@@ -234,6 +234,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 				{ displayPostContent &&
 					displayPostContentRadio === 'excerpt' && (
 						<RangeControl
+							__nextHasNoMarginBottom
 							label={ __( 'Max number of words in excerpt' ) }
 							value={ excerptLength }
 							onChange={ ( value ) =>
@@ -355,6 +356,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 
 				{ postLayout === 'grid' && (
 					<RangeControl
+						__nextHasNoMarginBottom
 						label={ __( 'Columns' ) }
 						value={ columns }
 						onChange={ ( value ) =>

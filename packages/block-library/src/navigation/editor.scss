@@ -540,6 +540,13 @@ body.editor-styles-wrapper
 	color: inherit;
 }
 
+.components-heading.wp-block-navigation-off-canvas-editor__title {
+	margin: 0;
+}
+.wp-block-navigation-off-canvas-editor__header {
+	margin-bottom: $grid-unit-10;
+}
+
 // Customize the mobile editing.
 // This can be revisited in the future, but for now, inherit design from the parent.
 .is-menu-open .wp-block-navigation__responsive-container-content * {
@@ -579,6 +586,13 @@ body.editor-styles-wrapper
 .wp-block-navigation-delete-menu-button {
 	width: 100%;
 	justify-content: center;
+	margin-bottom: $grid-unit-20;
+}
+
+// increased specificity to override button variant
+// for the manage menus button in the advanced area
+// of the navigation block
+.components-button.is-link.wp-block-navigation-manage-menus-button {
 	margin-bottom: $grid-unit-20;
 }
 
@@ -623,6 +637,17 @@ body.editor-styles-wrapper
 	border: 1px solid;
 	justify-content: space-between;
 	width: 100%;
+}
+
+.wp-block-navigation__navigation-selector-button__icon {
+	flex: 0 0 auto;
+}
+
+.wp-block-navigation__navigation-selector-button__label {
+	flex: 0 1 auto;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .wp-block-navigation__navigation-selector-button--createnew {

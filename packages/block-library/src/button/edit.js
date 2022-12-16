@@ -17,6 +17,7 @@ import {
 	Popover,
 } from '@wordpress/components';
 import {
+	AlignmentControl,
 	BlockControls,
 	InspectorControls,
 	RichText,
@@ -76,7 +77,7 @@ function ButtonEdit( props ) {
 		onReplace,
 		mergeBlocks,
 	} = props;
-	const { linkTarget, placeholder, rel, style, text, url, width } =
+	const { textAlign, linkTarget, placeholder, rel, style, text, url, width } =
 		attributes;
 
 	function onToggleOpenInNewTab( value ) {
@@ -170,6 +171,7 @@ function ButtonEdit( props ) {
 						colorProps.className,
 						borderProps.className,
 						{
+							[ `has-text-align-${ textAlign }` ]: textAlign,
 							// For backwards compatibility add style that isn't
 							// provided via block support.
 							'no-border-radius': style?.border?.radius === 0,
@@ -193,6 +195,12 @@ function ButtonEdit( props ) {
 				/>
 			</div>
 			<BlockControls group="block">
+				<AlignmentControl
+					value={ textAlign }
+					onChange={ ( nextAlign ) => {
+						setAttributes( { textAlign: nextAlign } );
+					} }
+				/>
 				{ ! isURLSet && (
 					<ToolbarButton
 						name="link"

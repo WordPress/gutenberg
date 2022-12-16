@@ -2,12 +2,14 @@
  * WordPress dependencies
  */
 import { getBlockType } from '@wordpress/blocks';
+import { __experimentalSpacer as Spacer } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import ContextMenu from './context-menu';
 import ScreenHeader from './header';
+import BlockPreviewPanel from './block-preview-panel';
 
 function ScreenBlock( { name } ) {
 	const blockType = getBlockType( name );
@@ -15,7 +17,13 @@ function ScreenBlock( { name } ) {
 	return (
 		<>
 			<ScreenHeader title={ blockType.title } />
-			<ContextMenu parentMenu={ '/blocks/' + name } name={ name } />
+			<Spacer paddingX={ 4 }>
+				<BlockPreviewPanel name={ name } />
+			</Spacer>
+			<ContextMenu
+				parentMenu={ '/blocks/' + encodeURIComponent( name ) }
+				name={ name }
+			/>
 		</>
 	);
 }

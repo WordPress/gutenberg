@@ -1,6 +1,6 @@
 export default `
 <!-- wp:heading -->
-<h2 id="this-is-an-anchor">What is Gutenberg?</h2>
+<h2 class="wp-block-heading" id="this-is-an-anchor">What is Gutenberg?</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
@@ -8,7 +8,7 @@ export default `
 <!-- /wp:paragraph -->
 
 <!-- wp:heading {"textAlign":"left","level":4,"className":"has-primary-background-color has-background","style":{"typography":{"lineHeight":"2.5"}}} -->
-<h4 class="has-text-align-left has-primary-background-color has-background" style="line-height:2.5">Heading with line-height set</h4>
+<h4 class="wp-block-heading has-text-align-left has-primary-background-color has-background" style="line-height:2.5">Heading with line-height set</h4>
 <!-- /wp:heading -->
 
 <!-- wp:list -->
