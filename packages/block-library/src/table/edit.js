@@ -57,6 +57,7 @@ import {
 	toggleSection,
 	isEmptyTableSection,
 } from './state';
+import { normalizeRowColSpan } from './utils';
 
 const ALIGNMENT_CONTROLS = [
 	{
@@ -404,7 +405,14 @@ function TableEdit( {
 				<tr key={ rowIndex }>
 					{ cells.map(
 						(
-							{ content, tag: CellTag, scope, align, colspan },
+							{
+								content,
+								tag: CellTag,
+								scope,
+								align,
+								colspan,
+								rowspan,
+							},
 							columnIndex
 						) => (
 							<RichText
@@ -417,7 +425,8 @@ function TableEdit( {
 									'wp-block-table__cell-content'
 								) }
 								scope={ CellTag === 'th' ? scope : undefined }
-								colSpan={ colspan }
+								colSpan={ normalizeRowColSpan( colspan ) }
+								rowSpan={ normalizeRowColSpan( rowspan ) }
 								value={ content }
 								onChange={ onChange }
 								unstableOnFocus={ () => {

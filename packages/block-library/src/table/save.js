@@ -14,6 +14,11 @@ import {
 	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 
+/**
+ * Internal dependencies
+ */
+import { normalizeRowColSpan } from './utils';
+
 export default function save( { attributes } ) {
 	const { hasFixedLayout, head, body, foot, caption } = attributes;
 	const isEmpty = ! head.length && ! body.length && ! foot.length;
@@ -44,7 +49,14 @@ export default function save( { attributes } ) {
 					<tr key={ rowIndex }>
 						{ cells.map(
 							(
-								{ content, tag, scope, align, colspan },
+								{
+									content,
+									tag,
+									scope,
+									align,
+									colspan,
+									rowspan,
+								},
 								cellIndex
 							) => {
 								const cellClasses = classnames( {
@@ -65,7 +77,12 @@ export default function save( { attributes } ) {
 										scope={
 											tag === 'th' ? scope : undefined
 										}
-										colSpan={ colspan }
+										colSpan={ normalizeRowColSpan(
+											colspan
+										) }
+										rowSpan={ normalizeRowColSpan(
+											rowspan
+										) }
 									/>
 								);
 							}

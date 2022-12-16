@@ -5,12 +5,12 @@ const tableContentPasteSchema = ( { phrasingContentSchema } ) => ( {
 			th: {
 				allowEmpty: true,
 				children: phrasingContentSchema,
-				attributes: [ 'scope', 'colspan' ],
+				attributes: [ 'scope', 'colspan', 'rowspan' ],
 			},
 			td: {
 				allowEmpty: true,
 				children: phrasingContentSchema,
-				attributes: [ 'colspan' ],
+				attributes: [ 'colspan', 'rowspan' ],
 			},
 		},
 	},
