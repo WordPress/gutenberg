@@ -42,49 +42,57 @@ function Store( registry, suspense ) {
 	let lastIsAsync;
 	let subscribe;
 
-	function createSubscriber( stores ) {
-		return ( listener ) => {
+	const createSubscriber = ( stores ) => ( listener ) => {
+		// Invalidate the value right after subscription was created. React will
+		// call `getValue` after subscribing, to detect store updates that happened
+		// in the interval between the `getValue` call during render and creating
+		// the subscription, which is slightly delayed. We need to ensure that this
+		// second `getValue` call will compute a fresh value.
+		lastMapResultValid = false;
+
+		const onStoreChange = () => {
+			// Invalidate the value on store update, so that a fresh value is computed.
 			lastMapResultValid = false;
-
-			const onStoreChange = () => {
-				lastMapResultValid = false;
-				listener();
-			};
-
-			const onChange = () => {
-				if ( lastIsAsync ) {
-					renderQueue.add( queueContext, onStoreChange );
-				} else {
-					onStoreChange();
-				}
-			};
-
-			const unsubs = stores.map( ( storeName ) => {
-				return registry.subscribe( onChange, storeName );
-			} );
-
-			return () => {
-				// The return value of the subscribe function could be undefined if the store is a custom generic store.
-				for ( const unsub of unsubs ) {
-					unsub?.();
-				}
-				renderQueue.cancel( queueContext );
-			};
+			listener();
 		};
-	}
 
-	return ( mapSelect, resub, isAsync ) => {
-		function selectValue() {
-			return mapSelect( select, registry );
-		}
+		const onChange = () => {
+			if ( lastIsAsync ) {
+				renderQueue.add( queueContext, onStoreChange );
+			} else {
+				onStoreChange();
+			}
+		};
+
+		const unsubs = stores.map( ( storeName ) => {
+			return registry.subscribe( onChange, storeName );
+		} );
+
+		return () => {
+			// The return value of the subscribe function could be undefined if the store is a custom generic store.
+			for ( const unsub of unsubs ) {
+				unsub?.();
+			}
+			// Cancel existing store updates that were already scheduled.
+			renderQueue.cancel( queueContext );
+		};
+	};
+
+	return ( mapSelect, resubscribe, isAsync ) => {
+		const selectValue = () => mapSelect( select, registry );
 
 		function updateValue( selectFromStore ) {
+			// If the last value is valid, and the `mapSelect` callback hasn't changed,
+			// then we can safely return the cached value. The value can change only on
+			// store update, and in that case value will be invalidated by the listener.
 			if ( lastMapResultValid && mapSelect === lastMapSelect ) {
 				return lastMapResult;
 			}
 
 			const mapResult = selectFromStore();
 
+			// If the new value is shallow-equal to the old one, keep the old one so
+			// that we don't trigger unwanted updates that do a `===` check.
 			if ( ! isShallowEqual( lastMapResult, mapResult ) ) {
 				lastMapResult = mapResult;
 			}
@@ -92,16 +100,26 @@ function Store( registry, suspense ) {
 		}
 
 		function getValue() {
+			// Update the value in case it's been invalidated or `mapSelect` has changed.
 			updateValue( selectValue );
 			return lastMapResult;
 		}
 
+		// When transitioning from async to sync mode, cancel existing store updates
+		// that have been scheduled, and invalidate the value so that it's freshly
+		// computed. It might have been changed by the update we just cancelled.
 		if ( lastIsAsync && ! isAsync ) {
 			lastMapResultValid = false;
 			renderQueue.cancel( queueContext );
 		}
 
-		if ( ! subscribe || ( resub && mapSelect !== lastMapSelect ) ) {
+		// Either initialize the `subscribe` function, or create a new one if `mapSelect`
+		// changed and has dependencies.
+		// Usage without dependencies, `useSelect( ( s ) => { ... } )`, will subscribe
+		// only once, at mount, and won't resubscibe even if `mapSelect` changes.
+		if ( ! subscribe || ( resubscribe && mapSelect !== lastMapSelect ) ) {
+			// Find out what stores the `mapSelect` callback is selecting from and
+			// use that list to create subscriptions to specific stores.
 			const listeningStores = { current: null };
 			updateValue( () =>
 				registry.__unstableMarkListeningStores(
@@ -117,7 +135,8 @@ function Store( registry, suspense ) {
 		lastIsAsync = isAsync;
 		lastMapSelect = mapSelect;
 
-		return { getValue, subscribe };
+		// Return a pair of functions that can be passed to `useSyncExternalStore`.
+		return { subscribe, getValue };
 	};
 }
 
@@ -130,7 +149,7 @@ function useMappingSelect( suspense, mapSelect, deps ) {
 	const isAsync = useAsyncMode();
 	const store = useMemo( () => Store( registry, suspense ), [ registry ] );
 	const selector = useCallback( mapSelect, deps );
-	const { getValue, subscribe } = store( selector, !! deps, isAsync );
+	const { subscribe, getValue } = store( selector, !! deps, isAsync );
 	const result = useSyncExternalStore( subscribe, getValue, getValue );
 	useDebugValue( result );
 	return result;
@@ -201,6 +220,8 @@ function useMappingSelect( suspense, mapSelect, deps ) {
  * @return {UseSelectReturn<T>} A custom react hook.
  */
 export default function useSelect( mapSelect, deps ) {
+	// On initial call, on mount, determine the mode of this `useSelect` call
+	// and then never allow it to change on subsequent updates.
 	const staticSelectMode = typeof mapSelect !== 'function';
 	const staticSelectModeRef = useRef( staticSelectMode );
 
@@ -213,6 +234,8 @@ export default function useSelect( mapSelect, deps ) {
 	}
 
 	/* eslint-disable react-hooks/rules-of-hooks */
+	// `staticSelectMode` is not allowed to change during the hook instance's,
+	// lifetime, so the rules of hooks are not really violated.
 	return staticSelectMode
 		? useStaticSelect( mapSelect )
 		: useMappingSelect( false, mapSelect, deps );
