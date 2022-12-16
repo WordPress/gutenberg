@@ -152,7 +152,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 					) }
 					<RangeControl
 						__nextHasNoMarginBottom
-						label={ __( 'Max number of words in title' ) }
+						label={ __( 'Max number of characters in title' ) }
 						value={ titleLength }
 						onChange={ ( value ) =>
 							setAttributes( { titleLength: value } )
