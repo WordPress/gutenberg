@@ -17,6 +17,9 @@ yarn.lock
 /composer.lock
 
 .cache
+!/.cache/
+/.cache/**
+!/.cache/.gitkeep
 .eslintcache
 *.tsbuildinfo
 
