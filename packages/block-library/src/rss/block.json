@@ -42,7 +42,7 @@
 		},
 		"titleLength": {
 			"type": "number",
-			"default": 30
+			"default": 75
 		}
 	},
 	"supports": {

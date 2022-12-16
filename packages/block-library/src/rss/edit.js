@@ -157,8 +157,8 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 						onChange={ ( value ) =>
 							setAttributes( { titleLength: value } )
 						}
-						min={ 10 }
-						max={ 100 }
+						min={ 20 }
+						max={ 150 }
 						required
 					/>
 					{ blockLayout === 'grid' && (

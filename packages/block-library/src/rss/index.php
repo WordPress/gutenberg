@@ -6,6 +6,25 @@
  */
 
 /**
+ * Helper function to trim text to a certain number of characters while preserving whole words.
+ *
+ * @param string $to_trim The text to trim.
+ * @param int    $character_count The maximum number of characters to return.
+ * @param string $more The string to append to the trimmed text.
+ */
+function trim_to_word_boundary( $to_trim, $character_count, $more = ' [&hellip;]' ) {
+	// Strip tags to mimic behavior of `wp_trim_words`.
+	$to_trim = wp_strip_all_tags( $to_trim );
+
+	if ( strlen( $to_trim ) <= $character_count ) {
+		return $to_trim;
+	}
+
+	preg_match( '/^(.{0,' . $character_count . '})\s/', $to_trim, $parts );
+	return $parts[1] . $more;
+}
+
+/**
  * Renders the `core/rss` block on server.
  *
  * @param array $attributes The block attributes.
@@ -34,16 +53,23 @@ function render_block_core_rss( $attributes ) {
 		$excerpt_trimmed = esc_attr( wp_trim_words( $excerpt_decoded, $attributes['excerptLength'], ' [&hellip;]' ) );
 
 		$title = esc_html( trim( strip_tags( $item->get_title() ) ) );
+		// $excerpt_trimmed and $title are now sanitized
+
 		if ( empty( $title ) ) {
-			preg_match( '/^(.{0,' . $attributes['titleLength'] . '})\s/', $excerpt_trimmed, $parts );
-			$title = __( $parts[1] );
-			// Excerpt will be sanitized later on
+			// If the title is empty, use the begining of the excerpt instead.
+			$title = trim_to_word_boundary( $excerpt_trimmed, $attributes['titleLength'], '' );
 			if ( $attributes['displayExcerpt'] ) {
-				$excerpt_trimmed = trim(substr($excerpt_trimmed, strlen($title)));
+				// Trim out the words that were used for the title.
+				$excerpt_trimmed = trim( substr( $excerpt_trimmed, strlen( $title ) ) );
+			} else {
+				// If the excerpt is not displayed, append an ellipsis.
+				$title = $title . ' [&hellip;]';
 			}
 		} else {
-			$title = substr($title, 0, $attributes['titleLength']);
+			// If the title is too long, trim it.
+			$title = trim_to_word_boundary( $title, $attributes['titleLength'], ' [&hellip;]' );
 		}
+
 		$link = $item->get_link();
 		$link = esc_url( $link );
 		if ( $link ) {
