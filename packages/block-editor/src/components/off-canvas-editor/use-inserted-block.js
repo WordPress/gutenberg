@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
+
 /**
  * Internal dependencies
  */
@@ -26,8 +27,17 @@ export const useInsertedBlock = ( insertedBlockClientId ) => {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const setInsertedBlockAttributes = ( _updatedAttributes ) => {
+		if ( ! insertedBlockClientId ) return;
 		updateBlockAttributes( insertedBlockClientId, _updatedAttributes );
 	};
+
+	if ( ! insertedBlockClientId ) {
+		return {
+			insertedBlockAttributes: undefined,
+			insertedBlockName: undefined,
+			setInsertedBlockAttributes,
+		};
+	}
 
 	return {
 		insertedBlockAttributes,
