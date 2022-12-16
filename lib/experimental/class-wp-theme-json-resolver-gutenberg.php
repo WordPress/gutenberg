@@ -175,15 +175,15 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_2 {
 	}
 
 	/**
-	 * Adds all nested json files within a given directory to a given array.
+	 * Returns an array of all nested json files within a given directory.
 	 *
-	 * @param dir   $dir The directory to recursively iterate and list files of.
-	 * @param array $array The array to add to found json files to.
+	 * @param dir $dir The directory to recursively iterate and list files of.
 	 * @return array The merged array.
 	 */
-	private static function recursively_iterate_JSON( $dir, $array ) {
-		$nested_files = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $dir ) );
-		return array_merge( $array, iterator_to_array( new RegexIterator( $nested_files, '/^.+\.json$/i', RecursiveRegexIterator::GET_MATCH ) ) );
+	private static function recursively_iterate_JSON( $dir ) {
+		$nested_files      = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $dir ) );
+		$nested_json_files = iterator_to_array( new RegexIterator( $nested_files, '/^.+\.json$/i', RecursiveRegexIterator::GET_MATCH ) );
+		return $nested_json_files;
 	}
 
 	/**
@@ -192,13 +192,22 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_6_2 {
 	 * @return array
 	 */
 	public static function get_style_variations() {
-		$variations             = array();
-		$base_directory         = get_stylesheet_directory() . '/styles';
-		$parent_theme_directory = get_template_directory() . '/styles';
+		$variations         = array();
+		$base_directory     = get_stylesheet_directory() . '/styles';
+		$template_directory = get_template_directory() . '/styles';
 		if ( is_dir( $base_directory ) ) {
-			$variation_files = static::recursively_iterate_JSON( $base_directory, array() );
-			if ( $parent_theme_directory !== $base_directory && is_dir( $parent_theme_directory ) ) {
-				$variation_files = static::recursively_iterate_JSON( $parent_theme_directory, $variation_files );
+			$variation_files = static::recursively_iterate_JSON( $base_directory );
+			if ( $template_directory !== $base_directory && is_dir( $template_directory ) ) {
+				$variation_files_parent = static::recursively_iterate_JSON( $template_directory );
+				// If the child and parent variation file basename are the same, only include the child theme's
+				foreach ( $variation_files_parent as $parent_path => $parent ) {
+					foreach ( $variation_files as $child_path => $child ) {
+						if ( basename( $parent_path ) === basename( $child_path ) ) {
+							unset( $variation_files_parent[ $parent_path ] );
+						}
+					}
+				}
+				$variation_files = array_merge( $variation_files, $variation_files_parent );
 			}
 			ksort( $variation_files );
 			foreach ( $variation_files as $path => $file ) {
