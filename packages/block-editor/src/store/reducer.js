@@ -1313,14 +1313,15 @@ function selectionHelper( state = {}, action ) {
 
 			const shouldNotUpdateSelection = false;
 
+			if ( action.indexToSelect === shouldNotUpdateSelection ) {
+				return state;
+			}
+
 			const blockToSelect =
 				action.blocks[ action.indexToSelect ] ||
 				action.blocks[ action.blocks.length - 1 ];
 
-			if (
-				! blockToSelect ||
-				action.indexToSelect === shouldNotUpdateSelection
-			) {
+			if ( ! blockToSelect ) {
 				return {};
 			}
 

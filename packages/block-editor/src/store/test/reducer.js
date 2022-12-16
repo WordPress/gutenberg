@@ -2719,7 +2719,7 @@ describe( 'state', () => {
 			);
 		} );
 
-		it( 'should replace the selected block but not apply a selection  when `indexToSelect` is explicitly set to `false`', () => {
+		it( 'should replace the selected block but not updated selection  when `indexToSelect` is explicitly set to `false`', () => {
 			const original = deepFreeze( {
 				selectionStart: { clientId: 'chicken' },
 				selectionEnd: { clientId: 'chicken' },
@@ -2737,8 +2737,8 @@ describe( 'state', () => {
 			const state = selection( original, action );
 			expect( state ).toEqual(
 				expect.objectContaining( {
-					selectionStart: {},
-					selectionEnd: {},
+					selectionStart: { clientId: 'chicken' },
+					selectionEnd: { clientId: 'chicken' },
 				} )
 			);
 		} );
