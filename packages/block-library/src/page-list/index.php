@@ -139,6 +139,7 @@ function block_core_page_list_build_css_font_sizes( $context ) {
  * @param boolean $show_submenu_icons Whether to show submenu indicator icons.
  * @param boolean $is_navigation_child If block is a child of Navigation block.
  * @param array   $nested_pages The array of nested pages.
+ * @param boolean $is_nested Whether the submenu is nested or not.
  * @param array   $active_page_ancestor_ids An array of ancestor ids for active page.
  * @param array   $colors Color information for overlay styles.
  * @param integer $depth The nesting depth.
@@ -253,7 +254,7 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	++$block_id;
 
 	$parent_page_id = $attributes['parentPageID'];
-	$is_nested = $attributes['isNested'];
+	$is_nested      = $attributes['isNested'];
 
 	$all_pages = get_pages(
 		array(
