@@ -16,6 +16,10 @@ const defaultShortcuts = {
 			character: '`',
 		},
 		{
+			modifier: 'ctrlShift',
+			character: '~',
+		},
+		{
 			modifier: 'access',
 			character: 'p',
 		},

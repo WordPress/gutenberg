@@ -49,7 +49,7 @@ const BaseComponent = ( { noticeOperations, noticeUI, notifications } ) => {
 				noticeOperations.createNotice( item )
 			);
 		}
-	}, [] );
+	}, [ noticeOperations, notifications ] );
 	return (
 		<div>
 			{ noticeUI }

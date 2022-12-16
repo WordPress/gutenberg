@@ -14,17 +14,13 @@ function BlockTypesChecklist( { blockTypes, value, onItemChange } ) {
 				>
 					<CheckboxControl
 						__nextHasNoMarginBottom
-						label={
-							<>
-								{ blockType.title }
-								<BlockIcon icon={ blockType.icon } />
-							</>
-						}
+						label={ blockType.title }
 						checked={ value.includes( blockType.name ) }
 						onChange={ ( ...args ) =>
 							onItemChange( blockType.name, ...args )
 						}
 					/>
+					<BlockIcon icon={ blockType.icon } />
 				</li>
 			) ) }
 		</ul>

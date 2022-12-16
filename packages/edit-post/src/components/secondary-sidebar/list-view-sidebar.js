@@ -43,17 +43,17 @@ export default function ListViewSidebar() {
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
-			aria-label={ __( 'List View' ) }
-			className="edit-post-editor__list-view-panel"
+			aria-label={ __( 'Document Overview' ) }
+			className="edit-post-editor__document-overview-panel"
 			onKeyDown={ closeOnEscape }
 		>
 			<div
-				className="edit-post-editor__list-view-panel-header components-panel__header edit-post-sidebar__panel-tabs"
+				className="edit-post-editor__document-overview-panel-header components-panel__header edit-post-sidebar__panel-tabs"
 				ref={ headerFocusReturnRef }
 			>
 				<Button
 					icon={ closeSmall }
-					label={ __( 'Close List View Sidebar' ) }
+					label={ __( 'Close Document Overview Sidebar' ) }
 					onClick={ () => setIsListViewOpened( false ) }
 				/>
 				<ul>

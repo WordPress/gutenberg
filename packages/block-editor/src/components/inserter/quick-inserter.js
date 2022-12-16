@@ -31,6 +31,7 @@ export default function QuickInserter( {
 	clientId,
 	isAppender,
 	prioritizePatterns,
+	selectBlockOnInsert,
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
@@ -38,6 +39,7 @@ export default function QuickInserter( {
 		rootClientId,
 		clientId,
 		isAppender,
+		selectBlockOnInsert,
 	} );
 	const [ blockTypes ] = useBlockTypesState(
 		destinationRootClientId,
@@ -99,6 +101,7 @@ export default function QuickInserter( {
 		>
 			{ showSearch && (
 				<SearchControl
+					__nextHasNoMarginBottom
 					className="block-editor-inserter__search"
 					value={ filterValue }
 					onChange={ ( value ) => {
@@ -120,6 +123,7 @@ export default function QuickInserter( {
 					maxBlockTypes={ SHOWN_BLOCK_TYPES }
 					isDraggable={ false }
 					prioritizePatterns={ prioritizePatterns }
+					selectBlockOnInsert={ selectBlockOnInsert }
 				/>
 			</div>
 

@@ -120,6 +120,7 @@ An array of objects containing the following properties:
 -   `name`: `(string)` Defines the key for the tab.
 -   `title`:`(string)` Defines the translated text for the tab.
 -   `className`:`(string)` Optional. Defines the class to put on the tab.
+-   `icon`:`(ReactNode)` Optional. When set, displays the icon in place of the tab title. The title is then rendered as an aria-label and tooltip.
 
 > > **Note:** Other fields may be added to the object and accessed from the child function if desired.
 
@@ -141,6 +142,14 @@ The name of the tab to be selected upon mounting of component. If this prop is n
 -   Type: `String`
 -   Required: No
 -   Default: none
+
+#### selectOnMove
+
+When `true`, the tab will be selected when receiving focus (automatic tab activation). When `false`, the tab will be selected only when clicked (manual tab activation). See the [official W3C docs](https://www.w3.org/WAI/ARIA/apg/patterns/tabpanel/) for more info.
+
+-   Type: `boolean`
+-   Required: No
+-   Default: `true`
 
 #### children
 

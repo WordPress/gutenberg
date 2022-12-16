@@ -26,9 +26,10 @@ describe( 'persistence', () => {
 	} );
 
 	it( 'should not mutate options', () => {
-		const options = Object.freeze( { persist: true, reducer() {} } );
-
-		registry.registerStore( 'test', options );
+		expect( () => {
+			const options = Object.freeze( { persist: true, reducer() {} } );
+			registry.registerStore( 'test', options );
+		} ).not.toThrowError( /object is not extensible/ );
 	} );
 
 	it( 'should load a persisted value as initialState', () => {
