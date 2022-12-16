@@ -9,6 +9,7 @@ import {
 	pressKeyWithModifier,
 	showBlockToolbar,
 	clickBlockToolbarButton,
+	setClipboardData,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'RichText', () => {
@@ -553,6 +554,30 @@ describe( 'RichText', () => {
 		await page.keyboard.type( '-' );
 
 		// Expect: <strong>1</strong>-<em>2</em>
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should escape HTML on paste', async () => {
+		await clickBlockAppender();
+
+		// Test to see if HTML is kept.
+		await setClipboardData( { plainText: 'Test <img> tag\n' } );
+
+		await pressKeyWithModifier( 'primary', 'v' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should split rich text and escape HTML on paste', async () => {
+		await clickBlockAppender();
+
+		// Test to see if HTML is kept and block is split.
+		await setClipboardData( {
+			plainText: 'First line <img>\n\nSecond line <img>.',
+		} );
+
+		await pressKeyWithModifier( 'primary', 'v' );
+
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );
