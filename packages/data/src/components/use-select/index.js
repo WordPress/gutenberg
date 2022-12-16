@@ -101,17 +101,19 @@ function Store( registry, suspense ) {
 			renderQueue.cancel( queueContext );
 		}
 
-		const listeningStores = { current: null };
-		updateValue( () =>
-			registry.__unstableMarkListeningStores(
-				selectValue,
-				listeningStores
-			)
-		);
-
-		if ( ! lastMapSelect || ( resub && mapSelect !== lastMapSelect ) ) {
+		if ( ! subscribe || ( resub && mapSelect !== lastMapSelect ) ) {
+			const listeningStores = { current: null };
+			updateValue( () =>
+				registry.__unstableMarkListeningStores(
+					selectValue,
+					listeningStores
+				)
+			);
 			subscribe = createSubscriber( listeningStores.current );
+		} else {
+			updateValue( selectValue );
 		}
+
 		lastIsAsync = isAsync;
 		lastMapSelect = mapSelect;
 
