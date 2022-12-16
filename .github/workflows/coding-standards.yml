@@ -1,0 +1,101 @@
+name: PHP Coding Standards
+
+on:
+    push:
+        branches:
+            - trunk
+            - 'release/**'
+            - 'wp/**'
+    pull_request:
+        paths:
+            # Any change to a PHP file should run checks.
+            - '**.php'
+            # These files configure Composer. Changes could affect the outcome.
+            - 'composer.*'
+            # This file configures PHPCS. Changes could affect the outcome.
+            - 'phpcs.xml.dist'
+            # Changes to workflow files should always verify all workflows are successful.
+            - '.github/workflows/*.yml'
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    cancel-in-progress: true
+
+jobs:
+    # Runs PHP coding standards checks.
+    #
+    # Violations are reported inline with annotations.
+    #
+    # Performs the following steps:
+    # - Checks out the repository.
+    # - Sets up PHP.
+    # - Configures caching for PHPCS scans.
+    # - Installs Composer dependencies.
+    # - Make Composer packages available globally.
+    # - Runs PHPCS on the full codebase with warnings suppressed.
+    # - Generate a report for displaying issues as pull request annotations.
+    # - Runs PHPCS on the `tests` directory without warnings suppressed.
+    # - Generate a report for displaying `test` directory issues as pull request annotations.
+    # - Ensures version-controlled files are not modified or deleted.
+    phpcs:
+        name: PHP coding standards
+        runs-on: ubuntu-latest
+        timeout-minutes: 20
+        if: ${{ github.repository == 'WordPress/wordpress-develop' || github.event_name == 'pull_request' }}
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+
+            - name: Set up PHP
+              uses: shivammathur/setup-php@1a18b2267f80291a81ca1d33e7c851fe09e7dfc4 # v2.22.0
+              with:
+                  php-version: '7.4'
+                  coverage: none
+                  tools: cs2pr
+
+            # This date is used to ensure that the PHPCS cache is cleared at least once every week.
+            # http://man7.org/linux/man-pages/man1/date.1.html
+            - name: "Get last Monday's date"
+              id: get-date
+              run: echo "date=$(/bin/date -u --date='last Mon' "+%F")" >> $GITHUB_OUTPUT
+
+            - name: Cache PHPCS scan cache
+              uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 # v3.0.11
+              with:
+                  path: |
+                      .cache/phpcs-src.json
+                      .cache/phpcs-tests.json
+                  key: ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpcs-cache-${{ hashFiles('**/composer.json', 'phpcs.xml.dist') }}
+
+            # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
+            # passing a custom cache suffix ensures that the cache is flushed at least once per week.
+            - name: Install Composer dependencies
+              uses: ramsey/composer-install@83af392bf5f031813d25e6fe4cd626cdba9a2df6 # v2.2.0
+              with:
+                  custom-cache-suffix: ${{ steps.get-date.outputs.date }}
+
+            - name: Make Composer packages available globally
+              run: echo "${PWD}/vendor/bin" >> $GITHUB_PATH
+
+            - name: Run PHPCS on all Core files
+              id: phpcs-core
+              run: phpcs -n --report-full --cache=./.cache/phpcs-src.json --report-checkstyle=./.cache/phpcs-report.xml
+
+            - name: Show PHPCS results in PR
+              if: ${{ always() && steps.phpcs-core.outcome == 'failure' }}
+              run: cs2pr ./.cache/phpcs-report.xml
+
+            - name: Check test suite files for warnings
+              id: phpcs-tests
+              run: phpcs tests --report-full --cache=./.cache/phpcs-tests.json --report-checkstyle=./.cache/phpcs-tests-report.xml
+
+            - name: Show test suite scan results in PR
+              if: ${{ always() && steps.phpcs-tests.outcome == 'failure' }}
+              run: cs2pr ./.cache/phpcs-tests-report.xml
+
+            - name: Ensure version-controlled files are not modified during the tests
+              run: git diff --exit-code
