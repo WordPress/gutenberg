@@ -23,12 +23,4 @@
 	display: block;
 	// sidebar width - tab panel padding
 	max-width: $sidebar-width - (2 * $grid-unit-20);
-	.offcanvas-editor-list-view-block-select-button__lock {
-		display: inline-flex;
-		justify-content: center;
-		align-items: center;
-		overflow: hidden;
-		width: 16px;
-		height: 16px;
-	}
 }
