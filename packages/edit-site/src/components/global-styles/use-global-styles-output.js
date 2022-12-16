@@ -919,6 +919,11 @@ export function useGlobalStylesOutput() {
 				css: globalStyles,
 				isGlobalStyles: true,
 			},
+			// Load custom CSS in own stylesheet so that any invalid CSS entered in the input won't break all the global styles in the editor.
+			{
+				css: mergedConfig.styles.css ?? '',
+				isGlobalStyles: true,
+			},
 		];
 
 		return [ stylesheets, mergedConfig.settings, filters ];

@@ -1,4 +1,8 @@
-.edit-site-sidebar__content {
+.edit-site-sidebar__content.edit-site-sidebar__content {
+	overflow-x: unset;
+}
+
+.edit-site-sidebar__content > div {
 	// This matches the logo padding
-	padding: $grid-unit-15;
+	padding: 0 $grid-unit-15;
 }

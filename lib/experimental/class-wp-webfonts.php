@@ -178,7 +178,9 @@ class WP_Webfonts {
 	 */
 	public static function get_font_slug( $to_convert ) {
 		if ( is_array( $to_convert ) ) {
-			if ( isset( $to_convert['font-family'] ) ) {
+			if ( isset( $to_convert['slug'] ) ) {
+				return $to_convert['slug'];
+			} elseif ( isset( $to_convert['font-family'] ) ) {
 				$to_convert = $to_convert['font-family'];
 			} elseif ( isset( $to_convert['fontFamily'] ) ) {
 				$to_convert = $to_convert['fontFamily'];
@@ -186,6 +188,11 @@ class WP_Webfonts {
 				_doing_it_wrong( __METHOD__, __( 'Could not determine the font family name.', 'gutenberg' ), '6.0.0' );
 				return false;
 			}
+		}
+
+		// If the font-family is a comma-separated list (example: "Inter, sans-serif" ), use just the first font.
+		if ( strpos( $to_convert, ',' ) !== false ) {
+			$to_convert = explode( ',', $to_convert )[0];
 		}
 
 		return sanitize_title( $to_convert );

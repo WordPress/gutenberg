@@ -39,13 +39,16 @@
 
 .edit-site-layout__edit-button {
 	background: $gray-800;
-	color: $white;
+	/* Overrides the color for all states of the button */
+	color: inherit !important;
 }
 
 .edit-site-layout__sidebar {
 	grid-area: sidebar;
 	z-index: 1;
-	padding-top: $grid-unit-80;
+	overflow-y: auto;
+	max-height: calc(100vh - #{$header-height});
+	@include custom-scrollbars-on-hover;
 
 	// This is only necessary for the exit animation
 	.edit-site-layout.is-full-canvas & {

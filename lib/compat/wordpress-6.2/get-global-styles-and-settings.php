@@ -63,7 +63,7 @@ if ( ! function_exists( 'wp_theme_has_theme_json_clean_cache' ) ) {
  * Returns the stylesheet resulting of merging core, theme, and user data.
  *
  * @param array $types Types of styles to load. Optional.
- *                     It accepts 'variables', 'styles', 'presets' as values.
+ *                     It accepts 'variables', 'styles', 'presets', 'custom-css' as values.
  *                     If empty, it'll load all for themes with theme.json support
  *                     and only [ 'variables', 'presets' ] for themes without theme.json support.
  *
@@ -85,7 +85,7 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 	if ( empty( $types ) && ! $supports_theme_json ) {
 		$types = array( 'variables', 'presets', 'base-layout-styles' );
 	} elseif ( empty( $types ) ) {
-		$types = array( 'variables', 'styles', 'presets' );
+		$types = array( 'variables', 'styles', 'presets', 'custom-css' );
 	}
 
 	/*

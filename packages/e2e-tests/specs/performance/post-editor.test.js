@@ -32,6 +32,23 @@ import {
 
 jest.setTimeout( 1000000 );
 
+async function loadHtmlIntoTheBlockEditor( html ) {
+	await page.evaluate( ( _html ) => {
+		const { parse } = window.wp.blocks;
+		const { dispatch } = window.wp.data;
+		const blocks = parse( _html );
+
+		blocks.forEach( ( block ) => {
+			if ( block.name === 'core/image' ) {
+				delete block.attributes.id;
+				delete block.attributes.url;
+			}
+		} );
+
+		dispatch( 'core/block-editor' ).resetBlocks( blocks );
+	}, html );
+}
+
 describe( 'Post Editor Performance', () => {
 	const results = {
 		serverResponse: [],
@@ -41,6 +58,7 @@ describe( 'Post Editor Performance', () => {
 		firstContentfulPaint: [],
 		firstBlock: [],
 		type: [],
+		typeContainer: [],
 		focus: [],
 		listViewOpen: [],
 		inserterOpen: [],
@@ -51,25 +69,10 @@ describe( 'Post Editor Performance', () => {
 	let traceResults;
 
 	beforeAll( async () => {
-		const html = readFile(
-			join( __dirname, '../../assets/large-post.html' )
-		);
-
 		await createNewPost();
-		await page.evaluate( ( _html ) => {
-			const { parse } = window.wp.blocks;
-			const { dispatch } = window.wp.data;
-			const blocks = parse( _html );
-
-			blocks.forEach( ( block ) => {
-				if ( block.name === 'core/image' ) {
-					delete block.attributes.id;
-					delete block.attributes.url;
-				}
-			} );
-
-			dispatch( 'core/block-editor' ).resetBlocks( blocks );
-		}, html );
+		await loadHtmlIntoTheBlockEditor(
+			readFile( join( __dirname, '../../assets/large-post.html' ) )
+		);
 		await saveDraft();
 	} );
 
@@ -145,6 +148,58 @@ describe( 'Post Editor Performance', () => {
 			// It can impact the stability of the metric, so we exclude it.
 			for ( let j = 1; j < keyDownEvents.length; j++ ) {
 				results.type.push(
+					keyDownEvents[ j ] + keyPressEvents[ j ] + keyUpEvents[ j ]
+				);
+			}
+		}
+	} );
+
+	it( 'Typing within containers', async () => {
+		// Measuring block selection performance.
+		await createNewPost();
+		await loadHtmlIntoTheBlockEditor(
+			readFile(
+				join(
+					__dirname,
+					'../../assets/small-post-with-containers.html'
+				)
+			)
+		);
+		// Select the block where we type in
+		await page.waitForSelector( 'p[aria-label="Paragraph block"]' );
+		await page.click( 'p[aria-label="Paragraph block"]' );
+		// Ignore firsted typed character because it's different
+		// It probably deserves a dedicated metric.
+		// (isTyping triggers so it's slower)
+		await page.keyboard.type( 'x' );
+
+		let i = 10;
+		await page.tracing.start( {
+			path: traceFile,
+			screenshots: false,
+			categories: [ 'devtools.timeline' ],
+		} );
+
+		while ( i-- ) {
+			// Wait for the browser to be idle before starting the monitoring.
+			// eslint-disable-next-line no-restricted-syntax
+			await page.waitForTimeout( 500 );
+			await page.keyboard.type( 'x' );
+		}
+		// eslint-disable-next-line no-restricted-syntax
+		await page.waitForTimeout( 500 );
+		await page.tracing.stop();
+		traceResults = JSON.parse( readFile( traceFile ) );
+		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
+			getTypingEventDurations( traceResults );
+		if (
+			keyDownEvents.length === keyPressEvents.length &&
+			keyPressEvents.length === keyUpEvents.length
+		) {
+			// The first character typed triggers a longer time (isTyping change)
+			// It can impact the stability of the metric, so we exclude it.
+			for ( let j = 1; j < keyDownEvents.length; j++ ) {
+				results.typeContainer.push(
 					keyDownEvents[ j ] + keyPressEvents[ j ] + keyUpEvents[ j ]
 				);
 			}

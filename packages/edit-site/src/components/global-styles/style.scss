@@ -31,7 +31,8 @@ $block-preview-height: 150px;
 }
 
 .edit-site-global-styles-screen-heading-color,
-.edit-site-global-styles-screen-typography {
+.edit-site-global-styles-screen-typography,
+.edit-site-global-styles-screen-css {
 	margin: $grid-unit-20;
 }
 
@@ -132,4 +133,16 @@ $block-preview-height: 150px;
 	overflow: auto;
 	border: $gray-200 $border-width solid;
 	border-radius: $radius-block-ui;
+}
+
+.edit-site-global-styles__custom-css-input textarea {
+	font-family: $editor_html_font;
+}
+
+.edit-site-global-styles__custom-css-theme-css {
+	width: 100%;
+	line-break: anywhere;
+	white-space: break-spaces;
+	max-height: 200px;
+	overflow-y: scroll;
 }

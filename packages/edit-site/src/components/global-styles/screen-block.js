@@ -20,7 +20,10 @@ function ScreenBlock( { name } ) {
 			<Spacer paddingX={ 4 }>
 				<BlockPreviewPanel name={ name } />
 			</Spacer>
-			<ContextMenu parentMenu={ '/blocks/' + name } name={ name } />
+			<ContextMenu
+				parentMenu={ '/blocks/' + encodeURIComponent( name ) }
+				name={ name }
+			/>
 		</>
 	);
 }

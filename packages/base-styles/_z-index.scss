@@ -13,7 +13,7 @@ $z-layers: (
 	".edit-site-code-editor__toolbar": 1,
 
 	// These next three share a stacking context
-	".block-library-template-part__selection-search": 1, // higher sticky element
+	".block-library-template-part__selection-search": 2, // higher sticky element
 
 	// These next two share a stacking context
 	".interface-complementary-area .components-panel" : 0, // lower scrolling content
@@ -142,6 +142,9 @@ $z-layers: (
 	".skip-to-selected-block": 100000,
 	".interface-interface-skeleton__actions": 100000,
 
+	// The focus styles of the region navigation containers should be above their content.
+	".is-focusing-regions {region} :focus::after": 1000000,
+
 	// Show NUX tips above popovers, wp-admin menus, submenus, and sidebar:
 	".nux-dot-tip": 1000001,
 
@@ -177,8 +180,6 @@ $z-layers: (
 
 	// Appear under the topbar.
 	".customize-widgets__block-toolbar": 7,
-
-	".is-focusing-regions [role='region']:focus .interface-navigable-region__stacker": -1,
 );
 
 @function z-index( $key ) {
