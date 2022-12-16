@@ -210,24 +210,16 @@ function __ExperimentalOffCanvasEditor(
 					applicationAriaLabel={ __( 'Block navigation structure' ) }
 				>
 					<ListViewContext.Provider value={ contextValue }>
-						{ clientIdsTree.length ? (
-							<ListViewBranch
-								blocks={ clientIdsTree }
-								selectBlock={ selectEditorBlock }
-								showBlockMovers={ showBlockMovers }
-								fixedListWindow={ fixedListWindow }
-								selectedClientIds={ selectedClientIds }
-								isExpanded={ isExpanded }
-								shouldShowInnerBlocks={ shouldShowInnerBlocks }
-								selectBlockInCanvas={ selectBlockInCanvas }
-							/>
-						) : (
-							<tr className="offcanvas-editor-list-view-is-empty">
-								{ __(
-									'Your menu is currently empty. Add your first menu item to get started.'
-								) }
-							</tr>
-						) }
+						<ListViewBranch
+							blocks={ clientIdsTree }
+							selectBlock={ selectEditorBlock }
+							showBlockMovers={ showBlockMovers }
+							fixedListWindow={ fixedListWindow }
+							selectedClientIds={ selectedClientIds }
+							isExpanded={ isExpanded }
+							shouldShowInnerBlocks={ shouldShowInnerBlocks }
+							selectBlockInCanvas={ selectBlockInCanvas }
+						/>
 						<TreeGridRow
 							level={ 1 }
 							setSize={ 1 }
@@ -239,6 +231,15 @@ function __ExperimentalOffCanvasEditor(
 									<Appender { ...treeGridCellProps } />
 								) }
 							</TreeGridCell>
+							{ ! clientIdsTree.length && (
+								<TreeGridCell withoutGridItem>
+									<div className="offcanvas-editor-list-view-is-empty">
+										{ __(
+											'Your menu is currently empty. Add your first menu item to get started.'
+										) }
+									</div>
+								</TreeGridCell>
+							) }
 						</TreeGridRow>
 					</ListViewContext.Provider>
 				</TreeGrid>
