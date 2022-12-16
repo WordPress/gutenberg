@@ -210,16 +210,24 @@ function __ExperimentalOffCanvasEditor(
 					applicationAriaLabel={ __( 'Block navigation structure' ) }
 				>
 					<ListViewContext.Provider value={ contextValue }>
-						<ListViewBranch
-							blocks={ clientIdsTree }
-							selectBlock={ selectEditorBlock }
-							showBlockMovers={ showBlockMovers }
-							fixedListWindow={ fixedListWindow }
-							selectedClientIds={ selectedClientIds }
-							isExpanded={ isExpanded }
-							shouldShowInnerBlocks={ shouldShowInnerBlocks }
-							selectBlockInCanvas={ selectBlockInCanvas }
-						/>
+						{ clientIdsTree.length ? (
+							<ListViewBranch
+								blocks={ clientIdsTree }
+								selectBlock={ selectEditorBlock }
+								showBlockMovers={ showBlockMovers }
+								fixedListWindow={ fixedListWindow }
+								selectedClientIds={ selectedClientIds }
+								isExpanded={ isExpanded }
+								shouldShowInnerBlocks={ shouldShowInnerBlocks }
+								selectBlockInCanvas={ selectBlockInCanvas }
+							/>
+						) : (
+							<tr className="offcanvas-editor-list-view-is-empty">
+								{ __(
+									'Your menu is currently empty. Add your first menu item to get started.'
+								) }
+							</tr>
+						) }
 						<TreeGridRow
 							level={ 1 }
 							setSize={ 1 }

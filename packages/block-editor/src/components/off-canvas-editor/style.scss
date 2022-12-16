@@ -24,3 +24,8 @@
 	// sidebar width - tab panel padding
 	max-width: $sidebar-width - (2 * $grid-unit-20);
 }
+
+.offcanvas-editor-list-view-is-empty {
+	display: block;
+	margin-left: 28px;
+}
