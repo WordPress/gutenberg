@@ -143,18 +143,31 @@ class Inserter extends Component {
 			// Feel free to make them stable after a few releases.
 			__experimentalIsQuick: isQuick,
 			prioritizePatterns,
+			onSelectOrClose,
+			selectBlockOnInsert,
 		} = this.props;
 
 		if ( isQuick ) {
 			return (
 				<QuickInserter
-					onSelect={ () => {
+					onSelect={ ( blocks ) => {
+						const firstBlock =
+							Array.isArray( blocks ) && blocks?.length
+								? blocks[ 0 ]
+								: blocks;
+						if (
+							onSelectOrClose &&
+							typeof onSelectOrClose === 'function'
+						) {
+							onSelectOrClose( firstBlock );
+						}
 						onClose();
 					} }
 					rootClientId={ rootClientId }
 					clientId={ clientId }
 					isAppender={ isAppender }
 					prioritizePatterns={ prioritizePatterns }
+					selectBlockOnInsert={ selectBlockOnInsert }
 				/>
 			);
 		}
@@ -260,6 +273,7 @@ export default compose( [
 					allowedBlockType,
 					directInsertBlock,
 					onSelectOrClose,
+					selectBlockOnInsert,
 				} = ownProps;
 
 				if ( ! hasSingleBlockType && ! directInsertBlock ) {
@@ -370,10 +384,17 @@ export default compose( [
 					blockToInsert = createBlock( allowedBlockType.name );
 				}
 
-				insertBlock( blockToInsert, getInsertionIndex(), rootClientId );
+				insertBlock(
+					blockToInsert,
+					getInsertionIndex(),
+					rootClientId,
+					selectBlockOnInsert
+				);
 
 				if ( onSelectOrClose ) {
-					onSelectOrClose();
+					onSelectOrClose( {
+						clientId: blockToInsert?.clientId,
+					} );
 				}
 
 				const message = sprintf(

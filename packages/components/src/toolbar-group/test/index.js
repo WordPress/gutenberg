@@ -76,15 +76,17 @@ describe( 'ToolbarGroup', () => {
 				],
 			];
 
-			const { container } = render(
-				<ToolbarGroup controls={ controls } />
-			);
+			render( <ToolbarGroup controls={ controls } /> );
 
 			const buttons = screen.getAllByRole( 'button' );
+
 			expect( buttons ).toHaveLength( 2 );
-			expect(
-				container.querySelector( '.has-left-divider button' )
-			).toBe( buttons[ 1 ] );
+			expect( buttons[ 0 ].parentElement ).not.toHaveClass(
+				'has-left-divider'
+			);
+			expect( buttons[ 1 ].parentElement ).toHaveClass(
+				'has-left-divider'
+			);
 		} );
 
 		it( 'should call the clickHandler on click.', () => {

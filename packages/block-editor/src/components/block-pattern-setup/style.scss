@@ -6,7 +6,6 @@
 	width: 100%;
 	border-radius: $radius-block-ui;
 
-	// TODO change to check parent.
 	&.view-mode-grid {
 		.block-editor-block-pattern-setup__toolbar {
 			justify-content: center;
@@ -84,6 +83,7 @@
 		display: flex;
 		flex-direction: column;
 		width: 100%;
+		height: 100%;
 		box-sizing: border-box;
 
 		.carousel-container {
@@ -91,6 +91,7 @@
 			position: relative;
 			padding: 0;
 			margin: 0;
+			height: 100%;
 			list-style: none;
 			transform-style: preserve-3d;
 			* {
@@ -100,6 +101,8 @@
 				position: absolute;
 				top: 0;
 				width: 100%;
+				height: 100%;
+				background-color: $white;
 				margin: auto;
 				padding: 0;
 				transition: transform 0.5s, z-index 0.5s;

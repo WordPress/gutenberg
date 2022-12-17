@@ -162,6 +162,7 @@ export default function CoverInspectorControls( {
 						) }
 						{ showFocalPointPicker && (
 							<FocalPointPicker
+								__nextHasNoMarginBottom
 								label={ __( 'Focal point picker' ) }
 								url={ url }
 								value={ focalPoint }
@@ -179,6 +180,7 @@ export default function CoverInspectorControls( {
 							isImageBackground &&
 							isImgElement && (
 								<TextareaControl
+									__nextHasNoMarginBottom
 									label={ __(
 										'Alt text (alternative text)'
 									) }
@@ -265,6 +267,7 @@ export default function CoverInspectorControls( {
 					panelId={ clientId }
 				>
 					<RangeControl
+						__nextHasNoMarginBottom
 						label={ __( 'Overlay opacity' ) }
 						value={ dimRatio }
 						onChange={ ( newDimRation ) =>
