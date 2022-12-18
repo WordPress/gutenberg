@@ -30,7 +30,7 @@ import {
 	useInnerBlocksProps,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
-import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import {
 	placeCaretAtHorizontalEdge,
 	__unstableStripHTML as stripHTML,
@@ -455,7 +455,7 @@ export default function NavigationLinkEdit( {
 			: __( 'This item is missing a link' );
 
 	return (
-		<Fragment>
+		<>
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton
@@ -645,6 +645,6 @@ export default function NavigationLinkEdit( {
 				</a>
 				<div { ...innerBlocksProps } />
 			</div>
-		</Fragment>
+		</>
 	);
 }
