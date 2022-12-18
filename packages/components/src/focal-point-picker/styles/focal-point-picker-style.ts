@@ -54,6 +54,10 @@ export const MediaPlaceholder = styled.div`
 
 export const StyledUnitControl = styled( UnitControl )`
 	width: 100px;
+
+	&&& {
+		margin-bottom: 0;
+	}
 `;
 
 const deprecatedBottomMargin = ( {
