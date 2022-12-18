@@ -1,9 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { act } from 'react-test-renderer';
 
 /**
  * Internal dependencies
@@ -49,6 +48,10 @@ const props = {
 
 const toggleLabelRegex = /Border color( and style)* picker/;
 const colorPickerRegex = /Border color picker/;
+
+function getWrappingPopoverElement( element ) {
+	return element.closest( '.components-popover' );
+}
 
 describe( 'BorderBoxControl', () => {
 	describe( 'Linked view rendering', () => {
@@ -187,7 +190,15 @@ describe( 'BorderBoxControl', () => {
 
 			const colorButton = screen.getByLabelText( colorPickerRegex );
 			await user.click( colorButton );
-			await act( () => Promise.resolve() );
+
+			// Wait for color picker popover to fully appear
+			await waitFor( () =>
+				expect(
+					getWrappingPopoverElement(
+						screen.getByLabelText( 'Custom color picker.' )
+					)
+				).toBePositionedPopover()
+			);
 
 			const styleLabel = screen.queryByText( 'Style' );
 			const solidButton = screen.queryByRole( 'button', {
@@ -277,8 +288,22 @@ describe( 'BorderBoxControl', () => {
 			);
 
 			const colorButtons = screen.getAllByLabelText( colorPickerRegex );
+			expect( colorButtons ).toHaveLength( 4 );
 
-			function assertStyleOptionsMissing() {
+			for ( let i = 0; i < colorButtons.length; i++ ) {
+				// Click on the color button to show the color picker popover.
+				await user.click( colorButtons[ 0 ] );
+
+				// Wait for color picker popover to fully appear
+				const colorPickerButton = screen.getByRole( 'button', {
+					name: 'Custom color picker.',
+				} );
+				await waitFor( () =>
+					expect(
+						getWrappingPopoverElement( colorPickerButton )
+					).toBePositionedPopover()
+				);
+
 				const styleLabel = screen.queryByText( 'Style' );
 				const solidButton = screen.queryByRole( 'button', {
 					name: 'Solid',
@@ -294,23 +319,10 @@ describe( 'BorderBoxControl', () => {
 				expect( solidButton ).not.toBeInTheDocument();
 				expect( dashedButton ).not.toBeInTheDocument();
 				expect( dottedButton ).not.toBeInTheDocument();
+
+				// Click again to hide the popover.
+				await user.click( colorButtons[ 0 ] );
 			}
-
-			await user.click( colorButtons[ 0 ] );
-			assertStyleOptionsMissing();
-			await user.click( colorButtons[ 0 ] );
-
-			await user.click( colorButtons[ 1 ] );
-			assertStyleOptionsMissing();
-			await user.click( colorButtons[ 1 ] );
-
-			await user.click( colorButtons[ 2 ] );
-			assertStyleOptionsMissing();
-			await user.click( colorButtons[ 2 ] );
-
-			await user.click( colorButtons[ 3 ] );
-			assertStyleOptionsMissing();
-			await user.click( colorButtons[ 3 ] );
 		} );
 	} );
 
