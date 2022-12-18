@@ -20,8 +20,30 @@ function trim_to_word_boundary( $to_trim, $character_count, $more = ' [&hellip;]
 		return $to_trim;
 	}
 
-	preg_match( '/^(.{0,' . $character_count . '})\s/', $to_trim, $parts );
-	return $parts[1] . $more;
+	preg_match( '/^.{0,' . $character_count . '}\s/', $to_trim, $parts );
+	return $parts[0] . $more;
+}
+
+/**
+ * Helper funtion to trim text up to the first period (.) followed by a space.
+ * If no period is found, the text is trimmed to the nearest word boundary.
+ * If multiple periods are found, the last one within $title_length is used.
+ * 
+ * @param string $to_trim The text to trim.
+ * @param int    $title_length The maximum number of characters to return.
+ * @param string $more The string to append to the trimmed text.
+ */
+function trim_title_from_excerpt( $to_trim, $title_length, $more = ' [&hellip;]' ) {
+	$to_trim = trim_to_word_boundary($to_trim, $title_length, $more );
+
+	// Match to the first period followed by a space.
+	preg_match( '/^.{0,' . $title_length . '}\.\s/', $to_trim, $parts );
+
+	if ( empty( $parts[0] ) ) {
+		return $to_trim;
+	}
+
+	return $parts[0] . $more;
 }
 
 /**
@@ -57,7 +79,7 @@ function render_block_core_rss( $attributes ) {
 
 		if ( empty( $title ) ) {
 			// If the title is empty, use the begining of the excerpt instead.
-			$title = trim_to_word_boundary( $excerpt_trimmed, $attributes['titleLength'], '' );
+			$title = trim_title_from_excerpt( $excerpt_trimmed, $attributes['titleLength'], '' );
 			if ( $attributes['displayExcerpt'] ) {
 				// Trim out the words that were used for the title.
 				$excerpt_trimmed = trim( substr( $excerpt_trimmed, strlen( $title ) ) );
