@@ -22,6 +22,8 @@
 		"IS_GUTENBERG_PLUGIN": true
 	},
 	"dependencies": {
+		"@codemirror/lang-css": "6.0.1",
+		"@codemirror/lint": "6.1.0",
 		"@wordpress/a11y": "file:packages/a11y",
 		"@wordpress/annotations": "file:packages/annotations",
 		"@wordpress/api-fetch": "file:packages/api-fetch",
@@ -84,6 +86,7 @@
 		"@wordpress/warning": "file:packages/warning",
 		"@wordpress/widgets": "file:packages/widgets",
 		"@wordpress/wordcount": "file:packages/wordcount",
+		"codemirror": "6.0.1",
 		"wicg-inert": "3.1.2"
 	},
 	"devDependencies": {

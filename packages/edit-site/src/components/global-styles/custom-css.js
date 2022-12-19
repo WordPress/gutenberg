@@ -1,8 +1,15 @@
 /**
+ * External dependencies
+ */
+import { EditorView, basicSetup } from 'codemirror';
+import { css } from '@codemirror/lang-css';
+
+/**
  * WordPress dependencies
  */
 import { TextareaControl, Panel, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -10,6 +17,16 @@ import { __ } from '@wordpress/i18n';
 import { useStyle } from './hooks';
 
 function CustomCSSControl() {
+	const editorRef = useRef();
+	useEffect( () => {
+		if ( editorRef.current ) {
+			new EditorView( {
+				extensions: [ basicSetup, css() ],
+				parent: editorRef.current,
+			} );
+		}
+	}, [ editorRef.current ] );
+
 	const [ customCSS, setCustomCSS ] = useStyle( 'css' );
 	const [ themeCSS ] = useStyle( 'css', null, 'base' );
 	const ignoreThemeCustomCSS = '/* IgnoreThemeCustomCSS */';
@@ -41,6 +58,7 @@ function CustomCSSControl() {
 
 	return (
 		<>
+			<textinput ref={ editorRef }></textinput>
 			<TextareaControl
 				__nextHasNoMarginBottom
 				value={
