@@ -1331,16 +1331,33 @@ class WP_HTML_Tag_Processor {
 	}
 
 	/**
-	 * Sort function to arrange objects with a start property in ascending order.
+	 * Compare two WP_HTML_Text_Replacement objects.
 	 *
 	 * @since 6.2.0
 	 *
-	 * @param object $a First attribute update.
-	 * @param object $b Second attribute update.
+	 * @param WP_HTML_Text_Replacement $a First attribute update.
+	 * @param WP_HTML_Text_Replacement $b Second attribute update.
 	 * @return integer
 	 */
 	private static function sort_start_ascending( $a, $b ) {
-		return $a->start - $b->start;
+		$by_start = $a->start - $b->start;
+		if ( $by_start !== 0 ) {
+			return $by_start;
+		}
+
+		$by_text = isset( $a->text, $b->text ) ? strcmp( $a->text, $b->text ) : 0;
+		if ( $by_text !== 0 ) {
+			return $by_text;
+		}
+
+		/*
+		 * We shouldn't ever get here because it would imply
+		 * that we have two identical updates, or that we're
+		 * trying to replace the same input text twice. Still
+		 * we'll handle this sort to preserve determinism,
+		 * which might come in handy when debugging.
+		 */
+		return $a->end - $b->end;
 	}
 
 	/**
@@ -1474,17 +1491,17 @@ class WP_HTML_Tag_Processor {
 		 */
 		if ( preg_match(
 			'~[' .
-				// Syntax-like characters.
-				'"\'>&</ =' .
-				// Control characters.
-				'\x{00}-\x{1F}' .
-				// HTML noncharacters.
-				'\x{FDD0}-\x{FDEF}' .
-				'\x{FFFE}\x{FFFF}\x{1FFFE}\x{1FFFF}\x{2FFFE}\x{2FFFF}\x{3FFFE}\x{3FFFF}' .
-				'\x{4FFFE}\x{4FFFF}\x{5FFFE}\x{5FFFF}\x{6FFFE}\x{6FFFF}\x{7FFFE}\x{7FFFF}' .
-				'\x{8FFFE}\x{8FFFF}\x{9FFFE}\x{9FFFF}\x{AFFFE}\x{AFFFF}\x{BFFFE}\x{BFFFF}' .
-				'\x{CFFFE}\x{CFFFF}\x{DFFFE}\x{DFFFF}\x{EFFFE}\x{EFFFF}\x{FFFFE}\x{FFFFF}' .
-				'\x{10FFFE}\x{10FFFF}' .
+			// Syntax-like characters.
+			'"\'>&</ =' .
+			// Control characters.
+			'\x{00}-\x{1F}' .
+			// HTML noncharacters.
+			'\x{FDD0}-\x{FDEF}' .
+			'\x{FFFE}\x{FFFF}\x{1FFFE}\x{1FFFF}\x{2FFFE}\x{2FFFF}\x{3FFFE}\x{3FFFF}' .
+			'\x{4FFFE}\x{4FFFF}\x{5FFFE}\x{5FFFF}\x{6FFFE}\x{6FFFF}\x{7FFFE}\x{7FFFF}' .
+			'\x{8FFFE}\x{8FFFF}\x{9FFFE}\x{9FFFF}\x{AFFFE}\x{AFFFF}\x{BFFFE}\x{BFFFF}' .
+			'\x{CFFFE}\x{CFFFF}\x{DFFFE}\x{DFFFF}\x{EFFFE}\x{EFFFF}\x{FFFFE}\x{FFFFF}' .
+			'\x{10FFFE}\x{10FFFF}' .
 			']~Ssu',
 			$name
 		) ) {
@@ -1657,7 +1674,14 @@ class WP_HTML_Tag_Processor {
 		$this->updated_bytes = strlen( $this->updated_html );
 
 		// 3. Point this tag processor at the original tag opener and consume it
-		$this->parsed_bytes = strlen( $updated_html_up_to_current_tag_name_end ) - $this->tag_name_length - 2;
+
+		/*
+		 * When we get here we're at the end of the tag name, and we want to rewind to before it
+		 * <p>Previous HTML<em>More HTML</em></p>
+		 *                 ^  | back up by the length of the tag name plus the opening <
+		 *                 \<-/ back up by strlen("em") + 1 ==> 3
+		 */
+		$this->parsed_bytes = strlen( $updated_html_up_to_current_tag_name_end ) - $this->tag_name_length - 1;
 		$this->next_tag();
 
 		return $this->html;
