@@ -1,10 +1,15 @@
 <?php
+/**
+ * WP_WebfontsLocal_Provider tests.
+ *
+ * @package    WordPress
+ * @subpackage Webfonts
+ */
 
 /**
- * @group  webfonts
- * @covers WP_WebfontsLocal_Provider
+ * @group webfonts
  */
-class WP_Webfonts_Provider_Local_Test extends WP_UnitTestCase {
+class Tests_Webfonts_WpWebfontsProviderLocal extends WP_UnitTestCase {
 	private $provider;
 	private $theme_root;
 	private $orig_theme_dir;
@@ -15,27 +20,6 @@ class WP_Webfonts_Provider_Local_Test extends WP_UnitTestCase {
 		$this->provider = new WP_Webfonts_Provider_Local();
 
 		$this->set_up_theme();
-	}
-
-	/**
-	 * Local `src` paths to need to be relative to the theme. This method sets up the
-	 * `wp-content/themes/` directory to ensure consistency when running tests.
-	 */
-	private function set_up_theme() {
-		$this->theme_root                = realpath( DIR_TESTDATA . '/themedir1' );
-		$this->orig_theme_dir            = $GLOBALS['wp_theme_directories'];
-		$GLOBALS['wp_theme_directories'] = array( $this->theme_root );
-
-		$theme_root_callback = function () {
-			return $this->theme_root;
-		};
-		add_filter( 'theme_root', $theme_root_callback );
-		add_filter( 'stylesheet_root', $theme_root_callback );
-		add_filter( 'template_root', $theme_root_callback );
-
-		// Clear caches.
-		wp_clean_themes_cache();
-		unset( $GLOBALS['wp_themes'] );
 	}
 
 	public function tear_down() {
@@ -79,7 +63,7 @@ class WP_Webfonts_Provider_Local_Test extends WP_UnitTestCase {
 	/**
 	 * @covers WP_Webfonts_Provider_Local::get_css
 	 *
-	 * @dataProvider data_get_css
+	 * @dataProvider data_get_css_print_styles
 	 *
 	 * @param array  $webfonts Prepared webfonts (to store in WP_Webfonts_Provider_Local::$webfonts property).
 	 * @param string $expected Expected CSS.
@@ -88,7 +72,24 @@ class WP_Webfonts_Provider_Local_Test extends WP_UnitTestCase {
 		$property = $this->get_webfonts_property();
 		$property->setValue( $this->provider, $webfonts );
 
-		$this->assertSame( $expected, $this->provider->get_css() );
+		$this->assertSame( $expected['font-face-css'], $this->provider->get_css() );
+	}
+
+	/**
+	 * @covers WP_Webfonts_Provider_Local::print_styles
+	 *
+	 * @dataProvider data_get_css_print_styles
+	 *
+	 * @param array  $webfonts Prepared webfonts (to store in WP_Webfonts_Provider_Local::$webfonts property).
+	 * @param string $expected Expected CSS.
+	 */
+	public function test_print_styles( array $webfonts, $expected ) {
+		$property = $this->get_webfonts_property();
+		$property->setValue( $this->provider, $webfonts );
+
+		$expected_output = sprintf( $expected['style-element'], $expected['font-face-css'] );
+		$this->expectOutputString( $expected_output );
+		$this->provider->print_styles();
 	}
 
 	/**
@@ -96,7 +97,7 @@ class WP_Webfonts_Provider_Local_Test extends WP_UnitTestCase {
 	 *
 	 * @return array
 	 */
-	public function data_get_css() {
+	public function data_get_css_print_styles() {
 		return array(
 			'truetype format' => array(
 				'webfonts' => array(
@@ -108,10 +109,13 @@ class WP_Webfonts_Provider_Local_Test extends WP_UnitTestCase {
 						'src'         => 'http://example.org/assets/fonts/OpenSans-Italic-VariableFont_wdth,wght.ttf',
 					),
 				),
-				'expected' => <<<CSS
+				'expected' => array(
+					'style-element' => "<style id='wp-webfonts-local' type='text/css'>\n%s\n</style>\n",
+					'font-face-css' => <<<CSS
 @font-face{font-family:"Open Sans";font-style:italic;font-weight:bold;src:local("Open Sans"), url('http://example.org/assets/fonts/OpenSans-Italic-VariableFont_wdth,wght.ttf') format('truetype');}
 CSS
-			,
+					,
+				),
 			),
 			'woff2 format'    => array(
 				'webfonts' => array(
@@ -132,12 +136,37 @@ CSS
 						'src'          => 'http://example.org/assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2',
 					),
 				),
-				'expected' => <<<CSS
+				'expected' => array(
+					'style-element' => "<style id='wp-webfonts-local' type='text/css'>\n%s\n</style>\n",
+					'font-face-css' => <<<CSS
 @font-face{font-family:"Source Serif Pro";font-style:normal;font-weight:200 900;font-stretch:normal;src:local("Source Serif Pro"), url('http://example.org/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2') format('woff2');}@font-face{font-family:"Source Serif Pro";font-style:italic;font-weight:200 900;font-stretch:normal;src:local("Source Serif Pro"), url('http://example.org/assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2') format('woff2');}
 CSS
-			,
+
+					,
+				),
 			),
 		);
+	}
+
+	/**
+	 * Local `src` paths to need to be relative to the theme. This method sets up the
+	 * `wp-content/themes/` directory to ensure consistency when running tests.
+	 */
+	private function set_up_theme() {
+		$this->theme_root                = realpath( DIR_TESTDATA . '/themedir1' );
+		$this->orig_theme_dir            = $GLOBALS['wp_theme_directories'];
+		$GLOBALS['wp_theme_directories'] = array( $this->theme_root );
+
+		$theme_root_callback = function () {
+			return $this->theme_root;
+		};
+		add_filter( 'theme_root', $theme_root_callback );
+		add_filter( 'stylesheet_root', $theme_root_callback );
+		add_filter( 'template_root', $theme_root_callback );
+
+		// Clear caches.
+		wp_clean_themes_cache();
+		unset( $GLOBALS['wp_themes'] );
 	}
 
 	private function get_webfonts_property() {

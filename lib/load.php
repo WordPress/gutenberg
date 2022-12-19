@@ -89,18 +89,24 @@ require __DIR__ . '/compat/wordpress-6.2/widgets.php';
 // Experimental features.
 remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WP 6.0's stopgap handler for Webfonts API.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
-require __DIR__ . '/experimental/register-webfonts-from-theme-json.php';
 if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
 	require __DIR__ . '/experimental/html/index.php';
 }
 require __DIR__ . '/experimental/class-wp-theme-json-resolver-gutenberg.php';
-require __DIR__ . '/experimental/class-wp-webfonts.php';
-require __DIR__ . '/experimental/class-wp-webfonts-provider.php';
-require __DIR__ . '/experimental/class-wp-webfonts-provider-local.php';
-require __DIR__ . '/experimental/webfonts.php';
+require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/navigation-page.php';
 require __DIR__ . '/experimental/kses.php';
+
+// Web Fonts API.
+require __DIR__ . '/experimental/webfonts-deprecations.php'; // Temporary deprecated functions.
+require __DIR__ . '/experimental/class-wp-webfonts.php'; // Temporary deprecated class.
+require __DIR__ . '/experimental/class-wp-webfonts-utils.php';
+require __DIR__ . '/experimental/register-webfonts-from-theme-json.php';
+require __DIR__ . '/experimental/class-wp-web-fonts.php';
+require __DIR__ . '/experimental/class-wp-webfonts-provider.php';
+require __DIR__ . '/experimental/class-wp-webfonts-provider-local.php';
+require __DIR__ . '/experimental/webfonts.php';
 
 // Plugin specific code.
 require __DIR__ . '/class-wp-theme-json-gutenberg.php';
