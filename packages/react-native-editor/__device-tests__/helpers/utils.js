@@ -316,6 +316,7 @@ const clickElementOutsideOfTextInput = async ( driver, element ) => {
 const longPressMiddleOfElement = async (
 	driver,
 	element,
+	waitTime = 5000, // Setting to wait a bit longer because this is failing more frequently on the CI
 	customElementSize
 ) => {
 	const location = await element.getLocation();
@@ -326,7 +327,7 @@ const longPressMiddleOfElement = async (
 
 	const action = new wd.TouchAction( driver )
 		.longPress( { x, y } )
-		.wait( 5000 ) // Setting to wait a bit longer because this is failing more frequently on the CI
+		.wait( waitTime )
 		.release();
 	await action.perform();
 };

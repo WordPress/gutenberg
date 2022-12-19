@@ -314,6 +314,7 @@ class EditorPage {
 			await longPressMiddleOfElement(
 				this.driver,
 				addButton,
+				8000,
 				customElementSize
 			);
 			const addBlockBeforeButtonLocator = isAndroid()
