@@ -95,6 +95,12 @@
 		}
 	}
 
+	.block-editor-inserter__toggle.components-button.has-icon {
+		path {
+			color: $white;
+		}
+	}
+
 	// This content only shows up inside the empty appender.
 	.block-editor-default-block-appender__content {
 		display: none;
