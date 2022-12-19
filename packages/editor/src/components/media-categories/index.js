@@ -127,6 +127,7 @@ const inserterMediaCategories = [
 		label: 'Openverse',
 		name: 'openverse',
 		mediaType: 'image',
+		description: <p>{ __( 'Disclaimer message' ) }</p>,
 		async fetch( query = {} ) {
 			const defaultArgs = {
 				mature: false,

@@ -60,6 +60,7 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 					category.label.toLocaleLowerCase()
 				) }
 			/>
+			{ category.description }
 			{ isLoading && (
 				<div className={ `${ baseCssClass }-spinner` }>
 					<Spinner />
