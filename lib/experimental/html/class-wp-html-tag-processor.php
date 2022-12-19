@@ -1341,12 +1341,12 @@ class WP_HTML_Tag_Processor {
 	 */
 	private static function sort_start_ascending( $a, $b ) {
 		$by_start = $a->start - $b->start;
-		if ( $by_start !== 0 ) {
+		if ( 0 !== $by_start ) {
 			return $by_start;
 		}
 
 		$by_text = isset( $a->text, $b->text ) ? strcmp( $a->text, $b->text ) : 0;
-		if ( $by_text !== 0 ) {
+		if ( 0 !== $by_text ) {
 			return $by_text;
 		}
 
