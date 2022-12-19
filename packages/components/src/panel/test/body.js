@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -10,10 +10,8 @@ import { PanelBody } from '../body';
 
 const getPanelBody = ( container ) =>
 	container.querySelector( '.components-panel__body' );
-const getPanelBodyContent = ( container ) =>
-	container.querySelector( '.components-panel__body > div' );
-const getPanelToggle = ( container ) =>
-	container.querySelector( '.components-panel__body-toggle' );
+const getPanelBodyContent = () => screen.queryByTestId( 'inner-content' );
+const getPanelToggle = () => screen.getByRole( 'button', { name: 'Panel' } );
 
 describe( 'PanelBody', () => {
 	describe( 'basic rendering', () => {
@@ -28,7 +26,7 @@ describe( 'PanelBody', () => {
 		it( 'should render inner content, if opened', () => {
 			const { container } = render(
 				<PanelBody opened={ true }>
-					<div className="inner-content">Content</div>
+					<div data-testid="inner-content">Content</div>
 				</PanelBody>
 			);
 			const panelContent = getPanelBodyContent( container );
@@ -39,7 +37,7 @@ describe( 'PanelBody', () => {
 		it( 'should be opened by default', () => {
 			const { container } = render(
 				<PanelBody>
-					<div>Content</div>
+					<div data-testid="inner-content">Content</div>
 				</PanelBody>
 			);
 			const panelContent = getPanelBodyContent( container );
@@ -50,7 +48,7 @@ describe( 'PanelBody', () => {
 		it( 'should render as initially opened, if specified', () => {
 			const { container } = render(
 				<PanelBody initialOpen={ true }>
-					<div>Content</div>
+					<div data-testid="inner-content">Content</div>
 				</PanelBody>
 			);
 			const panelContent = getPanelBodyContent( container );
@@ -61,7 +59,11 @@ describe( 'PanelBody', () => {
 		it( 'should call the children function, if specified', () => {
 			const { container, rerender } = render(
 				<PanelBody opened={ true }>
-					{ ( { opened } ) => <div hidden={ opened }>Content</div> }
+					{ ( { opened } ) => (
+						<div hidden={ opened } data-testid="inner-content">
+							Content
+						</div>
+					) }
 				</PanelBody>
 			);
 			let panelContent = getPanelBodyContent( container );
@@ -71,7 +73,11 @@ describe( 'PanelBody', () => {
 
 			rerender(
 				<PanelBody opened={ false }>
-					{ ( { opened } ) => <div hidden={ opened }>Content</div> }
+					{ ( { opened } ) => (
+						<div hidden={ opened } data-testid="inner-content">
+							Content
+						</div>
+					) }
 				</PanelBody>
 			);
 			panelContent = getPanelBodyContent( container );
@@ -85,7 +91,7 @@ describe( 'PanelBody', () => {
 		it( 'should toggle collapse with opened prop', () => {
 			const { container, rerender } = render(
 				<PanelBody opened={ true }>
-					<div>Content</div>
+					<div data-testid="inner-content">Content</div>
 				</PanelBody>
 			);
 			let panelContent = getPanelBodyContent( container );
@@ -94,7 +100,7 @@ describe( 'PanelBody', () => {
 
 			rerender(
 				<PanelBody opened={ false }>
-					<div>Content</div>
+					<div data-testid="inner-content">Content</div>
 				</PanelBody>
 			);
 
@@ -104,7 +110,7 @@ describe( 'PanelBody', () => {
 
 			rerender(
 				<PanelBody opened={ true }>
-					<div>Content</div>
+					<div data-testid="inner-content">Content</div>
 				</PanelBody>
 			);
 
@@ -116,7 +122,7 @@ describe( 'PanelBody', () => {
 		it( 'should toggle when clicking header', () => {
 			const { container } = render(
 				<PanelBody title="Panel" initialOpen={ false }>
-					<div>Content</div>
+					<div data-testid="inner-content">Content</div>
 				</PanelBody>
 			);
 			let panelContent = getPanelBodyContent( container );
@@ -142,7 +148,7 @@ describe( 'PanelBody', () => {
 
 			const { container } = render(
 				<PanelBody title="Panel" buttonProps={ { onClick: mock } }>
-					<div>Content</div>
+					<div data-testid="inner-content">Content</div>
 				</PanelBody>
 			);
 
