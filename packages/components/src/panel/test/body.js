@@ -29,7 +29,7 @@ describe( 'PanelBody', () => {
 					<div data-testid="inner-content">Content</div>
 				</PanelBody>
 			);
-			const panelContent = screen.queryByTestId( 'inner-content' );
+			const panelContent = screen.getByTestId( 'inner-content' );
 
 			expect( panelContent ).toBeVisible();
 		} );
@@ -40,7 +40,7 @@ describe( 'PanelBody', () => {
 					<div data-testid="inner-content">Content</div>
 				</PanelBody>
 			);
-			const panelContent = screen.queryByTestId( 'inner-content' );
+			const panelContent = screen.getByTestId( 'inner-content' );
 
 			expect( panelContent ).toBeVisible();
 		} );
@@ -51,7 +51,7 @@ describe( 'PanelBody', () => {
 					<div data-testid="inner-content">Content</div>
 				</PanelBody>
 			);
-			const panelContent = screen.queryByTestId( 'inner-content' );
+			const panelContent = screen.getByTestId( 'inner-content' );
 
 			expect( panelContent ).toBeVisible();
 		} );
@@ -66,7 +66,7 @@ describe( 'PanelBody', () => {
 					) }
 				</PanelBody>
 			);
-			let panelContent = screen.queryByTestId( 'inner-content' );
+			let panelContent = screen.getByTestId( 'inner-content' );
 
 			expect( panelContent ).toBeInTheDocument();
 			expect( panelContent ).not.toBeVisible();
@@ -81,7 +81,7 @@ describe( 'PanelBody', () => {
 					) }
 				</PanelBody>
 			);
-			panelContent = screen.queryByTestId( 'inner-content' );
+			panelContent = screen.getByTestId( 'inner-content' );
 
 			expect( panelContent ).toBeVisible();
 			expect( panelContent ).not.toHaveAttribute( 'hidden' );
@@ -95,7 +95,7 @@ describe( 'PanelBody', () => {
 					<div data-testid="inner-content">Content</div>
 				</PanelBody>
 			);
-			let panelContent = screen.queryByTestId( 'inner-content' );
+			let panelContent = screen.getByTestId( 'inner-content' );
 
 			expect( panelContent ).toBeVisible();
 
@@ -115,7 +115,7 @@ describe( 'PanelBody', () => {
 				</PanelBody>
 			);
 
-			panelContent = screen.queryByTestId( 'inner-content' );
+			panelContent = screen.getByTestId( 'inner-content' );
 
 			expect( panelContent ).toBeVisible();
 		} );
@@ -133,7 +133,7 @@ describe( 'PanelBody', () => {
 
 			fireEvent.click( panelToggle );
 
-			panelContent = screen.queryByTestId( 'inner-content' );
+			panelContent = screen.getByTestId( 'inner-content' );
 
 			expect( panelContent ).toBeVisible();
 
