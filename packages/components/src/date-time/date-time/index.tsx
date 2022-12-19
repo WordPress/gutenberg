@@ -43,14 +43,14 @@ function UnforwardedDateTimePicker(
 	if ( ! __nextRemoveHelpButton ) {
 		deprecated( 'Help button in wp.components.DateTimePicker', {
 			since: '13.4',
-			version: '14.6', // Six months of plugin releases.
+			version: '15.8', // One year of plugin releases.
 			hint: 'Set the `__nextRemoveHelpButton` prop to `true` to remove this warning and opt in to the new behaviour, which will become the default in a future version.',
 		} );
 	}
 	if ( ! __nextRemoveResetButton ) {
 		deprecated( 'Reset button in wp.components.DateTimePicker', {
 			since: '13.4',
-			version: '14.6', // Six months of plugin releases.
+			version: '15.8', // One year of plugin releases.
 			hint: 'Set the `__nextRemoveResetButton` prop to `true` to remove this warning and opt in to the new behaviour, which will become the default in a future version.',
 		} );
 	}

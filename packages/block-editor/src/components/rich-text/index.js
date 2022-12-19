@@ -44,6 +44,7 @@ import { useFormatTypes } from './use-format-types';
 import { useRemoveBrowserShortcuts } from './use-remove-browser-shortcuts';
 import { useShortcuts } from './use-shortcuts';
 import { useInputEvents } from './use-input-events';
+import { useInsertReplacementText } from './use-insert-replacement-text';
 import { useFirefoxCompat } from './use-firefox-compat';
 import FormatEdit from './format-edit';
 import { getMultilineTag, getAllowedFormats } from './utils';
@@ -97,7 +98,6 @@ function RichTextWrapper(
 		onReplace,
 		placeholder,
 		allowedFormats,
-		formattingControls,
 		withoutInteractiveFormatting,
 		onRemove,
 		onMerge,
@@ -165,7 +165,6 @@ function RichTextWrapper(
 	const multilineTag = getMultilineTag( multiline );
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
-		formattingControls,
 		disableFormats,
 	} );
 	const hasFormats =
@@ -369,6 +368,7 @@ function RichTextWrapper(
 						<Popover.__unstableSlotNameProvider value="__unstable-block-tools-after">
 							{ children &&
 								children( { value, onChange, onFocus } ) }
+
 							<FormatEdit
 								value={ value }
 								onChange={ onChange }
@@ -408,6 +408,7 @@ function RichTextWrapper(
 						onReplace,
 						selectionChange,
 					} ),
+					useInsertReplacementText(),
 					useRemoveBrowserShortcuts(),
 					useShortcuts( keyboardShortcuts ),
 					useInputEvents( inputEvents ),

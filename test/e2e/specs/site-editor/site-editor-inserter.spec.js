@@ -16,8 +16,9 @@ test.describe( 'Site Editor Inserter', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test.beforeEach( async ( { admin } ) => {
+	test.beforeEach( async ( { admin, siteEditor } ) => {
 		await admin.visitSiteEditor();
+		await siteEditor.enterEditMode();
 	} );
 
 	test( 'inserter toggle button should toggle global inserter', async ( {

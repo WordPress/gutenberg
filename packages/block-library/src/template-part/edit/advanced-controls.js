@@ -7,12 +7,18 @@ import { sprintf, __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { TemplatePartImportControls } from './import-controls';
+
 export function TemplatePartAdvancedControls( {
 	tagName,
 	setAttributes,
 	isEntityAvailable,
 	templatePartId,
 	defaultWrapper,
+	hasInnerBlocks,
 } ) {
 	const [ area, setArea ] = useEntityProp(
 		'postType',
@@ -87,6 +93,12 @@ export function TemplatePartAdvancedControls( {
 				value={ tagName || '' }
 				onChange={ ( value ) => setAttributes( { tagName: value } ) }
 			/>
+			{ ! hasInnerBlocks && (
+				<TemplatePartImportControls
+					area={ area }
+					setAttributes={ setAttributes }
+				/>
+			) }
 		</InspectorControls>
 	);
 }

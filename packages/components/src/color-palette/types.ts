@@ -24,7 +24,7 @@ type PaletteProps = {
 	/**
 	 * Callback called when a color is selected.
 	 */
-	onChange: ( newColor?: string ) => void;
+	onChange: ( newColor?: string, index?: number ) => void;
 	value?: string;
 	actions?: ReactNode;
 };

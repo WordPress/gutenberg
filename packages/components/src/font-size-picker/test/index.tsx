@@ -147,11 +147,19 @@ describe( 'FontSizePicker', () => {
 		);
 
 		test.each( [
-			{ option: 'Default', value: '8px', expectedValue: undefined },
-			{ option: 'Tiny 8', value: undefined, expectedValue: '8px' },
+			{
+				option: 'Default',
+				value: '8px',
+				expectedArguments: [ undefined ],
+			},
+			{
+				option: 'Tiny 8',
+				value: undefined,
+				expectedArguments: [ '8px', fontSizes[ 0 ] ],
+			},
 		] )(
-			'calls onChange( $expectedValue ) when $option is selected',
-			async ( { option, value, expectedValue } ) => {
+			'calls onChange( $expectedArguments ) when $option is selected',
+			async ( { option, value, expectedArguments } ) => {
 				const user = userEvent.setup( {
 					advanceTimers: jest.advanceTimersByTime,
 				} );
@@ -171,7 +179,7 @@ describe( 'FontSizePicker', () => {
 					screen.getByRole( 'option', { name: option } )
 				);
 				expect( onChange ).toHaveBeenCalledTimes( 1 );
-				expect( onChange ).toHaveBeenCalledWith( expectedValue );
+				expect( onChange ).toHaveBeenCalledWith( ...expectedArguments );
 			}
 		);
 
@@ -282,18 +290,37 @@ describe( 'FontSizePicker', () => {
 		);
 
 		test.each( [
-			{ option: 'Default', value: '8px', expectedValue: undefined },
-			{ option: 'Tiny 8px', value: undefined, expectedValue: '8px' },
-			{ option: 'Small 1em', value: '8px', expectedValue: '1em' },
-			{ option: 'Medium 2rem', value: '8px', expectedValue: '2rem' },
+			{
+				option: 'Default',
+				value: '8px',
+				expectedArguments: [ undefined ],
+			},
+			{
+				option: 'Tiny 8px',
+				value: undefined,
+				expectedArguments: [ '8px', fontSizes[ 0 ] ],
+			},
+			{
+				option: 'Small 1em',
+				value: '8px',
+				expectedArguments: [ '1em', fontSizes[ 1 ] ],
+			},
+			{
+				option: 'Medium 2rem',
+				value: '8px',
+				expectedArguments: [ '2rem', fontSizes[ 2 ] ],
+			},
 			{
 				option: 'Large',
 				value: '8px',
-				expectedValue: 'clamp(1.75rem, 3vw, 2.25rem)',
+				expectedArguments: [
+					'clamp(1.75rem, 3vw, 2.25rem)',
+					fontSizes[ 3 ],
+				],
 			},
 		] )(
 			'calls onChange( $expectedValue ) when $option is selected',
-			async ( { option, value, expectedValue } ) => {
+			async ( { option, value, expectedArguments } ) => {
 				const user = userEvent.setup( {
 					advanceTimers: jest.advanceTimersByTime,
 				} );
@@ -313,7 +340,7 @@ describe( 'FontSizePicker', () => {
 					screen.getByRole( 'option', { name: option } )
 				);
 				expect( onChange ).toHaveBeenCalledTimes( 1 );
-				expect( onChange ).toHaveBeenCalledWith( expectedValue );
+				expect( onChange ).toHaveBeenCalledWith( ...expectedArguments );
 			}
 		);
 
@@ -405,7 +432,7 @@ describe( 'FontSizePicker', () => {
 			);
 			await user.click( screen.getByRole( 'radio', { name: 'Medium' } ) );
 			expect( onChange ).toHaveBeenCalledTimes( 1 );
-			expect( onChange ).toHaveBeenCalledWith( '16px' );
+			expect( onChange ).toHaveBeenCalledWith( '16px', fontSizes[ 1 ] );
 		} );
 
 		commonToggleGroupTests( fontSizes );
@@ -481,16 +508,19 @@ describe( 'FontSizePicker', () => {
 		);
 
 		test.each( [
-			{ radio: 'Small', expectedValue: '12px' },
-			{ radio: 'Medium', expectedValue: '1em' },
-			{ radio: 'Large', expectedValue: '2rem' },
+			{ radio: 'Small', expectedArguments: [ '12px', fontSizes[ 0 ] ] },
+			{ radio: 'Medium', expectedArguments: [ '1em', fontSizes[ 1 ] ] },
+			{ radio: 'Large', expectedArguments: [ '2rem', fontSizes[ 2 ] ] },
 			{
 				radio: 'Extra Large',
-				expectedValue: 'clamp(1.75rem, 3vw, 2.25rem)',
+				expectedArguments: [
+					'clamp(1.75rem, 3vw, 2.25rem)',
+					fontSizes[ 3 ],
+				],
 			},
 		] )(
-			'calls onChange( $expectedValue ) when $radio is selected',
-			async ( { radio, expectedValue } ) => {
+			'calls onChange( $expectedArguments ) when $radio is selected',
+			async ( { radio, expectedArguments } ) => {
 				const user = userEvent.setup( {
 					advanceTimers: jest.advanceTimersByTime,
 				} );
@@ -506,7 +536,7 @@ describe( 'FontSizePicker', () => {
 					screen.getByRole( 'radio', { name: radio } )
 				);
 				expect( onChange ).toHaveBeenCalledTimes( 1 );
-				expect( onChange ).toHaveBeenCalledWith( expectedValue );
+				expect( onChange ).toHaveBeenCalledWith( ...expectedArguments );
 			}
 		);
 

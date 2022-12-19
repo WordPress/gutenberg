@@ -102,18 +102,20 @@ export function isOfTypes( value, types ) {
  * commentAttributes returns the attribute value depending on its source
  * definition of the given attribute key.
  *
- * @param {string}      attributeKey      Attribute key.
- * @param {Object}      attributeSchema   Attribute's schema.
- * @param {string|Node} innerHTML         Block's raw content.
- * @param {Object}      commentAttributes Block's comment attributes.
+ * @param {string} attributeKey      Attribute key.
+ * @param {Object} attributeSchema   Attribute's schema.
+ * @param {Node}   innerDOM          Parsed DOM of block's inner HTML.
+ * @param {Object} commentAttributes Block's comment attributes.
+ * @param {string} innerHTML         Raw HTML from block node's innerHTML property.
  *
  * @return {*} Attribute value.
  */
 export function getBlockAttribute(
 	attributeKey,
 	attributeSchema,
-	innerHTML,
-	commentAttributes
+	innerDOM,
+	commentAttributes,
+	innerHTML
 ) {
 	let value;
 
@@ -125,6 +127,10 @@ export function getBlockAttribute(
 				? commentAttributes[ attributeKey ]
 				: undefined;
 			break;
+		// raw source means that it's the original raw block content.
+		case 'raw':
+			value = innerHTML;
+			break;
 		case 'attribute':
 		case 'property':
 		case 'html':
@@ -133,7 +139,7 @@ export function getBlockAttribute(
 		case 'node':
 		case 'query':
 		case 'tag':
-			value = parseWithAttributeSchema( innerHTML, attributeSchema );
+			value = parseWithAttributeSchema( innerDOM, attributeSchema );
 			break;
 	}
 
@@ -270,7 +276,7 @@ export function getBlockAttributes(
 	const blockType = normalizeBlockType( blockTypeOrName );
 
 	const blockAttributes = mapValues( blockType.attributes, ( schema, key ) =>
-		getBlockAttribute( key, schema, doc, attributes )
+		getBlockAttribute( key, schema, doc, attributes, innerHTML )
 	);
 
 	return applyFilters(

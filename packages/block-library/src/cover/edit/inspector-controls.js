@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Fragment, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import {
 	Button,
 	ExternalLink,
@@ -146,7 +146,7 @@ export default function CoverInspectorControls( {
 				{ !! url && (
 					<PanelBody title={ __( 'Media settings' ) }>
 						{ isImageBackground && (
-							<Fragment>
+							<>
 								<ToggleControl
 									label={ __( 'Fixed background' ) }
 									checked={ hasParallax }
@@ -158,10 +158,11 @@ export default function CoverInspectorControls( {
 									checked={ isRepeated }
 									onChange={ toggleIsRepeated }
 								/>
-							</Fragment>
+							</>
 						) }
 						{ showFocalPointPicker && (
 							<FocalPointPicker
+								__nextHasNoMarginBottom
 								label={ __( 'Focal point picker' ) }
 								url={ url }
 								value={ focalPoint }
@@ -179,6 +180,7 @@ export default function CoverInspectorControls( {
 							isImageBackground &&
 							isImgElement && (
 								<TextareaControl
+									__nextHasNoMarginBottom
 									label={ __(
 										'Alt text (alternative text)'
 									) }
@@ -265,6 +267,7 @@ export default function CoverInspectorControls( {
 					panelId={ clientId }
 				>
 					<RangeControl
+						__nextHasNoMarginBottom
 						label={ __( 'Overlay opacity' ) }
 						value={ dimRatio }
 						onChange={ ( newDimRation ) =>
