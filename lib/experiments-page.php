@@ -89,6 +89,18 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 
+	add_settings_field(
+		'gutenberg-global-styles-custom-css',
+		__( 'Global styles custom css ', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Test the new global styles custom css input. This requires a user to have unfiltered html capabilities.', 'gutenberg' ),
+			'id'    => 'gutenberg-global-styles-custom-css',
+		)
+	);
+
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'
