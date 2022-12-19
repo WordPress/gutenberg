@@ -17,6 +17,7 @@ describe( 'PanelBody', () => {
 	describe( 'basic rendering', () => {
 		it( 'should render an empty div with the matching className', () => {
 			const { container } = render( <PanelBody /> );
+
 			const panelBody = getPanelBody( container );
 
 			expect( panelBody ).toBeVisible();
@@ -29,9 +30,8 @@ describe( 'PanelBody', () => {
 					<div data-testid="inner-content">Content</div>
 				</PanelBody>
 			);
-			const panelContent = screen.getByTestId( 'inner-content' );
 
-			expect( panelContent ).toBeVisible();
+			expect( screen.getByTestId( 'inner-content' ) ).toBeVisible();
 		} );
 
 		it( 'should be opened by default', () => {
@@ -40,9 +40,8 @@ describe( 'PanelBody', () => {
 					<div data-testid="inner-content">Content</div>
 				</PanelBody>
 			);
-			const panelContent = screen.getByTestId( 'inner-content' );
 
-			expect( panelContent ).toBeVisible();
+			expect( screen.getByTestId( 'inner-content' ) ).toBeVisible();
 		} );
 
 		it( 'should render as initially opened, if specified', () => {
@@ -51,9 +50,8 @@ describe( 'PanelBody', () => {
 					<div data-testid="inner-content">Content</div>
 				</PanelBody>
 			);
-			const panelContent = screen.getByTestId( 'inner-content' );
 
-			expect( panelContent ).toBeVisible();
+			expect( screen.getByTestId( 'inner-content' ) ).toBeVisible();
 		} );
 
 		it( 'should call the children function, if specified', () => {
@@ -153,9 +151,7 @@ describe( 'PanelBody', () => {
 				</PanelBody>
 			);
 
-			const panelToggle = screen.getByRole( 'button', { name: 'Panel' } );
-
-			fireEvent.click( panelToggle );
+			fireEvent.click( screen.getByRole( 'button', { name: 'Panel' } ) );
 
 			expect( mock ).toHaveBeenCalled();
 		} );
