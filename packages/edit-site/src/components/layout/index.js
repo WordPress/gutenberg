@@ -98,6 +98,7 @@ export default function Layout( { onError } ) {
 	// Ideally this effect could be removed if we move the "isMobileCanvasVisible" into the store.
 	const [ canvasResizer, canvasSize ] = useResizeObserver();
 	const [ fullResizer, fullSize ] = useResizeObserver();
+	const [ canvasContainerResizer, canvasContainerSize ] = useResizeObserver();
 	const [ forcedWidth, setForcedWidth ] = useState( null );
 	const [ isResizing, setIsResizing ] = useState( false );
 	useEffect( () => {
@@ -260,7 +261,7 @@ export default function Layout( { onError } ) {
 							paddingBottom: showFrame ? canvasPadding : 0,
 						} }
 					>
-						{ canvasResizer }
+						{ canvasContainerResizer }
 						<ResizableBox
 							size={ {
 								height: '100%',
@@ -273,6 +274,7 @@ export default function Layout( { onError } ) {
 							} }
 							className="edit-site-layout__resize-handle-container"
 							minWidth="100"
+							maxWidth={ canvasContainerSize.width }
 							enable={ {
 								left:
 									! isMobileViewport &&
