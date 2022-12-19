@@ -142,7 +142,11 @@ function NavigationMenuSelector( {
 		},
 	};
 
-	if ( ! hasNavigationMenus && ! hasClassicMenus ) {
+	if (
+		! hasNavigationMenus &&
+		! hasClassicMenus &&
+		! isOffCanvasNavigationEditorEnabled
+	) {
 		return (
 			<Button
 				className="wp-block-navigation__navigation-selector-button--createnew"
