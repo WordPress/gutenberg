@@ -161,7 +161,8 @@ add_filter(
 	'block_editor_settings_all',
 	function( $settings ) {
 		// We must override what core is passing now.
-		$settings['__unstableResolvedAssets'] = gutenberg_resolve_assets_override();
+		$settings['__unstableResolvedAssets']    = gutenberg_resolve_assets_override();
+		$settings['__unstableIsBlockBasedTheme'] = wp_is_block_theme();
 		return $settings;
 	},
 	100
