@@ -4,12 +4,20 @@
 import { FormTokenField } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { useState, useEffect } from '@wordpress/element';
+import { useDebounce } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { useTaxonomies } from '../../utils';
-import { MAX_FETCHED_TERMS } from '../../constants';
+
+const EMPTY_ARRAY = [];
+const BASE_QUERY = {
+	order: 'asc',
+	_fields: 'id,name',
+	context: 'view',
+};
 
 // Helper function to get the term id based on user input in terms `FormTokenField`.
 const getTermIdByTermValue = ( terms, termValue ) => {
@@ -33,20 +41,6 @@ const getTermIdByTermValue = ( terms, termValue ) => {
 	return terms.find(
 		( term ) => term.name.toLocaleLowerCase() === termValueLower
 	)?.id;
-};
-
-const useTaxonomyTerms = ( slug ) => {
-	return useSelect(
-		( select ) => {
-			const terms = select( coreStore ).getEntityRecords(
-				'taxonomy',
-				slug,
-				{ context: 'view', per_page: MAX_FETCHED_TERMS }
-			);
-			return { terms };
-		},
-		[ slug ]
-	);
 };
 
 export function TaxonomyControls( { onChange, query } ) {
@@ -73,7 +67,7 @@ export function TaxonomyControls( { onChange, query } ) {
 					<TaxonomyItem
 						key={ taxonomy.slug }
 						taxonomy={ taxonomy }
-						value={ value }
+						terms={ value }
 						onChange={ handleChange }
 					/>
 				);
@@ -81,41 +75,97 @@ export function TaxonomyControls( { onChange, query } ) {
 		</>
 	);
 }
-function TaxonomyItem( { taxonomy, value, onChange } ) {
-	const { terms } = useTaxonomyTerms( taxonomy.slug );
-	if ( ! terms?.length ) {
-		return null;
-	}
 
+function TaxonomyItem( { taxonomy, terms, onChange } ) {
+	const [ search, setSearch ] = useState( '' );
+	const [ value, setValue ] = useState( EMPTY_ARRAY );
+	const [ suggestions, setSuggestions ] = useState( EMPTY_ARRAY );
+	const debouncedSearch = useDebounce( setSearch, 250 );
+	const { searchResults, searchHasResolved } = useSelect(
+		( select ) => {
+			if ( ! search ) {
+				return { searchResults: EMPTY_ARRAY, searchHasResolved: true };
+			}
+			const { getEntityRecords, hasFinishedResolution } =
+				select( coreStore );
+			const selectorArgs = [
+				'taxonomy',
+				taxonomy.slug,
+				{
+					...BASE_QUERY,
+					search,
+					orderby: 'name',
+					exclude: terms,
+					per_page: 20,
+				},
+			];
+			return {
+				searchResults: getEntityRecords( ...selectorArgs ),
+				searchHasResolved: hasFinishedResolution(
+					'getEntityRecords',
+					selectorArgs
+				),
+			};
+		},
+		[ search, terms ]
+	);
+	const currentTerms = useSelect(
+		( select ) => {
+			if ( ! terms?.length ) return EMPTY_ARRAY;
+			const { getEntityRecords } = select( coreStore );
+			return getEntityRecords( 'taxonomy', taxonomy.slug, {
+				...BASE_QUERY,
+				include: terms,
+				per_page: terms.length,
+			} );
+		},
+		[ terms ]
+	);
+	// Update the `value` state only after the selectors are resolved
+	// to avoid emptying the input when we're changing terms.
+	useEffect( () => {
+		if ( ! terms?.length ) {
+			setValue( EMPTY_ARRAY );
+		}
+		if ( ! currentTerms?.length ) return;
+		// Returns only the existing entity ids. This prevents the component
+		// from crashing in the editor, when non existing ids are provided.
+		const sanitizedValue = terms.reduce( ( accumulator, id ) => {
+			const entity = currentTerms.find( ( term ) => term.id === id );
+			if ( entity ) {
+				accumulator.push( {
+					id,
+					value: entity.name,
+				} );
+			}
+			return accumulator;
+		}, [] );
+		setValue( sanitizedValue );
+	}, [ terms, currentTerms ] );
+	// Update suggestions only when the query has resolved.
+	useEffect( () => {
+		if ( ! searchHasResolved ) return;
+		setSuggestions( searchResults.map( ( result ) => result.name ) );
+	}, [ searchResults, searchHasResolved ] );
 	const onTermsChange = ( newTermValues ) => {
 		const termIds = new Set();
 		for ( const termValue of newTermValues ) {
-			const termId = getTermIdByTermValue( terms, termValue );
+			const termId = getTermIdByTermValue( searchResults, termValue );
 			if ( termId ) {
 				termIds.add( termId );
 			}
 		}
-
+		setSuggestions( EMPTY_ARRAY );
 		onChange( Array.from( termIds ) );
 	};
-
-	// Selects only the existing term ids in proper format to be
-	// used in `FormTokenField`. This prevents the component from
-	// crashing in the editor, when non existing term ids were provided.
-	const taxQueryValue = value
-		.map( ( termId ) => terms.find( ( t ) => t.id === termId ) )
-		.filter( Boolean )
-		.map( ( term ) => ( { id: term.id, value: term.name } ) );
-
 	return (
-		<div className="block-library-query-inspector__taxonomy-control">
-			<FormTokenField
-				label={ taxonomy.name }
-				value={ taxQueryValue }
-				suggestions={ terms.map( ( t ) => t.name ) }
-				onChange={ onTermsChange }
-				__experimentalShowHowTo={ false }
-			/>
-		</div>
+		<FormTokenField
+			label={ taxonomy.name }
+			value={ value }
+			onInputChange={ debouncedSearch }
+			suggestions={ suggestions }
+			onChange={ onTermsChange }
+			__experimentalShowHowTo={ false }
+		/>
 	);
 }
