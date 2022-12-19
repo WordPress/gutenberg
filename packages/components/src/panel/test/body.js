@@ -8,20 +8,12 @@ import { render, fireEvent, screen } from '@testing-library/react';
  */
 import { PanelBody } from '../body';
 
-const getPanelBody = ( container ) =>
-	// There currently isn't an accessible way to retrieve the panel body wrapper.
-	// eslint-disable-next-line testing-library/no-node-access
-	container.querySelector( '.components-panel__body' );
-
 describe( 'PanelBody', () => {
 	describe( 'basic rendering', () => {
 		it( 'should render an empty div with the matching className', () => {
 			const { container } = render( <PanelBody /> );
 
-			const panelBody = getPanelBody( container );
-
-			expect( panelBody ).toBeVisible();
-			expect( panelBody.tagName ).toBe( 'DIV' );
+			expect( container ).toMatchSnapshot();
 		} );
 
 		it( 'should render inner content, if opened', () => {
