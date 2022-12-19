@@ -56,6 +56,7 @@ describe( 'PanelBody', () => {
 					) }
 				</PanelBody>
 			);
+
 			let panelContent = screen.getByTestId( 'inner-content' );
 
 			expect( panelContent ).toBeInTheDocument();
@@ -71,6 +72,7 @@ describe( 'PanelBody', () => {
 					) }
 				</PanelBody>
 			);
+
 			panelContent = screen.getByTestId( 'inner-content' );
 
 			expect( panelContent ).toBeVisible();
@@ -85,6 +87,7 @@ describe( 'PanelBody', () => {
 					<div data-testid="inner-content">Content</div>
 				</PanelBody>
 			);
+
 			let panelContent = screen.getByTestId( 'inner-content' );
 
 			expect( panelContent ).toBeVisible();
@@ -116,6 +119,7 @@ describe( 'PanelBody', () => {
 					<div data-testid="inner-content">Content</div>
 				</PanelBody>
 			);
+
 			let panelContent = screen.queryByTestId( 'inner-content' );
 			const panelToggle = screen.getByRole( 'button', { name: 'Panel' } );
 
