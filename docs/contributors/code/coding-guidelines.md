@@ -136,9 +136,277 @@ export { __unstableDoTerribleAwfulAction } from './api';
 -   An **experimental API** is one which is planned for eventual public availability, but is subject to further experimentation, testing, and discussion.
 -   An **unstable API** is one which serves as a means to an end. It is not desired to ever be converted into a public API.
 
-In both cases, the API should be made stable or removed at the earliest opportunity.
+In both cases, the API should be made stable or removed at the earliest opportunity. 
 
 While an experimental API may often stabilize into a publicly-available API, there is no guarantee that it will. The conversion to a stable API will inherently be considered a breaking change by the mere fact that the function name must be changed to remove the `__experimental` prefix.
+
+#### Experimental APIs and WordPress Core
+
+Plugin and theme authors are forced to rely on the __experimental features that could get removed or changed in a backwards incompatible way at any time. It is a serious maintenance burden. Every new Gutenberg/WordPress release means potentially breaking changes.
+
+Ideally, the API wouldn't be introduced at all.
+
+Also, shipping essential features as experimental sends the wrong message to the developers: With all these __experimental APIs around, adding another one surely can't be a big deal. What does "experimental" even mean at this point? What is a valid use case, and what isn't?
+
+The number keeps growing unless something slows it down.
+
+It could be a project policy, but policies need enforcement. It is hard, it creates extra work, and it is discouraging for new contributors.
+
+How about a soft nudge? It could be a CI check or a bot that detects new __experimental APIs and tries to educate the PR author? Ideally, it would propose an alternative.
+
+#### General principles
+
+Avoid introducing public experimental APIs.
+
+Every experimental API is a liability. If that API is not removed or stabilized in time, it will get merged to the next major WordPress release and plugin authors will start relying on it. The Gutenberg plugin may not offer any BC guarantees for its public experimental APIs, but the WordPress core does. As of June 2022, a total of 280 __experimental APIs got merged to WordPress core and are there to stay.
+
+In contrast, non-exported experimental APIs are truly private and completely fine. They are an internal implementation detail, no different than any other non-exported function. Their name is their only distinguishing feature. They can be adjusted, refactored, and completely removed on a whim without affecting any WordPress plugin or theme.
+
+The tactical guidelines below will help you proceed without introducing new experimental APIs.
+
+#### General guidelines
+
+Some `__experimental` functions are exported in *package A* and only used in a single *package B* and nowhere else. Consider removing such functions from package A and making them private and non-exported members of package B.
+
+If your experimental API is only meant for the Gutenberg Plugin but not for the next WordPress major release, consider limiting the export to the plugin environment. For example, `@wordpress/components` could do that to receive early feedback about a new Component, but avoid bringing that component to WordPress core:
+
+```js
+if ( IS_GUTENBERG_PLUGIN ) {
+	export { __experimentalFunction } from './experiments';
+}
+```
+
+#### Replace experimental selectors with hooks
+
+In React components, you can replace public experimental selectors with non-exported React hooks:
+
+```js
+// Instead of this:
+	// selectors.js:
+	export function __unstableHasActiveBlockOverlayActive( state, parent ) { /* ... */ }
+	export function __unstableIsWithinBlockOverlay( state, clientId ) {
+		let parent = state.blocks.parents[ clientId ];
+		while ( !! parent ) {
+			if ( __unstableHasActiveBlockOverlayActive( state, parent ) ) {
+				return true;
+			}
+			parent = state.blocks.parents[ parent ];
+		}
+		return false;
+	}
+	// MyComponent.js:
+	function MyComponent({ clientId }) {
+		const { __unstableIsWithinBlockOverlay } = useSelect( myStore );
+		const isWithinBlockOverlay = __unstableIsWithinBlockOverlay( clientId );
+		// ...
+	}
+
+// Consider this:
+	// MyComponent.js:
+	function hasActiveBlockOverlayActive ( selectors, parent ) { /* ... */ }
+	function useIsWithinBlockOverlay( clientId ) {
+		return useSelect( ( select ) => {
+			const selectors = select( blockEditorStore ); 
+			let parent = selectors.getBlockRootClientId( clientId );
+			while ( !!parent ) {
+				if ( hasActiveBlockOverlayActive( selectors, parent ) ) {
+					return true;
+				}
+				parent = selectors.getBlockRootClientId( parent );
+			}
+			return false;
+		});
+	}
+	function MyComponent({ clientId }) {
+		const isWithinBlockOverlay = useIsWithinBlockOverlay( clientId );
+		// ...
+	}
+```
+
+If your experimental selector needs to access a part of the store that isn't
+accessible by the existing public selectors, you may access the store data directly
+via `useRegistry()`:
+
+```js
+function MyComponent() {
+	const registry = useRegistry();
+	const enabledFeatures = registry.stores['my-store'].store.getState().features;
+	// ...
+}
+```
+
+#### Replace experimental actions with hooks and thunks
+
+Public experimental actions can be replaced with non-exported React hooks:
+
+```js
+// Instead of this:
+	// actions.js:
+	export function __experimentalBeforeSave() {
+		return { type: 'BEFORE_SAVE' };
+	}
+	// MyComponent.js:
+	function MyComponent() {
+		const { __experimentalBeforeSave } = useDispatch( myStore );
+		const onClick = () => __experimentalBeforeSave();
+		// ...
+	}
+
+// Consider this:
+	// MyComponent.js:
+	function MyComponent() {
+		const registry = useRegistry();
+		const onClick = () => registry.stores['my-store'].store.dispatch({ type: 'BEFORE_SAVE' });
+		// ...
+	}
+```
+
+In addition, the existing public actions can dispatch private actions:
+
+```js
+export function toggleFeature( scope, featureName ) {
+    return function ( { dispatch } ) {
+		dispatch({ type: 'BEFORE_SAVE' })
+		// ...
+    };
+}
+```
+
+#### `lock()` and `unlock()`
+
+Use the `lock()` and `unlock()` API from `@wordpress/experiments` to
+privately export almost anything. See the examples below and learn more
+in the [`@wordpress/experiments` package README.md](https://github.com/WordPress/gutenberg/blob/HEAD/packages/experiments/README.md).
+
+##### Experimental selectors and actions
+
+Attach private selectors and actions to a public store:
+
+```js
+// In @wordpress/package1/store.js:
+import { __experimentalHasContentRoleAttribute } from './selectors';
+import { lock } from './experiments';
+
+export const store = registerStore(/* ... */);
+/* Attach a private selector to the exported store: */
+lock(store, {
+	__experimentalHasContentRoleAttribute
+});
+
+// In @wordpress/package2/MyComponent.js:
+import { store } from '@wordpress/package1';
+import { useSelect } from '@wordpress/data';
+import { unlock } from './experiments';
+
+function MyComponent() {
+    const hasRole = useSelect( ( select ) => (
+		// Use the private selector:
+        unlock( select( store ) ).__experimentalHasContentRoleAttribute()
+    ) );
+
+    // ...
+}
+```
+
+##### Experimental functions, classes, and variables
+
+```js
+// In @wordpress/package1/index.js:
+import { lock } from './experiments';
+
+export const experiments = {};
+/* Attach private data to the exported object */
+lock(store, {
+	__experimentalCallback: function() {},
+	__experimentalReactComponent: function MyComponent() { return <div/>; },
+	__experimentalClass: class Experiment{},
+	__experimentalVariable: 5,
+});
+
+
+// In @wordpress/package2/index.js:
+import { experiments } from '@wordpress/package1';
+import { unlock } from './experiments';
+
+const {
+	__experimentalCallback,
+	__experimentalReactComponent,
+	__experimentalClass,
+	__experimentalVariable
+} = unlock( experiments );
+```
+
+#### Experimental function arguments
+
+To add an experimental argument to a stable function you'll need
+to prepare a stable and an experimental version of that function.
+Then, export the stable function and `lock()` the unstable function
+inside it:
+
+```js
+// In @wordpress/package1/index.js:
+import { lock } from './experiments';
+
+export function log(data) {
+	__experimentalLog(data, 'log');
+}
+function __experimentalLog(data, __experimentalMethod) {
+	if(__experimentalMethod === 'log') {
+		console.log(data)
+	} else if(__experimentalMethod === 'table') {
+		console.table(data)
+	}
+}
+
+// In @wordpress/package2/index.js:
+import { log } from '@wordpress/package1';
+import { unlock } from './experiments';
+
+const __experimentalLog = unlock(log);
+__experimentalLog(data, 'table');
+// Or:
+unlock(log)('table');
+```
+
+#### Experimental React Component properties
+
+To add an experimental argument to a stable component you'll need
+to prepare a stable and an experimental version of that component.
+Then, export the stable function and `lock()` the unstable function
+inside it:
+
+```js
+// In @wordpress/package1/index.js:
+import { lock } from './experiments';
+
+export function DataListing({data}) {
+	return <ExperimentalDataListing data={data} format='list' />;
+}
+function ExperimentalDataListing({data, format}) {
+	if(format === 'list') {
+		return (<ul> {/* ... */} </ul>)
+	} else if(format === 'table') {
+		return (<table> {/* ... */} </table>)
+	}
+}
+
+// In @wordpress/package2/index.js:
+import { DataListing } from '@wordpress/package1';
+import { unlock } from './experiments';
+
+const ExperimentalDataListing = unlock(DataListing);
+export function MyComponent() {
+	return (
+		<ExperimentalDataListing data={data} format="table" />
+	)
+}
+```
+
+#### Experimental Block.json APIs
+
+In the future, the new `__experimental` APIs introduced in block.json and
+theme.json will only apply to the core WordPress blocks. Plugins and themes
+will not be able to use them.
 
 ### Objects
 
