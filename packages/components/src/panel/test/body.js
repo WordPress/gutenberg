@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, fireEvent, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -113,7 +114,11 @@ describe( 'PanelBody', () => {
 			expect( panelContent ).toBeVisible();
 		} );
 
-		it( 'should toggle when clicking header', () => {
+		it( 'should toggle when clicking header', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
 			render(
 				<PanelBody title="Panel" initialOpen={ false }>
 					<div data-testid="inner-content">Content</div>
@@ -125,20 +130,23 @@ describe( 'PanelBody', () => {
 
 			expect( panelContent ).not.toBeInTheDocument();
 
-			fireEvent.click( panelToggle );
+			await user.click( panelToggle );
 
 			panelContent = screen.getByTestId( 'inner-content' );
 
 			expect( panelContent ).toBeVisible();
 
-			fireEvent.click( panelToggle );
+			await user.click( panelToggle );
 
 			panelContent = screen.queryByTestId( 'inner-content' );
 
 			expect( panelContent ).not.toBeInTheDocument();
 		} );
 
-		it( 'should pass button props to panel title', () => {
+		it( 'should pass button props to panel title', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
 			const mock = jest.fn();
 
 			render(
@@ -147,7 +155,7 @@ describe( 'PanelBody', () => {
 				</PanelBody>
 			);
 
-			fireEvent.click( screen.getByRole( 'button', { name: 'Panel' } ) );
+			await user.click( screen.getByRole( 'button', { name: 'Panel' } ) );
 
 			expect( mock ).toHaveBeenCalled();
 		} );
