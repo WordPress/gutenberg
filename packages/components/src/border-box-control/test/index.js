@@ -201,20 +201,12 @@ describe( 'BorderBoxControl', () => {
 			);
 
 			const styleLabel = screen.queryByText( 'Style' );
-			const solidButton = screen.queryByRole( 'button', {
-				name: 'Solid',
-			} );
-			const dashedButton = screen.queryByRole( 'button', {
-				name: 'Dashed',
-			} );
-			const dottedButton = screen.queryByRole( 'button', {
-				name: 'Dotted',
+			const styleButtons = screen.queryAllByRole( 'button', {
+				name: /(Solid)|(Dashed)|(Dotted)/,
 			} );
 
 			expect( styleLabel ).not.toBeInTheDocument();
-			expect( solidButton ).not.toBeInTheDocument();
-			expect( dashedButton ).not.toBeInTheDocument();
-			expect( dottedButton ).not.toBeInTheDocument();
+			expect( styleButtons.length ).toBe( 0 );
 		} );
 	} );
 
@@ -292,7 +284,7 @@ describe( 'BorderBoxControl', () => {
 
 			for ( let i = 0; i < colorButtons.length; i++ ) {
 				// Click on the color button to show the color picker popover.
-				await user.click( colorButtons[ 0 ] );
+				await user.click( colorButtons[ i ] );
 
 				// Wait for color picker popover to fully appear
 				const colorPickerButton = screen.getByRole( 'button', {
@@ -305,23 +297,15 @@ describe( 'BorderBoxControl', () => {
 				);
 
 				const styleLabel = screen.queryByText( 'Style' );
-				const solidButton = screen.queryByRole( 'button', {
-					name: 'Solid',
-				} );
-				const dashedButton = screen.queryByRole( 'button', {
-					name: 'Dashed',
-				} );
-				const dottedButton = screen.queryByRole( 'button', {
-					name: 'Dotted',
+				const styleButtons = screen.queryAllByRole( 'button', {
+					name: /(Solid)|(Dashed)|(Dotted)/,
 				} );
 
 				expect( styleLabel ).not.toBeInTheDocument();
-				expect( solidButton ).not.toBeInTheDocument();
-				expect( dashedButton ).not.toBeInTheDocument();
-				expect( dottedButton ).not.toBeInTheDocument();
+				expect( styleButtons.length ).toBe( 0 );
 
 				// Click again to hide the popover.
-				await user.click( colorButtons[ 0 ] );
+				await user.click( colorButtons[ i ] );
 			}
 		} );
 	} );
