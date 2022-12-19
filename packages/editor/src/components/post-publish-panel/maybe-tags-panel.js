@@ -25,7 +25,17 @@ const TagsPanel = () => {
 		const store = select( coreStore );
 		return store.getTaxonomy( slug );
 	} );
-	const pluralName = get( tagsTaxonomy, [ 'labels', 'name' ], __( 'Tags' ) );
+	const labelWithFallback = (
+		labelProperty,
+		fallbackIsTag,
+		fallbackIsNotTag
+	) =>
+		get(
+			tagsTaxonomy,
+			[ 'labels', labelProperty ],
+			tagsTaxonomy.slug === 'tag' ? fallbackIsTag : fallbackIsNotTag
+		);
+	const pluralName = labelWithFallback( 'name', __( 'Tags' ), __( 'Terms' ) );
 	const addTerms = sprintf(
 		// translators: %s: Taxonomy terms input label
 		__( 'Add %s' ),

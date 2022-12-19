@@ -67,15 +67,27 @@ function MaybeCategoryPanel() {
 		return null;
 	}
 
-	const pluralName = get(
-		categoriesTaxonomy,
-		[ 'labels', 'name' ],
-		__( 'Categories' )
+	const labelWithFallback = (
+		labelProperty,
+		fallbackIsCategory,
+		fallbackIsNotCategory
+	) =>
+		get(
+			categoriesTaxonomy,
+			[ 'labels', labelProperty ],
+			categoriesTaxonomy.slug === 'category'
+				? fallbackIsCategory
+				: fallbackIsNotCategory
+		);
+	const pluralName = labelWithFallback(
+		'name',
+		__( 'Categories' ),
+		__( 'Terms' )
 	);
-	const singularName = get(
-		categoriesTaxonomy,
-		[ 'labels', 'singular_name' ],
-		__( 'Category' )
+	const singularName = labelWithFallback(
+		'singular_name',
+		__( 'Category' ),
+		__( 'Term' )
 	);
 	const panelBodyTitle = [
 		__( 'Suggestion:' ),
