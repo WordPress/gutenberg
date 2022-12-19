@@ -12,8 +12,6 @@ const getPanelBody = ( container ) =>
 	// There currently isn't an accessible way to retrieve the panel body wrapper.
 	// eslint-disable-next-line testing-library/no-node-access
 	container.querySelector( '.components-panel__body' );
-const getPanelBodyContent = () => screen.queryByTestId( 'inner-content' );
-const getPanelToggle = () => screen.getByRole( 'button', { name: 'Panel' } );
 
 describe( 'PanelBody', () => {
 	describe( 'basic rendering', () => {
@@ -21,45 +19,45 @@ describe( 'PanelBody', () => {
 			const { container } = render( <PanelBody /> );
 			const panelBody = getPanelBody( container );
 
-			expect( panelBody ).toBeTruthy();
+			expect( panelBody ).toBeVisible();
 			expect( panelBody.tagName ).toBe( 'DIV' );
 		} );
 
 		it( 'should render inner content, if opened', () => {
-			const { container } = render(
+			render(
 				<PanelBody opened={ true }>
 					<div data-testid="inner-content">Content</div>
 				</PanelBody>
 			);
-			const panelContent = getPanelBodyContent( container );
+			const panelContent = screen.queryByTestId( 'inner-content' );
 
-			expect( panelContent ).toBeTruthy();
+			expect( panelContent ).toBeVisible();
 		} );
 
 		it( 'should be opened by default', () => {
-			const { container } = render(
+			render(
 				<PanelBody>
 					<div data-testid="inner-content">Content</div>
 				</PanelBody>
 			);
-			const panelContent = getPanelBodyContent( container );
+			const panelContent = screen.queryByTestId( 'inner-content' );
 
-			expect( panelContent ).toBeTruthy();
+			expect( panelContent ).toBeVisible();
 		} );
 
 		it( 'should render as initially opened, if specified', () => {
-			const { container } = render(
+			render(
 				<PanelBody initialOpen={ true }>
 					<div data-testid="inner-content">Content</div>
 				</PanelBody>
 			);
-			const panelContent = getPanelBodyContent( container );
+			const panelContent = screen.queryByTestId( 'inner-content' );
 
-			expect( panelContent ).toBeTruthy();
+			expect( panelContent ).toBeVisible();
 		} );
 
 		it( 'should call the children function, if specified', () => {
-			const { container, rerender } = render(
+			const { rerender } = render(
 				<PanelBody opened={ true }>
 					{ ( { opened } ) => (
 						<div hidden={ opened } data-testid="inner-content">
@@ -68,9 +66,10 @@ describe( 'PanelBody', () => {
 					) }
 				</PanelBody>
 			);
-			let panelContent = getPanelBodyContent( container );
+			let panelContent = screen.queryByTestId( 'inner-content' );
 
-			expect( panelContent ).toBeTruthy();
+			expect( panelContent ).toBeInTheDocument();
+			expect( panelContent ).not.toBeVisible();
 			expect( panelContent ).toHaveAttribute( 'hidden', '' );
 
 			rerender(
@@ -82,23 +81,23 @@ describe( 'PanelBody', () => {
 					) }
 				</PanelBody>
 			);
-			panelContent = getPanelBodyContent( container );
+			panelContent = screen.queryByTestId( 'inner-content' );
 
-			expect( panelContent ).toBeTruthy();
+			expect( panelContent ).toBeVisible();
 			expect( panelContent ).not.toHaveAttribute( 'hidden' );
 		} );
 	} );
 
 	describe( 'toggling', () => {
 		it( 'should toggle collapse with opened prop', () => {
-			const { container, rerender } = render(
+			const { rerender } = render(
 				<PanelBody opened={ true }>
 					<div data-testid="inner-content">Content</div>
 				</PanelBody>
 			);
-			let panelContent = getPanelBodyContent( container );
+			let panelContent = screen.queryByTestId( 'inner-content' );
 
-			expect( panelContent ).toBeTruthy();
+			expect( panelContent ).toBeVisible();
 
 			rerender(
 				<PanelBody opened={ false }>
@@ -106,9 +105,9 @@ describe( 'PanelBody', () => {
 				</PanelBody>
 			);
 
-			panelContent = getPanelBodyContent( container );
+			panelContent = screen.queryByTestId( 'inner-content' );
 
-			expect( panelContent ).toBeFalsy();
+			expect( panelContent ).not.toBeInTheDocument();
 
 			rerender(
 				<PanelBody opened={ true }>
@@ -116,45 +115,45 @@ describe( 'PanelBody', () => {
 				</PanelBody>
 			);
 
-			panelContent = getPanelBodyContent( container );
+			panelContent = screen.queryByTestId( 'inner-content' );
 
-			expect( panelContent ).toBeTruthy();
+			expect( panelContent ).toBeVisible();
 		} );
 
 		it( 'should toggle when clicking header', () => {
-			const { container } = render(
+			render(
 				<PanelBody title="Panel" initialOpen={ false }>
 					<div data-testid="inner-content">Content</div>
 				</PanelBody>
 			);
-			let panelContent = getPanelBodyContent( container );
-			const panelToggle = getPanelToggle( container );
+			let panelContent = screen.queryByTestId( 'inner-content' );
+			const panelToggle = screen.getByRole( 'button', { name: 'Panel' } );
 
-			expect( panelContent ).toBeFalsy();
-
-			fireEvent.click( panelToggle );
-
-			panelContent = getPanelBodyContent( container );
-
-			expect( panelContent ).toBeTruthy();
+			expect( panelContent ).not.toBeInTheDocument();
 
 			fireEvent.click( panelToggle );
 
-			panelContent = getPanelBodyContent( container );
+			panelContent = screen.queryByTestId( 'inner-content' );
 
-			expect( panelContent ).toBeFalsy();
+			expect( panelContent ).toBeVisible();
+
+			fireEvent.click( panelToggle );
+
+			panelContent = screen.queryByTestId( 'inner-content' );
+
+			expect( panelContent ).not.toBeInTheDocument();
 		} );
 
 		it( 'should pass button props to panel title', () => {
 			const mock = jest.fn();
 
-			const { container } = render(
+			render(
 				<PanelBody title="Panel" buttonProps={ { onClick: mock } }>
 					<div data-testid="inner-content">Content</div>
 				</PanelBody>
 			);
 
-			const panelToggle = getPanelToggle( container );
+			const panelToggle = screen.getByRole( 'button', { name: 'Panel' } );
 
 			fireEvent.click( panelToggle );
 
