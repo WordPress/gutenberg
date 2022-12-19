@@ -96,7 +96,11 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test the new global styles custom css input. This requires a user to have unfiltered html capabilities.', 'gutenberg' ),
+			'label' => sprintf(
+				/* translators: %s: WordPress documentation for roles and capabilities. */
+				__( 'Test the Global Styles custom CSS field in the site editor. This requires a user to have <a href="%s">unfiltered html capabilities</a>.', 'gutenberg' ),
+				'https://wordpress.org/support/article/roles-and-capabilities/#unfiltered_html'
+			),
 			'id'    => 'gutenberg-global-styles-custom-css',
 		)
 	);
