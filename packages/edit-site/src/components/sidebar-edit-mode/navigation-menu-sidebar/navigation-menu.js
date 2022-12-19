@@ -3,6 +3,7 @@
  */
 import {
 	__experimentalListView as ListView,
+	__experimentalOffCanvasEditor as OffCanvasEditor,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
@@ -48,5 +49,14 @@ export default function NavigationMenu( { innerBlocks, id } ) {
 			}
 		} );
 	}, [ updateBlockListSettings, innerBlocks ] );
+
+	if ( window?.__experimentalEnableOffCanvasNavigationEditor ) {
+		return (
+			<OffCanvasEditor
+				blocks={ innerBlocks }
+				selectBlockInCanvas={ false }
+			/>
+		);
+	}
 	return <ListView id={ id } />;
 }

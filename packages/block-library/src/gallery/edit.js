@@ -20,6 +20,7 @@ import {
 	MediaPlaceholder,
 	InspectorControls,
 	useBlockProps,
+	useInnerBlocksProps,
 	BlockControls,
 	MediaReplaceFlow,
 } from '@wordpress/block-editor';
@@ -63,6 +64,7 @@ const linkOptions = [
 	},
 ];
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
+const allowedBlocks = [ 'core/image' ];
 
 const PLACEHOLDER_TEXT = Platform.isNative
 	? __( 'ADD MEDIA' )
@@ -483,8 +485,20 @@ function GalleryEdit( props ) {
 		className: classnames( className, 'has-nested-images' ),
 	} );
 
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		allowedBlocks,
+		orientation: 'horizontal',
+		renderAppender: false,
+		__experimentalLayout: { type: 'default', alignments: [] },
+	} );
+
 	if ( ! hasImages ) {
-		return <View { ...blockProps }>{ mediaPlaceholder }</View>;
+		return (
+			<View { ...innerBlocksProps }>
+				{ innerBlocksProps.children }
+				{ mediaPlaceholder }
+			</View>
+		);
 	}
 
 	const hasLinkTo = linkTo && linkTo !== 'none';
@@ -579,7 +593,7 @@ function GalleryEdit( props ) {
 						? mediaPlaceholder
 						: undefined
 				}
-				blockProps={ blockProps }
+				blockProps={ innerBlocksProps }
 				insertBlocksAfter={ insertBlocksAfter }
 			/>
 		</>

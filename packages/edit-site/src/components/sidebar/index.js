@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { memo } from '@wordpress/element';
 import { __experimentalNavigatorProvider as NavigatorProvider } from '@wordpress/components';
 
 /**
@@ -22,7 +23,7 @@ function SidebarScreens() {
 	);
 }
 
-export function Sidebar() {
+function Sidebar() {
 	return (
 		<NavigatorProvider
 			className="edit-site-sidebar__content"
@@ -32,3 +33,5 @@ export function Sidebar() {
 		</NavigatorProvider>
 	);
 }
+
+export default memo( Sidebar );

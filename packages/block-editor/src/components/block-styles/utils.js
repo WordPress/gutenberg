@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-import { find } from 'lodash';
-/**
  * WordPress dependencies
  */
 import TokenList from '@wordpress/token-list';
@@ -23,13 +19,15 @@ export function getActiveStyle( styles, className ) {
 		}
 
 		const potentialStyleName = style.substring( 9 );
-		const activeStyle = find( styles, { name: potentialStyleName } );
+		const activeStyle = styles?.find(
+			( { name } ) => name === potentialStyleName
+		);
 		if ( activeStyle ) {
 			return activeStyle;
 		}
 	}
 
-	return find( styles, 'isDefault' );
+	return getDefaultStyle( styles );
 }
 
 /**
@@ -88,5 +86,5 @@ export function getRenderedStyles( styles ) {
  * @return {Object?}        The default style object, if found.
  */
 export function getDefaultStyle( styles ) {
-	return find( styles, 'isDefault' );
+	return styles?.find( ( style ) => style.isDefault );
 }
