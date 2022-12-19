@@ -75,7 +75,7 @@ class WP_Style_Engine_Block_Style_Metadata_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests adding new second-level property metadata to the block styles definition.
+	 * Tests adding new second-level property metadata to the block styles definition and ignore `value_func` values.
 	 *
 	 * @covers ::add_metadata
 	 */

@@ -44,24 +44,29 @@ class WP_Style_Engine_Block_Style_Metadata {
 	/**
 	 * Adds block style metadata.
 	 *
-	 * @param array $metadata The $metadata.
+	 * @param array $new_metadata The $metadata to be added.
 	 *
 	 * @return WP_Style_Engine_Block_Style_Metadata Returns the object to allow chaining methods.
 	 */
-	public function add_metadata( $metadata = array() ) {
-		foreach ( $metadata as $definition_group_key => $definition_group_style ) {
+	public function add_metadata( $new_metadata = array() ) {
+		if ( empty( $new_metadata ) ) {
+			return $this;
+		}
+
+		foreach ( $new_metadata as $definition_group_key => $definition_group_style ) {
 			if ( ! is_array( $definition_group_style ) || empty( $definition_group_style ) ) {
 				continue;
 			}
 
-			if ( ! array_key_exists( $definition_group_key, $this->merged_block_support_metadata ) ) {
+			// Adds a new top-level group if it doesn't exist already.
+			if ( ! isset( $this->merged_block_support_metadata[ $definition_group_key ] ) ) {
 				$this->merged_block_support_metadata[ $definition_group_key ] = array();
 			}
 
 			foreach ( $definition_group_style as $style_definition_key => $style_definition ) {
 				// Bails early if merging metadata is attempting to overwrite existing, original style metadata.
-				if ( array_key_exists( $definition_group_key, $this->base_metadata )
-					&& array_key_exists( $style_definition_key, $this->base_metadata[ $definition_group_key ] ) ) {
+				if ( isset( $this->base_metadata[ $definition_group_key ] )
+					&& isset( $this->base_metadata[ $definition_group_key ][ $style_definition_key ] ) ) {
 					continue;
 				}
 
@@ -69,7 +74,8 @@ class WP_Style_Engine_Block_Style_Metadata {
 					continue;
 				}
 
-				$array_to_extend         = array_key_exists( $style_definition_key, $this->merged_block_support_metadata[ $definition_group_key ] ) ? $this->merged_block_support_metadata[ $definition_group_key ][ $style_definition_key ] : array();
+				$array_to_extend         = isset( $this->merged_block_support_metadata[ $definition_group_key ][ $style_definition_key ] )
+											? $this->merged_block_support_metadata[ $definition_group_key ][ $style_definition_key ] : array();
 				$merged_style_definition = $this->merge_custom_style_definitions_metadata( $array_to_extend, $style_definition );
 
 				if ( $merged_style_definition ) {
