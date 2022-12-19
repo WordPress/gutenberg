@@ -27,7 +27,7 @@ import {
 	getColorClassName,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
-import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { link as linkIcon, removeSubmenu } from '@wordpress/icons';
 import { useResourcePermissions } from '@wordpress/core-data';
@@ -438,7 +438,7 @@ export default function NavigationSubmenuEdit( {
 		! selectedBlockHasChildren || onlyDescendantIsEmptyLink;
 
 	return (
-		<Fragment>
+		<>
 			<BlockControls>
 				<ToolbarGroup>
 					{ ! openSubmenusOnClick && (
@@ -571,6 +571,6 @@ export default function NavigationSubmenuEdit( {
 				) }
 				<div { ...innerBlocksProps } />
 			</div>
-		</Fragment>
+		</>
 	);
 }
