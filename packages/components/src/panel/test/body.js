@@ -25,7 +25,7 @@ describe( 'PanelBody', () => {
 
 		it( 'should render inner content, if opened', () => {
 			render(
-				<PanelBody opened={ true }>
+				<PanelBody opened>
 					<div data-testid="inner-content">Content</div>
 				</PanelBody>
 			);
@@ -47,7 +47,7 @@ describe( 'PanelBody', () => {
 
 		it( 'should render as initially opened, if specified', () => {
 			render(
-				<PanelBody initialOpen={ true }>
+				<PanelBody initialOpen>
 					<div data-testid="inner-content">Content</div>
 				</PanelBody>
 			);
@@ -58,7 +58,7 @@ describe( 'PanelBody', () => {
 
 		it( 'should call the children function, if specified', () => {
 			const { rerender } = render(
-				<PanelBody opened={ true }>
+				<PanelBody opened>
 					{ ( { opened } ) => (
 						<div hidden={ opened } data-testid="inner-content">
 							Content
@@ -91,7 +91,7 @@ describe( 'PanelBody', () => {
 	describe( 'toggling', () => {
 		it( 'should toggle collapse with opened prop', () => {
 			const { rerender } = render(
-				<PanelBody opened={ true }>
+				<PanelBody opened>
 					<div data-testid="inner-content">Content</div>
 				</PanelBody>
 			);
@@ -110,7 +110,7 @@ describe( 'PanelBody', () => {
 			expect( panelContent ).not.toBeInTheDocument();
 
 			rerender(
-				<PanelBody opened={ true }>
+				<PanelBody opened>
 					<div data-testid="inner-content">Content</div>
 				</PanelBody>
 			);
