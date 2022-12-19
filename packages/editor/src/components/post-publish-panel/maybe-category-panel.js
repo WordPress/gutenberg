@@ -19,6 +19,7 @@ import HierarchicalTermSelector from '../post-taxonomies/hierarchical-term-selec
 import { store as editorStore } from '../../store';
 
 function MaybeCategoryPanel() {
+	const categoriesTaxonomy = useSelect( coreStore ).getTaxonomy( 'category' );
 	const hasNoCategory = useSelect( ( select ) => {
 		const postType = select( editorStore ).getCurrentPostType();
 		const { canUser, getEntityRecord, getTaxonomy } = select( coreStore );
