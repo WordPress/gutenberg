@@ -9,6 +9,8 @@ import { render, fireEvent, screen } from '@testing-library/react';
 import { PanelBody } from '../body';
 
 const getPanelBody = ( container ) =>
+	// There currently isn't an accessible way to retrieve the panel body wrapper.
+	// eslint-disable-next-line testing-library/no-node-access
 	container.querySelector( '.components-panel__body' );
 const getPanelBodyContent = () => screen.queryByTestId( 'inner-content' );
 const getPanelToggle = () => screen.getByRole( 'button', { name: 'Panel' } );
