@@ -8,4 +8,10 @@
 		word-break: normal;
 		overflow-wrap: break-word;
 	}
+
+	// Hide the description by default.
+	// If a theme opts-in to show descriptions, they will need to provide styles for them.
+	.wp-block-navigation-item__description {
+		display: none;
+	}
 }

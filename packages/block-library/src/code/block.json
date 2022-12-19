@@ -15,14 +15,15 @@
 	},
 	"supports": {
 		"anchor": true,
-		"__experimentalSelector": ".wp-block-code > code",
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
-			"__experimentalFontStyle": true,
+			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
-			"__experimentalLetterSpacing": true,
+			"__experimentalFontStyle": true,
 			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
@@ -44,7 +45,11 @@
 		"color": {
 			"text": true,
 			"background": true,
-			"gradients": true
+			"gradients": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
 		}
 	},
 	"style": "wp-block-code"

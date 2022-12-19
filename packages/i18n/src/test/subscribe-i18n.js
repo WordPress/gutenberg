@@ -21,24 +21,24 @@ describe( 'i18n updates', () => {
 
 		i18n.subscribe( doTranslation );
 
-		// do translation on empty instance with no translation data
+		// Do translation on empty instance with no translation data.
 		doTranslation();
 
-		// set translation data
+		// Set translation data.
 		i18n.setLocaleData( {
 			original: [ 'translated' ],
 		} );
 
-		// add a filter and then remove it
+		// Add a filter and then remove it.
 		const filter = ( text ) => '[' + text + ']';
 		hooks.addFilter( 'i18n.gettext', 'test', filter );
 		hooks.removeFilter( 'i18n.gettext', 'test', filter );
 
 		expect( doneTranslations ).toEqual( [
-			'original', // no translations before setLocaleData
-			'translated', // after setLocaleData
-			'[translated]', // after addFilter
-			'translated', // after removeFilter
+			'original', // No translations before setLocaleData.
+			'translated', // After setLocaleData.
+			'[translated]', // After addFilter.
+			'translated', // After removeFilter.
 		] );
 	} );
 } );

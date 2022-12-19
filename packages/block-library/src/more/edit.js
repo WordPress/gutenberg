@@ -53,17 +53,15 @@ export default function MoreEdit( {
 				</PanelBody>
 			</InspectorControls>
 			<div { ...useBlockProps() }>
-				<div className="wp-block-more">
-					<input
-						aria-label={ __( 'Read more link text' ) }
-						type="text"
-						value={ customText }
-						placeholder={ DEFAULT_TEXT }
-						onChange={ onChangeInput }
-						onKeyDown={ onKeyDown }
-						style={ style }
-					/>
-				</div>
+				<input
+					aria-label={ __( '“Read more” link text' ) }
+					type="text"
+					value={ customText }
+					placeholder={ DEFAULT_TEXT }
+					onChange={ onChangeInput }
+					onKeyDown={ onKeyDown }
+					style={ style }
+				/>
 			</div>
 		</>
 	);

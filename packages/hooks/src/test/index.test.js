@@ -268,7 +268,7 @@ test( 'filters with the same and different priorities', () => {
 	addFilter( 'test_order', 'my_callback_fn_1d', callbacks.fn_1d, 1 );
 
 	expect( applyFilters( 'test_order', [] ) ).toEqual( [
-		// all except 2b and 3a, which we removed earlier
+		// All except 2b and 3a, which we removed earlier.
 		'1a',
 		'1b',
 		'1c',
@@ -566,7 +566,7 @@ test( 'doingAction, didAction and hasAction.', () => {
 	doAction( 'another.action' );
 	expect( doingAction( 'test.action' ) ).toBe( false );
 
-	// Verify an action with no handlers is still counted
+	// Verify an action with no handlers is still counted.
 	expect( didAction( 'unattached.action' ) ).toBe( 0 );
 	doAction( 'unattached.action' );
 	expect( doingAction( 'unattached.action' ) ).toBe( false );

@@ -15,7 +15,7 @@ import {
 	Flex,
 	FlexItem,
 } from '@wordpress/components';
-import { reusableBlock } from '@wordpress/icons';
+import { symbol } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -43,9 +43,8 @@ export default function ReusableBlockConvertButton( {
 	const canConvert = useSelect(
 		( select ) => {
 			const { canUser } = select( coreStore );
-			const { getBlocksByClientId, canInsertBlockType } = select(
-				blockEditorStore
-			);
+			const { getBlocksByClientId, canInsertBlockType } =
+				select( blockEditorStore );
 
 			const blocks = getBlocksByClientId( clientIds ) ?? [];
 
@@ -81,13 +80,11 @@ export default function ReusableBlockConvertButton( {
 		[ clientIds ]
 	);
 
-	const {
-		__experimentalConvertBlocksToReusable: convertBlocksToReusable,
-	} = useDispatch( store );
+	const { __experimentalConvertBlocksToReusable: convertBlocksToReusable } =
+		useDispatch( store );
 
-	const { createSuccessNotice, createErrorNotice } = useDispatch(
-		noticesStore
-	);
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
 	const onConvert = useCallback(
 		async function ( reusableBlockTitle ) {
 			try {
@@ -113,12 +110,12 @@ export default function ReusableBlockConvertButton( {
 			{ ( { onClose } ) => (
 				<>
 					<MenuItem
-						icon={ reusableBlock }
+						icon={ symbol }
 						onClick={ () => {
 							setIsModalOpen( true );
 						} }
 					>
-						{ __( 'Add to Reusable blocks' ) }
+						{ __( 'Create Reusable block' ) }
 					</MenuItem>
 					{ isModalOpen && (
 						<Modal
@@ -150,7 +147,7 @@ export default function ReusableBlockConvertButton( {
 								>
 									<FlexItem>
 										<Button
-											variant="secondary"
+											variant="tertiary"
 											onClick={ () => {
 												setIsModalOpen( false );
 												setTitle( '' );

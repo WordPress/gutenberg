@@ -88,6 +88,7 @@ export default function FontAppearanceControl( props ) {
 		hasFontStyles = true,
 		hasFontWeights = true,
 		value: { fontStyle, fontWeight },
+		...otherProps
 	} = props;
 	const hasStylesOrWeights = hasFontStyles || hasFontWeights;
 	const label = getFontAppearanceLabel( hasFontStyles, hasFontWeights );
@@ -205,6 +206,7 @@ export default function FontAppearanceControl( props ) {
 	return (
 		hasStylesOrWeights && (
 			<CustomSelectControl
+				{ ...otherProps }
 				className="components-font-appearance-control"
 				label={ label }
 				describedBy={ getDescribedBy() }
@@ -213,6 +215,7 @@ export default function FontAppearanceControl( props ) {
 				onChange={ ( { selectedItem } ) =>
 					onChange( selectedItem.style )
 				}
+				__nextUnconstrainedWidth
 			/>
 		)
 	);

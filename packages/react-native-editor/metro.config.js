@@ -36,8 +36,8 @@ module.exports = {
 			 * within this project to include the necessary `/assets/..` that Metro's
 			 * server expects to traverse to the correct directory.
 			 *
-			 * - https://git.io/JBV4e
-			 * - https://git.io/JBFon
+			 * - https://github.com/facebook/metro/issues/290
+			 * - https://github.com/expo/expo/issues/7545#issuecomment-712737616
 			 */
 			const firstUrlSegment = req.url.split( '/' )[ 1 ];
 			if ( packageNames.includes( firstUrlSegment ) ) {

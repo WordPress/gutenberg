@@ -4,6 +4,7 @@
 const fs = require( 'fs' );
 const path = require( 'path' );
 const { mapValues, kebabCase } = require( 'lodash' );
+const SimpleGit = require( 'simple-git' );
 
 /**
  * Internal dependencies
@@ -15,13 +16,13 @@ const {
 	askForConfirmation,
 	getRandomTemporaryPath,
 } = require( '../lib/utils' );
-const git = require( '../lib/git' );
 const config = require( '../config' );
 
 /**
  * @typedef WPPerformanceCommandOptions
  *
  * @property {boolean=} ci          Run on CI.
+ * @property {number=}  rounds      Run each test suite this many times for each branch.
  * @property {string=}  testsBranch The branch whose performance test files will be used for testing.
  * @property {string=}  wpVersion   The WordPress version to be used as the base install for testing.
  */
@@ -36,6 +37,7 @@ const config = require( '../config' );
  * @property {number[]} firstContentfulPaint Represents the time when the browser first renders any text or media.
  * @property {number[]} firstBlock           Represents the time when Puppeteer first sees a block selector in the DOM.
  * @property {number[]} type                 Average type time.
+ * @property {number[]} typeContainer        Average type time within a container.
  * @property {number[]} focus                Average block selection time.
  * @property {number[]} inserterOpen         Average time to open global inserter.
  * @property {number[]} inserterSearch       Average time to search the inserter.
@@ -55,6 +57,9 @@ const config = require( '../config' );
  * @property {number=} type                 Average type time.
  * @property {number=} minType              Minimum type time.
  * @property {number=} maxType              Maximum type time.
+ * @property {number=} typeContainer        Average type time within a container.
+ * @property {number=} minTypeContainer     Minimum type time within a container.
+ * @property {number=} maxTypeContainer     Maximum type time within a container.
  * @property {number=} focus                Average block selection time.
  * @property {number=} minFocus             Min block selection time.
  * @property {number=} maxFocus             Max block selection time.
@@ -128,6 +133,9 @@ function curateResults( results ) {
 		type: average( results.type ),
 		minType: Math.min( ...results.type ),
 		maxType: Math.max( ...results.type ),
+		typeContainer: average( results.typeContainer ),
+		minTypeContainer: Math.min( ...results.typeContainer ),
+		maxTypeContainer: Math.max( ...results.typeContainer ),
 		focus: average( results.focus ),
 		minFocus: Math.min( ...results.focus ),
 		maxFocus: Math.max( ...results.focus ),
@@ -147,27 +155,6 @@ function curateResults( results ) {
 }
 
 /**
- * Set up the given branch for testing.
- *
- * @param {string} branch               Branch name.
- * @param {string} environmentDirectory Path to the plugin environment's clone.
- */
-async function setUpGitBranch( branch, environmentDirectory ) {
-	// Restore clean working directory (e.g. if `package-lock.json` has local
-	// changes after install).
-	await git.discardLocalChanges( environmentDirectory );
-
-	log( '        >> Fetching the ' + formats.success( branch ) + ' branch' );
-	await git.checkoutRemoteBranch( environmentDirectory, branch );
-
-	log( '        >> Building the ' + formats.success( branch ) + ' branch' );
-	await runShellScript(
-		'npm install && npm run build',
-		environmentDirectory
-	);
-}
-
-/**
  * Runs the performance tests on the current branch.
  *
  * @param {string} testSuite                Name of the tests set.
@@ -177,7 +164,7 @@ async function setUpGitBranch( branch, environmentDirectory ) {
  */
 async function runTestSuite( testSuite, performanceTestDirectory ) {
 	await runShellScript(
-		`npm run test-performance -- packages/e2e-tests/specs/performance/${ testSuite }.test.js`,
+		`npm run test:performance -- packages/e2e-tests/specs/performance/${ testSuite }.test.js`,
 		performanceTestDirectory
 	);
 	const rawResults = await readJSONFile(
@@ -196,6 +183,9 @@ async function runTestSuite( testSuite, performanceTestDirectory ) {
  * @param {WPPerformanceCommandOptions} options  Command options.
  */
 async function runPerformanceTests( branches, options ) {
+	const runningInCI = !! process.env.CI || !! options.ci;
+	const TEST_ROUNDS = options.rounds || 1;
+
 	// The default value doesn't work because commander provides an array.
 	if ( branches.length === 0 ) {
 		branches = [ 'trunk' ];
@@ -204,38 +194,61 @@ async function runPerformanceTests( branches, options ) {
 	log(
 		formats.title( '\n💃 Performance Tests 🕺\n' ),
 		'\nWelcome! This tool runs the performance tests on multiple branches and displays a comparison table.\n' +
-			'In order to run the tests, the tool is going to load a WordPress environment on 8888 and 8889 ports.\n' +
+			'In order to run the tests, the tool is going to load a WordPress environment on ports 8888 and 8889.\n' +
 			'Make sure these ports are not used before continuing.\n'
 	);
 
-	if ( ! options.ci ) {
+	if ( ! runningInCI ) {
 		await askForConfirmation( 'Ready to go? ' );
 	}
 
 	// 1- Preparing the tests directory.
 	log( '\n>> Preparing the tests directories' );
 	log( '    >> Cloning the repository' );
-	const baseDirectory = await git.clone( config.gitRepositoryURL );
+
+	/**
+	 * @type {string[]} git refs against which to run tests;
+	 *                  could be commit SHA, branch name, tag, etc...
+	 */
+	if ( branches.length < 2 ) {
+		throw new Error( `Need at least two git refs to run` );
+	}
+
+	const baseDirectory = getRandomTemporaryPath();
+	fs.mkdirSync( baseDirectory, { recursive: true } );
+
+	// @ts-ignore
+	const git = SimpleGit( baseDirectory );
+	await git
+		.raw( 'init' )
+		.raw( 'remote', 'add', 'origin', config.gitRepositoryURL );
+
+	for ( const branch of branches ) {
+		await git.raw( 'fetch', '--depth=1', 'origin', branch );
+	}
+
+	await git.raw( 'checkout', branches[ 0 ] );
+
 	const rootDirectory = getRandomTemporaryPath();
 	const performanceTestDirectory = rootDirectory + '/tests';
 	await runShellScript( 'mkdir -p ' + rootDirectory );
 	await runShellScript(
 		'cp -R ' + baseDirectory + ' ' + performanceTestDirectory
 	);
+
 	if ( !! options.testsBranch ) {
-		log(
-			'    >> Fetching the test branch: ' +
-				formats.success( options.testsBranch ) +
-				' branch'
-		);
-		await git.checkoutRemoteBranch(
-			performanceTestDirectory,
-			options.testsBranch
-		);
+		const branchName = formats.success( options.testsBranch );
+		log( `    >> Fetching the test-runner branch: ${ branchName }` );
+
+		// @ts-ignore
+		await SimpleGit( performanceTestDirectory )
+			.raw( 'fetch', '--depth=1', 'origin', options.testsBranch )
+			.raw( 'checkout', options.testsBranch );
 	}
+
 	log( '    >> Installing dependencies and building packages' );
 	await runShellScript(
-		'npm install && npm run build:packages',
+		'npm ci && node ./bin/packages/build.js',
 		performanceTestDirectory
 	);
 	log( '    >> Creating the environment folders' );
@@ -245,16 +258,36 @@ async function runPerformanceTests( branches, options ) {
 	log( '\n>> Preparing an environment directory per branch' );
 	const branchDirectories = {};
 	for ( const branch of branches ) {
-		log( '    >> Branch: ' + branch );
+		log( `    >> Branch: ${ branch }` );
 		const environmentDirectory =
 			rootDirectory + '/envs/' + kebabCase( branch );
 		// @ts-ignore
 		branchDirectories[ branch ] = environmentDirectory;
+		const buildPath = `${ environmentDirectory }/plugin`;
 		await runShellScript( 'mkdir ' + environmentDirectory );
-		await runShellScript(
-			'cp -R ' + baseDirectory + ' ' + environmentDirectory + '/plugin'
-		);
-		await setUpGitBranch( branch, environmentDirectory + '/plugin' );
+		await runShellScript( `cp -R ${ baseDirectory } ${ buildPath }` );
+
+		const fancyBranch = formats.success( branch );
+
+		if ( branch === options.testsBranch ) {
+			log(
+				`        >> Re-using the testing branch for ${ fancyBranch }`
+			);
+			await runShellScript(
+				`cp -R ${ performanceTestDirectory } ${ buildPath }`
+			);
+		} else {
+			log( `        >> Fetching the ${ fancyBranch } branch` );
+			// @ts-ignore
+			await SimpleGit( buildPath ).reset( 'hard' ).checkout( branch );
+
+			log( `        >> Building the ${ fancyBranch } branch` );
+			await runShellScript(
+				'npm ci && npm run prebuild:packages && node ./bin/packages/build.js && npx wp-scripts build',
+				buildPath
+			);
+		}
+
 		await runShellScript(
 			'cp ' +
 				path.resolve(
@@ -303,13 +336,9 @@ async function runPerformanceTests( branches, options ) {
 			formats.success( performanceTestDirectory )
 	);
 	for ( const branch of branches ) {
-		log(
-			'>> Environment Directory (' +
-				branch +
-				') : ' +
-				// @ts-ignore
-				formats.success( branchDirectories[ branch ] )
-		);
+		// @ts-ignore
+		const envPath = formats.success( branchDirectories[ branch ] );
+		log( `>> Environment Directory (${ branch }) : ${ envPath }` );
 	}
 
 	// 4- Running the tests.
@@ -323,13 +352,13 @@ async function runPerformanceTests( branches, options ) {
 		results[ testSuite ] = {};
 		/** @type {Array<Record<string, WPPerformanceResults>>} */
 		const rawResults = [];
-		// Alternate three times between branches
-		for ( let i = 0; i < 3; i++ ) {
+		// Alternate three times between branches.
+		for ( let i = 0; i < TEST_ROUNDS; i++ ) {
 			rawResults[ i ] = {};
 			for ( const branch of branches ) {
 				// @ts-ignore
 				const environmentDirectory = branchDirectories[ branch ];
-				log( '    >> Branch: ' + branch + ', Suite: ' + testSuite );
+				log( `    >> Branch: ${ branch }, Suite: ${ testSuite }` );
 				log( '        >> Starting the environment.' );
 				await runShellScript(
 					'../../tests/node_modules/.bin/wp-env start',
@@ -371,6 +400,15 @@ async function runPerformanceTests( branches, options ) {
 					type: rawResults.map( ( r ) => r[ branch ].type ),
 					minType: rawResults.map( ( r ) => r[ branch ].minType ),
 					maxType: rawResults.map( ( r ) => r[ branch ].maxType ),
+					typeContainer: rawResults.map(
+						( r ) => r[ branch ].typeContainer
+					),
+					minTypeContainer: rawResults.map(
+						( r ) => r[ branch ].minTypeContainer
+					),
+					maxTypeContainer: rawResults.map(
+						( r ) => r[ branch ].maxTypeContainer
+					),
 					focus: rawResults.map( ( r ) => r[ branch ].focus ),
 					minFocus: rawResults.map( ( r ) => r[ branch ].minFocus ),
 					maxFocus: rawResults.map( ( r ) => r[ branch ].maxFocus ),

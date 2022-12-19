@@ -24,7 +24,11 @@
 		"anchor": true,
 		"color": {
 			"gradients": true,
-			"link": true
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
 		},
 		"typography": {
 			"fontSize": true,
@@ -34,12 +38,14 @@
 			"__experimentalFontWeight": true,
 			"__experimentalLetterSpacing": true,
 			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true,
 				"fontAppearance": true
 			}
 		},
 		"spacing": {
+			"margin": true,
 			"padding": true
 		}
 	},

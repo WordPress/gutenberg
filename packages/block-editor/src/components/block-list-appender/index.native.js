@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { last } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
@@ -36,7 +31,9 @@ function BlockListAppender( {
 		return (
 			<DefaultBlockAppender
 				rootClientId={ rootClientId }
-				lastBlockClientId={ last( blockClientIds ) }
+				lastBlockClientId={
+					blockClientIds[ blockClientIds.length - 1 ]
+				}
 				containerStyle={ styles.blockListAppender }
 				placeholder={ blockClientIds.length > 0 ? '' : null }
 				showSeparator={ showSeparator }
@@ -48,9 +45,8 @@ function BlockListAppender( {
 }
 
 export default withSelect( ( select, { rootClientId } ) => {
-	const { getBlockOrder, canInsertBlockType, getTemplateLock } = select(
-		blockEditorStore
-	);
+	const { getBlockOrder, canInsertBlockType, getTemplateLock } =
+		select( blockEditorStore );
 
 	return {
 		isLocked: !! getTemplateLock( rootClientId ),

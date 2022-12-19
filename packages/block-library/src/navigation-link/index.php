@@ -98,7 +98,14 @@ function block_core_navigation_link_build_css_font_sizes( $context ) {
 		$font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $context['fontSize'] );
 	} elseif ( $has_custom_font_size ) {
 		// Add the custom font size inline style.
-		$font_sizes['inline_styles'] = sprintf( 'font-size: %s;', $context['style']['typography']['fontSize'] );
+		$font_sizes['inline_styles'] = sprintf(
+			'font-size: %s;',
+			wp_get_typography_font_size_value(
+				array(
+					'size' => $context['style']['typography']['fontSize'],
+				)
+			)
+		);
 	}
 
 	return $font_sizes;
@@ -110,7 +117,7 @@ function block_core_navigation_link_build_css_font_sizes( $context ) {
  * @return string
  */
 function block_core_navigation_link_render_submenu_icon() {
-	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" role="img" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
+	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
 }
 
 /**
@@ -150,7 +157,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 
 	$css_classes = trim( implode( ' ', $classes ) );
 	$has_submenu = count( $block->inner_blocks ) > 0;
-	$is_active   = ! empty( $attributes['id'] ) && ( get_the_ID() === $attributes['id'] );
+	$is_active   = ! empty( $attributes['id'] ) && ( get_queried_object_id() === (int) $attributes['id'] );
 
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
@@ -193,36 +200,25 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		'<span class="wp-block-navigation-item__label">';
 
 	if ( isset( $attributes['label'] ) ) {
-		$html .= wp_kses(
-			$attributes['label'],
-			array(
-				'code'   => array(),
-				'em'     => array(),
-				'img'    => array(
-					'scale' => array(),
-					'class' => array(),
-					'style' => array(),
-					'src'   => array(),
-					'alt'   => array(),
-				),
-				's'      => array(),
-				'span'   => array(
-					'style' => array(),
-				),
-				'strong' => array(),
-			)
-		);
+		$html .= wp_kses_post( $attributes['label'] );
 	}
 
 	$html .= '</span>';
+
+	// Add description if available.
+	if ( ! empty( $attributes['description'] ) ) {
+		$html .= '<span class="wp-block-navigation-item__description">';
+		$html .= wp_kses_post( $attributes['description'] );
+		$html .= '</span>';
+	}
+
+	$html .= '</a>';
+	// End anchor tag content.
 
 	if ( isset( $block->context['showSubmenuIcon'] ) && $block->context['showSubmenuIcon'] && $has_submenu ) {
 		// The submenu icon can be hidden by a CSS rule on the Navigation Block.
 		$html .= '<span class="wp-block-navigation__submenu-icon">' . block_core_navigation_link_render_submenu_icon() . '</span>';
 	}
-
-	$html .= '</a>';
-	// End anchor tag content.
 
 	if ( $has_submenu ) {
 		$inner_blocks_html = '';
@@ -348,3 +344,67 @@ function register_block_core_navigation_link() {
 	);
 }
 add_action( 'init', 'register_block_core_navigation_link' );
+
+/**
+ * Disables the display of block inspector tabs for the Navigation Link block.
+ *
+ * This is only a temporary measure until we have a TabPanel and mechanism that
+ * will allow the Navigation Link to programmatically select a tab when edited
+ * via a specific context.
+ *
+ * See:
+ * - https://github.com/WordPress/gutenberg/issues/45951
+ * - https://github.com/WordPress/gutenberg/pull/46321
+ * - https://github.com/WordPress/gutenberg/pull/46271
+ *
+ * @param array $settings Default editor settings.
+ * @return array Filtered editor settings.
+ */
+function gutenberg_disable_tabs_for_navigation_link_block( $settings ) {
+	$current_tab_settings = _wp_array_get(
+		$settings,
+		array( '__experimentalBlockInspectorTabs' ),
+		array()
+	);
+
+	$settings['__experimentalBlockInspectorTabs'] = array_merge(
+		$current_tab_settings,
+		array( 'core/navigation-link' => false )
+	);
+
+	return $settings;
+}
+
+add_filter( 'block_editor_settings_all', 'gutenberg_disable_tabs_for_navigation_link_block' );
+
+/**
+ * Enables animation of the block inspector for the Navigation Link block.
+ *
+ * See:
+ * - https://github.com/WordPress/gutenberg/pull/46342
+ * - https://github.com/WordPress/gutenberg/issues/45884
+ *
+ * @param array $settings Default editor settings.
+ * @return array Filtered editor settings.
+ */
+function gutenberg_enable_animation_for_navigation_link_inspector( $settings ) {
+	$current_animation_settings = _wp_array_get(
+		$settings,
+		array( '__experimentalBlockInspectorAnimation' ),
+		array()
+	);
+
+	$settings['__experimentalBlockInspectorAnimation'] = array_merge(
+		$current_animation_settings,
+		array(
+			'core/navigation-link' =>
+				array(
+					'enterDirection' => 'rightToLeft',
+				),
+		)
+	);
+
+	return $settings;
+}
+
+add_filter( 'block_editor_settings_all', 'gutenberg_enable_animation_for_navigation_link_inspector' );

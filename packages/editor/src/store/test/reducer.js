@@ -11,7 +11,6 @@ import {
 	isUpdatingSamePostProperty,
 	shouldOverwriteState,
 	getPostRawValue,
-	preferences,
 	saving,
 	postSavingLock,
 	postAutosavingLock,
@@ -160,36 +159,6 @@ describe( 'state', () => {
 			const value = getPostRawValue( { raw: '' } );
 
 			expect( value ).toBe( '' );
-		} );
-	} );
-
-	describe( 'preferences()', () => {
-		it( 'should apply all defaults', () => {
-			const state = preferences( undefined, {} );
-			expect( state ).toEqual( {
-				insertUsage: {},
-				isPublishSidebarEnabled: true,
-			} );
-		} );
-
-		it( 'should disable the publish sidebar', () => {
-			const original = deepFreeze( preferences( undefined, {} ) );
-			const state = preferences( original, {
-				type: 'DISABLE_PUBLISH_SIDEBAR',
-			} );
-
-			expect( state.isPublishSidebarEnabled ).toBe( false );
-		} );
-
-		it( 'should enable the publish sidebar', () => {
-			const original = deepFreeze(
-				preferences( { isPublishSidebarEnabled: false }, {} )
-			);
-			const state = preferences( original, {
-				type: 'ENABLE_PUBLISH_SIDEBAR',
-			} );
-
-			expect( state.isPublishSidebarEnabled ).toBe( true );
 		} );
 	} );
 

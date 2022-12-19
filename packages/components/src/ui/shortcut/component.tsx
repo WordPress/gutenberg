@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 
 /**
  * Internal dependencies
@@ -25,7 +25,7 @@ export interface Props {
 
 function Shortcut(
 	props: WordPressComponentProps< Props, 'span' >,
-	forwardedRef: Ref< any >
+	forwardedRef: ForwardedRef< any >
 ): JSX.Element | null {
 	const {
 		as: asProp = 'span',

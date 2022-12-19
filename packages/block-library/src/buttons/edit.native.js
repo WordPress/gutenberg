@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { debounce } from 'lodash';
 import { View } from 'react-native';
 
 /**
@@ -14,7 +13,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { createBlock, getBlockSupport } from '@wordpress/blocks';
-import { useResizeObserver } from '@wordpress/compose';
+import { debounce, useResizeObserver } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { alignmentHelpers } from '@wordpress/components';
@@ -49,11 +48,8 @@ export default function ButtonsEdit( {
 
 	const { isInnerButtonSelected, shouldDelete } = useSelect(
 		( select ) => {
-			const {
-				getBlockCount,
-				getBlockParents,
-				getSelectedBlockClientId,
-			} = select( blockEditorStore );
+			const { getBlockCount, getBlockParents, getSelectedBlockClientId } =
+				select( blockEditorStore );
 			const selectedBlockClientId = getSelectedBlockClientId();
 			const selectedBlockParents = getBlockParents(
 				selectedBlockClientId,
@@ -73,16 +69,15 @@ export default function ButtonsEdit( {
 	);
 
 	const preferredStyle = useSelect( ( select ) => {
-		const preferredStyleVariations = select(
-			blockEditorStore
-		).getSettings().__experimentalPreferredStyleVariations;
+		const preferredStyleVariations =
+			select( blockEditorStore ).getSettings()
+				.__experimentalPreferredStyleVariations;
 		return preferredStyleVariations?.value?.[ buttonBlockName ];
 	}, [] );
 
 	const { getBlockOrder } = useSelect( blockEditorStore );
-	const { insertBlock, removeBlock, selectBlock } = useDispatch(
-		blockEditorStore
-	);
+	const { insertBlock, removeBlock, selectBlock } =
+		useDispatch( blockEditorStore );
 
 	useEffect( () => {
 		const { width } = sizes || {};
@@ -144,7 +139,7 @@ export default function ButtonsEdit( {
 						}
 						popoverProps={ {
 							position: 'bottom right',
-							isAlternate: true,
+							variant: 'toolbar',
 						} }
 					/>
 				</BlockControls>

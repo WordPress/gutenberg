@@ -13,7 +13,7 @@ const {
 	isLocalEnvironment,
 } = require( './__device-tests__/helpers/utils' );
 
-jest.setTimeout( 1000000 ); // in milliseconds
+jest.setTimeout( 1000000 ); // In milliseconds.
 
 let iOSScreenRecordingProcess;
 let androidScreenRecordingProcess;
@@ -97,7 +97,7 @@ jasmine.getEnv().addReporter( {
 
 		if ( isAndroid() ) {
 			androidScreenRecordingProcess.kill( 'SIGINT' );
-			// wait for kill
+			// Wait for kill.
 			childProcess.execSync( 'sleep 1' );
 
 			try {

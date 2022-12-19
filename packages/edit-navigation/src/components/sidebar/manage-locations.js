@@ -34,9 +34,8 @@ export default function ManageLocations( {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const openModal = () => setIsModalOpen( true );
 	const closeModal = () => setIsModalOpen( false );
-	const { createSuccessNotice, createErrorNotice } = useDispatch(
-		noticesStore
-	);
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
 
 	const validateBatchResponse = ( batchResponse ) => {
 		if ( batchResponse.failed ) {

@@ -2,21 +2,24 @@
  * WordPress dependencies
  */
 import {
-	__experimentalUseNavigator as useNavigator,
+	__experimentalNavigatorButton as NavigatorButton,
+	__experimentalNavigatorBackButton as NavigatorBackButton,
 	__experimentalItem as Item,
 	FlexItem,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { Icon } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import { IconWithCurrentColor } from './icon-with-current-color';
 
 function GenericNavigationButton( { icon, children, ...props } ) {
 	return (
 		<Item { ...props }>
 			{ icon && (
 				<HStack justify="flex-start">
-					<FlexItem>
-						<Icon icon={ icon } size={ 24 } />
-					</FlexItem>
+					<IconWithCurrentColor icon={ icon } size={ 24 } />
 					<FlexItem>{ children }</FlexItem>
 				</HStack>
 			) }
@@ -24,16 +27,13 @@ function GenericNavigationButton( { icon, children, ...props } ) {
 		</Item>
 	);
 }
-function NavigationButton( { path, ...props } ) {
-	const { push } = useNavigator();
-	return (
-		<GenericNavigationButton onClick={ () => push( path ) } { ...props } />
-	);
+
+function NavigationButtonAsItem( props ) {
+	return <NavigatorButton as={ GenericNavigationButton } { ...props } />;
 }
 
-function NavigationBackButton( { ...props } ) {
-	const { pop } = useNavigator();
-	return <GenericNavigationButton onClick={ pop } { ...props } />;
+function NavigationBackButtonAsItem( props ) {
+	return <NavigatorBackButton as={ GenericNavigationButton } { ...props } />;
 }
 
-export { NavigationButton, NavigationBackButton };
+export { NavigationButtonAsItem, NavigationBackButtonAsItem };

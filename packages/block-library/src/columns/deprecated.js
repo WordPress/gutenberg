@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -49,8 +48,12 @@ const migrateCustomColors = ( attributes ) => {
 	if ( attributes.customBackgroundColor ) {
 		style.color.background = attributes.customBackgroundColor;
 	}
+
+	const { customTextColor, customBackgroundColor, ...restAttributes } =
+		attributes;
+
 	return {
-		...omit( attributes, [ 'customTextColor', 'customBackgroundColor' ] ),
+		...restAttributes,
 		style,
 		isStackedOnMobile: true,
 	};
@@ -97,7 +100,8 @@ export default [
 				'has-text-color': textColor || customTextColor,
 				[ backgroundClass ]: backgroundClass,
 				[ textClass ]: textClass,
-				[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+				[ `are-vertically-aligned-${ verticalAlignment }` ]:
+					verticalAlignment,
 			} );
 
 			const style = {
@@ -167,9 +171,11 @@ export default [
 				createBlock( 'core/column', {}, columnBlocks )
 			);
 
+			const { columns: ignoredColumns, ...restAttributes } = attributes;
+
 			return [
 				{
-					...omit( attributes, [ 'columns' ] ),
+					...restAttributes,
 					isStackedOnMobile: true,
 				},
 				migratedInnerBlocks,
@@ -193,8 +199,9 @@ export default [
 			},
 		},
 		migrate( attributes, innerBlocks ) {
+			const { columns, ...restAttributes } = attributes;
 			attributes = {
-				...omit( attributes, [ 'columns' ] ),
+				...restAttributes,
 				isStackedOnMobile: true,
 			};
 
@@ -204,7 +211,8 @@ export default [
 			const { verticalAlignment, columns } = attributes;
 
 			const wrapperClasses = classnames( `has-${ columns }-columns`, {
-				[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+				[ `are-vertically-aligned-${ verticalAlignment }` ]:
+					verticalAlignment,
 			} );
 
 			return (

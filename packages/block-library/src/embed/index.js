@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import initBlock from '../utils/init-block';
 import edit from './edit';
 import save from './save';
 import metadata from './block.json';
@@ -20,3 +21,5 @@ export const settings = {
 	variations,
 	deprecated,
 };
+
+export const init = () => initBlock( { name, metadata, settings } );

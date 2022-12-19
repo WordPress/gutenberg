@@ -18,7 +18,7 @@ const { TooltipPopoverView } = styles;
 /**
  *
  * @param {import('../context').WordPressComponentProps<import('./types').ContentProps, 'div'>} props
- * @param {import('react').Ref<any>}                                                            forwardedRef
+ * @param {import('react').ForwardedRef<any>}                                                   forwardedRef
  */
 function TooltipContent( props, forwardedRef ) {
 	const { children, className, ...otherProps } = useContextSystem(

@@ -33,12 +33,8 @@ function AspectGroup( { aspectRatios, isDisabled, label, onClick, value } ) {
 }
 
 export default function AspectRatioDropdown( { toggleProps } ) {
-	const {
-		isInProgress,
-		aspect,
-		setAspect,
-		defaultAspect,
-	} = useImageEditingContext();
+	const { isInProgress, aspect, setAspect, defaultAspect } =
+		useImageEditingContext();
 
 	return (
 		<DropdownMenu

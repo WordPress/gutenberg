@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render } from 'enzyme';
+import { render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -10,13 +10,17 @@ import withInstanceId from '../';
 
 describe( 'withInstanceId', () => {
 	const DumpComponent = withInstanceId( ( { instanceId } ) => {
-		return <div>{ instanceId }</div>;
+		return <div data-testid="wrapper">{ instanceId }</div>;
 	} );
 
 	it( 'should generate a new instanceId for each instance', () => {
-		const dumb1 = render( <DumpComponent /> );
-		const dumb2 = render( <DumpComponent /> );
-		// Unrendered element.
-		expect( dumb1.text() ).not.toBe( dumb2.text() );
+		render( <DumpComponent /> );
+		render( <DumpComponent /> );
+
+		const elements = screen.getAllByTestId( 'wrapper' );
+
+		expect( elements[ 0 ] ).not.toHaveTextContent(
+			elements[ 1 ].textContent
+		);
 	} );
 } );

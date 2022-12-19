@@ -3,7 +3,10 @@
  */
 import { __ } from '@wordpress/i18n';
 import { toggleFormat } from '@wordpress/rich-text';
-import { RichTextToolbarButton } from '@wordpress/block-editor';
+import {
+	RichTextToolbarButton,
+	RichTextShortcut,
+} from '@wordpress/block-editor';
 import { formatStrikethrough } from '@wordpress/icons';
 
 const name = 'core/strikethrough';
@@ -21,13 +24,20 @@ export const strikethrough = {
 		}
 
 		return (
-			<RichTextToolbarButton
-				icon={ formatStrikethrough }
-				title={ title }
-				onClick={ onClick }
-				isActive={ isActive }
-				role="menuitemcheckbox"
-			/>
+			<>
+				<RichTextShortcut
+					type="access"
+					character="d"
+					onUse={ onClick }
+				/>
+				<RichTextToolbarButton
+					icon={ formatStrikethrough }
+					title={ title }
+					onClick={ onClick }
+					isActive={ isActive }
+					role="menuitemcheckbox"
+				/>
+			</>
 		);
 	},
 };

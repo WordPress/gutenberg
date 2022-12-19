@@ -1,258 +1,354 @@
 /**
  * External dependencies
  */
-import { render, fireEvent, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import BoxControl from '../';
 
+const Example = ( extraProps ) => {
+	const [ state, setState ] = useState();
+
+	return (
+		<BoxControl
+			values={ state }
+			onChange={ ( next ) => setState( next ) }
+			{ ...extraProps }
+		/>
+	);
+};
+
 describe( 'BoxControl', () => {
 	describe( 'Basic rendering', () => {
-		it( 'should render', () => {
-			const { container } = render( <BoxControl /> );
-			const input = container.querySelector( 'input' );
+		it( 'should render a box control input', () => {
+			render( <BoxControl /> );
 
-			expect( input ).toBeTruthy();
+			expect(
+				screen.getByRole( 'textbox', { name: 'Box Control' } )
+			).toBeVisible();
 		} );
 
-		it( 'should update values when interacting with input', () => {
-			const { container } = render( <BoxControl /> );
-			const input = container.querySelector( 'input' );
-			const unitSelect = container.querySelector( 'select' );
+		it( 'should update values when interacting with input', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
 
-			input.focus();
-			fireEvent.change( input, { target: { value: '100%' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
+			render( <BoxControl /> );
 
-			expect( input.value ).toBe( '100' );
-			expect( unitSelect.value ).toBe( '%' );
+			const input = screen.getByRole( 'textbox', {
+				name: 'Box Control',
+			} );
+
+			await user.type( input, '100%' );
+			await user.keyboard( '{Enter}' );
+
+			expect( input ).toHaveValue( '100' );
+			expect(
+				screen.getByRole( 'combobox', {
+					name: 'Select unit',
+				} )
+			).toHaveValue( '%' );
 		} );
 	} );
 
 	describe( 'Reset', () => {
-		it( 'should reset values when clicking Reset', () => {
-			const { container, getByText } = render( <BoxControl /> );
-			const input = container.querySelector( 'input' );
-			const unitSelect = container.querySelector( 'select' );
-			const reset = getByText( /Reset/ );
+		it( 'should reset values when clicking Reset', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
 
-			input.focus();
-			fireEvent.change( input, { target: { value: '100px' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
+			render( <BoxControl /> );
 
-			expect( input.value ).toBe( '100' );
-			expect( unitSelect.value ).toBe( 'px' );
+			const input = screen.getByRole( 'textbox', {
+				name: 'Box Control',
+			} );
+			const select = screen.getByRole( 'combobox', {
+				name: 'Select unit',
+			} );
 
-			reset.focus();
-			fireEvent.click( reset );
+			await user.type( input, '100px' );
+			await user.keyboard( '{Enter}' );
 
-			expect( input.value ).toBe( '' );
-			expect( unitSelect.value ).toBe( 'px' );
+			expect( input ).toHaveValue( '100' );
+			expect( select ).toHaveValue( 'px' );
+
+			await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
+
+			expect( input ).toHaveValue( '' );
+			expect( select ).toHaveValue( 'px' );
 		} );
 
-		it( 'should reset values when clicking Reset, if controlled', () => {
-			const Example = () => {
-				const [ state, setState ] = useState();
+		it( 'should reset values when clicking Reset, if controlled', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
 
-				return (
-					<BoxControl
-						values={ state }
-						onChange={ ( next ) => setState( next ) }
-					/>
-				);
-			};
-			const { container, getByText } = render( <Example /> );
-			const input = container.querySelector( 'input' );
-			const unitSelect = container.querySelector( 'select' );
-			const reset = getByText( /Reset/ );
+			render( <Example /> );
 
-			input.focus();
-			fireEvent.change( input, { target: { value: '100px' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
+			const input = screen.getByRole( 'textbox', {
+				name: 'Box Control',
+			} );
+			const select = screen.getByRole( 'combobox', {
+				name: 'Select unit',
+			} );
 
-			expect( input.value ).toBe( '100' );
-			expect( unitSelect.value ).toBe( 'px' );
+			await user.type( input, '100px' );
+			await user.keyboard( '{Enter}' );
 
-			reset.focus();
-			fireEvent.click( reset );
+			expect( input ).toHaveValue( '100' );
+			expect( select ).toHaveValue( 'px' );
 
-			expect( input.value ).toBe( '' );
-			expect( unitSelect.value ).toBe( 'px' );
+			await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
+
+			expect( input ).toHaveValue( '' );
+			expect( select ).toHaveValue( 'px' );
 		} );
 
-		it( 'should reset values when clicking Reset, if controlled <-> uncontrolled state changes', () => {
-			const Example = () => {
-				const [ state, setState ] = useState();
+		it( 'should reset values when clicking Reset, if controlled <-> uncontrolled state changes', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
 
-				return (
-					<BoxControl
-						values={ state }
-						onChange={ ( next ) => {
-							if ( next.top ) {
-								setState( next );
-							} else {
-								// This reverts it to being uncontrolled
-								setState( undefined );
-							}
-						} }
-					/>
-				);
-			};
-			const { container, getByText } = render( <Example /> );
-			const input = container.querySelector( 'input' );
-			const unitSelect = container.querySelector( 'select' );
-			const reset = getByText( /Reset/ );
+			render( <Example /> );
 
-			input.focus();
-			fireEvent.change( input, { target: { value: '100px' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
+			const input = screen.getByRole( 'textbox', {
+				name: 'Box Control',
+			} );
+			const select = screen.getByRole( 'combobox', {
+				name: 'Select unit',
+			} );
 
-			expect( input.value ).toBe( '100' );
-			expect( unitSelect.value ).toBe( 'px' );
+			await user.type( input, '100px' );
+			await user.keyboard( '{Enter}' );
 
-			reset.focus();
-			fireEvent.click( reset );
+			expect( input ).toHaveValue( '100' );
+			expect( select ).toHaveValue( 'px' );
 
-			expect( input.value ).toBe( '' );
-			expect( unitSelect.value ).toBe( 'px' );
+			await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
+
+			expect( input ).toHaveValue( '' );
+			expect( select ).toHaveValue( 'px' );
 		} );
-	} );
 
-	describe( 'Unlinked Sides', () => {
-		it( 'should update a single side value when unlinked', () => {
-			let state = {};
-			const setState = ( newState ) => ( state = newState );
+		it( 'should persist cleared value when focus changes', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+			const spyChange = jest.fn();
 
-			const { container, getByLabelText } = render(
-				<BoxControl
-					values={ state }
-					onChange={ ( next ) => setState( next ) }
-				/>
-			);
+			render( <BoxControl onChange={ ( v ) => spyChange( v ) } /> );
 
-			const unlink = getByLabelText( /Unlink Sides/ );
-			fireEvent.click( unlink );
+			const input = screen.getByRole( 'textbox', {
+				name: 'Box Control',
+			} );
 
-			const input = container.querySelector( 'input' );
-			const unitSelect = container.querySelector( 'select' );
+			await user.type( input, '100%' );
+			await user.keyboard( '{Enter}' );
 
-			input.focus();
-			fireEvent.change( input, { target: { value: '100px' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
+			expect( input ).toHaveValue( '100' );
+			expect(
+				screen.getByRole( 'combobox', {
+					name: 'Select unit',
+				} )
+			).toHaveValue( '%' );
 
-			expect( input.value ).toBe( '100' );
-			expect( unitSelect.value ).toBe( 'px' );
+			await user.clear( input );
+			expect( input ).toHaveValue( '' );
+			// Clicking document.body to trigger a blur event on the input.
+			await user.click( document.body );
 
-			expect( state ).toEqual( {
-				top: '100px',
+			expect( input ).toHaveValue( '' );
+			expect( spyChange ).toHaveBeenLastCalledWith( {
+				top: undefined,
 				right: undefined,
 				bottom: undefined,
 				left: undefined,
 			} );
 		} );
+	} );
 
-		it( 'should update a whole axis when value is changed when unlinked', () => {
-			let state = {};
-			const setState = ( newState ) => ( state = newState );
+	describe( 'Unlinked sides', () => {
+		it( 'should update a single side value when unlinked', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
 
-			const { container, getByLabelText } = render(
-				<BoxControl
-					values={ state }
-					onChange={ ( next ) => setState( next ) }
-					splitOnAxis={ true }
-				/>
+			render( <Example /> );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Unlink sides' } )
 			);
 
-			const unlink = getByLabelText( /Unlink Sides/ );
-			fireEvent.click( unlink );
+			await user.type(
+				screen.getByRole( 'textbox', { name: 'Top' } ),
+				'100px'
+			);
+			await user.keyboard( '{Enter}' );
 
-			const input = container.querySelector( 'input' );
-			const unitSelect = container.querySelector( 'select' );
+			expect(
+				screen.getByRole( 'textbox', { name: 'Top' } )
+			).toHaveValue( '100' );
+			expect(
+				screen.getByRole( 'textbox', { name: 'Right' } )
+			).not.toHaveValue();
+			expect(
+				screen.getByRole( 'textbox', { name: 'Bottom' } )
+			).not.toHaveValue();
+			expect(
+				screen.getByRole( 'textbox', { name: 'Left' } )
+			).not.toHaveValue();
 
-			input.focus();
-			fireEvent.change( input, { target: { value: '100px' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
+			screen
+				.getAllByRole( 'combobox', { name: 'Select unit' } )
+				.forEach( ( combobox ) => {
+					expect( combobox ).toHaveValue( 'px' );
+				} );
+		} );
 
-			expect( input.value ).toBe( '100' );
-			expect( unitSelect.value ).toBe( 'px' );
-
-			expect( state ).toEqual( {
-				top: '100px',
-				right: undefined,
-				bottom: '100px',
-				left: undefined,
+		it( 'should update a whole axis when value is changed when unlinked', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
 			} );
+
+			render( <Example splitOnAxis /> );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Unlink sides' } )
+			);
+
+			await user.type(
+				screen.getByRole( 'textbox', {
+					name: 'Vertical',
+				} ),
+				'100px'
+			);
+			await user.keyboard( '{Enter}' );
+
+			expect(
+				screen.getByRole( 'textbox', { name: 'Vertical' } )
+			).toHaveValue( '100' );
+			expect(
+				screen.getByRole( 'textbox', { name: 'Horizontal' } )
+			).not.toHaveValue();
+
+			screen
+				.getAllByRole( 'combobox', { name: 'Select unit' } )
+				.forEach( ( combobox ) => {
+					expect( combobox ).toHaveValue( 'px' );
+				} );
 		} );
 	} );
 
 	describe( 'Unit selections', () => {
-		it( 'should update unlinked controls unit selection based on all input control', () => {
-			// Render control
+		it( 'should update unlinked controls unit selection based on all input control', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			// Render control.
 			render( <BoxControl /> );
 
-			// Make unit selection on all input control
-			const allUnitSelect = screen.getByLabelText( 'Select unit' );
-			allUnitSelect.focus();
-			fireEvent.change( allUnitSelect, { target: { value: 'em' } } );
+			// Make unit selection on all input control.
+			await user.selectOptions(
+				screen.getByRole( 'combobox', {
+					name: 'Select unit',
+				} ),
+				[ 'em' ]
+			);
 
-			// Unlink the controls
-			const unlink = screen.getByLabelText( /Unlink Sides/ );
-			fireEvent.click( unlink );
+			// Unlink the controls.
+			await user.click(
+				screen.getByRole( 'button', { name: 'Unlink sides' } )
+			);
+
+			const controls = screen.getAllByRole( 'combobox', {
+				name: 'Select unit',
+			} );
+
+			// Confirm we have exactly 4 controls.
+			expect( controls ).toHaveLength( 4 );
 
 			// Confirm that each individual control has the selected unit
-			const unlinkedSelects = screen.getAllByDisplayValue( 'em' );
-			expect( unlinkedSelects.length ).toEqual( 4 );
+			controls.forEach( ( control ) => {
+				expect( control ).toHaveValue( 'em' );
+			} );
 		} );
 
-		it( 'should use individual side attribute unit when available', () => {
-			// Render control
+		it( 'should use individual side attribute unit when available', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			// Render control.
 			const { rerender } = render( <BoxControl /> );
 
-			// Make unit selection on all input control
-			const allUnitSelect = screen.getByLabelText( 'Select unit' );
-			allUnitSelect.focus();
-			fireEvent.change( allUnitSelect, { target: { value: 'vw' } } );
+			// Make unit selection on all input control.
+			await user.selectOptions(
+				screen.getByRole( 'combobox', {
+					name: 'Select unit',
+				} ),
+				[ 'vw' ]
+			);
 
-			// Unlink the controls
-			const unlink = screen.getByLabelText( /Unlink Sides/ );
-			fireEvent.click( unlink );
+			// Unlink the controls.
+			await user.click(
+				screen.getByRole( 'button', { name: 'Unlink sides' } )
+			);
+
+			const controls = screen.getAllByRole( 'combobox', {
+				name: 'Select unit',
+			} );
+
+			// Confirm we have exactly 4 controls.
+			expect( controls ).toHaveLength( 4 );
 
 			// Confirm that each individual control has the selected unit
-			const unlinkedSelects = screen.getAllByDisplayValue( 'vw' );
-			expect( unlinkedSelects.length ).toEqual( 4 );
+			controls.forEach( ( control ) => {
+				expect( control ).toHaveValue( 'vw' );
+			} );
 
 			// Rerender with individual side value & confirm unit is selected.
 			rerender( <BoxControl values={ { top: '2.5em' } } /> );
 
-			const topSelect = screen.getByDisplayValue( 'em' );
-			const otherSelects = screen.getAllByDisplayValue( 'vw' );
+			const rerenderedControls = screen.getAllByRole( 'combobox', {
+				name: 'Select unit',
+			} );
 
-			expect( topSelect ).toBeInTheDocument();
-			expect( otherSelects.length ).toEqual( 3 );
+			// Confirm we have exactly 4 controls.
+			expect( rerenderedControls ).toHaveLength( 4 );
+
+			// Confirm that each individual control has the right selected unit
+			rerenderedControls.forEach( ( control, index ) => {
+				const expected = index === 0 ? 'em' : 'vw';
+				expect( control ).toHaveValue( expected );
+			} );
 		} );
 	} );
 
 	describe( 'onChange updates', () => {
-		it( 'should call onChange when values contain more than just CSS units', () => {
+		it( 'should call onChange when values contain more than just CSS units', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
 			const setState = jest.fn();
 
 			render( <BoxControl onChange={ setState } /> );
 
-			const input = screen.getByLabelText( 'Box Control', {
-				selector: 'input',
-			} );
-
-			input.focus();
-			fireEvent.change( input, { target: { value: '7.5rem' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
+			await user.type(
+				screen.getByRole( 'textbox', {
+					name: 'Box Control',
+				} ),
+				'7.5rem'
+			);
+			await user.keyboard( '{Enter}' );
 
 			expect( setState ).toHaveBeenCalledWith( {
 				top: '7.5rem',
@@ -262,14 +358,20 @@ describe( 'BoxControl', () => {
 			} );
 		} );
 
-		it( 'should not pass invalid CSS unit only values to onChange', () => {
+		it( 'should not pass invalid CSS unit only values to onChange', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
 			const setState = jest.fn();
 
 			render( <BoxControl onChange={ setState } /> );
 
-			const allUnitSelect = screen.getByLabelText( 'Select unit' );
-			allUnitSelect.focus();
-			fireEvent.change( allUnitSelect, { target: { value: 'rem' } } );
+			await user.selectOptions(
+				screen.getByRole( 'combobox', {
+					name: 'Select unit',
+				} ),
+				'rem'
+			);
 
 			expect( setState ).toHaveBeenCalledWith( {
 				top: undefined,

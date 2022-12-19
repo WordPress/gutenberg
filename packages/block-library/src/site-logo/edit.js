@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { includes, pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -40,7 +39,6 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { crop, upload } from '@wordpress/icons';
-import { SVG, Path } from '@wordpress/primitives';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -72,7 +70,7 @@ const SiteLogo = ( {
 } ) => {
 	const clientWidth = useClientWidth( containerRef, [ align ] );
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const isWideAligned = includes( [ 'wide', 'full' ], align );
+	const isWideAligned = [ 'wide', 'full' ].includes( align );
 	const isResizable = ! isWideAligned && isLargeViewport;
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
@@ -82,13 +80,17 @@ const SiteLogo = ( {
 	} );
 	const { imageEditing, maxWidth, title } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		const siteEntities = select( coreStore ).getEditedEntityRecord(
+		const siteEntities = select( coreStore ).getEntityRecord(
 			'root',
-			'site'
+			'__unstableBase'
 		);
 		return {
-			title: siteEntities.title,
-			...pick( getSettings(), [ 'imageEditing', 'maxWidth' ] ),
+			title: siteEntities?.name,
+			...Object.fromEntries(
+				Object.entries( getSettings() ).filter( ( [ key ] ) =>
+					[ 'imageEditing', 'maxWidth' ].includes( key )
+				)
+			),
 		};
 	}, [] );
 
@@ -121,9 +123,10 @@ const SiteLogo = ( {
 			src={ logoUrl }
 			alt={ alt }
 			onLoad={ ( event ) => {
-				setNaturalSize(
-					pick( event.target, [ 'naturalWidth', 'naturalHeight' ] )
-				);
+				setNaturalSize( {
+					naturalWidth: event.target.naturalWidth,
+					naturalHeight: event.target.naturalHeight,
+				} );
 			} }
 		/>
 	);
@@ -292,6 +295,7 @@ const SiteLogo = ( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<RangeControl
+						__nextHasNoMarginBottom
 						label={ __( 'Image width' ) }
 						onChange={ ( newWidth ) =>
 							setAttributes( { width: newWidth } )
@@ -359,7 +363,6 @@ export default function LogoEdit( {
 	isSelected,
 } ) {
 	const { width, shouldSyncIcon } = attributes;
-	const [ logoUrl, setLogoUrl ] = useState();
 	const ref = useRef();
 
 	const {
@@ -370,15 +373,16 @@ export default function LogoEdit( {
 		mediaItemData,
 		isRequestingMediaItem,
 	} = useSelect( ( select ) => {
-		const { canUser, getEntityRecord, getEditedEntityRecord } = select(
-			coreStore
-		);
-		const siteSettings = getEditedEntityRecord( 'root', 'site' );
-		const siteData = getEntityRecord( 'root', '__unstableBase' );
-		const _siteLogo = siteSettings?.site_logo;
-		const _readOnlyLogo = siteData?.site_logo;
+		const { canUser, getEntityRecord, getEditedEntityRecord } =
+			select( coreStore );
 		const _canUserEdit = canUser( 'update', 'settings' );
-		const _siteLogoId = _canUserEdit ? _siteLogo : _readOnlyLogo;
+		const siteSettings = _canUserEdit
+			? getEditedEntityRecord( 'root', 'site' )
+			: undefined;
+		const siteData = getEntityRecord( 'root', '__unstableBase' );
+		const _siteLogoId = _canUserEdit
+			? siteSettings?.site_logo
+			: siteData?.site_logo;
 		const _siteIconId = siteSettings?.site_icon;
 		const mediaItem =
 			_siteLogoId &&
@@ -395,7 +399,7 @@ export default function LogoEdit( {
 		return {
 			siteLogoId: _siteLogoId,
 			canUserEdit: _canUserEdit,
-			url: siteData?.url,
+			url: siteData?.home,
 			mediaItemData: mediaItem,
 			isRequestingMediaItem: _isRequestingMediaItem,
 			siteIconId: _siteIconId,
@@ -417,17 +421,12 @@ export default function LogoEdit( {
 	};
 
 	const setIcon = ( newValue ) =>
+		// The new value needs to be `null` to reset the Site Icon.
 		editEntityRecord( 'root', 'site', undefined, {
-			site_icon: newValue,
+			site_icon: newValue ?? null,
 		} );
 
-	let alt = null;
-	if ( mediaItemData ) {
-		alt = mediaItemData.alt_text;
-		if ( logoUrl !== mediaItemData.source_url ) {
-			setLogoUrl( mediaItemData.source_url );
-		}
-	}
+	const { alt_text: alt, source_url: logoUrl } = mediaItemData ?? {};
 
 	const onInitialSelectLogo = ( media ) => {
 		// Initialize the syncSiteIcon toggle. If we currently have no Site logo and no
@@ -451,9 +450,8 @@ export default function LogoEdit( {
 		}
 
 		if ( ! media.id && media.url ) {
-			// This is a temporary blob image
+			// This is a temporary blob image.
 			setLogo( undefined );
-			setLogoUrl( media.url );
 			return;
 		}
 
@@ -462,13 +460,12 @@ export default function LogoEdit( {
 
 	const onRemoveLogo = () => {
 		setLogo( null );
-		setLogoUrl( undefined );
 		setAttributes( { width: undefined } );
 	};
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const onUploadError = ( message ) => {
-		createErrorNotice( message[ 2 ], { type: 'snackbar' } );
+		createErrorNotice( message, { type: 'snackbar' } );
 	};
 
 	const controls = canUserEdit && logoUrl && (
@@ -519,20 +516,11 @@ export default function LogoEdit( {
 			<Placeholder
 				className={ placeholderClassName }
 				preview={ logoImage }
+				withIllustration={ true }
+				style={ {
+					width,
+				} }
 			>
-				{
-					<SVG
-						className="components-placeholder__illustration"
-						fill="none"
-						xmlns="http://www.w3.org/2000/svg"
-						viewBox="0 0 60 60"
-					>
-						<Path
-							vectorEffect="non-scaling-stroke"
-							d="m61 32.622-13.555-9.137-15.888 9.859a5 5 0 0 1-5.386-.073l-9.095-5.989L1 37.5"
-						/>
-					</SVG>
-				}
 				{ content }
 			</Placeholder>
 		);
@@ -555,7 +543,7 @@ export default function LogoEdit( {
 			{ !! logoUrl && logoImage }
 			{ ! logoUrl && ! canUserEdit && (
 				<Placeholder className="site-logo_placeholder">
-					{ isLoading && (
+					{ !! isLoading && (
 						<span className="components-placeholder__preview">
 							<Spinner />
 						</span>

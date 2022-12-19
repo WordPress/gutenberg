@@ -4,6 +4,7 @@
 import {
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
+	__experimentalUseNavigator as useNavigator,
 } from '@wordpress/components';
 import { getBlockTypes } from '@wordpress/blocks';
 
@@ -20,8 +21,13 @@ import ScreenColorPalette from './screen-color-palette';
 import ScreenBackgroundColor from './screen-background-color';
 import ScreenTextColor from './screen-text-color';
 import ScreenLinkColor from './screen-link-color';
+import ScreenHeadingColor from './screen-heading-color';
+import ScreenButtonColor from './screen-button-color';
 import ScreenLayout from './screen-layout';
 import ScreenStyleVariations from './screen-style-variations';
+import ScreenBorder from './screen-border';
+import StyleBook from '../style-book';
+import ScreenCSS from './screen-css';
 
 function GlobalStylesNavigationScreen( { className, ...props } ) {
 	return (
@@ -38,7 +44,8 @@ function GlobalStylesNavigationScreen( { className, ...props } ) {
 }
 
 function ContextScreens( { name } ) {
-	const parentMenu = name === undefined ? '' : '/blocks/' + name;
+	const parentMenu =
+		name === undefined ? '' : '/blocks/' + encodeURIComponent( name );
 
 	return (
 		<>
@@ -56,6 +63,18 @@ function ContextScreens( { name } ) {
 				path={ parentMenu + '/typography/link' }
 			>
 				<ScreenTypographyElement name={ name } element="link" />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen
+				path={ parentMenu + '/typography/heading' }
+			>
+				<ScreenTypographyElement name={ name } element="heading" />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen
+				path={ parentMenu + '/typography/button' }
+			>
+				<ScreenTypographyElement name={ name } element="button" />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/colors' }>
@@ -82,6 +101,22 @@ function ContextScreens( { name } ) {
 				<ScreenLinkColor name={ name } />
 			</GlobalStylesNavigationScreen>
 
+			<GlobalStylesNavigationScreen
+				path={ parentMenu + '/colors/heading' }
+			>
+				<ScreenHeadingColor name={ name } />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen
+				path={ parentMenu + '/colors/button' }
+			>
+				<ScreenButtonColor name={ name } />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path={ parentMenu + '/border' }>
+				<ScreenBorder name={ name } />
+			</GlobalStylesNavigationScreen>
+
 			<GlobalStylesNavigationScreen path={ parentMenu + '/layout' }>
 				<ScreenLayout name={ name } />
 			</GlobalStylesNavigationScreen>
@@ -89,9 +124,36 @@ function ContextScreens( { name } ) {
 	);
 }
 
-function GlobalStylesUI() {
-	const blocks = getBlockTypes();
+function GlobalStylesStyleBook( { onClose } ) {
+	const navigator = useNavigator();
+	const { path } = navigator.location;
+	return (
+		<StyleBook
+			isSelected={ ( blockName ) =>
+				// Match '/blocks/core%2Fbutton' and
+				// '/blocks/core%2Fbutton/typography', but not
+				// '/blocks/core%2Fbuttons'.
+				path === `/blocks/${ encodeURIComponent( blockName ) }` ||
+				path.startsWith(
+					`/blocks/${ encodeURIComponent( blockName ) }/`
+				)
+			}
+			onSelect={ ( blockName ) => {
+				// Clear navigator history by going back to the root.
+				const depth = path.match( /\//g ).length;
+				for ( let i = 0; i < depth; i++ ) {
+					navigator.goBack();
+				}
+				// Now go to the selected block.
+				navigator.goTo( '/blocks/' + encodeURIComponent( blockName ) );
+			} }
+			onClose={ onClose }
+		/>
+	);
+}
 
+function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
+	const blocks = getBlockTypes();
 	return (
 		<NavigatorProvider
 			className="edit-site-global-styles-sidebar__navigator-provider"
@@ -112,7 +174,7 @@ function GlobalStylesUI() {
 			{ blocks.map( ( block ) => (
 				<GlobalStylesNavigationScreen
 					key={ 'menu-block-' + block.name }
-					path={ '/blocks/' + block.name }
+					path={ '/blocks/' + encodeURIComponent( block.name ) }
 				>
 					<ScreenBlock name={ block.name } />
 				</GlobalStylesNavigationScreen>
@@ -126,6 +188,13 @@ function GlobalStylesUI() {
 					name={ block.name }
 				/>
 			) ) }
+
+			{ isStyleBookOpened && (
+				<GlobalStylesStyleBook onClose={ onCloseStyleBook } />
+			) }
+			<GlobalStylesNavigationScreen path="/css">
+				<ScreenCSS />
+			</GlobalStylesNavigationScreen>
 		</NavigatorProvider>
 	);
 }

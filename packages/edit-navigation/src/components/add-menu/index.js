@@ -102,7 +102,7 @@ function AddMenu( {
 				variant="primary"
 				disabled={ ! menuName.length }
 				isBusy={ isCreatingMenu }
-				/* Button is disabled but still focusable */
+				/* Button is disabled but still focusable. */
 				aria-disabled={ ! menuName.length || isCreatingMenu }
 			>
 				{ __( 'Create menu' ) }

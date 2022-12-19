@@ -1,0 +1,121 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`List block adds one item to the list 1`] = `
+"<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>First list item</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List block changes the indentation level 1`] = `
+"<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>Item 1<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>Item 2</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List block changes to ordered list 1`] = `
+"<!-- wp:list {\\"ordered\\":true} -->
+<ol><!-- wp:list-item -->
+<li>Item 1</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Item 2</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Item 3</li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list -->"
+`;
+
+exports[`List block changes to reverse ordered list 1`] = `
+"<!-- wp:list {\\"ordered\\":true,\\"reversed\\":true} -->
+<ol reversed><!-- wp:list-item -->
+<li>Item 1</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Item 2</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Item 3</li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list -->"
+`;
+
+exports[`List block inserts block 1`] = `
+"<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List block removes the indentation level 1`] = `
+"<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>Item 1</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Item 2</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List block sets a start value to an ordered list 1`] = `
+"<!-- wp:list {\\"ordered\\":true,\\"start\\":25} -->
+<ol start=\\"25\\"><!-- wp:list-item -->
+<li>Item 1</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Item 2</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Item 3</li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list -->"
+`;
+
+exports[`List block shows different indentation levels 1`] = `
+"<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>List item 1</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>List item 2<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>List item nested 1</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>List item nested 2<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>Extra item 1</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Extra item 2</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>List item 3</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->"
+`;

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -20,6 +15,8 @@ import { decodeEntities } from '@wordpress/html-entities';
  * Internal dependencies
  */
 import AddMenu from '../add-menu';
+
+const noop = () => {};
 
 export default function MenuSwitcher( {
 	menus,

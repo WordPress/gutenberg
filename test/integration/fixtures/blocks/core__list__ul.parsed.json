@@ -2,10 +2,71 @@
 	{
 		"blockName": "core/list",
 		"attrs": {},
-		"innerBlocks": [],
-		"innerHTML": "\n<ul><li>Text & Headings</li><li>Images & Videos</li><li>Galleries</li><li>Embeds, like YouTube, Tweets, or other WordPress posts.</li><li>Layout blocks, like Buttons, Hero Images, Separators, etc.</li><li>And <em>Lists</em> like this one of course :)</li></ul>\n",
+		"innerBlocks": [
+			{
+				"blockName": "core/list-item",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n<li>Text &amp; Headings</li>\n",
+				"innerContent": [ "\n<li>Text &amp; Headings</li>\n" ]
+			},
+			{
+				"blockName": "core/list-item",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n<li>Images &amp; Videos</li>\n",
+				"innerContent": [ "\n<li>Images &amp; Videos</li>\n" ]
+			},
+			{
+				"blockName": "core/list-item",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n<li>Galleries</li>\n",
+				"innerContent": [ "\n<li>Galleries</li>\n" ]
+			},
+			{
+				"blockName": "core/list-item",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n<li>Embeds, like YouTube, Tweets, or other WordPress posts.</li>\n",
+				"innerContent": [
+					"\n<li>Embeds, like YouTube, Tweets, or other WordPress posts.</li>\n"
+				]
+			},
+			{
+				"blockName": "core/list-item",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n<li>Layout blocks, like Buttons, Hero Images, Separators, etc.</li>\n",
+				"innerContent": [
+					"\n<li>Layout blocks, like Buttons, Hero Images, Separators, etc.</li>\n"
+				]
+			},
+			{
+				"blockName": "core/list-item",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n<li>And <em>Lists</em> like this one of course :)</li>\n",
+				"innerContent": [
+					"\n<li>And <em>Lists</em> like this one of course :)</li>\n"
+				]
+			}
+		],
+		"innerHTML": "\n<ul>\n\n\n\n\n\n\n\n\n\n</ul>\n",
 		"innerContent": [
-			"\n<ul><li>Text & Headings</li><li>Images & Videos</li><li>Galleries</li><li>Embeds, like YouTube, Tweets, or other WordPress posts.</li><li>Layout blocks, like Buttons, Hero Images, Separators, etc.</li><li>And <em>Lists</em> like this one of course :)</li></ul>\n"
+			"\n<ul>",
+			null,
+			"\n\n",
+			null,
+			"\n\n",
+			null,
+			"\n\n",
+			null,
+			"\n\n",
+			null,
+			"\n\n",
+			null,
+			"</ul>\n"
 		]
 	}
 ]

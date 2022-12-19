@@ -15,7 +15,6 @@ import {
 } from 'react-native';
 import Modal from 'react-native-modal';
 import SafeArea from 'react-native-safe-area';
-import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -55,22 +54,19 @@ class BottomSheet extends Component {
 		this.isScrolling = this.isScrolling.bind( this );
 		this.onShouldEnableScroll = this.onShouldEnableScroll.bind( this );
 		this.onDismiss = this.onDismiss.bind( this );
-		this.onShouldSetBottomSheetMaxHeight = this.onShouldSetBottomSheetMaxHeight.bind(
-			this
-		);
+		this.onShouldSetBottomSheetMaxHeight =
+			this.onShouldSetBottomSheetMaxHeight.bind( this );
 
 		this.setIsFullScreen = this.setIsFullScreen.bind( this );
 
 		this.onDimensionsChange = this.onDimensionsChange.bind( this );
 		this.onHeaderLayout = this.onHeaderLayout.bind( this );
 		this.onCloseBottomSheet = this.onCloseBottomSheet.bind( this );
-		this.onHandleClosingBottomSheet = this.onHandleClosingBottomSheet.bind(
-			this
-		);
+		this.onHandleClosingBottomSheet =
+			this.onHandleClosingBottomSheet.bind( this );
 		this.onHardwareButtonPress = this.onHardwareButtonPress.bind( this );
-		this.onHandleHardwareButtonPress = this.onHandleHardwareButtonPress.bind(
-			this
-		);
+		this.onHandleHardwareButtonPress =
+			this.onHandleHardwareButtonPress.bind( this );
 		this.keyboardShow = this.keyboardShow.bind( this );
 		this.keyboardHide = this.keyboardHide.bind( this );
 
@@ -121,9 +117,9 @@ class BottomSheet extends Component {
 
 		if ( duration && easing ) {
 			// This layout animation is the same as the React Native's KeyboardAvoidingView component.
-			// Reference: https://github.com/facebook/react-native/blob/266b21baf35e052ff28120f79c06c4f6dddc51a9/Libraries/Components/Keyboard/KeyboardAvoidingView.js#L119-L128
+			// Reference: https://github.com/facebook/react-native/blob/266b21baf35e052ff28120f79c06c4f6dddc51a9/Libraries/Components/Keyboard/KeyboardAvoidingView.js#L119-L128.
 			const animationConfig = {
-				// We have to pass the duration equal to minimal accepted duration defined here: RCTLayoutAnimation.m
+				// We have to pass the duration equal to minimal accepted duration defined here: RCTLayoutAnimation.m.
 				duration: duration > 10 ? duration : 10,
 				type: LayoutAnimation.Types[ easing ] || 'keyboard',
 			};
@@ -148,10 +144,10 @@ class BottomSheet extends Component {
 			// TODO: Reinstate animations, possibly replacing `LayoutAnimation` with
 			// more nuanced `Animated` usage or replacing our custom `BottomSheet`
 			// with `@gorhom/bottom-sheet`. This animation was disabled to avoid a
-			// preexisting bug: https://git.io/JMPCV
+			// preexisting bug: https://github.com/WordPress/gutenberg/issues/30562
 			// this.performRegularLayoutAnimation( {
 			// 	useLastLayoutAnimation: false,
-			// } );
+			// } );.
 		}
 	}
 
@@ -195,7 +191,7 @@ class BottomSheet extends Component {
 		);
 
 		// 'Will' keyboard events are not available on Android.
-		// Reference: https://reactnative.dev/docs/0.61/keyboard#addlistener
+		// Reference: https://reactnative.dev/docs/0.61/keyboard#addlistener.
 		this.keyboardShowListener = Keyboard.addListener(
 			Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
 			this.keyboardShow
@@ -249,7 +245,7 @@ class BottomSheet extends Component {
 		const statusBarHeight =
 			Platform.OS === 'android' ? StatusBar.currentHeight : 0;
 
-		// `maxHeight` when modal is opened along with a keyboard
+		// `maxHeight` when modal is opened along with a keyboard.
 		const maxHeightWithOpenKeyboard =
 			0.95 *
 			( Dimensions.get( 'window' ).height -
@@ -257,7 +253,7 @@ class BottomSheet extends Component {
 				statusBarHeight -
 				this.headerHeight );
 
-		// In landscape orientation, set `maxHeight` to ~96% of the height
+		// In landscape orientation, set `maxHeight` to ~96% of the height.
 		if ( width > height ) {
 			this.setState( {
 				maxHeight: Math.min(
@@ -265,7 +261,7 @@ class BottomSheet extends Component {
 					maxHeightWithOpenKeyboard
 				),
 			} );
-			// In portrait orientation, set `maxHeight` to ~59% of the height
+			// In portrait orientation, set `maxHeight` to ~59% of the height.
 		} else {
 			this.setState( {
 				maxHeight: Math.min(
@@ -403,6 +399,7 @@ class BottomSheet extends Component {
 			children,
 			withHeaderSeparator = false,
 			hasNavigation,
+			onDismiss,
 			...rest
 		} = this.props;
 		const {
@@ -419,7 +416,7 @@ class BottomSheet extends Component {
 		const panResponder = PanResponder.create( {
 			onMoveShouldSetPanResponder: ( evt, gestureState ) => {
 				// 'swiping-to-close' option is temporarily and partially disabled
-				//	on Android ( swipe / drag is still available in the top most area - near drag indicator)
+				// on Android ( swipe / drag is still available in the top most area - near drag indicator).
 				if ( Platform.OS === 'ios' ) {
 					// Activates swipe down over child Touchables if the swipe is long enough.
 					// With this we can adjust sensibility on the swipe vs tap gestures.
@@ -449,7 +446,7 @@ class BottomSheet extends Component {
 			listStyle = { maxHeight };
 
 			// Allow setting a "static" height of the bottom sheet
-			// by settting the min height to the max height.
+			// by setting the min height to the max height.
 			if ( this.props.setMinHeightToMaxHeight ) {
 				listStyle.minHeight = maxHeight;
 			}
@@ -495,12 +492,12 @@ class BottomSheet extends Component {
 		);
 
 		const showDragIndicator = () => {
-			// if iOS or not fullscreen show the drag indicator
+			// If iOS or not fullscreen show the drag indicator.
 			if ( Platform.OS === 'ios' || ! this.state.isFullScreen ) {
 				return true;
 			}
 
-			// Otherwise check the allowDragIndicator
+			// Otherwise check the allowDragIndicator.
 			return this.props.allowDragIndicator;
 		};
 
@@ -530,9 +527,7 @@ class BottomSheet extends Component {
 					panResponder.panHandlers.onMoveShouldSetResponderCapture
 				}
 				onAccessibilityEscape={ this.onCloseBottomSheet }
-				// We need to prevent overwriting the onDismiss prop,
-				// for this reason it is excluded from the rest object.
-				{ ...omit( rest, 'onDismiss' ) }
+				{ ...rest }
 			>
 				<KeyboardAvoidingView
 					behavior={ Platform.OS === 'ios' && 'padding' }
@@ -568,15 +563,15 @@ class BottomSheet extends Component {
 					>
 						<BottomSheetProvider
 							value={ {
-								shouldEnableBottomSheetScroll: this
-									.onShouldEnableScroll,
-								shouldEnableBottomSheetMaxHeight: this
-									.onShouldSetBottomSheetMaxHeight,
+								shouldEnableBottomSheetScroll:
+									this.onShouldEnableScroll,
+								shouldEnableBottomSheetMaxHeight:
+									this.onShouldSetBottomSheetMaxHeight,
 								isBottomSheetContentScrolling: isScrolling,
-								onHandleClosingBottomSheet: this
-									.onHandleClosingBottomSheet,
-								onHandleHardwareButtonPress: this
-									.onHandleHardwareButtonPress,
+								onHandleClosingBottomSheet:
+									this.onHandleClosingBottomSheet,
+								onHandleHardwareButtonPress:
+									this.onHandleHardwareButtonPress,
 								listProps,
 								setIsFullScreen: this.setIsFullScreen,
 								safeAreaBottomInset,

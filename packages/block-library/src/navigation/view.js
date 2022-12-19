@@ -1,32 +1,3 @@
-/**
- * External dependencies
- */
-import MicroModal from 'micromodal';
-
-// Responsive navigation toggle.
-function navigationToggleModal( modal ) {
-	const dialogContainer = modal.querySelector(
-		`.wp-block-navigation__responsive-dialog`
-	);
-
-	const isHidden = 'true' === modal.getAttribute( 'aria-hidden' );
-
-	modal.classList.toggle( 'has-modal-open', ! isHidden );
-	dialogContainer.toggleAttribute( 'aria-modal', ! isHidden );
-
-	if ( isHidden ) {
-		dialogContainer.removeAttribute( 'role' );
-		dialogContainer.removeAttribute( 'aria-modal' );
-	} else {
-		dialogContainer.setAttribute( 'role', 'dialog' );
-		dialogContainer.setAttribute( 'aria-modal', 'true' );
-	}
-
-	// Add a class to indicate the modal is open.
-	const htmlElement = document.documentElement;
-	htmlElement.classList.toggle( 'has-modal-open' );
-}
-
 // Open on click functionality.
 function closeSubmenus( element ) {
 	element
@@ -65,12 +36,6 @@ function toggleSubmenuOnClick( event ) {
 // Necessary for some themes such as TT1 Blocks, where
 // scripts could be loaded before the body.
 window.addEventListener( 'load', () => {
-	MicroModal.init( {
-		onShow: navigationToggleModal,
-		onClose: navigationToggleModal,
-		openClass: 'is-menu-open',
-	} );
-
 	const submenuButtons = document.querySelectorAll(
 		'.wp-block-navigation-submenu__toggle'
 	);
@@ -90,7 +55,7 @@ window.addEventListener( 'load', () => {
 			}
 		} );
 	} );
-	// Close on focus outside.
+	// Close on focus outside or escape key.
 	document.addEventListener( 'keyup', function ( event ) {
 		const submenuBlocks = document.querySelectorAll(
 			'.wp-block-navigation-item.has-child'
@@ -98,6 +63,11 @@ window.addEventListener( 'load', () => {
 		submenuBlocks.forEach( function ( block ) {
 			if ( ! block.contains( event.target ) ) {
 				closeSubmenus( block );
+			} else if ( event.key === 'Escape' ) {
+				const toggle = block.querySelector( '[aria-expanded="true"]' );
+				closeSubmenus( block );
+				// Focus the submenu trigger so focus does not get trapped in the closed submenu.
+				toggle?.focus();
 			}
 		} );
 	} );

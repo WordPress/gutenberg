@@ -7,12 +7,18 @@ import { sprintf, __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { TemplatePartImportControls } from './import-controls';
+
 export function TemplatePartAdvancedControls( {
 	tagName,
 	setAttributes,
 	isEntityAvailable,
 	templatePartId,
 	defaultWrapper,
+	hasInnerBlocks,
 } ) {
 	const [ area, setArea ] = useEntityProp(
 		'postType',
@@ -31,10 +37,10 @@ export function TemplatePartAdvancedControls( {
 	const { areaOptions } = useSelect( ( select ) => {
 		// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
 		// Blocks can be loaded into a *non-post* block editor.
-		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		const definedAreas = select(
-			'core/editor'
-		).__experimentalGetDefaultTemplatePartAreas();
+		/* eslint-disable @wordpress/data-no-store-string-literals */
+		const definedAreas =
+			select( 'core/editor' ).__experimentalGetDefaultTemplatePartAreas();
+		/* eslint-enable @wordpress/data-no-store-string-literals */
 		return {
 			areaOptions: definedAreas.map( ( { label, area: _area } ) => ( {
 				label,
@@ -87,6 +93,12 @@ export function TemplatePartAdvancedControls( {
 				value={ tagName || '' }
 				onChange={ ( value ) => setAttributes( { tagName: value } ) }
 			/>
+			{ ! hasInnerBlocks && (
+				<TemplatePartImportControls
+					area={ area }
+					setAttributes={ setAttributes }
+				/>
+			) }
 		</InspectorControls>
 	);
 }

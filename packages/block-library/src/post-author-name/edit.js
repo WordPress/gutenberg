@@ -50,6 +50,7 @@ function PostAuthorNameEdit( {
 		<a
 			href="#author-pseudo-link"
 			onClick={ ( event ) => event.preventDefault() }
+			className="wp-block-post-author-name__link"
 		>
 			{ displayName }
 		</a>

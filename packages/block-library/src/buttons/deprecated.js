@@ -15,11 +15,8 @@ const migrateWithLayout = ( attributes ) => {
 		return attributes;
 	}
 
-	const {
-		contentJustification,
-		orientation,
-		...updatedAttributes
-	} = attributes;
+	const { contentJustification, orientation, ...updatedAttributes } =
+		attributes;
 
 	if ( contentJustification || orientation ) {
 		Object.assign( updatedAttributes, {
@@ -67,7 +64,8 @@ const deprecated = [
 				<div
 					{ ...useBlockProps.save( {
 						className: classnames( {
-							[ `is-content-justification-${ contentJustification }` ]: contentJustification,
+							[ `is-content-justification-${ contentJustification }` ]:
+								contentJustification,
 							'is-vertical': orientation === 'vertical',
 						} ),
 					} ) }

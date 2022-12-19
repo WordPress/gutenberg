@@ -4,7 +4,11 @@
 import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
-import { pasteHandler } from '@wordpress/blocks';
+import {
+	pasteHandler,
+	findTransform,
+	getBlockTransforms,
+} from '@wordpress/blocks';
 import {
 	isEmpty,
 	insert,
@@ -17,9 +21,9 @@ import { isURL } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { filePasteHandler } from './file-paste-handler';
 import { addActiveFormats, isShortcode } from './utils';
 import { splitValue } from './split-value';
+import { shouldDismissPastedFiles } from '../../utils/pasting';
 
 /** @typedef {import('@wordpress/rich-text').RichTextValue} RichTextValue */
 
@@ -62,7 +66,6 @@ export function usePasteHandler( props ) {
 			} = propsRef.current;
 
 			if ( ! isSelected ) {
-				event.preventDefault();
 				return;
 			}
 
@@ -155,26 +158,48 @@ export function usePasteHandler( props ) {
 				return;
 			}
 
-			// Only process file if no HTML is present.
-			// Note: a pasted file may have the URL as plain text.
-			if ( files && files.length && ! html ) {
-				const content = pasteHandler( {
-					HTML: filePasteHandler( files ),
-					mode: 'BLOCKS',
-					tagName,
-					preserveWhiteSpace,
-				} );
-
+			if ( files?.length ) {
 				// Allows us to ask for this information when we get a report.
 				// eslint-disable-next-line no-console
 				window.console.log( 'Received items:\n\n', files );
+			}
+
+			// Process any attached files, unless we infer that the files in
+			// question are redundant "screenshots" of the actual HTML payload,
+			// as created by certain office-type programs.
+			//
+			// @see shouldDismissPastedFiles
+			if (
+				files?.length &&
+				! shouldDismissPastedFiles( files, html, plainText )
+			) {
+				const fromTransforms = getBlockTransforms( 'from' );
+				const blocks = files
+					.reduce( ( accumulator, file ) => {
+						const transformation = findTransform(
+							fromTransforms,
+							( transform ) =>
+								transform.type === 'files' &&
+								transform.isMatch( [ file ] )
+						);
+						if ( transformation ) {
+							accumulator.push(
+								transformation.transform( [ file ] )
+							);
+						}
+						return accumulator;
+					}, [] )
+					.flat();
+				if ( ! blocks.length ) {
+					return;
+				}
 
 				if ( onReplace && isEmpty( value ) ) {
-					onReplace( content );
+					onReplace( blocks );
 				} else {
 					splitValue( {
 						value,
-						pastedBlocks: content,
+						pastedBlocks: blocks,
 						onReplace,
 						onSplit,
 						onSplitMiddle,
@@ -248,17 +273,29 @@ export function usePasteHandler( props ) {
 }
 
 /**
- * Normalizes a given string of HTML to remove the Windows specific "Fragment" comments
- * and any preceeding and trailing whitespace.
+ * Normalizes a given string of HTML to remove the Windows-specific "Fragment"
+ * comments and any preceding and trailing content.
  *
  * @param {string} html the html to be normalized
  * @return {string} the normalized html
  */
 function removeWindowsFragments( html ) {
-	const startReg = /.*<!--StartFragment-->/s;
-	const endReg = /<!--EndFragment-->.*/s;
+	const startStr = '<!--StartFragment-->';
+	const startIdx = html.indexOf( startStr );
+	if ( startIdx > -1 ) {
+		html = html.substring( startIdx + startStr.length );
+	} else {
+		// No point looking for EndFragment
+		return html;
+	}
 
-	return html.replace( startReg, '' ).replace( endReg, '' );
+	const endStr = '<!--EndFragment-->';
+	const endIdx = html.indexOf( endStr );
+	if ( endIdx > -1 ) {
+		html = html.substring( 0, endIdx );
+	}
+
+	return html;
 }
 
 /**

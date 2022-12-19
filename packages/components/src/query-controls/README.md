@@ -51,7 +51,7 @@ const MyQueryControls = () => {
 			selectedCategoryId={ category }
 			onCategoryChange={ ( newCategory ) => updateQuery( { category: newCategory } ) }
 			onNumberOfItemsChange={ ( newNumberOfItems ) =>
-				updateQuery( { numberOfItems: newCategory } )
+				updateQuery( { numberOfItems: newNumberOfItems } )
 			}
 		/>
 	);
@@ -104,7 +104,7 @@ const MyQueryControls = () => {
 			selectedCategories={ selectedCategories }
 			onCategoryChange={ ( category ) => updateQuery( { selectedCategories: category } ) }
 			onNumberOfItemsChange={ ( newNumberOfItems ) =>
-				updateQuery( { numberOfItems: newCategory } )
+				updateQuery( { numberOfItems: newNumberOfItems } )
 			}
 		/>
 	);
@@ -179,7 +179,7 @@ A function that receives the new author value. If this is not specified, the aut
 
 #### onCategoryChange
 
-A function that receives the new author value. If this is not specified, the category controls are not included.
+A function that receives the new category value. If this is not specified, the category controls are not included.
 
 -   Type: `Function`
 -   Required: No

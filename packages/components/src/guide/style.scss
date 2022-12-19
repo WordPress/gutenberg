@@ -20,6 +20,7 @@
 		border-bottom: none;
 		padding: 0;
 		position: sticky;
+		height: $header-height;
 
 		.components-button {
 			align-self: flex-start;
@@ -127,9 +128,5 @@
 
 	&.components-guide__finish-button {
 		right: $grid-unit-40;
-	}
-
-	&.components-guide__inline-finish-button {
-		display: none;
 	}
 }

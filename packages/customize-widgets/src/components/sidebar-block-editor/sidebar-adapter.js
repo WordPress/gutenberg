@@ -128,10 +128,8 @@ export default class SidebarAdapter {
 	}
 
 	_replaceHistory() {
-		this.history[
-			this.historyIndex
-		] = this._getWidgetIds().map( ( widgetId ) =>
-			this.getWidget( widgetId )
+		this.history[ this.historyIndex ] = this._getWidgetIds().map(
+			( widgetId ) => this.getWidget( widgetId )
 		);
 	}
 

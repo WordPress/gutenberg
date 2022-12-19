@@ -1,7 +1,7 @@
 /**
  * Generates core block documentation using block.json files.
  * Reads from  : packages/block-library/src
- * Publishes to: docs/reference-guides/core-blocks.ms
+ * Publishes to: docs/reference-guides/core-blocks.md
  */
 
 /**
@@ -10,7 +10,6 @@
 const path = require( 'path' );
 const glob = require( 'fast-glob' );
 const fs = require( 'fs' );
-const { keys } = require( 'lodash' );
 /**
  * Path to root project directory.
  *
@@ -68,7 +67,11 @@ const TOKEN_PATTERN = new RegExp( START_TOKEN + '[^]*' + END_TOKEN );
  * @return {string[]} Array of truthy keys
  */
 function getTruthyKeys( obj ) {
-	return keys( obj )
+	if ( ! obj ) {
+		return [];
+	}
+
+	return Object.keys( obj )
 		.filter( ( key ) => ! key.startsWith( '__exp' ) )
 		.map( ( key ) => ( obj[ key ] ? key : `~~${ key }~~` ) );
 }
@@ -147,8 +150,10 @@ function readBlockJSON( filename ) {
 	const blockjson = require( filename );
 
 	const sourcefile = getSourceFromFile( filename );
-	const supportsAugmented = augmentSupports( blockjson.supports );
-	const supportsList = processObjWithInnerKeys( supportsAugmented );
+	const supportsList =
+		blockjson.supports !== undefined
+			? processObjWithInnerKeys( augmentSupports( blockjson.supports ) )
+			: [];
 	const attributes = getTruthyKeys( blockjson.attributes );
 
 	return `

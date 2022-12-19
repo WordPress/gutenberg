@@ -15,9 +15,9 @@ import './style.scss';
 
 import Edit from './edit';
 import save from './save';
+import metadata from './block.json';
 
-registerBlockType( 'create-block/gutenpride', {
-	apiVersion: 2,
+registerBlockType( metadata.name, {
 	/**
 	 * @see ./edit.js
 	 */
@@ -29,7 +29,7 @@ registerBlockType( 'create-block/gutenpride', {
 } );
 ```
 
-The first parameter in the **registerBlockType** function is the block name, this should match exactly to the name registered in the PHP file.
+The first parameter in the **registerBlockType** function is the block name, this should match exactly to the `name` property in the `block.json` file. By importing the metadata from `block.json` and referencing the `name` property in the first parameter we ensure that they will match, and continue to match even if the name is subsequently changed in `block.json`.
 
 The second parameter to the function is the block object. See the [block registration documentation](/docs/reference-guides/block-api/block-registration.md) for full details.
 
@@ -37,29 +37,31 @@ The last two block object properties are **edit** and **save**, these are the ke
 
 The results of the edit function is what the editor will render to the editor page when the block is inserted.
 
-The results of the save function is what the editor will insert into the **post_content** field when the post is saved. The post_content field is the field in the WordPress database used to store the content of the post.
+The results of the save function is what the editor will insert into the **post_content** field when the post is saved. The post_content field is the field in the **wp_posts** table in the WordPress database that is used to store the content of the post.
 
-Most of the properties are set in the `block.json` file.
+Most of the properties are set in the `src/block.json` file.
 
 ```json
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
 	"name": "create-block/gutenpride",
+	"version": "0.1.0",
 	"title": "Gutenpride",
-	"category": "widgets",
-	"icon": "smiley",
-	"description": "Example block written with ESNext standard and JSX support – build step required.",
+	"category": "text",
+	"icon": "flag",
+	"description": "A Gutenberg block to show your pride! This block enables you to type text and style it with the color font Gilbert from Type with Pride.",
 	"supports": {
 		"html": false
 	},
 	"textdomain": "gutenpride",
-	"editorScript": "file:./build/index.js",
-	"editorStyle": "file:./build/index.css",
-	"style": "file:./build/style-index.css"
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css"
 }
 ```
 
-The **title** is the title of the block shown in the Inserter.
+The **title** is the title of the block shown in the Inserter and in other areas of the editor.
 
 The **icon** is the icon shown in the Inserter. The icon property expects any Dashicon name as a string, see [list of available icons](https://developer.wordpress.org/resource/dashicons/). You can also provide an SVG object, but for now it's easiest to just pick a Dashicon name.
 

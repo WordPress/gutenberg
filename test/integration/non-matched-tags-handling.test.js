@@ -6,7 +6,7 @@ import { registerCoreBlocks } from '@wordpress/block-library';
 
 describe( 'Handling of non matched tags in block transforms', () => {
 	beforeAll( () => {
-		// Load all hooks that modify blocks
+		// Load all hooks that modify blocks.
 		require( '../../packages/editor/src/hooks' );
 		registerCoreBlocks();
 	} );

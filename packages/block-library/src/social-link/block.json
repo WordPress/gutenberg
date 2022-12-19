@@ -16,6 +16,9 @@
 		},
 		"label": {
 			"type": "string"
+		},
+		"rel": {
+			"type": "string"
 		}
 	},
 	"usesContext": [

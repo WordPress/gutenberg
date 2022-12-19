@@ -80,7 +80,7 @@ function useRemoteUrlData( url ) {
 						} );
 					}
 				} );
-			// Cleanup: when the URL changes the abort the current request
+			// Cleanup: when the URL changes the abort the current request.
 			return () => {
 				controller.abort();
 			};

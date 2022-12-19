@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
@@ -15,13 +16,14 @@ import Button from '../button';
 import Dropdown from '../dropdown';
 import Tooltip from '../tooltip';
 
-function Option( {
-	className,
-	isSelected,
-	selectedIconProps,
-	tooltipText,
-	...additionalProps
-} ) {
+function Option( props ) {
+	const {
+		className,
+		isSelected,
+		selectedIconProps,
+		tooltipText,
+		...additionalProps
+	} = props;
 	const optionButton = (
 		<Button
 			isPressed={ isSelected }
@@ -51,12 +53,8 @@ function Option( {
 	);
 }
 
-function DropdownLinkAction( {
-	buttonProps,
-	className,
-	dropdownProps,
-	linkText,
-} ) {
+function DropdownLinkAction( props ) {
+	const { buttonProps, className, dropdownProps, linkText } = props;
 	return (
 		<Dropdown
 			className={ classnames(
@@ -79,15 +77,15 @@ function DropdownLinkAction( {
 	);
 }
 
-function ButtonAction( { className, children, ...additionalProps } ) {
+function ButtonAction( props ) {
+	const { className, children, ...additionalProps } = props;
 	return (
 		<Button
 			className={ classnames(
 				'components-circular-option-picker__clear',
 				className
 			) }
-			isSmall
-			variant="secondary"
+			variant="tertiary"
 			{ ...additionalProps }
 		>
 			{ children }
@@ -95,12 +93,8 @@ function ButtonAction( { className, children, ...additionalProps } ) {
 	);
 }
 
-export default function CircularOptionPicker( {
-	actions,
-	className,
-	options,
-	children,
-} ) {
+export default function CircularOptionPicker( props ) {
+	const { actions, className, options, children } = props;
 	return (
 		<div
 			className={ classnames(

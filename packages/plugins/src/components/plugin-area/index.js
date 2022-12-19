@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
 import memoize from 'memize';
 
 /**
@@ -14,6 +13,7 @@ import { addAction, removeAction } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { PluginContextProvider } from '../plugin-context';
+import { PluginErrorBoundary } from '../plugin-error-boundary';
 import { getPlugins } from '../../api';
 
 /**
@@ -66,8 +66,7 @@ class PluginArea extends Component {
 
 	getCurrentPluginsState() {
 		return {
-			plugins: map(
-				getPlugins( this.props.scope ),
+			plugins: getPlugins( this.props.scope ).map(
 				( { icon, name, render } ) => {
 					return {
 						Plugin: render,
@@ -109,12 +108,17 @@ class PluginArea extends Component {
 	render() {
 		return (
 			<div style={ { display: 'none' } }>
-				{ map( this.state.plugins, ( { context, Plugin } ) => (
+				{ this.state.plugins.map( ( { context, Plugin } ) => (
 					<PluginContextProvider
 						key={ context.name }
 						value={ context }
 					>
-						<Plugin />
+						<PluginErrorBoundary
+							name={ context.name }
+							onError={ this.props.onError }
+						>
+							<Plugin />
+						</PluginErrorBoundary>
 					</PluginContextProvider>
 				) ) }
 			</div>

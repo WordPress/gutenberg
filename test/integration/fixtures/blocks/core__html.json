@@ -1,12 +1,10 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/html",
 		"isValid": true,
 		"attributes": {
 			"content": "<h1>Some HTML code</h1>\n<div>This is a div</div>"
 		},
-		"innerBlocks": [],
-		"originalContent": "<h1>Some HTML code</h1>\n<div>This is a div</div>"
+		"innerBlocks": []
 	}
 ]

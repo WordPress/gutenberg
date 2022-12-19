@@ -14,10 +14,8 @@ export default forwardRef( function RovingTabIndexItem(
 ) {
 	const localRef = useRef();
 	const ref = forwardedRef || localRef;
-	const {
-		lastFocusedElement,
-		setLastFocusedElement,
-	} = useRovingTabIndexContext();
+	const { lastFocusedElement, setLastFocusedElement } =
+		useRovingTabIndexContext();
 	let tabIndex;
 
 	if ( lastFocusedElement ) {

@@ -2,11 +2,13 @@
  * External dependencies
  */
 import { parse as hpqParse } from 'hpq';
-import { flow, mapValues, castArray } from 'lodash';
+import { mapValues } from 'lodash';
+import memoize from 'memize';
 
 /**
  * WordPress dependencies
  */
+import { pipe } from '@wordpress/compose';
 import { applyFilters } from '@wordpress/hooks';
 
 /**
@@ -27,7 +29,7 @@ import { normalizeBlockType } from '../utils';
  * @return {Function} Enhanced hpq matcher.
  */
 export const toBooleanAttributeMatcher = ( matcher ) =>
-	flow( [
+	pipe( [
 		matcher,
 		// Expected values from `attr( 'disabled' )`:
 		//
@@ -102,18 +104,19 @@ export function isOfTypes( value, types ) {
  *
  * @param {string} attributeKey      Attribute key.
  * @param {Object} attributeSchema   Attribute's schema.
- * @param {string} innerHTML         Block's raw content.
+ * @param {Node}   innerDOM          Parsed DOM of block's inner HTML.
  * @param {Object} commentAttributes Block's comment attributes.
+ * @param {string} innerHTML         Raw HTML from block node's innerHTML property.
  *
  * @return {*} Attribute value.
  */
 export function getBlockAttribute(
 	attributeKey,
 	attributeSchema,
-	innerHTML,
-	commentAttributes
+	innerDOM,
+	commentAttributes,
+	innerHTML
 ) {
-	const { type, enum: enumSet } = attributeSchema;
 	let value;
 
 	switch ( attributeSchema.source ) {
@@ -124,6 +127,10 @@ export function getBlockAttribute(
 				? commentAttributes[ attributeKey ]
 				: undefined;
 			break;
+		// raw source means that it's the original raw block content.
+		case 'raw':
+			value = innerHTML;
+			break;
 		case 'attribute':
 		case 'property':
 		case 'html':
@@ -132,18 +139,21 @@ export function getBlockAttribute(
 		case 'node':
 		case 'query':
 		case 'tag':
-			value = parseWithAttributeSchema( innerHTML, attributeSchema );
+			value = parseWithAttributeSchema( innerDOM, attributeSchema );
 			break;
 	}
 
-	if ( ! isValidByType( value, type ) || ! isValidByEnum( value, enumSet ) ) {
+	if (
+		! isValidByType( value, attributeSchema.type ) ||
+		! isValidByEnum( value, attributeSchema.enum )
+	) {
 		// Reject the value if it is not valid. Reverting to the undefined
 		// value ensures the default is respected, if applicable.
 		value = undefined;
 	}
 
 	if ( value === undefined ) {
-		return attributeSchema.default;
+		value = attributeSchema.default;
 	}
 
 	return value;
@@ -161,7 +171,10 @@ export function getBlockAttribute(
  * @return {boolean} Whether value is valid.
  */
 export function isValidByType( value, type ) {
-	return type === undefined || isOfTypes( value, castArray( type ) );
+	return (
+		type === undefined ||
+		isOfTypes( value, Array.isArray( type ) ? type : [ type ] )
+	);
 }
 
 /**
@@ -186,7 +199,7 @@ export function isValidByEnum( value, enumSet ) {
  *
  * @return {Function} A hpq Matcher.
  */
-export function matcherFromSource( sourceConfig ) {
+export const matcherFromSource = memoize( ( sourceConfig ) => {
 	switch ( sourceConfig.source ) {
 		case 'attribute':
 			let matcher = attr( sourceConfig.selector, sourceConfig.attribute );
@@ -210,7 +223,7 @@ export function matcherFromSource( sourceConfig ) {
 			);
 			return query( sourceConfig.selector, subMatchers );
 		case 'tag':
-			return flow( [
+			return pipe( [
 				prop( sourceConfig.selector, 'nodeName' ),
 				( nodeName ) =>
 					nodeName ? nodeName.toLowerCase() : undefined,
@@ -219,26 +232,37 @@ export function matcherFromSource( sourceConfig ) {
 			// eslint-disable-next-line no-console
 			console.error( `Unknown source type "${ sourceConfig.source }"` );
 	}
+} );
+
+/**
+ * Parse a HTML string into DOM tree.
+ *
+ * @param {string|Node} innerHTML HTML string or already parsed DOM node.
+ *
+ * @return {Node} Parsed DOM node.
+ */
+function parseHtml( innerHTML ) {
+	return hpqParse( innerHTML, ( h ) => h );
 }
 
 /**
  * Given a block's raw content and an attribute's schema returns the attribute's
  * value depending on its source.
  *
- * @param {string} innerHTML       Block's raw content.
- * @param {Object} attributeSchema Attribute's schema.
+ * @param {string|Node} innerHTML       Block's raw content.
+ * @param {Object}      attributeSchema Attribute's schema.
  *
  * @return {*} Attribute value.
  */
 export function parseWithAttributeSchema( innerHTML, attributeSchema ) {
-	return hpqParse( innerHTML, matcherFromSource( attributeSchema ) );
+	return matcherFromSource( attributeSchema )( parseHtml( innerHTML ) );
 }
 
 /**
  * Returns the block attributes of a registered block node given its type.
  *
  * @param {string|Object} blockTypeOrName Block type or name.
- * @param {string}        innerHTML       Raw block content.
+ * @param {string|Node}   innerHTML       Raw block content.
  * @param {?Object}       attributes      Known block attributes (from delimiters).
  *
  * @return {Object} All block attributes.
@@ -248,17 +272,11 @@ export function getBlockAttributes(
 	innerHTML,
 	attributes = {}
 ) {
+	const doc = parseHtml( innerHTML );
 	const blockType = normalizeBlockType( blockTypeOrName );
-	const blockAttributes = mapValues(
-		blockType.attributes,
-		( attributeSchema, attributeKey ) => {
-			return getBlockAttribute(
-				attributeKey,
-				attributeSchema,
-				innerHTML,
-				attributes
-			);
-		}
+
+	const blockAttributes = mapValues( blockType.attributes, ( schema, key ) =>
+		getBlockAttribute( key, schema, doc, attributes, innerHTML )
 	);
 
 	return applyFilters(

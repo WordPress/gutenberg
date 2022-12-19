@@ -168,20 +168,17 @@ export const annotation = {
 	},
 	__experimentalGetPropsForEditableTreeChangeHandler( dispatch ) {
 		return {
-			removeAnnotation: dispatch( STORE_NAME )
-				.__experimentalRemoveAnnotation,
-			updateAnnotationRange: dispatch( STORE_NAME )
-				.__experimentalUpdateAnnotationRange,
+			removeAnnotation:
+				dispatch( STORE_NAME ).__experimentalRemoveAnnotation,
+			updateAnnotationRange:
+				dispatch( STORE_NAME ).__experimentalUpdateAnnotationRange,
 		};
 	},
 	__experimentalCreateOnChangeEditableValue( props ) {
 		return ( formats ) => {
 			const positions = retrieveAnnotationPositions( formats );
-			const {
-				removeAnnotation,
-				updateAnnotationRange,
-				annotations,
-			} = props;
+			const { removeAnnotation, updateAnnotationRange, annotations } =
+				props;
 
 			updateAnnotationsWithPositions( annotations, positions, {
 				removeAnnotation,

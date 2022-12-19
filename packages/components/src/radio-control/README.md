@@ -75,57 +75,51 @@ const MyRadioControl = () => {
 			onChange={ ( value ) => setOption( value ) }
 		/>
 	);
-}
+};
 ```
 
 ### Props
 
 The component accepts the following props:
 
-### hideLabelFromVision
-
-If true, the label will only be visible to screen readers.
-
--   Type: `Boolean`
--   Required: No
-
-#### label
-
-If this property is added, a label will be generated using label property as the content.
-
--   Type: `String`
--   Required: No
-
-#### help
+#### `help`: `string | WPElement`
 
 If this property is added, a help text will be generated using help property as the content.
 
--   Type: `String|WPElement`
 -   Required: No
 
-#### selected
+#### `hideLabelFromVision`: `boolean`
 
-The value property of the currently selected option.
+If true, the label will only be visible to screen readers.
 
--   Type: `Object`
 -   Required: No
 
-#### options
+#### `label`: `string`
 
-An array of objects containing the following properties:
+If this property is added, a label will be generated using label property as the content.
 
--   `label`: (string) The label to be shown to the user.
--   `value`: (Object) The internal value compared against select and passed to onChange.
+-   Required: No
 
-*   Type: `Array`
-*   Required: No
-
-#### onChange
+#### `onChange`: `( value: string ) => void`
 
 A function that receives the value of the new option that is being selected as input.
 
--   Type: `function`
 -   Required: Yes
+
+#### `options`: `{ label: string, value: string }[]`
+
+An array of objects containing the value and label of the options.
+
+-   `label`: `string` The label to be shown to the user.
+-   `value`: `string` The internal value compared against select and passed to onChange.
+
+*   Required: No
+
+#### `selected`: `string`
+
+The value property of the currently selected option.
+
+-   Required: No
 
 ## Related components
 

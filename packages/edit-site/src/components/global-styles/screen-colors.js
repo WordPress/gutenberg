@@ -6,6 +6,7 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	__experimentalZStack as ZStack,
 	FlexItem,
 	ColorIndicator,
 } from '@wordpress/components';
@@ -15,9 +16,11 @@ import {
  */
 import ScreenHeader from './header';
 import Palette from './palette';
-import { NavigationButton } from './navigation-button';
+import { NavigationButtonAsItem } from './navigation-button';
 import { getSupportedGlobalStylesPanels, useStyle } from './hooks';
 import Subtitle from './subtitle';
+import ColorIndicatorWrapper from './color-indicator-wrapper';
+import BlockPreviewPanel from './block-preview-panel';
 
 function BackgroundColorItem( { name, parentMenu } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
@@ -32,16 +35,22 @@ function BackgroundColorItem( { name, parentMenu } ) {
 	}
 
 	return (
-		<NavigationButton path={ parentMenu + '/colors/background' }>
+		<NavigationButtonAsItem
+			path={ parentMenu + '/colors/background' }
+			aria-label={ __( 'Colors background styles' ) }
+		>
 			<HStack justify="flex-start">
-				<FlexItem>
+				<ColorIndicatorWrapper expanded={ false }>
 					<ColorIndicator
 						colorValue={ gradientValue ?? backgroundColor }
+						data-testid="background-color-indicator"
 					/>
+				</ColorIndicatorWrapper>
+				<FlexItem className="edit-site-global-styles__color-label">
+					{ __( 'Background' ) }
 				</FlexItem>
-				<FlexItem>{ __( 'Background' ) }</FlexItem>
 			</HStack>
-		</NavigationButton>
+		</NavigationButtonAsItem>
 	);
 }
 
@@ -55,14 +64,22 @@ function TextColorItem( { name, parentMenu } ) {
 	}
 
 	return (
-		<NavigationButton path={ parentMenu + '/colors/text' }>
+		<NavigationButtonAsItem
+			path={ parentMenu + '/colors/text' }
+			aria-label={ __( 'Colors text styles' ) }
+		>
 			<HStack justify="flex-start">
-				<FlexItem>
-					<ColorIndicator colorValue={ color } />
+				<ColorIndicatorWrapper expanded={ false }>
+					<ColorIndicator
+						colorValue={ color }
+						data-testid="text-color-indicator"
+					/>
+				</ColorIndicatorWrapper>
+				<FlexItem className="edit-site-global-styles__color-label">
+					{ __( 'Text' ) }
 				</FlexItem>
-				<FlexItem>{ __( 'Text' ) }</FlexItem>
 			</HStack>
-		</NavigationButton>
+		</NavigationButtonAsItem>
 	);
 }
 
@@ -70,25 +87,96 @@ function LinkColorItem( { name, parentMenu } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	const hasSupport = supports.includes( 'linkColor' );
 	const [ color ] = useStyle( 'elements.link.color.text', name );
+	const [ colorHover ] = useStyle( 'elements.link.:hover.color.text', name );
 
 	if ( ! hasSupport ) {
 		return null;
 	}
 
 	return (
-		<NavigationButton path={ parentMenu + '/colors/link' }>
+		<NavigationButtonAsItem
+			path={ parentMenu + '/colors/link' }
+			aria-label={ __( 'Colors link styles' ) }
+		>
 			<HStack justify="flex-start">
-				<FlexItem>
-					<ColorIndicator colorValue={ color } />
+				<ZStack isLayered={ false } offset={ -8 }>
+					<ColorIndicatorWrapper expanded={ false }>
+						<ColorIndicator colorValue={ color } />
+					</ColorIndicatorWrapper>
+					<ColorIndicatorWrapper expanded={ false }>
+						<ColorIndicator colorValue={ colorHover } />
+					</ColorIndicatorWrapper>
+				</ZStack>
+				<FlexItem className="edit-site-global-styles__color-label">
+					{ __( 'Links' ) }
 				</FlexItem>
-				<FlexItem>{ __( 'Links' ) }</FlexItem>
 			</HStack>
-		</NavigationButton>
+		</NavigationButtonAsItem>
+	);
+}
+
+function HeadingColorItem( { name, parentMenu } ) {
+	const supports = getSupportedGlobalStylesPanels( name );
+	const hasSupport = supports.includes( 'color' );
+	const [ color ] = useStyle( 'elements.heading.color.text', name );
+	const [ bgColor ] = useStyle( 'elements.heading.color.background', name );
+
+	if ( ! hasSupport ) {
+		return null;
+	}
+
+	return (
+		<NavigationButtonAsItem
+			path={ parentMenu + '/colors/heading' }
+			aria-label={ __( 'Colors heading styles' ) }
+		>
+			<HStack justify="flex-start">
+				<ZStack isLayered={ false } offset={ -8 }>
+					<ColorIndicatorWrapper expanded={ false }>
+						<ColorIndicator colorValue={ bgColor } />
+					</ColorIndicatorWrapper>
+					<ColorIndicatorWrapper expanded={ false }>
+						<ColorIndicator colorValue={ color } />
+					</ColorIndicatorWrapper>
+				</ZStack>
+				<FlexItem>{ __( 'Headings' ) }</FlexItem>
+			</HStack>
+		</NavigationButtonAsItem>
+	);
+}
+
+function ButtonColorItem( { name, parentMenu } ) {
+	const supports = getSupportedGlobalStylesPanels( name );
+	const hasSupport = supports.includes( 'buttonColor' );
+	const [ color ] = useStyle( 'elements.button.color.text', name );
+	const [ bgColor ] = useStyle( 'elements.button.color.background', name );
+
+	if ( ! hasSupport ) {
+		return null;
+	}
+
+	return (
+		<NavigationButtonAsItem path={ parentMenu + '/colors/button' }>
+			<HStack justify="flex-start">
+				<ZStack isLayered={ false } offset={ -8 }>
+					<ColorIndicatorWrapper expanded={ false }>
+						<ColorIndicator colorValue={ bgColor } />
+					</ColorIndicatorWrapper>
+					<ColorIndicatorWrapper expanded={ false }>
+						<ColorIndicator colorValue={ color } />
+					</ColorIndicatorWrapper>
+				</ZStack>
+				<FlexItem className="edit-site-global-styles__color-label">
+					{ __( 'Buttons' ) }
+				</FlexItem>
+			</HStack>
+		</NavigationButtonAsItem>
 	);
 }
 
 function ScreenColors( { name } ) {
-	const parentMenu = name === undefined ? '' : '/blocks/' + name;
+	const parentMenu =
+		name === undefined ? '' : '/blocks/' + encodeURIComponent( name );
 
 	return (
 		<>
@@ -98,6 +186,8 @@ function ScreenColors( { name } ) {
 					'Manage palettes and the default color of different global elements on the site.'
 				) }
 			/>
+
+			<BlockPreviewPanel name={ name } />
 
 			<div className="edit-site-global-styles-screen-colors">
 				<VStack spacing={ 10 }>
@@ -115,6 +205,14 @@ function ScreenColors( { name } ) {
 								parentMenu={ parentMenu }
 							/>
 							<LinkColorItem
+								name={ name }
+								parentMenu={ parentMenu }
+							/>
+							<HeadingColorItem
+								name={ name }
+								parentMenu={ parentMenu }
+							/>
+							<ButtonColorItem
 								name={ name }
 								parentMenu={ parentMenu }
 							/>

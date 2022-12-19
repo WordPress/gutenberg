@@ -1,15 +1,10 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-import useResizeAware from 'react-resize-aware';
-
-/**
  * WordPress dependencies
  */
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
+import { useResizeObserver } from '@wordpress/compose';
 
-const { clearTimeout, setTimeout } = window;
+const noop = () => {};
 
 export type Axis = 'x' | 'y';
 
@@ -56,11 +51,10 @@ export function useResizeLabel( {
 	showPx = false,
 }: UseResizeLabelArgs ): UseResizeLabelProps {
 	/*
-	 * The width/height values derive from this special useResizeAware hook.
-	 * This custom hook uses injects an iFrame into the element, allowing it
-	 * to tap into the onResize (window) callback events.
+	 * The width/height values derive from this special useResizeObserver hook.
+	 * This custom hook uses the ResizeObserver API to listen for resize events.
 	 */
-	const [ resizeListener, sizes ] = useResizeAware();
+	const [ resizeListener, sizes ] = useResizeObserver();
 
 	/*
 	 * Indicates if the x/y axis is preferred.
@@ -90,23 +84,23 @@ export function useResizeLabel( {
 	 */
 	const moveTimeoutRef = useRef< number >();
 
-	const unsetMoveXY = () => {
-		/*
-		 * If axis is controlled, we will avoid resetting the moveX and moveY values.
-		 * This will allow for the preferred axis values to persist in the label.
-		 */
-		if ( isAxisControlled ) return;
-		setMoveX( false );
-		setMoveY( false );
-	};
+	const debounceUnsetMoveXY = useCallback( () => {
+		const unsetMoveXY = () => {
+			/*
+			 * If axis is controlled, we will avoid resetting the moveX and moveY values.
+			 * This will allow for the preferred axis values to persist in the label.
+			 */
+			if ( isAxisControlled ) return;
+			setMoveX( false );
+			setMoveY( false );
+		};
 
-	const debounceUnsetMoveXY = () => {
 		if ( moveTimeoutRef.current ) {
-			clearTimeout( moveTimeoutRef.current );
+			window.clearTimeout( moveTimeoutRef.current );
 		}
 
-		moveTimeoutRef.current = setTimeout( unsetMoveXY, fadeTimeout );
-	};
+		moveTimeoutRef.current = window.setTimeout( unsetMoveXY, fadeTimeout );
+	}, [ fadeTimeout, isAxisControlled ] );
 
 	useEffect( () => {
 		/*
@@ -149,7 +143,7 @@ export function useResizeLabel( {
 
 		onResize( { width, height } );
 		debounceUnsetMoveXY();
-	}, [ width, height ] );
+	}, [ width, height, onResize, debounceUnsetMoveXY ] );
 
 	const label = getSizeLabel( {
 		axis,

@@ -1,0 +1,11 @@
+{
+	"version": 2,
+	"settings": {
+		"appearanceTools": true,
+		"typography": {
+			"fluid": {
+				"minFontSize": "16px"
+			}
+		}
+	}
+}

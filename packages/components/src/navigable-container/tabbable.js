@@ -3,7 +3,6 @@
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
-import { TAB } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -12,8 +11,8 @@ import NavigableContainer from './container';
 
 export function TabbableContainer( { eventToOffset, ...props }, ref ) {
 	const innerEventToOffset = ( evt ) => {
-		const { keyCode, shiftKey } = evt;
-		if ( TAB === keyCode ) {
+		const { code, shiftKey } = evt;
+		if ( 'Tab' === code ) {
 			return shiftKey ? -1 : 1;
 		}
 
@@ -27,7 +26,7 @@ export function TabbableContainer( { eventToOffset, ...props }, ref ) {
 		// - +1: move focus forward
 		// - -1: move focus backward
 		// -  0: don't move focus, but acknowledge event and thus stop it
-		// - undefined: do nothing, let the event propagate
+		// - undefined: do nothing, let the event propagate.
 		if ( eventToOffset ) {
 			return eventToOffset( evt );
 		}

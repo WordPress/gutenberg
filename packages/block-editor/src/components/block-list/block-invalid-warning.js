@@ -28,7 +28,7 @@ export function BlockInvalidWarning( {
 	const onCompare = useCallback( () => setCompare( true ), [] );
 	const onCompareClose = useCallback( () => setCompare( false ), [] );
 
-	// We memo the array here to prevent the children components from being updated unexpectedly
+	// We memo the array here to prevent the children components from being updated unexpectedly.
 	const hiddenActions = useMemo(
 		() =>
 			[

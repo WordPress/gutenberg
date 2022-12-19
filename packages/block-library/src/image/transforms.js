@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { every } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createBlobURL } from '@wordpress/blob';
@@ -19,7 +14,7 @@ export function stripFirstImage( attributes, { shortcode } ) {
 
 	let nodeToRemove = body.querySelector( 'img' );
 
-	// if an image has parents, find the topmost node to remove
+	// If an image has parents, find the topmost node to remove.
 	while (
 		nodeToRemove &&
 		nodeToRemove.parentNode &&
@@ -90,9 +85,10 @@ const transforms = {
 					node.className +
 					' ' +
 					node.querySelector( 'img' ).className;
-				const alignMatches = /(?:^|\s)align(left|center|right)(?:$|\s)/.exec(
-					className
-				);
+				const alignMatches =
+					/(?:^|\s)align(left|center|right)(?:$|\s)/.exec(
+						className
+					);
 				const anchor = node.id === '' ? undefined : node.id;
 				const align = alignMatches ? alignMatches[ 1 ] : undefined;
 				const idMatches = /(?:^|\s)wp-image-(\d+)(?:$|\s)/.exec(
@@ -150,11 +146,13 @@ const transforms = {
 						__(
 							'If uploading to a gallery all files need to be image formats'
 						),
-						{ id: 'gallery-transform-invalid-file' }
+						{
+							id: 'gallery-transform-invalid-file',
+							type: 'snackbar',
+						}
 					);
 				}
-				return every(
-					files,
+				return files.every(
 					( file ) => file.type.indexOf( 'image/' ) === 0
 				);
 			},

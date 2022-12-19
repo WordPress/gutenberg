@@ -9,6 +9,9 @@
 	"keywords": [ "link" ],
 	"textdomain": "default",
 	"attributes": {
+		"textAlign": {
+			"type": "string"
+		},
 		"url": {
 			"type": "string",
 			"source": "attribute",
@@ -56,15 +59,25 @@
 	},
 	"supports": {
 		"anchor": true,
-		"align": true,
+		"align": false,
 		"alignWide": false,
 		"color": {
 			"__experimentalSkipSerialization": true,
-			"gradients": true
+			"gradients": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
 		},
 		"typography": {
 			"fontSize": true,
+			"lineHeight": true,
 			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
@@ -84,7 +97,7 @@
 				"radius": true
 			}
 		},
-		"__experimentalSelector": ".wp-block-button__link"
+		"__experimentalSelector": ".wp-block-button .wp-block-button__link"
 	},
 	"styles": [
 		{ "name": "fill", "label": "Fill", "isDefault": true },

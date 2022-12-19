@@ -31,16 +31,17 @@ describe( 'Widgets screen', () => {
 		await visitWidgetsScreen();
 
 		// Disable welcome guide if it is enabled.
-		const isWelcomeGuideActive = await page.evaluate( () =>
-			wp.data
-				.select( 'core/interface' )
-				.isFeatureActive( 'core/edit-widgets', 'welcomeGuide' )
+		const isWelcomeGuideActive = await page.evaluate(
+			() =>
+				!! wp.data
+					.select( 'core/preferences' )
+					.get( 'core/edit-widgets', 'welcomeGuide' )
 		);
 		if ( isWelcomeGuideActive ) {
 			await page.evaluate( () =>
 				wp.data
-					.dispatch( 'core/interface' )
-					.toggleFeature( 'core/edit-widgets', 'welcomeGuide' )
+					.dispatch( 'core/preferences' )
+					.toggle( 'core/edit-widgets', 'welcomeGuide' )
 			);
 		}
 
@@ -112,7 +113,8 @@ describe( 'Widgets screen', () => {
 		const insertionPointIndicator = await page.$(
 			'.block-editor-block-list__insertion-point-indicator'
 		);
-		const insertionPointIndicatorBoundingBox = await insertionPointIndicator.boundingBox();
+		const insertionPointIndicatorBoundingBox =
+			await insertionPointIndicator.boundingBox();
 
 		expect(
 			insertionPointIndicatorBoundingBox.y > lastBlockBoundingBox.y
@@ -297,7 +299,8 @@ describe( 'Widgets screen', () => {
 			firstParagraphBlock
 		);
 
-		const secondParagraphBlockBoundingBox = await secondParagraphBlock.boundingBox();
+		const secondParagraphBlockBoundingBox =
+			await secondParagraphBlock.boundingBox();
 
 		// Click outside the block to move the focus back to the widget area.
 		await page.mouse.click(
@@ -559,16 +562,18 @@ describe( 'Widgets screen', () => {
 			{},
 			firstParagraphBlock
 		);
-		const duplicatedParagraphBlock = await firstParagraphBlock.evaluateHandle(
-			( paragraph ) => paragraph.nextSibling
-		);
+		const duplicatedParagraphBlock =
+			await firstParagraphBlock.evaluateHandle(
+				( paragraph ) => paragraph.nextSibling
+			);
 
 		const firstParagraphBlockClientId = await firstParagraphBlock.evaluate(
 			( node ) => node.dataset.block
 		);
-		const duplicatedParagraphBlockClientId = await duplicatedParagraphBlock.evaluate(
-			( node ) => node.dataset.block
-		);
+		const duplicatedParagraphBlockClientId =
+			await duplicatedParagraphBlock.evaluate(
+				( node ) => node.dataset.block
+			);
 
 		expect( firstParagraphBlockClientId ).not.toBe(
 			duplicatedParagraphBlockClientId
@@ -811,7 +816,7 @@ describe( 'Widgets screen', () => {
 		// To do: clicking on the Snackbar causes focus loss.
 		await page.focus( '.block-editor-writing-flow' );
 
-		// Undo block deletion and save again
+		// Undo block deletion and save again.
 		await pressKeyWithModifier( 'primary', 'z' );
 		await saveWidgets();
 

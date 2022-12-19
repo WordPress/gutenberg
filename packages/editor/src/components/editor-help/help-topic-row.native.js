@@ -9,7 +9,7 @@ import { useNavigation } from '@react-navigation/native';
 import { TextControl, Icon } from '@wordpress/components';
 import { chevronRight } from '@wordpress/icons';
 
-const HelpTopicRow = ( { label, icon, screenName } ) => {
+const HelpTopicRow = ( { label, icon, screenName, isLastItem } ) => {
 	const navigation = useNavigation();
 
 	const openSubSheet = () => {
@@ -18,7 +18,7 @@ const HelpTopicRow = ( { label, icon, screenName } ) => {
 
 	return (
 		<TextControl
-			separatorType="leftMargin"
+			separatorType={ isLastItem ? 'none' : 'leftMargin' }
 			customActionButton
 			leftAlign
 			onPress={ openSubSheet }

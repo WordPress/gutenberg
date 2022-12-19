@@ -33,46 +33,45 @@ function Example() {
 
 Size of the shadow value when active (see the `value` and `isInteractive` props).
 
-- Required: No
+-   Required: No
 
 ### `borderRadius`: `CSSProperties[ 'borderRadius' ]`
 
 Renders the border-radius of the shadow.
 
-- Required: No
-- Default: `inherit`
+-   Required: No
+-   Default: `inherit`
 
 ### `focus`: `number`
 
-Size of the shadow value when focused (see the `value` and `isInteractive` props).
+Size of the shadow value when focused (see the `value` and `isInteractive`props).
 
-- Required: No
+-   Required: No
 
 ### `hover`: `number`
 
-Size of the shadow value when hovered  (see the `value` and `isInteractive` props).
+Size of the shadow value when hovered (see the `value` and `isInteractive` props).
 
-- Required: No
+-   Required: No
 
 ### `isInteractive`: `boolean`
 
 Determines if `hover`, `active`, and `focus` shadow values should be automatically calculated and rendered.
 
-- Required: No
-- Default: `false`
+-   Required: No
+-   Default: `false`
 
 ### `offset`: `number`
 
 Dimensional offsets (margin) for the shadow.
 
-- Required: No
-- Default: `0`
+-   Required: No
+-   Default: `0`
 
-### `value`
-
-**Type**: `number`
+### `value`: `number`
 
 Size of the shadow, based on the Style system's elevation system. The `value` determines the strength of the shadow, which sense of depth.
+
 In the example below, `isInteractive` is activated to give a better sense of depth.
 
 ```jsx
@@ -86,3 +85,6 @@ function Example() {
 	);
 }
 ```
+
+-   Required: No
+-   Default: `0`

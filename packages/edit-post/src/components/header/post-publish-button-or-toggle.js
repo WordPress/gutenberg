@@ -91,12 +91,10 @@ export default compose(
 		isBeingScheduled: select( editorStore ).isEditedPostBeingScheduled(),
 		isPending: select( editorStore ).isCurrentPostPending(),
 		isPublished: select( editorStore ).isCurrentPostPublished(),
-		isPublishSidebarEnabled: select(
-			editorStore
-		).isPublishSidebarEnabled(),
-		isPublishSidebarOpened: select(
-			editPostStore
-		).isPublishSidebarOpened(),
+		isPublishSidebarEnabled:
+			select( editorStore ).isPublishSidebarEnabled(),
+		isPublishSidebarOpened:
+			select( editPostStore ).isPublishSidebarOpened(),
 		isScheduled: select( editorStore ).isCurrentPostScheduled(),
 	} ) ),
 	withDispatch( ( dispatch ) => {

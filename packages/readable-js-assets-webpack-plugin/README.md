@@ -14,7 +14,7 @@ Install the module
 npm install @wordpress/readable-js-assets-webpack-plugin --save-dev
 ```
 
-**Note**: This package requires Node.js 12.0.0 or later. It also requires webpack 4.8.3 and newer. It is not compatible with older versions.
+**Note**: This package requires Node.js 14.0.0 or later. It also requires webpack 4.8.3 and newer. It is not compatible with older versions.
 
 ## Usage
 

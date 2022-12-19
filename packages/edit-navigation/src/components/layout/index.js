@@ -55,9 +55,8 @@ const interfaceLabels = {
 
 export default function Layout( { blockEditorSettings } ) {
 	const contentAreaRef = useBlockSelectionClearer();
-	const [ isMenuNameControlFocused, setIsMenuNameControlFocused ] = useState(
-		false
-	);
+	const [ isMenuNameControlFocused, setIsMenuNameControlFocused ] =
+		useState( false );
 	const { saveNavigationPost } = useDispatch( editNavigationStore );
 	const savePost = () => saveNavigationPost( navigationPost );
 

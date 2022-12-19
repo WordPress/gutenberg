@@ -106,8 +106,8 @@ function InserterMenu( {
 	}, [] );
 
 	const onClose = useCallback( () => {
-		// if should replace but didn't insert any block
-		// re-insert default block
+		// If should replace but didn't insert any block
+		// re-insert default block.
 		if ( shouldReplaceBlock ) {
 			insertDefaultBlock( {}, destinationRootClientId, insertionIndex );
 		}
@@ -140,7 +140,7 @@ function InserterMenu( {
 			// Avoid a focus loop, see https://github.com/WordPress/gutenberg/issues/30562
 			if ( Platform.OS === 'ios' ) {
 				AccessibilityInfo.isScreenReaderEnabled().then( ( enabled ) => {
-					// In testing, the bug focus loop needed a longer timeout when VoiceOver was enabled
+					// In testing, the bug focus loop needed a longer timeout when VoiceOver was enabled.
 					const timeout = enabled ? 200 : 100;
 					// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
 					setTimeout( () => {
@@ -162,13 +162,15 @@ function InserterMenu( {
 		[ setFilterValue ]
 	);
 
-	const onKeyboardShow = useCallback( () => setShowTabs( false ), [
-		setShowTabs,
-	] );
+	const onKeyboardShow = useCallback(
+		() => setShowTabs( false ),
+		[ setShowTabs ]
+	);
 
-	const onKeyboardHide = useCallback( () => setShowTabs( true ), [
-		setShowTabs,
-	] );
+	const onKeyboardHide = useCallback(
+		() => setShowTabs( true ),
+		[ setShowTabs ]
+	);
 
 	const showSearchForm = items.length > MIN_ITEMS_FOR_SEARCH;
 	const isFullScreen = ! isIOS && showSearchForm;

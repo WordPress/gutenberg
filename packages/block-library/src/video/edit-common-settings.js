@@ -12,14 +12,8 @@ const options = [
 ];
 
 const VideoSettings = ( { setAttributes, attributes } ) => {
-	const {
-		autoplay,
-		controls,
-		loop,
-		muted,
-		playsInline,
-		preload,
-	} = attributes;
+	const { autoplay, controls, loop, muted, playsInline, preload } =
+		attributes;
 
 	const autoPlayHelpText = __(
 		'Autoplay may cause usability issues for some users.'

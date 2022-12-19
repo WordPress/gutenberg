@@ -1,7 +1,10 @@
 /**
  * External dependencies
  */
-import { get, cloneDeep, set, isEqual, has } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
+import { get, set } from 'lodash';
+import { colord, extend } from 'colord';
+import a11yPlugin from 'colord/plugins/a11y';
 
 /**
  * WordPress dependencies
@@ -20,16 +23,20 @@ import {
 import { getValueFromVariable, getPresetVariableFromValue } from './utils';
 import { GlobalStylesContext } from './context';
 
-const EMPTY_CONFIG = { isGlobalStylesUserThemeJSON: true, version: 1 };
+// Enable colord's a11y plugin.
+extend( [ a11yPlugin ] );
+
+const EMPTY_CONFIG = { settings: {}, styles: {} };
 
 export const useGlobalStylesReset = () => {
 	const { user: config, setUserConfig } = useContext( GlobalStylesContext );
-	const canReset = !! config && ! isEqual( config, EMPTY_CONFIG );
+	const canReset = !! config && ! fastDeepEqual( config, EMPTY_CONFIG );
 	return [
 		canReset,
-		useCallback( () => setUserConfig( () => EMPTY_CONFIG ), [
-			setUserConfig,
-		] ),
+		useCallback(
+			() => setUserConfig( () => EMPTY_CONFIG ),
+			[ setUserConfig ]
+		),
 	];
 };
 
@@ -47,7 +54,8 @@ export function useSetting( path, blockName, source = 'all' ) {
 
 	const setSetting = ( newValue ) => {
 		setUserConfig( ( currentConfig ) => {
-			const newUserConfig = cloneDeep( currentConfig );
+			// Deep clone `currentConfig` to avoid mutating it later.
+			const newUserConfig = JSON.parse( JSON.stringify( currentConfig ) );
 			const pathToSet = PATHS_WITH_MERGE[ path ]
 				? fullPath + '.custom'
 				: fullPath;
@@ -108,7 +116,8 @@ export function useStyle( path, blockName, source = 'all' ) {
 
 	const setStyle = ( newValue ) => {
 		setUserConfig( ( currentConfig ) => {
-			const newUserConfig = cloneDeep( currentConfig );
+			// Deep clone `currentConfig` to avoid mutating it later.
+			const newUserConfig = JSON.parse( JSON.stringify( currentConfig ) );
 			set(
 				newUserConfig,
 				finalPath,
@@ -127,21 +136,25 @@ export function useStyle( path, blockName, source = 'all' ) {
 	switch ( source ) {
 		case 'all':
 			result = getValueFromVariable(
-				mergedConfig.settings,
+				mergedConfig,
 				blockName,
-				get( userConfig, finalPath ) ?? get( baseConfig, finalPath )
+				// The stlyes.css path is allowed to be empty, so don't revert to base if undefined.
+				finalPath === 'styles.css'
+					? get( userConfig, finalPath )
+					: get( userConfig, finalPath ) ??
+							get( baseConfig, finalPath )
 			);
 			break;
 		case 'user':
 			result = getValueFromVariable(
-				mergedConfig.settings,
+				mergedConfig,
 				blockName,
 				get( userConfig, finalPath )
 			);
 			break;
 		case 'base':
 			result = getValueFromVariable(
-				baseConfig.settings,
+				baseConfig,
 				blockName,
 				get( baseConfig, finalPath )
 			);
@@ -158,14 +171,17 @@ const ROOT_BLOCK_SUPPORTS = [
 	'backgroundColor',
 	'color',
 	'linkColor',
+	'buttonColor',
 	'fontFamily',
 	'fontSize',
 	'fontStyle',
 	'fontWeight',
 	'lineHeight',
 	'textDecoration',
-	'textTransform',
 	'padding',
+	'contentSize',
+	'wideSize',
+	'blockGap',
 ];
 
 export function getSupportedGlobalStylesPanels( name ) {
@@ -180,6 +196,21 @@ export function getSupportedGlobalStylesPanels( name ) {
 	}
 
 	const supportKeys = [];
+
+	// Check for blockGap support.
+	// Block spacing support doesn't map directly to a single style property, so needs to be handled separately.
+	// Also, only allow `blockGap` support if serialization has not been skipped, to be sure global spacing can be applied.
+	if (
+		blockType?.supports?.spacing?.blockGap &&
+		blockType?.supports?.spacing?.__experimentalSkipSerialization !==
+			true &&
+		! blockType?.supports?.spacing?.__experimentalSkipSerialization?.some?.(
+			( spacingType ) => spacingType === 'blockGap'
+		)
+	) {
+		supportKeys.push( 'blockGap' );
+	}
+
 	Object.keys( STYLE_PROPERTY ).forEach( ( styleName ) => {
 		if ( ! STYLE_PROPERTY[ styleName ].support ) {
 			return;
@@ -190,10 +221,8 @@ export function getSupportedGlobalStylesPanels( name ) {
 		// unset, we still enable it.
 		if ( STYLE_PROPERTY[ styleName ].requiresOptOut ) {
 			if (
-				has(
-					blockType.supports,
-					STYLE_PROPERTY[ styleName ].support[ 0 ]
-				) &&
+				STYLE_PROPERTY[ styleName ].support[ 0 ] in
+					blockType.supports &&
 				get(
 					blockType.supports,
 					STYLE_PROPERTY[ styleName ].support
@@ -303,4 +332,35 @@ export function useGradientsPerOrigin( name ) {
 		}
 		return result;
 	}, [ customGradients, themeGradients, defaultGradients ] );
+}
+
+export function useColorRandomizer( name ) {
+	const [ themeColors, setThemeColors ] = useSetting(
+		'color.palette.theme',
+		name
+	);
+
+	function randomizeColors() {
+		/* eslint-disable no-restricted-syntax */
+		const randomRotationValue = Math.floor( Math.random() * 225 );
+		/* eslint-enable no-restricted-syntax */
+
+		const newColors = themeColors.map( ( colorObject ) => {
+			const { color } = colorObject;
+			const newColor = colord( color )
+				.rotate( randomRotationValue )
+				.toHex();
+
+			return {
+				...colorObject,
+				color: newColor,
+			};
+		} );
+
+		setThemeColors( newColors );
+	}
+
+	return window.__experimentalEnableColorRandomizer
+		? [ randomizeColors ]
+		: [];
 }

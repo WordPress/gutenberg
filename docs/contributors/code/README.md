@@ -12,7 +12,7 @@ Real-time discussions for development take place in `#core-editor` and `#core-js
 
 The Gutenberg project uses GitHub for managing code and tracking issues. The main repository is at: [https://github.com/WordPress/gutenberg](https://github.com/WordPress/gutenberg).
 
-Browse [the issues list](https://github.com/wordpress/gutenberg/issues) to find issues to work on. The [good first issue](https://github.com/wordpress/gutenberg/issues?q=is%3Aopen+is%3Aissue+label%3A%22Good+First+Issue%22) and [good first review](https://github.com/wordpress/gutenberg/issues?q=is%3Aopen+is%3Aissue+label%3A%22Good+First+Issue%22) labels are good starting points.
+Browse [the issues list](https://github.com/wordpress/gutenberg/issues) to find issues to work on. The [good first issue](https://github.com/wordpress/gutenberg/issues?q=is%3Aopen+is%3Aissue+label%3A%22Good+First+Issue%22) and [good first review](https://github.com/WordPress/gutenberg/pulls?q=is%3Aopen+is%3Apr+label%3A%22Good+First+Review%22) labels are good starting points.
 
 ## Contributor Resources
 

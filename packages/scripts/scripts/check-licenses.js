@@ -60,6 +60,7 @@ const gpl2CompatibleLicenses = [
 	'ODC-By-1.0',
 	'Public Domain',
 	'Unlicense',
+	'W3C-20150513',
 	'WTFPL',
 	'Zlib',
 ];
@@ -235,7 +236,7 @@ function detectTypeFromLicenseFiles( path ) {
 		if ( existsSync( licensePath ) ) {
 			const licenseText = readFileSync( licensePath ).toString();
 
-			// Check if the file contains any of the strings in licenseFileStrings
+			// Check if the file contains any of the strings in licenseFileStrings.
 			return Object.keys( licenseFileStrings ).reduce(
 				( stringDetectedType, licenseStringType ) => {
 					const licenseFileString =

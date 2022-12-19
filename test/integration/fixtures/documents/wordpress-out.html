@@ -1,5 +1,5 @@
 <!-- wp:heading -->
-<h2>Howdy</h2>
+<h2 class="wp-block-heading">Howdy</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
@@ -7,7 +7,7 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:heading {"level":3} -->
-<h3>More tag</h3>
+<h3 class="wp-block-heading">More tag</h3>
 <!-- /wp:heading -->
 
 <!-- wp:more -->
@@ -15,11 +15,13 @@
 <!-- /wp:more -->
 
 <!-- wp:heading {"level":3} -->
-<h3>Shortcode</h3>
+<h3 class="wp-block-heading">Shortcode</h3>
 <!-- /wp:heading -->
 
-<!-- wp:gallery {"shortCodeTransforms":[{"id":1}],"columns":3,"linkTo":"none"} -->
-<figure class="wp-block-gallery has-nested-images columns-3 is-cropped"></figure>
+<!-- wp:gallery {"columns":3,"linkTo":"none"} -->
+<figure class="wp-block-gallery has-nested-images columns-3 is-cropped"><!-- wp:image {"id":1} -->
+<figure class="wp-block-image"><img alt="" class="wp-image-1"/></figure>
+<!-- /wp:image --></figure>
 <!-- /wp:gallery -->
 
 <!-- wp:image {"id":5114} -->
@@ -27,7 +29,7 @@
 <!-- /wp:image -->
 
 <!-- wp:image {"align":"right","id":5114} -->
-<div class="wp-block-image"><figure class="alignright"><img src="aligned.png" alt="" class="wp-image-5114"/></figure></div>
+<figure class="wp-block-image alignright"><img src="aligned.png" alt="" class="wp-image-5114"/></figure>
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->

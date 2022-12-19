@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
@@ -14,6 +9,8 @@ import { forwardRef } from '@wordpress/element';
  */
 import InserterMenu from './menu';
 import { store as blockEditorStore } from '../../store';
+
+const noop = () => {};
 
 function InserterLibrary(
 	{
@@ -29,13 +26,18 @@ function InserterLibrary(
 	},
 	ref
 ) {
-	const destinationRootClientId = useSelect(
+	const { destinationRootClientId, prioritizePatterns } = useSelect(
 		( select ) => {
-			const { getBlockRootClientId } = select( blockEditorStore );
+			const { getBlockRootClientId, getSettings } =
+				select( blockEditorStore );
 
-			return (
-				rootClientId || getBlockRootClientId( clientId ) || undefined
-			);
+			const _rootClientId =
+				rootClientId || getBlockRootClientId( clientId ) || undefined;
+			return {
+				destinationRootClientId: _rootClientId,
+				prioritizePatterns:
+					getSettings().__experimentalPreferPatternsOnRoot,
+			};
 		},
 		[ clientId, rootClientId ]
 	);
@@ -51,6 +53,7 @@ function InserterLibrary(
 			__experimentalInsertionIndex={ __experimentalInsertionIndex }
 			__experimentalFilterValue={ __experimentalFilterValue }
 			shouldFocusBlock={ shouldFocusBlock }
+			prioritizePatterns={ prioritizePatterns }
 			ref={ ref }
 		/>
 	);

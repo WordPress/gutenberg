@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { find, uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,8 +15,10 @@ import { NavigationGroupContext } from './context';
 import { GroupTitleUI } from '../styles/navigation-styles';
 import { useNavigationContext } from '../context';
 
+let uniqueId = 0;
+
 export default function NavigationGroup( { children, className, title } ) {
-	const [ groupId ] = useState( uniqueId( 'group-' ) );
+	const [ groupId ] = useState( `group-${ ++uniqueId }` );
 	const {
 		navigationTree: { items },
 	} = useNavigationContext();
@@ -25,7 +26,11 @@ export default function NavigationGroup( { children, className, title } ) {
 	const context = { group: groupId };
 
 	// Keep the children rendered to make sure invisible items are included in the navigation tree.
-	if ( ! find( items, { group: groupId, _isVisible: true } ) ) {
+	if (
+		! Object.values( items ).some(
+			( item ) => item.group === groupId && item._isVisible
+		)
+	) {
 		return (
 			<NavigationGroupContext.Provider value={ context }>
 				{ children }

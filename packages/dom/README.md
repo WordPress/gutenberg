@@ -28,8 +28,8 @@ _Returns_
 
 ### documentHasSelection
 
-Check whether the current document has a selection. This checks for both
-focus in an input field and general text selection.
+Check whether the current document has a selection. This includes focus in
+input fields, textareas, and general rich-text selection.
 
 _Parameters_
 
@@ -57,9 +57,9 @@ _Returns_
 
 ### documentHasUncollapsedSelection
 
-Check whether the current document has any sort of selection. This includes
-ranges of text across elements and any selection inside `<input>` and
-`<textarea>` elements.
+Check whether the current document has any sort of (uncollapsed) selection.
+This includes ranges of text across elements and any selection inside
+textual `<input>` and `<textarea>` elements.
 
 _Parameters_
 
@@ -67,7 +67,7 @@ _Parameters_
 
 _Returns_
 
--   `boolean`: Whether there is any sort of "selection" in the document.
+-   `boolean`: Whether there is any recognizable text selection in the document.
 
 ### focus
 
@@ -122,7 +122,8 @@ _Returns_
 
 ### getRectangleFromRange
 
-Get the rectangle of a given Range.
+Get the rectangle of a given Range. Returns `null` if no suitable rectangle
+can be found.
 
 _Parameters_
 
@@ -130,7 +131,7 @@ _Parameters_
 
 _Returns_
 
--   `DOMRect`: The rectangle.
+-   `DOMRect?`: The rectangle.
 
 ### getScrollContainer
 
@@ -184,6 +185,18 @@ _Returns_
 
 -   `boolean`: True if entirely selected, false if not.
 
+### isFormElement
+
+Detects if element is a form element.
+
+_Parameters_
+
+-   _element_ `Element`: The element to check.
+
+_Returns_
+
+-   `boolean`: True if form element and false otherwise.
+
 ### isHorizontalEdge
 
 Check whether the selection is horizontally at the edge of the container.
@@ -199,8 +212,7 @@ _Returns_
 
 ### isNumberInput
 
-Check whether the given element is an input field of type number
-and has a valueAsNumber
+Check whether the given element is an input field of type number.
 
 _Parameters_
 
@@ -208,7 +220,7 @@ _Parameters_
 
 _Returns_
 
--   `node is HTMLInputElement`: True if the node is input and holds a number.
+-   `node is HTMLInputElement`: True if the node is number input.
 
 ### isPhrasingContent
 

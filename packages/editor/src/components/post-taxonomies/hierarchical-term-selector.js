@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get, some, unescape as unescapeString, without } from 'lodash';
+import { get, unescape as unescapeString } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -95,7 +95,7 @@ export function sortBySelected( termsTree, terms ) {
  * @return {Object} Term object.
  */
 export function findTerm( terms, parent, name ) {
-	return find( terms, ( term ) => {
+	return terms.find( ( term ) => {
 		return (
 			( ( ! term.parent && ! parent ) ||
 				parseInt( term.parent ) === parseInt( parent ) ) &&
@@ -152,7 +152,7 @@ export function getFilterMatcher( filterValue ) {
  * @param {string} props.slug Taxonomy slug.
  * @return {WPElement}        Hierarchical term selector component.
  */
-function HierarchicalTermSelector( { slug } ) {
+export function HierarchicalTermSelector( { slug } ) {
 	const [ adding, setAdding ] = useState( false );
 	const [ formName, setFormName ] = useState( '' );
 	/**
@@ -173,12 +173,10 @@ function HierarchicalTermSelector( { slug } ) {
 		taxonomy,
 	} = useSelect(
 		( select ) => {
-			const { getCurrentPost, getEditedPostAttribute } = select(
-				editorStore
-			);
-			const { getTaxonomy, getEntityRecords, isResolving } = select(
-				coreStore
-			);
+			const { getCurrentPost, getEditedPostAttribute } =
+				select( editorStore );
+			const { getTaxonomy, getEntityRecords, isResolving } =
+				select( coreStore );
 			const _taxonomy = getTaxonomy( slug );
 
 			return {
@@ -260,7 +258,7 @@ function HierarchicalTermSelector( { slug } ) {
 	const onChange = ( termId ) => {
 		const hasTerm = terms.includes( termId );
 		const newTerms = hasTerm
-			? without( terms, termId )
+			? terms.filter( ( id ) => id !== termId )
 			: [ ...terms, termId ];
 		onUpdateTerms( newTerms );
 	};
@@ -288,11 +286,11 @@ function HierarchicalTermSelector( { slug } ) {
 			return;
 		}
 
-		// check if the term we are adding already exists
+		// Check if the term we are adding already exists.
 		const existingTerm = findTerm( availableTerms, formParent, formName );
 		if ( existingTerm ) {
-			// if the term we are adding exists but is not selected select it
-			if ( ! some( terms, ( term ) => term === existingTerm.id ) ) {
+			// If the term we are adding exists but is not selected select it.
+			if ( ! terms.some( ( term ) => term === existingTerm.id ) ) {
 				onUpdateTerms( [ ...terms, existingTerm.id ] );
 			}
 
@@ -360,6 +358,7 @@ function HierarchicalTermSelector( { slug } ) {
 					className="editor-post-taxonomies__hierarchical-terms-choice"
 				>
 					<CheckboxControl
+						__nextHasNoMarginBottom
 						checked={ terms.indexOf( term.id ) !== -1 }
 						onChange={ () => {
 							const termId = parseInt( term.id, 10 );

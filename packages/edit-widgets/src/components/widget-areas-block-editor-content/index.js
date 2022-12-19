@@ -11,7 +11,7 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
-import { store as interfaceStore } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -24,7 +24,7 @@ export default function WidgetAreasBlockEditorContent( {
 } ) {
 	const hasThemeStyles = useSelect(
 		( select ) =>
-			select( interfaceStore ).isFeatureActive(
+			!! select( preferencesStore ).get(
 				'core/edit-widgets',
 				'themeStyles'
 			),

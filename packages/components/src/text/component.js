@@ -7,7 +7,7 @@ import useText from './hook';
 
 /**
  * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'span'>} props
- * @param {import('react').Ref<any>}                                                         forwardedRef
+ * @param {import('react').ForwardedRef<any>}                                                forwardedRef
  */
 function Text( props, forwardedRef ) {
 	const textProps = useText( props );

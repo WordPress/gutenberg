@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, each, get } from 'lodash';
+import { isEmpty, get } from 'lodash';
 
 /**
  * Internal dependencies
@@ -13,7 +13,7 @@ export function removeNewTabRel( currentRel ) {
 
 	if ( currentRel !== undefined && ! isEmpty( newRel ) ) {
 		if ( ! isEmpty( newRel ) ) {
-			each( NEW_TAB_REL, ( relVal ) => {
+			NEW_TAB_REL.forEach( ( relVal ) => {
 				const regExp = new RegExp( '\\b' + relVal + '\\b', 'gi' );
 				newRel = newRel.replace( regExp, '' );
 			} );

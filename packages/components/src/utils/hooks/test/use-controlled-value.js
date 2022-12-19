@@ -83,9 +83,9 @@ describe( 'useControlledValue', () => {
 
 		expect( getInput() ).toHaveValue( 'Code is Poetry' );
 
-		// primarily this proves that the hook doesn't break if no onChange is passed but
+		// Primarily this proves that the hook doesn't break if no onChange is passed but
 		// value turns into a controlled state, for example if the value needs to be set
-		// to a constant in certain conditions but no change listening needs to happen
+		// to a constant in certain conditions but no change listening needs to happen.
 		fireEvent.change( getInput(), { target: { value: 'WordPress.org' } } );
 
 		// If `value` is passed then we expect the value to be fully controlled
@@ -93,7 +93,7 @@ describe( 'useControlledValue', () => {
 		// we're managing internal state.
 		expect( getInput() ).toHaveValue( 'Code is Poetry' );
 
-		// Next we un-set the value to uncover the internal state which was still maintained
+		// Next we un-set the value to uncover the internal state which was still maintained.
 		rerender( <Input /> );
 
 		expect( getInput() ).toHaveValue( 'WordPress.org' );

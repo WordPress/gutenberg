@@ -2,7 +2,9 @@
 
 End-To-End (E2E) test utils for WordPress.
 
-_It works properly with the minimum version of Gutenberg `9.2.0` or the minimum version of WordPress `5.6.0`._
+_It works properly with the minimum version of Gutenberg `13.8.0` or the minimum version of WordPress `6.0.0`._
+
+**Note that there's currently an ongoing [project](https://github.com/WordPress/gutenberg/issues/38851) to migrate E2E tests to Playwright instead. This package is deprecated and will only accept bug fixes until fully migrated.**
 
 ## Installation
 
@@ -12,7 +14,7 @@ Install the module
 npm install @wordpress/e2e-test-utils --save-dev
 ```
 
-**Note**: This package requires Node.js 12.0.0 or later. It is not compatible with older versions.
+**Note**: This package requires Node.js 14.0.0 or later. It is not compatible with older versions.
 
 ## API
 
@@ -109,7 +111,7 @@ _Parameters_
 
 ### closeGlobalBlockInserter
 
-Undocumented declaration.
+Closes the global inserter.
 
 ### closeListView
 
@@ -160,6 +162,14 @@ _Parameters_
 -   _object.content_ `[string]`: Content of the new post.
 -   _object.excerpt_ `[string]`: Excerpt of the new post.
 -   _object.showWelcomeGuide_ `[boolean]`: Whether to show the welcome guide.
+
+### createNewTemplate
+
+Opens the template editor with a newly created template.
+
+_Parameters_
+
+-   _name_ `string`: Name of the template.
 
 ### createReusableBlock
 
@@ -223,6 +233,14 @@ _Parameters_
 
 Delete all menus using the REST API
 
+### deleteAllTemplates
+
+Delete all the templates of given type.
+
+_Parameters_
+
+-   _type_ `('wp_template'|'wp_template_part')`: - Template type to delete.
+
 ### deleteAllWidgets
 
 Delete all the widgets in the widgets screen.
@@ -258,6 +276,10 @@ Disable auto-accepting any dialogs.
 
 Disables Pre-publish checks.
 
+### disableSiteEditorWelcomeGuide
+
+Skips the welcome guide popping up to first time users of the site editor
+
 ### dragAndResize
 
 Clicks an element, drags a particular distance and releases the mouse button.
@@ -288,11 +310,15 @@ Enables Pre-publish checks.
 
 ### ensureSidebarOpened
 
-Verifies that the edit post sidebar is opened, and if it is not, opens it.
+Verifies that the edit post/site/widgets sidebar is opened, and if it is not, opens it.
 
 _Returns_
 
--   `Promise`: Promise resolving once the edit post sidebar is opened.
+-   `Promise`: Promise resolving once the sidebar is opened.
+
+### enterEditMode
+
+Enters edit mode.
 
 ### findSidebarPanelToggleButtonWithTitle
 
@@ -364,6 +390,14 @@ _Returns_
 
 -   `Promise`: Promise resolving with current post content markup.
 
+### getCurrentSiteEditorContent
+
+Returns a promise which resolves with the edited post content (HTML string).
+
+_Returns_
+
+-   `Promise<string>`: Promise resolving with post content markup.
+
 ### getEditedPostContent
 
 Returns a promise which resolves with the edited post content (HTML string).
@@ -371,6 +405,18 @@ Returns a promise which resolves with the edited post content (HTML string).
 _Returns_
 
 -   `Promise`: Promise resolving with post content markup.
+
+### getListViewBlocks
+
+Gets all block anchor nodes in the list view that match a given block name label.
+
+_Parameters_
+
+-   _blockLabel_ `string`: the label of the block as displayed in the ListView.
+
+_Returns_
+
+-   `Promise`: all the blocks anchor nodes matching the lable in the ListView.
 
 ### getOption
 
@@ -409,41 +455,37 @@ _Returns_
 
 ### insertBlock
 
-Opens the inserter, searches for the given term, then selects the first
-result that appears. It then waits briefly for the block list to update.
+Inserts a block matching a given search term via the global inserter.
 
 _Parameters_
 
--   _searchTerm_ `string`: The text to search the inserter for.
+-   _searchTerm_ `string`: The term by which to find the block to insert.
 
 ### insertBlockDirectoryBlock
 
-Opens the inserter, searches for the given block, then selects the
-first result that appears from the block directory. It then waits briefly for the block list to
-update.
+Inserts a Block Directory block matching a given search term via the global
+inserter.
 
 _Parameters_
 
--   _searchTerm_ `string`: The text to search the inserter for.
+-   _searchTerm_ `string`: The term by which to find the Block Directory block to insert.
 
 ### insertPattern
 
-Opens the inserter, searches for the given pattern, then selects the first
-result that appears. It then waits briefly for the block list to update.
+Inserts a pattern matching a given search term via the global inserter.
 
 _Parameters_
 
--   _searchTerm_ `string`: The text to search the inserter for.
+-   _searchTerm_ `string`: The term by which to find the pattern to insert.
 
 ### insertReusableBlock
 
-Opens the inserter, searches for the given reusable block, then selects the
-first result that appears. It then waits briefly for the block list to
-update.
+Inserts a reusable block matching a given search term via the global
+inserter.
 
 _Parameters_
 
--   _searchTerm_ `string`: The text to search the inserter for.
+-   _searchTerm_ `string`: The term by which to find the reusable block to insert.
 
 ### installPlugin
 
@@ -531,7 +573,15 @@ Clicks on the button in the header which opens Document Settings sidebar when it
 
 ### openGlobalBlockInserter
 
-Opens the global block inserter.
+Opens the global inserter.
+
+### openGlobalStylesPanel
+
+Opens a global styles panel.
+
+_Parameters_
+
+-   _panelName_ `string`: Name of the panel that is going to be opened.
 
 ### openListView
 
@@ -548,6 +598,10 @@ _Parameters_
 _Returns_
 
 -   `Page`: preview page.
+
+### openPreviousGlobalStylesPanel
+
+Opens the previous global styles panel.
 
 ### openPublishPanel
 
@@ -594,6 +648,10 @@ _Returns_
 
 -   `Promise`: Promise resolving when publish is complete.
 
+### resetPreferences
+
+Clears all user meta preferences.
+
 ### saveDraft
 
 Saves the post as a draft, resolving once the request is complete (once the
@@ -605,27 +663,51 @@ _Returns_
 
 ### searchForBlock
 
-Search for block in the global inserter
+Searches for a block via the global inserter.
 
 _Parameters_
 
--   _searchTerm_ `string`: The text to search the inserter for.
+-   _searchTerm_ `string`: The term to search the inserter for.
+
+_Returns_
+
+-   `Promise<ElementHandle|null>`: The handle of block to be inserted or null if nothing was found.
+
+### searchForBlockDirectoryBlock
+
+Searches for a Block Directory block via the global inserter.
+
+_Parameters_
+
+-   _searchTerm_ `string`: The term to search the inserter for.
+
+_Returns_
+
+-   `Promise<ElementHandle|null>`: The handle of the Block Directory block to be inserted or null if nothing was found.
 
 ### searchForPattern
 
-Search for pattern in the global inserter
+Searches for a pattern via the global inserter.
 
 _Parameters_
 
--   _searchTerm_ `string`: The text to search the inserter for.
+-   _searchTerm_ `string`: The term to search the inserter for.
+
+_Returns_
+
+-   `Promise<ElementHandle|null>`: The handle of the pattern to be inserted or null if nothing was found.
 
 ### searchForReusableBlock
 
-Search for reusable block in the global inserter.
+Searches for a reusable block via the global inserter.
 
 _Parameters_
 
--   _searchTerm_ `string`: The text to search the inserter for.
+-   _searchTerm_ `string`: The term to search the inserter for.
+
+_Returns_
+
+-   `Promise<ElementHandle|null>`: The handle of the reusable block to be inserted or null if nothing was found.
 
 ### selectBlockByClientId
 
@@ -662,6 +744,10 @@ _Parameters_
 
 -   _setting_ `string`: The option, used to get the option by id.
 -   _value_ `string`: The value to set the option to.
+
+_Returns_
+
+-   `string`: The previous value of the option.
 
 ### setPostContent
 
@@ -733,9 +819,17 @@ running the tests as (if we're not already that user).
 
 Toggles the global inserter.
 
+### toggleGlobalStyles
+
+Toggles the global styles sidebar (opens it if closed and closes it if open).
+
 ### toggleMoreMenu
 
 Toggles the More Menu.
+
+_Parameters_
+
+-   _waitFor_ `['open' | 'close']`: Whether it should wait for the menu to open or close. If `undefined` it won't wait for anything.
 
 ### toggleOfflineMode
 
@@ -758,6 +852,14 @@ Converts editor's block type.
 _Parameters_
 
 -   _name_ `string`: Block name.
+
+### trashAllComments
+
+Navigates to the comments listing screen and bulk-trashes any comments which exist.
+
+_Returns_
+
+-   `Promise`: Promise resolving once comments have been trashed.
 
 ### trashAllPosts
 
@@ -788,6 +890,21 @@ _Parameters_
 
 -   _adminPath_ `string`: String to be serialized as pathname.
 -   _query_ `string`: String to be serialized as query portion of URL.
+
+### visitSiteEditor
+
+Visits the Site Editor main page
+
+By default, it also skips the welcome guide. The option can be disabled if need be.
+
+_Related_
+
+-   disableSiteEditorWelcomeGuide
+
+_Parameters_
+
+-   _query_ `string`: String to be serialized as query portion of URL.
+-   _skipWelcomeGuide_ `[boolean]`: Whether to skip the welcome guide as part of the navigation.
 
 ### waitForWindowDimensions
 

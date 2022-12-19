@@ -48,9 +48,8 @@ module.exports = ( babel ) => {
 				}
 
 				const { scopeVariable } = getOptions( state );
-				state.hasUndeclaredScopeVariable = ! path.scope.hasBinding(
-					scopeVariable
-				);
+				state.hasUndeclaredScopeVariable =
+					! path.scope.hasBinding( scopeVariable );
 			},
 			JSXFragment( path, state ) {
 				if ( state.hasUndeclaredScopeVariableFrag ) {
@@ -62,9 +61,8 @@ module.exports = ( babel ) => {
 					return;
 				}
 
-				state.hasUndeclaredScopeVariableFrag = ! path.scope.hasBinding(
-					scopeVariableFrag
-				);
+				state.hasUndeclaredScopeVariableFrag =
+					! path.scope.hasBinding( scopeVariableFrag );
 			},
 			Program: {
 				exit( path, state ) {

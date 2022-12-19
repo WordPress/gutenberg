@@ -4,7 +4,7 @@
 	"name": "core/group",
 	"title": "Group",
 	"category": "design",
-	"description": "Combine blocks into a group.",
+	"description": "Gather blocks in a layout container.",
 	"keywords": [ "container", "wrapper", "row", "section" ],
 	"textdomain": "default",
 	"attributes": {
@@ -14,24 +14,35 @@
 		},
 		"templateLock": {
 			"type": [ "string", "boolean" ],
-			"enum": [ "all", "insert", false ]
+			"enum": [ "all", "insert", "contentOnly", false ]
 		}
 	},
 	"supports": {
+		"__experimentalOnEnter": true,
+		"__experimentalSettings": true,
 		"align": [ "wide", "full" ],
 		"anchor": true,
+		"ariaLabel": true,
 		"html": false,
 		"color": {
 			"gradients": true,
-			"link": true
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
 		},
 		"spacing": {
+			"margin": [ "top", "bottom" ],
 			"padding": true,
 			"blockGap": true,
 			"__experimentalDefaultControls": {
 				"padding": true,
 				"blockGap": true
 			}
+		},
+		"dimensions": {
+			"minHeight": true
 		},
 		"__experimentalBorder": {
 			"color": true,
@@ -48,15 +59,19 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
-			"__experimentalFontStyle": true,
+			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
-			"__experimentalLetterSpacing": true,
+			"__experimentalFontStyle": true,
 			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
 		},
-		"__experimentalLayout": true
+		"__experimentalLayout": {
+			"allowSizingOnChildren": true
+		}
 	},
 	"editorStyle": "wp-block-group-editor",
 	"style": "wp-block-group"

@@ -33,7 +33,31 @@ function customizeProductTypeSelector( OriginalComponent ) {
 
 wp.hooks.addFilter(
 	'editor.PostTaxonomyType',
-	'my-custom-plugin',
+	'my-plugin/set-custom-term-selector',
 	customizeProductTypeSelector
+);
+```
+
+Or, to use the hierarchical term selector with a non-hierarchical taxonomy `track`,
+you can set the `HierarchicalTermSelector` component as shown below.
+
+```js
+const el = wp.element.createElement;
+const HierarchicalTermSelector = wp.editor.PostTaxonomiesHierarchicalTermSelector;
+
+function customizeTrackSelector( OriginalComponent ) {
+	return function ( props ) {
+		if ( props.slug === 'track' ) {
+			return el( HierarchicalTermSelector, props );
+		} else {
+			return el( OriginalComponent, props );
+		}
+	};
+}
+
+wp.hooks.addFilter(
+	'editor.PostTaxonomyType',
+	'my-plugin/set-hierarchical-term-selector',
+	customizeTrackSelector
 );
 ```

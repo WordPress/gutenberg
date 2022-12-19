@@ -33,7 +33,8 @@ const deprecated = [
 			const { verticalAlignment, width } = attributes;
 
 			const wrapperClasses = classnames( {
-				[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+				[ `is-vertically-aligned-${ verticalAlignment }` ]:
+					verticalAlignment,
 			} );
 
 			const style = { flexBasis: width + '%' };

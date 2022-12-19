@@ -28,7 +28,7 @@ const DEFAULT_CONTROLS = [ 'top', 'center', 'bottom' ];
 const DEFAULT_CONTROL = 'top';
 
 const POPOVER_PROPS = {
-	isAlternate: true,
+	variant: 'toolbar',
 };
 
 function BlockVerticalAlignmentUI( {
@@ -47,11 +47,12 @@ function BlockVerticalAlignmentUI( {
 		BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
 
 	const UIComponent = isToolbar ? ToolbarGroup : ToolbarDropdownMenu;
-	const extraProps = isToolbar ? { isCollapsed } : {};
+	const extraProps = isToolbar
+		? { isCollapsed }
+		: { popoverProps: { POPOVER_PROPS } };
 
 	return (
 		<UIComponent
-			popoverProps={ POPOVER_PROPS }
 			icon={
 				activeAlignment
 					? activeAlignment.icon

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { castArray } from 'lodash';
 // diff doesn't tree-shake correctly, so we import from the individual
 // module here, to avoid including too much of the library
 import { diffChars } from 'diff/lib/diff/character';
@@ -43,10 +42,12 @@ function BlockCompare( {
 	}
 
 	function getConvertedContent( convertedBlock ) {
-		// The convertor may return an array of items or a single item
-		const newBlocks = castArray( convertedBlock );
+		// The convertor may return an array of items or a single item.
+		const newBlocks = Array.isArray( convertedBlock )
+			? convertedBlock
+			: [ convertedBlock ];
 
-		// Get converted block details
+		// Get converted block details.
 		const newContent = newBlocks.map( ( item ) =>
 			getSaveContent( item.name, item.attributes, item.innerBlocks )
 		);

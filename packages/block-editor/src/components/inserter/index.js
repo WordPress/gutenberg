@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { size } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -30,6 +29,7 @@ const defaultRenderToggle = ( {
 	blockTitle,
 	hasSingleBlockType,
 	toggleProps = {},
+	prioritizePatterns,
 } ) => {
 	let label;
 	if ( hasSingleBlockType ) {
@@ -38,13 +38,15 @@ const defaultRenderToggle = ( {
 			_x( 'Add %s', 'directly add the only allowed block' ),
 			blockTitle
 		);
+	} else if ( prioritizePatterns ) {
+		label = __( 'Add pattern' );
 	} else {
 		label = _x( 'Add block', 'Generic label for block inserter button' );
 	}
 
 	const { onClick, ...rest } = toggleProps;
 
-	// Handle both onClick functions from the toggle and the parent component
+	// Handle both onClick functions from the toggle and the parent component.
 	function handleClick( event ) {
 		if ( onToggle ) {
 			onToggle( event );
@@ -81,7 +83,7 @@ class Inserter extends Component {
 	onToggle( isOpen ) {
 		const { onToggle } = this.props;
 
-		// Surface toggle callback to parent component
+		// Surface toggle callback to parent component.
 		if ( onToggle ) {
 			onToggle( isOpen );
 		}
@@ -106,6 +108,7 @@ class Inserter extends Component {
 			toggleProps,
 			hasItems,
 			renderToggle = defaultRenderToggle,
+			prioritizePatterns,
 		} = this.props;
 
 		return renderToggle( {
@@ -116,6 +119,7 @@ class Inserter extends Component {
 			hasSingleBlockType,
 			directInsertBlock,
 			toggleProps,
+			prioritizePatterns,
 		} );
 	}
 
@@ -138,17 +142,32 @@ class Inserter extends Component {
 			// This prop is experimental to give some time for the quick inserter to mature
 			// Feel free to make them stable after a few releases.
 			__experimentalIsQuick: isQuick,
+			prioritizePatterns,
+			onSelectOrClose,
+			selectBlockOnInsert,
 		} = this.props;
 
 		if ( isQuick ) {
 			return (
 				<QuickInserter
-					onSelect={ () => {
+					onSelect={ ( blocks ) => {
+						const firstBlock =
+							Array.isArray( blocks ) && blocks?.length
+								? blocks[ 0 ]
+								: blocks;
+						if (
+							onSelectOrClose &&
+							typeof onSelectOrClose === 'function'
+						) {
+							onSelectOrClose( firstBlock );
+						}
 						onClose();
 					} }
 					rootClientId={ rootClientId }
 					clientId={ clientId }
 					isAppender={ isAppender }
+					prioritizePatterns={ prioritizePatterns }
+					selectBlockOnInsert={ selectBlockOnInsert }
 				/>
 			);
 		}
@@ -162,6 +181,7 @@ class Inserter extends Component {
 				clientId={ clientId }
 				isAppender={ isAppender }
 				showInserterHelpPanel={ showInserterHelpPanel }
+				prioritizePatterns={ prioritizePatterns }
 			/>
 		);
 	}
@@ -206,7 +226,9 @@ export default compose( [
 			hasInserterItems,
 			__experimentalGetAllowedBlocks,
 			__experimentalGetDirectInsertBlock,
+			getSettings,
 		} = select( blockEditorStore );
+
 		const { getBlockVariations } = select( blocksStore );
 
 		rootClientId =
@@ -214,15 +236,15 @@ export default compose( [
 
 		const allowedBlocks = __experimentalGetAllowedBlocks( rootClientId );
 
-		const directInsertBlock = __experimentalGetDirectInsertBlock(
-			rootClientId
-		);
+		const directInsertBlock =
+			__experimentalGetDirectInsertBlock( rootClientId );
+
+		const settings = getSettings();
 
 		const hasSingleBlockType =
-			size( allowedBlocks ) === 1 &&
-			size(
-				getBlockVariations( allowedBlocks[ 0 ].name, 'inserter' )
-			) === 0;
+			allowedBlocks?.length === 1 &&
+			getBlockVariations( allowedBlocks[ 0 ].name, 'inserter' )
+				?.length === 0;
 
 		let allowedBlockType = false;
 		if ( hasSingleBlockType ) {
@@ -236,6 +258,8 @@ export default compose( [
 			allowedBlockType,
 			directInsertBlock,
 			rootClientId,
+			prioritizePatterns:
+				settings.__experimentalPreferPatternsOnRoot && ! rootClientId,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
@@ -249,6 +273,7 @@ export default compose( [
 					allowedBlockType,
 					directInsertBlock,
 					onSelectOrClose,
+					selectBlockOnInsert,
 				} = ownProps;
 
 				if ( ! hasSingleBlockType && ! directInsertBlock ) {
@@ -256,9 +281,8 @@ export default compose( [
 				}
 
 				function getAdjacentBlockAttributes( attributesToCopy ) {
-					const { getBlock, getPreviousBlockClientId } = select(
-						blockEditorStore
-					);
+					const { getBlock, getPreviousBlockClientId } =
+						select( blockEditorStore );
 
 					if (
 						! attributesToCopy ||
@@ -336,7 +360,7 @@ export default compose( [
 						return getBlockIndex( end ) + 1;
 					}
 
-					// Otherwise, we insert at the end of the current rootClientId
+					// Otherwise, we insert at the end of the current rootClientId.
 					return getBlockOrder( rootClientId ).length;
 				}
 
@@ -360,10 +384,17 @@ export default compose( [
 					blockToInsert = createBlock( allowedBlockType.name );
 				}
 
-				insertBlock( blockToInsert, getInsertionIndex(), rootClientId );
+				insertBlock(
+					blockToInsert,
+					getInsertionIndex(),
+					rootClientId,
+					selectBlockOnInsert
+				);
 
 				if ( onSelectOrClose ) {
-					onSelectOrClose();
+					onSelectOrClose( {
+						clientId: blockToInsert?.clientId,
+					} );
 				}
 
 				const message = sprintf(

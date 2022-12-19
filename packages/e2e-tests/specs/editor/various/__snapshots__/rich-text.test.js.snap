@@ -32,7 +32,7 @@ exports[`RichText should handle Home and End keys 1`] = `
 
 exports[`RichText should handle change in tag name gracefully 1`] = `
 "<!-- wp:heading {\\"level\\":3} -->
-<h3></h3>
+<h3 class=\\"wp-block-heading\\"></h3>
 <!-- /wp:heading -->"
 `;
 
@@ -102,12 +102,24 @@ exports[`RichText should only mutate text data on input 1`] = `
 
 exports[`RichText should paste list contents into paragraph 1`] = `
 "<!-- wp:list -->
-<ul><li>1<ul><li>2</li></ul></li></ul>
+<ul><!-- wp:list-item -->
+<li>1<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>2</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->
 
-<!-- wp:paragraph -->
-<p>1<br>2</p>
-<!-- /wp:paragraph -->"
+<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>1<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>2</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->"
 `;
 
 exports[`RichText should paste paragraph contents into list 1`] = `
@@ -116,7 +128,9 @@ exports[`RichText should paste paragraph contents into list 1`] = `
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
-<ul><li>1</li><li>2</li></ul>
+<ul><!-- wp:list-item -->
+<li>1<br>2</li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->"
 `;
 
@@ -175,6 +189,18 @@ exports[`RichText should transform backtick to code 1`] = `
 exports[`RichText should transform backtick to code 2`] = `
 "<!-- wp:paragraph -->
 <p>A \`backtick\`</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`RichText should transform when typing backtick over selection 1`] = `
+"<!-- wp:paragraph -->
+<p>A <code>selection</code> test.</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`RichText should transform when typing backtick over selection 2`] = `
+"<!-- wp:paragraph -->
+<p>A \`selection\` test.</p>
 <!-- /wp:paragraph -->"
 `;
 

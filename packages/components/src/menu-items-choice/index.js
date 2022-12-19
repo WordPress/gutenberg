@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { check } from '@wordpress/icons';
@@ -12,6 +7,8 @@ import { check } from '@wordpress/icons';
  * Internal dependencies
  */
 import MenuItem from '../menu-item';
+
+const noop = () => {};
 
 export default function MenuItemsChoice( {
 	choices = [],

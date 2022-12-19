@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { View, TouchableWithoutFeedback, Text } from 'react-native';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -36,11 +35,13 @@ import { __, sprintf } from '@wordpress/i18n';
 import { isURL, getProtocol } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { video as SvgIcon, replace } from '@wordpress/icons';
-import { withSelect } from '@wordpress/data';
+import { withDispatch, withSelect } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
+import { createUpgradedEmbedBlock } from '../embed/util';
 import style from './style.scss';
 import SvgIconRetry from './icon-retry';
 import VideoCommonSettings from './edit-common-settings';
@@ -61,15 +62,13 @@ class VideoEdit extends Component {
 		};
 
 		this.mediaUploadStateReset = this.mediaUploadStateReset.bind( this );
-		this.onSelectMediaUploadOption = this.onSelectMediaUploadOption.bind(
-			this
-		);
-		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
-			this
-		);
-		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind(
-			this
-		);
+		this.onSelectMediaUploadOption =
+			this.onSelectMediaUploadOption.bind( this );
+		this.onSelectURL = this.onSelectURL.bind( this );
+		this.finishMediaUploadWithSuccess =
+			this.finishMediaUploadWithSuccess.bind( this );
+		this.finishMediaUploadWithFailure =
+			this.finishMediaUploadWithFailure.bind( this );
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
 		this.onVideoPressed = this.onVideoPressed.bind( this );
 		this.onVideoContanerLayout = this.onVideoContanerLayout.bind( this );
@@ -84,7 +83,7 @@ class VideoEdit extends Component {
 	}
 
 	componentWillUnmount() {
-		// this action will only exist if the user pressed the trash button on the block holder
+		// This action will only exist if the user pressed the trash button on the block holder.
 		if (
 			hasAction( 'blocks.onRemoveBlockCheckUpload' ) &&
 			this.state.isUploadInProgress
@@ -98,7 +97,7 @@ class VideoEdit extends Component {
 
 	static getDerivedStateFromProps( props, state ) {
 		// Avoid a UI flicker in the toolbar by insuring that isCaptionSelected
-		// is updated immediately any time the isSelected prop becomes false
+		// is updated immediately any time the isSelected prop becomes false.
 		return {
 			isCaptionSelected: props.isSelected && state.isCaptionSelected,
 		};
@@ -160,6 +159,25 @@ class VideoEdit extends Component {
 		setAttributes( { id, src: url } );
 	}
 
+	onSelectURL( url ) {
+		const { createErrorNotice, onReplace, setAttributes } = this.props;
+
+		if ( isURL( url ) ) {
+			// Check if there's an embed block that handles this URL.
+			const embedBlock = createUpgradedEmbedBlock( {
+				attributes: { url },
+			} );
+			if ( undefined !== embedBlock ) {
+				onReplace( embedBlock );
+				return;
+			}
+
+			setAttributes( { id: url, src: url } );
+		} else {
+			createErrorNotice( __( 'Invalid URL.' ) );
+		}
+	}
+
 	onVideoContanerLayout( event ) {
 		const { width } = event.nativeEvent.layout;
 		const height = width / VIDEO_ASPECT_RATIO;
@@ -191,12 +209,8 @@ class VideoEdit extends Component {
 	}
 
 	render() {
-		const {
-			setAttributes,
-			attributes,
-			isSelected,
-			wasBlockJustInserted,
-		} = this.props;
+		const { setAttributes, attributes, isSelected, wasBlockJustInserted } =
+			this.props;
 		const { id, src } = attributes;
 		const { videoContainerHeight } = this.state;
 
@@ -205,6 +219,7 @@ class VideoEdit extends Component {
 				allowedTypes={ [ MEDIA_TYPE_VIDEO ] }
 				isReplacingMedia={ true }
 				onSelect={ this.onSelectMediaUploadOption }
+				onSelectURL={ this.onSelectURL }
 				render={ ( { open, getMediaOptions } ) => {
 					return (
 						<ToolbarGroup>
@@ -226,6 +241,7 @@ class VideoEdit extends Component {
 					<MediaPlaceholder
 						allowedTypes={ [ MEDIA_TYPE_VIDEO ] }
 						onSelect={ this.onSelectMediaUploadOption }
+						onSelectURL={ this.onSelectURL }
 						icon={ this.getIcon( ICON_TYPE.PLACEHOLDER ) }
 						onFocus={ this.props.onFocus }
 						autoOpenMediaUpload={
@@ -248,7 +264,7 @@ class VideoEdit extends Component {
 					) }
 					{ isSelected && (
 						<InspectorControls>
-							<PanelBody title={ __( 'Video settings' ) }>
+							<PanelBody title={ __( 'Settings' ) }>
 								<VideoCommonSettings
 									setAttributes={ setAttributes }
 									attributes={ attributes }
@@ -350,7 +366,7 @@ class VideoEdit extends Component {
 					<BlockCaption
 						accessible={ true }
 						accessibilityLabelCreator={ ( caption ) =>
-							isEmpty( caption )
+							! caption
 								? /* translators: accessibility text. Empty video caption. */
 								  __( 'Video caption. Empty' )
 								: sprintf(
@@ -362,7 +378,7 @@ class VideoEdit extends Component {
 						clientId={ this.props.clientId }
 						isSelected={ this.state.isCaptionSelected }
 						onFocus={ this.onFocusCaption }
-						onBlur={ this.props.onBlur } // always assign onBlur as props
+						onBlur={ this.props.onBlur } // Always assign onBlur as props.
 						insertBlocksAfter={ this.props.insertBlocksAfter }
 					/>
 				</View>
@@ -378,5 +394,10 @@ export default compose( [
 			'inserter_menu'
 		),
 	} ) ),
+	withDispatch( ( dispatch ) => {
+		const { createErrorNotice } = dispatch( noticesStore );
+
+		return { createErrorNotice };
+	} ),
 	withPreferredColorScheme,
 ] )( VideoEdit );

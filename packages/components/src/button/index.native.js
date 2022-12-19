@@ -8,12 +8,12 @@ import {
 	View,
 	Platform,
 } from 'react-native';
-import { isArray } from 'lodash';
+import { LongPressGestureHandler, State } from 'react-native-gesture-handler';
 
 /**
  * WordPress dependencies
  */
-import { Children, cloneElement } from '@wordpress/element';
+import { Children, cloneElement, useCallback } from '@wordpress/element';
 import {
 	usePreferredColorScheme,
 	usePreferredColorSchemeStyle,
@@ -55,7 +55,7 @@ const styles = StyleSheet.create( {
 		backgroundColor: '#2e4453',
 	},
 	subscriptInactive: {
-		color: '#7b9ab1', // $toolbar-button
+		color: '#7b9ab1', // $toolbar-button.
 		fontWeight: 'bold',
 		fontSize: 13,
 		alignSelf: 'flex-end',
@@ -63,7 +63,7 @@ const styles = StyleSheet.create( {
 		marginBottom,
 	},
 	subscriptInactiveDark: {
-		color: '#a7aaad', // $gray_20
+		color: '#a7aaad', // $gray_20.
 	},
 	subscriptActive: {
 		color: 'white',
@@ -144,16 +144,16 @@ export function Button( props ) {
 	// Should show the tooltip if...
 	const shouldShowTooltip =
 		! isDisabled &&
-		// an explicit tooltip is passed or...
+		// An explicit tooltip is passed or...
 		( ( showTooltip && label ) ||
-			// there's a shortcut or...
+			// There's a shortcut or...
 			shortcut ||
-			// there's a label and...
+			// There's a label and...
 			( !! label &&
-				// the children are empty and...
+				// The children are empty and...
 				( ! children ||
-					( isArray( children ) && ! children.length ) ) &&
-				// the tooltip is not explicitly disabled.
+					( Array.isArray( children ) && ! children.length ) ) &&
+				// The tooltip is not explicitly disabled.
 				false !== showTooltip ) );
 
 	const newIcon = icon
@@ -162,6 +162,15 @@ export function Button( props ) {
 				isPressed,
 		  } )
 		: null;
+
+	const longPressHandler = useCallback(
+		( { nativeEvent } ) => {
+			if ( nativeEvent.state === State.ACTIVE && onLongPress ) {
+				onLongPress();
+			}
+		},
+		[ onLongPress ]
+	);
 
 	const element = (
 		<TouchableOpacity
@@ -172,28 +181,33 @@ export function Button( props ) {
 			accessibilityRole={ 'button' }
 			accessibilityHint={ hint }
 			onPress={ onClick }
-			onLongPress={ onLongPress }
 			style={ containerStyle }
 			disabled={ isDisabled }
 			testID={ testID }
 		>
-			<View style={ buttonViewStyle }>
-				<View style={ { flexDirection: 'row' } }>
-					{ newIcon }
-					{ newChildren }
-					{ subscript && (
-						<Text
-							style={
-								isPressed
-									? styles.subscriptActive
-									: subscriptInactive
-							}
-						>
-							{ subscript }
-						</Text>
-					) }
+			<LongPressGestureHandler
+				minDurationMs={ 500 }
+				maxDist={ 150 }
+				onHandlerStateChange={ longPressHandler }
+			>
+				<View style={ buttonViewStyle }>
+					<View style={ { flexDirection: 'row' } }>
+						{ newIcon }
+						{ newChildren }
+						{ subscript && (
+							<Text
+								style={
+									isPressed
+										? styles.subscriptActive
+										: subscriptInactive
+								}
+							>
+								{ subscript }
+							</Text>
+						) }
+					</View>
 				</View>
-			</View>
+			</LongPressGestureHandler>
 		</TouchableOpacity>
 	);
 

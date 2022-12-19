@@ -1,6 +1,6 @@
 .wp-block-video {
-	margin: 0 0 1em 0;
-
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
 	video {
 		width: 100%;
 	}

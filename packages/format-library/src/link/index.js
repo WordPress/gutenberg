@@ -135,7 +135,7 @@ export const link = {
 			.replace( /<[^>]+>/g, '' )
 			.trim();
 
-		// A URL was pasted, turn the selection into a link
+		// A URL was pasted, turn the selection into a link.
 		if ( ! isURL( pastedText ) ) {
 			return value;
 		}

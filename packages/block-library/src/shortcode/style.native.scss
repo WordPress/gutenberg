@@ -11,18 +11,25 @@
 	color: $gray-50;
 }
 
-.blockShortcode {
-	font-family: $default-monospace-font;
-	font-weight: 400;
-	font-size: 14px;
+.blockShortcodeContainer {
 	padding: 12px;
 	border-radius: 4px;
 	background-color: $gray-light;
 }
 
+.blockShortcodeContainerDark {
+	background-color: $gray-100;
+}
+
+.blockShortcode {
+	font-family: $default-monospace-font;
+	font-weight: 400;
+	font-size: 14px;
+	color: $gray-900;
+}
+
 .blockShortcodeDark {
 	color: $white;
-	background-color: $gray-100;
 }
 
 .placeholder {

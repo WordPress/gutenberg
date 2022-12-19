@@ -69,8 +69,6 @@ wp.data.dispatch( 'core/interface' ).unpinItem( 'core/edit-post', 'edit-post-blo
 wp.data.select( 'core/interface' ).isItemPinned( 'core/edit-post', 'edit-post-block-patterns/block-patterns-sidebar' ); -> false
 ```
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
-
 ### Preferences
 
 The interface package provides some helpers for implementing editor preferences.

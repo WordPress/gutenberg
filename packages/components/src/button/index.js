@@ -3,7 +3,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -48,6 +47,7 @@ function useDeprecatedProps( {
 		deprecated( 'Button isDefault prop', {
 			since: '5.4',
 			alternative: 'variant="secondary"',
+			version: '6.2',
 		} );
 
 		computedVariant ??= 'secondary';
@@ -92,6 +92,12 @@ export function Button( props, ref ) {
 		'components-button__description'
 	);
 
+	const hasChildren =
+		children?.[ 0 ] &&
+		children[ 0 ] !== null &&
+		// Tooltip should not considered as a child
+		children?.[ 0 ]?.props?.className !== 'components-tooltip';
+
 	const classes = classnames( 'components-button', className, {
 		'is-secondary': variant === 'secondary',
 		'is-primary': variant === 'primary',
@@ -101,7 +107,7 @@ export function Button( props, ref ) {
 		'is-busy': isBusy,
 		'is-link': variant === 'link',
 		'is-destructive': isDestructive,
-		'has-text': !! icon && !! children,
+		'has-text': !! icon && hasChildren,
 		'has-icon': !! icon,
 	} );
 
@@ -132,16 +138,15 @@ export function Button( props, ref ) {
 	// Should show the tooltip if...
 	const shouldShowTooltip =
 		! trulyDisabled &&
-		// an explicit tooltip is passed or...
+		// An explicit tooltip is passed or...
 		( ( showTooltip && label ) ||
-			// there's a shortcut or...
+			// There's a shortcut or...
 			shortcut ||
-			// there's a label and...
+			// There's a label and...
 			( !! label &&
-				// the children are empty and...
-				( ! children ||
-					( isArray( children ) && ! children.length ) ) &&
-				// the tooltip is not explicitly disabled.
+				// The children are empty and...
+				! children?.length &&
+				// The tooltip is not explicitly disabled.
 				false !== showTooltip ) );
 
 	const descriptionId = describedBy ? instanceId : null;
@@ -185,7 +190,7 @@ export function Button( props, ref ) {
 	return (
 		<>
 			<Tooltip
-				text={ describedBy ? describedBy : label }
+				text={ children?.length && describedBy ? describedBy : label }
 				shortcut={ shortcut }
 				position={ tooltipPosition }
 			>

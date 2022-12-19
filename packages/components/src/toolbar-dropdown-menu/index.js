@@ -19,14 +19,14 @@ function ToolbarDropdownMenu( props, ref ) {
 
 	// ToobarItem will pass all props to the render prop child, which will pass
 	// all props to the toggle of DropdownMenu. This means that ToolbarDropdownMenu
-	// has the same API as DrpodownMenu.
+	// has the same API as DropdownMenu.
 	return (
 		<ToolbarItem ref={ ref } { ...props.toggleProps }>
 			{ ( toolbarItemProps ) => (
 				<DropdownMenu
 					{ ...props }
 					popoverProps={ {
-						isAlternate: true,
+						variant: 'toolbar',
 						...props.popoverProps,
 					} }
 					toggleProps={ toolbarItemProps }

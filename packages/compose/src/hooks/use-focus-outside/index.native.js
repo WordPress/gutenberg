@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { includes } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useCallback, useEffect, useRef } from '@wordpress/element';
@@ -20,7 +15,7 @@ const INPUT_BUTTON_TYPES = [ 'button', 'submit' ];
  * @typedef {HTMLButtonElement | HTMLLinkElement | HTMLInputElement} FocusNormalizedButton
  */
 
-// Disable reason: Rule doesn't support predicate return types
+// Disable reason: Rule doesn't support predicate return types.
 /* eslint-disable jsdoc/valid-types */
 /**
  * Returns true if the given element is a button element subject to focus
@@ -39,8 +34,7 @@ function isFocusNormalizedButton( eventTarget ) {
 			return true;
 
 		case 'INPUT':
-			return includes(
-				INPUT_BUTTON_TYPES,
+			return INPUT_BUTTON_TYPES.includes(
 				/** @type {HTMLInputElement} */ ( eventTarget ).type
 			);
 	}
@@ -133,7 +127,7 @@ export default function useFocusOutside( onFocusOutside ) {
 	 */
 	const normalizeButtonFocus = useCallback( ( event ) => {
 		const { type, target } = event;
-		const isInteractionEnd = includes( [ 'mouseup', 'touchend' ], type );
+		const isInteractionEnd = [ 'mouseup', 'touchend' ].includes( type );
 
 		if ( isInteractionEnd ) {
 			preventBlurCheck.current = false;

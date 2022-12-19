@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/image",
 		"isValid": true,
 		"attributes": {
@@ -11,7 +10,6 @@
 			"width": 100,
 			"height": 100
 		},
-		"innerBlocks": [],
-		"originalContent": "<figure class=\"wp-block-image alignleft\">\n\t<img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt=\"\" width=\"100\" height=\"100\" />\n</figure>"
+		"innerBlocks": []
 	}
 ]

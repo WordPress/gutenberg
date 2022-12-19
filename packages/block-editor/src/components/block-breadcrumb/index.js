@@ -22,11 +22,8 @@ import { store as blockEditorStore } from '../../store';
 function BlockBreadcrumb( { rootLabelText } ) {
 	const { selectBlock, clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { clientId, parents, hasSelection } = useSelect( ( select ) => {
-		const {
-			getSelectionStart,
-			getSelectedBlockClientId,
-			getBlockParents,
-		} = select( blockEditorStore );
+		const { getSelectionStart, getSelectedBlockClientId, getBlockParents } =
+			select( blockEditorStore );
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
 			parents: getBlockParents( selectedBlockClientId ),
@@ -80,7 +77,10 @@ function BlockBreadcrumb( { rootLabelText } ) {
 						variant="tertiary"
 						onClick={ () => selectBlock( parentClientId ) }
 					>
-						<BlockTitle clientId={ parentClientId } />
+						<BlockTitle
+							clientId={ parentClientId }
+							maximumLength={ 35 }
+						/>
 					</Button>
 					<Icon
 						icon={ chevronRightSmall }
@@ -93,7 +93,7 @@ function BlockBreadcrumb( { rootLabelText } ) {
 					className="block-editor-block-breadcrumb__current"
 					aria-current="true"
 				>
-					<BlockTitle clientId={ clientId } />
+					<BlockTitle clientId={ clientId } maximumLength={ 35 } />
 				</li>
 			) }
 		</ul>

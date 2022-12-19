@@ -7,15 +7,16 @@ import classNames from 'classnames';
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
-import { Fragment, useEffect } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import {
 	BlockControls,
 	useInnerBlocksProps,
 	useBlockProps,
 	InspectorControls,
 	ContrastChecker,
-	PanelColorSettings,
 	withColors,
+	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
+	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
 import {
 	MenuGroup,
@@ -46,6 +47,7 @@ const getDefaultBlockLayout = ( blockTypeOrName ) => {
 
 export function SocialLinksEdit( props ) {
 	const {
+		clientId,
 		name,
 		attributes,
 		iconBackgroundColor,
@@ -58,6 +60,7 @@ export function SocialLinksEdit( props ) {
 
 	const {
 		iconBackgroundColorValue,
+		customIconBackgroundColor,
 		iconColorValue,
 		openInNewTab,
 		showLabels,
@@ -66,18 +69,27 @@ export function SocialLinksEdit( props ) {
 	} = attributes;
 	const usedLayout = layout || getDefaultBlockLayout( name );
 
-	// Remove icon background color if logos only style selected.
-	const logosOnly =
-		attributes.className?.indexOf( 'is-style-logos-only' ) >= 0;
+	const logosOnly = attributes.className?.includes( 'is-style-logos-only' );
+
+	// Remove icon background color when logos only style is selected or
+	// restore it when any other style is selected.
+	const backgroundBackup = useRef( {} );
 	useEffect( () => {
 		if ( logosOnly ) {
+			backgroundBackup.current = {
+				iconBackgroundColor,
+				iconBackgroundColorValue,
+				customIconBackgroundColor,
+			};
 			setAttributes( {
 				iconBackgroundColor: undefined,
 				customIconBackgroundColor: undefined,
 				iconBackgroundColorValue: undefined,
 			} );
+		} else {
+			setAttributes( { ...backgroundBackup.current } );
 		}
-	}, [ logosOnly, setAttributes ] );
+	}, [ logosOnly ] );
 
 	const SocialPlaceholder = (
 		<li className="wp-block-social-links__social-placeholder">
@@ -98,6 +110,7 @@ export function SocialLinksEdit( props ) {
 	// Fallback color values are used maintain selections in case switching
 	// themes and named colors in palette do not match.
 	const className = classNames( size, {
+		'has-visible-labels': showLabels,
 		'has-icon-color': iconColor.color || iconColorValue,
 		'has-icon-background-color':
 			iconBackgroundColor.color || iconBackgroundColorValue,
@@ -126,6 +139,10 @@ export function SocialLinksEdit( props ) {
 				setAttributes( { iconColorValue: colorValue } );
 			},
 			label: __( 'Icon color' ),
+			resetAllFilter: () => {
+				setIconColor( undefined );
+				setAttributes( { iconColorValue: undefined } );
+			},
 		},
 	];
 
@@ -141,11 +158,17 @@ export function SocialLinksEdit( props ) {
 				} );
 			},
 			label: __( 'Icon background' ),
+			resetAllFilter: () => {
+				setIconBackgroundColor( undefined );
+				setAttributes( { iconBackgroundColorValue: undefined } );
+			},
 		} );
 	}
 
+	const colorGradientSettings = useMultipleOriginColorsAndGradients();
+
 	return (
-		<Fragment>
+		<>
 			<BlockControls group="other">
 				<ToolbarDropdownMenu
 					label={ __( 'Size' ) }
@@ -200,12 +223,29 @@ export function SocialLinksEdit( props ) {
 						}
 					/>
 				</PanelBody>
-				<PanelColorSettings
-					__experimentalHasMultipleOrigins
-					__experimentalIsRenderedInSidebar
-					title={ __( 'Color' ) }
-					colorSettings={ colorSettings }
-				/>
+			</InspectorControls>
+			<InspectorControls __experimentalGroup="color">
+				{ colorSettings.map(
+					( { onChange, label, value, resetAllFilter } ) => (
+						<ColorGradientSettingsDropdown
+							key={ `social-links-color-${ label }` }
+							__experimentalHasMultipleOrigins
+							__experimentalIsRenderedInSidebar
+							settings={ [
+								{
+									colorValue: value,
+									label,
+									onColorChange: onChange,
+									isShownByDefault: true,
+									resetAllFilter,
+									enableAlpha: true,
+								},
+							] }
+							panelId={ clientId }
+							{ ...colorGradientSettings }
+						/>
+					)
+				) }
 				{ ! logosOnly && (
 					<ContrastChecker
 						{ ...{
@@ -217,7 +257,7 @@ export function SocialLinksEdit( props ) {
 				) }
 			</InspectorControls>
 			<ul { ...innerBlocksProps } />
-		</Fragment>
+		</>
 	);
 }
 

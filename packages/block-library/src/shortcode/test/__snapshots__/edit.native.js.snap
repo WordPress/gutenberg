@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Shortcode block edits content 1`] = `
+"<!-- wp:shortcode -->
+[youtube https://www.youtube.com/watch?v=ssfHW5lwFZg]
+<!-- /wp:shortcode -->"
+`;
+
+exports[`Shortcode block inserts block 1`] = `"<!-- wp:shortcode /-->"`;

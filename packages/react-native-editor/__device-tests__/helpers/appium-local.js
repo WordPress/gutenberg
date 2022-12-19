@@ -3,7 +3,7 @@
  */
 const childProcess = require( 'child_process' );
 
-// Spawns an appium process
+// Spawns an appium process.
 const start = ( localAppiumPort ) =>
 	new Promise( ( resolve, reject ) => {
 		const appium = childProcess.spawn( 'appium', [

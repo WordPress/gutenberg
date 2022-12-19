@@ -1,118 +1,104 @@
 # Feature Flags
 
-With phase 2 of the Gutenberg project there's a need for improved control over how code changes are released. Newer features developed for phase 2 and beyond should only be released to the Gutenberg plugin, while improvements and bug fixes should still continue to make their way into core releases.
+'Feature flags' are variables that allow you to prevent specific code in the Gutenberg project from being shipped to WordPress core, and to run certain experimental features only in the plugin.
 
-The technique for handling this is known as a 'feature flag'.
+## Introducing `process.env.IS_GUTENBERG_PLUGIN`
 
-## Introducing `process.env.GUTENBERG_PHASE`
+The `process.env.IS_GUTENBERG_PLUGIN` is an environment variable whose value 'flags' whether code is running within the Gutenberg plugin. 
 
-The `process.env.GUTENBERG_PHASE` is an environment variable containing a number that represents the phase. When the codebase is built for the plugin, this variable will be set to `2`. When building for core, it will be set to `1`.
+When the codebase is built for the plugin, this variable will be set to `true`. When building for WordPress core, it will be set to `false` or `undefined`.
 
 ## Basic Use
 
-A phase 2 function or constant should be exported using the following ternary syntax:
+### Exporting features
+
+A plugin-only function or constant should be exported using the following ternary syntax:
 
 ```js
-function myPhaseTwoFeature() {
+function myPluginOnlyFeature() {
 	// implementation
 }
 
-export const phaseTwoFeature =
-	process.env.GUTENBERG_PHASE === 2 ? myPhaseTwoFeature : undefined;
+export const pluginOnlyFeature =
+	process.env.IS_GUTENBERG_PLUGIN ? myPluginOnlyFeature : undefined;
 ```
 
-In phase 1 environments the `phaseTwoFeature` export will be `undefined`.
+In the above example, the `pluginOnlyFeature` export will be `undefined` in non-plugin environments such as WordPress core.
 
-If you're attempting to import and call a phase 2 feature, be sure to wrap the call to the function in an if statement to avoid an error:
+### Importing features
+
+If you're attempting to import and call a plugin-only feature, be sure to wrap the function call in an `if` statement to avoid an error:
 
 ```js
-import { phaseTwoFeature } from '@wordpress/foo';
+import { pluginOnlyFeature } from '@wordpress/foo';
 
-if ( process.env.GUTENBERG_PHASE === 2 ) {
-	phaseTwoFeature();
+if ( process.env.IS_GUTENBERG_PLUGIN ) {
+	pluginOnlyFeature();
 }
 ```
 
-### How it works
+## How it works
 
-During the webpack build, any instances of `process.env.GUTENBERG_PHASE` will be replaced using webpack's define plugin (https://webpack.js.org/plugins/define-plugin/).
+During the webpack build, instances of `process.env.IS_GUTENBERG_PLUGIN` will be replaced using webpack's [define plugin](https://webpack.js.org/plugins/define-plugin/).
 
-If you write the following code:
+For example, in the following code –
 
 ```js
-if ( process.env.GUTENBERG_PHASE === 2 ) {
-	phaseTwoFeature();
+if ( process.env.IS_GUTENBERG_PLUGIN ) {
+	pluginOnlyFeature();
 }
 ```
 
-When building the codebase for the plugin the variable will be replaced with the number literal `2`:
+– the variable `process.env.IS_GUTENBERG_PLUGIN` will be replaced with the boolean `true` during the plugin-only build:
 
 ```js
-if ( 2 === 2 ) {
-	phaseTwoFeature();
+if ( true ) { // Wepack has replaced `process.env.IS_GUTENBERG_PLUGIN` with `true`
+	pluginOnlyFeature();
 }
 ```
 
-Any code within the body of the if statement will be executed within the gutenberg plugin since `2 === 2` evaluates to `true`.
+This ensures that code within the body of the `if` statement will always be executed.
 
-For core, the `process.env.GUTENBERG_PHASE` variable is replaced with `1`, so the built code will look like:
+In WordPress core, the `process.env.IS_GUTENBERG_PLUGIN` variable is replaced with `undefined`. The built code looks like this:
 
 ```js
-if ( 1 === 2 ) {
-	phaseTwoFeature();
+if ( undefined ) { // Wepack has replaced `process.env.IS_GUTENBERG_PLUGIN` with `undefined`
+	pluginOnlyFeature();
 }
 ```
 
-`1 === 2` evaluates to false so the phase 2 feature will not be executed within core.
+`undefined` evaluates to `false` so the plugin-only feature will not be executed.
 
 ### Dead Code Elimination
 
-When building code for production, webpack 'minifies' code (https://en.wikipedia.org/wiki/Minification_(programming)), removing the amount of unnecessary JavaScript as much as possible. One of the steps involves something known as 'dead code elimination'.
+For production builds, webpack ['minifies'](https://en.wikipedia.org/wiki/Minification_(programming)) the code, removing as much unnecessary JavaScript as it can. 
 
-When the following code is encountered, webpack determines that the surrounding `if`statement is unnecessary:
+One of the steps involves something known as 'dead code elimination'. For example, when the following code is encountered, webpack determines that the surrounding `if` statement is unnecessary:
 
 ```js
-if ( 2 === 2 ) {
-	phaseTwoFeature();
+if ( true ) {
+	pluginOnlyFeature();
 }
 ```
 
-The condition will always evaluates to `true`, so can be removed leaving just the code in the body:
+The condition will always evaluate to `true`, so webpack removes it, leaving behind the code that was in the body:
 
 ```js
-phaseTwoFeature();
+pluginOnlyFeature(); // The `if` condition block has been removed. Only the body remains.
 ```
 
-Similarly when building for core, the condition in the following `if` statement always resolves to false:
+Similarly, when building for WordPress core, the condition in the following `if` statement always resolves to false:
 
 ```js
-if ( 1 === 2 ) {
-	phaseTwoFeature();
+if ( undefined ) {
+	pluginOnlyFeature();
 }
 ```
 
-The minification process will remove the entire `if` statement including the body, ensuring code destined for phase 2 is not included in the built JavaScript intended for core.
+In this case, the minification process will remove the entire `if` statement including the body, ensuring plugin-only code is not included in WordPress core build.
 
 ## FAQ
 
-#### Why should I only use `===` or `!==` when comparing `process.env.GUTENBERG_PHASE` and not `>`, `>=`, `<` or `<=`?
+#### Why shouldn't I assign the result of an expression involving `IS_GUTENBERG_PLUGIN` to a variable, e.g. `const isMyFeatureActive = process.env.IS_GUTENBERG_PLUGIN === 2`?
 
-This is a restriction due to the behaviour of the greater than or less than operators in JavaScript when `process.env.GUTENBERG_PHASE` is undefined, as might be the case for third party users of WordPress npm packages. Both `process.env.GUTENBERG_PHASE < 2` and `process.env.GUTENBERG_PHASE > 1` resolve to false. When writing `if ( process.env.GUTENBERG_PHASE > 1 )`, the intention might be to avoid executing the phase 2 code in the following `if` statement's body. That's fine since it will evaluate to false.
-
-However, the following code doesn't quite have the intended behaviour:
-
-```
-function myPhaseTwoFeature() {
-	if ( process.env.GUTENBERG_PHASE < 2 ) {
-		return;
-	}
-
-	// implementation of phase 2 feature
-}
-```
-
-Here an early return is used to avoid execution of a phase 2 feature, but because the `if` condition resolves to false, the early return is bypassed and the phase 2 feature is incorrectly triggered.
-
-#### Why shouldn't I assign the result of an expression involving `GUTENBERG_PHASE` to a variable, e.g. `const isMyFeatureActive = process.env.GUTENBERG_PHASE === 2`?
-
-The aim here is to avoid introducing any complexity that could result in webpack's minifier not being able to eliminate dead code. See the [Dead Code Elimination](#dead-code-elimination) section for further details.
+Introducing complexity may prevent webpack's minifier from identifying and therefore eliminating dead code. Therefore it is recommended to use the examples in this document to ensure your feature flag functions as intended. For further details, see the [Dead Code Elimination](#dead-code-elimination) section.

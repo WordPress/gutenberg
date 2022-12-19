@@ -11,41 +11,36 @@ import * as selectors from './selectors';
 import * as actions from './actions';
 import * as resolvers from './resolvers';
 import createLocksActions from './locks/actions';
-import { defaultEntities, getMethodName } from './entities';
+import { rootEntitiesConfig, getMethodName } from './entities';
 import { STORE_NAME } from './name';
 
 // The entity selectors/resolvers and actions are shortcuts to their generic equivalents
-// (getEntityRecord, getEntityRecords, updateEntityRecord, updateEntityRecordss)
-// Instead of getEntityRecord, the consumer could use more user-frieldly named selector: getPostType, getTaxonomy...
+// (getEntityRecord, getEntityRecords, updateEntityRecord, updateEntityRecords)
+// Instead of getEntityRecord, the consumer could use more user-friendly named selector: getPostType, getTaxonomy...
 // The "kind" and the "name" of the entity are combined to generate these shortcuts.
 
-const entitySelectors = defaultEntities.reduce( ( result, entity ) => {
+const entitySelectors = rootEntitiesConfig.reduce( ( result, entity ) => {
 	const { kind, name } = entity;
 	result[ getMethodName( kind, name ) ] = ( state, key, query ) =>
 		selectors.getEntityRecord( state, kind, name, key, query );
-	result[ getMethodName( kind, name, 'get', true ) ] = ( state, ...args ) =>
-		selectors.getEntityRecords( state, kind, name, ...args );
+	result[ getMethodName( kind, name, 'get', true ) ] = ( state, query ) =>
+		selectors.getEntityRecords( state, kind, name, query );
 	return result;
 }, {} );
 
-const entityResolvers = defaultEntities.reduce( ( result, entity ) => {
+const entityResolvers = rootEntitiesConfig.reduce( ( result, entity ) => {
 	const { kind, name } = entity;
 	result[ getMethodName( kind, name ) ] = ( key, query ) =>
 		resolvers.getEntityRecord( kind, name, key, query );
 	const pluralMethodName = getMethodName( kind, name, 'get', true );
 	result[ pluralMethodName ] = ( ...args ) =>
 		resolvers.getEntityRecords( kind, name, ...args );
-	result[ pluralMethodName ].shouldInvalidate = ( action, ...args ) =>
-		resolvers.getEntityRecords.shouldInvalidate(
-			action,
-			kind,
-			name,
-			...args
-		);
+	result[ pluralMethodName ].shouldInvalidate = ( action ) =>
+		resolvers.getEntityRecords.shouldInvalidate( action, kind, name );
 	return result;
 }, {} );
 
-const entityActions = defaultEntities.reduce( ( result, entity ) => {
+const entityActions = rootEntitiesConfig.reduce( ( result, entity ) => {
 	const { kind, name } = entity;
 	result[ getMethodName( kind, name, 'save' ) ] = ( key ) =>
 		actions.saveEntityRecord( kind, name, key );
@@ -59,15 +54,12 @@ const storeConfig = () => ( {
 	actions: { ...actions, ...entityActions, ...createLocksActions() },
 	selectors: { ...selectors, ...entitySelectors },
 	resolvers: { ...resolvers, ...entityResolvers },
-	__experimentalUseThunks: true,
 } );
 
 /**
  * Store definition for the code data namespace.
  *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore
- *
- * @type {Object}
  */
 export const store = createReduxStore( STORE_NAME, storeConfig() );
 
@@ -75,4 +67,6 @@ register( store );
 
 export { default as EntityProvider } from './entity-provider';
 export * from './entity-provider';
+export * from './entity-types';
 export * from './fetch';
+export * from './hooks';

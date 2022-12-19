@@ -2,7 +2,6 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { flatMap } from 'lodash';
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -79,7 +78,5 @@ export const __experimentalGetAnnotationsForRichText = createSelector(
  * @return {Array} All annotations currently applied.
  */
 export function __experimentalGetAnnotations( state ) {
-	return flatMap( state, ( annotations ) => {
-		return annotations;
-	} );
+	return Object.values( state ).flat();
 }

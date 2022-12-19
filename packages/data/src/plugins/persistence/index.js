@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { merge, isPlainObject } from 'lodash';
+import { isPlainObject } from 'is-plain-object';
+import { merge } from 'lodash';
 
 /**
  * Internal dependencies
@@ -63,10 +64,8 @@ export const withLazySameState = ( reducer ) => ( state, action ) => {
  * @return {Object} Persistence interface.
  */
 export function createPersistenceInterface( options ) {
-	const {
-		storage = DEFAULT_STORAGE,
-		storageKey = DEFAULT_STORAGE_KEY,
-	} = options;
+	const { storage = DEFAULT_STORAGE, storageKey = DEFAULT_STORAGE_KEY } =
+		options;
 
 	let data;
 
@@ -222,70 +221,6 @@ function persistencePlugin( registry, pluginOptions ) {
 	};
 }
 
-/**
- * Move the 'features' object in local storage from the sourceStoreName to the
- * interface store.
- *
- * @param {Object} persistence     The persistence interface.
- * @param {string} sourceStoreName The name of the store that has persisted
- *                                 preferences to migrate to the interface
- *                                 package.
- */
-export function migrateFeaturePreferencesToInterfaceStore(
-	persistence,
-	sourceStoreName
-) {
-	const interfaceStoreName = 'core/interface';
-	const state = persistence.get();
-	const sourcePreferences = state[ sourceStoreName ]?.preferences;
-	const sourceFeatures = sourcePreferences?.features;
-
-	if ( sourceFeatures ) {
-		const targetFeatures =
-			state[ interfaceStoreName ]?.preferences?.features;
-
-		// Avoid migrating features again if they've previously been migrated.
-		if ( ! targetFeatures?.[ sourceStoreName ] ) {
-			// Set the feature values in the interface store, the features
-			// object is keyed by 'scope', which matches the store name for
-			// the source.
-			persistence.set( interfaceStoreName, {
-				preferences: {
-					features: {
-						...targetFeatures,
-						[ sourceStoreName ]: sourceFeatures,
-					},
-				},
-			} );
-
-			// Remove feature preferences from the source.
-			persistence.set( sourceStoreName, {
-				preferences: {
-					...sourcePreferences,
-					features: undefined,
-				},
-			} );
-		}
-	}
-}
-
-/**
- * Deprecated: Remove this function and the code in WordPress Core that calls
- * it once WordPress 6.0 is released.
- */
-
-persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
-	const persistence = createPersistenceInterface( pluginOptions );
-
-	migrateFeaturePreferencesToInterfaceStore(
-		persistence,
-		'core/edit-widgets'
-	);
-	migrateFeaturePreferencesToInterfaceStore(
-		persistence,
-		'core/customize-widgets'
-	);
-	migrateFeaturePreferencesToInterfaceStore( persistence, 'core/edit-post' );
-};
+persistencePlugin.__unstableMigrate = () => {};
 
 export default persistencePlugin;

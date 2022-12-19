@@ -2,7 +2,6 @@
  * External dependencies
  */
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
-const { escapeRegExp } = require( 'lodash' );
 const { join, sep } = require( 'path' );
 const fastGlob = require( 'fast-glob' );
 
@@ -17,28 +16,45 @@ const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extrac
 const { baseConfig, plugins, stylesTransform } = require( './shared' );
 
 /*
- * Matches a block's name in paths in the form
- * build-module/<blockName>/view.js
+ * Matches a block's filepaths in the form build-module/<filename>.js
  */
-const blockNameRegex = new RegExp( /(?<=build-module\/).*(?=(\/view))/g );
+const blockViewRegex = new RegExp(
+	/build-module\/(?<filename>.*\/view.*).js$/
+);
 
 /**
  * We need to automatically rename some functions when they are called inside block files,
  * but have been declared elsewhere. This way we can call Gutenberg override functions, but
  * the block will still call the core function when updates are back ported.
  */
-const prefixFunctions = [ 'build_query_vars_from_query_block' ];
+const prefixFunctions = [
+	'build_query_vars_from_query_block',
+	'wp_enqueue_block_support_styles',
+	'wp_get_typography_font_size_value',
+	'wp_style_engine_get_styles',
+];
+
+/**
+ * Escapes the RegExp special characters.
+ *
+ * @param {string} string Input string.
+ *
+ * @return {string} Regex-escaped string.
+ */
+function escapeRegExp( string ) {
+	return string.replace( /[\\^$.*+?()[\]{}|]/g, '\\$&' );
+}
 
 const createEntrypoints = () => {
 	/*
-	 * Returns an array of paths to view.js files within the `@wordpress/block-library` package.
-	 * These paths can be matched by the regex `blockNameRegex` in order to extract
-	 * the block's name.
+	 * Returns an array of paths to block view files within the `@wordpress/block-library` package.
+	 * These paths can be matched by the regex `blockViewRegex` in order to extract
+	 * the block's filename.
 	 *
 	 * Returns an empty array if no files were found.
 	 */
 	const blockViewScriptPaths = fastGlob.sync(
-		'./packages/block-library/build-module/**/view.js'
+		'./packages/block-library/build-module/**/view*.js'
 	);
 
 	/*
@@ -46,11 +62,14 @@ const createEntrypoints = () => {
 	 * each block's view.js file.
 	 */
 	return blockViewScriptPaths.reduce( ( entries, scriptPath ) => {
-		const [ blockName ] = scriptPath.match( blockNameRegex );
+		const result = scriptPath.match( blockViewRegex );
+		if ( ! result?.groups?.filename ) {
+			return entries;
+		}
 
 		return {
 			...entries,
-			[ 'blocks/' + blockName ]: scriptPath,
+			[ result.groups.filename ]: scriptPath,
 		};
 	}, {} );
 };
@@ -61,7 +80,7 @@ module.exports = {
 	entry: createEntrypoints(),
 	output: {
 		devtoolNamespace: 'wp',
-		filename: './build/block-library/[name]/view.min.js',
+		filename: './build/block-library/blocks/[name].min.js',
 		path: join( __dirname, '..', '..' ),
 	},
 	plugins: [
@@ -126,7 +145,11 @@ module.exports = {
 							// block will still call the core function when updates are back ported.
 							content = content.replace(
 								new RegExp( prefixFunctions.join( '|' ), 'g' ),
-								( match ) => `${ prefix }${ match }`
+								( match ) =>
+									`${ prefix }${ match.replace(
+										/^wp_/,
+										''
+									) }`
 							);
 
 							// Within content, search for any function definitions. For

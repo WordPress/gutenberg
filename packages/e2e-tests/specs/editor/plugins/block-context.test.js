@@ -77,7 +77,7 @@ describe( 'Block context', () => {
 		);
 		expect( content ).toMatch( /^123,\d+,post$/ );
 
-		// Clean up
+		// Clean up.
 		await editorPage.bringToFront();
 		await previewPage.close();
 	} );

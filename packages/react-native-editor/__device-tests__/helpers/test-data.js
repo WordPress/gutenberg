@@ -96,7 +96,7 @@ exports.imageCompletehtml = `<!-- wp:image {"id":1,"sizeslug":"large"} -->
 <!-- /wp:paragraph -->`;
 
 exports.imageShorteHtml = `<!-- wp:image {"id":1,"sizeslug":"large"} -->
-<figure class="wp-block-image size-large"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/><figcaption>C'est la vie my friends</figcaption></figure>
+<figure class="wp-block-image size-large"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="A snow-capped mountain top in a cloudy sky with red-leafed trees in the foreground" class="wp-image-1"/><figcaption class="wp-element-caption">C'est la vie my friends</figcaption></figure>
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->
@@ -135,9 +135,55 @@ exports.coverHeightWithRemUnit = `<!-- wp:cover {"customOverlayColor":"#ffffff",
 <!-- /wp:cover -->`;
 
 exports.fileBlockPlaceholder = `<!-- wp:file {"id":3,"href":"https://wordpress.org/latest.zip"} -->
-<div class="wp-block-file"><a href="https://wordpress.org/latest.zip">WordPress.zip</a><a href="https://wordpress.org/latest.zip" class="wp-block-file__button" download>Download</a></div>
+<div class="wp-block-file"><a href="https://wordpress.org/latest.zip">WordPress.zip</a><a href="https://wordpress.org/latest.zip" class="wp-block-file__button wp-element-button" download>Download</a></div>
 <!-- /wp:file -->`;
 
 exports.audioBlockPlaceholder = `<!-- wp:audio {"id":5} -->
 <figure class="wp-block-audio"><audio controls src="https://cldup.com/59IrU0WJtq.mp3"></audio></figure>
 <!-- /wp:audio -->`;
+
+exports.headerBlockEmpty = `<!-- wp:heading -->
+<h2 class="wp-block-heading"></h2>
+<!-- /wp:heading -->`;
+
+exports.separatorBlockEmpty = `<!-- wp:separator -->
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+<!-- /wp:separator -->`;
+
+exports.listBlockEmpty = `<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`;
+
+exports.imageBlockEmpty = `<!-- wp:image -->
+<figure class="wp-block-image"><img alt=""/></figure>
+<!-- /wp:image -->`;
+
+exports.moreBlockEmpty = `<!-- wp:more -->
+<!--more-->
+<!-- /wp:more -->`;
+
+exports.paragraphBlockEmpty = `<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->`;
+
+exports.paragraphBlockShortText = `<!-- wp:paragraph -->
+<p>Rock music approaches at high velocity.</p>
+<!-- /wp:paragraph -->`;
+
+exports.multiLinesParagraphBlock = `<!-- wp:paragraph -->
+<p>multiple lines<br>multiple lines<br>multiple lines</p>
+<!-- /wp:paragraph -->`;
+
+exports.unknownElementParagraphBlock = `<!-- wp:paragraph -->
+<p><unknownhtmlelement>abc</unknownhtmlelement>D</p>
+<!-- /wp:paragraph -->`;
+
+exports.lettersInParagraphBlock = `<!-- wp:paragraph -->
+<p>ABCD</p>
+<!-- /wp:paragraph -->`;
+
+exports.spacerBlock = `<!-- wp:spacer -->
+<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->`;

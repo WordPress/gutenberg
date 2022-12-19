@@ -14,65 +14,69 @@ const { execSync } = require( 'child_process' );
 const env = require( './env' );
 const parseXdebugMode = require( './parse-xdebug-mode' );
 
-// Colors
+// Colors.
 const boldWhite = chalk.bold.white;
 const wpPrimary = boldWhite.bgHex( '#00669b' );
 const wpGreen = boldWhite.bgHex( '#4ab866' );
 const wpRed = boldWhite.bgHex( '#d94f4f' );
 const wpYellow = boldWhite.bgHex( '#f0b849' );
 
-// Spinner
-const withSpinner = ( command ) => ( ...args ) => {
-	const spinner = ora().start();
-	args[ 0 ].spinner = spinner;
-	let time = process.hrtime();
-	return command( ...args ).then(
-		( message ) => {
-			time = process.hrtime( time );
-			spinner.succeed(
-				`${ message || spinner.text } (in ${ time[ 0 ] }s ${ (
-					time[ 1 ] / 1e6
-				).toFixed( 0 ) }ms)`
-			);
-			process.exit( 0 );
-		},
-		( error ) => {
-			if ( error instanceof env.ValidationError ) {
-				// Error is a validation error. That means the user did something wrong.
-				spinner.fail( error.message );
-				process.exit( 1 );
-			} else if (
-				error &&
-				typeof error === 'object' &&
-				'exitCode' in error &&
-				'err' in error &&
-				'out' in error
-			) {
-				// Error is a docker-compose error. That means something docker-related failed.
-				// https://github.com/PDMLab/docker-compose/blob/HEAD/src/index.ts
-				spinner.fail( 'Error while running docker-compose command.' );
-				if ( error.out ) {
-					process.stdout.write( error.out );
-				}
-				if ( error.err ) {
-					process.stderr.write( error.err );
-				}
-				process.exit( error.exitCode );
-			} else if ( error ) {
-				// Error is an unknown error. That means there was a bug in our code.
-				spinner.fail(
-					typeof error === 'string' ? error : error.message
+// Spinner.
+const withSpinner =
+	( command ) =>
+	( ...args ) => {
+		const spinner = ora().start();
+		args[ 0 ].spinner = spinner;
+		let time = process.hrtime();
+		return command( ...args ).then(
+			( message ) => {
+				time = process.hrtime( time );
+				spinner.succeed(
+					`${ message || spinner.text } (in ${ time[ 0 ] }s ${ (
+						time[ 1 ] / 1e6
+					).toFixed( 0 ) }ms)`
 				);
-				// Disable reason: Using console.error() means we get a stack trace.
-				console.error( error );
-				process.exit( 1 );
-			} else {
-				spinner.fail( 'An unknown error occured.' );
-				process.exit( 1 );
+				process.exit( 0 );
+			},
+			( error ) => {
+				if ( error instanceof env.ValidationError ) {
+					// Error is a validation error. That means the user did something wrong.
+					spinner.fail( error.message );
+					process.exit( 1 );
+				} else if (
+					error &&
+					typeof error === 'object' &&
+					'exitCode' in error &&
+					'err' in error &&
+					'out' in error
+				) {
+					// Error is a docker-compose error. That means something docker-related failed.
+					// https://github.com/PDMLab/docker-compose/blob/HEAD/src/index.ts
+					spinner.fail(
+						'Error while running docker-compose command.'
+					);
+					if ( error.out ) {
+						process.stdout.write( error.out );
+					}
+					if ( error.err ) {
+						process.stderr.write( error.err );
+					}
+					process.exit( error.exitCode );
+				} else if ( error ) {
+					// Error is an unknown error. That means there was a bug in our code.
+					spinner.fail(
+						typeof error === 'string' ? error : error.message
+					);
+					// Disable reason: Using console.error() means we get a stack trace.
+					console.error( error );
+					process.exit( 1 );
+				} else {
+					spinner.fail( 'An unknown error occurred.' );
+					process.exit( 1 );
+				}
 			}
-		}
-	);
-};
+		);
+	};
 
 module.exports = function cli() {
 	// Do nothing if Docker is unavailable.
@@ -91,6 +95,10 @@ module.exports = function cli() {
 		describe: 'Enable debug output.',
 		default: false,
 	} );
+
+	// Make sure any unknown arguments are passed to the command as arguments.
+	// This allows options to be passed to "run" without being quoted.
+	yargs.parserConfiguration( { 'unknown-options-as-args': true } );
 
 	yargs.command(
 		'start',
@@ -171,7 +179,7 @@ module.exports = function cli() {
 				describe: 'The container to run the command on.',
 			} );
 			args.positional( 'command', {
-				type: 'string',
+				type: 'array',
 				describe: 'The command to run.',
 			} );
 		},
@@ -189,6 +197,7 @@ module.exports = function cli() {
 		'$0 run tests-cli bash',
 		'Open a bash session in the WordPress tests instance.'
 	);
+
 	yargs.command(
 		'destroy',
 		wpRed(

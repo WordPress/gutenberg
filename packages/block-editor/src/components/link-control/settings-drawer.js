@@ -1,13 +1,10 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { ToggleControl, VisuallyHidden } from '@wordpress/components';
+
+const noop = () => {};
 
 const LinkControlSettingsDrawer = ( { value, onChange = noop, settings } ) => {
 	if ( ! settings || ! settings.length ) {

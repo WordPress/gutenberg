@@ -5,7 +5,8 @@ import { MenuGroup, MenuItem, VisuallyHidden } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { external } from '@wordpress/icons';
-import { MoreMenuDropdown, MoreMenuFeatureToggle } from '@wordpress/interface';
+import { MoreMenuDropdown } from '@wordpress/interface';
+import { PreferenceToggleMenuItem } from '@wordpress/preferences';
 import { displayShortcut } from '@wordpress/keycodes';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useViewportMatch } from '@wordpress/compose';
@@ -38,9 +39,9 @@ export default function MoreMenu() {
 					<>
 						{ isLargeViewport && (
 							<MenuGroup label={ _x( 'View', 'noun' ) }>
-								<MoreMenuFeatureToggle
+								<PreferenceToggleMenuItem
 									scope="core/edit-widgets"
-									feature="fixedToolbar"
+									name="fixedToolbar"
 									label={ __( 'Top toolbar' ) }
 									info={ __(
 										'Access all block and document tools in a single place'
@@ -63,9 +64,9 @@ export default function MoreMenu() {
 							>
 								{ __( 'Keyboard shortcuts' ) }
 							</MenuItem>
-							<MoreMenuFeatureToggle
+							<PreferenceToggleMenuItem
 								scope="core/edit-widgets"
-								feature="welcomeGuide"
+								name="welcomeGuide"
 								label={ __( 'Welcome Guide' ) }
 							/>
 							<MenuItem
@@ -90,9 +91,9 @@ export default function MoreMenu() {
 							/>
 						</MenuGroup>
 						<MenuGroup label={ __( 'Preferences' ) }>
-							<MoreMenuFeatureToggle
+							<PreferenceToggleMenuItem
 								scope="core/edit-widgets"
-								feature="keepCaretInsideBlock"
+								name="keepCaretInsideBlock"
 								label={ __(
 									'Contain text cursor inside block'
 								) }
@@ -106,18 +107,18 @@ export default function MoreMenu() {
 									'Contain text cursor inside block deactivated'
 								) }
 							/>
-							<MoreMenuFeatureToggle
+							<PreferenceToggleMenuItem
 								scope="core/edit-widgets"
-								feature="themeStyles"
+								name="themeStyles"
 								info={ __(
 									'Make the editor look like your theme.'
 								) }
 								label={ __( 'Use theme styles' ) }
 							/>
 							{ isLargeViewport && (
-								<MoreMenuFeatureToggle
+								<PreferenceToggleMenuItem
 									scope="core/edit-widgets"
-									feature="showBlockBreadcrumbs"
+									name="showBlockBreadcrumbs"
 									label={ __( 'Display block breadcrumbs' ) }
 									info={ __(
 										'Shows block breadcrumbs at the bottom of the editor.'

@@ -84,7 +84,7 @@ register_block_style(
 );
 ```
 
-Alternatively, if a stylesheet was already registered which contains the CSS for the block style, it is possible to just pass the stylesheet's handle so `register_block_style` function will make sure it is enqueue.
+Alternatively, if a stylesheet was already registered which contains the CSS for the block style, it is possible to just pass the stylesheet's handle so `register_block_style` function will make sure it is enqueued.
 
 The following code sample provides an example of this use case:
 

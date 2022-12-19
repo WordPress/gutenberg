@@ -11,11 +11,12 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import { InputControl } from '../input-control';
 import { Text } from '../text';
 import { Spacer } from '../spacer';
 import { space } from '../ui/utils/space';
-import { ColorHexInputControl } from './styles';
 import { COLORS } from '../utils/colors-values';
+import type { StateReducer } from '../input-control/reducer/state';
 
 interface HexInputProps {
 	color: Colord;
@@ -24,18 +25,35 @@ interface HexInputProps {
 }
 
 export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
-	const handleValidate = ( value: string ) => {
-		if ( ! colord( '#' + value ).isValid() ) {
-			throw new Error( 'Invalid hex color input' );
+	const handleChange = ( nextValue: string | undefined ) => {
+		if ( ! nextValue ) return;
+		const hexValue = nextValue.startsWith( '#' )
+			? nextValue
+			: '#' + nextValue;
+
+		onChange( colord( hexValue ) );
+	};
+
+	const stateReducer: StateReducer = ( state, action ) => {
+		const nativeEvent = action.payload?.event?.nativeEvent as InputEvent;
+
+		if ( 'insertFromPaste' !== nativeEvent?.inputType ) {
+			return { ...state };
 		}
+
+		const value = state.value?.startsWith( '#' )
+			? state.value.slice( 1 ).toUpperCase()
+			: state.value?.toUpperCase();
+
+		return { ...state, value };
 	};
 
 	return (
-		<ColorHexInputControl
+		<InputControl
 			prefix={
 				<Spacer
 					as={ Text }
-					marginLeft={ space( 3.5 ) }
+					marginLeft={ space( 4 ) }
 					color={ COLORS.ui.theme }
 					lineHeight={ 1 }
 				>
@@ -43,13 +61,13 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 				</Spacer>
 			}
 			value={ color.toHex().slice( 1 ).toUpperCase() }
-			onChange={ ( nextValue ) => {
-				onChange( colord( '#' + nextValue ) );
-			} }
-			onValidate={ handleValidate }
-			maxLength={ enableAlpha ? 8 : 6 }
+			onChange={ handleChange }
+			maxLength={ enableAlpha ? 9 : 7 }
 			label={ __( 'Hex color' ) }
 			hideLabelFromVision
+			size="__unstable-large"
+			__unstableStateReducer={ stateReducer }
+			__unstableInputWidth="9em"
 		/>
 	);
 };

@@ -16,7 +16,7 @@ let indoc, offset, output, stack;
  * There are four references extracted using this tokenizer:
  *
  * match: Full match of the tag (i.e. <strong>, </strong>, <br/>)
- * isClosing: The closing slash, it it exists.
+ * isClosing: The closing slash, if it exists.
  * name: The name portion of the tag (strong, br) (if )
  * isSelfClosed: The slash on a self closing tag, if it exists.
  *
@@ -169,10 +169,8 @@ function proceed( conversionMap ) {
 	switch ( tokenType ) {
 		case 'no-more-tokens':
 			if ( stackDepth !== 0 ) {
-				const {
-					leadingTextStart: stackLeadingText,
-					tokenStart,
-				} = stack.pop();
+				const { leadingTextStart: stackLeadingText, tokenStart } =
+					stack.pop();
 				output.push( indoc.substr( stackLeadingText, tokenStart ) );
 			}
 			addText();
@@ -193,7 +191,7 @@ function proceed( conversionMap ) {
 				return true;
 			}
 
-			// otherwise we found an inner element
+			// Otherwise we found an inner element.
 			addChild(
 				createFrame( conversionMap[ name ], startOffset, tokenLength )
 			);
@@ -214,15 +212,15 @@ function proceed( conversionMap ) {
 			return true;
 
 		case 'closer':
-			// if we're not nesting then this is easy - close the block
+			// If we're not nesting then this is easy - close the block.
 			if ( 1 === stackDepth ) {
 				closeOuterElement( startOffset );
 				offset = startOffset + tokenLength;
 				return true;
 			}
 
-			// otherwise we're nested and we have to close out the current
-			// block and add it as a innerBlock to the parent
+			// Otherwise we're nested and we have to close out the current
+			// block and add it as a innerBlock to the parent.
 			const stackTop = stack.pop();
 			const text = indoc.substr(
 				stackTop.prevOffset,
@@ -256,7 +254,7 @@ function proceed( conversionMap ) {
  */
 function nextToken() {
 	const matches = tokenizer.exec( indoc );
-	// we have no more tokens
+	// We have no more tokens.
 	if ( null === matches ) {
 		return [ 'no-more-tokens' ];
 	}
@@ -325,13 +323,8 @@ function addChild( frame ) {
  *                           the element.
  */
 function closeOuterElement( endOffset ) {
-	const {
-		element,
-		leadingTextStart,
-		prevOffset,
-		tokenStart,
-		children,
-	} = stack.pop();
+	const { element, leadingTextStart, prevOffset, tokenStart, children } =
+		stack.pop();
 
 	const text = endOffset
 		? indoc.substr( prevOffset, endOffset - prevOffset )

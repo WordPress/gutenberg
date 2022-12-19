@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/site-title",
 		"isValid": true,
 		"attributes": {
@@ -9,7 +8,6 @@
 			"linkTarget": "_self",
 			"fontFamily": "cambria-georgia"
 		},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]

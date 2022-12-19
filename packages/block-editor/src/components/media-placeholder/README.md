@@ -140,6 +140,14 @@ Whether to allow multiple selection of files or not.
 -   Default: `false`
 -   Platform: Web
 
+### mediaPreview
+
+The component is rendered as a preview in the placeholder.
+
+-   Type: `Component`
+-   Required: No
+-   Platform: Web
+
 ### onError
 
 Callback called when an upload error happens.

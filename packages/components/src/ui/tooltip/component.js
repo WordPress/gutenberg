@@ -19,7 +19,7 @@ import { TooltipShortcut } from './styles';
 
 /**
  * @param {import('../context').WordPressComponentProps<import('./types').Props, 'div'>} props
- * @param {import('react').Ref<any>}                                                     forwardedRef
+ * @param {import('react').ForwardedRef<any>}                                            forwardedRef
  */
 function Tooltip( props, forwardedRef ) {
 	const {

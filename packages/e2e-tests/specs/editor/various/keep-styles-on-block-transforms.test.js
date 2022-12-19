@@ -4,9 +4,9 @@
 import {
 	clickBlockAppender,
 	createNewPost,
+	getEditedPostContent,
 	pressKeyWithModifier,
 	transformBlockTo,
-	getEditedPostContent,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Keep styles on block transforms', () => {
@@ -17,13 +17,9 @@ describe( 'Keep styles on block transforms', () => {
 	it( 'Should keep colors during a transform', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '## Heading' );
-		const [ colorPanelToggle ] = await page.$x(
-			"//button[./span[contains(text(),'Color')]]"
-		);
-		await colorPanelToggle.click();
 
 		const textColorButton = await page.waitForSelector(
-			'.block-editor-panel-color-gradient-settings__item'
+			'.block-editor-panel-color-gradient-settings__dropdown'
 		);
 		await textColorButton.click();
 
@@ -35,23 +31,6 @@ describe( 'Keep styles on block transforms', () => {
 		);
 		await page.click( 'h2[data-type="core/heading"]' );
 		await transformBlockTo( 'Paragraph' );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
-	it( 'Should keep the font size during a transform from multiple blocks into a single one', async () => {
-		// Create a paragraph block with some content.
-		await clickBlockAppender();
-		await page.keyboard.type( 'Line 1 to be made large' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'Line 2 to be made large' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'Line 3 to be made large' );
-		await pressKeyWithModifier( 'shift', 'ArrowUp' );
-		await pressKeyWithModifier( 'shift', 'ArrowUp' );
-		await page.click(
-			'[role="radiogroup"][aria-label="Font size"] [aria-label="Large"]'
-		);
-		await transformBlockTo( 'List' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 

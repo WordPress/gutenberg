@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { has, get } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,8 +16,10 @@ import {
 	withNotices,
 	withFilters,
 } from '@wordpress/components';
+import { isBlobURL } from '@wordpress/blob';
+import { useState } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { useSelect, withDispatch, withSelect } from '@wordpress/data';
 import {
 	MediaUpload,
 	MediaUploadCheck,
@@ -38,63 +40,94 @@ const DEFAULT_FEATURE_IMAGE_LABEL = __( 'Featured image' );
 const DEFAULT_SET_FEATURE_IMAGE_LABEL = __( 'Set featured image' );
 const DEFAULT_REMOVE_FEATURE_IMAGE_LABEL = __( 'Remove image' );
 
+const instructions = (
+	<p>
+		{ __(
+			'To edit the featured image, you need permission to upload media.'
+		) }
+	</p>
+);
+
+function getMediaDetails( media, postId ) {
+	if ( ! media ) {
+		return {};
+	}
+
+	const defaultSize = applyFilters(
+		'editor.PostFeaturedImage.imageSize',
+		'large',
+		media.id,
+		postId
+	);
+	if ( defaultSize in ( media?.media_details?.sizes ?? {} ) ) {
+		return {
+			mediaWidth: media.media_details.sizes[ defaultSize ].width,
+			mediaHeight: media.media_details.sizes[ defaultSize ].height,
+			mediaSourceUrl: media.media_details.sizes[ defaultSize ].source_url,
+		};
+	}
+
+	// Use fallbackSize when defaultSize is not available.
+	const fallbackSize = applyFilters(
+		'editor.PostFeaturedImage.imageSize',
+		'thumbnail',
+		media.id,
+		postId
+	);
+	if ( fallbackSize in ( media?.media_details?.sizes ?? {} ) ) {
+		return {
+			mediaWidth: media.media_details.sizes[ fallbackSize ].width,
+			mediaHeight: media.media_details.sizes[ fallbackSize ].height,
+			mediaSourceUrl:
+				media.media_details.sizes[ fallbackSize ].source_url,
+		};
+	}
+
+	// Use full image size when fallbackSize and defaultSize are not available.
+	return {
+		mediaWidth: media.media_details.width,
+		mediaHeight: media.media_details.height,
+		mediaSourceUrl: media.source_url,
+	};
+}
+
 function PostFeaturedImage( {
 	currentPostId,
 	featuredImageId,
 	onUpdateImage,
-	onDropImage,
 	onRemoveImage,
 	media,
 	postType,
 	noticeUI,
+	noticeOperations,
 } ) {
+	const [ isLoading, setIsLoading ] = useState( false );
+	const mediaUpload = useSelect( ( select ) => {
+		return select( blockEditorStore ).getSettings().mediaUpload;
+	}, [] );
 	const postLabel = get( postType, [ 'labels' ], {} );
-	const instructions = (
-		<p>
-			{ __(
-				'To edit the featured image, you need permission to upload media.'
-			) }
-		</p>
+	const { mediaWidth, mediaHeight, mediaSourceUrl } = getMediaDetails(
+		media,
+		currentPostId
 	);
 
-	let mediaWidth, mediaHeight, mediaSourceUrl;
-	if ( media ) {
-		const mediaSize = applyFilters(
-			'editor.PostFeaturedImage.imageSize',
-			'post-thumbnail',
-			media.id,
-			currentPostId
-		);
-		if ( has( media, [ 'media_details', 'sizes', mediaSize ] ) ) {
-			// use mediaSize when available
-			mediaWidth = media.media_details.sizes[ mediaSize ].width;
-			mediaHeight = media.media_details.sizes[ mediaSize ].height;
-			mediaSourceUrl = media.media_details.sizes[ mediaSize ].source_url;
-		} else {
-			// get fallbackMediaSize if mediaSize is not available
-			const fallbackMediaSize = applyFilters(
-				'editor.PostFeaturedImage.imageSize',
-				'thumbnail',
-				media.id,
-				currentPostId
-			);
-			if (
-				has( media, [ 'media_details', 'sizes', fallbackMediaSize ] )
-			) {
-				// use fallbackMediaSize when mediaSize is not available
-				mediaWidth =
-					media.media_details.sizes[ fallbackMediaSize ].width;
-				mediaHeight =
-					media.media_details.sizes[ fallbackMediaSize ].height;
-				mediaSourceUrl =
-					media.media_details.sizes[ fallbackMediaSize ].source_url;
-			} else {
-				// use full image size when mediaFallbackSize and mediaSize are not available
-				mediaWidth = media.media_details.width;
-				mediaHeight = media.media_details.height;
-				mediaSourceUrl = media.source_url;
-			}
-		}
+	function onDropFiles( filesList ) {
+		mediaUpload( {
+			allowedTypes: [ 'image' ],
+			filesList,
+			onFileChange( [ image ] ) {
+				if ( isBlobURL( image?.url ) ) {
+					setIsLoading( true );
+					return;
+				}
+				onUpdateImage( image );
+				setIsLoading( false );
+			},
+			onError( message ) {
+				noticeOperations.removeAllNotices();
+				noticeOperations.createErrorNotice( message );
+			},
+		} );
 	}
 
 	return (
@@ -165,40 +198,40 @@ function PostFeaturedImage( {
 											/>
 										</ResponsiveWrapper>
 									) }
-									{ !! featuredImageId && ! media && (
-										<Spinner />
-									) }
+									{ isLoading && <Spinner /> }
 									{ ! featuredImageId &&
+										! isLoading &&
 										( postLabel.set_featured_image ||
 											DEFAULT_SET_FEATURE_IMAGE_LABEL ) }
 								</Button>
-								<DropZone onFilesDrop={ onDropImage } />
+								<DropZone onFilesDrop={ onDropFiles } />
 							</div>
 						) }
 						value={ featuredImageId }
 					/>
 				</MediaUploadCheck>
-				{ !! featuredImageId && media && ! media.isLoading && (
-					<MediaUploadCheck>
-						<MediaUpload
-							title={
-								postLabel.featured_image ||
-								DEFAULT_FEATURE_IMAGE_LABEL
-							}
-							onSelect={ onUpdateImage }
-							unstableFeaturedImageFlow
-							allowedTypes={ ALLOWED_MEDIA_TYPES }
-							modalClass="editor-post-featured-image__media-modal"
-							render={ ( { open } ) => (
-								<Button onClick={ open } variant="secondary">
-									{ __( 'Replace Image' ) }
-								</Button>
-							) }
-						/>
-					</MediaUploadCheck>
-				) }
 				{ !! featuredImageId && (
 					<MediaUploadCheck>
+						{ media && (
+							<MediaUpload
+								title={
+									postLabel.featured_image ||
+									DEFAULT_FEATURE_IMAGE_LABEL
+								}
+								onSelect={ onUpdateImage }
+								unstableFeaturedImageFlow
+								allowedTypes={ ALLOWED_MEDIA_TYPES }
+								modalClass="editor-post-featured-image__media-modal"
+								render={ ( { open } ) => (
+									<Button
+										onClick={ open }
+										variant="secondary"
+									>
+										{ __( 'Replace Image' ) }
+									</Button>
+								) }
+							/>
+						) }
 						<Button
 							onClick={ onRemoveImage }
 							variant="link"

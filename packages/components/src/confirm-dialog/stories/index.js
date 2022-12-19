@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { text } from '@storybook/addon-knobs';
-
-/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -15,83 +10,42 @@ import Button from '../../button';
 import { Heading } from '../../heading';
 import { ConfirmDialog } from '..';
 
-export default {
+const meta = {
 	component: ConfirmDialog,
 	title: 'Components (Experimental)/ConfirmDialog',
+	argTypes: {
+		children: {
+			control: { type: 'text' },
+		},
+		confirmButtonText: {
+			control: { type: 'text' },
+		},
+		cancelButtonText: {
+			control: { type: 'text' },
+		},
+		isOpen: {
+			control: { type: null },
+		},
+		onConfirm: {
+			control: { type: null },
+		},
+		onCancel: {
+			control: { type: null },
+		},
+	},
+	args: {
+		children: 'Would you like to privately publish the post now?',
+	},
 	parameters: {
-		knobs: { disable: false },
+		docs: { source: { state: 'open' } },
 	},
 };
 
-const daText = () =>
-	text( 'message', 'Would you like to privately publish the post now?' );
+export default meta;
 
-// Simplest usage: just declare the component with the required `onConfirm` prop.
-export const _default = () => {
-	const [ confirmVal, setConfirmVal ] = useState( "Hasn't confirmed yet" );
-
-	return (
-		<>
-			<ConfirmDialog onConfirm={ () => setConfirmVal( 'Confirmed!' ) }>
-				{ daText() }
-			</ConfirmDialog>
-			<Heading level={ 1 }>{ confirmVal }</Heading>
-		</>
-	);
-};
-
-export const WithJSXMessage = () => {
-	const [ confirmVal, setConfirmVal ] = useState( "Hasn't confirmed yet" );
-
-	return (
-		<>
-			<ConfirmDialog onConfirm={ () => setConfirmVal( 'Confirmed!' ) }>
-				<Heading level={ 2 }>{ daText() }</Heading>
-			</ConfirmDialog>
-			<Heading level={ 1 }>{ confirmVal }</Heading>
-		</>
-	);
-};
-
-export const VeeeryLongMessage = () => {
-	const [ confirmVal, setConfirmVal ] = useState( "Hasn't confirmed yet" );
-
-	return (
-		<>
-			<ConfirmDialog onConfirm={ () => setConfirmVal( 'Confirmed!' ) }>
-				{ daText().repeat( 20 ) }
-			</ConfirmDialog>
-			<Heading level={ 1 }>{ confirmVal }</Heading>
-		</>
-	);
-};
-
-export const UncontrolledAndWithExplicitOnCancel = () => {
-	const [ confirmVal, setConfirmVal ] = useState(
-		"Hasn't confirmed or cancelled yet"
-	);
-
-	return (
-		<>
-			<ConfirmDialog
-				onConfirm={ () => setConfirmVal( 'Confirmed!' ) }
-				onCancel={ () => setConfirmVal( 'Cancelled' ) }
-			>
-				{ daText() }
-			</ConfirmDialog>
-			<Heading level={ 1 }>{ confirmVal }</Heading>
-		</>
-	);
-};
-
-// Controlled `ConfirmDialog`s require both `onConfirm` *and* `onCancel to be passed
-// It's expected that the user will then use it to hide the dialog, too (see the
-// `setIsOpen` calls below).
-export const Controlled = () => {
+const Template = ( args ) => {
 	const [ isOpen, setIsOpen ] = useState( false );
-	const [ confirmVal, setConfirmVal ] = useState(
-		"Hasn't confirmed or cancelled yet"
-	);
+	const [ confirmVal, setConfirmVal ] = useState( '' );
 
 	const handleConfirm = () => {
 		setConfirmVal( 'Confirmed!' );
@@ -102,22 +56,75 @@ export const Controlled = () => {
 		setConfirmVal( 'Cancelled' );
 		setIsOpen( false );
 	};
-
 	return (
 		<>
+			<Button variant="primary" onClick={ () => setIsOpen( true ) }>
+				Open ConfirmDialog
+			</Button>
+
 			<ConfirmDialog
+				{ ...args }
 				isOpen={ isOpen }
 				onConfirm={ handleConfirm }
 				onCancel={ handleCancel }
 			>
-				{ daText() }
+				{ args.children }
 			</ConfirmDialog>
 
 			<Heading level={ 1 }>{ confirmVal }</Heading>
-
-			<Button variant="primary" onClick={ () => setIsOpen( true ) }>
-				Open ConfirmDialog
-			</Button>
 		</>
 	);
+};
+
+// Simplest usage: just declare the component with the required `onConfirm` prop. Note: the `onCancel` prop is optional here, unless you'd like to render the component in Controlled mode (see below)
+export const _default = Template.bind( {} );
+const _defaultSnippet = `() => {
+  const [ isOpen, setIsOpen ] = useState( false );
+  const [ confirmVal, setConfirmVal ] = useState('');
+
+  const handleConfirm = () => {
+    setConfirmVal( 'Confirmed!' );
+    setIsOpen( false );
+  };
+
+  const handleCancel = () => {
+    setConfirmVal( 'Cancelled' );
+    setIsOpen( false );
+  };
+
+  return (
+    <>
+    <ConfirmDialog
+      isOpen={ isOpen }
+      onConfirm={ handleConfirm }
+      onCancel={ handleCancel }
+    >
+      Would you like to privately publish the post now?
+    </ConfirmDialog>
+
+    <Heading level={ 1 }>{ confirmVal }</Heading>
+
+    <Button variant="primary" onClick={ () => setIsOpen( true ) }>
+      Open ConfirmDialog
+    </Button>
+    </>
+    );
+  };`;
+_default.args = {};
+_default.parameters = {
+	docs: {
+		source: {
+			code: _defaultSnippet,
+			language: 'jsx',
+			type: 'auto',
+			format: 'true',
+		},
+	},
+};
+
+// To customize button text, pass the `cancelButtonText` and/or `confirmButtonText` props.
+export const withCustomButtonLabels = Template.bind( {} );
+withCustomButtonLabels.args = {
+	cancelButtonText: 'No thanks',
+	confirmButtonText: 'Yes please!',
 };

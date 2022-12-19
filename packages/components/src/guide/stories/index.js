@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { times } from 'lodash';
 import { text, number } from '@storybook/addon-knobs';
 
 /**
@@ -41,16 +40,18 @@ const ModalExample = ( { numberOfPages, ...props } ) => {
 				<Guide
 					{ ...props }
 					onFinish={ closeGuide }
-					pages={ times( numberOfPages, ( page ) => ( {
-						content: (
-							<>
-								<h1>
-									Page { page + 1 } of { numberOfPages }
-								</h1>
-								<p>{ loremIpsum }</p>
-							</>
-						),
-					} ) ) }
+					pages={ Array.from( { length: numberOfPages } ).map(
+						( _, page ) => ( {
+							content: (
+								<>
+									<h1>
+										Page { page + 1 } of { numberOfPages }
+									</h1>
+									<p>{ loremIpsum }</p>
+								</>
+							),
+						} )
+					) }
 				/>
 			) }
 		</>

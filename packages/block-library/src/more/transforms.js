@@ -15,11 +15,11 @@ const transforms = {
 			transform( node ) {
 				const { customText, noTeaser } = node.dataset;
 				const attrs = {};
-				// Don't copy unless defined and not an empty string
+				// Don't copy unless defined and not an empty string.
 				if ( customText ) {
 					attrs.customText = customText;
 				}
-				// Special handling for boolean
+				// Special handling for boolean.
 				if ( noTeaser === '' ) {
 					attrs.noTeaser = true;
 				}

@@ -7,18 +7,20 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalZStack as ZStack,
 	__experimentalVStack as VStack,
-	FlexBlock,
 	ColorIndicator,
+	Button,
 } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
+import { shuffle } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import Subtitle from './subtitle';
-import { NavigationButton } from './navigation-button';
-import { useSetting } from './hooks';
+import { NavigationButtonAsItem } from './navigation-button';
+import { useColorRandomizer, useSetting } from './hooks';
+import ColorIndicatorWrapper from './color-indicator-wrapper';
 
 const EMPTY_COLORS = [];
 
@@ -31,6 +33,9 @@ function Palette( { name } ) {
 		'color.defaultPalette',
 		name
 	);
+
+	const [ randomizeThemeColors ] = useColorRandomizer();
+
 	const colors = useMemo(
 		() => [
 			...( customColors || EMPTY_COLORS ),
@@ -44,7 +49,7 @@ function Palette( { name } ) {
 
 	const screenPath = ! name
 		? '/colors/palette'
-		: '/blocks/' + name + '/colors/palette';
+		: '/blocks/' + encodeURIComponent( name ) + '/colors/palette';
 	const paletteButtonText =
 		colors.length > 0
 			? sprintf(
@@ -58,22 +63,39 @@ function Palette( { name } ) {
 		<VStack spacing={ 3 }>
 			<Subtitle>{ __( 'Palette' ) }</Subtitle>
 			<ItemGroup isBordered isSeparated>
-				<NavigationButton path={ screenPath }>
-					<HStack isReversed={ colors.length === 0 }>
-						<FlexBlock>
-							<ZStack isLayered={ false } offset={ -8 }>
-								{ colors.slice( 0, 5 ).map( ( { color } ) => (
-									<ColorIndicator
-										key={ color }
-										colorValue={ color }
-									/>
+				<NavigationButtonAsItem
+					path={ screenPath }
+					aria-label={ __( 'Color palettes' ) }
+				>
+					<HStack
+						direction={
+							colors.length === 0 ? 'row-reverse' : 'row'
+						}
+					>
+						<ZStack isLayered={ false } offset={ -8 }>
+							{ colors
+								.slice( 0, 5 )
+								.map( ( { color }, index ) => (
+									<ColorIndicatorWrapper
+										key={ `${ color }-${ index }` }
+									>
+										<ColorIndicator colorValue={ color } />
+									</ColorIndicatorWrapper>
 								) ) }
-							</ZStack>
-						</FlexBlock>
+						</ZStack>
 						<FlexItem>{ paletteButtonText }</FlexItem>
 					</HStack>
-				</NavigationButton>
+				</NavigationButtonAsItem>
 			</ItemGroup>
+			{ randomizeThemeColors && (
+				<Button
+					variant="secondary"
+					icon={ shuffle }
+					onClick={ randomizeThemeColors }
+				>
+					{ __( 'Randomize colors' ) }
+				</Button>
+			) }
 		</VStack>
 	);
 }

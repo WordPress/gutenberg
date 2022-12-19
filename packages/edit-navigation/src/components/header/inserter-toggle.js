@@ -19,12 +19,12 @@ function InserterToggle() {
 	const { isInserterOpened, hasInserterItems } = useSelect(
 		( select ) => {
 			return {
-				hasInserterItems: select( blockEditorStore ).hasInserterItems(
-					navBlockClientId
-				),
-				isInserterOpened: select(
-					editNavigationStore
-				).isInserterOpened(),
+				hasInserterItems:
+					select( blockEditorStore ).hasInserterItems(
+						navBlockClientId
+					),
+				isInserterOpened:
+					select( editNavigationStore ).isInserterOpened(),
 			};
 		},
 		[ navBlockClientId ]

@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## 21.5.0 (2022-11-16)
+
+## 21.4.0 (2022-11-02)
+
+## 21.3.0 (2022-10-19)
+
+## 21.2.0 (2022-10-05)
+
+## 21.1.0 (2022-09-21)
+
+## 21.0.0 (2022-08-24)
+
+### Breaking Change
+
+-   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
+
 ## 20.0.0 (2022-01-27)
 
 ### Breaking Change

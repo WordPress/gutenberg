@@ -14,25 +14,25 @@ class WP_Navigation_Page_Test extends WP_UnitTestCase {
 	/** @var WP_Scripts */
 	private static $wp_scripts;
 
-	public static function setUpBeforeClass() {
-		parent::setUpBeforeClass();
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
 		global $wp_scripts;
 		static::$wp_scripts = clone $wp_scripts;
 	}
 
-	public static function tearDownAfterClass() {
-		parent::tearDownAfterClass();
+	public static function tear_down_after_class() {
+		parent::tear_down_after_class();
 		global $wp_scripts;
 		$wp_scripts = static::$wp_scripts;
 	}
 
-	public function setUp() {
-		parent::setUp();
+	public function set_up() {
+		parent::set_up();
 		$this->callback = $this->createMock( WP_Navigation_Page_Test_Callback::class );
 	}
 
-	public function tearDown() {
-		parent::tearDown();
+	public function tear_down() {
+		parent::tear_down();
 		remove_filter( 'navigation_editor_preload_paths', array( $this->callback, 'preload_paths_callback' ) );
 		remove_filter( 'wp_get_nav_menus', array( $this->callback, 'wp_nav_menus_callback' ) );
 		remove_filter( 'rest_pre_dispatch', array( $this->callback, 'preload_menus_rest_pre_dispatch_callback' ) );
@@ -83,7 +83,7 @@ class WP_Navigation_Page_Test extends WP_UnitTestCase {
 		$this->callback
 			->expects( $this->once() )
 			->method( 'preload_menus_rest_pre_dispatch_callback' )
-			->willReturn( new $response );
+			->willReturn( $response );
 
 		gutenberg_navigation_editor_preload_menus();
 

@@ -6,7 +6,7 @@ import { createRegistry, controls } from '..';
 jest.useRealTimers();
 
 describe( 'controls', () => {
-	// create a registry with store to test select controls
+	// Create a registry with store to test select controls.
 	function createSelectTestRegistry() {
 		const registry = createRegistry();
 
@@ -21,13 +21,13 @@ describe( 'controls', () => {
 			}
 		};
 
-		// Select state both without and with a resolver
+		// Select state both without and with a resolver.
 		const selectors = {
 			selectorWithoutResolver: ( state ) => state,
 			selectorWithResolver: ( state ) => state,
 		};
 
-		// The resolver receives data after a little delay
+		// The resolver receives data after a little delay.
 		const resolvers = {
 			*selectorWithResolver() {
 				yield new Promise( ( r ) => setTimeout( r, 10 ) );
@@ -35,7 +35,7 @@ describe( 'controls', () => {
 			},
 		};
 
-		// actions that call the tested controls and return the selected value
+		// actions that call the tested controls and return the selected value.
 		const actions = {
 			*resolveWithoutResolver() {
 				const value = yield controls.resolveSelect(
@@ -130,7 +130,7 @@ describe( 'controls', () => {
 		function createDispatchTestRegistry() {
 			const registry = createRegistry();
 
-			// store stores a counter that can be incremented
+			// Store stores a counter that can be incremented.
 			const reducer = ( state = 0, action ) => {
 				switch ( action.type ) {
 					case 'INC':
@@ -141,11 +141,11 @@ describe( 'controls', () => {
 			};
 
 			const actions = {
-				// increment the counter
+				// increment the counter.
 				inc() {
 					return { type: 'INC' };
 				},
-				// increment the counter twice in an async routine with controls
+				// Increment the counter twice in an async routine with controls.
 				*doubleInc() {
 					yield controls.dispatch( 'test/dispatch', 'inc' );
 					yield controls.dispatch( 'test/dispatch', 'inc' );

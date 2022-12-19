@@ -1,13 +1,11 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/template-part",
 		"isValid": true,
 		"attributes": {
 			"slug": "header",
 			"theme": "twentytwenty"
 		},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]

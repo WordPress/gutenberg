@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
 /**
@@ -14,8 +15,16 @@ import CONFIG from '../../utils/config-values';
 const CIRCLE_SIZE = 32;
 const INNER_CIRCLE_SIZE = 3;
 
+const deprecatedBottomMargin = ( { __nextHasNoMarginBottom } ) => {
+	return ! __nextHasNoMarginBottom
+		? css`
+				margin-bottom: ${ space( 2 ) };
+		  `
+		: '';
+};
+
 export const Root = styled( Flex )`
-	margin-bottom: ${ space( 2 ) };
+	${ deprecatedBottomMargin }
 `;
 
 export const CircleRoot = styled.div`
@@ -33,12 +42,16 @@ export const CircleIndicatorWrapper = styled.div`
 	position: relative;
 	width: 100%;
 	height: 100%;
+
+	:focus-visible {
+		outline: none;
+	}
 `;
 
 export const CircleIndicator = styled.div`
-	background: ${ COLORS.admin.theme };
+	background: ${ COLORS.ui.theme };
 	border-radius: 50%;
-	border: ${ INNER_CIRCLE_SIZE }px solid ${ COLORS.admin.theme };
+	border: ${ INNER_CIRCLE_SIZE }px solid ${ COLORS.ui.theme };
 	bottom: 0;
 	box-sizing: border-box;
 	display: block;

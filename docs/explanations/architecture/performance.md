@@ -26,7 +26,7 @@ Based on the idea that **when editing a given block, it is very rare that an upd
 
 ## The performance benchmark job
 
-A tool to compare performance accross multiple branches/tags/commits is provided. You can run it locally like so: `./bin/plugin/cli.js perf [branches]`, example:
+A tool to compare performance across multiple branches/tags/commits is provided. You can run it locally like so: `./bin/plugin/cli.js perf [branches]`, example:
 
 ```
 ./bin/plugin/cli.js perf trunk v8.1.0 v8.0.0

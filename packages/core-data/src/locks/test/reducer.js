@@ -62,7 +62,7 @@ describe( 'locks', () => {
 							red,
 							blue,
 							green: {
-								// ...and add the lock
+								// ...and add the lock.
 								locks: [ lock ],
 								children: {},
 							},
@@ -92,7 +92,7 @@ describe( 'locks', () => {
 							red,
 							blue,
 							green: {
-								// ...and add the lock
+								// ...and add the lock.
 								locks: [ lock ],
 								children: {},
 							},
@@ -118,7 +118,7 @@ describe( 'locks', () => {
 							red,
 							blue,
 							green: {
-								// Should remove the lock
+								// Should remove the lock.
 								locks: [],
 								children: {},
 							},

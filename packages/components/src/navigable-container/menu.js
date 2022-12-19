@@ -1,14 +1,9 @@
 // @ts-nocheck
-/**
- * External dependencies
- */
-import { includes } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
-import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -20,26 +15,30 @@ export function NavigableMenu(
 	ref
 ) {
 	const eventToOffset = ( evt ) => {
-		const { keyCode } = evt;
+		const { code } = evt;
 
-		let next = [ DOWN ];
-		let previous = [ UP ];
+		let next = [ 'ArrowDown' ];
+		let previous = [ 'ArrowUp' ];
 
 		if ( orientation === 'horizontal' ) {
-			next = [ RIGHT ];
-			previous = [ LEFT ];
+			next = [ 'ArrowRight' ];
+			previous = [ 'ArrowLeft' ];
 		}
 
 		if ( orientation === 'both' ) {
-			next = [ RIGHT, DOWN ];
-			previous = [ LEFT, UP ];
+			next = [ 'ArrowRight', 'ArrowDown' ];
+			previous = [ 'ArrowLeft', 'ArrowUp' ];
 		}
 
-		if ( includes( next, keyCode ) ) {
+		if ( next.includes( code ) ) {
 			return 1;
-		} else if ( includes( previous, keyCode ) ) {
+		} else if ( previous.includes( code ) ) {
 			return -1;
-		} else if ( includes( [ DOWN, UP, LEFT, RIGHT ], keyCode ) ) {
+		} else if (
+			[ 'ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight' ].includes(
+				code
+			)
+		) {
 			// Key press should be handled, e.g. have event propagation and
 			// default behavior handled by NavigableContainer but not result
 			// in an offset.

@@ -18,15 +18,20 @@
 		"html": false,
 		"color": {
 			"gradients": true,
-			"text": false
+			"text": false,
+			"__experimentalDefaultControls": {
+				"background": true
+			}
 		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
-			"__experimentalFontStyle": true,
+			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
-			"__experimentalLetterSpacing": true,
+			"__experimentalFontStyle": true,
 			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}

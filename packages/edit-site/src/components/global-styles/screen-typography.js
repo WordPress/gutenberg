@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalVStack as VStack,
@@ -13,10 +13,11 @@ import {
  * Internal dependencies
  */
 import ScreenHeader from './header';
-import { NavigationButton } from './navigation-button';
+import { NavigationButtonAsItem } from './navigation-button';
 import { useStyle } from './hooks';
 import Subtitle from './subtitle';
 import TypographyPanel from './typography-panel';
+import BlockPreviewPanel from './block-preview-panel';
 
 function Item( { name, parentMenu, element, label } ) {
 	const hasSupport = ! name;
@@ -43,8 +44,17 @@ function Item( { name, parentMenu, element, label } ) {
 		return null;
 	}
 
+	const navigationButtonLabel = sprintf(
+		// translators: %s: is a subset of Typography, e.g., 'text' or 'links'.
+		__( 'Typography %s styles' ),
+		label
+	);
+
 	return (
-		<NavigationButton path={ parentMenu + '/typography/' + element }>
+		<NavigationButtonAsItem
+			path={ parentMenu + '/typography/' + element }
+			aria-label={ navigationButtonLabel }
+		>
 			<HStack justify="flex-start">
 				<FlexItem
 					className="edit-site-global-styles-screen-typography__indicator"
@@ -62,7 +72,7 @@ function Item( { name, parentMenu, element, label } ) {
 				</FlexItem>
 				<FlexItem>{ label }</FlexItem>
 			</HStack>
-		</NavigationButton>
+		</NavigationButtonAsItem>
 	);
 }
 
@@ -77,6 +87,8 @@ function ScreenTypography( { name } ) {
 					'Manage the typography settings for different elements.'
 				) }
 			/>
+
+			<BlockPreviewPanel name={ name } />
 
 			{ ! name && (
 				<div className="edit-site-global-styles-screen-typography">
@@ -95,12 +107,23 @@ function ScreenTypography( { name } ) {
 								element="link"
 								label={ __( 'Links' ) }
 							/>
+							<Item
+								name={ name }
+								parentMenu={ parentMenu }
+								element="heading"
+								label={ __( 'Headings' ) }
+							/>
+							<Item
+								name={ name }
+								parentMenu={ parentMenu }
+								element="button"
+								label={ __( 'Buttons' ) }
+							/>
 						</ItemGroup>
 					</VStack>
 				</div>
 			) }
-
-			{ /* no typography elements support yet for blocks */ }
+			{ /* No typography elements support yet for blocks. */ }
 			{ !! name && <TypographyPanel name={ name } element="text" /> }
 		</>
 	);

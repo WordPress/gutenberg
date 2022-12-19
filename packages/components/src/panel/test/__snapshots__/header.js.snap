@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PanelHeader basic rendering should render PanelHeader with empty div inside 1`] = `
+<div>
+  <div
+    class="components-panel__header"
+  />
+</div>
+`;

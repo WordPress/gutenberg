@@ -1,13 +1,11 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/post-date",
 		"isValid": true,
 		"attributes": {
 			"isLink": false,
 			"fontFamily": "cambria-georgia"
 		},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]

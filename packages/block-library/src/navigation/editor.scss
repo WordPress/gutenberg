@@ -100,13 +100,24 @@
 	display: block;
 	position: static;
 	width: 100%;
+
+	// Colors need to work in both dark themes, and dark dropdown colors.
+	// This customization would be nice to retire in a refactor of the canvas appender button.
+	.block-editor-button-block-appender {
+		color: $white;
+		background: $gray-900;
+		padding: 0;
+		width: $button-size-small;
+		border-radius: $radius-block-ui;
+		margin-right: 0;
+		margin-left: auto;
+	}
 }
 
 // Hide when hovering.
 .wp-block-navigation__submenu-container .block-list-appender {
 	display: none;
 }
-
 
 /**
  * Colors Selector component
@@ -187,8 +198,25 @@ $color-control-label-height: 20px;
 	}
 }
 
-.wp-block-navigation .block-editor-button-block-appender {
-	justify-content: flex-start;
+// Override inner padding on default appender.
+// This should be a temporary fix, to be replaced by improvements to
+// the sibling inserter. Or by the dropdown appender that is used in Group, instead of the "Button block appender".
+// See https://github.com/WordPress/gutenberg/issues/37572.
+.wp-block-navigation .wp-block + .block-list-appender .block-editor-button-block-appender {
+	background-color: $gray-900;
+	color: $white;
+
+	// This needs specificity to override an inherited padding.
+	// That source padding in turn has high specificity to protect
+	// from theme CSS bleed.
+	&.block-editor-button-block-appender.block-editor-button-block-appender {
+		padding: 0;
+	}
+}
+
+.wp-block-navigation .wp-block .wp-block .block-editor-button-block-appender {
+	background-color: transparent;
+	color: $gray-900;
 }
 
 
@@ -258,9 +286,9 @@ $color-control-label-height: 20px;
 		right: 0;
 		bottom: 0;
 		left: 0;
-		border: $border-width dashed currentColor;
-		opacity: 0.4;
 		pointer-events: none;
+		border: $border-width dashed currentColor;
+		@include placeholder-style();
 
 		// Inherit border radius from style variations.
 		border-radius: inherit;
@@ -268,7 +296,22 @@ $color-control-label-height: 20px;
 
 	> svg {
 		fill: currentColor;
-		opacity: 0.4;
+	}
+}
+
+// Prevent layout shift for vertical variant.
+.wp-block-navigation.is-vertical .is-small,
+.wp-block-navigation.is-vertical .is-medium {
+	.components-placeholder__fieldset {
+		// The size of two buttons, with top and bottom padding, and gap.
+		min-height: ($button-size * 2) + $grid-unit-15 + ($grid-unit-15 * 0.5);
+	}
+}
+
+.wp-block-navigation.is-vertical .is-large {
+	.components-placeholder__fieldset {
+		// The size of three buttons, with top and bottom padding, and gap.
+		min-height: ($button-size * 3) + $grid-unit-15 + $grid-unit-15;
 	}
 }
 
@@ -277,7 +320,7 @@ $color-control-label-height: 20px;
 .wp-block-navigation-placeholder__controls {
 	padding: ($grid-unit-15 * 0.5) $grid-unit-10;
 	flex-direction: row;
-	align-items: center;
+	align-items: flex-start;
 }
 
 .wp-block-navigation-placeholder__controls {
@@ -299,26 +342,25 @@ $color-control-label-height: 20px;
 	float: left;
 	width: 100%;
 
-	// Show stacked for the vertical navigation, or small placeholders.
+	// Hide the navigation indicator when in small contexts.
 	.is-small &,
 	.is-medium & {
 		.wp-block-navigation-placeholder__actions__indicator,
-		.wp-block-navigation-placeholder__actions__indicator + hr,
-		.wp-block-navigation-placeholder__actions > :nth-last-child(3), // Add all pages.
-		.wp-block-navigation-placeholder__actions > :nth-last-child(2) { // hr separator after it.
+		.wp-block-navigation-placeholder__actions__indicator + hr {
 			display: none;
 		}
 	}
 
-	// Show stacked for the vertical navigation, or small placeholders.
-	.is-small & {
+	// Vertical orientation or small context.
+	.is-small &,
+	.wp-block-navigation.is-vertical & {
 		.wp-block-navigation-placeholder__actions {
 			flex-direction: column;
-		}
+			align-items: flex-start;
 
-		// Hide the separators in the vertical version.
-		.wp-block-navigation-placeholder__actions hr {
-			display: none;
+			hr {
+				display: none;
+			}
 		}
 	}
 
@@ -335,7 +377,7 @@ $color-control-label-height: 20px;
 	align-items: center;
 	justify-content: flex-start;
 	line-height: 0;
-	min-height: $button-size;
+	height: $button-size;
 
 	// Line up with the icon in the toolbar.
 	margin-left: $grid-unit-05;
@@ -473,6 +515,7 @@ body.editor-styles-wrapper
 // so focus is applied naturally on the block container.
 // It's important the right container has focus, otherwise you can't press
 // "Delete" to remove the block.
+.wp-block-navigation__responsive-container,
 .wp-block-navigation__responsive-close {
 	@include break-small() {
 		pointer-events: none;
@@ -497,6 +540,13 @@ body.editor-styles-wrapper
 	color: inherit;
 }
 
+.components-heading.wp-block-navigation-off-canvas-editor__title {
+	margin: 0;
+}
+.wp-block-navigation-off-canvas-editor__header {
+	margin-bottom: $grid-unit-10;
+}
+
 // Customize the mobile editing.
 // This can be revisited in the future, but for now, inherit design from the parent.
 .is-menu-open .wp-block-navigation__responsive-container-content * {
@@ -514,19 +564,14 @@ body.editor-styles-wrapper
 	}
 }
 
-.wp-block-navigation__unsaved-changes {
-	position: relative;
+// Space spinner to give it breathing
+// room when block is selected and has focus outline.
+.wp-block-navigation .components-spinner {
+	padding: $grid-unit-10 $grid-unit-15;
+}
 
-	.components-spinner {
-		position: absolute;
-		top: calc(50% - #{$spinner-size} / 2);
-		left: calc(50% - #{$spinner-size} / 2);
-
-		// Delay showing the saving spinner until after 2 seconds.
-		// This should ensure it only shows for slow connections.
-		opacity: 0;
-		animation: 0.5s linear 2s normal forwards fadein;
-	}
+.wp-block-navigation .wp-block-navigation__uncontrolled-inner-blocks-loading-indicator {
+	margin-top: 0;
 }
 
 @keyframes fadeouthalf {
@@ -538,20 +583,23 @@ body.editor-styles-wrapper
 	}
 }
 
-.wp-block-navigation__unsaved-changes-overlay.is-saving {
-	opacity: 1;
-	animation: 0.5s linear 2s normal forwards fadeouthalf;
-}
-
 .wp-block-navigation-delete-menu-button {
 	width: 100%;
 	justify-content: center;
 	margin-bottom: $grid-unit-20;
 }
 
+// increased specificity to override button variant
+// for the manage menus button in the advanced area
+// of the navigation block
+.components-button.is-link.wp-block-navigation-manage-menus-button {
+	margin-bottom: $grid-unit-20;
+}
+
 .wp-block-navigation__overlay-menu-preview {
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
 	width: 100%;
 	background-color: $gray-100;
 	padding: 0 $grid-unit-30;
@@ -563,4 +611,53 @@ body.editor-styles-wrapper
 		outline: 1px solid transparent; // Box shadow is removed in high contrast mode, a transparent outline is made opaque.
 		background-color: $white;
 	}
+}
+
+// Temp - hide toolbar component when Nav Menu Selector is empty.
+// TODO - extract state to common hook or parent component to avoid render.
+.wp-block-navigation__toolbar-menu-selector.components-toolbar-group:empty {
+	display: none;
+}
+
+// Temp - hide adjacent <hr>s when Nav Menu Selector is empty.
+// TODO - extract state to common hook or parent component to avoid render of <hr>.
+.wp-block-navigation-placeholder__actions hr + hr {
+	display: none;
+}
+
+/**
+ * Navigation selector styles
+ */
+.wp-block-navigation__navigation-selector {
+	margin-bottom: $grid-unit-20;
+	width: 100%;
+}
+
+.wp-block-navigation__navigation-selector-button {
+	border: 1px solid;
+	justify-content: space-between;
+	width: 100%;
+}
+
+.wp-block-navigation__navigation-selector-button__icon {
+	flex: 0 0 auto;
+}
+
+.wp-block-navigation__navigation-selector-button__label {
+	flex: 0 1 auto;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.wp-block-navigation__navigation-selector-button--createnew {
+	border: 1px solid;
+	margin-bottom: $grid-unit-20;
+	width: 100%;
+}
+
+// Buttons inside a disabled component get semitransparent when there's a clickthrough overlay.
+// Since this navigation button is content rather than UI, however, override that.
+.wp-block-navigation__responsive-container-open.components-button {
+	opacity: 1;
 }

@@ -16,10 +16,8 @@ import { useBoundaryStyle } from './use-boundary-style';
 import { useCopyHandler } from './use-copy-handler';
 import { useFormatBoundaries } from './use-format-boundaries';
 import { useSelectObject } from './use-select-object';
-import { useIndentListItemOnSpace } from './use-indent-list-item-on-space';
 import { useInputAndSelection } from './use-input-and-selection';
 import { useDelete } from './use-delete';
-import { useSpace } from './use-space';
 
 export function useRichText( {
 	value = '',
@@ -204,6 +202,7 @@ export function useRichText( {
 	useLayoutEffect( () => {
 		if ( didMount.current && value !== _value.current ) {
 			applyFromProps();
+			forceRender();
 		}
 	}, [ value ] );
 
@@ -211,6 +210,10 @@ export function useRichText( {
 	useLayoutEffect( () => {
 		if ( ! hadSelectionUpdate.current ) {
 			return;
+		}
+
+		if ( ref.current.ownerDocument.activeElement !== ref.current ) {
+			ref.current.focus();
 		}
 
 		applyFromProps();
@@ -229,11 +232,6 @@ export function useRichText( {
 			handleChange,
 			multilineTag,
 		} ),
-		useIndentListItemOnSpace( {
-			multilineTag,
-			createRecord,
-			handleChange,
-		} ),
 		useInputAndSelection( {
 			record,
 			applyRecord,
@@ -242,7 +240,6 @@ export function useRichText( {
 			isSelected,
 			onSelectionChange,
 		} ),
-		useSpace(),
 		useRefEffect( () => {
 			applyFromProps();
 			didMount.current = true;

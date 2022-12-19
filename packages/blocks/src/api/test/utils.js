@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { createBlock } from '../factory';
@@ -21,9 +16,11 @@ import {
 	__experimentalGetBlockAttributesNamesByRole,
 } from '../utils';
 
+const noop = () => {};
+
 describe( 'block helpers', () => {
 	beforeAll( () => {
-		// Initialize the block store
+		// Initialize the block store.
 		require( '../../store' );
 	} );
 

@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
-import renderer, { act } from 'react-test-renderer';
+import { render, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -13,10 +12,13 @@ import {
 	registerBlockType,
 	unregisterBlockType,
 } from '@wordpress/blocks';
+import { SlotFillProvider } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
+import BlockControls from '../../components/block-controls';
+import BlockEdit from '../../components/block-edit';
 import BlockEditorProvider from '../../components/provider';
 import {
 	getValidAlignments,
@@ -25,11 +27,14 @@ import {
 	addAssignedAlign,
 } from '../align';
 
+const noop = () => {};
+
 describe( 'align', () => {
 	const blockSettings = {
 		save: noop,
 		category: 'text',
 		title: 'block title',
+		edit: ( { children } ) => <>{ children }</>,
 	};
 
 	afterEach( () => {
@@ -153,6 +158,12 @@ describe( 'align', () => {
 	} );
 
 	describe( 'withToolbarControls', () => {
+		const componentProps = {
+			name: 'core/foo',
+			attributes: {},
+			isSelected: true,
+		};
+
 		it( 'should do nothing if no valid alignments', () => {
 			registerBlockType( 'core/foo', blockSettings );
 
@@ -160,15 +171,21 @@ describe( 'align', () => {
 				( { wrapperProps } ) => <div { ...wrapperProps } />
 			);
 
-			const wrapper = renderer.create(
-				<EnhancedComponent
-					name="core/foo"
-					attributes={ {} }
-					isSelected
-				/>
+			render(
+				<SlotFillProvider>
+					<BlockEdit { ...componentProps }>
+						<EnhancedComponent { ...componentProps } />
+					</BlockEdit>
+					<BlockControls.Slot group="block" />
+				</SlotFillProvider>
 			);
-			// when there's only one child, `rendered` in the tree is an object not an array.
-			expect( wrapper.toTree().rendered ).toBeInstanceOf( Object );
+
+			expect(
+				screen.queryByRole( 'button', {
+					name: 'Align',
+					expanded: false,
+				} )
+			).not.toBeInTheDocument();
 		} );
 
 		it( 'should render toolbar controls if valid alignments', () => {
@@ -184,14 +201,21 @@ describe( 'align', () => {
 				( { wrapperProps } ) => <div { ...wrapperProps } />
 			);
 
-			const wrapper = renderer.create(
-				<EnhancedComponent
-					name="core/foo"
-					attributes={ {} }
-					isSelected
-				/>
+			render(
+				<SlotFillProvider>
+					<BlockEdit { ...componentProps }>
+						<EnhancedComponent { ...componentProps } />
+					</BlockEdit>
+					<BlockControls.Slot group="block" />
+				</SlotFillProvider>
 			);
-			expect( wrapper.toTree().rendered ).toHaveLength( 2 );
+
+			expect(
+				screen.getAllByRole( 'button', {
+					name: 'Align',
+					expanded: false,
+				} )
+			).toHaveLength( 2 );
 		} );
 	} );
 
@@ -206,28 +230,27 @@ describe( 'align', () => {
 			} );
 
 			const EnhancedComponent = withDataAlign( ( { wrapperProps } ) => (
-				<div { ...wrapperProps } />
+				<button { ...wrapperProps } />
 			) );
 
-			let wrapper;
-			act( () => {
-				wrapper = renderer.create(
-					<BlockEditorProvider
-						settings={ { alignWide: true, supportsLayout: false } }
-						value={ [] }
-					>
-						<EnhancedComponent
-							attributes={ {
-								align: 'wide',
-							} }
-							name="core/foo"
-						/>
-					</BlockEditorProvider>
-				);
-			} );
-			expect( wrapper.root.findByType( 'div' ).props ).toEqual( {
-				'data-align': 'wide',
-			} );
+			render(
+				<BlockEditorProvider
+					settings={ { alignWide: true, supportsLayout: false } }
+					value={ [] }
+				>
+					<EnhancedComponent
+						attributes={ {
+							align: 'wide',
+						} }
+						name="core/foo"
+					/>
+				</BlockEditorProvider>
+			);
+
+			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
+				'data-align',
+				'wide'
+			);
 		} );
 
 		it( 'should not render wide/full wrapper props if wide controls are not enabled', () => {
@@ -240,26 +263,27 @@ describe( 'align', () => {
 			} );
 
 			const EnhancedComponent = withDataAlign( ( { wrapperProps } ) => (
-				<div { ...wrapperProps } />
+				<button { ...wrapperProps } />
 			) );
 
-			let wrapper;
-			act( () => {
-				wrapper = renderer.create(
-					<BlockEditorProvider
-						settings={ { alignWide: false } }
-						value={ [] }
-					>
-						<EnhancedComponent
-							name="core/foo"
-							attributes={ {
-								align: 'wide',
-							} }
-						/>
-					</BlockEditorProvider>
-				);
-			} );
-			expect( wrapper.root.findByType( 'div' ).props ).toEqual( {} );
+			render(
+				<BlockEditorProvider
+					settings={ { alignWide: false } }
+					value={ [] }
+				>
+					<EnhancedComponent
+						name="core/foo"
+						attributes={ {
+							align: 'wide',
+						} }
+					/>
+				</BlockEditorProvider>
+			);
+
+			expect( screen.getByRole( 'button' ) ).not.toHaveAttribute(
+				'data-align',
+				'wide'
+			);
 		} );
 
 		it( 'should not render invalid align', () => {
@@ -272,26 +296,27 @@ describe( 'align', () => {
 			} );
 
 			const EnhancedComponent = withDataAlign( ( { wrapperProps } ) => (
-				<div { ...wrapperProps } />
+				<button { ...wrapperProps } />
 			) );
 
-			let wrapper;
-			act( () => {
-				wrapper = renderer.create(
-					<BlockEditorProvider
-						settings={ { alignWide: true } }
-						value={ [] }
-					>
-						<EnhancedComponent
-							name="core/foo"
-							attributes={ {
-								align: 'wide',
-							} }
-						/>
-					</BlockEditorProvider>
-				);
-			} );
-			expect( wrapper.root.findByType( 'div' ).props ).toEqual( {} );
+			render(
+				<BlockEditorProvider
+					settings={ { alignWide: true } }
+					value={ [] }
+				>
+					<EnhancedComponent
+						name="core/foo"
+						attributes={ {
+							align: 'wide',
+						} }
+					/>
+				</BlockEditorProvider>
+			);
+
+			expect( screen.getByRole( 'button' ) ).not.toHaveAttribute(
+				'data-align',
+				'wide'
+			);
 		} );
 	} );
 

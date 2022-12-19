@@ -1,13 +1,60 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/list",
 		"isValid": true,
 		"attributes": {
 			"ordered": false,
-			"values": "<li>Text &amp; Headings</li><li>Images &amp; Videos</li><li>Galleries</li><li>Embeds, like YouTube, Tweets, or other WordPress posts.</li><li>Layout blocks, like Buttons, Hero Images, Separators, etc.</li><li>And <em>Lists</em> like this one of course :)</li>"
+			"values": ""
 		},
-		"innerBlocks": [],
-		"originalContent": "<ul><li>Text & Headings</li><li>Images & Videos</li><li>Galleries</li><li>Embeds, like YouTube, Tweets, or other WordPress posts.</li><li>Layout blocks, like Buttons, Hero Images, Separators, etc.</li><li>And <em>Lists</em> like this one of course :)</li></ul>"
+		"innerBlocks": [
+			{
+				"name": "core/list-item",
+				"isValid": true,
+				"attributes": {
+					"content": "Text &amp; Headings"
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/list-item",
+				"isValid": true,
+				"attributes": {
+					"content": "Images &amp; Videos"
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/list-item",
+				"isValid": true,
+				"attributes": {
+					"content": "Galleries"
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/list-item",
+				"isValid": true,
+				"attributes": {
+					"content": "Embeds, like YouTube, Tweets, or other WordPress posts."
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/list-item",
+				"isValid": true,
+				"attributes": {
+					"content": "Layout blocks, like Buttons, Hero Images, Separators, etc."
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/list-item",
+				"isValid": true,
+				"attributes": {
+					"content": "And <em>Lists</em> like this one of course :)"
+				},
+				"innerBlocks": []
+			}
+		]
 	}
 ]

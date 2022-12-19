@@ -1,0 +1,38 @@
+{
+	"runner": "@playwright/test",
+	"title": "should copy only partial selection of text blocks",
+	"path": "/home/runner/work/gutenberg/gutenberg/test/e2e/specs/editor/various/copy-cut-paste.spec.js",
+	"results": [
+		{
+			"retry": 0,
+			"workerIndex": 0,
+			"duration": 4240,
+			"startTime": "2022-05-06T14:50:33.338Z",
+			"stdout": [],
+			"stderr": [],
+			"attachments": [
+				{
+					"name": "expected",
+					"path": "/home/runner/work/gutenberg/gutenberg/artifacts/test-results/editor-various-copy-cut-paste-Copy-cut-paste-should-copy-only-partial-selection-of-text-blocks-chromium/Copy-cut-paste-should-copy-only-partial-selection-of-text-blocks-2-expected.txt",
+					"contentType": "text/plain"
+				},
+				{
+					"name": "actual",
+					"path": "/home/runner/work/gutenberg/gutenberg/artifacts/test-results/editor-various-copy-cut-paste-Copy-cut-paste-should-copy-only-partial-selection-of-text-blocks-chromium/Copy-cut-paste-should-copy-only-partial-selection-of-text-blocks-2-actual.txt",
+					"contentType": "text/plain"
+				}
+			],
+			"status": "failed",
+			"errors": [
+				{
+					"message": "\u001b[31mSnapshot comparison failed:\u001b[39m\n\n  <!-- wp:paragraph -->\n  <p>block</p>\n  <!-- /wp:paragraph -->\n\n  <!-- wp:paragraph -->\n  <p>B </p>\n  <!-- /wp:paragraph -->\n\n  <!-- wp:paragraph -->\n  <p>A \u001b[0m\u001b[9m\u001b[31mblock\u001b[39m\u001b[29m\u001b[0m\u001b[32m</p>\u001b[39m\n  \u001b[32m<!-- /wp:paragraph -->\u001b[39m\n\n  \u001b[32m<!-- wp:paragraph -->\u001b[39m\n  \u001b[32m<p>\u001b[39m</p>\n  <!-- /wp:paragraph -->\n\n  <!-- wp:paragraph -->\n  <p>\u001b[0m\u001b[9m\u001b[31mB \u001b[39m\u001b[29m\u001b[0mblock</p>\n  <!-- /wp:paragraph -->\n\nExpected: \u001b[33m/home/runner/work/gutenberg/gutenberg/artifacts/test-results/editor-various-copy-cut-paste-Copy-cut-paste-should-copy-only-partial-selection-of-text-blocks-chromium/Copy-cut-paste-should-copy-only-partial-selection-of-text-blocks-2-expected.txt\u001b[39m\nReceived: \u001b[33m/home/runner/work/gutenberg/gutenberg/artifacts/test-results/editor-various-copy-cut-paste-Copy-cut-paste-should-copy-only-partial-selection-of-text-blocks-chromium/Copy-cut-paste-should-copy-only-partial-selection-of-text-blocks-2-actual.txt\u001b[39m",
+					"stack": "Error: \u001b[31mSnapshot comparison failed:\u001b[39m\n\n  <!-- wp:paragraph -->\n  <p>block</p>\n  <!-- /wp:paragraph -->\n\n  <!-- wp:paragraph -->\n  <p>B </p>\n  <!-- /wp:paragraph -->\n\n  <!-- wp:paragraph -->\n  <p>A \u001b[0m\u001b[9m\u001b[31mblock\u001b[39m\u001b[29m\u001b[0m\u001b[32m</p>\u001b[39m\n  \u001b[32m<!-- /wp:paragraph -->\u001b[39m\n\n  \u001b[32m<!-- wp:paragraph -->\u001b[39m\n  \u001b[32m<p>\u001b[39m</p>\n  <!-- /wp:paragraph -->\n\n  <!-- wp:paragraph -->\n  <p>\u001b[0m\u001b[9m\u001b[31mB \u001b[39m\u001b[29m\u001b[0mblock</p>\n  <!-- /wp:paragraph -->\n\nExpected: \u001b[33m/home/runner/work/gutenberg/gutenberg/artifacts/test-results/editor-various-copy-cut-paste-Copy-cut-paste-should-copy-only-partial-selection-of-text-blocks-chromium/Copy-cut-paste-should-copy-only-partial-selection-of-text-blocks-2-expected.txt\u001b[39m\nReceived: \u001b[33m/home/runner/work/gutenberg/gutenberg/artifacts/test-results/editor-various-copy-cut-paste-Copy-cut-paste-should-copy-only-partial-selection-of-text-blocks-chromium/Copy-cut-paste-should-copy-only-partial-selection-of-text-blocks-2-actual.txt\u001b[39m\n    at /home/runner/work/gutenberg/gutenberg/test/e2e/specs/editor/various/copy-cut-paste.spec.js:253:52"
+				}
+			],
+			"error": {
+				"message": "\u001b[31mSnapshot comparison failed:\u001b[39m\n\n  <!-- wp:paragraph -->\n  <p>block</p>\n  <!-- /wp:paragraph -->\n\n  <!-- wp:paragraph -->\n  <p>B </p>\n  <!-- /wp:paragraph -->\n\n  <!-- wp:paragraph -->\n  <p>A \u001b[0m\u001b[9m\u001b[31mblock\u001b[39m\u001b[29m\u001b[0m\u001b[32m</p>\u001b[39m\n  \u001b[32m<!-- /wp:paragraph -->\u001b[39m\n\n  \u001b[32m<!-- wp:paragraph -->\u001b[39m\n  \u001b[32m<p>\u001b[39m</p>\n  <!-- /wp:paragraph -->\n\n  <!-- wp:paragraph -->\n  <p>\u001b[0m\u001b[9m\u001b[31mB \u001b[39m\u001b[29m\u001b[0mblock</p>\n  <!-- /wp:paragraph -->\n\nExpected: \u001b[33m/home/runner/work/gutenberg/gutenberg/artifacts/test-results/editor-various-copy-cut-paste-Copy-cut-paste-should-copy-only-partial-selection-of-text-blocks-chromium/Copy-cut-paste-should-copy-only-partial-selection-of-text-blocks-2-expected.txt\u001b[39m\nReceived: \u001b[33m/home/runner/work/gutenberg/gutenberg/artifacts/test-results/editor-various-copy-cut-paste-Copy-cut-paste-should-copy-only-partial-selection-of-text-blocks-chromium/Copy-cut-paste-should-copy-only-partial-selection-of-text-blocks-2-actual.txt\u001b[39m",
+				"stack": "Error: \u001b[31mSnapshot comparison failed:\u001b[39m\n\n  <!-- wp:paragraph -->\n  <p>block</p>\n  <!-- /wp:paragraph -->\n\n  <!-- wp:paragraph -->\n  <p>B </p>\n  <!-- /wp:paragraph -->\n\n  <!-- wp:paragraph -->\n  <p>A \u001b[0m\u001b[9m\u001b[31mblock\u001b[39m\u001b[29m\u001b[0m\u001b[32m</p>\u001b[39m\n  \u001b[32m<!-- /wp:paragraph -->\u001b[39m\n\n  \u001b[32m<!-- wp:paragraph -->\u001b[39m\n  \u001b[32m<p>\u001b[39m</p>\n  <!-- /wp:paragraph -->\n\n  <!-- wp:paragraph -->\n  <p>\u001b[0m\u001b[9m\u001b[31mB \u001b[39m\u001b[29m\u001b[0mblock</p>\n  <!-- /wp:paragraph -->\n\nExpected: \u001b[33m/home/runner/work/gutenberg/gutenberg/artifacts/test-results/editor-various-copy-cut-paste-Copy-cut-paste-should-copy-only-partial-selection-of-text-blocks-chromium/Copy-cut-paste-should-copy-only-partial-selection-of-text-blocks-2-expected.txt\u001b[39m\nReceived: \u001b[33m/home/runner/work/gutenberg/gutenberg/artifacts/test-results/editor-various-copy-cut-paste-Copy-cut-paste-should-copy-only-partial-selection-of-text-blocks-chromium/Copy-cut-paste-should-copy-only-partial-selection-of-text-blocks-2-actual.txt\u001b[39m\n    at /home/runner/work/gutenberg/gutenberg/test/e2e/specs/editor/various/copy-cut-paste.spec.js:253:52"
+			}
+		}
+	]
+}

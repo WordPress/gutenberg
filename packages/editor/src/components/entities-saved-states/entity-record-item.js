@@ -36,7 +36,7 @@ export default function EntityRecordItem( {
 		return parents[ parents.length - 1 ];
 	}, [] );
 
-	// Handle templates that might use default descriptive titles
+	// Handle templates that might use default descriptive titles.
 	const entityRecordTitle = useSelect(
 		( select ) => {
 			if ( 'postType' !== kind || 'wp_template' !== name ) {
@@ -57,18 +57,18 @@ export default function EntityRecordItem( {
 
 	const isSelected = useSelect(
 		( select ) => {
-			const selectedBlockId = select(
-				blockEditorStore
-			).getSelectedBlockClientId();
+			const selectedBlockId =
+				select( blockEditorStore ).getSelectedBlockClientId();
 			return selectedBlockId === parentBlockId;
 		},
 		[ parentBlockId ]
 	);
 	const isSelectedText = isSelected ? __( 'Selected' ) : __( 'Select' );
 	const { selectBlock } = useDispatch( blockEditorStore );
-	const selectParentBlock = useCallback( () => selectBlock( parentBlockId ), [
-		parentBlockId,
-	] );
+	const selectParentBlock = useCallback(
+		() => selectBlock( parentBlockId ),
+		[ parentBlockId ]
+	);
 	const selectAndDismiss = useCallback( () => {
 		selectBlock( parentBlockId );
 		closePanel();
@@ -77,6 +77,7 @@ export default function EntityRecordItem( {
 	return (
 		<PanelRow>
 			<CheckboxControl
+				__nextHasNoMarginBottom
 				label={
 					<strong>
 						{ decodeEntities( entityRecordTitle ) ||

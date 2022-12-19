@@ -1,5 +1,11 @@
 /**
- * A real number or something parsable as a number
+ * The argument value for the `space()` utility function.
+ *
+ * When this is a number or a numeric string, it will be interpreted as a
+ * multiplier for the grid base value (4px). For example, `space( 2 )` will be 8px.
+ *
+ * Otherwise, it will be interpreted as a literal CSS length value. For example,
+ * `space( 'auto' )` will be 'auto', and `space( '2px' )` will be 2px.
  */
 export type SpaceInput = number | string;
 
@@ -21,14 +27,14 @@ export function space( value?: SpaceInput ): string | undefined {
 		return undefined;
 	}
 
-	// handle empty strings, if it's the number 0 this still works
+	// Handle empty strings, if it's the number 0 this still works.
 	if ( ! value ) {
 		return '0';
 	}
 
 	const asInt = typeof value === 'number' ? value : Number( value );
 
-	// test if the input has a unit, was NaN, or was one of the named CSS values (like `auto`), in which case just use that value
+	// Test if the input has a unit, was NaN, or was one of the named CSS values (like `auto`), in which case just use that value.
 	if (
 		( typeof window !== 'undefined' &&
 			window.CSS?.supports?.( 'margin', value.toString() ) ) ||

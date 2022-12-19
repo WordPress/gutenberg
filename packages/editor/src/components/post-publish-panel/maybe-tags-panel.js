@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { some, get } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -104,7 +104,7 @@ export default compose(
 			areTagsFetched: tagsTaxonomy !== undefined,
 			isPostTypeSupported:
 				tagsTaxonomy &&
-				some( tagsTaxonomy.types, ( type ) => type === postType ),
+				tagsTaxonomy.types.some( ( type ) => type === postType ),
 			hasTags: tags && tags.length,
 		};
 	} ),

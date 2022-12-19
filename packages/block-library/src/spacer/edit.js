@@ -15,9 +15,7 @@ import { View } from '@wordpress/primitives';
  * Internal dependencies
  */
 import SpacerControls from './controls';
-
-export const MIN_SPACER_SIZE = 1;
-export const MAX_SPACER_SIZE = 500;
+import { MIN_SPACER_SIZE } from './constants';
 
 const ResizableSpacer = ( {
 	orientation,
@@ -58,10 +56,7 @@ const ResizableSpacer = ( {
 				}
 			} }
 			onResizeStop={ ( _event, _direction, elt ) => {
-				const nextVal = Math.min(
-					MAX_SPACER_SIZE,
-					getCurrentSize( elt )
-				);
+				const nextVal = getCurrentSize( elt );
 				onResizeStop( `${ nextVal }px` );
 				setIsResizing( false );
 			} }
@@ -147,6 +142,7 @@ const SpacerEdit = ( {
 		return (
 			<>
 				<ResizableSpacer
+					minHeight={ MIN_SPACER_SIZE }
 					enable={ {
 						top: false,
 						right: false,

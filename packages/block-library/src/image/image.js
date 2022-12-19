@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, filter, map, pick, includes } from 'lodash';
+import { get, isEmpty, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -29,12 +29,29 @@ import {
 	BlockAlignmentControl,
 	__experimentalImageEditor as ImageEditor,
 	__experimentalImageEditingProvider as ImageEditingProvider,
+	__experimentalGetElementClassName,
+	__experimentalUseBorderProps as useBorderProps,
 } from '@wordpress/block-editor';
-import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
+import {
+	useEffect,
+	useMemo,
+	useState,
+	useRef,
+	useCallback,
+} from '@wordpress/element';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
-import { createBlock, switchToBlockType } from '@wordpress/blocks';
-import { crop, overlayText, upload } from '@wordpress/icons';
+import {
+	createBlock,
+	getDefaultBlockName,
+	switchToBlockType,
+} from '@wordpress/blocks';
+import {
+	crop,
+	overlayText,
+	upload,
+	caption as captionIcon,
+} from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -43,7 +60,7 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
 import useClientWidth from './use-client-width';
-import { isExternalImage, isMediaDestroyed } from './edit';
+import { isExternalImage } from './edit';
 
 /**
  * Module constants
@@ -52,7 +69,20 @@ import { MIN_SIZE, ALLOWED_MEDIA_TYPES } from './constants';
 
 export default function Image( {
 	temporaryURL,
-	attributes: {
+	attributes,
+	setAttributes,
+	isSelected,
+	insertBlocksAfter,
+	onReplace,
+	onSelectImage,
+	onSelectURL,
+	onUploadError,
+	containerRef,
+	context,
+	clientId,
+	isContentLocked,
+} ) {
+	const {
 		url = '',
 		alt,
 		caption,
@@ -67,35 +97,24 @@ export default function Image( {
 		height,
 		linkTarget,
 		sizeSlug,
-	},
-	setAttributes,
-	isSelected,
-	insertBlocksAfter,
-	onReplace,
-	onCloseModal,
-	onSelectImage,
-	onSelectURL,
-	onUploadError,
-	containerRef,
-	context,
-	clientId,
-	onImageLoadError,
-} ) {
+	} = attributes;
 	const imageRef = useRef();
-	const captionRef = useRef();
-	const prevUrl = usePrevious( url );
+	const prevCaption = usePrevious( caption );
+	const [ showCaption, setShowCaption ] = useState( !! caption );
 	const { allowResize = true } = context;
 	const { getBlock } = useSelect( blockEditorStore );
 
 	const { image, multiImageSelection } = useSelect(
 		( select ) => {
 			const { getMedia } = select( coreStore );
-			const { getMultiSelectedBlockClientIds, getBlockName } = select(
-				blockEditorStore
-			);
+			const { getMultiSelectedBlockClientIds, getBlockName } =
+				select( blockEditorStore );
 			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
 			return {
-				image: id && isSelected ? getMedia( id ) : null,
+				image:
+					id && isSelected
+						? getMedia( id, { context: 'view' } )
+						: null,
 				multiImageSelection:
 					multiSelectedClientIds.length &&
 					multiSelectedClientIds.every(
@@ -104,46 +123,44 @@ export default function Image( {
 					),
 			};
 		},
-		[ id, isSelected ]
+		[ id, isSelected, clientId ]
 	);
-	const {
-		canInsertCover,
-		imageEditing,
-		imageSizes,
-		maxWidth,
-		mediaUpload,
-	} = useSelect(
-		( select ) => {
-			const {
-				getBlockRootClientId,
-				getSettings,
-				canInsertBlockType,
-			} = select( blockEditorStore );
+	const { canInsertCover, imageEditing, imageSizes, maxWidth, mediaUpload } =
+		useSelect(
+			( select ) => {
+				const {
+					getBlockRootClientId,
+					getSettings,
+					canInsertBlockType,
+				} = select( blockEditorStore );
 
-			const rootClientId = getBlockRootClientId( clientId );
-			const settings = pick( getSettings(), [
-				'imageEditing',
-				'imageSizes',
-				'maxWidth',
-				'mediaUpload',
-			] );
+				const rootClientId = getBlockRootClientId( clientId );
+				const settings = Object.fromEntries(
+					Object.entries( getSettings() ).filter( ( [ key ] ) =>
+						[
+							'imageEditing',
+							'imageSizes',
+							'maxWidth',
+							'mediaUpload',
+						].includes( key )
+					)
+				);
 
-			return {
-				...settings,
-				canInsertCover: canInsertBlockType(
-					'core/cover',
-					rootClientId
-				),
-			};
-		},
-		[ clientId ]
-	);
+				return {
+					...settings,
+					canInsertCover: canInsertBlockType(
+						'core/cover',
+						rootClientId
+					),
+				};
+			},
+			[ clientId ]
+		);
 	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
-	const { createErrorNotice, createSuccessNotice } = useDispatch(
-		noticesStore
-	);
+	const { createErrorNotice, createSuccessNotice } =
+		useDispatch( noticesStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const isWideAligned = includes( [ 'wide', 'full' ], align );
+	const isWideAligned = [ 'wide', 'full' ].includes( align );
 	const [
 		{ loadedNaturalWidth, loadedNaturalHeight },
 		setLoadedNaturalSize,
@@ -151,9 +168,12 @@ export default function Image( {
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const [ externalBlob, setExternalBlob ] = useState();
 	const clientWidth = useClientWidth( containerRef, [ align ] );
-	const isResizable = allowResize && ! ( isWideAligned && isLargeViewport );
+	const isResizable =
+		allowResize &&
+		! isContentLocked &&
+		! ( isWideAligned && isLargeViewport );
 	const imageSizeOptions = map(
-		filter( imageSizes, ( { slug } ) =>
+		imageSizes.filter( ( { slug } ) =>
 			get( image, [ 'media_details', 'sizes', slug, 'source_url' ] )
 		),
 		( { name, slug } ) => ( { value: slug, label: name } )
@@ -175,19 +195,27 @@ export default function Image( {
 			.catch( () => {} );
 	}, [ id, url, isSelected, externalBlob ] );
 
-	// Focus the caption after inserting an image from the placeholder. This is
-	// done to preserve the behaviour of focussing the first tabbable element
-	// when a block is mounted. Previously, the image block would remount when
-	// the placeholder is removed. Maybe this behaviour could be removed.
+	// We need to show the caption when changes come from
+	// history navigation(undo/redo).
 	useEffect( () => {
-		if ( url && ! prevUrl && isSelected ) {
-			captionRef.current.focus();
+		if ( caption && ! prevCaption ) {
+			setShowCaption( true );
 		}
-	}, [ url, prevUrl ] );
+	}, [ caption, prevCaption ] );
+
+	// Focus the caption when we click to add one.
+	const captionRef = useCallback(
+		( node ) => {
+			if ( node && ! caption ) {
+				node.focus();
+			}
+		},
+		[ caption ]
+	);
 
 	// Get naturalWidth and naturalHeight from image ref, and fall back to loaded natural
 	// width and height. This resolves an issue in Safari where the loaded natural
-	// witdth and height is otherwise lost when switching between alignments.
+	// width and height is otherwise lost when switching between alignments.
 	// See: https://github.com/WordPress/gutenberg/pull/37210.
 	const { naturalWidth, naturalHeight } = useMemo( () => {
 		return {
@@ -218,13 +246,10 @@ export default function Image( {
 		// Check if there's an embed block that handles this URL, e.g., instagram URL.
 		// See: https://github.com/WordPress/gutenberg/pull/11472
 		const embedBlock = createUpgradedEmbedBlock( { attributes: { url } } );
-		const shouldReplace = undefined !== embedBlock;
 
-		if ( shouldReplace ) {
+		if ( undefined !== embedBlock ) {
 			onReplace( embedBlock );
 		}
-
-		onImageLoadError( shouldReplace );
 	}
 
 	function onSetHref( props ) {
@@ -295,11 +320,11 @@ export default function Image( {
 	useEffect( () => {
 		if ( ! isSelected ) {
 			setIsEditingImage( false );
+			if ( ! caption ) {
+				setShowCaption( false );
+			}
 		}
-		if ( isSelected && isMediaDestroyed( id ) ) {
-			onImageLoadError();
-		}
-	}, [ isSelected ] );
+	}, [ isSelected, caption ] );
 
 	const canEditImage = id && naturalWidth && naturalHeight && imageEditing;
 	const allowCrop = ! multiImageSelection && canEditImage && ! isEditingImage;
@@ -314,10 +339,29 @@ export default function Image( {
 	const controls = (
 		<>
 			<BlockControls group="block">
-				<BlockAlignmentControl
-					value={ align }
-					onChange={ updateAlignment }
-				/>
+				{ ! isContentLocked && (
+					<BlockAlignmentControl
+						value={ align }
+						onChange={ updateAlignment }
+					/>
+				) }
+				{ ! isContentLocked && (
+					<ToolbarButton
+						onClick={ () => {
+							setShowCaption( ! showCaption );
+							if ( showCaption && caption ) {
+								setAttributes( { caption: undefined } );
+							}
+						} }
+						icon={ captionIcon }
+						isPressed={ showCaption }
+						label={
+							showCaption
+								? __( 'Remove caption' )
+								: __( 'Add caption' )
+						}
+					/>
+				) }
 				{ ! multiImageSelection && ! isEditingImage && (
 					<ImageURLInputUI
 						url={ href || '' }
@@ -362,14 +406,14 @@ export default function Image( {
 						onSelect={ onSelectImage }
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
-						onCloseModal={ onCloseModal }
 					/>
 				</BlockControls>
 			) }
 			<InspectorControls>
-				<PanelBody title={ __( 'Image settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					{ ! multiImageSelection && (
 						<TextareaControl
+							__nextHasNoMarginBottom
 							label={ __( 'Alt text (alternative text)' ) }
 							value={ alt }
 							onChange={ updateAlt }
@@ -437,6 +481,11 @@ export default function Image( {
 		defaultedAlt = __( 'This image has an empty alt attribute' );
 	}
 
+	const borderProps = useBorderProps( attributes );
+	const isRounded = attributes.className?.includes( 'is-style-rounded' );
+	const hasCustomBorder =
+		!! borderProps.className || ! isEmpty( borderProps.style );
+
 	let img = (
 		// Disable reason: Image itself is not meant to be interactive, but
 		// should direct focus to block.
@@ -453,6 +502,8 @@ export default function Image( {
 					} );
 				} }
 				ref={ imageRef }
+				className={ borderProps.className }
+				style={ borderProps.style }
 			/>
 			{ temporaryURL && <Spinner /> }
 		</>
@@ -474,6 +525,7 @@ export default function Image( {
 	if ( canEditImage && isEditingImage ) {
 		img = (
 			<ImageEditor
+				borderProps={ isRounded ? undefined : borderProps }
 				url={ url }
 				width={ width }
 				height={ height }
@@ -538,7 +590,7 @@ export default function Image( {
 			<ResizableBox
 				size={ {
 					width: width ?? 'auto',
-					height: height ?? 'auto',
+					height: height && ! hasCustomBorder ? height : 'auto',
 				} }
 				showHandle={ isSelected }
 				minWidth={ minWidth }
@@ -560,6 +612,7 @@ export default function Image( {
 						height: parseInt( currentHeight + delta.height, 10 ),
 					} );
 				} }
+				resizeRatio={ align === 'center' ? 2 : 1 }
 			>
 				{ img }
 			</ResizableBox>
@@ -583,22 +636,28 @@ export default function Image( {
 				which causes duplicated image upload. */ }
 			{ ! temporaryURL && controls }
 			{ img }
-			{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
-				<RichText
-					ref={ captionRef }
-					tagName="figcaption"
-					aria-label={ __( 'Image caption text' ) }
-					placeholder={ __( 'Add caption' ) }
-					value={ caption }
-					onChange={ ( value ) =>
-						setAttributes( { caption: value } )
-					}
-					inlineToolbar
-					__unstableOnSplitAtEnd={ () =>
-						insertBlocksAfter( createBlock( 'core/paragraph' ) )
-					}
-				/>
-			) }
+			{ showCaption &&
+				( ! RichText.isEmpty( caption ) || isSelected ) && (
+					<RichText
+						className={ __experimentalGetElementClassName(
+							'caption'
+						) }
+						ref={ captionRef }
+						tagName="figcaption"
+						aria-label={ __( 'Image caption text' ) }
+						placeholder={ __( 'Add caption' ) }
+						value={ caption }
+						onChange={ ( value ) =>
+							setAttributes( { caption: value } )
+						}
+						inlineToolbar
+						__unstableOnSplitAtEnd={ () =>
+							insertBlocksAfter(
+								createBlock( getDefaultBlockName() )
+							)
+						}
+					/>
+				) }
 		</ImageEditingProvider>
 	);
 }

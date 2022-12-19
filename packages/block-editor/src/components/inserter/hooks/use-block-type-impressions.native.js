@@ -11,9 +11,8 @@ import { store as blockEditorStore } from '../../../store';
 
 function useBlockTypeImpressions( blockTypes ) {
 	const { blockTypeImpressions } = useSelect( ( select ) => {
-		const { getSettings: getBlockEditorSettings } = select(
-			blockEditorStore
-		);
+		const { getSettings: getBlockEditorSettings } =
+			select( blockEditorStore );
 		const { impressions } = getBlockEditorSettings();
 
 		return {
@@ -32,12 +31,12 @@ function useBlockTypeImpressions( blockTypes ) {
 				...blockTypeImpressions,
 				[ name ]: 0,
 			};
-			// Persist block type impression to JavaScript store
+			// Persist block type impression to JavaScript store.
 			updateSettings( {
 				impressions: updatedBlockTypeImpressions,
 			} );
 
-			// Persist block type impression count to native app store
+			// Persist block type impression count to native app store.
 			setBlockTypeImpressions( updatedBlockTypeImpressions );
 		}
 	};

@@ -13,7 +13,8 @@ const debug = require( '../../debug' );
  * @param {GitHub}                    octokit Initialized Octokit REST client.
  */
 async function assignFixedIssues( payload, octokit ) {
-	const regex = /(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved):? +(?:\#?|https?:\/\/github\.com\/WordPress\/gutenberg\/issues\/)(\d+)/gi;
+	const regex =
+		/(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved):? +(?:\#?|https?:\/\/github\.com\/WordPress\/gutenberg\/issues\/)(\d+)/gi;
 
 	let match;
 	while ( ( match = regex.exec( payload.pull_request.body ) ) ) {

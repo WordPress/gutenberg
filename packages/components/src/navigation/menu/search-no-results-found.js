@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { filter } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -19,7 +14,9 @@ export default function NavigationSearchNoResultsFound( { search } ) {
 		navigationTree: { items },
 	} = useNavigationContext();
 
-	const resultsCount = filter( items, '_isVisible' ).length;
+	const resultsCount = Object.values( items ).filter(
+		( item ) => item._isVisible
+	).length;
 
 	if ( ! search || !! resultsCount ) {
 		return null;

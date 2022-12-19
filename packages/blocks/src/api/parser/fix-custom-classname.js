@@ -1,14 +1,16 @@
 /**
- * External dependencies
- */
-import { difference, omit } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { hasBlockSupport } from '../registration';
 import { getSaveContent } from '../serializer';
 import { parseWithAttributeSchema } from './get-block-attributes';
+
+const CLASS_ATTR_SCHEMA = {
+	type: 'string',
+	source: 'attribute',
+	selector: '[data-custom-class-name] > *',
+	attribute: 'class',
+};
 
 /**
  * Given an HTML string, returns an array of class names assigned to the root
@@ -19,14 +21,10 @@ import { parseWithAttributeSchema } from './get-block-attributes';
  * @return {string[]} Array of class names assigned to the root element.
  */
 export function getHTMLRootElementClasses( innerHTML ) {
-	innerHTML = `<div data-custom-class-name>${ innerHTML }</div>`;
-
-	const parsed = parseWithAttributeSchema( innerHTML, {
-		type: 'string',
-		source: 'attribute',
-		selector: '[data-custom-class-name] > *',
-		attribute: 'class',
-	} );
+	const parsed = parseWithAttributeSchema(
+		`<div data-custom-class-name>${ innerHTML }</div>`,
+		CLASS_ATTR_SCHEMA
+	);
 
 	return parsed ? parsed.trim().split( /\s+/ ) : [];
 }
@@ -49,13 +47,15 @@ export function fixCustomClassname( blockAttributes, blockType, innerHTML ) {
 		// attributes, with the exception of `className`. This will determine
 		// the default set of classes. From there, any difference in innerHTML
 		// can be considered as custom classes.
-		const attributesSansClassName = omit( blockAttributes, [
-			'className',
-		] );
+		const { className: omittedClassName, ...attributesSansClassName } =
+			blockAttributes;
 		const serialized = getSaveContent( blockType, attributesSansClassName );
 		const defaultClasses = getHTMLRootElementClasses( serialized );
 		const actualClasses = getHTMLRootElementClasses( innerHTML );
-		const customClasses = difference( actualClasses, defaultClasses );
+
+		const customClasses = actualClasses.filter(
+			( className ) => ! defaultClasses.includes( className )
+		);
 
 		if ( customClasses.length ) {
 			blockAttributes.className = customClasses.join( ' ' );

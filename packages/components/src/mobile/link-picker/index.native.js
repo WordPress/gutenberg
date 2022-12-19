@@ -3,7 +3,6 @@
  */
 import { SafeAreaView, TouchableOpacity, View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { lowerCase, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -22,11 +21,11 @@ import LinkPickerResults from './link-picker-results';
 import NavBar from '../bottom-sheet/nav-bar';
 import styles from './styles.scss';
 
-// this creates a search suggestion for adding a url directly
+// This creates a search suggestion for adding a url directly.
 export const createDirectEntry = ( value ) => {
 	let type = 'URL';
 
-	const protocol = lowerCase( getProtocol( value ) ) || '';
+	const protocol = getProtocol( value )?.toLowerCase() || '';
 
 	if ( protocol.includes( 'mailto' ) ) {
 		type = 'mailto';
@@ -36,7 +35,7 @@ export const createDirectEntry = ( value ) => {
 		type = 'tel';
 	}
 
-	if ( startsWith( value, '#' ) ) {
+	if ( value?.startsWith( '#' ) ) {
 		type = 'internal';
 	}
 
@@ -64,8 +63,8 @@ export const LinkPicker = ( {
 	} );
 	const directEntry = createDirectEntry( value );
 
-	// the title of a direct entry is displayed as the raw input value, but if we
-	// are replacing empty text, we want to use the generated url
+	// The title of a direct entry is displayed as the raw input value, but if we
+	// are replacing empty text, we want to use the generated url.
 	const pickLink = ( { title, url, isDirectEntry } ) => {
 		onLinkPicked( { title: isDirectEntry ? url : title, url } );
 	};
@@ -92,6 +91,9 @@ export const LinkPicker = ( {
 		getURLFromClipboard()
 			.then( ( url ) => setValue( { value, clipboardUrl: url } ) )
 			.catch( () => setValue( { value, clipboardUrl: '' } ) );
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
 	// TODO: Localize the accessibility label.

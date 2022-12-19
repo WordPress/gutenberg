@@ -1,0 +1,12 @@
+{
+	"version": 2,
+	"styles": {
+		"color": {
+			"background": "#ffef0b",
+			"text": "#191911"
+		},
+		"typography": {
+			"fontSize": "15px"
+		}
+	}
+}

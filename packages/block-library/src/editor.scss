@@ -1,13 +1,17 @@
 @import "./archives/editor.scss";
 @import "./audio/editor.scss";
+@import "./avatar/editor.scss";
 @import "./block/editor.scss";
 @import "./button/editor.scss";
 @import "./buttons/editor.scss";
 @import "./categories/editor.scss";
+@import "./code/editor.scss";
 @import "./columns/editor.scss";
-@import "./comments-query-loop/editor.scss";
+@import "./comments/editor.scss";
+@import "./comment-author-avatar/editor.scss";
 @import "./comments-pagination/editor.scss";
 @import "./comments-pagination-numbers/editor.scss";
+@import "./comments-title/editor.scss";
 @import "./cover/editor.scss";
 @import "./embed/editor.scss";
 @import "./file/editor.scss";
@@ -46,6 +50,9 @@
 @import "./query-pagination/editor.scss";
 @import "./query-pagination-numbers/editor.scss";
 @import "./post-featured-image/editor.scss";
+@import "./post-comments-form/editor.scss";
+
+@import "./editor-elements.scss";
 
 :root .editor-styles-wrapper {
 	@include background-colors-deprecated();

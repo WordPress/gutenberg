@@ -22,9 +22,25 @@ class WP_REST_Pattern_Directory_Controller_Test extends WP_Test_REST_Controller_
 	protected static $contributor_id;
 
 	/**
-	 * Set up class test fixtures.
+	 * An instance of WP_REST_Pattern_Directory_Controller class.
 	 *
-	 * @since 5.8.0
+	 * @since 6.0.0
+	 *
+	 * @var WP_REST_Pattern_Directory_Controller
+	 */
+	private static $controller;
+
+	/**
+	 * List of URLs captured.
+	 *
+	 * @since 6.2.0
+	 *
+	 * @var string[]
+	 */
+	protected static $http_request_urls;
+
+	/**
+	 * Set up class test fixtures.
 	 *
 	 * @param WP_UnitTest_Factory $factory WordPress unit test factory.
 	 */
@@ -34,395 +50,156 @@ class WP_REST_Pattern_Directory_Controller_Test extends WP_Test_REST_Controller_
 				'role' => 'contributor',
 			)
 		);
+
+		self::$http_request_urls = array();
+
+		static::$controller = new Gutenberg_REST_Pattern_Directory_Controller_6_2();
+	}
+
+	public static function wpTearDownAfterClass() {
+		self::delete_user( self::$contributor_id );
 	}
 
 	/**
-	 * Asserts that the pattern matches the expected response schema.
-	 *
-	 * @param WP_REST_Response[] $pattern An individual pattern from the REST API response.
+	 * Clear the captured request URLs after each test.
 	 */
-	public function assertPatternMatchesSchema( $pattern ) {
-		$schema     = ( new WP_REST_Pattern_Directory_Controller() )->get_item_schema();
-		$pattern_id = isset( $pattern->id ) ? $pattern->id : '{pattern ID is missing}';
-
-		$this->assertTrue(
-			rest_validate_value_from_schema( $pattern, $schema ),
-			"Pattern ID `$pattern_id` doesn't match the response schema."
-		);
-
-		$this->assertSame(
-			array_keys( $schema['properties'] ),
-			array_keys( $pattern ),
-			"Pattern ID `$pattern_id` doesn't contain all of the fields expected from the schema."
-		);
+	public function tear_down() {
+		self::$http_request_urls = array();
+		parent::tear_down();
 	}
 
 	/**
 	 * @covers WP_REST_Pattern_Directory_Controller::register_routes
 	 *
 	 * @since 5.8.0
+	 * @since 6.2.0 Added pattern directory categories endpoint.
 	 */
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
 
 		$this->assertArrayHasKey( '/wp/v2/pattern-directory/patterns', $routes );
+		$this->assertArrayHasKey( '/wp/v2/pattern-directory/categories', $routes );
 	}
 
 	/**
-	 * @covers WP_REST_Pattern_Directory_Controller::get_context_param
+	 * @covers WP_REST_Pattern_Directory_Controller::prepare_pattern_category_for_response
 	 *
-	 * @since 5.8.0
+	 * @since 6.2.0
 	 */
-	public function test_context_param() {
-		$request  = new WP_REST_Request( 'OPTIONS', '/wp/v2/pattern-directory/patterns' );
-		$response = rest_get_server()->dispatch( $request );
-		$patterns = $response->get_data();
+	public function test_prepare_pattern_category_for_response() {
+		$raw_categories = array(
+			(object) array(
+				'id'          => 3,
+				'name'        => 'Columns',
+				'slug'        => 'columns',
+				'description' => 'A description',
+			),
+		);
 
-		$this->assertSame( 'view', $patterns['endpoints'][0]['args']['context']['default'] );
-		$this->assertSame( array( 'view', 'embed' ), $patterns['endpoints'][0]['args']['context']['enum'] );
+		$prepared_category = static::$controller->prepare_response_for_collection(
+			static::$controller->prepare_pattern_category_for_response( $raw_categories[0], new WP_REST_Request() )
+		);
+
+		$this->assertSame(
+			array(
+				'id'   => 3,
+				'name' => 'Columns',
+				'slug' => 'columns',
+			),
+			$prepared_category
+		);
 	}
 
+
 	/**
+	 * Tests if the provided query args are passed through to the wp.org API.
+	 *
+	 * @dataProvider data_get_items_query_args
+	 *
 	 * @covers WP_REST_Pattern_Directory_Controller::get_items
 	 *
-	 * @since 5.8.0
-	 */
-	public function test_get_items() {
-		wp_set_current_user( self::$contributor_id );
-		self::mock_successful_response( 'browse-all', true );
-
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
-		$response = rest_do_request( $request );
-		$patterns = $response->get_data();
-
-		$this->assertNotWPError( $response->as_error() );
-		$this->assertSame( 200, $response->status );
-		$this->assertGreaterThan( 0, count( $patterns ) );
-
-		array_walk( $patterns, array( $this, 'assertPatternMatchesSchema' ) );
-	}
-
-	/**
-	 * @covers WP_REST_Pattern_Directory_Controller::get_items
+	 * @since 6.2.0
 	 *
-	 * @since 5.8.0
+	 * @param string $param    Query parameter name (ex, page).
+	 * @param mixed  $value    Query value to test.
+	 * @param bool   $is_error Whether this value should error or not.
+	 * @param mixed  $expected Expected value (or expected error code).
 	 */
-	public function test_get_items_by_category() {
+	public function test_get_items_query_args( $param, $value, $is_error, $expected ) {
 		wp_set_current_user( self::$contributor_id );
-		self::mock_successful_response( 'browse-category', true );
+		self::capture_http_urls();
 
 		$request = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
-		$request->set_query_params( array( 'category' => 2 ) );
+		if ( $value ) {
+			$request->set_query_params( array( $param => $value ) );
+		}
+
 		$response = rest_do_request( $request );
-		$patterns = $response->get_data();
-
-		$this->assertNotWPError( $response->as_error() );
-		$this->assertSame( 200, $response->status );
-		$this->assertGreaterThan( 0, count( $patterns ) );
-
-		array_walk( $patterns, array( $this, 'assertPatternMatchesSchema' ) );
-
-		foreach ( $patterns as $pattern ) {
-			$this->assertContains( 'buttons', $pattern['categories'] );
+		$data     = $response->get_data();
+		if ( $is_error ) {
+			$this->assertSame( $expected, $data['code'] );
+			$this->assertStringContainsString( $param, $data['message'] );
+		} else {
+			$this->assertCount( 1, self::$http_request_urls );
+			$this->assertStringContainsString( $param . '=' . $expected, self::$http_request_urls[0] );
 		}
 	}
 
 	/**
-	 * @covers WP_REST_Pattern_Directory_Controller::get_items
-	 *
-	 * @since 5.8.0
+	 * @since 6.2.0
 	 */
-	public function test_get_items_by_keyword() {
-		wp_set_current_user( self::$contributor_id );
-		self::mock_successful_response( 'browse-keyword', true );
+	public function data_get_items_query_args() {
+		return array(
+			'per_page default'   => array( 'per_page', false, false, 100 ),
+			'per_page custom-1'  => array( 'per_page', 5, false, 5 ),
+			'per_page custom-2'  => array( 'per_page', 50, false, 50 ),
+			'per_page invalid-1' => array( 'per_page', 200, true, 'rest_invalid_param' ),
+			'per_page invalid-2' => array( 'per_page', 'abc', true, 'rest_invalid_param' ),
 
-		$request = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
-		$request->set_query_params( array( 'keyword' => 11 ) );
-		$response = rest_do_request( $request );
-		$patterns = $response->get_data();
+			'page default'       => array( 'page', false, false, 1 ),
+			'page custom'        => array( 'page', 5, false, 5 ),
+			'page invalid'       => array( 'page', 'abc', true, 'rest_invalid_param' ),
 
-		$this->assertNotWPError( $response->as_error() );
-		$this->assertSame( 200, $response->status );
-		$this->assertGreaterThan( 0, count( $patterns ) );
+			'offset custom'      => array( 'offset', 5, false, 5 ),
+			'offset invalid-1'   => array( 'offset', 'abc', true, 'rest_invalid_param' ),
 
-		array_walk( $patterns, array( $this, 'assertPatternMatchesSchema' ) );
+			'order default'      => array( 'order', false, false, 'desc' ),
+			'order custom'       => array( 'order', 'asc', false, 'asc' ),
+			'order invalid-1'    => array( 'order', 10, true, 'rest_invalid_param' ),
+			'order invalid-2'    => array( 'order', 'fake', true, 'rest_invalid_param' ),
 
-		foreach ( $patterns as $pattern ) {
-			$this->assertContains( 'core', $pattern['keywords'] );
-		}
-	}
-
-	/**
-	 * @covers WP_REST_Pattern_Directory_Controller::get_items
-	 *
-	 * @since 5.8.0
-	 */
-	public function test_get_items_search() {
-		wp_set_current_user( self::$contributor_id );
-		self::mock_successful_response( 'search', true );
-
-		$search_term = 'button';
-		$request     = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
-		$request->set_query_params( array( 'search' => $search_term ) );
-		$response = rest_do_request( $request );
-		$patterns = $response->get_data();
-
-		$this->assertNotWPError( $response->as_error() );
-		$this->assertSame( 200, $response->status );
-		$this->assertGreaterThan( 0, count( $patterns ) );
-
-		array_walk( $patterns, array( $this, 'assertPatternMatchesSchema' ) );
-
-		foreach ( $patterns as $pattern ) {
-			$search_field_values = $pattern['title'] . ' ' . $pattern['description'];
-
-			$this->assertNotFalse( stripos( $search_field_values, $search_term ) );
-		}
-	}
-
-	/**
-	 * @covers WP_REST_Pattern_Directory_Controller::get_items
-	 *
-	 * @since 5.8.0
-	 */
-	public function test_get_items_wdotorg_unavailable() {
-		wp_set_current_user( self::$contributor_id );
-		self::prevent_requests_to_host( 'api.wordpress.org' );
-
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
-		$response = rest_do_request( $request );
-
-		$this->assertErrorResponse( 'patterns_api_failed', $response, 500 );
-	}
-
-	/**
-	 * @covers WP_REST_Pattern_Directory_Controller::get_items
-	 *
-	 * @since 5.8.0
-	 */
-	public function test_get_items_logged_out() {
-		$request = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
-		$request->set_query_params( array( 'search' => 'button' ) );
-		$response = rest_do_request( $request );
-
-		$this->assertErrorResponse( 'rest_pattern_directory_cannot_view', $response );
-	}
-
-	/**
-	 * @covers WP_REST_Pattern_Directory_Controller::get_items
-	 *
-	 * @since 5.8.0
-	 */
-	public function test_get_items_no_results() {
-		wp_set_current_user( self::$contributor_id );
-		self::mock_successful_response( 'browse-all', false );
-
-		$request = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
-		$request->set_query_params( array( 'category' => PHP_INT_MAX ) );
-		$response = rest_do_request( $request );
-		$patterns = $response->get_data();
-
-		$this->assertSame( 200, $response->status );
-		$this->assertSame( array(), $patterns );
-	}
-
-	/**
-	 * @covers WP_REST_Pattern_Directory_Controller::get_items
-	 *
-	 * @since 5.8.0
-	 */
-	public function test_get_items_search_no_results() {
-		wp_set_current_user( self::$contributor_id );
-		self::mock_successful_response( 'search', false );
-
-		$request = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
-		$request->set_query_params( array( 'search' => '0c4549ee68f24eaaed46a49dc983ecde' ) );
-		$response = rest_do_request( $request );
-		$patterns = $response->get_data();
-
-		$this->assertSame( 200, $response->status );
-		$this->assertSame( array(), $patterns );
-	}
-
-	/**
-	 * @covers WP_REST_Pattern_Directory_Controller::get_items
-	 *
-	 * @since 5.8.0
-	 */
-	public function test_get_items_invalid_response_data() {
-		wp_set_current_user( self::$contributor_id );
-		self::mock_successful_response( 'invalid-data', true );
-
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
-		$response = rest_do_request( $request );
-
-		$this->assertSame( 500, $response->status );
-		$this->assertWPError( $response->as_error() );
-	}
-
-	/**
-	 * @covers WP_REST_Pattern_Directory_Controller::get_items
-	 *
-	 * @since 5.8.0
-	 */
-	public function test_get_items_prepare_filter() {
-		wp_set_current_user( self::$contributor_id );
-		self::mock_successful_response( 'browse-all', true );
-
-		// Test that filter changes uncached values.
-		add_filter(
-			'rest_prepare_block_pattern',
-			function() {
-				return 'initial value';
-			}
+			'orderby default'    => array( 'orderby', false, false, 'date' ),
+			'orderby custom-1'   => array( 'orderby', 'title', false, 'title' ),
+			'orderby custom-2'   => array( 'orderby', 'date', false, 'date' ),
+			'orderby custom-3'   => array( 'orderby', 'favorite_count', false, 'favorite_count' ),
+			'orderby invalid-1'  => array( 'orderby', 10, true, 'rest_invalid_param' ),
+			'orderby invalid-2'  => array( 'orderby', 'fake', true, 'rest_invalid_param' ),
 		);
-
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
-		$response = rest_do_request( $request );
-		$patterns = $response->get_data();
-
-		$this->assertSame( 'initial value', $patterns[0] );
-
-		// Test that filter changes cached values (the previous request primed the cache).
-		add_filter(
-			'rest_prepare_block_pattern',
-			function() {
-				return 'modified the cache';
-			},
-			11
-		);
-
-		// Test that the filter works against cached values.
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
-		$response = rest_do_request( $request );
-		$patterns = $response->get_data();
-
-		$this->assertSame( 'modified the cache', $patterns[0] );
-	}
-
-	public function test_get_item() {
-		$this->markTestSkipped( 'Controller does not have get_item route.' );
-	}
-
-	public function test_create_item() {
-		$this->markTestSkipped( 'Controller does not have create_item route.' );
-	}
-
-	public function test_update_item() {
-		$this->markTestSkipped( 'Controller does not have update_item route.' );
-	}
-
-	public function test_delete_item() {
-		$this->markTestSkipped( 'Controller does not have delete_item route.' );
 	}
 
 	/**
-	 * @covers WP_REST_Pattern_Directory_Controller::prepare_item_for_response
+	 * Attach a filter to capture requested wp.org URL.
 	 *
-	 * @since 5.8.0
+	 * @since 6.2.0
 	 */
-	public function test_prepare_item() {
-		$controller                   = new WP_REST_Pattern_Directory_Controller();
-		$raw_patterns                 = json_decode( self::get_raw_response( 'browse-all' ) );
-		$raw_patterns[0]->extra_field = 'this should be removed';
-
-		$prepared_pattern = $controller->prepare_response_for_collection(
-			$controller->prepare_item_for_response( $raw_patterns[0], new WP_REST_Request() )
-		);
-
-		$this->assertPatternMatchesSchema( $prepared_pattern );
-		$this->assertArrayNotHasKey( 'extra_field', $prepared_pattern );
-	}
-
-	/**
-	 * @covers WP_REST_Pattern_Directory_Controller::prepare_item_for_response
-	 *
-	 * @since 5.8.0
-	 */
-	public function test_prepare_item_search() {
-		$controller                   = new WP_REST_Pattern_Directory_Controller();
-		$raw_patterns                 = json_decode( self::get_raw_response( 'search' ) );
-		$raw_patterns[0]->extra_field = 'this should be removed';
-
-		$prepared_pattern = $controller->prepare_response_for_collection(
-			$controller->prepare_item_for_response( $raw_patterns[0], new WP_REST_Request() )
-		);
-
-		$this->assertPatternMatchesSchema( $prepared_pattern );
-		$this->assertArrayNotHasKey( 'extra_field', $prepared_pattern );
-	}
-
-	/**
-	 * Get a mocked raw response from api.wordpress.org.
-	 *
-	 * @return string
-	 */
-	private static function get_raw_response( $action ) {
-		$fixtures_dir = __DIR__ . '/fixtures/rest-api/pattern-directory';
-
-		switch ( $action ) {
-			default:
-			case 'browse-all':
-				// Response from https://api.wordpress.org/patterns/1.0/.
-				$response = file_get_contents( $fixtures_dir . '/browse-all.json' );
-				break;
-
-			case 'browse-category':
-				// Response from https://api.wordpress.org/patterns/1.0/?pattern-categories=2.
-				$response = file_get_contents( $fixtures_dir . '/browse-category-2.json' );
-				break;
-
-			case 'browse-keyword':
-				// Response from https://api.wordpress.org/patterns/1.0/?pattern-keywords=11.
-				$response = file_get_contents( $fixtures_dir . '/browse-keyword-11.json' );
-				break;
-
-			case 'search':
-				// Response from https://api.wordpress.org/patterns/1.0/?search=button.
-				$response = file_get_contents( $fixtures_dir . '/search-button.json' );
-				break;
-
-			case 'invalid-data':
-				$response = ''; // Any HTTP 200 response from w.org should be in JSON, even if it contains an error message.
-				break;
-		}
-
-		return $response;
-	}
-
-	/**
-	 * @covers WP_REST_Pattern_Directory_Controller::get_item_schema
-	 *
-	 * @since 5.8.0
-	 */
-	public function test_get_item_schema() {
-		$this->markTestSkipped( "The controller's schema is hardcoded, so tests would not be meaningful." );
-	}
-
-	/**
-	 * Simulate a successful outbound HTTP requests, to keep tests pure and performant.
-	 *
-	 * @param string $action          Pass a case from `get_raw_response()` to determine returned data.
-	 * @param bool   $expects_results Pass `true` to get results, or `false` to get 0 results.
-	 *
-	 * @since 5.8.0
-	 */
-	private static function mock_successful_response( $action, $expects_results ) {
+	private static function capture_http_urls() {
 		add_filter(
 			'pre_http_request',
-			static function ( $preempt, $args, $url ) use ( $action, $expects_results ) {
-
+			function ( $preempt, $args, $url ) {
 				if ( 'api.wordpress.org' !== wp_parse_url( $url, PHP_URL_HOST ) ) {
 					return $preempt;
 				}
 
+				self::$http_request_urls[] = $url;
+
+				// Return a response to prevent external API request.
 				$response = array(
 					'headers'  => array(),
 					'response' => array(
 						'code'    => 200,
 						'message' => 'OK',
 					),
-					'body'     => $expects_results ? self::get_raw_response( $action ) : '[]',
+					'body'     => '[]',
 					'cookies'  => array(),
 					'filename' => null,
 				);
@@ -435,30 +212,59 @@ class WP_REST_Pattern_Directory_Controller_Test extends WP_Test_REST_Controller_
 	}
 
 	/**
-	 * Simulate a network failure on outbound http requests to a given hostname.
-	 *
-	 * @since 5.8.0
-	 *
-	 * @param string $blocked_host The host to block connections to.
+	 * @doesNotPerformAssertions
 	 */
-	private static function prevent_requests_to_host( $blocked_host = 'api.wordpress.org' ) {
-		add_filter(
-			'pre_http_request',
-			static function ( $return, $args, $url ) use ( $blocked_host ) {
-
-				if ( wp_parse_url( $url, PHP_URL_HOST ) === $blocked_host ) {
-					return new WP_Error(
-						'patterns_api_failed',
-						"An expected error occurred connecting to $blocked_host because of a unit test.",
-						"cURL error 7: Failed to connect to $blocked_host port 80: Connection refused"
-					);
-
-				}
-
-				return $return;
-			},
-			10,
-			3
-		);
+	public function test_context_param() {
+		// Covered by the core test.
 	}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
+	public function test_get_items() {
+		// Covered by the core test.
+	}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
+	public function test_prepare_item() {
+		// Covered by the core test.
+	}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
+	public function test_get_item() {
+		// Controller does not implement get_item().
+	}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
+	public function test_create_item() {
+		// Controller does not implement create_item().
+	}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
+	public function test_update_item() {
+		// Controller does not implement update_item().
+	}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
+	public function test_delete_item() {
+		// Controller does not implement delete_item().
+	}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
+	public function test_get_item_schema() {
+		// The controller's schema is hardcoded, so tests would not be meaningful.
+	}
+
 }

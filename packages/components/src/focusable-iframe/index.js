@@ -4,6 +4,10 @@
 import { useMergeRefs, useFocusableIframe } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
 
+/**
+ * @param {Object}                                 props
+ * @param {import('react').Ref<HTMLIFrameElement>} props.iframeRef
+ */
 export default function FocusableIframe( { iframeRef, ...props } ) {
 	const ref = useMergeRefs( [ iframeRef, useFocusableIframe() ] );
 	deprecated( 'wp.components.FocusableIframe', {

@@ -5,19 +5,19 @@ import { useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as noticeStore } from '@wordpress/notices';
 
-function useNavigationNotice( { name, message } = {} ) {
+function useNavigationNotice( { name, message = '' } = {} ) {
 	const noticeRef = useRef();
 
 	const { createWarningNotice, removeNotice } = useDispatch( noticeStore );
 
-	const showNotice = () => {
+	const showNotice = ( customMsg ) => {
 		if ( noticeRef.current ) {
 			return;
 		}
 
 		noticeRef.current = name;
 
-		createWarningNotice( message, {
+		createWarningNotice( customMsg || message, {
 			id: noticeRef.current,
 			type: 'snackbar',
 		} );

@@ -2,24 +2,22 @@
 	z-index: z-index(".components-tooltip");
 
 	.components-popover__content {
-		min-width: 0;
+		min-width: min-content;
 	}
 }
 
 .components-tooltip .components-popover__content {
-	background: $gray-900;
+	background: $components-color-foreground; // TODO: Discuss with designers.
 	border-radius: $radius-block-ui;
 	border-width: 0;
-	color: $white;
+	outline: none;
+	color: $components-color-foreground-inverted;
 	white-space: nowrap;
 	text-align: center;
 	line-height: 1.4;
 	font-size: 12px;
 	box-shadow: none;
-
-	> div {
-		padding: $grid-unit-05 $grid-unit-10;
-	}
+	padding: $grid-unit-05 $grid-unit-10;
 }
 
 .components-tooltip__shortcut {

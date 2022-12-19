@@ -484,8 +484,7 @@ export const spec = [
 		description: 'should handle multiline list value',
 		multilineTag: 'li',
 		multilineWrapperTags: [ 'ul', 'ol' ],
-		html:
-			'<li>one<ul><li>a</li><li>b<ol><li>1</li><li>2</li></ol></li></ul></li><li>three</li>',
+		html: '<li>one<ul><li>a</li><li>b<ol><li>1</li><li>2</li></ol></li></ul></li><li>three</li>',
 		createRange: ( element ) => ( {
 			startOffset: 0,
 			startContainer: element,
@@ -785,6 +784,7 @@ export const specWithRegistration = [
 				[
 					{
 						type: 'my-plugin/link',
+						tagName: 'a',
 						attributes: {},
 						unregisteredAttributes: {},
 					},
@@ -809,6 +809,7 @@ export const specWithRegistration = [
 				[
 					{
 						type: 'my-plugin/link',
+						tagName: 'a',
 						attributes: {},
 						unregisteredAttributes: {
 							class: 'test',
@@ -835,6 +836,7 @@ export const specWithRegistration = [
 				[
 					{
 						type: 'core/link',
+						tagName: 'a',
 						attributes: {},
 						unregisteredAttributes: {
 							class: 'custom-format',
@@ -900,6 +902,7 @@ export const specWithRegistration = [
 				[
 					{
 						type: 'my-plugin/link',
+						tagName: 'a',
 						attributes: {},
 						unregisteredAttributes: {},
 					},

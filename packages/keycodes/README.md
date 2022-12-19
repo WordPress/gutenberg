@@ -114,6 +114,18 @@ Keycode for F10 key.
 
 Keycode for HOME key.
 
+### isAppleOS
+
+Return true if platform is MacOS.
+
+_Parameters_
+
+-   _\_window_ `Window?`: window object by default; used for DI testing.
+
+_Returns_
+
+-   `boolean`: True if MacOS; false otherwise.
+
 ### isKeyboardEvent
 
 An object that contains functions to check if a keyboard event matches a

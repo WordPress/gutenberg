@@ -15,12 +15,12 @@ let _decodeTextArea;
  * @return {string} The decoded string.
  */
 export function decodeEntities( html ) {
-	// not a string, or no entities to decode
+	// Not a string, or no entities to decode.
 	if ( 'string' !== typeof html || -1 === html.indexOf( '&' ) ) {
 		return html;
 	}
 
-	// create a textarea for decoding entities, that we can reuse
+	// Create a textarea for decoding entities, that we can reuse.
 	if ( undefined === _decodeTextArea ) {
 		if (
 			document.implementation &&

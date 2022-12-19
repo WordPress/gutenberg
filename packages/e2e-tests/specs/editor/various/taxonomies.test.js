@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { random } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -18,6 +13,12 @@ import {
  */
 const TAG_TOKEN_SELECTOR =
 	'.components-form-token-field__token-text span:not(.components-visually-hidden)';
+
+function generateRandomNumber() {
+	// Using `Math.random()` directly is fine in this testing context.
+	// eslint-disable-next-line no-restricted-syntax
+	return Math.round( 1 + Math.random() * ( Number.MAX_SAFE_INTEGER - 1 ) );
+}
 
 describe( 'Taxonomies', () => {
 	const canCreatTermInTaxonomy = ( taxonomy ) => {
@@ -152,7 +153,7 @@ describe( 'Taxonomies', () => {
 		// Click the tag input field.
 		await tagInput.click();
 
-		const tagName = "tag'-" + random( 1, Number.MAX_SAFE_INTEGER );
+		const tagName = "tag'-" + generateRandomNumber();
 
 		// Type the category name in the field.
 		await tagInput.type( tagName );
@@ -200,7 +201,7 @@ describe( 'Taxonomies', () => {
 			return;
 		}
 
-		// At the start there are no tag tokens
+		// At the start there are no tag tokens.
 		expect( await page.$$( TAG_TOKEN_SELECTOR ) ).toHaveLength( 0 );
 
 		const tagsPanel = await findSidebarPanelWithTitle( 'Tags' );
@@ -211,7 +212,7 @@ describe( 'Taxonomies', () => {
 		// Click the tag input field.
 		await tagInput.click();
 
-		const tagName = 'tag-' + random( 1, Number.MAX_SAFE_INTEGER );
+		const tagName = 'tag-' + generateRandomNumber();
 
 		// Type the category name in the field.
 		await tagInput.type( tagName );

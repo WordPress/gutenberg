@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
 /**
  * Internal dependencies
@@ -15,33 +15,40 @@ export type FlexDirection = ResponsiveCSSValue<
 
 export type FlexProps = {
 	/**
-	 * Aligns children using CSS Flexbox `align-items`. Vertically aligns content if the `direction` is `row`, or horizontally aligns content if the `direction` is `column`.
-	 *
-	 * In the example below, `flex-start` will align the children content to the top.
+	 * Aligns children using CSS Flexbox `align-items`. Vertically aligns
+	 * content if the `direction` is `row`, or horizontally aligns content if
+	 * the `direction` is `column`.
 	 *
 	 * @default 'center'
 	 */
 	align?: CSSProperties[ 'alignItems' ];
 	/**
-	 * The direction flow of the children content can be adjusted with `direction`. `column` will align children vertically and `row` will align children horizontally.
+	 * The direction flow of the children content can be adjusted with
+	 * `direction`. `column` will align children vertically and `row` will align
+	 * children horizontally.
 	 *
 	 * @default 'row'
 	 */
 	direction?: FlexDirection;
 	/**
-	 * Expands to the maximum available width (if horizontal) or height (if vertical).
+	 * Expands to the maximum available width (if horizontal) or height (if
+	 * vertical).
 	 *
 	 * @default true
 	 */
 	expanded?: boolean;
 	/**
-	 * Spacing in between each child can be adjusted by using `gap`. The value of `gap` works as a multiplier to the library's grid system (base of `4px`).
+	 * Spacing in between each child can be adjusted by using `gap`.
+	 *
+	 * Can either be a number (which will act as a multiplier to the library's
+	 * grid system base of 4px), or a literal CSS value string.
 	 *
 	 * @default 2
 	 */
 	gap?: SpaceInput;
 	/**
-	 * Horizontally aligns content if the `direction` is `row`, or vertically aligns content if the `direction` is `column`.
+	 * Horizontally aligns content if the `direction` is `row`, or vertically
+	 * aligns content if the `direction` is `column`.
 	 *
 	 * @default 'space-between'
 	 */
@@ -55,7 +62,7 @@ export type FlexProps = {
 	/**
 	 * The children elements.
 	 */
-	children: React.ReactNode;
+	children: ReactNode;
 	/**
 	 * @deprecated
 	 */
@@ -76,7 +83,7 @@ export type FlexItemProps = {
 	/**
 	 * The children elements.
 	 */
-	children: React.ReactNode;
+	children?: ReactNode;
 };
 
 export type FlexBlockProps = Omit< FlexItemProps, 'isBlock' >;

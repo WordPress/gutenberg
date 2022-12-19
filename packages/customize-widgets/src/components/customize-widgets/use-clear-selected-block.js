@@ -22,9 +22,8 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * @param {Object} popoverRef     The ref object of the popover node container.
  */
 export default function useClearSelectedBlock( sidebarControl, popoverRef ) {
-	const { hasSelectedBlock, hasMultiSelection } = useSelect(
-		blockEditorStore
-	);
+	const { hasSelectedBlock, hasMultiSelection } =
+		useSelect( blockEditorStore );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 
 	useEffect( () => {
