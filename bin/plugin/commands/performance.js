@@ -36,13 +36,13 @@ const config = require( '../config' );
  * @property {number[]} loaded               Represents the time when the load event of the current document is completed.
  * @property {number[]} firstContentfulPaint Represents the time when the browser first renders any text or media.
  * @property {number[]} firstBlock           Represents the time when Puppeteer first sees a block selector in the DOM.
- * @property {number[]} type                 Average type time.
- * @property {number[]} typeContainer        Average type time within a container.
- * @property {number[]} focus                Average block selection time.
- * @property {number[]} inserterOpen         Average time to open global inserter.
- * @property {number[]} inserterSearch       Average time to search the inserter.
- * @property {number[]} inserterHover        Average time to move mouse between two block item in the inserter.
- * @property {number[]} listViewOpen         Average time to open listView
+ * @property {number[]} type                 Median type time.
+ * @property {number[]} typeContainer        Median type time within a container.
+ * @property {number[]} focus                Median block selection time.
+ * @property {number[]} inserterOpen         Median time to open global inserter.
+ * @property {number[]} inserterSearch       Median time to search the inserter.
+ * @property {number[]} inserterHover        Median time to move mouse between two block item in the inserter.
+ * @property {number[]} listViewOpen         Median time to open listView
  */
 
 /**
@@ -54,39 +54,28 @@ const config = require( '../config' );
  * @property {number=} loaded               Represents the time when the load event of the current document is completed.
  * @property {number=} firstContentfulPaint Represents the time when the browser first renders any text or media.
  * @property {number=} firstBlock           Represents the time when Puppeteer first sees a block selector in the DOM.
- * @property {number=} type                 Average type time.
+ * @property {number=} type                 Median type time.
  * @property {number=} minType              Minimum type time.
  * @property {number=} maxType              Maximum type time.
- * @property {number=} typeContainer        Average type time within a container.
+ * @property {number=} typeContainer        Median type time within a container.
  * @property {number=} minTypeContainer     Minimum type time within a container.
  * @property {number=} maxTypeContainer     Maximum type time within a container.
- * @property {number=} focus                Average block selection time.
+ * @property {number=} focus                Median block selection time.
  * @property {number=} minFocus             Min block selection time.
  * @property {number=} maxFocus             Max block selection time.
- * @property {number=} inserterOpen         Average time to open global inserter.
+ * @property {number=} inserterOpen         Median time to open global inserter.
  * @property {number=} minInserterOpen      Min time to open global inserter.
  * @property {number=} maxInserterOpen      Max time to open global inserter.
- * @property {number=} inserterSearch       Average time to open global inserter.
+ * @property {number=} inserterSearch       Median time to open global inserter.
  * @property {number=} minInserterSearch    Min time to open global inserter.
  * @property {number=} maxInserterSearch    Max time to open global inserter.
- * @property {number=} inserterHover        Average time to move mouse between two block item in the inserter.
+ * @property {number=} inserterHover        Median time to move mouse between two block item in the inserter.
  * @property {number=} minInserterHover     Min time to move mouse between two block item in the inserter.
  * @property {number=} maxInserterHover     Max time to move mouse between two block item in the inserter.
- * @property {number=} listViewOpen         Average time to open list view.
+ * @property {number=} listViewOpen         Median time to open list view.
  * @property {number=} minListViewOpen      Min time to open list view.
  * @property {number=} maxListViewOpen      Max time to open list view.
  */
-
-/**
- * Computes the average number from an array numbers.
- *
- * @param {number[]} array
- *
- * @return {number} Average.
- */
-function average( array ) {
-	return array.reduce( ( a, b ) => a + b, 0 ) / array.length;
-}
 
 /**
  * Computes the median number from an array numbers.
@@ -124,31 +113,31 @@ function formatTime( number ) {
  */
 function curateResults( results ) {
 	return {
-		serverResponse: average( results.serverResponse ),
-		firstPaint: average( results.firstPaint ),
-		domContentLoaded: average( results.domContentLoaded ),
-		loaded: average( results.loaded ),
-		firstContentfulPaint: average( results.firstContentfulPaint ),
-		firstBlock: average( results.firstBlock ),
-		type: average( results.type ),
+		serverResponse: median( results.serverResponse ),
+		firstPaint: median( results.firstPaint ),
+		domContentLoaded: median( results.domContentLoaded ),
+		loaded: median( results.loaded ),
+		firstContentfulPaint: median( results.firstContentfulPaint ),
+		firstBlock: median( results.firstBlock ),
+		type: median( results.type ),
 		minType: Math.min( ...results.type ),
 		maxType: Math.max( ...results.type ),
-		typeContainer: average( results.typeContainer ),
+		typeContainer: median( results.typeContainer ),
 		minTypeContainer: Math.min( ...results.typeContainer ),
 		maxTypeContainer: Math.max( ...results.typeContainer ),
-		focus: average( results.focus ),
+		focus: median( results.focus ),
 		minFocus: Math.min( ...results.focus ),
 		maxFocus: Math.max( ...results.focus ),
-		inserterOpen: average( results.inserterOpen ),
+		inserterOpen: median( results.inserterOpen ),
 		minInserterOpen: Math.min( ...results.inserterOpen ),
 		maxInserterOpen: Math.max( ...results.inserterOpen ),
-		inserterSearch: average( results.inserterSearch ),
+		inserterSearch: median( results.inserterSearch ),
 		minInserterSearch: Math.min( ...results.inserterSearch ),
 		maxInserterSearch: Math.max( ...results.inserterSearch ),
-		inserterHover: average( results.inserterHover ),
+		inserterHover: median( results.inserterHover ),
 		minInserterHover: Math.min( ...results.inserterHover ),
 		maxInserterHover: Math.max( ...results.inserterHover ),
-		listViewOpen: average( results.listViewOpen ),
+		listViewOpen: median( results.listViewOpen ),
 		minListViewOpen: Math.min( ...results.listViewOpen ),
 		maxListViewOpen: Math.max( ...results.listViewOpen ),
 	};

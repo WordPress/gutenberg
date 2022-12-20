@@ -5,13 +5,24 @@ const { readFileSync, existsSync } = require( 'fs' );
 const path = require( 'path' );
 const chalk = require( 'chalk' );
 
-function average( array ) {
-	return array.reduce( ( a, b ) => a + b ) / array.length;
-}
-
 function round( number, decimalPlaces = 2 ) {
 	const factor = Math.pow( 10, decimalPlaces );
 	return Math.round( number * factor ) / factor;
+}
+
+/**
+ * Computes the median number from an array numbers.
+ *
+ * @param {number[]} array
+ *
+ * @return {number} Median.
+ */
+function median( array ) {
+	const mid = Math.floor( array.length / 2 ),
+		numbers = [ ...array ].sort( ( a, b ) => a - b );
+	return array.length % 2 !== 0
+		? numbers[ mid ]
+		: ( numbers[ mid - 1 ] + numbers[ mid ] ) / 2;
 }
 
 const title = chalk.bold;
@@ -48,21 +59,19 @@ class PerformanceReporter {
 			// eslint-disable-next-line no-console
 			console.log( `
 ${ title( 'Loading Time:' ) }
-Average time to server response (subtracted from client side metrics): ${ success(
-				round( average( serverResponse ) ) + 'ms'
+Median time to server response (subtracted from client side metrics): ${ success(
+				round( median( serverResponse ) ) + 'ms'
 			) }
-Average time to first paint: ${ success(
-				round( average( firstPaint ) ) + 'ms'
+Median time to first paint: ${ success( round( median( firstPaint ) ) + 'ms' ) }
+Median time to DOM content load: ${ success(
+				round( median( domContentLoaded ) ) + 'ms'
 			) }
-Average time to DOM content load: ${ success(
-				round( average( domContentLoaded ) ) + 'ms'
+Median time to load: ${ success( round( median( loaded ) ) + 'ms' ) }
+Median time to first contentful paint: ${ success(
+				round( median( firstContentfulPaint ) ) + 'ms'
 			) }
-Average time to load: ${ success( round( average( loaded ) ) + 'ms' ) }
-Average time to first contentful paint: ${ success(
-				round( average( firstContentfulPaint ) ) + 'ms'
-			) }
-Average time to first block: ${ success(
-				round( average( firstBlock ) ) + 'ms'
+Median time to first block: ${ success(
+				round( median( firstBlock ) ) + 'ms'
 			) }` );
 		}
 
@@ -70,7 +79,7 @@ Average time to first block: ${ success(
 			// eslint-disable-next-line no-console
 			console.log( `
 ${ title( 'Typing:' ) }
-Average time to type character: ${ success( round( average( type ) ) + 'ms' ) }
+Median time to type character: ${ success( round( median( type ) ) + 'ms' ) }
 Slowest time to type character: ${ success(
 				round( Math.max( ...type ) ) + 'ms'
 			) }
@@ -83,8 +92,8 @@ Fastest time to type character: ${ success(
 			// eslint-disable-next-line no-console
 			console.log( `
 ${ title( 'Typing within a container:' ) }
-Average time to type within a container: ${ success(
-				round( average( typeContainer ) ) + 'ms'
+Median time to type within a container: ${ success(
+				round( median( typeContainer ) ) + 'ms'
 			) }
 Slowest time to type within a container: ${ success(
 				round( Math.max( ...typeContainer ) ) + 'ms'
@@ -98,7 +107,7 @@ Fastest time to type within a container: ${ success(
 			// eslint-disable-next-line no-console
 			console.log( `
 ${ title( 'Block Selection:' ) }
-Average time to select a block: ${ success( round( average( focus ) ) + 'ms' ) }
+Median time to select a block: ${ success( round( median( focus ) ) + 'ms' ) }
 Slowest time to select a block: ${ success(
 				round( Math.max( ...focus ) ) + 'ms'
 			) }
@@ -111,8 +120,8 @@ Fastest time to select a block: ${ success(
 			// eslint-disable-next-line no-console
 			console.log( `
 ${ title( 'Opening List View:' ) }
-Average time to open list view: ${ success(
-				round( average( listViewOpen ) ) + 'ms'
+Median time to open list view: ${ success(
+				round( median( listViewOpen ) ) + 'ms'
 			) }
 Slowest time to open list view: ${ success(
 				round( Math.max( ...listViewOpen ) ) + 'ms'
@@ -126,8 +135,8 @@ Fastest time to open list view: ${ success(
 			// eslint-disable-next-line no-console
 			console.log( `
 ${ title( 'Opening Global Inserter:' ) }
-Average time to open global inserter: ${ success(
-				round( average( inserterOpen ) ) + 'ms'
+Median time to open global inserter: ${ success(
+				round( median( inserterOpen ) ) + 'ms'
 			) }
 Slowest time to open global inserter: ${ success(
 				round( Math.max( ...inserterOpen ) ) + 'ms'
@@ -141,8 +150,8 @@ Fastest time to open global inserter: ${ success(
 			// eslint-disable-next-line no-console
 			console.log( `
 ${ title( 'Inserter Search:' ) }
-Average time to type the inserter search input: ${ success(
-				round( average( inserterSearch ) ) + 'ms'
+Median time to type the inserter search input: ${ success(
+				round( median( inserterSearch ) ) + 'ms'
 			) }
 Slowest time to type the inserter search input: ${ success(
 				round( Math.max( ...inserterSearch ) ) + 'ms'
@@ -156,8 +165,8 @@ Fastest time to type the inserter search input: ${ success(
 			// eslint-disable-next-line no-console
 			console.log( `
 ${ title( 'Inserter Block Item Hover:' ) }
-Average time to move mouse between two block item in the inserter: ${ success(
-				round( average( inserterHover ) ) + 'ms'
+Median time to move mouse between two block item in the inserter: ${ success(
+				round( median( inserterHover ) ) + 'ms'
 			) }
 Slowest time to move mouse between two block item in the inserter: ${ success(
 				round( Math.max( ...inserterHover ) ) + 'ms'
