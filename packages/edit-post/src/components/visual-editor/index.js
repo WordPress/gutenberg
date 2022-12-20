@@ -119,6 +119,7 @@ export default function VisualEditor( { styles } ) {
 		editedPostTemplate = {},
 		wrapperBlockName,
 		wrapperUniqueId,
+		isBlockBasedTheme,
 	} = useSelect( ( select ) => {
 		const {
 			isFeatureActive,
@@ -137,7 +138,8 @@ export default function VisualEditor( { styles } ) {
 			_wrapperBlockName = 'core/post-content';
 		}
 
-		const supportsTemplateMode = getEditorSettings().supportsTemplateMode;
+		const editorSettings = getEditorSettings();
+		const supportsTemplateMode = editorSettings.supportsTemplateMode;
 		const canEditTemplate = select( coreStore ).canUser(
 			'create',
 			'templates'
@@ -155,6 +157,7 @@ export default function VisualEditor( { styles } ) {
 					: undefined,
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
+			isBlockBasedTheme: editorSettings.__unstableIsBlockBasedTheme,
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -336,6 +339,7 @@ export default function VisualEditor( { styles } ) {
 				>
 					<MaybeIframe
 						shouldIframe={
+							( isBlockBasedTheme && ! hasMetaBoxes ) ||
 							isTemplateMode ||
 							deviceType === 'Tablet' ||
 							deviceType === 'Mobile'

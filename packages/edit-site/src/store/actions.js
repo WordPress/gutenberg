@@ -72,9 +72,10 @@ export const setTemplate =
 		}
 
 		dispatch( {
-			type: 'SET_TEMPLATE',
-			templateId,
-			page: { context: { templateSlug } },
+			type: 'SET_EDITED_POST',
+			postType: 'wp_template',
+			id: templateId,
+			context: { templateSlug },
 		} );
 	};
 
@@ -105,9 +106,10 @@ export const addTemplate =
 		}
 
 		dispatch( {
-			type: 'SET_TEMPLATE',
-			templateId: newTemplate.id,
-			page: { context: { templateSlug: newTemplate.slug } },
+			type: 'SET_EDITED_POST',
+			postType: 'wp_template',
+			id: newTemplate.id,
+			context: { templateSlug: newTemplate.slug },
 		} );
 	};
 
@@ -167,21 +169,37 @@ export const removeTemplate =
  */
 export function setTemplatePart( templatePartId ) {
 	return {
-		type: 'SET_TEMPLATE_PART',
-		templatePartId,
+		type: 'SET_EDITED_POST',
+		postType: 'wp_template_part',
+		id: templatePartId,
 	};
 }
 
 /**
- * Action that sets the home template ID to the template ID of the page resolved
- * from a given path.
- *
- * @param {number} homeTemplateId The template ID for the homepage.
+ * @deprecated
  */
-export function setHomeTemplateId( homeTemplateId ) {
+export function setHomeTemplateId() {
+	deprecated( "dispatch( 'core/edit-site' ).setHomeTemplateId", {
+		since: '6.2',
+		version: '6.4',
+	} );
+
 	return {
-		type: 'SET_HOME_TEMPLATE',
-		homeTemplateId,
+		type: 'NOTHING',
+	};
+}
+
+/**
+ * Set's the current block editor context.
+ *
+ * @param {Object} context The context object.
+ *
+ * @return {number} The resolved template ID for the page route.
+ */
+export function setEditedPostContext( context ) {
+	return {
+		type: 'SET_EDITED_POST_CONTEXT',
+		context,
 	};
 }
 
@@ -221,17 +239,13 @@ export const setPage =
 		}
 
 		dispatch( {
-			type: 'SET_PAGE',
-			page: template.slug
-				? {
-						...page,
-						context: {
-							...page.context,
-							templateSlug: template.slug,
-						},
-				  }
-				: page,
-			templateId: template.id,
+			type: 'SET_EDITED_POST',
+			postType: 'wp_template',
+			id: template.id,
+			context: {
+				...page.context,
+				templateSlug: template.slug,
+			},
 		} );
 
 		return template.id;

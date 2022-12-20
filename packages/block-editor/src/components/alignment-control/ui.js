@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { find } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, isRTL } from '@wordpress/i18n';
@@ -46,8 +41,7 @@ function AlignmentUI( {
 		return () => onChange( value === align ? undefined : align );
 	}
 
-	const activeAlignment = find(
-		alignmentControls,
+	const activeAlignment = alignmentControls.find(
 		( control ) => control.align === value
 	);
 

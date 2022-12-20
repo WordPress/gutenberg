@@ -102,11 +102,11 @@ export function isOfTypes( value, types ) {
  * commentAttributes returns the attribute value depending on its source
  * definition of the given attribute key.
  *
- * @param {string}      attributeKey      Attribute key.
- * @param {Object}      attributeSchema   Attribute's schema.
- * @param {Node}        innerDOM          Parsed DOM of block's inner HTML.
- * @param {Object}      commentAttributes Block's comment attributes.
- * @param {string}      innerHTML         Raw HTML from block node's innerHTML property.
+ * @param {string} attributeKey      Attribute key.
+ * @param {Object} attributeSchema   Attribute's schema.
+ * @param {Node}   innerDOM          Parsed DOM of block's inner HTML.
+ * @param {Object} commentAttributes Block's comment attributes.
+ * @param {string} innerHTML         Raw HTML from block node's innerHTML property.
  *
  * @return {*} Attribute value.
  */

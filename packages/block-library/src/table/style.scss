@@ -11,6 +11,14 @@
 		width: 100%;
 	}
 
+	thead {
+		border-bottom: 3px solid;
+	}
+
+	tfoot {
+		border-top: 3px solid;
+	}
+
 	// Match default border style to default style in editor
 	td,
 	th {

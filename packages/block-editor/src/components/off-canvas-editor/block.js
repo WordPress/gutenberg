@@ -42,7 +42,7 @@ import useBlockDisplayInformation from '../use-block-display-information';
 import { useBlockLock } from '../block-lock';
 
 function ListViewBlock( {
-	block,
+	block: { clientId },
 	isDragged,
 	isSelected,
 	isBranchSelected,
@@ -60,7 +60,6 @@ function ListViewBlock( {
 } ) {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
-	const { clientId, attributes } = block;
 
 	const { isLocked, isContentLocked } = useBlockLock( clientId );
 	const forceSelectionContentLock = useSelect(
@@ -87,24 +86,77 @@ function ListViewBlock( {
 		( isSelected &&
 			selectedClientIds[ selectedClientIds.length - 1 ] === clientId );
 
-	const { replaceBlock, toggleBlockHighlight } =
+	const { insertBlock, replaceBlock, toggleBlockHighlight } =
 		useDispatch( blockEditorStore );
 
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const blockName = useSelect(
-		( select ) => select( blockEditorStore ).getBlockName( clientId ),
+	const block = useSelect(
+		( select ) => select( blockEditorStore ).getBlock( clientId ),
 		[ clientId ]
 	);
+
+	// If ListView has experimental features related to the Persistent List View,
+	// only focus the selected list item on mount; otherwise the list would always
+	// try to steal the focus from the editor canvas.
+	useEffect( () => {
+		if ( ! isTreeGridMounted && isSelected ) {
+			cellRef.current.focus();
+		}
+	}, [] );
+
+	const onMouseEnter = useCallback( () => {
+		setIsHovered( true );
+		toggleBlockHighlight( clientId, true );
+	}, [ clientId, setIsHovered, toggleBlockHighlight ] );
+	const onMouseLeave = useCallback( () => {
+		setIsHovered( false );
+		toggleBlockHighlight( clientId, false );
+	}, [ clientId, setIsHovered, toggleBlockHighlight ] );
+
+	const selectEditorBlock = useCallback(
+		( event ) => {
+			selectBlock( event, clientId );
+			event.preventDefault();
+		},
+		[ clientId, selectBlock ]
+	);
+
+	const updateSelection = useCallback(
+		( newClientId ) => {
+			selectBlock( undefined, newClientId );
+		},
+		[ selectBlock ]
+	);
+
+	const { isTreeGridMounted, expand, collapse } = useListViewContext();
+
+	const toggleExpanded = useCallback(
+		( event ) => {
+			// Prevent shift+click from opening link in a new window when toggling.
+			event.preventDefault();
+			event.stopPropagation();
+			if ( isExpanded === true ) {
+				collapse( clientId );
+			} else if ( isExpanded === false ) {
+				expand( clientId );
+			}
+		},
+		[ clientId, expand, collapse, isExpanded ]
+	);
+
+	const instanceId = useInstanceId( ListViewBlock );
+
+	if ( ! block ) {
+		return null;
+	}
 
 	// When a block hides its toolbar it also hides the block settings menu,
 	// since that menu is part of the toolbar in the editor canvas.
 	// List View respects this by also hiding the block settings menu.
-	const showBlockActions = hasBlockSupport(
-		blockName,
-		'__experimentalToolbar',
-		true
-	);
-	const instanceId = useInstanceId( ListViewBlock );
+	const showBlockActions =
+		!! block &&
+		hasBlockSupport( block.name, '__experimentalToolbar', true );
+
 	const descriptionId = `list-view-block-select-button__${ instanceId }`;
 	const blockPositionDescription = getBlockPositionDescription(
 		position,
@@ -143,9 +195,7 @@ function ListViewBlock( {
 		  )
 		: __( 'Edit' );
 
-	const { isTreeGridMounted, expand, collapse } = useListViewContext();
-
-	const isEditable = block.name !== 'core/page-list-item';
+	const isEditable = !! block && block.name !== 'core/page-list-item';
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
 	const moverCellClassName = classnames(
@@ -161,53 +211,6 @@ function ListViewBlock( {
 	const listViewBlockEditClassName = classnames(
 		'block-editor-list-view-block__menu-cell',
 		{ 'is-visible': isHovered || isFirstSelectedBlock }
-	);
-
-	// If ListView has experimental features related to the Persistent List View,
-	// only focus the selected list item on mount; otherwise the list would always
-	// try to steal the focus from the editor canvas.
-	useEffect( () => {
-		if ( ! isTreeGridMounted && isSelected ) {
-			cellRef.current.focus();
-		}
-	}, [] );
-
-	const onMouseEnter = useCallback( () => {
-		setIsHovered( true );
-		toggleBlockHighlight( clientId, true );
-	}, [ clientId, setIsHovered, toggleBlockHighlight ] );
-	const onMouseLeave = useCallback( () => {
-		setIsHovered( false );
-		toggleBlockHighlight( clientId, false );
-	}, [ clientId, setIsHovered, toggleBlockHighlight ] );
-
-	const selectEditorBlock = useCallback(
-		( event ) => {
-			selectBlock( event, clientId );
-			event.preventDefault();
-		},
-		[ clientId, selectBlock ]
-	);
-
-	const updateSelection = useCallback(
-		( newClientId ) => {
-			selectBlock( undefined, newClientId );
-		},
-		[ selectBlock ]
-	);
-
-	const toggleExpanded = useCallback(
-		( event ) => {
-			// Prevent shift+click from opening link in a new window when toggling.
-			event.preventDefault();
-			event.stopPropagation();
-			if ( isExpanded === true ) {
-				collapse( clientId );
-			} else if ( isExpanded === false ) {
-				expand( clientId );
-			}
-		},
-		[ clientId, expand, collapse, isExpanded ]
 	);
 
 	let colSpan;
@@ -325,27 +328,28 @@ function ListViewBlock( {
 
 			{ showBlockActions && (
 				<>
-					<TreeGridCell
-						className={ listViewBlockEditClassName }
-						aria-selected={
-							!! isSelected || forceSelectionContentLock
-						}
-					>
-						{ ( props ) =>
-							isEditable && (
+					{ isEditable && (
+						<TreeGridCell
+							className={ listViewBlockEditClassName }
+							aria-selected={
+								!! isSelected || forceSelectionContentLock
+							}
+						>
+							{ ( props ) => (
 								<BlockEditButton
 									{ ...props }
 									label={ editAriaLabel }
 									clientId={ clientId }
 								/>
-							)
-						}
-					</TreeGridCell>
+							) }
+						</TreeGridCell>
+					) }
 					<TreeGridCell
 						className={ listViewBlockSettingsClassName }
 						aria-selected={
 							!! isSelected || forceSelectionContentLock
 						}
+						colSpan={ isEditable ? 1 : 2 } // When an item is not editable then we don't output the cell for the edit button, so we need to adjust the colspan so that the HTML is valid.
 					>
 						{ ( { ref, tabIndex, onFocus } ) => (
 							<BlockSettingsDropdown
@@ -368,24 +372,38 @@ function ListViewBlock( {
 											const newLink = createBlock(
 												'core/navigation-link'
 											);
-											const newSubmenu = createBlock(
-												'core/navigation-submenu',
-												attributes,
-												block.innerBlocks
-													? [
-															...block.innerBlocks,
-															newLink,
-													  ]
-													: [ newLink ]
-											);
-											replaceBlock(
-												clientId,
-												newSubmenu
-											);
+											if (
+												block.name ===
+												'core/navigation-submenu'
+											) {
+												const updateSelectionOnInsert = false;
+												insertBlock(
+													newLink,
+													block.innerBlocks.length,
+													clientId,
+													updateSelectionOnInsert
+												);
+											} else {
+												// Convert to a submenu if the block currently isn't one.
+												const newSubmenu = createBlock(
+													'core/navigation-submenu',
+													block.attributes,
+													block.innerBlocks
+														? [
+																...block.innerBlocks,
+																newLink,
+														  ]
+														: [ newLink ]
+												);
+												replaceBlock(
+													clientId,
+													newSubmenu
+												);
+											}
 											onClose();
 										} }
 									>
-										{ __( 'Add a submenu item' ) }
+										{ __( 'Add submenu item' ) }
 									</MenuItem>
 								) }
 							</BlockSettingsDropdown>

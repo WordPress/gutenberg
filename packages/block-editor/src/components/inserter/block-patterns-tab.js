@@ -53,10 +53,17 @@ function usePatternsCategories() {
 				)
 			)
 			.sort( ( { name: currentName }, { name: nextName } ) => {
-				if ( ! [ currentName, nextName ].includes( 'featured' ) ) {
+				if (
+					! [ currentName, nextName ].some( ( categoryName ) =>
+						[ 'featured', 'text' ].includes( categoryName )
+					)
+				) {
 					return 0;
 				}
-				return currentName === 'featured' ? -1 : 1;
+				// Move `featured` category to the top and `text` to the bottom.
+				return currentName === 'featured' || nextName === 'text'
+					? -1
+					: 1;
 			} );
 
 		if (
@@ -83,6 +90,7 @@ export function BlockPatternsCategoryDialog( {
 	rootClientId,
 	onInsert,
 	category,
+	showTitlesAsTooltip,
 } ) {
 	const container = useRef();
 
@@ -103,6 +111,7 @@ export function BlockPatternsCategoryDialog( {
 				rootClientId={ rootClientId }
 				onInsert={ onInsert }
 				category={ category }
+				showTitlesAsTooltip={ showTitlesAsTooltip }
 			/>
 		</div>
 	);
@@ -112,6 +121,7 @@ export function BlockPatternsCategoryPanel( {
 	rootClientId,
 	onInsert,
 	category,
+	showTitlesAsTooltip,
 } ) {
 	const [ allPatterns, , onClick ] = usePatternsState(
 		onInsert,
@@ -161,6 +171,7 @@ export function BlockPatternsCategoryPanel( {
 				orientation="vertical"
 				category={ category.label }
 				isDraggable
+				showTitlesAsTooltip={ showTitlesAsTooltip }
 			/>
 		</div>
 	);
@@ -233,6 +244,7 @@ function BlockPatternsTabs( {
 							onInsert={ onInsert }
 							rootClientId={ rootClientId }
 							category={ category }
+							showTitlesAsTooltip={ false }
 						/>
 					) }
 				</MobileTabNavigation>
