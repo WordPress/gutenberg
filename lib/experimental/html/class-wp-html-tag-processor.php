@@ -1413,6 +1413,45 @@ class WP_HTML_Tag_Processor {
 	}
 
 	/**
+	 * Returns parsed attributes matching a given prefix in the currently-opened tag.
+	 *
+	 * Example:
+	 * <code>
+	 *     $p = new WP_HTML_Tag_Processor( '<div data-enabled class="test" data-test-id="14">Test</div>' );
+	 *     $p->next_tag( [ 'class_name' => 'test' ] ) === true;
+	 *     $p->get_attributes_by_prefix( 'data-' ) === array( 'data-enabled' => true, 'data-test-id' => '14' );
+	 *
+	 *     $p->next_tag( [] ) === false;
+	 *     $p->get_attributes_by_prefix( 'data' ) === null;
+	 * </code>
+	 *
+	 * @since 6.2.0
+	 *
+	 * @param string $prefix Prefix of attributes whose value is requested.
+	 * @return array|null Associative array of attribute names and values, or `null` if not at a tag.
+	 *                    Boolean attributes map to `true`.
+	 */
+	function get_attributes_by_prefix( $prefix ) {
+		if ( null === $this->tag_name_starts_at ) {
+			return null;
+		}
+
+		$comparable = strtolower( $prefix );
+		$matches    = array_filter(
+			array_keys( $this->attributes ),
+			function( $attr ) use ( $comparable ) {
+				return str_starts_with( $attr, $comparable );
+			}
+		);
+
+		$results = array();
+		foreach ( $matches as $attr ) {
+			$results[ $attr ] = $this->get_attribute( $attr );
+		}
+		return $results;
+	}
+
+	/**
 	 * Returns the lowercase name of the currently-opened tag.
 	 *
 	 * Example:
