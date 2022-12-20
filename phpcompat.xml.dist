@@ -37,8 +37,8 @@
 
 	<!--
 		Scanning this folder throws too many errors.
-		Currently, Gutenberg relies on the "PHPUnit Tests" CI job to ensure that dependencies are compatible
-		with all supported PHP versions.
+		Currently, Gutenberg relies on the "PHPUnit Tests" CI job to ensure that
+		dependencies are compatible with all supported PHP versions.
 	-->
 	<exclude-pattern>/vendor/*</exclude-pattern>
 </ruleset>
