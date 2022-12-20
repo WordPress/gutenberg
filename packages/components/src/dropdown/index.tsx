@@ -54,7 +54,7 @@ function UnforwardedDropdown(
 	// re-renders when the popover's anchor updates.
 	const [ fallbackPopoverAnchor, setFallbackPopoverAnchor ] =
 		useState< HTMLDivElement | null >( null );
-	const containerRef = useRef< HTMLDivElement | null >( null );
+	const containerRef = useRef< HTMLDivElement >();
 	const [ isOpen, setIsOpen ] = useObservableState( false, onToggle );
 
 	useEffect(
