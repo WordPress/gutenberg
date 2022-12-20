@@ -13,17 +13,15 @@ import { store as coreStore } from '@wordpress/core-data';
 const getExternalLink = ( url, text ) =>
 	`<a href="${ url }" target="_blank" rel="noreferrer noopener">${ text }</a>`;
 
-const getOpenvereLicense = (
-	license,
-	licenseVersion = '', // unknown version.
-	licenseUrl
-) => {
+const getOpenvereLicense = ( license, licenseVersion, licenseUrl ) => {
 	let licenseName = license.trim();
 	// PDM has no abbreviation
 	if ( license !== 'pdm' ) {
 		licenseName = license.toUpperCase().replace( 'SAMPLING', 'Sampling' );
 	}
 	// If version is known, append version to the name.
+	// The license has to have a version to be valid. Only
+	// PDM (public domain mark) doesn't have a version.
 	if ( licenseVersion ) {
 		licenseName += ` ${ licenseVersion }`;
 	}
@@ -54,8 +52,7 @@ const getOpenvereLicense = (
 
 const getOpenverseCaption = ( item ) => {
 	const {
-		/* translators: Openverse default media item title in the block inserter's media list. (ex. 'This work by {creator} is marked with CC0 1.0'). */
-		title = __( 'This work' ),
+		title,
 		foreign_landing_url: foreignLandingUrl,
 		creator,
 		creator_url: creatorUrl,
@@ -63,10 +60,10 @@ const getOpenverseCaption = ( item ) => {
 		license_version: licenseVersion,
 		license_url: licenseUrl,
 	} = item;
-	let _title = decodeEntities( title );
-	if ( !! foreignLandingUrl ) {
-		_title = getExternalLink( foreignLandingUrl, _title );
-	}
+	/* translators: Openverse default media item title in the block inserter's media list. (ex. 'This work by {creator} is marked with CC0 1.0'). */
+	const defaultTitle = __( 'This work' );
+	let _title = title ? decodeEntities( title ) : defaultTitle;
+	_title = getExternalLink( foreignLandingUrl, _title );
 	const fullLicense = getOpenvereLicense(
 		license,
 		licenseVersion,
