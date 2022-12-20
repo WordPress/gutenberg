@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import {
 	getBlockType,
 	getUnregisteredTypeHandlerName,
@@ -19,7 +19,7 @@ import {
 	__experimentalUseNavigator as useNavigator,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMemo, useCallback, useEffect } from '@wordpress/element';
+import { useMemo, useCallback, useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -245,12 +245,10 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			blockType.name === 'core/navigation-submenu' )
 	) {
 		return (
-			<NavigatorProvider initialPath={ `/${ selectedBlockClientId }` }>
-				<NavigationInspector
-					selectedBlockClientId={ selectedBlockClientId }
-					blockName={ blockType.name }
-				/>
-			</NavigatorProvider>
+			<NavigationInspector
+				selectedBlockClientId={ selectedBlockClientId }
+				blockName={ blockType.name }
+			/>
 		);
 	}
 
@@ -339,9 +337,7 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 };
 
 const NavigationInspector = ( { selectedBlockClientId, blockName } ) => {
-	const navigator = useNavigator();
-	const { goTo } = navigator;
-	const { navBlockClientId, childNavBlocks } = useSelect(
+	const { parentNavBlock, childNavBlocks } = useSelect(
 		( select ) => {
 			const {
 				getBlockParentsByBlockName,
@@ -349,15 +345,15 @@ const NavigationInspector = ( { selectedBlockClientId, blockName } ) => {
 				getBlock,
 			} = select( blockEditorStore );
 
-			let _navBlockClientId;
+			let navBlockClientId;
 
 			if ( blockName === 'core/navigation' ) {
-				_navBlockClientId = selectedBlockClientId;
+				navBlockClientId = selectedBlockClientId;
 			} else if (
 				blockName === 'core/navigation-link' ||
 				blockName === 'core/navigation-submenu'
 			) {
-				_navBlockClientId = getBlockParentsByBlockName(
+				navBlockClientId = getBlockParentsByBlockName(
 					selectedBlockClientId,
 					'core/navigation',
 					true
@@ -365,11 +361,11 @@ const NavigationInspector = ( { selectedBlockClientId, blockName } ) => {
 			}
 
 			const _childClientIds = getClientIdsOfDescendants( [
-				_navBlockClientId,
+				navBlockClientId,
 			] );
 
 			return {
-				navBlockClientId: _navBlockClientId,
+				parentNavBlock: getBlock( navBlockClientId ),
 				childNavBlocks: _childClientIds.map( ( id ) => {
 					return getBlock( id );
 				} ),
@@ -378,25 +374,94 @@ const NavigationInspector = ( { selectedBlockClientId, blockName } ) => {
 		[ selectedBlockClientId, blockName ]
 	);
 
+	return (
+		<NavigatorProvider
+			initialPath={ selectedBlockClientId }
+			initialAnimationSettings={ { initial: false } }
+		>
+			<NavigationInspectorScreens
+				selectedBlockClientId={ selectedBlockClientId }
+				parentNavBlock={ parentNavBlock }
+				childNavBlocks={ childNavBlocks }
+			/>
+		</NavigatorProvider>
+	);
+};
+
+const NavigationInspectorScreens = ( {
+	selectedBlockClientId,
+	parentNavBlock,
+	childNavBlocks,
+} ) => {
+	const { goTo } = useNavigator();
+	const previousDepth = useRef( -1 );
+	const { navBlockTree } = useSelect(
+		( select ) => {
+			const { __unstableGetClientIdWithClientIdsTree } =
+				select( blockEditorStore );
+
+			return {
+				navBlockTree: __unstableGetClientIdWithClientIdsTree(
+					parentNavBlock.clientId
+				),
+			};
+		},
+		[ selectedBlockClientId ]
+	);
+
+	const getBlockDepth = ( targetClientId, currentDepth, rootBlock ) => {
+		if ( targetClientId === rootBlock.clientId ) {
+			return currentDepth;
+		}
+		for ( let i = 0; i < rootBlock.innerBlocks.length; i++ ) {
+			const newDepth = getBlockDepth(
+				targetClientId,
+				currentDepth + 1,
+				rootBlock.innerBlocks[ i ]
+			);
+			if ( newDepth > currentDepth ) {
+				return newDepth;
+			}
+		}
+	};
+
 	useEffect( () => {
-		goTo( `/${ selectedBlockClientId }` );
+		const currentDepth = getBlockDepth(
+			selectedBlockClientId,
+			0,
+			navBlockTree
+		);
+		const animationSettings = {
+			initial: false,
+		};
+
+		if ( currentDepth === 0 && previousDepth.current > 0 ) {
+			animationSettings.initial = {
+				x: isRTL() ? 50 : -50,
+				opacity: 0,
+			};
+		} else if ( currentDepth > 0 && previousDepth.current === 0 ) {
+			animationSettings.initial = {
+				x: isRTL() ? -50 : 50,
+				opacity: 0,
+			};
+		}
+		previousDepth.current = currentDepth;
+		goTo( selectedBlockClientId, animationSettings );
 	}, [ selectedBlockClientId ] );
 
 	return (
 		<>
-			<NavigatorScreen
-				path={ `/${ navBlockClientId }` }
-				key={ navBlockClientId }
-			>
+			<NavigatorScreen path={ parentNavBlock.clientId }>
 				<BlockInspectorSingleBlock
-					clientId={ navBlockClientId }
-					blockName={ 'core/navigation' }
+					clientId={ parentNavBlock.clientId }
+					blockName={ parentNavBlock.name }
 				/>
 			</NavigatorScreen>
 			{ childNavBlocks.map( ( childNavBlock ) => {
 				return (
 					<NavigatorScreen
-						path={ `/${ childNavBlock.clientId }` }
+						path={ childNavBlock.clientId }
 						key={ childNavBlock.clientId }
 					>
 						<BlockInspectorSingleBlock

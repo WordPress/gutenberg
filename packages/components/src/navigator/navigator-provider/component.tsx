@@ -30,8 +30,13 @@ function UnconnectedNavigatorProvider(
 	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
-	const { initialPath, children, className, ...otherProps } =
-		useContextSystem( props, 'NavigatorProvider' );
+	const {
+		initialPath,
+		initialAnimationSettings,
+		children,
+		className,
+		...otherProps
+	} = useContextSystem( props, 'NavigatorProvider' );
 
 	const [ locationHistory, setLocationHistory ] = useState<
 		NavigatorLocation[]
@@ -41,8 +46,13 @@ function UnconnectedNavigatorProvider(
 		},
 	] );
 
+	const [ animationSettings, setAnimationSettings ] = useState(
+		initialAnimationSettings
+	);
+
 	const goTo: NavigatorContextType[ 'goTo' ] = useCallback(
-		( path, options = {} ) => {
+		( path, animationOverrideSettings = {}, options = {} ) => {
+			setAnimationSettings( animationOverrideSettings );
 			setLocationHistory( ( prevLocationHistory ) => [
 				...prevLocationHistory,
 				{
@@ -56,21 +66,27 @@ function UnconnectedNavigatorProvider(
 		[]
 	);
 
-	const goBack: NavigatorContextType[ 'goBack' ] = useCallback( () => {
-		setLocationHistory( ( prevLocationHistory ) => {
-			if ( prevLocationHistory.length <= 1 ) {
-				return prevLocationHistory;
-			}
-			return [
-				...prevLocationHistory.slice( 0, -2 ),
-				{
-					...prevLocationHistory[ prevLocationHistory.length - 2 ],
-					isBack: true,
-					hasRestoredFocus: false,
-				},
-			];
-		} );
-	}, [] );
+	const goBack: NavigatorContextType[ 'goBack' ] = useCallback(
+		( animationOverrideSettings = {} ) => {
+			setAnimationSettings( animationOverrideSettings );
+			setLocationHistory( ( prevLocationHistory ) => {
+				if ( prevLocationHistory.length <= 1 ) {
+					return prevLocationHistory;
+				}
+				return [
+					...prevLocationHistory.slice( 0, -2 ),
+					{
+						...prevLocationHistory[
+							prevLocationHistory.length - 2
+						],
+						isBack: true,
+						hasRestoredFocus: false,
+					},
+				];
+			} );
+		},
+		[]
+	);
 
 	const navigatorContextValue: NavigatorContextType = useMemo(
 		() => ( {
@@ -80,8 +96,9 @@ function UnconnectedNavigatorProvider(
 			},
 			goTo,
 			goBack,
+			animationSettings,
 		} ),
-		[ locationHistory, goTo, goBack ]
+		[ locationHistory, goTo, goBack, animationSettings ]
 	);
 
 	const cx = useCx();

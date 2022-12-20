@@ -18,6 +18,7 @@ export type NavigatorContext = {
 	location: NavigatorLocation;
 	goTo: ( path: string, options?: NavigateOptions ) => void;
 	goBack: () => void;
+	animationSettings?: {};
 };
 
 // Returned by the `useNavigator` hook.
@@ -28,6 +29,7 @@ export type NavigatorProviderProps = {
 	 * The initial active path.
 	 */
 	initialPath: string;
+	initialAnimationSettings?: object;
 	/**
 	 * The children elements.
 	 */

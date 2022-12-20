@@ -54,7 +54,7 @@ function UnconnectedNavigatorScreen(
 	);
 
 	const prefersReducedMotion = useReducedMotion();
-	const { location } = useContext( NavigatorContext );
+	const { location, animationSettings } = useContext( NavigatorContext );
 	const isMatch = location.path === escapeAttribute( path );
 	const wrapperRef = useRef< HTMLDivElement >( null );
 
@@ -185,6 +185,7 @@ function UnconnectedNavigatorScreen(
 		animate,
 		exit,
 		initial,
+		...animationSettings,
 	};
 
 	return (
