@@ -10,14 +10,19 @@ import DimensionsPanel, { useHasDimensionsPanel } from './dimensions-panel';
 import ScreenHeader from './header';
 import BlockPreviewPanel from './block-preview-panel';
 
-function ScreenLayout( { name } ) {
+function ScreenLayout( { name, variationPath = '' } ) {
 	const hasDimensionsPanel = useHasDimensionsPanel( name );
 
 	return (
 		<>
 			<ScreenHeader title={ __( 'Layout' ) } />
 			<BlockPreviewPanel name={ name } />
-			{ hasDimensionsPanel && <DimensionsPanel name={ name } /> }
+			{ hasDimensionsPanel && (
+				<DimensionsPanel
+					name={ name }
+					variationPath={ variationPath }
+				/>
+			) }
 		</>
 	);
 }

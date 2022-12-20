@@ -166,7 +166,7 @@ function ContextScreens( { name, parentMenu = '' } ) {
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/layout' }>
-				<ScreenLayout name={ name } />
+				<ScreenLayout name={ name } variationPath={ variationPath } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/variations' }>
