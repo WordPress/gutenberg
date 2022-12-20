@@ -47,7 +47,7 @@ function UnforwardedDropdown(
 		onClose,
 		onToggle,
 		style,
-	}: WordPressComponentProps< DropdownProps, 'div' >,
+	}: DropdownProps,
 	forwardedRef: ForwardedRef< any >
 ) {
 	// Use internal state instead of a ref to make sure that the component
