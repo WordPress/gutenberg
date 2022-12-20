@@ -77,10 +77,9 @@ export type DropdownProps = {
 	 * in the Dropdown component,
 	 * e.g.: the ability to have the popover without an arrow.
 	 */
-	popoverProps?: WordPressComponentProps<
-		Omit< PopoverProps, 'children' >,
-		'div',
-		false
+	popoverProps?: Omit<
+		ComponentPropsWithoutRef< typeof Popover >,
+		'children'
 	>;
 	/**
 	 * The direction in which the popover should open
