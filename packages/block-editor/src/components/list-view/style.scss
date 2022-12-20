@@ -178,7 +178,7 @@
 	.block-editor-block-icon {
 		align-self: flex-start;
 		margin-right: $grid-unit-10;
-		width: $icon-size;
+		flex: 0 0 $icon-size;
 	}
 
 	.block-editor-list-view-block__menu-cell,
