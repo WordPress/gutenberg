@@ -152,6 +152,18 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @covers WP_HTML_Tag_Processor::get_attribute_names
+	 */
+	public function test_get_attribute_names() {
+		$p = new WP_HTML_Tag_Processor( '<div enabled class="test" data-test-id="14">Test</div>' );
+		$p->next_tag();
+		$this->assertSame(
+			array( 'enabled', 'class', 'data-test-id' ),
+			$p->get_attribute_names()
+		);
+	}
+
+	/**
 	 * @ticket 56299
 	 *
 	 * @covers next_tag

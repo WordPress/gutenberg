@@ -1413,6 +1413,32 @@ class WP_HTML_Tag_Processor {
 	}
 
 	/**
+	 * Returns the names of all attributes in the currently-opened tag.
+	 *
+	 * Example:
+	 * <code>
+	 *     $p = new WP_HTML_Tag_Processor( '<div enabled class="test" data-test-id="14">Test</div>' );
+	 *     $p->next_tag( [ 'class_name' => 'test' ] ) === true;
+	 *     $p->get_attribute_names() === array( 'enabled', 'class', 'data-test-id' );
+	 *
+	 *     $p->next_tag( [] ) === false;
+	 *     $p->get_attribute_names() === null;
+	 * </code>
+	 *
+	 * @since 6.2.0
+	 *
+	 * @param string $prefix Prefix of attributes whose value is requested.
+	 * @return array|null List of attribute names, or `null` if not at a tag.
+	 */
+	function get_attribute_names() {
+		if ( null === $this->tag_name_starts_at ) {
+			return null;
+		}
+
+		return array_keys( $this->attributes );
+	}
+
+	/**
 	 * Returns the lowercase name of the currently-opened tag.
 	 *
 	 * Example:
