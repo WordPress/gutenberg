@@ -2710,6 +2710,10 @@ class WP_Theme_JSON_Gutenberg {
 			if ( empty( $input ) ) {
 				continue;
 			}
+			if ( is_array( $input ) && 'css' === key( $input ) ) {
+				$output = safecss_filter_attr( $input['css'] ); // need to work out what filter to use as safecss_filter_attr doesn't work.
+				continue;
+			}
 
 			$output = static::remove_insecure_styles( $input );
 
