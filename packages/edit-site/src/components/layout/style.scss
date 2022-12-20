@@ -190,4 +190,8 @@
 
 .edit-site-layout__resize-handle-container {
 	margin: auto;
+
+	.resizable-editor__drag-handle {
+		z-index: -1;
+	}
 }
