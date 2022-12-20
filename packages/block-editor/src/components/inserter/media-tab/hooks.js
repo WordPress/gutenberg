@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useState, useRef } from '@wordpress/element';
+import { useEffect, useState, useRef, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -70,20 +70,50 @@ export function useMediaResults( category, query = {} ) {
 	return { mediaList, isLoading };
 }
 
+function useInserterMediaCategories() {
+	const { inserterMediaCategories, allowedMimeTypes } = useSelect(
+		( select ) => {
+			const { getSettings } = select( blockEditorStore );
+			const {
+				__unstableInserterMediaCategories,
+				allowedMimeTypes: _allowedMimeTypes,
+			} = getSettings();
+			return {
+				inserterMediaCategories: __unstableInserterMediaCategories,
+				allowedMimeTypes: _allowedMimeTypes,
+			};
+		},
+		[]
+	);
+	// The allowed `mime_types` can be altered by `upload_mimes` filter and restrict
+	// some of them. In this case we shouldn't add the category to the available media
+	// categories list in the inserter.
+	const allowedCategories = useMemo( () => {
+		if ( ! inserterMediaCategories || ! allowedMimeTypes ) {
+			return;
+		}
+		return inserterMediaCategories.filter( ( category ) => {
+			// When a category has set `hasAvailableMedia` to `true`, means is an
+			// external source. In this case we don't need to check for allowed mime types,
+			// as they are used for restricting uploads for this media type and not for
+			// inserting media from external sources.
+			if ( category.hasAvailableMedia ) {
+				return true;
+			}
+			return Object.values( allowedMimeTypes ).some( ( mimeType ) =>
+				mimeType.startsWith( `${ category.mediaType }/` )
+			);
+		} );
+	}, [ inserterMediaCategories, allowedMimeTypes ] );
+	return allowedCategories;
+}
+
 export function useMediaCategories( rootClientId ) {
 	const [ categories, setCategories ] = useState( [] );
-	const {
-		canInsertImage,
-		canInsertVideo,
-		canInsertAudio,
-		inserterMediaCategories,
-	} = useSelect(
+	const { canInsertImage, canInsertVideo, canInsertAudio } = useSelect(
 		( select ) => {
-			const { canInsertBlockType, getSettings } =
-				select( blockEditorStore );
+			const { canInsertBlockType } = select( blockEditorStore );
 			return {
-				inserterMediaCategories:
-					getSettings().__unstableInserterMediaCategories,
 				canInsertImage: canInsertBlockType(
 					'core/image',
 					rootClientId
@@ -100,6 +130,7 @@ export function useMediaCategories( rootClientId ) {
 		},
 		[ rootClientId ]
 	);
+	const inserterMediaCategories = useInserterMediaCategories();
 	useEffect( () => {
 		( async () => {
 			const _categories = [];

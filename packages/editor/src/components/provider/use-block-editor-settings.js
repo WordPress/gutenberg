@@ -143,6 +143,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 						'alignWide',
 						'allowedBlockTypes',
 						'blockInspectorTabs',
+						'allowedMimeTypes',
 						'bodyPlaceholder',
 						'canLockBlocks',
 						'codeEditingEnabled',
