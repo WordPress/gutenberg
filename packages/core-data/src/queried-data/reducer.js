@@ -85,7 +85,13 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 function removeEntitiesById( entities, ids ) {
 	return Object.fromEntries(
 		Object.entries( entities ).filter(
-			( [ id ] ) => ! ids.some( ( itemId ) => +itemId === +id )
+			( [ id ] ) =>
+				! ids.some( ( itemId ) => {
+					if ( Number.isInteger( itemId ) ) {
+						return itemId === +id;
+					}
+					return itemId === id;
+				} )
 		)
 	);
 }
