@@ -68,6 +68,10 @@
 	// Active.
 	&.is-active::after {
 		height: calc(1 * var(--wp-admin-border-width-focus));
+
+		// Windows high contrast mode.
+		outline: 2px solid transparent;
+		outline-offset: -1px;
 	}
 
 	// Focus.
