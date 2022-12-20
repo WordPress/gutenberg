@@ -119,7 +119,7 @@ Settings related to typography.
 | customFontSize | boolean | true |  |
 | fontStyle | boolean | true |  |
 | fontWeight | boolean | true |  |
-| fluid | boolean |  |  |
+| fluid | undefined | false |  |
 | letterSpacing | boolean | true |  |
 | lineHeight | boolean | false |  |
 | textDecoration | boolean | true |  |
@@ -146,7 +146,7 @@ Border styles.
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
 | color | string |  |
-| radius | undefined |  |
+| radius | string, object |  |
 | style | string |  |
 | width | string |  |
 | top | object | color, style, width |

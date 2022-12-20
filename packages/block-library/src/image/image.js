@@ -413,6 +413,7 @@ export default function Image( {
 				<PanelBody title={ __( 'Settings' ) }>
 					{ ! multiImageSelection && (
 						<TextareaControl
+							__nextHasNoMarginBottom
 							label={ __( 'Alt text (alternative text)' ) }
 							value={ alt }
 							onChange={ updateAlt }
@@ -611,6 +612,7 @@ export default function Image( {
 						height: parseInt( currentHeight + delta.height, 10 ),
 					} );
 				} }
+				resizeRatio={ align === 'center' ? 2 : 1 }
 			>
 				{ img }
 			</ResizableBox>

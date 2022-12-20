@@ -32,7 +32,7 @@ export default function SidebarNavigationScreenMain() {
 		<SidebarNavigationScreen
 			path="/"
 			title={
-				<HStack style={ { minHeight: 36 } }>
+				<HStack justify="space-between" style={ { minHeight: 36 } }>
 					<div>{ __( 'Design' ) }</div>
 					{ ! isMobileViewport && isEditorPage && (
 						<Button

@@ -146,18 +146,13 @@ export const getSettings = createSelector(
 );
 
 /**
- * Returns the current home template ID.
- *
- * @param {Object} state Global application state.
- *
- * @return {number?} Home template ID.
+ * @deprecated
  */
-export function getHomeTemplateId( state ) {
-	return state.homeTemplateId;
-}
-
-function getCurrentEditedPost( state ) {
-	return state.editedPost;
+export function getHomeTemplateId() {
+	deprecated( "select( 'core/edit-site' ).getHomeTemplateId", {
+		since: '6.2',
+		version: '6.4',
+	} );
 }
 
 /**
@@ -168,7 +163,7 @@ function getCurrentEditedPost( state ) {
  * @return {TemplateType?} Template type.
  */
 export function getEditedPostType( state ) {
-	return getCurrentEditedPost( state ).type;
+	return state.editedPost.postType;
 }
 
 /**
@@ -179,18 +174,31 @@ export function getEditedPostType( state ) {
  * @return {string?} Post ID.
  */
 export function getEditedPostId( state ) {
-	return getCurrentEditedPost( state ).id;
+	return state.editedPost.id;
+}
+
+/**
+ * Returns the edited post's context object.
+ *
+ * @deprecated
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} Page.
+ */
+export function getEditedPostContext( state ) {
+	return state.editedPost.context;
 }
 
 /**
  * Returns the current page object.
  *
+ * @deprecated
  * @param {Object} state Global application state.
  *
  * @return {Object} Page.
  */
 export function getPage( state ) {
-	return getCurrentEditedPost( state ).page;
+	return { context: state.editedPost.context };
 }
 
 /**

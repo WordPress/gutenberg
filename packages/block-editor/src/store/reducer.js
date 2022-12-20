@@ -2,7 +2,6 @@
  * External dependencies
  */
 import fastDeepEqual from 'fast-deep-equal/es6';
-import { omit, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -113,7 +112,10 @@ function getFlattenedClientIds( blocks ) {
  * @return {Array} Flattened block attributes object.
  */
 function getFlattenedBlocksWithoutAttributes( blocks ) {
-	return flattenBlocks( blocks, ( block ) => omit( block, 'attributes' ) );
+	return flattenBlocks( blocks, ( block ) => {
+		const { attributes, ...restBlock } = block;
+		return restBlock;
+	} );
 }
 
 /**
@@ -782,8 +784,8 @@ export const blocks = pipe(
 				}
 
 				// Do nothing if only attributes change.
-				const changes = omit( action.updates, 'attributes' );
-				if ( isEmpty( changes ) ) {
+				const { attributes, ...changes } = action.updates;
+				if ( Object.values( changes ).length === 0 ) {
 					return state;
 				}
 
@@ -1641,13 +1643,18 @@ export const blockListSettings = ( state = {}, action ) => {
 		// should correct the state.
 		case 'REPLACE_BLOCKS':
 		case 'REMOVE_BLOCKS': {
-			return omit( state, action.clientIds );
+			return Object.fromEntries(
+				Object.entries( state ).filter(
+					( [ id ] ) => ! action.clientIds.includes( id )
+				)
+			);
 		}
 		case 'UPDATE_BLOCK_LIST_SETTINGS': {
 			const { clientId } = action;
 			if ( ! action.settings ) {
 				if ( state.hasOwnProperty( clientId ) ) {
-					return omit( state, clientId );
+					const { [ clientId ]: removedBlock, ...restBlocks } = state;
+					return restBlocks;
 				}
 
 				return state;

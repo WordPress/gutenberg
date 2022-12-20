@@ -27,7 +27,7 @@ import {
 	getColorClassName,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
-import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { link as linkIcon, removeSubmenu } from '@wordpress/icons';
 import { useResourcePermissions } from '@wordpress/core-data';
@@ -43,7 +43,11 @@ import { name } from './block.json';
 import { LinkUI } from '../navigation-link/link-ui';
 import { updateAttributes } from '../navigation-link/update-attributes';
 
-const ALLOWED_BLOCKS = [ 'core/navigation-link', 'core/navigation-submenu' ];
+const ALLOWED_BLOCKS = [
+	'core/navigation-link',
+	'core/navigation-submenu',
+	'core/page-list',
+];
 
 const DEFAULT_BLOCK = {
 	name: 'core/navigation-link',
@@ -434,7 +438,7 @@ export default function NavigationSubmenuEdit( {
 		! selectedBlockHasChildren || onlyDescendantIsEmptyLink;
 
 	return (
-		<Fragment>
+		<>
 			<BlockControls>
 				<ToolbarGroup>
 					{ ! openSubmenusOnClick && (
@@ -477,6 +481,7 @@ export default function NavigationSubmenuEdit( {
 						autoComplete="off"
 					/>
 					<TextareaControl
+						__nextHasNoMarginBottom
 						value={ description || '' }
 						onChange={ ( descriptionValue ) => {
 							setAttributes( {
@@ -566,6 +571,6 @@ export default function NavigationSubmenuEdit( {
 				) }
 				<div { ...innerBlocksProps } />
 			</div>
-		</Fragment>
+		</>
 	);
 }

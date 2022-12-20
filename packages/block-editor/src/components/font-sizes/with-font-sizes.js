@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, pickBy } from 'lodash';
+import { pickBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -107,9 +107,9 @@ export default ( ...fontSizeNames ) => {
 						customFontSizeAttributeName
 					) {
 						return ( fontSizeValue ) => {
-							const fontSizeObject = find( this.props.fontSizes, {
-								size: Number( fontSizeValue ),
-							} );
+							const fontSizeObject = this.props.fontSizes?.find(
+								( { size } ) => size === Number( fontSizeValue )
+							);
 							this.props.setAttributes( {
 								[ fontSizeAttributeName ]:
 									fontSizeObject && fontSizeObject.slug
