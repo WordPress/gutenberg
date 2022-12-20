@@ -1,22 +1,12 @@
 name: PHP Compatibility
 
 on:
-    # PHP compatibility testing was introduced in WordPress 5.5.
     push:
         branches:
             - trunk
-            - '5.[5-9]'
-            - '[6-9].[0-9]'
-        tags:
-            - '[0-9]+.[0-9]'
-            - '[0-9]+.[0-9].[0-9]+'
-            - '![34].[0-9].[0-9]+'
-            - '!5.[0-4].[0-9]+'
+            - 'release/**'
+            - 'wp/**'
     pull_request:
-        branches:
-            - trunk
-            - '5.[5-9]'
-            - '[6-9].[0-9]'
         paths:
             # This workflow only scans PHP files.
             - '**.php'
@@ -54,7 +44,7 @@ jobs:
         name: Check PHP compatibility
         runs-on: ubuntu-latest
         timeout-minutes: 20
-        if: ${{ github.repository == 'WordPress/wordpress-develop' || github.event_name == 'pull_request' }}
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
         steps:
             - name: Checkout repository
@@ -103,46 +93,3 @@ jobs:
 
             - name: Ensure version-controlled files are not modified or deleted
               run: git diff --exit-code
-
-    slack-notifications:
-        name: Slack Notifications
-        uses: WordPress/wordpress-develop/.github/workflows/slack-notifications.yml@trunk
-        needs: [php-compatibility]
-        if: ${{ github.repository == 'WordPress/wordpress-develop' && github.event_name != 'pull_request' && always() }}
-        with:
-            calling_status: ${{ needs.php-compatibility.result == 'success' && 'success' || needs.php-compatibility.result == 'cancelled' && 'cancelled' || 'failure' }}
-        secrets:
-            SLACK_GHA_SUCCESS_WEBHOOK: ${{ secrets.SLACK_GHA_SUCCESS_WEBHOOK }}
-            SLACK_GHA_CANCELLED_WEBHOOK: ${{ secrets.SLACK_GHA_CANCELLED_WEBHOOK }}
-            SLACK_GHA_FIXED_WEBHOOK: ${{ secrets.SLACK_GHA_FIXED_WEBHOOK }}
-            SLACK_GHA_FAILURE_WEBHOOK: ${{ secrets.SLACK_GHA_FAILURE_WEBHOOK }}
-
-    failed-workflow:
-        name: Failed workflow tasks
-        runs-on: ubuntu-latest
-        needs: [php-compatibility, slack-notifications]
-        if: |
-            always() &&
-            github.repository == 'WordPress/wordpress-develop' &&
-            github.event_name != 'pull_request' &&
-            github.run_attempt < 2 &&
-            (
-              needs.php-compatibility.result == 'cancelled' || needs.php-compatibility.result == 'failure'
-            )
-
-        steps:
-            - name: Dispatch workflow run
-              uses: actions/github-script@100527700e8b29ca817ac0e0dfbfc5e8ff38edda # v6.3.2
-              with:
-                  retries: 2
-                  retry-exempt-status-codes: 418
-                  script: |
-                      github.rest.actions.createWorkflowDispatch({
-                        owner: context.repo.owner,
-                        repo: context.repo.repo,
-                        workflow_id: 'failed-workflow.yml',
-                        ref: 'trunk',
-                        inputs: {
-                          run_id: '${{ github.run_id }}'
-                        }
-                      });
