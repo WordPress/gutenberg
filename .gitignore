@@ -16,10 +16,12 @@ yarn.lock
 /perf-envs
 /composer.lock
 
+# The /.cache folder is needed for the "PHP Coding Standards" CI job.
 .cache
 !/.cache/
 /.cache/**
 !/.cache/.gitkeep
+
 .eslintcache
 *.tsbuildinfo
 
