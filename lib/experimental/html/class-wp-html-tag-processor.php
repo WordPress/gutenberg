@@ -1544,17 +1544,17 @@ class WP_HTML_Tag_Processor {
 		 */
 		if ( preg_match(
 			'~[' .
-			// Syntax-like characters.
-			'"\'>&</ =' .
-			// Control characters.
-			'\x{00}-\x{1F}' .
-			// HTML noncharacters.
-			'\x{FDD0}-\x{FDEF}' .
-			'\x{FFFE}\x{FFFF}\x{1FFFE}\x{1FFFF}\x{2FFFE}\x{2FFFF}\x{3FFFE}\x{3FFFF}' .
-			'\x{4FFFE}\x{4FFFF}\x{5FFFE}\x{5FFFF}\x{6FFFE}\x{6FFFF}\x{7FFFE}\x{7FFFF}' .
-			'\x{8FFFE}\x{8FFFF}\x{9FFFE}\x{9FFFF}\x{AFFFE}\x{AFFFF}\x{BFFFE}\x{BFFFF}' .
-			'\x{CFFFE}\x{CFFFF}\x{DFFFE}\x{DFFFF}\x{EFFFE}\x{EFFFF}\x{FFFFE}\x{FFFFF}' .
-			'\x{10FFFE}\x{10FFFF}' .
+				// Syntax-like characters.
+				'"\'>&</ =' .
+				// Control characters.
+				'\x{00}-\x{1F}' .
+				// HTML noncharacters.
+				'\x{FDD0}-\x{FDEF}' .
+				'\x{FFFE}\x{FFFF}\x{1FFFE}\x{1FFFF}\x{2FFFE}\x{2FFFF}\x{3FFFE}\x{3FFFF}' .
+				'\x{4FFFE}\x{4FFFF}\x{5FFFE}\x{5FFFF}\x{6FFFE}\x{6FFFF}\x{7FFFE}\x{7FFFF}' .
+				'\x{8FFFE}\x{8FFFF}\x{9FFFE}\x{9FFFF}\x{AFFFE}\x{AFFFF}\x{BFFFE}\x{BFFFF}' .
+				'\x{CFFFE}\x{CFFFF}\x{DFFFE}\x{DFFFF}\x{EFFFE}\x{EFFFF}\x{FFFFE}\x{FFFFF}' .
+				'\x{10FFFE}\x{10FFFF}' .
 			']~Ssu',
 			$name
 		) ) {
