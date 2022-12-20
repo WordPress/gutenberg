@@ -81,12 +81,12 @@ jobs:
             - name: Make Composer packages available globally
               run: echo "${PWD}/vendor/bin" >> $GITHUB_PATH
 
-            - name: Run PHPCS on all Core files
-              id: phpcs-core
+            - name: Run PHPCS on all Gutenberg files
+              id: phpcs-gutenberg
               run: phpcs -n --report-full --cache=./.cache/phpcs-src.json --report-checkstyle=./.cache/phpcs-report.xml
 
             - name: Show PHPCS results in PR
-              if: ${{ always() && steps.phpcs-core.outcome == 'failure' }}
+              if: ${{ always() && steps.phpcs-gutenberg.outcome == 'failure' }}
               run: cs2pr ./.cache/phpcs-report.xml
 
             - name: Check test suite files for warnings
