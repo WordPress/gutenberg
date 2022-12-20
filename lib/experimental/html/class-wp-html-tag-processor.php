@@ -1116,9 +1116,6 @@ class WP_HTML_Tag_Processor {
 	 * Converts class name updates into tag attributes updates
 	 * (they are accumulated in different data formats for performance).
 	 *
-	 * This method is only meant to run right before the attribute updates are applied.
-	 * The behavior in all other cases is undefined.
-	 *
 	 * @return void
 	 * @since 6.2.0
 	 *
@@ -1126,14 +1123,24 @@ class WP_HTML_Tag_Processor {
 	 * @see $lexical_updates
 	 */
 	private function class_name_updates_to_attributes_updates() {
-		if ( count( $this->classname_updates ) === 0 || isset( $this->lexical_updates['class'] ) ) {
-			$this->classname_updates = array();
+		if ( count( $this->classname_updates ) === 0 ) {
 			return;
 		}
 
-		$existing_class = isset( $this->attributes['class'] )
-			? substr( $this->html, $this->attributes['class']->value_starts_at, $this->attributes['class']->value_length )
-			: '';
+		if ( isset( $this->lexical_updates['class'] ) ) {
+			$existing_class = $this->extract_attribute_value_from_lexical_update( 'class' );
+			if ( true === $existing_class ) {
+				$existing_class = '';
+			}
+		} elseif ( isset( $this->attributes['class'] ) ) {
+			$existing_class = substr(
+				$this->html,
+				$this->attributes['class']->value_starts_at,
+				$this->attributes['class']->value_length
+			);
+		} else {
+			$existing_class = '';
+		}
 
 		/**
 		 * Updated "class" attribute value.
@@ -1371,6 +1378,53 @@ class WP_HTML_Tag_Processor {
 	}
 
 	/**
+	 * Given an attribute name, return its value as set in $lexical_updates.
+	 *
+	 * @since 6.2.0
+	 *
+	 * @param string $name The attribute name.
+	 * @return string|true|null Value of attribute or `null` if not available.
+	 *                          Boolean attributes return `true`.
+	 */
+	private function extract_attribute_value_from_lexical_update( $name ) {
+		$comparable = strtolower( trim( $name ) );
+
+		if ( ! isset( $this->lexical_updates[ $comparable ] ) ) {
+			return null;
+		}
+
+		$attribute = trim( $this->lexical_updates[ $comparable ]->text );
+		// Has the attribute been removed?
+		if ( '' === $attribute ) {
+			return null;
+		}
+
+		/**
+		 * When the lexical update contains just the attribute name,
+		 * the value becomes a boolean true. For example:
+		 *
+		 * ```php
+		 * $p = new WP_HTML_Tag_Processor('<input type="checkbox" />');
+		 * $p->set_attribute('checked', true);
+		 * // The lexical update contains just the string "checked"
+		 *
+		 * $p->get_attribute('checked');
+		 * // returns true thanks to the condition below
+		 *
+		 * echo $p->get_updated_html();
+		 * // <input type="checkbox" checked />
+		 * ```
+		 */
+		if ( $attribute === $comparable ) {
+			return true;
+		}
+
+		// $attribute is a 'name="value"' string, so we extract the value.
+		$value = substr( $attribute, strlen( $comparable ) + 2, -1 );
+		return html_entity_decode( $value );
+	}
+
+	/**
 	 * Returns the value of the parsed attribute in the currently-opened tag.
 	 *
 	 * Example:
@@ -1397,6 +1451,24 @@ class WP_HTML_Tag_Processor {
 		}
 
 		$comparable = strtolower( $name );
+
+		/**
+		 * For $this->lexical_updates (below), it makes sense (and is easy enough) to only
+		 * evaluate the updates for the attribute we're interested in (if any) and to ignore
+		 * updates for all other attributes. For class name updates OTOH, we would need to
+		 * replicate most of the logic from `class_name_updates_to_attributes_updates` here,
+		 * so we might as well just call that function and have classname updates "promoted"
+		 * to attribute updates.
+		 */
+		if ( 'class' === $name ) {
+			$this->class_name_updates_to_attributes_updates();
+		}
+
+		// If we have an update for this attribute, return the updated value.
+		if ( isset( $this->lexical_updates[ $comparable ] ) ) {
+			return $this->extract_attribute_value_from_lexical_update( $comparable );
+		}
+
 		if ( ! isset( $this->attributes[ $comparable ] ) ) {
 			return null;
 		}
@@ -1638,6 +1710,10 @@ class WP_HTML_Tag_Processor {
 	 * @param string $name The attribute name to remove.
 	 */
 	public function remove_attribute( $name ) {
+		if ( $this->is_closing_tag ) {
+			return false;
+		}
+
 		/**
 		 * > There must never be two or more attributes on
 		 * > the same start tag whose names are an ASCII
@@ -1647,7 +1723,15 @@ class WP_HTML_Tag_Processor {
 		 * @see https://html.spec.whatwg.org/multipage/syntax.html#attributes-2:ascii-case-insensitive
 		 */
 		$name = strtolower( $name );
-		if ( $this->is_closing_tag || ! isset( $this->attributes[ $name ] ) ) {
+
+		if ( ! isset( $this->attributes[ $name ] ) ) {
+			if ( 'class' === $name && count( $this->classname_updates ) !== 0 ) {
+				$this->classname_updates = array();
+			}
+			if ( isset( $this->lexical_updates[ $name ] ) ) {
+				unset( $this->lexical_updates[ $name ] );
+			}
+
 			return false;
 		}
 
