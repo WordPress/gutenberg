@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { InnerBlocks } from '@wordpress/block-editor';
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -30,10 +30,95 @@ function useFrontPageId() {
 	}, [] );
 }
 
+/**
+ * Determine the colors for a menu.
+ *
+ * Order of priority is:
+ * 1: Overlay custom colors (if submenu)
+ * 2: Overlay theme colors (if submenu)
+ * 3: Custom colors
+ * 4: Theme colors
+ * 5: Global styles
+ *
+ * @param {Object}  context
+ * @param {boolean} isSubMenu
+ */
+function getColors( context, isSubMenu ) {
+	const {
+		textColor,
+		customTextColor,
+		backgroundColor,
+		customBackgroundColor,
+		overlayTextColor,
+		customOverlayTextColor,
+		overlayBackgroundColor,
+		customOverlayBackgroundColor,
+		style,
+	} = context;
+
+	const colors = {};
+
+	if ( isSubMenu && !! customOverlayTextColor ) {
+		colors.customTextColor = customOverlayTextColor;
+	} else if ( isSubMenu && !! overlayTextColor ) {
+		colors.textColor = overlayTextColor;
+	} else if ( !! customTextColor ) {
+		colors.customTextColor = customTextColor;
+	} else if ( !! textColor ) {
+		colors.textColor = textColor;
+	} else if ( !! style?.color?.text ) {
+		colors.customTextColor = style.color.text;
+	}
+
+	if ( isSubMenu && !! customOverlayBackgroundColor ) {
+		colors.customBackgroundColor = customOverlayBackgroundColor;
+	} else if ( isSubMenu && !! overlayBackgroundColor ) {
+		colors.backgroundColor = overlayBackgroundColor;
+	} else if ( !! customBackgroundColor ) {
+		colors.customBackgroundColor = customBackgroundColor;
+	} else if ( !! backgroundColor ) {
+		colors.backgroundColor = backgroundColor;
+	} else if ( !! style?.color?.background ) {
+		colors.customTextColor = style.color.background;
+	}
+
+	return colors;
+}
+
 export default function PageListItemEdit( { context, attributes } ) {
 	const { id, label, link, hasChildren } = attributes;
 	const isNavigationChild = 'showSubmenuIcon' in context;
 	const frontPageId = useFrontPageId();
+
+	const innerBlocksColors = getColors( context, true );
+
+	const blockProps = useBlockProps( {
+		className: classnames(
+			'wp-block-pages-list__item',
+			'wp-block-navigation__submenu-container',
+			{
+				'has-text-color': !! (
+					innerBlocksColors.textColor ||
+					innerBlocksColors.customTextColor
+				),
+				[ `has-${ innerBlocksColors.textColor }-color` ]:
+					!! innerBlocksColors.textColor,
+				'has-background': !! (
+					innerBlocksColors.backgroundColor ||
+					innerBlocksColors.customBackgroundColor
+				),
+				[ `has-${ innerBlocksColors.backgroundColor }-background-color` ]:
+					!! innerBlocksColors.backgroundColor,
+			}
+		),
+		style: {
+			color: innerBlocksColors.customTextColor,
+			backgroundColor: innerBlocksColors.customBackgroundColor,
+		},
+	} );
+
+	const innerBlocksProps = useInnerBlocksProps( blockProps );
+
 	return (
 		<li
 			key={ id }
@@ -84,9 +169,8 @@ export default function PageListItemEdit( { context, attributes } ) {
 							'wp-block-navigation__submenu-container':
 								isNavigationChild,
 						} ) }
-					>
-						<InnerBlocks />
-					</ul>
+						{ ...innerBlocksProps }
+					></ul>
 				</>
 			) }
 		</li>

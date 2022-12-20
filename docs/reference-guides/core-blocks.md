@@ -429,7 +429,7 @@ Display a list of all pages. ([Source](https://github.com/WordPress/gutenberg/tr
 -	**Name:** core/page-list
 -	**Category:** widgets
 -	**Supports:** typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:** parentPageID
+-	**Attributes:** isNested, parentPageID
 
 ## Page List Item
 

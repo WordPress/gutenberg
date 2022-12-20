@@ -17,7 +17,7 @@ import {
 	__unstableMotion as motion,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMemo, useCallback, Fragment } from '@wordpress/element';
+import { useMemo, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -268,12 +268,10 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 				</AnimatedContainer>
 			) }
 		>
-			<Fragment>
-				<BlockInspectorSingleBlock
-					clientId={ selectedBlockClientId }
-					blockName={ blockType.name }
-				/>
-			</Fragment>
+			<BlockInspectorSingleBlock
+				clientId={ selectedBlockClientId }
+				blockName={ blockType.name }
+			/>
 		</BlockInspectorSingleBlockWrapper>
 	);
 };
