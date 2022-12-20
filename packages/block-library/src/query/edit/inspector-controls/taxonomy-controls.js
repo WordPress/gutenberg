@@ -54,7 +54,7 @@ export function TaxonomyControls( { onChange, query } ) {
 	return (
 		<>
 			{ taxonomies.map( ( taxonomy ) => {
-				const value = taxQuery?.[ taxonomy.slug ] || [];
+				const termIds = taxQuery?.[ taxonomy.slug ] || [];
 				const handleChange = ( newTermIds ) =>
 					onChange( {
 						taxQuery: {
@@ -67,7 +67,7 @@ export function TaxonomyControls( { onChange, query } ) {
 					<TaxonomyItem
 						key={ taxonomy.slug }
 						taxonomy={ taxonomy }
-						terms={ value }
+						termIds={ termIds }
 						onChange={ handleChange }
 					/>
 				);
@@ -76,7 +76,16 @@ export function TaxonomyControls( { onChange, query } ) {
 	);
 }
 
-function TaxonomyItem( { taxonomy, terms, onChange } ) {
+/**
+ * Renders a `FormTokenField` for a given taxonomy.
+ *
+ * @param {Object}   props          The props for the component.
+ * @param {Object}   props.taxonomy The taxonomy object.
+ * @param {number[]} props.termIds  An array with the block's term ids for the given taxonomy.
+ * @param {Function} props.onChange Callback `onChange` function.
+ * @return {JSX.Element} The rendered component.
+ */
+function TaxonomyItem( { taxonomy, termIds, onChange } ) {
 	const [ search, setSearch ] = useState( '' );
 	const [ value, setValue ] = useState( EMPTY_ARRAY );
 	const [ suggestions, setSuggestions ] = useState( EMPTY_ARRAY );
@@ -95,7 +104,7 @@ function TaxonomyItem( { taxonomy, terms, onChange } ) {
 					...BASE_QUERY,
 					search,
 					orderby: 'name',
-					exclude: terms,
+					exclude: termIds,
 					per_page: 20,
 				},
 			];
@@ -107,31 +116,34 @@ function TaxonomyItem( { taxonomy, terms, onChange } ) {
 				),
 			};
 		},
-		[ search, terms ]
+		[ search, termIds ]
 	);
-	const currentTerms = useSelect(
+	// `existingTerms` are the ones fetched from the API and their type is `{ id: number; name: string }`.
+	// They are used to extract the terms' names to populate the `FormTokenField` properly
+	// and to sanitize the provided `termIds`, by setting only the ones that exist.
+	const existingTerms = useSelect(
 		( select ) => {
-			if ( ! terms?.length ) return EMPTY_ARRAY;
+			if ( ! termIds?.length ) return EMPTY_ARRAY;
 			const { getEntityRecords } = select( coreStore );
 			return getEntityRecords( 'taxonomy', taxonomy.slug, {
 				...BASE_QUERY,
-				include: terms,
-				per_page: terms.length,
+				include: termIds,
+				per_page: termIds.length,
 			} );
 		},
-		[ terms ]
+		[ termIds ]
 	);
 	// Update the `value` state only after the selectors are resolved
 	// to avoid emptying the input when we're changing terms.
 	useEffect( () => {
-		if ( ! terms?.length ) {
+		if ( ! termIds?.length ) {
 			setValue( EMPTY_ARRAY );
 		}
-		if ( ! currentTerms?.length ) return;
+		if ( ! existingTerms?.length ) return;
 		// Returns only the existing entity ids. This prevents the component
 		// from crashing in the editor, when non existing ids are provided.
-		const sanitizedValue = terms.reduce( ( accumulator, id ) => {
-			const entity = currentTerms.find( ( term ) => term.id === id );
+		const sanitizedValue = termIds.reduce( ( accumulator, id ) => {
+			const entity = existingTerms.find( ( term ) => term.id === id );
 			if ( entity ) {
 				accumulator.push( {
 					id,
@@ -141,22 +153,22 @@ function TaxonomyItem( { taxonomy, terms, onChange } ) {
 			return accumulator;
 		}, [] );
 		setValue( sanitizedValue );
-	}, [ terms, currentTerms ] );
+	}, [ termIds, existingTerms ] );
 	// Update suggestions only when the query has resolved.
 	useEffect( () => {
 		if ( ! searchHasResolved ) return;
 		setSuggestions( searchResults.map( ( result ) => result.name ) );
 	}, [ searchResults, searchHasResolved ] );
 	const onTermsChange = ( newTermValues ) => {
-		const termIds = new Set();
+		const newTermIds = new Set();
 		for ( const termValue of newTermValues ) {
 			const termId = getTermIdByTermValue( searchResults, termValue );
 			if ( termId ) {
-				termIds.add( termId );
+				newTermIds.add( termId );
 			}
 		}
 		setSuggestions( EMPTY_ARRAY );
-		onChange( Array.from( termIds ) );
+		onChange( Array.from( newTermIds ) );
 	};
 	return (
 		<FormTokenField
