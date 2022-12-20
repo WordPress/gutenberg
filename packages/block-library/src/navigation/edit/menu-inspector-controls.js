@@ -6,7 +6,11 @@ import {
 	InspectorControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { PanelBody, VisuallyHidden } from '@wordpress/components';
+import {
+	PanelBody,
+	__experimentalHStack as HStack,
+	__experimentalHeading as Heading,
+} from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
@@ -21,6 +25,7 @@ const MenuInspectorControls = ( {
 	createNavigationMenuIsSuccess,
 	createNavigationMenuIsError,
 	currentMenuId = null,
+	isNavigationMenuMissing,
 	isManageMenusButtonDisabled,
 	onCreateNew,
 	onSelectClassicMenu,
@@ -51,37 +56,61 @@ const MenuInspectorControls = ( {
 					isOffCanvasNavigationEditorEnabled ? null : __( 'Menu' )
 				}
 			>
-				<>
-					{ isOffCanvasNavigationEditorEnabled && (
-						<VisuallyHidden as="h2">
-							{ __( 'Menu' ) }
-						</VisuallyHidden>
-					) }
-					<NavigationMenuSelector
-						currentMenuId={ currentMenuId }
-						onSelectClassicMenu={ onSelectClassicMenu }
-						onSelectNavigationMenu={ onSelectNavigationMenu }
-						onCreateNew={ onCreateNew }
-						createNavigationMenuIsSuccess={
-							createNavigationMenuIsSuccess
-						}
-						createNavigationMenuIsError={
-							createNavigationMenuIsError
-						}
-						actionLabel={ actionLabel }
-					/>
-					{ isOffCanvasNavigationEditorEnabled ? (
-						<OffCanvasEditor
-							blocks={ clientIdsTree }
-							isExpanded={ true }
-							selectBlockInCanvas={ false }
+				{ isOffCanvasNavigationEditorEnabled ? (
+					<>
+						<HStack className="wp-block-navigation-off-canvas-editor__header">
+							<Heading
+								className="wp-block-navigation-off-canvas-editor__title"
+								level={ 2 }
+							>
+								{ __( 'Menu' ) }
+							</Heading>
+							<NavigationMenuSelector
+								currentMenuId={ currentMenuId }
+								onSelectClassicMenu={ onSelectClassicMenu }
+								onSelectNavigationMenu={
+									onSelectNavigationMenu
+								}
+								onCreateNew={ onCreateNew }
+								createNavigationMenuIsSuccess={
+									createNavigationMenuIsSuccess
+								}
+								createNavigationMenuIsError={
+									createNavigationMenuIsError
+								}
+								actionLabel={ actionLabel }
+							/>
+						</HStack>
+						{ currentMenuId && isNavigationMenuMissing ? (
+							<p>{ __( 'Select or create a menu' ) }</p>
+						) : (
+							<OffCanvasEditor
+								blocks={ clientIdsTree }
+								isExpanded={ true }
+								selectBlockInCanvas={ false }
+							/>
+						) }
+					</>
+				) : (
+					<>
+						<NavigationMenuSelector
+							currentMenuId={ currentMenuId }
+							onSelectClassicMenu={ onSelectClassicMenu }
+							onSelectNavigationMenu={ onSelectNavigationMenu }
+							onCreateNew={ onCreateNew }
+							createNavigationMenuIsSuccess={
+								createNavigationMenuIsSuccess
+							}
+							createNavigationMenuIsError={
+								createNavigationMenuIsError
+							}
+							actionLabel={ actionLabel }
 						/>
-					) : (
 						<ManageMenusButton
 							disabled={ isManageMenusButtonDisabled }
 						/>
-					) }
-				</>
+					</>
+				) }
 			</PanelBody>
 		</InspectorControls>
 	);
