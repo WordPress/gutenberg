@@ -146,7 +146,7 @@ Border styles.
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
 | color | string |  |
-| radius | undefined |  |
+| radius | string, object |  |
 | style | string |  |
 | width | string |  |
 | top | object | color, style, width |
