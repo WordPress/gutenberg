@@ -145,10 +145,10 @@ Border styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
-| color | undefined |  |
-| radius | undefined |  |
-| style | undefined |  |
-| width | undefined |  |
+| color | string |  |
+| radius | string, object |  |
+| style | string |  |
+| width | string |  |
 | top | object | color, style, width |
 | right | object | color, style, width |
 | bottom | object | color, style, width |
@@ -162,9 +162,9 @@ Color styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
-| background | undefined |  |
-| gradient | undefined |  |
-| text | undefined |  |
+| background | string |  |
+| gradient | string |  |
+| text | string |  |
 
 ---
 
@@ -174,7 +174,7 @@ Spacing styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
-| blockGap | undefined |  |
+| blockGap | string |  |
 | margin | object | bottom, left, right, top |
 | padding | object | bottom, left, right, top |
 
@@ -186,14 +186,14 @@ Typography styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
-| fontFamily | undefined |  |
-| fontSize | undefined |  |
-| fontStyle | undefined |  |
-| fontWeight | undefined |  |
-| letterSpacing | undefined |  |
-| lineHeight | undefined |  |
-| textDecoration | undefined |  |
-| textTransform | undefined |  |
+| fontFamily | string |  |
+| fontSize | string |  |
+| fontStyle | string |  |
+| fontWeight | string |  |
+| letterSpacing | string |  |
+| lineHeight | string |  |
+| textDecoration | string |  |
+| textTransform | string |  |
 
 ---
 
@@ -203,7 +203,7 @@ CSS and SVG filter styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
-| duotone | undefined |  |
+| duotone | string |  |
 
 ---
 
@@ -220,10 +220,10 @@ Outline styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
-| color | undefined |  |
-| offset | undefined |  |
-| style | undefined |  |
-| width | undefined |  |
+| color | string |  |
+| offset | string |  |
+| style | string |  |
+| width | string |  |
 
 ---
 
