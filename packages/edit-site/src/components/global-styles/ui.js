@@ -123,27 +123,42 @@ function ContextScreens( { name, parentMenu = '' } ) {
 			<GlobalStylesNavigationScreen
 				path={ parentMenu + '/colors/background' }
 			>
-				<ScreenBackgroundColor name={ name } />
+				<ScreenBackgroundColor
+					name={ name }
+					variationPath={ variationPath }
+				/>
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/colors/text' }>
-				<ScreenTextColor name={ name } />
+				<ScreenTextColor
+					name={ name }
+					variationPath={ variationPath }
+				/>
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/colors/link' }>
-				<ScreenLinkColor name={ name } />
+				<ScreenLinkColor
+					name={ name }
+					variationPath={ variationPath }
+				/>
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen
 				path={ parentMenu + '/colors/heading' }
 			>
-				<ScreenHeadingColor name={ name } />
+				<ScreenHeadingColor
+					name={ name }
+					variationPath={ variationPath }
+				/>
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen
 				path={ parentMenu + '/colors/button' }
 			>
-				<ScreenButtonColor name={ name } />
+				<ScreenButtonColor
+					name={ name }
+					variationPath={ variationPath }
+				/>
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/border' }>

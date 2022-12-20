@@ -22,6 +22,11 @@ import Subtitle from './subtitle';
 import ColorIndicatorWrapper from './color-indicator-wrapper';
 import BlockPreviewPanel from './block-preview-panel';
 
+function variationPathToURL( variationPath ) {
+	// Replace the dots with slashes, add slash at the beginning and remove the last slash.
+	return '/' + variationPath.replace( /\./g, '/' ).slice( 0, -1 );
+}
+
 function BackgroundColorItem( { name, parentMenu, variationPath = '' } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	const hasSupport =
@@ -42,7 +47,11 @@ function BackgroundColorItem( { name, parentMenu, variationPath = '' } ) {
 
 	return (
 		<NavigationButtonAsItem
-			path={ parentMenu + '/colors/background' }
+			path={
+				parentMenu +
+				variationPathToURL( variationPath ) +
+				'/colors/background'
+			}
 			aria-label={ __( 'Colors background styles' ) }
 		>
 			<HStack justify="flex-start">
@@ -71,7 +80,11 @@ function TextColorItem( { name, parentMenu, variationPath = '' } ) {
 
 	return (
 		<NavigationButtonAsItem
-			path={ parentMenu + '/colors/text' }
+			path={
+				parentMenu +
+				variationPathToURL( variationPath ) +
+				'/colors/text'
+			}
 			aria-label={ __( 'Colors text styles' ) }
 		>
 			<HStack justify="flex-start">
@@ -107,7 +120,11 @@ function LinkColorItem( { name, parentMenu, variationPath = '' } ) {
 
 	return (
 		<NavigationButtonAsItem
-			path={ parentMenu + '/colors/link' }
+			path={
+				parentMenu +
+				variationPathToURL( variationPath ) +
+				'/colors/link'
+			}
 			aria-label={ __( 'Colors link styles' ) }
 		>
 			<HStack justify="flex-start">
@@ -145,7 +162,11 @@ function HeadingColorItem( { name, parentMenu, variationPath = '' } ) {
 
 	return (
 		<NavigationButtonAsItem
-			path={ parentMenu + '/colors/heading' }
+			path={
+				parentMenu +
+				variationPathToURL( variationPath ) +
+				'/colors/heading'
+			}
 			aria-label={ __( 'Colors heading styles' ) }
 		>
 			<HStack justify="flex-start">
@@ -180,7 +201,13 @@ function ButtonColorItem( { name, parentMenu, variationPath = '' } ) {
 	}
 
 	return (
-		<NavigationButtonAsItem path={ parentMenu + '/colors/button' }>
+		<NavigationButtonAsItem
+			path={
+				parentMenu +
+				variationPathToURL( variationPath ) +
+				'/colors/button'
+			}
+		>
 			<HStack justify="flex-start">
 				<ZStack isLayered={ false } offset={ -8 }>
 					<ColorIndicatorWrapper expanded={ false }>
