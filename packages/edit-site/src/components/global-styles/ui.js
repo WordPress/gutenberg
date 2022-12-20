@@ -42,6 +42,7 @@ import StyleBook from '../style-book';
 import ScreenCSS from './screen-css';
 import { unlock } from '../../private-apis';
 import ScreenEffects from './screen-effects';
+import ScreenRevisions from './screen-revisions';
 
 const SLOT_FILL_NAME = 'GlobalStylesMenu';
 const { Slot: GlobalStylesMenuSlot, Fill: GlobalStylesMenuFill } =
@@ -349,6 +350,9 @@ function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
 
 			<GlobalStylesActionMenu />
 			<GlobalStylesBlockLink />
+			<GlobalStylesNavigationScreen path="/revisions">
+				<ScreenRevisions />
+			</GlobalStylesNavigationScreen>
 		</NavigatorProvider>
 	);
 }
