@@ -272,8 +272,9 @@ export default function Layout( { onError } ) {
 										? forcedWidth ?? '100%'
 										: '100%',
 							} }
+							resizeRatio={ 2 }
 							className="edit-site-layout__resize-handle-container"
-							minWidth="100"
+							minWidth={ 360 }
 							maxWidth={ canvasContainerSize.width }
 							enable={ {
 								left:
@@ -281,13 +282,8 @@ export default function Layout( { onError } ) {
 									isEditorPage &&
 									canvasMode === 'view',
 							} }
-							onResizeStop={ ( _, _2, _3, delta ) => {
-								setForcedWidth(
-									parseInt(
-										( forcedWidth ?? canvasSize.width ) +
-											delta.width
-									)
-								);
+							onResizeStop={ () => {
+								setForcedWidth( canvasSize.width );
 								setIsResizing( false );
 							} }
 							onResizeStart={ () => {
