@@ -15,6 +15,7 @@ import {
 	visitSiteEditor,
 	enterEditMode,
 	deleteAllTemplates,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Multi-entity save flow', () => {
@@ -94,8 +95,8 @@ describe( 'Multi-entity save flow', () => {
 		it( 'Save flow should work as expected.', async () => {
 			await createNewPost();
 			// Edit the page some.
-			await page.waitForSelector( '.editor-post-title' );
-			await page.click( '.editor-post-title' );
+			await canvas().waitForSelector( '.editor-post-title' );
+			await canvas().click( '.editor-post-title' );
 			await page.keyboard.type( 'Test Post...' );
 			await page.keyboard.press( 'Enter' );
 
@@ -110,8 +111,8 @@ describe( 'Multi-entity save flow', () => {
 
 			// Add a reusable block and edit it.
 			await createReusableBlock( 'Hi!', 'Test' );
-			await page.waitForSelector( 'p[data-type="core/paragraph"]' );
-			await page.click( 'p[data-type="core/paragraph"]' );
+			await canvas().waitForSelector( 'p[data-type="core/paragraph"]' );
+			await canvas().click( 'p[data-type="core/paragraph"]' );
 			await page.keyboard.type( 'Oh!' );
 
 			// Should trigger multi-entity save button once template part edited.
@@ -169,7 +170,7 @@ describe( 'Multi-entity save flow', () => {
 			} );
 
 			// Update the post.
-			await page.click( '.editor-post-title' );
+			await canvas().click( '.editor-post-title' );
 			await page.keyboard.type( '...more title!' );
 
 			// Verify update button is enabled.
@@ -182,9 +183,9 @@ describe( 'Multi-entity save flow', () => {
 			await assertExistence( saveA11ySelector, false );
 
 			// Update reusable block again.
-			await page.click( 'p[data-type="core/paragraph"]' );
+			await canvas().click( 'p[data-type="core/paragraph"]' );
 			// We need to click again due to the clickthrough overlays in reusable blocks.
-			await page.click( 'p[data-type="core/paragraph"]' );
+			await canvas().click( 'p[data-type="core/paragraph"]' );
 			await page.keyboard.type( 'R!' );
 
 			// Multi-entity saving should be enabled.
@@ -203,19 +204,19 @@ describe( 'Multi-entity save flow', () => {
 			);
 			const editableSiteTitleSelector =
 				'.wp-block-site-title a[contenteditable="true"]';
-			await page.waitForSelector( editableSiteTitleSelector );
-			await page.focus( editableSiteTitleSelector );
+			await canvas().waitForSelector( editableSiteTitleSelector );
+			await canvas().focus( editableSiteTitleSelector );
 			await page.keyboard.type( '...' );
 
 			await insertBlock( 'Site Tagline' );
 			// Wait for the placeholder.
-			await page.waitForXPath(
+			await canvas().waitForXPath(
 				'//span[@data-rich-text-placeholder="Write site tagline…"]'
 			);
 			const editableSiteTagLineSelector =
 				'.wp-block-site-tagline[contenteditable="true"]';
-			await page.waitForSelector( editableSiteTagLineSelector );
-			await page.focus( editableSiteTagLineSelector );
+			await canvas().waitForSelector( editableSiteTagLineSelector );
+			await canvas().focus( editableSiteTagLineSelector );
 			await page.keyboard.type( 'Just another WordPress site' );
 
 			await clickButton( 'Publish' );

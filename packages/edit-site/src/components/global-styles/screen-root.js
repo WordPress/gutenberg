@@ -35,6 +35,8 @@ function ScreenRoot() {
 		};
 	}, [] );
 
+	const __experimentalGlobalStylesCustomCSS =
+		window?.__experimentalEnableGlobalStylesCustomCSS;
 	return (
 		<Card size="small">
 			<CardBody>
@@ -100,33 +102,38 @@ function ScreenRoot() {
 				</ItemGroup>
 			</CardBody>
 
-			<CardDivider />
-
-			<CardBody>
-				<Spacer
-					as="p"
-					paddingTop={ 2 }
-					paddingX="13px"
-					marginBottom={ 4 }
-				>
-					{ __(
-						'Add your own CSS to customize the appearance and layout of your site.'
-					) }
-				</Spacer>
-				<ItemGroup>
-					<NavigationButtonAsItem
-						path="/css"
-						aria-label={ __( 'Additional CSS' ) }
-					>
-						<HStack justify="space-between">
-							<FlexItem>{ __( 'Custom' ) }</FlexItem>
-							<IconWithCurrentColor
-								icon={ isRTL() ? chevronLeft : chevronRight }
-							/>
-						</HStack>
-					</NavigationButtonAsItem>
-				</ItemGroup>
-			</CardBody>
+			{ __experimentalGlobalStylesCustomCSS && (
+				<>
+					<CardDivider />
+					<CardBody>
+						<Spacer
+							as="p"
+							paddingTop={ 2 }
+							paddingX="13px"
+							marginBottom={ 4 }
+						>
+							{ __(
+								'Add your own CSS to customize the appearance and layout of your site.'
+							) }
+						</Spacer>
+						<ItemGroup>
+							<NavigationButtonAsItem
+								path="/css"
+								aria-label={ __( 'Additional CSS' ) }
+							>
+								<HStack justify="space-between">
+									<FlexItem>{ __( 'Custom' ) }</FlexItem>
+									<IconWithCurrentColor
+										icon={
+											isRTL() ? chevronLeft : chevronRight
+										}
+									/>
+								</HStack>
+							</NavigationButtonAsItem>
+						</ItemGroup>
+					</CardBody>
+				</>
+			) }
 		</Card>
 	);
 }
