@@ -149,6 +149,34 @@ function ScreenRoot() {
 					</CardBody>
 				</>
 			) }
+
+			<CardDivider />
+
+			<CardBody>
+				<Spacer
+					as="p"
+					paddingTop={ 2 }
+					paddingX="13px"
+					marginBottom={ 4 }
+				>
+					{ __(
+						"View the last ten revisions to your site's styles."
+					) }
+				</Spacer>
+				<ItemGroup>
+					<NavigationButtonAsItem
+						path="/revisions"
+						aria-label={ __( 'Styles revisions' ) }
+					>
+						<HStack justify="space-between">
+							<FlexItem>{ __( 'Revisions' ) }</FlexItem>
+							<IconWithCurrentColor
+								icon={ isRTL() ? chevronLeft : chevronRight }
+							/>
+						</HStack>
+					</NavigationButtonAsItem>
+				</ItemGroup>
+			</CardBody>
 		</Card>
 	);
 }

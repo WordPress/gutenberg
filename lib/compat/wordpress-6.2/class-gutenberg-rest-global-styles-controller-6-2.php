@@ -20,6 +20,72 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 	}
 
 	/**
+	 * Retrieves the global styles type' schema, conforming to JSON Schema.
+	 *
+	 * @since 5.9.0
+	 *
+	 * @return array Item schema data.
+	 */
+	public function get_item_schema() {
+		if ( $this->schema ) {
+			return $this->add_additional_fields_schema( $this->schema );
+		}
+
+		$schema = array(
+			'$schema'    => 'http://json-schema.org/draft-04/schema#',
+			'title'      => $this->post_type,
+			'type'       => 'object',
+			'properties' => array(
+				'id'        => array(
+					'description' => __( 'ID of global styles config.' ),
+					'type'        => 'string',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'readonly'    => true,
+				),
+				'styles'    => array(
+					'description' => __( 'Global styles.' ),
+					'type'        => array( 'object' ),
+					'context'     => array( 'view', 'edit' ),
+				),
+				'settings'  => array(
+					'description' => __( 'Global settings.' ),
+					'type'        => array( 'object' ),
+					'context'     => array( 'view', 'edit' ),
+				),
+				'title'     => array(
+					'description' => __( 'Title of the global styles variation.' ),
+					'type'        => array( 'object', 'string' ),
+					'default'     => '',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'properties'  => array(
+						'raw'      => array(
+							'description' => __( 'Title for the global styles variation, as it exists in the database.' ),
+							'type'        => 'string',
+							'context'     => array( 'view', 'edit', 'embed' ),
+						),
+						'rendered' => array(
+							'description' => __( 'HTML title for the post, transformed for display.' ),
+							'type'        => 'string',
+							'context'     => array( 'view', 'edit', 'embed' ),
+							'readonly'    => true,
+						),
+					),
+				),
+				'revisions' => array(
+					'description' => __( 'Global styles revisions.' ),
+					'type'        => array( 'object' ),
+					'context'     => array( 'view', 'edit' ),
+					'readonly'    => true,
+				),
+			),
+		);
+
+		$this->schema = $schema;
+
+		return $this->add_additional_fields_schema( $this->schema );
+	}
+
+	/**
 	 * Prepare a global styles config output for response.
 	 *
 	 * @since 5.9.0
@@ -65,6 +131,37 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 
 		if ( rest_is_field_included( 'styles', $fields ) ) {
 			$data['styles'] = ! empty( $config['styles'] ) && $is_global_styles_user_theme_json ? $config['styles'] : new stdClass();
+		}
+
+		if ( $is_global_styles_user_theme_json && rest_is_field_included( 'revisions', $fields ) ) {
+			$user_theme_revisions = wp_get_post_revisions(
+				$post->ID,
+				array(
+					'author'         => $post->post_author,
+					'posts_per_page' => 10,
+				)
+			);
+			if ( empty( $user_theme_revisions ) ) {
+				$data['revisions'] = array();
+			} else {
+				$user_revisions = array();
+				// Mostly taken from wp_prepare_revisions_for_js().
+				foreach ( $user_theme_revisions as $revision ) {
+					$raw_revision_config = json_decode( $revision->post_content, true );
+					$config              = ( new WP_Theme_JSON_Gutenberg( $raw_revision_config, 'custom' ) )->get_raw_data();
+					$now_gmt             = time();
+					$modified            = strtotime( $revision->post_modified );
+					$modified_gmt        = strtotime( $revision->post_modified_gmt . ' +0000' );
+					$user_revisions[]    = array(
+						'styles'    => ! empty( $config['styles'] ) ? $config['styles'] : new stdClass(),
+						'dateShort' => date_i18n( _x( 'j M @ H:i', 'revision date short format' ), $modified ),
+						/* translators: %s: Human-readable time difference. */
+						'timeAgo'   => sprintf( __( '%s ago' ), human_time_diff( $modified_gmt, $now_gmt ) ),
+						'id'        => $revision->ID,
+					);
+				}
+				$data['revisions'] = $user_revisions;
+			}
 		}
 
 		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
