@@ -11,6 +11,10 @@ import { useSelect } from '@wordpress/data';
 import { NavigationButtonAsItem } from './navigation-button';
 import ContextMenu from './context-menu';
 
+function getCoreBlockStyles( blockStyles ) {
+	return blockStyles?.filter( ( style ) => style.source === 'block' );
+}
+
 export function useHasVariationsPanel( name, parentMenu = '' ) {
 	const isInsideVariationsPanel = parentMenu.includes( 'variations' );
 	const blockStyles = useSelect(
@@ -20,7 +24,8 @@ export function useHasVariationsPanel( name, parentMenu = '' ) {
 		},
 		[ name ]
 	);
-	return !! blockStyles?.length && ! isInsideVariationsPanel;
+	const coreBlockStyles = getCoreBlockStyles( blockStyles );
+	return !! coreBlockStyles?.length && ! isInsideVariationsPanel;
 }
 
 export function VariationsPanel( { name } ) {
@@ -31,10 +36,11 @@ export function VariationsPanel( { name } ) {
 		},
 		[ name ]
 	);
+	const coreBlockStyles = getCoreBlockStyles( blockStyles );
 
 	return (
 		<>
-			{ blockStyles.map( ( style, index ) => (
+			{ coreBlockStyles.map( ( style, index ) => (
 				<NavigationButtonAsItem
 					key={ index }
 					icon={ '+' }
