@@ -21,7 +21,7 @@ function gutenberg_get_block_editor_settings_6_2( $settings ) {
 			'isGlobalStyles' => true,
 		);
 	}
-
+	$settings['__experimentalCanUserEditGlobalCustomCSS'] = ! current_user_can( 'unfiltered_html' ) ? false : true;
 	return $settings;
 }
 

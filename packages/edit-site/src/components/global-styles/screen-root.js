@@ -16,6 +16,7 @@ import { isRTL, __ } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -26,6 +27,11 @@ import ContextMenu from './context-menu';
 import StylesPreview from './preview';
 
 function ScreenRoot() {
+	const canUserEditGlobalCustomCSS = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings().__experimentalCanUserEditGlobalCustomCSS;
+	} );
+
 	const { variations } = useSelect( ( select ) => {
 		return {
 			variations:
@@ -35,8 +41,6 @@ function ScreenRoot() {
 		};
 	}, [] );
 
-	const __experimentalGlobalStylesCustomCSS =
-		window?.__experimentalEnableGlobalStylesCustomCSS;
 	return (
 		<Card size="small">
 			<CardBody>
@@ -102,7 +106,7 @@ function ScreenRoot() {
 				</ItemGroup>
 			</CardBody>
 
-			{ __experimentalGlobalStylesCustomCSS && (
+			{ canUserEditGlobalCustomCSS && (
 				<>
 					<CardDivider />
 					<CardBody>
