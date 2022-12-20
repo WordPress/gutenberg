@@ -15,14 +15,12 @@ const meta: ComponentMeta< typeof Dropdown > = {
 	component: Dropdown,
 	subcomponents: { DropdownContentWrapper },
 	argTypes: {
-		expandOnMobile: { control: { type: 'boolean' } },
 		focusOnMount: {
 			control: {
 				type: 'radio',
 				options: [ 'firstElement', true, false ],
 			},
 		},
-		headerTitle: { control: { type: 'text' } },
 		renderContent: { control: { type: null } },
 		renderToggle: { control: { type: null } },
 	},
