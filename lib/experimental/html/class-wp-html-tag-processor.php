@@ -1428,7 +1428,7 @@ class WP_HTML_Tag_Processor {
 	 * @since 6.2.0
 	 *
 	 * @param string $prefix Prefix of attributes whose value is requested.
-	 * @return array|null Associative array of attribute names and values, or `null` if not at a tag.
+	 * @return array|null Associative array of matching attribute names and values, or `null` if not at a tag.
 	 *                    Boolean attributes map to `true`.
 	 */
 	function get_attributes_by_prefix( $prefix ) {
