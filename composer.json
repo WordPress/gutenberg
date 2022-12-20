@@ -38,6 +38,7 @@
 		"composer/installers": "~1.0"
 	},
 	"scripts": {
+		"compat": "phpcs --standard=phpcompat.xml.dist --report=summary,source",
 		"format": "phpcbf --standard=phpcs.xml.dist --report-summary --report-source",
 		"lint": "phpcs --standard=phpcs.xml.dist",
 		"test": "phpunit",
