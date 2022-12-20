@@ -80,7 +80,7 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
  * @param {Object} entities Entity objects, keyed by entity ID.
  * @param {Array}  ids      Entity IDs to filter out.
  *
- * @return {Object} Next state.
+ * @return {Object} Filtered entities.
  */
 function removeEntitiesById( entities, ids ) {
 	return Object.fromEntries(
