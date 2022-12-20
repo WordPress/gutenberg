@@ -171,13 +171,15 @@ function TaxonomyItem( { taxonomy, termIds, onChange } ) {
 		onChange( Array.from( newTermIds ) );
 	};
 	return (
-		<FormTokenField
-			label={ taxonomy.name }
-			value={ value }
-			onInputChange={ debouncedSearch }
-			suggestions={ suggestions }
-			onChange={ onTermsChange }
-			__experimentalShowHowTo={ false }
-		/>
+		<div className="block-library-query-inspector__taxonomy-control">
+			<FormTokenField
+				label={ taxonomy.name }
+				value={ value }
+				onInputChange={ debouncedSearch }
+				suggestions={ suggestions }
+				onChange={ onTermsChange }
+				__experimentalShowHowTo={ false }
+			/>
+		</div>
 	);
 }
