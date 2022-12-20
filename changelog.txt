@@ -1,5 +1,25 @@
 == Changelog ==
 
+= 14.8.0-rc.2 =
+
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Global Styles
+- Global Styles REST API endpoint: Check custom CSS is included before attempting to validate. ([46561](https://github.com/WordPress/gutenberg/pull/46561))
+- Reverts the custom CSS to an experiment while we resolve the handling of unfiltered html capabilities. ([46663](https://github.com/WordPress/gutenberg/pull/46663))
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@andrewserong @glendaviesnz
+
+
 = 14.8.0-rc.1 =
 
 ## Changelog
