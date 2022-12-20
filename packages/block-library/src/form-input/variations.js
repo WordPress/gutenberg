@@ -7,6 +7,7 @@ const variations = [
 	{
 		name: 'text',
 		title: __( 'Text input' ),
+		icon: 'edit-page',
 		description: __( 'A generic text input.' ),
 		attributes: { type: 'text' },
 		isDefault: true,
@@ -17,6 +18,7 @@ const variations = [
 	{
 		name: 'textarea',
 		title: __( 'Textarea input' ),
+		icon: 'testimonial',
 		description: __(
 			'A textarea input to allow entering multiple lines of text.'
 		),
@@ -29,6 +31,7 @@ const variations = [
 		name: 'checkbox',
 		title: __( 'Checkbox input' ),
 		description: __( 'A simple checkbox input.' ),
+		icon: 'forms',
 		attributes: { type: 'checkbox' },
 		isDefault: true,
 		scope: [ 'inserter', 'transform' ],
@@ -37,6 +40,7 @@ const variations = [
 	{
 		name: 'email',
 		title: __( 'Email input' ),
+		icon: 'email',
 		description: __( 'Used for email addresses.' ),
 		attributes: { type: 'email' },
 		isDefault: true,
@@ -46,6 +50,7 @@ const variations = [
 	{
 		name: 'url',
 		title: __( 'URL input' ),
+		icon: 'admin-site',
 		description: __( 'Used for URLs.' ),
 		attributes: { type: 'url' },
 		isDefault: true,
@@ -55,6 +60,7 @@ const variations = [
 	{
 		name: 'tel',
 		title: __( 'Telephone input' ),
+		icon: 'phone',
 		description: __( 'Used for phone numbers.' ),
 		attributes: { type: 'tel' },
 		isDefault: true,
@@ -64,6 +70,7 @@ const variations = [
 	{
 		name: 'number',
 		title: __( 'Number input' ),
+		icon: 'edit-page',
 		description: __( 'A numeric input.' ),
 		attributes: { type: 'number' },
 		isDefault: true,

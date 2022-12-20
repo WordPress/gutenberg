@@ -4,6 +4,7 @@
 	"name": "core/form-submit-button",
 	"title": "Form submit button",
 	"category": "common",
+	"icon": "button",
 	"parent": [ "core/form" ],
 	"description": "A submission button for forms.",
 	"keywords": [ "submit", "button", "form" ],

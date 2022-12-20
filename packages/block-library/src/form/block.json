@@ -7,6 +7,7 @@
 	"description": "A form.",
 	"keywords": [ "container", "wrapper", "row", "section" ],
 	"textdomain": "default",
+	"icon": "feedback",
 	"attributes": {
 		"action": {
 			"type": "string",
