@@ -43,6 +43,17 @@ import ResizeHandle from '../block-editor/resize-handle';
 import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
 
 const ANIMATION_DURATION = 0.5;
+const emptyResizeHandleStyles = {
+	position: undefined,
+	userSelect: undefined,
+	cursor: undefined,
+	width: undefined,
+	height: undefined,
+	top: undefined,
+	right: undefined,
+	bottom: undefined,
+	left: undefined,
+};
 
 export default function Layout( { onError } ) {
 	// This ensures the edited entity id and type are initialized properly.
@@ -281,6 +292,10 @@ export default function Layout( { onError } ) {
 									! isMobileViewport &&
 									isEditorPage &&
 									canvasMode === 'view',
+								right:
+									! isMobileViewport &&
+									isEditorPage &&
+									canvasMode === 'view',
 							} }
 							onResizeStop={ () => {
 								setForcedWidth( canvasSize.width );
@@ -291,20 +306,12 @@ export default function Layout( { onError } ) {
 							} }
 							handleComponent={ {
 								left: <ResizeHandle direction="left" />,
+								right: <ResizeHandle direction="right" />,
 							} }
 							handleClasses={ undefined }
 							handleStyles={ {
-								left: {
-									position: undefined,
-									userSelect: undefined,
-									cursor: undefined,
-									width: undefined,
-									height: undefined,
-									top: undefined,
-									right: undefined,
-									bottom: undefined,
-									left: undefined,
-								},
+								left: emptyResizeHandleStyles,
+								right: emptyResizeHandleStyles,
 							} }
 						>
 							{ canvasResizer }
@@ -315,9 +322,10 @@ export default function Layout( { onError } ) {
 									className="edit-site-layout__canvas"
 									transition={ {
 										type: 'tween',
-										duration: disableMotion
-											? 0
-											: ANIMATION_DURATION,
+										duration:
+											disableMotion || isResizing
+												? 0
+												: ANIMATION_DURATION,
 										ease: 'easeOut',
 									} }
 								>
@@ -337,9 +345,10 @@ export default function Layout( { onError } ) {
 										} }
 										transition={ {
 											type: 'tween',
-											duration: disableMotion
-												? 0
-												: ANIMATION_DURATION,
+											duration:
+												disableMotion || isResizing
+													? 0
+													: ANIMATION_DURATION,
 											ease: 'easeOut',
 										} }
 									>
