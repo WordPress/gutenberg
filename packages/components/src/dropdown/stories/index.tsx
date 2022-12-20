@@ -30,7 +30,6 @@ const meta: ComponentMeta< typeof Dropdown > = {
 		controls: {
 			expanded: true,
 		},
-		docs: { source: { state: 'open' } },
 	},
 };
 export default meta;
