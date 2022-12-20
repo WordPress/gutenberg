@@ -101,8 +101,10 @@ describe( 'Post Editor Performance', () => {
 		let i = 5;
 		while ( i-- ) {
 			await page.reload();
-			await page.waitForSelector( 'iframe[name="editor-canvas"]' );
-			await canvas().waitForSelector( '.wp-block' );
+			await page.waitForSelector( '.edit-post-layout', {
+				timeout: 120000,
+			} );
+			await canvas().waitForSelector( '.wp-block', { timeout: 120000 } );
 			const {
 				serverResponse,
 				firstPaint,
