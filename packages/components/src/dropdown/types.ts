@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import type { CSSProperties, ReactNode } from 'react';
+import type { ComponentPropsWithoutRef, CSSProperties, ReactNode } from 'react';
 
 /**
  * Internal dependencies
  */
+import type Popover from '../popover';
 import type { PopoverProps } from '../popover/types';
-import type { WordPressComponentProps } from '../ui/context';
 
 type CallbackProps = {
 	isOpen: boolean;
