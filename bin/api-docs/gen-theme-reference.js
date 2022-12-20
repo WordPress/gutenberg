@@ -176,8 +176,9 @@ const formatType = ( prop ) => {
 
 		propTypes.forEach( ( item ) => {
 			if ( item.type ) types.push( item.type );
-			// $ref is always an object
-			if ( item.$ref ) types.push( 'object' );
+			// refComplete is always an object
+			if ( item.$ref && item.$ref === '#/definitions/refComplete' )
+				types.push( 'object' );
 		} );
 
 		type = [ ...new Set( types ) ].join( ', ' );
