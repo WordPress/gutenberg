@@ -15,6 +15,7 @@ import {
 	closeGlobalBlockInserter,
 	openListView,
 	closeListView,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -100,7 +101,8 @@ describe( 'Post Editor Performance', () => {
 		let i = 5;
 		while ( i-- ) {
 			await page.reload();
-			await page.waitForSelector( '.wp-block' );
+			await page.waitForSelector( 'iframe[name="editor-canvas"]' );
+			await canvas().waitForSelector( '.wp-block' );
 			const {
 				serverResponse,
 				firstPaint,
@@ -166,8 +168,8 @@ describe( 'Post Editor Performance', () => {
 			)
 		);
 		// Select the block where we type in
-		await page.waitForSelector( 'p[aria-label="Paragraph block"]' );
-		await page.click( 'p[aria-label="Paragraph block"]' );
+		await canvas().waitForSelector( 'p[aria-label="Paragraph block"]' );
+		await canvas().click( 'p[aria-label="Paragraph block"]' );
 		// Ignore firsted typed character because it's different
 		// It probably deserves a dedicated metric.
 		// (isTyping triggers so it's slower)
@@ -217,7 +219,7 @@ describe( 'Post Editor Performance', () => {
 			);
 			dispatch( 'core/block-editor' ).resetBlocks( blocks );
 		} );
-		const paragraphs = await page.$$( '.wp-block' );
+		const paragraphs = await canvas().$$( '.wp-block' );
 		await page.tracing.start( {
 			path: traceFile,
 			screenshots: false,
