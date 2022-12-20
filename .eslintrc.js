@@ -107,6 +107,7 @@ const restrictedImports = [
 			'negate',
 			'noop',
 			'nth',
+			'omit',
 			'omitBy',
 			'once',
 			'orderby',
