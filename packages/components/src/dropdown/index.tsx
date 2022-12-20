@@ -20,17 +20,17 @@ import type { DropdownProps } from './types';
 function useObservableState(
 	initialState: boolean,
 	onStateChange?: ( newState: boolean ) => void
-): [ boolean, ( newState: boolean ) => void ] {
+) {
 	const [ state, setState ] = useState( initialState );
 	return [
 		state,
-		( value ) => {
+		( value: boolean ) => {
 			setState( value );
 			if ( onStateChange ) {
 				onStateChange( value );
 			}
 		},
-	];
+	] as const;
 }
 
 function UnforwardedDropdown(
