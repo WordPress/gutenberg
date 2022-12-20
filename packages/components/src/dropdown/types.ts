@@ -103,10 +103,10 @@ export type DropdownProps = {
 	 * The first argument of the callback is an object
 	 * containing the following properties:
 	 *
-	 * isOpen: whether the dropdown menu is opened or not
-	 * onToggle: A function switching the dropdown menu's state
+	 * - isOpen: whether the dropdown menu is opened or not
+	 * - onToggle: A function switching the dropdown menu's state
 	 * from open to closed and vice versa
-	 * onClose: A function that closes the menu if invoked
+	 * - onClose: A function that closes the menu if invoked
 	 */
 	renderToggle: ( props: CallbackProps ) => ReactNode;
 	/**
