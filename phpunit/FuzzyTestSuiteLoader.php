@@ -1,8 +1,21 @@
 <?php
 /**
- * This file is derived from the PHPUnit project and customized for the
- * needs of the Gutenberg project.
+ * Implements a custom PHPUnit loader so that it's possible to run WordPress
+ * tests (with their non-standard filenames) without further modifications.
+ * 
+ * WordPress test files follow lowercase-kebab-casing conventions:
+ *   phpunit/html/wp-html-tag-processor-test.php
+ * 
+ * PHPUnit test files follow Title_Snake_Casing conventions:
+ *   phpunit/html/WP_HTML_Tag_Processor_Test.php
  *
+ * This makes it difficult to run the WordPress files from the CLI with
+ * PHPUnit. The loader in this module lets PHPUnit find and use both
+ * kinds of test file naming schemes.
+ *
+ * The code mostly derives from the PHPUnit project
+ * @see {https://github.com/sebastianbergmann/phpunit/blob/db39a78860c36cef3e04d0e4b9f2253e968f0c88/src/Runner/TestSuiteLoader.php}
+ * 
  * @package gutenberg
  */
 
