@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
 /**
  * Internal dependencies
@@ -25,6 +25,10 @@ export type DropdownContentWrapperProps = {
 };
 
 export type DropdownProps = {
+	/**
+	 * The className of the global container.
+	 */
+	className?: string;
 	/**
 	 * If you want to target the dropdown menu for styling purposes,
 	 * you need to provide a contentClassName because it's not being rendered
@@ -105,4 +109,8 @@ export type DropdownProps = {
 	 * onClose: A function that closes the menu if invoked
 	 */
 	renderToggle: ( props: CallbackProps ) => ReactNode;
+	/**
+	 * The style of the global container.
+	 */
+	style?: CSSProperties;
 };

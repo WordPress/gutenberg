@@ -114,3 +114,9 @@ A callback invoked to render the Dropdown Toggle Button.
 Its props are the same as the `renderContent` props.
 
 -   Required: Yes
+
+### `style`: `React.CSSProperties`
+
+The style of the global container
+
+-   Required: No

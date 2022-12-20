@@ -14,7 +14,6 @@ import { useMergeRefs } from '@wordpress/compose';
  * Internal dependencies
  */
 import Popover from '../popover';
-import type { WordPressComponentProps } from '../ui/context';
 import type { DropdownProps } from './types';
 
 function useObservableState(
