@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<ruleset name="WordPress PHP Compatibility">
-	<description>Apply PHP compatibility checks to all WordPress Core files</description>
+<ruleset name="Gutenberg PHP Compatibility">
+	<description>Apply PHP compatibility checks to all Gutenberg files</description>
 
 	<rule ref="PHPCompatibilityWP"/>
 
@@ -25,7 +25,10 @@
 	<!-- Show sniff codes in all reports. -->
 	<arg value="ps"/>
 
-	<!-- For now, only the files in src are scanned. -->
-	<file>./lib/</file>
-	<file>./packages/</file>
+	<file>./bin</file>
+	<file>./gutenberg.php</file>
+	<file>./lib</file>
+	<file>./packages</file>
+	<file>./phpunit</file>
+	<file>./post-content.php</file>
 </ruleset>
