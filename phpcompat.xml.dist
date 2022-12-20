@@ -31,4 +31,14 @@
 	<file>./packages</file>
 	<file>./phpunit</file>
 	<file>./post-content.php</file>
+
+	<!-- Code which doesn't go into production may have different requirements. -->
+	<exclude-pattern>/node_modules/*</exclude-pattern>
+
+	<!--
+		Scanning this folder throws too many errors.
+		Currently, Gutenberg relies on the "PHPUnit Tests" CI job to ensure that dependencies are compatible
+		with all supported PHP versions.
+	-->
+	<exclude-pattern>/vendor/*</exclude-pattern>
 </ruleset>
