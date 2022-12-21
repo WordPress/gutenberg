@@ -312,7 +312,7 @@ const BlockActionsMenu = ( {
 const EMPTY_BLOCK_LIST = [];
 
 export default compose(
-	withSelect( ( select, { clientIds } ) => {
+	withSelect( ( select, { clientId } ) => {
 		const {
 			getBlockIndex,
 			getBlockRootClientId,
@@ -325,23 +325,19 @@ export default compose(
 			canInsertBlockType,
 			getTemplateLock,
 		} = select( blockEditorStore );
-		const normalizedClientIds = Array.isArray( clientIds )
-			? clientIds
-			: [ clientIds ];
-		const block = getBlock( normalizedClientIds );
-		const blockName = getBlockName( normalizedClientIds );
+		const block = getBlock( clientId );
+		const blockName = getBlockName( clientId );
 		const blockType = getBlockType( blockName );
 		const blockTitle = blockType?.title;
-		const firstClientId = normalizedClientIds[ 0 ];
+		const firstClientId = clientId;
 		const rootClientId = getBlockRootClientId( firstClientId );
 		const blockOrder = getBlockOrder( rootClientId );
 
 		const firstIndex = getBlockIndex( firstClientId );
-		const lastIndex = getBlockIndex(
-			normalizedClientIds[ normalizedClientIds.length - 1 ]
-		);
+		const isFirst = firstIndex === 0;
+		const isLast = clientId === blockOrder.length - 1;
 
-		const innerBlocks = getBlocksByClientId( clientIds );
+		const innerBlocks = getBlocksByClientId( clientId );
 
 		const canDuplicate = innerBlocks.every( ( innerBlock ) => {
 			return (
@@ -383,8 +379,8 @@ export default compose(
 			isEmptyDefaultBlock,
 			isLocked,
 			canDuplicate,
-			isFirst: firstIndex === 0,
-			isLast: lastIndex === blockOrder.length - 1,
+			isFirst,
+			isLast,
 			isReusableBlockType,
 			reusableBlock,
 			rootClientId,
@@ -395,7 +391,7 @@ export default compose(
 	withDispatch(
 		(
 			dispatch,
-			{ clientIds, rootClientId, currentIndex, selectedBlockClientId },
+			{ clientId, rootClientId, currentIndex, selectedBlockClientId },
 			{ select }
 		) => {
 			const {
@@ -426,12 +422,12 @@ export default compose(
 					);
 				},
 				duplicateBlock() {
-					return duplicateBlocks( clientIds );
+					return duplicateBlocks( [ clientId ] );
 				},
 				onMoveDown: ( ...args ) =>
-					moveBlocksDown( clientIds, rootClientId, ...args ),
+					moveBlocksDown( clientId, rootClientId, ...args ),
 				onMoveUp: ( ...args ) =>
-					moveBlocksUp( clientIds, rootClientId, ...args ),
+					moveBlocksUp( clientId, rootClientId, ...args ),
 				openGeneralSidebar: () =>
 					openGeneralSidebar( 'edit-post/block' ),
 				pasteBlock: ( clipboardBlock ) => {
@@ -452,7 +448,7 @@ export default compose(
 							rootClientId
 						);
 					} else {
-						replaceBlocks( clientIds, clipboardBlock );
+						replaceBlocks( clientId, clipboardBlock );
 					}
 				},
 				removeBlocks,
