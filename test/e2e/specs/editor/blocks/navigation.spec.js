@@ -30,7 +30,9 @@ test.describe(
 			// Check Page List is in the list view.
 
 			// Open the list view.
-			await editor.page.locator( '[aria-label="List View"i]' ).click();
+			await editor.page
+				.locator( '[aria-label="Document Overview"i]' )
+				.click();
 			// Click the Navigation block expander, we need to use force because it has aria-hidden set to true.
 			await editor.page
 				.locator(
