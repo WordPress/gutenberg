@@ -5,8 +5,8 @@ import { createBlock } from '@wordpress/blocks';
 import { moreVertical } from '@wordpress/icons';
 import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+import { store as blockEditorStore, BlockTitle } from '@wordpress/block-editor';
+import { __, sprintf } from '@wordpress/i18n';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -19,6 +19,12 @@ export const LeafMoreMenu = ( props ) => {
 
 	const { insertBlock, replaceBlock, removeBlocks } =
 		useDispatch( blockEditorStore );
+
+	const label = sprintf(
+		/* translators: %s: block name */
+		__( 'Remove %s' ),
+		BlockTitle( { clientId, maximumLength: 25 } )
+	);
 
 	return (
 		<DropdownMenu
@@ -66,7 +72,7 @@ export const LeafMoreMenu = ( props ) => {
 							onClose();
 						} }
 					>
-						{ __( 'Remove item' ) }
+						{ label }
 					</MenuItem>
 				</MenuGroup>
 			) }
