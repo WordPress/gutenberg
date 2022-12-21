@@ -12,6 +12,7 @@ import {
 	forwardRef,
 	useMemo,
 	useReducer,
+	renderToString,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -204,7 +205,7 @@ function Iframe(
 	}, [] );
 	const bodyRef = useMergeRefs( [ contentRef, clearerRef, writingFlowRef ] );
 
-	head = (
+	const styleAssets = (
 		<>
 			<style>{ 'html{height:auto!important;}body{margin:0}' }</style>
 			{ [ ...styles, ...neededCompatStyles ].map(
@@ -224,9 +225,15 @@ function Iframe(
 					);
 				}
 			) }
-			{ head }
 		</>
 	);
+
+	// Correct doctype is required to enable rendering in standards
+	// mode. Also preload the styles to avoid a flash of unstyled
+	// content.
+	const srcDoc = useMemo( () => {
+		return '<!doctype html>' + renderToString( styleAssets );
+	}, [] );
 
 	return (
 		<>
@@ -235,14 +242,17 @@ function Iframe(
 				{ ...props }
 				ref={ useMergeRefs( [ ref, setRef ] ) }
 				tabIndex={ tabIndex }
-				// Correct doctype is required to enable rendering in standards mode
-				srcDoc="<!doctype html>"
+				// Correct doctype is required to enable rendering in standards
+				// mode. Also preload the styles to avoid a flash of unstyled
+				// content.
+				srcDoc={ srcDoc }
 				title={ __( 'Editor canvas' ) }
 			>
 				{ iframeDocument &&
 					createPortal(
 						<>
 							<head ref={ headRef }>
+								{ styleAssets }
 								{ head }
 								<style>
 									{ `html { transition: background 5s; ${

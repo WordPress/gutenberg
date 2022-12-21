@@ -120,6 +120,7 @@ export default function VisualEditor( { styles } ) {
 		wrapperBlockName,
 		wrapperUniqueId,
 		isBlockBasedTheme,
+		assets,
 	} = useSelect( ( select ) => {
 		const {
 			isFeatureActive,
@@ -158,6 +159,10 @@ export default function VisualEditor( { styles } ) {
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 			isBlockBasedTheme: editorSettings.__unstableIsBlockBasedTheme,
+			// WARNING: use getEditorSettings from the editor store, not the
+			// block editor store. The settings on the block editor store set
+			// with a delay.
+			assets: editorSettings.__unstableResolvedAssets,
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -165,20 +170,15 @@ export default function VisualEditor( { styles } ) {
 		( select ) => select( editPostStore ).hasMetaBoxes(),
 		[]
 	);
-	const {
-		themeHasDisabledLayoutStyles,
-		themeSupportsLayout,
-		assets,
-		isFocusMode,
-	} = useSelect( ( select ) => {
-		const _settings = select( blockEditorStore ).getSettings();
-		return {
-			themeHasDisabledLayoutStyles: _settings.disableLayoutStyles,
-			themeSupportsLayout: _settings.supportsLayout,
-			assets: _settings.__unstableResolvedAssets,
-			isFocusMode: _settings.focusMode,
-		};
-	}, [] );
+	const { themeHasDisabledLayoutStyles, themeSupportsLayout, isFocusMode } =
+		useSelect( ( select ) => {
+			const _settings = select( blockEditorStore ).getSettings();
+			return {
+				themeHasDisabledLayoutStyles: _settings.disableLayoutStyles,
+				themeSupportsLayout: _settings.supportsLayout,
+				isFocusMode: _settings.focusMode,
+			};
+		}, [] );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const desktopCanvasStyles = {
