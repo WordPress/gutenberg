@@ -58,7 +58,7 @@ export interface SelectControlProps
 		 */
 		disabled?: boolean;
 	}[];
-	value?: number | string | string[];
+	value?: string | string[] | number;
 	/**
 	 * As an alternative to the `options` prop, `optgroup`s and `options` can be
 	 * passed in as `children` for more customizability.
