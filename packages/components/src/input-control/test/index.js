@@ -65,6 +65,7 @@ describe( 'InputControl', () => {
 			const help = screen.getByRole( 'link', { name: 'My help text' } );
 
 			expect(
+				// eslint-disable-next-line testing-library/no-node-access
 				help.closest( `#${ input.getAttribute( 'aria-details' ) }` )
 			).toBeVisible();
 		} );

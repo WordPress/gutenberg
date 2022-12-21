@@ -486,6 +486,7 @@ describe( 'FormTokenField', () => {
 
 			// This is testing implementation details, but I'm not sure there's
 			// a better way.
+			// eslint-disable-next-line testing-library/no-node-access
 			expect( input.parentElement?.parentElement ).toHaveClass(
 				'test-classname'
 			);
