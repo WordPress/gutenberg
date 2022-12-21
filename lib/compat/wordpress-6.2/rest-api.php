@@ -116,15 +116,3 @@ function gutenberg_modify_rest_sidebars_response( $response ) {
 	return $response;
 }
 add_filter( 'rest_prepare_sidebar', 'gutenberg_modify_rest_sidebars_response' );
-
-
-register_block_pattern(
-	'query/template-type-test',
-	array(
-		'title'         => __( 'Template type test', 'gutenberg' ),
-		'templateTypes' => array( '404' ),
-		'content'       => '<!-- wp:paragraph {"align":"center","fontSize":"x-large"} -->
-							<p class="has-text-align-center has-x-large-font-size">404</p>
-							<!-- /wp:paragraph -->',
-	)
-);
