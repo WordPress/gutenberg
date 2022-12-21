@@ -208,8 +208,8 @@ class WP_HTML_Attribute_Sourcer {
 						'tag' => $tags->get_tag(),
 						'selector' => $next
 					] );
-					$state = [];
-					while ( $tags->next_within_balanced_tags( $state ) ) {
+					$state = WP_HTML_Processor::new_state();
+					while ( $tags->balanced_next( $state ) ) {
 						continue;
 					}
 
@@ -234,8 +234,9 @@ class WP_HTML_Attribute_Sourcer {
 						'tag' => $tags->get_tag(),
 						'selector' => $next
 					] );
-					$state = [];
-					while ( $tags->next_within_balanced_tags( $state, null, 1 ) ) {
+					$state = WP_HTML_Processor::new_state();
+					$state->match_depth = 1;
+					while ( $tags->balanced_next( $state ) ) {
 						if ( null === self::select_match( $tags, $next ) ) {
 							continue;
 						}
@@ -259,8 +260,8 @@ class WP_HTML_Attribute_Sourcer {
 						'tag' => $tags->get_tag(),
 						'selector' => $next
 					] );
-					$state = [];
-					while ( $tags->next_within_balanced_tags( $state ) ) {
+					$state = WP_HTML_Processor::new_state();
+					while ( $tags->balanced_next( $state ) ) {
 						if ( null === self::select_match( $tags, $next ) ) {
 							continue;
 						}

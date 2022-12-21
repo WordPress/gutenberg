@@ -16,41 +16,114 @@
  * not, that `<p>` itself is a special element.
  */
 
+
+class WP_HTML_Processor_Scan_State {
+	public $budget = 1000;
+	public $open_tags = array();
+	public $bail_depth = 0;
+	public $match_depth = null;
+
+	public function relative_depth() {
+		return count( $this->open_tags );
+	}
+
+	public function also_scan_siblings() {
+		$this->bail_depth = -1;
+	}
+}
+
+
 class WP_HTML_Processor extends WP_HTML_Tag_Processor {
-	public function next_within_balanced_tags( &$state, $query = null, $max_depth = 1000 ) {
-		if ( empty( $state ) ) {
-			$state['budget'] = 1000;
-			$state['tag_name'] = $this->get_tag();
-			$state['balanced_depth'] = 1;
-			$state['depth'] = 1;
+	public static function new_state() {
+		return new WP_HTML_Processor_Scan_State();
+	}
 
-			if ( self::is_html_void_element( $this->get_tag() ) ) {
+	public function balanced_next( WP_HTML_Processor_Scan_State $state, $query = null ) {
+		while ( $this->next_tag( array( 'tag_closers' => 'visit' ) ) && $state->budget-- > 0 ) {
+			$tag_name  = $this->get_tag();
+			$is_closer = $this->is_tag_closer();
+			$is_void   = self::is_html_void_element( $tag_name );
+			$type      = self::classify_tag_type( $is_closer, $is_void );
+
+			/*
+			 * Step 1. Update the stack of open tags.
+			 *
+			 * If and when we add more complete HTML parsing support we will also
+			 * need to track the stack of active formats so that we can properly
+			 * handle missing tags and overlapping tags.
+			 */
+
+			switch ( $type ) {
+				case 'void':
+					/*
+					 * Void tags (such as <img>) can't have children and so we
+					 * won't push or pop them from the stack of open tags.
+					 *
+					 * If and when we support self-closing foreign tags we would
+					 * need to separately track those, but their behavior matches
+					 * this case. The self-closing flag is ignored for HTML5 tags.
+					 */
+					break;
+
+				case 'opener':
+					$state->open_tags[] = $tag_name;
+					break;
+
+				case 'closer':
+					$last_tag = array_pop( $state->open_tags );
+
+					/*
+					 * Currently we can only support fully-normative and balanced HTML5.
+					 * If we encounter anything we don't expect then we will bail. In a
+					 * future update we may perform more careful HTML parsing and unlock
+					 * navigating through non-normative documents.
+					 */
+					if ( $last_tag !== $tag_name ) {
+						return false;
+					}
+					break;
+			}
+
+			/*
+			 * Void elements don't enter the stack, but they do exist in the
+			 * depth hierarchy, so we have to temporarily account for that.
+			 *
+			 * We could have followed the approach in the HTML5 spec by appending
+			 * the void tag to the stack of open tags, and then remember to pop it
+			 * when existing this function, but by tracking it like this we don't
+			 * have to remember to do that.
+			 */
+			$depth = $type === 'void'
+				? $state->relative_depth() + 1
+				: $state->relative_depth();
+
+			/*
+			 * Step 2. If we've reached the depth at which we want to stop searching,
+			 * then bail at the current tag. This is mostly used to stop at the end
+			 * of the opening tag's closing tag, but if set negative can continue
+			 * scanning sibling elements (-1) or parents (-2) and so on.
+			 */
+
+			if ( $state->bail_depth === $depth ) {
 				return false;
 			}
-		}
 
-		while ( $this->next_tag( array( 'tag_closers' => 'visit' ) ) && $state['budget']-- > 0 ) {
-			if (
-				$this->get_tag() === $state['tag_name'] &&
-				$this->is_tag_closer() &&
-				$state['balanced_depth'] === 1
-			) {
-				return false;
-			}
+			/*
+			 * Step 3. Determine if we have a matching tag. In addition to the query
+			 * we pass along to the underlying tag processor we're going to allow
+			 * specifying the relative depth for a match. For example, a CSS child
+			 * combinator would specify that a match must have a relative depth of 1,
+			 * indicating that it's a direct child of the surrounding element, whereas
+			 * the descendant selector could match at any depth and so sets this to `null`.
+			 * To prevent matching _above_ a tag we rely on the `bail_depth` to stop
+			 * searching once we've exited the tag on which we started, or reach its parent.
+			 */
 
-			if ( $state['depth'] <= $max_depth ) {
+			if ( ! isset( $state->match_depth ) || $state->match_depth  === $depth ) {
 				$this->parse_query( $query );
 				if ( $this->matches() ) {
 					return true;
 				}
-			}
-
-			if ( ! self::is_html_void_element( $this->get_tag() ) ) {
-				$state['depth'] += $this->is_tag_closer() ? -1 : 1;
-			}
-
-			if ( $this->get_tag() === $state['tag_name'] ) {
-				$state['balanced_depth'] += $this->is_tag_closer() ? -1 : 1;
 			}
 		}
 
@@ -72,26 +145,13 @@ class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 		}
 
 		$this->set_bookmark( $start_name );
-		$tag_name = $this->get_tag();
-		$depth = 1;
 
-		if ( self::is_html_void_element( $tag_name ) ) {
-			return '';
+		$state = self::new_state();
+		while ( $this->balanced_next( $state ) ) {
+			continue;
 		}
 
-		while ( $this->next_tag( [ 'tag_closers' => 'visit' ] ) ) {
-			if ( $this->get_tag() !== $tag_name ) {
-				continue;
-			}
-
-			if ( $this->is_tag_closer() && $depth === 1 ) {
-				$this->set_bookmark( $end_name );
-				break;
-			}
-
-			$depth += $this->is_tag_closer() ? -1 : 1;
-		}
-
+		$this->set_bookmark( $end_name );
 		$content = $this->content_inside_bookmarks( $start_name, $end_name );
 		$this->seek( $start_name );
 
@@ -115,6 +175,14 @@ class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 	/*
 	 * HTML-related Utility Functions
 	 */
+
+	public static function classify_tag_type( $is_closer, $is_void ) {
+		if ( $is_void ) {
+			return 'void';
+		}
+
+		return $is_closer ? 'closer' : 'opener';
+	}
 
 	/**
 	 * @see https://html.spec.whatwg.org/#elements-2
