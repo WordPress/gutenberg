@@ -6,8 +6,20 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 test.describe(
 	'As a user I want the navigation block to fallback to the best possible default',
 	() => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'emptytheme' );
+		} );
+
 		test.beforeEach( async ( { admin } ) => {
 			await admin.createNewPost();
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'twentytwentyone' );
+		} );
+
+		test.afterEach( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllPosts();
 		} );
 
 		test( 'default to a list of pages if there are no menus', async ( {
