@@ -15,6 +15,8 @@ export type Term = {
 	value?: string;
 };
 
+export type TermsWithChildren = Array< Term & { children: Term[] } >;
+
 export type CategorySelectProps = {
 	label: TreeSelectProps[ 'label' ];
 	noOptionLabel: TreeSelectProps[ 'noOptionLabel' ];
