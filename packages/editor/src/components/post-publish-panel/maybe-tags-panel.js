@@ -6,7 +6,7 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { compose, ifCondition } from '@wordpress/compose';
 import { useSelect, withSelect } from '@wordpress/data';
@@ -25,40 +25,30 @@ const TagsPanel = () => {
 		const store = select( coreStore );
 		return store.getTaxonomy( slug );
 	} );
-	const labelWithFallback = (
-		labelProperty,
-		fallbackIsTag,
-		fallbackIsNotTag
-	) =>
-		get(
-			tagsTaxonomy,
-			[ 'labels', labelProperty ],
-			tagsTaxonomy.slug === 'tag' ? fallbackIsTag : fallbackIsNotTag
-		);
-	const pluralName = labelWithFallback( 'name', __( 'Tags' ), __( 'Terms' ) );
-	const addTerms = sprintf(
-		// translators: %s: Taxonomy terms input label
-		__( 'Add %s' ),
-		pluralName.toLowerCase()
+	const labelWithFallback = ( labelProperty, fallback ) =>
+		get( tagsTaxonomy, [ 'labels', labelProperty ], fallback );
+
+	const prePublishSuggestionLabel = labelWithFallback(
+		'pre_publish_suggestion',
+		__( 'Add new tag' )
+	);
+
+	const prePublishSuggestionDescription = labelWithFallback(
+		'pre_publish_description',
+		__(
+			'Tags help users and search engines navigate your site and find your content. Add a few keywords to describe your post.'
+		)
 	);
 	const panelBodyTitle = [
 		__( 'Suggestion:' ),
 		<span className="editor-post-publish-panel__link" key="label">
-			{ addTerms }
+			{ prePublishSuggestionLabel }
 		</span>,
 	];
 
 	return (
 		<PanelBody initialOpen={ false } title={ panelBodyTitle }>
-			<p>
-				{ sprintf(
-					// translators: %s: Taxonomy terms input description
-					__(
-						'%s help users and search engines navigate your site and find your content. Add a few keywords to describe your post.'
-					),
-					pluralName
-				) }
-			</p>
+			<p>{ prePublishSuggestionDescription }</p>
 			<FlatTermSelector slug={ slug } />
 		</PanelBody>
 	);

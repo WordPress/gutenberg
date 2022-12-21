@@ -6,7 +6,7 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { PanelBody } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
@@ -22,8 +22,7 @@ function MaybeCategoryPanel() {
 	const categoriesTaxonomy = useSelect( coreStore ).getTaxonomy( 'category' );
 	const hasNoCategory = useSelect( ( select ) => {
 		const postType = select( editorStore ).getCurrentPostType();
-		const { canUser, getEntityRecord, getTaxonomy } = select( coreStore );
-		const categoriesTaxonomy = getTaxonomy( 'category' );
+		const { canUser, getEntityRecord } = select( coreStore );
 		const defaultCategoryId = canUser( 'read', 'settings' )
 			? getEntityRecord( 'root', 'site' )?.default_category
 			: undefined;
@@ -64,50 +63,31 @@ function MaybeCategoryPanel() {
 		return null;
 	}
 
-	const labelWithFallback = (
-		labelProperty,
-		fallbackIsCategory,
-		fallbackIsNotCategory
-	) =>
-		get(
-			categoriesTaxonomy,
-			[ 'labels', labelProperty ],
-			categoriesTaxonomy.slug === 'category'
-				? fallbackIsCategory
-				: fallbackIsNotCategory
-		);
-	const pluralName = labelWithFallback(
-		'name',
-		__( 'Categories' ),
-		__( 'Terms' )
+	const labelWithFallback = ( labelProperty, fallback ) =>
+		get( categoriesTaxonomy, [ 'labels', labelProperty ], fallback );
+
+	const prePublishSuggestionLabel = labelWithFallback(
+		'pre_publish_suggestion',
+		__( 'Assign a category' )
 	);
-	const singularName = labelWithFallback(
-		'singular_name',
-		__( 'Category' ),
-		__( 'Term' )
+
+	const prePublishSuggestionDescription = labelWithFallback(
+		'pre_publish_description',
+		__(
+			'Categories provide a helpful way to group related posts together and to quickly tell readers what a post is about.'
+		)
 	);
+
 	const panelBodyTitle = [
 		__( 'Suggestion:' ),
 		<span className="editor-post-publish-panel__link" key="label">
-			{ sprintf(
-				// translators: %s: Taxonomy terms input label
-				__( 'Assign a %s' ),
-				singularName.toLowerCase()
-			) }
+			{ prePublishSuggestionLabel }
 		</span>,
 	];
 
 	return (
 		<PanelBody initialOpen={ false } title={ panelBodyTitle }>
-			<p>
-				{ sprintf(
-					// translators: %s: Taxonomy terms input description
-					__(
-						'%s provide a helpful way to group related posts together and to quickly tell readers what a post is about.'
-					),
-					pluralName
-				) }
-			</p>
+			<p>{ prePublishSuggestionDescription }</p>
 			<HierarchicalTermSelector slug="category" />
 		</PanelBody>
 	);
