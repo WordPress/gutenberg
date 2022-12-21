@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Key } from 'React';
+import type { Key } from 'react';
 
 /**
  * Internal dependencies
