@@ -46,6 +46,32 @@ function GlobalStylesNavigationScreen( { className, ...props } ) {
 	);
 }
 
+function BlockStyleVariationsScreens( { name } ) {
+	const blockStyleVariations = useSelect(
+		( select ) => {
+			const { getBlockStyles } = select( blocksStore );
+			return getBlockStyles( name );
+		},
+		[ name ]
+	);
+	if ( ! blockStyleVariations?.length ) {
+		return null;
+	}
+
+	return blockStyleVariations.map( ( variation ) => (
+		<ContextScreens
+			key={ variation.name + name }
+			name={ name }
+			parentMenu={
+				'/blocks/' +
+				encodeURIComponent( name ) +
+				'/variations/' +
+				encodeURIComponent( variation.name )
+			}
+		/>
+	) );
+}
+
 function ContextScreens( { name, parentMenu = '' } ) {
 	const hasVariationPath = parentMenu.search( 'variations' );
 	const variationPath =
@@ -212,9 +238,7 @@ function GlobalStylesStyleBook( { onClose } ) {
 
 function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
 	const blocks = getBlockTypes();
-	const getBlockStyles = useSelect( ( select ) => {
-		return select( blocksStore ).getBlockStyles;
-	}, [] );
+
 	return (
 		<NavigatorProvider
 			className="edit-site-global-styles-sidebar__navigator-provider"
@@ -251,23 +275,13 @@ function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
 				/>
 			) ) }
 
-			{ blocks.map( ( block ) => {
-				const blockStyleVariations = getBlockStyles( block.name );
-				if ( ! blockStyleVariations?.length ) {
-					return null;
-				}
-				return blockStyleVariations.map( ( variation ) => (
-					<ContextScreens
-						key={ variation.name + block.name }
+			{ blocks.map( ( block, index ) => {
+				return (
+					<BlockStyleVariationsScreens
+						key={ 'screens-block-styles-' + block.name + index }
 						name={ block.name }
-						parentMenu={
-							'/blocks/' +
-							encodeURIComponent( block.name ) +
-							'/variations/' +
-							encodeURIComponent( variation.name )
-						}
 					/>
-				) );
+				);
 			} ) }
 			{ isStyleBookOpened && (
 				<GlobalStylesStyleBook onClose={ onCloseStyleBook } />

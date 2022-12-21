@@ -2165,9 +2165,16 @@ class WP_Theme_JSON_Gutenberg {
 			$variation_selectors = array();
 			if ( isset( $node['variations'] ) ) {
 				foreach ( $node['variations'] as $variation => $node ) {
+					// There might not be a selector if this is a newly created variation, so we need to provide one.
+					$variation_selector = '';
+					if ( isset( $selectors[ $name ]['styleVariations'][ $variation ] ) ) {
+						$variation_selector = $selectors[ $name ]['styleVariations'][ $variation ];
+					} elseif ( isset( $selectors[ $name ]['selector'] ) ) {
+						$variation_selector = '.is-style-' . $variation . '.is-style-' . $variation . $selectors[ $name ]['selector'];
+					}
 					$variation_selectors[] = array(
 						'path'     => array( 'styles', 'blocks', $name, 'variations', $variation ),
-						'selector' => $selectors[ $name ]['styleVariations'][ $variation ],
+						'selector' => $variation_selector,
 					);
 				}
 			}
