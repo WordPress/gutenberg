@@ -329,13 +329,12 @@ export default compose(
 		const blockName = getBlockName( clientId );
 		const blockType = getBlockType( blockName );
 		const blockTitle = blockType?.title;
-		const firstClientId = clientId;
-		const rootClientId = getBlockRootClientId( firstClientId );
+		const rootClientId = getBlockRootClientId( clientId );
 		const blockOrder = getBlockOrder( rootClientId );
 
-		const firstIndex = getBlockIndex( firstClientId );
-		const isFirst = firstIndex === 0;
-		const isLast = clientId === blockOrder.length - 1;
+		const currentBlockIndex = getBlockIndex( clientId );
+		const isFirst = currentBlockIndex === 0;
+		const isLast = currentBlockIndex === blockOrder.length - 1;
 
 		const innerBlocks = getBlocksByClientId( clientId );
 
@@ -374,7 +373,7 @@ export default compose(
 		return {
 			blockTitle,
 			canInsertBlockType,
-			currentIndex: firstIndex,
+			currentIndex: currentBlockIndex,
 			getBlocksByClientId,
 			isEmptyDefaultBlock,
 			isLocked,
@@ -425,9 +424,9 @@ export default compose(
 					return duplicateBlocks( [ clientId ] );
 				},
 				onMoveDown: ( ...args ) =>
-					moveBlocksDown( clientId, rootClientId, ...args ),
+					moveBlocksDown( [ clientId ], rootClientId, ...args ),
 				onMoveUp: ( ...args ) =>
-					moveBlocksUp( clientId, rootClientId, ...args ),
+					moveBlocksUp( [ clientId ], rootClientId, ...args ),
 				openGeneralSidebar: () =>
 					openGeneralSidebar( 'edit-post/block' ),
 				pasteBlock: ( clipboardBlock ) => {

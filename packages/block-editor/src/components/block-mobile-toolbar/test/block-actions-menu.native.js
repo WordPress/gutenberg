@@ -67,6 +67,7 @@ describe( 'Block Actions Menu', () => {
 		it( 'moves blocks up and down', async () => {
 			const screen = await initializeEditor( {
 				initialHtml: INITIAL_HTML,
+				screenWidth: 100,
 			} );
 			const { getByLabelText } = screen;
 
@@ -76,11 +77,11 @@ describe( 'Block Actions Menu', () => {
 			} );
 			fireEvent.press( spacerBlock );
 
+			// Open block actions menu
+			fireEvent.press( getByLabelText( /Open Block Actions Menu/ ) );
+
 			// Tap on the Move Down button
-			const downButton = getByLabelText(
-				/Move block down from row 2 to row 3/
-			);
-			fireEvent.press( downButton );
+			fireEvent.press( getByLabelText( /Move block down/ ) );
 
 			// Get Heading block
 			const headingBlock = await getBlock( screen, 'Heading', {
@@ -88,11 +89,11 @@ describe( 'Block Actions Menu', () => {
 			} );
 			fireEvent.press( headingBlock );
 
+			// Open block actions menu
+			fireEvent.press( getByLabelText( /Open Block Actions Menu/ ) );
+
 			// Tap on the Move Up button
-			const upButton = getByLabelText(
-				/Move block up from row 2 to row 1/
-			);
-			fireEvent.press( upButton );
+			fireEvent.press( getByLabelText( /Move block up/ ) );
 
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
@@ -106,6 +107,9 @@ describe( 'Block Actions Menu', () => {
 			// Get Paragraph block
 			const paragraphBlock = await getBlock( screen, 'Paragraph' );
 			fireEvent.press( paragraphBlock );
+
+			// Open block actions menu
+			fireEvent.press( getByLabelText( /Open Block Actions Menu/ ) );
 
 			// Get the Move Up button
 			const upButton = getByLabelText( /Move block up/ );
@@ -130,6 +134,9 @@ describe( 'Block Actions Menu', () => {
 				rowIndex: 3,
 			} );
 			fireEvent.press( headingBlock );
+
+			// Open block actions menu
+			fireEvent.press( getByLabelText( /Open Block Actions Menu/ ) );
 
 			// Get the Move Down button
 			const downButton = getByLabelText( /Move block down/ );
