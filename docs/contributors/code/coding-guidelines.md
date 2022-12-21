@@ -140,33 +140,29 @@ In both cases, the API should be made stable or removed at the earliest opportun
 
 While an experimental API may often stabilize into a publicly-available API, there is no guarantee that it will. The conversion to a stable API will inherently be considered a breaking change by the mere fact that the function name must be changed to remove the `__experimental` prefix.
 
-#### Experimental APIs and WordPress Core
+#### Experimental APIs merged into WordPress Core become a liability
 
-Plugin and theme authors are forced to rely on the __experimental features that could get removed or changed in a backwards incompatible way at any time. It is a serious maintenance burden. Every new Gutenberg/WordPress release means potentially breaking changes.
+**Avoid introducing public experimental APIs.**
 
-Ideally, the API wouldn't be introduced at all.
+As of June 2022, WordPress Core contains 280 publicly exported experimental APIs. They got merged from the Gutenberg
+plugin during the major WordPress releases. Many plugins and themes rely on these experimental APIs for essential
+features that can't be accessed in any other way. Naturally, these APIs can't be removed without a warning anymore.
+They are a part of the WordPress public API and fall under the 
+[WordPress Backwards Compatibility policy](https://developer.wordpress.org/block-editor/contributors/code/backward-compatibility/). 
+Removing them involves a deprecation process that spans multiple WordPress releases. 
 
-Also, shipping essential features as experimental sends the wrong message to the developers: With all these __experimental APIs around, adding another one surely can't be a big deal. What does "experimental" even mean at this point? What is a valid use case, and what isn't?
+**Use private experimental APIs instead.**
 
-The number keeps growing unless something slows it down.
+Make your experimental APIs private and don't expose them to WordPress extenders. 
 
-It could be a project policy, but policies need enforcement. It is hard, it creates extra work, and it is discouraging for new contributors.
-
-How about a soft nudge? It could be a CI check or a bot that detects new __experimental APIs and tries to educate the PR author? Ideally, it would propose an alternative.
-
-#### General principles
-
-Avoid introducing public experimental APIs.
-
-Every experimental API is a liability. If that API is not removed or stabilized in time, it will get merged to the next major WordPress release and plugin authors will start relying on it. The Gutenberg plugin may not offer any BC guarantees for its public experimental APIs, but the WordPress core does. As of June 2022, a total of 280 __experimental APIs got merged to WordPress core and are there to stay.
-
-In contrast, the non-exported experimental APIs cannot be accessed outside of the package which makes them truly private. They are an internal implementation detail, no different than any other non-exported function. Their `__experimental` name is their only distinguishing feature. They can be adjusted, refactored, and completely removed on a whim without affecting any WordPress plugin or theme.
+This way they'll remain internal implementation details that can be changed or removed
+ without a warning and without breaking WordPress plugins.
 
 The tactical guidelines below will help you write code without introducing new experimental APIs.
 
 #### General guidelines
 
-Some `__experimental` functions are exported in *package A* and only used in a single *package B* and nowhere else. Consider removing such functions from package A and making them private and non-exported members of package B.
+Some `__experimental` functions are exported in *package A* and only used in a single *package B* and nowhere else. Consider removing such functions from *package A* and making them private and non-exported members of *package B*.
 
 If your experimental API is only meant for the Gutenberg Plugin but not for the next WordPress major release, consider limiting the export to the plugin environment. For example, `@wordpress/components` could do that to receive early feedback about a new Component, but avoid bringing that component to WordPress core:
 
@@ -175,8 +171,6 @@ if ( IS_GUTENBERG_PLUGIN ) {
 	export { __experimentalFunction } from './experiments';
 }
 ```
-
-The experimental APIs that already are publicly available via `window.wp` should remain accessible as removing them would break the existing plugins and themes.
 
 #### Replace experimental selectors with hooks
 
