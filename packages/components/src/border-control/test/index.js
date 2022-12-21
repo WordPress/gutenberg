@@ -94,7 +94,7 @@ const clearWidthInput = () => setWidthInput( '' );
 
 describe( 'BorderControl', () => {
 	describe( 'basic rendering', () => {
-		it( 'should render standard border control', async () => {
+		it( 'should render standard border control', () => {
 			const props = createProps();
 			render( <BorderControl { ...props } /> );
 
@@ -115,7 +115,7 @@ describe( 'BorderControl', () => {
 			expect( slider ).not.toBeInTheDocument();
 		} );
 
-		it( 'should hide label', async () => {
+		it( 'should hide label', () => {
 			const props = createProps( { hideLabelFromVision: true } );
 			render( <BorderControl { ...props } /> );
 			const label = screen.getByText( props.label );
@@ -129,7 +129,7 @@ describe( 'BorderControl', () => {
 			);
 		} );
 
-		it( 'should render with slider', async () => {
+		it( 'should render with slider', () => {
 			const props = createProps( { withSlider: true } );
 			render( <BorderControl { ...props } /> );
 
@@ -137,7 +137,7 @@ describe( 'BorderControl', () => {
 			expect( slider ).toBeInTheDocument();
 		} );
 
-		it( 'should render placeholder in UnitControl', async () => {
+		it( 'should render placeholder in UnitControl', () => {
 			const props = createProps( { placeholder: 'Mixed' } );
 			render( <BorderControl { ...props } /> );
 
@@ -200,7 +200,7 @@ describe( 'BorderControl', () => {
 
 	describe( 'color and style picker aria labels', () => {
 		describe( 'with style selection enabled', () => {
-			it( 'should include both color and style in label', async () => {
+			it( 'should include both color and style in label', () => {
 				const props = createProps( { value: undefined } );
 				render( <BorderControl { ...props } /> );
 
@@ -209,7 +209,7 @@ describe( 'BorderControl', () => {
 				).toBeInTheDocument();
 			} );
 
-			it( 'should correctly describe named color selection', async () => {
+			it( 'should correctly describe named color selection', () => {
 				const props = createProps( { value: { color: '#72aee6' } } );
 				render( <BorderControl { ...props } /> );
 
@@ -220,7 +220,7 @@ describe( 'BorderControl', () => {
 				).toBeInTheDocument();
 			} );
 
-			it( 'should correctly describe custom color selection', async () => {
+			it( 'should correctly describe custom color selection', () => {
 				const props = createProps( { value: { color: '#4b1d80' } } );
 				render( <BorderControl { ...props } /> );
 
@@ -231,7 +231,7 @@ describe( 'BorderControl', () => {
 				).toBeInTheDocument();
 			} );
 
-			it( 'should correctly describe named color and style selections', async () => {
+			it( 'should correctly describe named color and style selections', () => {
 				const props = createProps( {
 					value: { color: '#72aee6', style: 'dotted' },
 				} );
@@ -244,7 +244,7 @@ describe( 'BorderControl', () => {
 				).toBeInTheDocument();
 			} );
 
-			it( 'should correctly describe custom color and style selections', async () => {
+			it( 'should correctly describe custom color and style selections', () => {
 				const props = createProps( {
 					value: { color: '#4b1d80', style: 'dashed' },
 				} );
@@ -259,7 +259,7 @@ describe( 'BorderControl', () => {
 		} );
 
 		describe( 'with style selection disabled', () => {
-			it( 'should only include color in the label', async () => {
+			it( 'should only include color in the label', () => {
 				const props = createProps( {
 					value: undefined,
 					enableStyle: false,
@@ -271,7 +271,7 @@ describe( 'BorderControl', () => {
 				).toBeInTheDocument();
 			} );
 
-			it( 'should correctly describe named color selection', async () => {
+			it( 'should correctly describe named color selection', () => {
 				const props = createProps( {
 					value: { color: '#72aee6' },
 					enableStyle: false,
@@ -285,7 +285,7 @@ describe( 'BorderControl', () => {
 				).toBeInTheDocument();
 			} );
 
-			it( 'should correctly describe custom color selection', async () => {
+			it( 'should correctly describe custom color selection', () => {
 				const props = createProps( {
 					value: { color: '#4b1d80' },
 					enableStyle: false,
@@ -302,7 +302,7 @@ describe( 'BorderControl', () => {
 	} );
 
 	describe( 'onChange handling', () => {
-		it( 'should update width with slider value', async () => {
+		it( 'should update width with slider value', () => {
 			const props = createProps( { withSlider: true } );
 			const { rerender } = render( <BorderControl { ...props } /> );
 
