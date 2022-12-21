@@ -121,6 +121,9 @@ export default function VisualEditor( { styles } ) {
 		wrapperUniqueId,
 		isBlockBasedTheme,
 		assets,
+		themeHasDisabledLayoutStyles,
+		themeSupportsLayout,
+		isFocusMode,
 	} = useSelect( ( select ) => {
 		const {
 			isFeatureActive,
@@ -161,8 +164,12 @@ export default function VisualEditor( { styles } ) {
 			isBlockBasedTheme: editorSettings.__unstableIsBlockBasedTheme,
 			// WARNING: use getEditorSettings from the editor store, not the
 			// block editor store. The settings on the block editor store set
-			// with a delay.
+			// with a delay and we need the assets on the first render for the
+			// iframe srcDoc.
 			assets: editorSettings.__unstableResolvedAssets,
+			themeHasDisabledLayoutStyles: editorSettings.disableLayoutStyles,
+			themeSupportsLayout: editorSettings.supportsLayout,
+			isFocusMode: editorSettings.focusMode,
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -170,15 +177,6 @@ export default function VisualEditor( { styles } ) {
 		( select ) => select( editPostStore ).hasMetaBoxes(),
 		[]
 	);
-	const { themeHasDisabledLayoutStyles, themeSupportsLayout, isFocusMode } =
-		useSelect( ( select ) => {
-			const _settings = select( blockEditorStore ).getSettings();
-			return {
-				themeHasDisabledLayoutStyles: _settings.disableLayoutStyles,
-				themeSupportsLayout: _settings.supportsLayout,
-				isFocusMode: _settings.focusMode,
-			};
-		}, [] );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const desktopCanvasStyles = {
