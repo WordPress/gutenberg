@@ -286,6 +286,7 @@ const BlockActionsMenu = ( {
 				} }
 			/>
 			<Picker
+				testID="block-actions-menu"
 				ref={ blockActionsMenuPickerRef }
 				options={ options }
 				onChange={ onPickerSelect }
