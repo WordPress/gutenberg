@@ -9,26 +9,26 @@ import type { Key } from 'react';
 import type { FormTokenFieldProps } from '../form-token-field/types';
 import type { Tree, TreeSelectProps } from '../tree-select/types';
 
-export type Term = {
+export type Entity = {
 	id: Tree[ 'id' ];
 	name: Tree[ 'name' ];
 	parent?: number | null;
 	value?: string;
 };
 
-export type TermsWithChildren = Array< Term & { children: Term[] } >;
+export type TermsWithChildren = Array< Entity & { children: Entity[] } >;
 
 export type CategorySelectProps = {
-	categoriesList: Term[];
+	categoriesList: Entity[];
 	key: Key;
 	label: TreeSelectProps[ 'label' ];
 	noOptionLabel: TreeSelectProps[ 'noOptionLabel' ];
 	onChange: TreeSelectProps[ 'onChange' ];
-	selectedCategoryId?: Term[ 'id' ];
+	selectedCategoryId?: Entity[ 'id' ];
 };
 
 export type AuthorSelectProps = {
-	authorList?: Term[];
+	authorList?: Entity[];
 	label: TreeSelectProps[ 'label' ];
 	noOptionLabel: TreeSelectProps[ 'noOptionLabel' ];
 	onChange: TreeSelectProps[ 'onChange' ];
@@ -42,15 +42,15 @@ export type QueryControlsProps = {
 	 */
 	authorList?: AuthorSelectProps[ 'authorList' ];
 	/**
-	 * An array of categoris with their IDs; renders a `CategorySelect`
+	 * An array of categories, renders a `CategorySelect`
 	 * sub-component when passed in conjunction with `onCategoryChange`.
 	 */
 	categoriesList?: CategorySelectProps[ 'categoriesList' ];
 	/**
-	 * An array of category names; renders a `FormTokenField` component
+	 * An array of category names, renders a `FormTokenField` component
 	 * when passed in conjunction with `onCategoryChange`.
 	 */
-	categorySuggestions?: Term[ 'name' ][];
+	categorySuggestions?: Entity[ 'name' ][];
 	/**
 	 * The maximum items.
 	 *
@@ -97,11 +97,11 @@ export type QueryControlsProps = {
 	 */
 	onOrderByChange?: ( newOrderBy: string ) => void;
 	/**
-	 * The order in which to retrieve posts. Can be 'asc' or 'desc'.
+	 * The order in which to retrieve posts.
 	 */
 	order?: 'asc' | 'desc';
 	/**
-	 * The meta key by which to order posts. Can be 'date' or 'title'.
+	 * The meta key by which to order posts.
 	 */
 	orderBy?: 'data' | 'title';
 	/**
@@ -111,7 +111,7 @@ export type QueryControlsProps = {
 	/**
 	 * The selected categories for the `categorySuggestions`.
 	 */
-	selectedCategories?: Term[];
+	selectedCategories?: Entity[];
 	/**
 	 * The selected category for the `categoriesList`.
 	 */

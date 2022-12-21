@@ -6,7 +6,7 @@ import { groupBy } from 'lodash';
 /**
  * Internal dependencies
  */
-import type { Term, TermsWithChildren } from './types';
+import type { Entity, TermsWithChildren } from './types';
 
 /**
  * Returns terms in a tree form.
@@ -16,7 +16,7 @@ import type { Term, TermsWithChildren } from './types';
  * @return Array of terms in tree format.
  */
 export function buildTermsTree(
-	flatTerms: readonly Term[]
+	flatTerms: readonly Entity[]
 ): TermsWithChildren {
 	const flatTermsWithParentAndChildren = flatTerms.map( ( term ) => {
 		return {
@@ -30,7 +30,7 @@ export function buildTermsTree(
 	if ( termsByParent.null && termsByParent.null.length ) {
 		return flatTermsWithParentAndChildren;
 	}
-	const fillWithChildren = ( terms: Term[] ): TermsWithChildren => {
+	const fillWithChildren = ( terms: Entity[] ): TermsWithChildren => {
 		return terms.map( ( term ) => {
 			const children = termsByParent[ term.id ];
 			return {
