@@ -45,12 +45,12 @@ export type QueryControlsProps = {
 	 * An array of categoris with their IDs; renders a `CategorySelect`
 	 * sub-component when passed in conjunction with `onCategoryChange`.
 	 */
-	categoriesList: CategorySelectProps[ 'categoriesList' ];
+	categoriesList?: CategorySelectProps[ 'categoriesList' ];
 	/**
 	 * An array of category names; renders a `FormTokenField` component
 	 * when passed in conjunction with `onCategoryChange`.
 	 */
-	categorySuggestions: Term[ 'name' ][];
+	categorySuggestions?: Term[ 'name' ][];
 	/**
 	 * The selected author ID.
 	 */
@@ -80,7 +80,7 @@ export type QueryControlsProps = {
 	 * A function that receives the new category value.
 	 * If this is not specified, the category controls are not included.
 	 */
-	onCategoryChange: CategorySelectProps[ 'onChange' ] &
+	onCategoryChange?: CategorySelectProps[ 'onChange' ] &
 		FormTokenFieldProps[ 'onChange' ];
 	/**
 	 * A function that receives the new number of items value.
