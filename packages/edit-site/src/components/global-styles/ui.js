@@ -7,6 +7,7 @@ import {
 	__experimentalUseNavigator as useNavigator,
 } from '@wordpress/components';
 import { getBlockTypes } from '@wordpress/blocks';
+import { useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -127,17 +128,18 @@ function ContextScreens( { name } ) {
 function GlobalStylesStyleBook( { onClose } ) {
 	const navigator = useNavigator();
 	const { path } = navigator.location;
+	const [ selectedBlockPath, setSelectedBlockPath ] = useState( '' );
+
+	useEffect( () => {
+		const pathPrefix = /^\/blocks\//g;
+		setSelectedBlockPath(
+			decodeURIComponent( path ).replace( pathPrefix, '' )
+		);
+	}, [ path ] );
+
 	return (
 		<StyleBook
-			isSelected={ ( blockName ) =>
-				// Match '/blocks/core%2Fbutton' and
-				// '/blocks/core%2Fbutton/typography', but not
-				// '/blocks/core%2Fbuttons'.
-				path === `/blocks/${ encodeURIComponent( blockName ) }` ||
-				path.startsWith(
-					`/blocks/${ encodeURIComponent( blockName ) }/`
-				)
-			}
+			selectedBlockPath={ selectedBlockPath }
 			onSelect={ ( blockName ) => {
 				// Clear navigator history by going back to the root.
 				const depth = path.match( /\//g ).length;

@@ -6,17 +6,23 @@ import { getBlockType, getBlockFromExample } from '@wordpress/blocks';
 import { useResizeObserver } from '@wordpress/compose';
 import { __experimentalSpacer as Spacer } from '@wordpress/components';
 
+/**
+ * Internal dependencies
+ */
+import { useHasStyleBook } from '../style-book';
+
 const BlockPreviewPanel = ( { name } ) => {
 	const [
 		containerResizeListener,
 		{ width: containerWidth, height: containerHeight },
 	] = useResizeObserver();
+	const hasStyleBook = useHasStyleBook();
 	const blockExample = getBlockType( name )?.example;
 	const blocks = blockExample && getBlockFromExample( name, blockExample );
 	const viewportWidth = blockExample?.viewportWidth || containerWidth;
 	const minHeight = containerHeight;
 
-	return ! blockExample ? null : (
+	return ! blockExample || hasStyleBook ? null : (
 		<Spacer marginX={ 4 } marginBottom={ 4 }>
 			<div className="edit-site-global-styles__block-preview-panel">
 				{ containerResizeListener }

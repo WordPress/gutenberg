@@ -78,6 +78,7 @@ export function TabPanel( {
 	tabs,
 	selectOnMove = true,
 	initialTabName,
+	selectedTabName,
 	orientation = 'horizontal',
 	activeClass = 'is-active',
 	onSelect,
@@ -109,6 +110,12 @@ export function TabPanel( {
 			handleTabSelection( initialTabName || tabs[ 0 ].name );
 		}
 	}, [ tabs, selectedTab?.name, initialTabName, handleTabSelection ] );
+
+	useEffect( () => {
+		if ( selectedTabName ) {
+			setSelected( selectedTabName );
+		}
+	}, [ selectedTabName ] );
 
 	return (
 		<div className={ className }>

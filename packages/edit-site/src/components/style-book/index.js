@@ -79,7 +79,7 @@ function getExamples() {
 	return [ headingsExample, ...otherExamples ];
 }
 
-function StyleBook( { isSelected, onSelect, onClose } ) {
+function StyleBook( { selectedBlockPath, onSelect, onClose } ) {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const [ textColor ] = useStyle( 'color.text' );
 	const [ backgroundColor ] = useStyle( 'color.background' );
@@ -99,6 +99,30 @@ function StyleBook( { isSelected, onSelect, onClose } ) {
 				} ) ),
 		[ examples ]
 	);
+
+	// Match 'core/button' and
+	// 'core/button/typography', but not
+	// 'core/buttons'.
+	const isSelected = ( blockName ) =>
+		selectedBlockPath === blockName ||
+		selectedBlockPath.startsWith( `${ blockName }/` );
+
+	const selectedTab = useMemo(
+		() =>
+			(
+				getCategories()
+					.filter( ( category ) =>
+						examples.some(
+							( example ) =>
+								example.category === category.slug &&
+								isSelected( example.name )
+						)
+					)
+					.shift() || {}
+			).slug,
+		[ examples, isSelected ]
+	);
+
 	return (
 		<StyleBookFill>
 			<section
@@ -121,6 +145,7 @@ function StyleBook( { isSelected, onSelect, onClose } ) {
 				<TabPanel
 					className="edit-site-style-book__tab-panel"
 					tabs={ tabs }
+					selectedTabName={ selectedTab }
 				>
 					{ ( tab ) => (
 						<Examples
