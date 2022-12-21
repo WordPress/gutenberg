@@ -46,6 +46,7 @@ function InterfaceSkeleton(
 		actions,
 		labels,
 		className,
+		enableRegionNavigation = true,
 		// Todo: does this need to be a prop.
 		// Can we use a dependency to keyboard-shortcuts directly?
 		shortcuts,
@@ -83,8 +84,11 @@ function InterfaceSkeleton(
 
 	return (
 		<div
-			{ ...navigateRegionsProps }
-			ref={ useMergeRefs( [ ref, navigateRegionsProps.ref ] ) }
+			{ ...( enableRegionNavigation ? navigateRegionsProps : {} ) }
+			ref={ useMergeRefs( [
+				ref,
+				enableRegionNavigation ? navigateRegionsProps.ref : undefined,
+			] ) }
 			className={ classnames(
 				className,
 				'interface-interface-skeleton',
