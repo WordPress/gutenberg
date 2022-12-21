@@ -280,13 +280,13 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	const INDIRECT_PROPERTIES_METADATA = array(
 		'gap'        => array(
-			array( 'spacing', 'blockGap' )
+			array( 'spacing', 'blockGap' ),
 		),
 		'column-gap' => array(
-			array( 'spacing', 'blockGap', 'left' )
+			array( 'spacing', 'blockGap', 'left' ),
 		),
 		'row-gap'    => array(
-			array( 'spacing', 'blockGap', 'top' )
+			array( 'spacing', 'blockGap', 'top' ),
 		),
 		'max-width'  => array(
 			array( 'layout', 'contentSize' ),
