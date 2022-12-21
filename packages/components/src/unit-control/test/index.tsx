@@ -112,6 +112,7 @@ describe( 'UnitControl', () => {
 			);
 
 			expect(
+				// eslint-disable-next-line testing-library/no-node-access
 				withoutClassName.querySelector( '.components-unit-control' )
 			).not.toHaveClass( 'hello' );
 			expect(
