@@ -399,7 +399,7 @@ export default compose(
 				duplicateBlocks,
 				removeBlocks,
 				insertBlock,
-				replaceBlocks,
+				replaceBlock,
 				clearSelectedBlock,
 			} = dispatch( blockEditorStore );
 			const { openGeneralSidebar } = dispatch( 'core/edit-post' );
@@ -447,7 +447,7 @@ export default compose(
 							rootClientId
 						);
 					} else {
-						replaceBlocks( clientId, clipboardBlock );
+						replaceBlock( clientId, clipboardBlock );
 					}
 				},
 				removeBlocks,
