@@ -153,7 +153,7 @@ const test = base.extend<
 
 			await use( requestUtils );
 		},
-		{ scope: 'worker' },
+		{ scope: 'worker', auto: true },
 	],
 	// An automatic fixture to configure snapshot settings globally.
 	snapshotConfig: [

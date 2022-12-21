@@ -8,15 +8,12 @@ import classnames from 'classnames';
  */
 import {
 	RichText,
-	useInnerBlocksProps,
 	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 import { VisuallyHidden } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { View } from '@wordpress/primitives';
-
-const allowedBlocks = [ 'core/image' ];
 
 export const Gallery = ( props ) => {
 	const {
@@ -31,16 +28,9 @@ export const Gallery = ( props ) => {
 
 	const { align, columns, caption, imageCrop } = attributes;
 
-	const { children, ...innerBlocksProps } = useInnerBlocksProps( blockProps, {
-		allowedBlocks,
-		orientation: 'horizontal',
-		renderAppender: false,
-		__experimentalLayout: { type: 'default', alignments: [] },
-	} );
-
 	return (
 		<figure
-			{ ...innerBlocksProps }
+			{ ...blockProps }
 			className={ classnames(
 				blockProps.className,
 				layoutClassNames,
@@ -53,8 +43,8 @@ export const Gallery = ( props ) => {
 				}
 			) }
 		>
-			{ children }
-			{ isSelected && ! children && (
+			{ blockProps.children }
+			{ isSelected && ! blockProps.children && (
 				<View className="blocks-gallery-media-placeholder-wrapper">
 					{ mediaPlaceholder }
 				</View>

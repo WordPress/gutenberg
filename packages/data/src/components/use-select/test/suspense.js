@@ -139,10 +139,11 @@ describe( 'useSuspenseSelect', () => {
 			}
 
 			render() {
+				const { children } = this.props;
 				if ( this.state.error ) {
 					return <div aria-label="error">{ this.state.error }</div>;
 				}
-				return this.props.children;
+				return children;
 			}
 		}
 

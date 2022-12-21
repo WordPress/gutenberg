@@ -30,7 +30,7 @@ import {
 	useInnerBlocksProps,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
-import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import {
 	placeCaretAtHorizontalEdge,
 	__unstableStripHTML as stripHTML,
@@ -48,6 +48,7 @@ import { useMergeRefs } from '@wordpress/compose';
 import { name } from './block.json';
 import { LinkUI } from './link-ui';
 import { updateAttributes } from './update-attributes';
+import { getColors } from '../navigation/edit/utils';
 
 /**
  * A React hook to determine if it's dragging within the target element.
@@ -99,61 +100,6 @@ const useIsDraggingWithin = ( elementRef ) => {
 
 	return isDraggingWithin;
 };
-
-/**
- * Determine the colors for a menu.
- *
- * Order of priority is:
- * 1: Overlay custom colors (if submenu)
- * 2: Overlay theme colors (if submenu)
- * 3: Custom colors
- * 4: Theme colors
- * 5: Global styles
- *
- * @param {Object}  context
- * @param {boolean} isSubMenu
- */
-function getColors( context, isSubMenu ) {
-	const {
-		textColor,
-		customTextColor,
-		backgroundColor,
-		customBackgroundColor,
-		overlayTextColor,
-		customOverlayTextColor,
-		overlayBackgroundColor,
-		customOverlayBackgroundColor,
-		style,
-	} = context;
-
-	const colors = {};
-
-	if ( isSubMenu && !! customOverlayTextColor ) {
-		colors.customTextColor = customOverlayTextColor;
-	} else if ( isSubMenu && !! overlayTextColor ) {
-		colors.textColor = overlayTextColor;
-	} else if ( !! customTextColor ) {
-		colors.customTextColor = customTextColor;
-	} else if ( !! textColor ) {
-		colors.textColor = textColor;
-	} else if ( !! style?.color?.text ) {
-		colors.customTextColor = style.color.text;
-	}
-
-	if ( isSubMenu && !! customOverlayBackgroundColor ) {
-		colors.customBackgroundColor = customOverlayBackgroundColor;
-	} else if ( isSubMenu && !! overlayBackgroundColor ) {
-		colors.backgroundColor = overlayBackgroundColor;
-	} else if ( !! customBackgroundColor ) {
-		colors.customBackgroundColor = customBackgroundColor;
-	} else if ( !! backgroundColor ) {
-		colors.backgroundColor = backgroundColor;
-	} else if ( !! style?.color?.background ) {
-		colors.customTextColor = style.color.background;
-	}
-
-	return colors;
-}
 
 const useIsInvalidLink = ( kind, type, id ) => {
 	const isPostType =
@@ -424,6 +370,7 @@ export default function NavigationLinkEdit( {
 	const ALLOWED_BLOCKS = [
 		'core/navigation-link',
 		'core/navigation-submenu',
+		'core/page-list',
 	];
 	const DEFAULT_BLOCK = {
 		name: 'core/navigation-link',
@@ -454,7 +401,7 @@ export default function NavigationLinkEdit( {
 			: __( 'This item is missing a link' );
 
 	return (
-		<Fragment>
+		<>
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton
@@ -494,6 +441,7 @@ export default function NavigationLinkEdit( {
 						autoComplete="off"
 					/>
 					<TextareaControl
+						__nextHasNoMarginBottom
 						value={ description || '' }
 						onChange={ ( descriptionValue ) => {
 							setAttributes( { description: descriptionValue } );
@@ -643,6 +591,6 @@ export default function NavigationLinkEdit( {
 				</a>
 				<div { ...innerBlocksProps } />
 			</div>
-		</Fragment>
+		</>
 	);
 }

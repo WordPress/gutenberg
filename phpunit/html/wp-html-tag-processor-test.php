@@ -1132,7 +1132,7 @@ HTML;
 		$examples  = array();
 		$examples['Invalid entity inside attribute value'] = array(
 			'<img src="https://s0.wp.com/i/atat.png" title="&; First &lt;title&gt; is &notit;" TITLE="second title" title="An Imperial &imperial; AT-AT"><span>test</span>',
-			'<img foo="bar" class="firstTag" src="https://s0.wp.com/i/atat.png" title="&; First &lt;title&gt; is &notit;" TITLE="second title" title="An Imperial &imperial; AT-AT"><span class="secondTag">test</span>',
+			'<img class="firstTag" foo="bar" src="https://s0.wp.com/i/atat.png" title="&; First &lt;title&gt; is &notit;" TITLE="second title" title="An Imperial &imperial; AT-AT"><span class="secondTag">test</span>',
 		);
 
 		$examples['HTML tag opening inside attribute value'] = array(
@@ -1147,152 +1147,152 @@ HTML;
 
 		$examples['Single and double quotes in attribute value'] = array(
 			'<p title="Demonstrating how to use single quote (\') and double quote (&quot;)"><span>test</span>',
-			'<p foo="bar" class="firstTag" title="Demonstrating how to use single quote (\') and double quote (&quot;)"><span class="secondTag">test</span>',
+			'<p class="firstTag" foo="bar" title="Demonstrating how to use single quote (\') and double quote (&quot;)"><span class="secondTag">test</span>',
 		);
 
 		$examples['Unquoted attribute values'] = array(
 			'<hr a=1 a=2 a=3 a=5 /><span>test</span>',
-			'<hr foo="bar" class="firstTag" a=1 a=2 a=3 a=5 /><span class="secondTag">test</span>',
+			'<hr class="firstTag" foo="bar" a=1 a=2 a=3 a=5 /><span class="secondTag">test</span>',
 		);
 
 		$examples['Double-quotes escaped in double-quote attribute value'] = array(
 			'<hr title="This is a &quot;double-quote&quot;"><span>test</span>',
-			'<hr foo="bar" class="firstTag" title="This is a &quot;double-quote&quot;"><span class="secondTag">test</span>',
+			'<hr class="firstTag" foo="bar" title="This is a &quot;double-quote&quot;"><span class="secondTag">test</span>',
 		);
 
 		$examples['Unquoted attribute value'] = array(
 			'<hr id=code><span>test</span>',
-			'<hr foo="bar" class="firstTag" id=code><span class="secondTag">test</span>',
+			'<hr class="firstTag" foo="bar" id=code><span class="secondTag">test</span>',
 		);
 
 		$examples['Unquoted attribute value with tag-like value'] = array(
 			'<hr id= 	<code> ><span>test</span>',
-			'<hr foo="bar" class="firstTag" id= 	<code> ><span class="secondTag">test</span>',
+			'<hr class="firstTag" foo="bar" id= 	<code> ><span class="secondTag">test</span>',
 		);
 
 		$examples['Unquoted attribute value with tag-like value followed by tag-like data'] = array(
 			'<hr id=code>><span>test</span>',
-			'<hr foo="bar" class="firstTag" id=code>><span class="secondTag">test</span>',
+			'<hr class="firstTag" foo="bar" id=code>><span class="secondTag">test</span>',
 		);
 
 		$examples['1'] = array(
 			'<hr id=&quo;code><span>test</span>',
-			'<hr foo="bar" class="firstTag" id=&quo;code><span class="secondTag">test</span>',
+			'<hr class="firstTag" foo="bar" id=&quo;code><span class="secondTag">test</span>',
 		);
 
 		$examples['2'] = array(
 			'<hr id/test=5><span>test</span>',
-			'<hr foo="bar" class="firstTag" id/test=5><span class="secondTag">test</span>',
+			'<hr class="firstTag" foo="bar" id/test=5><span class="secondTag">test</span>',
 		);
 
 		$examples['4'] = array(
 			'<hr title="<hr>"><span>test</span>',
-			'<hr foo="bar" class="firstTag" title="<hr>"><span class="secondTag">test</span>',
+			'<hr class="firstTag" foo="bar" title="<hr>"><span class="secondTag">test</span>',
 		);
 
 		$examples['5'] = array(
 			'<hr id=>code><span>test</span>',
-			'<hr foo="bar" class="firstTag" id=>code><span class="secondTag">test</span>',
+			'<hr class="firstTag" foo="bar" id=>code><span class="secondTag">test</span>',
 		);
 
 		$examples['6'] = array(
 			'<hr id"quo="test"><span>test</span>',
-			'<hr foo="bar" class="firstTag" id"quo="test"><span class="secondTag">test</span>',
+			'<hr class="firstTag" foo="bar" id"quo="test"><span class="secondTag">test</span>',
 		);
 
 		$examples['7'] = array(
 			'<hr id' . $null_byte . 'zero="test"><span>test</span>',
-			'<hr foo="bar" class="firstTag" id' . $null_byte . 'zero="test"><span class="secondTag">test</span>',
+			'<hr class="firstTag" foo="bar" id' . $null_byte . 'zero="test"><span class="secondTag">test</span>',
 		);
 
 		$examples['8'] = array(
 			'<hr >id="test"><span>test</span>',
-			'<hr foo="bar" class="firstTag" >id="test"><span class="secondTag">test</span>',
+			'<hr class="firstTag" foo="bar" >id="test"><span class="secondTag">test</span>',
 		);
 
 		$examples['9'] = array(
 			'<hr =id="test"><span>test</span>',
-			'<hr foo="bar" class="firstTag" =id="test"><span class="secondTag">test</span>',
+			'<hr class="firstTag" foo="bar" =id="test"><span class="secondTag">test</span>',
 		);
 
 		$examples['10'] = array(
 			'</><span>test</span>',
-			'</><span foo="bar" class="firstTag">test</span>',
+			'</><span class="firstTag" foo="bar">test</span>',
 		);
 
 		$examples['11'] = array(
 			'The applicative operator <* works well in Haskell; <data-tag> is what?<span>test</span>',
-			'The applicative operator <* works well in Haskell; <data-tag foo="bar" class="firstTag"> is what?<span class="secondTag">test</span>',
+			'The applicative operator <* works well in Haskell; <data-tag class="firstTag" foo="bar"> is what?<span class="secondTag">test</span>',
 		);
 
 		$examples['12'] = array(
 			'<3 is a heart but <t3> is a tag.<span>test</span>',
-			'<3 is a heart but <t3 foo="bar" class="firstTag"> is a tag.<span class="secondTag">test</span>',
+			'<3 is a heart but <t3 class="firstTag" foo="bar"> is a tag.<span class="secondTag">test</span>',
 		);
 
 		$examples['13'] = array(
 			'<?comment --><span>test</span>',
-			'<?comment --><span foo="bar" class="firstTag">test</span>',
+			'<?comment --><span class="firstTag" foo="bar">test</span>',
 		);
 
 		$examples['14'] = array(
 			'<!-- this is a comment. no <strong>tags</strong> allowed --><span>test</span>',
-			'<!-- this is a comment. no <strong>tags</strong> allowed --><span foo="bar" class="firstTag">test</span>',
+			'<!-- this is a comment. no <strong>tags</strong> allowed --><span class="firstTag" foo="bar">test</span>',
 		);
 
 		$examples['15'] = array(
 			'<![CDATA[This <is> a <strong id="yes">HTML Tag</strong>]]><span>test</span>',
-			'<![CDATA[This <is> a <strong id="yes">HTML Tag</strong>]]><span foo="bar" class="firstTag">test</span>',
+			'<![CDATA[This <is> a <strong id="yes">HTML Tag</strong>]]><span class="firstTag" foo="bar">test</span>',
 		);
 
 		$examples['16'] = array(
 			'<hr ===name="value"><span>test</span>',
-			'<hr foo="bar" class="firstTag" ===name="value"><span class="secondTag">test</span>',
+			'<hr class="firstTag" foo="bar" ===name="value"><span class="secondTag">test</span>',
 		);
 
 		$examples['17'] = array(
 			'<hr asdf="test"><span>test</span>',
-			'<hr foo="bar" class="firstTag" asdf="test"><span class="secondTag">test</span>',
+			'<hr class="firstTag" foo="bar" asdf="test"><span class="secondTag">test</span>',
 		);
 
 		$examples['18'] = array(
 			'<hr =asdf="tes"><span>test</span>',
-			'<hr foo="bar" class="firstTag" =asdf="tes"><span class="secondTag">test</span>',
+			'<hr class="firstTag" foo="bar" =asdf="tes"><span class="secondTag">test</span>',
 		);
 
 		$examples['19'] = array(
 			'<hr ==="test"><span>test</span>',
-			'<hr foo="bar" class="firstTag" ==="test"><span class="secondTag">test</span>',
+			'<hr class="firstTag" foo="bar" ==="test"><span class="secondTag">test</span>',
 		);
 
 		$examples['20'] = array(
 			'<hr =><span>test</span>',
-			'<hr foo="bar" class="firstTag" =><span class="secondTag">test</span>',
+			'<hr class="firstTag" foo="bar" =><span class="secondTag">test</span>',
 		);
 
 		$examples['21'] = array(
 			'<hr =5><span>test</span>',
-			'<hr foo="bar" class="firstTag" =5><span class="secondTag">test</span>',
+			'<hr class="firstTag" foo="bar" =5><span class="secondTag">test</span>',
 		);
 
 		$examples['22'] = array(
 			'<hr ==><span>test</span>',
-			'<hr foo="bar" class="firstTag" ==><span class="secondTag">test</span>',
+			'<hr class="firstTag" foo="bar" ==><span class="secondTag">test</span>',
 		);
 
 		$examples['23'] = array(
 			'<hr ===><span>test</span>',
-			'<hr foo="bar" class="firstTag" ===><span class="secondTag">test</span>',
+			'<hr class="firstTag" foo="bar" ===><span class="secondTag">test</span>',
 		);
 
 		$examples['24'] = array(
 			'<hr disabled><span>test</span>',
-			'<hr foo="bar" class="firstTag" disabled><span class="secondTag">test</span>',
+			'<hr class="firstTag" foo="bar" disabled><span class="secondTag">test</span>',
 		);
 
 		$examples['25'] = array(
 			'<hr a"sdf="test"><span>test</span>',
-			'<hr foo="bar" class="firstTag" a"sdf="test"><span class="secondTag">test</span>',
+			'<hr class="firstTag" foo="bar" a"sdf="test"><span class="secondTag">test</span>',
 		);
 
 		$examples['Multiple unclosed tags treated as a single tag'] = array(
@@ -1306,7 +1306,7 @@ HTML;
 HTML
 			,
 			<<<HTML
-			<hr foo="bar" class="firstTag" id=">"code
+			<hr class="firstTag" foo="bar" id=">"code
 			<hr id="value>"code
 			<hr id="/>"code
 			<hr id="value/>"code
@@ -1318,12 +1318,12 @@ HTML
 
 		$examples['27'] = array(
 			'<hr id   =5><span>test</span>',
-			'<hr foo="bar" class="firstTag" id   =5><span class="secondTag">test</span>',
+			'<hr class="firstTag" foo="bar" id   =5><span class="secondTag">test</span>',
 		);
 
 		$examples['28'] = array(
 			'<hr id a  =5><span>test</span>',
-			'<hr foo="bar" class="firstTag" id a  =5><span class="secondTag">test</span>',
+			'<hr class="firstTag" foo="bar" id a  =5><span class="secondTag">test</span>',
 		);
 
 		return $examples;

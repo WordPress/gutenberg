@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { find } from 'lodash';
 import removeAccents from 'remove-accents';
 
 /**
@@ -290,8 +289,7 @@ function useAutocomplete( {
 		const textAfterSelection = getTextContent(
 			slice( record, undefined, getTextContent( record ).length )
 		);
-		const completer = find(
-			completers,
+		const completer = completers?.find(
 			( { triggerPrefix, allowContext } ) => {
 				const index = text.lastIndexOf( triggerPrefix );
 

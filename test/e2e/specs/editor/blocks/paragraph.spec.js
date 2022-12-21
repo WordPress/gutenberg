@@ -569,6 +569,10 @@ class DraggingUtils {
 		// Check that both x and y axis of the dropzone
 		// have a less than 1 difference with a given target element
 		const box = await this.dropZone.boundingBox();
+		if ( ! box ) {
+			return false;
+		}
+
 		return (
 			Math.abs( element.x - box.x ) < 1 &&
 			Math.abs( element.y - box.y ) < 1
