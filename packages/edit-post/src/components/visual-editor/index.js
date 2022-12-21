@@ -305,6 +305,17 @@ export default function VisualEditor( { styles } ) {
 		titleRef?.current?.focus();
 	}, [ isWelcomeGuideVisible, isCleanNewPost ] );
 
+	styles = useMemo(
+		() => [
+			...styles,
+			{
+				// We should move this in to future to the body.
+				css: `.edit-post-visual-editor__post-title-wrapper{margin-top:4rem}`,
+			},
+		],
+		[ styles ]
+	);
+
 	return (
 		<BlockTools
 			__unstableContentRef={ ref }
@@ -374,10 +385,15 @@ export default function VisualEditor( { styles } ) {
 						{ ! isTemplateMode && (
 							<div
 								className={ classnames(
+									// This wrapper div should have the same
+									// classes as the block list beneath.
+									'is-root-container',
+									'block-editor-block-list__layout',
 									'edit-post-visual-editor__post-title-wrapper',
 									{
 										'is-focus-mode': isFocusMode,
-									}
+									},
+									blockListLayoutClass
 								) }
 								contentEditable={ false }
 							>
