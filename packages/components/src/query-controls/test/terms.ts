@@ -51,7 +51,7 @@ describe( 'buildTermsTree()', () => {
 				name: 'foo',
 				parent: 0,
 				children: [
-					{ id: '2245', name: 'foo', parent: 2232, children: [] },
+					{ id: '2245', name: 'baz', parent: 2232, children: [] },
 				],
 			},
 		];
