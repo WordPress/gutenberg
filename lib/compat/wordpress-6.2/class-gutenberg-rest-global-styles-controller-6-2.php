@@ -154,6 +154,7 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 					$modified_gmt        = strtotime( $revision->post_modified_gmt . ' +0000' );
 					$user_revisions[]    = array(
 						'styles'    => ! empty( $config['styles'] ) ? $config['styles'] : new stdClass(),
+						'settings'  => ! empty( $config['settings'] ) ? $config['settings'] : new stdClass(),
 						'dateShort' => date_i18n( _x( 'j M @ H:i', 'revision date short format' ), $modified ),
 						/* translators: %s: Human-readable time difference. */
 						'timeAgo'   => sprintf( __( '%s ago' ), human_time_diff( $modified_gmt, $now_gmt ) ),

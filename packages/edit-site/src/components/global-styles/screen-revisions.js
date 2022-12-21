@@ -3,6 +3,7 @@
  */
 import { set } from 'lodash';
 import classnames from 'classnames';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
@@ -20,8 +21,19 @@ import ScreenHeader from './header';
 import Subtitle from './subtitle';
 import { GlobalStylesContext } from './context';
 
+// Taken from packages/edit-site/src/hooks/push-changes-to-global-styles/index.js.
+// TODO abstract
 function cloneDeep( object ) {
 	return ! object ? {} : JSON.parse( JSON.stringify( object ) );
+}
+
+// Taken from packages/edit-site/src/components/global-styles/screen-style-variations.js.
+// TODO abstract
+function compareVariations( a, b ) {
+	return (
+		fastDeepEqual( a.styles, b.styles ) &&
+		fastDeepEqual( a.settings, b.settings )
+	);
 }
 
 function ScreenRevisions() {
@@ -43,20 +55,32 @@ function ScreenRevisions() {
 			userRevisions: record?.revisions || [],
 		};
 	}, [] );
-	const [ currentRevision, setCurrentRevision ] = useState(
-		userRevisions?.[ 0 ].id
-	);
+
+	const hasRevisions = userRevisions.length > 0;
+	const [ currentRevisionId, setCurrentRevisionId ] = useState( () => {
+		if ( ! hasRevisions ) {
+			return 0;
+		}
+		let currentRevision = userRevisions[ 0 ];
+		for ( let i = 0; i < userRevisions.length; i++ ) {
+			if ( compareVariations( userConfig, userRevisions[ i ] ) ) {
+				currentRevision = userRevisions[ i ];
+				break;
+			}
+		}
+		return currentRevision?.id;
+	} );
+
 	const restoreRevision = useCallback(
 		( revision ) => {
 			const newUserConfig = cloneDeep( userConfig );
 			set( newUserConfig, [ 'styles' ], revision?.styles );
+			set( newUserConfig, [ 'settings' ], revision?.settings );
 			setUserConfig( () => newUserConfig );
-			setCurrentRevision( revision?.id );
+			setCurrentRevisionId( revision?.id );
 		},
 		[ userConfig ]
 	);
-
-	const hasRevisions = userRevisions.length > 0;
 
 	return (
 		<>
@@ -69,25 +93,21 @@ function ScreenRevisions() {
 			<div className="edit-site-global-styles-screen-revisions">
 				<VStack spacing={ 3 }>
 					<Subtitle>{ __( 'REVISIONS' ) }</Subtitle>
-					{ hasRevisions
-						? userRevisions.map( ( revision ) => (
+					{ hasRevisions ? (
+						userRevisions.map( ( revision ) => {
+							const isActive = revision?.id === currentRevisionId;
+							return (
 								<Button
 									className={ classnames(
 										'edit-site-global-styles-screen-revisions__revision-item',
 										{
-											'is-current':
-												currentRevision === revision.id,
+											'is-current': isActive,
 										}
 									) }
 									variant={
-										currentRevision === revision.id
-											? 'tertiary'
-											: 'secondary'
+										isActive ? 'tertiary' : 'secondary'
 									}
-									isPressed={
-										currentRevision === revision.id
-									}
-									disabled={ currentRevision === revision.id }
+									disabled={ isActive }
 									key={ `user-styles-revision-${ revision.id }` }
 									onClick={ () => {
 										restoreRevision( revision );
@@ -100,8 +120,11 @@ function ScreenRevisions() {
 										({ revision.dateShort })
 									</span>
 								</Button>
-						  ) )
-						: __( 'There are currently no revisions.' ) }
+							);
+						} )
+					) : (
+						<p>{ __( 'There are currently no revisions.' ) }</p>
+					) }
 				</VStack>
 			</div>
 		</>
