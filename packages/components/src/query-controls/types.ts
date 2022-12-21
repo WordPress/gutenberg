@@ -52,10 +52,6 @@ export type QueryControlsProps = {
 	 */
 	categorySuggestions?: Term[ 'name' ][];
 	/**
-	 * The selected author ID.
-	 */
-	selectedAuthorId?: AuthorSelectProps[ 'selectedAuthorId' ];
-	/**
 	 * The maximum items.
 	 *
 	 * @default 100
@@ -75,7 +71,7 @@ export type QueryControlsProps = {
 	 * A function that receives the new author value.
 	 * If this is not specified, the author controls are not included.
 	 */
-	onAuthorChange?: () => void;
+	onAuthorChange?: AuthorSelectProps[ 'onChange' ];
 	/**
 	 * A function that receives the new category value.
 	 * If this is not specified, the category controls are not included.
@@ -108,6 +104,10 @@ export type QueryControlsProps = {
 	 * The meta key by which to order posts. Can be 'date' or 'title'.
 	 */
 	orderBy?: 'data' | 'title';
+	/**
+	 * The selected author ID.
+	 */
+	selectedAuthorId?: AuthorSelectProps[ 'selectedAuthorId' ];
 	/**
 	 * The selected categories for the `categorySuggestions`.
 	 */

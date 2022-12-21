@@ -123,11 +123,10 @@ An array of author IDs that is passed into an `AuthorSelect` sub-component.
 -   Required: No
 -   Platform: Web
 
-#### selectedAuthorId
+#### `selectedAuthorId`: `string`
 
 The selected author ID.
 
--   Type: `Number`
 -   Required: No
 -   Platform: Web
 
