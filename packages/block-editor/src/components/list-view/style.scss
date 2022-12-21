@@ -22,8 +22,11 @@
 	&.is-selected.is-synced td {
 		background: var(--wp-block-synced-color);
 	}
-	&.is-synced:not(.is-selected) .block-editor-list-view-block-contents .block-editor-block-icon {
-		color: var(--wp-block-synced-color);
+	&.is-synced:not(.is-selected) .block-editor-list-view-block-contents {
+		&:hover,
+		.block-editor-block-icon {
+			color: var(--wp-block-synced-color);
+		}
 	}
 	&.is-selected .block-editor-list-view-block-contents,
 	&.is-selected .components-button.has-icon {
