@@ -122,7 +122,7 @@ export function QueryControls( {
 						value: item.name || item.value || '',
 					} ) )
 				}
-				suggestions={ Object.keys( categorySuggestions ) }
+				suggestions={ categorySuggestions }
 				onChange={ onCategoryChange }
 				maxSuggestions={ MAX_CATEGORIES_SUGGESTIONS }
 			/>

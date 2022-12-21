@@ -132,7 +132,7 @@ The selected author ID.
 
 #### categoriesList
 
-An array of category IDs; renders a `CategorySelect` sub-component when passed in conjunction with `onCategoryChange`.
+An array of categories; renders a `CategorySelect` sub-component when passed in conjunction with `onCategoryChange`.
 
 -   Type: `Array`
 -   Required: No
