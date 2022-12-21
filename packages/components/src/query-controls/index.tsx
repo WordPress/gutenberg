@@ -18,7 +18,7 @@ const DEFAULT_MAX_ITEMS = 100;
 const MAX_CATEGORIES_SUGGESTIONS = 20;
 
 /**
- * A select control that queries for entities.
+ * Select controls that query for entities.
  *
  * ```jsx
  * const MyQueryControls = () => (
