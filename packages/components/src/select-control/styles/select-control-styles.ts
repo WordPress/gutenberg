@@ -13,7 +13,10 @@ import type { SelectControlProps } from '../types';
 import InputControlSuffixWrapper from '../../input-control/input-suffix-wrapper';
 
 interface SelectProps
-	extends Pick< SelectControlProps, '__next36pxDefaultSize' | 'disabled' > {
+	extends Pick<
+		SelectControlProps,
+		'__next36pxDefaultSize' | 'disabled' | 'multiple'
+	> {
 	// Using `selectSize` instead of `size` to avoid a type conflict with the
 	// `size` HTML attribute of the `select` element.
 	selectSize?: SelectControlProps[ 'size' ];
@@ -50,8 +53,13 @@ const fontSizeStyles = ( { selectSize = 'default' }: SelectProps ) => {
 
 const sizeStyles = ( {
 	__next36pxDefaultSize,
+	multiple,
 	selectSize = 'default',
 }: SelectProps ) => {
+	if ( multiple ) {
+		return;
+	}
+
 	const sizes = {
 		default: {
 			height: 36,
@@ -91,6 +99,7 @@ export const chevronIconSize = 18;
 
 const sizePaddings = ( {
 	__next36pxDefaultSize,
+	multiple,
 	selectSize = 'default',
 }: SelectProps ) => {
 	const iconWidth = chevronIconSize;
@@ -117,7 +126,17 @@ const sizePaddings = ( {
 		};
 	}
 
-	return rtl( sizes[ selectSize ] || sizes.default );
+	const selectedSize = sizes[ selectSize ] || sizes.default;
+
+	return rtl( {
+		...selectedSize,
+		...( multiple
+			? {
+					paddingTop: selectedSize.paddingLeft,
+					paddingBottom: selectedSize.paddingLeft,
+			  }
+			: {} ),
+	} );
 };
 
 // TODO: Resolve need to use &&& to increase specificity
