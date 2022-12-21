@@ -14,6 +14,8 @@ import { useState } from '@wordpress/element';
  */
 import BaseInputControl from '../';
 
+jest.useFakeTimers();
+
 const setupUser = () =>
 	userEvent.setup( {
 		advanceTimers: jest.advanceTimersByTime,

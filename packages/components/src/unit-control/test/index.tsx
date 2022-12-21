@@ -16,6 +16,8 @@ import UnitControl from '..';
 import { parseQuantityAndUnitFromRawValue } from '../utils';
 import type { UnitControlOnChangeCallback } from '../types';
 
+jest.useFakeTimers();
+
 const getInput = ( {
 	isInputTypeText = false,
 }: {
