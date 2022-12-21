@@ -7,11 +7,11 @@ import type { Key } from 'react';
  * Internal dependencies
  */
 import type { FormTokenFieldProps } from '../form-token-field/types';
-import type { Tree, TreeSelectProps } from '../tree-select/types';
+import type { TreeSelectProps } from '../tree-select/types';
 
 export type Entity = {
-	id: Tree[ 'id' ];
-	name: Tree[ 'name' ];
+	id: number;
+	name: string;
 	parent?: number | null;
 	value?: string;
 };
@@ -32,7 +32,7 @@ export type AuthorSelectProps = {
 	label: TreeSelectProps[ 'label' ];
 	noOptionLabel: TreeSelectProps[ 'noOptionLabel' ];
 	onChange: TreeSelectProps[ 'onChange' ];
-	selectedAuthorId?: string;
+	selectedAuthorId?: number;
 };
 
 export type QueryControlsProps = {

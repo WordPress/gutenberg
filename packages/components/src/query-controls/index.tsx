@@ -87,7 +87,7 @@ export function QueryControls( {
 					},
 				] }
 				onChange={ ( value ) => {
-					if ( Array.isArray( value ) ) {
+					if ( typeof value !== 'string' ) {
 						return;
 					}
 

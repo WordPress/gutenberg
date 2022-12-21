@@ -18,7 +18,7 @@ export type SelectOptions = Required<
 >[ 'options' ];
 
 export interface Tree {
-	id: string;
+	id: number | string;
 	name: string;
 	children?: Tree[];
 }
