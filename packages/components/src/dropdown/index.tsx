@@ -1,35 +1,39 @@
-// @ts-nocheck
 /**
  * External dependencies
  */
 import classnames from 'classnames';
+import type { ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useState } from '@wordpress/element';
+import { forwardRef, useEffect, useRef, useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import Popover from '../popover';
+import type { DropdownProps } from './types';
 
-function useObservableState( initialState, onStateChange ) {
+function useObservableState(
+	initialState: boolean,
+	onStateChange?: ( newState: boolean ) => void
+) {
 	const [ state, setState ] = useState( initialState );
 	return [
 		state,
-		( value ) => {
+		( value: boolean ) => {
 			setState( value );
 			if ( onStateChange ) {
 				onStateChange( value );
 			}
 		},
-	];
+	] as const;
 }
 
-export default function Dropdown( props ) {
-	const {
+function UnforwardedDropdown(
+	{
 		renderContent,
 		renderToggle,
 		className,
@@ -42,12 +46,14 @@ export default function Dropdown( props ) {
 		onClose,
 		onToggle,
 		style,
-	} = props;
+	}: DropdownProps,
+	forwardedRef: ForwardedRef< any >
+) {
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ fallbackPopoverAnchor, setFallbackPopoverAnchor ] =
-		useState( null );
-	const containerRef = useRef();
+		useState< HTMLDivElement | null >( null );
+	const containerRef = useRef< HTMLDivElement >();
 	const [ isOpen, setIsOpen ] = useObservableState( false, onToggle );
 
 	useEffect(
@@ -70,8 +76,13 @@ export default function Dropdown( props ) {
 	 * case a dialog has opened, allowing focus to return when it's dismissed.
 	 */
 	function closeIfFocusOutside() {
+		if ( ! containerRef.current ) {
+			return;
+		}
+
 		const { ownerDocument } = containerRef.current;
-		const dialog = ownerDocument.activeElement.closest( '[role="dialog"]' );
+		const dialog =
+			ownerDocument?.activeElement?.closest( '[role="dialog"]' );
 		if (
 			! containerRef.current.contains( ownerDocument.activeElement ) &&
 			( ! dialog || dialog.contains( containerRef.current ) )
@@ -99,11 +110,15 @@ export default function Dropdown( props ) {
 	return (
 		<div
 			className={ classnames( 'components-dropdown', className ) }
-			ref={ useMergeRefs( [ setFallbackPopoverAnchor, containerRef ] ) }
+			ref={ useMergeRefs( [
+				containerRef,
+				forwardedRef,
+				setFallbackPopoverAnchor,
+			] ) }
 			// Some UAs focus the closest focusable parent when the toggle is
 			// clicked. Making this div focusable ensures such UAs will focus
 			// it and `closeIfFocusOutside` can tell if the toggle was clicked.
-			tabIndex="-1"
+			tabIndex={ -1 }
 			style={ style }
 		>
 			{ renderToggle( args ) }
@@ -136,3 +151,32 @@ export default function Dropdown( props ) {
 		</div>
 	);
 }
+
+/**
+ * Renders a button that opens a floating content modal when clicked.
+ *
+ * ```jsx
+ * import { Button, Dropdown } from '@wordpress/components';
+ *
+ * const MyDropdown = () => (
+ *   <Dropdown
+ *     className="my-container-class-name"
+ *     contentClassName="my-popover-content-classname"
+ *     position="bottom right"
+ *     renderToggle={ ( { isOpen, onToggle } ) => (
+ *       <Button
+ *         variant="primary"
+ *         onClick={ onToggle }
+ *         aria-expanded={ isOpen }
+ *       >
+ *         Toggle Popover!
+ *       </Button>
+ *     ) }
+ *     renderContent={ () => <div>This is the content of the popover.</div> }
+ *   />
+ * );
+ * ```
+ */
+export const Dropdown = forwardRef( UnforwardedDropdown );
+
+export default Dropdown;

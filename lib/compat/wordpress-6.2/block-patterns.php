@@ -225,6 +225,7 @@ function gutenberg_register_theme_block_patterns() {
 		'blockTypes'    => 'Block Types',
 		'postTypes'     => 'Post Types',
 		'inserter'      => 'Inserter',
+		'templateTypes' => 'Template Types',
 	);
 
 	/*
@@ -294,7 +295,7 @@ function gutenberg_register_theme_block_patterns() {
 					}
 
 					// For properties of type array, parse data as comma-separated.
-					foreach ( array( 'categories', 'keywords', 'blockTypes', 'postTypes' ) as $property ) {
+					foreach ( array( 'categories', 'keywords', 'blockTypes', 'postTypes', 'templateTypes' ) as $property ) {
 						if ( ! empty( $pattern_data[ $property ] ) ) {
 							$pattern_data[ $property ] = array_filter(
 								preg_split(
