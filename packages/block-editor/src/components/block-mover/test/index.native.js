@@ -2,11 +2,14 @@
  * External dependencies
  */
 import {
+	addBlock,
 	fireEvent,
 	initializeEditor,
 	getBlock,
+	within,
 	getEditorHtml,
 	render,
+	changeTextOfRichText,
 } from 'test/helpers';
 
 /**
@@ -19,16 +22,6 @@ import { registerCoreBlocks } from '@wordpress/block-library';
  * Internal dependencies
  */
 import { BlockMover } from '../index';
-
-const INITIAL_HTML = `<!-- wp:paragraph -->
-<p></p>
-<!-- /wp:paragraph -->
-<!-- wp:spacer -->
-<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
-<!-- /wp:spacer -->
-<!-- wp:heading -->
-<h2 class="wp-block-heading"></h2>
-<!-- /wp:heading -->`;
 
 describe( 'Block Mover Picker', () => {
 	it( 'renders without crashing', () => {
@@ -83,10 +76,26 @@ describe( 'Block Mover Picker', () => {
 		} );
 
 		it( 'moves blocks up and down', async () => {
-			const screen = await initializeEditor( {
-				initialHtml: INITIAL_HTML,
-			} );
+			const screen = await initializeEditor();
 			const { getByLabelText } = screen;
+
+			// Add Paragraph block
+			await addBlock( screen, 'Paragraph' );
+
+			// Get Paragraph block
+			const paragraphBlock = await getBlock( screen, 'Paragraph' );
+			fireEvent.press( paragraphBlock );
+			const paragraphField =
+				within( paragraphBlock ).getByPlaceholderText(
+					'Start writing…'
+				);
+			changeTextOfRichText( paragraphField, 'Hello!' );
+
+			// Add Spacer block
+			await addBlock( screen, 'Spacer' );
+
+			// Add Heading block
+			await addBlock( screen, 'Heading' );
 
 			// Get Spacer block
 			const spacerBlock = await getBlock( screen, 'Spacer', {
@@ -116,13 +125,29 @@ describe( 'Block Mover Picker', () => {
 		} );
 
 		it( 'disables the Move Up button for the first block', async () => {
-			const screen = await initializeEditor( {
-				initialHtml: INITIAL_HTML,
-			} );
+			const screen = await initializeEditor();
 			const { getByLabelText } = screen;
 
+			// Add Paragraph block
+			await addBlock( screen, 'Paragraph' );
+
 			// Get Paragraph block
-			const paragraphBlock = await getBlock( screen, 'Paragraph' );
+			let paragraphBlock = await getBlock( screen, 'Paragraph' );
+			fireEvent.press( paragraphBlock );
+			const paragraphField =
+				within( paragraphBlock ).getByPlaceholderText(
+					'Start writing…'
+				);
+			changeTextOfRichText( paragraphField, 'Hello!' );
+
+			// Add Spacer block
+			await addBlock( screen, 'Spacer' );
+
+			// Add Heading block
+			await addBlock( screen, 'Heading' );
+
+			// Get Paragraph block
+			paragraphBlock = await getBlock( screen, 'Paragraph' );
 			fireEvent.press( paragraphBlock );
 
 			// Get the Move Up button
@@ -138,10 +163,26 @@ describe( 'Block Mover Picker', () => {
 		} );
 
 		it( 'disables the Move Down button for the last block', async () => {
-			const screen = await initializeEditor( {
-				initialHtml: INITIAL_HTML,
-			} );
+			const screen = await initializeEditor();
 			const { getByLabelText } = screen;
+
+			// Add Paragraph block
+			await addBlock( screen, 'Paragraph' );
+
+			// Get Paragraph block
+			const paragraphBlock = await getBlock( screen, 'Paragraph' );
+			fireEvent.press( paragraphBlock );
+			const paragraphField =
+				within( paragraphBlock ).getByPlaceholderText(
+					'Start writing…'
+				);
+			changeTextOfRichText( paragraphField, 'Hello!' );
+
+			// Add Spacer block
+			await addBlock( screen, 'Spacer' );
+
+			// Add Heading block
+			await addBlock( screen, 'Heading' );
 
 			// Get Heading block
 			const headingBlock = await getBlock( screen, 'Heading', {
