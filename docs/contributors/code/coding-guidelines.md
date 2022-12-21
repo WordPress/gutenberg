@@ -160,9 +160,9 @@ Avoid introducing public experimental APIs.
 
 Every experimental API is a liability. If that API is not removed or stabilized in time, it will get merged to the next major WordPress release and plugin authors will start relying on it. The Gutenberg plugin may not offer any BC guarantees for its public experimental APIs, but the WordPress core does. As of June 2022, a total of 280 __experimental APIs got merged to WordPress core and are there to stay.
 
-In contrast, non-exported experimental APIs are truly private and completely fine. They are an internal implementation detail, no different than any other non-exported function. Their name is their only distinguishing feature. They can be adjusted, refactored, and completely removed on a whim without affecting any WordPress plugin or theme.
+In contrast, the non-exported experimental APIs cannot be accessed outside of the package which makes them truly private. They are an internal implementation detail, no different than any other non-exported function. Their `__experimental` name is their only distinguishing feature. They can be adjusted, refactored, and completely removed on a whim without affecting any WordPress plugin or theme.
 
-The tactical guidelines below will help you proceed without introducing new experimental APIs.
+The tactical guidelines below will help you write code without introducing new experimental APIs.
 
 #### General guidelines
 
@@ -176,9 +176,11 @@ if ( IS_GUTENBERG_PLUGIN ) {
 }
 ```
 
+The experimental APIs that already are publicly available via `window.wp` should remain accessible as removing them would break the existing plugins and themes.
+
 #### Replace experimental selectors with hooks
 
-In React components, you can replace public experimental selectors with non-exported React hooks:
+Sometimes a non-exported React hook suffices as a substitute for introducing a new experimental selectors:
 
 ```js
 // Instead of this:
@@ -223,85 +225,99 @@ In React components, you can replace public experimental selectors with non-expo
 	}
 ```
 
-If your experimental selector needs to access a part of the store that isn't
-accessible by the existing public selectors, you may access the store data directly
-via `useRegistry()`:
+#### Dispatch experimental actions in thunks
 
-```js
-function MyComponent() {
-	const registry = useRegistry();
-	const enabledFeatures = registry.stores['my-store'].store.getState().features;
-	// ...
-}
-```
-
-#### Replace experimental actions with hooks and thunks
-
-Public experimental actions can be replaced with non-exported React hooks:
-
-```js
-// Instead of this:
-	// actions.js:
-	export function __experimentalBeforeSave() {
-		return { type: 'BEFORE_SAVE' };
-	}
-	// MyComponent.js:
-	function MyComponent() {
-		const { __experimentalBeforeSave } = useDispatch( myStore );
-		const onClick = () => __experimentalBeforeSave();
-		// ...
-	}
-
-// Consider this:
-	// MyComponent.js:
-	function MyComponent() {
-		const registry = useRegistry();
-		const onClick = () => registry.stores['my-store'].store.dispatch({ type: 'BEFORE_SAVE' });
-		// ...
-	}
-```
-
-In addition, the existing public actions can dispatch private actions:
+Turning an existing public action into a [thunk](/docs/how-to-guides/thunks.md)
+enables dispatching private actions inline:
 
 ```js
 export function toggleFeature( scope, featureName ) {
     return function ( { dispatch } ) {
-		dispatch({ type: 'BEFORE_SAVE' })
+		dispatch({ type: '__experimental_BEFORE_TOGGLE' })
 		// ...
     };
 }
 ```
 
-#### `lock()` and `unlock()`
+#### Use the `lock()` and `unlock()` API from `@wordpress/experiments` to privately export almost anything
 
-Use the `lock()` and `unlock()` API from `@wordpress/experiments` to
-privately export almost anything. See the examples below and learn more
-in the [`@wordpress/experiments` package README.md](https://github.com/WordPress/gutenberg/blob/HEAD/packages/experiments/README.md).
+Each `@wordpress` package wanting to privately access or expose experimental APIs can
+do so by opting-in to `@wordpress/experiments`:
+
+```js
+// In packages/block-editor/experiments.js:
+import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/experiments';
+export const { lock, unlock } =
+	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
+		'I know using unstable features means my plugin or theme will inevitably break on the next WordPress release.',
+		'@wordpress/block-editor' // The package opting in
+	);
+```
+
+Each `@wordpress` package may only opt-in once. The process clearly communicates the extenders are not supposed
+to use it. This document will focus on the usage examples, but you can [find out more about the `@wordpress/experiments` package in the its README.md](/packages/experiments/README.md).
+
+Once the package opted-in, you can use the `lock()` and `unlock()` utilities:
+
+```js
+// Say this object is exported from a package:
+export const publicObject = {};
+
+// However, this string is internal and should not be publicly available:
+const __experimentalString = '__experimental information';
+
+// Solution: lock the string "inside" of the object:
+lock( publicObject, __experimentalString );
+
+// The string is not nested in the object and cannot be extracted from it:
+console.log( publicObject );
+// {}
+
+// The only way to access the string is by "unlocking" the object:
+console.log( unlock( publicObject ) );
+// "__experimental information"
+
+// lock() accepts all data types, not just strings:
+export const anotherObject = {};
+lock( anotherObject, function __experimentalFn() {} );
+console.log( unlock( anotherObject ) );
+// function __experimentalFn() {}
+```
+
+Keep reading to learn how to use `lock()` and `unlock()` to avoid publicly exporting
+different kinds of `__experimental` APIs.
 
 ##### Experimental selectors and actions
 
-Attach private selectors and actions to a public store:
+You can attach private selectors and actions to a public store:
 
 ```js
-// In @wordpress/package1/store.js:
-import { __experimentalHasContentRoleAttribute } from './selectors';
+// In packages/package1/store.js:
+import { __experimentalHasContentRoleAttribute, ...selectors } from './selectors';
+// The `lock` function is exported from the internal experiments.js file where
+// the opt-in function was called.
 import { lock } from './experiments';
 
 export const store = registerStore(/* ... */);
-/* Attach a private selector to the exported store: */
+// Attach a private selector to the exported store:
 lock(store, {
 	__experimentalHasContentRoleAttribute
 });
 
-// In @wordpress/package2/MyComponent.js:
+
+// In packages/package2/MyComponent.js:
 import { store } from '@wordpress/package1';
 import { useSelect } from '@wordpress/data';
+// The `unlock` function is exported from the internal experiments.js file where
+// the opt-in function was called.
 import { unlock } from './experiments';
 
 function MyComponent() {
     const hasRole = useSelect( ( select ) => (
 		// Use the private selector:
         unlock( select( store ) ).__experimentalHasContentRoleAttribute()
+		// Note the unlock() is required. This line wouldn't work:
+        // select( store ).__experimentalHasContentRoleAttribute()
     ) );
 
     // ...
@@ -311,20 +327,20 @@ function MyComponent() {
 ##### Experimental functions, classes, and variables
 
 ```js
-// In @wordpress/package1/index.js:
+// In packages/package1/index.js:
 import { lock } from './experiments';
 
 export const experiments = {};
 /* Attach private data to the exported object */
-lock(store, {
+lock(experiments, {
 	__experimentalCallback: function() {},
-	__experimentalReactComponent: function MyComponent() { return <div/>; },
+	__experimentalReactComponent: function ExperimentalComponent() { return <div/>; },
 	__experimentalClass: class Experiment{},
 	__experimentalVariable: 5,
 });
 
 
-// In @wordpress/package2/index.js:
+// In packages/package2/index.js:
 import { experiments } from '@wordpress/package1';
 import { unlock } from './experiments';
 
@@ -347,25 +363,33 @@ inside it:
 // In @wordpress/package1/index.js:
 import { lock } from './experiments';
 
-export function log(data) {
-	__experimentalLog(data, 'log');
-}
-function __experimentalLog(data, __experimentalMethod) {
-	if(__experimentalMethod === 'log') {
-		console.log(data)
-	} else if(__experimentalMethod === 'table') {
-		console.table(data)
+// The experimental function contains all the logic
+function __experimentalValidateBlocks(formula, __experimentalIsStrict) {
+	let isValid = false;
+	// ...complex logic we don't want to duplicate...
+	if ( __experimentalIsStrict ) {
+		// ...
 	}
+	// ...complex logic we don't want to duplicate...
+
+	return isValid;
 }
+
+// The stable public function is a thin wrapper that calls the
+// experimental function with the experimental features disabled
+export function validateBlocks(blocks) {
+	__experimentalValidateBlocks(blocks, false);
+}
+lock( validateBlocks, __experimentalValidateBlocks );
+
 
 // In @wordpress/package2/index.js:
-import { log } from '@wordpress/package1';
+import { validateBlocks } from '@wordpress/package1';
 import { unlock } from './experiments';
 
-const __experimentalLog = unlock(log);
-__experimentalLog(data, 'table');
-// Or:
-unlock(log)('table');
+// The experimental function may be "unlocked" given the stable function:
+const __experimentalValidateBlocks = unlock(validateBlocks);
+__experimentalValidateBlocks(blocks, true);
 ```
 
 #### Experimental React Component properties
@@ -379,34 +403,44 @@ inside it:
 // In @wordpress/package1/index.js:
 import { lock } from './experiments';
 
-export function DataListing({data}) {
-	return <ExperimentalDataListing data={data} format='list' />;
+// The experimental component contains all the logic
+const ExperimentalMyButton = ( { title, __experimentalShowIcon = true } ) => {
+	// ...complex logic we don't want to duplicate...
+  
+	return (
+		<button>
+			{ __experimentalShowIcon  && <Icon src={some icon} /> } { title }  
+		</button>
+	);
 }
-function ExperimentalDataListing({data, format}) {
-	if(format === 'list') {
-		return (<ul> {/* ... */} </ul>)
-	} else if(format === 'table') {
-		return (<table> {/* ... */} </table>)
-	}
-}
+
+// The stable public component is a thin wrapper that calls the
+// experimental component with the experimental features disabled
+export const MyButton = ( { title } ) => 
+    <ExperimentalMyExistingButton title={ title } __experimentalShowIcon={ false } />
+
+lock(MyButton, ExperimentalMyButton);
+
 
 // In @wordpress/package2/index.js:
-import { DataListing } from '@wordpress/package1';
+import { MyButton } from '@wordpress/package1';
 import { unlock } from './experiments';
 
-const ExperimentalDataListing = unlock(DataListing);
+// The experimental component may be "unlocked" given the stable component:
+const ExperimentalMyButton = unlock(MyButton);
 export function MyComponent() {
 	return (
-		<ExperimentalDataListing data={data} format="table" />
+		<ExperimentalMyButton data={data} __experimentalShowIcon={ true } />
 	)
 }
 ```
 
-#### Experimental Block.json APIs
+#### Experimental block.json and theme.json APIs
 
-In the future, the new `__experimental` APIs introduced in block.json and
-theme.json will only apply to the core WordPress blocks. Plugins and themes
-will not be able to use them.
+As of today, there is no way to restrict the `block.json` and `theme.json` APIs
+to the Gutenberg codebase. In the future, however, the new `__experimental` APIs
+will only apply to the core WordPress blocks and plugins and themes will not be
+able to access them.
 
 ### Objects
 

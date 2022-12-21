@@ -1,53 +1,78 @@
 # Experiments
 
-Private `__experimental` APIs that are not [exposed publicly plugin authors](https://make.wordpress.org/core/2022/08/10/proposal-stop-merging-experimental-apis-from-gutenberg-to-wordpress-core/#respond).
+`@wordpress/experiments`  enables sharing private `__experimental` APIs across `@wordpress` packages without
+[publicly exposing them to WordPress extenders](https://make.wordpress.org/core/2022/08/10/proposal-stop-merging-experimental-apis-from-gutenberg-to-wordpress-core/#respond).
 
-This package acts as a "dealer" that only allows WordPress packages to use the experimental APIs.
+## Getting started
 
-Each package needs to start by registering itself:
-
-```js
-const { lock, unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
-	'<CONSENT STRING>', // See index.js, this may change without notice.
-	'@wordpress/blocks'
-);
-```
-
-The function name communicates that plugins are not supposed to use it. To make double and triple sure, the first argument must be that exact consent string, and the second argument must be a known `@wordpress` package that hasn't opted in yet – otherwise an error is thrown.
-
-The `lock` and `unlock` API may be used as follows:
+Every `@wordpress` package wanting to privately access or expose experimental APIs must opt-in to `@wordpress/experiments`:
 
 ```js
-// In the package exposing the experimental APIs:
-const { lock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
-	'<CONSENT STRING>', // See index.js, this may change without notice.
-	'@wordpress/blocks'
-);
-export const __experiments = {};
-lock( __experiments, {
-	privateFunction() {
-		console.log( 'I am a private function!' );
-	},
-} );
-
-// In the package consuming the experimental APIs:
-const { unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
-	'<CONSENT STRING>', // See index.js, this may change without notice.
-	'@wordpress/block-editor'
-);
-console.log( __experiments.privateFunction );
-// undefined
-
-console.log( unlock( __experiments ).privateFunction );
-// Function
-
-unlock( __experiments ).privateFunction();
-// "I am a private function!"
+// In packages/block-editor/experiments.js:
+import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/experiments';
+export const { lock, unlock } =
+	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
+		'I know using unstable features means my plugin or theme will inevitably break on the next WordPress release.',
+		'@wordpress/block-editor' // The package opting in
+	);
 ```
 
-All new experimental APIs should be shipped as **private** using this method.
+Each package may only opt-in once. The function name communicates that plugins are not supposed to use it. To make double and triple sure, the first argument must be that exact consent string, and the second argument must be a known `@wordpress` package that hasn't opted in yet – otherwise an error is thrown.
 
-The **public** experimental APIs that have already been shipped in a stable WordPress version should remain accessible via `window.wp`. Please do not create new ones.
+Once the opt-in is complete, the obtained `lock()` and `unlock()` utilities enable hiding `__experimental` APIs from the naked eye:
+
+```js
+// Say this object is exported from a package:
+export const publicObject = {};
+
+// However, this string is internal and should not be publicly available:
+const __experimentalString = '__experimental information';
+
+// Solution: lock the string "inside" of the object:
+lock( publicObject, __experimentalString );
+
+// The string is not nested in the object and cannot be extracted from it:
+console.log( publicObject );
+// {}
+
+// The only way to access the string is by "unlocking" the object:
+console.log( unlock( publicObject ) );
+// "__experimental information"
+
+// lock() accepts all data types, not just strings:
+export const anotherObject = {};
+lock( anotherObject, function __experimentalFn() {} );
+console.log( unlock( anotherObject ) );
+// function __experimentalFn() {}
+```
+
+Use `lock()` and `unlock()` to privately distribute the `__experimental` APIs across `@wordpress` packages:
+
+```js
+// In packages/package1/index.js:
+import { lock } from './experiments';
+
+export const experiments = {};
+/* Attach private data to the exported object */
+lock(experiments, {
+	__experimentalFunction: function() {},
+});
+
+// In packages/package2/index.js:
+import { experiments } from '@wordpress/package1';
+import { unlock } from './experiments';
+
+const {
+	__experimentalFunction
+} = unlock( experiments );
+```
+
+## Shipping experimental APIs
+
+See the [Experimental and Unstable APIs chapter of Coding Guidelines](/docs/contributors/code/coding-guidelines.md) to learn how `lock()` and `unlock()` can help
+you ship private experimental functions, arguments, components, properties, actions, selectors.
+
+## Technical limitations
 
 A determined developer who would want to use the private experimental APIs at all costs would have to:
 
