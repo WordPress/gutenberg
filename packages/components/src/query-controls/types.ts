@@ -18,12 +18,12 @@ export type Term = {
 export type TermsWithChildren = Array< Term & { children: Term[] } >;
 
 export type CategorySelectProps = {
+	categoriesList: Term[];
+	key: Key;
 	label: TreeSelectProps[ 'label' ];
 	noOptionLabel: TreeSelectProps[ 'noOptionLabel' ];
 	onChange: TreeSelectProps[ 'onChange' ];
-	categoriesList: Term[];
-	selectedCategoryId: TreeSelectProps[ 'selectedId' ];
-	key: Key;
+	selectedCategoryId?: Term[ 'id' ];
 };
 
 export type AuthorSelectProps = {

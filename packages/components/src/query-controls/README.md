@@ -9,29 +9,29 @@ import { QueryControls } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 const QUERY_DEFAULTS = {
-	category: 1,
+	category: '1',
 	categories: [
 		{
-			id: 1,
+			id: '1',
 			name: 'Category 1',
 			parent: 0,
 		},
 		{
-			id: 2,
+			id: '2',
 			name: 'Category 1b',
 			parent: 1,
 		},
 		{
-			id: 3,
+			id: '3',
 			name: 'Category 2',
 			parent: 0,
 		},
 	],
 	maxItems: 20,
-	minItems: 1,	
+	minItems: 1,
 	numberOfItems: 10,
 	order: 'asc',
-	orderBy: 'title',	
+	orderBy: 'title',
 };
 
 const MyQueryControls = () => {
@@ -69,17 +69,17 @@ const QUERY_DEFAULTS = {
 	selectedCategories: [ 1 ],
 	categories: [
 		{
-			id: 1,
+			id: '1',
 			name: 'Category 1',
 			parent: 0,
 		},
 		{
-			id: 2,
+			id: '2',
 			name: 'Category 1b',
 			parent: 1,
 		},
 		{
-			id: 3,
+			id: '3',
 			name: 'Category 2',
 			parent: 0,
 		},
