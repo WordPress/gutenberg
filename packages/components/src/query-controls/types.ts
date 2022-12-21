@@ -37,7 +37,7 @@ export type AuthorSelectProps = {
 
 export type QueryControlsProps = {
 	/**
-	 * An array of terms with author IDs that is passed into
+	 * An array of authors that is passed into
 	 * an `AuthorSelect` sub-component.
 	 */
 	authorList?: AuthorSelectProps[ 'authorList' ];
@@ -50,7 +50,7 @@ export type QueryControlsProps = {
 	 * An array of category names, renders a `FormTokenField` component
 	 * when passed in conjunction with `onCategoryChange`.
 	 */
-	categorySuggestions?: Entity[ 'name' ][];
+	categorySuggestions?: { [ categoryName: Entity[ 'name' ] ]: Entity };
 	/**
 	 * The maximum items.
 	 *
