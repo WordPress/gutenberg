@@ -236,7 +236,7 @@ function ListViewBlock( {
 		? selectedClientIds
 		: [ clientId ];
 
-	const BlockSettingsDropdownComponent = LeafMoreMenu
+	const MoreMenuComponent = LeafMoreMenu
 		? LeafMoreMenu
 		: BlockSettingsDropdown;
 
@@ -356,7 +356,7 @@ function ListViewBlock( {
 					>
 						{ ( { ref, tabIndex, onFocus } ) => (
 							<>
-								<BlockSettingsDropdownComponent
+								<MoreMenuComponent
 									clientIds={ dropdownClientIds }
 									block={ block }
 									clientId={ clientId }
