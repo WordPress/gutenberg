@@ -44,9 +44,6 @@ const config: PlaywrightTestConfig = {
 		trace: 'retain-on-failure',
 		screenshot: 'only-on-failure',
 		video: 'on-first-retry',
-		launchOptions: {
-			slowMo: 1000,
-		},
 	},
 	webServer: {
 		command: 'npm run wp-env start',
