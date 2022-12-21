@@ -6,6 +6,7 @@ import type { Key } from 'React';
 /**
  * Internal dependencies
  */
+import type { FormTokenFieldProps } from '../form-token-field/types';
 import type { Tree, TreeSelectProps } from '../tree-select/types';
 
 export type Term = {
@@ -40,17 +41,17 @@ export type QueryControlsProps = {
 	 */
 	authorList?: AuthorSelectProps[ 'authorList' ];
 	/**
-	 * The selected author ID.
-	 */
-	selectedAuthorId?: AuthorSelectProps[ 'selectedAuthorId' ];
-	/**
 	 * An array of categoris with their IDs; renders a `CategorySelect` sub-component when passed in conjunction with `onCategoryChange`.
 	 */
-	categoriesList?: CategorySelectProps[ 'categoriesList' ];
+	categoriesList: CategorySelectProps[ 'categoriesList' ];
 	/**
 	 * An array of category names; renders a `FormTokenField` component when passed in conjunction with `onCategoryChange`.
 	 */
-	categorySuggestions?: Term[ 'name' ][];
+	categorySuggestions: Term[ 'name' ][];
+	/**
+	 * The selected author ID.
+	 */
+	selectedAuthorId?: AuthorSelectProps[ 'selectedAuthorId' ];
 	/**
 	 * The maximum items.
 	 *
@@ -74,11 +75,12 @@ export type QueryControlsProps = {
 	/**
 	 * A function that receives the new category value. If this is not specified, the category controls are not included.
 	 */
-	onCategoryChange?: () => void; // TODO
+	onCategoryChange: CategorySelectProps[ 'onChange' ] &
+		FormTokenFieldProps[ 'onChange' ];
 	/**
 	 * A function that receives the new number of items value. If this is not specified, then the number of items range control is not included.
 	 */
-	onNumberOfItemsChange?: () => void; // TODO
+	onNumberOfItemsChange?: ( newNumber?: number ) => void;
 	/**
 	 * A function that receives the new order value. If this or onOrderByChange are not specified, then the order controls are not included.
 	 */
