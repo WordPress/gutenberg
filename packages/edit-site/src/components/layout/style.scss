@@ -1,7 +1,7 @@
 $hub-height: $grid-unit-20 * 2 + $button-size;
 
 .edit-site-layout {
-	min-height: 100%;
+	height: 100%;
 	background: $gray-900;
 	color: $white;
 	display: flex;
@@ -60,12 +60,12 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 .edit-site-layout__content {
 	flex-grow: 1;
 	display: flex;
+	overflow: auto;
 }
 
 .edit-site-layout__sidebar {
 	z-index: 1;
 	overflow-y: auto;
-	padding-top: $hub-height + $canvas-padding * 2;
 	width: 100vw;
 	@include custom-scrollbars-on-hover;
 
