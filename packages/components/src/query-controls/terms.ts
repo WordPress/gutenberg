@@ -4,13 +4,18 @@
 import { groupBy } from 'lodash';
 
 /**
+ * Internal dependencies
+ */
+import type { Term } from './types';
+
+/**
  * Returns terms in a tree form.
  *
- * @param {Array} flatTerms Array of terms in flat format.
+ * @param flatTerms Array of terms in flat format.
  *
- * @return {Array} Array of terms in tree format.
+ * @return Array of terms in tree format.
  */
-export function buildTermsTree( flatTerms ) {
+export function buildTermsTree( flatTerms: readonly Term[] ): Term[] {
 	const flatTermsWithParentAndChildren = flatTerms.map( ( term ) => {
 		return {
 			children: [],
@@ -23,7 +28,9 @@ export function buildTermsTree( flatTerms ) {
 	if ( termsByParent.null && termsByParent.null.length ) {
 		return flatTermsWithParentAndChildren;
 	}
-	const fillWithChildren = ( terms ) => {
+	const fillWithChildren = (
+		terms: Term[]
+	): Array< Term & { children: Term[] } > => {
 		return terms.map( ( term ) => {
 			const children = termsByParent[ term.id ];
 			return {

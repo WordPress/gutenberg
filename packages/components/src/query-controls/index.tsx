@@ -6,15 +6,43 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import CategorySelect from './category-select';
-import { RangeControl, SelectControl, FormTokenField } from '../';
 import AuthorSelect from './author-select';
+import CategorySelect from './category-select';
+import FormTokenField from '../form-token-field';
+import RangeControl from '../range-control';
+import SelectControl from '../select-control';
+import type { QueryControlsProps } from './types';
 
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 100;
 const MAX_CATEGORIES_SUGGESTIONS = 20;
 
-export default function QueryControls( {
+/**
+ * A select control that queries for entities.
+ *
+ * ```jsx
+ * const MyQueryControls = () => (
+ *   <QueryControls
+ *     { ...{ maxItems, minItems, numberOfItems, order, orderBy } }
+ *     onOrderByChange={ ( newOrderBy ) => {
+ *       updateQuery( { orderBy: newOrderBy } )
+ *     }
+ *     onOrderChange={ ( newOrder ) => {
+ *       updateQuery( { order: newOrder } )
+ *     }
+ *     categoriesList={ categories }
+ *     selectedCategoryId={ category }
+ *     onCategoryChange={ ( newCategory ) => {
+ *       updateQuery( { category: newCategory } )
+ *     }
+ *     onNumberOfItemsChange={ ( newNumberOfItems ) => {
+ *       updateQuery( { numberOfItems: newNumberOfItems } )
+ *     } }
+ *   />
+ * );
+ * ```
+ */
+export function QueryControls( {
 	authorList,
 	selectedAuthorId,
 	categoriesList,
@@ -31,7 +59,7 @@ export default function QueryControls( {
 	onNumberOfItemsChange,
 	onOrderChange,
 	onOrderByChange,
-} ) {
+}: QueryControlsProps ) {
 	return [
 		onOrderChange && onOrderByChange && (
 			<SelectControl
@@ -59,6 +87,10 @@ export default function QueryControls( {
 					},
 				] }
 				onChange={ ( value ) => {
+					if ( Array.isArray( value ) ) {
+						return;
+					}
+
 					const [ newOrderBy, newOrder ] = value.split( '/' );
 					if ( newOrder !== order ) {
 						onOrderChange( newOrder );
@@ -87,7 +119,7 @@ export default function QueryControls( {
 					selectedCategories &&
 					selectedCategories.map( ( item ) => ( {
 						id: item.id,
-						value: item.name || item.value,
+						value: item.name || item.value || '',
 					} ) )
 				}
 				suggestions={ Object.keys( categorySuggestions ) }
@@ -119,3 +151,5 @@ export default function QueryControls( {
 		),
 	];
 }
+
+export default QueryControls;

@@ -3,6 +3,7 @@
  */
 import { buildTermsTree } from './terms';
 import TreeSelect from '../tree-select';
+import type { AuthorSelectProps } from './types';
 
 export default function AuthorSelect( {
 	label,
@@ -10,7 +11,7 @@ export default function AuthorSelect( {
 	authorList,
 	selectedAuthorId,
 	onChange,
-} ) {
+}: AuthorSelectProps ) {
 	if ( ! authorList ) return null;
 	const termsTree = buildTermsTree( authorList );
 	return (

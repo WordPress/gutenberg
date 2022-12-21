@@ -3,10 +3,12 @@
  */
 import { buildTermsTree } from './terms';
 import TreeSelect from '../tree-select';
+
 /**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
+import type { CategorySelectProps } from './types';
 
 export default function CategorySelect( {
 	label,
@@ -15,7 +17,7 @@ export default function CategorySelect( {
 	selectedCategoryId,
 	onChange,
 	...props
-} ) {
+}: CategorySelectProps ) {
 	const termsTree = useMemo( () => {
 		return buildTermsTree( categoriesList );
 	}, [ categoriesList ] );
