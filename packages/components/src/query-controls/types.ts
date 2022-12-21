@@ -28,24 +28,27 @@ export type CategorySelectProps = {
 };
 
 export type AuthorSelectProps = {
+	authorList?: Term[];
 	label: TreeSelectProps[ 'label' ];
 	noOptionLabel: TreeSelectProps[ 'noOptionLabel' ];
 	onChange: TreeSelectProps[ 'onChange' ];
-	authorList?: Term[];
 	selectedAuthorId?: string;
 };
 
 export type QueryControlsProps = {
 	/**
-	 * An array of terms with author IDs that is passed into an `AuthorSelect` sub-component.
+	 * An array of terms with author IDs that is passed into
+	 * an `AuthorSelect` sub-component.
 	 */
 	authorList?: AuthorSelectProps[ 'authorList' ];
 	/**
-	 * An array of categoris with their IDs; renders a `CategorySelect` sub-component when passed in conjunction with `onCategoryChange`.
+	 * An array of categoris with their IDs; renders a `CategorySelect`
+	 * sub-component when passed in conjunction with `onCategoryChange`.
 	 */
 	categoriesList: CategorySelectProps[ 'categoriesList' ];
 	/**
-	 * An array of category names; renders a `FormTokenField` component when passed in conjunction with `onCategoryChange`.
+	 * An array of category names; renders a `FormTokenField` component
+	 * when passed in conjunction with `onCategoryChange`.
 	 */
 	categorySuggestions: Term[ 'name' ][];
 	/**
@@ -69,24 +72,32 @@ export type QueryControlsProps = {
 	 */
 	numberOfItems?: number;
 	/**
-	 * A function that receives the new author value. If this is not specified, the author controls are not included.
+	 * A function that receives the new author value.
+	 * If this is not specified, the author controls are not included.
 	 */
 	onAuthorChange?: () => void;
 	/**
-	 * A function that receives the new category value. If this is not specified, the category controls are not included.
+	 * A function that receives the new category value.
+	 * If this is not specified, the category controls are not included.
 	 */
 	onCategoryChange: CategorySelectProps[ 'onChange' ] &
 		FormTokenFieldProps[ 'onChange' ];
 	/**
-	 * A function that receives the new number of items value. If this is not specified, then the number of items range control is not included.
+	 * A function that receives the new number of items value.
+	 * If this is not specified, then the number of items
+	 * range control is not included.
 	 */
 	onNumberOfItemsChange?: ( newNumber?: number ) => void;
 	/**
-	 * A function that receives the new order value. If this or onOrderByChange are not specified, then the order controls are not included.
+	 * A function that receives the new order value.
+	 * If this or onOrderByChange are not specified,
+	 * then the order controls are not included.
 	 */
 	onOrderChange?: ( newOrder: string ) => void;
 	/**
-	 * A function that receives the new orderby value. If this or onOrderChange are not specified, then the order controls are not included.
+	 * A function that receives the new orderby value.
+	 * If this or onOrderChange are not specified,
+	 * then the order controls are not included.
 	 */
 	onOrderByChange?: ( newOrderBy: string ) => void;
 	/**
