@@ -117,7 +117,7 @@ describe( 'Block Actions Menu', () => {
 				upButton.props.accessibilityState?.disabled;
 			expect( isUpButtonDisabled ).toBe( true );
 
-			// Press the button to make sure the move doesn't block
+			// Press the button to make sure the block doesn't move
 			fireEvent.press( upButton );
 
 			expect( getEditorHtml() ).toMatchSnapshot();
@@ -144,7 +144,7 @@ describe( 'Block Actions Menu', () => {
 				downButton.props.accessibilityState?.disabled;
 			expect( isDownButtonDisabled ).toBe( true );
 
-			// Press the button to make sure the move doesn't block
+			// Press the button to make sure the block doesn't move
 			fireEvent.press( downButton );
 
 			expect( getEditorHtml() ).toMatchSnapshot();
