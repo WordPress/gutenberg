@@ -1474,6 +1474,14 @@ class WP_HTML_Tag_Processor {
 			return false;
 		}
 
+		/**
+		 * Uppercase characters in the attributes names are converted into lowercase characters
+		 * according to the HTML parsing spec:
+		 *
+		 * @see https://html.spec.whatwg.org/multipage/parsing.html#attribute-name-state
+		 */
+		$name = strtolower( $name );
+
 		/*
 		 * Verify that the attribute name is allowable. In WP_DEBUG
 		 * environments we want to crash quickly to alert developers
