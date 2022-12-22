@@ -68,7 +68,7 @@ jobs:
 
             - name: Show test suite scan results in PR
               if: ${{ always() && steps.phpcs-tests.outcome == 'failure' }}
-              run: cs2pr ./.cache/phpcs-tests-report.xml
+              run: cs2pr ./.cache/phpcs-report.xml
 
             - name: Ensure version-controlled files are not modified during the tests
               run: git diff --exit-code
