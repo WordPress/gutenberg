@@ -43,6 +43,7 @@ import BlockHtml from './block-html';
 import { useBlockProps } from './use-block-props';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
+import { unlock } from '../../experiments';
 export const BlockListBlockContext = createContext();
 
 /**
@@ -115,10 +116,9 @@ function BlockListBlock( {
 				!! __unstableGetContentLockingParent( clientId );
 			return {
 				themeSupportsLayout: getSettings().supportsLayout,
-				isContentBlock:
-					select( blocksStore ).__experimentalHasContentRoleAttribute(
-						name
-					),
+				isContentBlock: unlock(
+					select( blocksStore )
+				).__experimentalHasContentRoleAttribute( name ),
 				hasContentLockedParent: _hasContentLockedParent,
 				isContentLocking:
 					getTemplateLock( clientId ) === 'contentOnly' &&

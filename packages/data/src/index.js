@@ -30,6 +30,8 @@ export { createRegistrySelector, createRegistryControl } from './factory';
 export { controls } from './controls';
 export { default as createReduxStore } from './redux-store';
 
+export { experiments } from './experiments';
+
 /**
  * Object of available plugins to use with a registry.
  *
