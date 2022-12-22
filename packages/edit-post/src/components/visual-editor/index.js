@@ -152,6 +152,11 @@ export default function VisualEditor( { styles } ) {
 			isBlockBasedTheme: editorSettings.__unstableIsBlockBasedTheme,
 		};
 	}, [] );
+	const { isCleanNewPost } = useSelect( editorStore );
+	const hasMetaBoxes = useSelect(
+		( select ) => select( editPostStore ).hasMetaBoxes(),
+		[]
+	);
 	const { themeHasDisabledLayoutStyles, themeSupportsLayout, isFocusMode } =
 		useSelect( ( select ) => {
 			const _settings = select( blockEditorStore ).getSettings();
@@ -161,11 +166,6 @@ export default function VisualEditor( { styles } ) {
 				isFocusMode: _settings.focusMode,
 			};
 		}, [] );
-	const { isCleanNewPost } = useSelect( editorStore );
-	const hasMetaBoxes = useSelect(
-		( select ) => select( editPostStore ).hasMetaBoxes(),
-		[]
-	);
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const desktopCanvasStyles = {
