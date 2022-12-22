@@ -1581,6 +1581,13 @@ class WP_HTML_Tag_Processor {
 	 * @param string $name The attribute name to remove.
 	 */
 	public function remove_attribute( $name ) {
+		/**
+		 * Uppercase characters in the attributes names are converted into lowercase characters
+		 * according to the HTML parsing spec:
+		 *
+		 * @see https://html.spec.whatwg.org/multipage/parsing.html#attribute-name-state
+		 */
+		$name = strtolower( $name );
 		if ( $this->is_closing_tag || ! isset( $this->attributes[ $name ] ) ) {
 			return false;
 		}
