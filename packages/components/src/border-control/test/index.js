@@ -14,6 +14,8 @@ import {
  */
 import { BorderControl } from '../';
 
+jest.useRealTimers();
+
 const colors = [
 	{ name: 'Gray', color: '#f6f7f7' },
 	{ name: 'Blue', color: '#72aee6' },
