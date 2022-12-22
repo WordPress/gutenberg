@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -15,6 +15,14 @@ import { forwardRef } from '@wordpress/element';
 import ListViewBlockSelectButton from './block-select-button';
 import BlockDraggable from '../block-draggable';
 import { store as blockEditorStore } from '../../store';
+import { updateAttributes } from './update-attributes';
+import { LinkUI } from './link-ui';
+import { useInsertedBlock } from './use-inserted-block';
+
+const BLOCKS_WITH_LINK_UI_SUPPORT = [
+	'core/navigation-link',
+	'core/navigation-submenu',
+];
 
 const ListViewBlockContents = forwardRef(
 	(
@@ -33,18 +41,41 @@ const ListViewBlockContents = forwardRef(
 		ref
 	) => {
 		const { clientId } = block;
-
-		const { blockMovingClientId, selectedBlockInBlockEditor } = useSelect(
+		const [ isLinkUIOpen, setIsLinkUIOpen ] = useState();
+		const {
+			blockMovingClientId,
+			selectedBlockInBlockEditor,
+			lastInsertedBlockClientId,
+		} = useSelect(
 			( select ) => {
-				const { hasBlockMovingClientId, getSelectedBlockClientId } =
-					select( blockEditorStore );
+				const {
+					hasBlockMovingClientId,
+					getSelectedBlockClientId,
+					getLastInsertedBlockClientId,
+				} = select( blockEditorStore );
 				return {
 					blockMovingClientId: hasBlockMovingClientId(),
 					selectedBlockInBlockEditor: getSelectedBlockClientId(),
+					lastInsertedBlockClientId: getLastInsertedBlockClientId(),
 				};
 			},
 			[ clientId ]
 		);
+
+		const {
+			insertedBlockAttributes,
+			insertedBlockName,
+			setInsertedBlockAttributes,
+		} = useInsertedBlock( lastInsertedBlockClientId );
+
+		useEffect( () => {
+			if (
+				clientId === lastInsertedBlockClientId &&
+				BLOCKS_WITH_LINK_UI_SUPPORT?.includes( insertedBlockName )
+			) {
+				setIsLinkUIOpen( true );
+			}
+		}, [ lastInsertedBlockClientId ] );
 
 		const isBlockMoveTarget =
 			blockMovingClientId && selectedBlockInBlockEditor === clientId;
@@ -61,27 +92,50 @@ const ListViewBlockContents = forwardRef(
 			? selectedClientIds
 			: [ clientId ];
 
+		let maybeLinkUI;
+		if ( isLinkUIOpen ) {
+			maybeLinkUI = (
+				<LinkUI
+					clientId={ lastInsertedBlockClientId }
+					link={ insertedBlockAttributes }
+					onClose={ () => setIsLinkUIOpen( false ) }
+					hasCreateSuggestion={ false }
+					onChange={ ( updatedValue ) => {
+						updateAttributes(
+							updatedValue,
+							setInsertedBlockAttributes,
+							insertedBlockAttributes
+						);
+						setIsLinkUIOpen( false );
+					} }
+				/>
+			);
+		}
+
 		return (
-			<BlockDraggable clientIds={ draggableClientIds }>
-				{ ( { draggable, onDragStart, onDragEnd } ) => (
-					<ListViewBlockSelectButton
-						ref={ ref }
-						className={ className }
-						block={ block }
-						onClick={ onClick }
-						onToggleExpanded={ onToggleExpanded }
-						isSelected={ isSelected }
-						position={ position }
-						siblingBlockCount={ siblingBlockCount }
-						level={ level }
-						draggable={ draggable }
-						onDragStart={ onDragStart }
-						onDragEnd={ onDragEnd }
-						isExpanded={ isExpanded }
-						{ ...props }
-					/>
-				) }
-			</BlockDraggable>
+			<>
+				{ maybeLinkUI }
+				<BlockDraggable clientIds={ draggableClientIds }>
+					{ ( { draggable, onDragStart, onDragEnd } ) => (
+						<ListViewBlockSelectButton
+							ref={ ref }
+							className={ className }
+							block={ block }
+							onClick={ onClick }
+							onToggleExpanded={ onToggleExpanded }
+							isSelected={ isSelected }
+							position={ position }
+							siblingBlockCount={ siblingBlockCount }
+							level={ level }
+							draggable={ draggable }
+							onDragStart={ onDragStart }
+							onDragEnd={ onDragEnd }
+							isExpanded={ isExpanded }
+							{ ...props }
+						/>
+					) }
+				</BlockDraggable>
+			</>
 		);
 	}
 );
