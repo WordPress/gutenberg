@@ -286,7 +286,7 @@ class WP_Theme_JSON_Resolver_Base {
 		 * and merge the static::$theme upon that.
 		 */
 		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( get_default_block_editor_settings() );
-		if ( ! static::theme_has_support() ) {
+		if ( ! wp_theme_has_theme_json() ) {
 			if ( ! isset( $theme_support_data['settings']['color'] ) ) {
 				$theme_support_data['settings']['color'] = array();
 			}
@@ -407,11 +407,11 @@ class WP_Theme_JSON_Resolver_Base {
 		/*
 		 * Bail early if the theme does not support a theme.json.
 		 *
-		 * Since WP_Theme_JSON_Resolver::theme_has_support() only supports the active
+		 * Since wp_theme_has_theme_json() only supports the active
 		 * theme, the extra condition for whether $theme is the active theme is
 		 * present here.
 		 */
-		if ( $theme->get_stylesheet() === get_stylesheet() && ! static::theme_has_support() ) {
+		if ( $theme->get_stylesheet() === get_stylesheet() && ! wp_theme_has_theme_json() ) {
 			return array();
 		}
 
