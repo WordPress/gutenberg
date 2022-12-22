@@ -17,7 +17,7 @@
  * @access private
  */
 #[AllowDynamicProperties]
-class WP_Theme_JSON_Resolver_Base {
+class WP_Theme_JSON_Resolver_Gutenberg {
 
 	/**
 	 * Container for keep track of registered blocks.
