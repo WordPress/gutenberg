@@ -179,7 +179,7 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 		$p = new WP_HTML_Tag_Processor( '<div DATA-enabled="true">Test</div>' );
 		$p->next_tag();
 		$p->remove_attribute( 'data-enabled' );
-		$this->assertEquals( '<div>Test</div>', $p->get_updated_html(), 'A case-insensitive remove_attribute call did not remove the attribute.' );
+		$this->assertEquals( '<div >Test</div>', $p->get_updated_html(), 'A case-insensitive remove_attribute call did not remove the attribute.' );
 	}
 
 	/**
