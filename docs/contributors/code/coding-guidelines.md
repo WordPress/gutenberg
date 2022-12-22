@@ -149,7 +149,8 @@ plugin during the major WordPress releases. Many plugins and themes rely on thes
 features that can't be accessed in any other way. Naturally, these APIs can't be removed without a warning anymore.
 They are a part of the WordPress public API and fall under the 
 [WordPress Backwards Compatibility policy](https://developer.wordpress.org/block-editor/contributors/code/backward-compatibility/). 
-Removing them involves a deprecation process that spans multiple WordPress releases. 
+Removing them involves a deprecation process. It may be relatively easy for some APIs, but it may require effort and
+span multiple WordPress releases for others.
 
 **Use private experimental APIs instead.**
 
