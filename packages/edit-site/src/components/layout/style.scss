@@ -135,10 +135,6 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 	min-height: 100% !important;
 }
 
-.edit-site-layout__view-mode-toggle-container {
-	height: $header-height;
-	width: $header-height;
-}
 .edit-site-layout__view-mode-toggle.components-button {
 	position: relative;
 	color: $white;

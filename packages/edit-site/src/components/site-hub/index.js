@@ -25,7 +25,7 @@ import { store as editSiteStore } from '../../store';
 import { useLocation } from '../routes';
 import getIsListPage from '../../utils/get-is-list-page';
 import SiteIcon from '../site-icon';
-import useEditedEntityRecord from '../edited-entity-title';
+import useEditedEntityRecord from '../use-edited-entity-record';
 
 const HUB_ANIMATION_DURATION = 0.3;
 
@@ -63,6 +63,7 @@ function SiteHub( {
 	const isBackToDashboardButton =
 		( ! isMobileViewport && canvasMode === 'view' ) ||
 		( isMobileViewport && ! isMobileCanvasVisible );
+	const showLabels = canvasMode !== 'edit';
 	const siteIconButtonProps = isBackToDashboardButton
 		? {
 				href: dashboardLink || 'index.php',
@@ -88,9 +89,12 @@ function SiteHub( {
 				ease: 'easeOut',
 			} }
 		>
-			<HStack justify="flex-start">
+			<HStack
+				justify="flex-start"
+				className="edit-site-site-hub__text-content"
+			>
 				<motion.div
-					className="edit-site-layout__view-mode-toggle-container"
+					className="edit-site-site-hub__view-mode-toggle-container"
 					layout
 					transition={ {
 						type: 'tween',
@@ -106,12 +110,16 @@ function SiteHub( {
 					</Button>
 				</motion.div>
 
-				<VStack spacing={ 0 }>
-					<div>{ getTitle() }</div>
-					<div className="edit-site-site-hub__post-type">
-						{ entityConfig?.label }
-					</div>
-				</VStack>
+				{ showLabels && (
+					<VStack spacing={ 0 }>
+						<div className="edit-site-site-hub__title">
+							{ getTitle() }
+						</div>
+						<div className="edit-site-site-hub__post-type">
+							{ entityConfig?.label }
+						</div>
+					</VStack>
+				) }
 			</HStack>
 
 			{ showEditButton && (

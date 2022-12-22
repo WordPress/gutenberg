@@ -31,7 +31,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import TemplateDetails from '../../template-details';
-import useEditedEntityRecord from '../../edited-entity-title';
+import useEditedEntityRecord from '../../use-edited-entity-record';
 
 function getBlockDisplayText( block ) {
 	if ( block ) {
