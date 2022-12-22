@@ -2,8 +2,7 @@
 /**
  * WP_Theme_JSON_Resolver class
  *
- * @package WordPress
- * @subpackage Theme
+ * @package gutenberg
  * @since 5.8.0
  */
 
@@ -18,7 +17,7 @@
  * @access private
  */
 #[AllowDynamicProperties]
-class WP_Theme_JSON_Resolver {
+class WP_Theme_JSON_Resolver_Base {
 
 	/**
 	 * Container for keep track of registered blocks.
