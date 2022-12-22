@@ -40,31 +40,33 @@ export const { lock, unlock } =
  *
  * ```js
  * // In the package exposing the private selectors:
- *
  * import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/experiments';
  * export const { lock, unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules( /* ... *\/ );
  *
  * import { experiments as dataExperiments } from '@wordpress/data';
  * const { registerPrivateActionsAndSelectors } = unlock( dataExperiments );
  *
- * const store = registerStore( 'my-store', { /* ... *\/ } );
+ * import { __experimentalHasContentRoleAttribute, ...selectors } from './store/selectors';
+ * import { __experimentalToggleFeature, ...actions } from './store/actions';
+ * const store = registerStore( 'my-store', { selectors, actions, /* ... *\/ } );
  * registerPrivateActionsAndSelectors( store, {
- *     __experimentalAction: ( state ) => state.value,
+ *     __experimentalToggleFeature
  * }, {
- *     __experimentalSelector: ( state ) => state.value,
+ *     __experimentalHasContentRoleAttribute
  * } );
  *
  * // In the package using the private selectors:
- * import { store as blockEditorStore } from '@wordpress/block-editor';
- * unlock( registry.select( blockEditorStore ) ).__experimentalSelector();
+ * import { store as storeWithPrivateAPIs } from '@wordpress/package';
+ * unlock( registry.dispatch( storeWithPrivateAPIs ) ).__experimentalToggleFeature();
+ * unlock( registry.select( storeWithPrivateAPIs ) ).__experimentalHasContentRoleAttribute();
  *
  * // Or in a React component:
- * useSelect( ( select ) => (
- *     unlock( select( blockEditorStore ) ).__experimentalSelector()
- * ) );
  * useDispatch( ( dispatch ) => {
- *     unlock( dispatch( blockEditorStore ) ).__experimentalAction()
+ *     unlock( dispatch( storeWithPrivateAPIs ) ).__experimentalToggleFeature()
  * } );
+ * useSelect( ( select ) => (
+ *     unlock( select( storeWithPrivateAPIs ) ).__experimentalHasContentRoleAttribute()
+ * ) );
  * ```
  *
  * @param {Object} store     The store descriptor to register the private selectors on.
@@ -84,19 +86,8 @@ export function registerPrivateActionsAndSelectors(
  * Only available to core packages. These APIs are not stable and may
  * change without notice. Do not use outside of core.
  *
- * @example
- *
- * ```js
- * import { unlock } from '../experiments';
- * import { experiments as dataExperiments } from '@wordpress/data';
- * const { registerPrivateSelectors } = unlock( dataExperiments );
- *
- * import { store as blockEditorStore } from './store';
- * import { __unstableSelectionHasUnmergeableBlock } from './store/selectors';
- * registerPrivateSelectors( store, {
- * __experimentalHasContentRoleAttribute
- * } );
- * ```
+ * Available APIs:
+ * – registerPrivateActionsAndSelectors
  */
 export const experiments = {};
 lock( experiments, {
