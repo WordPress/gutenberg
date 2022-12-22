@@ -32,8 +32,8 @@ export const { lock, unlock } =
  * unlock( registry.select( blockEditorStore ) ).__experimentalSelector();
  * ```
  *
- * Note the objects returned by select() and dispatch() have the good old public 
- * methods, but the modules that opted-in to the private APIs can also "unlock" 
+ * Note the objects returned by select() and dispatch() have the good old public
+ * methods, but the modules that opted-in to the private APIs can also "unlock"
  * additional private selectors and actions.
  *
  * @example
