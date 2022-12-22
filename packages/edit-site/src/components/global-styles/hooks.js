@@ -355,6 +355,15 @@ export function useFontFamilies() {
 		);
 	};
 
+	const sortFontFaces = ( fontFaces ) => {
+		return fontFaces.sort( ( a, b ) => {
+			if ( a.fontStyle === b.fontStyle ) {
+				return a.fontWeight.localeCompare( b.fontWeight );
+			}
+			return a.fontStyle.localeCompare( b.fontStyle ) * -1;
+		} );
+	};
+
 	const handleAddFontFace = ( fontFace ) => {
 		const { fontFamily, fontWeight, fontStyle } = fontFace;
 		const slug = getFontSlug( fontFamily );
@@ -468,6 +477,7 @@ export function useFontFamilies() {
 		handleAddFontFace,
 		handleRemoveFontFace,
 		getFontSlug,
+		sortFontFaces,
 	};
 }
 

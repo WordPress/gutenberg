@@ -14,7 +14,8 @@ import { useFontFamilies } from './hooks';
 import FontFaceItem from './font-face-item';
 
 function ScreenThemeFontFacesList( { themeFontSelected } ) {
-	const { fontFamilies, handleRemoveFontFace } = useFontFamilies();
+	const { fontFamilies, handleRemoveFontFace, sortFontFaces } =
+		useFontFamilies();
 	const font = fontFamilies[ themeFontSelected ];
 
 	return (
@@ -43,8 +44,8 @@ function ScreenThemeFontFacesList( { themeFontSelected } ) {
 				{ ! font && <p>{ __( 'No font faces available' ) }</p> }
 
 				{ font &&
-					font.fontFace &&
-					font.fontFace.map( ( fontFace, i ) => {
+					Array.isArray( font.fontFace ) &&
+					sortFontFaces( font.fontFace ).map( ( fontFace, i ) => {
 						return (
 							! fontFace.shouldBeRemoved && (
 								<FontFaceItem
