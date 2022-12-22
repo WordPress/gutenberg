@@ -3,16 +3,25 @@
  */
 import { set } from 'lodash';
 import classnames from 'classnames';
-import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { __experimentalVStack as VStack, Button } from '@wordpress/components';
+import {
+	__experimentalVStack as VStack,
+	Button,
+	SelectControl,
+} from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { useContext, useCallback, useState } from '@wordpress/element';
+import {
+	useContext,
+	useCallback,
+	useState,
+	useEffect,
+	useMemo,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -20,60 +29,100 @@ import { useContext, useCallback, useState } from '@wordpress/element';
 import ScreenHeader from './header';
 import Subtitle from './subtitle';
 import { GlobalStylesContext } from './context';
+import { decodeEntities } from '@wordpress/html-entities';
+import { isGlobalStyleConfigEqual } from './utils';
 
-// Taken from packages/edit-site/src/hooks/push-changes-to-global-styles/index.js.
-// TODO abstract
-function cloneDeep( object ) {
-	return ! object ? {} : JSON.parse( JSON.stringify( object ) );
+function RevisionsSelect( { userRevisions, currentRevisionId, onChange } ) {
+	const userRevisionsOptions = useMemo( () => {
+		return ( userRevisions ?? [] ).map( ( revision ) => {
+			return {
+				value: revision.id,
+				label: decodeEntities( revision.title.rendered ),
+			};
+		} );
+	}, [ userRevisions ] );
+	const setCurrentRevisionId = ( value ) => {
+		const revisionId = Number( value );
+		onChange(
+			userRevisions.find( ( revision ) => revision.id === revisionId )
+		);
+	};
+	return (
+		<SelectControl
+			className="edit-site-global-styles-screen-revisions__selector"
+			label={ __( 'Styles revisions' ) }
+			options={ userRevisionsOptions }
+			onChange={ setCurrentRevisionId }
+			value={ currentRevisionId }
+		/>
+	);
 }
 
-// Taken from packages/edit-site/src/components/global-styles/screen-style-variations.js.
-// TODO abstract
-function compareVariations( a, b ) {
+function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
 	return (
-		fastDeepEqual( a.styles, b.styles ) &&
-		fastDeepEqual( a.settings, b.settings )
+		<ol className="edit-site-global-styles-screen-revisions__revisions-list">
+			{ userRevisions.map( ( revision ) => {
+				const isActive = revision?.id === currentRevisionId;
+				return (
+					<li key={ `user-styles-revision-${ revision.id }` }>
+						<Button
+							className={ classnames(
+								'edit-site-global-styles-screen-revisions__revision-item',
+								{
+									'is-current': isActive,
+								}
+							) }
+							variant={ isActive ? 'tertiary' : 'secondary' }
+							disabled={ isActive }
+							onClick={ () => {
+								onChange( revision );
+							} }
+						>
+							<span className="edit-site-global-styles-screen-revisions__title">
+								{ revision.title.rendered }
+							</span>
+						</Button>
+					</li>
+				);
+			} ) }
+		</ol>
 	);
 }
 
 function ScreenRevisions() {
 	const { user: userConfig, setUserConfig } =
 		useContext( GlobalStylesContext );
-	const { userRevisions } = useSelect( ( select ) => {
-		const { getEditedEntityRecord } = select( coreStore );
-		const _globalStylesId =
-			select( coreStore ).__experimentalGetCurrentGlobalStylesId();
-
-		// Maybe we can return the whole object from __experimentalGetCurrentGlobalStylesId
-		// and rename it to __experimentalGetCurrentGlobalStyles,
-		// otherwise we're grabbing this twice.
-		const record = _globalStylesId
-			? getEditedEntityRecord( 'root', 'globalStyles', _globalStylesId )
-			: undefined;
-
-		return {
-			userRevisions: record?.revisions || [],
-		};
-	}, [] );
-
+	const { userRevisions } = useSelect(
+		( select ) => ( {
+			userRevisions:
+				select(
+					coreStore
+				).__experimentalGetCurrentThemeGlobalStylesRevisions() || [],
+		} ),
+		[]
+	);
+	const [ currentRevisionId, setCurrentRevisionId ] = useState();
 	const hasRevisions = userRevisions.length > 0;
-	const [ currentRevisionId, setCurrentRevisionId ] = useState( () => {
+
+	useEffect( () => {
 		if ( ! hasRevisions ) {
-			return 0;
+			return;
 		}
 		let currentRevision = userRevisions[ 0 ];
 		for ( let i = 0; i < userRevisions.length; i++ ) {
-			if ( compareVariations( userConfig, userRevisions[ i ] ) ) {
+			if ( isGlobalStyleConfigEqual( userConfig, userRevisions[ i ] ) ) {
 				currentRevision = userRevisions[ i ];
 				break;
 			}
 		}
-		return currentRevision?.id;
-	} );
+		setCurrentRevisionId( currentRevision?.id );
+	}, [ userRevisions, hasRevisions ] );
 
 	const restoreRevision = useCallback(
 		( revision ) => {
-			const newUserConfig = cloneDeep( userConfig );
+			const newUserConfig = ! userConfig
+				? {}
+				: JSON.parse( JSON.stringify( userConfig ) );
 			set( newUserConfig, [ 'styles' ], revision?.styles );
 			set( newUserConfig, [ 'settings' ], revision?.settings );
 			setUserConfig( () => newUserConfig );
@@ -82,46 +131,26 @@ function ScreenRevisions() {
 		[ userConfig ]
 	);
 
+	const RevisionsComponent =
+		userRevisions.length >= 10 ? RevisionsSelect : RevisionsButtons;
+
 	return (
 		<>
 			<ScreenHeader
 				title={ __( 'Revisions' ) }
 				description={ __(
-					"Select a revision to preview it in the editor. Changes won't take effect until you've saved the template."
+					"Select one of your styles revisions to preview it in the editor. Changes won't take effect until you've saved the template."
 				) }
 			/>
 			<div className="edit-site-global-styles-screen-revisions">
 				<VStack spacing={ 3 }>
 					<Subtitle>{ __( 'REVISIONS' ) }</Subtitle>
 					{ hasRevisions ? (
-						userRevisions.map( ( revision ) => {
-							const isActive = revision?.id === currentRevisionId;
-							return (
-								<Button
-									className={ classnames(
-										'edit-site-global-styles-screen-revisions__revision-item',
-										{
-											'is-current': isActive,
-										}
-									) }
-									variant={
-										isActive ? 'tertiary' : 'secondary'
-									}
-									disabled={ isActive }
-									key={ `user-styles-revision-${ revision.id }` }
-									onClick={ () => {
-										restoreRevision( revision );
-									} }
-								>
-									<span className="edit-site-global-styles-screen-revisions__time-ago">
-										{ revision.timeAgo }
-									</span>
-									<span className="edit-site-global-styles-screen-revisions__date">
-										({ revision.dateShort })
-									</span>
-								</Button>
-							);
-						} )
+						<RevisionsComponent
+							onChange={ restoreRevision }
+							currentRevisionId={ currentRevisionId }
+							userRevisions={ userRevisions }
+						/>
 					) : (
 						<p>{ __( 'There are currently no revisions.' ) }</p>
 					) }

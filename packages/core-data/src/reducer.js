@@ -134,10 +134,10 @@ export function currentTheme( state = undefined, action ) {
  *
  * @return {string|undefined} Updated state.
  */
-export function currentGlobalStylesId( state = undefined, action ) {
+export function currentGlobalStyles( state = undefined, action ) {
 	switch ( action.type ) {
-		case 'RECEIVE_CURRENT_GLOBAL_STYLES_ID':
-			return action.id;
+		case 'RECEIVE_CURRENT_GLOBAL_STYLES':
+			return action.globalStyles;
 	}
 
 	return state;
@@ -177,6 +177,26 @@ export function themeGlobalStyleVariations( state = {}, action ) {
 			return {
 				...state,
 				[ action.stylesheet ]: action.variations,
+			};
+	}
+
+	return state;
+}
+
+/**
+ * Reducer managing the theme global styles revisions.
+ *
+ * @param {Record<string, object>} state  Current state.
+ * @param {Object}                 action Dispatched action.
+ *
+ * @return {Record<string, object>} Updated state.
+ */
+export function themeGlobalStyleRevisions( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_THEME_GLOBAL_STYLE_REVISIONS':
+			return {
+				...state,
+				[ action.currentId ]: action.revisions,
 			};
 	}
 
@@ -646,9 +666,10 @@ export default combineReducers( {
 	terms,
 	users,
 	currentTheme,
-	currentGlobalStylesId,
+	currentGlobalStyles,
 	currentUser,
 	themeGlobalStyleVariations,
+	themeGlobalStyleRevisions,
 	themeBaseGlobalStyles,
 	taxonomies,
 	entities,

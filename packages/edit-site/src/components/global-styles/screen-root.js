@@ -12,10 +12,11 @@ import {
 	CardDivider,
 	CardMedia,
 } from '@wordpress/components';
-import { isRTL, __ } from '@wordpress/i18n';
-import { chevronLeft, chevronRight } from '@wordpress/icons';
+import { isRTL, __, sprintf, _n } from '@wordpress/i18n';
+import { backup, chevronLeft, chevronRight } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { useContext } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
@@ -26,11 +27,14 @@ import { NavigationButtonAsItem } from './navigation-button';
 import ContextMenu from './context-menu';
 import StylesPreview from './preview';
 import { unlock } from '../../private-apis';
+// @TODO does this exist?
+import { GlobalStylesContext } from './context';
 
 function ScreenRoot() {
 	const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 	const [ customCSS ] = useGlobalStyle( 'css' );
-
+	const { userConfigRevisionsCount: revisionsCount } =
+		useContext( GlobalStylesContext );
 	const { variations, canEditCSS } = useSelect( ( select ) => {
 		const {
 			getEntityRecord,
@@ -49,6 +53,8 @@ function ScreenRoot() {
 				!! globalStyles?._links?.[ 'wp:action-edit-css' ] ?? false,
 		};
 	}, [] );
+
+	const chevronIcon = isRTL() ? chevronLeft : chevronRight;
 
 	return (
 		<Card size="small" className="edit-site-global-styles-screen-root">
@@ -70,9 +76,7 @@ function ScreenRoot() {
 										{ __( 'Browse styles' ) }
 									</FlexItem>
 									<IconWithCurrentColor
-										icon={
-											isRTL() ? chevronLeft : chevronRight
-										}
+										icon={ chevronIcon }
 									/>
 								</HStack>
 							</NavigationButtonAsItem>
@@ -107,9 +111,7 @@ function ScreenRoot() {
 					>
 						<HStack justify="space-between">
 							<FlexItem>{ __( 'Blocks' ) }</FlexItem>
-							<IconWithCurrentColor
-								icon={ isRTL() ? chevronLeft : chevronRight }
-							/>
+							<IconWithCurrentColor icon={ chevronIcon } />
 						</HStack>
 					</NavigationButtonAsItem>
 				</ItemGroup>
@@ -139,9 +141,7 @@ function ScreenRoot() {
 										{ __( 'Additional CSS' ) }
 									</FlexItem>
 									<IconWithCurrentColor
-										icon={
-											isRTL() ? chevronLeft : chevronRight
-										}
+										icon={ chevronIcon }
 									/>
 								</HStack>
 							</NavigationButtonAsItem>
@@ -177,6 +177,46 @@ function ScreenRoot() {
 					</NavigationButtonAsItem>
 				</ItemGroup>
 			</CardBody>
+
+			{ revisionsCount > 0 ? (
+				<>
+					<CardDivider />
+					<CardBody>
+						<Spacer
+							as="p"
+							paddingTop={ 2 }
+							paddingX="13px"
+							marginBottom={ 4 }
+						>
+							{ __( "View revisions to your site's styles." ) }
+						</Spacer>
+						<ItemGroup>
+							<NavigationButtonAsItem
+								path="/revisions"
+								aria-label={ __( 'Styles revisions' ) }
+								icon={ backup }
+							>
+								<HStack justify="space-between">
+									<FlexItem>
+										{ sprintf(
+											/* translators: %d: number of revisions */
+											_n(
+												'%d Revision',
+												'%d Revisions',
+												revisionsCount
+											),
+											revisionsCount
+										) }
+									</FlexItem>
+									<IconWithCurrentColor
+										icon={ chevronIcon }
+									/>
+								</HStack>
+							</NavigationButtonAsItem>
+						</ItemGroup>
+					</CardBody>
+				</>
+			) : null }
 		</Card>
 	);
 }

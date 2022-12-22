@@ -31,13 +31,14 @@ export interface State {
 	autosaves: Record< string | number, Array< unknown > >;
 	blockPatterns: Array< unknown >;
 	blockPatternCategories: Array< unknown >;
-	currentGlobalStylesId: string;
+	currentGlobalStyles: GlobalStyles;
 	currentTheme: string;
 	currentUser: ET.User< 'edit' >;
 	embedPreviews: Record< string, { html: string } >;
 	entities: EntitiesState;
 	themeBaseGlobalStyles: Record< string, Object >;
 	themeGlobalStyleVariations: Record< string, string >;
+	themeGlobalStyleRevisions: Record< number, Object >;
 	undo: UndoState;
 	userPermissions: Record< string, boolean >;
 	users: UserState;
@@ -80,6 +81,13 @@ interface UserState {
 	queries: Record< string, EntityRecordKey[] >;
 	byId: Record< EntityRecordKey, ET.User< 'edit' > >;
 }
+
+type GlobalStyles = {
+	title: { raw: string; rendered: string };
+	id: string;
+	settings: Record< string, Object >;
+	styles: Record< string, Object >;
+};
 
 type Optional< T > = T | undefined;
 
@@ -942,10 +950,12 @@ export function getCurrentTheme( state: State ): any {
  *
  * @param state Data state.
  *
- * @return The current global styles ID.
+ * @return The current global styles.
  */
-export function __experimentalGetCurrentGlobalStylesId( state: State ): string {
-	return state.currentGlobalStylesId;
+export function __experimentalGetCurrentGlobalStyles(
+	state: State
+): GlobalStyles {
+	return state.currentGlobalStyles;
 }
 
 /**
@@ -1197,7 +1207,7 @@ export function __experimentalGetCurrentThemeBaseGlobalStyles(
 }
 
 /**
- * Return the ID of the current global styles object.
+ * Returns the variations of the current global styles theme.
  *
  * @param state Data state.
  *
@@ -1211,6 +1221,23 @@ export function __experimentalGetCurrentThemeGlobalStylesVariations(
 		return null;
 	}
 	return state.themeGlobalStyleVariations[ currentTheme.stylesheet ];
+}
+
+/**
+ * Returns the revisions of the current global styles theme.
+ *
+ * @param  state Data state.
+ *
+ * @return The current global styles.
+ */
+export function __experimentalGetCurrentThemeGlobalStylesRevisions(
+	state: State
+): GlobalStyles | null {
+	const currentGlobalStyles = __experimentalGetCurrentGlobalStyles( state );
+	if ( ! currentGlobalStyles?.id ) {
+		return null;
+	}
+	return state.themeGlobalStyleRevisions[ currentGlobalStyles.id ];
 }
 
 /**

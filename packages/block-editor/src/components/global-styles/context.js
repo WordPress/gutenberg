@@ -8,6 +8,7 @@ export const DEFAULT_GLOBAL_STYLES_CONTEXT = {
 	base: {},
 	merged: {},
 	setUserConfig: () => {},
+	userConfigRevisionsCount: 0,
 };
 
 export const GlobalStylesContext = createContext(

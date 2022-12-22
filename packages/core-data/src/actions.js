@@ -131,21 +131,21 @@ export function receiveCurrentTheme( currentTheme ) {
 }
 
 /**
- * Returns an action object used in signalling that the current global styles id has been received.
+ * Returns an action object used in signalling that the current global styles has been received.
  * Ignored from documentation as it's internal to the data store.
  *
  * @ignore
  *
- * @param {string} currentGlobalStylesId The current global styles id.
+ * @param {Object} currentGlobalStyles The current global styles CPT.
  *
  * @return {Object} Action object.
  */
-export function __experimentalReceiveCurrentGlobalStylesId(
-	currentGlobalStylesId
+export function __experimentalReceiveCurrentGlobalStyles(
+	currentGlobalStyles
 ) {
 	return {
-		type: 'RECEIVE_CURRENT_GLOBAL_STYLES_ID',
-		id: currentGlobalStylesId,
+		type: 'RECEIVE_CURRENT_GLOBAL_STYLES',
+		globalStyles: currentGlobalStyles,
 	};
 }
 
@@ -190,6 +190,28 @@ export function __experimentalReceiveThemeGlobalStyleVariations(
 		type: 'RECEIVE_THEME_GLOBAL_STYLE_VARIATIONS',
 		stylesheet,
 		variations,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the theme global styles CPT post revisions have been received.
+ * Ignored from documentation as it's internal to the data store.
+ *
+ * @ignore
+ *
+ * @param {number} currentId The post id.
+ * @param {Array}  revisions The global styles revisions.
+ *
+ * @return {Object} Action object.
+ */
+export function __experimentalReceiveThemeGlobalStyleRevisions(
+	currentId,
+	revisions
+) {
+	return {
+		type: 'RECEIVE_THEME_GLOBAL_STYLE_REVISIONS',
+		currentId,
+		revisions,
 	};
 }
 

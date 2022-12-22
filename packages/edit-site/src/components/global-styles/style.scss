@@ -203,16 +203,17 @@
 	margin: $grid-unit-20;
 }
 
+.edit-site-global-styles-screen-revisions__revisions-list {
+	list-style: none;
+	margin: 0;
+}
+
 .edit-site-global-styles-screen-revisions__revision-item {
 	justify-content: center;
+	width: 100%;
 	&.is-current:disabled {
 		color: $white;
 		background: $gray-900;
 	}
 }
 
-.edit-site-global-styles-screen-revisions__time-ago {
-	display: inline-block;
-	margin-right: $grid-unit-10;
-	font-style: italic;
-}
