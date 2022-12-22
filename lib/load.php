@@ -91,7 +91,6 @@ require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
 	require __DIR__ . '/experimental/html/index.php';
 }
-require __DIR__ . '/experimental/class-wp-theme-json-resolver-gutenberg.php';
 require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/navigation-page.php';
