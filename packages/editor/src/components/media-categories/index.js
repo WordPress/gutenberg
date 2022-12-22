@@ -13,7 +13,7 @@ import { store as coreStore } from '@wordpress/core-data';
 const getExternalLink = ( url, text ) =>
 	`<a href="${ url }" target="_blank" rel="noreferrer noopener">${ text }</a>`;
 
-const getOpenvereLicense = ( license, licenseVersion, licenseUrl ) => {
+const getOpenverseLicense = ( license, licenseVersion, licenseUrl ) => {
 	let licenseName = license.trim();
 	// PDM has no abbreviation
 	if ( license !== 'pdm' ) {
@@ -64,7 +64,7 @@ const getOpenverseCaption = ( item ) => {
 	const defaultTitle = __( 'This work' );
 	let _title = title ? decodeEntities( title ) : defaultTitle;
 	_title = getExternalLink( foreignLandingUrl, _title );
-	const fullLicense = getOpenvereLicense(
+	const fullLicense = getOpenverseLicense(
 		license,
 		licenseVersion,
 		licenseUrl
@@ -122,6 +122,7 @@ const inserterMediaCategories = [
 	},
 	{
 		label: 'Openverse',
+		searchLabel: 'Openverse',
 		name: 'openverse',
 		mediaType: 'image',
 		description: <p>{ __( 'Disclaimer message' ) }</p>,

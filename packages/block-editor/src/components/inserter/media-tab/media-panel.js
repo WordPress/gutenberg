@@ -43,6 +43,8 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 		search: debouncedSearch,
 	} );
 	const baseCssClass = 'block-editor-inserter__media-panel';
+	const searchLabel =
+		category.searchLabel || category.label.toLocaleLowerCase();
 	return (
 		<div className={ baseCssClass }>
 			<SearchControl
@@ -52,12 +54,12 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 				label={ sprintf(
 					/* translators: %s: Name of the media category(ex. 'images, videos'). */
 					__( 'Search %s' ),
-					category.label.toLocaleLowerCase()
+					searchLabel
 				) }
 				placeholder={ sprintf(
 					/* translators: %s: Name of the media category(ex. 'images, videos'). */
 					__( 'Search %s' ),
-					category.label.toLocaleLowerCase()
+					searchLabel
 				) }
 			/>
 			{ category.description }

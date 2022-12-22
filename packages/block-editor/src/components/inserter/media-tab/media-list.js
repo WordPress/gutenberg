@@ -17,13 +17,19 @@ import { cloneBlock } from '@wordpress/blocks';
 import InserterDraggableBlocks from '../../inserter-draggable-blocks';
 import { getBlockAndPreviewFromMedia } from './utils';
 
+const MAXIMUM_TITLE_LENGTH = 25;
 function MediaPreview( { media, onClick, composite, mediaType } ) {
 	const [ block, preview ] = useMemo(
 		() => getBlockAndPreviewFromMedia( media, mediaType ),
 		[ media, mediaType ]
 	);
-	// TODO: Media titles can be very long, we should truncate them somehow(try css first..).
 	const title = media.title?.rendered || media.title;
+	let truncatedTitle;
+	if ( title.length > MAXIMUM_TITLE_LENGTH ) {
+		const omission = '...';
+		truncatedTitle =
+			title.slice( 0, MAXIMUM_TITLE_LENGTH - omission.length ) + omission;
+	}
 	const baseCssClass = 'block-editor-inserter__media-list';
 	return (
 		<InserterDraggableBlocks isEnabled={ true } blocks={ [ block ] }>
@@ -34,7 +40,7 @@ function MediaPreview( { media, onClick, composite, mediaType } ) {
 					onDragStart={ onDragStart }
 					onDragEnd={ onDragEnd }
 				>
-					<Tooltip text={ title }>
+					<Tooltip text={ truncatedTitle || title }>
 						<CompositeItem
 							role="option"
 							as="div"
