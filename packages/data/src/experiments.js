@@ -10,14 +10,16 @@ export const { lock, unlock } =
 	);
 
 /**
- * Enables registering private actions on a store without exposing
- * them to the public API.
+ * Enables registering private actions and selectors on a store without exposing
+ * them as public API.
  *
  * Use it with the store descriptor object:
  *
  * ```js
  * const store = createReduxStore( 'my-store', { ... } );
- * registerPrivateSelectors( store, {
+ * registerPrivateActionsAndSelectors( store, {
+ *     __experimentalAction: ( state ) => state.value,
+ * }, {
  *     __experimentalSelector: ( state ) => state.value,
  * } );
  * ```
@@ -26,12 +28,13 @@ export const { lock, unlock } =
  * `unlock()` utility:
  *
  * ```js
+ * unlock( registry.dispatch( blockEditorStore ) ).__experimentalAction();
  * unlock( registry.select( blockEditorStore ) ).__experimentalSelector();
  * ```
  *
- * Note the object returned by select() has the good old public methods,
- * but the private API participants can also "unlock" it to access the private
- * parts.
+ * Note the objects returned by select() and dispatch() have the good old public 
+ * methods, but the modules that opted-in to the private APIs can also "unlock" 
+ * additional private selectors and actions.
  *
  * @example
  *
@@ -42,10 +45,12 @@ export const { lock, unlock } =
  * export const { lock, unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules( /* ... *\/ );
  *
  * import { experiments as dataExperiments } from '@wordpress/data';
- * const { registerPrivateSelectors } = unlock( dataExperiments );
+ * const { registerPrivateActionsAndSelectors } = unlock( dataExperiments );
  *
  * const store = registerStore( 'my-store', { /* ... *\/ } );
- * registerPrivateSelectors( store, {
+ * registerPrivateActionsAndSelectors( store, {
+ *     __experimentalAction: ( state ) => state.value,
+ * }, {
  *     __experimentalSelector: ( state ) => state.value,
  * } );
  *
@@ -54,73 +59,24 @@ export const { lock, unlock } =
  * unlock( registry.select( blockEditorStore ) ).__experimentalSelector();
  *
  * // Or in a React component:
- * useSelect( ( select ) => ( {
- *     parent: privateOf( select( blockEditorStore ) ).__experimentalSelector();
- * } ) );
+ * useSelect( ( select ) => (
+ *     unlock( select( blockEditorStore ) ).__experimentalSelector()
+ * ) );
+ * useDispatch( ( dispatch ) => {
+ *     unlock( dispatch( blockEditorStore ) ).__experimentalAction()
+ * } );
  * ```
  *
  * @param {Object} store     The store descriptor to register the private selectors on.
- * @param {Object} selectors The private selectors to register in a { name: ( state ) => {} } format.
+ * @param {Object} actions   The private actions to register in a { actionName: ( ...args ) => action } format.
+ * @param {Object} selectors The private selectors to register in a { selectorName: ( state, ...args ) => data } format.
  */
-export function registerPrivateSelectors( store, selectors ) {
-	lock( store, { selectors } );
-}
-
-/**
- * Enables registering private actions on a store without exposing
- * them to the public API.
- *
- * Use it with the store descriptor object:
- *
- * ```js
- * const store = createReduxStore( 'my-store', { ... } );
- * registerPrivateActions( store, {
- *     __experimentalAction: ( state ) => state.value,
- * } );
- * ```
- *
- * Once the actions are registered, they can be accessed using the
- * `unlock()` utility:
- *
- * ```js
- * unlock( registry.select( blockEditorStore ) ).__experimentalAction();
- * ```
- *
- * Note the object returned by select() has the good old public methods,
- * but the private API participants can also "unlock" it to access the private
- * parts.
- *
- * @example
- *
- * ```js
- * // In the package exposing the private actions:
- *
- * import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/experiments';
- * export const { lock, unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules( /* ... *\/ );
- *
- * import { experiments as dataExperiments } from '@wordpress/data';
- * const { registerPrivateActions } = unlock( dataExperiments );
- *
- * const store = registerStore( 'my-store', { /* ... *\/ } );
- * registerPrivateActions( store, {
- *     __experimentalAction: ( state ) => state.value,
- * } );
- *
- * // In the package using the private actions:
- * import { store as blockEditorStore } from '@wordpress/block-editor';
- * unlock( registry.dispatch( blockEditorStore ) ).__experimentalAction();
- *
- * // Or in a React component:
- * useDispatch( ( dispatch ) => ( {
- *     parent: privateOf( dispatch( blockEditorStore ) ).__experimentalAction();
- * } ) );
- * ```
- *
- * @param {Object} store   The store descriptor to register the private actions on.
- * @param {Object} actions The private actions to register in a { name: ( state ) => {} } format.
- */
-export function registerPrivateActions( store, actions ) {
-	lock( store, { actions } );
+export function registerPrivateActionsAndSelectors(
+	store,
+	actions = {},
+	selectors = {}
+) {
+	lock( store, { actions, selectors } );
 }
 
 /**
@@ -144,6 +100,5 @@ export function registerPrivateActions( store, actions ) {
  */
 export const experiments = {};
 lock( experiments, {
-	registerPrivateSelectors,
-	registerPrivateActions,
+	registerPrivateActionsAndSelectors,
 } );
