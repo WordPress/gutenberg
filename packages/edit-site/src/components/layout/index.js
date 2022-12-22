@@ -180,15 +180,34 @@ export default function Layout( { onError } ) {
 					) }
 				</motion.div>
 
-				{ isEditorPage &&
-					( canvasMode === 'edit' || isMobileCanvasVisible ) && (
-						<NavigableRegion
-							className="edit-site-layout__header"
-							ariaLabel={ __( 'Editor top bar' ) }
-						>
-							{ canvasMode === 'edit' && <Header /> }
-						</NavigableRegion>
-					) }
+				<AnimatePresence initial={ false }>
+					{ isEditorPage &&
+						( canvasMode === 'edit' || isMobileCanvasVisible ) && (
+							<NavigableRegion
+								className="edit-site-layout__header"
+								ariaLabel={ __( 'Editor top bar' ) }
+								as={ motion.div }
+								animate={ {
+									y: 0,
+								} }
+								initial={ {
+									y: '-100%',
+								} }
+								exit={ {
+									y: '-100%',
+								} }
+								transition={ {
+									type: 'tween',
+									duration: disableMotion
+										? 0
+										: ANIMATION_DURATION,
+									ease: 'easeOut',
+								} }
+							>
+								{ canvasMode === 'edit' && <Header /> }
+							</NavigableRegion>
+						) }
+				</AnimatePresence>
 
 				<div className="edit-site-layout__content">
 					<AnimatePresence initial={ false }>

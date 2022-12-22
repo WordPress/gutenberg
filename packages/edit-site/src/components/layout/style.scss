@@ -14,7 +14,7 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 	left: $canvas-padding;
 	width: calc(100vw - #{$canvas-padding * 2});
 	height: $hub-height;
-	z-index: 2;
+	z-index: 3;
 
 	background: $black;
 	padding: $grid-unit-20;
@@ -60,6 +60,13 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 .edit-site-layout__header {
 	height: $header-height;
 	display: flex;
+	z-index: 2;
+
+	// This is only necessary for the exit animation
+	.edit-site-layout:not(.is-full-canvas) & {
+		position: fixed;
+		width: 100vw;
+	}
 }
 
 .edit-site-layout__content {
