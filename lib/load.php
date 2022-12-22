@@ -108,7 +108,7 @@ require __DIR__ . '/experimental/webfonts.php';
 
 // Plugin specific code.
 require __DIR__ . '/class-wp-theme-json-gutenberg.php';
-require __DIR__ . '/class-wp-theme-json-resolver.php';
+require __DIR__ . '/class-wp-theme-json-resolver-gutenberg.php';
 require __DIR__ . '/blocks.php';
 require __DIR__ . '/client-assets.php';
 require __DIR__ . '/demo.php';
