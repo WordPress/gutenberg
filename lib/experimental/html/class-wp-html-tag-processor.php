@@ -1010,13 +1010,7 @@ class WP_HTML_Tag_Processor {
 		}
 
 		$attribute_start = $this->parsed_bytes;
-		/**
-		 * Uppercase characters in the attributes names are converted into lowercase characters
-		 * according to the HTML parsing spec:
-		 *
-		 * @see https://html.spec.whatwg.org/multipage/parsing.html#attribute-name-state
-		 */
-		$attribute_name      = strtolower( substr( $this->html, $attribute_start, $name_length ) );
+		$attribute_name = substr( $this->html, $attribute_start, $name_length );
 		$this->parsed_bytes += $name_length;
 		if ( $this->parsed_bytes >= strlen( $this->html ) ) {
 			return false;
@@ -1065,9 +1059,19 @@ class WP_HTML_Tag_Processor {
 			return true;
 		}
 
+		/**
+		 * > There must never be two or more attributes on
+		 * > the same start tag whose names are an ASCII
+		 * > case-insensitive match for each other.
+		 *     - HTML 5 spec
+		 *
+		 * @see https://html.spec.whatwg.org/multipage/syntax.html#attributes-2:ascii-case-insensitive
+		 */
+		$comparable_name = strtolower( $attribute_name);
+
 		// If an attribute is listed many times, only use the first declaration and ignore the rest.
-		if ( ! array_key_exists( $attribute_name, $this->attributes ) ) {
-			$this->attributes[ $attribute_name ] = new WP_HTML_Attribute_Token(
+		if ( ! array_key_exists( $comparable_name, $this->attributes ) ) {
+			$this->attributes[ $comparable_name ] = new WP_HTML_Attribute_Token(
 				$attribute_name,
 				$value_start,
 				$value_length,
@@ -1077,7 +1081,7 @@ class WP_HTML_Tag_Processor {
 			);
 		}
 
-		return $this->attributes[ $attribute_name ];
+		return $this->attributes[ $comparable_name ];
 	}
 
 	/**
@@ -1474,14 +1478,6 @@ class WP_HTML_Tag_Processor {
 			return false;
 		}
 
-		/**
-		 * Uppercase characters in the attributes names are converted into lowercase characters
-		 * according to the HTML parsing spec:
-		 *
-		 * @see https://html.spec.whatwg.org/multipage/parsing.html#attribute-name-state
-		 */
-		$name = strtolower( $name );
-
 		/*
 		 * Verify that the attribute name is allowable. In WP_DEBUG
 		 * environments we want to crash quickly to alert developers
@@ -1543,7 +1539,17 @@ class WP_HTML_Tag_Processor {
 			$updated_attribute = "{$name}=\"{$escaped_new_value}\"";
 		}
 
-		if ( isset( $this->attributes[ $name ] ) ) {
+		/**
+		 * > There must never be two or more attributes on
+		 * > the same start tag whose names are an ASCII
+		 * > case-insensitive match for each other.
+		 *     - HTML 5 spec
+		 *
+		 * @see https://html.spec.whatwg.org/multipage/syntax.html#attributes-2:ascii-case-insensitive
+		 */
+		$comparable_name = strtolower( $name );
+
+		if ( isset( $this->attributes[ $comparable_name ] ) ) {
 			/*
 			 * Update an existing attribute.
 			 *
@@ -1555,7 +1561,7 @@ class WP_HTML_Tag_Processor {
 			 *
 			 *    Result: <div id="new"/>
 			 */
-			$existing_attribute               = $this->attributes[ $name ];
+			$existing_attribute               = $this->attributes[ $comparable_name ];
 			$this->attribute_updates[ $name ] = new WP_HTML_Text_Replacement(
 				$existing_attribute->start,
 				$existing_attribute->end,
@@ -1573,7 +1579,7 @@ class WP_HTML_Tag_Processor {
 			 *
 			 *    Result: <div id="new"/>
 			 */
-			$this->attribute_updates[ $name ] = new WP_HTML_Text_Replacement(
+			$this->attribute_updates[ $comparable_name ] = new WP_HTML_Text_Replacement(
 				$this->tag_name_starts_at + $this->tag_name_length,
 				$this->tag_name_starts_at + $this->tag_name_length,
 				' ' . $updated_attribute
@@ -1590,10 +1596,12 @@ class WP_HTML_Tag_Processor {
 	 */
 	public function remove_attribute( $name ) {
 		/**
-		 * Uppercase characters in the attributes names are converted into lowercase characters
-		 * according to the HTML parsing spec:
+		 * > There must never be two or more attributes on
+		 * > the same start tag whose names are an ASCII
+		 * > case-insensitive match for each other.
+		 *     - HTML 5 spec
 		 *
-		 * @see https://html.spec.whatwg.org/multipage/parsing.html#attribute-name-state
+		 * @see https://html.spec.whatwg.org/multipage/syntax.html#attributes-2:ascii-case-insensitive
 		 */
 		$name = strtolower( $name );
 		if ( $this->is_closing_tag || ! isset( $this->attributes[ $name ] ) ) {
