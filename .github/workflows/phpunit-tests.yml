@@ -21,26 +21,23 @@ concurrency:
 
 jobs:
     test-php:
-        name: ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }} on ${{ matrix.os }}
-        runs-on: ${{ matrix.os }}
+        name: ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }} on ubuntu-latest
+        runs-on: ubuntu-latest
         timeout-minutes: 20
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
             matrix:
                 php:
-                    [
-                        '5.6',
-                        '7.0',
-                        '7.1',
-                        '7.2',
-                        '7.3',
-                        '7.4',
-                        '8.0',
-                        '8.1',
-                        '8.2',
-                    ]
-                os: [ubuntu-latest]
+                    - '5.6'
+                    - '7.0'
+                    - '7.1'
+                    - '7.2'
+                    - '7.3'
+                    - '7.4'
+                    - '8.0'
+                    - '8.1'
+                    - '8.2'
                 multisite: [false, true]
 
         env:
