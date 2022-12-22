@@ -122,39 +122,4 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_Base {
 		return $with_theme_supports;
 	}
 
-	/**
-	 * Gets the styles for blocks from the block.json file.
-	 *
-	 * @return WP_Theme_JSON
-	 */
-	public static function get_block_data() {
-		$registry = WP_Block_Type_Registry::get_instance();
-		$blocks   = $registry->get_all_registered();
-		$config   = array( 'version' => 1 );
-		foreach ( $blocks as $block_name => $block_type ) {
-			if ( isset( $block_type->supports['__experimentalStyle'] ) ) {
-				$config['styles']['blocks'][ $block_name ] = static::remove_JSON_comments( $block_type->supports['__experimentalStyle'] );
-			}
-
-			if (
-				isset( $block_type->supports['spacing']['blockGap']['__experimentalDefault'] ) &&
-				null === _wp_array_get( $config, array( 'styles', 'blocks', $block_name, 'spacing', 'blockGap' ), null )
-			) {
-				// Ensure an empty placeholder value exists for the block, if it provides a default blockGap value.
-				// The real blockGap value to be used will be determined when the styles are rendered for output.
-				$config['styles']['blocks'][ $block_name ]['spacing']['blockGap'] = null;
-			}
-		}
-
-		/**
-		 * Filters the data provided by the blocks for global styles & settings.
-		 *
-		 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
-		 */
-		$theme_json = apply_filters( 'wp_theme_json_data_blocks', new WP_Theme_JSON_Data_Gutenberg( $config, 'blocks' ) );
-		$config     = $theme_json->get_data();
-
-		return new WP_Theme_JSON_Gutenberg( $config, 'blocks' );
-	}
-
 }
