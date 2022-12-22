@@ -51,6 +51,10 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 	@include break-small {
 		width: calc(#{$sidebar-width} - #{$canvas-padding * 2});
 	}
+
+	.components-button {
+		height: $grid-unit-40;
+	}
 }
 
 .edit-site-layout__header {
