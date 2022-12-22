@@ -16,9 +16,9 @@ import type { Entity, TermsWithChildren } from './types';
  * @return Array of terms in tree format.
  */
 export function buildTermsTree(
-	flatTerms: readonly Entity[]
-): TermsWithChildren {
-	const flatTermsWithParentAndChildren = flatTerms.map( ( term ) => {
+	flatTerms?: readonly Entity[]
+): TermsWithChildren | undefined {
+	const flatTermsWithParentAndChildren = flatTerms?.map( ( term ) => {
 		return {
 			children: [],
 			parent: null,

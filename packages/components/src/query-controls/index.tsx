@@ -18,7 +18,7 @@ const DEFAULT_MAX_ITEMS = 100;
 const MAX_CATEGORIES_SUGGESTIONS = 20;
 
 /**
- * Select controls that query for entities.
+ * Controls to query for posts.
  *
  * ```jsx
  * const MyQueryControls = () => (

@@ -115,127 +115,116 @@ The format of the categories list also needs to be updated to match what `FormTo
 
 ### Props
 
-#### authorList
+#### `authorList`: `Entity[]`
 
-An array of author IDs that is passed into an `AuthorSelect` sub-component.
+An array of authors that is passed into an `AuthorSelect` sub-component.
 
--   Type: `Array`
 -   Required: No
 -   Platform: Web
 
-#### `selectedAuthorId`: `string`
+#### `categoriesList`: `Entity[]`
+
+An array of categories, renders a `CategorySelect` sub-component when passed in conjunction with `onCategoryChange`.
+
+-   Required: No
+-   Platform: Web
+
+#### `categorySuggestions`: `{ [ categoryName: Entity[ 'name' ] ]: Entity }`
+
+An array of categories, renders a `FormTokenField` component when passed in conjunction with `onCategoryChange`.
+
+-   Required: No
+-   Platform: Web
+
+#### `maxItems`: `number`
+
+The maximum of items.
+
+-   Required: No
+-   Default: 100
+-   Platform: Web
+
+#### `minItems`: `number`
+
+The minimum of items.
+
+-   Required: No
+-   Default: 1
+-   Platform: Web
+
+#### `numberOfItems`: `number`
+
+The selected number of items to retrieve via the query.
+
+-   Required: No
+-   Platform: Web
+
+#### `onAuthorChange`: `TreeSelectProps[ 'onChange' ]`
+
+A function that receives the new author value. If this is not specified, the author controls are not included.
+
+-   Required: No
+-   Platform: Web
+
+#### `onCategoryChange`: `TreeSelectProps[ 'onChange' ] & FormTokenFieldProps[ 'onChange' ]`
+
+A function that receives the new category value. If this is not specified, the category controls are not included.
+
+-   Required: No
+-   Platform: Web
+
+#### `onNumberOfItemsChange`: `( newNumber?: number ) => void`
+
+A function that receives the new number of items value. If this is not specified, then the number of items range control is not included.
+
+-   Required: No
+-   Platform: Web
+
+#### `onOrderChange`: `( newOrder: string ) => void`
+
+A function that receives the new order value. If this or onOrderByChange are not specified, then the order controls are not included.
+
+-   Required: No
+-   Platform: Web
+
+#### `onOrderByChange`: `( newOrderBy: string ) => void`
+
+A function that receives the new orderby value. If this or onOrderChange are not specified, then the order controls are not included.
+
+-   Required: No
+-   Platform: Web
+
+#### `order`: `'asc' | 'desc'`
+
+The order in which to retrieve posts.
+
+-   Required: No
+-   Platform: Web
+
+#### `orderBy`: `'data' | 'title'`
+
+The meta key by which to order posts.
+
+-   Required: No
+-   Platform: Web
+
+#### `selectedAuthorId`: `Entity[ 'id' ]`
 
 The selected author ID.
 
 -   Required: No
 -   Platform: Web
 
-#### categoriesList
-
-An array of categories; renders a `CategorySelect` sub-component when passed in conjunction with `onCategoryChange`.
-
--   Type: `Array`
--   Required: No
--   Platform: Web
-
-#### categorySuggestions
-
-An array of category names; renders a `FormTokenField` component when passed in conjunction with `onCategoryChange`.
-
--   Type: `Array`
--   Required: No
--   Platform: Web
-
-#### maxItems
-
--   Type: `Number`
--   Required: No
--   Default: 100
--   Platform: Web
-
-#### minItems
-
--   Type: `Number`
--   Required: No
--   Default: 1
--   Platform: Web
-
-#### numberOfItems
-
-The selected number of items to retrieve via the query.
-
--   Type: `Number`
--   Required: No
--   Platform: Web
-
-#### onAuthorChange
-
-A function that receives the new author value. If this is not specified, the author controls are not included.
-
--   Type: `Function`
--   Required: No
--   Platform: Web
-
-#### onCategoryChange
-
-A function that receives the new category value. If this is not specified, the category controls are not included.
-
--   Type: `Function`
--   Required: No
--   Platform: Web
-
-#### onNumberOfItemsChange
-
-A function that receives the new number of items value. If this is not specified, then the number of items range control is not included.
-
--   Type: `Function`
--   Required: No
--   Platform: Web
-
-#### onOrderChange
-
-A function that receives the new order value. If this or onOrderByChange are not specified, then the order controls are not included.
-
--   Type: `Function`
--   Required: No
--   Platform: Web
-
-#### onOrderByChange
-
-A function that receives the new orderby value. If this or onOrderChange are not specified, then the order controls are not included.
-
--   Type: `Function`
--   Required: No
--   Platform: Web
-
-#### order
-
-The order in which to retrieve posts. Can be 'asc' or 'desc'.
-
--   Type: `String`
--   Required: No
--   Platform: Web
-
-#### orderBy
-
-The meta key by which to order posts. Can be 'date' or 'title'.
-
--   Type: `String`
--   Required: No
--   Platform: Web
-
-#### selectedCategories
+#### `selectedCategories`: `Entity[]`
 
 The selected categories for the `categorySuggestions`.
 
--   Type: `Array`
 -   Required: No
 -   Platform: Web
 
-#### selectedCategoryId
+#### `selectedCategoryId`: `Entity[ 'id' ]`
 
 The selected category for the `categoriesList`.
 
--   Type: `Number`
 -   Required: No
 -   Platform: Web

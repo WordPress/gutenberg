@@ -19,20 +19,20 @@ export type Entity = {
 export type TermsWithChildren = Array< Entity & { children: Entity[] } >;
 
 export type CategorySelectProps = {
-	categoriesList: Entity[];
+	categoriesList: QueryControlsProps[ 'categoriesList' ];
 	key: Key;
 	label: TreeSelectProps[ 'label' ];
 	noOptionLabel: TreeSelectProps[ 'noOptionLabel' ];
 	onChange: TreeSelectProps[ 'onChange' ];
-	selectedCategoryId?: Entity[ 'id' ];
+	selectedCategoryId: QueryControlsProps[ 'selectedCategoryId' ];
 };
 
 export type AuthorSelectProps = {
-	authorList?: Entity[];
+	authorList: QueryControlsProps[ 'authorList' ];
 	label: TreeSelectProps[ 'label' ];
 	noOptionLabel: TreeSelectProps[ 'noOptionLabel' ];
-	onChange: TreeSelectProps[ 'onChange' ];
-	selectedAuthorId?: number;
+	onChange: QueryControlsProps[ 'onAuthorChange' ];
+	selectedAuthorId: QueryControlsProps[ 'selectedAuthorId' ];
 };
 
 export type QueryControlsProps = {
@@ -40,12 +40,12 @@ export type QueryControlsProps = {
 	 * An array of authors that is passed into
 	 * an `AuthorSelect` sub-component.
 	 */
-	authorList?: AuthorSelectProps[ 'authorList' ];
+	authorList?: Entity[];
 	/**
 	 * An array of categories, renders a `CategorySelect`
 	 * sub-component when passed in conjunction with `onCategoryChange`.
 	 */
-	categoriesList?: CategorySelectProps[ 'categoriesList' ];
+	categoriesList?: Entity[];
 	/**
 	 * An array of category names, renders a `FormTokenField` component
 	 * when passed in conjunction with `onCategoryChange`.
@@ -71,12 +71,12 @@ export type QueryControlsProps = {
 	 * A function that receives the new author value.
 	 * If this is not specified, the author controls are not included.
 	 */
-	onAuthorChange?: AuthorSelectProps[ 'onChange' ];
+	onAuthorChange?: TreeSelectProps[ 'onChange' ];
 	/**
 	 * A function that receives the new category value.
 	 * If this is not specified, the category controls are not included.
 	 */
-	onCategoryChange?: CategorySelectProps[ 'onChange' ] &
+	onCategoryChange?: TreeSelectProps[ 'onChange' ] &
 		FormTokenFieldProps[ 'onChange' ];
 	/**
 	 * A function that receives the new number of items value.
@@ -107,7 +107,7 @@ export type QueryControlsProps = {
 	/**
 	 * The selected author ID.
 	 */
-	selectedAuthorId?: AuthorSelectProps[ 'selectedAuthorId' ];
+	selectedAuthorId?: Entity[ 'id' ];
 	/**
 	 * The selected categories for the `categorySuggestions`.
 	 */
@@ -115,5 +115,5 @@ export type QueryControlsProps = {
 	/**
 	 * The selected category for the `categoriesList`.
 	 */
-	selectedCategoryId?: CategorySelectProps[ 'selectedCategoryId' ];
+	selectedCategoryId?: Entity[ 'id' ];
 };
