@@ -39,6 +39,7 @@ import SiteIcon from '../site-icon';
 import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
 
 const ANIMATION_DURATION = 0.5;
+const HUB_ANIMATION_DURATION = 0.3;
 
 export default function Layout( { onError } ) {
 	// This ensures the edited entity id and type are initialized properly.
@@ -138,7 +139,7 @@ export default function Layout( { onError } ) {
 					layout
 					transition={ {
 						type: 'tween',
-						duration: disableMotion ? 0 : ANIMATION_DURATION,
+						duration: disableMotion ? 0 : HUB_ANIMATION_DURATION,
 						ease: 'easeOut',
 					} }
 				>
@@ -147,7 +148,9 @@ export default function Layout( { onError } ) {
 						layout
 						transition={ {
 							type: 'tween',
-							duration: disableMotion ? 0 : ANIMATION_DURATION,
+							duration: disableMotion
+								? 0
+								: HUB_ANIMATION_DURATION,
 							ease: 'easeOut',
 						} }
 					>
