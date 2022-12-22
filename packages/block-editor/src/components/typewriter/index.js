@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useRefEffect } from '@wordpress/compose';
-import { computeCaretRect } from '@wordpress/dom';
+import { computeCaretRect, getScrollContainer } from '@wordpress/dom';
 import { useSelect } from '@wordpress/data';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 
@@ -98,16 +98,33 @@ export function useTypewriter() {
 					return;
 				}
 
-				const { scrollY, innerHeight } = defaultView;
-				const { top, height } = caretRect;
-				const relativeScrollPosition = top / innerHeight;
+				const scrollContainer = getScrollContainer( node );
 
-				// If the scroll position is at the start, the active editable
-				// element is the last one, and the caret is positioned within the
-				// initial trigger percentage of the page, do not scroll the page.
-				// The typewriter effect should not kick in until an empty page has
-				// been filled with the initial trigger percentage or the user
-				// scrolls intentionally down.
+				// The page must be scrollable.
+				if ( ! scrollContainer ) {
+					return;
+				}
+
+				const windowScroll =
+					scrollContainer === ownerDocument.body ||
+					scrollContainer === ownerDocument.documentElement;
+				const scrollY = windowScroll
+					? defaultView.scrollY
+					: scrollContainer.scrollTop;
+				const scrollContainerY = windowScroll
+					? 0
+					: scrollContainer.getBoundingClientRect().top;
+				const relativeScrollPosition = windowScroll
+					? caretRect.top / defaultView.innerHeight
+					: ( caretRect.top - scrollContainerY ) /
+					  ( defaultView.innerHeight - scrollContainerY );
+
+				// If the scroll position is at the start, the active editable element
+				// is the last one, and the caret is positioned within the initial
+				// trigger percentage of the page, do not scroll the page.
+				// The typewriter effect should not kick in until an empty page has been
+				// filled with the initial trigger percentage or the user scrolls
+				// intentionally down.
 				if (
 					scrollY === 0 &&
 					relativeScrollPosition < initialTriggerPercentage &&
@@ -118,20 +135,29 @@ export function useTypewriter() {
 					return;
 				}
 
+				const scrollContainerHeight = windowScroll
+					? defaultView.innerHeight
+					: scrollContainer.clientHeight;
+
 				// Abort if the target scroll position would scroll the caret out of
 				// view.
 				if (
 					// The caret is under the lower fold.
-					top + height > innerHeight ||
+					caretRect.top + caretRect.height >
+						scrollContainerY + scrollContainerHeight ||
 					// The caret is above the upper fold.
-					top < 0
+					caretRect.top < scrollContainerY
 				) {
 					// Reset the caret position to maintain.
 					caretRect = currentCaretRect;
 					return;
 				}
 
-				defaultView.scrollBy( 0, diff );
+				if ( windowScroll ) {
+					defaultView.scrollBy( 0, diff );
+				} else {
+					scrollContainer.scrollTop += diff;
+				}
 			}
 
 			/**
