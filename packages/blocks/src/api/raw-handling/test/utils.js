@@ -10,20 +10,6 @@ import { getBlockContentSchemaFromTransforms, isPlain } from '../utils';
 import { store as mockStore } from '../../../store';
 import { STORE_NAME as mockStoreName } from '../../../store/constants';
 
-jest.mock( '@wordpress/experiments', () => {
-	return {
-		__dangerousOptInToUnstableAPIsOnlyForCoreModules: () => {
-			return {
-				unlock: () => {
-					return {
-						registerPrivateActions: () => {},
-						registerPrivateSelectors: () => {},
-					};
-				},
-			};
-		},
-	};
-} );
 jest.mock( '@wordpress/data', () => {
 	return {
 		select: jest.fn( ( store ) => {

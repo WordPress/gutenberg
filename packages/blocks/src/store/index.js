@@ -11,9 +11,6 @@ import * as selectors from './selectors';
 import * as actions from './actions';
 import { STORE_NAME } from './constants';
 
-import { registerPrivateSelectors } from '../experiments';
-const { __experimentalHasContentRoleAttribute, ...stableSelectors } = selectors;
-
 /**
  * Store definition for the blocks namespace.
  *
@@ -23,10 +20,8 @@ const { __experimentalHasContentRoleAttribute, ...stableSelectors } = selectors;
  */
 export const store = createReduxStore( STORE_NAME, {
 	reducer,
-	selectors: stableSelectors,
+	selectors,
 	actions,
 } );
-
-registerPrivateSelectors( store, { __experimentalHasContentRoleAttribute } );
 
 register( store );
