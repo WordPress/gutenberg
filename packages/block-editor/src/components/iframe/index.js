@@ -21,6 +21,7 @@ import {
 	useRefEffect,
 } from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -28,6 +29,7 @@ import { __experimentalStyleProvider as StyleProvider } from '@wordpress/compone
 import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useWritingFlow } from '../writing-flow';
 import { useCompatibilityStyles } from './use-compatibility-styles';
+import { store as blockEditorStore } from '../../store';
 
 /**
  * Bubbles some event types (keydown, keypress, and dragover) to parent document
@@ -98,20 +100,22 @@ async function loadScript( head, { id, src } ) {
 	} );
 }
 
-function Iframe(
-	{
-		contentRef,
-		children,
-		head,
-		tabIndex = 0,
-		assets,
-		scale = 1,
-		frameSize = 0,
-		readonly,
-		...props
-	},
-	ref
-) {
+function Iframe( {
+	contentRef,
+	children,
+	head,
+	tabIndex = 0,
+	scale = 1,
+	frameSize = 0,
+	readonly,
+	forwardedRef: ref,
+	...props
+} ) {
+	const assets = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().__unstableResolvedAssets,
+		[]
+	);
 	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
@@ -296,4 +300,23 @@ function Iframe(
 	);
 }
 
-export default forwardRef( Iframe );
+function IframeIfReady( props, ref ) {
+	const isInitialised = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().__internalIsInitialized,
+		[]
+	);
+
+	// We shouldn't render the iframe until the editor settings are initialised.
+	// The initial settings are needed to get the styles for the srcDoc, which
+	// cannot be changed after the iframe is mounted. srcDoc is used to to set
+	// the initial iframe HTML, which is required to avoid a flash of unstyled
+	// content.
+	if ( ! isInitialised ) {
+		return null;
+	}
+
+	return <Iframe { ...props } forwardRef={ ref } />;
+}
+
+export default forwardRef( IframeIfReady );

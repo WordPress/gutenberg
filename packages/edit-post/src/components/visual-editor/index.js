@@ -46,14 +46,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import BlockInspectorButton from './block-inspector-button';
 import { store as editPostStore } from '../../store';
 
-function MaybeIframe( {
-	children,
-	contentRef,
-	shouldIframe,
-	styles,
-	assets,
-	style,
-} ) {
+function MaybeIframe( { children, contentRef, shouldIframe, styles, style } ) {
 	const ref = useMouseMoveTypingReset();
 
 	if ( ! shouldIframe ) {
@@ -75,7 +68,6 @@ function MaybeIframe( {
 	return (
 		<Iframe
 			head={ <EditorStyles styles={ styles } /> }
-			assets={ assets }
 			ref={ ref }
 			contentRef={ contentRef }
 			style={ { width: '100%', height: '100%', display: 'block' } }
@@ -120,10 +112,6 @@ export default function VisualEditor( { styles } ) {
 		wrapperBlockName,
 		wrapperUniqueId,
 		isBlockBasedTheme,
-		assets,
-		themeHasDisabledLayoutStyles,
-		themeSupportsLayout,
-		isFocusMode,
 	} = useSelect( ( select ) => {
 		const {
 			isFeatureActive,
@@ -162,16 +150,17 @@ export default function VisualEditor( { styles } ) {
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 			isBlockBasedTheme: editorSettings.__unstableIsBlockBasedTheme,
-			// WARNING: use getEditorSettings from the editor store, not the
-			// block editor store. The settings on the block editor store set
-			// with a delay and we need the assets on the first render for the
-			// iframe srcDoc.
-			assets: editorSettings.__unstableResolvedAssets,
-			themeHasDisabledLayoutStyles: editorSettings.disableLayoutStyles,
-			themeSupportsLayout: editorSettings.supportsLayout,
-			isFocusMode: editorSettings.focusMode,
 		};
 	}, [] );
+	const { themeHasDisabledLayoutStyles, themeSupportsLayout, isFocusMode } =
+		useSelect( ( select ) => {
+			const _settings = select( blockEditorStore ).getSettings();
+			return {
+				themeHasDisabledLayoutStyles: _settings.disableLayoutStyles,
+				themeSupportsLayout: _settings.supportsLayout,
+				isFocusMode: _settings.focusMode,
+			};
+		}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
 	const hasMetaBoxes = useSelect(
 		( select ) => select( editPostStore ).hasMetaBoxes(),
@@ -359,7 +348,6 @@ export default function VisualEditor( { styles } ) {
 						}
 						contentRef={ contentRef }
 						styles={ styles }
-						assets={ assets }
 					>
 						{ themeSupportsLayout &&
 							! themeHasDisabledLayoutStyles &&
