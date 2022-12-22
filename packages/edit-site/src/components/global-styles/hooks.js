@@ -331,11 +331,16 @@ export function useGradientsPerOrigin( name ) {
 }
 
 export function useFontFamilies() {
-	const [ fontFamilies = [], setFontFamilies ] = useSetting(
+	const [ fonts = [], setFontFamilies ] = useSetting(
 		'typography.fontFamilies'
 	);
 
-	const count = Array.isArray( fontFamilies ) ? fontFamilies.length : 0;
+	// sort font families alphabetically by name
+	const fontFamilies = useMemo( () => {
+		return fonts.sort( ( a, b ) => a?.name.localeCompare( b?.name ) );
+	}, [ fonts ] );
+
+	const count = fontFamilies.length || 0;
 
 	const getFontSlug = ( content ) => {
 		// Get the slug.
