@@ -2,24 +2,18 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Icon, plusCircle, check } from '@wordpress/icons';
-import { Tooltip, Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import ScreenHeader from './header';
-import FontFaceItem from './font-face-item';
+import AddFontFaceItem from './add-font-face-item';
 import Subtitle from './subtitle';
 import { useFontFamilies } from './hooks';
 
 function ScreenGoogleFontFacesList( { googleFontSelected: font } ) {
-	const {
-		fontFamilies,
-		handleAddFontFace,
-		handleRemoveFontFace,
-		getFontSlug,
-	} = useFontFamilies();
+	const { fontFamilies, getFontSlug } = useFontFamilies();
+
 	const existingFamilyIndex = fontFamilies.findIndex(
 		( { slug } ) => slug === getFontSlug( font.family )
 	);
@@ -42,10 +36,12 @@ function ScreenGoogleFontFacesList( { googleFontSelected: font } ) {
 					gap: '1rem',
 				} }
 			>
-				<Subtitle>{ font.family + __( ' variants:' ) }</Subtitle>
+				{ font && (
+					<Subtitle>{ font.family + __( ' variants:' ) }</Subtitle>
+				) }
 
 				{ font &&
-					font.variants.map( ( variant ) => {
+					font.variants.map( ( variant, i ) => {
 						const style = variant.includes( 'italic' )
 							? 'italic'
 							: 'normal';
@@ -57,8 +53,14 @@ function ScreenGoogleFontFacesList( { googleFontSelected: font } ) {
 						const isExistingFace =
 							existingFamilyIndex !== -1 &&
 							fontFamilies[ existingFamilyIndex ]?.fontFace?.find(
-								( { fontWeight, fontStyle } ) =>
-									fontWeight === weight && fontStyle === style
+								( {
+									fontWeight,
+									fontStyle,
+									shouldBeRemoved,
+								} ) =>
+									fontWeight === weight &&
+									fontStyle === style &&
+									! shouldBeRemoved
 							);
 
 						const fontFace = {
@@ -69,56 +71,10 @@ function ScreenGoogleFontFacesList( { googleFontSelected: font } ) {
 						};
 
 						return (
-							<FontFaceItem
-								key={ variant }
+							<AddFontFaceItem
 								fontFace={ fontFace }
-								title={ variant }
-								actionTrigger={
-									! isExistingFace ? (
-										<Tooltip
-											text={ __( 'Add font face' ) }
-											delay={ 0 }
-										>
-											<Button
-												style={ { padding: '0 8px' } }
-												onClick={ () =>
-													handleAddFontFace(
-														fontFace.fontFamily,
-														fontFace.fontWeight,
-														fontFace.fontStyle,
-														fontFace.url
-													)
-												}
-											>
-												<Icon
-													icon={ plusCircle }
-													size={ 20 }
-												/>
-											</Button>
-										</Tooltip>
-									) : (
-										<Tooltip
-											text={ __( 'Remove Font Face' ) }
-											delay={ 0 }
-										>
-											<Button
-												style={ { padding: '0 8px' } }
-												onClick={ () =>
-													handleRemoveFontFace(
-														font.family,
-														weight,
-														style
-													)
-												}
-											>
-												<Icon
-													icon={ check }
-													size={ 20 }
-												/>
-											</Button>
-										</Tooltip>
-									)
-								}
+								isExistingFace={ isExistingFace }
+								key={ `variant-${ i }` }
 							/>
 						);
 					} ) }

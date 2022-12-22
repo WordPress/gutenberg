@@ -11,26 +11,72 @@
  */
 class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Global_Styles_Controller {
 
-	protected function download_font_face ( $font_face ) {
-		// Download font asset in temp folder
-		$font_asset_url = $font_face['src'][0];
+	protected function get_font_file_extension ( $mime ) {
+		$extensions = array(
+			'font/ttf' => 'ttf',
+			'font/woff' => 'woff',
+			'font/woff2' => 'woff2',
+		);
+		if ( isset( $extensions[ $mime] ) ) {
+			return $extensions[ $mime ];
+		}
+		throw new Exception('Mime type not allowed');
+	}
 
-		$file_extension = pathinfo($font_asset_url, PATHINFO_EXTENSION);
-        $file_name = $font_face['fontFamily'].'_'.$font_face['fontStyle'].'_'.$font_face['fontWeight'].'.'.$file_extension;
-		
+	protected function base64_decode_file($data) {
+		if(preg_match('/^data\:([a-zA-Z]+\/[a-zA-Z]+);base64\,([a-zA-Z0-9\+\/]+\=*)$/', $data, $matches)) {
+			return [
+					'mime' => $matches[1],
+					'data' => base64_decode($matches[2]),
+			];
+		}
+		return false;
+	}
+
+	protected function delete_font_asset ( $font_face ) {
+		$fonts_dir = $this->get_fonts_dir();  
+		foreach ( $font_face['src'] as $url ) {
+			// TODO: make this work with relative urls too
+			$filename = basename( $url );
+			$filepath = $fonts_dir['basedir'] . $filename;
+			if ( file_exists( $filepath ) ) {
+				return unlink(
+					$filepath
+				);
+			}
+		}
+		return false;
+	}
+
+	protected function get_fonts_dir () {
 		$theme_data = wp_get_theme();
 		$theme_slug = $theme_data->get('TextDomain');
-		
 		$upload_dir = wp_upload_dir();
 		$fonts_dir = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'fonts' . DIRECTORY_SEPARATOR . $theme_slug . DIRECTORY_SEPARATOR;
-		wp_mkdir_p( $fonts_dir );
-		copy ( $font_asset_url, $fonts_dir . $file_name );
+		$font_path = $upload_dir['baseurl']."/fonts/".$theme_slug."/".$file_name;
+		return array (
+			'basedir' => $fonts_dir,
+			'baseurl' => $font_path,
+		);
+	}
 
-		$fonts_url_path = $upload_dir['baseurl']."/fonts/".$theme_slug."/".$file_name;
+
+
+	protected function write_font_face ( $font_face ) {
+		$font_asset = $this->base64_decode_file( $font_face['base64'] );
+
+		$file_extension = $this->get_font_file_extension( $font_asset[ 'mime' ] );
+        $file_name = $font_face['fontFamily'].'_'.$font_face['fontStyle'].'_'.$font_face['fontWeight'].'.'.$file_extension;
+		
+		$fonts_dir = $this->get_fonts_dir();  		
+		wp_mkdir_p( $fonts_dir['basedir'] );
+		file_put_contents( $fonts_dir['basedir'] . $file_name, $font_asset['data'] );
 		
 		$new_font_face =  $font_face;
-		unset( $new_font_face['shouldBeDownloaded'] );
-		$new_font_face['src'] = array ( $fonts_url_path );
+		unset( $new_font_face['shouldBeDecoded'] );
+		unset( $new_font_face['base64'] );
+		$font_url = $fonts_dir['baseurl'] . $file_name;
+		$new_font_face['src'] = array ( $font_url );
 
 		return $new_font_face;
 	}
@@ -43,16 +89,22 @@ class Gutenberg_REST_Global_Styles_Controller extends WP_REST_Global_Styles_Cont
 				$new_font_faces = array();
 				foreach ( $font_family['fontFace'] as $font_face ) {
 					$updated_font_face = $font_face;
-					if ( isset( $updated_font_face['shouldBeDownloaded'] ) ) {
-						$updated_font_face = $this->download_font_face( $font_face );
+					if ( isset( $updated_font_face['shouldBeDecoded'] ) ) {
+						$updated_font_face = $this->write_font_face( $font_face );
 					}
-					$new_font_faces[] = $updated_font_face;
+					if ( !isset ( $font_face['shouldBeRemoved'] ) ) {
+						$new_font_faces[] = $updated_font_face;
+					} else {
+						$this->delete_font_asset( $font_face );
+					}
 				}
 
 				$font_family['fontFace'] = $new_font_faces;
 			}
-
-			$prepared_font_families[] = $font_family;
+			if ( ! isset ( $font_family[ 'shouldBeRemoved' ] ) ) {
+				$prepared_font_families[] = $font_family;
+			}
+			
 		}
 
 		return $prepared_font_families;

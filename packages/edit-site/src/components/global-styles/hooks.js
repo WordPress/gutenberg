@@ -335,6 +335,8 @@ export function useFontFamilies() {
 		'typography.fontFamilies'
 	);
 
+	const count = Array.isArray( fontFamilies ) ? fontFamilies.length : 0;
+
 	const getFontSlug = ( content ) => {
 		// Get the slug.
 		return (
@@ -348,15 +350,11 @@ export function useFontFamilies() {
 		);
 	};
 
-	const handleAddFontFace = (
-		fontFamilyName,
-		fontWeight,
-		fontStyle,
-		url
-	) => {
-		const newFaceSlug = getFontSlug( fontFamilyName );
+	const handleAddFontFace = ( fontFace ) => {
+		const { fontFamily, fontWeight, fontStyle } = fontFace;
+		const slug = getFontSlug( fontFamily );
 		const existingFamilyIndex = fontFamilies.findIndex(
-			( { slug } ) => slug === getFontSlug( newFaceSlug )
+			( { slug: s } ) => s === slug
 		);
 
 		const existingFace =
@@ -367,65 +365,101 @@ export function useFontFamilies() {
 				  )
 				: null;
 
-		if ( existingFace ) {
+		const isReAddingFontFace = existingFace && existingFace.shouldBeRemoved;
+
+		if ( existingFace && ! isReAddingFontFace ) {
 			throw new Error( __( 'Font face already exists.' ) );
 		}
 
-		const newFace = {
-			fontFamily: fontFamilyName,
-			fontStyle,
-			fontWeight,
-			src: [ url ],
-			shouldBeDownloaded: true,
-		};
+		fontFace.shouldBeDecoded = true;
 
 		if ( existingFamilyIndex !== -1 ) {
 			// deep	copy
 			const updatedFontFamilies = JSON.parse(
 				JSON.stringify( fontFamilies )
 			);
+
 			if (
 				Array.isArray( fontFamilies[ existingFamilyIndex ].fontFace )
 			) {
-				updatedFontFamilies[ existingFamilyIndex ].fontFace = [
-					...updatedFontFamilies[ existingFamilyIndex ].fontFace,
-					newFace,
-				];
+				if ( ! isReAddingFontFace ) {
+					updatedFontFamilies[ existingFamilyIndex ].fontFace = [
+						...updatedFontFamilies[ existingFamilyIndex ].fontFace,
+						fontFace,
+					];
+				} else {
+					delete fontFace.shouldBeRemoved;
+					updatedFontFamilies[ existingFamilyIndex ].fontFace = [
+						...updatedFontFamilies[
+							existingFamilyIndex
+						].fontFace.filter(
+							( { fontWeight: weight, fontStyle: style } ) =>
+								weight !== fontWeight || style !== fontStyle
+						),
+						fontFace,
+					];
+				}
 			} else {
 				updatedFontFamilies[ existingFamilyIndex ].fontFace = [
-					newFace,
+					fontFace,
 				];
 			}
 			setFontFamilies( updatedFontFamilies );
 		} else {
 			const newFamily = {
-				fontFamily: fontFamilyName,
-				name: fontFamilyName,
-				slug: newFaceSlug,
-				fontFace: [ newFace ],
+				fontFamily,
+				name: fontFamily,
+				slug,
+				fontFace: [ fontFace ],
 			};
 			setFontFamilies( [ ...fontFamilies, newFamily ] );
 		}
 	};
 
-	const handleRemoveFontFace = ( fontFamilyName, fontWeight, fontStyle ) => {
+	const handleRemoveFontFace = ( fontFamily, fontWeight, fontStyle ) => {
+		const slug = getFontSlug( fontFamily );
+		const existingFamilyIndex = fontFamilies.findIndex(
+			( { slug: s } ) => s === slug
+		);
+
+		// add shouldBeRemoved flag to fontFace for the backend to remove it
+		const updatedFontFaces = fontFamilies[
+			existingFamilyIndex
+		].fontFace.map( ( fontFace ) => {
+			if (
+				fontFace.fontWeight === fontWeight &&
+				fontFace.fontStyle === fontStyle
+			) {
+				return {
+					...fontFace,
+					shouldBeRemoved: true,
+				};
+			}
+			return fontFace;
+		} );
+
+		const updatedFamily = {
+			...fontFamilies[ existingFamilyIndex ],
+			fontFace: updatedFontFaces,
+		};
+
+		// Add shouldBeRemoved flag to the family if all fontFaces are removed
+		if (
+			updatedFontFaces.every( ( fontFace ) => fontFace.shouldBeRemoved )
+		) {
+			updatedFamily.shouldBeRemoved = true;
+		}
+
 		const updatedFontFamilies = JSON.parse(
 			JSON.stringify( fontFamilies )
 		);
-		const newFaceSlug = getFontSlug( fontFamilyName );
-		const existingFamilyIndex = fontFamilies.findIndex(
-			( { slug } ) => slug === getFontSlug( newFaceSlug )
-		);
-		const updatedFamily = updatedFontFamilies[ existingFamilyIndex ];
-		updatedFamily.fontFace = updatedFamily.fontFace.filter(
-			( { fontWeight: weight, fontStyle: style } ) =>
-				weight !== fontWeight || style !== fontStyle
-		);
+		updatedFontFamilies[ existingFamilyIndex ] = updatedFamily;
 		setFontFamilies( updatedFontFamilies );
 	};
 
 	return {
 		fontFamilies,
+		count,
 		handleAddFontFace,
 		handleRemoveFontFace,
 		getFontSlug,

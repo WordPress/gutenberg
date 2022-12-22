@@ -2,15 +2,21 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { Icon, check } from '@wordpress/icons';
+import { Tooltip, Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import ScreenHeader from './header';
-import FontFaceItem from './font-face-item';
 import Subtitle from './subtitle';
+import { useFontFamilies } from './hooks';
+import FontFaceItem from './font-face-item';
 
-function ScreenThemeFontFacesList( { themeFontSelected: font } ) {
+function ScreenThemeFontFacesList( { themeFontSelected } ) {
+	const { fontFamilies, handleRemoveFontFace } = useFontFamilies();
+	const font = fontFamilies[ themeFontSelected ];
+
 	return (
 		<>
 			<ScreenHeader
@@ -27,19 +33,47 @@ function ScreenThemeFontFacesList( { themeFontSelected: font } ) {
 					gap: '1rem',
 				} }
 			>
-				<Subtitle>
-					{ ( font.name || font.fontFamily ) + __( ' variants:' ) }
-				</Subtitle>
+				{ font && (
+					<Subtitle>
+						{ ( font.name || font.fontFamily ) +
+							__( ' variants:' ) }
+					</Subtitle>
+				) }
+
+				{ ! font && <p>{ __( 'No font faces available' ) }</p> }
 
 				{ font &&
 					font.fontFace &&
 					font.fontFace.map( ( fontFace, i ) => {
 						return (
-							<FontFaceItem
-								key={ `fontface-${ i }` }
-								fontFace={ fontFace }
-								title={ `${ fontFace.fontWeight } ${ fontFace.fontStyle }` }
-							/>
+							! fontFace.shouldBeRemoved && (
+								<FontFaceItem
+									fontFace={ fontFace }
+									key={ `font-face-${ i }` }
+									actionTrigger={
+										<Tooltip
+											text={ __( 'Remove Font Face' ) }
+											delay={ 0 }
+										>
+											<Button
+												style={ { padding: '0 8px' } }
+												onClick={ () =>
+													handleRemoveFontFace(
+														fontFace.fontFamily,
+														fontFace.fontWeight,
+														fontFace.fontStyle
+													)
+												}
+											>
+												<Icon
+													icon={ check }
+													size={ 20 }
+												/>
+											</Button>
+										</Tooltip>
+									}
+								/>
+							)
 						);
 					} ) }
 			</div>

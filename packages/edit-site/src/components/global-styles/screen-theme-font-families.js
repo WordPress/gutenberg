@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	__experimentalNavigatorButton as NavigatorButton,
 	__experimentalSurface as Surface,
+	__experimentalUseNavigator as useNavigator,
 	Tooltip,
 } from '@wordpress/components';
 import { Icon, chevronRight } from '@wordpress/icons';
@@ -17,7 +18,12 @@ import FontFaceItem from './font-face-item';
 import { useFontFamilies } from './hooks';
 
 function ScreenThemeFontFamilies( { setThemeFontSelected } ) {
-	const { fontFamilies } = useFontFamilies();
+	const { fontFamilies, count } = useFontFamilies();
+	const { goTo } = useNavigator();
+
+	if ( ! count ) {
+		goTo( '/typography' );
+	}
 
 	const handleClick = ( family ) => {
 		setThemeFontSelected( family );
@@ -26,10 +32,13 @@ function ScreenThemeFontFamilies( { setThemeFontSelected } ) {
 	return (
 		<>
 			<ScreenHeader
-				title={ __( 'Theme Font Families' ) }
-				description={ __( 'Font families included in your theme' ) }
+				title={ __( 'Font Families' ) }
+				description={
+					count
+						? __( 'Font families included available' )
+						: __( 'No font families available' )
+				}
 			/>
-
 			<Surface
 				style={ {
 					background: '#eee',
@@ -39,7 +48,7 @@ function ScreenThemeFontFamilies( { setThemeFontSelected } ) {
 					gap: '1rem',
 				} }
 			>
-				{ fontFamilies.map( ( family ) => {
+				{ fontFamilies.map( ( family, i ) => {
 					const fontFace = {
 						name: family.name,
 						fontFamily: family.fontFamily,
@@ -48,7 +57,7 @@ function ScreenThemeFontFamilies( { setThemeFontSelected } ) {
 					};
 					return (
 						<FontFaceItem
-							key={ family.fontFamily }
+							key={ `family-${ i }` }
 							fontFace={ fontFace }
 							title={
 								<strong>
@@ -63,7 +72,7 @@ function ScreenThemeFontFamilies( { setThemeFontSelected } ) {
 										<NavigatorButton
 											path="/typography/font-families/theme-font-faces"
 											onClick={ () => {
-												handleClick( family );
+												handleClick( i );
 											} }
 										>
 											<Icon

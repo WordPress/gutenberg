@@ -13,6 +13,7 @@ const DEMO_TEXT = 'The quick brown fox jumps over the lazy dog';
 
 function FontFaceItem( { title, fontFace, actionTrigger } ) {
 	useEffect( () => {
+		// Load font asset in the broser
 		if ( fontFace.url ) {
 			// eslint-disable-next-line no-undef
 			const newFont = new FontFace(

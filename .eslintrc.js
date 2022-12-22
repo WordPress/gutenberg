@@ -197,6 +197,9 @@ module.exports = {
 		'plugin:eslint-comments/recommended',
 	],
 	globals: {
+		File: 'readonly',
+		fetch: 'readonly',
+		FileReader: 'readonly',
 		wp: 'off',
 	},
 	settings: {

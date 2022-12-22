@@ -4,11 +4,20 @@
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalItemGroup as ItemGroup,
+	__experimentalItem as Item,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	__experimentalText as Text,
+	__experimentalUseNavigator as useNavigator,
 	FlexItem,
+	Dropdown,
+	Icon,
+	MenuGroup,
+	MenuItem,
+	Button,
 } from '@wordpress/components';
+import { moreVertical } from '@wordpress/icons';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -18,42 +27,43 @@ import { NavigationButtonAsItem } from './navigation-button';
 import { useStyle, useFontFamilies } from './hooks';
 import Subtitle from './subtitle';
 import TypographyPanel from './typography-panel';
+import FontUploadModal from './font-upload-modal';
 
-function AddFontFamilyItem() {
-	return (
-		<NavigationButtonAsItem
-			path={ '/typography/font-families/' }
-			aria-label={ __( 'Add Font Family' ) }
-		>
-			<HStack justify="flex-start">
-				<FlexItem>{ __( '+' ) }</FlexItem>
-				<FlexItem>{ __( 'Add Font Family' ) }</FlexItem>
-			</HStack>
-		</NavigationButtonAsItem>
-	);
-}
-
-function FontFamilies( { parentMenu } ) {
-	const { fontFamilies } = useFontFamilies();
-
-	const count = Array.isArray( fontFamilies )
-		? fontFamilies.filter( ( font ) => !! font.slug ).length
-		: 0;
+function FontFamilies() {
+	const { goTo } = useNavigator();
+	const { count } = useFontFamilies();
 
 	return (
-		<>
-			<NavigationButtonAsItem
-				path={ parentMenu + '/typography/font-families/theme' }
-				aria-label={ __( 'Theme Font Families' ) }
-			>
-				<HStack justify="space-between">
-					<FlexItem>
-						<Text>{ __( 'Aa' ) }</Text>
-					</FlexItem>
-					<FlexItem>{ count + __( ' Font Families' ) }</FlexItem>
-				</HStack>
-			</NavigationButtonAsItem>
-		</>
+		<ItemGroup isBordered isSeparated>
+			{ count > 0 && (
+				<Item
+					onClick={ () => {
+						goTo( '/typography/font-families/theme' );
+					} }
+				>
+					<HStack justify="space-between">
+						<FlexItem>
+							<Text>{ __( 'Aa' ) }</Text>
+						</FlexItem>
+						<FlexItem>{ count + __( ' Font Families' ) }</FlexItem>
+					</HStack>
+				</Item>
+			) }
+			{ ! count && (
+				<Item
+					onClick={ () => {
+						goTo( '/typography/font-families/' );
+					} }
+				>
+					<HStack justify="space-between">
+						<FlexItem>
+							<Text>{ __( '+' ) }</Text>
+						</FlexItem>
+						<FlexItem>{ __( 'Add Google Fonts' ) }</FlexItem>
+					</HStack>
+				</Item>
+			) }
+		</ItemGroup>
 	);
 }
 
@@ -115,6 +125,49 @@ function ElementItem( { name, parentMenu, element, label } ) {
 	);
 }
 
+function FontFamiliesMenu() {
+	const { goTo } = useNavigator();
+	const [ isModalLocalFontOpen, setIsModalLocalFontOpen ] = useState( false );
+	const toggleModalLocalFontOpen = () => {
+		setIsModalLocalFontOpen( ! isModalLocalFontOpen );
+	};
+	return (
+		<>
+			{ isModalLocalFontOpen && (
+				<FontUploadModal
+					toggleModalLocalFontOpen={ toggleModalLocalFontOpen }
+				/>
+			) }
+
+			<MenuGroup label={ __( 'Font Families' ) }>
+				<MenuItem
+					onClick={ () => {
+						goTo( '/typography/font-families/' );
+					} }
+				>
+					<Text>{ __( 'Add Google Fonts' ) }</Text>
+				</MenuItem>
+				<MenuItem onClick={ toggleModalLocalFontOpen }>
+					<Text>{ __( 'Upload Local Font' ) }</Text>
+				</MenuItem>
+			</MenuGroup>
+		</>
+	);
+}
+
+function FontFamiliesDropdown() {
+	return (
+		<Dropdown
+			renderContent={ () => <FontFamiliesMenu /> }
+			renderToggle={ ( { isOpen, onToggle } ) => (
+				<Button onClick={ onToggle } aria-expanded={ isOpen }>
+					<Icon icon={ moreVertical } />
+				</Button>
+			) }
+		/>
+	);
+}
+
 function ScreenTypography( { name } ) {
 	const parentMenu = name === undefined ? '' : '/blocks/' + name;
 
@@ -130,11 +183,12 @@ function ScreenTypography( { name } ) {
 			{ ! name && (
 				<div className="edit-site-global-styles-screen-typography">
 					<VStack spacing={ 3 }>
-						<Subtitle>{ __( 'Font Families' ) }</Subtitle>
-						<ItemGroup isBordered isSeparated>
-							<FontFamilies parentMenu={ parentMenu } />
-							<AddFontFamilyItem />
-						</ItemGroup>
+						<HStack>
+							<Subtitle>{ __( 'Font Families' ) }</Subtitle>
+							<FontFamiliesDropdown />
+						</HStack>
+
+						<FontFamilies />
 
 						<Subtitle>{ __( 'Elements' ) }</Subtitle>
 						<ItemGroup isBordered isSeparated>
