@@ -245,6 +245,9 @@ class WP_Theme_JSON_Resolver_Base {
 			} else {
 				$theme_json_data = array();
 			}
+			// BEGIN OF EXPERIMENTAL CODE. Not to backport to core.
+			$theme_json_data = gutenberg_add_registered_webfonts_to_theme_json( $theme_json_data );
+			// END OF EXPERIMENTAL CODE.
 
 			/**
 			 * Filters the data provided by the theme for global styles and settings.
@@ -263,7 +266,10 @@ class WP_Theme_JSON_Resolver_Base {
 				if ( '' !== $parent_theme_json_file ) {
 					$parent_theme_json_data = static::read_json_file( $parent_theme_json_file );
 					$parent_theme_json_data = static::translate( $parent_theme_json_data, $wp_theme->parent()->get( 'TextDomain' ) );
-					$parent_theme           = new WP_Theme_JSON_Gutenberg( $parent_theme_json_data );
+					// BEGIN OF EXPERIMENTAL CODE. Not to backport to core.
+					$parent_theme_json_data = gutenberg_add_registered_webfonts_to_theme_json( $parent_theme_json_data );
+					// END OF EXPERIMENTAL CODE.
+					$parent_theme = new WP_Theme_JSON_Gutenberg( $parent_theme_json_data );
 
 					/*
 					 * Merge the child theme.json into the parent theme.json.
