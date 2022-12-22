@@ -288,16 +288,18 @@ You can attach private selectors and actions to a public store:
 
 ```js
 // In packages/package1/store.js:
+import { experiments as dataExperiments } from '@wordpress/data';
 import { __experimentalHasContentRoleAttribute, ...selectors } from './selectors';
 // The `lock` function is exported from the internal experiments.js file where
 // the opt-in function was called.
-import { lock } from './experiments';
+import { lock, unlock } from './experiments';
 
 export const store = registerStore(/* ... */);
 // Attach a private selector to the exported store:
-lock(store, {
+const { registerPrivateActionsAndSelectors } = unlock( dataExperiments );
+registerPrivateActionsAndSelectors( store, {}, {
 	__experimentalHasContentRoleAttribute
-});
+} );
 
 
 // In packages/package2/MyComponent.js:
