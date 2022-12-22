@@ -6,16 +6,6 @@ on:
             - trunk
             - 'release/**'
             - 'wp/**'
-    pull_request:
-        paths:
-            # Any change to a PHP file should run checks.
-            - '**.php'
-            # These files configure Composer. Changes could affect the outcome.
-            - 'composer.*'
-            # This file configures PHPCS. Changes could affect the outcome.
-            - 'phpcs.xml.dist'
-            # Changes to workflow files should always verify all workflows are successful.
-            - '.github/workflows/*.yml'
     # Allow manually triggering the workflow.
     workflow_dispatch:
 
