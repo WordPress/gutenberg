@@ -60,15 +60,11 @@ jobs:
 
             - name: Run PHPCS on all Gutenberg files
               id: phpcs-gutenberg
-              run: phpcs -n --report-full --cache=./.cache/phpcs-src.json --report-checkstyle=./.cache/phpcs-report.xml
+              run: phpcs --report-full --report-checkstyle=./.cache/phpcs-report.xml
 
             - name: Show PHPCS results in PR
               if: ${{ always() && steps.phpcs-gutenberg.outcome == 'failure' }}
               run: cs2pr ./.cache/phpcs-report.xml
-
-            - name: Check test suite files for warnings
-              id: phpcs-tests
-              run: phpcs phpunit --report-full --cache=./.cache/phpcs-tests.json --report-checkstyle=./.cache/phpcs-tests-report.xml
 
             - name: Show test suite scan results in PR
               if: ${{ always() && steps.phpcs-tests.outcome == 'failure' }}
