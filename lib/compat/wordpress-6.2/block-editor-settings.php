@@ -13,6 +13,8 @@
  * @return array New block editor settings.
  */
 function gutenberg_get_block_editor_settings_6_2( $settings ) {
+	$can_user_edit_global_custom_css = apply_filters( 'enable_global_styles_custom_css', current_user_can( 'unfiltered_html' ) );
+
 	if ( wp_theme_has_theme_json() ) {
 		// Add the custom CSS as separate style sheet so any invalid CSS entered by users does not break other global styles.
 		$settings['styles'][] = array(
@@ -21,7 +23,7 @@ function gutenberg_get_block_editor_settings_6_2( $settings ) {
 			'isGlobalStyles' => true,
 		);
 	}
-	$settings['__experimentalCanUserEditGlobalCustomCSS'] = ! current_user_can( 'unfiltered_html' ) ? false : true;
+	$settings['__experimentalCanUserEditGlobalCustomCSS'] = ! $can_user_edit_global_custom_css ? false : true;
 	return $settings;
 }
 
