@@ -11,12 +11,12 @@ import EquivalentKeyMap from 'equivalent-key-map';
  */
 import createReduxRoutineMiddleware from '@wordpress/redux-routine';
 import { compose } from '@wordpress/compose';
-import { createExperiment, configureLockTarget } from '@wordpress/experiments';
 
 /**
  * Internal dependencies
  */
 import { builtinControls } from '../controls';
+import { lock } from '../experiments';
 import promise from '../promise-middleware';
 import createResolversCacheMiddleware from '../resolvers-cache-middleware';
 import createThunkMiddleware from './thunk-middleware';
@@ -109,7 +109,8 @@ function createResolversCache() {
  * @return   {StoreDescriptor<ReduxStoreConfig<State,Actions,Selectors>>} Store Object.
  */
 export default function createReduxStore( key, options ) {
-	const storeExperiment = createExperiment();
+	const privateActions = {};
+	const privateSelectors = {};
 	const storeDescriptor = {
 		name: key,
 		instantiate: ( registry ) => {
@@ -150,19 +151,14 @@ export default function createReduxStore( key, options ) {
 				},
 				store
 			);
-			configureLockTarget( actions, {
-				experiment: storeExperiment,
-				map: ( privateData ) => {
-					if ( ! privateData?.actions ) {
-						throw new Error(
-							`Tried to unlock experimental actions on the ${ key } store where ` +
-								`no experimental actions were defined. Did you forget to call ` +
-								`registerPrivateActions()?`
-						);
-					}
-					return mapActions( privateData.actions, store );
-				},
-			} );
+			lock(
+				actions,
+				new Proxy( privateActions, {
+					get: ( target, prop ) => {
+						return mapActions( privateActions, store )[ prop ];
+					},
+				} )
+			);
 
 			let selectors = mapSelectors(
 				{
@@ -183,27 +179,22 @@ export default function createReduxStore( key, options ) {
 				},
 				store
 			);
-			configureLockTarget( selectors, {
-				experiment: storeExperiment,
-				map: ( privateData ) => {
-					if ( ! privateData?.selectors ) {
-						throw new Error(
-							`Tried to unlock experimental selectors on the ${ key } store where ` +
-								`no experimental selectors were defined. Did you forget to call ` +
-								`registerPrivateSelectors()?`
-						);
-					}
-					return mapSelectors(
-						mapValues(
-							privateData.selectors,
-							( selector ) =>
-								( state, ...args ) =>
-									selector( state.root, ...args )
-						),
-						store
-					);
-				},
-			} );
+			lock(
+				selectors,
+				new Proxy( privateSelectors, {
+					get: ( target, prop ) => {
+						return mapSelectors(
+							mapValues(
+								privateSelectors,
+								( selector ) =>
+									( state, ...args ) =>
+										selector( state.root, ...args )
+							),
+							store
+						)[ prop ];
+					},
+				} )
+			);
 
 			if ( options.resolvers ) {
 				const result = mapResolvers(
@@ -263,7 +254,15 @@ export default function createReduxStore( key, options ) {
 			};
 		},
 	};
-	configureLockTarget( storeDescriptor, { experiment: storeExperiment } );
+
+	lock( storeDescriptor, {
+		registerPrivateActions: ( actions ) => {
+			Object.assign( privateActions, actions );
+		},
+		registerPrivateSelectors: ( selectors ) => {
+			Object.assign( privateSelectors, selectors );
+		},
+	} );
 
 	return storeDescriptor;
 }

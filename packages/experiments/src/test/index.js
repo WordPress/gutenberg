@@ -6,8 +6,6 @@ import {
 	resetRegisteredExperiments,
 	resetAllowedCoreModules,
 	allowCoreModule,
-	createExperiment,
-	configureLockTarget,
 } from '../implementation';
 
 beforeEach( () => {
@@ -131,98 +129,6 @@ describe( 'lock(), unlock()', () => {
 
 		// Get the experimental APIs registered by @experiments/test
 		expect( coreDataExperiments.unlock( object ).secret ).toBe( 'sh' );
-	} );
-} );
-
-describe( 'configureLockTarget()', () => {
-	let lock, unlock;
-	beforeEach( () => {
-		// This would live in @experiments/test:
-		// Opt-in to experimental APIs
-		const experimentsAPI = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
-			requiredConsent,
-			'@experiments/test'
-		);
-		lock = experimentsAPI.lock;
-		unlock = experimentsAPI.unlock;
-	} );
-
-	it( 'Should return the same private data upon unlocking two lock targets sharing the same experiment', () => {
-		const thisExperiment = createExperiment();
-		const object1 = {};
-		configureLockTarget( object1, {
-			experiment: thisExperiment,
-		} );
-
-		const object2 = {};
-		configureLockTarget( object2, {
-			experiment: thisExperiment,
-		} );
-
-		lock( object1, 'sh' );
-		expect( unlock( object1 ) ).toBe( 'sh' );
-		expect( unlock( object2 ) ).toBe( 'sh' );
-	} );
-
-	it(
-		'Should return the same private data upon unlocking two lock targets sharing the same experiment ' +
-			'even when unlocking a cloned lock target',
-		() => {
-			const thisExperiment = createExperiment();
-			const object1 = {};
-			configureLockTarget( object1, {
-				experiment: thisExperiment,
-			} );
-
-			const object2 = {};
-			configureLockTarget( object2, {
-				experiment: thisExperiment,
-			} );
-
-			lock( object1, 'sh' );
-			expect( unlock( object1 ) ).toBe( 'sh' );
-			expect( unlock( { ...object2 } ) ).toBe( 'sh' );
-		}
-	);
-
-	it( 'Should pass the locked data through map on the first unlock()', () => {
-		const object = {};
-		configureLockTarget( object, {
-			map( secretString ) {
-				return `Decorated: ${ secretString }`;
-			},
-		} );
-		lock( object, 'sh' );
-		expect( unlock( object ) ).toBe( 'Decorated: sh' );
-	} );
-
-	it( 'Should pass null through map if there is no private data available on the first unlock()', () => {
-		const object = {};
-		configureLockTarget( object, {
-			map( secretString ) {
-				return `Decorated: ${ secretString }`;
-			},
-		} );
-		expect( unlock( object ) ).toBe( 'Decorated: null' );
-	} );
-
-	it( 'Should pass the locked data through map on the first unlock() even when the experiment is specified', () => {
-		const thisExperiment = createExperiment();
-		const object1 = {};
-		const object2 = {};
-		configureLockTarget( object1, {
-			experiment: thisExperiment,
-		} );
-		configureLockTarget( object2, {
-			experiment: thisExperiment,
-			map( secretString ) {
-				return `Decorated: ${ secretString }`;
-			},
-		} );
-		lock( object1, 'sh' );
-		expect( unlock( object1 ) ).toBe( 'sh' );
-		expect( unlock( object2 ) ).toBe( 'Decorated: sh' );
-		expect( unlock( object1 ) ).toBe( 'sh' );
 	} );
 } );
 

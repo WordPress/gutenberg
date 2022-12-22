@@ -510,12 +510,7 @@ _Returns_
 
 ### experiments
 
-The experimental APIs exposed by the `@wordpress/data` package.
-Only available to core packages. These APIs are not stable and may
-change without notice. Do not use outside of core.
-
-Available APIs:
-– registerPrivateActionsAndSelectors
+Undocumented declaration.
 
 ### plugins
 

@@ -102,13 +102,14 @@ export const __dangerousOptInToUnstableAPIsOnlyForCoreModules = (
  * @param {any}             privateData The private data to bind to the object.
  */
 function lock( object, privateData ) {
-	const { experiment } = getLockTargetConfig( object );
-	lockedData.set( experiment, {
-		privateData,
-	} );
+	if ( ! object ) {
+		throw new Error( 'Cannot lock an undefined object.' );
+	}
+	if ( ! ( __experiment in object ) ) {
+		object[ __experiment ] = {};
+	}
+	lockedData.set( object[ __experiment ], privateData );
 }
-
-const identity = ( x ) => x;
 
 /**
  * Unlocks the private data bound to an object.
@@ -134,106 +135,25 @@ const identity = ( x ) => x;
  * @return {any} The private data bound to the object.
  */
 function unlock( object ) {
-	const { experiment, map = identity } = getLockTargetConfig( object );
+	if ( ! object ) {
+		throw new Error( 'Cannot unlock an undefined object.' );
+	}
+	if ( ! ( __experiment in object ) ) {
+		throw new Error(
+			'Cannot unlock an object that was not locked before. '
+		);
+	}
 
-	const lockedEntry = lockedData.get( experiment ) || {
-		privateData: null,
-	};
-
-	return map( lockedEntry.privateData );
+	return lockedData.get( object[ __experiment ] );
 }
 
 const lockedData = new WeakMap();
 
 /**
- * Used by configureLockTarget() to store the experiment configuration
- * inside lock/unlock targets.
+ * Used by lock() and unlock() to uniquely identify the private data
+ * related to a containing object.
  */
-const __lockTargetConfig = Symbol( 'Lock Target' );
-
-/**
- * Configures the locking and unlocking process of a given object. See
- * the examples and `config` parameter below for more details.
- *
- * @example
- * ```js
- *   const experiment = createExperiment();
- *   // Use the same experiment for two objects:
- *   const object1 = {};
- *   configureLockTarget( object1, { experiment } );
- *
- *   const object2 = {};
- *   configureLockTarget( object2, { experiment } );
- *
- *   // Lock the first object:
- *   lock( object1, 'sh' );
- *
- *   // The private data can be accessed via both objects:
- *   unlock( object1 ) // "sh"
- *   unlock( object2 ) // "sh"
- *
- *   // The configuration is preserved through cloning:
- *   const object3 = { ...object1 };
- *   unlock( object3 ) // "sh"
- * ```
- *
- * @example
- * ```js
- *   const experiment = createExperiment();
- *   // Use the same experiment for two objects:
- *   const object = {};
- *   configureLockTarget( object, {
- *     map( privateData ) {
- * 	     return privateData.toUpperCase();
- *     },
- *   } );
- *
- *   lock( object1, 'private' );
- *   unlock( object1 ) // "PRIVATE"
- * ```
- *
- * @param {any}      lockTarget          The object that will later be passed to `lock()` and `unlock()`.
- * @param {Object}   config              The locking configuration.
- * @param {Function} [config.experiment] The experiment to use for locking/unlocking, see `createExperiment()`.
- *                                       If two objects use the same experiment, they will share the same private data.
- * @param {Function} [config.map]        A function to map the private data when `unlock()` is called.
- *                                       It receives the private data as its only argument and returns
- *                                       the updated private data.
- */
-export function configureLockTarget( lockTarget, config ) {
-	const { map, experiment = createExperiment(), ...rest } = config;
-	if ( Object.entries( rest ).length ) {
-		throw new Error(
-			`Unknown options provided to configureLockingBehavior: ${ Object.keys(
-				rest
-			).join( ', ' ) }`
-		);
-	}
-	lockTarget[ __lockTargetConfig ] = {
-		experiment,
-		map,
-	};
-}
-
-/**
- * Creates a new experiment with unique identity.
- *
- * @return {Object} A new experiment object.
- */
-export function createExperiment() {
-	// This is a simple object with a unique identity.
-	// It's used to identify the private data associated with a given object.
-	// See `configureLockTarget()` and `lock()` for more details.
-	return {};
-}
-
-function getLockTargetConfig( object ) {
-	return (
-		object[ __lockTargetConfig ] || {
-			experiment: object,
-		}
-	);
-}
+const __experiment = Symbol( 'Experiment ID' );
 
 // Unit tests utilities:
 

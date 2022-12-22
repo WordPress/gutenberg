@@ -3,12 +3,11 @@
  */
 import { createRegistry } from '../registry';
 import createReduxStore from '../redux-store';
-import { experiments as dataExperiments, unlock } from '../experiments';
+import { unlock } from '../experiments';
 
 /**
  * WordPress dependencies
  */
-const { registerPrivateActionsAndSelectors } = unlock( dataExperiments );
 
 beforeEach( () => {
 	jest.useFakeTimers( 'legacy' );
@@ -67,11 +66,9 @@ describe( 'Private data APIs', () => {
 	describe( 'private selectors', () => {
 		it( 'should expose public selectors by default', () => {
 			const groceryStore = createStore();
-			registerPrivateActionsAndSelectors(
-				groceryStore,
-				{},
-				{ getSecretDiscount }
-			);
+			unlock( groceryStore ).registerPrivateSelectors( groceryStore, {
+				getSecretDiscount,
+			} );
 
 			const publicSelectors = registry.select( groceryStore );
 			expect( publicSelectors.getPublicPrice ).toEqual(
@@ -81,11 +78,9 @@ describe( 'Private data APIs', () => {
 
 		it( 'should not expose private selectors by default', () => {
 			const groceryStore = createStore();
-			registerPrivateActionsAndSelectors(
-				groceryStore,
-				{},
-				{ getSecretDiscount }
-			);
+			unlock( groceryStore ).registerPrivateSelectors( {
+				getSecretDiscount,
+			} );
 
 			const publicSelectors = registry.select( groceryStore );
 			expect( publicSelectors.getSecretDiscount ).toEqual( undefined );
@@ -93,11 +88,9 @@ describe( 'Private data APIs', () => {
 
 		it( 'should make private selectors available via unlock()', () => {
 			const groceryStore = createStore();
-			registerPrivateActionsAndSelectors(
-				groceryStore,
-				{},
-				{ getSecretDiscount }
-			);
+			unlock( groceryStore ).registerPrivateSelectors( {
+				getSecretDiscount,
+			} );
 
 			const privateSelectors = unlock( registry.select( groceryStore ) );
 			expect( privateSelectors.getSecretDiscount ).toEqual(
@@ -107,31 +100,19 @@ describe( 'Private data APIs', () => {
 
 		it( 'should give private selectors access to the state', () => {
 			const groceryStore = createStore();
-			registerPrivateActionsAndSelectors(
-				groceryStore,
-				{},
-				{ getSecretDiscount }
-			);
+			unlock( groceryStore ).registerPrivateSelectors( {
+				getSecretDiscount,
+			} );
 
 			const privateSelectors = unlock( registry.select( groceryStore ) );
 			expect( privateSelectors.getSecretDiscount() ).toEqual( 800 );
-		} );
-
-		it( 'should throw a clear error when no private selectors are found in the unlock() call', () => {
-			const groceryStore = createStore();
-
-			// Forgot to wrap the `getSecretDiscount` in a { selectors: {} } object.
-
-			expect( () =>
-				unlock( registry.select( groceryStore ) )
-			).toThrowError( /no experimental selectors were defined/ );
 		} );
 	} );
 
 	describe( 'private actions', () => {
 		it( 'should expose public actions by default', () => {
 			const groceryStore = createStore();
-			registerPrivateActionsAndSelectors( groceryStore, {
+			unlock( groceryStore ).registerPrivateActions( groceryStore, {
 				setSecretDiscount,
 			} );
 			const publicActions = registry.dispatch( groceryStore );
@@ -142,7 +123,7 @@ describe( 'Private data APIs', () => {
 
 		it( 'should not expose private actions by default', () => {
 			const groceryStore = createStore();
-			registerPrivateActionsAndSelectors( groceryStore, {
+			unlock( groceryStore ).registerPrivateActions( {
 				setSecretDiscount,
 			} );
 			const publicActions = registry.dispatch( groceryStore );
@@ -151,7 +132,7 @@ describe( 'Private data APIs', () => {
 
 		it( 'should make private actions available via unlock)', () => {
 			const groceryStore = createStore();
-			registerPrivateActionsAndSelectors( groceryStore, {
+			unlock( groceryStore ).registerPrivateActions( {
 				setSecretDiscount,
 			} );
 			const privateActions = unlock( registry.dispatch( groceryStore ) );
@@ -162,11 +143,12 @@ describe( 'Private data APIs', () => {
 
 		it( 'should work with both private actions and private selectors at the same time', () => {
 			const groceryStore = createStore();
-			registerPrivateActionsAndSelectors(
-				groceryStore,
-				{ setSecretDiscount },
-				{ getSecretDiscount }
-			);
+			unlock( groceryStore ).registerPrivateActions( {
+				setSecretDiscount,
+			} );
+			unlock( groceryStore ).registerPrivateSelectors( {
+				getSecretDiscount,
+			} );
 			const privateActions = unlock( registry.dispatch( groceryStore ) );
 			const privateSelectors = unlock( registry.select( groceryStore ) );
 			expect( privateActions.setSecretDiscount ).toEqual(
@@ -179,7 +161,7 @@ describe( 'Private data APIs', () => {
 
 		it( 'should dispatch private actions like regular actions', () => {
 			const groceryStore = createStore();
-			registerPrivateActionsAndSelectors( groceryStore, {
+			unlock( groceryStore ).registerPrivateActions( {
 				setSecretDiscount,
 			} );
 			const privateActions = unlock( registry.dispatch( groceryStore ) );
@@ -191,31 +173,21 @@ describe( 'Private data APIs', () => {
 
 		it( 'should dispatch private action thunks like regular actions', () => {
 			const groceryStore = createStore();
-			registerPrivateActionsAndSelectors(
-				groceryStore,
-				{
-					setSecretDiscountThunk:
-						( price ) =>
-						( { dispatch } ) => {
-							dispatch( { type: 'SET_PRIVATE_PRICE', price } );
-						},
-				},
-				{ getSecretDiscount }
-			);
+			unlock( groceryStore ).registerPrivateActions( {
+				setSecretDiscountThunk:
+					( price ) =>
+					( { dispatch } ) => {
+						dispatch( { type: 'SET_PRIVATE_PRICE', price } );
+					},
+			} );
+			unlock( groceryStore ).registerPrivateSelectors( {
+				getSecretDiscount,
+			} );
 			const privateActions = unlock( registry.dispatch( groceryStore ) );
 			privateActions.setSecretDiscountThunk( 100 );
 			expect(
 				unlock( registry.select( groceryStore ) ).getSecretDiscount()
 			).toEqual( 100 );
-		} );
-
-		it( 'should throw a clear error when no private actions are found in the unlock() call', () => {
-			const groceryStore = createStore();
-			// Forgot to wrap the `setSecretDiscount` in an { actions: {} } object.
-
-			expect( () =>
-				unlock( registry.dispatch( groceryStore ) )
-			).toThrowError( /no experimental actions were defined/ );
 		} );
 	} );
 } );

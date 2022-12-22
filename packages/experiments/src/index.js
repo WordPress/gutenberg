@@ -1,5 +1,1 @@
-export {
-	__dangerousOptInToUnstableAPIsOnlyForCoreModules,
-	configureLockTarget,
-	createExperiment,
-} from './implementation';
+export { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from './implementation';
