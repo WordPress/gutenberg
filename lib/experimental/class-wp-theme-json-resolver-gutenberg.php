@@ -157,21 +157,4 @@ class WP_Theme_JSON_Resolver_Gutenberg extends WP_Theme_JSON_Resolver_Base {
 		return new WP_Theme_JSON_Gutenberg( $config, 'blocks' );
 	}
 
-	/**
-	 * When given an array, this will remove any keys with the name `//`.
-	 *
-	 * @param array $array The array to filter.
-	 * @return array The filtered array.
-	 */
-	private static function remove_JSON_comments( $array ) {
-		unset( $array['//'] );
-		foreach ( $array as $k => $v ) {
-			if ( is_array( $v ) ) {
-				$array[ $k ] = static::remove_JSON_comments( $v );
-			}
-		}
-
-		return $array;
-	}
-
 }
