@@ -99,7 +99,6 @@ jobs:
                   curl --version
                   git --version
                   svn --version
-                  composer --version
                   locale -a
 
             - name: Start Docker environment
