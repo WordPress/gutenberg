@@ -1009,8 +1009,14 @@ class WP_HTML_Tag_Processor {
 			return false;
 		}
 
-		$attribute_start     = $this->parsed_bytes;
-		$attribute_name      = substr( $this->html, $attribute_start, $name_length );
+		$attribute_start = $this->parsed_bytes;
+		/**
+		 * Uppercase characters in the attributes names are converted into lowercase characters
+		 * according to the HTML parsing spec:
+		 *
+		 * @see https://html.spec.whatwg.org/multipage/parsing.html#attribute-name-state
+		 */
+		$attribute_name      = strtolower( substr( $this->html, $attribute_start, $name_length ) );
 		$this->parsed_bytes += $name_length;
 		if ( $this->parsed_bytes >= strlen( $this->html ) ) {
 			return false;
