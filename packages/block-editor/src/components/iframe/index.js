@@ -116,7 +116,7 @@ function Iframe(
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
 	const styles = useParsedAssets( assets?.styles );
 	const styleIds = styles.map( ( style ) => style.id );
-	const compatStyles = useCompatibilityStyles( styles );
+	const compatStyles = useCompatibilityStyles();
 	const neededCompatStyles = compatStyles.filter(
 		( style ) => ! styleIds.includes( style.id )
 	);
