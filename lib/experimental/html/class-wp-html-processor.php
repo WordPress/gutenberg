@@ -20,22 +20,24 @@
 class WP_HTML_Processor_Scan_State {
 	public $budget = 1000;
 	public $open_tags = array();
-	public $bail_depth = 0;
 	public $match_depth = null;
 
 	public function relative_depth() {
 		return count( $this->open_tags );
 	}
-
-	public function also_scan_siblings() {
-		$this->bail_depth = -1;
-	}
 }
 
 
 class WP_HTML_Processor extends WP_HTML_Tag_Processor {
-	public static function new_state() {
-		return new WP_HTML_Processor_Scan_State();
+	public function new_state() {
+		$state = new WP_HTML_Processor_Scan_State();
+		$tag_name = $this->get_tag();
+
+		if ( ! self::is_html_void_element( $tag_name  ) && ! $this->is_tag_closer() ) {
+			$state->open_tags[] = $tag_name;
+		}
+
+		return $state;
 	}
 
 	public function balanced_next( WP_HTML_Processor_Scan_State $state, $query = null ) {
@@ -98,13 +100,9 @@ class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 				: $state->relative_depth();
 
 			/*
-			 * Step 2. If we've reached the depth at which we want to stop searching,
-			 * then bail at the current tag. This is mostly used to stop at the end
-			 * of the opening tag's closing tag, but if set negative can continue
-			 * scanning sibling elements (-1) or parents (-2) and so on.
+			 * Step 2. Bail if we've reached the end of the tag in which we started.
 			 */
-
-			if ( $state->bail_depth === $depth ) {
+			if ( 0 === $depth ) {
 				return false;
 			}
 
@@ -119,7 +117,7 @@ class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 			 * searching once we've exited the tag on which we started, or reach its parent.
 			 */
 
-			if ( ! isset( $state->match_depth ) || $state->match_depth  === $depth ) {
+			if ( ! isset( $state->match_depth ) || $state->match_depth + 1 === $depth ) {
 				$this->parse_query( $query );
 				if ( $this->matches() ) {
 					return true;

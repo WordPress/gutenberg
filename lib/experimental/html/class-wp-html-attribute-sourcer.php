@@ -62,19 +62,6 @@ if ( ! function_exists( 'array_is_list' ) ) {
 	}
 }
 
-class Selector {
-	public $element = null;
-	public $class = null;
-	public $hash = null;
-	public $has_attribute = null;
-	public $then = null;
-}
-
-class ParseResult {
-	public $last_index;
-	public $selector = null;
-}
-
 class WP_HTML_Attribute_Sourcer {
 	/**
 	 * Attributes definitions, typically from `block.json`.
@@ -208,7 +195,7 @@ class WP_HTML_Attribute_Sourcer {
 						'tag' => $tags->get_tag(),
 						'selector' => $next
 					] );
-					$state = WP_HTML_Processor::new_state();
+					$state = $tags->new_state();
 					while ( $tags->balanced_next( $state ) ) {
 						continue;
 					}
@@ -234,7 +221,7 @@ class WP_HTML_Attribute_Sourcer {
 						'tag' => $tags->get_tag(),
 						'selector' => $next
 					] );
-					$state = WP_HTML_Processor::new_state();
+					$state = $tags->new_state();
 					$state->match_depth = 1;
 					while ( $tags->balanced_next( $state ) ) {
 						if ( null === self::select_match( $tags, $next ) ) {
@@ -260,7 +247,7 @@ class WP_HTML_Attribute_Sourcer {
 						'tag' => $tags->get_tag(),
 						'selector' => $next
 					] );
-					$state = WP_HTML_Processor::new_state();
+					$state = $tags->new_state();
 					while ( $tags->balanced_next( $state ) ) {
 						if ( null === self::select_match( $tags, $next ) ) {
 							continue;
