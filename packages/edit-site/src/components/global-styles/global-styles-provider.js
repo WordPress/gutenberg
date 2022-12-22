@@ -49,44 +49,41 @@ const cleanEmptyObject = ( object ) => {
 };
 
 function useGlobalStylesUserConfig() {
-	const { globalStylesId, isReady, settings, styles } = useSelect(
-		( select ) => {
-			const { getEditedEntityRecord, hasFinishedResolution } =
-				select( coreStore );
-			const _globalStylesId =
-				select( coreStore ).__experimentalGetCurrentGlobalStylesId();
-			const record = _globalStylesId
-				? getEditedEntityRecord(
+	const {
+		globalStylesId,
+		isReady,
+		settings,
+		styles,
+		userConfigRevisionsCount,
+	} = useSelect( ( select ) => {
+		const { getEditedEntityRecord, hasFinishedResolution } =
+			select( coreStore );
+		const _globalStyles =
+			select( coreStore ).__experimentalGetCurrentGlobalStyles();
+		const record = _globalStyles?.id
+			? getEditedEntityRecord( 'root', 'globalStyles', _globalStyles.id )
+			: undefined;
+
+		let hasResolved = false;
+		if ( hasFinishedResolution( '__experimentalGetCurrentGlobalStyles' ) ) {
+			hasResolved = _globalStyles?.id
+				? hasFinishedResolution( 'getEditedEntityRecord', [
 						'root',
 						'globalStyles',
-						_globalStylesId
-				  )
-				: undefined;
+						_globalStyles.id,
+				  ] )
+				: true;
+		}
 
-			let hasResolved = false;
-			if (
-				hasFinishedResolution(
-					'__experimentalGetCurrentGlobalStylesId'
-				)
-			) {
-				hasResolved = _globalStylesId
-					? hasFinishedResolution( 'getEditedEntityRecord', [
-							'root',
-							'globalStyles',
-							_globalStylesId,
-					  ] )
-					: true;
-			}
-
-			return {
-				globalStylesId: _globalStylesId,
-				isReady: hasResolved,
-				settings: record?.settings,
-				styles: record?.styles,
-			};
-		},
-		[]
-	);
+		return {
+			globalStylesId: _globalStyles?.id,
+			isReady: hasResolved,
+			settings: record?.settings,
+			styles: record?.styles,
+			userConfigRevisionsCount:
+				record?._links?.[ 'version-history' ]?.[ 0 ]?.count || 0,
+		};
+	}, [] );
 
 	const { getEditedEntityRecord } = useSelect( coreStore );
 	const { editEntityRecord } = useDispatch( coreStore );
@@ -123,7 +120,7 @@ function useGlobalStylesUserConfig() {
 		[ globalStylesId ]
 	);
 
-	return [ isReady, config, setConfig ];
+	return [ isReady, config, setConfig, userConfigRevisionsCount ];
 }
 
 function useGlobalStylesBaseConfig() {
@@ -137,8 +134,12 @@ function useGlobalStylesBaseConfig() {
 }
 
 function useGlobalStylesContext() {
-	const [ isUserConfigReady, userConfig, setUserConfig ] =
-		useGlobalStylesUserConfig();
+	const [
+		isUserConfigReady,
+		userConfig,
+		setUserConfig,
+		userConfigRevisionsCount,
+	] = useGlobalStylesUserConfig();
 	const [ isBaseConfigReady, baseConfig ] = useGlobalStylesBaseConfig();
 	const mergedConfig = useMemo( () => {
 		if ( ! baseConfig || ! userConfig ) {
@@ -152,6 +153,7 @@ function useGlobalStylesContext() {
 			user: userConfig,
 			base: baseConfig,
 			merged: mergedConfig,
+			userConfigRevisionsCount,
 			setUserConfig,
 		};
 	}, [
@@ -161,6 +163,7 @@ function useGlobalStylesContext() {
 		setUserConfig,
 		isUserConfigReady,
 		isBaseConfigReady,
+		userConfigRevisionsCount,
 	] );
 
 	return context;

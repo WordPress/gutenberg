@@ -16,6 +16,25 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 	 * @return void
 	 */
 	public function register_routes() {
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<id>[\/\w-]+)/revisions',
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_item_revisions' ),
+					'permission_callback' => array( $this, 'get_item_permissions_check' ),
+					'args'                => array(
+						'id' => array(
+							'description'       => __( 'The id of a template' ),
+							'type'              => 'string',
+							'sanitize_callback' => array( $this, '_sanitize_global_styles_callback' ),
+						),
+					),
+				),
+				'schema' => array( $this, 'get_public_item_schema' ),
+			)
+		);
 		parent::register_routes();
 	}
 
@@ -84,6 +103,59 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 
 		return $this->add_additional_fields_schema( $this->schema );
 	}
+	/**
+	 * Returns revisions of the given global styles config custom post type.
+	 *
+	 * @since 6.2
+	 *
+	 * @param WP_REST_Request $request The request instance.
+	 *
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function get_item_revisions( $request ) {
+		$post = $this->get_post( $request['id'] );
+		if ( is_wp_error( $post ) ) {
+			return $post;
+		}
+		$revisions                        = array();
+		$raw_config                       = json_decode( $post->post_content, true );
+		$is_global_styles_user_theme_json = isset( $raw_config['isGlobalStylesUserThemeJSON'] ) && true === $raw_config['isGlobalStylesUserThemeJSON'];
+
+		if ( $is_global_styles_user_theme_json ) {
+			$user_theme_revisions = wp_get_post_revisions(
+				$post->ID,
+				array(
+					'author'         => $post->post_author,
+					'posts_per_page' => 10,
+				)
+			);
+
+			if ( ! empty( $user_theme_revisions ) ) {
+				// Mostly taken from wp_prepare_revisions_for_js().
+				foreach ( $user_theme_revisions as $revision ) {
+					$raw_revision_config = json_decode( $revision->post_content, true );
+					$config              = ( new WP_Theme_JSON_Gutenberg( $raw_revision_config, 'custom' ) )->get_raw_data();
+					$now_gmt             = time();
+					$modified            = strtotime( $revision->post_modified );
+					$modified_gmt        = strtotime( $revision->post_modified_gmt . ' +0000' );
+					/* translators: %s: Human-readable time difference. */
+					$time_ago    = sprintf( __( '%s ago', 'gutenberg' ), human_time_diff( $modified_gmt, $now_gmt ) );
+					$date_short  = date_i18n( _x( 'j M @ H:i', 'revision date short format', 'gutenberg' ), $modified );
+					$revisions[] = array(
+						'styles'   => ! empty( $config['styles'] ) ? $config['styles'] : new stdClass(),
+						'settings' => ! empty( $config['settings'] ) ? $config['settings'] : new stdClass(),
+						'title'    => array(
+							'raw'      => $revision->post_modified,
+							/* translators: 1: Human-readable time difference, 2: short date combined to show rendered revision date. */
+							'rendered' => sprintf( __( '%1$s (%2$s)', 'gutenberg' ), $time_ago, $date_short ),
+						),
+						'id'       => $revision->ID,
+					);
+				}
+			}
+		}
+		return rest_ensure_response( $revisions );
+	}
 
 	/**
 	 * Prepare a global styles config output for response.
@@ -133,38 +205,6 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 			$data['styles'] = ! empty( $config['styles'] ) && $is_global_styles_user_theme_json ? $config['styles'] : new stdClass();
 		}
 
-		if ( $is_global_styles_user_theme_json && rest_is_field_included( 'revisions', $fields ) ) {
-			$user_theme_revisions = wp_get_post_revisions(
-				$post->ID,
-				array(
-					'author'         => $post->post_author,
-					'posts_per_page' => 10,
-				)
-			);
-			if ( empty( $user_theme_revisions ) ) {
-				$data['revisions'] = array();
-			} else {
-				$user_revisions = array();
-				// Mostly taken from wp_prepare_revisions_for_js().
-				foreach ( $user_theme_revisions as $revision ) {
-					$raw_revision_config = json_decode( $revision->post_content, true );
-					$config              = ( new WP_Theme_JSON_Gutenberg( $raw_revision_config, 'custom' ) )->get_raw_data();
-					$now_gmt             = time();
-					$modified            = strtotime( $revision->post_modified );
-					$modified_gmt        = strtotime( $revision->post_modified_gmt . ' +0000' );
-					$user_revisions[]    = array(
-						'styles'    => ! empty( $config['styles'] ) ? $config['styles'] : new stdClass(),
-						'settings'  => ! empty( $config['settings'] ) ? $config['settings'] : new stdClass(),
-						'dateShort' => date_i18n( _x( 'j M @ H:i', 'revision date short format' ), $modified ),
-						/* translators: %s: Human-readable time difference. */
-						'timeAgo'   => sprintf( __( '%s ago' ), human_time_diff( $modified_gmt, $now_gmt ) ),
-						'id'        => $revision->ID,
-					);
-				}
-				$data['revisions'] = $user_revisions;
-			}
-		}
-
 		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
 		$data    = $this->add_additional_fields_to_object( $data, $request );
 		$data    = $this->filter_response_by_context( $data, $context );
@@ -174,6 +214,15 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 
 		if ( rest_is_field_included( '_links', $fields ) || rest_is_field_included( '_embedded', $fields ) ) {
 			$links = $this->prepare_links( $post->ID );
+			if ( $is_global_styles_user_theme_json ) {
+				$revisions                = wp_get_latest_revision_id_and_total_count( $post->ID );
+				$revisions_count          = ! is_wp_error( $revisions ) ? $revisions['count'] : 0;
+				$revisions_base           = sprintf( '/%s/%s/%d/revisions', $this->namespace, $this->rest_base, $post->ID );
+				$links['version-history'] = array(
+					'href'  => rest_url( $revisions_base ),
+					'count' => $revisions_count,
+				);
+			}
 			$response->add_links( $links );
 			if ( ! empty( $links['self']['href'] ) ) {
 				$actions = $this->get_available_actions();
