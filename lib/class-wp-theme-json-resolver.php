@@ -407,7 +407,7 @@ class WP_Theme_JSON_Resolver_Base {
 		/*
 		 * Bail early if the theme does not support a theme.json.
 		 *
-		 * Since wp_theme_has_theme_json() only supports the active
+		 * Since wp_theme_has_theme_json only supports the active
 		 * theme, the extra condition for whether $theme is the active theme is
 		 * present here.
 		 */
@@ -419,14 +419,16 @@ class WP_Theme_JSON_Resolver_Base {
 		$post_type_filter = 'wp_global_styles';
 		$stylesheet       = $theme->get_stylesheet();
 		$args             = array(
-			'posts_per_page'      => 1,
-			'orderby'             => 'date',
-			'order'               => 'desc',
-			'post_type'           => $post_type_filter,
-			'post_status'         => $post_status_filter,
-			'ignore_sticky_posts' => true,
-			'no_found_rows'       => true,
-			'tax_query'           => array(
+			'posts_per_page'         => 1,
+			'orderby'                => 'date',
+			'order'                  => 'desc',
+			'post_type'              => $post_type_filter,
+			'post_status'            => $post_status_filter,
+			'ignore_sticky_posts'    => true,
+			'no_found_rows'          => true,
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'tax_query'              => array(
 				array(
 					'taxonomy' => 'wp_theme',
 					'field'    => 'name',
@@ -438,7 +440,7 @@ class WP_Theme_JSON_Resolver_Base {
 		$global_style_query = new WP_Query();
 		$recent_posts       = $global_style_query->query( $args );
 		if ( count( $recent_posts ) === 1 ) {
-			$user_cpt = get_post( $recent_posts[0], ARRAY_A );
+			$user_cpt = get_object_vars( $recent_posts[0] );
 		} elseif ( $create_post ) {
 			$cpt_post_id = wp_insert_post(
 				array(
@@ -454,7 +456,7 @@ class WP_Theme_JSON_Resolver_Base {
 				true
 			);
 			if ( ! is_wp_error( $cpt_post_id ) ) {
-				$user_cpt = get_post( $cpt_post_id, ARRAY_A );
+				$user_cpt = get_object_vars( get_post( $cpt_post_id ) );
 			}
 		}
 
