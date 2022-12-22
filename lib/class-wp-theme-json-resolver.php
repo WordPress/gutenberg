@@ -182,7 +182,7 @@ class WP_Theme_JSON_Resolver {
 		 */
 		$theme_json   = apply_filters( 'wp_theme_json_data_default', new WP_Theme_JSON_Data( $config, 'default' ) );
 		$config       = $theme_json->get_data();
-		static::$core = new WP_Theme_JSON( $config, 'default' );
+		static::$core = new WP_Theme_JSON_Gutenberg( $config, 'default' );
 
 		return static::$core;
 	}
@@ -264,7 +264,7 @@ class WP_Theme_JSON_Resolver {
 			 */
 			$theme_json      = apply_filters( 'wp_theme_json_data_theme', new WP_Theme_JSON_Data( $theme_json_data, 'theme' ) );
 			$theme_json_data = $theme_json->get_data();
-			static::$theme   = new WP_Theme_JSON( $theme_json_data );
+			static::$theme   = new WP_Theme_JSON_Gutenberg( $theme_json_data );
 
 			if ( $wp_theme->parent() ) {
 				// Get parent theme.json.
@@ -272,7 +272,7 @@ class WP_Theme_JSON_Resolver {
 				if ( '' !== $parent_theme_json_file ) {
 					$parent_theme_json_data = static::read_json_file( $parent_theme_json_file );
 					$parent_theme_json_data = static::translate( $parent_theme_json_data, $wp_theme->parent()->get( 'TextDomain' ) );
-					$parent_theme           = new WP_Theme_JSON( $parent_theme_json_data );
+					$parent_theme           = new WP_Theme_JSON_Gutenberg( $parent_theme_json_data );
 
 					/*
 					 * Merge the child theme.json into the parent theme.json.
@@ -294,7 +294,7 @@ class WP_Theme_JSON_Resolver {
 		 * So we take theme supports, transform it to theme.json shape
 		 * and merge the static::$theme upon that.
 		 */
-		$theme_support_data = WP_Theme_JSON::get_from_editor_settings( get_default_block_editor_settings() );
+		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( get_default_block_editor_settings() );
 		if ( ! static::theme_has_support() ) {
 			if ( ! isset( $theme_support_data['settings']['color'] ) ) {
 				$theme_support_data['settings']['color'] = array();
@@ -323,7 +323,7 @@ class WP_Theme_JSON_Resolver {
 			// Classic themes without a theme.json don't support global duotone.
 			$theme_support_data['settings']['color']['defaultDuotone'] = false;
 		}
-		$with_theme_supports = new WP_Theme_JSON( $theme_support_data );
+		$with_theme_supports = new WP_Theme_JSON_Gutenberg( $theme_support_data );
 		$with_theme_supports->merge( static::$theme );
 		return $with_theme_supports;
 	}
@@ -369,7 +369,7 @@ class WP_Theme_JSON_Resolver {
 		$theme_json = apply_filters( 'wp_theme_json_data_blocks', new WP_Theme_JSON_Data( $config, 'blocks' ) );
 		$config     = $theme_json->get_data();
 
-		static::$blocks = new WP_Theme_JSON( $config, 'blocks' );
+		static::$blocks = new WP_Theme_JSON_Gutenberg( $config, 'blocks' );
 		return static::$blocks;
 	}
 
@@ -451,7 +451,7 @@ class WP_Theme_JSON_Resolver {
 		} elseif ( $create_post ) {
 			$cpt_post_id = wp_insert_post(
 				array(
-					'post_content' => '{"version": ' . WP_Theme_JSON::LATEST_SCHEMA . ', "isGlobalStylesUserThemeJSON": true }',
+					'post_content' => '{"version": ' . WP_Theme_JSON_Gutenberg::LATEST_SCHEMA . ', "isGlobalStylesUserThemeJSON": true }',
 					'post_status'  => 'publish',
 					'post_title'   => 'Custom Styles', // Do not make string translatable, see https://core.trac.wordpress.org/ticket/54518.
 					'post_type'    => $post_type_filter,
@@ -500,7 +500,7 @@ class WP_Theme_JSON_Resolver {
 				 */
 				$theme_json = apply_filters( 'wp_theme_json_data_user', new WP_Theme_JSON_Data( $config, 'custom' ) );
 				$config     = $theme_json->get_data();
-				return new WP_Theme_JSON( $config, 'custom' );
+				return new WP_Theme_JSON_Gutenberg( $config, 'custom' );
 			}
 
 			// Very important to verify that the flag isGlobalStylesUserThemeJSON is true.
@@ -518,7 +518,7 @@ class WP_Theme_JSON_Resolver {
 		/** This filter is documented in wp-includes/class-wp-theme-json-resolver.php */
 		$theme_json   = apply_filters( 'wp_theme_json_data_user', new WP_Theme_JSON_Data( $config, 'custom' ) );
 		$config       = $theme_json->get_data();
-		static::$user = new WP_Theme_JSON( $config, 'custom' );
+		static::$user = new WP_Theme_JSON_Gutenberg( $config, 'custom' );
 
 		return static::$user;
 	}
@@ -673,7 +673,7 @@ class WP_Theme_JSON_Resolver {
 				$decoded_file = wp_json_file_decode( $path, array( 'associative' => true ) );
 				if ( is_array( $decoded_file ) ) {
 					$translated = static::translate( $decoded_file, wp_get_theme()->get( 'TextDomain' ) );
-					$variation  = ( new WP_Theme_JSON( $translated ) )->get_raw_data();
+					$variation  = ( new WP_Theme_JSON_Gutenberg( $translated ) )->get_raw_data();
 					if ( empty( $variation['title'] ) ) {
 						$variation['title'] = basename( $path, '.json' );
 					}
