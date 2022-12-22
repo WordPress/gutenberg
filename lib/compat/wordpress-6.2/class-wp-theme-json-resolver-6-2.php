@@ -98,21 +98,6 @@ class WP_Theme_JSON_Resolver_6_2 extends WP_Theme_JSON_Resolver_Base {
 	}
 
 	/**
-	 * Determines whether the active theme has a theme.json file.
-	 *
-	 * @since 5.8.0
-	 * @since 5.9.0 Added a check in the parent theme.
-	 * @deprecated 6.2.0 Use wp_theme_has_theme_json() instead.
-	 *
-	 * @return bool
-	 */
-	public static function theme_has_support() {
-		_deprecated_function( __METHOD__, '6.2.0', 'wp_theme_has_theme_json()' );
-
-		return wp_theme_has_theme_json();
-	}
-
-	/**
 	 * Returns the data merged from multiple origins.
 	 *
 	 * There are four sources of data (origins) for a site:

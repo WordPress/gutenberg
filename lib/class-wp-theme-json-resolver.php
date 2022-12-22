@@ -57,14 +57,6 @@ class WP_Theme_JSON_Resolver_Base {
 	protected static $theme = null;
 
 	/**
-	 * Whether or not the theme supports theme.json.
-	 *
-	 * @since 5.8.0
-	 * @var bool
-	 */
-	protected static $theme_has_support = null;
-
-	/**
 	 * Container for data coming from the user.
 	 *
 	 * @since 5.9.0
@@ -596,18 +588,14 @@ class WP_Theme_JSON_Resolver_Base {
 	 *
 	 * @since 5.8.0
 	 * @since 5.9.0 Added a check in the parent theme.
+	 * @deprecated 6.2.0 Use wp_theme_has_theme_json() instead.
 	 *
 	 * @return bool
 	 */
 	public static function theme_has_support() {
-		if ( ! isset( static::$theme_has_support ) ) {
-			static::$theme_has_support = (
-				static::get_file_path_from_theme( 'theme.json' ) !== '' ||
-				static::get_file_path_from_theme( 'theme.json', true ) !== ''
-			);
-		}
+		_deprecated_function( __METHOD__, '6.2.0', 'wp_theme_has_theme_json()' );
 
-		return static::$theme_has_support;
+		return wp_theme_has_theme_json();
 	}
 
 	/**
@@ -650,7 +638,6 @@ class WP_Theme_JSON_Resolver_Base {
 		static::$theme                    = null;
 		static::$user                     = null;
 		static::$user_custom_post_type_id = null;
-		static::$theme_has_support        = null;
 		static::$i18n_schema              = null;
 	}
 
