@@ -9,6 +9,8 @@ import userEvent from '@testing-library/user-event';
  */
 import Dropdown from '..';
 
+jest.useFakeTimers();
+
 describe( 'Dropdown', () => {
 	it( 'should toggle the dropdown properly', async () => {
 		const user = userEvent.setup( {

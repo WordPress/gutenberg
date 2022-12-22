@@ -21,6 +21,8 @@ import { useState } from '@wordpress/element';
  */
 import FormTokenField from '../';
 
+jest.useFakeTimers();
+
 const FormTokenFieldWithState = ( {
 	onChange,
 	value,

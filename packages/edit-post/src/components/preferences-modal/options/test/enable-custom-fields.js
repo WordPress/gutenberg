@@ -12,6 +12,8 @@ import {
 	CustomFieldsConfirmation,
 } from '../enable-custom-fields';
 
+jest.useFakeTimers();
+
 describe( 'EnableCustomFieldsOption', () => {
 	it( 'renders a checked checkbox when custom fields are enabled', () => {
 		const { container } = render(

@@ -9,6 +9,8 @@ import userEvent from '@testing-library/user-event';
  */
 import { PanelBody } from '../body';
 
+jest.useFakeTimers();
+
 describe( 'PanelBody', () => {
 	describe( 'basic rendering', () => {
 		it( 'should render an empty div with the matching className', () => {

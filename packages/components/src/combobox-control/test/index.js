@@ -14,6 +14,8 @@ import { useState } from '@wordpress/element';
  */
 import ComboboxControl from '../';
 
+jest.useFakeTimers();
+
 const timezones = [
 	{ label: 'Greenwich Mean Time', value: 'GMT' },
 	{ label: 'Universal Coordinated Time', value: 'UTC' },
