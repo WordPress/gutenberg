@@ -519,9 +519,15 @@ class WP_Theme_JSON_Resolver_Base {
 	/**
 	 * Returns the data merged from multiple origins.
 	 *
-	 * There are three sources of data (origins) for a site:
-	 * default, theme, and custom. The custom's has higher priority
-	 * than the theme's, and the theme's higher than default's.
+	 * There are four sources of data (origins) for a site:
+	 *
+	 * - default => WordPress
+	 * - blocks  => each one of the blocks provides data for itself
+	 * - theme   => the active theme
+	 * - custom  => data provided by the user
+	 *
+	 * The custom's has higher priority than the theme's, the theme's higher than blocks',
+	 * and block's higher than default's.
 	 *
 	 * Unlike the getters
 	 * {@link https://developer.wordpress.org/reference/classes/wp_theme_json_resolver/get_core_data/ get_core_data},
@@ -529,7 +535,7 @@ class WP_Theme_JSON_Resolver_Base {
 	 * and {@link https://developer.wordpress.org/reference/classes/wp_theme_json_resolver/get_user_data/ get_user_data},
 	 * this method returns data after it has been merged with the previous origins.
 	 * This means that if the same piece of data is declared in different origins
-	 * (user, theme, and core), the last origin overrides the previous.
+	 * (default, blocks, theme, custom), the last origin overrides the previous.
 	 *
 	 * For example, if the user has set a background color
 	 * for the paragraph block, and the theme has done it as well,
@@ -540,8 +546,9 @@ class WP_Theme_JSON_Resolver_Base {
 	 *              added the `$origin` parameter.
 	 * @since 6.1.0 Added block data and generation of spacingSizes array.
 	 *
-	 * @param string $origin Optional. To what level should we merge data.
-	 *                       Valid values are 'theme' or 'custom'. Default 'custom'.
+	 * @param string $origin Optional. To what level should we merge data:'default', 'blocks', 'theme' or 'custom'.
+	 *                       'custom' is used as default value as well as fallback value if the origin is unknown.
+	 *
 	 * @return WP_Theme_JSON
 	 */
 	public static function get_merged_data( $origin = 'custom' ) {
@@ -550,16 +557,24 @@ class WP_Theme_JSON_Resolver_Base {
 		}
 
 		$result = static::get_core_data();
-		$result->merge( static::get_block_data() );
-		$result->merge( static::get_theme_data() );
-
-		if ( 'custom' === $origin ) {
-			$result->merge( static::get_user_data() );
+		if ( 'default' === $origin ) {
+			$result->set_spacing_sizes();
+			return $result;
 		}
 
-		// Generate the default spacingSizes array based on the merged spacingScale settings.
-		$result->set_spacing_sizes();
+		$result->merge( static::get_block_data() );
+		if ( 'blocks' === $origin ) {
+			return $result;
+		}
 
+		$result->merge( static::get_theme_data() );
+		if ( 'theme' === $origin ) {
+			$result->set_spacing_sizes();
+			return $result;
+		}
+
+		$result->merge( static::get_user_data() );
+		$result->set_spacing_sizes();
 		return $result;
 	}
 
