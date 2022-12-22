@@ -20,22 +20,6 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-    # Runs the PHPUnit tests for Gutenberg.
-    #
-    # Performs the following steps:
-    # - Sets environment variables.
-    # - Checks out the repository.
-    # - Sets up Node.js.
-    # - Sets up PHP.
-    # - Installs Composer dependencies.
-    # - Installs npm dependencies
-    # - Logs general debug information about the runner.
-    # - Logs Docker debug information (about the Docker installation within the runner).
-    # - Starts the wp-env Docker containers.
-    # - Logs the running Docker containers.
-    # - Logs debug information about what's installed within the wp-env Docker containers.
-    # - Install WordPress and Gutenberg within the Docker container.
-    # - Run the PHPUnit tests.
     test-php:
         name: ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }} on ${{ matrix.os }}
         runs-on: ${{ matrix.os }}

@@ -27,21 +27,6 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-    # Runs PHP coding standards checks.
-    #
-    # Violations are reported inline with annotations.
-    #
-    # Performs the following steps:
-    # - Checks out the repository.
-    # - Sets up PHP.
-    # - Configures caching for PHPCS scans.
-    # - Installs Composer dependencies.
-    # - Make Composer packages available globally.
-    # - Runs PHPCS on the full codebase with warnings suppressed.
-    # - Generate a report for displaying issues as pull request annotations.
-    # - Runs PHPCS on the `tests` directory without warnings suppressed.
-    # - Generate a report for displaying `test` directory issues as pull request annotations.
-    # - Ensures version-controlled files are not modified or deleted.
     phpcs:
         name: PHP coding standards
         runs-on: ubuntu-latest
