@@ -94,7 +94,6 @@ jobs:
 
             - name: General debug information
               run: |
-                  php --version
                   npm --version
                   node --version
                   curl --version
