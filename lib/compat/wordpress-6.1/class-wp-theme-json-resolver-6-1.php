@@ -18,14 +18,6 @@
 class WP_Theme_JSON_Resolver_6_1 extends WP_Theme_JSON_Resolver_Base {
 
 	/**
-	 * Container for data coming from core.
-	 *
-	 * @since 5.8.0
-	 * @var WP_Theme_JSON
-	 */
-	protected static $core = null;
-
-	/**
 	 * Given a theme.json structure modifies it in place
 	 * to update certain values by its translated strings
 	 * according to the language set by the user.
