@@ -316,7 +316,7 @@ function IframeIfReady( props, ref ) {
 		return null;
 	}
 
-	return <Iframe { ...props } forwardRef={ ref } />;
+	return <Iframe { ...props } forwardedRef={ ref } />;
 }
 
 export default forwardRef( IframeIfReady );
