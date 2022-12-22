@@ -131,7 +131,7 @@ An array of categories, renders a `CategorySelect` sub-component when passed in 
 
 #### `categorySuggestions`: `{ [ categoryName: Entity[ 'name' ] ]: Entity }`
 
-An array of categories, renders a `FormTokenField` component when passed in conjunction with `onCategoryChange`.
+An object of categories, renders a `FormTokenField` component when passed in conjunction with `onCategoryChange`.
 
 -   Required: No
 -   Platform: Web
