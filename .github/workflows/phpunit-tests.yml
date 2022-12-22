@@ -9,6 +9,8 @@ on:
             - trunk
             - 'release/**'
             - 'wp/**'
+    # Allow manually triggering the workflow.
+    workflow_dispatch:
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:

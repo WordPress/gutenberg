@@ -16,6 +16,8 @@ on:
             - 'phpcs.xml.dist'
             # Changes to workflow files should always verify all workflows are successful.
             - '.github/workflows/*.yml'
+    # Allow manually triggering the workflow.
+    workflow_dispatch:
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
