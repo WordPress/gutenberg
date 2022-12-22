@@ -22,11 +22,6 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 	border-radius: $radius-block-ui * 4;
 	box-shadow: $shadow-modal;
 
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: $grid-unit-10;
-
 	.edit-site-layout.is-full-canvas & {
 		top: 0;
 		left: 0;
@@ -50,14 +45,6 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 
 	@include break-small {
 		width: calc(#{$nav-sidebar-width} - #{$canvas-padding * 2});
-	}
-
-	.components-button {
-		height: $grid-unit-40;
-	}
-
-	.components-button {
-		height: $grid-unit-40;
 	}
 }
 
