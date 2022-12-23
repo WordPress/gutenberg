@@ -12,10 +12,6 @@ import ImageSizeControl from '../index';
 describe( 'ImageSizeControl', () => {
 	const mockOnChange = jest.fn();
 	const mockOnChangeImage = jest.fn();
-	const getHeightInput = () =>
-		screen.getByRole( 'spinbutton', { name: 'Height' } );
-	const getWidthInput = () =>
-		screen.getByRole( 'spinbutton', { name: 'Width' } );
 
 	afterEach( () => {
 		// Cleanup on exiting.
@@ -34,8 +30,12 @@ describe( 'ImageSizeControl', () => {
 			/>
 		);
 
-		expect( getHeightInput().value ).toBe( '300' );
-		expect( getWidthInput().value ).toBe( '400' );
+		expect(
+			screen.getByRole( 'spinbutton', { name: 'Height' } ).value
+		).toBe( '300' );
+		expect(
+			screen.getByRole( 'spinbutton', { name: 'Width' } ).value
+		).toBe( '400' );
 	} );
 
 	it( 'returns default dimensions when custom dimensions are undefined', () => {
@@ -47,15 +47,23 @@ describe( 'ImageSizeControl', () => {
 			/>
 		);
 
-		expect( getHeightInput().value ).toBe( '100' );
-		expect( getWidthInput().value ).toBe( '200' );
+		expect(
+			screen.getByRole( 'spinbutton', { name: 'Height' } ).value
+		).toBe( '100' );
+		expect(
+			screen.getByRole( 'spinbutton', { name: 'Width' } ).value
+		).toBe( '200' );
 	} );
 
 	it( 'returns empty string when custom and default dimensions are undefined', () => {
 		render( <ImageSizeControl onChange={ mockOnChange } /> );
 
-		expect( getHeightInput().value ).toBe( '' );
-		expect( getWidthInput().value ).toBe( '' );
+		expect(
+			screen.getByRole( 'spinbutton', { name: 'Height' } ).value
+		).toBe( '' );
+		expect(
+			screen.getByRole( 'spinbutton', { name: 'Width' } ).value
+		).toBe( '' );
 	} );
 
 	it( 'returns default dimensions when initially undefined defaults are defined on rerender', () => {
@@ -65,8 +73,10 @@ describe( 'ImageSizeControl', () => {
 			<ImageSizeControl onChange={ mockOnChange } />
 		);
 
-		const heightInput = getHeightInput();
-		const widthInput = getWidthInput();
+		const heightInput = screen.getByRole( 'spinbutton', {
+			name: 'Height',
+		} );
+		const widthInput = screen.getByRole( 'spinbutton', { name: 'Width' } );
 
 		// The dimensions are initially set to an empty string.
 		expect( heightInput.value ).toBe( '' );
@@ -92,8 +102,12 @@ describe( 'ImageSizeControl', () => {
 			const user = userEvent.setup();
 			render( <ImageSizeControl onChange={ mockOnChange } /> );
 
-			const heightInput = getHeightInput();
-			const widthInput = getWidthInput();
+			const heightInput = screen.getByRole( 'spinbutton', {
+				name: 'Height',
+			} );
+			const widthInput = screen.getByRole( 'spinbutton', {
+				name: 'Width',
+			} );
 
 			expect( heightInput.value ).toBe( '' );
 			expect( widthInput.value ).toBe( '' );
@@ -115,8 +129,12 @@ describe( 'ImageSizeControl', () => {
 
 			render( <ImageSizeControl onChange={ mockOnChange } /> );
 
-			const heightInput = getHeightInput();
-			const widthInput = getWidthInput();
+			const heightInput = screen.getByRole( 'spinbutton', {
+				name: 'Height',
+			} );
+			const widthInput = screen.getByRole( 'spinbutton', {
+				name: 'Width',
+			} );
 
 			expect( heightInput.value ).toBe( '' );
 			expect( widthInput.value ).toBe( '' );
@@ -143,8 +161,12 @@ describe( 'ImageSizeControl', () => {
 				/>
 			);
 
-			const heightInput = getHeightInput();
-			const widthInput = getWidthInput();
+			const heightInput = screen.getByRole( 'spinbutton', {
+				name: 'Height',
+			} );
+			const widthInput = screen.getByRole( 'spinbutton', {
+				name: 'Width',
+			} );
 
 			expect( heightInput.value ).toBe( '100' );
 			expect( widthInput.value ).toBe( '100' );
@@ -174,8 +196,12 @@ describe( 'ImageSizeControl', () => {
 				/>
 			);
 
-			const heightInput = getHeightInput();
-			const widthInput = getWidthInput();
+			const heightInput = screen.getByRole( 'spinbutton', {
+				name: 'Height',
+			} );
+			const widthInput = screen.getByRole( 'spinbutton', {
+				name: 'Width',
+			} );
 
 			expect( heightInput.value ).toBe( '100' );
 			expect( widthInput.value ).toBe( '100' );
@@ -209,8 +235,12 @@ describe( 'ImageSizeControl', () => {
 				/>
 			);
 
-			const heightInput = getHeightInput();
-			const widthInput = getWidthInput();
+			const heightInput = screen.getByRole( 'spinbutton', {
+				name: 'Height',
+			} );
+			const widthInput = screen.getByRole( 'spinbutton', {
+				name: 'Width',
+			} );
 
 			// The initial dimension values display first.
 			expect( heightInput.value ).toBe( '300' );
@@ -267,8 +297,12 @@ describe( 'ImageSizeControl', () => {
 			await user.click( screen.getByText( '50%' ) );
 
 			// Both attributes are set to the rounded scaled value.
-			expect( getHeightInput().value ).toBe( '50' );
-			expect( getWidthInput().value ).toBe( '101' );
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Height' } ).value
+			).toBe( '50' );
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Width' } ).value
+			).toBe( '101' );
 		} );
 	} );
 
