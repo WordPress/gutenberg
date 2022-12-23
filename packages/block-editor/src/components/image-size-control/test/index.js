@@ -31,11 +31,11 @@ describe( 'ImageSizeControl', () => {
 		);
 
 		expect(
-			screen.getByRole( 'spinbutton', { name: 'Height' } ).value
-		).toBe( '300' );
+			screen.getByRole( 'spinbutton', { name: 'Height' } )
+		).toHaveValue( 300 );
 		expect(
-			screen.getByRole( 'spinbutton', { name: 'Width' } ).value
-		).toBe( '400' );
+			screen.getByRole( 'spinbutton', { name: 'Width' } )
+		).toHaveValue( 400 );
 	} );
 
 	it( 'returns default dimensions when custom dimensions are undefined', () => {
@@ -48,22 +48,22 @@ describe( 'ImageSizeControl', () => {
 		);
 
 		expect(
-			screen.getByRole( 'spinbutton', { name: 'Height' } ).value
-		).toBe( '100' );
+			screen.getByRole( 'spinbutton', { name: 'Height' } )
+		).toHaveValue( 100 );
 		expect(
-			screen.getByRole( 'spinbutton', { name: 'Width' } ).value
-		).toBe( '200' );
+			screen.getByRole( 'spinbutton', { name: 'Width' } )
+		).toHaveValue( 200 );
 	} );
 
-	it( 'returns empty string when custom and default dimensions are undefined', () => {
+	it( 'returns no value when custom and default dimensions are undefined', () => {
 		render( <ImageSizeControl onChange={ mockOnChange } /> );
 
 		expect(
-			screen.getByRole( 'spinbutton', { name: 'Height' } ).value
-		).toBe( '' );
+			screen.getByRole( 'spinbutton', { name: 'Height' } )
+		).toHaveValue( null );
 		expect(
-			screen.getByRole( 'spinbutton', { name: 'Width' } ).value
-		).toBe( '' );
+			screen.getByRole( 'spinbutton', { name: 'Width' } )
+		).toHaveValue( null );
 	} );
 
 	it( 'returns default dimensions when initially undefined defaults are defined on rerender', () => {
@@ -79,8 +79,8 @@ describe( 'ImageSizeControl', () => {
 		const widthInput = screen.getByRole( 'spinbutton', { name: 'Width' } );
 
 		// The dimensions are initially set to an empty string.
-		expect( heightInput.value ).toBe( '' );
-		expect( widthInput.value ).toBe( '' );
+		expect( heightInput ).toHaveValue( null );
+		expect( widthInput ).toHaveValue( null );
 
 		// When new default dimensions are passed on a rerender (for example after they
 		// are calculated following an image upload), update values to the new defaults.
@@ -93,8 +93,8 @@ describe( 'ImageSizeControl', () => {
 		);
 
 		// The dimensions should update to the defaults.
-		expect( heightInput.value ).toBe( '300' );
-		expect( widthInput.value ).toBe( '400' );
+		expect( heightInput ).toHaveValue( 300 );
+		expect( widthInput ).toHaveValue( 400 );
 	} );
 
 	describe( 'updating dimension inputs', () => {
@@ -109,8 +109,8 @@ describe( 'ImageSizeControl', () => {
 				name: 'Width',
 			} );
 
-			expect( heightInput.value ).toBe( '' );
-			expect( widthInput.value ).toBe( '' );
+			expect( heightInput ).toHaveValue( null );
+			expect( widthInput ).toHaveValue( null );
 
 			const newHeight = '500';
 
@@ -120,8 +120,8 @@ describe( 'ImageSizeControl', () => {
 			expect( mockOnChange ).toHaveBeenCalledTimes( newHeight.length );
 			expect( mockOnChange ).toHaveBeenLastCalledWith( { height: 500 } );
 
-			expect( heightInput.value ).toBe( '500' );
-			expect( widthInput.value ).toBe( '' );
+			expect( heightInput ).toHaveValue( 500 );
+			expect( widthInput ).toHaveValue( null );
 		} );
 
 		it( 'updates width and calls onChange', async () => {
@@ -136,8 +136,8 @@ describe( 'ImageSizeControl', () => {
 				name: 'Width',
 			} );
 
-			expect( heightInput.value ).toBe( '' );
-			expect( widthInput.value ).toBe( '' );
+			expect( heightInput ).toHaveValue( null );
+			expect( widthInput ).toHaveValue( null );
 
 			const newWidth = '500';
 			await user.clear( widthInput );
@@ -146,8 +146,8 @@ describe( 'ImageSizeControl', () => {
 			expect( mockOnChange ).toHaveBeenCalledTimes( newWidth.length );
 			expect( mockOnChange ).toHaveBeenLastCalledWith( { width: 500 } );
 
-			expect( heightInput.value ).toBe( '' );
-			expect( widthInput.value ).toBe( '500' );
+			expect( heightInput ).toHaveValue( null );
+			expect( widthInput ).toHaveValue( 500 );
 		} );
 
 		it( 'updates height and calls onChange for empty value', async () => {
@@ -168,8 +168,8 @@ describe( 'ImageSizeControl', () => {
 				name: 'Width',
 			} );
 
-			expect( heightInput.value ).toBe( '100' );
-			expect( widthInput.value ).toBe( '100' );
+			expect( heightInput ).toHaveValue( 100 );
+			expect( widthInput ).toHaveValue( 100 );
 
 			await user.clear( heightInput );
 
@@ -181,8 +181,8 @@ describe( 'ImageSizeControl', () => {
 			} );
 
 			// Height is updated to empty value and does not reset to default.
-			expect( heightInput.value ).toBe( '' );
-			expect( widthInput.value ).toBe( '100' );
+			expect( heightInput ).toHaveValue( null );
+			expect( widthInput ).toHaveValue( 100 );
 		} );
 
 		it( 'updates width and calls onChange for empty value', async () => {
@@ -203,8 +203,8 @@ describe( 'ImageSizeControl', () => {
 				name: 'Width',
 			} );
 
-			expect( heightInput.value ).toBe( '100' );
-			expect( widthInput.value ).toBe( '100' );
+			expect( heightInput ).toHaveValue( 100 );
+			expect( widthInput ).toHaveValue( 100 );
 
 			await user.clear( widthInput );
 
@@ -216,8 +216,8 @@ describe( 'ImageSizeControl', () => {
 			} );
 
 			// Width is updated to empty value and does not reset to default.
-			expect( heightInput.value ).toBe( '100' );
-			expect( widthInput.value ).toBe( '' );
+			expect( heightInput ).toHaveValue( 100 );
+			expect( widthInput ).toHaveValue( null );
 		} );
 	} );
 
@@ -243,8 +243,8 @@ describe( 'ImageSizeControl', () => {
 			} );
 
 			// The initial dimension values display first.
-			expect( heightInput.value ).toBe( '300' );
-			expect( widthInput.value ).toBe( '400' );
+			expect( heightInput ).toHaveValue( 300 );
+			expect( widthInput ).toHaveValue( 400 );
 
 			await user.click( screen.getByText( 'Reset' ) );
 
@@ -255,8 +255,8 @@ describe( 'ImageSizeControl', () => {
 			} );
 
 			// The inputs display the default values once more.
-			expect( heightInput.value ).toBe( '100' );
-			expect( widthInput.value ).toBe( '200' );
+			expect( heightInput ).toHaveValue( 100 );
+			expect( widthInput ).toHaveValue( 200 );
 		} );
 	} );
 
@@ -298,11 +298,11 @@ describe( 'ImageSizeControl', () => {
 
 			// Both attributes are set to the rounded scaled value.
 			expect(
-				screen.getByRole( 'spinbutton', { name: 'Height' } ).value
-			).toBe( '50' );
+				screen.getByRole( 'spinbutton', { name: 'Height' } )
+			).toHaveValue( 50 );
 			expect(
-				screen.getByRole( 'spinbutton', { name: 'Width' } ).value
-			).toBe( '101' );
+				screen.getByRole( 'spinbutton', { name: 'Width' } )
+			).toHaveValue( 101 );
 		} );
 	} );
 
@@ -323,7 +323,7 @@ describe( 'ImageSizeControl', () => {
 				/>
 			);
 
-			expect( screen.getByLabelText( 'Image size' ).value ).toBe(
+			expect( screen.getByLabelText( 'Image size' ) ).toHaveValue(
 				'medium'
 			);
 		} );
