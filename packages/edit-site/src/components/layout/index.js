@@ -163,6 +163,7 @@ export default function Layout( { onError } ) {
 					</motion.div>
 					{ showEditButton && (
 						<Button
+							className="edit-site-layout__edit-button"
 							label={ __( 'Open the editor' ) }
 							onClick={ () => {
 								__unstableSetCanvasMode( 'edit' );

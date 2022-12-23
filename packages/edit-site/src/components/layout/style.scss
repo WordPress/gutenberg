@@ -14,7 +14,7 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 	left: $canvas-padding;
 	width: calc(100vw - #{$canvas-padding * 2});
 	height: $hub-height;
-	z-index: 3;
+	z-index: z-index(".edit-site-layout__hub");
 
 	background: $black;
 	padding: $grid-unit-20;
@@ -60,7 +60,7 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 .edit-site-layout__header {
 	height: $header-height;
 	display: flex;
-	z-index: 2;
+	z-index: z-index(".edit-site-layout__header");
 
 	// This is only necessary for the exit animation
 	.edit-site-layout:not(.is-full-canvas) & {
@@ -78,7 +78,7 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 }
 
 .edit-site-layout__sidebar {
-	z-index: 1;
+	z-index: z-index(".edit-site-layout__sidebar");
 	overflow-y: auto;
 	width: 100vw;
 	@include custom-scrollbars-on-hover;
@@ -99,7 +99,7 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 .edit-site-layout__canvas-container {
 	position: relative;
 	flex-grow: 1;
-	z-index: 2;
+	z-index: z-index(".edit-site-layout__canvas-container");
 }
 
 .edit-site-layout__canvas {
