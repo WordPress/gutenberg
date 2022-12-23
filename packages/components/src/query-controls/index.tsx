@@ -60,96 +60,100 @@ export function QueryControls( {
 	onOrderChange,
 	onOrderByChange,
 }: QueryControlsProps ) {
-	return [
-		onOrderChange && onOrderByChange && (
-			<SelectControl
-				key="query-controls-order-select"
-				label={ __( 'Order by' ) }
-				value={ `${ orderBy }/${ order }` }
-				options={ [
-					{
-						label: __( 'Newest to oldest' ),
-						value: 'date/desc',
-					},
-					{
-						label: __( 'Oldest to newest' ),
-						value: 'date/asc',
-					},
-					{
-						/* translators: label for ordering posts by title in ascending order */
-						label: __( 'A → Z' ),
-						value: 'title/asc',
-					},
-					{
-						/* translators: label for ordering posts by title in descending order */
-						label: __( 'Z → A' ),
-						value: 'title/desc',
-					},
-				] }
-				onChange={ ( value ) => {
-					if ( typeof value !== 'string' ) {
-						return;
-					}
+	return (
+		<>
+			{ [
+				onOrderChange && onOrderByChange && (
+					<SelectControl
+						key="query-controls-order-select"
+						label={ __( 'Order by' ) }
+						value={ `${ orderBy }/${ order }` }
+						options={ [
+							{
+								label: __( 'Newest to oldest' ),
+								value: 'date/desc',
+							},
+							{
+								label: __( 'Oldest to newest' ),
+								value: 'date/asc',
+							},
+							{
+								/* translators: label for ordering posts by title in ascending order */
+								label: __( 'A → Z' ),
+								value: 'title/asc',
+							},
+							{
+								/* translators: label for ordering posts by title in descending order */
+								label: __( 'Z → A' ),
+								value: 'title/desc',
+							},
+						] }
+						onChange={ ( value ) => {
+							if ( typeof value !== 'string' ) {
+								return;
+							}
 
-					const [ newOrderBy, newOrder ] = value.split( '/' );
-					if ( newOrder !== order ) {
-						onOrderChange( newOrder );
-					}
-					if ( newOrderBy !== orderBy ) {
-						onOrderByChange( newOrderBy );
-					}
-				} }
-			/>
-		),
-		categoriesList && onCategoryChange && (
-			<CategorySelect
-				key="query-controls-category-select"
-				categoriesList={ categoriesList }
-				label={ __( 'Category' ) }
-				noOptionLabel={ __( 'All' ) }
-				selectedCategoryId={ selectedCategoryId }
-				onChange={ onCategoryChange }
-			/>
-		),
-		categorySuggestions && onCategoryChange && (
-			<FormTokenField
-				key="query-controls-categories-select"
-				label={ __( 'Categories' ) }
-				value={
-					selectedCategories &&
-					selectedCategories.map( ( item ) => ( {
-						id: item.id,
-						value: item.name || item.value || '',
-					} ) )
-				}
-				suggestions={ Object.keys( categorySuggestions ) }
-				onChange={ onCategoryChange }
-				maxSuggestions={ MAX_CATEGORIES_SUGGESTIONS }
-			/>
-		),
-		onAuthorChange && (
-			<AuthorSelect
-				key="query-controls-author-select"
-				authorList={ authorList }
-				label={ __( 'Author' ) }
-				noOptionLabel={ __( 'All' ) }
-				selectedAuthorId={ selectedAuthorId }
-				onChange={ onAuthorChange }
-			/>
-		),
-		onNumberOfItemsChange && (
-			<RangeControl
-				__nextHasNoMarginBottom
-				key="query-controls-range-control"
-				label={ __( 'Number of items' ) }
-				value={ numberOfItems }
-				onChange={ onNumberOfItemsChange }
-				min={ minItems }
-				max={ maxItems }
-				required
-			/>
-		),
-	];
+							const [ newOrderBy, newOrder ] = value.split( '/' );
+							if ( newOrder !== order ) {
+								onOrderChange( newOrder );
+							}
+							if ( newOrderBy !== orderBy ) {
+								onOrderByChange( newOrderBy );
+							}
+						} }
+					/>
+				),
+				categoriesList && onCategoryChange && (
+					<CategorySelect
+						key="query-controls-category-select"
+						categoriesList={ categoriesList }
+						label={ __( 'Category' ) }
+						noOptionLabel={ __( 'All' ) }
+						selectedCategoryId={ selectedCategoryId }
+						onChange={ onCategoryChange }
+					/>
+				),
+				categorySuggestions && onCategoryChange && (
+					<FormTokenField
+						key="query-controls-categories-select"
+						label={ __( 'Categories' ) }
+						value={
+							selectedCategories &&
+							selectedCategories.map( ( item ) => ( {
+								id: item.id,
+								value: item.name || item.value || '',
+							} ) )
+						}
+						suggestions={ Object.keys( categorySuggestions ) }
+						onChange={ onCategoryChange }
+						maxSuggestions={ MAX_CATEGORIES_SUGGESTIONS }
+					/>
+				),
+				onAuthorChange && (
+					<AuthorSelect
+						key="query-controls-author-select"
+						authorList={ authorList }
+						label={ __( 'Author' ) }
+						noOptionLabel={ __( 'All' ) }
+						selectedAuthorId={ selectedAuthorId }
+						onChange={ onAuthorChange }
+					/>
+				),
+				onNumberOfItemsChange && (
+					<RangeControl
+						__nextHasNoMarginBottom
+						key="query-controls-range-control"
+						label={ __( 'Number of items' ) }
+						value={ numberOfItems }
+						onChange={ onNumberOfItemsChange }
+						min={ minItems }
+						max={ maxItems }
+						required
+					/>
+				),
+			] }
+		</>
+	);
 }
 
 export default QueryControls;

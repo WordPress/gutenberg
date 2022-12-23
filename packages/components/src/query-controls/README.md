@@ -66,7 +66,16 @@ The `QueryControls` component now supports multiple category selection, to repla
 const QUERY_DEFAULTS = {
 	orderBy: 'title',
 	order: 'asc',
-	selectedCategories: [ 1 ],
+	selectedCategories: [
+		{
+			id: 1,
+			name: 'Category 1',
+		},
+		{
+			id: 2,
+			name: 'Category 1b',
+		},
+	],
 	categories: [
 		{
 			id: 1,

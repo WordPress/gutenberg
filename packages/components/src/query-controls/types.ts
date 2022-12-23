@@ -103,7 +103,7 @@ export type QueryControlsProps = {
 	/**
 	 * The meta key by which to order posts.
 	 */
-	orderBy?: 'data' | 'title';
+	orderBy?: 'date' | 'title';
 	/**
 	 * The selected author ID.
 	 */
