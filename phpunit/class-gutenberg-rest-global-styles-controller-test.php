@@ -135,6 +135,49 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 		);
 	}
 
+	public function test_get_item_revisions() {
+		wp_set_current_user( self::$admin_id );
+		// Update post to create a new revision.
+		$config          = array(
+			'version'                     => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'isGlobalStylesUserThemeJSON' => true,
+			'styles'                      => array(
+				'color' => array(
+					'background' => 'hotpink',
+				),
+			),
+		);
+		$new_styles_post = array(
+			'ID'           => self::$global_styles_id,
+			'post_content' => wp_json_encode( $config ),
+		);
+
+		wp_update_post( $new_styles_post, true, false );
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/global-styles/' . self::$global_styles_id . '/revisions' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertCount( 1, $data, 'Check that only one revision exists' );
+		$this->assertArrayHasKey( 'id', $data[0], 'Check that an id key exists' );
+		$this->assertArrayHasKey( 'raw', $data[0]['title'], 'Check that a raw title key exists' );
+		$this->assertArrayHasKey( 'rendered', $data[0]['title'], 'Check that a rendered title key exists' );
+		$this->assertEquals(
+			$data[0]['settings'],
+			new stdClass(),
+			'Check that the revision settings exist in the response.'
+		);
+		$this->assertEquals(
+			$data[0]['styles'],
+			array(
+				'color' => array(
+					'background' => 'hotpink',
+				),
+			),
+			'Check that the revision styles match the last updated styles.'
+		);
+	}
+
 	/**
 	 * @doesNotPerformAssertions
 	 */
