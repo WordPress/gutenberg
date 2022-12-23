@@ -176,7 +176,7 @@ describe( 'ImageSizeControl', () => {
 			// onChange is called and sets the dimension to undefined rather than
 			// the empty string.
 			expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
-			expect( mockOnChange ).toHaveBeenCalledWith( {
+			expect( mockOnChange ).toHaveBeenLastCalledWith( {
 				height: undefined,
 			} );
 
@@ -211,7 +211,7 @@ describe( 'ImageSizeControl', () => {
 			// onChange is called and sets the dimension to undefined rather than
 			// the empty string.
 			expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
-			expect( mockOnChange ).toHaveBeenCalledWith( {
+			expect( mockOnChange ).toHaveBeenLastCalledWith( {
 				width: undefined,
 			} );
 
@@ -249,7 +249,7 @@ describe( 'ImageSizeControl', () => {
 			await user.click( screen.getByText( 'Reset' ) );
 
 			// Both attributes are set to undefined to clear custom values.
-			expect( mockOnChange ).toHaveBeenCalledWith( {
+			expect( mockOnChange ).toHaveBeenLastCalledWith( {
 				height: undefined,
 				width: undefined,
 			} );
@@ -277,7 +277,7 @@ describe( 'ImageSizeControl', () => {
 			expect( screen.getByText( '50%' ) ).toHaveClass( 'is-pressed' );
 
 			// Both attributes are set to the rounded scaled value.
-			expect( mockOnChange ).toHaveBeenCalledWith( {
+			expect( mockOnChange ).toHaveBeenLastCalledWith( {
 				height: 50,
 				width: 101,
 			} );
@@ -346,7 +346,7 @@ describe( 'ImageSizeControl', () => {
 			);
 
 			// onChangeImage is called with the slug and the event.
-			expect( mockOnChangeImage ).toHaveBeenCalledWith(
+			expect( mockOnChangeImage ).toHaveBeenLastCalledWith(
 				'thumbnail',
 				expect.any( Object )
 			);
