@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { set } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -120,12 +119,10 @@ function ScreenRevisions() {
 
 	const restoreRevision = useCallback(
 		( revision ) => {
-			const newUserConfig = ! userConfig
-				? {}
-				: JSON.parse( JSON.stringify( userConfig ) );
-			set( newUserConfig, [ 'styles' ], revision?.styles );
-			set( newUserConfig, [ 'settings' ], revision?.settings );
-			setUserConfig( () => newUserConfig );
+			setUserConfig( () => ( {
+				styles: revision?.styles,
+				settings: revision?.settings,
+			} ) );
 			setCurrentRevisionId( revision?.id );
 		},
 		[ userConfig ]
