@@ -95,7 +95,7 @@ type ResizableBoxProps = ResizableProps & {
 	__experimentalTooltipProps: Parameters< typeof ResizeTooltip >[ 0 ];
 };
 
-function ResizableBox(
+function UnforwardedResizableBox(
 	{
 		className,
 		children,
@@ -124,4 +124,6 @@ function ResizableBox(
 	);
 }
 
-export default forwardRef( ResizableBox );
+const ResizableBox = forwardRef( UnforwardedResizableBox );
+
+export default ResizableBox;
