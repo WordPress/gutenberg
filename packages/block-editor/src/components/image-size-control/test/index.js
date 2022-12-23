@@ -246,7 +246,7 @@ describe( 'ImageSizeControl', () => {
 			expect( heightInput ).toHaveValue( 300 );
 			expect( widthInput ).toHaveValue( 400 );
 
-			await user.click( screen.getByText( 'Reset' ) );
+			await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
 
 			// Both attributes are set to undefined to clear custom values.
 			expect( mockOnChange ).toHaveBeenLastCalledWith( {
@@ -272,9 +272,14 @@ describe( 'ImageSizeControl', () => {
 				/>
 			);
 
-			await user.click( screen.getByText( '50%' ) );
+			const button = screen.getByRole( 'button', {
+				name: '50%',
+				pressed: false,
+			} );
 
-			expect( screen.getByText( '50%' ) ).toHaveClass( 'is-pressed' );
+			await user.click( button );
+
+			expect( button ).toHaveClass( 'is-pressed' );
 
 			// Both attributes are set to the rounded scaled value.
 			expect( mockOnChange ).toHaveBeenLastCalledWith( {
@@ -294,7 +299,12 @@ describe( 'ImageSizeControl', () => {
 				/>
 			);
 
-			await user.click( screen.getByText( '50%' ) );
+			const button = screen.getByRole( 'button', {
+				name: '50%',
+				pressed: false,
+			} );
+
+			await user.click( button );
 
 			// Both attributes are set to the rounded scaled value.
 			expect(
@@ -323,9 +333,9 @@ describe( 'ImageSizeControl', () => {
 				/>
 			);
 
-			expect( screen.getByLabelText( 'Image size' ) ).toHaveValue(
-				'medium'
-			);
+			expect(
+				screen.getByRole( 'combobox', { name: 'Image size' } )
+			).toHaveValue( 'medium' );
 		} );
 
 		it( 'calls onChangeImage with selected slug on selection', async () => {
@@ -341,7 +351,7 @@ describe( 'ImageSizeControl', () => {
 			);
 
 			await user.selectOptions(
-				screen.getByLabelText( 'Image size' ),
+				screen.getByRole( 'combobox', { name: 'Image size' } ),
 				'thumbnail'
 			);
 
