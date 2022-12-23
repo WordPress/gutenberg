@@ -42,7 +42,7 @@ jobs:
               with:
                   name: raw-perf-results
                   path: |
-                      /perf-results-*.json
+                      /home/runner/work/gutenberg/gutenberg/perf-results-*.json
 
             - name: Compare performance with current WordPress Core and previous Gutenberg versions
               if: github.event_name == 'release'

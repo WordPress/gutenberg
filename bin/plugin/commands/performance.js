@@ -179,7 +179,7 @@ async function runTestSuite( testSuite, performanceTestDirectory ) {
 			performanceTestDirectory,
 			`packages/e2e-tests/specs/performance/${ testSuite }.test.results.json`
 		),
-		`/perf-results-${ testSuite }.json`
+		`/home/runner/work/gutenberg/gutenberg/perf-results-${ testSuite }.json`
 	);
 
 	return curateResults( rawResults );
