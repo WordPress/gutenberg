@@ -182,7 +182,12 @@ async function runTestSuite( testSuite, performanceTestDirectory ) {
 		`/home/runner/work/gutenberg/gutenberg/perf-results-${ testSuite }.json`
 	);
 
-	return curateResults( rawResults );
+	try {
+		return curateResults( rawResults );
+	} catch ( e ) {
+		console.log( JSON.stringify( rawResults, null, 2 ) );
+		return rawResults;
+	}
 }
 
 /**
