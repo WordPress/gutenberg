@@ -43,7 +43,7 @@ jobs:
               uses: gradle/gradle-build-action@3fbe033aaae657f011f88f29be9e65ed26bd29ef # v2.3.3
 
             - name: AVD cache
-              uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 # v3.0.11
+              uses: actions/cache@c1a5de879eb890d062a85ee0252d6036480b1fe2 # v3.2.1
               id: avd-cache
               with:
                   path: |
