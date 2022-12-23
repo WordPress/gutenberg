@@ -177,6 +177,12 @@ $z-layers: (
 
 	// Appear under the topbar.
 	".customize-widgets__block-toolbar": 7,
+
+	// Site editor layout
+	".edit-site-layout__hub": 3,
+	".edit-site-layout__header": 2,
+	".edit-site-layout__canvas-container": 2,
+	".edit-site-layout__sidebar": 1,
 );
 
 @function z-index( $key ) {
