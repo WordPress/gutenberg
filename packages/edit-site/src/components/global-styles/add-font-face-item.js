@@ -65,7 +65,6 @@ function AddFontFace( { fontFace, isExistingFace } ) {
 		<FontFaceItem
 			key={ `${ fontFace.fontWeight }-${ fontFace.fontStyle }` }
 			fontFace={ fontFace }
-			title={ `${ fontFace.fontWeight } ${ fontFace.fontStyle }` }
 			actionTrigger={
 				! isExistingFace ? (
 					<Tooltip text={ __( 'Add font face' ) } delay={ 0 }>

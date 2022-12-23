@@ -9,6 +9,11 @@ import {
 } from '@wordpress/components';
 import { useEffect } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import { FONT_WEIGHTS, FONT_STYLES } from './typography-utils';
+
 const DEMO_TEXT = 'The quick brown fox jumps over the lazy dog';
 
 function FontFaceItem( { title, fontFace, actionTrigger } ) {
@@ -44,16 +49,19 @@ function FontFaceItem( { title, fontFace, actionTrigger } ) {
 		paddingTop: '16px',
 	};
 
+	const weightTitle =
+		FONT_WEIGHTS[ fontFace.fontWeight ] || fontFace.fontWeight;
+	const styleTitle =
+		fontFace.fontStyle !== 'normal'
+			? FONT_STYLES[ fontFace.fontStyle ] || fontFace.fontStyle
+			: '';
+	const defaultTitle = `${ weightTitle } ${ styleTitle }`;
+
 	return (
 		<Surface variant="primary">
 			<Surface style={ headContainerStyles }>
 				<HStack justify="space-between">
-					<Text>
-						{ title ||
-							`${ fontFace.name || fontFace.fontFamily } ${
-								fontFace.fontStyle
-							} ${ fontFace.fontWeight }` }
-					</Text>
+					<Text>{ title || defaultTitle }</Text>
 					{ actionTrigger && <FlexItem>{ actionTrigger }</FlexItem> }
 				</HStack>
 			</Surface>

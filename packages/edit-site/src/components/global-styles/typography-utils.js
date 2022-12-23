@@ -8,6 +8,7 @@
  * WordPress dependencies
  */
 import { getComputedFluidTypographyValue } from '@wordpress/block-editor';
+import { _x } from '@wordpress/i18n';
 
 /**
  * @typedef {Object} FluidPreset
@@ -65,3 +66,20 @@ export function getTypographyFontSizeValue( preset, typographySettings ) {
 
 	return defaultSize;
 }
+
+export const FONT_STYLES = {
+	normal: _x( 'Regular', 'font style' ),
+	italic: _x( 'Italic', 'font style' ),
+};
+
+export const FONT_WEIGHTS = {
+	100: _x( 'Thin', 'font weight' ),
+	200: _x( 'Extra Light', 'font weight' ),
+	300: _x( 'Light', 'font weight' ),
+	400: _x( 'Regular', 'font weight' ),
+	500: _x( 'Medium', 'font weight' ),
+	600: _x( 'Semi Bold', 'font weight' ),
+	700: _x( 'Bold', 'font weight' ),
+	800: _x( 'Extra Bold', 'font weight' ),
+	900: _x( 'Black', 'font weight' ),
+};

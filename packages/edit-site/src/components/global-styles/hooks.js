@@ -335,14 +335,7 @@ export function useFontFamilies() {
 		'typography.fontFamilies'
 	);
 
-	// sort font families alphabetically by name
-	const fontFamilies = useMemo( () => {
-		return fonts.sort( ( a, b ) => a?.name.localeCompare( b?.name ) );
-	}, [ fonts ] );
-
-	const count = fontFamilies.length || 0;
-
-	const getFontSlug = ( content ) => {
+	const getFontSlug = ( content = '' ) => {
 		// Get the slug.
 		return (
 			content
@@ -354,6 +347,17 @@ export function useFontFamilies() {
 				.replace( /(^-+)|(-+$)/g, '' )
 		);
 	};
+
+	// sort font families alphabetically
+	const fontFamilies = useMemo( () => {
+		return fonts.sort( ( a, b ) =>
+			getFontSlug( a.name || a.fontFamily ).localeCompare(
+				getFontSlug( b.name || b.fontFamily )
+			)
+		);
+	}, [ fonts ] );
+
+	const count = fontFamilies.length || 0;
 
 	const sortFontFaces = ( fontFaces ) => {
 		return fontFaces.sort( ( a, b ) => {
