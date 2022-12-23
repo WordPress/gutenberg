@@ -29,6 +29,7 @@ import StylesPreview from './preview';
 import { unlock } from '../../private-apis';
 // @TODO does this exist?
 import { GlobalStylesContext } from './context';
+import { MINIMUM_REVISION_COUNT } from './screen-revisions';
 
 function ScreenRoot() {
 	const { useGlobalStyle } = unlock( blockEditorPrivateApis );
@@ -178,7 +179,7 @@ function ScreenRoot() {
 				</ItemGroup>
 			</CardBody>
 
-			{ revisionsCount > 0 ? (
+			{ revisionsCount >= MINIMUM_REVISION_COUNT ? (
 				<>
 					<CardDivider />
 					<CardBody>

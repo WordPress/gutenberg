@@ -21,6 +21,7 @@ import {
 	useEffect,
 	useMemo,
 } from '@wordpress/element';
+import { check } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -30,6 +31,9 @@ import Subtitle from './subtitle';
 import { GlobalStylesContext } from './context';
 import { decodeEntities } from '@wordpress/html-entities';
 import { isGlobalStyleConfigEqual } from './utils';
+
+export const MINIMUM_REVISION_COUNT = 2;
+const SELECTOR_MINIMUM_REVISION_COUNT = 10;
 
 function RevisionsSelect( { userRevisions, currentRevisionId, onChange } ) {
 	const userRevisionsOptions = useMemo( () => {
@@ -73,6 +77,7 @@ function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
 							) }
 							variant={ isActive ? 'tertiary' : 'secondary' }
 							disabled={ isActive }
+							icon={ isActive ? check : null }
 							onClick={ () => {
 								onChange( revision );
 							} }
@@ -101,7 +106,7 @@ function ScreenRevisions() {
 		[]
 	);
 	const [ currentRevisionId, setCurrentRevisionId ] = useState();
-	const hasRevisions = userRevisions.length > 0;
+	const hasRevisions = userRevisions.length >= MINIMUM_REVISION_COUNT;
 
 	useEffect( () => {
 		if ( ! hasRevisions ) {
@@ -129,7 +134,9 @@ function ScreenRevisions() {
 	);
 
 	const RevisionsComponent =
-		userRevisions.length >= 10 ? RevisionsSelect : RevisionsButtons;
+		userRevisions.length >= SELECTOR_MINIMUM_REVISION_COUNT
+			? RevisionsSelect
+			: RevisionsButtons;
 
 	return (
 		<>
