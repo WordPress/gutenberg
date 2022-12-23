@@ -136,7 +136,15 @@ const inserterMediaCategories = [
 			const response = await window.fetch( url );
 			const jsonResponse = await response.json();
 			const results = jsonResponse.results;
-			return results.map( ( result ) => ( {
+			const withAdjustments = results.map( ( result ) => ( {
+				...result,
+				// This is a temp solution for better titles, until Openverse API
+				// completes the cleaning up of some titles of their upstream data.
+				title: result.title?.startsWith( 'File:' )
+					? result.title.slice( 5 )
+					: result.title,
+			} ) );
+			return withAdjustments.map( ( result ) => ( {
 				...result,
 				sourceId: result.id,
 				id: undefined,
