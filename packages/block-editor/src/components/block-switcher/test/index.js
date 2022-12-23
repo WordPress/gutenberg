@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, within } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -15,7 +15,8 @@ import { copy } from '@wordpress/icons';
  * Internal dependencies
  */
 import { BlockSwitcher, BlockSwitcherDropdownMenu } from '../';
-import { act } from 'react-test-renderer';
+
+jest.useFakeTimers();
 
 jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
 jest.mock( '../../block-title/use-block-display-title', () =>

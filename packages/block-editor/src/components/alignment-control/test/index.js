@@ -14,6 +14,8 @@ import { alignLeft, alignCenter } from '@wordpress/icons';
  */
 import AlignmentUI from '../ui';
 
+jest.useFakeTimers();
+
 describe( 'AlignmentUI', () => {
 	const alignment = 'left';
 	const onChangeSpy = jest.fn();

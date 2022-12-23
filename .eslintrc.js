@@ -372,9 +372,6 @@ module.exports = {
 				'plugin:jest-dom/recommended',
 				'plugin:testing-library/react',
 			],
-			rules: {
-				'testing-library/no-node-access': 'off',
-			},
 		},
 		{
 			files: [ 'packages/e2e-test*/**/*.js' ],

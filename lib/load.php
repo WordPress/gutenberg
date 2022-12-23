@@ -66,7 +66,6 @@ require __DIR__ . '/compat/wordpress-6.1/blocks.php';
 require __DIR__ . '/compat/wordpress-6.1/persisted-preferences.php';
 require __DIR__ . '/compat/wordpress-6.1/get-global-styles-and-settings.php';
 require __DIR__ . '/compat/wordpress-6.1/class-wp-theme-json-data-gutenberg.php';
-require __DIR__ . '/compat/wordpress-6.1/class-wp-theme-json-resolver-6-1.php';
 require __DIR__ . '/compat/wordpress-6.1/block-template-utils.php';
 require __DIR__ . '/compat/wordpress-6.1/wp-theme-get-post-templates.php';
 require __DIR__ . '/compat/wordpress-6.1/script-loader.php';
@@ -80,7 +79,6 @@ require __DIR__ . '/compat/wordpress-6.2/script-loader.php';
 require __DIR__ . '/compat/wordpress-6.2/block-template-utils.php';
 require __DIR__ . '/compat/wordpress-6.2/get-global-styles-and-settings.php';
 require __DIR__ . '/compat/wordpress-6.2/default-filters.php';
-require __DIR__ . '/compat/wordpress-6.2/class-wp-theme-json-resolver-6-2.php';
 require __DIR__ . '/compat/wordpress-6.2/edit-form-blocks.php';
 require __DIR__ . '/compat/wordpress-6.2/site-editor.php';
 require __DIR__ . '/compat/wordpress-6.2/block-editor-settings.php';
@@ -93,7 +91,6 @@ require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
 	require __DIR__ . '/experimental/html/index.php';
 }
-require __DIR__ . '/experimental/class-wp-theme-json-resolver-gutenberg.php';
 require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/navigation-page.php';
@@ -111,6 +108,7 @@ require __DIR__ . '/experimental/webfonts.php';
 
 // Plugin specific code.
 require __DIR__ . '/class-wp-theme-json-gutenberg.php';
+require __DIR__ . '/class-wp-theme-json-resolver-gutenberg.php';
 require __DIR__ . '/blocks.php';
 require __DIR__ . '/client-assets.php';
 require __DIR__ . '/demo.php';
