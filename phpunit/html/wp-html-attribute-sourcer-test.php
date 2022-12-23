@@ -73,6 +73,82 @@ class WP_HTML_Attribute_Sourcer_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @dataProvider data_nested_combinators
+	 */
+	public function test_sources_nested_combinators( $expected, $html, $attributes ) {
+		$this->assertSame( $expected, ( new WP_HTML_Attribute_Sourcer( $attributes, $html ) )->source_attributes() );
+	}
+
+	public function data_nested_combinators() {
+		return array(
+			array(
+				array( 'attributes' => array( 'link' => 'docs.html' ), 'unparsed' => array() ),
+				'<section><div><a href="docs.html"></a></div></section>',
+				array(
+					'link' => array(
+						'type' => 'string',
+						'source' => 'attribute',
+						'selector' => 'section div a',
+						'attribute' => 'href'
+					),
+				),
+			),
+
+			array(
+				array( 'attributes' => array( 'link' => null ), 'unparsed' => array() ),
+				'<section><div></div><a href="docs.html"></a></section>',
+				array(
+					'link' => array(
+						'type' => 'string',
+						'source' => 'attribute',
+						'selector' => 'section div a',
+						'attribute' => 'href'
+					),
+				),
+			),
+
+			array(
+				array( 'attributes' => array( 'link' => 'docs.html' ), 'unparsed' => array() ),
+				'<section><div><a href="docs.html"></a></div></section>',
+				array(
+					'link' => array(
+						'type' => 'string',
+						'source' => 'attribute',
+						'selector' => 'section > div > a',
+						'attribute' => 'href'
+					),
+				),
+			),
+
+			array(
+				array( 'attributes' => array( 'link' => 'docs.html' ), 'unparsed' => array() ),
+				'<section><div></div><a href="docs.html"></a></section>',
+				array(
+					'link' => array(
+						'type' => 'string',
+						'source' => 'attribute',
+						'selector' => 'section > div + a',
+						'attribute' => 'href'
+					),
+				),
+			),
+		);
+	}
+
+	/**
+	 * @dataProvider data_skipping_non_matches
+	 */
+	public function test_sources_skipping_non_matches( $expected, $html, $attributes ) {
+		$this->assertSame( $expected, ( new WP_HTML_Attribute_Sourcer( $attributes, $html ) )->source_attributes() );
+	}
+
+	public function data_skipping_non_matches() {
+		return array(
+
+		);
+	}
+
+	/**
 	 * @dataProvider data_sourced_attributes
 	 */
 	public function test_sources_attributes( $expected, $html, $attributes ) {
