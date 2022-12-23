@@ -26,7 +26,7 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 					'permission_callback' => array( $this, 'get_item_permissions_check' ),
 					'args'                => array(
 						'id' => array(
-							'description'       => __( 'The id of a template' ),
+							'description'       => __( 'The id of the global styles post.' ),
 							'type'              => 'string',
 							'sanitize_callback' => array( $this, '_sanitize_global_styles_callback' ),
 						),
@@ -126,7 +126,7 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 				$post->ID,
 				array(
 					'author'         => $post->post_author,
-					'posts_per_page' => 10,
+					'posts_per_page' => 100,
 				)
 			);
 
