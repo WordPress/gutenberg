@@ -2702,20 +2702,21 @@ class WP_Theme_JSON_Gutenberg {
 
 		$theme_json = static::sanitize( $theme_json, $valid_block_names, $valid_element_names );
 
-		$blocks_metadata = static::get_blocks_metadata();
-		$style_nodes     = static::get_style_nodes( $theme_json, $blocks_metadata );
+		$blocks_metadata                 = static::get_blocks_metadata();
+		$style_nodes                     = static::get_style_nodes( $theme_json, $blocks_metadata );
+		$can_user_edit_global_custom_css = apply_filters( 'enable_global_styles_custom_css', current_user_can( 'unfiltered_html' ) );
 
 		foreach ( $style_nodes as $metadata ) {
 			$input = _wp_array_get( $theme_json, $metadata['path'], array() );
 			if ( empty( $input ) ) {
 				continue;
 			}
-			if ( is_array( $input ) && 'css' === key( $input ) ) {
-				$output = safecss_filter_attr( $input['css'] ); // need to work out what filter to use as safecss_filter_attr doesn't work.
-				continue;
+			// The global styles custom CSS is not sanitized, but can only be edited by default by users with unfiltered_html capability.
+			if ( is_array( $input ) && 'css' === key( $input ) && $can_user_edit_global_custom_css ) {
+				$output = $input;
+			} else {
+				$output = static::remove_insecure_styles( $input );
 			}
-
-			$output = static::remove_insecure_styles( $input );
 
 			/*
 			 * Get a reference to element name from path.
