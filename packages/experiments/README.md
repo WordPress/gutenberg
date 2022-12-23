@@ -17,7 +17,12 @@ export const { lock, unlock } =
 	);
 ```
 
-Each package may only opt-in once. The function name communicates that plugins are not supposed to use it. To make double and triple sure, the first argument must be that exact consent string, and the second argument must be a known `@wordpress` package that hasn't opted in yet – otherwise an error is thrown.
+Each package may only opt in once. The function name communicates that plugins are not supposed to use it.
+
+The function will throw an error if the following conditions are not met:
+
+1. The first argument must exactly match the required consent string: `'I know using unstable features means my plugin or theme will inevitably break on the next WordPress release.'`. 
+2. The second argument must be a known `@wordpress` package that hasn't yet opted into `@wordpress/experiments`
 
 Once the opt-in is complete, the obtained `lock()` and `unlock()` utilities enable hiding `__experimental` APIs from the naked eye:
 
