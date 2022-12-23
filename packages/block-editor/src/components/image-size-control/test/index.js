@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -85,7 +86,8 @@ describe( 'ImageSizeControl', () => {
 	} );
 
 	describe( 'updating dimension inputs', () => {
-		it( 'updates height and calls onChange', () => {
+		it( 'updates height and calls onChange', async () => {
+			const user = userEvent.setup();
 			render( <ImageSizeControl onChange={ mockOnChange } /> );
 
 			const heightInput = getHeightInput();
@@ -94,16 +96,21 @@ describe( 'ImageSizeControl', () => {
 			expect( heightInput.value ).toBe( '' );
 			expect( widthInput.value ).toBe( '' );
 
-			fireEvent.change( heightInput, { target: { value: '500' } } );
+			const newHeight = '500';
 
-			expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
-			expect( mockOnChange ).toHaveBeenCalledWith( { height: 500 } );
+			await user.clear( heightInput );
+			await user.type( heightInput, newHeight );
+
+			expect( mockOnChange ).toHaveBeenCalledTimes( newHeight.length );
+			expect( mockOnChange ).toHaveBeenLastCalledWith( { height: 500 } );
 
 			expect( heightInput.value ).toBe( '500' );
 			expect( widthInput.value ).toBe( '' );
 		} );
 
-		it( 'updates width and calls onChange', () => {
+		it( 'updates width and calls onChange', async () => {
+			const user = userEvent.setup();
+
 			render( <ImageSizeControl onChange={ mockOnChange } /> );
 
 			const heightInput = getHeightInput();
@@ -112,16 +119,20 @@ describe( 'ImageSizeControl', () => {
 			expect( heightInput.value ).toBe( '' );
 			expect( widthInput.value ).toBe( '' );
 
-			fireEvent.change( widthInput, { target: { value: '500' } } );
+			const newWidth = '500';
+			await user.clear( widthInput );
+			await user.type( widthInput, newWidth );
 
-			expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
-			expect( mockOnChange ).toHaveBeenCalledWith( { width: 500 } );
+			expect( mockOnChange ).toHaveBeenCalledTimes( newWidth.length );
+			expect( mockOnChange ).toHaveBeenLastCalledWith( { width: 500 } );
 
 			expect( heightInput.value ).toBe( '' );
 			expect( widthInput.value ).toBe( '500' );
 		} );
 
-		it( 'updates height and calls onChange for empty value', () => {
+		it( 'updates height and calls onChange for empty value', async () => {
+			const user = userEvent.setup();
+
 			render(
 				<ImageSizeControl
 					imageHeight="100"
@@ -136,7 +147,7 @@ describe( 'ImageSizeControl', () => {
 			expect( heightInput.value ).toBe( '100' );
 			expect( widthInput.value ).toBe( '100' );
 
-			fireEvent.change( heightInput, { target: { value: '' } } );
+			await user.clear( heightInput );
 
 			// onChange is called and sets the dimension to undefined rather than
 			// the empty string.
@@ -150,7 +161,9 @@ describe( 'ImageSizeControl', () => {
 			expect( widthInput.value ).toBe( '100' );
 		} );
 
-		it( 'updates width and calls onChange for empty value', () => {
+		it( 'updates width and calls onChange for empty value', async () => {
+			const user = userEvent.setup();
+
 			render(
 				<ImageSizeControl
 					imageHeight="100"
@@ -165,7 +178,7 @@ describe( 'ImageSizeControl', () => {
 			expect( heightInput.value ).toBe( '100' );
 			expect( widthInput.value ).toBe( '100' );
 
-			fireEvent.change( widthInput, { target: { value: '' } } );
+			await user.clear( widthInput );
 
 			// onChange is called and sets the dimension to undefined rather than
 			// the empty string.
@@ -181,7 +194,9 @@ describe( 'ImageSizeControl', () => {
 	} );
 
 	describe( 'reset button', () => {
-		it( 'resets both height and width to default values', () => {
+		it( 'resets both height and width to default values', async () => {
+			const user = userEvent.setup();
+
 			render(
 				<ImageSizeControl
 					imageHeight="100"
@@ -199,7 +214,7 @@ describe( 'ImageSizeControl', () => {
 			expect( heightInput.value ).toBe( '300' );
 			expect( widthInput.value ).toBe( '400' );
 
-			fireEvent.click( screen.getByText( 'Reset' ) );
+			await user.click( screen.getByText( 'Reset' ) );
 
 			// Both attributes are set to undefined to clear custom values.
 			expect( mockOnChange ).toHaveBeenCalledWith( {
@@ -214,7 +229,9 @@ describe( 'ImageSizeControl', () => {
 	} );
 
 	describe( 'image size percentage presets', () => {
-		it( 'updates height and width attributes on selection', () => {
+		it( 'updates height and width attributes on selection', async () => {
+			const user = userEvent.setup();
+
 			render(
 				<ImageSizeControl
 					imageHeight="100"
@@ -223,7 +240,7 @@ describe( 'ImageSizeControl', () => {
 				/>
 			);
 
-			fireEvent.click( screen.getByText( '50%' ) );
+			await user.click( screen.getByText( '50%' ) );
 
 			expect( screen.getByText( '50%' ) ).toHaveClass( 'is-pressed' );
 
@@ -234,7 +251,9 @@ describe( 'ImageSizeControl', () => {
 			} );
 		} );
 
-		it( 'updates height and width inputs on selection', () => {
+		it( 'updates height and width inputs on selection', async () => {
+			const user = userEvent.setup();
+
 			render(
 				<ImageSizeControl
 					imageHeight="100"
@@ -243,7 +262,7 @@ describe( 'ImageSizeControl', () => {
 				/>
 			);
 
-			fireEvent.click( screen.getByText( '50%' ) );
+			await user.click( screen.getByText( '50%' ) );
 
 			// Both attributes are set to the rounded scaled value.
 			expect( getHeightInput().value ).toBe( '50' );
@@ -273,7 +292,9 @@ describe( 'ImageSizeControl', () => {
 			);
 		} );
 
-		it( 'calls onChangeImage with selected slug on selection', () => {
+		it( 'calls onChangeImage with selected slug on selection', async () => {
+			const user = userEvent.setup();
+
 			render(
 				<ImageSizeControl
 					imageSizeOptions={ IMAGE_SIZE_OPTIONS }
@@ -283,9 +304,10 @@ describe( 'ImageSizeControl', () => {
 				/>
 			);
 
-			fireEvent.change( screen.getByLabelText( 'Image size' ), {
-				target: { value: 'thumbnail' },
-			} );
+			await user.selectOptions(
+				screen.getByLabelText( 'Image size' ),
+				'thumbnail'
+			);
 
 			// onChangeImage is called with the slug and the event.
 			expect( mockOnChangeImage ).toHaveBeenCalledWith(
