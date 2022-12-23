@@ -23,7 +23,7 @@ const tableWithHeaderFooterAndBodyUsingColspan = `
 	</tbody>
 	<tfoot>
 		<tr>
-			<th colspan="2">Footer Cell</th>
+			<th colspan="2">Colspan 2</th>
 			<th>Footer Cell</th>
 		</tr>
 	</tfoot>
@@ -96,7 +96,7 @@ describe( 'pasteHandler', () => {
 			foot: [
 				{
 					cells: [
-						{ content: 'Footer Cell', tag: 'th', colspan: '2' },
+						{ content: 'Colspan 2', tag: 'th', colspan: '2' },
 						{ content: 'Footer Cell', tag: 'th' },
 					],
 				},
