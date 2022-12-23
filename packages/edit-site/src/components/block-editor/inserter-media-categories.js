@@ -26,8 +26,7 @@ const getOpenverseLicense = ( license, licenseVersion, licenseUrl ) => {
 		licenseName += ` ${ licenseVersion }`;
 	}
 	// For licenses other than public-domain marks, prepend 'CC' to the name.
-	const isPublicDomainMark = [ 'pdm', 'cc0' ].includes( license );
-	if ( ! isPublicDomainMark ) {
+	if ( ! [ 'pdm', 'cc0' ].includes( license ) ) {
 		licenseName = `CC ${ licenseName }`;
 	}
 	if ( !! licenseUrl ) {
@@ -36,18 +35,7 @@ const getOpenverseLicense = ( license, licenseVersion, licenseUrl ) => {
 			licenseName
 		);
 	}
-	const markedLicence = isPublicDomainMark
-		? sprintf(
-				/* translators: %s: Name of the media's license (ex. 'CC0 1.0'). */
-				__( 'is marked with %s' ),
-				license
-		  )
-		: sprintf(
-				/* translators: %s: Name of the media's license (ex. 'CC BY-ND 2.0'). */
-				__( 'is licensed under %s' ),
-				license
-		  );
-	return markedLicence;
+	return license;
 };
 
 const getOpenverseCaption = ( item ) => {
@@ -78,7 +66,7 @@ const getOpenverseCaption = ( item ) => {
 		__( ' by %s' ),
 		_creator
 	);
-	const caption = `"${ _title }" ${ _creator } ${ fullLicense }.`;
+	const caption = `"${ _title }" ${ _creator }/ ${ fullLicense }.`;
 	return caption.replace( /\s{2}/g, ' ' );
 };
 
