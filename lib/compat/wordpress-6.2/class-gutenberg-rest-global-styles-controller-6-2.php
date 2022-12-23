@@ -26,7 +26,7 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 					'permission_callback' => array( $this, 'get_item_permissions_check' ),
 					'args'                => array(
 						'id' => array(
-							'description'       => __( 'The id of the global styles post.' ),
+							'description'       => __( 'The id of the global styles post.', 'gutenberg' ),
 							'type'              => 'string',
 							'sanitize_callback' => array( $this, '_sanitize_global_styles_callback' ),
 						),
@@ -56,34 +56,34 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 			'type'       => 'object',
 			'properties' => array(
 				'id'        => array(
-					'description' => __( 'ID of global styles config.' ),
+					'description' => __( 'ID of global styles config.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
 				'styles'    => array(
-					'description' => __( 'Global styles.' ),
+					'description' => __( 'Global styles.', 'gutenberg' ),
 					'type'        => array( 'object' ),
 					'context'     => array( 'view', 'edit' ),
 				),
 				'settings'  => array(
-					'description' => __( 'Global settings.' ),
+					'description' => __( 'Global settings.', 'gutenberg' ),
 					'type'        => array( 'object' ),
 					'context'     => array( 'view', 'edit' ),
 				),
 				'title'     => array(
-					'description' => __( 'Title of the global styles variation.' ),
+					'description' => __( 'Title of the global styles variation.', 'gutenberg' ),
 					'type'        => array( 'object', 'string' ),
 					'default'     => '',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'properties'  => array(
 						'raw'      => array(
-							'description' => __( 'Title for the global styles variation, as it exists in the database.' ),
+							'description' => __( 'Title for the global styles variation, as it exists in the database.', 'gutenberg' ),
 							'type'        => 'string',
 							'context'     => array( 'view', 'edit', 'embed' ),
 						),
 						'rendered' => array(
-							'description' => __( 'HTML title for the post, transformed for display.' ),
+							'description' => __( 'HTML title for the post, transformed for display.', 'gutenberg' ),
 							'type'        => 'string',
 							'context'     => array( 'view', 'edit', 'embed' ),
 							'readonly'    => true,
@@ -91,7 +91,7 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 					),
 				),
 				'revisions' => array(
-					'description' => __( 'Global styles revisions.' ),
+					'description' => __( 'Global styles revisions.', 'gutenberg' ),
 					'type'        => array( 'object' ),
 					'context'     => array( 'view', 'edit' ),
 					'readonly'    => true,
