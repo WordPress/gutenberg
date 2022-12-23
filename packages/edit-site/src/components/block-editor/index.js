@@ -155,6 +155,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const isViewMode = canvasMode === 'view';
 	const showBlockAppender =
 		( isTemplatePart && hasBlocks ) || isViewMode ? false : undefined;
+
 	// eslint-disable-next-line @wordpress/data-no-store-string-literals
 	const { enableComplementaryArea } = useDispatch( 'core/interface' );
 
