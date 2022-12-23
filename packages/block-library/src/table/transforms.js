@@ -8,6 +8,7 @@ import { createBlock, getBlockAttributes } from '@wordpress/blocks';
  */
 import { name } from './block.json';
 import { getListContentSchema } from '../list/transforms';
+import { getListItemBullet } from './utils';
 
 const tableContentPasteSchema = ( { phrasingContentSchema } ) => ( {
 	tr: {
@@ -62,8 +63,10 @@ const transformContent = ( cell ) => {
 	const parser = new DOMParser();
 	const document = parser.parseFromString( cell.content, 'text/html' );
 	const result = [];
+	let orderedListUsesNumbers = true;
 	const processDOMTree = ( node, listDepth = 0 ) => {
 		if ( isList( node ) ) {
+			//debugger;
 			if ( listDepth === 0 ) {
 				result.push( '<br/>' );
 			}
@@ -73,10 +76,11 @@ const transformContent = ( cell ) => {
 					let simple = [];
 					children.forEach( ( child ) => {
 						if ( isList( child ) ) {
-							const bullet =
-								node.tagName === 'UL'
-									? '-'
-									: `${ listItemIndex + 1 }.`;
+							const bullet = getListItemBullet(
+								node.tagName,
+								orderedListUsesNumbers,
+								listItemIndex
+							);
 							if ( simple.length ) {
 								result.push(
 									`${ indent(
@@ -85,16 +89,18 @@ const transformContent = ( cell ) => {
 								);
 								simple = [];
 							}
+							orderedListUsesNumbers = ! orderedListUsesNumbers;
 							processDOMTree( child, listDepth + 1 );
 						} else {
 							simple.push( child.outerHTML || child.textContent );
 						}
 					} );
 					if ( simple.length ) {
-						const bullet =
-							node.tagName === 'UL'
-								? '-'
-								: `${ listItemIndex + 1 }.`;
+						const bullet = getListItemBullet(
+							node.tagName,
+							orderedListUsesNumbers,
+							listItemIndex
+						);
 
 						result.push(
 							`${ indent(
