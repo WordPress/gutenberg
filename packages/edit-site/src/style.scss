@@ -20,10 +20,12 @@
 @import "./components/layout/style.scss";
 @import "./components/sidebar/style.scss";
 @import "./components/sidebar-navigation-item/style.scss";
-@import "./components/sidebar-navigation-root/style.scss";
-@import "./components/sidebar-navigation-title/style.scss";
+@import "./components/sidebar-navigation-screen/style.scss";
+@import "./components/sidebar-navigation-screen-templates/style.scss";
+@import "./components/site-hub/style.scss";
 @import "./components/site-icon/style.scss";
 @import "./components/style-book/style.scss";
+@import "./hooks/push-changes-to-global-styles/style.scss";
 
 html #wpadminbar {
 	display: none;

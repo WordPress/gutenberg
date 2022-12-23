@@ -25,12 +25,22 @@ import { _x } from '@wordpress/i18n';
  */
 
 /**
+ * @typedef {Object} TypographySettings
+ * @property {?string|?number} size              A default font size.
+ * @property {?string}         minViewPortWidth  Minimum viewport size from which type will have fluidity. Optional if size is specified.
+ * @property {?string}         maxViewPortWidth  Maximum size up to which type will have fluidity. Optional if size is specified.
+ * @property {?number}         scaleFactor       A scale factor to determine how fast a font scales within boundaries. Optional.
+ * @property {?number}         minFontSizeFactor How much to scale defaultFontSize by to derive minimumFontSize. Optional.
+ * @property {?string}         minFontSize       The smallest a calculated font size may be. Optional.
+ */
+
+/**
  * Returns a font-size value based on a given font-size preset.
  * Takes into account fluid typography parameters and attempts to return a css formula depending on available, valid values.
  *
- * @param {Preset}  preset
- * @param {Object}  typographySettings
- * @param {boolean} typographySettings.fluid Whether fluid typography is enabled.
+ * @param {Preset}                     preset
+ * @param {Object}                     typographySettings
+ * @param {boolean|TypographySettings} typographySettings.fluid Whether fluid typography is enabled, and, optionally, fluid font size options.
  *
  * @return {string|*} A font-size value or the value of preset.size.
  */
@@ -45,7 +55,11 @@ export function getTypographyFontSizeValue( preset, typographySettings ) {
 		return defaultSize;
 	}
 
-	if ( true !== typographySettings?.fluid ) {
+	if (
+		! typographySettings?.fluid ||
+		( typeof typographySettings?.fluid === 'object' &&
+			Object.keys( typographySettings.fluid ).length === 0 )
+	) {
 		return defaultSize;
 	}
 
@@ -54,10 +68,16 @@ export function getTypographyFontSizeValue( preset, typographySettings ) {
 		return defaultSize;
 	}
 
+	const fluidTypographySettings =
+		typeof typographySettings?.fluid === 'object'
+			? typographySettings?.fluid
+			: {};
+
 	const fluidFontSizeValue = getComputedFluidTypographyValue( {
 		minimumFontSize: preset?.fluid?.min,
 		maximumFontSize: preset?.fluid?.max,
 		fontSize: defaultSize,
+		minimumFontSizeLimit: fluidTypographySettings?.minFontSize,
 	} );
 
 	if ( !! fluidFontSizeValue ) {

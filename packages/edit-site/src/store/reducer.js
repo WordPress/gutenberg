@@ -51,35 +51,17 @@ export function settings( state = {}, action ) {
  */
 export function editedPost( state = {}, action ) {
 	switch ( action.type ) {
-		case 'SET_TEMPLATE':
-		case 'SET_PAGE':
+		case 'SET_EDITED_POST':
 			return {
-				type: 'wp_template',
-				id: action.templateId,
-				page: action.page,
+				postType: action.postType,
+				id: action.id,
+				context: action.context,
 			};
-		case 'SET_TEMPLATE_PART':
+		case 'SET_EDITED_POST_CONTEXT':
 			return {
-				type: 'wp_template_part',
-				id: action.templatePartId,
+				...state,
+				context: action.context,
 			};
-	}
-
-	return state;
-}
-
-/**
- * Reducer for information about the site's homepage.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function homeTemplateId( state, action ) {
-	switch ( action.type ) {
-		case 'SET_HOME_TEMPLATE':
-			return action.homeTemplateId;
 	}
 
 	return state;
@@ -162,7 +144,6 @@ export default combineReducers( {
 	deviceType,
 	settings,
 	editedPost,
-	homeTemplateId,
 	blockInserterPanel,
 	listViewPanel,
 	saveViewPanel,

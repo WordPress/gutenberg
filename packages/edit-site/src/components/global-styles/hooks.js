@@ -138,7 +138,11 @@ export function useStyle( path, blockName, source = 'all' ) {
 			result = getValueFromVariable(
 				mergedConfig,
 				blockName,
-				get( userConfig, finalPath ) ?? get( baseConfig, finalPath )
+				// The stlyes.css path is allowed to be empty, so don't revert to base if undefined.
+				finalPath === 'styles.css'
+					? get( userConfig, finalPath )
+					: get( userConfig, finalPath ) ??
+							get( baseConfig, finalPath )
 			);
 			break;
 		case 'user':

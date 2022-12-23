@@ -10,6 +10,7 @@ $header-toolbar-min-width: 335px;
 	width: 100%;
 	justify-content: space-between;
 	border-bottom: $border-width solid $gray-200;
+	padding-left: $header-height;
 
 	.edit-site-header-edit-mode__start {
 		display: flex;

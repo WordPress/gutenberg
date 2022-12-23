@@ -28,6 +28,7 @@ import { useStyle, useFontFamilies } from './hooks';
 import Subtitle from './subtitle';
 import TypographyPanel from './typography-panel';
 import FontUploadModal from './font-upload-modal';
+import BlockPreviewPanel from './block-preview-panel';
 
 function FontFamilies() {
 	const { goTo } = useNavigator();
@@ -179,6 +180,8 @@ function ScreenTypography( { name } ) {
 					'Manage the typography settings for different elements.'
 				) }
 			/>
+
+			<BlockPreviewPanel name={ name } />
 
 			{ ! name && (
 				<div className="edit-site-global-styles-screen-typography">

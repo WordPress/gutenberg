@@ -68,6 +68,7 @@ const restrictedImports = [
 			'every',
 			'extend',
 			'filter',
+			'find',
 			'findIndex',
 			'findKey',
 			'findLast',
@@ -106,6 +107,7 @@ const restrictedImports = [
 			'negate',
 			'noop',
 			'nth',
+			'omit',
 			'omitBy',
 			'once',
 			'orderby',
@@ -373,9 +375,6 @@ module.exports = {
 				'plugin:jest-dom/recommended',
 				'plugin:testing-library/react',
 			],
-			rules: {
-				'testing-library/no-node-access': 'off',
-			},
 		},
 		{
 			files: [ 'packages/e2e-test*/**/*.js' ],

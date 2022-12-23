@@ -81,9 +81,11 @@ describe( 'ToolbarGroup', () => {
 			const buttons = screen.getAllByRole( 'button' );
 
 			expect( buttons ).toHaveLength( 2 );
+			// eslint-disable-next-line testing-library/no-node-access
 			expect( buttons[ 0 ].parentElement ).not.toHaveClass(
 				'has-left-divider'
 			);
+			// eslint-disable-next-line testing-library/no-node-access
 			expect( buttons[ 1 ].parentElement ).toHaveClass(
 				'has-left-divider'
 			);

@@ -9,13 +9,14 @@ import classnames from 'classnames';
 import {
 	__experimentalItem as Item,
 	__experimentalHStack as HStack,
-	FlexItem,
+	FlexBlock,
 } from '@wordpress/components';
-import { Icon } from '@wordpress/icons';
+import { chevronRight, Icon } from '@wordpress/icons';
 
 export default function SidebarNavigationItem( {
 	className,
 	icon,
+	withChevron = false,
 	children,
 	...props
 } ) {
@@ -34,7 +35,14 @@ export default function SidebarNavigationItem( {
 						icon={ icon }
 						size={ 24 }
 					/>
-					<FlexItem>{ children }</FlexItem>
+					<FlexBlock>{ children }</FlexBlock>
+					{ withChevron && (
+						<Icon
+							style={ { fill: 'currentcolor' } }
+							icon={ chevronRight }
+							size={ 24 }
+						/>
+					) }
 				</HStack>
 			) }
 			{ ! icon && children }

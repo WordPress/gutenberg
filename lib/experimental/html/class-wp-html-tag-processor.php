@@ -1331,16 +1331,33 @@ class WP_HTML_Tag_Processor {
 	}
 
 	/**
-	 * Sort function to arrange objects with a start property in ascending order.
+	 * Compare two WP_HTML_Text_Replacement objects.
 	 *
 	 * @since 6.2.0
 	 *
-	 * @param object $a First attribute update.
-	 * @param object $b Second attribute update.
+	 * @param WP_HTML_Text_Replacement $a First attribute update.
+	 * @param WP_HTML_Text_Replacement $b Second attribute update.
 	 * @return integer
 	 */
 	private static function sort_start_ascending( $a, $b ) {
-		return $a->start - $b->start;
+		$by_start = $a->start - $b->start;
+		if ( 0 !== $by_start ) {
+			return $by_start;
+		}
+
+		$by_text = isset( $a->text, $b->text ) ? strcmp( $a->text, $b->text ) : 0;
+		if ( 0 !== $by_text ) {
+			return $by_text;
+		}
+
+		/*
+		 * We shouldn't ever get here because it would imply
+		 * that we have two identical updates, or that we're
+		 * trying to replace the same input text twice. Still
+		 * we'll handle this sort to preserve determinism,
+		 * which might come in handy when debugging.
+		 */
+		return $a->end - $b->end;
 	}
 
 	/**
@@ -1657,7 +1674,14 @@ class WP_HTML_Tag_Processor {
 		$this->updated_bytes = strlen( $this->updated_html );
 
 		// 3. Point this tag processor at the original tag opener and consume it
-		$this->parsed_bytes = strlen( $updated_html_up_to_current_tag_name_end ) - $this->tag_name_length - 2;
+
+		/*
+		 * When we get here we're at the end of the tag name, and we want to rewind to before it
+		 * <p>Previous HTML<em>More HTML</em></p>
+		 *                 ^  | back up by the length of the tag name plus the opening <
+		 *                 \<-/ back up by strlen("em") + 1 ==> 3
+		 */
+		$this->parsed_bytes = strlen( $updated_html_up_to_current_tag_name_end ) - $this->tag_name_length - 1;
 		$this->next_tag();
 
 		return $this->html;
