@@ -1,5 +1,21 @@
 == Changelog ==
 
+= 14.8.1 =
+
+## Changelog
+
+### Bug Fixes
+
+- Update the script registration of the react scripts with a cache version to prevent browser cache issues. ([46768](https://github.com/WordPress/gutenberg/pull/46768))
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@youknowriad
+
+
 = 14.8.0 =
 
 ## Changelog
