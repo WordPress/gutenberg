@@ -12,8 +12,10 @@ import ImageSizeControl from '../index';
 describe( 'ImageSizeControl', () => {
 	const mockOnChange = jest.fn();
 	const mockOnChangeImage = jest.fn();
-	const getHeightInput = () => screen.getByLabelText( 'Height' );
-	const getWidthInput = () => screen.getByLabelText( 'Width' );
+	const getHeightInput = () =>
+		screen.getByRole( 'spinbutton', { name: 'Height' } );
+	const getWidthInput = () =>
+		screen.getByRole( 'spinbutton', { name: 'Width' } );
 
 	afterEach( () => {
 		// Cleanup on exiting.
