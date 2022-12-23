@@ -31,7 +31,7 @@ export function getBlockAndPreviewFromMedia( media, mediaType ) {
 	const PreviewTag = mediaTypeTag[ mediaType ];
 	const preview = (
 		<PreviewTag
-			src={ mediaSrc }
+			src={ media.previewUrl || mediaSrc }
 			alt={ alt }
 			controls={ mediaType === 'audio' ? true : undefined }
 			inert="true"

@@ -79,6 +79,7 @@ const coreMediaFetch = async ( query = {} ) => {
 		...mediaItem,
 		alt: mediaItem.alt_text,
 		url: mediaItem.source_url,
+		previewUrl: mediaItem.media_details?.sizes?.medium?.source_url,
 		caption: mediaItem.caption?.raw,
 	} ) );
 };
@@ -140,6 +141,7 @@ const inserterMediaCategories = [
 				sourceId: result.id,
 				id: undefined,
 				caption: getOpenverseCaption( result ),
+				previewUrl: result.thumbnail,
 			} ) );
 		},
 		hasAvailableMedia: true,

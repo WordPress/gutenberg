@@ -23,12 +23,13 @@ import { store as blockEditorStore } from '../../../store';
  * WordPress media blocks(image, video, audio).
  *
  * @typedef {Object} InserterMediaItem
- * @property {string}        title      The title of the media item.
- * @property {string}        src        The source url of the media item.
- * @property {number}        [id]       The WordPress id of the media item.
- * @property {number|string} [sourceId] The id of the media item from external source.
- * @property {string}        [alt]      The alt text of the media item.
- * @property {string}        [caption]  The caption of the media item.
+ * @property {string}        title        The title of the media item.
+ * @property {string}        url          The source url of the media item.
+ * @property {string}        [previewUrl] The preview source url of the media item to display in the media list.
+ * @property {number}        [id]         The WordPress id of the media item.
+ * @property {number|string} [sourceId]   The id of the media item from external source.
+ * @property {string}        [alt]        The alt text of the media item.
+ * @property {string}        [caption]    The caption of the media item.
  *
  */
 
