@@ -103,8 +103,8 @@ class WP_HTML_Attribute_Sourcer {
 			}
 
 			$tags = self::select( $sourcer['selector'], $this->html );
-			if ( null === $tags ) {
-				$unparsed[] = $name;
+			if ( ! $tags ) {
+				$attributes[ $name ] = null;
 				continue;
 			}
 
@@ -155,6 +155,63 @@ class WP_HTML_Attribute_Sourcer {
 	}
 
 	public static function select( $selectors, $html ) {
+		$selector_index = 0;
+
+		selector_choice:
+		$tags = new WP_HTML_Processor( $html );
+		$outer_state = $tags->new_state();
+
+		$selector = $selectors[$selector_index];
+		$next = $selectors[$selector_index];
+
+		loop:
+		while ( $tags->balanced_next( $outer_state ) ) {
+			if ( ! self::select_match( $tags, $selector ) ) {
+				continue;
+			}
+
+			if ( ! isset( $next['then'] ) ) {
+				return $tags;
+			}
+
+			$prev = $next;
+			$next = $next['then'];
+
+			$inner_state = $tags->new_state();
+			switch ( $next['combinator'] ) {
+				case '+':
+					$outer_state->match_depth = 1;
+					while ( $tags->balanced_next( $outer_state ) ) {
+						if ( self::select_match( $tags, $next ) ) {
+							return $tags;
+						}
+					}
+					break;
+
+				case '>':
+					$inner_state->match_depth = 1;
+				case ' ':
+					while ( $tags->balanced_next( $inner_state ) ) {
+						if ( self::select_match( $tags, $next ) ) {
+							return $tags;
+						}
+					}
+					while ( $tags->balanced_next( $inner_state ) ) {
+						continue;
+					}
+					$next = $prev;
+					goto loop;
+			}
+		}
+
+		if ( ++$selector_index < count( $selectors ) ) {
+			goto selector_choice;
+		}
+
+		return false;
+	}
+
+	public static function select_draft1( $selectors, $html ) {
 		$tags = new WP_HTML_Processor( $html );
 		if ( ! $tags->next_tag() ) {
 			return null;

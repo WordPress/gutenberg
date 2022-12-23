@@ -7,7 +7,15 @@
  * @subpackage HTML
  */
 
-require_once __DIR__ . '/../../lib/experimental/html/class-wp-html-processor.php';
+require_once __DIR__ . '/../../lib/experimental/html/index.php';
+
+if ( ! function_exists( 'esc_attr' ) ) {
+	function esc_attr( $s ) { return htmlentities( $s, ENT_QUOTES, null, false ); }
+}
+
+if ( ! class_exists( 'WP_UnitTestCase' ) ) {
+	class WP_UnitTestCase extends PHPUnit\Framework\TestCase {}
+}
 
 /**
  * @group html-processor
@@ -142,7 +150,9 @@ HTML
 		$this->assertEquals( 3, $li_count );
 
 		// Ensure that we ended up where we expected.
-		$this->assertEquals( 'P', $tags->get_tag() );
+		$this->assertEquals( 'UL', $tags->get_tag() );
+		$this->assertTrue( $tags->is_tag_closer() );
+		$tags->next_tag();
 		$this->assertTrue( $tags->get_attribute( 'inner' ) );
 
 		// And now flush out the previous stack/frame
@@ -151,7 +161,8 @@ HTML
 		}
 
 		// Ensure that we're back where we want to be after exiting two separate frames.
-		$this->assertEquals( 'SECTION', $tags->get_tag() );
+		$this->assertEquals( 'P', $tags->get_tag() );
+		$this->assertTrue( $tags->is_tag_closer() );
 		$tags->next_tag( 'p' );
 		$this->assertTrue( $tags->get_attribute( 'wanted' ) );
 	}

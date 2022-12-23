@@ -6,7 +6,15 @@
  * @subpackage HTML
  */
 
-require_once __DIR__ . '/../../lib/experimental/html/class-wp-html-attribute-sourcer.php';
+require_once __DIR__ . '/../../lib/experimental/html/index.php';
+
+if ( ! function_exists( 'esc_attr' ) ) {
+	function esc_attr( $s ) { return htmlentities( $s, ENT_QUOTES, null, false ); }
+}
+
+if ( ! class_exists( 'WP_UnitTestCase' ) ) {
+	class WP_UnitTestCase extends PHPUnit\Framework\TestCase {}
+}
 
 /**
  * @group html
@@ -14,6 +22,56 @@ require_once __DIR__ . '/../../lib/experimental/html/class-wp-html-attribute-sou
  * @coversDefaultClass WP_HTML_Attribute_Sourcer
  */
 class WP_HTML_Attribute_Sourcer_Test extends WP_UnitTestCase {
+	/**
+	 * @dataProvider data_single_combinators
+	 */
+	public function test_sources_single_combinators( $expected, $html, $attributes ) {
+		$this->assertSame( $expected, ( new WP_HTML_Attribute_Sourcer( $attributes, $html ) )->source_attributes() );
+	}
+
+	public function data_single_combinators() {
+		return array(
+			array(
+				array( 'attributes' => array( 'link' => 'docs.html' ), 'unparsed' => array() ),
+				'<div><a href="docs.html"></a></div>',
+				array(
+					'link' => array(
+						'type' => 'string',
+						'source' => 'attribute',
+						'selector' => 'div a',
+						'attribute' => 'href'
+					),
+				),
+			),
+
+			array(
+				array( 'attributes' => array( 'link' => 'docs.html' ), 'unparsed' => array() ),
+				'<div><a href="docs.html"></a></div>',
+				array(
+					'link' => array(
+						'type' => 'string',
+						'source' => 'attribute',
+						'selector' => 'div > a',
+						'attribute' => 'href'
+					),
+				),
+			),
+
+			array(
+				array( 'attributes' => array( 'link' => 'docs.html' ), 'unparsed' => array() ),
+				'<div></div><a href="docs.html"></a>',
+				array(
+					'link' => array(
+						'type' => 'string',
+						'source' => 'attribute',
+						'selector' => 'div + a',
+						'attribute' => 'href'
+					),
+				),
+			),
+		);
+	}
+
 	/**
 	 * @dataProvider data_sourced_attributes
 	 */

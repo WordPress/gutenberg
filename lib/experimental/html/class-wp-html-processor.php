@@ -81,7 +81,6 @@ class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 					 * navigating through non-normative documents.
 					 */
 					if ( $last_tag !== $tag_name ) {
-						$this->next_tag();
 						return false;
 					}
 					break;
@@ -104,7 +103,6 @@ class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 			 * Step 2. Bail if we've reached the end of the tag in which we started.
 			 */
 			if ( 0 === $depth ) {
-				$this->next_tag();
 				return false;
 			}
 
@@ -127,7 +125,6 @@ class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 			}
 		}
 
-		$this->next_tag();
 		return false;
 	}
 
