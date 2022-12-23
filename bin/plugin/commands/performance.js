@@ -173,6 +173,15 @@ async function runTestSuite( testSuite, performanceTestDirectory ) {
 			`packages/e2e-tests/specs/performance/${ testSuite }.test.results.json`
 		)
 	);
+
+	fs.copyFileSync(
+		path.join(
+			performanceTestDirectory,
+			`packages/e2e-tests/specs/performance/${ testSuite }.test.results.json`
+		),
+		`/perf-results-${ testSuite }.json`
+	);
+
 	return curateResults( rawResults );
 }
 

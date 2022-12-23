@@ -35,7 +35,14 @@ jobs:
 
             - name: Compare performance with trunk
               if: github.event_name == 'pull_request'
-              run: ./bin/plugin/cli.js perf $GITHUB_SHA trunk --tests-branch $GITHUB_SHA
+              run: ./bin/plugin/cli.js perf release/14.8 release/14.7 wp/6.1 --wp-version 6.1 --rounds 1
+
+            - name: Store Raw Results
+              uses: actions/upload-artifact@v3
+              with:
+                  name: raw-perf-results
+                  path: |
+                      /perf-results-*.json
 
             - name: Compare performance with current WordPress Core and previous Gutenberg versions
               if: github.event_name == 'release'
