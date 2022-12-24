@@ -69,6 +69,19 @@ class WP_HTML_Attribute_Sourcer_Test extends WP_UnitTestCase {
 					),
 				),
 			),
+
+			array(
+				array( 'attributes' => array( 'link' => null ), 'unparsed' => array() ),
+				'<div></div><hr><a href="docs.html"></a>',
+				array(
+					'link' => array(
+						'type' => 'string',
+						'source' => 'attribute',
+						'selector' => 'div + a',
+						'attribute' => 'href'
+					),
+				),
+			),
 		);
 	}
 

@@ -83,6 +83,14 @@ class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 					if ( $last_tag !== $tag_name ) {
 						return false;
 					}
+
+					/*
+					 * Step 2. Bail if we've reached the end of the tag in which we started.
+					 */
+					if ( 0 === $state->relative_depth() ) {
+						return false;
+					}
+
 					break;
 			}
 
@@ -98,13 +106,6 @@ class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 			$depth = $type === 'void'
 				? $state->relative_depth() + 1
 				: $state->relative_depth();
-
-			/*
-			 * Step 2. Bail if we've reached the end of the tag in which we started.
-			 */
-			if ( 0 === $depth ) {
-				return false;
-			}
 
 			/*
 			 * Step 3. Determine if we have a matching tag. In addition to the query

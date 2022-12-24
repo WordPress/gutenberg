@@ -8,6 +8,10 @@
  *  - select_adjacent_sibling( $tags_at_start_tag, $selector_sequence )
  *  - select_general_sibling( $tags_at_start_tag, $selector_sequence )
  *  - close_n_levels( $tags_at_depth, $n_levels )
+ *
+ * @TODO:
+ *  - [ ] Handle multiple joined constraints for classes and attributes
+ *        e.g. ".locale-en-US.localized[data-translation-id][data-translate]"
  */
 
 /**
@@ -174,31 +178,53 @@ class WP_HTML_Attribute_Sourcer {
 				return $tags;
 			}
 
+			inner_loop:
 			$prev = $next;
 			$next = $next['then'];
 
 			$inner_state = $tags->new_state();
 			switch ( $next['combinator'] ) {
+				/*
+				 * Adjacent sibling must be the immediately-following
+				 * element which shares the same parent.
+				 */
 				case '+':
-					$outer_state->match_depth = 1;
-					while ( $tags->balanced_next( $outer_state ) ) {
-						if ( self::select_match( $tags, $next ) ) {
-							return $tags;
-						}
-					}
-					break;
-
-				case '>':
-					$inner_state->match_depth = 1;
-				case ' ':
-					while ( $tags->balanced_next( $inner_state ) ) {
-						if ( self::select_match( $tags, $next ) ) {
-							return $tags;
-						}
-					}
+					// Close out this tag if it needs to be.
 					while ( $tags->balanced_next( $inner_state ) ) {
 						continue;
 					}
+
+					if ( $tags->balanced_next( $outer_state ) && self::select_match( $tags, $next ) ) {
+						if ( ! isset( $next['then'] ) ) {
+							return $tags;
+						}
+						goto inner_loop;
+					}
+
+					$next = $prev;
+					break;
+
+				// Child combinator
+				case '>':
+					$inner_state->match_depth = 1;
+					// Intentional fallthrough
+				// Descendant combinator
+				case ' ':
+					/*
+					 * This match has to be a child of the matched tag,
+					 * and the matched tag has to be its parent for the
+					 * case of the child combinator.
+					 */
+					while ( $tags->balanced_next( $inner_state ) ) {
+						if ( self::select_match( $tags, $next ) ) {
+							if ( ! isset( $next['then'] ) ) {
+								return $tags;
+							}
+
+							goto inner_loop;
+						}
+					}
+
 					$next = $prev;
 					goto loop;
 			}
