@@ -310,7 +310,11 @@ export default function VisualEditor( { styles } ) {
 			...styles,
 			{
 				// We should move this in to future to the body.
-				css: `.edit-post-visual-editor__post-title-wrapper{margin-top:4rem}`,
+				css:
+					`.edit-post-visual-editor__post-title-wrapper{margin-top:4rem}` +
+					( paddingBottom
+						? `body{padding-bottom:${ paddingBottom }}`
+						: '' ),
 			},
 		],
 		[ styles ]
@@ -358,7 +362,6 @@ export default function VisualEditor( { styles } ) {
 						contentRef={ contentRef }
 						styles={ styles }
 						assets={ assets }
-						style={ { paddingBottom } }
 					>
 						{ themeSupportsLayout &&
 							! themeHasDisabledLayoutStyles &&

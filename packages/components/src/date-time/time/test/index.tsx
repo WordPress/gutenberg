@@ -9,6 +9,8 @@ import userEvent from '@testing-library/user-event';
  */
 import TimePicker from '..';
 
+jest.useFakeTimers();
+
 describe( 'TimePicker', () => {
 	it( 'should call onChange with updated date values', async () => {
 		const user = userEvent.setup( {

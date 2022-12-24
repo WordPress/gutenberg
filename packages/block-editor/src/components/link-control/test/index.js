@@ -376,9 +376,15 @@ describe( 'Searching for a link', () => {
 		const searchResults = await screen.findByRole( 'listbox', {
 			name: /Search results for.*/,
 		} );
-		const searchResultTextHighlightElements = Array.from(
-			searchResults.querySelectorAll( 'button[role="option"] mark' )
-		);
+
+		const searchResultTextHighlightElements = within( searchResults )
+			.getAllByRole( 'option' )
+			// TODO: Change to `getByRole( 'mark' )` when officially supported by
+			// WAI-ARIA 1.3 - see https://w3c.github.io/aria/#mark
+			// eslint-disable-next-line testing-library/no-node-access
+			.map( ( searchResult ) => searchResult.querySelector( 'mark' ) )
+			.flat()
+			.filter( Boolean );
 
 		// Given we're mocking out the results we should always have 4 mark elements.
 		expect( searchResultTextHighlightElements ).toHaveLength( 4 );
@@ -1092,6 +1098,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 			// Check human readable error notice is perceivable.
 			expect( errorNotice ).toBeVisible();
+			// eslint-disable-next-line testing-library/no-node-access
 			expect( errorNotice.parentElement ).toHaveClass(
 				'block-editor-link-control__search-error'
 			);
@@ -1324,7 +1331,8 @@ describe( 'Selecting links', () => {
 				} );
 
 				// Make sure focus is retained after submission.
-				expect( container ).toContainElement( document.activeElement );
+				// eslint-disable-next-line testing-library/no-node-access
+				expect( container.firstChild ).toHaveFocus();
 
 				expect( currentLink ).toBeVisible();
 				expect(
@@ -1594,11 +1602,13 @@ describe( 'Rich link previews', () => {
 		await waitFor( () => expect( linkPreview ).toHaveClass( 'is-rich' ) );
 
 		// Todo: refactor to use user-facing queries.
+		// eslint-disable-next-line testing-library/no-node-access
 		const hasRichImagePreview = linkPreview.querySelector(
 			'.block-editor-link-control__search-item-image'
 		);
 
 		// Todo: refactor to use user-facing queries.
+		// eslint-disable-next-line testing-library/no-node-access
 		const hasRichDescriptionPreview = linkPreview.querySelector(
 			'.block-editor-link-control__search-item-description'
 		);
@@ -1646,11 +1656,14 @@ describe( 'Rich link previews', () => {
 
 		await waitFor( () => expect( linkPreview ).toHaveClass( 'is-rich' ) );
 
+		// eslint-disable-next-line testing-library/no-node-access
 		const iconPreview = linkPreview.querySelector(
 			`.block-editor-link-control__search-item-icon`
 		);
 
+		// eslint-disable-next-line testing-library/no-node-access
 		const fallBackIcon = iconPreview.querySelector( 'svg' );
+		// eslint-disable-next-line testing-library/no-node-access
 		const richIcon = iconPreview.querySelector( 'img' );
 
 		expect( fallBackIcon ).toBeVisible();
@@ -1680,6 +1693,7 @@ describe( 'Rich link previews', () => {
 				expect( linkPreview ).toHaveClass( 'is-rich' )
 			);
 
+			// eslint-disable-next-line testing-library/no-node-access
 			const missingDataItem = linkPreview.querySelector(
 				`.block-editor-link-control__search-item-${ dataItem }`
 			);

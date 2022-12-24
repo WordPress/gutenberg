@@ -17,6 +17,7 @@
 -   `InputControl`: Fix internal `Flex` wrapper usage that could add an unintended `height: 100%` ([#46213](https://github.com/WordPress/gutenberg/pull/46213)).
 -   `Navigator`: Allow calling `goTo` and `goBack` twice in one render cycle ([#46391](https://github.com/WordPress/gutenberg/pull/46391)).
 -   `Modal`: Fix unexpected modal closing in IME Composition ([#46453](https://github.com/WordPress/gutenberg/pull/46453)).
+-   `Toolbar`: Fix duplicate focus style on anchor link button ([#46759](https://github.com/WordPress/gutenberg/pull/46759)).
 
 ### Enhancements
 
