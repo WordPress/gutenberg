@@ -23,6 +23,56 @@ if ( ! class_exists( 'WP_UnitTestCase' ) ) {
  */
 class WP_HTML_Attribute_Sourcer_Test extends WP_UnitTestCase {
 	/**
+	 * @dataProvider data_ids_and_their_selectors
+	 */
+	public function test_selects_proper_html_from_selector( $wanted_ids, $selector ) {
+		$html = <<<HTML
+<main id="main">
+	<section id="main-section">
+		<header id="header"><h2 id="page-title">It's a post!</h2></header>
+	</section>
+
+	<section id="post-section" class="wp-post post-15 post">
+		<h2 id="post-title" class="post-title">The antics of ants with antlers</h2>
+		<p>
+			<img id="ant-logo" href="ant.jpg">
+			<strong id="strong-ants">Ants</strong>
+			<em id="funny-stuff">with antlers can be funny</em>.
+		</p>
+		<ul id="ul-list">
+			<li id="li-1">Decorations</li>
+			<li id="li-2">Cleanup crew</li>
+			<li id="li-3">Spooky visitors</li>
+		</ul>
+	</section>
+</main>
+HTML;
+
+		list( $selectors ) = WP_HTML_Attribute_Sourcer::parse_selector( $selector );
+		$this->assertIsArray( $selectors );
+
+		$found_ids = array();
+		if ( $tags = WP_HTML_Attribute_Sourcer::select( [ $selectors ], $html ) ) {
+			$found_ids[] = $tags->get_attribute( 'id' );
+		}
+
+		$this->assertEqualsCanonicalizing( $wanted_ids, $found_ids );
+	}
+
+	public function data_ids_and_their_selectors() {
+		return array(
+			array( array( 'li-1' ), 'li' ),
+			array( array(), 'section > p img + em' ),
+			array( array( 'strong-ants' ), 'section > p img + strong' ),
+			array( array( 'funny-stuff' ), 'section > p strong + em' ),
+			array( array( 'page-title' ), 'section   h2' ),
+			array( array( 'post-title' ), 'section > h2' ),
+			array( array( 'ant-logo' ), '[href]' ),
+			array( array(), '.non-existent' ),
+		);
+	}
+
+	/**
 	 * @dataProvider data_single_combinators
 	 */
 	public function test_sources_single_combinators( $expected, $html, $attributes ) {

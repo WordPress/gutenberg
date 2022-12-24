@@ -4,6 +4,7 @@
  * @TODO: Handle self-closing foreign elements.
  * @TODO: Detect non-normative HTML input.
  * @TODO: Consider parsing non-normative HTML input, support adoption agency algorithm.
+ * @TODO: Figure out how multiple external states can conflict.
  *
  * If we support non-normative HTML we can probably handle significantly more
  * HTML without introducing unexpected results, but I'm not sure yet if we can
@@ -65,6 +66,10 @@ class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 					 * need to separately track those, but their behavior matches
 					 * this case. The self-closing flag is ignored for HTML5 tags.
 					 */
+					if ( 0 === $state->relative_depth() ) {
+						return false;
+					}
+
 					break;
 
 				case 'opener':

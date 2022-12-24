@@ -12,6 +12,7 @@
  * @TODO:
  *  - [ ] Handle multiple joined constraints for classes and attributes
  *        e.g. ".locale-en-US.localized[data-translation-id][data-translate]"
+ *  - [ ] Handle comma-separated selector sequences; apparently we only grab the first right now
  */
 
 /**
@@ -158,6 +159,10 @@ class WP_HTML_Attribute_Sourcer {
 		return $tags;
 	}
 
+	/**
+	 * @TODO: This needs to be able to continue to the next match
+	 *        Pass in $tags? Pass in a bookmark?
+	 */
 	public static function select( $selectors, $html ) {
 		$selector_index = 0;
 
@@ -165,7 +170,7 @@ class WP_HTML_Attribute_Sourcer {
 		$tags = new WP_HTML_Processor( $html );
 		$outer_state = $tags->new_state();
 
-		$next = $selectors[$selector_index];
+		$next = $selectors[ $selector_index ];
 
 		loop:
 		while ( $tags->balanced_next( $outer_state ) ) {
