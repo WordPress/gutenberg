@@ -16,6 +16,12 @@ export type Entity = {
 	value?: string;
 };
 
+export type Category = {
+	id: number;
+	value: string;
+	name?: string;
+};
+
 export type TermsWithChildren = Array< Entity & { children: Entity[] } >;
 
 export type CategorySelectProps = {
@@ -111,9 +117,9 @@ export type QueryControlsProps = {
 	/**
 	 * The selected categories for the `categorySuggestions`.
 	 */
-	selectedCategories?: Entity[];
+	selectedCategories?: Category[];
 	/**
 	 * The selected category for the `categoriesList`.
 	 */
-	selectedCategoryId?: Entity[ 'id' ];
+	selectedCategoryId?: Category[ 'id' ];
 };

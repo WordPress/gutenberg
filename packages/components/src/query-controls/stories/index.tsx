@@ -51,11 +51,11 @@ Default.args = {
 	selectedCategories: [
 		{
 			id: 11,
-			name: 'TypeScript',
+			value: 'TypeScript',
 		},
 		{
 			id: 12,
-			name: 'JavaScript',
+			value: 'JavaScript',
 		},
 	],
 	numberOfItems: 5,
