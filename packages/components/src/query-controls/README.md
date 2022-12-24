@@ -69,30 +69,30 @@ const QUERY_DEFAULTS = {
 	selectedCategories: [
 		{
 			id: 1,
-			name: 'Category 1',
+			value: 'Category 1',
 		},
 		{
 			id: 2,
-			name: 'Category 1b',
+			value: 'Category 1b',
 		},
 	],
-	categories: [
-		{
+	categories: {
+		'Category 1': {
 			id: 1,
 			name: 'Category 1',
 			parent: 0,
 		},
-		{
+		'Category 1b': {
 			id: 2,
 			name: 'Category 1b',
 			parent: 1,
 		},
-		{
+		'Category 2': {
 			id: 3,
 			name: 'Category 2',
 			parent: 0,
 		},
-	],
+	},
 	numberOfItems: 10,
 };
 
