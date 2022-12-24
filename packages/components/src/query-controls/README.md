@@ -224,14 +224,14 @@ The selected author ID.
 -   Required: No
 -   Platform: Web
 
-#### `selectedCategories`: `Entity[]`
+#### `selectedCategories`: `Category[]`
 
 The selected categories for the `categorySuggestions`.
 
 -   Required: No
 -   Platform: Web
 
-#### `selectedCategoryId`: `Entity[ 'id' ]`
+#### `selectedCategoryId`: `Category[ 'id' ]`
 
 The selected category for the `categoriesList`.
 
