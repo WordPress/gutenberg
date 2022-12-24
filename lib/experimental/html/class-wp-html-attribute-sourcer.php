@@ -165,12 +165,11 @@ class WP_HTML_Attribute_Sourcer {
 		$tags = new WP_HTML_Processor( $html );
 		$outer_state = $tags->new_state();
 
-		$selector = $selectors[$selector_index];
 		$next = $selectors[$selector_index];
 
 		loop:
 		while ( $tags->balanced_next( $outer_state ) ) {
-			if ( ! self::select_match( $tags, $selector ) ) {
+			if ( ! self::select_match( $tags, $next ) ) {
 				continue;
 			}
 

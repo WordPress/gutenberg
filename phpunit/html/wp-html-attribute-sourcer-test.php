@@ -171,7 +171,7 @@ class WP_HTML_Attribute_Sourcer_Test extends WP_UnitTestCase {
 	public function data_sourced_attributes() {
 		return array(
 			array(
-				array( 'attributes' => array( 'link' => 'docs.html' ), 'unparsed' => array() ),
+				array( 'attributes' => array( 'link' => 'image' ), 'unparsed' => array() ),
 				<<<EOF
 					<main>
 						<section>Just another section</section>
