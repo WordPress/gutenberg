@@ -14,6 +14,8 @@ import { useState } from '@wordpress/element';
  */
 import MediaReplaceFlow from '../';
 
+jest.useFakeTimers();
+
 const noop = () => {};
 
 function TestWrapper() {

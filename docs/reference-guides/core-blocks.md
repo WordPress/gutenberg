@@ -428,8 +428,8 @@ Display a list of all pages. ([Source](https://github.com/WordPress/gutenberg/tr
 
 -	**Name:** core/page-list
 -	**Category:** widgets
--	**Supports:** ~~html~~, ~~reusable~~
--	**Attributes:** parentPageID
+-	**Supports:** typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Attributes:** isNested, parentPageID
 
 ## Page List Item
 

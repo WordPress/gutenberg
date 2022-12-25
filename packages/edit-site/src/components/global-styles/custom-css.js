@@ -42,6 +42,7 @@ function CustomCSSControl() {
 	return (
 		<>
 			<TextareaControl
+				__nextHasNoMarginBottom
 				value={
 					customCSS?.replace( ignoreThemeCustomCSS, '' ) ||
 					themeCustomCSS

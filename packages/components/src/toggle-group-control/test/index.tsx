@@ -18,6 +18,8 @@ import {
 	ToggleGroupControlOptionIcon,
 } from '../index';
 
+jest.useFakeTimers();
+
 function getWrappingPopoverElement( element: HTMLElement ) {
 	return element.closest( '.components-popover' );
 }

@@ -16,6 +16,8 @@ import UnitControl from '..';
 import { parseQuantityAndUnitFromRawValue } from '../utils';
 import type { UnitControlOnChangeCallback } from '../types';
 
+jest.useFakeTimers();
+
 const getInput = ( {
 	isInputTypeText = false,
 }: {
@@ -112,6 +114,7 @@ describe( 'UnitControl', () => {
 			);
 
 			expect(
+				// eslint-disable-next-line testing-library/no-node-access
 				withoutClassName.querySelector( '.components-unit-control' )
 			).not.toHaveClass( 'hello' );
 			expect(

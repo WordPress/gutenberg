@@ -754,8 +754,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	public function test_allow_indirect_properties() {
 		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
 			array(
-				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-				'styles'  => array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'   => array(
 					'blocks'  => array(
 						'core/social-links' => array(
 							'spacing' => array(
@@ -770,12 +770,18 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						'blockGap' => '3em',
 					),
 				),
+				'settings' => array(
+					'layout' => array(
+						'contentSize' => '800px',
+						'wideSize'    => '1000px',
+					),
+				),
 			)
 		);
 
 		$expected = array(
-			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-			'styles'  => array(
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'styles'   => array(
 				'blocks'  => array(
 					'core/social-links' => array(
 						'spacing' => array(
@@ -788,6 +794,12 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'spacing' => array(
 					'blockGap' => '3em',
+				),
+			),
+			'settings' => array(
+				'layout' => array(
+					'contentSize' => '800px',
+					'wideSize'    => '1000px',
 				),
 			),
 		);

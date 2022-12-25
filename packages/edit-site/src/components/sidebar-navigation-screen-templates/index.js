@@ -4,10 +4,9 @@
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHStack as HStack,
-	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useViewportMatch } from '@wordpress/compose';
@@ -20,7 +19,6 @@ import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { useLocation } from '../routes';
 import { store as editSiteStore } from '../../store';
-import getIsListPage from '../../utils/get-is-list-page';
 import AddNewTemplate from '../add-new-template';
 
 function omit( object, keys ) {
@@ -62,10 +60,7 @@ export default function SidebarNavigationScreenTemplates( {
 	postType = 'wp_template',
 } ) {
 	const { params } = useLocation();
-	const { __unstableSetCanvasMode } = useDispatch( editSiteStore );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const isListPage = getIsListPage( params );
-	const isEditorPage = ! isListPage;
 
 	// Ideally the URL params would be enough.
 	// Loading the editor should ideally redirect to the home page
@@ -125,31 +120,18 @@ export default function SidebarNavigationScreenTemplates( {
 			path={ config[ postType ].path }
 			parentTitle={ __( 'Design' ) }
 			title={
-				<HStack style={ { minHeight: 36 } } justify="space-between">
+				<HStack justify="space-between">
 					<div style={ { flexShrink: 0 } }>
 						{ config[ postType ].labels.title }
 					</div>
 					{ ! isMobileViewport && (
-						<HStack spacing={ 2 } justify="right">
-							<AddNewTemplate
-								templateType={ postType }
-								toggleProps={ {
-									className:
-										'edit-site-sidebar-navigation-screen-templates__add-button',
-								} }
-							/>
-							{ isEditorPage && (
-								<Button
-									className="edit-site-layout__edit-button"
-									label={ __( 'Open the editor' ) }
-									onClick={ () => {
-										__unstableSetCanvasMode( 'edit' );
-									} }
-								>
-									{ __( 'Edit' ) }
-								</Button>
-							) }
-						</HStack>
+						<AddNewTemplate
+							templateType={ postType }
+							toggleProps={ {
+								className:
+									'edit-site-sidebar-navigation-screen-templates__add-button',
+							} }
+						/>
 					) }
 				</HStack>
 			}

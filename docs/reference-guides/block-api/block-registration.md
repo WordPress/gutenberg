@@ -145,7 +145,7 @@ styles: [
 ],
 ```
 
-Plugins and Themes can also register [custom block style](/docs/reference-guides/filters/block-filters.md#block-styles) for existing blocks.
+Plugins and Themes can also register [custom block style](/docs/reference-guides/block-api/block-styles.md) for existing blocks.
 
 #### attributes (optional)
 

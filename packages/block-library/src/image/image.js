@@ -413,6 +413,7 @@ export default function Image( {
 				<PanelBody title={ __( 'Settings' ) }>
 					{ ! multiImageSelection && (
 						<TextareaControl
+							__nextHasNoMarginBottom
 							label={ __( 'Alt text (alternative text)' ) }
 							value={ alt }
 							onChange={ updateAlt }

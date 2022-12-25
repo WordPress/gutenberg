@@ -22,7 +22,6 @@ import {
 	EntitiesSavedStates,
 } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
-import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -31,7 +30,6 @@ import { SidebarComplementaryAreaFills } from '../sidebar-edit-mode';
 import BlockEditor from '../block-editor';
 import CodeEditor from '../code-editor';
 import KeyboardShortcuts from '../keyboard-shortcuts';
-import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
 import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
 import WelcomeGuide from '../welcome-guide';
@@ -52,9 +50,6 @@ const interfaceLabels = {
 };
 
 export default function Editor() {
-	// This ensures the edited entity id and type are initialized properly.
-	useInitEditedEntityFromURL();
-
 	const {
 		editedPostId,
 		editedPostType,
@@ -68,8 +63,6 @@ export default function Editor() {
 		isInserterOpen,
 		isListViewOpen,
 		isSaveViewOpen,
-		previousShortcut,
-		nextShortcut,
 		showIconLabels,
 	} = useSelect( ( select ) => {
 		const {
@@ -84,9 +77,6 @@ export default function Editor() {
 		} = select( editSiteStore );
 		const { hasFinishedResolution, getEntityRecord } = select( coreStore );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
-		const { getAllShortcutKeyCombinations } = select(
-			keyboardShortcutsStore
-		);
 		const { getActiveComplementaryArea } = select( interfaceStore );
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();
@@ -115,12 +105,6 @@ export default function Editor() {
 			isSaveViewOpen: isSaveViewOpened(),
 			isRightSidebarOpen: getActiveComplementaryArea(
 				editSiteStore.name
-			),
-			previousShortcut: getAllShortcutKeyCombinations(
-				'core/edit-site/previous-region'
-			),
-			nextShortcut: getAllShortcutKeyCombinations(
-				'core/edit-site/next-region'
 			),
 			showIconLabels: select( preferencesStore ).get(
 				'core/edit-site',
@@ -182,6 +166,7 @@ export default function Editor() {
 						<BlockContextProvider value={ blockContext }>
 							<SidebarComplementaryAreaFills />
 							<InterfaceSkeleton
+								enableRegionNavigation={ false }
 								className={
 									showIconLabels && 'show-icon-labels'
 								}
@@ -262,10 +247,6 @@ export default function Editor() {
 										/>
 									)
 								}
-								shortcuts={ {
-									previous: previousShortcut,
-									next: nextShortcut,
-								} }
 								labels={ {
 									...interfaceLabels,
 									secondarySidebar: secondarySidebarLabel,
