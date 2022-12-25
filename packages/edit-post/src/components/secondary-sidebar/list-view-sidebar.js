@@ -90,6 +90,7 @@ export default function ListViewSidebar() {
 			aria-label={ __( 'Document Overview' ) }
 			className="edit-post-editor__document-overview-panel"
 			onKeyDown={ closeOnEscape }
+			ref={ sidebarRef }
 		>
 			<div
 				className="edit-post-editor__document-overview-panel-header components-panel__header edit-post-sidebar__panel-tabs"
