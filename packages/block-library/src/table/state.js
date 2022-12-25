@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, mapValues, pick } from 'lodash';
+import { get, mapValues } from 'lodash';
 
 const INHERITED_COLUMN_ATTRIBUTES = [ 'align' ];
 
@@ -78,7 +78,11 @@ export function updateSelectedCell( state, selection, updateCell ) {
 		return state;
 	}
 
-	const tableSections = pick( state, [ 'head', 'body', 'foot' ] );
+	const tableSections = Object.fromEntries(
+		Object.entries( state ).filter( ( [ key ] ) =>
+			[ 'head', 'body', 'foot' ].includes( key )
+		)
+	);
 	const { sectionName: selectionSectionName, rowIndex: selectionRowIndex } =
 		selection;
 
@@ -174,9 +178,12 @@ export function insertRow( state, { sectionName, rowIndex, columnCount } ) {
 							[ 'cells', index ],
 							{}
 						);
-						const inheritedAttributes = pick(
-							firstCellInColumn,
-							INHERITED_COLUMN_ATTRIBUTES
+
+						const inheritedAttributes = Object.fromEntries(
+							Object.entries( firstCellInColumn ).filter(
+								( [ key ] ) =>
+									INHERITED_COLUMN_ATTRIBUTES.includes( key )
+							)
 						);
 
 						return {
@@ -220,7 +227,11 @@ export function deleteRow( state, { sectionName, rowIndex } ) {
  * @return {Object} New table state.
  */
 export function insertColumn( state, { columnIndex } ) {
-	const tableSections = pick( state, [ 'head', 'body', 'foot' ] );
+	const tableSections = Object.fromEntries(
+		Object.entries( state ).filter( ( [ key ] ) =>
+			[ 'head', 'body', 'foot' ].includes( key )
+		)
+	);
 
 	return mapValues( tableSections, ( section, sectionName ) => {
 		// Bail early if the table section is empty.
@@ -259,7 +270,11 @@ export function insertColumn( state, { columnIndex } ) {
  * @return {Object} New table state.
  */
 export function deleteColumn( state, { columnIndex } ) {
-	const tableSections = pick( state, [ 'head', 'body', 'foot' ] );
+	const tableSections = Object.fromEntries(
+		Object.entries( state ).filter( ( [ key ] ) =>
+			[ 'head', 'body', 'foot' ].includes( key )
+		)
+	);
 
 	return mapValues( tableSections, ( section ) => {
 		// Bail early if the table section is empty.

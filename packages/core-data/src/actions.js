@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual, find } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 import { v4 as uuid } from 'uuid';
 
 /**
@@ -255,7 +255,9 @@ export const deleteEntityRecord =
 	) =>
 	async ( { dispatch } ) => {
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
-		const entityConfig = find( configs, { kind, name } );
+		const entityConfig = configs.find(
+			( config ) => config.kind === kind && config.name === name
+		);
 		let error;
 		let deletedRecord = false;
 		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
@@ -355,7 +357,9 @@ export const editEntityRecord =
 				const value = mergedEdits[ key ]
 					? { ...editedRecordValue, ...edits[ key ] }
 					: edits[ key ];
-				acc[ key ] = isEqual( recordValue, value ) ? undefined : value;
+				acc[ key ] = fastDeepEqual( recordValue, value )
+					? undefined
+					: value;
 				return acc;
 			}, {} ),
 			transientEdits,
@@ -448,7 +452,9 @@ export const saveEntityRecord =
 	) =>
 	async ( { select, resolveSelect, dispatch } ) => {
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
-		const entityConfig = find( configs, { kind, name } );
+		const entityConfig = configs.find(
+			( config ) => config.kind === kind && config.name === name
+		);
 		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
 			return;
 		}
@@ -720,7 +726,9 @@ export const saveEditedEntityRecord =
 			return;
 		}
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
-		const entityConfig = find( configs, { kind, name } );
+		const entityConfig = configs.find(
+			( config ) => config.kind === kind && config.name === name
+		);
 		if ( ! entityConfig ) {
 			return;
 		}

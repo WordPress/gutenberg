@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { find } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -240,8 +239,7 @@ function wrapperSelector( select ) {
 	);
 
 	// Get the clientId of the topmost parent with the capture toolbars setting.
-	const capturingClientId = find(
-		blockParentsClientIds,
+	const capturingClientId = blockParentsClientIds.find(
 		( parentClientId ) =>
 			parentBlockListSettings[ parentClientId ]
 				?.__experimentalCaptureToolbars

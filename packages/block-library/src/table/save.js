@@ -43,7 +43,10 @@ export default function save( { attributes } ) {
 				{ rows.map( ( { cells }, rowIndex ) => (
 					<tr key={ rowIndex }>
 						{ cells.map(
-							( { content, tag, scope, align }, cellIndex ) => {
+							(
+								{ content, tag, scope, align, colspan },
+								cellIndex
+							) => {
 								const cellClasses = classnames( {
 									[ `has-text-align-${ align }` ]: align,
 								} );
@@ -62,6 +65,7 @@ export default function save( { attributes } ) {
 										scope={
 											tag === 'th' ? scope : undefined
 										}
+										colSpan={ colspan }
 									/>
 								);
 							}

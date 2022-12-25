@@ -15,6 +15,8 @@ import { useSelect } from '@wordpress/data';
  */
 import PostSavedState from '../';
 
+jest.useFakeTimers();
+
 const mockSavePost = jest.fn();
 
 jest.mock( '@wordpress/data/src/components/use-dispatch', () => {

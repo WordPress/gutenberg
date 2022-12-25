@@ -32,6 +32,7 @@ import type {
 	SinglePaletteProps,
 } from './types';
 import type { WordPressComponentProps } from '../ui/context';
+import type { DropdownProps } from '../dropdown/types';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
@@ -70,7 +71,7 @@ function SinglePalette( {
 					}
 					style={ { backgroundColor: color, color } }
 					onClick={
-						isSelected ? clearColor : () => onChange( color )
+						isSelected ? clearColor : () => onChange( color, index )
 					}
 					aria-label={
 						name
@@ -83,10 +84,6 @@ function SinglePalette( {
 			);
 		} );
 	}, [ colors, value, onChange, clearColor ] );
-
-	if ( colors.length === 0 ) {
-		return null;
-	}
 
 	return (
 		<CircularOptionPicker
@@ -118,7 +115,9 @@ function MultiplePalettes( {
 						<SinglePalette
 							clearColor={ clearColor }
 							colors={ colorPalette }
-							onChange={ onChange }
+							onChange={ ( newColor ) =>
+								onChange( newColor, index )
+							}
 							value={ value }
 							actions={
 								colors.length === index + 1 ? actions : null
@@ -136,7 +135,7 @@ export function CustomColorPickerDropdown( {
 	popoverProps: receivedPopoverProps,
 	...props
 }: CustomColorPickerDropdownProps ) {
-	const popoverProps = useMemo(
+	const popoverProps = useMemo< DropdownProps[ 'popoverProps' ] >(
 		() => ( {
 			shift: true,
 			...( isRenderedInSidebar

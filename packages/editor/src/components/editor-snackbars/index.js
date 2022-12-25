@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { filter } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { SnackbarList } from '@wordpress/components';
@@ -16,9 +11,9 @@ export default function EditorSnackbars() {
 		[]
 	);
 	const { removeNotice } = useDispatch( noticesStore );
-	const snackbarNotices = filter( notices, {
-		type: 'snackbar',
-	} );
+	const snackbarNotices = notices.filter(
+		( { type } ) => type === 'snackbar'
+	);
 
 	return (
 		<SnackbarList

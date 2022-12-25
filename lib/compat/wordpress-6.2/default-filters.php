@@ -17,6 +17,9 @@
  * @package gutenberg
  */
 
-add_action( 'switch_theme', 'wp_theme_has_theme_json_clean_cache' );
-add_action( 'start_previewing_theme', 'wp_theme_has_theme_json_clean_cache' );
-add_action( 'upgrader_process_complete', '_wp_theme_has_theme_json_clean_cache_upon_upgrading_active_theme', 10, 2 );
+/**
+ * When backporting to core, the existing filters hooked to WP_Theme_JSON_Resolver::clean_cached_data()
+ * need to be removed.
+ */
+add_action( 'start_previewing_theme', '_gutenberg_clean_theme_json_caches' );
+add_action( 'switch_theme', '_gutenberg_clean_theme_json_caches' );
