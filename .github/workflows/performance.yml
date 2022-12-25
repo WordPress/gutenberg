@@ -35,7 +35,7 @@ jobs:
 
             - name: Compare performance with trunk
               if: github.event_name == 'pull_request'
-              run: ./bin/plugin/cli.js perf release/14.8 release/14.7 wp/6.1 --wp-version 6.1 --tests-branch=release/14.7 --rounds 20
+              run: ./bin/plugin/cli.js perf release/14.8 release/14.7 wp/6.1 --wp-version 6.1 --tests-branch=b95cded4f619dba920f71fa6e6b4e1027cbec88f
 
             - name: Store Raw Results
               uses: actions/upload-artifact@v3
