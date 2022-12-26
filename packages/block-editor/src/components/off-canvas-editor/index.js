@@ -231,6 +231,15 @@ function __ExperimentalOffCanvasEditor(
 									<Appender { ...treeGridCellProps } />
 								) }
 							</TreeGridCell>
+							{ ! clientIdsTree.length && (
+								<TreeGridCell withoutGridItem>
+									<div className="offcanvas-editor-list-view-is-empty">
+										{ __(
+											'Your menu is currently empty. Add your first menu item to get started.'
+										) }
+									</div>
+								</TreeGridCell>
+							) }
 						</TreeGridRow>
 					</ListViewContext.Provider>
 				</TreeGrid>

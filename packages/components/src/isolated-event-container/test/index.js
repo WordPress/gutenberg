@@ -9,6 +9,8 @@ import userEvent from '@testing-library/user-event';
  */
 import IsolatedEventContainer from '../';
 
+jest.useFakeTimers();
+
 describe( 'IsolatedEventContainer', () => {
 	it( 'should pass props to container', async () => {
 		const user = userEvent.setup( {

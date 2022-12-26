@@ -14,6 +14,8 @@ import { Component } from '@wordpress/element';
  */
 import withFocusReturn from '../';
 
+jest.useFakeTimers();
+
 class Test extends Component {
 	render() {
 		const { className, focusHistory } = this.props;

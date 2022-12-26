@@ -176,9 +176,8 @@
 	}
 
 	.block-editor-block-icon {
-		align-self: flex-start;
 		margin-right: $grid-unit-10;
-		width: $icon-size;
+		flex: 0 0 $icon-size;
 	}
 
 	.block-editor-list-view-block__menu-cell,
@@ -319,11 +318,6 @@
 
 	.block-editor-list-view-block-select-button__lock {
 		line-height: 0;
-		width: 24px;
-		min-width: 24px;
-		margin-left: auto;
-		padding: 0;
-		vertical-align: middle;
 	}
 }
 

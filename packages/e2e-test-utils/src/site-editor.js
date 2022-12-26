@@ -166,11 +166,11 @@ export async function openPreviousGlobalStylesPanel() {
  * Enters edit mode.
  */
 export async function enterEditMode() {
-	const editSiteToggle = await page.$( '.edit-site-layout__edit-button' );
+	const editSiteToggle = await page.$( '.edit-site-site-hub__edit-button' );
 	// This check is necessary for the performance tests in old branches
 	// where the site editor toggle was not implemented yet.
 	if ( ! editSiteToggle ) {
 		return;
 	}
-	await page.click( '.edit-site-layout__edit-button' );
+	await page.click( '.edit-site-site-hub__edit-button' );
 }

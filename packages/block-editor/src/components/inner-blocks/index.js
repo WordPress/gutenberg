@@ -87,8 +87,10 @@ function UncontrolledInnerBlocks( props ) {
 
 			const blockType = getBlockType( block.name );
 
-			if ( ! blockType || ! blockType.providesContext ) {
-				return {};
+			if (
+				Object.keys( blockType?.providesContext ?? {} ).length === 0
+			) {
+				return { name: block.name };
 			}
 
 			return {

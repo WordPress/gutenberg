@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { forwardRef, useState } from '@wordpress/element';
 /**
  * Internal dependencies
@@ -10,6 +10,7 @@ import { store as blockEditorStore } from '../../store';
 import Inserter from '../inserter';
 import { LinkUI } from './link-ui';
 import { updateAttributes } from './update-attributes';
+import { useInsertedBlock } from './use-inserted-block';
 
 const BLOCKS_WITH_LINK_UI_SUPPORT = [
 	'core/navigation-link',
@@ -36,27 +37,11 @@ export const Appender = forwardRef( ( props, ref ) => {
 		};
 	}, [] );
 
-	const { insertedBlockAttributes, insertedBlockName } = useSelect(
-		( select ) => {
-			const { getBlockName, getBlockAttributes } =
-				select( blockEditorStore );
-
-			return {
-				insertedBlockAttributes: getBlockAttributes(
-					insertedBlockClientId
-				),
-				insertedBlockName: getBlockName( insertedBlockClientId ),
-			};
-		},
-		[ insertedBlockClientId ]
-	);
-
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-
-	const setAttributes =
-		( _insertedBlockClientId ) => ( _updatedAttributes ) => {
-			updateBlockAttributes( _insertedBlockClientId, _updatedAttributes );
-		};
+	const {
+		insertedBlockAttributes,
+		insertedBlockName,
+		setInsertedBlockAttributes,
+	} = useInsertedBlock( insertedBlockClientId );
 
 	const maybeSetInsertedBlockOnInsertion = ( _insertedBlock ) => {
 		if ( ! _insertedBlock?.clientId ) {
@@ -81,7 +66,7 @@ export const Appender = forwardRef( ( props, ref ) => {
 				onChange={ ( updatedValue ) => {
 					updateAttributes(
 						updatedValue,
-						setAttributes( insertedBlockClientId ),
+						setInsertedBlockAttributes,
 						insertedBlockAttributes
 					);
 					setInsertedBlockClientId( null );

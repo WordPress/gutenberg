@@ -9,6 +9,8 @@ import userEvent from '@testing-library/user-event';
  */
 import ColorPalette from '..';
 
+jest.useFakeTimers();
+
 const EXAMPLE_COLORS = [
 	{ name: 'red', color: '#f00' },
 	{ name: 'green', color: '#0f0' },
