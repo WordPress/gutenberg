@@ -5,7 +5,7 @@
  * @package gutenberg
  */
 
-if ( ! function_exists( 'wp_theme_use_cache' ) ) {
+if ( ! function_exists( 'wp_theme_use_persistent_cache' ) ) {
 	/**
 	 * Returns whether theme file-based logic should use caching where applicable.
 	 *
@@ -13,7 +13,7 @@ if ( ! function_exists( 'wp_theme_use_cache' ) ) {
 	 * production environments. However, when developing a theme, using a cache can be detrimental as changes to the
 	 * theme files may not immediately be reflected.
 	 *
-	 * The {@see 'wp_theme_use_cache'} filter can be used to control this behavior, decoupled from the overall
+	 * The {@see 'wp_theme_use_persistent_cache'} filter can be used to control this behavior, decoupled from the overall
 	 * environment's configuration, as neither `WP_DEBUG` nor `WP_ENVIRONMENT_TYPE` are a reliable indicator for
 	 * whether a theme is being developed or not.
 	 *
@@ -21,7 +21,7 @@ if ( ! function_exists( 'wp_theme_use_cache' ) ) {
 	 *
 	 * @return bool True when a cache should be used for theme file-based logic, false otherwise.
 	 */
-	function wp_theme_use_cache() {
+	function wp_theme_use_persistent_cache() {
 		// By default, use a cache unless in a local or development environment.
 		// This is not reliable though, so a filter is available for more granular handling.
 		$use_cache = ! in_array( wp_get_environment_type(), array( 'local', 'development' ), true );
@@ -44,7 +44,7 @@ if ( ! function_exists( 'wp_theme_use_cache' ) ) {
 		 * @param bool $use_cache Whether to use a cache for theme file-based logic. By default this is true unless in
 		 *                        a local or development environment.
 		 */
-		return apply_filters( 'wp_theme_use_cache', $use_cache );
+		return apply_filters( 'wp_theme_use_persistent_cache', $use_cache );
 	}
 }
 
@@ -69,7 +69,7 @@ if ( ! function_exists( 'wp_theme_has_theme_json' ) ) {
 		 * with the $found parameter which apparently had some issues in some implementations
 		 * https://developer.wordpress.org/reference/functions/wp_cache_get/
 		 */
-		if ( wp_theme_use_cache() && is_int( $theme_has_support ) ) {
+		if ( wp_theme_use_persistent_cache() && is_int( $theme_has_support ) ) {
 			return (bool) $theme_has_support;
 		}
 
@@ -111,7 +111,7 @@ if ( ! function_exists( 'wp_theme_has_theme_json_clean_cache' ) ) {
  * @return string Stylesheet.
  */
 function gutenberg_get_global_stylesheet( $types = array() ) {
-	$can_use_cached = empty( $types ) && wp_theme_use_cache();
+	$can_use_cached = empty( $types ) && wp_theme_use_persistent_cache();
 	$cache_key      = 'gutenberg_get_global_stylesheet';
 	$cache_group    = 'theme_json';
 	if ( $can_use_cached ) {
@@ -215,7 +215,7 @@ function gutenberg_get_global_settings( $path = array(), $context = array() ) {
 	$cache_key   = 'gutenberg_get_global_settings_' . $origin;
 	$settings    = wp_cache_get( $cache_key, $cache_group );
 
-	if ( false === $settings || ! wp_theme_use_cache() ) {
+	if ( false === $settings || ! wp_theme_use_persistent_cache() ) {
 		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $origin )->get_settings();
 		wp_cache_set( $cache_key, $settings, $cache_group );
 	}
