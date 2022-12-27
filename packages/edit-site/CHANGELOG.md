@@ -13,6 +13,7 @@
 ### Bug Fix
 
 -   Don't show block inserter when the canvas is view mode ([#46763](https://github.com/WordPress/gutenberg/pull/46763)).
+-   Fix unnatural rounded corners in view mode ([#46792](https://github.com/WordPress/gutenberg/pull/46792)).
 
 
 ## 4.19.0 (2022-11-16)
