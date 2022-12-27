@@ -15,6 +15,8 @@ import { useState } from '@wordpress/element';
 import NumberControl from '..';
 import type { NumberControlProps } from '../types';
 
+jest.useFakeTimers();
+
 function StatefulNumberControl( props: NumberControlProps ) {
 	const [ value, setValue ] = useState( props.value );
 	const handleOnChange = ( v: string | undefined ) => setValue( v );

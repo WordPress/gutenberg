@@ -199,7 +199,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 		setAttributes( {
 			mediaWidth: applyWidthConstraints( width ),
 		} );
-		setTemporaryMediaWidth( applyWidthConstraints( width ) );
+		setTemporaryMediaWidth( null );
 	};
 
 	const classNames = classnames( {
@@ -281,6 +281,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 			) }
 			{ mediaType === 'image' && (
 				<TextareaControl
+					__nextHasNoMarginBottom
 					label={ __( 'Alt text (alternative text)' ) }
 					value={ mediaAlt }
 					onChange={ onMediaAltChange }

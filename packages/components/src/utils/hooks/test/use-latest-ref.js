@@ -13,6 +13,8 @@ import { useState } from '@wordpress/element';
  */
 import { useLatestRef } from '..';
 
+jest.useFakeTimers();
+
 function debounce( callback, timeout = 0 ) {
 	let timeoutId = 0;
 	return ( ...args ) => {

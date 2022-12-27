@@ -30,4 +30,20 @@ test.describe( 'HTML block', () => {
 <!-- /wp:html -->`
 		);
 	} );
+
+	test( 'should not encode <', async ( { editor, page } ) => {
+		// Create a Custom HTML block with the slash shortcut.
+		await page.click( 'role=button[name="Add default block"i]' );
+		await page.keyboard.type( '/html' );
+		await expect(
+			page.locator( 'role=option[name="Custom HTML"i][selected]' )
+		).toBeVisible();
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '1 < 2' );
+		await editor.publishPost();
+		await page.reload();
+		await expect(
+			page.locator( '[data-type="core/html"] textarea' )
+		).toBeVisible();
+	} );
 } );

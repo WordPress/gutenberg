@@ -90,16 +90,18 @@ function gutenberg_resolve_assets_override() {
 	$block_registry = WP_Block_Type_Registry::get_instance();
 
 	foreach ( $block_registry->get_all_registered() as $block_type ) {
-		$style_handles = array_merge(
-			$style_handles,
-			$block_type->style_handles,
-			$block_type->editor_style_handles
-		);
+		// In older WordPress versions, like 6.0, these properties are not defined.
+		if ( isset( $block_type->style_handles ) && is_array( $block_type->style_handles ) ) {
+			$style_handles = array_merge( $style_handles, $block_type->style_handles );
+		}
 
-		$script_handles = array_merge(
-			$script_handles,
-			$block_type->script_handles
-		);
+		if ( isset( $block_type->editor_style_handles ) && is_array( $block_type->editor_style_handles ) ) {
+			$style_handles = array_merge( $style_handles, $block_type->editor_style_handles );
+		}
+
+		if ( isset( $block_type->script_handles ) && is_array( $block_type->script_handles ) ) {
+			$script_handles = array_merge( $script_handles, $block_type->script_handles );
+		}
 	}
 
 	$style_handles = array_unique( $style_handles );
@@ -125,6 +127,30 @@ function gutenberg_resolve_assets_override() {
 
 	$scripts = ob_get_clean();
 
+	/*
+	 * Generate web font @font-face styles for the site editor iframe.
+	 * Use the registered font families for printing.
+	 */
+	if ( class_exists( 'WP_Web_Fonts' ) ) {
+		$wp_webfonts = wp_webfonts();
+		$registered  = $wp_webfonts->get_registered_font_families();
+		if ( ! empty( $registered ) ) {
+			$queue = $wp_webfonts->queue;
+			$done  = $wp_webfonts->done;
+
+			$wp_webfonts->done  = array();
+			$wp_webfonts->queue = $registered;
+
+			ob_start();
+			$wp_webfonts->do_items();
+			$styles .= ob_get_clean();
+
+			// Reset the Web Fonts API.
+			$wp_webfonts->done  = $done;
+			$wp_webfonts->queue = $queue;
+		}
+	}
+
 	return array(
 		'styles'  => $styles,
 		'scripts' => $scripts,
@@ -135,7 +161,8 @@ add_filter(
 	'block_editor_settings_all',
 	function( $settings ) {
 		// We must override what core is passing now.
-		$settings['__unstableResolvedAssets'] = gutenberg_resolve_assets_override();
+		$settings['__unstableResolvedAssets']    = gutenberg_resolve_assets_override();
+		$settings['__unstableIsBlockBasedTheme'] = wp_is_block_theme();
 		return $settings;
 	},
 	100

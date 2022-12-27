@@ -14,6 +14,8 @@ import { useState } from '@wordpress/element';
  */
 import BoxControl from '../';
 
+jest.useFakeTimers();
+
 const Example = ( extraProps ) => {
 	const [ state, setState ] = useState();
 

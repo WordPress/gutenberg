@@ -15,6 +15,8 @@ import { arrowLeft, arrowRight, arrowUp, arrowDown } from '@wordpress/icons';
 import DropdownMenu from '../';
 import { MenuItem } from '../../';
 
+jest.useFakeTimers();
+
 describe( 'DropdownMenu', () => {
 	it( 'should not render when neither controls nor children are assigned', () => {
 		render( <DropdownMenu /> );
