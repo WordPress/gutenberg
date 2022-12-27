@@ -19,14 +19,26 @@ import { useFontFamilies } from './hooks';
 
 function ScreenThemeFontFamilies( { setThemeFontSelected } ) {
 	const { fontFamilies, count } = useFontFamilies();
-	const { goTo } = useNavigator();
+	const { goBack } = useNavigator();
+
+	// we do this instead of filtering the font families in the useFontFamilies hook because we need to keep the index of the font families to set the selected font family.
+	const shouldDisplayFontFamily = ( fontFamily ) => {
+		// If the font family has no font faces, it should be displayed.
+		if ( ! fontFamily.fontFace ) {
+			return true;
+		}
+		// If the font family has font faces, it should be displayed if at least one of them is not flagged as shouldBeRemoved.
+		return fontFamily.fontFace.some(
+			( fontFace ) => ! fontFace.shouldBeRemoved
+		);
+	};
 
 	if ( ! count ) {
-		goTo( '/typography' );
+		goBack();
 	}
 
-	const handleClick = ( family ) => {
-		setThemeFontSelected( family );
+	const handleClick = ( index ) => {
+		setThemeFontSelected( index );
 	};
 
 	return (
@@ -55,6 +67,11 @@ function ScreenThemeFontFamilies( { setThemeFontSelected } ) {
 						fontStyle: 'normal',
 						fontWeight: '400',
 					};
+
+					if ( ! shouldDisplayFontFamily( family ) ) {
+						return null;
+					}
+
 					return (
 						<FontFaceItem
 							key={ `family-${ i }` }
