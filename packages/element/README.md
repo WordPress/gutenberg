@@ -214,6 +214,10 @@ _Changelog_
 
 `6.2.0` Introduced in WordPress core.
 
+### EnvironmentContext
+
+Undocumented declaration.
+
 ### findDOMNode
 
 Finds the dom node of a React component.

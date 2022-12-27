@@ -99,7 +99,7 @@ export {
 /*
  * Content Related Components
  */
-
+export { BlockContent } from './block-content';
 export { default as __unstableBlockSettingsMenuFirstItem } from './block-settings-menu/block-settings-menu-first-item';
 export { default as __unstableBlockToolbarLastItem } from './block-toolbar/block-toolbar-last-item';
 export { default as __unstableBlockNameContext } from './block-toolbar/block-name-context';
