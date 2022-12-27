@@ -21,7 +21,6 @@ import {
 	requestContactCustomerSupport,
 	requestGotoCustomerSupportOptions,
 } from '@wordpress/react-native-bridge';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -58,12 +57,9 @@ const HELP_TOPICS = [
 	},
 ];
 
-function EditorHelpTopics( { close, isVisible, onClose } ) {
-	const { postType, enableSupportSection } = useSelect( ( select ) => ( {
+function EditorHelpTopics( { close, isVisible, onClose, showSupport } ) {
+	const { postType } = useSelect( ( select ) => ( {
 		postType: select( editorStore ).getEditedPostAttribute( 'type' ),
-		enableSupportSection:
-			select( blockEditorStore ).getSettings( 'capabilities' )
-				.supportSection === true,
 	} ) );
 
 	const title =
@@ -171,7 +167,7 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 														);
 													}
 												) }
-												{ enableSupportSection &&
+												{ showSupport &&
 													supportSection }
 											</PanelBody>
 										</ScrollView>
