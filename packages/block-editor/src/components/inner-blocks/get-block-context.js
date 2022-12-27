@@ -22,18 +22,19 @@ const BLOCK_CONTEXT_CACHE = new WeakMap();
  */
 export default function getBlockContext( attributes, blockType ) {
 	if ( ! BLOCK_CONTEXT_CACHE.has( blockType ) ) {
-		BLOCK_CONTEXT_CACHE.set( blockType, new WeakMap() );
+		BLOCK_CONTEXT_CACHE.set( blockType, new Map() );
 	}
 
 	const blockTypeCache = BLOCK_CONTEXT_CACHE.get( blockType );
-	if ( ! blockTypeCache.has( attributes ) ) {
-		const context = mapValues(
-			blockType.providesContext,
-			( attributeName ) => attributes[ attributeName ]
-		);
+	const context = mapValues(
+		blockType.providesContext,
+		( attributeName ) => attributes[ attributeName ]
+	);
 
-		blockTypeCache.set( attributes, context );
+	const cacheKey = JSON.stringify( context );
+	if ( ! blockTypeCache.has( cacheKey ) ) {
+		blockTypeCache.set( cacheKey, context );
 	}
 
-	return blockTypeCache.get( attributes );
+	return blockTypeCache.get( cacheKey );
 }
