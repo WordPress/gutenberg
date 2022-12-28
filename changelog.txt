@@ -1,5 +1,29 @@
 == Changelog ==
 
+= 14.8.3 =
+
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Plugin
+Fixes compatibility with WordPress 6.0.x. This includes the following PRs:
+- #46579
+- #46750
+- #46806
+- #46809
+
+Broadly, this needed to include the two refactors of the Theme_JSON compatibility files, along with two fixes switching `wp_*` and `gutenberg_*` function variants as needed.
+ 
+## Contributors
+
+The following contributors were involved with this release:
+
+@geriux @Mamaduka @oandregal @noahtallen
+
+
 = 14.8.2 =
 
 
