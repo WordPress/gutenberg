@@ -317,7 +317,7 @@ function checkDepLicense( path ) {
 				.map( ( e ) => e.trim() );
 		}
 
-		if ( checkAllAllowed( licenseTypes, licenses ) ) {
+		if ( checkAllCompatible( licenseTypes, licenses ) ) {
 			return;
 		}
 	}
@@ -341,7 +341,7 @@ function checkDepLicense( path ) {
 			.map( ( e ) => e.trim() );
 	}
 
-	if ( checkAllAllowed( detectedLicenseTypes, licenses ) ) {
+	if ( checkAllCompatible( detectedLicenseTypes, licenses ) ) {
 		return;
 	}
 
@@ -351,12 +351,25 @@ function checkDepLicense( path ) {
 	);
 }
 
-function checkAllAllowed( packageLicenses, allowedLicenses ) {
-	return packageLicenses.reduce( ( allowed, license ) => {
+/**
+ * Check that all of the licenses for a package are compatible.
+ *
+ * This function is invoked when the licenses are a conjunctive ("AND") list of licenses.
+ * In that case, the software is only compatible if all of the licenses in the list are
+ * compatible.
+ *
+ * @param {Array} packageLicenses the licenses that a package is licensed under.
+ * @param {Array} compatibleLicenses the list of compatible licenses.
+ * @return {boolean} true if all of the packageLicenses appear in compatibleLicenses.
+ */
+function checkAllCompatible( packageLicenses, compatibleLicenses ) {
+	return packageLicenses.reduce( ( compatible, packageLicense ) => {
 		return (
-			allowed &&
-			allowedLicenses.find( ( allowedLicense ) =>
-				checkLicense( allowedLicense, license )
+			compatible &&
+			compatibleLicenses.reduce(
+				( found, allowedLicense ) =>
+					found || checkLicense( allowedLicense, packageLicense ),
+				false
 			)
 		);
 	}, true );
@@ -367,5 +380,5 @@ traverseDepTree( topLevelDeps );
 // Required for unit testing
 module.exports = {
 	detectTypeFromLicenseText,
-	checkAllAllowed,
+	checkAllCompatible,
 };

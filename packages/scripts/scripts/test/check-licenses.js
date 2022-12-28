@@ -7,7 +7,10 @@ const path = require( 'path' );
 /**
  * Internal dependencies
  */
-import { detectTypeFromLicenseText } from '../check-licenses';
+import {
+	detectTypeFromLicenseText,
+	checkAllCompatible,
+} from '../check-licenses';
 
 describe( 'detectTypeFromLicenseText', () => {
 	let licenseText;
@@ -57,6 +60,30 @@ describe( 'detectTypeFromLicenseText', () => {
 
 		expect( detectTypeFromLicenseText( licenseText ) ).toBe(
 			'Apache-2.0 AND MIT'
+		);
+	} );
+} );
+
+describe( 'checkAllCompatible', () => {
+	it( "should return 'true' when single license is in the allowed list", () => {
+		expect( checkAllCompatible( [ 'B' ], [ 'A', 'B', 'C' ] ) ).toBe( true );
+	} );
+
+	it( "should return 'false' when single license is not in the allowed list", () => {
+		expect( checkAllCompatible( [ 'D' ], [ 'A', 'B', 'C' ] ) ).toBe(
+			false
+		);
+	} );
+
+	it( "should return 'true' when all licenses are in the allowed list", () => {
+		expect( checkAllCompatible( [ 'A', 'C' ], [ 'A', 'B', 'C' ] ) ).toBe(
+			true
+		);
+	} );
+
+	it( "should return 'false' when any license is not in the allowed list", () => {
+		expect( checkAllCompatible( [ 'A', 'D' ], [ 'A', 'B', 'C' ] ) ).toBe(
+			false
 		);
 	} );
 } );
