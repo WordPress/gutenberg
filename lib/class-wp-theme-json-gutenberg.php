@@ -1806,7 +1806,7 @@ class WP_Theme_JSON_Gutenberg {
 				 * Values that already have a clamp() function will not pass the test,
 				 * and therefore the original $value will be returned.
 				 */
-				$value = wp_get_typography_font_size_value( array( 'size' => $value ) );
+				$value = gutenberg_get_typography_font_size_value( array( 'size' => $value ) );
 			}
 
 			$declarations[] = array(
