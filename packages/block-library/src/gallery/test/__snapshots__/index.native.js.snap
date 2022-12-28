@@ -32,6 +32,17 @@ exports[`Gallery block Columns setting does not increment due to maximum value 1
 <!-- /wp:gallery -->"
 `;
 
+exports[`Gallery block V1 deprecation shows the Gallery block as Unsupported if the flag galleryWithImageBlocks is set to false 1`] = `
+"<!-- wp:gallery {\\"ids\\":[13,15],\\"linkTo\\":\\"none\\"} -->
+<figure class=\\"wp-block-gallery columns-2 is-cropped\\">
+			<ul class=\\"blocks-gallery-grid\\"><li class=\\"blocks-gallery-item\\">
+			<figure><img src=\\"https://test-site.files.wordpress.com/local-image-1.jpeg\\" data-id=\\"13\\" class=\\"wp-image-13\\" />
+			</figure></li><li class=\\"blocks-gallery-item\\"><figure>
+			<img src=\\"https://test-site.files.wordpress.com/local-image-2.jpeg\\" data-id=\\"15\\" class=\\"wp-image-15\\" />
+			</figure></li></ul></figure>
+<!-- /wp:gallery -->"
+`;
+
 exports[`Gallery block cancels uploads 1`] = `
 "<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->
 <figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":null} -->

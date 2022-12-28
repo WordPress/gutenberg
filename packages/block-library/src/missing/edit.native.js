@@ -35,6 +35,13 @@ import styles from './style.scss';
 // Blocks that can't be edited through the Unsupported block editor identified by their name.
 const UBE_INCOMPATIBLE_BLOCKS = [ 'core/block' ];
 const I18N_BLOCK_SCHEMA_TITLE = 'block title';
+const CUSTOM_UNSUPPORTED_BLOCK_MESSAGE = {
+	'core/gallery': {
+		/* translators: Unsupported block alert title. %s: The localized block name */
+		title: __( "'%s' needs an updated version of WordPress" ),
+		description: __( 'Please update to version 5.9 or above' ),
+	},
+};
 
 export class UnsupportedBlockEdit extends Component {
 	constructor( props ) {
@@ -120,6 +127,26 @@ export class UnsupportedBlockEdit extends Component {
 		}
 	}
 
+	getSheetTitle( blockName ) {
+		if ( CUSTOM_UNSUPPORTED_BLOCK_MESSAGE[ blockName ] ) {
+			return CUSTOM_UNSUPPORTED_BLOCK_MESSAGE[ blockName ]?.title;
+		}
+
+		/* translators: Missing block alert title. %s: The localized block name */
+		return __( "'%s' is not fully-supported" );
+	}
+
+	getSheetDescription( blockName ) {
+		if ( CUSTOM_UNSUPPORTED_BLOCK_MESSAGE[ blockName ] ) {
+			return CUSTOM_UNSUPPORTED_BLOCK_MESSAGE[ blockName ]?.description;
+		}
+
+		return applyFilters(
+			'native.missing_block_detail',
+			__( 'We are working hard to add more blocks with each release.' )
+		);
+	}
+
 	renderSheet( blockTitle, blockName ) {
 		const {
 			getStylesFromColorScheme,
@@ -146,13 +173,9 @@ export class UnsupportedBlockEdit extends Component {
 			styles.infoSheetIconDark
 		);
 
-		/* translators: Missing block alert title. %s: The localized block name */
-		const titleFormat = __( "'%s' is not fully-supported" );
+		const titleFormat = this.getSheetTitle( blockName );
 		const infoTitle = sprintf( titleFormat, blockTitle );
-		const missingBlockDetail = applyFilters(
-			'native.missing_block_detail',
-			__( 'We are working hard to add more blocks with each release.' )
-		);
+		const missingBlockDetail = this.getSheetDescription( blockName );
 		const missingBlockActionButton = applyFilters(
 			'native.missing_block_action_button',
 			__( 'Edit using web editor' )
