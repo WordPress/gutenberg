@@ -47,7 +47,7 @@ function ScreenThemeFontFamilies( { setThemeFontSelected } ) {
 				title={ __( 'Font Families' ) }
 				description={
 					count
-						? __( 'Font families included available' )
+						? __( 'Font families available' )
 						: __( 'No font families available' )
 				}
 			/>
