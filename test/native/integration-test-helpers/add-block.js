@@ -11,13 +11,16 @@ import { waitFor } from './wait-for';
 /**
  * Adds a block via the block picker.
  *
- * @param {import('@testing-library/react-native').RenderAPI} screen    A Testing Library screen.
- * @param {string}                                            blockName Name of the block to be inserted as shown in the block picker.
+ * @param {import('@testing-library/react-native').RenderAPI} screen                 A Testing Library screen.
+ * @param {string}                                            blockName              Name of the block to be inserted as shown in the block picker.
+ * @param {boolean}                                           [isPickerOpened=false] isPickerOpened Option to skip opening the inserter picker.
  */
-export const addBlock = async ( screen, blockName ) => {
+export const addBlock = async ( screen, blockName, isPickerOpened = false ) => {
 	const { getByLabelText, getByTestId, getByText } = screen;
 
-	fireEvent.press( getByLabelText( 'Add block' ) );
+	if ( ! isPickerOpened ) {
+		fireEvent.press( getByLabelText( 'Add block' ) );
+	}
 
 	const blockList = getByTestId( 'InserterUI-Blocks' );
 	// onScroll event used to force the FlatList to render all items
