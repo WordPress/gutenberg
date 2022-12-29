@@ -40,8 +40,7 @@ function ScreenRoot() {
 
 		return {
 			variations: __experimentalGetCurrentThemeGlobalStylesVariations(),
-			canEditCSS:
-				globalStyles?._links?.[ 'wp:action-unfiltered-html' ] ?? false,
+			canEditCSS: globalStyles?._links?.[ 'wp:action-edit-css' ] ?? false,
 		};
 	}, [] );
 
