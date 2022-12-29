@@ -26,17 +26,25 @@ import ContextMenu from './context-menu';
 import StylesPreview from './preview';
 
 function ScreenRoot() {
-	const { variations } = useSelect( ( select ) => {
+	const { variations, canEditCSS } = useSelect( ( select ) => {
+		const {
+			getEntityRecord,
+			__experimentalGetCurrentGlobalStylesId,
+			__experimentalGetCurrentThemeGlobalStylesVariations,
+		} = select( coreStore );
+
+		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
+		const globalStyles = globalStylesId
+			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
+			: undefined;
+
 		return {
-			variations:
-				select(
-					coreStore
-				).__experimentalGetCurrentThemeGlobalStylesVariations(),
+			variations: __experimentalGetCurrentThemeGlobalStylesVariations(),
+			canEditCSS:
+				globalStyles?._links?.[ 'wp:action-unfiltered-html' ] ?? false,
 		};
 	}, [] );
 
-	const __experimentalGlobalStylesCustomCSS =
-		window?.__experimentalEnableGlobalStylesCustomCSS;
 	return (
 		<Card size="small">
 			<CardBody>
@@ -102,7 +110,7 @@ function ScreenRoot() {
 				</ItemGroup>
 			</CardBody>
 
-			{ __experimentalGlobalStylesCustomCSS && (
+			{ canEditCSS && (
 				<>
 					<CardDivider />
 					<CardBody>

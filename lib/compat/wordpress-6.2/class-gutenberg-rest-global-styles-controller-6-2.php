@@ -90,6 +90,28 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 	}
 
 	/**
+	 * Get the link relations available for the post and current user.
+	 *
+	 * @since 5.9.0
+	 *
+	 * @return array List of link relations.
+	 */
+	protected function get_available_actions() {
+		$rels = array();
+
+		$post_type = get_post_type_object( $this->post_type );
+		if ( current_user_can( $post_type->cap->publish_posts ) ) {
+			$rels[] = 'https://api.w.org/action-publish';
+		}
+
+		if ( current_user_can( 'unfiltered_html' ) ) {
+			$rels[] = 'https://api.w.org/action-unfiltered-html';
+		}
+
+		return $rels;
+	}
+
+	/**
 	 * Updates a single global style config.
 	 *
 	 * @since 5.9.0
