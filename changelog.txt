@@ -1,5 +1,22 @@
 == Changelog ==
 
+= 14.8.4 =
+
+
+
+## Changelog
+
+### Various
+
+- Fixes an issue where gutenberg bundled `theme.json` was not utilized. ([46810](https://github.com/WordPress/gutenberg/pull/46810)) This meant that Gutenberg features newer than the WordPress `theme.json` file were unavailable in 14.8.
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@madhusudhand
+
+
 = 14.8.3 =
 
 
