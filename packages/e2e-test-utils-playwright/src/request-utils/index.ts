@@ -17,7 +17,11 @@ import { createUser, deleteAllUsers } from './users';
 import { setupRest, rest, getMaxBatchSize, batchRest } from './rest';
 import { getPluginsMap, activatePlugin, deactivatePlugin } from './plugins';
 import { deleteAllTemplates } from './templates';
-import { activateTheme } from './themes';
+import {
+	activateTheme,
+	getCurrentThemeGlobalStylesPostId,
+	getThemeGlobalStylesRevisions,
+} from './themes';
 import { deleteAllBlocks } from './blocks';
 import { createComment, deleteAllComments } from './comments';
 import { createPost, deleteAllPosts } from './posts';
@@ -136,12 +140,16 @@ class RequestUtils {
 	deactivatePlugin: typeof deactivatePlugin = deactivatePlugin.bind( this );
 	/** @borrows activateTheme as this.activateTheme */
 	activateTheme: typeof activateTheme = activateTheme.bind( this );
+	/** @borrows getCurrentThemeGlobalStylesPostId as this.getCurrentThemeGlobalStylesPostId */
+	getCurrentThemeGlobalStylesPostId: typeof getCurrentThemeGlobalStylesPostId = getCurrentThemeGlobalStylesPostId.bind( this );
 	/** @borrows deleteAllBlocks as this.deleteAllBlocks */
 	deleteAllBlocks = deleteAllBlocks.bind( this );
 	/** @borrows createPost as this.createPost */
 	createPost: typeof createPost = createPost.bind( this );
 	/** @borrows deleteAllPosts as this.deleteAllPosts */
 	deleteAllPosts: typeof deleteAllPosts = deleteAllPosts.bind( this );
+	/** @borrows getThemeGlobalStylesRevisions as this.getThemeGlobalStylesRevisions */
+	getThemeGlobalStylesRevisions: typeof getThemeGlobalStylesRevisions = getThemeGlobalStylesRevisions.bind( this );
 	/** @borrows createClassicMenu as this.createClassicMenu */
 	createClassicMenu: typeof createClassicMenu =
 		createClassicMenu.bind( this );

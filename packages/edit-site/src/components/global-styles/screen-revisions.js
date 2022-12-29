@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalVStack as VStack,
 	Button,
@@ -81,6 +81,11 @@ function RevisionsButtons( { userRevisions, currentRevisionId, onChange } ) {
 							onClick={ () => {
 								onChange( revision );
 							} }
+							aria-label={ sprintf(
+								/* translators: %s: human-friendly revision creation date */
+								__( 'Restore revision from %s' ),
+								revision.title.rendered
+							) }
 						>
 							<span className="edit-site-global-styles-screen-revisions__title">
 								{ revision.title.rendered }
