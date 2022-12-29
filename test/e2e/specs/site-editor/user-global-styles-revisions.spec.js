@@ -50,20 +50,24 @@ test.describe( 'Global styles revisions', () => {
 		// Navigates to Styles -> Typography -> Text and click on a size.
 		await page.getByRole( 'button', { name: 'Styles' } ).click();
 
-		// This is fugly right now because there's seemingly no way to
-		// delete global styles custom post type revisions using the REST API.
-		// See: https://developer.wordpress.org/rest-api/reference/post-revisions/#delete-a-post-revision
-		// And: https://developer.wordpress.org/rest-api/reference/posts/#delete-a-post
-		// @TODO add a DELETE /revisions endpoint to class-gutenberg-rest-global-styles-controller-6-2.php.
+		/*
+		 * This is fugly right now because there's seemingly no way to
+		 * delete global styles custom post type revisions using the REST API.
+		 * See: https://developer.wordpress.org/rest-api/reference/post-revisions/#delete-a-post-revision
+		 * And: https://developer.wordpress.org/rest-api/reference/posts/#delete-a-post
+		 * @TODO add a DELETE /revisions endpoint to class-gutenberg-rest-global-styles-controller-6-2.php.
+		 */
 		const currentRevisions =
 			await userGlobalStylesRevisions.getGlobalStylesRevisions();
 
+		// There are not enough revisions to show the revisions UI yet, so let's create some.
 		if ( currentRevisions.length < 2 ) {
 			await expect(
 				page.getByRole( 'button', {
 					name: 'Styles revisions',
 				} )
 			).not.toBeVisible();
+			// Change a style and save it.
 			await page
 				.getByRole( 'button', { name: 'Typography styles' } )
 				.click();
@@ -73,9 +77,14 @@ test.describe( 'Global styles revisions', () => {
 			await page.getByRole( 'button', { name: 'Appearance' } ).click();
 			await page.getByRole( 'option', { name: 'Thin' } ).click();
 			await editor.saveSiteEditorEntities();
+
+			// Change a style and save it again just for good luck.
+			// We need more than 2 revisions to show the UI.
 			await page.getByRole( 'button', { name: 'Appearance' } ).click();
 			await page.getByRole( 'option', { name: 'Light' } ).click();
 			await editor.saveSiteEditorEntities();
+
+			// Back to styles pane.
 			await page.click(
 				'role=button[name="Navigate to the previous view"i]'
 			);
@@ -87,7 +96,18 @@ test.describe( 'Global styles revisions', () => {
 					name: 'Styles revisions',
 				} )
 			).toBeVisible();
+			await page
+				.getByRole( 'button', { name: 'Styles revisions' } )
+				.click();
+			const revisionButtons = page.locator(
+				'role=button[name=/^Restore revision/]'
+			);
+
+			await expect( revisionButtons ).toHaveCount(
+				currentRevisions.length + 2
+			);
 		} else {
+			// There are some revisions. Let's check that the UI looks how we expect it to.
 			await expect(
 				page.getByRole( 'button', {
 					name: 'Styles revisions',
