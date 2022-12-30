@@ -15,6 +15,8 @@ import { SelectControl } from '@wordpress/components';
  */
 import ResponsiveBlockControl from '../index';
 
+jest.useFakeTimers();
+
 const inputId = 'input-12345678';
 
 const sizeOptions = [
@@ -38,13 +40,13 @@ const sizeOptions = [
 
 const renderTestDefaultControlComponent = ( labelComponent, device ) => {
 	return (
-		<Fragment>
+		<>
 			<SelectControl label={ labelComponent } options={ sizeOptions } />
 			<p id={ device.id }>
 				{ device.label } is used here for testing purposes to ensure we
 				have access to details about the device.
 			</p>
-		</Fragment>
+		</>
 	);
 };
 

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, find } from 'lodash';
+import { map } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -2469,8 +2469,7 @@ export const __experimentalGetBlockListSettingsForBlocks = createSelector(
  */
 export const __experimentalGetReusableBlockTitle = createSelector(
 	( state, ref ) => {
-		const reusableBlock = find(
-			getReusableBlocks( state ),
+		const reusableBlock = getReusableBlocks( state ).find(
 			( block ) => block.id === ref
 		);
 		if ( ! reusableBlock ) {

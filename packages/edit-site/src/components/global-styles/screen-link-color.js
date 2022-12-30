@@ -90,7 +90,6 @@ function ScreenLinkColor( { name } ) {
 								className="edit-site-screen-link-color__control"
 								colors={ colorsPerOrigin }
 								disableCustomColors={ ! areCustomSolidsEnabled }
-								__experimentalHasMultipleOrigins
 								showTitle={ false }
 								enableAlpha
 								__experimentalIsRenderedInSidebar

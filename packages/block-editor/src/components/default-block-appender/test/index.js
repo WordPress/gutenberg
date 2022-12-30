@@ -9,6 +9,8 @@ import userEvent from '@testing-library/user-event';
  */
 import { DefaultBlockAppender, ZWNBSP } from '../';
 
+jest.useFakeTimers();
+
 describe( 'DefaultBlockAppender', () => {
 	it( 'should match snapshot', () => {
 		const onAppend = jest.fn();
