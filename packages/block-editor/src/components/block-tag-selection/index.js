@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { ToolbarDropdownMenu } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -13,7 +13,7 @@ import TagIcon from './tag-icon';
 const DEFAULT_TAGS = [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ];
 
 const POPOVER_PROPS = {
-	className: 'block-library-heading-level-dropdown',
+	className: 'block-editor-block-tag-selection',
 };
 
 /** @typedef {import('@wordpress/element').WPComponent} WPComponent */
@@ -51,16 +51,11 @@ export default function TagSelectionDropdown( {
 			controls={ tagslist.map( ( targetTag ) => {
 				{
 					const isActive = targetTag === selectedTag;
-
 					return {
 						icon: (
 							<TagIcon tag={ targetTag } isPressed={ isActive } />
 						),
-						label: sprintf(
-							// translators: %s: the name of the HTML tag
-							__( 'HTML tag: %s' ),
-							targetTag
-						),
+						label: targetTag,
 						isActive,
 						onClick() {
 							onChange( targetTag );
