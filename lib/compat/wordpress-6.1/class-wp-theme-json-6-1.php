@@ -45,22 +45,6 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON {
 	);
 
 	/**
-	 * The top-level keys a theme.json can have.
-	 *
-	 * @var string[]
-	 */
-	const VALID_TOP_LEVEL_KEYS = array(
-		'customTemplates',
-		'patterns',
-		'settings',
-		'styles',
-		'templateParts',
-		'version',
-		'title',
-		'description',
-	);
-
-	/**
 	 * Metadata for style properties.
 	 *
 	 * Each element is a direct mapping from the CSS property name to the
