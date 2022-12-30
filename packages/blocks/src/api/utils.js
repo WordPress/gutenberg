@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { every, reduce } from 'lodash';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
@@ -31,37 +30,38 @@ extend( [ namesPlugin, a11yPlugin ] );
 const ICON_COLORS = [ '#191e23', '#f8f9f9' ];
 
 /**
- * Determines whether the block is a default block
- * and its attributes are equal to the default attributes
+ * Determines whether the block's attributes are equal to the default attributes
  * which means the block is unmodified.
  *
  * @param {WPBlock} block Block Object
  *
- * @return {boolean} Whether the block is an unmodified default block
+ * @return {boolean} Whether the block is an unmodified block.
  */
-export function isUnmodifiedDefaultBlock( block ) {
-	const defaultBlockName = getDefaultBlockName();
-	if ( block.name !== defaultBlockName ) {
-		return false;
-	}
-
+export function isUnmodifiedBlock( block ) {
 	// Cache a created default block if no cache exists or the default block
 	// name changed.
-	if (
-		! isUnmodifiedDefaultBlock.block ||
-		isUnmodifiedDefaultBlock.block.name !== defaultBlockName
-	) {
-		isUnmodifiedDefaultBlock.block = createBlock( defaultBlockName );
+	if ( ! isUnmodifiedBlock[ block.name ] ) {
+		isUnmodifiedBlock[ block.name ] = createBlock( block.name );
 	}
 
-	const newDefaultBlock = isUnmodifiedDefaultBlock.block;
-	const blockType = getBlockType( defaultBlockName );
+	const newBlock = isUnmodifiedBlock[ block.name ];
+	const blockType = getBlockType( block.name );
 
-	return every(
-		blockType?.attributes,
-		( value, key ) =>
-			newDefaultBlock.attributes[ key ] === block.attributes[ key ]
+	return Object.keys( blockType?.attributes ?? {} ).every(
+		( key ) => newBlock.attributes[ key ] === block.attributes[ key ]
 	);
+}
+
+/**
+ * Determines whether the block is a default block and its attributes are equal
+ * to the default attributes which means the block is unmodified.
+ *
+ * @param {WPBlock} block Block Object
+ *
+ * @return {boolean} Whether the block is an unmodified default block.
+ */
+export function isUnmodifiedDefaultBlock( block ) {
+	return block.name === getDefaultBlockName() && isUnmodifiedBlock( block );
 }
 
 /**
@@ -259,9 +259,8 @@ export function __experimentalSanitizeBlockAttributes( name, attributes ) {
 		throw new Error( `Block type '${ name }' is not registered.` );
 	}
 
-	return reduce(
-		blockType.attributes,
-		( accumulator, schema, key ) => {
+	return Object.entries( blockType.attributes ).reduce(
+		( accumulator, [ key, schema ] ) => {
 			const value = attributes[ key ];
 
 			if ( undefined !== value ) {

@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { castArray } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -15,7 +14,6 @@ import { memo, useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import BlockEditorProvider from '../provider';
-import LiveBlockPreview from './live';
 import AutoHeightBlockPreview from './auto';
 import { store as blockEditorStore } from '../../store';
 import { BlockListItems } from '../block-list';
@@ -24,34 +22,32 @@ export function BlockPreview( {
 	blocks,
 	__experimentalPadding = 0,
 	viewportWidth = 1200,
-	__experimentalLive = false,
-	__experimentalOnClick,
 	__experimentalMinHeight,
+	__experimentalStyles = [],
 } ) {
 	const originalSettings = useSelect(
 		( select ) => select( blockEditorStore ).getSettings(),
 		[]
 	);
-	const settings = useMemo( () => {
-		const _settings = { ...originalSettings };
-		_settings.__experimentalBlockPatterns = [];
-		return _settings;
-	}, [ originalSettings ] );
-	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
+	const settings = useMemo(
+		() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
+		[ originalSettings ]
+	);
+	const renderedBlocks = useMemo(
+		() => ( Array.isArray( blocks ) ? blocks : [ blocks ] ),
+		[ blocks ]
+	);
 	if ( ! blocks || blocks.length === 0 ) {
 		return null;
 	}
 	return (
 		<BlockEditorProvider value={ renderedBlocks } settings={ settings }>
-			{ __experimentalLive ? (
-				<LiveBlockPreview onClick={ __experimentalOnClick } />
-			) : (
-				<AutoHeightBlockPreview
-					viewportWidth={ viewportWidth }
-					__experimentalPadding={ __experimentalPadding }
-					__experimentalMinHeight={ __experimentalMinHeight }
-				/>
-			) }
+			<AutoHeightBlockPreview
+				viewportWidth={ viewportWidth }
+				__experimentalPadding={ __experimentalPadding }
+				__experimentalMinHeight={ __experimentalMinHeight }
+				__experimentalStyles={ __experimentalStyles }
+			/>
 		</BlockEditorProvider>
 	);
 }
@@ -94,13 +90,16 @@ export function useBlockPreview( {
 		( select ) => select( blockEditorStore ).getSettings(),
 		[]
 	);
-	const disabledRef = useDisabled();
-	const ref = useMergeRefs( [ props.ref, disabledRef ] );
 	const settings = useMemo(
-		() => ( { ...originalSettings, __experimentalBlockPatterns: [] } ),
+		() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
 		[ originalSettings ]
 	);
-	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
+	const disabledRef = useDisabled();
+	const ref = useMergeRefs( [ props.ref, disabledRef ] );
+	const renderedBlocks = useMemo(
+		() => ( Array.isArray( blocks ) ? blocks : [ blocks ] ),
+		[ blocks ]
+	);
 
 	const children = (
 		<BlockEditorProvider value={ renderedBlocks } settings={ settings }>

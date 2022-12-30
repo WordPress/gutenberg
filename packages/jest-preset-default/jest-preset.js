@@ -17,7 +17,6 @@ module.exports = {
 			'@wordpress/jest-preset-default/scripts/setup-test-framework.js'
 		),
 	],
-	snapshotSerializers: [ require.resolve( 'enzyme-to-json/serializer.js' ) ],
 	testEnvironment: 'jsdom',
 	testMatch: [
 		'**/__tests__/**/*.[jt]s?(x)',
@@ -25,7 +24,7 @@ module.exports = {
 		'**/?(*.)test.[jt]s?(x)',
 	],
 	testPathIgnorePatterns: [ '/node_modules/', '<rootDir>/vendor/' ],
-	timers: 'fake',
+	timers: 'real',
 	transform: {
 		'\\.[jt]sx?$': require.resolve( 'babel-jest' ),
 	},

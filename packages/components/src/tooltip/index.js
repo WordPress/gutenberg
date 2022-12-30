@@ -228,6 +228,9 @@ function Tooltip( props ) {
 		document.removeEventListener( 'mouseup', cancelIsMouseDown );
 	};
 
+	// Ignore reason: updating the deps array here could cause unexpected changes in behavior.
+	// Deferring until a more detailed investigation/refactor can be performed.
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect( () => clearOnUnmount, [] );
 
 	if ( Children.count( children ) !== 1 ) {

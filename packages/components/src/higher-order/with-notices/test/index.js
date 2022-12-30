@@ -49,7 +49,7 @@ const BaseComponent = ( { noticeOperations, noticeUI, notifications } ) => {
 				noticeOperations.createNotice( item )
 			);
 		}
-	}, [] );
+	}, [ noticeOperations, notifications ] );
 	return (
 		<div>
 			{ noticeUI }
@@ -91,7 +91,7 @@ describe( 'withNotices operations', () => {
 		act( () => {
 			handle.current.createNotice( { content: message } );
 		} );
-		expect( getByText( message ) ).not.toBeNull();
+		expect( getByText( message ) ).toBeInTheDocument();
 	} );
 
 	it( 'should create notices of error status with createErrorNotice', () => {
@@ -101,6 +101,7 @@ describe( 'withNotices operations', () => {
 		act( () => {
 			handle.current.createErrorNotice( message );
 		} );
+		// eslint-disable-next-line testing-library/no-node-access
 		expect( getByText( message )?.closest( '.is-error' ) ).not.toBeNull();
 	} );
 

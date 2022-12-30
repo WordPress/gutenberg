@@ -272,8 +272,8 @@ export function BorderPanel( props ) {
 						onChange={ onBorderChange }
 						popoverOffset={ 40 }
 						popoverPlacement="left-start"
+						size="__unstable-large"
 						value={ hydratedBorder }
-						__experimentalHasMultipleOrigins={ true }
 						__experimentalIsRenderedInSidebar={ true }
 					/>
 				</ToolsPanelItem>

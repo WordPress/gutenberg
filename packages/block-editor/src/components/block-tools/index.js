@@ -124,7 +124,7 @@ export default function BlockTools( {
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div { ...props } onKeyDown={ onKeyDown }>
 			<InsertionPointOpenRef.Provider value={ useRef( false ) }>
-				{ ! isTyping && ! isZoomOutMode && (
+				{ ! isTyping && (
 					<InsertionPoint
 						__unstableContentRef={ __unstableContentRef }
 					/>

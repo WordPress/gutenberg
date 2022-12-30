@@ -101,14 +101,13 @@ const MyDropdownMenu = () => (
 Alternatively, specify a `children` function which returns elements valid for use in a DropdownMenu: `MenuItem`, `MenuItemsChoice`, or `MenuGroup`.
 
 ```jsx
-import { Fragment } from '@wordpress/element';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { more, arrowUp, arrowDown, trash } from '@wordpress/icons';
 
 const MyDropdownMenu = () => (
 	<DropdownMenu icon={ more } label="Select a direction">
 		{ ( { onClose } ) => (
-			<Fragment>
+			<>
 				<MenuGroup>
 					<MenuItem icon={ arrowUp } onClick={ onClose }>
 						Move Up
@@ -122,7 +121,7 @@ const MyDropdownMenu = () => (
 						Remove
 					</MenuItem>
 				</MenuGroup>
-			</Fragment>
+			</>
 		) }
 	</DropdownMenu>
 );

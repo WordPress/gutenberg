@@ -1,9 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { Fragment, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import {
-	BaseControl,
 	Button,
 	ExternalLink,
 	FocalPointPicker,
@@ -73,18 +72,17 @@ function CoverHeightInput( {
 	const min = isPx ? COVER_MIN_HEIGHT : 0;
 
 	return (
-		<BaseControl label={ __( 'Minimum height of cover' ) } id={ inputId }>
-			<UnitControl
-				id={ inputId }
-				isResetValueOnUnitChange
-				min={ min }
-				onChange={ handleOnChange }
-				onUnitChange={ onUnitChange }
-				style={ { maxWidth: 80 } }
-				units={ units }
-				value={ computedValue }
-			/>
-		</BaseControl>
+		<UnitControl
+			label={ __( 'Minimum height of cover' ) }
+			id={ inputId }
+			isResetValueOnUnitChange
+			min={ min }
+			onChange={ handleOnChange }
+			onUnitChange={ onUnitChange }
+			__unstableInputWidth={ '80px' }
+			units={ units }
+			value={ computedValue }
+		/>
 	);
 }
 export default function CoverInspectorControls( {
@@ -148,7 +146,7 @@ export default function CoverInspectorControls( {
 				{ !! url && (
 					<PanelBody title={ __( 'Media settings' ) }>
 						{ isImageBackground && (
-							<Fragment>
+							<>
 								<ToggleControl
 									label={ __( 'Fixed background' ) }
 									checked={ hasParallax }
@@ -160,10 +158,11 @@ export default function CoverInspectorControls( {
 									checked={ isRepeated }
 									onChange={ toggleIsRepeated }
 								/>
-							</Fragment>
+							</>
 						) }
 						{ showFocalPointPicker && (
 							<FocalPointPicker
+								__nextHasNoMarginBottom
 								label={ __( 'Focal point picker' ) }
 								url={ url }
 								value={ focalPoint }
@@ -181,6 +180,7 @@ export default function CoverInspectorControls( {
 							isImageBackground &&
 							isImgElement && (
 								<TextareaControl
+									__nextHasNoMarginBottom
 									label={ __(
 										'Alt text (alternative text)'
 									) }
@@ -227,7 +227,6 @@ export default function CoverInspectorControls( {
 			</InspectorControls>
 			<InspectorControls __experimentalGroup="color">
 				<ColorGradientSettingsDropdown
-					__experimentalHasMultipleOrigins
 					__experimentalIsRenderedInSidebar
 					settings={ [
 						{
@@ -267,6 +266,7 @@ export default function CoverInspectorControls( {
 					panelId={ clientId }
 				>
 					<RangeControl
+						__nextHasNoMarginBottom
 						label={ __( 'Overlay opacity' ) }
 						value={ dimRatio }
 						onChange={ ( newDimRation ) =>

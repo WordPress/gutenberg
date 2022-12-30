@@ -84,7 +84,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 			array(
 				'taxonomy' => 'wp_theme',
 				'field'    => 'name',
-				'terms'    => wp_get_theme()->get_stylesheet(),
+				'terms'    => get_stylesheet(),
 			),
 		),
 	);
@@ -249,71 +249,85 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 }
 
 /**
- * Builds the title and description of a post specific template based on the underlying referenced post.
+ * Builds the title and description of a post-specific template based on the underlying referenced post.
  * Mutates the underlying template object.
  *
+ * @since 6.1.0
  * @access private
  * @internal
  *
  * @param string            $post_type Post type e.g.: page, post, product.
  * @param string            $slug      Slug of the post e.g.: a-story-about-shoes.
  * @param WP_Block_Template $template  Template to mutate adding the description and title computed.
- *
  * @return boolean Returns true if the referenced post was found and false otherwise.
  */
 function _gutenberg_build_title_and_description_for_single_post_type_block_template( $post_type, $slug, WP_Block_Template $template ) {
 	$post_type_object = get_post_type_object( $post_type );
 
-	$posts = get_posts(
-		array(
-			'name'      => $slug,
-			'post_type' => $post_type,
-		)
+	$default_args = array(
+		'post_type'              => $post_type,
+		'post_status'            => 'publish',
+		'posts_per_page'         => 1,
+		'update_post_meta_cache' => false,
+		'update_post_term_cache' => false,
+		'ignore_sticky_posts'    => true,
+		'no_found_rows'          => true,
 	);
-	if ( empty( $posts ) ) {
+
+	$args = array(
+		'name' => $slug,
+	);
+	$args = wp_parse_args( $args, $default_args );
+
+	$posts_query = new WP_Query( $args );
+
+	if ( empty( $posts_query->posts ) ) {
 		$template->title = sprintf(
-			// translators: Represents the title of a user's custom template in the Site Editor referencing a post that was not found, where %1$s is the singular name of a post type and %2$s is the slug of the deleted post, e.g. "Not found: Page(hello)".
-			__( 'Not found: %1$s(%2$s)', 'gutenberg' ),
+			/* translators: Custom template title in the Site Editor referencing a post that was not found. 1: Post type singular name, 2: Post type slug. */
+			__( 'Not found: %1$s (%2$s)', 'gutenberg' ),
 			$post_type_object->labels->singular_name,
 			$slug
 		);
+
 		return false;
 	}
 
-	$post_title = $posts[0]->post_title;
+	$post_title = $posts_query->posts[0]->post_title;
 
 	$template->title = sprintf(
-		// translators: Represents the title of a user's custom template in the Site Editor, where %1$s is the singular name of a post type and %2$s is the name of the post, e.g. "Page: Hello".
+		/* translators: Custom template title in the Site Editor. 1: Post type singular name, 2: Post title. */
 		__( '%1$s: %2$s', 'gutenberg' ),
 		$post_type_object->labels->singular_name,
 		$post_title
 	);
+
 	$template->description = sprintf(
-		// translators: Represents the description of a user's custom template in the Site Editor, e.g. "Template for Page: Hello".
-		__( 'Template for %1$s', 'gutenberg' ),
+		/* translators: Custom template description in the Site Editor. %s: Post title. */
+		__( 'Template for %s', 'gutenberg' ),
 		$post_title
 	);
 
-	$posts_with_same_title = get_posts(
-		array(
-			'title'       => $post_title,
-			'post_type'   => $post_type,
-			'post_status' => 'publish',
-		)
+	$args = array(
+		'title' => $post_title,
 	);
-	if ( count( $posts_with_same_title ) > 1 ) {
+	$args = wp_parse_args( $args, $default_args );
+
+	$posts_with_same_title_query = new WP_Query( $args );
+
+	if ( count( $posts_with_same_title_query->posts ) > 1 ) {
 		$template->title = sprintf(
-			// translators: Represents the title of a user's custom template in the Site Editor, where %1$s is the template title and %2$s is the slug of the post type, e.g. "Project: Hello (project_type)".
+			/* translators: Custom template title in the Site Editor. 1: Template title, 2: Post type slug. */
 			__( '%1$s (%2$s)', 'gutenberg' ),
 			$template->title,
 			$slug
 		);
 	}
+
 	return true;
 }
 
 /**
- * Builds the title and description of a taxonomy specific template based on the underlying entity referenced.
+ * Builds the title and description of a taxonomy-specific template based on the underlying entity referenced.
  * Mutates the underlying template object.
  *
  * @access private
@@ -323,58 +337,71 @@ function _gutenberg_build_title_and_description_for_single_post_type_block_templ
  * @param string            $slug     Slug of the term, e.g.: shoes.
  * @param WP_Block_Template $template Template to mutate adding the description and title computed.
  *
- * @return boolean True if an term referenced was found and false otherwise.
+ * @return boolean True if the term referenced was found and false otherwise.
  */
 function _gutenberg_build_title_and_description_for_taxonomy_block_template( $taxonomy, $slug, WP_Block_Template $template ) {
 	$taxonomy_object = get_taxonomy( $taxonomy );
 
-	$terms = get_terms(
-		array(
-			'taxonomy'   => $taxonomy,
-			'hide_empty' => false,
-			'slug'       => $slug,
-		)
+	$default_args = array(
+		'taxonomy'               => $taxonomy,
+		'hide_empty'             => false,
+		'update_term_meta_cache' => false,
 	);
 
-	if ( empty( $terms ) ) {
+	$term_query = new WP_Term_Query();
+
+	$args = array(
+		'number' => 1,
+		'slug'   => $slug,
+	);
+	$args = wp_parse_args( $args, $default_args );
+
+	$terms_query = $term_query->query( $args );
+
+	if ( empty( $terms_query ) ) {
 		$template->title = sprintf(
-			// translators: Represents the title of a user's custom template in the Site Editor referencing a taxonomy term that was not found, where %1$s is the singular name of a taxonomy and %2$s is the slug of the deleted term, e.g. "Not found: Category(shoes)".
-			__( 'Not found: %1$s(%2$s)', 'gutenberg' ),
+			/* translators: Custom template title in the Site Editor, referencing a taxonomy term that was not found. 1: Taxonomy singular name, 2: Term slug. */
+			__( 'Not found: %1$s (%2$s)', 'gutenberg' ),
 			$taxonomy_object->labels->singular_name,
 			$slug
 		);
 		return false;
 	}
 
-	$term_title = $terms[0]->name;
+	$term_title = $terms_query[0]->name;
 
 	$template->title = sprintf(
-		// translators: Represents the title of a user's custom template in the Site Editor, where %1$s is the singular name of a taxonomy and %2$s is the name of the term, e.g. "Category: shoes".
+		/* translators: Custom template title in the Site Editor. 1: Taxonomy singular name, 2: Term title. */
 		__( '%1$s: %2$s', 'gutenberg' ),
 		$taxonomy_object->labels->singular_name,
 		$term_title
 	);
+
 	$template->description = sprintf(
-		// translators: Represents the description of a user's custom template in the Site Editor, e.g. "Template for Category: shoes".
-		__( 'Template for %1$s', 'gutenberg' ),
+		/* translators: Custom template description in the Site Editor. %s: Term title. */
+		__( 'Template for %s', 'gutenberg' ),
 		$term_title
 	);
 
-	$terms_with_same_title = get_terms(
-		array(
-			'taxonomy'   => $taxonomy,
-			'hide_empty' => false,
-			'name'       => $term_title,
-		)
+	$term_query = new WP_Term_Query();
+
+	$args = array(
+		'number' => 2,
+		'name'   => $term_title,
 	);
-	if ( count( $terms_with_same_title ) > 1 ) {
+	$args = wp_parse_args( $args, $default_args );
+
+	$terms_with_same_title_query = $term_query->query( $args );
+
+	if ( count( $terms_with_same_title_query ) > 1 ) {
 		$template->title = sprintf(
-			// translators: Represents the title of a user's custom template in the Site Editor, where %1$s is the template title and %2$s is the slug of the taxonomy, e.g. "Category: shoes (product_tag)".
+			/* translators: Custom template title in the Site Editor. 1: Template title, 2: Term slug. */
 			__( '%1$s (%2$s)', 'gutenberg' ),
 			$template->title,
 			$slug
 		);
 	}
+
 	return true;
 }
 
@@ -402,7 +429,7 @@ function gutenberg_build_block_template_result_from_post( $post ) {
 
 	$theme          = $terms[0]->name;
 	$template_file  = _get_block_template_file( $post->post_type, $post->post_name );
-	$has_theme_file = wp_get_theme()->get_stylesheet() === $theme && null !== $template_file;
+	$has_theme_file = get_stylesheet() === $theme && null !== $template_file;
 
 	$template                 = new WP_Block_Template();
 	$template->wp_id          = $post->ID;
@@ -484,7 +511,7 @@ function gutenberg_build_block_template_result_from_post( $post ) {
 						);
 						if ( count( $users_with_same_name ) > 1 ) {
 							$template->title = sprintf(
-								// translators: Represents the title of a user's custom template in the Site Editor, where %1$s is the template title of an author template and %2$s is the nicename of the author, e.g. "Author: Jorge (jorge-costa)".
+								// translators: Represents the title of a user's custom template in the Site Editor, where %1$s is the template title of an author template and %2$s is the nicename of the author, e.g. "Author: Jane Doe (jane-doe)".
 								__( '%1$s (%2$s)', 'gutenberg' ),
 								$template->title,
 								$nice_name

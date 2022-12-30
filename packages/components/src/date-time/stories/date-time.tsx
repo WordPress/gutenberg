@@ -52,6 +52,10 @@ const Template: ComponentStory< typeof DateTimePicker > = ( {
 export const Default: ComponentStory< typeof DateTimePicker > = Template.bind(
 	{}
 );
+Default.args = {
+	__nextRemoveHelpButton: true,
+	__nextRemoveResetButton: true,
+};
 
 export const WithEvents: ComponentStory< typeof DateTimePicker > =
 	Template.bind( {} );

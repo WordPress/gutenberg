@@ -12,7 +12,7 @@ if ( class_exists( 'WP_Style_Engine_CSS_Rules_Store' ) ) {
 }
 
 /**
- * Holds, sanitizes, processes and prints CSS declarations for the style engine.
+ * Holds, sanitizes, processes and prints CSS declarations for the Style Engine.
  *
  * @access private
  */

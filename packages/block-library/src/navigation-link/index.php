@@ -98,7 +98,14 @@ function block_core_navigation_link_build_css_font_sizes( $context ) {
 		$font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $context['fontSize'] );
 	} elseif ( $has_custom_font_size ) {
 		// Add the custom font size inline style.
-		$font_sizes['inline_styles'] = sprintf( 'font-size: %s;', $context['style']['typography']['fontSize'] );
+		$font_sizes['inline_styles'] = sprintf(
+			'font-size: %s;',
+			wp_get_typography_font_size_value(
+				array(
+					'size' => $context['style']['typography']['fontSize'],
+				)
+			)
+		);
 	}
 
 	return $font_sizes;
@@ -337,3 +344,67 @@ function register_block_core_navigation_link() {
 	);
 }
 add_action( 'init', 'register_block_core_navigation_link' );
+
+/**
+ * Disables the display of block inspector tabs for the Navigation Link block.
+ *
+ * This is only a temporary measure until we have a TabPanel and mechanism that
+ * will allow the Navigation Link to programmatically select a tab when edited
+ * via a specific context.
+ *
+ * See:
+ * - https://github.com/WordPress/gutenberg/issues/45951
+ * - https://github.com/WordPress/gutenberg/pull/46321
+ * - https://github.com/WordPress/gutenberg/pull/46271
+ *
+ * @param array $settings Default editor settings.
+ * @return array Filtered editor settings.
+ */
+function gutenberg_disable_tabs_for_navigation_link_block( $settings ) {
+	$current_tab_settings = _wp_array_get(
+		$settings,
+		array( '__experimentalBlockInspectorTabs' ),
+		array()
+	);
+
+	$settings['__experimentalBlockInspectorTabs'] = array_merge(
+		$current_tab_settings,
+		array( 'core/navigation-link' => false )
+	);
+
+	return $settings;
+}
+
+add_filter( 'block_editor_settings_all', 'gutenberg_disable_tabs_for_navigation_link_block' );
+
+/**
+ * Enables animation of the block inspector for the Navigation Link block.
+ *
+ * See:
+ * - https://github.com/WordPress/gutenberg/pull/46342
+ * - https://github.com/WordPress/gutenberg/issues/45884
+ *
+ * @param array $settings Default editor settings.
+ * @return array Filtered editor settings.
+ */
+function gutenberg_enable_animation_for_navigation_link_inspector( $settings ) {
+	$current_animation_settings = _wp_array_get(
+		$settings,
+		array( '__experimentalBlockInspectorAnimation' ),
+		array()
+	);
+
+	$settings['__experimentalBlockInspectorAnimation'] = array_merge(
+		$current_animation_settings,
+		array(
+			'core/navigation-link' =>
+				array(
+					'enterDirection' => 'rightToLeft',
+				),
+		)
+	);
+
+	return $settings;
+}
+
+add_filter( 'block_editor_settings_all', 'gutenberg_enable_animation_for_navigation_link_inspector' );

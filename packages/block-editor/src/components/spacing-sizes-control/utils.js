@@ -96,7 +96,7 @@ export function getSpacingPresetCssVar( value ) {
  *
  * @param {string} value Value to extract slug from.
  *
- * @return {number} The int value of the slug from given spacing preset.
+ * @return {string|undefined} The int value of the slug from given spacing preset.
  */
 export function getSpacingPresetSlug( value ) {
 	if ( ! value ) {

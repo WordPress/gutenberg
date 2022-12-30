@@ -40,7 +40,7 @@ class Tests_Blocks_RenderLastPosts extends WP_UnitTestCase {
 
 		$file = DIR_TESTDATA . '/images/canola.jpg';
 
-		for ( $i = 0; $i < 5; $i ++ ) {
+		for ( $i = 0; $i < 5; $i++ ) {
 			self::$posts[ $i ]          = $factory->post->create_and_get();
 			self::$attachment_ids[ $i ] = $factory->attachment->create_upload_object( $file, self::$posts[ $i ]->ID );
 			set_post_thumbnail( self::$posts[ $i ], self::$attachment_ids[ $i ] );

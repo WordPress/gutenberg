@@ -77,21 +77,74 @@ export type CurriedSelectorsOf< S > = S extends StoreDescriptor<
 	: never;
 
 /**
- * Removes the first argument from a function
+ * Removes the first argument from a function.
  *
- * This is designed to remove the `state` parameter from
+ * By default, it removes the `state` parameter from
  * registered selectors since that argument is supplied
  * by the editor when calling `select(…)`.
  *
  * For functions with no arguments, which some selectors
  * are free to define, returns the original function.
+ *
+ * It is possible to manually provide a custom curried signature
+ * and avoid the automatic inference. When the
+ * F generic argument passed to this helper extends the
+ * SelectorWithCustomCurrySignature type, the F['CurriedSignature']
+ * property is used verbatim.
+ *
+ * This is useful because TypeScript does not correctly remove
+ * arguments from complex function signatures constrained by
+ * interdependent generic parameters.
+ * For more context, see https://github.com/WordPress/gutenberg/pull/41578
  */
-export type CurriedState< F > = F extends (
-	state: any,
-	...args: infer P
-) => infer R
+type CurriedState< F > = F extends SelectorWithCustomCurrySignature
+	? F[ 'CurriedSignature' ]
+	: F extends ( state: any, ...args: infer P ) => infer R
 	? ( ...args: P ) => R
 	: F;
+
+/**
+ * Utility to manually specify curried selector signatures.
+ *
+ * It comes handy when TypeScript can't automatically produce the
+ * correct curried function signature. For example:
+ *
+ * ```ts
+ * type BadlyInferredSignature = CurriedState<
+ *     <K extends string | number>(
+ *         state: any,
+ *         kind: K,
+ *         key: K extends string ? 'one value' : false
+ *     ) => K
+ * >
+ * // BadlyInferredSignature evaluates to:
+ * // (kind: string number, key: false "one value") => string number
+ * ```
+ *
+ * With SelectorWithCustomCurrySignature, we can provide a custom
+ * signature and avoid relying on TypeScript inference:
+ * ```ts
+ * interface MySelectorSignature extends SelectorWithCustomCurrySignature {
+ *     <K extends string | number>(
+ *         state: any,
+ *         kind: K,
+ *         key: K extends string ? 'one value' : false
+ *     ): K;
+ *
+ *     CurriedSignature: <K extends string | number>(
+ *         kind: K,
+ *         key: K extends string ? 'one value' : false
+ *     ): K;
+ * }
+ * type CorrectlyInferredSignature = CurriedState<MySelectorSignature>
+ * // <K extends string | number>(kind: K, key: K extends string ? 'one value' : false): K;
+ *
+ * For even more context, see https://github.com/WordPress/gutenberg/pull/41578
+ * ```
+ */
+export interface SelectorWithCustomCurrySignature {
+	CurriedSignature: Function;
+}
 
 export interface DataRegistry {
 	register: ( store: StoreDescriptor< any > ) => void;

@@ -10,13 +10,15 @@ import userEvent from '@testing-library/user-event';
  */
 import DatePicker from '..';
 
+jest.useFakeTimers();
+
 describe( 'DatePicker', () => {
 	it( 'should highlight the current date', () => {
 		render( <DatePicker currentDate="2022-05-02T11:00:00" /> );
 
 		expect(
 			screen.getByRole( 'button', { name: 'May 2, 2022. Selected' } )
-		).not.toBeNull();
+		).toBeInTheDocument();
 	} );
 
 	it( "should highlight today's date when not provided a currentDate", () => {
@@ -27,7 +29,7 @@ describe( 'DatePicker', () => {
 			screen.getByRole( 'button', {
 				name: `${ todayDescription }. Selected`,
 			} )
-		).not.toBeNull();
+		).toBeInTheDocument();
 	} );
 
 	it( 'should call onChange when a day is selected', async () => {

@@ -100,7 +100,7 @@ const ModifiedWarning = ( { originalBlock, ...props } ) => {
 			originalBlock.title || originalName
 		);
 		actions.push(
-			<Button key="convert" onClick={ convertToHTML } variant="link">
+			<Button key="convert" onClick={ convertToHTML } variant="tertiary">
 				{ __( 'Keep as HTML' ) }
 			</Button>
 		);

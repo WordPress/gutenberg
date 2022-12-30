@@ -107,6 +107,7 @@ export default function QueryControls( {
 		),
 		onNumberOfItemsChange && (
 			<RangeControl
+				__nextHasNoMarginBottom
 				key="query-controls-range-control"
 				label={ __( 'Number of items' ) }
 				value={ numberOfItems }

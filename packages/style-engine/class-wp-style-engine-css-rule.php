@@ -12,7 +12,7 @@ if ( class_exists( 'WP_Style_Engine_CSS_Rule' ) ) {
 }
 
 /**
- * Holds, sanitizes, processes and prints CSS declarations for the style engine.
+ * Holds, sanitizes, processes and prints CSS declarations for the Style Engine.
  *
  * @access private
  */
@@ -113,8 +113,10 @@ class WP_Style_Engine_CSS_Rule {
 		$declarations_indent = $should_prettify ? $indent_count + 1 : 0;
 		$suffix              = $should_prettify ? "\n" : '';
 		$spacer              = $should_prettify ? ' ' : '';
-		$selector            = $should_prettify ? str_replace( ',', ",\n", $this->get_selector() ) : $this->get_selector();
-		$css_declarations    = $this->declarations->get_declarations_string( $should_prettify, $declarations_indent );
+		// Trims any multiple selectors strings.
+		$selector         = $should_prettify ? implode( ',', array_map( 'trim', explode( ',', $this->get_selector() ) ) ) : $this->get_selector();
+		$selector         = $should_prettify ? str_replace( array( ',' ), ",\n", $selector ) : $selector;
+		$css_declarations = $this->declarations->get_declarations_string( $should_prettify, $declarations_indent );
 
 		if ( empty( $css_declarations ) ) {
 			return '';

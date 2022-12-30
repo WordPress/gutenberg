@@ -15,7 +15,7 @@ describe( 'props', () => {
 				<span />
 			</View>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
 	test( 'should render as another element', () => {
@@ -24,7 +24,7 @@ describe( 'props', () => {
 				<span />
 			</View>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
 	test( 'should render with custom styles (string)', () => {
@@ -38,7 +38,7 @@ describe( 'props', () => {
 				<span />
 			</View>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
 	test( 'should render with custom styles (object)', () => {
@@ -52,7 +52,7 @@ describe( 'props', () => {
 				<span />
 			</View>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
 	test( 'should render with custom styles (Array)', () => {
@@ -69,6 +69,6 @@ describe( 'props', () => {
 				<span />
 			</View>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 } );

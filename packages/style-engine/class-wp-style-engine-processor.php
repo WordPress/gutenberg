@@ -85,7 +85,7 @@ class WP_Style_Engine_Processor {
 	 *     Optional. An array of options. Default empty array.
 	 *
 	 *     @type bool $optimize Whether to optimize the CSS output, e.g., combine rules. Default is `false`.
-	 *     @type bool $prettify Whether to add new lines and indents to output. Default is the test of whether the global constant `SCRIPT_DEBUG` is defined.
+	 *     @type bool $prettify Whether to add new lines and indents to output. Default is to inherit the value of the global constant `SCRIPT_DEBUG`, if it is defined.
 	 * }
 	 *
 	 * @return string The computed CSS.
@@ -93,7 +93,7 @@ class WP_Style_Engine_Processor {
 	public function get_css( $options = array() ) {
 		$defaults = array(
 			'optimize' => true,
-			'prettify' => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG,
+			'prettify' => SCRIPT_DEBUG,
 		);
 		$options  = wp_parse_args( $options, $defaults );
 

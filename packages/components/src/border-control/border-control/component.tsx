@@ -39,8 +39,9 @@ const UnconnectedBorderControl = (
 	const {
 		colors,
 		disableCustomColors,
+		disableUnits,
 		enableAlpha,
-		enableStyle = true,
+		enableStyle,
 		hideLabelFromVision,
 		innerWrapperClassName,
 		inputWidth,
@@ -52,14 +53,13 @@ const UnconnectedBorderControl = (
 		__unstablePopoverProps,
 		previousStyleSelection,
 		showDropdownHeader,
+		size,
 		sliderClassName,
 		value: border,
 		widthUnit,
 		widthValue,
 		withSlider,
-		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
-		__next36pxDefaultSize,
 		...otherProps
 	} = useBorderControl( props );
 
@@ -69,7 +69,7 @@ const UnconnectedBorderControl = (
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
 			/>
-			<HStack spacing={ 3 } className={ innerWrapperClassName }>
+			<HStack spacing={ 4 } className={ innerWrapperClassName }>
 				<UnitControl
 					prefix={
 						<BorderControlDropdown
@@ -82,13 +82,10 @@ const UnconnectedBorderControl = (
 							onChange={ onBorderChange }
 							previousStyleSelection={ previousStyleSelection }
 							showDropdownHeader={ showDropdownHeader }
-							__experimentalHasMultipleOrigins={
-								__experimentalHasMultipleOrigins
-							}
 							__experimentalIsRenderedInSidebar={
 								__experimentalIsRenderedInSidebar
 							}
-							__next36pxDefaultSize={ __next36pxDefaultSize }
+							size={ size }
 						/>
 					}
 					label={ __( 'Border width' ) }
@@ -97,10 +94,13 @@ const UnconnectedBorderControl = (
 					onChange={ onWidthChange }
 					value={ border?.width || '' }
 					placeholder={ placeholder }
+					disableUnits={ disableUnits }
 					__unstableInputWidth={ inputWidth }
+					size={ size }
 				/>
 				{ withSlider && (
 					<RangeControl
+						__nextHasNoMarginBottom
 						label={ __( 'Border width' ) }
 						hideLabelFromVision
 						className={ sliderClassName }

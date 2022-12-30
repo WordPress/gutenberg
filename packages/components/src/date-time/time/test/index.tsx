@@ -9,6 +9,8 @@ import userEvent from '@testing-library/user-event';
  */
 import TimePicker from '..';
 
+jest.useFakeTimers();
+
 describe( 'TimePicker', () => {
 	it( 'should call onChange with updated date values', async () => {
 		const user = userEvent.setup( {
@@ -303,12 +305,8 @@ describe( 'TimePicker', () => {
 		 * This is not ideal, but best of we can do for now until we refactor
 		 * AM/PM into accessible elements, like radio buttons.
 		 */
-		expect(
-			screen.getByText( 'AM' ).classList.contains( 'is-primary' )
-		).toBe( false );
-		expect(
-			screen.getByText( 'PM' ).classList.contains( 'is-primary' )
-		).toBe( true );
+		expect( screen.getByText( 'AM' ) ).not.toHaveClass( 'is-primary' );
+		expect( screen.getByText( 'PM' ) ).toHaveClass( 'is-primary' );
 	} );
 
 	it( 'should have different layouts/orders for 12/24 hour formats', () => {

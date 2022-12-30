@@ -47,6 +47,14 @@ $navigation-icon-size: 24px;
 		display: block;
 	}
 
+	// This rule needs extra specificity so that it inherits the correct color from its parent.
+	// Otherwise, a link color set by a parent group can override the value.
+	// This also fixes an issue where a navigation with an explicitly set color is overridden
+	// by link colors defined in Global Styles.
+	.wp-block-navigation-item__content.wp-block-navigation-item__content {
+		color: inherit;
+	}
+
 	// The following rules provide class based application of user selected text
 	// decoration via block supports.
 	&.has-text-decoration-underline .wp-block-navigation-item__content {
@@ -351,7 +359,9 @@ button.wp-block-navigation-item__content {
 
 // Provide a default padding for submenus who should always have some, regardless of the top level menu items.
 :where(.wp-block-navigation .wp-block-navigation__submenu-container .wp-block-navigation-item a:not(.wp-element-button)),
-:where(.wp-block-navigation .wp-block-navigation__submenu-container .wp-block-navigation-submenu a:not(.wp-element-button)) {
+:where(.wp-block-navigation .wp-block-navigation__submenu-container .wp-block-navigation-submenu a:not(.wp-element-button)),
+:where(.wp-block-navigation .wp-block-navigation__submenu-container .wp-block-navigation-submenu button.wp-block-navigation-item__content),
+:where(.wp-block-navigation .wp-block-navigation__submenu-container .wp-block-pages-list__item button.wp-block-navigation-item__content) {
 	padding: 0.5em 1em;
 }
 
@@ -523,7 +533,6 @@ button.wp-block-navigation-item__content {
 			}
 
 			// Always expand/unfold submenus inside the modal.
-			.has-child .submenu-container,
 			.has-child .wp-block-navigation__submenu-container {
 				// Unset CSS that hides dropdown menus.
 				opacity: 1;
@@ -645,6 +654,14 @@ button.wp-block-navigation-item__content {
 .wp-block-navigation__responsive-container-open {
 	display: flex;
 
+	// When set to collapse into a text button, it should inherit the parent font.
+	// This needs specificity to override inherited properties by the button element and component.
+	&.wp-block-navigation__responsive-container-open.wp-block-navigation__responsive-container-open {
+		font-family: inherit;
+		font-weight: inherit;
+		font-size: inherit;
+	}
+
 	&:not(.always-shown) {
 		@include break-small {
 			display: none;
@@ -658,6 +675,14 @@ button.wp-block-navigation-item__content {
 	top: 0;
 	right: 0;
 	z-index: 2; // Needs to be above the modal z index itself.
+
+	// When set to collapse into a text button, it should inherit the parent font.
+	// This needs specificity to override inherited properties by the button element and component.
+	&.wp-block-navigation__responsive-container-close.wp-block-navigation__responsive-container-close {
+		font-family: inherit;
+		font-weight: inherit;
+		font-size: inherit;
+	}
 }
 
 // The menu adds wrapping containers.

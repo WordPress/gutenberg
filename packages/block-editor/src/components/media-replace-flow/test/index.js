@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
@@ -12,6 +13,8 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import MediaReplaceFlow from '../';
+
+jest.useFakeTimers();
 
 const noop = () => {};
 
@@ -31,80 +34,125 @@ function TestWrapper() {
 	);
 }
 
-function setUpMediaReplaceFlow() {
-	const { container } = render( <TestWrapper /> );
-	return container;
+/**
+ * Returns the first found popover element up the DOM tree.
+ *
+ * @param {HTMLElement} element Element to start with.
+ * @return {HTMLElement|null} Popover element, or `null` if not found.
+ */
+function getWrappingPopoverElement( element ) {
+	return element.closest( '.components-popover' );
 }
 
 describe( 'General media replace flow', () => {
 	it( 'renders successfully', () => {
-		const container = setUpMediaReplaceFlow();
+		render( <TestWrapper /> );
 
-		const mediaReplaceButton = container.querySelector(
-			'button[aria-expanded="false"]'
-		);
-
-		expect( mediaReplaceButton ).not.toBeNull();
+		expect(
+			screen.getByRole( 'button', {
+				expanded: false,
+				name: 'Replace',
+			} )
+		).toBeVisible();
 	} );
 
-	it( 'renders replace menu', () => {
-		const container = setUpMediaReplaceFlow();
-
-		const mediaReplaceButton = container.querySelector(
-			'button[aria-expanded="false"]'
-		);
-		mediaReplaceButton.click();
-
-		const uploadMenu = container.querySelector(
-			'.block-editor-media-replace-flow__media-upload-menu'
-		);
-
-		expect( uploadMenu ).not.toBeNull();
-	} );
-
-	it( 'displays media URL', () => {
-		const container = setUpMediaReplaceFlow();
-
-		const mediaReplaceButton = container.querySelector(
-			'button[aria-expanded="false"]'
-		);
-		mediaReplaceButton.click();
-
-		const mediaURL = container.querySelector( '.components-external-link' );
-
-		expect( mediaURL.href ).toEqual( 'https://example.media/' );
-	} );
-
-	it( 'edits media URL', () => {
-		const container = setUpMediaReplaceFlow();
-
-		const mediaReplaceButton = container.querySelector(
-			'button[aria-expanded="false"]'
-		);
-		mediaReplaceButton.click();
-
-		const editMediaURL = container.querySelector(
-			'.block-editor-link-control__search-item-action'
-		);
-
-		editMediaURL.click();
-
-		const mediaURLInput = container.querySelector(
-			'.block-editor-url-input__input'
-		);
-
-		fireEvent.change( mediaURLInput, {
-			target: { value: 'https://new.example.media' },
+	it( 'renders replace menu', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
 		} );
 
-		const saveMediaURLButton = container.querySelector(
-			'.block-editor-link-control__search-submit'
+		render( <TestWrapper /> );
+
+		await user.click(
+			screen.getByRole( 'button', {
+				expanded: false,
+				name: 'Replace',
+			} )
+		);
+		const uploadMenu = screen.getByRole( 'menu' );
+
+		await waitFor( () =>
+			expect(
+				getWrappingPopoverElement( uploadMenu )
+			).toBePositionedPopover()
 		);
 
-		saveMediaURLButton.click();
+		await waitFor( () => expect( uploadMenu ).toBeVisible() );
+	} );
 
-		const mediaURL = container.querySelector( '.components-external-link' );
+	it( 'displays media URL', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
 
-		expect( mediaURL.href ).toEqual( 'https://new.example.media/' );
+		render( <TestWrapper /> );
+
+		await user.click(
+			screen.getByRole( 'button', {
+				expanded: false,
+				name: 'Replace',
+			} )
+		);
+
+		const link = screen.getByRole( 'link', {
+			name: 'example.media (opens in a new tab)',
+		} );
+
+		await waitFor( () =>
+			expect( getWrappingPopoverElement( link ) ).toBePositionedPopover()
+		);
+
+		expect( link ).toHaveAttribute( 'href', 'https://example.media' );
+	} );
+
+	it( 'edits media URL', async () => {
+		const user = userEvent.setup( {
+			advanceTimers: jest.advanceTimersByTime,
+		} );
+
+		render( <TestWrapper /> );
+
+		await user.click(
+			screen.getByRole( 'button', {
+				expanded: false,
+				name: 'Replace',
+			} )
+		);
+
+		await waitFor( () =>
+			expect(
+				getWrappingPopoverElement(
+					screen.getByRole( 'link', {
+						name: 'example.media (opens in a new tab)',
+					} )
+				)
+			).toBePositionedPopover()
+		);
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Edit',
+			} )
+		);
+
+		const mediaURLInput = screen.getByRole( 'combobox', {
+			name: 'URL',
+			expanded: false,
+		} );
+
+		await user.clear( mediaURLInput );
+		await user.type( mediaURLInput, 'https://new.example.media' );
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Submit',
+			} )
+		);
+
+		expect(
+			screen.getByRole( 'link', {
+				name: 'new.example.media (opens in a new tab)',
+			} )
+		).toHaveAttribute( 'href', 'https://new.example.media' );
 	} );
 } );

@@ -132,7 +132,7 @@ function ScreenHeadingColor( { name } ) {
 				>
 					<ToggleGroupControlOption
 						value="heading"
-						/* translators: 'All' refers to selecting all heading levels 
+						/* translators: 'All' refers to selecting all heading levels
 						and applying the same style to h1-h6. */
 						label={ __( 'All' ) }
 					/>
@@ -159,7 +159,6 @@ function ScreenHeadingColor( { name } ) {
 						className="edit-site-screen-heading-text-color__control"
 						colors={ colorsPerOrigin }
 						disableCustomColors={ ! areCustomSolidsEnabled }
-						__experimentalHasMultipleOrigins
 						showTitle={ false }
 						enableAlpha
 						__experimentalIsRenderedInSidebar
@@ -186,7 +185,6 @@ function ScreenHeadingColor( { name } ) {
 						gradients={ gradientsPerOrigin }
 						disableCustomColors={ ! areCustomSolidsEnabled }
 						disableCustomGradients={ ! areCustomGradientsEnabled }
-						__experimentalHasMultipleOrigins
 						showTitle={ false }
 						enableAlpha
 						__experimentalIsRenderedInSidebar
