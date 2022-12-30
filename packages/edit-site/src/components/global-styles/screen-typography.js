@@ -17,6 +17,7 @@ import { NavigationButtonAsItem } from './navigation-button';
 import { useStyle } from './hooks';
 import Subtitle from './subtitle';
 import TypographyPanel from './typography-panel';
+import BlockPreviewPanel from './block-preview-panel';
 
 function Item( { name, parentMenu, element, label } ) {
 	const hasSupport = ! name;
@@ -86,6 +87,8 @@ function ScreenTypography( { name } ) {
 					'Manage the typography settings for different elements.'
 				) }
 			/>
+
+			<BlockPreviewPanel name={ name } />
 
 			{ ! name && (
 				<div className="edit-site-global-styles-screen-typography">

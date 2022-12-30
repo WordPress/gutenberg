@@ -16,6 +16,8 @@ import Navigation from '..';
 import NavigationItem from '../item';
 import NavigationMenu from '../menu';
 
+jest.useFakeTimers();
+
 const TestNavigation = ( { activeItem, rootTitle, showBadge } = {} ) => (
 	<Navigation activeItem={ activeItem }>
 		<NavigationMenu title={ rootTitle }>

@@ -20,13 +20,6 @@ const meta: ComponentMeta< typeof ColorPalette > = {
 	title: 'Components/ColorPalette',
 	component: ColorPalette,
 	argTypes: {
-		// Removing the control because setting this prop without changing the
-		// format of the `colors` prop can break the component.
-		__experimentalHasMultipleOrigins: {
-			control: {
-				type: null,
-			},
-		},
 		as: { control: { type: null } },
 		onChange: { action: 'onChange', control: { type: null } },
 		value: { control: { type: null } },
@@ -69,14 +62,8 @@ Default.args = {
 	],
 };
 
-/**
- * When setting the `__experimentalHasMultipleOrigins` prop to `true`,
- * the `colors` prop is expected to be an array of color palettes, rather
- * than an array of color objects.
- */
 export const MultipleOrigins = Template.bind( {} );
 MultipleOrigins.args = {
-	__experimentalHasMultipleOrigins: true,
 	colors: [
 		{
 			name: 'Primary colors',

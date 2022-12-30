@@ -153,6 +153,8 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		// Disable resizing in mobile viewport.
 		! isMobileViewport;
 	const isViewMode = canvasMode === 'view';
+	const showBlockAppender =
+		( isTemplatePart && hasBlocks ) || isViewMode ? false : undefined;
 
 	// eslint-disable-next-line @wordpress/data-no-store-string-literals
 	const { enableComplementaryArea } = useDispatch( 'core/interface' );
@@ -243,11 +245,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 									<BlockList
 										className="edit-site-block-editor__block-list wp-site-blocks"
 										__experimentalLayout={ LAYOUT }
-										renderAppender={
-											isTemplatePart && hasBlocks
-												? false
-												: undefined
-										}
+										renderAppender={ showBlockAppender }
 									/>
 								</EditorCanvas>
 							</ResizableEditor>

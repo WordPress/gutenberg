@@ -11,6 +11,10 @@
 		"parentPageID": {
 			"type": "integer",
 			"default": 0
+		},
+		"isNested": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"usesContext": [

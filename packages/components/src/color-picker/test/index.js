@@ -8,6 +8,8 @@ import { render, fireEvent } from '@testing-library/react';
  */
 import { ColorPicker } from '..';
 
+jest.useFakeTimers();
+
 /**
  * Ordinarily we'd try to select the compnoent by role but the silder role appears
  * on several elements and we'd end up encoding assumptions about order when
