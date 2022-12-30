@@ -2,8 +2,9 @@
  * External dependencies
  */
 import memize from 'memize';
-import { map, without } from 'lodash';
+import { map } from 'lodash';
 import { I18nManager } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 /**
  * WordPress dependencies
@@ -76,9 +77,8 @@ class Editor extends Component {
 					? map( blockTypes, 'name' )
 					: settings.allowedBlockTypes || [];
 
-			settings.allowedBlockTypes = without(
-				defaultAllowedBlockTypes,
-				...hiddenBlockTypes
+			settings.allowedBlockTypes = defaultAllowedBlockTypes.filter(
+				( type ) => ! hiddenBlockTypes.includes( type )
 			);
 		}
 
@@ -174,17 +174,19 @@ class Editor extends Component {
 		};
 
 		return (
-			<SlotFillProvider>
-				<EditorProvider
-					settings={ editorSettings }
-					post={ normalizedPost }
-					initialEdits={ initialEdits }
-					useSubRegistry={ false }
-					{ ...props }
-				>
-					<Layout setTitleRef={ this.setTitleRef } />
-				</EditorProvider>
-			</SlotFillProvider>
+			<GestureHandlerRootView style={ { flex: 1 } }>
+				<SlotFillProvider>
+					<EditorProvider
+						settings={ editorSettings }
+						post={ normalizedPost }
+						initialEdits={ initialEdits }
+						useSubRegistry={ false }
+						{ ...props }
+					>
+						<Layout setTitleRef={ this.setTitleRef } />
+					</EditorProvider>
+				</SlotFillProvider>
+			</GestureHandlerRootView>
 		);
 	}
 }

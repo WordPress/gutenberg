@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { find } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, isRTL } from '@wordpress/i18n';
@@ -30,7 +25,7 @@ const DEFAULT_ALIGNMENT_CONTROLS = [
 
 const POPOVER_PROPS = {
 	position: 'bottom right',
-	isAlternate: true,
+	variant: 'toolbar',
 };
 
 function AlignmentUI( {
@@ -46,8 +41,7 @@ function AlignmentUI( {
 		return () => onChange( value === align ? undefined : align );
 	}
 
-	const activeAlignment = find(
-		alignmentControls,
+	const activeAlignment = alignmentControls.find(
 		( control ) => control.align === value
 	);
 

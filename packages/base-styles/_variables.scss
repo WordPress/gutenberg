@@ -49,7 +49,7 @@ $button-size: 36px;
 $button-size-small: 24px;
 $header-height: 60px;
 $panel-header-height: $grid-unit-60;
-$nav-sidebar-width: 300px;
+$nav-sidebar-width: 360px;
 $admin-bar-height: 32px;
 $admin-bar-height-big: 46px;
 $admin-sidebar-width: 160px;
@@ -57,15 +57,15 @@ $admin-sidebar-width-big: 190px;
 $admin-sidebar-width-collapsed: 36px;
 $modal-min-width: 360px;
 $spinner-size: 16px;
+$canvas-padding: $grid-unit-30;
 
 
 /**
  * Shadows.
  */
 
-$shadow-popover: 0 2px 6px rgba($black, 0.05);
-$shadow-modal: 0 10px 10px rgba($black, 0.25);
-
+$shadow-popover: 0 0.7px 1px rgba($black, 0.1), 0 1.2px 1.7px -0.2px rgba($black, 0.1), 0 2.3px 3.3px -0.5px rgba($black, 0.1);
+$shadow-modal: 0 0.7px 1px rgba($black, 0.15), 0 2.7px 3.8px -0.2px rgba($black, 0.15), 0 5.5px 7.8px -0.3px rgba($black, 0.15), 0.1px 11.5px 16.4px -0.5px rgba($black, 0.15);
 
 /**
  * Editor widths.

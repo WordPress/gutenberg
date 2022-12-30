@@ -136,6 +136,17 @@ final class WP_Style_Engine {
 				),
 			),
 		),
+		'dimensions' => array(
+			'minHeight' => array(
+				'property_keys' => array(
+					'default' => 'min-height',
+				),
+				'path'          => array( 'dimensions', 'minHeight' ),
+				'css_vars'      => array(
+					'spacing' => '--wp--preset--spacing--$slug',
+				),
+			),
+		),
 		'spacing'    => array(
 			'padding' => array(
 				'property_keys' => array(
@@ -194,6 +205,12 @@ final class WP_Style_Engine {
 					'default' => 'line-height',
 				),
 				'path'          => array( 'typography', 'lineHeight' ),
+			),
+			'textColumns'    => array(
+				'property_keys' => array(
+					'default' => 'column-count',
+				),
+				'path'          => array( 'typography', 'textColumns' ),
 			),
 			'textDecoration' => array(
 				'property_keys' => array(

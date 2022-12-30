@@ -1,0 +1,437 @@
+// This remove the margins set here: https://github.com/WordPress/gutenberg/blob/17e5c2d870d84fb6de48dcd5bc3c38cd0c0fb0d0/packages/block-library/src/editor.scss#L56
+// It removes the margins around blocks when a BlockPreview is rendered in the block style selector
+.block-editor-block-styles .block-editor-block-list__block {
+	margin: 0;
+}
+
+/**
+ * Cross-Block Selection
+ */
+
+@keyframes selection-overlay__fade-in-animation {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 0.4;
+	}
+}
+
+// Note to developers refactoring this, please test navigation mode, and
+// multi selection and hovering the block switcher to highlight the block.
+// Also be sure to test partial selections in Safari, as it draws the
+// selection marker with an entirely different model than Blink.
+.block-editor-block-list__layout {
+	position: relative;
+
+	// Hide selections on this element, otherwise Safari will include it stacked
+	// under your actual selection.
+	&::selection {
+		background: transparent;
+	}
+
+	.has-multi-selection &::selection {
+		background: transparent;
+	}
+
+	// Block multi selection
+	.block-editor-block-list__block.is-multi-selected:not(.is-partially-selected) {
+		// Apply a rounded radius to the entire block.
+		border-radius: $radius-block-ui;
+		overflow: hidden;
+
+		// Hide the native selection indicator, for the selection, and children.
+		&::selection,
+		& ::selection {
+			background: transparent;
+		}
+
+		// Draw a spot color overlay.
+		&::after {
+			content: "";
+			position: absolute;
+			z-index: 1;
+			pointer-events: none;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			background: var(--wp-admin-theme-color);
+			opacity: 0.4;
+			border-radius: $radius-block-ui;
+
+			// Animate.
+			animation: selection-overlay__fade-in-animation 0.1s ease-out;
+			animation-fill-mode: forwards;
+			@include reduce-motion("animation");
+
+			// Show outline in high contrast mode.
+			outline: 2px solid transparent;
+		}
+	}
+
+	// Block highlight, and navigation mode, not focus.
+	// By not using a pseudo element, we can limit ourselves to only
+	// using ::after, leaving ::before free. Otherwise, highlight + multi-select
+	// would require the opacity-changing overlay to be on ::before.
+	.block-editor-block-list__block.is-highlighted,
+	.block-editor-block-list__block.is-highlighted ~ .is-multi-selected,
+	&.is-navigate-mode .block-editor-block-list__block.is-selected,
+	& .is-block-moving-mode.block-editor-block-list__block.has-child-selected {
+		border-radius: $radius-block-ui;
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+		// Show outline in high contrast mode.
+		outline: 2px solid transparent;
+	}
+
+	// Block focus.
+	.block-editor-block-list__block:not([contenteditable]):focus {
+		outline: none;
+
+		// We're using a pseudo element to overflow placeholder borders
+		// and any border inside the block itself.
+		&::after {
+			content: "";
+			position: absolute;
+			z-index: 1;
+			pointer-events: none;
+			top: $border-width;
+			right: $border-width;
+			bottom: $border-width;
+			left: $border-width;
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			border-radius: $radius-block-ui - $border-width; // Border is outset, so subtract the width to achieve correct radius.
+			outline: 2px solid transparent; // This shows up in Windows High Contrast Mode.
+
+			// Show a light color for dark themes.
+			.is-dark-theme & {
+				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $dark-theme-focus;
+			}
+		}
+	}
+
+	// Moving blocks using keyboard (Ellipsis > Move).
+	& .is-block-moving-mode.block-editor-block-list__block.is-selected {
+		box-shadow: none;
+		outline: none;
+
+		&::after {
+			content: "";
+			position: absolute;
+			z-index: 0;
+			pointer-events: none;
+			transition:
+				border-color 0.1s linear,
+				border-style 0.1s linear,
+				box-shadow 0.1s linear;
+			right: 0;
+			left: 0;
+			top: -$default-block-margin * 0.5;
+			border-radius: $radius-block-ui;
+			border-top: 4px solid $gray-400;
+		}
+	}
+
+	& .is-block-moving-mode.can-insert-moving-block.block-editor-block-list__block.is-selected {
+		&::after {
+			border-color: var(--wp-admin-theme-color);
+		}
+	}
+
+	// Ensure an accurate partial text selection.
+	// To do this, we disable text selection on the main container, then re-enable it only on the
+	// elements that actually get selected.
+	// To keep in mind: user-select is currently inherited to all nodes inside.
+	.has-multi-selection & {
+		user-select: none;
+	}
+
+	// Re-enable it on components inside.
+	[class^="components-"] {
+		user-select: text;
+	}
+}
+
+.is-block-moving-mode.block-editor-block-list__block-selection-button {
+	// Should be invisible but not unfocusable.
+	opacity: 0;
+	font-size: 1px;
+	height: 1px;
+	padding: 0;
+}
+
+.is-content-locked {
+	.block-editor-block-list__block {
+		pointer-events: none;
+	}
+	.is-content-block {
+		pointer-events: initial;
+	}
+}
+
+.block-editor-block-list__layout .block-editor-block-list__block {
+	// With `position: static`, Safari marks a full-width selection rectangle, including margins.
+	// With `position: relative`, Safari marks an inline selection rectangle, similar to that of
+	// Blink based browsers, but it also does "crop" the marker, which can result in a small line
+	// from the preceding paragraph showing, which is effectively the above selection bleeding in.
+	// We choose relative, as that matches the multi-selection, which is limited to the block footprint.
+	position: relative;
+
+	// Re-enable text-selection on editable blocks.
+	user-select: text;
+
+	// Break long strings of text without spaces so they don't overflow the block.
+	overflow-wrap: break-word;
+
+	.reusable-block-edit-panel * {
+		z-index: z-index(".block-editor-block-list__block .reusable-block-edit-panel *");
+	}
+
+	/**
+	 * Notices
+	 */
+	.components-placeholder .components-with-notices-ui {
+		margin: -10px 0 12px 0;
+	}
+
+	.components-with-notices-ui {
+		margin: 0 0 12px 0;
+		width: 100%;
+
+		.components-notice {
+			margin-left: 0;
+			margin-right: 0;
+
+			.components-notice__content {
+				font-size: $default-font-size;
+			}
+		}
+	}
+
+	// Warnings
+	&.has-warning {
+		min-height: $grid-unit-60;
+
+		// When a block has a warning, you shouldn't be able to manipulate the contents.
+		> * {
+			pointer-events: none;
+			user-select: none;
+		}
+
+		// Allow the warning action buttons to be manipulable.
+		.block-editor-warning {
+			pointer-events: all;
+		}
+	}
+
+	// Scrim overlay.
+	&.has-warning::after {
+		content: "";
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		border-radius: $radius-block-ui;
+		background-color: rgba($white, 0.4);
+	}
+
+	// Avoid conflict with the multi-selection highlight color.
+	&.has-warning.is-multi-selected::after {
+		background-color: transparent;
+	}
+
+	// Reusable blocks clickthrough overlays.
+	&.is-reusable > .block-editor-inner-blocks > .block-editor-block-list__layout.has-overlay {
+		// Remove only the top click overlay.
+		&::after {
+			display: none;
+		}
+
+		// Restore it for subsequent.
+		.block-editor-block-list__layout.has-overlay::after {
+			display: block;
+		}
+	}
+
+	// Reusable blocks parent border.
+	&.is-reusable.has-child-selected::after {
+		box-shadow: 0 0 0 1px var(--wp-admin-theme-color);
+	}
+
+	// Clear floats.
+	&[data-clear="true"] {
+		float: none;
+	}
+}
+
+.is-outline-mode .block-editor-block-list__block:not(.remove-outline) {
+	&.is-hovered {
+		cursor: default;
+
+		&::after {
+			content: "";
+			position: absolute;
+			pointer-events: none;
+			top: $border-width;
+			left: $border-width;
+			right: $border-width;
+			bottom: $border-width;
+			box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
+			border-radius: $radius-block-ui - $border-width;
+		}
+	}
+
+	&.is-selected {
+		cursor: default;
+
+		&.rich-text {
+			cursor: unset;
+		}
+
+		&::after {
+			content: "";
+			position: absolute;
+			pointer-events: none;
+			top: $border-width;
+			left: $border-width;
+			right: $border-width;
+			bottom: $border-width;
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			border-radius: $radius-block-ui;
+		}
+	}
+}
+
+// Spotlight mode. Fade out blocks unless they contain a selected block.
+.is-focus-mode .block-editor-block-list__block:not(.has-child-selected) {
+	opacity: 0.2;
+	transition: opacity 0.1s linear;
+	@include reduce-motion("transition");
+
+	// Nested blocks should never be faded. If the parent block is already faded
+	// out, it shouldn't be faded out more. If the parent block in not faded
+	// out, it shouldn't be faded out either because the block as a whole,
+	// including inner blocks, should be focused.
+	.block-editor-block-list__block,
+	&.is-selected,
+	&.is-multi-selected {
+		opacity: 1;
+	}
+}
+
+.is-focus-mode .block-editor-block-list__block.is-content-locked.has-child-selected,
+.is-focus-mode .block-editor-block-list__block.is-content-locked-temporarily-editing-as-blocks.has-child-selected {
+	&,
+	& .block-editor-block-list__block {
+		opacity: 1;
+	}
+}
+
+.wp-block[data-align="left"] > *,
+.wp-block[data-align="right"] > *,
+.wp-block.alignleft,
+.wp-block.alignright {
+	// Without z-index, won't be clickable as "above" adjacent content.
+	z-index: z-index("{core/image aligned left or right} .wp-block");
+}
+
+.wp-site-blocks > [data-align="left"] {
+	float: left;
+	margin-right: 2em;
+}
+
+.wp-site-blocks > [data-align="right"] {
+	float: right;
+	margin-left: 2em;
+}
+
+.wp-site-blocks > [data-align="center"] {
+	justify-content: center;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+/**
+ * In-Canvas Inserter
+ */
+
+.block-editor-block-list .block-editor-inserter {
+	margin: $grid-unit-10;
+	cursor: move; // Fallback for IE/Edge < 14
+	cursor: grab;
+}
+
+@keyframes block-editor-inserter__toggle__fade-in-animation {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+// Hide the appender that sits at the end of block lists, when inside a nested block,
+// unless the block itself, or a parent, is selected.
+.wp-block .block-list-appender .block-editor-inserter__toggle {
+	animation: block-editor-inserter__toggle__fade-in-animation 0.1s ease;
+	animation-fill-mode: forwards;
+	@include reduce-motion("animation");
+}
+
+.block-editor-block-list__block:not(.is-selected):not(.has-child-selected) .block-editor-default-block-appender {
+	display: none;
+
+	.block-editor-inserter__toggle {
+		opacity: 0;
+		transform: scale(0);
+	}
+}
+
+.block-editor-block-list__block .block-editor-block-list__block-html-textarea {
+	display: block;
+	margin: 0;
+	padding: $grid-unit-15;
+	width: 100%;
+	border: none;
+	outline: none;
+	border-radius: 2px;
+	box-shadow: inset 0 0 0 $border-width $gray-900;
+	resize: none;
+	overflow: hidden;
+	font-family: $editor-html-font;
+	font-size: $text-editor-font-size;
+	line-height: 1.5;
+	transition: padding 0.2s linear;
+	@include reduce-motion("transition");
+
+	&:focus {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+	}
+}
+
+
+/**
+ * Warnings.
+ */
+
+.block-editor-block-list__block .block-editor-warning {
+	z-index: z-index(".block-editor-warning");
+	position: relative;
+
+	&.block-editor-block-list__block-crash-warning {
+		// The block crash warning has no block preview underneath it.
+		// The lack of a preview combined with the negative margin that
+		// the warning normally has results in crashed blocks overlapping
+		// any blocks that come after them. Resetting the margin to `auto`
+		// solves this.
+		margin-bottom: auto;
+	}
+}
+
+.block-editor-iframe__body {
+	background-color: $white;
+	transition: all 0.3s;
+	transform-origin: top center;
+}

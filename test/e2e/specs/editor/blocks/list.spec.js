@@ -600,6 +600,32 @@ test.describe( 'List', () => {
 		);
 	} );
 
+	test( 'should create paragraph on Enter in quote block', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/quote' } );
+		await page.keyboard.type( '/list' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'aaa' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:quote -->
+<blockquote class="wp-block-quote"><!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>aaa</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph --></blockquote>
+<!-- /wp:quote -->`
+		);
+	} );
+
 	test( 'should indent and outdent level 1', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/list' } );
 		await page.keyboard.type( 'a' );
@@ -1064,9 +1090,11 @@ test.describe( 'List', () => {
 <p></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
-<p>2</p>
-<!-- /wp:paragraph -->`
+<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>2</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
 		);
 	} );
 
@@ -1148,6 +1176,85 @@ test.describe( 'List', () => {
 		await pageUtils.pressKeyWithModifier( 'secondary', 'M' ); // Emulates CTRL+Shift+Alt + M => toggle code editor
 
 		// Verify no WSOD and content is proper.
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	test( 'should merge two list with same attributes', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.click( 'role=button[name="Add default block"i]' );
+		await page.keyboard.type( '* a' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'b' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '* c' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>a</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>b</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>c</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->` );
+
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'Backspace' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>a</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>b</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>c</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->` );
+	} );
+
+	test( 'can be exited to selected paragraph', async ( { editor, page } ) => {
+		await page.click( 'role=button[name="Add default block"i]' );
+		await page.keyboard.type( '* ' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '1' );
+
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	test( 'selects all transformed output', async ( { editor, page } ) => {
+		await editor.insertBlock( {
+			name: 'core/list',
+			innerBlocks: [
+				{ name: 'core/list-item', attributes: { content: '1' } },
+				{ name: 'core/list-item', attributes: { content: '2' } },
+			],
+		} );
+
+		await editor.selectBlocks(
+			page.locator( 'role=document[name="Block: List"i]' )
+		);
+
+		await page.getByRole( 'button', { name: 'List' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Paragraph' } ).click();
+
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+
+		await page.getByRole( 'button', { name: 'Paragraph' } ).click();
+		await page.getByRole( 'menuitem', { name: 'List' } ).click();
+
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

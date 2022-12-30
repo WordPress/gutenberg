@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import TestRenderer, { act } from 'react-test-renderer';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -11,165 +12,121 @@ import createReduxStore from '../../../redux-store';
 import { createRegistry } from '../../../registry';
 import { RegistryProvider } from '../../registry-provider';
 
+jest.useRealTimers();
+
 describe( 'useDispatch', () => {
-	let registry;
-	beforeEach( () => {
-		registry = createRegistry();
-	} );
+	const counterStore = {
+		reducer: ( state = 0, action ) => {
+			if ( action.type === 'INC' ) {
+				return state + 1;
+			}
 
-	it( 'returns dispatch function from store with no store name provided', () => {
-		registry.registerStore( 'demoStore', {
-			reducer: ( state ) => state,
-			actions: {
-				foo: () => 'bar',
-			},
-		} );
+			return state;
+		},
+		actions: {
+			inc: () => ( { type: 'INC' } ),
+		},
+		selectors: {
+			get: ( state ) => state,
+		},
+	};
+
+	it( 'returns dispatch function from store with no store name provided', async () => {
+		const user = userEvent.setup();
+		const registry = createRegistry();
+		registry.registerStore( 'demo', counterStore );
+
 		const TestComponent = () => {
-			return <div></div>;
-		};
-		const Component = () => {
 			const dispatch = useDispatch();
-			return <TestComponent dispatch={ dispatch } />;
+			return <button onClick={ () => dispatch( 'demo' ).inc() } />;
 		};
 
-		let testRenderer;
-		act( () => {
-			testRenderer = TestRenderer.create(
-				<RegistryProvider value={ registry }>
-					<Component />
-				</RegistryProvider>
-			);
-		} );
-
-		const testInstance = testRenderer.root;
-
-		expect( testInstance.findByType( TestComponent ).props.dispatch ).toBe(
-			registry.dispatch
+		render(
+			<RegistryProvider value={ registry }>
+				<TestComponent />
+			</RegistryProvider>
 		);
+
+		await user.click( screen.getByRole( 'button' ) );
+
+		expect( registry.select( 'demo' ).get() ).toBe( 1 );
 	} );
-	it( 'returns expected action creators from store for given storeName', () => {
-		const noop = () => ( { type: '__INERT__' } );
-		const testAction = jest.fn().mockImplementation( noop );
-		const store = createReduxStore( 'demoStore', {
-			reducer: ( state ) => state,
-			actions: {
-				foo: testAction,
-			},
-		} );
+
+	it( 'returns expected action creators from store for given store descriptor', async () => {
+		const user = userEvent.setup();
+		const store = createReduxStore( 'demoStore', counterStore );
+		const registry = createRegistry();
 		registry.register( store );
 
 		const TestComponent = () => {
-			const { foo } = useDispatch( store );
-			return <button onClick={ foo } />;
+			const { inc } = useDispatch( store );
+			return <button onClick={ inc } />;
 		};
 
-		let testRenderer;
+		render(
+			<RegistryProvider value={ registry }>
+				<TestComponent />
+			</RegistryProvider>
+		);
 
-		act( () => {
-			testRenderer = TestRenderer.create(
-				<RegistryProvider value={ registry }>
-					<TestComponent />
-				</RegistryProvider>
-			);
-		} );
+		await user.click( screen.getByRole( 'button' ) );
 
-		const testInstance = testRenderer.root;
-
-		act( () => {
-			testInstance.findByType( 'button' ).props.onClick();
-		} );
-
-		expect( testAction ).toHaveBeenCalledTimes( 1 );
+		expect( registry.select( store ).get() ).toBe( 1 );
 	} );
 
-	it( 'returns expected action creators from store for given store descriptor', () => {
-		const noop = () => ( { type: '__INERT__' } );
-		const testAction = jest.fn().mockImplementation( noop );
-		registry.registerStore( 'demoStore', {
-			reducer: ( state ) => state,
-			actions: {
-				foo: testAction,
-			},
-		} );
+	it( 'returns expected action creators from store for given storeName', async () => {
+		const user = userEvent.setup();
+		const registry = createRegistry();
+		registry.registerStore( 'demoStore', counterStore );
 		const TestComponent = () => {
-			const { foo } = useDispatch( 'demoStore' );
-			return <button onClick={ foo } />;
+			const { inc } = useDispatch( 'demoStore' );
+			return <button onClick={ inc } />;
 		};
 
-		let testRenderer;
+		render(
+			<RegistryProvider value={ registry }>
+				<TestComponent />
+			</RegistryProvider>
+		);
 
-		act( () => {
-			testRenderer = TestRenderer.create(
-				<RegistryProvider value={ registry }>
-					<TestComponent />
-				</RegistryProvider>
-			);
-		} );
+		await user.click( screen.getByRole( 'button' ) );
 
-		const testInstance = testRenderer.root;
-
-		act( () => {
-			testInstance.findByType( 'button' ).props.onClick();
-		} );
-
-		expect( testAction ).toHaveBeenCalledTimes( 1 );
+		expect( registry.select( 'demoStore' ).get() ).toBe( 1 );
 	} );
 
-	it( 'returns dispatch from correct registry if registries change', () => {
-		const reducer = ( state ) => state;
-		const noop = () => ( { type: '__INERT__' } );
-		const firstRegistryAction = jest.fn().mockImplementation( noop );
-		const secondRegistryAction = jest.fn().mockImplementation( noop );
+	it( 'returns dispatch from correct registry if registries change', async () => {
+		const user = userEvent.setup();
 
-		const firstRegistry = registry;
-		firstRegistry.registerStore( 'demo', {
-			reducer,
-			actions: {
-				noop: firstRegistryAction,
-			},
-		} );
+		const firstRegistry = createRegistry();
+		firstRegistry.registerStore( 'demo', counterStore );
+
+		const secondRegistry = createRegistry();
+		secondRegistry.registerStore( 'demo', counterStore );
 
 		const TestComponent = () => {
 			const dispatch = useDispatch();
-			return <button onClick={ () => dispatch( 'demo' ).noop() } />;
+			return <button onClick={ () => dispatch( 'demo' ).inc() } />;
 		};
 
-		let testRenderer;
-		act( () => {
-			testRenderer = TestRenderer.create(
-				<RegistryProvider value={ firstRegistry }>
-					<TestComponent />
-				</RegistryProvider>
-			);
-		} );
-		const testInstance = testRenderer.root;
+		const { rerender } = render(
+			<RegistryProvider value={ firstRegistry }>
+				<TestComponent />
+			</RegistryProvider>
+		);
 
-		act( () => {
-			testInstance.findByType( 'button' ).props.onClick();
-		} );
+		await user.click( screen.getByRole( 'button' ) );
 
-		expect( firstRegistryAction ).toHaveBeenCalledTimes( 1 );
-		expect( secondRegistryAction ).toHaveBeenCalledTimes( 0 );
+		expect( firstRegistry.select( 'demo' ).get() ).toBe( 1 );
+		expect( secondRegistry.select( 'demo' ).get() ).toBe( 0 );
 
-		const secondRegistry = createRegistry();
-		secondRegistry.registerStore( 'demo', {
-			reducer,
-			actions: {
-				noop: secondRegistryAction,
-			},
-		} );
+		rerender(
+			<RegistryProvider value={ secondRegistry }>
+				<TestComponent />
+			</RegistryProvider>
+		);
 
-		act( () => {
-			testRenderer.update(
-				<RegistryProvider value={ secondRegistry }>
-					<TestComponent />
-				</RegistryProvider>
-			);
-		} );
-		act( () => {
-			testInstance.findByType( 'button' ).props.onClick();
-		} );
-		expect( firstRegistryAction ).toHaveBeenCalledTimes( 1 );
-		expect( secondRegistryAction ).toHaveBeenCalledTimes( 1 );
+		await user.click( screen.getByRole( 'button' ) );
+		expect( firstRegistry.select( 'demo' ).get() ).toBe( 1 );
+		expect( secondRegistry.select( 'demo' ).get() ).toBe( 1 );
 	} );
 } );

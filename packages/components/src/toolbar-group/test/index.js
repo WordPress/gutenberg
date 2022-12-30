@@ -13,13 +13,13 @@ describe( 'ToolbarGroup', () => {
 		it( 'should render an empty node, when controls are not passed', () => {
 			const { container } = render( <ToolbarGroup /> );
 
-			expect( container.innerHTML ).toBe( '' );
+			expect( container ).toBeEmptyDOMElement();
 		} );
 
 		it( 'should render an empty node, when controls are empty', () => {
 			const { container } = render( <ToolbarGroup controls={ [] } /> );
 
-			expect( container.innerHTML ).toBe( '' );
+			expect( container ).toBeEmptyDOMElement();
 		} );
 
 		it( 'should render a list of controls with buttons', () => {
@@ -36,10 +36,8 @@ describe( 'ToolbarGroup', () => {
 			render( <ToolbarGroup controls={ controls } /> );
 
 			const toolbarButton = screen.getByLabelText( 'WordPress' );
-			expect( toolbarButton.getAttribute( 'aria-pressed' ) ).toBe(
-				'false'
-			);
-			expect( toolbarButton.getAttribute( 'type' ) ).toBe( 'button' );
+			expect( toolbarButton ).toHaveAttribute( 'aria-pressed', 'false' );
+			expect( toolbarButton ).toHaveAttribute( 'type', 'button' );
 		} );
 
 		it( 'should render a list of controls with buttons and active control', () => {
@@ -56,10 +54,8 @@ describe( 'ToolbarGroup', () => {
 			render( <ToolbarGroup controls={ controls } /> );
 
 			const toolbarButton = screen.getByLabelText( 'WordPress' );
-			expect( toolbarButton.getAttribute( 'aria-pressed' ) ).toBe(
-				'true'
-			);
-			expect( toolbarButton.getAttribute( 'type' ) ).toBe( 'button' );
+			expect( toolbarButton ).toHaveAttribute( 'aria-pressed', 'true' );
+			expect( toolbarButton ).toHaveAttribute( 'type', 'button' );
 		} );
 
 		it( 'should render a nested list of controls with separator between', () => {
@@ -80,15 +76,19 @@ describe( 'ToolbarGroup', () => {
 				],
 			];
 
-			const { container } = render(
-				<ToolbarGroup controls={ controls } />
-			);
+			render( <ToolbarGroup controls={ controls } /> );
 
 			const buttons = screen.getAllByRole( 'button' );
+
 			expect( buttons ).toHaveLength( 2 );
-			expect(
-				container.querySelector( '.has-left-divider button' )
-			).toBe( buttons[ 1 ] );
+			// eslint-disable-next-line testing-library/no-node-access
+			expect( buttons[ 0 ].parentElement ).not.toHaveClass(
+				'has-left-divider'
+			);
+			// eslint-disable-next-line testing-library/no-node-access
+			expect( buttons[ 1 ].parentElement ).toHaveClass(
+				'has-left-divider'
+			);
 		} );
 
 		it( 'should call the clickHandler on click.', () => {

@@ -21,6 +21,8 @@ import { useState } from '@wordpress/element';
  */
 import FormTokenField from '../';
 
+jest.useFakeTimers();
+
 const FormTokenFieldWithState = ( {
 	onChange,
 	value,
@@ -277,8 +279,8 @@ describe( 'FormTokenField', () => {
 
 			// There should be 1 "remove item" button for the "bergamot" token
 			expect(
-				screen.getAllByRole( 'button', { name: 'Remove item' } )
-			).toHaveLength( 1 );
+				screen.getByRole( 'button', { name: 'Remove item' } )
+			).toBeInTheDocument();
 
 			// Click the "X" button for the "bergamot" token (the only one)
 			await user.click(
@@ -486,6 +488,7 @@ describe( 'FormTokenField', () => {
 
 			// This is testing implementation details, but I'm not sure there's
 			// a better way.
+			// eslint-disable-next-line testing-library/no-node-access
 			expect( input.parentElement?.parentElement ).toHaveClass(
 				'test-classname'
 			);
@@ -827,10 +830,10 @@ describe( 'FormTokenField', () => {
 
 			// Currently, none of the suggestions are selected
 			expect(
-				within( suggestionList ).queryAllByRole( 'option', {
+				within( suggestionList ).queryByRole( 'option', {
 					selected: true,
 				} )
-			).toHaveLength( 0 );
+			).not.toBeInTheDocument();
 
 			// Pressing the down arrow will select "Salmon"
 			await user.keyboard( '[ArrowDown]' );
@@ -900,10 +903,10 @@ describe( 'FormTokenField', () => {
 
 			// Currently, none of the suggestions are selected
 			expect(
-				within( suggestionList ).queryAllByRole( 'option', {
+				within( suggestionList ).queryByRole( 'option', {
 					selected: true,
 				} )
-			).toHaveLength( 0 );
+			).not.toBeInTheDocument();
 
 			const tigerOption = within( suggestionList ).getByRole( 'option', {
 				name: 'Tiger',

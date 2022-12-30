@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, within } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -15,6 +15,8 @@ import { copy } from '@wordpress/icons';
  * Internal dependencies
  */
 import { BlockSwitcher, BlockSwitcherDropdownMenu } from '../';
+
+jest.useFakeTimers();
 
 jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
 jest.mock( '../../block-title/use-block-display-title', () =>
@@ -210,6 +212,7 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 				} ),
 				'[ArrowDown]'
 			);
+			await act( () => Promise.resolve() );
 
 			expect(
 				screen.getByRole( 'button', {
@@ -252,6 +255,7 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 					expanded: false,
 				} )
 			);
+			await act( () => Promise.resolve() );
 
 			expect(
 				screen.getByRole( 'button', {
@@ -282,14 +286,15 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 					expanded: false,
 				} )
 			);
+			await act( () => Promise.resolve() );
 
 			expect(
 				within(
 					screen.getByRole( 'menu', {
 						name: 'Block Name',
 					} )
-				).getAllByRole( 'menuitem' )
-			).toHaveLength( 1 );
+				).getByRole( 'menuitem' )
+			).toBeInTheDocument();
 		} );
 	} );
 } );

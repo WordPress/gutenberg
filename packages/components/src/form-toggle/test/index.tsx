@@ -15,6 +15,8 @@ import { useState } from '@wordpress/element';
 import FormToggle, { noop } from '..';
 import type { FormToggleProps } from '../types';
 
+jest.useFakeTimers();
+
 const getInput = () => screen.getByRole( 'checkbox' ) as HTMLInputElement;
 
 const ControlledFormToggle = ( { onChange }: FormToggleProps ) => {
@@ -36,7 +38,7 @@ describe( 'FormToggle', () => {
 			const { container } = render( <FormToggle onChange={ noop } /> );
 
 			expect( getInput() ).not.toBeChecked();
-			expect( container.firstChild ).toMatchSnapshot();
+			expect( container ).toMatchSnapshot();
 		} );
 
 		it( 'should render a checked checkbox when providing checked prop', () => {

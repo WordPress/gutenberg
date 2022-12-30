@@ -556,6 +556,18 @@ _Properties_
 -   _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
 -   _frecency_ `number`: Heuristic that combines frequency and recency.
 
+### getLastInsertedBlockClientId
+
+Gets the client id of the last inserted block.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `string|undefined`: Client Id of the last inserted block.
+
 ### getLastMultiSelectedBlockClientId
 
 Returns the client ID of the last block in the multi-selection set, or null
@@ -801,7 +813,7 @@ _Parameters_
 
 _Returns_
 
--   `?string`: Block Template Lock
+-   `string|false`: Block Template Lock
 
 ### hasBlockMovingClientId
 
@@ -1191,10 +1203,6 @@ _Parameters_
 
 Action that hides the insertion point.
 
-_Returns_
-
--   `Object`: Action object.
-
 ### insertAfterBlock
 
 Action that inserts an empty block after a given block.
@@ -1514,11 +1522,16 @@ _Parameters_
 
 -   _rootClientId_ `?string`: Optional root client ID of block list on which to insert.
 -   _index_ `?number`: Index at which block should be inserted.
--   _\_\_unstableOptions_ `Object`: Whether or not to show an inserter button.
+-   _\_\_unstableOptions_ `?Object`: Additional options.
 
 _Returns_
 
 -   `Object`: Action object.
+
+_Properties_
+
+-   _\_\_unstableWithInserter_ `boolean`: Whether or not to show an inserter button.
+-   _operation_ `WPDropOperation`: The operation to perform when applied, either 'insert' or 'replace' for now.
 
 ### startDraggingBlocks
 
