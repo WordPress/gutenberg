@@ -12,7 +12,7 @@ import {
 	URLInput,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { Fragment, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import {
 	Button,
 	PanelBody,
@@ -89,7 +89,7 @@ const SocialLinkEdit = ( {
 	} );
 
 	return (
-		<Fragment>
+		<>
 			<InspectorControls>
 				<PanelBody
 					title={ sprintf(
@@ -144,7 +144,7 @@ const SocialLinkEdit = ( {
 					) }
 				</Button>
 			</li>
-		</Fragment>
+		</>
 	);
 };
 

@@ -15,6 +15,8 @@ import userEvent from '@testing-library/user-event';
  */
 import { ConfirmDialog } from '..';
 
+jest.useFakeTimers();
+
 const noop = () => {};
 
 describe( 'Confirm', () => {

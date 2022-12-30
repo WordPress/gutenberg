@@ -9,6 +9,8 @@ import userEvent from '@testing-library/user-event';
  */
 import { PageAttributesOrder } from '../order';
 
+jest.useFakeTimers();
+
 describe( 'PageAttributesOrder', () => {
 	/**
 	 * When starting to type inside the spinbutton, select the current value

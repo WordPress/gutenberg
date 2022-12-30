@@ -16,6 +16,7 @@ import { store as editorStore } from '@wordpress/editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { addFilter } from '@wordpress/hooks';
+import { registerLegacyWidgetBlock } from '@wordpress/widgets';
 
 /**
  * Internal dependencies
@@ -109,6 +110,7 @@ export function initializeEditor( id, settings ) {
 
 	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
 	registerCoreBlocks();
+	registerLegacyWidgetBlock( { inserter: false } );
 	if ( process.env.IS_GUTENBERG_PLUGIN ) {
 		__experimentalRegisterExperimentalCoreBlocks( {
 			enableFSEBlocks: true,

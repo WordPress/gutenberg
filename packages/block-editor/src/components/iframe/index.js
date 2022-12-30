@@ -26,97 +26,7 @@ import { __experimentalStyleProvider as StyleProvider } from '@wordpress/compone
  */
 import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useWritingFlow } from '../writing-flow';
-
-const BODY_CLASS_NAME = 'editor-styles-wrapper';
-const BLOCK_PREFIX = 'wp-block';
-
-/**
- * Clones stylesheets targetting the editor canvas to the given document. A
- * stylesheet is considered targetting the editor a canvas if it contains the
- * `editor-styles-wrapper`, `wp-block`, or `wp-block-*` class selectors.
- *
- * Ideally, this hook should be removed in the future and styles should be added
- * explicitly as editor styles.
- */
-function useStylesCompatibility() {
-	return useRefEffect( ( node ) => {
-		// Search the document for stylesheets targetting the editor canvas.
-		Array.from( document.styleSheets ).forEach( ( styleSheet ) => {
-			try {
-				// May fail for external styles.
-				// eslint-disable-next-line no-unused-expressions
-				styleSheet.cssRules;
-			} catch ( e ) {
-				return;
-			}
-
-			const { ownerNode, cssRules } = styleSheet;
-
-			if ( ! cssRules ) {
-				return;
-			}
-
-			// Generally, ignore inline styles. We add inline styles belonging to a
-			// stylesheet later, which may or may not match the selectors.
-			if ( ownerNode.tagName !== 'LINK' ) {
-				return;
-			}
-
-			// Don't try to add the reset styles, which were removed as a dependency
-			// from `edit-blocks` for the iframe since we don't need to reset admin
-			// styles.
-			if ( ownerNode.id === 'wp-reset-editor-styles-css' ) {
-				return;
-			}
-
-			function matchFromRules( _cssRules ) {
-				return Array.from( _cssRules ).find(
-					( {
-						selectorText,
-						conditionText,
-						cssRules: __cssRules,
-					} ) => {
-						// If the rule is conditional then it will not have selector text.
-						// Recurse into child CSS ruleset to determine selector eligibility.
-						if ( conditionText ) {
-							return matchFromRules( __cssRules );
-						}
-
-						return (
-							selectorText &&
-							( selectorText.includes(
-								`.${ BODY_CLASS_NAME }`
-							) ||
-								selectorText.includes( `.${ BLOCK_PREFIX }` ) )
-						);
-					}
-				);
-			}
-
-			const isMatch = matchFromRules( cssRules );
-
-			if (
-				isMatch &&
-				! node.ownerDocument.getElementById( ownerNode.id )
-			) {
-				// Display warning once we have a way to add style dependencies to the editor.
-				// See: https://github.com/WordPress/gutenberg/pull/37466.
-				node.appendChild( ownerNode.cloneNode( true ) );
-
-				// Add inline styles belonging to the stylesheet.
-				const inlineCssId = ownerNode.id.replace(
-					'-css',
-					'-inline-css'
-				);
-				const inlineCssElement = document.getElementById( inlineCssId );
-
-				if ( inlineCssElement ) {
-					node.appendChild( inlineCssElement.cloneNode( true ) );
-				}
-			}
-		} );
-	}, [] );
-}
+import { useCompatibilityStyles } from './use-compatibility-styles';
 
 /**
  * Bubbles some event types (keydown, keypress, and dragover) to parent document
@@ -205,6 +115,11 @@ function Iframe(
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
 	const styles = useParsedAssets( assets?.styles );
+	const styleIds = styles.map( ( style ) => style.id );
+	const compatStyles = useCompatibilityStyles();
+	const neededCompatStyles = compatStyles.filter(
+		( style ) => ! styleIds.includes( style.id )
+	);
 	const scripts = useParsedAssets( assets?.scripts );
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
@@ -288,12 +203,11 @@ function Iframe(
 			} );
 	}, [] );
 	const bodyRef = useMergeRefs( [ contentRef, clearerRef, writingFlowRef ] );
-	const styleCompatibilityRef = useStylesCompatibility();
 
 	head = (
 		<>
 			<style>{ 'html{height:auto!important;}body{margin:0}' }</style>
-			{ styles.map(
+			{ [ ...styles, ...neededCompatStyles ].map(
 				( { tagName, href, id, rel, media, textContent } ) => {
 					const TagName = tagName.toLowerCase();
 
@@ -342,7 +256,7 @@ function Iframe(
 								ref={ bodyRef }
 								className={ classnames(
 									'block-editor-iframe__body',
-									BODY_CLASS_NAME,
+									'editor-styles-wrapper',
 									...bodyClasses
 								) }
 								style={ {
@@ -359,15 +273,6 @@ function Iframe(
 								inert={ readonly ? 'true' : undefined }
 							>
 								{ contentResizeListener }
-								{ /*
-								 * This is a wrapper for the extra styles and scripts
-								 * rendered imperatively by cloning the parent,
-								 * it's important that this div's content remains uncontrolled.
-								 */ }
-								<div
-									style={ { display: 'none' } }
-									ref={ styleCompatibilityRef }
-								/>
 								<StyleProvider document={ iframeDocument }>
 									{ children }
 								</StyleProvider>

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get, isEmpty, map } from 'lodash';
+import { get, isEmpty, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -211,7 +211,7 @@ function GalleryEdit( props ) {
 		// string, so ensure comparison works correctly by converting the
 		// newImage.id to a string.
 		const newImageId = newImage.id.toString();
-		const currentImage = find( images, { id: newImageId } );
+		const currentImage = images.find( ( { id } ) => id === newImageId );
 		const currentImageCaption = currentImage
 			? currentImage.caption
 			: newImage.caption;
@@ -220,9 +220,9 @@ function GalleryEdit( props ) {
 			return currentImageCaption;
 		}
 
-		const attachment = find( attachmentCaptions, {
-			id: newImageId,
-		} );
+		const attachment = attachmentCaptions.find(
+			( { id } ) => id === newImageId
+		);
 
 		// If the attachment caption is updated.
 		if ( attachment && attachment.caption !== newImage.caption ) {
