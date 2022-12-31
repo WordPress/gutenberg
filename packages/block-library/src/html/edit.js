@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useContext, useState } from '@wordpress/element';
+import { useContext } from '@wordpress/element';
 import {
 	BlockControls,
 	PlainText,
@@ -16,15 +16,14 @@ import { ToolbarButton, Disabled, ToolbarGroup } from '@wordpress/components';
 import Preview from './preview';
 
 export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
-	const [ isPreview, setIsPreview ] = useState();
 	const isDisabled = useContext( Disabled.Context );
 
 	function switchToPreview() {
-		setIsPreview( true );
+		setAttributes( { preview: true } );
 	}
 
 	function switchToHTML() {
-		setIsPreview( false );
+		setAttributes( { preview: false } );
 	}
 
 	return (
@@ -33,21 +32,21 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 				<ToolbarGroup>
 					<ToolbarButton
 						className="components-tab-button"
-						isPressed={ ! isPreview }
+						isPressed={ ! attributes.preview }
 						onClick={ switchToHTML }
 					>
 						HTML
 					</ToolbarButton>
 					<ToolbarButton
 						className="components-tab-button"
-						isPressed={ isPreview }
+						isPressed={ attributes.preview }
 						onClick={ switchToPreview }
 					>
 						{ __( 'Preview' ) }
 					</ToolbarButton>
 				</ToolbarGroup>
 			</BlockControls>
-			{ isPreview || isDisabled ? (
+			{ attributes.preview || isDisabled ? (
 				<Preview
 					content={ attributes.content }
 					isSelected={ isSelected }
