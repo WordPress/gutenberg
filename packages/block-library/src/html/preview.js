@@ -20,7 +20,7 @@ const DEFAULT_STYLES = `
 	}
 `;
 
-export default function HTMLEditPreview( { content, isSelected } ) {
+export default function HTMLEditPreview( { content } ) {
 	const settingStyles = useSelect( ( select ) => {
 		return select( blockEditorStore ).getSettings()?.styles;
 	}, [] );
@@ -34,13 +34,11 @@ export default function HTMLEditPreview( { content, isSelected } ) {
 		<>
 			<SandBox html={ content } styles={ styles } />
 			{ /*
-				An overlay is added when the block is not selected in order to register click events.
+				An overlay is added when the block is in preview in order to register click events.
 				Some browsers do not bubble up the clicks from the sandboxed iframe, which makes it
 				difficult to reselect the block.
 			*/ }
-			{ ! isSelected && (
-				<div className="block-library-html__preview-overlay"></div>
-			) }
+			<div className="block-library-html__preview-overlay"></div>
 		</>
 	);
 }
