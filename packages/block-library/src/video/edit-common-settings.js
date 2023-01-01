@@ -50,28 +50,28 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 			<ToggleControl
 				label={ __( 'Autoplay' ) }
 				onChange={ toggleFactory.autoplay }
-				checked={ autoplay }
+				checked={ !! autoplay }
 				help={ getAutoplayHelp }
 			/>
 			<ToggleControl
 				label={ __( 'Loop' ) }
 				onChange={ toggleFactory.loop }
-				checked={ loop }
+				checked={ !! loop }
 			/>
 			<ToggleControl
 				label={ __( 'Muted' ) }
 				onChange={ toggleFactory.muted }
-				checked={ muted }
+				checked={ !! muted }
 			/>
 			<ToggleControl
 				label={ __( 'Playback controls' ) }
 				onChange={ toggleFactory.controls }
-				checked={ controls }
+				checked={ !! controls }
 			/>
 			<ToggleControl
 				label={ __( 'Play inline' ) }
 				onChange={ toggleFactory.playsInline }
-				checked={ playsInline }
+				checked={ !! playsInline }
 			/>
 			<SelectControl
 				label={ __( 'Preload' ) }
