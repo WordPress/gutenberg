@@ -113,8 +113,7 @@ export function TabPanel( {
 					? initialTab.name
 					: firstEnabledTab.name
 			);
-		}
-		if ( selectedTab?.disabled && firstEnabledTab ) {
+		} else if ( selectedTab?.disabled && firstEnabledTab ) {
 			handleTabSelection( firstEnabledTab.name );
 		}
 	}, [
