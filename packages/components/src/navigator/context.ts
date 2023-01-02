@@ -12,6 +12,5 @@ const initialContextValue: NavigatorContextType = {
 	location: {},
 	goTo: () => {},
 	goBack: () => {},
-	animationSettings: {},
 };
 export const NavigatorContext = createContext( initialContextValue );

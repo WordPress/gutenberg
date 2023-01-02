@@ -7,6 +7,12 @@ type NavigateOptions = {
 	focusTargetSelector?: string;
 };
 
+export type AnimationOverride =
+	| 'forceForward'
+	| 'forceBackward'
+	| 'disableAnimation'
+	| null;
+
 export type NavigatorLocation = NavigateOptions & {
 	isInitial?: boolean;
 	isBack?: boolean;
@@ -16,9 +22,13 @@ export type NavigatorLocation = NavigateOptions & {
 
 export type NavigatorContext = {
 	location: NavigatorLocation;
-	goTo: ( path: string, options?: NavigateOptions ) => void;
+	goTo: (
+		path: string,
+		animationOverride?: AnimationOverride,
+		options?: NavigateOptions
+	) => void;
 	goBack: () => void;
-	animationSettings?: {};
+	animationOverride?: AnimationOverride;
 };
 
 // Returned by the `useNavigator` hook.
@@ -29,7 +39,7 @@ export type NavigatorProviderProps = {
 	 * The initial active path.
 	 */
 	initialPath: string;
-	initialAnimationSettings?: object;
+	initialAnimationOverride?: AnimationOverride;
 	/**
 	 * The children elements.
 	 */

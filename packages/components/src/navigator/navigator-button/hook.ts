@@ -33,7 +33,7 @@ export function useNavigatorButton(
 		useCallback(
 			( e ) => {
 				e.preventDefault();
-				goTo( escapedPath, {
+				goTo( escapedPath, null, {
 					focusTargetSelector: cssSelectorForAttribute(
 						attributeName,
 						escapedPath

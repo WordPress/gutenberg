@@ -32,7 +32,7 @@ function UnconnectedNavigatorProvider(
 ) {
 	const {
 		initialPath,
-		initialAnimationSettings,
+		initialAnimationOverride = null,
 		children,
 		className,
 		...otherProps
@@ -46,13 +46,13 @@ function UnconnectedNavigatorProvider(
 		},
 	] );
 
-	const [ animationSettings, setAnimationSettings ] = useState(
-		initialAnimationSettings
+	const [ animationOverride, setAnimationOverride ] = useState(
+		initialAnimationOverride
 	);
 
 	const goTo: NavigatorContextType[ 'goTo' ] = useCallback(
-		( path, animationOverrideSettings = {}, options = {} ) => {
-			setAnimationSettings( animationOverrideSettings );
+		( path, newAnimationOverride = null, options = {} ) => {
+			setAnimationOverride( newAnimationOverride );
 			setLocationHistory( ( prevLocationHistory ) => [
 				...prevLocationHistory,
 				{
@@ -66,27 +66,21 @@ function UnconnectedNavigatorProvider(
 		[]
 	);
 
-	const goBack: NavigatorContextType[ 'goBack' ] = useCallback(
-		( animationOverrideSettings = {} ) => {
-			setAnimationSettings( animationOverrideSettings );
-			setLocationHistory( ( prevLocationHistory ) => {
-				if ( prevLocationHistory.length <= 1 ) {
-					return prevLocationHistory;
-				}
-				return [
-					...prevLocationHistory.slice( 0, -2 ),
-					{
-						...prevLocationHistory[
-							prevLocationHistory.length - 2
-						],
-						isBack: true,
-						hasRestoredFocus: false,
-					},
-				];
-			} );
-		},
-		[]
-	);
+	const goBack: NavigatorContextType[ 'goBack' ] = useCallback( () => {
+		setLocationHistory( ( prevLocationHistory ) => {
+			if ( prevLocationHistory.length <= 1 ) {
+				return prevLocationHistory;
+			}
+			return [
+				...prevLocationHistory.slice( 0, -2 ),
+				{
+					...prevLocationHistory[ prevLocationHistory.length - 2 ],
+					isBack: true,
+					hasRestoredFocus: false,
+				},
+			];
+		} );
+	}, [] );
 
 	const navigatorContextValue: NavigatorContextType = useMemo(
 		() => ( {
@@ -96,9 +90,9 @@ function UnconnectedNavigatorProvider(
 			},
 			goTo,
 			goBack,
-			animationSettings,
+			animationOverride,
 		} ),
-		[ locationHistory, goTo, goBack, animationSettings ]
+		[ locationHistory, goTo, goBack, animationOverride ]
 	);
 
 	const cx = useCx();

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, isRTL } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	getBlockType,
 	getUnregisteredTypeHandlerName,
@@ -377,7 +377,7 @@ const NavigationInspector = ( { selectedBlockClientId, blockName } ) => {
 	return (
 		<NavigatorProvider
 			initialPath={ selectedBlockClientId }
-			initialAnimationSettings={ { initial: false } }
+			initialAnimationOverride="disableAnimation"
 		>
 			<NavigationInspectorScreens
 				selectedBlockClientId={ selectedBlockClientId }
@@ -431,23 +431,14 @@ const NavigationInspectorScreens = ( {
 			0,
 			navBlockTree
 		);
-		const animationSettings = {
-			initial: false,
-		};
-
+		let animationOverride = 'disableAnimation';
 		if ( currentDepth === 0 && previousDepth.current > 0 ) {
-			animationSettings.initial = {
-				x: isRTL() ? 50 : -50,
-				opacity: 0,
-			};
+			animationOverride = 'forceForward';
 		} else if ( currentDepth > 0 && previousDepth.current === 0 ) {
-			animationSettings.initial = {
-				x: isRTL() ? -50 : 50,
-				opacity: 0,
-			};
+			animationOverride = 'forceBackward';
 		}
 		previousDepth.current = currentDepth;
-		goTo( selectedBlockClientId, animationSettings );
+		goTo( selectedBlockClientId, animationOverride );
 	}, [ selectedBlockClientId ] );
 
 	return (
