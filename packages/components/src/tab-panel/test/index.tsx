@@ -162,6 +162,95 @@ describe( 'TabPanel', () => {
 		expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
 	} );
 
+	it( 'should disable the tab when `disabled` is true', async () => {
+		const user = setupUser();
+		const mockOnSelect = jest.fn();
+
+		render(
+			<TabPanel
+				tabs={ [
+					...TABS,
+					{
+						name: 'delta',
+						title: 'Delta',
+						className: 'delta-class',
+						disabled: true,
+					},
+				] }
+				children={ () => undefined }
+				onSelect={ mockOnSelect }
+			/>
+		);
+
+		expect( screen.getByRole( 'tab', { name: 'Delta' } ) ).toHaveAttribute(
+			'aria-disabled',
+			'true'
+		);
+
+		// onSelect gets called on the initial render.
+		expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+
+		// onSelect should not be called since the disabled tab is highlighted, but not selected.
+		await user.keyboard( '[ArrowLeft]' );
+		expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'should select the first enabled tab when the inital tab is disabled', () => {
+		const mockOnSelect = jest.fn();
+
+		render(
+			<TabPanel
+				tabs={ [
+					{
+						name: 'alpha',
+						title: 'Alpha',
+						className: 'alpha-class',
+						disabled: true,
+					},
+					{
+						name: 'beta',
+						title: 'Beta',
+						className: 'beta-class',
+					},
+				] }
+				initialTabName="alpha"
+				children={ () => undefined }
+				onSelect={ mockOnSelect }
+			/>
+		);
+
+		expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
+	} );
+
+	it( 'should select the first enabled tab when the currently selected becomes disabled', () => {
+		const mockOnSelect = jest.fn();
+
+		const { rerender } = render(
+			<TabPanel
+				tabs={ TABS }
+				children={ () => undefined }
+				onSelect={ mockOnSelect }
+			/>
+		);
+
+		expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+
+		rerender(
+			<TabPanel
+				tabs={ TABS.map( ( tab ) => {
+					if ( tab.name === 'alpha' ) {
+						return { ...tab, disabled: true };
+					}
+					return tab;
+				} ) }
+				children={ () => undefined }
+				onSelect={ mockOnSelect }
+			/>
+		);
+
+		expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
+	} );
+
 	describe( 'fallbacks when new tab list invalidates current selection', () => {
 		it( 'should select `initialTabName` if defined', async () => {
 			const user = setupUser();
