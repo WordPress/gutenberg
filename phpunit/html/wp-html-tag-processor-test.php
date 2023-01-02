@@ -257,8 +257,8 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	 *
 	 * @covers get_attribute_names_with_prefix
 	 */
-	public function test_get_attribute_names_with_prefix_returns_attribute_names() {
-		$p = new WP_HTML_Tag_Processor( '<div data-enabled class="test" data-test-id="14">Test</div>' );
+	public function test_get_attribute_names_with_prefix_returns_matching_attribute_names_in_lowercase() {
+		$p = new WP_HTML_Tag_Processor( '<div DATA-enabled class="test" data-test-ID="14">Test</div>' );
 		$p->next_tag();
 		$this->assertSame(
 			array( 'data-enabled', 'data-test-id' ),
