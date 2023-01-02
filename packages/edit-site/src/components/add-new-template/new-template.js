@@ -270,7 +270,6 @@ function useMissingTemplates(
 ) {
 	const existingTemplates = useExistingTemplates();
 	const defaultTemplateTypes = useDefaultTemplateTypes();
-	const extraTemplateTypes = useExtraTemplateTypes();
 	const existingTemplateSlugs = ( existingTemplates || [] ).map(
 		( { slug } ) => slug
 	);
@@ -279,6 +278,7 @@ function useMissingTemplates(
 			DEFAULT_TEMPLATE_SLUGS.includes( template.slug ) &&
 			! existingTemplateSlugs.includes( template.slug )
 	);
+	const extraTemplateTypes = useExtraTemplateTypes();
 	const onClickMenuItem = ( _entityForSuggestions ) => {
 		setShowCustomTemplateModal( true );
 		setEntityForSuggestions( _entityForSuggestions );
@@ -328,7 +328,14 @@ function useMissingTemplates(
 		...usePostTypeArchiveMenuItems(),
 		...postTypesMenuItems,
 		...taxonomiesMenuItems,
-		...extraTemplateTypes,
 	];
-	return missingTemplates;
+
+	const missingTemplateSlugs = ( missingTemplates || [] ).map(
+		( { slug } ) => slug
+	);
+	const missingExtraTemplateTypes = ( extraTemplateTypes || [] ).filter(
+		( template ) => ! missingTemplateSlugs.includes( template.slug )
+	);
+
+	return [ ...missingTemplates, ...missingExtraTemplateTypes ];
 }
