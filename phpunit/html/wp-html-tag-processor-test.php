@@ -269,6 +269,29 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 *
+	 * @covers set_attribute
+	 * @covers get_updated_html
+	 * @covers get_attribute_names
+	 */
+	public function test_get_attribute_names_returns_attribute_added_by_set_attribute() {
+		$p = new WP_HTML_Tag_Processor( '<div class="test">Test</div>' );
+		$p->next_tag();
+		$p->set_attribute( 'test-attribute', 'test-value' );
+		$this->assertSame(
+			'<div test-attribute="test-value" class="test">Test</div>',
+			$p->get_updated_html(),
+			"Updated HTML doesn't include attribute added via set_attribute"
+		);
+		$this->assertSame(
+			array( 'test-attribute', 'class' ),
+			$p->get_attribute_names(),
+			"Accessing attribute names doesn't find attribute added via set_attribute"
+		);
+	}
+
+	/**
+	 * @ticket 56299
+	 *
 	 * @covers __toString
 	 */
 	public function tostring_returns_updated_html() {
