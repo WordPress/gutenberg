@@ -1430,7 +1430,7 @@ class WP_HTML_Tag_Processor {
 	 * @return array|null List of attribute names, or `null` if not at a tag.
 	 */
 	function get_attribute_names() {
-		if ( null === $this->tag_name_starts_at ) {
+		if ( $this->is_closing_tag || null === $this->tag_name_starts_at ) {
 			return null;
 		}
 
