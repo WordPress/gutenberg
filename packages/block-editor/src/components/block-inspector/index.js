@@ -14,12 +14,9 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	Button,
-	__experimentalNavigatorProvider as NavigatorProvider,
-	__experimentalNavigatorScreen as NavigatorScreen,
-	__experimentalUseNavigator as useNavigator,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMemo, useCallback, useEffect, useRef } from '@wordpress/element';
+import { useMemo, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -37,6 +34,7 @@ import { default as InspectorControls } from '../inspector-controls';
 import { default as InspectorControlsTabs } from '../inspector-controls-tabs';
 import useInspectorControlsTabs from '../inspector-controls-tabs/use-inspector-controls-tabs';
 import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel';
+import NavigationInspector from './navigation-inspector';
 
 function useContentBlocks( blockTypes, block ) {
 	const contentBlocksObjectAux = useMemo( () => {
@@ -248,6 +246,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			<NavigationInspector
 				selectedBlockClientId={ selectedBlockClientId }
 				blockName={ blockType.name }
+				blockInspectorSingleBlock={ BlockInspectorSingleBlock }
 			/>
 		);
 	}
@@ -333,136 +332,6 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 			) }
 			<SkipToSelectedBlock key="back" />
 		</div>
-	);
-};
-
-const NavigationInspector = ( { selectedBlockClientId, blockName } ) => {
-	const { parentNavBlock, childNavBlocks } = useSelect(
-		( select ) => {
-			const {
-				getBlockParentsByBlockName,
-				getClientIdsOfDescendants,
-				getBlock,
-			} = select( blockEditorStore );
-
-			let navBlockClientId;
-
-			if ( blockName === 'core/navigation' ) {
-				navBlockClientId = selectedBlockClientId;
-			} else if (
-				blockName === 'core/navigation-link' ||
-				blockName === 'core/navigation-submenu'
-			) {
-				navBlockClientId = getBlockParentsByBlockName(
-					selectedBlockClientId,
-					'core/navigation',
-					true
-				)[ 0 ];
-			}
-
-			const _childClientIds = getClientIdsOfDescendants( [
-				navBlockClientId,
-			] );
-
-			return {
-				parentNavBlock: getBlock( navBlockClientId ),
-				childNavBlocks: _childClientIds.map( ( id ) => {
-					return getBlock( id );
-				} ),
-			};
-		},
-		[ selectedBlockClientId, blockName ]
-	);
-
-	return (
-		<NavigatorProvider
-			initialPath={ selectedBlockClientId }
-			initialAnimationOverride="disableAnimation"
-		>
-			<NavigationInspectorScreens
-				selectedBlockClientId={ selectedBlockClientId }
-				parentNavBlock={ parentNavBlock }
-				childNavBlocks={ childNavBlocks }
-			/>
-		</NavigatorProvider>
-	);
-};
-
-const NavigationInspectorScreens = ( {
-	selectedBlockClientId,
-	parentNavBlock,
-	childNavBlocks,
-} ) => {
-	const { goTo } = useNavigator();
-	const previousDepth = useRef( -1 );
-	const { navBlockTree } = useSelect(
-		( select ) => {
-			const { __unstableGetClientIdWithClientIdsTree } =
-				select( blockEditorStore );
-
-			return {
-				navBlockTree: __unstableGetClientIdWithClientIdsTree(
-					parentNavBlock.clientId
-				),
-			};
-		},
-		[ selectedBlockClientId ]
-	);
-
-	const getBlockDepth = ( targetClientId, currentDepth, rootBlock ) => {
-		if ( targetClientId === rootBlock.clientId ) {
-			return currentDepth;
-		}
-		for ( let i = 0; i < rootBlock.innerBlocks.length; i++ ) {
-			const newDepth = getBlockDepth(
-				targetClientId,
-				currentDepth + 1,
-				rootBlock.innerBlocks[ i ]
-			);
-			if ( newDepth > currentDepth ) {
-				return newDepth;
-			}
-		}
-	};
-
-	useEffect( () => {
-		const currentDepth = getBlockDepth(
-			selectedBlockClientId,
-			0,
-			navBlockTree
-		);
-		let animationOverride = 'disableAnimation';
-		if ( currentDepth === 0 && previousDepth.current > 0 ) {
-			animationOverride = 'forceForward';
-		} else if ( currentDepth > 0 && previousDepth.current === 0 ) {
-			animationOverride = 'forceBackward';
-		}
-		previousDepth.current = currentDepth;
-		goTo( selectedBlockClientId, animationOverride );
-	}, [ selectedBlockClientId ] );
-
-	return (
-		<>
-			<NavigatorScreen path={ parentNavBlock.clientId }>
-				<BlockInspectorSingleBlock
-					clientId={ parentNavBlock.clientId }
-					blockName={ parentNavBlock.name }
-				/>
-			</NavigatorScreen>
-			{ childNavBlocks.map( ( childNavBlock ) => {
-				return (
-					<NavigatorScreen
-						path={ childNavBlock.clientId }
-						key={ childNavBlock.clientId }
-					>
-						<BlockInspectorSingleBlock
-							clientId={ childNavBlock.clientId }
-							blockName={ childNavBlock.name }
-						/>
-					</NavigatorScreen>
-				);
-			} ) }
-		</>
 	);
 };
 
