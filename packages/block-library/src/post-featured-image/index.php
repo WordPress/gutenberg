@@ -49,7 +49,7 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	if ( $is_link ) {
 		$link_target    = $attributes['linkTarget'];
 		$rel            = ! empty( $attributes['rel'] ) ? 'rel="' . esc_attr( $attributes['rel'] ) . '"' : '';
-		$height         = ! empty( $attributes['height'] ) ? 'style="' . esc_attr( $attributes['height'] ) . '"' : '';
+		$height         = ! empty( $attributes['height'] ) ? 'style="height:' . esc_attr( $attributes['height'] ) . '"' : '';
 		$featured_image = sprintf(
 			'<a href="%1$s" target="%2$s" %3$s %4$s>%5$s%6$s</a>',
 			get_the_permalink( $post_ID ),
