@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.14.0 (2022-12-14)
+
 ### Enhancements
 
 -   Lighten the border color in the `input-style__neutral` mixin ([#46252](https://github.com/WordPress/gutenberg/pull/46252)).
