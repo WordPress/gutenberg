@@ -42,16 +42,17 @@ export { hasBlockSwitcher } from './has-block-switcher';
 export { getPageError } from './get-page-error';
 export { getOption } from './get-option';
 export {
-	insertBlock,
-	insertPattern,
-	insertReusableBlock,
-	searchForBlock,
-	searchForPattern,
-	searchForReusableBlock,
-	insertBlockDirectoryBlock,
 	openGlobalBlockInserter,
 	closeGlobalBlockInserter,
 	toggleGlobalBlockInserter,
+	searchForBlock,
+	searchForPattern,
+	searchForReusableBlock,
+	searchForBlockDirectoryBlock,
+	insertBlock,
+	insertPattern,
+	insertReusableBlock,
+	insertBlockDirectoryBlock,
 } from './inserter';
 export { installPlugin } from './install-plugin';
 export { installTheme } from './install-theme';

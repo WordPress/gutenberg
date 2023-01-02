@@ -17,6 +17,13 @@
 			margin-bottom: $grid-unit-10;
 		}
 	}
+
+	// Reset unexpected margin-bottom from being applied to the `BaseControl`
+	// component of the `FocalPointPicker` component.
+	.components-focal-point-picker-control .components-base-control {
+		margin-bottom: 0;
+	}
+
 	.components-panel__body {
 		border: none;
 		border-top: $border-width solid $gray-200;

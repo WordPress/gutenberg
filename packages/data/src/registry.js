@@ -60,7 +60,7 @@ function getStoreName( storeNameOrDescriptor ) {
 export function createRegistry( storeConfigs = {}, parent = null ) {
 	const stores = {};
 	const emitter = createEmitter();
-	const listeningStores = new Set();
+	let listeningStores = null;
 
 	/**
 	 * Global listener called for each store's update.
@@ -112,7 +112,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 */
 	function select( storeNameOrDescriptor ) {
 		const storeName = getStoreName( storeNameOrDescriptor );
-		listeningStores.add( storeName );
+		listeningStores?.add( storeName );
 		const store = stores[ storeName ];
 		if ( store ) {
 			return store.getSelectors();
@@ -122,11 +122,12 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	}
 
 	function __unstableMarkListeningStores( callback, ref ) {
-		listeningStores.clear();
+		listeningStores = new Set();
 		try {
 			return callback.call( this );
 		} finally {
 			ref.current = Array.from( listeningStores );
+			listeningStores = null;
 		}
 	}
 
@@ -143,7 +144,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 */
 	function resolveSelect( storeNameOrDescriptor ) {
 		const storeName = getStoreName( storeNameOrDescriptor );
-		listeningStores.add( storeName );
+		listeningStores?.add( storeName );
 		const store = stores[ storeName ];
 		if ( store ) {
 			return store.getResolveSelectors();
@@ -165,7 +166,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 */
 	function suspendSelect( storeNameOrDescriptor ) {
 		const storeName = getStoreName( storeNameOrDescriptor );
-		listeningStores.add( storeName );
+		listeningStores?.add( storeName );
 		const store = stores[ storeName ];
 		if ( store ) {
 			return store.getSuspendSelectors();

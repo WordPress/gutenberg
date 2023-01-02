@@ -20,6 +20,7 @@ import { NavigationButtonAsItem } from './navigation-button';
 import { getSupportedGlobalStylesPanels, useStyle } from './hooks';
 import Subtitle from './subtitle';
 import ColorIndicatorWrapper from './color-indicator-wrapper';
+import BlockPreviewPanel from './block-preview-panel';
 
 function BackgroundColorItem( { name, parentMenu } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
@@ -185,6 +186,8 @@ function ScreenColors( { name } ) {
 					'Manage palettes and the default color of different global elements on the site.'
 				) }
 			/>
+
+			<BlockPreviewPanel name={ name } />
 
 			<div className="edit-site-global-styles-screen-colors">
 				<VStack spacing={ 10 }>

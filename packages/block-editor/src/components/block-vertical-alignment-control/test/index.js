@@ -9,6 +9,8 @@ import userEvent from '@testing-library/user-event';
  */
 import BlockVerticalAlignmentUI from '../ui';
 
+jest.useFakeTimers();
+
 describe( 'BlockVerticalAlignmentUI', () => {
 	const alignment = 'top';
 	const onChange = jest.fn();

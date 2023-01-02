@@ -127,6 +127,30 @@ function gutenberg_resolve_assets_override() {
 
 	$scripts = ob_get_clean();
 
+	/*
+	 * Generate web font @font-face styles for the site editor iframe.
+	 * Use the registered font families for printing.
+	 */
+	if ( class_exists( 'WP_Web_Fonts' ) ) {
+		$wp_webfonts = wp_webfonts();
+		$registered  = $wp_webfonts->get_registered_font_families();
+		if ( ! empty( $registered ) ) {
+			$queue = $wp_webfonts->queue;
+			$done  = $wp_webfonts->done;
+
+			$wp_webfonts->done  = array();
+			$wp_webfonts->queue = $registered;
+
+			ob_start();
+			$wp_webfonts->do_items();
+			$styles .= ob_get_clean();
+
+			// Reset the Web Fonts API.
+			$wp_webfonts->done  = $done;
+			$wp_webfonts->queue = $queue;
+		}
+	}
+
 	return array(
 		'styles'  => $styles,
 		'scripts' => $scripts,
@@ -137,7 +161,8 @@ add_filter(
 	'block_editor_settings_all',
 	function( $settings ) {
 		// We must override what core is passing now.
-		$settings['__unstableResolvedAssets'] = gutenberg_resolve_assets_override();
+		$settings['__unstableResolvedAssets']    = gutenberg_resolve_assets_override();
+		$settings['__unstableIsBlockBasedTheme'] = wp_is_block_theme();
 		return $settings;
 	},
 	100

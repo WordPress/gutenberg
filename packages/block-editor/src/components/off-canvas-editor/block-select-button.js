@@ -12,7 +12,7 @@ import {
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
-import { Icon, lock } from '@wordpress/icons';
+import { Icon, lockSmall as lock } from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
 
 /**
@@ -79,7 +79,11 @@ function ListViewBlockSelectButton(
 				aria-hidden={ true }
 			>
 				<ListViewExpander onClick={ onToggleExpanded } />
-				<BlockIcon icon={ blockInformation?.icon } showColors />
+				<BlockIcon
+					icon={ blockInformation?.icon }
+					showColors
+					context="list-view"
+				/>
 				<HStack
 					alignment="center"
 					className="block-editor-list-view-block-select-button__label-wrapper"

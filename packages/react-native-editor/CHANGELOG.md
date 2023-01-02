@@ -10,13 +10,14 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Add capabilities to force only Core blocks and control Support section [#46215]
+
+## 1.86.1
+-   [*] Block Actions Menu - Fix block title regression and adds integration tests [#46699]
 
 ## 1.86.0
 -   [**] Upgrade React Native to 0.69.4 [#43485]
 -   [**] Prevent error message from unneccesarily firing when uploading to Gallery block [#46175]
-
-## 1.85.0
--   [*] [iOS] Fixed iOS Voice Control support within Image block captions. [#44850]
 
 ## 1.85.1
 -   [**] Prevent error message from unneccesarily firing when uploading to Gallery block [#46175]

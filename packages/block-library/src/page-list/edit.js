@@ -39,6 +39,7 @@ import { convertDescription } from './constants';
 // We only show the edit option when page count is <= MAX_PAGE_COUNT
 // Performance of Navigation Links is not good past this value.
 const MAX_PAGE_COUNT = 100;
+const NOOP = () => {};
 
 export default function PageListEdit( {
 	context,
@@ -49,8 +50,6 @@ export default function PageListEdit( {
 	const { parentPageID } = attributes;
 	const [ pages ] = useGetPages();
 	const { pagesByParentId, totalPages, hasResolvedPages } = usePageData();
-	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
 
 	const isNavigationChild = 'showSubmenuIcon' in context;
 	const allowConvertToLinks =
@@ -133,6 +132,9 @@ export default function PageListEdit( {
 		renderAppender: false,
 		__unstableDisableDropZone: true,
 		templateLock: 'all',
+		onInput: NOOP,
+		onChange: NOOP,
+		value: blockList,
 	} );
 
 	const getBlockContent = () => {
@@ -185,29 +187,35 @@ export default function PageListEdit( {
 		}
 	};
 
-	useEffect( () => {
-		__unstableMarkNextChangeAsNotPersistent();
-		if ( blockList ) {
-			replaceInnerBlocks( clientId, blockList );
-		}
-	}, [ clientId, blockList ] );
-
 	const { replaceBlock, selectBlock } = useDispatch( blockEditorStore );
 
-	const { parentNavBlockClientId } = useSelect( ( select ) => {
-		const { getSelectedBlockClientId, getBlockParentsByBlockName } =
-			select( blockEditorStore );
+	const { parentNavBlockClientId, isNested } = useSelect(
+		( select ) => {
+			const { getSelectedBlockClientId, getBlockParentsByBlockName } =
+				select( blockEditorStore );
 
-		const _selectedBlockClientId = getSelectedBlockClientId();
+			const _selectedBlockClientId = getSelectedBlockClientId();
 
-		return {
-			parentNavBlockClientId: getBlockParentsByBlockName(
-				_selectedBlockClientId,
-				'core/navigation',
-				true
-			)[ 0 ],
-		};
-	}, [] );
+			return {
+				parentNavBlockClientId: getBlockParentsByBlockName(
+					_selectedBlockClientId,
+					'core/navigation',
+					true
+				)[ 0 ],
+				isNested:
+					getBlockParentsByBlockName(
+						clientId,
+						'core/navigation-submenu',
+						true
+					).length > 0,
+			};
+		},
+		[ clientId ]
+	);
+
+	useEffect( () => {
+		setAttributes( { isNested } );
+	}, [ isNested ] );
 
 	return (
 		<>

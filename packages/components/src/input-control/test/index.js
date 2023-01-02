@@ -14,6 +14,8 @@ import { useState } from '@wordpress/element';
  */
 import BaseInputControl from '../';
 
+jest.useFakeTimers();
+
 const setupUser = () =>
 	userEvent.setup( {
 		advanceTimers: jest.advanceTimersByTime,
@@ -65,6 +67,7 @@ describe( 'InputControl', () => {
 			const help = screen.getByRole( 'link', { name: 'My help text' } );
 
 			expect(
+				// eslint-disable-next-line testing-library/no-node-access
 				help.closest( `#${ input.getAttribute( 'aria-details' ) }` )
 			).toBeVisible();
 		} );

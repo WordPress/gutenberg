@@ -51,6 +51,7 @@ describe( 'Site Editor Performance', () => {
 			firstContentfulPaint: [],
 			firstBlock: [],
 			type: [],
+			typeContainer: [],
 			focus: [],
 			inserterOpen: [],
 			inserterHover: [],
