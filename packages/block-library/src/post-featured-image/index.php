@@ -34,7 +34,11 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 		if ( get_the_title( $post_ID ) ) {
 			$attr['alt'] = trim( strip_tags( get_the_title( $post_ID ) ) );
 		} else {
-			$attr['alt'] = esc_attr__( 'Untitled post ' ) . $post_ID;
+			$attr['alt'] = sprintf(
+				// translators: %d is the post ID.
+				__( 'Untitled post %d' ),
+				$post_ID
+			);
 		}
 	}
 
