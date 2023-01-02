@@ -80,6 +80,19 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	 * @covers next_tag
 	 * @covers get_attribute
 	 */
+	public function test_get_attribute_returns_null_when_in_closing_tag() {
+		$p = new WP_HTML_Tag_Processor( '<div class="test">Test</div>' );
+		$this->assertTrue( $p->next_tag( 'div' ), 'Querying an existing tag did not return true' );
+		$this->assertTrue( $p->next_tag( array( 'tag_closers' => 'visit' ) ), 'Querying an existing closing tag did not return true' );
+		$this->assertNull( $p->get_attribute( 'class' ), 'Accessing an attribute of a closing tag did not return null' );
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers next_tag
+	 * @covers get_attribute
+	 */
 	public function test_get_attribute_returns_null_when_attribute_missing() {
 		$p = new WP_HTML_Tag_Processor( '<div class="test">Test</div>' );
 		$this->assertTrue( $p->next_tag( 'div' ), 'Querying an existing tag did not return true' );
