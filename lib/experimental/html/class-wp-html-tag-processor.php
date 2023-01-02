@@ -1009,8 +1009,8 @@ class WP_HTML_Tag_Processor {
 			return false;
 		}
 
-		$attribute_start = $this->parsed_bytes;
-		$attribute_name = substr( $this->html, $attribute_start, $name_length );
+		$attribute_start     = $this->parsed_bytes;
+		$attribute_name      = substr( $this->html, $attribute_start, $name_length );
 		$this->parsed_bytes += $name_length;
 		if ( $this->parsed_bytes >= strlen( $this->html ) ) {
 			return false;
@@ -1067,7 +1067,7 @@ class WP_HTML_Tag_Processor {
 		 *
 		 * @see https://html.spec.whatwg.org/multipage/syntax.html#attributes-2:ascii-case-insensitive
 		 */
-		$comparable_name = strtolower( $attribute_name);
+		$comparable_name = strtolower( $attribute_name );
 
 		// If an attribute is listed many times, only use the first declaration and ignore the rest.
 		if ( ! array_key_exists( $comparable_name, $this->attributes ) ) {
