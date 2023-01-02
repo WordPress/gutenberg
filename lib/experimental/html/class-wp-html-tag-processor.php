@@ -1413,28 +1413,36 @@ class WP_HTML_Tag_Processor {
 	}
 
 	/**
-	 * Returns the names of all attributes in the currently-opened tag.
+	 * Returns the names of all attributes matching a given prefix in the currently-opened tag.
 	 *
 	 * Example:
 	 * <code>
-	 *     $p = new WP_HTML_Tag_Processor( '<div enabled class="test" data-test-id="14">Test</div>' );
+	 *     $p = new WP_HTML_Tag_Processor( '<div data-enabled class="test" data-test-id="14">Test</div>' );
 	 *     $p->next_tag( [ 'class_name' => 'test' ] ) === true;
-	 *     $p->get_attribute_names() === array( 'enabled', 'class', 'data-test-id' );
+	 *     $p->get_attribute_names_with_prefix() === array( 'data-enabled', 'data-test-id' );
 	 *
 	 *     $p->next_tag( [] ) === false;
-	 *     $p->get_attribute_names() === null;
+	 *     $p->get_attribute_names_with_prefix() === null;
 	 * </code>
 	 *
 	 * @since 6.2.0
 	 *
 	 * @return array|null List of attribute names, or `null` if not at a tag.
 	 */
-	function get_attribute_names() {
+	function get_attribute_names_with_prefix( $prefix ) {
 		if ( $this->is_closing_tag || null === $this->tag_name_starts_at ) {
 			return null;
 		}
 
-		return array_keys( $this->attributes );
+		$comparable = strtolower( $prefix );
+
+		$matches = array_filter(
+			array_keys( $this->attributes ),
+			function( $attr ) use ( $comparable ) {
+				return str_starts_with( $attr, $comparable );
+			}
+		);
+		return array_values( $matches );
 	}
 
 	/**

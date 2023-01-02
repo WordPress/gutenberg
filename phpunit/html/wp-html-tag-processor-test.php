@@ -211,58 +211,58 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 *
-	 * @covers get_attribute_names
+	 * @covers get_attribute_names_with_prefix
 	 */
-	public function test_get_attribute_names_returns_null_before_finding_tags() {
-		$p = new WP_HTML_Tag_Processor( '<div class="test">Test</div>' );
-		$this->assertNull( $p->get_attribute_names() );
+	public function test_get_attribute_names_with_prefix_returns_null_before_finding_tags() {
+		$p = new WP_HTML_Tag_Processor( '<div data-foo="bar">Test</div>' );
+		$this->assertNull( $p->get_attribute_names_with_prefix( 'data-' ) );
 	}
 
 	/**
 	 * @ticket 56299
 	 *
-	 * @covers get_attribute
+	 * @covers get_attribute_names_with_prefix
 	 */
-	public function test_get_attribute_names_returns_null_when_not_in_open_tag() {
-		$p = new WP_HTML_Tag_Processor( '<div class="test">Test</div>' );
+	public function test_get_attribute_names_with_prefix_returns_null_when_not_in_open_tag() {
+		$p = new WP_HTML_Tag_Processor( '<div data-foo="bar">Test</div>' );
 		$p->next_tag( 'p' );
-		$this->assertNull( $p->get_attribute_names(), 'Accessing attributes of a non-existing tag did not return null' );
+		$this->assertNull( $p->get_attribute_names_with_prefix( 'data-' ), 'Accessing attributes of a non-existing tag did not return null' );
 	}
 
 	/**
 	 * @ticket 56299
 	 *
-	 * @covers get_attribute_names
+	 * @covers get_attribute_names_with_prefix
 	 */
-	public function test_get_attribute_names_returns_null_when_in_closing_tag() {
-		$p = new WP_HTML_Tag_Processor( '<div class="test">Test</div>' );
+	public function test_get_attribute_names_with_prefix_returns_null_when_in_closing_tag() {
+		$p = new WP_HTML_Tag_Processor( '<div data-foo="bar">Test</div>' );
 		$p->next_tag( 'div' );
 		$p->next_tag( array( 'tag_closers' => 'visit' ) );
-		$this->assertNull( $p->get_attribute_names(), 'Accessing attributes of a closing tag did not return null' );
+		$this->assertNull( $p->get_attribute_names_with_prefix( 'data-' ), 'Accessing attributes of a closing tag did not return null' );
 	}
 
 	/**
 	 * @ticket 56299
 	 *
-	 * @covers get_attribute_names
+	 * @covers get_attribute_names_with_prefix
 	 */
-	public function test_get_attribute_names_returns_empty_array_when_no_attributes_present() {
+	public function test_get_attribute_names_with_prefix_returns_empty_array_when_no_attributes_present() {
 		$p = new WP_HTML_Tag_Processor( '<div>Test</div>' );
 		$p->next_tag( 'div' );
-		$this->assertSame( array(), $p->get_attribute_names(), 'Accessing the attributes on a tag without any did not return an empty array' );
+		$this->assertSame( array(), $p->get_attribute_names_with_prefix( 'data-' ), 'Accessing the attributes on a tag without any did not return an empty array' );
 	}
 
 	/**
 	 * @ticket 56299
 	 *
-	 * @covers get_attribute_names
+	 * @covers get_attribute_names_with_prefix
 	 */
-	public function test_get_attribute_names_returns_attribute_names() {
-		$p = new WP_HTML_Tag_Processor( '<div enabled class="test" data-test-id="14">Test</div>' );
+	public function test_get_attribute_names_with_prefix_returns_attribute_names() {
+		$p = new WP_HTML_Tag_Processor( '<div data-enabled class="test" data-test-id="14">Test</div>' );
 		$p->next_tag();
 		$this->assertSame(
-			array( 'enabled', 'class', 'data-test-id' ),
-			$p->get_attribute_names()
+			array( 'data-enabled', 'data-test-id' ),
+			$p->get_attribute_names_with_prefix( 'data-' )
 		);
 	}
 
@@ -271,20 +271,20 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	 *
 	 * @covers set_attribute
 	 * @covers get_updated_html
-	 * @covers get_attribute_names
+	 * @covers get_attribute_names_with_prefix
 	 */
-	public function test_get_attribute_names_returns_attribute_added_by_set_attribute() {
-		$p = new WP_HTML_Tag_Processor( '<div class="test">Test</div>' );
+	public function test_get_attribute_names_with_prefix_returns_attribute_added_by_set_attribute() {
+		$p = new WP_HTML_Tag_Processor( '<div data-foo="bar">Test</div>' );
 		$p->next_tag();
-		$p->set_attribute( 'test-attribute', 'test-value' );
+		$p->set_attribute( 'data-test-id', '14' );
 		$this->assertSame(
-			'<div test-attribute="test-value" class="test">Test</div>',
+			'<div data-test-id="14" data-foo="bar">Test</div>',
 			$p->get_updated_html(),
 			"Updated HTML doesn't include attribute added via set_attribute"
 		);
 		$this->assertSame(
-			array( 'test-attribute', 'class' ),
-			$p->get_attribute_names(),
+			array( 'data-test-id', 'data-foo' ),
+			$p->get_attribute_names_with_prefix( 'data-' ),
 			"Accessing attribute names doesn't find attribute added via set_attribute"
 		);
 	}
