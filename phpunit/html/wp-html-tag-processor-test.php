@@ -221,7 +221,7 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 *
-	 * @covers get_attribute
+	 * @covers get_attribute_names
 	 */
 	public function test_get_attribute_names_returns_null_when_not_in_open_tag() {
 		$p = new WP_HTML_Tag_Processor( '<div class="test">Test</div>' );
