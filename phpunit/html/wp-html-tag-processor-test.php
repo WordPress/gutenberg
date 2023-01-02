@@ -209,9 +209,55 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers WP_HTML_Tag_Processor::get_attribute_names
+	 * @ticket 56299
+	 *
+	 * @covers get_attribute_names
 	 */
-	public function test_get_attribute_names() {
+	public function test_get_attribute_names_returns_null_before_finding_tags() {
+		$p = new WP_HTML_Tag_Processor( '<div class="test">Test</div>' );
+		$this->assertNull( $p->get_attribute_names() );
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers get_attribute
+	 */
+	public function test_get_attribute_names_returns_null_when_not_in_open_tag() {
+		$p = new WP_HTML_Tag_Processor( '<div class="test">Test</div>' );
+		$p->next_tag( 'p' );
+		$this->assertNull( $p->get_attribute_names(), 'Accessing attributes of a non-existing tag did not return null' );
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers get_attribute_names
+	 */
+	public function test_get_attribute_names_returns_null_when_in_closing_tag() {
+		$p = new WP_HTML_Tag_Processor( '<div class="test">Test</div>' );
+		$p->next_tag( 'div' );
+		$p->next_tag( array( 'tag_closers' => 'visit' ) );
+		$this->assertNull( $p->get_attribute_names(), 'Accessing attributes of a closing tag did not return null' );
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers get_attribute_names
+	 */
+	public function test_get_attribute_names_returns_empty_array_when_no_attributes_present() {
+		$p = new WP_HTML_Tag_Processor( '<div>Test</div>' );
+		$p->next_tag( 'div' );
+		$this->assertSame( array(), $p->get_attribute_names(), 'Accessing the attributes on a tag without any did not return an empty array' );
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers get_attribute_names
+	 */
+	public function test_get_attribute_names_returns_attribute_names() {
 		$p = new WP_HTML_Tag_Processor( '<div enabled class="test" data-test-id="14">Test</div>' );
 		$p->next_tag();
 		$this->assertSame(
