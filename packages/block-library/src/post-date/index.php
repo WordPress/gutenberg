@@ -21,13 +21,21 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 	$post_ID            = $block->context['postId'];
 	$align_class_name   = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
+	$formatted_date     = get_the_date( empty( $attributes['format'] ) ? '' : $attributes['format'], $post_ID );
+	$unformatted_date   = esc_attr( get_the_date( 'c', $post_ID ) );
 
+	/*
+	 * If the "Display last modified date" setting is enabled,
+	 * only display the modified date if it is different from the publishing date.
+	 */
 	if ( isset( $attributes['displayType'] ) && 'modified' === $attributes['displayType'] ) {
-		$formatted_date   = get_the_modified_date( empty( $attributes['format'] ) ? '' : $attributes['format'], $post_ID );
-		$unformatted_date = esc_attr( get_the_modified_date( 'c', $post_ID ) );
-	} else {
-		$formatted_date   = get_the_date( empty( $attributes['format'] ) ? '' : $attributes['format'], $post_ID );
-		$unformatted_date = esc_attr( get_the_date( 'c', $post_ID ) );
+		if ( get_the_modified_date( 'Y-m-d h:i', $post_ID ) !== get_the_date( 'Y-m-d h:i', $post_ID ) ) {
+			$formatted_date     = get_the_modified_date( empty( $attributes['format'] ) ? '' : $attributes['format'], $post_ID );
+			$unformatted_date   = esc_attr( get_the_modified_date( 'c', $post_ID ) );
+			$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name . ' wp-block-post-date__modified-date' ) );
+		} else {
+			return '';
+		}
 	}
 
 	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
