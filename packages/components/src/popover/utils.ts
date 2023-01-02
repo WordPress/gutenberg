@@ -139,25 +139,6 @@ export const placementToMotionAnimationProps = (
 	};
 };
 
-/**
- * Returns the offset of a document's frame element.
- *
- * @param document The iframe's owner document.
- *
- * @return The offset of the document's frame element, or undefined if the
- * document has no frame element.
- */
-export const getFrameOffset = (
-	document?: Document
-): { x: number; y: number } | undefined => {
-	const frameElement = document?.defaultView?.frameElement;
-	if ( ! frameElement ) {
-		return;
-	}
-	const iframeRect = frameElement.getBoundingClientRect();
-	return { x: iframeRect.left, y: iframeRect.top };
-};
-
 export const getFrameScale = (
 	document?: Document
 ): {
