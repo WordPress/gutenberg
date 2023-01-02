@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { map, filter } from 'lodash';
+import { map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -199,7 +199,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 		setAttributes( {
 			mediaWidth: applyWidthConstraints( width ),
 		} );
-		setTemporaryMediaWidth( applyWidthConstraints( width ) );
+		setTemporaryMediaWidth( null );
 	};
 
 	const classNames = classnames( {
@@ -226,7 +226,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 	};
 
 	const imageSizeOptions = map(
-		filter( imageSizes, ( { slug } ) =>
+		imageSizes.filter( ( { slug } ) =>
 			getImageSourceUrlBySizeSlug( image, slug )
 		),
 		( { name, slug } ) => ( { value: slug, label: name } )
@@ -268,6 +268,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 			) }
 			{ imageFill && mediaUrl && mediaType === 'image' && (
 				<FocalPointPicker
+					__nextHasNoMarginBottom
 					label={ __( 'Focal point picker' ) }
 					url={ mediaUrl }
 					value={ focalPoint }
@@ -280,6 +281,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 			) }
 			{ mediaType === 'image' && (
 				<TextareaControl
+					__nextHasNoMarginBottom
 					label={ __( 'Alt text (alternative text)' ) }
 					value={ mediaAlt }
 					onChange={ onMediaAltChange }
@@ -306,6 +308,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 			) }
 			{ mediaUrl && (
 				<RangeControl
+					__nextHasNoMarginBottom
 					label={ __( 'Media width' ) }
 					value={ temporaryMediaWidth || mediaWidth }
 					onChange={ commitWidthChange }

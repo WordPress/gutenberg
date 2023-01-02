@@ -76,6 +76,18 @@ const lineHeight = {
 	},
 };
 
+const textColumns = {
+	name: 'textColumns',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'typography', 'textColumns' ],
+			'columnCount'
+		);
+	},
+};
+
 const textDecoration = {
 	name: 'textDecoration',
 	generate: ( style: Style, options: StyleOptions ) => {
@@ -107,6 +119,7 @@ export default [
 	fontWeight,
 	letterSpacing,
 	lineHeight,
+	textColumns,
 	textDecoration,
 	textTransform,
 ];

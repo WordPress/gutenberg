@@ -70,7 +70,7 @@ async function testNativeSelection() {
 			return;
 		}
 
-		if ( ! selection.rangeCount === 1 ) {
+		if ( selection.rangeCount !== 1 ) {
 			throw 'expected one range';
 		}
 
@@ -398,6 +398,11 @@ describe( 'Multi-block selection', () => {
 			`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Group')]`
 		);
 		await page.keyboard.press( 'Enter' );
+
+		// Select the default, selected Group layout from the variation picker.
+		await page.click(
+			'button[aria-label="Group: Gather blocks in a container."]'
+		);
 
 		const groupAppender = await page.waitForSelector(
 			'.block-editor-button-block-appender'

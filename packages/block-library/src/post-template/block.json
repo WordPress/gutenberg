@@ -22,6 +22,14 @@
 		"__experimentalLayout": {
 			"allowEditing": false
 		},
+		"color": {
+			"gradients": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,

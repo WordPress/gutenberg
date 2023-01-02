@@ -22,6 +22,7 @@ const config = require( '../config' );
  * @typedef WPPerformanceCommandOptions
  *
  * @property {boolean=} ci          Run on CI.
+ * @property {number=}  rounds      Run each test suite this many times for each branch.
  * @property {string=}  testsBranch The branch whose performance test files will be used for testing.
  * @property {string=}  wpVersion   The WordPress version to be used as the base install for testing.
  */
@@ -36,6 +37,7 @@ const config = require( '../config' );
  * @property {number[]} firstContentfulPaint Represents the time when the browser first renders any text or media.
  * @property {number[]} firstBlock           Represents the time when Puppeteer first sees a block selector in the DOM.
  * @property {number[]} type                 Average type time.
+ * @property {number[]} typeContainer        Average type time within a container.
  * @property {number[]} focus                Average block selection time.
  * @property {number[]} inserterOpen         Average time to open global inserter.
  * @property {number[]} inserterSearch       Average time to search the inserter.
@@ -55,6 +57,9 @@ const config = require( '../config' );
  * @property {number=} type                 Average type time.
  * @property {number=} minType              Minimum type time.
  * @property {number=} maxType              Maximum type time.
+ * @property {number=} typeContainer        Average type time within a container.
+ * @property {number=} minTypeContainer     Minimum type time within a container.
+ * @property {number=} maxTypeContainer     Maximum type time within a container.
  * @property {number=} focus                Average block selection time.
  * @property {number=} minFocus             Min block selection time.
  * @property {number=} maxFocus             Max block selection time.
@@ -128,6 +133,9 @@ function curateResults( results ) {
 		type: average( results.type ),
 		minType: Math.min( ...results.type ),
 		maxType: Math.max( ...results.type ),
+		typeContainer: average( results.typeContainer ),
+		minTypeContainer: Math.min( ...results.typeContainer ),
+		maxTypeContainer: Math.max( ...results.typeContainer ),
 		focus: average( results.focus ),
 		minFocus: Math.min( ...results.focus ),
 		maxFocus: Math.max( ...results.focus ),
@@ -176,6 +184,7 @@ async function runTestSuite( testSuite, performanceTestDirectory ) {
  */
 async function runPerformanceTests( branches, options ) {
 	const runningInCI = !! process.env.CI || !! options.ci;
+	const TEST_ROUNDS = options.rounds || 1;
 
 	// The default value doesn't work because commander provides an array.
 	if ( branches.length === 0 ) {
@@ -239,7 +248,7 @@ async function runPerformanceTests( branches, options ) {
 
 	log( '    >> Installing dependencies and building packages' );
 	await runShellScript(
-		'npm ci && npm run build:packages',
+		'npm ci && node ./bin/packages/build.js',
 		performanceTestDirectory
 	);
 	log( '    >> Creating the environment folders' );
@@ -258,12 +267,26 @@ async function runPerformanceTests( branches, options ) {
 		await runShellScript( 'mkdir ' + environmentDirectory );
 		await runShellScript( `cp -R ${ baseDirectory } ${ buildPath }` );
 
-		log( `        >> Fetching the ${ formats.success( branch ) } branch` );
-		// @ts-ignore
-		await SimpleGit( buildPath ).reset( 'hard' ).checkout( branch );
+		const fancyBranch = formats.success( branch );
 
-		log( `        >> Building the ${ formats.success( branch ) } branch` );
-		await runShellScript( 'npm ci && npm run build', buildPath );
+		if ( branch === options.testsBranch ) {
+			log(
+				`        >> Re-using the testing branch for ${ fancyBranch }`
+			);
+			await runShellScript(
+				`cp -R ${ performanceTestDirectory } ${ buildPath }`
+			);
+		} else {
+			log( `        >> Fetching the ${ fancyBranch } branch` );
+			// @ts-ignore
+			await SimpleGit( buildPath ).reset( 'hard' ).checkout( branch );
+
+			log( `        >> Building the ${ fancyBranch } branch` );
+			await runShellScript(
+				'npm ci && npm run prebuild:packages && node ./bin/packages/build.js && npx wp-scripts build',
+				buildPath
+			);
+		}
 
 		await runShellScript(
 			'cp ' +
@@ -330,7 +353,7 @@ async function runPerformanceTests( branches, options ) {
 		/** @type {Array<Record<string, WPPerformanceResults>>} */
 		const rawResults = [];
 		// Alternate three times between branches.
-		for ( let i = 0; i < 3; i++ ) {
+		for ( let i = 0; i < TEST_ROUNDS; i++ ) {
 			rawResults[ i ] = {};
 			for ( const branch of branches ) {
 				// @ts-ignore
@@ -377,6 +400,15 @@ async function runPerformanceTests( branches, options ) {
 					type: rawResults.map( ( r ) => r[ branch ].type ),
 					minType: rawResults.map( ( r ) => r[ branch ].minType ),
 					maxType: rawResults.map( ( r ) => r[ branch ].maxType ),
+					typeContainer: rawResults.map(
+						( r ) => r[ branch ].typeContainer
+					),
+					minTypeContainer: rawResults.map(
+						( r ) => r[ branch ].minTypeContainer
+					),
+					maxTypeContainer: rawResults.map(
+						( r ) => r[ branch ].maxTypeContainer
+					),
 					focus: rawResults.map( ( r ) => r[ branch ].focus ),
 					minFocus: rawResults.map( ( r ) => r[ branch ].minFocus ),
 					maxFocus: rawResults.map( ( r ) => r[ branch ].maxFocus ),
