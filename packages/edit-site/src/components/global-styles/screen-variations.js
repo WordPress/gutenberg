@@ -11,6 +11,7 @@ import {
 	useHasVariationsPanel,
 } from './variations-panel';
 import ScreenHeader from './header';
+import BlockPreviewPanel from './block-preview-panel';
 
 export function ScreenVariations( { name, path = '' } ) {
 	const hasVariationsPanel = useHasVariationsPanel( name, path );
@@ -33,6 +34,10 @@ export function ScreenVariation( { blockName, styleName } ) {
 	return (
 		<>
 			<ScreenHeader title={ styleName } />
+			<BlockPreviewPanel
+				name={ blockName }
+				variation={ `is-style-${ styleName }` }
+			/>
 			<VariationPanel blockName={ blockName } styleName={ styleName } />
 		</>
 	);
