@@ -21,6 +21,7 @@ const meta: ComponentMeta< typeof Dropdown > = {
 				options: [ 'firstElement', true, false ],
 			},
 		},
+		position: { control: { type: null } },
 		renderContent: { control: { type: null } },
 		renderToggle: { control: { type: null } },
 	},
@@ -42,7 +43,6 @@ const Template: ComponentStory< typeof Dropdown > = ( args ) => {
 
 export const Default: ComponentStory< typeof Dropdown > = Template.bind( {} );
 Default.args = {
-	position: 'bottom right',
 	renderToggle: ( { isOpen, onToggle } ) => (
 		<Button onClick={ onToggle } aria-expanded={ isOpen } isPrimary>
 			Open dropdown
