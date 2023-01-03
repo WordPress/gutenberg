@@ -51,7 +51,7 @@ function UnconnectedNavigatorProvider(
 	);
 
 	const goTo: NavigatorContextType[ 'goTo' ] = useCallback(
-		( path, newAnimationOverride = null, options = {} ) => {
+		( path, options = {}, newAnimationOverride = null ) => {
 			setAnimationOverride( newAnimationOverride );
 			setLocationHistory( ( prevLocationHistory ) => [
 				...prevLocationHistory,

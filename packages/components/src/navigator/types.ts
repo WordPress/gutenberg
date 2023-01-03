@@ -24,8 +24,8 @@ export type NavigatorContext = {
 	location: NavigatorLocation;
 	goTo: (
 		path: string,
-		animationOverride?: AnimationOverride,
-		options?: NavigateOptions
+		options?: NavigateOptions,
+		animationOverride?: AnimationOverride
 	) => void;
 	goBack: () => void;
 	animationOverride?: AnimationOverride;

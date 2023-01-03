@@ -122,7 +122,7 @@ const NavigationInspectorScreens = ( {
 			animationOverride = 'forceBackward';
 		}
 		previousDepth.current = currentDepth;
-		goTo( selectedBlockClientId, animationOverride );
+		goTo( selectedBlockClientId, {}, animationOverride );
 	}, [ selectedBlockClientId ] );
 
 	return (
