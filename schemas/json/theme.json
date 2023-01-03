@@ -67,6 +67,40 @@
 				}
 			}
 		},
+		"settingsPropertiesShadow": {
+			"type": "object",
+			"properties": {
+				"shadow": {
+					"description": "Settings related to shadows.",
+					"type": "object",
+					"properties": {
+						"palette": {
+							"description": "Shadow presets for the shadow picker.\nGenerates a single custom property (`--wp--preset--shadow--{slug}`) per preset value.",
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"name": {
+										"description": "Name of the shadow preset, translatable.",
+										"type": "string"
+									},
+									"slug": {
+										"description": "Kebab-case unique identifier for the shadow preset.",
+										"type": "string"
+									},
+									"shadow": {
+										"description": "CSS box-shadow value",
+										"type": "string"
+									}
+								},
+								"required": [ "name", "slug", "shadow" ],
+								"additionalProperties": false
+							}
+						}
+					}
+				}
+			}
+		},
 		"settingsPropertiesColor": {
 			"type": "object",
 			"properties": {
@@ -586,6 +620,7 @@
 				{ "$ref": "#/definitions/settingsPropertiesAppearanceTools" },
 				{ "$ref": "#/definitions/settingsPropertiesBorder" },
 				{ "$ref": "#/definitions/settingsPropertiesColor" },
+				{ "$ref": "#/definitions/settingsPropertiesShadow" },
 				{ "$ref": "#/definitions/settingsPropertiesLayout" },
 				{ "$ref": "#/definitions/settingsPropertiesSpacing" },
 				{ "$ref": "#/definitions/settingsPropertiesTypography" },
@@ -602,6 +637,7 @@
 					"properties": {
 						"appearanceTools": {},
 						"border": {},
+						"shadow": {},
 						"color": {},
 						"layout": {},
 						"spacing": {},
@@ -1952,6 +1988,7 @@
 						"spacing": {},
 						"typography": {},
 						"border": {},
+						"shadow": {},
 						"custom": {},
 						"blocks": {
 							"description": "Settings defined on a per-block basis.",

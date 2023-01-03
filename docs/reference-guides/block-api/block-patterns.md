@@ -114,6 +114,8 @@ _Note:_
 
 `register_block_pattern_category()` should be called from a handler attached to the init hook.
 
+The category will not show under Patterns unless a pattern has been assigned to that category.
+
 ```php
 function my_plugin_register_my_pattern_categories() {
   register_block_pattern_category( ... );

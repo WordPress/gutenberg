@@ -138,7 +138,6 @@ export const WithMultipleOrigins = Template.bind( {} );
 WithMultipleOrigins.args = {
 	...Default.args,
 	colors: multipleOriginColors,
-	__experimentalHasMultipleOrigins: true,
 };
 
 /**

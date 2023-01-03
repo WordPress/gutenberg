@@ -328,6 +328,7 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
             .instagramEmbed: true,
             .loomEmbed: true,
             .smartframeEmbed: true,
+            .supportSection: true
         ]
     }
 

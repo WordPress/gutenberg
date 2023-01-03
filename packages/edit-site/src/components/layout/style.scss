@@ -22,11 +22,6 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 	border-radius: $radius-block-ui * 4;
 	box-shadow: $shadow-modal;
 
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: $grid-unit-10;
-
 	.edit-site-layout.is-full-canvas & {
 		top: 0;
 		left: 0;
@@ -37,7 +32,7 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 		width: 100vw;
 		box-shadow: none;
 
-		@include break-small {
+		@include break-medium {
 			width: auto;
 			padding-right: 0;
 		}
@@ -48,12 +43,8 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 		padding-right: 0;
 	}
 
-	@include break-small {
+	@include break-medium {
 		width: calc(#{$nav-sidebar-width} - #{$canvas-padding * 2});
-	}
-
-	.components-button {
-		height: $grid-unit-40;
 	}
 }
 
@@ -83,7 +74,7 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 	width: 100vw;
 	@include custom-scrollbars-on-hover;
 
-	@include break-small {
+	@include break-medium {
 		width: $nav-sidebar-width;
 	}
 
@@ -114,7 +105,7 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 		color: $gray-900;
 		background: $white;
 	}
-	@include break-small {
+	@include break-medium {
 		top: $canvas-padding;
 		bottom: $canvas-padding;
 		width: calc(100% - #{$canvas-padding});
@@ -144,10 +135,6 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 	min-height: 100% !important;
 }
 
-.edit-site-layout__view-mode-toggle-container {
-	height: $header-height;
-	width: $header-height;
-}
 .edit-site-layout__view-mode-toggle.components-button {
 	position: relative;
 	color: $white;
