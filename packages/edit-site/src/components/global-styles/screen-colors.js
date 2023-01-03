@@ -23,6 +23,9 @@ import ColorIndicatorWrapper from './color-indicator-wrapper';
 import BlockPreviewPanel from './block-preview-panel';
 
 function variationPathToURL( variationPath ) {
+	if ( ! variationPath ) {
+		return '';
+	}
 	// Replace the dots with slashes, add slash at the beginning and remove the last slash.
 	return '/' + variationPath.replace( /\./g, '/' ).slice( 0, -1 );
 }
