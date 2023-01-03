@@ -71,15 +71,7 @@ function BlockManagerCategory( { title, blockTypes } ) {
 	const titleId = 'edit-post-block-manager__category-title-' + instanceId;
 
 	const isAllChecked = checkedBlockNames.length === filteredBlockTypes.length;
-
-	let ariaChecked;
-	if ( isAllChecked ) {
-		ariaChecked = 'true';
-	} else if ( checkedBlockNames.length > 0 ) {
-		ariaChecked = 'mixed';
-	} else {
-		ariaChecked = 'false';
-	}
+	const isIndeterminate = ! isAllChecked && checkedBlockNames.length > 0;
 
 	return (
 		<div
@@ -92,7 +84,7 @@ function BlockManagerCategory( { title, blockTypes } ) {
 				checked={ isAllChecked }
 				onChange={ toggleAllVisible }
 				className="edit-post-block-manager__category-title"
-				aria-checked={ ariaChecked }
+				indeterminate={ isIndeterminate }
 				label={ <span id={ titleId }>{ title }</span> }
 			/>
 			<BlockTypesChecklist

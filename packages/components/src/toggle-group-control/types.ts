@@ -92,7 +92,8 @@ export type ToggleGroupControlProps = Pick<
 	 */
 	isAdaptiveWidth?: boolean;
 	/**
-	 * Renders `ToggleGroupControl` as a (CSS) block element.
+	 * Renders `ToggleGroupControl` as a (CSS) block element, spanning the entire width of
+	 * the available space. This is the recommended style when the options are text-based and not icons.
 	 *
 	 * @default false
 	 */

@@ -29,7 +29,19 @@ export default function ColorPanel( {
 	const definedColors = settings.filter( ( setting ) => setting?.colorValue );
 
 	useEffect( () => {
-		if ( ! enableContrastChecking || ! definedColors.length ) {
+		if ( ! enableContrastChecking ) {
+			return;
+		}
+		if ( ! definedColors.length ) {
+			if ( detectedBackgroundColor ) {
+				setDetectedBackgroundColor();
+			}
+			if ( detectedColor ) {
+				setDetectedColor();
+			}
+			if ( detectedLinkColor ) {
+				setDetectedColor();
+			}
 			return;
 		}
 
@@ -69,7 +81,6 @@ export default function ColorPanel( {
 				panelId={ clientId }
 				settings={ settings }
 				__experimentalIsItemGroup={ false }
-				__experimentalHasMultipleOrigins
 				__experimentalIsRenderedInSidebar
 				{ ...colorGradientSettings }
 			/>

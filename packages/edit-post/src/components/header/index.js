@@ -25,6 +25,7 @@ import { store as editPostStore } from '../../store';
 import TemplateTitle from './template-title';
 
 function Header( { setEntitiesSavedStatesCallback } ) {
+	const isLargeViewport = useViewportMatch( 'large' );
 	const {
 		hasActiveMetaboxes,
 		isPublishSidebarOpened,
@@ -40,12 +41,11 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 			showIconLabels:
 				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
 			isDistractionFree:
-				select( editPostStore ).isFeatureActive( 'distractionFree' ),
+				select( editPostStore ).isFeatureActive( 'distractionFree' ) &&
+				isLargeViewport,
 		} ),
 		[]
 	);
-
-	const isLargeViewport = useViewportMatch( 'large' );
 
 	const classes = classnames( 'edit-post-header' );
 

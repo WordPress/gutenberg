@@ -16,7 +16,9 @@ describe( 'a11y', () => {
 
 	it( 'tabs header bar', async () => {
 		await pressKeyWithModifier( 'ctrl', '`' );
-
+		await pressKeyWithModifier( 'ctrl', '`' );
+		await pressKeyWithModifier( 'ctrl', '`' );
+		await pressKeyWithModifier( 'ctrl', '`' );
 		await page.keyboard.press( 'Tab' );
 
 		const isFocusedToggle = await page.$eval(

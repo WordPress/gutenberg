@@ -5,6 +5,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
+import { displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -29,6 +30,8 @@ export default function SaveButton() {
 
 	const disabled = ! isDirty || isSaving;
 
+	const label = __( 'Save' );
+
 	return (
 		<Button
 			variant="primary"
@@ -37,8 +40,21 @@ export default function SaveButton() {
 			aria-expanded={ isSaveViewOpen }
 			isBusy={ isSaving }
 			onClick={ disabled ? undefined : () => setIsSaveViewOpened( true ) }
+			label={ label }
+			/*
+			 * We want the tooltip to show the keyboard shortcut only when the
+			 * button does something, i.e. when it's not disabled.
+			 */
+			shortcut={ disabled ? undefined : displayShortcut.primary( 's' ) }
+			/*
+			 * Displaying the keyboard shortcut conditionally makes the tooltip
+			 * itself show conditionally. This would trigger a full-rerendering
+			 * of the button that we want to avoid. By setting `showTooltip`,
+			 & the tooltip is always rendered even when there's no keyboard shortcut.
+			 */
+			showTooltip
 		>
-			{ __( 'Save' ) }
+			{ label }
 		</Button>
 	);
 }

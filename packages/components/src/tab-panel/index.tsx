@@ -2,12 +2,11 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { find } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useCallback } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 
 /**
@@ -20,7 +19,6 @@ import type { WordPressComponentProps } from '../ui/context';
 
 const TabButton = ( {
 	tabId,
-	onClick,
 	children,
 	selected,
 	...rest
@@ -30,7 +28,7 @@ const TabButton = ( {
 		tabIndex={ selected ? null : -1 }
 		aria-selected={ selected }
 		id={ tabId }
-		onClick={ onClick }
+		__experimentalIsFocusable
 		{ ...rest }
 	>
 		{ children }
@@ -77,6 +75,7 @@ export function TabPanel( {
 	className,
 	children,
 	tabs,
+	selectOnMove = true,
 	initialTabName,
 	orientation = 'horizontal',
 	activeClass = 'is-active',
@@ -85,29 +84,53 @@ export function TabPanel( {
 	const instanceId = useInstanceId( TabPanel, 'tab-panel' );
 	const [ selected, setSelected ] = useState< string >();
 
-	const handleTabSelection = ( tabKey: string ) => {
-		setSelected( tabKey );
-		onSelect?.( tabKey );
-	};
+	const handleTabSelection = useCallback(
+		( tabKey: string ) => {
+			setSelected( tabKey );
+			onSelect?.( tabKey );
+		},
+		[ onSelect ]
+	);
 
-	const onNavigate = ( _childIndex: number, child: HTMLButtonElement ) => {
+	// Simulate a click on the newly focused tab, which causes the component
+	// to show the `tab-panel` associated with the clicked tab.
+	const activateTabAutomatically = (
+		_childIndex: number,
+		child: HTMLButtonElement
+	) => {
 		child.click();
 	};
-	const selectedTab = find( tabs, { name: selected } );
+	const selectedTab = tabs.find( ( { name } ) => name === selected );
 	const selectedId = `${ instanceId }-${ selectedTab?.name ?? 'none' }`;
 
 	useEffect( () => {
-		if ( ! selectedTab?.name && tabs.length > 0 ) {
-			handleTabSelection( initialTabName || tabs[ 0 ].name );
+		const firstEnabledTab = tabs.find( ( tab ) => ! tab.disabled );
+		const initialTab = tabs.find( ( tab ) => tab.name === initialTabName );
+		if ( ! selectedTab?.name && firstEnabledTab ) {
+			handleTabSelection(
+				initialTab && ! initialTab.disabled
+					? initialTab.name
+					: firstEnabledTab.name
+			);
+		} else if ( selectedTab?.disabled && firstEnabledTab ) {
+			handleTabSelection( firstEnabledTab.name );
 		}
-	}, [ tabs, selectedTab?.name, initialTabName ] );
+	}, [
+		tabs,
+		selectedTab?.name,
+		selectedTab?.disabled,
+		initialTabName,
+		handleTabSelection,
+	] );
 
 	return (
 		<div className={ className }>
 			<NavigableMenu
 				role="tablist"
 				orientation={ orientation }
-				onNavigate={ onNavigate }
+				onNavigate={
+					selectOnMove ? activateTabAutomatically : undefined
+				}
 				className="components-tab-panel__tabs"
 			>
 				{ tabs.map( ( tab ) => (
@@ -124,8 +147,12 @@ export function TabPanel( {
 						selected={ tab.name === selected }
 						key={ tab.name }
 						onClick={ () => handleTabSelection( tab.name ) }
+						disabled={ tab.disabled }
+						label={ tab.icon && tab.title }
+						icon={ tab.icon }
+						showTooltip={ !! tab.icon }
 					>
-						{ tab.title }
+						{ ! tab.icon && tab.title }
 					</TabButton>
 				) ) }
 			</NavigableMenu>

@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import type { CSSProperties, MouseEventHandler, ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
 /**
  * Internal dependencies
  */
-import type { PopoverProps } from '../popover/types';
+import type { DropdownProps } from '../dropdown/types';
 
 export type ColorObject = {
 	name: string;
@@ -24,7 +24,7 @@ type PaletteProps = {
 	/**
 	 * Callback called when a color is selected.
 	 */
-	onChange: ( newColor?: string ) => void;
+	onChange: ( newColor?: string, index?: number ) => void;
 	value?: string;
 	actions?: ReactNode;
 };
@@ -37,15 +37,8 @@ export type MultiplePalettesProps = PaletteProps & {
 	colors: PaletteObject[];
 };
 
-// TODO: should extend `Dropdown`'s props once it gets refactored to TypeScript
-export type CustomColorPickerDropdownProps = {
+export type CustomColorPickerDropdownProps = DropdownProps & {
 	isRenderedInSidebar: boolean;
-	renderContent: () => ReactNode;
-	popoverProps?: Omit< PopoverProps, 'children' >;
-	renderToggle: ( props: {
-		isOpen: boolean;
-		onToggle: MouseEventHandler< HTMLButtonElement >;
-	} ) => ReactNode;
 };
 
 export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
@@ -81,13 +74,6 @@ export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
 	 * Currently active value.
 	 */
 	value?: string;
-	/**
-	 * Whether the colors prop is an array of color palettes,
-	 * rather than an array of color objects.
-	 *
-	 * @default false
-	 */
-	__experimentalHasMultipleOrigins?: boolean;
 	/**
 	 * Whether this is rendered in the sidebar.
 	 *

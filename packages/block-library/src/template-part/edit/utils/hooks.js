@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, kebabCase } from 'lodash';
+import { kebabCase } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -150,8 +150,12 @@ export function useTemplatePartArea( area ) {
 				).__experimentalGetDefaultTemplatePartAreas();
 			/* eslint-enable @wordpress/data-no-store-string-literals */
 
-			const selectedArea = find( definedAreas, { area } );
-			const defaultArea = find( definedAreas, { area: 'uncategorized' } );
+			const selectedArea = definedAreas.find(
+				( definedArea ) => definedArea.area === area
+			);
+			const defaultArea = definedAreas.find(
+				( definedArea ) => definedArea.area === 'uncategorized'
+			);
 
 			return {
 				icon: selectedArea?.icon || defaultArea?.icon,
