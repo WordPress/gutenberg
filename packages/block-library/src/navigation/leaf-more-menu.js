@@ -17,7 +17,7 @@ const POPOVER_PROPS = {
 export const LeafMoreMenu = ( props ) => {
 	const { clientId, block } = props;
 
-	const { insertBlock, replaceBlock, removeBlocks } =
+	const { insertBlock, replaceBlock, removeBlocks, replaceInnerBlocks } =
 		useDispatch( blockEditorStore );
 
 	const label = sprintf(
@@ -40,11 +40,11 @@ export const LeafMoreMenu = ( props ) => {
 					<MenuItem
 						icon={ addSubmenu }
 						onClick={ () => {
+							const updateSelectionOnInsert = false;
 							const newLink = createBlock(
 								'core/navigation-link'
 							);
 							if ( block.name === 'core/navigation-submenu' ) {
-								const updateSelectionOnInsert = false;
 								insertBlock(
 									newLink,
 									block.innerBlocks.length,
@@ -57,10 +57,21 @@ export const LeafMoreMenu = ( props ) => {
 									'core/navigation-submenu',
 									block.attributes,
 									block.innerBlocks
-										? [ ...block.innerBlocks, newLink ]
-										: [ newLink ]
 								);
+
+								// The following must happen as two independent actions.
+								// Why? Because the offcanvas editor relies on the getLastInsertedBlocksClientIds
+								// selector to determine which block is "active". As the UX needs the newLink to be
+								// the "active" block it must be the last block to be inserted.
+								// Therefore the Submenu is first created and **then** the newLink is inserted
+								// thus ensuring it is the last inserted block.
 								replaceBlock( clientId, newSubmenu );
+
+								replaceInnerBlocks(
+									newSubmenu.clientId,
+									[ newLink ],
+									updateSelectionOnInsert
+								);
 							}
 							onClose();
 						} }
