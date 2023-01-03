@@ -10,6 +10,7 @@ import {
 	PanelBody,
 	__experimentalHStack as HStack,
 	__experimentalHeading as Heading,
+	Spinner,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -31,6 +32,7 @@ const MenuInspectorControls = ( {
 	onCreateNew,
 	onSelectClassicMenu,
 	onSelectNavigationMenu,
+	isLoading,
 } ) => {
 	const isOffCanvasNavigationEditorEnabled =
 		window?.__experimentalEnableOffCanvasNavigationEditor === true;
@@ -49,6 +51,25 @@ const MenuInspectorControls = ( {
 		},
 		[ clientId ]
 	);
+
+	const experimentMainContent = () => {
+		if ( currentMenuId && isNavigationMenuMissing ) {
+			<p>{ __( 'Select or create a menu' ) }</p>;
+		}
+
+		if ( isLoading ) {
+			return <Spinner />;
+		}
+
+		return (
+			<OffCanvasEditor
+				blocks={ clientIdsTree }
+				isExpanded={ true }
+				selectBlockInCanvas={ false }
+				LeafMoreMenu={ LeafMoreMenu }
+			/>
+		);
+	};
 
 	return (
 		<InspectorControls __experimentalGroup={ menuControlsSlot }>
@@ -82,16 +103,7 @@ const MenuInspectorControls = ( {
 								actionLabel={ actionLabel }
 							/>
 						</HStack>
-						{ currentMenuId && isNavigationMenuMissing ? (
-							<p>{ __( 'Select or create a menu' ) }</p>
-						) : (
-							<OffCanvasEditor
-								blocks={ clientIdsTree }
-								isExpanded={ true }
-								selectBlockInCanvas={ false }
-								LeafMoreMenu={ LeafMoreMenu }
-							/>
-						) }
+						{ experimentMainContent() }
 					</>
 				) : (
 					<>
