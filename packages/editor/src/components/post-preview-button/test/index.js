@@ -9,6 +9,8 @@ import userEvent from '@testing-library/user-event';
  */
 import { PostPreviewButton } from '../';
 
+jest.useFakeTimers();
+
 describe( 'PostPreviewButton', () => {
 	const documentWrite = jest.fn();
 	const documentTitle = jest.fn();

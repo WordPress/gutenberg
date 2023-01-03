@@ -10,6 +10,8 @@ import { act } from 'react-test-renderer';
  */
 import { BorderBoxControl } from '../';
 
+jest.useFakeTimers();
+
 const colors = [
 	{ name: 'Gray', color: '#f6f7f7' },
 	{ name: 'Blue', color: '#72aee6' },

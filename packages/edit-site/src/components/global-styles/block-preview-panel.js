@@ -22,9 +22,19 @@ const BlockPreviewPanel = ( { name } ) => {
 				{ containerResizeListener }
 
 				<BlockPreview
+					blocks={ blocks }
 					viewportWidth={ viewportWidth }
 					__experimentalMinHeight={ minHeight }
-					blocks={ blocks }
+					__experimentalStyles={ [
+						{
+							css: `
+								body{
+									min-height:${ minHeight }px;
+									display:flex;align-items:center;justify-content:center;
+								}
+							`,
+						},
+					] }
 				/>
 			</div>
 		</Spacer>

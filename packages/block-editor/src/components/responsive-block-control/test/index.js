@@ -15,6 +15,8 @@ import { SelectControl } from '@wordpress/components';
  */
 import ResponsiveBlockControl from '../index';
 
+jest.useFakeTimers();
+
 const inputId = 'input-12345678';
 
 const sizeOptions = [

@@ -7,7 +7,9 @@ import userEvent from '@testing-library/user-event';
 /**
  * Internal dependencies
  */
-import Dropdown from '../';
+import Dropdown from '..';
+
+jest.useFakeTimers();
 
 describe( 'Dropdown', () => {
 	it( 'should toggle the dropdown properly', async () => {
@@ -24,14 +26,13 @@ describe( 'Dropdown', () => {
 					</button>
 				) }
 				renderContent={ () => <span>test</span> }
-				popoverProps={ { 'data-testid': 'popover' } }
 			/>
 		);
 
 		const button = screen.getByRole( 'button', { expanded: false } );
 
 		expect( button ).toBeVisible();
-		expect( screen.queryByTestId( 'popover' ) ).not.toBeInTheDocument();
+		expect( screen.queryByText( 'test' ) ).not.toBeInTheDocument();
 
 		await user.click( button );
 
@@ -40,7 +41,7 @@ describe( 'Dropdown', () => {
 		).toBeVisible();
 
 		await waitFor( () =>
-			expect( screen.getByTestId( 'popover' ) ).toBeVisible()
+			expect( screen.queryByText( 'test' ) ).toBeVisible()
 		);
 
 		// Cleanup remaining effects, like the delayed popover positioning
@@ -68,21 +69,20 @@ describe( 'Dropdown', () => {
 						close
 					</button>,
 				] }
-				renderContent={ () => null }
-				popoverProps={ { 'data-testid': 'popover' } }
+				renderContent={ () => <span>test</span> }
 			/>
 		);
 
-		expect( screen.queryByTestId( 'popover' ) ).not.toBeInTheDocument();
+		expect( screen.queryByText( 'test' ) ).not.toBeInTheDocument();
 
 		await user.click( screen.getByRole( 'button', { name: 'Toggle' } ) );
 
 		await waitFor( () =>
-			expect( screen.getByTestId( 'popover' ) ).toBeVisible()
+			expect( screen.getByText( 'test' ) ).toBeVisible()
 		);
 
 		await user.click( screen.getByRole( 'button', { name: 'close' } ) );
 
-		expect( screen.queryByTestId( 'popover' ) ).not.toBeInTheDocument();
+		expect( screen.queryByText( 'test' ) ).not.toBeInTheDocument();
 	} );
 } );

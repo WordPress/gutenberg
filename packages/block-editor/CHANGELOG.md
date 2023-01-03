@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 11.1.0 (2023-01-02)
+
+## 11.0.0 (2022-12-14)
+
 ### Breaking Changes
 
 -   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
@@ -14,6 +18,7 @@
 ### Bug Fix
 
 -   `SpacingSizesControl`: Change ARIA role from `region` to `group` to avoid unwanted ARIA landmark regions ([#46530](https://github.com/WordPress/gutenberg/pull/46530)).
+-   `FocalPointPicker`:  Fix layout misalignment when placed in the `BlockInspector` ([#46631](https://github.com/WordPress/gutenberg/pull/46631)).
 
 ## 10.5.0 (2022-11-16)
 
