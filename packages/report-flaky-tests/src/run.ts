@@ -3,9 +3,7 @@
  */
 import * as github from '@actions/github';
 import * as core from '@actions/core';
-import * as fs from 'fs/promises';
-import * as path from 'path';
-import type { PullRequestEvent } from '@octokit/webhooks-types';
+import type { WorkflowRunCompletedEvent } from '@octokit/webhooks-types';
 
 /**
  * Internal dependencies
@@ -23,34 +21,30 @@ import type { ReportedIssue } from './types';
 
 async function run() {
 	const token = core.getInput( 'repo-token', { required: true } );
-	const artifactPath = core.getInput( 'artifact-path', {
+	const artifactName = core.getInput( 'artifact-name', {
 		required: true,
 	} );
 
-	const { runId: runID, repo, ref } = github.context;
-	const runURL = `https://github.com/${ repo.owner }/${ repo.repo }/actions/runs/${ runID }`;
-	const api = new GitHubAPI( token, repo );
+	// eslint-disable-next-line no-console
+	console.debug( JSON.stringify( github.context, null, 2 ) );
 
-	const flakyTestsDir = await fs.readdir( artifactPath );
-	const flakyTests = await Promise.all(
-		flakyTestsDir.map( ( filename ) =>
-			fs
-				.readFile( path.join( artifactPath, filename ), 'utf-8' )
-				.then( ( text ) => JSON.parse( text ) )
-		)
+	const { repo } = github.context;
+	// Cast the payload type: https://github.com/actions/toolkit/tree/main/packages/github#webhook-payload-typescript-definitions
+	const payload = github.context.payload as WorkflowRunCompletedEvent;
+	const api = new GitHubAPI( token, repo );
+	const runID = payload.workflow_run.id;
+	const headBranch = payload.workflow_run.head_branch;
+	const runURL = payload.workflow_run.html_url;
+
+	const flakyTests = await api.downloadReportFromArtifact(
+		runID,
+		artifactName
 	);
 
 	if ( ! flakyTests || flakyTests.length === 0 ) {
 		// No flaky tests reported in this run.
 		return;
 	}
-
-	const headBranch =
-		github.context.eventName === 'pull_request'
-			? // Cast the payload type: https://github.com/actions/toolkit/tree/main/packages/github#webhook-payload-typescript-definitions
-			  ( github.context.payload as PullRequestEvent ).pull_request.head
-					.ref
-			: ref.replace( /^refs\/(heads|tag)\//, '' );
 
 	const label = core.getInput( 'label', { required: true } );
 	const issues = await api.fetchAllIssuesLabeledFlaky( label );
@@ -165,25 +159,23 @@ async function run() {
 	}
 
 	const { html_url: commentUrl } =
-		github.context.eventName === 'pull_request'
+		payload.workflow_run.pull_requests.length > 0
 			? await api.createCommentOnPR(
-					// Cast the payload type: https://github.com/actions/toolkit/tree/main/packages/github#webhook-payload-typescript-definitions
-					( github.context.payload as PullRequestEvent ).number,
+					payload.workflow_run.pull_requests[ 0 ].number,
 					renderCommitComment( {
 						runURL,
 						reportedIssues,
-						commitSHA: (
-							github.context.payload as PullRequestEvent
-						 ).pull_request.head.sha,
+						commitSHA:
+							payload.workflow_run.pull_requests[ 0 ].head.sha,
 					} ),
 					isReportComment
 			  )
 			: await api.createCommentOnCommit(
-					github.context.sha,
+					payload.workflow_run.head_sha,
 					renderCommitComment( {
 						runURL,
 						reportedIssues,
-						commitSHA: github.context.sha,
+						commitSHA: payload.workflow_run.head_sha,
 					} ),
 					isReportComment
 			  );

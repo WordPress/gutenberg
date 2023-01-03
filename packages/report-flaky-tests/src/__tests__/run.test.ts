@@ -92,8 +92,8 @@ describe( 'Report flaky tests', () => {
 		( core.getInput as jest.Mock )
 			// token
 			.mockReturnValueOnce( 'repo-token' )
-			// artifact-path
-			.mockReturnValueOnce( 'flaky-tests' )
+			// artifact-name
+			.mockReturnValueOnce( 'flaky-tests-report' )
 			// label
 			.mockReturnValueOnce( '[Type] Flaky Test' );
 
@@ -192,8 +192,8 @@ describe( 'Report flaky tests', () => {
 		( core.getInput as jest.Mock )
 			// token
 			.mockReturnValueOnce( 'repo-token' )
-			// artifact-path
-			.mockReturnValueOnce( 'flaky-tests' )
+			// artifact-name
+			.mockReturnValueOnce( 'flaky-tests-report' )
 			// label
 			.mockReturnValueOnce( '[Type] Flaky Test' );
 

@@ -8,10 +8,10 @@ inputs:
         description: 'The flaky-test label name'
         required: true
         default: 'flaky-test'
-    artifact-path:
-        description: 'The path of the downloaded artifact'
+    artifact-name:
+        description: 'The name of the artifact to download'
         required: true
-        default: 'flaky-tests'
+        default: 'flaky-tests-report'
 runs:
     using: 'node16'
     main: 'build/index.js'
