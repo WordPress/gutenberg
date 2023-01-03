@@ -190,14 +190,14 @@
 			"defaultPresets": true,
 			"presets": [
 				{
-					"name": "Natural",
-					"slug": "natural",
-					"shadow": "0 .2rem .3rem 0 rgba(0,0,0, 0.3), 0 .5rem .6rem 0 rgba(0,0,0, 0.4)"
+					"name": "Elevated",
+					"slug": "elevated",
+					"shadow": "rgba(0, 0, 0, 0.4) 0 2rem 4rem -1rem, rgba(0, 0, 0, 0.6) 0 1rem 2rem -1.5rem"
 				},
 				{
-					"name": "Sharp",
-					"slug": "sharp",
-					"shadow": ".5rem .5rem 0 0 rgba(0,0,0, 0.4)"
+					"name": "Near",
+					"slug": "near",
+					"shadow": "rgba(0, 0, 0, 0.3) 0 0.25rem 0.5rem 0, rgba(0, 0, 0, 0.4) 0 0.05rem 0.2rem 0px"
 				}
 			]
 		},
