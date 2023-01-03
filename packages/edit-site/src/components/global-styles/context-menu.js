@@ -14,6 +14,7 @@ import { useHasDimensionsPanel } from './dimensions-panel';
 import { useHasTypographyPanel } from './typography-panel';
 import { useHasVariationsPanel } from './variations-panel';
 import { NavigationButtonAsItem } from './navigation-button';
+import { ScreenVariations } from './screen-variations';
 
 function ContextMenu( { name, parentMenu = '' } ) {
 	const hasTypographyPanel = useHasTypographyPanel( name );
@@ -62,13 +63,7 @@ function ContextMenu( { name, parentMenu = '' } ) {
 				</NavigationButtonAsItem>
 			) }
 			{ hasVariationsPanel && (
-				<NavigationButtonAsItem
-					icon={ '+' }
-					path={ parentMenu + '/variations' }
-					aria-label={ __( 'Style variations' ) }
-				>
-					{ __( 'Variations' ) }
-				</NavigationButtonAsItem>
+				<ScreenVariations name={ name } path={ parentMenu } />
 			) }
 		</ItemGroup>
 	);

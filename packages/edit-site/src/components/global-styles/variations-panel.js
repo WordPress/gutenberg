@@ -3,7 +3,7 @@
  */
 import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-
+import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 /**
  * Internal dependencies
  */
@@ -39,7 +39,7 @@ export function VariationsPanel( { name } ) {
 	const coreBlockStyles = getCoreBlockStyles( blockStyles );
 
 	return (
-		<>
+		<ItemGroup isBordered isSeparated>
 			{ coreBlockStyles.map( ( style, index ) => (
 				<NavigationButtonAsItem
 					key={ index }
@@ -55,7 +55,7 @@ export function VariationsPanel( { name } ) {
 					{ style.label }
 				</NavigationButtonAsItem>
 			) ) }
-		</>
+		</ItemGroup>
 	);
 }
 

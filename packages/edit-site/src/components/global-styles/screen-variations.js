@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { __experimentalVStack as VStack } from '@wordpress/components';
 /**
  * Internal dependencies
  */
@@ -12,6 +13,7 @@ import {
 } from './variations-panel';
 import ScreenHeader from './header';
 import BlockPreviewPanel from './block-preview-panel';
+import Subtitle from './subtitle';
 
 export function ScreenVariations( { name, path = '' } ) {
 	const hasVariationsPanel = useHasVariationsPanel( name, path );
@@ -20,20 +22,21 @@ export function ScreenVariations( { name, path = '' } ) {
 		return null;
 	}
 	return (
-		<>
-			<ScreenHeader
-				title={ __( 'Style Variations' ) }
-				description={ __( 'Customise style variations.' ) }
-			/>
-			<VariationsPanel name={ name } />
-		</>
+		<div className="edit-site-global-styles-screen-variations">
+			<VStack spacing={ 3 }>
+				<p>Manage style variations, saved block appearence presets.</p>
+				<Subtitle>{ __( 'Style Variations' ) }</Subtitle>
+				<VariationsPanel name={ name } />
+			</VStack>
+		</div>
 	);
 }
 
-export function ScreenVariation( { blockName, styleName } ) {
+export function ScreenVariation( { blockName, style } ) {
+	const { name: styleName, label: styleLabel } = style;
 	return (
 		<>
-			<ScreenHeader title={ styleName } />
+			<ScreenHeader title={ styleLabel } />
 			<BlockPreviewPanel
 				name={ blockName }
 				variation={ `is-style-${ styleName }` }

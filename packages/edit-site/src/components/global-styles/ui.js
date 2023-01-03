@@ -27,7 +27,7 @@ import ScreenHeadingColor from './screen-heading-color';
 import ScreenButtonColor from './screen-button-color';
 import ScreenLayout from './screen-layout';
 import ScreenStyleVariations from './screen-style-variations';
-import { ScreenVariations, ScreenVariation } from './screen-variations';
+import { ScreenVariation } from './screen-variations';
 import ScreenBorder from './screen-border';
 import StyleBook from '../style-book';
 import ScreenCSS from './screen-css';
@@ -95,10 +95,7 @@ function ContextScreens( { name, parentMenu = '' } ) {
 				key={ index }
 				path={ parentMenu + '/variations/' + style.name }
 			>
-				<ScreenVariation
-					blockName={ blockName }
-					styleName={ style.name }
-				/>
+				<ScreenVariation blockName={ blockName } style={ style } />
 			</GlobalStylesNavigationScreen>
 		) );
 	};
@@ -195,9 +192,6 @@ function ContextScreens( { name, parentMenu = '' } ) {
 				<ScreenLayout name={ name } variationPath={ variationPath } />
 			</GlobalStylesNavigationScreen>
 
-			<GlobalStylesNavigationScreen path={ parentMenu + '/variations' }>
-				<ScreenVariations name={ name } path={ parentMenu } />
-			</GlobalStylesNavigationScreen>
 			{ !! blockStyleVariations?.length && (
 				<BlockStylesNavigationScreens
 					blockStyles={ blockStyleVariations }
