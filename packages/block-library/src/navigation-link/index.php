@@ -146,7 +146,7 @@ function is_url_encoded($url) {
  *
  * @return string $url Returns the decoded url.
  */
-function urldecode_once($url){
+function maybe_urldecode($url){
     if(is_url_encoded($url)){
         return rawurldecode($url);
     }
@@ -205,7 +205,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 
 	// Start appending HTML attributes to anchor tag.
 	if ( isset( $attributes['url'] ) ) {
-		$html .= ' href="' . esc_url( urldecode_once( $attributes['url'] ) ) . '"';
+		$html .= ' href="' . esc_url( maybe_urldecode( $attributes['url'] ) ) . '"';
 	}
 
 	if ( $is_active ) {
