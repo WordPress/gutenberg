@@ -1,8 +1,8 @@
-// @ts-nocheck
 /**
  * External dependencies
  */
 import classnames from 'classnames';
+import type { ForwardedRef, HTMLProps, ReactNode } from 'react';
 
 /**
  * WordPress dependencies
@@ -17,8 +17,10 @@ import { useInstanceId } from '@wordpress/compose';
 import Tooltip from '../tooltip';
 import Icon from '../icon';
 import { VisuallyHidden } from '../visually-hidden';
+import type { WordPressComponentProps } from '../ui/context';
+import type { ButtonProps, DeprecatedButtonProps, DisabledEvents, TagName } from './types';
 
-const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ];
+const disabledEventsOnDisabledButton: Array< keyof DisabledEvents > = [ 'onMouseDown', 'onClick' ];
 
 function useDeprecatedProps( {
 	isDefault,
@@ -28,7 +30,7 @@ function useDeprecatedProps( {
 	isLink,
 	variant,
 	...otherProps
-} ) {
+}: WordPressComponentProps< ButtonProps & DeprecatedButtonProps, TagName > ) {
 	let computedVariant = variant;
 
 	if ( isPrimary ) {
@@ -63,7 +65,10 @@ function useDeprecatedProps( {
 	};
 }
 
-export function Button( props, ref ) {
+export function UnforwardedButton(
+	props: WordPressComponentProps< ButtonProps, TagName >,
+	ref: ForwardedRef< any >
+) {
 	const {
 		href,
 		target,
@@ -93,6 +98,7 @@ export function Button( props, ref ) {
 	);
 
 	const hasChildren =
+		Array.isArray( children ) &&
 		children?.[ 0 ] &&
 		children[ 0 ] !== null &&
 		// Tooltip should not considered as a child
@@ -113,8 +119,7 @@ export function Button( props, ref ) {
 
 	const trulyDisabled = disabled && ! isFocusable;
 	const Tag = href !== undefined && ! trulyDisabled ? 'a' : 'button';
-	const tagProps =
-		Tag === 'a'
+	const tagProps: HTMLProps< TagName > = Tag === 'a'
 			? { href, target }
 			: {
 					type: 'button',
@@ -145,24 +150,32 @@ export function Button( props, ref ) {
 			// There's a label and...
 			( !! label &&
 				// The children are empty and...
-				! children?.length &&
+				( ! Array.isArray( children ) || ! children?.length ) &&
 				// The tooltip is not explicitly disabled.
 				false !== showTooltip ) );
 
-	const descriptionId = describedBy ? instanceId : null;
+	const descriptionId = describedBy ? instanceId : undefined;
 
 	const describedById =
 		additionalProps[ 'aria-describedby' ] || descriptionId;
 
+	const tagElementProps = {
+		...tagProps,
+		...additionalProps,
+		className: classes,
+		'aria-label': additionalProps[ 'aria-label' ] || label,
+		'aria-describedby': describedById,
+		ref: ref,
+	}
+
+	const TagElement = ( { children, ...otherProps }: { children: ReactNode } & typeof tagElementProps ) => {
+		return Tag === 'a'
+			? <a { ...otherProps as JSX.IntrinsicElements[ 'a' ] } >{ children }</a>
+			: <button { ...otherProps as JSX.IntrinsicElements[ 'button' ]} >{ children }</button>
+	}
+
 	const element = (
-		<Tag
-			{ ...tagProps }
-			{ ...additionalProps }
-			className={ classes }
-			aria-label={ additionalProps[ 'aria-label' ] || label }
-			aria-describedby={ describedById }
-			ref={ ref }
-		>
+		<TagElement { ...tagElementProps }>
 			{ icon && iconPosition === 'left' && (
 				<Icon icon={ icon } size={ iconSize } />
 			) }
@@ -171,7 +184,7 @@ export function Button( props, ref ) {
 				<Icon icon={ icon } size={ iconSize } />
 			) }
 			{ children }
-		</Tag>
+		</TagElement>
 	);
 
 	if ( ! shouldShowTooltip ) {
@@ -190,7 +203,7 @@ export function Button( props, ref ) {
 	return (
 		<>
 			<Tooltip
-				text={ children?.length && describedBy ? describedBy : label }
+				text={ Array.isArray( children ) && children?.length && describedBy ? describedBy : label }
 				shortcut={ shortcut }
 				position={ tooltipPosition }
 			>
@@ -205,4 +218,5 @@ export function Button( props, ref ) {
 	);
 }
 
-export default forwardRef( Button );
+export const Button = forwardRef( UnforwardedButton );
+export default Button;
