@@ -90,13 +90,6 @@ Use this object to access properties/features of the `Popover` component that ar
 
 -   Required: No
 
-### `position`: `PopoverProps[ 'position' ]`
-
-The direction in which the popover should open relative to its parent node. Specify a y- and an x-axis as a space-separated string. Supports `"top"`, `"bottom"` y-axis, and `"left"`, `"center"`, `"right"` x-axis.
-
--   Required: No
--   Default: `"top center"`
-
 ### `renderContent`: `( props: CallbackProps ) => ReactNode`
 
 A callback invoked to render the content of the dropdown menu.

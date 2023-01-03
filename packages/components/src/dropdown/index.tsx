@@ -172,18 +172,18 @@ function UnforwardedDropdown(
  * const MyDropdown = () => (
  *   <Dropdown
  *     className="my-container-class-name"
- *     contentClassName="my-popover-content-classname"
- *     position="bottom right"
+ *     contentClassName="my-dropdown-content-classname"
+ *     popoverProps={ { placement: 'bottom-start' } }
  *     renderToggle={ ( { isOpen, onToggle } ) => (
  *       <Button
  *         variant="primary"
  *         onClick={ onToggle }
  *         aria-expanded={ isOpen }
  *       >
- *         Toggle Popover!
+ *         Toggle Dropdown!
  *       </Button>
  *     ) }
- *     renderContent={ () => <div>This is the content of the popover.</div> }
+ *     renderContent={ () => <div>This is the content of the dropdown.</div> }
  *   />
  * );
  * ```
