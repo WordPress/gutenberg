@@ -152,7 +152,7 @@ function UnforwardedDropdown(
 					{ ...popoverProps }
 					className={ classnames(
 						'components-dropdown__content',
-						popoverProps ? popoverProps.className : undefined,
+						popoverProps?.className,
 						contentClassName
 					) }
 				>
