@@ -92,29 +92,24 @@ const ListViewBlockContents = forwardRef(
 			? selectedClientIds
 			: [ clientId ];
 
-		let maybeLinkUI;
-		if ( isLinkUIOpen ) {
-			maybeLinkUI = (
-				<LinkUI
-					clientId={ lastInsertedBlockClientId }
-					link={ insertedBlockAttributes }
-					onClose={ () => setIsLinkUIOpen( false ) }
-					hasCreateSuggestion={ false }
-					onChange={ ( updatedValue ) => {
-						updateAttributes(
-							updatedValue,
-							setInsertedBlockAttributes,
-							insertedBlockAttributes
-						);
-						setIsLinkUIOpen( false );
-					} }
-				/>
-			);
-		}
-
 		return (
 			<>
-				{ maybeLinkUI }
+				{ isLinkUIOpen && (
+					<LinkUI
+						clientId={ lastInsertedBlockClientId }
+						link={ insertedBlockAttributes }
+						onClose={ () => setIsLinkUIOpen( false ) }
+						hasCreateSuggestion={ false }
+						onChange={ ( updatedValue ) => {
+							updateAttributes(
+								updatedValue,
+								setInsertedBlockAttributes,
+								insertedBlockAttributes
+							);
+							setIsLinkUIOpen( false );
+						} }
+					/>
+				) }
 				<BlockDraggable clientIds={ draggableClientIds }>
 					{ ( { draggable, onDragStart, onDragEnd } ) => (
 						<ListViewBlockSelectButton
