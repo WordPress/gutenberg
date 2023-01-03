@@ -1427,6 +1427,7 @@ class WP_HTML_Tag_Processor {
 	 *
 	 * @since 6.2.0
 	 *
+	 * @param string $prefix Prefix of requested attribute names.
 	 * @return array|null List of attribute names, or `null` if not at a tag.
 	 */
 	function get_attribute_names_with_prefix( $prefix ) {
