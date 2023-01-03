@@ -68,17 +68,22 @@ const ListViewBlockContents = forwardRef(
 			setInsertedBlockAttributes,
 		} = useInsertedBlock( lastInsertedBlockClientId );
 
-		const hasCommittedLinkValue = insertedBlockAttributes?.id;
+		const hasExistingLinkValue = insertedBlockAttributes?.id;
 
 		useEffect( () => {
 			if (
 				clientId === lastInsertedBlockClientId &&
 				BLOCKS_WITH_LINK_UI_SUPPORT?.includes( insertedBlockName ) &&
-				! hasCommittedLinkValue
+				! hasExistingLinkValue // don't re-show the Link UI if the block already has a link value.
 			) {
 				setIsLinkUIOpen( true );
 			}
-		}, [ lastInsertedBlockClientId, hasCommittedLinkValue ] );
+		}, [
+			lastInsertedBlockClientId,
+			clientId,
+			insertedBlockName,
+			hasExistingLinkValue,
+		] );
 
 		const isBlockMoveTarget =
 			blockMovingClientId && selectedBlockInBlockEditor === clientId;
