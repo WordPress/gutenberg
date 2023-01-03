@@ -13,7 +13,7 @@ const MyDropdown = () => (
 	<Dropdown
 		className="my-container-class-name"
 		contentClassName="my-popover-content-classname"
-		position="bottom right"
+		popoverProps={ { placement: 'bottom-start' } }
 		renderToggle={ ( { isOpen, onToggle } ) => (
 			<Button
 				variant="primary"
