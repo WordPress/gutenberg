@@ -16,9 +16,9 @@ const meta: ComponentMeta< typeof Dropdown > = {
 	subcomponents: { DropdownContentWrapper },
 	argTypes: {
 		focusOnMount: {
+			options: [ 'firstElement', true, false ],
 			control: {
 				type: 'radio',
-				options: [ 'firstElement', true, false ],
 			},
 		},
 		position: { control: { type: null } },
