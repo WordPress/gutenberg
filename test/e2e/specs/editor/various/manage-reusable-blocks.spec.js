@@ -13,7 +13,7 @@ test.describe( 'Managing reusable blocks', () => {
 		await admin.visitAdminPage( 'edit.php', 'post_type=wp_block' );
 	} );
 
-	test( 'Should import reusable blocks', async ( { admin, page } ) => {
+	test( 'Should import reusable blocks', async ( { page } ) => {
 		const originalEntries = await page.locator( '.hentry' ).count();
 
 		// Import Reusable block.
