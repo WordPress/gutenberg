@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
@@ -40,21 +41,41 @@ export function VariationsPanel( { name } ) {
 
 	return (
 		<ItemGroup isBordered isSeparated>
-			{ coreBlockStyles.map( ( style, index ) => (
-				<NavigationButtonAsItem
-					key={ index }
-					icon={ '+' }
-					path={
-						'/blocks/' +
-						encodeURIComponent( name ) +
-						'/variations/' +
-						encodeURIComponent( style.name )
-					}
-					aria-label={ style.label }
-				>
-					{ style.label }
-				</NavigationButtonAsItem>
-			) ) }
+			{ coreBlockStyles.map( ( style, index ) => {
+				if ( style?.isDefault ) {
+					return (
+						<NavigationButtonAsItem
+							key={ index }
+							disabled={ true }
+							path={
+								'/blocks/' +
+								encodeURIComponent( name ) +
+								'/variations/' +
+								encodeURIComponent( style.name )
+							}
+							aria-label={ `${ style.label } ${ __(
+								'(Default)'
+							) }` }
+						>
+							{ `${ style.label } ${ __( '(Default)' ) }` }
+						</NavigationButtonAsItem>
+					);
+				}
+				return (
+					<NavigationButtonAsItem
+						key={ index }
+						path={
+							'/blocks/' +
+							encodeURIComponent( name ) +
+							'/variations/' +
+							encodeURIComponent( style.name )
+						}
+						aria-label={ style.label }
+					>
+						{ style.label }
+					</NavigationButtonAsItem>
+				);
+			} ) }
 		</ItemGroup>
 	);
 }
