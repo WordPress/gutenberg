@@ -152,8 +152,10 @@ function Navigation( {
 		isError: createNavigationMenuIsError,
 	} = useCreateNavigationMenu( clientId );
 
+	const [ isCreatingMenu, setIsCreatingMenu ] = useState( false );
 	const createUntitledEmptyNavigationMenu = () => {
 		createNavigationMenu( '' );
+		setIsCreatingMenu( true );
 	};
 
 	useEffect( () => {
@@ -727,6 +729,8 @@ function Navigation( {
 					onCreateNew={ createUntitledEmptyNavigationMenu }
 					onSelectClassicMenu={ onSelectClassicMenu }
 					onSelectNavigationMenu={ onSelectNavigationMenu }
+					isCreatingMenu={ isCreatingMenu }
+					setIsCreatingMenu={ setIsCreatingMenu }
 				/>
 				{ stylingInspectorControls }
 				<ResponsiveWrapper
@@ -768,6 +772,8 @@ function Navigation( {
 					onCreateNew={ createUntitledEmptyNavigationMenu }
 					onSelectClassicMenu={ onSelectClassicMenu }
 					onSelectNavigationMenu={ onSelectNavigationMenu }
+					isCreatingMenu={ isCreatingMenu }
+					setIsCreatingMenu={ setIsCreatingMenu }
 				/>
 				<Warning>
 					{ __(
@@ -822,6 +828,8 @@ function Navigation( {
 					onSelectNavigationMenu={ onSelectNavigationMenu }
 					onSelectClassicMenu={ onSelectClassicMenu }
 					onCreateEmpty={ createUntitledEmptyNavigationMenu }
+					isCreatingMenu={ isCreatingMenu }
+					setIsCreatingMenu={ setIsCreatingMenu }
 				/>
 			</TagName>
 		);
@@ -842,6 +850,8 @@ function Navigation( {
 					onCreateNew={ createUntitledEmptyNavigationMenu }
 					onSelectClassicMenu={ onSelectClassicMenu }
 					onSelectNavigationMenu={ onSelectNavigationMenu }
+					isCreatingMenu={ isCreatingMenu }
+					setIsCreatingMenu={ setIsCreatingMenu }
 				/>
 				{ stylingInspectorControls }
 				{ isEntityAvailable && (

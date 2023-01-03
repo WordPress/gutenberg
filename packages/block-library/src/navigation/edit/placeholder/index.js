@@ -23,6 +23,8 @@ export default function NavigationPlaceholder( {
 	onSelectNavigationMenu,
 	onSelectClassicMenu,
 	onCreateEmpty,
+	isCreatingMenu,
+	setIsCreatingMenu,
 } ) {
 	const { isResolvingMenus, hasResolvedMenus } = useNavigationEntities();
 
@@ -76,6 +78,8 @@ export default function NavigationPlaceholder( {
 								className:
 									'wp-block-navigation-placeholder__actions__dropdown',
 							} }
+							isCreatingMenu={ isCreatingMenu }
+							setIsCreatingMenu={ setIsCreatingMenu }
 						/>
 
 						<hr />

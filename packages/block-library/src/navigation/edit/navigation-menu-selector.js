@@ -30,6 +30,8 @@ function NavigationMenuSelector( {
 	createNavigationMenuIsSuccess,
 	createNavigationMenuIsError,
 	toggleProps = {},
+	isCreatingMenu,
+	setIsCreatingMenu,
 } ) {
 	const isOffCanvasNavigationEditorEnabled =
 		window?.__experimentalEnableOffCanvasNavigationEditor === true;
@@ -39,7 +41,6 @@ function NavigationMenuSelector( {
 	const [ selectorLabel, setSelectorLabel ] = useState( '' );
 	const [ isPressed, setIsPressed ] = useState( false );
 	const [ enableOptions, setEnableOptions ] = useState( false );
-	const [ isCreatingMenu, setIsCreatingMenu ] = useState( false );
 
 	actionLabel = actionLabel || createActionLabel;
 
@@ -155,7 +156,6 @@ function NavigationMenuSelector( {
 				__experimentalIsFocusable
 				onClick={ () => {
 					onCreateNew();
-					setIsCreatingMenu( true );
 					setSelectorLabel( __( 'Loading …' ) );
 					setEnableOptions( false );
 				} }
@@ -227,7 +227,6 @@ function NavigationMenuSelector( {
 								onClick={ () => {
 									onClose();
 									onCreateNew();
-									setIsCreatingMenu( true );
 									setSelectorLabel( __( 'Loading …' ) );
 									setEnableOptions( false );
 								} }

@@ -30,6 +30,8 @@ const MenuInspectorControls = ( {
 	onCreateNew,
 	onSelectClassicMenu,
 	onSelectNavigationMenu,
+	isCreatingMenu,
+	setIsCreatingMenu,
 } ) => {
 	const isOffCanvasNavigationEditorEnabled =
 		window?.__experimentalEnableOffCanvasNavigationEditor === true;
@@ -48,6 +50,25 @@ const MenuInspectorControls = ( {
 		},
 		[ clientId ]
 	);
+
+	const experimentPanelContent = () => {
+		if ( currentMenuId && isNavigationMenuMissing ) {
+			return <p>{ __( 'Select or create a menu' ) }</p>;
+		}
+
+		// Don't show the offcanvas editor if we're creating a new menu.
+		if ( isCreatingMenu ) {
+			return <p>{ __( 'Creating new menu…' ) }</p>;
+		}
+
+		return (
+			<OffCanvasEditor
+				blocks={ clientIdsTree }
+				isExpanded={ true }
+				selectBlockInCanvas={ false }
+			/>
+		);
+	};
 
 	return (
 		<InspectorControls __experimentalGroup={ menuControlsSlot }>
@@ -79,17 +100,11 @@ const MenuInspectorControls = ( {
 									createNavigationMenuIsError
 								}
 								actionLabel={ actionLabel }
+								isCreatingMenu={ isCreatingMenu }
+								setIsCreatingMenu={ setIsCreatingMenu }
 							/>
 						</HStack>
-						{ currentMenuId && isNavigationMenuMissing ? (
-							<p>{ __( 'Select or create a menu' ) }</p>
-						) : (
-							<OffCanvasEditor
-								blocks={ clientIdsTree }
-								isExpanded={ true }
-								selectBlockInCanvas={ false }
-							/>
-						) }
+						{ experimentPanelContent() }
 					</>
 				) : (
 					<>
