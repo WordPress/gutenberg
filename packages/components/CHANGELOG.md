@@ -4,7 +4,7 @@
 
 ### Internal
 
--   `Dashicon`: remove unnecessary type for `classname` prop ([46849](https://github.com/WordPress/gutenberg/pull/46849)).
+-   `Dashicon`: remove unnecessary type for `className` prop ([46849](https://github.com/WordPress/gutenberg/pull/46849)).
 
 ## 23.1.0 (2023-01-02)
 
