@@ -4,23 +4,25 @@
  *
  * @package    WordPress
  * @subpackage WebFonts
- * @since      6.0.0
+ * @since      X.X.X
  */
 
 if ( ! function_exists( 'wp_webfonts' ) ) {
 	/**
-	 * Instantiates the webfonts controller, if not already set, and returns it.
+	 * Initialize $wp_webfonts if it has not been set.
 	 *
-	 * @since 6.0.0
+	 * @since X.X.X
 	 *
-	 * @return WP_Webfonts Instance of the controller.
+	 * @global WP_Web_Fonts $wp_webfonts
+	 *
+	 * @return WP_Web_Fonts WP_Web_Fonts instance.
 	 */
 	function wp_webfonts() {
 		global $wp_webfonts;
 
-		if ( ! $wp_webfonts instanceof WP_Webfonts ) {
-			$wp_webfonts = new WP_Webfonts();
-			$wp_webfonts->init();
+		if ( ! ( $wp_webfonts instanceof WP_Web_Fonts ) ) {
+			$wp_webfonts = new WP_Web_Fonts();
+			$wp_webfonts->register_provider( 'local', 'WP_Webfonts_Provider_Local' );
 		}
 
 		return $wp_webfonts;
@@ -29,132 +31,111 @@ if ( ! function_exists( 'wp_webfonts' ) ) {
 
 if ( ! function_exists( 'wp_register_webfonts' ) ) {
 	/**
-	 * Registers a collection of webfonts.
+	 * Registers one or more font-families and each of their variations.
 	 *
-	 * Example of how to register Source Serif Pro font with font-weight range of 200-900
-	 * and font-style of normal and italic:
+	 * @since X.X.X
 	 *
-	 * If the font files are contained within the theme:
-	 * <code>
-	 * wp_register_webfonts(
-	 *      array(
-	 *          array(
-	 *              'provider'    => 'local',
-	 *              'font-family' => 'Source Serif Pro',
-	 *              'font-weight' => '200 900',
-	 *              'font-style'  => 'normal',
-	 *              'src'         => get_theme_file_uri( 'assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2' ),
-	 *          ),
-	 *          array(
-	 *              'provider'    => 'local',
-	 *              'font-family' => 'Source Serif Pro',
-	 *              'font-weight' => '200 900',
-	 *              'font-style'  => 'italic',
-	 *              'src'         => get_theme_file_uri( 'assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2' ),
-	 *          ),
-	 *      )
-	 * );
-	 * </code>
+	 * @param array[] $webfonts {
+	 *     Web fonts to be registered, grouped by each font-family.
 	 *
-	 * Webfonts should be registered in the `after_setup_theme` hook.
+	 *     @type string $font-family => array[] $variations {
+	 *          An array of web font variations for this font-family.
+	 *          Each variation has the following structure.
 	 *
-	 * @since 6.0.0
-	 *
-	 * @param array[] $webfonts Webfonts to be registered.
-	 *                        This contains an array of webfonts to be registered.
-	 *                        Each webfont is an array.
-	 * @return string[] The font family slug of the registered webfonts.
+	 *          @type array $variation {
+	 *              @type string $provider     The provider ID. Default 'local'.
+	 *              @type string $font-style   The font-style property. Default 'normal'.
+	 *              @type string $font-weight  The font-weight property. Default '400'.
+	 *              @type string $font-display The font-display property. Default 'fallback'.
+	 *         }
+	 *     }
+	 * }
+	 * @return string[] Array of registered font family handles.
 	 */
 	function wp_register_webfonts( array $webfonts ) {
-		$registered_webfont_slugs = array();
+		$registered  = array();
+		$wp_webfonts = wp_webfonts();
 
-		foreach ( $webfonts as $webfont ) {
-			$slug = wp_register_webfont( $webfont );
+		// BACKPORT NOTE: Do not backport this code block to Core.
+		if ( $wp_webfonts->is_deprecated_structure( $webfonts ) ) {
+			$webfonts = $wp_webfonts->migrate_deprecated_structure( $webfonts );
+		}
+		// BACKPORT NOTE: end of code block.
 
-			if ( is_string( $slug ) ) {
-				$registered_webfont_slugs[ $slug ] = true;
+		foreach ( $webfonts as $font_family => $variations ) {
+			$font_family_handle = $wp_webfonts->add_font_family( $font_family );
+			if ( ! $font_family_handle ) {
+				continue;
 			}
+
+			// Register each of the variations for this font family.
+			foreach ( $variations as $variation_handle => $variation ) {
+				if ( ! WP_Webfonts_Utils::is_defined( $variation_handle ) ) {
+					$variation_handle = '';
+				}
+
+				$wp_webfonts->add_variation( $font_family_handle, $variation, $variation_handle );
+			}
+
+			$registered[] = $font_family_handle;
 		}
 
-		return array_keys( $registered_webfont_slugs );
-	}
-}
-
-if ( ! function_exists( 'wp_register_webfont' ) ) {
-	/**
-	 * Registers a single webfont.
-	 *
-	 * Example of how to register Source Serif Pro font with font-weight range of 200-900:
-	 *
-	 * If the font file is contained within the theme:
-	 *
-	 * <code>
-	 * wp_register_webfont(
-	 *      array(
-	 *          'provider'    => 'local',
-	 *          'font-family' => 'Source Serif Pro',
-	 *          'font-weight' => '200 900',
-	 *          'font-style'  => 'normal',
-	 *          'src'         => get_theme_file_uri( 'assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2' ),
-	 *      )
-	 * );
-	 * </code>
-	 *
-	 * @since 6.0.0
-	 *
-	 * @param array $webfont Webfont to be registered.
-	 * @return string|false The font family slug if successfully registered, else false.
-	 */
-	function wp_register_webfont( array $webfont ) {
-		return wp_webfonts()->register_webfont( $webfont );
+		return $registered;
 	}
 }
 
 if ( ! function_exists( 'wp_enqueue_webfonts' ) ) {
 	/**
-	 * Enqueues a collection of font families.
+	 * Enqueues one or more font family and all of its variations.
 	 *
-	 * Example of how to enqueue Source Serif Pro and Roboto font families, both registered beforehand.
+	 * @since X.X.X
 	 *
-	 * <code>
-	 * wp_enqueue_webfonts(
-	 *  'Roboto',
-	 *  'Sans Serif Pro'
-	 * );
-	 * </code>
-	 *
-	 * Font families should be enqueued from the `init` hook or later.
-	 *
-	 * @since 6.0.0
-	 *
-	 * @param string[] $webfonts Font families to be enqueued.
+	 * @param string[] $font_families Font family(ies) to enqueue.
 	 */
-	function wp_enqueue_webfonts( array $webfonts ) {
-		foreach ( $webfonts as $webfont ) {
-			wp_enqueue_webfont( $webfont );
-		}
+	function wp_enqueue_webfonts( array $font_families ) {
+		$handles = array_map( array( WP_Webfonts_Utils::class, 'convert_font_family_into_handle' ), $font_families );
+
+		wp_webfonts()->enqueue( $handles );
 	}
 }
 
-if ( ! function_exists( 'wp_enqueue_webfont' ) ) {
+if ( ! function_exists( 'wp_enqueue_webfont_variations' ) ) {
 	/**
-	 * Enqueue a single font family that has been registered beforehand.
+	 * Enqueues a specific set of web font variations.
 	 *
-	 * Example of how to enqueue Source Serif Pro font:
+	 * @since X.X.X
 	 *
-	 * <code>
-	 * wp_enqueue_webfont( 'Source Serif Pro' );
-	 * </code>
-	 *
-	 * Font families should be enqueued from the `init` hook or later.
-	 *
-	 * @since 6.0.0
-	 *
-	 * @param string $font_family_name The font family name to be enqueued.
-	 * @return bool True if successfully enqueued, else false.
+	 * @param string|string[] $variation_handles Variation handle (string) or handles (array of strings).
 	 */
-	function wp_enqueue_webfont( $font_family_name ) {
-		return wp_webfonts()->enqueue_webfont( $font_family_name );
+	function wp_enqueue_webfont_variations( $variation_handles ) {
+		wp_webfonts()->enqueue( $variation_handles );
+	}
+}
+
+if ( ! function_exists( 'wp_deregister_font_family' ) ) {
+	/**
+	 * Deregisters a font family and all of its registered variations.
+	 *
+	 * @since X.X.X
+	 *
+	 * @param string $font_family_handle The font family to remove.
+	 */
+	function wp_deregister_font_family( $font_family_handle ) {
+		wp_webfonts()->remove_font_family( $font_family_handle );
+	}
+}
+
+if ( ! function_exists( 'wp_deregister_webfont_variation' ) ) {
+	/**
+	 * Deregisters a font variation.
+	 *
+	 * @since X.X.X
+	 *
+	 * @param string $font_family_handle The font family for this variation.
+	 * @param string $variation_handle   The variation's handle to remove.
+	 */
+	function wp_deregister_webfont_variation( $font_family_handle, $variation_handle ) {
+		wp_webfonts()->remove_variation( $font_family_handle, $variation_handle );
 	}
 }
 
@@ -189,27 +170,39 @@ if ( ! function_exists( 'wp_register_webfont_provider' ) ) {
 	}
 }
 
-if ( ! function_exists( 'wp_get_webfont_providers' ) ) {
+if ( ! function_exists( 'wp_print_webfonts' ) ) {
 	/**
-	 * Gets all registered providers.
+	 * Invokes each provider to process and print its styles.
 	 *
-	 * Return an array of providers, each keyed by their unique
-	 * ID (i.e. the `$id` property in the provider's object) with
-	 * an instance of the provider (object):
-	 *     ID => provider instance
+	 * @since X.X.X
 	 *
-	 * Each provider contains the business logic for how to
-	 * process its specific font service (i.e. local or remote)
-	 * and how to generate the `@font-face` styles for its service.
-	 *
-	 * @since 6.0.0
-	 *
-	 * @return WP_Webfonts_Provider[] All registered providers, each keyed by their unique ID.
+	 * @param string|string[]|false $handles Optional. Items to be processed: queue (false),
+	 *                                       single item (string), or multiple items (array of strings).
+	 *                                       Default false.
+	 * @return array|string[] Array of web font handles that have been processed.
+	 *                        An empty array if none were processed.
 	 */
-	function wp_get_webfont_providers() {
-		return wp_webfonts()->get_providers();
+	function wp_print_webfonts( $handles = false ) {
+		global $wp_webfonts;
+
+		if ( empty( $handles ) ) {
+			$handles = false;
+		}
+
+		_wp_scripts_maybe_doing_it_wrong( __FUNCTION__ );
+
+		if ( ! ( $wp_webfonts instanceof WP_Web_Fonts ) ) {
+			if ( ! $handles ) {
+				return array(); // No need to instantiate if nothing is there.
+			}
+		}
+
+		return wp_webfonts()->do_items( $handles );
 	}
 }
+
+add_action( 'admin_print_styles', 'wp_print_webfonts', 50 );
+add_action( 'wp_head', 'wp_print_webfonts', 50 );
 
 /**
  * Add webfonts mime types.

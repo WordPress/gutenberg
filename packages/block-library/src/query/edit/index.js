@@ -92,6 +92,7 @@ function PatternSelectionModal( {
 					blockName={ blockNameForPatterns }
 					clientId={ clientId }
 					onBlockPatternSelect={ onBlockPatternSelect }
+					showTitles={ true }
 				/>
 			</BlockContextProvider>
 		</Modal>

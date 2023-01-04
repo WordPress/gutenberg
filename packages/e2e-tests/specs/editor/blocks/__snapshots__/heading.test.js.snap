@@ -2,19 +2,19 @@
 
 exports[`Heading can be created by prefixing existing content with number signs and a space 1`] = `
 "<!-- wp:heading {\\"level\\":4} -->
-<h4>4</h4>
+<h4 class=\\"wp-block-heading\\">4</h4>
 <!-- /wp:heading -->"
 `;
 
 exports[`Heading can be created by prefixing number sign and a space 1`] = `
 "<!-- wp:heading {\\"level\\":3} -->
-<h3>3</h3>
+<h3 class=\\"wp-block-heading\\">3</h3>
 <!-- /wp:heading -->"
 `;
 
 exports[`Heading should correctly apply named colors 1`] = `
 "<!-- wp:heading {\\"textColor\\":\\"luminous-vivid-orange\\"} -->
-<h2 class=\\"has-luminous-vivid-orange-color has-text-color\\">Heading</h2>
+<h2 class=\\"wp-block-heading has-luminous-vivid-orange-color has-text-color\\">Heading</h2>
 <!-- /wp:heading -->"
 `;
 
@@ -24,13 +24,13 @@ exports[`Heading should create a paragraph block above when pressing enter at th
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
-<h2>a</h2>
+<h2 class=\\"wp-block-heading\\">a</h2>
 <!-- /wp:heading -->"
 `;
 
 exports[`Heading should create a paragraph block below when pressing enter at the end 1`] = `
 "<!-- wp:heading -->
-<h2>a</h2>
+<h2 class=\\"wp-block-heading\\">a</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
@@ -40,12 +40,12 @@ exports[`Heading should create a paragraph block below when pressing enter at th
 
 exports[`Heading should not work with the list input rule 1`] = `
 "<!-- wp:heading -->
-<h2>1. H</h2>
+<h2 class=\\"wp-block-heading\\">1. H</h2>
 <!-- /wp:heading -->"
 `;
 
 exports[`Heading should work with the format input rules 1`] = `
 "<!-- wp:heading -->
-<h2><code>code</code></h2>
+<h2 class=\\"wp-block-heading\\"><code>code</code></h2>
 <!-- /wp:heading -->"
 `;

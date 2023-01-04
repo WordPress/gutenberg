@@ -18,6 +18,12 @@ import {
 	ToggleGroupControlOptionIcon,
 } from '../index';
 
+jest.useFakeTimers();
+
+function getWrappingPopoverElement( element: HTMLElement ) {
+	return element.closest( '.components-popover' );
+}
+
 describe( 'ToggleGroupControl', () => {
 	const options = (
 		<>
@@ -51,6 +57,7 @@ describe( 'ToggleGroupControl', () => {
 
 			expect( container ).toMatchSnapshot();
 		} );
+
 		it( 'with icons', () => {
 			const { container } = render(
 				<ToggleGroupControl
@@ -110,11 +117,17 @@ describe( 'ToggleGroupControl', () => {
 
 		await user.hover( firstRadio );
 
+		const tooltip = await screen.findByText(
+			'Click for Delicious Gnocchi'
+		);
+
 		await waitFor( () =>
 			expect(
-				screen.getByText( 'Click for Delicious Gnocchi' )
-			).toBeVisible()
+				getWrappingPopoverElement( tooltip )
+			).toBePositionedPopover()
 		);
+
+		expect( tooltip ).toBeVisible();
 	} );
 
 	it( 'should not render tooltip', async () => {

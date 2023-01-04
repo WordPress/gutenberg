@@ -66,7 +66,6 @@ const Overlay = ( {
 			) }
 			<InspectorControls __experimentalGroup="color">
 				<ColorGradientSettingsDropdown
-					__experimentalHasMultipleOrigins
 					__experimentalIsRenderedInSidebar
 					settings={ [
 						{
@@ -98,6 +97,7 @@ const Overlay = ( {
 					panelId={ clientId }
 				>
 					<RangeControl
+						__nextHasNoMarginBottom
 						label={ __( 'Overlay opacity' ) }
 						value={ dimRatio }
 						onChange={ ( newDimRatio ) =>
