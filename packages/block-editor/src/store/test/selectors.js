@@ -73,7 +73,7 @@ const {
 	__experimentalGetPatternTransformItems,
 	wasBlockJustInserted,
 	__experimentalGetGlobalBlocksByName,
-	getLastInsertedBlockClientId,
+	__experimentalGetLastInsertedBlockClientId: getLastInsertedBlockClientId,
 } = selectors;
 
 describe( 'selectors', () => {

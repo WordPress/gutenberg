@@ -2658,7 +2658,7 @@ export function wasBlockJustInserted( state, clientId, source ) {
  * @param {Object} state Global application state.
  * @return {string|undefined} Client Id of the last inserted block.
  */
-export function getLastInsertedBlockClientId( state ) {
+export function __experimentalGetLastInsertedBlockClientId( state ) {
 	return state?.lastBlockInserted?.clientId;
 }
 
