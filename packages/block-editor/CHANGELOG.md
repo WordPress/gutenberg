@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   `BlockInspector`: Fix browser warning error when block is not selected ([#46875](https://github.com/WordPress/gutenberg/pull/46875)).
+
 ## 11.1.0 (2023-01-02)
 
 ## 11.0.0 (2022-12-14)
