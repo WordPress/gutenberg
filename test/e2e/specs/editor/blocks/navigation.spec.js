@@ -31,14 +31,13 @@ test.describe(
 			// Check Page List is in the list view.
 
 			// Open the list view.
-			await page.locator( '[aria-label="Document Overview"i]' ).click();
+			await page.click( '[aria-label="Document Overview"i]' );
 
 			// Click the Navigation block expander, we need to use force because it has aria-hidden set to true.
-			await page
-				.locator(
-					`//a[.//span[text()='Navigation']]/span[contains(@class, 'block-editor-list-view__expander')]`
-				)
-				.click( { force: true } );
+			await page.click(
+				`//a[.//span[text()='Navigation']]/span[contains(@class, 'block-editor-list-view__expander')]`,
+				{ force: true }
+			);
 
 			// Find the Page list selector inside the navigation block.
 			const pageListSelector = await page.locator(
