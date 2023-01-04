@@ -26,20 +26,6 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-    # Runs PHP compatibility testing.
-    #
-    # Violations are reported inline with annotations.
-    #
-    # Performs the following steps:
-    # - Checks out the repository.
-    # - Sets up PHP.
-    # - Logs debug information.
-    # - Configures caching for PHP compatibility scans.
-    # - Installs Composer dependencies.
-    # - Make Composer packages available globally.
-    # - Runs the PHP compatibility tests.
-    # - Generate a report for displaying issues as pull request annotations.
-    # - Ensures version-controlled files are not modified or deleted.
     php-compatibility:
         name: Check PHP compatibility
         runs-on: ubuntu-latest
@@ -56,10 +42,6 @@ jobs:
                   php-version: '7.4'
                   coverage: none
                   tools: cs2pr
-
-            - name: Log debug information
-              run: |
-                  composer --version
 
             # This date is used to ensure that the PHP compatibility cache is cleared at least once every week.
             # http://man7.org/linux/man-pages/man1/date.1.html
