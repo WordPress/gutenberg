@@ -74,7 +74,7 @@ describe( 'Inserter', () => {
 			fireEvent.press( addBlockToBeginningButton );
 
 			// Add another block at the beginning
-			await addBlock( screen, 'More', true );
+			await addBlock( screen, 'More', { isPickerOpened: true } );
 
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
@@ -104,7 +104,7 @@ describe( 'Inserter', () => {
 			fireEvent.press( addBlockBeforeButton );
 
 			// Add another block before the first one
-			await addBlock( screen, 'Heading', true );
+			await addBlock( screen, 'Heading', { isPickerOpened: true } );
 
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
@@ -142,7 +142,7 @@ describe( 'Inserter', () => {
 			fireEvent.press( addBlockAfterButton );
 
 			// Add another block after the Heading block
-			await addBlock( screen, 'More', true );
+			await addBlock( screen, 'More', { isPickerOpened: true } );
 
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
@@ -176,7 +176,7 @@ describe( 'Inserter', () => {
 			fireEvent.press( addBlockToEndButton );
 
 			// Add another block to the end after the Paragraph Block
-			await addBlock( screen, 'More', true );
+			await addBlock( screen, 'More', { isPickerOpened: true } );
 
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
