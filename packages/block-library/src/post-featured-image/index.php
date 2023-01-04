@@ -25,11 +25,11 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 		the_post();
 	}
 
-	$is_link        = isset( $attributes['isLink'] ) && $attributes['isLink'];
-	$size_slug      = isset( $attributes['sizeSlug'] ) ? $attributes['sizeSlug'] : 'post-thumbnail';
-	$attr           = get_block_core_post_featured_image_border_attributes( $attributes );
-	$overlay_markup = get_block_core_post_featured_image_overlay_element_markup( $attributes );
-	$title          = isset( $attributes['title'] ) ? $attributes['title'] : '';
+	$is_link         = isset( $attributes['isLink'] ) && $attributes['isLink'];
+	$size_slug       = isset( $attributes['sizeSlug'] ) ? $attributes['sizeSlug'] : 'post-thumbnail';
+	$attr            = get_block_core_post_featured_image_border_attributes( $attributes );
+	$overlay_markup  = get_block_core_post_featured_image_overlay_element_markup( $attributes );
+	$title_attribute = isset( $attributes['title'] ) ? $attributes['title'] : '';
 
 	if ( $is_link ) {
 		$attr['alt'] = trim( strip_tags( get_the_title( $post_ID ) ) );
@@ -43,8 +43,15 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 		$attr['style'] = empty( $attr['style'] ) ? $extra_styles : $attr['style'] . $extra_styles;
 	}
 
-	if ( $title ) {
-		$attr['title'] = trim( strip_tags( $title ) );
+	/*
+	 * If the image is linked and the target has a post title,
+	 * keep the post title as the link text in the alt attribute,
+	 * and do not output the title attribute.
+	 * This is because the post title describes the link target,
+	 * while the image title attribute describes the role of the image.
+	*/
+	if ( $title_attribute && ! ( $is_link && get_the_title( $post_ID ) ) ) {
+		$attr['title'] = trim( strip_tags( $title_attribute ) );
 	}
 
 	$featured_image = get_the_post_thumbnail( $post_ID, $size_slug, $attr );
