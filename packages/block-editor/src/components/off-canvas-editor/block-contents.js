@@ -51,12 +51,13 @@ const ListViewBlockContents = forwardRef(
 				const {
 					hasBlockMovingClientId,
 					getSelectedBlockClientId,
-					getLastInsertedBlockClientId,
+					__experimentalGetLastInsertedBlockClientId,
 				} = select( blockEditorStore );
 				return {
 					blockMovingClientId: hasBlockMovingClientId(),
 					selectedBlockInBlockEditor: getSelectedBlockClientId(),
-					lastInsertedBlockClientId: getLastInsertedBlockClientId(),
+					lastInsertedBlockClientId:
+						__experimentalGetLastInsertedBlockClientId(),
 				};
 			},
 			[ clientId ]
