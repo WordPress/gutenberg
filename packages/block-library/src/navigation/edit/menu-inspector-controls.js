@@ -19,6 +19,7 @@ import { __ } from '@wordpress/i18n';
  */
 import ManageMenusButton from './manage-menus-button';
 import NavigationMenuSelector from './navigation-menu-selector';
+import { LeafMoreMenu } from '../leaf-more-menu';
 
 const MenuInspectorControls = ( {
 	clientId,
@@ -88,6 +89,7 @@ const MenuInspectorControls = ( {
 								blocks={ clientIdsTree }
 								isExpanded={ true }
 								selectBlockInCanvas={ false }
+								LeafMoreMenu={ LeafMoreMenu }
 							/>
 						) }
 					</>
