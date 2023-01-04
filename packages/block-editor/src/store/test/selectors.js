@@ -4457,7 +4457,7 @@ describe( 'selectors', () => {
 
 			const state = {
 				lastBlockInserted: {
-					clientId: expectedClientId,
+					clientIds: [ expectedClientId ],
 					source,
 				},
 			};
@@ -4474,7 +4474,7 @@ describe( 'selectors', () => {
 
 			const state = {
 				lastBlockInserted: {
-					clientId: unexpectedClientId,
+					clientIds: [ unexpectedClientId ],
 					source,
 				},
 			};
@@ -4490,7 +4490,7 @@ describe( 'selectors', () => {
 
 			const state = {
 				lastBlockInserted: {
-					clientId,
+					clientIds: [ clientId ],
 				},
 			};
 
@@ -4679,7 +4679,7 @@ describe( 'getLastInsertedBlockClientId', () => {
 	it( 'should return clientId if blocks have been inserted', () => {
 		const state = {
 			lastBlockInserted: {
-				clientId: '123456',
+				clientIds: [ '123456' ],
 			},
 		};
 

@@ -3255,7 +3255,7 @@ describe( 'state', () => {
 	} );
 
 	describe( 'lastBlockInserted', () => {
-		it( 'should return client id if last block inserted is called with action INSERT_BLOCKS', () => {
+		it( 'should contain client id if last block inserted is called with action INSERT_BLOCKS', () => {
 			const expectedClientId = '62bfef6e-d5e9-43ba-b7f9-c77cf354141f';
 
 			const action = {
@@ -3272,7 +3272,7 @@ describe( 'state', () => {
 
 			const state = lastBlockInserted( {}, action );
 
-			expect( state.clientId ).toBe( expectedClientId );
+			expect( state.clientIds ).toContain( expectedClientId );
 		} );
 
 		it( 'should return inserter_menu source if last block inserted is called with action INSERT_BLOCKS', () => {
@@ -3297,7 +3297,7 @@ describe( 'state', () => {
 
 		it( 'should return state if last block inserted is called with action INSERT_BLOCKS and block list is empty', () => {
 			const expectedState = {
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 			};
 
 			const action = {
@@ -3313,7 +3313,7 @@ describe( 'state', () => {
 			expect( state ).toEqual( expectedState );
 		} );
 
-		it( 'should return client id of first block when blocks are replaced with REPLACE_BLOCKS', () => {
+		it( 'should return client ids of blocks when called with REPLACE_BLOCKS', () => {
 			const clientIdOne = '62bfef6e-d5e9-43ba-b7f9-c77cf354141f';
 			const clientIdTwo = '9db792c6-a25a-495d-adbd-97d56a4c4189';
 
@@ -3331,10 +3331,10 @@ describe( 'state', () => {
 
 			const state = lastBlockInserted( {}, action );
 
-			expect( state.clientId ).toBe( clientIdOne );
+			expect( state.clientIds ).toEqual( [ clientIdOne, clientIdTwo ] );
 		} );
 
-		it( 'should return client id of first block when inner blocks are replaced with REPLACE_INNER_BLOCKS', () => {
+		it( 'should return client ids of all blocks when inner blocks are replaced with REPLACE_INNER_BLOCKS', () => {
 			const clientIdOne = '62bfef6e-d5e9-43ba-b7f9-c77cf354141f';
 			const clientIdTwo = '9db792c6-a25a-495d-adbd-97d56a4c4189';
 
@@ -3352,7 +3352,7 @@ describe( 'state', () => {
 
 			const state = lastBlockInserted( {}, action );
 
-			expect( state.clientId ).toBe( clientIdOne );
+			expect( state.clientIds ).toEqual( [ clientIdOne, clientIdTwo ] );
 		} );
 
 		it( 'should return empty state if last block inserted is called with action RESET_BLOCKS', () => {

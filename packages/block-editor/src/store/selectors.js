@@ -2647,7 +2647,7 @@ export const __experimentalGetActiveBlockIdByBlockNames = createSelector(
 export function wasBlockJustInserted( state, clientId, source ) {
 	const { lastBlockInserted } = state;
 	return (
-		lastBlockInserted.clientId === clientId &&
+		lastBlockInserted.clientIds?.includes( clientId ) &&
 		lastBlockInserted.source === source
 	);
 }
@@ -2659,7 +2659,10 @@ export function wasBlockJustInserted( state, clientId, source ) {
  * @return {string|undefined} Client Id of the last inserted block.
  */
 export function __experimentalGetLastInsertedBlockClientId( state ) {
-	return state?.lastBlockInserted?.clientId;
+	return (
+		state?.lastBlockInserted?.clientIds?.length &&
+		state?.lastBlockInserted?.clientIds[ 0 ]
+	);
 }
 
 /**
