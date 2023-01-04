@@ -228,7 +228,7 @@ function UnforwardedColorPalette(
 		__experimentalIsRenderedInSidebar = false,
 		...otherProps
 	} = props;
-	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
+	const clearColor = useCallback( () => onChange( '' ), [ onChange ] );
 
 	const hasMultipleColorOrigins =
 		colors.length > 0 &&
