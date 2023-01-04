@@ -29,7 +29,7 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	$size_slug      = isset( $attributes['sizeSlug'] ) ? $attributes['sizeSlug'] : 'post-thumbnail';
 	$attr           = get_block_core_post_featured_image_border_attributes( $attributes );
 	$overlay_markup = get_block_core_post_featured_image_overlay_element_markup( $attributes );
-	$title          = isset( $attributes['title'] ) && $attributes['title'];
+	$title          = isset( $attributes['title'] ) ? $attributes['title'] : '';
 
 	if ( $is_link ) {
 		$attr['alt'] = trim( strip_tags( get_the_title( $post_ID ) ) );
