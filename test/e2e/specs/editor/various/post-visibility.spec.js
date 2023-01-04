@@ -4,7 +4,6 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Post visibility', () => {
-	const wp = '';
 	[ 'large', 'small' ].forEach( ( viewport ) => {
 		test( `can be changed when the viewport is ${ viewport }`, async ( {
 			page,
@@ -27,7 +26,7 @@ test.describe( 'Post visibility', () => {
 			await page.click( 'role=button[name="OK"i]' );
 
 			const currentStatus = await page.evaluate( () => {
-				return wp.data
+				return window.wp.data
 					.select( 'core/editor' )
 					.getEditedPostAttribute( 'status' );
 			} );
@@ -48,7 +47,7 @@ test.describe( 'Post visibility', () => {
 			await editor.openDocumentSettingsSidebar();
 
 			const initialStatus = await page.evaluate( () => {
-				return wp.data
+				return window.wp.data
 					.select( 'core/editor' )
 					.getEditedPostAttribute( 'status' );
 			} );
@@ -62,7 +61,7 @@ test.describe( 'Post visibility', () => {
 			await page.click( 'role=button[name="Cancel"i]' );
 
 			const currentStatus = await page.evaluate( () => {
-				return wp.data
+				return window.wp.data
 					.select( 'core/editor' )
 					.getEditedPostAttribute( 'status' );
 			} );
@@ -96,7 +95,7 @@ test.describe( 'Post visibility', () => {
 		await page.click( 'role=button[name="OK"i]' );
 
 		const currentStatus = await page.evaluate( () => {
-			return wp.data
+			return window.wp.data
 				.select( 'core/editor' )
 				.getEditedPostAttribute( 'status' );
 		} );
