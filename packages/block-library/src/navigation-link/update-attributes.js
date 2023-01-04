@@ -86,12 +86,13 @@ export const updateAttributes = (
 		( ! newKind && ! isBuiltInType ) || newKind === 'custom';
 	const kind = isCustomLink ? 'custom' : newKind;
 
+	const hasId = id && Number.isInteger( id );
+
 	setAttributes( {
-		// Passed `url` may already be encoded. To prevent double encoding, decodeURI is executed to revert to the original string.
 		...( newUrl && { url: encodeURI( safeDecodeURI( newUrl ) ) } ),
 		...( label && { label } ),
 		...( undefined !== opensInNewTab && { opensInNewTab } ),
-		...( id && Number.isInteger( id ) && { id } ),
+		...( hasId && { id } ),
 		...( kind && { kind } ),
 		...( type && type !== 'URL' && { type } ),
 	} );
