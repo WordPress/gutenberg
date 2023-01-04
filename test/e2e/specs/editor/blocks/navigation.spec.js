@@ -28,6 +28,10 @@ test.describe(
 		} ) => {
 			await editor.insertBlock( { name: 'core/navigation' } );
 
+			// Necessary to wait for the block to be in loaded state else
+			// initial rendered state will not be resolved.
+			await page.waitForLoadState( 'networkidle' );
+
 			// Check Page List is in the list view.
 
 			// Open the list view.
@@ -50,9 +54,7 @@ test.describe(
 				`//a[.//span[text()='Page List']]`
 			);
 
-			// Todo: wait on resolution state of the block
-			// in order to proceed with assertion using `toBeVisible()`.
-			await expect( pageListSelector ).toBeTruthy();
+			await expect( pageListSelector ).toBeVisible();
 
 			// Check the markup of the block is correct.
 			await editor.publishPost();
