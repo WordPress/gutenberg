@@ -15,6 +15,7 @@ import {
 	Placeholder,
 	Button,
 	TextControl,
+	ToolbarButton,
 } from '@wordpress/components';
 import {
 	InspectorControls,
@@ -23,12 +24,16 @@ import {
 	MediaReplaceFlow,
 	useBlockProps,
 	store as blockEditorStore,
+	__experimentalGetElementClassName,
 	__experimentalUseBorderProps as useBorderProps,
+	RichText,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
-import { upload } from '@wordpress/icons';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import { upload, caption as captionIcon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
-
+import { useEffect, useState, useCallback } from '@wordpress/element';
+import { usePrevious } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
@@ -47,10 +52,12 @@ function PostFeaturedImageDisplay( {
 	clientId,
 	attributes,
 	setAttributes,
+	isSelected,
+	insertBlocksAfter,
 	context: { postId, postType: postTypeSlug, queryId },
 } ) {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
-	const { isLink, height, width, scale, sizeSlug, rel, linkTarget } =
+	const { isLink, height, width, scale, sizeSlug, rel, linkTarget, caption } =
 		attributes;
 	const [ featuredImage, setFeaturedImage ] = useEntityProp(
 		'postType',
@@ -58,6 +65,32 @@ function PostFeaturedImageDisplay( {
 		'featured_media',
 		postId
 	);
+
+	const prevCaption = usePrevious( caption );
+	const [ showCaption, setShowCaption ] = useState( !! caption );
+	// We need to show the caption when changes come from
+	// history navigation(undo/redo).
+	useEffect( () => {
+		if ( caption && ! prevCaption ) {
+			setShowCaption( true );
+		}
+	}, [ caption, prevCaption ] );
+
+	// Focus the caption when we click to add one.
+	const captionRef = useCallback(
+		( node ) => {
+			if ( node && ! caption ) {
+				node.focus();
+			}
+		},
+		[ caption ]
+	);
+
+	useEffect( () => {
+		if ( ! isSelected && ! caption ) {
+			setShowCaption( false );
+		}
+	}, [ isSelected, caption ] );
 
 	const { media, postType } = useSelect(
 		( select ) => {
@@ -121,6 +154,23 @@ function PostFeaturedImageDisplay( {
 
 	const controls = (
 		<>
+			<BlockControls group="block">
+				<ToolbarButton
+					onClick={ () => {
+						setShowCaption( ! showCaption );
+						if ( showCaption && caption ) {
+							setAttributes( { caption: undefined } );
+						}
+					} }
+					icon={ captionIcon }
+					isPressed={ showCaption }
+					label={
+						showCaption
+							? __( 'Remove caption' )
+							: __( 'Add caption' )
+					}
+				/>
+			</BlockControls>
 			<DimensionControls
 				clientId={ clientId }
 				attributes={ attributes }
@@ -262,6 +312,28 @@ function PostFeaturedImageDisplay( {
 					setAttributes={ setAttributes }
 					clientId={ clientId }
 				/>
+				{ showCaption &&
+					( ! RichText.isEmpty( caption ) || isSelected ) && (
+						<RichText
+							tagName="figcaption"
+							className={ __experimentalGetElementClassName(
+								'caption'
+							) }
+							aria-label={ __( 'Image caption text' ) }
+							ref={ captionRef }
+							placeholder={ __( 'Add caption' ) }
+							value={ caption }
+							onChange={ ( value ) =>
+								setAttributes( { caption: value } )
+							}
+							inlineToolbar
+							__unstableOnSplitAtEnd={ () =>
+								insertBlocksAfter(
+									createBlock( getDefaultBlockName() )
+								)
+							}
+						/>
+					) }
 			</figure>
 		</>
 	);

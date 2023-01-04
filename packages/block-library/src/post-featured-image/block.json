@@ -48,6 +48,9 @@
 		},
 		"customGradient": {
 			"type": "string"
+		},
+		"caption": {
+			"type": "string"
 		}
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],

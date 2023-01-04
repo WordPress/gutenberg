@@ -29,6 +29,7 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	$size_slug      = isset( $attributes['sizeSlug'] ) ? $attributes['sizeSlug'] : 'post-thumbnail';
 	$attr           = get_block_core_post_featured_image_border_attributes( $attributes );
 	$overlay_markup = get_block_core_post_featured_image_overlay_element_markup( $attributes );
+	$caption        = isset( $attributes['caption'] ) ? $attributes['caption'] : '';
 
 	if ( $is_link ) {
 		$attr['alt'] = trim( strip_tags( get_the_title( $post_ID ) ) );
@@ -61,11 +62,16 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 		$featured_image = $featured_image . $overlay_markup;
 	}
 
+	$image_caption = '';
+	if ( $caption ) {
+		$image_caption = '<figcaption class="wp-element-caption">' . $caption . '</figcaption>';
+	}
+
 	$wrapper_attributes = empty( $attributes['width'] )
 		? get_block_wrapper_attributes()
 		: get_block_wrapper_attributes( array( 'style' => "width:{$attributes['width']};" ) );
 
-	return "<figure {$wrapper_attributes}>{$featured_image}</figure>";
+	return "<figure {$wrapper_attributes}>{$featured_image}{$image_caption}</figure>";
 }
 
 /**
