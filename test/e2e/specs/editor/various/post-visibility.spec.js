@@ -5,9 +5,6 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Post visibility', () => {
 	const wp = '';
-	test.afterEach( async ( { pageUtils } ) => {
-		await pageUtils.setBrowserViewport( 'large' );
-	} );
 	[ 'large', 'small' ].forEach( ( viewport ) => {
 		test( `can be changed when the viewport is ${ viewport }`, async ( {
 			page,
@@ -82,7 +79,7 @@ test.describe( 'Post visibility', () => {
 		await admin.createNewPost();
 
 		// Enter a title for this post.
-		await page.type( '.editor-post-title__input', 'Title' );
+		await page.type( 'role=textbox[name="Add title"i]', 'Title' );
 
 		await editor.openDocumentSettingsSidebar();
 
