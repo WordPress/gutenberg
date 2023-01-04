@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Internal
+-   `AlignmentMatrixControl`: Update center cell label to 'Center' instead of 'Center Center' ([#46852](https://github.com/WordPress/gutenberg/pull/46852)).
+
 ## 23.1.0 (2023-01-02)
 
 ## 23.0.0 (2022-12-14)
