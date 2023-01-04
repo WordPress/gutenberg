@@ -171,11 +171,11 @@ async function run() {
 					isReportComment
 			  )
 			: await api.createCommentOnCommit(
-					payload.workflow_run.head_sha,
+					github.context.sha,
 					renderCommitComment( {
 						runURL,
 						reportedIssues,
-						commitSHA: payload.workflow_run.head_sha,
+						commitSHA: github.context.sha,
 					} ),
 					isReportComment
 			  );
