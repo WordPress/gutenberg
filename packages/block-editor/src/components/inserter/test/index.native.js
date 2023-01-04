@@ -180,5 +180,98 @@ describe( 'Inserter', () => {
 
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
+
+		it( 'adds new block at the end of post', async () => {
+			const screen = await initializeEditor();
+
+			// Add Spacer block
+			await addBlock( screen, 'Spacer' );
+
+			// Add Heading block
+			await addBlock( screen, 'Heading' );
+
+			// Get Heading block
+			const headingBlock = await getBlock( screen, 'Heading', {
+				rowIndex: 2,
+			} );
+			expect( headingBlock ).toBeVisible();
+
+			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
+
+		it( 'inserts between 2 existing blocks', async () => {
+			const screen = await initializeEditor();
+
+			// Add Spacer block
+			await addBlock( screen, 'Spacer' );
+
+			// Add Heading block
+			await addBlock( screen, 'Heading' );
+
+			// Get Spacer block
+			const spacerBlock = await getBlock( screen, 'Spacer' );
+			fireEvent.press( spacerBlock );
+
+			// Add More block
+			await addBlock( screen, 'More' );
+
+			// Get More block
+			const moreBlock = await getBlock( screen, 'More', { rowIndex: 2 } );
+			expect( moreBlock ).toBeVisible();
+
+			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
+
+		it( 'inserts block at the end of post when no block is selected', async () => {
+			const screen = await initializeEditor();
+			const { getAllByLabelText } = screen;
+
+			// Add Spacer block
+			await addBlock( screen, 'Spacer' );
+
+			// Add Heading block
+			await addBlock( screen, 'Heading' );
+
+			// Select the title
+			const titleInputElement = await getAllByLabelText(
+				'Post title. test'
+			)[ 0 ];
+			expect( titleInputElement ).toBeVisible();
+			fireEvent.press( titleInputElement );
+
+			// Add More block
+			await addBlock( screen, 'More' );
+
+			// Get More block
+			const moreBlock = await getBlock( screen, 'More', { rowIndex: 3 } );
+			expect( moreBlock ).toBeVisible();
+
+			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
+
+		it( 'creates a new Paragraph block tapping on the empty area below the last block', async () => {
+			const screen = await initializeEditor();
+			const { getByLabelText } = screen;
+
+			// Add Spacer block
+			await addBlock( screen, 'Spacer' );
+
+			// Add Heading block
+			await addBlock( screen, 'Heading' );
+
+			// Get the empty paragraph placeholder
+			const paragraphPlaceholder = await getByLabelText(
+				'Add paragraph block'
+			);
+			fireEvent.press( paragraphPlaceholder );
+
+			// Get Paragraph block
+			const paragraphBlock = await getBlock( screen, 'Paragraph', {
+				rowIndex: 3,
+			} );
+			expect( paragraphBlock ).toBeVisible();
+
+			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
 	} );
 } );
