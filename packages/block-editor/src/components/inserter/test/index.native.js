@@ -70,7 +70,7 @@ describe( 'Inserter', () => {
 			const addBlockToBeginningButton = await getByLabelText(
 				'Add To Beginning'
 			);
-			expect( addBlockToBeginningButton ).toBeTruthy();
+			expect( addBlockToBeginningButton ).toBeVisible();
 			fireEvent.press( addBlockToBeginningButton );
 
 			// Add another block at the beginning
@@ -100,7 +100,7 @@ describe( 'Inserter', () => {
 			const addBlockBeforeButton = await getByLabelText(
 				'Add Block Before'
 			);
-			expect( addBlockBeforeButton ).toBeTruthy();
+			expect( addBlockBeforeButton ).toBeVisible();
 			fireEvent.press( addBlockBeforeButton );
 
 			// Add another block before the first one
@@ -138,7 +138,7 @@ describe( 'Inserter', () => {
 			const addBlockAfterButton = await getByLabelText(
 				'Add Block After'
 			);
-			expect( addBlockAfterButton ).toBeTruthy();
+			expect( addBlockAfterButton ).toBeVisible();
 			fireEvent.press( addBlockAfterButton );
 
 			// Add another block after the Heading block
@@ -172,7 +172,7 @@ describe( 'Inserter', () => {
 
 			// Get Add To End option
 			const addBlockToEndButton = await getByLabelText( 'Add To End' );
-			expect( addBlockToEndButton ).toBeTruthy();
+			expect( addBlockToEndButton ).toBeVisible();
 			fireEvent.press( addBlockToEndButton );
 
 			// Add another block to the end after the Paragraph Block
