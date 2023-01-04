@@ -30,8 +30,13 @@ function UnconnectedNavigatorProvider(
 	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
-	const { initialPath, children, className, ...otherProps } =
-		useContextSystem( props, 'NavigatorProvider' );
+	const {
+		initialPath,
+		initialAnimationOverride = null,
+		children,
+		className,
+		...otherProps
+	} = useContextSystem( props, 'NavigatorProvider' );
 
 	const [ locationHistory, setLocationHistory ] = useState<
 		NavigatorLocation[]
@@ -41,8 +46,13 @@ function UnconnectedNavigatorProvider(
 		},
 	] );
 
+	const [ animationOverride, setAnimationOverride ] = useState(
+		initialAnimationOverride
+	);
+
 	const goTo: NavigatorContextType[ 'goTo' ] = useCallback(
-		( path, options = {} ) => {
+		( path, options = {}, newAnimationOverride = null ) => {
+			setAnimationOverride( newAnimationOverride );
 			setLocationHistory( ( prevLocationHistory ) => [
 				...prevLocationHistory,
 				{
@@ -80,8 +90,9 @@ function UnconnectedNavigatorProvider(
 			},
 			goTo,
 			goBack,
+			animationOverride,
 		} ),
-		[ locationHistory, goTo, goBack ]
+		[ locationHistory, goTo, goBack, animationOverride ]
 	);
 
 	const cx = useCx();

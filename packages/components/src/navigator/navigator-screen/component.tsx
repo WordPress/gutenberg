@@ -44,6 +44,8 @@ type Props = Omit<
 	keyof MotionProps
 >;
 
+type AnimationInitial = boolean | { opacity: number; x: number };
+
 function UnconnectedNavigatorScreen(
 	props: Props,
 	forwardedRef: ForwardedRef< any >
@@ -54,7 +56,7 @@ function UnconnectedNavigatorScreen(
 	);
 
 	const prefersReducedMotion = useReducedMotion();
-	const { location } = useContext( NavigatorContext );
+	const { location, animationOverride } = useContext( NavigatorContext );
 	const isMatch = location.path === escapeAttribute( path );
 	const wrapperRef = useRef< HTMLDivElement >( null );
 
@@ -161,13 +163,28 @@ function UnconnectedNavigatorScreen(
 		},
 		x: 0,
 	};
-	const initial = {
+	let initial: AnimationInitial = {
 		opacity: 0,
 		x:
 			( isRTL() && location.isBack ) || ( ! isRTL() && ! location.isBack )
 				? 50
 				: -50,
 	};
+	if ( animationOverride ) {
+		switch ( animationOverride ) {
+			case 'forceForward':
+				initial.x = isRTL() ? 50 : -50;
+				break;
+
+			case 'forceBackward':
+				initial.x = isRTL() ? -50 : 50;
+				break;
+
+			case 'disableAnimation':
+				initial = false;
+				break;
+		}
+	}
 	const exit = {
 		delay: animationExitDelay,
 		opacity: 0,
