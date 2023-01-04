@@ -101,7 +101,7 @@ export const combineReducers = turboCombineReducers;
  *
  * @type {(storeNameOrDescriptor: StoreDescriptor|string) => Object}
  */
-export const select  = defaultRegistry.select;
+export const select = defaultRegistry.select;
 
 /**
  * Given a store descriptor, returns an object containing the store's selectors pre-bound to state
