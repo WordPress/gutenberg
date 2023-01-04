@@ -54,7 +54,7 @@ const MenuInspectorControls = ( {
 
 	const experimentMainContent = () => {
 		if ( currentMenuId && isNavigationMenuMissing ) {
-			<p>{ __( 'Select or create a menu' ) }</p>;
+			return <p>{ __( 'Select or create a menu' ) }</p>;
 		}
 
 		if ( isLoading ) {
