@@ -11,7 +11,6 @@ class Mock_Provider extends WP_Webfonts_Provider {
 	public function get_css() {
 		$handles = array_keys( $this->webfonts );
 		return implode( '; ', $handles );
-		return sprintf( $this->css, implode( '; ', $handles ) );
 	}
 
 	/**

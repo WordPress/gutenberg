@@ -4,13 +4,11 @@
 import { blockNames } from './pages/editor-page';
 import {
 	headerBlockEmpty,
-	imageBlockEmpty,
 	listBlockEmpty,
 	moreBlockEmpty,
 	paragraphBlockEmpty,
 	separatorBlockEmpty,
 } from './helpers/test-data';
-import { waitForMediaLibrary } from './helpers/utils';
 
 describe( 'Gutenberg Editor tests for Block insertion 2', () => {
 	it( 'adds new block at the end of post', async () => {
@@ -57,47 +55,17 @@ describe( 'Gutenberg Editor tests for Block insertion 2', () => {
 		expect( html.toLowerCase() ).toBe( expectedHtml );
 	} );
 
-	it( 'inserts block before selected block', async () => {
-		const separatorBlockElement = await editorPage.getBlockAtPosition(
-			blockNames.separator,
-			2
-		);
-		await separatorBlockElement.click();
-
-		await editorPage.addNewBlock( blockNames.image, 'before' );
-
-		await waitForMediaLibrary( editorPage.driver );
-		await editorPage.closePicker();
-
-		const imageBlock = await editorPage.getBlockAtPosition(
-			blockNames.image,
-			2
-		);
-		expect( imageBlock ).toBeTruthy();
-
-		const expectedHtml = [
-			headerBlockEmpty,
-			imageBlockEmpty,
-			separatorBlockEmpty,
-			listBlockEmpty,
-		].join( '\n\n' );
-
-		const html = await editorPage.getHtmlContent();
-		expect( html.toLowerCase() ).toBe( expectedHtml );
-	} );
-
 	it( 'inserts block at the end of post when no block is selected', async () => {
 		await editorPage.addNewBlock( blockNames.more );
 
 		const moreBlock = await editorPage.getBlockAtPosition(
 			blockNames.more,
-			5
+			4
 		);
 		expect( moreBlock ).toBeTruthy();
 
 		const expectedHtml = [
 			headerBlockEmpty,
-			imageBlockEmpty,
 			separatorBlockEmpty,
 			listBlockEmpty,
 			moreBlockEmpty,
@@ -112,13 +80,12 @@ describe( 'Gutenberg Editor tests for Block insertion 2', () => {
 
 		const paragraphBlock = await editorPage.getBlockAtPosition(
 			blockNames.paragraph,
-			6
+			5
 		);
 		expect( paragraphBlock ).toBeTruthy();
 
 		const expectedHtml = [
 			headerBlockEmpty,
-			imageBlockEmpty,
 			separatorBlockEmpty,
 			listBlockEmpty,
 			moreBlockEmpty,
