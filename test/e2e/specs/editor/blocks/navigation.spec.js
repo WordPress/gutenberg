@@ -24,23 +24,24 @@ test.describe(
 
 		test( 'default to a list of pages if there are no menus', async ( {
 			editor,
+			page,
 		} ) => {
 			await editor.insertBlock( { name: 'core/navigation' } );
 
 			// Check Page List is in the list view.
 
 			// Open the list view.
-			await editor.page
-				.locator( '[aria-label="Document Overview"i]' )
-				.click();
+			await page.locator( '[aria-label="Document Overview"i]' ).click();
+
 			// Click the Navigation block expander, we need to use force because it has aria-hidden set to true.
-			await editor.page
+			await page
 				.locator(
 					`//a[.//span[text()='Navigation']]/span[contains(@class, 'block-editor-list-view__expander')]`
 				)
 				.click( { force: true } );
+
 			// Find the Page list selector inside the navigation block.
-			const pageListSelector = await editor.page.locator(
+			const pageListSelector = await page.locator(
 				`//table[contains(@aria-label,'Block navigation structure')]//a[.//span[text()='Page List']]`
 			);
 
