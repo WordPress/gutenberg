@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
-import { moreVertical } from '@wordpress/icons';
+import { addSubmenu, moreVertical } from '@wordpress/icons';
 import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
 import { store as blockEditorStore, BlockTitle } from '@wordpress/block-editor';
@@ -38,6 +38,7 @@ export const LeafMoreMenu = ( props ) => {
 			{ ( { onClose } ) => (
 				<MenuGroup>
 					<MenuItem
+						icon={ addSubmenu }
 						onClick={ () => {
 							const newLink = createBlock(
 								'core/navigation-link'
