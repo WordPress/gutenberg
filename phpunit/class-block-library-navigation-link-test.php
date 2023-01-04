@@ -214,23 +214,23 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 
 	public function test_returns_link_for_decoded_link() {
 
-		$urls_before_render = [
-				"https://example.com/?id=10&data=lzB%252Fzd%252FZA%253D%253D",
-				"https://example.com/?id=10&data=lzB%2Fzd%FZA%3D%3D",
-				"https://example.com/?id=10&data=1234",
-		];
+		$urls_before_render = array(
+			'https://example.com/?id=10&data=lzB%252Fzd%252FZA%253D%253D',
+			'https://example.com/?id=10&data=lzB%2Fzd%FZA%3D%3D',
+			'https://example.com/?id=10&data=1234',
+		);
 
-		$urls_after_render = [
-				'https://example.com/?id=10&#038;data=lzB%2Fzd%2FZA%3D%3D',
-				"https://example.com/?id=10&#038;data=lzB%2Fzd%FZA%3D%3D",
-				'https://example.com/?id=10&#038;data=1234',
-		];
+		$urls_after_render = array(
+			'https://example.com/?id=10&#038;data=lzB%2Fzd%2FZA%3D%3D',
+			'https://example.com/?id=10&#038;data=lzB%2Fzd%FZA%3D%3D',
+			'https://example.com/?id=10&#038;data=1234',
+		);
 
 		foreach ( $urls_before_render as $idx => $link ) {
-				$parsed_blocks = parse_blocks('<!-- wp:navigation-link {"label":"test label", "url": "' . $link  . '"} /-->');
-		    $this->assertEquals( 1, count( $parsed_blocks ) );
-				$block = $parsed_blocks[0];
-		    $navigation_link_block = new WP_Block( $block, array() );
+				$parsed_blocks = parse_blocks( '<!-- wp:navigation-link {"label":"test label", "url": "' . $link . '"} /-->' );
+			$this->assertEquals( 1, count( $parsed_blocks ) );
+				$block             = $parsed_blocks[0];
+			$navigation_link_block = new WP_Block( $block, array() );
 				$this->assertEquals(
 					true,
 					strpos(
@@ -239,7 +239,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 							array(),
 							$navigation_link_block
 						),
-						$urls_after_render[$idx]
+						$urls_after_render[ $idx ]
 					) !== false
 				);
 		};
