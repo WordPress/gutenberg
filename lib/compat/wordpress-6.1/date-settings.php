@@ -45,10 +45,10 @@ function gutenberg_update_date_settings( $scripts ) {
 				array(
 					'l10n'     => array(
 						'locale'        => get_user_locale(),
-						'months'        => array_values( $wp_locale->month ),
-						'monthsShort'   => array_values( $wp_locale->month_abbrev ),
-						'weekdays'      => array_values( $wp_locale->weekday ),
-						'weekdaysShort' => array_values( $wp_locale->weekday_abbrev ),
+						'months'        => is_array( $wp_locale->month ) ? array_values( $wp_locale->month ) : null,
+						'monthsShort'   => is_array( $wp_locale->month_abbrev ) ? array_values( $wp_locale->month_abbrev ) : null,
+						'weekdays'      => is_array( $wp_locale->weekday ) ? array_values( $wp_locale->weekday ) : null,
+						'weekdaysShort' => is_array( $wp_locale->weekday_abbrev ) ? array_values( $wp_locale->weekday_abbrev ) : null,
 						'meridiem'      => (object) $wp_locale->meridiem,
 						'relative'      => array(
 							/* translators: %s: Duration. */
