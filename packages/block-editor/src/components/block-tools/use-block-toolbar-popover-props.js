@@ -138,7 +138,7 @@ export default function useBlockToolbarPopoverProps( {
 					toolbarHeight
 				)
 			),
-		[ contentElement, selectedBlockElement, toolbarHeight ]
+		[ contentElement, selectedBlockElement, scrollContainer, toolbarHeight ]
 	);
 
 	// Update props when the block is moved. This also ensures the props are
