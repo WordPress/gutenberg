@@ -33,18 +33,26 @@ test.describe(
 			// Open the list view.
 			await page.click( '[aria-label="Document Overview"i]' );
 
-			// Click the Navigation block expander, we need to use force because it has aria-hidden set to true.
-			await page.click(
-				`//a[.//span[text()='Navigation']]/span[contains(@class, 'block-editor-list-view__expander')]`,
-				{ force: true }
+			const listView = await page.locator(
+				`//table[contains(@aria-label,'Block navigation structure')]`
 			);
+
+			// Click the Navigation block expander within the List View.
+			await listView
+				.locator( `//a[.//span[text()='Navigation']]` )
+				.locator( '.block-editor-list-view__expander' )
+				.click( {
+					force: true, // required as element has aria-hidden set to true.);
+				} );
 
 			// Find the Page list selector inside the navigation block.
-			const pageListSelector = await page.locator(
-				`//table[contains(@aria-label,'Block navigation structure')]//a[.//span[text()='Page List']]`
+			const pageListSelector = await listView.locator(
+				`//a[.//span[text()='Page List']]`
 			);
 
-			expect( pageListSelector ).toBeTruthy();
+			// Todo: wait on resolution state of the block
+			// in order to proceed with assertion using `toBeVisible()`.
+			await expect( pageListSelector ).toBeTruthy();
 
 			// Check the markup of the block is correct.
 			await editor.publishPost();
