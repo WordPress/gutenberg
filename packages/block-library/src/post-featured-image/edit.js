@@ -15,6 +15,7 @@ import {
 	Placeholder,
 	Button,
 	TextControl,
+	ExternalLink,
 } from '@wordpress/components';
 import {
 	InspectorControls,
@@ -50,7 +51,7 @@ function PostFeaturedImageDisplay( {
 	context: { postId, postType: postTypeSlug, queryId },
 } ) {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
-	const { isLink, height, width, scale, sizeSlug, rel, linkTarget } =
+	const { isLink, height, width, scale, sizeSlug, rel, linkTarget, title } =
 		attributes;
 	const [ featuredImage, setFeaturedImage ] = useEntityProp(
 		'postType',
@@ -74,7 +75,6 @@ function PostFeaturedImageDisplay( {
 		[ featuredImage, postTypeSlug ]
 	);
 	const mediaUrl = getMediaSourceUrlBySizeSlug( media, sizeSlug );
-
 	const imageSizes = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().imageSizes,
 		[]
@@ -118,6 +118,12 @@ function PostFeaturedImageDisplay( {
 	const onUploadError = ( message ) => {
 		createErrorNotice( message, { type: 'snackbar' } );
 	};
+
+	function onSetTitle( value ) {
+		// This is the HTML title attribute, separate from the media object
+		// title.
+		setAttributes( { title: value } );
+	}
 
 	const controls = (
 		<>
@@ -163,6 +169,25 @@ function PostFeaturedImageDisplay( {
 						</>
 					) }
 				</PanelBody>
+			</InspectorControls>
+			<InspectorControls __experimentalGroup="advanced">
+				<TextControl
+					label={ __( 'Title attribute' ) }
+					value={ title || '' }
+					onChange={ onSetTitle }
+					help={
+						<>
+							{ __(
+								'Describe the role of this image on the page.'
+							) }
+							<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute">
+								{ __(
+									'(Note: many devices and browsers do not display this text.)'
+								) }
+							</ExternalLink>
+						</>
+					}
+				/>
 			</InspectorControls>
 		</>
 	);
@@ -232,6 +257,7 @@ function PostFeaturedImageDisplay( {
 						: __( 'Featured image' )
 				}
 				style={ imageStyles }
+				title={ title }
 			/>
 		);
 	}

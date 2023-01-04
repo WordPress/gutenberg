@@ -48,6 +48,13 @@
 		},
 		"customGradient": {
 			"type": "string"
+		},
+		"title": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "img",
+			"attribute": "title",
+			"__experimentalRole": "content"
 		}
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],
