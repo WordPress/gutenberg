@@ -11,43 +11,62 @@ jobs:
         name: Report to GitHub
         runs-on: ubuntu-latest
         steps:
+            # Checkout defaults to using the branch which triggered the event, which
+            # isn't necessarily `trunk` (e.g. in the case of a merge).
+            - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+              with:
+                  ref: trunk
+
             - uses: actions/github-script@v6
-              id: all-jobs-finished
+              id: download-artifact
               with:
                   result-encoding: string
                   script: |
-                      const { data: { jobs } } = await github.rest.actions.listJobsForWorkflowRun( {
+                      const { data: { artifacts } } = await github.rest.actions.listWorkflowRunArtifacts( {
                         owner: context.repo.owner,
                         repo: context.repo.repo,
                         run_id: context.payload.workflow_run.id,
                       } );
-                      return jobs.every( ( job ) => job.status === 'completed' );
+                      const matchArtifact = artifacts.find(
+                        ( artifact ) => artifact.name === 'flaky-tests-report'
+                      );
+                      if ( ! matchArtifact ) {
+                        return false;
+                      }
+                      const download = await github.rest.actions.downloadArtifact( {
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        artifact_id: matchArtifact.id,
+                        archive_format: 'zip',
+                      } );
+                      await require( 'fs/promises' ).writeFile(
+                        `${process.env.GITHUB_WORKSPACE}/flaky-tests-report.zip`,
+                        Buffer.from( download.data )
+                      );
+                      return true;
 
-            # Checkout defaults to using the branch which triggered the event, which
-            # isn't necessarily `trunk` (e.g. in the case of a merge).
-            - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
-              if: ${{ steps.all-jobs-finished.outputs.result == 'true' }}
-              with:
-                  ref: trunk
+            - name: Unzip artifact
+              if: ${{ steps.download-artifact.outputs.result == 'true' }}
+              run: unzip flaky-tests-report.zip -d flaky-tests
 
             - name: Use desired version of NodeJS
-              if: ${{ steps.all-jobs-finished.outputs.result == 'true' }}
+              if: ${{ steps.download-artifact.outputs.result == 'true' }}
               uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
               with:
                   node-version-file: '.nvmrc'
                   cache: npm
 
             - name: Npm install and build
-              if: ${{ steps.all-jobs-finished.outputs.result == 'true' }}
+              if: ${{ steps.download-artifact.outputs.result == 'true' }}
               # TODO: We don't have to build the entire project, just the action itself.
               run: |
                   npm ci
                   npm run build:packages
 
             - name: Report flaky tests
-              if: ${{ steps.all-jobs-finished.outputs.result == 'true' }}
+              if: ${{ steps.download-artifact.outputs.result == 'true' }}
               uses: ./packages/report-flaky-tests
               with:
                   repo-token: '${{ secrets.GITHUB_TOKEN }}'
                   label: '[Type] Flaky Test'
-                  artifact-name: flaky-tests-report
+                  artifact-path: flaky-tests

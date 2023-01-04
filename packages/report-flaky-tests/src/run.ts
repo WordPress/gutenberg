@@ -3,6 +3,8 @@
  */
 import * as github from '@actions/github';
 import * as core from '@actions/core';
+import * as fs from 'fs/promises';
+import * as path from 'path';
 import type { WorkflowRunCompletedEvent } from '@octokit/webhooks-types';
 
 /**
@@ -21,7 +23,7 @@ import type { ReportedIssue } from './types';
 
 async function run() {
 	const token = core.getInput( 'repo-token', { required: true } );
-	const artifactName = core.getInput( 'artifact-name', {
+	const artifactPath = core.getInput( 'artifact-path', {
 		required: true,
 	} );
 
@@ -32,13 +34,16 @@ async function run() {
 	// Cast the payload type: https://github.com/actions/toolkit/tree/main/packages/github#webhook-payload-typescript-definitions
 	const payload = github.context.payload as WorkflowRunCompletedEvent;
 	const api = new GitHubAPI( token, repo );
-	const runID = payload.workflow_run.id;
 	const headBranch = payload.workflow_run.head_branch;
 	const runURL = payload.workflow_run.html_url;
 
-	const flakyTests = await api.downloadReportFromArtifact(
-		runID,
-		artifactName
+	const flakyTestsDir = await fs.readdir( artifactPath );
+	const flakyTests = await Promise.all(
+		flakyTestsDir.map( ( filename ) =>
+			fs
+				.readFile( path.join( artifactPath, filename ), 'utf-8' )
+				.then( ( text ) => JSON.parse( text ) )
+		)
 	);
 
 	if ( ! flakyTests || flakyTests.length === 0 ) {
