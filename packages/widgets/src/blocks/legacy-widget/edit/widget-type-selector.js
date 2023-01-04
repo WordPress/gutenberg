@@ -28,7 +28,6 @@ export default function WidgetTypeSelector( { selectedId, onSelect } ) {
 	return (
 		<SelectControl
 			__nextHasNoMarginBottom
-			className="wp-block-legacy-widget__select-widget"
 			label={ __( 'Select a legacy widget to display:' ) }
 			value={ selectedId ?? '' }
 			options={ [

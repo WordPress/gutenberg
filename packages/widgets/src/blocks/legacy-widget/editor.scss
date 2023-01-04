@@ -163,13 +163,3 @@
 	min-width: 400px;
 }
 
-.wp-block-legacy-widget {
-	.wp-block-legacy-widget__selector-container {
-		width: 100%;
-	}
-
-	// Replaces margin on BaseControl
-	.wp-block-legacy-widget__select-widget {
-		margin-bottom: $grid-unit-10;
-	}
-}

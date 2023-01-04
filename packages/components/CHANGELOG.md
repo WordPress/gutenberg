@@ -5,6 +5,7 @@
 ### Internal
 
 -   `Dashicon`: remove unnecessary type for `className` prop ([46849](https://github.com/WordPress/gutenberg/pull/46849)).
+-   `ColorPicker` & `QueryControls`: Replace bottom margin overrides with `__nextHasNoMarginBottom` ([#46448](https://github.com/WordPress/gutenberg/pull/46448)).
 
 ## 23.1.0 (2023-01-02)
 
@@ -42,7 +43,6 @@
 -   Lighten the border color on control components ([#46252](https://github.com/WordPress/gutenberg/pull/46252)).
 -   `Popover`: Prevent unnecessary paint when scrolling by using transform instead of top/left positionning ([#46187](https://github.com/WordPress/gutenberg/pull/46187)).
 -   `CircularOptionPicker`: Prevent unecessary paint on hover ([#46197](https://github.com/WordPress/gutenberg/pull/46197)).
--   `ColorPicker` & `QueryControls`: Replace bottom margin overrides with `__nextHasNoMarginBottom` ([#46448](https://github.com/WordPress/gutenberg/pull/46448)).
 
 ### Experimental
 

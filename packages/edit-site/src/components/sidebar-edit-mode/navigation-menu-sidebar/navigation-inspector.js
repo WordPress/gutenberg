@@ -3,10 +3,7 @@
  */
 import { useSelect } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
-import {
-	SelectControl,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { SelectControl } from '@wordpress/components';
 import { store as coreStore, useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	store as blockEditorStore,
@@ -171,7 +168,7 @@ export default function NavigationInspector() {
 	}, [ isLoadingInnerBlocks, hasLoadedInnerBlocks ] );
 
 	return (
-		<VStack>
+		<div className="edit-site-navigation-inspector">
 			{ hasResolvedNavigationMenus && ! hasNavigationMenus && (
 				<p className="edit-site-navigation-inspector__empty-msg">
 					{ __( 'There are no Navigation Menus.' ) }
@@ -184,6 +181,7 @@ export default function NavigationInspector() {
 			{ hasResolvedNavigationMenus && hasMoreThanOneNavigationMenu && (
 				<SelectControl
 					__nextHasNoMarginBottom
+					className="edit-site-navigation-inspector__select-menu"
 					aria-controls={
 						// aria-controls should only apply when referenced element is in DOM
 						hasLoadedInnerBlocks ? navMenuListId : undefined
@@ -220,6 +218,6 @@ export default function NavigationInspector() {
 					{ __( 'Navigation Menu is empty.' ) }
 				</p>
 			) }
-		</VStack>
+		</div>
 	);
 }
