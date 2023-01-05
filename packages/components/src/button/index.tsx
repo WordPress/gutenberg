@@ -18,9 +18,17 @@ import Tooltip from '../tooltip';
 import Icon from '../icon';
 import { VisuallyHidden } from '../visually-hidden';
 import type { WordPressComponentProps } from '../ui/context';
-import type { ButtonProps, DeprecatedButtonProps, DisabledEvents, TagName } from './types';
+import type {
+	ButtonProps,
+	DeprecatedButtonProps,
+	DisabledEvents,
+	TagName,
+} from './types';
 
-const disabledEventsOnDisabledButton: Array< keyof DisabledEvents > = [ 'onMouseDown', 'onClick' ];
+const disabledEventsOnDisabledButton: Array< keyof DisabledEvents > = [
+	'onMouseDown',
+	'onClick',
+];
 
 function useDeprecatedProps( {
 	isDefault,
@@ -119,7 +127,8 @@ export function UnforwardedButton(
 
 	const trulyDisabled = disabled && ! isFocusable;
 	const Tag = href !== undefined && ! trulyDisabled ? 'a' : 'button';
-	const tagProps: HTMLProps< TagName > = Tag === 'a'
+	const tagProps: HTMLProps< TagName > =
+		Tag === 'a'
 			? { href, target }
 			: {
 					type: 'button',
@@ -166,13 +175,22 @@ export function UnforwardedButton(
 		'aria-label': additionalProps[ 'aria-label' ] || label,
 		'aria-describedby': describedById,
 		ref: ref,
-	}
+	};
 
-	const TagElement = ( { children, ...otherProps }: { children: ReactNode } & typeof tagElementProps ) => {
-		return Tag === 'a'
-			? <a { ...otherProps as JSX.IntrinsicElements[ 'a' ] } >{ children }</a>
-			: <button { ...otherProps as JSX.IntrinsicElements[ 'button' ]} >{ children }</button>
-	}
+	const TagElement = ( {
+		children: tagChildren,
+		...otherProps
+	}: { children: ReactNode } & typeof tagElementProps ) => {
+		return Tag === 'a' ? (
+			<a { ...( otherProps as WordPressComponentProps< {}, 'a' > ) }>
+				{ tagChildren }
+			</a>
+		) : (
+			<button { ...( otherProps as WordPressComponentProps< {}, 'button' > ) }>
+				{ tagChildren }
+			</button>
+		);
+	};
 
 	const element = (
 		<TagElement { ...tagElementProps }>
@@ -203,7 +221,11 @@ export function UnforwardedButton(
 	return (
 		<>
 			<Tooltip
-				text={ Array.isArray( children ) && children?.length && describedBy ? describedBy : label }
+				text={
+					Array.isArray( children ) && children?.length && describedBy
+						? describedBy
+						: label
+				}
 				shortcut={ shortcut }
 				position={ tooltipPosition }
 			>
