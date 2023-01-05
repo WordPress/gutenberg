@@ -17,11 +17,9 @@ const meta: ComponentMeta< typeof ResizableBox > = {
 	title: 'Components/ResizableBox',
 	component: ResizableBox,
 	argTypes: {
-		__experimentalShowTooltip: { control: 'boolean' },
 		minHeight: { control: 'number' },
 		minWidth: { control: 'number' },
 		onResizeStop: { action: 'onResizeStop' },
-		showHandle: { control: 'boolean' },
 	},
 	parameters: {
 		controls: { expanded: true },
