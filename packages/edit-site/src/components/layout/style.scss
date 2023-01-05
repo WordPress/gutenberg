@@ -70,9 +70,7 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 
 .edit-site-layout__sidebar {
 	z-index: z-index(".edit-site-layout__sidebar");
-	overflow-y: auto;
 	width: 100vw;
-	@include custom-scrollbars-on-hover;
 
 	@include break-medium {
 		width: $nav-sidebar-width;
@@ -85,12 +83,37 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 		left: 0;
 		top: 0;
 	}
+
+	.resizable-editor__drag-handle {
+		opacity: 1;
+		animation: drag-handle__fade-in-animation 1s ease;
+		&.is-right {
+			right: -$grid-unit-20 + $canvas-padding;
+		}
+	}
+
+	> div {
+		overflow-y: auto;
+		min-height: 100%;
+		@include custom-scrollbars-on-hover;
+	}
 }
 
 .edit-site-layout__canvas-container {
 	position: relative;
 	flex-grow: 1;
 	z-index: z-index(".edit-site-layout__canvas-container");
+
+	&.is-resizing::after {
+		// This covers the whole content which ensures mouse up triggers
+		// even if the content is "inert".
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		content: "";
+	}
 }
 
 .edit-site-layout__canvas {
@@ -99,11 +122,12 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 	left: 0;
 	bottom: 0;
 	width: 100%;
-	box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 8px 10px -6px rgba(0, 0, 0, 0.8);
 
 	& > div {
 		color: $gray-900;
 		background: $white;
+		z-index: -1;
+		box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 8px 10px -6px rgba(0, 0, 0, 0.8);
 	}
 	@include break-medium {
 		top: $canvas-padding;
@@ -179,5 +203,18 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 	.edit-site-layout__view-mode-toggle-icon {
 		display: flex;
 		border-radius: $radius-block-ui;
+	}
+}
+
+@keyframes drag-handle__fade-in-animation {
+	0% {
+		opacity: 0;
+	}
+	// Delay showing the drag handles after the layout animation finishes.
+	50% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
 	}
 }

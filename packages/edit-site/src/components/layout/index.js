@@ -11,6 +11,7 @@ import {
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
 	__unstableUseNavigateRegions as useNavigateRegions,
+	ResizableBox,
 } from '@wordpress/components';
 import {
 	useReducedMotion,
@@ -35,8 +36,20 @@ import getIsListPage from '../../utils/get-is-list-page';
 import Header from '../header-edit-mode';
 import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
 import SiteHub from '../site-hub';
+import ResizeHandle from '../block-editor/resize-handle';
 
 const ANIMATION_DURATION = 0.5;
+const emptyResizeHandleStyles = {
+	position: undefined,
+	userSelect: undefined,
+	cursor: undefined,
+	width: undefined,
+	height: undefined,
+	top: undefined,
+	right: undefined,
+	bottom: undefined,
+	left: undefined,
+};
 
 export default function Layout( { onError } ) {
 	// This ensures the edited entity id and type are initialized properly.
@@ -86,6 +99,8 @@ export default function Layout( { onError } ) {
 	// Ideally this effect could be removed if we move the "isMobileCanvasVisible" into the store.
 	const [ canvasResizer, canvasSize ] = useResizeObserver();
 	const [ fullResizer, fullSize ] = useResizeObserver();
+	const [ forcedWidth, setForcedWidth ] = useState( null );
+	const [ isResizing, setIsResizing ] = useState( false );
 	useEffect( () => {
 		if ( canvasMode === 'view' && isMobileViewport ) {
 			setIsMobileCanvasVisible( false );
@@ -113,6 +128,9 @@ export default function Layout( { onError } ) {
 			>
 				<SiteHub
 					className="edit-site-layout__hub"
+					style={ {
+						width: forcedWidth ? forcedWidth - 48 : undefined,
+					} }
 					isMobileCanvasVisible={ isMobileCanvasVisible }
 					setIsMobileCanvasVisible={ setIsMobileCanvasVisible }
 				/>
@@ -149,7 +167,7 @@ export default function Layout( { onError } ) {
 				<div className="edit-site-layout__content">
 					<AnimatePresence initial={ false }>
 						{ showSidebar && (
-							<NavigableRegion
+							<ResizableBox
 								as={ motion.div }
 								initial={ {
 									opacity: 0,
@@ -167,17 +185,58 @@ export default function Layout( { onError } ) {
 										: ANIMATION_DURATION,
 									ease: 'easeOut',
 								} }
+								size={ {
+									height: '100%',
+									width:
+										! isMobileViewport &&
+										isEditorPage &&
+										canvasMode === 'view'
+											? forcedWidth ?? 360
+											: undefined,
+								} }
 								className="edit-site-layout__sidebar"
-								ariaLabel={ __( 'Navigation sidebar' ) }
+								enable={ {
+									right:
+										! isMobileViewport &&
+										isEditorPage &&
+										canvasMode === 'view',
+								} }
+								onResizeStop={ ( event, direction, elt ) => {
+									setForcedWidth( elt.clientWidth );
+									setIsResizing( false );
+								} }
+								onResizeStart={ () => {
+									setIsResizing( true );
+								} }
+								handleComponent={ {
+									right: <ResizeHandle direction="right" />,
+								} }
+								handleClasses={ undefined }
+								handleStyles={ {
+									right: emptyResizeHandleStyles,
+								} }
+								minWidth={ 320 }
+								maxWidth={
+									fullSize ? fullSize.width - 360 : undefined
+								}
 							>
-								<Sidebar />
-							</NavigableRegion>
+								<NavigableRegion
+									ariaLabel={ __( 'Navigation sidebar' ) }
+								>
+									<Sidebar />
+								</NavigableRegion>
+							</ResizableBox>
 						) }
 					</AnimatePresence>
 
 					{ showCanvas && (
 						<div
-							className="edit-site-layout__canvas-container"
+							className={ classnames(
+								'edit-site-layout__canvas-container',
+								{
+									'is-resizing': isResizing,
+								}
+							) }
 							style={ {
 								paddingTop: showFrame ? canvasPadding : 0,
 								paddingBottom: showFrame ? canvasPadding : 0,
@@ -191,9 +250,10 @@ export default function Layout( { onError } ) {
 									className="edit-site-layout__canvas"
 									transition={ {
 										type: 'tween',
-										duration: disableMotion
-											? 0
-											: ANIMATION_DURATION,
+										duration:
+											disableMotion || isResizing
+												? 0
+												: ANIMATION_DURATION,
 										ease: 'easeOut',
 									} }
 								>
@@ -213,9 +273,10 @@ export default function Layout( { onError } ) {
 										} }
 										transition={ {
 											type: 'tween',
-											duration: disableMotion
-												? 0
-												: ANIMATION_DURATION,
+											duration:
+												disableMotion || isResizing
+													? 0
+													: ANIMATION_DURATION,
 											ease: 'easeOut',
 										} }
 									>

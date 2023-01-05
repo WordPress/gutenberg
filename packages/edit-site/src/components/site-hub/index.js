@@ -30,9 +30,9 @@ import useEditedEntityRecord from '../use-edited-entity-record';
 const HUB_ANIMATION_DURATION = 0.3;
 
 function SiteHub( {
-	className,
 	isMobileCanvasVisible,
 	setIsMobileCanvasVisible,
+	...props
 } ) {
 	const { params } = useLocation();
 	const isListPage = getIsListPage( params );
@@ -81,7 +81,8 @@ function SiteHub( {
 
 	return (
 		<motion.div
-			className={ classnames( 'edit-site-site-hub', className ) }
+			{ ...props }
+			className={ classnames( 'edit-site-site-hub', props.className ) }
 			layout
 			transition={ {
 				type: 'tween',
