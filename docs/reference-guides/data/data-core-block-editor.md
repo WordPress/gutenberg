@@ -570,6 +570,18 @@ _Returns_
 
 -   `string|undefined`: Client Id of the last inserted block.
 
+### getLastInsertedBlocksClientIds
+
+Gets the client ids of the last inserted blocks.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `Array|undefined`: Client Ids of the last inserted block(s).
+
 ### getLastMultiSelectedBlockClientId
 
 Returns the client ID of the last block in the multi-selection set, or null
