@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -27,7 +32,14 @@ import {
 	DropdownMenu,
 } from '../..';
 
-export default { title: 'Components/Toolbar', component: Toolbar };
+const meta: ComponentMeta< typeof Toolbar > = {
+	title: 'Components/Toolbar',
+	component: Toolbar,
+	parameters: {
+		controls: { expanded: true },
+	},
+};
+export default meta;
 
 function InlineImageIcon() {
 	return (
@@ -38,10 +50,10 @@ function InlineImageIcon() {
 }
 
 /* eslint-disable no-restricted-syntax */
-export const _default = () => {
+const DefaultTemplate: ComponentStory< typeof Toolbar > = ( args ) => {
 	return (
 		// id is required for server side rendering
-		<Toolbar label="Options" id="options-toolbar">
+		<Toolbar id="options-toolbar" { ...args }>
 			<ToolbarGroup>
 				<ToolbarButton icon={ paragraph } label="Paragraph" />
 			</ToolbarGroup>
@@ -109,10 +121,15 @@ export const _default = () => {
 	);
 };
 
-export const withoutGroup = () => {
+export const Default: ComponentStory< typeof Toolbar > = DefaultTemplate.bind(
+	{}
+);
+Default.args = { label: 'Options' };
+
+const WithoutGroupTemplate: ComponentStory< typeof Toolbar > = ( args ) => {
 	return (
 		// id is required for server side rendering
-		<Toolbar label="Options" id="options-toolbar-without-group">
+		<Toolbar id="options-toolbar-without-group" { ...args }>
 			<ToolbarButton icon={ formatBold } label="Bold" isPressed />
 			<ToolbarButton icon={ formatItalic } label="Italic" />
 			<ToolbarButton icon={ link } label="Link" />
@@ -121,12 +138,16 @@ export const withoutGroup = () => {
 };
 /* eslint-enable no-restricted-syntax */
 
-export const toolbars = () => {
+export const WithoutGroup: ComponentStory< typeof Toolbar > =
+	WithoutGroupTemplate.bind( {} );
+WithoutGroup.args = { label: 'Options' };
+
+const ToolbarsTemplate: ComponentStory< typeof Toolbar > = ( args ) => {
 	return (
 		<div>
 			<div style={ { padding: '20px' } }>
 				<h2>Icon-only Toolbar</h2>
-				<Toolbar>
+				<Toolbar { ...args }>
 					<ToolbarButton icon={ formatBold } title="Bold" />
 					<ToolbarButton
 						icon={ formatItalic }
@@ -139,7 +160,7 @@ export const toolbars = () => {
 
 			<div style={ { padding: '20px' } }>
 				<h2>Text-only Toolbar</h2>
-				<Toolbar>
+				<Toolbar { ...args }>
 					<ToolbarButton>Bold Format</ToolbarButton>
 					<ToolbarButton isActive>Italic Format</ToolbarButton>
 					<ToolbarButton>Link Format</ToolbarButton>
@@ -148,7 +169,7 @@ export const toolbars = () => {
 
 			<div style={ { padding: '20px' } }>
 				<h2>Text and Icon Toolbar</h2>
-				<Toolbar>
+				<Toolbar { ...args }>
 					<ToolbarButton icon={ formatBold } title="Bold" />
 					<ToolbarButton isActive>Bold Format</ToolbarButton>
 					<ToolbarButton icon={ formatItalic } title="Italic" />
@@ -160,17 +181,24 @@ export const toolbars = () => {
 
 			<div style={ { padding: '20px' } }>
 				<h2>Single Icon Button Toolbar</h2>
-				<Toolbar>
+				<Toolbar { ...args }>
 					<ToolbarButton icon={ formatBold } title="Bold" />
 				</Toolbar>
 			</div>
 
 			<div style={ { padding: '20px' } }>
 				<h2>Single Text Button toolbar</h2>
-				<Toolbar>
+				<Toolbar { ...args }>
 					<ToolbarButton>Bold Toolbar</ToolbarButton>
 				</Toolbar>
 			</div>
 		</div>
 	);
+};
+
+export const Toolbars: ComponentStory< typeof Toolbar > = ToolbarsTemplate.bind(
+	{}
+);
+Toolbars.args = {
+	label: 'Example',
 };
