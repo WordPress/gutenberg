@@ -17,8 +17,6 @@ const meta: ComponentMeta< typeof ResizableBox > = {
 	title: 'Components/ResizableBox',
 	component: ResizableBox,
 	argTypes: {
-		minHeight: { control: 'number' },
-		minWidth: { control: 'number' },
 		onResizeStop: { action: 'onResizeStop' },
 	},
 	parameters: {
