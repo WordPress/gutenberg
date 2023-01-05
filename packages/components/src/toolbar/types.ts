@@ -16,7 +16,7 @@ export type ToolbarProps = {
 	/**
 	 * Children to render in the toolbar.
 	 */
-	children: ReactNode;
+	children?: ReactNode;
 } & ReakitToolbarProps;
 
 export type ToolbarContainerProps = ReakitToolbarProps &
