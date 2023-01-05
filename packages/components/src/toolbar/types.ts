@@ -6,6 +6,10 @@ import type { ToolbarProps as ReakitToolbarProps } from 'reakit/Toolbar';
 
 export type ToolbarProps = {
 	/**
+	 * Children to render in the toolbar.
+	 */
+	children?: ReactNode;
+	/**
 	 * Class to set on the container div.
 	 */
 	className?: string;
@@ -13,10 +17,6 @@ export type ToolbarProps = {
 	 * An accessible label for the toolbar.
 	 */
 	label: string;
-	/**
-	 * Children to render in the toolbar.
-	 */
-	children?: ReactNode;
 } & ReakitToolbarProps;
 
 export type ToolbarContainerProps = ReakitToolbarProps &
