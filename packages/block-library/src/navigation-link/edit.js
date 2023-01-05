@@ -435,7 +435,11 @@ export default function NavigationLinkEdit( {
 					<TextControl
 						value={ url || '' }
 						onChange={ ( urlValue ) => {
-							setAttributes( { url: urlValue } );
+							updateAttributes(
+								{ url: urlValue },
+								setAttributes,
+								attributes
+							);
 						} }
 						label={ __( 'URL' ) }
 						autoComplete="off"
