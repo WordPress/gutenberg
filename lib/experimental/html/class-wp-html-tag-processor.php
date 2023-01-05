@@ -1413,11 +1413,20 @@ class WP_HTML_Tag_Processor {
 	}
 
 	/**
-	 * Returns the names of all attributes matching a given prefix in the currently-opened tag.
+	 * Returns the (lowercase) names of all attributes matching a given prefix in the currently-opened tag.
+	 *
+	 * Note that matching is case-insensitive. This is in accordance with the spec:
+	 *
+	 * > There must never be two or more attributes on
+	 * > the same start tag whose names are an ASCII
+	 * > case-insensitive match for each other.
+	 *     - HTML 5 spec
+	 *
+	 * @see https://html.spec.whatwg.org/multipage/syntax.html#attributes-2:ascii-case-insensitive
 	 *
 	 * Example:
 	 * <code>
-	 *     $p = new WP_HTML_Tag_Processor( '<div data-enabled class="test" data-test-id="14">Test</div>' );
+	 *     $p = new WP_HTML_Tag_Processor( '<div data-ENABLED class="test" DATA-test-id="14">Test</div>' );
 	 *     $p->next_tag( [ 'class_name' => 'test' ] ) === true;
 	 *     $p->get_attribute_names_with_prefix( 'data-' ) === array( 'data-enabled', 'data-test-id' );
 	 *
