@@ -2655,10 +2655,21 @@ export function wasBlockJustInserted( state, clientId, source ) {
 /**
  * Gets the client id of the last inserted block.
  *
+ * @deprecated
  * @param {Object} state Global application state.
  * @return {string|undefined} Client Id of the last inserted block.
  */
-export function __experimentalGetLastInsertedBlockClientId( state ) {
+export function getLastInsertedBlockClientId( state ) {
+	deprecated(
+		'wp.data.select( "core/block-editor" ).getLastInsertedBlockClientId',
+		{
+			since: '15.0',
+			plugin: 'Gutenberg',
+			alternative:
+				'wp.data.select( "core/block-editor" ).getLastInsertedBlocksClientIds',
+		}
+	);
+
 	return (
 		state?.lastBlockInserted?.clientIds?.length &&
 		state?.lastBlockInserted?.clientIds[ 0 ]
