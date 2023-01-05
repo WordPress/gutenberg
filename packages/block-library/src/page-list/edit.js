@@ -41,6 +41,63 @@ import { convertDescription } from './constants';
 const MAX_PAGE_COUNT = 100;
 const NOOP = () => {};
 
+function BlockContent( {
+	blockProps,
+	innerBlocksProps,
+	hasResolvedPages,
+	totalPages,
+	blockList,
+	pages,
+} ) {
+	if ( ! hasResolvedPages ) {
+		return (
+			<div { ...blockProps }>
+				<Spinner />
+			</div>
+		);
+	}
+
+	if ( totalPages === null ) {
+		return (
+			<div { ...blockProps }>
+				<Notice status={ 'warning' } isDismissible={ false }>
+					{ __( 'Page List: Cannot retrieve Pages.' ) }
+				</Notice>
+			</div>
+		);
+	}
+
+	if ( totalPages === 0 ) {
+		return (
+			<div { ...blockProps }>
+				<Notice status={ 'info' } isDismissible={ false }>
+					{ __( 'Page List: Cannot retrieve Pages.' ) }
+				</Notice>
+			</div>
+		);
+	}
+
+	if ( blockList.length === 0 ) {
+		const parentPageDetails =
+			pages && pages.find( ( page ) => page.id === parentPageID );
+		return (
+			<div { ...blockProps }>
+				<Warning>
+					{ sprintf(
+						// translators: %s: Page title.
+						__( '"%s" page has no children.' ),
+						parentPageDetails.title.rendered
+					) }
+				</Warning>
+			</div>
+		);
+	}
+
+	if ( totalPages > 0 ) {
+		return <ul { ...innerBlocksProps }></ul>;
+	}
+}
+
 export default function PageListEdit( {
 	context,
 	clientId,
@@ -137,56 +194,6 @@ export default function PageListEdit( {
 		value: blockList,
 	} );
 
-	const getBlockContent = () => {
-		if ( ! hasResolvedPages ) {
-			return (
-				<div { ...blockProps }>
-					<Spinner />
-				</div>
-			);
-		}
-
-		if ( totalPages === null ) {
-			return (
-				<div { ...blockProps }>
-					<Notice status={ 'warning' } isDismissible={ false }>
-						{ __( 'Page List: Cannot retrieve Pages.' ) }
-					</Notice>
-				</div>
-			);
-		}
-
-		if ( totalPages === 0 ) {
-			return (
-				<div { ...blockProps }>
-					<Notice status={ 'info' } isDismissible={ false }>
-						{ __( 'Page List: Cannot retrieve Pages.' ) }
-					</Notice>
-				</div>
-			);
-		}
-
-		if ( blockList.length === 0 ) {
-			const parentPageDetails =
-				pages && pages.find( ( page ) => page.id === parentPageID );
-			return (
-				<div { ...blockProps }>
-					<Warning>
-						{ sprintf(
-							// translators: %s: Page title.
-							__( '"%s" page has no children.' ),
-							parentPageDetails.title.rendered
-						) }
-					</Warning>
-				</div>
-			);
-		}
-
-		if ( totalPages > 0 ) {
-			return <ul { ...innerBlocksProps }></ul>;
-		}
-	};
-
 	const { replaceBlock, selectBlock } = useDispatch( blockEditorStore );
 
 	const { parentNavBlockClientId, isNested } = useSelect(
@@ -271,8 +278,14 @@ export default function PageListEdit( {
 					clientId={ clientId }
 				/>
 			) }
-
-			{ getBlockContent() }
+			<BlockContent
+				blockProps={ blockProps }
+				innerBlocksProps={ innerBlocksProps }
+				hasResolvedPages={ hasResolvedPages }
+				totalPages={ totalPages }
+				blockList={ blockList }
+				pages={ pages }
+			/>
 		</>
 	);
 }
