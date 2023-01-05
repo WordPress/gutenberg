@@ -56,12 +56,14 @@ jobs:
                   node-version-file: '.nvmrc'
                   cache: npm
 
-            - name: Npm install and build
+            # Changing into the action's directory and running `npm install` is much
+            # faster than a full project-wide `npm ci`.
+            - name: npm install and build
               if: ${{ steps.download-artifact.outputs.result == 'true' }}
-              # TODO: We don't have to build the entire project, just the action itself.
+              working-directory: packages/report-flaky-tests
               run: |
-                  npm ci
-                  npm run build:packages
+                  npm install
+                  npm run bundle
 
             - name: Report flaky tests
               if: ${{ steps.download-artifact.outputs.result == 'true' }}
