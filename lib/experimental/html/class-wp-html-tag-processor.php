@@ -1419,10 +1419,10 @@ class WP_HTML_Tag_Processor {
 	 * <code>
 	 *     $p = new WP_HTML_Tag_Processor( '<div data-enabled class="test" data-test-id="14">Test</div>' );
 	 *     $p->next_tag( [ 'class_name' => 'test' ] ) === true;
-	 *     $p->get_attribute_names_with_prefix() === array( 'data-enabled', 'data-test-id' );
+	 *     $p->get_attribute_names_with_prefix( 'data-' ) === array( 'data-enabled', 'data-test-id' );
 	 *
 	 *     $p->next_tag( [] ) === false;
-	 *     $p->get_attribute_names_with_prefix() === null;
+	 *     $p->get_attribute_names_with_prefix( 'data-' ) === null;
 	 * </code>
 	 *
 	 * @since 6.2.0
