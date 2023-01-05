@@ -6,6 +6,10 @@
 
 -   `Dashicon`: remove unnecessary type for `className` prop ([46849](https://github.com/WordPress/gutenberg/pull/46849)).
 
+### Bug Fix
+
+-   `Placeholder`: set fixed right margin for label's icon ([46918](https://github.com/WordPress/gutenberg/pull/46918)).
+
 ## 23.1.0 (2023-01-02)
 
 ## 23.0.0 (2022-12-14)
@@ -76,6 +80,7 @@
 -   `TabPanel`: Add ability to set icon only tab buttons ([#45005](https://github.com/WordPress/gutenberg/pull/45005)).
 
 ### Internal
+
 -   `AnglePickerControl`: remove `:focus-visible' outline on `CircleOutlineWrapper` ([#45758](https://github.com/WordPress/gutenberg/pull/45758))
 
 ### Bug Fix
