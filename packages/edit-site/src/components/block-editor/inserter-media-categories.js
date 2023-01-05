@@ -119,7 +119,7 @@ const inserterMediaCategories = [
 			const defaultArgs = {
 				mature: false,
 				excluded_source: 'flickr',
-				license: 'cc0',
+				license: 'pdm,cc0',
 			};
 			const finalQuery = { ...query, ...defaultArgs };
 			const mapFromInserterMediaRequest = {
@@ -140,7 +140,7 @@ const inserterMediaCategories = [
 				...result,
 				// This is a temp solution for better titles, until Openverse API
 				// completes the cleaning up of some titles of their upstream data.
-				title: result.title?.startsWith( 'File:' )
+				title: result.title?.toLowerCase().startsWith( 'file:' )
 					? result.title.slice( 5 )
 					: result.title,
 			} ) );
