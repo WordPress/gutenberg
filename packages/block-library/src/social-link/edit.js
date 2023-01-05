@@ -106,7 +106,7 @@ const SocialLinkEdit = ( {
 							help={ __(
 								'Briefly describe the link to help screen reader users.'
 							) }
-							value={ label }
+							value={ label || '' }
 							onChange={ ( value ) =>
 								setAttributes( { label: value } )
 							}
