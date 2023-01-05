@@ -101,6 +101,8 @@ export default function Layout( { onError } ) {
 	const [ fullResizer, fullSize ] = useResizeObserver();
 	const [ forcedWidth, setForcedWidth ] = useState( null );
 	const [ isResizing, setIsResizing ] = useState( false );
+	const isResizingEnabled = ! isMobileViewport && canvasMode === 'view';
+	const defaultSidebarWidth = isMobileViewport ? '100vw' : 360;
 	useEffect( () => {
 		if ( canvasMode === 'view' && isMobileViewport ) {
 			setIsMobileCanvasVisible( false );
@@ -129,7 +131,10 @@ export default function Layout( { onError } ) {
 				<SiteHub
 					className="edit-site-layout__hub"
 					style={ {
-						width: forcedWidth ? forcedWidth - 48 : undefined,
+						width:
+							isResizingEnabled && forcedWidth
+								? forcedWidth - 48
+								: undefined,
 					} }
 					isMobileCanvasVisible={ isMobileCanvasVisible }
 					setIsMobileCanvasVisible={ setIsMobileCanvasVisible }
@@ -188,18 +193,13 @@ export default function Layout( { onError } ) {
 								size={ {
 									height: '100%',
 									width:
-										! isMobileViewport &&
-										isEditorPage &&
-										canvasMode === 'view'
-											? forcedWidth ?? 360
-											: undefined,
+										isResizingEnabled && forcedWidth
+											? forcedWidth
+											: defaultSidebarWidth,
 								} }
 								className="edit-site-layout__sidebar"
 								enable={ {
-									right:
-										! isMobileViewport &&
-										isEditorPage &&
-										canvasMode === 'view',
+									right: isResizingEnabled,
 								} }
 								onResizeStop={ ( event, direction, elt ) => {
 									setForcedWidth( elt.clientWidth );
@@ -215,9 +215,11 @@ export default function Layout( { onError } ) {
 								handleStyles={ {
 									right: emptyResizeHandleStyles,
 								} }
-								minWidth={ 320 }
+								minWidth={ isResizingEnabled ? 320 : undefined }
 								maxWidth={
-									fullSize ? fullSize.width - 360 : undefined
+									isResizingEnabled && fullSize
+										? fullSize.width - 360
+										: undefined
 								}
 							>
 								<NavigableRegion

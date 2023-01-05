@@ -78,7 +78,7 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 
 	// This is only necessary for the exit animation
 	.edit-site-layout.is-full-canvas & {
-		position: fixed;
+		position: fixed !important;
 		height: 100vh;
 		left: 0;
 		top: 0;
