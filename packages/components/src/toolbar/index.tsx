@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import type { ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
@@ -37,7 +38,7 @@ import { ToolbarProps } from './types';
  */
 function UnforwardedToolbar(
 	{ className, label, ...props }: ToolbarProps,
-	ref
+	ref: ForwardedRef< any >
 ) {
 	if ( ! label ) {
 		deprecated( 'Using Toolbar without label prop', {
