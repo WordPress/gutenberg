@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { memo } from '@wordpress/element';
+import { memo, useRef } from '@wordpress/element';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 
 /**
@@ -12,6 +12,7 @@ import { useListViewContext } from './context';
 import { isClientIdSelected } from './utils';
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
+import useListViewScrollIntoView from './use-list-view-scroll-into-view';
 
 /**
  * Given a block, returns the total number of blocks in that subtree. This is used to help determine
@@ -116,6 +117,16 @@ function ListViewBranch( props ) {
 
 	const { expandedState, draggedClientIds } = useListViewContext();
 
+	// For long lists where the selected item may fall outside of the current window,
+	// pass a reference to the corresponding placeholder row for the selected item.
+	// The "real" selected item is also observed in ListViewBlock, when rendered.
+	const invisibleSelectedItemRef = useRef();
+	useListViewScrollIntoView( {
+		firstSelectedBlockClientId: selectedClientIds?.[ 0 ],
+		numBlocksSelected: selectedClientIds?.length,
+		selectedItemRef: invisibleSelectedItemRef,
+	} );
+
 	if ( ! canParentExpand ) {
 		return null;
 	}
@@ -187,7 +198,13 @@ function ListViewBranch( props ) {
 							/>
 						) }
 						{ ! showBlock && (
-							<tr>
+							<tr
+								ref={
+									clientId === selectedClientIds[ 0 ]
+										? invisibleSelectedItemRef
+										: undefined
+								}
+							>
 								<td className="block-editor-list-view-placeholder" />
 							</tr>
 						) }

@@ -27,6 +27,7 @@ import { sprintf, __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import ListViewLeaf from './leaf';
+import useListViewScrollIntoView from './use-list-view-scroll-into-view';
 import {
 	BlockMoverUpButton,
 	BlockMoverDownButton,
@@ -219,6 +220,14 @@ function ListViewBlock( {
 	const dropdownClientIds = selectedClientIds.includes( clientId )
 		? selectedClientIds
 		: [ clientId ];
+
+	// When the block is selected, pass in the ref to the selected item, so that it can be scrolled into view.
+	// For long lists, the placeholder for the selected block is also observed, within ListViewBranch.
+	useListViewScrollIntoView( {
+		firstSelectedBlockClientId: selectedClientIds?.[ 0 ],
+		numBlocksSelected: selectedClientIds?.length,
+		selectedItemRef: isSelected ? cellRef : undefined,
+	} );
 
 	return (
 		<ListViewLeaf
