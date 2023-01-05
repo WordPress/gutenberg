@@ -14,18 +14,14 @@ import deprecated from '@wordpress/deprecated';
  */
 import ToolbarGroup from '../toolbar-group';
 import ToolbarContainer from './toolbar-container';
+import { ToolbarProps } from './types';
 
 /**
  * Renders a toolbar.
  *
  * To add controls, simply pass `ToolbarButton` components as children.
- *
- * @param {Object} props             Component props.
- * @param {string} [props.className] Class to set on the container div.
- * @param {string} [props.label]     ARIA label for toolbar container.
- * @param {Object} ref               React Element ref.
  */
-function Toolbar( { className, label, ...props }, ref ) {
+function Toolbar( { className, label, ...props }: ToolbarProps, ref ) {
 	if ( ! label ) {
 		deprecated( 'Using Toolbar without label prop', {
 			since: '5.6',

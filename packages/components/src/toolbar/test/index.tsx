@@ -6,7 +6,7 @@ import { render, screen } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import Toolbar from '../';
+import Toolbar from '..';
 import ToolbarButton from '../../toolbar-button';
 
 describe( 'Toolbar', () => {
