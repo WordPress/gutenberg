@@ -19,7 +19,7 @@ export type ToolbarProps = {
 	label: string;
 } & ReakitToolbarProps;
 
-export type ToolbarContainerProps = ReakitToolbarProps &
-	Pick< ToolbarProps, 'label' > & {
+export type ToolbarContainerProps = Pick< ToolbarProps, 'label' > &
+	ReakitToolbarProps & {
 		className: string;
 	};
