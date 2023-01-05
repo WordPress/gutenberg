@@ -20,8 +20,25 @@ import { ToolbarProps } from './types';
  * Renders a toolbar.
  *
  * To add controls, simply pass `ToolbarButton` components as children.
+ *
+ * ```jsx
+ * import { Toolbar, ToolbarButton } from '@wordpress/components';
+ * import { formatBold, formatItalic, link } from '@wordpress/icons';
+ *
+ * function MyToolbar() {
+ *   return (
+ *     <Toolbar label="Options">
+ *       <ToolbarButton icon={ formatBold } label="Bold" />
+ *       <ToolbarButton icon={ formatItalic } label="Italic" />
+ *       <ToolbarButton icon={ link } label="Link" />
+ *     </Toolbar>
+ *   );
+ * }
  */
-function Toolbar( { className, label, ...props }: ToolbarProps, ref ) {
+function UnforwardedToolbar(
+	{ className, label, ...props }: ToolbarProps,
+	ref
+) {
 	if ( ! label ) {
 		deprecated( 'Using Toolbar without label prop', {
 			since: '5.6',
@@ -45,4 +62,5 @@ function Toolbar( { className, label, ...props }: ToolbarProps, ref ) {
 	);
 }
 
-export default forwardRef( Toolbar );
+export const Toolbar = forwardRef( UnforwardedToolbar );
+export default Toolbar;

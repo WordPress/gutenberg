@@ -59,6 +59,12 @@ function MyToolbar() {
 
 Toolbar will pass all HTML props to the underlying element. Additionally, you can pass the custom props specified below.
 
+#### `children`: `ReactNode`
+
+Children to render in the toolbar.
+
+-    Required: No
+
 #### `className`: `string`
 
 Class to set on the container div.
