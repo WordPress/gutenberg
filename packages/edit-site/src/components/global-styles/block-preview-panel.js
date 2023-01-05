@@ -12,13 +12,19 @@ const BlockPreviewPanel = ( { name, variation = '' } ) => {
 		{ width: containerWidth, height: containerHeight },
 	] = useResizeObserver();
 	const blockExample = getBlockType( name )?.example;
-	if ( variation ) {
-		blockExample.attributes = {
+	const blockExampleWithVariation = {
+		...blockExample,
+		attributes: {
 			...blockExample.attributes,
 			className: variation,
-		};
-	}
-	const blocks = blockExample && getBlockFromExample( name, blockExample );
+		},
+	};
+	const blocks =
+		blockExample &&
+		getBlockFromExample(
+			name,
+			variation ? blockExampleWithVariation : blockExample
+		);
 	const viewportWidth = blockExample?.viewportWidth || containerWidth;
 	const minHeight = containerHeight;
 
