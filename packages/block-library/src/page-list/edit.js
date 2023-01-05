@@ -40,6 +40,7 @@ import { convertDescription } from './constants';
 // Performance of Navigation Links is not good past this value.
 const MAX_PAGE_COUNT = 100;
 const NOOP = () => {};
+const EMPTY_ARR = [];
 
 function BlockContent( {
 	blockProps,
@@ -105,23 +106,20 @@ export default function PageListEdit( {
 	setAttributes,
 } ) {
 	const { parentPageID } = attributes;
-	const { records: pages, hasResolved: hasResolvedPages } = useEntityRecords(
-		'postType',
-		'page',
-		{
+	const { records: pages = EMPTY_ARR, hasResolved: hasResolvedPages } =
+		useEntityRecords( 'postType', 'page', {
 			orderby: 'menu_order',
 			order: 'asc',
 			_fields: [ 'id', 'link', 'parent', 'title', 'menu_order' ],
 			per_page: -1,
 			context: 'view',
-		}
-	);
+		} );
 	useMemo( () => {
 		// TODO: Once the REST API supports passing multiple values to
 		// 'orderby', this can be removed.
 		// https://core.trac.wordpress.org/ticket/39037
 
-		const sortedPages = [ ...( pages ?? [] ) ].sort( ( a, b ) => {
+		const sortedPages = pages.sort( ( a, b ) => {
 			if ( a.menu_order === b.menu_order ) {
 				return a.title.rendered.localeCompare( b.title.rendered );
 			}
