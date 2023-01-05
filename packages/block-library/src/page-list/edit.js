@@ -23,30 +23,31 @@ import {
 	Notice,
 	ComboboxControl,
 	Button,
+	Modal,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState, useEffect } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import ConvertToLinksModal from './convert-to-links-modal';
-import { convertToNavigationLinks } from './convert-to-navigation-links';
-import { convertDescription } from './constants';
+import { useConvertToNavigationLinks } from './use-convert-to-navigation-links';
 
 // We only show the edit option when page count is <= MAX_PAGE_COUNT
 // Performance of Navigation Links is not good past this value.
 const MAX_PAGE_COUNT = 100;
 const NOOP = () => {};
-const EMPTY_ARR = [];
+
+const convertDescription = __(
+	'This menu is automatically kept in sync with pages on your site. You can manage the menu yourself by clicking customize below.'
+);
 
 function BlockContent( {
 	blockProps,
 	innerBlocksProps,
 	hasResolvedPages,
-	totalPages,
 	blockList,
 	pages,
 } ) {
@@ -58,7 +59,7 @@ function BlockContent( {
 		);
 	}
 
-	if ( totalPages === null ) {
+	if ( pages === null ) {
 		return (
 			<div { ...blockProps }>
 				<Notice status={ 'warning' } isDismissible={ false }>
@@ -68,7 +69,7 @@ function BlockContent( {
 		);
 	}
 
-	if ( totalPages === 0 ) {
+	if ( pages.length === 0 ) {
 		return (
 			<div { ...blockProps }>
 				<Notice status={ 'info' } isDismissible={ false }>
@@ -79,8 +80,9 @@ function BlockContent( {
 	}
 
 	if ( blockList.length === 0 ) {
-		const parentPageDetails =
-			pages && pages.find( ( page ) => page.id === parentPageID );
+		const parentPageDetails = pages.find(
+			( page ) => page.id === parentPageID
+		);
 		return (
 			<div { ...blockProps }>
 				<Warning>
@@ -94,9 +96,52 @@ function BlockContent( {
 		);
 	}
 
-	if ( totalPages > 0 ) {
+	if ( pages.length > 0 ) {
 		return <ul { ...innerBlocksProps }></ul>;
 	}
+}
+
+function ConvertToLinksModal( { onClick, disabled } ) {
+	const [ isOpen, setOpen ] = useState( false );
+	const openModal = () => setOpen( true );
+	const closeModal = () => setOpen( false );
+
+	return (
+		<>
+			<BlockControls group="other">
+				<ToolbarButton title={ __( 'Edit' ) } onClick={ openModal }>
+					{ __( 'Edit' ) }
+				</ToolbarButton>
+			</BlockControls>
+			{ isOpen && (
+				<Modal
+					closeLabel={ __( 'Close' ) }
+					onRequestClose={ closeModal }
+					title={ __( 'Customize this menu' ) }
+					className={ 'wp-block-page-list-modal' }
+					aria={ {
+						describedby: 'wp-block-page-list-modal__description',
+					} }
+				>
+					<p id={ 'wp-block-page-list-modal__description' }>
+						{ convertDescription }
+					</p>
+					<div className="wp-block-page-list-modal-buttons">
+						<Button variant="tertiary" onClick={ closeModal }>
+							{ __( 'Cancel' ) }
+						</Button>
+						<Button
+							variant="primary"
+							disabled={ disabled }
+							onClick={ onClick }
+						>
+							{ __( 'Customize' ) }
+						</Button>
+					</div>
+				</Modal>
+			) }
+		</>
+	);
 }
 
 export default function PageListEdit( {
@@ -106,26 +151,47 @@ export default function PageListEdit( {
 	setAttributes,
 } ) {
 	const { parentPageID } = attributes;
-	const { records: pages = EMPTY_ARR, hasResolved: hasResolvedPages } =
-		useEntityRecords( 'postType', 'page', {
+
+	const { records: pages, hasResolved: hasResolvedPages } = useEntityRecords(
+		'postType',
+		'page',
+		{
+			per_page: MAX_PAGE_COUNT,
+			_fields: [ 'id', 'link', 'menu_order', 'parent', 'title', 'type' ],
+			// TODO: When https://core.trac.wordpress.org/ticket/39037 REST API support for multiple orderby
+			// values is resolved, update 'orderby' to [ 'menu_order', 'post_title' ] to provide a consistent
+			// sort.
 			orderby: 'menu_order',
 			order: 'asc',
-			_fields: [ 'id', 'link', 'parent', 'title', 'menu_order' ],
-			per_page: -1,
-			context: 'view',
-		} );
-	useMemo( () => {
+		}
+	);
+
+	const allowConvertToLinks =
+		'showSubmenuIcon' in context &&
+		pages?.length > 0 &&
+		pages?.length <= MAX_PAGE_COUNT;
+
+	const convertToNavigationLinks = useConvertToNavigationLinks( {
+		clientId,
+		pages,
+	} );
+
+	const pagesByParentId = useMemo( () => {
+		if ( pages === null ) {
+			return new Map();
+		}
+
 		// TODO: Once the REST API supports passing multiple values to
 		// 'orderby', this can be removed.
 		// https://core.trac.wordpress.org/ticket/39037
-
 		const sortedPages = pages.sort( ( a, b ) => {
 			if ( a.menu_order === b.menu_order ) {
 				return a.title.rendered.localeCompare( b.title.rendered );
 			}
 			return a.menu_order - b.menu_order;
 		} );
-		const pagesByParentId = sortedPages.reduce( ( accumulator, page ) => {
+
+		return sortedPages.reduce( ( accumulator, page ) => {
 			const { parent } = page;
 			if ( accumulator.has( parent ) ) {
 				accumulator.get( parent ).push( page );
@@ -134,21 +200,7 @@ export default function PageListEdit( {
 			}
 			return accumulator;
 		}, new Map() );
-
-		return {
-			pagesByParentId,
-			hasResolvedPages,
-			totalPages: pages?.length ?? null,
-		};
-	}, [ pages, hasResolvedPages ] );
-
-	const isNavigationChild = 'showSubmenuIcon' in context;
-	const allowConvertToLinks =
-		isNavigationChild && totalPages <= MAX_PAGE_COUNT;
-
-	const [ isOpen, setOpen ] = useState( false );
-	const openModal = () => setOpen( true );
-	const closeModal = () => setOpen( false );
+	}, [ pages ] );
 
 	const blockProps = useBlockProps( {
 		className: classnames( 'wp-block-page-list', {
@@ -228,27 +280,16 @@ export default function PageListEdit( {
 		value: blockList,
 	} );
 
-	const { replaceBlock, selectBlock } = useDispatch( blockEditorStore );
-
-	const { parentNavBlockClientId, isNested } = useSelect(
+	const { isNested } = useSelect(
 		( select ) => {
-			const { getSelectedBlockClientId, getBlockParentsByBlockName } =
-				select( blockEditorStore );
-
-			const _selectedBlockClientId = getSelectedBlockClientId();
-
+			const { getBlockParentsByBlockName } = select( blockEditorStore );
+			const blockParents = getBlockParentsByBlockName(
+				clientId,
+				'core/navigation-submenu',
+				true
+			);
 			return {
-				parentNavBlockClientId: getBlockParentsByBlockName(
-					_selectedBlockClientId,
-					'core/navigation',
-					true
-				)[ 0 ],
-				isNested:
-					getBlockParentsByBlockName(
-						clientId,
-						'core/navigation-submenu',
-						true
-					).length > 0,
+				isNested: blockParents.length > 0,
 			};
 		},
 		[ clientId ]
@@ -261,22 +302,13 @@ export default function PageListEdit( {
 	return (
 		<>
 			<InspectorControls>
-				{ isNavigationChild && pages?.length > 0 && (
+				{ allowConvertToLinks && (
 					<PanelBody title={ __( 'Customize this menu' ) }>
 						<p>{ convertDescription }</p>
 						<Button
 							variant="primary"
 							disabled={ ! hasResolvedPages }
-							onClick={ () => {
-								const navigationLinks =
-									convertToNavigationLinks( pages );
-
-								// Replace the Page List block with the Navigation Links.
-								replaceBlock( clientId, navigationLinks );
-
-								// Select the Navigation block to reveal the changes.
-								selectBlock( parentNavBlockClientId );
-							} }
+							onClick={ convertToNavigationLinks }
 						>
 							{ __( 'Customize' ) }
 						</Button>
@@ -299,24 +331,16 @@ export default function PageListEdit( {
 					</PanelBody>
 				) }
 			</InspectorControls>
-			{ allowConvertToLinks && totalPages > 0 && (
-				<BlockControls group="other">
-					<ToolbarButton title={ __( 'Edit' ) } onClick={ openModal }>
-						{ __( 'Edit' ) }
-					</ToolbarButton>
-				</BlockControls>
-			) }
-			{ allowConvertToLinks && isOpen && (
+			{ allowConvertToLinks && (
 				<ConvertToLinksModal
-					onClose={ closeModal }
-					clientId={ clientId }
+					disabled={ ! hasResolvedPages }
+					onClick={ convertToNavigationLinks }
 				/>
 			) }
 			<BlockContent
 				blockProps={ blockProps }
 				innerBlocksProps={ innerBlocksProps }
 				hasResolvedPages={ hasResolvedPages }
-				totalPages={ totalPages }
 				blockList={ blockList }
 				pages={ pages }
 			/>
