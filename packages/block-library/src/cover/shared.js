@@ -1,7 +1,14 @@
 /**
+ * External dependencies
+ */
+import { FastAverageColor } from 'fast-average-color';
+
+/**
  * WordPress dependencies
  */
 import { getBlobTypeByURL, isBlobURL } from '@wordpress/blob';
+import { applyFilters } from '@wordpress/hooks';
+import { Platform } from '@wordpress/element';
 
 const POSITION_CLASSNAMES = {
 	'top left': 'is-position-top-left',
@@ -23,6 +30,13 @@ export const COVER_MAX_HEIGHT = 1000;
 export const COVER_DEFAULT_HEIGHT = 300;
 export const DEFAULT_FOCAL_POINT = { x: 0.5, y: 0.5 };
 export const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
+
+export function retrieveFastAverageColor() {
+	if ( ! retrieveFastAverageColor.fastAverageColor ) {
+		retrieveFastAverageColor.fastAverageColor = new FastAverageColor();
+	}
+	return retrieveFastAverageColor.fastAverageColor;
+}
 
 export function mediaPosition( { x, y } = DEFAULT_FOCAL_POINT ) {
 	return `${ Math.round( x * 100 ) }% ${ Math.round( y * 100 ) }%`;
@@ -66,7 +80,7 @@ export function attributesFromMedia( setAttributes, dimRatio ) {
 			mediaType = media.type;
 		}
 
-		setAttributes( {
+		const attributesToSet = {
 			dimRatio: dimRatio === 100 ? 50 : dimRatio,
 			url: media.url,
 			id: media.id,
@@ -76,7 +90,33 @@ export function attributesFromMedia( setAttributes, dimRatio ) {
 			...( mediaType === VIDEO_BACKGROUND_TYPE
 				? { hasParallax: undefined }
 				: {} ),
-		} );
+		};
+
+		if ( Platform.OS === 'web' ) {
+			retrieveFastAverageColor()
+				.getColorAsync( media.url, {
+					// Previously the default color was white, but that changed
+					// in v6.0.0 so it has to be manually set now.
+					defaultColor: [ 255, 255, 255, 255 ],
+					// Errors that come up don't reject the promise, so error
+					// logging has to be silenced with this option.
+					silent: process.env.NODE_ENV === 'production',
+					crossOrigin: applyFilters(
+						'media.crossOrigin',
+						undefined,
+						media.url
+					),
+				} )
+				.then( ( color ) =>
+					setAttributes( {
+						...attributesToSet,
+						customOverlayColor: color.hex,
+					} )
+				)
+				.catch( () => setAttributes( attributesToSet ) );
+		} else {
+			setAttributes( attributesToSet );
+		}
 	};
 }
 

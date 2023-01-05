@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { FastAverageColor } from 'fast-average-color';
 import { colord } from 'colord';
 
 /**
@@ -10,12 +9,10 @@ import { colord } from 'colord';
 import { useEffect, useState } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 
-function retrieveFastAverageColor() {
-	if ( ! retrieveFastAverageColor.fastAverageColor ) {
-		retrieveFastAverageColor.fastAverageColor = new FastAverageColor();
-	}
-	return retrieveFastAverageColor.fastAverageColor;
-}
+/**
+ * Internal dependencies
+ */
+import { retrieveFastAverageColor } from '../shared';
 
 /**
  * useCoverIsDark is a hook that returns a boolean variable specifying if the cover
