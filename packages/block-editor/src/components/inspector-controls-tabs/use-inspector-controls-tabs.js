@@ -42,15 +42,13 @@ export default function useInspectorControlsTabs( blockName ) {
 		color: colorGroup,
 		default: defaultGroup,
 		dimensions: dimensionsGroup,
-		list: listGroup,
 		typography: typographyGroup,
 	} = InspectorControlsGroups;
 
 	// List View Tab: If there are any fills for the list group add that tab.
 	const listViewDisabled = useIsListViewTabDisabled( blockName );
-	const listFills = useSlotFills( listGroup.Slot.__unstableName );
 
-	if ( ! listViewDisabled && !! listFills && listFills.length ) {
+	if ( ! listViewDisabled ) {
 		tabs.push( TAB_LIST_VIEW );
 	}
 

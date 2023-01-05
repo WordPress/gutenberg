@@ -1673,6 +1673,15 @@ export const blockListSettings = ( state = {}, action ) => {
 	return state;
 };
 
+export function defaultInspectorControlsTab( state = null, action ) {
+	switch ( action.type ) {
+		case 'SET_DEFAULT_INSPECTOR_CONTROLS_TAB':
+			return action.tab;
+	}
+
+	return state;
+}
+
 /**
  * Reducer returning which mode is enabled.
  *
@@ -1879,6 +1888,7 @@ export default combineReducers( {
 	settings,
 	preferences,
 	lastBlockAttributesChange,
+	defaultInspectorControlsTab,
 	editorMode,
 	hasBlockMovingClientId,
 	automaticChangeStatus,

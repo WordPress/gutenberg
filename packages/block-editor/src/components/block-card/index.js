@@ -45,13 +45,17 @@ function BlockCard( { title, icon, description, blockType, className } ) {
 		};
 	}, [] );
 
-	const { selectBlock } = useDispatch( blockEditorStore );
+	const { selectBlock, setDefaultInspectorControlsTab } =
+		useDispatch( blockEditorStore );
 
 	return (
 		<div className={ classnames( 'block-editor-block-card', className ) }>
 			{ isOffCanvasNavigationEditorEnabled && parentNavBlockClientId && (
 				<Button
-					onClick={ () => selectBlock( parentNavBlockClientId ) }
+					onClick={ () => {
+						setDefaultInspectorControlsTab( 'list' );
+						selectBlock( parentNavBlockClientId );
+					} }
 					label={ __( 'Go to parent Navigation block' ) }
 					style={
 						// TODO: This style override is also used in ToolsPanelHeader.

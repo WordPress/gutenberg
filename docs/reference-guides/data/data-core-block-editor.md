@@ -477,6 +477,10 @@ _Returns_
 
 -   `Array`: ids of top-level and descendant blocks.
 
+### getDefaultInspectorControlsTab
+
+Undocumented declaration.
+
 ### getDraggedBlockClientIds
 
 Returns the client ids of any blocks being directly dragged.
@@ -1484,6 +1488,10 @@ Action that sets whether given blocks are visible on the canvas.
 _Parameters_
 
 -   _updates_ `Record<string,boolean>`: For each block's clientId, its new visibility setting.
+
+### setDefaultInspectorControlsTab
+
+Undocumented declaration.
 
 ### setHasControlledInnerBlocks
 

@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useSelect } from '@wordpress/data';
 import { TabPanel } from '@wordpress/components';
 
 /**
@@ -10,7 +11,7 @@ import { TAB_SETTINGS, TAB_STYLES, TAB_LIST_VIEW } from './utils';
 import SettingsTab from './settings-tab';
 import StylesTab from './styles-tab';
 import InspectorControls from '../inspector-controls';
-import useIsListViewTabDisabled from './use-is-list-view-tab-disabled';
+import { store as blockEditorStore } from '../../store';
 
 export default function InspectorControlsTabs( {
 	blockName,
@@ -18,14 +19,10 @@ export default function InspectorControlsTabs( {
 	hasBlockStyles,
 	tabs,
 } ) {
-	// The tabs panel will mount before fills are rendered to the list view
-	// slot. This means the list view tab isn't initially included in the
-	// available tabs so the panel defaults selection to the styles tab
-	// which at the time is the first tab. This check allows blocks known to
-	// include the list view tab to set it as the tab selected by default.
-	const initialTabName = ! useIsListViewTabDisabled( blockName )
-		? TAB_LIST_VIEW.name
-		: undefined;
+	const initialTabName = useSelect( ( select ) => {
+		const { getDefaultInspectorControlsTab } = select( blockEditorStore );
+		return getDefaultInspectorControlsTab() ?? TAB_STYLES.name;
+	}, [] );
 
 	return (
 		<TabPanel
@@ -53,7 +50,9 @@ export default function InspectorControlsTabs( {
 
 				if ( tab.name === TAB_LIST_VIEW.name ) {
 					return (
-						<InspectorControls.Slot __experimentalGroup="list" />
+						<div>
+							<InspectorControls.Slot __experimentalGroup="list" />
+						</div>
 					);
 				}
 			} }

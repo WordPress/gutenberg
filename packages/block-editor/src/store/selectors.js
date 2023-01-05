@@ -2534,6 +2534,10 @@ export function isNavigationMode( state ) {
 	return state.editorMode === 'navigation';
 }
 
+export function getDefaultInspectorControlsTab( state ) {
+	return state.defaultInspectorControlsTab;
+}
+
 /**
  * Returns the current editor mode.
  *

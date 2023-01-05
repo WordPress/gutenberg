@@ -1501,6 +1501,12 @@ export const __unstableMarkAutomaticChange =
 		} );
 	};
 
+export const setDefaultInspectorControlsTab =
+	( tab ) =>
+	( { dispatch } ) => {
+		dispatch( { type: 'SET_DEFAULT_INSPECTOR_CONTROLS_TAB', tab } );
+	};
+
 /**
  * Action that enables or disables the navigation mode.
  *
