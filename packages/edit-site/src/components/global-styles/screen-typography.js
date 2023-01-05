@@ -18,6 +18,7 @@ import { useStyle } from './hooks';
 import Subtitle from './subtitle';
 import TypographyPanel from './typography-panel';
 import BlockPreviewPanel from './block-preview-panel';
+import { getVariationClassNameFromPath } from './utils';
 
 function Item( { name, parentMenu, element, label } ) {
 	const hasSupport = ! name;
@@ -78,7 +79,7 @@ function Item( { name, parentMenu, element, label } ) {
 
 function ScreenTypography( { name, variationPath = '' } ) {
 	const parentMenu = name === undefined ? '' : '/blocks/' + name;
-
+	const variationClassName = getVariationClassNameFromPath( variationPath );
 	return (
 		<>
 			<ScreenHeader
@@ -88,7 +89,7 @@ function ScreenTypography( { name, variationPath = '' } ) {
 				) }
 			/>
 
-			<BlockPreviewPanel name={ name } />
+			<BlockPreviewPanel name={ name } variation={ variationClassName } />
 
 			{ ! name && (
 				<div className="edit-site-global-styles-screen-typography">

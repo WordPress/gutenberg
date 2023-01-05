@@ -21,6 +21,7 @@ import { getSupportedGlobalStylesPanels, useStyle } from './hooks';
 import Subtitle from './subtitle';
 import ColorIndicatorWrapper from './color-indicator-wrapper';
 import BlockPreviewPanel from './block-preview-panel';
+import { getVariationClassNameFromPath } from './utils';
 
 function variationPathToURL( variationPath ) {
 	if ( ! variationPath ) {
@@ -231,6 +232,7 @@ function ButtonColorItem( { name, parentMenu, variationPath = '' } ) {
 function ScreenColors( { name, variationPath = '' } ) {
 	const parentMenu =
 		name === undefined ? '' : '/blocks/' + encodeURIComponent( name );
+	const variationClassName = getVariationClassNameFromPath( variationPath );
 
 	return (
 		<>
@@ -241,7 +243,7 @@ function ScreenColors( { name, variationPath = '' } ) {
 				) }
 			/>
 
-			<BlockPreviewPanel name={ name } />
+			<BlockPreviewPanel name={ name } variation={ variationClassName } />
 
 			<div className="edit-site-global-styles-screen-colors">
 				<VStack spacing={ 10 }>
