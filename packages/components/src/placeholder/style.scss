@@ -54,6 +54,10 @@
 		}
 	}
 
+	.dashicon {
+		margin-right: 0.7em;
+	}
+
 	// Don't take up space if the label is empty.
 	&:empty {
 		display: none;
