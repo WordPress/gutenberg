@@ -21,6 +21,7 @@ const LineHeightControl = ( {
 	/** Start opting into the new margin-free styles that will become the default in a future version. */
 	__nextHasNoMarginBottom = false,
 	__unstableInputWidth = '60px',
+	placeholder = BASE_DEFAULT_VALUE,
 	...otherProps
 } ) => {
 	const isDefined = isLineHeightDefined( lineHeight );
@@ -95,7 +96,7 @@ const LineHeightControl = ( {
 				__unstableStateReducer={ stateReducer }
 				onChange={ onChange }
 				label={ __( 'Line height' ) }
-				placeholder={ BASE_DEFAULT_VALUE }
+				placeholder={ placeholder }
 				step={ STEP }
 				value={ value }
 				min={ 0 }
