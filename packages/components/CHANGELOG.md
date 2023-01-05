@@ -8,7 +8,7 @@
 
 ### Bug Fix
 
--   `Placeholder`: fix label icon right margin when using dashicons ([46918](https://github.com/WordPress/gutenberg/pull/46918)).
+-   `Placeholder`: set fixed right margin for label's icon ([46918](https://github.com/WordPress/gutenberg/pull/46918)).
 
 ## 23.1.0 (2023-01-02)
 

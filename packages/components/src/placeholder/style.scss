@@ -45,17 +45,13 @@
 	> svg,
 	.dashicon,
 	.block-editor-block-icon {
-		margin-right: 1ch;
+		margin-right: $grid-unit-15;
 		fill: currentColor;
 		// Optimizate for high contrast modes.
 		// See also https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/.
 		@media (forced-colors: active) {
 			fill: CanvasText;
 		}
-	}
-
-	.dashicon {
-		margin-right: 0.7em;
 	}
 
 	// Don't take up space if the label is empty.
