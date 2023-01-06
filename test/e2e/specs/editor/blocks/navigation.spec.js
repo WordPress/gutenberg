@@ -26,35 +26,30 @@ test.describe(
 			editor,
 			page,
 		} ) => {
+			const pagesRequest = page
+				.waitForRequest( ( response ) => {
+					return response.url().includes( 'rest_route=/wp/v2/pages' );
+				} )
+				.catch( () => {} );
+
+			const menusRequest = page
+				.waitForRequest( ( response ) => {
+					return response.url().includes( 'rest_route=/wp/v2/menus' );
+				} )
+				.catch( () => {} );
+
 			await editor.insertBlock( { name: 'core/navigation' } );
 
-			// Necessary to wait for the block to be in loaded state else
-			// initial rendered state will not be resolved.
-			await page.waitForLoadState( 'networkidle' );
+			await pagesRequest;
+			await menusRequest;
 
-			// Check Page List is in the list view.
+			//await page.waitForTimeout( 10000 );
 
-			// Open the list view.
-			await page.click( '[aria-label="Document Overview"i]' );
+			const pageListBlock = await page.getByRole( 'document', {
+				name: 'Block: Page List',
+			} );
 
-			const listView = await page.locator(
-				`//table[contains(@aria-label,'Block navigation structure')]`
-			);
-
-			// Click the Navigation block expander within the List View.
-			await listView
-				.locator( `//a[.//span[text()='Navigation']]` )
-				.locator( '.block-editor-list-view__expander' )
-				.click( {
-					force: true, // required as element has aria-hidden set to true.);
-				} );
-
-			// Find the Page list selector inside the navigation block.
-			const pageListSelector = await listView.locator(
-				`//a[.//span[text()='Page List']]`
-			);
-
-			await expect( pageListSelector ).toBeVisible();
+			await expect( pageListBlock ).toBeVisible();
 
 			// Check the markup of the block is correct.
 			await editor.publishPost();
