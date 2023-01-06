@@ -537,7 +537,7 @@ describe( 'Manual link entry', () => {
 				} );
 
 				let submitButton = screen.getByRole( 'button', {
-					name: 'Submit',
+					name: 'Apply',
 				} );
 
 				expect( submitButton ).toBeDisabled();
@@ -555,7 +555,7 @@ describe( 'Manual link entry', () => {
 				await user.keyboard( '[Enter]' );
 
 				submitButton = screen.getByRole( 'button', {
-					name: 'Submit',
+					name: 'Apply',
 				} );
 
 				// Verify the UI hasn't allowed submission.
@@ -578,7 +578,7 @@ describe( 'Manual link entry', () => {
 				} );
 
 				let submitButton = screen.queryByRole( 'button', {
-					name: 'Submit',
+					name: 'Apply',
 				} );
 
 				expect( submitButton ).toBeDisabled();
@@ -597,7 +597,7 @@ describe( 'Manual link entry', () => {
 				await user.click( submitButton );
 
 				submitButton = screen.queryByRole( 'button', {
-					name: 'Submit',
+					name: 'Apply',
 				} );
 
 				// Verify the UI hasn't allowed submission.
@@ -1859,7 +1859,7 @@ describe( 'Controlling link title text', () => {
 		expect( textInput ).toHaveValue( textValue );
 
 		const submitButton = screen.queryByRole( 'button', {
-			name: 'Submit',
+			name: 'Apply',
 		} );
 
 		await user.click( submitButton );

@@ -117,7 +117,7 @@ function LinkControl( {
 	value,
 	settings = DEFAULT_LINK_SETTINGS,
 	onChange = noop,
-	onRemove = noop,
+	onRemove,
 	noDirectEntry = false,
 	showSuggestions = true,
 	showInitialSuggestions,
@@ -257,7 +257,7 @@ function LinkControl( {
 			resetInternalValues();
 			stopEditing();
 		} else {
-			onRemove();
+			onRemove?.();
 		}
 	};
 
