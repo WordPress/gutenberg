@@ -77,20 +77,11 @@ $preview-image-height: 140px;
 }
 
 .block-editor-link-control__search-actions {
-	position: absolute;
-	/*
-	 * Actions must be positioned on top of URLInput, since the input will grow
-	 * when suggestions are rendered.
-	 *
-	 * Compensate for:
-	 *  - Border (1px)
-	 *  - Vertically, for the difference in height between the input (40px) and
-	 *    the icon buttons.
-	 *  - Horizontally, pad to the minimum of: default input padding, or the
-	 *    equivalent of the vertical padding.
-	 */
-	top: 1px + ( ( 40px - $button-size ) * 0.5 );
-	right: $grid-unit-20 + 1px + min($grid-unit-10, ( 40px - $button-size ) * 0.5);
+	display: flex;
+	flex-direction: row-reverse; // put "Cancel" on the left but retain DOM order.
+	justify-content: flex-start;
+	margin: $grid-unit-20; // allow margin collapse for vertical spacing.
+	gap: $grid-unit-10;
 }
 
 .components-button .block-editor-link-control__search-submit .has-icon {

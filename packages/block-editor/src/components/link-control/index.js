@@ -6,8 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button, Spinner, Notice, TextControl } from '@wordpress/components';
-import { keyboardReturn } from '@wordpress/icons';
+import {
+	Button,
+	ButtonGroup,
+	Spinner,
+	Notice,
+	TextControl,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
@@ -299,17 +304,7 @@ function LinkControl( {
 								createSuggestionButtonText
 							}
 							useLabel={ showTextControl }
-						>
-							<div className="block-editor-link-control__search-actions">
-								<Button
-									onClick={ handleSubmit }
-									label={ __( 'Submit' ) }
-									icon={ keyboardReturn }
-									className="block-editor-link-control__search-submit"
-									disabled={ currentInputIsEmpty } // Disallow submitting empty values.
-								/>
-							</div>
-						</LinkControlSearchInput>
+						/>
 					</div>
 					{ errorMessage && (
 						<Notice
@@ -320,6 +315,19 @@ function LinkControl( {
 							{ errorMessage }
 						</Notice>
 					) }
+					<ButtonGroup className="block-editor-link-control__search-actions">
+						<Button
+							variant="primary"
+							onClick={ handleSubmit }
+							className="xblock-editor-link-control__search-submit"
+							disabled={ currentInputIsEmpty } // Disallow submitting empty values.
+						>
+							{ __( 'Apply' ) }
+						</Button>
+						<Button variant="secondary" onClick={ stopEditing }>
+							{ __( 'Cancel' ) }
+						</Button>
+					</ButtonGroup>
 				</>
 			) }
 
