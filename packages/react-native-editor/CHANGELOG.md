@@ -10,6 +10,8 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.87.0
 -   [*] Add capabilities to force only Core blocks and control Support section [#46215]
 
 ## 1.86.1

@@ -20,7 +20,7 @@ import {
 	BlockInspector,
 	BlockTools,
 	__unstableBlockToolbarLastItem,
-	__unstableBlockSettingsMenuFirstItem,
+	__unstableUseClipboardHandler as useClipboardHandler,
 	__unstableUseTypingObserver as useTypingObserver,
 	BlockEditorKeyboardShortcuts,
 	store as blockEditorStore,
@@ -43,7 +43,6 @@ import TemplatePartConverter from '../template-part-converter';
 import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar-edit-mode';
 import { store as editSiteStore } from '../../store';
-import BlockInspectorButton from './block-inspector-button';
 import BackButton from './back-button';
 import ResizableEditor from './resizable-editor';
 import EditorCanvas from './editor-canvas';
@@ -140,7 +139,11 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const { setPage } = useDispatch( editSiteStore );
 
 	const contentRef = useRef();
-	const mergedRefs = useMergeRefs( [ contentRef, useTypingObserver() ] );
+	const mergedRefs = useMergeRefs( [
+		contentRef,
+		useClipboardHandler(),
+		useTypingObserver(),
+	] );
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const [ resizeObserver, sizes ] = useResizeObserver();
@@ -249,11 +252,6 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 									/>
 								</EditorCanvas>
 							</ResizableEditor>
-							<__unstableBlockSettingsMenuFirstItem>
-								{ ( { onClose } ) => (
-									<BlockInspectorButton onClick={ onClose } />
-								) }
-							</__unstableBlockSettingsMenuFirstItem>
 							<__unstableBlockToolbarLastItem>
 								<__unstableBlockNameContext.Consumer>
 									{ ( blockName ) =>

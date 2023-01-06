@@ -20,7 +20,6 @@ import {
 	__unstableUseTypewriter as useTypewriter,
 	__unstableUseClipboardHandler as useClipboardHandler,
 	__unstableUseTypingObserver as useTypingObserver,
-	__unstableBlockSettingsMenuFirstItem,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	__unstableEditorStyles as EditorStyles,
 	useSetting,
@@ -43,7 +42,6 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import BlockInspectorButton from './block-inspector-button';
 import { store as editPostStore } from '../../store';
 
 function MaybeIframe( {
@@ -419,11 +417,6 @@ export default function VisualEditor( { styles } ) {
 					</MaybeIframe>
 				</motion.div>
 			</motion.div>
-			<__unstableBlockSettingsMenuFirstItem>
-				{ ( { onClose } ) => (
-					<BlockInspectorButton onClick={ onClose } />
-				) }
-			</__unstableBlockSettingsMenuFirstItem>
 		</BlockTools>
 	);
 }
