@@ -17,6 +17,7 @@ const meta: ComponentMeta< typeof ResizableBox > = {
 	title: 'Components/ResizableBox',
 	component: ResizableBox,
 	argTypes: {
+		children: { control: { type: null } },
 		enable: { control: 'object' },
 		onResizeStop: { action: 'onResizeStop' },
 	},
