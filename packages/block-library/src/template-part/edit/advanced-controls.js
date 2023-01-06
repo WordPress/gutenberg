@@ -63,6 +63,7 @@ export function TemplatePartAdvancedControls( {
 					/>
 
 					<SelectControl
+						__nextHasNoMarginBottom
 						label={ __( 'Area' ) }
 						labelPosition="top"
 						options={ areaOptions }
@@ -72,6 +73,7 @@ export function TemplatePartAdvancedControls( {
 				</>
 			) }
 			<SelectControl
+				__nextHasNoMarginBottom
 				label={ __( 'HTML element' ) }
 				options={ [
 					{
