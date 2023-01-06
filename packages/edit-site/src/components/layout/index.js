@@ -19,7 +19,7 @@ import {
 	useResizeObserver,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import { NavigableRegion } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
@@ -54,7 +54,7 @@ const emptyResizeHandleStyles = {
 export default function Layout( { onError } ) {
 	// This ensures the edited entity id and type are initialized properly.
 	useInitEditedEntityFromURL();
-
+	const hubRef = useRef();
 	const { params } = useLocation();
 	const isListPage = getIsListPage( params );
 	const isEditorPage = ! isListPage;
@@ -133,6 +133,7 @@ export default function Layout( { onError } ) {
 				) }
 			>
 				<SiteHub
+					ref={ hubRef }
 					className="edit-site-layout__hub"
 					style={ {
 						width:
@@ -212,6 +213,13 @@ export default function Layout( { onError } ) {
 								} }
 								onResizeStart={ () => {
 									setIsResizing( true );
+								} }
+								onResize={ ( event, direction, elt ) => {
+									// This is a performance optimization
+									// We set the width imperatively to avoid re-rendering
+									// the whole component while resizing.
+									hubRef.current.style.width =
+										elt.clientWidth - 48 + 'px';
 								} }
 								handleComponent={ {
 									right: (
