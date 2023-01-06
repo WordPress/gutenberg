@@ -57,7 +57,6 @@ import {
 	toggleSection,
 	isEmptyTableSection,
 } from './state';
-import { normalizeRowColSpan } from './utils';
 
 const ALIGNMENT_CONTROLS = [
 	{
@@ -425,8 +424,8 @@ function TableEdit( {
 									'wp-block-table__cell-content'
 								) }
 								scope={ CellTag === 'th' ? scope : undefined }
-								colSpan={ normalizeRowColSpan( colspan ) }
-								rowSpan={ normalizeRowColSpan( rowspan ) }
+								colSpan={ colspan }
+								rowSpan={ rowspan }
 								value={ content }
 								onChange={ onChange }
 								unstableOnFocus={ () => {
