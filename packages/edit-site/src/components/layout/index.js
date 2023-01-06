@@ -209,7 +209,12 @@ export default function Layout( { onError } ) {
 									setIsResizing( true );
 								} }
 								handleComponent={ {
-									right: <ResizeHandle direction="right" />,
+									right: (
+										<ResizeHandle
+											direction="right"
+											variation="separator"
+										/>
+									),
 								} }
 								handleClasses={ undefined }
 								handleStyles={ {

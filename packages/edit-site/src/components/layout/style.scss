@@ -84,12 +84,8 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 		top: 0;
 	}
 
-	.resizable-editor__drag-handle {
-		opacity: 1;
-		animation: drag-handle__fade-in-animation 1s ease;
-		&.is-right {
-			right: -$grid-unit-20 + $canvas-padding;
-		}
+	.resizable-editor__drag-handle.is-right {
+		right: -$grid-unit-20 + $canvas-padding;
 	}
 
 	> div {
@@ -203,18 +199,5 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 	.edit-site-layout__view-mode-toggle-icon {
 		display: flex;
 		border-radius: $radius-block-ui;
-	}
-}
-
-@keyframes drag-handle__fade-in-animation {
-	0% {
-		opacity: 0;
-	}
-	// Delay showing the drag handles after the layout animation finishes.
-	50% {
-		opacity: 0;
-	}
-	100% {
-		opacity: 1;
 	}
 }
