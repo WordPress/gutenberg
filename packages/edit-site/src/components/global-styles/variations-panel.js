@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
@@ -43,23 +42,7 @@ export function VariationsPanel( { name } ) {
 		<ItemGroup isBordered isSeparated>
 			{ coreBlockStyles.map( ( style, index ) => {
 				if ( style?.isDefault ) {
-					return (
-						<NavigationButtonAsItem
-							key={ index }
-							disabled={ true }
-							path={
-								'/blocks/' +
-								encodeURIComponent( name ) +
-								'/variations/' +
-								encodeURIComponent( style.name )
-							}
-							aria-label={ `${ style.label } ${ __(
-								'(Default)'
-							) }` }
-						>
-							{ `${ style.label } ${ __( '(Default)' ) }` }
-						</NavigationButtonAsItem>
-					);
+					return null;
 				}
 				return (
 					<NavigationButtonAsItem
