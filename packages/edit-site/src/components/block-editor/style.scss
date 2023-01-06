@@ -97,7 +97,17 @@
 
 	&.is-variation-separator {
 		height: 100%;
-		opacity: 0;
+
+		&::after {
+			width: 1px;
+			border-radius: 0;
+			background: $gray-800;
+			left: auto;
+			right: 0;
+			transition: all ease .2s;
+			transition-delay: .1s;
+			@include reduce-motion;
+		}
 	}
 
 	&::after {
@@ -127,6 +137,7 @@
 			background: $gray-400;
 		}
 		&.is-variation-separator::after {
+			width: 2px;
 			background: var(--wp-admin-theme-color);
 		}
 	}
