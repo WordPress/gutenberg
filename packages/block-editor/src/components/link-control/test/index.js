@@ -608,6 +608,115 @@ describe( 'Manual link entry', () => {
 		);
 	} );
 
+	describe( 'Handling cancellation', () => {
+		it( 'should allow cancellation of the link creation process and reset any entered values', async () => {
+			const user = userEvent.setup();
+			const mockOnRemove = jest.fn();
+
+			render( <LinkControl onRemove={ mockOnRemove } /> );
+
+			// Search Input UI.
+			const searchInput = screen.getByRole( 'combobox', {
+				name: 'URL',
+			} );
+
+			const cancelButton = screen.queryByRole( 'button', {
+				name: 'Cancel',
+			} );
+
+			expect( cancelButton ).toBeEnabled();
+			expect( cancelButton ).toBeVisible();
+
+			// Simulate adding a link for a term.
+			await user.type( searchInput, 'https://www.wordpress.org' );
+
+			// Attempt to submit the empty search value in the input.
+			await user.click( cancelButton );
+
+			// Verify the consumer can handle the cancellation.
+			expect( mockOnRemove ).toHaveBeenCalled();
+
+			expect( searchInput ).toHaveValue( '' );
+		} );
+
+		it( 'should allow cancellation of the link editing process and reset any entered values', async () => {
+			const user = userEvent.setup();
+			const initialLink = fauxEntitySuggestions[ 0 ];
+
+			const LinkControlConsumer = () => {
+				const [ link, setLink ] = useState( initialLink );
+
+				return (
+					<LinkControl
+						value={ link }
+						onChange={ ( suggestion ) => {
+							setLink( suggestion );
+						} }
+						hasTextControl
+					/>
+				);
+			};
+
+			render( <LinkControlConsumer /> );
+
+			let linkPreview = screen.getByLabelText( 'Currently selected' );
+
+			expect( linkPreview ).toBeInTheDocument();
+
+			// Click the "Edit" button to trigger into the editing mode.
+			let editButton = screen.queryByRole( 'button', {
+				name: 'Edit',
+			} );
+
+			await user.click( editButton );
+
+			let searchInput = screen.getByRole( 'combobox', {
+				name: 'URL',
+			} );
+
+			let textInput = screen.getByRole( 'textbox', {
+				name: 'Text',
+			} );
+
+			// Make a change to the search input.
+			await user.type( searchInput, 'This URL value was changed!' );
+
+			// Make a change to the text input.
+			await user.type( textInput, 'This text value was changed!' );
+
+			const cancelButton = screen.queryByRole( 'button', {
+				name: 'Cancel',
+			} );
+
+			// Cancel the editing process.
+			await user.click( cancelButton );
+
+			linkPreview = screen.getByLabelText( 'Currently selected' );
+
+			expect( linkPreview ).toBeInTheDocument();
+
+			// Re-query the edit button as it's been replaced.
+			editButton = screen.queryByRole( 'button', {
+				name: 'Edit',
+			} );
+
+			await user.click( editButton );
+
+			// Re-query the inputs as they have been replaced.
+			searchInput = screen.getByRole( 'combobox', {
+				name: 'URL',
+			} );
+
+			textInput = screen.getByRole( 'textbox', {
+				name: 'Text',
+			} );
+
+			// Expect to see the original link values and **not** the changed values.
+			expect( searchInput ).toHaveValue( initialLink.url );
+			expect( textInput ).toHaveValue( initialLink.text );
+		} );
+	} );
+
 	describe( 'Alternative link protocols and formats', () => {
 		it.each( [
 			[ 'mailto:example123456@wordpress.org', 'mailto' ],

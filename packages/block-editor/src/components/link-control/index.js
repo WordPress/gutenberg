@@ -250,13 +250,14 @@ function LinkControl( {
 	const handleCancel = ( event ) => {
 		event.preventDefault();
 
-		// If there is an existing link then revert to the existing
-		// link and exit editing mode. Otherwise remove the link.
+		// Ensure that any unsubmitted input changes are reset.
+		resetInternalValues();
+
 		if ( hasLinkValue ) {
-			// Ensure that any unsubmitted input changes are reset.
-			resetInternalValues();
+			// If there is a link then exist editing mode and show preview.
 			stopEditing();
 		} else {
+			// If there is no link value, then remove the link entirely.
 			onRemove?.();
 		}
 	};
