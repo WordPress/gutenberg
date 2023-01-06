@@ -117,7 +117,7 @@ function LinkControl( {
 	value,
 	settings = DEFAULT_LINK_SETTINGS,
 	onChange = noop,
-	onRemove,
+	onRemove = noop,
 	noDirectEntry = false,
 	showSuggestions = true,
 	showInitialSuggestions,
@@ -195,6 +195,8 @@ function LinkControl( {
 		isEndingEditWithFocus.current = false;
 	}, [ isEditingLink, isCreatingPage ] );
 
+	const hasLinkValue = value?.url?.trim()?.length > 0;
+
 	/**
 	 * Cancels editing state and marks that focus may need to be restored after
 	 * the next render, if focus was within the wrapper when editing finished.
@@ -240,6 +242,25 @@ function LinkControl( {
 		}
 	};
 
+	const resetInternalValues = () => {
+		setInternalUrlInputValue( value?.url );
+		setInternalTextInputValue( value?.title );
+	};
+
+	const handleCancel = ( event ) => {
+		event.preventDefault();
+
+		// If there is an existing link then revert to the existing
+		// link and exit editing mode. Otherwise remove the link.
+		if ( hasLinkValue ) {
+			// Ensure that any unsubmitted input changes are reset.
+			resetInternalValues();
+			stopEditing();
+		} else {
+			onRemove();
+		}
+	};
+
 	const currentUrlInputValue = propInputValue || internalUrlInputValue;
 
 	const currentInputIsEmpty = ! currentUrlInputValue?.trim()?.length;
@@ -252,7 +273,7 @@ function LinkControl( {
 	// Only show text control once a URL value has been committed
 	// and it isn't just empty whitespace.
 	// See https://github.com/WordPress/gutenberg/pull/33849/#issuecomment-932194927.
-	const showTextControl = value?.url?.trim()?.length > 0 && hasTextControl;
+	const showTextControl = hasLinkValue && hasTextControl;
 
 	return (
 		<div
@@ -324,7 +345,7 @@ function LinkControl( {
 						>
 							{ __( 'Apply' ) }
 						</Button>
-						<Button variant="secondary" onClick={ stopEditing }>
+						<Button variant="secondary" onClick={ handleCancel }>
 							{ __( 'Cancel' ) }
 						</Button>
 					</ButtonGroup>
