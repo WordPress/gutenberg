@@ -91,6 +91,9 @@ function ScaledBlockPreview( {
 					documentElement.style.width = '100%';
 					bodyElement.style.padding = __experimentalPadding + 'px';
 
+					// Necessary for proper previews of styles with border styles assigned to the body.
+					bodyElement.style.border = 'none';
+
 					// Necessary for contentResizeListener to work.
 					bodyElement.style.boxSizing = 'border-box';
 					bodyElement.style.position = 'absolute';
