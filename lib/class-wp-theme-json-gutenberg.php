@@ -713,7 +713,7 @@ class WP_Theme_JSON_Gutenberg {
 		$schema_styles_blocks   = array();
 		$schema_settings_blocks = array();
 		foreach ( $valid_block_names as $block ) {
-			// Blocks can have multiple style variations, so we need to build the schema for each one.
+			// Build the schema for each block style variation.
 			$style_variation_names    = isset( $input['styles']['blocks'][ $block ]['variations'] ) ? array_keys( $input['styles']['blocks'][ $block ]['variations'] ) : array();
 			$schema_styles_variations = array();
 			if ( ! empty( $style_variation_names ) ) {
@@ -876,6 +876,7 @@ class WP_Theme_JSON_Gutenberg {
 			if ( ! empty( $block_type->styles ) ) {
 				$style_selectors = array();
 				foreach ( $block_type->styles as $style ) {
+					// The style variation classname is duplicated in the selector to ensure that it overrides core block styles.
 					$style_selectors[ $style['name'] ] = static::append_to_selector( '.is-style-' . $style['name'] . '.is-style-' . $style['name'], static::$blocks_metadata[ $block_name ]['selector'] );
 				}
 				static::$blocks_metadata[ $block_name ]['styleVariations'] = $style_selectors;
@@ -2258,13 +2259,14 @@ class WP_Theme_JSON_Gutenberg {
 			}
 		}
 
-		// If there are style variations, generate the selectors for them, including any feature selectors.
+		// If there are style variations, generate the declarations for them, including any feature selectors the block may have.
 		$style_variation_declarations = array();
 		if ( ! empty( $block_metadata['variations'] ) ) {
 			foreach ( $block_metadata['variations'] as $style_variation ) {
 				$style_variation_node     = _wp_array_get( $this->theme_json, $style_variation['path'], array() );
 				$style_variation_selector = $style_variation['selector'];
 
+				// If the block has feature selectors, generate the declarations for them within the current style variation.
 				if ( ! empty( $block_metadata['features'] ) ) {
 					foreach ( $block_metadata['features'] as $feature_name => $feature_selector ) {
 						if ( ! empty( $style_variation_node[ $feature_name ] ) ) {
@@ -2289,12 +2291,13 @@ class WP_Theme_JSON_Gutenberg {
 							} else {
 								$style_variation_declarations[ $combined_feature_selectors ] = $new_feature_declarations;
 							}
-							// Remove the feature from the block's node now the
+							// Remove the feature from the variation's node now the
 							// styles will be included under the feature level selector.
 							unset( $style_variation_node[ $feature_name ] );
 						}
 					}
 				}
+				// Compute declarations for remaining styles not covered by feature level selectors.
 				$style_variation_declarations[ $style_variation_selector ] = static::compute_style_properties( $style_variation_node, $settings, null, $this->theme_json );
 			}
 		}

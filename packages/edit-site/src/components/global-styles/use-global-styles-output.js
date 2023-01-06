@@ -173,6 +173,29 @@ function flattenTree( input = {}, prefix, token ) {
 }
 
 /**
+ * Gets variation selector string from feature selector.
+ *
+ * @param {string} featureSelector        The feature selector.
+ *
+ * @param {string} styleVariationSelector The style variation selector.
+ * @return {string} Combined selector string.
+ *
+ */
+function concatFeatureVariationSelectorString(
+	featureSelector,
+	styleVariationSelector
+) {
+	const featureSelectors = featureSelector.split( ',' );
+	const combinedSelectors = [];
+	featureSelectors.forEach( ( selector ) => {
+		combinedSelectors.push(
+			`${ styleVariationSelector.trim() }${ selector.trim() }`
+		);
+	} );
+	return combinedSelectors.join( ', ' );
+}
+
+/**
  * Transform given style tree into a set of style declarations.
  *
  * @param {Object}  blockStyles         Block styles.
@@ -717,26 +740,12 @@ export const toStyles = (
 											if (
 												!! featureDeclarations.length
 											) {
-												const _featureSelectors =
-													featureSelector.split(
-														','
-													);
-												const combinedSelectors = [];
-												_featureSelectors.forEach(
-													( _featureSelector ) => {
-														combinedSelectors.push(
-															`${ styleVariationSelector.trim() }${ _featureSelector.trim() }`
-														);
-													}
-												);
-												const combinedSelectorString =
-													combinedSelectors.join(
-														', '
-													);
-
 												ruleset =
 													ruleset +
-													`${ combinedSelectorString }{${ featureDeclarations.join(
+													`${ concatFeatureVariationSelectorString(
+														featureSelector,
+														styleVariationSelector
+													) }{${ featureDeclarations.join(
 														';'
 													) } }`;
 											}
