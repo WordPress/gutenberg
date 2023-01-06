@@ -64,11 +64,6 @@ function render_block_core_search( $attributes ) {
 		);
 	}
 
-	// Check array attributes place holder value isset or not
-	if( empty( $attributes['placeholder'] ) ) {
-		$attributes['placeholder'] = 'Optional placeholder…';
-	}
-
 	if ( $show_input ) {
 		$input_classes = array( 'wp-block-search__input' );
 		if ( $is_button_inside ) {
@@ -78,11 +73,10 @@ function render_block_core_search( $attributes ) {
 			$input_classes[] = $typography_classes;
 		}
 		$input_markup = sprintf(
-			'<input type="search" id="%s" class="wp-block-search__input %s" name="s" value="%s" placeholder="%s" %s required />',
+			'<input type="search" id="%s" class="wp-block-search__input %s" name="s" value="%s" %s required />',
 			$input_id,
 			esc_attr( implode( ' ', $input_classes ) ),
 			get_search_query(),
-			esc_attr( $attributes['placeholder'] ),
 			$inline_styles['input']
 		);
 	}
