@@ -303,7 +303,7 @@ Add custom HTML code and preview it as you edit. ([Source](https://github.com/Wo
 -	**Name:** core/html
 -	**Category:** widgets
 -	**Supports:** ~~className~~, ~~customClassName~~, ~~html~~
--	**Attributes:** content, preview
+-	**Attributes:** content, isPreview
 
 ## Image
 

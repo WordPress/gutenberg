@@ -18,35 +18,27 @@ import Preview from './preview';
 export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 	const isDisabled = useContext( Disabled.Context );
 
-	function switchToPreview() {
-		setAttributes( { preview: true } );
-	}
-
-	function switchToHTML() {
-		setAttributes( { preview: false } );
-	}
-
 	return (
 		<div { ...useBlockProps( { className: 'block-library-html__edit' } ) }>
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton
 						className="components-tab-button"
-						isPressed={ ! attributes.preview }
-						onClick={ switchToHTML }
+						isPressed={ ! attributes.isPreview }
+						onClick={ () => setAttributes( { isPreview: false } ) }
 					>
-						HTML
+						{ __( 'HTML' ) }
 					</ToolbarButton>
 					<ToolbarButton
 						className="components-tab-button"
-						isPressed={ attributes.preview }
-						onClick={ switchToPreview }
+						isPressed={ attributes.isPreview }
+						onClick={ () => setAttributes( { isPreview: true } ) }
 					>
 						{ __( 'Preview' ) }
 					</ToolbarButton>
 				</ToolbarGroup>
 			</BlockControls>
-			{ attributes.preview || isDisabled ? (
+			{ attributes.isPreview || isDisabled ? (
 				<Preview
 					content={ attributes.content }
 					isSelected={ isSelected }

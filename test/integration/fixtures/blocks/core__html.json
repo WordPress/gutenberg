@@ -4,7 +4,7 @@
 		"isValid": true,
 		"attributes": {
 			"content": "<h1>Some HTML code</h1>\n<div>This is a div</div>",
-			"preview": false
+			"isPreview": false
 		},
 		"innerBlocks": []
 	}
