@@ -32,11 +32,10 @@ const OPTION_CLASSNAME =
 	'block-editor-hooks__position-selection__select-control__option';
 
 const DEFAULT_OPTION = {
-	key: 'static',
+	key: 'default',
 	value: '',
-	name: __( 'Static' ),
+	name: __( 'Default' ),
 	className: OPTION_CLASSNAME,
-	__experimentalHint: __( 'The default position' ),
 };
 
 const STICKY_OPTION = {
@@ -45,7 +44,7 @@ const STICKY_OPTION = {
 	name: __( 'Sticky' ),
 	className: OPTION_CLASSNAME,
 	__experimentalHint: __(
-		'The block will scroll with the document but stick instead of exiting the viewport'
+		'The block will stick to the top of the window instead of scrolling.'
 	),
 };
 
@@ -55,7 +54,7 @@ const FIXED_OPTION = {
 	name: __( 'Fixed' ),
 	className: OPTION_CLASSNAME,
 	__experimentalHint: __(
-		'The block will not move when the page is scrolled'
+		'The block will not move when the page is scrolled.'
 	),
 };
 
@@ -247,7 +246,10 @@ export function PositionEdit( props ) {
 	return Platform.select( {
 		web: (
 			<>
-				<BaseControl className="block-editor-hooks__position-selection">
+				<BaseControl
+					className="block-editor-hooks__position-selection"
+					help={ selectedOption?.__experimentalHint }
+				>
 					<CustomSelectControl
 						__nextUnconstrainedWidth
 						__next36pxDefaultSize
