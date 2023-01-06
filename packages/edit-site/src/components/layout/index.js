@@ -103,6 +103,10 @@ export default function Layout( { onError } ) {
 	const [ isResizing, setIsResizing ] = useState( false );
 	const isResizingEnabled = ! isMobileViewport && canvasMode === 'view';
 	const defaultSidebarWidth = isMobileViewport ? '100vw' : 360;
+	let canvasWidth = isResizing ? '100%' : fullSize.width;
+	if ( showFrame && ! isResizing ) {
+		canvasWidth = canvasSize.width - canvasPadding;
+	}
 	useEffect( () => {
 		if ( canvasMode === 'view' && isMobileViewport ) {
 			setIsMobileCanvasVisible( false );
@@ -185,9 +189,10 @@ export default function Layout( { onError } ) {
 								} }
 								transition={ {
 									type: 'tween',
-									duration: disableMotion
-										? 0
-										: ANIMATION_DURATION,
+									duration:
+										disableMotion || isResizing
+											? 0
+											: ANIMATION_DURATION,
 									ease: 'easeOut',
 								} }
 								size={ {
@@ -273,10 +278,7 @@ export default function Layout( { onError } ) {
 										} }
 										initial={ false }
 										animate={ {
-											width: showFrame
-												? canvasSize.width -
-												  canvasPadding
-												: fullSize.width,
+											width: canvasWidth,
 										} }
 										transition={ {
 											type: 'tween',
