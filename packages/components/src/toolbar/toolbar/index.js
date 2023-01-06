@@ -12,7 +12,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import ToolbarGroup from '../toolbar-group';
+import ToolbarGroup from '../../toolbar-group';
 import ToolbarContainer from './toolbar-container';
 
 /**
