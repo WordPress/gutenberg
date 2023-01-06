@@ -11,7 +11,6 @@ import ListViewBlock from './block';
 import { useListViewContext } from './context';
 import { isClientIdSelected } from './utils';
 import { store as blockEditorStore } from '../../store';
-import useBlockDisplayInformation from '../use-block-display-information';
 
 /**
  * Given a block, returns the total number of blocks in that subtree. This is used to help determine
@@ -92,31 +91,23 @@ function ListViewBranch( props ) {
 		isExpanded,
 		parentId,
 		shouldShowInnerBlocks = true,
-		isSyncedBranch = false,
+		selectBlockInCanvas,
 	} = props;
 
-	const parentBlockInformation = useBlockDisplayInformation( parentId );
-	const syncedBranch = isSyncedBranch || !! parentBlockInformation?.isSynced;
-
-	const canParentExpand = useSelect(
+	const isContentLocked = useSelect(
 		( select ) => {
-			if ( ! parentId ) {
-				return true;
-			}
-
-			const isContentLocked =
+			return !! (
+				parentId &&
 				select( blockEditorStore ).getTemplateLock( parentId ) ===
-				'contentOnly';
-			const canEdit = select( blockEditorStore ).canEditBlock( parentId );
-
-			return isContentLocked ? false : canEdit;
+					'contentOnly'
+			);
 		},
 		[ parentId ]
 	);
 
 	const { expandedState, draggedClientIds } = useListViewContext();
 
-	if ( ! canParentExpand ) {
+	if ( isContentLocked ) {
 		return null;
 	}
 
@@ -183,7 +174,7 @@ function ListViewBranch( props ) {
 								isExpanded={ shouldExpand }
 								listPosition={ nextPosition }
 								selectedClientIds={ selectedClientIds }
-								isSyncedBranch={ syncedBranch }
+								selectBlockInCanvas={ selectBlockInCanvas }
 							/>
 						) }
 						{ ! showBlock && (
@@ -204,7 +195,7 @@ function ListViewBranch( props ) {
 								isBranchSelected={ isSelectedBranch }
 								selectedClientIds={ selectedClientIds }
 								isExpanded={ isExpanded }
-								isSyncedBranch={ syncedBranch }
+								selectBlockInCanvas={ selectBlockInCanvas }
 							/>
 						) }
 					</AsyncModeProvider>
