@@ -34,6 +34,10 @@ To release a release candidate (RC) version of the plugin, enter `rc`. To releas
 
 This will trigger a GitHub Actions (GHA) workflow that bumps the plugin version, builds the Gutenberg plugin .zip file, creates a release draft, and attaches the plugin .zip file to it. This part of the process typically takes a little under six minutes. You'll see that workflow appear at the top of the list, right under the blue banner. Once it's finished, it'll change its status icon from a yellow dot to a green checkmark. You can follow along in a more detailed view by clicking on the workflow.
 
+#### Publishing the @wordpress packages to NPM
+
+As part of the release candidate (RC) process, all of the `@wordpress` packages are published to NPM. You may see messaging after the ["Build Gutenberg Plugin Zip" action](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml) action has created the draft release that the ["Publish npm packages"](https://github.com/WordPress/gutenberg/actions/workflows/publish-npm-packages.yml) action requires someone with appropriate permissions to trigger the action. This is not the case as this process is automated and it will automatically run after the release notes are published.
+
 #### View the release draft
 
 As soon as the workflow has finished, you'll find the release draft under [https://github.com/WordPress/gutenberg/releases](https://github.com/WordPress/gutenberg/releases). The draft is pre-populated with changelog entries based on previous release candidates for this version, and any changes that have since been cherry-picked to the release branch. Thus, when releasing the first stable version of a series, make sure to delete any RC version headers (that are only there for your information) and to move the more recent changes to the correct section (see below).

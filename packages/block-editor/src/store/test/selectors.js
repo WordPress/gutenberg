@@ -73,6 +73,7 @@ const {
 	__experimentalGetPatternTransformItems,
 	wasBlockJustInserted,
 	__experimentalGetGlobalBlocksByName,
+	getLastInsertedBlocksClientIds,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -4456,7 +4457,7 @@ describe( 'selectors', () => {
 
 			const state = {
 				lastBlockInserted: {
-					clientId: expectedClientId,
+					clientIds: [ expectedClientId ],
 					source,
 				},
 			};
@@ -4473,7 +4474,7 @@ describe( 'selectors', () => {
 
 			const state = {
 				lastBlockInserted: {
-					clientId: unexpectedClientId,
+					clientIds: [ unexpectedClientId ],
 					source,
 				},
 			};
@@ -4489,7 +4490,7 @@ describe( 'selectors', () => {
 
 			const state = {
 				lastBlockInserted: {
-					clientId,
+					clientIds: [ clientId ],
 				},
 			};
 
@@ -4662,6 +4663,29 @@ describe( '__unstableGetClientIdsTree', () => {
 					{ clientId: 'baz', innerBlocks: [] },
 				],
 			},
+		] );
+	} );
+} );
+
+describe( 'getLastInsertedBlocksClientIds', () => {
+	it( 'should return undefined if no blocks have been inserted', () => {
+		const state = {
+			lastBlockInserted: {},
+		};
+
+		expect( getLastInsertedBlocksClientIds( state ) ).toEqual( undefined );
+	} );
+
+	it( 'should return clientIds if blocks have been inserted', () => {
+		const state = {
+			lastBlockInserted: {
+				clientIds: [ '123456', '78910' ],
+			},
+		};
+
+		expect( getLastInsertedBlocksClientIds( state ) ).toEqual( [
+			'123456',
+			'78910',
 		] );
 	} );
 } );

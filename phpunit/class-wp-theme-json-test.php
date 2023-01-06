@@ -435,6 +435,76 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEquals( $variables, $theme_json->get_stylesheet( array( 'variables' ) ) );
 	}
 
+	/**
+	 * Tests generating the spacing presets array based on the spacing scale provided.
+	 *
+	 * @dataProvider data_set_spacing_sizes_when_invalid
+	 */
+	public function test_shadow_preset_styles() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'shadow' => array(
+						'palette' => array(
+							array(
+								'slug'   => 'natural',
+								'shadow' => '5px 5px 5px 0 black',
+							),
+							array(
+								'slug'   => 'sharp',
+								'shadow' => '5px 5px black',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$styles = 'body{--wp--preset--shadow--natural: 5px 5px 5px 0 black;--wp--preset--shadow--sharp: 5px 5px black;}';
+		$this->assertEquals( $styles, $theme_json->get_stylesheet() );
+		$this->assertEquals( $styles, $theme_json->get_stylesheet( array( 'variables' ) ) );
+	}
+
+	public function test_get_shadow_styles_for_blocks() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'shadow' => array(
+						'palette' => array(
+							array(
+								'slug'   => 'natural',
+								'shadow' => '5px 5px 0 0 black',
+							),
+						),
+					),
+				),
+				'styles'   => array(
+					'blocks'   => array(
+						'core/paragraph' => array(
+							'shadow' => 'var(--wp--preset--shadow--natural)',
+						),
+					),
+					'elements' => array(
+						'button' => array(
+							'shadow' => 'var:preset|shadow|natural',
+						),
+						'link'   => array(
+							'shadow' => array( 'ref' => 'styles.elements.button.shadow' ),
+						),
+					),
+				),
+			)
+		);
+
+		$global_styles  = 'body{--wp--preset--shadow--natural: 5px 5px 0 0 black;}body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
+		$element_styles = 'a:where(:not(.wp-element-button)){box-shadow: var(--wp--preset--shadow--natural);}.wp-element-button, .wp-block-button__link{box-shadow: var(--wp--preset--shadow--natural);}p{box-shadow: var(--wp--preset--shadow--natural);}';
+		$styles         = $global_styles . $element_styles;
+
+		$this->assertEquals( $styles, $theme_json->get_stylesheet() );
+	}
+
 	public function test_get_stylesheet_handles_whitelisted_element_pseudo_selectors() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
@@ -749,6 +819,62 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$expected      = $base_styles . $block_styles . $preset_styles;
 
 		$this->assertEquals( $expected, $theme_json->get_stylesheet() );
+	}
+
+	public function test_allow_indirect_properties() {
+		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'   => array(
+					'blocks'  => array(
+						'core/social-links' => array(
+							'spacing' => array(
+								'blockGap' => array(
+									'top'  => '1em',
+									'left' => '2em',
+								),
+							),
+						),
+					),
+					'spacing' => array(
+						'blockGap' => '3em',
+					),
+				),
+				'settings' => array(
+					'layout' => array(
+						'contentSize' => '800px',
+						'wideSize'    => '1000px',
+					),
+				),
+			)
+		);
+
+		$expected = array(
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'styles'   => array(
+				'blocks'  => array(
+					'core/social-links' => array(
+						'spacing' => array(
+							'blockGap' => array(
+								'top'  => '1em',
+								'left' => '2em',
+							),
+						),
+					),
+				),
+				'spacing' => array(
+					'blockGap' => '3em',
+				),
+			),
+			'settings' => array(
+				'layout' => array(
+					'contentSize' => '800px',
+					'wideSize'    => '1000px',
+				),
+			),
+		);
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
 	public function test_remove_invalid_element_pseudo_selectors() {
@@ -1452,5 +1578,19 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ) );
 		$this->assertEquals( $expected, $stylesheet );
 
+	}
+
+	public function test_get_stylesheet_handles_custom_css() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'css' => 'body { color:purple; }',
+				),
+			)
+		);
+
+		$custom_css = 'body { color:purple; }';
+		$this->assertEquals( $custom_css, $theme_json->get_stylesheet( array( 'custom-css' ) ) );
 	}
 }

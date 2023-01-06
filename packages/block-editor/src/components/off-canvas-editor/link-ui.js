@@ -75,6 +75,7 @@ function LinkControlTransforms( { clientId } ) {
 	const { replaceBlock } = useDispatch( blockEditorStore );
 
 	const featuredBlocks = [
+		'core/page-list',
 		'core/site-logo',
 		'core/social-links',
 		'core/search',

@@ -15,6 +15,7 @@ function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
 	return (
 		<div className="editor-post-excerpt">
 			<TextareaControl
+				__nextHasNoMarginBottom
 				label={ __( 'Write an excerpt (optional)' ) }
 				className="editor-post-excerpt__textarea"
 				onChange={ ( value ) => onUpdateExcerpt( value ) }

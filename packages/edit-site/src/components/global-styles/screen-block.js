@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { getBlockType } from '@wordpress/blocks';
-import { __experimentalSpacer as Spacer } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -17,9 +16,7 @@ function ScreenBlock( { name } ) {
 	return (
 		<>
 			<ScreenHeader title={ blockType.title } />
-			<Spacer paddingX={ 4 }>
-				<BlockPreviewPanel name={ name } />
-			</Spacer>
+			<BlockPreviewPanel name={ name } />
 			<ContextMenu
 				parentMenu={ '/blocks/' + encodeURIComponent( name ) }
 				name={ name }

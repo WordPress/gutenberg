@@ -15,6 +15,8 @@ import { useState } from '@wordpress/element';
 import FormToggle, { noop } from '..';
 import type { FormToggleProps } from '../types';
 
+jest.useFakeTimers();
+
 const getInput = () => screen.getByRole( 'checkbox' ) as HTMLInputElement;
 
 const ControlledFormToggle = ( { onChange }: FormToggleProps ) => {

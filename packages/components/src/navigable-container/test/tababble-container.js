@@ -9,6 +9,8 @@ import userEvent from '@testing-library/user-event';
  */
 import { TabbableContainer } from '../tabbable';
 
+jest.useFakeTimers();
+
 const TabbableContainerTestCase = ( props ) => (
 	<TabbableContainer { ...props }>
 		<button>Item 1</button>

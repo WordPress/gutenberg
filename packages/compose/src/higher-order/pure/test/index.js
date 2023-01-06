@@ -14,6 +14,8 @@ import { Component } from '@wordpress/element';
  */
 import pure from '../';
 
+jest.useFakeTimers();
+
 describe( 'pure', () => {
 	it( 'functional component should rerender only when props change', () => {
 		let i = 0;

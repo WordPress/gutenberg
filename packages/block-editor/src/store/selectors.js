@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, find } from 'lodash';
+import { map } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -2469,8 +2469,7 @@ export const __experimentalGetBlockListSettingsForBlocks = createSelector(
  */
 export const __experimentalGetReusableBlockTitle = createSelector(
 	( state, ref ) => {
-		const reusableBlock = find(
-			getReusableBlocks( state ),
+		const reusableBlock = getReusableBlocks( state ).find(
 			( block ) => block.id === ref
 		);
 		if ( ! reusableBlock ) {
@@ -2648,9 +2647,19 @@ export const __experimentalGetActiveBlockIdByBlockNames = createSelector(
 export function wasBlockJustInserted( state, clientId, source ) {
 	const { lastBlockInserted } = state;
 	return (
-		lastBlockInserted.clientId === clientId &&
+		lastBlockInserted.clientIds?.includes( clientId ) &&
 		lastBlockInserted.source === source
 	);
+}
+
+/**
+ * Gets the client ids of the last inserted blocks.
+ *
+ * @param {Object} state Global application state.
+ * @return {Array|undefined} Client Ids of the last inserted block(s).
+ */
+export function getLastInsertedBlocksClientIds( state ) {
+	return state?.lastBlockInserted?.clientIds;
 }
 
 /**
@@ -2690,8 +2699,8 @@ export const __unstableGetContentLockingParent = createSelector(
 	( state, clientId ) => {
 		let current = clientId;
 		let result;
-		while ( !! state.blocks.parents[ current ] ) {
-			current = state.blocks.parents[ current ];
+		while ( state.blocks.parents.has( current ) ) {
+			current = state.blocks.parents.get( current );
 			if ( getTemplateLock( state, current ) === 'contentOnly' ) {
 				result = current;
 			}
