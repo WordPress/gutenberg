@@ -11,8 +11,7 @@ import { wordpress } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { Toolbar } from '../../';
-import ToolbarButton from '../';
+import { Toolbar, ToolbarButton } from '..';
 
 export default {
 	title: 'Components/ToolbarButton',
