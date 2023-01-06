@@ -628,6 +628,7 @@ export default function Image( {
 			{ showCaption &&
 				( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText
+						identifier="caption"
 						className={ __experimentalGetElementClassName(
 							'caption'
 						) }
