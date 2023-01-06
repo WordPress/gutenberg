@@ -308,6 +308,7 @@
 		"test:unit": "wp-scripts test-unit-js --config test/unit/jest.config.js",
 		"test:unit:date": "bash ./bin/unit-test-date.sh",
 		"test:unit:debug": "wp-scripts --inspect-brk test-unit-js --runInBand --no-cache --verbose --config test/unit/jest.config.js ",
+		"test:unit:profile": "wp-scripts --cpu-prof test-unit-js --runInBand --no-cache --verbose --config test/unit/jest.config.js ",
 		"pretest:unit:php": "wp-env start",
 		"test:unit:php": "wp-env run tests-wordpress /var/www/html/wp-content/plugins/gutenberg/vendor/bin/phpunit -c /var/www/html/wp-content/plugins/gutenberg/phpunit.xml.dist --verbose",
 		"pretest:unit:php:multisite": "wp-env start",
