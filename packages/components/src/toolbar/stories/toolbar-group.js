@@ -6,7 +6,7 @@ import { formatBold, formatItalic, link } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { ToolbarButton, ToolbarGroup } from '../../';
+import { ToolbarButton, ToolbarGroup } from '..';
 
 export default { title: 'Components/ToolbarGroup', component: ToolbarGroup };
 

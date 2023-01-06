@@ -6,9 +6,9 @@ import { useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import DropdownMenu from '../dropdown-menu';
+import DropdownMenu from '../../dropdown-menu';
 import ToolbarContext from '../toolbar-context';
-import ToolbarItem from '../toolbar-item';
+import ToolbarItem from '../../toolbar-item';
 
 function ToolbarGroupCollapsed( { controls = [], toggleProps, ...props } ) {
 	// It'll contain state if `ToolbarGroup` is being used within
