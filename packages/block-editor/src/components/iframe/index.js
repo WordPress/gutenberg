@@ -268,7 +268,10 @@ function Iframe(
 										frameSize
 									}px`,
 									marginTop: frameSize,
-									transform: `scale( ${ scale } )`,
+									transform:
+										scale !== 1
+											? `scale( ${ scale } )`
+											: undefined,
 								} }
 								inert={ readonly ? 'true' : undefined }
 							>
