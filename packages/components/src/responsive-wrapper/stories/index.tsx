@@ -11,6 +11,9 @@ import ResponsiveWrapper from '..';
 const meta: ComponentMeta< typeof ResponsiveWrapper > = {
 	component: ResponsiveWrapper,
 	title: 'Components/ResponsiveWrapper',
+	argTypes: {
+		children: { control: { type: null } },
+	},
 	parameters: {
 		controls: { expanded: true },
 		docs: { source: { state: 'open' } },
