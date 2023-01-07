@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { useResizeObserver, useDebounce } from '@wordpress/compose';
 import { SVG, Path } from '@wordpress/primitives';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
 
 /**
@@ -84,15 +84,20 @@ export function Placeholder< IconProps = unknown >(
 	} );
 
 	const debouncedSpeak = useDebounce( speak, 100 );
+	const [ isInitialFocus, setIsInitialFocus ] = useState( false );
 
 	useEffect( () => {
-		if ( instructions ) {
+		if ( instructions && isInitialFocus ) {
 			debouncedSpeak( instructions );
 		}
-	}, [ instructions, debouncedSpeak ] );
+	}, [ instructions, debouncedSpeak, isInitialFocus ] );
 
 	return (
-		<div { ...additionalProps } className={ classes }>
+		<div
+			{ ...additionalProps }
+			className={ classes }
+			onFocus={ () => setIsInitialFocus( true ) }
+		>
 			{ withIllustration ? PlaceholderIllustration : null }
 			{ resizeListener }
 			{ notices }
