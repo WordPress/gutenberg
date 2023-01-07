@@ -76,6 +76,7 @@ describe( 'Placeholder', () => {
 
 			// Test for empty content. When the content is empty,
 			// the only way to query the div is with `querySelector`
+			// eslint-disable-next-line testing-library/no-node-access
 			const placeholderFieldset = placeholder.querySelector(
 				'.components-placeholder__fieldset'
 			);
