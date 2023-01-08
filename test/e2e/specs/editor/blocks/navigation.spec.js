@@ -1,7 +1,17 @@
 /**
  * WordPress dependencies
  */
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const {
+	test,
+	expect,
+	Editor,
+} = require( '@wordpress/e2e-test-utils-playwright' );
+
+test.use( {
+	editor: async ( { page }, use ) => {
+		await use( new Editor( { page, hasIframe: true } ) );
+	},
+} );
 
 test.describe(
 	'As a user I want the navigation block to fallback to the best possible default',
@@ -24,32 +34,17 @@ test.describe(
 
 		test( 'default to a list of pages if there are no menus', async ( {
 			editor,
-			page,
 		} ) => {
-			const pagesRequest = page
-				.waitForRequest( ( response ) => {
-					return response.url().includes( 'rest_route=/wp/v2/pages' );
-				} )
-				.catch( () => {} );
-
-			const menusRequest = page
-				.waitForRequest( ( response ) => {
-					return response.url().includes( 'rest_route=/wp/v2/menus' );
-				} )
-				.catch( () => {} );
-
 			await editor.insertBlock( { name: 'core/navigation' } );
 
-			await pagesRequest;
-			await menusRequest;
-
-			//await page.waitForTimeout( 10000 );
-
-			const pageListBlock = await page.getByRole( 'document', {
+			const pageListBlock = editor.canvas.getByRole( 'document', {
 				name: 'Block: Page List',
 			} );
 
-			await expect( pageListBlock ).toBeVisible();
+			await expect( pageListBlock ).toBeVisible( {
+				// Wait for the API to be loaded.
+				timeout: 10000,
+			} );
 
 			// Check the markup of the block is correct.
 			await editor.publishPost();
