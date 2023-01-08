@@ -146,3 +146,21 @@ $block-preview-height: 150px;
 	max-height: 200px;
 	overflow-y: scroll;
 }
+
+.edit-site-global-styles__cs {
+	margin-bottom: 0.5em;
+
+	.components-heading {
+		margin: 0 !important;
+	}
+}
+
+.edit-site-global-styles__cs-content {
+	display: flex;
+	gap: 2em;
+	flex-direction: column;
+
+	.components-button {
+		margin-left: auto;
+	}
+}

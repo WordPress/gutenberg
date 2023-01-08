@@ -194,6 +194,28 @@ export function __experimentalReceiveThemeGlobalStyleVariations(
 }
 
 /**
+ * Returns an action object used in signalling that the user global styles variations have been received.
+ * Ignored from documentation as it's internal to the data store.
+ *
+ * @ignore
+ *
+ * @param {string}  stylesheet Stylesheet.
+ * @param {Array}  variations The global styles variations.
+ *
+ * @return {Object} Action object.
+ */
+export function __experimentalReceiveUserGlobalStyleVariations(
+	stylesheet,
+	variations
+) {
+	return {
+		type: 'RECEIVE_USER_GLOBAL_STYLE_VARIATIONS',
+		stylesheet,
+		variations,
+	};
+}
+
+/**
  * Returns an action object used in signalling that the index has been received.
  *
  * @deprecated since WP 5.9, this is not useful anymore, use the selector direclty.
@@ -832,5 +854,47 @@ export function receiveAutosaves( postId, autosaves ) {
 		type: 'RECEIVE_AUTOSAVES',
 		postId,
 		autosaves: Array.isArray( autosaves ) ? autosaves : [ autosaves ],
+	};
+}
+
+/**
+ * @param {Object} globalStylesData Global styles configuration.
+ */
+export const __experimentalCreateNewGlobalStylesVariation =
+	( globalStylesData ) =>
+	async ( { dispatch, resolveSelect } ) => {
+		const currentTheme = await resolveSelect.getCurrentTheme();
+
+		await apiFetch( {
+			path: '/wp/v2/global-styles',
+			method: 'POST',
+			data: globalStylesData,
+		} );
+
+		// Refresh variations
+		const variations = await apiFetch( {
+			path: `/wp/v2/global-styles/user/variations`,
+		} );
+		dispatch.__experimentalReceiveUserGlobalStyleVariations(
+			currentTheme.stylesheet,
+			variations
+		);
+	};
+
+/**
+ * Tracks whether changes have been made to global styles associated variation
+ * ID.
+ * Ignored from documentation as it's internal to the data store.
+ *
+ * @ignore
+ *
+ * @param {boolean} hasChanged Whether it changed.
+ *
+ * @return {Object} Action object.
+ */
+export function __experimentalAssociatedVariationChanged( hasChanged ) {
+	return {
+		type: 'SET_ASSOCIATED_VARIATION_CHANGED',
+		hasChanged,
 	};
 }

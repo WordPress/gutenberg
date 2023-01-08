@@ -16,6 +16,8 @@ import {
 	__EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE,
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 } from '@wordpress/blocks';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -363,4 +365,37 @@ export function useColorRandomizer( name ) {
 	return window.__experimentalEnableColorRandomizer
 		? [ randomizeColors ]
 		: [];
+}
+
+export function useHasUserModifiedStyles() {
+	const { user } = useContext( GlobalStylesContext );
+	return (
+		Boolean( user ) &&
+		( Object.keys( user.settings ).length !== 0 ||
+			Object.keys( user.styles ).length !== 0 )
+	);
+}
+
+export function useCreateNewStyleRecord( title ) {
+	const { __experimentalCreateNewGlobalStylesVariation } =
+		useDispatch( coreStore );
+	const { user } = useContext( GlobalStylesContext );
+	const callback = useCallback( () => {
+		return __experimentalCreateNewGlobalStylesVariation( {
+			...user,
+			title,
+		} );
+	}, [ title, user ] );
+	return callback;
+}
+
+export function useCustomSavedStyles() {
+	const { variations } = useSelect( ( select ) => {
+		const { __experimentalGetGlobalStylesVariations } = select( coreStore );
+		return {
+			variations: __experimentalGetGlobalStylesVariations( 'user' ),
+		};
+	}, [] );
+
+	return variations;
 }

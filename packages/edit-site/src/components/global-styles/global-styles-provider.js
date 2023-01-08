@@ -15,6 +15,8 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { GlobalStylesContext } from './context';
 
+/* eslint-disable dot-notation, camelcase */
+
 function mergeTreesCustomizer( _, srcValue ) {
 	// We only pass as arrays the presets,
 	// in which case we want the new array of values
@@ -45,10 +47,13 @@ const cleanEmptyObject = ( object ) => {
 };
 
 function useGlobalStylesUserConfig() {
-	const { globalStylesId, isReady, settings, styles } = useSelect(
-		( select ) => {
-			const { getEditedEntityRecord, hasFinishedResolution } =
-				select( coreStore );
+	const { hasFinishedResolution } = useSelect( coreStore );
+	const { editEntityRecord, __experimentalAssociatedVariationChanged } =
+		useDispatch( coreStore );
+
+	const { globalStylesId, isReady, settings, styles, associated_style_id } =
+		useSelect( ( select ) => {
+			const { getEditedEntityRecord } = select( coreStore );
 			const _globalStylesId =
 				select( coreStore ).__experimentalGetCurrentGlobalStylesId();
 			const record = _globalStylesId
@@ -58,6 +63,19 @@ function useGlobalStylesUserConfig() {
 						_globalStylesId
 				  )
 				: undefined;
+			const _associatedStyleId = record
+				? record[ 'associated_style_id' ]
+				: undefined;
+			if (
+				_associatedStyleId &&
+				! __experimentalAssociatedVariationChanged()
+			) {
+				getEditedEntityRecord(
+					'root',
+					'globalStyles',
+					_associatedStyleId
+				);
+			}
 
 			let hasResolved = false;
 			if (
@@ -65,13 +83,33 @@ function useGlobalStylesUserConfig() {
 					'__experimentalGetCurrentGlobalStylesId'
 				)
 			) {
-				hasResolved = _globalStylesId
-					? hasFinishedResolution( 'getEditedEntityRecord', [
+				hasResolved = ( () => {
+					if ( ! _globalStylesId ) {
+						return false;
+					}
+
+					const userStyleFinishedResolution = hasFinishedResolution(
+						'getEditedEntityRecord',
+						[ 'root', 'globalStyles', _globalStylesId ]
+					);
+
+					if ( ! _associatedStyleId ) {
+						return userStyleFinishedResolution;
+					}
+
+					const associatedStyleFinishedResolution =
+						__experimentalAssociatedVariationChanged() ||
+						hasFinishedResolution( 'getEditedEntityRecord', [
 							'root',
 							'globalStyles',
-							_globalStylesId,
-					  ] )
-					: true;
+							_associatedStyleId,
+						] );
+
+					return (
+						userStyleFinishedResolution &&
+						associatedStyleFinishedResolution
+					);
+				} )();
 			}
 
 			return {
@@ -79,19 +117,18 @@ function useGlobalStylesUserConfig() {
 				isReady: hasResolved,
 				settings: record?.settings,
 				styles: record?.styles,
+				associated_style_id: _associatedStyleId,
 			};
-		},
-		[]
-	);
+		}, [] );
 
 	const { getEditedEntityRecord } = useSelect( coreStore );
-	const { editEntityRecord } = useDispatch( coreStore );
 	const config = useMemo( () => {
 		return {
 			settings: settings ?? {},
 			styles: styles ?? {},
+			associated_style_id: associated_style_id ?? null,
 		};
-	}, [ settings, styles ] );
+	}, [ settings, styles, associated_style_id ] );
 
 	const setConfig = useCallback(
 		( callback, options = {} ) => {
@@ -103,18 +140,84 @@ function useGlobalStylesUserConfig() {
 			const currentConfig = {
 				styles: record?.styles ?? {},
 				settings: record?.settings ?? {},
+				associated_style_id: record?.associated_style_id ?? null,
 			};
 			const updatedConfig = callback( currentConfig );
+			const updatedRecord = {
+				styles: cleanEmptyObject( updatedConfig.styles ) || {},
+				settings: cleanEmptyObject( updatedConfig.settings ) || {},
+				associated_style_id:
+					updatedConfig[ 'associated_style_id' ] || null,
+			};
+
+			let associatedStyleIdChanged = false;
+
+			if (
+				currentConfig[ 'associated_style_id' ] !==
+				updatedRecord[ 'associated_style_id' ]
+			) {
+				associatedStyleIdChanged = true;
+			}
+
+			__experimentalAssociatedVariationChanged(
+				associatedStyleIdChanged
+			);
+
 			editEntityRecord(
 				'root',
 				'globalStyles',
 				globalStylesId,
-				{
-					styles: cleanEmptyObject( updatedConfig.styles ) || {},
-					settings: cleanEmptyObject( updatedConfig.settings ) || {},
-				},
+				updatedRecord,
 				options
 			);
+
+			if (
+				! associatedStyleIdChanged &&
+				updatedRecord[ 'associated_style_id' ]
+			) {
+				if (
+					( ! hasFinishedResolution( 'getEditedEntityRecord' ),
+					[
+						'root',
+						'globalStyles',
+						updatedRecord[ 'associated_style_id' ],
+					] )
+				) {
+					const intervalId = setInterval( () => {
+						if (
+							( hasFinishedResolution( 'getEditedEntityRecord' ),
+							[
+								'root',
+								'globalStyles',
+								updatedRecord[ 'associated_style_id' ],
+							] )
+						) {
+							editEntityRecord(
+								'root',
+								'globalStyles',
+								updatedRecord[ 'associated_style_id' ],
+								{
+									settings: updatedRecord.settings,
+									styles: updatedRecord.styles,
+								},
+								options
+							);
+							clearInterval( intervalId );
+						}
+					}, 500 );
+				} else {
+					editEntityRecord(
+						'root',
+						'globalStyles',
+						updatedRecord[ 'associated_style_id' ],
+						{
+							settings: updatedRecord.settings,
+							styles: updatedRecord.styles,
+						},
+						options
+					);
+				}
+			}
 		},
 		[ globalStylesId ]
 	);
@@ -161,6 +264,8 @@ function useGlobalStylesContext() {
 
 	return context;
 }
+
+/* eslint-enable dot-notation, camelcase */
 
 export function GlobalStylesProvider( { children } ) {
 	const context = useGlobalStylesContext();

@@ -34,9 +34,11 @@ export interface State {
 	embedPreviews: Record< string, { html: string } >;
 	entities: EntitiesState;
 	themeBaseGlobalStyles: Record< string, Object >;
-	themeGlobalStyleVariations: Record< string, string >;
+	themeGlobalStyleVariations: Record< string, Object[] >;
+	userGlobalStyleVariations: Record< string, Object[] >;
 	undo: UndoState;
 	users: UserState;
+	associatedVariationChanged: boolean;
 }
 
 type EntityRecordKey = string | number;
@@ -1238,20 +1240,27 @@ export function __experimentalGetCurrentThemeBaseGlobalStyles(
 }
 
 /**
- * Return the ID of the current global styles object.
+ * Return global styles variations.
  *
  * @param  state Data state.
+ * @param author Variations author. Either 'theme' or 'user'.
  *
- * @return The current global styles ID.
+ * @return Global styles variations
  */
-export function __experimentalGetCurrentThemeGlobalStylesVariations(
-	state: State
-): string | null {
+export function __experimentalGetGlobalStylesVariations(
+	state: State,
+	author: 'theme' | 'user' = 'theme'
+): Object[] | null {
 	const currentTheme = getCurrentTheme( state );
 	if ( ! currentTheme ) {
 		return null;
 	}
-	return state.themeGlobalStyleVariations[ currentTheme.stylesheet ];
+
+	if ( author === 'theme' ) {
+		return state.themeGlobalStyleVariations[ currentTheme.stylesheet ];
+	}
+
+	return state.userGlobalStyleVariations[ currentTheme.stylesheet ];
 }
 
 /**
@@ -1274,4 +1283,10 @@ export function getBlockPatterns( state: State ): Array< any > {
  */
 export function getBlockPatternCategories( state: State ): Array< any > {
 	return state.blockPatternCategories;
+}
+
+export function __experimentalHasAssociatedVariationChanged(
+	state: State
+): boolean {
+	return state.associatedVariationChanged;
 }
