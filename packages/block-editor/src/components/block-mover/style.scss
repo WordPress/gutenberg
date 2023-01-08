@@ -95,3 +95,10 @@
 		@include block-toolbar-button-style__focus();
 	}
 }
+
+// Styles when the 'show button text labels' preference is enabled.
+.show-icon-labels {
+	.block-editor-block-mover:not(.is-horizontal) .block-editor-block-mover__move-button-container {
+		width: auto;
+	}
+}
