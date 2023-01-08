@@ -137,7 +137,7 @@ function PushChangesToGlobalStylesControl( {
 				disabled={ changes.length === 0 }
 				onClick={ pushChanges }
 			>
-				{ __( 'Push changes globally' ) }
+				{ __( 'Apply globally' ) }
 			</Button>
 		</BaseControl>
 	);
