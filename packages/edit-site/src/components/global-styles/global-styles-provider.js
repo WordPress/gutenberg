@@ -47,7 +47,10 @@ const cleanEmptyObject = ( object ) => {
 };
 
 function useGlobalStylesUserConfig() {
-	const { hasFinishedResolution } = useSelect( coreStore );
+	const {
+		hasFinishedResolution,
+		__experimentalHasAssociatedVariationChanged,
+	} = useSelect( coreStore );
 	const { editEntityRecord, __experimentalAssociatedVariationChanged } =
 		useDispatch( coreStore );
 
@@ -68,7 +71,7 @@ function useGlobalStylesUserConfig() {
 				: undefined;
 			if (
 				_associatedStyleId &&
-				! __experimentalAssociatedVariationChanged()
+				! __experimentalHasAssociatedVariationChanged()
 			) {
 				getEditedEntityRecord(
 					'root',
@@ -98,7 +101,7 @@ function useGlobalStylesUserConfig() {
 					}
 
 					const associatedStyleFinishedResolution =
-						__experimentalAssociatedVariationChanged() ||
+						__experimentalHasAssociatedVariationChanged() ||
 						hasFinishedResolution( 'getEditedEntityRecord', [
 							'root',
 							'globalStyles',
