@@ -136,10 +136,22 @@ export function hasPositionSupport( blockType ) {
  * Checks if there is a current value in the position block support attributes.
  *
  * @param {Object} props Block props.
- * @return {boolean}     Whether or not the block has a position value set.
+ * @return {boolean} Whether or not the block has a position value set.
  */
 export function hasPositionValue( props ) {
 	return props.attributes.style?.position?.type !== undefined;
+}
+
+/**
+ * Checks if the block is currently set to a sticky or fixed position.
+ * This check is helpful for determining how to position block toolbars or other elements.
+ *
+ * @param {Object} attributes Block attributes.
+ * @return {boolean} Whether or not the block is set to a sticky or fixed position.
+ */
+export function hasStickyOrFixedPositionValue( attributes ) {
+	const positionType = attributes.style?.position?.type;
+	return positionType === 'sticky' || positionType === 'fixed';
 }
 
 /**

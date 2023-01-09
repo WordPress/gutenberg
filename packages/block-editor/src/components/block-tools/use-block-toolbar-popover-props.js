@@ -16,6 +16,7 @@ import {
  */
 import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
+import { hasStickyOrFixedPositionValue } from '../../hooks/position';
 
 const COMMON_PROPS = {
 	placement: 'top-start',
@@ -48,6 +49,7 @@ const RESTRICTED_HEIGHT_PROPS = {
  * @param {Element} selectedBlockElement The outer DOM element of the first selected block.
  * @param {Element} scrollContainer      The scrollable container for the contentElement.
  * @param {number}  toolbarHeight        The height of the toolbar in pixels.
+ * @param {boolean} isSticky             Whether or not the selected block is sticky or fixed.
  *
  * @return {Object} The popover props used to determine the position of the toolbar.
  */
@@ -55,7 +57,8 @@ function getProps(
 	contentElement,
 	selectedBlockElement,
 	scrollContainer,
-	toolbarHeight
+	toolbarHeight,
+	isSticky
 ) {
 	if ( ! contentElement || ! selectedBlockElement ) {
 		return DEFAULT_PROPS;
@@ -83,7 +86,11 @@ function getProps(
 	const isBlockTallerThanViewport =
 		blockRect.height > viewportHeight - toolbarHeight;
 
-	if ( hasSpaceForToolbarAbove || isBlockTallerThanViewport ) {
+	// Sticky blocks are treated as if they will never have enough space for the toolbar above.
+	if (
+		! isSticky &&
+		( hasSpaceForToolbarAbove || isBlockTallerThanViewport )
+	) {
 		return DEFAULT_PROPS;
 	}
 
@@ -105,6 +112,19 @@ export default function useBlockToolbarPopoverProps( {
 } ) {
 	const selectedBlockElement = useBlockElement( clientId );
 	const [ toolbarHeight, setToolbarHeight ] = useState( 0 );
+	const { blockIndex, isSticky } = useSelect(
+		( select ) => {
+			const { getBlockIndex, getBlockAttributes } =
+				select( blockEditorStore );
+			return {
+				blockIndex: getBlockIndex( clientId ),
+				isSticky: hasStickyOrFixedPositionValue(
+					getBlockAttributes( clientId )
+				),
+			};
+		},
+		[ clientId ]
+	);
 	const scrollContainer = useMemo( () => {
 		if ( ! contentElement ) {
 			return;
@@ -116,12 +136,9 @@ export default function useBlockToolbarPopoverProps( {
 			contentElement,
 			selectedBlockElement,
 			scrollContainer,
-			toolbarHeight
+			toolbarHeight,
+			isSticky
 		)
-	);
-	const blockIndex = useSelect(
-		( select ) => select( blockEditorStore ).getBlockIndex( clientId ),
-		[ clientId ]
 	);
 
 	const popoverRef = useRefEffect( ( popoverNode ) => {
@@ -135,7 +152,8 @@ export default function useBlockToolbarPopoverProps( {
 					contentElement,
 					selectedBlockElement,
 					scrollContainer,
-					toolbarHeight
+					toolbarHeight,
+					isSticky
 				)
 			),
 		[ contentElement, selectedBlockElement, scrollContainer, toolbarHeight ]
