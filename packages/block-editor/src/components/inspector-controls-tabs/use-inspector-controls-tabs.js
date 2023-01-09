@@ -3,6 +3,7 @@
  */
 import { __experimentalUseSlotFills as useSlotFills } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -46,12 +47,23 @@ export default function useInspectorControlsTabs( blockName ) {
 		typography: typographyGroup,
 	} = InspectorControlsGroups;
 
+	const showIconLabels = useSelect( ( select ) => {
+		return select( preferencesStore ).get(
+			'core/edit-post',
+			'showIconLabels'
+		);
+	} );
+
 	// List View Tab: If there are any fills for the list group add that tab.
 	const listViewDisabled = useIsListViewTabDisabled( blockName );
 	const listFills = useSlotFills( listGroup.Slot.__unstableName );
 
 	if ( ! listViewDisabled && !! listFills && listFills.length ) {
-		tabs.push( TAB_LIST_VIEW );
+		tabs.push(
+			showIconLabels
+				? { ...TAB_LIST_VIEW, icon: undefined }
+				: TAB_LIST_VIEW
+		);
 	}
 
 	// Styles Tab: Add this tab if there are any fills for block supports
@@ -64,7 +76,9 @@ export default function useInspectorControlsTabs( blockName ) {
 	];
 
 	if ( styleFills.length ) {
-		tabs.push( TAB_STYLES );
+		tabs.push(
+			showIconLabels ? { ...TAB_STYLES, icon: undefined } : TAB_STYLES
+		);
 	}
 
 	// Settings Tab: If there are any fills for the general InspectorControls
@@ -75,7 +89,9 @@ export default function useInspectorControlsTabs( blockName ) {
 	];
 
 	if ( settingsFills.length ) {
-		tabs.push( TAB_SETTINGS );
+		tabs.push(
+			showIconLabels ? { ...TAB_SETTINGS, icon: undefined } : TAB_SETTINGS
+		);
 	}
 
 	const tabSettings = useSelect( ( select ) => {
