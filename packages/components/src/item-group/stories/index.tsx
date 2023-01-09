@@ -57,38 +57,47 @@ Default.args = {
 	 ).map( mapPropsToItem ),
 };
 
-export const NonClickableItems: ComponentStory< typeof ItemGroup > = Template.bind( {} );
+export const NonClickableItems: ComponentStory< typeof ItemGroup > =
+	Template.bind( {} );
 NonClickableItems.args = {
 	children: (
 		[
 			{
-				children: 'This <Item /> is not click-able because it doesn\'t have an `onClick` prop',
+				children:
+					"This <Item /> is not click-able because it doesn't have an `onClick` prop",
 			},
 			{
-				children: 'This <Item /> is also not click-able because it doesn\'t have an `onClick` prop',
+				children:
+					"This <Item /> is also not click-able because it doesn't have an `onClick` prop",
 			},
 		] as ItemProps[]
 	 ).map( mapPropsToItem ),
 };
 
-export const CustomItemSize: ComponentStory< typeof ItemGroup > = Template.bind( {} );
+export const CustomItemSize: ComponentStory< typeof ItemGroup > = Template.bind(
+	{}
+);
 CustomItemSize.args = {
 	children: (
 		[
 			{
-				children: 'This <Item /> will inherit the size from <ItemGroup /> (try changing the size prop)',
+				children:
+					'This <Item /> will inherit the size from <ItemGroup /> (try changing the size prop)',
 			},
 			{
-				children: 'This <Item /> has a hardcoded size="large", regardless of <ItemGroup />\'s size',
+				children:
+					'This <Item /> has a hardcoded size="large", regardless of <ItemGroup />\'s size',
 				size: 'large',
 			},
 		] as ItemProps[]
 	 ).map( mapPropsToItem ),
 };
 
-export const WithBorder: ComponentStory< typeof ItemGroup > = Template.bind( {} );
+export const WithBorder: ComponentStory< typeof ItemGroup > = Template.bind(
+	{}
+);
 WithBorder.args = {
 	...Default.args,
 	isBordered: true,
-	isSeparated: true
+	isSeparated: true,
 };
