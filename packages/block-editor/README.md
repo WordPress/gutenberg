@@ -348,6 +348,10 @@ _Returns_
 
 Undocumented declaration.
 
+### findInPresetsBy
+
+Undocumented declaration.
+
 ### FontSizePicker
 
 _Related_
@@ -527,6 +531,35 @@ _Returns_
 
 -   `Object`: Typography block support derived CSS classes & styles.
 
+### getTypographyFontSizeValue
+
+Returns a font-size value based on a given font-size preset.
+Takes into account fluid typography parameters and attempts to return a css formula depending on available, valid values.
+
+_Parameters_
+
+-   _preset_ `Preset`:
+-   _typographySettings_ `Object`:
+-   _typographySettings.fluid_ `boolean|TypographySettings`: Whether fluid typography is enabled, and, optionally, fluid font size options.
+
+_Returns_
+
+-   `string|*`: A font-size value or the value of preset.size.
+
+### getValueFromVariable
+
+Attempts to fetch the value of a theme.json CSS variable.
+
+_Parameters_
+
+-   _features_ `Object`: GlobalStylesContext config, e.g., user, base or merged. Represents the theme.json tree.
+-   _blockName_ `string`: The name of a block as represented in the styles property. E.g., 'root' for root-level, and 'core/${blockName}' for blocks.
+-   _variable_ `string|*`: An incoming style value. A CSS var value is expected, but it could be any value.
+
+_Returns_
+
+-   `string|*|{ref}`: The value of the CSS var, if found. If not found, the passed variable argument.
+
 ### InnerBlocks
 
 _Related_
@@ -615,6 +648,10 @@ Undocumented declaration.
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/plain-text/README.md>
+
+### PRESET_METADATA
+
+Undocumented declaration.
 
 ### RichText
 

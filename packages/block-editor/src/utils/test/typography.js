@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { getTypographyFontSizeValue } from '../typography-utils';
+import { getTypographyFontSizeValue } from '../typography';
 
 describe( 'typography utils', () => {
 	describe( 'getTypographyFontSizeValue', () => {

@@ -16,11 +16,12 @@ import {
 	__EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE,
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 } from '@wordpress/blocks';
+import { getValueFromVariable } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { getValueFromVariable, getPresetVariableFromValue } from './utils';
+import { getPresetVariableFromValue } from './utils';
 import { GlobalStylesContext } from './context';
 
 // Enable colord's a11y plugin.

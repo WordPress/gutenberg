@@ -5,9 +5,9 @@
  */
 
 /**
- * WordPress dependencies
+ * Internal dependencies
  */
-import { getComputedFluidTypographyValue } from '@wordpress/block-editor';
+import { getComputedFluidTypographyValue } from '../components/font-sizes';
 
 /**
  * @typedef {Object} FluidPreset

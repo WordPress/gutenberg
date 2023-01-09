@@ -18,13 +18,14 @@ import {
 	__unstablePresetDuotoneFilter as PresetDuotoneFilter,
 	__experimentalGetGapCSSValue as getGapCSSValue,
 	store as blockEditorStore,
+	PRESET_METADATA,
+	getTypographyFontSizeValue,
 } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { PRESET_METADATA, ROOT_BLOCK_SELECTOR, scopeSelector } from './utils';
-import { getTypographyFontSizeValue } from './typography-utils';
+import { ROOT_BLOCK_SELECTOR, scopeSelector } from './utils';
 import { GlobalStylesContext } from './context';
 import { useSetting } from './hooks';
 
