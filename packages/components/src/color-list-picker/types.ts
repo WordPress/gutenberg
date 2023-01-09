@@ -9,10 +9,10 @@ export type ColorListPickerProps = {
 		color: NonNullable< CSSProperties[ 'color' ] >;
 	} >;
 	labels: Array< string >;
-	value?: Array< string >;
+	value?: Array< string | undefined >;
 	disableCustomColors?: boolean;
 	enableAlpha?: boolean;
-	onChange: ( newValue: Array< string > ) => void; // TODO: resolve conflict with ColorPalette's onChange prop, which expects an optional value arg.
+	onChange: ( newValue: Array< string | undefined > ) => void;
 };
 
 export type ColorOptionProps = Pick<
@@ -20,6 +20,6 @@ export type ColorOptionProps = Pick<
 	'colors' | 'disableCustomColors' | 'enableAlpha'
 > & {
 	label: ColorListPickerProps[ 'labels' ][ number ];
-	value: string; // TODO: can we extract this from ColorListPickerProps['value']? That prop being optional is a little tricky
-	onChange: ( newValue: string ) => void; // TODO: resolve conflict with ColorPalette's onChange prop, which expects an optional value arg.
+	value: string | undefined;
+	onChange: ( newValue: string | undefined ) => void;
 };
