@@ -5,6 +5,7 @@
 ### Internal
 
 -   `Dashicon`: remove unnecessary type for `className` prop ([46849](https://github.com/WordPress/gutenberg/pull/46849)).
+-   `ColorListPicker`: Convert to TypeScript ([#46358](https://github.com/WordPress/gutenberg/pull/46358)).
 
 ## 23.1.0 (2023-01-02)
 
