@@ -49,7 +49,7 @@ function ScaledBlockPreview( {
 				...styles,
 				...__experimentalStyles,
 				{
-					css: 'body{height:auto;overflow:hidden;}',
+					css: 'body{height:auto;overflow:hidden;border:none;}',
 					__unstableType: 'presets',
 				},
 			];
@@ -90,9 +90,6 @@ function ScaledBlockPreview( {
 					documentElement.style.position = 'absolute';
 					documentElement.style.width = '100%';
 					bodyElement.style.padding = __experimentalPadding + 'px';
-
-					// Necessary for proper previews of styles with border styles assigned to the body.
-					bodyElement.style.border = 'none';
 
 					// Necessary for contentResizeListener to work.
 					bodyElement.style.boxSizing = 'border-box';
