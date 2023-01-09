@@ -87,7 +87,7 @@ CustomItemSize.args = {
 };
 
 export const WithBorder: ComponentStory< typeof ItemGroup > = Template.bind( {} );
-BorderedItems.args = {
+WithBorder.args = {
 	...Default.args,
 	isBordered: true,
 	isSeparated: true
