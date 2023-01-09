@@ -88,7 +88,7 @@
 	cursor: ew-resize;
 	outline: none;
 	background: none;
-	border-radius: 2px;
+	border-radius: $radius-block-ui;
 	border: 0;
 
 	&.is-variation-default {
@@ -119,7 +119,7 @@
 		content: "";
 		width: $grid-unit-05;
 		background: $gray-600;
-		border-radius: 2px;
+		border-radius: $radius-block-ui;
 	}
 
 	&.is-left {
