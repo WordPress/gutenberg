@@ -72,7 +72,7 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test a new navigation menu editor sidebar in the site editor.', 'gutenberg' ),
+			'label' => __( 'Test a new global navigation menu sidebar in the site editor.', 'gutenberg' ),
 			'id'    => 'gutenberg-site-editor-navigation-menu-sidebar',
 		)
 	);
