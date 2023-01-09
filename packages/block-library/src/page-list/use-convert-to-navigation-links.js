@@ -5,7 +5,7 @@ import { createBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
-function convertToNavigationLinks( pages = [] ) {
+export function convertToNavigationLinks( pages = [] ) {
 	const linkMap = {};
 	const navigationLinks = [];
 	pages.forEach( ( { id, title, link: url, type, parent } ) => {
