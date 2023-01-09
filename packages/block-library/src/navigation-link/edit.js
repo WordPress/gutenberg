@@ -23,7 +23,11 @@ import {
 	store as blockEditorStore,
 	getColorClassName,
 	useInnerBlocksProps,
+<<<<<<< HEAD
 	useBlockEditingMode,
+=======
+	__experimentalLinkControl as LinkControl,
+>>>>>>> 9fd8fde7cfa (Implement proof of concept)
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
@@ -35,6 +39,12 @@ import { useMergeRefs, useInstanceId } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+<<<<<<< HEAD
+=======
+import { name } from './block.json';
+import { LinkUI, getSuggestionsQuery } from './link-ui';
+import { updateAttributes } from './update-attributes';
+>>>>>>> 9fd8fde7cfa (Implement proof of concept)
 import { getColors } from '../navigation/edit/utils';
 import {
 	Controls,
@@ -497,6 +507,12 @@ export default function NavigationLinkEdit( {
 		isInvalid ? __( 'Invalid' ) : __( 'Draft' )
 	})`;
 
+	const testLink = {
+		url,
+		opensInNewTab: attributes?.opensInNewTab,
+		title: label && stripHTML( label ),
+	};
+
 	return (
 		<>
 			<BlockControls>
@@ -521,11 +537,93 @@ export default function NavigationLinkEdit( {
 				</ToolbarGroup>
 			</BlockControls>
 			<InspectorControls>
+<<<<<<< HEAD
 				<Controls
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					clientId={ clientId }
 				/>
+=======
+				{ /* className="wp-block-navigation-link__inline-link-input"
+				clientId={ clientId }
+				link={ attributes }
+				onClose={ () => setIsLinkOpen( false ) }
+				anchor={ popoverAnchor }
+				hasCreateSuggestion={ userCanCreate }
+				onRemove={ removeLink }
+				onChange=
+				{ ( updatedValue ) => {
+					updateAttributes( updatedValue, setAttributes, attributes );
+				} } */ }
+
+				<PanelBody title={ __( 'Link settings' ) }>
+					<LinkControl
+						hasTextControl
+						hasRichPreviews
+						className="wp-block-navigation-link__inline-link-input"
+						value={ testLink }
+						showInitialSuggestions={ true }
+						noDirectEntry={ !! type }
+						noURLSuggestion={ !! type }
+						suggestionsQuery={ getSuggestionsQuery( type, kind ) }
+						onChange={ ( updatedValue ) => {
+							updateAttributes(
+								updatedValue,
+								setAttributes,
+								attributes
+							);
+						} }
+						onRemove={ removeLink }
+					/>
+					<TextControl
+						value={ label ? stripHTML( label ) : '' }
+						onChange={ ( labelValue ) => {
+							setAttributes( { label: labelValue } );
+						} }
+						label={ __( 'Label' ) }
+						autoComplete="off"
+					/>
+					<TextControl
+						value={ url || '' }
+						onChange={ ( urlValue ) => {
+							updateAttributes(
+								{ url: urlValue },
+								setAttributes,
+								attributes
+							);
+						} }
+						label={ __( 'URL' ) }
+						autoComplete="off"
+					/>
+					<TextareaControl
+						__nextHasNoMarginBottom
+						value={ description || '' }
+						onChange={ ( descriptionValue ) => {
+							setAttributes( { description: descriptionValue } );
+						} }
+						label={ __( 'Description' ) }
+						help={ __(
+							'The description will be displayed in the menu if the current theme supports it.'
+						) }
+					/>
+					<TextControl
+						value={ title || '' }
+						onChange={ ( titleValue ) => {
+							setAttributes( { title: titleValue } );
+						} }
+						label={ __( 'Link title' ) }
+						autoComplete="off"
+					/>
+					<TextControl
+						value={ rel || '' }
+						onChange={ ( relValue ) => {
+							setAttributes( { rel: relValue } );
+						} }
+						label={ __( 'Link rel' ) }
+						autoComplete="off"
+					/>
+				</PanelBody>
+>>>>>>> 9fd8fde7cfa (Implement proof of concept)
 			</InspectorControls>
 			<div { ...blockProps }>
 				{ hasMissingEntity && (
