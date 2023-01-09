@@ -9,7 +9,7 @@ import { useContext, forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Button from '../button';
+import Button from '../../button';
 import ToolbarItem from '../toolbar-item';
 import ToolbarContext from '../toolbar-context';
 import ToolbarButtonContainer from './toolbar-button-container';

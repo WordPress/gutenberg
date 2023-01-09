@@ -63,11 +63,6 @@
 		"src/panel",
 		"src/query-controls",
 		"src/toolbar",
-		"src/toolbar-button",
-		"src/toolbar-context",
-		"src/toolbar-dropdown-menu",
-		"src/toolbar-group",
-		"src/toolbar-item",
 		"src/tree-grid"
 	]
 }

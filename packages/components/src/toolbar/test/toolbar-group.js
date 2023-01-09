@@ -6,7 +6,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import ToolbarGroup from '../';
+import { ToolbarGroup } from '..';
 
 describe( 'ToolbarGroup', () => {
 	describe( 'basic rendering', () => {
