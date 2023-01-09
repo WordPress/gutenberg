@@ -8,7 +8,8 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
  */
 import { ItemGroup } from '../item-group/component';
 import { Item } from '../item/component';
-import type { ItemProps } from '../types';
+
+type ItemProps = React.ComponentPropsWithoutRef< typeof Item >;
 
 const meta: ComponentMeta< typeof ItemGroup > = {
 	component: ItemGroup,
@@ -38,17 +39,56 @@ Default.args = {
 	children: (
 		[
 			{
-				children: 'Default non-clickable item',
-			},
-			{
-				children: 'Clickable item',
+				children: 'First item',
 				// eslint-disable-next-line no-alert
-				onClick: () => alert( 'WordPress.org' ),
+				onClick: () => alert( 'First item clicked' ),
 			},
 			{
-				children: 'Item with hardcoded size="large"',
+				children: 'Second item',
+				// eslint-disable-next-line no-alert
+				onClick: () => alert( 'Second item clicked' ),
+			},
+			{
+				children: 'Third item',
+				// eslint-disable-next-line no-alert
+				onClick: () => alert( 'Third item clicked' ),
+			},
+		] as ItemProps[]
+	 ).map( mapPropsToItem ),
+};
+
+export const NonClickableItems: ComponentStory< typeof ItemGroup > = Template.bind( {} );
+NonClickableItems.args = {
+	children: (
+		[
+			{
+				children: 'This <Item /> is not click-able because it doesn\'t have an `onClick` prop',
+			},
+			{
+				children: 'This <Item /> is also not click-able because it doesn\'t have an `onClick` prop',
+			},
+		] as ItemProps[]
+	 ).map( mapPropsToItem ),
+};
+
+export const CustomItemSize: ComponentStory< typeof ItemGroup > = Template.bind( {} );
+CustomItemSize.args = {
+	children: (
+		[
+			{
+				children: 'This <Item /> will inherit the size from <ItemGroup /> (try changing the size prop)',
+			},
+			{
+				children: 'This <Item /> has a hardcoded size="large", regardless of <ItemGroup />\'s size',
 				size: 'large',
 			},
 		] as ItemProps[]
 	 ).map( mapPropsToItem ),
+};
+
+export const WithBorder: ComponentStory< typeof ItemGroup > = Template.bind( {} );
+BorderedItems.args = {
+	...Default.args,
+	isBordered: true,
+	isSeparated: true
 };
