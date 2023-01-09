@@ -26,7 +26,7 @@ This document outlines a typical flow of migrating a Jest + Puppeteer test to Pl
         },
     } );
     ```
-7. If there's a missing util, try inline the operations directly in the test if there are only a few steps. If you think it deserves to be implemented as a test util, then follow the [guide](#migration-steps-for-test-utils) below.
+7. If there's a missing util, try to inline the operations directly in the test if there are only a few steps. If you think it deserves to be implemented as a test util, then follow the [guide](#migration-steps-for-test-utils) below.
 8. Manually migrate other details in the tests following the proposed [best practices](https://github.com/WordPress/gutenberg/tree/HEAD/docs/contributors/code/e2e/README.md#best-practices). Note that even though the differences in the API of Playwright and Puppeteer are similar, some manual changes are still required.
 
 ## Migration steps for test utils
