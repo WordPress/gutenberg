@@ -188,8 +188,6 @@ function BlockPatternsTabs( {
 } ) {
 	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
 	const categories = usePatternsCategories( rootClientId );
-	const [ showPatternsExplorer2, setShowPatternsExplorer2 ] =
-		useState( false );
 	const isMobile = useViewportMatch( 'medium', '<' );
 	return (
 		<>
