@@ -97,7 +97,7 @@ function PushChangesToGlobalStylesControl( {
 		createSuccessNotice(
 			sprintf(
 				// translators: %s: Title of the block e.g. 'Heading'.
-				__( 'Applied styles to all %s blocks.' ),
+				__( '%s styles updated.' ),
 				getBlockType( name ).title
 			),
 			{
@@ -124,7 +124,7 @@ function PushChangesToGlobalStylesControl( {
 			help={ sprintf(
 				// translators: %s: Title of the block e.g. 'Heading'.
 				__(
-					'Move this block’s typography, spacing, dimensions, and color styles to all %s blocks.'
+					'Apply this block’s typography, spacing, dimensions, and color styles to all %s blocks.'
 				),
 				getBlockType( name ).title
 			) }

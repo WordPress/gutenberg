@@ -80,7 +80,7 @@ test.describe( 'Push to Global Styles button', () => {
 		await expect(
 			page.getByRole( 'button', {
 				name: 'Dismiss this notice',
-				text: 'Applied styles to all Heading blocks.',
+				text: 'Heading styles updated.',
 			} )
 		).toBeVisible();
 
