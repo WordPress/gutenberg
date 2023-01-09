@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import {
-	__experimentalListView as ListView,
 	__experimentalOffCanvasEditor as OffCanvasEditor,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -50,13 +49,7 @@ export default function NavigationMenu( { innerBlocks, id } ) {
 		} );
 	}, [ updateBlockListSettings, innerBlocks ] );
 
-	if ( window?.__experimentalEnableOffCanvasNavigationEditor ) {
-		return (
-			<OffCanvasEditor
-				blocks={ innerBlocks }
-				selectBlockInCanvas={ false }
-			/>
-		);
-	}
-	return <ListView id={ id } />;
+	return (
+		<OffCanvasEditor blocks={ innerBlocks } selectBlockInCanvas={ false } />
+	);
 }

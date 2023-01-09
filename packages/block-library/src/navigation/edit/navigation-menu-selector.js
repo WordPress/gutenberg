@@ -31,8 +31,6 @@ function NavigationMenuSelector( {
 	createNavigationMenuIsError,
 	toggleProps = {},
 } ) {
-	const isOffCanvasNavigationEditorEnabled =
-		window?.__experimentalEnableOffCanvasNavigationEditor === true;
 	/* translators: %s: The name of a menu. */
 	const createActionLabel = __( "Create from '%s'" );
 
@@ -149,44 +147,11 @@ function NavigationMenuSelector( {
 		},
 	};
 
-	if (
-		! hasNavigationMenus &&
-		! hasClassicMenus &&
-		! isOffCanvasNavigationEditorEnabled
-	) {
-		return (
-			<Button
-				className="wp-block-navigation__navigation-selector-button--createnew"
-				isBusy={ ! enableOptions }
-				disabled={ ! enableOptions }
-				__experimentalIsFocusable
-				onClick={ () => {
-					onCreateNew();
-					setIsCreatingMenu( true );
-					setSelectorLabel( __( 'Loading …' ) );
-					setEnableOptions( false );
-				} }
-			>
-				{ __( 'Create new menu' ) }
-			</Button>
-		);
-	}
-
 	return (
 		<DropdownMenu
-			className={
-				isOffCanvasNavigationEditorEnabled
-					? ''
-					: 'wp-block-navigation__navigation-selector'
-			}
 			label={ selectorLabel }
-			text={ isOffCanvasNavigationEditorEnabled ? '' : selectorLabel }
-			icon={ isOffCanvasNavigationEditorEnabled ? moreVertical : null }
-			toggleProps={
-				isOffCanvasNavigationEditorEnabled
-					? { isSmall: true }
-					: toggleProps
-			}
+			icon={ moreVertical }
+			toggleProps={ { isSmall: true } }
 		>
 			{ ( { onClose } ) => (
 				<>
