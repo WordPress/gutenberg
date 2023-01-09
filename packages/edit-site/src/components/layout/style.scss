@@ -86,7 +86,7 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 	}
 
 	.resizable-editor__drag-handle.is-right {
-		right: 0;
+		right: math.div(-$grid-unit-15, 2);
 	}
 
 	> div {
