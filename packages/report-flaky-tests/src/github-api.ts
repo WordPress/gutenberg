@@ -4,12 +4,6 @@
 import { getOctokit } from '@actions/github';
 import type { GitHub } from '@actions/github/lib/utils';
 import type { Endpoints } from '@octokit/types';
-import * as unzipper from 'unzipper';
-
-/**
- * Internal dependencies
- */
-import type { FlakyTestResult } from './types';
 
 type Octokit = InstanceType< typeof GitHub >;
 
@@ -25,44 +19,6 @@ class GitHubAPI {
 	constructor( token: string, repo: Repo ) {
 		this.#octokit = getOctokit( token );
 		this.#repo = repo;
-	}
-
-	async downloadReportFromArtifact(
-		runID: number,
-		artifactName: string
-	): Promise< FlakyTestResult[] | undefined > {
-		const {
-			data: { artifacts },
-		} = await this.#octokit.rest.actions.listWorkflowRunArtifacts( {
-			...this.#repo,
-			run_id: runID,
-		} );
-
-		const matchArtifact = artifacts.find(
-			( artifact ) => artifact.name === artifactName
-		);
-
-		if ( ! matchArtifact ) {
-			return undefined;
-		}
-
-		const download = await this.#octokit.rest.actions.downloadArtifact( {
-			...this.#repo,
-			artifact_id: matchArtifact.id,
-			archive_format: 'zip',
-		} );
-
-		const { files } = await unzipper.Open.buffer(
-			Buffer.from( download.data as Buffer )
-		);
-		const fileBuffers = await Promise.all(
-			files.map( ( file ) => file.buffer() )
-		);
-		const parsedFiles = fileBuffers.map(
-			( buffer ) => JSON.parse( buffer.toString() ) as FlakyTestResult
-		);
-
-		return parsedFiles;
 	}
 
 	async fetchAllIssuesLabeledFlaky( label: string ) {

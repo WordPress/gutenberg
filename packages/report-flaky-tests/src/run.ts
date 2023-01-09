@@ -27,9 +27,6 @@ async function run() {
 		required: true,
 	} );
 
-	// eslint-disable-next-line no-console
-	console.debug( JSON.stringify( github.context, null, 2 ) );
-
 	const { repo } = github.context;
 	// Cast the payload type: https://github.com/actions/toolkit/tree/main/packages/github#webhook-payload-typescript-definitions
 	const payload = github.context.payload as WorkflowRunCompletedEvent;
