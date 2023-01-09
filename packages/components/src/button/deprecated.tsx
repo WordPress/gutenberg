@@ -1,4 +1,8 @@
-// @ts-nocheck
+/**
+ * External dependencies
+ */
+import type { ForwardedRef } from 'react';
+
 /**
  * WordPress dependencies
  */
@@ -8,9 +12,23 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Button from '../button';
+import Button from '.';
+import type { ButtonProps, DeprecatedIconButtonProps, TagName } from './types';
+import type { WordPressComponentProps } from '../ui/context';
 
-function IconButton( { labelPosition, size, tooltip, label, ...props }, ref ) {
+function UnforwardedIconButton(
+	{
+		labelPosition,
+		size,
+		tooltip,
+		label,
+		...props
+	}: WordPressComponentProps<
+		ButtonProps & DeprecatedIconButtonProps,
+		TagName
+	>,
+	ref: ForwardedRef< any >
+) {
 	deprecated( 'wp.components.IconButton', {
 		since: '5.4',
 		alternative: 'wp.components.Button',
@@ -29,4 +47,4 @@ function IconButton( { labelPosition, size, tooltip, label, ...props }, ref ) {
 	);
 }
 
-export default forwardRef( IconButton );
+export default forwardRef( UnforwardedIconButton );

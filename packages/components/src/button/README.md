@@ -177,6 +177,12 @@ Whether the button is focused.
 -   Type: `Boolean`
 -   Required: No
 
+#### `onMouseDown`: ( event: MouseEvent< HTMLElement > ) => void;`
+
+Called when the mouse is down.
+
+-   Required: No
+
 #### target
 
 If provided with `href`, sets the `target` attribute to the `a`.

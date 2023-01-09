@@ -2,7 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import type { ForwardedRef, HTMLProps, ReactNode } from 'react';
+import type {
+	ForwardedRef,
+	HTMLProps,
+	MouseEvent,
+	ReactNode,
+} from 'react';
 
 /**
  * WordPress dependencies
@@ -21,11 +26,11 @@ import type { WordPressComponentProps } from '../ui/context';
 import type {
 	ButtonProps,
 	DeprecatedButtonProps,
-	DisabledEvents,
+	DisabledEvent,
 	TagName,
 } from './types';
 
-const disabledEventsOnDisabledButton: Array< keyof DisabledEvents > = [
+const disabledEventsOnDisabledButton: Array< DisabledEvent > = [
 	'onMouseDown',
 	'onClick',
 ];
@@ -142,9 +147,13 @@ export function UnforwardedButton(
 		tagProps[ 'aria-disabled' ] = true;
 
 		for ( const disabledEvent of disabledEventsOnDisabledButton ) {
-			additionalProps[ disabledEvent ] = ( event ) => {
-				event.stopPropagation();
-				event.preventDefault();
+			additionalProps[ disabledEvent ] = (
+				event: MouseEvent< HTMLElement >
+			) => {
+				if ( event ) {
+					event.stopPropagation();
+					event.preventDefault();
+				}
 			};
 		}
 	}
@@ -174,21 +183,16 @@ export function UnforwardedButton(
 		className: classes,
 		'aria-label': additionalProps[ 'aria-label' ] || label,
 		'aria-describedby': describedById,
-		ref: ref,
+		ref,
 	};
 
-	const TagElement = ( {
-		children: tagChildren,
-		...otherProps
-	}: { children: ReactNode } & typeof tagElementProps ) => {
+	const TagElement = ( tagProps: { children: ReactNode } & typeof tagElementProps ) => {
 		return Tag === 'a' ? (
-			<a { ...( otherProps as WordPressComponentProps< {}, 'a' > ) }>
-				{ tagChildren }
-			</a>
+			<Tag { ...( tagProps as WordPressComponentProps< {}, 'a' > ) } />
 		) : (
-			<button { ...( otherProps as WordPressComponentProps< {}, 'button' > ) }>
-				{ tagChildren }
-			</button>
+			<Tag
+				{ ...( tagProps as WordPressComponentProps< {}, 'button' > ) }
+			/>
 		);
 	};
 

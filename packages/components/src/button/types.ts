@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { KeyboardEvent, MouseEvent, ReactNode } from 'react';
+import type { MouseEventHandler, ReactNode } from 'react';
 
 /**
  * Internal dependencies
@@ -26,7 +26,7 @@ export type ButtonProps = {
 	 * `'tertiary'` (the text-based button styles), and
 	 * `'link'` (the link button styles).
 	 */
-	variant: 'primary' | 'secondary' | 'tertiary' | 'link';
+	variant?: 'primary' | 'secondary' | 'tertiary' | 'link';
 	/**
 	 * Renders a red text-based button style to indicate destructive behavior.
 	 */
@@ -68,13 +68,17 @@ export type ButtonProps = {
 	 * Please refer to the Icon component for more details regarding
 	 * the default value of its `size` prop.
 	 */
-	iconSize?: IconProps< unknown > [ 'size' ]
+	iconSize?: IconProps< unknown >[ 'size' ];
 	/**
 	 * If provided with `icon`, sets the position of icon relative to the `text`.
 	 *
 	 * @default 'left'
 	 */
 	iconPosition?: 'left' | 'right';
+	/**
+	 * Called when the mouse is down.
+	 */
+	onMouseDown?: MouseEventHandler< HTMLElement >;
 	/**
 	 * If provided, displays the given text inside the button. If the button contains children elements, the text is displayed before them.
 	 */
@@ -102,7 +106,7 @@ export type ButtonProps = {
 	 * Whether this is focusable.
 	 */
 	__experimentalIsFocusable?: boolean;
-}
+};
 
 export type DeprecatedButtonProps = {
 	isDefault?: boolean;
@@ -110,11 +114,16 @@ export type DeprecatedButtonProps = {
 	isSecondary?: boolean;
 	isTertiary?: boolean;
 	isLink?: boolean;
-}
-
-export type DisabledEvents = {
-	onMouseDown: MouseEvent;
-	onClick: KeyboardEvent;
 };
+
+export type DeprecatedIconButtonProps = {
+	labelPosition: ButtonProps[ 'tooltipPosition' ];
+	size: ButtonProps[ 'iconSize' ];
+	showTooltip?: boolean;
+	label: ButtonProps[ 'label' ];
+	tooltip: ButtonProps[ 'label' ];
+};
+
+export type DisabledEvent = 'onMouseDown' | 'onClick';
 
 export type TagName = 'a' | 'button';
