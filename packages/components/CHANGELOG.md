@@ -9,6 +9,7 @@
 -   `ColorPicker` & `QueryControls`: Replace bottom margin overrides with `__nextHasNoMarginBottom` ([#46448](https://github.com/WordPress/gutenberg/pull/46448)).
 -   `SandBox`: Convert to TypeScript ([#46478](https://github.com/WordPress/gutenberg/pull/46478)).
 -   `ResponsiveWrapper`: Convert to TypeScript ([#46480](https://github.com/WordPress/gutenberg/pull/46480)).
+-   `ItemGroup`: migrate Storybook to controls, refactor to TypeScript ([46945](https://github.com/WordPress/gutenberg/pull/46945)).
 
 ### Bug Fix
 
