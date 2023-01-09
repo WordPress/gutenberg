@@ -1,5 +1,9 @@
 .block-editor-list-view-tree {
 	width: 100%;
+	max-width: 100%;
+	overflow-x: auto;
+	@include custom-scrollbars-on-hover(#ffffff);
+	display: block;
 	border-collapse: collapse;
 	padding: 0;
 	margin: 0;
@@ -9,11 +13,18 @@
 		margin: (-$grid-unit-15) (-$grid-unit-15 * 0.5) 0;
 		width: calc(100% + #{ $grid-unit-15 });
 	}
+
+	tbody {
+		display: flex;
+		flex-direction: column;
+	}
 }
 
 .block-editor-list-view-leaf {
 	// Use position relative for row animation.
 	position: relative;
+	display: flex;
+	max-width: $sidebar-width - (2 * $grid-unit-20);
 
 	// The background has to be applied to the td, not tr, or border-radius won't work.
 	&.is-selected td {
@@ -190,6 +201,10 @@
 		flex: 0 0 $icon-size;
 	}
 
+	.block-editor-list-view-block__contents-cell {
+		flex-basis: 100%;
+	}
+
 	.block-editor-list-view-block__menu-cell,
 	.block-editor-list-view-block__mover-cell,
 	.block-editor-list-view-block__contents-cell {
@@ -291,17 +306,24 @@
 	}
 
 	.block-editor-list-view-block-select-button__label-wrapper {
-		min-width: 120px;
+		//min-width: 120px;
 	}
 
 	.block-editor-list-view-block-select-button__title {
-		flex: 1;
-		position: relative;
+		//flex: 1;
+		//position: relative;
+		margin-right: auto;
+		display: inline-flex;
+		align-items: center;
 
 		.components-truncate {
-			position: absolute;
+			//position: absolute;
 			width: 100%;
-			transform: translateY(-50%);
+			//transform: translateY(-50%);
+			display: inline-block;
+			max-width: 120px;
+			text-overflow: ellipsis;
+			overflow: hidden;
 		}
 	}
 
