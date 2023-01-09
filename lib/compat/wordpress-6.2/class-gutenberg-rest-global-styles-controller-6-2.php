@@ -252,8 +252,13 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 			return $post_before;
 		}
 
-		if ( ! empty( $request['associated_style_id'] ) ) {
-			if ( $request['id'] !== WP_Theme_JSON_Resolver_Gutenberg::get_user_global_styles_post_id() ) {
+		$changes = $this->prepare_item_for_database( $request );
+		if ( is_wp_error( $changes ) ) {
+			return $changes;
+		}
+
+		if ( isset( $request['associated_style_id'] ) ) {
+			if ( ( (int) $request['id'] ) !== WP_Theme_JSON_Resolver_Gutenberg::get_user_global_styles_post_id() ) {
 				return new WP_Error(
 					'rest_cannot_edit',
 					__( 'Sorry, you are not allowed to add an associated style id to this global style.', 'gutenberg' ),
@@ -261,18 +266,13 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 				);
 			}
 
-			if ( is_numeric( $request['associated_style_id'] ) && $request['associated_style_id'] < 0 ) {
+			if ( is_numeric( $request['associated_style_id'] ) && $request['associated_style_id'] <= 0 ) {
 				$id = null;
 			} else {
 				$id = $request['associated_style_id'];
 			}
 
 			WP_Theme_JSON_Resolver_Gutenberg::associate_user_variation_with_global_styles_post( $id );
-		}
-
-		$changes = $this->prepare_item_for_database( $request );
-		if ( is_wp_error( $changes ) ) {
-			return $changes;
 		}
 
 		$result = wp_update_post( wp_slash( (array) $changes ), true, false );
@@ -350,6 +350,7 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 				$changes->post_title = $request['title']['raw'];
 			}
 		}
+
 		return $changes;
 	}
 

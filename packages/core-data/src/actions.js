@@ -862,10 +862,10 @@ export function receiveAutosaves( postId, autosaves ) {
  */
 export const __experimentalCreateNewGlobalStylesVariation =
 	( globalStylesData ) =>
-	async ( { dispatch, resolveSelect } ) => {
+	async ( { dispatch, resolveSelect, select } ) => {
 		const currentTheme = await resolveSelect.getCurrentTheme();
 
-		await apiFetch( {
+		const newVariationData = await apiFetch( {
 			path: '/wp/v2/global-styles',
 			method: 'POST',
 			data: globalStylesData,
@@ -879,6 +879,25 @@ export const __experimentalCreateNewGlobalStylesVariation =
 			currentTheme.stylesheet,
 			variations
 		);
+
+		/* eslint-disable dot-notation */
+		// Discard changes to the previously associated variation
+		const globalStylesId = select.__experimentalGetCurrentGlobalStylesId();
+		const userConfig = select.getEditedEntityRecord(
+			'root',
+			'globalStyles',
+			globalStylesId
+		);
+		if ( userConfig[ 'associated_style_id' ] ) {
+			dispatch.__experimentalDiscardRecordChanges(
+				'root',
+				'globalStyles',
+				userConfig[ 'associated_style_id' ]
+			);
+		}
+		/* eslint-enable dot-notation */
+
+		return newVariationData;
 	};
 
 /**
@@ -898,3 +917,40 @@ export function __experimentalAssociatedVariationChanged( hasChanged ) {
 		hasChanged,
 	};
 }
+
+/**
+ * Discards changes in the specified record.
+ *
+ * @param {string} kind     Entity kind.
+ * @param {string} name     Entity name.
+ * @param {*} recordId Record ID.
+ *
+ */
+export const __experimentalDiscardRecordChanges =
+	( kind, name, recordId ) =>
+	( { dispatch, select } ) => {
+		const edits = select.getEntityRecordEdits( kind, name, recordId );
+
+		if ( ! edits ) {
+			return;
+		}
+
+		const clearedEdits = Object.keys( edits ).reduce( ( acc, key ) => {
+			return {
+				...acc,
+				[ key ]: undefined,
+			};
+		}, {} );
+
+		dispatch( {
+			type: 'EDIT_ENTITY_RECORD',
+			kind,
+			name,
+			recordId,
+			edits: clearedEdits,
+			transientEdits: clearedEdits,
+			meta: {
+				isUndo: false,
+			},
+		} );
+	};

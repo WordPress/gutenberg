@@ -530,8 +530,12 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 		$prev_id = get_post_meta( $current_gs_id, 'associated_user_variation', true );
 
-		if ( empty( $prev_id ) ) {
+		if ( empty( $prev_id ) && ! empty( $id ) ) {
 			return add_post_meta( $current_gs_id, 'associated_user_variation', $id, true );
+		}
+
+		if ( empty( $id ) ) {
+			return delete_post_meta( $current_gs_id, 'associated_user_variation' );
 		}
 
 		return update_post_meta( $current_gs_id, 'associated_user_variation', $id );

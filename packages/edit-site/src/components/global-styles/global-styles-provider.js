@@ -6,7 +6,7 @@ import { mergeWith, isEmpty, mapValues } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useMemo, useCallback } from '@wordpress/element';
+import { useMemo, useCallback, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -51,8 +51,11 @@ function useGlobalStylesUserConfig() {
 		hasFinishedResolution,
 		__experimentalHasAssociatedVariationChanged,
 	} = useSelect( coreStore );
-	const { editEntityRecord, __experimentalAssociatedVariationChanged } =
-		useDispatch( coreStore );
+	const {
+		editEntityRecord,
+		__experimentalAssociatedVariationChanged,
+		__experimentalDiscardRecordChanges,
+	} = useDispatch( coreStore );
 
 	const { globalStylesId, isReady, settings, styles, associated_style_id } =
 		useSelect( ( select ) => {
@@ -143,14 +146,14 @@ function useGlobalStylesUserConfig() {
 			const currentConfig = {
 				styles: record?.styles ?? {},
 				settings: record?.settings ?? {},
-				associated_style_id: record?.associated_style_id ?? null,
+				associated_style_id: record?.associated_style_id ?? 0,
 			};
 			const updatedConfig = callback( currentConfig );
 			const updatedRecord = {
 				styles: cleanEmptyObject( updatedConfig.styles ) || {},
 				settings: cleanEmptyObject( updatedConfig.settings ) || {},
 				associated_style_id:
-					updatedConfig[ 'associated_style_id' ] || null,
+					updatedConfig[ 'associated_style_id' ] || 0,
 			};
 
 			let associatedStyleIdChanged = false;
@@ -174,6 +177,25 @@ function useGlobalStylesUserConfig() {
 				options
 			);
 
+			// If a theme variation is selected, discard any changes made to the
+			// associated style record
+			if (
+				! updatedRecord[ 'associated_style_id' ] &&
+				currentConfig[ 'associated_style_id' ] &&
+				hasFinishedResolution( 'getEditedEntityRecord', [
+					'root',
+					'globalStyles',
+					currentConfig[ 'associated_style_id' ],
+				] )
+			) {
+				__experimentalDiscardRecordChanges(
+					'root',
+					'globalStyles',
+					currentConfig[ 'associated_style_id' ]
+				);
+			}
+
+			// Also add changes that were made to the user record to the associated record.
 			if (
 				! associatedStyleIdChanged &&
 				updatedRecord[ 'associated_style_id' ]
@@ -225,7 +247,16 @@ function useGlobalStylesUserConfig() {
 		[ globalStylesId ]
 	);
 
-	return [ isReady, config, setConfig ];
+	const [ selectedThemeVariationChanged, setSelectedThemeVariationChanged ] =
+		useState( false );
+
+	return [
+		isReady,
+		config,
+		setConfig,
+		selectedThemeVariationChanged,
+		setSelectedThemeVariationChanged,
+	];
 }
 
 function useGlobalStylesBaseConfig() {
@@ -239,8 +270,13 @@ function useGlobalStylesBaseConfig() {
 }
 
 function useGlobalStylesContext() {
-	const [ isUserConfigReady, userConfig, setUserConfig ] =
-		useGlobalStylesUserConfig();
+	const [
+		isUserConfigReady,
+		userConfig,
+		setUserConfig,
+		selectedThemeVariationChanged,
+		setSelectedThemeVariationChanged,
+	] = useGlobalStylesUserConfig();
 	const [ isBaseConfigReady, baseConfig ] = useGlobalStylesBaseConfig();
 	const mergedConfig = useMemo( () => {
 		if ( ! baseConfig || ! userConfig ) {
@@ -255,6 +291,8 @@ function useGlobalStylesContext() {
 			base: baseConfig,
 			merged: mergedConfig,
 			setUserConfig,
+			selectedThemeVariationChanged,
+			setSelectedThemeVariationChanged,
 		};
 	}, [
 		mergedConfig,
@@ -263,6 +301,8 @@ function useGlobalStylesContext() {
 		setUserConfig,
 		isUserConfigReady,
 		isBaseConfigReady,
+		selectedThemeVariationChanged,
+		setSelectedThemeVariationChanged,
 	] );
 
 	return context;

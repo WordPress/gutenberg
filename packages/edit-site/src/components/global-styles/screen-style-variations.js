@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
@@ -46,19 +45,28 @@ import {
 	useCreateNewStyleRecord,
 	useCustomSavedStyles,
 } from './hooks';
+import { compareVariations } from './utils';
 
 /* eslint-disable dot-notation */
 
-function compareVariations( a, b ) {
-	return (
-		fastDeepEqual( a.styles, b.styles ) &&
-		fastDeepEqual( a.settings, b.settings )
-	);
-}
-
-function Variation( { variation } ) {
+function Variation( {
+	variation,
+	selectedThemeVariationChanged,
+	setSelectedThemeVariationChanged,
+} ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
+	const { hasEditsForEntityRecord } = useSelect( coreStore );
+	const { globalStyleId } = useSelect( ( select ) => {
+		return {
+			globalStyleId:
+				select( coreStore ).__experimentalGetCurrentGlobalStylesId(),
+		};
+	}, [] );
+
+	// StylesPreview needs to be wrapped in a custom context so that the styles
+	// appear correctly. Otherwise, they would be overriden by current user
+	// settings.
 	const context = useMemo( () => {
 		return {
 			user: {
@@ -72,10 +80,33 @@ function Variation( { variation } ) {
 	}, [ variation, base ] );
 
 	const selectVariation = () => {
+		/* eslint-disable no-alert */
+		if (
+			user[ 'associated_style_id' ] &&
+			hasEditsForEntityRecord(
+				'root',
+				'globalStyles',
+				user[ 'associated_style_id' ]
+			) &&
+			! selectedThemeVariationChanged &&
+			hasEditsForEntityRecord( 'root', 'globalStyles', globalStyleId ) &&
+			! window.confirm(
+				__(
+					'Are you sure you want to switch to this variation? Unsaved changes will be lost.'
+				)
+			)
+		) {
+			return;
+		}
+		/* eslint-enable no-alert */
+
+		setSelectedThemeVariationChanged( true );
+
 		setUserConfig( () => {
 			return {
 				settings: variation.settings,
 				styles: variation.styles,
+				associated_style_id: 0,
 			};
 		} );
 	};
@@ -92,39 +123,66 @@ function Variation( { variation } ) {
 	}, [ user, variation ] );
 
 	return (
-		<GlobalStylesContext.Provider value={ context }>
-			<div
-				className={ classnames(
-					'edit-site-global-styles-variations_item',
-					{
-						'is-active': isActive,
-					}
-				) }
-				role="button"
-				onClick={ selectVariation }
-				onKeyDown={ selectOnEnter }
-				tabIndex="0"
-				aria-label={ variation?.title }
-				aria-current={ isActive }
-				onFocus={ () => setIsFocused( true ) }
-				onBlur={ () => setIsFocused( false ) }
-			>
-				<div className="edit-site-global-styles-variations_item-preview">
+		<div
+			className={ classnames( 'edit-site-global-styles-variations_item', {
+				'is-active': isActive,
+			} ) }
+			role="button"
+			onClick={ selectVariation }
+			onKeyDown={ selectOnEnter }
+			tabIndex="0"
+			aria-label={ variation?.title }
+			aria-current={ isActive }
+			onFocus={ () => setIsFocused( true ) }
+			onBlur={ () => setIsFocused( false ) }
+		>
+			<div className="edit-site-global-styles-variations_item-preview">
+				<GlobalStylesContext.Provider value={ context }>
 					<StylesPreview
 						label={ variation?.title }
 						isFocused={ isFocused }
 						withHoverView
 					/>
-				</div>
+				</GlobalStylesContext.Provider>
 			</div>
-		</GlobalStylesContext.Provider>
+		</div>
 	);
 }
 
-function UserVariation( { variation } ) {
+function UserVariation( { variation, selectedThemeVariationChanged } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
-	const { user, setUserConfig } = useContext( GlobalStylesContext );
+	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
 	const associatedStyleId = user[ 'associated_style_id' ];
+	const { hasEditsForEntityRecord } = useSelect( coreStore );
+	const { globalStyleId, hasAssociatedVariationChanged } = useSelect(
+		( select ) => {
+			return {
+				globalStyleId:
+					select(
+						coreStore
+					).__experimentalGetCurrentGlobalStylesId(),
+				hasAssociatedVariationChanged:
+					select(
+						coreStore
+					).__experimentalHasAssociatedVariationChanged(),
+			};
+		},
+		[]
+	);
+	// StylesPreview needs to be wrapped in a custom context so that the styles
+	// appear correctly. Otherwise, they would be overriden by current user
+	// settings.
+	const context = useMemo( () => {
+		return {
+			user: {
+				settings: variation.settings ?? {},
+				styles: variation.styles ?? {},
+			},
+			base,
+			merged: mergeBaseAndUserConfigs( base, variation ),
+			setUserConfig: () => {},
+		};
+	}, [ variation, base ] );
 
 	const isActive = useMemo(
 		() => variation.id === associatedStyleId,
@@ -132,12 +190,32 @@ function UserVariation( { variation } ) {
 	);
 
 	const selectVariation = useCallback( () => {
+		/* eslint-disable no-alert */
+		if (
+			! selectedThemeVariationChanged &&
+			! hasAssociatedVariationChanged &&
+			hasEditsForEntityRecord( 'root', 'globalStyles', globalStyleId ) &&
+			! window.confirm(
+				__(
+					'Are you sure you want to switch to this variation? Unsaved changes will be lost.'
+				)
+			)
+		) {
+			return;
+		}
+		/* eslint-enable no-alert */
+
 		setUserConfig( () => ( {
 			settings: variation.settings,
 			styles: variation.styles,
 			associated_style_id: variation.id,
 		} ) );
-	}, [ variation ] );
+	}, [
+		variation,
+		globalStyleId,
+		hasAssociatedVariationChanged,
+		selectedThemeVariationChanged,
+	] );
 
 	const selectOnEnter = ( event ) => {
 		if ( event.keyCode === ENTER ) {
@@ -161,11 +239,13 @@ function UserVariation( { variation } ) {
 			onBlur={ () => setIsFocused( false ) }
 		>
 			<div className="edit-site-global-styles-variations_item-preview">
-				<StylesPreview
-					label={ variation?.title }
-					isFocused={ isFocused }
-					withHoverView
-				/>
+				<GlobalStylesContext.Provider value={ context }>
+					<StylesPreview
+						label={ variation?.title }
+						isFocused={ isFocused }
+						withHoverView
+					/>
+				</GlobalStylesContext.Provider>
 			</div>
 		</div>
 	);
@@ -176,12 +256,24 @@ function ScreenStyleVariations() {
 		useState( false );
 	const [ newStyleName, setNewStyleName ] = useState( '' );
 	const [ isStyleRecordSaving, setIsStyleRecordSaving ] = useState( false );
-	const { user } = useContext( GlobalStylesContext );
-
 	const {
-		__experimentalHasAssociatedVariationChanged,
-		getEditedEntityRecord,
-	} = useSelect( coreStore );
+		user,
+		setSelectedThemeVariationChanged,
+		selectedThemeVariationChanged,
+		setUserConfig,
+	} = useContext( GlobalStylesContext );
+	const { __experimentalAssociatedVariationChanged } =
+		useDispatch( coreStore );
+
+	const { getEditedEntityRecord } = useSelect( coreStore );
+	const { associatedVariationChanged } = useSelect( ( select ) => {
+		return {
+			associatedVariationChanged:
+				select(
+					coreStore
+				).__experimentalHasAssociatedVariationChanged(),
+		};
+	}, [] );
 	const { variations, mode } = useSelect( ( select ) => {
 		return {
 			variations:
@@ -236,21 +328,23 @@ function ScreenStyleVariations() {
 
 	const createNewStyleRecord = useCreateNewStyleRecord( newStyleName );
 
-	// TODO Wrap in useCallback
-	// Needs to be done on back button click, otherwise if getEditedEntityRecord is called
-	// when a variation is clicked, there is an ugly screen re-render that resets navigation.
-	const handleBackButtonClick = () => {
-		if (
-			user[ 'associated_style_id' ] &&
-			__experimentalHasAssociatedVariationChanged()
-		) {
+	// This functionality needs to be done on back button click, otherwise if
+	// getEditedEntityRecord is called when a variation is clicked, there is an
+	// ugly screen re-render that resets navigation.
+	const handleBackButtonClick = useCallback( () => {
+		if ( user[ 'associated_style_id' ] && associatedVariationChanged ) {
+			// Load entity for editing
 			getEditedEntityRecord(
 				'root',
 				'globalStyles',
 				user[ 'associated_style_id' ]
 			);
 		}
-	};
+
+		// Reset state
+		setSelectedThemeVariationChanged( false );
+		__experimentalAssociatedVariationChanged( false );
+	}, [ associatedVariationChanged, user ] );
 
 	return (
 		<>
@@ -284,6 +378,12 @@ function ScreenStyleVariations() {
 								<UserVariation
 									key={ variation.id }
 									variation={ variation }
+									associatedVariationChanged={
+										associatedVariationChanged
+									}
+									selectedThemeVariationChanged={
+										selectedThemeVariationChanged
+									}
 								/>
 							) ) }
 						</Grid>
@@ -300,7 +400,19 @@ function ScreenStyleVariations() {
 					<Heading level={ 2 }>{ __( 'Theme styles' ) }</Heading>
 					<Grid columns={ 2 }>
 						{ withEmptyVariation?.map( ( variation, index ) => (
-							<Variation key={ index } variation={ variation } />
+							<Variation
+								key={ index }
+								variation={ variation }
+								associatedVariationChanged={
+									associatedVariationChanged
+								}
+								selectedThemeVariationChanged={
+									selectedThemeVariationChanged
+								}
+								setSelectedThemeVariationChanged={
+									setSelectedThemeVariationChanged
+								}
+							/>
 						) ) }
 					</Grid>
 				</CardBody>
@@ -322,7 +434,15 @@ function ScreenStyleVariations() {
 						/>
 						<Button
 							onClick={ () => {
-								createNewStyleRecord().then( () => {
+								createNewStyleRecord().then( ( variation ) => {
+									// Set new variation as the associated one.
+									if ( variation?.id ) {
+										setUserConfig( ( currentConfig ) => ( {
+											...currentConfig,
+											associated_style_id: variation.id,
+										} ) );
+									}
+
 									setIsStyleRecordSaving( false );
 									setCreateNewVariationModalOpen( false );
 								} );

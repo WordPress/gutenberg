@@ -370,9 +370,8 @@ export function useColorRandomizer( name ) {
 export function useHasUserModifiedStyles() {
 	const { user } = useContext( GlobalStylesContext );
 	return (
-		Boolean( user ) &&
-		( Object.keys( user.settings ).length !== 0 ||
-			Object.keys( user.styles ).length !== 0 )
+		Object.keys( user.settings ).length > 0 ||
+		Object.keys( user.styles ).length > 0
 	);
 }
 
