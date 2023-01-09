@@ -31,7 +31,7 @@ const ALLOWED_BLOCKS = {
 	],
 };
 
-export default function NavigationMenu( { innerBlocks, id } ) {
+export default function NavigationMenu( { innerBlocks } ) {
 	const { updateBlockListSettings } = useDispatch( blockEditorStore );
 
 	//TODO: Block settings are normally updated as a side effect of rendering InnerBlocks in BlockList
