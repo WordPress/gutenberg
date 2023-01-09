@@ -27,6 +27,7 @@ import {
 	store as blockEditorStore,
 	getColorClassName,
 	useInnerBlocksProps,
+	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { useState, useEffect, useRef } from '@wordpress/element';
@@ -46,7 +47,7 @@ import { useMergeRefs } from '@wordpress/compose';
  * Internal dependencies
  */
 import { name } from './block.json';
-import { LinkUI } from './link-ui';
+import { LinkUI, getSuggestionsQuery } from './link-ui';
 import { updateAttributes } from './update-attributes';
 import { getColors } from '../navigation/edit/utils';
 
@@ -406,6 +407,12 @@ export default function NavigationLinkEdit( {
 			? __( 'This item has been deleted, or is a draft' )
 			: __( 'This item is missing a link' );
 
+	const testLink = {
+		url,
+		opensInNewTab: attributes?.opensInNewTab,
+		title: label && stripHTML( label ),
+	};
+
 	return (
 		<>
 			<BlockControls>
@@ -429,7 +436,37 @@ export default function NavigationLinkEdit( {
 			</BlockControls>
 			{ /* Warning, this duplicated in packages/block-library/src/navigation-submenu/edit.js */ }
 			<InspectorControls>
+				{ /* className="wp-block-navigation-link__inline-link-input"
+				clientId={ clientId }
+				link={ attributes }
+				onClose={ () => setIsLinkOpen( false ) }
+				anchor={ popoverAnchor }
+				hasCreateSuggestion={ userCanCreate }
+				onRemove={ removeLink }
+				onChange=
+				{ ( updatedValue ) => {
+					updateAttributes( updatedValue, setAttributes, attributes );
+				} } */ }
+
 				<PanelBody title={ __( 'Link settings' ) }>
+					<LinkControl
+						hasTextControl
+						hasRichPreviews
+						className="wp-block-navigation-link__inline-link-input"
+						value={ testLink }
+						showInitialSuggestions={ true }
+						noDirectEntry={ !! type }
+						noURLSuggestion={ !! type }
+						suggestionsQuery={ getSuggestionsQuery( type, kind ) }
+						onChange={ ( updatedValue ) => {
+							updateAttributes(
+								updatedValue,
+								setAttributes,
+								attributes
+							);
+						} }
+						onRemove={ removeLink }
+					/>
 					<TextControl
 						__nextHasNoMarginBottom
 						value={ label ? stripHTML( label ) : '' }
