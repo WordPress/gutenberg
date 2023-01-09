@@ -2,44 +2,16 @@
  * External dependencies
  */
 import * as core from '@actions/core';
-import * as github from '@actions/github';
 
 /**
  * Internal dependencies
  */
 import { run } from '../run';
+import mockPushEventContext from '../__fixtures__/push-event.json';
+import mockPullRequestEventContext from '../__fixtures__/pr-event.json';
 
 jest.useFakeTimers( 'modern' ).setSystemTime( new Date( '2020-05-10' ) );
 
-const mockPushEventContext = {
-	runId: 100,
-	repo: {
-		owner: 'WordPress',
-		repo: 'gutenberg',
-	},
-	ref: 'refs/heads/trunk',
-	sha: 'commitSHA',
-	eventName: 'push',
-};
-const mockPullRequestEventContext = {
-	runId: 100,
-	repo: {
-		owner: 'WordPress',
-		repo: 'gutenberg',
-	},
-	ref: 'refs/pull/10/merge',
-	sha: 'mergeSHA',
-	eventName: 'pull_request',
-	payload: {
-		number: 10,
-		pull_request: {
-			head: {
-				ref: 'headBranch',
-				sha: 'headSHA',
-			},
-		},
-	},
-};
 const mockGetContext = jest.fn(
 	(): typeof mockPushEventContext | typeof mockPullRequestEventContext =>
 		mockPullRequestEventContext
@@ -162,14 +134,14 @@ describe( 'Report flaky tests', () => {
 		);
 
 		expect( mockAPI.createCommentOnPR ).toHaveBeenCalledTimes( 1 );
-		expect( mockAPI.createCommentOnPR.mock.calls[ 0 ][ 0 ] ).toBe( 10 );
+		expect( mockAPI.createCommentOnPR.mock.calls[ 0 ][ 0 ] ).toBe( 49 );
 		expect( mockAPI.createCommentOnPR.mock.calls[ 0 ][ 1 ] )
 			.toMatchInlineSnapshot( `
 		"<!-- flaky-tests-report-comment -->
-		**Flaky tests detected in headSHA.**
+		**Flaky tests detected in ea3c1b3b3ea66d59dfdff69ec6bb76761d1ba3c8.**
 		Some tests passed with failed attempts. The failures may not be related to this commit but are still reported for visibility. See [the documentation](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/testing-overview.md#flaky-tests) for more information.
 
-		🔍  Workflow run URL: https://github.com/WordPress/gutenberg/actions/runs/100
+		🔍  Workflow run URL: https://github.com/WordPress/gutenberg/actions/runs/3839191975
 		📝  Reported issues:
 		- #1 in \`/test/e2e/specs/editor/various/copy-cut-paste.spec.js\`
 		- #2 in \`specs/site-editor/template-part.test.js\`"
@@ -263,15 +235,15 @@ describe( 'Report flaky tests', () => {
 
 		expect( mockAPI.createCommentOnCommit ).toHaveBeenCalledTimes( 1 );
 		expect( mockAPI.createCommentOnCommit.mock.calls[ 0 ][ 0 ] ).toBe(
-			'commitSHA'
+			'449fdf9021c27a3f3ed21b92299feef755aabafc'
 		);
 		expect( mockAPI.createCommentOnCommit.mock.calls[ 0 ][ 1 ] )
 			.toMatchInlineSnapshot( `
 		"<!-- flaky-tests-report-comment -->
-		**Flaky tests detected in commitSHA.**
+		**Flaky tests detected in 449fdf9021c27a3f3ed21b92299feef755aabafc.**
 		Some tests passed with failed attempts. The failures may not be related to this commit but are still reported for visibility. See [the documentation](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/testing-overview.md#flaky-tests) for more information.
 
-		🔍  Workflow run URL: https://github.com/WordPress/gutenberg/actions/runs/100
+		🔍  Workflow run URL: https://github.com/WordPress/gutenberg/actions/runs/3838914554
 		📝  Reported issues:
 		- #1 in \`/test/e2e/specs/editor/various/copy-cut-paste.spec.js\`
 		- #2 in \`specs/site-editor/template-part.test.js\`"
