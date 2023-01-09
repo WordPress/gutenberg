@@ -199,17 +199,18 @@ export function PositionEdit( props ) {
 
 	const allowFixed = hasFixedPositionSupport( blockName );
 	const allowSticky = hasStickyPositionSupport( blockName );
+	const value = style?.position?.type;
 
 	const options = useMemo( () => {
 		const availableOptions = [ DEFAULT_OPTION ];
-		if ( allowSticky ) {
+		if ( allowSticky || value === STICKY_OPTION.value ) {
 			availableOptions.push( STICKY_OPTION );
 		}
-		if ( allowFixed ) {
+		if ( allowFixed || value === FIXED_OPTION.value ) {
 			availableOptions.push( FIXED_OPTION );
 		}
 		return availableOptions;
-	}, [ allowFixed, allowSticky ] );
+	}, [ allowFixed, allowSticky, value ] );
 
 	if ( useIsPositionDisabled( props ) ) {
 		return null;
@@ -238,18 +239,14 @@ export function PositionEdit( props ) {
 		} );
 	};
 
-	const value = style?.position?.type;
 	const selectedOption = value
-		? options.find( ( option ) => option.value === value )
+		? options.find( ( option ) => option.value === value ) || DEFAULT_OPTION
 		: DEFAULT_OPTION;
 
 	return Platform.select( {
 		web: (
 			<>
-				<BaseControl
-					className="block-editor-hooks__position-selection"
-					help={ selectedOption?.__experimentalHint }
-				>
+				<BaseControl className="block-editor-hooks__position-selection">
 					<CustomSelectControl
 						__nextUnconstrainedWidth
 						__next36pxDefaultSize
