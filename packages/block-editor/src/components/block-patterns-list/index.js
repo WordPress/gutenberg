@@ -76,7 +76,6 @@ function BlockPattern( {
 							/>
 							{ ! showTooltip && (
 								<div className="block-editor-block-patterns-list__item-title">
-									{ /* // TODO: decode titles from PD */ }
 									{ pattern.title }
 								</div>
 							) }
@@ -118,9 +117,10 @@ function BlockPatternList( {
 		>
 			{ blockPatterns.map( ( pattern ) => {
 				const isShown = shownPatterns.includes( pattern );
+				const key = pattern.name || pattern.id;
 				return isShown ? (
 					<BlockPattern
-						key={ pattern.name || pattern.id } // TODO: This is a temporary fix to avoid a crash from PD.
+						key={ key }
 						pattern={ pattern }
 						onClick={ onClickPattern }
 						isDraggable={ isDraggable }
@@ -128,9 +128,7 @@ function BlockPatternList( {
 						showTooltip={ showTitlesAsTooltip }
 					/>
 				) : (
-					<BlockPatternPlaceholder
-						key={ pattern.name || pattern.id }
-					/>
+					<BlockPatternPlaceholder key={ key } />
 				);
 			} ) }
 		</Composite>

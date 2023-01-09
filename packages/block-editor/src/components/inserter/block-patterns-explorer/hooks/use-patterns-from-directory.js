@@ -2,25 +2,30 @@
  * WordPress dependencies
  */
 import { useEffect, useState, useRef } from '@wordpress/element';
-import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
+import { useSelect } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../../../store';
 
 const defaultPerPage = 10;
-const CACHE = new Map();
 
 export default function usePatternsFromDirectory( options = {} ) {
 	const abortController = useRef();
 	const [ patterns, setPatterns ] = useState( [] );
 	const isLoading = useRef();
+	const fetchEntities = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().__unstableFetchEntities,
+		[]
+	);
 	useEffect( () => {
-		// Request only if we perform a search or select a category.
-		if ( ! [ options.search, options.category ].filter( Boolean ).length ) {
+		if ( ! fetchEntities ) {
 			return;
 		}
-		const key = JSON.stringify( options );
-		if ( CACHE.has( key ) ) {
-			isLoading.current = false;
-			setPatterns( CACHE.get( key ) );
+		// Request only if we perform a search or select a category.
+		if ( ! [ options.search, options.category ].filter( Boolean ).length ) {
 			return;
 		}
 		// If we have a pending request and make a new one, abort the former.
@@ -34,15 +39,15 @@ export default function usePatternsFromDirectory( options = {} ) {
 				: new AbortController();
 		isLoading.current = true;
 		setPatterns( [] ); // Empty the previous results.
-		apiFetch( {
-			path: addQueryArgs( '/wp/v2/pattern-directory/patterns', {
+		fetchEntities(
+			'/wp/v2/pattern-directory/patterns',
+			{
 				...options,
 				per_page: options.per_page || defaultPerPage,
-			} ),
-			signal: abortController.current?.signal,
-		} )
+			},
+			abortController
+		)
 			.then( ( fetchedPatterns ) => {
-				CACHE.set( key, fetchedPatterns );
 				isLoading.current = false;
 				setPatterns( fetchedPatterns );
 			} )

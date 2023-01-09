@@ -4,6 +4,7 @@
 import { Platform, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
+	__unstableFetchEntities as fetchEntities,
 	store as coreStore,
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 	__experimentalFetchUrlData as fetchUrlData,
@@ -188,6 +189,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				fetchLinkSuggestions( search, searchOptions, settings ),
 			// TODO: We should find a proper way to consolidate similar cases
 			// like reusable blocks, fetch entities, etc.
+			__unstableFetchEntities: fetchEntities,
 			__unstableFetchMedia: fetchMedia,
 			__experimentalFetchRichUrlData: fetchUrlData,
 			__experimentalCanUserUseUnfilteredHTML: canUseUnfilteredHTML,
