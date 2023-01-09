@@ -126,7 +126,7 @@ const DefaultControls = ( props ) => {
 };
 
 const MenuInspectorControls = ( props ) => {
-	// Show the OffCanvasEditor controls if we're in the Gutenberg plugin.
+	// Show the OffCanvasEditor controls if we're in the Gutenberg plugin. Previously used isOffCanvasNavigationEditorEnabled.
 	return (
 		<InspectorControls __experimentalGroup="list">
 			<PanelBody
