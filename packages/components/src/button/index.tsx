@@ -186,18 +186,22 @@ export function UnforwardedButton(
 		ref,
 	};
 
-	const TagElement = ( tagProps: { children: ReactNode } & typeof tagElementProps ) => {
+	const TagElement = ( { children }: { children: ReactNode } ) => {
 		return Tag === 'a' ? (
-			<Tag { ...( tagProps as WordPressComponentProps< {}, 'a' > ) } />
+			<Tag { ...( tagElementProps as WordPressComponentProps< {}, 'a' > ) } >
+				{ children }
+			</Tag>
 		) : (
 			<Tag
-				{ ...( tagProps as WordPressComponentProps< {}, 'button' > ) }
-			/>
+				{ ...( tagElementProps as WordPressComponentProps< {}, 'button' > ) }
+			>
+				{ children }
+			</Tag>
 		);
 	};
 
 	const element = (
-		<TagElement { ...tagElementProps }>
+		<TagElement>
 			{ icon && iconPosition === 'left' && (
 				<Icon icon={ icon } size={ iconSize } />
 			) }
