@@ -489,11 +489,8 @@
 	/* stylelint-enable function-comma-space-after */
 }
 
-@mixin custom-scrollbars-on-hover() {
+@mixin custom-scrollbars-on-hover($track-color: #1e1e1e, $handle-color: #757575) {
 	visibility: hidden;
-
-	$handle-color: #757575;
-	$track-color: #1e1e1e;
 
 	// WebKit
 	&::-webkit-scrollbar {

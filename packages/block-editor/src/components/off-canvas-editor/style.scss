@@ -17,6 +17,7 @@
 .offcanvas-editor-list-view-tree-wrapper {
 	max-width: 100%;
 	overflow-x: auto;
+	@include custom-scrollbars-on-hover(#ffffff);
 }
 
 .offcanvas-editor-list-view-leaf {
