@@ -15,7 +15,7 @@ import { HStack } from '../h-stack';
 import type { ColorListPickerProps, ColorOptionProps } from './types';
 
 function ColorOption( {
-	label = 'test',
+	label,
 	value,
 	colors,
 	disableCustomColors,
