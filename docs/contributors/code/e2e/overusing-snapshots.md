@@ -47,11 +47,9 @@ Instead of writing the assertions in comments, we can try directly writing them 
 ```js
 // ...
 
-{
-	// Expect empty paragraph outside quote block.
-	const blocks = await editor.getBlocks();
-	expect( blocks ).toHaveLength( 2 );
-	expect( blocks[ 0 ] ).toMatchObject( {
+// Expect empty paragraph outside quote block.
+await expect.poll( editor.getBlocks ).toMatchObject( [
+	{
 		name: 'core/quote',
 		innerBlocks: [
 			{
@@ -59,33 +57,29 @@ Instead of writing the assertions in comments, we can try directly writing them 
 				attributes: { content: '1' },
 			},
 		],
-	} );
-	expect( blocks[ 1 ] ).toMatchObject( {
+	},
+	{
 		name: 'core/paragraph',
 		attributes: { content: '' },
-	} );
-}
+	}
+] );
 
 // ...
 
-{
-	// Expect the paragraph to be merged into the quote block.
-	const blocks = await editor.getBlocks();
-	expect( blocks ).toHaveLength( 1 );
-	expect( blocks[ 0 ] ).toMatchObject( {
-		name: 'core/quote',
-		innerBlocks: [
-			{
-				name: 'core/paragraph',
-				attributes: { content: '1' },
-			},
-			{
-				name: 'core/paragraph',
-				attributes: { content: '2' },
-			},
-		],
-	} );
-}
+// Expect the paragraph to be merged into the quote block.
+await expect.poll( editor.getBlocks ).toMatchObject( [ {
+	name: 'core/quote',
+	innerBlocks: [
+		{
+			name: 'core/paragraph',
+			attributes: { content: '1' },
+		},
+		{
+			name: 'core/paragraph',
+			attributes: { content: '2' },
+		},
+	],
+} ] );
 ```
 
 These assertions are more readable and explicit. You can add additional assertions or split existing ones into multiple ones to highlight their importance. Whether to keep the comments is up to you, but it's usually fine to omit them when the code is already readable without them.
@@ -103,12 +97,10 @@ expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:paragraph -->
 We can consider this pattern as a variant of snapshot testing, and we should follow the same rule when writing them. It's often better to rewrite them using `editor.getBlocks` or other methods to make explicit assertions.
 
 ```js
-const blocks = await editor.getBlocks();
-expect( blocks ).toHaveLength( 0 );
-expect( blocks[ 0 ] ).toMatchObject( {
+await expect.poll( editor.getBlocks ).toMatchObject( [ {
 	name: 'core/paragraph',
 	attributes: { content: 'Paragraph' },
-} );
+} ] );
 ```
 
 ## What about test coverage?
