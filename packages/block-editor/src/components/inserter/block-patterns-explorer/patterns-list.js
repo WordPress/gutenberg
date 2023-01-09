@@ -66,11 +66,7 @@ function PatternList( { filterValue, selectedCategory } ) {
 			),
 		[ destinationRootClientId ]
 	);
-	const options = {
-		allowed_blocks: Array.isArray( allowedBlocks )
-			? allowedBlocks.join( ',' )
-			: undefined,
-	};
+	const options = { allowed_blocks: allowedBlocks?.join( ',' ) };
 	if ( !! filterValue ) {
 		options.search = filterValue;
 	} else if ( selectedCategory ) {

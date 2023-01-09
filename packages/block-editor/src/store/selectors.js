@@ -2046,14 +2046,14 @@ export const getInserterItems = createSelector(
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional root client ID of block list.
  *
- * @return {string[]|boolean} Array of allowed core block names or `true` if all blocks are allowed.
+ * @return {string[]|undefined} Array of allowed core block names or `undefined` if all blocks are allowed.
  */
 export const __getAllowedCoreBlockNames = createSelector(
 	( state, rootClientId = null ) => {
 		// We have to filter the blocks using parts of the logic of `canIncludeBlockTypeInInserter`,
 		// with the main difference that we don't check the parent/ancestor relationship.
 		// We also discard non core blocks. This is needed to determine in the end if all
-		// available core blocks can be inserted, so we can just send a flag indicating this.
+		// available core blocks can be inserted.
 		const allCoreBlockTypes = getBlockTypes().filter(
 			( blockType ) =>
 				blockType.name.startsWith( 'core/' ) &&
@@ -2094,11 +2094,11 @@ export const __getAllowedCoreBlockNames = createSelector(
 		const allowedBlocksWithNestedBlocks = [
 			...new Set( [ ...allowedBlockNames, ...allowedNestedBlocks ] ),
 		];
-		// If all core blocks can be inserted, just return `all` to indicate this.
+		// If all core blocks can be inserted, just return `undefined`.
 		if (
 			allowedBlocksWithNestedBlocks.length === allCoreBlockTypes.length
 		) {
-			return true;
+			return;
 		}
 		allowedBlocksWithNestedBlocks.sort();
 		return allowedBlocksWithNestedBlocks;

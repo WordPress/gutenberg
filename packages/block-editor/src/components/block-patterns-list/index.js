@@ -10,6 +10,7 @@ import {
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -48,46 +49,51 @@ function BlockPattern( {
 			blocks={ blocks }
 			isPattern={ !! pattern }
 		>
-			{ ( { draggable, onDragStart, onDragEnd } ) => (
-				<div
-					className="block-editor-block-patterns-list__list-item"
-					draggable={ draggable }
-					onDragStart={ onDragStart }
-					onDragEnd={ onDragEnd }
-				>
-					<WithToolTip
-						showTooltip={ showTooltip }
-						title={ pattern.title }
+			{ ( { draggable, onDragStart, onDragEnd } ) => {
+				const patternTitle = decodeEntities( pattern.title );
+				return (
+					<div
+						className="block-editor-block-patterns-list__list-item"
+						draggable={ draggable }
+						onDragStart={ onDragStart }
+						onDragEnd={ onDragEnd }
 					>
-						<CompositeItem
-							role="option"
-							as="div"
-							{ ...composite }
-							className="block-editor-block-patterns-list__item"
-							onClick={ () => onClick( pattern, blocks ) }
-							aria-label={ pattern.title }
-							aria-describedby={
-								pattern.description ? descriptionId : undefined
-							}
+						<WithToolTip
+							showTooltip={ showTooltip }
+							title={ patternTitle }
 						>
-							<BlockPreview
-								blocks={ blocks }
-								viewportWidth={ viewportWidth }
-							/>
-							{ ! showTooltip && (
-								<div className="block-editor-block-patterns-list__item-title">
-									{ pattern.title }
-								</div>
-							) }
-							{ !! pattern.description && (
-								<VisuallyHidden id={ descriptionId }>
-									{ pattern.description }
-								</VisuallyHidden>
-							) }
-						</CompositeItem>
-					</WithToolTip>
-				</div>
-			) }
+							<CompositeItem
+								role="option"
+								as="div"
+								{ ...composite }
+								className="block-editor-block-patterns-list__item"
+								onClick={ () => onClick( pattern, blocks ) }
+								aria-label={ patternTitle }
+								aria-describedby={
+									pattern.description
+										? descriptionId
+										: undefined
+								}
+							>
+								<BlockPreview
+									blocks={ blocks }
+									viewportWidth={ viewportWidth }
+								/>
+								{ ! showTooltip && (
+									<div className="block-editor-block-patterns-list__item-title">
+										{ patternTitle }
+									</div>
+								) }
+								{ !! pattern.description && (
+									<VisuallyHidden id={ descriptionId }>
+										{ pattern.description }
+									</VisuallyHidden>
+								) }
+							</CompositeItem>
+						</WithToolTip>
+					</div>
+				);
+			} }
 		</InserterDraggableBlocks>
 	);
 }
