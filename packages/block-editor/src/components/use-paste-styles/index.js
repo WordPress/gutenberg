@@ -139,10 +139,11 @@ export default function usePasteStyles() {
 			let html = '';
 			try {
 				// `http:` sites won't have the clipboard property on navigator.
+				// (with the exception of localhost.)
 				if ( ! window.navigator.clipboard ) {
 					createErrorNotice(
 						__(
-							'Reading from the clipboard is only available in secure contexts (HTTPS) in supporting browsers.'
+							'Unable to paste styles. This feature is only available on secure (https) sites in supporting browsers.'
 						),
 						{ type: 'snackbar' }
 					);
@@ -153,7 +154,9 @@ export default function usePasteStyles() {
 			} catch ( error ) {
 				// Possibly the permission is denied.
 				createErrorNotice(
-					__( 'Permission denied: Unable to read from clipboard.' ),
+					__(
+						'Unable to paste styles. Please allow browser clipboard permissions before continuing.'
+					),
 					{
 						type: 'snackbar',
 					}
@@ -164,7 +167,9 @@ export default function usePasteStyles() {
 			// Abort if the copied text is empty or doesn't look like serialized blocks.
 			if ( ! html || ! hasSerializedBlocks( html ) ) {
 				createWarningNotice(
-					__( "The copied data doesn't appear to be blocks." ),
+					__(
+						"Unable to paste styles. Block styles couldn't be found within the copied content."
+					),
 					{
 						type: 'snackbar',
 					}
