@@ -42,7 +42,10 @@ test.describe(
 			} );
 
 			await expect( pageListBlock ).toBeVisible( {
-				// Wait for the API to be loaded.
+				// Wait for the Nav and Page List block API requests to resolve.
+				// Note: avoid waiting on network requests as these are not perceivable
+				// to the user.
+				// See: https://github.com/WordPress/gutenberg/pull/45070#issuecomment-1373712007.
 				timeout: 10000,
 			} );
 
