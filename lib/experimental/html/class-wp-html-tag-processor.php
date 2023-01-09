@@ -1446,14 +1446,13 @@ class WP_HTML_Tag_Processor {
 
 		$comparable = strtolower( $prefix );
 
-		$matches = array_filter(
-			$this->attributes,
-			function( $attr ) use ( $comparable ) {
-				return str_starts_with( $attr, $comparable );
-			},
-			ARRAY_FILTER_USE_KEY
-		);
-		return array_keys( $matches );
+		$matches = array();
+		foreach ( array_keys( $this->attributes ) as $attr_name ) {
+			if ( str_starts_with( $attr_name, $comparable ) ) {
+				$matches[] = $attr_name;
+			}
+		}
+		return $matches;
 	}
 
 	/**
