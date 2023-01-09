@@ -193,9 +193,16 @@ class WP_HTML_Attribute_Sourcer {
 				 * element which shares the same parent.
 				 */
 				case '+':
-					// Close out this tag if it needs to be.
-					while ( $tags->balanced_next( $inner_state ) ) {
-						continue;
+					/*
+					 * If we have opened a tag we need to continue scanning past all of its children.
+					 * `balanced_next()` will end up on the closing tag, so if we don't have any
+					 * children, or no closing tag, we need to skip this because `balanced_tag()`
+					 * would end up in those cases on the sibling element.
+					 */
+					if ( ! WP_HTML_Processor::is_html_void_element( $tags->get_tag() ) ) {
+						while ( $tags->balanced_next( $inner_state ) ) {
+							continue;
+						}
 					}
 
 					if ( $tags->balanced_next( $outer_state ) && self::select_match( $tags, $next ) ) {

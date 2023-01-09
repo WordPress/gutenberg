@@ -20,6 +20,7 @@
  * @TODO: Add slow mode to escape character entities in CSS class names?
  *        (This requires a custom decoder since `html_entity_decode()`
  *        doesn't handle attribute character reference decoding rules.
+ * @TODO: Do we make any indexing assumptions based on only scanning tag openers? $tag_name - 1 vs. </tag>?
  *
  * @package WordPress
  * @subpackage HTML
@@ -1437,6 +1438,26 @@ class WP_HTML_Tag_Processor {
 		$tag_name = substr( $this->html, $this->tag_name_starts_at, $this->tag_name_length );
 
 		return strtoupper( $tag_name );
+	}
+
+	/**
+	 * Returns a representation of the currently-open tag, for debug purposes.
+	 *
+	 * @since 6.3.0
+	 * @return string
+	 */
+	public function debug_current_token() {
+		if ( null === $this->tag_name_starts_at ) {
+			return '';
+		}
+
+		if ( $this->is_tag_closer() ) {
+			$tag_name = substr( $this->html, $this->tag_name_starts_at, $this->tag_name_length );
+			return "</{$tag_name}>";
+		}
+
+		$tag_starts_at = $this->tag_name_starts_at - 1;
+		return substr( $this->html, $tag_starts_at, $this->tag_ends_at - $tag_starts_at + 1 );
 	}
 
 	/**
