@@ -1,5 +1,29 @@
 == Changelog ==
 
+= 14.9.1 =
+
+
+
+## Changelog
+
+### Bug Fixes
+
+- REST API: Do not set sidebar status to 'active' when using classic theme. ([46966](https://github.com/WordPress/gutenberg/pull/46966))
+
+
+## First time contributors
+
+The following PRs were merged by first time contributors:
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@noisysocks
+
+
 = 14.9.0 =
 
 ## Changelog
