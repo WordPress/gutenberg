@@ -14,6 +14,11 @@
 	}
 }
 
+.offcanvas-editor-list-view-leaf {
+	// sidebar width - tab panel padding
+	max-width: $sidebar-width - (2 * $grid-unit-20);
+}
+
 .offcanvas-editor-list-view-is-empty {
 	margin-left: $grid-unit-20;
 }

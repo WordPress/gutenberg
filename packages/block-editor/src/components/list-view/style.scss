@@ -24,7 +24,6 @@
 	// Use position relative for row animation.
 	position: relative;
 	display: flex;
-	max-width: $sidebar-width - (2 * $grid-unit-20);
 
 	// The background has to be applied to the td, not tr, or border-radius won't work.
 	&.is-selected td {
@@ -305,21 +304,13 @@
 		}
 	}
 
-	.block-editor-list-view-block-select-button__label-wrapper {
-		//min-width: 120px;
-	}
-
 	.block-editor-list-view-block-select-button__title {
-		//flex: 1;
-		//position: relative;
 		margin-right: auto;
 		display: inline-flex;
 		align-items: center;
 
 		.components-truncate {
-			//position: absolute;
 			width: 100%;
-			//transform: translateY(-50%);
 			display: inline-block;
 			max-width: 120px;
 			text-overflow: ellipsis;
