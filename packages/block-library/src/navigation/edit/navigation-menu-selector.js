@@ -6,11 +6,9 @@ import {
 	MenuItem,
 	MenuItemsChoice,
 	DropdownMenu,
-	Button,
-	VisuallyHidden,
 } from '@wordpress/components';
 import { useEntityProp } from '@wordpress/core-data';
-import { Icon, chevronUp, chevronDown, moreVertical } from '@wordpress/icons';
+import { moreVertical } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useEffect, useMemo, useState } from '@wordpress/element';
@@ -35,8 +33,6 @@ function NavigationMenuSelector( {
 	const createActionLabel = __( "Create from '%s'" );
 
 	const [ selectorLabel, setSelectorLabel ] = useState( '' );
-	const [ isPressed, setIsPressed ] = useState( false );
-	const [ enableOptions, setEnableOptions ] = useState( false );
 	const [ isCreatingMenu, setIsCreatingMenu ] = useState( false );
 
 	actionLabel = actionLabel || createActionLabel;
@@ -56,11 +52,6 @@ function NavigationMenuSelector( {
 		'wp_navigation',
 		'title'
 	);
-
-	const shouldEnableMenuSelector =
-		( canSwitchNavigationMenu || canUserCreateNavigationMenu ) &&
-		hasResolvedNavigationMenus &&
-		! isCreatingMenu;
 
 	const menuChoices = useMemo( () => {
 		return (
@@ -125,28 +116,6 @@ function NavigationMenuSelector( {
 		isNavigationMenuResolved,
 	] );
 
-	toggleProps = {
-		...toggleProps,
-		className: 'wp-block-navigation__navigation-selector-button',
-		children: (
-			<>
-				<VisuallyHidden as="span">
-					{ __( 'Select Menu' ) }
-				</VisuallyHidden>
-				<Icon
-					icon={ isPressed ? chevronUp : chevronDown }
-					className="wp-block-navigation__navigation-selector-button__icon"
-				/>
-			</>
-		),
-		isBusy: ! enableOptions,
-		disabled: ! enableOptions,
-		__experimentalIsFocusable: true,
-		onClick: () => {
-			setIsPressed( ! isPressed );
-		},
-	};
-
 	return (
 		<DropdownMenu
 			label={ selectorLabel }
@@ -176,7 +145,6 @@ function NavigationMenuSelector( {
 											setSelectorLabel(
 												__( 'Loading …' )
 											);
-											setEnableOptions( false );
 											onSelectClassicMenu( menu );
 											onClose();
 										} }
@@ -201,7 +169,6 @@ function NavigationMenuSelector( {
 									onCreateNew();
 									setIsCreatingMenu( true );
 									setSelectorLabel( __( 'Loading …' ) );
-									setEnableOptions( false );
 								} }
 							>
 								{ __( 'Create new menu' ) }
