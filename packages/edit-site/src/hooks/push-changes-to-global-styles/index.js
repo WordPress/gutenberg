@@ -97,7 +97,7 @@ function PushChangesToGlobalStylesControl( {
 		createSuccessNotice(
 			sprintf(
 				// translators: %s: Title of the block e.g. 'Heading'.
-				__( 'Pushed styles to all %s blocks.' ),
+				__( 'Applied styles to all %s blocks.' ),
 				getBlockType( name ).title
 			),
 			{
