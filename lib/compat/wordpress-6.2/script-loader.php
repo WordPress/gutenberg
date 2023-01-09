@@ -167,3 +167,25 @@ add_filter(
 	},
 	100
 );
+
+/**
+ * Set the window global for enabling off-canvas editing for the navigation
+ * block.
+ *
+ * This global is used temporarily while the experimental off-canvas editor is
+ * being stabilized. It allows for more granular control if a singular feature
+ * needs to be moved into the plugin only. Additionally it offers an escape
+ * hatch for disabling the entire set of features while things are stabilizing.
+ *
+ * As individual features make it through review this variable will slowly be
+ * removed from the JavaScript. When all instance are removed, this action can
+ * also be removed.
+ */
+function gutenberg_enable_off_canvas_navigation_editor() {
+	wp_add_inline_script(
+		'wp-block-editor',
+		'window.__enableOffCanvasNavigationEditor = true',
+		'before'
+	);
+}
+add_action( 'admin_init', 'gutenberg_enable_off_canvas_navigation_editor' );

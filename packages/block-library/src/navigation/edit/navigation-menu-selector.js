@@ -32,7 +32,7 @@ function NavigationMenuSelector( {
 	toggleProps = {},
 } ) {
 	const isOffCanvasNavigationEditorEnabled =
-		window?.__experimentalEnableOffCanvasNavigationEditor === true;
+		window?.__enableOffCanvasNavigationEditor === true;
 	/* translators: %s: The name of a menu. */
 	const createActionLabel = __( "Create from '%s'" );
 

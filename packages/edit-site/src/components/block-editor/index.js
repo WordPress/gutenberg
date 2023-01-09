@@ -180,7 +180,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 
 	let MaybeNavMenuSidebarToggle = Fragment;
 	const isOffCanvasNavigationEditorEnabled =
-		window?.__experimentalEnableOffCanvasNavigationEditor === true;
+		window?.__enableOffCanvasNavigationEditor === true;
 
 	if ( isOffCanvasNavigationEditorEnabled ) {
 		MaybeNavMenuSidebarToggle = NavMenuSidebarToggle;

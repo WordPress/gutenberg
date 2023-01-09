@@ -28,7 +28,7 @@ function BlockCard( { title, icon, description, blockType, className } ) {
 	}
 
 	const isOffCanvasNavigationEditorEnabled =
-		window?.__experimentalEnableOffCanvasNavigationEditor === true;
+		window?.__enableOffCanvasNavigationEditor === true;
 
 	const { parentNavBlockClientId } = useSelect( ( select ) => {
 		const { getSelectedBlockClientId, getBlockParentsByBlockName } =

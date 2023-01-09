@@ -90,7 +90,7 @@ function Navigation( {
 	customPlaceholder: CustomPlaceholder = null,
 } ) {
 	const isOffCanvasNavigationEditorEnabled =
-		window?.__experimentalEnableOffCanvasNavigationEditor === true;
+		window?.__enableOffCanvasNavigationEditor === true;
 
 	const {
 		openSubmenusOnClick,

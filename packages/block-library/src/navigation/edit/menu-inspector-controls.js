@@ -124,7 +124,7 @@ const DefaultControls = ( props ) => {
 
 const MenuInspectorControls = ( props ) => {
 	const isOffCanvasNavigationEditorEnabled =
-		window?.__experimentalEnableOffCanvasNavigationEditor === true;
+		window?.__enableOffCanvasNavigationEditor === true;
 	const menuControlsSlot = window?.__experimentalEnableBlockInspectorTabs
 		? 'list'
 		: undefined;

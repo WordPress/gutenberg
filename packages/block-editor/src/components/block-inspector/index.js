@@ -173,7 +173,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 	const showTabs = availableTabs?.length > 1;
 
 	const isOffCanvasNavigationEditorEnabled =
-		window?.__experimentalEnableOffCanvasNavigationEditor === true;
+		window?.__enableOffCanvasNavigationEditor === true;
 
 	const blockInspectorAnimationSettings = useSelect(
 		( select ) => {

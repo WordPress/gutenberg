@@ -50,7 +50,7 @@ export default function NavigationMenu( { innerBlocks, id } ) {
 		} );
 	}, [ updateBlockListSettings, innerBlocks ] );
 
-	if ( window?.__experimentalEnableOffCanvasNavigationEditor ) {
+	if ( window?.__enableOffCanvasNavigationEditor ) {
 		return (
 			<OffCanvasEditor
 				blocks={ innerBlocks }
