@@ -50,6 +50,7 @@ function BlockContent( {
 	hasResolvedPages,
 	blockList,
 	pages,
+	parentPageID,
 } ) {
 	if ( ! hasResolvedPages ) {
 		return (
@@ -343,6 +344,7 @@ export default function PageListEdit( {
 				hasResolvedPages={ hasResolvedPages }
 				blockList={ blockList }
 				pages={ pages }
+				parentPageID={ parentPageID }
 			/>
 		</>
 	);
