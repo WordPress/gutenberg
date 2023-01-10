@@ -2,6 +2,13 @@
 
 /**
  * Decodes HTML character references based on their context.
+ * Decodes into UTF-8 string.
+ *
+ * @see https://html.spec.whatwg.org/entities.json
+ *
+ * @TODO: Write and commit script to generate the lookup table.
+ * @TODO: Add function for searching within string so we can avoid allocating "class" value.
+ * @TODO: Add encoder?
  */
 
 class WP_HTML_Character_Reference_Transcoder {
@@ -167,6 +174,14 @@ class WP_HTML_Character_Reference_Transcoder {
 		return $buffer;
 	}
 
+	/**
+	 * When numeric character references indicate certain code points
+	 * within the C1 control characters, these substitutions are used.
+	 *
+	 * @see https://html.spec.whatwg.org/#numeric-character-reference-end-state
+	 *
+	 * @var string[]
+	 */
 	static $c1_replacements = array(
 		0x80 => "€",
 		0x82 => "‚",
@@ -197,6 +212,18 @@ class WP_HTML_Character_Reference_Transcoder {
 		0x9F => "Ÿ",
 	);
 
+	/**
+	 * Generate from HTML5 spec
+	 *
+	 * Group names by first two letters, then sort full names within each
+	 * group by their length, longest first, so that e.g. `&AMP;` matches
+	 * before `&AMP`.
+	 *
+	 * @see https://html.spec.whatwg.org/#named-character-references
+	 * @see https://html.spec.whatwg.org/entities.json
+	 *
+	 * @var string[][][] character references and associated substitutions.
+	 */
 	static $character_references = array(
 		"AE" => array( "names" => array( "lig;", "lig" ), "refs" => array( "Æ", "Æ" ) ),
 		"AM" => array( "names" => array( "P;", "P" ), "refs" => array( "&", "&" ) ),
