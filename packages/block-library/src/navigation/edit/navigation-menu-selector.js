@@ -69,7 +69,10 @@ function NavigationMenuSelector( {
 			navigationMenus?.map( ( { id, title } ) => {
 				const label = decodeEntities( title.rendered );
 				if ( id === currentMenuId && ! isCreatingMenu ) {
-					setSelectorLabel( currentTitle );
+					setSelectorLabel(
+						/* translators: %s is the name of a navigation menu. */
+						sprintf( __( 'You are currently editing %s' ), label )
+					);
 					setEnableOptions( shouldEnableMenuSelector );
 				}
 				return {
@@ -102,7 +105,7 @@ function NavigationMenuSelector( {
 		if ( ! hasResolvedNavigationMenus ) {
 			setSelectorLabel( __( 'Loading …' ) );
 		} else if ( noMenuSelected || noBlockMenus || menuUnavailable ) {
-			setSelectorLabel( __( 'Select menu' ) );
+			setSelectorLabel( __( 'Choose a Navigation menu' ) );
 			setEnableOptions( shouldEnableMenuSelector );
 		}
 
