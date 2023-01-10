@@ -148,6 +148,13 @@ export type PopoverProps = {
 	 * @default undefined
 	 */
 	variant?: 'unstyled' | 'toolbar';
+	/**
+	 * Places the popover over the reference rectangle and adjusts its size to
+	 * fit it exactly.
+	 *
+	 * @default false
+	 */
+	overlay?: boolean;
 	// Deprecated props
 	/**
 	 * Prevent the popover from flipping and resizing when meeting the viewport
