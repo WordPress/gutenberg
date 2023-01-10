@@ -18,10 +18,10 @@ import type { WordPressComponentProps } from '../ui/context';
 
 function UnforwardedIconButton(
 	{
+		label,
 		labelPosition,
 		size,
 		tooltip,
-		label,
 		...props
 	}: WordPressComponentProps<
 		ButtonProps & DeprecatedIconButtonProps,

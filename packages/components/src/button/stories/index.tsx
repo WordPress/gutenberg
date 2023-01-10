@@ -2,6 +2,7 @@
  * External dependencies
  */
 import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { ReactNode } from 'react';
 
 /**
  * WordPress dependencies
@@ -19,7 +20,6 @@ import {
  */
 import './style.css';
 import Button from '..';
-import type { ReactNode } from 'react';
 
 const meta: ComponentMeta< typeof Button > = {
 	title: 'Components/Button',
