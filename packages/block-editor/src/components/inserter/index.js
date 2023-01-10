@@ -10,9 +10,14 @@ import { speak } from '@wordpress/a11y';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Dropdown, Button } from '@wordpress/components';
 import { Component } from '@wordpress/element';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { useSelect, withDispatch, withSelect } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
-import { createBlock, store as blocksStore } from '@wordpress/blocks';
+import {
+	createBlock,
+	store as blocksStore,
+	__experimentalGetBlockLabel as getBlockLabel,
+	getBlockType,
+} from '@wordpress/blocks';
 import { plus } from '@wordpress/icons';
 
 /**
@@ -21,6 +26,15 @@ import { plus } from '@wordpress/icons';
 import InserterMenu from './menu';
 import QuickInserter from './quick-inserter';
 import { store as blockEditorStore } from '../../store';
+
+// Duplicated from elsewhere.
+function getBlockDisplayText( block ) {
+	if ( block ) {
+		const blockType = getBlockType( block.name );
+		return blockType ? getBlockLabel( blockType, block.attributes ) : null;
+	}
+	return null;
+}
 
 const defaultRenderToggle = ( {
 	onToggle,
@@ -31,10 +45,19 @@ const defaultRenderToggle = ( {
 	toggleProps = {},
 	prioritizePatterns,
 	label,
+	rootClientId,
 } ) => {
-	let buttonLabel;
+	const {
+		getBlock,
+	} = useSelect( blockEditorStore );
+	const rootBlock = getBlock( rootClientId );
+	const rootBlockTitle = getBlockDisplayText( rootBlock );
 
-	if ( label ) {
+	let buttonLabel;
+	if ( rootBlockTitle ) {
+		/* translators: %s is a block name, e.g. Navigation */
+		buttonLabel = sprintf( __('Add block to %s' ), rootBlockTitle );
+	} else if ( label ) {
 		buttonLabel = label;
 	} else if ( hasSingleBlockType ) {
 		buttonLabel = sprintf(
@@ -117,6 +140,8 @@ class Inserter extends Component {
 			renderToggle = defaultRenderToggle,
 			prioritizePatterns,
 			toggleLabel,
+			clientId,
+			rootClientId,
 		} = this.props;
 
 		return renderToggle( {
@@ -129,6 +154,8 @@ class Inserter extends Component {
 			toggleProps,
 			prioritizePatterns,
 			label: toggleLabel,
+			clientId,
+			rootClientId,
 		} );
 	}
 
