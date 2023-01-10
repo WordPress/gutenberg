@@ -24,7 +24,6 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 
 	public function set_up() {
 		parent::set_up();
-		switch_theme( 'emptytheme' );
 	}
 
 	/**
@@ -38,20 +37,11 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 				'role' => 'administrator',
 			)
 		);
+
+		switch_theme( 'emptytheme' );
+
 		// This creates the global styles for the current theme.
-		self::$global_styles_id = wp_insert_post(
-			array(
-				'post_content' => '{"version": ' . WP_Theme_JSON_Gutenberg::LATEST_SCHEMA . ', "isGlobalStylesUserThemeJSON": true }',
-				'post_status'  => 'publish',
-				'post_title'   => __( 'Custom Styles', 'default' ),
-				'post_type'    => 'wp_global_styles',
-				'post_name'    => 'wp-global-styles-emptytheme',
-				'tax_input'    => array(
-					'wp_theme' => 'emptytheme',
-				),
-			),
-			true
-		);
+		self::$global_styles_id = WP_Theme_JSON_Resolver_Gutenberg::get_user_global_styles_post_id();
 	}
 
 
@@ -143,7 +133,30 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 	}
 
 	public function test_create_item() {
-		$this->markTestIncomplete();
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/global-styles' );
+		$request->set_body_params(
+			array(
+				'title'    => 'Custom user variation',
+				'settings' => new stdClass(),
+				'styles'   => new stdClass(),
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		unset( $data['_links'] );
+
+		$this->assertEquals(
+			array(
+				'title' => array(
+					'raw'      => 'Custom user variation',
+					'rendered' => 'Custom user variation',
+				),
+			),
+			array(
+				'title' => $data['title'],
+			)
+		);
 	}
 
 	public function test_update_item() {
