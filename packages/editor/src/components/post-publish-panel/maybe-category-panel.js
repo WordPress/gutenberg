@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { get } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -14,10 +19,10 @@ import HierarchicalTermSelector from '../post-taxonomies/hierarchical-term-selec
 import { store as editorStore } from '../../store';
 
 function MaybeCategoryPanel() {
+	const categoriesTaxonomy = useSelect( coreStore ).getTaxonomy( 'category' );
 	const hasNoCategory = useSelect( ( select ) => {
 		const postType = select( editorStore ).getCurrentPostType();
-		const { canUser, getEntityRecord, getTaxonomy } = select( coreStore );
-		const categoriesTaxonomy = getTaxonomy( 'category' );
+		const { canUser, getEntityRecord } = select( coreStore );
 		const defaultCategoryId = canUser( 'read', 'settings' )
 			? getEntityRecord( 'root', 'site' )?.default_category
 			: undefined;
@@ -58,20 +63,31 @@ function MaybeCategoryPanel() {
 		return null;
 	}
 
+	const labelWithFallback = ( labelProperty, fallback ) =>
+		get( categoriesTaxonomy, [ 'labels', labelProperty ], fallback );
+
+	const prePublishSuggestionLabel = labelWithFallback(
+		'pre_publish_suggestion',
+		__( 'Assign a category' )
+	);
+
+	const prePublishSuggestionDescription = labelWithFallback(
+		'pre_publish_description',
+		__(
+			'Categories provide a helpful way to group related posts together and to quickly tell readers what a post is about.'
+		)
+	);
+
 	const panelBodyTitle = [
 		__( 'Suggestion:' ),
 		<span className="editor-post-publish-panel__link" key="label">
-			{ __( 'Assign a category' ) }
+			{ prePublishSuggestionLabel }
 		</span>,
 	];
 
 	return (
 		<PanelBody initialOpen={ false } title={ panelBodyTitle }>
-			<p>
-				{ __(
-					'Categories provide a helpful way to group related posts together and to quickly tell readers what a post is about.'
-				) }
-			</p>
+			<p>{ prePublishSuggestionDescription }</p>
 			<HierarchicalTermSelector slug="category" />
 		</PanelBody>
 	);

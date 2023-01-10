@@ -1,10 +1,15 @@
 /**
+ * External dependencies
+ */
+import { get } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { compose, ifCondition } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { useSelect, withSelect } from '@wordpress/data';
 import { PanelBody } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -15,21 +20,36 @@ import FlatTermSelector from '../post-taxonomies/flat-term-selector';
 import { store as editorStore } from '../../store';
 
 const TagsPanel = () => {
+	const slug = 'post_tag';
+	const tagsTaxonomy = useSelect( ( select ) => {
+		const store = select( coreStore );
+		return store.getTaxonomy( slug );
+	} );
+	const labelWithFallback = ( labelProperty, fallback ) =>
+		get( tagsTaxonomy, [ 'labels', labelProperty ], fallback );
+
+	const prePublishSuggestionLabel = labelWithFallback(
+		'pre_publish_suggestion',
+		__( 'Add new tag' )
+	);
+
+	const prePublishSuggestionDescription = labelWithFallback(
+		'pre_publish_description',
+		__(
+			'Tags help users and search engines navigate your site and find your content. Add a few keywords to describe your post.'
+		)
+	);
 	const panelBodyTitle = [
 		__( 'Suggestion:' ),
 		<span className="editor-post-publish-panel__link" key="label">
-			{ __( 'Add tags' ) }
+			{ prePublishSuggestionLabel }
 		</span>,
 	];
 
 	return (
 		<PanelBody initialOpen={ false } title={ panelBodyTitle }>
-			<p>
-				{ __(
-					'Tags help users and search engines navigate your site and find your content. Add a few keywords to describe your post.'
-				) }
-			</p>
-			<FlatTermSelector slug={ 'post_tag' } />
+			<p>{ prePublishSuggestionDescription }</p>
+			<FlatTermSelector slug={ slug } />
 		</PanelBody>
 	);
 };
