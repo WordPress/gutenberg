@@ -392,15 +392,10 @@ const UnforwardedPopover = (
 	} = useFloating( {
 		placement: normalizedPlacementFromProps,
 		middleware,
-		whileElementsMounted: (
-			referenceParam,
-			floatingParam,
-			updateParam
-		) => {
-			return autoUpdate( referenceParam, floatingParam, updateParam, {
+		whileElementsMounted: ( referenceParam, floatingParam, updateParam ) =>
+			autoUpdate( referenceParam, floatingParam, updateParam, {
 				animationFrame: true,
-			} );
-		},
+			} ),
 	} );
 
 	const arrowCallbackRef = useCallback(
