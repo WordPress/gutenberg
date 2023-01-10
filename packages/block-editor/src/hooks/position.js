@@ -195,8 +195,8 @@ export function useIsPositionDisabled( { name: blockName } = {} ) {
 	return ! hasPositionSupport( blockName ) || isDisabled;
 }
 
-/**
- * Inspector control panel containing the padding related configuration
+/*
+ * Position controls to be rendered in an inspector control panel.
  *
  * @param {Object} props
  *
@@ -223,10 +223,6 @@ export function PositionEdit( props ) {
 		}
 		return availableOptions;
 	}, [ allowFixed, allowSticky, value ] );
-
-	if ( useIsPositionDisabled( props ) ) {
-		return null;
-	}
 
 	const onChangeType = ( next ) => {
 		// For now, use a hard-coded `0px` value for the position.
@@ -286,7 +282,7 @@ export function PositionEdit( props ) {
 }
 
 /**
- * Override the default edit UI to include layout controls
+ * Override the default edit UI to include position controls.
  *
  * @param {Function} BlockEdit Original component.
  *
@@ -299,9 +295,11 @@ export const withInspectorControls = createHigherOrderComponent(
 			blockName,
 			POSITION_SUPPORT_KEY
 		);
+		const showPositionControls =
+			positionSupport && ! useIsPositionDisabled( props );
 
 		return [
-			positionSupport && (
+			showPositionControls && (
 				<InspectorControls
 					key="position"
 					__experimentalGroup="position"
@@ -316,7 +314,7 @@ export const withInspectorControls = createHigherOrderComponent(
 );
 
 /**
- * Override the default block element to add the layout styles.
+ * Override the default block element to add the position styles.
  *
  * @param {Function} BlockListBlock Original component.
  *
@@ -329,16 +327,18 @@ export const withPositionStyles = createHigherOrderComponent(
 			name,
 			POSITION_SUPPORT_KEY
 		);
+		const allowPositionStyles =
+			hasPositionBlockSupport && ! useIsPositionDisabled( props );
 
 		const id = useInstanceId( BlockListBlock );
 		const element = useContext( BlockList.__unstableElementContext );
 
 		// Higher specificity to override defaults in editor UI.
-		const positionSelector = `.wp-container-position-${ id }.wp-container-position-${ id }`;
+		const positionSelector = `.wp-container-${ id }.wp-container-${ id }`;
 
 		// Get CSS string for the current position values.
 		let css;
-		if ( hasPositionBlockSupport ) {
+		if ( allowPositionStyles ) {
 			css =
 				getPositionCSS( {
 					selector: positionSelector,
@@ -348,13 +348,12 @@ export const withPositionStyles = createHigherOrderComponent(
 
 		// Attach a `wp-container-` id-based class name.
 		const className = classnames( props?.className, {
-			[ `wp-container-position-${ id }` ]:
-				hasPositionBlockSupport && !! css, // Only attach a container class if there is generated CSS to be attached.
+			[ `wp-container-${ id }` ]: allowPositionStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
 		} );
 
 		return (
 			<>
-				{ hasPositionBlockSupport &&
+				{ allowPositionStyles &&
 					element &&
 					!! css &&
 					createPortal( <style>{ css }</style>, element ) }
