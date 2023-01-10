@@ -13,13 +13,7 @@
  * @TODO: Clean up attribute token class after is_true addition
  * @TODO: Prune whitespace when removing classes/attributes: e.g. "a b c" -> "c" not " c"
  * @TODO: Skip over `/` in attributes area, split attribute names by `/`
- * @TODO: Decode HTML references/entities in class names when matching.
- *        E.g. match having class `1<"2` needs to recognize `class="1&lt;&quot;2"`.
- * @TODO: Decode character references in `get_attribute()`
  * @TODO: Properly escape attribute value in `set_attribute()`
- * @TODO: Add slow mode to escape character entities in CSS class names?
- *        (This requires a custom decoder since `html_entity_decode()`
- *        doesn't handle attribute character reference decoding rules.
  *
  * @package WordPress
  * @subpackage HTML
@@ -1189,7 +1183,7 @@ class WP_HTML_Tag_Processor {
 			}
 
 			$raw_name = substr( $existing_class, $at, $name_length );
-			$name = WP_HTML_Character_Reference_Transcoder::decode( 'attribute', $raw_name );
+			$name = WP_HTML_Character_Reference_Transcoder::decode_utf8( 'attribute', $raw_name );
 			$at  += $name_length;
 
 			// If this class is marked for removal, start processing the next one.
@@ -1410,7 +1404,7 @@ class WP_HTML_Tag_Processor {
 
 		$raw_value = substr( $this->html, $attribute->value_starts_at, $attribute->value_length );
 
-		return WP_HTML_Character_Reference_Transcoder::decode( 'attribute', $raw_value );
+		return WP_HTML_Character_Reference_Transcoder::decode_utf8( 'attribute', $raw_value );
 	}
 
 	/**
@@ -1876,7 +1870,7 @@ class WP_HTML_Tag_Processor {
 			 * See https://html.spec.whatwg.org/#attributes-3
 			 * See https://html.spec.whatwg.org/#space-separated-tokens
 			 */
-			$decoded_class = WP_HTML_Character_Reference_Transcoder::decode(
+			$decoded_class = WP_HTML_Character_Reference_Transcoder::decode_utf8(
 				'attribute',
 				substr( $this->html, $class_start, $class_end - $class_start )
 			);

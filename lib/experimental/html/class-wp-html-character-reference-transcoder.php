@@ -20,7 +20,7 @@ class WP_HTML_Character_Reference_Transcoder {
 	 * @param string $input String potentially containing character references.
 	 * @return string String with character references replaced by their corresponding text.
 	 */
-	public static function decode( $context, $input ) {
+	public static function decode_utf8( $context, $input ) {
 		$at = 0;
 		$buffer = '';
 		$budget = 1000;
@@ -96,13 +96,32 @@ class WP_HTML_Character_Reference_Transcoder {
 					continue;
 				}
 
-				/*
-				 * By relying on PHP's function we don't have to deal with higher
-				 * code point conversion into bytes. Unfortunately it requires a
-				 * very specific syntax. We have to preprocess the character
-				 * reference before calling it.
-				 */
-				$buffer .= html_entity_decode( 16 === $numeric_base ? "&#x{$digits};" : "&#{$digits};" );
+				// Convert code point to UTF-8 bytes.
+				if ( $code_point < 0x80 ) {
+					$buffer .= sprintf( '%c', $code_point & 0x7F );
+				} else if ( $code_point < 0x800 ) {
+					$buffer .= sprintf(
+						'%c%c',
+						0xC0 | ( ( $code_point >> 6 ) & 0x1F ),
+						0x80 | ($code_point & 0x3F)
+					);
+				} else if ( $code_point < 0x10000 ) {
+					$buffer .= sprintf(
+						'%c%c%c',
+						0xE0 | ( ( $code_point >> 12 ) & 0x0F ),
+						0x80 | ( ( $code_point >> 6 ) & 0x3F ),
+						0x80 | ( $code_point & 0x3F )
+					);
+				} else {
+					$buffer .= sprintf(
+						'%c%c%c%c',
+						0xF0 | ( ( $code_point >> 18 ) & 0x07 ),
+						0x80 | ( ( $code_point >> 12 ) & 0x3F ),
+						0x80 | ( ( $code_point >> 6 ) & 0x3F ),
+						0x80 | ( $code_point & 0x3F )
+					);
+				}
+
 				$at += $digit_count;
 				if ( $at < strlen( $input ) && ';' === $input[ $at ] ) {
 					$at++;
