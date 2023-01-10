@@ -63,8 +63,8 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 		$featured_image = $featured_image . $overlay_markup;
 	}
 
-	$width  = ! empty( $attributes['width'] ) ? esc_attr( safecss_filter_attr( 'width:' . esc_attr( $attributes['width'] ) ) ) . ';' : '';
-	$height = ! empty( $attributes['height'] ) ? esc_attr( safecss_filter_attr( 'height:' . esc_attr( $attributes['height'] ) ) ) . ';' : '';
+	$width  = ! empty( $attributes['width'] ) ? esc_attr( safecss_filter_attr( 'width:' . $attributes['width'] ) ) . ';' : '';
+	$height = ! empty( $attributes['height'] ) ? esc_attr( safecss_filter_attr( 'height:' . $attributes['height'] ) ) . ';' : '';
 	if ( ! $height && ! $width ) {
 		$wrapper_attributes = get_block_wrapper_attributes();
 	} else {
