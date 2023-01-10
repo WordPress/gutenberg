@@ -292,6 +292,12 @@
 		}
 	}
 
+	.block-editor-block-settings-menu {
+		height: 100%;
+		display: flex;
+		align-items: center;
+	}
+
 	.block-editor-inserter__toggle {
 		background: $gray-900;
 		color: $white;
