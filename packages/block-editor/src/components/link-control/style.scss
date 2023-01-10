@@ -24,6 +24,27 @@ $preview-image-height: 140px;
 	}
 }
 
+.block-editor-link-control .block-editor-media-placeholder {
+	border: 1px dashed #333;
+	background-color: #e7e7e7;
+	box-shadow: none;
+	margin: 10px;
+	min-height: auto;
+	width: auto;
+
+	.components-form-file-upload {
+		margin-right: 10px;
+	}
+
+	.components-placeholder__fieldset {
+		flex-direction: row;
+	}
+
+	.block-editor-media-placeholder__button {
+		margin-bottom: 0;
+	}
+}
+
 // Provides positioning context for reset button. Without this then when an
 // error notice is displayed the input's reset button is incorrectly positioned.
 .block-editor-link-control__search-input-wrapper {
