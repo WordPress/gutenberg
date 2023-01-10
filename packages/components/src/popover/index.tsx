@@ -43,6 +43,7 @@ import {
 import { close } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
 import { Path, SVG } from '@wordpress/primitives';
+import { getScrollContainer } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -52,6 +53,7 @@ import ScrollLock from '../scroll-lock';
 import { Slot, Fill, useSlot } from '../slot-fill';
 import {
 	getFrameOffset,
+	getFrameScale,
 	positionToPlacement,
 	placementToMotionAnimationProps,
 	getReferenceOwnerDocument,
@@ -363,10 +365,15 @@ const UnforwardedPopover = (
 	} = useFloating( {
 		placement: normalizedPlacementFromProps,
 		middleware,
-		whileElementsMounted: ( referenceParam, floatingParam, updateParam ) =>
-			autoUpdate( referenceParam, floatingParam, updateParam, {
+		whileElementsMounted: (
+			referenceParam,
+			floatingParam,
+			updateParam
+		) => {
+			return autoUpdate( referenceParam, floatingParam, updateParam, {
 				animationFrame: true,
-			} ),
+			} );
+		},
 	} );
 
 	const arrowCallbackRef = useCallback(
@@ -399,12 +406,14 @@ const UnforwardedPopover = (
 			fallbackReferenceElement,
 			fallbackDocument: document,
 		} );
+		const scale = getFrameScale( resultingReferenceOwnerDoc );
 		const resultingReferenceElement = getReferenceElement( {
 			anchor,
 			anchorRef,
 			anchorRect,
 			getAnchorRect,
 			fallbackReferenceElement,
+			scale,
 		} );
 
 		referenceCallbackRef( resultingReferenceElement );
@@ -441,17 +450,24 @@ const UnforwardedPopover = (
 		}
 
 		const { defaultView } = referenceOwnerDocument;
+		const { frameElement } = defaultView;
+
+		const scrollContainer = frameElement
+			? getScrollContainer( frameElement )
+			: null;
 
 		const updateFrameOffset = () => {
 			frameOffsetRef.current = getFrameOffset( referenceOwnerDocument );
 			update();
 		};
 		defaultView.addEventListener( 'resize', updateFrameOffset );
+		scrollContainer?.addEventListener( 'scroll', updateFrameOffset );
 
 		updateFrameOffset();
 
 		return () => {
 			defaultView.removeEventListener( 'resize', updateFrameOffset );
+			scrollContainer?.removeEventListener( 'scroll', updateFrameOffset );
 		};
 	}, [ referenceOwnerDocument, update, refs.floating ] );
 

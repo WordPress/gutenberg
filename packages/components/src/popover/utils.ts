@@ -157,6 +157,15 @@ export const getFrameOffset = (
 	return { x: iframeRect.left, y: iframeRect.top };
 };
 
+export const getFrameScale = ( document?: Document ): number => {
+	const frameElement = document?.defaultView?.frameElement as HTMLElement;
+	if ( ! frameElement ) {
+		return 1;
+	}
+	const transform = frameElement.style.transform;
+	return parseFloat( transform.replace( /scale\((\d+\.?\d*)\)/, '$1' ) );
+};
+
 export const getReferenceOwnerDocument = ( {
 	anchor,
 	anchorRef,
@@ -213,11 +222,13 @@ export const getReferenceElement = ( {
 	anchorRect,
 	getAnchorRect,
 	fallbackReferenceElement,
+	scale,
 }: Pick<
 	PopoverProps,
 	'anchorRef' | 'anchorRect' | 'getAnchorRect' | 'anchor'
 > & {
 	fallbackReferenceElement: Element | null;
+	scale: number;
 } ): ReferenceType | null => {
 	let referenceElement = null;
 
@@ -277,6 +288,22 @@ export const getReferenceElement = ( {
 		// If no explicit ref is passed via props, fall back to
 		// anchoring to the popover's parent node.
 		referenceElement = fallbackReferenceElement.parentElement;
+	}
+
+	if ( referenceElement && scale !== 1 ) {
+		// If the popover is inside an iframe, the coordinates of the
+		// reference element need to be scaled to match the iframe's scale.
+		const rect = referenceElement.getBoundingClientRect();
+		referenceElement = {
+			getBoundingClientRect() {
+				return new window.DOMRect(
+					rect.x * scale,
+					rect.y * scale,
+					rect.width * scale,
+					rect.height * scale
+				);
+			},
+		};
 	}
 
 	// Convert any `undefined` value to `null`.
