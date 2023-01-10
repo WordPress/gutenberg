@@ -145,8 +145,7 @@ function UserVariation( { variation, userChangesMatchAnyVariation } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
 	const associatedStyleId = user[ 'associated_style_id' ];
-	const { hasEditsForEntityRecord, hasFinishedResolution } =
-		useSelect( coreStore );
+	const { hasEditsForEntityRecord } = useSelect( coreStore );
 	const {
 		deleteEntityRecord,
 		__experimentalRefreshUserGlobalStylesVariations,
@@ -230,16 +229,6 @@ function UserVariation( { variation, userChangesMatchAnyVariation } ) {
 	};
 
 	const deleteStyleHandler = useCallback( () => {
-		if (
-			! hasFinishedResolution( 'getEditedEntityRecord', [
-				'root',
-				'globalStyles',
-				variation.id,
-			] )
-		) {
-			return;
-		}
-
 		// If this is the associated variation, remove the association
 		if ( associatedStyleId === variation.id ) {
 			setUserConfig( ( currentConfig ) => ( {
@@ -251,11 +240,7 @@ function UserVariation( { variation, userChangesMatchAnyVariation } ) {
 		deleteEntityRecord( 'root', 'globalStyles', variation.id ).then( () => {
 			__experimentalRefreshUserGlobalStylesVariations();
 		} );
-	}, [
-		variation,
-		associatedStyleId,
-		__experimentalRefreshUserGlobalStylesVariations,
-	] );
+	}, [ variation, associatedStyleId ] );
 
 	return (
 		<div
