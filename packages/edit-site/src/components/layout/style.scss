@@ -147,7 +147,10 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 		top: 0;
 		bottom: 0;
 		width: 100%;
-		border-radius: 0;
+
+		& > div {
+			border-radius: 0;
+		}
 	}
 }
 
