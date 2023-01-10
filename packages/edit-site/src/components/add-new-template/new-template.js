@@ -205,6 +205,7 @@ export default function NewTemplate( {
 										slug,
 										onClick,
 										icon,
+										isWPSuggestion = false,
 									} = template;
 									return (
 										<MenuItem
@@ -219,7 +220,10 @@ export default function NewTemplate( {
 											onClick={ () =>
 												onClick
 													? onClick( template )
-													: createTemplate( template )
+													: createTemplate(
+															template,
+															isWPSuggestion
+													  )
 											}
 										>
 											{ title }
@@ -281,7 +285,13 @@ function useMissingTemplates(
 			DEFAULT_TEMPLATE_SLUGS.includes( template.slug ) &&
 			! existingTemplateSlugs.includes( template.slug )
 	);
-	const extraTemplateTypes = useExtraTemplateTypes();
+	const extraTemplateTypes = ( useExtraTemplateTypes() || [] ).map(
+		( template ) => {
+			template.isWPSuggestion = false;
+			return template;
+		}
+	);
+
 	const onClickMenuItem = ( _entityForSuggestions ) => {
 		setShowCustomTemplateModal( true );
 		setEntityForSuggestions( _entityForSuggestions );
@@ -337,7 +347,9 @@ function useMissingTemplates(
 		( { slug } ) => slug
 	);
 	const missingExtraTemplateTypes = ( extraTemplateTypes || [] ).filter(
-		( template ) => ! missingTemplateSlugs.includes( template.slug )
+		( template ) =>
+			! missingTemplateSlugs.includes( template.slug ) &&
+			! existingTemplateSlugs.includes( template.slug )
 	);
 
 	return [ ...missingTemplates, ...missingExtraTemplateTypes ];
