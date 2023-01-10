@@ -222,4 +222,12 @@ HTML
 		// Did we only visit the tags inside section > * > p?
 		$this->assertEquals( 1, $p2_count );
 	}
+
+	public function test_set_content_inside_balanced_tags_sets_content_correctly() {
+		$tags = new WP_HTML_Processor( '<div>outside</div><section><div><img>inside</div></section>' );
+
+		$tags->next_tag( 'section' );
+		$tags->set_content_inside_balanced_tags( 'This is the new section content.' );
+		$this->assertSame( '<div>outside</div><section>This is the new section content.</section>', $tags->get_updated_html() );
+	}
 }
