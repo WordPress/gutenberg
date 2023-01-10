@@ -375,12 +375,19 @@ export default function NavigationLinkEdit( {
 	const DEFAULT_BLOCK = {
 		name: 'core/navigation-link',
 	};
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: ALLOWED_BLOCKS,
-		__experimentalDefaultBlock: DEFAULT_BLOCK,
-		__experimentalDirectInsert: true,
-		renderAppender: false,
-	} );
+
+	const innerBlocksProps = useInnerBlocksProps(
+		{
+			...blockProps,
+			className: 'remove-outline', // Remove the outline from the inner blocks container.
+		},
+		{
+			allowedBlocks: ALLOWED_BLOCKS,
+			__experimentalDefaultBlock: DEFAULT_BLOCK,
+			__experimentalDirectInsert: true,
+			renderAppender: false,
+		}
+	);
 
 	if ( ! url || isInvalid || isDraft ) {
 		blockProps.onClick = () => setIsLinkOpen( true );
@@ -435,7 +442,11 @@ export default function NavigationLinkEdit( {
 					<TextControl
 						value={ url || '' }
 						onChange={ ( urlValue ) => {
-							setAttributes( { url: urlValue } );
+							updateAttributes(
+								{ url: urlValue },
+								setAttributes,
+								attributes
+							);
 						} }
 						label={ __( 'URL' ) }
 						autoComplete="off"

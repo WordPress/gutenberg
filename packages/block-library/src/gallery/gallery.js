@@ -51,6 +51,7 @@ export const Gallery = ( props ) => {
 			) }
 			<RichTextVisibilityHelper
 				isHidden={ ! isSelected && RichText.isEmpty( caption ) }
+				identifier="caption"
 				tagName="figcaption"
 				className={ classnames(
 					'blocks-gallery-caption',

@@ -177,7 +177,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 
 	const blockInspectorAnimationSettings = useSelect(
 		( select ) => {
-			if ( isOffCanvasNavigationEditorEnabled ) {
+			if ( isOffCanvasNavigationEditorEnabled && blockType ) {
 				const globalBlockInspectorAnimationSettings =
 					select( blockEditorStore ).getSettings()
 						.__experimentalBlockInspectorAnimation;

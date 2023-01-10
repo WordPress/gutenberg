@@ -58,6 +58,7 @@ export default function DefaultStylePicker( { blockName } ) {
 		onUpdatePreferredStyleVariations && (
 			<div className="default-style-picker__default-switcher">
 				<SelectControl
+					__nextHasNoMarginBottom
 					options={ selectOptions }
 					value={ preferredStyle || '' }
 					label={ __( 'Default Style' ) }

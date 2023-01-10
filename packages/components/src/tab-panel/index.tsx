@@ -19,7 +19,6 @@ import type { WordPressComponentProps } from '../ui/context';
 
 const TabButton = ( {
 	tabId,
-	onClick,
 	children,
 	selected,
 	...rest
@@ -29,7 +28,7 @@ const TabButton = ( {
 		tabIndex={ selected ? null : -1 }
 		aria-selected={ selected }
 		id={ tabId }
-		onClick={ onClick }
+		__experimentalIsFocusable
 		{ ...rest }
 	>
 		{ children }
@@ -105,10 +104,24 @@ export function TabPanel( {
 	const selectedId = `${ instanceId }-${ selectedTab?.name ?? 'none' }`;
 
 	useEffect( () => {
-		if ( ! selectedTab?.name && tabs.length > 0 ) {
-			handleTabSelection( initialTabName || tabs[ 0 ].name );
+		const firstEnabledTab = tabs.find( ( tab ) => ! tab.disabled );
+		const initialTab = tabs.find( ( tab ) => tab.name === initialTabName );
+		if ( ! selectedTab?.name && firstEnabledTab ) {
+			handleTabSelection(
+				initialTab && ! initialTab.disabled
+					? initialTab.name
+					: firstEnabledTab.name
+			);
+		} else if ( selectedTab?.disabled && firstEnabledTab ) {
+			handleTabSelection( firstEnabledTab.name );
 		}
-	}, [ tabs, selectedTab?.name, initialTabName, handleTabSelection ] );
+	}, [
+		tabs,
+		selectedTab?.name,
+		selectedTab?.disabled,
+		initialTabName,
+		handleTabSelection,
+	] );
 
 	return (
 		<div className={ className }>
@@ -134,6 +147,7 @@ export function TabPanel( {
 						selected={ tab.name === selected }
 						key={ tab.name }
 						onClick={ () => handleTabSelection( tab.name ) }
+						disabled={ tab.disabled }
 						label={ tab.icon && tab.title }
 						icon={ tab.icon }
 						showTooltip={ !! tab.icon }
