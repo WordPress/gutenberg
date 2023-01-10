@@ -2,12 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import type {
-	ForwardedRef,
-	HTMLProps,
-	MouseEvent,
-	ReactNode,
-} from 'react';
+import type { ForwardedRef, HTMLProps, MouseEvent, ReactNode } from 'react';
 
 /**
  * WordPress dependencies
@@ -147,9 +142,7 @@ export function UnforwardedButton(
 		tagProps[ 'aria-disabled' ] = true;
 
 		for ( const disabledEvent of disabledEventsOnDisabledButton ) {
-			additionalProps[ disabledEvent ] = (
-				event: MouseEvent< HTMLElement >
-			) => {
+			additionalProps[ disabledEvent ] = ( event: MouseEvent ) => {
 				if ( event ) {
 					event.stopPropagation();
 					event.preventDefault();
@@ -186,16 +179,25 @@ export function UnforwardedButton(
 		ref,
 	};
 
-	const TagElement = ( { children }: { children: ReactNode } ) => {
+	const TagElement = ( {
+		children: tagChildren,
+	}: {
+		children: ReactNode;
+	} ) => {
 		return Tag === 'a' ? (
-			<Tag { ...( tagElementProps as WordPressComponentProps< {}, 'a' > ) } >
-				{ children }
+			<Tag
+				{ ...( tagElementProps as WordPressComponentProps< {}, 'a' > ) }
+			>
+				{ tagChildren }
 			</Tag>
 		) : (
 			<Tag
-				{ ...( tagElementProps as WordPressComponentProps< {}, 'button' > ) }
+				{ ...( tagElementProps as WordPressComponentProps<
+					{},
+					'button'
+				> ) }
 			>
-				{ children }
+				{ tagChildren }
 			</Tag>
 		);
 	};
