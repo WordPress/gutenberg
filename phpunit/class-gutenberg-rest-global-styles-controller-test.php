@@ -173,7 +173,23 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 	}
 
 	public function test_delete_item() {
-		$this->markTestIncomplete();
+		wp_set_current_user( self::$admin_id );
+		$post_id  = WP_Theme_JSON_Resolver_Gutenberg::add_user_global_styles_variation(
+			array(
+				'title'         => 'Title',
+				'global_styles' => \wp_json_encode(
+					array(
+						'settings' => new stdClass,
+						'styles'   => new stdClass,
+					)
+				),
+				'stylesheet'    => get_stylesheet(),
+			)
+		);
+		$request  = new WP_REST_Request( 'DELETE', '/wp/v2/global-styles/' . $post_id );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertTrue( $data['deleted'] );
 	}
 
 	public function test_prepare_item() {
