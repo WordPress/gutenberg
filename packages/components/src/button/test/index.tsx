@@ -12,8 +12,8 @@ import { plusCircle } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import Button from '../';
-import { Tooltip } from '../../';
+import Button from '..';
+import Tooltip from '../../tooltip';
 
 jest.mock( '../../icon', () => () => <div data-testid="test-icon" /> );
 
@@ -137,16 +137,6 @@ describe( 'Button', () => {
 			render( <Button className="gutenberg" /> );
 
 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'gutenberg' );
-		} );
-
-		it( 'should render an additional WordPress prop of value awesome', () => {
-			render( <Button WordPress="awesome" /> );
-
-			expect( console ).toHaveErrored();
-			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
-				'wordpress',
-				'awesome'
-			);
 		} );
 
 		it( 'should render an icon button', () => {
@@ -360,11 +350,13 @@ describe( 'Button', () => {
 
 	describe( 'deprecated props', () => {
 		it( 'should not break when the legacy isPrimary prop is passed', () => {
+			// @ts-expect-error
 			render( <Button isPrimary /> );
 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-primary' );
 		} );
 
 		it( 'should not break when the legacy isSecondary prop is passed', () => {
+			// @ts-expect-error
 			render( <Button isSecondary /> );
 			expect( screen.getByRole( 'button' ) ).toHaveClass(
 				'is-secondary'
@@ -372,16 +364,19 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should not break when the legacy isTertiary prop is passed', () => {
+			// @ts-expect-error
 			render( <Button isTertiary /> );
 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-tertiary' );
 		} );
 
 		it( 'should not break when the legacy isLink prop is passed', () => {
+			// @ts-expect-error
 			render( <Button isLink /> );
 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-link' );
 		} );
 
 		it( 'should warn when the isDefault prop is passed', () => {
+			// @ts-expect-error
 			render( <Button isDefault /> );
 			expect( screen.getByRole( 'button' ) ).toHaveClass(
 				'is-secondary'
