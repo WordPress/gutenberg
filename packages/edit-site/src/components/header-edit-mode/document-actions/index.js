@@ -25,16 +25,13 @@ import {
 	useBlockDisplayInformation,
 	BlockIcon,
 } from '@wordpress/block-editor';
-import { store as coreStore } from '@wordpress/core-data';
-import { store as editorStore } from '@wordpress/editor';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
  */
 import TemplateDetails from '../../template-details';
-import { store as editSiteStore } from '../../../store';
+import useEditedEntityRecord from '../../use-edited-entity-record';
 
 function getBlockDisplayText( block ) {
 	if ( block ) {
@@ -70,36 +67,15 @@ function useSecondaryText() {
 }
 
 export default function DocumentActions() {
-	const { showIconLabels, entityTitle, template, templateType, isLoaded } =
-		useSelect( ( select ) => {
-			const { getEditedPostType, getEditedPostId } =
-				select( editSiteStore );
-			const { getEditedEntityRecord } = select( coreStore );
-			const { __experimentalGetTemplateInfo: getTemplateInfo } =
-				select( editorStore );
-			const postType = getEditedPostType();
-			const postId = getEditedPostId();
-			const record = getEditedEntityRecord(
-				'postType',
-				postType,
-				postId
-			);
-			const _isLoaded = !! postId;
-
-			return {
-				showIconLabels: select( preferencesStore ).get(
-					'core/edit-site',
-					'showIconLabels'
-				),
-				entityTitle: getTemplateInfo( record ).title,
-				isLoaded: _isLoaded,
-				template: record,
-				templateType: postType,
-			};
-		}, [] );
-
-	const entityLabel =
-		templateType === 'wp_template_part' ? 'template part' : 'template';
+	const showIconLabels = useSelect(
+		( select ) =>
+			select( preferencesStore ).get(
+				'core/edit-site',
+				'showIconLabels'
+			),
+		[]
+	);
+	const { isLoaded, record, getTitle } = useEditedEntityRecord();
 	const { label, icon } = useSecondaryText();
 
 	// Use internal state instead of a ref to make sure that the component
@@ -126,13 +102,18 @@ export default function DocumentActions() {
 	}
 
 	// Return feedback that the template does not seem to exist.
-	if ( ! entityTitle ) {
+	if ( ! record ) {
 		return (
 			<div className="edit-site-document-actions">
 				{ __( 'Template not found' ) }
 			</div>
 		);
 	}
+
+	const entityLabel =
+		record.type === 'wp_template_part'
+			? __( 'template part' )
+			: __( 'template' );
 
 	return (
 		<div
@@ -156,7 +137,7 @@ export default function DocumentActions() {
 							entityLabel
 						) }
 					</VisuallyHidden>
-					{ decodeEntities( entityTitle ) }
+					{ getTitle() }
 				</Text>
 				<div className="edit-site-document-actions__secondary-item">
 					<BlockIcon icon={ icon } showColors />
@@ -186,7 +167,7 @@ export default function DocumentActions() {
 					contentClassName="edit-site-document-actions__info-dropdown"
 					renderContent={ ( { onClose } ) => (
 						<TemplateDetails
-							template={ template }
+							template={ record }
 							onClose={ onClose }
 						/>
 					) }

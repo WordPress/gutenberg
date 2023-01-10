@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __experimentalUseSlotFills as useSlotFills } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -10,6 +11,29 @@ import InspectorControlsGroups from '../inspector-controls/groups';
 import useIsListViewTabDisabled from './use-is-list-view-tab-disabled';
 import { InspectorAdvancedControls } from '../inspector-controls';
 import { TAB_LIST_VIEW, TAB_SETTINGS, TAB_STYLES } from './utils';
+import { store as blockEditorStore } from '../../store';
+
+const EMPTY_ARRAY = [];
+
+function getShowTabs( blockName, tabSettings = {} ) {
+	// Don't allow settings to force the display of tabs if the block inspector
+	// tabs experiment hasn't been opted into.
+	if ( ! window?.__experimentalEnableBlockInspectorTabs ) {
+		return false;
+	}
+
+	// Block specific setting takes precedence over generic default.
+	if ( tabSettings[ blockName ] !== undefined ) {
+		return tabSettings[ blockName ];
+	}
+
+	// Use generic default if set over the Gutenberg experiment option.
+	if ( tabSettings.default !== undefined ) {
+		return tabSettings.default;
+	}
+
+	return true;
+}
 
 export default function useInspectorControlsTabs( blockName ) {
 	const tabs = [];
@@ -54,5 +78,12 @@ export default function useInspectorControlsTabs( blockName ) {
 		tabs.push( TAB_SETTINGS );
 	}
 
-	return tabs;
+	const tabSettings = useSelect( ( select ) => {
+		return select( blockEditorStore ).getSettings()
+			.__experimentalBlockInspectorTabs;
+	}, [] );
+
+	const showTabs = getShowTabs( blockName, tabSettings );
+
+	return showTabs ? tabs : EMPTY_ARRAY;
 }

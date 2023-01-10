@@ -89,6 +89,22 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 
+	add_settings_field(
+		'gutenberg-global-styles-custom-css',
+		__( 'Global styles custom css ', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => sprintf(
+				/* translators: %s: WordPress documentation for roles and capabilities. */
+				__( 'Test the Global Styles custom CSS field in the site editor. This requires a user to have <a href="%s">unfiltered html capabilities</a>.', 'gutenberg' ),
+				'https://wordpress.org/support/article/roles-and-capabilities/#unfiltered_html'
+			),
+			'id'    => 'gutenberg-global-styles-custom-css',
+		)
+	);
+
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'
@@ -126,22 +142,3 @@ function gutenberg_display_experiment_section() {
 
 	<?php
 }
-
-/**
- * Extends default editor settings with experiments settings.
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
- */
-function gutenberg_experiments_editor_settings( $settings ) {
-	// The refactored gallery currently can't be run on sites with use_balanceTags option set.
-	// This bypass needs to remain in place until this is resolved and a patch released.
-	// https://core.trac.wordpress.org/ticket/54130.
-	$experiments_settings = array(
-		'__unstableGalleryWithImageBlocks' => (int) get_option( 'use_balanceTags' ) !== 1 || is_wp_version_compatible( '5.9' ),
-	);
-	return array_merge( $settings, $experiments_settings );
-}
-
-add_filter( 'block_editor_settings_all', 'gutenberg_experiments_editor_settings' );

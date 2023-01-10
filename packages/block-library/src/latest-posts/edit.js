@@ -234,6 +234,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 				{ displayPostContent &&
 					displayPostContentRadio === 'excerpt' && (
 						<RangeControl
+							__nextHasNoMarginBottom
 							label={ __( 'Max number of words in excerpt' ) }
 							value={ excerptLength }
 							onChange={ ( value ) =>
@@ -355,6 +356,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 
 				{ postLayout === 'grid' && (
 					<RangeControl
+						__nextHasNoMarginBottom
 						label={ __( 'Columns' ) }
 						value={ columns }
 						onChange={ ( value ) =>
@@ -431,7 +433,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 				<ToolbarGroup controls={ layoutControls } />
 			</BlockControls>
 			<ul { ...blockProps }>
-				{ displayPosts.map( ( post, i ) => {
+				{ displayPosts.map( ( post ) => {
 					const titleTrimmed = post.title.rendered.trim();
 					let excerpt = post.excerpt.rendered;
 					const currentAuthor = authorList?.find(
@@ -491,7 +493,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 					);
 
 					return (
-						<li key={ i }>
+						<li key={ post.id }>
 							{ renderFeaturedImage && (
 								<div className={ imageClasses }>
 									{ addLinkToFeaturedImage ? (

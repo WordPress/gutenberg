@@ -10,7 +10,8 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import MediaList from './media-list';
-import { useMediaResults, useDebouncedInput } from './hooks';
+import useDebouncedInput from '../hooks/use-debounced-input';
+import { useMediaResults } from './hooks';
 import InserterNoResults from '../no-results';
 
 const INITIAL_MEDIA_ITEMS_PER_PAGE = 10;

@@ -9,6 +9,8 @@ import userEvent from '@testing-library/user-event';
  */
 import BlockAlignmentUI from '../ui';
 
+jest.useFakeTimers();
+
 describe( 'BlockAlignmentUI', () => {
 	const alignment = 'left';
 	const onChange = jest.fn();

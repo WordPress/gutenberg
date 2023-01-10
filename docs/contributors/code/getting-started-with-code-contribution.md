@@ -18,6 +18,9 @@ We recommend using the [Node Version Manager](https://github.com/nvm-sh/nvm) (nv
 
 As an alternative to Docker setup, you can use [Local](https://localwp.com/), [WampServer](http://www.wampserver.com/en/), or [MAMP](https://www.mamp.info/), or even use a remote server.
 
+-   GitHub CLI
+    Although not a requirement, the [GitHub CLI](https://cli.github.com/) can be very useful in helping you checkout pull requests locally. Both from the Gutenberg repo and forked repos. This can be a major time saver while code reviewing and testing pull requests.
+
 ## Getting the Gutenberg code
 
 Fork the Gutenberg repository, clone it to your computer and add the WordPress repository as upstream.

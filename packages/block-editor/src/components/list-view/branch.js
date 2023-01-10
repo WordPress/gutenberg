@@ -7,9 +7,6 @@ import { AsyncModeProvider, useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-/**
- * Internal dependencies
- */
 import ListViewBlock from './block';
 import { useListViewContext } from './context';
 import { isClientIdSelected } from './utils';
@@ -79,10 +76,12 @@ const countReducer =
 		return count + 1;
 	};
 
+const noop = () => {};
+
 function ListViewBranch( props ) {
 	const {
 		blocks,
-		selectBlock,
+		selectBlock = noop,
 		showBlockMovers,
 		selectedClientIds,
 		level = 1,
@@ -214,9 +213,5 @@ function ListViewBranch( props ) {
 		</>
 	);
 }
-
-ListViewBranch.defaultProps = {
-	selectBlock: () => {},
-};
 
 export default memo( ListViewBranch );

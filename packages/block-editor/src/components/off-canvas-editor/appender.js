@@ -37,7 +37,9 @@ export const Appender = forwardRef( ( props, ref ) => {
 				ref={ ref }
 				rootClientId={ clientId }
 				position="bottom right"
-				isAppender
+				isAppender={ true }
+				selectBlockOnInsert={ false }
+				shouldDirectInsert={ false }
 				__experimentalIsQuick
 				{ ...props }
 			/>

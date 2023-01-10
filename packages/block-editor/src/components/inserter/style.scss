@@ -287,7 +287,7 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
-.block-editor-inserter__patterns-category-panel {
+.block-editor-inserter__patterns-category-dialog {
 	background: $gray-100;
 	border-left: $border-width solid $gray-200;
 	border-right: $border-width solid $gray-200;
@@ -316,9 +316,13 @@ $block-inserter-tabs-height: 44px;
 			box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
 		}
 	}
+}
 
-	.block-editor-block-patterns-list__item-title {
-		display: none;
+.block-editor-inserter__patterns-category-panel {
+	padding: 0 $grid-unit-20;
+
+	@include break-medium {
+		padding: 0;
 	}
 }
 
@@ -557,26 +561,27 @@ $block-inserter-tabs-height: 44px;
 			box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
 		}
 	}
+}
 
-	.block-editor-inserter__media-panel {
+.block-editor-inserter__media-panel {
+	height: 100%;
+	padding: 0 $grid-unit-20;
+
+	@include break-medium {
+		padding: 0;
+	}
+
+	.block-editor-inserter__media-panel-spinner {
 		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
 
-		&-title {
-			font-size: calc(1.25 * 13px);
-		}
-
-		&-spinner {
-			height: 100%;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-		}
-
-		&-search {
-			&.components-search-control {
-				input[type="search"].components-search-control__input {
-					background: $white;
-				}
+	.block-editor-inserter__media-panel-search {
+		&.components-search-control {
+			input[type="search"].components-search-control__input {
+				background: $white;
 			}
 		}
 	}
@@ -622,5 +627,15 @@ $block-inserter-tabs-height: 44px;
 			// Windows High Contrast mode will show this outline, but not the box-shadow.
 			outline: 2px solid transparent;
 		}
+	}
+}
+
+
+.block-editor-inserter__mobile-tab-navigation {
+	padding: $grid-unit-20;
+	height: 100%;
+
+	> * {
+		height: 100%;
 	}
 }

@@ -168,6 +168,6 @@ export const withBlockControls = createHigherOrderComponent(
 
 addFilter(
 	'editor.BlockEdit',
-	'core/style/with-block-controls',
+	'core/content-lock-ui/with-block-controls',
 	withBlockControls
 );
