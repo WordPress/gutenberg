@@ -22,7 +22,11 @@ import { useSelect, useDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { getValueFromVariable, getPresetVariableFromValue } from './utils';
+import {
+	getValueFromVariable,
+	getPresetVariableFromValue,
+	compareVariations,
+} from './utils';
 import { GlobalStylesContext } from './context';
 
 // Enable colord's a11y plugin.
@@ -397,4 +401,16 @@ export function useCustomSavedStyles() {
 	}, [] );
 
 	return variations;
+}
+
+export function useUserChangesMatchAnyVariation( variations ) {
+	const { user } = useContext( GlobalStylesContext );
+	const matches = useMemo(
+		() =>
+			variations?.some( ( variation ) =>
+				compareVariations( user, variation )
+			),
+		[ user, variations ]
+	);
+	return matches;
 }

@@ -102,6 +102,9 @@ function gutenberg_register_global_styles_endpoints() {
 }
 add_action( 'rest_api_init', 'gutenberg_register_global_styles_endpoints' );
 
+/**
+ * Registers the themes REST API routes.
+ */
 function gutenberg_register_themes_endpoints() {
 	$controller = new Gutenberg_REST_Themes_Controller_6_2();
 	$controller->register_routes();

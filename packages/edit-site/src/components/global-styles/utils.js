@@ -336,6 +336,22 @@ export function scopeSelector( scope, selector ) {
 }
 
 export function compareVariations( a, b ) {
+	if ( ! a.styles ) {
+		a.styles = {};
+	}
+
+	if ( ! a.settings ) {
+		a.settings = {};
+	}
+
+	if ( ! b.styles ) {
+		b.styles = {};
+	}
+
+	if ( ! b.settings ) {
+		b.settings = {};
+	}
+
 	return (
 		fastDeepEqual( a.styles, b.styles ) &&
 		fastDeepEqual( a.settings, b.settings )

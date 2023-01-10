@@ -662,15 +662,6 @@ export function blockPatternCategories( state = [], action ) {
 	return state;
 }
 
-export function associatedVariationChanged( state = false, action ) {
-	switch ( action.type ) {
-		case 'SET_ASSOCIATED_VARIATION_CHANGED':
-			return action.hasChanged;
-	}
-
-	return state;
-}
-
 export default combineReducers( {
 	terms,
 	users,
@@ -688,5 +679,4 @@ export default combineReducers( {
 	blockPatterns,
 	blockPatternCategories,
 	userGlobalStyleVariations,
-	associatedVariationChanged,
 } );

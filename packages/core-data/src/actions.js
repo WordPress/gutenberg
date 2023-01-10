@@ -901,24 +901,6 @@ export const __experimentalCreateNewGlobalStylesVariation =
 	};
 
 /**
- * Tracks whether changes have been made to global styles associated variation
- * ID.
- * Ignored from documentation as it's internal to the data store.
- *
- * @ignore
- *
- * @param {boolean} hasChanged Whether it changed.
- *
- * @return {Object} Action object.
- */
-export function __experimentalAssociatedVariationChanged( hasChanged ) {
-	return {
-		type: 'SET_ASSOCIATED_VARIATION_CHANGED',
-		hasChanged,
-	};
-}
-
-/**
  * Discards changes in the specified record.
  *
  * @param {string} kind     Entity kind.

@@ -44,16 +44,13 @@ import {
 	useHasUserModifiedStyles,
 	useCreateNewStyleRecord,
 	useCustomSavedStyles,
+	useUserChangesMatchAnyVariation,
 } from './hooks';
 import { compareVariations } from './utils';
 
 /* eslint-disable dot-notation */
 
-function Variation( {
-	variation,
-	selectedThemeVariationChanged,
-	setSelectedThemeVariationChanged,
-} ) {
+function Variation( { variation, userChangesMatchAnyVariation } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
 	const { hasEditsForEntityRecord } = useSelect( coreStore );
@@ -82,13 +79,7 @@ function Variation( {
 	const selectVariation = () => {
 		/* eslint-disable no-alert */
 		if (
-			user[ 'associated_style_id' ] &&
-			hasEditsForEntityRecord(
-				'root',
-				'globalStyles',
-				user[ 'associated_style_id' ]
-			) &&
-			! selectedThemeVariationChanged &&
+			! userChangesMatchAnyVariation &&
 			hasEditsForEntityRecord( 'root', 'globalStyles', globalStyleId ) &&
 			! window.confirm(
 				__(
@@ -99,8 +90,6 @@ function Variation( {
 			return;
 		}
 		/* eslint-enable no-alert */
-
-		setSelectedThemeVariationChanged( true );
 
 		setUserConfig( () => {
 			return {
@@ -149,26 +138,21 @@ function Variation( {
 	);
 }
 
-function UserVariation( { variation, selectedThemeVariationChanged } ) {
+function UserVariation( { variation, userChangesMatchAnyVariation } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
 	const associatedStyleId = user[ 'associated_style_id' ];
-	const { hasEditsForEntityRecord } = useSelect( coreStore );
-	const { globalStyleId, hasAssociatedVariationChanged } = useSelect(
-		( select ) => {
-			return {
-				globalStyleId:
-					select(
-						coreStore
-					).__experimentalGetCurrentGlobalStylesId(),
-				hasAssociatedVariationChanged:
-					select(
-						coreStore
-					).__experimentalHasAssociatedVariationChanged(),
-			};
-		},
-		[]
-	);
+	const {
+		hasEditsForEntityRecord,
+		getEditedEntityRecord,
+		hasFinishedResolution,
+	} = useSelect( coreStore );
+	const { globalStyleId } = useSelect( ( select ) => {
+		return {
+			globalStyleId:
+				select( coreStore ).__experimentalGetCurrentGlobalStylesId(),
+		};
+	}, [] );
 	// StylesPreview needs to be wrapped in a custom context so that the styles
 	// appear correctly. Otherwise, they would be overriden by current user
 	// settings.
@@ -192,8 +176,7 @@ function UserVariation( { variation, selectedThemeVariationChanged } ) {
 	const selectVariation = useCallback( () => {
 		/* eslint-disable no-alert */
 		if (
-			! selectedThemeVariationChanged &&
-			! hasAssociatedVariationChanged &&
+			! userChangesMatchAnyVariation &&
 			hasEditsForEntityRecord( 'root', 'globalStyles', globalStyleId ) &&
 			! window.confirm(
 				__(
@@ -205,17 +188,23 @@ function UserVariation( { variation, selectedThemeVariationChanged } ) {
 		}
 		/* eslint-enable no-alert */
 
+		// Load record for editing
+		if (
+			! hasFinishedResolution( 'getEditedEntityRecord', [
+				'root',
+				'globalStyles',
+				variation.id,
+			] )
+		) {
+			getEditedEntityRecord( 'root', 'globalStyles', variation.id );
+		}
+
 		setUserConfig( () => ( {
 			settings: variation.settings,
 			styles: variation.styles,
 			associated_style_id: variation.id,
 		} ) );
-	}, [
-		variation,
-		globalStyleId,
-		hasAssociatedVariationChanged,
-		selectedThemeVariationChanged,
-	] );
+	}, [ variation, globalStyleId, userChangesMatchAnyVariation ] );
 
 	const selectOnEnter = ( event ) => {
 		if ( event.keyCode === ENTER ) {
@@ -256,24 +245,8 @@ function ScreenStyleVariations() {
 		useState( false );
 	const [ newStyleName, setNewStyleName ] = useState( '' );
 	const [ isStyleRecordSaving, setIsStyleRecordSaving ] = useState( false );
-	const {
-		user,
-		setSelectedThemeVariationChanged,
-		selectedThemeVariationChanged,
-		setUserConfig,
-	} = useContext( GlobalStylesContext );
-	const { __experimentalAssociatedVariationChanged } =
-		useDispatch( coreStore );
+	const { setUserConfig } = useContext( GlobalStylesContext );
 
-	const { getEditedEntityRecord } = useSelect( coreStore );
-	const { associatedVariationChanged } = useSelect( ( select ) => {
-		return {
-			associatedVariationChanged:
-				select(
-					coreStore
-				).__experimentalHasAssociatedVariationChanged(),
-		};
-	}, [] );
 	const { variations, mode } = useSelect( ( select ) => {
 		return {
 			variations:
@@ -300,6 +273,19 @@ function ScreenStyleVariations() {
 
 	const hasUserModifiedStyles = useHasUserModifiedStyles();
 	const userVariations = useCustomSavedStyles();
+	const allVariations = useMemo( () => {
+		const ret = [];
+		if ( Array.isArray( withEmptyVariation ) ) {
+			ret.push( ...withEmptyVariation );
+		}
+		if ( Array.isArray( userVariations ) ) {
+			ret.push( ...userVariations );
+		}
+		return ret;
+	}, [ withEmptyVariation, userVariations ] );
+
+	const userChangesMatchAnyVariation =
+		useUserChangesMatchAnyVariation( allVariations );
 
 	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
 	const shouldRevertInitialMode = useRef( null );
@@ -328,24 +314,6 @@ function ScreenStyleVariations() {
 
 	const createNewStyleRecord = useCreateNewStyleRecord( newStyleName );
 
-	// This functionality needs to be done on back button click, otherwise if
-	// getEditedEntityRecord is called when a variation is clicked, there is an
-	// ugly screen re-render that resets navigation.
-	const handleBackButtonClick = useCallback( () => {
-		if ( user[ 'associated_style_id' ] && associatedVariationChanged ) {
-			// Load entity for editing
-			getEditedEntityRecord(
-				'root',
-				'globalStyles',
-				user[ 'associated_style_id' ]
-			);
-		}
-
-		// Reset state
-		setSelectedThemeVariationChanged( false );
-		__experimentalAssociatedVariationChanged( false );
-	}, [ associatedVariationChanged, user ] );
-
 	return (
 		<>
 			<ScreenHeader
@@ -354,7 +322,6 @@ function ScreenStyleVariations() {
 				description={ __(
 					'Choose a variation to change the look of the site.'
 				) }
-				onBackButtonClick={ handleBackButtonClick }
 			/>
 			<Card isBorderless>
 				<CardBody>
@@ -378,11 +345,8 @@ function ScreenStyleVariations() {
 								<UserVariation
 									key={ variation.id }
 									variation={ variation }
-									associatedVariationChanged={
-										associatedVariationChanged
-									}
-									selectedThemeVariationChanged={
-										selectedThemeVariationChanged
+									userChangesMatchAnyVariation={
+										userChangesMatchAnyVariation
 									}
 								/>
 							) ) }
@@ -403,14 +367,8 @@ function ScreenStyleVariations() {
 							<Variation
 								key={ index }
 								variation={ variation }
-								associatedVariationChanged={
-									associatedVariationChanged
-								}
-								selectedThemeVariationChanged={
-									selectedThemeVariationChanged
-								}
-								setSelectedThemeVariationChanged={
-									setSelectedThemeVariationChanged
+								userChangesMatchAnyVariation={
+									userChangesMatchAnyVariation
 								}
 							/>
 						) ) }

@@ -8,8 +8,6 @@ export const DEFAULT_GLOBAL_STYLES_CONTEXT = {
 	base: {},
 	merged: {},
 	setUserConfig: () => {},
-	selectedThemeVariationChanged: false,
-	setSelectedThemeVariationChanged: () => {},
 };
 
 export const GlobalStylesContext = createContext(

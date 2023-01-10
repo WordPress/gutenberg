@@ -54,7 +54,7 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 	 *
 	 * @return WP_REST_Response|WP_Error
 	 */
-	public function get_user_items( $request ) {
+	public function get_user_items( /* @phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable */ $request ) {
 		$variations = WP_Theme_JSON_Resolver_Gutenberg::get_user_style_variations();
 		$response   = rest_ensure_response( $variations );
 		return $response;
@@ -68,13 +68,13 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access for the item, WP_Error object otherwise.
 	 */
-	public function get_user_items_permissions_check( $request ) {
+	public function get_user_items_permissions_check( /* @phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable */ $request ) {
 		// Verify if the current user has edit_theme_options capability.
 		// This capability is required to edit/view/delete templates.
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
 			return new WP_Error(
 				'rest_cannot_manage_global_styles',
-				__( 'Sorry, you are not allowed to access the global styles on this site.' ),
+				__( 'Sorry, you are not allowed to access the global styles on this site.', 'gutenberg' ),
 				array(
 					'status' => rest_authorization_required_code(),
 				)

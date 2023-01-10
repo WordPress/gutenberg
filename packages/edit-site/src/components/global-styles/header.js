@@ -12,7 +12,7 @@ import {
 import { isRTL, __ } from '@wordpress/i18n';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
 
-function ScreenHeader( { title, description, onBackButtonClick } ) {
+function ScreenHeader( { title, description } ) {
 	return (
 		<VStack spacing={ 0 }>
 			<View>
@@ -27,7 +27,6 @@ function ScreenHeader( { title, description, onBackButtonClick } ) {
 							icon={ isRTL() ? chevronRight : chevronLeft }
 							isSmall
 							aria-label={ __( 'Navigate to the previous view' ) }
-							onClick={ onBackButtonClick }
 						/>
 						<Spacer>
 							<Heading level={ 5 }>{ title }</Heading>

@@ -469,8 +469,10 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		return $user_cpt;
 	}
 
+	// @codingStandardsIgnoreStart Squiz.Commenting.FunctionComment.ParamCommentFullStop
 	/**
 	 * Saves a new user variation into the database.
+	 *
 	 *
 	 * @param array $args Arguments. All are required.
 	 *     {
@@ -511,6 +513,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 		return $post_id;
 	}
+	// @codingStandardsIgnoreEnd Squiz.Commenting.FunctionComment.ParamCommentFullStop
 
 	/**
 	 * Make an association between post $id and post containing current user

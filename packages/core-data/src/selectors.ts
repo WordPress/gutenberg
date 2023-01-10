@@ -38,7 +38,6 @@ export interface State {
 	userGlobalStyleVariations: Record< string, Object[] >;
 	undo: UndoState;
 	users: UserState;
-	associatedVariationChanged: boolean;
 }
 
 type EntityRecordKey = string | number;
@@ -1283,10 +1282,4 @@ export function getBlockPatterns( state: State ): Array< any > {
  */
 export function getBlockPatternCategories( state: State ): Array< any > {
 	return state.blockPatternCategories;
-}
-
-export function __experimentalHasAssociatedVariationChanged(
-	state: State
-): boolean {
-	return state.associatedVariationChanged;
 }

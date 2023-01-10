@@ -47,18 +47,14 @@ const cleanEmptyObject = ( object ) => {
 };
 
 function useGlobalStylesUserConfig() {
-	const {
-		hasFinishedResolution,
-		__experimentalHasAssociatedVariationChanged,
-	} = useSelect( coreStore );
-	const {
-		editEntityRecord,
-		__experimentalAssociatedVariationChanged,
-		__experimentalDiscardRecordChanges,
-	} = useDispatch( coreStore );
+	const { hasFinishedResolution } = useSelect( coreStore );
+	const { editEntityRecord, __experimentalDiscardRecordChanges } =
+		useDispatch( coreStore );
 
-	const { globalStylesId, isReady, settings, styles, associated_style_id } =
-		useSelect( ( select ) => {
+	const [ isReady, setIsReady ] = useState( false );
+
+	const { globalStylesId, settings, styles, associated_style_id } = useSelect(
+		( select ) => {
 			const { getEditedEntityRecord } = select( coreStore );
 			const _globalStylesId =
 				select( coreStore ).__experimentalGetCurrentGlobalStylesId();
@@ -72,10 +68,7 @@ function useGlobalStylesUserConfig() {
 			const _associatedStyleId = record
 				? record[ 'associated_style_id' ]
 				: undefined;
-			if (
-				_associatedStyleId &&
-				! __experimentalHasAssociatedVariationChanged()
-			) {
+			if ( _associatedStyleId ) {
 				getEditedEntityRecord(
 					'root',
 					'globalStyles',
@@ -85,6 +78,7 @@ function useGlobalStylesUserConfig() {
 
 			let hasResolved = false;
 			if (
+				! isReady &&
 				hasFinishedResolution(
 					'__experimentalGetCurrentGlobalStylesId'
 				)
@@ -104,7 +98,6 @@ function useGlobalStylesUserConfig() {
 					}
 
 					const associatedStyleFinishedResolution =
-						__experimentalHasAssociatedVariationChanged() ||
 						hasFinishedResolution( 'getEditedEntityRecord', [
 							'root',
 							'globalStyles',
@@ -116,16 +109,21 @@ function useGlobalStylesUserConfig() {
 						associatedStyleFinishedResolution
 					);
 				} )();
+
+				if ( hasResolved ) {
+					setIsReady( true );
+				}
 			}
 
 			return {
 				globalStylesId: _globalStylesId,
-				isReady: hasResolved,
 				settings: record?.settings,
 				styles: record?.styles,
 				associated_style_id: _associatedStyleId,
 			};
-		}, [] );
+		},
+		[]
+	);
 
 	const { getEditedEntityRecord } = useSelect( coreStore );
 	const config = useMemo( () => {
@@ -164,10 +162,6 @@ function useGlobalStylesUserConfig() {
 			) {
 				associatedStyleIdChanged = true;
 			}
-
-			__experimentalAssociatedVariationChanged(
-				associatedStyleIdChanged
-			);
 
 			editEntityRecord(
 				'root',
@@ -247,16 +241,7 @@ function useGlobalStylesUserConfig() {
 		[ globalStylesId ]
 	);
 
-	const [ selectedThemeVariationChanged, setSelectedThemeVariationChanged ] =
-		useState( false );
-
-	return [
-		isReady,
-		config,
-		setConfig,
-		selectedThemeVariationChanged,
-		setSelectedThemeVariationChanged,
-	];
+	return [ isReady, config, setConfig ];
 }
 
 function useGlobalStylesBaseConfig() {
@@ -270,13 +255,8 @@ function useGlobalStylesBaseConfig() {
 }
 
 function useGlobalStylesContext() {
-	const [
-		isUserConfigReady,
-		userConfig,
-		setUserConfig,
-		selectedThemeVariationChanged,
-		setSelectedThemeVariationChanged,
-	] = useGlobalStylesUserConfig();
+	const [ isUserConfigReady, userConfig, setUserConfig ] =
+		useGlobalStylesUserConfig();
 	const [ isBaseConfigReady, baseConfig ] = useGlobalStylesBaseConfig();
 	const mergedConfig = useMemo( () => {
 		if ( ! baseConfig || ! userConfig ) {
@@ -291,8 +271,6 @@ function useGlobalStylesContext() {
 			base: baseConfig,
 			merged: mergedConfig,
 			setUserConfig,
-			selectedThemeVariationChanged,
-			setSelectedThemeVariationChanged,
 		};
 	}, [
 		mergedConfig,
@@ -301,8 +279,6 @@ function useGlobalStylesContext() {
 		setUserConfig,
 		isUserConfigReady,
 		isBaseConfigReady,
-		selectedThemeVariationChanged,
-		setSelectedThemeVariationChanged,
 	] );
 
 	return context;
