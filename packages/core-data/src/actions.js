@@ -862,9 +862,7 @@ export function receiveAutosaves( postId, autosaves ) {
  */
 export const __experimentalCreateNewGlobalStylesVariation =
 	( globalStylesData ) =>
-	async ( { dispatch, resolveSelect, select } ) => {
-		const currentTheme = await resolveSelect.getCurrentTheme();
-
+	async ( { dispatch, select } ) => {
 		const newVariationData = await apiFetch( {
 			path: '/wp/v2/global-styles',
 			method: 'POST',
@@ -872,13 +870,7 @@ export const __experimentalCreateNewGlobalStylesVariation =
 		} );
 
 		// Refresh variations
-		const variations = await apiFetch( {
-			path: `/wp/v2/global-styles/user/variations`,
-		} );
-		dispatch.__experimentalReceiveUserGlobalStyleVariations(
-			currentTheme.stylesheet,
-			variations
-		);
+		await dispatch.__experimentalRefreshUserGlobalStylesVariations();
 
 		/* eslint-disable dot-notation */
 		// Discard changes to the previously associated variation
@@ -898,6 +890,19 @@ export const __experimentalCreateNewGlobalStylesVariation =
 		/* eslint-enable dot-notation */
 
 		return newVariationData;
+	};
+
+export const __experimentalRefreshUserGlobalStylesVariations =
+	() =>
+	async ( { dispatch, resolveSelect } ) => {
+		const currentTheme = await resolveSelect.getCurrentTheme();
+		const variations = await apiFetch( {
+			path: `/wp/v2/global-styles/user/variations`,
+		} );
+		dispatch.__experimentalReceiveUserGlobalStyleVariations(
+			currentTheme.stylesheet,
+			variations
+		);
 	};
 
 /**

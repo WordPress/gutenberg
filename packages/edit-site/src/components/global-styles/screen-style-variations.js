@@ -23,6 +23,8 @@ import {
 	CardDivider,
 	Button,
 	Modal,
+	MenuGroup,
+	MenuItem,
 	__experimentalHeading as Heading,
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
@@ -32,6 +34,7 @@ import {
 import { plus } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { MoreMenuDropdown } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -142,17 +145,30 @@ function UserVariation( { variation, userChangesMatchAnyVariation } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
 	const associatedStyleId = user[ 'associated_style_id' ];
+	const { hasEditsForEntityRecord, hasFinishedResolution } =
+		useSelect( coreStore );
 	const {
-		hasEditsForEntityRecord,
-		getEditedEntityRecord,
-		hasFinishedResolution,
-	} = useSelect( coreStore );
+		deleteEntityRecord,
+		__experimentalRefreshUserGlobalStylesVariations,
+	} = useDispatch( coreStore );
 	const { globalStyleId } = useSelect( ( select ) => {
 		return {
 			globalStyleId:
 				select( coreStore ).__experimentalGetCurrentGlobalStylesId(),
 		};
 	}, [] );
+
+	const isMoreMenuClick = useCallback( ( e ) => {
+		if (
+			e.target.closest( '.components-dropdown-menu__toggle' ) ||
+			e.target.closest( '.components-menu-item__button' )
+		) {
+			return true;
+		}
+
+		return false;
+	}, [] );
+
 	// StylesPreview needs to be wrapped in a custom context so that the styles
 	// appear correctly. Otherwise, they would be overriden by current user
 	// settings.
@@ -173,38 +189,38 @@ function UserVariation( { variation, userChangesMatchAnyVariation } ) {
 		[ variation, associatedStyleId ]
 	);
 
-	const selectVariation = useCallback( () => {
-		/* eslint-disable no-alert */
-		if (
-			! userChangesMatchAnyVariation &&
-			hasEditsForEntityRecord( 'root', 'globalStyles', globalStyleId ) &&
-			! window.confirm(
-				__(
-					'Are you sure you want to switch to this variation? Unsaved changes will be lost.'
+	const selectVariation = useCallback(
+		( e ) => {
+			if ( isMoreMenuClick( e ) ) {
+				return;
+			}
+
+			/* eslint-disable no-alert */
+			if (
+				! userChangesMatchAnyVariation &&
+				hasEditsForEntityRecord(
+					'root',
+					'globalStyles',
+					globalStyleId
+				) &&
+				! window.confirm(
+					__(
+						'Are you sure you want to switch to this variation? Unsaved changes will be lost.'
+					)
 				)
-			)
-		) {
-			return;
-		}
-		/* eslint-enable no-alert */
+			) {
+				return;
+			}
+			/* eslint-enable no-alert */
 
-		// Load record for editing
-		if (
-			! hasFinishedResolution( 'getEditedEntityRecord', [
-				'root',
-				'globalStyles',
-				variation.id,
-			] )
-		) {
-			getEditedEntityRecord( 'root', 'globalStyles', variation.id );
-		}
-
-		setUserConfig( () => ( {
-			settings: variation.settings,
-			styles: variation.styles,
-			associated_style_id: variation.id,
-		} ) );
-	}, [ variation, globalStyleId, userChangesMatchAnyVariation ] );
+			setUserConfig( () => ( {
+				settings: variation.settings,
+				styles: variation.styles,
+				associated_style_id: variation.id,
+			} ) );
+		},
+		[ variation, globalStyleId, userChangesMatchAnyVariation ]
+	);
 
 	const selectOnEnter = ( event ) => {
 		if ( event.keyCode === ENTER ) {
@@ -212,6 +228,34 @@ function UserVariation( { variation, userChangesMatchAnyVariation } ) {
 			selectVariation();
 		}
 	};
+
+	const deleteStyleHandler = useCallback( () => {
+		if (
+			! hasFinishedResolution( 'getEditedEntityRecord', [
+				'root',
+				'globalStyles',
+				variation.id,
+			] )
+		) {
+			return;
+		}
+
+		// If this is the associated variation, remove the association
+		if ( associatedStyleId === variation.id ) {
+			setUserConfig( ( currentConfig ) => ( {
+				...currentConfig,
+				associated_style_id: 0,
+			} ) );
+		}
+
+		deleteEntityRecord( 'root', 'globalStyles', variation.id ).then( () => {
+			__experimentalRefreshUserGlobalStylesVariations();
+		} );
+	}, [
+		variation,
+		associatedStyleId,
+		__experimentalRefreshUserGlobalStylesVariations,
+	] );
 
 	return (
 		<div
@@ -236,6 +280,15 @@ function UserVariation( { variation, userChangesMatchAnyVariation } ) {
 					/>
 				</GlobalStylesContext.Provider>
 			</div>
+			<MoreMenuDropdown>
+				{ () => (
+					<MenuGroup>
+						<MenuItem onClick={ deleteStyleHandler }>
+							{ __( 'Delete style' ) }
+						</MenuItem>
+					</MenuGroup>
+				) }
+			</MoreMenuDropdown>
 		</div>
 	);
 }

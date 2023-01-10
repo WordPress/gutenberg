@@ -90,6 +90,8 @@ $block-preview-height: 150px;
 
 .edit-site-global-styles-variations_item {
 	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
 
 	.edit-site-global-styles-variations_item-preview {
 		padding: $border-width * 2;
@@ -107,6 +109,16 @@ $block-preview-height: 150px;
 
 	&:focus .edit-site-global-styles-variations_item-preview {
 		border: var(--wp-admin-theme-color) var(--wp-admin-border-width-focus) solid;
+	}
+
+	.components-dropdown {
+		margin-left: auto;
+	}
+
+	.components-dropdown-menu__toggle {
+		> svg {
+			transform: rotate(90deg);
+		}
 	}
 }
 
