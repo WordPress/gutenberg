@@ -2,7 +2,8 @@
 
 /**
  * Decodes HTML character references based on their context.
- * Decodes into UTF-8 string.
+ * Decodes into UTF-8 string. Leaves invalid character references
+ * as their raw input instead of replacing with U+FFFD.
  *
  * @see https://html.spec.whatwg.org/entities.json
  *
@@ -29,7 +30,7 @@ class WP_HTML_Character_Reference_Transcoder {
 			/*
 			 * We have to have at least as many successive characters as
 			 * can be used to find the character reference group. The
-			 * shorted named character reference is three characters, so
+			 * shortest named character reference is three characters, so
 			 * we need at least this many.
 			 */
 			if ( false === $next || $next > strlen( $input ) - 3 ) {
