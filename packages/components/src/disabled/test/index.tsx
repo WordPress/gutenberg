@@ -9,6 +9,8 @@ import { render, screen } from '@testing-library/react';
 import Disabled from '../';
 import userEvent from '@testing-library/user-event';
 
+jest.useFakeTimers();
+
 describe( 'Disabled', () => {
 	const Form = () => (
 		<form title="form">

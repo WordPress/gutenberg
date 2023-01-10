@@ -21,6 +21,7 @@ import {
 	media,
 	notFound,
 	page,
+	plus,
 	post,
 	postAuthor,
 	postDate,
@@ -80,7 +81,11 @@ const TEMPLATE_ICONS = {
 	attachment: media,
 };
 
-export default function NewTemplate( { postType } ) {
+export default function NewTemplate( {
+	postType,
+	toggleProps,
+	showIcon = true,
+} ) {
 	const [ showCustomTemplateModal, setShowCustomTemplateModal ] =
 		useState( false );
 	const [
@@ -178,15 +183,13 @@ export default function NewTemplate( { postType } ) {
 		<>
 			<DropdownMenu
 				className="edit-site-new-template-dropdown"
-				icon={ null }
-				text={ postType.labels.add_new }
+				icon={ showIcon ? plus : null }
+				text={ showIcon ? null : postType.labels.add_new }
 				label={ postType.labels.add_new_item }
 				popoverProps={ {
 					noArrow: false,
 				} }
-				toggleProps={ {
-					variant: 'primary',
-				} }
+				toggleProps={ toggleProps }
 			>
 				{ () => (
 					<>

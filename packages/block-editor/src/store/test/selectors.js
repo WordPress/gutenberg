@@ -73,6 +73,7 @@ const {
 	__experimentalGetPatternTransformItems,
 	wasBlockJustInserted,
 	__experimentalGetGlobalBlocksByName,
+	getLastInsertedBlocksClientIds,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -3733,7 +3734,7 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getTemplateLock', () => {
-		it( 'should return the general template lock if no clientId was set', () => {
+		it( 'should return the general template lock if no clientId was specified', () => {
 			const state = {
 				settings: { templateLock: 'all' },
 			};
@@ -3741,7 +3742,7 @@ describe( 'selectors', () => {
 			expect( getTemplateLock( state ) ).toBe( 'all' );
 		} );
 
-		it( 'should return undefined if the specified clientId was not found', () => {
+		it( 'should return false if the specified clientId was not found', () => {
 			const state = {
 				settings: { templateLock: 'all' },
 				blockListSettings: {
@@ -3751,10 +3752,10 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getTemplateLock( state, 'ribs' ) ).toBe( undefined );
+			expect( getTemplateLock( state, 'ribs' ) ).toBe( false );
 		} );
 
-		it( 'should return undefined if template lock was not set on the specified block', () => {
+		it( 'should return false if template lock was not set on the specified block', () => {
 			const state = {
 				settings: { templateLock: 'all' },
 				blockListSettings: {
@@ -3764,7 +3765,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getTemplateLock( state, 'ribs' ) ).toBe( undefined );
+			expect( getTemplateLock( state, 'chicken' ) ).toBe( false );
 		} );
 
 		it( 'should return the template lock for the specified clientId', () => {
@@ -4456,7 +4457,7 @@ describe( 'selectors', () => {
 
 			const state = {
 				lastBlockInserted: {
-					clientId: expectedClientId,
+					clientIds: [ expectedClientId ],
 					source,
 				},
 			};
@@ -4473,7 +4474,7 @@ describe( 'selectors', () => {
 
 			const state = {
 				lastBlockInserted: {
-					clientId: unexpectedClientId,
+					clientIds: [ unexpectedClientId ],
 					source,
 				},
 			};
@@ -4489,7 +4490,7 @@ describe( 'selectors', () => {
 
 			const state = {
 				lastBlockInserted: {
-					clientId,
+					clientIds: [ clientId ],
 				},
 			};
 
@@ -4662,6 +4663,29 @@ describe( '__unstableGetClientIdsTree', () => {
 					{ clientId: 'baz', innerBlocks: [] },
 				],
 			},
+		] );
+	} );
+} );
+
+describe( 'getLastInsertedBlocksClientIds', () => {
+	it( 'should return undefined if no blocks have been inserted', () => {
+		const state = {
+			lastBlockInserted: {},
+		};
+
+		expect( getLastInsertedBlocksClientIds( state ) ).toEqual( undefined );
+	} );
+
+	it( 'should return clientIds if blocks have been inserted', () => {
+		const state = {
+			lastBlockInserted: {
+				clientIds: [ '123456', '78910' ],
+			},
+		};
+
+		expect( getLastInsertedBlocksClientIds( state ) ).toEqual( [
+			'123456',
+			'78910',
 		] );
 	} );
 } );

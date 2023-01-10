@@ -12,6 +12,7 @@ import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
+import { plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -20,7 +21,11 @@ import { useHistory } from '../routes';
 import { store as editSiteStore } from '../../store';
 import CreateTemplatePartModal from '../create-template-part-modal';
 
-export default function NewTemplatePart( { postType } ) {
+export default function NewTemplatePart( {
+	postType,
+	showIcon = true,
+	toggleProps,
+} ) {
 	const history = useHistory();
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -83,12 +88,14 @@ export default function NewTemplatePart( { postType } ) {
 	return (
 		<>
 			<Button
-				variant="primary"
+				{ ...toggleProps }
 				onClick={ () => {
 					setIsModalOpen( true );
 				} }
+				icon={ showIcon ? plus : null }
+				label={ postType.labels.add_new }
 			>
-				{ postType.labels.add_new }
+				{ showIcon ? null : postType.labels.add_new }
 			</Button>
 			{ isModalOpen && (
 				<CreateTemplatePartModal

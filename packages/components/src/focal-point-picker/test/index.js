@@ -9,6 +9,8 @@ import userEvent from '@testing-library/user-event';
  */
 import Picker from '..';
 
+jest.useFakeTimers();
+
 describe( 'FocalPointPicker', () => {
 	describe( 'focus and blur', () => {
 		it( 'clicking the draggable area should focus it', async () => {

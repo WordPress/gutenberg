@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, isEmpty, kebabCase, pickBy, set } from 'lodash';
+import { get, isEmpty, kebabCase, set } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -449,17 +449,19 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 	}
 
 	const pickStyleKeys = ( treeToPickFrom ) =>
-		pickBy( treeToPickFrom, ( value, key ) =>
-			[
-				'border',
-				'color',
-				'dimensions',
-				'spacing',
-				'typography',
-				'filter',
-				'outline',
-				'shadow',
-			].includes( key )
+		Object.fromEntries(
+			Object.entries( treeToPickFrom ?? {} ).filter( ( [ key ] ) =>
+				[
+					'border',
+					'color',
+					'dimensions',
+					'spacing',
+					'typography',
+					'filter',
+					'outline',
+					'shadow',
+				].includes( key )
+			)
 		);
 
 	// Top-level.
@@ -917,6 +919,11 @@ export function useGlobalStylesOutput() {
 			},
 			{
 				css: globalStyles,
+				isGlobalStyles: true,
+			},
+			// Load custom CSS in own stylesheet so that any invalid CSS entered in the input won't break all the global styles in the editor.
+			{
+				css: mergedConfig.styles.css ?? '',
 				isGlobalStyles: true,
 			},
 		];

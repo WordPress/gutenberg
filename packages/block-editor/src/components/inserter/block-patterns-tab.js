@@ -28,8 +28,11 @@ import BlockPatternList from '../block-patterns-list';
 import PatternsExplorerModal from './block-patterns-explorer/explorer';
 import MobileTabNavigation from './mobile-tab-navigation';
 
-function usePatternsCategories() {
-	const [ allPatterns, allCategories ] = usePatternsState();
+function usePatternsCategories( rootClientId ) {
+	const [ allPatterns, allCategories ] = usePatternsState(
+		undefined,
+		rootClientId
+	);
 
 	const hasRegisteredCategory = useCallback(
 		( pattern ) => {
@@ -53,10 +56,17 @@ function usePatternsCategories() {
 				)
 			)
 			.sort( ( { name: currentName }, { name: nextName } ) => {
-				if ( ! [ currentName, nextName ].includes( 'featured' ) ) {
+				if (
+					! [ currentName, nextName ].some( ( categoryName ) =>
+						[ 'featured', 'text' ].includes( categoryName )
+					)
+				) {
 					return 0;
 				}
-				return currentName === 'featured' ? -1 : 1;
+				// Move `featured` category to the top and `text` to the bottom.
+				return currentName === 'featured' || nextName === 'text'
+					? -1
+					: 1;
 			} );
 
 		if (
@@ -83,6 +93,7 @@ export function BlockPatternsCategoryDialog( {
 	rootClientId,
 	onInsert,
 	category,
+	showTitlesAsTooltip,
 } ) {
 	const container = useRef();
 
@@ -103,6 +114,7 @@ export function BlockPatternsCategoryDialog( {
 				rootClientId={ rootClientId }
 				onInsert={ onInsert }
 				category={ category }
+				showTitlesAsTooltip={ showTitlesAsTooltip }
 			/>
 		</div>
 	);
@@ -112,13 +124,14 @@ export function BlockPatternsCategoryPanel( {
 	rootClientId,
 	onInsert,
 	category,
+	showTitlesAsTooltip,
 } ) {
 	const [ allPatterns, , onClick ] = usePatternsState(
 		onInsert,
 		rootClientId
 	);
 
-	const availableCategories = usePatternsCategories();
+	const availableCategories = usePatternsCategories( rootClientId );
 	const currentCategoryPatterns = useMemo(
 		() =>
 			allPatterns.filter( ( pattern ) => {
@@ -161,6 +174,7 @@ export function BlockPatternsCategoryPanel( {
 				orientation="vertical"
 				category={ category.label }
 				isDraggable
+				showTitlesAsTooltip={ showTitlesAsTooltip }
 			/>
 		</div>
 	);
@@ -173,7 +187,7 @@ function BlockPatternsTabs( {
 	rootClientId,
 } ) {
 	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
-	const categories = usePatternsCategories();
+	const categories = usePatternsCategories( rootClientId );
 	const isMobile = useViewportMatch( 'medium', '<' );
 	return (
 		<>
@@ -233,6 +247,7 @@ function BlockPatternsTabs( {
 							onInsert={ onInsert }
 							rootClientId={ rootClientId }
 							category={ category }
+							showTitlesAsTooltip={ false }
 						/>
 					) }
 				</MobileTabNavigation>

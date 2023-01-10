@@ -9,6 +9,8 @@ import userEvent from '@testing-library/user-event';
  */
 import Warning from '../index';
 
+jest.useFakeTimers();
+
 describe( 'Warning', () => {
 	it( 'should match snapshot', () => {
 		const { container } = render( <Warning>error</Warning> );

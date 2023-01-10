@@ -14,6 +14,7 @@ import CopyContentMenuItem from './copy-content-menu-item';
 import KeyboardShortcutsHelpMenuItem from './keyboard-shortcuts-help-menu-item';
 import ToolsMoreMenuGroup from '../components/header/tools-more-menu-group';
 import WelcomeGuideMenuItem from './welcome-guide-menu-item';
+import NavigationListViewMenuItem from './navigation-list-view-menu-item';
 
 registerPlugin( 'edit-post', {
 	render() {
@@ -55,6 +56,7 @@ registerPlugin( 'edit-post', {
 						</>
 					) }
 				</ToolsMoreMenuGroup>
+				<NavigationListViewMenuItem />
 			</>
 		);
 	},

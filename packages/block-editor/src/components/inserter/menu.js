@@ -67,20 +67,24 @@ function InserterMenu(
 			insertionIndex: __experimentalInsertionIndex,
 			shouldFocusBlock,
 		} );
-	const { showPatterns, hasReusableBlocks } = useSelect(
+	const { showPatterns, inserterItems } = useSelect(
 		( select ) => {
-			const { __experimentalGetAllowedPatterns, getSettings } =
+			const { __experimentalGetAllowedPatterns, getInserterItems } =
 				select( blockEditorStore );
 			return {
 				showPatterns: !! __experimentalGetAllowedPatterns(
 					destinationRootClientId
 				).length,
-				hasReusableBlocks:
-					!! getSettings().__experimentalReusableBlocks?.length,
+				inserterItems: getInserterItems( destinationRootClientId ),
 			};
 		},
 		[ destinationRootClientId ]
 	);
+	const hasReusableBlocks = useMemo( () => {
+		return inserterItems.some(
+			( { category } ) => category === 'reusable'
+		);
+	}, [ inserterItems ] );
 
 	const mediaCategories = useMediaCategories( destinationRootClientId );
 	const showMedia = !! mediaCategories.length;
@@ -293,6 +297,7 @@ function InserterMenu(
 					rootClientId={ destinationRootClientId }
 					onInsert={ onInsertPattern }
 					category={ selectedPatternCategory }
+					showTitlesAsTooltip
 				/>
 			) }
 		</div>

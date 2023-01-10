@@ -96,7 +96,6 @@ function ScreenBackgroundColor( { name } ) {
 				gradients={ gradientsPerOrigin }
 				disableCustomColors={ ! areCustomSolidsEnabled }
 				disableCustomGradients={ ! areCustomGradientsEnabled }
-				__experimentalHasMultipleOrigins
 				showTitle={ false }
 				enableAlpha
 				__experimentalIsRenderedInSidebar

@@ -8,6 +8,7 @@ import type { Browser, Page, BrowserContext, Frame } from '@playwright/test';
  */
 import { clickBlockOptionsMenuItem } from './click-block-options-menu-item';
 import { clickBlockToolbarButton } from './click-block-toolbar-button';
+import { getBlocks } from './get-blocks';
 import { getEditedPostContent } from './get-edited-post-content';
 import { insertBlock } from './insert-block';
 import { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
@@ -56,6 +57,7 @@ export class Editor {
 	}
 	clickBlockOptionsMenuItem = clickBlockOptionsMenuItem.bind( this );
 	clickBlockToolbarButton = clickBlockToolbarButton.bind( this );
+	getBlocks = getBlocks.bind( this );
 	getEditedPostContent = getEditedPostContent.bind( this );
 	insertBlock = insertBlock.bind( this );
 	openDocumentSettingsSidebar = openDocumentSettingsSidebar.bind( this );
