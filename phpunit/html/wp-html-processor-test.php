@@ -230,4 +230,20 @@ HTML
 		$tags->set_content_inside_balanced_tags( 'This is the new section content.' );
 		$this->assertSame( '<div>outside</div><section>This is the new section content.</section>', $tags->get_updated_html() );
 	}
+
+	public function test_set_content_inside_balanced_tags_updates_bookmarks_correctly() {
+		$tags = new WP_HTML_Processor( '<div>outside</div><section><div><img>inside</div></section>' );
+
+		$tags->next_tag( 'div' );
+		$tags->set_bookmark( 'start' );
+		$tags->next_tag( 'img' );
+		$this->assertSame( 'IMG', $tags->get_tag() );
+		$tags->set_bookmark( 'after' );
+		$tags->seek( 'start' );
+
+		$tags->set_content_inside_balanced_tags( 'This is the new div content.' );
+		$this->assertSame( '<div>This is the new div content.</div><section><div><img>inside</div></section>', $tags->get_updated_html() );
+		$tags->seek( 'after' );
+		$this->assertSame( 'IMG', $tags->get_tag() );
+	}
 }
