@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, pickBy } from 'lodash';
+import { get } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -104,16 +104,15 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 				categories && categories.length > 0
 					? categories.map( ( cat ) => cat.id )
 					: [];
-			const latestPostsQuery = pickBy(
-				{
+			const latestPostsQuery = Object.fromEntries(
+				Object.entries( {
 					categories: catIds,
 					author: selectedAuthor,
 					order,
 					orderby: orderBy,
 					per_page: postsToShow,
 					_embed: 'wp:featuredmedia',
-				},
-				( value ) => typeof value !== 'undefined'
+				} ).filter( ( [ , value ] ) => typeof value !== 'undefined' )
 			);
 
 			return {
