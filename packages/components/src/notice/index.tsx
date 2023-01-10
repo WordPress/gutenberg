@@ -15,6 +15,10 @@ import { close } from '@wordpress/icons';
  * Internal dependencies
  */
 import { Button } from '..';
+import type { NoticeProps } from './types';
+import type { WordPressComponentProps } from '../ui/context';
+
+/** @typedef {import('@wordpress/element').WPElement} WPElement */
 
 const noop = () => {};
 
@@ -71,7 +75,7 @@ function Notice( {
 	// It is distinct from onRemove, which _looks_ like a callback but is
 	// actually the function to call to remove the notice from the UI.
 	onDismiss = noop,
-} ) {
+}: WordPressComponentProps< NoticeProps, 'div', false > ) {
 	useSpokenMessage( spokenMessage, politeness );
 
 	const classes = classnames(
