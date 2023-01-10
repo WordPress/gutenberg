@@ -15,8 +15,9 @@ class WP_HTML_Character_Reference_Transcoder {
 	public static function decode( $context, $input ) {
 		$at = 0;
 		$buffer = '';
+		$budget = 1000;
 
-		while ( $at < strlen( $input ) ) {
+		while ( $at < strlen( $input ) && $budget-- > 0 ) {
 			$next = strpos( $input, '&', $at );
 			/*
 			 * We have to have at least as many successive characters as
@@ -153,6 +154,10 @@ class WP_HTML_Character_Reference_Transcoder {
 					}
 				}
 			}
+		}
+
+		if ( 0 === $at ) {
+			return $input;
 		}
 
 		if ( $at < strlen( $input ) ) {
