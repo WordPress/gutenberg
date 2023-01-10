@@ -88,7 +88,7 @@ export function getPositionCSS( { selector, style } ) {
 	} );
 
 	if ( positionType === 'sticky' || positionType === 'fixed' ) {
-		// TODO: Work out where to put the magic z-index value.
+		// TODO: Replace hard-coded z-index value with a z-index preset approach in theme.json.
 		output += `z-index: 10`;
 	}
 	output += `}`;

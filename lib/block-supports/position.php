@@ -102,7 +102,7 @@ function gutenberg_render_position_support( $block_content, $block ) {
 				'selector'     => $selector,
 				'declarations' => array(
 					'position' => $position_type,
-					'z-index'  => '10', // TODO: This hard-coded value should live somewhere else.
+					'z-index'  => '10', // TODO: Replace hard-coded z-index value with a z-index preset approach in theme.json.
 				),
 			);
 	}
