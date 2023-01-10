@@ -155,9 +155,6 @@ module.exports = function buildDockerComposeConfig( config ) {
 	const developmentWpImage = `wordpress${
 		developmentPhpVersion ? ':php' + developmentPhpVersion : ''
 	}`;
-	const testsWpImage = `wordpress${
-		testsPhpVersion ? ':php' + testsPhpVersion : ''
-	}`;
 	// Set the WordPress CLI images with the PHP version tag.
 	const developmentWpCliImage = `wordpress:cli${
 		! developmentPhpVersion || developmentPhpVersion.length === 0
@@ -237,8 +234,8 @@ module.exports = function buildDockerComposeConfig( config ) {
 				volumes: developmentMounts,
 			},
 			'tests-wordpress': {
+				build: '.',
 				depends_on: [ 'tests-mysql' ],
-				image: testsWpImage,
 				ports: [ testsPorts ],
 				environment: {
 					...dbEnv.credentials,
