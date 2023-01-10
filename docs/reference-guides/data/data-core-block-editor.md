@@ -556,9 +556,9 @@ _Properties_
 -   _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
 -   _frecency_ `number`: Heuristic that combines frequency and recency.
 
-### getLastInsertedBlockClientId
+### getLastInsertedBlocksClientIds
 
-Gets the client id of the last inserted block.
+Gets the client ids of the last inserted blocks.
 
 _Parameters_
 
@@ -566,7 +566,7 @@ _Parameters_
 
 _Returns_
 
--   `string|undefined`: Client Id of the last inserted block.
+-   `Array|undefined`: Client Ids of the last inserted block(s).
 
 ### getLastMultiSelectedBlockClientId
 

@@ -9,7 +9,7 @@ import type { ReactNode } from 'react';
 import type { IconType } from '../icon';
 import type { Button } from '../button';
 
-type Tab = {
+type Tab< IconProps = unknown > = {
 	/**
 	 * The key of the tab.
 	 */
@@ -22,18 +22,24 @@ type Tab = {
 	 * The class name to apply to the tab button.
 	 */
 	className?: string;
+	/**
+	 * The icon used for the tab button.
+	 */
+	icon?: IconType< IconProps >;
+	/**
+	 * Determines if the tab button should be disabled.
+	 */
+	disabled?: boolean;
 } & Record< any, any >;
 
 export type TabButtonProps< IconProps = unknown > = {
 	children: ReactNode;
-	className?: string;
-	icon?: IconType< IconProps >;
 	label?: string;
 	onClick: Parameters< typeof Button >[ 0 ][ 'onClick' ];
 	selected: boolean;
 	showTooltip?: boolean;
 	tabId: string;
-};
+} & Pick< Tab< IconProps >, 'className' | 'icon' | 'disabled' >;
 
 export type TabPanelProps = {
 	/**

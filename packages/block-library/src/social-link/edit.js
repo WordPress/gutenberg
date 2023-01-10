@@ -43,6 +43,7 @@ const SocialLinkURLPopover = ( {
 		>
 			<div className="block-editor-url-input">
 				<URLInput
+					__nextHasNoMarginBottom
 					value={ url }
 					onChange={ ( nextURL ) =>
 						setAttributes( { url: nextURL } )
@@ -105,7 +106,7 @@ const SocialLinkEdit = ( {
 							help={ __(
 								'Briefly describe the link to help screen reader users.'
 							) }
-							value={ label }
+							value={ label || '' }
 							onChange={ ( value ) =>
 								setAttributes( { label: value } )
 							}

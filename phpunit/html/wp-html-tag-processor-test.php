@@ -154,6 +154,50 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	/**
 	 * @ticket 56299
 	 *
+	 * @covers next_tag
+	 * @covers get_attribute
+	 */
+	public function test_attributes_parser_is_case_insensitive() {
+		$p = new WP_HTML_Tag_Processor( '<div DATA-enabled="true" data-VISIBLE>Test</div>' );
+		$p->next_tag();
+		$p->get_attribute( 'data-enabled' );
+		$this->assertEquals( 'true', $p->get_attribute( 'DATA-enabled' ), 'A case-insensitive get_attribute call did not return "true".' );
+		$this->assertEquals( 'true', $p->get_attribute( 'data-enabled' ), 'A case-insensitive get_attribute call did not return "true".' );
+		$this->assertEquals( 'true', $p->get_attribute( 'DATA-ENABLED' ), 'A case-insensitive get_attribute call did not return "true".' );
+		$this->assertEquals( true, $p->get_attribute( 'data-VISIBLE' ), 'A case-insensitive get_attribute call did not return true.' );
+		$this->assertEquals( true, $p->get_attribute( 'DATA-visible' ), 'A case-insensitive get_attribute call did not return true.' );
+		$this->assertEquals( true, $p->get_attribute( 'dAtA-ViSiBlE' ), 'A case-insensitive get_attribute call did not return true.' );
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers next_tag
+	 * @covers remove_attribute
+	 */
+	public function test_remove_attribute_is_case_insensitive() {
+		$p = new WP_HTML_Tag_Processor( '<div DATA-enabled="true">Test</div>' );
+		$p->next_tag();
+		$p->remove_attribute( 'data-enabled' );
+		$this->assertEquals( '<div >Test</div>', $p->get_updated_html(), 'A case-insensitive remove_attribute call did not remove the attribute.' );
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers next_tag
+	 * @covers set_attribute
+	 */
+	public function test_set_attribute_is_case_insensitive() {
+		$p = new WP_HTML_Tag_Processor( '<div DATA-enabled="true">Test</div>' );
+		$p->next_tag();
+		$p->set_attribute( 'data-enabled', 'abc' );
+		$this->assertEquals( '<div data-enabled="abc">Test</div>', $p->get_updated_html(), 'A case-insensitive set_attribute call did not update the existing attribute.' );
+	}
+
+	/**
+	 * @ticket 56299
+	 *
 	 * @covers __toString
 	 */
 	public function tostring_returns_updated_html() {

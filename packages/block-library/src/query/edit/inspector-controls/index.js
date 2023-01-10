@@ -144,6 +144,7 @@ export default function QueryInspectorControls( {
 						) }
 						{ showPostTypeControl && (
 							<SelectControl
+								__nextHasNoMarginBottom
 								options={ postTypesSelectOptions }
 								value={ postType }
 								label={ __( 'Post type' ) }

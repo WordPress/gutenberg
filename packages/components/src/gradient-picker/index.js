@@ -99,7 +99,6 @@ export default function GradientPicker( {
 	value,
 	clearable = true,
 	disableCustomGradients = false,
-	__experimentalHasMultipleOrigins,
 	__experimentalIsRenderedInSidebar,
 } ) {
 	const clearGradient = useCallback(
@@ -107,7 +106,7 @@ export default function GradientPicker( {
 		[ onChange ]
 	);
 	const Component =
-		__experimentalHasMultipleOrigins && gradients?.length
+		gradients?.length && gradients[ 0 ].gradients
 			? MultipleOrigin
 			: SingleOrigin;
 

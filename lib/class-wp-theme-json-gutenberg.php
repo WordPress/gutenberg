@@ -11,7 +11,7 @@
  *
  * This class is for internal core usage and is not supposed to be used by extenders (plugins and/or themes).
  * This is a low-level API that may need to do breaking changes. Please,
- * use get_global_settings, get_global_styles, and get_global_stylesheet instead.
+ * use gutenberg_get_global_settings, gutenberg_get_global_styles, and gutenberg_get_global_stylesheet instead.
  *
  * @access private
  */
@@ -117,6 +117,15 @@ class WP_Theme_JSON_Gutenberg {
 	 * @var array
 	 */
 	const PRESETS_METADATA = array(
+		array(
+			'path'              => array( 'shadow', 'palette' ),
+			'prevent_override'  => array( 'shadow', 'defaultPalette' ),
+			'use_default_names' => false,
+			'value_key'         => 'shadow',
+			'css_vars'          => '--wp--preset--shadow--$slug',
+			'classes'           => array(),
+			'properties'        => array( 'box-shadow' ),
+		),
 		array(
 			'path'              => array( 'color', 'palette' ),
 			'prevent_override'  => array( 'color', 'defaultPalette' ),
@@ -332,6 +341,10 @@ class WP_Theme_JSON_Gutenberg {
 			'radius' => null,
 			'style'  => null,
 			'width'  => null,
+		),
+		'shadow'                        => array(
+			'palette'        => null,
+			'defaultPalette' => null,
 		),
 		'color'                         => array(
 			'background'       => null,
@@ -1806,7 +1819,7 @@ class WP_Theme_JSON_Gutenberg {
 				 * Values that already have a clamp() function will not pass the test,
 				 * and therefore the original $value will be returned.
 				 */
-				$value = wp_get_typography_font_size_value( array( 'size' => $value ) );
+				$value = gutenberg_get_typography_font_size_value( array( 'size' => $value ) );
 			}
 
 			$declarations[] = array(

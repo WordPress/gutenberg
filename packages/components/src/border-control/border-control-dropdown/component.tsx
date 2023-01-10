@@ -30,14 +30,13 @@ import type { ColorProps, DropdownProps } from '../types';
 
 const getColorObject = (
 	colorValue: CSSProperties[ 'borderColor' ],
-	colors: ColorProps[ 'colors' ] | undefined,
-	hasMultipleColorOrigins: boolean
+	colors: ColorProps[ 'colors' ] | undefined
 ) => {
-	if ( ! colorValue || ! colors ) {
+	if ( ! colorValue || ! colors || colors.length === 0 ) {
 		return;
 	}
 
-	if ( hasMultipleColorOrigins ) {
+	if ( ( colors as PaletteObject[] )[ 0 ].colors !== undefined ) {
 		let matchedColor;
 
 		( colors as PaletteObject[] ).some( ( origin ) =>
@@ -126,7 +125,6 @@ const BorderControlDropdown = (
 	forwardedRef: React.ForwardedRef< any >
 ) => {
 	const {
-		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
 		border,
 		colors,
@@ -147,11 +145,7 @@ const BorderControlDropdown = (
 	} = useBorderControlDropdown( props );
 
 	const { color, style } = border || {};
-	const colorObject = getColorObject(
-		color,
-		colors,
-		!! __experimentalHasMultipleOrigins
-	);
+	const colorObject = getColorObject( color, colors );
 
 	const toggleAriaLabel = getToggleAriaLabel(
 		color,
@@ -207,9 +201,6 @@ const BorderControlDropdown = (
 						value={ color }
 						onChange={ onColorChange }
 						{ ...{ colors, disableCustomColors } }
-						__experimentalHasMultipleOrigins={
-							__experimentalHasMultipleOrigins
-						}
 						__experimentalIsRenderedInSidebar={
 							__experimentalIsRenderedInSidebar
 						}
