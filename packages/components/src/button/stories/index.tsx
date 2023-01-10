@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -13,9 +18,10 @@ import {
  * Internal dependencies
  */
 import './style.css';
-import Button from '../';
+import Button from '..';
+import type { ReactNode } from 'react';
 
-export default {
+const meta: ComponentMeta< typeof Button > = {
 	title: 'Components/Button',
 	component: Button,
 	argTypes: {
@@ -118,54 +124,60 @@ export default {
 		docs: { source: { state: 'open' } },
 	},
 };
+export default meta;
 
-function Template( { children, ...props } ) {
+const Template: ComponentStory< typeof Button > = ( {
+	children,
+	...props
+} ) => {
 	return <Button { ...props }>{ children }</Button>;
-}
+};
 
-export const Default = Template.bind( {} );
+export const Default: ComponentStory< typeof Button > = Template.bind( {} );
 Default.args = {
 	children: 'Code is poetry',
 };
 
-export const Primary = Template.bind( {} );
+export const Primary: ComponentStory< typeof Button > = Template.bind( {} );
 Primary.args = {
 	...Default.args,
 	variant: 'primary',
 };
 
-export const Secondary = Template.bind( {} );
+export const Secondary: ComponentStory< typeof Button > = Template.bind( {} );
 Secondary.args = {
 	...Default.args,
 	variant: 'secondary',
 };
 
-export const Tertiary = Template.bind( {} );
+export const Tertiary: ComponentStory< typeof Button > = Template.bind( {} );
 Tertiary.args = {
 	...Default.args,
 	variant: 'tertiary',
 };
 
-export const Link = Template.bind( {} );
+export const Link: ComponentStory< typeof Button > = Template.bind( {} );
 Link.args = {
 	...Default.args,
 	variant: 'link',
 };
 
-export const IsDestructive = Template.bind( {} );
+export const IsDestructive: ComponentStory< typeof Button > = Template.bind(
+	{}
+);
 IsDestructive.args = {
 	...Default.args,
 	isDestructive: true,
 };
 
-export const Icon = Template.bind( {} );
+export const Icon: ComponentStory< typeof Button > = Template.bind( {} );
 Icon.args = {
 	label: 'Code is poetry',
 	icon: 'wordpress',
 };
 
-export const groupedIcons = () => {
-	const GroupContainer = ( { children } ) => (
+export const groupedIcons: ComponentStory< typeof Button > = () => {
+	const GroupContainer = ( { children }: { children: ReactNode } ) => (
 		<div style={ { display: 'inline-flex' } }>{ children }</div>
 	);
 
