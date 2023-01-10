@@ -135,6 +135,57 @@ class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 	}
 
 	public function get_content_inside_balanced_tags() {
+		list( $start_name, $end_name ) = $this->get_balanced_tags();
+		$content = $this->get_content_inside_bookmarks( $start_name, $end_name );
+		$this->seek( $start_name );
+
+		$this->release_bookmark( $start_name );
+		$this->release_bookmark( $end_name );
+
+		return $content;
+	}
+
+	private function get_content_inside_bookmarks( $start_bookmark, $end_bookmark ) {
+		if ( ! isset( $this->bookmarks[ $start_bookmark ], $this->bookmarks[ $end_bookmark ] ) ) {
+			return null;
+		}
+
+		$start = $this->bookmarks[ $start_bookmark ];
+		$end   = $this->bookmarks[ $end_bookmark ];
+
+		return substr( $this->get_updated_html(), $start->end + 1, $end->start - $start->end - 2 );
+	}
+
+	public function set_content_inside_balanced_tags( $content ) {
+		list( $start_name, $end_name ) = $this->get_balanced_tags();
+		$this->set_content_inside_bookmarks( $start_name, $end_name, $content );
+		$this->seek( $start_name );
+
+		$this->release_bookmark( $start_name );
+		$this->release_bookmark( $end_name );
+
+		return $content;
+	}
+
+	private function set_content_inside_bookmarks( $start_bookmark, $end_bookmark, $content ) {
+		if ( ! isset( $this->bookmarks[ $start_bookmark ], $this->bookmarks[ $end_bookmark ] ) ) {
+			return null;
+		}
+
+		$this->get_updated_html();
+
+		$start = $this->bookmarks[ $start_bookmark ];
+		$end   = $this->bookmarks[ $end_bookmark ];
+
+		$this->add_lexical_update( $start->end + 1, $end->start - 1, $content );
+	}
+
+	/**
+	 * If on an opening tag, return a pair of bookmarks for it, and for the matching closing tag.
+	 *
+	 * @return array A pair of bookmarks for the current opening and matching closing tags.
+	 */
+	public function get_balanced_tags() {
 		static $start_name = null;
 		static $end_name = null;
 
@@ -149,31 +200,22 @@ class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 		}
 
 		$this->set_bookmark( $start_name );
+		$this->find_matching_closing_tag();
+		$this->set_bookmark( $end_name );
 
+		return array( $start_name, $end_name );
+	}
+
+	/**
+	 * If on an opening tag, navigate to the matching closing tag.
+	 *
+	 * @return void
+	 */
+	public function find_matching_closing_tag() {
 		$state = self::new_state();
 		while ( $this->balanced_next( $state ) ) {
 			continue;
 		}
-
-		$this->set_bookmark( $end_name );
-		$content = $this->content_inside_bookmarks( $start_name, $end_name );
-		$this->seek( $start_name );
-
-		$this->release_bookmark( $start_name );
-		$this->release_bookmark( $end_name );
-
-		return $content;
-	}
-
-	private function content_inside_bookmarks( $start_bookmark, $end_bookmark ) {
-		if ( ! isset( $this->bookmarks[ $start_bookmark ], $this->bookmarks[ $end_bookmark ] ) ) {
-			return null;
-		}
-
-		$start = $this->bookmarks[ $start_bookmark ];
-		$end   = $this->bookmarks[ $end_bookmark ];
-
-		return substr( $this->get_updated_html(), $start->end + 1, $end->start - $start->end - 2 );
 	}
 
 	/*
