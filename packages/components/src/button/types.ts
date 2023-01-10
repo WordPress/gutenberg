@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { MouseEventHandler, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 /**
  * Internal dependencies
@@ -75,10 +75,6 @@ export type ButtonProps = {
 	 * @default 'left'
 	 */
 	iconPosition?: 'left' | 'right';
-	/**
-	 * Called when the mouse is down.
-	 */
-	onMouseDown?: MouseEventHandler< HTMLElement >;
 	/**
 	 * If provided, displays the given text inside the button. If the button contains children elements, the text is displayed before them.
 	 */

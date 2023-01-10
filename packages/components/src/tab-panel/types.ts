@@ -7,6 +7,7 @@ import type { ReactNode } from 'react';
  * Internal dependencies
  */
 import type { IconType } from '../icon';
+import type { Button } from '../button';
 
 type Tab = {
 	/**
@@ -28,7 +29,7 @@ export type TabButtonProps< IconProps = unknown > = {
 	className?: string;
 	icon?: IconType< IconProps >;
 	label?: string;
-	onClick: ( event: MouseEvent ) => void;
+	onClick: Parameters< typeof Button >[ 0 ][ 'onClick' ];
 	selected: boolean;
 	showTooltip?: boolean;
 	tabId: string;

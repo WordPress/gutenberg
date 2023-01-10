@@ -44,7 +44,7 @@ export const Default: ComponentStory< typeof Dropdown > = Template.bind( {} );
 Default.args = {
 	position: 'bottom right',
 	renderToggle: ( { isOpen, onToggle } ) => (
-		<Button onClick={ onToggle } aria-expanded={ isOpen } isPrimary>
+		<Button onClick={ onToggle } aria-expanded={ isOpen } variant="primary">
 			Open dropdown
 		</Button>
 	),
