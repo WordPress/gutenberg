@@ -9,6 +9,8 @@ import userEvent from '@testing-library/user-event';
  */
 import BlockVerticalAlignmentUI from '../ui';
 
+jest.useFakeTimers();
+
 describe( 'BlockVerticalAlignmentUI', () => {
 	const alignment = 'top';
 	const onChange = jest.fn();
@@ -45,7 +47,7 @@ describe( 'BlockVerticalAlignmentUI', () => {
 			advanceTimers: jest.advanceTimersByTime,
 		} );
 
-		render(
+		const { unmount } = render(
 			<BlockVerticalAlignmentUI
 				isToolbar
 				value={ alignment }
@@ -70,6 +72,9 @@ describe( 'BlockVerticalAlignmentUI', () => {
 				name: /^Align \w+$/,
 			} )
 		).toHaveLength( 3 );
+
+		// Cancel running effects, like delayed dropdown menu popover positioning.
+		unmount();
 	} );
 
 	it( 'should call onChange with undefined, when the control is already active', async () => {

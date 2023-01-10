@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -87,7 +86,11 @@ const SiteLogo = ( {
 		);
 		return {
 			title: siteEntities?.name,
-			...pick( getSettings(), [ 'imageEditing', 'maxWidth' ] ),
+			...Object.fromEntries(
+				Object.entries( getSettings() ).filter( ( [ key ] ) =>
+					[ 'imageEditing', 'maxWidth' ].includes( key )
+				)
+			),
 		};
 	}, [] );
 
@@ -120,9 +123,10 @@ const SiteLogo = ( {
 			src={ logoUrl }
 			alt={ alt }
 			onLoad={ ( event ) => {
-				setNaturalSize(
-					pick( event.target, [ 'naturalWidth', 'naturalHeight' ] )
-				);
+				setNaturalSize( {
+					naturalWidth: event.target.naturalWidth,
+					naturalHeight: event.target.naturalHeight,
+				} );
 			} }
 		/>
 	);
@@ -291,6 +295,7 @@ const SiteLogo = ( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<RangeControl
+						__nextHasNoMarginBottom
 						label={ __( 'Image width' ) }
 						onChange={ ( newWidth ) =>
 							setAttributes( { width: newWidth } )
@@ -512,6 +517,9 @@ export default function LogoEdit( {
 				className={ placeholderClassName }
 				preview={ logoImage }
 				withIllustration={ true }
+				style={ {
+					width,
+				} }
 			>
 				{ content }
 			</Placeholder>

@@ -4,12 +4,15 @@
 import {
 	__experimentalOffCanvasEditor as OffCanvasEditor,
 	InspectorControls,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
 	__experimentalHStack as HStack,
 	__experimentalHeading as Heading,
+	Spinner,
 } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -17,115 +20,126 @@ import { __ } from '@wordpress/i18n';
  */
 import ManageMenusButton from './manage-menus-button';
 import NavigationMenuSelector from './navigation-menu-selector';
+import { LeafMoreMenu } from '../leaf-more-menu';
 
-const WrappedNavigationMenuSelector = ( {
+/* translators: %s: The name of a menu. */
+const actionLabel = __( "Switch to '%s'" );
+
+const ExperimentMainContent = ( {
 	clientId,
 	currentMenuId,
-	handleUpdateMenu,
-	convertClassicMenu,
-	onCreateNew,
-	createNavigationMenuIsSuccess,
-	createNavigationMenuIsError,
-} ) => (
-	<NavigationMenuSelector
-		currentMenuId={ currentMenuId }
-		clientId={ clientId }
-		onSelectNavigationMenu={ ( menuId ) => {
-			handleUpdateMenu( menuId );
-		} }
-		onSelectClassicMenu={ async ( classicMenu ) => {
-			const navMenu = await convertClassicMenu(
-				classicMenu.id,
-				classicMenu.name,
-				'draft'
-			);
-			if ( navMenu ) {
-				handleUpdateMenu( navMenu.id, {
-					focusNavigationBlock: true,
-				} );
-			}
-		} }
-		onCreateNew={ onCreateNew }
-		createNavigationMenuIsSuccess={ createNavigationMenuIsSuccess }
-		createNavigationMenuIsError={ createNavigationMenuIsError }
-		/* translators: %s: The name of a menu. */
-		actionLabel={ __( "Switch to '%s'" ) }
-	/>
-);
-const MenuInspectorControls = ( {
-	clientId,
-	convertClassicMenu,
-	createNavigationMenuIsSuccess,
-	createNavigationMenuIsError,
-	currentMenuId = null,
-	handleUpdateMenu,
+	isLoading,
 	isNavigationMenuMissing,
-	innerBlocks,
-	isManageMenusButtonDisabled,
-	onCreateNew,
 } ) => {
-	const isOffCanvasNavigationEditorEnabled =
-		window?.__experimentalEnableOffCanvasNavigationEditor === true;
+	// Provide a hierarchy of clientIds for the given Navigation block (clientId).
+	// This is required else the list view will display the entire block tree.
+	const clientIdsTree = useSelect(
+		( select ) => {
+			const { __unstableGetClientIdsTree } = select( blockEditorStore );
+			return __unstableGetClientIdsTree( clientId );
+		},
+		[ clientId ]
+	);
+
+	if ( currentMenuId && isNavigationMenuMissing ) {
+		return <p>{ __( 'Select or create a menu' ) }</p>;
+	}
+
+	if ( isLoading ) {
+		return <Spinner />;
+	}
 
 	return (
-		<InspectorControls>
+		<OffCanvasEditor
+			blocks={ clientIdsTree }
+			isExpanded={ true }
+			selectBlockInCanvas={ false }
+			LeafMoreMenu={ LeafMoreMenu }
+		/>
+	);
+};
+
+const ExperimentControls = ( props ) => {
+	const {
+		createNavigationMenuIsSuccess,
+		createNavigationMenuIsError,
+		currentMenuId = null,
+		onCreateNew,
+		onSelectClassicMenu,
+		onSelectNavigationMenu,
+	} = props;
+
+	return (
+		<>
+			<HStack className="wp-block-navigation-off-canvas-editor__header">
+				<Heading
+					className="wp-block-navigation-off-canvas-editor__title"
+					level={ 2 }
+				>
+					{ __( 'Menu' ) }
+				</Heading>
+				<NavigationMenuSelector
+					currentMenuId={ currentMenuId }
+					onSelectClassicMenu={ onSelectClassicMenu }
+					onSelectNavigationMenu={ onSelectNavigationMenu }
+					onCreateNew={ onCreateNew }
+					createNavigationMenuIsSuccess={
+						createNavigationMenuIsSuccess
+					}
+					createNavigationMenuIsError={ createNavigationMenuIsError }
+					actionLabel={ actionLabel }
+				/>
+			</HStack>
+			<ExperimentMainContent { ...props } />
+		</>
+	);
+};
+
+const DefaultControls = ( props ) => {
+	const {
+		createNavigationMenuIsSuccess,
+		createNavigationMenuIsError,
+		currentMenuId = null,
+		isManageMenusButtonDisabled,
+		onCreateNew,
+		onSelectClassicMenu,
+		onSelectNavigationMenu,
+	} = props;
+
+	return (
+		<>
+			<NavigationMenuSelector
+				currentMenuId={ currentMenuId }
+				onSelectClassicMenu={ onSelectClassicMenu }
+				onSelectNavigationMenu={ onSelectNavigationMenu }
+				onCreateNew={ onCreateNew }
+				createNavigationMenuIsSuccess={ createNavigationMenuIsSuccess }
+				createNavigationMenuIsError={ createNavigationMenuIsError }
+				actionLabel={ actionLabel }
+			/>
+			<ManageMenusButton disabled={ isManageMenusButtonDisabled } />
+		</>
+	);
+};
+
+const MenuInspectorControls = ( props ) => {
+	const isOffCanvasNavigationEditorEnabled =
+		window?.__experimentalEnableOffCanvasNavigationEditor === true;
+	const menuControlsSlot = window?.__experimentalEnableBlockInspectorTabs
+		? 'list'
+		: undefined;
+
+	return (
+		<InspectorControls __experimentalGroup={ menuControlsSlot }>
 			<PanelBody
 				title={
 					isOffCanvasNavigationEditorEnabled ? null : __( 'Menu' )
 				}
 			>
 				{ isOffCanvasNavigationEditorEnabled ? (
-					<>
-						<HStack className="wp-block-navigation-off-canvas-editor__header">
-							<Heading
-								className="wp-block-navigation-off-canvas-editor__title"
-								level={ 2 }
-							>
-								{ __( 'Menu' ) }
-							</Heading>
-							<WrappedNavigationMenuSelector
-								clientId={ clientId }
-								currentMenuId={ currentMenuId }
-								handleUpdateMenu={ handleUpdateMenu }
-								convertClassicMenu={ convertClassicMenu }
-								onCreateNew={ onCreateNew }
-								createNavigationMenuIsSuccess={
-									createNavigationMenuIsSuccess
-								}
-								createNavigationMenuIsError={
-									createNavigationMenuIsError
-								}
-							/>
-						</HStack>
-						{ currentMenuId && isNavigationMenuMissing ? (
-							<p>{ __( 'Select or create a menu' ) }</p>
-						) : (
-							<OffCanvasEditor
-								blocks={ innerBlocks }
-								isExpanded={ true }
-								selectBlockInCanvas={ false }
-							/>
-						) }
-					</>
+					<ExperimentControls { ...props } />
 				) : (
-					<>
-						<WrappedNavigationMenuSelector
-							clientId={ clientId }
-							currentMenuId={ currentMenuId }
-							handleUpdateMenu={ handleUpdateMenu }
-							convertClassicMenu={ convertClassicMenu }
-							onCreateNew={ onCreateNew }
-							createNavigationMenuIsSuccess={
-								createNavigationMenuIsSuccess
-							}
-							createNavigationMenuIsError={
-								createNavigationMenuIsError
-							}
-						/>
-						<ManageMenusButton
-							disabled={ isManageMenusButtonDisabled }
-						/>
-					</>
+					<DefaultControls { ...props } />
 				) }
 			</PanelBody>
 		</InspectorControls>

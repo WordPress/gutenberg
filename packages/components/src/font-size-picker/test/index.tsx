@@ -10,6 +10,8 @@ import userEvent from '@testing-library/user-event';
 import FontSizePicker from '../';
 import type { FontSize } from '../types';
 
+jest.useFakeTimers();
+
 describe( 'FontSizePicker', () => {
 	test.each( [
 		// Use units when initial value uses units.

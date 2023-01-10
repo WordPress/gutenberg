@@ -16,6 +16,11 @@ import {
 import { Button, Placeholder } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import { useScopedBlockVariations } from '../utils';
+
 export default function QueryPlaceholder( {
 	attributes,
 	clientId,
@@ -57,7 +62,6 @@ export default function QueryPlaceholder( {
 		return (
 			<QueryVariationPicker
 				clientId={ clientId }
-				name={ name }
 				attributes={ attributes }
 				setAttributes={ setAttributes }
 				icon={ icon }
@@ -98,28 +102,12 @@ export default function QueryPlaceholder( {
 
 function QueryVariationPicker( {
 	clientId,
-	name,
 	attributes,
 	setAttributes,
 	icon,
 	label,
 } ) {
-	const { defaultVariation, scopeVariations } = useSelect(
-		( select ) => {
-			const {
-				getBlockVariations,
-				getBlockType,
-				getDefaultBlockVariation,
-			} = select( blocksStore );
-
-			return {
-				blockType: getBlockType( name ),
-				defaultVariation: getDefaultBlockVariation( name, 'block' ),
-				scopeVariations: getBlockVariations( name, 'block' ),
-			};
-		},
-		[ name ]
-	);
+	const scopeVariations = useScopedBlockVariations( attributes );
 	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 	const blockProps = useBlockProps();
 	return (
@@ -128,23 +116,24 @@ function QueryVariationPicker( {
 				icon={ icon }
 				label={ label }
 				variations={ scopeVariations }
-				onSelect={ ( nextVariation = defaultVariation ) => {
-					if ( nextVariation.attributes ) {
+				onSelect={ ( variation ) => {
+					if ( variation.attributes ) {
 						setAttributes( {
-							...nextVariation.attributes,
+							...variation.attributes,
 							query: {
-								...nextVariation.attributes.query,
+								...variation.attributes.query,
 								postType:
 									attributes.query.postType ||
-									nextVariation.attributes.query.postType,
+									variation.attributes.query.postType,
 							},
+							namespace: attributes.namespace,
 						} );
 					}
-					if ( nextVariation.innerBlocks ) {
+					if ( variation.innerBlocks ) {
 						replaceInnerBlocks(
 							clientId,
 							createBlocksFromInnerBlocksTemplate(
-								nextVariation.innerBlocks
+								variation.innerBlocks
 							),
 							false
 						);

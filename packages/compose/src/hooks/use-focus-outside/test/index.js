@@ -9,6 +9,8 @@ import userEvent from '@testing-library/user-event';
  */
 import useFocusOutside from '../';
 
+jest.useFakeTimers();
+
 const FocusOutsideComponent = ( { onFocusOutside: callback } ) => (
 	<div>
 		{ /* Wrapper */ }

@@ -15,6 +15,10 @@ import Notice from '../index';
 
 jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
 
+function getNoticeWrapper( container ) {
+	return container.firstChild;
+}
+
 describe( 'Notice', () => {
 	beforeEach( () => {
 		speak.mockReset();
@@ -39,15 +43,16 @@ describe( 'Notice', () => {
 
 	it( 'should not have is-dismissible class when isDismissible prop is false', () => {
 		const { container } = render( <Notice isDismissible={ false } /> );
+		const wrapper = getNoticeWrapper( container );
 
-		expect( container.firstChild ).toHaveClass( 'components-notice' );
-		expect( container.firstChild ).not.toHaveClass( 'is-dismissible' );
+		expect( wrapper ).toHaveClass( 'components-notice' );
+		expect( wrapper ).not.toHaveClass( 'is-dismissible' );
 	} );
 
 	it( 'should default to info status', () => {
 		const { container } = render( <Notice /> );
 
-		expect( container.firstChild ).toHaveClass( 'is-info' );
+		expect( getNoticeWrapper( container ) ).toHaveClass( 'is-info' );
 	} );
 
 	describe( 'useSpokenMessage', () => {
