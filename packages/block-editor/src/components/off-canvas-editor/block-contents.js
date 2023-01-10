@@ -8,6 +8,8 @@ import classnames from 'classnames';
  */
 import { useSelect } from '@wordpress/data';
 import { forwardRef, useEffect, useState } from '@wordpress/element';
+import { speak } from '@wordpress/a11y';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -18,6 +20,7 @@ import { store as blockEditorStore } from '../../store';
 import { updateAttributes } from './update-attributes';
 import { LinkUI } from './link-ui';
 import { useInsertedBlock } from './use-inserted-block';
+import useBlockDisplayTitle from '../block-title/use-block-display-title';
 
 const BLOCKS_WITH_LINK_UI_SUPPORT = [
 	'core/navigation-link',
@@ -42,6 +45,12 @@ const ListViewBlockContents = forwardRef(
 	) => {
 		const { clientId } = block;
 		const [ isLinkUIOpen, setIsLinkUIOpen ] = useState();
+
+		const blockTitle = useBlockDisplayTitle( {
+			clientId,
+			context: 'list-view',
+		} );
+
 		const {
 			blockMovingClientId,
 			selectedBlockInBlockEditor,
@@ -88,6 +97,16 @@ const ListViewBlockContents = forwardRef(
 			insertedBlockName,
 			hasExistingLinkValue,
 		] );
+
+		useEffect( () => {
+			if ( clientId === lastInsertedBlockClientId && blockTitle ) {
+				speak(
+					// translators: %s: name of block being inserted (i.e. Paragraph, Image, Group etc)
+					sprintf( __( '%s block inserted' ), blockTitle ),
+					'assertive'
+				);
+			}
+		}, [ lastInsertedBlockClientId, clientId, blockTitle ] );
 
 		const isBlockMoveTarget =
 			blockMovingClientId && selectedBlockInBlockEditor === clientId;
