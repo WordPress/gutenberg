@@ -105,7 +105,9 @@ export function useTypewriter() {
 					return;
 				}
 
-				const windowScroll = scrollContainer === ownerDocument.body;
+				const windowScroll =
+					scrollContainer === ownerDocument.body ||
+					scrollContainer === ownerDocument.documentElement;
 				const scrollY = windowScroll
 					? defaultView.scrollY
 					: scrollContainer.scrollTop;

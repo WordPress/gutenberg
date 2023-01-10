@@ -70,7 +70,6 @@ function ScreenButtonColor( { name } ) {
 				className="edit-site-screen-button-color__control"
 				colors={ colorsPerOrigin }
 				disableCustomColors={ ! areCustomSolidsEnabled }
-				__experimentalHasMultipleOrigins
 				showTitle={ false }
 				enableAlpha
 				__experimentalIsRenderedInSidebar
@@ -87,7 +86,6 @@ function ScreenButtonColor( { name } ) {
 				className="edit-site-screen-button-color__control"
 				colors={ colorsPerOrigin }
 				disableCustomColors={ ! areCustomSolidsEnabled }
-				__experimentalHasMultipleOrigins
 				showTitle={ false }
 				enableAlpha
 				__experimentalIsRenderedInSidebar

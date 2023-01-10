@@ -11,31 +11,28 @@ import UngroupButton from '../ungroup-button';
 import { store as blockEditorStore } from '../../store';
 
 export default function BlockToolbar() {
-	const { blockClientIds, isValid, mode } = useSelect( ( select ) => {
+	const { isSelected, isValidAndVisual } = useSelect( ( select ) => {
 		const { getBlockMode, getSelectedBlockClientIds, isBlockValid } =
 			select( blockEditorStore );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 
 		return {
-			blockClientIds: selectedBlockClientIds,
-			isValid:
+			isSelected: selectedBlockClientIds.length > 0,
+			isValidAndVisual:
 				selectedBlockClientIds.length === 1
-					? isBlockValid( selectedBlockClientIds[ 0 ] )
-					: null,
-			mode:
-				selectedBlockClientIds.length === 1
-					? getBlockMode( selectedBlockClientIds[ 0 ] )
-					: null,
+					? isBlockValid( selectedBlockClientIds[ 0 ] ) &&
+					  getBlockMode( selectedBlockClientIds[ 0 ] ) === 'visual'
+					: false,
 		};
 	}, [] );
 
-	if ( blockClientIds.length === 0 ) {
+	if ( ! isSelected ) {
 		return null;
 	}
 
 	return (
 		<>
-			{ mode === 'visual' && isValid && (
+			{ isValidAndVisual && (
 				<>
 					<UngroupButton />
 					<BlockControls.Slot group="block" />

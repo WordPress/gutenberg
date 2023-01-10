@@ -35,7 +35,7 @@ A block requires a few properties to be specified before it can be registered su
 
 -   **Type:** `String`
 
-This is the display title for your block, which can be translated with our translation functions. The title will display in the Inserter and in other areas of the editor. 
+This is the display title for your block, which can be translated with our translation functions. The title will display in the Inserter and in other areas of the editor.
 
 ```js
 // Our data object
@@ -90,7 +90,7 @@ icon: 'book-alt',
 icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><path d="M19 13H5v-2h14v2z" /></svg>,
 ```
 
-**Note:** Custom SVG icons are automatically wrapped in the [`wp.primitives.SVG` component](/packages/primitives/src/svg/) to add accessibility attributes (`aria-hidden`, `role`, and `focusable`).
+**Note:** Custom SVG icons are automatically wrapped in the [`wp.primitives.SVG` component](/packages/primitives/README.md) to add accessibility attributes (`aria-hidden`, `role`, and `focusable`).
 
 An object can also be passed as icon, in this case, icon, as specified above, should be included in the src property.
 
@@ -145,7 +145,7 @@ styles: [
 ],
 ```
 
-Plugins and Themes can also register [custom block style](/docs/reference-guides/filters/block-filters.md#block-styles) for existing blocks.
+Plugins and Themes can also register [custom block style](/docs/reference-guides/block-api/block-styles.md) for existing blocks.
 
 #### attributes (optional)
 
@@ -179,7 +179,7 @@ attributes: {
 
 -   **Type:** `Object`
 
-Example provides structured example data for the block. This data is used to construct a preview for the block to be shown in the Inspector Help Panel when the user mouses over the block.
+Example provides structured example data for the block. This data is used to construct a preview for the block to be shown in the Inspector Help Panel when the user mouses over the block and in the Styles panel when the block is selected.
 
 The data provided in the example object should match the attributes defined. For example:
 

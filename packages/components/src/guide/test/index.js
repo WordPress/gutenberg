@@ -9,6 +9,8 @@ import userEvent from '@testing-library/user-event';
  */
 import Guide from '../';
 
+jest.useFakeTimers();
+
 describe( 'Guide', () => {
 	it( 'renders nothing when there are no pages', () => {
 		render( <Guide pages={ [] } /> );

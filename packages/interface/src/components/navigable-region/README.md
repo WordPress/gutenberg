@@ -4,8 +4,6 @@
 
 It also renders a child `div` element that is responsible to set a negative `z-index` stack level, to make sure the focus style is always visible, regardless of other elements that may cut-off the focus style outline otherwise.
 
-It can use a CSS animation via the `motion` component.
-
 ## Props
 
 ### children
@@ -29,10 +27,10 @@ A meaningful name for the ARIA landmark region.
 -   Type: `String`
 -   Required: Yes
 
-### motionProps
+### as
 
-Properties of `motionProps` object will be used by the `motion` component to set a CSS animation on the wrapper div.
+The component used as the root of the region. Defaults to a `div` element.
 
--   Type: `Object`
--   Required: No
--   Default: `{}`
+-   Type: `Component`
+-   Required: no
+-   Default: `div`

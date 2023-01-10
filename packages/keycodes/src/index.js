@@ -233,11 +233,11 @@ export const displayShortcutList = mapValues( modifiers, ( modifier ) => {
 			/** @type {string[]} */ ( [] )
 		);
 
-		// Symbols (`,.) are removed by the default regular expression,
+		// Symbols (~`,.) are removed by the default regular expression,
 		// so override the rule to allow symbols used for shortcuts.
 		// see: https://github.com/blakeembrey/change-case#options
 		const capitalizedCharacter = capitalCase( character, {
-			stripRegexp: /[^A-Z0-9`,\.\\\-]/gi,
+			stripRegexp: /[^A-Z0-9~`,\.\\\-]/gi,
 		} );
 
 		return [ ...modifierKeys, capitalizedCharacter ];
@@ -298,6 +298,8 @@ export const shortcutAriaLabel = mapValues( modifiers, ( modifier ) => {
 			'.': __( 'Period' ),
 			/* translators: backtick as in the character '`' */
 			'`': __( 'Backtick' ),
+			/* translators: tilde as in the character '~' */
+			'~': __( 'Tilde' ),
 		};
 
 		return [ ...modifier( _isApple ), character ]

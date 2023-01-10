@@ -68,7 +68,7 @@ function BlockMenuItem( { block } ) {
 
 	return (
 		<NavigationButtonAsItem
-			path={ '/blocks/' + block.name }
+			path={ '/blocks/' + encodeURIComponent( block.name ) }
 			aria-label={ navigationButtonLabel }
 		>
 			<HStack justify="flex-start">
@@ -129,6 +129,7 @@ function ScreenBlockList() {
 				) }
 			/>
 			<SearchControl
+				__nextHasNoMarginBottom
 				className="edit-site-block-types-search"
 				onChange={ setFilterValue }
 				value={ filterValue }

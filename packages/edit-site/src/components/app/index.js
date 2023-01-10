@@ -1,8 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { SlotFillProvider } from '@wordpress/components';
+import { SlotFillProvider, Popover } from '@wordpress/components';
 import { UnsavedChangesWarning } from '@wordpress/editor';
+import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
@@ -12,12 +13,9 @@ import { PluginArea } from '@wordpress/plugins';
  * Internal dependencies
  */
 import { Routes } from '../routes';
-import Editor from '../editor';
-import List from '../list';
-import NavigationSidebar from '../navigation-sidebar';
-import getIsListPage from '../../utils/get-is-list-page';
+import Layout from '../layout';
 
-export default function EditSiteApp( { reboot, homeTemplate } ) {
+export default function App( { reboot } ) {
 	const { createErrorNotice } = useDispatch( noticesStore );
 
 	function onPluginAreaError( name ) {
@@ -33,43 +31,16 @@ export default function EditSiteApp( { reboot, homeTemplate } ) {
 	}
 
 	return (
-		<SlotFillProvider>
-			<UnsavedChangesWarning />
+		<ShortcutProvider style={ { height: '100%' } }>
+			<SlotFillProvider>
+				<Popover.Slot />
+				<UnsavedChangesWarning />
 
-			<Routes>
-				{ ( { params } ) => {
-					const isListPage = getIsListPage( params );
-
-					// The existence of a 'front-page' supersedes every other setting.
-					const homeTemplateType =
-						params.postId?.includes( 'front-page' ) ||
-						params.postId === homeTemplate?.postId
-							? 'site-editor'
-							: undefined;
-
-					return (
-						<>
-							{ isListPage ? (
-								<List />
-							) : (
-								<Editor onError={ reboot } />
-							) }
-							<PluginArea onError={ onPluginAreaError } />
-							{ /* Keep the instance of the sidebar to ensure focus will not be lost
-							 * when navigating to other pages. */ }
-							<NavigationSidebar
-								// Open the navigation sidebar by default when in the list page.
-								isDefaultOpen={ !! isListPage }
-								activeTemplateType={
-									isListPage
-										? params.postType
-										: homeTemplateType
-								}
-							/>
-						</>
-					);
-				} }
-			</Routes>
-		</SlotFillProvider>
+				<Routes>
+					<Layout onError={ reboot } />
+					<PluginArea onError={ onPluginAreaError } />
+				</Routes>
+			</SlotFillProvider>
+		</ShortcutProvider>
 	);
 }

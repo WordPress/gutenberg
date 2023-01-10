@@ -166,7 +166,7 @@ const matchUrl = ( reqUrl, urls ) => {
 };
 
 describe( 'adding blocks from block directory', () => {
-	beforeEach( async () => {
+	beforeAll( async () => {
 		await createNewPost();
 	} );
 

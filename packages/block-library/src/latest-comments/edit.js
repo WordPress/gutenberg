@@ -56,6 +56,7 @@ export default function LatestComments( { attributes, setAttributes } ) {
 						}
 					/>
 					<RangeControl
+						__nextHasNoMarginBottom
 						label={ __( 'Number of comments' ) }
 						value={ commentsToShow }
 						onChange={ ( value ) =>

@@ -62,7 +62,6 @@ const UnconnectedBorderBoxControl = (
 		splitValue,
 		toggleLinked,
 		wrapperClassName,
-		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
 		...otherProps
 	} = useBorderBoxControl( props );
@@ -116,9 +115,6 @@ const UnconnectedBorderBoxControl = (
 						width={
 							size === '__unstable-large' ? '116px' : '110px'
 						}
-						__experimentalHasMultipleOrigins={
-							__experimentalHasMultipleOrigins
-						}
 						__experimentalIsRenderedInSidebar={
 							__experimentalIsRenderedInSidebar
 						}
@@ -134,9 +130,6 @@ const UnconnectedBorderBoxControl = (
 						popoverPlacement={ popoverPlacement }
 						popoverOffset={ popoverOffset }
 						value={ splitValue }
-						__experimentalHasMultipleOrigins={
-							__experimentalHasMultipleOrigins
-						}
 						__experimentalIsRenderedInSidebar={
 							__experimentalIsRenderedInSidebar
 						}

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, isEmpty, pick } from 'lodash';
+import { get, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -58,7 +58,12 @@ import {
 } from './constants';
 
 export const pickRelevantMediaFiles = ( image, size ) => {
-	const imageProps = pick( image, [ 'alt', 'id', 'link', 'caption' ] );
+	const imageProps = Object.fromEntries(
+		Object.entries( image ?? {} ).filter( ( [ key ] ) =>
+			[ 'alt', 'id', 'link', 'caption' ].includes( key )
+		)
+	);
+
 	imageProps.url =
 		get( image, [ 'sizes', size, 'url' ] ) ||
 		get( image, [ 'media_details', 'sizes', size, 'source_url' ] ) ||

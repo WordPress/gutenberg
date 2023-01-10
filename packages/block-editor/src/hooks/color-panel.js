@@ -81,7 +81,6 @@ export default function ColorPanel( {
 				panelId={ clientId }
 				settings={ settings }
 				__experimentalIsItemGroup={ false }
-				__experimentalHasMultipleOrigins
 				__experimentalIsRenderedInSidebar
 				{ ...colorGradientSettings }
 			/>

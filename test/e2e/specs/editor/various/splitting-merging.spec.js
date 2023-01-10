@@ -377,7 +377,11 @@ test.describe( 'splitting and merging blocks', () => {
 				await page.keyboard.type( 'item 1' );
 				await page.keyboard.press( 'Enter' );
 				await page.keyboard.type( 'item 2' );
-				await pageUtils.pressKeyTimes( 'ArrowUp', 2 );
+				await pageUtils.pressKeyTimes( 'ArrowUp', 3 );
+				await page.keyboard.press( 'Delete' );
+
+				expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+
 				await page.keyboard.press( 'Delete' );
 				// Carret should be in the first block and at the proper position.
 				await page.keyboard.type( '-' );
@@ -395,6 +399,10 @@ test.describe( 'splitting and merging blocks', () => {
 				await page.keyboard.type( 'item 2' );
 				await page.keyboard.press( 'ArrowUp' );
 				await pageUtils.pressKeyTimes( 'ArrowLeft', 6 );
+				await page.keyboard.press( 'Backspace' );
+
+				expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+
 				await page.keyboard.press( 'Backspace' );
 				// Carret should be in the first block and at the proper position.
 				await page.keyboard.type( '-' );

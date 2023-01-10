@@ -62,7 +62,7 @@ function PostAuthorEdit( {
 		attributes;
 	const avatarSizes = [];
 	const authorName = authorDetails?.name || __( 'Post Author' );
-	if ( authorDetails ) {
+	if ( authorDetails?.avatar_urls ) {
 		Object.keys( authorDetails.avatar_urls ).forEach( ( size ) => {
 			avatarSizes.push( {
 				value: size,
@@ -103,6 +103,7 @@ function PostAuthorEdit( {
 						authorOptions.length &&
 						( ( showCombobox && (
 							<ComboboxControl
+								__nextHasNoMarginBottom
 								label={ __( 'Author' ) }
 								options={ authorOptions }
 								value={ authorId }
@@ -111,6 +112,7 @@ function PostAuthorEdit( {
 							/>
 						) ) || (
 							<SelectControl
+								__nextHasNoMarginBottom
 								label={ __( 'Author' ) }
 								value={ authorId }
 								options={ authorOptions }
@@ -126,6 +128,7 @@ function PostAuthorEdit( {
 					/>
 					{ showAvatar && (
 						<SelectControl
+							__nextHasNoMarginBottom
 							label={ __( 'Avatar size' ) }
 							value={ attributes.avatarSize }
 							options={ avatarSizes }
@@ -172,7 +175,7 @@ function PostAuthorEdit( {
 			</BlockControls>
 
 			<div { ...blockProps }>
-				{ showAvatar && authorDetails && (
+				{ showAvatar && authorDetails?.avatar_urls && (
 					<div className="wp-block-post-author__avatar">
 						<img
 							width={ attributes.avatarSize }

@@ -784,6 +784,7 @@ export const specWithRegistration = [
 				[
 					{
 						type: 'my-plugin/link',
+						tagName: 'a',
 						attributes: {},
 						unregisteredAttributes: {},
 					},
@@ -808,6 +809,7 @@ export const specWithRegistration = [
 				[
 					{
 						type: 'my-plugin/link',
+						tagName: 'a',
 						attributes: {},
 						unregisteredAttributes: {
 							class: 'test',
@@ -834,6 +836,7 @@ export const specWithRegistration = [
 				[
 					{
 						type: 'core/link',
+						tagName: 'a',
 						attributes: {},
 						unregisteredAttributes: {
 							class: 'custom-format',
@@ -899,6 +902,7 @@ export const specWithRegistration = [
 				[
 					{
 						type: 'my-plugin/link',
+						tagName: 'a',
 						attributes: {},
 						unregisteredAttributes: {},
 					},

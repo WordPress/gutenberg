@@ -87,7 +87,7 @@ describe( 'Heading', () => {
 		await page.keyboard.press( 'Enter' );
 		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
 		"<!-- wp:heading {\\"level\\":3,\\"style\\":{\\"color\\":{\\"text\\":\\"#4b7f4d\\"}}} -->
-		<h3 class=\\"has-text-color\\" style=\\"color:#4b7f4d\\">Heading</h3>
+		<h3 class=\\"wp-block-heading has-text-color\\" style=\\"color:#4b7f4d\\">Heading</h3>
 		<!-- /wp:heading -->"
 	` );
 	} );

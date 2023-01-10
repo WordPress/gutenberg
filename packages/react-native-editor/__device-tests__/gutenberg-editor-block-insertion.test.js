@@ -81,7 +81,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 
 	it( 'should be able to insert block at the beginning of post from the title', async () => {
 		await editorPage.addNewBlock( blockNames.paragraph );
-		let paragraphBlockElement = await editorPage.getTextBlockAtPosition(
+		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
 		);
 		if ( isAndroid() ) {
@@ -98,15 +98,19 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		const titleElement = await editorPage.getTitleElement( {
 			autoscroll: true,
 		} );
+		expect( titleElement ).toBeTruthy();
 		await titleElement.click();
 
 		await editorPage.addNewBlock( blockNames.paragraph );
-		paragraphBlockElement = await editorPage.getTextBlockAtPosition(
+		const emptyParagraphBlock = await editorPage.getBlockAtPosition(
 			blockNames.paragraph
 		);
-		await clickMiddleOfElement( editorPage.driver, paragraphBlockElement );
+		expect( emptyParagraphBlock ).toBeTruthy();
+		const emptyParagraphBlockElement =
+			await editorPage.getTextBlockAtPosition( blockNames.paragraph );
+		expect( emptyParagraphBlockElement ).toBeTruthy();
+
 		await editorPage.sendTextToParagraphBlock( 1, testData.mediumText );
-		await paragraphBlockElement.click();
 		const html = await editorPage.getHtmlContent();
 		expect( html.toLowerCase() ).toBe(
 			testData.blockInsertionHtmlFromTitle.toLowerCase()

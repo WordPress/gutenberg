@@ -1,24 +1,19 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
  */
 import RangeControl from '../';
 
-const getRangeInput = (): HTMLInputElement | null =>
-	screen.getByRole( 'slider' ) as HTMLInputElement;
-const getNumberInput = (): HTMLInputElement | null =>
-	screen.getByRole( 'spinbutton' ) as HTMLInputElement;
-const getResetButton = (): HTMLButtonElement | null =>
-	screen.getByRole( 'button' ) as HTMLButtonElement;
+const getRangeInput = (): HTMLInputElement => screen.getByRole( 'slider' );
+const getNumberInput = (): HTMLInputElement => screen.getByRole( 'spinbutton' );
+const getResetButton = (): HTMLButtonElement => screen.getByRole( 'button' );
 
-const fireChangeEvent = (
-	input: HTMLInputElement | null,
-	value?: number | string
-) => fireEvent.change( input as Element, { target: { value } } );
+const fireChangeEvent = ( input: HTMLInputElement, value?: number | string ) =>
+	fireEvent.change( input, { target: { value } } );
 
 describe( 'RangeControl', () => {
 	describe( '#render()', () => {
@@ -30,10 +25,10 @@ describe( 'RangeControl', () => {
 			const rangeInput = getRangeInput();
 			const numberInput = getNumberInput();
 
-			rangeInput?.focus();
+			act( () => rangeInput.focus() );
 			fireChangeEvent( rangeInput, '5' );
 
-			numberInput?.focus();
+			act( () => numberInput.focus() );
 			fireChangeEvent( numberInput, '10' );
 
 			expect( onChange ).toHaveBeenCalledWith( 5 );
@@ -48,9 +43,11 @@ describe( 'RangeControl', () => {
 				/>
 			);
 
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
 			const beforeIcon = container.querySelector(
 				'.dashicons-format-image'
 			);
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
 			const afterIcon = container.querySelector(
 				'.dashicons-format-video'
 			);
@@ -68,9 +65,9 @@ describe( 'RangeControl', () => {
 			const numberInput = getNumberInput();
 
 			fireChangeEvent( numberInput, '10' );
-			fireEvent.blur( numberInput as Element );
+			fireEvent.blur( numberInput );
 
-			expect( rangeInput?.value ).not.toBe( '10' );
+			expect( rangeInput.value ).not.toBe( '10' );
 		} );
 
 		it( 'should not apply if new value is greater than maximum', () => {
@@ -80,9 +77,9 @@ describe( 'RangeControl', () => {
 			const numberInput = getNumberInput();
 
 			fireChangeEvent( numberInput, '21' );
-			fireEvent.blur( numberInput as Element );
+			fireEvent.blur( numberInput );
 
-			expect( rangeInput?.value ).not.toBe( '21' );
+			expect( rangeInput.value ).not.toBe( '21' );
 		} );
 
 		it( 'should not call onChange if new value is invalid', () => {
@@ -93,7 +90,7 @@ describe( 'RangeControl', () => {
 
 			const numberInput = getNumberInput();
 
-			numberInput?.focus();
+			act( () => numberInput.focus() );
 			fireChangeEvent( numberInput, '25e' );
 
 			expect( onChange ).not.toHaveBeenCalled();
@@ -108,15 +105,15 @@ describe( 'RangeControl', () => {
 			const rangeInput = getRangeInput();
 			const numberInput = getNumberInput();
 
-			numberInput?.focus();
+			act( () => numberInput.focus() );
 			fireChangeEvent( numberInput, '-1.1' );
 
-			expect( numberInput?.value ).toBe( '-1.1' );
-			expect( rangeInput?.value ).toBe( '-1' );
+			expect( numberInput.value ).toBe( '-1.1' );
+			expect( rangeInput.value ).toBe( '-1' );
 
-			fireEvent.blur( numberInput as Element );
+			fireEvent.blur( numberInput );
 			expect( onChange ).toHaveBeenCalledWith( -1 );
-			expect( numberInput?.value ).toBe( '-1' );
+			expect( numberInput.value ).toBe( '-1' );
 		} );
 
 		it( 'should validate when provided a max or min of zero', () => {
@@ -125,11 +122,11 @@ describe( 'RangeControl', () => {
 			const rangeInput = getRangeInput();
 			const numberInput = getNumberInput();
 
-			numberInput?.focus();
+			act( () => numberInput.focus() );
 			fireChangeEvent( numberInput, '1' );
-			fireEvent.blur( numberInput as Element );
+			fireEvent.blur( numberInput );
 
-			expect( rangeInput?.value ).toBe( '0' );
+			expect( rangeInput.value ).toBe( '0' );
 		} );
 
 		it( 'should validate when min and max are negative', () => {
@@ -138,16 +135,16 @@ describe( 'RangeControl', () => {
 			const rangeInput = getRangeInput();
 			const numberInput = getNumberInput();
 
-			numberInput?.focus();
+			act( () => numberInput.focus() );
 
 			fireChangeEvent( numberInput, '-101' );
-			expect( rangeInput?.value ).toBe( '-100' );
+			expect( rangeInput.value ).toBe( '-100' );
 
 			fireChangeEvent( numberInput, '-49' );
-			expect( rangeInput?.value ).toBe( '-50' );
+			expect( rangeInput.value ).toBe( '-50' );
 
 			fireChangeEvent( numberInput, '-50' );
-			expect( rangeInput?.value ).toBe( '-50' );
+			expect( rangeInput.value ).toBe( '-50' );
 		} );
 
 		it( 'should take into account the step starting from min', () => {
@@ -163,16 +160,16 @@ describe( 'RangeControl', () => {
 			const rangeInput = getRangeInput();
 			const numberInput = getNumberInput();
 
-			numberInput?.focus();
+			act( () => numberInput.focus() );
 			fireChangeEvent( numberInput, '0.125' );
 
 			expect( onChange ).toHaveBeenCalledWith( 0.125 );
-			expect( rangeInput?.value ).toBe( '0.125' );
+			expect( rangeInput.value ).toBe( '0.125' );
 
 			fireChangeEvent( numberInput, '0.225' );
 
 			expect( onChange ).toHaveBeenCalledWith( 0.225 );
-			expect( rangeInput?.value ).toBe( '0.225' );
+			expect( rangeInput.value ).toBe( '0.225' );
 		} );
 	} );
 
@@ -182,7 +179,7 @@ describe( 'RangeControl', () => {
 
 			const rangeInput = getRangeInput();
 
-			expect( rangeInput?.value ).toBe( '5' );
+			expect( rangeInput.value ).toBe( '5' );
 		} );
 
 		it( 'should render initialPosition if no value is provided', () => {
@@ -190,7 +187,7 @@ describe( 'RangeControl', () => {
 
 			const rangeInput = getRangeInput();
 
-			expect( rangeInput?.value ).toBe( '50' );
+			expect( rangeInput.value ).toBe( '50' );
 		} );
 
 		it( 'should render value instead of initialPosition is provided', () => {
@@ -198,7 +195,7 @@ describe( 'RangeControl', () => {
 
 			const rangeInput = getRangeInput();
 
-			expect( rangeInput?.value ).toBe( '10' );
+			expect( rangeInput.value ).toBe( '10' );
 		} );
 
 		it( 'should clamp initialPosition between min and max on first render, and on reset', () => {
@@ -216,19 +213,19 @@ describe( 'RangeControl', () => {
 			const resetButton = getResetButton();
 
 			// Value should be clamped on initial load
-			expect( numberInput?.value ).toBe( '100' );
-			expect( rangeInput?.value ).toBe( '100' );
+			expect( numberInput.value ).toBe( '100' );
+			expect( rangeInput.value ).toBe( '100' );
 
 			fireChangeEvent( numberInput, '50' );
 
-			expect( numberInput?.value ).toBe( '50' );
-			expect( rangeInput?.value ).toBe( '50' );
+			expect( numberInput.value ).toBe( '50' );
+			expect( rangeInput.value ).toBe( '50' );
 
 			// Value should be clamped after resetting
-			fireEvent.click( resetButton as Element );
+			fireEvent.click( resetButton );
 
-			expect( numberInput?.value ).toBe( '100' );
-			expect( rangeInput?.value ).toBe( '100' );
+			expect( numberInput.value ).toBe( '100' );
+			expect( rangeInput.value ).toBe( '100' );
 		} );
 	} );
 
@@ -255,8 +252,8 @@ describe( 'RangeControl', () => {
 			const rangeInput = getRangeInput();
 			const numberInput = getNumberInput();
 
-			expect( rangeInput?.value ).toBe( '0' );
-			expect( numberInput?.value ).toBe( '0' );
+			expect( rangeInput.value ).toBe( '0' );
+			expect( numberInput.value ).toBe( '0' );
 		} );
 
 		it( 'should update both field and range on change', () => {
@@ -265,17 +262,17 @@ describe( 'RangeControl', () => {
 			const rangeInput = getRangeInput();
 			const numberInput = getNumberInput();
 
-			rangeInput?.focus();
+			act( () => rangeInput.focus() );
 			fireChangeEvent( rangeInput, 13 );
 
-			expect( rangeInput?.value ).toBe( '13' );
-			expect( numberInput?.value ).toBe( '13' );
+			expect( rangeInput.value ).toBe( '13' );
+			expect( numberInput.value ).toBe( '13' );
 
-			numberInput?.focus();
+			act( () => numberInput.focus() );
 			fireChangeEvent( numberInput, 7 );
 
-			expect( rangeInput?.value ).toBe( '7' );
-			expect( numberInput?.value ).toBe( '7' );
+			expect( rangeInput.value ).toBe( '7' );
+			expect( numberInput.value ).toBe( '7' );
 		} );
 
 		it( 'should reset input values if next value is removed', () => {
@@ -285,12 +282,12 @@ describe( 'RangeControl', () => {
 			const numberInput = getNumberInput();
 
 			fireChangeEvent( numberInput, '' );
-			fireEvent.blur( numberInput as Element );
+			fireEvent.blur( numberInput );
 
 			// Reset to 50. Median value of min: 0, max: 100.
-			expect( rangeInput?.value ).toBe( '50' );
+			expect( rangeInput.value ).toBe( '50' );
 			// Input field should be blank.
-			expect( numberInput?.value ).toBe( '' );
+			expect( numberInput.value ).toBe( '' );
 		} );
 	} );
 
@@ -310,10 +307,10 @@ describe( 'RangeControl', () => {
 			const rangeInput = getRangeInput();
 			const numberInput = getNumberInput();
 
-			fireEvent.click( resetButton as Element );
+			fireEvent.click( resetButton );
 
-			expect( rangeInput?.value ).toBe( '33' );
-			expect( numberInput?.value ).toBe( '33' );
+			expect( rangeInput.value ).toBe( '33' );
+			expect( numberInput.value ).toBe( '33' );
 			expect( spy ).toHaveBeenCalledWith( 33 );
 		} );
 
@@ -332,10 +329,10 @@ describe( 'RangeControl', () => {
 			const rangeInput = getRangeInput();
 			const numberInput = getNumberInput();
 
-			fireEvent.click( resetButton as Element );
+			fireEvent.click( resetButton );
 
-			expect( rangeInput?.value ).toBe( '50' );
-			expect( numberInput?.value ).toBe( '' );
+			expect( rangeInput.value ).toBe( '50' );
+			expect( numberInput.value ).toBe( '' );
 		} );
 	} );
 } );

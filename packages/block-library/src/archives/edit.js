@@ -48,6 +48,7 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 						}
 					/>
 					<SelectControl
+						__nextHasNoMarginBottom
 						label={ __( 'Group by:' ) }
 						options={ [
 							{ label: __( 'Year' ), value: 'yearly' },

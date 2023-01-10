@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, groupBy, orderBy } from 'lodash';
+import { map, groupBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,6 +17,7 @@ import BlockTypesList from '../block-types-list';
 import InserterPanel from './panel';
 import useBlockTypesState from './hooks/use-block-types-state';
 import InserterListbox from '../inserter-listbox';
+import { orderBy } from '../../utils/sorting';
 
 const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
@@ -42,7 +43,7 @@ export function BlockTypesTab( {
 	);
 
 	const suggestedItems = useMemo( () => {
-		return orderBy( items, [ 'frecency' ], [ 'desc' ] ).slice(
+		return orderBy( items, 'frecency', 'desc' ).slice(
 			0,
 			MAX_SUGGESTED_ITEMS
 		);

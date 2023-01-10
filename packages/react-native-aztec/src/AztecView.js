@@ -284,5 +284,6 @@ class AztecView extends Component {
 const RCTAztecView = requireNativeComponent( 'RCTAztecView', AztecView );
 
 AztecView.InputState = AztecInputState;
+AztecView.KeyCodes = KEYCODES;
 
 export default AztecView;

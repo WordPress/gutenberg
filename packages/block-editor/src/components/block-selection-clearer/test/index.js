@@ -43,12 +43,12 @@ describe( 'BlockSelectionClearer component', () => {
 		} ) );
 
 		render(
-			<BlockSelectionClearer>
+			<BlockSelectionClearer data-testid="selection-clearer">
 				<button>Not a block</button>
 			</BlockSelectionClearer>
 		);
-		const button = screen.getByRole( 'button' );
-		fireEvent.mouseDown( button.parentElement );
+
+		fireEvent.mouseDown( screen.getByTestId( 'selection-clearer' ) );
 
 		expect( mockClearSelectedBlock ).toBeCalled();
 	} );
@@ -64,12 +64,12 @@ describe( 'BlockSelectionClearer component', () => {
 		} ) );
 
 		render(
-			<BlockSelectionClearer>
+			<BlockSelectionClearer data-testid="selection-clearer">
 				<button>Not a block</button>
 			</BlockSelectionClearer>
 		);
-		const button = screen.getByRole( 'button' );
-		fireEvent.mouseDown( button.parentElement );
+
+		fireEvent.mouseDown( screen.getByTestId( 'selection-clearer' ) );
 
 		expect( mockClearSelectedBlock ).toBeCalled();
 	} );
@@ -82,12 +82,12 @@ describe( 'BlockSelectionClearer component', () => {
 		} ) );
 
 		render(
-			<BlockSelectionClearer>
+			<BlockSelectionClearer data-testid="selection-clearer">
 				<button>Not a block</button>
 			</BlockSelectionClearer>
 		);
-		const button = screen.getByRole( 'button' );
-		fireEvent.mouseDown( button.parentElement );
+
+		fireEvent.mouseDown( screen.getByTestId( 'selection-clearer' ) );
 
 		expect( mockClearSelectedBlock ).not.toBeCalled();
 	} );
@@ -106,12 +106,12 @@ describe( 'BlockSelectionClearer component', () => {
 		} ) );
 
 		render(
-			<BlockSelectionClearer>
+			<BlockSelectionClearer data-testid="selection-clearer">
 				<button>Not a block</button>
 			</BlockSelectionClearer>
 		);
-		const button = screen.getByRole( 'button' );
-		fireEvent.mouseDown( button.parentElement );
+
+		fireEvent.mouseDown( screen.getByTestId( 'selection-clearer' ) );
 
 		expect( mockClearSelectedBlock ).not.toBeCalled();
 	} );

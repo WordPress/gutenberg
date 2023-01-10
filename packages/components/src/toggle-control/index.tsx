@@ -12,6 +12,7 @@ import { useInstanceId } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import { FlexBlock } from '../flex';
 import FormToggle from '../form-toggle';
 import BaseControl from '../base-control';
 import type { WordPressComponentProps } from '../ui/context/wordpress-component';
@@ -94,12 +95,13 @@ export function ToggleControl( {
 					aria-describedby={ describedBy }
 					disabled={ disabled }
 				/>
-				<label
+				<FlexBlock
+					as="label"
 					htmlFor={ id }
 					className="components-toggle-control__label"
 				>
 					{ label }
-				</label>
+				</FlexBlock>
 			</HStack>
 		</BaseControl>
 	);

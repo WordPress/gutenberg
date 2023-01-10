@@ -47,6 +47,11 @@
 							"type": "string",
 							"source": "attribute",
 							"attribute": "data-align"
+						},
+						"colspan": {
+							"type": "string",
+							"source": "attribute",
+							"attribute": "colspan"
 						}
 					}
 				}
@@ -82,6 +87,11 @@
 							"type": "string",
 							"source": "attribute",
 							"attribute": "data-align"
+						},
+						"colspan": {
+							"type": "string",
+							"source": "attribute",
+							"attribute": "colspan"
 						}
 					}
 				}
@@ -117,6 +127,11 @@
 							"type": "string",
 							"source": "attribute",
 							"attribute": "data-align"
+						},
+						"colspan": {
+							"type": "string",
+							"source": "attribute",
+							"attribute": "colspan"
 						}
 					}
 				}

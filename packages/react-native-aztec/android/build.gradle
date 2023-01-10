@@ -73,10 +73,15 @@ repositories {
             includeGroup "org.wordpress.aztec"
         }
     }
-    maven { url "https://a8c-libs.s3.amazonaws.com/android/hermes-mirror" }
     maven { url "https://a8c-libs.s3.amazonaws.com/android/react-native-mirror" }
     google()
-    mavenCentral()
+    mavenCentral {
+        // We don't want to fetch react-native from Maven Central as there are
+        // older versions over there.
+        content {
+            excludeGroup "com.facebook.react"
+        }
+    }
 }
 
 dependencies {

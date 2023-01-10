@@ -12,6 +12,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import Button from '../../button';
+import InputControl from '../../input-control';
 import Modal from '../';
 import type { ModalProps } from '../types';
 
@@ -74,6 +75,8 @@ const Template: ComponentStory< typeof Modal > = ( {
 						non proident, sunt in culpa qui officia deserunt mollit
 						anim id est laborum.
 					</p>
+
+					<InputControl style={ { marginBottom: '20px' } } />
 
 					<Button variant="secondary" onClick={ closeModal }>
 						Close Modal

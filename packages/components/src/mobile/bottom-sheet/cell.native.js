@@ -58,7 +58,7 @@ class BottomSheetCell extends Component {
 
 		AccessibilityInfo.isScreenReaderEnabled().then(
 			( isScreenReaderEnabled ) => {
-				if ( this.isCurrent ) {
+				if ( this.isCurrent && isScreenReaderEnabled ) {
 					this.setState( { isScreenReaderEnabled } );
 				}
 			}

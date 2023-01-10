@@ -159,10 +159,14 @@ export const dispatch = defaultRegistry.dispatch;
 
 /**
  * Given a listener function, the function will be called any time the state value
- * of one of the registered stores has changed. This function returns a `unsubscribe`
- * function used to stop the subscription.
+ * of one of the registered stores has changed. If you specify the optional
+ * `storeNameOrDescriptor` parameter, the listener function will be called only
+ * on updates on that one specific registered store.
  *
- * @param {Function} listener Callback function.
+ * This function returns an `unsubscribe` function used to stop the subscription.
+ *
+ * @param {Function}                listener              Callback function.
+ * @param {string|StoreDescriptor?} storeNameOrDescriptor Optional store name.
  *
  * @example
  * ```js

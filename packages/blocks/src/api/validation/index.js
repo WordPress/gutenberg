@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Tokenizer } from 'simple-html-tokenizer';
-import { isEqual } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
@@ -423,7 +423,9 @@ export const isEqualAttributesOfName = {
 		return actualDiff.length === 0 && expectedDiff.length === 0;
 	},
 	style: ( actual, expected ) => {
-		return isEqual( ...[ actual, expected ].map( getStyleProperties ) );
+		return fastDeepEqual(
+			...[ actual, expected ].map( getStyleProperties )
+		);
 	},
 	// For each boolean attribute, mere presence of attribute in both is enough
 	// to assume equivalence.

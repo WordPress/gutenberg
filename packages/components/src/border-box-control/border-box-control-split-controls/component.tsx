@@ -33,7 +33,6 @@ const BorderBoxControlSplitControls = (
 		rightAlignedClassName,
 		size = 'default',
 		value,
-		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
 		...otherProps
 	} = useBorderBoxControlSplitControls( props );
@@ -65,7 +64,6 @@ const BorderBoxControlSplitControls = (
 		enableAlpha,
 		enableStyle,
 		isCompact: true,
-		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
 		size,
 	};

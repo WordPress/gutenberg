@@ -47,7 +47,6 @@ function ScreenTextColor( { name } ) {
 				className="edit-site-screen-text-color__control"
 				colors={ colorsPerOrigin }
 				disableCustomColors={ ! areCustomSolidsEnabled }
-				__experimentalHasMultipleOrigins
 				showTitle={ false }
 				enableAlpha
 				__experimentalIsRenderedInSidebar

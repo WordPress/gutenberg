@@ -45,22 +45,44 @@ const cleanEmptyObject = ( object ) => {
 };
 
 function useGlobalStylesUserConfig() {
-	const { globalStylesId, settings, styles } = useSelect( ( select ) => {
-		const _globalStylesId =
-			select( coreStore ).__experimentalGetCurrentGlobalStylesId();
-		const record = _globalStylesId
-			? select( coreStore ).getEditedEntityRecord(
-					'root',
-					'globalStyles',
-					_globalStylesId
-			  )
-			: undefined;
-		return {
-			globalStylesId: _globalStylesId,
-			settings: record?.settings,
-			styles: record?.styles,
-		};
-	}, [] );
+	const { globalStylesId, isReady, settings, styles } = useSelect(
+		( select ) => {
+			const { getEditedEntityRecord, hasFinishedResolution } =
+				select( coreStore );
+			const _globalStylesId =
+				select( coreStore ).__experimentalGetCurrentGlobalStylesId();
+			const record = _globalStylesId
+				? getEditedEntityRecord(
+						'root',
+						'globalStyles',
+						_globalStylesId
+				  )
+				: undefined;
+
+			let hasResolved = false;
+			if (
+				hasFinishedResolution(
+					'__experimentalGetCurrentGlobalStylesId'
+				)
+			) {
+				hasResolved = _globalStylesId
+					? hasFinishedResolution( 'getEditedEntityRecord', [
+							'root',
+							'globalStyles',
+							_globalStylesId,
+					  ] )
+					: true;
+			}
+
+			return {
+				globalStylesId: _globalStylesId,
+				isReady: hasResolved,
+				settings: record?.settings,
+				styles: record?.styles,
+			};
+		},
+		[]
+	);
 
 	const { getEditedEntityRecord } = useSelect( coreStore );
 	const { editEntityRecord } = useDispatch( coreStore );
@@ -72,7 +94,7 @@ function useGlobalStylesUserConfig() {
 	}, [ settings, styles ] );
 
 	const setConfig = useCallback(
-		( callback ) => {
+		( callback, options = {} ) => {
 			const record = getEditedEntityRecord(
 				'root',
 				'globalStyles',
@@ -83,15 +105,21 @@ function useGlobalStylesUserConfig() {
 				settings: record?.settings ?? {},
 			};
 			const updatedConfig = callback( currentConfig );
-			editEntityRecord( 'root', 'globalStyles', globalStylesId, {
-				styles: cleanEmptyObject( updatedConfig.styles ) || {},
-				settings: cleanEmptyObject( updatedConfig.settings ) || {},
-			} );
+			editEntityRecord(
+				'root',
+				'globalStyles',
+				globalStylesId,
+				{
+					styles: cleanEmptyObject( updatedConfig.styles ) || {},
+					settings: cleanEmptyObject( updatedConfig.settings ) || {},
+				},
+				options
+			);
 		},
 		[ globalStylesId ]
 	);
 
-	return [ !! settings || !! styles, config, setConfig ];
+	return [ isReady, config, setConfig ];
 }
 
 function useGlobalStylesBaseConfig() {

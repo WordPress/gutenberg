@@ -14,6 +14,8 @@ import { Component } from '@wordpress/element';
  */
 import withFocusReturn from '../';
 
+jest.useFakeTimers();
+
 class Test extends Component {
 	render() {
 		const { className, focusHistory } = this.props;
@@ -88,7 +90,7 @@ describe( 'withFocusReturn()', () => {
 				advanceTimers: jest.advanceTimersByTime,
 			} );
 
-			const { container, unmount } = render( <Composite />, {
+			const { unmount } = render( <Composite />, {
 				container: document.body.appendChild(
 					document.createElement( 'div' )
 				),
@@ -103,9 +105,6 @@ describe( 'withFocusReturn()', () => {
 
 			// Should return to the activeElement saved with this component.
 			unmount();
-			render( <div></div>, {
-				container,
-			} );
 			expect( activeElement ).toHaveFocus();
 		} );
 	} );

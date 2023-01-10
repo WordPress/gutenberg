@@ -41,7 +41,7 @@ const UI = {
 	themeDark10: ADMIN.themeDark10,
 	background: white,
 	backgroundDisabled: GRAY[ 100 ],
-	border: GRAY[ 700 ],
+	border: GRAY[ 600 ],
 	borderHover: GRAY[ 700 ],
 	borderFocus: ADMIN.themeDark10,
 	borderDisabled: GRAY[ 400 ],

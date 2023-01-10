@@ -18,6 +18,8 @@ From your plugins directory, to create your block run:
 npx @wordpress/create-block gutenpride --template @wordpress/create-block-tutorial-template
 ```
 
+> Remember that you should use Node.js v14. Other versions may result in an error in the terminal. See [Node Development Tools](https://developer.wordpress.org/block-editor/getting-started/devenv/#node-development-tools) for more info.
+
 The [npx command](https://docs.npmjs.com/cli/v8/commands/npx) runs a command from a remote package, in this case our create-block package that will create a new directory called `gutenpride`, installs the necessary files, and builds the block plugin. If you want an interactive mode that prompts you for details, run the command without the `gutenpride` name.
 
 You now need to activate the plugin from inside wp-admin plugins page.

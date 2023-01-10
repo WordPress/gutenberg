@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, map } from 'lodash';
+import { map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -23,8 +23,7 @@ export function MetaBoxesSection( {
 	...sectionProps
 } ) {
 	// The 'Custom Fields' meta box is a special case that we handle separately.
-	const thirdPartyMetaBoxes = filter(
-		metaBoxes,
+	const thirdPartyMetaBoxes = metaBoxes.filter(
 		( { id } ) => id !== 'postcustom'
 	);
 

@@ -85,7 +85,7 @@ describe( 'PostTaxonomies', () => {
 	} );
 
 	it( 'should render no children if taxonomy data not available', () => {
-		const taxonomies = {};
+		const taxonomies = null;
 
 		const { container } = render(
 			<PostTaxonomies postType="page" taxonomies={ taxonomies } />

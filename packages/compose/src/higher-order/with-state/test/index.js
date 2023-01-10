@@ -9,6 +9,8 @@ import userEvent from '@testing-library/user-event';
  */
 import withState from '../';
 
+jest.useFakeTimers();
+
 describe( 'withState', () => {
 	it( 'should pass initial state and allow updates', async () => {
 		const user = userEvent.setup( {

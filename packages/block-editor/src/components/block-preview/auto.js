@@ -25,14 +25,18 @@ function ScaledBlockPreview( {
 	containerWidth,
 	__experimentalPadding,
 	__experimentalMinHeight,
+	__experimentalStyles,
 } ) {
+	if ( ! viewportWidth ) {
+		viewportWidth = containerWidth;
+	}
+
 	const [ contentResizeListener, { height: contentHeight } ] =
 		useResizeObserver();
-	const { styles, assets, duotone } = useSelect( ( select ) => {
+	const { styles, duotone } = useSelect( ( select ) => {
 		const settings = select( store ).getSettings();
 		return {
 			styles: settings.styles,
-			assets: settings.__unstableResolvedAssets,
 			duotone: settings.__experimentalFeatures?.color?.duotone,
 		};
 	}, [] );
@@ -42,6 +46,7 @@ function ScaledBlockPreview( {
 		if ( styles ) {
 			return [
 				...styles,
+				...__experimentalStyles,
 				{
 					css: 'body{height:auto;overflow:hidden;}',
 					__unstableType: 'presets',
@@ -50,7 +55,7 @@ function ScaledBlockPreview( {
 		}
 
 		return styles;
-	}, [ styles ] );
+	}, [ styles, __experimentalStyles ] );
 
 	const svgFilters = useMemo( () => {
 		return [ ...( duotone?.default ?? [] ), ...( duotone?.theme ?? [] ) ];
@@ -73,7 +78,6 @@ function ScaledBlockPreview( {
 		>
 			<Iframe
 				head={ <EditorStyles styles={ editorStyles } /> }
-				assets={ assets }
 				contentRef={ useRefEffect( ( bodyElement ) => {
 					const {
 						ownerDocument: { documentElement },

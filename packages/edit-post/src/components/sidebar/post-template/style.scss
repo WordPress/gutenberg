@@ -5,6 +5,8 @@
 	span {
 		display: block;
 		width: 45%;
+		// Match padding on tertiary buttons for alignment.
+		padding: $grid-unit-15 * 0.5 0;
 	}
 }
 

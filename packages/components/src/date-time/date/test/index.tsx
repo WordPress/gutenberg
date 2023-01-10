@@ -10,6 +10,8 @@ import userEvent from '@testing-library/user-event';
  */
 import DatePicker from '..';
 
+jest.useFakeTimers();
+
 describe( 'DatePicker', () => {
 	it( 'should highlight the current date', () => {
 		render( <DatePicker currentDate="2022-05-02T11:00:00" /> );

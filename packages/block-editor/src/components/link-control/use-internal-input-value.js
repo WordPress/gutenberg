@@ -10,11 +10,11 @@ export default function useInternalInputValue( value ) {
 
 	useEffect( () => {
 		/**
-		 * If the value's `text` property changes then sync this
+		 * If the value changes then sync this
 		 * back up with state.
 		 */
-		if ( value?.title && value.title !== internalInputValue ) {
-			setInternalInputValue( value.title );
+		if ( value && value !== internalInputValue ) {
+			setInternalInputValue( value );
 		}
 	}, [ value ] );
 

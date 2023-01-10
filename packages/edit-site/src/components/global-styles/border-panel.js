@@ -184,7 +184,6 @@ export default function BorderPanel( { name } ) {
 						popoverOffset={ 40 }
 						popoverPlacement="left-start"
 						value={ border }
-						__experimentalHasMultipleOrigins={ true }
 						__experimentalIsRenderedInSidebar={ true }
 						size={ '__unstable-large' }
 					/>

@@ -6,7 +6,7 @@ import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
-import { dispatch, select } from '@wordpress/data';
+import { dispatch } from '@wordpress/data';
 import { render, unmountComponentAtNode } from '@wordpress/element';
 import {
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
@@ -15,19 +15,15 @@ import {
 import { store as editorStore } from '@wordpress/editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { __ } from '@wordpress/i18n';
-import { store as viewportStore } from '@wordpress/viewport';
-import { getQueryArgs } from '@wordpress/url';
 import { addFilter } from '@wordpress/hooks';
+import { registerLegacyWidgetBlock } from '@wordpress/widgets';
 
 /**
  * Internal dependencies
  */
 import './hooks';
 import { store as editSiteStore } from './store';
-import EditSiteApp from './components/app';
-import getIsListPage from './utils/get-is-list-page';
-import ErrorBoundaryWarning from './components/error-boundary/warning';
+import App from './components/app';
 
 /**
  * Reinitializes the editor after the user chooses to reboot the editor after
@@ -38,22 +34,6 @@ import ErrorBoundaryWarning from './components/error-boundary/warning';
  * @param {?Object} settings Editor settings object.
  */
 export function reinitializeEditor( target, settings ) {
-	// Display warning if editor wasn't able to resolve homepage template.
-	if ( ! settings.__unstableHomeTemplate ) {
-		render(
-			<ErrorBoundaryWarning
-				message={ __(
-					'The editor is unable to find a block template for the homepage.'
-				) }
-				dashboardLink={
-					settings.__experimentalDashboardLink ?? 'index.php'
-				}
-			/>,
-			target
-		);
-		return;
-	}
-
 	/*
 	 * Prevent adding the Clasic block in the site editor.
 	 * Only add the filter when the site editor is initialized, not imported.
@@ -91,16 +71,6 @@ export function reinitializeEditor( target, settings ) {
 			showListViewByDefault: false,
 		} );
 
-		// Check if the block list view should be open by default.
-		if (
-			select( preferencesStore ).get(
-				'core/edit-site',
-				'showListViewByDefault'
-			)
-		) {
-			dispatch( editSiteStore ).setIsListViewOpened( true );
-		}
-
 		dispatch( interfaceStore ).setDefaultComplementaryArea(
 			'core/edit-site',
 			'edit-site/template'
@@ -116,31 +86,13 @@ export function reinitializeEditor( target, settings ) {
 			defaultTemplateTypes: settings.defaultTemplateTypes,
 			defaultTemplatePartAreas: settings.defaultTemplatePartAreas,
 		} );
-
-		const isLandingOnListPage = getIsListPage(
-			getQueryArgs( window.location.href )
-		);
-
-		if ( isLandingOnListPage ) {
-			// Default the navigation panel to be opened when we're in a bigger
-			// screen and land in the list screen.
-			dispatch( editSiteStore ).setIsNavigationPanelOpened(
-				select( viewportStore ).isViewportMatch( 'medium' )
-			);
-		}
 	}
 
 	// Prevent the default browser action for files dropped outside of dropzones.
 	window.addEventListener( 'dragover', ( e ) => e.preventDefault(), false );
 	window.addEventListener( 'drop', ( e ) => e.preventDefault(), false );
 
-	render(
-		<EditSiteApp
-			reboot={ reboot }
-			homeTemplate={ settings.__unstableHomeTemplate }
-		/>,
-		target
-	);
+	render( <App reboot={ reboot } />, target );
 }
 
 /**
@@ -158,6 +110,7 @@ export function initializeEditor( id, settings ) {
 
 	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
 	registerCoreBlocks();
+	registerLegacyWidgetBlock( { inserter: false } );
 	if ( process.env.IS_GUTENBERG_PLUGIN ) {
 		__experimentalRegisterExperimentalCoreBlocks( {
 			enableFSEBlocks: true,
@@ -167,7 +120,6 @@ export function initializeEditor( id, settings ) {
 	reinitializeEditor( target, settings );
 }
 
-export { default as __experimentalNavigationToggle } from './components/navigation-sidebar/navigation-toggle';
 export { default as PluginSidebar } from './components/sidebar-edit-mode/plugin-sidebar';
 export { default as PluginSidebarMoreMenuItem } from './components/header-edit-mode/plugin-sidebar-more-menu-item';
 export { default as PluginMoreMenuItem } from './components/header-edit-mode/plugin-more-menu-item';

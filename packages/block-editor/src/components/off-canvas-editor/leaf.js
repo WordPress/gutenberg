@@ -36,7 +36,11 @@ export default function ListViewLeaf( {
 	return (
 		<AnimatedTreeGridRow
 			ref={ ref }
-			className={ classnames( 'block-editor-list-view-leaf', className ) }
+			className={ classnames(
+				'block-editor-list-view-leaf',
+				'offcanvas-editor-list-view-leaf',
+				className
+			) }
 			level={ level }
 			positionInSet={ position }
 			setSize={ rowCount }

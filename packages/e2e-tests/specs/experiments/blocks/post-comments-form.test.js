@@ -6,8 +6,7 @@ import {
 	activateTheme,
 	setOption,
 	visitSiteEditor,
-	openSiteEditorNavigationPanel,
-	navigateSiteEditorBackToRoot,
+	enterEditMode,
 	deleteAllTemplates,
 	canvas,
 } from '@wordpress/e2e-test-utils';
@@ -24,15 +23,15 @@ describe( 'Post Comments Form', () => {
 
 			// Navigate to "Singular" post template
 			await visitSiteEditor();
-			await openSiteEditorNavigationPanel();
-			await navigateSiteEditorBackToRoot();
 			await expect( page ).toClick(
-				'.components-navigation__item-title',
+				'.edit-site-sidebar-navigation-item',
 				{ text: /templates/i }
 			);
-			await expect( page ).toClick( '.components-heading > a', {
-				text: /singular/i,
-			} );
+			await expect( page ).toClick(
+				'.edit-site-sidebar-navigation-item',
+				{ text: /singular/i }
+			);
+			await enterEditMode();
 
 			// Insert post comments form
 			await insertBlock( 'Post Comments Form' );

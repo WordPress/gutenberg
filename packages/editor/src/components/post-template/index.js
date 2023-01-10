@@ -44,6 +44,7 @@ export function PostTemplate() {
 
 	return (
 		<SelectControl
+			__nextHasNoMarginBottom
 			label={ __( 'Template:' ) }
 			value={ selectedTemplate }
 			onChange={ ( templateSlug ) => {

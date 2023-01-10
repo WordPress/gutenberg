@@ -45,7 +45,6 @@ function ColorGradientControlInner( {
 	gradients,
 	disableCustomColors,
 	disableCustomGradients,
-	__experimentalHasMultipleOrigins,
 	__experimentalIsRenderedInSidebar,
 	className,
 	label,
@@ -80,9 +79,6 @@ function ColorGradientControlInner( {
 						: onColorChange
 				}
 				{ ...{ colors, disableCustomColors } }
-				__experimentalHasMultipleOrigins={
-					__experimentalHasMultipleOrigins
-				}
 				__experimentalIsRenderedInSidebar={
 					__experimentalIsRenderedInSidebar
 				}
@@ -103,9 +99,6 @@ function ColorGradientControlInner( {
 						: onGradientChange
 				}
 				{ ...{ gradients, disableCustomGradients } }
-				__experimentalHasMultipleOrigins={
-					__experimentalHasMultipleOrigins
-				}
 				__experimentalIsRenderedInSidebar={
 					__experimentalIsRenderedInSidebar
 				}

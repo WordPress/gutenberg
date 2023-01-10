@@ -387,7 +387,7 @@ function gutenberg_get_duotone_filter_svg( $preset ) {
 
 	$svg = ob_get_clean();
 
-	if ( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) {
+	if ( ! SCRIPT_DEBUG ) {
 		// Clean up the whitespace.
 		$svg = preg_replace( "/[\r\n\t ]+/", ' ', $svg );
 		$svg = str_replace( '> <', '><', $svg );
@@ -464,7 +464,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 
 	// !important is needed because these styles render before global styles,
 	// and they should be overriding the duotone filters set by global styles.
-	$filter_style = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG
+	$filter_style = SCRIPT_DEBUG
 		? $selector . " {\n\tfilter: " . $filter_property . " !important;\n}\n"
 		: $selector . '{filter:' . $filter_property . ' !important;}';
 

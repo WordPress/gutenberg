@@ -24,10 +24,7 @@ const getGroupPlaceholderIcons = ( name = 'group' ) => {
 				height="32"
 				viewBox="0 0 44 32"
 			>
-				<Path
-					d="M42 0H2C.9 0 0 .9 0 2v28c0 1.1.9 2 2 2h40c1.1 0 2-.9 2-2V2c0-1.1-.9-2-2-2z"
-					// style="fill:#ccc"
-				/>
+				<Path d="M42 0H2C.9 0 0 .9 0 2v28c0 1.1.9 2 2 2h40c1.1 0 2-.9 2-2V2c0-1.1-.9-2-2-2z" />
 			</SVG>
 		),
 		'group-row': (
@@ -37,10 +34,7 @@ const getGroupPlaceholderIcons = ( name = 'group' ) => {
 				height="32"
 				viewBox="0 0 44 32"
 			>
-				<Path
-					d="M42 0H23.5c-.6 0-1 .4-1 1v30c0 .6.4 1 1 1H42c1.1 0 2-.9 2-2V2c0-1.1-.9-2-2-2zM20.5 0H2C.9 0 0 .9 0 2v28c0 1.1.9 2 2 2h18.5c.6 0 1-.4 1-1V1c0-.6-.4-1-1-1z"
-					// style="fill:#ccc"
-				/>
+				<Path d="M42 0H23.5c-.6 0-1 .4-1 1v30c0 .6.4 1 1 1H42c1.1 0 2-.9 2-2V2c0-1.1-.9-2-2-2zM20.5 0H2C.9 0 0 .9 0 2v28c0 1.1.9 2 2 2h18.5c.6 0 1-.4 1-1V1c0-.6-.4-1-1-1z" />
 			</SVG>
 		),
 		'group-stack': (
@@ -50,10 +44,7 @@ const getGroupPlaceholderIcons = ( name = 'group' ) => {
 				height="32"
 				viewBox="0 0 44 32"
 			>
-				<Path
-					d="M42 0H2C.9 0 0 .9 0 2v12.5c0 .6.4 1 1 1h42c.6 0 1-.4 1-1V2c0-1.1-.9-2-2-2zm1 16.5H1c-.6 0-1 .4-1 1V30c0 1.1.9 2 2 2h40c1.1 0 2-.9 2-2V17.5c0-.6-.4-1-1-1z"
-					// style="fill:#ccc"
-				/>
+				<Path d="M42 0H2C.9 0 0 .9 0 2v12.5c0 .6.4 1 1 1h42c.6 0 1-.4 1-1V2c0-1.1-.9-2-2-2zm1 16.5H1c-.6 0-1 .4-1 1V30c0 1.1.9 2 2 2h40c1.1 0 2-.9 2-2V17.5c0-.6-.4-1-1-1z" />
 			</SVG>
 		),
 	};
@@ -130,23 +121,13 @@ export function useShouldShowPlaceHolder( {
  * @return {JSX.Element}                The placeholder.
  */
 function GroupPlaceHolder( { name, onSelect } ) {
-	const { defaultVariation, variations } = useSelect(
-		( select ) => {
-			const { getBlockVariations, getDefaultBlockVariation } =
-				select( blocksStore );
-			return {
-				defaultVariation: getDefaultBlockVariation( name, 'block' ),
-				variations: getBlockVariations( name, 'block' ) || [],
-			};
-		},
+	const variations = useSelect(
+		( select ) => select( blocksStore ).getBlockVariations( name, 'block' ),
 		[ name ]
 	);
 	const blockProps = useBlockProps( {
 		className: 'wp-block-group__placeholder',
 	} );
-	const selectVariation = ( nextVariation = defaultVariation ) =>
-		onSelect( nextVariation );
-
 	return (
 		<div { ...blockProps }>
 			<Placeholder
@@ -171,7 +152,7 @@ function GroupPlaceHolder( { name, onSelect } ) {
 									variation.name
 								) }
 								iconSize={ 44 }
-								onClick={ () => selectVariation( variation ) }
+								onClick={ () => onSelect( variation ) }
 								className="wp-block-group-placeholder__variation-button"
 								label={ `${ variation.title }: ${ variation.description }` }
 							/>

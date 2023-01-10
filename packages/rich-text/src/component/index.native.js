@@ -372,6 +372,7 @@ export class RichText extends Component {
 		this.customEditableOnKeyDown?.( {
 			preventDefault: () => undefined,
 			...event,
+			key: RCTAztecView.KeyCodes[ event?.keyCode ],
 		} );
 
 		this.handleDelete( event );

@@ -13,6 +13,7 @@ export default function CommentsInspectorControls( {
 		<InspectorControls>
 			<InspectorControls __experimentalGroup="advanced">
 				<SelectControl
+					__nextHasNoMarginBottom
 					label={ __( 'HTML element' ) }
 					options={ [
 						{ label: __( 'Default (<div>)' ), value: 'div' },

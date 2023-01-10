@@ -9,6 +9,8 @@ import userEvent from '@testing-library/user-event';
  */
 import { createCustomColorsHOC } from '../with-colors';
 
+jest.useFakeTimers();
+
 describe( 'createCustomColorsHOC', () => {
 	it( 'provides the wrapped component with color values and setter functions as props', () => {
 		const withCustomColors = createCustomColorsHOC( [

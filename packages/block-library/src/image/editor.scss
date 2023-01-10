@@ -161,17 +161,6 @@ figure.wp-block-image:not(.wp-block) {
 		min-width: 260px;
 		overflow: visible !important;
 	}
-
-	.components-range-control {
-		flex: 1;
-	}
-
-	.components-base-control__field {
-		display: flex;
-		margin-bottom: 0;
-		flex-direction: column;
-		align-items: flex-start;
-	}
 }
 
 .wp-block-image__aspect-ratio {

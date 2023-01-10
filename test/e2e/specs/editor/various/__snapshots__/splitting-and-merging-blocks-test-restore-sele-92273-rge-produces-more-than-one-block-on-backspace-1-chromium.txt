@@ -3,9 +3,11 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>-item 1</p>
+<p>item 1</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
-<p>item 2</p>
-<!-- /wp:paragraph -->
+<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>item 2</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->

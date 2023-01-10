@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { ScrollView } from 'react-native';
-import { find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -35,7 +34,7 @@ function BlockStyles( { clientId, url } ) {
 
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
-	const renderedStyles = find( styles, 'isDefault' )
+	const renderedStyles = styles?.find( ( style ) => style.isDefault )
 		? styles
 		: [
 				{

@@ -20,6 +20,8 @@ import {
 	NavigatorBackButton,
 } from '..';
 
+jest.useFakeTimers();
+
 jest.mock( 'framer-motion', () => {
 	const actual = jest.requireActual( 'framer-motion' );
 	return {

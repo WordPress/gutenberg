@@ -18,6 +18,7 @@ import {
 } from '@wordpress/components';
 import {
 	__experimentalUseCustomSides as useCustomSides,
+	__experimentalHeightControl as HeightControl,
 	__experimentalSpacingSizesControl as SpacingSizesControl,
 } from '@wordpress/block-editor';
 import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
@@ -556,19 +557,15 @@ export default function DimensionsPanel( { name } ) {
 			) }
 			{ showMinHeightControl && (
 				<ToolsPanelItem
-					className="single-column"
 					hasValue={ hasMinHeightValue }
 					label={ __( 'Min. height' ) }
 					onDeselect={ resetMinHeightValue }
 					isShownByDefault={ true }
 				>
-					<UnitControl
+					<HeightControl
 						label={ __( 'Min. height' ) }
 						value={ minHeightValue }
 						onChange={ setMinHeightValue }
-						units={ units }
-						min={ 0 }
-						size={ '__unstable-large' }
 					/>
 				</ToolsPanelItem>
 			) }

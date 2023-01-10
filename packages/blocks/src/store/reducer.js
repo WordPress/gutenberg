@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, find, get, isEmpty, map, mapValues } from 'lodash';
+import { get, isEmpty, map, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -144,8 +144,11 @@ export function blockStyles( state = {}, action ) {
 		case 'REMOVE_BLOCK_STYLES':
 			return {
 				...state,
-				[ action.blockName ]: filter(
-					get( state, [ action.blockName ], [] ),
+				[ action.blockName ]: get(
+					state,
+					[ action.blockName ],
+					[]
+				).filter(
 					( style ) => action.styleNames.indexOf( style.name ) === -1
 				),
 			};
@@ -195,8 +198,11 @@ export function blockVariations( state = {}, action ) {
 		case 'REMOVE_BLOCK_VARIATIONS':
 			return {
 				...state,
-				[ action.blockName ]: filter(
-					get( state, [ action.blockName ], [] ),
+				[ action.blockName ]: get(
+					state,
+					[ action.blockName ],
+					[]
+				).filter(
 					( variation ) =>
 						action.variationNames.indexOf( variation.name ) === -1
 				),
@@ -259,7 +265,9 @@ export function categories( state = DEFAULT_CATEGORIES, action ) {
 			if ( ! action.category || isEmpty( action.category ) ) {
 				return state;
 			}
-			const categoryToChange = find( state, [ 'slug', action.slug ] );
+			const categoryToChange = state.find(
+				( { slug } ) => slug === action.slug
+			);
 			if ( categoryToChange ) {
 				return map( state, ( category ) => {
 					if ( category.slug === action.slug ) {

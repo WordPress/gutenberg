@@ -189,6 +189,11 @@ export function BlockSettingsDropdown( {
 		},
 	} );
 
+	// This can occur when the selected block (the parent)
+	// displays child blocks within a List View.
+	const parentBlockIsSelected =
+		selectedBlockClientIds?.includes( firstParentClientId );
+
 	return (
 		<BlockActions
 			clientIds={ clientIds }
@@ -204,6 +209,7 @@ export function BlockSettingsDropdown( {
 				onInsertBefore,
 				onRemove,
 				onCopy,
+				onPasteStyles,
 				onMoveTo,
 				blocks,
 			} ) => (
@@ -221,26 +227,33 @@ export function BlockSettingsDropdown( {
 								<__unstableBlockSettingsMenuFirstItem.Slot
 									fillProps={ { onClose } }
 								/>
-								{ !! firstParentClientId && (
-									<MenuItem
-										{ ...showParentOutlineGestures }
-										ref={ selectParentButtonRef }
-										icon={
-											<BlockIcon
-												icon={ parentBlockType.icon }
-											/>
-										}
-										onClick={ () =>
-											selectBlock( firstParentClientId )
-										}
-									>
-										{ sprintf(
-											/* translators: %s: Name of the block's parent. */
-											__( 'Select parent block (%s)' ),
-											parentBlockType.title
-										) }
-									</MenuItem>
-								) }
+								{ ! parentBlockIsSelected &&
+									!! firstParentClientId && (
+										<MenuItem
+											{ ...showParentOutlineGestures }
+											ref={ selectParentButtonRef }
+											icon={
+												<BlockIcon
+													icon={
+														parentBlockType.icon
+													}
+												/>
+											}
+											onClick={ () =>
+												selectBlock(
+													firstParentClientId
+												)
+											}
+										>
+											{ sprintf(
+												/* translators: %s: Name of the block's parent. */
+												__(
+													'Select parent block (%s)'
+												),
+												parentBlockType.title
+											) }
+										</MenuItem>
+									) }
 								{ count === 1 && (
 									<BlockHTMLConvertButton
 										clientId={ firstBlockClientId }
@@ -250,6 +263,9 @@ export function BlockSettingsDropdown( {
 									blocks={ blocks }
 									onCopy={ onCopy }
 								/>
+								<MenuItem onClick={ onPasteStyles }>
+									{ __( 'Paste styles' ) }
+								</MenuItem>
 								{ canDuplicate && (
 									<MenuItem
 										onClick={ pipe(

@@ -35,3 +35,23 @@ Default.args = {
 		},
 	],
 };
+
+export const DisabledTab = Template.bind( {} );
+DisabledTab.args = {
+	children: ( tab ) => <p>Selected tab: { tab.title }</p>,
+	tabs: [
+		{
+			name: 'tab1',
+			title: 'Tab 1',
+			disabled: true,
+		},
+		{
+			name: 'tab2',
+			title: 'Tab 2',
+		},
+		{
+			name: 'tab3',
+			title: 'Tab 3',
+		},
+	],
+};

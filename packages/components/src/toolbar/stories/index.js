@@ -17,15 +17,8 @@ import {
 /**
  * Internal dependencies
  */
-import Toolbar from '../';
-import {
-	SVG,
-	Path,
-	ToolbarButton,
-	ToolbarGroup,
-	ToolbarItem,
-	DropdownMenu,
-} from '../../';
+import { Toolbar, ToolbarButton, ToolbarGroup, ToolbarItem } from '..';
+import { SVG, Path, DropdownMenu } from '../../..';
 
 export default { title: 'Components/Toolbar', component: Toolbar };
 

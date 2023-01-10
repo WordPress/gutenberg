@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, act } from '@testing-library/react';
+import { render, screen, act, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -12,6 +12,12 @@ import Tooltip from '../';
  * WordPress dependencies
  */
 import { TOOLTIP_DELAY } from '../index.js';
+
+jest.useFakeTimers();
+
+function getWrappingPopoverElement( element ) {
+	return element.closest( '.components-popover' );
+}
 
 describe( 'Tooltip', () => {
 	describe( '#render()', () => {
@@ -24,7 +30,7 @@ describe( 'Tooltip', () => {
 			);
 
 			const button = screen.getByText( 'Button 1' );
-			button.focus();
+			act( () => button.focus() );
 			expect( screen.queryByText( 'Help text' ) ).not.toBeInTheDocument();
 		} );
 
@@ -37,11 +43,11 @@ describe( 'Tooltip', () => {
 
 			expect(
 				screen.getByRole( 'button', { name: 'Hover Me!' } )
-			).toBeInTheDocument();
+			).toBeVisible();
 			expect( screen.queryByText( 'Help text' ) ).not.toBeInTheDocument();
 		} );
 
-		it( 'should render children with additional tooltip when focused', () => {
+		it( 'should render children with additional tooltip when focused', async () => {
 			const mockOnFocus = jest.fn();
 
 			render(
@@ -51,19 +57,27 @@ describe( 'Tooltip', () => {
 			);
 
 			const button = screen.getByRole( 'button', { name: 'Hover Me!' } );
-			expect( button ).toBeInTheDocument();
+			expect( button ).toBeVisible();
 
 			// Before focus, the tooltip is not shown.
 			expect( screen.queryByText( 'Help text' ) ).not.toBeInTheDocument();
 
-			button.focus();
+			act( () => button.focus() );
 
 			// Tooltip is shown after focusing the anchor.
-			expect( screen.getByText( 'Help text' ) ).toBeInTheDocument();
+			const tooltip = screen.getByText( 'Help text' );
+			expect( tooltip ).toBeVisible();
 			expect( mockOnFocus ).toHaveBeenCalledWith(
 				expect.objectContaining( {
 					type: 'focus',
 				} )
+			);
+
+			// Wait for the tooltip element to be positioned (aligned with the button)
+			await waitFor( () =>
+				expect(
+					getWrappingPopoverElement( tooltip )
+				).toBePositionedPopover()
 			);
 		} );
 
@@ -79,7 +93,7 @@ describe( 'Tooltip', () => {
 			);
 
 			const button = screen.getByRole( 'button', { name: 'Hover Me!' } );
-			expect( button ).toBeInTheDocument();
+			expect( button ).toBeVisible();
 
 			await user.hover( button );
 
@@ -89,7 +103,15 @@ describe( 'Tooltip', () => {
 			act( () => jest.advanceTimersByTime( TOOLTIP_DELAY ) );
 
 			// Tooltip shows after the delay
-			expect( screen.getByText( 'Help text' ) ).toBeInTheDocument();
+			const tooltip = screen.getByText( 'Help text' );
+			expect( tooltip ).toBeVisible();
+
+			// Wait for the tooltip element to be positioned (aligned with the button)
+			await waitFor( () =>
+				expect(
+					getWrappingPopoverElement( tooltip )
+				).toBePositionedPopover()
+			);
 		} );
 
 		it( 'should not show tooltip on focus as result of mouse click', async () => {
@@ -105,7 +127,7 @@ describe( 'Tooltip', () => {
 			);
 
 			const button = screen.getByRole( 'button', { text: 'Hover Me!' } );
-			expect( button ).toBeInTheDocument();
+			expect( button ).toBeVisible();
 
 			await user.click( button );
 
@@ -144,7 +166,7 @@ describe( 'Tooltip', () => {
 			);
 
 			const button = screen.getByRole( 'button', { name: 'Hover Me!' } );
-			expect( button ).toBeInTheDocument();
+			expect( button ).toBeVisible();
 
 			await user.hover( button );
 
@@ -161,9 +183,17 @@ describe( 'Tooltip', () => {
 			act( () => jest.advanceTimersByTime( TEST_DELAY - TOOLTIP_DELAY ) );
 
 			// Tooltip shows after TEST_DELAY time
-			expect( screen.getByText( 'Help text' ) ).toBeInTheDocument();
+			const tooltip = screen.getByText( 'Help text' );
+			expect( tooltip ).toBeVisible();
 
 			expect( mockOnFocus ).not.toHaveBeenCalled();
+
+			// Wait for the tooltip element to be positioned (aligned with the button)
+			await waitFor( () =>
+				expect(
+					getWrappingPopoverElement( tooltip )
+				).toBePositionedPopover()
+			);
 		} );
 
 		it( 'should show tooltip when an element is disabled', async () => {
@@ -178,12 +208,13 @@ describe( 'Tooltip', () => {
 			);
 
 			const button = screen.getByRole( 'button', { name: 'Click me' } );
-			expect( button ).toBeInTheDocument();
+			expect( button ).toBeVisible();
 			expect( button ).toBeDisabled();
 
 			// Note: this is testing for implementation details,
 			// but couldn't find a better way.
 			const buttonRect = button.getBoundingClientRect();
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
 			const eventCatcher = container.querySelector( '.event-catcher' );
 			const eventCatcherRect = eventCatcher.getBoundingClientRect();
 			expect( buttonRect ).toEqual( eventCatcherRect );
@@ -198,9 +229,15 @@ describe( 'Tooltip', () => {
 			act( () => jest.advanceTimersByTime( TOOLTIP_DELAY ) );
 
 			// Tooltip shows after the delay
-			expect(
-				screen.getByText( 'Show helpful text here' )
-			).toBeInTheDocument();
+			const tooltip = screen.getByText( 'Show helpful text here' );
+			expect( tooltip ).toBeVisible();
+
+			// Wait for the tooltip element to be positioned (aligned with the button)
+			await waitFor( () =>
+				expect(
+					getWrappingPopoverElement( tooltip )
+				).toBePositionedPopover()
+			);
 		} );
 
 		it( 'should not emit events back to children when they are disabled', async () => {
@@ -217,8 +254,8 @@ describe( 'Tooltip', () => {
 				</Tooltip>
 			);
 
-			const eventCatcher =
-				container.getElementsByClassName( 'event-catcher' )[ 0 ];
+			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+			const eventCatcher = container.querySelector( '.event-catcher' );
 			await user.click( eventCatcher );
 			expect( onClickMock ).not.toHaveBeenCalled();
 		} );
@@ -275,6 +312,62 @@ describe( 'Tooltip', () => {
 
 			// Tooltip won't show, since the mouse has left the anchor
 			expect( screen.queryByText( 'Help text' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'should render the shortcut display text when a string is passed as the shortcut', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			render(
+				<Tooltip text="Help text" shortcut="shortcut text">
+					<button>Hover Me!</button>
+				</Tooltip>
+			);
+
+			const button = screen.getByRole( 'button', { name: 'Hover Me!' } );
+			await user.hover( button );
+
+			const tooltip = await screen.findByText( 'shortcut text' );
+			expect( tooltip ).toBeVisible();
+
+			// Wait for the tooltip element to be positioned (aligned with the button)
+			await waitFor( () =>
+				expect(
+					getWrappingPopoverElement( tooltip )
+				).toBePositionedPopover()
+			);
+		} );
+
+		it( 'should render the shortcut display text and aria-label when an object is passed as the shortcut with the correct properties', async () => {
+			const user = userEvent.setup( {
+				advanceTimers: jest.advanceTimersByTime,
+			} );
+
+			render(
+				<Tooltip
+					text="Help text"
+					shortcut={ {
+						display: 'shortcut text',
+						ariaLabel: 'shortcut label',
+					} }
+				>
+					<button>Hover Me!</button>
+				</Tooltip>
+			);
+
+			const button = screen.getByRole( 'button', { name: 'Hover Me!' } );
+			await user.hover( button );
+
+			const tooltip = await screen.findByLabelText( 'shortcut label' );
+			expect( tooltip ).toHaveTextContent( 'shortcut text' );
+
+			// Wait for the tooltip element to be positioned (aligned with the button)
+			await waitFor( () =>
+				expect(
+					getWrappingPopoverElement( tooltip )
+				).toBePositionedPopover()
+			);
 		} );
 	} );
 } );

@@ -28,12 +28,18 @@ export function useUndoAutomaticChange() {
 				return;
 			}
 
+			const { __experimentalUndo } = getSettings();
+
+			if ( ! __experimentalUndo ) {
+				return;
+			}
+
 			if ( ! didAutomaticChange() ) {
 				return;
 			}
 
 			event.preventDefault();
-			getSettings().__experimentalUndo();
+			__experimentalUndo();
 		}
 
 		element.addEventListener( 'keydown', onKeyDown );

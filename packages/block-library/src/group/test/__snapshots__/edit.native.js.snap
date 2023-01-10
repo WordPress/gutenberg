@@ -3,7 +3,7 @@
 exports[`Group block inserts block and adds a Heading block as an inner block 1`] = `
 "<!-- wp:group {\\"layout\\":{\\"type\\":\\"constrained\\"}} -->
 <div class=\\"wp-block-group\\"><!-- wp:heading -->
-<h2></h2>
+<h2 class=\\"wp-block-heading\\"></h2>
 <!-- /wp:heading --></div>
 <!-- /wp:group -->"
 `;

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { View } from 'react-native';
-import { isEmpty } from 'lodash';
 
 /**
  * Internal dependencies
@@ -100,7 +99,7 @@ export const Gallery = ( props ) => {
 				isSelected={ isCaptionSelected }
 				accessible={ true }
 				accessibilityLabelCreator={ ( caption ) =>
-					isEmpty( caption )
+					! caption
 						? /* translators: accessibility text. Empty gallery caption. */
 
 						  'Gallery caption. Empty'

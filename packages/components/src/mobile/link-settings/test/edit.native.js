@@ -4,7 +4,7 @@
  * External dependencies
  */
 import Clipboard from '@react-native-clipboard/clipboard';
-import { fireEvent, initializeEditor, waitFor } from 'test/helpers';
+import { fireEvent, initializeEditor } from 'test/helpers';
 /**
  * WordPress dependencies
  */
@@ -76,24 +76,18 @@ describe.each( [
 		Clipboard.getString.mockReturnValue( url );
 
 		// Act.
-		const block = await waitFor( () =>
-			subject.getByLabelText(
-				type === 'core/image' ? /Image Block/ : /Button Block/
-			)
+		const [ block ] = await subject.findAllByLabelText(
+			type === 'core/image' ? /Image Block/ : /Button Block/
 		);
 		fireEvent.press( block );
 		fireEvent.press( block );
-		fireEvent.press(
-			await waitFor( () => subject.getByLabelText( 'Open Settings' ) )
-		);
+		fireEvent.press( await subject.findByLabelText( 'Open Settings' ) );
 
 		// Assert.
-		const linkToField = await waitFor( () =>
-			subject.getByLabelText(
-				`Link to, ${
-					type === 'core/image' ? 'None' : 'Search or type URL'
-				}`
-			)
+		const linkToField = await subject.findByLabelText(
+			`Link to, ${
+				type === 'core/image' ? 'None' : 'Search or type URL'
+			}`
 		);
 		expect( linkToField ).toBeTruthy();
 	} );
@@ -113,37 +107,29 @@ describe.each( [
 				Clipboard.getString.mockReturnValue( url );
 
 				// Act.
-				const block = await waitFor( () =>
-					subject.getByLabelText(
-						type === 'core/image' ? /Image Block/ : /Button Block/
-					)
+				const [ block ] = await subject.findAllByLabelText(
+					type === 'core/image' ? /Image Block/ : /Button Block/
 				);
 				fireEvent.press( block );
 				fireEvent.press( block );
 				fireEvent.press(
-					await waitFor( () =>
-						subject.getByLabelText( 'Open Settings' )
-					)
+					await subject.findByLabelText( 'Open Settings' )
 				);
 				fireEvent.press(
-					await waitFor( () =>
-						subject.getByLabelText(
-							`Link to, ${
-								type === 'core/image'
-									? 'None'
-									: 'Search or type URL'
-							}`
-						)
+					await subject.findByLabelText(
+						`Link to, ${
+							type === 'core/image'
+								? 'None'
+								: 'Search or type URL'
+						}`
 					)
 				);
 				if ( type === 'core/image' ) {
 					fireEvent.press(
-						await waitFor( () =>
-							subject.getByLabelText( /Custom URL/ )
-						)
+						await subject.findByLabelText( /Custom URL/ )
 					);
 				}
-				await waitFor( () => subject.getByLabelText( 'Apply' ) );
+				await subject.findByLabelText( 'Apply' );
 
 				// Assert.
 				expect(
@@ -166,60 +152,46 @@ describe.each( [
 				Clipboard.getString.mockReturnValue( url );
 
 				// Act.
-				const block = await waitFor( () =>
-					subject.getByLabelText(
-						type === 'core/image' ? /Image Block/ : /Button Block/
-					)
+				const [ block ] = await subject.findAllByLabelText(
+					type === 'core/image' ? /Image Block/ : /Button Block/
 				);
 				fireEvent.press( block );
 				fireEvent.press( block );
 				fireEvent.press(
-					await waitFor( () =>
-						subject.getByLabelText( 'Open Settings' )
-					)
+					await subject.findByLabelText( 'Open Settings' )
 				);
 				fireEvent.press(
-					await waitFor( () =>
-						subject.getByLabelText(
-							`Link to, ${
-								type === 'core/image'
-									? 'None'
-									: 'Search or type URL'
-							}`
-						)
+					await subject.findByLabelText(
+						`Link to, ${
+							type === 'core/image'
+								? 'None'
+								: 'Search or type URL'
+						}`
 					)
 				);
 				if ( type === 'core/image' ) {
 					fireEvent.press(
-						await waitFor( () =>
-							subject.getByLabelText( 'Custom URL. Empty' )
-						)
+						await subject.findByLabelText( 'Custom URL. Empty' )
 					);
 				}
 				fireEvent.press(
-					await waitFor( () =>
-						subject.getByLabelText(
-							`Copy URL from the clipboard, ${ url }`
-						)
+					await subject.findByLabelText(
+						`Copy URL from the clipboard, ${ url }`
 					)
 				);
 				fireEvent.press(
-					await waitFor( () =>
-						subject.getByLabelText(
-							`Link to, ${
-								type === 'core/image' ? 'Custom URL' : url
-							}`
-						)
+					await subject.findByLabelText(
+						`Link to, ${
+							type === 'core/image' ? 'Custom URL' : url
+						}`
 					)
 				);
 				if ( type === 'core/image' ) {
 					fireEvent.press(
-						await waitFor( () =>
-							subject.getByLabelText( `Custom URL, ${ url }` )
-						)
+						await subject.findByLabelText( `Custom URL, ${ url }` )
 					);
 				}
-				await waitFor( () => subject.getByLabelText( 'Apply' ) );
+				await subject.findByLabelText( 'Apply' );
 
 				// Assert.
 				expect(
@@ -245,51 +217,37 @@ describe.each( [
 					Clipboard.getString.mockReturnValue( url );
 
 					// Act.
-					const block = await waitFor( () =>
-						subject.getByLabelText(
-							type === 'core/image'
-								? /Image Block/
-								: /Button Block/
-						)
+					const [ block ] = await subject.findAllByLabelText(
+						type === 'core/image' ? /Image Block/ : /Button Block/
 					);
 					fireEvent.press( block );
 					fireEvent.press( block );
 					fireEvent.press(
-						await waitFor( () =>
-							subject.getByLabelText( 'Open Settings' )
-						)
+						await subject.findByLabelText( 'Open Settings' )
 					);
 					fireEvent.press(
-						await waitFor( () =>
-							subject.getByLabelText(
-								`Link to, ${
-									type === 'core/image'
-										? 'None'
-										: 'Search or type URL'
-								}`
-							)
+						await subject.findByLabelText(
+							`Link to, ${
+								type === 'core/image'
+									? 'None'
+									: 'Search or type URL'
+							}`
 						)
 					);
 					if ( type === 'core/image' ) {
 						fireEvent.press(
-							await waitFor( () =>
-								subject.getByLabelText( /Custom URL/ )
-							)
+							await subject.findByLabelText( /Custom URL/ )
 						);
 					}
-					await waitFor( () =>
-						subject.getByLabelText(
-							`Copy URL from the clipboard, ${ url }`
-						)
+					await subject.findByLabelText(
+						`Copy URL from the clipboard, ${ url }`
 					);
 
 					// Assert.
-					const clipboardUrl = await waitFor( () =>
-						subject.getByText( url )
-					);
+					const clipboardUrl = await subject.findByText( url );
 					expect( clipboardUrl ).toBeTruthy();
-					const clipboardNote = await waitFor( () =>
-						subject.getByText( __( 'From clipboard' ) )
+					const clipboardNote = await subject.findByText(
+						__( 'From clipboard' )
 					);
 					expect( clipboardNote ).toBeTruthy();
 				}
@@ -312,53 +270,39 @@ describe.each( [
 					Clipboard.getString.mockReturnValue( url );
 
 					// Act.
-					const block = await waitFor( () =>
-						subject.getByLabelText(
-							type === 'core/image'
-								? /Image Block/
-								: /Button Block/
-						)
+					const [ block ] = await subject.findAllByLabelText(
+						type === 'core/image' ? /Image Block/ : /Button Block/
 					);
 					fireEvent.press( block );
 					fireEvent.press( block );
 					fireEvent.press(
-						await waitFor( () =>
-							subject.getByLabelText( 'Open Settings' )
-						)
+						await subject.findByLabelText( 'Open Settings' )
 					);
 					fireEvent.press(
-						await waitFor( () =>
-							subject.getByLabelText(
-								`Link to, ${
-									type === 'core/image'
-										? 'None'
-										: 'Search or type URL'
-								}`
-							)
+						await subject.findByLabelText(
+							`Link to, ${
+								type === 'core/image'
+									? 'None'
+									: 'Search or type URL'
+							}`
 						)
 					);
 					if ( type === 'core/image' ) {
 						fireEvent.press(
-							await waitFor( () =>
-								subject.getByLabelText( /Custom URL/ )
-							)
+							await subject.findByLabelText( /Custom URL/ )
 						);
 					}
 					fireEvent.press(
-						await waitFor( () =>
-							subject.getByLabelText(
-								`Copy URL from the clipboard, ${ url }`
-							)
+						await subject.findByLabelText(
+							`Copy URL from the clipboard, ${ url }`
 						)
 					);
 
 					// Assert.
-					const linkToField = await waitFor( () =>
-						subject.getByLabelText(
-							`Link to, ${
-								type === 'core/image' ? 'Custom URL' : url
-							}`
-						)
+					const linkToField = await subject.findByLabelText(
+						`Link to, ${
+							type === 'core/image' ? 'Custom URL' : url
+						}`
 					);
 					expect( linkToField ).toBeTruthy();
 				}

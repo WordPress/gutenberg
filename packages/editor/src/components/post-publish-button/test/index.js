@@ -9,6 +9,8 @@ import userEvent from '@testing-library/user-event';
  */
 import { PostPublishButton } from '../';
 
+jest.useFakeTimers();
+
 describe( 'PostPublishButton', () => {
 	describe( 'aria-disabled', () => {
 		it( 'should be true if post is currently saving', () => {

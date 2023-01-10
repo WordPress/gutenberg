@@ -472,6 +472,7 @@ const UnforwardedPopover = (
 			placement={ computedPlacement }
 			className={ classnames( 'components-popover', className, {
 				'is-expanded': isExpanded,
+				'is-positioned': x !== null && y !== null,
 				// Use the 'alternate' classname for 'toolbar' variant for back compat.
 				[ `is-${
 					computedVariant === 'toolbar'
@@ -488,8 +489,15 @@ const UnforwardedPopover = (
 					? undefined
 					: {
 							position: strategy,
-							left: Number.isNaN( x ) ? 0 : x ?? undefined,
-							top: Number.isNaN( y ) ? 0 : y ?? undefined,
+							top: 0,
+							left: 0,
+							// `x` and `y` are framer-motion specific props and are shorthands
+							// for `translateX` and `translateY`. Currently it is not possible
+							// to use `translateX` and `translateY` because those values would
+							// be overridden by the return value of the
+							// `placementToMotionAnimationProps` function in `AnimatedWrapper`
+							x: Math.round( x ?? 0 ) || undefined,
+							y: Math.round( y ?? 0 ) || undefined,
 					  }
 			}
 		>

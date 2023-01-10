@@ -3,7 +3,7 @@
  */
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { FlatList } from 'react-native';
-import { isEqual } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 import Animated, {
 	useAnimatedScrollHandler,
 	useSharedValue,
@@ -14,7 +14,7 @@ import Animated, {
  */
 import { memo, useCallback, useRef } from '@wordpress/element';
 
-const List = memo( FlatList, isEqual );
+const List = memo( FlatList, fastDeepEqual );
 const AnimatedKeyboardAwareScrollView = Animated.createAnimatedComponent(
 	KeyboardAwareScrollView
 );

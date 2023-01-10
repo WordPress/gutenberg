@@ -111,16 +111,14 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Move focus to the sidebar area.
 		await pressKeyWithModifier( 'ctrl', '`' );
-		await pressKeyWithModifier( 'ctrl', '`' );
-		await pressKeyWithModifier( 'ctrl', '`' );
 		await tabToColumnsControl();
 
 		// Tweak the columns count by increasing it by one.
 		await page.keyboard.press( 'ArrowRight' );
 
 		// Navigate to the third column in the columns block.
-		await pressKeyWithModifier( 'ctrl', '`' );
-		await pressKeyWithModifier( 'ctrl', '`' );
+		await pressKeyWithModifier( 'ctrlShift', '`' );
+		await pressKeyWithModifier( 'ctrlShift', '`' );
 		await pressKeyTimes( 'Tab', 4 );
 		await pressKeyTimes( 'ArrowDown', 4 );
 		await page.waitForSelector(

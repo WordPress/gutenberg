@@ -42,6 +42,10 @@ export const CircleIndicatorWrapper = styled.div`
 	position: relative;
 	width: 100%;
 	height: 100%;
+
+	:focus-visible {
+		outline: none;
+	}
 `;
 
 export const CircleIndicator = styled.div`

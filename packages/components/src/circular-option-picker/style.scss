@@ -26,6 +26,7 @@ $color-palette-circle-spacing: 12px;
 	vertical-align: top;
 	transform: scale(1);
 	transition: 100ms transform ease;
+	will-change: transform;
 	@include reduce-motion("transition");
 
 	&:hover {

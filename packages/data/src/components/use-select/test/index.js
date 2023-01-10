@@ -50,9 +50,9 @@ describe( 'useSelect', () => {
 			</RegistryProvider>
 		);
 
-		// 2 times expected
+		// 2 selectSpy calls expected
 		// - 1 for initial mount
-		// - 1 for after mount before subscription set.
+		// - 1 for the subscription effect checking if value has changed
 		expect( selectSpy ).toHaveBeenCalledTimes( 2 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 1 );
 
@@ -118,7 +118,7 @@ describe( 'useSelect', () => {
 		expect( screen.getByRole( 'status' ) ).toHaveTextContent( 'bar' );
 	} );
 
-	it( 'avoid calling nested listener after unmounted', async () => {
+	it( 'does not rerender a nested component that is to be unmounted', () => {
 		registry.registerStore( 'toggler', {
 			reducer: ( state = false, action ) =>
 				action.type === 'TOGGLE' ? ! state : state,
@@ -133,16 +133,16 @@ describe( 'useSelect', () => {
 		const mapSelect = ( select ) => select( 'toggler' ).get();
 
 		const mapSelectChild = jest.fn( mapSelect );
-		function Child() {
+		const Child = jest.fn( () => {
 			const show = useSelect( mapSelectChild, [] );
 			return show ? 'yes' : 'no';
-		}
+		} );
 
 		const mapSelectParent = jest.fn( mapSelect );
-		function Parent() {
+		const Parent = jest.fn( () => {
 			const show = useSelect( mapSelectParent, [] );
 			return show ? <Child /> : 'none';
-		}
+		} );
 
 		render(
 			<RegistryProvider value={ registry }>
@@ -154,14 +154,10 @@ describe( 'useSelect', () => {
 		expect( screen.getByText( 'none' ) ).toBeInTheDocument();
 		expect( mapSelectParent ).toHaveBeenCalledTimes( 2 );
 		expect( mapSelectChild ).toHaveBeenCalledTimes( 0 );
+		expect( Parent ).toHaveBeenCalledTimes( 1 );
+		expect( Child ).toHaveBeenCalledTimes( 0 );
 
-		// act() does batched updates internally, i.e., any scheduled setStates or effects
-		// will be executed only after the dispatch finishes. But we want to opt out of
-		// batched updates here. We want all the setStates to be done synchronously, as the
-		// store listeners are called. The async/await code is a trick to do it: do the
-		// dispatch in a different event loop tick, where the batched updates are no longer active.
-		await act( async () => {
-			await Promise.resolve();
+		act( () => {
 			registry.dispatch( 'toggler' ).toggle();
 		} );
 
@@ -169,18 +165,21 @@ describe( 'useSelect', () => {
 		expect( screen.getByText( 'yes' ) ).toBeInTheDocument();
 		expect( mapSelectParent ).toHaveBeenCalledTimes( 3 );
 		expect( mapSelectChild ).toHaveBeenCalledTimes( 2 );
+		expect( Parent ).toHaveBeenCalledTimes( 2 );
+		expect( Child ).toHaveBeenCalledTimes( 1 );
 
-		await act( async () => {
-			await Promise.resolve();
+		act( () => {
 			registry.dispatch( 'toggler' ).toggle();
 		} );
 
 		// Check that child was unmounted without any extra state update being performed on it.
-		// I.e., `mapSelectChild` was never called again, and no "state update on an unmounted
-		// component" warning was triggered.
+		// I.e., `mapSelectChild` was called again, and state update was scheduled, we cannot
+		// avoid that, but the state update is never executed and doesn't do a rerender.
 		expect( screen.getByText( 'none' ) ).toBeInTheDocument();
 		expect( mapSelectParent ).toHaveBeenCalledTimes( 4 );
-		expect( mapSelectChild ).toHaveBeenCalledTimes( 2 );
+		expect( mapSelectChild ).toHaveBeenCalledTimes( 3 );
+		expect( Parent ).toHaveBeenCalledTimes( 3 );
+		expect( Child ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	describe( 'rerenders as expected with various mapSelect return types', () => {
@@ -593,7 +592,7 @@ describe( 'useSelect', () => {
 				'count2'
 			);
 
-			screen.getByText( 'Toggle' ).click();
+			act( () => screen.getByText( 'Toggle' ).click() );
 
 			expect( selectCount1 ).toHaveBeenCalledTimes( 2 );
 			expect( selectCount2 ).toHaveBeenCalledTimes( 2 );
@@ -1143,6 +1142,40 @@ describe( 'useSelect', () => {
 				registry.dispatch( 'counter-2' ).inc();
 			} );
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '10' );
+		} );
+	} );
+
+	describe( 'static store selection mode', () => {
+		it( 'can read the current value from store', () => {
+			registry.registerStore( 'testStore', {
+				reducer: ( s = 0, a ) => ( a.type === 'INC' ? s + 1 : s ),
+				actions: { inc: () => ( { type: 'INC' } ) },
+				selectors: { get: ( s ) => s },
+			} );
+
+			const record = jest.fn();
+
+			function TestComponent() {
+				const { get } = useSelect( 'testStore' );
+				return (
+					<button onClick={ () => record( get() ) }>record</button>
+				);
+			}
+
+			render(
+				<RegistryProvider value={ registry }>
+					<TestComponent />
+				</RegistryProvider>
+			);
+
+			fireEvent.click( screen.getByRole( 'button' ) );
+			expect( record ).toHaveBeenLastCalledWith( 0 );
+
+			// no need to act() as the component doesn't react to the updates
+			registry.dispatch( 'testStore' ).inc();
+
+			fireEvent.click( screen.getByRole( 'button' ) );
+			expect( record ).toHaveBeenLastCalledWith( 1 );
 		} );
 	} );
 } );

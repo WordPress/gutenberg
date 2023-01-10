@@ -14,7 +14,6 @@ import { memo, useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import BlockEditorProvider from '../provider';
-import LiveBlockPreview from './live';
 import AutoHeightBlockPreview from './auto';
 import { store as blockEditorStore } from '../../store';
 import { BlockListItems } from '../block-list';
@@ -23,9 +22,8 @@ export function BlockPreview( {
 	blocks,
 	__experimentalPadding = 0,
 	viewportWidth = 1200,
-	__experimentalLive = false,
-	__experimentalOnClick,
 	__experimentalMinHeight,
+	__experimentalStyles = [],
 } ) {
 	const originalSettings = useSelect(
 		( select ) => select( blockEditorStore ).getSettings(),
@@ -44,15 +42,12 @@ export function BlockPreview( {
 	}
 	return (
 		<BlockEditorProvider value={ renderedBlocks } settings={ settings }>
-			{ __experimentalLive ? (
-				<LiveBlockPreview onClick={ __experimentalOnClick } />
-			) : (
-				<AutoHeightBlockPreview
-					viewportWidth={ viewportWidth }
-					__experimentalPadding={ __experimentalPadding }
-					__experimentalMinHeight={ __experimentalMinHeight }
-				/>
-			) }
+			<AutoHeightBlockPreview
+				viewportWidth={ viewportWidth }
+				__experimentalPadding={ __experimentalPadding }
+				__experimentalMinHeight={ __experimentalMinHeight }
+				__experimentalStyles={ __experimentalStyles }
+			/>
 		</BlockEditorProvider>
 	);
 }

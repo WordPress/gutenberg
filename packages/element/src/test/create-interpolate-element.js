@@ -209,15 +209,13 @@ describe( 'createInterpolateElement', () => {
 		};
 		const { container, rerender } = render( <TestComponent switchKey /> );
 
-		expect( container.firstChild ).toContainHTML( '<em>string!</em>' );
-		expect( container.firstChild ).not.toContainHTML( '<strong>' );
+		expect( container ).toContainHTML( '<em>string!</em>' );
+		expect( container ).not.toContainHTML( '<strong>' );
 
 		rerender( <TestComponent switchKey={ false } /> );
 
-		expect( container.firstChild ).toContainHTML(
-			'<strong>string!</strong>'
-		);
-		expect( container.firstChild ).not.toContainHTML( '<em>' );
+		expect( container ).toContainHTML( '<strong>string!</strong>' );
+		expect( container ).not.toContainHTML( '<em>' );
 	} );
 	it( 'handles parsing emojii correctly', () => {
 		const testString = '👳‍♀️<icon>🚨🤷‍♂️⛈️fully</icon> here';

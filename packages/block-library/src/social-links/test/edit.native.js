@@ -104,7 +104,6 @@ describe( 'Social links block', () => {
 
 	it( 'shows the social links bottom sheet when tapping on the inline appender', async () => {
 		const screen = await initializeEditor();
-		const { getByTestId, getByText } = screen;
 
 		// Add block
 		await addBlock( screen, 'Social Icons' );
@@ -131,7 +130,7 @@ describe( 'Social links block', () => {
 		fireEvent.press( appenderButton );
 
 		// Find a social link in the inserter
-		const blockList = getByTestId( 'InserterUI-Blocks' );
+		const blockList = screen.getByTestId( 'InserterUI-Blocks' );
 
 		// onScroll event used to force the FlatList to render all items
 		fireEvent.scroll( blockList, {
@@ -143,10 +142,12 @@ describe( 'Social links block', () => {
 		} );
 
 		// Add the Amazon link
-		const amazonBlock = await waitFor( () => getByText( 'Amazon' ) );
+		const amazonBlock = await screen.findByText( 'Amazon' );
 		expect( amazonBlock ).toBeVisible();
 
 		fireEvent.press( amazonBlock );
+
+		await screen.findByTestId( 'navigation-screen-LinkSettingsScreen' );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );

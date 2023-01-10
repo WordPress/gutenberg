@@ -2,7 +2,7 @@
 
 ## Overview
 
-A block typically inserts markup (HTML) into post content that you want to style in someway. This guides walks through a few different ways you can use CSS with the block editor and how to work with styles and stylesheets.
+A block typically inserts markup (HTML) into post content that you want to style in some way. This guide walks through a few different ways you can use CSS with the block editor and how to work with styles and stylesheets.
 
 ## Before you start
 
@@ -162,7 +162,7 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 
 ### Build or add dependency
 
-In order to include the blockEditor as a dependancy, make sure to run the build step, or update the asset php file.
+In order to include the blockEditor as a dependency, make sure to run the build step, or update the asset php file.
 
 {% codetabs %}
 {% JSX %}
@@ -174,7 +174,7 @@ npm run build
 
 {% Plain %}
 
-Edit the asset file to include the block-editor dependancy for the scripts.
+Edit the asset file to include the block-editor dependency for the scripts.
 
 ```php
 <?php return

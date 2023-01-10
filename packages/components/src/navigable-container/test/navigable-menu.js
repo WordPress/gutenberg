@@ -9,6 +9,8 @@ import userEvent from '@testing-library/user-event';
  */
 import { NavigableMenu } from '../menu';
 
+jest.useFakeTimers();
+
 const NavigableMenuTestCase = ( props ) => (
 	<NavigableMenu { ...props }>
 		<button>Item 1</button>

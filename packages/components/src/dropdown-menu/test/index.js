@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -14,6 +14,8 @@ import { arrowLeft, arrowRight, arrowUp, arrowDown } from '@wordpress/icons';
  */
 import DropdownMenu from '../';
 import { MenuItem } from '../../';
+
+jest.useFakeTimers();
 
 describe( 'DropdownMenu', () => {
 	it( 'should not render when neither controls nor children are assigned', () => {
@@ -65,11 +67,14 @@ describe( 'DropdownMenu', () => {
 
 		await user.keyboard( '[ArrowDown]' );
 
-		let menu;
-		await waitFor( () => {
-			menu = screen.getByRole( 'menu' );
-			return expect( menu ).toBeVisible();
-		} );
+		// Wait for the `floating-ui` effects in `Dropdown`/`Popover` to finish running
+		// See also: https://floating-ui.com/docs/react-dom#testing
+		await act( () => Promise.resolve() );
+
+		const menu = screen.getByRole( 'menu' );
+
+		// we need to wait because showing the dropdown is animated
+		await waitFor( () => expect( menu ).toBeVisible() );
 
 		expect( within( menu ).getAllByRole( 'menuitem' ) ).toHaveLength(
 			controls.length
@@ -88,15 +93,18 @@ describe( 'DropdownMenu', () => {
 		);
 
 		const button = screen.getByRole( 'button' );
-		button.focus();
+		act( () => button.focus() );
 
 		await user.keyboard( '[ArrowDown]' );
 
-		let menu;
-		await waitFor( () => {
-			menu = screen.getByRole( 'menu' );
-			return expect( menu ).toBeVisible();
-		} );
+		// Wait for the `floating-ui` effects in `Dropdown`/`Popover` to finish running
+		// See also: https://floating-ui.com/docs/react-dom#testing
+		await act( () => Promise.resolve() );
+
+		const menu = screen.getByRole( 'menu' );
+
+		// we need to wait because showing the dropdown is animated
+		await waitFor( () => expect( menu ).toBeVisible() );
 
 		// Clicking the menu item will close the dropdown menu
 		await user.click( within( menu ).getByRole( 'menuitem' ) );

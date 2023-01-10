@@ -1,0 +1,128 @@
+[
+	{
+		"blockName": "core/query",
+		"attrs": {
+			"queryId": 3,
+			"query": {
+				"perPage": 3,
+				"pages": 0,
+				"offset": 0,
+				"postType": "post",
+				"order": "desc",
+				"orderBy": "date",
+				"author": "",
+				"search": "",
+				"exclude": [],
+				"sticky": "",
+				"inherit": false
+			},
+			"displayLayout": {
+				"type": "flex",
+				"columns": 3
+			},
+			"align": "wide",
+			"style": {
+				"color": {
+					"background": "#284d5f"
+				},
+				"elements": {
+					"link": {
+						"color": {
+							"text": "var:preset|color|luminous-vivid-amber"
+						}
+					}
+				}
+			},
+			"textColor": "pale-cyan-blue"
+		},
+		"innerBlocks": [
+			{
+				"blockName": "core/post-template",
+				"attrs": {
+					"fontSize": "large"
+				},
+				"innerBlocks": [
+					{
+						"blockName": "core/post-title",
+						"attrs": {},
+						"innerBlocks": [],
+						"innerHTML": "",
+						"innerContent": []
+					},
+					{
+						"blockName": "core/post-date",
+						"attrs": {},
+						"innerBlocks": [],
+						"innerHTML": "",
+						"innerContent": []
+					},
+					{
+						"blockName": "core/post-excerpt",
+						"attrs": {},
+						"innerBlocks": [],
+						"innerHTML": "",
+						"innerContent": []
+					}
+				],
+				"innerHTML": "\n\n\n\n\n\n",
+				"innerContent": [ "\n", null, "\n\n", null, "\n\n", null, "\n" ]
+			},
+			{
+				"blockName": "core/query-pagination",
+				"attrs": {},
+				"innerBlocks": [
+					{
+						"blockName": "core/query-pagination-previous",
+						"attrs": {},
+						"innerBlocks": [],
+						"innerHTML": "",
+						"innerContent": []
+					},
+					{
+						"blockName": "core/query-pagination-numbers",
+						"attrs": {},
+						"innerBlocks": [],
+						"innerHTML": "",
+						"innerContent": []
+					},
+					{
+						"blockName": "core/query-pagination-next",
+						"attrs": {},
+						"innerBlocks": [],
+						"innerHTML": "",
+						"innerContent": []
+					}
+				],
+				"innerHTML": "\n\n\n\n\n\n",
+				"innerContent": [ "\n", null, "\n\n", null, "\n\n", null, "\n" ]
+			},
+			{
+				"blockName": "core/query-no-results",
+				"attrs": {},
+				"innerBlocks": [
+					{
+						"blockName": "core/paragraph",
+						"attrs": {
+							"placeholder": "Add text or blocks that will display when a query returns no results."
+						},
+						"innerBlocks": [],
+						"innerHTML": "\n<p>No results found.</p>\n",
+						"innerContent": [ "\n<p>No results found.</p>\n" ]
+					}
+				],
+				"innerHTML": "\n\n",
+				"innerContent": [ "\n", null, "\n" ]
+			}
+		],
+		"innerHTML": "\n<div class=\"wp-block-query alignwide has-pale-cyan-blue-color has-text-color has-background has-link-color\" style=\"background-color:#284d5f\">\n\n\n\n</div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-query alignwide has-pale-cyan-blue-color has-text-color has-background has-link-color\" style=\"background-color:#284d5f\">",
+			null,
+			"\n\n",
+			null,
+			"\n\n",
+			null,
+			"</div>\n"
+		]
+	}
+]

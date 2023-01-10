@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -28,7 +23,7 @@ function SingleOrigin( {
 	actions,
 } ) {
 	const gradientOptions = useMemo( () => {
-		return map( gradients, ( { gradient, name } ) => (
+		return gradients.map( ( { gradient, name }, index ) => (
 			<CircularOptionPicker.Option
 				key={ gradient }
 				value={ gradient }
@@ -42,7 +37,7 @@ function SingleOrigin( {
 				onClick={
 					value === gradient
 						? clearGradient
-						: () => onChange( gradient )
+						: () => onChange( gradient, index )
 				}
 				aria-label={
 					name
@@ -80,7 +75,9 @@ function MultipleOrigin( {
 						<SingleOrigin
 							clearGradient={ clearGradient }
 							gradients={ gradientSet }
-							onChange={ onChange }
+							onChange={ ( gradient ) =>
+								onChange( gradient, index )
+							}
 							value={ value }
 							{ ...( gradients.length === index + 1
 								? { actions }
@@ -102,7 +99,6 @@ export default function GradientPicker( {
 	value,
 	clearable = true,
 	disableCustomGradients = false,
-	__experimentalHasMultipleOrigins,
 	__experimentalIsRenderedInSidebar,
 } ) {
 	const clearGradient = useCallback(
@@ -110,7 +106,7 @@ export default function GradientPicker( {
 		[ onChange ]
 	);
 	const Component =
-		__experimentalHasMultipleOrigins && gradients?.length
+		gradients?.length && gradients[ 0 ].gradients
 			? MultipleOrigin
 			: SingleOrigin;
 

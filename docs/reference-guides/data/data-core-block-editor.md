@@ -556,6 +556,18 @@ _Properties_
 -   _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
 -   _frecency_ `number`: Heuristic that combines frequency and recency.
 
+### getLastInsertedBlocksClientIds
+
+Gets the client ids of the last inserted blocks.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `Array|undefined`: Client Ids of the last inserted block(s).
+
 ### getLastMultiSelectedBlockClientId
 
 Returns the client ID of the last block in the multi-selection set, or null
@@ -801,7 +813,7 @@ _Parameters_
 
 _Returns_
 
--   `?string`: Block Template Lock
+-   `string|false`: Block Template Lock
 
 ### hasBlockMovingClientId
 

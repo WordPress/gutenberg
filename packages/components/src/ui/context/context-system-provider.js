@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { isEqual, merge } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
+import { merge } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -42,7 +43,7 @@ function useContextSystemBridge( { value } ) {
 	useUpdateEffect( () => {
 		if (
 			// Objects are equivalent.
-			isEqual( valueRef.current, value ) &&
+			fastDeepEqual( valueRef.current, value ) &&
 			// But not the same reference.
 			valueRef.current !== value
 		) {

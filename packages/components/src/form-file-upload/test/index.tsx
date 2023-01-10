@@ -14,6 +14,8 @@ import FormFileUpload from '..';
  */
 const { File } = window;
 
+jest.useFakeTimers();
+
 // @testing-library/user-event considers changing <input type="file"> to a string as a change, but it do not occur on real browsers, so the comparisons will be against this result
 const fakePath = expect.objectContaining( {
 	target: expect.objectContaining( {

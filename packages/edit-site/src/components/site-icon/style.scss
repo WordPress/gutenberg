@@ -1,0 +1,10 @@
+.edit-site-site-icon__icon {
+	fill: currentColor;
+}
+
+.edit-site-site-icon__image {
+	width: $button-size;
+	height: $button-size;
+	border-radius: $radius-block-ui;
+	object-fit: cover;
+}

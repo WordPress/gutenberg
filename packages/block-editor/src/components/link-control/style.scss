@@ -55,6 +55,7 @@ $preview-image-height: 140px;
 	.components-base-control__label {
 		margin-right: $grid-unit-20;
 		margin-bottom: 0;
+		min-width: 29px; // align with search results.
 	}
 
 	input[type="text"],

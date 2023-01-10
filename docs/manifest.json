@@ -1268,31 +1268,31 @@
 	{
 		"title": "ToolbarButton",
 		"slug": "toolbar-button",
-		"markdown_source": "../packages/components/src/toolbar-button/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar-button/README.md",
 		"parent": "components"
 	},
 	{
 		"title": "ToolbarDropdownMenu",
 		"slug": "toolbar-dropdown-menu",
-		"markdown_source": "../packages/components/src/toolbar-dropdown-menu/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar-dropdown-menu/README.md",
 		"parent": "components"
 	},
 	{
 		"title": "ToolbarGroup",
 		"slug": "toolbar-group",
-		"markdown_source": "../packages/components/src/toolbar-group/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar-group/README.md",
 		"parent": "components"
 	},
 	{
 		"title": "ToolbarItem",
 		"slug": "toolbar-item",
-		"markdown_source": "../packages/components/src/toolbar-item/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar-item/README.md",
 		"parent": "components"
 	},
 	{
 		"title": "Toolbar",
 		"slug": "toolbar",
-		"markdown_source": "../packages/components/src/toolbar/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar/README.md",
 		"parent": "components"
 	},
 	{
@@ -1734,12 +1734,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/nux",
-		"slug": "packages-nux",
-		"markdown_source": "../packages/nux/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/plugins",
 		"slug": "packages-plugins",
 		"markdown_source": "../packages/plugins/README.md",
@@ -1971,12 +1965,6 @@
 		"title": "Notices Data",
 		"slug": "data-core-notices",
 		"markdown_source": "../docs/reference-guides/data/data-core-notices.md",
-		"parent": "data"
-	},
-	{
-		"title": "The NUX (New User Experience) Data",
-		"slug": "data-core-nux",
-		"markdown_source": "../docs/reference-guides/data/data-core-nux.md",
 		"parent": "data"
 	},
 	{

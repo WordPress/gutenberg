@@ -14,6 +14,8 @@ import { plus } from '@wordpress/icons';
  */
 import { DimensionControl } from '../';
 
+jest.useFakeTimers();
+
 describe( 'DimensionControl', () => {
 	const onChangeHandler = jest.fn();
 	const instanceId = 1;

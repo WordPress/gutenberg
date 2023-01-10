@@ -18,9 +18,10 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as reusableBlocksStore } from '../../store';
 
 function ReusableBlocksManageButton( { clientId } ) {
-	const { canRemove, isVisible } = useSelect(
+	const { canRemove, isVisible, innerBlockCount } = useSelect(
 		( select ) => {
-			const { getBlock, canRemoveBlock } = select( blockEditorStore );
+			const { getBlock, canRemoveBlock, getBlockCount } =
+				select( blockEditorStore );
 			const { canUser } = select( coreStore );
 			const reusableBlock = getBlock( clientId );
 
@@ -34,6 +35,7 @@ function ReusableBlocksManageButton( { clientId } ) {
 						'blocks',
 						reusableBlock.attributes.ref
 					),
+				innerBlockCount: getBlockCount( clientId ),
 			};
 		},
 		[ clientId ]
@@ -55,7 +57,9 @@ function ReusableBlocksManageButton( { clientId } ) {
 			</MenuItem>
 			{ canRemove && (
 				<MenuItem onClick={ () => convertBlockToStatic( clientId ) }>
-					{ __( 'Convert to regular blocks' ) }
+					{ innerBlockCount > 1
+						? __( 'Convert to regular blocks' )
+						: __( 'Convert to regular block' ) }
 				</MenuItem>
 			) }
 		</BlockSettingsMenuControls>

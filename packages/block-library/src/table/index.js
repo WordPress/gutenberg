@@ -91,6 +91,7 @@ export const settings = {
 				},
 			],
 		},
+		viewportWidth: 450,
 	},
 	transforms,
 	edit,

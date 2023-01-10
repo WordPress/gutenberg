@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
@@ -69,7 +69,7 @@ function DuotonePicker( {
 					name
 			  )
 			: tooltipText;
-		const isSelected = isEqual( colors, value );
+		const isSelected = fastDeepEqual( colors, value );
 
 		return (
 			<CircularOptionPicker.Option

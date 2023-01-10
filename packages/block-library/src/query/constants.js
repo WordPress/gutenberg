@@ -1,7 +1,0 @@
-export const MAX_FETCHED_TERMS = 100;
-export const DEFAULTS_POSTS_PER_PAGE = 3;
-
-export default {
-	MAX_FETCHED_TERMS,
-	DEFAULTS_POSTS_PER_PAGE,
-};

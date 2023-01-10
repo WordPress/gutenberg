@@ -8,7 +8,7 @@ import type { ConsoleMessage } from '@playwright/test';
 /**
  * Internal dependencies
  */
-import { Admin, Editor, PageUtils, RequestUtils } from './index';
+import { Admin, Editor, PageUtils, RequestUtils, SiteEditor } from './index';
 
 const STORAGE_STATE_PATH =
 	process.env.STORAGE_STATE_PATH ||
@@ -102,6 +102,7 @@ const test = base.extend<
 		editor: Editor;
 		pageUtils: PageUtils;
 		snapshotConfig: void;
+		siteEditor: SiteEditor;
 	},
 	{
 		requestUtils: RequestUtils;
@@ -112,6 +113,9 @@ const test = base.extend<
 	},
 	editor: async ( { page }, use ) => {
 		await use( new Editor( { page } ) );
+	},
+	siteEditor: async ( { page }, use ) => {
+		await use( new SiteEditor( { page } ) );
 	},
 	page: async ( { page }, use ) => {
 		page.on( 'console', observeConsoleLogging );
@@ -149,7 +153,7 @@ const test = base.extend<
 
 			await use( requestUtils );
 		},
-		{ scope: 'worker' },
+		{ scope: 'worker', auto: true },
 	],
 	// An automatic fixture to configure snapshot settings globally.
 	snapshotConfig: [

@@ -37,4 +37,26 @@ test.describe( 'Using Format API', () => {
 <!-- /wp:paragraph -->`
 		);
 	} );
+
+	test( 'should show unknow formatting button', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: '<big>test</big>' },
+		} );
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:paragraph -->
+<p><big>test</big></p>
+<!-- /wp:paragraph -->`
+		);
+		await page.keyboard.press( 'ArrowRight' );
+		await editor.clickBlockToolbarButton( 'Clear Unknown Formatting' );
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:paragraph -->
+<p>test</p>
+<!-- /wp:paragraph -->`
+		);
+	} );
 } );

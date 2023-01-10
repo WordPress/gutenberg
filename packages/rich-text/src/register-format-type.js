@@ -82,7 +82,10 @@ export function registerFormatType( name, settings ) {
 			richTextStore
 		).getFormatTypeForBareElement( settings.tagName );
 
-		if ( formatTypeForBareElement ) {
+		if (
+			formatTypeForBareElement &&
+			formatTypeForBareElement.name !== 'core/unknown'
+		) {
 			window.console.error(
 				`Format "${ formatTypeForBareElement.name }" is already registered to handle bare tag name "${ settings.tagName }".`
 			);

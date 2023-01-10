@@ -34,7 +34,7 @@ According to the [WebAIM: Screen Reader User Survey #8 Results](https://webaim.o
 | NVDA with Internet Explorer | 14               | 1.2%             |
 | Other combinations          | 126              | 10.4%            |
 
-When testing with screen readers, try to use some of the combinations at the top of this list. For example, when testing with VoiceOver, it's preferrable to use Safari.
+When testing with screen readers, try to use some of the combinations at the top of this list. For example, when testing with VoiceOver, it's preferable to use Safari.
 
 ### NVDA with Firefox
 

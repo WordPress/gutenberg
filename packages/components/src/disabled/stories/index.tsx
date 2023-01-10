@@ -15,6 +15,7 @@ import Disabled from '../';
 import SelectControl from '../../select-control/';
 import TextControl from '../../text-control/';
 import TextareaControl from '../../textarea-control/';
+import { VStack } from '../../v-stack/';
 
 const meta: ComponentMeta< typeof Disabled > = {
 	title: 'Components/Disabled',
@@ -37,18 +38,21 @@ const Form = () => {
 	const [ textControlValue, setTextControlValue ] = useState( '' );
 	const [ textAreaValue, setTextAreaValue ] = useState( '' );
 	return (
-		<div>
+		<VStack>
 			<TextControl
+				__nextHasNoMarginBottom
 				label="Text Control"
 				value={ textControlValue }
 				onChange={ setTextControlValue }
 			/>
 			<TextareaControl
+				__nextHasNoMarginBottom
 				label="TextArea Control"
 				value={ textAreaValue }
 				onChange={ setTextAreaValue }
 			/>
 			<SelectControl
+				__nextHasNoMarginBottom
 				label="Select Control"
 				onChange={ () => {} }
 				options={ [
@@ -58,7 +62,7 @@ const Form = () => {
 					{ value: 'c', label: 'Option C' },
 				] }
 			/>
-		</div>
+		</VStack>
 	);
 };
 

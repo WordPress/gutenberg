@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * Given the current and next item entity record, returns the minimally "modified"
@@ -22,7 +22,7 @@ export default function conservativeMapItem( item, nextItem ) {
 	let hasChanges = false;
 	const result = {};
 	for ( const key in nextItem ) {
-		if ( isEqual( item[ key ], nextItem[ key ] ) ) {
+		if ( fastDeepEqual( item[ key ], nextItem[ key ] ) ) {
 			result[ key ] = item[ key ];
 		} else {
 			hasChanges = true;

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { capitalCase, pascalCase } from 'change-case';
-import { map, find, get } from 'lodash';
+import { map, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -288,7 +288,9 @@ export const getMethodName = (
 	prefix = 'get',
 	usePlural = false
 ) => {
-	const entityConfig = find( rootEntitiesConfig, { kind, name } );
+	const entityConfig = rootEntitiesConfig.find(
+		( config ) => config.kind === kind && config.name === name
+	);
 	const kindPrefix = kind === 'root' ? '' : pascalCase( kind );
 	const nameSuffix = pascalCase( name ) + ( usePlural ? 's' : '' );
 	const suffix =
@@ -313,7 +315,9 @@ export const getOrLoadEntitiesConfig =
 			return configs;
 		}
 
-		const loader = find( additionalEntityConfigLoaders, { kind } );
+		const loader = additionalEntityConfigLoaders.find(
+			( l ) => l.kind === kind
+		);
 		if ( ! loader ) {
 			return [];
 		}

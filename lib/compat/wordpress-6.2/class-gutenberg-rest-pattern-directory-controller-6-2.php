@@ -9,7 +9,7 @@
 /**
  * Controller which provides REST endpoint for block patterns from wordpress.org/patterns.
  */
-class Gutenberg_REST_Pattern_Directory_Controller_6_2 extends Gutenberg_REST_Pattern_Directory_Controller_6_0 {
+class Gutenberg_REST_Pattern_Directory_Controller_6_2 extends WP_REST_Pattern_Directory_Controller {
 	/**
 	 * Registers the necessary REST API routes.
 	 *

@@ -9,6 +9,8 @@ import userEvent from '@testing-library/user-event';
  */
 import URLInputButton from '../button';
 
+jest.useFakeTimers();
+
 describe( 'URLInputButton', () => {
 	it( 'should render a `Insert link` button and not be pressed when `url` is not provided', () => {
 		render( <URLInputButton /> );

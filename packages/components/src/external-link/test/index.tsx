@@ -9,6 +9,8 @@ import userEvent from '@testing-library/user-event';
  */
 import { ExternalLink } from '..';
 
+jest.useFakeTimers();
+
 const setupUser = () =>
 	userEvent.setup( {
 		advanceTimers: jest.advanceTimersByTime,

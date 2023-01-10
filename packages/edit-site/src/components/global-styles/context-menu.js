@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
-import { typography, color, layout } from '@wordpress/icons';
+import { typography, border, color, layout } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -19,7 +19,7 @@ function ContextMenu( { name, parentMenu = '' } ) {
 	const hasColorPanel = useHasColorPanel( name );
 	const hasBorderPanel = useHasBorderPanel( name );
 	const hasDimensionsPanel = useHasDimensionsPanel( name );
-	const hasLayoutPanel = hasBorderPanel || hasDimensionsPanel;
+	const hasLayoutPanel = hasDimensionsPanel;
 
 	return (
 		<ItemGroup>
@@ -39,6 +39,15 @@ function ContextMenu( { name, parentMenu = '' } ) {
 					aria-label={ __( 'Colors styles' ) }
 				>
 					{ __( 'Colors' ) }
+				</NavigationButtonAsItem>
+			) }
+			{ hasBorderPanel && (
+				<NavigationButtonAsItem
+					icon={ border }
+					path={ parentMenu + '/border' }
+					aria-label={ __( 'Border styles' ) }
+				>
+					{ __( 'Border' ) }
 				</NavigationButtonAsItem>
 			) }
 			{ hasLayoutPanel && (

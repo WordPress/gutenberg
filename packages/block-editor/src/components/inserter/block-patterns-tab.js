@@ -8,20 +8,16 @@ import {
 	useRef,
 	useEffect,
 } from '@wordpress/element';
-import { _x, __, isRTL } from '@wordpress/i18n';
+import { _x, __ } from '@wordpress/i18n';
 import { useAsyncList, useViewportMatch } from '@wordpress/compose';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 	__experimentalHStack as HStack,
-	__experimentalNavigatorProvider as NavigatorProvider,
-	__experimentalNavigatorScreen as NavigatorScreen,
-	__experimentalNavigatorButton as NavigatorButton,
-	__experimentalNavigatorBackButton as NavigatorBackButton,
 	FlexBlock,
 	Button,
 } from '@wordpress/components';
-import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
+import { Icon, chevronRight } from '@wordpress/icons';
 import { focus } from '@wordpress/dom';
 
 /**
@@ -30,9 +26,13 @@ import { focus } from '@wordpress/dom';
 import usePatternsState from './hooks/use-patterns-state';
 import BlockPatternList from '../block-patterns-list';
 import PatternsExplorerModal from './block-patterns-explorer/explorer';
+import MobileTabNavigation from './mobile-tab-navigation';
 
-function usePatternsCategories() {
-	const [ allPatterns, allCategories ] = usePatternsState();
+function usePatternsCategories( rootClientId ) {
+	const [ allPatterns, allCategories ] = usePatternsState(
+		undefined,
+		rootClientId
+	);
 
 	const hasRegisteredCategory = useCallback(
 		( pattern ) => {
@@ -56,10 +56,17 @@ function usePatternsCategories() {
 				)
 			)
 			.sort( ( { name: currentName }, { name: nextName } ) => {
-				if ( ! [ currentName, nextName ].includes( 'featured' ) ) {
+				if (
+					! [ currentName, nextName ].some( ( categoryName ) =>
+						[ 'featured', 'text' ].includes( categoryName )
+					)
+				) {
 					return 0;
 				}
-				return currentName === 'featured' ? -1 : 1;
+				// Move `featured` category to the top and `text` to the bottom.
+				return currentName === 'featured' || nextName === 'text'
+					? -1
+					: 1;
 			} );
 
 		if (
@@ -86,6 +93,7 @@ export function BlockPatternsCategoryDialog( {
 	rootClientId,
 	onInsert,
 	category,
+	showTitlesAsTooltip,
 } ) {
 	const container = useRef();
 
@@ -100,12 +108,13 @@ export function BlockPatternsCategoryDialog( {
 	return (
 		<div
 			ref={ container }
-			className="block-editor-inserter__patterns-category-panel"
+			className="block-editor-inserter__patterns-category-dialog"
 		>
 			<BlockPatternsCategoryPanel
 				rootClientId={ rootClientId }
 				onInsert={ onInsert }
 				category={ category }
+				showTitlesAsTooltip={ showTitlesAsTooltip }
 			/>
 		</div>
 	);
@@ -115,13 +124,14 @@ export function BlockPatternsCategoryPanel( {
 	rootClientId,
 	onInsert,
 	category,
+	showTitlesAsTooltip,
 } ) {
 	const [ allPatterns, , onClick ] = usePatternsState(
 		onInsert,
 		rootClientId
 	);
 
-	const availableCategories = usePatternsCategories();
+	const availableCategories = usePatternsCategories( rootClientId );
 	const currentCategoryPatterns = useMemo(
 		() =>
 			allPatterns.filter( ( pattern ) => {
@@ -151,7 +161,7 @@ export function BlockPatternsCategoryPanel( {
 	}
 
 	return (
-		<div>
+		<div className="block-editor-inserter__patterns-category-panel">
 			<div className="block-editor-inserter__patterns-category-panel-title">
 				{ category.label }
 			</div>
@@ -164,6 +174,7 @@ export function BlockPatternsCategoryPanel( {
 				orientation="vertical"
 				category={ category.label }
 				isDraggable
+				showTitlesAsTooltip={ showTitlesAsTooltip }
 			/>
 		</div>
 	);
@@ -176,9 +187,8 @@ function BlockPatternsTabs( {
 	rootClientId,
 } ) {
 	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
-	const categories = usePatternsCategories();
+	const categories = usePatternsCategories( rootClientId );
 	const isMobile = useViewportMatch( 'medium', '<' );
-
 	return (
 		<>
 			{ ! isMobile && (
@@ -231,10 +241,16 @@ function BlockPatternsTabs( {
 				</div>
 			) }
 			{ isMobile && (
-				<BlockPatternsTabNavigation
-					onInsert={ onInsert }
-					rootClientId={ rootClientId }
-				/>
+				<MobileTabNavigation categories={ categories }>
+					{ ( category ) => (
+						<BlockPatternsCategoryPanel
+							onInsert={ onInsert }
+							rootClientId={ rootClientId }
+							category={ category }
+							showTitlesAsTooltip={ false }
+						/>
+					) }
+				</MobileTabNavigation>
 			) }
 			{ showPatternsExplorer && (
 				<PatternsExplorerModal
@@ -244,56 +260,6 @@ function BlockPatternsTabs( {
 				/>
 			) }
 		</>
-	);
-}
-
-function BlockPatternsTabNavigation( { onInsert, rootClientId } ) {
-	const categories = usePatternsCategories();
-
-	return (
-		<NavigatorProvider initialPath="/">
-			<NavigatorScreen path="/">
-				<ItemGroup>
-					{ categories.map( ( category ) => (
-						<NavigatorButton
-							key={ category.name }
-							path={ `/category/${ category.name }` }
-							as={ Item }
-							isAction
-						>
-							<HStack>
-								<FlexBlock>{ category.label }</FlexBlock>
-								<Icon
-									icon={
-										isRTL() ? chevronLeft : chevronRight
-									}
-								/>
-							</HStack>
-						</NavigatorButton>
-					) ) }
-				</ItemGroup>
-			</NavigatorScreen>
-
-			{ categories.map( ( category ) => (
-				<NavigatorScreen
-					key={ category.name }
-					path={ `/category/${ category.name }` }
-				>
-					<NavigatorBackButton
-						icon={ isRTL() ? chevronRight : chevronLeft }
-						isSmall
-						aria-label={ __( 'Navigate to the categories list' ) }
-					>
-						{ __( 'Back' ) }
-					</NavigatorBackButton>
-					<BlockPatternsCategoryPanel
-						category={ category }
-						rootClientId={ rootClientId }
-						onInsert={ onInsert }
-					/>
-				</NavigatorScreen>
-			) ) }
-		</NavigatorProvider>
 	);
 }
 

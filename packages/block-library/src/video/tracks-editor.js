@@ -119,6 +119,7 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 					/>
 				</div>
 				<SelectControl
+					__nextHasNoMarginBottom
 					className="block-library-video-tracks-editor__single-track-editor-kind-select"
 					options={ KIND_OPTIONS }
 					value={ kind }

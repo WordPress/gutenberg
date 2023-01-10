@@ -59,7 +59,6 @@ const UnconnectedBorderControl = (
 		widthUnit,
 		widthValue,
 		withSlider,
-		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
 		...otherProps
 	} = useBorderControl( props );
@@ -83,9 +82,6 @@ const UnconnectedBorderControl = (
 							onChange={ onBorderChange }
 							previousStyleSelection={ previousStyleSelection }
 							showDropdownHeader={ showDropdownHeader }
-							__experimentalHasMultipleOrigins={
-								__experimentalHasMultipleOrigins
-							}
 							__experimentalIsRenderedInSidebar={
 								__experimentalIsRenderedInSidebar
 							}
@@ -104,6 +100,7 @@ const UnconnectedBorderControl = (
 				/>
 				{ withSlider && (
 					<RangeControl
+						__nextHasNoMarginBottom
 						label={ __( 'Border width' ) }
 						hideLabelFromVision
 						className={ sliderClassName }

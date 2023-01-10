@@ -35,6 +35,7 @@ function restoreOnAttributes( attributes, isEditableTree ) {
  *
  * @param {Object}  $1                        Named parameters.
  * @param {string}  $1.type                   The format type.
+ * @param {string}  $1.tagName                The tag name.
  * @param {Object}  $1.attributes             The format attributes.
  * @param {Object}  $1.unregisteredAttributes The unregistered format
  *                                            attributes.
@@ -48,6 +49,7 @@ function restoreOnAttributes( attributes, isEditableTree ) {
  */
 function fromFormat( {
 	type,
+	tagName,
 	attributes,
 	unregisteredAttributes,
 	object,
@@ -100,7 +102,7 @@ function fromFormat( {
 	}
 
 	return {
-		type: formatType.tagName,
+		type: formatType.tagName === '*' ? tagName : formatType.tagName,
 		object: formatType.object,
 		attributes: restoreOnAttributes( elementAttributes, isEditableTree ),
 	};
@@ -241,7 +243,8 @@ export function toTree( {
 					return;
 				}
 
-				const { type, attributes, unregisteredAttributes } = format;
+				const { type, tagName, attributes, unregisteredAttributes } =
+					format;
 
 				const boundaryClass =
 					isEditableTree &&
@@ -253,6 +256,7 @@ export function toTree( {
 					parent,
 					fromFormat( {
 						type,
+						tagName,
 						attributes,
 						unregisteredAttributes,
 						boundaryClass,

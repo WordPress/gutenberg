@@ -32,6 +32,7 @@ import type {
 	SinglePaletteProps,
 } from './types';
 import type { WordPressComponentProps } from '../ui/context';
+import type { DropdownProps } from '../dropdown/types';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
@@ -70,7 +71,7 @@ function SinglePalette( {
 					}
 					style={ { backgroundColor: color, color } }
 					onClick={
-						isSelected ? clearColor : () => onChange( color )
+						isSelected ? clearColor : () => onChange( color, index )
 					}
 					aria-label={
 						name
@@ -83,10 +84,6 @@ function SinglePalette( {
 			);
 		} );
 	}, [ colors, value, onChange, clearColor ] );
-
-	if ( colors.length === 0 ) {
-		return null;
-	}
 
 	return (
 		<CircularOptionPicker
@@ -118,7 +115,9 @@ function MultiplePalettes( {
 						<SinglePalette
 							clearColor={ clearColor }
 							colors={ colorPalette }
-							onChange={ onChange }
+							onChange={ ( newColor ) =>
+								onChange( newColor, index )
+							}
 							value={ value }
 							actions={
 								colors.length === index + 1 ? actions : null
@@ -136,7 +135,7 @@ export function CustomColorPickerDropdown( {
 	popoverProps: receivedPopoverProps,
 	...props
 }: CustomColorPickerDropdownProps ) {
-	const popoverProps = useMemo(
+	const popoverProps = useMemo< DropdownProps[ 'popoverProps' ] >(
 		() => ( {
 			shift: true,
 			...( isRenderedInSidebar
@@ -168,7 +167,7 @@ export function CustomColorPickerDropdown( {
 export const extractColorNameFromCurrentValue = (
 	currentValue?: ColorPaletteProps[ 'value' ],
 	colors: ColorPaletteProps[ 'colors' ] = [],
-	showMultiplePalettes: ColorPaletteProps[ '__experimentalHasMultipleOrigins' ] = false
+	showMultiplePalettes: boolean = false
 ) => {
 	if ( ! currentValue ) {
 		return '';
@@ -226,33 +225,32 @@ function UnforwardedColorPalette(
 		enableAlpha = false,
 		onChange,
 		value,
-		__experimentalHasMultipleOrigins = false,
 		__experimentalIsRenderedInSidebar = false,
 		...otherProps
 	} = props;
 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
 
+	const hasMultipleColorOrigins =
+		colors.length > 0 &&
+		( colors as PaletteObject[] )[ 0 ].colors !== undefined;
 	const buttonLabelName = useMemo(
 		() =>
 			extractColorNameFromCurrentValue(
 				value,
 				colors,
-				__experimentalHasMultipleOrigins
+				hasMultipleColorOrigins
 			),
-		[ value, colors, __experimentalHasMultipleOrigins ]
+		[ value, colors, hasMultipleColorOrigins ]
 	);
 
-	// Make sure that the `colors` array has a format (single/multiple) that is
-	// compatible with the `__experimentalHasMultipleOrigins` flag. This is true
-	// when __experimentalHasMultipleOrigins and areColorsMultiplePalette() are
-	// either both `true` or both `false`.
+	// Make sure that the `colors` array has a valid format.
 	if (
 		colors.length > 0 &&
-		__experimentalHasMultipleOrigins !== areColorsMultiplePalette( colors )
+		hasMultipleColorOrigins !== areColorsMultiplePalette( colors )
 	) {
 		// eslint-disable-next-line no-console
 		console.warn(
-			'wp.components.ColorPalette: please specify a format for the `colors` prop that is compatible with the `__experimentalHasMultipleOrigins` prop.'
+			'wp.components.ColorPalette: please specify a valid format for the `colors` prop. '
 		);
 		return null;
 	}
@@ -342,7 +340,7 @@ function UnforwardedColorPalette(
 					) }
 				/>
 			) }
-			{ __experimentalHasMultipleOrigins ? (
+			{ hasMultipleColorOrigins ? (
 				<MultiplePalettes
 					{ ...paletteCommonProps }
 					colors={ colors as PaletteObject[] }

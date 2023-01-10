@@ -28,8 +28,7 @@
 	"dependencies": {
 		"@actions/core": "^1.8.0",
 		"@actions/github": "^5.0.1",
-		"jest-message-util": "^28.0.2",
-		"unzipper": "^0.10.11"
+		"jest-message-util": "^28.0.2"
 	},
 	"publishConfig": {
 		"access": "public"

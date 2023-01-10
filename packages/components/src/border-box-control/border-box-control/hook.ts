@@ -33,7 +33,6 @@ export function useBorderBoxControl(
 		enableStyle = true,
 		size = 'default',
 		value,
-		__experimentalHasMultipleOrigins = false,
 		__experimentalIsRenderedInSidebar = false,
 		...otherProps
 	} = useContextSystem( props, 'BorderBoxControl' );
@@ -136,7 +135,6 @@ export function useBorderBoxControl(
 		size,
 		splitValue,
 		wrapperClassName,
-		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
 	};
 }

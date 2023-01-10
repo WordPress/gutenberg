@@ -218,6 +218,7 @@ function AudioEdit( {
 						checked={ loop }
 					/>
 					<SelectControl
+						__nextHasNoMarginBottom
 						label={ _x( 'Preload', 'noun; Audio block parameter' ) }
 						value={ preload || '' }
 						// `undefined` is required for the preload attribute to be unset.
@@ -251,6 +252,7 @@ function AudioEdit( {
 				{ showCaption &&
 					( ! RichText.isEmpty( caption ) || isSelected ) && (
 						<RichText
+							identifier="caption"
 							tagName="figcaption"
 							className={ __experimentalGetElementClassName(
 								'caption'

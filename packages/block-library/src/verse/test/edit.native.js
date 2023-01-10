@@ -1,47 +1,54 @@
 /**
  * External dependencies
  */
-import { render } from 'test/helpers';
-
-/**
- * Internal dependencies
- */
-import { metadata, settings, name } from '../index';
+import {
+	addBlock,
+	getEditorHtml,
+	initializeEditor,
+	getBlock,
+} from 'test/helpers';
 
 /**
  * WordPress dependencies
  */
-import { BlockEdit } from '@wordpress/block-editor';
-import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
+import { registerCoreBlocks } from '@wordpress/block-library';
 
-const Verse = ( { clientId, ...props } ) => (
-	<BlockEdit name={ name } clientId={ clientId || 0 } { ...props } />
-);
+beforeAll( () => {
+	// Register all core blocks
+	registerCoreBlocks();
+} );
 
-describe( 'Verse Block', () => {
-	beforeAll( () => {
-		registerBlockType( name, {
-			...metadata,
-			...settings,
+afterAll( () => {
+	// Clean up registered blocks
+	getBlockTypes().forEach( ( block ) => {
+		unregisterBlockType( block.name );
+	} );
+} );
+
+describe( 'Verse block', () => {
+	it( 'inserts block', async () => {
+		const screen = await initializeEditor();
+
+		// Add block
+		await addBlock( screen, 'Verse' );
+
+		// Get block
+		const verseBlock = await getBlock( screen, 'Verse' );
+		expect( verseBlock ).toBeVisible();
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'renders block text set as initial content', async () => {
+		const screen = await initializeEditor( {
+			initialHtml: `<!-- wp:verse -->
+			<pre class="wp-block-verse">Sample text</pre>
+			<!-- /wp:verse -->`,
 		} );
-	} );
 
-	afterAll( () => {
-		unregisterBlockType( name );
-	} );
-
-	it( 'renders without crashing', () => {
-		const component = render( <Verse attributes={ { content: '' } } /> );
-		const rendered = component.toJSON();
-		expect( rendered ).toBeTruthy();
-	} );
-
-	it( 'renders given text without crashing', () => {
-		const component = render(
-			<Verse attributes={ { content: 'sample text' } } />
-		);
-		expect(
-			component.getByDisplayValue( '<pre>sample text</pre>' )
-		).toBeTruthy();
+		// Get block
+		const verseBlock = await getBlock( screen, 'Verse' );
+		expect( verseBlock ).toBeVisible();
+		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 } );

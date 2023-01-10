@@ -11,6 +11,7 @@ import { useContext, useEffect, useRef, useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import useNavigationMenu from '../use-navigation-menu';
+import { areBlocksDirty } from './are-blocks-dirty';
 
 const EMPTY_OBJECT = {};
 const DRAFT_MENU_PARAMS = [
@@ -51,13 +52,17 @@ export default function UnsavedInnerBlocks( {
 		}
 	}, [ blocks ] );
 
-	// If the current inner blocks object is different in any way
-	// from the original inner blocks from the post content then the
-	// user has made changes to the inner blocks. At this point the inner
-	// blocks can be considered "dirty".
-	// We also make sure the current innerBlocks had a chance to be set.
-	const innerBlocksAreDirty =
-		!! originalBlocks.current && blocks !== originalBlocks.current;
+	// If the current inner blocks are different from the original inner blocks
+	// from the post content then the user has made changes to the inner blocks.
+	// At this point the inner blocks can be considered "dirty".
+	// Note: referential equality is not sufficient for comparison as the inner blocks
+	// of the page list are controlled and may be updated async due to syncing with
+	// entity records. As a result we need to perform a deep equality check skipping
+	// the page list's inner blocks.
+	const innerBlocksAreDirty = areBlocksDirty(
+		originalBlocks?.current,
+		blocks
+	);
 
 	const shouldDirectInsert = useMemo(
 		() =>

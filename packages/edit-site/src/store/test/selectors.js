@@ -9,13 +9,9 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import {
 	getCanUserCreateMedia,
 	getSettings,
-	getHomeTemplateId,
 	getEditedPostType,
 	getEditedPostId,
-	getPage,
-	getNavigationPanelActiveMenu,
 	getReusableBlocks,
-	isNavigationOpened,
 	isInserterOpened,
 	isListViewOpened,
 	__unstableGetPreference,
@@ -72,7 +68,7 @@ describe( 'selectors', () => {
 			const state = {
 				settings: {},
 				preferences: {},
-				editedPost: { type: 'wp_template' },
+				editedPost: { postType: 'wp_template' },
 			};
 			const setInserterOpened = () => {};
 			expect( getSettings( state, setInserterOpened ) ).toEqual( {
@@ -95,7 +91,7 @@ describe( 'selectors', () => {
 
 			const state = {
 				settings: { key: 'value' },
-				editedPost: { type: 'wp_template_part' },
+				editedPost: { postType: 'wp_template_part' },
 			};
 			const setInserterOpened = () => {};
 
@@ -114,13 +110,6 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getHomeTemplateId', () => {
-		it( 'returns the home template ID', () => {
-			const state = { homeTemplateId: {} };
-			expect( getHomeTemplateId( state ) ).toBe( state.homeTemplateId );
-		} );
-	} );
-
 	describe( 'getEditedPostId', () => {
 		it( 'returns the template ID', () => {
 			const state = { editedPost: { id: 10 } };
@@ -130,36 +119,8 @@ describe( 'selectors', () => {
 
 	describe( 'getEditedPostType', () => {
 		it( 'returns the template type', () => {
-			const state = { editedPost: { type: 'wp_template' } };
+			const state = { editedPost: { postType: 'wp_template' } };
 			expect( getEditedPostType( state ) ).toBe( 'wp_template' );
-		} );
-	} );
-
-	describe( 'getPage', () => {
-		it( 'returns the page object', () => {
-			const page = {};
-			const state = { editedPost: { page } };
-			expect( getPage( state ) ).toBe( page );
-		} );
-	} );
-
-	describe( 'getNavigationPanelActiveMenu', () => {
-		it( 'returns the current navigation menu', () => {
-			const state = {
-				navigationPanel: { menu: 'test-menu', isOpen: false },
-			};
-			expect( getNavigationPanelActiveMenu( state ) ).toBe( 'test-menu' );
-		} );
-	} );
-
-	describe( 'isNavigationOpened', () => {
-		it( 'returns the navigation panel isOpened state', () => {
-			const state = {
-				navigationPanel: { menu: 'test-menu', isOpen: false },
-			};
-			expect( isNavigationOpened( state ) ).toBe( false );
-			state.navigationPanel.isOpen = true;
-			expect( isNavigationOpened( state ) ).toBe( true );
 		} );
 	} );
 

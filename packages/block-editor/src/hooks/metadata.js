@@ -27,8 +27,7 @@ export function addMetaAttribute( blockTypeSettings ) {
 
 	const supportsBlockNaming = hasBlockMetadataSupport(
 		blockTypeSettings,
-		'name',
-		false
+		'name'
 	);
 
 	if ( supportsBlockNaming ) {

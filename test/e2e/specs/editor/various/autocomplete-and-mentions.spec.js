@@ -409,4 +409,32 @@ test.describe( 'Autocomplete', () => {
 <p>@ringbearer +thebetterhobbit</p>
 <!-- /wp:paragraph -->` );
 	} );
+
+	test( 'should hide UI when selection changes (by keyboard)', async ( {
+		page,
+	} ) => {
+		await page.click( 'role=button[name="Add default block"i]' );
+		await page.keyboard.type( '@fr' );
+		await expect(
+			page.locator( 'role=option', { hasText: 'Frodo Baggins' } )
+		).toBeVisible();
+		await page.keyboard.press( 'ArrowLeft' );
+		await expect(
+			page.locator( 'role=option', { hasText: 'Frodo Baggins' } )
+		).not.toBeVisible();
+	} );
+
+	test( 'should hide UI when selection changes (by mouse)', async ( {
+		page,
+	} ) => {
+		await page.click( 'role=button[name="Add default block"i]' );
+		await page.keyboard.type( '@fr' );
+		await expect(
+			page.locator( 'role=option', { hasText: 'Frodo Baggins' } )
+		).toBeVisible();
+		await page.click( '[data-type="core/paragraph"]' );
+		await expect(
+			page.locator( 'role=option', { hasText: 'Frodo Baggins' } )
+		).not.toBeVisible();
+	} );
 } );

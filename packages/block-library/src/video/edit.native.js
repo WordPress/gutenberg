@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { View, TouchableWithoutFeedback, Text } from 'react-native';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -367,7 +366,7 @@ class VideoEdit extends Component {
 					<BlockCaption
 						accessible={ true }
 						accessibilityLabelCreator={ ( caption ) =>
-							isEmpty( caption )
+							! caption
 								? /* translators: accessibility text. Empty video caption. */
 								  __( 'Video caption. Empty' )
 								: sprintf(

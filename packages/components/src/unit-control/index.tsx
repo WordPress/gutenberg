@@ -60,6 +60,7 @@ function UnforwardedUnitControl(
 		units: unitsProp = CSS_UNITS,
 		value: valueProp,
 		onBlur: onBlurProp,
+		onFocus: onFocusProp,
 		...props
 	} = unitControlProps;
 
@@ -244,6 +245,7 @@ function UnforwardedUnitControl(
 			unit={ unit }
 			units={ units }
 			onBlur={ onBlurProp }
+			onFocus={ onFocusProp }
 		/>
 	) : null;
 
@@ -277,6 +279,7 @@ function UnforwardedUnitControl(
 			value={ parsedQuantity ?? '' }
 			step={ step }
 			__unstableStateReducer={ stateReducer }
+			onFocus={ onFocusProp }
 		/>
 	);
 }

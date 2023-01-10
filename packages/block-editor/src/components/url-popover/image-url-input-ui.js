@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, map } from 'lodash';
+import { map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -189,7 +189,7 @@ const ImageURLInputUI = ( {
 			linkDestinationInput = LINK_DESTINATION_NONE;
 		} else {
 			linkDestinationInput = (
-				find( linkDestinations, ( destination ) => {
+				linkDestinations.find( ( destination ) => {
 					return destination.url === value;
 				} ) || { linkDestination: LINK_DESTINATION_CUSTOM }
 			).linkDestination;
@@ -236,8 +236,9 @@ const ImageURLInputUI = ( {
 	const linkEditorValue = urlInput !== null ? urlInput : url;
 
 	const urlLabel = (
-		find( getLinkDestinations(), [ 'linkDestination', linkDestination ] ) ||
-		{}
+		getLinkDestinations().find(
+			( destination ) => destination.linkDestination === linkDestination
+		) || {}
 	).title;
 
 	return (

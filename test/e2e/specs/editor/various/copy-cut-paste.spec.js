@@ -433,4 +433,19 @@ test.describe( 'Copy/cut/paste', () => {
 			await page.evaluate( () => document.activeElement.innerHTML )
 		).toBe( 'axyb' );
 	} );
+
+	test( 'should paste preformatted in list', async ( {
+		page,
+		pageUtils,
+		editor,
+	} ) => {
+		await pageUtils.setClipboardData( {
+			html: '<pre>x</pre>',
+		} );
+		await editor.insertBlock( { name: 'core/list' } );
+		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		// Ensure the selection is correct.
+		await page.keyboard.type( 'y' );
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
