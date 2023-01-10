@@ -111,8 +111,9 @@ add_action( 'rest_api_init', 'gutenberg_register_global_styles_endpoints' );
  * @return WP_REST_Response $response Updated response object.
  */
 function gutenberg_modify_rest_sidebars_response( $response ) {
-	$response->data['status'] = wp_is_block_theme() ? 'inactive' : 'active';
-
+	if ( wp_is_block_theme() ) {
+		$response->data['status'] = 'inactive';
+	}
 	return $response;
 }
 add_filter( 'rest_prepare_sidebar', 'gutenberg_modify_rest_sidebars_response' );

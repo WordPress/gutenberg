@@ -17,6 +17,7 @@ import {
 	formatTestResults,
 	parseIssueBody,
 	renderCommitComment,
+	isReportComment,
 } from './markdown';
 import type { ReportedIssue } from './types';
 
@@ -163,19 +164,30 @@ async function run() {
 		return;
 	}
 
-	const commitSHA =
+	const { html_url: commentUrl } =
 		github.context.eventName === 'pull_request'
-			? // Cast the payload type: https://github.com/actions/toolkit/tree/main/packages/github#webhook-payload-typescript-definitions
-			  ( github.context.payload as PullRequestEvent ).pull_request.head
-					.sha
-			: github.context.sha;
-	const { html_url: commentUrl } = await api.createComment(
-		commitSHA,
-		renderCommitComment( {
-			runURL,
-			reportedIssues,
-		} )
-	);
+			? await api.createCommentOnPR(
+					// Cast the payload type: https://github.com/actions/toolkit/tree/main/packages/github#webhook-payload-typescript-definitions
+					( github.context.payload as PullRequestEvent ).number,
+					renderCommitComment( {
+						runURL,
+						reportedIssues,
+						commitSHA: (
+							github.context.payload as PullRequestEvent
+						 ).pull_request.head.sha,
+					} ),
+					isReportComment
+			  )
+			: await api.createCommentOnCommit(
+					github.context.sha,
+					renderCommitComment( {
+						runURL,
+						reportedIssues,
+						commitSHA: github.context.sha,
+					} ),
+					isReportComment
+			  );
+
 	core.info( `Reported the summary of the flaky tests to ${ commentUrl }` );
 }
 

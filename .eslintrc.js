@@ -115,6 +115,7 @@ const restrictedImports = [
 			'partial',
 			'partialRight',
 			'pick',
+			'pickBy',
 			'random',
 			'reduce',
 			'reject',
