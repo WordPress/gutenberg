@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import type { ForwardedRef, HTMLProps, MouseEvent, ReactNode } from 'react';
+import type { ForwardedRef, HTMLProps, MouseEvent } from 'react';
 
 /**
  * WordPress dependencies
@@ -170,7 +170,7 @@ export function UnforwardedButton(
 	const describedById =
 		additionalProps[ 'aria-describedby' ] || descriptionId;
 
-	const tagElementProps = {
+	const elementProps = {
 		...tagProps,
 		...additionalProps,
 		className: classes,
@@ -179,31 +179,8 @@ export function UnforwardedButton(
 		ref,
 	};
 
-	const TagElement = ( {
-		children: tagChildren,
-	}: {
-		children: ReactNode;
-	} ) => {
-		return Tag === 'a' ? (
-			<Tag
-				{ ...( tagElementProps as WordPressComponentProps< {}, 'a' > ) }
-			>
-				{ tagChildren }
-			</Tag>
-		) : (
-			<Tag
-				{ ...( tagElementProps as WordPressComponentProps<
-					{},
-					'button'
-				> ) }
-			>
-				{ tagChildren }
-			</Tag>
-		);
-	};
-
-	const element = (
-		<TagElement>
+	const elementChildren = (
+		<>
 			{ icon && iconPosition === 'left' && (
 				<Icon icon={ icon } size={ iconSize } />
 			) }
@@ -212,8 +189,24 @@ export function UnforwardedButton(
 				<Icon icon={ icon } size={ iconSize } />
 			) }
 			{ children }
-		</TagElement>
+		</>
 	);
+
+	const element =
+		Tag === 'a' ? (
+			<a { ...( elementProps as WordPressComponentProps< {}, 'a' > ) }>
+				{ elementChildren }
+			</a>
+		) : (
+			<button
+				{ ...( elementProps as WordPressComponentProps<
+					{},
+					'button'
+				> ) }
+			>
+				{ elementChildren }
+			</button>
+		);
 
 	if ( ! shouldShowTooltip ) {
 		return (
