@@ -1413,6 +1413,49 @@ class WP_HTML_Tag_Processor {
 	}
 
 	/**
+	 * Returns the lowercase names of all attributes matching a given prefix in the currently-opened tag.
+	 *
+	 * Note that matching is case-insensitive. This is in accordance with the spec:
+	 *
+	 * > There must never be two or more attributes on
+	 * > the same start tag whose names are an ASCII
+	 * > case-insensitive match for each other.
+	 *     - HTML 5 spec
+	 *
+	 * @see https://html.spec.whatwg.org/multipage/syntax.html#attributes-2:ascii-case-insensitive
+	 *
+	 * Example:
+	 * <code>
+	 *     $p = new WP_HTML_Tag_Processor( '<div data-ENABLED class="test" DATA-test-id="14">Test</div>' );
+	 *     $p->next_tag( [ 'class_name' => 'test' ] ) === true;
+	 *     $p->get_attribute_names_with_prefix( 'data-' ) === array( 'data-enabled', 'data-test-id' );
+	 *
+	 *     $p->next_tag( [] ) === false;
+	 *     $p->get_attribute_names_with_prefix( 'data-' ) === null;
+	 * </code>
+	 *
+	 * @since 6.2.0
+	 *
+	 * @param string $prefix Prefix of requested attribute names.
+	 * @return array|null List of attribute names, or `null` if not at a tag.
+	 */
+	function get_attribute_names_with_prefix( $prefix ) {
+		if ( $this->is_closing_tag || null === $this->tag_name_starts_at ) {
+			return null;
+		}
+
+		$comparable = strtolower( $prefix );
+
+		$matches = array();
+		foreach ( array_keys( $this->attributes ) as $attr_name ) {
+			if ( str_starts_with( $attr_name, $comparable ) ) {
+				$matches[] = $attr_name;
+			}
+		}
+		return $matches;
+	}
+
+	/**
 	 * Returns the lowercase name of the currently-opened tag.
 	 *
 	 * Example:
