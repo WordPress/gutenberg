@@ -208,52 +208,50 @@ function __ExperimentalOffCanvasEditor(
 				listViewRef={ elementRef }
 				blockDropTarget={ blockDropTarget }
 			/>
-			<div className="offcanvas-editor-list-view-tree-wrapper">
-				<TreeGrid
-					id={ id }
-					className="block-editor-list-view-tree"
-					aria-label={ __( 'Block navigation structure' ) }
-					ref={ treeGridRef }
-					onCollapseRow={ collapseRow }
-					onExpandRow={ expandRow }
-					onFocusRow={ focusRow }
-					applicationAriaLabel={ __( 'Block navigation structure' ) }
-				>
-					<ListViewContext.Provider value={ contextValue }>
-						<ListViewBranch
-							blocks={ clientIdsTree }
-							selectBlock={ selectEditorBlock }
-							showBlockMovers={ showBlockMovers }
-							fixedListWindow={ fixedListWindow }
-							selectedClientIds={ selectedClientIds }
-							isExpanded={ isExpanded }
-							shouldShowInnerBlocks={ shouldShowInnerBlocks }
-							selectBlockInCanvas={ selectBlockInCanvas }
-						/>
-						<TreeGridRow
-							level={ 1 }
-							setSize={ 1 }
-							positionInSet={ 1 }
-							isExpanded={ true }
-						>
-							<TreeGridCell>
-								{ ( treeGridCellProps ) => (
-									<Appender { ...treeGridCellProps } />
-								) }
-							</TreeGridCell>
-							{ ! clientIdsTree.length && (
-								<TreeGridCell withoutGridItem>
-									<div className="offcanvas-editor-list-view-is-empty">
-										{ __(
-											'Your menu is currently empty. Add your first menu item to get started.'
-										) }
-									</div>
-								</TreeGridCell>
+			<TreeGrid
+				id={ id }
+				className="block-editor-list-view-tree"
+				aria-label={ __( 'Block navigation structure' ) }
+				ref={ treeGridRef }
+				onCollapseRow={ collapseRow }
+				onExpandRow={ expandRow }
+				onFocusRow={ focusRow }
+				applicationAriaLabel={ __( 'Block navigation structure' ) }
+			>
+				<ListViewContext.Provider value={ contextValue }>
+					<ListViewBranch
+						blocks={ clientIdsTree }
+						selectBlock={ selectEditorBlock }
+						showBlockMovers={ showBlockMovers }
+						fixedListWindow={ fixedListWindow }
+						selectedClientIds={ selectedClientIds }
+						isExpanded={ isExpanded }
+						shouldShowInnerBlocks={ shouldShowInnerBlocks }
+						selectBlockInCanvas={ selectBlockInCanvas }
+					/>
+					<TreeGridRow
+						level={ 1 }
+						setSize={ 1 }
+						positionInSet={ 1 }
+						isExpanded={ true }
+					>
+						<TreeGridCell>
+							{ ( treeGridCellProps ) => (
+								<Appender { ...treeGridCellProps } />
 							) }
-						</TreeGridRow>
-					</ListViewContext.Provider>
-				</TreeGrid>
-			</div>
+						</TreeGridCell>
+						{ ! clientIdsTree.length && (
+							<TreeGridCell withoutGridItem>
+								<div className="offcanvas-editor-list-view-is-empty">
+									{ __(
+										'Your menu is currently empty. Add your first menu item to get started.'
+									) }
+								</div>
+							</TreeGridCell>
+						) }
+					</TreeGridRow>
+				</ListViewContext.Provider>
+			</TreeGrid>
 		</AsyncModeProvider>
 	);
 }
