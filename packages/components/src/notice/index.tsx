@@ -14,9 +14,7 @@ import { close } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { Button } from '../';
-
-/** @typedef {import('@wordpress/element').WPElement} WPElement */
+import { Button } from '..';
 
 const noop = () => {};
 
