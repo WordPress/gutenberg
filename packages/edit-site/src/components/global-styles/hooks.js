@@ -16,7 +16,7 @@ import {
 	__EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE,
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 } from '@wordpress/blocks';
-import { store as coreStore } from '@wordpress/core-data';
+import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
@@ -380,27 +380,57 @@ export function useHasUserModifiedStyles() {
 }
 
 export function useCreateNewStyleRecord( title ) {
-	const { __experimentalCreateNewGlobalStylesVariation } =
-		useDispatch( coreStore );
+	const { saveEntityRecord } = useDispatch( coreStore );
 	const { user } = useContext( GlobalStylesContext );
 	const callback = useCallback( () => {
-		return __experimentalCreateNewGlobalStylesVariation( {
+		const recordData = {
 			...user,
 			title,
-		} );
+		};
+		/* eslint-disable dot-notation */
+		delete recordData[ 'associated_style_id' ];
+		delete recordData[ 'id' ];
+		/* eslint-enable dot-notation */
+		return saveEntityRecord( 'root', 'globalStyles', recordData ).then(
+			( rawVariation ) => {
+				return {
+					...rawVariation,
+					title: rawVariation?.title?.rendered,
+				};
+			}
+		);
 	}, [ title, user ] );
 	return callback;
 }
 
 export function useCustomSavedStyles() {
-	const { variations } = useSelect( ( select ) => {
-		const { __experimentalGetGlobalStylesVariations } = select( coreStore );
+	const { globalStylesId } = useSelect( ( select ) => {
 		return {
-			variations: __experimentalGetGlobalStylesVariations( 'user' ),
+			globalStylesId:
+				select( coreStore ).__experimentalGetCurrentGlobalStylesId(),
 		};
 	}, [] );
+	const { records: variations } = useEntityRecords( 'root', 'globalStyles' );
 
-	return variations;
+	const customVariations = useMemo( () => {
+		return (
+			variations
+				?.filter( ( variation ) => variation.id !== globalStylesId )
+				?.map( ( variation ) => {
+					let newVariation = variation;
+					if ( variation?.title?.rendered !== undefined ) {
+						newVariation = {
+							...variation,
+							title: variation.title.rendered,
+						};
+					}
+
+					return newVariation;
+				} ) || []
+		);
+	}, [ globalStylesId, variations ] );
+
+	return customVariations;
 }
 
 export function useUserChangesMatchAnyVariation( variations ) {

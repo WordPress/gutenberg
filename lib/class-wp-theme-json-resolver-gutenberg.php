@@ -782,7 +782,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	}
 
 	/**
-	 * Returns the style variations defined by the user.
+	 * Returns all style variations.
 	 *
 	 * @since 6.2.0
 	 *
@@ -790,8 +790,6 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 */
 	public static function get_user_style_variations() {
 		$stylesheet = get_stylesheet();
-
-		$initial_variation = (int) static::get_user_global_styles_post_id();
 
 		$args = array(
 			'posts_per_page'         => -1,
@@ -803,7 +801,6 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			'no_found_rows'          => true,
 			'update_post_meta_cache' => false,
 			'update_post_term_cache' => false,
-			'post__not_in'           => array( $initial_variation ),
 			'tax_query'              => array(
 				array(
 					'taxonomy' => 'wp_theme',

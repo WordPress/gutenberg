@@ -146,10 +146,7 @@ function UserVariation( { variation, userChangesMatchAnyVariation } ) {
 	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
 	const associatedStyleId = user[ 'associated_style_id' ];
 	const { hasEditsForEntityRecord } = useSelect( coreStore );
-	const {
-		deleteEntityRecord,
-		__experimentalRefreshUserGlobalStylesVariations,
-	} = useDispatch( coreStore );
+	const { deleteEntityRecord } = useDispatch( coreStore );
 	const { globalStyleId } = useSelect( ( select ) => {
 		return {
 			globalStyleId:
@@ -237,9 +234,7 @@ function UserVariation( { variation, userChangesMatchAnyVariation } ) {
 			} ) );
 		}
 
-		deleteEntityRecord( 'root', 'globalStyles', variation.id ).then( () => {
-			__experimentalRefreshUserGlobalStylesVariations();
-		} );
+		deleteEntityRecord( 'root', 'globalStyles', variation.id );
 	}, [ variation, associatedStyleId ] );
 
 	return (

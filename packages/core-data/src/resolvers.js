@@ -504,7 +504,7 @@ export const __experimentalGetGlobalStylesVariations =
 			);
 		} else {
 			const variations = await apiFetch( {
-				path: `/wp/v2/global-styles/user/variations`,
+				path: `/wp/v2/global-styles`,
 			} );
 			dispatch.__experimentalReceiveUserGlobalStyleVariations(
 				currentTheme.stylesheet,

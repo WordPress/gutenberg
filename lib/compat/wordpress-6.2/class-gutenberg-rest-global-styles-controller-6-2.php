@@ -26,19 +26,12 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 					'permission_callback' => array( $this, 'create_item_permissions_check' ),
 					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::CREATABLE ),
 				),
-				'schema' => array( $this, 'get_public_item_schema' ),
-			)
-		);
-
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/user/variations',
-			array(
 				array(
 					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => array( $this, 'get_user_items' ),
-					'permission_callback' => array( $this, 'get_user_items_permissions_check' ),
+					'callback'            => array( $this, 'get_items' ),
+					'permission_callback' => array( $this, 'get_items_permissions_check' ),
 				),
+				'schema' => array( $this, 'get_public_item_schema' ),
 			)
 		);
 
@@ -128,6 +121,45 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 	}
 
 	/**
+	 * Checks if a given request has access to read all theme global styles configs.
+	 *
+	 * @since 6.0.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has read access for the item, WP_Error object otherwise.
+	 */
+	public function get_items_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		// Verify if the current user has edit_theme_options capability.
+		// This capability is required to edit/view/delete templates.
+		if ( ! current_user_can( 'edit_theme_options' ) ) {
+			return new WP_Error(
+				'rest_cannot_manage_global_styles',
+				__( 'Sorry, you are not allowed to access the global styles on this site.', 'gutenberg' ),
+				array(
+					'status' => rest_authorization_required_code(),
+				)
+			);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Deletes the given global styles config.
+	 *
+	 * @since 6.2
+	 *
+	 * @param WP_REST_Request $request The request instance.
+	 *
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function get_items( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		$variations = WP_Theme_JSON_Resolver_Gutenberg::get_user_style_variations();
+		$response   = rest_ensure_response( $variations );
+		return $response;
+	}
+
+	/**
 	 * Checks if a given request has access to delete a single global style.
 	 *
 	 * @since 6.2
@@ -193,45 +225,6 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 		}
 
 		return $response;
-	}
-
-	/**
-	 * Returns the user global styles variations.
-	 *
-	 * @since 6.2
-	 *
-	 * @param WP_REST_Request $request The request instance.
-	 *
-	 * @return WP_REST_Response|WP_Error
-	 */
-	public function get_user_items( /* @phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable */ $request ) {
-		$variations = WP_Theme_JSON_Resolver_Gutenberg::get_user_style_variations();
-		$response   = rest_ensure_response( $variations );
-		return $response;
-	}
-
-	/**
-	 * Checks if a given request has access to read a single user global styles config.
-	 *
-	 * @since 6.2
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return true|WP_Error True if the request has read access for the item, WP_Error object otherwise.
-	 */
-	public function get_user_items_permissions_check( /* @phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable */ $request ) {
-		// Verify if the current user has edit_theme_options capability.
-		// This capability is required to edit/view/delete templates.
-		if ( ! current_user_can( 'edit_theme_options' ) ) {
-			return new WP_Error(
-				'rest_cannot_manage_global_styles',
-				__( 'Sorry, you are not allowed to access the global styles on this site.', 'gutenberg' ),
-				array(
-					'status' => rest_authorization_required_code(),
-				)
-			);
-		}
-
-		return true;
 	}
 
 	/**

@@ -858,54 +858,6 @@ export function receiveAutosaves( postId, autosaves ) {
 }
 
 /**
- * @param {Object} globalStylesData Global styles configuration.
- */
-export const __experimentalCreateNewGlobalStylesVariation =
-	( globalStylesData ) =>
-	async ( { dispatch, select } ) => {
-		const newVariationData = await apiFetch( {
-			path: '/wp/v2/global-styles',
-			method: 'POST',
-			data: globalStylesData,
-		} );
-
-		// Refresh variations
-		await dispatch.__experimentalRefreshUserGlobalStylesVariations();
-
-		/* eslint-disable dot-notation */
-		// Discard changes to the previously associated variation
-		const globalStylesId = select.__experimentalGetCurrentGlobalStylesId();
-		const userConfig = select.getEditedEntityRecord(
-			'root',
-			'globalStyles',
-			globalStylesId
-		);
-		if ( userConfig[ 'associated_style_id' ] ) {
-			dispatch.__experimentalDiscardRecordChanges(
-				'root',
-				'globalStyles',
-				userConfig[ 'associated_style_id' ]
-			);
-		}
-		/* eslint-enable dot-notation */
-
-		return newVariationData;
-	};
-
-export const __experimentalRefreshUserGlobalStylesVariations =
-	() =>
-	async ( { dispatch, resolveSelect } ) => {
-		const currentTheme = await resolveSelect.getCurrentTheme();
-		const variations = await apiFetch( {
-			path: `/wp/v2/global-styles/user/variations`,
-		} );
-		dispatch.__experimentalReceiveUserGlobalStyleVariations(
-			currentTheme.stylesheet,
-			variations
-		);
-	};
-
-/**
  * Discards changes in the specified record.
  *
  * @param {string} kind     Entity kind.

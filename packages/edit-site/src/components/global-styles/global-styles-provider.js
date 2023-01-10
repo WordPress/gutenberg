@@ -161,6 +161,11 @@ function useGlobalStylesUserConfig() {
 				updatedRecord[ 'associated_style_id' ]
 			) {
 				associatedStyleIdChanged = true;
+				__experimentalDiscardRecordChanges(
+					'root',
+					'globalStyles',
+					currentConfig[ 'associated_style_id' ]
+				);
 			}
 
 			editEntityRecord(
@@ -170,24 +175,6 @@ function useGlobalStylesUserConfig() {
 				updatedRecord,
 				options
 			);
-
-			// If a theme variation is selected, discard any changes made to the
-			// associated style record
-			if (
-				! updatedRecord[ 'associated_style_id' ] &&
-				currentConfig[ 'associated_style_id' ] &&
-				hasFinishedResolution( 'getEditedEntityRecord', [
-					'root',
-					'globalStyles',
-					currentConfig[ 'associated_style_id' ],
-				] )
-			) {
-				__experimentalDiscardRecordChanges(
-					'root',
-					'globalStyles',
-					currentConfig[ 'associated_style_id' ]
-				);
-			}
 
 			// Also add changes that were made to the user record to the associated record.
 			if (
