@@ -37,6 +37,7 @@ import Header from '../header-edit-mode';
 import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
 import SiteHub from '../site-hub';
 import ResizeHandle from '../block-editor/resize-handle';
+import useSyncCanvasModeWithURL from '../sync-state-with-url/use-sync-canvas-mode-with-url';
 
 const ANIMATION_DURATION = 0.5;
 const emptyResizeHandleStyles = {
@@ -54,6 +55,8 @@ const emptyResizeHandleStyles = {
 export default function Layout( { onError } ) {
 	// This ensures the edited entity id and type are initialized properly.
 	useInitEditedEntityFromURL();
+	useSyncCanvasModeWithURL();
+
 	const hubRef = useRef();
 	const { params } = useLocation();
 	const isListPage = getIsListPage( params );
@@ -116,6 +119,13 @@ export default function Layout( { onError } ) {
 			setIsMobileCanvasVisible( true );
 		}
 	}, [ canvasMode, isMobileViewport ] );
+
+	// Synchronizing the URL with the store value of canvasMode happens in an effect
+	// This condition ensures the component is only rendered after the synchronization happens
+	// which prevents any animations due to potential canvasMode value change.
+	if ( canvasMode === 'init' ) {
+		return null;
+	}
 
 	return (
 		<>
