@@ -1413,7 +1413,7 @@ class WP_HTML_Tag_Processor {
 	}
 
 	/**
-	 * Returns the (lowercase) names of all attributes matching a given prefix in the currently-opened tag.
+	 * Returns the lowercase names of all attributes matching a given prefix in the currently-opened tag.
 	 *
 	 * Note that matching is case-insensitive. This is in accordance with the spec:
 	 *
