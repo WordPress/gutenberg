@@ -20,6 +20,7 @@ import { useEffect, useMemo, useState } from '@wordpress/element';
  */
 import useNavigationMenu from '../use-navigation-menu';
 import useNavigationEntities from '../use-navigation-entities';
+import ManageMenusButton from './manage-menus-button';
 
 function NavigationMenuSelector( {
 	currentMenuId,
@@ -30,6 +31,7 @@ function NavigationMenuSelector( {
 	createNavigationMenuIsSuccess,
 	createNavigationMenuIsError,
 	toggleProps = {},
+	isManageMenusButtonDisabled,
 } ) {
 	const isOffCanvasNavigationEditorEnabled =
 		window?.__experimentalEnableOffCanvasNavigationEditor === true;
@@ -234,6 +236,14 @@ function NavigationMenuSelector( {
 							>
 								{ __( 'Create new menu' ) }
 							</MenuItem>
+							{ isOffCanvasNavigationEditorEnabled && (
+								<ManageMenusButton
+									isManageMenusButtonDisabled={
+										isManageMenusButtonDisabled
+									}
+									isMenuItem={ true }
+								/>
+							) }
 						</MenuGroup>
 					) }
 				</>
