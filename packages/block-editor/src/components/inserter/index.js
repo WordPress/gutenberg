@@ -30,18 +30,25 @@ const defaultRenderToggle = ( {
 	hasSingleBlockType,
 	toggleProps = {},
 	prioritizePatterns,
+	label,
 } ) => {
-	let label;
-	if ( hasSingleBlockType ) {
-		label = sprintf(
+	let buttonLabel;
+
+	if ( label ) {
+		buttonLabel = label;
+	} else if ( hasSingleBlockType ) {
+		buttonLabel = sprintf(
 			// translators: %s: the name of the block when there is only one
 			_x( 'Add %s', 'directly add the only allowed block' ),
 			blockTitle
 		);
 	} else if ( prioritizePatterns ) {
-		label = __( 'Add pattern' );
+		buttonLabel = __( 'Add pattern' );
 	} else {
-		label = _x( 'Add block', 'Generic label for block inserter button' );
+		buttonLabel = _x(
+			'Add block',
+			'Generic label for block inserter button'
+		);
 	}
 
 	const { onClick, ...rest } = toggleProps;
@@ -59,7 +66,7 @@ const defaultRenderToggle = ( {
 	return (
 		<Button
 			icon={ plus }
-			label={ label }
+			label={ buttonLabel }
 			tooltipPosition="bottom"
 			onClick={ handleClick }
 			className="block-editor-inserter__toggle"
@@ -109,6 +116,7 @@ class Inserter extends Component {
 			hasItems,
 			renderToggle = defaultRenderToggle,
 			prioritizePatterns,
+			toggleLabel,
 		} = this.props;
 
 		return renderToggle( {
@@ -120,6 +128,7 @@ class Inserter extends Component {
 			directInsertBlock,
 			toggleProps,
 			prioritizePatterns,
+			label: toggleLabel,
 		} );
 	}
 
