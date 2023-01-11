@@ -54,19 +54,20 @@ const LAYOUT = {
 	alignments: [],
 };
 
-export default function BlockEditor( { setIsInserterOpen } ) {
+export default function BlockEditor() {
+	const { setPage, setIsInserterOpened } = useDispatch( editSiteStore );
 	const { storedSettings, templateType, canvasMode } = useSelect(
 		( select ) => {
 			const { getSettings, getEditedPostType, __unstableGetCanvasMode } =
 				select( editSiteStore );
 
 			return {
-				storedSettings: getSettings( setIsInserterOpen ),
+				storedSettings: getSettings( setIsInserterOpened ),
 				templateType: getEditedPostType(),
 				canvasMode: __unstableGetCanvasMode(),
 			};
 		},
-		[ setIsInserterOpen ]
+		[ setIsInserterOpened ]
 	);
 
 	const settingsBlockPatterns =
@@ -136,7 +137,6 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		'postType',
 		templateType
 	);
-	const { setPage } = useDispatch( editSiteStore );
 
 	const contentRef = useRef();
 	const mergedRefs = useMergeRefs( [
