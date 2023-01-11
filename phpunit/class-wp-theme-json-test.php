@@ -894,7 +894,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 									'background' => 'blue',
 								),
 							),
-							':seen' => array(
+							':seen'  => array(
 								'color' => array(
 									'background' => 'ivory',
 								),
