@@ -22,32 +22,75 @@ import { applyBlockDeprecatedVersions } from './apply-block-deprecated-versions'
 import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
 
 /**
- * The raw structure of a block includes its attributes, inner
- * blocks, and inner HTML. It is important to distinguish inner blocks from
- * the HTML content of the block as only the latter is relevant for block
- * validation and edit operations.
+ * The "block node" represents a transition from serialized block data
+ * into a fully-loaded block with its implementation. It contains the
+ * information parsed from the input document; be that serialized HTML
+ * as is the default case in WordPress, or directly loaded from a
+ * structured data store.
  *
- * @typedef WPRawBlock
+ * Block nodes do not indicate all of a block's attributes, as some of
+ * its attributes may be sourced later on from the `innerHTML` by the
+ * block implementation. This is one example of where the block node
+ * is not a complete "block" and requires further processing.
  *
- * @property {string=}         blockName    Block name
- * @property {Object=}         attrs        Block raw or comment attributes.
- * @property {string}          innerHTML    HTML content of the block.
- * @property {(string|null)[]} innerContent Content without inner blocks.
- * @property {WPRawBlock[]}    innerBlocks  Inner Blocks.
+ * Block validation only examines `innerHTML` and delegates the validation
+ * of any inner blocks to the block loading process for those blocks.
+ * This prevents an issue with a potentially deeply-nested inner block
+ * from cascading up and invalidating all of its parent blocks.
+ *
+ * @typedef {Object} BlockNode
+ *
+ * @property {string|null}     blockName    Name indicating namespaced block type, e.g. "my-plugin/my-block".
+ *                                          A `null` block name is given to a section of freeform HTML content.
+ * @property {Object|null}     attrs        Attributes sourced from parsed JSON in the block comment delimiters.
+ *                                          When unable to parse block comment attributes, `attrs` will be `null`.
+ * @property {BlockNode[]}     innerBlocks  Nested block nodes; may be empty.
+ * @property {(string|null)[]} innerContent Indicates arrangement of text chunks and inner blocks.
+ * @property {string}          innerHTML    Full text inside block boundaries excluding inner block content.
  */
 
 /**
- * Fully parsed block object.
+ * Fully parsed and runnable Gutenberg block.
  *
- * @typedef WPBlock
+ * A runnable block combines a parsed block node with a matching
+ * block implementation. The implementation provides an `edit`
+ * (and possibly a `save`) function used to interact with the
+ * block node inside the editor and to serialize its contents
+ * on save.
  *
- * @property {string}     name                    Block name
- * @property {Object}     attributes              Block raw or comment attributes.
- * @property {WPBlock[]}  innerBlocks             Inner Blocks.
- * @property {string}     originalContent         Original content of the block before validation fixes.
- * @property {boolean}    isValid                 Whether the block is valid.
- * @property {Object[]}   validationIssues        Validation issues.
- * @property {WPRawBlock} [__unstableBlockSource] Un-processed original copy of block if created through parser.
+ * These blocks may be substantially different from parsed block
+ * nodes which created them as the loading process may run the
+ * block through a pipeline of automatic fixes, normalization,
+ * and upgrade through the deprecation process.
+ *
+ * It's possible that the editor was unable to recognize a block
+ * during the loading process. In such a case the block object
+ * may be an entirely different block than one expects from the
+ * block node which created it.
+ *
+ * Unrecognizable blocks exist for a few different reasons:
+ *  - Raw HTML was found in the input document and wrapped in
+ *    a "freeform" block to represent that non-block content.
+ *  - A block node specifies a block type that isn't registered
+ *    in the editor and is wrapped in a "missing" block.
+ *  - Blocks which fail validation will be tagged with a `false`
+ *    value for `isValid`.
+ *
+ * Except for freeform HTML content, the editor is unable to
+ * interact with unrecognizable blocks and will be inert in
+ * the editor unless converted into a recognizable block.
+ *
+ * @typedef {Object} WPBlock
+ *
+ * @property {string}    name                    Name indicating namespaced block type, e.g. "my-plugin/my-block".
+ * @property {Object}    attributes              All block attributes, combining those present in the associated
+ *                                               block node which created this block, and those which the block
+ *                                               implementation sourced from the block's `innerHTML`.
+ * @property {WPBlock[]} innerBlocks             Nested inner blocks; may be empty.
+ * @property {string}    originalContent         Original content of the block before validation fixes.
+ * @property {boolean}   isValid                 Whether the editor recognizes the block and can interact with it.
+ * @property {Object[]}  validationIssues        Validation issues.
+ * @property {BlockNode} [__unstableBlockSource] Original unprocessed block node which created this block, if available.
  */
 
 /**
@@ -61,31 +104,32 @@ import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
  * both in the parser level for previous content and to convert such blocks
  * used in Custom Post Types templates.
  *
- * @param {WPRawBlock} rawBlock
+ * @param {BlockNode} block
  *
- * @return {WPRawBlock} The block's name and attributes, changed accordingly if a match was found
+ * @return {BlockNode} The block's name and attributes, changed accordingly if a match was found
  */
-function convertLegacyBlocks( rawBlock ) {
-	const [ correctName, correctedAttributes ] =
-		convertLegacyBlockNameAndAttributes(
-			rawBlock.blockName,
-			rawBlock.attrs
-		);
-	return {
-		...rawBlock,
-		blockName: correctName,
-		attrs: correctedAttributes,
-	};
+function convertLegacyBlocks( block ) {
+	const { blockName: rawBlockName, attrs: rawAttrs } = block;
+
+	const [ blockName, attrs ] = convertLegacyBlockNameAndAttributes(
+		rawBlockName,
+		rawAttrs
+	);
+
+	const needsCorrection = blockName !== rawBlockName || attrs !== rawAttrs;
+
+	// Avoid cloning block data if no conversion was performed.
+	return needsCorrection ? { ...block, blockName, attrs } : block;
 }
 
 /**
  * Normalize the raw block by applying the fallback block name if none given,
  * sanitize the parsed HTML...
  *
- * @param {WPRawBlock}    rawBlock The raw block object.
+ * @param {BlockNode}     rawBlock The raw block object.
  * @param {ParseOptions?} options  Extra options for handling block parsing.
  *
- * @return {WPRawBlock} The normalized block object.
+ * @return {BlockNode} The normalized block object.
  */
 export function normalizeRawBlock( rawBlock, options ) {
 	const fallbackBlockName = getFreeformContentHandlerName();
@@ -103,6 +147,7 @@ export function normalizeRawBlock( rawBlock, options ) {
 		rawBlockName === fallbackBlockName &&
 		! options?.__unstableSkipAutop
 	) {
+		// @TODO: Should we be running autop on all of the text chunks of innerContents?
 		rawInnerHTML = autop( rawInnerHTML ).trim();
 	}
 
@@ -118,9 +163,9 @@ export function normalizeRawBlock( rawBlock, options ) {
 /**
  * Uses the "unregistered blockType" to create a block object.
  *
- * @param {WPRawBlock} rawBlock block.
+ * @param {BlockNode} rawBlock block.
  *
- * @return {WPRawBlock} The unregistered block object.
+ * @return {BlockNode} The unregistered block object.
  */
 function createMissingBlockType( rawBlock ) {
 	const unregisteredFallbackBlock =
@@ -187,10 +232,10 @@ function applyBlockValidation( unvalidatedBlock, blockType ) {
 /**
  * Given a raw block returned by grammar parsing, returns a fully parsed block.
  *
- * @param {WPRawBlock}   rawBlock The raw block object.
+ * @param {BlockNode}    rawBlock The raw block object.
  * @param {ParseOptions} options  Extra options for handling block parsing.
  *
- * @return {WPBlock} Fully parsed block.
+ * @return {WPBlock|undefined} Fully parsed block.
  */
 export function parseRawBlock( rawBlock, options ) {
 	let normalizedBlock = normalizeRawBlock( rawBlock, options );
@@ -221,11 +266,45 @@ export function parseRawBlock( rawBlock, options ) {
 		return;
 	}
 
-	// Parse inner blocks recursively.
-	const parsedInnerBlocks = normalizedBlock.innerBlocks
-		.map( ( innerBlock ) => parseRawBlock( innerBlock, options ) )
-		// See https://github.com/WordPress/gutenberg/pull/17164.
-		.filter( ( innerBlock ) => !! innerBlock );
+	/*
+	 * Parse inner blocks recursively.
+	 *
+	 * Once we can asynchronously load blocks we'll store
+	 * a Promise for each parse. We need to insert these
+	 * Promises in sequence here to avoid the possibility
+	 * of re-ordering the blocks due to data races in the
+	 * parsing and loading.
+	 */
+	const parsedInnerBlocks = [];
+	for ( const innerBlock of normalizedBlock.innerBlocks ) {
+		parsedInnerBlocks.push( parseRawBlock( innerBlock, options ) );
+	}
+
+	/*
+	 * Once these are also resolved promises, we will then
+	 * need to run through the list and prune any blocks
+	 * which were removed; for example, an empty freeform
+	 * block. We will need to `await Promise.all( blocks )`
+	 * when that time comes before moving on to this step.
+	 *
+	 * Note: We normally expect few or no removed blocks,
+	 *       particularly as a ratio of all blocks. Because
+	 *       of that we'll optimize for the normal case with
+	 *       the use of `splice`, which will collapse this
+	 *       step into a quick scan through the array.
+	 */
+	for ( let i = 0; i < parsedInnerBlocks.length; i++ ) {
+		if ( ! parsedInnerBlocks[ i ] ) {
+			/*
+			 * Some inner blocks might be removed during parsing,
+			 * e.g. an empty freeform block. We have to remove
+			 * these from the final array.
+			 *
+			 * @See https://github.com/WordPress/gutenberg/pull/17164.
+			 */
+			parsedInnerBlocks.splice( i--, 1 );
+		}
+	}
 
 	// Get the fully parsed block.
 	const parsedBlock = createBlock(
@@ -298,20 +377,46 @@ export function parseRawBlock( rawBlock, options ) {
  * and isolating the blocks serialized in the document and manifestly not in the
  * content within the blocks.
  *
- * @see
- * https://developer.wordpress.org/block-editor/packages/packages-block-serialization-default-parser/
+ * @see https://developer.wordpress.org/block-editor/packages/packages-block-serialization-default-parser/
  *
  * @param {string}       content The post content.
  * @param {ParseOptions} options Extra options for handling block parsing.
  *
- * @return {Array} Block list.
+ * @return {WPBlock[]} Block list.
  */
 export default function parse( content, options ) {
-	return grammarParse( content ).reduce( ( accumulator, rawBlock ) => {
-		const block = parseRawBlock( rawBlock, options );
-		if ( block ) {
-			accumulator.push( block );
+	const blockNodes = grammarParse( content );
+	const blocks = [];
+
+	/*
+	 * When we can asynchronously load blocks we will store
+	 * a Promise for each parse. We need to insert these
+	 * Promises in sequence here to avoid the possibility
+	 * of re-ordering the blocks due to data races in the
+	 * parsing and loading.
+	 */
+	for ( const blockNode of blockNodes ) {
+		blocks.push( parseRawBlock( blockNode, options ) );
+	}
+
+	/*
+	 * Once these are also resolved promises, we will then
+	 * need to run through the list and prune any blocks
+	 * which were removed; for example, an empty freeform
+	 * block. We will need to `await Promise.all( blocks )`
+	 * when that time comes before moving on to this step.
+	 *
+	 * Note: We normally expect few or no removed blocks,
+	 *       particularly as a ratio of all blocks. Because
+	 *       of that we'll optimize for the normal case with
+	 *       the use of `splice`, which will collapse this
+	 *       step into a quick scan through the array.
+	 */
+	for ( let i = 0; i < blocks.length; i++ ) {
+		if ( ! blocks[ i ] ) {
+			blocks.splice( i--, 1 );
 		}
-		return accumulator;
-	}, [] );
+	}
+
+	return blocks;
 }

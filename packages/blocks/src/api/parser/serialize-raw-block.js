@@ -8,7 +8,7 @@ import { getCommentDelimitedContent } from '../serializer';
  * @property {boolean} [isCommentDelimited=true] Whether to output HTML comments around blocks.
  */
 
-/** @typedef {import("./").WPRawBlock} WPRawBlock */
+/** @typedef {import("./").BlockNode} WPRawBlock */
 
 /**
  * Serializes a block node into the native HTML-comment-powered block format.
@@ -40,16 +40,24 @@ export function serializeRawBlock( rawBlock, options = {} ) {
 	} = rawBlock;
 
 	let childIndex = 0;
-	const content = innerContent
-		.map( ( item ) =>
-			// `null` denotes a nested block, otherwise we have an HTML fragment.
-			item !== null
-				? item
-				: serializeRawBlock( innerBlocks[ childIndex++ ], options )
-		)
-		.join( '\n' )
-		.replace( /\n+/g, '\n' )
-		.trim();
+	let content = '';
+
+	for ( const chunk of innerContent ) {
+		/*
+		 * A `null` value indicates a placeholder for inner blocks,
+		 * while text content will be a string. While we can directly
+		 * append text chunks, we have to recursively serialize any
+		 * inner blocks before appending them.
+		 */
+		const serializedChunk =
+			chunk === null
+				? serializeRawBlock( innerBlocks[ childIndex++ ], options )
+				: chunk;
+
+		content += `${ serializedChunk }\n`;
+	}
+
+	content = content.replace( /\n+/g, '\n' ).trim();
 
 	return isCommentDelimited
 		? getCommentDelimitedContent( blockName, attrs, content )

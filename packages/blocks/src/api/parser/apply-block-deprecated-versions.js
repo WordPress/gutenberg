@@ -22,7 +22,7 @@ function stubFalse() {
  * and no eligible migrations exist.
  *
  * @param {import(".").WPBlock}                   block     Parsed and invalid block object.
- * @param {import(".").WPRawBlock}                rawBlock  Raw block object.
+ * @param {import(".").BlockNode}                 rawBlock  Raw block object.
  * @param {import('../registration').WPBlockType} blockType Block type. This is normalize not necessary and
  *                                                          can be inferred from the block name,
  *                                                          but it's here for performance reasons.
