@@ -21,11 +21,12 @@ class WP_HTML_Character_Reference_Transcoder {
 	 * @return string String with character references replaced by their corresponding text.
 	 */
 	public static function decode_utf8( $context, $input ) {
-		$at = 0;
+		$at     = 0;
 		$buffer = '';
 		$budget = 1000;
+		$end    = strlen( $input );
 
-		while ( $at < strlen( $input ) && $budget-- > 0 ) {
+		while ( $at < $end && $budget-- > 0 ) {
 			$next = strpos( $input, '&', $at );
 			/*
 			 * We have to have at least as many successive characters as
@@ -33,7 +34,7 @@ class WP_HTML_Character_Reference_Transcoder {
 			 * shortest named character reference is three characters, so
 			 * we need at least this many.
 			 */
-			if ( false === $next || $next > strlen( $input ) - 3 ) {
+			if ( false === $next || $next + 3 > $end ) {
 				break;
 			}
 
@@ -59,7 +60,7 @@ class WP_HTML_Character_Reference_Transcoder {
 
 				// Leading zeros are interpreted as zero values; skip them.
 				$at += strspn( $input, '0', $at );
-				if ( $at === strlen( $input ) ) {
+				if ( $at === $end ) {
 					$buffer .= substr( $input, $next, $at - $next );
 					break;
 				}
@@ -89,7 +90,7 @@ class WP_HTML_Character_Reference_Transcoder {
 
 				if ( $code_point >= 0x80 && $code_point <= 0x9F && array_key_exists( $code_point, self::$c1_replacements ) ) {
 					$at += $digit_count;
-					if ( $at < strlen( $input ) && ';' === $input[ $at ] ) {
+					if ( $at < $end && ';' === $input[ $at ] ) {
 						$at++;
 					}
 					$buffer .= self::$c1_replacements[ $code_point ];
@@ -103,7 +104,7 @@ class WP_HTML_Character_Reference_Transcoder {
 					$buffer .= sprintf(
 						'%c%c',
 						0xC0 | ( ( $code_point >> 6 ) & 0x1F ),
-						0x80 | ($code_point & 0x3F)
+						0x80 | ( $code_point & 0x3F )
 					);
 				} else if ( $code_point < 0x10000 ) {
 					$buffer .= sprintf(
@@ -123,7 +124,7 @@ class WP_HTML_Character_Reference_Transcoder {
 				}
 
 				$at += $digit_count;
-				if ( $at < strlen( $input ) && ';' === $input[ $at ] ) {
+				if ( $at < $end && ';' === $input[ $at ] ) {
 					$at++;
 				}
 				continue;
@@ -131,63 +132,70 @@ class WP_HTML_Character_Reference_Transcoder {
 
 			// &Aacute; -> group "Aa" (skip & since we know it's there).
 			$group = substr( $input, $at, 2 );
-			$at += 2;
 
 			if ( array_key_exists( $group, self::$character_references ) ) {
+				$at += 2;
 				list( 'names' => $names, 'refs' => $refs ) = self::$character_references[ $group ];
 
 				foreach ( $names as $index => $name ) {
-					if ( $at + strlen( $name ) > strlen( $input ) || $name !== substr( $input, $at, strlen( $name ) ) ) {
+					$name_length = strlen( $name );
+
+					if ( $at + $name_length > $end || $name !== substr( $input, $at, $name_length ) ) {
 						continue;
 					}
 
-					// Unambiguous ampersand is always good.
-					if ( ';' === $name[ strlen( $name ) - 1 ] ) {
+					$at += $name_length;
+
+					// If we have an un-ambiguous ampersand we can always safely decode it.
+					if ( ';' === $name[ $name_length - 1 ] ) {
 						$buffer .= $refs[ $index ];
-						$at += strlen( $name );
 						continue 2;
 					}
 
-					if ( $at + strlen( $name ) < strlen( $input ) && ';' === $input[ $at + strlen( $name ) ] ) {
-						$buffer .= $refs[ $index ];
-						$at += strlen( $name ) + 1;
-						continue 2;
-					}
-
+					/*
+					 * At this point though have matched an entry in the named
+					 * character reference table but the match doesn't end in `;`.
+					 * We need to determine if the next letter makes it an ambiguous.
+					 */
 					$ambiguous_follower = (
-						$at + strlen( $name ) < strlen( $input ) &&
+						$at < $end &&
 						(
-							ctype_alnum( $input[ $at + strlen( $name ) ] ) ||
-							'=' === $input[ $at + strlen( $name ) ]
+							ctype_alnum( $input[ $at ] ) ||
+							'=' === $input[ $at ]
 						)
 					);
 					if ( ! $ambiguous_follower ) {
 						$buffer .= $refs[ $index ];
-						$at += strlen( $name );
 						continue 2;
 					}
 
 					// Ambiguous ampersand is context-sensitive.
 					switch ( $context ) {
 						case 'attribute':
-							$at += strlen( $name );
 							$buffer .= substr( $input, $next, $at - $next );
-							continue 2;
+							continue 3;
 
 						case 'data':
 							$buffer .= $refs[ $index ];
-							$at += strlen( $name );
-							continue 2;
+							continue 3;
 					}
 				}
 			}
+
+			/*
+			 * Whether by failing to find a group or failing to find a name,
+			 * we have failed to match a character reference name, so we can
+			 * continue processing as if this is plain text and leave the
+			 * invalid character reference name in place.
+			 */
+			$buffer .= substr( $input, $next, $at );
 		}
 
 		if ( 0 === $at ) {
 			return $input;
 		}
 
-		if ( $at < strlen( $input ) ) {
+		if ( $at < $end ) {
 			$buffer .= substr( $input, $at );
 		}
 
