@@ -14,7 +14,7 @@ type CommonNoticeActionProps = {
 // `onClick` will be ignored.
 type NoticeActionWithURL = CommonNoticeActionProps & {
 	url: string;
-	onClick?: ( event: SyntheticEvent ) => void;
+	onClick?: () => void;
 };
 type NoticeActionWithOnClick = CommonNoticeActionProps & {
 	url?: string;
@@ -73,8 +73,10 @@ export type NoticeProps = {
 	onDismiss?: () => void;
 	/**
 	 * An array of action objects.
+	 *
+	 * @default []
 	 */
-	actions: Array< NoticeAction >;
+	actions?: Array< NoticeAction >;
 	/**
 	 * Determines whether or not the message should be parsed as custom HTML
 	 * instead of a string.

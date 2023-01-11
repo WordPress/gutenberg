@@ -16,7 +16,7 @@ import type { WPElement } from '@wordpress/element';
  * Internal dependencies
  */
 import Button from '../button';
-import type { NoticeProps } from './types';
+import type { NoticeAction, NoticeProps } from './types';
 import type { WordPressComponentProps } from '../ui/context';
 import type { SyntheticEvent } from 'react';
 
@@ -100,6 +100,11 @@ function Notice( {
 								noDefaultClasses = false,
 								onClick,
 								url,
+							}: NoticeAction & {
+								// `isPrimary` is a legacy prop included for
+								// backcompat, but `variant` should be used
+								// instead.
+								isPrimary?: boolean;
 							},
 							index
 						) => {
