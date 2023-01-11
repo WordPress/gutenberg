@@ -711,7 +711,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				$decoded_file = wp_json_file_decode( $path, array( 'associative' => true ) );
 				if ( is_array( $decoded_file ) ) {
 					$translated = static::translate( $decoded_file, wp_get_theme()->get( 'TextDomain' ) );
-					$variation  = ( new WP_Theme_JSON( $translated ) )->get_raw_data();
+					$variation  = ( new WP_Theme_JSON_Gutenberg( $translated ) )->get_raw_data();
 					if ( empty( $variation['title'] ) ) {
 						$variation['title'] = basename( $path, '.json' );
 					}
