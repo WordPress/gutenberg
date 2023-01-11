@@ -20,6 +20,7 @@ import { plus } from '@wordpress/icons';
 import { useHistory } from '../routes';
 import { store as editSiteStore } from '../../store';
 import CreateTemplatePartModal from '../create-template-part-modal';
+import { useExistingTemplateParts } from './utils';
 
 export default function NewTemplatePart( {
 	postType,
@@ -31,6 +32,7 @@ export default function NewTemplatePart( {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { __unstableSetCanvasMode } = useDispatch( editSiteStore );
+	const existingTemplateParts = useExistingTemplateParts();
 
 	async function createTemplatePart( { title, area } ) {
 		if ( ! title ) {
@@ -39,6 +41,26 @@ export default function NewTemplatePart( {
 			} );
 			return;
 		}
+
+		const uniqueTitle = () => {
+			const lowercaseTitle = title.toLowerCase();
+			const existingTitles = existingTemplateParts.map(
+				( templatePart ) => templatePart.title.rendered.toLowerCase()
+			);
+
+			if ( ! existingTitles.includes( lowercaseTitle ) ) {
+				return title;
+			}
+
+			let suffix = 2;
+			while (
+				existingTitles.includes( `${ lowercaseTitle } ${ suffix }` )
+			) {
+				suffix++;
+			}
+
+			return `${ title } ${ suffix }`;
+		};
 
 		try {
 			// Currently template parts only allow latin chars.
@@ -52,7 +74,7 @@ export default function NewTemplatePart( {
 				'wp_template_part',
 				{
 					slug: cleanSlug,
-					title,
+					title: uniqueTitle(),
 					content: '',
 					area,
 				},
