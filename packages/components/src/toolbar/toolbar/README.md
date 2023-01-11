@@ -59,11 +59,16 @@ function MyToolbar() {
 
 Toolbar will pass all HTML props to the underlying element. Additionally, you can pass the custom props specified below.
 
-#### label
+#### `className`: `string`
+
+Class to set on the container div.
+
+-   Required: No
+
+#### `label`: `string`
 
 An accessible label for the toolbar.
 
--   Type: `String`
 -   Required: Yes
 
 ## Related components
