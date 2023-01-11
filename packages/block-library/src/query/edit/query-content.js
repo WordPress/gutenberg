@@ -94,6 +94,17 @@ export default function QueryContent( {
 		setAttributes( {
 			displayLayout: { ...displayLayout, ...newDisplayLayout },
 		} );
+	const htmlElementMessages = {
+		main: __(
+			'The <main> element should be used for the primary content of your document only. '
+		),
+		section: __(
+			"The <section> element should represent a standalone portion of the document that can't be better represented by another element."
+		),
+		aside: __(
+			"The <aside> element should represent a portion of a document whose content is only indirectly related to the document's main content."
+		),
+	};
 	return (
 		<>
 			<QueryInspectorControls
@@ -125,6 +136,7 @@ export default function QueryContent( {
 					onChange={ ( value ) =>
 						setAttributes( { tagName: value } )
 					}
+					help={ htmlElementMessages[ TagName ] }
 				/>
 			</InspectorControls>
 			<TagName { ...innerBlocksProps } />
