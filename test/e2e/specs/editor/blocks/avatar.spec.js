@@ -65,7 +65,8 @@ test.describe( 'Avatar', () => {
 
 		await newUser.click();
 
-		const newSrc = await avatarImage.getAttribute( 'src' );
+		const updatedAvatarImage = avatarBlock.locator( 'img' );
+		const newSrc = await updatedAvatarImage.getAttribute( 'src' );
 
 		expect( newSrc ).not.toBe( originalSrc );
 	} );
