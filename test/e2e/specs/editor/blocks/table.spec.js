@@ -77,6 +77,7 @@ test.describe( 'Table', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/table' } );
 		await editor.openDocumentSettingsSidebar();
+		await editor.switchBlockInspectorTab( 'Settings' );
 
 		const headerSwitch = page.locator(
 			'role=checkbox[name="Header section"i]'
@@ -132,11 +133,13 @@ test.describe( 'Table', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/table' } );
 		await editor.openDocumentSettingsSidebar();
+		await editor.switchBlockInspectorTab( 'Settings' );
 
 		// Create the table.
 		await page.click( 'role=button[name="Create Table"i]' );
 
 		// Toggle on the switches and add some content.
+		await editor.switchBlockInspectorTab( 'Settings' );
 		await page.locator( 'role=checkbox[name="Header section"i]' ).check();
 		await page.locator( 'role=checkbox[name="Footer section"i]' ).check();
 		await page.click( 'role=textbox[name="Body cell text"i] >> nth=0' );
@@ -202,11 +205,12 @@ test.describe( 'Table', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/table' } );
 		await editor.openDocumentSettingsSidebar();
+		await editor.switchBlockInspectorTab( 'Settings' );
 
 		// Create the table.
 		await page.click( 'role=button[name="Create Table"i]' );
 
-		// Enable fixed width as it exascerbates the amount of empty space around the RichText.
+		// Enable fixed width as it exacerbates the amount of empty space around the RichText.
 		await page
 			.locator( 'role=checkbox[name="Fixed width table cells"i]' )
 			.check();

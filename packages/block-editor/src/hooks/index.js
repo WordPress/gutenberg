@@ -14,6 +14,7 @@ import './color';
 import './duotone';
 import './font-size';
 import './border';
+import './position';
 import './layout';
 import './content-lock-ui';
 import './metadata';

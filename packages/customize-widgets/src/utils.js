@@ -98,16 +98,12 @@ export function widgetToBlock( { id, idBase, number, instance } ) {
 	const {
 		encoded_serialized_instance: encoded,
 		instance_hash_key: hash,
-		raw_instance: rawInstance,
+		raw_instance: raw,
 		...rest
 	} = instance;
 
-	// It's unclear why `content` is sometimes `undefined`, but it shouldn't be.
-	const rawContent = rawInstance.content || '';
-	const raw = { ...rawInstance, content: rawContent };
-
 	if ( idBase === 'block' ) {
-		const parsedBlocks = parse( raw.content, {
+		const parsedBlocks = parse( raw.content ?? '', {
 			__unstableSkipAutop: true,
 		} );
 		block = parsedBlocks.length

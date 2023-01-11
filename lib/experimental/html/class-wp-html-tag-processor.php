@@ -1059,9 +1059,19 @@ class WP_HTML_Tag_Processor {
 			return true;
 		}
 
+		/**
+		 * > There must never be two or more attributes on
+		 * > the same start tag whose names are an ASCII
+		 * > case-insensitive match for each other.
+		 *     - HTML 5 spec
+		 *
+		 * @see https://html.spec.whatwg.org/multipage/syntax.html#attributes-2:ascii-case-insensitive
+		 */
+		$comparable_name = strtolower( $attribute_name );
+
 		// If an attribute is listed many times, only use the first declaration and ignore the rest.
-		if ( ! array_key_exists( $attribute_name, $this->attributes ) ) {
-			$this->attributes[ $attribute_name ] = new WP_HTML_Attribute_Token(
+		if ( ! array_key_exists( $comparable_name, $this->attributes ) ) {
+			$this->attributes[ $comparable_name ] = new WP_HTML_Attribute_Token(
 				$attribute_name,
 				$value_start,
 				$value_length,
@@ -1071,7 +1081,7 @@ class WP_HTML_Tag_Processor {
 			);
 		}
 
-		return $this->attributes[ $attribute_name ];
+		return $this->attributes[ $comparable_name ];
 	}
 
 	/**
@@ -1331,16 +1341,33 @@ class WP_HTML_Tag_Processor {
 	}
 
 	/**
-	 * Sort function to arrange objects with a start property in ascending order.
+	 * Compare two WP_HTML_Text_Replacement objects.
 	 *
 	 * @since 6.2.0
 	 *
-	 * @param object $a First attribute update.
-	 * @param object $b Second attribute update.
+	 * @param WP_HTML_Text_Replacement $a First attribute update.
+	 * @param WP_HTML_Text_Replacement $b Second attribute update.
 	 * @return integer
 	 */
 	private static function sort_start_ascending( $a, $b ) {
-		return $a->start - $b->start;
+		$by_start = $a->start - $b->start;
+		if ( 0 !== $by_start ) {
+			return $by_start;
+		}
+
+		$by_text = isset( $a->text, $b->text ) ? strcmp( $a->text, $b->text ) : 0;
+		if ( 0 !== $by_text ) {
+			return $by_text;
+		}
+
+		/*
+		 * We shouldn't ever get here because it would imply
+		 * that we have two identical updates, or that we're
+		 * trying to replace the same input text twice. Still
+		 * we'll handle this sort to preserve determinism,
+		 * which might come in handy when debugging.
+		 */
+		return $a->end - $b->end;
 	}
 
 	/**
@@ -1383,6 +1410,49 @@ class WP_HTML_Tag_Processor {
 		$raw_value = substr( $this->html, $attribute->value_starts_at, $attribute->value_length );
 
 		return html_entity_decode( $raw_value );
+	}
+
+	/**
+	 * Returns the lowercase names of all attributes matching a given prefix in the currently-opened tag.
+	 *
+	 * Note that matching is case-insensitive. This is in accordance with the spec:
+	 *
+	 * > There must never be two or more attributes on
+	 * > the same start tag whose names are an ASCII
+	 * > case-insensitive match for each other.
+	 *     - HTML 5 spec
+	 *
+	 * @see https://html.spec.whatwg.org/multipage/syntax.html#attributes-2:ascii-case-insensitive
+	 *
+	 * Example:
+	 * <code>
+	 *     $p = new WP_HTML_Tag_Processor( '<div data-ENABLED class="test" DATA-test-id="14">Test</div>' );
+	 *     $p->next_tag( [ 'class_name' => 'test' ] ) === true;
+	 *     $p->get_attribute_names_with_prefix( 'data-' ) === array( 'data-enabled', 'data-test-id' );
+	 *
+	 *     $p->next_tag( [] ) === false;
+	 *     $p->get_attribute_names_with_prefix( 'data-' ) === null;
+	 * </code>
+	 *
+	 * @since 6.2.0
+	 *
+	 * @param string $prefix Prefix of requested attribute names.
+	 * @return array|null List of attribute names, or `null` if not at a tag.
+	 */
+	function get_attribute_names_with_prefix( $prefix ) {
+		if ( $this->is_closing_tag || null === $this->tag_name_starts_at ) {
+			return null;
+		}
+
+		$comparable = strtolower( $prefix );
+
+		$matches = array();
+		foreach ( array_keys( $this->attributes ) as $attr_name ) {
+			if ( str_starts_with( $attr_name, $comparable ) ) {
+				$matches[] = $attr_name;
+			}
+		}
+		return $matches;
 	}
 
 	/**
@@ -1512,7 +1582,17 @@ class WP_HTML_Tag_Processor {
 			$updated_attribute = "{$name}=\"{$escaped_new_value}\"";
 		}
 
-		if ( isset( $this->attributes[ $name ] ) ) {
+		/**
+		 * > There must never be two or more attributes on
+		 * > the same start tag whose names are an ASCII
+		 * > case-insensitive match for each other.
+		 *     - HTML 5 spec
+		 *
+		 * @see https://html.spec.whatwg.org/multipage/syntax.html#attributes-2:ascii-case-insensitive
+		 */
+		$comparable_name = strtolower( $name );
+
+		if ( isset( $this->attributes[ $comparable_name ] ) ) {
 			/*
 			 * Update an existing attribute.
 			 *
@@ -1524,7 +1604,7 @@ class WP_HTML_Tag_Processor {
 			 *
 			 *    Result: <div id="new"/>
 			 */
-			$existing_attribute               = $this->attributes[ $name ];
+			$existing_attribute               = $this->attributes[ $comparable_name ];
 			$this->attribute_updates[ $name ] = new WP_HTML_Text_Replacement(
 				$existing_attribute->start,
 				$existing_attribute->end,
@@ -1542,7 +1622,7 @@ class WP_HTML_Tag_Processor {
 			 *
 			 *    Result: <div id="new"/>
 			 */
-			$this->attribute_updates[ $name ] = new WP_HTML_Text_Replacement(
+			$this->attribute_updates[ $comparable_name ] = new WP_HTML_Text_Replacement(
 				$this->tag_name_starts_at + $this->tag_name_length,
 				$this->tag_name_starts_at + $this->tag_name_length,
 				' ' . $updated_attribute
@@ -1558,6 +1638,15 @@ class WP_HTML_Tag_Processor {
 	 * @param string $name The attribute name to remove.
 	 */
 	public function remove_attribute( $name ) {
+		/**
+		 * > There must never be two or more attributes on
+		 * > the same start tag whose names are an ASCII
+		 * > case-insensitive match for each other.
+		 *     - HTML 5 spec
+		 *
+		 * @see https://html.spec.whatwg.org/multipage/syntax.html#attributes-2:ascii-case-insensitive
+		 */
+		$name = strtolower( $name );
 		if ( $this->is_closing_tag || ! isset( $this->attributes[ $name ] ) ) {
 			return false;
 		}
@@ -1657,7 +1746,14 @@ class WP_HTML_Tag_Processor {
 		$this->updated_bytes = strlen( $this->updated_html );
 
 		// 3. Point this tag processor at the original tag opener and consume it
-		$this->parsed_bytes = strlen( $updated_html_up_to_current_tag_name_end ) - $this->tag_name_length - 2;
+
+		/*
+		 * When we get here we're at the end of the tag name, and we want to rewind to before it
+		 * <p>Previous HTML<em>More HTML</em></p>
+		 *                 ^  | back up by the length of the tag name plus the opening <
+		 *                 \<-/ back up by strlen("em") + 1 ==> 3
+		 */
+		$this->parsed_bytes = strlen( $updated_html_up_to_current_tag_name_end ) - $this->tag_name_length - 1;
 		$this->next_tag();
 
 		return $this->html;

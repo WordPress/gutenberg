@@ -16,12 +16,6 @@ import { store as blockEditorStore } from '../../store';
 const EMPTY_ARRAY = [];
 
 function getShowTabs( blockName, tabSettings = {} ) {
-	// Don't allow settings to force the display of tabs if the block inspector
-	// tabs experiment hasn't been opted into.
-	if ( ! window?.__experimentalEnableBlockInspectorTabs ) {
-		return false;
-	}
-
 	// Block specific setting takes precedence over generic default.
 	if ( tabSettings[ blockName ] !== undefined ) {
 		return tabSettings[ blockName ];
@@ -43,6 +37,7 @@ export default function useInspectorControlsTabs( blockName ) {
 		default: defaultGroup,
 		dimensions: dimensionsGroup,
 		list: listGroup,
+		position: positionGroup,
 		typography: typographyGroup,
 	} = InspectorControlsGroups;
 
@@ -71,6 +66,7 @@ export default function useInspectorControlsTabs( blockName ) {
 	// or Advanced Controls slot, then add this tab.
 	const settingsFills = [
 		...( useSlotFills( defaultGroup.Slot.__unstableName ) || [] ),
+		...( useSlotFills( positionGroup.Slot.__unstableName ) || [] ),
 		...( useSlotFills( InspectorAdvancedControls.slotName ) || [] ),
 	];
 
@@ -79,8 +75,7 @@ export default function useInspectorControlsTabs( blockName ) {
 	}
 
 	const tabSettings = useSelect( ( select ) => {
-		return select( blockEditorStore ).getSettings()
-			.__experimentalBlockInspectorTabs;
+		return select( blockEditorStore ).getSettings().blockInspectorTabs;
 	}, [] );
 
 	const showTabs = getShowTabs( blockName, tabSettings );

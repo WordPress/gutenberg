@@ -15,6 +15,8 @@ import { useState } from '@wordpress/element';
 import BaseCheckboxControl from '..';
 import type { CheckboxControlProps } from '../types';
 
+jest.useFakeTimers();
+
 const noop = () => {};
 
 const getInput = () => screen.getByRole( 'checkbox' ) as HTMLInputElement;

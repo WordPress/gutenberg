@@ -69,7 +69,7 @@ export function SidebarComplementaryAreaFills() {
 	// See https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/feature-flags.md#dead-code-elimination.
 	let MaybeNavigationMenuSidebar = Fragment;
 
-	if ( process.env.IS_GUTENBERG_PLUGIN ) {
+	if ( window?.__experimentalEnableOffCanvasNavigationEditor === true ) {
 		MaybeNavigationMenuSidebar = NavigationMenuSidebar;
 	}
 

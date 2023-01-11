@@ -17,7 +17,7 @@ import {
 	__unstableMotion as motion,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMemo, useCallback, Fragment } from '@wordpress/element';
+import { useMemo, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -35,6 +35,7 @@ import { default as InspectorControls } from '../inspector-controls';
 import { default as InspectorControlsTabs } from '../inspector-controls-tabs';
 import useInspectorControlsTabs from '../inspector-controls-tabs/use-inspector-controls-tabs';
 import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel';
+import PositionControls from '../inspector-controls-tabs/position-controls-panel';
 
 function useContentBlocks( blockTypes, block ) {
 	const contentBlocksObjectAux = useMemo( () => {
@@ -177,11 +178,13 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 
 	const blockInspectorAnimationSettings = useSelect(
 		( select ) => {
-			if ( isOffCanvasNavigationEditorEnabled ) {
+			if ( isOffCanvasNavigationEditorEnabled && blockType ) {
 				const globalBlockInspectorAnimationSettings =
 					select( blockEditorStore ).getSettings()
 						.__experimentalBlockInspectorAnimation;
-				return globalBlockInspectorAnimationSettings[ blockType.name ];
+				return globalBlockInspectorAnimationSettings?.[
+					blockType.name
+				];
 			}
 			return null;
 		},
@@ -266,12 +269,10 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 				</AnimatedContainer>
 			) }
 		>
-			<Fragment>
-				<BlockInspectorSingleBlock
-					clientId={ selectedBlockClientId }
-					blockName={ blockType.name }
-				/>
-			</Fragment>
+			<BlockInspectorSingleBlock
+				clientId={ selectedBlockClientId }
+				blockName={ blockType.name }
+			/>
 		</BlockInspectorSingleBlockWrapper>
 	);
 };
@@ -377,6 +378,7 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 						__experimentalGroup="border"
 						label={ __( 'Border' ) }
 					/>
+					<PositionControls />
 					<div>
 						<AdvancedControls />
 					</div>

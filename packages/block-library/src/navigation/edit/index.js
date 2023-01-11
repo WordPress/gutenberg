@@ -648,7 +648,6 @@ function Navigation( {
 				{ hasColorSettings && (
 					<>
 						<ColorGradientSettingsDropdown
-							__experimentalHasMultipleOrigins
 							__experimentalIsRenderedInSidebar
 							settings={ [
 								{
@@ -728,6 +727,7 @@ function Navigation( {
 					onCreateNew={ createUntitledEmptyNavigationMenu }
 					onSelectClassicMenu={ onSelectClassicMenu }
 					onSelectNavigationMenu={ onSelectNavigationMenu }
+					isLoading={ isLoading }
 				/>
 				{ stylingInspectorControls }
 				<ResponsiveWrapper
@@ -769,6 +769,7 @@ function Navigation( {
 					onCreateNew={ createUntitledEmptyNavigationMenu }
 					onSelectClassicMenu={ onSelectClassicMenu }
 					onSelectNavigationMenu={ onSelectNavigationMenu }
+					isLoading={ isLoading }
 				/>
 				<Warning>
 					{ __(
@@ -843,6 +844,7 @@ function Navigation( {
 					onCreateNew={ createUntitledEmptyNavigationMenu }
 					onSelectClassicMenu={ onSelectClassicMenu }
 					onSelectNavigationMenu={ onSelectNavigationMenu }
+					isLoading={ isLoading }
 				/>
 				{ stylingInspectorControls }
 				{ isEntityAvailable && (

@@ -15,7 +15,7 @@ import {
 	useColorsPerOrigin,
 } from './hooks';
 
-function ScreenTextColor( { name } ) {
+function ScreenTextColor( { name, variationPath = '' } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	const [ solids ] = useSetting( 'color.palette', name );
 	const [ areCustomSolidsEnabled ] = useSetting( 'color.custom', name );
@@ -28,8 +28,12 @@ function ScreenTextColor( { name } ) {
 		isTextEnabled &&
 		( solids.length > 0 || areCustomSolidsEnabled );
 
-	const [ color, setColor ] = useStyle( 'color.text', name );
-	const [ userColor ] = useStyle( 'color.text', name, 'user' );
+	const [ color, setColor ] = useStyle( variationPath + 'color.text', name );
+	const [ userColor ] = useStyle(
+		variationPath + 'color.text',
+		name,
+		'user'
+	);
 
 	if ( ! hasTextColor ) {
 		return null;
@@ -47,7 +51,6 @@ function ScreenTextColor( { name } ) {
 				className="edit-site-screen-text-color__control"
 				colors={ colorsPerOrigin }
 				disableCustomColors={ ! areCustomSolidsEnabled }
-				__experimentalHasMultipleOrigins
 				showTitle={ false }
 				enableAlpha
 				__experimentalIsRenderedInSidebar

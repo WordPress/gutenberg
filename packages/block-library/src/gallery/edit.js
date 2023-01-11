@@ -65,6 +65,7 @@ const linkOptions = [
 ];
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const allowedBlocks = [ 'core/image' ];
+const LAYOUT = { type: 'default', alignments: [] };
 
 const PLACEHOLDER_TEXT = Platform.isNative
 	? __( 'ADD MEDIA' )
@@ -494,8 +495,8 @@ function GalleryEdit( props ) {
 		allowedBlocks,
 		orientation: 'horizontal',
 		renderAppender: false,
-		__experimentalLayout: { type: 'default', alignments: [] },
-		...nativeInnerBlockProps,
+		__experimentalLayout: LAYOUT,
+    ...nativeInnerBlockProps,
 	} );
 
 	if ( ! hasImages ) {
@@ -536,6 +537,7 @@ function GalleryEdit( props ) {
 						help={ getImageCropHelp }
 					/>
 					<SelectControl
+						__nextHasNoMarginBottom
 						label={ __( 'Link to' ) }
 						value={ linkTo }
 						onChange={ setLinkTo }
@@ -551,6 +553,7 @@ function GalleryEdit( props ) {
 					) }
 					{ imageSizeOptions?.length > 0 && (
 						<SelectControl
+							__nextHasNoMarginBottom
 							label={ __( 'Image size' ) }
 							value={ sizeSlug }
 							options={ imageSizeOptions }
