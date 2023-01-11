@@ -283,7 +283,9 @@ function ScreenStyleVariations() {
 	const { variations, mode } = useSelect( ( select ) => {
 		return {
 			variations:
-				select( coreStore ).__experimentalGetGlobalStylesVariations(),
+				select(
+					coreStore
+				).__experimentalGetCurrentThemeGlobalStylesVariations(),
 
 			mode: select( blockEditorStore ).__unstableGetEditorMode(),
 		};

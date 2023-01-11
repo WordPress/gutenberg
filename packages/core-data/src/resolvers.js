@@ -487,30 +487,17 @@ export const __experimentalGetCurrentThemeBaseGlobalStyles =
 		);
 	};
 
-/**
- * @param {string} [author] Variations author. Either 'theme' or 'user'.
- */
-export const __experimentalGetGlobalStylesVariations =
-	( author = 'theme' ) =>
+export const __experimentalGetCurrentThemeGlobalStylesVariations =
+	() =>
 	async ( { resolveSelect, dispatch } ) => {
 		const currentTheme = await resolveSelect.getCurrentTheme();
-		if ( author === 'theme' ) {
-			const variations = await apiFetch( {
-				path: `/wp/v2/global-styles/themes/${ currentTheme.stylesheet }/variations`,
-			} );
-			dispatch.__experimentalReceiveThemeGlobalStyleVariations(
-				currentTheme.stylesheet,
-				variations
-			);
-		} else {
-			const variations = await apiFetch( {
-				path: `/wp/v2/global-styles`,
-			} );
-			dispatch.__experimentalReceiveUserGlobalStyleVariations(
-				currentTheme.stylesheet,
-				variations
-			);
-		}
+		const variations = await apiFetch( {
+			path: `/wp/v2/global-styles/themes/${ currentTheme.stylesheet }/variations`,
+		} );
+		dispatch.__experimentalReceiveThemeGlobalStyleVariations(
+			currentTheme.stylesheet,
+			variations
+		);
 	};
 
 export const getBlockPatterns =

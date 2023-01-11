@@ -35,7 +35,6 @@ export interface State {
 	entities: EntitiesState;
 	themeBaseGlobalStyles: Record< string, Object >;
 	themeGlobalStyleVariations: Record< string, Object[] >;
-	userGlobalStyleVariations: Record< string, Object[] >;
 	undo: UndoState;
 	users: UserState;
 }
@@ -1242,24 +1241,17 @@ export function __experimentalGetCurrentThemeBaseGlobalStyles(
  * Return global styles variations.
  *
  * @param  state Data state.
- * @param author Variations author. Either 'theme' or 'user'.
  *
  * @return Global styles variations
  */
-export function __experimentalGetGlobalStylesVariations(
-	state: State,
-	author: 'theme' | 'user' = 'theme'
+export function __experimentalGetCurrentThemeGlobalStylesVariations(
+	state: State
 ): Object[] | null {
 	const currentTheme = getCurrentTheme( state );
 	if ( ! currentTheme ) {
 		return null;
 	}
-
-	if ( author === 'theme' ) {
-		return state.themeGlobalStyleVariations[ currentTheme.stylesheet ];
-	}
-
-	return state.userGlobalStyleVariations[ currentTheme.stylesheet ];
+	return state.themeGlobalStyleVariations[ currentTheme.stylesheet ];
 }
 
 /**

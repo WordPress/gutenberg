@@ -29,7 +29,9 @@ function ScreenRoot() {
 	const { variations } = useSelect( ( select ) => {
 		return {
 			variations:
-				select( coreStore ).__experimentalGetGlobalStylesVariations(),
+				select(
+					coreStore
+				).__experimentalGetCurrentThemeGlobalStylesVariations(),
 		};
 	}, [] );
 
