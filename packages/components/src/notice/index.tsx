@@ -10,6 +10,7 @@ import { __ } from '@wordpress/i18n';
 import { RawHTML, useEffect, renderToString } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
 import { close } from '@wordpress/icons';
+import type { WPElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -18,18 +19,12 @@ import Button from '../button';
 import type { NoticeProps } from './types';
 import type { WordPressComponentProps } from '../ui/context';
 
-/** @typedef {import('@wordpress/element').WPElement} WPElement */
-
 const noop = () => {};
 
-/**
- * Custom hook which announces the message with the given politeness, if a
- * valid message is provided.
- *
- * @param {string|WPElement}     [message]  Message to announce.
- * @param {'polite'|'assertive'} politeness Politeness to announce.
- */
-function useSpokenMessage( message, politeness ) {
+function useSpokenMessage(
+	message: NoticeProps[ 'spokenMessage' ] | WPElement,
+	politeness: NoticeProps[ 'politeness' ]
+) {
 	const spokenMessage =
 		typeof message === 'string' ? message : renderToString( message );
 
@@ -40,15 +35,7 @@ function useSpokenMessage( message, politeness ) {
 	}, [ spokenMessage, politeness ] );
 }
 
-/**
- * Given a notice status, returns an assumed default politeness for the status.
- * Defaults to 'assertive'.
- *
- * @param {string} [status] Notice status.
- *
- * @return {'polite'|'assertive'} Notice politeness.
- */
-function getDefaultPoliteness( status ) {
+function getDefaultPoliteness( status: NoticeProps[ 'status' ] ) {
 	switch ( status ) {
 		case 'success':
 		case 'warning':
