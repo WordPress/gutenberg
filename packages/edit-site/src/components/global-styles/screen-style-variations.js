@@ -438,6 +438,7 @@ function ScreenStyleVariations() {
 
 									setIsStyleRecordSaving( false );
 									setCreateNewVariationModalOpen( false );
+									setNewStyleName( '' );
 								} );
 								setIsStyleRecordSaving( true );
 							} }

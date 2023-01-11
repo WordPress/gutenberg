@@ -85,7 +85,7 @@ function useGlobalStylesUserConfig() {
 			) {
 				hasResolved = ( () => {
 					if ( ! _globalStylesId ) {
-						return false;
+						return true;
 					}
 
 					const userStyleFinishedResolution = hasFinishedResolution(
@@ -110,7 +110,7 @@ function useGlobalStylesUserConfig() {
 					);
 				} )();
 
-				if ( hasResolved ) {
+				if ( hasResolved && ! isReady ) {
 					setIsReady( true );
 				}
 			}
@@ -189,7 +189,18 @@ function useGlobalStylesUserConfig() {
 						updatedRecord[ 'associated_style_id' ],
 					] )
 				) {
+					let numTries = 0;
+					const MAX_NUM_TRIES = 30;
 					const intervalId = setInterval( () => {
+						++numTries;
+
+						if ( numTries > MAX_NUM_TRIES ) {
+							clearInterval( intervalId );
+							throw new Error(
+								'Failed editing associated global style entity record.'
+							);
+						}
+
 						if (
 							( hasFinishedResolution( 'getEditedEntityRecord' ),
 							[
