@@ -496,7 +496,7 @@ function GalleryEdit( props ) {
 		orientation: 'horizontal',
 		renderAppender: false,
 		__experimentalLayout: LAYOUT,
-    ...nativeInnerBlockProps,
+		...nativeInnerBlockProps,
 	} );
 
 	if ( ! hasImages ) {
