@@ -52,6 +52,20 @@ export const useExistingTemplates = () => {
 	);
 };
 
+export const useExistingTemplateParts = () => {
+	return useSelect(
+		( select ) =>
+			select( coreStore ).getEntityRecords(
+				'postType',
+				'wp_template_part',
+				{
+					per_page: -1,
+				}
+			),
+		[]
+	);
+};
+
 export const useDefaultTemplateTypes = () => {
 	return useSelect(
 		( select ) =>

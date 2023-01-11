@@ -308,6 +308,11 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	$nested_pages = block_core_page_list_nest_pages( $top_level_pages, $pages_with_children );
 
 	if ( 0 !== $parent_page_id ) {
+		// If the parent page has no child pages, there is nothing to show.
+		if ( ! array_key_exists( $parent_page_id, $pages_with_children ) ) {
+			return;
+		}
+
 		$nested_pages = block_core_page_list_nest_pages(
 			$pages_with_children[ $parent_page_id ],
 			$pages_with_children

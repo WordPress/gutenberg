@@ -66,7 +66,7 @@ if ( ! function_exists( 'wp_theme_has_theme_json_clean_cache' ) ) {
  *                     It accepts as values: 'variables', 'presets', 'styles', 'base-layout-styles, and 'custom-css'.
  *                     If empty, it'll load the following:
  *                     - for themes without theme.json: 'variables', 'presets', 'base-layout-styles'.
- *                     - for temes with theme.json: 'variables', 'presets', 'styles', 'custom-css'.
+ *                     - for themes with theme.json: 'variables', 'presets', 'styles', 'custom-css'.
  *
  * @return string Stylesheet.
  */

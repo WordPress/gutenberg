@@ -146,3 +146,12 @@ $block-preview-height: 150px;
 	max-height: 200px;
 	overflow-y: scroll;
 }
+
+.edit-site-global-styles-screen-variations {
+	margin-top: $grid-unit-20;
+	border-top: 1px solid $gray-300;
+
+	& > * {
+		margin: $grid-unit-30 $grid-unit-20;
+	}
+}

@@ -15,7 +15,7 @@ import {
 	useColorsPerOrigin,
 } from './hooks';
 
-function ScreenLinkColor( { name } ) {
+function ScreenLinkColor( { name, variationPath = '' } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	const [ solids ] = useSetting( 'color.palette', name );
 	const [ areCustomSolidsEnabled ] = useSetting( 'color.custom', name );
@@ -32,20 +32,32 @@ function ScreenLinkColor( { name } ) {
 	const pseudoStates = {
 		default: {
 			label: __( 'Default' ),
-			value: useStyle( 'elements.link.color.text', name )[ 0 ],
-			handler: useStyle( 'elements.link.color.text', name )[ 1 ],
+			value: useStyle(
+				variationPath + 'elements.link.color.text',
+				name
+			)[ 0 ],
+			handler: useStyle(
+				variationPath + 'elements.link.color.text',
+				name
+			)[ 1 ],
 			userValue: useStyle(
-				'elements.link.color.text',
+				variationPath + 'elements.link.color.text',
 				name,
 				'user'
 			)[ 0 ],
 		},
 		hover: {
 			label: __( 'Hover' ),
-			value: useStyle( 'elements.link.:hover.color.text', name )[ 0 ],
-			handler: useStyle( 'elements.link.:hover.color.text', name )[ 1 ],
+			value: useStyle(
+				variationPath + 'elements.link.:hover.color.text',
+				name
+			)[ 0 ],
+			handler: useStyle(
+				variationPath + 'elements.link.:hover.color.text',
+				name
+			)[ 1 ],
 			userValue: useStyle(
-				'elements.link.:hover.color.text',
+				variationPath + 'elements.link.:hover.color.text',
 				name,
 				'user'
 			)[ 0 ],

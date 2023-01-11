@@ -76,7 +76,7 @@ describe( 'Block Switcher', () => {
 				'core/group',
 				'core/heading',
 				'core/columns',
-			].map( ( block ) => wp.blocks.unregisterBlockType( block ) );
+			].forEach( ( block ) => wp.blocks.unregisterBlockType( block ) );
 		} );
 
 		await page.keyboard.press( 'ArrowUp' );

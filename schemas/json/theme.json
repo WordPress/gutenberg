@@ -1948,11 +1948,22 @@
 						"css": {},
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
+						},
+						"variations": {
+							"$ref": "#/definitions/stylesVariationPropertiesComplete"
 						}
 					},
 					"additionalProperties": false
 				}
 			]
+		},
+		"stylesVariationPropertiesComplete": {
+			"type": "object",
+			"patternProperties": {
+				"^[a-z][a-z0-9-]*$": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				}
+			}
 		}
 	},
 	"type": "object",

@@ -6,11 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { createBlock, hasBlockSupport } from '@wordpress/blocks';
+import { hasBlockSupport } from '@wordpress/blocks';
 import {
 	__experimentalTreeGridCell as TreeGridCell,
 	__experimentalTreeGridItem as TreeGridItem,
-	MenuItem,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { moreVertical } from '@wordpress/icons';
@@ -86,8 +85,7 @@ function ListViewBlock( {
 		( isSelected &&
 			selectedClientIds[ selectedClientIds.length - 1 ] === clientId );
 
-	const { insertBlock, replaceBlock, toggleBlockHighlight } =
-		useDispatch( blockEditorStore );
+	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const block = useSelect(
@@ -128,7 +126,8 @@ function ListViewBlock( {
 		[ selectBlock ]
 	);
 
-	const { isTreeGridMounted, expand, collapse } = useListViewContext();
+	const { isTreeGridMounted, expand, collapse, LeafMoreMenu } =
+		useListViewContext();
 
 	const toggleExpanded = useCallback(
 		( event ) => {
@@ -236,6 +235,10 @@ function ListViewBlock( {
 	const dropdownClientIds = selectedClientIds.includes( clientId )
 		? selectedClientIds
 		: [ clientId ];
+
+	const MoreMenuComponent = LeafMoreMenu
+		? LeafMoreMenu
+		: BlockSettingsDropdown;
 
 	return (
 		<ListViewLeaf
@@ -352,61 +355,26 @@ function ListViewBlock( {
 						colSpan={ isEditable ? 1 : 2 } // When an item is not editable then we don't output the cell for the edit button, so we need to adjust the colspan so that the HTML is valid.
 					>
 						{ ( { ref, tabIndex, onFocus } ) => (
-							<BlockSettingsDropdown
-								clientIds={ dropdownClientIds }
-								icon={ moreVertical }
-								label={ settingsAriaLabel }
-								toggleProps={ {
-									ref,
-									className:
-										'block-editor-list-view-block__menu',
-									tabIndex,
-									onFocus,
-								} }
-								disableOpenOnArrowDown
-								__experimentalSelectBlock={ updateSelection }
-							>
-								{ ( { onClose } ) => (
-									<MenuItem
-										onClick={ () => {
-											const newLink = createBlock(
-												'core/navigation-link'
-											);
-											if (
-												block.name ===
-												'core/navigation-submenu'
-											) {
-												const updateSelectionOnInsert = false;
-												insertBlock(
-													newLink,
-													block.innerBlocks.length,
-													clientId,
-													updateSelectionOnInsert
-												);
-											} else {
-												// Convert to a submenu if the block currently isn't one.
-												const newSubmenu = createBlock(
-													'core/navigation-submenu',
-													block.attributes,
-													block.innerBlocks
-														? [
-																...block.innerBlocks,
-																newLink,
-														  ]
-														: [ newLink ]
-												);
-												replaceBlock(
-													clientId,
-													newSubmenu
-												);
-											}
-											onClose();
-										} }
-									>
-										{ __( 'Add submenu item' ) }
-									</MenuItem>
-								) }
-							</BlockSettingsDropdown>
+							<>
+								<MoreMenuComponent
+									clientIds={ dropdownClientIds }
+									block={ block }
+									clientId={ clientId }
+									icon={ moreVertical }
+									label={ settingsAriaLabel }
+									toggleProps={ {
+										ref,
+										className:
+											'block-editor-list-view-block__menu',
+										tabIndex,
+										onFocus,
+									} }
+									disableOpenOnArrowDown
+									__experimentalSelectBlock={
+										updateSelection
+									}
+								/>
+							</>
 						) }
 					</TreeGridCell>
 				</>

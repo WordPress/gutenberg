@@ -13,6 +13,7 @@ const stickyOptions = [
 export default function StickyControl( { value, onChange } ) {
 	return (
 		<SelectControl
+			__nextHasNoMarginBottom
 			label={ __( 'Sticky posts' ) }
 			options={ stickyOptions }
 			value={ value }

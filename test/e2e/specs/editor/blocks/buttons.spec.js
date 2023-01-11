@@ -131,6 +131,7 @@ test.describe( 'Buttons', () => {
 		await editor.insertBlock( { name: 'core/buttons' } );
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
+		await editor.switchBlockInspectorTab( 'Settings' );
 		await page.click(
 			'role=group[name="Button width"i] >> role=button[name="25%"i]'
 		);
