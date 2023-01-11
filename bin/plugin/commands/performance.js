@@ -353,7 +353,7 @@ async function runPerformanceTests( branches, options ) {
 	// 4- Running the tests.
 	log( '\n>> Running the tests' );
 
-	const testSuites = [ 'post-editor', 'site-editor' ];
+	const testSuites = [ 'post-editor', 'site-editor', 'front-end' ];
 
 	/** @type {Record<string,Record<string, WPPerformanceResults>>} */
 	const results = {};
