@@ -379,78 +379,25 @@ async function runPerformanceTests( branches, options ) {
 
 		// Computing medians.
 		for ( const branch of branches ) {
-			const medians = mapValues(
-				{
-					serverResponse: rawResults.map(
-						( r ) => r[ branch ].serverResponse
-					),
-					firstPaint: rawResults.map(
-						( r ) => r[ branch ].firstPaint
-					),
-					domContentLoaded: rawResults.map(
-						( r ) => r[ branch ].domContentLoaded
-					),
-					loaded: rawResults.map( ( r ) => r[ branch ].loaded ),
-					firstContentfulPaint: rawResults.map(
-						( r ) => r[ branch ].firstContentfulPaint
-					),
-					firstBlock: rawResults.map(
-						( r ) => r[ branch ].firstBlock
-					),
-					type: rawResults.map( ( r ) => r[ branch ].type ),
-					minType: rawResults.map( ( r ) => r[ branch ].minType ),
-					maxType: rawResults.map( ( r ) => r[ branch ].maxType ),
-					typeContainer: rawResults.map(
-						( r ) => r[ branch ].typeContainer
-					),
-					minTypeContainer: rawResults.map(
-						( r ) => r[ branch ].minTypeContainer
-					),
-					maxTypeContainer: rawResults.map(
-						( r ) => r[ branch ].maxTypeContainer
-					),
-					focus: rawResults.map( ( r ) => r[ branch ].focus ),
-					minFocus: rawResults.map( ( r ) => r[ branch ].minFocus ),
-					maxFocus: rawResults.map( ( r ) => r[ branch ].maxFocus ),
-					inserterOpen: rawResults.map(
-						( r ) => r[ branch ].inserterOpen
-					),
-					minInserterOpen: rawResults.map(
-						( r ) => r[ branch ].minInserterOpen
-					),
-					maxInserterOpen: rawResults.map(
-						( r ) => r[ branch ].maxInserterOpen
-					),
-					inserterSearch: rawResults.map(
-						( r ) => r[ branch ].inserterSearch
-					),
-					minInserterSearch: rawResults.map(
-						( r ) => r[ branch ].minInserterSearch
-					),
-					maxInserterSearch: rawResults.map(
-						( r ) => r[ branch ].maxInserterSearch
-					),
-					inserterHover: rawResults.map(
-						( r ) => r[ branch ].inserterHover
-					),
-					minInserterHover: rawResults.map(
-						( r ) => r[ branch ].minInserterHover
-					),
-					maxInserterHover: rawResults.map(
-						( r ) => r[ branch ].maxInserterHover
-					),
-					listViewOpen: rawResults.map(
-						( r ) => r[ branch ].listViewOpen
-					),
-					minListViewOpen: rawResults.map(
-						( r ) => r[ branch ].minListViewOpen
-					),
-					maxListViewOpen: rawResults.map(
-						( r ) => r[ branch ].maxListViewOpen
-					),
-				},
-				median
-			);
+			/**
+			 * @type {string[]}
+			 */
+			let dataPointsForTestSuite = [];
+			if ( rawResults.length > 0 ) {
+				dataPointsForTestSuite = Object.keys(
+					rawResults[ 0 ][ branch ]
+				);
+			}
+
+			const resultsByDataPoint = {};
+			dataPointsForTestSuite.forEach( ( dataPoint ) => {
+				// @ts-ignore
+				resultsByDataPoint[ dataPoint ] = rawResults.map(
+					// @ts-ignore
+					( r ) => r[ branch ][ dataPoint ]
+				);
+			} );
+			const medians = mapValues( resultsByDataPoint, median );
 
 			// Format results as times.
 			results[ testSuite ][ branch ] = mapValues( medians, formatTime );
