@@ -11,7 +11,7 @@ import { createURL } from '@wordpress/e2e-test-utils';
 
 describe( 'Front End Performance', () => {
 	const results = {
-		TTFB: [],
+		timeToFirstByte: [],
 	};
 
 	afterAll( async () => {
@@ -22,7 +22,7 @@ describe( 'Front End Performance', () => {
 		);
 	} );
 
-	it( 'TTFB', async () => {
+	it( 'Time To First Byte (TTFB)', async () => {
 		let i = 5;
 		while ( i-- ) {
 			await page.goto( createURL( '/' ) );
@@ -30,7 +30,7 @@ describe( 'Front End Performance', () => {
 				JSON.stringify( performance.getEntriesByType( 'navigation' ) )
 			);
 			const [ navigationTiming ] = JSON.parse( navigationTimingJson );
-			results.TTFB.push(
+			results.timeToFirstByte.push(
 				navigationTiming.responseStart - navigationTiming.requestStart
 			);
 		}

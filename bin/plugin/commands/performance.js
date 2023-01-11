@@ -30,6 +30,7 @@ const config = require( '../config' );
 /**
  * @typedef WPRawPerformanceResults
  *
+ * @property {number[]} timeToFirstByte      Represents the time since the browser started the request until it received a response.
  * @property {number[]} serverResponse       Represents the time the server takes to respond.
  * @property {number[]} firstPaint           Represents the time when the user agent first rendered after navigation.
  * @property {number[]} domContentLoaded     Represents the time immediately after the document's DOMContentLoaded event completes.
@@ -48,6 +49,7 @@ const config = require( '../config' );
 /**
  * @typedef WPPerformanceResults
  *
+ * @property {number=} timeToFirstByte      Represents the time since the browser started the request until it received a response.
  * @property {number=} serverResponse       Represents the time the server takes to respond.
  * @property {number=} firstPaint           Represents the time when the user agent first rendered after navigation.
  * @property {number=} domContentLoaded     Represents the time immediately after the document's DOMContentLoaded event completes.
@@ -118,11 +120,18 @@ function formatTime( number ) {
 /**
  * Curate the raw performance results.
  *
+ * @param {string} testSuite
  * @param {WPRawPerformanceResults} results
  *
  * @return {WPPerformanceResults} Curated Performance results.
  */
-function curateResults( results ) {
+function curateResults( testSuite, results ) {
+	if ( testSuite === 'front-end' ) {
+		return {
+			timeToFirstByte: average( results.timeToFirstByte ),
+		};
+	}
+
 	return {
 		serverResponse: average( results.serverResponse ),
 		firstPaint: average( results.firstPaint ),
@@ -173,7 +182,7 @@ async function runTestSuite( testSuite, performanceTestDirectory ) {
 			`packages/e2e-tests/specs/performance/${ testSuite }.test.results.json`
 		)
 	);
-	return curateResults( rawResults );
+	return curateResults( testSuite, rawResults );
 }
 
 /**
