@@ -189,11 +189,6 @@ const restrictedImports = [
 		message:
 			"edit-widgets is a WordPress top level package that shouldn't be imported into other packages",
 	},
-	{
-		name: '@wordpress/edit-navigation',
-		message:
-			"edit-navigation is a WordPress top level package that shouldn't be imported into other packages",
-	},
 ];
 
 module.exports = {
