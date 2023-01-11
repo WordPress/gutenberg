@@ -125,12 +125,9 @@ const DefaultControls = ( props ) => {
 const MenuInspectorControls = ( props ) => {
 	const isOffCanvasNavigationEditorEnabled =
 		window?.__experimentalEnableOffCanvasNavigationEditor === true;
-	const menuControlsSlot = window?.__experimentalEnableBlockInspectorTabs
-		? 'list'
-		: undefined;
 
 	return (
-		<InspectorControls __experimentalGroup={ menuControlsSlot }>
+		<InspectorControls __experimentalGroup="list">
 			<PanelBody
 				title={
 					isOffCanvasNavigationEditorEnabled ? null : __( 'Menu' )
