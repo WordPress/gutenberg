@@ -7,12 +7,16 @@ import { writeFileSync } from 'fs';
 /**
  * WordPress dependencies
  */
-import { createURL } from '@wordpress/e2e-test-utils';
+import { createURL, logout } from '@wordpress/e2e-test-utils';
 
 describe( 'Front End Performance', () => {
 	const results = {
 		timeToFirstByte: [],
 	};
+
+	beforeAll( async () => {
+		await logout();
+	} );
 
 	afterAll( async () => {
 		const resultsFilename = basename( __filename, '.js' ) + '.results.json';
