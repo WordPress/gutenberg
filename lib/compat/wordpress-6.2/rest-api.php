@@ -103,6 +103,15 @@ function gutenberg_register_global_styles_endpoints() {
 add_action( 'rest_api_init', 'gutenberg_register_global_styles_endpoints' );
 
 /**
+ * Registers the themes REST API routes.
+ */
+function gutenberg_register_themes_endpoints() {
+	$controller = new Gutenberg_REST_Themes_Controller_6_2();
+	$controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_themes_endpoints' );
+
+/**
  * Updates REST API response for the sidebars and marks them as 'inactive'.
  *
  * Note: This can be a part of the `prepare_item_for_response` in `class-wp-rest-sidebars-controller.php`.

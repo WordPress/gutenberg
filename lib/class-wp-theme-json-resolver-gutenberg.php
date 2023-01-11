@@ -432,7 +432,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		$args             = array(
 			'posts_per_page'         => 1,
 			'orderby'                => 'date',
-			'order'                  => 'desc',
+			'order'                  => 'asc',
 			'post_type'              => $post_type_filter,
 			'post_status'            => $post_status_filter,
 			'ignore_sticky_posts'    => true,
@@ -453,25 +453,108 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		if ( count( $recent_posts ) === 1 ) {
 			$user_cpt = get_object_vars( $recent_posts[0] );
 		} elseif ( $create_post ) {
-			$cpt_post_id = wp_insert_post(
+			$cpt_post_id = self::add_user_global_styles_variation(
 				array(
-					'post_content' => '{"version": ' . WP_Theme_JSON_Gutenberg::LATEST_SCHEMA . ', "isGlobalStylesUserThemeJSON": true }',
-					'post_status'  => 'publish',
-					'post_title'   => 'Custom Styles', // Do not make string translatable, see https://core.trac.wordpress.org/ticket/54518.
-					'post_type'    => $post_type_filter,
-					'post_name'    => sprintf( 'wp-global-styles-%s', urlencode( $stylesheet ) ),
-					'tax_input'    => array(
-						'wp_theme' => array( $stylesheet ),
-					),
-				),
-				true
+					'title'         => 'Custom Styles',  // Do not make string translatable, see https://core.trac.wordpress.org/ticket/54518.
+					'global_styles' => '{"version": ' . WP_Theme_JSON_Gutenberg::LATEST_SCHEMA . ', "isGlobalStylesUserThemeJSON": true }',
+					'stylesheet'    => $stylesheet,
+				)
 			);
+
 			if ( ! is_wp_error( $cpt_post_id ) ) {
 				$user_cpt = get_object_vars( get_post( $cpt_post_id ) );
 			}
 		}
 
 		return $user_cpt;
+	}
+
+	// @codingStandardsIgnoreStart Squiz.Commenting.FunctionComment.ParamCommentFullStop
+	/**
+	 * Saves a new user variation into the database.
+	 *
+	 *
+	 * @param array $args Arguments. All are required.
+	 *     {
+	 *     @type string title Global styles variation name.
+	 *     @type string global_styles Global styles settings as a JSON string.
+	 *     @type string $stylesheet Slug of the theme associated with these global styles.
+	 * }
+	 *
+	 * @return int|WP_Error Post ID of the new variation or error if insertion failed.
+	 */
+	public static function add_user_global_styles_variation( $args ) {
+		$theme = wp_get_theme();
+
+		/*
+		 * Bail early if the theme does not support a theme.json.
+		 *
+		 * Since wp_theme_has_theme_json only supports the active
+		 * theme, the extra condition for whether $theme is the active theme is
+		 * present here.
+		 */
+		if ( $theme->get_stylesheet() === $args['stylesheet'] && ! wp_theme_has_theme_json() ) {
+			return new WP_Error( __( 'Theme does not have theme.json', 'gutenberg' ) );
+		}
+
+		$post_id = wp_insert_post(
+			array(
+				'post_content' => $args['global_styles'],
+				'post_status'  => 'publish',
+				'post_title'   => $args['title'],
+				'post_type'    => 'wp_global_styles',
+				'post_name'    => sprintf( 'wp-global-styles-%s', urlencode( $args['stylesheet'] ) ),
+				'tax_input'    => array(
+					'wp_theme' => array( $args['stylesheet'] ),
+				),
+			),
+			true
+		);
+
+		return $post_id;
+	}
+	// @codingStandardsIgnoreEnd Squiz.Commenting.FunctionComment.ParamCommentFullStop
+
+	/**
+	 * Make an association between post $id and post containing current user
+	 * global styles
+	 *
+	 * @since 6.2
+	 *
+	 * @param int|null $id ID of the associated post. Null to delete the asociation.
+	 * @return int|false Meta ID on success, false on failure.
+	 */
+	public static function associate_user_variation_with_global_styles_post( $id ) {
+		$current_gs_id = static::get_user_global_styles_post_id();
+
+		if ( $id === $current_gs_id ) {
+			return false;
+		}
+
+		$prev_id = get_post_meta( $current_gs_id, 'associated_user_variation', true );
+
+		if ( empty( $prev_id ) && ! empty( $id ) ) {
+			return add_post_meta( $current_gs_id, 'associated_user_variation', $id, true );
+		}
+
+		if ( empty( $id ) ) {
+			return delete_post_meta( $current_gs_id, 'associated_user_variation' );
+		}
+
+		return update_post_meta( $current_gs_id, 'associated_user_variation', $id );
+	}
+
+	/**
+	 * Get associated variation ID.
+	 *
+	 * @since 6.2
+	 *
+	 * @return int|null|false Meta ID or null on success, false on failure.
+	 */
+	public static function get_associated_user_variation_id() {
+		$current_gs_id = static::get_user_global_styles_post_id();
+
+		return get_post_meta( $current_gs_id, 'associated_user_variation', true );
 	}
 
 	/**
@@ -698,4 +781,47 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		return $variations;
 	}
 
+	/**
+	 * Returns all style variations.
+	 *
+	 * @since 6.2.0
+	 *
+	 * @return array
+	 */
+	public static function get_user_style_variations() {
+		$stylesheet = get_stylesheet();
+
+		$args = array(
+			'posts_per_page'         => -1,
+			'orderby'                => 'date',
+			'order'                  => 'desc',
+			'post_type'              => 'wp_global_styles',
+			'post_status'            => 'publish',
+			'ignore_sticky_posts'    => true,
+			'no_found_rows'          => true,
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'tax_query'              => array(
+				array(
+					'taxonomy' => 'wp_theme',
+					'field'    => 'name',
+					'terms'    => $stylesheet,
+				),
+			),
+		);
+
+		$global_style_query = new WP_Query();
+		$variation_posts    = $global_style_query->query( $args );
+		$variations         = array();
+
+		foreach ( $variation_posts as $variation_post ) {
+			$decoded            = json_decode( $variation_post->post_content, true );
+			$variation          = ( new WP_Theme_JSON_Gutenberg( $decoded ) )->get_raw_data();
+			$variation['title'] = $variation_post->post_title;
+			$variation['id']    = $variation_post->ID;
+			$variations[]       = $variation;
+		}
+
+		return $variations;
+	}
 }
