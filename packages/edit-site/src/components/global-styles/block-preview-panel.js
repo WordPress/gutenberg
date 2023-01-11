@@ -15,7 +15,7 @@ const BlockPreviewPanel = ( { name, variation = '' } ) => {
 	const blockExampleWithVariation = {
 		...blockExample,
 		attributes: {
-			...blockExample.attributes,
+			...blockExample?.attributes,
 			className: variation,
 		},
 	};
