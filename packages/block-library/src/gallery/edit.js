@@ -485,11 +485,17 @@ function GalleryEdit( props ) {
 		className: classnames( className, 'has-nested-images' ),
 	} );
 
+	const nativeInnerBlockProps = Platform.isNative && {
+		marginHorizontal: 0,
+		marginVertical: 0,
+	};
+
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks,
 		orientation: 'horizontal',
 		renderAppender: false,
 		__experimentalLayout: { type: 'default', alignments: [] },
+		...nativeInnerBlockProps,
 	} );
 
 	if ( ! hasImages ) {
