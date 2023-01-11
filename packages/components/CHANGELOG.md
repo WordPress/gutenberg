@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 23.2.0 (2023-01-11)
+
 ### Internal
 
 -   `Toolbar`: move all subcomponents under the same folder ([46951](https://github.com/WordPress/gutenberg/pull/46951)).
