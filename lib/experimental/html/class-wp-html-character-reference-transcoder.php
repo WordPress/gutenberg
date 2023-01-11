@@ -82,7 +82,31 @@ class WP_HTML_Character_Reference_Transcoder {
 				 * replace it eventually, but until render we don't want to inject
 				 * these replacement characters into the data stream.
 				 */
-				if ( $code_point > 0x10FFFF ) {
+				if (
+					// Null character.
+					0 === $code_point ||
+
+					// Outside Unicode range.
+					$code_point > 0x10FFFF ||
+
+					// Surrogate.
+					( $code_point >= 0xD800 && $code_point <= 0xDFFF ) ||
+
+					// Noncharacters.
+					( $code_point >= 0xFDD0 && $code_point <= 0xFDEF ) ||
+					( 0xFFFE === ( $code_point & 0xFFFE ) ) ||
+
+					// 0x0D or non-ASCII-whitespace control
+					0x0D === $code_point ||
+					(
+						$code_point >= 0 &&
+						$code_point <= 0x1F &&
+						0x9 !== $code_point &&
+						0xA !== $code_point &&
+						0xC !== $code_point &&
+						0xD !== $code_point
+					)
+				) {
 					$at += $digit_count;
 					$buffer .= substr( $input, $next, $at - $next );
 					continue;
