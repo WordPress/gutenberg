@@ -721,4 +721,5 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		}
 		return $variations;
 	}
+	
 }
