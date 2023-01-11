@@ -14,7 +14,7 @@ import { close } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { Button } from '..';
+import Button from '../button';
 import type { NoticeProps } from './types';
 import type { WordPressComponentProps } from '../ui/context';
 
