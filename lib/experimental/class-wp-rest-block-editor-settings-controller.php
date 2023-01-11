@@ -198,7 +198,7 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
 				),
 
-				'blockInspectorTabs'       => array(
+				'blockInspectorTabs'                     => array(
 					'description' => __( 'Block inspector tab display overrides.', 'gutenberg' ),
 					'type'        => 'object',
 					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
