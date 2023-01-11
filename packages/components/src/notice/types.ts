@@ -7,7 +7,7 @@ type CommonNoticeActionProps = {
 	label: string;
 	className?: string;
 	noDefaultClasses?: boolean;
-	variant?: 'primary';
+	variant?: 'primary' | 'secondary' | 'link';
 };
 // `url` and `onClick` can both be provided, but `url` takes precedence. If
 // `url` is provided, the action's button will be rendered as an anchor and
