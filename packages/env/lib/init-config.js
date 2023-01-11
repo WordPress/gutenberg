@@ -169,10 +169,12 @@ function installXdebug( enableXdebug ) {
 
 	return `
 # Install Xdebug:
+RUN apt-get update -y && apt-get -y install iproute2
 RUN if [ -z "$(pecl list | grep xdebug)" ] ; then pecl install xdebug ; fi
 RUN docker-php-ext-enable xdebug
 RUN echo 'xdebug.start_with_request=yes' >> /usr/local/etc/php/php.ini
 RUN echo 'xdebug.mode=${ enableXdebug }' >> /usr/local/etc/php/php.ini
 RUN echo '${ clientDetectSettings }' >> /usr/local/etc/php/php.ini
+RUN HOST_IP=$(ip route | awk '/default/ { print $3 }'); echo "xdebug.client_host=\"$HOST_IP\"" >> /usr/local/etc/php/php.ini
 	`;
 }
