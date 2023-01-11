@@ -15,15 +15,12 @@ export async function switchBlockInspectorTab( this: Editor, label: string ) {
 	const inspectorTabButton = this.page.locator(
 		`role=region[name="Editor settings"i] >> role=tab[name="${ label }"i]`
 	);
+	const id = await inspectorTabButton.getAttribute( 'id' );
 
-	if ( inspectorTabButton ) {
-		const id = await inspectorTabButton.getAttribute( 'id' );
-		await inspectorTabButton.click();
-
-		await expect(
-			this.page.locator(
-				`role=region[name="Editor settings"i] >> div[role="tabpanel"][aria-labelledby="${ id }"]`
-			)
-		).toBeVisible();
-	}
+	await inspectorTabButton.click();
+	await expect(
+		this.page.locator(
+			`role=region[name="Editor settings"i] >> div[role="tabpanel"][aria-labelledby="${ id }"]`
+		)
+	).toBeVisible();
 }
