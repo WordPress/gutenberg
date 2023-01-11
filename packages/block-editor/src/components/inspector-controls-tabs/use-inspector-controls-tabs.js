@@ -75,8 +75,7 @@ export default function useInspectorControlsTabs( blockName ) {
 	}
 
 	const tabSettings = useSelect( ( select ) => {
-		return select( blockEditorStore ).getSettings()
-			.__experimentalBlockInspectorTabs;
+		return select( blockEditorStore ).getSettings().blockInspectorTabs;
 	}, [] );
 
 	const showTabs = getShowTabs( blockName, tabSettings );
