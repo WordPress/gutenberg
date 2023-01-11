@@ -18,6 +18,7 @@ import { selectBlocks } from './select-blocks';
 import { setContent } from './set-content';
 import { showBlockToolbar } from './show-block-toolbar';
 import { saveSiteEditorEntities } from './site-editor';
+import { switchBlockInspectorTab } from './switch-block-inspector-tab';
 import { transformBlockTo } from './transform-block-to';
 
 type EditorConstructorProps = {
@@ -67,5 +68,6 @@ export class Editor {
 	selectBlocks = selectBlocks.bind( this );
 	setContent = setContent.bind( this );
 	showBlockToolbar = showBlockToolbar.bind( this );
+	switchBlockInspectorTab = switchBlockInspectorTab.bind( this );
 	transformBlockTo = transformBlockTo.bind( this );
 }
