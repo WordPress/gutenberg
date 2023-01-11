@@ -222,7 +222,11 @@ function ListViewBranch( props ) {
 				>
 					<TreeGridCell>
 						{ ( treeGridCellProps ) => (
-							<Appender { ...treeGridCellProps } />
+							<Appender
+								nestingLevel={ level }
+								blockCount={ blockCount }
+								{ ...treeGridCellProps }
+							/>
 						) }
 					</TreeGridCell>
 				</TreeGridRow>
