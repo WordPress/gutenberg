@@ -8,6 +8,23 @@
 
 class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	/**
+	 * Administrator ID.
+	 *
+	 * @var int
+	 */
+	protected static $administrator_id;
+
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+
+		self::$administrator_id = self::factory()->user->create(
+			array(
+				'role' => 'administrator',
+			)
+		);
+	}
+
+	/**
 	 * @dataProvider data_get_layout_definitions
 	 *
 	 * @param array $layout_definitions Layout definitions as stored in core theme.json.
@@ -1597,5 +1614,85 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$custom_css = 'body { color:purple; }';
 		$this->assertEquals( $custom_css, $theme_json->get_stylesheet( array( 'custom-css' ) ) );
+	}
+
+	public function test_allows_custom_css_for_users_with_caps() {
+		wp_set_current_user( self::$administrator_id );
+
+		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'css'    => 'body { color:purple; }',
+					'blocks' => array(
+						'core/separator' => array(
+							'color' => array(
+								'background' => 'blue',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = array(
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'styles'  => array(
+				'css'    => 'body { color:purple; }',
+				'blocks' => array(
+					'core/separator' => array(
+						'color' => array(
+							'background' => 'blue',
+						),
+					),
+				),
+			),
+		);
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
+	public function test_removes_custom_css_for_users_without_caps() {
+		wp_set_current_user( self::$administrator_id );
+
+		$remove_edit_css_cap = function( $caps, $cap ) {
+			if ( 'edit_css' === $cap ) {
+				$caps = array( 'do_not_allow' );
+			}
+			return $caps;
+		};
+		add_filter( 'map_meta_cap', $remove_edit_css_cap, 10, 2 );
+
+		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'css'    => 'body { color:purple; }',
+					'blocks' => array(
+						'core/separator' => array(
+							'color' => array(
+								'background' => 'blue',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = array(
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'styles'  => array(
+				'blocks' => array(
+					'core/separator' => array(
+						'color' => array(
+							'background' => 'blue',
+						),
+					),
+				),
+			),
+		);
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+		remove_filter( 'map_meta_cap', $remove_edit_css_cap );
 	}
 }
