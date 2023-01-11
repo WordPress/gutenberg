@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "14.9.1",
+	"version": "15.0.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
