@@ -18,6 +18,7 @@ import type { WPElement } from '@wordpress/element';
 import Button from '../button';
 import type { NoticeProps } from './types';
 import type { WordPressComponentProps } from '../ui/context';
+import type { SyntheticEvent } from 'react';
 
 const noop = () => {};
 
@@ -78,7 +79,7 @@ function Notice( {
 		children = <RawHTML>{ children }</RawHTML>;
 	}
 
-	const onDismissNotice = ( event ) => {
+	const onDismissNotice = ( event: SyntheticEvent ) => {
 		event?.preventDefault?.();
 		onDismiss();
 		onRemove();
