@@ -126,7 +126,10 @@ function formatTime( number ) {
  * @return {WPPerformanceResults} Curated Performance results.
  */
 function curateResults( testSuite, results ) {
-	if ( testSuite === 'front-end' ) {
+	if (
+		testSuite === 'front-end-twentytwentyone' ||
+		testSuite === 'front-end-twentytwentythree'
+	) {
 		return {
 			timeToFirstByte: average( results.timeToFirstByte ),
 		};
@@ -353,7 +356,12 @@ async function runPerformanceTests( branches, options ) {
 	// 4- Running the tests.
 	log( '\n>> Running the tests' );
 
-	const testSuites = [ 'post-editor', 'site-editor', 'front-end' ];
+	const testSuites = [
+		'post-editor',
+		'site-editor',
+		'front-end-twentytwentyone',
+		'front-end-twentytwentythree',
+	];
 
 	/** @type {Record<string,Record<string, WPPerformanceResults>>} */
 	const results = {};
