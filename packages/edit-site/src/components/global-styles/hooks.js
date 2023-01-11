@@ -373,10 +373,14 @@ export function useColorRandomizer( name ) {
 
 export function useHasUserModifiedStyles() {
 	const { user } = useContext( GlobalStylesContext );
-	return (
-		Object.keys( user.settings ).length > 0 ||
-		Object.keys( user.styles ).length > 0
-	);
+	const hasModifiedStyles = useMemo( () => {
+		return (
+			Object.keys( user.settings ).length > 0 ||
+			Object.keys( user.styles ).length > 0
+		);
+	}, [ user ] );
+
+	return hasModifiedStyles;
 }
 
 export function useCreateNewStyleRecord( title ) {
