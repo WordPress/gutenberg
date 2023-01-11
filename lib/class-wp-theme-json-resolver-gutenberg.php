@@ -671,7 +671,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 	/**
 	 * Returns an array of all nested json files within a given directory.
-	 * 
+	 *
 	 * @since 6.2.0
 	 *
 	 * @param dir $dir The directory to recursively iterate and list files of.
@@ -721,5 +721,4 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		}
 		return $variations;
 	}
-	
 }
