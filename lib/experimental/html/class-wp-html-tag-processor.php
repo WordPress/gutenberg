@@ -423,7 +423,7 @@ class WP_HTML_Tag_Processor {
 	 * @since 6.2.0
 	 * @var WP_HTML_Text_Replacement[]
 	 */
-	private $attribute_updates = array();
+	private $lexical_updates = array();
 
 	/**
 	 * Tracks how many times we've performed a `seek()`
@@ -1097,15 +1097,15 @@ class WP_HTML_Tag_Processor {
 	}
 
 	/**
-	 * Applies attribute updates and cleans up once a tag is fully parsed.
+	 * Applies lexical updates and cleans up once a tag is fully parsed.
 	 *
 	 * @since 6.2.0
 	 *
 	 * @return void
 	 */
 	private function after_tag() {
-		$this->class_name_updates_to_attributes_updates();
-		$this->apply_attributes_updates();
+		$this->class_name_updates_to_lexical_updates();
+		$this->apply_lexical_updates();
 		$this->tag_name_starts_at = null;
 		$this->tag_name_length    = null;
 		$this->tag_ends_at        = null;
@@ -1114,20 +1114,20 @@ class WP_HTML_Tag_Processor {
 	}
 
 	/**
-	 * Converts class name updates into tag attributes updates
+	 * Converts class name updates into tag lexical updates
 	 * (they are accumulated in different data formats for performance).
 	 *
-	 * This method is only meant to run right before the attribute updates are applied.
+	 * This method is only meant to run right before the lexical updates are applied.
 	 * The behavior in all other cases is undefined.
 	 *
 	 * @return void
 	 * @since 6.2.0
 	 *
 	 * @see $classname_updates
-	 * @see $attribute_updates
+	 * @see $lexical_updates
 	 */
-	private function class_name_updates_to_attributes_updates() {
-		if ( count( $this->classname_updates ) === 0 || isset( $this->attribute_updates['class'] ) ) {
+	private function class_name_updates_to_lexical_updates() {
+		if ( count( $this->classname_updates ) === 0 || isset( $this->lexical_updates['class'] ) ) {
 			$this->classname_updates = array();
 			return;
 		}
@@ -1247,13 +1247,13 @@ class WP_HTML_Tag_Processor {
 	 *
 	 * @since 6.2.0
 	 */
-	private function apply_attributes_updates() {
-		if ( ! count( $this->attribute_updates ) ) {
+	private function apply_lexical_updates() {
+		if ( ! count( $this->lexical_updates ) ) {
 			return;
 		}
 
 		/**
-		 * Attribute updates can be enqueued in any order but as we
+		 * Lexical updates can be enqueued in any order but as we
 		 * progress through the document to replace them we have to
 		 * make our replacements in the order in which they are found
 		 * in that document.
@@ -1262,9 +1262,9 @@ class WP_HTML_Tag_Processor {
 		 * out of order, which could otherwise lead to mangled output,
 		 * partially-duplicate attributes, and overwritten attributes.
 		 */
-		usort( $this->attribute_updates, array( self::class, 'sort_start_ascending' ) );
+		usort( $this->lexical_updates, array( self::class, 'sort_start_ascending' ) );
 
-		foreach ( $this->attribute_updates as $diff ) {
+		foreach ( $this->lexical_updates as $diff ) {
 			$this->updated_html .= substr( $this->html, $this->updated_bytes, $diff->start - $this->updated_bytes );
 			$this->updated_html .= $diff->text;
 			$this->updated_bytes = $diff->end;
@@ -1272,7 +1272,7 @@ class WP_HTML_Tag_Processor {
 
 		foreach ( $this->bookmarks as $bookmark ) {
 			/**
-			 * As we loop through $this->attribute_updates, we keep comparing
+			 * As we loop through $this->lexical_updates, we keep comparing
 			 * $bookmark->start and $bookmark->end to $diff->start. We can't
 			 * change it and still expect the correct result, so let's accumulate
 			 * the deltas separately and apply them all at once after the loop.
@@ -1280,7 +1280,7 @@ class WP_HTML_Tag_Processor {
 			$head_delta = 0;
 			$tail_delta = 0;
 
-			foreach ( $this->attribute_updates as $diff ) {
+			foreach ( $this->lexical_updates as $diff ) {
 				$update_head = $bookmark->start >= $diff->start;
 				$update_tail = $bookmark->end >= $diff->start;
 
@@ -1303,7 +1303,7 @@ class WP_HTML_Tag_Processor {
 			$bookmark->end   += $tail_delta;
 		}
 
-		$this->attribute_updates = array();
+		$this->lexical_updates = array();
 	}
 
 	/**
@@ -1346,8 +1346,8 @@ class WP_HTML_Tag_Processor {
 	 *
 	 * @since 6.2.0
 	 *
-	 * @param WP_HTML_Text_Replacement $a First attribute update.
-	 * @param WP_HTML_Text_Replacement $b Second attribute update.
+	 * @param WP_HTML_Text_Replacement $a First lexical update.
+	 * @param WP_HTML_Text_Replacement $b Second lexical update.
 	 * @return integer
 	 */
 	private static function sort_start_ascending( $a, $b ) {
@@ -1582,8 +1582,8 @@ class WP_HTML_Tag_Processor {
 			 *
 			 *    Result: <div id="new"/>
 			 */
-			$existing_attribute               = $this->attributes[ $comparable_name ];
-			$this->attribute_updates[ $name ] = new WP_HTML_Text_Replacement(
+			$existing_attribute             = $this->attributes[ $comparable_name ];
+			$this->lexical_updates[ $name ] = new WP_HTML_Text_Replacement(
 				$existing_attribute->start,
 				$existing_attribute->end,
 				$updated_attribute
@@ -1600,7 +1600,7 @@ class WP_HTML_Tag_Processor {
 			 *
 			 *    Result: <div id="new"/>
 			 */
-			$this->attribute_updates[ $comparable_name ] = new WP_HTML_Text_Replacement(
+			$this->lexical_updates[ $comparable_name ] = new WP_HTML_Text_Replacement(
 				$this->tag_name_starts_at + $this->tag_name_length,
 				$this->tag_name_starts_at + $this->tag_name_length,
 				' ' . $updated_attribute
@@ -1640,7 +1640,7 @@ class WP_HTML_Tag_Processor {
 		 *
 		 *    Result: <div />
 		 */
-		$this->attribute_updates[ $name ] = new WP_HTML_Text_Replacement(
+		$this->lexical_updates[ $name ] = new WP_HTML_Text_Replacement(
 			$this->attributes[ $name ]->start,
 			$this->attributes[ $name ]->end,
 			''
@@ -1702,7 +1702,7 @@ class WP_HTML_Tag_Processor {
 	 */
 	public function get_updated_html() {
 		// Short-circuit if there are no new updates to apply.
-		if ( ! count( $this->classname_updates ) && ! count( $this->attribute_updates ) ) {
+		if ( ! count( $this->classname_updates ) && ! count( $this->lexical_updates ) ) {
 			return $this->updated_html . substr( $this->html, $this->updated_bytes );
 		}
 
@@ -1715,8 +1715,8 @@ class WP_HTML_Tag_Processor {
 		$updated_html_up_to_current_tag_name_end            = $this->updated_html . $delta_between_updated_html_end_and_current_tag_end;
 
 		// 1. Apply the attributes updates to the original HTML
-		$this->class_name_updates_to_attributes_updates();
-		$this->apply_attributes_updates();
+		$this->class_name_updates_to_lexical_updates();
+		$this->apply_lexical_updates();
 
 		// 2. Replace the original HTML with the updated HTML
 		$this->html          = $this->updated_html . substr( $this->html, $this->updated_bytes );
