@@ -8,8 +8,6 @@ import { render, fireEvent } from '@testing-library/react';
  */
 import { ColorPicker } from '..';
 
-jest.useFakeTimers();
-
 /**
  * Ordinarily we'd try to select the compnoent by role but the silder role appears
  * on several elements and we'd end up encoding assumptions about order when
@@ -43,11 +41,7 @@ function moveReactColorfulSlider( sliderElement, from, to ) {
 	fireEvent( sliderElement, new FakeMouseEvent( 'mousemove', to ) );
 }
 
-const sleep = ( ms ) => {
-	const promise = new Promise( ( resolve ) => setTimeout( resolve, ms ) );
-	jest.advanceTimersByTime( ms + 1 );
-	return promise;
-};
+const sleep = ( ms ) => new Promise( ( resolve ) => setTimeout( resolve, ms ) );
 
 const hslaMatcher = expect.objectContaining( {
 	h: expect.any( Number ),
