@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { get } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * Internal dependencies
@@ -332,4 +333,27 @@ export function scopeSelector( scope, selector ) {
 	} );
 
 	return selectorsScoped.join( ', ' );
+}
+
+export function compareVariations( a, b ) {
+	if ( ! a.styles ) {
+		a.styles = {};
+	}
+
+	if ( ! a.settings ) {
+		a.settings = {};
+	}
+
+	if ( ! b.styles ) {
+		b.styles = {};
+	}
+
+	if ( ! b.settings ) {
+		b.settings = {};
+	}
+
+	return (
+		fastDeepEqual( a.styles, b.styles ) &&
+		fastDeepEqual( a.settings, b.settings )
+	);
 }

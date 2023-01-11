@@ -188,6 +188,26 @@ export function themeGlobalStyleVariations( state = {}, action ) {
 }
 
 /**
+ * Reducer managing the user global styles variations.
+ *
+ * @param {Record<string, object>} state  Current state.
+ * @param {Object}                 action Dispatched action.
+ *
+ * @return {Record<string, object>} Updated state.
+ */
+export function userGlobalStyleVariations( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_USER_GLOBAL_STYLE_VARIATIONS':
+			return {
+				...state,
+				[ action.stylesheet ]: action.variations,
+			};
+	}
+
+	return state;
+}
+
+/**
  * Higher Order Reducer for a given entity config. It supports:
  *
  *  - Fetching
@@ -658,4 +678,5 @@ export default combineReducers( {
 	autosaves,
 	blockPatterns,
 	blockPatternCategories,
+	userGlobalStyleVariations,
 } );

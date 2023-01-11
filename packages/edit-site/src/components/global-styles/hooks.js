@@ -16,11 +16,17 @@ import {
 	__EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE,
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 } from '@wordpress/blocks';
+import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { getValueFromVariable, getPresetVariableFromValue } from './utils';
+import {
+	getValueFromVariable,
+	getPresetVariableFromValue,
+	compareVariations,
+} from './utils';
 import { GlobalStylesContext } from './context';
 
 // Enable colord's a11y plugin.
@@ -363,4 +369,78 @@ export function useColorRandomizer( name ) {
 	return window.__experimentalEnableColorRandomizer
 		? [ randomizeColors ]
 		: [];
+}
+
+export function useHasUserModifiedStyles() {
+	const { user } = useContext( GlobalStylesContext );
+	return (
+		Object.keys( user.settings ).length > 0 ||
+		Object.keys( user.styles ).length > 0
+	);
+}
+
+export function useCreateNewStyleRecord( title ) {
+	const { saveEntityRecord } = useDispatch( coreStore );
+	const { user } = useContext( GlobalStylesContext );
+	const callback = useCallback( () => {
+		const recordData = {
+			...user,
+			title,
+		};
+		/* eslint-disable dot-notation */
+		delete recordData[ 'associated_style_id' ];
+		delete recordData[ 'id' ];
+		/* eslint-enable dot-notation */
+		return saveEntityRecord( 'root', 'globalStyles', recordData ).then(
+			( rawVariation ) => {
+				return {
+					...rawVariation,
+					title: rawVariation?.title?.rendered,
+				};
+			}
+		);
+	}, [ title, user ] );
+	return callback;
+}
+
+export function useCustomSavedStyles() {
+	const { globalStylesId } = useSelect( ( select ) => {
+		return {
+			globalStylesId:
+				select( coreStore ).__experimentalGetCurrentGlobalStylesId(),
+		};
+	}, [] );
+	const { records: variations } = useEntityRecords( 'root', 'globalStyles' );
+
+	const customVariations = useMemo( () => {
+		return (
+			variations
+				?.filter( ( variation ) => variation.id !== globalStylesId )
+				?.map( ( variation ) => {
+					let newVariation = variation;
+					if ( variation?.title?.rendered !== undefined ) {
+						newVariation = {
+							...variation,
+							title: variation.title.rendered,
+						};
+					}
+
+					return newVariation;
+				} ) || []
+		);
+	}, [ globalStylesId, variations ] );
+
+	return customVariations;
+}
+
+export function useUserChangesMatchAnyVariation( variations ) {
+	const { user } = useContext( GlobalStylesContext );
+	const matches = useMemo(
+		() =>
+			variations?.some( ( variation ) =>
+				compareVariations( user, variation )
+			),
+		[ user, variations ]
+	);
+	return matches;
 }
