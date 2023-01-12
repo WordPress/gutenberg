@@ -121,6 +121,7 @@ describe( 'getPxFromCssUnit', () => {
 			[ 'abc', null ],
 			[ 'console.log("howdy"); + 10px', null ],
 			[ 'calc(12vw * 10px', null ], // Missing closing bracket.
+			[ 'calc( 1em + 0.875rem )', '30px' ], // Decimals
 		];
 
 		test.each( testData )(
