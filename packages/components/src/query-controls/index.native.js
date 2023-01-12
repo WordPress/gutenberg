@@ -79,6 +79,7 @@ const QueryControls = memo(
 						noOptionLabel={ __( 'All' ) }
 						selectedCategoryId={ selectedCategoryId }
 						onChange={ onCategoryChange }
+						hideCancelButton={ true }
 					/>
 				) }
 				{ onNumberOfItemsChange && (
