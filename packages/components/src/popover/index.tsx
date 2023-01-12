@@ -484,6 +484,8 @@ const UnforwardedPopover = (
 			ref={ mergedFloatingRef }
 			{ ...dialogProps }
 			tabIndex={ -1 }
+			aria-label="popover label"
+			role="region"
 			style={
 				isExpanded
 					? undefined
