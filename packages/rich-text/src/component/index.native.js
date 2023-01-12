@@ -854,9 +854,13 @@ export class RichText extends Component {
 		// we compare previous values to refresh the selected font size,
 		// this is also used when the tag name changes
 		// e.g Heading block and a level change like h1->h2.
-		const currentFontSizeStyle = this.getParsedFontSize( style?.fontSize );
-		const prevFontSizeStyle = this.getParsedFontSize(
-			prevProps?.style?.fontSize
+		const currentFontSizeStyle = this.getParsedCssValue(
+			style?.fontSize,
+			DEFAULT_FONT_SIZE
+		);
+		const prevFontSizeStyle = this.getParsedCssValue(
+			prevProps?.style?.fontSize,
+			DEFAULT_FONT_SIZE
 		);
 		const isDifferentTag = prevProps.tagName !== tagName;
 		if (
@@ -911,16 +915,16 @@ export class RichText extends Component {
 		};
 	}
 
-	getParsedFontSize( fontSize ) {
+	getParsedCssValue( value, defaultValue, fontSize = DEFAULT_FONT_SIZE ) {
 		const { height, width } = Dimensions.get( 'window' );
-		const cssUnitOptions = { height, width, fontSize: DEFAULT_FONT_SIZE };
+		const cssUnitOptions = { height, width, fontSize };
 
-		if ( ! fontSize ) {
-			return fontSize;
+		if ( ! value ) {
+			return value;
 		}
 
 		const selectedPxValue =
-			getPxFromCssUnit( fontSize, cssUnitOptions ) ?? DEFAULT_FONT_SIZE;
+			getPxFromCssUnit( value, cssUnitOptions ) ?? defaultValue;
 
 		return parseFloat( selectedPxValue );
 	}
@@ -957,38 +961,40 @@ export class RichText extends Component {
 
 		// We need to always convert to px units because the selected value
 		// could be coming from the web where it could be stored as a different unit.
-		const selectedPxValue = this.getParsedFontSize( newFontSize );
+		const selectedPxValue = this.getParsedCssValue(
+			newFontSize,
+			DEFAULT_FONT_SIZE
+		);
 
 		return selectedPxValue;
 	}
 
 	getLineHeight() {
 		const { baseGlobalStyles, tagName, lineHeight, style } = this.props;
+		const { currentFontSize } = this.state;
 		const tagNameLineHeight =
 			baseGlobalStyles?.elements?.[ tagName ]?.typography?.lineHeight;
 		let newLineHeight;
 
 		if ( ! this.getIsBlockBasedTheme() ) {
-			return;
+			return MIN_LINE_HEIGHT;
 		}
 
 		// For block-based themes, get the default editor line height.
 		if ( baseGlobalStyles?.typography?.lineHeight && tagName === 'p' ) {
-			newLineHeight = parseFloat(
-				baseGlobalStyles?.typography?.lineHeight
-			);
+			newLineHeight = baseGlobalStyles?.typography?.lineHeight;
 		}
 
 		// For block-based themes, get the default element line height
 		// e.g h1, h2.
 		if ( tagNameLineHeight ) {
-			newLineHeight = parseFloat( tagNameLineHeight );
+			newLineHeight = tagNameLineHeight;
 		}
 
 		// For line height values provided from the styles,
 		// usually from values set from the line height picker.
 		if ( style?.lineHeight ) {
-			newLineHeight = parseFloat( style.lineHeight );
+			newLineHeight = style.lineHeight;
 		}
 
 		// Fall-back to a line height provided from its props (if there's any)
@@ -997,12 +1003,34 @@ export class RichText extends Component {
 			newLineHeight = lineHeight;
 		}
 
+		// If it can't be converted into a floating point number is probably a CSS value
+		if ( ! parseFloat( newLineHeight ) ) {
+			const parsedLineHeight = this.getParsedCssValue(
+				newLineHeight,
+				MIN_LINE_HEIGHT,
+				currentFontSize
+			);
+
+			// Line height is in pixels
+			if ( Number.isInteger( parsedLineHeight ) ) {
+				const pxValue = parsedLineHeight / currentFontSize;
+				newLineHeight = parseFloat(
+					parseFloat( pxValue ).toFixed( 2 )
+				);
+			} else {
+				newLineHeight = parsedLineHeight;
+			}
+		}
+
 		// Check the final value is not over the minimum supported value.
-		if ( newLineHeight && newLineHeight < MIN_LINE_HEIGHT ) {
+		if (
+			! newLineHeight ||
+			( newLineHeight && newLineHeight < MIN_LINE_HEIGHT )
+		) {
 			newLineHeight = MIN_LINE_HEIGHT;
 		}
 
-		return newLineHeight;
+		return parseFloat( newLineHeight );
 	}
 
 	getIsBlockBasedTheme() {
