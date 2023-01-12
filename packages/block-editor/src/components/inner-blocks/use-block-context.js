@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import { mapValues } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { getBlockType } from '@wordpress/blocks';
+import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -25,17 +20,26 @@ export default function useBlockContext( clientId ) {
 	return useSelect(
 		( select ) => {
 			const block = select( blockEditorStore ).getBlock( clientId );
-			const blockType = getBlockType( block?.name );
-
-			if (
-				Object.keys( blockType?.providesContext ?? {} ).length === 0
-			) {
+			if ( ! block ) {
 				return undefined;
 			}
 
-			return mapValues(
-				blockType.providesContext,
-				( attributeName ) => block.attributes[ attributeName ]
+			const blockType = select( blocksStore ).getBlockType( block.name );
+			if ( ! blockType ) {
+				return undefined;
+			}
+
+			if ( Object.keys( blockType.providesContext ).length === 0 ) {
+				return undefined;
+			}
+
+			return Object.fromEntries(
+				Object.entries( blockType.providesContext ).map(
+					( [ contextName, attributeName ] ) => [
+						contextName,
+						block.attributes[ attributeName ],
+					]
+				)
 			);
 		},
 		[ clientId ]
