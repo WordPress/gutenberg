@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, isEmpty, kebabCase, pickBy, set } from 'lodash';
+import { get, isEmpty, kebabCase, set } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,6 +10,7 @@ import {
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
 	getBlockTypes,
+	store as blocksStore,
 } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { useContext, useMemo } from '@wordpress/element';
@@ -169,6 +170,29 @@ function flattenTree( input = {}, prefix, token ) {
 		}
 	} );
 	return result;
+}
+
+/**
+ * Gets variation selector string from feature selector.
+ *
+ * @param {string} featureSelector        The feature selector.
+ *
+ * @param {string} styleVariationSelector The style variation selector.
+ * @return {string} Combined selector string.
+ *
+ */
+function concatFeatureVariationSelectorString(
+	featureSelector,
+	styleVariationSelector
+) {
+	const featureSelectors = featureSelector.split( ',' );
+	const combinedSelectors = [];
+	featureSelectors.forEach( ( selector ) => {
+		combinedSelectors.push(
+			`${ styleVariationSelector.trim() }${ selector.trim() }`
+		);
+	} );
+	return combinedSelectors.join( ', ' );
 }
 
 /**
@@ -449,17 +473,19 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 	}
 
 	const pickStyleKeys = ( treeToPickFrom ) =>
-		pickBy( treeToPickFrom, ( value, key ) =>
-			[
-				'border',
-				'color',
-				'dimensions',
-				'spacing',
-				'typography',
-				'filter',
-				'outline',
-				'shadow',
-			].includes( key )
+		Object.fromEntries(
+			Object.entries( treeToPickFrom ?? {} ).filter( ( [ key ] ) =>
+				[
+					'border',
+					'color',
+					'dimensions',
+					'spacing',
+					'typography',
+					'filter',
+					'outline',
+					'shadow',
+				].includes( key )
+			)
 		);
 
 	// Top-level.
@@ -484,6 +510,16 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 	Object.entries( tree.styles?.blocks ?? {} ).forEach(
 		( [ blockName, node ] ) => {
 			const blockStyles = pickStyleKeys( node );
+
+			if ( node?.variations ) {
+				const variations = {};
+				Object.keys( node.variations ).forEach( ( variation ) => {
+					variations[ variation ] = pickStyleKeys(
+						node.variations[ variation ]
+					);
+				} );
+				blockStyles.variations = variations;
+			}
 			if (
 				!! blockStyles &&
 				!! blockSelectors?.[ blockName ]?.selector
@@ -499,6 +535,8 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 					styles: blockStyles,
 					featureSelectors:
 						blockSelectors[ blockName ].featureSelectors,
+					styleVariationSelectors:
+						blockSelectors[ blockName ].styleVariationSelectors,
 				} );
 			}
 
@@ -647,6 +685,7 @@ export const toStyles = (
 			fallbackGapValue,
 			hasLayoutSupport,
 			featureSelectors,
+			styleVariationSelectors,
 		} ) => {
 			// Process styles for block support features with custom feature level
 			// CSS selectors set.
@@ -667,6 +706,69 @@ export const toStyles = (
 									`${ featureSelector }{${ featureDeclarations.join(
 										';'
 									) } }`;
+							}
+						}
+					}
+				);
+			}
+
+			if ( styleVariationSelectors ) {
+				Object.entries( styleVariationSelectors ).forEach(
+					( [ styleVariationName, styleVariationSelector ] ) => {
+						if ( styles?.variations?.[ styleVariationName ] ) {
+							// If the block uses any custom selectors for block support, add those first.
+							if ( featureSelectors ) {
+								Object.entries( featureSelectors ).forEach(
+									( [ featureName, featureSelector ] ) => {
+										if (
+											styles?.variations?.[
+												styleVariationName
+											]?.[ featureName ]
+										) {
+											const featureStyles = {
+												[ featureName ]:
+													styles.variations[
+														styleVariationName
+													][ featureName ],
+											};
+											const featureDeclarations =
+												getStylesDeclarations(
+													featureStyles
+												);
+											delete styles.variations[
+												styleVariationName
+											][ featureName ];
+
+											if (
+												!! featureDeclarations.length
+											) {
+												ruleset =
+													ruleset +
+													`${ concatFeatureVariationSelectorString(
+														featureSelector,
+														styleVariationSelector
+													) }{${ featureDeclarations.join(
+														';'
+													) } }`;
+											}
+										}
+									}
+								);
+							}
+							// Otherwise add regular selectors.
+							const styleVariationDeclarations =
+								getStylesDeclarations(
+									styles?.variations?.[ styleVariationName ],
+									styleVariationSelector,
+									useRootPaddingAlign,
+									tree
+								);
+							if ( !! styleVariationDeclarations.length ) {
+								ruleset =
+									ruleset +
+									`${ styleVariationSelector }{${ styleVariationDeclarations.join(
+										';'
+									) }}`;
 							}
 						}
 					}
@@ -802,7 +904,7 @@ export function toSvgFilters( tree, blockSelectors ) {
 	} );
 }
 
-export const getBlockSelectors = ( blockTypes ) => {
+export const getBlockSelectors = ( blockTypes, getBlockStyles ) => {
 	const result = {};
 	blockTypes.forEach( ( blockType ) => {
 		const name = blockType.name;
@@ -815,6 +917,15 @@ export const getBlockSelectors = ( blockTypes ) => {
 		const fallbackGapValue =
 			blockType?.supports?.spacing?.blockGap?.__experimentalDefault;
 
+		const blockStyleVariations = getBlockStyles( name );
+		const styleVariationSelectors = {};
+		if ( blockStyleVariations?.length ) {
+			blockStyleVariations.forEach( ( variation ) => {
+				const styleVariationSelector = `.is-style-${ variation.name }${ selector }`;
+				styleVariationSelectors[ variation.name ] =
+					styleVariationSelector;
+			} );
+		}
 		// For each block support feature add any custom selectors.
 		const featureSelectors = {};
 		Object.entries( BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS ).forEach(
@@ -840,6 +951,10 @@ export const getBlockSelectors = ( blockTypes ) => {
 			hasLayoutSupport,
 			name,
 			selector,
+			styleVariationSelectors: Object.keys( styleVariationSelectors )
+				.length
+				? styleVariationSelectors
+				: undefined,
 		};
 	} );
 
@@ -892,12 +1007,19 @@ export function useGlobalStylesOutput() {
 		return !! getSettings().disableLayoutStyles;
 	} );
 
+	const getBlockStyles = useSelect( ( select ) => {
+		return select( blocksStore ).getBlockStyles;
+	}, [] );
+
 	return useMemo( () => {
 		if ( ! mergedConfig?.styles || ! mergedConfig?.settings ) {
 			return [];
 		}
 		mergedConfig = updateConfigWithSeparator( mergedConfig );
-		const blockSelectors = getBlockSelectors( getBlockTypes() );
+		const blockSelectors = getBlockSelectors(
+			getBlockTypes(),
+			getBlockStyles
+		);
 		const customProperties = toCustomProperties(
 			mergedConfig,
 			blockSelectors
@@ -909,6 +1031,7 @@ export function useGlobalStylesOutput() {
 			hasFallbackGapSupport,
 			disableLayoutStyles
 		);
+
 		const filters = toSvgFilters( mergedConfig, blockSelectors );
 		const stylesheets = [
 			{

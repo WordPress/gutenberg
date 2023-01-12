@@ -52,6 +52,16 @@ Settings related to borders.
 
 ---
 
+### shadow
+
+Settings related to shadows.
+
+| Property  | Type   | Default | Props  |
+| ---       | ---    | ---    |---   |
+| palette | array |  | name, shadow, slug |
+
+---
+
 ### color
 
 Settings related to colors.

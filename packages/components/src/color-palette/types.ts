@@ -75,13 +75,6 @@ export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
 	 */
 	value?: string;
 	/**
-	 * Whether the colors prop is an array of color palettes,
-	 * rather than an array of color objects.
-	 *
-	 * @default false
-	 */
-	__experimentalHasMultipleOrigins?: boolean;
-	/**
 	 * Whether this is rendered in the sidebar.
 	 *
 	 * @default false

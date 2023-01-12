@@ -80,6 +80,19 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	 * @covers next_tag
 	 * @covers get_attribute
 	 */
+	public function test_get_attribute_returns_null_when_in_closing_tag() {
+		$p = new WP_HTML_Tag_Processor( '<div class="test">Test</div>' );
+		$this->assertTrue( $p->next_tag( 'div' ), 'Querying an existing tag did not return true' );
+		$this->assertTrue( $p->next_tag( array( 'tag_closers' => 'visit' ) ), 'Querying an existing closing tag did not return true' );
+		$this->assertNull( $p->get_attribute( 'class' ), 'Accessing an attribute of a closing tag did not return null' );
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers next_tag
+	 * @covers get_attribute
+	 */
 	public function test_get_attribute_returns_null_when_attribute_missing() {
 		$p = new WP_HTML_Tag_Processor( '<div class="test">Test</div>' );
 		$this->assertTrue( $p->next_tag( 'div' ), 'Querying an existing tag did not return true' );
@@ -149,6 +162,131 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 		$this->assertTrue( $p->get_attribute( 'c' ), 'Accessing an existing attribute did not return true' );
 		$this->assertTrue( $p->get_attribute( 'd' ), 'Accessing an existing attribute did not return true' );
 		$this->assertSame( 'test', $p->get_attribute( 'e' ), 'Accessing an existing e="test" did not return "test"' );
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers next_tag
+	 * @covers get_attribute
+	 */
+	public function test_attributes_parser_is_case_insensitive() {
+		$p = new WP_HTML_Tag_Processor( '<div DATA-enabled="true" data-VISIBLE>Test</div>' );
+		$p->next_tag();
+		$p->get_attribute( 'data-enabled' );
+		$this->assertEquals( 'true', $p->get_attribute( 'DATA-enabled' ), 'A case-insensitive get_attribute call did not return "true".' );
+		$this->assertEquals( 'true', $p->get_attribute( 'data-enabled' ), 'A case-insensitive get_attribute call did not return "true".' );
+		$this->assertEquals( 'true', $p->get_attribute( 'DATA-ENABLED' ), 'A case-insensitive get_attribute call did not return "true".' );
+		$this->assertEquals( true, $p->get_attribute( 'data-VISIBLE' ), 'A case-insensitive get_attribute call did not return true.' );
+		$this->assertEquals( true, $p->get_attribute( 'DATA-visible' ), 'A case-insensitive get_attribute call did not return true.' );
+		$this->assertEquals( true, $p->get_attribute( 'dAtA-ViSiBlE' ), 'A case-insensitive get_attribute call did not return true.' );
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers next_tag
+	 * @covers remove_attribute
+	 */
+	public function test_remove_attribute_is_case_insensitive() {
+		$p = new WP_HTML_Tag_Processor( '<div DATA-enabled="true">Test</div>' );
+		$p->next_tag();
+		$p->remove_attribute( 'data-enabled' );
+		$this->assertEquals( '<div >Test</div>', $p->get_updated_html(), 'A case-insensitive remove_attribute call did not remove the attribute.' );
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers next_tag
+	 * @covers set_attribute
+	 */
+	public function test_set_attribute_is_case_insensitive() {
+		$p = new WP_HTML_Tag_Processor( '<div DATA-enabled="true">Test</div>' );
+		$p->next_tag();
+		$p->set_attribute( 'data-enabled', 'abc' );
+		$this->assertEquals( '<div data-enabled="abc">Test</div>', $p->get_updated_html(), 'A case-insensitive set_attribute call did not update the existing attribute.' );
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers get_attribute_names_with_prefix
+	 */
+	public function test_get_attribute_names_with_prefix_returns_null_before_finding_tags() {
+		$p = new WP_HTML_Tag_Processor( '<div data-foo="bar">Test</div>' );
+		$this->assertNull( $p->get_attribute_names_with_prefix( 'data-' ) );
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers get_attribute_names_with_prefix
+	 */
+	public function test_get_attribute_names_with_prefix_returns_null_when_not_in_open_tag() {
+		$p = new WP_HTML_Tag_Processor( '<div data-foo="bar">Test</div>' );
+		$p->next_tag( 'p' );
+		$this->assertNull( $p->get_attribute_names_with_prefix( 'data-' ), 'Accessing attributes of a non-existing tag did not return null' );
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers get_attribute_names_with_prefix
+	 */
+	public function test_get_attribute_names_with_prefix_returns_null_when_in_closing_tag() {
+		$p = new WP_HTML_Tag_Processor( '<div data-foo="bar">Test</div>' );
+		$p->next_tag( 'div' );
+		$p->next_tag( array( 'tag_closers' => 'visit' ) );
+		$this->assertNull( $p->get_attribute_names_with_prefix( 'data-' ), 'Accessing attributes of a closing tag did not return null' );
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers get_attribute_names_with_prefix
+	 */
+	public function test_get_attribute_names_with_prefix_returns_empty_array_when_no_attributes_present() {
+		$p = new WP_HTML_Tag_Processor( '<div>Test</div>' );
+		$p->next_tag( 'div' );
+		$this->assertSame( array(), $p->get_attribute_names_with_prefix( 'data-' ), 'Accessing the attributes on a tag without any did not return an empty array' );
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers get_attribute_names_with_prefix
+	 */
+	public function test_get_attribute_names_with_prefix_returns_matching_attribute_names_in_lowercase() {
+		$p = new WP_HTML_Tag_Processor( '<div DATA-enabled class="test" data-test-ID="14">Test</div>' );
+		$p->next_tag();
+		$this->assertSame(
+			array( 'data-enabled', 'data-test-id' ),
+			$p->get_attribute_names_with_prefix( 'data-' )
+		);
+	}
+
+	/**
+	 * @ticket 56299
+	 *
+	 * @covers set_attribute
+	 * @covers get_updated_html
+	 * @covers get_attribute_names_with_prefix
+	 */
+	public function test_get_attribute_names_with_prefix_returns_attribute_added_by_set_attribute() {
+		$p = new WP_HTML_Tag_Processor( '<div data-foo="bar">Test</div>' );
+		$p->next_tag();
+		$p->set_attribute( 'data-test-id', '14' );
+		$this->assertSame(
+			'<div data-test-id="14" data-foo="bar">Test</div>',
+			$p->get_updated_html(),
+			"Updated HTML doesn't include attribute added via set_attribute"
+		);
+		$this->assertSame(
+			array( 'data-test-id', 'data-foo' ),
+			$p->get_attribute_names_with_prefix( 'data-' ),
+			"Accessing attribute names doesn't find attribute added via set_attribute"
+		);
 	}
 
 	/**

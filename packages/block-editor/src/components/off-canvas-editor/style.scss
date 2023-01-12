@@ -1,4 +1,4 @@
-.offcanvas-editor__appender .block-editor-inserter__toggle {
+.offcanvas-editor-appender .block-editor-inserter__toggle {
 	background-color: #1e1e1e;
 	color: #fff;
 	margin: $grid-unit-10 0 0 24px;
@@ -12,6 +12,10 @@
 		background: var(--wp-admin-theme-color);
 		color: #fff;
 	}
+}
+
+.offcanvas-editor-appender__description {
+	display: none;
 }
 
 .offcanvas-editor-list-view-tree-wrapper {

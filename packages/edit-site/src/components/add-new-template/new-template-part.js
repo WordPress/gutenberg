@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { kebabCase } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -20,6 +15,11 @@ import { plus } from '@wordpress/icons';
 import { useHistory } from '../routes';
 import { store as editSiteStore } from '../../store';
 import CreateTemplatePartModal from '../create-template-part-modal';
+import {
+	useExistingTemplateParts,
+	getUniqueTemplatePartTitle,
+	getCleanTemplatePartSlug,
+} from '../../utils/template-part-create';
 
 export default function NewTemplatePart( {
 	postType,
@@ -31,6 +31,7 @@ export default function NewTemplatePart( {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { __unstableSetCanvasMode } = useDispatch( editSiteStore );
+	const existingTemplateParts = useExistingTemplateParts();
 
 	async function createTemplatePart( { title, area } ) {
 		if ( ! title ) {
@@ -41,18 +42,18 @@ export default function NewTemplatePart( {
 		}
 
 		try {
-			// Currently template parts only allow latin chars.
-			// Fallback slug will receive suffix by default.
-			const cleanSlug =
-				kebabCase( title ).replace( /[^\w-]+/g, '' ) ||
-				'wp-custom-part';
+			const cleanSlug = getCleanTemplatePartSlug( title );
+			const uniqueTitle = getUniqueTemplatePartTitle(
+				title,
+				existingTemplateParts
+			);
 
 			const templatePart = await saveEntityRecord(
 				'postType',
 				'wp_template_part',
 				{
 					slug: cleanSlug,
-					title,
+					title: uniqueTitle,
 					content: '',
 					area,
 				},

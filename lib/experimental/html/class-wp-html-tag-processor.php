@@ -1059,9 +1059,19 @@ class WP_HTML_Tag_Processor {
 			return true;
 		}
 
+		/**
+		 * > There must never be two or more attributes on
+		 * > the same start tag whose names are an ASCII
+		 * > case-insensitive match for each other.
+		 *     - HTML 5 spec
+		 *
+		 * @see https://html.spec.whatwg.org/multipage/syntax.html#attributes-2:ascii-case-insensitive
+		 */
+		$comparable_name = strtolower( $attribute_name );
+
 		// If an attribute is listed many times, only use the first declaration and ignore the rest.
-		if ( ! array_key_exists( $attribute_name, $this->attributes ) ) {
-			$this->attributes[ $attribute_name ] = new WP_HTML_Attribute_Token(
+		if ( ! array_key_exists( $comparable_name, $this->attributes ) ) {
+			$this->attributes[ $comparable_name ] = new WP_HTML_Attribute_Token(
 				$attribute_name,
 				$value_start,
 				$value_length,
@@ -1071,7 +1081,7 @@ class WP_HTML_Tag_Processor {
 			);
 		}
 
-		return $this->attributes[ $attribute_name ];
+		return $this->attributes[ $comparable_name ];
 	}
 
 	/**
@@ -1403,6 +1413,49 @@ class WP_HTML_Tag_Processor {
 	}
 
 	/**
+	 * Returns the lowercase names of all attributes matching a given prefix in the currently-opened tag.
+	 *
+	 * Note that matching is case-insensitive. This is in accordance with the spec:
+	 *
+	 * > There must never be two or more attributes on
+	 * > the same start tag whose names are an ASCII
+	 * > case-insensitive match for each other.
+	 *     - HTML 5 spec
+	 *
+	 * @see https://html.spec.whatwg.org/multipage/syntax.html#attributes-2:ascii-case-insensitive
+	 *
+	 * Example:
+	 * <code>
+	 *     $p = new WP_HTML_Tag_Processor( '<div data-ENABLED class="test" DATA-test-id="14">Test</div>' );
+	 *     $p->next_tag( [ 'class_name' => 'test' ] ) === true;
+	 *     $p->get_attribute_names_with_prefix( 'data-' ) === array( 'data-enabled', 'data-test-id' );
+	 *
+	 *     $p->next_tag( [] ) === false;
+	 *     $p->get_attribute_names_with_prefix( 'data-' ) === null;
+	 * </code>
+	 *
+	 * @since 6.2.0
+	 *
+	 * @param string $prefix Prefix of requested attribute names.
+	 * @return array|null List of attribute names, or `null` if not at a tag.
+	 */
+	function get_attribute_names_with_prefix( $prefix ) {
+		if ( $this->is_closing_tag || null === $this->tag_name_starts_at ) {
+			return null;
+		}
+
+		$comparable = strtolower( $prefix );
+
+		$matches = array();
+		foreach ( array_keys( $this->attributes ) as $attr_name ) {
+			if ( str_starts_with( $attr_name, $comparable ) ) {
+				$matches[] = $attr_name;
+			}
+		}
+		return $matches;
+	}
+
+	/**
 	 * Returns the lowercase name of the currently-opened tag.
 	 *
 	 * Example:
@@ -1529,7 +1582,17 @@ class WP_HTML_Tag_Processor {
 			$updated_attribute = "{$name}=\"{$escaped_new_value}\"";
 		}
 
-		if ( isset( $this->attributes[ $name ] ) ) {
+		/**
+		 * > There must never be two or more attributes on
+		 * > the same start tag whose names are an ASCII
+		 * > case-insensitive match for each other.
+		 *     - HTML 5 spec
+		 *
+		 * @see https://html.spec.whatwg.org/multipage/syntax.html#attributes-2:ascii-case-insensitive
+		 */
+		$comparable_name = strtolower( $name );
+
+		if ( isset( $this->attributes[ $comparable_name ] ) ) {
 			/*
 			 * Update an existing attribute.
 			 *
@@ -1541,7 +1604,7 @@ class WP_HTML_Tag_Processor {
 			 *
 			 *    Result: <div id="new"/>
 			 */
-			$existing_attribute               = $this->attributes[ $name ];
+			$existing_attribute               = $this->attributes[ $comparable_name ];
 			$this->attribute_updates[ $name ] = new WP_HTML_Text_Replacement(
 				$existing_attribute->start,
 				$existing_attribute->end,
@@ -1559,7 +1622,7 @@ class WP_HTML_Tag_Processor {
 			 *
 			 *    Result: <div id="new"/>
 			 */
-			$this->attribute_updates[ $name ] = new WP_HTML_Text_Replacement(
+			$this->attribute_updates[ $comparable_name ] = new WP_HTML_Text_Replacement(
 				$this->tag_name_starts_at + $this->tag_name_length,
 				$this->tag_name_starts_at + $this->tag_name_length,
 				' ' . $updated_attribute
@@ -1575,6 +1638,15 @@ class WP_HTML_Tag_Processor {
 	 * @param string $name The attribute name to remove.
 	 */
 	public function remove_attribute( $name ) {
+		/**
+		 * > There must never be two or more attributes on
+		 * > the same start tag whose names are an ASCII
+		 * > case-insensitive match for each other.
+		 *     - HTML 5 spec
+		 *
+		 * @see https://html.spec.whatwg.org/multipage/syntax.html#attributes-2:ascii-case-insensitive
+		 */
+		$name = strtolower( $name );
 		if ( $this->is_closing_tag || ! isset( $this->attributes[ $name ] ) ) {
 			return false;
 		}

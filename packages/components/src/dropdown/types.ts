@@ -82,16 +82,6 @@ export type DropdownProps = {
 		'children'
 	>;
 	/**
-	 * The direction in which the popover should open
-	 * relative to its parent node.
-	 * Specify a y- and an x-axis as a space-separated string.
-	 * Supports "top", "bottom" y-axis,
-	 * and "left", "center", "right" x-axis.
-	 *
-	 * @default 'top center'
-	 */
-	position?: PopoverProps[ 'position' ];
-	/**
 	 * A callback invoked to render the content of the dropdown menu.
 	 * Its first argument is the same as the renderToggle prop.
 	 */
@@ -112,4 +102,13 @@ export type DropdownProps = {
 	 * The style of the global container.
 	 */
 	style?: CSSProperties;
+	/**
+	 * Legacy way to specify the popover's position with respect to its anchor.
+	 * For details about the possible values, see the `Popover` component's docs.
+	 * _Note: this prop is deprecated. Use the `popoverProps.placement` prop
+	 * instead._
+	 *
+	 * @deprecated
+	 */
+	position?: PopoverProps[ 'position' ];
 };
