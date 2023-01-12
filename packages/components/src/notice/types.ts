@@ -83,3 +83,14 @@ export type NoticeProps = {
 	 */
 	__unstableHTML?: boolean;
 };
+
+export type NoticeListProps = {
+	notices: Array<
+		Omit< NoticeProps, 'children' > & {
+			id: string;
+			content: string;
+		}
+	>;
+	onRemove?: ( id: string ) => void;
+	children?: ReactNode;
+};

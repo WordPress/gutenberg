@@ -17,7 +17,7 @@ function NoticeList( {
 	onRemove = noop,
 	className,
 	children,
-}: WordPressComponentProps< NoticeListProps, 'div' > ) {
+}: WordPressComponentProps< NoticeListProps, 'div', false > ) {
 	const removeNotice =
 		( id: NoticeListProps[ 'notices' ][ number ][ 'id' ] ) => () =>
 			onRemove( id );
