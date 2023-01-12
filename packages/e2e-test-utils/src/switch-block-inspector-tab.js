@@ -13,7 +13,7 @@ export async function switchBlockInspectorTab( label ) {
 		throw new Error( `Missing block inspector tab: ${ label }.` );
 	}
 
-	const id = await page.evaluate( ( tab ) => tab.id, tabButton );
+	const id = await ( await tabButton.getProperty( 'id' ) ).jsonValue();
 	await tabButton.click();
 	await page.waitForSelector(
 		`div[role="tabpanel"][aria-labelledby="${ id }"]`
