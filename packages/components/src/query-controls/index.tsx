@@ -122,7 +122,7 @@ export function QueryControls( {
 							selectedCategories &&
 							selectedCategories.map( ( item ) => ( {
 								id: item.id,
-								value: item.name || item.value || '',
+								value: item.name || item.value,
 							} ) )
 						}
 						suggestions={ Object.keys( categorySuggestions ) }
