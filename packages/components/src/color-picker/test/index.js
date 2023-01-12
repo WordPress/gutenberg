@@ -87,7 +87,6 @@ describe( 'ColorPicker', () => {
 				{ pageX: 10, pageY: 10 }
 			);
 
-			// `onChange` is debounced so we need to sleep for at least 1ms before checking that onChange was called
 			await waitFor( () =>
 				expect( onChangeComplete ).toHaveBeenCalled()
 			);
@@ -113,7 +112,6 @@ describe( 'ColorPicker', () => {
 			{ pageX: 10, pageY: 10 }
 		);
 
-		// `onChange` is debounced so we need to sleep for at least 1ms before checking that onChange was called
 		await waitFor( () => expect( onChange ).toHaveBeenCalled() );
 
 		expect( onChange ).toHaveBeenCalledWith(
@@ -146,7 +144,6 @@ describe( 'ColorPicker', () => {
 			{ pageX: 10, pageY: 10 }
 		);
 
-		// `onChange` is debounced so we need to sleep for at least 1ms before checking that onChange was called
 		await waitFor( () => expect( onChange ).toHaveBeenCalled() );
 
 		expect( onChange ).toHaveBeenCalledWith(
