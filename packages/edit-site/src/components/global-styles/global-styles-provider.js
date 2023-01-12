@@ -13,8 +13,8 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { GlobalStylesContext } from './context';
 import CanvasSpinner from '../canvas-spinner';
+import { GlobalStylesContext } from '@wordpress/block-editor';
 
 function mergeTreesCustomizer( _, srcValue ) {
 	// We only pass as arrays the presets,

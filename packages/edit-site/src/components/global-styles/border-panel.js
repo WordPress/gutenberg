@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalBorderRadiusControl as BorderRadiusControl } from '@wordpress/block-editor';
+import {
+	__experimentalBorderRadiusControl as BorderRadiusControl,
+	useGlobalStylesSetting as useSetting,
+	useStyle,
+} from '@wordpress/block-editor';
 import {
 	__experimentalBorderBoxControl as BorderBoxControl,
 	__experimentalHasSplitBorders as hasSplitBorders,
@@ -15,12 +19,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import {
-	getSupportedGlobalStylesPanels,
-	useColorsPerOrigin,
-	useSetting,
-	useStyle,
-} from './hooks';
+import { getSupportedGlobalStylesPanels, useColorsPerOrigin } from './hooks';
 
 export function useHasBorderPanel( name ) {
 	const controls = [

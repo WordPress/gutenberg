@@ -20,13 +20,15 @@ import {
 	__experimentalUseCustomSides as useCustomSides,
 	__experimentalHeightControl as HeightControl,
 	__experimentalSpacingSizesControl as SpacingSizesControl,
+	useGlobalStylesSetting as useSetting,
+	useStyle,
 } from '@wordpress/block-editor';
 import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { getSupportedGlobalStylesPanels, useSetting, useStyle } from './hooks';
+import { getSupportedGlobalStylesPanels } from './hooks';
 
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
 

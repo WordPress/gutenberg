@@ -13,12 +13,13 @@ import { styles, moreVertical, seen } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useState, useEffect } from '@wordpress/element';
+import { useGlobalStylesReset } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import DefaultSidebar from './default-sidebar';
-import { GlobalStylesUI, useGlobalStylesReset } from '../global-styles';
+import { GlobalStylesUI } from '../global-styles';
 import { store as editSiteStore } from '../../store';
 
 export default function GlobalStylesSidebar() {

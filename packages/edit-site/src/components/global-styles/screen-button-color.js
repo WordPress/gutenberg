@@ -2,18 +2,17 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { __experimentalColorGradientControl as ColorGradientControl } from '@wordpress/block-editor';
+import {
+	__experimentalColorGradientControl as ColorGradientControl,
+	useGlobalStylesSetting as useSetting,
+	useStyle,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import ScreenHeader from './header';
-import {
-	getSupportedGlobalStylesPanels,
-	useSetting,
-	useStyle,
-	useColorsPerOrigin,
-} from './hooks';
+import { getSupportedGlobalStylesPanels, useColorsPerOrigin } from './hooks';
 
 function ScreenButtonColor( { name, variationPath = '' } ) {
 	const supports = getSupportedGlobalStylesPanels( name );

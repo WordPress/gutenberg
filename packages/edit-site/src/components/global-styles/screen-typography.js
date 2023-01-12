@@ -8,13 +8,13 @@ import {
 	__experimentalHStack as HStack,
 	FlexItem,
 } from '@wordpress/components';
+import { useStyle } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import ScreenHeader from './header';
 import { NavigationButtonAsItem } from './navigation-button';
-import { useStyle } from './hooks';
 import Subtitle from './subtitle';
 import TypographyPanel from './typography-panel';
 import BlockPreviewPanel from './block-preview-panel';

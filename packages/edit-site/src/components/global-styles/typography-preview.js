@@ -1,7 +1,7 @@
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import { useStyle } from './hooks';
+import { useStyle } from '@wordpress/block-editor';
 
 export default function TypographyPreview( { name, element, headingLevel } ) {
 	let prefix = '';

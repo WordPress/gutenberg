@@ -4,6 +4,9 @@
 import {
 	__unstableIframe as Iframe,
 	__unstableEditorStyles as EditorStyles,
+	useGlobalStylesSetting as useSetting,
+	useStyle,
+	useGlobalStylesOutput,
 } from '@wordpress/block-editor';
 import {
 	__unstableMotion as motion,
@@ -12,12 +15,6 @@ import {
 } from '@wordpress/components';
 import { useReducedMotion, useResizeObserver } from '@wordpress/compose';
 import { useState, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { useSetting, useStyle } from './hooks';
-import { useGlobalStylesOutput } from './use-global-styles-output';
 
 const firstFrame = {
 	start: {

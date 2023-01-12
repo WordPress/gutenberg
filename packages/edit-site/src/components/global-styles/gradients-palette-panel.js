@@ -8,11 +8,11 @@ import {
 	DuotonePicker,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useGlobalStylesSetting as useSetting } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { useSetting } from './hooks';
 import Subtitle from './subtitle';
 
 const noop = () => {};

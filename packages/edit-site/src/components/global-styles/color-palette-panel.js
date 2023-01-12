@@ -6,11 +6,7 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import { useSetting } from './hooks';
+import { useGlobalStylesSetting as useSetting } from '@wordpress/block-editor';
 
 export default function ColorPalettePanel( { name } ) {
 	const [ themeColors, setThemeColors ] = useSetting(

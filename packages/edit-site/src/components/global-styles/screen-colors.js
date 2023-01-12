@@ -10,6 +10,7 @@ import {
 	FlexItem,
 	ColorIndicator,
 } from '@wordpress/components';
+import { useStyle } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -17,7 +18,7 @@ import {
 import ScreenHeader from './header';
 import Palette from './palette';
 import { NavigationButtonAsItem } from './navigation-button';
-import { getSupportedGlobalStylesPanels, useStyle } from './hooks';
+import { getSupportedGlobalStylesPanels } from './hooks';
 import Subtitle from './subtitle';
 import ColorIndicatorWrapper from './color-indicator-wrapper';
 import BlockPreviewPanel from './block-preview-panel';

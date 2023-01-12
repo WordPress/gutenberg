@@ -19,15 +19,10 @@ import {
 	getBlockFromExample,
 	createBlock,
 } from '@wordpress/blocks';
-import { BlockPreview } from '@wordpress/block-editor';
+import { BlockPreview, useStyle } from '@wordpress/block-editor';
 import { closeSmall } from '@wordpress/icons';
 import { useResizeObserver } from '@wordpress/compose';
 import { useMemo, memo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { useStyle } from '../global-styles';
 
 const SLOT_FILL_NAME = 'EditSiteStyleBook';
 const { Slot: StyleBookSlot, Fill: StyleBookFill } =

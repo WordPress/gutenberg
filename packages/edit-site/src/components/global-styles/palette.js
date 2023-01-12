@@ -13,13 +13,14 @@ import {
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { shuffle } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
+import { useGlobalStylesSetting as useSetting } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import Subtitle from './subtitle';
 import { NavigationButtonAsItem } from './navigation-button';
-import { useColorRandomizer, useSetting } from './hooks';
+import { useColorRandomizer } from './hooks';
 import ColorIndicatorWrapper from './color-indicator-wrapper';
 
 const EMPTY_COLORS = [];

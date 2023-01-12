@@ -6,7 +6,11 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
-import { __experimentalColorGradientControl as ColorGradientControl } from '@wordpress/block-editor';
+import {
+	__experimentalColorGradientControl as ColorGradientControl,
+	useGlobalStylesSetting as useSetting,
+	useStyle,
+} from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 
 /**
@@ -15,8 +19,6 @@ import { useState } from '@wordpress/element';
 import ScreenHeader from './header';
 import {
 	getSupportedGlobalStylesPanels,
-	useSetting,
-	useStyle,
 	useColorsPerOrigin,
 	useGradientsPerOrigin,
 } from './hooks';
