@@ -9,12 +9,7 @@ import userEvent from '@testing-library/user-event';
  */
 import TabPanel from '..';
 
-jest.useFakeTimers();
-
-const setupUser = () =>
-	userEvent.setup( {
-		advanceTimers: jest.advanceTimersByTime,
-	} );
+const setupUser = () => userEvent.setup();
 
 const TABS = [
 	{
