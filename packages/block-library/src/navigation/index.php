@@ -775,6 +775,16 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$toggle_aria_label_open      = $should_display_icon_label ? 'aria-label="' . __( 'Open menu' ) . '"' : ''; // Open button label.
 	$toggle_aria_label_close     = $should_display_icon_label ? 'aria-label="' . __( 'Close menu' ) . '"' : ''; // Close button label.
 
+	/**
+	 * To do:
+	 * The overlay always shows if $attributes['overlayMenu'] === 'mobile'.
+	 * Some CSS is not loading, probably because do_blocks is used after wp_head?
+	 */
+	$overlay = isset( $attributes['overlayTemplatePart'] ) ? get_block_template( $attributes['overlayTemplatePart'] , 'wp_template_part' ) : '';
+	if ( ! empty( $overlay ) ) {
+		$inner_blocks_html = do_blocks( $overlay->content );
+	}
+
 	$responsive_container_markup = sprintf(
 		'<button aria-haspopup="true" %3$s class="%6$s" data-micromodal-trigger="%1$s">%9$s</button>
 			<div class="%5$s" style="%7$s" id="%1$s">

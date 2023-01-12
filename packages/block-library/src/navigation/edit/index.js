@@ -67,6 +67,7 @@ import { useInnerBlocks } from './use-inner-blocks';
 import { detectColors } from './utils';
 import ManageMenusButton from './manage-menus-button';
 import MenuInspectorControls from './menu-inspector-controls';
+import OverlayTemplatePartSelector from './overlay-template-part-selector';
 
 function Navigation( {
 	attributes,
@@ -104,6 +105,7 @@ function Navigation( {
 		} = {},
 		hasIcon,
 		icon = 'handle',
+		overlayTemplatePart,
 	} = attributes;
 
 	const ref = attributes.ref;
@@ -201,8 +203,7 @@ function Navigation( {
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
 
-	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] =
-		useState( false );
+	const [ isResponsiveMenuOpen ] = useState( false );
 
 	const [ overlayMenuPreview, setOverlayMenuPreview ] = useState( false );
 
@@ -553,94 +554,93 @@ function Navigation( {
 	const stylingInspectorControls = (
 		<>
 			<InspectorControls>
-				{ hasSubmenuIndicatorSetting && (
-					<PanelBody title={ __( 'Display' ) }>
-						{ isResponsive && (
-							<>
-								<Button
-									className={ overlayMenuPreviewClasses }
-									onClick={ () => {
-										setOverlayMenuPreview(
-											! overlayMenuPreview
-										);
-									} }
-								>
-									{ hasIcon && (
-										<>
-											<OverlayMenuIcon icon={ icon } />
-											<Icon icon={ close } />
-										</>
-									) }
-									{ ! hasIcon && (
-										<>
-											<span>{ __( 'Menu' ) }</span>
-											<span>{ __( 'Close' ) }</span>
-										</>
-									) }
-								</Button>
-								{ overlayMenuPreview && (
-									<OverlayMenuPreview
-										setAttributes={ setAttributes }
-										hasIcon={ hasIcon }
-										icon={ icon }
-									/>
+				<PanelBody title={ __( 'Overlay' ) }>
+					<ToggleGroupControl
+						label={ __( 'Configure overlay menu' ) }
+						value={ overlayMenu }
+						help={ __(
+							'Collapses the navigation options in a menu icon opening an overlay.'
+						) }
+						onChange={ ( value ) =>
+							setAttributes( { overlayMenu: value } )
+						}
+						isBlock
+						hideLabelFromVision
+					>
+						<ToggleGroupControlOption
+							value="never"
+							label={ __( 'Off' ) }
+						/>
+						<ToggleGroupControlOption
+							value="mobile"
+							label={ __( 'Mobile' ) }
+						/>
+						<ToggleGroupControlOption
+							value="always"
+							label={ __( 'Always' ) }
+						/>
+					</ToggleGroupControl>
+					{ isResponsive && (
+						<>
+							<Button
+								className={ overlayMenuPreviewClasses }
+								onClick={ () => {
+									setOverlayMenuPreview(
+										! overlayMenuPreview
+									);
+								} }
+							>
+								{ hasIcon && (
+									<>
+										<OverlayMenuIcon icon={ icon } />
+										<Icon icon={ close } />
+									</>
 								) }
-							</>
-						) }
-						<h3>{ __( 'Overlay Menu' ) }</h3>
-						<ToggleGroupControl
-							label={ __( 'Configure overlay menu' ) }
-							value={ overlayMenu }
-							help={ __(
-								'Collapses the navigation options in a menu icon opening an overlay.'
+								{ ! hasIcon && (
+									<>
+										<span>{ __( 'Menu' ) }</span>
+										<span>{ __( 'Close' ) }</span>
+									</>
+								) }
+							</Button>
+							{ overlayMenuPreview && (
+								<OverlayMenuPreview
+									setAttributes={ setAttributes }
+									hasIcon={ hasIcon }
+									icon={ icon }
+								/>
 							) }
-							onChange={ ( value ) =>
-								setAttributes( { overlayMenu: value } )
-							}
-							isBlock
-							hideLabelFromVision
-						>
-							<ToggleGroupControlOption
-								value="never"
-								label={ __( 'Off' ) }
-							/>
-							<ToggleGroupControlOption
-								value="mobile"
-								label={ __( 'Mobile' ) }
-							/>
-							<ToggleGroupControlOption
-								value="always"
-								label={ __( 'Always' ) }
-							/>
-						</ToggleGroupControl>
-						{ hasSubmenus && (
-							<>
-								<h3>{ __( 'Submenus' ) }</h3>
-								<ToggleControl
-									checked={ openSubmenusOnClick }
-									onChange={ ( value ) => {
-										setAttributes( {
-											openSubmenusOnClick: value,
-											...( value && {
-												showSubmenuIcon: true,
-											} ), // Make sure arrows are shown when we toggle this on.
-										} );
-									} }
-									label={ __( 'Open on click' ) }
-								/>
-
-								<ToggleControl
-									checked={ showSubmenuIcon }
-									onChange={ ( value ) => {
-										setAttributes( {
-											showSubmenuIcon: value,
-										} );
-									} }
-									disabled={ attributes.openSubmenusOnClick }
-									label={ __( 'Show arrow' ) }
-								/>
-							</>
-						) }
+						</>
+					) }
+					<OverlayTemplatePartSelector
+						attributes={ attributes }
+						setAttributes={ setAttributes }
+					/>
+				</PanelBody>
+				{ hasSubmenuIndicatorSetting && hasSubmenus && (
+					<PanelBody title={ __( 'Submenus' ) }>
+						<ToggleControl
+							checked={ openSubmenusOnClick }
+							onChange={ ( value ) => {
+								setAttributes( {
+									openSubmenusOnClick: value,
+									...( value && {
+										showSubmenuIcon: true,
+									} ), // Make sure arrows are shown when we toggle this on.
+								} );
+							} }
+							label={ __( 'Open on click' ) }
+						/>
+						<ToggleControl
+							checked={ showSubmenuIcon }
+							onChange={ ( value ) => {
+								setAttributes( {
+									showSubmenuIcon: value,
+								} );
+							} }
+							disabled={ attributes.openSubmenusOnClick }
+							label={ __( 'Show arrow' ) }
+						/>
 					</PanelBody>
 				) }
 			</InspectorControls>
@@ -664,13 +664,13 @@ function Navigation( {
 								},
 								{
 									colorValue: overlayTextColor.color,
-									label: __( 'Submenu & overlay text' ),
+									label: __( 'Submenu text' ),
 									onColorChange: setOverlayTextColor,
 									resetAllFilter: () => setOverlayTextColor(),
 								},
 								{
 									colorValue: overlayBackgroundColor.color,
-									label: __( 'Submenu & overlay background' ),
+									label: __( 'Submenu background' ),
 									onColorChange: setOverlayBackgroundColor,
 									resetAllFilter: () =>
 										setOverlayBackgroundColor(),
@@ -732,14 +732,12 @@ function Navigation( {
 				{ stylingInspectorControls }
 				<ResponsiveWrapper
 					id={ clientId }
-					onToggle={ setResponsiveMenuVisibility }
 					isOpen={ isResponsiveMenuOpen }
 					hasIcon={ hasIcon }
 					icon={ icon }
 					isResponsive={ 'never' !== overlayMenu }
 					isHiddenByDefault={ 'always' === overlayMenu }
-					overlayBackgroundColor={ overlayBackgroundColor }
-					overlayTextColor={ overlayTextColor }
+					overlayTemplatePart={ overlayTemplatePart }
 				>
 					<UnsavedInnerBlocks
 						createNavigationMenu={ createNavigationMenu }
@@ -889,15 +887,13 @@ function Navigation( {
 					<TagName { ...blockProps }>
 						<ResponsiveWrapper
 							id={ clientId }
-							onToggle={ setResponsiveMenuVisibility }
 							label={ __( 'Menu' ) }
 							hasIcon={ hasIcon }
 							icon={ icon }
 							isOpen={ isResponsiveMenuOpen }
 							isResponsive={ isResponsive }
 							isHiddenByDefault={ 'always' === overlayMenu }
-							overlayBackgroundColor={ overlayBackgroundColor }
-							overlayTextColor={ overlayTextColor }
+							overlayTemplatePart={ overlayTemplatePart }
 						>
 							{ isEntityAvailable && (
 								<NavigationInnerBlocks
