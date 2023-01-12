@@ -10,14 +10,9 @@ import { speak } from '@wordpress/a11y';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Dropdown, Button } from '@wordpress/components';
 import { Component } from '@wordpress/element';
-import { useSelect, withDispatch, withSelect } from '@wordpress/data';
+import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
-import {
-	createBlock,
-	store as blocksStore,
-	__experimentalGetBlockLabel as getBlockLabel,
-	getBlockType,
-} from '@wordpress/blocks';
+import { createBlock, store as blocksStore } from '@wordpress/blocks';
 import { plus } from '@wordpress/icons';
 
 /**
@@ -27,15 +22,6 @@ import InserterMenu from './menu';
 import QuickInserter from './quick-inserter';
 import { store as blockEditorStore } from '../../store';
 
-// Duplicated from elsewhere.
-function getBlockDisplayText( block ) {
-	if ( block ) {
-		const blockType = getBlockType( block.name );
-		return blockType ? getBlockLabel( blockType, block.attributes ) : null;
-	}
-	return null;
-}
-
 const defaultRenderToggle = ( {
 	onToggle,
 	disabled,
@@ -44,34 +30,18 @@ const defaultRenderToggle = ( {
 	hasSingleBlockType,
 	toggleProps = {},
 	prioritizePatterns,
-	label,
-	rootClientId,
 } ) => {
-	const {
-		getBlock,
-	} = useSelect( blockEditorStore );
-	const rootBlock = getBlock( rootClientId );
-	const rootBlockTitle = getBlockDisplayText( rootBlock );
-
-	let buttonLabel;
-	if ( rootBlockTitle ) {
-		/* translators: %s is a block name, e.g. Navigation */
-		buttonLabel = sprintf( __('Add block to %s' ), rootBlockTitle );
-	} else if ( label ) {
-		buttonLabel = label;
-	} else if ( hasSingleBlockType ) {
-		buttonLabel = sprintf(
+	let label;
+	if ( hasSingleBlockType ) {
+		label = sprintf(
 			// translators: %s: the name of the block when there is only one
 			_x( 'Add %s', 'directly add the only allowed block' ),
 			blockTitle
 		);
 	} else if ( prioritizePatterns ) {
-		buttonLabel = __( 'Add pattern' );
+		label = __( 'Add pattern' );
 	} else {
-		buttonLabel = _x(
-			'Add block',
-			'Generic label for block inserter button'
-		);
+		label = _x( 'Add block', 'Generic label for block inserter button' );
 	}
 
 	const { onClick, ...rest } = toggleProps;
@@ -89,7 +59,7 @@ const defaultRenderToggle = ( {
 	return (
 		<Button
 			icon={ plus }
-			label={ buttonLabel }
+			label={ label }
 			tooltipPosition="bottom"
 			onClick={ handleClick }
 			className="block-editor-inserter__toggle"
@@ -139,9 +109,6 @@ class Inserter extends Component {
 			hasItems,
 			renderToggle = defaultRenderToggle,
 			prioritizePatterns,
-			toggleLabel,
-			clientId,
-			rootClientId,
 		} = this.props;
 
 		return renderToggle( {
@@ -153,9 +120,6 @@ class Inserter extends Component {
 			directInsertBlock,
 			toggleProps,
 			prioritizePatterns,
-			label: toggleLabel,
-			clientId,
-			rootClientId,
 		} );
 	}
 
