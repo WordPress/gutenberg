@@ -73,7 +73,8 @@ function OverlayTemplatePartSelector( {
 
 	// Create a list of template parts for the dropdown.
 	const templatePartChoices = useMemo( () => {
-		if ( ! filteredTemplateParts ) {
+		if ( filteredTemplateParts?.length === 0 ) {
+			setEnableOptions( true );
 			return;
 		}
 		return (
@@ -88,7 +89,7 @@ function OverlayTemplatePartSelector( {
 					.replace( 'n', 'N' )
 					.replaceAll( 'o', 'O' )
 					.replace( 'O', 'o' );
-				if ( id === overlayTemplatePart && ! isCreatingTemplatePart ) {
+				if ( ! isCreatingTemplatePart ) {
 					setEnableOptions( true );
 				}
 				return {
