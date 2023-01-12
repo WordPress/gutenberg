@@ -138,8 +138,7 @@ export default {
 			: 'wrap';
 		const verticalAlignment =
 			verticalAlignmentMap[ layout.verticalAlignment ];
-		const alignItems =
-			alignItemsMap[ layout.justifyContent ] || alignItemsMap.left;
+		const alignItems = alignItemsMap[ layout.justifyContent ];
 
 		let output = '';
 		const rules = [];
@@ -160,7 +159,9 @@ export default {
 				rules.push( `justify-content: ${ verticalAlignment }` );
 			}
 			rules.push( 'flex-direction: column' );
-			rules.push( `align-items: ${ alignItems }` );
+			if ( alignItems ) {
+				rules.push( `align-items: ${ alignItems }` );
+			}
 		}
 
 		if ( rules.length ) {

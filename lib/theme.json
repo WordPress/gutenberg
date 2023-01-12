@@ -346,8 +346,7 @@
 						{
 							"selector": "",
 							"rules": {
-								"flex-wrap": "wrap",
-								"align-items": "center"
+								"flex-wrap": "wrap"
 							}
 						},
 						{
