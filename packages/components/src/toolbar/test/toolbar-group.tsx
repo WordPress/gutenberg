@@ -23,7 +23,7 @@ describe( 'ToolbarGroup', () => {
 		} );
 
 		it( 'should render a list of controls with buttons', () => {
-			const clickHandler = ( event ) => event;
+			const clickHandler = ( event: Event ) => event;
 			const controls = [
 				{
 					icon: 'wordpress',
@@ -41,7 +41,7 @@ describe( 'ToolbarGroup', () => {
 		} );
 
 		it( 'should render a list of controls with buttons and active control', () => {
-			const clickHandler = ( event ) => event;
+			const clickHandler = ( event: Event ) => event;
 			const controls = [
 				{
 					icon: 'wordpress',
