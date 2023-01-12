@@ -147,7 +147,7 @@ describe( 'TabPanel', () => {
 		);
 	} );
 
-	it( 'should select `initialTabname` if defined', () => {
+	it( 'should select `initialTabName` if defined', () => {
 		const mockOnSelect = jest.fn();
 
 		render(
@@ -160,6 +160,39 @@ describe( 'TabPanel', () => {
 		);
 		expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
 		expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
+	} );
+
+	it( 'waits for the tab with the `initialTabName` to become present in the `tabs` array before selecting it', () => {
+		const mockOnSelect = jest.fn();
+
+		const { rerender } = render(
+			<TabPanel
+				tabs={ TABS }
+				initialTabName="delta"
+				children={ () => undefined }
+				onSelect={ mockOnSelect }
+			/>
+		);
+
+		// There should be no selected tab.
+		expect(
+			screen.queryByRole( 'tab', { selected: true } )
+		).not.toBeInTheDocument();
+
+		rerender(
+			<TabPanel
+				tabs={ [
+					{ name: 'delta', title: 'Delta', className: 'delta-class' },
+					...TABS,
+				] }
+				initialTabName="delta"
+				children={ () => undefined }
+				onSelect={ mockOnSelect }
+			/>
+		);
+
+		expect( getSelectedTab() ).toHaveTextContent( 'Delta' );
+		expect( mockOnSelect ).toHaveBeenLastCalledWith( 'delta' );
 	} );
 
 	it( 'should disable the tab when `disabled` is true', async () => {
