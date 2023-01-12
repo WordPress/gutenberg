@@ -1,11 +1,6 @@
 // Import styles for rendering the static content of deprecated gallery versions.
 @import "./deprecated.scss";
 
-// The following is a temporary override until flex layout supports
-// an align items setting of normal.
-figure.wp-block-gallery.has-nested-images {
-	align-items: normal;
-}
 // Styles for current version of gallery block.
 .wp-block-gallery.has-nested-images {
 	// Need bogus :not(#individual-image) to override long :not()
