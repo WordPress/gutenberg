@@ -12,15 +12,11 @@ import { expect } from '../test';
  * @param {string} label
  */
 export async function switchBlockInspectorTab( this: Editor, label: string ) {
-	const inspectorTabButton = this.page.locator(
-		`role=region[name="Editor settings"i] >> role=tab[name="${ label }"i]`
+	const editorSettings = this.page.locator(
+		'role=region[name="Editor settings"i]'
 	);
-	const id = await inspectorTabButton.getAttribute( 'id' );
-
-	await inspectorTabButton.click();
+	await editorSettings.locator( `role=tab[name="${ label }"i]` ).click();
 	await expect(
-		this.page.locator(
-			`role=region[name="Editor settings"i] >> div[role="tabpanel"][aria-labelledby="${ id }"]`
-		)
+		editorSettings.locator( `role=tabpanel[name="${ label }"i]` )
 	).toBeVisible();
 }
