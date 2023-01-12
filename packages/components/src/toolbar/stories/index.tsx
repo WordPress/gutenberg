@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -13,14 +18,20 @@ import {
 	more,
 	paragraph,
 } from '@wordpress/icons';
+import { SVG, Path } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
  */
 import { Toolbar, ToolbarButton, ToolbarGroup, ToolbarItem } from '..';
-import { SVG, Path, DropdownMenu } from '../../..';
+import DropdownMenu from '../../dropdown-menu';
 
-export default { title: 'Components/Toolbar', component: Toolbar };
+const meta: ComponentMeta< typeof Toolbar > = {
+	title: 'Components/Toolbar',
+	component: Toolbar,
+};
+
+export default meta;
 
 function InlineImageIcon() {
 	return (
@@ -31,7 +42,7 @@ function InlineImageIcon() {
 }
 
 /* eslint-disable no-restricted-syntax */
-export const _default = () => {
+export const Default: ComponentStory< typeof Toolbar > = () => {
 	return (
 		// id is required for server side rendering
 		<Toolbar label="Options" id="options-toolbar">
@@ -40,7 +51,7 @@ export const _default = () => {
 			</ToolbarGroup>
 			<ToolbarGroup>
 				<ToolbarItem>
-					{ ( toggleProps ) => (
+					{ ( toggleProps: unknown ) => (
 						<DropdownMenu
 							hasArrowIndicator
 							icon={ alignLeft }
@@ -72,6 +83,7 @@ export const _default = () => {
 				<ToolbarButton icon={ link } label="Link" />
 				<ToolbarGroup
 					isCollapsed
+					// @ts-ignore TODO: Remove when ToolbarGroup is typed
 					icon={ false }
 					label="More rich text controls"
 					controls={ [
@@ -85,6 +97,7 @@ export const _default = () => {
 				/>
 			</ToolbarGroup>
 			<ToolbarGroup
+				// @ts-ignore TODO: Remove when ToolbarGroup is typed
 				icon={ more }
 				label="Align"
 				isCollapsed
@@ -102,24 +115,35 @@ export const _default = () => {
 	);
 };
 
-export const withoutGroup = () => {
+const WithoutGroupTemplate: ComponentStory< typeof Toolbar > = ( {
+	children,
+	...args
+} ) => {
 	return (
 		// id is required for server side rendering
-		<Toolbar label="Options" id="options-toolbar-without-group">
+		<Toolbar { ...args }>
 			<ToolbarButton icon={ formatBold } label="Bold" isPressed />
 			<ToolbarButton icon={ formatItalic } label="Italic" />
 			<ToolbarButton icon={ link } label="Link" />
 		</Toolbar>
 	);
 };
-/* eslint-enable no-restricted-syntax */
 
-export const toolbars = () => {
+export const WithoutGroup: ComponentStory< typeof Toolbar > =
+	WithoutGroupTemplate.bind( {} );
+
+/* eslint-enable no-restricted-syntax */
+WithoutGroupTemplate.args = {
+	label: 'Options',
+	id: 'options-toolbar-without-group',
+};
+
+const ToolbarsTemplate: ComponentStory< typeof Toolbar > = ( { ...args } ) => {
 	return (
 		<div>
 			<div style={ { padding: '20px' } }>
 				<h2>Icon-only Toolbar</h2>
-				<Toolbar>
+				<Toolbar { ...args }>
 					<ToolbarButton icon={ formatBold } title="Bold" />
 					<ToolbarButton
 						icon={ formatItalic }
@@ -132,7 +156,7 @@ export const toolbars = () => {
 
 			<div style={ { padding: '20px' } }>
 				<h2>Text-only Toolbar</h2>
-				<Toolbar>
+				<Toolbar { ...args }>
 					<ToolbarButton>Bold Format</ToolbarButton>
 					<ToolbarButton isActive>Italic Format</ToolbarButton>
 					<ToolbarButton>Link Format</ToolbarButton>
@@ -141,7 +165,7 @@ export const toolbars = () => {
 
 			<div style={ { padding: '20px' } }>
 				<h2>Text and Icon Toolbar</h2>
-				<Toolbar>
+				<Toolbar { ...args }>
 					<ToolbarButton icon={ formatBold } title="Bold" />
 					<ToolbarButton isActive>Bold Format</ToolbarButton>
 					<ToolbarButton icon={ formatItalic } title="Italic" />
@@ -153,17 +177,21 @@ export const toolbars = () => {
 
 			<div style={ { padding: '20px' } }>
 				<h2>Single Icon Button Toolbar</h2>
-				<Toolbar>
+				<Toolbar { ...args }>
 					<ToolbarButton icon={ formatBold } title="Bold" />
 				</Toolbar>
 			</div>
 
 			<div style={ { padding: '20px' } }>
 				<h2>Single Text Button toolbar</h2>
-				<Toolbar>
+				<Toolbar { ...args }>
 					<ToolbarButton>Bold Toolbar</ToolbarButton>
 				</Toolbar>
 			</div>
 		</div>
 	);
 };
+
+export const Toolbars: ComponentStory< typeof Toolbar > = ToolbarsTemplate.bind(
+	{}
+);
