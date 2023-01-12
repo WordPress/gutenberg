@@ -503,13 +503,13 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
- 
+
 	/**
 	 * Test that get_style_variations returns all variations, including parent theme variations if the theme is a child.
 	 *
 	 * @covers WP_Theme_JSON_Resolver::get_style_variations
 	 **/
- 	public function test_get_style_variations_returns_all_variations() {
+	public function test_get_style_variations_returns_all_variations() {
 		// Switch to a child theme.
 		switch_theme( 'block-theme-child' );
 		wp_set_current_user( self::$administrator_id );
