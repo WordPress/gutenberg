@@ -25,7 +25,7 @@ export default function useBlockContext( clientId ) {
 	return useSelect(
 		( select ) => {
 			const block = select( blockEditorStore ).getBlock( clientId );
-			const blockType = getBlockType( block.name );
+			const blockType = getBlockType( block?.name );
 
 			if (
 				Object.keys( blockType?.providesContext ?? {} ).length === 0
