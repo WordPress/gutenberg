@@ -18,7 +18,7 @@ export default function AuthorSelect( {
 		<TreeSelect
 			{ ...{ label, noOptionLabel, onChange } }
 			tree={ termsTree }
-			selectedId={ selectedAuthorId }
+			selectedId={ String( selectedAuthorId ) }
 		/>
 	);
 }

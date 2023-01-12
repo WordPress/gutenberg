@@ -49,7 +49,7 @@ export interface SelectControlProps
 		 * The internal value used to choose the selected value.
 		 * This is also the value passed to `onChange` when the option is selected.
 		 */
-		value: string | number;
+		value: string;
 		id?: string;
 		/**
 		 * Whether or not the option should have the disabled attribute.
@@ -58,7 +58,7 @@ export interface SelectControlProps
 		 */
 		disabled?: boolean;
 	}[];
-	value?: string | string[] | number;
+	value?: string | string[];
 	/**
 	 * As an alternative to the `options` prop, `optgroup`s and `options` can be
 	 * passed in as `children` for more customizability.

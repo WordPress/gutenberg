@@ -26,7 +26,7 @@ export default function CategorySelect( {
 		<TreeSelect
 			{ ...{ label, noOptionLabel, onChange } }
 			tree={ termsTree }
-			selectedId={ selectedCategoryId }
+			selectedId={ String( selectedCategoryId ) }
 			{ ...props }
 		/>
 	);

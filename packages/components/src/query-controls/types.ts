@@ -16,13 +16,19 @@ export type Entity = {
 	value?: string;
 };
 
+export type EntityForTree = Omit< Entity, 'id' > & {
+	id: string;
+};
+
+export type TermsWithChildren = Array<
+	EntityForTree & { children: EntityForTree[] }
+>;
+
 export type Category = {
 	id: number;
 	value: string;
 	name?: string;
 };
-
-export type TermsWithChildren = Array< Entity & { children: Entity[] } >;
 
 export type CategorySelectProps = {
 	categoriesList: QueryControlsProps[ 'categoriesList' ];
