@@ -20,7 +20,20 @@ import {
 import { Toolbar, ToolbarButton, ToolbarGroup, ToolbarItem } from '..';
 import { SVG, Path, DropdownMenu } from '../../..';
 
-export default { title: 'Components/Toolbar', component: Toolbar };
+export default {
+	title: 'Components/Toolbar',
+	component: Toolbar,
+	subcomponents: {
+		ToolbarButton,
+		ToolbarGroup,
+		ToolbarItem,
+		ToolbarDropdownMenu,
+	},
+	parameters: {
+		controls: { expanded: true },
+		docs: { source: { state: 'open' } },
+	},
+};
 
 function InlineImageIcon() {
 	return (
