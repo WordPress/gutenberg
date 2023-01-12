@@ -70,7 +70,7 @@ function NavigationMenuSelector( {
 				const label =
 					decodeEntities( title.rendered ) ||
 					/* translators: %s is the index of the menu in the list of menus. */
-					sprintf( __( 'Untitled menu %s' ), index + 1 );
+					sprintf( __( '(no title %s)' ), index + 1 );
 
 				if ( id === currentMenuId && ! isCreatingMenu ) {
 					setSelectorLabel(
