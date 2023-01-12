@@ -12,12 +12,19 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 *
 	 * @var int
 	 */
-	protected static $administrator_id;
+	private static $administrator_id;
+
+	/**
+	 * User ID.
+	 *
+	 * @var int
+	 */
+	private static $user_id;
 
 	public static function set_up_before_class() {
 		parent::set_up_before_class();
 
-		self::$administrator_id = self::factory()->user->create(
+		static::$administrator_id = self::factory()->user->create(
 			array(
 				'role' => 'administrator',
 			)
@@ -26,6 +33,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		if ( is_multisite() ) {
 			grant_super_admin( self::$administrator_id );
 		}
+
+		static::$user_id = self::factory()->user->create();
 	}
 
 	/**
@@ -1620,8 +1629,14 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEquals( $custom_css, $theme_json->get_stylesheet( array( 'custom-css' ) ) );
 	}
 
-	public function test_allows_custom_css_for_users_with_caps() {
-		wp_set_current_user( self::$administrator_id );
+	/**
+	 * @dataProvider data_custom_css_for_user_caps
+	 *
+	 * @param string $user_property The property name for current user.
+	 * @param array  $expected      Expected results.
+	 */
+	public function test_custom_css_for_user_caps( $user_property, array $expected ) {
+		wp_set_current_user( static::${$user_property} );
 
 		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
 			array(
@@ -1639,65 +1654,47 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$expected = array(
-			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-			'styles'  => array(
-				'css'    => 'body { color:purple; }',
-				'blocks' => array(
-					'core/separator' => array(
-						'color' => array(
-							'background' => 'blue',
-						),
-					),
-				),
-			),
-		);
-
 		$this->assertEqualSetsWithIndex( $expected, $actual );
-		remove_filter( 'map_meta_cap', $grant_edit_css_cap );
 	}
 
-	public function test_removes_custom_css_for_users_without_caps() {
-		wp_set_current_user( self::$administrator_id );
-
-		$remove_edit_css_cap = function( $caps, $cap ) {
-			if ( 'edit_css' === $cap ) {
-				$caps = array( 'do_not_allow' );
-			}
-			return $caps;
-		};
-		add_filter( 'map_meta_cap', $remove_edit_css_cap, 10, 2 );
-
-		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
-			array(
-				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-				'styles'  => array(
-					'css'    => 'body { color:purple; }',
-					'blocks' => array(
-						'core/separator' => array(
-							'color' => array(
-								'background' => 'blue',
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_custom_css_for_user_caps() {
+		return array(
+			'allows custom css for users with caps'     => array(
+				'user_property' => 'administrator_id',
+				'expected'      => array(
+					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'styles'  => array(
+						'css'    => 'body { color:purple; }',
+						'blocks' => array(
+							'core/separator' => array(
+								'color' => array(
+									'background' => 'blue',
+								),
 							),
 						),
 					),
 				),
-			)
-		);
-
-		$expected = array(
-			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-			'styles'  => array(
-				'blocks' => array(
-					'core/separator' => array(
-						'color' => array(
-							'background' => 'blue',
+			),
+			'removes custom css for users without caps' => array(
+				'user_property' => 'user_id',
+				'expected'      => array(
+					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'styles'  => array(
+						'blocks' => array(
+							'core/separator' => array(
+								'color' => array(
+									'background' => 'blue',
+								),
+							),
 						),
 					),
 				),
 			),
 		);
-
-		$this->assertEqualSetsWithIndex( $expected, $actual );
-		remove_filter( 'map_meta_cap', $remove_edit_css_cap );
 	}
 }
