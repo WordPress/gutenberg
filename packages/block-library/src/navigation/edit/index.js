@@ -650,7 +650,7 @@ function Navigation( {
 					</PanelBody>
 				) }
 			</InspectorControls>
-			<InspectorControls __experimentalGroup="color">
+			<InspectorControls group="color">
 				{ hasColorSettings && (
 					<>
 						<ColorGradientSettingsDropdown
@@ -854,7 +854,7 @@ function Navigation( {
 				/>
 				{ stylingInspectorControls }
 				{ isEntityAvailable && (
-					<InspectorControls __experimentalGroup="advanced">
+					<InspectorControls group="advanced">
 						{ hasResolvedCanUserUpdateNavigationMenu &&
 							canUserUpdateNavigationMenu && (
 								<NavigationMenuNameControl />

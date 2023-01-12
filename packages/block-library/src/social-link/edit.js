@@ -114,7 +114,7 @@ const SocialLinkEdit = ( {
 					</PanelRow>
 				</PanelBody>
 			</InspectorControls>
-			<InspectorControls __experimentalGroup="advanced">
+			<InspectorControls group="advanced">
 				<TextControl
 					label={ __( 'Link rel' ) }
 					value={ rel || '' }
