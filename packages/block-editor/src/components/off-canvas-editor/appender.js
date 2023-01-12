@@ -10,6 +10,7 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import Inserter from '../inserter';
 
 export const Appender = forwardRef(
@@ -32,14 +33,20 @@ export const Appender = forwardRef(
 			};
 		}, [] );
 
+		const blockTitle = useBlockDisplayTitle( {
+			clientId,
+			context: 'list-view',
+		} );
+
 		if ( hideInserter ) {
 			return null;
 		}
 
 		const descriptionId = `off-canvas-editor-appender__${ instanceId }`;
 		const description = sprintf(
-			/* translators: 1: The numerical position of the block. 2: The level of nesting for the block. */
-			__( 'Append at position %1$d, Level %2$d' ),
+			/* translators: 1: The name of the block. 2: The numerical position of the block. 3: The level of nesting for the block. */
+			__( 'Append to %1$s block at position %2$d, Level %3$d' ),
+			blockTitle,
 			blockCount + 1,
 			nestingLevel
 		);
