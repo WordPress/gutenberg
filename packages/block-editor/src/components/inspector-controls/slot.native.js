@@ -9,7 +9,7 @@ import warning from '@wordpress/warning';
 import groups from './groups';
 
 export default function InspectorControlsSlot( {
-	__experimentalGroup: group = 'default',
+	group = 'default',
 	...props
 } ) {
 	const Slot = groups[ group ]?.Slot;

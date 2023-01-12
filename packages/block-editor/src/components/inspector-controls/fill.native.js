@@ -19,7 +19,7 @@ import { BlockSettingsButton } from '../block-settings';
 
 export default function InspectorControlsFill( {
 	children,
-	__experimentalGroup: group = 'default',
+	group = 'default',
 	...props
 } ) {
 	const isDisplayed = useDisplayBlockControls();

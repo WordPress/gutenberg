@@ -15,7 +15,7 @@ import BlockSupportSlotContainer from './block-support-slot-container';
 import groups from './groups';
 
 export default function InspectorControlsSlot( {
-	__experimentalGroup: group = 'default',
+	group = 'default',
 	label,
 	...props
 } ) {

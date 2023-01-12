@@ -19,8 +19,8 @@ import useDisplayBlockControls from '../use-display-block-controls';
 import groups from './groups';
 
 export default function InspectorControlsFill( {
-	__experimentalGroup: group = 'default',
 	children,
+	group = 'default',
 } ) {
 	const isDisplayed = useDisplayBlockControls();
 	const Fill = groups[ group ]?.Fill;
