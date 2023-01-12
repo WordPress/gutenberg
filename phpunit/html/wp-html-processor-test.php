@@ -266,4 +266,13 @@ HTML
 		$tags->set_attribute( 'id', 'thesection' );
 		$this->assertSame( '<div>outside</div><section id="thesection">This is the new section content.</section>', $tags->get_updated_html() );
 	}
+
+	public function test_set_content_inside_balanced_tags_preceded_by_set_attribute_works() {
+		$tags = new WP_HTML_Processor( self::HTML );
+
+		$tags->next_tag( 'section' );
+		$tags->set_attribute( 'id', 'thesection' );
+		$tags->set_content_inside_balanced_tags( 'This is the new section content.' );
+		$this->assertSame( '<div>outside</div><section id="thesection">This is the new section content.</section>', $tags->get_updated_html() );
+	}
 }
