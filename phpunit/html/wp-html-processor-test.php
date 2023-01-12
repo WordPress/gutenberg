@@ -23,8 +23,10 @@ if ( ! class_exists( 'WP_UnitTestCase' ) ) {
  * @coversDefaultClass WP_HTML_Processor
  */
 class WP_HTML_Processor_Test extends WP_UnitTestCase {
+	const HTML = '<div>outside</div><section><div><img>inside</div></section>';
+
 	public function test_find_descendant_tag() {
-		$tags = new WP_HTML_Processor( '<div>outside</div><section><div><img>inside</div></section>' );
+		$tags = new WP_HTML_Processor( self::HTML );
 
 		$tags->next_tag( 'div' );
 		$state = $tags->new_state();
@@ -224,7 +226,7 @@ HTML
 	}
 
 	public function test_set_content_inside_balanced_tags_sets_content_correctly() {
-		$tags = new WP_HTML_Processor( '<div>outside</div><section><div><img>inside</div></section>' );
+		$tags = new WP_HTML_Processor( self::HTML );
 
 		$tags->next_tag( 'section' );
 		$tags->set_content_inside_balanced_tags( 'This is the new section content.' );
@@ -232,7 +234,7 @@ HTML
 	}
 
 	public function test_set_content_inside_balanced_tags_updates_bookmarks_correctly() {
-		$tags = new WP_HTML_Processor( '<div>outside</div><section><div><img>inside</div></section>' );
+		$tags = new WP_HTML_Processor( self::HTML );
 
 		$tags->next_tag( 'div' );
 		$tags->set_bookmark( 'start' );
