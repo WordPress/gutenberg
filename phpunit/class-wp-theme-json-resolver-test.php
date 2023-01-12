@@ -503,4 +503,63 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_get_style_variations_returns_all_variations() {
+		// Switch to a child theme.
+		switch_theme( 'block-theme-child' );
+		wp_set_current_user( self::$administrator_id );
+
+		$actual_settings   = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations();
+		$expected_settings = array(
+			array(
+				'version'  => 2,
+				'title'    => 'variation-child',
+				'settings' => array(
+					'blocks' => array(
+						'core/post-title' => array(
+							'color' => array(
+								'palette' => array(
+									'theme' => array(
+										array(
+											'slug'  => 'light',
+											'name'  => 'Light',
+											'color' => '#f1f1f1',
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			),
+			array(
+				'version'  => 2,
+				'title'    => 'variation',
+				'settings' => array(
+					'blocks' => array(
+						'core/paragraph' => array(
+							'color' => array(
+								'palette' => array(
+									'theme' => array(
+										array(
+											'slug'  => 'light',
+											'name'  => 'Light',
+											'color' => '#f2f2f2',
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			),
+		);
+		self::recursive_ksort( $actual_settings );
+		self::recursive_ksort( $expected_settings );
+
+		$this->assertSame(
+			$expected_settings,
+			$actual_settings
+		);
+	}
+
 }
