@@ -43,6 +43,8 @@ function gutenberg_build_files_notice() {
 	echo '</p></div>';
 }
 
+// Small change.
+
 /**
  * Verify that we can initialize the Gutenberg editor , then load it.
  *
