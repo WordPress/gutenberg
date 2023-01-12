@@ -12,13 +12,24 @@ import {
 	link,
 	more,
 	paragraph,
+	arrowUp,
+	arrowDown,
+	arrowLeft,
+	arrowRight,
+	chevronDown,
 } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { Toolbar, ToolbarButton, ToolbarGroup, ToolbarItem } from '..';
-import { SVG, Path, DropdownMenu } from '../../..';
+import {
+	Toolbar,
+	ToolbarButton,
+	ToolbarGroup,
+	ToolbarItem,
+	ToolbarDropdownMenu,
+} from '..';
+import { SVG, Path, DropdownMenu } from '../../../build';
 
 export default {
 	title: 'Components/Toolbar',
@@ -43,10 +54,10 @@ function InlineImageIcon() {
 	);
 }
 
-/* eslint-disable no-restricted-syntax */
-export const _default = () => {
+export const Default = () => {
 	return (
 		// id is required for server side rendering
+		// eslint-disable-next-line no-restricted-syntax
 		<Toolbar label="Options" id="options-toolbar">
 			<ToolbarGroup>
 				<ToolbarButton icon={ paragraph } label="Paragraph" />
@@ -111,13 +122,36 @@ export const _default = () => {
 					{ icon: alignRight, title: 'Align right' },
 				] }
 			/>
+			<ToolbarDropdownMenu
+				icon={ chevronDown }
+				label="Select a direction"
+				controls={ [
+					{
+						title: 'Up',
+						icon: arrowUp,
+					},
+					{
+						title: 'Right',
+						icon: arrowRight,
+					},
+					{
+						title: 'Down',
+						icon: arrowDown,
+					},
+					{
+						title: 'Left',
+						icon: arrowLeft,
+					},
+				] }
+			/>
 		</Toolbar>
 	);
 };
 
-export const withoutGroup = () => {
+export const WithoutGroup = () => {
 	return (
 		// id is required for server side rendering
+		// eslint-disable-next-line no-restricted-syntax
 		<Toolbar label="Options" id="options-toolbar-without-group">
 			<ToolbarButton icon={ formatBold } label="Bold" isPressed />
 			<ToolbarButton icon={ formatItalic } label="Italic" />
@@ -125,58 +159,62 @@ export const withoutGroup = () => {
 		</Toolbar>
 	);
 };
-/* eslint-enable no-restricted-syntax */
 
-export const toolbars = () => {
+export const OnlyIcons = () => {
 	return (
-		<div>
-			<div style={ { padding: '20px' } }>
-				<h2>Icon-only Toolbar</h2>
-				<Toolbar>
-					<ToolbarButton icon={ formatBold } title="Bold" />
-					<ToolbarButton
-						icon={ formatItalic }
-						title="Italic"
-						isActive
-					/>
-					<ToolbarButton icon={ link } title="Link" />
-				</Toolbar>
-			</div>
+		// id is required for server side rendering
+		// eslint-disable-next-line no-restricted-syntax
+		<Toolbar>
+			<ToolbarButton icon={ formatBold } title="Bold" />
+			<ToolbarButton icon={ formatItalic } title="Italic" isActive />
+			<ToolbarButton icon={ link } title="Link" />
+		</Toolbar>
+	);
+};
 
-			<div style={ { padding: '20px' } }>
-				<h2>Text-only Toolbar</h2>
-				<Toolbar>
-					<ToolbarButton>Bold Format</ToolbarButton>
-					<ToolbarButton isActive>Italic Format</ToolbarButton>
-					<ToolbarButton>Link Format</ToolbarButton>
-				</Toolbar>
-			</div>
+export const OnlyText = () => {
+	return (
+		// id is required for server side rendering
+		// eslint-disable-next-line no-restricted-syntax
+		<Toolbar>
+			<ToolbarButton>Bold Format</ToolbarButton>
+			<ToolbarButton isActive>Italic Format</ToolbarButton>
+			<ToolbarButton>Link Format</ToolbarButton>
+		</Toolbar>
+	);
+};
 
-			<div style={ { padding: '20px' } }>
-				<h2>Text and Icon Toolbar</h2>
-				<Toolbar>
-					<ToolbarButton icon={ formatBold } title="Bold" />
-					<ToolbarButton isActive>Bold Format</ToolbarButton>
-					<ToolbarButton icon={ formatItalic } title="Italic" />
-					<ToolbarButton>Italic Format</ToolbarButton>
-					<ToolbarButton icon={ link } title="Link" />
-					<ToolbarButton>Link Format</ToolbarButton>
-				</Toolbar>
-			</div>
+export const TextAndIcon = () => {
+	return (
+		// id is required for server side rendering
+		// eslint-disable-next-line no-restricted-syntax
+		<Toolbar>
+			<ToolbarButton icon={ formatBold } title="Bold" />
+			<ToolbarButton isActive>Bold Format</ToolbarButton>
+			<ToolbarButton icon={ formatItalic } title="Italic" />
+			<ToolbarButton>Italic Format</ToolbarButton>
+			<ToolbarButton icon={ link } title="Link" />
+			<ToolbarButton>Link Format</ToolbarButton>
+		</Toolbar>
+	);
+};
 
-			<div style={ { padding: '20px' } }>
-				<h2>Single Icon Button Toolbar</h2>
-				<Toolbar>
-					<ToolbarButton icon={ formatBold } title="Bold" />
-				</Toolbar>
-			</div>
+export const SingleIconButton = () => {
+	return (
+		// id is required for server side rendering
+		// eslint-disable-next-line no-restricted-syntax
+		<Toolbar>
+			<ToolbarButton icon={ formatBold } title="Bold" />
+		</Toolbar>
+	);
+};
 
-			<div style={ { padding: '20px' } }>
-				<h2>Single Text Button toolbar</h2>
-				<Toolbar>
-					<ToolbarButton>Bold Toolbar</ToolbarButton>
-				</Toolbar>
-			</div>
-		</div>
+export const SingleTextButton = () => {
+	return (
+		// id is required for server side rendering
+		// eslint-disable-next-line no-restricted-syntax
+		<Toolbar>
+			<ToolbarButton>Bold Toolbar</ToolbarButton>
+		</Toolbar>
 	);
 };
