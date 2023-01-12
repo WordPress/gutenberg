@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, waitFor } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -40,8 +40,6 @@ function moveReactColorfulSlider( sliderElement, from, to ) {
 	fireEvent( sliderElement, new FakeMouseEvent( 'mousedown', from ) );
 	fireEvent( sliderElement, new FakeMouseEvent( 'mousemove', to ) );
 }
-
-const sleep = ( ms ) => new Promise( ( resolve ) => setTimeout( resolve, ms ) );
 
 const hslaMatcher = expect.objectContaining( {
 	h: expect.any( Number ),
@@ -90,7 +88,9 @@ describe( 'ColorPicker', () => {
 			);
 
 			// `onChange` is debounced so we need to sleep for at least 1ms before checking that onChange was called
-			await sleep( 1 );
+			await waitFor( () =>
+				expect( onChangeComplete ).toHaveBeenCalled()
+			);
 
 			expect( onChangeComplete ).toHaveBeenCalledWith(
 				legacyColorMatcher
@@ -114,7 +114,7 @@ describe( 'ColorPicker', () => {
 		);
 
 		// `onChange` is debounced so we need to sleep for at least 1ms before checking that onChange was called
-		await sleep( 1 );
+		await waitFor( () => expect( onChange ).toHaveBeenCalled() );
 
 		expect( onChange ).toHaveBeenCalledWith(
 			expect.stringMatching( /^#([a-fA-F0-9]{8})$/ )
@@ -147,7 +147,7 @@ describe( 'ColorPicker', () => {
 		);
 
 		// `onChange` is debounced so we need to sleep for at least 1ms before checking that onChange was called
-		await sleep( 1 );
+		await waitFor( () => expect( onChange ).toHaveBeenCalled() );
 
 		expect( onChange ).toHaveBeenCalledWith(
 			expect.stringMatching( /^#([a-fA-F0-9]{6})$/ )
