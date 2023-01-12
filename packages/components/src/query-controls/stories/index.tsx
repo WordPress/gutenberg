@@ -12,9 +12,9 @@ const meta: ComponentMeta< typeof QueryControls > = {
 	title: 'Components/QueryControls',
 	component: QueryControls,
 	parameters: {
-		controls: {
-			expanded: true,
-		},
+		actions: { argTypesRegex: '^on.*' },
+		controls: { expanded: true },
+		docs: { source: { state: 'open' } },
 	},
 };
 export default meta;
