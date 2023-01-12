@@ -31,11 +31,11 @@ export type Category = {
 };
 
 export type CategorySelectProps = {
-	categoriesList: QueryControlsProps[ 'categoriesList' ];
+	categoriesList: NonNullable< QueryControlsProps[ 'categoriesList' ] >;
 	key: Key;
 	label: TreeSelectProps[ 'label' ];
 	noOptionLabel: TreeSelectProps[ 'noOptionLabel' ];
-	onChange: TreeSelectProps[ 'onChange' ];
+	onChange: NonNullable< TreeSelectProps[ 'onChange' ] >;
 	selectedCategoryId: QueryControlsProps[ 'selectedCategoryId' ];
 };
 
@@ -43,7 +43,7 @@ export type AuthorSelectProps = {
 	authorList: QueryControlsProps[ 'authorList' ];
 	label: TreeSelectProps[ 'label' ];
 	noOptionLabel: TreeSelectProps[ 'noOptionLabel' ];
-	onChange: QueryControlsProps[ 'onAuthorChange' ];
+	onChange: NonNullable< QueryControlsProps[ 'onAuthorChange' ] >;
 	selectedAuthorId: QueryControlsProps[ 'selectedAuthorId' ];
 };
 
