@@ -1619,6 +1619,15 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	public function test_allows_custom_css_for_users_with_caps() {
 		wp_set_current_user( self::$administrator_id );
 
+		// Explicitly grant 'edit_css' capabilities.
+		$grant_edit_css_cap = function( $caps, $cap ) {
+			if ( 'edit_css' === $cap ) {
+				$caps = array( 'edit_theme_options' );
+			}
+			return $caps;
+		};
+		add_filter( 'map_meta_cap', $grant_edit_css_cap, 10, 2 );
+
 		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -1650,6 +1659,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertEqualSetsWithIndex( $expected, $actual );
+		remove_filter( 'map_meta_cap', $grant_edit_css_cap );
 	}
 
 	public function test_removes_custom_css_for_users_without_caps() {
