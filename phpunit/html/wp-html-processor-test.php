@@ -248,4 +248,13 @@ HTML
 		$tags->seek( 'after' );
 		$this->assertSame( 'IMG', $tags->get_tag() );
 	}
+
+	public function test_set_content_inside_balanced_tags_subsequent_updates_on_the_same_tag_work() {
+		$tags = new WP_HTML_Processor( self::HTML );
+
+		$tags->next_tag( 'section' );
+		$tags->set_content_inside_balanced_tags( 'This is the new section content.' );
+		$tags->set_content_inside_balanced_tags( 'This is the even newer section content.' );
+		$this->assertSame( '<div>outside</div><section>This is the even newer section content.</section>', $tags->get_updated_html() );
+	}
 }
