@@ -52,7 +52,9 @@ test.describe( 'Avatar', () => {
 		);
 
 		await expect( blockInspectorControls ).toBeVisible();
-		await editor.switchBlockInspectorTab( 'Settings' );
+		await page.click(
+			`role=region[name="Editor settings"i] >> role=tab[name="Settings"i]`
+		);
 
 		const userInput = page.locator(
 			'role=region[name="Editor settings"i] >> role=combobox[name="User"i]'

@@ -9,11 +9,13 @@ export async function switchBlockInspectorTab( label ) {
 		`.block-editor-block-inspector__tabs button[aria-label="${ label }"]`
 	);
 
-	if ( tabButton ) {
-		const id = await page.evaluate( ( tab ) => tab.id, tabButton );
-		await tabButton.click();
-		await page.waitForSelector(
-			`div[role="tabpanel"][aria-labelledby="${ id }"]`
-		);
+	if ( ! tabButton ) {
+		throw new Error( `Missing block inspector tab: ${ label }.` );
 	}
+
+	const id = await ( await tabButton.getProperty( 'id' ) ).jsonValue();
+	await tabButton.click();
+	await page.waitForSelector(
+		`div[role="tabpanel"][aria-labelledby="${ id }"]`
+	);
 }
