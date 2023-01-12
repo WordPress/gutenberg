@@ -7,8 +7,12 @@
 		margin-right: $grid-unit-30;
 
 		svg {
-			margin: auto 0 auto $grid-unit-10;
+			margin: auto 0 $grid-unit-05 $grid-unit-10;
 		}
+	}
+
+	.components-input-control {
+		margin-bottom: 0;
 	}
 }
 
