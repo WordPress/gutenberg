@@ -3,7 +3,7 @@
  */
 import { useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { Button, Notice } from '@wordpress/components';
+import { Notice } from '@wordpress/components';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
@@ -16,11 +16,7 @@ import {
 	ComplementaryArea,
 	store as interfaceStore,
 } from '@wordpress/interface';
-import {
-	EditorNotices,
-	EditorSnackbars,
-	EntitiesSavedStates,
-} from '@wordpress/editor';
+import { EditorNotices, EditorSnackbars } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -64,7 +60,6 @@ export default function Editor() {
 		isRightSidebarOpen,
 		isInserterOpen,
 		isListViewOpen,
-		isSaveViewOpen,
 		showIconLabels,
 	} = useSelect( ( select ) => {
 		const {
@@ -75,7 +70,6 @@ export default function Editor() {
 			getCanvasMode,
 			isInserterOpened,
 			isListViewOpened,
-			isSaveViewOpened,
 		} = unlock( select( editSiteStore ) );
 		const { hasFinishedResolution, getEntityRecord } = select( coreStore );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
@@ -104,7 +98,6 @@ export default function Editor() {
 			blockEditorMode: __unstableGetEditorMode(),
 			isInserterOpen: isInserterOpened(),
 			isListViewOpen: isListViewOpened(),
-			isSaveViewOpen: isSaveViewOpened(),
 			isRightSidebarOpen: getActiveComplementaryArea(
 				editSiteStore.name
 			),
@@ -114,8 +107,7 @@ export default function Editor() {
 			),
 		};
 	}, [] );
-	const { setIsSaveViewOpened, setEditedPostContext } =
-		useDispatch( editSiteStore );
+	const { setEditedPostContext } = useDispatch( editSiteStore );
 
 	const isViewMode = canvasMode === 'view';
 	const isEditMode = canvasMode === 'edit';
@@ -209,38 +201,6 @@ export default function Editor() {
 									isEditMode &&
 									isRightSidebarOpen && (
 										<ComplementaryArea.Slot scope="core/edit-site" />
-									)
-								}
-								actions={
-									isEditMode && (
-										<>
-											{ isSaveViewOpen ? (
-												<EntitiesSavedStates
-													close={ () =>
-														setIsSaveViewOpened(
-															false
-														)
-													}
-												/>
-											) : (
-												<div className="edit-site-editor__toggle-save-panel">
-													<Button
-														variant="secondary"
-														className="edit-site-editor__toggle-save-panel-button"
-														onClick={ () =>
-															setIsSaveViewOpened(
-																true
-															)
-														}
-														aria-expanded={ false }
-													>
-														{ __(
-															'Open save panel'
-														) }
-													</Button>
-												</div>
-											) }
-										</>
 									)
 								}
 								footer={

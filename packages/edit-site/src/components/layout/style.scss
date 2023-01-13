@@ -205,3 +205,20 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 		border-radius: $radius-block-ui;
 	}
 }
+
+.edit-site-layout__actions {
+	z-index: z-index(".edit-site-layout__actions");
+	position: fixed !important; // Need to override the default relative positioning
+	top: -9999em;
+	bottom: auto;
+	left: auto;
+	right: 0;
+	width: $sidebar-width;
+	color: $gray-900;
+
+	&:focus,
+	&:focus-within {
+		top: auto;
+		bottom: 0;
+	}
+}
