@@ -6,6 +6,7 @@ import {
 	__experimentalUseSlotFills as useSlotFills,
 } from '@wordpress/components';
 import warning from '@wordpress/warning';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -15,10 +16,21 @@ import BlockSupportSlotContainer from './block-support-slot-container';
 import groups from './groups';
 
 export default function InspectorControlsSlot( {
+	__experimentalGroup,
 	group = 'default',
 	label,
 	...props
 } ) {
+	if ( __experimentalGroup ) {
+		deprecated(
+			'`__experimentalGroup` property in `InspectorControlsSlot`',
+			{
+				since: '6.2',
+				alternative: '`group`',
+			}
+		);
+		group = __experimentalGroup;
+	}
 	const Slot = groups[ group ]?.Slot;
 	const slot = useSlot( Slot?.__unstableName );
 	const fills = useSlotFills( Slot?.__unstableName );
