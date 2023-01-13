@@ -12,6 +12,7 @@ import {
 	forwardRef,
 	useMemo,
 	useReducer,
+	renderToString,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -20,6 +21,7 @@ import {
 	useRefEffect,
 } from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -27,6 +29,7 @@ import { __experimentalStyleProvider as StyleProvider } from '@wordpress/compone
 import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useWritingFlow } from '../writing-flow';
 import { useCompatibilityStyles } from './use-compatibility-styles';
+import { store as blockEditorStore } from '../../store';
 
 /**
  * Bubbles some event types (keydown, keypress, and dragover) to parent document
@@ -97,20 +100,22 @@ async function loadScript( head, { id, src } ) {
 	} );
 }
 
-function Iframe(
-	{
-		contentRef,
-		children,
-		head,
-		tabIndex = 0,
-		assets,
-		scale = 1,
-		frameSize = 0,
-		readonly,
-		...props
-	},
-	ref
-) {
+function Iframe( {
+	contentRef,
+	children,
+	head,
+	tabIndex = 0,
+	scale = 1,
+	frameSize = 0,
+	readonly,
+	forwardedRef: ref,
+	...props
+} ) {
+	const assets = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().__unstableResolvedAssets,
+		[]
+	);
 	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
@@ -204,7 +209,7 @@ function Iframe(
 	}, [] );
 	const bodyRef = useMergeRefs( [ contentRef, clearerRef, writingFlowRef ] );
 
-	head = (
+	const styleAssets = (
 		<>
 			<style>{ 'html{height:auto!important;}body{margin:0}' }</style>
 			{ [ ...styles, ...neededCompatStyles ].map(
@@ -224,9 +229,15 @@ function Iframe(
 					);
 				}
 			) }
-			{ head }
 		</>
 	);
+
+	// Correct doctype is required to enable rendering in standards
+	// mode. Also preload the styles to avoid a flash of unstyled
+	// content.
+	const srcDoc = useMemo( () => {
+		return '<!doctype html>' + renderToString( styleAssets );
+	}, [] );
 
 	return (
 		<>
@@ -235,14 +246,17 @@ function Iframe(
 				{ ...props }
 				ref={ useMergeRefs( [ ref, setRef ] ) }
 				tabIndex={ tabIndex }
-				// Correct doctype is required to enable rendering in standards mode
-				srcDoc="<!doctype html>"
+				// Correct doctype is required to enable rendering in standards
+				// mode. Also preload the styles to avoid a flash of unstyled
+				// content.
+				srcDoc={ srcDoc }
 				title={ __( 'Editor canvas' ) }
 			>
 				{ iframeDocument &&
 					createPortal(
 						<>
 							<head ref={ headRef }>
+								{ styleAssets }
 								{ head }
 								<style>
 									{ `html { transition: background 5s; ${
@@ -286,4 +300,23 @@ function Iframe(
 	);
 }
 
-export default forwardRef( Iframe );
+function IframeIfReady( props, ref ) {
+	const isInitialised = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().__internalIsInitialized,
+		[]
+	);
+
+	// We shouldn't render the iframe until the editor settings are initialised.
+	// The initial settings are needed to get the styles for the srcDoc, which
+	// cannot be changed after the iframe is mounted. srcDoc is used to to set
+	// the initial iframe HTML, which is required to avoid a flash of unstyled
+	// content.
+	if ( ! isInitialised ) {
+		return null;
+	}
+
+	return <Iframe { ...props } forwardedRef={ ref } />;
+}
+
+export default forwardRef( IframeIfReady );

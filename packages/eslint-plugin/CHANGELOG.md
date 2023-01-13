@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Bump `eslint-plugin-jest` version to 27.2.1.
+
 ## 13.8.0 (2023-01-02)
 
 ## 13.7.0 (2022-12-14)

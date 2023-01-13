@@ -1,12 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { memo } from '@wordpress/element';
+import {
+	__experimentalTreeGridRow as TreeGridRow,
+	__experimentalTreeGridCell as TreeGridCell,
+} from '@wordpress/components';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
+import { memo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
+
+import { Appender } from './appender';
 import ListViewBlock from './block';
 import { useListViewContext } from './context';
 import { isClientIdSelected } from './utils';
@@ -111,8 +117,14 @@ function ListViewBranch( props ) {
 		return null;
 	}
 
+	// Only show the appender at the first level.
+	const showAppender = level === 1;
+
 	const filteredBlocks = blocks.filter( Boolean );
 	const blockCount = filteredBlocks.length;
+
+	// The appender means an extra row in List View, so add 1 to the row count.
+	const rowCount = showAppender ? blockCount + 1 : blockCount;
 	let nextPosition = listPosition;
 
 	return (
@@ -167,7 +179,7 @@ function ListViewBranch( props ) {
 								isDragged={ isDragged }
 								level={ level }
 								position={ position }
-								rowCount={ blockCount }
+								rowCount={ rowCount }
 								siblingBlockCount={ blockCount }
 								showBlockMovers={ showBlockMovers }
 								path={ updatedPath }
@@ -201,6 +213,24 @@ function ListViewBranch( props ) {
 					</AsyncModeProvider>
 				);
 			} ) }
+			{ showAppender && (
+				<TreeGridRow
+					level={ level }
+					setSize={ rowCount }
+					positionInSet={ rowCount }
+					isExpanded={ true }
+				>
+					<TreeGridCell>
+						{ ( treeGridCellProps ) => (
+							<Appender
+								nestingLevel={ level }
+								blockCount={ blockCount }
+								{ ...treeGridCellProps }
+							/>
+						) }
+					</TreeGridCell>
+				</TreeGridRow>
+			) }
 		</>
 	);
 }

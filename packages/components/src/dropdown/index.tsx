@@ -9,6 +9,7 @@ import type { ForwardedRef } from 'react';
  */
 import { forwardRef, useEffect, useRef, useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -41,14 +42,24 @@ function UnforwardedDropdown(
 		expandOnMobile,
 		headerTitle,
 		focusOnMount,
-		position,
 		popoverProps,
 		onClose,
 		onToggle,
 		style,
+
+		// Deprecated props
+		position,
 	}: DropdownProps,
 	forwardedRef: ForwardedRef< any >
 ) {
+	if ( position !== undefined ) {
+		deprecated( '`position` prop in wp.components.Dropdown', {
+			since: '6.2',
+			alternative: '`popoverProps.placement` prop',
+			hint: 'Note that the `position` prop will override any values passed through the `popoverProps.placement` prop.',
+		} );
+	}
+
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ fallbackPopoverAnchor, setFallbackPopoverAnchor ] =
@@ -141,7 +152,7 @@ function UnforwardedDropdown(
 					{ ...popoverProps }
 					className={ classnames(
 						'components-dropdown__content',
-						popoverProps ? popoverProps.className : undefined,
+						popoverProps?.className,
 						contentClassName
 					) }
 				>
@@ -161,18 +172,18 @@ function UnforwardedDropdown(
  * const MyDropdown = () => (
  *   <Dropdown
  *     className="my-container-class-name"
- *     contentClassName="my-popover-content-classname"
- *     position="bottom right"
+ *     contentClassName="my-dropdown-content-classname"
+ *     popoverProps={ { placement: 'bottom-start' } }
  *     renderToggle={ ( { isOpen, onToggle } ) => (
  *       <Button
  *         variant="primary"
  *         onClick={ onToggle }
  *         aria-expanded={ isOpen }
  *       >
- *         Toggle Popover!
+ *         Toggle Dropdown!
  *       </Button>
  *     ) }
- *     renderContent={ () => <div>This is the content of the popover.</div> }
+ *     renderContent={ () => <div>This is the content of the dropdown.</div> }
  *   />
  * );
  * ```
