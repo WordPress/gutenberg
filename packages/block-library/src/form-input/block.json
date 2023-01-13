@@ -46,6 +46,9 @@
 	"supports": {
 		"anchor": true,
 		"reusable": false,
+		"spacing": {
+			"margin": [ "top", "bottom" ]
+		},
 		"__experimentalBorder": {
 			"radius": true,
 			"__experimentalSkipSerialization": true,

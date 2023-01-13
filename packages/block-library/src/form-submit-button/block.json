@@ -12,5 +12,6 @@
 	"supports": {
 		"lock": false,
 		"multiple": false
-	}
+	},
+	"style": [ "wp-block-form-submit-button" ]
 }
