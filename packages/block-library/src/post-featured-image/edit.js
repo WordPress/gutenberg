@@ -35,6 +35,7 @@ import { upload, caption as captionIcon, pencil } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { useEffect, useState, useCallback } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
+
 /**
  * Internal dependencies
  */
@@ -109,7 +110,7 @@ function PostFeaturedImageDisplay( {
 				media:
 					featuredImage &&
 					getMedia( featuredImage, {
-						context: 'edit',
+						context: 'view',
 					} ),
 				postType: postTypeSlug && getPostType( postTypeSlug ),
 			};
@@ -118,8 +119,8 @@ function PostFeaturedImageDisplay( {
 	);
 	const mediaUrl = getMediaSourceUrlBySizeSlug( media, sizeSlug );
 
-	const mediaLibraryCaption = !! media?.caption?.raw
-		? media?.caption?.raw
+	const mediaLibraryCaption = !! media?.caption?.rendered
+		? media?.caption?.rendered
 		: '';
 
 	const captionControls = [
@@ -421,9 +422,10 @@ function PostFeaturedImageDisplay( {
 						className={ __experimentalGetElementClassName(
 							'caption'
 						) }
-					>
-						{ mediaLibraryCaption }
-					</figcaption>
+						dangerouslySetInnerHTML={ {
+							__html: mediaLibraryCaption,
+						} }
+					/>
 				) }
 			</figure>
 		</>
