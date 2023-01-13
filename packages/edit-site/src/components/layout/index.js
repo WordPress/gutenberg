@@ -234,7 +234,6 @@ export default function Layout( { onError } ) {
 								handleComponent={ {
 									right: (
 										<ResizeHandle
-											direction="right"
 											variation="separator"
 										/>
 									),

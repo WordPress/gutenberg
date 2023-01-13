@@ -84,10 +84,6 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 		top: 0;
 	}
 
-	.resizable-editor__drag-handle.is-right {
-		right: math.div(-$grid-unit-15, 2);
-	}
-
 	> div {
 		overflow-y: auto;
 		min-height: 100%;

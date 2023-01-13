@@ -97,12 +97,15 @@
 
 	&.is-variation-separator {
 		height: 100%;
+		width: $grid-unit-30;
+		right: 0;
 
 		&::after {
 			width: 2px;
 			border-radius: 0;
-			background: $gray-800;
-			left: 0;
+			background: transparent;
+			left: 50%;
+			transform: translateX( -1px );
 			right: 0;
 			transition: all ease 0.2s;
 			transition-delay: 0.1s;
