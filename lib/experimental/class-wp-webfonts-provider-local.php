@@ -244,7 +244,7 @@ class WP_Webfonts_Provider_Local extends WP_Webfonts_Provider {
 	 * @return string The CSS.
 	 */
 	private function compile_src( $font_family, array $value ) {
-		$src = "local($font_family)";
+		$src = '';
 
 		foreach ( $value as $item ) {
 
