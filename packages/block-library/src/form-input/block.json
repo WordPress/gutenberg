@@ -45,14 +45,6 @@
 	},
 	"supports": {
 		"anchor": true,
-		"color": {
-			"__experimentalSkipSerialization": true,
-			"gradients": true,
-			"__experimentalDefaultControls": {
-				"background": true,
-				"text": true
-			}
-		},
 		"reusable": false,
 		"__experimentalBorder": {
 			"radius": true,

@@ -292,7 +292,7 @@ The basic building block for forms. ([Source](https://github.com/WordPress/guten
 
 -	**Name:** core/form-input
 -	**Category:** common
--	**Supports:** anchor, color (background, gradients, text), ~~reusable~~
+-	**Supports:** anchor, ~~reusable~~
 -	**Attributes:** inlineLabel, label, name, placeholder, required, type
 
 ## Form submit button
