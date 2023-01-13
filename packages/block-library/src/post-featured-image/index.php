@@ -25,11 +25,12 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 		the_post();
 	}
 
-	$is_link        = isset( $attributes['isLink'] ) && $attributes['isLink'];
-	$size_slug      = isset( $attributes['sizeSlug'] ) ? $attributes['sizeSlug'] : 'post-thumbnail';
-	$attr           = get_block_core_post_featured_image_border_attributes( $attributes );
-	$overlay_markup = get_block_core_post_featured_image_overlay_element_markup( $attributes );
-	$caption        = isset( $attributes['caption'] ) ? $attributes['caption'] : '';
+	$is_link         = isset( $attributes['isLink'] ) && $attributes['isLink'];
+	$size_slug       = isset( $attributes['sizeSlug'] ) ? $attributes['sizeSlug'] : 'post-thumbnail';
+	$attr            = get_block_core_post_featured_image_border_attributes( $attributes );
+	$overlay_markup  = get_block_core_post_featured_image_overlay_element_markup( $attributes );
+	$caption         = isset( $attributes['caption'] ) ? $attributes['caption'] : '';
+	$display_caption = isset( $attributes['displayCaption'] ) ? $attributes['displayCaption'] : '';
 
 	if ( $is_link ) {
 		$attr['alt'] = trim( strip_tags( get_the_title( $post_ID ) ) );
@@ -67,6 +68,8 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	$image_caption = '';
 	if ( $caption ) {
 		$image_caption = '<figcaption class="wp-element-caption">' . $caption . '</figcaption>';
+	} else if ( $display_caption ) {
+		$image_caption = '<figcaption class="wp-element-caption">' . get_the_post_thumbnail_caption() . '</figcaption>';
 	}
 
 	$width  = ! empty( $attributes['width'] ) ? esc_attr( safecss_filter_attr( 'width:' . $attributes['width'] ) ) . ';' : '';
