@@ -174,7 +174,7 @@ export default function Editor() {
 								content={
 									<>
 										<GlobalStylesRenderer />
-										<EditorNotices />
+										{ isEditMode && <EditorNotices /> }
 										{ showVisualEditor && editedPost && (
 											<BlockEditor />
 										) }

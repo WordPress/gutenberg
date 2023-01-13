@@ -681,7 +681,7 @@ describe( 'global styles renderer', () => {
 			const imageBlock = { name: 'core/image', supports: imageSupports };
 			const blockTypes = [ imageBlock ];
 
-			expect( getBlockSelectors( blockTypes ) ).toEqual( {
+			expect( getBlockSelectors( blockTypes, () => {} ) ).toEqual( {
 				'core/image': {
 					name: imageBlock.name,
 					selector: imageSupports.__experimentalSelector,

@@ -20,7 +20,7 @@ export default function PostTemplate() {
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 	// Memoize popoverProps to avoid returning a new object every time.
 	const popoverProps = useMemo(
-		() => ( { anchor: popoverAnchor } ),
+		() => ( { anchor: popoverAnchor, placement: 'bottom-end' } ),
 		[ popoverAnchor ]
 	);
 
@@ -57,7 +57,6 @@ export default function PostTemplate() {
 			<span>{ __( 'Template' ) }</span>
 			<Dropdown
 				popoverProps={ popoverProps }
-				position="bottom left"
 				className="edit-post-post-template__dropdown"
 				contentClassName="edit-post-post-template__dialog"
 				focusOnMount

@@ -14,8 +14,6 @@ import { useState } from '@wordpress/element';
  */
 import BoxControl from '../';
 
-jest.useFakeTimers();
-
 const Example = ( extraProps ) => {
 	const [ state, setState ] = useState();
 
@@ -39,9 +37,7 @@ describe( 'BoxControl', () => {
 		} );
 
 		it( 'should update values when interacting with input', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <BoxControl /> );
 
@@ -63,9 +59,7 @@ describe( 'BoxControl', () => {
 
 	describe( 'Reset', () => {
 		it( 'should reset values when clicking Reset', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <BoxControl /> );
 
@@ -89,9 +83,7 @@ describe( 'BoxControl', () => {
 		} );
 
 		it( 'should reset values when clicking Reset, if controlled', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <Example /> );
 
@@ -115,9 +107,7 @@ describe( 'BoxControl', () => {
 		} );
 
 		it( 'should reset values when clicking Reset, if controlled <-> uncontrolled state changes', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <Example /> );
 
@@ -141,9 +131,7 @@ describe( 'BoxControl', () => {
 		} );
 
 		it( 'should persist cleared value when focus changes', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 			const spyChange = jest.fn();
 
 			render( <BoxControl onChange={ ( v ) => spyChange( v ) } /> );
@@ -179,9 +167,7 @@ describe( 'BoxControl', () => {
 
 	describe( 'Unlinked sides', () => {
 		it( 'should update a single side value when unlinked', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <Example /> );
 
@@ -216,9 +202,7 @@ describe( 'BoxControl', () => {
 		} );
 
 		it( 'should update a whole axis when value is changed when unlinked', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <Example splitOnAxis /> );
 
@@ -251,9 +235,7 @@ describe( 'BoxControl', () => {
 
 	describe( 'Unit selections', () => {
 		it( 'should update unlinked controls unit selection based on all input control', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			// Render control.
 			render( <BoxControl /> );
@@ -285,9 +267,7 @@ describe( 'BoxControl', () => {
 		} );
 
 		it( 'should use individual side attribute unit when available', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			// Render control.
 			const { rerender } = render( <BoxControl /> );
@@ -337,9 +317,7 @@ describe( 'BoxControl', () => {
 
 	describe( 'onChange updates', () => {
 		it( 'should call onChange when values contain more than just CSS units', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 			const setState = jest.fn();
 
 			render( <BoxControl onChange={ setState } /> );
@@ -361,9 +339,7 @@ describe( 'BoxControl', () => {
 		} );
 
 		it( 'should not pass invalid CSS unit only values to onChange', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 			const setState = jest.fn();
 
 			render( <BoxControl onChange={ setState } /> );
