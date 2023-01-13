@@ -4,9 +4,15 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react';
 
 /**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import QueryControls from '..';
+import type { Category } from '../types';
 
 const meta: ComponentMeta< typeof QueryControls > = {
 	title: 'Components/QueryControls',
@@ -19,12 +25,41 @@ const meta: ComponentMeta< typeof QueryControls > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof QueryControls > = ( props ) => {
-	return <QueryControls { ...props } />;
+const DefaultTemplate: ComponentStory< typeof QueryControls > = ( props ) => {
+	const [ ownNumberOfItems, setOwnNumberOfItems ] = useState( props.numberOfItems );
+	const [ ownOrder, setOwnOrder ] = useState( props.order );
+	const [ ownOrderBy, setOwnOrderBy ] = useState( props.orderBy );
+	const [ ownSelectedAuthorId, setOwnSelectedAuthorId ] = useState( props.selectedAuthorId );
+	const [ ownSelectedCategories, setOwnSelectedCategories ] = useState( props.selectedCategories );
+
+	const onCategoryChange = ( tokens: Array< Category | string > ) => {
+		const allCategories =	tokens?.map( ( token ) => {
+				return typeof token === 'string'
+					? ( props.categorySuggestions?.[ token ] as Category )
+					: token;
+			} )
+
+			setOwnSelectedCategories( allCategories );
+	};
+
+	return <QueryControls { ...{
+		...props,
+		selectedCategories: ownSelectedCategories,
+		onCategoryChange,
+		onOrderChange: setOwnOrder,
+		onOrderByChange: setOwnOrderBy,
+		order: ownOrder,
+		orderBy: ownOrderBy,
+		selectedAuthorId: ownSelectedAuthorId,
+		numberOfItems: ownNumberOfItems,
+		onNumberOfItemsChange: setOwnNumberOfItems,
+		onAuthorChange: ( newAuthor ) => {
+			setOwnSelectedAuthorId( Number( newAuthor ) );
+		},
+	} } />;
 };
 
-const noop = () => {};
-export const Default: ComponentStory< typeof QueryControls > = Template.bind(
+export const Default: ComponentStory< typeof QueryControls > = DefaultTemplate.bind(
 	{}
 );
 Default.args = {
@@ -59,18 +94,28 @@ Default.args = {
 		},
 	],
 	numberOfItems: 5,
-	onAuthorChange: noop,
-	onCategoryChange: noop,
-	onNumberOfItemsChange: noop,
-	onOrderByChange: noop,
-	onOrderChange: noop,
 	order: 'desc',
 	orderBy: 'date',
 	selectedAuthorId: 1,
 };
 
+const SingleCategoryTemplate: ComponentStory< typeof QueryControls > = ( props ) => {
+	const [ ownOrder, setOwnOrder ] = useState( props.order );
+	const [ ownOrderBy, setOwnOrderBy ] = useState( props.orderBy );
+	const [ ownSelectedCategoryId, setSelectedCategoryId ] = useState( props.selectedCategoryId );
+
+	return <QueryControls { ...{
+		...props,
+		onCategoryChange: setSelectedCategoryId,
+		onOrderByChange: setOwnOrderBy,
+		onOrderChange: setOwnOrder,
+		order: ownOrder,
+		orderBy: ownOrderBy,
+		selectedCategoryId: ownSelectedCategoryId,
+	} } />;
+};
 export const SelectSingleCategory: ComponentStory< typeof QueryControls > =
-	Template.bind( {} );
+	SingleCategoryTemplate.bind( {} );
 SelectSingleCategory.args = {
 	categoriesList: [
 		{
@@ -82,6 +127,5 @@ SelectSingleCategory.args = {
 			name: 'JavaScript',
 		},
 	],
-	onCategoryChange: noop,
 	selectedCategoryId: 11,
 };
