@@ -247,6 +247,7 @@ export default function QueryInspectorControls( {
 								onDeselect={ () => setQuerySearch( '' ) }
 							>
 								<TextControl
+									__nextHasNoMarginBottom
 									label={ __( 'Keyword' ) }
 									value={ querySearch }
 									onChange={ setQuerySearch }

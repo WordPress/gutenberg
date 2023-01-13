@@ -432,6 +432,7 @@ export default function NavigationLinkEdit( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Link settings' ) }>
 					<TextControl
+						__nextHasNoMarginBottom
 						value={ label ? stripHTML( label ) : '' }
 						onChange={ ( labelValue ) => {
 							setAttributes( { label: labelValue } );
@@ -440,6 +441,7 @@ export default function NavigationLinkEdit( {
 						autoComplete="off"
 					/>
 					<TextControl
+						__nextHasNoMarginBottom
 						value={ url || '' }
 						onChange={ ( urlValue ) => {
 							updateAttributes(
@@ -463,6 +465,7 @@ export default function NavigationLinkEdit( {
 						) }
 					/>
 					<TextControl
+						__nextHasNoMarginBottom
 						value={ title || '' }
 						onChange={ ( titleValue ) => {
 							setAttributes( { title: titleValue } );
@@ -471,6 +474,7 @@ export default function NavigationLinkEdit( {
 						autoComplete="off"
 					/>
 					<TextControl
+						__nextHasNoMarginBottom
 						value={ rel || '' }
 						onChange={ ( relValue ) => {
 							setAttributes( { rel: relValue } );

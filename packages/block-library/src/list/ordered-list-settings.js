@@ -9,6 +9,7 @@ const OrderedListSettings = ( { setAttributes, reversed, start } ) => (
 	<InspectorControls>
 		<PanelBody title={ __( 'Ordered list settings' ) }>
 			<TextControl
+				__nextHasNoMarginBottom
 				label={ __( 'Start value' ) }
 				type="number"
 				onChange={ ( value ) => {
