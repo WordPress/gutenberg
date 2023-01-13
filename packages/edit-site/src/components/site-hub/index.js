@@ -16,7 +16,6 @@ import {
 import { useReducedMotion, useViewportMatch } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { store as coreStore } from '@wordpress/core-data';
 import { forwardRef } from '@wordpress/element';
 
 /**
@@ -26,34 +25,36 @@ import { store as editSiteStore } from '../../store';
 import { useLocation } from '../routes';
 import getIsListPage from '../../utils/get-is-list-page';
 import SiteIcon from '../site-icon';
-import useEditedEntityRecord from '../use-edited-entity-record';
+import { useEntityRecordTitle } from '../use-edited-entity-record';
 
 const HUB_ANIMATION_DURATION = 0.3;
+
+function PostTitle( { postType, postId } ) {
+	return useEntityRecordTitle( 'postType', postType, postId );
+}
 
 const SiteHub = forwardRef(
 	( { isMobileCanvasVisible, setIsMobileCanvasVisible, ...props }, ref ) => {
 		const { params } = useLocation();
 		const isListPage = getIsListPage( params );
 		const isEditorPage = ! isListPage;
-		const { canvasMode, dashboardLink, entityConfig } = useSelect(
-			( select ) => {
-				select( editSiteStore ).getEditedPostType();
+		const { canvasMode, dashboardLink, context, postType, postId } =
+			useSelect( ( select ) => {
 				const {
 					__unstableGetCanvasMode,
 					getSettings,
 					getEditedPostType,
+					getEditedPostId,
+					getEditedPostContext,
 				} = select( editSiteStore );
 				return {
 					canvasMode: __unstableGetCanvasMode(),
 					dashboardLink: getSettings().__experimentalDashboardLink,
-					entityConfig: select( coreStore ).getEntityConfig(
-						'postType',
-						getEditedPostType()
-					),
+					postType: getEditedPostType(),
+					postId: getEditedPostId(),
+					context: getEditedPostContext(),
 				};
-			},
-			[]
-		);
+			}, [] );
 		const disableMotion = useReducedMotion();
 		const isMobileViewport = useViewportMatch( 'medium', '<' );
 		const { __unstableSetCanvasMode } = useDispatch( editSiteStore );
@@ -80,7 +81,6 @@ const SiteHub = forwardRef(
 						__unstableSetCanvasMode( 'view' );
 					},
 			  };
-		const { getTitle } = useEditedEntityRecord();
 
 		return (
 			<motion.div
@@ -122,11 +122,16 @@ const SiteHub = forwardRef(
 
 					{ showLabels && (
 						<VStack spacing={ 0 }>
-							<div className="edit-site-site-hub__title">
-								{ getTitle() }
-							</div>
+							{ !! context?.postType && !! context?.postType && (
+								<div className="edit-site-site-hub__title">
+									<PostTitle { ...context } />
+								</div>
+							) }
 							<div className="edit-site-site-hub__post-type">
-								{ entityConfig?.label }
+								<PostTitle
+									postType={ postType }
+									postId={ postId }
+								/>
 							</div>
 						</VStack>
 					) }

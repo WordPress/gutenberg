@@ -31,7 +31,9 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import TemplateDetails from '../../template-details';
-import useEditedEntityRecord from '../../use-edited-entity-record';
+import useEditedEntityRecord, {
+	useEntityRecordTitle,
+} from '../../use-edited-entity-record';
 
 function getBlockDisplayText( block ) {
 	if ( block ) {
@@ -66,6 +68,10 @@ function useSecondaryText() {
 	return {};
 }
 
+function PostTitle( { postType, postId } ) {
+	return useEntityRecordTitle( 'postType', postType, postId );
+}
+
 export default function DocumentActions() {
 	const showIconLabels = useSelect(
 		( select ) =>
@@ -75,7 +81,7 @@ export default function DocumentActions() {
 			),
 		[]
 	);
-	const { isLoaded, record, getTitle } = useEditedEntityRecord();
+	const { isLoaded, record } = useEditedEntityRecord();
 	const { label, icon } = useSecondaryText();
 
 	// Use internal state instead of a ref to make sure that the component
@@ -138,7 +144,7 @@ export default function DocumentActions() {
 							entityLabel
 						) }
 					</VisuallyHidden>
-					{ getTitle() }
+					<PostTitle postType={ record.type } postId={ record.id } />
 				</Text>
 				<div className="edit-site-document-actions__secondary-item">
 					<BlockIcon icon={ icon } showColors />
