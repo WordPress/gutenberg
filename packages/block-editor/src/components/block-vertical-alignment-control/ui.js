@@ -7,7 +7,13 @@ import { ToolbarGroup, ToolbarDropdownMenu } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { alignTop, alignCenter, alignBottom } from './icons';
+import {
+	alignTop,
+	alignCenter,
+	alignBottom,
+	alignStretch,
+	spaceBetween,
+} from './icons';
 
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	top: {
@@ -21,6 +27,14 @@ const BLOCK_ALIGNMENTS_CONTROLS = {
 	bottom: {
 		icon: alignBottom,
 		title: _x( 'Align bottom', 'Block vertical alignment setting' ),
+	},
+	stretch: {
+		icon: alignStretch,
+		title: _x( 'Stretch to fill', 'Block vertical alignment setting' ),
+	},
+	spaceBetween: {
+		icon: spaceBetween,
+		title: _x( 'Space between', 'Block vertical alignment setting' ),
 	},
 };
 
