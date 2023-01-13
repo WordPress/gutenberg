@@ -17,6 +17,14 @@ import type { Category, QueryControlsProps } from '../types';
 const meta: ComponentMeta< typeof QueryControls > = {
 	title: 'Components/QueryControls',
 	component: QueryControls,
+	argTypes: {
+		numberOfItems: { control: { type: null } },
+		order: { control: { type: null } },
+		orderBy: { control: { type: null } },
+		selectedAuthorId: { control: { type: null } },
+		selectedCategories: { control: { type: null } },
+		selectedCategoryId: { control: { type: null } },
+	},
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
@@ -57,7 +65,7 @@ const DefaultTemplate: ComponentStory< typeof QueryControls > = ( props ) => {
 	return (
 		<QueryControls
 			{ ...props }
-			selectedCategories={ ownSelectedCategories }
+			numberOfItems={ ownNumberOfItems }
 			onCategoryChange={ onCategoryChange }
 			onOrderByChange={ ( newOrderBy ) => {
 				setOwnOrderBy( newOrderBy as QueryControlsProps[ 'orderBy' ] );
@@ -67,12 +75,12 @@ const DefaultTemplate: ComponentStory< typeof QueryControls > = ( props ) => {
 			} }
 			order={ ownOrder }
 			orderBy={ ownOrderBy }
-			selectedAuthorId={ ownSelectedAuthorId }
-			numberOfItems={ ownNumberOfItems }
 			onNumberOfItemsChange={ setOwnNumberOfItems }
 			onAuthorChange={ ( newAuthor ) => {
 				setOwnSelectedAuthorId( Number( newAuthor ) );
 			} }
+			selectedAuthorId={ ownSelectedAuthorId }
+			selectedCategories={ ownSelectedCategories }
 		/>
 	);
 };
