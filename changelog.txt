@@ -78,6 +78,8 @@
 #### Block Library
 - Lodash: Remove `_.pickBy()` from latest posts block. ([46974](https://github.com/WordPress/gutenberg/pull/46974))
 
+### Accessibility
+- Block Editor: Revert `aria-controls` to `aria-owns` in `URLInput` to use the more broadly supported ARIA 1.0 combobox pattern. ([47148](https://github.com/WordPress/gutenberg/pull/47148))
 
 ### Experiments
 
