@@ -11,14 +11,14 @@ describe( 'buildTermsTree()', () => {
 		] );
 		const output = Object.freeze( [
 			{
-				id: 2232,
+				id: '2232',
 				name: 'foo',
 				parent: null,
 				children: [],
 				dummy: true,
 			},
 			{
-				id: 2245,
+				id: '2245',
 				name: 'baz',
 				parent: null,
 				children: [],
@@ -34,8 +34,8 @@ describe( 'buildTermsTree()', () => {
 			{ id: 2245, name: 'baz', parent: 0, dummy: false },
 		] );
 		const output = [
-			{ id: 2232, name: 'foo', parent: 0, children: [], dummy: true },
-			{ id: 2245, name: 'baz', parent: 0, children: [], dummy: false },
+			{ id: '2232', name: 'foo', parent: 0, children: [], dummy: true },
+			{ id: '2245', name: 'baz', parent: 0, children: [], dummy: false },
 		];
 		const termsTreem = buildTermsTree( input );
 		expect( termsTreem ).toEqual( output );
@@ -47,11 +47,11 @@ describe( 'buildTermsTree()', () => {
 		] );
 		const output = [
 			{
-				id: 2232,
+				id: '2232',
 				name: 'foo',
 				parent: 0,
 				children: [
-					{ id: 2245, name: 'baz', parent: 2232, children: [] },
+					{ id: '2245', name: 'baz', parent: 2232, children: [] },
 				],
 			},
 		];
@@ -67,15 +67,15 @@ describe( 'buildTermsTree()', () => {
 		] );
 		const output = [
 			{
-				id: 2232,
+				id: '2232',
 				name: 'a',
 				parent: 0,
 				children: [
-					{ id: 2245, name: 'b', parent: 2232, children: [] },
-					{ id: 2246, name: 'd', parent: 2232, children: [] },
+					{ id: '2245', name: 'b', parent: 2232, children: [] },
+					{ id: '2246', name: 'd', parent: 2232, children: [] },
 				],
 			},
-			{ id: 2249, name: 'c', parent: 0, children: [] },
+			{ id: '2249', name: 'c', parent: 0, children: [] },
 		];
 		const termsTreem = buildTermsTree( input );
 		expect( termsTreem ).toEqual( output );
