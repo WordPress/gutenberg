@@ -5,7 +5,7 @@ import * as github from '@actions/github';
 import * as core from '@actions/core';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import type { PullRequestEvent } from '@octokit/webhooks-types';
+import type { WorkflowRunCompletedEvent } from '@octokit/webhooks-types';
 
 /**
  * Internal dependencies
@@ -27,9 +27,12 @@ async function run() {
 		required: true,
 	} );
 
-	const { runId: runID, repo, ref } = github.context;
-	const runURL = `https://github.com/${ repo.owner }/${ repo.repo }/actions/runs/${ runID }`;
+	const { repo } = github.context;
+	// Cast the payload type: https://github.com/actions/toolkit/tree/main/packages/github#webhook-payload-typescript-definitions
+	const payload = github.context.payload as WorkflowRunCompletedEvent;
 	const api = new GitHubAPI( token, repo );
+	const headBranch = payload.workflow_run.head_branch;
+	const runURL = payload.workflow_run.html_url;
 
 	const flakyTestsDir = await fs.readdir( artifactPath );
 	const flakyTests = await Promise.all(
@@ -44,13 +47,6 @@ async function run() {
 		// No flaky tests reported in this run.
 		return;
 	}
-
-	const headBranch =
-		github.context.eventName === 'pull_request'
-			? // Cast the payload type: https://github.com/actions/toolkit/tree/main/packages/github#webhook-payload-typescript-definitions
-			  ( github.context.payload as PullRequestEvent ).pull_request.head
-					.ref
-			: ref.replace( /^refs\/(heads|tag)\//, '' );
 
 	const label = core.getInput( 'label', { required: true } );
 	const issues = await api.fetchAllIssuesLabeledFlaky( label );
@@ -165,16 +161,14 @@ async function run() {
 	}
 
 	const { html_url: commentUrl } =
-		github.context.eventName === 'pull_request'
+		payload.workflow_run.pull_requests.length > 0
 			? await api.createCommentOnPR(
-					// Cast the payload type: https://github.com/actions/toolkit/tree/main/packages/github#webhook-payload-typescript-definitions
-					( github.context.payload as PullRequestEvent ).number,
+					payload.workflow_run.pull_requests[ 0 ].number,
 					renderCommitComment( {
 						runURL,
 						reportedIssues,
-						commitSHA: (
-							github.context.payload as PullRequestEvent
-						 ).pull_request.head.sha,
+						commitSHA:
+							payload.workflow_run.pull_requests[ 0 ].head.sha,
 					} ),
 					isReportComment
 			  )

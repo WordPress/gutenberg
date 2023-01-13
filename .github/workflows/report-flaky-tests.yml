@@ -1,0 +1,73 @@
+name: Report flaky tests
+
+on:
+    workflow_run:
+        workflows: [End-to-End Tests]
+        types:
+            - completed
+
+jobs:
+    report-to-issues:
+        name: Report to GitHub
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+              with:
+                  ref: trunk
+
+            - name: Download flaky tests report artifact
+              uses: actions/github-script@v6
+              id: download-artifact
+              with:
+                  result-encoding: string
+                  script: |
+                      const { data: { artifacts } } = await github.rest.actions.listWorkflowRunArtifacts( {
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        run_id: context.payload.workflow_run.id,
+                      } );
+                      const matchArtifact = artifacts.find(
+                        ( artifact ) => artifact.name === 'flaky-tests-report'
+                      );
+                      if ( ! matchArtifact ) {
+                        return false;
+                      }
+                      const download = await github.rest.actions.downloadArtifact( {
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        artifact_id: matchArtifact.id,
+                        archive_format: 'zip',
+                      } );
+                      await require( 'fs/promises' ).writeFile(
+                        `${process.env.GITHUB_WORKSPACE}/flaky-tests-report.zip`,
+                        Buffer.from( download.data )
+                      );
+                      return true;
+
+            - name: Unzip artifact
+              if: ${{ steps.download-artifact.outputs.result == 'true' }}
+              run: unzip flaky-tests-report.zip -d flaky-tests
+
+            - name: Use desired version of NodeJS
+              if: ${{ steps.download-artifact.outputs.result == 'true' }}
+              uses: actions/setup-node@v3
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: npm
+
+            # Changing into the action's directory and running `npm install` is much
+            # faster than a full project-wide `npm ci`.
+            - name: npm install and build
+              if: ${{ steps.download-artifact.outputs.result == 'true' }}
+              working-directory: packages/report-flaky-tests
+              run: |
+                  npm install
+                  npm run bundle
+
+            - name: Report flaky tests
+              if: ${{ steps.download-artifact.outputs.result == 'true' }}
+              uses: ./packages/report-flaky-tests
+              with:
+                  repo-token: '${{ secrets.GITHUB_TOKEN }}'
+                  label: '[Type] Flaky Test'
+                  artifact-path: flaky-tests

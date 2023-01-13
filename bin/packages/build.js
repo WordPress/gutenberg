@@ -227,6 +227,7 @@ if ( files.length ) {
 				`**/{__mocks__,__tests__,test}/**`,
 				`**/{storybook,stories}/**`,
 				`**/e2e-test-utils-playwright/**`,
+				`**/report-flaky-tests/**`,
 			],
 			onlyFiles: true,
 		}
