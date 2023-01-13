@@ -30,6 +30,7 @@ exports[`core/more/edit/native should match snapshot when content is empty 1`] =
       fontFamily="serif"
       fontSize={16}
       isMultiline={false}
+      lineHeight={1}
       maxImagesWidth={200}
       onBlur={[Function]}
       onChange={[Function]}
@@ -77,6 +78,7 @@ exports[`core/more/edit/native should match snapshot when content is not empty 1
       fontFamily="serif"
       fontSize={16}
       isMultiline={false}
+      lineHeight={1}
       maxImagesWidth={200}
       onBlur={[Function]}
       onChange={[Function]}
