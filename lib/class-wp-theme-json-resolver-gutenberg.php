@@ -527,7 +527,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	public static function associate_user_variation_with_global_styles_post( $id ) {
 		$current_gs_id = static::get_user_global_styles_post_id();
 
-		if ( $id === $current_gs_id ) {
+		if ( ( (int) $id ) === $current_gs_id ) {
 			return false;
 		}
 

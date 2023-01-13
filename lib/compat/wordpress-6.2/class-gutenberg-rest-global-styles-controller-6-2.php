@@ -145,7 +145,7 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 	}
 
 	/**
-	 * Deletes the given global styles config.
+	 * Gets all user global styles.
 	 *
 	 * @since 6.2
 	 *
