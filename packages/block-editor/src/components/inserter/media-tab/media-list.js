@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -6,10 +11,14 @@ import {
 	__unstableUseCompositeState as useCompositeState,
 	__unstableCompositeItem as CompositeItem,
 	Tooltip,
+	DropdownMenu,
+	MenuGroup,
+	MenuItem,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { useMemo, useCallback } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
+import { useMemo, useCallback, useState } from '@wordpress/element';
 import { cloneBlock } from '@wordpress/blocks';
+import { moreVertical, external } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -18,10 +27,48 @@ import InserterDraggableBlocks from '../../inserter-draggable-blocks';
 import { getBlockAndPreviewFromMedia } from './utils';
 
 const MAXIMUM_TITLE_LENGTH = 25;
-function MediaPreview( { media, onClick, composite, mediaType } ) {
+const MEDIA_OPTIONS_POPOVER_PROPS = {
+	position: 'bottom left',
+	variant: 'toolbar',
+};
+
+function MediaPreviewOptions( { category, media } ) {
+	if ( ! category.getReportUrl ) {
+		return null;
+	}
+	const reportUrl = category.getReportUrl( media );
+	return (
+		<DropdownMenu
+			className="block-editor-inserter__media-list__item-preview-options"
+			label={ __( 'Options' ) }
+			popoverProps={ MEDIA_OPTIONS_POPOVER_PROPS }
+			icon={ moreVertical }
+		>
+			{ () => (
+				<MenuGroup>
+					<MenuItem
+						onClick={ () =>
+							window.open( reportUrl, '_blank' ).focus()
+						}
+						icon={ external }
+					>
+						{ sprintf(
+							/* translators: %s: The media type to report e.g: "image", "video", "audio" */
+							__( 'Report %s' ),
+							category.mediaType
+						) }
+					</MenuItem>
+				</MenuGroup>
+			) }
+		</DropdownMenu>
+	);
+}
+
+function MediaPreview( { media, onClick, composite, category } ) {
+	const [ isHovered, setIsHovered ] = useState( false );
 	const [ block, preview ] = useMemo(
-		() => getBlockAndPreviewFromMedia( media, mediaType ),
-		[ media, mediaType ]
+		() => getBlockAndPreviewFromMedia( media, category.mediaType ),
+		[ media, category.mediaType ]
 	);
 	const title = media.title?.rendered || media.title;
 	let truncatedTitle;
@@ -30,33 +77,46 @@ function MediaPreview( { media, onClick, composite, mediaType } ) {
 		truncatedTitle =
 			title.slice( 0, MAXIMUM_TITLE_LENGTH - omission.length ) + omission;
 	}
-	const baseCssClass = 'block-editor-inserter__media-list';
+	const onMouseEnter = useCallback( () => setIsHovered( true ), [] );
+	const onMouseLeave = useCallback( () => setIsHovered( false ), [] );
 	return (
 		<InserterDraggableBlocks isEnabled={ true } blocks={ [ block ] }>
 			{ ( { draggable, onDragStart, onDragEnd } ) => (
 				<div
-					className={ `${ baseCssClass }__list-item` }
+					className={ classnames(
+						'block-editor-inserter__media-list__list-item',
+						{
+							'is-hovered': isHovered,
+						}
+					) }
 					draggable={ draggable }
 					onDragStart={ onDragStart }
 					onDragEnd={ onDragEnd }
 				>
 					<Tooltip text={ truncatedTitle || title }>
-						<CompositeItem
-							role="option"
-							as="div"
-							{ ...composite }
-							className={ `${ baseCssClass }__item` }
-							onClick={ () => {
-								onClick( block );
-							} }
-							aria-label={ title }
+						{ /* Adding `is-hovered` class to the wrapper element is needed
+							because the options Popover is rendered outside of this node. */ }
+						<div
+							onMouseEnter={ onMouseEnter }
+							onMouseLeave={ onMouseLeave }
 						>
-							<div
-								className={ `${ baseCssClass }__item-preview` }
+							<CompositeItem
+								role="option"
+								as="div"
+								{ ...composite }
+								className="block-editor-inserter__media-list__item"
+								onClick={ () => onClick( block ) }
+								aria-label={ title }
 							>
-								{ preview }
-							</div>
-						</CompositeItem>
+								<div className="block-editor-inserter__media-list__item-preview">
+									{ preview }
+								</div>
+							</CompositeItem>
+							<MediaPreviewOptions
+								category={ category }
+								media={ media }
+							/>
+						</div>
 					</Tooltip>
 				</div>
 			) }
@@ -66,7 +126,7 @@ function MediaPreview( { media, onClick, composite, mediaType } ) {
 
 function MediaList( {
 	mediaList,
-	mediaType,
+	category,
 	onClick,
 	label = __( 'Media List' ),
 } ) {
@@ -88,7 +148,7 @@ function MediaList( {
 				<MediaPreview
 					key={ media.id || media.sourceId || index }
 					media={ media }
-					mediaType={ mediaType }
+					category={ category }
 					onClick={ onPreviewClick }
 					composite={ composite }
 				/>

@@ -151,6 +151,8 @@ const inserterMediaCategories = [
 				previewUrl: result.thumbnail,
 			} ) );
 		},
+		getReportUrl: ( { sourceId } ) =>
+			`https://wordpress.org/openverse/image/${ sourceId }/report/`,
 		hasAvailableMedia: true,
 	},
 ];

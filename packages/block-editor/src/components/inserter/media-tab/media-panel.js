@@ -73,7 +73,7 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 					rootClientId={ rootClientId }
 					onClick={ onInsert }
 					mediaList={ mediaList }
-					mediaType={ category.mediaType }
+					category={ category }
 				/>
 			) }
 		</div>
