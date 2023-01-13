@@ -23,6 +23,9 @@
 	"supports": {
 		"align": true,
 		"html": false,
+		"position": {
+			"sticky": true
+		},
 		"reusable": false
 	},
 	"editorStyle": "wp-block-template-part-editor"

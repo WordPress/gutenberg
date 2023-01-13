@@ -815,7 +815,7 @@ Edit the different global regions of your site, like the header, footer, sidebar
 
 -	**Name:** core/template-part
 -	**Category:** theme
--	**Supports:** align, ~~html~~, ~~reusable~~
+-	**Supports:** align, position (sticky), ~~html~~, ~~reusable~~
 -	**Attributes:** area, slug, tagName, theme
 
 ## Term Description
