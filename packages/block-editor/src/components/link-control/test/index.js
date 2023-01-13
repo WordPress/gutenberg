@@ -140,6 +140,17 @@ describe( 'Basic rendering', () => {
 		expect( searchInput ).toBeInTheDocument();
 	} );
 
+	it( 'should have aria-owns attribute to follow the ARIA 1.0 pattern', () => {
+		render( <LinkControl /> );
+
+		// Search Input UI.
+		const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
+
+		expect( searchInput ).toBeInTheDocument();
+		expect( searchInput ).not.toHaveAttribute( 'aria-controls' );
+		expect( searchInput ).toHaveAttribute( 'aria-owns' );
+	} );
+
 	it( 'should not render protocol in links', async () => {
 		const user = userEvent.setup();
 		mockFetchSearchSuggestions.mockImplementation( () =>
@@ -1375,6 +1386,15 @@ describe( 'Selecting links', () => {
 				firstSearchSuggestion
 			);
 
+			// Check aria-selected attribute is omitted on non-highlighted items.
+			expect( firstSearchSuggestion ).toHaveAttribute(
+				'aria-selected',
+				'true'
+			);
+			expect( secondSearchSuggestion ).not.toHaveAttribute(
+				'aria-selected'
+			);
+
 			// Check we can go down again using the down arrow.
 			triggerArrowDown( searchInput );
 
@@ -1387,6 +1407,15 @@ describe( 'Selecting links', () => {
 				secondSearchSuggestion
 			);
 
+			// Check aria-selected attribute is omitted on non-highlighted items.
+			expect( firstSearchSuggestion ).not.toHaveAttribute(
+				'aria-selected'
+			);
+			expect( secondSearchSuggestion ).toHaveAttribute(
+				'aria-selected',
+				'true'
+			);
+
 			// Check we can go back up via up arrow.
 			triggerArrowUp( searchInput );
 
@@ -1397,6 +1426,15 @@ describe( 'Selecting links', () => {
 			// We should be back to highlighting the first search result again.
 			expect( selectedSearchResultElement ).toEqual(
 				firstSearchSuggestion
+			);
+
+			// Check aria-selected attribute is omitted on non-highlighted items.
+			expect( firstSearchSuggestion ).toHaveAttribute(
+				'aria-selected',
+				'true'
+			);
+			expect( secondSearchSuggestion ).not.toHaveAttribute(
+				'aria-selected'
 			);
 
 			expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
