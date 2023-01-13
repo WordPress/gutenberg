@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { safeDecodeURIComponent } from '.';
+import { safeDecodeURIComponent } from './safe-decode-uri-component';
 import { getQueryString } from './get-query-string';
 
 /** @typedef {import('./get-query-arg').QueryArgParsed} QueryArgParsed */
