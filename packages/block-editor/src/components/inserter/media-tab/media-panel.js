@@ -62,7 +62,6 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 					searchLabel
 				) }
 			/>
-			{ category.description }
 			{ isLoading && (
 				<div className={ `${ baseCssClass }-spinner` }>
 					<Spinner />

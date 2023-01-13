@@ -18,7 +18,7 @@ export function getBlockAndPreviewFromMedia( media, mediaType ) {
 	// Add the common attributes between the different media types.
 	const attributes = {
 		id: media.id || undefined,
-		caption: media.caption || undefined, // TODO: probably check to escape for security
+		caption: media.caption || undefined,
 	};
 	const mediaSrc = media.url;
 	const alt = media.alt || undefined;
@@ -35,6 +35,12 @@ export function getBlockAndPreviewFromMedia( media, mediaType ) {
 			alt={ alt }
 			controls={ mediaType === 'audio' ? true : undefined }
 			inert="true"
+			onError={ ( { currentTarget } ) => {
+				// Fallback to the media source if the preview cannot be loaded.
+				if ( currentTarget.src === media.previewUrl ) {
+					currentTarget.src = mediaSrc;
+				}
+			} }
 		/>
 	);
 	return [ createBlock( `core/${ mediaType }`, attributes ), preview ];

@@ -114,11 +114,10 @@ const inserterMediaCategories = [
 		searchLabel: 'Openverse',
 		name: 'openverse',
 		mediaType: 'image',
-		description: <p>{ __( 'Disclaimer message' ) }</p>,
 		async fetch( query = {} ) {
 			const defaultArgs = {
 				mature: false,
-				excluded_source: 'flickr',
+				excluded_source: 'flickr,inaturalist,wikimedia',
 				license: 'pdm,cc0',
 			};
 			const finalQuery = { ...query, ...defaultArgs };
