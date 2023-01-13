@@ -88,6 +88,12 @@ $block-preview-height: 150px;
 	padding: $grid-unit-20;
 }
 
+.edit-site-screen-background-color__control {
+	.block-editor-color-gradient-control__panel {
+		padding: $grid-unit-20;
+	}
+}
+
 .edit-site-global-styles-variations_item {
 	box-sizing: border-box;
 
