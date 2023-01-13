@@ -16,7 +16,7 @@ import {
 	useStyle,
 } from './hooks';
 
-function ScreenBackgroundColor( { name } ) {
+function ScreenBackgroundColor( { name, variationPath = '' } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	const [ solids ] = useSetting( 'color.palette', name );
 	const [ gradients ] = useSetting( 'color.gradients', name );
@@ -39,16 +39,23 @@ function ScreenBackgroundColor( { name } ) {
 		supports.includes( 'background' ) &&
 		( gradients.length > 0 || areCustomGradientsEnabled );
 	const [ backgroundColor, setBackgroundColor ] = useStyle(
-		'color.background',
+		variationPath + 'color.background',
 		name
 	);
 	const [ userBackgroundColor ] = useStyle(
-		'color.background',
+		variationPath + 'color.background',
 		name,
 		'user'
 	);
-	const [ gradient, setGradient ] = useStyle( 'color.gradient', name );
-	const [ userGradient ] = useStyle( 'color.gradient', name, 'user' );
+	const [ gradient, setGradient ] = useStyle(
+		variationPath + 'color.gradient',
+		name
+	);
+	const [ userGradient ] = useStyle(
+		variationPath + 'color.gradient',
+		name,
+		'user'
+	);
 
 	if ( ! hasBackgroundColor && ! hasGradientColor ) {
 		return null;

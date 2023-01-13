@@ -70,7 +70,7 @@ describe( 'AlignmentUI', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Align',
+				name: 'Align text',
 			} )
 		);
 

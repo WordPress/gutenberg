@@ -122,7 +122,9 @@ function ScreenRoot() {
 								aria-label={ __( 'Additional CSS' ) }
 							>
 								<HStack justify="space-between">
-									<FlexItem>{ __( 'Custom' ) }</FlexItem>
+									<FlexItem>
+										{ __( 'Additional CSS' ) }
+									</FlexItem>
 									<IconWithCurrentColor
 										icon={
 											isRTL() ? chevronLeft : chevronRight

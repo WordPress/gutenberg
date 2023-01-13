@@ -78,18 +78,6 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-block-inspector-tabs',
-		__( 'Block inspector tabs ', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Test a new block inspector view splitting settings and appearance controls into tabs', 'gutenberg' ),
-			'id'    => 'gutenberg-block-inspector-tabs',
-		)
-	);
-
-	add_settings_field(
 		'gutenberg-global-styles-custom-css',
 		__( 'Global styles custom css ', 'gutenberg' ),
 		'gutenberg_display_experiment_field',

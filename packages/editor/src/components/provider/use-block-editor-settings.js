@@ -135,7 +135,6 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				Object.entries( settings ).filter( ( [ key ] ) =>
 					[
 						'__experimentalBlockDirectory',
-						'__experimentalBlockInspectorTabs',
 						'__experimentalDiscussionSettings',
 						'__experimentalFeatures',
 						'__experimentalPreferredStyleVariations',
@@ -143,6 +142,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 						'__unstableGalleryWithImageBlocks',
 						'alignWide',
 						'allowedBlockTypes',
+						'blockInspectorTabs',
 						'bodyPlaceholder',
 						'canLockBlocks',
 						'codeEditingEnabled',

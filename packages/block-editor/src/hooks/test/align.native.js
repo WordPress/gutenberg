@@ -83,7 +83,7 @@ describe( 'Align options', () => {
 					expect( paragraphBlock ).toBeVisible();
 
 					// Open alignments menu
-					const alignmentButtons = getByLabelText( 'Align' );
+					const alignmentButtons = getByLabelText( 'Align text' );
 					fireEvent.press( alignmentButtons );
 
 					// Select alignment option.

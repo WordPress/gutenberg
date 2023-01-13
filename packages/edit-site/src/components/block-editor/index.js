@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback, useMemo, useRef, Fragment } from '@wordpress/element';
+import { useCallback, useMemo, useRef } from '@wordpress/element';
 import {
 	useEntityBlockEditor,
 	__experimentalFetchMedia as fetchMedia,
@@ -19,12 +19,10 @@ import {
 	__experimentalLinkControl,
 	BlockInspector,
 	BlockTools,
-	__unstableBlockToolbarLastItem,
 	__unstableUseClipboardHandler as useClipboardHandler,
 	__unstableUseTypingObserver as useTypingObserver,
 	BlockEditorKeyboardShortcuts,
 	store as blockEditorStore,
-	__unstableBlockNameContext,
 } from '@wordpress/block-editor';
 import {
 	useMergeRefs,
@@ -32,9 +30,6 @@ import {
 	useResizeObserver,
 } from '@wordpress/compose';
 import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
-import { listView } from '@wordpress/icons';
-import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -54,19 +49,20 @@ const LAYOUT = {
 	alignments: [],
 };
 
-export default function BlockEditor( { setIsInserterOpen } ) {
+export default function BlockEditor() {
+	const { setPage, setIsInserterOpened } = useDispatch( editSiteStore );
 	const { storedSettings, templateType, canvasMode } = useSelect(
 		( select ) => {
 			const { getSettings, getEditedPostType, __unstableGetCanvasMode } =
 				select( editSiteStore );
 
 			return {
-				storedSettings: getSettings( setIsInserterOpen ),
+				storedSettings: getSettings( setIsInserterOpened ),
 				templateType: getEditedPostType(),
 				canvasMode: __unstableGetCanvasMode(),
 			};
 		},
-		[ setIsInserterOpen ]
+		[ setIsInserterOpened ]
 	);
 
 	const settingsBlockPatterns =
@@ -136,7 +132,6 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		'postType',
 		templateType
 	);
-	const { setPage } = useDispatch( editSiteStore );
 
 	const contentRef = useRef();
 	const mergedRefs = useMergeRefs( [
@@ -158,33 +153,6 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const isViewMode = canvasMode === 'view';
 	const showBlockAppender =
 		( isTemplatePart && hasBlocks ) || isViewMode ? false : undefined;
-
-	// eslint-disable-next-line @wordpress/data-no-store-string-literals
-	const { enableComplementaryArea } = useDispatch( 'core/interface' );
-
-	const NavMenuSidebarToggle = () => (
-		<ToolbarGroup>
-			<ToolbarButton
-				className="components-toolbar__control"
-				label={ __( 'Open navigation list view' ) }
-				onClick={ () =>
-					enableComplementaryArea(
-						'core/edit-site',
-						'edit-site/block-inspector'
-					)
-				}
-				icon={ listView }
-			/>
-		</ToolbarGroup>
-	);
-
-	let MaybeNavMenuSidebarToggle = Fragment;
-	const isOffCanvasNavigationEditorEnabled =
-		window?.__experimentalEnableOffCanvasNavigationEditor === true;
-
-	if ( isOffCanvasNavigationEditorEnabled ) {
-		MaybeNavMenuSidebarToggle = NavMenuSidebarToggle;
-	}
 
 	return (
 		<BlockEditorProvider
@@ -252,15 +220,6 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 									/>
 								</EditorCanvas>
 							</ResizableEditor>
-							<__unstableBlockToolbarLastItem>
-								<__unstableBlockNameContext.Consumer>
-									{ ( blockName ) =>
-										blockName === 'core/navigation' && (
-											<MaybeNavMenuSidebarToggle />
-										)
-									}
-								</__unstableBlockNameContext.Consumer>
-							</__unstableBlockToolbarLastItem>
 						</BlockTools>
 					)
 				}

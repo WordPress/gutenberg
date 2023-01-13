@@ -132,6 +132,9 @@ test.describe( 'Buttons', () => {
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
 		await page.click(
+			`role=region[name="Editor settings"i] >> role=tab[name="Settings"i]`
+		);
+		await page.click(
 			'role=group[name="Button width"i] >> role=button[name="25%"i]'
 		);
 

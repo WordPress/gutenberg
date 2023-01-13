@@ -67,6 +67,7 @@ const ExperimentControls = ( props ) => {
 		onCreateNew,
 		onSelectClassicMenu,
 		onSelectNavigationMenu,
+		isManageMenusButtonDisabled,
 	} = props;
 
 	return (
@@ -88,6 +89,7 @@ const ExperimentControls = ( props ) => {
 					}
 					createNavigationMenuIsError={ createNavigationMenuIsError }
 					actionLabel={ actionLabel }
+					isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
 				/>
 			</HStack>
 			<ExperimentMainContent { ...props } />
@@ -116,6 +118,7 @@ const DefaultControls = ( props ) => {
 				createNavigationMenuIsSuccess={ createNavigationMenuIsSuccess }
 				createNavigationMenuIsError={ createNavigationMenuIsError }
 				actionLabel={ actionLabel }
+				isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
 			/>
 			<ManageMenusButton disabled={ isManageMenusButtonDisabled } />
 		</>
@@ -125,7 +128,7 @@ const DefaultControls = ( props ) => {
 const MenuInspectorControls = ( props ) => {
 	const isOffCanvasNavigationEditorEnabled =
 		window?.__experimentalEnableOffCanvasNavigationEditor === true;
-	const menuControlsSlot = window?.__experimentalEnableBlockInspectorTabs
+	const menuControlsSlot = isOffCanvasNavigationEditorEnabled
 		? 'list'
 		: undefined;
 
