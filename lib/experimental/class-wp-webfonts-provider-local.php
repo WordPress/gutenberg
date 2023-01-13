@@ -85,14 +85,14 @@ class WP_Webfonts_Provider_Local extends WP_Webfonts_Provider {
 	 *      font-style:normal;
 	 *      font-weight:200 900;
 	 *      font-stretch:normal;
-	 *      src:local("Source Serif Pro"), url('/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2') format('woff2');
+	 *      src:url('/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2') format('woff2');
 	 * }
 	 * @font-face{
 	 *      font-family:"Source Serif Pro";
 	 *      font-style:italic;
 	 *      font-weight:200 900;
 	 *      font-stretch:normal;
-	 *      src:local("Source Serif Pro"), url('/assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2') format('woff2');
+	 *      src:url('/assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2') format('woff2');
 	 * }
 	 * </code>
 	 *
@@ -256,6 +256,8 @@ class WP_Webfonts_Provider_Local extends WP_Webfonts_Provider {
 				? ", url({$item['url']})"
 				: ", url('{$item['url']}') format('{$item['format']}')";
 		}
+
+		$src = ltrim( $src, ',' );
 		return $src;
 	}
 

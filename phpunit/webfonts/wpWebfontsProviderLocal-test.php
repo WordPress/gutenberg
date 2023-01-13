@@ -112,7 +112,7 @@ class Tests_Webfonts_WpWebfontsProviderLocal extends WP_UnitTestCase {
 				'expected' => array(
 					'style-element' => "<style id='wp-webfonts-local' type='text/css'>\n%s\n</style>\n",
 					'font-face-css' => <<<CSS
-@font-face{font-family:"Open Sans";font-style:italic;font-weight:bold;src:local("Open Sans"), url('http://example.org/assets/fonts/OpenSans-Italic-VariableFont_wdth,wght.ttf') format('truetype');}
+@font-face{font-family:"Open Sans";font-style:italic;font-weight:bold;src:url('http://example.org/assets/fonts/OpenSans-Italic-VariableFont_wdth,wght.ttf') format('truetype');}
 CSS
 					,
 				),
@@ -139,7 +139,7 @@ CSS
 				'expected' => array(
 					'style-element' => "<style id='wp-webfonts-local' type='text/css'>\n%s\n</style>\n",
 					'font-face-css' => <<<CSS
-@font-face{font-family:"Source Serif Pro";font-style:normal;font-weight:200 900;font-stretch:normal;src:local("Source Serif Pro"), url('http://example.org/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2') format('woff2');}@font-face{font-family:"Source Serif Pro";font-style:italic;font-weight:200 900;font-stretch:normal;src:local("Source Serif Pro"), url('http://example.org/assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2') format('woff2');}
+@font-face{font-family:"Source Serif Pro";font-style:normal;font-weight:200 900;font-stretch:normal;src:url('http://example.org/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2') format('woff2');}@font-face{font-family:"Source Serif Pro";font-style:italic;font-weight:200 900;font-stretch:normal;src:url('http://example.org/assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2') format('woff2');}
 CSS
 
 					,
