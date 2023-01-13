@@ -16,6 +16,7 @@ import {
 	Button,
 	TextControl,
 	ToolbarButton,
+	ToolbarDropdownMenu,
 } from '@wordpress/components';
 import {
 	InspectorControls,
@@ -30,7 +31,7 @@ import {
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
-import { upload, caption as captionIcon } from '@wordpress/icons';
+import { upload, caption as captionIcon, pencil } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { useEffect, useState, useCallback } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
@@ -57,8 +58,17 @@ function PostFeaturedImageDisplay( {
 	context: { postId, postType: postTypeSlug, queryId },
 } ) {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
-	const { isLink, height, width, scale, sizeSlug, rel, linkTarget, caption } =
-		attributes;
+	const {
+		isLink,
+		height,
+		width,
+		scale,
+		sizeSlug,
+		rel,
+		linkTarget,
+		caption,
+		displayCaption,
+	} = attributes;
 	const [ featuredImage, setFeaturedImage ] = useEntityProp(
 		'postType',
 		postTypeSlug,
@@ -99,7 +109,7 @@ function PostFeaturedImageDisplay( {
 				media:
 					featuredImage &&
 					getMedia( featuredImage, {
-						context: 'view',
+						context: 'edit',
 					} ),
 				postType: postTypeSlug && getPostType( postTypeSlug ),
 			};
@@ -107,6 +117,49 @@ function PostFeaturedImageDisplay( {
 		[ featuredImage, postTypeSlug ]
 	);
 	const mediaUrl = getMediaSourceUrlBySizeSlug( media, sizeSlug );
+
+	const mediaLibraryCaption = !! media?.caption?.raw
+		? media?.caption?.raw
+		: '';
+
+	const captionControls = [
+		{
+			role: 'menuitemradio',
+			title: __( 'Media Library caption' ),
+			isActive: displayCaption === true,
+			icon: captionIcon,
+			label: !! displayCaption
+				? __( 'Hide Media Library caption' )
+				: __( 'Show Media library caption' ),
+			onClick: () => {
+				setAttributes( {
+					displayCaption: !! displayCaption ? false : true,
+					caption: undefined,
+				} );
+				if ( showCaption === true ) {
+					setShowCaption( ! showCaption );
+				}
+			},
+		},
+		{
+			role: 'menuitemradio',
+			title: __( 'Custom caption' ),
+			isActive: showCaption === true,
+			icon: pencil,
+			label: !! displayCaption
+				? __( 'Remove caption' )
+				: __( 'Add caption' ),
+			onClick: () => {
+				setAttributes( {
+					displayCaption: false,
+				} );
+				setShowCaption( ! showCaption );
+				if ( showCaption && caption ) {
+					setAttributes( { caption: undefined } );
+				}
+			},
+		},
+	];
 
 	const imageSizes = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().imageSizes,
@@ -155,21 +208,49 @@ function PostFeaturedImageDisplay( {
 	const controls = (
 		<>
 			<BlockControls group="block">
-				<ToolbarButton
-					onClick={ () => {
-						setShowCaption( ! showCaption );
-						if ( showCaption && caption ) {
-							setAttributes( { caption: undefined } );
+				{ mediaLibraryCaption && ! isDescendentOfQueryLoop && (
+					<ToolbarDropdownMenu
+						icon={ captionIcon }
+						label={ __( 'Caption' ) }
+						controls={ captionControls }
+					/>
+				) }
+				{ ! mediaLibraryCaption && ! isDescendentOfQueryLoop && (
+					<ToolbarButton
+						onClick={ () => {
+							setShowCaption( ! showCaption );
+							if ( showCaption && caption ) {
+								setAttributes( { caption: undefined } );
+							}
+						} }
+						icon={ captionIcon }
+						isPressed={ showCaption }
+						label={
+							showCaption
+								? __( 'Remove caption' )
+								: __( 'Add caption' )
 						}
-					} }
-					icon={ captionIcon }
-					isPressed={ showCaption }
-					label={
-						showCaption
-							? __( 'Remove caption' )
-							: __( 'Add caption' )
-					}
-				/>
+					/>
+				) }
+				{ mediaLibraryCaption && isDescendentOfQueryLoop && (
+					<ToolbarButton
+						onClick={ () => {
+							setAttributes( {
+								displayCaption: !! displayCaption
+									? false
+									: true,
+								caption: undefined,
+							} );
+						} }
+						icon={ captionIcon }
+						isPressed={ displayCaption }
+						label={
+							!! displayCaption
+								? __( 'Hide Media Library caption' )
+								: __( 'Show Media Library caption' )
+						}
+					/>
+				) }
 			</BlockControls>
 			<DimensionControls
 				clientId={ clientId }
@@ -313,6 +394,7 @@ function PostFeaturedImageDisplay( {
 					clientId={ clientId }
 				/>
 				{ showCaption &&
+					! displayCaption &&
 					( ! RichText.isEmpty( caption ) || isSelected ) && (
 						<RichText
 							tagName="figcaption"
@@ -334,6 +416,15 @@ function PostFeaturedImageDisplay( {
 							}
 						/>
 					) }
+				{ displayCaption && (
+					<figcaption
+						className={ __experimentalGetElementClassName(
+							'caption'
+						) }
+					>
+						{ mediaLibraryCaption }
+					</figcaption>
+				) }
 			</figure>
 		</>
 	);

@@ -49,6 +49,10 @@
 		"customGradient": {
 			"type": "string"
 		},
+		"displayCaption": {
+			"type": "boolean",
+			"default": false
+		},
 		"caption": {
 			"type": "string"
 		}
