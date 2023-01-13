@@ -59,11 +59,11 @@ const DefaultTemplate: ComponentStory< typeof QueryControls > = ( props ) => {
 			{ ...props }
 			selectedCategories={ ownSelectedCategories }
 			onCategoryChange={ onCategoryChange }
-			onOrderChange={ ( newOrder ) => {
-				setOwnOrder( newOrder as QueryControlsProps[ 'order' ] );
-			} }
 			onOrderByChange={ ( newOrderBy ) => {
 				setOwnOrderBy( newOrderBy as QueryControlsProps[ 'orderBy' ] );
+			} }
+			onOrderChange={ ( newOrder ) => {
+				setOwnOrder( newOrder as QueryControlsProps[ 'order' ] );
 			} }
 			order={ ownOrder }
 			orderBy={ ownOrderBy }
@@ -131,11 +131,11 @@ const SingleCategoryTemplate: ComponentStory< typeof QueryControls > = (
 			onCategoryChange={ ( newCategory ) => {
 				setSelectedCategoryId( Number( newCategory ) );
 			} }
-			onOrderChange={ ( newOrder ) => {
-				setOwnOrder( newOrder as QueryControlsProps[ 'order' ] );
-			} }
 			onOrderByChange={ ( newOrderBy ) => {
 				setOwnOrderBy( newOrderBy as QueryControlsProps[ 'orderBy' ] );
+			} }
+			onOrderChange={ ( newOrder ) => {
+				setOwnOrder( newOrder as QueryControlsProps[ 'order' ] );
 			} }
 			order={ ownOrder }
 			orderBy={ ownOrderBy }
