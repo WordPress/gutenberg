@@ -9,6 +9,18 @@
 		gap: 0.5em;
 		align-items: center;
 	}
+
+	/*
+	Small tweak to left-align the checkbox.
+	Even though `:has` is not currently supported in Firefox, this is a small tweak
+	and does not affect the functionality of the block or the user's experience.
+	There will be a minor inconsistency between browsers. However, it's more important to provide
+	a better experience for 80+% of users, until Firefor catches up and supports `:has`.
+	*/
+	&:has(input[type="checkbox"]) {
+		width: fit-content;
+		flex-direction: row-reverse;
+	}
 }
 
 .wp-block-form-input__label-content {
