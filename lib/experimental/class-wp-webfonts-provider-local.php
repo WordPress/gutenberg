@@ -257,7 +257,7 @@ class WP_Webfonts_Provider_Local extends WP_Webfonts_Provider {
 				: ", url('{$item['url']}') format('{$item['format']}')";
 		}
 
-		$src = ltrim( $src, ',' );
+		$src = ltrim( $src, ', ' );
 		return $src;
 	}
 
