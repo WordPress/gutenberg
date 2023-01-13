@@ -5,6 +5,7 @@
 ### Bug Fix
 
 -   `BlockInspector`: Fix browser warning error when block is not selected ([#46875](https://github.com/WordPress/gutenberg/pull/46875)).
+-   Move component styles needed for iframes to content styles ([#47103](https://github.com/WordPress/gutenberg/pull/47103)).
 
 ## 11.1.0 (2023-01-02)
 
