@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { TextControl } from '@wordpress/components';
+import { __experimentalNumberControl as NumberControl } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
@@ -25,13 +25,11 @@ export const PageAttributesOrder = ( { onUpdateOrder, order = 0 } ) => {
 	};
 	const value = orderInput === null ? order : orderInput;
 	return (
-		<TextControl
-			className="editor-page-attributes__order"
-			type="number"
+		<NumberControl
 			label={ __( 'Order' ) }
 			value={ value }
 			onChange={ setUpdatedOrder }
-			size={ 6 }
+			labelPosition="side"
 			onBlur={ () => {
 				setOrderInput( null );
 			} }
