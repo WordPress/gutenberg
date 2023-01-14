@@ -135,6 +135,7 @@ function NonDefaultControls( { format, onChange } ) {
 			</BaseControl>
 			{ isCustom && (
 				<TextControl
+					__nextHasNoMarginBottom
 					label={ __( 'Custom format' ) }
 					hideLabelFromVision
 					help={ createInterpolateElement(
