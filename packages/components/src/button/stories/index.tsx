@@ -126,11 +126,8 @@ const meta: ComponentMeta< typeof Button > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof Button > = ( {
-	children,
-	...props
-} ) => {
-	return <Button { ...props }>{ children }</Button>;
+const Template: ComponentStory< typeof Button > = ( props ) => {
+	return <Button { ...props }></Button>;
 };
 
 export const Default: ComponentStory< typeof Button > = Template.bind( {} );
@@ -176,7 +173,7 @@ Icon.args = {
 	icon: 'wordpress',
 };
 
-export const groupedIcons: ComponentStory< typeof Button > = () => {
+export const GroupedIcons: ComponentStory< typeof Button > = () => {
 	const GroupContainer = ( { children }: { children: ReactNode } ) => (
 		<div style={ { display: 'inline-flex' } }>{ children }</div>
 	);
