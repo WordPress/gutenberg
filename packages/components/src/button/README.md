@@ -121,67 +121,71 @@ The presence of a `href` prop determines whether an `anchor` element is rendered
 
 Props not included in this set will be applied to the `a` or `button` element.
 
-#### disabled
+#### `children`: `ReactNode`
+
+The button's children.
+
+-   Required: No
+
+#### `disabled`: `boolean`
 
 Whether the button is disabled. If `true`, this will force a `button` element to be rendered.
 
--   Type: `Boolean`
 -   Required: No
 
-#### href
+#### `describedBy`: `string`
+
+An accessible description for the button.
+
+-   Required: No
+
+#### `href`: `string`
 
 If provided, renders `a` instead of `button`.
 
--   Type: `String`
 -   Required: No
 
-#### variant
+#### `variant`: `string`
 
 Specifies the button's style. The accepted values are `'primary'` (the primary button styles), `'secondary'` (the default button styles), `'tertiary'` (the text-based button styles), and `'link'` (the link button styles).
 
--   Type: `String`
 -   Required: No
 
-#### isDestructive
+#### `isDestructive`: `boolean`
 
 Renders a red text-based button style to indicate destructive behavior.
 
--   Type: `Boolean`
 -   Required: No
 
-#### isSmall
+#### `isSmall`: `boolean`
 
 Decreases the size of the button.
 
 -   Type: `Boolean`
 -   Required: No
 
-#### isPressed
+#### `isPressed`: `boolean`
 
 Renders a pressed button style.
 
--   Type: `Boolean`
 -   Required: No
 
-#### isBusy
+#### `isBusy`: `boolean`
 
 Indicates activity while a action is being performed.
 
--   Type: `Boolean`
 -   Required: No
 
-#### focus
+#### `focus`: `boolean`
 
 Whether the button is focused.
 
--   Type: `Boolean`
 -   Required: No
 
-#### target
+#### `target`: `string`
 
 If provided with `href`, sets the `target` attribute to the `a`.
 
--   Type: `String`
 -   Required: No
 
 #### className
@@ -191,61 +195,54 @@ An optional additional class name to apply to the rendered button.
 -   Type: `String`
 -   Required: No
 
-#### icon
+#### `icon`: `IconProps< unknown >[ 'icon' ]`
 
 If provided, renders an [Icon](/packages/components/src/icon/README.md) component inside the button.
 
--   Type: `String|Function|WPComponent|null`
 -   Required: No
 
-#### iconSize
+#### `iconSize`: `IconProps< unknown >[ 'size' ]`
 
 If provided with `icon`, sets the icon size. Please refer to the [Icon](/packages/components/src/icon/README.md) component for more details regarding the default value of its `size` prop.
 
--   Type: `Number`
 -   Required: No
 
-#### iconPosition
+#### `iconPosition`: `'left' | 'right'`
 
 If provided with `icon`, sets the position of icon relative to the `text`. Available options are `left|right`.
 
--   Type: `string`
 -   Required: No
 -   Default: `left`
 
-#### text
+#### `text`: `string`
 
 If provided, displays the given text inside the button. If the button contains children elements, the text is displayed before them.
 
--   Type: `String`
 -   Required: No
 
-#### showTooltip
+#### `showTooltip`: `boolean`
 
 If provided, renders a [Tooltip](/packages/components/src/tooltip/README.md) component for the button.
 
--   Type: `Boolean`
 -   Required: No
 
-#### tooltipPosition
+#### `tooltipPosition`: `string`
 
 If provided with`showTooltip`, sets the position of the tooltip. Please refer to the [Tooltip](/packages/components/src/tooltip/README.md) component for more details regarding the defaults.
 
 -   Type: `String`
 -   Require: No
 
-#### shortcut
+#### `shortcut`: `string | object`
 
 If provided with `showTooltip`, appends the Shortcut label to the tooltip content. If an `Object` is provided, it should contain `display` and `ariaLabel` keys.
 
--   Type: `String|Object`
 -   Required: No
 
-#### label
+#### `label`: `string`
 
 Sets the `aria-label` of the component, if none is provided. Sets the Tooltip content if `showTooltip` is provided.
 
--   Type: `String`
 -   Required: No
 
 ## Related components

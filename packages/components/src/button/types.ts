@@ -14,7 +14,7 @@ export type ButtonProps = {
 	 */
 	children?: ReactNode;
 	/**
-	 * The accessible description for the button.
+	 * An accessible description for the button.
 	 */
 	describedBy?: string;
 	/**
@@ -92,7 +92,7 @@ export type ButtonProps = {
 	/**
 	 * Specifies the button's style.
 	 * The accepted values are:
-	 * primary' (the primary button styles)
+	 * 'primary' (the primary button styles)
 	 * 'secondary' (the default button styles)
 	 * 'tertiary' (the text-based button styles)
 	 * 'link' (the link button styles)
