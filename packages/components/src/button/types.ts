@@ -69,9 +69,9 @@ export type ButtonProps = {
 	label?: string;
 	/**
 	 * If provided with `showTooltip`, appends the Shortcut label to the tooltip content.
-	 * If an `Object` is provided, it should contain `display` and `ariaLabel` keys.
+	 * If an object is provided, it should contain `display` and `ariaLabel` keys.
 	 */
-	shortcut?: string | Object;
+	shortcut?: string | { display: string; ariaLabel: string };
 	/**
 	 * If provided, renders a Tooltip component for the button.
 	 */

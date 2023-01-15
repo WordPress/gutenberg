@@ -233,9 +233,9 @@ If provided with`showTooltip`, sets the position of the tooltip. Please refer to
 -   Type: `String`
 -   Require: No
 
-#### `shortcut`: `string | object`
+#### `shortcut`: `string | { display: string; ariaLabel: string; }`
 
-If provided with `showTooltip`, appends the Shortcut label to the tooltip content. If an `Object` is provided, it should contain `display` and `ariaLabel` keys.
+If provided with `showTooltip`, appends the Shortcut label to the tooltip content. If an object is provided, it should contain `display` and `ariaLabel` keys.
 
 -   Required: No
 
