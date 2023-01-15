@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import type { ForwardedRef, HTMLProps, MouseEvent } from 'react';
+import type { ForwardedRef, HTMLProps, MouseEvent, ReactElement } from 'react';
 
 /**
  * WordPress dependencies
@@ -163,7 +163,7 @@ export function UnforwardedButton(
 			// There's a label and...
 			( !! label &&
 				// The children are empty and...
-				( ! Array.isArray( children ) || ! children?.length ) &&
+				! ( children as string | ReactElement[] )?.length &&
 				// The tooltip is not explicitly disabled.
 				false !== showTooltip ) );
 
@@ -209,7 +209,7 @@ export function UnforwardedButton(
 		<>
 			<Tooltip
 				text={
-					Array.isArray( children ) && children?.length && describedBy
+					( children as string | ReactElement[] )?.length && describedBy
 						? describedBy
 						: label
 				}
