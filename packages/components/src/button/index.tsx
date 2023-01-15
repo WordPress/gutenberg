@@ -172,15 +172,17 @@ export function UnforwardedButton(
 	const describedById =
 		additionalProps[ 'aria-describedby' ] || descriptionId;
 
-	const element = (
-		<Tag
-			{ ...tagProps }
-			{ ...additionalProps }
-			className={ classes }
-			aria-label={ additionalProps[ 'aria-label' ] || label }
-			aria-describedby={ describedById }
-			ref={ ref }
-		>
+	const elementProps = {
+		...tagProps,
+		...additionalProps,
+		className: classes,
+		'aria-label': additionalProps[ 'aria-label' ] || label,
+		'aria-describedby': describedById,
+		ref,
+	};
+
+	const elementChildren = (
+		<>
 			{ icon && iconPosition === 'left' && (
 				<Icon icon={ icon } size={ iconSize } />
 			) }
@@ -189,8 +191,24 @@ export function UnforwardedButton(
 				<Icon icon={ icon } size={ iconSize } />
 			) }
 			{ children }
-		</Tag>
+		</>
 	);
+
+	const element =
+		Tag === 'a' ? (
+			<a { ...( elementProps as WordPressComponentProps< {}, 'a' > ) }>
+				{ elementChildren }
+			</a>
+		) : (
+			<button
+				{ ...( elementProps as WordPressComponentProps<
+					{},
+					'button'
+				> ) }
+			>
+				{ elementChildren }
+			</button>
+		);
 
 	if ( ! shouldShowTooltip ) {
 		return (
