@@ -106,11 +106,13 @@ export function UnforwardedButton(
 	);
 
 	const hasChildren =
-		Array.isArray( children ) &&
-		children?.[ 0 ] &&
-		children[ 0 ] !== null &&
-		// Tooltip should not considered as a child
-		children?.[ 0 ]?.props?.className !== 'components-tooltip';
+		( 'string' === typeof children && !! children ) || (
+			Array.isArray( children ) &&
+			children?.[ 0 ] &&
+			children[ 0 ] !== null &&
+			// Tooltip should not considered as a child
+			children?.[ 0 ]?.props?.className !== 'components-tooltip'
+		);
 
 	const classes = classnames( 'components-button', className, {
 		'is-secondary': variant === 'secondary',
