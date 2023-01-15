@@ -106,13 +106,12 @@ export function UnforwardedButton(
 	);
 
 	const hasChildren =
-		( 'string' === typeof children && !! children ) || (
-			Array.isArray( children ) &&
+		( 'string' === typeof children && !! children ) ||
+		( Array.isArray( children ) &&
 			children?.[ 0 ] &&
 			children[ 0 ] !== null &&
 			// Tooltip should not considered as a child
-			children?.[ 0 ]?.props?.className !== 'components-tooltip'
-		);
+			children?.[ 0 ]?.props?.className !== 'components-tooltip' );
 
 	const classes = classnames( 'components-button', className, {
 		'is-secondary': variant === 'secondary',
@@ -196,13 +195,18 @@ export function UnforwardedButton(
 
 	const element =
 		Tag === 'a' ? (
-			<a { ...( elementProps as WordPressComponentProps< {}, 'a' > ) }>
+			<a
+				{ ...( elementProps as WordPressComponentProps<
+					ButtonProps,
+					'a'
+				> ) }
+			>
 				{ elementChildren }
 			</a>
 		) : (
 			<button
 				{ ...( elementProps as WordPressComponentProps<
-					{},
+					ButtonProps,
 					'button'
 				> ) }
 			>
@@ -227,7 +231,8 @@ export function UnforwardedButton(
 		<>
 			<Tooltip
 				text={
-					( children as string | ReactElement[] )?.length && describedBy
+					( children as string | ReactElement[] )?.length &&
+					describedBy
 						? describedBy
 						: label
 				}
