@@ -240,6 +240,8 @@ If provided with`showTooltip`, sets the position of the tooltip. Please refer to
 
 Specifies the button's style. The accepted values are `'primary'` (the primary button styles), `'secondary'` (the default button styles), `'tertiary'` (the text-based button styles), and `'link'` (the link button styles).
 
+-   Required: No
+
 ## Related components
 
 -   To group buttons together, use the [ButtonGroup](/packages/components/src/button-group/README.md) component.
