@@ -1,12 +1,11 @@
 /**
  * External dependencies
  */
-import type { ReactNode } from 'react';
+import type { MouseEvent, ReactNode } from 'react';
 
 /**
  * Internal dependencies
  */
-import type { Button } from '../button';
 import type { IconType } from '../icon';
 
 type Tab< IconProps = unknown > = {
@@ -35,7 +34,7 @@ type Tab< IconProps = unknown > = {
 export type TabButtonProps< IconProps = unknown > = {
 	children: ReactNode;
 	label?: string;
-	onClick: Parameters< typeof Button >[ 0 ][ 'onClick' ];
+	onClick: ( event: MouseEvent ) => void;
 	selected: boolean;
 	showTooltip?: boolean;
 	tabId: string;
