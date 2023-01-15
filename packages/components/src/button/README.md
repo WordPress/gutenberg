@@ -161,7 +161,6 @@ Renders a red text-based button style to indicate destructive behavior.
 
 Decreases the size of the button.
 
--   Type: `Boolean`
 -   Required: No
 
 #### `isPressed`: `boolean`
@@ -188,11 +187,10 @@ If provided with `href`, sets the `target` attribute to the `a`.
 
 -   Required: No
 
-#### className
+#### `className`: `string`
 
 An optional additional class name to apply to the rendered button.
 
--   Type: `String`
 -   Required: No
 
 #### `icon`: `IconProps< unknown >[ 'icon' ]`
@@ -230,8 +228,7 @@ If provided, renders a [Tooltip](/packages/components/src/tooltip/README.md) com
 
 If provided with`showTooltip`, sets the position of the tooltip. Please refer to the [Tooltip](/packages/components/src/tooltip/README.md) component for more details regarding the defaults.
 
--   Type: `String`
--   Require: No
+-   Required: No
 
 #### `shortcut`: `string | { display: string; ariaLabel: string; }`
 
