@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [**] Gallery block: Address styling regression, in which negative margin was added [#47086]
 
 ## 1.87.0
 -   [*] Add capabilities to force only Core blocks and control Support section [#46215]

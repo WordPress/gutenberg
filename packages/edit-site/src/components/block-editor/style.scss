@@ -78,20 +78,49 @@
 }
 
 .resizable-editor__drag-handle {
-	$height: 100px;
 	position: absolute;
 	top: 0;
 	bottom: 0;
 	padding: 0;
 	margin: auto 0;
-	width: $grid-unit-05;
-	height: $height;
+	width: $grid-unit-15;
 	appearance: none;
 	cursor: ew-resize;
 	outline: none;
-	background: $gray-600;
-	border-radius: 2px;
+	background: none;
+	border-radius: $radius-block-ui;
 	border: 0;
+
+	&.is-variation-default {
+		height: 100px;
+	}
+
+	&.is-variation-separator {
+		height: 100%;
+
+		&::after {
+			width: 1px;
+			border-radius: 0;
+			background: $gray-800;
+			left: auto;
+			right: 50%;
+			transition: all ease 0.2s;
+			transition-delay: 0.1s;
+			@include reduce-motion;
+		}
+	}
+
+	&::after {
+		position: absolute;
+		top: 0;
+		left: $grid-unit-05;
+		right: 0;
+		bottom: 0;
+		content: "";
+		width: $grid-unit-05;
+		background: $gray-600;
+		border-radius: $radius-block-ui;
+	}
 
 	&.is-left {
 		left: -$grid-unit-20;
@@ -103,10 +132,17 @@
 
 	&:hover,
 	&:active {
-		background: $gray-400;
+		opacity: 1;
+		&.is-variation-default::after {
+			background: $gray-400;
+		}
+		&.is-variation-separator::after {
+			width: 2px;
+			background: var(--wp-admin-theme-color);
+		}
 	}
 
-	&:focus {
+	&:focus::after {
 		box-shadow: 0 0 0 1px $gray-800, 0 0 0 calc(var(--wp-admin-border-width-focus) + 1px) var(--wp-admin-theme-color);
 	}
 }

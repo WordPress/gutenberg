@@ -48,7 +48,7 @@ function ScaledBlockPreview( {
 				...styles,
 				...__experimentalStyles,
 				{
-					css: 'body{height:auto;overflow:hidden;}',
+					css: 'body{height:auto;overflow:hidden;border:none;}',
 					__unstableType: 'presets',
 				},
 			];

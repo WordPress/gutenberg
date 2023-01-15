@@ -16,8 +16,6 @@ import Navigation from '..';
 import NavigationItem from '../item';
 import NavigationMenu from '../menu';
 
-jest.useFakeTimers();
-
 const TestNavigation = ( { activeItem, rootTitle, showBadge } = {} ) => (
 	<Navigation activeItem={ activeItem }>
 		<NavigationMenu title={ rootTitle }>
@@ -192,9 +190,7 @@ describe( 'Navigation', () => {
 	} );
 
 	it( 'should set an active category on click', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render( <TestNavigation /> );
 
@@ -236,9 +232,7 @@ describe( 'Navigation', () => {
 	} );
 
 	it( 'should navigate up a level when clicking the back button', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render( <TestNavigation rootTitle="Home" /> );
 
@@ -252,9 +246,7 @@ describe( 'Navigation', () => {
 	} );
 
 	it( 'should navigate correctly when controlled', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render( <TestNavigationControlled /> );
 
