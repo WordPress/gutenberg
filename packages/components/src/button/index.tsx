@@ -25,7 +25,7 @@ import type {
 	TagName,
 } from './types';
 
-const disabledEventsOnDisabledButton: Array< DisabledEvent > = [
+const disabledEventsOnDisabledButton: DisabledEvent[] = [
 	'onMouseDown',
 	'onClick',
 ];
