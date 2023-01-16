@@ -19,7 +19,7 @@ import Button from '../button';
 import type { NoticeAction, SnackbarProps } from './types';
 import type { WordPressComponentProps } from '../ui/context';
 
-const NOTICE_TIMEOUT = 10000;
+const NOTICE_TIMEOUT = 5000;
 
 /**
  * Custom hook which announces the message with the given politeness, if a
