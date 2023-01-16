@@ -87,7 +87,7 @@ function Notice( {
 		}
 	);
 
-	if ( __unstableHTML ) {
+	if ( __unstableHTML && typeof children === 'string' ) {
 		children = <RawHTML>{ children }</RawHTML>;
 	}
 

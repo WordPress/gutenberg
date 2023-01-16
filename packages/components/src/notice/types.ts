@@ -23,6 +23,8 @@ type NoticeActionWithOnClick = CommonNoticeActionProps & {
 
 export type NoticeAction = NoticeActionWithURL | NoticeActionWithOnClick;
 
+type NoticeChildren = string | JSX.Element;
+
 export type NoticeProps = {
 	/**
 	 * The displayed message of a notice. Also used as the spoken message for
