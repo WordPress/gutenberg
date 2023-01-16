@@ -458,7 +458,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		 * If a block's block.json skips serialization for spacing or spacing.blockGap,
 		 * don't apply the user-defined value to the styles.
 		 */
-		$should_skip_gap_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' );
+		$should_skip_gap_serialization = wp_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' );
 
 		$style = gutenberg_get_layout_style(
 			".$container_class.$container_class",
