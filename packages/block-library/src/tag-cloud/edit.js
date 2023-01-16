@@ -109,6 +109,7 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>
 				<SelectControl
+					__nextHasNoMarginBottom
 					label={ __( 'Taxonomy' ) }
 					options={ getTaxonomyOptions() }
 					value={ taxonomy }

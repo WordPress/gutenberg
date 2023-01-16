@@ -28,8 +28,11 @@ import BlockPatternList from '../block-patterns-list';
 import PatternsExplorerModal from './block-patterns-explorer/explorer';
 import MobileTabNavigation from './mobile-tab-navigation';
 
-function usePatternsCategories() {
-	const [ allPatterns, allCategories ] = usePatternsState();
+function usePatternsCategories( rootClientId ) {
+	const [ allPatterns, allCategories ] = usePatternsState(
+		undefined,
+		rootClientId
+	);
 
 	const hasRegisteredCategory = useCallback(
 		( pattern ) => {
@@ -128,7 +131,7 @@ export function BlockPatternsCategoryPanel( {
 		rootClientId
 	);
 
-	const availableCategories = usePatternsCategories();
+	const availableCategories = usePatternsCategories( rootClientId );
 	const currentCategoryPatterns = useMemo(
 		() =>
 			allPatterns.filter( ( pattern ) => {
@@ -184,7 +187,7 @@ function BlockPatternsTabs( {
 	rootClientId,
 } ) {
 	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
-	const categories = usePatternsCategories();
+	const categories = usePatternsCategories( rootClientId );
 	const isMobile = useViewportMatch( 'medium', '<' );
 	return (
 		<>

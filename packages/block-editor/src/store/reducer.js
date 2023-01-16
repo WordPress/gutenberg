@@ -1829,14 +1829,19 @@ export function highlightedBlock( state, action ) {
 export function lastBlockInserted( state = {}, action ) {
 	switch ( action.type ) {
 		case 'INSERT_BLOCKS':
+		case 'REPLACE_BLOCKS':
+		case 'REPLACE_INNER_BLOCKS':
 			if ( ! action.blocks.length ) {
 				return state;
 			}
 
-			const clientId = action.blocks[ 0 ].clientId;
+			const clientIds = action.blocks.map( ( block ) => {
+				return block.clientId;
+			} );
+
 			const source = action.meta?.source;
 
-			return { clientId, source };
+			return { clientIds, source };
 		case 'RESET_BLOCKS':
 			return {};
 	}

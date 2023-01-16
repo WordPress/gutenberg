@@ -183,6 +183,7 @@ $z-layers: (
 	".edit-site-layout__header": 2,
 	".edit-site-layout__canvas-container": 2,
 	".edit-site-layout__sidebar": 1,
+	".edit-site-layout__canvas-container.is-resizing::after": 100,
 );
 
 @function z-index( $key ) {

@@ -308,11 +308,11 @@ add_action( 'init', 'register_block_core_navigation_submenu' );
 function gutenberg_disable_tabs_for_navigation_submenu_block( $settings ) {
 	$current_tab_settings = _wp_array_get(
 		$settings,
-		array( '__experimentalBlockInspectorTabs' ),
+		array( 'blockInspectorTabs' ),
 		array()
 	);
 
-	$settings['__experimentalBlockInspectorTabs'] = array_merge(
+	$settings['blockInspectorTabs'] = array_merge(
 		$current_tab_settings,
 		array( 'core/navigation-submenu' => false )
 	);

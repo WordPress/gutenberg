@@ -247,15 +247,10 @@ export function useBlockNameForPatterns( clientId, attributes ) {
 			if ( ! activeVariationName ) {
 				return;
 			}
-			const {
-				getBlockRootClientId,
-				__experimentalGetPatternsByBlockTypes,
-			} = select( blockEditorStore );
+			const { getBlockRootClientId, getPatternsByBlockTypes } =
+				select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
-			return __experimentalGetPatternsByBlockTypes(
-				blockName,
-				rootClientId
-			);
+			return getPatternsByBlockTypes( blockName, rootClientId );
 		},
 		[ clientId, activeVariationName ]
 	);

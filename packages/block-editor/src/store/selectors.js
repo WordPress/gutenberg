@@ -2313,7 +2313,7 @@ export const __experimentalGetAllowedPatterns = createSelector(
  *
  * @return {Array} The list of matched block patterns based on declared `blockTypes` and block name.
  */
-export const __experimentalGetPatternsByBlockTypes = createSelector(
+export const getPatternsByBlockTypes = createSelector(
 	( state, blockNames, rootClientId = null ) => {
 		if ( ! blockNames ) return EMPTY_ARRAY;
 		const patterns = __experimentalGetAllowedPatterns(
@@ -2328,6 +2328,27 @@ export const __experimentalGetPatternsByBlockTypes = createSelector(
 				normalizedBlockNames.includes( blockName )
 			)
 		);
+	},
+	( state, blockNames, rootClientId ) => [
+		...__experimentalGetAllowedPatterns.getDependants(
+			state,
+			rootClientId
+		),
+	]
+);
+
+export const __experimentalGetPatternsByBlockTypes = createSelector(
+	( state, blockNames, rootClientId = null ) => {
+		deprecated(
+			'wp.data.select( "core/block-editor" ).__experimentalGetPatternsByBlockTypes',
+			{
+				alternative:
+					'wp.data.select( "core/block-editor" ).getPatternsByBlockTypes',
+				since: '6.2',
+				version: '6.4',
+			}
+		);
+		return getPatternsByBlockTypes( state, blockNames, rootClientId );
 	},
 	( state, blockNames, rootClientId ) => [
 		...__experimentalGetAllowedPatterns.getDependants(
@@ -2384,17 +2405,14 @@ export const __experimentalGetPatternTransformItems = createSelector(
 		 * block pattern's blocks and try to find matches from the selected blocks.
 		 * Now this happens in the consumer to avoid heavy operations in the selector.
 		 */
-		return __experimentalGetPatternsByBlockTypes(
+		return getPatternsByBlockTypes(
 			state,
 			selectedBlockNames,
 			rootClientId
 		);
 	},
 	( state, blocks, rootClientId ) => [
-		...__experimentalGetPatternsByBlockTypes.getDependants(
-			state,
-			rootClientId
-		),
+		...getPatternsByBlockTypes.getDependants( state, rootClientId ),
 	]
 );
 
@@ -2647,19 +2665,19 @@ export const __experimentalGetActiveBlockIdByBlockNames = createSelector(
 export function wasBlockJustInserted( state, clientId, source ) {
 	const { lastBlockInserted } = state;
 	return (
-		lastBlockInserted.clientId === clientId &&
+		lastBlockInserted.clientIds?.includes( clientId ) &&
 		lastBlockInserted.source === source
 	);
 }
 
 /**
- * Gets the client id of the last inserted block.
+ * Gets the client ids of the last inserted blocks.
  *
  * @param {Object} state Global application state.
- * @return {string|undefined} Client Id of the last inserted block.
+ * @return {Array|undefined} Client Ids of the last inserted block(s).
  */
-export function getLastInsertedBlockClientId( state ) {
-	return state?.lastBlockInserted?.clientId;
+export function getLastInsertedBlocksClientIds( state ) {
+	return state?.lastBlockInserted?.clientIds;
 }
 
 /**

@@ -97,6 +97,7 @@ const ColorPicker = (
 			<AuxiliaryColorArtefactWrapper>
 				<AuxiliaryColorArtefactHStackHeader justify="space-between">
 					<SelectControl
+						__nextHasNoMarginBottom
 						options={ options }
 						value={ colorType }
 						onChange={ ( nextColorType ) =>
