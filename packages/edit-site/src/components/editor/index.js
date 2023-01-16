@@ -37,6 +37,7 @@ import { store as editSiteStore } from '../../store';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
 import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
 import useTitle from '../routes/use-title';
+import CanvasSpinner from '../canvas-spinner';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor content landmark region. */
@@ -149,7 +150,7 @@ export default function Editor() {
 	useTitle( isReady && __( 'Editor (beta)' ) );
 
 	if ( ! isReady ) {
-		return null;
+		return <CanvasSpinner />;
 	}
 
 	return (
