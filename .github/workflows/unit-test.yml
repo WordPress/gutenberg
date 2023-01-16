@@ -208,7 +208,7 @@ jobs:
             - name: Ensure version-controlled files are not modified during the tests
               run: git diff --exit-code
 
-    # This job is deprecated but should temporarily be present for compatibility reasons.
+    # This job is deprecated but be present for compatibility reasons.
     unit-php:
         name: PHP
         runs-on: ubuntu-latest
