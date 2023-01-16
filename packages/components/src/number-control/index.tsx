@@ -19,12 +19,19 @@ import deprecated from '@wordpress/deprecated';
 import { Input, SpinButton } from './styles/number-control-styles';
 import * as inputControlActionTypes from '../input-control/reducer/actions';
 import { add, roundClamp } from '../utils/math';
-import { ensureNumber, ensureString, isValueEmpty } from '../utils/values';
+import {
+	ensureFiniteNumber,
+	ensureFiniteNumberAsString,
+	isValueEmpty,
+} from '../utils/values';
 import type { WordPressComponentProps } from '../ui/context/wordpress-component';
 import type { NumberControlProps } from './types';
 import { HStack } from '../h-stack';
 import { Spacer } from '../spacer';
 import { computeStep, constrainValue, spinValue } from './utils';
+
+const DEFAULT_STEP = 1;
+const DEFAULT_SHIFT_STEP = 10;
 
 function UnforwardedNumberControl(
 	{
@@ -39,8 +46,8 @@ function UnforwardedNumberControl(
 		max = Infinity,
 		min = -Infinity,
 		required = false,
-		shiftStep = 10,
-		step = 1,
+		shiftStep = DEFAULT_SHIFT_STEP,
+		step = DEFAULT_STEP,
 		type: typeProp = 'number',
 		value: valueProp,
 		size = 'default',
@@ -64,14 +71,21 @@ function UnforwardedNumberControl(
 	}
 
 	const valuePropAsString =
-		valueProp !== undefined ? ensureString( valueProp ) : undefined;
-	const shiftStepAsNumber = ensureNumber( shiftStep );
+		valueProp !== undefined
+			? ensureFiniteNumberAsString( valueProp ) ?? undefined
+			: undefined;
+	const shiftStepAsNumber =
+		ensureFiniteNumber( shiftStep ) ?? DEFAULT_SHIFT_STEP;
 
 	const inputRef = useRef< HTMLInputElement >();
 	const mergedRef = useMergeRefs( [ inputRef, forwardedRef ] );
 
 	const isStepAny = step === 'any';
-	const baseStep = isStepAny ? 1 : ensureNumber( step );
+	// Base step is `1` when `step="any". Use `1` as a fallback in case
+	// `step` prop couldn't be parsed to a finite number.
+	const baseStep = isStepAny
+		? DEFAULT_STEP
+		: ensureFiniteNumber( step ) ?? DEFAULT_STEP;
 	const baseValue = roundClamp( 0, min, max, baseStep );
 
 	const autoComplete = typeProp === 'number' ? 'off' : undefined;
@@ -102,9 +116,9 @@ function UnforwardedNumberControl(
 				 ).payload.event;
 				const valueToSpin = isValueEmpty( currentValue )
 					? baseValue
-					: ensureNumber( currentValue );
+					: ensureFiniteNumber( currentValue ) ?? baseValue;
 
-				nextState.value = ensureString(
+				const nextValue = ensureFiniteNumberAsString(
 					spinValue( {
 						value: valueToSpin,
 						direction:
@@ -120,6 +134,10 @@ function UnforwardedNumberControl(
 						min,
 					} )
 				);
+
+				if ( nextValue !== null ) {
+					nextState.value = nextValue;
+				}
 			}
 
 			/**
@@ -173,9 +191,9 @@ function UnforwardedNumberControl(
 
 					const valueToConstrain = isValueEmpty( currentValue )
 						? baseValue
-						: ensureNumber( currentValue );
+						: ensureFiniteNumber( currentValue ) ?? baseValue;
 
-					nextState.value = ensureString(
+					const nextValue = ensureFiniteNumberAsString(
 						constrainValue( {
 							value: add( valueToConstrain, distance ),
 							isStepAny,
@@ -187,6 +205,10 @@ function UnforwardedNumberControl(
 								: undefined,
 						} )
 					);
+
+					if ( nextValue !== null ) {
+						nextState.value = nextValue;
+					}
 				}
 			}
 
@@ -201,17 +223,23 @@ function UnforwardedNumberControl(
 					currentValue === undefined ||
 					( required === false && currentValue === '' );
 
-				nextState.value = applyEmptyValue
+				const nextValue = applyEmptyValue
 					? ''
-					: ensureString(
+					: ensureFiniteNumberAsString(
 							constrainValue( {
-								value: ensureNumber( currentValue ),
+								value:
+									ensureFiniteNumber( currentValue ) ??
+									baseValue,
 								isStepAny,
 								min,
 								max,
 								baseStep,
 							} )
 					  );
+
+				if ( nextValue !== null ) {
+					nextState.value = nextValue;
+				}
 			}
 
 			return nextState;
@@ -220,33 +248,38 @@ function UnforwardedNumberControl(
 	const buildSpinButtonClickHandler =
 		( direction: 'up' | 'down' ) =>
 		( event: MouseEvent< HTMLButtonElement > ) => {
+			if ( onChange === undefined ) {
+				return;
+			}
+
 			const valueToSpin = isValueEmpty( valuePropAsString )
 				? baseValue
-				: ensureNumber( valuePropAsString );
+				: ensureFiniteNumber( valuePropAsString ) ?? baseValue;
 
-			return onChange?.(
-				ensureString(
-					spinValue( {
-						value: valueToSpin,
-						direction,
-						event,
-						isShiftStepEnabled,
-						shiftStep: shiftStepAsNumber,
-						baseStep,
-						isStepAny,
-						min,
-						max,
-					} )
-				),
-				{
+			const onChangeValue = ensureFiniteNumberAsString(
+				spinValue( {
+					value: valueToSpin,
+					direction,
+					event,
+					isShiftStepEnabled,
+					shiftStep: shiftStepAsNumber,
+					baseStep,
+					isStepAny,
+					min,
+					max,
+				} )
+			);
+
+			if ( onChangeValue !== null ) {
+				return onChange( onChangeValue, {
 					// Set event.target to the <input> so that consumers can use
 					// e.g. event.target.validity.
 					event: {
 						...event,
 						target: inputRef.current!,
 					},
-				}
-			);
+				} );
+			}
 		};
 
 	return (

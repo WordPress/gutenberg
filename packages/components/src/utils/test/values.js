@@ -1,7 +1,11 @@
 /**
  * Internal dependencies
  */
-import { isValueNumeric, ensureString, ensureNumber } from '../values';
+import {
+	isValueNumeric,
+	ensureFiniteNumberAsString,
+	ensureFiniteNumber,
+} from '../values';
 
 /**
  * This works because Node 12 ships with `small-icu` instead of `full-icu`
@@ -100,7 +104,7 @@ describe( 'isValueNumeric', () => {
 	} );
 } );
 
-describe( 'ensureString', () => {
+describe( 'ensureFiniteNumberAsString', () => {
 	it.each( [
 		[ '1', '1' ],
 		[ 'abc', 'abc' ],
@@ -110,30 +114,32 @@ describe( 'ensureString', () => {
 		[ 0, '0' ],
 		[ '0', '0' ],
 		[ '', '' ],
-		[ NaN, 'NaN' ],
+		[ NaN, null ],
 	] )(
-		'should convert `%s` (unknown) to `%s` (string)',
+		'should convert `%s` (type unknown) to `%s` (type string)',
 		( input, expectedOutput ) => {
-			expect( ensureString( input ) ).toBe( expectedOutput );
+			expect( ensureFiniteNumberAsString( input ) ).toBe(
+				expectedOutput
+			);
 		}
 	);
 } );
 
-describe( 'ensureNumber', () => {
+describe( 'ensureFiniteNumber', () => {
 	it.each( [
 		[ '1', 1 ],
-		[ 'abc', NaN ],
+		[ 'abc', null ],
 		[ 2e3, 2000 ],
 		[ 42, 42 ],
 		[ -14, -14 ],
 		[ 0, 0 ],
 		[ '0', 0 ],
-		[ '', NaN ],
-		[ 'NaN', NaN ],
+		[ '', null ],
+		[ 'NaN', null ],
 	] )(
-		'should convert `%s` (unknown) to `%s` (string)',
+		'should convert `%s` (type unknown) to `%s` (type string)',
 		( input, expectedOutput ) => {
-			expect( ensureNumber( input ) ).toBe( expectedOutput );
+			expect( ensureFiniteNumber( input ) ).toBe( expectedOutput );
 		}
 	);
 } );
