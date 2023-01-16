@@ -7,6 +7,7 @@ import type { ChangeEvent } from 'react';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
+import { forwardRef, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -39,7 +40,7 @@ import type { WordPressComponentProps } from '../ui/context';
  * };
  * ```
  */
-export function TextareaControl(
+export function UnforwardedTextareaControl(
 	props: WordPressComponentProps< TextareaControlProps, 'textarea', false >
 ) {
 	const {
@@ -57,7 +58,7 @@ export function TextareaControl(
 	const id = `inspector-textarea-control-${ instanceId }`;
 	const onChangeValue = ( event: ChangeEvent< HTMLTextAreaElement > ) =>
 		onChange( event.target.value );
-
+	const textareaRef = useRef( null );
 	return (
 		<BaseControl
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
@@ -71,6 +72,7 @@ export function TextareaControl(
 				className="components-textarea-control__input"
 				id={ id }
 				rows={ rows }
+				ref={ textareaRef }
 				onChange={ onChangeValue }
 				aria-describedby={ !! help ? id + '__help' : undefined }
 				value={ value }
@@ -80,4 +82,6 @@ export function TextareaControl(
 	);
 }
 
-export default TextareaControl;
+export const TextTextareaControl = forwardRef( UnforwardedTextareaControl );
+
+export default TextTextareaControl;
