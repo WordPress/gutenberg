@@ -233,7 +233,17 @@ export default function Layout( { onError } ) {
 								} }
 								handleComponent={ {
 									right: (
-										<ResizeHandle variation="separator" />
+										<ResizeHandle
+											direction="right"
+											variation="separator"
+											resizeWidthBy={ ( delta ) => {
+												setForcedWidth(
+													( forcedWidth ??
+														defaultSidebarWidth ) +
+														delta
+												);
+											} }
+										/>
 									),
 								} }
 								handleClasses={ undefined }

@@ -89,6 +89,10 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 		min-height: 100%;
 		@include custom-scrollbars-on-hover;
 	}
+
+	.resizable-editor__drag-handle {
+		right: 0;
+	}
 }
 
 .edit-site-layout__canvas-container {
