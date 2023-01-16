@@ -233,9 +233,7 @@ export default function Layout( { onError } ) {
 								} }
 								handleComponent={ {
 									right: (
-										<ResizeHandle
-											variation="separator"
-										/>
+										<ResizeHandle variation="separator" />
 									),
 								} }
 								handleClasses={ undefined }
