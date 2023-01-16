@@ -673,6 +673,24 @@ _Returns_
 
 -   `?string`: Adjacent block's client ID, or null if none exists.
 
+### getPatternsByBlockTypes
+
+Returns the list of patterns based on their declared `blockTypes`
+and a block's name.
+Patterns can use `blockTypes` to integrate in work flows like
+suggesting appropriate patterns in a Placeholder state(during insertion)
+or blocks transformations.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _blockNames_ `string|string[]`: Block's name or array of block names to find matching pattens.
+-   _rootClientId_ `?string`: Optional target root client ID.
+
+_Returns_
+
+-   `Array`: The list of matched block patterns based on declared `blockTypes` and block name.
+
 ### getPreviousBlockClientId
 
 Returns the previous block's client ID from the given reference start ID.
