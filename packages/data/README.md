@@ -508,10 +508,6 @@ _Returns_
 
 -   `Object`: Object containing the action creators.
 
-### experiments
-
-Undocumented declaration.
-
 ### plugins
 
 Object of available plugins to use with a registry.
