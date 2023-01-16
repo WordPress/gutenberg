@@ -82,6 +82,6 @@ export function UnforwardedTextareaControl(
 	);
 }
 
-export const TextTextareaControl = forwardRef( UnforwardedTextareaControl );
+export const TextareaControl = forwardRef( UnforwardedTextareaControl );
 
-export default TextTextareaControl;
+export default TextareaControl;
