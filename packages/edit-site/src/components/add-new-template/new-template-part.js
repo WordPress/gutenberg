@@ -42,11 +42,11 @@ export default function NewTemplatePart( {
 		}
 
 		try {
-			const cleanSlug = getCleanTemplatePartSlug( title );
 			const uniqueTitle = getUniqueTemplatePartTitle(
 				title,
 				existingTemplateParts
 			);
+			const cleanSlug = getCleanTemplatePartSlug( uniqueTitle );
 
 			const templatePart = await saveEntityRecord(
 				'postType',
