@@ -23,7 +23,7 @@ gutenberg_pre_init();
  *
  * @since 0.1.0
  */
-function gutenberg_wordpress_version_notice() {
+function gutenberg_wordpress_version_notice   () {
 	echo '<div class="error"><p>';
 	/* translators: %s: Minimum required version */
 	printf( __( 'Gutenberg requires WordPress %s or later to function properly. Please upgrade WordPress before activating Gutenberg.', 'gutenberg' ), '5.9' );
