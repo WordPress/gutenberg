@@ -1096,15 +1096,15 @@ class WP_HTML_Tag_Processor {
 	}
 
 	/**
-	 * Applies lexical updates and cleans up once a tag is fully parsed.
+	 * Applies attribute updates and cleans up once a tag is fully parsed.
 	 *
 	 * @since 6.2.0
 	 *
 	 * @return void
 	 */
 	private function after_tag() {
-		$this->class_name_updates_to_lexical_updates();
-		$this->apply_lexical_updates();
+		$this->class_name_updates_to_attributes_updates();
+		$this->apply_attributes_updates();
 		$this->tag_name_starts_at = null;
 		$this->tag_name_length    = null;
 		$this->tag_ends_at        = null;
@@ -1113,10 +1113,10 @@ class WP_HTML_Tag_Processor {
 	}
 
 	/**
-	 * Converts class name updates into tag lexical updates
+	 * Converts class name updates into tag attributes updates
 	 * (they are accumulated in different data formats for performance).
 	 *
-	 * This method is only meant to run right before the lexical updates are applied.
+	 * This method is only meant to run right before the attribute updates are applied.
 	 * The behavior in all other cases is undefined.
 	 *
 	 * @return void
@@ -1125,7 +1125,7 @@ class WP_HTML_Tag_Processor {
 	 * @see $classname_updates
 	 * @see $lexical_updates
 	 */
-	private function class_name_updates_to_lexical_updates() {
+	private function class_name_updates_to_attributes_updates() {
 		if ( count( $this->classname_updates ) === 0 || isset( $this->lexical_updates['class'] ) ) {
 			$this->classname_updates = array();
 			return;
@@ -1246,13 +1246,13 @@ class WP_HTML_Tag_Processor {
 	 *
 	 * @since 6.2.0
 	 */
-	private function apply_lexical_updates() {
+	private function apply_attributes_updates() {
 		if ( ! count( $this->lexical_updates ) ) {
 			return;
 		}
 
 		/**
-		 * Lexical updates can be enqueued in any order but as we
+		 * Attribute updates can be enqueued in any order but as we
 		 * progress through the document to replace them we have to
 		 * make our replacements in the order in which they are found
 		 * in that document.
@@ -1345,8 +1345,8 @@ class WP_HTML_Tag_Processor {
 	 *
 	 * @since 6.2.0
 	 *
-	 * @param WP_HTML_Text_Replacement $a First lexical update.
-	 * @param WP_HTML_Text_Replacement $b Second lexical update.
+	 * @param WP_HTML_Text_Replacement $a First attribute update.
+	 * @param WP_HTML_Text_Replacement $b Second attribute update.
 	 * @return integer
 	 */
 	private static function sort_start_ascending( $a, $b ) {
@@ -1737,8 +1737,8 @@ class WP_HTML_Tag_Processor {
 		$updated_html_up_to_current_tag_name_end            = $this->updated_html . $delta_between_updated_html_end_and_current_tag_end;
 
 		// 1. Apply the attributes updates to the original HTML
-		$this->class_name_updates_to_lexical_updates();
-		$this->apply_lexical_updates();
+		$this->class_name_updates_to_attributes_updates();
+		$this->apply_attributes_updates();
 
 		// 2. Replace the original HTML with the updated HTML
 		$this->html          = $this->updated_html . substr( $this->html, $this->updated_bytes );
