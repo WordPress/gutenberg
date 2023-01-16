@@ -564,8 +564,10 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__media-panel {
-	height: 100%;
+	min-height: 100%;
 	padding: 0 $grid-unit-20;
+	display: flex;
+	flex-direction: column;
 
 	@include break-medium {
 		padding: 0;
@@ -576,12 +578,18 @@ $block-inserter-tabs-height: 44px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		flex: 1;
 	}
 
 	.block-editor-inserter__media-panel-search {
 		&.components-search-control {
 			input[type="search"].components-search-control__input {
 				background: $white;
+			}
+			button.components-button {
+				min-width: auto;
+				padding-left: $grid-unit-05 * 0.5;
+				padding-right: $grid-unit-05 * 0.5;
 			}
 		}
 	}
@@ -646,7 +654,7 @@ $block-inserter-tabs-height: 44px;
 			display: flex;
 			align-items: center;
 			overflow: hidden;
-			border-radius: 4px;
+			border-radius: 2px;
 
 			> * {
 				margin: 0 auto;
@@ -660,6 +668,12 @@ $block-inserter-tabs-height: 44px;
 			// Windows High Contrast mode will show this outline, but not the box-shadow.
 			outline: 2px solid transparent;
 		}
+	}
+}
+
+.block-editor-inserter__media-list__item-preview-options__popover {
+	.components-menu-item__button .components-menu-item__item {
+		min-width: auto;
 	}
 }
 

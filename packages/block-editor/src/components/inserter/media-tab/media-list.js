@@ -29,7 +29,8 @@ import { getBlockAndPreviewFromMedia } from './utils';
 const MAXIMUM_TITLE_LENGTH = 25;
 const MEDIA_OPTIONS_POPOVER_PROPS = {
 	position: 'bottom left',
-	variant: 'toolbar',
+	className:
+		'block-editor-inserter__media-list__item-preview-options__popover',
 };
 
 function MediaPreviewOptions( { category, media } ) {
