@@ -46,7 +46,11 @@ export default {
 	},
 };
 
-const Template = ( props ) => <DropdownMenu { ...props } />;
+const Template = ( props ) => (
+	<div style={ { height: 150 } }>
+		<DropdownMenu { ...props } />
+	</div>
+);
 
 export const Default = Template.bind( {} );
 Default.args = {
