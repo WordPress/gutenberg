@@ -61,7 +61,7 @@ export const constrainValue = ( {
  * @param  args.isShiftStepEnabled True if pressing shift enables increased step
  * @param  args.shiftStep          The step value to use when shift-stepping
  * @param  args.baseStep           The default, base step value
- * @param  args.isStepAny          True is `step==="any"`
+ * @param  args.isStepAny          True if `step==="any"`
  * @param  args.min                The minimum value that the result can assume
  * @param  args.max                The maximum value that the result can assume
  */
