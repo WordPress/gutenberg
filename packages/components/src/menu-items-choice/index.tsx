@@ -7,15 +7,16 @@ import { check } from '@wordpress/icons';
  * Internal dependencies
  */
 import MenuItem from '../menu-item';
+import type { MenuItemsChoiceProps } from './types';
 
 const noop = () => {};
 
-export default function MenuItemsChoice( {
+function MenuItemsChoice( {
 	choices = [],
 	onHover = noop,
 	onSelect,
 	value,
-} ) {
+}: MenuItemsChoiceProps ) {
 	return choices.map( ( item ) => {
 		const isSelected = value === item.value;
 		return (
@@ -33,7 +34,7 @@ export default function MenuItemsChoice( {
 					}
 				} }
 				onMouseEnter={ () => onHover( item.value ) }
-				onMouseLeave={ () => onHover( null ) }
+				onMouseLeave={ () => onHover() }
 				aria-label={ item[ 'aria-label' ] }
 			>
 				{ item.label }
@@ -41,3 +42,5 @@ export default function MenuItemsChoice( {
 		);
 	} );
 }
+
+export default MenuItemsChoice;
