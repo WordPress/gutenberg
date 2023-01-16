@@ -157,6 +157,7 @@ class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 	}
 
 	public function set_content_inside_balanced_tags( $content ) {
+		$this->get_updated_html();
 		list( $start_name, $end_name ) = $this->get_balanced_tags();
 		$this->set_content_inside_bookmarks( $start_name, $end_name, $content );
 		$this->seek( $start_name );
@@ -171,8 +172,6 @@ class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 		if ( ! isset( $this->bookmarks[ $start_bookmark ], $this->bookmarks[ $end_bookmark ] ) ) {
 			return null;
 		}
-
-		$this->get_updated_html();
 
 		$start = $this->bookmarks[ $start_bookmark ];
 		$end   = $this->bookmarks[ $end_bookmark ];
