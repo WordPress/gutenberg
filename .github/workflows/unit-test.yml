@@ -54,7 +54,7 @@ jobs:
               run: npm run test:unit:date -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
     test-php:
-        name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }} on ubuntu-latest
+        name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }}${{ matrix.wordpress != '' && format( ' (WP {0}) ', matrix.wordpress ) || '' }} on ubuntu-latest
         runs-on: ubuntu-latest
         timeout-minutes: 20
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
@@ -72,9 +72,15 @@ jobs:
                     - '8.1'
                     - '8.2'
                 multisite: [false, true]
+                wordpress: [''] # Latest WordPress version.
+                include:
+                    # Test with the previous WP version.
+                    - php: '7.4'
+                      wordpress: '6.0'
 
         env:
             WP_ENV_PHP_VERSION: ${{ matrix.php }}
+            WP_ENV_CORE: WordPress/WordPress${{ matrix.wordpress != '' && format( '#{0}-branch', matrix.wordpress ) || '' }}
 
         steps:
             - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
