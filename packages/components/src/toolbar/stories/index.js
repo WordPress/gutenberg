@@ -60,7 +60,7 @@ export const Default = () => {
 		// eslint-disable-next-line no-restricted-syntax
 		<Toolbar label="Options" id="options-toolbar">
 			<ToolbarGroup>
-				<ToolbarButton icon={ paragraph } label="Paragraph" />
+				<ToolbarButton icon={ paragraph } text="Paragraph" />
 			</ToolbarGroup>
 			<ToolbarGroup>
 				<ToolbarItem>
