@@ -29,7 +29,7 @@ import {
 	ToolbarItem,
 	ToolbarDropdownMenu,
 } from '..';
-import { SVG, Path, DropdownMenu } from '../../../build';
+import { SVG, Path, DropdownMenu } from '../../';
 
 export default {
 	title: 'Components/Toolbar',
