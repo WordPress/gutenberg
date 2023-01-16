@@ -219,7 +219,7 @@ jobs:
               if: ${{ needs.test-php.result != 'success' }}
               run: exit 1
 
-            - name: Fail the job if not conforming to the coding standards
+            - name: "Fail the job if the code doesn't conform to the coding standards"
               if: ${{ needs.phpcs.result != 'success' }}
               run: exit 1
 
