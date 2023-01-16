@@ -2818,7 +2818,12 @@ class WP_Theme_JSON_Gutenberg {
 				continue;
 			}
 
-			$output = static::remove_insecure_styles( $input );
+			// The global styles custom CSS is not sanitized, but can only be edited by users with 'edit_css' capability.
+			if ( isset( $input['css'] ) && current_user_can( 'edit_css' ) ) {
+				$output = $input;
+			} else {
+				$output = static::remove_insecure_styles( $input );
+			}
 
 			/*
 			 * Get a reference to element name from path.
