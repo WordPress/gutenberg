@@ -28,7 +28,6 @@ runs:
           run: |
               echo "NODE_VERSION=$(node -v)" >> $GITHUB_OUTPUT
               echo "NPM_VERSION=$(npm -v)" >> $GITHUB_OUTPUT
-          shell: bash
 
         - name: Cache node_modules
           id: cache-node_modules
@@ -40,11 +39,9 @@ runs:
         - name: Npm install
           if: ${{ steps.cache-node_modules.outputs.cache-hit != 'true' }}
           run: npm ci
-          shell: bash
 
         - name: Post-install
           if: ${{ steps.cache-node_modules.outputs.cache-hit == 'true' }}
           run: |
               npm run postinstall
               npx lerna run postinstall
-          shell: bash
