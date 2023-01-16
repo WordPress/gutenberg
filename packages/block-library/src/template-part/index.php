@@ -128,7 +128,7 @@ function render_block_core_template_part( $attributes ) {
 
 	// Look up area definition.
 	$area_definition = null;
-	$defined_areas = get_allowed_block_template_part_areas();
+	$defined_areas   = get_allowed_block_template_part_areas();
 	foreach ( $defined_areas as $defined_area ) {
 		if ( $defined_area['area'] === $area ) {
 			$area_definition = $defined_area;
@@ -156,7 +156,7 @@ function render_block_core_template_part( $attributes ) {
 	$content = $wp_embed->autoembed( $content );
 
 	if ( empty( $attributes['tagName'] ) ) {
-		$area_tag      = 'div';
+		$area_tag = 'div';
 		if ( $area_definition && isset( $area_definition['area_tag'] ) ) {
 			$area_tag = $area_definition['area_tag'];
 		}
