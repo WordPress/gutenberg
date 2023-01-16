@@ -36,6 +36,9 @@ export default {
 			control: { type: 'object' },
 		},
 		text: { control: { type: 'text' } },
+		toggleProps: {
+			control: { type: 'object' },
+		},
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -63,9 +66,6 @@ Default.args = {
 			onClick: () => console.log( 'down!' ),
 		},
 	],
-	toggleProps: {
-		showTooltip: true,
-	},
 };
 
 export const WithChildren = Template.bind( {} );
