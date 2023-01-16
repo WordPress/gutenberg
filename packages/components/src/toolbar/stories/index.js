@@ -40,6 +40,9 @@ export default {
 		ToolbarItem,
 		ToolbarDropdownMenu,
 	},
+	argTypes: {
+		children: { control: { type: null } },
+	},
 	parameters: {
 		controls: { expanded: true },
 		docs: { source: { state: 'open' } },
@@ -54,11 +57,14 @@ function InlineImageIcon() {
 	);
 }
 
-export const Default = () => {
-	return (
-		// id is required for server side rendering
-		// eslint-disable-next-line no-restricted-syntax
-		<Toolbar label="Options" id="options-toolbar">
+const Template = ( props ) => <Toolbar { ...props } />;
+
+export const Default = Template.bind( {} );
+Default.args = {
+	label: 'Options',
+	id: 'options-toolbar',
+	children: (
+		<>
 			<ToolbarGroup>
 				<ToolbarButton icon={ paragraph } text="Paragraph" />
 			</ToolbarGroup>
@@ -144,18 +150,19 @@ export const Default = () => {
 					},
 				] }
 			/>
-		</Toolbar>
-	);
+		</>
+	),
 };
 
-export const WithoutGroup = () => {
-	return (
-		// id is required for server side rendering
-		// eslint-disable-next-line no-restricted-syntax
-		<Toolbar label="Options" id="options-toolbar-without-group">
+export const WithoutGroup = Template.bind( {} );
+WithoutGroup.args = {
+	label: 'Options',
+	id: 'options-toolbar-without-group',
+	children: (
+		<>
 			<ToolbarButton icon={ formatBold } label="Bold" isPressed />
 			<ToolbarButton icon={ formatItalic } label="Italic" />
 			<ToolbarButton icon={ link } label="Link" />
-		</Toolbar>
-	);
+		</>
+	),
 };
