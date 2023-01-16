@@ -422,7 +422,7 @@ const ExperimentalMyButton = ( { title, __experimentalShowIcon = true } ) => {
 // The stable public component is a thin wrapper that calls the
 // experimental component with the experimental features disabled
 export const MyButton = ( { title } ) => 
-    <ExperimentalMyExistingButton title={ title } __experimentalShowIcon={ false } />
+    <ExperimentalMyButton title={ title } __experimentalShowIcon={ false } />
 
 lock(MyButton, ExperimentalMyButton);
 
