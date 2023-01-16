@@ -1,12 +1,17 @@
 /**
+ * External dependencies
+ */
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
+
+/**
  * Internal dependencies
  */
-import Notice from '../';
+import Notice from '..';
+import type { NoticeProps } from '../types';
 
 // TODO: Add a story involving NoticeList to help people understand
 // the difference between onDismiss/onRemove.
-
-export default {
+const meta: ComponentMeta< typeof Notice > = {
 	title: 'Components/Notice',
 	component: Notice,
 	argTypes: {
@@ -28,17 +33,19 @@ export default {
 		docs: { source: { state: 'open' } },
 	},
 };
+export default meta;
 
-const Template = ( props ) => {
+const Template = ( props: NoticeProps ) => {
 	return <Notice { ...props } />;
 };
 
-export const Default = Template.bind( {} );
+export const Default: ComponentStory< typeof Notice > = Template.bind( {} );
 Default.args = {
 	children: 'This is a notice.',
 };
 
-export const WithCustomSpokenMessage = Template.bind( {} );
+export const WithCustomSpokenMessage: ComponentStory< typeof Notice > =
+	Template.bind( {} );
 WithCustomSpokenMessage.args = {
 	...Default.args,
 	politeness: 'assertive',
