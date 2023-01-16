@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classNames from 'classnames';
+import removeAccents from 'remove-accents';
 
 /**
  * WordPress dependencies
@@ -11,6 +12,28 @@ import {
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 } from '@wordpress/block-editor';
+
+/**
+ * Get the name attribute from a content string.
+ *
+ * @param {string} content The block content.
+ *
+ * @return {string} Returns the slug.
+ */
+const getNameFromLabel = ( content ) => {
+	const dummyElement = document.createElement( 'div' );
+	dummyElement.innerHTML = content;
+	// Get the slug.
+	return (
+		removeAccents( dummyElement.innerText )
+			// Convert anything that's not a letter or number to a hyphen.
+			.replace( /[^\p{L}\p{N}]+/gu, '-' )
+			// Convert to lowercase
+			.toLowerCase()
+			// Remove any remaining leading or trailing hyphens.
+			.replace( /(^-+)|(-+$)/g, '' )
+	);
+};
 
 export default function save( { attributes } ) {
 	const { type, name, label, inlineLabel, required, placeholder } =
@@ -44,7 +67,7 @@ export default function save( { attributes } ) {
 			<TagName
 				className={ inputClasses }
 				type={ type }
-				name={ name || label }
+				name={ name || getNameFromLabel( label ) }
 				required={ required }
 				aria-required={ required }
 				placeholder={ placeholder || undefined }
