@@ -155,7 +155,10 @@ export default function createReduxStore( key, options ) {
 				actions,
 				new Proxy( privateActions, {
 					get: ( target, prop ) => {
-						return mapActions( privateActions, store )[ prop ];
+						return (
+							mapActions( privateActions, store )[ prop ] ||
+							actions[ prop ]
+						);
 					},
 				} )
 			);
@@ -183,15 +186,17 @@ export default function createReduxStore( key, options ) {
 				selectors,
 				new Proxy( privateSelectors, {
 					get: ( target, prop ) => {
-						return mapSelectors(
-							mapValues(
-								privateSelectors,
-								( selector ) =>
-									( state, ...args ) =>
-										selector( state.root, ...args )
-							),
-							store
-						)[ prop ];
+						return (
+							mapSelectors(
+								mapValues(
+									privateSelectors,
+									( selector ) =>
+										( state, ...args ) =>
+											selector( state.root, ...args )
+								),
+								store
+							)[ prop ] || selectors[ prop ]
+						);
 					},
 				} )
 			);

@@ -51,6 +51,11 @@ describe( 'Private data APIs', () => {
 						...state,
 						secretDiscount: action?.price,
 					};
+				} else if ( action?.type === 'SET_PUBLIC_PRICE' ) {
+					return {
+						...state,
+						price: action?.price,
+					};
 				}
 				return {
 					price: 1000,
@@ -96,6 +101,10 @@ describe( 'Private data APIs', () => {
 			expect( privateSelectors.getSecretDiscount ).toEqual(
 				expect.any( Function )
 			);
+			// The public selector is still accessible:
+			expect( privateSelectors.getPublicPrice ).toEqual(
+				expect.any( Function )
+			);
 		} );
 
 		it( 'should give private selectors access to the state', () => {
@@ -106,6 +115,16 @@ describe( 'Private data APIs', () => {
 
 			const privateSelectors = unlock( registry.select( groceryStore ) );
 			expect( privateSelectors.getSecretDiscount() ).toEqual( 800 );
+		} );
+
+		it( 'should support public selectors accessed via unlock()', () => {
+			const groceryStore = createStore();
+			unlock( groceryStore ).registerPrivateSelectors( {
+				getSecretDiscount,
+			} );
+
+			const unlockedSelectors = unlock( registry.select( groceryStore ) );
+			expect( unlockedSelectors.getPublicPrice() ).toEqual( 1000 );
 		} );
 	} );
 
@@ -139,6 +158,10 @@ describe( 'Private data APIs', () => {
 			expect( privateActions.setSecretDiscount ).toEqual(
 				expect.any( Function )
 			);
+			// The public action is still accessible:
+			expect( privateActions.setPublicPrice ).toEqual(
+				expect.any( Function )
+			);
 		} );
 
 		it( 'should work with both private actions and private selectors at the same time', () => {
@@ -169,6 +192,18 @@ describe( 'Private data APIs', () => {
 			expect(
 				registry.select( groceryStore ).getState().secretDiscount
 			).toEqual( 400 );
+		} );
+
+		it( 'should dispatch public actions on the unlocked store', () => {
+			const groceryStore = createStore();
+			unlock( groceryStore ).registerPrivateActions( {
+				setSecretDiscount,
+			} );
+			const privateActions = unlock( registry.dispatch( groceryStore ) );
+			privateActions.setPublicPrice( 400 );
+			expect( registry.select( groceryStore ).getState().price ).toEqual(
+				400
+			);
 		} );
 
 		it( 'should dispatch private action thunks like regular actions', () => {
