@@ -44,7 +44,7 @@ export const __dangerousOptInToUnstableAPIsOnlyForCoreModules = (
 ) => {
 	if ( ! CORE_MODULES_USING_EXPERIMENTS.includes( moduleName ) ) {
 		throw new Error(
-			`You tried to opt-in to unstable APIs as a module "${ moduleName }". ` +
+			`You tried to opt-in to unstable APIs as module "${ moduleName }". ` +
 				'This feature is only for JavaScript modules shipped with WordPress core. ' +
 				'Please do not use it in plugins and themes as the unstable APIs will be removed ' +
 				'without a warning. If you ignore this error and depend on unstable features, ' +
