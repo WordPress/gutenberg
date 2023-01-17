@@ -2184,11 +2184,7 @@ export const __experimentalGetAllowedBlocks = createSelector(
 		return getAllowedBlocks( state, rootClientId );
 	},
 	( state, rootClientId ) => [
-		state.blockListSettings[ rootClientId ],
-		state.blocks.byClientId,
-		state.settings.allowedBlockTypes,
-		state.settings.templateLock,
-		getBlockTypes(),
+		...getAllowedBlocks.getDependants( state, rootClientId ),
 	]
 );
 
