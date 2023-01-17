@@ -2,13 +2,11 @@
 	border-top: $border-width solid $gray-300;
 }
 
-.block-editor-url-popover__additional-controls > div[role="menu"]
-.components-button:not(:disabled):not([aria-disabled="true"]):not(.is-secondary) > svg {
+.block-editor-url-popover__additional-controls > div[role="menu"] .components-button:not(:disabled):not([aria-disabled="true"]):not(.is-secondary) > svg {
 	box-shadow: none;
 }
 
-.block-editor-url-popover__additional-controls
-div[role="menu"] > .components-button {
+.block-editor-url-popover__additional-controls div[role="menu"] > .components-button {
 	padding-left: $grid-unit-15;
 }
 
