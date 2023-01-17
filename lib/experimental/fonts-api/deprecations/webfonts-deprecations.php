@@ -63,32 +63,6 @@ if ( ! function_exists( 'wp_register_webfonts' ) ) {
 	}
 }
 
-if ( ! function_exists( 'wp_enqueue_webfont' ) ) {
-	/**
-	 * Enqueue a single font family that has been registered beforehand.
-	 *
-	 * Example of how to enqueue Source Serif Pro font:
-	 *
-	 * <code>
-	 * wp_enqueue_webfont( 'Source Serif Pro' );
-	 * </code>
-	 *
-	 * Font families should be enqueued from the `init` hook or later.
-	 *
-	 * @since 6.0.0
-	 * @deprecated X.X.X Use wp_enqueue_webfonts().
-	 *
-	 * @param string $font_family_name The font family name to be enqueued.
-	 * @return bool True if successfully enqueued, else false.
-	 */
-	function wp_enqueue_webfont( $font_family_name ) {
-		_deprecated_function( __FUNCTION__, 'X.X.X', 'wp_enqueue_webfonts()' );
-
-		wp_enqueue_webfonts( array( $font_family_name ) );
-		return true;
-	}
-}
-
 if ( ! function_exists( 'wp_register_webfont' ) ) {
 	/**
 	 * Registers a single webfont.
@@ -119,6 +93,48 @@ if ( ! function_exists( 'wp_register_webfont' ) ) {
 		_deprecated_function( __FUNCTION__, '14.9.1', 'wp_register_fonts()' );
 
 		return wp_fonts()->register_webfont( $webfont, '', '', false );
+	}
+}
+
+if ( ! function_exists( 'wp_enqueue_webfonts' ) ) {
+	/**
+	 * Enqueues one or more font family and all of its variations.
+	 *
+	 * @since X.X.X
+	 * @since GB 15.1 Use wp_enqueue_fonts() ihstead.
+	 *
+	 * @param string[] $font_families Font family(ies) to enqueue.
+	 */
+	function wp_enqueue_webfonts( array $font_families ) {
+		_deprecated_function( __FUNCTION__, 'GB 15.1', 'wp_enqueue_fonts()' );
+
+		wp_enqueue_fonts( $font_families );
+	}
+}
+
+if ( ! function_exists( 'wp_enqueue_webfont' ) ) {
+	/**
+	 * Enqueue a single font family that has been registered beforehand.
+	 *
+	 * Example of how to enqueue Source Serif Pro font:
+	 *
+	 * <code>
+	 * wp_enqueue_webfont( 'Source Serif Pro' );
+	 * </code>
+	 *
+	 * Font families should be enqueued from the `init` hook or later.
+	 *
+	 * @since 6.0.0
+	 * @deprecated GB 14.9.1 Use wp_enqueue_fonts() instead.
+	 *
+	 * @param string $font_family_name The font family name to be enqueued.
+	 * @return bool True if successfully enqueued, else false.
+	 */
+	function wp_enqueue_webfont( $font_family_name ) {
+		_deprecated_function( __FUNCTION__, 'GB 14.9.1', 'wp_enqueue_fonts()' );
+
+		wp_enqueue_fonts( array( $font_family_name ) );
+		return true;
 	}
 }
 

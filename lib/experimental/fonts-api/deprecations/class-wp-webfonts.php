@@ -135,15 +135,15 @@ class WP_Webfonts extends WP_Dependencies {
 	 * Enqueue a font-family that has been already registered.
 	 *
 	 * @since 6.0.0
-	 * @deprecated X.X.X Use wp_enqueue_webfonts().
+	 * @deprecated GB 14.9.1 Use wp_enqueue_fonts().
 	 *
 	 * @param string $font_family_name The font family name to be enqueued.
 	 * @return bool True if successfully enqueued, else false.
 	 */
 	public function enqueue_webfont( $font_family_name ) {
-		_deprecated_function( __METHOD__, 'X.X.X', 'wp_enqueue_webfonts()' );
+		_deprecated_function( __METHOD__, 'GB 14.9.1', 'wp_enqueue_fonts()' );
 
-		wp_enqueue_webfonts( array( $font_family_name ) );
+		wp_enqueue_fonts( array( $font_family_name ) );
 		return true;
 	}
 

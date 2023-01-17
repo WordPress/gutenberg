@@ -84,7 +84,7 @@ if ( ! function_exists( 'wp_register_fonts' ) ) {
 	}
 }
 
-if ( ! function_exists( 'wp_enqueue_webfonts' ) ) {
+if ( ! function_exists( 'wp_enqueue_fonts' ) ) {
 	/**
 	 * Enqueues one or more font family and all of its variations.
 	 *
@@ -92,7 +92,7 @@ if ( ! function_exists( 'wp_enqueue_webfonts' ) ) {
 	 *
 	 * @param string[] $font_families Font family(ies) to enqueue.
 	 */
-	function wp_enqueue_webfonts( array $font_families ) {
+	function wp_enqueue_fonts( array $font_families ) {
 		$handles = array_map( array( WP_Fonts_Utils::class, 'convert_font_family_into_handle' ), $font_families );
 
 		wp_fonts()->enqueue( $handles );

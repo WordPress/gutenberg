@@ -108,7 +108,7 @@ if ( ! function_exists( 'gutenberg_register_fonts_from_theme_json' ) ) {
 		}
 
 		wp_register_fonts( $fonts );
-		wp_enqueue_webfonts( $handles );
+		wp_enqueue_fonts( $handles );
 	}
 }
 
