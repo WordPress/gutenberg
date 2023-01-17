@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, within, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 // Need to mock the BlockControls wrapper as this requires a slot to run
@@ -88,11 +88,14 @@ describe( 'Cover block controls', () => {
 			await user.click(
 				screen.getByLabelText( 'Change content position' )
 			);
-			within( screen.getByRole( 'grid' ) )
-				.getByRole( 'gridcell', {
-					name: 'top left',
-				} )
-				.focus();
+
+			await act( async () =>
+				within( screen.getByRole( 'grid' ) )
+					.getByRole( 'gridcell', {
+						name: 'top left',
+					} )
+					.focus()
+			);
 
 			expect( setAttributes ).toHaveBeenCalledWith( {
 				contentPosition: 'top left',
