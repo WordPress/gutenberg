@@ -119,25 +119,40 @@ export const numberToString = ( value ) => {
 };
 
 /**
- * Regardless of the input being a string or a number, returns a number.
- *
- * Returns `undefined` in case the string is `undefined` or not a valid numeric value.
+ * Regardless of the input being a string or a number, returns a number. Returns
+ * null if the string can't be parsed to a finite number (ie. NaN or ±Infinity).
  *
  * @param {string | number} value
- * @return {number} The parsed number.
+ * @return {number | null} The parsed number.
  */
-export const ensureNumber = ( value ) => {
-	return typeof value === 'string' ? stringToNumber( value ) : value;
+export const ensureFiniteNumber = ( value ) => {
+	if ( typeof value === 'number' ) {
+		return value;
+	}
+
+	const valueAsNumber = stringToNumber( value );
+
+	if ( ! Number.isFinite( valueAsNumber ) ) {
+		return null;
+	}
+
+	return valueAsNumber;
 };
 
 /**
- * Regardless of the input being a string or a number, returns a number.
- *
- * Returns `undefined` in case the string is `undefined` or not a valid numeric value.
+ * Regardless of the input being a string or a number, returns a string.
  *
  * @param {string | number} value
- * @return {string} The converted string, or `undefined` in case the input is `undefined` or `NaN`.
+ * @return {string | null} The converted string.
  */
-export const ensureString = ( value ) => {
-	return typeof value === 'string' ? value : numberToString( value );
+export const ensureFiniteNumberAsString = ( value ) => {
+	if ( typeof value === 'string' ) {
+		return value;
+	}
+
+	if ( ! Number.isFinite( value ) ) {
+		return null;
+	}
+
+	return numberToString( value );
 };

@@ -1,7 +1,11 @@
 /**
  * Internal dependencies
  */
-import { isValueNumeric } from '../values';
+import {
+	isValueNumeric,
+	ensureFiniteNumberAsString,
+	ensureFiniteNumber,
+} from '../values';
 
 /**
  * This works because Node 12 ships with `small-icu` instead of `full-icu`
@@ -98,4 +102,44 @@ describe( 'isValueNumeric', () => {
 			expect( isValueNumeric( '١٬٠٠٠٫a', 'ar' ) ).toBe( false );
 		} );
 	} );
+} );
+
+describe( 'ensureFiniteNumberAsString', () => {
+	it.each( [
+		[ '1', '1' ],
+		[ 'abc', 'abc' ],
+		[ 2e3, '2000' ],
+		[ 42, '42' ],
+		[ -14, '-14' ],
+		[ 0, '0' ],
+		[ '0', '0' ],
+		[ '', '' ],
+		[ NaN, null ],
+	] )(
+		'should convert `%s` (type unknown) to `%s` (type string)',
+		( input, expectedOutput ) => {
+			expect( ensureFiniteNumberAsString( input ) ).toBe(
+				expectedOutput
+			);
+		}
+	);
+} );
+
+describe( 'ensureFiniteNumber', () => {
+	it.each( [
+		[ '1', 1 ],
+		[ 'abc', null ],
+		[ 2e3, 2000 ],
+		[ 42, 42 ],
+		[ -14, -14 ],
+		[ 0, 0 ],
+		[ '0', 0 ],
+		[ '', null ],
+		[ 'NaN', null ],
+	] )(
+		'should convert `%s` (type unknown) to `%s` (type string)',
+		( input, expectedOutput ) => {
+			expect( ensureFiniteNumber( input ) ).toBe( expectedOutput );
+		}
+	);
 } );

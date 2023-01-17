@@ -19,20 +19,24 @@ import deprecated from '@wordpress/deprecated';
 import { Input, SpinButton } from './styles/number-control-styles';
 import * as inputControlActionTypes from '../input-control/reducer/actions';
 import { add, subtract, roundClamp } from '../utils/math';
-import { ensureNumber, isValueEmpty } from '../utils/values';
+import {
+	ensureFiniteNumber,
+	ensureFiniteNumberAsString,
+	isValueEmpty,
+} from '../utils/values';
 import type { WordPressComponentProps } from '../ui/context/wordpress-component';
 import type { NumberControlProps } from './types';
 import { HStack } from '../h-stack';
 import { Spacer } from '../spacer';
 
-const noop = () => {};
+const DEFAULT_STEP = 1;
+const DEFAULT_SHIFT_STEP = 10;
 
 function UnforwardedNumberControl(
 	{
 		__unstableStateReducer: stateReducerProp,
 		className,
 		dragDirection = 'n',
-		hideHTMLArrows = false,
 		spinControls = 'native',
 		isDragEnabled = true,
 		isShiftStepEnabled = true,
@@ -40,13 +44,18 @@ function UnforwardedNumberControl(
 		max = Infinity,
 		min = -Infinity,
 		required = false,
-		shiftStep = 10,
-		step = 1,
+		shiftStep = DEFAULT_SHIFT_STEP,
+		step = DEFAULT_STEP,
 		type: typeProp = 'number',
 		value: valueProp,
 		size = 'default',
 		suffix,
-		onChange = noop,
+		onChange,
+
+		// Deprecated
+		hideHTMLArrows = false,
+
+		// Rest
 		...props
 	}: WordPressComponentProps< NumberControlProps, 'input', false >,
 	forwardedRef: ForwardedRef< any >
@@ -60,40 +69,62 @@ function UnforwardedNumberControl(
 		spinControls = 'none';
 	}
 
+	if ( typeof valueProp === 'number' ) {
+		// TODO: deprecate `value` as a `number`
+	}
+
+	const valuePropAsString =
+		valueProp !== undefined
+			? ensureFiniteNumberAsString( valueProp ) ?? undefined
+			: undefined;
+	const shiftStepAsNumber =
+		ensureFiniteNumber( shiftStep ) ?? DEFAULT_SHIFT_STEP;
+
 	const inputRef = useRef< HTMLInputElement >();
 	const mergedRef = useMergeRefs( [ inputRef, forwardedRef ] );
 
 	const isStepAny = step === 'any';
-	const baseStep = isStepAny ? 1 : ensureNumber( step );
+	// Base step is `1` when `step="any". Use `1` as a fallback in case
+	// `step` prop couldn't be parsed to a finite number.
+	const baseStep = isStepAny
+		? DEFAULT_STEP
+		: ensureFiniteNumber( step ) ?? DEFAULT_STEP;
 	const baseValue = roundClamp( 0, min, max, baseStep );
-	const constrainValue = (
-		value: number | string,
-		stepOverride?: number
-	) => {
+	const constrainValue = ( value: number, stepOverride?: number ) => {
 		// When step is "any" clamp the value, otherwise round and clamp it.
 		return isStepAny
-			? Math.min( max, Math.max( min, ensureNumber( value ) ) )
+			? Math.min( max, Math.max( min, value ) )
 			: roundClamp( value, min, max, stepOverride ?? baseStep );
 	};
 
 	const autoComplete = typeProp === 'number' ? 'off' : undefined;
 	const classes = classNames( 'components-number-control', className );
 
+	/**
+	 * Computes the new value when the current value needs to change following a
+	 * "spin" event (i.e. up or down arrow, up or down spin buttons)
+	 */
 	const spinValue = (
-		value: string | number | undefined,
+		value: number,
 		direction: 'up' | 'down',
 		event: KeyboardEvent | MouseEvent | undefined
 	) => {
 		event?.preventDefault();
-		const shift = event?.shiftKey && isShiftStepEnabled;
-		const delta = shift ? ensureNumber( shiftStep ) * baseStep : baseStep;
-		let nextValue = isValueEmpty( value ) ? baseValue : value;
-		if ( direction === 'up' ) {
-			nextValue = add( nextValue, delta );
-		} else if ( direction === 'down' ) {
-			nextValue = subtract( nextValue, delta );
-		}
-		return constrainValue( nextValue, shift ? delta : undefined );
+		const enableShift = event?.shiftKey && isShiftStepEnabled;
+
+		const computedStep = enableShift
+			? shiftStepAsNumber * baseStep
+			: baseStep;
+
+		const nextValue =
+			direction === 'up'
+				? add( value, computedStep )
+				: subtract( value, computedStep );
+
+		return constrainValue(
+			nextValue,
+			enableShift ? computedStep : undefined
+		);
 	};
 
 	/**
@@ -107,35 +138,53 @@ function UnforwardedNumberControl(
 		( state, action ) => {
 			const nextState = { ...state };
 
-			const { type, payload } = action;
-			const event = payload.event;
 			const currentValue = nextState.value;
 
 			/**
 			 * Handles custom UP and DOWN Keyboard events
 			 */
 			if (
-				type === inputControlActionTypes.PRESS_UP ||
-				type === inputControlActionTypes.PRESS_DOWN
+				action.type === inputControlActionTypes.PRESS_UP ||
+				action.type === inputControlActionTypes.PRESS_DOWN
 			) {
-				// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
-				nextState.value = spinValue(
-					currentValue,
-					type === inputControlActionTypes.PRESS_UP ? 'up' : 'down',
-					event as KeyboardEvent | undefined
+				const actionEvent = (
+					action as inputControlActionTypes.KeyEventAction
+				 ).payload.event;
+				const valueToSpin = isValueEmpty( currentValue )
+					? baseValue
+					: ensureFiniteNumber( currentValue ) ?? baseValue;
+
+				const nextValue = ensureFiniteNumberAsString(
+					spinValue(
+						valueToSpin,
+						action.type === inputControlActionTypes.PRESS_UP
+							? 'up'
+							: 'down',
+						actionEvent as KeyboardEvent
+					)
 				);
+
+				if ( nextValue !== null ) {
+					nextState.value = nextValue;
+				}
 			}
 
 			/**
 			 * Handles drag to update events
 			 */
-			if ( type === inputControlActionTypes.DRAG && isDragEnabled ) {
-				// @ts-expect-error TODO: See if reducer actions can be typed better
-				const [ x, y ] = payload.delta;
-				// @ts-expect-error TODO: See if reducer actions can be typed better
-				const enableShift = payload.shiftKey && isShiftStepEnabled;
-				const modifier = enableShift
-					? ensureNumber( shiftStep ) * baseStep
+			if (
+				action.type === inputControlActionTypes.DRAG &&
+				isDragEnabled
+			) {
+				const dragPayload = (
+					action as inputControlActionTypes.DragAction
+				 ).payload;
+				const [ x, y ] = dragPayload.delta;
+
+				// `shiftKey` comes via the `useDrag` hook
+				const enableShift = dragPayload.shiftKey && isShiftStepEnabled;
+				const computedStep = enableShift
+					? shiftStepAsNumber * baseStep
 					: baseStep;
 
 				let directionModifier;
@@ -165,14 +214,22 @@ function UnforwardedNumberControl(
 
 				if ( delta !== 0 ) {
 					delta = Math.ceil( Math.abs( delta ) ) * Math.sign( delta );
-					const distance = delta * modifier * directionModifier;
+					const distance = delta * computedStep * directionModifier;
 
-					// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
-					nextState.value = constrainValue(
-						// @ts-expect-error TODO: Investigate if it's ok for currentValue to be undefined
-						add( currentValue, distance ),
-						enableShift ? modifier : undefined
+					const valueToConstrain = isValueEmpty( currentValue )
+						? baseValue
+						: ensureFiniteNumber( currentValue ) ?? baseValue;
+
+					const nextValue = ensureFiniteNumberAsString(
+						constrainValue(
+							add( valueToConstrain, distance ),
+							enableShift ? computedStep : undefined
+						)
 					);
+
+					if ( nextValue !== null ) {
+						nextState.value = nextValue;
+					}
 				}
 			}
 
@@ -180,17 +237,24 @@ function UnforwardedNumberControl(
 			 * Handles commit (ENTER key press or blur)
 			 */
 			if (
-				type === inputControlActionTypes.PRESS_ENTER ||
-				type === inputControlActionTypes.COMMIT
+				action.type === inputControlActionTypes.PRESS_ENTER ||
+				action.type === inputControlActionTypes.COMMIT
 			) {
 				const applyEmptyValue =
-					required === false && currentValue === '';
+					currentValue === undefined ||
+					( required === false && currentValue === '' );
 
-				// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
-				nextState.value = applyEmptyValue
-					? currentValue
-					: // @ts-expect-error TODO: Investigate if it's ok for currentValue to be undefined
-					  constrainValue( currentValue );
+				const nextValue = applyEmptyValue
+					? ''
+					: ensureFiniteNumberAsString(
+							constrainValue(
+								ensureFiniteNumber( currentValue ) ?? baseValue
+							)
+					  );
+
+				if ( nextValue !== null ) {
+					nextState.value = nextValue;
+				}
 			}
 
 			return nextState;
@@ -198,15 +262,30 @@ function UnforwardedNumberControl(
 
 	const buildSpinButtonClickHandler =
 		( direction: 'up' | 'down' ) =>
-		( event: MouseEvent< HTMLButtonElement > ) =>
-			onChange( String( spinValue( valueProp, direction, event ) ), {
-				// Set event.target to the <input> so that consumers can use
-				// e.g. event.target.validity.
-				event: {
-					...event,
-					target: inputRef.current!,
-				},
-			} );
+		( event: MouseEvent< HTMLButtonElement > ) => {
+			if ( onChange === undefined ) {
+				return;
+			}
+
+			const valueToSpin = isValueEmpty( valuePropAsString )
+				? baseValue
+				: ensureFiniteNumber( valuePropAsString ) ?? baseValue;
+
+			const onChangeValue = ensureFiniteNumberAsString(
+				spinValue( valueToSpin, direction, event )
+			);
+
+			if ( onChangeValue !== null ) {
+				return onChange( onChangeValue, {
+					// Set event.target to the <input> so that consumers can use
+					// e.g. event.target.validity.
+					event: {
+						...event,
+						target: inputRef.current!,
+					},
+				} );
+			}
+		};
 
 	return (
 		<Input
@@ -224,8 +303,7 @@ function UnforwardedNumberControl(
 			required={ required }
 			step={ step }
 			type={ typeProp }
-			// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
-			value={ valueProp }
+			value={ valuePropAsString }
 			__unstableStateReducer={ ( state, action ) => {
 				const baseState = numberControlStateReducer( state, action );
 				return stateReducerProp?.( baseState, action ) ?? baseState;
