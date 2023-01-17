@@ -154,6 +154,23 @@ if ( ! function_exists( 'wp_enqueue_webfont_variations' ) ) {
 	}
 }
 
+if ( ! function_exists( 'wp_deregister_webfont_variation' ) ) {
+	/**
+	 * Deregisters a font variation.
+	 *
+	 * @since GB 14.9.1
+	 * @deprecated GB 15.1 Use wp_deregister_font_variation() instead.
+	 *
+	 * @param string $font_family_handle The font family for this variation.
+	 * @param string $variation_handle   The variation's handle to remove.
+	 */
+	function wp_deregister_webfont_variation( $font_family_handle, $variation_handle ) {
+		_deprecated_function( __FUNCTION__, 'GB 15.1', 'wp_deregister_font_variation()' );
+
+		wp_deregister_font_variation( $font_family_handle, $variation_handle );
+	}
+}
+
 if ( ! function_exists( 'wp_get_webfont_providers' ) ) {
 	/**
 	 * Gets all registered providers.

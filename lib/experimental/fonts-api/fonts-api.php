@@ -125,7 +125,7 @@ if ( ! function_exists( 'wp_deregister_font_family' ) ) {
 	}
 }
 
-if ( ! function_exists( 'wp_deregister_webfont_variation' ) ) {
+if ( ! function_exists( 'wp_deregister_font_variation' ) ) {
 	/**
 	 * Deregisters a font variation.
 	 *
@@ -134,7 +134,7 @@ if ( ! function_exists( 'wp_deregister_webfont_variation' ) ) {
 	 * @param string $font_family_handle The font family for this variation.
 	 * @param string $variation_handle   The variation's handle to remove.
 	 */
-	function wp_deregister_webfont_variation( $font_family_handle, $variation_handle ) {
+	function wp_deregister_font_variation( $font_family_handle, $variation_handle ) {
 		wp_fonts()->remove_variation( $font_family_handle, $variation_handle );
 	}
 }
