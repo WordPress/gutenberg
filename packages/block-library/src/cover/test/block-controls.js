@@ -20,7 +20,7 @@ import CoverBlockControls from '../edit/block-controls';
 
 function setup( jsx ) {
 	return {
-		user: userEvent.setup( { advanceTimers: jest.advanceTimersByTime } ),
+		user: userEvent.setup(),
 		...render( jsx ),
 	};
 }

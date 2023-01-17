@@ -36,7 +36,7 @@ import metadata from '../block.json';
 
 function setup( jsx ) {
 	return {
-		user: userEvent.setup( { advanceTimers: jest.advanceTimersByTime } ),
+		user: userEvent.setup(),
 		...render( jsx ),
 	};
 }
@@ -117,7 +117,7 @@ describe( 'Cover edit', () => {
 				} )
 			);
 
-			expect( setOverlayColor ).toHaveBeenCalledWith( '#000000' );
+			expect( setOverlayColor ).toHaveBeenCalledWith( '#000000', 0 );
 		} );
 	} );
 } );
