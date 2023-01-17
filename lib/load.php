@@ -101,7 +101,7 @@ require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/fonts-api/deprecations/webfonts-deprecations.php';
 require __DIR__ . '/experimental/fonts-api/deprecations/class-wp-webfonts.php';
 require __DIR__ . '/experimental/fonts-api/class-wp-fonts-utils.php';
-require __DIR__ . '/experimental/fonts-api/register-webfonts-from-theme-json.php';
+require __DIR__ . '/experimental/fonts-api/register-fonts-from-theme-json.php';
 require __DIR__ . '/experimental/fonts-api/class-wp-web-fonts.php';
 require __DIR__ . '/experimental/fonts-api/class-wp-webfonts-provider.php';
 require __DIR__ . '/experimental/fonts-api/class-wp-webfonts-provider-local.php';

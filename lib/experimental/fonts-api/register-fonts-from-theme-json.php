@@ -5,11 +5,11 @@
  * @package gutenberg
  */
 
-if ( ! function_exists( 'gutenberg_register_webfonts_from_theme_json' ) ) {
+if ( ! function_exists( 'gutenberg_register_fonts_from_theme_json' ) ) {
 	/**
-	 * Register webfonts defined in theme.json.
+	 * Register fonts defined in theme.json.
 	 */
-	function gutenberg_register_webfonts_from_theme_json() {
+	function gutenberg_register_fonts_from_theme_json() {
 		// Get settings.
 		$settings = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_settings();
 
@@ -44,8 +44,8 @@ if ( ! function_exists( 'gutenberg_register_webfonts_from_theme_json' ) ) {
 			return;
 		}
 
-		$webfonts = array();
-		$handles  = array();
+		$fonts   = array();
+		$handles = array();
 
 		// Look for fontFamilies.
 		foreach ( $settings['typography']['fontFamilies'] as $font_families ) {
@@ -98,28 +98,28 @@ if ( ! function_exists( 'gutenberg_register_webfonts_from_theme_json' ) ) {
 					}
 
 					$handles[] = $font_family_handle;
-					if ( ! array_key_exists( $font_family_handle, $webfonts ) ) {
-						$webfonts[ $font_family_handle ] = array();
+					if ( ! array_key_exists( $font_family_handle, $fonts ) ) {
+						$fonts[ $font_family_handle ] = array();
 					}
 
-					$webfonts[ $font_family_handle ][] = $font_face;
+					$fonts[ $font_family_handle ][] = $font_face;
 				}
 			}
 		}
 
-		wp_register_webfonts( $webfonts );
+		wp_register_webfonts( $fonts );
 		wp_enqueue_webfonts( $handles );
 	}
 }
 
-if ( ! function_exists( 'gutenberg_add_registered_webfonts_to_theme_json' ) ) {
+if ( ! function_exists( 'gutenberg_add_registered_fonts_to_theme_json' ) ) {
 	/**
 	 * Add missing fonts data to the global styles.
 	 *
 	 * @param array $data The global styles.
 	 * @return array The global styles with missing fonts data.
 	 */
-	function gutenberg_add_registered_webfonts_to_theme_json( $data ) {
+	function gutenberg_add_registered_fonts_to_theme_json( $data ) {
 		$font_families_registered = wp_webfonts()->get_registered_font_families();
 		$font_families_from_theme = ! empty( $data['settings']['typography']['fontFamilies'] )
 			? $data['settings']['typography']['fontFamilies']
@@ -175,9 +175,9 @@ if ( ! function_exists( 'gutenberg_add_registered_webfonts_to_theme_json' ) ) {
 	}
 }
 
-// `gutenberg_register_webfonts_from_theme_json()` calls `WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()`, which instantiates `WP_Theme_JSON_Gutenberg()`;
+// `gutenberg_register_fonts_from_theme_json()` calls `WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()`, which instantiates `WP_Theme_JSON_Gutenberg()`;
 // Gutenberg server-side blocks are registered via the init hook with a priority value of `20`. E.g., `add_action( 'init', 'register_block_core_image', 20 )`;
 // This priority value is added dynamically during the build. See: tools/webpack/blocks.js.
 // We want to make sure Gutenberg blocks are re-registered before any Theme_JSON operations take place
 // so that we have access to updated merged data.
-add_action( 'init', 'gutenberg_register_webfonts_from_theme_json', 21 );
+add_action( 'init', 'gutenberg_register_fonts_from_theme_json', 21 );
