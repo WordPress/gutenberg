@@ -18,6 +18,8 @@ import {
 	chevronRight,
 } from '@wordpress/icons';
 import { isRTL, __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -38,6 +40,21 @@ function ContextMenu( { name, parentMenu = '' } ) {
 	const hasDimensionsPanel = useHasDimensionsPanel( name );
 	const hasLayoutPanel = hasDimensionsPanel;
 	const hasVariationsPanel = useHasVariationsPanel( name, parentMenu );
+
+	const { canEditCSS } = useSelect( ( select ) => {
+		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
+			select( coreStore );
+
+		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
+		const globalStyles = globalStylesId
+			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
+			: undefined;
+
+		return {
+			canEditCSS:
+				!! globalStyles?._links?.[ 'wp:action-edit-css' ] ?? false,
+		};
+	}, [] );
 
 	return (
 		<>
@@ -78,71 +95,43 @@ function ContextMenu( { name, parentMenu = '' } ) {
 						{ __( 'Layout' ) }
 					</NavigationButtonAsItem>
 				) }
+				{ hasVariationsPanel && (
+					<ScreenVariations name={ name } path={ parentMenu } />
+				) }
+				{ !! parentMenu && !! canEditCSS && (
+					<>
+						<CardDivider />
+						<CardBody>
+							<Spacer as="p" paddingTop={ 2 } marginBottom={ 4 }>
+								{ __(
+									'Add your own CSS to customize the block appearance.'
+								) }
+							</Spacer>
+							<ItemGroup>
+								<NavigationButtonAsItem
+									path={ parentMenu + '/css' }
+									aria-label={ __( 'Additional block CSS' ) }
+								>
+									<HStack justify="space-between">
+										<FlexItem>
+											{ __( 'Additional block CSS' ) }
+										</FlexItem>
+										<IconWithCurrentColor
+											icon={
+												isRTL()
+													? chevronLeft
+													: chevronRight
+											}
+										/>
+									</HStack>
+								</NavigationButtonAsItem>
+							</ItemGroup>
+						</CardBody>
+						<CardDivider />
+					</>
+				) }
 			</ItemGroup>
-			{ !! parentMenu && (
-				<>
-					<CardDivider />
-					<CardBody>
-						<Spacer
-							as="p"
-							paddingTop={ 2 }
-							paddingX="13px"
-							marginBottom={ 4 }
-						>
-							{ __(
-								'Add your own CSS to customize the block appearance.'
-							) }
-						</Spacer>
-						<ItemGroup>
-							<NavigationButtonAsItem
-								path={ parentMenu + '/css' }
-								aria-label={ __( 'Additional CSS' ) }
-							>
-								<HStack justify="space-between">
-									<FlexItem>{ __( 'Custom' ) }</FlexItem>
-									<IconWithCurrentColor
-										icon={
-											isRTL() ? chevronLeft : chevronRight
-										}
-									/>
-								</HStack>
-							</NavigationButtonAsItem>
-						</ItemGroup>
-					</CardBody>
-				</>
-			) }
 		</>
-			{ hasColorPanel && (
-				<NavigationButtonAsItem
-					icon={ color }
-					path={ parentMenu + '/colors' }
-					aria-label={ __( 'Colors styles' ) }
-				>
-					{ __( 'Colors' ) }
-				</NavigationButtonAsItem>
-			) }
-			{ hasBorderPanel && (
-				<NavigationButtonAsItem
-					icon={ border }
-					path={ parentMenu + '/border' }
-					aria-label={ __( 'Border styles' ) }
-				>
-					{ __( 'Border' ) }
-				</NavigationButtonAsItem>
-			) }
-			{ hasLayoutPanel && (
-				<NavigationButtonAsItem
-					icon={ layout }
-					path={ parentMenu + '/layout' }
-					aria-label={ __( 'Layout styles' ) }
-				>
-					{ __( 'Layout' ) }
-				</NavigationButtonAsItem>
-			) }
-			{ hasVariationsPanel && (
-				<ScreenVariations name={ name } path={ parentMenu } />
-			) }
-		</ItemGroup>
 	);
 }
 
