@@ -51,3 +51,24 @@ WithCustomSpokenMessage.args = {
 	politeness: 'assertive',
 	spokenMessage: 'This is a notice with a custom spoken message',
 };
+
+export const WithActions: ComponentStory< typeof Notice > = Template.bind( {} );
+WithActions.args = {
+	...Default.args,
+	actions: [
+		{
+			label: 'Click me!',
+			onClick: () => {},
+			variant: 'primary',
+		},
+		{
+			label: 'Or click me instead!',
+			onClick: () => {},
+		},
+		{
+			label: 'Or visit a link for more info',
+			url: 'https://wordpress.org',
+			variant: 'link',
+		},
+	],
+};
