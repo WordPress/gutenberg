@@ -105,7 +105,7 @@ require __DIR__ . '/experimental/fonts-api/register-fonts-from-theme-json.php';
 require __DIR__ . '/experimental/fonts-api/class-wp-web-fonts.php';
 require __DIR__ . '/experimental/fonts-api/class-wp-webfonts-provider.php';
 require __DIR__ . '/experimental/fonts-api/class-wp-webfonts-provider-local.php';
-require __DIR__ . '/experimental/fonts-api/webfonts.php';
+require __DIR__ . '/experimental/fonts-api/fonts-api.php';
 
 // Plugin specific code.
 require __DIR__ . '/class-wp-theme-json-gutenberg.php';

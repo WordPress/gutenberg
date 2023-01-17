@@ -48,22 +48,22 @@ class WP_Webfonts extends WP_Dependencies {
 	 * Initializes the API.
 	 *
 	 * @since 6.0.0
-	 * @deprecated X.X.X Use wp_webfonts().
+	 * @deprecated GB 14.9.1 Use wp_fonts().
 	 */
 	public static function init() {
-		_deprecated_function( __METHOD__, 'X.X.X', 'wp_webfonts()' );
+		_deprecated_function( __METHOD__, 'GB 14.9.1', 'wp_fonts()' );
 	}
 
 	/**
 	 * Gets the list of registered fonts.
 	 *
 	 * @since 6.0.0
-	 * @deprecated X.X.X Use wp_webfonts()->get_registered().
+	 * @deprecated 14.9.1 Use wp_fonts()->get_registered().
 	 *
 	 * @return array[]
 	 */
 	public function get_registered_webfonts() {
-		_deprecated_function( __METHOD__, 'X.X.X', 'wp_webfonts()->get_registered()' );
+		_deprecated_function( __METHOD__, '14.9.1', 'wp_fonts()->get_registered()' );
 
 		return $this->_get_registered_webfonts();
 	}
@@ -72,12 +72,12 @@ class WP_Webfonts extends WP_Dependencies {
 	 * Gets the list of enqueued fonts.
 	 *
 	 * @since 6.0.0
-	 * @deprecated X.X.X Use wp_webfonts()->get_enqueued().
+	 * @deprecated GB 14.9.1 Use wp_fonts()->get_enqueued().
 	 *
 	 * @return array[]
 	 */
 	public function get_enqueued_webfonts() {
-		_deprecated_function( __METHOD__, 'X.X.X', 'wp_webfonts()->get_enqueued()' );
+		_deprecated_function( __METHOD__, 'GB 14.9.1', 'wp_fonts()->get_enqueued()' );
 
 		return $this->queue;
 	}
@@ -86,12 +86,12 @@ class WP_Webfonts extends WP_Dependencies {
 	 * Gets the list of all fonts.
 	 *
 	 * @since 6.0.0
-	 * @deprecated X.X.X Use wp_webfonts()->get_registered().
+	 * @deprecated GB 14.9.1 Use wp_fonts()->get_registered().
 	 *
 	 * @return array[]
 	 */
 	public function get_all_webfonts() {
-		_deprecated_function( __METHOD__, 'X.X.X', 'wp_webfonts()->get_registered()' );
+		_deprecated_function( __METHOD__, 'GB 14.9.1', 'wp_fonts()->get_registered()' );
 
 		return $this->_get_registered_webfonts();
 	}

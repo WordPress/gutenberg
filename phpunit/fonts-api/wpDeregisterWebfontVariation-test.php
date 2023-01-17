@@ -20,7 +20,7 @@ class Tests_Webfonts_WpDeregisterWebfontVariation extends WP_Fonts_TestCase {
 
 	public function set_up() {
 		parent::set_up();
-		$this->wp_webfonts       = wp_webfonts();
+		$this->wp_webfonts       = wp_fonts();
 		$this->fonts_to_register = $this->get_registered_local_fonts();
 	}
 

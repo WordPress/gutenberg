@@ -10,6 +10,28 @@
  * @since      X.X.X
  */
 
+if ( ! function_exists( 'wp_webfonts' ) ) {
+	/**
+	 * Initialize $wp_webfonts if it has not been set.
+	 *
+	 * @since X.X.X
+	 * @deprecated GB 15.1 Use wp_fonts() instead.
+	 *
+	 * @global WP_Web_Fonts $wp_webfonts
+	 *
+	 * @return WP_Web_Fonts WP_Web_Fonts instance.
+	 */
+	function wp_webfonts() {
+		_deprecated_function( __FUNCTION__, 'GB 15.1', 'wp_fonts()' );
+
+		global $wp_webfonts;
+
+		$wp_webfonts = wp_fonts();
+
+		return $wp_webfonts;
+	}
+}
+
 if ( ! function_exists( 'wp_enqueue_webfont' ) ) {
 	/**
 	 * Enqueue a single font family that has been registered beforehand.
@@ -57,15 +79,15 @@ if ( ! function_exists( 'wp_register_webfont' ) ) {
 	 * </code>
 	 *
 	 * @since 6.0.0
-	 * @deprecated X.X.X Use wp_register_webfonts().
+	 * @deprecated 14.9.1 Use wp_register_webfonts().
 	 *
 	 * @param array $webfont Webfont to be registered.
 	 * @return string|false The font family slug if successfully registered, else false.
 	 */
 	function wp_register_webfont( array $webfont ) {
-		_deprecated_function( __FUNCTION__, 'X.X.X', 'wp_register_webfonts()' );
+		_deprecated_function( __FUNCTION__, '14.9.1', 'wp_register_webfonts()' );
 
-		return wp_webfonts()->register_webfont( $webfont, '', '', false );
+		return wp_fonts()->register_webfont( $webfont, '', '', false );
 	}
 }
 
@@ -83,15 +105,15 @@ if ( ! function_exists( 'wp_get_webfont_providers' ) ) {
 	 * and how to generate the `@font-face` styles for its service.
 	 *
 	 * @since X.X.X
-	 * @deprecated X.X.X Use wp_webfonts()->get_providers().
+	 * @deprecated GB 14.9.1 Use wp_fonts()->get_providers().
 	 *
 	 * @return string[] All registered providers, each keyed by their unique ID.
 	 */
 	function wp_get_webfont_providers() {
-		_deprecated_function( __FUNCTION__, 'X.X.X', 'wp_webfonts()->get_providers()' );
+		_deprecated_function( __FUNCTION__, '14.9.1', 'wp_fonts()->get_providers()' );
 
 		$providers = array();
-		foreach ( wp_webfonts()->get_providers() as $id => $config ) {
+		foreach ( wp_fonts()->get_providers() as $id => $config ) {
 			$providers[ $id ] = $config['class'];
 		}
 

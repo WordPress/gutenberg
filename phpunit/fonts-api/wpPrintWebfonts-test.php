@@ -16,12 +16,12 @@ require_once __DIR__ . '/../fixtures/mock-provider.php';
 class Tests_Webfonts_WpPrintWebfonts extends WP_Fonts_TestCase {
 
 	public function test_should_return_empty_array_when_global_not_instance() {
-		global $wp_webfonts;
-		wp_webfonts();
-		$wp_webfonts = null;
+		global $wp_fonts;
+		wp_fonts();
+		$wp_fonts = null;
 
 		$this->assertSame( array(), wp_print_webfonts() );
-		$this->assertNotInstanceOf( WP_Webfonts::class, $wp_webfonts );
+		$this->assertNotInstanceOf( WP_Webfonts::class, $wp_fonts );
 	}
 
 	/**
@@ -73,7 +73,7 @@ class Tests_Webfonts_WpPrintWebfonts extends WP_Fonts_TestCase {
 	 * @param string $expected_output Expected printed output.
 	 */
 	public function test_should_print_enqueued( $setup, $expected_done, $expected_output ) {
-		$wp_webfonts = wp_webfonts();
+		$wp_webfonts = wp_fonts();
 
 		$this->setup_integrated_deps( $setup, $wp_webfonts );
 
@@ -93,7 +93,7 @@ class Tests_Webfonts_WpPrintWebfonts extends WP_Fonts_TestCase {
 	 * @param string $expected_output Expected printed output.
 	 */
 	public function test_should_print_handles_when_not_enqueued( $setup, $expected_done, $expected_output ) {
-		$wp_webfonts = wp_webfonts();
+		$wp_webfonts = wp_fonts();
 
 		$this->setup_integrated_deps( $setup, $wp_webfonts, false );
 		// Do not enqueue. Instead, pass the handles to wp_print_webfonts().
