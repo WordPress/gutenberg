@@ -234,3 +234,21 @@ if ( ! function_exists( 'wp_register_webfont_provider' ) ) {
 		return wp_register_font_provider( $name, $classname );
 	}
 }
+
+if ( ! function_exists( 'wp_print_webfonts' ) ) {
+	/**
+	 * Invokes each provider to process and print its styles.
+	 *
+	 * @since GB 14.9.1
+	 * @deprecated GB 15.1 Use wp_print_fonts() instead.
+	 *
+	 * @param string|string[]|false $handles Optional. Items to be processed: queue (false),
+	 *                                       single item (string), or multiple items (array of strings).
+	 *                                       Default false.
+	 * @return array|string[] Array of web font handles that have been processed.
+	 *                        An empty array if none were processed.
+	 */
+	function wp_print_webfonts( $handles = false ) {
+		return wp_print_fonts( $handles );
+	}
+}
