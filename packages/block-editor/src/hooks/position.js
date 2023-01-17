@@ -8,8 +8,13 @@ import classnames from 'classnames';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
-import { BaseControl, CustomSelectControl } from '@wordpress/components';
+import {
+	BaseControl,
+	CustomSelectControl,
+	Notice,
+} from '@wordpress/components';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 import {
 	useContext,
 	useMemo,
@@ -25,6 +30,7 @@ import BlockList from '../components/block-list';
 import useSetting from '../components/use-setting';
 import InspectorControls from '../components/inspector-controls';
 import { cleanEmptyObject } from './utils';
+import { store as blockEditorStore } from '../store';
 
 const POSITION_SUPPORT_KEY = 'position';
 
@@ -195,6 +201,40 @@ export function useIsPositionDisabled( { name: blockName } = {} ) {
 	return ! hasPositionSupport( blockName ) || isDisabled;
 }
 
+function StickyPositionChecker( { clientId, positionType } ) {
+	const { hasParents } = useSelect(
+		( select ) => {
+			const { getBlockParents } = select( blockEditorStore );
+			const parents = getBlockParents( clientId );
+
+			return {
+				hasParents: parents.length,
+			};
+		},
+		[ clientId ]
+	);
+
+	if ( positionType !== 'sticky' || ! hasParents ) {
+		return null;
+	}
+
+	const message = __(
+		'Sticky positioning works best with blocks that are set at the root of the document, as the sticky area locks to the next parent block. For sticky headers and footers, use a Group block at the root of the document.'
+	);
+
+	return (
+		<div className="block-editor-sticky-position-checker">
+			<Notice
+				spokenMessage={ null }
+				status="warning"
+				isDismissible={ false }
+			>
+				{ message }
+			</Notice>
+		</div>
+	);
+}
+
 /*
  * Position controls to be rendered in an inspector control panel.
  *
@@ -205,6 +245,7 @@ export function useIsPositionDisabled( { name: blockName } = {} ) {
 export function PositionEdit( props ) {
 	const {
 		attributes: { style = {} },
+		clientId,
 		name: blockName,
 		setAttributes,
 	} = props;
@@ -275,6 +316,10 @@ export function PositionEdit( props ) {
 						size={ '__unstable-large' }
 					/>
 				</BaseControl>
+				<StickyPositionChecker
+					clientId={ clientId }
+					positionType={ value }
+				/>
 			</>
 		),
 		native: null,
