@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Web_Fonts::dequeue() tests.
+ * WP_Fonts::dequeue() tests.
  *
  * @package    WordPress
  * @subpackage Fonts API
@@ -10,9 +10,9 @@ require_once __DIR__ . '/../wp-fonts-testcase.php';
 
 /**
  * @group  fontsapi
- * @covers WP_Web_Fonts::dequeue
+ * @covers WP_Fonts::dequeue
  */
-class Tests_Webfonts_WpWebfonts_Dequeue extends WP_Fonts_TestCase {
+class Tests_Fonts_WpFonts_Dequeue extends WP_Fonts_TestCase {
 
 	/**
 	 * @dataProvider data_enqueue
@@ -21,11 +21,11 @@ class Tests_Webfonts_WpWebfonts_Dequeue extends WP_Fonts_TestCase {
 	 * @param string|string[] $handles Handles to test.
 	 */
 	public function test_should_do_nothing_when_handles_not_queued( $handles ) {
-		$wp_webfonts = new WP_Web_Fonts();
+		$wp_fonts = new WP_Fonts();
 
-		$wp_webfonts->dequeue( $handles );
-		$this->assertEmpty( $this->get_queued_before_register( $wp_webfonts ), 'Prequeue should be empty' );
-		$this->assertEmpty( $wp_webfonts->queue, 'Queue should be empty' );
+		$wp_fonts->dequeue( $handles );
+		$this->assertEmpty( $this->get_queued_before_register( $wp_fonts ), 'Prequeue should be empty' );
+		$this->assertEmpty( $wp_fonts->queue, 'Queue should be empty' );
 	}
 
 	/**
@@ -37,20 +37,20 @@ class Tests_Webfonts_WpWebfonts_Dequeue extends WP_Fonts_TestCase {
 	 * @param string|string[] $handles Handles to test.
 	 */
 	public function test_should_dequeue_from_queue( $handles ) {
-		$wp_webfonts = new WP_Web_Fonts();
+		$wp_fonts = new WP_Fonts();
 
 		// Register and enqueue.
 		foreach ( $this->get_data_registry() as $handle => $variations ) {
-			$this->setup_register( $handle, $variations, $wp_webfonts );
+			$this->setup_register( $handle, $variations, $wp_fonts );
 		}
-		$wp_webfonts->enqueue( $handles );
+		$wp_fonts->enqueue( $handles );
 
 		// To make sure the handles are in the queue before dequeuing.
-		$this->assertNotEmpty( $wp_webfonts->queue, 'Queue not be empty before dequeueing' );
+		$this->assertNotEmpty( $wp_fonts->queue, 'Queue not be empty before dequeueing' );
 
 		// Run the test.
-		$wp_webfonts->dequeue( $handles );
-		$this->assertEmpty( $wp_webfonts->queue, 'Queue should be empty after dequeueing' );
+		$wp_fonts->dequeue( $handles );
+		$this->assertEmpty( $wp_fonts->queue, 'Queue should be empty after dequeueing' );
 	}
 
 	/**
@@ -62,11 +62,11 @@ class Tests_Webfonts_WpWebfonts_Dequeue extends WP_Fonts_TestCase {
 	 * @param string|string[] $handles Handles to test.
 	 */
 	public function test_should_dequeue_from_prequeue( $handles ) {
-		$wp_webfonts = new WP_Web_Fonts();
-		$wp_webfonts->enqueue( $handles );
-		$this->assertNotEmpty( $this->get_queued_before_register( $wp_webfonts ), 'Prequeue not be empty before dequeueing' );
+		$wp_fonts = new WP_Fonts();
+		$wp_fonts->enqueue( $handles );
+		$this->assertNotEmpty( $this->get_queued_before_register( $wp_fonts ), 'Prequeue not be empty before dequeueing' );
 
-		$wp_webfonts->dequeue( $handles );
-		$this->assertEmpty( $this->get_queued_before_register( $wp_webfonts ), 'Prequeue should be empty after dequeueing' );
+		$wp_fonts->dequeue( $handles );
+		$this->assertEmpty( $this->get_queued_before_register( $wp_fonts ), 'Prequeue should be empty after dequeueing' );
 	}
 }

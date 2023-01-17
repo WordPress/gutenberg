@@ -108,9 +108,9 @@ class Tests_Fonts_WpPrintFonts extends WP_Fonts_TestCase {
 	/**
 	 * Sets up the dependencies for integration test.
 	 *
-	 * @param array        $setup       Dependencies to set up.
-	 * @param WP_Web_Fonts $wp_fonts Instance of WP_Web_Fonts.
-	 * @param bool         $enqueue     Whether to enqueue. Default true.
+	 * @param array    $setup    Dependencies to set up.
+	 * @param WP_Fonts $wp_fonts Instance of WP_Fonts.
+	 * @param bool     $enqueue  Whether to enqueue. Default true.
 	 */
 	private function setup_integrated_deps( array $setup, $wp_fonts, $enqueue = true ) {
 		foreach ( $setup['provider'] as $provider ) {

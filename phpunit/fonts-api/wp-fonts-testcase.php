@@ -15,9 +15,9 @@ abstract class WP_Fonts_TestCase extends WP_UnitTestCase {
 	use WP_Fonts_Tests_Datasets;
 
 	/**
-	 * Original WP_Web_Fonts instance, before the tests.
+	 * Original WP_Fonts instance, before the tests.
 	 *
-	 * @var WP_Web_Fonts
+	 * @var WP_Fonts
 	 */
 	private $old_wp_fonts;
 
@@ -56,7 +56,7 @@ abstract class WP_Fonts_TestCase extends WP_UnitTestCase {
 	}
 
 	protected function set_up_mock( $method ) {
-		$mock = $this->setup_object_mock( $method, WP_Web_Fonts::class );
+		$mock = $this->setup_object_mock( $method, WP_Fonts::class );
 
 		// Set the global.
 		$GLOBALS['wp_fonts'] = $mock;
@@ -81,7 +81,7 @@ abstract class WP_Fonts_TestCase extends WP_UnitTestCase {
 	}
 
 	protected function get_variations( $font_family, $wp_fonts = null ) {
-		if ( ! ( $wp_fonts instanceof WP_Web_Fonts ) ) {
+		if ( ! ( $wp_fonts instanceof WP_Fonts ) ) {
 			$wp_fonts = wp_fonts();
 		}
 
@@ -96,7 +96,7 @@ abstract class WP_Fonts_TestCase extends WP_UnitTestCase {
 		return $this->get_property_value( 'queued_before_register', WP_Dependencies::class, $wp_fonts );
 	}
 
-	protected function get_reflection_property( $property_name, $class = 'WP_Web_Fonts' ) {
+	protected function get_reflection_property( $property_name, $class = 'WP_Fonts' ) {
 		$property = new ReflectionProperty( $class, $property_name );
 		$property->setAccessible( true );
 
@@ -135,7 +135,7 @@ abstract class WP_Fonts_TestCase extends WP_UnitTestCase {
 	 * @return ReflectionMethod Instance of the method, ie to invoke it in the test.
 	 */
 	protected function get_reflection_method( $method_name ) {
-		$method = new ReflectionMethod( WP_Web_Fonts::class, $method_name );
+		$method = new ReflectionMethod( WP_Fonts::class, $method_name );
 		$method->setAccessible( true );
 
 		return $method;
@@ -144,11 +144,11 @@ abstract class WP_Fonts_TestCase extends WP_UnitTestCase {
 	/**
 	 * Sets up multiple font family and variation mocks.
 	 *
-	 * @param array        $inputs   Array of array( font-family => variations ) to setup.
-	 * @param WP_Web_Fonts $wp_fonts Instance of WP_Web_Fonts.
+	 * @param array    $inputs   Array of array( font-family => variations ) to setup.
+	 * @param WP_Fonts $wp_fonts Instance of WP_Fonts.
 	 * @return stdClass[] Array of registered mocks.
 	 */
-	protected function setup_registration_mocks( array $inputs, WP_Web_Fonts $wp_fonts ) {
+	protected function setup_registration_mocks( array $inputs, WP_Fonts $wp_fonts ) {
 		$mocks = array();
 
 		$build_mock = function ( $font_family, $is_font_family = false ) use ( &$mocks, $wp_fonts ) {
@@ -187,12 +187,12 @@ abstract class WP_Fonts_TestCase extends WP_UnitTestCase {
 	/**
 	 * Register one or more font-family and its variations to set up a test.
 	 *
-	 * @param string            $font_family Font family to test.
-	 * @param array             $variations  Variations.
-	 * @param WP_Web_Fonts|null $wp_fonts    Optional. Instance of the WP_Web_Fonts.
+	 * @param string        $font_family Font family to test.
+	 * @param array         $variations  Variations.
+	 * @param WP_Fonts|null $wp_fonts    Optional. Instance of the WP_Fonts.
 	 */
 	protected function setup_register( $font_family, $variations, $wp_fonts = null ) {
-		if ( ! ( $wp_fonts instanceof WP_Web_Fonts ) ) {
+		if ( ! ( $wp_fonts instanceof WP_Fonts ) ) {
 			$wp_fonts = wp_fonts();
 		}
 
@@ -207,18 +207,18 @@ abstract class WP_Fonts_TestCase extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Sets up the WP_Web_Fonts::$provider property.
+	 * Sets up the WP_Fonts::$provider property.
 	 *
-	 * @param WP_Web_Fonts $wp_fonts     Instance of WP_Web_Fonts.
+	 * @param WP_Fonts     $wp_fonts     Instance of WP_Fonts.
 	 * @param string|array $provider     Provider ID when string. Else provider definition with 'id' and 'class' keys.
 	 * @param array        $font_handles Optional. Font handles for this provider.
 	 */
-	protected function setup_provider_property_mock( WP_Web_Fonts $wp_fonts, $provider, array $font_handles = array() ) {
+	protected function setup_provider_property_mock( WP_Fonts $wp_fonts, $provider, array $font_handles = array() ) {
 		if ( is_string( $provider ) ) {
 			$provider = $this->get_provider_definitions( $provider );
 		}
 
-		$property  = $this->setup_property( WP_Web_Fonts::class, 'providers' );
+		$property  = $this->setup_property( WP_Fonts::class, 'providers' );
 		$providers = $property->getValue( $wp_fonts );
 
 		if ( ! isset( $providers[ $provider['id'] ] ) ) {

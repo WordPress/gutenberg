@@ -11,17 +11,17 @@ require_once __DIR__ . '/wp-fonts-testcase.php';
 /**
  * @group  fontsapi
  * @covers ::wp_enqueue_fonts
- * @covers WP_Web_Fonts::enqueue
+ * @covers WP_Fonts::enqueue
  */
 class Tests_Fonts_WpEnqueueFonts extends WP_Fonts_TestCase {
 
 	/**
-	 * Unit test for registering a font-family that mocks WP_Web_Fonts.
+	 * Unit test for registering a font-family that mocks WP_Fonts.
 	 *
 	 * @dataProvider data_should_enqueue
 	 *
 	 * @param string[] $font_families    Font families to test.
-	 * @param string[] $expected_handles Expected handles passed to WP_Web_Fonts::enqueue().
+	 * @param string[] $expected_handles Expected handles passed to WP_Fonts::enqueue().
 	 */
 	public function test_unit_should_enqueue( $font_families, $expected_handles ) {
 		$mock = $this->set_up_mock( 'enqueue' );
@@ -40,7 +40,7 @@ class Tests_Fonts_WpEnqueueFonts extends WP_Fonts_TestCase {
 	 * @dataProvider data_should_enqueue
 	 *
 	 * @param string[] $font_families    Font families to test.
-	 * @param string[] $expected_handles Expected handles passed to WP_Web_Fonts::enqueue().
+	 * @param string[] $expected_handles Expected handles passed to WP_Fonts::enqueue().
 	 */
 	public function test_should_enqueue_after_registration( $font_families, $expected_handles ) {
 		// Register the font-families.
@@ -60,7 +60,7 @@ class Tests_Fonts_WpEnqueueFonts extends WP_Fonts_TestCase {
 	 * @dataProvider data_should_enqueue
 	 *
 	 * @param string[] $font_families    Font families to test.
-	 * @param string[] $expected_handles Expected handles passed to WP_Web_Fonts::enqueue().
+	 * @param string[] $expected_handles Expected handles passed to WP_Fonts::enqueue().
 	 */
 	public function test_should_enqueue_before_registration( $font_families, $expected_handles ) {
 		wp_enqueue_fonts( $font_families );

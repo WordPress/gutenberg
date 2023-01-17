@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Web_Fonts::query() tests.
+ * WP_Fonts::query() tests.
  *
  * @package    WordPress
  * @subpackage Fonts API
@@ -10,15 +10,15 @@ require_once __DIR__ . '/../wp-fonts-testcase.php';
 
 /**
  * @group  fontsapi
- * @covers WP_Web_Fonts::query
+ * @covers WP_Fonts::query
  */
-class Tests_Webfonts_WpWebfonts_Query extends WP_Fonts_TestCase {
-	private $wp_webfonts;
+class Tests_Fonts_WpFonts_Query extends WP_Fonts_TestCase {
+	private $wp_fonts;
 
 	public function set_up() {
 		parent::set_up();
 
-		$this->wp_webfonts = new WP_Web_Fonts();
+		$this->wp_fonts = new WP_Fonts();
 	}
 
 	/**
@@ -28,7 +28,7 @@ class Tests_Webfonts_WpWebfonts_Query extends WP_Fonts_TestCase {
 	 * @param string $query_handle Handle to test.
 	 */
 	public function test_should_fail_when_handles_not_registered( $query_handle ) {
-		$this->assertFalse( $this->wp_webfonts->query( $query_handle, 'registered' ) );
+		$this->assertFalse( $this->wp_fonts->query( $query_handle, 'registered' ) );
 	}
 
 	/**
@@ -38,7 +38,7 @@ class Tests_Webfonts_WpWebfonts_Query extends WP_Fonts_TestCase {
 	 * @param string $query_handle Handle to test.
 	 */
 	public function test_should_fail_when_handles_not_registered_or_enqueued( $query_handle ) {
-		$this->assertFalse( $this->wp_webfonts->query( $query_handle, 'queue' ) );
+		$this->assertFalse( $this->wp_fonts->query( $query_handle, 'queue' ) );
 	}
 
 	/**
@@ -49,7 +49,7 @@ class Tests_Webfonts_WpWebfonts_Query extends WP_Fonts_TestCase {
 	public function test_registered_query_should_succeed_when_registered( $query_handle ) {
 		$this->setup_registry();
 
-		$actual = $this->wp_webfonts->query( $query_handle, 'registered' );
+		$actual = $this->wp_fonts->query( $query_handle, 'registered' );
 		$this->assertInstanceOf( '_WP_Dependency', $actual, 'Query should return an instance of _WP_Dependency' );
 		$this->assertSame( $query_handle, $actual->handle, 'Query object handle should match the given handle to query' );
 	}
@@ -61,9 +61,9 @@ class Tests_Webfonts_WpWebfonts_Query extends WP_Fonts_TestCase {
 	 */
 	public function test_enqueued_query_should_succeed_when_registered_and_enqueued( $query_handle ) {
 		$this->setup_registry();
-		$this->wp_webfonts->enqueue( $query_handle );
+		$this->wp_fonts->enqueue( $query_handle );
 
-		$this->assertTrue( $this->wp_webfonts->query( $query_handle, 'enqueued' ) );
+		$this->assertTrue( $this->wp_fonts->query( $query_handle, 'enqueued' ) );
 	}
 
 	/**
@@ -72,9 +72,9 @@ class Tests_Webfonts_WpWebfonts_Query extends WP_Fonts_TestCase {
 	 * @param string $query_handle Handle to test.
 	 */
 	public function test_enqueued_query_should_fail_when_not_registered_but_enqueued( $query_handle ) {
-		$this->wp_webfonts->enqueue( $query_handle );
+		$this->wp_fonts->enqueue( $query_handle );
 
-		$this->assertFalse( $this->wp_webfonts->query( $query_handle, 'enqueued' ) );
+		$this->assertFalse( $this->wp_fonts->query( $query_handle, 'enqueued' ) );
 	}
 
 	/**
@@ -104,13 +104,13 @@ class Tests_Webfonts_WpWebfonts_Query extends WP_Fonts_TestCase {
 	}
 
 	public function test_done_query_should_fail_when_no_variations() {
-		$this->wp_webfonts->register_provider( 'local', WP_Fonts_Provider_Local::class );
+		$this->wp_fonts->register_provider( 'local', WP_Fonts_Provider_Local::class );
 		$this->setup_registry();
-		$this->wp_webfonts->enqueue( 'lato' );
+		$this->wp_fonts->enqueue( 'lato' );
 
-		$this->wp_webfonts->do_items( 'lato' );
+		$this->wp_fonts->do_items( 'lato' );
 
-		$this->assertFalse( $this->wp_webfonts->query( 'lato', 'done' ) );
+		$this->assertFalse( $this->wp_fonts->query( 'lato', 'done' ) );
 	}
 
 	/**
@@ -119,16 +119,16 @@ class Tests_Webfonts_WpWebfonts_Query extends WP_Fonts_TestCase {
 	 * @param string $query_handle Handle to test.
 	 */
 	public function test_done_query_should_succeed_when_registered_and_enqueued( $query_handle ) {
-		$this->wp_webfonts->register_provider( 'local', WP_Fonts_Provider_Local::class );
+		$this->wp_fonts->register_provider( 'local', WP_Fonts_Provider_Local::class );
 		$this->setup_registry();
-		$this->wp_webfonts->enqueue( $query_handle );
+		$this->wp_fonts->enqueue( $query_handle );
 
-		// Process the web fonts while ignoring all the printed output.
+		// Process the fonts while ignoring all the printed output.
 		$this->expectOutputRegex( '`.`' );
-		$this->wp_webfonts->do_items( $query_handle );
+		$this->wp_fonts->do_items( $query_handle );
 		$this->getActualOutput();
 
-		$this->assertTrue( $this->wp_webfonts->query( $query_handle, 'done' ) );
+		$this->assertTrue( $this->wp_fonts->query( $query_handle, 'done' ) );
 	}
 
 	/**
@@ -145,7 +145,7 @@ class Tests_Webfonts_WpWebfonts_Query extends WP_Fonts_TestCase {
 
 	private function setup_registry() {
 		foreach ( $this->get_registered_local_fonts() as $handle => $variations ) {
-			$this->setup_register( $handle, $variations, $this->wp_webfonts );
+			$this->setup_register( $handle, $variations, $this->wp_fonts );
 		}
 	}
 }

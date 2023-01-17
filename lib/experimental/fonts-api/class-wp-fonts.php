@@ -1,13 +1,13 @@
 <?php
 /**
- * Web Fonts API class.
+ * WP Fonts API class.
  *
  * @package    WordPress
  * @subpackage Fonts API
  * @since      X.X.X
  */
 
-if ( class_exists( 'WP_Web_Fonts' ) ) {
+if ( class_exists( 'WP_Fonts' ) ) {
 	return;
 }
 
@@ -16,7 +16,7 @@ if ( class_exists( 'WP_Web_Fonts' ) ) {
  *
  * @since X.X.X
  */
-class WP_Web_Fonts extends WP_Webfonts {
+class WP_Fonts extends WP_Webfonts {
 
 	/**
 	 * An array of registered providers.
@@ -28,9 +28,9 @@ class WP_Web_Fonts extends WP_Webfonts {
 	private $providers = array();
 
 	/**
-	 * The flipped $to_do array of web font handles.
+	 * The flipped $to_do array of font handles.
 	 *
-	 * Used for a faster lookup of the web font handles.
+	 * Used for a faster lookup of the font handles.
 	 *
 	 * @since X.X.X
 	 *
@@ -69,12 +69,12 @@ class WP_Web_Fonts extends WP_Webfonts {
 	 */
 	public function __construct() {
 		/**
-		 * Filters the web font variation's property defaults.
+		 * Filters the font variation's property defaults.
 		 *
 		 * @since X.X.X
 		 *
 		 * @param array $defaults {
-		 *     An array of required web font properties and defaults.
+		 *     An array of required font properties and defaults.
 		 *
 		 *     @type string $provider     The provider ID. Default 'local'.
 		 *     @type string $font-family  The font-family property. Default empty string.
@@ -83,16 +83,16 @@ class WP_Web_Fonts extends WP_Webfonts {
 		 *     @type string $font-display The font-display property. Default 'fallback'.
 		 * }
 		 */
-		$this->variation_property_defaults = apply_filters( 'wp_webfont_variation_defaults', $this->variation_property_defaults );
+		$this->variation_property_defaults = apply_filters( 'wp_font_variation_defaults', $this->variation_property_defaults );
 
 		/**
-		 * Fires when the WP_Webfonts instance is initialized.
+		 * Fires when the WP_Fonts instance is initialized.
 		 *
 		 * @since X.X.X
 		 *
-		 * @param WP_Web_Fonts $wp_webfonts WP_Web_Fonts instance (passed by reference).
+		 * @param WP_Fonts $wp_fonts WP_Fonts instance (passed by reference).
 		 */
-		do_action_ref_array( 'wp_default_webfonts', array( &$this ) );
+		do_action_ref_array( 'wp_default_fonts', array( &$this ) );
 	}
 
 	/**
@@ -386,7 +386,7 @@ class WP_Web_Fonts extends WP_Webfonts {
 		if ( ! empty( $variation['src'] ) ) {
 			foreach ( (array) $variation['src'] as $src ) {
 				if ( empty( $src ) || ! is_string( $src ) ) {
-					trigger_error( 'Each webfont src must be a non-empty string.' );
+					trigger_error( 'Each font src must be a non-empty string.' );
 					return false;
 				}
 			}
@@ -444,7 +444,7 @@ class WP_Web_Fonts extends WP_Webfonts {
 	 *                                      Default false.
 	 * @param int|false            $group   Optional. Group level: level (int), no group (false).
 	 *
-	 * @return array|string[] Array of web font handles that have been processed.
+	 * @return array|string[] Array of font handles that have been processed.
 	 *                        An empty array if none were processed.
 	 */
 	public function do_items( $handles = false, $group = false ) {
@@ -467,7 +467,7 @@ class WP_Web_Fonts extends WP_Webfonts {
 				/* translators: %s is the provider name. */
 				trigger_error(
 					sprintf(
-						'Class "%s" not found for "%s" web font provider',
+						'Class "%s" not found for "%s" font provider',
 						$provider['class'],
 						$provider_id
 					)
@@ -571,7 +571,7 @@ class WP_Web_Fonts extends WP_Webfonts {
 	}
 
 	/**
-	 * Retrieves a list of enqueued web font variations for a provider.
+	 * Retrieves a list of enqueued font variations for a provider.
 	 *
 	 * @since X.X.X
 	 *
@@ -731,7 +731,7 @@ class WP_Web_Fonts extends WP_Webfonts {
 			}
 
 			$variation_obj        = $this->registered[ $variation_handle ];
-			$variation_properties = array( 'origin' => 'gutenberg_wp_webfonts_api' );
+			$variation_properties = array( 'origin' => 'gutenberg_wp_fonts_api' );
 			foreach ( $variation_obj->extra['font-properties'] as $property_name => $property_value ) {
 				$property_in_camelcase                          = lcfirst( str_replace( '-', '', ucwords( $property_name, '-' ) ) );
 				$variation_properties[ $property_in_camelcase ] = $property_value;

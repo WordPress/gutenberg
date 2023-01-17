@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Web_Fonts::add() tests.
+ * WP_Fonts::add() tests.
  *
  * @package    WordPress
  * @subpackage Fonts API
@@ -10,9 +10,9 @@ require_once __DIR__ . '/../wp-fonts-testcase.php';
 
 /**
  * @group  fontsapi
- * @covers WP_Web_Fonts::add
+ * @covers WP_Fonts::add
  */
-class Tests_Webfonts_WpWebfonts_Add extends WP_Fonts_TestCase {
+class Tests_Fonts_WpFonts_Add extends WP_Fonts_TestCase {
 
 	/**
 	 * @dataProvider data_handles
@@ -20,11 +20,11 @@ class Tests_Webfonts_WpWebfonts_Add extends WP_Fonts_TestCase {
 	 * @param string $handle Handle to register.
 	 */
 	public function test_add( $handle ) {
-		$wp_webfonts = new WP_Web_Fonts();
+		$wp_fonts = new WP_Fonts();
 
-		$this->assertTrue( $wp_webfonts->add( $handle, false ), 'Registering a handle should return true' );
-		$this->assertCount( 1, $wp_webfonts->registered );
-		$this->assertArrayHasKey( $handle, $wp_webfonts->registered, 'Font family handle should be in the registry after registration' );
+		$this->assertTrue( $wp_fonts->add( $handle, false ), 'Registering a handle should return true' );
+		$this->assertCount( 1, $wp_fonts->registered );
+		$this->assertArrayHasKey( $handle, $wp_fonts->registered, 'Font family handle should be in the registry after registration' );
 
 	}
 

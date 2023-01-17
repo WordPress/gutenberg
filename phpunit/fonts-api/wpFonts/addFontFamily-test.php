@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Web_Fonts::add_font_family() tests.
+ * WP_Fonts::add_font_family() tests.
  *
  * @package    WordPress
  * @subpackage Fonts API
@@ -10,9 +10,9 @@ require_once __DIR__ . '/../wp-fonts-testcase.php';
 
 /**
  * @group  fontsapi
- * @covers WP_Web_Fonts::add_font_family
+ * @covers WP_Fonts::add_font_family
  */
-class Tests_Webfonts_WpWebfonts_AddFontFamily extends WP_Fonts_TestCase {
+class Tests_Fonts_WpFonts_AddFontFamily extends WP_Fonts_TestCase {
 
 	/**
 	 * @dataProvider data_handles
@@ -21,12 +21,12 @@ class Tests_Webfonts_WpWebfonts_AddFontFamily extends WP_Fonts_TestCase {
 	 * @param string $expected    Expected handle.
 	 */
 	public function test_should_register( $font_family, $expected ) {
-		$wp_webfonts        = new WP_Web_Fonts();
-		$font_family_handle = $wp_webfonts->add_font_family( $font_family );
+		$wp_fonts           = new WP_Fonts();
+		$font_family_handle = $wp_fonts->add_font_family( $font_family );
 
 		$this->assertSame( $expected, $font_family_handle, 'Registering a font-family should return its handle' );
-		$this->assertCount( 1, $wp_webfonts->registered );
-		$this->assertArrayHasKey( $font_family_handle, $wp_webfonts->registered, 'Font family handle should be in the registry after registration' );
+		$this->assertCount( 1, $wp_fonts->registered );
+		$this->assertArrayHasKey( $font_family_handle, $wp_fonts->registered, 'Font family handle should be in the registry after registration' );
 
 	}
 

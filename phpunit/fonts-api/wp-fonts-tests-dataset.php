@@ -324,7 +324,7 @@ trait WP_Fonts_Tests_Datasets {
 				),
 			),
 			'src: array of an empty string'   => array(
-				'expected'           => 'Each webfont src must be a non-empty string.',
+				'expected'           => 'Each font src must be a non-empty string.',
 				'font_family_handle' => 'lato',
 				'variation'          => array(
 					'provider'    => 'local',
@@ -334,7 +334,7 @@ trait WP_Fonts_Tests_Datasets {
 				),
 			),
 			'src: array of a non-string'      => array(
-				'expected'           => 'Each webfont src must be a non-empty string.',
+				'expected'           => 'Each font src must be a non-empty string.',
 				'font_family_handle' => 'lato',
 				'variation'          => array(
 					'provider'    => 'local',
@@ -344,7 +344,7 @@ trait WP_Fonts_Tests_Datasets {
 				),
 			),
 			'src: array with an empty string' => array(
-				'expected'           => 'Each webfont src must be a non-empty string.',
+				'expected'           => 'Each font src must be a non-empty string.',
 				'font_family_handle' => 'lato',
 				'variation'          => array(
 					'provider'    => 'local',
@@ -358,7 +358,7 @@ trait WP_Fonts_Tests_Datasets {
 				),
 			),
 			'src: array with a non-string'    => array(
-				'expected'           => 'Each webfont src must be a non-empty string.',
+				'expected'           => 'Each font src must be a non-empty string.',
 				'font_family_handle' => 'lato',
 				'variation'          => array(
 					'provider'    => 'local',

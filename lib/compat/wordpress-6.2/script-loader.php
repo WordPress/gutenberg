@@ -131,7 +131,7 @@ function gutenberg_resolve_assets_override() {
 	 * Generate font @font-face styles for the site editor iframe.
 	 * Use the registered font families for printing.
 	 */
-	if ( class_exists( 'WP_Web_Fonts' ) ) {
+	if ( class_exists( 'WP_Fonts' ) ) {
 		$wp_fonts   = wp_fonts();
 		$registered = $wp_fonts->get_registered_font_families();
 		if ( ! empty( $registered ) ) {

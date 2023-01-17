@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Web_Fonts::get_registered() tests.
+ * WP_Fonts::get_registered() tests.
  *
  * @package    WordPress
  * @subpackage Fonts API
@@ -11,13 +11,13 @@ require_once __DIR__ . '/../wp-fonts-testcase.php';
 
 /**
  * @group  fontsapi
- * @covers WP_Web_Fonts::get_registered
+ * @covers WP_Fonts::get_registered
  */
-class Tests_Webfonts_WpWebfonts_GetRegistered extends WP_Fonts_TestCase {
+class Tests_Fonts_WpFonts_GetRegistered extends WP_Fonts_TestCase {
 
 	public function test_should_return_empty_when_none_registered() {
-		$wp_webfonts = new WP_Web_Fonts();
-		$this->assertEmpty( $wp_webfonts->get_registered() );
+		$wp_fonts = new WP_Fonts();
+		$this->assertEmpty( $wp_fonts->get_registered() );
 	}
 
 	/**
@@ -28,11 +28,11 @@ class Tests_Webfonts_WpWebfonts_GetRegistered extends WP_Fonts_TestCase {
 	 * @param array $inputs Font family(ies) and variations to register.
 	 */
 	public function test_should_return_queue_when_mocking_registered_property( array $inputs ) {
-		$wp_webfonts = new WP_Web_Fonts();
-		$mocks       = $this->setup_registration_mocks( $inputs, $wp_webfonts );
-		$expected    = array_keys( $mocks );
+		$wp_fonts = new WP_Fonts();
+		$mocks    = $this->setup_registration_mocks( $inputs, $wp_fonts );
+		$expected = array_keys( $mocks );
 
-		$this->assertSame( $expected, $wp_webfonts->get_registered() );
+		$this->assertSame( $expected, $wp_fonts->get_registered() );
 	}
 
 	/**
@@ -78,13 +78,13 @@ class Tests_Webfonts_WpWebfonts_GetRegistered extends WP_Fonts_TestCase {
 	 * @param array  $expected    Expected results.
 	 */
 	public function test_should_return_queue_when_items_are_registered( $font_family, array $inputs, array $expected ) {
-		$wp_webfonts = new WP_Web_Fonts();
+		$wp_fonts = new WP_Fonts();
 
 		// Register before testing.
 		foreach ( $inputs as $handle => $variations ) {
-			$this->setup_register( $handle, $variations, $wp_webfonts );
+			$this->setup_register( $handle, $variations, $wp_fonts );
 		}
 
-		$this->assertSame( $expected, $wp_webfonts->get_registered() );
+		$this->assertSame( $expected, $wp_fonts->get_registered() );
 	}
 }

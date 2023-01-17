@@ -13,15 +13,15 @@ if ( ! function_exists( 'wp_fonts' ) ) {
 	 *
 	 * @since X.X.X
 	 *
-	 * @global WP_Web_Fonts $wp_fonts
+	 * @global WP_Fonts $wp_fonts
 	 *
-	 * @return WP_Web_Fonts WP_Web_Fonts instance.
+	 * @return WP_Fonts WP_Fonts instance.
 	 */
 	function wp_fonts() {
 		global $wp_fonts;
 
-		if ( ! ( $wp_fonts instanceof WP_Web_Fonts ) ) {
-			$wp_fonts = new WP_Web_Fonts();
+		if ( ! ( $wp_fonts instanceof WP_Fonts ) ) {
+			$wp_fonts = new WP_Fonts();
 			$wp_fonts->register_provider( 'local', 'WP_Fonts_Provider_Local' );
 		}
 
@@ -191,7 +191,7 @@ if ( ! function_exists( 'wp_print_fonts' ) ) {
 
 		_wp_scripts_maybe_doing_it_wrong( __FUNCTION__ );
 
-		if ( ! ( $wp_fonts instanceof WP_Web_Fonts ) ) {
+		if ( ! ( $wp_fonts instanceof WP_Fonts ) ) {
 			if ( ! $handles ) {
 				return array(); // No need to instantiate if nothing is there.
 			}

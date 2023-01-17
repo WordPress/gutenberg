@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Web_Fonts::get_enqueued() tests.
+ * WP_Fonts::get_enqueued() tests.
  *
  * @package    WordPress
  * @subpackage Fonts API
@@ -10,13 +10,13 @@ require_once __DIR__ . '/../wp-fonts-testcase.php';
 
 /**
  * @group  fontsapi
- * @covers WP_Web_Fonts::get_enqueued
+ * @covers WP_Fonts::get_enqueued
  */
-class Tests_Webfonts_WpWebfonts_GetEnqueued extends WP_Fonts_TestCase {
+class Tests_Fonts_WpFonts_GetEnqueued extends WP_Fonts_TestCase {
 
 	public function test_should_return_empty_when_non_enqueued() {
-		$wp_webfonts = new WP_Web_Fonts();
-		$this->assertEmpty( $wp_webfonts->get_enqueued() );
+		$wp_fonts = new WP_Fonts();
+		$this->assertEmpty( $wp_fonts->get_enqueued() );
 	}
 
 	/**
@@ -28,10 +28,10 @@ class Tests_Webfonts_WpWebfonts_GetEnqueued extends WP_Fonts_TestCase {
 	 * @param array           $expected    Expected queue.
 	 */
 	public function test_should_return_queue_when_property_has_font_families( $not_used, array $expected ) {
-		$wp_webfonts        = new WP_Web_Fonts();
-		$wp_webfonts->queue = $expected;
+		$wp_fonts        = new WP_Fonts();
+		$wp_fonts->queue = $expected;
 
-		$this->assertSame( $expected, $wp_webfonts->get_enqueued() );
+		$this->assertSame( $expected, $wp_fonts->get_enqueued() );
 	}
 
 	/**
@@ -44,14 +44,14 @@ class Tests_Webfonts_WpWebfonts_GetEnqueued extends WP_Fonts_TestCase {
 	 * @param array           $expected    Expected queue.
 	 */
 	public function test_should_return_queue_when_font_families_registered_and_enqueued( $font_family, array $expected ) {
-		$wp_webfonts = new WP_Web_Fonts();
+		$wp_fonts = new WP_Fonts();
 
 		// Register and enqueue.
 		foreach ( $this->get_data_registry() as $handle => $variations ) {
-			$this->setup_register( $handle, $variations, $wp_webfonts );
+			$this->setup_register( $handle, $variations, $wp_fonts );
 		}
-		$wp_webfonts->enqueue( $font_family );
+		$wp_fonts->enqueue( $font_family );
 
-		$this->assertSame( $expected, $wp_webfonts->get_enqueued() );
+		$this->assertSame( $expected, $wp_fonts->get_enqueued() );
 	}
 }

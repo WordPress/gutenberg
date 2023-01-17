@@ -12,12 +12,12 @@ require_once __DIR__ . '/wp-fonts-testcase.php';
  * @group fontsapi
  * @group remove_fonts
  * @covers ::wp_deregister_font_family
- * @covers WP_Web_Fonts::remove_font_family
+ * @covers WP_Fonts::remove_font_family
  */
 class Tests_Webfonts_WpDeregisterFontFamily extends WP_Fonts_TestCase {
 
 	/**
-	 * Unit test for registering a font-family that mocks WP_Web_Fonts.
+	 * Unit test for registering a font-family that mocks WP_Fonts.
 	 *
 	 * @dataProvider data_font_family_handles
 	 *

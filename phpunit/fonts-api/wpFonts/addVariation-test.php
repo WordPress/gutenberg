@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Web_Fonts::add_variation() tests.
+ * WP_Fonts::add_variation() tests.
  *
  * @package    WordPress
  * @subpackage Fonts API
@@ -10,9 +10,9 @@ require_once __DIR__ . '/../wp-fonts-testcase.php';
 
 /**
  * @group  fontsapi
- * @covers WP_Web_Fonts::add_variation
+ * @covers WP_Fonts::add_variation
  */
-class Tests_Webfonts_WpWebfonts_AddVariation extends WP_Fonts_TestCase {
+class Tests_Fonts_WpFonts_AddVariation extends WP_Fonts_TestCase {
 
 	/**
 	 * @dataProvider data_valid_variation
@@ -23,13 +23,13 @@ class Tests_Webfonts_WpWebfonts_AddVariation extends WP_Fonts_TestCase {
 	 * @param string      $variation_handle   Optional. The variation's handle.
 	 */
 	public function test_should_register_variation_when_font_family_is_registered( $expected, $font_family_handle, array $variation, $variation_handle = '' ) {
-		$wp_webfonts = new WP_Web_Fonts();
-		$wp_webfonts->add( $font_family_handle, false );
+		$wp_fonts = new WP_Fonts();
+		$wp_fonts->add( $font_family_handle, false );
 
-		$variation_handle = $wp_webfonts->add_variation( $font_family_handle, $variation, $variation_handle );
+		$variation_handle = $wp_fonts->add_variation( $font_family_handle, $variation, $variation_handle );
 		$this->assertSame( $expected, $variation_handle, 'Registering a variation should return its handle' );
-		$this->assertArrayHasKey( $variation_handle, $wp_webfonts->registered, 'Variation handle should be in the registry after registration' );
-		$this->assertSame( array( $expected ), $this->get_variations( $font_family_handle, $wp_webfonts ), 'Variation should be registered to font family' );
+		$this->assertArrayHasKey( $variation_handle, $wp_fonts->registered, 'Variation handle should be in the registry after registration' );
+		$this->assertSame( array( $expected ), $this->get_variations( $font_family_handle, $wp_fonts ), 'Variation should be registered to font family' );
 	}
 
 	/**
@@ -41,14 +41,14 @@ class Tests_Webfonts_WpWebfonts_AddVariation extends WP_Fonts_TestCase {
 	 * @param string      $variation_handle   Optional. The variation's handle.
 	 */
 	public function test_should_not_reregister_font_family( $expected, $font_family_handle, array $variation, $variation_handle = '' ) {
-		$wp_webfonts = new WP_Web_Fonts();
-		$wp_webfonts->add( $font_family_handle, false );
+		$wp_fonts = new WP_Fonts();
+		$wp_fonts->add( $font_family_handle, false );
 
-		$variation_handle = $wp_webfonts->add_variation( $font_family_handle, $variation, $variation_handle );
+		$variation_handle = $wp_fonts->add_variation( $font_family_handle, $variation, $variation_handle );
 
 		// Font family should appear only once in the registered queue.
 		$expected = array( $font_family_handle, $variation_handle );
-		$this->assertSame( $expected, array_keys( $wp_webfonts->registered ), 'Font family should not be re-registered after registering a variation' );
+		$this->assertSame( $expected, array_keys( $wp_fonts->registered ), 'Font family should not be re-registered after registering a variation' );
 	}
 
 	/**
@@ -60,20 +60,20 @@ class Tests_Webfonts_WpWebfonts_AddVariation extends WP_Fonts_TestCase {
 	 * @param string      $variation_handle   Optional. The variation's handle.
 	 */
 	public function test_should_not_reregister_variation( $expected, $font_family_handle, array $variation, $variation_handle = '' ) {
-		$wp_webfonts = new WP_Web_Fonts();
-		$wp_webfonts->add( $font_family_handle, false );
+		$wp_fonts = new WP_Fonts();
+		$wp_fonts->add( $font_family_handle, false );
 
 		// Set up the test.
-		$variation_handle = $wp_webfonts->add_variation( $font_family_handle, $variation, $variation_handle );
+		$variation_handle = $wp_fonts->add_variation( $font_family_handle, $variation, $variation_handle );
 
 		// Run the test.
-		$variant_handle_on_reregister = $wp_webfonts->add_variation( $font_family_handle, $variation, $variation_handle );
+		$variant_handle_on_reregister = $wp_fonts->add_variation( $font_family_handle, $variation, $variation_handle );
 		$this->assertSame( $expected, $variant_handle_on_reregister, 'Variation should be registered to font family' );
 		$this->assertSame( $variation_handle, $variant_handle_on_reregister, 'Variation should return the previously registered variant handle' );
-		$this->assertSame( array( $variation_handle ), $this->get_variations( $font_family_handle, $wp_webfonts ), 'Variation should only be registered once' );
+		$this->assertSame( array( $variation_handle ), $this->get_variations( $font_family_handle, $wp_fonts ), 'Variation should only be registered once' );
 
-		$this->assertCount( 2, $wp_webfonts->registered );
-		$this->assertArrayHasKey( $variation_handle, $wp_webfonts->registered, 'Variation handle should be in the registry after registration' );
+		$this->assertCount( 2, $wp_fonts->registered );
+		$this->assertArrayHasKey( $variation_handle, $wp_fonts->registered, 'Variation handle should be in the registry after registration' );
 	}
 
 	/**
@@ -85,16 +85,16 @@ class Tests_Webfonts_WpWebfonts_AddVariation extends WP_Fonts_TestCase {
 	 * @param string      $variation_handle   Optional. The variation's handle.
 	 */
 	public function test_should_register_font_family_and_variation( $expected, $font_family_handle, array $variation, $variation_handle = '' ) {
-		$wp_webfonts = new WP_Web_Fonts();
+		$wp_fonts = new WP_Fonts();
 
-		$variation_handle = $wp_webfonts->add_variation( $font_family_handle, $variation, $variation_handle );
+		$variation_handle = $wp_fonts->add_variation( $font_family_handle, $variation, $variation_handle );
 		$this->assertSame( $expected, $variation_handle, 'Variation should return its registered handle' );
 
 		// Extra checks to ensure both are registered.
-		$this->assertCount( 2, $wp_webfonts->registered );
-		$this->assertArrayHasKey( $font_family_handle, $wp_webfonts->registered, 'Font family handle should be in the registry after registration' );
-		$this->assertArrayHasKey( $variation_handle, $wp_webfonts->registered, 'Variation handle should be in the registry after registration' );
-		$this->assertSame( array( $variation_handle ), $this->get_variations( $font_family_handle, $wp_webfonts ), 'Variation should be registered to the font family' );
+		$this->assertCount( 2, $wp_fonts->registered );
+		$this->assertArrayHasKey( $font_family_handle, $wp_fonts->registered, 'Font family handle should be in the registry after registration' );
+		$this->assertArrayHasKey( $variation_handle, $wp_fonts->registered, 'Variation handle should be in the registry after registration' );
+		$this->assertSame( array( $variation_handle ), $this->get_variations( $font_family_handle, $wp_fonts ), 'Variation should be registered to the font family' );
 	}
 
 	/**
@@ -107,11 +107,11 @@ class Tests_Webfonts_WpWebfonts_AddVariation extends WP_Fonts_TestCase {
 		$this->expectNotice();
 		$this->expectNoticeMessage( 'Font family handle must be a non-empty string.' );
 
-		$wp_webfonts = new WP_Web_Fonts();
-		$wp_webfonts->add_variation( $font_family_handle, $variation );
+		$wp_fonts = new WP_Fonts();
+		$wp_fonts->add_variation( $font_family_handle, $variation );
 
-		$this->assertEmpty( $wp_webfonts->registered, 'Registered queue should be empty' );
-		$this->assertEmpty( $this->get_variations( $font_family_handle, $wp_webfonts ), 'Variation should not be registered to the font family' );
+		$this->assertEmpty( $wp_fonts->registered, 'Registered queue should be empty' );
+		$this->assertEmpty( $this->get_variations( $font_family_handle, $wp_fonts ), 'Variation should not be registered to the font family' );
 	}
 
 	/**
@@ -126,8 +126,8 @@ class Tests_Webfonts_WpWebfonts_AddVariation extends WP_Fonts_TestCase {
 		$this->expectNotice();
 		$this->expectNoticeMessage( $expected_message );
 
-		$wp_webfonts = new WP_Web_Fonts();
-		$this->assertNull( $wp_webfonts->add_variation( $font_family_handle, $variation ) );
+		$wp_fonts = new WP_Fonts();
+		$this->assertNull( $wp_fonts->add_variation( $font_family_handle, $variation ) );
 	}
 
 	/**
@@ -140,10 +140,10 @@ class Tests_Webfonts_WpWebfonts_AddVariation extends WP_Fonts_TestCase {
 		$this->expectNotice();
 		$this->expectNoticeMessage( 'Variant handle could not be determined as font-weight and/or font-style are require' );
 
-		$wp_webfonts = new WP_Web_Fonts();
-		$wp_webfonts->add_variation( $font_family_handle, $variation );
+		$wp_fonts = new WP_Fonts();
+		$wp_fonts->add_variation( $font_family_handle, $variation );
 
-		$this->assertCount( 1, $wp_webfonts->registered );
-		$this->assertArrayHasKey( $font_family_handle, $wp_webfonts->registered );
+		$this->assertCount( 1, $wp_fonts->registered );
+		$this->assertArrayHasKey( $font_family_handle, $wp_fonts->registered );
 	}
 }

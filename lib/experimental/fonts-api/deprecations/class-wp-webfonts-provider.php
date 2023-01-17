@@ -61,6 +61,6 @@ abstract class WP_Webfonts_Provider extends WP_Fonts_Provider {
 	 */
 	public function set_fonts( array $fonts ) {
 		parent::set_fonts( $fonts );
-		$this->webfonts = $this->fonts;;
+		$this->webfonts = $this->fonts;
 	}
 }

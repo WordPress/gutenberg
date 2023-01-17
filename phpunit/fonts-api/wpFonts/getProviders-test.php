@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Web_Fonts::get_providers() tests.
+ * WP_Fonts::get_providers() tests.
  *
  * @package    WordPress
  * @subpackage Fonts API
@@ -11,22 +11,22 @@ require_once __DIR__ . '/../../fixtures/mock-provider.php';
 
 /**
  * @group  fontsapi
- * @covers WP_Web_Fonts::get_providers
+ * @covers WP_Fonts::get_providers
  */
-class Tests_Webfonts_WpWebfonts_GetProviders extends WP_Fonts_TestCase {
-	private $wp_webfonts;
+class Tests_Fonts_WpFonts_GetProviders extends WP_Fonts_TestCase {
+	private $wp_fonts;
 	private $providers_property;
 
 	public function set_up() {
 		parent::set_up();
-		$this->wp_webfonts = new WP_Web_Fonts();
+		$this->wp_fonts = new WP_Fonts();
 
-		$this->providers_property = new ReflectionProperty( WP_Web_Fonts::class, 'providers' );
+		$this->providers_property = new ReflectionProperty( WP_Fonts::class, 'providers' );
 		$this->providers_property->setAccessible( true );
 	}
 
 	public function test_should_be_empty() {
-		$actual = $this->wp_webfonts->get_providers();
+		$actual = $this->wp_fonts->get_providers();
 		$this->assertIsArray( $actual, 'Should return an empty array' );
 		$this->assertEmpty( $actual, 'Should return an empty array when no providers are registered' );
 	}
@@ -39,11 +39,11 @@ class Tests_Webfonts_WpWebfonts_GetProviders extends WP_Fonts_TestCase {
 	 */
 	public function test_get_providers( array $providers, array $expected ) {
 		$this->setup_providers( $providers );
-		$this->assertSame( $expected, $this->wp_webfonts->get_providers() );
+		$this->assertSame( $expected, $this->wp_fonts->get_providers() );
 	}
 
 	/**
-	 * Sets up the given providers and stores them in the `WP_Web_Fonts::providers` property.
+	 * Sets up the given providers and stores them in the `WP_Fonts::providers` property.
 	 *
 	 * @param array $providers Array of providers to set up.
 	 */
@@ -57,6 +57,6 @@ class Tests_Webfonts_WpWebfonts_GetProviders extends WP_Fonts_TestCase {
 			);
 		}
 
-		$this->providers_property->setValue( $this->wp_webfonts, $data );
+		$this->providers_property->setValue( $this->wp_fonts, $data );
 	}
 }

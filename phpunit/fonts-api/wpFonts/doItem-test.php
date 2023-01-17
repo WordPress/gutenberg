@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Web_Fonts::do_item() tests.
+ * WP_Fonts::do_item() tests.
  *
  * @package    WordPress
  * @subpackage Fonts API
@@ -11,18 +11,18 @@ require_once __DIR__ . '/../wp-fonts-testcase.php';
 /**
  * @group  fontsapi
  * @group  printfonts
- * @covers WP_Web_Fonts::do_item
+ * @covers WP_Fonts::do_item
  */
-class Tests_Webfonts_WpWebfonts_DoItem extends WP_Fonts_TestCase {
-	private $wp_webfonts;
+class Tests_Fonts_WpFonts_DoItem extends WP_Fonts_TestCase {
+	private $wp_fonts;
 
 	public function set_up() {
 		parent::set_up();
-		$this->wp_webfonts = new WP_Web_Fonts;
+		$this->wp_fonts = new WP_Fonts;
 	}
 
 	public function test_should_return_false_when_provider_not_registered() {
-		$this->assertFalse( $this->wp_webfonts->do_item( 'provider_not_registered' ) );
+		$this->assertFalse( $this->wp_fonts->do_item( 'provider_not_registered' ) );
 	}
 
 	/**
@@ -31,8 +31,8 @@ class Tests_Webfonts_WpWebfonts_DoItem extends WP_Fonts_TestCase {
 	 * @param array $provider Provider to mock.
 	 */
 	public function test_should_return_false_when_no_fonts_enqueued_for_provider( array $provider ) {
-		$this->setup_provider_property_mock( $this->wp_webfonts, $provider );
-		$this->assertFalse( $this->wp_webfonts->do_item( $provider['id'] ) );
+		$this->setup_provider_property_mock( $this->wp_fonts, $provider );
+		$this->assertFalse( $this->wp_fonts->do_item( $provider['id'] ) );
 	}
 
 	/**
@@ -50,7 +50,7 @@ class Tests_Webfonts_WpWebfonts_DoItem extends WP_Fonts_TestCase {
 	}
 
 	/**
-	 * Test the test set up to ensure the `Tests_Webfonts_WpWebfonts_DoItem_::setup_provider_property_mock()`
+	 * Test the test set up to ensure the `Tests_Fonts_WpFonts_DoItem_::setup_provider_property_mock()`
 	 * method works as expected.
 	 */
 	public function test_mocking_providers_property() {
@@ -62,34 +62,34 @@ class Tests_Webfonts_WpWebfonts_DoItem extends WP_Fonts_TestCase {
 			),
 		);
 
-		$this->setup_provider_property_mock( $this->wp_webfonts, $this->get_provider_definitions( 'mock' ), $font_handles );
-		$actual = $this->property['WP_Web_Fonts::$providers']->getValue( $this->wp_webfonts );
+		$this->setup_provider_property_mock( $this->wp_fonts, $this->get_provider_definitions( 'mock' ), $font_handles );
+		$actual = $this->property['WP_Fonts::$providers']->getValue( $this->wp_fonts );
 		$this->assertSame( $expected, $actual );
 	}
 
 	/**
-	 * Test the private method WP_Web_Fonts::get_enqueued_fonts_for_provider().
+	 * Test the private method WP_Fonts::get_enqueued_fonts_for_provider().
 	 *
 	 * Why? This test validates the right fonts are returned for use within
-	 * WP_Web_Fonts::do_item().
+	 * WP_Fonts::do_item().
 	 *
 	 * @dataProvider data_get_enqueued_fonts_for_provider
 	 *
 	 * @param array $font_handles Array of handles for the provider.
-	 * @param array $to_do        Handles to set for the WP_Web_Fonts::$to_do property.
+	 * @param array $to_do        Handles to set for the WP_Fonts::$to_do property.
 	 * @param array $expected     Expected result.
 	 */
 	public function test_get_enqueued_fonts_for_provider( $font_handles, $to_do, $expected ) {
 		// Set up the `to_do` property.
-		$this->wp_webfonts->to_do = $to_do;
+		$this->wp_fonts->to_do = $to_do;
 
 		// Open the method's visibility for testing.
 		$get_enqueued_fonts_for_provider = $this->get_reflection_method( 'get_enqueued_fonts_for_provider' );
 
-		// Mock the WP_Web_Fonts::$property to set up the test.
-		$this->setup_provider_property_mock( $this->wp_webfonts, $this->get_provider_definitions( 'mock' ), $font_handles );
+		// Mock the WP_Fonts::$property to set up the test.
+		$this->setup_provider_property_mock( $this->wp_fonts, $this->get_provider_definitions( 'mock' ), $font_handles );
 
-		$actual = $get_enqueued_fonts_for_provider->invoke( $this->wp_webfonts, 'mock' );
+		$actual = $get_enqueued_fonts_for_provider->invoke( $this->wp_fonts, 'mock' );
 		$this->assertSameSets( $expected, $actual );
 	}
 
@@ -124,10 +124,10 @@ class Tests_Webfonts_WpWebfonts_DoItem extends WP_Fonts_TestCase {
 	}
 
 	/**
-	 * Test the private method WP_Web_Fonts::get_font_properties_for_provider().
+	 * Test the private method WP_Fonts::get_font_properties_for_provider().
 	 *
 	 * Why? This test validates the right font properties are returned for use within
-	 * WP_Web_Fonts::do_item().
+	 * WP_Fonts::do_item().
 	 *
 	 * @dataProvider data_get_font_properties_for_provider
 	 *
@@ -139,14 +139,14 @@ class Tests_Webfonts_WpWebfonts_DoItem extends WP_Fonts_TestCase {
 		$fonts = $this->get_registered_fonts();
 		// Set all variations to 'mock' provider.
 
-		// Mock the WP_Web_Fonts::$property to set up the test.
-		$this->setup_provider_property_mock( $this->wp_webfonts, $this->get_provider_definitions( 'mock' ), $font_handles );
-		$this->setup_registration_mocks( $fonts, $this->wp_webfonts );
+		// Mock the WP_Fonts::$property to set up the test.
+		$this->setup_provider_property_mock( $this->wp_fonts, $this->get_provider_definitions( 'mock' ), $font_handles );
+		$this->setup_registration_mocks( $fonts, $this->wp_fonts );
 
 		// Open the method's visibility for testing.
 		$method = $this->get_reflection_method( 'get_font_properties_for_provider' );
 
-		$actual = $method->invoke( $this->wp_webfonts, $font_handles );
+		$actual = $method->invoke( $this->wp_fonts, $font_handles );
 		$this->assertSame( $expected, $actual );
 	}
 
@@ -193,13 +193,13 @@ class Tests_Webfonts_WpWebfonts_DoItem extends WP_Fonts_TestCase {
 		$provider_mock->expects( $this->once() )->method( 'set_fonts' )->with( $this->identicalTo( $expected['set_fonts'] ) );
 		$provider_mock->expects( $this->once() )->method( 'print_styles' );
 
-		// Set up the WP_Web_Fonts::$provider_instances property.
+		// Set up the WP_Fonts::$provider_instances property.
 		$provider_instances = $this->get_reflection_property( 'provider_instances' );
-		$provider_instances->setValue( $this->wp_webfonts, array( $provider['id'] => $provider_mock ) );
+		$provider_instances->setValue( $this->wp_fonts, array( $provider['id'] => $provider_mock ) );
 
 		// Test the method successfully processes the provider.
 		$this->expectOutputString( '' );
-		$this->assertTrue( $this->wp_webfonts->do_item( $provider['id'] ), 'WP_Web_Fonts::do_item() should return true' );
+		$this->assertTrue( $this->wp_fonts->do_item( $provider['id'] ), 'WP_Fonts::do_item() should return true' );
 	}
 
 	/**
@@ -216,7 +216,7 @@ class Tests_Webfonts_WpWebfonts_DoItem extends WP_Fonts_TestCase {
 
 		// Test the method successfully processes the provider.
 		$this->expectOutputString( $expected['printed_output'] );
-		$this->assertTrue( $this->wp_webfonts->do_item( $provider['id'] ), 'WP_Web_Fonts::do_item() should return true' );
+		$this->assertTrue( $this->wp_fonts->do_item( $provider['id'] ), 'WP_Fonts::do_item() should return true' );
 	}
 
 	/**
@@ -234,7 +234,7 @@ class Tests_Webfonts_WpWebfonts_DoItem extends WP_Fonts_TestCase {
 				'provider' => $this->get_provider_definitions( 'mock' ),
 				'fonts'    => $mock,
 				'expected' => array(
-					'set_fonts'   => array_merge( $mock['font1'], $mock['font2'], $mock['font3'] ),
+					'set_fonts'      => array_merge( $mock['font1'], $mock['font2'], $mock['font3'] ),
 					'printed_output' => sprintf(
 						'<mock id="wp-fonts-mock" attr="some-attr">%s; %s; %s; %s; %s; %s</mock>\n',
 						$font_faces['font1-300-normal'],
@@ -250,7 +250,7 @@ class Tests_Webfonts_WpWebfonts_DoItem extends WP_Fonts_TestCase {
 				'provider' => $this->get_provider_definitions( 'local' ),
 				'fonts'    => $local,
 				'expected' => array(
-					'set_fonts'   => array_merge( $local['merriweather'], $local['Source Serif Pro'] ),
+					'set_fonts'      => array_merge( $local['merriweather'], $local['Source Serif Pro'] ),
 					'printed_output' => sprintf(
 						"<style id='wp-fonts-local' type='text/css'>\n%s%s%s\n</style>\n",
 						$font_faces['merriweather-200-900-normal'],
@@ -270,14 +270,14 @@ class Tests_Webfonts_WpWebfonts_DoItem extends WP_Fonts_TestCase {
 	 * @param array $provider    Define provider.
 	 * @param array $fonts       Fonts to register and enqueue.
 	 * @param array $expected    Not used.
-	 * @param array $to_do_queue Value to set in the WP_Web_Fonts::$to_do queue.
+	 * @param array $to_do_queue Value to set in the WP_Fonts::$to_do queue.
 	 */
 	public function test_should_not_print_when_to_do_queue_empty( array $provider, array $fonts, $expected, $to_do_queue ) {
 		$this->setup_print_deps( $provider, $fonts, $to_do_queue );
 
 		// Test the method successfully processes the provider.
 		$this->expectOutputString( '' );
-		$this->assertFalse( $this->wp_webfonts->do_item( $provider['id'] ), 'WP_Web_Fonts::do_item() should return false' );
+		$this->assertFalse( $this->wp_fonts->do_item( $provider['id'] ), 'WP_Fonts::do_item() should return false' );
 	}
 
 	/**
@@ -316,21 +316,21 @@ class Tests_Webfonts_WpWebfonts_DoItem extends WP_Fonts_TestCase {
 	 *
 	 * @param array      $provider    Provider id and class.
 	 * @param array      $fonts       Fonts to register and enqueue.
-	 * @param array|null $to_do_queue Set the WP_Web_Fonts:$to_do queue.
+	 * @param array|null $to_do_queue Set the WP_Fonts:$to_do queue.
 	 */
 	private function setup_print_deps( $provider, $fonts, $to_do_queue = null ) {
 		// Set up the fonts for WP_Dependencies:get_data().
-		$mocks   = $this->setup_registration_mocks( $fonts, $this->wp_webfonts );
+		$mocks   = $this->setup_registration_mocks( $fonts, $this->wp_fonts );
 		$handles = array_keys( $mocks );
-		$this->setup_provider_property_mock( $this->wp_webfonts, $provider, $handles );
+		$this->setup_provider_property_mock( $this->wp_fonts, $provider, $handles );
 
-		// Set up the `WP_Web_Fonts::$to_do` and `WP_Web_Fonts::$to_do_keyed_handles` properties.
+		// Set up the `WP_Fonts::$to_do` and `WP_Fonts::$to_do_keyed_handles` properties.
 		if ( null === $to_do_queue ) {
 			$to_do_queue = $handles;
 		}
 
-		$this->wp_webfonts->to_do = $to_do_queue;
-		$to_do_keyed_handles      = $this->get_reflection_property( 'to_do_keyed_handles' );
-		$to_do_keyed_handles->setValue( $this->wp_webfonts, array_flip( $to_do_queue ) );
+		$this->wp_fonts->to_do = $to_do_queue;
+		$to_do_keyed_handles   = $this->get_reflection_property( 'to_do_keyed_handles' );
+		$to_do_keyed_handles->setValue( $this->wp_fonts, array_flip( $to_do_queue ) );
 	}
 }

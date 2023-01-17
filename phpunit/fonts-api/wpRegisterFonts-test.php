@@ -11,8 +11,8 @@ require_once __DIR__ . '/wp-fonts-testcase.php';
 /**
  * @group  fontsapi
  * @covers ::wp_register_fonts
- * @covers WP_Web_Fonts::add
- * @covers WP_Web_Fonts::add_variation
+ * @covers WP_Fonts::add
+ * @covers WP_Fonts::add_variation
  */
 class Tests_Fonts_WpRegisterFonts extends WP_Fonts_TestCase {
 

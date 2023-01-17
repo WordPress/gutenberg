@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Web_Fonts::remove() tests.
+ * WP_Fonts::remove() tests.
  *
  * @package    WordPress
  * @subpackage Fonts API
@@ -11,16 +11,16 @@ require_once __DIR__ . '/../wp-fonts-testcase.php';
 /**
  * @group  fontsapi
  * @group  remove_fonts
- * @covers WP_Web_Fonts::remove
+ * @covers WP_Fonts::remove
  */
-class Tests_Webfonts_WpWebfonts_Remove extends WP_Fonts_TestCase {
+class Tests_Fonts_WpFonts_Remove extends WP_Fonts_TestCase {
 
 	public function test_should_not_remove_when_none_registered() {
-		$wp_webfonts = new WP_Web_Fonts();
+		$wp_fonts = new WP_Fonts();
 
-		$wp_webfonts->remove( array( 'handle-1', 'handle2' ) );
+		$wp_fonts->remove( array( 'handle-1', 'handle2' ) );
 
-		$this->assertEmpty( $wp_webfonts->registered );
+		$this->assertEmpty( $wp_fonts->registered );
 	}
 
 	/**
@@ -30,12 +30,12 @@ class Tests_Webfonts_WpWebfonts_Remove extends WP_Fonts_TestCase {
 	 * @param array $expected Expected handles are running test.
 	 */
 	public function test_should_remove_when_registered( array $handles, array $expected ) {
-		$wp_webfonts             = new WP_Web_Fonts();
-		$wp_webfonts->registered = $this->generate_registered_queue();
+		$wp_fonts             = new WP_Fonts();
+		$wp_fonts->registered = $this->generate_registered_queue();
 
-		$wp_webfonts->remove( $handles );
+		$wp_fonts->remove( $handles );
 
-		$this->assertSameSets( $expected, array_keys( $wp_webfonts->registered ), 'Registered queue should match after removing handles' );
+		$this->assertSameSets( $expected, array_keys( $wp_fonts->registered ), 'Registered queue should match after removing handles' );
 	}
 
 	/**

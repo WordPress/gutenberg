@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Web_Fonts::enqueue() tests.
+ * WP_Fonts::enqueue() tests.
  *
  * @package    WordPress
  * @subpackage Fonts API
@@ -10,9 +10,9 @@ require_once __DIR__ . '/../wp-fonts-testcase.php';
 
 /**
  * @group  fontsapi
- * @covers WP_Web_Fonts::enqueue
+ * @covers WP_Fonts::enqueue
  */
-class Tests_Webfonts_WpWebfonts_Enqueue extends WP_Fonts_TestCase {
+class Tests_Fonts_WpFonts_Enqueue extends WP_Fonts_TestCase {
 
 	/**
 	 * @dataProvider data_enqueue
@@ -23,11 +23,11 @@ class Tests_Webfonts_WpWebfonts_Enqueue extends WP_Fonts_TestCase {
 	 * @param array           $expected Expected "queued_before_register" queue.
 	 */
 	public function test_should_prequeue_when_not_registered( $handles, $not_used, $expected ) {
-		$wp_webfonts = new WP_Web_Fonts();
-		$wp_webfonts->enqueue( $handles );
+		$wp_fonts = new WP_Fonts();
+		$wp_fonts->enqueue( $handles );
 
-		$this->assertSame( $expected, $this->get_queued_before_register( $wp_webfonts ), 'Handles should be added to before registered queue' );
-		$this->assertEmpty( $wp_webfonts->queue, 'Handles should not be added to the enqueue queue when not registered' );
+		$this->assertSame( $expected, $this->get_queued_before_register( $wp_fonts ), 'Handles should be added to before registered queue' );
+		$this->assertEmpty( $wp_fonts->queue, 'Handles should not be added to the enqueue queue when not registered' );
 	}
 
 	/**
@@ -40,14 +40,14 @@ class Tests_Webfonts_WpWebfonts_Enqueue extends WP_Fonts_TestCase {
 	 * @param array           $expected Expected queue.
 	 */
 	public function test_should_enqueue_when_registered( $handles, array $expected ) {
-		$wp_webfonts = new WP_Web_Fonts();
+		$wp_fonts = new WP_Fonts();
 		foreach ( $this->get_data_registry() as $font_family => $variations ) {
-			$this->setup_register( $font_family, $variations, $wp_webfonts );
+			$this->setup_register( $font_family, $variations, $wp_fonts );
 		}
 
-		$wp_webfonts->enqueue( $handles );
+		$wp_fonts->enqueue( $handles );
 
-		$this->assertEmpty( $this->get_queued_before_register( $wp_webfonts ), '"queued_before_register" queue should be empty' );
-		$this->assertSame( $expected, $wp_webfonts->queue, 'Queue should contain the given handles' );
+		$this->assertEmpty( $this->get_queued_before_register( $wp_fonts ), '"queued_before_register" queue should be empty' );
+		$this->assertSame( $expected, $wp_fonts->queue, 'Queue should contain the given handles' );
 	}
 }
