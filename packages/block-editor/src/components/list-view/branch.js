@@ -79,6 +79,24 @@ const countReducer =
 
 const noop = () => {};
 
+function PlaceholderRow( { isSelected, selectedClientIds } ) {
+	// For long lists where the selected item may fall outside of the current window,
+	// pass a reference to the corresponding placeholder row for the selected item.
+	// The "real" selected item is also observed in ListViewBlock, when rendered.
+	const rowItemRef = useRef();
+	useListViewScrollIntoView( {
+		isSelected,
+		rowItemRef,
+		selectedClientIds,
+	} );
+
+	return (
+		<tr ref={ rowItemRef }>
+			<td className="block-editor-list-view-placeholder" />
+		</tr>
+	);
+}
+
 function ListViewBranch( props ) {
 	const {
 		blocks,
@@ -116,16 +134,6 @@ function ListViewBranch( props ) {
 	);
 
 	const { expandedState, draggedClientIds } = useListViewContext();
-
-	// For long lists where the selected item may fall outside of the current window,
-	// pass a reference to the corresponding placeholder row for the selected item.
-	// The "real" selected item is also observed in ListViewBlock, when rendered.
-	const invisibleSelectedItemRef = useRef();
-	useListViewScrollIntoView( {
-		firstSelectedBlockClientId: selectedClientIds?.[ 0 ],
-		numBlocksSelected: selectedClientIds?.length,
-		selectedItemRef: invisibleSelectedItemRef,
-	} );
 
 	if ( ! canParentExpand ) {
 		return null;
@@ -197,17 +205,18 @@ function ListViewBranch( props ) {
 								isSyncedBranch={ syncedBranch }
 							/>
 						) }
-						{ ! showBlock && (
-							<tr
-								ref={
-									clientId === selectedClientIds[ 0 ]
-										? invisibleSelectedItemRef
-										: undefined
-								}
-							>
-								<td className="block-editor-list-view-placeholder" />
-							</tr>
-						) }
+						{ ! showBlock &&
+							( isSelected ? (
+								<PlaceholderRow
+									clientId={ clientId }
+									isSelected={ isSelected }
+									selectedClientIds={ selectedClientIds }
+								/>
+							) : (
+								<tr>
+									<td className="block-editor-list-view-placeholder" />
+								</tr>
+							) ) }
 						{ hasNestedBlocks && shouldExpand && ! isDragged && (
 							<ListViewBranch
 								parentId={ clientId }

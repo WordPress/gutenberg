@@ -2,28 +2,31 @@
  * WordPress dependencies
  */
 import { getScrollContainer } from '@wordpress/dom';
-import { useEffect } from '@wordpress/element';
+import { useLayoutEffect } from '@wordpress/element';
 
 export default function useListViewScrollIntoView( {
-	firstSelectedBlockClientId,
-	numBlocksSelected,
-	selectedItemRef,
+	isSelected,
+	selectedClientIds,
+	rowItemRef,
 } ) {
-	useEffect( () => {
+	const numBlocksSelected = selectedClientIds?.length;
+
+	useLayoutEffect( () => {
 		// Skip scrolling into view if more than one block is selected.
 		// This is to avoid scrolling the view in a multi selection where the user
 		// has intentionally selected multiple blocks within the list view,
 		// but the initially selected block may be out of view.
 		if (
+			! isSelected ||
 			numBlocksSelected !== 1 ||
-			! selectedItemRef?.current ||
-			! selectedItemRef.current.scrollIntoView
+			! rowItemRef?.current ||
+			! rowItemRef.current.scrollIntoView
 		) {
 			return;
 		}
 
-		const scrollContainer = getScrollContainer( selectedItemRef.current );
-		const { ownerDocument } = selectedItemRef.current;
+		const scrollContainer = getScrollContainer( rowItemRef.current );
+		const { ownerDocument } = rowItemRef.current;
 		const { defaultView } = ownerDocument;
 
 		const windowScroll =
@@ -36,7 +39,7 @@ export default function useListViewScrollIntoView( {
 			return;
 		}
 
-		const { top, height } = selectedItemRef.current.getBoundingClientRect();
+		const { top, height } = rowItemRef.current.getBoundingClientRect();
 		const topOfScrollContainer =
 			scrollContainer.getBoundingClientRect().top;
 
@@ -44,11 +47,7 @@ export default function useListViewScrollIntoView( {
 
 		// If the selected block is not currently visible, scroll to it.
 		if ( top < topOfScrollContainer || top + height > innerHeight ) {
-			selectedItemRef.current.scrollIntoView();
+			rowItemRef.current.scrollIntoView();
 		}
-	}, [
-		firstSelectedBlockClientId,
-		numBlocksSelected,
-		selectedItemRef?.current,
-	] );
+	}, [ isSelected, numBlocksSelected ] );
 }

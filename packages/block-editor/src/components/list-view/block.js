@@ -58,6 +58,7 @@ function ListViewBlock( {
 	isSyncedBranch,
 } ) {
 	const cellRef = useRef( null );
+	const rowRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const { clientId } = block;
 
@@ -224,9 +225,9 @@ function ListViewBlock( {
 	// When the block is selected, pass in the ref to the selected item, so that it can be scrolled into view.
 	// For long lists, the placeholder for the selected block is also observed, within ListViewBranch.
 	useListViewScrollIntoView( {
-		firstSelectedBlockClientId: selectedClientIds?.[ 0 ],
-		numBlocksSelected: selectedClientIds?.length,
-		selectedItemRef: isSelected ? cellRef : undefined,
+		isSelected,
+		rowItemRef: rowRef,
+		selectedClientIds,
 	} );
 
 	return (
@@ -244,6 +245,7 @@ function ListViewBlock( {
 			data-block={ clientId }
 			isExpanded={ canExpand ? isExpanded : undefined }
 			aria-selected={ !! isSelected || forceSelectionContentLock }
+			ref={ rowRef }
 		>
 			<TreeGridCell
 				className="block-editor-list-view-block__contents-cell"
