@@ -52,6 +52,25 @@ WithCustomSpokenMessage.args = {
 	spokenMessage: 'This is a notice with a custom spoken message',
 };
 
+export const WithJSXChildren: ComponentStory< typeof Notice > = Template.bind(
+	{}
+);
+WithJSXChildren.args = {
+	...Default.args,
+	children: (
+		<>
+			<p>
+				JSX elements can be helpful
+				<strong> if you need to format</strong> the notice output.
+			</p>
+			<code>
+				note: in the interest of consistency, this should not be
+				overused!
+			</code>
+		</>
+	),
+};
+
 export const WithActions: ComponentStory< typeof Notice > = Template.bind( {} );
 WithActions.args = {
 	...Default.args,
