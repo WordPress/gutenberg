@@ -26,8 +26,10 @@ import { useHasBorderPanel } from './border-panel';
 import { useHasColorPanel } from './color-utils';
 import { useHasDimensionsPanel } from './dimensions-panel';
 import { useHasTypographyPanel } from './typography-panel';
+import { useHasVariationsPanel } from './variations-panel';
 import { NavigationButtonAsItem } from './navigation-button';
 import { IconWithCurrentColor } from './icon-with-current-color';
+import { ScreenVariations } from './screen-variations';
 
 function ContextMenu( { name, parentMenu = '' } ) {
 	const hasTypographyPanel = useHasTypographyPanel( name );
@@ -35,6 +37,7 @@ function ContextMenu( { name, parentMenu = '' } ) {
 	const hasBorderPanel = useHasBorderPanel( name );
 	const hasDimensionsPanel = useHasDimensionsPanel( name );
 	const hasLayoutPanel = hasDimensionsPanel;
+	const hasVariationsPanel = useHasVariationsPanel( name, parentMenu );
 
 	return (
 		<>
@@ -109,6 +112,37 @@ function ContextMenu( { name, parentMenu = '' } ) {
 				</>
 			) }
 		</>
+			{ hasColorPanel && (
+				<NavigationButtonAsItem
+					icon={ color }
+					path={ parentMenu + '/colors' }
+					aria-label={ __( 'Colors styles' ) }
+				>
+					{ __( 'Colors' ) }
+				</NavigationButtonAsItem>
+			) }
+			{ hasBorderPanel && (
+				<NavigationButtonAsItem
+					icon={ border }
+					path={ parentMenu + '/border' }
+					aria-label={ __( 'Border styles' ) }
+				>
+					{ __( 'Border' ) }
+				</NavigationButtonAsItem>
+			) }
+			{ hasLayoutPanel && (
+				<NavigationButtonAsItem
+					icon={ layout }
+					path={ parentMenu + '/layout' }
+					aria-label={ __( 'Layout styles' ) }
+				>
+					{ __( 'Layout' ) }
+				</NavigationButtonAsItem>
+			) }
+			{ hasVariationsPanel && (
+				<ScreenVariations name={ name } path={ parentMenu } />
+			) }
+		</ItemGroup>
 	);
 }
 

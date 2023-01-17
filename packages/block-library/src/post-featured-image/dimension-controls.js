@@ -160,6 +160,7 @@ const DimensionControls = ( {
 					panelId={ clientId }
 				>
 					<SelectControl
+						__nextHasNoMarginBottom
 						label={ __( 'Image size' ) }
 						value={ sizeSlug || DEFAULT_SIZE }
 						options={ imageSizeOptions }

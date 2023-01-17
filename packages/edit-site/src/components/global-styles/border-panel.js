@@ -94,11 +94,15 @@ function applyAllFallbackStyles( border ) {
 	return applyFallbackStyle( border );
 }
 
-export default function BorderPanel( { name } ) {
+export default function BorderPanel( { name, variationPath = '' } ) {
 	// To better reflect if the user has customized a value we need to
 	// ensure the style value being checked is from the `user` origin.
-	const [ userBorderStyles ] = useStyle( 'border', name, 'user' );
-	const [ border, setBorder ] = useStyle( 'border', name );
+	const [ userBorderStyles ] = useStyle(
+		`${ variationPath }border`,
+		name,
+		'user'
+	);
+	const [ border, setBorder ] = useStyle( `${ variationPath }border`, name );
 	const colors = useColorsPerOrigin( name );
 
 	const showBorderColor = useHasBorderColorControl( name );
@@ -108,7 +112,7 @@ export default function BorderPanel( { name } ) {
 	// Border radius.
 	const showBorderRadius = useHasBorderRadiusControl( name );
 	const [ borderRadiusValues, setBorderRadius ] = useStyle(
-		'border.radius',
+		`${ variationPath }border.radius`,
 		name
 	);
 	const hasBorderRadius = () => {
@@ -184,7 +188,6 @@ export default function BorderPanel( { name } ) {
 						popoverOffset={ 40 }
 						popoverPlacement="left-start"
 						value={ border }
-						__experimentalHasMultipleOrigins={ true }
 						__experimentalIsRenderedInSidebar={ true }
 						size={ '__unstable-large' }
 					/>

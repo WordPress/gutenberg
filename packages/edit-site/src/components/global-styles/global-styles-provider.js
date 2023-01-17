@@ -14,6 +14,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { GlobalStylesContext } from './context';
+import CanvasSpinner from '../canvas-spinner';
 
 function mergeTreesCustomizer( _, srcValue ) {
 	// We only pass as arrays the presets,
@@ -165,7 +166,7 @@ function useGlobalStylesContext() {
 export function GlobalStylesProvider( { children } ) {
 	const context = useGlobalStylesContext();
 	if ( ! context.isReady ) {
-		return null;
+		return <CanvasSpinner />;
 	}
 
 	return (

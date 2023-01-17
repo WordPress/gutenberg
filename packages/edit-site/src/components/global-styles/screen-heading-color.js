@@ -21,7 +21,7 @@ import {
 	useGradientsPerOrigin,
 } from './hooks';
 
-function ScreenHeadingColor( { name } ) {
+function ScreenHeadingColor( { name, variationPath = '' } ) {
 	const [ selectedLevel, setCurrentTab ] = useState( 'heading' );
 
 	const supports = getSupportedGlobalStylesPanels( name );
@@ -52,30 +52,30 @@ function ScreenHeadingColor( { name } ) {
 		( gradients.length > 0 || areCustomGradientsEnabled );
 
 	const [ color, setColor ] = useStyle(
-		'elements.' + selectedLevel + '.color.text',
+		variationPath + 'elements.' + selectedLevel + '.color.text',
 		name
 	);
 	const [ userColor ] = useStyle(
-		'elements.' + selectedLevel + '.color.text',
+		variationPath + 'elements.' + selectedLevel + '.color.text',
 		name,
 		'user'
 	);
 
 	const [ backgroundColor, setBackgroundColor ] = useStyle(
-		'elements.' + selectedLevel + '.color.background',
+		variationPath + 'elements.' + selectedLevel + '.color.background',
 		name
 	);
 	const [ userBackgroundColor ] = useStyle(
-		'elements.' + selectedLevel + '.color.background',
+		variationPath + 'elements.' + selectedLevel + '.color.background',
 		name,
 		'user'
 	);
 	const [ gradient, setGradient ] = useStyle(
-		'elements.' + selectedLevel + '.color.gradient',
+		variationPath + 'elements.' + selectedLevel + '.color.gradient',
 		name
 	);
 	const [ userGradient ] = useStyle(
-		'elements.' + selectedLevel + '.color.gradient',
+		variationPath + 'elements.' + selectedLevel + '.color.gradient',
 		name,
 		'user'
 	);
@@ -132,7 +132,7 @@ function ScreenHeadingColor( { name } ) {
 				>
 					<ToggleGroupControlOption
 						value="heading"
-						/* translators: 'All' refers to selecting all heading levels 
+						/* translators: 'All' refers to selecting all heading levels
 						and applying the same style to h1-h6. */
 						label={ __( 'All' ) }
 					/>
@@ -159,7 +159,6 @@ function ScreenHeadingColor( { name } ) {
 						className="edit-site-screen-heading-text-color__control"
 						colors={ colorsPerOrigin }
 						disableCustomColors={ ! areCustomSolidsEnabled }
-						__experimentalHasMultipleOrigins
 						showTitle={ false }
 						enableAlpha
 						__experimentalIsRenderedInSidebar
@@ -186,7 +185,6 @@ function ScreenHeadingColor( { name } ) {
 						gradients={ gradientsPerOrigin }
 						disableCustomColors={ ! areCustomSolidsEnabled }
 						disableCustomGradients={ ! areCustomGradientsEnabled }
-						__experimentalHasMultipleOrigins
 						showTitle={ false }
 						enableAlpha
 						__experimentalIsRenderedInSidebar

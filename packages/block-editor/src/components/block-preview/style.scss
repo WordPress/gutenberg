@@ -35,29 +35,6 @@
 	}
 }
 
-.block-editor-block-preview__live-content {
-	* {
-		pointer-events: none;
-	}
-
-	// Hide the block appender, as the block is not editable in this context.
-	.block-list-appender {
-		display: none;
-	}
-
-	// Revert button disable styles to ensure that button styles render as they will on the
-	// front end of the site. For example, this ensures that Social Links icons display correctly.
-	.components-button:disabled {
-		opacity: initial;
-	}
-
-	// Hide placeholders.
-	.components-placeholder,
-	.block-editor-block-list__block[data-empty="true"] {
-		display: none;
-	}
-}
-
 // The goal of this pseudo-element is to cover the iframe
 // otherwise it won't be able to drag elements containing
 // the preview iframe in Safari.

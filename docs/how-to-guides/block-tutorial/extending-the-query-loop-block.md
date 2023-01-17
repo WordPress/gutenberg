@@ -119,6 +119,12 @@ The Query Loop block determines if there is an active variation of itself and if
 
 In order for a pattern to be “connected” with a Query Loop variation, you should add the name of your variation prefixed with the Query Loop name (e.g. `core/query/$variation_name`) to the pattern's `blockTypes` property. For more details about registering patterns [see here](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-patterns/).
 
+If you have not provided `innerBlocks` in your variation, there is also a way to suggest “connected” variations when the user selects `Start blank` in the setup phase. This is handled in a similar fashion with “connected” patterns, by checking if there is an active variation of Query Loop and if there are any connected variations to suggest.
+
+In order for a variation to be connected to another Query Loop variation we need to define the `scope` attribute with `['block']` as value and the `namespace` attribute defined as an array. This array should contain the names(`name` property) of any variations they want to be connected to.
+
+For example, if we have a Query Loop variation exposed to the inserter(`scope: ['inserter']`) with the name `products`, we can connect a scoped `block` variation by setting its `namespace` attribute to `['products']`. If the user selects this variation after having clicked `Start blank`, the namespace attribute will be overridden by the main inserter variation.
+
 ### Making Gutenberg recognize your variation
 
 There is one slight problem you might have realized after implementing this variation: while it is transparent to the user as they are inserting it, Gutenberg will still recognize the variation as a Query Loop block at its core and so, after its insertion, it will show up as a Query Loop block in the tree view of the editor, for instance.

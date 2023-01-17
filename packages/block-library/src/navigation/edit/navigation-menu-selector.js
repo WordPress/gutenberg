@@ -10,7 +10,7 @@ import {
 	VisuallyHidden,
 } from '@wordpress/components';
 import { useEntityProp } from '@wordpress/core-data';
-import { Icon, chevronUp, chevronDown } from '@wordpress/icons';
+import { Icon, chevronUp, chevronDown, moreVertical } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useEffect, useMemo, useState } from '@wordpress/element';
@@ -20,6 +20,7 @@ import { useEffect, useMemo, useState } from '@wordpress/element';
  */
 import useNavigationMenu from '../use-navigation-menu';
 import useNavigationEntities from '../use-navigation-entities';
+import ManageMenusButton from './manage-menus-button';
 
 function NavigationMenuSelector( {
 	currentMenuId,
@@ -30,7 +31,10 @@ function NavigationMenuSelector( {
 	createNavigationMenuIsSuccess,
 	createNavigationMenuIsError,
 	toggleProps = {},
+	isManageMenusButtonDisabled,
 } ) {
+	const isOffCanvasNavigationEditorEnabled =
+		window?.__experimentalEnableOffCanvasNavigationEditor === true;
 	/* translators: %s: The name of a menu. */
 	const createActionLabel = __( "Create from '%s'" );
 
@@ -64,10 +68,17 @@ function NavigationMenuSelector( {
 
 	const menuChoices = useMemo( () => {
 		return (
-			navigationMenus?.map( ( { id, title } ) => {
-				const label = decodeEntities( title.rendered );
+			navigationMenus?.map( ( { id, title }, index ) => {
+				const label =
+					decodeEntities( title.rendered ) ||
+					/* translators: %s is the index of the menu in the list of menus. */
+					sprintf( __( '(no title %s)' ), index + 1 );
+
 				if ( id === currentMenuId && ! isCreatingMenu ) {
-					setSelectorLabel( currentTitle );
+					setSelectorLabel(
+						/* translators: %s is the name of a navigation menu. */
+						sprintf( __( 'You are currently editing %s' ), label )
+					);
 					setEnableOptions( shouldEnableMenuSelector );
 				}
 				return {
@@ -100,7 +111,7 @@ function NavigationMenuSelector( {
 		if ( ! hasResolvedNavigationMenus ) {
 			setSelectorLabel( __( 'Loading …' ) );
 		} else if ( noMenuSelected || noBlockMenus || menuUnavailable ) {
-			setSelectorLabel( __( 'Select menu' ) );
+			setSelectorLabel( __( 'Choose a Navigation menu' ) );
 			setEnableOptions( shouldEnableMenuSelector );
 		}
 
@@ -140,7 +151,11 @@ function NavigationMenuSelector( {
 		},
 	};
 
-	if ( ! hasNavigationMenus && ! hasClassicMenus ) {
+	if (
+		! hasNavigationMenus &&
+		! hasClassicMenus &&
+		! isOffCanvasNavigationEditorEnabled
+	) {
 		return (
 			<Button
 				className="wp-block-navigation__navigation-selector-button--createnew"
@@ -161,15 +176,19 @@ function NavigationMenuSelector( {
 
 	return (
 		<DropdownMenu
-			className="wp-block-navigation__navigation-selector"
-			label={ selectorLabel }
-			text={
-				<span className="wp-block-navigation__navigation-selector-button__label">
-					{ selectorLabel }
-				</span>
+			className={
+				isOffCanvasNavigationEditorEnabled
+					? ''
+					: 'wp-block-navigation__navigation-selector'
 			}
-			icon={ null }
-			toggleProps={ toggleProps }
+			label={ selectorLabel }
+			text={ isOffCanvasNavigationEditorEnabled ? '' : selectorLabel }
+			icon={ isOffCanvasNavigationEditorEnabled ? moreVertical : null }
+			toggleProps={
+				isOffCanvasNavigationEditorEnabled
+					? { isSmall: true }
+					: toggleProps
+			}
 		>
 			{ ( { onClose } ) => (
 				<>
@@ -224,6 +243,14 @@ function NavigationMenuSelector( {
 							>
 								{ __( 'Create new menu' ) }
 							</MenuItem>
+							{ isOffCanvasNavigationEditorEnabled && (
+								<ManageMenusButton
+									isManageMenusButtonDisabled={
+										isManageMenusButtonDisabled
+									}
+									isMenuItem={ true }
+								/>
+							) }
 						</MenuGroup>
 					) }
 				</>

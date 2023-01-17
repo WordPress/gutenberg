@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { TextareaControl, Panel, PanelBody } from '@wordpress/components';
+import {
+	ExternalLink,
+	TextareaControl,
+	Panel,
+	PanelBody,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -55,9 +60,13 @@ function CustomCSSControl( { blockName } ) {
 				rows={ 15 }
 				className="edit-site-global-styles__custom-css-input"
 				spellCheck={ false }
-				help={ __(
-					"Enter your custom CSS in the textarea and preview in the editor. Changes won't take effect until you've saved the template."
-				) }
+				help={
+					<>
+						<ExternalLink href="https://wordpress.org/support/article/css/">
+							{ __( 'Learn more about CSS' ) }
+						</ExternalLink>
+					</>
+				}
 			/>
 			{ originalThemeCustomCSS && (
 				<Panel>

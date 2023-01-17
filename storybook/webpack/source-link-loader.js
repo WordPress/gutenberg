@@ -46,7 +46,8 @@ function alterParameters( properties, componentPath ) {
 
 	if ( ! parameters ) {
 		parameters = babel.types.objectProperty(
-			babel.types.identifier( 'parameters' )
+			babel.types.identifier( 'parameters' ),
+			babel.types.objectExpression( [] )
 		);
 		properties.push( parameters );
 	}

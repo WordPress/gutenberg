@@ -48,6 +48,7 @@ import { useMergeRefs } from '@wordpress/compose';
 import { name } from './block.json';
 import { LinkUI } from './link-ui';
 import { updateAttributes } from './update-attributes';
+import { getColors } from '../navigation/edit/utils';
 
 /**
  * A React hook to determine if it's dragging within the target element.
@@ -99,61 +100,6 @@ const useIsDraggingWithin = ( elementRef ) => {
 
 	return isDraggingWithin;
 };
-
-/**
- * Determine the colors for a menu.
- *
- * Order of priority is:
- * 1: Overlay custom colors (if submenu)
- * 2: Overlay theme colors (if submenu)
- * 3: Custom colors
- * 4: Theme colors
- * 5: Global styles
- *
- * @param {Object}  context
- * @param {boolean} isSubMenu
- */
-function getColors( context, isSubMenu ) {
-	const {
-		textColor,
-		customTextColor,
-		backgroundColor,
-		customBackgroundColor,
-		overlayTextColor,
-		customOverlayTextColor,
-		overlayBackgroundColor,
-		customOverlayBackgroundColor,
-		style,
-	} = context;
-
-	const colors = {};
-
-	if ( isSubMenu && !! customOverlayTextColor ) {
-		colors.customTextColor = customOverlayTextColor;
-	} else if ( isSubMenu && !! overlayTextColor ) {
-		colors.textColor = overlayTextColor;
-	} else if ( !! customTextColor ) {
-		colors.customTextColor = customTextColor;
-	} else if ( !! textColor ) {
-		colors.textColor = textColor;
-	} else if ( !! style?.color?.text ) {
-		colors.customTextColor = style.color.text;
-	}
-
-	if ( isSubMenu && !! customOverlayBackgroundColor ) {
-		colors.customBackgroundColor = customOverlayBackgroundColor;
-	} else if ( isSubMenu && !! overlayBackgroundColor ) {
-		colors.backgroundColor = overlayBackgroundColor;
-	} else if ( !! customBackgroundColor ) {
-		colors.customBackgroundColor = customBackgroundColor;
-	} else if ( !! backgroundColor ) {
-		colors.backgroundColor = backgroundColor;
-	} else if ( !! style?.color?.background ) {
-		colors.customTextColor = style.color.background;
-	}
-
-	return colors;
-}
 
 const useIsInvalidLink = ( kind, type, id ) => {
 	const isPostType =
@@ -429,12 +375,19 @@ export default function NavigationLinkEdit( {
 	const DEFAULT_BLOCK = {
 		name: 'core/navigation-link',
 	};
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: ALLOWED_BLOCKS,
-		__experimentalDefaultBlock: DEFAULT_BLOCK,
-		__experimentalDirectInsert: true,
-		renderAppender: false,
-	} );
+
+	const innerBlocksProps = useInnerBlocksProps(
+		{
+			...blockProps,
+			className: 'remove-outline', // Remove the outline from the inner blocks container.
+		},
+		{
+			allowedBlocks: ALLOWED_BLOCKS,
+			__experimentalDefaultBlock: DEFAULT_BLOCK,
+			__experimentalDirectInsert: true,
+			renderAppender: false,
+		}
+	);
 
 	if ( ! url || isInvalid || isDraft ) {
 		blockProps.onClick = () => setIsLinkOpen( true );
@@ -489,7 +442,11 @@ export default function NavigationLinkEdit( {
 					<TextControl
 						value={ url || '' }
 						onChange={ ( urlValue ) => {
-							setAttributes( { url: urlValue } );
+							updateAttributes(
+								{ url: urlValue },
+								setAttributes,
+								attributes
+							);
 						} }
 						label={ __( 'URL' ) }
 						autoComplete="off"

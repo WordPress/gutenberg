@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { getDefaultBlockName } from '@wordpress/blocks';
 
 /**
@@ -11,14 +11,48 @@ import DefaultBlockAppender from '../default-block-appender';
 import styles from './style.scss';
 import { store as blockEditorStore } from '../../store';
 
-function BlockListAppender( {
-	blockClientIds,
+function DefaultAppender( { rootClientId, showSeparator } ) {
+	const { blockClientIds, canInsertDefaultBlock } = useSelect(
+		( select ) => {
+			const { getBlockOrder, canInsertBlockType } =
+				select( blockEditorStore );
+			return {
+				blockClientIds: getBlockOrder( rootClientId ),
+				canInsertDefaultBlock: canInsertBlockType(
+					getDefaultBlockName(),
+					rootClientId
+				),
+			};
+		},
+		[ rootClientId ]
+	);
+
+	if ( ! canInsertDefaultBlock ) {
+		return null;
+	}
+
+	return (
+		<DefaultBlockAppender
+			rootClientId={ rootClientId }
+			lastBlockClientId={ blockClientIds[ blockClientIds.length - 1 ] }
+			containerStyle={ styles.blockListAppender }
+			placeholder={ blockClientIds.length > 0 ? '' : null }
+			showSeparator={ showSeparator }
+		/>
+	);
+}
+
+export default function BlockListAppender( {
 	rootClientId,
-	canInsertDefaultBlock,
-	isLocked,
 	renderAppender: CustomAppender,
 	showSeparator,
 } ) {
+	const isLocked = useSelect(
+		( select ) =>
+			!! select( blockEditorStore ).getTemplateLock( rootClientId ),
+		[ rootClientId ]
+	);
+
 	if ( isLocked ) {
 		return null;
 	}
@@ -27,33 +61,10 @@ function BlockListAppender( {
 		return <CustomAppender showSeparator={ showSeparator } />;
 	}
 
-	if ( canInsertDefaultBlock ) {
-		return (
-			<DefaultBlockAppender
-				rootClientId={ rootClientId }
-				lastBlockClientId={
-					blockClientIds[ blockClientIds.length - 1 ]
-				}
-				containerStyle={ styles.blockListAppender }
-				placeholder={ blockClientIds.length > 0 ? '' : null }
-				showSeparator={ showSeparator }
-			/>
-		);
-	}
-
-	return null;
+	return (
+		<DefaultAppender
+			rootClientId={ rootClientId }
+			showSeparator={ showSeparator }
+		/>
+	);
 }
-
-export default withSelect( ( select, { rootClientId } ) => {
-	const { getBlockOrder, canInsertBlockType, getTemplateLock } =
-		select( blockEditorStore );
-
-	return {
-		isLocked: !! getTemplateLock( rootClientId ),
-		blockClientIds: getBlockOrder( rootClientId ),
-		canInsertDefaultBlock: canInsertBlockType(
-			getDefaultBlockName(),
-			rootClientId
-		),
-	};
-} )( BlockListAppender );
