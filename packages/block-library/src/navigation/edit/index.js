@@ -472,17 +472,19 @@ function Navigation( {
 			'[data-type="core/navigation-submenu"] [data-type="core/navigation-link"]'
 		);
 
-		if ( subMenuElement ) {
-			// Only detect submenu overlay colors if they have previously been explicitly set.
-			// This avoids the contrast checker from reporting on inherited submenu colors and
-			// showing the contrast warning twice.
-			if ( overlayTextColor.color || overlayBackgroundColor.color ) {
-				detectColors(
-					subMenuElement,
-					setDetectedOverlayColor,
-					setDetectedOverlayBackgroundColor
-				);
-			}
+		if ( ! subMenuElement ) {
+			return;
+		}
+
+		// Only detect submenu overlay colors if they have previously been explicitly set.
+		// This avoids the contrast checker from reporting on inherited submenu colors and
+		// showing the contrast warning twice.
+		if ( overlayTextColor.color || overlayBackgroundColor.color ) {
+			detectColors(
+				subMenuElement,
+				setDetectedOverlayColor,
+				setDetectedOverlayBackgroundColor
+			);
 		}
 	} );
 
