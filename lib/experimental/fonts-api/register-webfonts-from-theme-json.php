@@ -86,12 +86,12 @@ if ( ! function_exists( 'gutenberg_register_webfonts_from_theme_json' ) ) {
 						}
 					}
 
-					$font_family_handle = WP_Webfonts_Utils::get_font_family_from_variation( $font_face );
+					$font_family_handle = WP_Fonts_Utils::get_font_family_from_variation( $font_face );
 					if ( empty( $font_family_handle ) && isset( $font_family['slug'] ) ) {
 						$font_family_handle = $font_family['slug'];
 					}
 					if ( ! empty( $font_family_handle ) ) {
-						$font_family_handle = WP_Webfonts_Utils::convert_font_family_into_handle( $font_family_handle );
+						$font_family_handle = WP_Fonts_Utils::convert_font_family_into_handle( $font_family_handle );
 					}
 					if ( empty( $font_family_handle ) ) {
 						_doing_it_wrong( __FUNCTION__, __( 'Font family not defined in the variation or "slug".', 'gutenberg' ), '6.1.0' );
@@ -134,8 +134,8 @@ if ( ! function_exists( 'gutenberg_add_registered_webfonts_to_theme_json' ) ) {
 		$get_families = static function ( $families_data ) {
 			$families = array();
 			foreach ( $families_data as $family ) {
-				$font_family = WP_Webfonts_Utils::get_font_family_from_variation( $family );
-				$handle      = WP_Webfonts_Utils::convert_font_family_into_handle( $font_family );
+				$font_family = WP_Fonts_Utils::get_font_family_from_variation( $family );
+				$handle      = WP_Fonts_Utils::convert_font_family_into_handle( $font_family );
 				if ( ! empty( $handle ) ) {
 					$families[ $handle ] = true;
 				}

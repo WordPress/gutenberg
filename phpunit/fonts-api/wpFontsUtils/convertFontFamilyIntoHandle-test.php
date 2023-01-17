@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Webfonts_Utils::convert_font_family_into_handle() tests.
+ * WP_Fonts_Utils::convert_font_family_into_handle() tests.
  *
  * @package    WordPress
  * @subpackage Fonts API
@@ -10,9 +10,9 @@ require_once __DIR__ . '/../wp-fonts-testcase.php';
 
 /**
  * @group fontsapi
- * @covers WP_Webfonts_Utils::convert_font_family_into_handle
+ * @covers WP_Fonts_Utils::convert_font_family_into_handle
  */
-class Tests_Webfonts_WpWebfontsUtils_ConvertFontFamilyIntoHandle extends WP_Fonts_TestCase {
+class Tests_Fonts_WpFontsUtils_ConvertFontFamilyIntoHandle extends WP_Fonts_TestCase {
 
 	/**
 	 * @dataProvider data_with_valid_input
@@ -21,7 +21,7 @@ class Tests_Webfonts_WpWebfontsUtils_ConvertFontFamilyIntoHandle extends WP_Font
 	 * @param string $expected    Expected results.
 	 */
 	public function test_should_convert_with_valid_input( $font_family, $expected ) {
-		$this->assertSame( $expected, WP_Webfonts_Utils::convert_font_family_into_handle( $font_family ) );
+		$this->assertSame( $expected, WP_Fonts_Utils::convert_font_family_into_handle( $font_family ) );
 	}
 
 	/**
@@ -61,12 +61,12 @@ class Tests_Webfonts_WpWebfontsUtils_ConvertFontFamilyIntoHandle extends WP_Font
 	/**
 	 * @dataProvider data_with_invalid_input
 	 *
-	 * @covers WP_Webfonts_Utils::convert_font_family_into_handle
+	 * @covers WP_Fonts_Utils::convert_font_family_into_handle
 	 *
 	 * @param mixed $invalid_input Invalid input.
 	 */
 	public function test_should_not_convert_with_invalid_input( $invalid_input ) {
-		$this->assertNull( WP_Webfonts_Utils::convert_font_family_into_handle( $invalid_input ) );
+		$this->assertNull( WP_Fonts_Utils::convert_font_family_into_handle( $invalid_input ) );
 	}
 
 	/**

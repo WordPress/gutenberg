@@ -159,7 +159,7 @@ abstract class WP_Fonts_TestCase extends WP_UnitTestCase {
 				$mock->extra['font-family'] = $font_family;
 			}
 
-			$handle = $is_font_family ? WP_Webfonts_Utils::convert_font_family_into_handle( $font_family ) : $font_family;
+			$handle = $is_font_family ? WP_Fonts_Utils::convert_font_family_into_handle( $font_family ) : $font_family;
 
 			// Add to each queue.
 			$mocks[ $handle ]                   = $mock;

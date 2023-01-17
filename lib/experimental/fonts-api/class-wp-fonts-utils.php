@@ -1,22 +1,22 @@
 <?php
 /**
- * Webfont API's utility helpers.
+ * Font API's utility helpers.
  *
  * @package    WordPress
  * @subpackage Fonts API
  * @since      X.X.X
  */
 
-if ( class_exists( 'WP_Webfonts_Utils' ) ) {
+if ( class_exists( 'WP_Fonts_Utils' ) ) {
 	return;
 }
 
 /**
- * Utility helpers for the Webfonts API.
+ * Utility helpers for the Fonts API.
  *
  * @since X.X.X
  */
-class WP_Webfonts_Utils {
+class WP_Fonts_Utils {
 
 	/**
 	 * Converts the given font family into a handle.

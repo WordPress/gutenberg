@@ -184,7 +184,7 @@ class WP_Web_Fonts extends WP_Webfonts {
 	 * @return string|null Font family handle when registration successes. Null on failure.
 	 */
 	public function add_font_family( $font_family ) {
-		$font_family_handle = WP_Webfonts_Utils::convert_font_family_into_handle( $font_family );
+		$font_family_handle = WP_Fonts_Utils::convert_font_family_into_handle( $font_family );
 		if ( ! $font_family_handle ) {
 			return null;
 		}
@@ -238,13 +238,13 @@ class WP_Web_Fonts extends WP_Webfonts {
 	 * @return string|null Variation handle on success. Else null.
 	 */
 	public function add_variation( $font_family_handle, array $variation, $variation_handle = '' ) {
-		if ( ! WP_Webfonts_Utils::is_defined( $font_family_handle ) ) {
+		if ( ! WP_Fonts_Utils::is_defined( $font_family_handle ) ) {
 			trigger_error( 'Font family handle must be a non-empty string.' );
 			return null;
 		}
 
 		// When there is a variation handle, check it.
-		if ( '' !== $variation_handle && ! WP_Webfonts_Utils::is_defined( $variation_handle ) ) {
+		if ( '' !== $variation_handle && ! WP_Fonts_Utils::is_defined( $variation_handle ) ) {
 			trigger_error( 'Variant handle must be a non-empty string.' );
 			return null;
 		}
@@ -265,7 +265,7 @@ class WP_Web_Fonts extends WP_Webfonts {
 
 		// When there's no variation handle, attempt to create one.
 		if ( '' === $variation_handle ) {
-			$variation_handle = WP_Webfonts_Utils::convert_variation_into_handle( $font_family_handle, $variation );
+			$variation_handle = WP_Fonts_Utils::convert_variation_into_handle( $font_family_handle, $variation );
 			if ( is_null( $variation_handle ) ) {
 				return null;
 			}
@@ -522,7 +522,7 @@ class WP_Web_Fonts extends WP_Webfonts {
 	 */
 	private function validate_handles( $handles ) {
 		// Validate each element is a non-empty string handle.
-		$handles = array_filter( (array) $handles, array( WP_Webfonts_Utils::class, 'is_defined' ) );
+		$handles = array_filter( (array) $handles, array( WP_Fonts_Utils::class, 'is_defined' ) );
 
 		if ( empty( $handles ) ) {
 			trigger_error( 'Handles must be a non-empty string or array of non-empty strings' );

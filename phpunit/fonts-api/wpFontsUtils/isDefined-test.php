@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Webfonts_Utils::is_defined() tests.
+ * WP_Fonts_Utils::is_defined() tests.
  *
  * @package    WordPress
  * @subpackage Fonts API
@@ -10,9 +10,9 @@ require_once __DIR__ . '/../wp-fonts-testcase.php';
 
 /**
  * @group fontsapi
- * @covers WP_Webfonts_Utils::is_defined
+ * @covers WP_Fonts_Utils::is_defined
  */
-class Tests_Webfonts_WpWebfontsUtils_IsDefined extends WP_Fonts_TestCase {
+class Tests_Fonts_WpFontsUtils_IsDefined extends WP_Fonts_TestCase {
 
 	/**
 	 * @dataProvider data_when_defined
@@ -20,7 +20,7 @@ class Tests_Webfonts_WpWebfontsUtils_IsDefined extends WP_Fonts_TestCase {
 	 * @param mixed $input Input to test.
 	 */
 	public function test_should_return_true_when_defined( $input ) {
-		$this->assertTrue( WP_Webfonts_Utils::is_defined( $input ) );
+		$this->assertTrue( WP_Fonts_Utils::is_defined( $input ) );
 	}
 
 	/**
@@ -41,7 +41,7 @@ class Tests_Webfonts_WpWebfontsUtils_IsDefined extends WP_Fonts_TestCase {
 	 * @param mixed $invalid_input Input to test.
 	 */
 	public function test_should_return_false_when_not_defined( $invalid_input ) {
-		$this->assertFalse( WP_Webfonts_Utils::is_defined( $invalid_input ) );
+		$this->assertFalse( WP_Fonts_Utils::is_defined( $invalid_input ) );
 	}
 
 	/**

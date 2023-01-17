@@ -70,7 +70,7 @@ if ( ! function_exists( 'wp_register_webfonts' ) ) {
 
 			// Register each of the variations for this font family.
 			foreach ( $variations as $variation_handle => $variation ) {
-				if ( ! WP_Webfonts_Utils::is_defined( $variation_handle ) ) {
+				if ( ! WP_Fonts_Utils::is_defined( $variation_handle ) ) {
 					$variation_handle = '';
 				}
 
@@ -93,7 +93,7 @@ if ( ! function_exists( 'wp_enqueue_webfonts' ) ) {
 	 * @param string[] $font_families Font family(ies) to enqueue.
 	 */
 	function wp_enqueue_webfonts( array $font_families ) {
-		$handles = array_map( array( WP_Webfonts_Utils::class, 'convert_font_family_into_handle' ), $font_families );
+		$handles = array_map( array( WP_Fonts_Utils::class, 'convert_font_family_into_handle' ), $font_families );
 
 		wp_webfonts()->enqueue( $handles );
 	}

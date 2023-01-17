@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Webfonts_Utils::convert_variation_into_handle() tests.
+ * WP_Fonts_Utils::convert_variation_into_handle() tests.
  *
  * @package    WordPress
  * @subpackage Fonts API
@@ -10,9 +10,9 @@ require_once __DIR__ . '/../wp-fonts-testcase.php';
 
 /**
  * @group fontsapi
- * @covers WP_Webfonts_Utils::convert_variation_into_handle
+ * @covers WP_Fonts_Utils::convert_variation_into_handle
  */
-class Tests_Webfonts_WpWebfontsUtils_ConvertVariationIntoHandle extends WP_Fonts_TestCase {
+class Tests_Fonts_WpFontsUtils_ConvertVariationIntoHandle extends WP_Fonts_TestCase {
 
 	/**
 	 * @dataProvider data_with_valid_input
@@ -22,7 +22,7 @@ class Tests_Webfonts_WpWebfontsUtils_ConvertVariationIntoHandle extends WP_Fonts
 	 * @param string $expected    Expected results.
 	 */
 	public function test_should_convert_with_valid_inputs( $font_family, array $variation, $expected ) {
-		$this->assertSame( $expected, WP_Webfonts_Utils::convert_variation_into_handle( $font_family, $variation ) );
+		$this->assertSame( $expected, WP_Fonts_Utils::convert_variation_into_handle( $font_family, $variation ) );
 	}
 
 	/**
@@ -74,7 +74,7 @@ class Tests_Webfonts_WpWebfontsUtils_ConvertVariationIntoHandle extends WP_Fonts
 		$this->expectNotice();
 		$this->expectNoticeMessage( 'Variant handle could not be determined as font-weight and/or font-style are require' );
 
-		$this->assertNull( WP_Webfonts_Utils::convert_variation_into_handle( $font_family, $invalid_input ) );
+		$this->assertNull( WP_Fonts_Utils::convert_variation_into_handle( $font_family, $invalid_input ) );
 	}
 
 	/**

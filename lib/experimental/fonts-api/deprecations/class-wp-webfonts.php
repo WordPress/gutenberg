@@ -29,7 +29,7 @@ class WP_Webfonts extends WP_Dependencies {
 	 * Gets the font slug.
 	 *
 	 * @since X.X.X
-	 * @deprecated Use WP_Webfonts_Utils::convert_font_family_into_handle() or WP_Webfonts_Utils::get_font_family_from_variation().
+	 * @deprecated Use WP_Fonts_Utils::convert_font_family_into_handle() or WP_Fonts_Utils::get_font_family_from_variation().
 	 *
 	 * @param array|string $to_convert The value to convert into a slug. Expected as the web font's array
 	 *                                 or a font-family as a string.
@@ -37,8 +37,8 @@ class WP_Webfonts extends WP_Dependencies {
 	 */
 	public static function get_font_slug( $to_convert ) {
 		$message = is_array( $to_convert )
-			? 'Use WP_Webfonts_Utils::get l_font_family_from_variation() to get the font family from an array and then WP_Webfonts_Utils::convert_font_family_into_handle() to convert the font-family name into a handle'
-			: 'Use WP_Webfonts_Utils::convert_font_family_into_handle() to convert the font-family name into a handle';
+			? 'Use WP_Fonts_Utils::get_font_family_from_variation() to get the font family from an array and then WP_Fonts_Utils::convert_font_family_into_handle() to convert the font-family name into a handle'
+			: 'Use WP_Fonts_Utils::convert_font_family_into_handle() to convert the font-family name into a handle';
 		_deprecated_function( __METHOD__, 'X.X.X', $message );
 
 		return static::_get_font_slug( $to_convert );
@@ -115,10 +115,10 @@ class WP_Webfonts extends WP_Dependencies {
 		}
 
 		// When font family's handle is not passed, attempt to get it from the variation.
-		if ( ! WP_Webfonts_Utils::is_defined( $font_family_handle ) ) {
-			$font_family = WP_Webfonts_Utils::get_font_family_from_variation( $webfont );
+		if ( ! WP_Fonts_Utils::is_defined( $font_family_handle ) ) {
+			$font_family = WP_Fonts_Utils::get_font_family_from_variation( $webfont );
 			if ( $font_family ) {
-				$font_family_handle = WP_Webfonts_Utils::convert_font_family_into_handle( $font_family );
+				$font_family_handle = WP_Fonts_Utils::convert_font_family_into_handle( $font_family );
 			}
 		}
 
@@ -161,7 +161,7 @@ class WP_Webfonts extends WP_Dependencies {
 
 		$new_webfonts = array();
 		foreach ( $webfonts as $webfont ) {
-			$font_family = WP_Webfonts_Utils::get_font_family_from_variation( $webfont );
+			$font_family = WP_Fonts_Utils::get_font_family_from_variation( $webfont );
 			if ( ! $font_family ) {
 				continue;
 			}
@@ -185,7 +185,7 @@ class WP_Webfonts extends WP_Dependencies {
 	public function is_deprecated_structure( array $webfonts ) {
 		// Checks the first key to determine if it's empty or non-string.
 		foreach ( $webfonts as $font_family => $variations ) {
-			return ! WP_Webfonts_Utils::is_defined( $font_family );
+			return ! WP_Fonts_Utils::is_defined( $font_family );
 		}
 	}
 
@@ -199,12 +199,12 @@ class WP_Webfonts extends WP_Dependencies {
 	protected function extract_font_family_from_deprecated_webfonts_structure( array $webfont, $message ) {
 		trigger_error( $message, E_USER_DEPRECATED );
 
-		$font_family = WP_Webfonts_Utils::get_font_family_from_variation( $webfont );
+		$font_family = WP_Fonts_Utils::get_font_family_from_variation( $webfont );
 		if ( ! $font_family ) {
 			return null;
 		}
 
-		return WP_Webfonts_Utils::convert_font_family_into_handle( $font_family );
+		return WP_Fonts_Utils::convert_font_family_into_handle( $font_family );
 	}
 
 	/**
@@ -217,9 +217,9 @@ class WP_Webfonts extends WP_Dependencies {
 	 * @return string|false The font slug on success, or false if the font-family cannot be determined.
 	 */
 	private static function _get_font_slug( $to_convert ) {
-		$font_family_name = is_array( $to_convert ) ? WP_Webfonts_Utils::get_font_family_from_variation( $to_convert ) : $to_convert;
+		$font_family_name = is_array( $to_convert ) ? WP_Fonts_Utils::get_font_family_from_variation( $to_convert ) : $to_convert;
 		return ! empty( $font_family_name )
-			? WP_Webfonts_Utils::convert_font_family_into_handle( $font_family_name )
+			? WP_Fonts_Utils::convert_font_family_into_handle( $font_family_name )
 			: false;
 	}
 
