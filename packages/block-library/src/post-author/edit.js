@@ -22,6 +22,7 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
+import { addQueryArgs } from '@wordpress/url';
 
 const minimumUsersForCombobox = 25;
 
@@ -29,6 +30,14 @@ const AUTHORS_QUERY = {
 	who: 'authors',
 	per_page: 100,
 };
+
+const DEFAULT_AVATAR_SIZES = [ 24, 48, 96 ].map( ( size ) => ( {
+	value: size,
+	label: `${ size } x ${ size }`,
+} ) );
+
+const DEFAULT_AVATAR_URL =
+	'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y';
 
 function PostAuthorEdit( {
 	isSelected,
@@ -58,18 +67,27 @@ function PostAuthorEdit( {
 
 	const { editEntityRecord } = useDispatch( coreStore );
 
-	const { textAlign, showAvatar, showBio, byline, isLink, linkTarget } =
-		attributes;
-	const avatarSizes = [];
-	const authorName = authorDetails?.name || __( 'Post Author' );
-	if ( authorDetails?.avatar_urls ) {
-		Object.keys( authorDetails.avatar_urls ).forEach( ( size ) => {
-			avatarSizes.push( {
+	const {
+		textAlign,
+		avatarSize,
+		showAvatar,
+		showBio,
+		byline,
+		isLink,
+		linkTarget,
+	} = attributes;
+	const avatarSizes = authorDetails?.avatar_urls
+		? Object.keys( authorDetails.avatar_urls ).map( ( size ) => ( {
 				value: size,
 				label: `${ size } x ${ size }`,
-			} );
-		} );
-	}
+		  } ) )
+		: DEFAULT_AVATAR_SIZES;
+	const authorName = authorDetails?.name || __( 'Post Author' );
+	const avatarUrl = authorDetails?.avatar_urls
+		? authorDetails.avatar_urls[ avatarSize ]
+		: addQueryArgs( DEFAULT_AVATAR_URL, {
+				s: avatarSize,
+		  } );
 
 	const blockProps = useBlockProps( {
 		className: classnames( {
@@ -130,7 +148,7 @@ function PostAuthorEdit( {
 						<SelectControl
 							__nextHasNoMarginBottom
 							label={ __( 'Avatar size' ) }
-							value={ attributes.avatarSize }
+							value={ avatarSize }
 							options={ avatarSizes }
 							onChange={ ( size ) => {
 								setAttributes( {
@@ -175,16 +193,12 @@ function PostAuthorEdit( {
 			</BlockControls>
 
 			<div { ...blockProps }>
-				{ showAvatar && authorDetails?.avatar_urls && (
+				{ showAvatar && (
 					<div className="wp-block-post-author__avatar">
 						<img
-							width={ attributes.avatarSize }
-							src={
-								authorDetails.avatar_urls[
-									attributes.avatarSize
-								]
-							}
-							alt={ authorDetails.name }
+							width={ avatarSize }
+							src={ avatarUrl }
+							alt={ authorDetails?.name || '' }
 						/>
 					</div>
 				) }
