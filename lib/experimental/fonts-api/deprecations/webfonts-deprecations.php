@@ -200,3 +200,37 @@ if ( ! function_exists( 'wp_get_webfont_providers' ) ) {
 		return $providers;
 	}
 }
+
+if ( ! function_exists( 'wp_register_webfont_provider' ) ) {
+	/**
+	 * Registers a custom font service provider.
+	 *
+	 * A webfont provider contains the business logic for how to
+	 * interact with a remote font service and how to generate
+	 * the `@font-face` styles for that remote service.
+	 *
+	 * How to register a custom font service provider:
+	 *    1. Load its class file into memory before registration.
+	 *    2. Pass the class' name to this function.
+	 *
+	 * For example, for a class named `My_Custom_Font_Service_Provider`:
+	 * ```
+	 *    wp_register_webfont_provider( My_Custom_Font_Service_Provider::class );
+	 * ```
+	 *
+	 * @since X.X.X
+	 * @deprecated GB 15.1 Use wp_register_font_provider() instead.
+	 *
+	 * @param string $name      The provider's name.
+	 * @param string $classname The provider's class name.
+	 *                          The class should be a child of `WP_Webfonts_Provider`.
+	 *                          See {@see WP_Webfonts_Provider}.
+	 *
+	 * @return bool True if successfully registered, else false.
+	 */
+	function wp_register_webfont_provider( $name, $classname ) {
+		_deprecated_function( __FUNCTION__, 'GB 15.1', 'wp_register_font_provider' );
+
+		return wp_register_font_provider( $name, $classname );
+	}
+}

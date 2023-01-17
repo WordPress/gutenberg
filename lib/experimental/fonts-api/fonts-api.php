@@ -139,7 +139,7 @@ if ( ! function_exists( 'wp_deregister_font_variation' ) ) {
 	}
 }
 
-if ( ! function_exists( 'wp_register_webfont_provider' ) ) {
+if ( ! function_exists( 'wp_register_font_provider' ) ) {
 	/**
 	 * Registers a custom font service provider.
 	 *
@@ -153,7 +153,7 @@ if ( ! function_exists( 'wp_register_webfont_provider' ) ) {
 	 *
 	 * For example, for a class named `My_Custom_Font_Service_Provider`:
 	 * ```
-	 *    wp_register_webfont_provider( My_Custom_Font_Service_Provider::class );
+	 *    wp_register_font_provider( My_Custom_Font_Service_Provider::class );
 	 * ```
 	 *
 	 * @since 6.0.0
@@ -165,7 +165,7 @@ if ( ! function_exists( 'wp_register_webfont_provider' ) ) {
 	 *
 	 * @return bool True if successfully registered, else false.
 	 */
-	function wp_register_webfont_provider( $name, $classname ) {
+	function wp_register_font_provider( $name, $classname ) {
 		return wp_fonts()->register_provider( $name, $classname );
 	}
 }

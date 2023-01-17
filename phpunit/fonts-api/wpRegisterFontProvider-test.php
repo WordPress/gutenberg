@@ -1,6 +1,6 @@
 <?php
 /**
- * Unit tests for wp_register_webfont_provider().
+ * Unit tests for wp_register_font_provider().
  *
  * @package    WordPress
  * @subpackage Fonts API
@@ -11,9 +11,9 @@ require_once __DIR__ . '/../fixtures/mock-provider.php';
 
 /**
  * @group  fontsapi
- * @covers ::wp_register_webfont_provider
+ * @covers ::wp_register_font_provider
  */
-class Tests_Webfonts_WpRegisterWebfontProvider extends WP_Fonts_TestCase {
+class Tests_Fonts_WpRegisterFontProvider extends WP_Fonts_TestCase {
 
 	/**
 	 * @dataProvider data_register_providers
@@ -31,7 +31,7 @@ class Tests_Webfonts_WpRegisterWebfontProvider extends WP_Fonts_TestCase {
 			)
 			->will( $this->returnValue( true ) );
 
-		$this->assertTrue( wp_register_webfont_provider( $provider_id, $class ), 'wp_register_webfont_provider() should return true' );
+		$this->assertTrue( wp_register_font_provider( $provider_id, $class ), 'wp_register_font_provider() should return true' );
 	}
 
 	/**
@@ -68,7 +68,7 @@ class Tests_Webfonts_WpRegisterWebfontProvider extends WP_Fonts_TestCase {
 			)
 			->will( $this->returnValue( false ) );
 
-		$this->assertFalse( wp_register_webfont_provider( $provider_id, $class ), 'wp_register_webfont_provider() should return false' );
+		$this->assertFalse( wp_register_font_provider( $provider_id, $class ), 'wp_register_font_provider() should return false' );
 
 	}
 
