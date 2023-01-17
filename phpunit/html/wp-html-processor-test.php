@@ -225,6 +225,15 @@ HTML
 		$this->assertEquals( 1, $p2_count );
 	}
 
+	public function test_set_content_inside_balanced_tags_on_void_element_has_no_effect() {
+		$tags = new WP_HTML_Processor( self::HTML );
+
+		$tags->next_tag( 'img' );
+		$content = $tags->set_content_inside_balanced_tags( 'This is the new img content' );
+		$this->assertFalse( $content );
+		$this->assertSame( self::HTML, $tags->get_updated_html() );
+	}
+
 	public function test_set_content_inside_balanced_tags_sets_content_correctly() {
 		$tags = new WP_HTML_Processor( self::HTML );
 

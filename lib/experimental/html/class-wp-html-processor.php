@@ -157,6 +157,10 @@ class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 	}
 
 	public function set_content_inside_balanced_tags( $content ) {
+		if ( self::is_html_void_element( $this->get_tag() ) ) {
+			return false;
+		}
+
 		$this->get_updated_html();
 		list( $start_name, $end_name ) = $this->get_balanced_tags();
 		$this->set_content_inside_bookmarks( $start_name, $end_name, $content );
