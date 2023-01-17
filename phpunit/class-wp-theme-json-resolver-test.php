@@ -505,7 +505,8 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 
 
 	/**
-	 * Test that get_style_variations returns all variations, including parent theme variations if the theme is a child.
+	 * Test that get_style_variations returns all variations, including parent theme variations if the theme is a child,
+	 * and that the child variation overwrites the parent variation of the same name.
 	 *
 	 * @covers WP_Theme_JSON_Resolver::get_style_variations
 	 **/
@@ -518,17 +519,17 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$expected_settings = array(
 			array(
 				'version'  => 2,
-				'title'    => 'variation-child',
+				'title'    => 'variation-a',
 				'settings' => array(
 					'blocks' => array(
-						'core/post-title' => array(
+						'core/paragraph' => array(
 							'color' => array(
 								'palette' => array(
 									'theme' => array(
 										array(
-											'slug'  => 'light',
-											'name'  => 'Light',
-											'color' => '#f1f1f1',
+											'slug'  => 'dark',
+											'name'  => 'Dark',
+											'color' => '#010101',
 										),
 									),
 								),
@@ -539,17 +540,17 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 			),
 			array(
 				'version'  => 2,
-				'title'    => 'variation',
+				'title'    => 'variation-b',
 				'settings' => array(
 					'blocks' => array(
-						'core/paragraph' => array(
+						'core/post-title' => array(
 							'color' => array(
 								'palette' => array(
 									'theme' => array(
 										array(
 											'slug'  => 'light',
 											'name'  => 'Light',
-											'color' => '#f2f2f2',
+											'color' => '#f1f1f1',
 										),
 									),
 								),
