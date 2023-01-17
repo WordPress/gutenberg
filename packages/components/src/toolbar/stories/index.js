@@ -57,7 +57,11 @@ function InlineImageIcon() {
 	);
 }
 
-const Template = ( props ) => <Toolbar { ...props } />;
+const Template = ( props ) => (
+	<div style={ { height: 280 } }>
+		<Toolbar { ...props } />
+	</div>
+);
 
 export const Default = Template.bind( {} );
 Default.args = {
