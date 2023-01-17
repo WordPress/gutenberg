@@ -79,6 +79,8 @@ Don't apply any colors other than those for Warnings, Success, or Errors.
 To display a plain notice, pass `Notice` a string:
 
 ```jsx
+import { Notice } from `@wordpress/components`;
+
 const MyNotice = () => (
 	<Notice status="error">An unknown error occurred.</Notice>
 );
@@ -87,6 +89,8 @@ const MyNotice = () => (
 For more complex markup, you can pass any JSX element:
 
 ```jsx
+import { Notice } from `@wordpress/components`;
+
 const MyNotice = () => (
 	<Notice status="error">
 		<p>

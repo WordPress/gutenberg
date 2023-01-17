@@ -49,6 +49,17 @@ function getDefaultPoliteness( status: NoticeProps[ 'status' ] ) {
 	}
 }
 
+/**
+ * `Notice` is a component used to communicate feedback to the user.
+ *
+ *```jsx
+ * import { Notice } from `@wordpress/components`;
+ *
+ * const MyNotice = () => (
+ *   <Notice status="error">An unknown error occurred.</Notice>
+ * );
+ * ```
+ */
 function Notice( {
 	className,
 	status = 'info',
