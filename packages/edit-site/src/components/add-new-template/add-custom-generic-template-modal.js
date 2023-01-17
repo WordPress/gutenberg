@@ -60,7 +60,7 @@ function AddCustomGenericTemplateModal( {
 		>
 			{ isCreatingTemplate && <TemplateActionsLoadingScreen /> }
 			<form onSubmit={ onCreateTemplate }>
-				<VStack spacing={ 3 }>
+				<VStack spacing={ 6 }>
 					<TextControl
 						__nextHasNoMarginBottom
 						label={ __( 'Name' ) }
