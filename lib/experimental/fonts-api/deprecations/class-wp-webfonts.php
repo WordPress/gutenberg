@@ -100,7 +100,7 @@ class WP_Webfonts extends WP_Dependencies {
 	 * Registers a webfont.
 	 *
 	 * @since 6.0.0
-	 * @deprecated X.X.X Use wp_register_webfonts().
+	 * @deprecated GB 14.9.1 Use wp_register_fonts().
 	 *
 	 * @param array  $webfont             Web font to register.
 	 * @param string $font_family_handle  Optional. Font family handle for the given variation.
@@ -111,7 +111,7 @@ class WP_Webfonts extends WP_Dependencies {
 	 */
 	public function register_webfont( array $webfont, $font_family_handle = '', $variation_handle = '', $silence_deprecation = false ) {
 		if ( ! $silence_deprecation ) {
-			_deprecated_function( __METHOD__, 'X.X.X', 'wp_register_webfonts()' );
+			_deprecated_function( __METHOD__, 'GB 14.9.1', 'wp_register_fonts()' );
 		}
 
 		// When font family's handle is not passed, attempt to get it from the variation.
@@ -155,7 +155,7 @@ class WP_Webfonts extends WP_Dependencies {
 	 * @return array
 	 */
 	public function migrate_deprecated_structure( array $webfonts ) {
-		$message = 'A deprecated web fonts array structure passed to wp_register_webfonts(). ' .
+		$message = 'A deprecated fonts array structure passed to wp_register_fonts(). ' .
 			'Variations must be grouped and keyed by their font family.';
 		trigger_error( $message, E_USER_DEPRECATED );
 

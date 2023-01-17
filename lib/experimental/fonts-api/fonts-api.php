@@ -29,14 +29,14 @@ if ( ! function_exists( 'wp_fonts' ) ) {
 	}
 }
 
-if ( ! function_exists( 'wp_register_webfonts' ) ) {
+if ( ! function_exists( 'wp_register_fonts' ) ) {
 	/**
 	 * Registers one or more font-families and each of their variations.
 	 *
 	 * @since X.X.X
 	 *
-	 * @param array[] $webfonts {
-	 *     Web fonts to be registered, grouped by each font-family.
+	 * @param array[] $fonts {
+	 *     Fonts to be registered, grouped by each font-family.
 	 *
 	 *     @type string $font-family => array[] $variations {
 	 *          An array of web font variations for this font-family.
@@ -52,17 +52,17 @@ if ( ! function_exists( 'wp_register_webfonts' ) ) {
 	 * }
 	 * @return string[] Array of registered font family handles.
 	 */
-	function wp_register_webfonts( array $webfonts ) {
-		$registered  = array();
-		$wp_fonts = wp_fonts();
+	function wp_register_fonts( array $fonts ) {
+		$registered = array();
+		$wp_fonts   = wp_fonts();
 
 		// BACKPORT NOTE: Do not backport this code block to Core.
-		if ( $wp_fonts->is_deprecated_structure( $webfonts ) ) {
-			$webfonts = $wp_fonts->migrate_deprecated_structure( $webfonts );
+		if ( $wp_fonts->is_deprecated_structure( $fonts ) ) {
+			$fonts = $wp_fonts->migrate_deprecated_structure( $fonts );
 		}
 		// BACKPORT NOTE: end of code block.
 
-		foreach ( $webfonts as $font_family => $variations ) {
+		foreach ( $fonts as $font_family => $variations ) {
 			$font_family_handle = $wp_fonts->add_font_family( $font_family );
 			if ( ! $font_family_handle ) {
 				continue;
