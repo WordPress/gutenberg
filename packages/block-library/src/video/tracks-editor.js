@@ -13,6 +13,7 @@ import {
 	Button,
 	TextControl,
 	SelectControl,
+	__experimentalGrid as Grid,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
@@ -88,7 +89,7 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 		<NavigableMenu>
 			<VStack
 				className="block-library-video-tracks-editor__single-track-editor"
-				spacing="3"
+				spacing="4"
 			>
 				<span className="block-library-video-tracks-editor__single-track-editor-edit-track-label">
 					{ __( 'Edit track' ) }
@@ -96,10 +97,9 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 				<span>
 					{ __( 'File' ) }: <b>{ fileName }</b>
 				</span>
-				<HStack spacing="4">
+				<Grid columns={ 2 } gap={ 4 }>
 					<TextControl
 						__nextHasNoMarginBottom
-						className="block-library-video-tracks-editor__single-track-editor-track-title"
 						/* eslint-disable jsx-a11y/no-autofocus */
 						autoFocus
 						/* eslint-enable jsx-a11y/no-autofocus */
@@ -115,7 +115,6 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 					/>
 					<TextControl
 						__nextHasNoMarginBottom
-						className="block-library-video-tracks-editor__single-track-editor-source-language"
 						onChange={ ( newSrcLang ) =>
 							onChange( {
 								...track,
@@ -126,7 +125,7 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 						value={ srcLang }
 						help={ __( 'Language tag (en, fr, etc.)' ) }
 					/>
-				</HStack>
+				</Grid>
 				<SelectControl
 					__nextHasNoMarginBottom
 					className="block-library-video-tracks-editor__single-track-editor-kind-select"
