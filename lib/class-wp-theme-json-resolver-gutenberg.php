@@ -237,9 +237,9 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		$options = wp_parse_args( $options, array( 'with_supports' => true ) );
 
 		if ( null === static::$theme || ! static::has_same_registered_blocks( 'theme' ) ) {
-			$theme_json_file = static::get_file_path_from_theme( 'theme.json' );
 			$wp_theme        = wp_get_theme();
-			if ( '' !== $theme_json_file ) {
+			$theme_json_file = $wp_theme->get_file_path( 'theme.json' );
+			if ( is_readable( $theme_json_file ) ) {
 				$theme_json_data = static::read_json_file( $theme_json_file );
 				$theme_json_data = static::translate( $theme_json_data, $wp_theme->get( 'TextDomain' ) );
 			} else {
@@ -262,8 +262,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 			if ( $wp_theme->parent() ) {
 				// Get parent theme.json.
-				$parent_theme_json_file = static::get_file_path_from_theme( 'theme.json', true );
-				if ( '' !== $parent_theme_json_file ) {
+				$parent_theme_json_file = $wp_theme->parent()->get_file_path( 'theme.json' );
+				if ( $theme_json_file !== $parent_theme_json_file && is_readable( $parent_theme_json_file ) ) {
 					$parent_theme_json_data = static::read_json_file( $parent_theme_json_file );
 					$parent_theme_json_data = static::translate( $parent_theme_json_data, $wp_theme->parent()->get( 'TextDomain' ) );
 					// BEGIN OF EXPERIMENTAL CODE. Not to backport to core.
@@ -639,6 +639,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @return string The whole file path or empty if the file doesn't exist.
 	 */
 	protected static function get_file_path_from_theme( $file_name, $template = false ) {
+		// TODO: Remove this method from core on 6.2 release.
+		_deprecated_function( __METHOD__, '6.2.0' );
 		$path      = $template ? get_template_directory() : get_stylesheet_directory();
 		$candidate = $path . '/' . $file_name;
 
