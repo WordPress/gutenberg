@@ -1,6 +1,6 @@
 <?php
 /**
- * Unit and integration tests for wp_enqueue_webfont_variations().
+ * Unit and integration tests for wp_enqueue_font_variations().
  *
  * @package    WordPress
  * @subpackage Fonts API
@@ -10,10 +10,10 @@ require_once __DIR__ . '/wp-fonts-testcase.php';
 
 /**
  * @group  fontsapi
- * @covers ::wp_enqueue_webfont_variations
+ * @covers ::wp_enqueue_font_variations
  * @covers WP_Webfonts::enqueue
  */
-class Tests_Webfonts_WpEnqueueWebfontVariations extends WP_Fonts_TestCase {
+class Tests_Fonts_WpEnqueueFontVariations extends WP_Fonts_TestCase {
 
 	/**
 	 * Unit test for registering one or more specific variations that mocks WP_Webfonts.
@@ -30,7 +30,7 @@ class Tests_Webfonts_WpEnqueueWebfontVariations extends WP_Fonts_TestCase {
 				$this->identicalTo( $handles )
 			);
 
-		wp_enqueue_webfont_variations( $handles );
+		wp_enqueue_font_variations( $handles );
 	}
 
 	/**
@@ -59,7 +59,7 @@ class Tests_Webfonts_WpEnqueueWebfontVariations extends WP_Fonts_TestCase {
 			$this->setup_register( $handle, $variations );
 		}
 
-		wp_enqueue_webfont_variations( $handles );
+		wp_enqueue_font_variations( $handles );
 		$this->assertEmpty( $this->get_queued_before_register(), '"queued_before_register" queue should be empty' );
 		$this->assertSame( $expected, $this->get_enqueued_handles(), 'Queue should contain the given handles' );
 	}
@@ -74,7 +74,7 @@ class Tests_Webfonts_WpEnqueueWebfontVariations extends WP_Fonts_TestCase {
 	 * @param array           $expected Expected "queued_before_register" queue.
 	 */
 	public function test_should_enqueue_before_registration( $handles, array $not_used, array $expected ) {
-		wp_enqueue_webfont_variations( $handles );
+		wp_enqueue_font_variations( $handles );
 
 		$this->assertSame( $expected, $this->get_queued_before_register(), '"queued_before_register" queue should contain the given handles' );
 		$this->assertEmpty( $this->get_enqueued_handles(), 'Queue should be empty' );
