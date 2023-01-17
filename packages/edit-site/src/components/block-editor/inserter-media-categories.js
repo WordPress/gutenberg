@@ -132,7 +132,11 @@ const inserterMediaCategories = [
 				const queryKey = mapFromInserterMediaRequest[ key ] || key;
 				url.searchParams.set( queryKey, value );
 			} );
-			const response = await window.fetch( url );
+			const response = await window.fetch( url, {
+				headers: {
+					'User-Agent': 'WordPress/inserter-media-fetch',
+				},
+			} );
 			const jsonResponse = await response.json();
 			const results = jsonResponse.results;
 			const withAdjustments = results.map( ( result ) => ( {
