@@ -1029,7 +1029,7 @@ export function useGlobalStylesOutput() {
 		}
 		mergedConfig = updateConfigWithSeparator( mergedConfig );
 
-	const blockSelectors = getBlockSelectors(
+		const blockSelectors = getBlockSelectors(
 			getBlockTypes(),
 			getBlockStyles
 		);
