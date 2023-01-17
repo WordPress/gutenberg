@@ -16,7 +16,8 @@ import warning from '@wordpress/warning';
  * Internal dependencies
  */
 import Button from '../button';
-import type { NoticeAction, SnackbarProps } from './types';
+import type { SnackbarProps } from './types';
+import type { NoticeAction } from '../notice/types';
 import type { WordPressComponentProps } from '../ui/context';
 
 const NOTICE_TIMEOUT = 10000;
