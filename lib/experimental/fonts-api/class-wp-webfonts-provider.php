@@ -5,7 +5,7 @@
  * Individual webfonts providers should extend this class and implement.
  *
  * @package    WordPress
- * @subpackage WebFonts
+ * @subpackage Fonts API
  * @since      X.X.X
  */
 

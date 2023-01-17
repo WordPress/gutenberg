@@ -3,7 +3,7 @@
  * Webfonts API functions.
  *
  * @package    WordPress
- * @subpackage WebFonts
+ * @subpackage Fonts API
  * @since      X.X.X
  */
 

@@ -3,7 +3,7 @@
  * Webfonts API: Provider for locally-hosted fonts.
  *
  * @package    WordPress
- * @subpackage WebFonts
+ * @subpackage Fonts API
  * @since      6.0.0
  */
 

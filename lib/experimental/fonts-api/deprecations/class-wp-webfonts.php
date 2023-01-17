@@ -7,9 +7,9 @@
  * using the previous API, it exists to prevent breakages, giving
  * developers time to upgrade their code.
  *
- * @since      X.X.X
- * @subpackage WebFonts
  * @package    WordPress
+ * @subpackage Fonts API
+ * @since      X.X.X
  */
 
 if ( class_exists( 'WP_Webfonts' ) ) {

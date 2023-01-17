@@ -3,7 +3,7 @@
  * Web Fonts API class.
  *
  * @package    WordPress
- * @subpackage WebFonts
+ * @subpackage Fonts API
  * @since      X.X.X
  */
 

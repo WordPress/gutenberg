@@ -5,9 +5,9 @@
  *
  * BACKPORT NOTE: Do not backport these deprecated functions to Core.
  *
- * @since      X.X.X
- * @subpackage WebFonts
  * @package    WordPress
+ * @subpackage Fonts API
+ * @since      X.X.X
  */
 
 if ( ! function_exists( 'wp_enqueue_webfont' ) ) {
