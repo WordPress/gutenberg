@@ -56,7 +56,7 @@ describe( 'getCleanTemplatePartSlug', () => {
 		);
 	} );
 
-	it( 'should return a slug of wp-custom-part', () => {
+	it( 'should default the slug to wp-custom-part', () => {
 		const title = '';
 		expect( getCleanTemplatePartSlug( title ) ).toBe( 'wp-custom-part' );
 	} );
