@@ -561,7 +561,7 @@ class WP_Web_Fonts extends WP_Webfonts {
 
 		// Invoke provider to print its styles.
 		$provider = $this->get_provider_instance( $provider_id );
-		$provider->set_webfonts( $properties_by_font );
+		$provider->set_fonts( $properties_by_font );
 		$provider->print_styles();
 
 		// Clean up.

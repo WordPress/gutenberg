@@ -29,7 +29,7 @@ class Tests_Fonts_WpFonts extends WP_Fonts_TestCase {
 	public function test_local_provider_is_automatically_registered() {
 		$expected = array(
 			'local' => array(
-				'class' => 'WP_Webfonts_Provider_Local',
+				'class' => 'WP_Fonts_Provider_Local',
 				'fonts' => array(),
 			),
 		);

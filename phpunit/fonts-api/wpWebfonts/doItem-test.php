@@ -187,10 +187,10 @@ class Tests_Webfonts_WpWebfonts_DoItem extends WP_Fonts_TestCase {
 	public function test_should_trigger_provider_when_mocked( array $provider, array $fonts, array $expected ) {
 		$this->setup_print_deps( $provider, $fonts );
 
-		$provider_mock = $this->setup_object_mock( array( 'set_webfonts', 'print_styles' ), $provider['class'] );
+		$provider_mock = $this->setup_object_mock( array( 'set_fonts', 'print_styles' ), $provider['class'] );
 
 		// Test the provider's methods are invoked.
-		$provider_mock->expects( $this->once() )->method( 'set_webfonts' )->with( $this->identicalTo( $expected['set_webfonts'] ) );
+		$provider_mock->expects( $this->once() )->method( 'set_fonts' )->with( $this->identicalTo( $expected['set_fonts'] ) );
 		$provider_mock->expects( $this->once() )->method( 'print_styles' );
 
 		// Set up the WP_Web_Fonts::$provider_instances property.
@@ -234,9 +234,9 @@ class Tests_Webfonts_WpWebfonts_DoItem extends WP_Fonts_TestCase {
 				'provider' => $this->get_provider_definitions( 'mock' ),
 				'fonts'    => $mock,
 				'expected' => array(
-					'set_webfonts'   => array_merge( $mock['font1'], $mock['font2'], $mock['font3'] ),
+					'set_fonts'   => array_merge( $mock['font1'], $mock['font2'], $mock['font3'] ),
 					'printed_output' => sprintf(
-						'<mock id="wp-webfonts-mock" attr="some-attr">%s; %s; %s; %s; %s; %s</mock>\n',
+						'<mock id="wp-fonts-mock" attr="some-attr">%s; %s; %s; %s; %s; %s</mock>\n',
 						$font_faces['font1-300-normal'],
 						$font_faces['font1-300-italic'],
 						$font_faces['font1-900-normal'],
@@ -250,9 +250,9 @@ class Tests_Webfonts_WpWebfonts_DoItem extends WP_Fonts_TestCase {
 				'provider' => $this->get_provider_definitions( 'local' ),
 				'fonts'    => $local,
 				'expected' => array(
-					'set_webfonts'   => array_merge( $local['merriweather'], $local['Source Serif Pro'] ),
+					'set_fonts'   => array_merge( $local['merriweather'], $local['Source Serif Pro'] ),
 					'printed_output' => sprintf(
-						"<style id='wp-webfonts-local' type='text/css'>\n%s%s%s\n</style>\n",
+						"<style id='wp-fonts-local' type='text/css'>\n%s%s%s\n</style>\n",
 						$font_faces['merriweather-200-900-normal'],
 						$font_faces['Source Serif Pro-300-normal'],
 						$font_faces['Source Serif Pro-900-italic']

@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_WebfontsLocal_Provider tests.
+ * WP_Fonts_Local_Provider tests.
  *
  * @package    WordPress
  * @subpackage Fonts API
@@ -11,7 +11,7 @@ require_once __DIR__ . '/wp-fonts-testcase.php';
 /**
  * @group fontsapi
  */
-class Tests_Webfonts_WpWebfontsProviderLocal extends WP_UnitTestCase {
+class Tests_Fonts_WpFontsProviderLocal extends WP_UnitTestCase {
 	private $provider;
 	private $theme_root;
 	private $orig_theme_dir;
@@ -19,7 +19,7 @@ class Tests_Webfonts_WpWebfontsProviderLocal extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 
-		$this->provider = new WP_Webfonts_Provider_Local();
+		$this->provider = new WP_Fonts_Provider_Local();
 
 		$this->set_up_theme();
 	}
@@ -34,10 +34,10 @@ class Tests_Webfonts_WpWebfontsProviderLocal extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers WP_Webfonts_Provider_Local::set_webfonts
+	 * @covers WP_Fonts_Provider_Local::set_fonts
 	 */
-	public function test_set_webfonts() {
-		$webfonts = array(
+	public function test_set_fonts() {
+		$fonts = array(
 			'source-serif-pro-200-900-normal-local' => array(
 				'provider'     => 'local',
 				'font-family'  => 'Source Serif Pro',
@@ -56,38 +56,38 @@ class Tests_Webfonts_WpWebfontsProviderLocal extends WP_UnitTestCase {
 			),
 		);
 
-		$this->provider->set_webfonts( $webfonts );
+		$this->provider->set_fonts( $fonts );
 
-		$property = $this->get_webfonts_property();
-		$this->assertSame( $webfonts, $property->getValue( $this->provider ) );
+		$property = $this->get_fonts_property();
+		$this->assertSame( $fonts, $property->getValue( $this->provider ) );
 	}
 
 	/**
-	 * @covers WP_Webfonts_Provider_Local::get_css
+	 * @covers WP_Fonts_Provider_Local::get_css
 	 *
 	 * @dataProvider data_get_css_print_styles
 	 *
-	 * @param array  $webfonts Prepared webfonts (to store in WP_Webfonts_Provider_Local::$webfonts property).
+	 * @param array  $fonts Prepared fonts (to store in WP_Fonts_Provider_Local::$fonts property).
 	 * @param string $expected Expected CSS.
 	 */
-	public function test_get_css( array $webfonts, $expected ) {
-		$property = $this->get_webfonts_property();
-		$property->setValue( $this->provider, $webfonts );
+	public function test_get_css( array $fonts, $expected ) {
+		$property = $this->get_fonts_property();
+		$property->setValue( $this->provider, $fonts );
 
 		$this->assertSame( $expected['font-face-css'], $this->provider->get_css() );
 	}
 
 	/**
-	 * @covers WP_Webfonts_Provider_Local::print_styles
+	 * @covers WP_Fonts_Provider_Local::print_styles
 	 *
 	 * @dataProvider data_get_css_print_styles
 	 *
-	 * @param array  $webfonts Prepared webfonts (to store in WP_Webfonts_Provider_Local::$webfonts property).
+	 * @param array  $fonts Prepared fonts (to store in WP_Fonts_Provider_Local::$fonts property).
 	 * @param string $expected Expected CSS.
 	 */
-	public function test_print_styles( array $webfonts, $expected ) {
-		$property = $this->get_webfonts_property();
-		$property->setValue( $this->provider, $webfonts );
+	public function test_print_styles( array $fonts, $expected ) {
+		$property = $this->get_fonts_property();
+		$property->setValue( $this->provider, $fonts );
 
 		$expected_output = sprintf( $expected['style-element'], $expected['font-face-css'] );
 		$this->expectOutputString( $expected_output );
@@ -102,7 +102,7 @@ class Tests_Webfonts_WpWebfontsProviderLocal extends WP_UnitTestCase {
 	public function data_get_css_print_styles() {
 		return array(
 			'truetype format' => array(
-				'webfonts' => array(
+				'fonts'    => array(
 					'open-sans-bold-italic-local' => array(
 						'provider'    => 'local',
 						'font-family' => 'Open Sans',
@@ -112,7 +112,7 @@ class Tests_Webfonts_WpWebfontsProviderLocal extends WP_UnitTestCase {
 					),
 				),
 				'expected' => array(
-					'style-element' => "<style id='wp-webfonts-local' type='text/css'>\n%s\n</style>\n",
+					'style-element' => "<style id='wp-fonts-local' type='text/css'>\n%s\n</style>\n",
 					'font-face-css' => <<<CSS
 @font-face{font-family:"Open Sans";font-style:italic;font-weight:bold;src:local("Open Sans"), url('http://example.org/assets/fonts/OpenSans-Italic-VariableFont_wdth,wght.ttf') format('truetype');}
 CSS
@@ -120,7 +120,7 @@ CSS
 				),
 			),
 			'woff2 format'    => array(
-				'webfonts' => array(
+				'fonts'    => array(
 					'source-serif-pro-200-900-normal-local' => array(
 						'provider'     => 'local',
 						'font-family'  => 'Source Serif Pro',
@@ -139,7 +139,7 @@ CSS
 					),
 				),
 				'expected' => array(
-					'style-element' => "<style id='wp-webfonts-local' type='text/css'>\n%s\n</style>\n",
+					'style-element' => "<style id='wp-fonts-local' type='text/css'>\n%s\n</style>\n",
 					'font-face-css' => <<<CSS
 @font-face{font-family:"Source Serif Pro";font-style:normal;font-weight:200 900;font-stretch:normal;src:local("Source Serif Pro"), url('http://example.org/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2') format('woff2');}@font-face{font-family:"Source Serif Pro";font-style:italic;font-weight:200 900;font-stretch:normal;src:local("Source Serif Pro"), url('http://example.org/assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2') format('woff2');}
 CSS
@@ -171,8 +171,8 @@ CSS
 		unset( $GLOBALS['wp_themes'] );
 	}
 
-	private function get_webfonts_property() {
-		$property = new ReflectionProperty( $this->provider, 'webfonts' );
+	private function get_fonts_property() {
+		$property = new ReflectionProperty( $this->provider, 'fonts' );
 		$property->setAccessible( true );
 
 		return $property;

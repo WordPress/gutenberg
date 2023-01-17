@@ -47,7 +47,7 @@ class Tests_Fonts_WpRegisterFontProvider extends WP_Fonts_TestCase {
 			),
 			'local' => array(
 				'provider_id' => 'local',
-				'class'       => WP_Webfonts_Provider_Local::class,
+				'class'       => WP_Fonts_Provider_Local::class,
 			),
 		);
 	}

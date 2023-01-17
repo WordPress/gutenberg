@@ -104,7 +104,7 @@ class Tests_Webfonts_WpWebfonts_Query extends WP_Fonts_TestCase {
 	}
 
 	public function test_done_query_should_fail_when_no_variations() {
-		$this->wp_webfonts->register_provider( 'local', WP_Webfonts_Provider_Local::class );
+		$this->wp_webfonts->register_provider( 'local', WP_Fonts_Provider_Local::class );
 		$this->setup_registry();
 		$this->wp_webfonts->enqueue( 'lato' );
 
@@ -119,7 +119,7 @@ class Tests_Webfonts_WpWebfonts_Query extends WP_Fonts_TestCase {
 	 * @param string $query_handle Handle to test.
 	 */
 	public function test_done_query_should_succeed_when_registered_and_enqueued( $query_handle ) {
-		$this->wp_webfonts->register_provider( 'local', WP_Webfonts_Provider_Local::class );
+		$this->wp_webfonts->register_provider( 'local', WP_Fonts_Provider_Local::class );
 		$this->setup_registry();
 		$this->wp_webfonts->enqueue( $query_handle );
 

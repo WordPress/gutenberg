@@ -22,7 +22,7 @@ if ( ! function_exists( 'wp_fonts' ) ) {
 
 		if ( ! ( $wp_fonts instanceof WP_Web_Fonts ) ) {
 			$wp_fonts = new WP_Web_Fonts();
-			$wp_fonts->register_provider( 'local', 'WP_Webfonts_Provider_Local' );
+			$wp_fonts->register_provider( 'local', 'WP_Fonts_Provider_Local' );
 		}
 
 		return $wp_fonts;

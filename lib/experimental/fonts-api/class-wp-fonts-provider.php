@@ -1,22 +1,22 @@
 <?php
 /**
- * Webfonts API: Provider abstract class.
+ * Fonts API: Provider abstract class.
  *
- * Individual webfonts providers should extend this class and implement.
+ * Individual fonts providers should extend this class and implement.
  *
  * @package    WordPress
  * @subpackage Fonts API
  * @since      X.X.X
  */
 
-if ( class_exists( 'WP_Webfonts_Provider' ) ) {
+if ( class_exists( 'WP_Fonts_Provider' ) ) {
 	return;
 }
 
 /**
- * Abstract class for Webfonts API providers.
+ * Abstract class for Fonts API providers.
  *
- * The starting point to building a webfont service provider.
+ * The starting point to building a font service provider.
  *
  * What is a Provider?
  *
@@ -24,15 +24,15 @@ if ( class_exists( 'WP_Webfonts_Provider' ) ) {
  * process its specific font service (i.e. local or remote)
  * and how to generate the `@font-face` styles for its service.
  *
- * It receives a collection of webfonts from the Controller
- * {@see WP_Webfonts_Provider::set_setfonts()}, and when requested
- * {@see WP_Webfonts_Provider::get_css()}, it transforms them
+ * It receives a collection of fonts from the Controller
+ * {@see WP_Fonts_Provider::set_setfonts()}, and when requested
+ * {@see WP_Fonts_Provider::get_css()}, it transforms them
  * into styles (in a performant way for the provider service
  * it manages).
  *
  * @since X.X.X
  */
-abstract class WP_Webfonts_Provider {
+abstract class WP_Fonts_Provider {
 
 	/**
 	 * The provider's unique ID.
@@ -44,13 +44,13 @@ abstract class WP_Webfonts_Provider {
 	protected $id = '';
 
 	/**
-	 * Webfonts to be processed.
+	 * Fonts to be processed.
 	 *
 	 * @since X.X.X
 	 *
 	 * @var array[]
 	 */
-	protected $webfonts = array();
+	protected $fonts = array();
 
 	/**
 	 * Array of Font-face style tag's attribute(s)
@@ -64,17 +64,14 @@ abstract class WP_Webfonts_Provider {
 	protected $style_tag_atts = array();
 
 	/**
-	 * Sets this provider's webfonts property.
-	 *
-	 * The API's Controller passes this provider's webfonts
-	 * for processing here in the provider.
+	 * Sets this provider's fonts property.
 	 *
 	 * @since X.X.X
 	 *
-	 * @param array[] $webfonts Registered webfonts.
+	 * @param array[] $fonts Registered fonts.
 	 */
-	public function set_webfonts( array $webfonts ) {
-		$this->webfonts = $webfonts;
+	public function set_fonts( array $fonts ) {
+		$this->fonts = $fonts;
 	}
 
 	/**
@@ -90,10 +87,10 @@ abstract class WP_Webfonts_Provider {
 	}
 
 	/**
-	 * Gets the `@font-face` CSS for the provider's webfonts.
+	 * Gets the `@font-face` CSS for the provider's fonts.
 	 *
 	 * This method is where the provider does it processing to build the
-	 * needed `@font-face` CSS for all of its webfonts. Specifics of how
+	 * needed `@font-face` CSS for all of its fonts. Specifics of how
 	 * this processing is done is contained in each provider.
 	 *
 	 * @since X.X.X
@@ -112,7 +109,7 @@ abstract class WP_Webfonts_Provider {
 	protected function get_style_element() {
 		$attributes = $this->generate_style_element_attributes();
 
-		return "<style id='wp-webfonts-{$this->id}'{$attributes}>\n%s\n</style>\n";
+		return "<style id='wp-fonts-{$this->id}'{$attributes}>\n%s\n</style>\n";
 	}
 
 	/**
