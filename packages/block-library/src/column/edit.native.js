@@ -152,6 +152,11 @@ function ColumnEdit( {
 		);
 	}
 
+	const parentWidth =
+		contentStyle &&
+		contentStyle[ clientId ] &&
+		contentStyle[ clientId ].width;
+
 	return (
 		<>
 			{ isSelected && (
@@ -211,11 +216,7 @@ function ColumnEdit( {
 			>
 				<InnerBlocks
 					renderAppender={ renderAppender }
-					parentWidth={
-						contentStyle &&
-						contentStyle[ clientId ] &&
-						contentStyle[ clientId ].width
-					}
+					parentWidth={ parentWidth }
 					blockWidth={ blockWidth }
 				/>
 			</View>
