@@ -8,12 +8,14 @@ import {
 	PanelBody,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { lazy, Suspense } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { useStyle } from './hooks';
 
+const CSSEditor = lazy( () => import( './css-editor' ) );
 function CustomCSSControl() {
 	const [ customCSS, setCustomCSS ] = useStyle( 'css' );
 	const [ themeCSS ] = useStyle( 'css', null, 'base' );
@@ -46,6 +48,9 @@ function CustomCSSControl() {
 
 	return (
 		<>
+			<Suspense>
+				<CSSEditor />
+			</Suspense>
 			<TextareaControl
 				__nextHasNoMarginBottom
 				value={
