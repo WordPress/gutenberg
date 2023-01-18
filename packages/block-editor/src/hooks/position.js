@@ -10,6 +10,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { BaseControl, CustomSelectControl } from '@wordpress/components';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 import {
 	useContext,
 	useMemo,
@@ -24,7 +25,9 @@ import { addFilter } from '@wordpress/hooks';
 import BlockList from '../components/block-list';
 import useSetting from '../components/use-setting';
 import InspectorControls from '../components/inspector-controls';
+import useBlockDisplayInformation from '../components/use-block-display-information';
 import { cleanEmptyObject } from './utils';
+import { store as blockEditorStore } from '../store';
 
 const POSITION_SUPPORT_KEY = 'position';
 
@@ -205,6 +208,7 @@ export function useIsPositionDisabled( { name: blockName } = {} ) {
 export function PositionEdit( props ) {
 	const {
 		attributes: { style = {} },
+		clientId,
 		name: blockName,
 		setAttributes,
 	} = props;
@@ -213,16 +217,41 @@ export function PositionEdit( props ) {
 	const allowSticky = hasStickyPositionSupport( blockName );
 	const value = style?.position?.type;
 
+	const { firstParentClientId } = useSelect(
+		( select ) => {
+			const { getBlockParents } = select( blockEditorStore );
+			const parents = getBlockParents( clientId );
+			const _firstParentClientId = parents[ parents.length - 1 ];
+			return {
+				firstParentClientId: _firstParentClientId,
+			};
+		},
+		[ clientId ]
+	);
+	const blockInformation = useBlockDisplayInformation( firstParentClientId );
+	const parentBlockTitle = blockInformation?.title;
+
 	const options = useMemo( () => {
 		const availableOptions = [ DEFAULT_OPTION ];
 		if ( allowSticky || value === STICKY_OPTION.value ) {
-			availableOptions.push( STICKY_OPTION );
+			availableOptions.push( {
+				...STICKY_OPTION,
+				__experimentalHint: parentBlockTitle
+					? sprintf(
+							/* translators: %s: Name of the block's parent. */
+							__( 'Sticks to the top of the parent %s block.' ),
+							parentBlockTitle
+					  )
+					: __(
+							'Sticks to the top of the window instead of scrolling.'
+					  ),
+			} );
 		}
 		if ( allowFixed || value === FIXED_OPTION.value ) {
 			availableOptions.push( FIXED_OPTION );
 		}
 		return availableOptions;
-	}, [ allowFixed, allowSticky, value ] );
+	}, [ allowFixed, allowSticky, parentBlockTitle, value ] );
 
 	const onChangeType = ( next ) => {
 		// For now, use a hard-coded `0px` value for the position.
