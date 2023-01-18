@@ -275,4 +275,30 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 
 		return $response;
 	}
+
+	/**
+	 * Returns the given theme global styles variations.
+	 *
+	 * @since 6.0.0
+	 * @since 6.2.0 Returns parent theme variations, if they exist.
+	 *
+	 * @param WP_REST_Request $request The request instance.
+	 *
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function get_theme_items( $request ) {
+		if ( get_stylesheet() !== $request['stylesheet'] ) {
+			// This endpoint only supports the active or parent theme for now.
+			return new WP_Error(
+				sprintf( '%s', $request['template'] ),
+				__( 'Theme not found.', 'gutenberg' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		$variations = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations();
+		$response   = rest_ensure_response( $variations );
+
+		return $response;
+	}
 }
