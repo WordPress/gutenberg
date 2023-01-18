@@ -8,19 +8,33 @@ test.describe( 'a11y', () => {
 		await admin.createNewPost();
 	} );
 
-	test( 'tabs header bar', async ( { page, pageUtils } ) => {
+	test( 'navigating through the Editor regions four times should land on the Editor top bar region', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		// On a new post, initial focus is set on the Post title.
+		await expect(
+			page.locator( 'role=textbox[name=/Add title/i]' )
+		).toBeFocused();
+		// Navigate to the 'Editor settings' region.
 		await pageUtils.pressKeyWithModifier( 'ctrl', '`' );
+		// Navigate to the 'Editor publish' region.
 		await pageUtils.pressKeyWithModifier( 'ctrl', '`' );
+		// Navigate to the 'Editor footer' region.
 		await pageUtils.pressKeyWithModifier( 'ctrl', '`' );
+		// Navigate to the 'Editor top bar' region.
 		await pageUtils.pressKeyWithModifier( 'ctrl', '`' );
-		await page.keyboard.press( 'Tab' );
 
+		// This test assumes the Editor is not in Fullscreen mode. Check the
+		// first tabbable element within the 'Editor top bar' region is the
+		// 'Toggle block inserter' button.
+		await page.keyboard.press( 'Tab' );
 		await expect(
 			page.locator( 'role=button[name=/Toggle block inserter/i]' )
 		).toBeFocused();
 	} );
 
-	test( 'constrains focus to a modal when tabbing', async ( {
+	test( 'should constrain tabbing within a modal', async ( {
 		page,
 		pageUtils,
 	} ) => {
@@ -41,7 +55,7 @@ test.describe( 'a11y', () => {
 		await expect( closeButton ).toBeFocused();
 	} );
 
-	test( 'returns focus to the first tabbable in a modal after blurring a tabbable', async ( {
+	test( 'should return focus to the first tabbable in a modal after blurring a tabbable', async ( {
 		page,
 		pageUtils,
 	} ) => {
@@ -62,7 +76,7 @@ test.describe( 'a11y', () => {
 		).toBeFocused();
 	} );
 
-	test( 'returns focus to the last tabbable in a modal after blurring a tabbable and tabbing in reverse direction', async ( {
+	test( 'should return focus to the last tabbable in a modal after blurring a tabbable and tabbing in reverse direction', async ( {
 		page,
 		pageUtils,
 	} ) => {
