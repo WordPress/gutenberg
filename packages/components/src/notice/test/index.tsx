@@ -15,7 +15,7 @@ import Notice from '../index';
 
 jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
 
-function getNoticeWrapper( container ) {
+function getNoticeWrapper( container: HTMLElement ) {
 	return container.firstChild;
 }
 
