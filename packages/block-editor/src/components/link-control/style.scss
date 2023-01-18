@@ -64,7 +64,6 @@ $preview-image-height: 140px;
 		width: calc(100% - #{$grid-unit-20 * 2});
 		display: block;
 		padding: 11px $grid-unit-20;
-		padding-right: ( $button-size * $block-editor-link-control-number-of-actions ); // width of reset and submit buttons
 		margin: 0;
 		position: relative;
 		border: 1px solid $gray-300;
@@ -470,14 +469,8 @@ $preview-image-height: 140px;
 		position: absolute;
 		left: auto;
 		bottom: auto;
-		/*
-		 * Position spinner to the left of the actions.
-		 *
-		 * Compensate for:
-		 *  - Input padding right ($button-size)
-		 */
 		top: calc(50% - #{$spinner-size} / 2);
-		right: $button-size;
+		right: $grid-unit-20;
 	}
 }
 
