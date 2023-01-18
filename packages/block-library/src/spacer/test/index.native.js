@@ -169,4 +169,85 @@ describe( 'Spacer block', () => {
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
+
+	it( 'inserts block with spacingSizes preset', async () => {
+		// Mock spacingSizes presets
+		const RAW_STYLES = {
+			typography: {
+				fontSize: 16,
+			},
+		};
+		const RAW_FEATURES = {
+			spacing: {
+				spacingSizes: {
+					theme: [
+						{
+							size: '3.125rem',
+							slug: '100',
+							name: '100',
+						},
+						{
+							size: '3.75rem',
+							slug: '110',
+							name: '110',
+						},
+					],
+				},
+			},
+		};
+
+		const initialHtml = `<!-- wp:spacer {"height":"var:preset|spacing|110"} -->
+		<div style="height:var(--wp--preset--spacing--110)" aria-hidden="true" class="wp-block-spacer"></div>
+		<!-- /wp:spacer -->`;
+		const screen = await initializeEditor( {
+			initialHtml,
+			rawStyles: JSON.stringify( RAW_STYLES ),
+			rawFeatures: JSON.stringify( RAW_FEATURES ),
+		} );
+
+		// Select Spacer block
+		const [ spacerBlock ] =
+			screen.getAllByLabelText( /Spacer Block\. Row 1/ );
+		fireEvent.press( spacerBlock );
+
+		// Open block settings
+		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+		await waitFor(
+			() => screen.getByTestId( 'block-settings-modal' ).props.isVisible
+		);
+
+		// Update height attribute
+		fireEvent.press( screen.getByText( '60' ) );
+		const heightTextInput = screen.getByDisplayValue( '60' );
+		fireEvent.changeText( heightTextInput, '70' );
+
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'inserts block with spacingSizes preset without matching global styles values', async () => {
+		const initialHtml = `<!-- wp:spacer {"height":"var:preset|spacing|30"} -->
+		<div style="height:var(--wp--preset--spacing--30)" aria-hidden="true" class="wp-block-spacer"></div>
+		<!-- /wp:spacer -->`;
+		const screen = await initializeEditor( {
+			initialHtml,
+		} );
+
+		// Select Spacer block
+		const [ spacerBlock ] =
+			screen.getAllByLabelText( /Spacer Block\. Row 1/ );
+		fireEvent.press( spacerBlock );
+
+		// Open block settings
+		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+		await waitFor(
+			() => screen.getByTestId( 'block-settings-modal' ).props.isVisible
+		);
+
+		// Update height attribute
+		fireEvent.press( screen.getByText( '100' ) );
+		const heightTextInput = screen.getByDisplayValue( '100' );
+		fireEvent.changeText( heightTextInput, '120' );
+
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
 } );

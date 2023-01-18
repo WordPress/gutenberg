@@ -416,6 +416,7 @@ export function getGlobalStyles( rawStyles, rawFeatures ) {
 				fontSizes,
 				customLineHeight: features?.custom?.[ 'line-height' ],
 			},
+			spacing: features?.spacing,
 		},
 		__experimentalGlobalStylesBaseStyles: globalStyles,
 	};
