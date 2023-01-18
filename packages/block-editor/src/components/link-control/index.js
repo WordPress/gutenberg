@@ -250,6 +250,7 @@ function LinkControl( {
 
 	const handleCancel = ( event ) => {
 		event.preventDefault();
+		event.stopPropagation();
 
 		// Ensure that any unsubmitted input changes are reset.
 		resetInternalValues();
