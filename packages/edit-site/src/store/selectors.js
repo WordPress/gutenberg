@@ -248,6 +248,31 @@ export function isSaveViewOpened( state ) {
 }
 
 /**
+ * Turns a recursive list of blocks into a flat list of blocks annotated with
+ * their child index and parent block.
+ *
+ * @param {Object} parentBlock A parent block to flatten
+ * @return {Object} A flat list of blocks, annotated by their index and parent ID, consisting
+ * 							    of all the input blocks and all the inner blocks in the tree.
+ */
+function blocksTreeToAnnotatedList( parentBlock ) {
+	return ( parentBlock.innerBlocks || [] ).flatMap( ( innerBlock, index ) =>
+		[ { block: innerBlock, parentBlock, childIndex: index } ].concat(
+			blocksTreeToAnnotatedList( innerBlock )
+		)
+	);
+}
+
+function getFlattenedBlockList( blockList = [] ) {
+	const list = blockList.flatMap( ( rootBlock ) =>
+		[ rootBlock ].concat(
+			blocksTreeToAnnotatedList( rootBlock ).map( ( { block } ) => block )
+		)
+	);
+	return list;
+}
+
+/**
  * Returns the template parts and their blocks for the current edited template.
  *
  * @param {Object} state Global application state.
@@ -279,7 +304,7 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
 			  )
 			: {};
 
-		return ( template.blocks ?? [] )
+		return getFlattenedBlockList( template.blocks ?? [] )
 			.filter( ( block ) => isTemplatePart( block ) )
 			.map( ( block ) => {
 				const {
