@@ -182,7 +182,7 @@ PanelRow accepts a forwarded ref that will be added to the wrapper div. Usage:
 
 #### PanelHeader
 
-This is a simple container for a header component. This is used by the `Panel` component under the hood, so it does not typically need to be used.
+`PanelHeader` renders the header for the `Panel`. This is used by the `Panel` component under the hood, so it does not typically need to be used.
 
 ##### Props
 
