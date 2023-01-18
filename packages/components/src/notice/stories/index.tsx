@@ -4,16 +4,23 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react';
 
 /**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import Notice from '..';
-import type { NoticeProps } from '../types';
+import Button from '../../button';
+import NoticeList from '../list';
+import type { NoticeProps, NoticeListProps } from '../types';
 
 const meta: ComponentMeta< typeof Notice > = {
 	title: 'Components/Notice',
 	component: Notice,
+	subcomponents: { NoticeList },
 	argTypes: {
-		isDismissible: { control: 'boolean' },
 		onDismiss: { control: { type: null } },
 		onRemove: { control: { type: null } },
 		politeness: {
@@ -89,3 +96,39 @@ WithActions.args = {
 		},
 	],
 };
+
+export const NoticeListSubcomponent: ComponentStory<
+	typeof NoticeList
+> = () => {
+	const exampleNotices = [
+		{
+			id: 'second-notice',
+			content: 'second notice content',
+		},
+		{
+			id: 'fist-notice',
+			content: 'first notice content',
+		},
+	];
+	const [ notices, setNotices ] = useState( exampleNotices );
+
+	const removeNotice = (
+		id: NoticeListProps[ 'notices' ][ number ][ 'id' ]
+	) => {
+		setNotices( notices.filter( ( notice ) => notice.id !== id ) );
+	};
+
+	const resetNotices = () => {
+		setNotices( exampleNotices );
+	};
+
+	return (
+		<>
+			<NoticeList notices={ notices } onRemove={ removeNotice } />
+			<Button variant={ 'primary' } onClick={ resetNotices }>
+				Reset Notices
+			</Button>
+		</>
+	);
+};
+NoticeListSubcomponent.storyName = 'NoticeList Subcomponent';
