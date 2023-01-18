@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, isEmpty, map } from 'lodash';
+import { get, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -164,12 +164,11 @@ export default function Image( {
 		allowResize &&
 		! isContentLocked &&
 		! ( isWideAligned && isLargeViewport );
-	const imageSizeOptions = map(
-		imageSizes.filter( ( { slug } ) =>
+	const imageSizeOptions = imageSizes
+		.filter( ( { slug } ) =>
 			get( image, [ 'media_details', 'sizes', slug, 'source_url' ] )
-		),
-		( { name, slug } ) => ( { value: slug, label: name } )
-	);
+		)
+		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
 
 	// If an image is externally hosted, try to fetch the image data. This may
 	// fail if the image host doesn't allow CORS with the domain. If it works,
