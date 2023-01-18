@@ -14,6 +14,7 @@ import {
 	TextControl,
 	TreeSelect,
 	withFilters,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useDebounce } from '@wordpress/compose';
@@ -415,6 +416,7 @@ export function HierarchicalTermSelector( { slug } ) {
 		<>
 			{ showFilter && (
 				<TextControl
+					__nextHasNoMarginBottom
 					className="editor-post-taxonomies__hierarchical-terms-filter"
 					label={ filterLabel }
 					value={ filterValue }
@@ -443,22 +445,25 @@ export function HierarchicalTermSelector( { slug } ) {
 			) }
 			{ showForm && (
 				<form onSubmit={ onAddTerm }>
-					<TextControl
-						className="editor-post-taxonomies__hierarchical-terms-input"
-						label={ newTermLabel }
-						value={ formName }
-						onChange={ onChangeFormName }
-						required
-					/>
-					{ !! availableTerms.length && (
-						<TreeSelect
-							label={ parentSelectLabel }
-							noOptionLabel={ noParentOption }
-							onChange={ onChangeFormParent }
-							selectedId={ formParent }
-							tree={ availableTermsTree }
+					<VStack>
+						<TextControl
+							__nextHasNoMarginBottom
+							className="editor-post-taxonomies__hierarchical-terms-input"
+							label={ newTermLabel }
+							value={ formName }
+							onChange={ onChangeFormName }
+							required
 						/>
-					) }
+						{ !! availableTerms.length && (
+							<TreeSelect
+								label={ parentSelectLabel }
+								noOptionLabel={ noParentOption }
+								onChange={ onChangeFormParent }
+								selectedId={ formParent }
+								tree={ availableTermsTree }
+							/>
+						) }
+					</VStack>
 					<Button
 						variant="secondary"
 						type="submit"
