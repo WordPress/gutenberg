@@ -612,6 +612,7 @@ describe( 'Manual link entry', () => {
 		it( 'should allow cancellation of the link creation process and reset any entered values', async () => {
 			const user = userEvent.setup();
 			const mockOnRemove = jest.fn();
+			const mockOnCancel = jest.fn();
 
 			render( <LinkControl onRemove={ mockOnRemove } /> );
 
@@ -635,6 +636,9 @@ describe( 'Manual link entry', () => {
 
 			// Verify the consumer can handle the cancellation.
 			expect( mockOnRemove ).toHaveBeenCalled();
+
+			// Ensure optional callback is not called.
+			expect( mockOnCancel ).not.toHaveBeenCalled();
 
 			expect( searchInput ).toHaveValue( '' );
 		} );
