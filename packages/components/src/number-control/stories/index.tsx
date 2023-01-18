@@ -62,3 +62,35 @@ export const Default = Template.bind( {} );
 Default.args = {
 	label: 'Value',
 };
+
+// Check if this was broken and at what point
+// in particular on commit actions, when `min` is not `undefined`
+export const Uncontrolled: ComponentStory< typeof NumberControl > = ( {
+	onChange,
+	...props
+} ) => {
+	const [ isValidValue, setIsValidValue ] = useState( true );
+
+	return (
+		<>
+			<NumberControl
+				{ ...props }
+				onChange={ ( v, extra ) => {
+					setIsValidValue(
+						( extra.event.target as HTMLInputElement ).validity
+							.valid
+					);
+					onChange?.( v, extra );
+				} }
+			/>
+			<p>Is valid? { isValidValue ? 'Yes' : 'No' }</p>
+		</>
+	);
+};
+Uncontrolled.argTypes = {
+	value: {
+		options: [ 'value', 'noValue' ],
+		mapping: { value: '15', noValue: undefined },
+		control: { type: 'select' },
+	},
+};
