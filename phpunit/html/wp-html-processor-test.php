@@ -284,4 +284,21 @@ HTML
 		$tags->set_content_inside_balanced_tags( 'This is the new section content.' );
 		$this->assertSame( '<div>outside</div><section id="thesection">This is the new section content.</section>', $tags->get_updated_html() );
 	}
+
+	public function test_set_content_inside_balanced_tags_invalidates_bookmarks_that_point_to_replaced_content() {
+		$tags = new WP_HTML_Processor( self::HTML );
+
+		$tags->next_tag( 'section' );
+		$tags->set_bookmark( 'start' );
+		$tags->next_tag( 'img' );
+		$tags->set_bookmark( 'replaced' );
+		$tags->seek( 'start' );
+
+		$tags->set_content_inside_balanced_tags( 'This is the new section content.' );
+		$this->assertSame( '<div>outside</div><section>This is the new section content.</section>', $tags->get_updated_html() );
+
+		$this->expectExceptionMessage( 'Invalid bookmark name' );
+		$successful_seek = $tags->seek( 'replaced' );
+		$this->assertFalse( $successful_seek );
+	}
 }
