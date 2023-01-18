@@ -56,6 +56,10 @@ function ContextMenu( { name, parentMenu = '' } ) {
 		};
 	}, [] );
 
+	const isBlocksPanel =
+		parentMenu.includes( 'blocks' ) &&
+		! parentMenu.includes( 'variations' );
+
 	return (
 		<>
 			<ItemGroup>
@@ -98,7 +102,7 @@ function ContextMenu( { name, parentMenu = '' } ) {
 				{ hasVariationsPanel && (
 					<ScreenVariations name={ name } path={ parentMenu } />
 				) }
-				{ !! parentMenu && !! canEditCSS && (
+				{ isBlocksPanel && canEditCSS && (
 					<>
 						<CardDivider />
 						<CardBody>

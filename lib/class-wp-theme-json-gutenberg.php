@@ -1089,10 +1089,10 @@ class WP_Theme_JSON_Gutenberg {
 			// Add the global styles block CSS.
 			if ( isset( $this->theme_json['styles']['blocks'] ) ) {
 				foreach ( $this->theme_json['styles']['blocks'] as $name => $node ) {
-					if ( _wp_array_get( $this->theme_json, array( 'styles', 'blocks', $name, 'css' ) ) ) {
-						$selector         = static::$blocks_metadata[ $name ]['selector'];
-						$custom_block_css = _wp_array_get( $this->theme_json, array( 'styles', 'blocks', $name, 'css' ) );
-						$stylesheet      .= $this->process_nested_css( $custom_block_css, $selector );
+					$custom_block_css = _wp_array_get( $this->theme_json, array( 'styles', 'blocks', $name, 'css' ) );
+					if ( $custom_block_css ) {
+						$selector    = static::$blocks_metadata[ $name ]['selector'];
+						$stylesheet .= $this->process_nested_css( $custom_block_css, $selector );
 					}
 				}
 			}
