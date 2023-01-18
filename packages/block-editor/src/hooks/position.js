@@ -46,9 +46,7 @@ const STICKY_OPTION = {
 	value: 'sticky',
 	name: __( 'Sticky' ),
 	className: OPTION_CLASSNAME,
-	__experimentalHint: __(
-		'The block will stick to the top of the window instead of scrolling.'
-	),
+	__experimentalHint: __( 'Sticks to the top of the window.' ),
 };
 
 const FIXED_OPTION = {
@@ -242,9 +240,7 @@ export function PositionEdit( props ) {
 							__( 'Sticks to the top of the parent %s block.' ),
 							parentBlockTitle
 					  )
-					: __(
-							'Sticks to the top of the window instead of scrolling.'
-					  ),
+					: __( 'Sticks to the top of the window.' ),
 			} );
 		}
 		if ( allowFixed || value === FIXED_OPTION.value ) {
