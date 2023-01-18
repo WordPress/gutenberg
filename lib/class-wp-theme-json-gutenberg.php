@@ -964,7 +964,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @return string The processed CSS.
 	 */
-	private function process_nested_css( $css, $selector ) {
+	private function process_blocks_custom_css_nested_styles( $css, $selector ) {
 		$processed_css = '';
 
 		// Split CSS nested rules.
@@ -1092,7 +1092,7 @@ class WP_Theme_JSON_Gutenberg {
 					$custom_block_css = _wp_array_get( $this->theme_json, array( 'styles', 'blocks', $name, 'css' ) );
 					if ( $custom_block_css ) {
 						$selector    = static::$blocks_metadata[ $name ]['selector'];
-						$stylesheet .= $this->process_nested_css( $custom_block_css, $selector );
+						$stylesheet .= $this->process_blocks_custom_css_nested_styles( $custom_block_css, $selector );
 					}
 				}
 			}
