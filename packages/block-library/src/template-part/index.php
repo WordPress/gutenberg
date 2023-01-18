@@ -40,7 +40,7 @@ function render_block_core_template_part( $attributes ) {
 				'no_found_rows'  => true,
 			)
 		);
-		$template_part_post = null;
+		$template_part_post  = null;
 		if ( $template_part_query->have_posts() ) {
 			foreach ( $template_part_query->posts as $template_post ) {
 				if ( $template_post->post_name === $attributes['slug'] ) {
