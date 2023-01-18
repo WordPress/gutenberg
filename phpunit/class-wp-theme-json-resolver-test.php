@@ -503,4 +503,70 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+
+	/**
+	 * Test that get_style_variations returns all variations, including parent theme variations if the theme is a child,
+	 * and that the child variation overwrites the parent variation of the same name.
+	 *
+	 * @covers WP_Theme_JSON_Resolver::get_style_variations
+	 **/
+	public function test_get_style_variations_returns_all_variations() {
+		// Switch to a child theme.
+		switch_theme( 'block-theme-child' );
+		wp_set_current_user( self::$administrator_id );
+
+		$actual_settings   = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations();
+		$expected_settings = array(
+			array(
+				'version'  => 2,
+				'title'    => 'variation-a',
+				'settings' => array(
+					'blocks' => array(
+						'core/paragraph' => array(
+							'color' => array(
+								'palette' => array(
+									'theme' => array(
+										array(
+											'slug'  => 'dark',
+											'name'  => 'Dark',
+											'color' => '#010101',
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			),
+			array(
+				'version'  => 2,
+				'title'    => 'variation-b',
+				'settings' => array(
+					'blocks' => array(
+						'core/post-title' => array(
+							'color' => array(
+								'palette' => array(
+									'theme' => array(
+										array(
+											'slug'  => 'light',
+											'name'  => 'Light',
+											'color' => '#f1f1f1',
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			),
+		);
+		self::recursive_ksort( $actual_settings );
+		self::recursive_ksort( $expected_settings );
+
+		$this->assertSame(
+			$expected_settings,
+			$actual_settings
+		);
+	}
+
 }
