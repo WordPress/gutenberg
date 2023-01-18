@@ -222,8 +222,9 @@ function ListViewBlock( {
 		? selectedClientIds
 		: [ clientId ];
 
-	// When the block is selected, pass in the ref to the selected item, so that it can be scrolled into view.
-	// For long lists, the placeholder for the selected block is also observed, within ListViewBranch.
+	// Pass in a ref to the row, so that it can be scrolled
+	// into view when selected. For long lists, the placeholder for the
+	// selected block is also observed, within ListViewLeafPlaceholder.
 	useListViewScrollIntoView( {
 		isSelected,
 		rowItemRef: rowRef,
