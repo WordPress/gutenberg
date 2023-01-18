@@ -154,7 +154,7 @@ export function useMediaCategories( rootClientId ) {
 				)
 			);
 			// We need to filter out categories that don't have any media items or
-			// the corresponding block type is not allowed to be inserted, based
+			// whose corresponding block type is not allowed to be inserted, based
 			// on the category's `mediaType`.
 			const canInsertMediaType = {
 				image: canInsertImage,
