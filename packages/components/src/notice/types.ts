@@ -85,12 +85,21 @@ export type NoticeProps = {
 };
 
 export type NoticeListProps = {
+	/**
+	 * Array of notices to render.
+	 */
 	notices: Array<
 		Omit< NoticeProps, 'children' > & {
 			id: string;
 			content: string;
 		}
 	>;
+	/**
+	 * Function called when a notice should be removed / dismissed.
+	 */
 	onRemove?: ( id: string ) => void;
+	/**
+	 * Children to be rendered inside the notice list.
+	 */
 	children?: ReactNode;
 };
