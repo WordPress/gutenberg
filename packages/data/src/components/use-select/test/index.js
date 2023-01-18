@@ -19,6 +19,19 @@ import {
 } from '../../..';
 import useSelect from '..';
 
+function counterStore( initialCount = 0 ) {
+	return {
+		reducer: ( state = initialCount, action ) =>
+			action.type === 'INC' ? state + 1 : state,
+		actions: {
+			inc: () => ( { type: 'INC' } ),
+		},
+		selectors: {
+			get: ( state ) => state,
+		},
+	};
+}
+
 describe( 'useSelect', () => {
 	let registry;
 	beforeEach( () => {
@@ -254,40 +267,20 @@ describe( 'useSelect', () => {
 	} );
 
 	describe( 're-calls the selector as few times as possible', () => {
-		const counterStore = {
-			actions: {
-				increment: () => ( { type: 'INCREMENT' } ),
-			},
-			reducer: ( state, action ) => {
-				if ( ! state ) {
-					return { counter: 0 };
-				}
-				if ( action?.type === 'INCREMENT' ) {
-					return { counter: state.counter + 1 };
-				}
-				return state;
-			},
-			selectors: {
-				getCounter: ( state ) => state.counter,
-			},
-		};
-
 		it( 'only calls the selectors it has selected', () => {
-			registry.registerStore( 'store-1', counterStore );
-			registry.registerStore( 'store-2', counterStore );
+			registry.registerStore( 'store-1', counterStore() );
+			registry.registerStore( 'store-2', counterStore() );
 
 			const selectCount1 = jest.fn();
 			const selectCount2 = jest.fn();
 
 			const TestComponent = jest.fn( () => {
 				const count1 = useSelect(
-					( select ) =>
-						selectCount1() || select( 'store-1' ).getCounter(),
+					( select ) => selectCount1() || select( 'store-1' ).get(),
 					[]
 				);
 				useSelect(
-					( select ) =>
-						selectCount2() || select( 'store-2' ).getCounter(),
+					( select ) => selectCount2() || select( 'store-2' ).get(),
 					[]
 				);
 
@@ -306,7 +299,7 @@ describe( 'useSelect', () => {
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0' );
 
 			act( () => {
-				registry.dispatch( 'store-2' ).increment();
+				registry.dispatch( 'store-2' ).inc();
 			} );
 
 			expect( selectCount1 ).toHaveBeenCalledTimes( 2 );
@@ -315,7 +308,7 @@ describe( 'useSelect', () => {
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0' );
 
 			act( () => {
-				registry.dispatch( 'store-1' ).increment();
+				registry.dispatch( 'store-1' ).inc();
 			} );
 
 			expect( selectCount1 ).toHaveBeenCalledTimes( 3 );
@@ -328,9 +321,9 @@ describe( 'useSelect', () => {
 		} );
 
 		it( 'can subscribe to multiple stores at once', () => {
-			registry.registerStore( 'store-1', counterStore );
-			registry.registerStore( 'store-2', counterStore );
-			registry.registerStore( 'store-3', counterStore );
+			registry.registerStore( 'store-1', counterStore() );
+			registry.registerStore( 'store-2', counterStore() );
+			registry.registerStore( 'store-3', counterStore() );
 
 			const selectCount1And2 = jest.fn();
 
@@ -338,8 +331,8 @@ describe( 'useSelect', () => {
 				const { count1, count2 } = useSelect(
 					( select ) =>
 						selectCount1And2() || {
-							count1: select( 'store-1' ).getCounter(),
-							count2: select( 'store-2' ).getCounter(),
+							count1: select( 'store-1' ).get(),
+							count2: select( 'store-2' ).get(),
 						},
 					[]
 				);
@@ -361,14 +354,14 @@ describe( 'useSelect', () => {
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0,0' );
 
 			act( () => {
-				registry.dispatch( 'store-2' ).increment();
+				registry.dispatch( 'store-2' ).inc();
 			} );
 
 			expect( selectCount1And2 ).toHaveBeenCalledTimes( 3 );
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0,1' );
 
 			act( () => {
-				registry.dispatch( 'store-3' ).increment();
+				registry.dispatch( 'store-3' ).inc();
 			} );
 
 			expect( selectCount1And2 ).toHaveBeenCalledTimes( 3 );
@@ -376,9 +369,9 @@ describe( 'useSelect', () => {
 		} );
 
 		it( 're-calls the selector when deps changed', () => {
-			registry.registerStore( 'store-1', counterStore );
-			registry.registerStore( 'store-2', counterStore );
-			registry.registerStore( 'store-3', counterStore );
+			registry.registerStore( 'store-1', counterStore() );
+			registry.registerStore( 'store-2', counterStore() );
+			registry.registerStore( 'store-3', counterStore() );
 
 			let dep, setDep;
 			const selectCount1AndDep = jest.fn();
@@ -388,7 +381,7 @@ describe( 'useSelect', () => {
 				const state = useSelect(
 					( select ) =>
 						selectCount1AndDep() || {
-							count1: select( 'store-1' ).getCounter(),
+							count1: select( 'store-1' ).get(),
 							dep,
 						},
 					[ dep ]
@@ -422,7 +415,7 @@ describe( 'useSelect', () => {
 			);
 
 			act( () => {
-				registry.dispatch( 'store-1' ).increment();
+				registry.dispatch( 'store-1' ).inc();
 			} );
 
 			expect( selectCount1AndDep ).toHaveBeenCalledTimes( 5 );
@@ -432,7 +425,7 @@ describe( 'useSelect', () => {
 		} );
 
 		it( 'captures state changes scheduled between render and effect', () => {
-			registry.registerStore( 'store-1', counterStore );
+			registry.registerStore( 'store-1', counterStore() );
 
 			class ChildComponent extends Component {
 				componentDidUpdate( prevProps ) {
@@ -441,7 +434,7 @@ describe( 'useSelect', () => {
 						this.props.childShouldDispatch !==
 							prevProps.childShouldDispatch
 					) {
-						registry.dispatch( 'store-1' ).increment();
+						registry.dispatch( 'store-1' ).inc();
 					}
 				}
 
@@ -451,7 +444,7 @@ describe( 'useSelect', () => {
 			}
 
 			const selectCount1AndDep = jest.fn( ( select ) => ( {
-				count1: select( 'store-1' ).getCounter(),
+				count1: select( 'store-1' ).get(),
 			} ) );
 
 			const TestComponent = () => {
@@ -491,19 +484,15 @@ describe( 'useSelect', () => {
 		it( 'handles registry selectors', () => {
 			const getCount1And2 = createRegistrySelector(
 				( select ) => ( state ) => ( {
-					count1: state.counter,
-					count2: select( 'store-2' ).getCounter(),
+					count1: state,
+					count2: select( 'store-2' ).get(),
 				} )
 			);
 
-			registry.registerStore( 'store-1', {
-				...counterStore,
-				selectors: {
-					...counterStore.selectors,
-					getCount1And2,
-				},
-			} );
-			registry.registerStore( 'store-2', counterStore );
+			const store1Spec = counterStore();
+			Object.assign( store1Spec.selectors, { getCount1And2 } );
+			registry.registerStore( 'store-1', store1Spec );
+			registry.registerStore( 'store-2', counterStore() );
 
 			const selectCount1And2 = jest.fn();
 
@@ -534,7 +523,7 @@ describe( 'useSelect', () => {
 			);
 
 			act( () => {
-				registry.dispatch( 'store-2' ).increment();
+				registry.dispatch( 'store-2' ).inc();
 			} );
 
 			expect( selectCount1And2 ).toHaveBeenCalledTimes( 3 );
@@ -544,8 +533,8 @@ describe( 'useSelect', () => {
 		} );
 
 		it( 'handles conditional statements in selectors', () => {
-			registry.registerStore( 'store-1', counterStore );
-			registry.registerStore( 'store-2', counterStore );
+			registry.registerStore( 'store-1', counterStore() );
+			registry.registerStore( 'store-2', counterStore() );
 
 			const selectCount1 = jest.fn();
 			const selectCount2 = jest.fn();
@@ -559,12 +548,12 @@ describe( 'useSelect', () => {
 					( select ) => {
 						if ( shouldSelectCount1 ) {
 							selectCount1();
-							select( 'store-1' ).getCounter();
+							select( 'store-1' ).get();
 							return 'count1';
 						}
 
 						selectCount2();
-						select( 'store-2' ).getCounter();
+						select( 'store-2' ).get();
 						return 'count2';
 					},
 					[ shouldSelectCount1 ]
@@ -600,16 +589,16 @@ describe( 'useSelect', () => {
 		} );
 
 		it( "handles subscriptions to the parent's stores", () => {
-			registry.registerStore( 'parent-store', counterStore );
+			registry.registerStore( 'parent-store', counterStore() );
 
 			const subRegistry = createRegistry( {}, registry );
-			subRegistry.registerStore( 'child-store', counterStore );
+			subRegistry.registerStore( 'child-store', counterStore() );
 
 			const TestComponent = jest.fn( () => {
 				const state = useSelect(
 					( select ) => ( {
-						parentCount: select( 'parent-store' ).getCounter(),
-						childCount: select( 'child-store' ).getCounter(),
+						parentCount: select( 'parent-store' ).get(),
+						childCount: select( 'child-store' ).get(),
 					} ),
 					[]
 				);
@@ -634,7 +623,7 @@ describe( 'useSelect', () => {
 			);
 
 			act( () => {
-				registry.dispatch( 'parent-store' ).increment();
+				registry.dispatch( 'parent-store' ).inc();
 			} );
 
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
@@ -643,13 +632,13 @@ describe( 'useSelect', () => {
 		} );
 
 		it( 'handles non-existing stores', () => {
-			registry.registerStore( 'store-1', counterStore );
+			registry.registerStore( 'store-1', counterStore() );
 
 			const TestComponent = jest.fn( () => {
 				const state = useSelect(
 					( select ) => ( {
-						count1: select( 'store-1' ).getCounter(),
-						count2: select( 'store-2' )?.getCounter() ?? 'blank',
+						count1: select( 'store-1' ).get(),
+						count2: select( 'store-2' )?.get() ?? 'blank',
 					} ),
 					[]
 				);
@@ -672,7 +661,7 @@ describe( 'useSelect', () => {
 			);
 
 			act( () => {
-				registry.dispatch( 'store-1' ).increment();
+				registry.dispatch( 'store-1' ).inc();
 			} );
 
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
@@ -687,8 +676,7 @@ describe( 'useSelect', () => {
 			const TestComponent = jest.fn( () => {
 				const state = useSelect(
 					( select ) =>
-						select( 'not-yet-registered-store' )?.getCounter() ??
-						'blank',
+						select( 'not-yet-registered-store' )?.get() ?? 'blank',
 					[]
 				);
 
@@ -706,7 +694,7 @@ describe( 'useSelect', () => {
 			act( () => {
 				registry.registerStore(
 					'not-yet-registered-store',
-					counterStore
+					counterStore()
 				);
 			} );
 
@@ -714,7 +702,7 @@ describe( 'useSelect', () => {
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( 'blank' );
 
 			act( () => {
-				registry.dispatch( 'not-yet-registered-store' ).increment();
+				registry.dispatch( 'not-yet-registered-store' ).inc();
 			} );
 
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1' );
@@ -729,9 +717,8 @@ describe( 'useSelect', () => {
 			const TestComponent = jest.fn( () => {
 				const state = useSelect(
 					( select ) =>
-						select(
-							'not-yet-registered-child-store'
-						)?.getCounter() ?? 'blank',
+						select( 'not-yet-registered-child-store' )?.get() ??
+						'blank',
 					[]
 				);
 
@@ -751,7 +738,7 @@ describe( 'useSelect', () => {
 			act( () => {
 				registry.registerStore(
 					'not-yet-registered-child-store',
-					counterStore
+					counterStore()
 				);
 			} );
 
@@ -759,9 +746,7 @@ describe( 'useSelect', () => {
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( 'blank' );
 
 			act( () => {
-				registry
-					.dispatch( 'not-yet-registered-child-store' )
-					.increment();
+				registry.dispatch( 'not-yet-registered-child-store' ).inc();
 			} );
 
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1' );
@@ -778,11 +763,11 @@ describe( 'useSelect', () => {
 					let counter = 0;
 
 					const selectors = {
-						getCounter: () => counter,
+						get: () => counter,
 					};
 
 					const actions = {
-						increment: () => {
+						inc: () => {
 							counter += 1;
 							storeChanged();
 						},
@@ -806,7 +791,7 @@ describe( 'useSelect', () => {
 
 			const TestComponent = jest.fn( () => {
 				const state = useSelect(
-					( select ) => select( customStore ).getCounter(),
+					( select ) => select( customStore ).get(),
 					[]
 				);
 
@@ -822,7 +807,7 @@ describe( 'useSelect', () => {
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0' );
 
 			act( () => {
-				registry.dispatch( customStore ).increment();
+				registry.dispatch( customStore ).inc();
 			} );
 
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1' );
@@ -832,25 +817,8 @@ describe( 'useSelect', () => {
 	} );
 
 	describe( 'async mode', () => {
-		function registerCounterStore( reg, initialCount = 0 ) {
-			reg.registerStore( 'counter', {
-				reducer: ( state = initialCount, action ) => {
-					if ( action.type === 'INCREMENT' ) {
-						return state + 1;
-					}
-					return state;
-				},
-				actions: {
-					inc: () => ( { type: 'INCREMENT' } ),
-				},
-				selectors: {
-					get: ( state ) => state,
-				},
-			} );
-		}
-
 		beforeEach( () => {
-			registerCounterStore( registry );
+			registry.registerStore( 'counter', counterStore() );
 		} );
 
 		it( 'renders with async mode', async () => {
@@ -1030,7 +998,7 @@ describe( 'useSelect', () => {
 
 		it( 'cancels scheduled updates when registry changes', async () => {
 			const registry2 = createRegistry();
-			registerCounterStore( registry2, 100 );
+			registry2.registerStore( 'counter', counterStore( 100 ) );
 
 			const selectSpy = jest.fn( ( select ) =>
 				select( 'counter' ).get()
@@ -1073,16 +1041,8 @@ describe( 'useSelect', () => {
 	} );
 
 	describe( 'usage without dependencies array', () => {
-		function registerStore( name, initial ) {
-			registry.registerStore( name, {
-				reducer: ( s = initial, a ) => ( a.type === 'inc' ? s + 1 : s ),
-				actions: { inc: () => ( { type: 'inc' } ) },
-				selectors: { get: ( s ) => s },
-			} );
-		}
-
 		it( 'does not memoize the callback when there are no deps', () => {
-			registerStore( 'store', 1 );
+			registry.registerStore( 'store', counterStore( 1 ) );
 
 			const Status = ( { multiple } ) => {
 				const count = useSelect(
@@ -1106,9 +1066,9 @@ describe( 'useSelect', () => {
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '2' );
 		} );
 
-		it( 'subscribes only stores used by the initial callback', () => {
-			registerStore( 'counter-1', 1 );
-			registerStore( 'counter-2', 10 );
+		it( 'resubscribes when the set of selected stores changes', () => {
+			registry.registerStore( 'counter-1', counterStore( 1 ) );
+			registry.registerStore( 'counter-2', counterStore( 10 ) );
 
 			const Status = ( { store } ) => {
 				const count = useSelect( ( select ) => select( store ).get() );
@@ -1145,11 +1105,7 @@ describe( 'useSelect', () => {
 
 	describe( 'static store selection mode', () => {
 		it( 'can read the current value from store', () => {
-			registry.registerStore( 'testStore', {
-				reducer: ( s = 0, a ) => ( a.type === 'INC' ? s + 1 : s ),
-				actions: { inc: () => ( { type: 'INC' } ) },
-				selectors: { get: ( s ) => s },
-			} );
+			registry.registerStore( 'testStore', counterStore() );
 
 			const record = jest.fn();
 
