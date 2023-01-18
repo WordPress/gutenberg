@@ -2144,14 +2144,14 @@ export const hasInserterItems = createSelector(
 );
 
 /**
- * Returns the list of allowed inserter blocks for inner blocks children
+ * Returns the list of allowed inserter blocks for inner blocks children.
  *
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional root client ID of block list.
  *
  * @return {Array?} The list of allowed block types.
  */
-export const __experimentalGetAllowedBlocks = createSelector(
+export const getAllowedBlocks = createSelector(
 	( state, rootClientId = null ) => {
 		if ( ! rootClientId ) {
 			return;
@@ -2167,6 +2167,24 @@ export const __experimentalGetAllowedBlocks = createSelector(
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 		getBlockTypes(),
+	]
+);
+
+export const __experimentalGetAllowedBlocks = createSelector(
+	( state, rootClientId = null ) => {
+		deprecated(
+			'wp.data.select( "core/block-editor" ).__experimentalGetAllowedBlocks',
+			{
+				alternative:
+					'wp.data.select( "core/block-editor" ).getAllowedBlocks',
+				since: '6.2',
+				version: '6.4',
+			}
+		);
+		return getAllowedBlocks( state, rootClientId );
+	},
+	( state, rootClientId ) => [
+		...getAllowedBlocks.getDependants( state, rootClientId ),
 	]
 );
 

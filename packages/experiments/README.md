@@ -1,51 +1,91 @@
 # Experiments
 
-Private `__experimental` APIs that are not [exposed publicly plugin authors](https://make.wordpress.org/core/2022/08/10/proposal-stop-merging-experimental-apis-from-gutenberg-to-wordpress-core/#respond).
+`@wordpress/experiments`  enables sharing private `__experimental` APIs across `@wordpress` packages without
+[publicly exposing them to WordPress extenders](https://make.wordpress.org/core/2022/08/10/proposal-stop-merging-experimental-apis-from-gutenberg-to-wordpress-core/#respond).
 
-This package acts as a "dealer" that only allows WordPress packages to use the experimental APIs.
+## Getting started
 
-Each package needs to start by registering itself:
+Every `@wordpress` package wanting to privately access or expose experimental APIs must opt-in to `@wordpress/experiments`:
 
 ```js
-const { register } =
+// In packages/block-editor/experiments.js:
+import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/experiments';
+export const { lock, unlock } =
 	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
-		'<CONSENT STRING>',  // See index.js, this may change without notice.
-		'@wordpress/blocks'
+		'I know using unstable features means my plugin or theme will inevitably break on the next WordPress release.',
+		'@wordpress/block-editor' // Name of the package calling __dangerousOptInToUnstableAPIsOnlyForCoreModules,
+								  // (not the name of the package whose APIs you want to access)
 	);
 ```
 
-The function name communicates that plugins are not supposed to use it. To make double and triple sure, the first argument must be that exact consent string, and the second argument must be a known `@wordpress` package that hasn't opted in yet – otherwise an error is thrown.
+Each package may only opt in once. The function name communicates that plugins are not supposed to use it.
 
-Expose a new `__experimental` API as follows:
+The function will throw an error if the following conditions are not met:
+
+1. The first argument must exactly match the required consent string: `'I know using unstable features means my plugin or theme will inevitably break on the next WordPress release.'`. 
+2. The second argument must be a known `@wordpress` package that hasn't yet opted into `@wordpress/experiments`
+
+Once the opt-in is complete, the obtained `lock()` and `unlock()` utilities enable hiding `__experimental` APIs from the naked eye:
 
 ```js
-export const __experiments = register( { __unstableGetInnerBlocksProps } )
+// Say this object is exported from a package:
+export const publicObject = {};
+
+// However, this string is internal and should not be publicly available:
+const __experimentalString = '__experimental information';
+
+// Solution: lock the string "inside" of the object:
+lock( publicObject, __experimentalString );
+
+// The string is not nested in the object and cannot be extracted from it:
+console.log( publicObject );
+// {}
+
+// The only way to access the string is by "unlocking" the object:
+console.log( unlock( publicObject ) );
+// "__experimental information"
+
+// lock() accepts all data types, not just strings:
+export const anotherObject = {};
+lock( anotherObject, function __experimentalFn() {} );
+console.log( unlock( anotherObject ) );
+// function __experimentalFn() {}
 ```
 
-Consume the registered `__experimental` APIs as follows:
+Use `lock()` and `unlock()` to privately distribute the `__experimental` APIs across `@wordpress` packages:
 
 ```js
-// In the @wordpress/block-editor package:
-import { __experiments as blocksExperiments } from '@wordpress/blocks';
-const { unlock } =
-	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
-		'<CONSENT STRING>',  // See index.js
-		'@wordpress/block-editor'
-	);
+// In packages/package1/index.js:
+import { lock } from './experiments';
 
-const { __unstableGetInnerBlocksProps } = unlock( blocksExperiments );
+export const experiments = {};
+/* Attach private data to the exported object */
+lock(experiments, {
+	__experimentalFunction: function() {},
+});
+
+// In packages/package2/index.js:
+import { experiments } from '@wordpress/package1';
+import { unlock } from './experiments';
+
+const {
+	__experimentalFunction
+} = unlock( experiments );
 ```
 
-All new experimental APIs should be shipped as **private** using this method.
+## Shipping experimental APIs
 
-The **public** experimental APIs that have already been shipped in a stable WordPress version should remain accessible via `window.wp`. Please do not create new ones.
+See the [Experimental and Unstable APIs chapter of Coding Guidelines](/docs/contributors/code/coding-guidelines.md) to learn how `lock()` and `unlock()` can help
+you ship private experimental functions, arguments, components, properties, actions, selectors.
+
+## Technical limitations
 
 A determined developer who would want to use the private experimental APIs at all costs would have to:
 
-* Realize a private importing system exists
-* Read the code where the risks would be spelled out in capital letters
-* Explicitly type out he or she is aware of the consequences
-* Pretend to register a `@wordpress` package (and trigger an error as soon as the real package is loaded)
+-   Realize a private importing system exists
+-   Read the code where the risks would be spelled out in capital letters
+-   Explicitly type out he or she is aware of the consequences
+-   Pretend to register a `@wordpress` package (and trigger an error as soon as the real package is loaded)
 
 Dangerously opting in to using these APIs by theme and plugin developers is not recommended. Furthermore, the WordPress Core philosophy to strive to maintain backward compatibility for third-party developers **does not apply** to experimental APIs registered via this package.
 
