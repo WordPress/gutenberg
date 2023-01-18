@@ -4,5 +4,5 @@
  * @this {import('.').SiteEditor}
  */
 export async function enterEditMode() {
-	await this.page.click( '.edit-site-layout__edit-button' );
+	await this.page.click( '.edit-site-site-hub__edit-button' );
 }

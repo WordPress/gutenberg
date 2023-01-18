@@ -338,6 +338,7 @@ class NativeEditorProvider extends Component {
 					isVisible={ this.state.isHelpVisible }
 					onClose={ () => this.setState( { isHelpVisible: false } ) }
 					close={ () => this.setState( { isHelpVisible: false } ) }
+					showSupport={ capabilities?.supportSection === true }
 				/>
 			</>
 		);

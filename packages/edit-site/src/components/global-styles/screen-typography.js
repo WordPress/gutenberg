@@ -17,6 +17,8 @@ import { NavigationButtonAsItem } from './navigation-button';
 import { useStyle } from './hooks';
 import Subtitle from './subtitle';
 import TypographyPanel from './typography-panel';
+import BlockPreviewPanel from './block-preview-panel';
+import { getVariationClassNameFromPath } from './utils';
 
 function Item( { name, parentMenu, element, label } ) {
 	const hasSupport = ! name;
@@ -75,9 +77,9 @@ function Item( { name, parentMenu, element, label } ) {
 	);
 }
 
-function ScreenTypography( { name } ) {
+function ScreenTypography( { name, variationPath = '' } ) {
 	const parentMenu = name === undefined ? '' : '/blocks/' + name;
-
+	const variationClassName = getVariationClassNameFromPath( variationPath );
 	return (
 		<>
 			<ScreenHeader
@@ -86,6 +88,8 @@ function ScreenTypography( { name } ) {
 					'Manage the typography settings for different elements.'
 				) }
 			/>
+
+			<BlockPreviewPanel name={ name } variation={ variationClassName } />
 
 			{ ! name && (
 				<div className="edit-site-global-styles-screen-typography">
@@ -121,7 +125,13 @@ function ScreenTypography( { name } ) {
 				</div>
 			) }
 			{ /* No typography elements support yet for blocks. */ }
-			{ !! name && <TypographyPanel name={ name } element="text" /> }
+			{ !! name && (
+				<TypographyPanel
+					name={ name }
+					variationPath={ variationPath }
+					element="text"
+				/>
+			) }
 		</>
 	);
 }

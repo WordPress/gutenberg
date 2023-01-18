@@ -15,7 +15,7 @@ import {
 	useColorsPerOrigin,
 } from './hooks';
 
-function ScreenButtonColor( { name } ) {
+function ScreenButtonColor( { name, variationPath = '' } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	const [ solids ] = useSetting( 'color.palette', name );
 	const [ areCustomSolidsEnabled ] = useSetting( 'color.custom', name );
@@ -30,7 +30,7 @@ function ScreenButtonColor( { name } ) {
 		( solids.length > 0 || areCustomSolidsEnabled );
 
 	const [ buttonTextColor, setButtonTextColor ] = useStyle(
-		'elements.button.color.text',
+		variationPath + 'elements.button.color.text',
 		name
 	);
 	const [ userButtonTextColor ] = useStyle(
@@ -70,7 +70,6 @@ function ScreenButtonColor( { name } ) {
 				className="edit-site-screen-button-color__control"
 				colors={ colorsPerOrigin }
 				disableCustomColors={ ! areCustomSolidsEnabled }
-				__experimentalHasMultipleOrigins
 				showTitle={ false }
 				enableAlpha
 				__experimentalIsRenderedInSidebar
@@ -87,7 +86,6 @@ function ScreenButtonColor( { name } ) {
 				className="edit-site-screen-button-color__control"
 				colors={ colorsPerOrigin }
 				disableCustomColors={ ! areCustomSolidsEnabled }
-				__experimentalHasMultipleOrigins
 				showTitle={ false }
 				enableAlpha
 				__experimentalIsRenderedInSidebar

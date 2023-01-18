@@ -52,6 +52,9 @@ test.describe( 'Avatar', () => {
 		);
 
 		await expect( blockInspectorControls ).toBeVisible();
+		await page.click(
+			`role=region[name="Editor settings"i] >> role=tab[name="Settings"i]`
+		);
 
 		const userInput = page.locator(
 			'role=region[name="Editor settings"i] >> role=combobox[name="User"i]'
@@ -64,7 +67,8 @@ test.describe( 'Avatar', () => {
 
 		await newUser.click();
 
-		const newSrc = await avatarImage.getAttribute( 'src' );
+		const updatedAvatarImage = avatarBlock.locator( 'img' );
+		const newSrc = await updatedAvatarImage.getAttribute( 'src' );
 
 		expect( newSrc ).not.toBe( originalSrc );
 	} );

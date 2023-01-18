@@ -41,9 +41,7 @@ describe( 'BlockVerticalAlignmentUI', () => {
 	} );
 
 	test( 'should expand controls when toggled', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const { unmount } = render(
 			<BlockVerticalAlignmentUI
@@ -76,9 +74,7 @@ describe( 'BlockVerticalAlignmentUI', () => {
 	} );
 
 	it( 'should call onChange with undefined, when the control is already active', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render(
 			<BlockVerticalAlignmentUI
@@ -102,9 +98,7 @@ describe( 'BlockVerticalAlignmentUI', () => {
 
 	it( 'should call onChange with alignment value when the control is inactive', async () => {
 		// note "middle" alias for "center"
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render(
 			<BlockVerticalAlignmentUI

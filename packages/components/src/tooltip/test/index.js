@@ -13,6 +13,8 @@ import Tooltip from '../';
  */
 import { TOOLTIP_DELAY } from '../index.js';
 
+jest.useFakeTimers();
+
 function getWrappingPopoverElement( element ) {
 	return element.closest( '.components-popover' );
 }

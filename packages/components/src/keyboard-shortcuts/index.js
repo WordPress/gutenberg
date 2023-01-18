@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useRef, Children } from '@wordpress/element';
@@ -28,16 +23,18 @@ function KeyboardShortcut( {
 function KeyboardShortcuts( { children, shortcuts, bindGlobal, eventName } ) {
 	const target = useRef();
 
-	const element = map( shortcuts, ( callback, shortcut ) => (
-		<KeyboardShortcut
-			key={ shortcut }
-			shortcut={ shortcut }
-			callback={ callback }
-			bindGlobal={ bindGlobal }
-			eventName={ eventName }
-			target={ target }
-		/>
-	) );
+	const element = Object.entries( shortcuts ?? {} ).map(
+		( [ shortcut, callback ] ) => (
+			<KeyboardShortcut
+				key={ shortcut }
+				shortcut={ shortcut }
+				callback={ callback }
+				bindGlobal={ bindGlobal }
+				eventName={ eventName }
+				target={ target }
+			/>
+		)
+	);
 
 	// Render as non-visual if there are no children pressed. Keyboard
 	// events will be bound to the document instead.

@@ -91,11 +91,6 @@ export const parameters = {
 	controls: {
 		sort: 'requiredFirst',
 	},
-	knobs: {
-		// Knobs are deprecated, and new stories should use addon-controls.
-		// Will be enabled on a per-story basis until migration is complete.
-		disable: true,
-	},
 	options: {
 		storySort: {
 			order: [
