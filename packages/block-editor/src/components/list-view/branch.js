@@ -189,7 +189,6 @@ function ListViewBranch( props ) {
 						) }
 						{ ! showBlock && (
 							<ListViewLeafPlaceholder
-								clientId={ clientId }
 								isSelected={ isSelected }
 								selectedClientIds={ selectedClientIds }
 							/>

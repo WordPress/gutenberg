@@ -16,8 +16,8 @@ import useListViewScrollIntoView from './use-list-view-scroll-into-view';
  * ensuring that the vertical space is reserved for the leaf.
  *
  * @param {Object}   props                   Component props.
- * @param {boolean}  props.isSelected        Children to be rendered.
- * @param {string[]} props.selectedClientIds Callback to fire when row is expanded.
+ * @param {boolean}  props.isSelected        Whether the leaf is selected.
+ * @param {string[]} props.selectedClientIds A list of selected block client ids.
  */
 export default function ListViewLeafPlaceholder( {
 	isSelected,
