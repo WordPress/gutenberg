@@ -1,18 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { memo, useRef } from '@wordpress/element';
+import { memo } from '@wordpress/element';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import ListViewBlock from './block';
+import ListViewLeafPlaceholder from './leaf-placeholder';
 import { useListViewContext } from './context';
 import { isClientIdSelected } from './utils';
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
-import useListViewScrollIntoView from './use-list-view-scroll-into-view';
 
 /**
  * Given a block, returns the total number of blocks in that subtree. This is used to help determine
@@ -78,24 +78,6 @@ const countReducer =
 	};
 
 const noop = () => {};
-
-function PlaceholderRow( { isSelected, selectedClientIds } ) {
-	// For long lists where the selected item may fall outside of the current window,
-	// pass a reference to the corresponding placeholder row for the selected item.
-	// The "real" selected item is also observed in ListViewBlock, when rendered.
-	const rowItemRef = useRef();
-	useListViewScrollIntoView( {
-		isSelected,
-		rowItemRef,
-		selectedClientIds,
-	} );
-
-	return (
-		<tr ref={ rowItemRef }>
-			<td className="block-editor-list-view-placeholder" />
-		</tr>
-	);
-}
 
 function ListViewBranch( props ) {
 	const {
@@ -205,18 +187,13 @@ function ListViewBranch( props ) {
 								isSyncedBranch={ syncedBranch }
 							/>
 						) }
-						{ ! showBlock &&
-							( isSelected ? (
-								<PlaceholderRow
-									clientId={ clientId }
-									isSelected={ isSelected }
-									selectedClientIds={ selectedClientIds }
-								/>
-							) : (
-								<tr>
-									<td className="block-editor-list-view-placeholder" />
-								</tr>
-							) ) }
+						{ ! showBlock && (
+							<ListViewLeafPlaceholder
+								clientId={ clientId }
+								isSelected={ isSelected }
+								selectedClientIds={ selectedClientIds }
+							/>
+						) }
 						{ hasNestedBlocks && shouldExpand && ! isDragged && (
 							<ListViewBranch
 								parentId={ clientId }
