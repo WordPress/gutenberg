@@ -18,7 +18,7 @@ export default function SidebarNavigationScreenMain() {
 	return (
 		<SidebarNavigationScreen
 			path="/"
-			title={ __( 'Design' ) }
+			heading={ __( 'Design' ) }
 			content={
 				<ItemGroup>
 					<NavigatorButton

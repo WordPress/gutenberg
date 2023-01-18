@@ -122,7 +122,7 @@ export default function SidebarNavigationScreenTemplates( {
 			title={
 				<HStack justify="space-between">
 					<div style={ { flexShrink: 0 } }>
-						{ config[ postType ].labels.title }
+						<h2>{ config[ postType ].labels.title }</h2>
 					</div>
 					{ ! isMobileViewport && (
 						<AddNewTemplate

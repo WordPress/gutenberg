@@ -15,6 +15,7 @@ export default function SidebarNavigationScreen( {
 	parentTitle,
 	title,
 	content,
+	heading,
 } ) {
 	return (
 		<NavigatorScreen
@@ -41,9 +42,15 @@ export default function SidebarNavigationScreen( {
 						<div className="edit-site-sidebar-navigation-screen__icon-placeholder" />
 					) }
 
-					<div className="edit-site-sidebar-navigation-screen__title">
-						{ title }
-					</div>
+					{ ! parentTitle && heading ? (
+						<div className="edit-site-sidebar-navigation-screen__title">
+							<h2>{ heading } </h2>
+						</div>
+					) : (
+						<div className="edit-site-sidebar-navigation-screen__title">
+							{ title }
+						</div>
+					) }
 				</HStack>
 
 				<nav className="edit-site-sidebar-navigation-screen__content">
