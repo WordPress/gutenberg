@@ -211,7 +211,11 @@ function ColumnEdit( {
 			>
 				<InnerBlocks
 					renderAppender={ renderAppender }
-					parentWidth={ contentStyle[ clientId ].width }
+					parentWidth={
+						contentStyle &&
+						contentStyle[ clientId ] &&
+						contentStyle[ clientId ].width
+					}
 					blockWidth={ blockWidth }
 				/>
 			</View>
