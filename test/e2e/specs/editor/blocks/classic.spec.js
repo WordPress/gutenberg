@@ -85,6 +85,7 @@ test.describe( 'Classic', () => {
 		await expect( galleryBlock ).toBeVisible();
 
 		// Focus on the editor so that keyboard shortcuts work.
+		// See: https://github.com/WordPress/gutenberg/issues/46844
 		await galleryBlock.focus();
 
 		// Check that you can undo back to a Classic block gallery in one step.
