@@ -148,7 +148,7 @@ function render_block_core_template_part( $attributes ) {
 	$content = wptexturize( $content );
 	$content = convert_smilies( $content );
 	$content = shortcode_unautop( $content );
-	$content = wp_filter_content_tags( $content, "the_template_part_{$area}" );
+	$content = wp_filter_content_tags( $content, "template_part_{$area}" );
 	$content = do_shortcode( $content );
 
 	// Handle embeds for block template parts.
