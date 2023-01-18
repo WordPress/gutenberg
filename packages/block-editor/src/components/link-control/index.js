@@ -118,6 +118,7 @@ function LinkControl( {
 	settings = DEFAULT_LINK_SETTINGS,
 	onChange = noop,
 	onRemove,
+	onCancel,
 	noDirectEntry = false,
 	showSuggestions = true,
 	showInitialSuggestions,
@@ -260,6 +261,8 @@ function LinkControl( {
 			// If there is no link value, then remove the link entirely.
 			onRemove?.();
 		}
+
+		onCancel?.();
 	};
 
 	const currentUrlInputValue = propInputValue || internalUrlInputValue;

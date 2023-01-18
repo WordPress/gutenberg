@@ -715,6 +715,22 @@ describe( 'Manual link entry', () => {
 			expect( searchInput ).toHaveValue( initialLink.url );
 			expect( textInput ).toHaveValue( initialLink.text );
 		} );
+
+		it( 'should call onCancel callback when cancelling if provided', async () => {
+			const user = userEvent.setup();
+			const mockOnCancel = jest.fn();
+
+			render( <LinkControl onCancel={ mockOnCancel } /> );
+
+			const cancelButton = screen.queryByRole( 'button', {
+				name: 'Cancel',
+			} );
+
+			await user.click( cancelButton );
+
+			// Verify the consumer can handle the cancellation.
+			expect( mockOnCancel ).toHaveBeenCalled();
+		} );
 	} );
 
 	describe( 'Alternative link protocols and formats', () => {
