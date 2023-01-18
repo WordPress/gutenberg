@@ -1,17 +1,7 @@
 /**
  * WordPress dependencies
  */
-const {
-	test,
-	expect,
-	Editor,
-} = require( '@wordpress/e2e-test-utils-playwright' );
-
-test.use( {
-	editor: async ( { page }, use ) => {
-		await use( new Editor( { page, hasIframe: true } ) );
-	},
-} );
+const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe(
 	'As a user I want the navigation block to fallback to the best possible default',

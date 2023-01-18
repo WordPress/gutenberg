@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ForwardedRef } from 'react';
+import type { ForwardedRef, RefObject } from 'react';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
@@ -10,7 +10,7 @@ import a11yPlugin from 'colord/plugins/a11y';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { useCallback, useMemo, forwardRef } from '@wordpress/element';
+import { useCallback, useRef, useMemo, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -214,10 +214,32 @@ const areColorsMultiplePalette = (
 	);
 };
 
+const normalizeColorValue = (
+	value: string | undefined,
+	ref: RefObject< HTMLElement > | null
+) => {
+	const currentValueIsCssVariable = /^var\(/.test( value ?? '' );
+
+	if ( ! currentValueIsCssVariable || ! ref?.current ) {
+		return value;
+	}
+
+	const { ownerDocument } = ref.current;
+	const { defaultView } = ownerDocument;
+	const computedBackgroundColor = defaultView?.getComputedStyle(
+		ref.current
+	).backgroundColor;
+
+	return computedBackgroundColor
+		? colord( computedBackgroundColor ).toHex()
+		: value;
+};
+
 function UnforwardedColorPalette(
 	props: WordPressComponentProps< ColorPaletteProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
+	const customColorPaletteRef = useRef< HTMLElement | null >( null );
 	const {
 		clearable = true,
 		colors = [],
@@ -258,7 +280,7 @@ function UnforwardedColorPalette(
 	const renderCustomColorPicker = () => (
 		<DropdownContentWrapper paddingSize="none">
 			<ColorPicker
-				color={ value }
+				color={ normalizeColorValue( value, customColorPaletteRef ) }
 				onChange={ ( color ) => onChange( color ) }
 				enableAlpha={ enableAlpha }
 			/>
@@ -303,6 +325,7 @@ function UnforwardedColorPalette(
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<Flex
 							as={ 'button' }
+							ref={ customColorPaletteRef }
 							justify="space-between"
 							align="flex-start"
 							className="components-color-palette__custom-color"

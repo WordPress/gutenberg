@@ -12,7 +12,6 @@ process.on( 'unhandledRejection', ( err ) => {
 /**
  * External dependencies
  */
-/* eslint-disable-next-line jest/no-jest-import */
 const jest = require( 'jest' );
 const { sync: spawn } = require( 'cross-spawn' );
 

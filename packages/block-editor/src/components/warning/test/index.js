@@ -9,8 +9,6 @@ import userEvent from '@testing-library/user-event';
  */
 import Warning from '../index';
 
-jest.useFakeTimers();
-
 describe( 'Warning', () => {
 	it( 'should match snapshot', () => {
 		const { container } = render( <Warning>error</Warning> );
@@ -33,9 +31,7 @@ describe( 'Warning', () => {
 	} );
 
 	it( 'should show hidden secondary actions', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render(
 			<Warning secondaryActions={ [ { title: 'test', onClick: null } ] }>

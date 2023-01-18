@@ -9,8 +9,6 @@ import userEvent from '@testing-library/user-event';
  */
 import URLInputButton from '../button';
 
-jest.useFakeTimers();
-
 describe( 'URLInputButton', () => {
 	it( 'should render a `Insert link` button and not be pressed when `url` is not provided', () => {
 		render( <URLInputButton /> );
@@ -57,9 +55,7 @@ describe( 'URLInputButton', () => {
 	} );
 
 	it( 'should render a form when `Insert link` button is clicked', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		render( <URLInputButton /> );
 
 		// Click the button to insert a link.
@@ -76,9 +72,7 @@ describe( 'URLInputButton', () => {
 	} );
 
 	it( 'should call `onChange` function once per each value change', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const onChangeMock = jest.fn();
 
 		render( <URLInputButton onChange={ onChangeMock } /> );
@@ -104,9 +98,7 @@ describe( 'URLInputButton', () => {
 	} );
 
 	it( 'should close the form when the user clicks the `Close` button', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render( <URLInputButton /> );
 
@@ -135,9 +127,7 @@ describe( 'URLInputButton', () => {
 	} );
 
 	it( 'should close the form when user submits it', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const onChangeMock = jest.fn();
 
 		render( <URLInputButton onChange={ onChangeMock } /> );

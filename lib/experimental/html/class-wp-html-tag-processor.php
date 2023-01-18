@@ -422,7 +422,7 @@ class WP_HTML_Tag_Processor {
 	 * @since 6.2.0
 	 * @var WP_HTML_Text_Replacement[]
 	 */
-	private $attribute_updates = array();
+	private $lexical_updates = array();
 
 	/**
 	 * Tracks how many times we've performed a `seek()`
@@ -1123,10 +1123,10 @@ class WP_HTML_Tag_Processor {
 	 * @since 6.2.0
 	 *
 	 * @see $classname_updates
-	 * @see $attribute_updates
+	 * @see $lexical_updates
 	 */
 	private function class_name_updates_to_attributes_updates() {
-		if ( count( $this->classname_updates ) === 0 || isset( $this->attribute_updates['class'] ) ) {
+		if ( count( $this->classname_updates ) === 0 || isset( $this->lexical_updates['class'] ) ) {
 			$this->classname_updates = array();
 			return;
 		}
@@ -1247,7 +1247,7 @@ class WP_HTML_Tag_Processor {
 	 * @since 6.2.0
 	 */
 	private function apply_attributes_updates() {
-		if ( ! count( $this->attribute_updates ) ) {
+		if ( ! count( $this->lexical_updates ) ) {
 			return;
 		}
 
@@ -1261,9 +1261,9 @@ class WP_HTML_Tag_Processor {
 		 * out of order, which could otherwise lead to mangled output,
 		 * partially-duplicate attributes, and overwritten attributes.
 		 */
-		usort( $this->attribute_updates, array( self::class, 'sort_start_ascending' ) );
+		usort( $this->lexical_updates, array( self::class, 'sort_start_ascending' ) );
 
-		foreach ( $this->attribute_updates as $diff ) {
+		foreach ( $this->lexical_updates as $diff ) {
 			$this->updated_html .= substr( $this->html, $this->updated_bytes, $diff->start - $this->updated_bytes );
 			$this->updated_html .= $diff->text;
 			$this->updated_bytes = $diff->end;
@@ -1271,7 +1271,7 @@ class WP_HTML_Tag_Processor {
 
 		foreach ( $this->bookmarks as $bookmark ) {
 			/**
-			 * As we loop through $this->attribute_updates, we keep comparing
+			 * As we loop through $this->lexical_updates, we keep comparing
 			 * $bookmark->start and $bookmark->end to $diff->start. We can't
 			 * change it and still expect the correct result, so let's accumulate
 			 * the deltas separately and apply them all at once after the loop.
@@ -1279,7 +1279,7 @@ class WP_HTML_Tag_Processor {
 			$head_delta = 0;
 			$tail_delta = 0;
 
-			foreach ( $this->attribute_updates as $diff ) {
+			foreach ( $this->lexical_updates as $diff ) {
 				$update_head = $bookmark->start >= $diff->start;
 				$update_tail = $bookmark->end >= $diff->start;
 
@@ -1302,7 +1302,7 @@ class WP_HTML_Tag_Processor {
 			$bookmark->end   += $tail_delta;
 		}
 
-		$this->attribute_updates = array();
+		$this->lexical_updates = array();
 	}
 
 	/**
@@ -1604,8 +1604,8 @@ class WP_HTML_Tag_Processor {
 			 *
 			 *    Result: <div id="new"/>
 			 */
-			$existing_attribute               = $this->attributes[ $comparable_name ];
-			$this->attribute_updates[ $name ] = new WP_HTML_Text_Replacement(
+			$existing_attribute             = $this->attributes[ $comparable_name ];
+			$this->lexical_updates[ $name ] = new WP_HTML_Text_Replacement(
 				$existing_attribute->start,
 				$existing_attribute->end,
 				$updated_attribute
@@ -1622,7 +1622,7 @@ class WP_HTML_Tag_Processor {
 			 *
 			 *    Result: <div id="new"/>
 			 */
-			$this->attribute_updates[ $comparable_name ] = new WP_HTML_Text_Replacement(
+			$this->lexical_updates[ $comparable_name ] = new WP_HTML_Text_Replacement(
 				$this->tag_name_starts_at + $this->tag_name_length,
 				$this->tag_name_starts_at + $this->tag_name_length,
 				' ' . $updated_attribute
@@ -1662,7 +1662,7 @@ class WP_HTML_Tag_Processor {
 		 *
 		 *    Result: <div />
 		 */
-		$this->attribute_updates[ $name ] = new WP_HTML_Text_Replacement(
+		$this->lexical_updates[ $name ] = new WP_HTML_Text_Replacement(
 			$this->attributes[ $name ]->start,
 			$this->attributes[ $name ]->end,
 			''
@@ -1724,7 +1724,7 @@ class WP_HTML_Tag_Processor {
 	 */
 	public function get_updated_html() {
 		// Short-circuit if there are no new updates to apply.
-		if ( ! count( $this->classname_updates ) && ! count( $this->attribute_updates ) ) {
+		if ( ! count( $this->classname_updates ) && ! count( $this->lexical_updates ) ) {
 			return $this->updated_html . substr( $this->html, $this->updated_bytes );
 		}
 

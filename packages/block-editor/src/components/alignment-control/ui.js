@@ -32,7 +32,7 @@ function AlignmentUI( {
 	value,
 	onChange,
 	alignmentControls = DEFAULT_ALIGNMENT_CONTROLS,
-	label = __( 'Align' ),
+	label = __( 'Align text' ),
 	describedBy = __( 'Change text alignment' ),
 	isCollapsed = true,
 	isToolbar,

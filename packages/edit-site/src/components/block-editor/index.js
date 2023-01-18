@@ -204,7 +204,7 @@ export default function BlockEditor() {
 							<BackButton />
 							<ResizableEditor
 								enableResizing={ enableResizing }
-								height={ sizes.height }
+								height={ sizes.height ?? '100%' }
 							>
 								<EditorCanvas
 									enableResizing={ enableResizing }
