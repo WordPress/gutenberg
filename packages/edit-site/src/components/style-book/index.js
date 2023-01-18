@@ -171,7 +171,7 @@ const Example = memo( ( { title, blocks, isSelected, onClick } ) => (
 			<BlockPreview
 				blocks={ blocks }
 				viewportWidth={ 0 }
-				__experimentalStyles={ [
+				additionalStyles={ [
 					{
 						css:
 							'.wp-block:first-child { margin-top: 0; }' +

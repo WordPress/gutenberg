@@ -36,8 +36,8 @@ const BlockPreviewPanel = ( { name, variation = '' } ) => {
 				<BlockPreview
 					blocks={ blocks }
 					viewportWidth={ viewportWidth }
-					__experimentalMinHeight={ minHeight }
-					__experimentalStyles={ [
+					minHeight={ minHeight }
+					additionalStyles={ [
 						{
 							css: `
 								body{
