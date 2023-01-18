@@ -214,25 +214,25 @@ const areColorsMultiplePalette = (
 	);
 };
 
-const getComputedBackgroundColorValueFromRef = (
+const normalizeColorValue = (
 	value: string | undefined,
 	ref: RefObject< HTMLElement > | null
 ) => {
-	let computedValue = value;
 	const currentValueIsCssVariable = /^var\(/.test( value ?? '' );
 
-	if ( currentValueIsCssVariable && ref?.current ) {
-		const { ownerDocument } = ref.current;
-		const { defaultView } = ownerDocument;
-		const computedBackgroundColor = defaultView?.getComputedStyle(
-			ref.current
-		).backgroundColor;
-
-		if ( computedBackgroundColor ) {
-			computedValue = colord( computedBackgroundColor ).toHex();
-		}
+	if ( ! currentValueIsCssVariable || ! ref?.current ) {
+		return value;
 	}
-	return computedValue;
+
+	const { ownerDocument } = ref.current;
+	const { defaultView } = ownerDocument;
+	const computedBackgroundColor = defaultView?.getComputedStyle(
+		ref.current
+	).backgroundColor;
+
+	return computedBackgroundColor
+		? colord( computedBackgroundColor ).toHex()
+		: value;
 };
 
 function UnforwardedColorPalette(
@@ -280,10 +280,7 @@ function UnforwardedColorPalette(
 	const renderCustomColorPicker = () => (
 		<DropdownContentWrapper paddingSize="none">
 			<ColorPicker
-				color={ getComputedBackgroundColorValueFromRef(
-					value,
-					customColorPaletteRef
-				) }
+				color={ normalizeColorValue( value, customColorPaletteRef ) }
 				onChange={ ( color ) => onChange( color ) }
 				enableAlpha={ enableAlpha }
 			/>
