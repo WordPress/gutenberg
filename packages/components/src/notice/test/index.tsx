@@ -42,7 +42,9 @@ describe( 'Notice', () => {
 	} );
 
 	it( 'should not have is-dismissible class when isDismissible prop is false', () => {
-		const { container } = render( <Notice isDismissible={ false } /> );
+		const { container } = render(
+			<Notice isDismissible={ false }>I cannot be dismissed!</Notice>
+		);
 		const wrapper = getNoticeWrapper( container );
 
 		expect( wrapper ).toHaveClass( 'components-notice' );
@@ -50,7 +52,7 @@ describe( 'Notice', () => {
 	} );
 
 	it( 'should default to info status', () => {
-		const { container } = render( <Notice /> );
+		const { container } = render( <Notice>FYI</Notice> );
 
 		expect( getNoticeWrapper( container ) ).toHaveClass( 'is-info' );
 	} );
