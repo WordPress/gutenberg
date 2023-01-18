@@ -528,6 +528,7 @@ describe( 'Links', () => {
 		// Navigate to and toggle the "Open in new tab" checkbox.
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Space' );
 
 		// Confirm that focus was not prematurely returned to the paragraph on
