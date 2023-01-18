@@ -10,20 +10,21 @@ import { css } from '@codemirror/lang-css';
 
 import { useEffect, useRef, Suspense } from '@wordpress/element';
 
-function CSSEditor() {
+function CSSEditor( { value } ) {
 	const editorRef = useRef();
 	useEffect( () => {
 		if ( editorRef.current ) {
 			new EditorView( {
 				extensions: [ basicSetup, css() ],
 				parent: editorRef.current,
+				doc: value,
 			} );
 		}
 	}, [ editorRef.current ] );
 
 	return (
 		<Suspense fallback={ <div>Loading</div> }>
-			<textinput ref={ editorRef }></textinput>
+			<div ref={ editorRef }></div>
 		</Suspense>
 	);
 }

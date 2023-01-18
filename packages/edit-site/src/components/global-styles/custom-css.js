@@ -49,26 +49,18 @@ function CustomCSSControl() {
 	return (
 		<>
 			<Suspense>
-				<CSSEditor />
+				<CSSEditor
+					value={
+						customCSS?.replace( ignoreThemeCustomCSS, '' ) ||
+						themeCustomCSS
+					}
+					onChange={ handleOnChange }
+				/>
 			</Suspense>
-			<TextareaControl
-				__nextHasNoMarginBottom
-				value={
-					customCSS?.replace( ignoreThemeCustomCSS, '' ) ||
-					themeCustomCSS
-				}
-				onChange={ ( value ) => handleOnChange( value ) }
-				rows={ 15 }
-				className="edit-site-global-styles__custom-css-input"
-				spellCheck={ false }
-				help={
-					<>
-						<ExternalLink href="https://wordpress.org/support/article/css/">
-							{ __( 'Learn more about CSS' ) }
-						</ExternalLink>
-					</>
-				}
-			/>
+			<ExternalLink href="https://wordpress.org/support/article/css/">
+				{ __( 'Learn more about CSS' ) }
+			</ExternalLink>
+
 			{ originalThemeCustomCSS && (
 				<Panel>
 					<PanelBody
