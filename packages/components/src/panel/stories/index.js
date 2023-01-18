@@ -4,6 +4,7 @@
 import Panel from '../';
 import PanelRow from '../row';
 import PanelBody from '../body';
+import InputControl from '../../input-control';
 
 /**
  * WordPress dependencies
@@ -53,6 +54,27 @@ Default.args = {
 				</PanelRow>
 			</PanelBody>
 		</>
+	),
+};
+
+/**
+ * `PanelRow` is a generic container for rows within a `PanelBody`.
+ * It is a flex container with a top margin for spacing.
+ */
+export const _PanelRow = Template.bind( {} );
+_PanelRow.args = {
+	children: (
+		<PanelBody title="My Profile">
+			<PanelRow>
+				<InputControl label="First name" />
+				<InputControl label="Last name" />
+			</PanelRow>
+			<PanelRow>
+				<div style={ { flex: 1 } }>
+					<InputControl label="Email" />
+				</div>
+			</PanelRow>
+		</PanelBody>
 	),
 };
 

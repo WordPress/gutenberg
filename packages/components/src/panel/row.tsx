@@ -28,6 +28,10 @@ function UnforwardedPanelRow(
 	);
 }
 
+/**
+ * `PanelRow` is a generic container for rows within a `PanelBody`.
+ * It is a flex container with a top margin for spacing.
+ */
 export const PanelRow = forwardRef( UnforwardedPanelRow );
 
 export default PanelRow;
