@@ -971,8 +971,8 @@ class WP_Theme_JSON_Gutenberg {
 		$parts = explode( '&', $css );
 		foreach ( $parts as $part ) {
 			$processed_css .= ( ! str_contains( $part, '{' ) )
-				? $selector . '{' . $part . '}' // If the part doesn't contain braces, it applies to the root level.
-				: $selector . $part; // Prepend the selector, which effectively replaces the "&" character.
+				? trim( $selector ) . '{' . trim( $part ) . '}' // If the part doesn't contain braces, it applies to the root level.
+				: trim( $selector . $part ); // Prepend the selector, which effectively replaces the "&" character.
 		}
 		return $processed_css;
 	}
