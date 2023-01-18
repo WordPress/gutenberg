@@ -964,7 +964,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @return string The processed CSS.
 	 */
-	private function process_blocks_custom_css_nested_styles( $css, $selector ) {
+	public function process_blocks_custom_css_nested_styles( $css, $selector ) {
 		$processed_css = '';
 
 		// Split CSS nested rules.
