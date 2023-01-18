@@ -1314,20 +1314,20 @@ class WP_HTML_Tag_Processor {
 			$tail_delta = 0;
 
 			foreach ( $this->lexical_updates as $diff ) {
-				$update_head = $bookmark->start >= $diff->start;
-				$update_tail = $bookmark->end >= $diff->start;
+				$bookmark_start_is_after_diff_start = $bookmark->start >= $diff->start;
+				$bookmark_end_is_after_diff_end     = $bookmark->end >= $diff->start;
 
-				if ( ! $update_head && ! $update_tail ) {
+				if ( ! $bookmark_start_is_after_diff_start && ! $bookmark_end_is_after_diff_end ) {
 					break;
 				}
 
 				$delta = strlen( $diff->text ) - ( $diff->end - $diff->start );
 
-				if ( $update_head ) {
+				if ( $bookmark_start_is_after_diff_start ) {
 					$head_delta += $delta;
 				}
 
-				if ( $update_tail ) {
+				if ( $bookmark_end_is_after_diff_end ) {
 					$tail_delta += $delta;
 				}
 			}
