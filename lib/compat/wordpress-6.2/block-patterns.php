@@ -9,14 +9,6 @@
  * Registers the block pattern categories.
  */
 function gutenberg_register_core_block_patterns_categories() {
-	register_block_pattern_category(
-		'query',
-		array(
-			'label'       => _x( 'Posts', 'Block pattern category', 'gutenberg' ),
-			'description' => __( 'Display your latest posts in lists, grids or other layouts.', 'gutenberg' ),
-		)
-	);
-
 	// Register new core block pattern categories.
 	register_block_pattern_category(
 		'call-to-action',
