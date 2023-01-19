@@ -35,11 +35,10 @@ export const cleanEmptyObject = ( object ) => {
  * Supports strings, numbers and arrays:
  *
  * 'foo' => [ 'foo' ]
- * 'foo.bar.baz' => [ 'foo', 'bar', 'baz' ]
  * 2 => [ '2' ]
  * [ 'foo', 'bar' ] => [ 'foo', 'bar' ]
  *
- * @param {number|string|Array} path Path
+ * @param {string|number|Array} path Path
  * @return {Array} Normalized path.
  */
 function normalizePath( path ) {
@@ -49,7 +48,7 @@ function normalizePath( path ) {
 		return [ path.toString() ];
 	}
 
-	return path.split( '.' ).filter( Boolean );
+	return [ path ];
 }
 
 /**

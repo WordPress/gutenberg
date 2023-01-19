@@ -63,36 +63,6 @@ describe( 'immutableSet', () => {
 			expect( result ).toEqual( { test: 2 } );
 		} );
 
-		describe( 'with dot notation access', () => {
-			it( 'assigns values at deeper levels', () => {
-				const result = immutableSet( {}, 'foo.bar.baz', 5 );
-
-				expect( result ).toEqual( { foo: { bar: { baz: 5 } } } );
-			} );
-
-			it( 'overrides existing values at deeper levels', () => {
-				const result = immutableSet(
-					{ foo: { bar: { baz: 1 } } },
-					'foo.bar.baz',
-					5
-				);
-
-				expect( result ).toEqual( { foo: { bar: { baz: 5 } } } );
-			} );
-
-			it( 'keeps other properties intact', () => {
-				const result = immutableSet(
-					{ foo: { bar: { baz: 1 } } },
-					'foo.bar.test',
-					5
-				);
-
-				expect( result ).toEqual( {
-					foo: { bar: { baz: 1, test: 5 } },
-				} );
-			} );
-		} );
-
 		describe( 'with array notation access', () => {
 			it( 'assigns values at deeper levels', () => {
 				const result = immutableSet( {}, [ 'foo', 'bar', 'baz' ], 5 );
@@ -134,7 +104,7 @@ describe( 'immutableSet', () => {
 
 		it( 'clones the object at deeper levels', () => {
 			const input = { foo: { bar: { baz: 1 } } };
-			const result = immutableSet( input, 'foo.bar.baz', 2 );
+			const result = immutableSet( input, [ 'foo', 'bar', 'baz' ], 2 );
 
 			expect( result ).not.toBe( input );
 			expect( result.foo ).not.toBe( input.foo );
