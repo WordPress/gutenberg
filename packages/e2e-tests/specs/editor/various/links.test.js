@@ -769,6 +769,7 @@ describe( 'Links', () => {
 			await page.keyboard.press( 'Tab' );
 			await page.keyboard.press( 'Tab' );
 			await page.keyboard.press( 'Tab' );
+			await page.keyboard.press( 'Tab' );
 
 			// Make a selection within the RichText.
 			await pressKeyWithModifier( 'shift', 'ArrowRight' );
