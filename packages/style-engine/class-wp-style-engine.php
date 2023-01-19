@@ -136,16 +136,16 @@ final class WP_Style_Engine {
 				),
 			),
 		),
-		'shadow' => array(
+		'shadow'     => array(
 			'shadow' => array(
 				'property_keys' => array(
-					'default'    => 'box-shadow',
+					'default' => 'box-shadow',
 				),
 				'path'          => array( 'shadow' ),
 				'css_vars'      => array(
 					'shadow' => '--wp--preset--shadow--$slug',
 				),
-			)
+			),
 		),
 		'dimensions' => array(
 			'minHeight' => array(
