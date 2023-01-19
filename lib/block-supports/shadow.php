@@ -38,14 +38,14 @@ function gutenberg_register_shadow_support( $block_type ) {
 }
 
 /**
- * Add CSS classes and inline styles for typography features such as font sizes
- * to the incoming attributes array. This will be applied to the block markup in
+ * Add CSS classes and inline styles for shadow features to the incoming attributes array.
+ * This will be applied to the block markup in
  * the front-end.
  *
  * @param  WP_Block_Type $block_type       Block type.
  * @param  array         $block_attributes Block attributes.
  *
- * @return array Typography CSS classes and inline styles.
+ * @return array Shadow CSS classes and inline styles.
  */
 function gutenberg_apply_shadow_support( $block_type, $block_attributes ) {
 	if ( ! property_exists( $block_type, 'supports' ) ) {
@@ -59,9 +59,9 @@ function gutenberg_apply_shadow_support( $block_type, $block_attributes ) {
 
 	$shadow_block_styles = array();
 
-	$preset_shadow = array_key_exists( 'shadow', $block_attributes ) ? "var:preset|shadow|{$block_attributes['shadow']}" : null;
-    $custom_shadow                    = isset( $block_attributes['style']['shadow'] ) ? $block_attributes['style']['shadow'] : null;
-    $shadow_block_styles['shadow'] = $preset_shadow ? $preset_shadow : $custom_shadow;
+	$preset_shadow                 = array_key_exists( 'shadow', $block_attributes ) ? "var:preset|shadow|{$block_attributes['shadow']}" : null;
+	$custom_shadow                 = isset( $block_attributes['style']['shadow'] ) ? $block_attributes['style']['shadow'] : null;
+	$shadow_block_styles['shadow'] = $preset_shadow ? $preset_shadow : $custom_shadow;
 
 	$attributes = array();
 	$styles     = gutenberg_style_engine_get_styles( $shadow_block_styles );
