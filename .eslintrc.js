@@ -101,6 +101,7 @@ const restrictedImports = [
 			'keys',
 			'last',
 			'lowerCase',
+			'map',
 			'mapKeys',
 			'maxBy',
 			'memoize',
