@@ -135,6 +135,7 @@ function gutenberg_register_core_block_patterns_categories() {
 		array(
 			'label'       => _x( 'Headers', 'Block pattern category', 'gutenberg' ),
 			'description' => __( 'A variety of header designs displaying your site title and navigation.', 'gutenberg' ),
+			'editors'    => array( 'core/site' ),
 		)
 	);
 }

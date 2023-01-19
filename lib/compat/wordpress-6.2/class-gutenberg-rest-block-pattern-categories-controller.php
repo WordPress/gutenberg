@@ -25,7 +25,7 @@ class Gutenberg_REST_Block_Pattern_Categories_Controller extends WP_REST_Block_P
 	 */
 	public function prepare_item_for_response( $item, $request ) {
 		$fields = $this->get_fields_for_response( $request );
-		$keys   = array( 'name', 'label', 'description' );
+		$keys   = array( 'name', 'label', 'description', 'editors' );
 		$data   = array();
 		foreach ( $keys as $key ) {
 			if ( isset( $item[ $key ] ) && rest_is_field_included( $key, $fields ) ) {
@@ -67,6 +67,12 @@ class Gutenberg_REST_Block_Pattern_Categories_Controller extends WP_REST_Block_P
 				'description' => array(
 					'description' => __( 'The category description, in human readable format.', 'gutenberg' ),
 					'type'        => 'string',
+					'readonly'    => true,
+					'context'     => array( 'view', 'edit', 'embed' ),
+				),
+				'editors' => array(
+					'description' => __( 'The editors this category is allowed to be shown on.', 'gutenberg' ),
+					'type'        => 'array',
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),

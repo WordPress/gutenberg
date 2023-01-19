@@ -102,10 +102,17 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			[
 				...( settingsBlockPatternCategories || [] ),
 				...( restBlockPatternCategories || [] ),
-			].filter(
-				( x, index, arr ) =>
-					index === arr.findIndex( ( y ) => x.name === y.name )
-			),
+			]
+				.filter(
+					( x, index, arr ) =>
+						index === arr.findIndex( ( y ) => x.name === y.name )
+				)
+				.filter( ( cat ) => {
+					if ( ! cat?.editors?.length ) {
+						return true;
+					}
+					return cat.editors.includes( 'core/post' );
+				} ),
 		[ settingsBlockPatternCategories, restBlockPatternCategories ]
 	);
 
