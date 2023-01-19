@@ -124,14 +124,14 @@ The format of the categories list also needs to be updated to match what `FormTo
 
 ### Props
 
-#### `authorList`: `Entity[]`
+#### `authorList`: `AuthorSelectProps[ 'authorList' ]`
 
 An array of authors that is passed into an `AuthorSelect` sub-component.
 
 -   Required: No
 -   Platform: Web
 
-#### `categoriesList`: `Entity[]`
+#### `categoriesList`: `CategorySelectProps[ 'categoriesList' ]`
 
 An array of categories, renders a `CategorySelect` sub-component when passed in conjunction with `onCategoryChange`.
 
@@ -168,14 +168,14 @@ The selected number of items to retrieve via the query.
 -   Required: No
 -   Platform: Web
 
-#### `onAuthorChange`: `TreeSelectProps[ 'onChange' ]`
+#### `onAuthorChange`: `AuthorSelectProps[ 'onChange' ]`
 
 A function that receives the new author value. If this is not specified, the author controls are not included.
 
 -   Required: No
 -   Platform: Web
 
-#### `onCategoryChange`: `TreeSelectProps[ 'onChange' ] & FormTokenFieldProps[ 'onChange' ]`
+#### `onCategoryChange`: `CategorySelectProps[ 'onChange' ] | FormTokenFieldProps[ 'onChange' ]`
 
 A function that receives the new category value. If this is not specified, the category controls are not included.
 
@@ -189,35 +189,35 @@ A function that receives the new number of items value. If this is not specified
 -   Required: No
 -   Platform: Web
 
-#### `onOrderChange`: `( newOrder: string ) => void`
+#### `onOrderChange`: `( newOrder: Order ) => void`
 
 A function that receives the new order value. If this or onOrderByChange are not specified, then the order controls are not included.
 
 -   Required: No
 -   Platform: Web
 
-#### `onOrderByChange`: `( newOrderBy: string ) => void`
+#### `onOrderByChange`: `( newOrderBy: OrderBy ) => void`
 
 A function that receives the new orderby value. If this or onOrderChange are not specified, then the order controls are not included.
 
 -   Required: No
 -   Platform: Web
 
-#### `order`: `'asc' | 'desc'`
+#### `order`: `Order`
 
 The order in which to retrieve posts.
 
 -   Required: No
 -   Platform: Web
 
-#### `orderBy`: `'data' | 'title'`
+#### `orderBy`: `OrderBy`
 
 The meta key by which to order posts.
 
 -   Required: No
 -   Platform: Web
 
-#### `selectedAuthorId`: `Entity[ 'id' ]`
+#### `selectedAuthorId`: `AuthorSelectProps[ 'selectedAuthorId' ]`
 
 The selected author ID.
 
@@ -231,7 +231,7 @@ The selected categories for the `categorySuggestions`.
 -   Required: No
 -   Platform: Web
 
-#### `selectedCategoryId`: `Category[ 'id' ]`
+#### `selectedCategoryId`: `CategorySelectProps[ 'selectedCategoryId' ]`
 
 The selected category for the `categoriesList`.
 
