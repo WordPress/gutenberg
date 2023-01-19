@@ -10,13 +10,6 @@
  */
 function gutenberg_register_core_block_patterns_categories() {
 	register_block_pattern_category(
-		'buttons',
-		array(
-			'label'       => _x( 'Buttons', 'Block pattern category', 'gutenberg' ),
-			'description' => __( 'Patterns that contain buttons and call to actions.', 'gutenberg' ),
-		)
-	);
-	register_block_pattern_category(
 		'columns',
 		array(
 			'label'       => _x( 'Columns', 'Block pattern category', 'gutenberg' ),
