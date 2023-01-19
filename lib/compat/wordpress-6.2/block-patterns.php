@@ -80,7 +80,16 @@ function gutenberg_register_core_block_patterns_categories() {
 			'description' => __( 'Display your latest posts in lists, grids or other layouts.', 'gutenberg' ),
 		)
 	);
+	register_block_pattern_category(
+		'products',
+		array(
+			'label'       => _x( 'Products', 'Block pattern category', 'gutenberg' ),
+			'description' => __( "Display your store's products in lists, grids or other layouts.", 'gutenberg' ),
+		)
+	);
+
 	// Site building pattern categories.
+	// Todo: register in the Site Editor only.
 	register_block_pattern_category(
 		'footer',
 		array(
