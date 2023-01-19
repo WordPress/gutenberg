@@ -6,7 +6,7 @@ import { render, screen } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import PanelHeader from '../header.js';
+import PanelHeader from '../header';
 
 describe( 'PanelHeader', () => {
 	describe( 'basic rendering', () => {
