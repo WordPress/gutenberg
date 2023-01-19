@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
@@ -148,6 +153,12 @@ export default function Editor() {
 		return <CanvasSpinner />;
 	}
 
+	const className = classnames( {
+		'show-icon-labels': showIconLabels,
+		'inserter-open': isInserterOpen,
+		'list-view-open': isListViewOpen,
+	} );
+
 	return (
 		<>
 			{ isEditMode && <WelcomeGuide /> }
@@ -163,9 +174,7 @@ export default function Editor() {
 							{ isEditMode && <StartTemplateOptions /> }
 							<InterfaceSkeleton
 								enableRegionNavigation={ false }
-								className={
-									showIconLabels && 'show-icon-labels'
-								}
+								className={ className }
 								notices={ isEditMode && <EditorSnackbars /> }
 								content={
 									<>
