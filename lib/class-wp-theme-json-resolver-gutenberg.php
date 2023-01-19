@@ -245,9 +245,6 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			} else {
 				$theme_json_data = array();
 			}
-			// BEGIN OF EXPERIMENTAL CODE. Not to backport to core.
-			$theme_json_data = gutenberg_add_registered_fonts_to_theme_json( $theme_json_data );
-			// END OF EXPERIMENTAL CODE.
 
 			/**
 			 * Filters the data provided by the theme for global styles and settings.
@@ -266,9 +263,6 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				if ( '' !== $parent_theme_json_file ) {
 					$parent_theme_json_data = static::read_json_file( $parent_theme_json_file );
 					$parent_theme_json_data = static::translate( $parent_theme_json_data, $wp_theme->parent()->get( 'TextDomain' ) );
-					// BEGIN OF EXPERIMENTAL CODE. Not to backport to core.
-					$parent_theme_json_data = gutenberg_add_registered_fonts_to_theme_json( $parent_theme_json_data );
-					// END OF EXPERIMENTAL CODE.
 					$parent_theme = new WP_Theme_JSON_Gutenberg( $parent_theme_json_data );
 
 					/*
@@ -279,6 +273,11 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 					static::$theme = $parent_theme;
 				}
 			}
+
+			// BEGIN OF EXPERIMENTAL CODE. Not to backport to core.
+			static::$theme = gutenberg_add_registered_fonts_to_theme_json( static::$theme );
+			// END OF EXPERIMENTAL CODE.
+
 		}
 
 		if ( ! $options['with_supports'] ) {
