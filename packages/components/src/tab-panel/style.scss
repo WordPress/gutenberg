@@ -24,6 +24,7 @@
 	&:focus:not(:disabled) {
 		position: relative;
 		box-shadow: none;
+		outline: none;
 	}
 
 	// Tab indicator
@@ -48,6 +49,10 @@
 	// Active.
 	&.is-active::after {
 		height: calc(1 * var(--wp-admin-border-width-focus));
+
+		// Windows high contrast mode.
+		outline: 2px solid transparent;
+		outline-offset: -1px;
 	}
 
 	// Focus.
@@ -71,5 +76,8 @@
 
 	&:focus-visible::before {
 		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+
+		// Windows high contrast mode.
+		outline: 2px solid transparent;
 	}
 }

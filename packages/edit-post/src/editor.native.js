@@ -2,7 +2,6 @@
  * External dependencies
  */
 import memize from 'memize';
-import { map } from 'lodash';
 import { I18nManager } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
@@ -74,7 +73,7 @@ class Editor extends Component {
 			// all block types).
 			const defaultAllowedBlockTypes =
 				true === settings.allowedBlockTypes
-					? map( blockTypes, 'name' )
+					? blockTypes.map( ( { name } ) => name )
 					: settings.allowedBlockTypes || [];
 
 			settings.allowedBlockTypes = defaultAllowedBlockTypes.filter(

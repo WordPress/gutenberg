@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { set, map, get } from 'lodash';
+import { set, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -147,9 +147,9 @@ export function getCurrentUser( state: State ): ET.User< 'edit' > {
  */
 export const getUserQueryResults = createSelector(
 	( state: State, queryID: string ): ET.User< 'edit' >[] => {
-		const queryResults = state.users.queries[ queryID ];
+		const queryResults = state.users.queries[ queryID ] ?? [];
 
-		return map( queryResults, ( id ) => state.users.byId[ id ] );
+		return queryResults.map( ( id ) => state.users.byId[ id ] );
 	},
 	( state: State, queryID: string ) => [
 		state.users.queries[ queryID ],

@@ -486,11 +486,17 @@ function GalleryEdit( props ) {
 		className: classnames( className, 'has-nested-images' ),
 	} );
 
+	const nativeInnerBlockProps = Platform.isNative && {
+		marginHorizontal: 0,
+		marginVertical: 0,
+	};
+
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks,
 		orientation: 'horizontal',
 		renderAppender: false,
 		__experimentalLayout: LAYOUT,
+		...nativeInnerBlockProps,
 	} );
 
 	if ( ! hasImages ) {
@@ -531,6 +537,7 @@ function GalleryEdit( props ) {
 						help={ getImageCropHelp }
 					/>
 					<SelectControl
+						__nextHasNoMarginBottom
 						label={ __( 'Link to' ) }
 						value={ linkTo }
 						onChange={ setLinkTo }
@@ -546,6 +553,7 @@ function GalleryEdit( props ) {
 					) }
 					{ imageSizeOptions?.length > 0 && (
 						<SelectControl
+							__nextHasNoMarginBottom
 							label={ __( 'Image size' ) }
 							value={ sizeSlug }
 							options={ imageSizeOptions }

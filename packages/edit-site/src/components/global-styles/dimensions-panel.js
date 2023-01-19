@@ -197,8 +197,11 @@ function useWideSizeProps( name ) {
 }
 
 // Props for managing `spacing.padding`.
-function usePaddingProps( name ) {
-	const [ rawPadding, setRawPadding ] = useStyle( 'spacing.padding', name );
+function usePaddingProps( name, variationPath = '' ) {
+	const [ rawPadding, setRawPadding ] = useStyle(
+		variationPath + 'spacing.padding',
+		name
+	);
 	const paddingValues = splitStyleValue( rawPadding );
 	const paddingSides = useCustomSides( name, 'padding' );
 	const isAxialPadding =
@@ -210,7 +213,11 @@ function usePaddingProps( name ) {
 		setRawPadding( padding );
 	};
 	const resetPaddingValue = () => setPaddingValues( {} );
-	const [ userSetPaddingValue ] = useStyle( 'spacing.padding', name, 'user' );
+	const [ userSetPaddingValue ] = useStyle(
+		variationPath + 'spacing.padding',
+		name,
+		'user'
+	);
 	// The `hasPaddingValue` check does not need a parsed value, as `userSetPaddingValue` will be `undefined` if not set.
 	const hasPaddingValue = () => !! userSetPaddingValue;
 
@@ -225,8 +232,11 @@ function usePaddingProps( name ) {
 }
 
 // Props for managing `spacing.margin`.
-function useMarginProps( name ) {
-	const [ rawMargin, setRawMargin ] = useStyle( 'spacing.margin', name );
+function useMarginProps( name, variationPath = '' ) {
+	const [ rawMargin, setRawMargin ] = useStyle(
+		variationPath + 'spacing.margin',
+		name
+	);
 	const marginValues = splitStyleValue( rawMargin );
 	const marginSides = useCustomSides( name, 'margin' );
 	const isAxialMargin =
@@ -252,14 +262,21 @@ function useMarginProps( name ) {
 }
 
 // Props for managing `spacing.blockGap`.
-function useBlockGapProps( name ) {
-	const [ gapValue, setGapValue ] = useStyle( 'spacing.blockGap', name );
+function useBlockGapProps( name, variationPath = '' ) {
+	const [ gapValue, setGapValue ] = useStyle(
+		variationPath + 'spacing.blockGap',
+		name
+	);
 	const gapValues = splitGapValue( gapValue );
 	const gapSides = useCustomSides( name, 'blockGap' );
 	const isAxialGap =
 		gapSides && gapSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
 	const resetGapValue = () => setGapValue( undefined );
-	const [ userSetGapValue ] = useStyle( 'spacing.blockGap', name, 'user' );
+	const [ userSetGapValue ] = useStyle(
+		variationPath + 'spacing.blockGap',
+		name,
+		'user'
+	);
 	const hasGapValue = () => !! userSetGapValue;
 	const setGapValues = ( nextBoxGapValue ) => {
 		if ( ! nextBoxGapValue ) {
@@ -288,9 +305,9 @@ function useBlockGapProps( name ) {
 }
 
 // Props for managing `dimensions.minHeight`.
-function useMinHeightProps( name ) {
+function useMinHeightProps( name, variationPath = '' ) {
 	const [ minHeightValue, setMinHeightValue ] = useStyle(
-		'dimensions.minHeight',
+		variationPath + 'dimensions.minHeight',
 		name
 	);
 	const resetMinHeightValue = () => setMinHeightValue( undefined );
@@ -303,7 +320,7 @@ function useMinHeightProps( name ) {
 	};
 }
 
-export default function DimensionsPanel( { name } ) {
+export default function DimensionsPanel( { name, variationPath = '' } ) {
 	const showContentSizeControl = useHasContentSize( name );
 	const showWideSizeControl = useHasWideSize( name );
 	const showPaddingControl = useHasPadding( name );
@@ -345,7 +362,7 @@ export default function DimensionsPanel( { name } ) {
 		setPaddingValues,
 		resetPaddingValue,
 		hasPaddingValue,
-	} = usePaddingProps( name );
+	} = usePaddingProps( name, variationPath );
 
 	// Props for managing `spacing.margin`.
 	const {
@@ -355,7 +372,7 @@ export default function DimensionsPanel( { name } ) {
 		setMarginValues,
 		resetMarginValue,
 		hasMarginValue,
-	} = useMarginProps( name );
+	} = useMarginProps( name, variationPath );
 
 	// Props for managing `spacing.blockGap`.
 	const {
@@ -367,7 +384,7 @@ export default function DimensionsPanel( { name } ) {
 		setGapValues,
 		resetGapValue,
 		hasGapValue,
-	} = useBlockGapProps( name );
+	} = useBlockGapProps( name, variationPath );
 
 	// Props for managing `dimensions.minHeight`.
 	const {
@@ -375,7 +392,7 @@ export default function DimensionsPanel( { name } ) {
 		setMinHeightValue,
 		resetMinHeightValue,
 		hasMinHeightValue,
-	} = useMinHeightProps( name );
+	} = useMinHeightProps( name, variationPath );
 
 	const resetAll = () => {
 		resetPaddingValue();

@@ -131,7 +131,7 @@ export function saveViewPanel( state = false, action ) {
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  */
-function canvasMode( state = 'view', action ) {
+function canvasMode( state = 'init', action ) {
 	switch ( action.type ) {
 		case 'SET_CANVAS_MODE':
 			return action.mode;

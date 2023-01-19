@@ -78,7 +78,7 @@ describe( 'withDispatch', () => {
 
 		// Function value reference should not have changed in props update.
 		// The spy method is only called during inital render.
-		expect( ButtonSpy ).toBeCalledTimes( 1 );
+		expect( ButtonSpy ).toHaveBeenCalledTimes( 1 );
 
 		await user.click( screen.getByRole( 'button' ) );
 		expect( registry.select( 'counter' ).getCount() ).toBe( 2 );

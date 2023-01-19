@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -68,15 +63,14 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 			value: '',
 			disabled: true,
 		};
-		const taxonomyOptions = map(
-			taxonomies?.filter( ( tax ) => !! tax.show_cloud ),
-			( item ) => {
+		const taxonomyOptions = ( taxonomies ?? [] )
+			.filter( ( tax ) => !! tax.show_cloud )
+			.map( ( item ) => {
 				return {
 					value: item.slug,
 					label: item.name,
 				};
-			}
-		);
+			} );
 
 		return [ selectOption, ...taxonomyOptions ];
 	};
@@ -109,6 +103,7 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>
 				<SelectControl
+					__nextHasNoMarginBottom
 					label={ __( 'Taxonomy' ) }
 					options={ getTaxonomyOptions() }
 					value={ taxonomy }
