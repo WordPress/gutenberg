@@ -16,6 +16,8 @@ export default function SidebarNavigationScreen( {
 	title,
 	content,
 } ) {
+	const TagName = parentTitle ? 'div' : 'h2';
+
 	return (
 		<NavigatorScreen
 			className="edit-site-sidebar-navigation-screen"
@@ -40,15 +42,9 @@ export default function SidebarNavigationScreen( {
 					) : (
 						<div className="edit-site-sidebar-navigation-screen__icon-placeholder" />
 					) }
-					{ ! parentTitle ? (
-						<div className="edit-site-sidebar-navigation-screen__title">
-							<h2>{ title }</h2>
-						</div>
-					) : (
-						<div className="edit-site-sidebar-navigation-screen__title">
-							{ title }
-						</div>
-					) }
+					<TagName className="edit-site-sidebar-navigation-screen__title">
+						{ title }
+					</TagName>
 				</HStack>
 
 				<nav className="edit-site-sidebar-navigation-screen__content">
