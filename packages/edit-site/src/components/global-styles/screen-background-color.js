@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -98,7 +103,13 @@ function ScreenBackgroundColor( { name, variationPath = '' } ) {
 				) }
 			/>
 			<ColorGradientControl
-				className="edit-site-screen-background-color__control"
+				className={ classnames(
+					'edit-site-screen-background-color__control',
+					{
+						'has-no-tabs':
+							! hasBackgroundColor || ! hasGradientColor,
+					}
+				) }
 				colors={ colorsPerOrigin }
 				gradients={ gradientsPerOrigin }
 				disableCustomColors={ ! areCustomSolidsEnabled }
