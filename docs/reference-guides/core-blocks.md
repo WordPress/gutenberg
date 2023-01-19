@@ -456,7 +456,7 @@ Show a block pattern. ([Source](https://github.com/WordPress/gutenberg/tree/trun
 -	**Name:** core/pattern
 -	**Category:** theme
 -	**Supports:** ~~html~~, ~~inserter~~
--	**Attributes:** slug
+-	**Attributes:** slug, templateLock
 
 ## Post Author
 

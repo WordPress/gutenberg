@@ -13,6 +13,10 @@
 	"attributes": {
 		"slug": {
 			"type": "string"
+		},
+		"templateLock": {
+			"type": [ "string", "boolean" ],
+			"enum": [ "all", "insert", "contentOnly", false ]
 		}
 	}
 }
