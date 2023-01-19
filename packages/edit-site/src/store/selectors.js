@@ -2,6 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
+import memoize from 'memize';
 
 /**
  * WordPress dependencies
@@ -248,29 +249,59 @@ export function isSaveViewOpened( state ) {
 }
 
 /**
- * Turns a recursive list of blocks into a flat list of blocks annotated with
- * their child index and parent block.
+ * Helper method to iterate through all blocks, recursing into inner blocks.
+ * Returns a flattened array of all blocks.
  *
- * @param {Object} parentBlock A parent block to flatten
- * @return {Object} A flat list of blocks, annotated by their index and parent ID, consisting
- * 							    of all the input blocks and all the inner blocks in the tree.
+ * @param {Array} blocks Blocks to flatten.
+ *
+ * @return {Array} Flattened object.
  */
-function blocksTreeToAnnotatedList( parentBlock ) {
-	return ( parentBlock.innerBlocks || [] ).flatMap( ( innerBlock, index ) =>
-		[ { block: innerBlock, parentBlock, childIndex: index } ].concat(
-			blocksTreeToAnnotatedList( innerBlock )
-		)
-	);
+function flattenBlocks( blocks ) {
+	const result = [];
+
+	const stack = [ ...blocks ];
+	while ( stack.length ) {
+		const { innerBlocks, ...block } = stack.shift();
+		// Place inner blocks at the beginning of the stack to preserve order.
+		stack.unshift( ...innerBlocks );
+		result.push( block );
+	}
+
+	return result;
 }
 
-function getFlattenedBlockList( blockList = [] ) {
-	const list = blockList.flatMap( ( rootBlock ) =>
-		[ rootBlock ].concat(
-			blocksTreeToAnnotatedList( rootBlock ).map( ( { block } ) => block )
-		)
-	);
-	return list;
+function getFilteredTemplatePartBlocks( templateBlocks = [], templateParts ) {
+	const templatePartsById = templateParts
+		? // Key template parts by their ID.
+		  templateParts.reduce(
+				( newTemplateParts, part ) => ( {
+					...newTemplateParts,
+					[ part.id ]: part,
+				} ),
+				{}
+		  )
+		: {};
+
+	return flattenBlocks( templateBlocks )
+		.filter( ( block ) => isTemplatePart( block ) )
+		.map( ( block ) => {
+			const {
+				attributes: { theme, slug },
+			} = block;
+			const templatePartId = `${ theme }//${ slug }`;
+			const templatePart = templatePartsById[ templatePartId ];
+
+			return {
+				templatePart,
+				block,
+			};
+		} )
+		.filter( ( { templatePart } ) => !! templatePart );
 }
+
+const memoizedGetFilteredTemplatePartBlocks = memoize(
+	getFilteredTemplatePartBlocks
+);
 
 /**
  * Returns the template parts and their blocks for the current edited template.
@@ -293,32 +324,11 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
 			'wp_template_part',
 			{ per_page: -1 }
 		);
-		const templatePartsById = templateParts
-			? // Key template parts by their ID.
-			  templateParts.reduce(
-					( newTemplateParts, part ) => ( {
-						...newTemplateParts,
-						[ part.id ]: part,
-					} ),
-					{}
-			  )
-			: {};
 
-		return getFlattenedBlockList( template.blocks ?? [] )
-			.filter( ( block ) => isTemplatePart( block ) )
-			.map( ( block ) => {
-				const {
-					attributes: { theme, slug },
-				} = block;
-				const templatePartId = `${ theme }//${ slug }`;
-				const templatePart = templatePartsById[ templatePartId ];
-
-				return {
-					templatePart,
-					block,
-				};
-			} )
-			.filter( ( { templatePart } ) => !! templatePart );
+		return memoizedGetFilteredTemplatePartBlocks(
+			template.blocks || [],
+			templateParts
+		);
 	}
 );
 
