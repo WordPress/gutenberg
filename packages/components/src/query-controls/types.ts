@@ -128,7 +128,8 @@ export type QueryControlsWithMultipleCategorySelectionProps =
 		 * The selected categories for the `categorySuggestions`.
 		 */
 		selectedCategories?: Array<
-			Entity & {
+			Omit< Entity, 'name' > & {
+				name?: string;
 				value: string;
 			}
 		>;
