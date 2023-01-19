@@ -19,19 +19,13 @@ export type TermsWithChildren = Array<
 	EntityForTree & { children: EntityForTree[] }
 >;
 
-export type Category = {
-	id: number;
-	value: string;
-	name?: string;
-};
-
 export type CategorySelectProps = Pick<
 	TreeSelectProps,
 	'label' | 'noOptionLabel'
 > & {
 	categoriesList: Entity[];
 	onChange: ( newCategory: string ) => void;
-	selectedCategoryId?: Category[ 'id' ];
+	selectedCategoryId?: Entity[ 'id' ];
 };
 
 export type AuthorSelectProps = Pick<
@@ -133,7 +127,11 @@ export type QueryControlsWithMultipleCategorySelectionProps =
 		/**
 		 * The selected categories for the `categorySuggestions`.
 		 */
-		selectedCategories?: Category[];
+		selectedCategories?: Array<
+			Entity & {
+				value: string;
+			}
+		>;
 		/**
 		 * A function that receives the new category value.
 		 * If this is not specified, the category controls are not included.

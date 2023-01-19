@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
  */
 import QueryControls from '..';
 import type {
-	Category,
+	Entity,
 	QueryControlsProps,
 	QueryControlsWithSingleCategorySelectionProps,
 	QueryControlsWithMultipleCategorySelectionProps,
@@ -77,10 +77,10 @@ export const Default: ComponentStory< typeof QueryControls > = ( args ) => {
 						? props.categorySuggestions?.[ token ]
 						: token;
 				} )
-				.filter( Boolean ) as Category[];
+				.filter( Boolean ) as Array< Required< Entity > >;
 
 			setOwnSelectedCategories( allCategories );
-	};
+		};
 
 	return (
 		<QueryControls
@@ -99,7 +99,7 @@ export const Default: ComponentStory< typeof QueryControls > = ( args ) => {
 			orderBy={ ownOrderBy }
 			onNumberOfItemsChange={ ( newNumber ) => {
 				onNumberOfItemsChange?.( newNumber );
-+				setOwnNumberOfItems( newNumber );
+				setOwnNumberOfItems( newNumber );
 			} }
 			onAuthorChange={ ( newAuthor ) => {
 				onAuthorChange?.( newAuthor );
@@ -135,10 +135,12 @@ Default.args = {
 	selectedCategories: [
 		{
 			id: 11,
+			name: 'TypeScript',
 			value: 'TypeScript',
 		},
 		{
 			id: 12,
+			name: 'JavaScript',
 			value: 'JavaScript',
 		},
 	],
