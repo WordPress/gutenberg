@@ -19,8 +19,8 @@
 	}
 
 	@media (min-width: $break-medium) {
-		.inserter-open .components-editor-notices__snackbar,
-		.list-view-open .components-editor-notices__snackbar {
+		.is-inserter-opened .components-editor-notices__snackbar,
+		.is-list-view-opened .components-editor-notices__snackbar {
 			padding-left: calc(16px + #{$nav-sidebar-width});
 		}
 	}

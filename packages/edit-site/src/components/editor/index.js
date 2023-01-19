@@ -155,8 +155,8 @@ export default function Editor() {
 
 	const className = classnames( {
 		'show-icon-labels': showIconLabels,
-		'inserter-open': isInserterOpen,
-		'list-view-open': isListViewOpen,
+		'is-inserter-opened': isInserterOpen,
+		'is-list-view-opened': isListViewOpen,
 	} );
 
 	return (

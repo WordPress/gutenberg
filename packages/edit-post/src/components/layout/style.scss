@@ -18,6 +18,13 @@
 	}
 }
 
+.is-inserter-opened,
+.is-list-view-opened {
+	.components-editor-notices__snackbar {
+		padding-left: calc(16px + #{$nav-sidebar-width});
+	}
+}
+
 @include editor-left(".edit-post-layout .components-editor-notices__snackbar");
 
 .edit-post-layout .editor-post-publish-panel {
