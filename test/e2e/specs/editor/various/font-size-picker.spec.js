@@ -92,11 +92,11 @@ test.describe( 'Font Size Picker', () => {
 					return doSet( obj, 0 );
 				}
 
-				window.wp.data.dispatch( 'core/block-editor' ).updateSettings(
+				window.wp.data.dispatch( 'core/editor' ).updateEditorSettings(
 					setDeep(
 						window.wp.data
-							.select( 'core/block-editor' )
-							.getSettings(),
+							.select( 'core/editor' )
+							.getEditorSettings(),
 						[
 							'__experimentalFeatures',
 							'typography',
