@@ -191,7 +191,6 @@
 			"text": true
 		},
 		"dimensions": {
-			"defaultAspectRatios": false,
 			"aspectRatio": [
 				{
 					"name": "1:1",
