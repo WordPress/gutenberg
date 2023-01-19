@@ -11,11 +11,27 @@ import CategorySelect from './category-select';
 import FormTokenField from '../form-token-field';
 import RangeControl from '../range-control';
 import SelectControl from '../select-control';
-import type { QueryControlsProps } from './types';
+import type {
+	QueryControlsProps,
+	QueryControlsWithMultipleCategorySelectionProps,
+	QueryControlsWithSingleCategorySelectionProps,
+} from './types';
 
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 100;
 const MAX_CATEGORIES_SUGGESTIONS = 20;
+
+function isSingleCategorySelection(
+	props: QueryControlsProps
+): props is QueryControlsWithSingleCategorySelectionProps {
+	return 'categoriesList' in props;
+}
+
+function isMultipleCategorySelection(
+	props: QueryControlsProps
+): props is QueryControlsWithMultipleCategorySelectionProps {
+	return 'categorySuggestions' in props;
+}
 
 /**
  * Controls to query for posts.
@@ -45,20 +61,18 @@ const MAX_CATEGORIES_SUGGESTIONS = 20;
 export function QueryControls( {
 	authorList,
 	selectedAuthorId,
-	categoriesList,
-	selectedCategoryId,
-	categorySuggestions,
-	selectedCategories,
 	numberOfItems,
 	order,
 	orderBy,
 	maxItems = DEFAULT_MAX_ITEMS,
 	minItems = DEFAULT_MIN_ITEMS,
-	onCategoryChange,
 	onAuthorChange,
 	onNumberOfItemsChange,
 	onOrderChange,
 	onOrderByChange,
+	// Props for single OR multiple category selection are not destructured here,
+	// but instead are destructured inline where necessary.
+	...props
 }: QueryControlsProps ) {
 	return (
 		<>
@@ -112,32 +126,38 @@ export function QueryControls( {
 						} }
 					/>
 				),
-				categoriesList && onCategoryChange && (
-					<CategorySelect
-						key="query-controls-category-select"
-						categoriesList={ categoriesList }
-						label={ __( 'Category' ) }
-						noOptionLabel={ __( 'All' ) }
-						selectedCategoryId={ selectedCategoryId }
-						onChange={ onCategoryChange }
-					/>
-				),
-				categorySuggestions && onCategoryChange && (
-					<FormTokenField
+				isSingleCategorySelection( props ) &&
+					props.categoriesList &&
+					props.onCategoryChange && (
+						<CategorySelect
+							key="query-controls-category-select"
+							categoriesList={ props.categoriesList }
+							label={ __( 'Category' ) }
+							noOptionLabel={ __( 'All' ) }
+							selectedCategoryId={ props.selectedCategoryId }
+							onChange={ props.onCategoryChange }
+						/>
+					),
+				isMultipleCategorySelection( props ) &&
+					props.categorySuggestions &&
+				props.onCategoryChange && (
+						<FormTokenField
 						key="query-controls-categories-select"
-						label={ __( 'Categories' ) }
-						value={
-							selectedCategories &&
-							selectedCategories.map( ( item ) => ( {
-								id: item.id,
-								value: item.name || item.value,
-							} ) )
-						}
-						suggestions={ Object.keys( categorySuggestions ) }
-						onChange={ onCategoryChange }
-						maxSuggestions={ MAX_CATEGORIES_SUGGESTIONS }
-					/>
-				),
+							label={ __( 'Categories' ) }
+							value={
+								props.selectedCategories &&
+								props.selectedCategories.map( ( item ) => ( {
+									id: item.id,
+									value: item.name || item.value,
+								} ) )
+							}
+							suggestions={ Object.keys(
+								props.categorySuggestions
+							) }
+							onChange={ props.onCategoryChange }
+							maxSuggestions={ MAX_CATEGORIES_SUGGESTIONS }
+						/>
+					),
 				onAuthorChange && (
 					<AuthorSelect
 						key="query-controls-author-select"

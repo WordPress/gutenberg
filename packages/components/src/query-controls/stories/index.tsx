@@ -12,7 +12,12 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import QueryControls from '..';
-import type { Category, QueryControlsProps } from '../types';
+import type {
+	Category,
+	QueryControlsProps,
+	QueryControlsWithSingleCategorySelectionProps,
+	QueryControlsWithMultipleCategorySelectionProps,
+} from '../types';
 
 const meta: ComponentMeta< typeof QueryControls > = {
 	title: 'Components/QueryControls',
@@ -33,7 +38,15 @@ const meta: ComponentMeta< typeof QueryControls > = {
 };
 export default meta;
 
-const DefaultTemplate: ComponentStory< typeof QueryControls > = ( props ) => {
+export const Default: ComponentStory< typeof QueryControls > = ( args ) => {
+	const {
+		onAuthorChange,
+		onCategoryChange,
+		onNumberOfItemsChange,
+		onOrderByChange,
+		onOrderChange,
+		...props
+	} = args as QueryControlsWithMultipleCategorySelectionProps;
 	const [ ownNumberOfItems, setOwnNumberOfItems ] = useState(
 		props.numberOfItems
 	);
@@ -46,37 +59,50 @@ const DefaultTemplate: ComponentStory< typeof QueryControls > = ( props ) => {
 		props.selectedCategories
 	);
 
-	const onCategoryChange: QueryControlsProps[ 'onCategoryChange' ] = (
-		tokens
-	) => {
-		if ( 'string' === typeof tokens ) {
-			return;
-		}
+	const handleCategoryChange: QueryControlsWithMultipleCategorySelectionProps[ 'onCategoryChange' ] =
+		( tokens ) => {
+			onCategoryChange?.( tokens );
 
-		const allCategories = tokens?.map( ( token ) => {
-			return typeof token === 'string'
-				? props.categorySuggestions?.[ token ]
-				: token;
-		} ) as Category[];
+			const hasNoSuggestion = tokens.some(
+				( token ) =>
+					typeof token === 'string' &&
+					! props.categorySuggestions?.[ token ]
+			);
+			if ( hasNoSuggestion ) {
+				return;
+			}
+			const allCategories = tokens
+				.map( ( token ) => {
+					return typeof token === 'string'
+						? props.categorySuggestions?.[ token ]
+						: token;
+				} )
+				.filter( Boolean ) as Category[];
 
-		setOwnSelectedCategories( allCategories );
+			setOwnSelectedCategories( allCategories );
 	};
 
 	return (
 		<QueryControls
 			{ ...props }
 			numberOfItems={ ownNumberOfItems }
-			onCategoryChange={ onCategoryChange }
+			onCategoryChange={ handleCategoryChange }
 			onOrderByChange={ ( newOrderBy ) => {
+				onOrderByChange?.( newOrderBy );
 				setOwnOrderBy( newOrderBy );
 			} }
 			onOrderChange={ ( newOrder ) => {
+				onOrderChange?.( newOrder );
 				setOwnOrder( newOrder );
 			} }
 			order={ ownOrder }
 			orderBy={ ownOrderBy }
-			onNumberOfItemsChange={ setOwnNumberOfItems }
+			onNumberOfItemsChange={ ( newNumber ) => {
+				onNumberOfItemsChange?.( newNumber );
++				setOwnNumberOfItems( newNumber );
+			} }
 			onAuthorChange={ ( newAuthor ) => {
+				onAuthorChange?.( newAuthor );
 				setOwnSelectedAuthorId( Number( newAuthor ) );
 			} }
 			selectedAuthorId={ ownSelectedAuthorId }
@@ -85,8 +111,6 @@ const DefaultTemplate: ComponentStory< typeof QueryControls > = ( props ) => {
 	);
 };
 
-export const Default: ComponentStory< typeof QueryControls > =
-	DefaultTemplate.bind( {} );
 Default.args = {
 	authorList: [
 		{
@@ -125,24 +149,37 @@ Default.args = {
 };
 
 const SingleCategoryTemplate: ComponentStory< typeof QueryControls > = (
-	props
+	args
 ) => {
+	const {
+		onAuthorChange,
+		onCategoryChange,
+		onNumberOfItemsChange,
+		onOrderByChange,
+		onOrderChange,
+		...props
+	} = args as QueryControlsWithSingleCategorySelectionProps;
 	const [ ownOrder, setOwnOrder ] = useState( props.order );
 	const [ ownOrderBy, setOwnOrderBy ] = useState( props.orderBy );
 	const [ ownSelectedCategoryId, setSelectedCategoryId ] = useState(
 		props.selectedCategoryId
 	);
 
+	const handleCategoryChange: QueryControlsWithSingleCategorySelectionProps[ 'onCategoryChange' ] =
+		( newCategory ) => {
+			onCategoryChange?.( newCategory );
+			setSelectedCategoryId( Number( newCategory ) );
+		};
+
 	return (
 		<QueryControls
 			{ ...props }
-			onCategoryChange={ ( newCategory ) => {
-				setSelectedCategoryId( Number( newCategory ) );
-			} }
+			onCategoryChange={ handleCategoryChange }
 			onOrderByChange={ ( newOrderBy ) => {
 				setOwnOrderBy( newOrderBy as QueryControlsProps[ 'orderBy' ] );
 			} }
 			onOrderChange={ ( newOrder ) => {
+				onOrderChange?.( newOrder );
 				setOwnOrder( newOrder as QueryControlsProps[ 'order' ] );
 			} }
 			order={ ownOrder }
