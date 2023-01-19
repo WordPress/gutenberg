@@ -360,6 +360,7 @@ function RichTextWrapper(
 	}
 
 	const TagName = tagName;
+
 	return (
 		<>
 			{ isSelected && (
@@ -389,11 +390,11 @@ function RichTextWrapper(
 			) }
 			<TagName
 				// Overridable props.
-				role="textbox"
 				aria-multiline={ ! disableLineBreaks }
 				aria-label={ placeholder }
 				{ ...props }
 				{ ...autocompleteProps }
+				role="textbox"
 				ref={ useMergeRefs( [
 					forwardedRef,
 					autocompleteProps.ref,
