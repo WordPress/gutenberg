@@ -16,13 +16,6 @@ function gutenberg_register_core_block_patterns_categories() {
 			'description' => __( 'Display your latest posts in lists, grids or other layouts.', 'gutenberg' ),
 		)
 	);
-	register_block_pattern_category(
-		'featured',
-		array(
-			'label'       => _x( 'Featured', 'Block pattern category', 'gutenberg' ),
-			'description' => __( 'A set of high quality curated patterns.', 'gutenberg' ),
-		)
-	);
 
 	// Register new core block pattern categories.
 	register_block_pattern_category(
