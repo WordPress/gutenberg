@@ -47,22 +47,27 @@ If an icon is included in the Notice, it should be color-coded to match the Noti
 
 ![A success Notice for updating a post](https://make.wordpress.org/design/files/2019/03/Notice-Do-1-alt.png)
 
+---
 **Don’t** use a Notice for a message that requires immediate attention and action from the user. Use a Modal for this instead.
 
 ![A Notice that requires an immediate action](https://make.wordpress.org/design/files/2019/03/Notice-Dont-1-alt.png)
 
+---
 **Do** display Notices at the top of the screen, below any toolbars.
 
 ![A success Notice for publishing a post](https://make.wordpress.org/design/files/2019/03/Notice-Do-2-alt.png)
 
+---
 **Don’t** show Notices on top of toolbars.
 
 ![A success Notice on top of the editor toolbar](https://make.wordpress.org/design/files/2019/03/Notice-Dont-2-alt.png)
 
+---
 **Do** use color to indicate the type of message being communicated.
 
 ![An error Notice using red](https://make.wordpress.org/design/files/2019/03/Notice-Do-3-alt.png)
 
+---
 **Don’t** apply any colors other than those for Warnings, Success, or Errors.
 
 ![An error Notice using purple](https://make.wordpress.org/design/files/2019/03/Notice-Dont-3-alt.png)
