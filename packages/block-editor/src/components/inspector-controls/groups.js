@@ -24,6 +24,7 @@ const groups = {
 	color: InspectorControlsColor,
 	dimensions: InspectorControlsDimensions,
 	list: InspectorControlsListView,
+	settings: InspectorControlsDefault, // Alias for default.
 	styles: InspectorControlsStyles,
 	typography: InspectorControlsTypography,
 	position: InspectorControlsPosition,
