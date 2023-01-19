@@ -14,7 +14,6 @@ import { useState } from '@wordpress/element';
 import QueryControls from '..';
 import type {
 	Entity,
-	QueryControlsProps,
 	QueryControlsWithSingleCategorySelectionProps,
 	QueryControlsWithMultipleCategorySelectionProps,
 } from '../types';
@@ -176,11 +175,11 @@ const SingleCategoryTemplate: ComponentStory< typeof QueryControls > = (
 			{ ...props }
 			onCategoryChange={ handleCategoryChange }
 			onOrderByChange={ ( newOrderBy ) => {
-				setOwnOrderBy( newOrderBy as QueryControlsProps[ 'orderBy' ] );
+				setOwnOrderBy( newOrderBy );
 			} }
 			onOrderChange={ ( newOrder ) => {
 				onOrderChange?.( newOrder );
-				setOwnOrder( newOrder as QueryControlsProps[ 'order' ] );
+				setOwnOrder( newOrder );
 			} }
 			order={ ownOrder }
 			orderBy={ ownOrderBy }
