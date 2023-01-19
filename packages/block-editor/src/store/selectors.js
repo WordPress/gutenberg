@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -202,7 +201,7 @@ export const __unstableGetClientIdWithClientIdsTree = createSelector(
  */
 export const __unstableGetClientIdsTree = createSelector(
 	( state, rootClientId = '' ) =>
-		map( getBlockOrder( state, rootClientId ), ( clientId ) =>
+		getBlockOrder( state, rootClientId ).map( ( clientId ) =>
 			__unstableGetClientIdWithClientIdsTree( state, clientId )
 		),
 	( state ) => [ state.blocks.order ]
@@ -314,13 +313,11 @@ export const __experimentalGetGlobalBlocksByName = createSelector(
  */
 export const getBlocksByClientId = createSelector(
 	( state, clientIds ) =>
-		map(
-			Array.isArray( clientIds ) ? clientIds : [ clientIds ],
+		( Array.isArray( clientIds ) ? clientIds : [ clientIds ] ).map(
 			( clientId ) => getBlock( state, clientId )
 		),
 	( state, clientIds ) =>
-		map(
-			Array.isArray( clientIds ) ? clientIds : [ clientIds ],
+		( Array.isArray( clientIds ) ? clientIds : [ clientIds ] ).map(
 			( clientId ) => state.blocks.tree.get( clientId )
 		)
 );
@@ -507,18 +504,18 @@ export const getBlockParents = createSelector(
 export const getBlockParentsByBlockName = createSelector(
 	( state, clientId, blockName, ascending = false ) => {
 		const parents = getBlockParents( state, clientId, ascending );
-		return map(
-			map( parents, ( id ) => ( {
+		return parents
+			.map( ( id ) => ( {
 				id,
 				name: getBlockName( state, id ),
-			} ) ).filter( ( { name } ) => {
+			} ) )
+			.filter( ( { name } ) => {
 				if ( Array.isArray( blockName ) ) {
 					return blockName.includes( name );
 				}
 				return name === blockName;
-			} ),
-			( { id } ) => id
-		);
+			} )
+			.map( ( { id } ) => id );
 	},
 	( state ) => [ state.blocks.parents ]
 );
