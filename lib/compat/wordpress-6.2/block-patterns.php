@@ -10,13 +10,6 @@
  */
 function gutenberg_register_core_block_patterns_categories() {
 	register_block_pattern_category(
-		'text',
-		array(
-			'label'       => _x( 'Text', 'Block pattern category', 'gutenberg' ),
-			'description' => __( 'Patterns containing mostly text.', 'gutenberg' ),
-		)
-	);
-	register_block_pattern_category(
 		'query',
 		array(
 			'label'       => _x( 'Posts', 'Block pattern category', 'gutenberg' ),
