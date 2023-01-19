@@ -18,10 +18,12 @@
 		padding-right: 16px;
 	}
 
-	.inserter-open .components-editor-notices__snackbar,
-	.list-view-open .components-editor-notices__snackbar {
-		padding-left: calc(16px + #{$nav-sidebar-width});
-		transition: none;
+	@media (min-width: $break-medium) {
+		.inserter-open .components-editor-notices__snackbar,
+		.list-view-open .components-editor-notices__snackbar {
+			padding-left: calc(16px + #{$nav-sidebar-width});
+			transition: none;
+		}
 	}
 }
 @include editor-left(".edit-site .components-editor-notices__snackbar")
