@@ -68,10 +68,10 @@ const DefaultTemplate: ComponentStory< typeof QueryControls > = ( props ) => {
 			numberOfItems={ ownNumberOfItems }
 			onCategoryChange={ onCategoryChange }
 			onOrderByChange={ ( newOrderBy ) => {
-				setOwnOrderBy( newOrderBy as QueryControlsProps[ 'orderBy' ] );
+				setOwnOrderBy( newOrderBy );
 			} }
 			onOrderChange={ ( newOrder ) => {
-				setOwnOrder( newOrder as QueryControlsProps[ 'order' ] );
+				setOwnOrder( newOrder );
 			} }
 			order={ ownOrder }
 			orderBy={ ownOrderBy }

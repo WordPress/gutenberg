@@ -96,10 +96,18 @@ export function QueryControls( {
 
 							const [ newOrderBy, newOrder ] = value.split( '/' );
 							if ( newOrder !== order ) {
-								onOrderChange( newOrder );
+								onOrderChange(
+									newOrder as NonNullable<
+										QueryControlsProps[ 'order' ]
+									>
+								);
 							}
 							if ( newOrderBy !== orderBy ) {
-								onOrderByChange( newOrderBy );
+								onOrderByChange(
+									newOrderBy as NonNullable<
+										QueryControlsProps[ 'orderBy' ]
+									>
+								);
 							}
 						} }
 					/>

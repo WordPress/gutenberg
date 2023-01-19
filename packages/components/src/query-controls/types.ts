@@ -47,6 +47,9 @@ export type AuthorSelectProps = {
 	selectedAuthorId: QueryControlsProps[ 'selectedAuthorId' ];
 };
 
+type Order = 'asc' | 'desc';
+type OrderBy = 'date' | 'title';
+
 export type QueryControlsProps = {
 	/**
 	 * An array of authors that is passed into
@@ -101,21 +104,21 @@ export type QueryControlsProps = {
 	 * If this or onOrderByChange are not specified,
 	 * then the order controls are not included.
 	 */
-	onOrderChange?: ( newOrder: string ) => void;
+	onOrderChange?: ( newOrder: Order ) => void;
 	/**
 	 * A function that receives the new orderby value.
 	 * If this or onOrderChange are not specified,
 	 * then the order controls are not included.
 	 */
-	onOrderByChange?: ( newOrderBy: string ) => void;
+	onOrderByChange?: ( newOrderBy: OrderBy ) => void;
 	/**
 	 * The order in which to retrieve posts.
 	 */
-	order?: 'asc' | 'desc';
+	order?: Order;
 	/**
 	 * The meta key by which to order posts.
 	 */
-	orderBy?: 'date' | 'title';
+	orderBy?: OrderBy;
 	/**
 	 * The selected author ID.
 	 */
