@@ -21,7 +21,7 @@ import {
 	BaseControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { shadow as shadowIcon } from '@wordpress/icons';
+import { shadow as shadowIcon, Icon, check } from '@wordpress/icons';
 import { useCallback } from '@wordpress/element';
 
 /**
@@ -145,7 +145,7 @@ function ShadowPresets( { label, presets, activeShadow, onSelect } ) {
 				{ label }
 			</BaseControl.VisualLabel>
 
-			<Grid columns={ 2 }>
+			<Grid columns={ 6 }>
 				{ presets.map( ( { name, shadow }, i ) => (
 					<ShadowIndicator
 						key={ i }
@@ -156,6 +156,7 @@ function ShadowPresets( { label, presets, activeShadow, onSelect } ) {
 								shadow === activeShadow ? undefined : shadow
 							)
 						}
+						shadow={ shadow }
 					/>
 				) ) }
 			</Grid>
@@ -163,16 +164,17 @@ function ShadowPresets( { label, presets, activeShadow, onSelect } ) {
 	);
 }
 
-function ShadowIndicator( { label, isActive, onSelect } ) {
+function ShadowIndicator( { label, isActive, onSelect, shadow } ) {
 	return (
-		<Button
-			className={ classnames(
-				'edit-site-global-styles__shadow-indicator',
-				{ active: isActive }
-			) }
-			onClick={ onSelect }
-		>
-			{ label }
-		</Button>
+		<>
+			<Button
+				className="edit-site-global-styles__shadow-indicator"
+				onClick={ onSelect }
+				aria-label={ label }
+				style={ { boxShadow: shadow } }
+			>
+				{ isActive && <Icon icon={ check } /> }
+			</Button>
+		</>
 	);
 }

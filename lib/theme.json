@@ -192,7 +192,7 @@
 				{
 					"name": "Elevated",
 					"slug": "elevated",
-					"shadow": "rgba(0, 0, 0, 0.4) 0 2rem 4rem -1rem, rgba(0, 0, 0, 0.6) 0 1rem 2rem -1.5rem"
+					"shadow": "rgba(0, 0, 0, 0.4) 0 2rem 4rem 0, rgba(0, 0, 0, 0.6) 0 1rem 2rem 0"
 				},
 				{
 					"name": "Near",
