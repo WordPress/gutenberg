@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import type { Key } from 'react';
-
-/**
  * Internal dependencies
  */
 import type { FormTokenFieldProps } from '../form-token-field/types';
@@ -30,42 +25,33 @@ export type Category = {
 	name?: string;
 };
 
-export type CategorySelectProps = {
-	categoriesList: NonNullable< QueryControlsProps[ 'categoriesList' ] >;
-	key: Key;
-	label: TreeSelectProps[ 'label' ];
-	noOptionLabel: TreeSelectProps[ 'noOptionLabel' ];
-	onChange: NonNullable< TreeSelectProps[ 'onChange' ] >;
-	selectedCategoryId: QueryControlsProps[ 'selectedCategoryId' ];
+export type CategorySelectProps = Pick<
+	TreeSelectProps,
+	'label' | 'noOptionLabel'
+> & {
+	categoriesList: Entity[];
+	onChange: ( newCategory: string ) => void;
+	selectedCategoryId?: Category[ 'id' ];
 };
 
-export type AuthorSelectProps = {
-	authorList: QueryControlsProps[ 'authorList' ];
-	label: TreeSelectProps[ 'label' ];
-	noOptionLabel: TreeSelectProps[ 'noOptionLabel' ];
-	onChange: NonNullable< QueryControlsProps[ 'onAuthorChange' ] >;
-	selectedAuthorId: QueryControlsProps[ 'selectedAuthorId' ];
+export type AuthorSelectProps = Pick<
+	TreeSelectProps,
+	'label' | 'noOptionLabel'
+> & {
+	authorList?: Entity[];
+	onChange: ( newAuthor: string ) => void;
+	selectedAuthorId?: Entity[ 'id' ];
 };
 
 type Order = 'asc' | 'desc';
 type OrderBy = 'date' | 'title';
 
-export type QueryControlsProps = {
+type BaseQueryControlsProps = {
 	/**
 	 * An array of authors that is passed into
 	 * an `AuthorSelect` sub-component.
 	 */
-	authorList?: Entity[];
-	/**
-	 * An array of categories, renders a `CategorySelect`
-	 * sub-component when passed in conjunction with `onCategoryChange`.
-	 */
-	categoriesList?: Entity[];
-	/**
-	 * An array of category names, renders a `FormTokenField` component
-	 * when passed in conjunction with `onCategoryChange`.
-	 */
-	categorySuggestions?: { [ categoryName: Entity[ 'name' ] ]: Entity };
+	authorList?: AuthorSelectProps[ 'authorList' ];
 	/**
 	 * The maximum items.
 	 *
@@ -86,13 +72,7 @@ export type QueryControlsProps = {
 	 * A function that receives the new author value.
 	 * If this is not specified, the author controls are not included.
 	 */
-	onAuthorChange?: TreeSelectProps[ 'onChange' ];
-	/**
-	 * A function that receives the new category value.
-	 * If this is not specified, the category controls are not included.
-	 */
-	onCategoryChange?: TreeSelectProps[ 'onChange' ] &
-		FormTokenFieldProps[ 'onChange' ];
+	onAuthorChange?: AuthorSelectProps[ 'onChange' ];
 	/**
 	 * A function that receives the new number of items value.
 	 * If this is not specified, then the number of items
@@ -122,13 +102,45 @@ export type QueryControlsProps = {
 	/**
 	 * The selected author ID.
 	 */
-	selectedAuthorId?: Entity[ 'id' ];
-	/**
-	 * The selected categories for the `categorySuggestions`.
-	 */
-	selectedCategories?: Category[];
-	/**
-	 * The selected category for the `categoriesList`.
-	 */
-	selectedCategoryId?: Category[ 'id' ];
+	selectedAuthorId?: AuthorSelectProps[ 'selectedAuthorId' ];
 };
+
+export type QueryControlsWithSingleCategorySelectionProps =
+	BaseQueryControlsProps & {
+		/**
+		 * An array of categories, renders a `CategorySelect`
+		 * sub-component when passed in conjunction with `onCategoryChange`.
+		 */
+		categoriesList?: CategorySelectProps[ 'categoriesList' ];
+		/**
+		 * The selected category for the `categoriesList`.
+		 */
+		selectedCategoryId?: CategorySelectProps[ 'selectedCategoryId' ];
+		/**
+		 * A function that receives the new category value.
+		 * If this is not specified, the category controls are not included.
+		 */
+		onCategoryChange?: CategorySelectProps[ 'onChange' ];
+	};
+
+export type QueryControlsWithMultipleCategorySelectionProps =
+	BaseQueryControlsProps & {
+		/**
+		 * An array of category names, renders a `FormTokenField` component
+		 * when passed in conjunction with `onCategoryChange`.
+		 */
+		categorySuggestions?: { [ categoryName: Entity[ 'name' ] ]: Entity };
+		/**
+		 * The selected categories for the `categorySuggestions`.
+		 */
+		selectedCategories?: Category[];
+		/**
+		 * A function that receives the new category value.
+		 * If this is not specified, the category controls are not included.
+		 */
+		onCategoryChange?: FormTokenFieldProps[ 'onChange' ];
+	};
+
+export type QueryControlsProps =
+	| QueryControlsWithSingleCategorySelectionProps
+	| QueryControlsWithMultipleCategorySelectionProps;
