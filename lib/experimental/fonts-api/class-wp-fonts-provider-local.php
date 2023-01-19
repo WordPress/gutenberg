@@ -205,7 +205,7 @@ class WP_Fonts_Provider_Local extends WP_Fonts_Provider {
 	 * @return string The CSS.
 	 */
 	private function compile_src( $font_family, array $value ) {
-		$src = "local($font_family)";
+		$src = '';
 
 		foreach ( $value as $item ) {
 
@@ -217,6 +217,8 @@ class WP_Fonts_Provider_Local extends WP_Fonts_Provider {
 				? ", url({$item['url']})"
 				: ", url('{$item['url']}') format('{$item['format']}')";
 		}
+
+		$src = ltrim( $src, ', ' );
 		return $src;
 	}
 

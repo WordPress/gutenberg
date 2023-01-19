@@ -1035,15 +1035,15 @@ trait WP_Fonts_Tests_Datasets {
 	protected function get_registered_fonts_css() {
 		return array(
 			'merriweather-200-900-normal' => <<<CSS
-@font-face{font-family:Merriweather;font-style:normal;font-weight:200 900;font-display:fallback;font-stretch:normal;src:local(Merriweather), url('https://example.com/assets/fonts/merriweather.ttf.woff2') format('woff2');}
+@font-face{font-family:Merriweather;font-style:normal;font-weight:200 900;font-display:fallback;font-stretch:normal;src:url('https://example.com/assets/fonts/merriweather.ttf.woff2') format('woff2');}
 CSS
 		,
 			'Source Serif Pro-300-normal' => <<<CSS
-@font-face{font-family:"Source Serif Pro";font-style:normal;font-weight:300;font-display:fallback;font-stretch:normal;src:local("Source Serif Pro"), url('https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2') format('woff2');}
+@font-face{font-family:"Source Serif Pro";font-style:normal;font-weight:300;font-display:fallback;font-stretch:normal;src:url('https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Roman.ttf.woff2') format('woff2');}
 CSS
 		,
 			'Source Serif Pro-900-italic' => <<<CSS
-@font-face{font-family:"Source Serif Pro";font-style:italic;font-weight:900;font-display:fallback;font-stretch:normal;src:local("Source Serif Pro"), url('https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2') format('woff2');}
+@font-face{font-family:"Source Serif Pro";font-style:italic;font-weight:900;font-display:fallback;font-stretch:normal;src:url('https://example.com/assets/fonts/source-serif-pro/SourceSerif4Variable-Italic.ttf.woff2') format('woff2');}
 CSS
 		,
 			'font1-300-normal'            => 'font1-300-normal',
