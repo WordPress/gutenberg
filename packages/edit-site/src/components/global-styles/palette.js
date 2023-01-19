@@ -13,7 +13,7 @@ import {
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { shuffle } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
-import { useGlobalStylesSetting as useSetting } from '@wordpress/block-editor';
+import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -22,15 +22,18 @@ import Subtitle from './subtitle';
 import { NavigationButtonAsItem } from './navigation-button';
 import { useColorRandomizer } from './hooks';
 import ColorIndicatorWrapper from './color-indicator-wrapper';
+import { unlock } from '../../experiments';
+
+const { useGlobalSetting } = unlock( blockEditorExperiments );
 
 const EMPTY_COLORS = [];
 
 function Palette( { name } ) {
-	const [ customColors ] = useSetting( 'color.palette.custom' );
-	const [ themeColors ] = useSetting( 'color.palette.theme' );
-	const [ defaultColors ] = useSetting( 'color.palette.default' );
+	const [ customColors ] = useGlobalSetting( 'color.palette.custom' );
+	const [ themeColors ] = useGlobalSetting( 'color.palette.theme' );
+	const [ defaultColors ] = useGlobalSetting( 'color.palette.default' );
 
-	const [ defaultPaletteEnabled ] = useSetting(
+	const [ defaultPaletteEnabled ] = useGlobalSetting(
 		'color.defaultPalette',
 		name
 	);

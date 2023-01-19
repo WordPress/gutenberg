@@ -4,24 +4,27 @@
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalColorGradientControl as ColorGradientControl,
-	useGlobalStylesSetting as useSetting,
-	useStyle,
+	experiments as blockEditorExperiments,
 } from '@wordpress/block-editor';
 import { TabPanel } from '@wordpress/components';
+
 /**
  * Internal dependencies
  */
 import ScreenHeader from './header';
 import { getSupportedGlobalStylesPanels, useColorsPerOrigin } from './hooks';
+import { unlock } from '../../experiments';
+
+const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 
 function ScreenLinkColor( { name, variationPath = '' } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
-	const [ solids ] = useSetting( 'color.palette', name );
-	const [ areCustomSolidsEnabled ] = useSetting( 'color.custom', name );
+	const [ solids ] = useGlobalSetting( 'color.palette', name );
+	const [ areCustomSolidsEnabled ] = useGlobalSetting( 'color.custom', name );
 
 	const colorsPerOrigin = useColorsPerOrigin( name );
 
-	const [ isLinkEnabled ] = useSetting( 'color.link', name );
+	const [ isLinkEnabled ] = useGlobalSetting( 'color.link', name );
 
 	const hasLinkColor =
 		supports.includes( 'linkColor' ) &&
@@ -31,15 +34,15 @@ function ScreenLinkColor( { name, variationPath = '' } ) {
 	const pseudoStates = {
 		default: {
 			label: __( 'Default' ),
-			value: useStyle(
+			value: useGlobalStyle(
 				variationPath + 'elements.link.color.text',
 				name
 			)[ 0 ],
-			handler: useStyle(
+			handler: useGlobalStyle(
 				variationPath + 'elements.link.color.text',
 				name
 			)[ 1 ],
-			userValue: useStyle(
+			userValue: useGlobalStyle(
 				variationPath + 'elements.link.color.text',
 				name,
 				'user'
@@ -47,15 +50,15 @@ function ScreenLinkColor( { name, variationPath = '' } ) {
 		},
 		hover: {
 			label: __( 'Hover' ),
-			value: useStyle(
+			value: useGlobalStyle(
 				variationPath + 'elements.link.:hover.color.text',
 				name
 			)[ 0 ],
-			handler: useStyle(
+			handler: useGlobalStyle(
 				variationPath + 'elements.link.:hover.color.text',
 				name
 			)[ 1 ],
-			userValue: useStyle(
+			userValue: useGlobalStyle(
 				variationPath + 'elements.link.:hover.color.text',
 				name,
 				'user'

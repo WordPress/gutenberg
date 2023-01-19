@@ -8,7 +8,7 @@ import {
 	__experimentalHStack as HStack,
 	FlexItem,
 } from '@wordpress/components';
-import { useStyle } from '@wordpress/block-editor';
+import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -19,6 +19,9 @@ import Subtitle from './subtitle';
 import TypographyPanel from './typography-panel';
 import BlockPreviewPanel from './block-preview-panel';
 import { getVariationClassNameFromPath } from './utils';
+import { unlock } from '../../experiments';
+
+const { useGlobalStyle } = unlock( blockEditorExperiments );
 
 function Item( { name, parentMenu, element, label } ) {
 	const hasSupport = ! name;
@@ -30,16 +33,28 @@ function Item( { name, parentMenu, element, label } ) {
 					textDecoration: 'underline',
 			  }
 			: {};
-	const [ fontFamily ] = useStyle( prefix + 'typography.fontFamily', name );
-	const [ fontStyle ] = useStyle( prefix + 'typography.fontStyle', name );
-	const [ fontWeight ] = useStyle( prefix + 'typography.fontWeight', name );
-	const [ letterSpacing ] = useStyle(
+	const [ fontFamily ] = useGlobalStyle(
+		prefix + 'typography.fontFamily',
+		name
+	);
+	const [ fontStyle ] = useGlobalStyle(
+		prefix + 'typography.fontStyle',
+		name
+	);
+	const [ fontWeight ] = useGlobalStyle(
+		prefix + 'typography.fontWeight',
+		name
+	);
+	const [ letterSpacing ] = useGlobalStyle(
 		prefix + 'typography.letterSpacing',
 		name
 	);
-	const [ backgroundColor ] = useStyle( prefix + 'color.background', name );
-	const [ gradientValue ] = useStyle( prefix + 'color.gradient', name );
-	const [ color ] = useStyle( prefix + 'color.text', name );
+	const [ backgroundColor ] = useGlobalStyle(
+		prefix + 'color.background',
+		name
+	);
+	const [ gradientValue ] = useGlobalStyle( prefix + 'color.gradient', name );
+	const [ color ] = useGlobalStyle( prefix + 'color.text', name );
 
 	if ( ! hasSupport ) {
 		return null;

@@ -30,7 +30,7 @@ export const useGlobalStylesReset = () => {
 	];
 };
 
-export function useSetting( path, blockName, source = 'all' ) {
+export function useGlobalSetting( path, blockName, source = 'all' ) {
 	const {
 		merged: mergedConfig,
 		base: baseConfig,
@@ -93,7 +93,7 @@ export function useSetting( path, blockName, source = 'all' ) {
 	return [ resultWithFallback, setSetting ];
 }
 
-export function useStyle( path, blockName, source = 'all' ) {
+export function useGlobalStyle( path, blockName, source = 'all' ) {
 	const {
 		merged: mergedConfig,
 		base: baseConfig,

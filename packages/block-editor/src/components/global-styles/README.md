@@ -39,39 +39,39 @@ function MyComponent() {
 }
 ```
 
-## useStyle
+## useGlobalStyle
 
 A react hook used to retrieve the style applied to a given context.
 
 ```js
-import { useStyle } from '@wordpress/block-editor';
+import { useGlobalStyle } from '@wordpress/block-editor';
 
 function MyComponent() {
 	// Text color for the site root.
-	const [ color, setColor ] = useStyle( 'color.text' ); 
+	const [ color, setColor ] = useGlobalStyle( 'color.text' ); 
 
 	// The user modified color for the core paragraph block.
-	const [ pColor, setPColor ] = useStyle( 'color.text', 'core/paragraph', 'user' ); 
+	const [ pColor, setPColor ] = useGlobalStyle( 'color.text', 'core/paragraph', 'user' ); 
 
 	return "Something";
 }
 ```
 
-## useSetting
+## useGlobalSetting
 
 A react hook used to retrieve the setting applied to a given context.
 
 ```js
-import { useGlobalStylesSetting as useSetting } from '@wordpress/block-editor';
+import { useGlobalSetting } from '@wordpress/block-editor';
 
 function MyComponent() {
 	// The default color palette.
-	const [ colorPalette, setColorPalette ] = useSetting( 'color.palette' ); 
+	const [ colorPalette, setColorPalette ] = useGlobalSetting( 'color.palette' ); 
 
 	// The base (theme + core) color palette for the paragraph block,
 	// ignoring user provided palette.
 	// If the palette is not defined for the paragraph block, the root one is returned.
-	const [ pColor, setPColor ] = useSetting( 'color.palette', 'core/paragraph', 'base' ); 
+	const [ pColor, setPColor ] = useGlobalSetting( 'color.palette', 'core/paragraph', 'base' ); 
 
 	return "Something";
 }

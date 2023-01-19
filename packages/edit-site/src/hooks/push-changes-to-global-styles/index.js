@@ -11,7 +11,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import {
 	InspectorAdvancedControls,
 	store as blockEditorStore,
-	GlobalStylesContext,
+	experiments as blockEditorExperiments,
 } from '@wordpress/block-editor';
 import { BaseControl, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -27,6 +27,9 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import { getSupportedGlobalStylesPanels } from '../../components/global-styles/hooks';
+import { unlock } from '../../experiments';
+
+const { GlobalStylesContext } = unlock( blockEditorExperiments );
 
 // TODO: Temporary duplication of constant in @wordpress/block-editor. Can be
 // removed by moving PushChangesToGlobalStylesControl to

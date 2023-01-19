@@ -14,7 +14,14 @@ import {
 	getBlockType,
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 } from '@wordpress/blocks';
-import { useGlobalStylesSetting as useSetting } from '@wordpress/block-editor';
+import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../experiments';
+
+const { useGlobalSetting } = unlock( blockEditorExperiments );
 
 // Enable colord's a11y plugin.
 extend( [ a11yPlugin ] );
@@ -100,10 +107,12 @@ export function getSupportedGlobalStylesPanels( name ) {
 }
 
 export function useColorsPerOrigin( name ) {
-	const [ customColors ] = useSetting( 'color.palette.custom', name );
-	const [ themeColors ] = useSetting( 'color.palette.theme', name );
-	const [ defaultColors ] = useSetting( 'color.palette.default', name );
-	const [ shouldDisplayDefaultColors ] = useSetting( 'color.defaultPalette' );
+	const [ customColors ] = useGlobalSetting( 'color.palette.custom', name );
+	const [ themeColors ] = useGlobalSetting( 'color.palette.theme', name );
+	const [ defaultColors ] = useGlobalSetting( 'color.palette.default', name );
+	const [ shouldDisplayDefaultColors ] = useGlobalSetting(
+		'color.defaultPalette'
+	);
 
 	return useMemo( () => {
 		const result = [];
@@ -143,10 +152,19 @@ export function useColorsPerOrigin( name ) {
 }
 
 export function useGradientsPerOrigin( name ) {
-	const [ customGradients ] = useSetting( 'color.gradients.custom', name );
-	const [ themeGradients ] = useSetting( 'color.gradients.theme', name );
-	const [ defaultGradients ] = useSetting( 'color.gradients.default', name );
-	const [ shouldDisplayDefaultGradients ] = useSetting(
+	const [ customGradients ] = useGlobalSetting(
+		'color.gradients.custom',
+		name
+	);
+	const [ themeGradients ] = useGlobalSetting(
+		'color.gradients.theme',
+		name
+	);
+	const [ defaultGradients ] = useGlobalSetting(
+		'color.gradients.default',
+		name
+	);
+	const [ shouldDisplayDefaultGradients ] = useGlobalSetting(
 		'color.defaultGradients'
 	);
 
@@ -188,7 +206,7 @@ export function useGradientsPerOrigin( name ) {
 }
 
 export function useColorRandomizer( name ) {
-	const [ themeColors, setThemeColors ] = useSetting(
+	const [ themeColors, setThemeColors ] = useGlobalSetting(
 		'color.palette.theme',
 		name
 	);

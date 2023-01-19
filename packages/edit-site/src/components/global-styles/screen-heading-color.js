@@ -8,8 +8,7 @@ import {
 } from '@wordpress/components';
 import {
 	__experimentalColorGradientControl as ColorGradientControl,
-	useGlobalStylesSetting as useSetting,
-	useStyle,
+	experiments as blockEditorExperiments,
 } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 
@@ -22,20 +21,26 @@ import {
 	useColorsPerOrigin,
 	useGradientsPerOrigin,
 } from './hooks';
+import { unlock } from '../../experiments';
+
+const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 
 function ScreenHeadingColor( { name, variationPath = '' } ) {
 	const [ selectedLevel, setCurrentTab ] = useState( 'heading' );
 
 	const supports = getSupportedGlobalStylesPanels( name );
-	const [ solids ] = useSetting( 'color.palette', name );
-	const [ gradients ] = useSetting( 'color.gradients', name );
-	const [ areCustomSolidsEnabled ] = useSetting( 'color.custom', name );
-	const [ areCustomGradientsEnabled ] = useSetting(
+	const [ solids ] = useGlobalSetting( 'color.palette', name );
+	const [ gradients ] = useGlobalSetting( 'color.gradients', name );
+	const [ areCustomSolidsEnabled ] = useGlobalSetting( 'color.custom', name );
+	const [ areCustomGradientsEnabled ] = useGlobalSetting(
 		'color.customGradient',
 		name
 	);
-	const [ isTextEnabled ] = useSetting( 'color.text', name );
-	const [ isBackgroundEnabled ] = useSetting( 'color.background', name );
+	const [ isTextEnabled ] = useGlobalSetting( 'color.text', name );
+	const [ isBackgroundEnabled ] = useGlobalSetting(
+		'color.background',
+		name
+	);
 
 	const colorsPerOrigin = useColorsPerOrigin( name );
 	const gradientsPerOrigin = useGradientsPerOrigin( name );
@@ -53,30 +58,30 @@ function ScreenHeadingColor( { name, variationPath = '' } ) {
 		supports.includes( 'background' ) &&
 		( gradients.length > 0 || areCustomGradientsEnabled );
 
-	const [ color, setColor ] = useStyle(
+	const [ color, setColor ] = useGlobalStyle(
 		variationPath + 'elements.' + selectedLevel + '.color.text',
 		name
 	);
-	const [ userColor ] = useStyle(
+	const [ userColor ] = useGlobalStyle(
 		variationPath + 'elements.' + selectedLevel + '.color.text',
 		name,
 		'user'
 	);
 
-	const [ backgroundColor, setBackgroundColor ] = useStyle(
+	const [ backgroundColor, setBackgroundColor ] = useGlobalStyle(
 		variationPath + 'elements.' + selectedLevel + '.color.background',
 		name
 	);
-	const [ userBackgroundColor ] = useStyle(
+	const [ userBackgroundColor ] = useGlobalStyle(
 		variationPath + 'elements.' + selectedLevel + '.color.background',
 		name,
 		'user'
 	);
-	const [ gradient, setGradient ] = useStyle(
+	const [ gradient, setGradient ] = useGlobalStyle(
 		variationPath + 'elements.' + selectedLevel + '.color.gradient',
 		name
 	);
-	const [ userGradient ] = useStyle(
+	const [ userGradient ] = useGlobalStyle(
 		variationPath + 'elements.' + selectedLevel + '.color.gradient',
 		name,
 		'user'

@@ -13,7 +13,7 @@ import { styles, moreVertical, seen } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useState, useEffect } from '@wordpress/element';
-import { useGlobalStylesReset } from '@wordpress/block-editor';
+import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -21,6 +21,9 @@ import { useGlobalStylesReset } from '@wordpress/block-editor';
 import DefaultSidebar from './default-sidebar';
 import { GlobalStylesUI } from '../global-styles';
 import { store as editSiteStore } from '../../store';
+import { unlock } from '../../experiments';
+
+const { useGlobalStylesReset } = unlock( blockEditorExperiments );
 
 export default function GlobalStylesSidebar() {
 	const [ canReset, onReset ] = useGlobalStylesReset();

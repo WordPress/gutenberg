@@ -25,7 +25,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import {
 	store as blockEditorStore,
-	GlobalStylesContext,
+	experiments as blockEditorExperiments,
 } from '@wordpress/block-editor';
 
 /**
@@ -34,6 +34,9 @@ import {
 import { mergeBaseAndUserConfigs } from './global-styles-provider';
 import StylesPreview from './preview';
 import ScreenHeader from './header';
+import { unlock } from '../../experiments';
+
+const { GlobalStylesContext } = unlock( blockEditorExperiments );
 
 function compareVariations( a, b ) {
 	return (

@@ -4,9 +4,7 @@
 import {
 	__unstableIframe as Iframe,
 	__unstableEditorStyles as EditorStyles,
-	useGlobalStylesSetting as useSetting,
-	useStyle,
-	useGlobalStylesOutput,
+	experiments as blockEditorExperiments,
 } from '@wordpress/block-editor';
 import {
 	__unstableMotion as motion,
@@ -15,6 +13,15 @@ import {
 } from '@wordpress/components';
 import { useReducedMotion, useResizeObserver } from '@wordpress/compose';
 import { useState, useMemo } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../experiments';
+
+const { useGlobalSetting, useGlobalStyle, useGlobalStylesOutput } = unlock(
+	blockEditorExperiments
+);
 
 const firstFrame = {
 	start: {
@@ -53,23 +60,25 @@ const normalizedHeight = 152;
 const normalizedColorSwatchSize = 32;
 
 const StylesPreview = ( { label, isFocused, withHoverView } ) => {
-	const [ fontWeight ] = useStyle( 'typography.fontWeight' );
-	const [ fontFamily = 'serif' ] = useStyle( 'typography.fontFamily' );
-	const [ headingFontFamily = fontFamily ] = useStyle(
+	const [ fontWeight ] = useGlobalStyle( 'typography.fontWeight' );
+	const [ fontFamily = 'serif' ] = useGlobalStyle( 'typography.fontFamily' );
+	const [ headingFontFamily = fontFamily ] = useGlobalStyle(
 		'elements.h1.typography.fontFamily'
 	);
-	const [ headingFontWeight = fontWeight ] = useStyle(
+	const [ headingFontWeight = fontWeight ] = useGlobalStyle(
 		'elements.h1.typography.fontWeight'
 	);
-	const [ textColor = 'black' ] = useStyle( 'color.text' );
-	const [ headingColor = textColor ] = useStyle( 'elements.h1.color.text' );
-	const [ backgroundColor = 'white' ] = useStyle( 'color.background' );
-	const [ gradientValue ] = useStyle( 'color.gradient' );
+	const [ textColor = 'black' ] = useGlobalStyle( 'color.text' );
+	const [ headingColor = textColor ] = useGlobalStyle(
+		'elements.h1.color.text'
+	);
+	const [ backgroundColor = 'white' ] = useGlobalStyle( 'color.background' );
+	const [ gradientValue ] = useGlobalStyle( 'color.gradient' );
 	const [ styles ] = useGlobalStylesOutput();
 	const disableMotion = useReducedMotion();
-	const [ coreColors ] = useSetting( 'color.palette.core' );
-	const [ themeColors ] = useSetting( 'color.palette.theme' );
-	const [ customColors ] = useSetting( 'color.palette.custom' );
+	const [ coreColors ] = useGlobalSetting( 'color.palette.core' );
+	const [ themeColors ] = useGlobalSetting( 'color.palette.theme' );
+	const [ customColors ] = useGlobalSetting( 'color.palette.custom' );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ containerResizeListener, { width } ] = useResizeObserver();
 	const ratio = width ? width / normalizedWidth : 1;

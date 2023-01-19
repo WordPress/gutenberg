@@ -348,6 +348,10 @@ _Returns_
 
 Undocumented declaration.
 
+### experiments
+
+Experimental @wordpress/block-editor APIs.
+
 ### FontSizePicker
 
 _Related_
@@ -526,10 +530,6 @@ _Parameters_
 _Returns_
 
 -   `Object`: Typography block support derived CSS classes & styles.
-
-### GlobalStylesContext
-
-Undocumented declaration.
 
 ### InnerBlocks
 
@@ -792,18 +792,6 @@ _Returns_
 
 -   `any`: value
 
-### useGlobalStylesOutput
-
-Undocumented declaration.
-
-### useGlobalStylesReset
-
-Undocumented declaration.
-
-### useGlobalStylesSetting
-
-Undocumented declaration.
-
 ### useInnerBlocksProps
 
 This hook is used to lightly mark an element as an inner blocks wrapper
@@ -843,10 +831,6 @@ _Parameters_
 _Returns_
 
 -   `any`: Returns the value defined for the setting.
-
-### useStyle
-
-Undocumented declaration.
 
 ### Warning
 
