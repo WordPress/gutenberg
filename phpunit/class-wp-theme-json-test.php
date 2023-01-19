@@ -1699,12 +1699,12 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @dataProvider data_process_blocks_custom_css_nested_styles
+	 * @dataProvider data_process_blocks_custom_css
 	 *
 	 * @param array  $input    An array containing the selector and css to test.
 	 * @param string $expected Expected results.
 	 */
-	public function test_process_blocks_custom_css_nested_styles( $input, $expected ) {
+	public function test_process_blocks_custom_css( $input, $expected ) {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -1712,7 +1712,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$this->assertEquals( $expected, $theme_json->process_blocks_custom_css_nested_styles( $input['css'], $input['selector'] ) );
+		$this->assertEquals( $expected, $theme_json->process_blocks_custom_css( $input['css'], $input['selector'] ) );
 	}
 
 	/**
@@ -1720,7 +1720,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 *
 	 * @return array[]
 	 */
-	public function data_process_blocks_custom_css_nested_styles() {
+	public function data_process_blocks_custom_css() {
 		return array(
 			// Simple CSS without any child selectors.
 			'no child selectors'                => array(
