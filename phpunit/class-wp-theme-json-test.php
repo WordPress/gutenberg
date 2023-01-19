@@ -476,7 +476,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
 					'shadow' => array(
-						'palette' => array(
+						'presets' => array(
 							array(
 								'slug'   => 'natural',
 								'shadow' => '5px 5px 5px 0 black',
@@ -502,7 +502,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
 					'shadow' => array(
-						'palette' => array(
+						'presets' => array(
 							array(
 								'slug'   => 'natural',
 								'shadow' => '5px 5px 0 0 black',

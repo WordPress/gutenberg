@@ -118,8 +118,8 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	const PRESETS_METADATA = array(
 		array(
-			'path'              => array( 'shadow', 'palette' ),
-			'prevent_override'  => array( 'shadow', 'defaultPalette' ),
+			'path'              => array( 'shadow', 'presets' ),
+			'prevent_override'  => array( 'shadow', 'defaultPresets' ),
 			'use_default_names' => false,
 			'value_key'         => 'shadow',
 			'css_vars'          => '--wp--preset--shadow--$slug',
@@ -343,8 +343,8 @@ class WP_Theme_JSON_Gutenberg {
 			'width'  => null,
 		),
 		'shadow'                        => array(
-			'palette'        => null,
-			'defaultPalette' => null,
+			'presets'        => null,
+			'defaultPresets' => null,
 		),
 		'color'                         => array(
 			'background'       => null,
