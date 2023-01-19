@@ -16,24 +16,12 @@ A Notice displays a succinct message. It can also offer the user options, like v
 
 Use Notices to communicate things that are important but don’t necessarily require action — a user can keep using the product even if they don’t choose to act on a Notice. They are less interruptive than a Modal.
 
-### Anatomy
-
-![Diagram of a Notice component with numbered labels](https://make.wordpress.org/design/files/2019/03/Notice-Anatomy.png)
-
-1. Container (status indicated with color)
-2. Icon (optional)
-3. Message
-4. Dismiss icon (optional)
-
 ### Usage
 
 Notices display at the top of the screen, below any toolbars anchored to the top of the page. They’re persistent and non-modal. Since they don’t overlay the content, users can ignore or dismiss them, and choose when to interact with them.
 
-![](https://make.wordpress.org/design/files/2019/03/Notice-States.png)
-
 Notices are color-coded to indicate the type of message being communicated:
 
--   **Default** notices have **no background**.
 -   **Informational** notices are **blue** by default.
     - If there is a parent `Theme` component with an `accent` color prop, informational notices will take on that color instead.
 -   **Success** notices are **green.**
