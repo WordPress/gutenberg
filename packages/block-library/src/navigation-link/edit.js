@@ -313,7 +313,7 @@ export default function NavigationLinkEdit( {
 	function removeLink() {
 		// Reset all attributes that comprise the link.
 		setAttributes( {
-			url: '',
+			url: undefined,
 			label: '',
 			id: '',
 			kind: '',
