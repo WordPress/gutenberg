@@ -68,6 +68,6 @@ exports[`Links should contain a label when it should open in a new tab 1`] = `
 
 exports[`Links should contain a label when it should open in a new tab 2`] = `
 "<!-- wp:paragraph -->
-<p>This is <a href=\\"http://wordpress.org\\">WordPress</a></p>
+<p>This is <a href=\\"http://wordpress.org\\" target=\\"_blank\\" rel=\\"noreferrer noopener\\">WordPress</a></p>
 <!-- /wp:paragraph -->"
 `;
