@@ -45,11 +45,8 @@ function gutenberg_register_shadow_support( $block_type ) {
  * @return array Shadow CSS classes and inline styles.
  */
 function gutenberg_apply_shadow_support( $block_type, $block_attributes ) {
-	if ( ! property_exists( $block_type, 'supports' ) ) {
-		return array();
-	}
+	$has_shadow_support = block_has_support( $block_type, array( 'shadow' ), false );
 
-	$has_shadow_support = _wp_array_get( $block_type->supports, array( 'shadow' ), false );
 	if ( ! $has_shadow_support ) {
 		return array();
 	}
