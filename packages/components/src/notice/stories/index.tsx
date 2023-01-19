@@ -9,8 +9,6 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
 import Notice from '..';
 import type { NoticeProps } from '../types';
 
-// TODO: Add a story involving NoticeList to help people understand
-// the difference between onDismiss/onRemove.
 const meta: ComponentMeta< typeof Notice > = {
 	title: 'Components/Notice',
 	component: Notice,
