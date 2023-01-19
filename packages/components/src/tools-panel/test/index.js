@@ -582,7 +582,7 @@ describe( 'ToolsPanel', () => {
 			// registerPanelItem has still only been called once.
 			expect( context.registerPanelItem ).toHaveBeenCalledTimes( 1 );
 			// deregisterPanelItem is called, given that we have switched panels.
-			expect( context.deregisterPanelItem ).toBeCalledWith(
+			expect( context.deregisterPanelItem ).toHaveBeenCalledWith(
 				altControlProps.label
 			);
 

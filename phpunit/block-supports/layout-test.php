@@ -7,6 +7,21 @@
  */
 
 class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
+	/**
+	 * @var string|null
+	 */
+	private $theme_root;
+
+	/**
+	 * @var array|null
+	 */
+	private $orig_theme_dir;
+
+	/**
+	 * @var array|null
+	 */
+	private $queries;
+
 	public function set_up() {
 		parent::set_up();
 		$this->theme_root     = realpath( __DIR__ . '/../data/themedir1' );

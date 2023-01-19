@@ -32,7 +32,6 @@ import useListViewClientIds from './use-list-view-client-ids';
 import useListViewDropZone from './use-list-view-drop-zone';
 import useListViewExpandSelectedItem from './use-list-view-expand-selected-item';
 import { store as blockEditorStore } from '../../store';
-import { Appender } from './appender';
 
 const expanded = ( state, action ) => {
 	if ( Array.isArray( action.clientIds ) ) {
@@ -236,11 +235,6 @@ function __ExperimentalOffCanvasEditor(
 							positionInSet={ 1 }
 							isExpanded={ true }
 						>
-							<TreeGridCell>
-								{ ( treeGridCellProps ) => (
-									<Appender { ...treeGridCellProps } />
-								) }
-							</TreeGridCell>
 							{ ! clientIdsTree.length && (
 								<TreeGridCell withoutGridItem>
 									<div className="offcanvas-editor-list-view-is-empty">

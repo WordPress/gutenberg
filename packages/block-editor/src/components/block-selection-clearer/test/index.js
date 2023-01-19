@@ -50,7 +50,7 @@ describe( 'BlockSelectionClearer component', () => {
 
 		fireEvent.mouseDown( screen.getByTestId( 'selection-clearer' ) );
 
-		expect( mockClearSelectedBlock ).toBeCalled();
+		expect( mockClearSelectedBlock ).toHaveBeenCalled();
 	} );
 
 	it( 'should clear the selected block when multiple blocks are selected', () => {
@@ -71,7 +71,7 @@ describe( 'BlockSelectionClearer component', () => {
 
 		fireEvent.mouseDown( screen.getByTestId( 'selection-clearer' ) );
 
-		expect( mockClearSelectedBlock ).toBeCalled();
+		expect( mockClearSelectedBlock ).toHaveBeenCalled();
 	} );
 
 	it( 'should not clear the block selection when no blocks are selected', () => {
@@ -89,7 +89,7 @@ describe( 'BlockSelectionClearer component', () => {
 
 		fireEvent.mouseDown( screen.getByTestId( 'selection-clearer' ) );
 
-		expect( mockClearSelectedBlock ).not.toBeCalled();
+		expect( mockClearSelectedBlock ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should not clear the block selection when the feature is disabled', () => {
@@ -113,6 +113,6 @@ describe( 'BlockSelectionClearer component', () => {
 
 		fireEvent.mouseDown( screen.getByTestId( 'selection-clearer' ) );
 
-		expect( mockClearSelectedBlock ).not.toBeCalled();
+		expect( mockClearSelectedBlock ).not.toHaveBeenCalled();
 	} );
 } );

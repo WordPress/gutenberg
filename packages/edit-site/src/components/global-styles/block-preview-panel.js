@@ -6,13 +6,25 @@ import { getBlockType, getBlockFromExample } from '@wordpress/blocks';
 import { useResizeObserver } from '@wordpress/compose';
 import { __experimentalSpacer as Spacer } from '@wordpress/components';
 
-const BlockPreviewPanel = ( { name } ) => {
+const BlockPreviewPanel = ( { name, variation = '' } ) => {
 	const [
 		containerResizeListener,
 		{ width: containerWidth, height: containerHeight },
 	] = useResizeObserver();
 	const blockExample = getBlockType( name )?.example;
-	const blocks = blockExample && getBlockFromExample( name, blockExample );
+	const blockExampleWithVariation = {
+		...blockExample,
+		attributes: {
+			...blockExample?.attributes,
+			className: variation,
+		},
+	};
+	const blocks =
+		blockExample &&
+		getBlockFromExample(
+			name,
+			variation ? blockExampleWithVariation : blockExample
+		);
 	const viewportWidth = blockExample?.viewportWidth || containerWidth;
 	const minHeight = containerHeight;
 

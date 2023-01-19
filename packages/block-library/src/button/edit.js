@@ -262,6 +262,7 @@ function ButtonEdit( props ) {
 			</InspectorControls>
 			<InspectorControls __experimentalGroup="advanced">
 				<TextControl
+					__nextHasNoMarginBottom
 					label={ __( 'Link rel' ) }
 					value={ rel || '' }
 					onChange={ ( newRel ) => setAttributes( { rel: newRel } ) }

@@ -88,6 +88,7 @@ export default function DocumentActions() {
 			// Use the title wrapper as the popover anchor so that the dropdown is
 			// centered over the whole title area rather than just one part of it.
 			anchor: popoverAnchor,
+			placement: 'bottom',
 		} ),
 		[ popoverAnchor ]
 	);
@@ -146,7 +147,6 @@ export default function DocumentActions() {
 
 				<Dropdown
 					popoverProps={ popoverProps }
-					position="bottom center"
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<Button
 							className="edit-site-document-actions__get-info"

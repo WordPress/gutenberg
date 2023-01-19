@@ -41,6 +41,7 @@ export default function ImageSizeControl( {
 		<>
 			{ ! isEmpty( imageSizeOptions ) && (
 				<SelectControl
+					__nextHasNoMarginBottom
 					label={ __( 'Image size' ) }
 					value={ slug }
 					options={ imageSizeOptions }

@@ -101,6 +101,7 @@ const restrictedImports = [
 			'keys',
 			'last',
 			'lowerCase',
+			'map',
 			'mapKeys',
 			'maxBy',
 			'memoize',
@@ -115,6 +116,7 @@ const restrictedImports = [
 			'partial',
 			'partialRight',
 			'pick',
+			'pickBy',
 			'random',
 			'reduce',
 			'reject',
@@ -367,10 +369,12 @@ module.exports = {
 				'packages/react-native-*/**/*.[tj]s?(x)',
 				'test/native/**/*.[tj]s?(x)',
 				'test/e2e/**/*.[tj]s?(x)',
+				'test/storybook-playwright/**/*.[tj]s?(x)',
 			],
 			extends: [
 				'plugin:jest-dom/recommended',
 				'plugin:testing-library/react',
+				'plugin:jest/recommended',
 			],
 		},
 		{

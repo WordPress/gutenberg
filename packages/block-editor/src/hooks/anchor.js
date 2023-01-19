@@ -68,6 +68,7 @@ export const withInspectorControl = createHigherOrderComponent(
 				const isWeb = Platform.OS === 'web';
 				const textControl = (
 					<TextControl
+						__nextHasNoMarginBottom
 						className="html-anchor-control"
 						label={ __( 'HTML anchor' ) }
 						help={

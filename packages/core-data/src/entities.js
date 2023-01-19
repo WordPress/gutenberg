@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { capitalCase, pascalCase } from 'change-case';
-import { map, get } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -213,7 +213,7 @@ async function loadPostTypeEntities() {
 	const postTypes = await apiFetch( {
 		path: '/wp/v2/types?context=view',
 	} );
-	return map( postTypes, ( postType, name ) => {
+	return Object.entries( postTypes ?? {} ).map( ( [ name, postType ] ) => {
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			name
 		);
@@ -251,7 +251,7 @@ async function loadTaxonomyEntities() {
 	const taxonomies = await apiFetch( {
 		path: '/wp/v2/taxonomies?context=view',
 	} );
-	return map( taxonomies, ( taxonomy, name ) => {
+	return Object.entries( taxonomies ?? {} ).map( ( [ name, taxonomy ] ) => {
 		const namespace = taxonomy?.rest_namespace ?? 'wp/v2';
 		return {
 			kind: 'taxonomy',

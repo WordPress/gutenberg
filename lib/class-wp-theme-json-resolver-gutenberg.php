@@ -246,7 +246,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				$theme_json_data = array();
 			}
 			// BEGIN OF EXPERIMENTAL CODE. Not to backport to core.
-			$theme_json_data = gutenberg_add_registered_webfonts_to_theme_json( $theme_json_data );
+			$theme_json_data = gutenberg_add_registered_fonts_to_theme_json( $theme_json_data );
 			// END OF EXPERIMENTAL CODE.
 
 			/**
@@ -267,7 +267,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 					$parent_theme_json_data = static::read_json_file( $parent_theme_json_file );
 					$parent_theme_json_data = static::translate( $parent_theme_json_data, $wp_theme->parent()->get( 'TextDomain' ) );
 					// BEGIN OF EXPERIMENTAL CODE. Not to backport to core.
-					$parent_theme_json_data = gutenberg_add_registered_webfonts_to_theme_json( $parent_theme_json_data );
+					$parent_theme_json_data = gutenberg_add_registered_fonts_to_theme_json( $parent_theme_json_data );
 					// END OF EXPERIMENTAL CODE.
 					$parent_theme = new WP_Theme_JSON_Gutenberg( $parent_theme_json_data );
 
@@ -670,32 +670,58 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	}
 
 	/**
-	 * Returns the style variations defined by the theme.
+	 * Returns an array of all nested json files within a given directory.
 	 *
-	 * @since 6.0.0
+	 * @since 6.2.0
+	 *
+	 * @param dir $dir The directory to recursively iterate and list files of.
+	 * @return array The merged array.
+	 */
+	private static function recursively_iterate_json( $dir ) {
+		$nested_files      = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $dir ) );
+		$nested_json_files = iterator_to_array( new RegexIterator( $nested_files, '/^.+\.json$/i', RecursiveRegexIterator::GET_MATCH ) );
+		return $nested_json_files;
+	}
+
+	/**
+	 * Returns the style variations defined by the theme (parent and child).
+	 *
+	 * @since 6.2.0 Returns parent theme variations if theme is a child.
 	 *
 	 * @return array
 	 */
 	public static function get_style_variations() {
-		$variations     = array();
-		$base_directory = get_stylesheet_directory() . '/styles';
+		$variation_files    = array();
+		$variations         = array();
+		$base_directory     = get_stylesheet_directory() . '/styles';
+		$template_directory = get_template_directory() . '/styles';
 		if ( is_dir( $base_directory ) ) {
-			$nested_files      = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $base_directory ) );
-			$nested_html_files = iterator_to_array( new RegexIterator( $nested_files, '/^.+\.json$/i', RecursiveRegexIterator::GET_MATCH ) );
-			ksort( $nested_html_files );
-			foreach ( $nested_html_files as $path => $file ) {
-				$decoded_file = wp_json_file_decode( $path, array( 'associative' => true ) );
-				if ( is_array( $decoded_file ) ) {
-					$translated = static::translate( $decoded_file, wp_get_theme()->get( 'TextDomain' ) );
-					$variation  = ( new WP_Theme_JSON_Gutenberg( $translated ) )->get_raw_data();
-					if ( empty( $variation['title'] ) ) {
-						$variation['title'] = basename( $path, '.json' );
+			$variation_files = static::recursively_iterate_json( $base_directory );
+		}
+		if ( is_dir( $template_directory ) && $template_directory !== $base_directory ) {
+			$variation_files_parent = static::recursively_iterate_json( $template_directory );
+			// If the child and parent variation file basename are the same, only include the child theme's.
+			foreach ( $variation_files_parent as $parent_path => $parent ) {
+				foreach ( $variation_files as $child_path => $child ) {
+					if ( basename( $parent_path ) === basename( $child_path ) ) {
+						unset( $variation_files_parent[ $parent_path ] );
 					}
-					$variations[] = $variation;
 				}
+			}
+			$variation_files = array_merge( $variation_files, $variation_files_parent );
+		}
+		ksort( $variation_files );
+		foreach ( $variation_files as $path => $file ) {
+			$decoded_file = wp_json_file_decode( $path, array( 'associative' => true ) );
+			if ( is_array( $decoded_file ) ) {
+				$translated = static::translate( $decoded_file, wp_get_theme()->get( 'TextDomain' ) );
+				$variation  = ( new WP_Theme_JSON_Gutenberg( $translated ) )->get_raw_data();
+				if ( empty( $variation['title'] ) ) {
+					$variation['title'] = basename( $path, '.json' );
+				}
+				$variations[] = $variation;
 			}
 		}
 		return $variations;
 	}
-
 }
