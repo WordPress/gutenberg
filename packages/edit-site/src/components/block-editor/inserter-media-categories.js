@@ -10,6 +10,24 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import { store as coreStore } from '@wordpress/core-data';
 
+/** @typedef {import('@wordpress/block-editor').InserterMediaRequest} InserterMediaRequest */
+/** @typedef {import('@wordpress/block-editor').InserterMediaItem} InserterMediaItem */
+/**
+ * Interface for inserter media category.
+ *
+ * @typedef {Object} InserterMediaCategory
+ * @property {string}                                                 label                The label of the media category. It's used in the inserter media items list.
+ * @property {string}                                                 [searchLabel]        The label to append in the search placeholder. If not provided the lowercase `label` will be used.
+ * @property {string}                                                 name                 The name of the media category, that should be unique among all media cateogries.
+ * @property {('image'|'audio'|'video')}                              mediaType            The media type of the media category.
+ * @property {(InserterMediaRequest) => Promise<InserterMediaItem[]>} fetch                The function to fetch media items for the category.
+ * @property {(InserterMediaItem)=> string}                           [getReportUrl]       If the media category support reporting media items, this function should return
+ *                                                                                         the report url for the media item. It accepts the `InserterMediaItem` as an argument.
+ * @property {boolean}                                                [isExternalResource] If the media category is an external resource, this should be set to true.
+ *                                                                                         This is used to avoid making a request to the external resource when the user
+ *                                                                                         opens the inserter for the first time.
+ */
+
 const getExternalLink = ( url, text ) =>
 	`<a href="${ url }" target="_blank" rel="noreferrer noopener">${ text }</a>`;
 
@@ -157,7 +175,7 @@ const inserterMediaCategories = [
 		},
 		getReportUrl: ( { sourceId } ) =>
 			`https://wordpress.org/openverse/image/${ sourceId }/report/`,
-		hasAvailableMedia: true,
+		isExternalResource: true,
 	},
 ];
 

@@ -30,7 +30,6 @@ import { store as blockEditorStore } from '../../../store';
  * @property {number|string} [sourceId]   The id of the media item from external source.
  * @property {string}        [alt]        The alt text of the media item.
  * @property {string}        [caption]    The caption of the media item.
- *
  */
 
 /**
@@ -94,11 +93,11 @@ function useInserterMediaCategories() {
 			return;
 		}
 		return inserterMediaCategories.filter( ( category ) => {
-			// When a category has set `hasAvailableMedia` to `true`, means is an
-			// external source. In this case we don't need to check for allowed mime types,
-			// as they are used for restricting uploads for this media type and not for
+			// When a category has set `isExternalResource` to `true`, we
+			// don't need to check for allowed mime types, as they are used
+			// for restricting uploads for this media type and not for
 			// inserting media from external sources.
-			if ( category.hasAvailableMedia ) {
+			if ( category.isExternalResource ) {
 				return true;
 			}
 			return Object.values( allowedMimeTypes ).some( ( mimeType ) =>
@@ -145,7 +144,7 @@ export function useMediaCategories( rootClientId ) {
 				await Promise.all(
 					inserterMediaCategories.map( async ( category ) => {
 						// Some sources are external and we don't need to make a request.
-						if ( category.hasAvailableMedia ) {
+						if ( category.isExternalResource ) {
 							return [ category.name, true ];
 						}
 						const results = await category.fetch( { per_page: 1 } );
