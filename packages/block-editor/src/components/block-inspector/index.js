@@ -214,6 +214,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 							group="border"
 							label={ __( 'Border' ) }
 						/>
+						<InspectorControls.Slot group="styles" />
 					</>
 				) }
 			</div>
@@ -372,6 +373,7 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 						group="border"
 						label={ __( 'Border' ) }
 					/>
+					<InspectorControls.Slot group="styles" />
 					<PositionControls />
 					<div>
 						<AdvancedControls />
