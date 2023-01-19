@@ -10,13 +10,6 @@
  */
 function gutenberg_register_core_block_patterns_categories() {
 	register_block_pattern_category(
-		'columns',
-		array(
-			'label'       => _x( 'Columns', 'Block pattern category', 'gutenberg' ),
-			'description' => __( 'Multi-column patterns with more complex layouts.', 'gutenberg' ),
-		)
-	);
-	register_block_pattern_category(
 		'text',
 		array(
 			'label'       => _x( 'Text', 'Block pattern category', 'gutenberg' ),
