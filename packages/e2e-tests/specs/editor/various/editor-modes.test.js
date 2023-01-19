@@ -71,7 +71,9 @@ describe( 'Editing modes (visual/HTML)', () => {
 			'.block-editor-block-list__layout .block-editor-block-list__block .block-editor-block-list__block-html-textarea',
 			( node ) => node.textContent
 		);
-		expect( htmlBlockContent ).toEqual( '<p>Hello world!</p>' );
+		expect( htmlBlockContent ).toEqual(
+			'<p class="wp-block-paragraph">Hello world!</p>'
+		);
 
 		// Change the `drop cap` using the sidebar.
 		await openTypographyToolsPanelMenu();
@@ -88,7 +90,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 			( node ) => node.textContent
 		);
 		expect( htmlBlockContent ).toEqual(
-			'<p class="has-drop-cap">Hello world!</p>'
+			'<p class="wp-block-paragraph has-drop-cap">Hello world!</p>'
 		);
 	} );
 
@@ -152,7 +154,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 
 		expect( await getCurrentPostContent() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
-		<p>Hi world!</p>
+		<p class=\\"wp-block-paragraph\\">Hi world!</p>
 		<!-- /wp:paragraph -->"
 	` );
 	} );

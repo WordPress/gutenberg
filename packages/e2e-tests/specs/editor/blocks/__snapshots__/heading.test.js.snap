@@ -20,7 +20,7 @@ exports[`Heading should correctly apply named colors 1`] = `
 
 exports[`Heading should create a paragraph block above when pressing enter at the start 1`] = `
 "<!-- wp:paragraph -->
-<p></p>
+<p class=\\"wp-block-paragraph\\"></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
@@ -34,7 +34,7 @@ exports[`Heading should create a paragraph block below when pressing enter at th
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p></p>
+<p class=\\"wp-block-paragraph\\"></p>
 <!-- /wp:paragraph -->"
 `;
 

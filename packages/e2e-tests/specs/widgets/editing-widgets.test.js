@@ -827,10 +827,10 @@ describe( 'Widgets screen', () => {
 		expect( serializedWidgetAreas ).toMatchInlineSnapshot( `
 		Object {
 		  "sidebar-1": "<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
-		<p>First Paragraph</p>
+		<p class=\\"wp-block-paragraph\\">First Paragraph</p>
 		</div></div>
 		<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
-		<p>Second Paragraph</p>
+		<p class=\\"wp-block-paragraph\\">Second Paragraph</p>
 		</div></div>",
 		}
 	` );

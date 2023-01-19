@@ -4,7 +4,7 @@ export default `
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p><strong>Bold</strong> <em>Italic</em> <s>Striked</s> Superscript<sup>(1)</sup> Subscript<sub>(2)</sub> <a href="http://www.wordpress.org" target="_blank" rel="noreferrer noopener">Link</a></p>
+<p class="wp-block-paragraph"><strong>Bold</strong> <em>Italic</em> <s>Striked</s> Superscript<sup>(1)</sup> Subscript<sub>(2)</sub> <a href="http://www.wordpress.org" target="_blank" rel="noreferrer noopener">Link</a></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading {"textAlign":"left","level":4,"className":"has-primary-background-color has-background","style":{"typography":{"lineHeight":"2.5"}}} -->
@@ -27,7 +27,7 @@ export default `
 
 <!-- wp:quote {"align":"left","className":"is-style-large"} -->
 <blockquote class="wp-block-quote has-text-align-left is-style-large"><!-- wp:paragraph -->
-<p>"This will make running your own blog a viable alternative again."</p>
+<p class="wp-block-paragraph">"This will make running your own blog a viable alternative again."</p>
 <!-- /wp:paragraph --><cite>— <a href="https://twitter.com/azumbrunnen_/status/1019347243084800005">Adrian Zumbrunnen</a></cite></blockquote>
 <!-- /wp:quote -->
 
@@ -36,7 +36,7 @@ export default `
 <!-- /wp:pullquote -->
 
 <!-- wp:paragraph {"dropCap":true,"className":"custom-class-1 custom-class-2 has-background has-vivid-red-background-color","fontSize":"large"} -->
-<p class="has-drop-cap custom-class-1 custom-class-2 has-background has-vivid-red-background-color has-large-font-size">
+<p class="wp-block-paragraph has-drop-cap custom-class-1 custom-class-2 has-background has-vivid-red-background-color has-large-font-size">
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer tempor tincidunt sapien, quis dictum orci sollicitudin quis. Proin sed elit id est pulvinar feugiat vitae eget dolor. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
 <!-- /wp:paragraph -->
 

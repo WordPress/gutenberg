@@ -59,7 +59,7 @@ describe( 'adding inline tokens', () => {
 
 		// Check the content.
 		const regex = new RegExp(
-			`<!-- wp:paragraph -->\\s*<p>a <img class="wp-image-\\d+" style="width:\\s*10px;?" src="[^"]+\\/${ filename }\\.png" alt=""\\/?><\\/p>\\s*<!-- \\/wp:paragraph -->`
+			`<!-- wp:paragraph -->\\s*<p class="wp-block-paragraph">a <img class="wp-image-\\d+" style="width:\\s*10px;?" src="[^"]+\\/${ filename }\\.png" alt=""\\/?><\\/p>\\s*<!-- \\/wp:paragraph -->`
 		);
 		expect( await getEditedPostContent() ).toMatch( regex );
 
@@ -74,7 +74,7 @@ describe( 'adding inline tokens', () => {
 
 		// Check the content.
 		const regex2 = new RegExp(
-			`<!-- wp:paragraph -->\\s*<p>a <img class="wp-image-\\d+" style="width:\\s*20px;?" src="[^"]+\\/${ filename }\\.png" alt=""\\/?><\\/p>\\s*<!-- \\/wp:paragraph -->`
+			`<!-- wp:paragraph -->\\s*<p class="wp-block-paragraph">a <img class="wp-image-\\d+" style="width:\\s*20px;?" src="[^"]+\\/${ filename }\\.png" alt=""\\/?><\\/p>\\s*<!-- \\/wp:paragraph -->`
 		);
 		expect( await getEditedPostContent() ).toMatch( regex2 );
 	} );

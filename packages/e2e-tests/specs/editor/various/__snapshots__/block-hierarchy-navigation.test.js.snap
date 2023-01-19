@@ -2,7 +2,7 @@
 
 exports[`Navigating the block hierarchy should appear and function even without nested blocks 1`] = `
 "<!-- wp:paragraph -->
-<p>and I say hello</p>
+<p class=\\"wp-block-paragraph\\">and I say hello</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:image -->
@@ -14,7 +14,7 @@ exports[`Navigating the block hierarchy should navigate block hierarchy using on
 "<!-- wp:columns -->
 <div class=\\"wp-block-columns\\"><!-- wp:column -->
 <div class=\\"wp-block-column\\"><!-- wp:paragraph -->
-<p>First column</p>
+<p class=\\"wp-block-paragraph\\">First column</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:column -->
 
@@ -24,7 +24,7 @@ exports[`Navigating the block hierarchy should navigate block hierarchy using on
 
 <!-- wp:column -->
 <div class=\\"wp-block-column\\"><!-- wp:paragraph -->
-<p>Third column</p>
+<p class=\\"wp-block-paragraph\\">Third column</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:column --></div>
 <!-- /wp:columns -->"
@@ -34,7 +34,7 @@ exports[`Navigating the block hierarchy should navigate using the list view side
 "<!-- wp:columns -->
 <div class=\\"wp-block-columns\\"><!-- wp:column -->
 <div class=\\"wp-block-column\\"><!-- wp:paragraph -->
-<p>First column</p>
+<p class=\\"wp-block-paragraph\\">First column</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:column -->
 
@@ -44,7 +44,7 @@ exports[`Navigating the block hierarchy should navigate using the list view side
 
 <!-- wp:column -->
 <div class=\\"wp-block-column\\"><!-- wp:paragraph -->
-<p>Third column</p>
+<p class=\\"wp-block-paragraph\\">Third column</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:column --></div>
 <!-- /wp:columns -->"
@@ -53,7 +53,7 @@ exports[`Navigating the block hierarchy should navigate using the list view side
 exports[`Navigating the block hierarchy should select the wrapper div for a group 1`] = `
 "<!-- wp:group {\\"layout\\":{\\"type\\":\\"constrained\\"}} -->
 <div class=\\"wp-block-group\\"><!-- wp:paragraph -->
-<p>just a paragraph</p>
+<p class=\\"wp-block-paragraph\\">just a paragraph</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:separator -->

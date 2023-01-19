@@ -21,7 +21,7 @@ describe( 'Quote', () => {
 		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
 		"<!-- wp:quote -->
 		<blockquote class=\\"wp-block-quote\\"><!-- wp:paragraph -->
-		<p>test</p>
+		<p class=\\"wp-block-paragraph\\">test</p>
 		<!-- /wp:paragraph --></blockquote>
 		<!-- /wp:quote -->"
 	` );
@@ -39,7 +39,7 @@ describe( 'Quote', () => {
 		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
 		"<!-- wp:quote -->
 		<blockquote class=\\"wp-block-quote\\"><!-- wp:paragraph -->
-		<p>test</p>
+		<p class=\\"wp-block-paragraph\\">test</p>
 		<!-- /wp:paragraph --></blockquote>
 		<!-- /wp:quote -->"
 	` );

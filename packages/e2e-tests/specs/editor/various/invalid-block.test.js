@@ -46,7 +46,7 @@ describe( 'invalid blocks', () => {
 			( node ) => node.textContent
 		);
 		expect( htmlBlockContent ).toEqual(
-			'<p>hello</p><p>invalid paragraph'
+			'<p class="wp-block-paragraph">hello</p><p>invalid paragraph'
 		);
 	} );
 
@@ -62,7 +62,7 @@ describe( 'invalid blocks', () => {
 		await setPostContent(
 			`
 			<!-- wp:paragraph -->
-			<p>aaaa <img src onerror=alert(1)></x dde></x>1
+			<p class="wp-block-paragraph">aaaa <img src onerror=alert(1)></x dde></x>1
 			<!-- /wp:paragraph -->
 			`
 		);
