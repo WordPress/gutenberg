@@ -67,7 +67,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 						onSubmit={ onSubmitURL }
 						className="wp-block-rss__placeholder-form"
 					>
-						<HStack align="baseline">
+						<HStack wrap>
 							<InputControl
 								__next36pxDefaultSize
 								placeholder={ __( 'Enter URL here…' ) }

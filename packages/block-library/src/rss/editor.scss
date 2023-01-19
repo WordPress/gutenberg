@@ -12,8 +12,10 @@
 			margin-bottom: 0;
 		}
 	}
+
+	.wp-block-rss__placeholder-input {
+		flex: 1;
+		min-width: 80%;
+	}
 }
 
-.wp-block-rss__placeholder-input {
-	flex: 1;
-}
