@@ -26,7 +26,6 @@ export function BlockPreview( {
 	additionalStyles = [],
 	// Deprecated props:
 	__experimentalMinHeight,
-	__experimentalStyles,
 	__experimentalPadding,
 } ) {
 	if ( __experimentalMinHeight ) {
@@ -34,15 +33,6 @@ export function BlockPreview( {
 		deprecated( 'The __experimentalMinHeight prop', {
 			since: '6.2',
 			alternative: 'minHeight',
-		} );
-	}
-	if ( __experimentalStyles ) {
-		additionalStyles = __experimentalStyles;
-		deprecated( 'The __experimentalStyles prop of BlockPreview', {
-			plugin: 'Gutenberg',
-			since: '15.0',
-			version: '15.2',
-			alternative: 'additionalStyles',
 		} );
 	}
 	if ( __experimentalPadding ) {
