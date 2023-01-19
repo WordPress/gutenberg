@@ -22,11 +22,11 @@ Notices display at the top of the screen, below any toolbars anchored to the top
 
 Notices are color-coded to indicate the type of message being communicated:
 
--   **Informational** notices are **blue** by default.
-    - If there is a parent `Theme` component with an `accent` color prop, informational notices will take on that color instead.
--   **Success** notices are **green.**
--   **Warning** notices are **yellow\*\***.\*\*
--   **Error** notices are **red.**
+- **Informational** notices are **blue** by default.
+- If there is a parent `Theme` component with an `accent` color prop, informational notices will take on that color instead.
+- **Success** notices are **green.**
+- **Warning** notices are **yellow\*\***.\*\*
+- **Error** notices are **red.**
 
 If an icon is included in the Notice, it should be color-coded to match the Notice state.
 
@@ -122,8 +122,8 @@ A function called to dismiss/remove the notice.
 
 A politeness level for the notice's spoken message. Should be provided as one of the valid options for [an `aria-live` attribute value](https://www.w3.org/TR/wai-aria-1.1/#aria-live).
 
--   A value of `'assertive'` is to be used for important, and usually time-sensitive, information. It will interrupt anything else the screen reader is announcing in that moment.
--   A value of `'polite'` is to be used for advisory information. It should not interrupt what the screen reader is announcing in that moment (the "speech queue") or interrupt the current task.
+- A value of `'assertive'` is to be used for important, and usually time-sensitive, information. It will interrupt anything else the screen reader is announcing in that moment.
+- A value of `'polite'` is to be used for advisory information. It should not interrupt what the screen reader is announcing in that moment (the "speech queue") or interrupt the current task.
 
 Note that this value should be considered a suggestion; assistive technologies may override it based on internal heuristics.
 
@@ -155,5 +155,5 @@ The default appearance of an action button is inferred based on whether `url` or
 
 ## Related components
 
--   To create a more prominent message that requires action, use a Modal.
+- To create a more prominent message that requires action, use a Modal.
 - For low priority, non-interruptive messsages, use Snackbar.
