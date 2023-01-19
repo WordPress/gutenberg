@@ -11,6 +11,10 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.87.2
+-   [*] Add boolean contentStyle and clientId check to Column Edit InnerBlocks [#47234]
+-   [*] Line-height and font-size regression fixes [#47284]
+
 ## 1.87.1
 -   [**] Gallery block: Address styling regression, in which negative margin was added [#47086]
 -   [*] RichText - Parse CSS values and avoid setting undefined ones [#47080]
