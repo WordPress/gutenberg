@@ -179,7 +179,7 @@ class WP_Fonts_Provider_Local extends WP_Fonts_Provider {
 
 			// Compile the "src" parameter.
 			if ( 'src' === $key ) {
-				$value = $this->compile_src( $font['font-family'], $value );
+				$value = $this->compile_src( $value );
 			}
 
 			// If font-variation-settings is an array, convert it to a string.
@@ -200,11 +200,10 @@ class WP_Fonts_Provider_Local extends WP_Fonts_Provider {
 	 *
 	 * @since X.X.X
 	 *
-	 * @param string $font_family Font family.
-	 * @param array  $value       Value to process.
+	 * @param array $value Value to process.
 	 * @return string The CSS.
 	 */
-	private function compile_src( $font_family, array $value ) {
+	private function compile_src( array $value ) {
 		$src = '';
 
 		foreach ( $value as $item ) {
