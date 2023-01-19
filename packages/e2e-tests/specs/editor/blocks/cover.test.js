@@ -126,7 +126,7 @@ describe( 'Cover', () => {
 			'.components-circular-option-picker__option-wrapper:first-child button'
 		);
 
-		// Select the cover block.By default the child paragraph gets selected.
+		// Select the cover block. By default the child paragraph gets selected.
 		await page.click(
 			'.edit-post-header-toolbar__document-overview-toggle'
 		);
@@ -134,16 +134,12 @@ describe( 'Cover', () => {
 			'.block-editor-list-view-block__contents-container a'
 		);
 
-		const heightInput = (
-			await page.$x(
-				'//div[./label[contains(text(),"Minimum height of cover")]]/following-sibling::div//input'
-			)
-		 )[ 0 ];
+		const heightInput = await page.waitForSelector(
+			'input[id*="block-cover-height-input"]'
+		);
 
 		// Verify the height of the cover is not defined.
-		expect(
-			await page.evaluate( ( { value } ) => value, heightInput )
-		).toBeFalsy();
+		expect( heightInput.value ).toBeFalsy();
 
 		const resizeButton = await page.$(
 			'.components-resizable-box__handle-bottom'
