@@ -50,6 +50,7 @@ const restrictedImports = [
 			'castArray',
 			'chunk',
 			'clamp',
+			'clone',
 			'cloneDeep',
 			'compact',
 			'concat',
