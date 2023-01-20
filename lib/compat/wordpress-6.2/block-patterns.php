@@ -11,6 +11,13 @@
 function gutenberg_register_core_block_patterns_categories() {
 	// Register new core block pattern categories.
 	register_block_pattern_category(
+		'banner',
+		array(
+			'label' => _x( 'Banners', 'Block pattern category', 'gutenberg' ),
+			'description' => _x( 'An element that helps structure or contrast the contents of a page.', 'gutenberg' ),
+		)
+	);
+	register_block_pattern_category(
 		'call-to-action',
 		array(
 			'label'       => _x( 'Call to Action', 'Block pattern category', 'gutenberg' ),
