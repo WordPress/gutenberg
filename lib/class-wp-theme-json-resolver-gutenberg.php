@@ -263,7 +263,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				if ( '' !== $parent_theme_json_file ) {
 					$parent_theme_json_data = static::read_json_file( $parent_theme_json_file );
 					$parent_theme_json_data = static::translate( $parent_theme_json_data, $wp_theme->parent()->get( 'TextDomain' ) );
-					$parent_theme = new WP_Theme_JSON_Gutenberg( $parent_theme_json_data );
+					$parent_theme           = new WP_Theme_JSON_Gutenberg( $parent_theme_json_data );
 
 					/*
 					 * Merge the child theme.json into the parent theme.json.
