@@ -23,12 +23,16 @@ import {
 import { __ } from '@wordpress/i18n';
 import { shadow as shadowIcon, Icon, check } from '@wordpress/icons';
 import { useCallback } from '@wordpress/element';
+import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { getSupportedGlobalStylesPanels, useStyle, useSetting } from './hooks';
+import { getSupportedGlobalStylesPanels } from './hooks';
 import { IconWithCurrentColor } from './icon-with-current-color';
+import { unlock } from '../../experiments';
+
+const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 
 export function useHasShadowControl( name ) {
 	const supports = getSupportedGlobalStylesPanels( name );
@@ -36,8 +40,15 @@ export function useHasShadowControl( name ) {
 }
 
 export default function ShadowPanel( { name, variationPath = '' } ) {
-	const [ shadow, setShadow ] = useStyle( `${ variationPath }shadow`, name );
-	const [ userShadow ] = useStyle( `${ variationPath }shadow`, name, 'user' );
+	const [ shadow, setShadow ] = useGlobalStyle(
+		`${ variationPath }shadow`,
+		name
+	);
+	const [ userShadow ] = useGlobalStyle(
+		`${ variationPath }shadow`,
+		name,
+		'user'
+	);
 	const hasShadow = () => !! userShadow;
 
 	const resetShadow = () => setShadow( undefined );
@@ -111,9 +122,11 @@ function renderShadowToggle() {
 }
 
 function ShadowPopoverContainer( { shadow, onShadowChange } ) {
-	const [ defaultShadows ] = useSetting( 'shadow.presets.default' );
-	const [ themeShadows ] = useSetting( 'shadow.presets.theme' );
-	const [ defaultPresetsEnabled ] = useSetting( 'shadow.defaultPresets' );
+	const [ defaultShadows ] = useGlobalSetting( 'shadow.presets.default' );
+	const [ themeShadows ] = useGlobalSetting( 'shadow.presets.theme' );
+	const [ defaultPresetsEnabled ] = useGlobalSetting(
+		'shadow.defaultPresets'
+	);
 
 	return (
 		<div className="edit-site-global-styles__shadow-panel">
