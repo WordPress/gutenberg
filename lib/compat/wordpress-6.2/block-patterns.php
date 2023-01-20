@@ -9,7 +9,7 @@
  * Registers the block pattern categories.
  */
 function gutenberg_register_core_block_patterns_categories() {
-	// Register new core block pattern categories.
+	// Register core block pattern categories.
 	register_block_pattern_category(
 		'banner',
 		array(
@@ -95,8 +95,7 @@ function gutenberg_register_core_block_patterns_categories() {
 		)
 	);
 
-	// Site building pattern categories.
-	// Todo: register in the Site Editor only.
+	// Register site building pattern categories.
 	register_block_pattern_category(
 		'footer',
 		array(
