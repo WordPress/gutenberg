@@ -12,6 +12,7 @@ import {
 	InspectorControls,
 	RichText,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	ComboboxControl,
@@ -22,7 +23,6 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-import { addQueryArgs } from '@wordpress/url';
 
 const minimumUsersForCombobox = 25;
 
@@ -36,9 +36,6 @@ const DEFAULT_AVATAR_SIZES = [ 24, 48, 96 ].map( ( size ) => ( {
 	label: `${ size } x ${ size }`,
 } ) );
 
-const DEFAULT_AVATAR_URL =
-	'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y';
-
 function PostAuthorEdit( {
 	isSelected,
 	context: { postType, postId, queryId },
@@ -46,7 +43,7 @@ function PostAuthorEdit( {
 	setAttributes,
 } ) {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
-	const { authorId, authorDetails, authors } = useSelect(
+	const { authorId, authorDetails, authors, defaultAutorUrl } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, getUser, getUsers } =
 				select( coreStore );
@@ -55,11 +52,15 @@ function PostAuthorEdit( {
 				postType,
 				postId
 			)?.author;
+			const { getSettings } = select( blockEditorStore );
+			const { avatarURL } =
+				getSettings().__experimentalDiscussionSettings;
 
 			return {
 				authorId: _authorId,
 				authorDetails: _authorId ? getUser( _authorId ) : null,
 				authors: getUsers( AUTHORS_QUERY ),
+				defaultAutorUrl: avatarURL,
 			};
 		},
 		[ postType, postId ]
@@ -85,9 +86,7 @@ function PostAuthorEdit( {
 	const authorName = authorDetails?.name || __( 'Post Author' );
 	const avatarUrl = authorDetails?.avatar_urls
 		? authorDetails.avatar_urls[ avatarSize ]
-		: addQueryArgs( DEFAULT_AVATAR_URL, {
-				s: avatarSize,
-		  } );
+		: defaultAutorUrl;
 
 	const blockProps = useBlockProps( {
 		className: classnames( {
