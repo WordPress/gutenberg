@@ -13,15 +13,15 @@
 	.components-editor-notices__snackbar {
 		position: fixed;
 		right: 0;
-		bottom: 40px;
-		padding-left: 16px;
-		padding-right: 16px;
+		bottom: $grid-unit-50;
+		padding-left: $grid-unit-20;
+		padding-right: $grid-unit-20;
 	}
 
 	@media (min-width: $break-medium) {
 		.is-inserter-opened .components-editor-notices__snackbar,
 		.is-list-view-opened .components-editor-notices__snackbar {
-			padding-left: calc(16px + #{$nav-sidebar-width});
+			padding-left: calc(#{$grid-unit-20} + #{$nav-sidebar-width});
 		}
 	}
 }
