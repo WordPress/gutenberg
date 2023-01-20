@@ -121,7 +121,6 @@ export default function PostTemplateEdit( {
 					slug: templateSlug.replace( 'category-', '' ),
 				} );
 			const query = {
-				offset: perPage ? perPage * ( page - 1 ) + offset : 0,
 				order,
 				orderby: orderBy,
 			};
@@ -145,8 +144,14 @@ export default function PostTemplateEdit( {
 					Object.assign( query, builtTaxQuery );
 				}
 			}
-			if ( perPage ) {
-				query.per_page = perPage;
+			if ( perPage && parseInt( perPage, 10 ) ) {
+				const normalizedPerPage = Math.abs( parseInt( offset, 10 ) );
+				const normalizedOffset = parseInt( offset, 10 )
+					? Math.abs( parseInt( offset, 10 ) )
+					: 0;
+				query.offset =
+					normalizedPerPage * ( page - 1 ) + normalizedOffset;
+				query.perPage = normalizedPerPage;
 			}
 			if ( author ) {
 				query.author = author;
