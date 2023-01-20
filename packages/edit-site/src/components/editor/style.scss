@@ -18,7 +18,7 @@
 		padding-right: $grid-unit-20;
 	}
 
-	@media (min-width: $break-medium) {
+	@include break-medium {
 		.is-inserter-opened .components-editor-notices__snackbar,
 		.is-list-view-opened .components-editor-notices__snackbar {
 			padding-left: calc(#{$grid-unit-20} + #{$nav-sidebar-width});
