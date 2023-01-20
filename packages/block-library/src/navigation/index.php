@@ -509,9 +509,8 @@ function block_core_navigation_from_block_get_post_ids( $block ) {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_core_navigation( $attributes, $content, $block ) {
-
-	static $seen_menu_names = array();
-	static $seen_ref        = array();
+	$seen_menu_names = array();
+	$seen_ref        = array();
 
 	// Flag used to indicate whether the rendered output is considered to be
 	// a fallback (i.e. the block has no menu associated with it).
