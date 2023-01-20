@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
-import { useMemo, useEffect } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import {
 	AlignmentToolbar,
 	BlockControls,
@@ -17,10 +17,7 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { PanelBody, ToggleControl, RangeControl } from '@wordpress/components';
-import { sprintf, __, _n, _x } from '@wordpress/i18n';
-import { count as wordCount } from '@wordpress/wordcount';
-import { speak } from '@wordpress/a11y';
-import { useDebounce } from '@wordpress/compose';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -36,7 +33,7 @@ export default function PostExcerptEditor( {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
 	const isEditable = userCanEdit && ! isDescendentOfQueryLoop;
-	const debouncedSpeak = useDebounce( speak, 500 );
+
 	const [
 		rawExcerpt,
 		setExcerpt,
@@ -54,14 +51,6 @@ export default function PostExcerptEditor( {
 	 * Do not translate into your own language.
 	 */
 	const wordCountType = _x( 'words', 'Word count type. Do not translate!' );
-	const currentWordCount = wordCount( rawExcerpt, wordCountType );
-
-	// Use speak() to announce the word count status when the current word count is updated.
-	useEffect( () => {
-		if ( !! speakWordCountMessage ) {
-			debouncedSpeak( speakWordCountMessage );
-		}
-	}, [ currentWordCount ] );
 
 	/**
 	 * When excerpt is editable, strip the html tags from
@@ -160,57 +149,26 @@ export default function PostExcerptEditor( {
 		trimmedExcerpt = rawOrRenderedExcerpt.trim().split( '', excerptLength );
 	}
 
-	/**
-	 * Show a warning if the word count is same as,
-	 * 5 words lower, or larger than the excerpt length value.
-	 */
-	let wordCountMessage,
-		speakWordCountMessage = null;
-	if (
-		excerptLength === currentWordCount ||
-		( excerptLength > currentWordCount &&
-			excerptLength - currentWordCount <= 5 )
-	) {
-		wordCountMessage = sprintf(
-			/* translators: 1: Number of words entered, 2: Number of words allowed. */
-			__( '%1$s / %2$s' ),
-			currentWordCount,
-			excerptLength
-		);
-		speakWordCountMessage = sprintf(
-			/* translators: 1: Number of words entered, 2: Number of words allowed. */
-			__( 'The excerpt uses %1$s out of %2$s words' ),
-			currentWordCount,
-			excerptLength
-		);
-	} else if ( currentWordCount > excerptLength ) {
-		// If the word count exceeds the excerpt length, show a warning with a negative value.
-		wordCountMessage = String( excerptLength - currentWordCount );
-		speakWordCountMessage = sprintf(
-			/* translators: %s: Number of words that exceed the excerpt length limit */
-			_n(
-				'The excerpt is %s word longer than allowed.',
-				'The excerpt is %s words longer than allowed.',
-				currentWordCount - excerptLength
-			),
-			String( currentWordCount - excerptLength )
-		);
-	}
+	trimmedExcerpt = trimmedExcerpt + '...';
 
 	const excerptContent = isEditable ? (
 		<RichText
 			className={ excerptClassName }
 			aria-label={ __( 'Post excerpt text' ) }
 			value={
-				trimmedExcerpt ||
-				( isSelected ? '' : __( 'No post excerpt found' ) )
+				isSelected
+					? rawOrRenderedExcerpt
+					: ( trimmedExcerpt !== '...' ? trimmedExcerpt : '' ) ||
+					  __( 'No post excerpt found' )
 			}
 			onChange={ setExcerpt }
 			tagName="p"
 		/>
 	) : (
 		<p className={ excerptClassName }>
-			{ trimmedExcerpt || __( 'No post excerpt found' ) }
+			{ trimmedExcerpt !== '...'
+				? trimmedExcerpt
+				: __( 'No post excerpt found' ) }
 		</p>
 	);
 	return (
@@ -235,7 +193,7 @@ export default function PostExcerptEditor( {
 						}
 					/>
 					<RangeControl
-						label={ __( 'Max number of words in excerpt' ) }
+						label={ __( 'Max number of words' ) }
 						value={ excerptLength }
 						onChange={ ( value ) => {
 							setAttributes( { excerptLength: value } );
@@ -248,9 +206,6 @@ export default function PostExcerptEditor( {
 			</InspectorControls>
 			<div { ...blockProps }>
 				{ excerptContent }
-				{ isSelected && wordCountMessage && (
-					<Warning>{ wordCountMessage }</Warning>
-				) }
 				{ ! showMoreOnNewLine && ' ' }
 				{ showMoreOnNewLine ? (
 					<p className="wp-block-post-excerpt__more-text">
