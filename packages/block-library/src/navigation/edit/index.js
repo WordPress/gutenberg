@@ -105,7 +105,6 @@ function Navigation( {
 		} = {},
 		hasIcon,
 		icon = 'handle',
-		overlayTemplatePart,
 	} = attributes;
 
 	const ref = attributes.ref;
@@ -735,12 +734,12 @@ function Navigation( {
 				{ stylingInspectorControls }
 				<ResponsiveWrapper
 					id={ clientId }
+					currentMenuId={ navigationMenu?.id }
 					isOpen={ isResponsiveMenuOpen }
 					hasIcon={ hasIcon }
 					icon={ icon }
 					isResponsive={ 'never' !== overlayMenu }
 					isHiddenByDefault={ 'always' === overlayMenu }
-					overlayTemplatePart={ overlayTemplatePart }
 				>
 					<UnsavedInnerBlocks
 						createNavigationMenu={ createNavigationMenu }
@@ -890,13 +889,13 @@ function Navigation( {
 					<TagName { ...blockProps }>
 						<ResponsiveWrapper
 							id={ clientId }
+							currentMenuId={ navigationMenu?.id }
 							label={ __( 'Menu' ) }
 							hasIcon={ hasIcon }
 							icon={ icon }
 							isOpen={ isResponsiveMenuOpen }
 							isResponsive={ isResponsive }
 							isHiddenByDefault={ 'always' === overlayMenu }
-							overlayTemplatePart={ overlayTemplatePart }
 						>
 							{ isEntityAvailable && (
 								<NavigationInnerBlocks
