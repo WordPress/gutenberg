@@ -139,7 +139,7 @@ describe( 'Cover', () => {
 		);
 
 		// Verify the height of the cover is not defined.
-		expect( heightInput.value ).toBeFalsy();
+		expect( heightInput.value ).toBe( '' );
 
 		const resizeButton = await page.$(
 			'.components-resizable-box__handle-bottom'
