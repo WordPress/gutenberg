@@ -137,6 +137,7 @@ function Layout( { styles } ) {
 		'is-inserter-opened': isInserterOpened,
 		'is-list-view-opened': isListViewOpened,
 		'is-entity-save-view-open': !! entitiesSavedStatesCallback,
+		'has-secondary-sidebar': isListViewOpened || isInserterOpened,
 	} );
 
 	const openSidebarPanel = () =>

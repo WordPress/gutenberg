@@ -19,8 +19,7 @@
 	}
 
 	@include break-medium {
-		.is-inserter-opened .components-editor-notices__snackbar,
-		.is-list-view-opened .components-editor-notices__snackbar {
+		.has-secondary-sidebar .components-editor-notices__snackbar {
 			padding-left: calc(#{$grid-unit-20} + #{$nav-sidebar-width});
 		}
 	}

@@ -7,21 +7,20 @@
 .edit-post-layout .components-editor-notices__snackbar {
 	position: fixed;
 	right: 0;
-	bottom: 40px;
-	padding-left: 16px;
-	padding-right: 16px;
+	bottom: $grid-unit-50;
+	padding-left: $grid-unit-20;
+	padding-right: $grid-unit-20;
 }
 
 .is-distraction-free {
 	.components-editor-notices__snackbar {
-		bottom: 20px;
+		bottom: calc(#{$grid-unit-50} / 2);
 	}
 }
 
-.is-inserter-opened,
-.is-list-view-opened {
+.has-secondary-sidebar {
 	.components-editor-notices__snackbar {
-		padding-left: calc(16px + #{$nav-sidebar-width});
+		padding-left: calc(#{$grid-unit-20} + #{$nav-sidebar-width});
 	}
 }
 
