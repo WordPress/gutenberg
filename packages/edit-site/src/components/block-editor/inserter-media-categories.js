@@ -13,12 +13,18 @@ import { store as coreStore } from '@wordpress/core-data';
 /** @typedef {import('@wordpress/block-editor').InserterMediaRequest} InserterMediaRequest */
 /** @typedef {import('@wordpress/block-editor').InserterMediaItem} InserterMediaItem */
 /**
+ * Interface for inserter media category labels.
+ *
+ * @typedef {Object} InserterMediaCategoryLabels
+ * @property {string} name                    General name of the media category. It's used in the inserter media items list.
+ * @property {string} [search_items='Search'] Label for searching items. Default is ‘Search Posts’ / ‘Search Pages’.
+ */
+/**
  * Interface for inserter media category.
  *
  * @typedef {Object} InserterMediaCategory
- * @property {string}                                                 label                The label of the media category. It's used in the inserter media items list.
- * @property {string}                                                 [searchLabel]        The label to append in the search placeholder. If not provided the lowercase `label` will be used.
  * @property {string}                                                 name                 The name of the media category, that should be unique among all media categories.
+ * @property {InserterMediaCategoryLabels}                            labels               Labels for the media category.
  * @property {('image'|'audio'|'video')}                              mediaType            The media type of the media category.
  * @property {(InserterMediaRequest) => Promise<InserterMediaItem[]>} fetch                The function to fetch media items for the category.
  * @property {(InserterMediaItem) => string}                          [getReportUrl]       If the media category supports reporting media items, this function should return
@@ -105,33 +111,44 @@ const coreMediaFetch = async ( query = {} ) => {
 /** @type {InserterMediaCategory[]} */
 const inserterMediaCategories = [
 	{
-		label: __( 'Images' ),
 		name: 'images',
+		labels: {
+			name: __( 'Images' ),
+			search_items: __( 'Search images' ),
+		},
 		mediaType: 'image',
 		async fetch( query = {} ) {
 			return coreMediaFetch( { ...query, media_type: 'image' } );
 		},
 	},
 	{
-		label: __( 'Videos' ),
 		name: 'videos',
+		labels: {
+			name: __( 'Videos' ),
+			search_items: __( 'Search videos' ),
+		},
 		mediaType: 'video',
 		async fetch( query = {} ) {
 			return coreMediaFetch( { ...query, media_type: 'video' } );
 		},
 	},
 	{
-		label: __( 'Audio' ),
 		name: 'audio',
+		labels: {
+			name: __( 'Audio' ),
+			search_items: __( 'Search audio' ),
+		},
 		mediaType: 'audio',
 		async fetch( query = {} ) {
 			return coreMediaFetch( { ...query, media_type: 'audio' } );
 		},
 	},
 	{
-		label: __( 'Openverse' ),
-		searchLabel: __( 'Openverse' ),
 		name: 'openverse',
+		labels: {
+			name: __( 'Openverse' ),
+			search_items: __( 'Search Openverse' ),
+		},
 		mediaType: 'image',
 		async fetch( query = {} ) {
 			const defaultArgs = {

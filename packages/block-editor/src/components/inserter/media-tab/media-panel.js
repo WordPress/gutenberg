@@ -4,7 +4,7 @@
 import { useRef, useEffect } from '@wordpress/element';
 import { Spinner, SearchControl } from '@wordpress/components';
 import { focus } from '@wordpress/dom';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -43,24 +43,15 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 		search: debouncedSearch,
 	} );
 	const baseCssClass = 'block-editor-inserter__media-panel';
-	const searchLabel =
-		category.searchLabel || category.label.toLocaleLowerCase();
+	const searchLabel = category.labels.search_items || __( 'Search' );
 	return (
 		<div className={ baseCssClass }>
 			<SearchControl
 				className={ `${ baseCssClass }-search` }
 				onChange={ setSearch }
 				value={ search }
-				label={ sprintf(
-					/* translators: %s: Name of the media category(ex. 'images, videos'). */
-					__( 'Search %s' ),
-					searchLabel
-				) }
-				placeholder={ sprintf(
-					/* translators: %s: Name of the media category(ex. 'images, videos'). */
-					__( 'Search %s' ),
-					searchLabel
-				) }
+				label={ searchLabel }
+				placeholder={ searchLabel }
 			/>
 			{ isLoading && (
 				<div className={ `${ baseCssClass }-spinner` }>
