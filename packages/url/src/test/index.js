@@ -888,6 +888,16 @@ describe( 'prependHTTP', () => {
 
 		expect( prependHTTP( url ) ).toBe( 'http://wordpress.org' );
 	} );
+
+	it( 'should use secure protocol when useHttps option is provided', () => {
+		const url = 'wordpress.org ';
+
+		expect(
+			prependHTTP( url, {
+				https: true,
+			} )
+		).toBe( 'https://wordpress.org' );
+	} );
 } );
 
 describe( 'safeDecodeURI', () => {

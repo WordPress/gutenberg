@@ -476,6 +476,7 @@ const actualURL = prependHTTP( 'wordpress.org' ); // http://wordpress.org
 _Parameters_
 
 -   _url_ `string`: The URL to test.
+-   _https_ `boolean`: whether or not to use secure https protocol.
 
 _Returns_
 
