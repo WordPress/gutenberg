@@ -344,7 +344,7 @@ function LinkControl( {
 						>
 							{ __( 'Apply' ) }
 						</Button>
-						<Button variant="link" onClick={ handleCancel }>
+						<Button variant="tertiary" onClick={ handleCancel }>
 							{ __( 'Cancel' ) }
 						</Button>
 					</div>
