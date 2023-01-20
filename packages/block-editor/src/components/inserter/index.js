@@ -225,7 +225,7 @@ export default compose( [
 			const {
 				getBlockRootClientId,
 				hasInserterItems,
-				__experimentalGetAllowedBlocks,
+				getAllowedBlocks,
 				__experimentalGetDirectInsertBlock,
 				getSettings,
 			} = select( blockEditorStore );
@@ -235,8 +235,7 @@ export default compose( [
 			rootClientId =
 				rootClientId || getBlockRootClientId( clientId ) || undefined;
 
-			const allowedBlocks =
-				__experimentalGetAllowedBlocks( rootClientId );
+			const allowedBlocks = getAllowedBlocks( rootClientId );
 
 			const directInsertBlock =
 				shouldDirectInsert &&

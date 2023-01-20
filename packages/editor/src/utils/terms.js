@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { groupBy, map, unescape as lodashUnescapeString } from 'lodash';
+import { groupBy, unescape as lodashUnescapeString } from 'lodash';
 
 /**
  * Returns terms in a tree form.
@@ -68,5 +68,5 @@ export const unescapeTerm = ( term ) => {
  * @return {Object[]} Array of term objects unescaped.
  */
 export const unescapeTerms = ( terms ) => {
-	return map( terms, unescapeTerm );
+	return ( terms ?? [] ).map( unescapeTerm );
 };

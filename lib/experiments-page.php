@@ -77,22 +77,6 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 
-	add_settings_field(
-		'gutenberg-global-styles-custom-css',
-		__( 'Global styles custom css ', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => sprintf(
-				/* translators: %s: WordPress documentation for roles and capabilities. */
-				__( 'Test the Global Styles custom CSS field in the site editor. This requires a user to have <a href="%s">unfiltered html capabilities</a>.', 'gutenberg' ),
-				'https://wordpress.org/support/article/roles-and-capabilities/#unfiltered_html'
-			),
-			'id'    => 'gutenberg-global-styles-custom-css',
-		)
-	);
-
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'

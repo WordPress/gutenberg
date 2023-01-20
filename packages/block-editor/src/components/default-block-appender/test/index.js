@@ -9,8 +9,6 @@ import userEvent from '@testing-library/user-event';
  */
 import { DefaultBlockAppender, ZWNBSP } from '../';
 
-jest.useFakeTimers();
-
 describe( 'DefaultBlockAppender', () => {
 	it( 'should match snapshot', () => {
 		const onAppend = jest.fn();
@@ -23,9 +21,7 @@ describe( 'DefaultBlockAppender', () => {
 	} );
 
 	it( 'should append a default block when input focused', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const onAppend = jest.fn();
 
 		const { container } = render(
@@ -44,9 +40,7 @@ describe( 'DefaultBlockAppender', () => {
 	} );
 
 	it( 'should optionally show without prompt', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const onAppend = jest.fn();
 
 		const { container } = render(

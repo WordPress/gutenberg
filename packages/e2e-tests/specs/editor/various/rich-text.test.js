@@ -408,6 +408,10 @@ describe( 'RichText', () => {
 		await button.evaluate( ( element ) => element.scrollIntoView() );
 		await button.click();
 
+		// Wait for the popover with "Text" tab to appear.
+		await page.waitForXPath(
+			'//button[@role="tab"][@aria-selected="true"][text()="Text"]'
+		);
 		// Tab to the "Text" tab.
 		await page.keyboard.press( 'Tab' );
 		// Tab to black.
