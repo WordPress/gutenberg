@@ -1,4 +1,12 @@
 /**
+ * The `editor` settings here need to be in sync with the corresponding ones in `editor` package.
+ * See `packages/editor/src/components/media-categories/index.js`.
+ *
+ * In the future we could consider creating an Openvese package that can be used in both `editor` and `site-editor`.
+ * The rest of the settings would still need to be in sync though.
+ */
+
+/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -37,7 +45,7 @@ import { store as coreStore } from '@wordpress/core-data';
 const getExternalLink = ( url, text ) =>
 	`<a href="${ url }" target="_blank" rel="noreferrer noopener">${ text }</a>`;
 
-const getOpenverseLicense = ( license, licenseVersion, licenseUrl ) => {
+const getOpenverseLicense = ( license, licenseVersion ) => {
 	let licenseName = license.trim();
 	// PDM has no abbreviation
 	if ( license !== 'pdm' ) {
@@ -53,13 +61,7 @@ const getOpenverseLicense = ( license, licenseVersion, licenseUrl ) => {
 	if ( ! [ 'pdm', 'cc0' ].includes( license ) ) {
 		licenseName = `CC ${ licenseName }`;
 	}
-	if ( !! licenseUrl ) {
-		license = getExternalLink(
-			`${ licenseUrl }?ref=openverse`,
-			licenseName
-		);
-	}
-	return license;
+	return licenseName;
 };
 
 const getOpenverseCaption = ( item ) => {
@@ -72,25 +74,33 @@ const getOpenverseCaption = ( item ) => {
 		license_version: licenseVersion,
 		license_url: licenseUrl,
 	} = item;
-	/* translators: Openverse default media item title in the block inserter's media list. (ex. 'This work by {creator} is marked with CC0 1.0'). */
-	const defaultTitle = __( 'This work' );
-	let _title = title ? decodeEntities( title ) : defaultTitle;
-	_title = getExternalLink( foreignLandingUrl, _title );
-	const fullLicense = getOpenverseLicense(
-		license,
-		licenseVersion,
-		licenseUrl
-	);
-	let _creator = decodeEntities( creator );
-	if ( creatorUrl ) {
-		_creator = getExternalLink( creatorUrl, creator );
-	}
-	_creator = sprintf(
-		/* translators: %s: Name of the media's creator. */
-		__( ' by %s' ),
-		_creator
-	);
-	const caption = `"${ _title }" ${ _creator }/ ${ fullLicense }.`;
+	const fullLicense = getOpenverseLicense( license, licenseVersion );
+	const _creator = decodeEntities( creator );
+	const caption = title
+		? sprintf(
+				// translators: %1s: Title of a media work from Openverse; %2s: Name of the media's creator; %3s: Media works's licence e.g: "CC0 1.0".
+				__( '"%1$s" by %2$s/ %3$s' ),
+				getExternalLink( foreignLandingUrl, decodeEntities( title ) ),
+				creatorUrl ? getExternalLink( creatorUrl, _creator ) : _creator,
+				licenseUrl
+					? getExternalLink(
+							`${ licenseUrl }?ref=openverse`,
+							fullLicense
+					  )
+					: fullLicense
+		  )
+		: sprintf(
+				// translators: %1s: Default title for an untitled media work from Openverse; %2s: Name of the media's creator; %3s: Media item's licence e.g: "CC0 1.0".
+				__( '"%1$s" by %2$s/ %3$s' ),
+				getExternalLink( foreignLandingUrl, 'Work' ),
+				creatorUrl ? getExternalLink( creatorUrl, _creator ) : _creator,
+				licenseUrl
+					? getExternalLink(
+							`${ licenseUrl }?ref=openverse`,
+							fullLicense
+					  )
+					: fullLicense
+		  );
 	return caption.replace( /\s{2}/g, ' ' );
 };
 
