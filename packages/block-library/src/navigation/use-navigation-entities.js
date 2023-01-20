@@ -55,11 +55,9 @@ export default function useNavigationEntities( menuId ) {
 			{ enabled: !! menuId }
 		);
 
-	const {
-		records: templateParts,
-		isResolving: isResolvingTemplateParts,
-		hasResolved: hasResolvedTemplateParts,
-	} = useEntityRecords( 'postType', 'wp_template_part', { per_page: -1 } );
+	const { records: theme } = useEntityRecords( 'root', 'theme', {
+		status: 'active',
+	} );
 
 	return {
 		pages,
@@ -75,11 +73,6 @@ export default function useNavigationEntities( menuId ) {
 		menuItems,
 		hasResolvedMenuItems,
 
-		templateParts,
-		isResolvingTemplateParts,
-		hasResolvedTemplateParts,
-		hasTemplateParts: !! (
-			hasResolvedTemplateParts && templateParts?.length
-		),
+		theme,
 	};
 }

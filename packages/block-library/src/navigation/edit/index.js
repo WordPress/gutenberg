@@ -612,10 +612,13 @@ function Navigation( {
 							) }
 						</>
 					) }
-					<OverlayTemplatePartSelector
-						attributes={ attributes }
-						setAttributes={ setAttributes }
-					/>
+					{ navigationMenu && (
+						<OverlayTemplatePartSelector
+							attributes={ attributes }
+							setAttributes={ setAttributes }
+							currentMenuId={ navigationMenu?.id }
+						/>
+					) }
 				</PanelBody>
 				{ hasSubmenuIndicatorSetting && hasSubmenus && (
 					<PanelBody title={ __( 'Submenus' ) }>

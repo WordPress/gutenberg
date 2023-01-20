@@ -71,9 +71,6 @@
 		"templateLock": {
 			"type": [ "string", "boolean" ],
 			"enum": [ "all", "insert", "contentOnly", false ]
-		},
-		"overlayTemplatePart": {
-			"type": "string"
 		}
 	},
 	"providesContext": {
