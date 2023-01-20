@@ -50,6 +50,8 @@ export type ModalProps = {
 	className?: string;
 	/**
 	 * Label on the close button.
+	 *
+	 * @default `__( 'Close dialog' )`
 	 */
 	closeButtonLabel?: string;
 	/**
@@ -60,6 +62,13 @@ export type ModalProps = {
 	 * `title` for other ways to provide a title.
 	 */
 	contentLabel?: string;
+	/**
+	 * If this property is added, it will be added to the modal scrollable section `div` as
+	 * `div` as `aria-label`.
+	 *
+	 * @default `__( 'Scrollable section' )`
+	 */
+	scrollableContentLabel?: string;
 	/**
 	 * If this property is true, it will focus the first tabbable element
 	 * rendered in the modal.
