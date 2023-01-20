@@ -45,11 +45,11 @@ function ScaledBlockPreview( {
 		if ( styles ) {
 			return [
 				...styles,
-				...additionalStyles,
 				{
-					css: 'body{height:auto;overflow:hidden;border:none;}',
+					css: 'body{height:auto;overflow:hidden;border:none;padding:0;}',
 					__unstableType: 'presets',
 				},
+				...additionalStyles,
 			];
 		}
 
