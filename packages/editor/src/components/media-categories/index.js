@@ -18,10 +18,10 @@ import { store as coreStore } from '@wordpress/core-data';
  * @typedef {Object} InserterMediaCategory
  * @property {string}                                                 label                The label of the media category. It's used in the inserter media items list.
  * @property {string}                                                 [searchLabel]        The label to append in the search placeholder. If not provided the lowercase `label` will be used.
- * @property {string}                                                 name                 The name of the media category, that should be unique among all media cateogries.
+ * @property {string}                                                 name                 The name of the media category, that should be unique among all media categories.
  * @property {('image'|'audio'|'video')}                              mediaType            The media type of the media category.
  * @property {(InserterMediaRequest) => Promise<InserterMediaItem[]>} fetch                The function to fetch media items for the category.
- * @property {(InserterMediaItem)=> string}                           [getReportUrl]       If the media category support reporting media items, this function should return
+ * @property {(InserterMediaItem) => string}                          [getReportUrl]       If the media category supports reporting media items, this function should return
  *                                                                                         the report url for the media item. It accepts the `InserterMediaItem` as an argument.
  * @property {boolean}                                                [isExternalResource] If the media category is an external resource, this should be set to true.
  *                                                                                         This is used to avoid making a request to the external resource when the user
@@ -102,6 +102,7 @@ const coreMediaFetch = async ( query = {} ) => {
 	} ) );
 };
 
+/** @type {InserterMediaCategory[]} */
 const inserterMediaCategories = [
 	{
 		label: __( 'Images' ),
@@ -157,16 +158,13 @@ const inserterMediaCategories = [
 			} );
 			const jsonResponse = await response.json();
 			const results = jsonResponse.results;
-			const withAdjustments = results.map( ( result ) => ( {
+			return results.map( ( result ) => ( {
 				...result,
 				// This is a temp solution for better titles, until Openverse API
 				// completes the cleaning up of some titles of their upstream data.
 				title: result.title?.toLowerCase().startsWith( 'file:' )
 					? result.title.slice( 5 )
 					: result.title,
-			} ) );
-			return withAdjustments.map( ( result ) => ( {
-				...result,
 				sourceId: result.id,
 				id: undefined,
 				caption: getOpenverseCaption( result ),

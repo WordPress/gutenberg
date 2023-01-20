@@ -10,8 +10,8 @@ const mediaTypeTag = { image: 'img', video: 'video', audio: 'audio' };
 /**
  * Creates a block and a preview element from a media object.
  *
- * @param {InserterMediaItem} media     The media object to create the block from.
- * @param {string}            mediaType The media type to create the block for( 'image', 'video', 'audio')
+ * @param {InserterMediaItem}         media     The media object to create the block from.
+ * @param {('image'|'audio'|'video')} mediaType The media type to create the block for.
  * @return {[WPBlock, JSX.Element]} An array containing the block and the preview element.
  */
 export function getBlockAndPreviewFromMedia( media, mediaType ) {
