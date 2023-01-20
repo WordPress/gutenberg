@@ -50,9 +50,32 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 		$content .= wp_link_pages( array( 'echo' => 0 ) );
 	}
 
+	$filters_to_remove = array(
+		'wptexturize'            => false,
+		'shortcode_unautop'      => false,
+		'wp_filter_content_tags' => false,
+		'do_shortcode'           => false,
+		'convert_smilies'        => false,
+	);
+
+	// Temporarily remove some filters that are not suitable for this block.
+	foreach ( $filters_to_remove as $filter => &$priority ) {
+		$priority = has_filter( 'the_content', $filter );
+		if ( false !== $priority ) {
+			remove_filter( 'the_content', $filter, $priority );
+		}
+	}
+
 	/** This filter is documented in wp-includes/post-template.php */
 	$content = apply_filters( 'the_content', str_replace( ']]>', ']]&gt;', $content ) );
 	unset( $seen_ids[ $post_id ] );
+
+	// Restore filters.
+	foreach ( $filters_to_remove as $filter => $priority ) {
+		if ( false !== $priority ) {
+			add_filter( 'the_content', $filter, $priority );
+		}
+	}
 
 	if ( empty( $content ) ) {
 		return '';
