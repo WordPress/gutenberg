@@ -128,8 +128,8 @@ const inserterMediaCategories = [
 		},
 	},
 	{
-		label: 'Openverse',
-		searchLabel: 'Openverse',
+		label: __( 'Openverse' ),
+		searchLabel: __( 'Openverse' ),
 		name: 'openverse',
 		mediaType: 'image',
 		async fetch( query = {} ) {
