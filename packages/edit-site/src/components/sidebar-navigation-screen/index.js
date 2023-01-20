@@ -14,7 +14,7 @@ export default function SidebarNavigationScreen( {
 	path,
 	parentTitle,
 	title,
-	action,
+	actions,
 	content,
 } ) {
 	return (
@@ -44,7 +44,7 @@ export default function SidebarNavigationScreen( {
 					<h2 className="edit-site-sidebar-navigation-screen__title">
 						{ title }
 					</h2>
-					{ action }
+					{ actions }
 				</HStack>
 
 				<nav className="edit-site-sidebar-navigation-screen__content">

@@ -117,7 +117,7 @@ export default function SidebarNavigationScreenTemplates( {
 			path={ config[ postType ].path }
 			parentTitle={ __( 'Design' ) }
 			title={ config[ postType ].labels.title }
-			action={
+			actions={
 				! isMobileViewport && (
 					<AddNewTemplate
 						templateType={ postType }
