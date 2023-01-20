@@ -134,12 +134,14 @@ describe( 'Cover', () => {
 			'.block-editor-list-view-block__contents-container a'
 		);
 
-		const heightInput = await page.waitForSelector(
+		const heightInputHandle = await page.waitForSelector(
 			'input[id*="block-cover-height-input"]'
 		);
 
 		// Verify the height of the cover is not defined.
-		expect( heightInput.value ).toBe( '' );
+		expect(
+			await page.evaluate( ( { value } ) => value, heightInputHandle )
+		).toBe( '' );
 
 		const resizeButton = await page.$(
 			'.components-resizable-box__handle-bottom'
@@ -184,7 +186,7 @@ describe( 'Cover', () => {
 		expect(
 			await page.evaluate(
 				( { value } ) => Number.parseInt( value ),
-				heightInput
+				heightInputHandle
 			)
 		).toBeGreaterThan( 100 );
 	} );
