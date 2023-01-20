@@ -162,6 +162,7 @@ function InserterSearchResults( {
 					shownPatterns={ currentShownPatterns }
 					blockPatterns={ filteredBlockPatterns }
 					onClickPattern={ onSelectBlockPattern }
+					onHover={ onHover }
 					isDraggable={ isDraggable }
 				/>
 			</div>
