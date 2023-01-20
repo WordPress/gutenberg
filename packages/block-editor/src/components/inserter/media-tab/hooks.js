@@ -20,7 +20,7 @@ import { store as blockEditorStore } from '../../../store';
 /**
  * Interface for inserter media responses. Any media resource should
  * map their response to this interface, in order to create the core
- * WordPress media blocks(image, video, audio).
+ * WordPress media blocks (image, video, audio).
  *
  * @typedef {Object} InserterMediaItem
  * @property {string}        title        The title of the media item.
