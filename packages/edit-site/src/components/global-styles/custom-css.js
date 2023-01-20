@@ -8,15 +8,18 @@ import {
 	PanelBody,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { useStyle } from './hooks';
+import { unlock } from '../../experiments';
+
+const { useGlobalStyle } = unlock( blockEditorExperiments );
 
 function CustomCSSControl() {
-	const [ customCSS, setCustomCSS ] = useStyle( 'css' );
-	const [ themeCSS ] = useStyle( 'css', null, 'base' );
+	const [ customCSS, setCustomCSS ] = useGlobalStyle( 'css' );
+	const [ themeCSS ] = useGlobalStyle( 'css', null, 'base' );
 	const ignoreThemeCustomCSS = '/* IgnoreThemeCustomCSS */';
 
 	// If there is custom css from theme.json show it in the edit box

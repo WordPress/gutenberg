@@ -7,7 +7,10 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { __experimentalColorGradientControl as ColorGradientControl } from '@wordpress/block-editor';
+import {
+	__experimentalColorGradientControl as ColorGradientControl,
+	experiments as blockEditorExperiments,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -17,16 +20,17 @@ import {
 	getSupportedGlobalStylesPanels,
 	useColorsPerOrigin,
 	useGradientsPerOrigin,
-	useSetting,
-	useStyle,
 } from './hooks';
+import { unlock } from '../../experiments';
+
+const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 
 function ScreenBackgroundColor( { name, variationPath = '' } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
-	const [ solids ] = useSetting( 'color.palette', name );
-	const [ gradients ] = useSetting( 'color.gradients', name );
-	const [ areCustomSolidsEnabled ] = useSetting( 'color.custom', name );
-	const [ areCustomGradientsEnabled ] = useSetting(
+	const [ solids ] = useGlobalSetting( 'color.palette', name );
+	const [ gradients ] = useGlobalSetting( 'color.gradients', name );
+	const [ areCustomSolidsEnabled ] = useGlobalSetting( 'color.custom', name );
+	const [ areCustomGradientsEnabled ] = useGlobalSetting(
 		'color.customGradient',
 		name
 	);
@@ -34,7 +38,10 @@ function ScreenBackgroundColor( { name, variationPath = '' } ) {
 	const colorsPerOrigin = useColorsPerOrigin( name );
 	const gradientsPerOrigin = useGradientsPerOrigin( name );
 
-	const [ isBackgroundEnabled ] = useSetting( 'color.background', name );
+	const [ isBackgroundEnabled ] = useGlobalSetting(
+		'color.background',
+		name
+	);
 
 	const hasBackgroundColor =
 		supports.includes( 'backgroundColor' ) &&
@@ -43,20 +50,20 @@ function ScreenBackgroundColor( { name, variationPath = '' } ) {
 	const hasGradientColor =
 		supports.includes( 'background' ) &&
 		( gradients.length > 0 || areCustomGradientsEnabled );
-	const [ backgroundColor, setBackgroundColor ] = useStyle(
+	const [ backgroundColor, setBackgroundColor ] = useGlobalStyle(
 		variationPath + 'color.background',
 		name
 	);
-	const [ userBackgroundColor ] = useStyle(
+	const [ userBackgroundColor ] = useGlobalStyle(
 		variationPath + 'color.background',
 		name,
 		'user'
 	);
-	const [ gradient, setGradient ] = useStyle(
+	const [ gradient, setGradient ] = useGlobalStyle(
 		variationPath + 'color.gradient',
 		name
 	);
-	const [ userGradient ] = useStyle(
+	const [ userGradient ] = useGlobalStyle(
 		variationPath + 'color.gradient',
 		name,
 		'user'
