@@ -14,7 +14,7 @@ function gutenberg_register_core_block_patterns_categories() {
 		'banner',
 		array(
 			'label' 	  => _x( 'Banners', 'Block pattern category', 'gutenberg' ),
-			'description' => _x( 'An element that helps structure or contrast the contents of a page.', 'gutenberg' ),
+			'description' => __( 'An element that helps structure or contrast the contents of a page.', 'gutenberg' ),
 		)
 	);
 	register_block_pattern_category(
