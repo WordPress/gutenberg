@@ -23,10 +23,8 @@ function UnforwardedIconButton(
 		size,
 		tooltip,
 		...props
-	}: WordPressComponentProps<
-		ButtonProps & DeprecatedIconButtonProps,
-		TagName
-	>,
+	}: React.ComponentPropsWithoutRef< typeof Button > &
+		DeprecatedIconButtonProps,
 	ref: ForwardedRef< any >
 ) {
 	deprecated( 'wp.components.IconButton', {
