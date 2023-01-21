@@ -121,8 +121,6 @@ describe( 'Links', () => {
 
 		// Navigate to and toggle the "Open in new tab" checkbox.
 		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Space' );
 
 		// Toggle should still have focus and be checked.
@@ -135,8 +133,7 @@ describe( 'Links', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		// Tab back to the Submit and apply the link.
-		await pressKeyWithModifier( 'shift', 'Tab' );
-		await pressKeyWithModifier( 'shift', 'Tab' );
+		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
 
 		// The link should have been inserted.
