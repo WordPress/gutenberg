@@ -4,6 +4,8 @@
 }
 
 .block-editor-block-preview__live-content {
+	user-select: none;
+
 	* {
 		pointer-events: none;
 	}
