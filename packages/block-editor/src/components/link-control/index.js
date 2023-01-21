@@ -350,15 +350,13 @@ function LinkControl( {
 				/>
 			) }
 
-			<div className="block-editor-link-control__drawer">
+			<div className="block-editor-link-control__tools">
 				{ showSettingsDrawer && (
-					<div className="block-editor-link-control__tools">
-						<LinkControlSettingsDrawer
-							value={ value }
-							settings={ settings }
-							onChange={ onChange }
-						/>
-					</div>
+					<LinkControlSettingsDrawer
+						value={ value }
+						settings={ settings }
+						onChange={ onChange }
+					/>
 				) }
 
 				{ isEditing && (
