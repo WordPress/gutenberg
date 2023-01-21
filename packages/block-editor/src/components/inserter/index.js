@@ -149,40 +149,58 @@ class Inserter extends Component {
 
 		if ( isQuick ) {
 			return (
-				<QuickInserter
-					onSelect={ ( blocks ) => {
-						const firstBlock =
-							Array.isArray( blocks ) && blocks?.length
-								? blocks[ 0 ]
-								: blocks;
-						if (
-							onSelectOrClose &&
-							typeof onSelectOrClose === 'function'
-						) {
-							onSelectOrClose( firstBlock );
-						}
+				<>
+					<QuickInserter
+						onSelect={ ( blocks ) => {
+							const firstBlock =
+								Array.isArray( blocks ) && blocks?.length
+									? blocks[ 0 ]
+									: blocks;
+							if (
+								onSelectOrClose &&
+								typeof onSelectOrClose === 'function'
+							) {
+								onSelectOrClose( firstBlock );
+							}
+							onClose();
+						} }
+						rootClientId={ rootClientId }
+						clientId={ clientId }
+						isAppender={ isAppender }
+						prioritizePatterns={ prioritizePatterns }
+						selectBlockOnInsert={ selectBlockOnInsert }
+					/>
+					<Button
+						variant="secondary"
+						className="block-editor-inserter__close"
+						onClick={ onClose }
+					>
+						{ __( 'Close' ) }
+					</Button>
+				</>
+			);
+		}
+
+		return (
+			<>
+				<InserterMenu
+					onSelect={ () => {
 						onClose();
 					} }
 					rootClientId={ rootClientId }
 					clientId={ clientId }
 					isAppender={ isAppender }
+					showInserterHelpPanel={ showInserterHelpPanel }
 					prioritizePatterns={ prioritizePatterns }
-					selectBlockOnInsert={ selectBlockOnInsert }
 				/>
-			);
-		}
-
-		return (
-			<InserterMenu
-				onSelect={ () => {
-					onClose();
-				} }
-				rootClientId={ rootClientId }
-				clientId={ clientId }
-				isAppender={ isAppender }
-				showInserterHelpPanel={ showInserterHelpPanel }
-				prioritizePatterns={ prioritizePatterns }
-			/>
+				<Button
+					variant="secondary"
+					className="block-editor-inserter__close"
+					onClick={ onClose }
+				>
+					{ __( 'Close' ) }
+				</Button>
+			</>
 		);
 	}
 
