@@ -426,8 +426,13 @@ $preview-image-height: 140px;
 	padding: 10px;
 }
 
+.block-editor-link-control__drawer {
+	flex-basis: 100%; // occupy full width.
+}
+
 .block-editor-link-control__tools {
 	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
 	justify-content: space-between;
 	border-top: $border-width solid $gray-300;
@@ -443,11 +448,6 @@ $preview-image-height: 140px;
 .block-editor-link-control__settings {
 	flex: 1;
 	margin: 0;
-
-
-	:last-child {
-		margin-bottom: 0;
-	}
 
 	.is-alternate & {
 		border-top: $border-width solid $gray-900;

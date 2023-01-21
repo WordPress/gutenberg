@@ -11,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 import { ENTER } from '@wordpress/keycodes';
+import { settings as settingsIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -135,6 +136,8 @@ function LinkControl( {
 	const wrapperNode = useRef();
 	const textInputRef = useRef();
 	const isEndingEditWithFocus = useRef( false );
+
+	const [ settingsOpen, setSettingsOpen ] = useState( false );
 
 	const [ internalUrlInputValue, setInternalUrlInputValue ] =
 		useInternalInputValue( value?.url || '' );
@@ -267,7 +270,7 @@ function LinkControl( {
 	const shownUnlinkControl =
 		onRemove && value && ! isEditingLink && ! isCreatingPage;
 
-	const showSettingsDrawer = !! settings?.length;
+	const showSettings = !! settings?.length;
 
 	// Only show text control once a URL value has been committed
 	// and it isn't just empty whitespace.
@@ -295,18 +298,6 @@ function LinkControl( {
 							'has-text-control': showTextControl,
 						} ) }
 					>
-						{ showTextControl && (
-							<TextControl
-								__nextHasNoMarginBottom
-								ref={ textInputRef }
-								className="block-editor-link-control__field block-editor-link-control__text-content"
-								label="Text"
-								value={ internalTextInputValue }
-								onChange={ setInternalTextInputValue }
-								onKeyDown={ handleSubmitWithEnter }
-							/>
-						) }
-
 						<LinkControlSearchInput
 							currentLink={ value }
 							className="block-editor-link-control__field block-editor-link-control__search-input"
@@ -351,12 +342,42 @@ function LinkControl( {
 			) }
 
 			<div className="block-editor-link-control__tools">
-				{ showSettingsDrawer && (
-					<LinkControlSettingsDrawer
-						value={ value }
-						settings={ settings }
-						onChange={ onChange }
-					/>
+				{ ( showSettings || showTextControl ) && (
+					<>
+						{ settingsOpen && (
+							<div
+								className="block-editor-link-control__drawer"
+								hidden={ ! settingsOpen }
+								id={ 'link-1' }
+							>
+								{ showTextControl && (
+									<TextControl
+										__nextHasNoMarginBottom
+										ref={ textInputRef }
+										className="block-editor-link-control__setting block-editor-link-control__text-content"
+										label="Text"
+										value={ internalTextInputValue }
+										onChange={ setInternalTextInputValue }
+										onKeyDown={ handleSubmitWithEnter }
+									/>
+								) }
+								{ showSettings && (
+									<LinkControlSettingsDrawer
+										value={ value }
+										settings={ settings }
+										onChange={ onChange }
+									/>
+								) }
+							</div>
+						) }
+						<Button
+							aria-expanded={ settingsOpen }
+							onClick={ () => setSettingsOpen( ! settingsOpen ) }
+							icon={ settingsIcon }
+							label={ __( 'Toggle link settings' ) }
+							aria-controls="link-1"
+						/>
+					</>
 				) }
 
 				{ isEditing && (
