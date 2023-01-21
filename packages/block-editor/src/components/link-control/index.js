@@ -6,7 +6,14 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button, Spinner, Notice, TextControl } from '@wordpress/components';
+import {
+	Button,
+	Spinner,
+	Notice,
+	TextControl,
+	__unstableMotion as motion,
+	__unstableAnimatePresence as AnimatePresence,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
@@ -344,32 +351,43 @@ function LinkControl( {
 			<div className="block-editor-link-control__tools">
 				{ ( showSettings || showTextControl ) && (
 					<>
-						{ settingsOpen && (
-							<div
-								className="block-editor-link-control__drawer"
-								hidden={ ! settingsOpen }
-								id={ 'link-1' }
-							>
-								{ showTextControl && (
-									<TextControl
-										__nextHasNoMarginBottom
-										ref={ textInputRef }
-										className="block-editor-link-control__setting block-editor-link-control__text-content"
-										label="Text"
-										value={ internalTextInputValue }
-										onChange={ setInternalTextInputValue }
-										onKeyDown={ handleSubmitWithEnter }
-									/>
-								) }
-								{ showSettings && (
-									<LinkControlSettingsDrawer
-										value={ value }
-										settings={ settings }
-										onChange={ onChange }
-									/>
-								) }
-							</div>
-						) }
+						<AnimatePresence>
+							{ settingsOpen && (
+								<motion.div
+									className="block-editor-link-control__drawer"
+									hidden={ ! settingsOpen }
+									id={ 'link-1' }
+									initial="collapsed"
+									animate="open"
+									exit="collapsed"
+									variants={ {
+										open: { opacity: 1, height: 'auto' },
+										collapsed: { opacity: 0, height: 0 },
+									} }
+								>
+									{ showTextControl && (
+										<TextControl
+											__nextHasNoMarginBottom
+											ref={ textInputRef }
+											className="block-editor-link-control__setting block-editor-link-control__text-content"
+											label="Text"
+											value={ internalTextInputValue }
+											onChange={
+												setInternalTextInputValue
+											}
+											onKeyDown={ handleSubmitWithEnter }
+										/>
+									) }
+									{ showSettings && (
+										<LinkControlSettingsDrawer
+											value={ value }
+											settings={ settings }
+											onChange={ onChange }
+										/>
+									) }
+								</motion.div>
+							) }
+						</AnimatePresence>
 						<Button
 							aria-expanded={ settingsOpen }
 							onClick={ () => setSettingsOpen( ! settingsOpen ) }
