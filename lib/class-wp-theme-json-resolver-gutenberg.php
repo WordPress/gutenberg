@@ -429,12 +429,14 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		$user_cpt         = array();
 		$post_type_filter = 'wp_global_styles';
 		$stylesheet       = $theme->get_stylesheet();
+		$post_name = "wp-global-styles-{urlencode($stylesheet)}";
 		$args             = array(
 			'posts_per_page'         => 1,
 			'orderby'                => 'date',
 			'order'                  => 'asc',
 			'post_type'              => $post_type_filter,
 			'post_status'            => $post_status_filter,
+			'post_name' => $post_name,
 			'ignore_sticky_posts'    => true,
 			'no_found_rows'          => true,
 			'update_post_meta_cache' => false,
@@ -458,6 +460,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 					'title'         => 'Custom Styles',  // Do not make string translatable, see https://core.trac.wordpress.org/ticket/54518.
 					'global_styles' => '{"version": ' . WP_Theme_JSON_Gutenberg::LATEST_SCHEMA . ', "isGlobalStylesUserThemeJSON": true }',
 					'stylesheet'    => $stylesheet,
+					'post_name'
 				)
 			);
 
@@ -469,16 +472,15 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		return $user_cpt;
 	}
 
-	// @codingStandardsIgnoreStart Squiz.Commenting.FunctionComment.ParamCommentFullStop
 	/**
 	 * Saves a new user variation into the database.
 	 *
 	 *
-	 * @param array $args Arguments. All are required.
-	 *     {
-	 *     @type string title Global styles variation name.
-	 *     @type string global_styles Global styles settings as a JSON string.
-	 *     @type string $stylesheet Slug of the theme associated with these global styles.
+	 * @param array $args {
+	 *     @type string title Required. Global styles variation name.
+	 *     @type string global_styles Required. Global styles settings as a JSON string.
+	 *     @type string $stylesheet Required. Slug of the theme associated with these global styles.
+	 *     @type string $post_name Required. Post name.
 	 * }
 	 *
 	 * @return int|WP_Error Post ID of the new variation or error if insertion failed.
@@ -503,7 +505,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				'post_status'  => 'publish',
 				'post_title'   => $args['title'],
 				'post_type'    => 'wp_global_styles',
-				'post_name'    => sprintf( 'wp-global-styles-%s', urlencode( $args['stylesheet'] ) ),
+				'post_name'    => $args['post_name'],
 				'tax_input'    => array(
 					'wp_theme' => array( $args['stylesheet'] ),
 				),
@@ -513,7 +515,6 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 		return $post_id;
 	}
-	// @codingStandardsIgnoreEnd Squiz.Commenting.FunctionComment.ParamCommentFullStop
 
 	/**
 	 * Make an association between post $id and post containing current user
