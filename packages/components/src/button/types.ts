@@ -88,7 +88,7 @@ export type ButtonProps = {
 	 * If provided with `showTooltip`, sets the position of the tooltip.
 	 * Please refer to the Tooltip component for more details regarding the defaults.
 	 */
-	tooltipPosition?: string;
+	tooltipPosition?: PopoverProps[ 'position' ];
 	/**
 	 * Specifies the button's style.
 	 * The accepted values are:
