@@ -12,9 +12,10 @@ import {
 	PanelBody,
 	Placeholder,
 	RangeControl,
-	TextControl,
 	ToggleControl,
 	ToolbarGroup,
+	__experimentalHStack as HStack,
+	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { grid, list, edit, rss } from '@wordpress/icons';
@@ -66,17 +67,20 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 						onSubmit={ onSubmitURL }
 						className="wp-block-rss__placeholder-form"
 					>
-						<TextControl
-							placeholder={ __( 'Enter URL here…' ) }
-							value={ feedURL }
-							onChange={ ( value ) =>
-								setAttributes( { feedURL: value } )
-							}
-							className="wp-block-rss__placeholder-input"
-						/>
-						<Button variant="primary" type="submit">
-							{ __( 'Use URL' ) }
-						</Button>
+						<HStack wrap>
+							<InputControl
+								__next36pxDefaultSize
+								placeholder={ __( 'Enter URL here…' ) }
+								value={ feedURL }
+								onChange={ ( value ) =>
+									setAttributes( { feedURL: value } )
+								}
+								className="wp-block-rss__placeholder-input"
+							/>
+							<Button variant="primary" type="submit">
+								{ __( 'Use URL' ) }
+							</Button>
+						</HStack>
 					</form>
 				</Placeholder>
 			</div>
