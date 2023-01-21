@@ -180,7 +180,8 @@ export default function Editor() {
 											<BlockEditor />
 										) }
 										{ editorMode === 'text' &&
-											editedPost && <CodeEditor /> }
+											editedPost &&
+											isEditMode && <CodeEditor /> }
 										{ hasLoadedPost && ! editedPost && (
 											<Notice
 												status="warning"
