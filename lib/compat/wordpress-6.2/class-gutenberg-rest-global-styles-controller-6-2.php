@@ -695,6 +695,7 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 		return $this->add_additional_fields_schema( $this->schema );
 	}
 
+	/**
 	 * Returns the given theme global styles variations.
 	 *
 	 * @since 6.0.0

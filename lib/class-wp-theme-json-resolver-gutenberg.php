@@ -429,14 +429,14 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		$user_cpt         = array();
 		$post_type_filter = 'wp_global_styles';
 		$stylesheet       = $theme->get_stylesheet();
-		$post_name = "wp-global-styles-{urlencode($stylesheet)}";
+		$post_name        = "wp-global-styles-{urlencode($stylesheet)}";
 		$args             = array(
 			'posts_per_page'         => 1,
 			'orderby'                => 'date',
 			'order'                  => 'asc',
 			'post_type'              => $post_type_filter,
 			'post_status'            => $post_status_filter,
-			'post_name' => $post_name,
+			'post_name'              => $post_name,
 			'ignore_sticky_posts'    => true,
 			'no_found_rows'          => true,
 			'update_post_meta_cache' => false,
@@ -460,7 +460,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 					'title'         => 'Custom Styles',  // Do not make string translatable, see https://core.trac.wordpress.org/ticket/54518.
 					'global_styles' => '{"version": ' . WP_Theme_JSON_Gutenberg::LATEST_SCHEMA . ', "isGlobalStylesUserThemeJSON": true }',
 					'stylesheet'    => $stylesheet,
-					'post_name'
+					'post_name'     => $post_name,
 				)
 			);
 
@@ -475,12 +475,13 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	/**
 	 * Saves a new user variation into the database.
 	 *
-	 *
 	 * @param array $args {
+	 *     Arguments to add a style variation.
+	 *
 	 *     @type string title Required. Global styles variation name.
 	 *     @type string global_styles Required. Global styles settings as a JSON string.
 	 *     @type string $stylesheet Required. Slug of the theme associated with these global styles.
-	 *     @type string $post_name Required. Post name.
+	 *     @type string $post_name Optional. Post name.
 	 * }
 	 *
 	 * @return int|WP_Error Post ID of the new variation or error if insertion failed.
@@ -499,21 +500,48 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			return new WP_Error( __( 'Theme does not have theme.json', 'gutenberg' ) );
 		}
 
-		$post_id = wp_insert_post(
-			array(
-				'post_content' => $args['global_styles'],
-				'post_status'  => 'publish',
-				'post_title'   => $args['title'],
-				'post_type'    => 'wp_global_styles',
-				'post_name'    => $args['post_name'],
-				'tax_input'    => array(
-					'wp_theme' => array( $args['stylesheet'] ),
-				),
+		$post_args = array(
+			'post_content' => $args['global_styles'],
+			'post_status'  => 'publish',
+			'post_title'   => $args['title'],
+			'post_type'    => 'wp_global_styles',
+			'tax_input'    => array(
+				'wp_theme' => array( $args['stylesheet'] ),
 			),
+		);
+
+		if ( ! empty( $args['post_name'] ) ) {
+			$post_args['post_name'] = $args['post_name'];
+		}
+
+		$post_id = wp_insert_post(
+			$post_args,
 			true
 		);
 
+		if ( empty( $args['post_name'] ) ) {
+			$post_id = wp_update_post(
+				array(
+					'ID'        => $post_id,
+					'post_name' => self::generate_user_style_variation_post_name( $post_id ),
+				)
+			);
+		}
+
 		return $post_id;
+	}
+
+	/**
+	 * Generate a post name for a variation with the given ID.
+	 *
+	 * @since 6.2
+	 *
+	 * @param int|null $variation_id Variation ID.
+	 * @return string Post name.
+	 */
+	public static function generate_user_style_variation_post_name( $variation_id ) {
+		$stylesheet = get_stylesheet();
+		return "wp-global-styles-{$stylesheet}-variation-{$variation_id}";
 	}
 
 	/**
