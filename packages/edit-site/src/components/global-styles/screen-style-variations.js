@@ -33,14 +33,16 @@ import {
 } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	store as blockEditorStore,
+	experiments as blockEditorExperiments,
+} from '@wordpress/block-editor';
 import { MoreMenuDropdown } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
 import { mergeBaseAndUserConfigs } from './global-styles-provider';
-import { GlobalStylesContext } from './context';
 import StylesPreview from './preview';
 import ScreenHeader from './header';
 import {
@@ -50,6 +52,9 @@ import {
 	useUserChangesMatchAnyVariation,
 } from './hooks';
 import { compareVariations } from './utils';
+import { unlock } from '../../experiments';
+
+const { GlobalStylesContext } = unlock( blockEditorExperiments );
 
 /* eslint-disable dot-notation */
 

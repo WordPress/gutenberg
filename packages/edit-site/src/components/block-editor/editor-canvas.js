@@ -53,7 +53,6 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 					) }
 				</>
 			}
-			assets={ settings.__unstableResolvedAssets }
 			ref={ mouseMoveTypingRef }
 			name="editor-canvas"
 			className="edit-site-visual-editor__editor-canvas"

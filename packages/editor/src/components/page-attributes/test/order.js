@@ -9,8 +9,6 @@ import userEvent from '@testing-library/user-event';
  */
 import { PageAttributesOrder } from '../order';
 
-jest.useFakeTimers();
-
 describe( 'PageAttributesOrder', () => {
 	/**
 	 * When starting to type inside the spinbutton, select the current value
@@ -22,9 +20,7 @@ describe( 'PageAttributesOrder', () => {
 	};
 
 	it( 'should reject invalid input', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const onUpdateOrder = jest.fn();
 
@@ -41,9 +37,7 @@ describe( 'PageAttributesOrder', () => {
 	} );
 
 	it( 'should update with zero input', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const onUpdateOrder = jest.fn();
 
@@ -59,9 +53,7 @@ describe( 'PageAttributesOrder', () => {
 	} );
 
 	it( 'should update with valid positive input', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const onUpdateOrder = jest.fn();
 
@@ -77,9 +69,7 @@ describe( 'PageAttributesOrder', () => {
 	} );
 
 	it( 'should update with valid negative input', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const onUpdateOrder = jest.fn();
 

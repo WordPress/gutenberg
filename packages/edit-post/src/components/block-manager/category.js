@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useMemo, useCallback } from '@wordpress/element';
@@ -50,7 +45,7 @@ function BlockManagerCategory( { title, blockTypes } ) {
 	}, [] );
 	const toggleAllVisible = useCallback(
 		( nextIsChecked ) => {
-			const blockNames = map( blockTypes, 'name' );
+			const blockNames = blockTypes.map( ( { name } ) => name );
 			if ( nextIsChecked ) {
 				showBlockTypes( blockNames );
 			} else {
@@ -64,9 +59,9 @@ function BlockManagerCategory( { title, blockTypes } ) {
 		return null;
 	}
 
-	const checkedBlockNames = map( filteredBlockTypes, 'name' ).filter(
-		( type ) => ! hiddenBlockTypes.includes( type )
-	);
+	const checkedBlockNames = filteredBlockTypes
+		.map( ( { name } ) => name )
+		.filter( ( type ) => ! hiddenBlockTypes.includes( type ) );
 
 	const titleId = 'edit-post-block-manager__category-title-' + instanceId;
 

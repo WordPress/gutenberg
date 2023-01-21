@@ -15,8 +15,14 @@
 
 .edit-site-site-hub__view-mode-toggle-container {
 	height: $header-height;
-	width: $header-height;
+	width: $header-height + 4px;
 	flex-shrink: 0;
+}
+
+.edit-site-layout.is-edit-mode {
+	.edit-site-site-hub__view-mode-toggle-container {
+		width: $header-height;
+	}
 }
 
 .edit-site-site-hub__text-content {

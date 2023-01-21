@@ -348,6 +348,10 @@ _Returns_
 
 Undocumented declaration.
 
+### experiments
+
+Experimental @wordpress/block-editor APIs.
+
 ### FontSizePicker
 
 _Related_

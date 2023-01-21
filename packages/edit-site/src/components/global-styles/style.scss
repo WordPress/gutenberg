@@ -84,7 +84,8 @@ $block-preview-height: 150px;
 
 .edit-site-screen-text-color__control,
 .edit-site-screen-link-color__control,
-.edit-site-screen-button-color__control {
+.edit-site-screen-button-color__control,
+.edit-site-screen-background-color__control.has-no-tabs {
 	padding: $grid-unit-20;
 }
 
@@ -157,6 +158,15 @@ $block-preview-height: 150px;
 	white-space: break-spaces;
 	max-height: 200px;
 	overflow-y: scroll;
+}
+
+.edit-site-global-styles-screen-variations {
+	margin-top: $grid-unit-20;
+	border-top: 1px solid $gray-300;
+
+	& > * {
+		margin: $grid-unit-30 $grid-unit-20;
+	}
 }
 
 .edit-site-global-styles__cs {
