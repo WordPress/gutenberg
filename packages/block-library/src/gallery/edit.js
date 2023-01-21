@@ -652,7 +652,7 @@ function GalleryEdit( props ) {
 			<Gallery
 				{ ...props }
 				showCaption={ showCaption }
-				ref={ captionRef }
+				ref={ Platform.isWeb ? captionRef : undefined }
 				images={ images }
 				mediaPlaceholder={
 					! hasImages || Platform.isNative
