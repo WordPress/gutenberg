@@ -25,10 +25,10 @@ import type {
 	TagName,
 } from './types';
 
-const disabledEventsOnDisabledButton: DisabledEvent[] = [
+const disabledEventsOnDisabledButton = [
 	'onMouseDown',
 	'onClick',
-];
+] as const;
 
 function useDeprecatedProps( {
 	isDefault,
