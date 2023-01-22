@@ -121,6 +121,4 @@ export type DeprecatedIconButtonProps = {
 	tooltip: ButtonProps[ 'label' ];
 };
 
-export type DisabledEvent = 'onMouseDown' | 'onClick';
-
 export type TagName = 'a' | 'button';
