@@ -139,6 +139,16 @@ describe( 'Button', () => {
 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'gutenberg' );
 		} );
 
+		it( 'should pass additional props to the element', () => {
+			render( <Button type="submit" /> );
+
+			expect( console ).toHaveErrored();
+			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
+				'type',
+				'submit'
+			);
+		} );
+
 		it( 'should render an icon button', () => {
 			render( <Button icon={ plusCircle } /> );
 			const button = screen.getByRole( 'button' );
