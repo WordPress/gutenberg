@@ -67,7 +67,7 @@ const {
 	__experimentalGetActiveBlockIdByBlockNames: getActiveBlockIdByBlockNames,
 	__experimentalGetAllowedPatterns,
 	__experimentalGetParsedPattern,
-	__experimentalGetPatternsByBlockTypes,
+	getPatternsByBlockTypes,
 	__unstableGetClientIdWithClientIdsTree,
 	__unstableGetClientIdsTree,
 	__experimentalGetPatternTransformItems,
@@ -4223,7 +4223,7 @@ describe( 'selectors', () => {
 			);
 		} );
 	} );
-	describe( '__experimentalGetPatternsByBlockTypes', () => {
+	describe( 'getPatternsByBlockTypes', () => {
 		const state = {
 			blocks: {
 				byClientId: new Map(
@@ -4263,22 +4263,17 @@ describe( 'selectors', () => {
 			},
 		};
 		it( 'should return empty array if no block name is provided', () => {
-			expect( __experimentalGetPatternsByBlockTypes( state ) ).toEqual(
-				[]
-			);
+			expect( getPatternsByBlockTypes( state ) ).toEqual( [] );
 		} );
 		it( 'shoud return empty array if no match is found', () => {
-			const patterns = __experimentalGetPatternsByBlockTypes(
+			const patterns = getPatternsByBlockTypes(
 				state,
 				'test/block-not-exists'
 			);
 			expect( patterns ).toEqual( [] );
 		} );
 		it( 'should return proper results when there are matched block patterns', () => {
-			const patterns = __experimentalGetPatternsByBlockTypes(
-				state,
-				'test/block-a'
-			);
+			const patterns = getPatternsByBlockTypes( state, 'test/block-a' );
 			expect( patterns ).toHaveLength( 2 );
 			expect( patterns ).toEqual(
 				expect.arrayContaining( [
@@ -4288,7 +4283,7 @@ describe( 'selectors', () => {
 			);
 		} );
 		it( 'should return proper result with matched patterns and allowed blocks from rootClientId', () => {
-			const patterns = __experimentalGetPatternsByBlockTypes(
+			const patterns = getPatternsByBlockTypes(
 				state,
 				'test/block-a',
 				'block1'

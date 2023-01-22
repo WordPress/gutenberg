@@ -22,39 +22,23 @@ import { transformBlockTo } from './transform-block-to';
 
 type EditorConstructorProps = {
 	page: Page;
-	hasIframe?: boolean;
 };
 
 export class Editor {
 	browser: Browser;
 	page: Page;
 	context: BrowserContext;
-	#hasIframe: boolean;
 
-	constructor( { page, hasIframe = false }: EditorConstructorProps ) {
+	constructor( { page }: EditorConstructorProps ) {
 		this.page = page;
 		this.context = page.context();
 		this.browser = this.context.browser()!;
-		this.#hasIframe = hasIframe;
 	}
 
 	get canvas(): Frame | Page {
-		let frame;
-
-		if ( this.#hasIframe ) {
-			frame = this.page.frame( 'editor-canvas' );
-		} else {
-			frame = this.page;
-		}
-
-		if ( ! frame ) {
-			throw new Error(
-				'EditorUtils: unable to find editor canvas iframe or page'
-			);
-		}
-
-		return frame;
+		return this.page.frame( 'editor-canvas' ) || this.page;
 	}
+
 	clickBlockOptionsMenuItem = clickBlockOptionsMenuItem.bind( this );
 	clickBlockToolbarButton = clickBlockToolbarButton.bind( this );
 	getBlocks = getBlocks.bind( this );

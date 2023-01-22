@@ -41,7 +41,7 @@ function SiteIcon( { className } ) {
 	) : (
 		<Icon
 			className="edit-site-site-icon__icon"
-			size="36px"
+			size="32px"
 			icon={ wordpress }
 		/>
 	);

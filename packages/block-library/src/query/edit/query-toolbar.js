@@ -24,15 +24,10 @@ export default function QueryToolbar( {
 } ) {
 	const hasPatterns = useSelect(
 		( select ) => {
-			const {
-				getBlockRootClientId,
-				__experimentalGetPatternsByBlockTypes,
-			} = select( blockEditorStore );
+			const { getBlockRootClientId, getPatternsByBlockTypes } =
+				select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
-			return !! __experimentalGetPatternsByBlockTypes(
-				name,
-				rootClientId
-			).length;
+			return !! getPatternsByBlockTypes( name, rootClientId ).length;
 		},
 		[ name, clientId ]
 	);

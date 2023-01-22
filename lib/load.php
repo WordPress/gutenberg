@@ -97,15 +97,16 @@ require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/navigation-page.php';
 require __DIR__ . '/experimental/kses.php';
 
-// Web Fonts API.
-require __DIR__ . '/experimental/webfonts-deprecations.php'; // Temporary deprecated functions.
-require __DIR__ . '/experimental/class-wp-webfonts.php'; // Temporary deprecated class.
-require __DIR__ . '/experimental/class-wp-webfonts-utils.php';
-require __DIR__ . '/experimental/register-webfonts-from-theme-json.php';
-require __DIR__ . '/experimental/class-wp-web-fonts.php';
-require __DIR__ . '/experimental/class-wp-webfonts-provider.php';
-require __DIR__ . '/experimental/class-wp-webfonts-provider-local.php';
-require __DIR__ . '/experimental/webfonts.php';
+// Fonts API.
+require __DIR__ . '/experimental/fonts-api/class-wp-fonts-provider.php';
+require __DIR__ . '/experimental/fonts-api/deprecations/webfonts-deprecations.php';
+require __DIR__ . '/experimental/fonts-api/deprecations/class-wp-webfonts-provider.php';
+require __DIR__ . '/experimental/fonts-api/deprecations/class-wp-webfonts.php';
+require __DIR__ . '/experimental/fonts-api/class-wp-fonts-utils.php';
+require __DIR__ . '/experimental/fonts-api/register-fonts-from-theme-json.php';
+require __DIR__ . '/experimental/fonts-api/class-wp-fonts.php';
+require __DIR__ . '/experimental/fonts-api/class-wp-fonts-provider-local.php';
+require __DIR__ . '/experimental/fonts-api/fonts-api.php';
 
 // Plugin specific code.
 require __DIR__ . '/class-wp-theme-json-gutenberg.php';
@@ -126,7 +127,6 @@ if ( is_dir( __DIR__ . '/../build/style-engine' ) ) {
 }
 
 // Block supports overrides.
-require __DIR__ . '/block-supports/utils.php';
 require __DIR__ . '/block-supports/settings.php';
 require __DIR__ . '/block-supports/elements.php';
 require __DIR__ . '/block-supports/colors.php';
