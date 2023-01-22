@@ -230,7 +230,7 @@ If provided, displays the given text inside the button. If the button contains c
 
 -   Required: No
 
-#### `tooltipPosition`: `string`
+#### `tooltipPosition`: `PopoverProps[ 'position' ]`
 
 If provided with`showTooltip`, sets the position of the tooltip. Please refer to the [Tooltip](/packages/components/src/tooltip/README.md) component for more details regarding the defaults.
 
