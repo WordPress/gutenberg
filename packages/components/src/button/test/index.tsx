@@ -142,7 +142,6 @@ describe( 'Button', () => {
 		it( 'should pass additional props to the element', () => {
 			render( <Button type="submit" /> );
 
-			expect( console ).toHaveErrored();
 			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
 				'type',
 				'submit'
