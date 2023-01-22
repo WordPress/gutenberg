@@ -90,7 +90,6 @@ export { default as GuidePage } from './guide/page';
 export { Heading as __experimentalHeading } from './heading';
 export { HStack as __experimentalHStack } from './h-stack';
 export { default as Icon } from './icon';
-export { default as IconButton } from './button/deprecated';
 export {
 	ItemGroup as __experimentalItemGroup,
 	Item as __experimentalItem,

@@ -124,32 +124,6 @@ export const CSS_UNITS = [
 export const DEFAULT_UNIT = allUnits.px;
 
 /**
- * Handles legacy value + unit handling.
- * This component use to manage both incoming value and units separately.
- *
- * Moving forward, ideally the value should be a string that contains both
- * the value and unit, example: '10px'
- *
- * @param  rawValue     The raw value as a string (may or may not contain the unit)
- * @param  fallbackUnit The unit used as a fallback, if not unit is detected in the `value`
- * @param  allowedUnits Units to derive from.
- * @return The extracted quantity and unit. The quantity can be `undefined` in case the raw value
- * could not be parsed to a number correctly. The unit can be `undefined` in case the unit parse
- * from the raw value could not be matched against the list of allowed units.
- */
-export function getParsedQuantityAndUnit(
-	rawValue?: string | number,
-	fallbackUnit?: string,
-	allowedUnits?: WPUnitControlUnit[]
-): [ number | undefined, string | undefined ] {
-	const initialValue = fallbackUnit
-		? `${ rawValue ?? '' }${ fallbackUnit }`
-		: rawValue;
-
-	return parseQuantityAndUnitFromRawValue( initialValue, allowedUnits );
-}
-
-/**
  * Checks if units are defined.
  *
  * @param  units List of units.
@@ -327,21 +301,18 @@ export const useCustomUnits = ( {
  * accurately displayed in the UI, even if the intention is to hide
  * the availability of that unit.
  *
- * @param  rawValue   Selected value to parse.
- * @param  legacyUnit Legacy unit value, if rawValue needs it appended.
- * @param  units      List of available units.
+ * @param  rawValue Selected value to parse.
+ * @param  units    List of available units.
  *
  * @return A collection of units containing the unit for the current value.
  */
 export function getUnitsWithCurrentUnit(
 	rawValue?: string | number,
-	legacyUnit?: string,
 	units: WPUnitControlUnit[] = ALL_CSS_UNITS
 ): WPUnitControlUnit[] {
 	const unitsToReturn = Array.isArray( units ) ? [ ...units ] : [];
-	const [ , currentUnit ] = getParsedQuantityAndUnit(
+	const [ , currentUnit ] = parseQuantityAndUnitFromRawValue(
 		rawValue,
-		legacyUnit,
 		ALL_CSS_UNITS
 	);
 

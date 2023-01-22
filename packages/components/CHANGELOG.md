@@ -97,6 +97,12 @@
 
 -   `Tooltip`: Add readme and unit tests for `shortcut` prop ([#46092](https://github.com/WordPress/gutenberg/pull/46092)).
 
+### Breaking changes
+
+-   Remove the deprecated IconButton component.
+-   Remove the deprecated unit prop from the UnitControl component.
+-   Remove the deprecated isDefault prop from the Button component.
+
 ## 22.1.0 (2022-11-16)
 
 ### Enhancements

@@ -380,13 +380,5 @@ describe( 'Button', () => {
 			render( <Button isLink /> );
 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-link' );
 		} );
-
-		it( 'should warn when the isDefault prop is passed', () => {
-			render( <Button isDefault /> );
-			expect( screen.getByRole( 'button' ) ).toHaveClass(
-				'is-secondary'
-			);
-			expect( console ).toHaveWarned();
-		} );
 	} );
 } );

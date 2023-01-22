@@ -196,22 +196,7 @@ describe( 'UnitControl utils', () => {
 		];
 
 		it( 'should return units list with valid current unit prepended', () => {
-			const result = getUnitsWithCurrentUnit(
-				'20%',
-				undefined,
-				limitedUnits
-			);
-
-			expect( result ).toHaveLength( 3 );
-
-			const currentUnit = result.shift();
-			expect( currentUnit?.value ).toBe( '%' );
-			expect( currentUnit?.label ).toBe( '%' );
-			expect( result ).toEqual( limitedUnits );
-		} );
-
-		it( 'should return units list with valid current unit prepended using legacy values', () => {
-			const result = getUnitsWithCurrentUnit( 20, '%', limitedUnits );
+			const result = getUnitsWithCurrentUnit( '20%', limitedUnits );
 
 			expect( result ).toHaveLength( 3 );
 
@@ -222,22 +207,14 @@ describe( 'UnitControl utils', () => {
 		} );
 
 		it( 'should return units list without invalid current unit prepended', () => {
-			const result = getUnitsWithCurrentUnit(
-				'20null',
-				undefined,
-				limitedUnits
-			);
+			const result = getUnitsWithCurrentUnit( '20null', limitedUnits );
 
 			expect( result ).toHaveLength( 2 );
 			expect( result ).toEqual( limitedUnits );
 		} );
 
 		it( 'should return units list without an existing current unit prepended', () => {
-			const result = getUnitsWithCurrentUnit(
-				'20em',
-				undefined,
-				limitedUnits
-			);
+			const result = getUnitsWithCurrentUnit( '20em', limitedUnits );
 
 			expect( result ).toHaveLength( 2 );
 			expect( result ).toEqual( limitedUnits );
