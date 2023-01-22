@@ -7,6 +7,7 @@ import type { ReactNode } from 'react';
  * Internal dependencies
  */
 import type { Props as IconProps } from '../icon';
+import type { PopoverProps } from '../popover/types';
 
 export type ButtonProps = {
 	/**

@@ -18,17 +18,9 @@ import Tooltip from '../tooltip';
 import Icon from '../icon';
 import { VisuallyHidden } from '../visually-hidden';
 import type { WordPressComponentProps } from '../ui/context';
-import type {
-	ButtonProps,
-	DeprecatedButtonProps,
-	DisabledEvent,
-	TagName,
-} from './types';
+import type { ButtonProps, DeprecatedButtonProps, TagName } from './types';
 
-const disabledEventsOnDisabledButton = [
-	'onMouseDown',
-	'onClick',
-] as const;
+const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ] as const;
 
 function useDeprecatedProps( {
 	isDefault,

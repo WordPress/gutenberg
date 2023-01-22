@@ -13,8 +13,7 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import Button from '.';
-import type { ButtonProps, DeprecatedIconButtonProps, TagName } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { DeprecatedIconButtonProps } from './types';
 
 function UnforwardedIconButton(
 	{
