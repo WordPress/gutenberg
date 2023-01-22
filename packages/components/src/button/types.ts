@@ -9,7 +9,7 @@ import type { ReactNode } from 'react';
 import type { Props as IconProps } from '../icon';
 import type { PopoverProps } from '../popover/types';
 
-export type ButtonProps = {
+export type BaseButtonProps = {
 	/**
 	 * The button's children.
 	 */
@@ -19,18 +19,9 @@ export type ButtonProps = {
 	 */
 	describedBy?: string;
 	/**
-	 * Whether the button is disabled.
-	 * If `true`, this will force a `button` element to be rendered.
-	 */
-	disabled?: boolean;
-	/**
 	 * Whether the button is focused.
 	 */
 	focus?: boolean;
-	/**
-	 * If provided, renders `a` instead of `button`.
-	 */
-	href?: string;
 	/**
 	 * If provided, renders an Icon component inside the button.
 	 */
@@ -56,10 +47,6 @@ export type ButtonProps = {
 	 */
 	isDestructive?: boolean;
 	/**
-	 * Renders a pressed button style.
-	 */
-	isPressed?: boolean;
-	/**
 	 * Decreases the size of the button.
 	 */
 	isSmall?: boolean;
@@ -77,10 +64,6 @@ export type ButtonProps = {
 	 * If provided, renders a Tooltip component for the button.
 	 */
 	showTooltip?: boolean;
-	/**
-	 * If provided with `href`, sets the `target` attribute to the `a`.
-	 */
-	target?: string;
 	/**
 	 * If provided, displays the given text inside the button. If the button contains children elements, the text is displayed before them.
 	 */
@@ -104,6 +87,31 @@ export type ButtonProps = {
 	 */
 	__experimentalIsFocusable?: boolean;
 };
+
+export type ButtonPropsAnchorElement = BaseButtonProps & {
+	/**
+	 * If provided, renders `a` instead of `button`.
+	 */
+	href: string;
+	/**
+	 * If provided with `href`, sets the `target` attribute to the `a`.
+	 */
+	target?: string;
+}
+
+export type ButtonPropsButtonElement = BaseButtonProps & {
+	/**
+	 * Whether the button is disabled.
+	 * If `true`, this will force a `button` element to be rendered.
+	 */
+	disabled?: boolean;
+	/**
+	 * Renders a pressed button style.
+	 */
+	isPressed?: boolean;
+}
+
+export type ButtonProps = ButtonPropsAnchorElement | ButtonPropsButtonElement;
 
 export type DeprecatedButtonProps = {
 	isDefault?: boolean;

@@ -126,7 +126,7 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should not pass the prop target into the element', () => {
-			render( <Button target="_blank" /> );
+			render( <Button href="https://wordpress.org/" target="_blank" /> );
 
 			expect( screen.getByRole( 'button' ) ).not.toHaveAttribute(
 				'target'

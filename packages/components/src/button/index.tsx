@@ -18,9 +18,31 @@ import Tooltip from '../tooltip';
 import Icon from '../icon';
 import { VisuallyHidden } from '../visually-hidden';
 import type { WordPressComponentProps } from '../ui/context';
-import type { ButtonProps, DeprecatedButtonProps, TagName } from './types';
+import type {
+	ButtonProps,
+	ButtonPropsAnchorElement,
+	ButtonPropsButtonElement,
+	DeprecatedButtonProps,
+	TagName,
+} from './types';
 
 const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ] as const;
+
+function hasAnchorProps(
+	props: ButtonProps
+): props is ButtonPropsAnchorElement {
+	return 'href' in props && props.href !== undefined;
+}
+
+function hasButtonProps(
+	props: ButtonProps
+): props is ButtonPropsButtonElement {
+	return (
+		( 'disabled' in props && !! props?.disabled ) ||
+		( '__experimentalIsFocusable' in props &&
+			!! props?.__experimentalIsFocusable )
+	);
+}
 
 function useDeprecatedProps( {
 	isDefault,
@@ -30,7 +52,15 @@ function useDeprecatedProps( {
 	isLink,
 	variant,
 	...otherProps
-}: WordPressComponentProps< ButtonProps & DeprecatedButtonProps, TagName > ) {
+}:
+	| WordPressComponentProps<
+			ButtonPropsAnchorElement & DeprecatedButtonProps,
+			'a'
+	  >
+	| WordPressComponentProps<
+			ButtonPropsButtonElement & DeprecatedButtonProps,
+			'button'
+	  > ) {
 	let computedVariant = variant;
 
 	if ( isPrimary ) {
@@ -66,18 +96,17 @@ function useDeprecatedProps( {
 }
 
 export function UnforwardedButton(
-	props: WordPressComponentProps< ButtonProps, TagName >,
+	props:
+		| WordPressComponentProps< ButtonPropsAnchorElement, 'a' >
+		| WordPressComponentProps< ButtonPropsButtonElement, 'button' >,
 	ref: ForwardedRef< any >
 ) {
+	const withDeprecatedProps = useDeprecatedProps( props );
 	const {
-		href,
-		target,
 		isSmall,
-		isPressed,
 		isBusy,
 		isDestructive,
 		className,
-		disabled,
 		icon,
 		iconPosition = 'left',
 		iconSize,
@@ -91,11 +120,17 @@ export function UnforwardedButton(
 		__experimentalIsFocusable: isFocusable,
 		describedBy,
 		...additionalProps
-	} = useDeprecatedProps( props );
+	} = withDeprecatedProps;
+
 	const instanceId = useInstanceId(
 		Button,
 		'components-button__description'
 	);
+
+	const isAnchorElement =
+		hasAnchorProps( withDeprecatedProps ) &&
+		! hasButtonProps( withDeprecatedProps );
+	const isButtonElement = ! isAnchorElement;
 
 	const hasChildren =
 		( 'string' === typeof children && !! children ) ||
@@ -110,7 +145,7 @@ export function UnforwardedButton(
 		'is-primary': variant === 'primary',
 		'is-small': isSmall,
 		'is-tertiary': variant === 'tertiary',
-		'is-pressed': isPressed,
+		'is-pressed': isButtonElement && withDeprecatedProps.isPressed,
 		'is-busy': isBusy,
 		'is-link': variant === 'link',
 		'is-destructive': isDestructive,
@@ -118,18 +153,19 @@ export function UnforwardedButton(
 		'has-icon': !! icon,
 	} );
 
-	const trulyDisabled = disabled && ! isFocusable;
-	const Tag = href !== undefined && ! trulyDisabled ? 'a' : 'button';
-	const tagProps: HTMLProps< TagName > =
-		Tag === 'a'
-			? { href, target }
-			: {
-					type: 'button',
-					disabled: trulyDisabled,
-					'aria-pressed': isPressed,
-			  };
+	const trulyDisabled =
+		isButtonElement && withDeprecatedProps.disabled && ! isFocusable;
+	const Tag = isAnchorElement ? 'a' : 'button';
 
-	if ( disabled && isFocusable ) {
+	const tagProps: HTMLProps< TagName > = isAnchorElement
+		? { href: withDeprecatedProps.href, target: withDeprecatedProps.target }
+		: {
+				type: 'button',
+				disabled: trulyDisabled,
+				'aria-pressed': withDeprecatedProps.isPressed,
+		  };
+
+	if ( isButtonElement && withDeprecatedProps.disabled && isFocusable ) {
 		// In this case, the button will be disabled, but still focusable and
 		// perceivable by screen reader users.
 		tagProps[ 'aria-disabled' ] = true;
@@ -189,7 +225,7 @@ export function UnforwardedButton(
 		Tag === 'a' ? (
 			<a
 				{ ...( elementProps as WordPressComponentProps<
-					ButtonProps,
+					ButtonPropsAnchorElement,
 					'a'
 				> ) }
 			>
@@ -198,7 +234,7 @@ export function UnforwardedButton(
 		) : (
 			<button
 				{ ...( elementProps as WordPressComponentProps<
-					ButtonProps,
+					ButtonPropsButtonElement,
 					'button'
 				> ) }
 			>
