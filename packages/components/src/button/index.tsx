@@ -103,14 +103,18 @@ export function UnforwardedButton(
 ) {
 	const withDeprecatedProps = useDeprecatedProps( props );
 	const {
+		href,
 		isSmall,
 		isBusy,
 		isDestructive,
 		className,
+		disabled,
 		icon,
 		iconPosition = 'left',
 		iconSize,
+		isPressed,
 		showTooltip,
+		target,
 		tooltipPosition,
 		shortcut,
 		label,
@@ -126,12 +130,10 @@ export function UnforwardedButton(
 		Button,
 		'components-button__description'
 	);
-
 	const isAnchorElement =
 		hasAnchorProps( withDeprecatedProps ) &&
 		! hasButtonProps( withDeprecatedProps );
 	const isButtonElement = ! isAnchorElement;
-
 	const hasChildren =
 		( 'string' === typeof children && !! children ) ||
 		( Array.isArray( children ) &&
@@ -161,9 +163,9 @@ export function UnforwardedButton(
 		? { href: withDeprecatedProps.href, target: withDeprecatedProps.target }
 		: {
 				type: 'button',
-				disabled: trulyDisabled,
+				disabled: withDeprecatedProps.disabled && ! isFocusable,
 				'aria-pressed': withDeprecatedProps.isPressed,
-		  };
+			};
 
 	if ( isButtonElement && withDeprecatedProps.disabled && isFocusable ) {
 		// In this case, the button will be disabled, but still focusable and
