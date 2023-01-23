@@ -16,6 +16,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
+	Disabled,
 } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -169,11 +170,13 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 		<>
 			{ inspectorControls }
 			<div { ...useBlockProps() }>
-				<ServerSideRender
-					skipBlockSupportAttributes
-					block="core/tag-cloud"
-					attributes={ attributes }
-				/>
+				<Disabled>
+					<ServerSideRender
+						skipBlockSupportAttributes
+						block="core/tag-cloud"
+						attributes={ attributes }
+					/>
+				</Disabled>
 			</div>
 		</>
 	);
