@@ -5,7 +5,7 @@
  * @package WordPress
  */
 
- /**
+/**
  * Adds a wp-block-paragraph class to the paragraph block content.
  *
  * For example, the following block content:

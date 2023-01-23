@@ -72,7 +72,7 @@ test.describe( 'Font Size Picker', () => {
 			await pageUtils.pressKeyTimes( 'Backspace', 2 );
 			await expect.poll( editor.getEditedPostContent )
 				.toBe( `<!-- wp:paragraph -->
-<p>Paragraph reset - custom size</p>
+<p class="wp-block-paragraph">Paragraph reset - custom size</p>
 <!-- /wp:paragraph -->` );
 		} );
 	} );
@@ -186,7 +186,7 @@ test.describe( 'Font Size Picker', () => {
 
 			await expect.poll( editor.getEditedPostContent )
 				.toBe( `<!-- wp:paragraph -->
-<p>Paragraph with font size reset using tools panel menu</p>
+<p class="wp-block-paragraph">Paragraph with font size reset using tools panel menu</p>
 <!-- /wp:paragraph -->` );
 		} );
 
@@ -220,7 +220,7 @@ test.describe( 'Font Size Picker', () => {
 
 			await expect.poll( editor.getEditedPostContent )
 				.toBe( `<!-- wp:paragraph -->
-<p>Paragraph with font size reset using input field</p>
+<p class="wp-block-paragraph">Paragraph with font size reset using input field</p>
 <!-- /wp:paragraph -->` );
 		} );
 	} );
@@ -266,7 +266,7 @@ test.describe( 'Font Size Picker', () => {
 
 			await expect.poll( editor.getEditedPostContent )
 				.toBe( `<!-- wp:paragraph -->
-<p>Paragraph with font size reset using tools panel menu</p>
+<p class="wp-block-paragraph">Paragraph with font size reset using tools panel menu</p>
 <!-- /wp:paragraph -->` );
 		} );
 
@@ -298,7 +298,7 @@ test.describe( 'Font Size Picker', () => {
 
 			await expect.poll( editor.getEditedPostContent )
 				.toBe( `<!-- wp:paragraph -->
-<p>Paragraph with font size reset using input field</p>
+<p class="wp-block-paragraph">Paragraph with font size reset using input field</p>
 <!-- /wp:paragraph -->` );
 		} );
 	} );

@@ -11,9 +11,9 @@
 					"layout": "column-1"
 				},
 				"innerBlocks": [],
-				"innerHTML": "\n\t<p class=\"layout-column-1\">Column One, Paragraph One</p>\n\t",
+				"innerHTML": "\n\t<p class=\"wp-block-paragraph layout-column-1\">Column One, Paragraph One</p>\n\t",
 				"innerContent": [
-					"\n\t<p class=\"layout-column-1\">Column One, Paragraph One</p>\n\t"
+					"\n\t<p class=\"wp-block-paragraph layout-column-1\">Column One, Paragraph One</p>\n\t"
 				]
 			},
 			{
@@ -22,9 +22,9 @@
 					"layout": "column-1"
 				},
 				"innerBlocks": [],
-				"innerHTML": "\n\t<p class=\"layout-column-1\">Column One, Paragraph Two</p>\n\t",
+				"innerHTML": "\n\t<p class=\"wp-block-paragraph layout-column-1\">Column One, Paragraph Two</p>\n\t",
 				"innerContent": [
-					"\n\t<p class=\"layout-column-1\">Column One, Paragraph Two</p>\n\t"
+					"\n\t<p class=\"wp-block-paragraph layout-column-1\">Column One, Paragraph Two</p>\n\t"
 				]
 			},
 			{
@@ -33,9 +33,9 @@
 					"layout": "column-2"
 				},
 				"innerBlocks": [],
-				"innerHTML": "\n\t<p class=\"layout-column-2\">Column Two, Paragraph One</p>\n\t",
+				"innerHTML": "\n\t<p class=\"wp-block-paragraph layout-column-2\">Column Two, Paragraph One</p>\n\t",
 				"innerContent": [
-					"\n\t<p class=\"layout-column-2\">Column Two, Paragraph One</p>\n\t"
+					"\n\t<p class=\"wp-block-paragraph layout-column-2\">Column Two, Paragraph One</p>\n\t"
 				]
 			},
 			{
@@ -44,9 +44,9 @@
 					"layout": "column-3"
 				},
 				"innerBlocks": [],
-				"innerHTML": "\n\t<p class=\"layout-column-3\">Column Three, Paragraph One</p>\n\t",
+				"innerHTML": "\n\t<p class=\"wp-block-paragraph layout-column-3\">Column Three, Paragraph One</p>\n\t",
 				"innerContent": [
-					"\n\t<p class=\"layout-column-3\">Column Three, Paragraph One</p>\n\t"
+					"\n\t<p class=\"wp-block-paragraph layout-column-3\">Column Three, Paragraph One</p>\n\t"
 				]
 			}
 		],

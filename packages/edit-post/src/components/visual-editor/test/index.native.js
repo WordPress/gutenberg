@@ -23,11 +23,11 @@ afterAll( () => {
 
 const initialHtml = `
 <!-- wp:paragraph -->
-<p>First example paragraph.</p>
+<p class="wp-block-paragraph">First example paragraph.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Second example paragraph.</p>
+<p class="wp-block-paragraph">Second example paragraph.</p>
 <!-- /wp:paragraph -->
 `;
 

@@ -15,9 +15,9 @@
 					"fontSize": "large"
 				},
 				"innerBlocks": [],
-				"innerHTML": "\n\t<p class=\"has-text-align-center has-large-font-size\"></p>\n\t",
+				"innerHTML": "\n\t<p class=\"wp-block-paragraph has-text-align-center has-large-font-size\"></p>\n\t",
 				"innerContent": [
-					"\n\t<p class=\"has-text-align-center has-large-font-size\"></p>\n\t"
+					"\n\t<p class=\"wp-block-paragraph has-text-align-center has-large-font-size\"></p>\n\t"
 				]
 			}
 		],

@@ -40,7 +40,7 @@ class Render_Block_Paragraph_Test extends WP_UnitTestCase {
 				'<p class="is-align-right">Hello World</p>',
 				'<p class="is-align-right wp-block-paragraph">Hello World</p>',
 			),
-			'should handle single quotes'                => array(
+			'should handle single quotes'               => array(
 				"<p class='is-align-right'>Hello World</p>",
 				'<p class="is-align-right wp-block-paragraph">Hello World</p>',
 			),

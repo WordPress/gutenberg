@@ -18,7 +18,7 @@ const COLOR_PINK = '#f78da7';
 const paragraph = coreBlocks[ 'core/paragraph' ];
 
 const TEXT_WITH_COLOR = `<!-- wp:paragraph -->
-<p>Hello <mark style="background-color:rgba(0,0,0,0);color:#cf2e2e" class="has-inline-color has-vivid-red-color">this is a test</mark></p>
+<p class="wp-block-paragraph">Hello <mark style="background-color:rgba(0,0,0,0);color:#cf2e2e" class="has-inline-color has-vivid-red-color">this is a test</mark></p>
 <!-- /wp:paragraph -->`;
 
 beforeAll( () => {

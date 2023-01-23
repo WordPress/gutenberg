@@ -13,15 +13,19 @@
 				"blockName": "core/paragraph",
 				"attrs": {},
 				"innerBlocks": [],
-				"innerHTML": "\n\t<p>This is a group block.</p>\n\t",
-				"innerContent": [ "\n\t<p>This is a group block.</p>\n\t" ]
+				"innerHTML": "\n\t<p class=\"wp-block-paragraph\">This is a group block.</p>\n\t",
+				"innerContent": [
+					"\n\t<p class=\"wp-block-paragraph\">This is a group block.</p>\n\t"
+				]
 			},
 			{
 				"blockName": "core/paragraph",
 				"attrs": {},
 				"innerBlocks": [],
-				"innerHTML": "\n\t<p>Group block content.</p>\n\t",
-				"innerContent": [ "\n\t<p>Group block content.</p>\n\t" ]
+				"innerHTML": "\n\t<p class=\"wp-block-paragraph\">Group block content.</p>\n\t",
+				"innerContent": [
+					"\n\t<p class=\"wp-block-paragraph\">Group block content.</p>\n\t"
+				]
 			}
 		],
 		"innerHTML": "\n<div class=\"wp-block-group alignfull has-secondary-background-color has-background\">\n\t\n\n\t\n</div>\n",

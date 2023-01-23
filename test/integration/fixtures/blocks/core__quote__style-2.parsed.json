@@ -9,9 +9,9 @@
 				"blockName": "core/paragraph",
 				"attrs": {},
 				"innerBlocks": [],
-				"innerHTML": "\n<p>There is no greater agony than bearing an untold story inside you.</p>\n",
+				"innerHTML": "\n<p class=\"wp-block-paragraph\">There is no greater agony than bearing an untold story inside you.</p>\n",
 				"innerContent": [
-					"\n<p>There is no greater agony than bearing an untold story inside you.</p>\n"
+					"\n<p class=\"wp-block-paragraph\">There is no greater agony than bearing an untold story inside you.</p>\n"
 				]
 			}
 		],

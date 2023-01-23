@@ -47,7 +47,7 @@ const BLOCKS = [
 		name: 'Paragraph',
 		html: `
 		<!-- wp:paragraph -->
-		<p>This is a paragraph.</p>
+		<p class="wp-block-paragraph">This is a paragraph.</p>
 		<!-- /wp:paragraph -->`,
 		layout: { x: 0, y: 0, width: 100, height: 100 },
 	},

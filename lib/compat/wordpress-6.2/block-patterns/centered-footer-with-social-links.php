@@ -29,7 +29,7 @@ return array(
 					<!-- /wp:spacer -->
 					
 					<!-- wp:paragraph {"align":"center"} -->
-					<p class="has-text-align-center">'
+					<p class="wp-block-paragraph has-text-align-center">'
 					. sprintf(
 						/* translators: %s: WordPress */
 						__( 'Proudly powered by %s', 'gutenberg' ),

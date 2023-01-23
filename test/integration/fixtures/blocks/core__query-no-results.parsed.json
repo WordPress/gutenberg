@@ -9,8 +9,8 @@
 					"placeholder": "Add a text or blocks that will display when the query returns no results."
 				},
 				"innerBlocks": [],
-				"innerHTML": "\n<p></p>\n",
-				"innerContent": [ "\n<p></p>\n" ]
+				"innerHTML": "\n<p class=\"wp-block-paragraph\"></p>\n",
+				"innerContent": [ "\n<p class=\"wp-block-paragraph\"></p>\n" ]
 			}
 		],
 		"innerHTML": "\n\n",

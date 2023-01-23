@@ -159,57 +159,57 @@ else:
 
 <!-- wp:group -->
 <div id="this-is-another-anchor" class="wp-block-group"><!-- wp:paragraph -->
-<p>One.</p>
+<p class="wp-block-paragraph">One.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Two</p>
+<p class="wp-block-paragraph">Two</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Three.</p>
+<p class="wp-block-paragraph">Three.</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->
 
 <!-- wp:columns {"className":"gutenberg-landing\u002d\u002ddevelopers-columns has-2-columns"} -->
 <div class="wp-block-columns gutenberg-landing--developers-columns has-2-columns"><!-- wp:column -->
 <div class="wp-block-column"><!-- wp:paragraph {"align":"left"} -->
-<p class="has-text-align-left"><strong>Built with modern technology.</strong></p>
+<p class="wp-block-paragraph has-text-align-left"><strong>Built with modern technology.</strong></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph {"align":"left"} -->
-<p class="has-text-align-left">Gutenberg was developed on GitHub using the WordPress REST API, JavaScript, and React.</p>
+<p class="wp-block-paragraph has-text-align-left">Gutenberg was developed on GitHub using the WordPress REST API, JavaScript, and React.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph {"align":"left","fontSize":"small"} -->
-<p class="has-text-align-left has-small-font-size"><a href="https://wordpress.org/gutenberg/handbook/language/">Learn more</a></p>
+<p class="wp-block-paragraph has-text-align-left has-small-font-size"><a href="https://wordpress.org/gutenberg/handbook/language/">Learn more</a></p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:column -->
 
 <!-- wp:column -->
 <div class="wp-block-column"><!-- wp:paragraph {"align":"left"} -->
-<p class="has-text-align-left"><strong>Designed for compatibility.</strong></p>
+<p class="wp-block-paragraph has-text-align-left"><strong>Designed for compatibility.</strong></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph {"align":"left"} -->
-<p class="has-text-align-left">We recommend migrating features to blocks, but support for existing WordPress functionality remains. There will be transition paths for shortcodes, meta-boxes, and Custom Post Types.</p>
+<p class="wp-block-paragraph has-text-align-left">We recommend migrating features to blocks, but support for existing WordPress functionality remains. There will be transition paths for shortcodes, meta-boxes, and Custom Post Types.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph {"align":"left","fontSize":"small"} -->
-<p class="has-text-align-left has-small-font-size"><a href="https://wordpress.org/gutenberg/handbook/reference/faq/">Learn more</a></p>
+<p class="wp-block-paragraph has-text-align-left has-small-font-size"><a href="https://wordpress.org/gutenberg/handbook/reference/faq/">Learn more</a></p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:column --></div>
 <!-- /wp:columns -->
 
 <!-- wp:media-text {"isStackedOnMobile":false,"className":"is-stacked-on-mobile"} -->
 <div class="wp-block-media-text alignwide is-stacked-on-mobile"><figure class="wp-block-media-text__media"></figure><div class="wp-block-media-text__content"><!-- wp:paragraph {"className":"has-large-font-size"} -->
-<p class="has-large-font-size"></p>
+<p class="wp-block-paragraph has-large-font-size"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:media-text -->
 
 <!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":890,"dimRatio":20,"overlayColor":"luminous-vivid-orange","focalPoint":{"x":"0.63","y":"0.83"},"minHeight":219} -->
 <div class="wp-block-cover" style="min-height:219px"><span aria-hidden="true" class="wp-block-cover__background has-luminous-vivid-orange-background-color has-background-dim-20 has-background-dim"></span><img class="wp-block-cover__image-background wp-image-890" alt="" src="https://cldup.com/cXyG__fTLN.jpg" style="object-position:63% 83%" data-object-fit="cover" data-object-position="63% 83%"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","className":"has-text-color has-very-light-gray-color","fontSize":"large"} -->
-<p class="has-text-align-center has-text-color has-very-light-gray-color has-large-font-size">Cool cover</p>
+<p class="wp-block-paragraph has-text-align-center has-text-color has-very-light-gray-color has-large-font-size">Cool cover</p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->
 
@@ -232,6 +232,6 @@ else:
 <!-- wp:rss /-->
 
 <!-- wp:paragraph -->
-<p>This block is used in initial HTML e2e tests and should be kept as the last block.</p>
+<p class="wp-block-paragraph">This block is used in initial HTML e2e tests and should be kept as the last block.</p>
 <!-- /wp:paragraph -->
 `;

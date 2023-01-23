@@ -5,5 +5,5 @@
 <!-- /wp:list -->
 
 <!-- wp:paragraph -->
-<p>1</p>
+<p class="wp-block-paragraph">1</p>
 <!-- /wp:paragraph -->

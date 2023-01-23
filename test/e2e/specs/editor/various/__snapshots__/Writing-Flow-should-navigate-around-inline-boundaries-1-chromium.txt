@@ -1,11 +1,11 @@
 <!-- wp:paragraph -->
-<p>FirstAfter</p>
+<p class="wp-block-paragraph">FirstAfter</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Before<strong>InsideSecondInside</strong>After</p>
+<p class="wp-block-paragraph">Before<strong>InsideSecondInside</strong>After</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>BeforeThird</p>
+<p class="wp-block-paragraph">BeforeThird</p>
 <!-- /wp:paragraph -->

@@ -3,5 +3,5 @@
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Paragraph</p>
+<p class="wp-block-paragraph">Paragraph</p>
 <!-- /wp:paragraph -->

@@ -30,7 +30,7 @@ Input post:
 	<!-- wp:column -->
 	<div class="wp-block-column">
 		<!-- wp:paragraph -->
-		<p>Left</p>
+		<p class="wp-block-paragraph">Left</p>
 		<!-- /wp:paragraph -->
 	</div>
 	<!-- /wp:column -->
@@ -38,7 +38,7 @@ Input post:
 	<!-- wp:column -->
 	<div class="wp-block-column">
 		<!-- wp:paragraph -->
-		<p><strong>Middle</strong></p>
+		<p class="wp-block-paragraph"><strong>Middle</strong></p>
 		<!-- /wp:paragraph -->
 	</div>
 	<!-- /wp:column -->
@@ -71,7 +71,7 @@ parse( post ) ===
 							blockName: 'core/paragraph',
 							attrs: null,
 							innerBlocks: [],
-							innerHTML: '\n<p>Left</p>\n',
+							innerHTML: '\n<p class="wp-block-paragraph">Left</p>\n',
 						},
 					],
 					innerHTML: '\n<div class="wp-block-column"></div>\n',
@@ -84,7 +84,7 @@ parse( post ) ===
 							blockName: 'core/paragraph',
 							attrs: null,
 							innerBlocks: [],
-							innerHTML: '\n<p><strong>Middle</strong></p>\n',
+							innerHTML: '\n<p class="wp-block-paragraph"><strong>Middle</strong></p>\n',
 						},
 					],
 					innerHTML: '\n<div class="wp-block-column"></div>\n',

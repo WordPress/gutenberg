@@ -12,7 +12,11 @@ exports[`undo should undo typing after a pause 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
-exports[`undo should undo typing after a pause 2`] = `""`;
+exports[`undo should undo typing after a pause 2`] = `
+"<!-- wp:paragraph -->
+<p class=\\"wp-block-paragraph\\">before pause</p>
+<!-- /wp:paragraph -->"
+`;
 
 exports[`undo should undo typing after non input change 1`] = `
 "<!-- wp:paragraph -->

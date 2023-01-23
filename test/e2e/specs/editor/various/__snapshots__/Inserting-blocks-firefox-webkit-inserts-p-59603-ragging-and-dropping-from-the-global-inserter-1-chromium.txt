@@ -1,5 +1,5 @@
 <!-- wp:paragraph -->
-<p>Dummy text</p>
+<p class="wp-block-paragraph">Dummy text</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:social-links {"customIconColor":"#ffffff","iconColorValue":"#ffffff","customIconBackgroundColor":"#3962e3","iconBackgroundColorValue":"#3962e3","className":"has-icon-color"} -->

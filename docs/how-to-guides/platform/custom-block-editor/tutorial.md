@@ -572,7 +572,7 @@ example of the format:
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>This is an experiment to discover how easy (or otherwise) it is to create a standalone instance of the Block Editor in WPAdmin.</p>
+<p class="wp-block-paragraph">This is an experiment to discover how easy (or otherwise) it is to create a standalone instance of the Block Editor in WPAdmin.</p>
 <!-- /wp:paragraph -->
 ```
 

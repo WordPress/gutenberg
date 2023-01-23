@@ -2,7 +2,7 @@
 
 exports[`Inserting blocks Should insert content using the placeholder and the regular inserter 1`] = `
 "<!-- wp:paragraph -->
-<p>Paragraph block</p>
+<p class="wp-block-paragraph">Paragraph block</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:quote -->
@@ -14,13 +14,13 @@ exports[`Inserting blocks Should insert content using the placeholder and the re
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph -->"
 `;
 
 exports[`Inserting blocks Should insert content using the placeholder and the regular inserter 2`] = `
 "<!-- wp:paragraph -->
-<p>Paragraph block</p>
+<p class="wp-block-paragraph">Paragraph block</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:quote -->
@@ -30,11 +30,11 @@ exports[`Inserting blocks Should insert content using the placeholder and the re
 
 exports[`Inserting blocks Should insert content using the placeholder and the regular inserter 3`] = `
 "<!-- wp:paragraph -->
-<p>Paragraph block</p>
+<p class="wp-block-paragraph">Paragraph block</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Second paragraph</p>
+<p class="wp-block-paragraph">Second paragraph</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:quote -->

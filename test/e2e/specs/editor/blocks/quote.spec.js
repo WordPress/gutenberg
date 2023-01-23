@@ -22,7 +22,7 @@ test.describe( 'Quote', () => {
 		expect( await editor.getEditedPostContent() ).toBe(
 			`<!-- wp:quote -->
 <blockquote class="wp-block-quote"><!-- wp:paragraph -->
-<p>Quote content</p>
+<p class="wp-block-paragraph">Quote content</p>
 <!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->`
 		);
@@ -41,11 +41,11 @@ test.describe( 'Quote', () => {
 		expect( await editor.getEditedPostContent() ).toBe(
 			`<!-- wp:quote -->
 <blockquote class="wp-block-quote"><!-- wp:paragraph -->
-<p>A quote</p>
+<p class="wp-block-paragraph">A quote</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Another paragraph</p>
+<p class="wp-block-paragraph">Another paragraph</p>
 <!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->`
 		);
@@ -63,7 +63,7 @@ test.describe( 'Quote', () => {
 		expect( await editor.getEditedPostContent() ).toBe(
 			`<!-- wp:quote -->
 <blockquote class="wp-block-quote"><!-- wp:paragraph -->
-<p>test</p>
+<p class="wp-block-paragraph">test</p>
 <!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->`
 		);
@@ -78,7 +78,7 @@ test.describe( 'Quote', () => {
 		expect( await editor.getEditedPostContent() ).toBe(
 			`<!-- wp:quote -->
 <blockquote class="wp-block-quote"><!-- wp:paragraph -->
-<p>I’m a quote</p>
+<p class="wp-block-paragraph">I’m a quote</p>
 <!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->`
 		);
@@ -94,7 +94,7 @@ test.describe( 'Quote', () => {
 		expect( await editor.getEditedPostContent() ).toBe(
 			`<!-- wp:quote -->
 <blockquote class="wp-block-quote"><!-- wp:paragraph -->
-<p>test</p>
+<p class="wp-block-paragraph">test</p>
 <!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->`
 		);
@@ -117,11 +117,11 @@ test.describe( 'Quote', () => {
 		expect( await editor.getEditedPostContent() ).toBe(
 			`<!-- wp:quote -->
 <blockquote class="wp-block-quote"><!-- wp:paragraph -->
-<p>one</p>
+<p class="wp-block-paragraph">one</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>two</p>
+<p class="wp-block-paragraph">two</p>
 <!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->`
 		);
@@ -142,11 +142,11 @@ test.describe( 'Quote', () => {
 			await editor.transformBlockTo( '*' );
 			expect( await editor.getEditedPostContent() ).toBe(
 				`<!-- wp:paragraph -->
-<p>one</p>
+<p class="wp-block-paragraph">one</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>two</p>
+<p class="wp-block-paragraph">two</p>
 <!-- /wp:paragraph -->`
 			);
 		} );
@@ -165,15 +165,15 @@ test.describe( 'Quote', () => {
 			await editor.transformBlockTo( '*' );
 			expect( await editor.getEditedPostContent() ).toBe(
 				`<!-- wp:paragraph -->
-<p>one</p>
+<p class="wp-block-paragraph">one</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>two</p>
+<p class="wp-block-paragraph">two</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>cite</p>
+<p class="wp-block-paragraph">cite</p>
 <!-- /wp:paragraph -->`
 			);
 		} );
@@ -189,11 +189,11 @@ test.describe( 'Quote', () => {
 			await editor.transformBlockTo( '*' );
 			expect( await editor.getEditedPostContent() ).toBe(
 				`<!-- wp:paragraph -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>cite</p>
+<p class="wp-block-paragraph">cite</p>
 <!-- /wp:paragraph -->`
 			);
 		} );
@@ -251,12 +251,12 @@ test.describe( 'Quote', () => {
 		expect( await editor.getEditedPostContent() ).toBe(
 			`<!-- wp:quote -->
 <blockquote class="wp-block-quote"><!-- wp:paragraph -->
-<p>1</p>
+<p class="wp-block-paragraph">1</p>
 <!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->
 
 <!-- wp:paragraph -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph -->`
 		);
 		await page.keyboard.press( 'Backspace' );
@@ -265,11 +265,11 @@ test.describe( 'Quote', () => {
 		expect( await editor.getEditedPostContent() ).toBe(
 			`<!-- wp:quote -->
 <blockquote class="wp-block-quote"><!-- wp:paragraph -->
-<p>1</p>
+<p class="wp-block-paragraph">1</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>2</p>
+<p class="wp-block-paragraph">2</p>
 <!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->`
 		);
@@ -280,7 +280,7 @@ test.describe( 'Quote', () => {
 		expect( await editor.getEditedPostContent() ).toBe(
 			`<!-- wp:quote -->
 <blockquote class="wp-block-quote"><!-- wp:paragraph -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->`
 		);
@@ -300,7 +300,7 @@ test.describe( 'Quote', () => {
 		expect( await editor.getEditedPostContent() ).toBe(
 			`<!-- wp:quote -->
 <blockquote class="wp-block-quote"><!-- wp:paragraph -->
-<p>1</p>
+<p class="wp-block-paragraph">1</p>
 <!-- /wp:paragraph --><cite>2</cite></blockquote>
 <!-- /wp:quote -->`
 		);
@@ -309,7 +309,7 @@ test.describe( 'Quote', () => {
 		await page.keyboard.press( 'Backspace' );
 		expect( await editor.getEditedPostContent() ).toBe(
 			`<!-- wp:paragraph -->
-<p>1</p>
+<p class="wp-block-paragraph">1</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:quote -->

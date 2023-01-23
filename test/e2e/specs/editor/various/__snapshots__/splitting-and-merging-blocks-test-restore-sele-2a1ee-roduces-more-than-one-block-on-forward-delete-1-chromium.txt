@@ -1,9 +1,9 @@
 <!-- wp:paragraph -->
-<p>hi</p>
+<p class="wp-block-paragraph">hi</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>item 1</p>
+<p class="wp-block-paragraph">item 1</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
