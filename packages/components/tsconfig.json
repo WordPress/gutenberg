@@ -43,7 +43,6 @@
 		"src/angle-picker-control",
 		"src/autocomplete",
 		"src/box-control",
-		"src/color-list-picker",
 		"src/combobox-control",
 		"src/custom-gradient-picker",
 		"src/dimension-control",
