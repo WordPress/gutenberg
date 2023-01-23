@@ -2,7 +2,6 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import memoize from 'memize';
 
 /**
  * WordPress dependencies
@@ -11,9 +10,13 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { uploadMedia } from '@wordpress/media-utils';
-import { isTemplatePart } from '@wordpress/blocks';
 import { Platform } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
+
+/**
+ * Internal dependencies
+ */
+import { memoizedGetFilteredTemplatePartBlocks } from './utils';
 
 /**
  * @typedef {'template'|'template_type'} TemplateType Template type.
@@ -249,61 +252,6 @@ export function isSaveViewOpened( state ) {
 }
 
 /**
- * Helper method to iterate through all blocks, recursing into inner blocks.
- * Returns a flattened array of all blocks.
- *
- * @param {Array} blocks Blocks to flatten.
- *
- * @return {Array} Flattened object.
- */
-function flattenBlocks( blocks ) {
-	const result = [];
-
-	const stack = [ ...blocks ];
-	while ( stack.length ) {
-		const { innerBlocks, ...block } = stack.shift();
-		// Place inner blocks at the beginning of the stack to preserve order.
-		stack.unshift( ...innerBlocks );
-		result.push( block );
-	}
-
-	return result;
-}
-
-function getFilteredTemplatePartBlocks( templateBlocks = [], templateParts ) {
-	const templatePartsById = templateParts
-		? // Key template parts by their ID.
-		  templateParts.reduce(
-				( newTemplateParts, part ) => ( {
-					...newTemplateParts,
-					[ part.id ]: part,
-				} ),
-				{}
-		  )
-		: {};
-
-	return flattenBlocks( templateBlocks )
-		.filter( ( block ) => isTemplatePart( block ) )
-		.map( ( block ) => {
-			const {
-				attributes: { theme, slug },
-			} = block;
-			const templatePartId = `${ theme }//${ slug }`;
-			const templatePart = templatePartsById[ templatePartId ];
-
-			return {
-				templatePart,
-				block,
-			};
-		} )
-		.filter( ( { templatePart } ) => !! templatePart );
-}
-
-const memoizedGetFilteredTemplatePartBlocks = memoize(
-	getFilteredTemplatePartBlocks
-);
-
-/**
  * Returns the template parts and their blocks for the current edited template.
  *
  * @param {Object} state Global application state.
@@ -326,7 +274,7 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
 		);
 
 		return memoizedGetFilteredTemplatePartBlocks(
-			template.blocks || [],
+			template.blocks,
 			templateParts
 		);
 	}
