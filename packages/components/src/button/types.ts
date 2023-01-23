@@ -11,14 +11,10 @@ import type { PopoverProps } from '../popover/types';
 import type { WordPressComponentProps } from '../ui/context/wordpress-component';
 
 export type ButtonProps =
-	| WordPressComponentProps<
-			CommonButtonProps & _ButtonProps,
-			'button',
-			false
-	  >
-	| WordPressComponentProps< CommonButtonProps & AnchorProps, 'a', false >;
+	| WordPressComponentProps< BaseButtonProps & _ButtonProps, 'button', false >
+	| WordPressComponentProps< BaseButtonProps & AnchorProps, 'a', false >;
 
-type CommonButtonProps = {
+type BaseButtonProps = {
 	/**
 	 * The button's children.
 	 */
