@@ -961,18 +961,6 @@ export const getBlockSelectors = ( blockTypes, getBlockStyles ) => {
 	return result;
 };
 
-export const getBlockNames = ( blockTypes ) => {
-	const result = {};
-	blockTypes.forEach( ( blockType ) => {
-		const name = blockType.name;
-		result[ name ] = {
-			name,
-		};
-	} );
-
-	return result;
-};
-
 /**
  * If there is a separator block whose color is defined in theme.json via background,
  * update the separator color to the same value by using border color.
@@ -1046,7 +1034,6 @@ export function useGlobalStylesOutput() {
 			getBlockTypes(),
 			getBlockStyles
 		);
-		const blockNames = getBlockNames( getBlockTypes() );
 
 		const customProperties = toCustomProperties(
 			mergedConfig,
@@ -1080,18 +1067,20 @@ export function useGlobalStylesOutput() {
 		// Loop through the blocks to check if there are custom CSS values.
 		// If there are, get the block selector and push the selector together with
 		// the CSS value to the 'stylesheets' array.
-		Object.entries( blockNames ).forEach( ( name ) => {
-			if ( mergedConfig.styles.blocks[ name[ 0 ] ]?.css ) {
-				const selector = blockSelectors[ name[ 0 ] ].selector;
-				stylesheets.push( {
-					css: processCSSNesting(
-						mergedConfig.styles.blocks[ name[ 0 ] ]?.css,
-						selector
-					),
-					isGlobalStyles: true,
-				} );
-			}
-		} );
+		getBlockTypes()
+			.map( ( blockType ) => blockType.name )
+			.forEach( ( name ) => {
+				if ( mergedConfig.styles.blocks[ name ]?.css ) {
+					const selector = blockSelectors[ name ].selector;
+					stylesheets.push( {
+						css: processCSSNesting(
+							mergedConfig.styles.blocks[ name ]?.css,
+							selector
+						),
+						isGlobalStyles: true,
+					} );
+				}
+			} );
 
 		return [ stylesheets, mergedConfig.settings, filters ];
 	}, [
