@@ -58,7 +58,7 @@ Settings related to shadows.
 
 | Property  | Type   | Default | Props  |
 | ---       | ---    | ---    |---   |
-| palette | array |  | name, shadow, slug |
+| presets | array |  | name, shadow, slug |
 
 ---
 

@@ -159,6 +159,19 @@ _Returns_
 
 -   `?string`: Return the client ID of the block, or null if none exists.
 
+### getAllowedBlocks
+
+Returns the list of allowed inserter blocks for inner blocks children.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _rootClientId_ `?string`: Optional root client ID of block list.
+
+_Returns_
+
+-   `Array?`: The list of allowed block types.
+
 ### getBlock
 
 Returns a block given its client ID. This is a parsed copy of the block,
