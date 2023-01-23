@@ -1065,20 +1065,18 @@ export function useGlobalStylesOutput() {
 		// Loop through the blocks to check if there are custom CSS values.
 		// If there are, get the block selector and push the selector together with
 		// the CSS value to the 'stylesheets' array.
-		getBlockTypes()
-			.map( ( blockType ) => blockType.name )
-			.forEach( ( name ) => {
-				if ( mergedConfig.styles.blocks[ name ]?.css ) {
-					const selector = blockSelectors[ name ].selector;
-					stylesheets.push( {
-						css: processCSSNesting(
-							mergedConfig.styles.blocks[ name ]?.css,
-							selector
-						),
-						isGlobalStyles: true,
-					} );
-				}
-			} );
+		getBlockTypes().forEach( ( blockType ) => {
+			if ( mergedConfig.styles.blocks[ blockType.name ]?.css ) {
+				const selector = blockSelectors[ blockType.name ].selector;
+				stylesheets.push( {
+					css: processCSSNesting(
+						mergedConfig.styles.blocks[ blockType.name ]?.css,
+						selector
+					),
+					isGlobalStyles: true,
+				} );
+			}
+		} );
 
 		return [ stylesheets, mergedConfig.settings, filters ];
 	}, [
