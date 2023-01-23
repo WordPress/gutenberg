@@ -9,7 +9,7 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, _x } from '@wordpress/i18n';
 import { resolveSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 
@@ -43,7 +43,10 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 
 const getExternalLink = ( url, text ) =>
-	`<a href="${ url }" target="_blank" rel="noreferrer noopener">${ text }</a>`;
+	`<a ${ getExternalLinkAttributes( url ) }>${ text }</a>`;
+
+const getExternalLinkAttributes = ( url ) =>
+	`href="${ url }" target="_blank" rel="noreferrer noopener"`;
 
 const getOpenverseLicense = ( license, licenseVersion ) => {
 	let licenseName = license.trim();
@@ -78,8 +81,8 @@ const getOpenverseCaption = ( item ) => {
 	const _creator = decodeEntities( creator );
 	const caption = title
 		? sprintf(
-				// translators: %1s: Title of a media work from Openverse; %2s: Name of the media's creator; %3s: Media works's licence e.g: "CC0 1.0".
-				__( '"%1$s" by %2$s/ %3$s' ),
+				// translators: %1s: Title of a media work from Openverse; %2s: Name of the work's creator; %3s: Work's licence e.g: "CC0 1.0".
+				_x( '"%1$s" by %2$s / %3$s', 'caption' ),
 				getExternalLink( foreignLandingUrl, decodeEntities( title ) ),
 				creatorUrl ? getExternalLink( creatorUrl, _creator ) : _creator,
 				licenseUrl
@@ -90,9 +93,9 @@ const getOpenverseCaption = ( item ) => {
 					: fullLicense
 		  )
 		: sprintf(
-				// translators: %1s: Default title for an untitled media work from Openverse; %2s: Name of the media's creator; %3s: Media item's licence e.g: "CC0 1.0".
-				__( '"%1$s" by %2$s/ %3$s' ),
-				getExternalLink( foreignLandingUrl, 'Work' ),
+				// translators: %1s: Link attributes for a given Openverse media work; %2s: Name of the work's creator; %3s: Works's licence e.g: "CC0 1.0".
+				_x( '<a %1$s>Work</a> by %2$s / %3$s', 'caption' ),
+				getExternalLinkAttributes( foreignLandingUrl ),
 				creatorUrl ? getExternalLink( creatorUrl, _creator ) : _creator,
 				licenseUrl
 					? getExternalLink(
