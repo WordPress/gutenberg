@@ -75,6 +75,7 @@ export function TemplatePartAdvancedControls( {
 			{ isEntityAvailable && (
 				<>
 					<TextControl
+						__nextHasNoMarginBottom
 						label={ __( 'Title' ) }
 						value={ title }
 						onChange={ ( value ) => {

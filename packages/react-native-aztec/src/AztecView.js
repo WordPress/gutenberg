@@ -256,6 +256,15 @@ class AztecView extends Component {
 			// We now support this but passing line-height as a prop instead.
 		}
 
+		// Remove Font size rendering for pre elements until we fix an issue with AztecAndroid.
+		if (
+			Platform.OS === 'android' &&
+			this.props.text?.tag === 'pre' &&
+			style.hasOwnProperty( 'fontSize' )
+		) {
+			delete style.fontSize;
+		}
+
 		return (
 			<TouchableWithoutFeedback onPress={ this._onPress }>
 				<RCTAztecView

@@ -45,11 +45,11 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 	}
 
 	const onConvert = async ( { title, area } ) => {
-		const cleanSlug = getCleanTemplatePartSlug( title );
 		const uniqueTitle = getUniqueTemplatePartTitle(
 			title,
 			existingTemplateParts
 		);
+		const cleanSlug = getCleanTemplatePartSlug( uniqueTitle );
 
 		const templatePart = await saveEntityRecord(
 			'postType',

@@ -286,6 +286,7 @@ export default function PostFeaturedImageEdit( {
 								checked={ linkTarget === '_blank' }
 							/>
 							<TextControl
+								__nextHasNoMarginBottom
 								label={ __( 'Link rel' ) }
 								value={ rel }
 								onChange={ ( newRel ) =>
@@ -347,6 +348,12 @@ export default function PostFeaturedImageEdit( {
 						}
 					/>
 				</BlockControls>
+        <DimensionControls
+					clientId={ clientId }
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					imageSizeOptions={ imageSizeOptions }
+				/>
 				<figure { ...blockProps }>
 					{ placeholder() }
 					<Overlay
@@ -434,7 +441,6 @@ export default function PostFeaturedImageEdit( {
 	 * - Is not inside a query loop
 	 * Then display the image and the image replacement option.
 	 */
-
 	return (
 		<>
 			{ controls }
