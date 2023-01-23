@@ -237,9 +237,8 @@ function BlockPopoverInbetween( {
 				props.className
 			) }
 			resize={ false }
-			overlay={ true }
 			flip={ false }
-			placement="bottom-start"
+			placement="overlay"
 			variant="unstyled"
 		>
 			<div className="block-editor-block-popover__inbetween-container">

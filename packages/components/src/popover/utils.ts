@@ -105,6 +105,7 @@ const PLACEMENT_TO_ANIMATION_ORIGIN: Record<
 	left: { originX: 1, originY: 0.5 }, // open from middle, right
 	'left-start': { originX: 1, originY: 0 }, // open from top, right
 	'left-end': { originX: 1, originY: 1 }, // open from bottom, right
+	overlay: { originX: 0.5, originY: 0.5 }, // open from center, center
 };
 
 /**
@@ -157,13 +158,21 @@ export const getFrameOffset = (
 	return { x: iframeRect.left, y: iframeRect.top };
 };
 
-export const getFrameScale = ( document?: Document ): number => {
+export const getFrameScale = (
+	document?: Document
+): {
+	x: number;
+	y: number;
+} => {
 	const frameElement = document?.defaultView?.frameElement as HTMLElement;
 	if ( ! frameElement ) {
-		return 1;
+		return { x: 1, y: 1 };
 	}
-	const transform = frameElement.style.transform;
-	return parseFloat( transform.replace( /scale\((\d+\.?\d*)\)/, '$1' ) );
+	const rect = frameElement.getBoundingClientRect();
+	return {
+		x: rect.width / frameElement.offsetWidth,
+		y: rect.height / frameElement.offsetHeight,
+	};
 };
 
 export const getReferenceOwnerDocument = ( {
@@ -228,7 +237,7 @@ export const getReferenceElement = ( {
 	'anchorRef' | 'anchorRect' | 'getAnchorRect' | 'anchor'
 > & {
 	fallbackReferenceElement: Element | null;
-	scale: number;
+	scale: { x: number; y: number };
 } ): ReferenceType | null => {
 	let referenceElement = null;
 
@@ -290,17 +299,17 @@ export const getReferenceElement = ( {
 		referenceElement = fallbackReferenceElement.parentElement;
 	}
 
-	if ( referenceElement && scale !== 1 ) {
+	if ( referenceElement && ( scale.x !== 1 || scale.y !== 1 ) ) {
 		// If the popover is inside an iframe, the coordinates of the
 		// reference element need to be scaled to match the iframe's scale.
 		const rect = referenceElement.getBoundingClientRect();
 		referenceElement = {
 			getBoundingClientRect() {
 				return new window.DOMRect(
-					rect.x * scale,
-					rect.y * scale,
-					rect.width * scale,
-					rect.height * scale
+					rect.x * scale.x,
+					rect.y * scale.y,
+					rect.width * scale.x,
+					rect.height * scale.y
 				);
 			},
 		};

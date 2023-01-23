@@ -67,6 +67,7 @@ import type {
 	PopoverAnchorRefTopBottom,
 } from './types';
 import { limitShift as customLimitShift } from './limit-shift';
+import { overlayMiddlewares } from './overlay-middlewares';
 
 /**
  * Name of slot in which popover should fill.
@@ -183,7 +184,6 @@ const UnforwardedPopover = (
 		resize = true,
 		shift = false,
 		variant,
-		overlay = false,
 
 		// Deprecated props
 		__unstableForcePosition,
@@ -271,16 +271,9 @@ const UnforwardedPopover = (
 	const frameOffsetRef = useRef( getFrameOffset( referenceOwnerDocument ) );
 
 	const middleware = [
+		...( placementProp === 'overlay' ? overlayMiddlewares() : [] ),
 		// Custom middleware which adjusts the popover's position by taking into
 		// account the offset of the anchor's iframe (if any) compared to the page.
-		overlay
-			? {
-					name: 'overlay',
-					fn( { rects }: MiddlewareArguments ) {
-						return rects.reference;
-					},
-			  }
-			: undefined,
 		{
 			name: 'frameOffset',
 			fn( { x, y }: MiddlewareArguments ) {
@@ -317,24 +310,6 @@ const UnforwardedPopover = (
 						Object.assign( firstElementChild.style, {
 							maxHeight: `${ sizeProps.availableHeight }px`,
 							overflow: 'auto',
-						} );
-					},
-			  } )
-			: undefined,
-		overlay
-			? size( {
-					apply( { rects } ) {
-						const { firstElementChild } =
-							refs.floating.current ?? {};
-
-						// Only HTMLElement instances have the `style` property.
-						if ( ! ( firstElementChild instanceof HTMLElement ) )
-							return;
-
-						// Reduce the height of the popover to the available space.
-						Object.assign( firstElementChild.style, {
-							width: `${ rects.reference.width }px`,
-							height: `${ rects.reference.height }px`,
 						} );
 					},
 			  } )
@@ -390,7 +365,10 @@ const UnforwardedPopover = (
 		placement: computedPlacement,
 		middlewareData: { arrow: arrowData },
 	} = useFloating( {
-		placement: normalizedPlacementFromProps,
+		placement:
+			( normalizedPlacementFromProps === 'overlay'
+				? undefined
+				: normalizedPlacementFromProps ) || 'bottom',
 		middleware,
 		whileElementsMounted: ( referenceParam, floatingParam, updateParam ) =>
 			autoUpdate( referenceParam, floatingParam, updateParam, {
