@@ -4,6 +4,11 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react';
 
 /**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import MenuItemsChoice from '..';
@@ -23,9 +28,18 @@ const meta: ComponentMeta< typeof MenuItemsChoice > = {
 export default meta;
 
 const Template: ComponentStory< typeof MenuItemsChoice > = ( args ) => {
+	const [ choice, setChoice ] = useState( args.value ?? '' );
+	const [ hovered, setHovered ] = useState< string | undefined >();
+
 	return (
 		<MenuGroup label="Editor">
-			<MenuItemsChoice { ...args } />
+			<MenuItemsChoice
+				{ ...args }
+				value={ choice }
+				onSelect={ ( value ) => setChoice( value ) }
+				onHover={ ( value ) => setHovered( value ) }
+			/>
+			<div>Currently hovered value: { hovered ? hovered : '-' }</div>
 		</MenuGroup>
 	);
 };
@@ -33,6 +47,7 @@ const Template: ComponentStory< typeof MenuItemsChoice > = ( args ) => {
 export const Default: ComponentStory< typeof MenuItemsChoice > = Template.bind(
 	{}
 );
+
 Default.args = {
 	choices: [
 		{
