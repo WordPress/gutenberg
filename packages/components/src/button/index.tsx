@@ -2,7 +2,13 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import type { ForwardedRef, HTMLProps, MouseEvent, ReactElement } from 'react';
+import type {
+	ComponentPropsWithoutRef,
+	ForwardedRef,
+	HTMLAttributes,
+	MouseEvent,
+	ReactElement,
+} from 'react';
 
 /**
  * WordPress dependencies
@@ -17,8 +23,7 @@ import { useInstanceId } from '@wordpress/compose';
 import Tooltip from '../tooltip';
 import Icon from '../icon';
 import { VisuallyHidden } from '../visually-hidden';
-import type { WordPressComponentProps } from '../ui/context';
-import type { ButtonProps, DeprecatedButtonProps, TagName } from './types';
+import type { ButtonProps, DeprecatedButtonProps } from './types';
 
 const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ] as const;
 
@@ -30,7 +35,7 @@ function useDeprecatedProps( {
 	isLink,
 	variant,
 	...otherProps
-}: WordPressComponentProps< ButtonProps & DeprecatedButtonProps, TagName > ) {
+}: ButtonProps & DeprecatedButtonProps ): ButtonProps {
 	let computedVariant = variant;
 
 	if ( isPrimary ) {
@@ -66,12 +71,10 @@ function useDeprecatedProps( {
 }
 
 export function UnforwardedButton(
-	props: WordPressComponentProps< ButtonProps, TagName >,
+	props: ButtonProps,
 	ref: ForwardedRef< any >
 ) {
 	const {
-		href,
-		target,
 		isSmall,
 		isPressed,
 		isBusy,
@@ -90,8 +93,14 @@ export function UnforwardedButton(
 		variant,
 		__experimentalIsFocusable: isFocusable,
 		describedBy,
-		...additionalProps
+		...buttonOrAnchorProps
 	} = useDeprecatedProps( props );
+
+	const { href, target, ...additionalProps } =
+		'href' in buttonOrAnchorProps
+			? buttonOrAnchorProps
+			: { href: undefined, target: undefined, ...buttonOrAnchorProps };
+
 	const instanceId = useInstanceId(
 		Button,
 		'components-button__description'
@@ -120,19 +129,22 @@ export function UnforwardedButton(
 
 	const trulyDisabled = disabled && ! isFocusable;
 	const Tag = href !== undefined && ! trulyDisabled ? 'a' : 'button';
-	const tagProps: HTMLProps< TagName > =
-		Tag === 'a'
-			? { href, target }
-			: {
+	const buttonProps: ComponentPropsWithoutRef< 'button' > =
+		Tag === 'button'
+			? {
 					type: 'button',
 					disabled: trulyDisabled,
 					'aria-pressed': isPressed,
-			  };
+			  }
+			: {};
+	const anchorProps: ComponentPropsWithoutRef< 'a' > =
+		Tag === 'a' ? { href, target } : {};
 
 	if ( disabled && isFocusable ) {
 		// In this case, the button will be disabled, but still focusable and
 		// perceivable by screen reader users.
-		tagProps[ 'aria-disabled' ] = true;
+		buttonProps[ 'aria-disabled' ] = true;
+		anchorProps[ 'aria-disabled' ] = true;
 
 		for ( const disabledEvent of disabledEventsOnDisabledButton ) {
 			additionalProps[ disabledEvent ] = ( event: MouseEvent ) => {
@@ -163,9 +175,7 @@ export function UnforwardedButton(
 	const describedById =
 		additionalProps[ 'aria-describedby' ] || descriptionId;
 
-	const elementProps = {
-		...tagProps,
-		...additionalProps,
+	const commonProps = {
 		className: classes,
 		'aria-label': additionalProps[ 'aria-label' ] || label,
 		'aria-describedby': describedById,
@@ -188,19 +198,17 @@ export function UnforwardedButton(
 	const element =
 		Tag === 'a' ? (
 			<a
-				{ ...( elementProps as WordPressComponentProps<
-					ButtonProps,
-					'a'
-				> ) }
+				{ ...anchorProps }
+				{ ...( additionalProps as HTMLAttributes< HTMLAnchorElement > ) }
+				{ ...commonProps }
 			>
 				{ elementChildren }
 			</a>
 		) : (
 			<button
-				{ ...( elementProps as WordPressComponentProps<
-					ButtonProps,
-					'button'
-				> ) }
+				{ ...buttonProps }
+				{ ...( additionalProps as HTMLAttributes< HTMLButtonElement > ) }
+				{ ...commonProps }
 			>
 				{ elementChildren }
 			</button>

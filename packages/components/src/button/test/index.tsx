@@ -126,7 +126,7 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should not pass the prop target into the element', () => {
-			render( <Button target="_blank" /> );
+			render( <Button href="https://wordpress.org/" target="_blank" /> );
 
 			expect( screen.getByRole( 'button' ) ).not.toHaveAttribute(
 				'target'
@@ -341,6 +341,7 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should become a button again when disabled is supplied', () => {
+			// @ts-expect-error - a button should not have `href`
 			render( <Button href="https://wordpress.org/" disabled /> );
 
 			expect( screen.getByRole( 'button' ) ).toBeVisible();

@@ -8,8 +8,17 @@ import type { ReactNode } from 'react';
  */
 import type { Props as IconProps } from '../icon';
 import type { PopoverProps } from '../popover/types';
+import type { WordPressComponentProps } from '../ui/context/wordpress-component';
 
-export type ButtonProps = {
+export type ButtonProps =
+	| WordPressComponentProps<
+			CommonButtonProps & _ButtonProps,
+			'button',
+			false
+	  >
+	| WordPressComponentProps< CommonButtonProps & AnchorProps, 'a', false >;
+
+type CommonButtonProps = {
 	/**
 	 * The button's children.
 	 */
@@ -19,18 +28,9 @@ export type ButtonProps = {
 	 */
 	describedBy?: string;
 	/**
-	 * Whether the button is disabled.
-	 * If `true`, this will force a `button` element to be rendered.
-	 */
-	disabled?: boolean;
-	/**
 	 * Whether the button is focused.
 	 */
 	focus?: boolean;
-	/**
-	 * If provided, renders `a` instead of `button`.
-	 */
-	href?: string;
 	/**
 	 * If provided, renders an Icon component inside the button.
 	 */
@@ -78,10 +78,6 @@ export type ButtonProps = {
 	 */
 	showTooltip?: boolean;
 	/**
-	 * If provided with `href`, sets the `target` attribute to the `a`.
-	 */
-	target?: string;
-	/**
 	 * If provided, displays the given text inside the button. If the button contains children elements, the text is displayed before them.
 	 */
 	text?: string;
@@ -105,6 +101,30 @@ export type ButtonProps = {
 	__experimentalIsFocusable?: boolean;
 };
 
+type _ButtonProps = {
+	/**
+	 * Whether the button is disabled.
+	 * If `true`, this will force a `button` element to be rendered.
+	 */
+	disabled?: boolean;
+};
+
+type AnchorProps = {
+	/**
+	 * Whether the button is disabled.
+	 * If `true`, this will force a `button` element to be rendered.
+	 */
+	disabled?: false;
+	/**
+	 * If provided, renders `a` instead of `button`.
+	 */
+	href: string;
+	/**
+	 * If provided with `href`, sets the `target` attribute to the `a`.
+	 */
+	target?: string;
+};
+
 export type DeprecatedButtonProps = {
 	isDefault?: boolean;
 	isLink?: boolean;
@@ -120,5 +140,3 @@ export type DeprecatedIconButtonProps = {
 	label: ButtonProps[ 'label' ];
 	tooltip: ButtonProps[ 'label' ];
 };
-
-export type TagName = 'a' | 'button';
