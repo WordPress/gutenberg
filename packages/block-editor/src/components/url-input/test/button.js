@@ -5,6 +5,11 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import URLInputButton from '../button';
@@ -128,9 +133,13 @@ describe( 'URLInputButton', () => {
 
 	it( 'should close the form when user submits it', async () => {
 		const user = userEvent.setup();
-		const onChangeMock = jest.fn();
 
-		render( <URLInputButton onChange={ onChangeMock } /> );
+		function TestInputButton() {
+			const [ url, onChange ] = useState( '' );
+			return <URLInputButton url={ url } onChange={ onChange } />;
+		}
+
+		render( <TestInputButton /> );
 
 		// Click the button to insert a link.
 		await user.click(
@@ -143,15 +152,15 @@ describe( 'URLInputButton', () => {
 		// Type something into the URL field.
 		await user.type( screen.getByRole( 'combobox' ), 'foo' );
 
-		// Submit the form.
-		await user.click(
-			screen.getByRole( 'button', {
-				name: 'Submit',
-			} )
-		);
+		const submitButton = screen.getByRole( 'button', {
+			name: 'Submit',
+		} );
 
-		expect(
-			screen.queryByRole( 'button', { name: 'Submit' } )
-		).not.toBeInTheDocument();
+		expect( submitButton ).toBeInTheDocument();
+
+		// Submit the form.
+		await user.click( submitButton );
+
+		expect( submitButton ).not.toBeInTheDocument();
 	} );
 } );
