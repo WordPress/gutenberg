@@ -11,10 +11,13 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { Icon, SelectControl } from '../';
+import Icon from '../icon';
+import SelectControl from '../select-control';
 import sizesTable, { findSizeBySlug } from './sizes';
+import type { DimensionControlProps, Size } from './types';
+import type { SelectControlProps } from '../select-control/types';
 
-export function DimensionControl( props ) {
+export function DimensionControl( props: DimensionControlProps ) {
 	const {
 		label,
 		value,
@@ -24,17 +27,17 @@ export function DimensionControl( props ) {
 		className = '',
 	} = props;
 
-	const onChangeSpacingSize = ( val ) => {
-		const theSize = findSizeBySlug( sizes, val );
+	const onChangeSpacingSize: SelectControlProps[ 'onChange' ] = ( val ) => {
+		const theSize = findSizeBySlug( sizes, val as string );
 
 		if ( ! theSize || value === theSize.slug ) {
-			onChange( undefined );
+			onChange?.( undefined );
 		} else if ( typeof onChange === 'function' ) {
 			onChange( theSize.slug );
 		}
 	};
 
-	const formatSizesAsOptions = ( theSizes ) => {
+	const formatSizesAsOptions = ( theSizes: Size[] ) => {
 		const options = theSizes.map( ( { name, slug } ) => ( {
 			label: name,
 			value: slug,
@@ -45,7 +48,8 @@ export function DimensionControl( props ) {
 				label: __( 'Default' ),
 				value: '',
 			},
-		].concat( options );
+			...options,
+		];
 	};
 
 	const selectLabel = (
