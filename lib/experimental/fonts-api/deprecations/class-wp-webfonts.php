@@ -157,7 +157,7 @@ class WP_Webfonts extends WP_Dependencies {
 	public function migrate_deprecated_structure( array $webfonts ) {
 		$message = 'A deprecated fonts array structure passed to wp_register_fonts(). ' .
 			'Variations must be grouped and keyed by their font family.';
-		trigger_error( $message, E_USER_DEPRECATED );
+		_deprecated_argument( __METHOD__, '14.9.1', $message );
 
 		$new_webfonts = array();
 		foreach ( $webfonts as $webfont ) {
