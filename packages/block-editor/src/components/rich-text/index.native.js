@@ -59,6 +59,14 @@ import EmbedHandlerPicker from './embed-handler-picker';
 
 const classes = 'block-editor-rich-text__editable';
 
+function limitIntegerValue( value ) {
+	const int32bit = Math.pow( 2, 31 );
+	return Math.min(
+		Math.max( parseInt( value, 10 ), -1 * ( int32bit - 1 ) ),
+		int32bit - 1
+	);
+}
+
 function RichTextWrapper(
 	{
 		children,
@@ -589,7 +597,7 @@ function RichTextWrapper(
 			selectionEnd={ selectionEnd }
 			onSelectionChange={ onSelectionChange }
 			tagName={ tagName }
-			start={ start }
+			start={ limitIntegerValue( start ) }
 			reversed={ reversed }
 			placeholder={ placeholder }
 			allowedFormats={ adjustedAllowedFormats }
