@@ -79,32 +79,69 @@ const getOpenverseCaption = ( item ) => {
 	} = item;
 	const fullLicense = getOpenverseLicense( license, licenseVersion );
 	const _creator = decodeEntities( creator );
-	const caption = title
-		? sprintf(
-				// translators: %1s: Title of a media work from Openverse; %2s: Name of the work's creator; %3s: Work's licence e.g: "CC0 1.0".
-				_x( '"%1$s" by %2$s / %3$s', 'caption' ),
-				getExternalLink( foreignLandingUrl, decodeEntities( title ) ),
-				creatorUrl ? getExternalLink( creatorUrl, _creator ) : _creator,
-				licenseUrl
-					? getExternalLink(
-							`${ licenseUrl }?ref=openverse`,
-							fullLicense
-					  )
-					: fullLicense
-		  )
-		: sprintf(
-				// translators: %1s: Link attributes for a given Openverse media work; %2s: Name of the work's creator; %3s: Works's licence e.g: "CC0 1.0".
-				_x( '<a %1$s>Work</a> by %2$s / %3$s', 'caption' ),
-				getExternalLinkAttributes( foreignLandingUrl ),
-				creatorUrl ? getExternalLink( creatorUrl, _creator ) : _creator,
-				licenseUrl
-					? getExternalLink(
-							`${ licenseUrl }?ref=openverse`,
-							fullLicense
-					  )
-					: fullLicense
-		  );
-	return caption.replace( /\s{2}/g, ' ' );
+	let _caption;
+	if ( _creator ) {
+		_caption = title
+			? sprintf(
+					// translators: %1s: Title of a media work from Openverse; %2s: Name of the work's creator; %3s: Work's licence e.g: "CC0 1.0".
+					_x( '"%1$s" by %2$s/ %3$s', 'caption' ),
+					getExternalLink(
+						foreignLandingUrl,
+						decodeEntities( title )
+					),
+					creatorUrl
+						? getExternalLink( creatorUrl, _creator )
+						: _creator,
+					licenseUrl
+						? getExternalLink(
+								`${ licenseUrl }?ref=openverse`,
+								fullLicense
+						  )
+						: fullLicense
+			  )
+			: sprintf(
+					// translators: %1s: Link attributes for a given Openverse media work; %2s: Name of the work's creator; %3s: Works's licence e.g: "CC0 1.0".
+					_x( '<a %1$s>Work</a> by %2$s/ %3$s', 'caption' ),
+					getExternalLinkAttributes( foreignLandingUrl ),
+					creatorUrl
+						? getExternalLink( creatorUrl, _creator )
+						: _creator,
+					licenseUrl
+						? getExternalLink(
+								`${ licenseUrl }?ref=openverse`,
+								fullLicense
+						  )
+						: fullLicense
+			  );
+	} else {
+		_caption = title
+			? sprintf(
+					// translators: %1s: Title of a media work from Openverse; %2s: Work's licence e.g: "CC0 1.0".
+					_x( '"%1$s"/ %2$s', 'caption' ),
+					getExternalLink(
+						foreignLandingUrl,
+						decodeEntities( title )
+					),
+					licenseUrl
+						? getExternalLink(
+								`${ licenseUrl }?ref=openverse`,
+								fullLicense
+						  )
+						: fullLicense
+			  )
+			: sprintf(
+					// translators: %1s: Link attributes for a given Openverse media work; %2s: Works's licence e.g: "CC0 1.0".
+					_x( '<a %1$s>Work</a>/ %3$s', 'caption' ),
+					getExternalLinkAttributes( foreignLandingUrl ),
+					licenseUrl
+						? getExternalLink(
+								`${ licenseUrl }?ref=openverse`,
+								fullLicense
+						  )
+						: fullLicense
+			  );
+	}
+	return _caption.replace( /\s{2}/g, ' ' );
 };
 
 const coreMediaFetch = async ( query = {} ) => {
