@@ -1342,7 +1342,7 @@ class WP_HTML_Tag_Processor {
 
 			// Did we end up invalidating the bookmark?
 			if ( ! isset( $this->bookmarks[ $bookmark_name ] ) ) {
-				break;
+				continue;
 			}
 
 			$bookmark->start += $head_delta;
