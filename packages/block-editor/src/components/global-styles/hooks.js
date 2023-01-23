@@ -8,12 +8,15 @@ import { get, set } from 'lodash';
  * WordPress dependencies
  */
 import { useContext, useCallback } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { getValueFromVariable, getPresetVariableFromValue } from './utils';
 import { GlobalStylesContext } from './context';
+import { unlock } from '../../experiments';
 
 const EMPTY_CONFIG = { settings: {}, styles: {} };
 
@@ -88,9 +91,10 @@ export function useGlobalStyle( path, blockName, source = 'all' ) {
 		user: userConfig,
 		setUserConfig,
 	} = useContext( GlobalStylesContext );
+	const appendedPath = path ? '.' + path : '';
 	const finalPath = ! blockName
-		? `styles.${ path }`
-		: `styles.blocks.${ blockName }.${ path }`;
+		? `styles${ appendedPath }`
+		: `styles.blocks.${ blockName }${ appendedPath }`;
 
 	const setStyle = ( newValue ) => {
 		setUserConfig( ( currentConfig ) => {
@@ -142,4 +146,19 @@ export function useGlobalStyle( path, blockName, source = 'all' ) {
 	}
 
 	return [ result, setStyle ];
+}
+
+export function useSupportedStyles( name, element ) {
+	const { supportedPanels } = useSelect(
+		( select ) => {
+			return {
+				supportedPanels: unlock(
+					select( blocksStore )
+				).getSupportedStyles( name, element ),
+			};
+		},
+		[ name, element ]
+	);
+
+	return supportedPanels;
 }
