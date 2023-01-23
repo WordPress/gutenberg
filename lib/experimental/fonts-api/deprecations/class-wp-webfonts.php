@@ -197,7 +197,7 @@ class WP_Webfonts extends WP_Dependencies {
 	 * @return string|null The font family slug if successfully registered. Else null.
 	 */
 	protected function extract_font_family_from_deprecated_webfonts_structure( array $webfont, $message ) {
-		trigger_error( $message, E_USER_DEPRECATED );
+		_deprecated_argument( __METHOD__, '14.9.1', $message );
 
 		$font_family = WP_Fonts_Utils::get_font_family_from_variation( $webfont );
 		if ( ! $font_family ) {
