@@ -15,11 +15,6 @@ import {
 import { useSelect } from '@wordpress/data';
 import { useContext, useMemo } from '@wordpress/element';
 import { getCSSRules } from '@wordpress/style-engine';
-import {
-	__unstablePresetDuotoneFilter as PresetDuotoneFilter,
-	__experimentalGetGapCSSValue as getGapCSSValue,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -27,7 +22,10 @@ import {
 import { PRESET_METADATA, ROOT_BLOCK_SELECTOR, scopeSelector } from './utils';
 import { getTypographyFontSizeValue } from './typography-utils';
 import { GlobalStylesContext } from './context';
-import { useSetting } from './hooks';
+import { useGlobalSetting } from './hooks';
+import { PresetDuotoneFilter } from '../duotone/components';
+import { getGapCSSValue } from '../../hooks/gap';
+import { store as blockEditorStore } from '../../store';
 
 // List of block support features that can have their related styles
 // generated under their own feature level selector rather than the block's.
@@ -996,10 +994,23 @@ function updateConfigWithSeparator( config ) {
 	return config;
 }
 
+const processCSSNesting = ( css, blockSelector ) => {
+	let processedCSS = '';
+
+	// Split CSS nested rules.
+	const parts = css.split( '&' );
+	parts.forEach( ( part ) => {
+		processedCSS += ! part.includes( '{' )
+			? blockSelector + '{' + part + '}' // If the part doesn't contain braces, it applies to the root level.
+			: blockSelector + part; // Prepend the selector, which effectively replaces the "&" character.
+	} );
+	return processedCSS;
+};
+
 export function useGlobalStylesOutput() {
 	let { merged: mergedConfig } = useContext( GlobalStylesContext );
 
-	const [ blockGap ] = useSetting( 'spacing.blockGap' );
+	const [ blockGap ] = useGlobalSetting( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGap !== null;
 	const hasFallbackGapSupport = ! hasBlockGapSupport; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback styles support.
 	const disableLayoutStyles = useSelect( ( select ) => {
@@ -1016,10 +1027,12 @@ export function useGlobalStylesOutput() {
 			return [];
 		}
 		mergedConfig = updateConfigWithSeparator( mergedConfig );
+
 		const blockSelectors = getBlockSelectors(
 			getBlockTypes(),
 			getBlockStyles
 		);
+
 		const customProperties = toCustomProperties(
 			mergedConfig,
 			blockSelectors
@@ -1048,6 +1061,22 @@ export function useGlobalStylesOutput() {
 				isGlobalStyles: true,
 			},
 		];
+
+		// Loop through the blocks to check if there are custom CSS values.
+		// If there are, get the block selector and push the selector together with
+		// the CSS value to the 'stylesheets' array.
+		getBlockTypes().forEach( ( blockType ) => {
+			if ( mergedConfig.styles.blocks[ blockType.name ]?.css ) {
+				const selector = blockSelectors[ blockType.name ].selector;
+				stylesheets.push( {
+					css: processCSSNesting(
+						mergedConfig.styles.blocks[ blockType.name ]?.css,
+						selector
+					),
+					isGlobalStyles: true,
+				} );
+			}
+		} );
 
 		return [ stylesheets, mergedConfig.settings, filters ];
 	}, [

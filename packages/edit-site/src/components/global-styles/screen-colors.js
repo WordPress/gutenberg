@@ -10,6 +10,7 @@ import {
 	FlexItem,
 	ColorIndicator,
 } from '@wordpress/components';
+import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -17,11 +18,14 @@ import {
 import ScreenHeader from './header';
 import Palette from './palette';
 import { NavigationButtonAsItem } from './navigation-button';
-import { getSupportedGlobalStylesPanels, useStyle } from './hooks';
+import { getSupportedGlobalStylesPanels } from './hooks';
 import Subtitle from './subtitle';
 import ColorIndicatorWrapper from './color-indicator-wrapper';
 import BlockPreviewPanel from './block-preview-panel';
 import { getVariationClassNameFromPath } from './utils';
+import { unlock } from '../../experiments';
+
+const { useGlobalStyle } = unlock( blockEditorExperiments );
 
 function variationPathToURL( variationPath ) {
 	if ( ! variationPath ) {
@@ -36,11 +40,11 @@ function BackgroundColorItem( { name, parentMenu, variationPath = '' } ) {
 	const hasSupport =
 		supports.includes( 'backgroundColor' ) ||
 		supports.includes( 'background' );
-	const [ backgroundColor ] = useStyle(
+	const [ backgroundColor ] = useGlobalStyle(
 		variationPath + 'color.background',
 		name
 	);
-	const [ gradientValue ] = useStyle(
+	const [ gradientValue ] = useGlobalStyle(
 		variationPath + 'color.gradient',
 		name
 	);
@@ -76,7 +80,7 @@ function BackgroundColorItem( { name, parentMenu, variationPath = '' } ) {
 function TextColorItem( { name, parentMenu, variationPath = '' } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	const hasSupport = supports.includes( 'color' );
-	const [ color ] = useStyle( variationPath + 'color.text', name );
+	const [ color ] = useGlobalStyle( variationPath + 'color.text', name );
 
 	if ( ! hasSupport ) {
 		return null;
@@ -109,11 +113,11 @@ function TextColorItem( { name, parentMenu, variationPath = '' } ) {
 function LinkColorItem( { name, parentMenu, variationPath = '' } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	const hasSupport = supports.includes( 'linkColor' );
-	const [ color ] = useStyle(
+	const [ color ] = useGlobalStyle(
 		variationPath + 'elements.link.color.text',
 		name
 	);
-	const [ colorHover ] = useStyle(
+	const [ colorHover ] = useGlobalStyle(
 		variationPath + 'elements.link.:hover.color.text',
 		name
 	);
@@ -151,11 +155,11 @@ function LinkColorItem( { name, parentMenu, variationPath = '' } ) {
 function HeadingColorItem( { name, parentMenu, variationPath = '' } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	const hasSupport = supports.includes( 'color' );
-	const [ color ] = useStyle(
+	const [ color ] = useGlobalStyle(
 		variationPath + 'elements.heading.color.text',
 		name
 	);
-	const [ bgColor ] = useStyle(
+	const [ bgColor ] = useGlobalStyle(
 		variationPath + 'elements.heading.color.background',
 		name
 	);
@@ -191,11 +195,11 @@ function HeadingColorItem( { name, parentMenu, variationPath = '' } ) {
 function ButtonColorItem( { name, parentMenu, variationPath = '' } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	const hasSupport = supports.includes( 'buttonColor' );
-	const [ color ] = useStyle(
+	const [ color ] = useGlobalStyle(
 		variationPath + 'elements.button.color.text',
 		name
 	);
-	const [ bgColor ] = useStyle(
+	const [ bgColor ] = useGlobalStyle(
 		variationPath + 'elements.button.color.background',
 		name
 	);

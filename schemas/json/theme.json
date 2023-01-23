@@ -74,7 +74,7 @@
 					"description": "Settings related to shadows.",
 					"type": "object",
 					"properties": {
-						"palette": {
+						"presets": {
 							"description": "Shadow presets for the shadow picker.\nGenerates a single custom property (`--wp--preset--shadow--{slug}`) per preset value.",
 							"type": "array",
 							"items": {
