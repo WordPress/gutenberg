@@ -35,6 +35,7 @@ module.exports = {
 		'<rootDir>/.+.native.js$',
 		'/packages/react-native-*',
 	],
+	resolver: '<rootDir>/test/unit/scripts/resolver.js',
 	transform: {
 		'^.+\\.[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
 	},
