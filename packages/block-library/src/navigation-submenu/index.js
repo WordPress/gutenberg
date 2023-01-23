@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { addSubmenu } from '@wordpress/icons';
+import { page } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -17,7 +17,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	icon: addSubmenu,
+	icon: page,
 
 	__experimentalLabel: ( { label } ) => label,
 
