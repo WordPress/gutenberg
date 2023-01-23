@@ -31,9 +31,7 @@ describe( 'DropdownMenu', () => {
 	} );
 
 	it( 'should open menu when pressing arrow down on the toggle and the controls prop is used to define menu items', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const controls = [
 			{
@@ -80,9 +78,7 @@ describe( 'DropdownMenu', () => {
 	} );
 
 	it( 'should open menu when pressing arrow down on the toggle and the children prop is used to define menu items', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render(
 			<DropdownMenu

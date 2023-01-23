@@ -25,7 +25,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useMemo, useState } from '@wordpress/element';
+import { useMemo, useState, useEffect } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 
@@ -189,20 +189,33 @@ export default function PageListEdit( {
 
 	const { replaceBlock, selectBlock } = useDispatch( blockEditorStore );
 
-	const { parentNavBlockClientId } = useSelect( ( select ) => {
-		const { getSelectedBlockClientId, getBlockParentsByBlockName } =
-			select( blockEditorStore );
+	const { parentNavBlockClientId, isNested } = useSelect(
+		( select ) => {
+			const { getSelectedBlockClientId, getBlockParentsByBlockName } =
+				select( blockEditorStore );
 
-		const _selectedBlockClientId = getSelectedBlockClientId();
+			const _selectedBlockClientId = getSelectedBlockClientId();
 
-		return {
-			parentNavBlockClientId: getBlockParentsByBlockName(
-				_selectedBlockClientId,
-				'core/navigation',
-				true
-			)[ 0 ],
-		};
-	}, [] );
+			return {
+				parentNavBlockClientId: getBlockParentsByBlockName(
+					_selectedBlockClientId,
+					'core/navigation',
+					true
+				)[ 0 ],
+				isNested:
+					getBlockParentsByBlockName(
+						clientId,
+						'core/navigation-submenu',
+						true
+					).length > 0,
+			};
+		},
+		[ clientId ]
+	);
+
+	useEffect( () => {
+		setAttributes( { isNested } );
+	}, [ isNested ] );
 
 	return (
 		<>

@@ -111,6 +111,7 @@ export default function PostTemplateForm( { onClose } ) {
 				</Notice>
 			) : (
 				<SelectControl
+					__nextHasNoMarginBottom
 					hideLabelFromVision
 					label={ __( 'Template' ) }
 					value={ selectedOption?.value ?? '' }

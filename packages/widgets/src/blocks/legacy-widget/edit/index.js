@@ -13,7 +13,7 @@ import {
 	BlockIcon,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { Spinner, Placeholder } from '@wordpress/components';
+import { Flex, FlexBlock, Spinner, Placeholder } from '@wordpress/components';
 import { brush as brushIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useState, useCallback } from '@wordpress/element';
@@ -57,30 +57,34 @@ function Empty( { attributes: { id, idBase }, setAttributes } ) {
 			icon={ <BlockIcon icon={ brushIcon } /> }
 			label={ __( 'Legacy Widget' ) }
 		>
-			<WidgetTypeSelector
-				selectedId={ id ?? idBase }
-				onSelect={ ( { selectedId, isMulti } ) => {
-					if ( ! selectedId ) {
-						setAttributes( {
-							id: null,
-							idBase: null,
-							instance: null,
-						} );
-					} else if ( isMulti ) {
-						setAttributes( {
-							id: null,
-							idBase: selectedId,
-							instance: {},
-						} );
-					} else {
-						setAttributes( {
-							id: selectedId,
-							idBase: null,
-							instance: null,
-						} );
-					}
-				} }
-			/>
+			<Flex>
+				<FlexBlock>
+					<WidgetTypeSelector
+						selectedId={ id ?? idBase }
+						onSelect={ ( { selectedId, isMulti } ) => {
+							if ( ! selectedId ) {
+								setAttributes( {
+									id: null,
+									idBase: null,
+									instance: null,
+								} );
+							} else if ( isMulti ) {
+								setAttributes( {
+									id: null,
+									idBase: selectedId,
+									instance: {},
+								} );
+							} else {
+								setAttributes( {
+									id: selectedId,
+									idBase: null,
+									instance: null,
+								} );
+							}
+						} }
+					/>
+				</FlexBlock>
+			</Flex>
 		</Placeholder>
 	);
 }

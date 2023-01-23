@@ -12,9 +12,7 @@ import Picker from '..';
 describe( 'FocalPointPicker', () => {
 	describe( 'focus and blur', () => {
 		it( 'clicking the draggable area should focus it', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const mockOnChange = jest.fn();
 
@@ -87,9 +85,7 @@ describe( 'FocalPointPicker', () => {
 
 	describe( 'resolvePoint handling', () => {
 		it( 'should allow value altering', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const spyChange = jest.fn();
 			const spy = jest.fn();
@@ -129,9 +125,7 @@ describe( 'FocalPointPicker', () => {
 			expect( xInput.value ).toBe( '93' );
 		} );
 		it( 'call onChange with the expected values', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const spyChange = jest.fn();
 			render(

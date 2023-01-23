@@ -8,6 +8,36 @@
 
 class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	/**
+	 * Administrator ID.
+	 *
+	 * @var int
+	 */
+	private static $administrator_id;
+
+	/**
+	 * User ID.
+	 *
+	 * @var int
+	 */
+	private static $user_id;
+
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+
+		static::$administrator_id = self::factory()->user->create(
+			array(
+				'role' => 'administrator',
+			)
+		);
+
+		if ( is_multisite() ) {
+			grant_super_admin( self::$administrator_id );
+		}
+
+		static::$user_id = self::factory()->user->create();
+	}
+
+	/**
 	 * @dataProvider data_get_layout_definitions
 	 *
 	 * @param array $layout_definitions Layout definitions as stored in core theme.json.
@@ -435,6 +465,76 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEquals( $variables, $theme_json->get_stylesheet( array( 'variables' ) ) );
 	}
 
+	/**
+	 * Tests generating the spacing presets array based on the spacing scale provided.
+	 *
+	 * @dataProvider data_set_spacing_sizes_when_invalid
+	 */
+	public function test_shadow_preset_styles() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'shadow' => array(
+						'presets' => array(
+							array(
+								'slug'   => 'natural',
+								'shadow' => '5px 5px 5px 0 black',
+							),
+							array(
+								'slug'   => 'sharp',
+								'shadow' => '5px 5px black',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$styles = 'body{--wp--preset--shadow--natural: 5px 5px 5px 0 black;--wp--preset--shadow--sharp: 5px 5px black;}';
+		$this->assertEquals( $styles, $theme_json->get_stylesheet() );
+		$this->assertEquals( $styles, $theme_json->get_stylesheet( array( 'variables' ) ) );
+	}
+
+	public function test_get_shadow_styles_for_blocks() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'shadow' => array(
+						'presets' => array(
+							array(
+								'slug'   => 'natural',
+								'shadow' => '5px 5px 0 0 black',
+							),
+						),
+					),
+				),
+				'styles'   => array(
+					'blocks'   => array(
+						'core/paragraph' => array(
+							'shadow' => 'var(--wp--preset--shadow--natural)',
+						),
+					),
+					'elements' => array(
+						'button' => array(
+							'shadow' => 'var:preset|shadow|natural',
+						),
+						'link'   => array(
+							'shadow' => array( 'ref' => 'styles.elements.button.shadow' ),
+						),
+					),
+				),
+			)
+		);
+
+		$global_styles  = 'body{--wp--preset--shadow--natural: 5px 5px 0 0 black;}body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
+		$element_styles = 'a:where(:not(.wp-element-button)){box-shadow: var(--wp--preset--shadow--natural);}.wp-element-button, .wp-block-button__link{box-shadow: var(--wp--preset--shadow--natural);}p{box-shadow: var(--wp--preset--shadow--natural);}';
+		$styles         = $global_styles . $element_styles;
+
+		$this->assertEquals( $styles, $theme_json->get_stylesheet() );
+	}
+
 	public function test_get_stylesheet_handles_whitelisted_element_pseudo_selectors() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
@@ -754,8 +854,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	public function test_allow_indirect_properties() {
 		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
 			array(
-				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-				'styles'  => array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'   => array(
 					'blocks'  => array(
 						'core/social-links' => array(
 							'spacing' => array(
@@ -770,12 +870,18 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						'blockGap' => '3em',
 					),
 				),
+				'settings' => array(
+					'layout' => array(
+						'contentSize' => '800px',
+						'wideSize'    => '1000px',
+					),
+				),
 			)
 		);
 
 		$expected = array(
-			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-			'styles'  => array(
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'styles'   => array(
 				'blocks'  => array(
 					'core/social-links' => array(
 						'spacing' => array(
@@ -788,6 +894,12 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'spacing' => array(
 					'blockGap' => '3em',
+				),
+			),
+			'settings' => array(
+				'layout' => array(
+					'contentSize' => '800px',
+					'wideSize'    => '1000px',
 				),
 			),
 		);
@@ -810,6 +922,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 								'color' => array(
 									'text'       => 'red',
 									'background' => 'blue',
+								),
+							),
+							':seen'  => array(
+								'color' => array(
+									'background' => 'ivory',
 								),
 							),
 						),
@@ -1510,5 +1627,74 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$custom_css = 'body { color:purple; }';
 		$this->assertEquals( $custom_css, $theme_json->get_stylesheet( array( 'custom-css' ) ) );
+	}
+
+	/**
+	 * @dataProvider data_custom_css_for_user_caps
+	 *
+	 * @param string $user_property The property name for current user.
+	 * @param array  $expected      Expected results.
+	 */
+	public function test_custom_css_for_user_caps( $user_property, array $expected ) {
+		wp_set_current_user( static::${$user_property} );
+
+		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'css'    => 'body { color:purple; }',
+					'blocks' => array(
+						'core/separator' => array(
+							'color' => array(
+								'background' => 'blue',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$this->assertSameSetsWithIndex( $expected, $actual );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_custom_css_for_user_caps() {
+		return array(
+			'allows custom css for users with caps'     => array(
+				'user_property' => 'administrator_id',
+				'expected'      => array(
+					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'styles'  => array(
+						'css'    => 'body { color:purple; }',
+						'blocks' => array(
+							'core/separator' => array(
+								'color' => array(
+									'background' => 'blue',
+								),
+							),
+						),
+					),
+				),
+			),
+			'removes custom css for users without caps' => array(
+				'user_property' => 'user_id',
+				'expected'      => array(
+					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'styles'  => array(
+						'blocks' => array(
+							'core/separator' => array(
+								'color' => array(
+									'background' => 'blue',
+								),
+							),
+						),
+					),
+				),
+			),
+		);
 	}
 }

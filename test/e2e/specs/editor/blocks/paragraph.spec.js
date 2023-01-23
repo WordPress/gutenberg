@@ -29,9 +29,7 @@ test.describe( 'Paragraph', () => {
 		await page.keyboard.type( '1' );
 
 		const firstBlockTagName = await page.evaluate( () => {
-			return document.querySelector(
-				'.block-editor-block-list__layout .wp-block'
-			).tagName;
+			return document.querySelector( '[data-block]' ).tagName;
 		} );
 
 		// The outer element should be a paragraph. Blocks should never have any
@@ -569,6 +567,10 @@ class DraggingUtils {
 		// Check that both x and y axis of the dropzone
 		// have a less than 1 difference with a given target element
 		const box = await this.dropZone.boundingBox();
+		if ( ! box ) {
+			return false;
+		}
+
 		return (
 			Math.abs( element.x - box.x ) < 1 &&
 			Math.abs( element.y - box.y ) < 1

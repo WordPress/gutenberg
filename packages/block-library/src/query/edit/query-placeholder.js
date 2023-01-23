@@ -16,6 +16,11 @@ import {
 import { Button, Placeholder } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import { useScopedBlockVariations } from '../utils';
+
 export default function QueryPlaceholder( {
 	attributes,
 	clientId,
@@ -29,19 +34,15 @@ export default function QueryPlaceholder( {
 	const { blockType, allVariations, hasPatterns } = useSelect(
 		( select ) => {
 			const { getBlockVariations, getBlockType } = select( blocksStore );
-			const {
-				getBlockRootClientId,
-				__experimentalGetPatternsByBlockTypes,
-			} = select( blockEditorStore );
+			const { getBlockRootClientId, getPatternsByBlockTypes } =
+				select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
 
 			return {
 				blockType: getBlockType( name ),
 				allVariations: getBlockVariations( name ),
-				hasPatterns: !! __experimentalGetPatternsByBlockTypes(
-					name,
-					rootClientId
-				).length,
+				hasPatterns: !! getPatternsByBlockTypes( name, rootClientId )
+					.length,
 			};
 		},
 		[ name, clientId ]
@@ -57,7 +58,6 @@ export default function QueryPlaceholder( {
 		return (
 			<QueryVariationPicker
 				clientId={ clientId }
-				name={ name }
 				attributes={ attributes }
 				setAttributes={ setAttributes }
 				icon={ icon }
@@ -98,16 +98,12 @@ export default function QueryPlaceholder( {
 
 function QueryVariationPicker( {
 	clientId,
-	name,
 	attributes,
 	setAttributes,
 	icon,
 	label,
 } ) {
-	const variations = useSelect(
-		( select ) => select( blocksStore ).getBlockVariations( name, 'block' ),
-		[ name ]
-	);
+	const scopeVariations = useScopedBlockVariations( attributes );
 	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 	const blockProps = useBlockProps();
 	return (
@@ -115,24 +111,25 @@ function QueryVariationPicker( {
 			<__experimentalBlockVariationPicker
 				icon={ icon }
 				label={ label }
-				variations={ variations }
-				onSelect={ ( nextVariation ) => {
-					if ( nextVariation.attributes ) {
+				variations={ scopeVariations }
+				onSelect={ ( variation ) => {
+					if ( variation.attributes ) {
 						setAttributes( {
-							...nextVariation.attributes,
+							...variation.attributes,
 							query: {
-								...nextVariation.attributes.query,
+								...variation.attributes.query,
 								postType:
 									attributes.query.postType ||
-									nextVariation.attributes.query.postType,
+									variation.attributes.query.postType,
 							},
+							namespace: attributes.namespace,
 						} );
 					}
-					if ( nextVariation.innerBlocks ) {
+					if ( variation.innerBlocks ) {
 						replaceInnerBlocks(
 							clientId,
 							createBlocksFromInnerBlocksTemplate(
-								nextVariation.innerBlocks
+								variation.innerBlocks
 							),
 							false
 						);

@@ -66,8 +66,6 @@ require __DIR__ . '/compat/wordpress-6.1/blocks.php';
 require __DIR__ . '/compat/wordpress-6.1/persisted-preferences.php';
 require __DIR__ . '/compat/wordpress-6.1/get-global-styles-and-settings.php';
 require __DIR__ . '/compat/wordpress-6.1/class-wp-theme-json-data-gutenberg.php';
-require __DIR__ . '/compat/wordpress-6.1/class-wp-theme-json-6-1.php';
-require __DIR__ . '/compat/wordpress-6.1/class-wp-theme-json-resolver-6-1.php';
 require __DIR__ . '/compat/wordpress-6.1/block-template-utils.php';
 require __DIR__ . '/compat/wordpress-6.1/wp-theme-get-post-templates.php';
 require __DIR__ . '/compat/wordpress-6.1/script-loader.php';
@@ -77,11 +75,11 @@ require __DIR__ . '/compat/wordpress-6.1/template-parts-screen.php';
 require __DIR__ . '/compat/wordpress-6.1/theme.php';
 
 // WordPress 6.2 compat.
+require __DIR__ . '/compat/wordpress-6.2/blocks.php';
 require __DIR__ . '/compat/wordpress-6.2/script-loader.php';
+require __DIR__ . '/compat/wordpress-6.2/block-template-utils.php';
 require __DIR__ . '/compat/wordpress-6.2/get-global-styles-and-settings.php';
 require __DIR__ . '/compat/wordpress-6.2/default-filters.php';
-require __DIR__ . '/compat/wordpress-6.2/class-wp-theme-json-resolver-6-2.php';
-require __DIR__ . '/compat/wordpress-6.2/class-wp-theme-json-6-2.php';
 require __DIR__ . '/compat/wordpress-6.2/edit-form-blocks.php';
 require __DIR__ . '/compat/wordpress-6.2/site-editor.php';
 require __DIR__ . '/compat/wordpress-6.2/block-editor-settings.php';
@@ -91,21 +89,28 @@ require __DIR__ . '/compat/wordpress-6.2/widgets.php';
 // Experimental features.
 remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WP 6.0's stopgap handler for Webfonts API.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
-require __DIR__ . '/experimental/register-webfonts-from-theme-json.php';
 if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
 	require __DIR__ . '/experimental/html/index.php';
 }
-require __DIR__ . '/experimental/class-wp-theme-json-gutenberg.php';
-require __DIR__ . '/experimental/class-wp-theme-json-resolver-gutenberg.php';
-require __DIR__ . '/experimental/class-wp-webfonts.php';
-require __DIR__ . '/experimental/class-wp-webfonts-provider.php';
-require __DIR__ . '/experimental/class-wp-webfonts-provider-local.php';
-require __DIR__ . '/experimental/webfonts.php';
+require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/navigation-page.php';
 require __DIR__ . '/experimental/kses.php';
 
+// Fonts API.
+require __DIR__ . '/experimental/fonts-api/class-wp-fonts-provider.php';
+require __DIR__ . '/experimental/fonts-api/deprecations/webfonts-deprecations.php';
+require __DIR__ . '/experimental/fonts-api/deprecations/class-wp-webfonts-provider.php';
+require __DIR__ . '/experimental/fonts-api/deprecations/class-wp-webfonts.php';
+require __DIR__ . '/experimental/fonts-api/class-wp-fonts-utils.php';
+require __DIR__ . '/experimental/fonts-api/register-fonts-from-theme-json.php';
+require __DIR__ . '/experimental/fonts-api/class-wp-fonts.php';
+require __DIR__ . '/experimental/fonts-api/class-wp-fonts-provider-local.php';
+require __DIR__ . '/experimental/fonts-api/fonts-api.php';
+
 // Plugin specific code.
+require __DIR__ . '/class-wp-theme-json-gutenberg.php';
+require __DIR__ . '/class-wp-theme-json-resolver-gutenberg.php';
 require __DIR__ . '/blocks.php';
 require __DIR__ . '/client-assets.php';
 require __DIR__ . '/demo.php';
@@ -122,13 +127,14 @@ if ( is_dir( __DIR__ . '/../build/style-engine' ) ) {
 }
 
 // Block supports overrides.
-require __DIR__ . '/block-supports/utils.php';
 require __DIR__ . '/block-supports/settings.php';
 require __DIR__ . '/block-supports/elements.php';
 require __DIR__ . '/block-supports/colors.php';
 require __DIR__ . '/block-supports/typography.php';
 require __DIR__ . '/block-supports/border.php';
 require __DIR__ . '/block-supports/layout.php';
+require __DIR__ . '/block-supports/position.php';
 require __DIR__ . '/block-supports/spacing.php';
 require __DIR__ . '/block-supports/dimensions.php';
 require __DIR__ . '/block-supports/duotone.php';
+require __DIR__ . '/block-supports/shadow.php';

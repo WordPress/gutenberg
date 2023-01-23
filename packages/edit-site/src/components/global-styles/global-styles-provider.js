@@ -9,11 +9,15 @@ import { mergeWith, isEmpty, mapValues } from 'lodash';
 import { useMemo, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { GlobalStylesContext } from './context';
+import CanvasSpinner from '../canvas-spinner';
+import { unlock } from '../../experiments';
+
+const { GlobalStylesContext } = unlock( blockEditorExperiments );
 
 function mergeTreesCustomizer( _, srcValue ) {
 	// We only pass as arrays the presets,
@@ -165,7 +169,7 @@ function useGlobalStylesContext() {
 export function GlobalStylesProvider( { children } ) {
 	const context = useGlobalStylesContext();
 	if ( ! context.isReady ) {
-		return null;
+		return <CanvasSpinner />;
 	}
 
 	return (

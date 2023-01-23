@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { act, render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -10,6 +10,16 @@ import userEvent from '@testing-library/user-event';
 import URLPopover from '../';
 
 jest.useRealTimers();
+
+/**
+ * Returns the first found popover element up the DOM tree.
+ *
+ * @param {HTMLElement} element Element to start with.
+ * @return {HTMLElement|null} Popover element, or `null` if not found.
+ */
+function getWrappingPopoverElement( element ) {
+	return element.closest( '.components-popover' );
+}
 
 describe( 'URLPopover', () => {
 	it( 'matches the snapshot in its default state', async () => {
@@ -22,8 +32,11 @@ describe( 'URLPopover', () => {
 			</URLPopover>
 		);
 
-		// wait for `Popover` effects to finish
-		await act( () => Promise.resolve() );
+		await waitFor( () =>
+			expect(
+				getWrappingPopoverElement( screen.getByText( 'Editor' ) )
+			).toBePositionedPopover()
+		);
 
 		expect( container ).toMatchSnapshot();
 	} );
@@ -53,8 +66,11 @@ describe( 'URLPopover', () => {
 			</URLPopover>
 		);
 
-		// wait for `Popover` effects to finish
-		await act( () => Promise.resolve() );
+		await waitFor( () =>
+			expect(
+				getWrappingPopoverElement( screen.getByText( 'Editor' ) )
+			).toBePositionedPopover()
+		);
 
 		expect( container ).toMatchSnapshot();
 	} );

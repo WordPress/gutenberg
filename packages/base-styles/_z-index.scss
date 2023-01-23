@@ -145,10 +145,7 @@ $z-layers: (
 	// The focus styles of the region navigation containers should be above their content.
 	".is-focusing-regions {region} :focus::after": 1000000,
 
-	// Show NUX tips above popovers, wp-admin menus, submenus, and sidebar:
-	".nux-dot-tip": 1000001,
-
-	// Show tooltips above NUX tips, wp-admin menus, submenus, and sidebar:
+	// Show tooltips above wp-admin menus, submenus, and sidebar:
 	".components-tooltip": 1000002,
 
 	// Keep template popover underneath 'Create custom template' modal overlay.
@@ -180,6 +177,13 @@ $z-layers: (
 
 	// Appear under the topbar.
 	".customize-widgets__block-toolbar": 7,
+
+	// Site editor layout
+	".edit-site-layout__hub": 3,
+	".edit-site-layout__header": 2,
+	".edit-site-layout__canvas-container": 2,
+	".edit-site-layout__sidebar": 1,
+	".edit-site-layout__canvas-container.is-resizing::after": 100,
 );
 
 @function z-index( $key ) {
