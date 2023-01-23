@@ -16,10 +16,13 @@ import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
 import { unlock } from '../../experiments';
 
 const { useGlobalStyle } = unlock( blockEditorExperiments );
+function CustomCSSControl( { blockName } ) {
+	// If blockName is defined, we are customizing CSS at the block level:
+	// styles.blocks.blockName.css
+	const block = !! blockName ? blockName : null;
 
-function CustomCSSControl() {
-	const [ customCSS, setCustomCSS ] = useGlobalStyle( 'css' );
-	const [ themeCSS ] = useGlobalStyle( 'css', null, 'base' );
+	const [ customCSS, setCustomCSS ] = useGlobalStyle( 'css', block );
+	const [ themeCSS ] = useGlobalStyle( 'css', block, 'base' );
 	const ignoreThemeCustomCSS = '/* IgnoreThemeCustomCSS */';
 
 	// If there is custom css from theme.json show it in the edit box
