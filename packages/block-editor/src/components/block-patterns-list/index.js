@@ -75,12 +75,6 @@ function BlockPattern( {
 								onClick( pattern, blocks );
 								onHover( null );
 							} }
-							onFocus={ () => {
-								if ( isDragging ) {
-									return;
-								}
-								onHover( pattern );
-							} }
 							onMouseEnter={ () => {
 								if ( isDragging ) {
 									return;
@@ -88,7 +82,6 @@ function BlockPattern( {
 								onHover( pattern );
 							} }
 							onMouseLeave={ () => onHover( null ) }
-							onBlur={ () => onHover( null ) }
 							aria-label={ pattern.title }
 							aria-describedby={
 								pattern.description ? descriptionId : undefined
