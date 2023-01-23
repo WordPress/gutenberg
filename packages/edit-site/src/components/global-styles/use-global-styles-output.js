@@ -1008,6 +1008,19 @@ function updateConfigWithSeparator( config ) {
 	return config;
 }
 
+const processCSSNesting = ( css, blockSelector ) => {
+	let processedCSS = '';
+
+	// Split CSS nested rules.
+	const parts = css.split( '&' );
+	parts.forEach( ( part ) => {
+		processedCSS += ! part.includes( '{' )
+			? blockSelector + '{' + part + '}' // If the part doesn't contain braces, it applies to the root level.
+			: blockSelector + part; // Prepend the selector, which effectively replaces the "&" character.
+	} );
+	return processedCSS;
+};
+
 export function useGlobalStylesOutput() {
 	let { merged: mergedConfig } = useContext( GlobalStylesContext );
 
@@ -1063,19 +1076,6 @@ export function useGlobalStylesOutput() {
 				isGlobalStyles: true,
 			},
 		];
-
-		const processCSSNesting = ( css, blockSelector ) => {
-			let processedCSS = '';
-
-			// Split CSS nested rules.
-			const parts = css.split( '&' );
-			parts.forEach( ( part ) => {
-				processedCSS += ! part.includes( '{' )
-					? blockSelector + '{' + part + '}' // If the part doesn't contain braces, it applies to the root level.
-					: blockSelector + part; // Prepend the selector, which effectively replaces the "&" character.
-			} );
-			return processedCSS;
-		};
 
 		// Loop through the blocks to check if there are custom CSS values.
 		// If there are, get the block selector and push the selector together with
