@@ -25,6 +25,8 @@ const meta: ComponentMeta< typeof Button > = {
 	title: 'Components/Button',
 	component: Button,
 	argTypes: {
+		// Overrides a limitation of the docgen interpreting our TS types for this as required.
+		href: { type: { name: 'string', required: false } },
 		icon: {
 			control: { type: 'select' },
 			options: [ 'wordpress', 'link', 'more' ],
