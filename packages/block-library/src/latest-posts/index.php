@@ -191,6 +191,10 @@ function render_block_core_latest_posts( $attributes ) {
 		$class .= ' has-author';
 	}
 
+	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
+		$class .= ' has-link-color';
+	}
+
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $class ) );
 
 	return sprintf(

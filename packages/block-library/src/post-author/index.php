@@ -38,7 +38,8 @@ function render_block_core_post_author( $attributes, $content, $block ) {
 	$byline  = ! empty( $attributes['byline'] ) ? $attributes['byline'] : false;
 	$classes = array_merge(
 		isset( $attributes['itemsJustification'] ) ? array( 'items-justified-' . $attributes['itemsJustification'] ) : array(),
-		isset( $attributes['textAlign'] ) ? array( 'has-text-align-' . $attributes['textAlign'] ) : array()
+		isset( $attributes['textAlign'] ) ? array( 'has-text-align-' . $attributes['textAlign'] ) : array(),
+		isset( $attributes['style']['elements']['link']['color']['text'] ) ? array( 'has-link-color' ) : array()
 	);
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
