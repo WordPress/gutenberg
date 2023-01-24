@@ -7,13 +7,13 @@ import {
 	store as coreStore,
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 	__experimentalFetchUrlData as fetchUrlData,
-	__experimentalFetchMedia as fetchMedia,
 } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
+import inserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import { store as editorStore } from '../../store';
 
@@ -142,6 +142,8 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 						'__unstableGalleryWithImageBlocks',
 						'alignWide',
 						'allowedBlockTypes',
+						'blockInspectorTabs',
+						'allowedMimeTypes',
 						'bodyPlaceholder',
 						'canLockBlocks',
 						'codeEditingEnabled',
@@ -185,9 +187,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
-			// TODO: We should find a proper way to consolidate similar cases
-			// like reusable blocks, fetch entities, etc.
-			__unstableFetchMedia: fetchMedia,
+			__unstableInserterMediaCategories: inserterMediaCategories,
 			__experimentalFetchRichUrlData: fetchUrlData,
 			__experimentalCanUserUseUnfilteredHTML: canUseUnfilteredHTML,
 			__experimentalUndo: undo,

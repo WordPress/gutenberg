@@ -13,7 +13,7 @@ export const BaseField = css`
 	background: ${ CONFIG.controlBackgroundColor };
 	border-radius: ${ CONFIG.controlBorderRadius };
 	border: 1px solid;
-	border-color: ${ CONFIG.controlBorderColor };
+	border-color: ${ COLORS.ui.border };
 	box-shadow: ${ CONFIG.controlBoxShadow };
 	display: flex;
 	flex: 1;
@@ -30,7 +30,7 @@ export const BaseField = css`
 	}
 
 	&:hover {
-		border-color: ${ CONFIG.controlBorderColorHover };
+		border-color: ${ COLORS.ui.borderHover };
 	}
 
 	&:focus,

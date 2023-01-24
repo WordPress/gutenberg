@@ -1,8 +1,4 @@
 .edit-site-new-template-dropdown {
-	.components-dropdown-menu__toggle {
-		padding: 6px 12px;
-	}
-
 	.edit-site-new-template-dropdown__popover {
 		@include break-small() {
 			min-width: 300px;
@@ -153,10 +149,6 @@
 	.components-modal__content::before {
 		margin-bottom: $grid-unit-05;
 	}
-}
-
-.edit-site-custom-generic-template__modal-actions {
-	margin-top: $grid-unit-15;
 }
 
 .edit-site-template-actions-loading-screen-modal {

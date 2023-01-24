@@ -348,6 +348,10 @@ _Returns_
 
 Undocumented declaration.
 
+### experiments
+
+Experimental @wordpress/block-editor APIs.
+
 ### FontSizePicker
 
 _Related_
@@ -428,6 +432,7 @@ _Parameters_
 -   _args.minimumFontSize_ `?string`: Minimum font size for any clamp() calculation. Optional.
 -   _args.scaleFactor_ `?number`: A scale factor to determine how fast a font scales within boundaries. Optional.
 -   _args.minimumFontSizeFactor_ `?number`: How much to scale defaultFontSize by to derive minimumFontSize. Optional.
+-   _args.minimumFontSizeLimit_ `?string`: The smallest a calculated font size may be. Optional.
 
 _Returns_
 
@@ -520,7 +525,7 @@ attributes.
 _Parameters_
 
 -   _attributes_ `Object`: Block attributes.
--   _isFluidFontSizeActive_ `boolean`: Whether the function should try to convert font sizes to fluid values.
+-   _fluidTypographySettings_ `Object|boolean`: If boolean, whether the function should try to convert font sizes to fluid values, otherwise an object containing theme fluid typography settings.
 
 _Returns_
 

@@ -42,24 +42,6 @@ function getWrappingPopoverElement( element ) {
 	return element.closest( '.components-popover' );
 }
 
-/**
- * Asserts that the specified popover has already been positioned.
- * Necessary because it will be positioned a bit later after it's displayed.
- *
- * We're intentionally not using `.toHaveStyle()` because we want to be
- * less specific and avoid specific values for better test flexibility.
- *
- * @async
- *
- * @param {HTMLElement} popover Popover element.
- */
-async function popoverIsPositioned( popover ) {
-	/* eslint-disable jest-dom/prefer-to-have-style */
-	await waitFor( () => expect( popover.style.top ).not.toBe( '' ) );
-	await waitFor( () => expect( popover.style.left ).not.toBe( '' ) );
-	/* eslint-enable jest-dom/prefer-to-have-style */
-}
-
 describe( 'General media replace flow', () => {
 	it( 'renders successfully', () => {
 		render( <TestWrapper /> );
@@ -73,9 +55,7 @@ describe( 'General media replace flow', () => {
 	} );
 
 	it( 'renders replace menu', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render( <TestWrapper /> );
 
@@ -87,15 +67,17 @@ describe( 'General media replace flow', () => {
 		);
 		const uploadMenu = screen.getByRole( 'menu' );
 
-		await popoverIsPositioned( getWrappingPopoverElement( uploadMenu ) );
+		await waitFor( () =>
+			expect(
+				getWrappingPopoverElement( uploadMenu )
+			).toBePositionedPopover()
+		);
 
 		await waitFor( () => expect( uploadMenu ).toBeVisible() );
 	} );
 
 	it( 'displays media URL', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render( <TestWrapper /> );
 
@@ -110,15 +92,15 @@ describe( 'General media replace flow', () => {
 			name: 'example.media (opens in a new tab)',
 		} );
 
-		await popoverIsPositioned( getWrappingPopoverElement( link ) );
+		await waitFor( () =>
+			expect( getWrappingPopoverElement( link ) ).toBePositionedPopover()
+		);
 
 		expect( link ).toHaveAttribute( 'href', 'https://example.media' );
 	} );
 
 	it( 'edits media URL', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render( <TestWrapper /> );
 
@@ -129,12 +111,14 @@ describe( 'General media replace flow', () => {
 			} )
 		);
 
-		await popoverIsPositioned(
-			getWrappingPopoverElement(
-				screen.getByRole( 'link', {
-					name: 'example.media (opens in a new tab)',
-				} )
-			)
+		await waitFor( () =>
+			expect(
+				getWrappingPopoverElement(
+					screen.getByRole( 'link', {
+						name: 'example.media (opens in a new tab)',
+					} )
+				)
+			).toBePositionedPopover()
 		);
 
 		await user.click(
@@ -153,7 +137,7 @@ describe( 'General media replace flow', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Submit',
+				name: 'Apply',
 			} )
 		);
 

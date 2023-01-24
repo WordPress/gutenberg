@@ -43,14 +43,14 @@ describe( 'BlockSelectionClearer component', () => {
 		} ) );
 
 		render(
-			<BlockSelectionClearer>
+			<BlockSelectionClearer data-testid="selection-clearer">
 				<button>Not a block</button>
 			</BlockSelectionClearer>
 		);
-		const button = screen.getByRole( 'button' );
-		fireEvent.mouseDown( button.parentElement );
 
-		expect( mockClearSelectedBlock ).toBeCalled();
+		fireEvent.mouseDown( screen.getByTestId( 'selection-clearer' ) );
+
+		expect( mockClearSelectedBlock ).toHaveBeenCalled();
 	} );
 
 	it( 'should clear the selected block when multiple blocks are selected', () => {
@@ -64,14 +64,14 @@ describe( 'BlockSelectionClearer component', () => {
 		} ) );
 
 		render(
-			<BlockSelectionClearer>
+			<BlockSelectionClearer data-testid="selection-clearer">
 				<button>Not a block</button>
 			</BlockSelectionClearer>
 		);
-		const button = screen.getByRole( 'button' );
-		fireEvent.mouseDown( button.parentElement );
 
-		expect( mockClearSelectedBlock ).toBeCalled();
+		fireEvent.mouseDown( screen.getByTestId( 'selection-clearer' ) );
+
+		expect( mockClearSelectedBlock ).toHaveBeenCalled();
 	} );
 
 	it( 'should not clear the block selection when no blocks are selected', () => {
@@ -82,14 +82,14 @@ describe( 'BlockSelectionClearer component', () => {
 		} ) );
 
 		render(
-			<BlockSelectionClearer>
+			<BlockSelectionClearer data-testid="selection-clearer">
 				<button>Not a block</button>
 			</BlockSelectionClearer>
 		);
-		const button = screen.getByRole( 'button' );
-		fireEvent.mouseDown( button.parentElement );
 
-		expect( mockClearSelectedBlock ).not.toBeCalled();
+		fireEvent.mouseDown( screen.getByTestId( 'selection-clearer' ) );
+
+		expect( mockClearSelectedBlock ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should not clear the block selection when the feature is disabled', () => {
@@ -106,13 +106,13 @@ describe( 'BlockSelectionClearer component', () => {
 		} ) );
 
 		render(
-			<BlockSelectionClearer>
+			<BlockSelectionClearer data-testid="selection-clearer">
 				<button>Not a block</button>
 			</BlockSelectionClearer>
 		);
-		const button = screen.getByRole( 'button' );
-		fireEvent.mouseDown( button.parentElement );
 
-		expect( mockClearSelectedBlock ).not.toBeCalled();
+		fireEvent.mouseDown( screen.getByTestId( 'selection-clearer' ) );
+
+		expect( mockClearSelectedBlock ).not.toHaveBeenCalled();
 	} );
 } );

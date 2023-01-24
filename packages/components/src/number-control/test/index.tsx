@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -43,9 +43,7 @@ describe( 'NumberControl', () => {
 
 	describe( 'onChange handling', () => {
 		it( 'should provide onChange callback with number value', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 			const spy = jest.fn();
 
 			render(
@@ -60,9 +58,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should call onChange callback when value is clamped on blur', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 			const onChangeSpy = jest.fn();
 
 			render(
@@ -94,10 +90,7 @@ describe( 'NumberControl', () => {
 			// After blur, value is clamped
 			expect( input ).toHaveValue( 4 );
 
-			// After the blur, the `onChange` callback fires asynchronously.
-			await waitFor( () => {
-				expect( onChangeSpy ).toHaveBeenCalledTimes( 3 );
-			} );
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 3 );
 
 			// First call: clear the input
 			expect( onChangeSpy ).toHaveBeenNthCalledWith( 1, '', true );
@@ -108,9 +101,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should call onChange callback when value is not valid', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 			const onChangeSpy = jest.fn();
 
 			render(
@@ -154,9 +145,7 @@ describe( 'NumberControl', () => {
 
 	describe( 'Validation', () => {
 		it( 'should clamp value within range on ENTER keypress', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <NumberControl value={ 5 } min={ 0 } max={ 10 } /> );
 
@@ -174,9 +163,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should clamp value within range on blur', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <NumberControl value={ 5 } min={ 0 } max={ 10 } /> );
 
@@ -195,9 +182,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should parse non-numeric values to a number on ENTER keypress when required', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <NumberControl value={ 5 } required /> );
 
@@ -210,9 +195,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should parse non-numeric values to empty string on ENTER keypress when not required', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <NumberControl value={ 5 } required={ false } /> );
 
@@ -231,9 +214,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should not enforce numerical value for empty string when required is omitted', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <NumberControl value={ 5 } /> );
 
@@ -248,9 +229,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should enforce numerical value for empty string when required', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <NumberControl value={ 5 } required /> );
 
@@ -264,9 +243,7 @@ describe( 'NumberControl', () => {
 
 	describe( 'Key UP interactions', () => {
 		it( 'should fire onKeyDown callback', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const spy = jest.fn();
 
@@ -280,9 +257,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should increment by step on key UP press', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <StatefulNumberControl value={ 5 } /> );
 
@@ -294,9 +269,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should increment from a negative value', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <StatefulNumberControl value={ -5 } /> );
 
@@ -308,9 +281,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should increment while preserving the decimal value when `step` is “any”', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <StatefulNumberControl value={ 866.5309 } step="any" /> );
 
@@ -322,9 +293,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should increment by shiftStep on key UP + shift press', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <StatefulNumberControl value={ 5 } shiftStep={ 10 } /> );
 
@@ -336,9 +305,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should increment by shiftStep while preserving the decimal value when `step` is “any”', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <StatefulNumberControl value={ 857.5309 } step="any" /> );
 
@@ -350,9 +317,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should increment by custom shiftStep on key UP + shift press', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <StatefulNumberControl value={ 5 } shiftStep={ 100 } /> );
 
@@ -364,9 +329,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should increment but be limited by max on shiftStep', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render(
 				<StatefulNumberControl
@@ -384,9 +347,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should not increment by shiftStep if disabled', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render(
 				<StatefulNumberControl
@@ -406,9 +367,7 @@ describe( 'NumberControl', () => {
 
 	describe( 'Key DOWN interactions', () => {
 		it( 'should fire onKeyDown callback', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 			const spy = jest.fn();
 
 			render( <StatefulNumberControl value={ 5 } onKeyDown={ spy } /> );
@@ -421,9 +380,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should decrement by step on key DOWN press', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <StatefulNumberControl value={ 5 } /> );
 
@@ -435,9 +392,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should decrement from a negative value', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <StatefulNumberControl value={ -5 } /> );
 
@@ -449,9 +404,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should decrement while preserving the decimal value when `step` is “any”', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <StatefulNumberControl value={ 868.5309 } step="any" /> );
 
@@ -463,9 +416,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should decrement by shiftStep on key DOWN + shift press', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <StatefulNumberControl value={ 5 } /> );
 
@@ -477,9 +428,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should decrement by shiftStep while preserving the decimal value when `step` is “any”', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <StatefulNumberControl value={ 877.5309 } step="any" /> );
 
@@ -491,9 +440,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should decrement by custom shiftStep on key DOWN + shift press', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render( <StatefulNumberControl value={ 5 } shiftStep={ 100 } /> );
 
@@ -505,9 +452,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should decrement but be limited by min on shiftStep', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render(
 				<StatefulNumberControl
@@ -525,9 +470,7 @@ describe( 'NumberControl', () => {
 		} );
 
 		it( 'should not decrement by shiftStep if disabled', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			render(
 				<StatefulNumberControl
@@ -575,9 +518,7 @@ describe( 'NumberControl', () => {
 		] )(
 			'should spin %s to %s when props = %o',
 			async ( direction, expectedValue, props ) => {
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 				const onChange = jest.fn();
 				render(
 					<NumberControl

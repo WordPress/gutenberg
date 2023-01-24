@@ -159,6 +159,19 @@ _Returns_
 
 -   `?string`: Return the client ID of the block, or null if none exists.
 
+### getAllowedBlocks
+
+Returns the list of allowed inserter blocks for inner blocks children.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _rootClientId_ `?string`: Optional root client ID of block list.
+
+_Returns_
+
+-   `Array?`: The list of allowed block types.
+
 ### getBlock
 
 Returns a block given its client ID. This is a parsed copy of the block,
@@ -556,6 +569,18 @@ _Properties_
 -   _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
 -   _frecency_ `number`: Heuristic that combines frequency and recency.
 
+### getLastInsertedBlocksClientIds
+
+Gets the client ids of the last inserted blocks.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `Array|undefined`: Client Ids of the last inserted block(s).
+
 ### getLastMultiSelectedBlockClientId
 
 Returns the client ID of the last block in the multi-selection set, or null
@@ -660,6 +685,24 @@ _Parameters_
 _Returns_
 
 -   `?string`: Adjacent block's client ID, or null if none exists.
+
+### getPatternsByBlockTypes
+
+Returns the list of patterns based on their declared `blockTypes`
+and a block's name.
+Patterns can use `blockTypes` to integrate in work flows like
+suggesting appropriate patterns in a Placeholder state(during insertion)
+or blocks transformations.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _blockNames_ `string|string[]`: Block's name or array of block names to find matching pattens.
+-   _rootClientId_ `?string`: Optional target root client ID.
+
+_Returns_
+
+-   `Array`: The list of matched block patterns based on declared `blockTypes` and block name.
 
 ### getPreviousBlockClientId
 
@@ -801,7 +844,7 @@ _Parameters_
 
 _Returns_
 
--   `?string`: Block Template Lock
+-   `string|false`: Block Template Lock
 
 ### hasBlockMovingClientId
 

@@ -12,7 +12,6 @@ import {
 } from '@wordpress/block-editor';
 import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -52,6 +51,7 @@ function GroupEditControls( { tagName, onSelectTagName } ) {
 	return (
 		<InspectorControls __experimentalGroup="advanced">
 			<SelectControl
+				__nextHasNoMarginBottom
 				label={ __( 'HTML element' ) }
 				options={ [
 					{ label: __( 'Default (<div>)' ), value: 'div' },
@@ -123,13 +123,10 @@ function GroupEdit( {
 	);
 
 	const { selectBlock } = useDispatch( blockEditorStore );
-	const updateSelection = useCallback(
-		( newClientId ) => selectBlock( newClientId, -1 ),
-		[ selectBlock ]
-	);
+
 	const selectVariation = ( nextVariation ) => {
 		setAttributes( nextVariation.attributes );
-		updateSelection( clientId );
+		selectBlock( clientId, -1 );
 		setShowPlaceholder( false );
 	};
 

@@ -6,21 +6,17 @@ import classNames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __, isRTL } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 	__experimentalHStack as HStack,
-	__experimentalNavigatorProvider as NavigatorProvider,
-	__experimentalNavigatorScreen as NavigatorScreen,
-	__experimentalNavigatorButton as NavigatorButton,
-	__experimentalNavigatorBackButton as NavigatorBackButton,
 	FlexBlock,
 	Button,
 } from '@wordpress/components';
-import { useCallback } from '@wordpress/element';
-import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
+import { useCallback, useMemo } from '@wordpress/element';
+import { Icon, chevronRight } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -30,6 +26,7 @@ import MediaUploadCheck from '../../media-upload/check';
 import MediaUpload from '../../media-upload';
 import { useMediaCategories } from './hooks';
 import { getBlockAndPreviewFromMedia } from './utils';
+import MobileTabNavigation from '../mobile-tab-navigation';
 
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video', 'audio' ];
 
@@ -52,6 +49,14 @@ function MediaTab( {
 		},
 		[ onInsert ]
 	);
+	const mobileMediaCategories = useMemo(
+		() =>
+			mediaCategories.map( ( mediaCategory ) => ( {
+				...mediaCategory,
+				label: mediaCategory.labels.name,
+			} ) ),
+		[ mediaCategories ]
+	);
 	return (
 		<>
 			{ ! isMobile && (
@@ -73,7 +78,7 @@ function MediaTab( {
 												mediaCategory,
 										}
 									) }
-									aria-label={ mediaCategory.label }
+									aria-label={ mediaCategory.labels.name }
 									aria-current={
 										mediaCategory === selectedCategory
 											? 'true'
@@ -82,7 +87,7 @@ function MediaTab( {
 								>
 									<HStack>
 										<FlexBlock>
-											{ mediaCategory.label }
+											{ mediaCategory.labels.name }
 										</FlexBlock>
 										<Icon icon={ chevronRight } />
 									</HStack>
@@ -121,61 +126,17 @@ function MediaTab( {
 				</div>
 			) }
 			{ isMobile && (
-				<MediaTabNavigation
-					onInsert={ onInsert }
-					rootClientId={ rootClientId }
-					mediaCategories={ mediaCategories }
-				/>
+				<MobileTabNavigation categories={ mobileMediaCategories }>
+					{ ( category ) => (
+						<MediaCategoryPanel
+							onInsert={ onInsert }
+							rootClientId={ rootClientId }
+							category={ category }
+						/>
+					) }
+				</MobileTabNavigation>
 			) }
 		</>
-	);
-}
-
-function MediaTabNavigation( { onInsert, rootClientId, mediaCategories } ) {
-	return (
-		<NavigatorProvider initialPath="/">
-			<NavigatorScreen path="/">
-				<ItemGroup>
-					{ mediaCategories.map( ( category ) => (
-						<NavigatorButton
-							key={ category.name }
-							path={ `/category/${ category.name }` }
-							as={ Item }
-							isAction
-						>
-							<HStack>
-								<FlexBlock>{ category.label }</FlexBlock>
-								<Icon
-									icon={
-										isRTL() ? chevronLeft : chevronRight
-									}
-								/>
-							</HStack>
-						</NavigatorButton>
-					) ) }
-				</ItemGroup>
-			</NavigatorScreen>
-			{ mediaCategories.map( ( category ) => (
-				<NavigatorScreen
-					key={ category.name }
-					path={ `/category/${ category.name }` }
-				>
-					<NavigatorBackButton
-						className="rigatonious"
-						icon={ isRTL() ? chevronRight : chevronLeft }
-						isSmall
-						aria-label={ __( 'Navigate to the categories list' ) }
-					>
-						{ __( 'Back' ) }
-					</NavigatorBackButton>
-					<MediaCategoryPanel
-						rootClientId={ rootClientId }
-						onInsert={ onInsert }
-						category={ category }
-					/>
-				</NavigatorScreen>
-			) ) }
-		</NavigatorProvider>
 	);
 }
 

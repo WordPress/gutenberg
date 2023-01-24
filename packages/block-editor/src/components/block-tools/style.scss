@@ -13,17 +13,22 @@
 .block-editor-block-list__insertion-point-indicator {
 	position: absolute;
 	background: var(--wp-admin-theme-color);
+	border-radius: 2px;
+	transform-origin: center;
+	opacity: 0;
+	will-change: transform, opacity;
 
 	.block-editor-block-list__insertion-point.is-vertical > & {
-		top: 50%;
-		height: $border-width;
+		top: calc(50% - 2px);
+		height: 4px;
+		width: 100%;
 	}
 
 	.block-editor-block-list__insertion-point.is-horizontal > & {
 		top: 0;
-		right: 0;
-		left: 50%;
-		width: $border-width;
+		bottom: 0;
+		left: calc(50% - 2px);
+		width: 4px;
 	}
 }
 
@@ -32,6 +37,8 @@
 	// Don't show on mobile.
 	display: none;
 	position: absolute;
+	will-change: transform;
+
 	@include break-mobile() {
 		display: flex;
 	}
@@ -52,7 +59,6 @@
 
 // Sibling inserter / "inbetweenserter".
 .block-editor-block-list__empty-block-inserter,
-.block-editor-default-block-appender,
 .block-editor-block-list__insertion-point-inserter {
 	.block-editor-inserter__toggle.components-button.has-icon {
 		// Basic look

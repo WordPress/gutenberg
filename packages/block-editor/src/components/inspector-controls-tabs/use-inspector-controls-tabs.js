@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __experimentalUseSlotFills as useSlotFills } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -10,6 +11,23 @@ import InspectorControlsGroups from '../inspector-controls/groups';
 import useIsListViewTabDisabled from './use-is-list-view-tab-disabled';
 import { InspectorAdvancedControls } from '../inspector-controls';
 import { TAB_LIST_VIEW, TAB_SETTINGS, TAB_STYLES } from './utils';
+import { store as blockEditorStore } from '../../store';
+
+const EMPTY_ARRAY = [];
+
+function getShowTabs( blockName, tabSettings = {} ) {
+	// Block specific setting takes precedence over generic default.
+	if ( tabSettings[ blockName ] !== undefined ) {
+		return tabSettings[ blockName ];
+	}
+
+	// Use generic default if set over the Gutenberg experiment option.
+	if ( tabSettings.default !== undefined ) {
+		return tabSettings.default;
+	}
+
+	return true;
+}
 
 export default function useInspectorControlsTabs( blockName ) {
 	const tabs = [];
@@ -19,6 +37,7 @@ export default function useInspectorControlsTabs( blockName ) {
 		default: defaultGroup,
 		dimensions: dimensionsGroup,
 		list: listGroup,
+		position: positionGroup,
 		typography: typographyGroup,
 	} = InspectorControlsGroups;
 
@@ -47,6 +66,7 @@ export default function useInspectorControlsTabs( blockName ) {
 	// or Advanced Controls slot, then add this tab.
 	const settingsFills = [
 		...( useSlotFills( defaultGroup.Slot.__unstableName ) || [] ),
+		...( useSlotFills( positionGroup.Slot.__unstableName ) || [] ),
 		...( useSlotFills( InspectorAdvancedControls.slotName ) || [] ),
 	];
 
@@ -54,5 +74,11 @@ export default function useInspectorControlsTabs( blockName ) {
 		tabs.push( TAB_SETTINGS );
 	}
 
-	return tabs;
+	const tabSettings = useSelect( ( select ) => {
+		return select( blockEditorStore ).getSettings().blockInspectorTabs;
+	}, [] );
+
+	const showTabs = getShowTabs( blockName, tabSettings );
+
+	return showTabs ? tabs : EMPTY_ARRAY;
 }

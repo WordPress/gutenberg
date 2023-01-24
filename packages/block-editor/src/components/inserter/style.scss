@@ -107,10 +107,6 @@ $block-inserter-tabs-height: 44px;
 	.components-search-control__icon {
 		right: $grid-unit-10 + ($grid-unit-60 - $icon-size) * 0.5;
 	}
-
-	.components-base-control__field {
-		margin-bottom: 0;
-	}
 }
 
 .block-editor-inserter__tabs {
@@ -291,7 +287,7 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
-.block-editor-inserter__patterns-category-panel {
+.block-editor-inserter__patterns-category-dialog {
 	background: $gray-100;
 	border-left: $border-width solid $gray-200;
 	border-right: $border-width solid $gray-200;
@@ -320,9 +316,13 @@ $block-inserter-tabs-height: 44px;
 			box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
 		}
 	}
+}
 
-	.block-editor-block-patterns-list__item-title {
-		display: none;
+.block-editor-inserter__patterns-category-panel {
+	padding: 0 $grid-unit-20;
+
+	@include break-medium {
+		padding: 0;
 	}
 }
 
@@ -561,26 +561,35 @@ $block-inserter-tabs-height: 44px;
 			box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
 		}
 	}
+}
 
-	.block-editor-inserter__media-panel {
+.block-editor-inserter__media-panel {
+	min-height: 100%;
+	padding: 0 $grid-unit-20;
+	display: flex;
+	flex-direction: column;
+
+	@include break-medium {
+		padding: 0;
+	}
+
+	.block-editor-inserter__media-panel-spinner {
 		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex: 1;
+	}
 
-		&-title {
-			font-size: calc(1.25 * 13px);
-		}
-
-		&-spinner {
-			height: 100%;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-		}
-
-		&-search {
-			&.components-search-control {
-				input[type="search"].components-search-control__input {
-					background: $white;
-				}
+	.block-editor-inserter__media-panel-search {
+		&.components-search-control {
+			input[type="search"].components-search-control__input {
+				background: $white;
+			}
+			button.components-button {
+				min-width: auto;
+				padding-left: $grid-unit-05 * 0.5;
+				padding-right: $grid-unit-05 * 0.5;
 			}
 		}
 	}
@@ -588,7 +597,8 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__media-list {
 	margin-top: $grid-unit-20;
-	&__list-item {
+	.block-editor-inserter__media-list__list-item {
+		position: relative;
 		cursor: pointer;
 		margin-bottom: $grid-unit-30;
 
@@ -599,16 +609,52 @@ $block-inserter-tabs-height: 44px;
 		&[draggable="true"] .block-editor-block-preview__container {
 			cursor: grab;
 		}
+
+		&.is-hovered {
+			.block-editor-inserter__media-list__item-preview {
+				box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
+			}
+
+			.block-editor-inserter__media-list__item-preview-options > button {
+				display: block;
+			}
+		}
+
+		.block-editor-inserter__media-list__item-preview-options {
+			position: absolute;
+			right: $grid-unit-10;
+			top: $grid-unit-10;
+
+			> button {
+				background: $white;
+				border-radius: $radius-block-ui;
+				display: none;
+
+				// These styles are important so as focus isn't lost
+				// when the button is focused and we hover away.
+				&.is-opened,
+				&:focus {
+					display: block;
+				}
+
+				&:hover {
+					box-shadow: inset 0 0 0 2px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+					// Windows High Contrast mode will show this outline, but not the box-shadow.
+					outline: 2px solid transparent;
+				}
+			}
+		}
 	}
 
-	&__item {
+	.block-editor-inserter__media-list__item {
 		height: 100%;
 
-		&-preview {
+		.block-editor-inserter__media-list__item-preview {
 			display: flex;
 			align-items: center;
 			overflow: hidden;
-			border-radius: 4px;
+			border-radius: 2px;
 
 			> * {
 				margin: 0 auto;
@@ -616,15 +662,27 @@ $block-inserter-tabs-height: 44px;
 			}
 		}
 
-		&:hover &-preview {
-			box-shadow: 0 0 0 2px var(--wp-admin-theme-color);
-		}
-
-		&:focus &-preview {
-			box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		&:focus .block-editor-inserter__media-list__item-preview {
+			box-shadow: inset 0 0 0 2px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 
 			// Windows High Contrast mode will show this outline, but not the box-shadow.
 			outline: 2px solid transparent;
 		}
+	}
+}
+
+.block-editor-inserter__media-list__item-preview-options__popover {
+	.components-menu-item__button .components-menu-item__item {
+		min-width: auto;
+	}
+}
+
+
+.block-editor-inserter__mobile-tab-navigation {
+	padding: $grid-unit-20;
+	height: 100%;
+
+	> * {
+		height: 100%;
 	}
 }

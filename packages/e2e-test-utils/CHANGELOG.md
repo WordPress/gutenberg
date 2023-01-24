@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 9.2.0 (2023-01-11)
+
+## 9.1.0 (2023-01-02)
+
+## 9.0.0 (2022-12-14)
+
+### Breaking changes
+
+-   Remove all the site editor navigation panel related utils: getSiteEditorMenuItem, isSiteEditorRoot, navigateSiteEditorBack, navigateSiteEditorBackToRoot, openSiteEditorNavigationPanel, siteEditorNavigateSequence, clickSiteEditorMenuItem, closeSiteEditorNavigationPanel.
+
 ## 8.6.0 (2022-11-16)
 
 ## 8.5.0 (2022-11-02)

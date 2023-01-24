@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/react-native-aztec",
-	"version": "1.85.0",
+	"version": "1.87.2",
 	"description": "Aztec view for react-native.",
 	"private": true,
 	"author": "The WordPress Contributors",

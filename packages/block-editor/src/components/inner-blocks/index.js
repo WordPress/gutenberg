@@ -7,11 +7,10 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
 	getBlockSupport,
-	getBlockType,
 	store as blocksStore,
 	__unstableGetInnerBlocksProps as getInnerBlocksProps,
 } from '@wordpress/blocks';
@@ -23,7 +22,7 @@ import ButtonBlockAppender from './button-block-appender';
 import DefaultBlockAppender from './default-block-appender';
 import useNestedSettingsUpdate from './use-nested-settings-update';
 import useInnerBlockTemplateSync from './use-inner-block-template-sync';
-import getBlockContext from './get-block-context';
+import useBlockContext from './use-block-context';
 import { BlockListItems } from '../block-list';
 import { BlockContextProvider } from '../block-context';
 import { useBlockEditContext } from '../block-edit/context';
@@ -75,32 +74,26 @@ function UncontrolledInnerBlocks( props ) {
 		templateInsertUpdatesSelection
 	);
 
-	const { context, name } = useSelect(
+	const context = useBlockContext( clientId );
+	const name = useSelect(
 		( select ) => {
-			const block = select( blockEditorStore ).getBlock( clientId );
-
-			// This check is here to avoid the Redux zombie bug where a child subscription
-			// is called before a parent, causing potential JS errors when the child has been removed.
-			if ( ! block ) {
-				return {};
-			}
-
-			const blockType = getBlockType( block.name );
-
-			if ( ! blockType || ! blockType.providesContext ) {
-				return {};
-			}
-
-			return {
-				context: getBlockContext( block.attributes, blockType ),
-				name: block.name,
-			};
+			return select( blockEditorStore ).getBlock( clientId )?.name;
 		},
 		[ clientId ]
 	);
 
 	const { allowSizingOnChildren = false } =
 		getBlockSupport( name, '__experimentalLayout' ) || {};
+
+	const layout = useMemo(
+		() => ( {
+			...__experimentalLayout,
+			...( allowSizingOnChildren && {
+				allowSizingOnChildren: true,
+			} ),
+		} ),
+		[ __experimentalLayout, allowSizingOnChildren ]
+	);
 
 	// This component needs to always be synchronous as it's the one changing
 	// the async mode depending on the block selection.
@@ -110,10 +103,7 @@ function UncontrolledInnerBlocks( props ) {
 				rootClientId={ clientId }
 				renderAppender={ renderAppender }
 				__experimentalAppenderTagName={ __experimentalAppenderTagName }
-				__experimentalLayout={ {
-					...__experimentalLayout,
-					allowSizingOnChildren,
-				} }
+				__experimentalLayout={ layout }
 				wrapperRef={ wrapperRef }
 				placeholder={ placeholder }
 			/>

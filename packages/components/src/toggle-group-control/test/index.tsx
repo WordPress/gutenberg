@@ -18,6 +18,10 @@ import {
 	ToggleGroupControlOptionIcon,
 } from '../index';
 
+function getWrappingPopoverElement( element: HTMLElement ) {
+	return element.closest( '.components-popover' );
+}
+
 describe( 'ToggleGroupControl', () => {
 	const options = (
 		<>
@@ -51,6 +55,7 @@ describe( 'ToggleGroupControl', () => {
 
 			expect( container ).toMatchSnapshot();
 		} );
+
 		it( 'with icons', () => {
 			const { container } = render(
 				<ToggleGroupControl
@@ -74,9 +79,7 @@ describe( 'ToggleGroupControl', () => {
 		} );
 	} );
 	it( 'should call onChange with proper value', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const mockOnChange = jest.fn();
 
 		render(
@@ -95,9 +98,7 @@ describe( 'ToggleGroupControl', () => {
 	} );
 
 	it( 'should render tooltip where `showTooltip` === `true`', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		render(
 			<ToggleGroupControl label="Test Toggle Group Control">
 				{ optionsWithTooltip }
@@ -110,17 +111,21 @@ describe( 'ToggleGroupControl', () => {
 
 		await user.hover( firstRadio );
 
+		const tooltip = await screen.findByText(
+			'Click for Delicious Gnocchi'
+		);
+
 		await waitFor( () =>
 			expect(
-				screen.getByText( 'Click for Delicious Gnocchi' )
-			).toBeVisible()
+				getWrappingPopoverElement( tooltip )
+			).toBePositionedPopover()
 		);
+
+		expect( tooltip ).toBeVisible();
 	} );
 
 	it( 'should not render tooltip', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		render(
 			<ToggleGroupControl label="Test Toggle Group Control">
 				{ optionsWithTooltip }
@@ -144,9 +149,7 @@ describe( 'ToggleGroupControl', () => {
 		describe( 'isDeselectable = false', () => {
 			it( 'should not be deselectable', async () => {
 				const mockOnChange = jest.fn();
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 
 				render(
 					<ToggleGroupControl
@@ -167,9 +170,7 @@ describe( 'ToggleGroupControl', () => {
 			} );
 
 			it( 'should not tab to next radio option', async () => {
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 
 				render(
 					<ToggleGroupControl value="rigas" label="Test">
@@ -192,9 +193,7 @@ describe( 'ToggleGroupControl', () => {
 		describe( 'isDeselectable = true', () => {
 			it( 'should be deselectable', async () => {
 				const mockOnChange = jest.fn();
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 
 				render(
 					<ToggleGroupControl
@@ -224,9 +223,7 @@ describe( 'ToggleGroupControl', () => {
 			} );
 
 			it( 'should tab to the next option button', async () => {
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 
 				render(
 					<ToggleGroupControl

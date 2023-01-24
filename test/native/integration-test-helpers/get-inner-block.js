@@ -17,7 +17,7 @@ export const getInnerBlock = (
 	blockName,
 	{ rowIndex = 1 } = {}
 ) => {
-	return within( parentBlock ).getByLabelText(
+	return within( parentBlock ).getAllByLabelText(
 		new RegExp( `${ blockName } Block\\. Row ${ rowIndex }` )
-	);
+	)[ 0 ];
 };

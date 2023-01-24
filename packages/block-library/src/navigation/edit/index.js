@@ -284,18 +284,37 @@ function Navigation( {
 			! hasResolvedNavigationMenus ||
 			isConvertingClassicMenu ||
 			fallbackNavigationMenus?.length > 0 ||
-			classicMenus?.length !== 1
+			! classicMenus?.length
 		) {
 			return;
 		}
 
 		// If there's non fallback navigation menus and
-		// only one classic menu then create a new navigation menu based on it.
-		convertClassicMenu(
-			classicMenus[ 0 ].id,
-			classicMenus[ 0 ].name,
-			'publish'
+		// a classic menu with a `primary` location or slug,
+		// then create a new navigation menu based on it.
+		// Otherwise, use the most recently created classic menu.
+		const primaryMenus = classicMenus.filter(
+			( classicMenu ) =>
+				classicMenu.locations.includes( 'primary' ) ||
+				classicMenu.slug === 'primary'
 		);
+
+		if ( primaryMenus.length ) {
+			convertClassicMenu(
+				primaryMenus[ 0 ].id,
+				primaryMenus[ 0 ].name,
+				'publish'
+			);
+		} else {
+			classicMenus.sort( ( a, b ) => {
+				return b.id - a.id;
+			} );
+			convertClassicMenu(
+				classicMenus[ 0 ].id,
+				classicMenus[ 0 ].name,
+				'publish'
+			);
+		}
 	}, [ hasResolvedNavigationMenus ] );
 
 	const navRef = useRef();
@@ -448,10 +467,19 @@ function Navigation( {
 			setDetectedColor,
 			setDetectedBackgroundColor
 		);
+
 		const subMenuElement = navRef.current?.querySelector(
-			'[data-type="core/navigation-link"] [data-type="core/navigation-link"]'
+			'[data-type="core/navigation-submenu"] [data-type="core/navigation-link"]'
 		);
-		if ( subMenuElement ) {
+
+		if ( ! subMenuElement ) {
+			return;
+		}
+
+		// Only detect submenu overlay colors if they have previously been explicitly set.
+		// This avoids the contrast checker from reporting on inherited submenu colors and
+		// showing the contrast warning twice.
+		if ( overlayTextColor.color || overlayBackgroundColor.color ) {
 			detectColors(
 				subMenuElement,
 				setDetectedOverlayColor,
@@ -629,7 +657,6 @@ function Navigation( {
 				{ hasColorSettings && (
 					<>
 						<ColorGradientSettingsDropdown
-							__experimentalHasMultipleOrigins
 							__experimentalIsRenderedInSidebar
 							settings={ [
 								{
@@ -698,17 +725,18 @@ function Navigation( {
 		return (
 			<TagName { ...blockProps }>
 				<MenuInspectorControls
+					clientId={ clientId }
 					createNavigationMenuIsSuccess={
 						createNavigationMenuIsSuccess
 					}
 					createNavigationMenuIsError={ createNavigationMenuIsError }
 					currentMenuId={ ref }
 					isNavigationMenuMissing={ isNavigationMenuMissing }
-					innerBlocks={ innerBlocks }
 					isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
 					onCreateNew={ createUntitledEmptyNavigationMenu }
 					onSelectClassicMenu={ onSelectClassicMenu }
 					onSelectNavigationMenu={ onSelectNavigationMenu }
+					isLoading={ isLoading }
 				/>
 				{ stylingInspectorControls }
 				<ResponsiveWrapper
@@ -740,16 +768,17 @@ function Navigation( {
 		return (
 			<TagName { ...blockProps }>
 				<MenuInspectorControls
+					clientId={ clientId }
 					createNavigationMenuIsSuccess={
 						createNavigationMenuIsSuccess
 					}
 					createNavigationMenuIsError={ createNavigationMenuIsError }
 					isNavigationMenuMissing={ isNavigationMenuMissing }
-					innerBlocks={ innerBlocks }
 					isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
 					onCreateNew={ createUntitledEmptyNavigationMenu }
 					onSelectClassicMenu={ onSelectClassicMenu }
 					onSelectNavigationMenu={ onSelectNavigationMenu }
+					isLoading={ isLoading }
 				/>
 				<Warning>
 					{ __(
@@ -813,17 +842,18 @@ function Navigation( {
 		<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
 			<RecursionProvider uniqueId={ recursionId }>
 				<MenuInspectorControls
+					clientId={ clientId }
 					createNavigationMenuIsSuccess={
 						createNavigationMenuIsSuccess
 					}
 					createNavigationMenuIsError={ createNavigationMenuIsError }
 					currentMenuId={ ref }
 					isNavigationMenuMissing={ isNavigationMenuMissing }
-					innerBlocks={ innerBlocks }
 					isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
 					onCreateNew={ createUntitledEmptyNavigationMenu }
 					onSelectClassicMenu={ onSelectClassicMenu }
 					onSelectNavigationMenu={ onSelectNavigationMenu }
+					isLoading={ isLoading }
 				/>
 				{ stylingInspectorControls }
 				{ isEntityAvailable && (

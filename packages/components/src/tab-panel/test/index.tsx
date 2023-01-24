@@ -9,10 +9,7 @@ import userEvent from '@testing-library/user-event';
  */
 import TabPanel from '..';
 
-const setupUser = () =>
-	userEvent.setup( {
-		advanceTimers: jest.advanceTimersByTime,
-	} );
+const setupUser = () => userEvent.setup();
 
 const TABS = [
 	{
@@ -145,7 +142,7 @@ describe( 'TabPanel', () => {
 		);
 	} );
 
-	it( 'should select `initialTabname` if defined', () => {
+	it( 'should select `initialTabName` if defined', () => {
 		const mockOnSelect = jest.fn();
 
 		render(
@@ -158,6 +155,128 @@ describe( 'TabPanel', () => {
 		);
 		expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
 		expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
+	} );
+
+	it( 'waits for the tab with the `initialTabName` to become present in the `tabs` array before selecting it', () => {
+		const mockOnSelect = jest.fn();
+
+		const { rerender } = render(
+			<TabPanel
+				tabs={ TABS }
+				initialTabName="delta"
+				children={ () => undefined }
+				onSelect={ mockOnSelect }
+			/>
+		);
+
+		// There should be no selected tab.
+		expect(
+			screen.queryByRole( 'tab', { selected: true } )
+		).not.toBeInTheDocument();
+
+		rerender(
+			<TabPanel
+				tabs={ [
+					{ name: 'delta', title: 'Delta', className: 'delta-class' },
+					...TABS,
+				] }
+				initialTabName="delta"
+				children={ () => undefined }
+				onSelect={ mockOnSelect }
+			/>
+		);
+
+		expect( getSelectedTab() ).toHaveTextContent( 'Delta' );
+		expect( mockOnSelect ).toHaveBeenLastCalledWith( 'delta' );
+	} );
+
+	it( 'should disable the tab when `disabled` is true', async () => {
+		const user = setupUser();
+		const mockOnSelect = jest.fn();
+
+		render(
+			<TabPanel
+				tabs={ [
+					...TABS,
+					{
+						name: 'delta',
+						title: 'Delta',
+						className: 'delta-class',
+						disabled: true,
+					},
+				] }
+				children={ () => undefined }
+				onSelect={ mockOnSelect }
+			/>
+		);
+
+		expect( screen.getByRole( 'tab', { name: 'Delta' } ) ).toHaveAttribute(
+			'aria-disabled',
+			'true'
+		);
+
+		// onSelect gets called on the initial render.
+		expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+
+		// onSelect should not be called since the disabled tab is highlighted, but not selected.
+		await user.keyboard( '[ArrowLeft]' );
+		expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'should select the first enabled tab when the inital tab is disabled', () => {
+		const mockOnSelect = jest.fn();
+
+		render(
+			<TabPanel
+				tabs={ [
+					{
+						name: 'alpha',
+						title: 'Alpha',
+						className: 'alpha-class',
+						disabled: true,
+					},
+					{
+						name: 'beta',
+						title: 'Beta',
+						className: 'beta-class',
+					},
+				] }
+				initialTabName="alpha"
+				children={ () => undefined }
+				onSelect={ mockOnSelect }
+			/>
+		);
+
+		expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
+	} );
+
+	it( 'should select the first enabled tab when the currently selected becomes disabled', () => {
+		const mockOnSelect = jest.fn();
+
+		const { rerender } = render(
+			<TabPanel
+				tabs={ TABS }
+				children={ () => undefined }
+				onSelect={ mockOnSelect }
+			/>
+		);
+
+		expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+
+		rerender(
+			<TabPanel
+				tabs={ TABS.map( ( tab ) => {
+					if ( tab.name === 'alpha' ) {
+						return { ...tab, disabled: true };
+					}
+					return tab;
+				} ) }
+				children={ () => undefined }
+				onSelect={ mockOnSelect }
+			/>
+		);
+
+		expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
 	} );
 
 	describe( 'fallbacks when new tab list invalidates current selection', () => {

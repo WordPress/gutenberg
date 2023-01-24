@@ -28,9 +28,28 @@ Width of the preview container in pixels. Controls at what size the blocks will 
 
 `viewportWidth` can be used to simulate how blocks look on different device sizes or to make sure make sure multiple previews will be rendered with the same scale, regardless of their content.
 
-### `__experimentalPadding`
+Set `viewportWidth` to `0` to make the viewport the same width as the container.
 
--   **Type** `Int`
--   **Default** `undefined`
+### minHeight
 
-Padding for the preview container body.
+Minimum height of the preview iframe in pixels.
+
+-   **Type:** `Int`
+-   **Default:** `undefined`
+
+### `additionalStyles`
+
+List of additional editor styles to load into the preview iframe. Each object
+should contain a `css` attribute. See `EditorStyles` for more info.
+
+```jsx
+<BlockPreview
+	blocks={ blocks }
+	additionalStyles={ [
+		{ css: 'body { padding: 16px; }' },
+	] }
+/>
+```
+
+-   **Type** `Array`
+-   **Default** `[]`

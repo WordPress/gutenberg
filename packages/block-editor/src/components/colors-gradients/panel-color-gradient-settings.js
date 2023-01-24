@@ -18,9 +18,7 @@ import { useInstanceId } from '@wordpress/compose';
  * Internal dependencies
  */
 import ColorGradientSettingsDropdown from './dropdown';
-import useSetting from '../use-setting';
-import useCommonSingleMultipleSelects from './use-common-single-multiple-selects';
-import useMultipleOriginColorsAndGradients from './use-multiple-origin-colors-and-gradients';
+import useColorsAndGradientsPalettes from './use-multiple-origin-colors-and-gradients';
 
 const colorsAndGradientKeys = [
 	'colors',
@@ -39,7 +37,6 @@ export const PanelColorGradientSettingsInner = ( {
 	settings,
 	title,
 	showTitle = true,
-	__experimentalHasMultipleOrigins,
 	__experimentalIsRenderedInSidebar,
 	enableAlpha,
 } ) => {
@@ -100,7 +97,6 @@ export const PanelColorGradientSettingsInner = ( {
 					gradients,
 					disableCustomColors,
 					disableCustomGradients,
-					__experimentalHasMultipleOrigins,
 					__experimentalIsRenderedInSidebar,
 					enableAlpha,
 				} }
@@ -114,19 +110,8 @@ export const PanelColorGradientSettingsInner = ( {
 	);
 };
 
-const PanelColorGradientSettingsSingleSelect = ( props ) => {
-	const colorGradientSettings = useCommonSingleMultipleSelects();
-	colorGradientSettings.colors = useSetting( 'color.palette' );
-	colorGradientSettings.gradients = useSetting( 'color.gradients' );
-	return (
-		<PanelColorGradientSettingsInner
-			{ ...{ ...colorGradientSettings, ...props } }
-		/>
-	);
-};
-
-const PanelColorGradientSettingsMultipleSelect = ( props ) => {
-	const colorGradientSettings = useMultipleOriginColorsAndGradients();
+const PanelColorGradientSettingsSelect = ( props ) => {
+	const colorGradientSettings = useColorsAndGradientsPalettes();
 	return (
 		<PanelColorGradientSettingsInner
 			{ ...{ ...colorGradientSettings, ...props } }
@@ -140,10 +125,7 @@ const PanelColorGradientSettings = ( props ) => {
 	) {
 		return <PanelColorGradientSettingsInner { ...props } />;
 	}
-	if ( props.__experimentalHasMultipleOrigins ) {
-		return <PanelColorGradientSettingsMultipleSelect { ...props } />;
-	}
-	return <PanelColorGradientSettingsSingleSelect { ...props } />;
+	return <PanelColorGradientSettingsSelect { ...props } />;
 };
 
 export default PanelColorGradientSettings;

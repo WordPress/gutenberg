@@ -1,74 +1,46 @@
 /**
- * External dependencies
- */
-import { boolean, select, text } from '@storybook/addon-knobs';
-
-/**
  * Internal dependencies
  */
 import Notice from '../';
 
+// TODO: Add a story involving NoticeList to help people understand
+// the difference between onDismiss/onRemove.
+
 export default {
 	title: 'Components/Notice',
 	component: Notice,
+	argTypes: {
+		isDismissible: { control: 'boolean' },
+		onDismiss: { control: { type: null } },
+		onRemove: { control: { type: null } },
+		politeness: {
+			control: 'radio',
+			options: [ 'assertive', 'polite' ],
+		},
+		spokenMessage: { control: 'text' },
+		status: {
+			control: 'radio',
+			options: [ 'warning', 'success', 'error', 'info' ],
+		},
+	},
 	parameters: {
-		knobs: { disable: false },
+		controls: { expanded: true },
+		docs: { source: { state: 'open' } },
 	},
 };
 
-export const _default = () => {
-	const status = select(
-		'Status',
-		{
-			Warning: 'warning',
-			Success: 'success',
-			Error: 'error',
-			Info: 'info',
-		},
-		'info'
-	);
-	const isDismissible = boolean( 'Is Dismissible', true );
-
-	return (
-		<Notice status={ status } isDismissible={ isDismissible }>
-			<p>This is a notice.</p>
-		</Notice>
-	);
+const Template = ( props ) => {
+	return <Notice { ...props } />;
 };
 
-export const withCustomSpokenMessage = () => {
-	const status = select(
-		'Status',
-		{
-			Warning: 'warning',
-			Success: 'success',
-			Error: 'error',
-			Info: 'info',
-		},
-		'info'
-	);
-	const isDismissible = boolean( 'Is Dismissible', true );
-	const politeness = select(
-		'Politeness',
-		{
-			Assertive: 'assertive',
-			Polite: 'polite',
-		},
-		'assertive'
-	);
-	const spokenMessage = text(
-		'Spoken Message',
-		'This is a notice with a custom spoken message'
-	);
+export const Default = Template.bind( {} );
+Default.args = {
+	children: 'This is a notice.',
+};
 
-	return (
-		<Notice
-			status={ status }
-			isDismissible={ isDismissible }
-			politeness={ politeness }
-			spokenMessage={ spokenMessage }
-		>
-			<p>This is a notice.</p>
-		</Notice>
-	);
+export const WithCustomSpokenMessage = Template.bind( {} );
+WithCustomSpokenMessage.args = {
+	...Default.args,
+	politeness: 'assertive',
+	spokenMessage: 'This is a notice with a custom spoken message',
 };
