@@ -22,7 +22,7 @@ function render_block_core_post_comments_link( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$classes = array(); 
+	$classes = array();
 	if ( isset( $attributes['textAlign'] ) ) {
 		$classes[] = 'has-text-align-' . $attributes['textAlign'];
 	}
