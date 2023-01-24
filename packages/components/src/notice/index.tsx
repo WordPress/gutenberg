@@ -10,7 +10,6 @@ import { __ } from '@wordpress/i18n';
 import { RawHTML, useEffect, renderToString } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
 import { close } from '@wordpress/icons';
-import type { WPElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,8 +21,12 @@ import type { SyntheticEvent } from 'react';
 
 const noop = () => {};
 
+/**
+ * Custom hook which announces the message with the given politeness, if a
+ * valid message is provided.
+ */
 function useSpokenMessage(
-	message: NoticeProps[ 'spokenMessage' ] | WPElement,
+	message: NoticeProps[ 'spokenMessage' ],
 	politeness: NoticeProps[ 'politeness' ]
 ) {
 	const spokenMessage =
