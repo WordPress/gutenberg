@@ -34,19 +34,32 @@ export default meta;
 
 const SelectControlWithState: ComponentStory< typeof SelectControl > = ( {
 	onChange,
+	multiple,
 	...args
 } ) => {
 	const [ selection, setSelection ] =
 		useState< ComponentProps< typeof SelectControl >[ 'value' ] >();
 
-	return (
+	const handleOnChange: ComponentProps<
+		typeof SelectControl
+	>[ 'onChange' ] = ( value ) => {
+		setSelection( value );
+		onChange?.( value );
+	};
+
+	return multiple ? (
 		<SelectControl
 			{ ...args }
-			value={ selection }
-			onChange={ ( value ) => {
-				setSelection( value );
-				onChange?.( value );
-			} }
+			multiple={ multiple }
+			value={ selection as string[] }
+			onChange={ handleOnChange }
+		/>
+	) : (
+		<SelectControl
+			{ ...args }
+			multiple={ multiple }
+			value={ selection as string }
+			onChange={ handleOnChange }
 		/>
 	);
 };
@@ -70,7 +83,7 @@ WithLabelAndHelpText.args = {
 
 /**
  * As an alternative to the `options` prop, `optgroup`s and `options` can be
- * passed in as `children` for more customizability.
+ * passed in as `children` for more customizeability.
  */
 export const WithCustomChildren: ComponentStory< typeof SelectControl > = (
 	args
