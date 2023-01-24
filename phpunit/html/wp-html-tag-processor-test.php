@@ -8,12 +8,14 @@
 
 require_once __DIR__ . '/../../lib/experimental/html/index.php';
 
+function esc_attr( $s ) { return str_replace( ['<', '>', '"'], ['&lt;', '&gt;', '&quot;'], $s ); }
+
 /**
  * @group html
  *
  * @coversDefaultClass WP_HTML_Tag_Processor
  */
-class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
+class WP_HTML_Tag_Processor_Test extends PHPUnit\Framework\TestCase {
 	const HTML_SIMPLE       = '<div id="first"><span id="second">Text</span></div>';
 	const HTML_WITH_CLASSES = '<div class="main with-border" id="first"><span class="not-main bold with-border" id="second">Text</span></div>';
 	const HTML_MALFORMED    = '<div><span class="d-md-none" Notifications</span><span class="d-none d-md-inline">Back to notifications</span></div>';
@@ -146,6 +148,32 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 		$p = new WP_HTML_Tag_Processor( '<div id="the &quot;grande&quot; is &lt; &#x033;&#50;oz&dagger;"></div>' );
 		$p->next_tag();
 		$this->assertSame( 'the "grande" is < 32oz†', $p->get_attribute( 'id' ), 'HTML Attribute value was returned without decoding character references' );
+	}
+
+	public function test_get_attribute_decodes_html_character_references_c1_replacements() {
+		$p = new WP_HTML_Tag_Processor( '<div id="&#x80;&#x81;"></div>' );
+		$p->next_tag();
+		$this->assertSame( '€&#x81;', $p->get_attribute( 'id' ), 'HTML Attribute value was returned without decoding character references' );
+	}
+
+	public function test_get_attribute_decodes_html_character_references_ambiguous_ampersand() {
+		$p = new WP_HTML_Tag_Processor( '<div id="&AElig and &AElig; but not &Abreve or &Abreve4 and &Abreve; and &AElig? and &AElig"></div>' );
+		$p->next_tag();
+		$this->assertSame( 'Æ and Æ but not &Abreve or &Abreve4 and Ă and Æ? and Æ', $p->get_attribute( 'id' ), 'HTML Attribute value was returned without decoding character references' );
+	}
+
+	public function add_class_does_character_references() {
+		$p = new WP_HTML_Tag_Processor( '<div class="before it&apos;s&#x20great after"></div>' );
+		$p->next_tag();
+		$p->add_class( "it's great" );
+		$this->assertSame( 'before it\'s great after', $p->get_attribute( 'class' ), 'HTML Attribute value was returned without decoding character references' );
+	}
+
+	public function remove_class_does_character_references() {
+		$p = new WP_HTML_Tag_Processor( '<div class="before it&apos;s&#x20great after"></div>' );
+		$p->next_tag();
+		$p->remove_class( "it's great" );
+		$this->assertSame( 'before after', $p->get_attribute( 'class' ), 'HTML Attribute value was returned without decoding character references' );
 	}
 
 	/**
