@@ -20,10 +20,7 @@ const EMPTY_ARRAY = [];
  * @param {?Array} templateParts Available template parts.
  * @return {Array} An array of template parts and their blocks.
  */
-export function getFilteredTemplatePartBlocks(
-	blocks = EMPTY_ARRAY,
-	templateParts
-) {
+function getFilteredTemplatePartBlocks( blocks = EMPTY_ARRAY, templateParts ) {
 	const templatePartsById = templateParts
 		? // Key template parts by their ID.
 		  templateParts.reduce(
@@ -65,6 +62,8 @@ export function getFilteredTemplatePartBlocks(
 	return result;
 }
 
-export const memoizedGetFilteredTemplatePartBlocks = memoize(
+const memoizedGetFilteredTemplatePartBlocks = memoize(
 	getFilteredTemplatePartBlocks
 );
+
+export { memoizedGetFilteredTemplatePartBlocks as getFilteredTemplatePartBlocks };

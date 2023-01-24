@@ -16,7 +16,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 /**
  * Internal dependencies
  */
-import { memoizedGetFilteredTemplatePartBlocks } from './utils';
+import { getFilteredTemplatePartBlocks } from './utils';
 
 /**
  * @typedef {'template'|'template_type'} TemplateType Template type.
@@ -273,10 +273,7 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
 			{ per_page: -1 }
 		);
 
-		return memoizedGetFilteredTemplatePartBlocks(
-			template.blocks,
-			templateParts
-		);
+		return getFilteredTemplatePartBlocks( template.blocks, templateParts );
 	}
 );
 
