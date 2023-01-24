@@ -277,17 +277,22 @@ function UnforwardedColorPalette(
 		return null;
 	}
 
+	const normalizedColorValue = normalizeColorValue(
+		value,
+		customColorPaletteRef
+	);
+
 	const renderCustomColorPicker = () => (
 		<DropdownContentWrapper paddingSize="none">
 			<ColorPicker
-				color={ normalizeColorValue( value, customColorPaletteRef ) }
+				color={ normalizedColorValue }
 				onChange={ ( color ) => onChange( color ) }
 				enableAlpha={ enableAlpha }
 			/>
 		</DropdownContentWrapper>
 	);
 
-	const colordColor = colord( value ?? '' );
+	const colordColor = colord( normalizedColorValue ?? '' );
 
 	const valueWithoutLeadingHash = value?.startsWith( '#' )
 		? value.substring( 1 )
