@@ -56,5 +56,5 @@ export default function NavigationMenu( { innerBlocks } ) {
 		} );
 	}, [ updateBlockListSettings, innerBlocks ] );
 
-	return <OffCanvasEditor blocks={ innerBlocks } />;
+	return <OffCanvasEditor blocks={ innerBlocks } selectBlockInCanvas={ true } />;
 }
