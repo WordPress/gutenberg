@@ -7,14 +7,16 @@ import { get, set } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useContext, useCallback } from '@wordpress/element';
+import { useContext, useCallback, useMemo } from '@wordpress/element';
 import { __EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { getValueFromVariable, getPresetVariableFromValue } from './utils';
 import { GlobalStylesContext } from './context';
+import { store as blockEditorStore } from '../../store';
 
 const EMPTY_CONFIG = { settings: {}, styles: {} };
 
@@ -30,128 +32,145 @@ export const useGlobalStylesReset = () => {
 	];
 };
 
+function cloneDeep( object ) {
+	return JSON.parse( JSON.stringify( object ) );
+}
+
 export function useGlobalSetting( path, blockName, source = 'all' ) {
+	const blockEditorSettings = useSelect(
+		( select ) => select( blockEditorStore ).getSettings(),
+		[]
+	);
+
 	const {
-		merged: mergedConfig,
 		base: baseConfig,
 		user: userConfig,
 		setUserConfig,
 	} = useContext( GlobalStylesContext );
 
-	const fullPath = ! blockName
-		? `settings.${ path }`
-		: `settings.blocks.${ blockName }.${ path }`;
+	const contextualPath = blockName ? `blocks.${ blockName }.${ path }` : path;
 
-	const setSetting = ( newValue ) => {
-		setUserConfig( ( currentConfig ) => {
-			// Deep clone `currentConfig` to avoid mutating it later.
-			const newUserConfig = JSON.parse( JSON.stringify( currentConfig ) );
-			const pathToSet = PATHS_WITH_MERGE[ path ]
-				? fullPath + '.custom'
-				: fullPath;
-			set( newUserConfig, pathToSet, newValue );
+	let setting;
 
-			return newUserConfig;
-		} );
-	};
+	if ( source === 'all' ) {
+		setting =
+			get( blockEditorSettings.__experimentalFeatures, contextualPath ) ??
+			get( blockEditorSettings.__experimentalFeatures, path );
+	} else if ( source === 'base' ) {
+		setting =
+			get( baseConfig.settings, contextualPath ) ??
+			get( baseConfig.settings, path );
+	} else if ( source === 'user' ) {
+		setting =
+			get( userConfig.settings, contextualPath ) ??
+			get( userConfig.settings, path );
+	} else {
+		throw new Error( 'Invalid source' );
+	}
 
-	const getSettingValueForContext = ( name ) => {
-		const currentPath = ! name
-			? `settings.${ path }`
-			: `settings.blocks.${ name }.${ path }`;
+	if ( PATHS_WITH_MERGE[ path ] ) {
+		setting = setting?.custom ?? setting?.theme ?? setting?.default;
+	}
 
-		const getSettingValue = ( configToUse ) => {
-			const result = get( configToUse, currentPath );
-			if ( PATHS_WITH_MERGE[ path ] ) {
-				return result?.custom ?? result?.theme ?? result?.default;
-			}
-			return result;
-		};
+	const setSetting = useCallback(
+		( newValue ) => {
+			setUserConfig( ( currentUserConfig ) => {
+				const newUserConfig = cloneDeep( currentUserConfig );
+				const pathToSet = PATHS_WITH_MERGE[ path ]
+					? `settings.${ contextualPath }.custom`
+					: `settings.${ contextualPath }`;
+				set( newUserConfig, pathToSet, newValue );
+				return newUserConfig;
+			} );
+		},
+		[ setUserConfig, path, contextualPath ]
+	);
 
-		let result;
-		switch ( source ) {
-			case 'all':
-				result = getSettingValue( mergedConfig );
-				break;
-			case 'user':
-				result = getSettingValue( userConfig );
-				break;
-			case 'base':
-				result = getSettingValue( baseConfig );
-				break;
-			default:
-				throw 'Unsupported source';
-		}
-
-		return result;
-	};
-
-	// Unlike styles settings get inherited from top level settings.
-	const resultWithFallback =
-		getSettingValueForContext( blockName ) ?? getSettingValueForContext();
-
-	return [ resultWithFallback, setSetting ];
+	return [ setting, setSetting ];
 }
 
 export function useGlobalStyle( path, blockName, source = 'all' ) {
+	const blockEditorSettings = useSelect(
+		( select ) => select( blockEditorStore ).getSettings(),
+		[]
+	);
+
 	const {
-		merged: mergedConfig,
 		base: baseConfig,
 		user: userConfig,
 		setUserConfig,
 	} = useContext( GlobalStylesContext );
-	const finalPath = ! blockName
-		? `styles.${ path }`
-		: `styles.blocks.${ blockName }.${ path }`;
 
-	const setStyle = ( newValue ) => {
-		setUserConfig( ( currentConfig ) => {
-			// Deep clone `currentConfig` to avoid mutating it later.
-			const newUserConfig = JSON.parse( JSON.stringify( currentConfig ) );
-			set(
-				newUserConfig,
-				finalPath,
-				getPresetVariableFromValue(
-					mergedConfig.settings,
-					blockName,
-					path,
-					newValue
-				)
-			);
-			return newUserConfig;
-		} );
-	};
+	const contextualPath = blockName ? `blocks.${ blockName }.${ path }` : path;
 
-	let result;
-	switch ( source ) {
-		case 'all':
-			result = getValueFromVariable(
+	// TODO:
+	//  should 'base' refer to the block editor settings?
+	//  then we just have 'user' from the context and 'all' is merging the two together?
+	//  what about settings?
+
+	const style = useMemo( () => {
+		const mergedConfig = {
+			styles: blockEditorSettings.__experimentalStyles,
+			settings: blockEditorSettings.__experimentalFeatures,
+		};
+		if ( source === 'all' ) {
+			return getValueFromVariable(
 				mergedConfig,
 				blockName,
-				// The stlyes.css path is allowed to be empty, so don't revert to base if undefined.
-				finalPath === 'styles.css'
-					? get( userConfig, finalPath )
-					: get( userConfig, finalPath ) ??
-							get( baseConfig, finalPath )
+				get( userConfig.styles, contextualPath ) ??
+					get(
+						blockEditorSettings.__experimentalStyles,
+						contextualPath
+					)
 			);
-			break;
-		case 'user':
-			result = getValueFromVariable(
+		} else if ( source === 'base' ) {
+			return getValueFromVariable(
 				mergedConfig,
 				blockName,
-				get( userConfig, finalPath )
+				get( blockEditorSettings.__experimentalStyles, contextualPath )
 			);
-			break;
-		case 'base':
-			result = getValueFromVariable(
-				baseConfig,
+		} else if ( source === 'user' ) {
+			return getValueFromVariable(
+				mergedConfig,
 				blockName,
-				get( baseConfig, finalPath )
+				get( userConfig.styles, contextualPath )
 			);
-			break;
-		default:
-			throw 'Unsupported source';
-	}
+		}
+		throw new Error( 'Invalid source' );
+	}, [
+		blockEditorSettings,
+		source,
+		blockName,
+		contextualPath,
+		baseConfig,
+		userConfig,
+	] );
 
-	return [ result, setStyle ];
+	const setStyle = useCallback(
+		( newValue ) => {
+			setUserConfig( ( currentUserConfig ) => {
+				const newUserConfig = cloneDeep( currentUserConfig );
+				set(
+					newUserConfig,
+					`styles.${ contextualPath }`,
+					getPresetVariableFromValue(
+						blockEditorSettings.__experimentalFeatures,
+						blockName,
+						path,
+						newValue
+					)
+				);
+				return newUserConfig;
+			} );
+		},
+		[
+			setUserConfig,
+			contextualPath,
+			blockEditorSettings.__experimentalFeatures,
+			blockName,
+			path,
+		]
+	);
+
+	return [ style, setStyle ];
 }

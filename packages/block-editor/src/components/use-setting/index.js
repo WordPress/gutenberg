@@ -7,10 +7,7 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import {
-	__EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE,
-	hasBlockSupport,
-} from '@wordpress/blocks';
+import { hasBlockSupport } from '@wordpress/blocks';
 import { applyFilters } from '@wordpress/hooks';
 
 /**
@@ -18,6 +15,7 @@ import { applyFilters } from '@wordpress/hooks';
  */
 import { useBlockEditContext } from '../block-edit';
 import { store as blockEditorStore } from '../../store';
+import { useGlobalSetting } from '../global-styles';
 
 const blockedPaths = [
 	'color',
@@ -56,6 +54,11 @@ const deprecatedFlags = {
 		return settings.enableCustomUnits;
 	},
 	'spacing.padding': ( settings ) => settings.enableCustomSpacing,
+	// Fallback for typography.dropCap. This is only necessary to support
+	// typography.dropCap. when __experimentalFeatures are not present (core
+	// without plugin). To remove when __experimentalFeatures are ported to
+	// core.
+	'typography.dropCap': () => true,
 };
 
 const prefixedFlags = {
@@ -93,9 +96,9 @@ const prefixedFlags = {
  * @param {string} path Path to desired value in settings.
  * @return {string}     The value for defined setting.
  */
-const removeCustomPrefixes = ( path ) => {
+function removeCustomPrefixes( path ) {
 	return prefixedFlags[ path ] || path;
-};
+}
 
 /**
  * Hook that retrieves the given setting for the block instance in use.
@@ -112,7 +115,8 @@ const removeCustomPrefixes = ( path ) => {
  */
 export default function useSetting( path ) {
 	const { name: blockName, clientId } = useBlockEditContext();
-
+	const normalizedPath = removeCustomPrefixes( path );
+	const [ globalSetting ] = useGlobalSetting( normalizedPath, blockName );
 	return useSelect(
 		( select ) => {
 			if ( blockedPaths.includes( path ) ) {
@@ -123,91 +127,73 @@ export default function useSetting( path ) {
 				return undefined;
 			}
 
-			// 0. Allow third parties to filter the block's settings at runtime.
-			let result = applyFilters(
-				'blockEditor.useSetting.before',
-				undefined,
-				path,
-				clientId,
-				blockName
-			);
-
-			if ( undefined !== result ) {
-				return result;
-			}
-
-			const normalizedPath = removeCustomPrefixes( path );
-
-			// 1. Take settings from the block instance or its ancestors.
-			// Start from the current block and work our way up the ancestors.
-			const candidates = [
-				clientId,
-				...select( blockEditorStore ).getBlockParents(
+			const getFilteredSetting = () =>
+				applyFilters(
+					'blockEditor.useSetting.before',
+					undefined,
+					path,
 					clientId,
-					/* ascending */ true
-				),
-			];
+					blockName
+				);
 
-			for ( const candidateClientId of candidates ) {
-				const candidateBlockName =
-					select( blockEditorStore ).getBlockName(
-						candidateClientId
-					);
-				if (
-					hasBlockSupport(
-						candidateBlockName,
-						'__experimentalSettings',
-						false
-					)
-				) {
-					const candidateAtts =
-						select( blockEditorStore ).getBlockAttributes(
+			const getBlockSetting = () => {
+				// Start from the current block and work our way up the ancestors.
+				const candidates = [
+					clientId,
+					...select( blockEditorStore ).getBlockParents(
+						clientId,
+						/* ascending */ true
+					),
+				];
+
+				for ( const candidateClientId of candidates ) {
+					const candidateBlockName =
+						select( blockEditorStore ).getBlockName(
 							candidateClientId
 						);
-					result =
-						get(
-							candidateAtts,
-							`settings.blocks.${ blockName }.${ normalizedPath }`
-						) ??
-						get( candidateAtts, `settings.${ normalizedPath }` );
-					if ( result !== undefined ) {
-						// Stop the search for more distant ancestors and move on.
-						break;
+					if (
+						hasBlockSupport(
+							candidateBlockName,
+							'__experimentalSettings',
+							false
+						)
+					) {
+						const candidateAttributes =
+							select( blockEditorStore ).getBlockAttributes(
+								candidateClientId
+							);
+						const result =
+							get(
+								candidateAttributes,
+								`settings.blocks.${ blockName }.${ normalizedPath }`
+							) ??
+							get(
+								candidateAttributes,
+								`settings.${ normalizedPath }`
+							);
+						if ( result !== undefined ) {
+							return result;
+						}
 					}
 				}
-			}
+			};
 
-			// 2. Fall back to the settings from the block editor store (__experimentalFeatures).
-			const settings = select( blockEditorStore ).getSettings();
-			if ( result === undefined ) {
-				const defaultsPath = `__experimentalFeatures.${ normalizedPath }`;
-				const blockPath = `__experimentalFeatures.blocks.${ blockName }.${ normalizedPath }`;
-				result =
-					get( settings, blockPath ) ?? get( settings, defaultsPath );
-			}
+			const getDeprecatedSetting = () =>
+				deprecatedFlags[ normalizedPath ]?.(
+					select( blockEditorStore ).getSettings()
+				);
 
-			// Return if the setting was found in either the block instance or the store.
-			if ( result !== undefined ) {
-				if ( PATHS_WITH_MERGE[ normalizedPath ] ) {
-					return result.custom ?? result.theme ?? result.default;
-				}
-				return result;
-			}
-
-			// 3. Otherwise, use deprecated settings.
-			const deprecatedSettingsValue = deprecatedFlags[ normalizedPath ]
-				? deprecatedFlags[ normalizedPath ]( settings )
-				: undefined;
-			if ( deprecatedSettingsValue !== undefined ) {
-				return deprecatedSettingsValue;
-			}
-
-			// 4. Fallback for typography.dropCap:
-			// This is only necessary to support typography.dropCap.
-			// when __experimentalFeatures are not present (core without plugin).
-			// To remove when __experimentalFeatures are ported to core.
-			return normalizedPath === 'typography.dropCap' ? true : undefined;
+			return (
+				// 0. Allow third parties to filter the block's settings at runtime.
+				getFilteredSetting() ??
+				// 1. Take settings from the block instance or its ancestors.
+				getBlockSetting() ??
+				// 2. Fall back to the settings from the block editor store (__experimentalFeatures).
+				globalSetting ??
+				// 3. Otherwise, use deprecated settings.
+				getDeprecatedSetting()
+			);
 		},
-		[ blockName, clientId, path ]
+		[ path, clientId, blockName, normalizedPath, globalSetting ]
 	);
 }
