@@ -14,7 +14,7 @@ import { useState } from '@wordpress/element';
 import Notice from '..';
 import Button from '../../button';
 import NoticeList from '../list';
-import type { NoticeProps, NoticeListProps } from '../types';
+import type { NoticeListProps } from '../types';
 
 const meta: ComponentMeta< typeof Notice > = {
 	title: 'Components/Notice',
@@ -27,26 +27,23 @@ const meta: ComponentMeta< typeof Notice > = {
 };
 export default meta;
 
-const Template = ( props: NoticeProps ) => {
+const Template: ComponentStory< typeof Notice > = ( props ) => {
 	return <Notice { ...props } />;
 };
 
-export const Default: ComponentStory< typeof Notice > = Template.bind( {} );
+export const Default = Template.bind( {} );
 Default.args = {
 	children: 'This is a notice.',
 };
 
-export const WithCustomSpokenMessage: ComponentStory< typeof Notice > =
-	Template.bind( {} );
+export const WithCustomSpokenMessage = Template.bind( {} );
 WithCustomSpokenMessage.args = {
 	...Default.args,
 	politeness: 'assertive',
 	spokenMessage: 'This is a notice with a custom spoken message',
 };
 
-export const WithJSXChildren: ComponentStory< typeof Notice > = Template.bind(
-	{}
-);
+export const WithJSXChildren = Template.bind( {} );
 WithJSXChildren.args = {
 	...Default.args,
 	children: (
@@ -63,7 +60,7 @@ WithJSXChildren.args = {
 	),
 };
 
-export const WithActions: ComponentStory< typeof Notice > = Template.bind( {} );
+export const WithActions = Template.bind( {} );
 WithActions.args = {
 	...Default.args,
 	actions: [
