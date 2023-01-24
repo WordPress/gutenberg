@@ -4,37 +4,42 @@
 import type { FormTokenFieldProps } from '../form-token-field/types';
 import type { TreeSelectProps } from '../tree-select/types';
 
-export type Entity = {
+export type Author = {
 	id: number;
 	name: string;
-	parent?: number | null;
-	value?: string;
 };
 
-export type EntityForTree = Omit< Entity, 'id' > & {
+export type Category = {
+	id: number;
+	name: string;
+	parent: number;
+};
+
+export type TermWithParentAndChildren = {
 	id: string;
+	name: string;
+	parent: number | null;
+	children: TermWithParentAndChildren[];
 };
 
-export type TermsWithChildren = Array<
-	EntityForTree & { children: EntityForTree[] }
->;
+export type TermsByParent = Record< string, TermWithParentAndChildren[] >;
 
 export type CategorySelectProps = Pick<
 	TreeSelectProps,
 	'label' | 'noOptionLabel'
 > & {
-	categoriesList: Entity[];
+	categoriesList: Category[];
 	onChange: ( newCategory: string ) => void;
-	selectedCategoryId?: Entity[ 'id' ];
+	selectedCategoryId?: Category[ 'id' ];
 };
 
 export type AuthorSelectProps = Pick<
 	TreeSelectProps,
 	'label' | 'noOptionLabel'
 > & {
-	authorList?: Entity[];
+	authorList?: Author[];
 	onChange: ( newAuthor: string ) => void;
-	selectedAuthorId?: Entity[ 'id' ];
+	selectedAuthorId?: Author[ 'id' ];
 };
 
 type Order = 'asc' | 'desc';
@@ -123,16 +128,13 @@ export type QueryControlsWithMultipleCategorySelectionProps =
 		 * An array of category names, renders a `FormTokenField` component
 		 * when passed in conjunction with `onCategoryChange`.
 		 */
-		categorySuggestions?: { [ categoryName: Entity[ 'name' ] ]: Entity };
+		categorySuggestions?: {
+			[ categoryName: Category[ 'name' ] ]: Category;
+		};
 		/**
 		 * The selected categories for the `categorySuggestions`.
 		 */
-		selectedCategories?: Array<
-			Omit< Entity, 'name' > & {
-				name?: string;
-				value: string;
-			}
-		>;
+		selectedCategories?: Category[];
 		/**
 		 * A function that receives the new category value.
 		 * If this is not specified, the category controls are not included.

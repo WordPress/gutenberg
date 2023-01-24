@@ -6,7 +6,12 @@ import { groupBy } from 'lodash';
 /**
  * Internal dependencies
  */
-import type { Entity, EntityForTree, TermsWithChildren } from './types';
+import type {
+	Author,
+	Category,
+	TermWithParentAndChildren,
+	TermsByParent,
+} from './types';
 
 /**
  * Returns terms in a tree form.
@@ -15,21 +20,27 @@ import type { Entity, EntityForTree, TermsWithChildren } from './types';
  *
  * @return Terms in tree format.
  */
-export function buildTermsTree( flatTerms: readonly Entity[] ) {
-	const flatTermsWithParentAndChildren = flatTerms.map( ( term ) => {
-		return {
-			children: [],
-			parent: null,
-			...term,
-			id: String( term.id ),
-		};
-	} );
+export function buildTermsTree( flatTerms: readonly ( Author | Category )[] ) {
+	const flatTermsWithParentAndChildren: TermWithParentAndChildren[] =
+		flatTerms.map( ( term ) => {
+			return {
+				children: [],
+				parent: null,
+				...term,
+				id: String( term.id ),
+			};
+		} );
 
-	const termsByParent = groupBy( flatTermsWithParentAndChildren, 'parent' );
+	const termsByParent: TermsByParent = groupBy(
+		flatTermsWithParentAndChildren,
+		'parent'
+	);
 	if ( termsByParent.null && termsByParent.null.length ) {
 		return flatTermsWithParentAndChildren;
 	}
-	const fillWithChildren = ( terms: EntityForTree[] ): TermsWithChildren => {
+	const fillWithChildren = (
+		terms: TermWithParentAndChildren[]
+	): TermWithParentAndChildren[] => {
 		return terms.map( ( term ) => {
 			const children = termsByParent[ term.id ];
 			return {

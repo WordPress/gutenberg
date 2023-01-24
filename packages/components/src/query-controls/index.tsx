@@ -148,6 +148,10 @@ export function QueryControls( {
 								props.selectedCategories &&
 								props.selectedCategories.map( ( item ) => ( {
 									id: item.id,
+									// Keeping the fallback to `item.value` for legacy reasons,
+									// even if items of `selectedCategories` should not have a
+									// `value` property.
+									// @ts-expect-error
 									value: item.name || item.value,
 								} ) )
 							}
