@@ -140,7 +140,7 @@ An array of categories, renders a `CategorySelect` sub-component when passed in 
 -   Required: No
 -   Platform: Web
 
-#### `categorySuggestions`: `{ [ categoryName: Category[ 'name' ] ]: Category }`
+#### `categorySuggestions`: `Record< Category[ 'name' ], Category >`
 
 An object of categories, renders a `FormTokenField` component when passed in conjunction with `onCategoryChange`.
 

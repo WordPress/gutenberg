@@ -47,18 +47,17 @@ type OrderBy = 'date' | 'title';
 
 type BaseQueryControlsProps = {
 	/**
-	 * An array of authors that is passed into
-	 * an `AuthorSelect` sub-component.
+	 * An array of the authors to select from.
 	 */
 	authorList?: AuthorSelectProps[ 'authorList' ];
 	/**
-	 * The maximum items.
+	 * The maximum number of items.
 	 *
 	 * @default 100
 	 */
 	maxItems?: number;
 	/**
-	 * The minimum of items.
+	 * The minimum number of items.
 	 *
 	 * @default 1
 	 */
@@ -69,24 +68,24 @@ type BaseQueryControlsProps = {
 	numberOfItems?: number;
 	/**
 	 * A function that receives the new author value.
-	 * If this is not specified, the author controls are not included.
+	 * If this prop is not specified, the author controls are not included.
 	 */
 	onAuthorChange?: AuthorSelectProps[ 'onChange' ];
 	/**
 	 * A function that receives the new number of items value.
-	 * If this is not specified, then the number of items
+	 * If this prop is not specified, then the number of items
 	 * range control is not included.
 	 */
 	onNumberOfItemsChange?: ( newNumber?: number ) => void;
 	/**
 	 * A function that receives the new order value.
-	 * If this or onOrderByChange are not specified,
+	 * If this prop or the `onOrderByChange` prop are not specified,
 	 * then the order controls are not included.
 	 */
 	onOrderChange?: ( newOrder: Order ) => void;
 	/**
 	 * A function that receives the new orderby value.
-	 * If this or onOrderChange are not specified,
+	 * If this prop or the `onOrderChange` prop are not specified,
 	 * then the order controls are not included.
 	 */
 	onOrderByChange?: ( newOrderBy: OrderBy ) => void;
@@ -107,17 +106,17 @@ type BaseQueryControlsProps = {
 export type QueryControlsWithSingleCategorySelectionProps =
 	BaseQueryControlsProps & {
 		/**
-		 * An array of categories, renders a `CategorySelect`
-		 * sub-component when passed in conjunction with `onCategoryChange`.
+		 * An array of categories, renders UI that allows selecting one category at
+		 * a time when passed in conjunction with the `onCategoryChange` prop.
 		 */
 		categoriesList?: CategorySelectProps[ 'categoriesList' ];
 		/**
-		 * The selected category for the `categoriesList`.
+		 * The selected category for the `categoriesList` prop.
 		 */
 		selectedCategoryId?: CategorySelectProps[ 'selectedCategoryId' ];
 		/**
 		 * A function that receives the new category value.
-		 * If this is not specified, the category controls are not included.
+		 * If this prop is not specified, the category controls are not included.
 		 */
 		onCategoryChange?: CategorySelectProps[ 'onChange' ];
 	};
@@ -125,14 +124,12 @@ export type QueryControlsWithSingleCategorySelectionProps =
 export type QueryControlsWithMultipleCategorySelectionProps =
 	BaseQueryControlsProps & {
 		/**
-		 * An array of category names, renders a `FormTokenField` component
-		 * when passed in conjunction with `onCategoryChange`.
+		 * An array of category names, renders UI that enables multiple selection
+		 * when passed in conjunction with the `onCategoryChange` prop.
 		 */
-		categorySuggestions?: {
-			[ categoryName: Category[ 'name' ] ]: Category;
-		};
+		categorySuggestions?: Record< Category[ 'name' ], Category >;
 		/**
-		 * The selected categories for the `categorySuggestions`.
+		 * The selected categories for the `categorySuggestions` prop.
 		 */
 		selectedCategories?: Category[];
 		/**
