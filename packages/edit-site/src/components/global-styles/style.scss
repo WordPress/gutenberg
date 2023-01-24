@@ -209,6 +209,15 @@ $block-preview-height: 150px;
 	}
 }
 
+// wrapper to clip the shadow beyond 6px
+.edit-site-global-styles__shadow-indicator-wrapper {
+	padding: 6px;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
 // These styles are similar to the color palette.
 .edit-site-global-styles__shadow-indicator {
 	color: $gray-800;
@@ -217,7 +226,6 @@ $block-preview-height: 150px;
 	cursor: pointer;
 	padding: 0;
 
-	// This should match the value of $color-palette-circle-size.
-	height: 28px;
-	width: 28px;
+	height: 24px;
+	width: 24px;
 }

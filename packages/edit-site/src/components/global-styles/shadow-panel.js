@@ -18,7 +18,6 @@ import {
 	Dropdown,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	Button,
-	BaseControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { shadow as shadowIcon, Icon, check } from '@wordpress/icons';
@@ -60,7 +59,7 @@ export default function ShadowPanel( { name, variationPath = '' } ) {
 	return (
 		<ToolsPanel label={ __( 'Shadow' ) } resetAll={ resetAll }>
 			<ToolsPanelItem
-				label={ __( 'Drop shadow' ) }
+				label={ __( 'Shadow' ) }
 				hasValue={ hasShadow }
 				onDeselect={ resetShadow }
 				isShownByDefault
@@ -113,7 +112,7 @@ function renderShadowToggle() {
 				<HStack justify="flex-start">
 					<IconWithCurrentColor icon={ shadowIcon } size={ 24 } />
 					<FlexItem className="edit-site-global-styles__shadow-label">
-						{ __( 'Drop shadow' ) }
+						{ __( 'Shadow' ) }
 					</FlexItem>
 				</HStack>
 			</Button>
@@ -128,21 +127,17 @@ function ShadowPopoverContainer( { shadow, onShadowChange } ) {
 		'shadow.defaultPresets'
 	);
 
+	const shadows = [
+		...( defaultPresetsEnabled ? defaultShadows : [] ),
+		...( themeShadows || [] ),
+	];
+
 	return (
 		<div className="edit-site-global-styles__shadow-panel">
 			<VStack spacing={ 4 }>
-				<Heading level={ 5 }>{ __( 'Drop shadows' ) }</Heading>
-				{ defaultPresetsEnabled && (
-					<ShadowPresets
-						label={ __( 'Default' ) }
-						presets={ defaultShadows }
-						activeShadow={ shadow }
-						onSelect={ onShadowChange }
-					/>
-				) }
+				<Heading level={ 5 }>{ __( 'Shadows' ) }</Heading>
 				<ShadowPresets
-					label={ __( 'Theme' ) }
-					presets={ themeShadows }
+					presets={ shadows }
 					activeShadow={ shadow }
 					onSelect={ onShadowChange }
 				/>
@@ -151,35 +146,27 @@ function ShadowPopoverContainer( { shadow, onShadowChange } ) {
 	);
 }
 
-function ShadowPresets( { label, presets, activeShadow, onSelect } ) {
+function ShadowPresets( { presets, activeShadow, onSelect } ) {
 	return ! presets ? null : (
-		<div>
-			<BaseControl.VisualLabel as="legend">
-				{ label }
-			</BaseControl.VisualLabel>
-
-			<Grid columns={ 6 }>
-				{ presets.map( ( { name, shadow }, i ) => (
-					<ShadowIndicator
-						key={ i }
-						label={ name }
-						isActive={ shadow === activeShadow }
-						onSelect={ () =>
-							onSelect(
-								shadow === activeShadow ? undefined : shadow
-							)
-						}
-						shadow={ shadow }
-					/>
-				) ) }
-			</Grid>
-		</div>
+		<Grid columns={ 6 } gap={ 0 } align="center" justify="center">
+			{ presets.map( ( { name, shadow }, i ) => (
+				<ShadowIndicator
+					key={ i }
+					label={ name }
+					isActive={ shadow === activeShadow }
+					onSelect={ () =>
+						onSelect( shadow === activeShadow ? undefined : shadow )
+					}
+					shadow={ shadow }
+				/>
+			) ) }
+		</Grid>
 	);
 }
 
 function ShadowIndicator( { label, isActive, onSelect, shadow } ) {
 	return (
-		<>
+		<div className="edit-site-global-styles__shadow-indicator-wrapper">
 			<Button
 				className="edit-site-global-styles__shadow-indicator"
 				onClick={ onSelect }
@@ -188,6 +175,6 @@ function ShadowIndicator( { label, isActive, onSelect, shadow } ) {
 			>
 				{ isActive && <Icon icon={ check } /> }
 			</Button>
-		</>
+		</div>
 	);
 }
