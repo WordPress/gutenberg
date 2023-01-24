@@ -72,6 +72,21 @@ function BlockStyleVariationsScreens( { name } ) {
 	) );
 }
 
+function BlockStylesNavigationScreens( {
+	parentMenu,
+	blockStyles,
+	blockName,
+} ) {
+	return blockStyles.map( ( style, index ) => (
+		<GlobalStylesNavigationScreen
+			key={ index }
+			path={ parentMenu + '/variations/' + style.name }
+		>
+			<ScreenVariation blockName={ blockName } style={ style } />
+		</GlobalStylesNavigationScreen>
+	) );
+}
+
 function ContextScreens( { name, parentMenu = '' } ) {
 	const hasVariationPath = parentMenu.search( 'variations' );
 	const variationPath =
@@ -88,17 +103,6 @@ function ContextScreens( { name, parentMenu = '' } ) {
 		},
 		[ name ]
 	);
-
-	const BlockStylesNavigationScreens = ( { blockStyles, blockName } ) => {
-		return blockStyles.map( ( style, index ) => (
-			<GlobalStylesNavigationScreen
-				key={ index }
-				path={ parentMenu + '/variations/' + style.name }
-			>
-				<ScreenVariation blockName={ blockName } style={ style } />
-			</GlobalStylesNavigationScreen>
-		) );
-	};
 
 	return (
 		<>
@@ -198,6 +202,7 @@ function ContextScreens( { name, parentMenu = '' } ) {
 
 			{ !! blockStyleVariations?.length && (
 				<BlockStylesNavigationScreens
+					parentMenu={ parentMenu }
 					blockStyles={ blockStyleVariations }
 					blockName={ name }
 				/>
