@@ -70,7 +70,7 @@ class Gutenberg_REST_Block_Pattern_Categories_Controller extends WP_REST_Block_P
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
-				'editors' => array(
+				'editors'     => array(
 					'description' => __( 'The editors this category is allowed to be shown on.', 'gutenberg' ),
 					'type'        => 'array',
 					'readonly'    => true,
