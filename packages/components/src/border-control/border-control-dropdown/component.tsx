@@ -24,7 +24,8 @@ import { useBorderControlDropdown } from './hook';
 import { StyledLabel } from '../../base-control/styles/base-control-styles';
 import DropdownContentWrapper from '../../dropdown/dropdown-content-wrapper';
 
-import type { ColorObject, PaletteObject } from '../../color-palette/types';
+import type { ColorObject } from '../../color-palette/types';
+import { isMultiplePaletteArray } from '../../color-palette/utils';
 import type { DropdownProps as DropdownComponentProps } from '../../dropdown/types';
 import type { ColorProps, DropdownProps } from '../types';
 
@@ -32,14 +33,15 @@ const getColorObject = (
 	colorValue: CSSProperties[ 'borderColor' ],
 	colors: ColorProps[ 'colors' ] | undefined
 ) => {
-	if ( ! colorValue || ! colors || colors.length === 0 ) {
+	if ( ! colorValue || ! colors ) {
 		return;
 	}
 
-	if ( ( colors as PaletteObject[] )[ 0 ].colors !== undefined ) {
+	if ( isMultiplePaletteArray( colors ) ) {
+		// Multiple origins
 		let matchedColor;
 
-		( colors as PaletteObject[] ).some( ( origin ) =>
+		colors.some( ( origin ) =>
 			origin.colors.some( ( color ) => {
 				if ( color.color === colorValue ) {
 					matchedColor = color;
@@ -53,9 +55,8 @@ const getColorObject = (
 		return matchedColor;
 	}
 
-	return ( colors as ColorObject[] ).find(
-		( color ) => color.color === colorValue
-	);
+	// Single origin
+	return colors.find( ( color ) => color.color === colorValue );
 };
 
 const getToggleAriaLabel = (
