@@ -190,14 +190,29 @@
 			"defaultPresets": true,
 			"presets": [
 				{
-					"name": "Elevated",
-					"slug": "elevated",
-					"shadow": "rgba(0, 0, 0, 0.4) 0 2rem 4rem 0, rgba(0, 0, 0, 0.6) 0 1rem 2rem 0"
+					"name": "Natural",
+					"slug": "natural",
+					"shadow": "6px 6px 9px rgba(0, 0, 0, 0.2)"
 				},
 				{
-					"name": "Near",
-					"slug": "near",
-					"shadow": "rgba(0, 0, 0, 0.3) 0 0.25rem 0.5rem 0, rgba(0, 0, 0, 0.4) 0 0.05rem 0.2rem 0px"
+					"name": "Deep",
+					"slug": "deep",
+					"shadow": "12px 12px 50px rgba(0, 0, 0, 0.4)"
+				},
+				{
+					"name": "Sharp",
+					"slug": "sharp",
+					"shadow": "6px 6px 0px rgba(0, 0, 0, 0.2)"
+				},
+				{
+					"name": "Outlined",
+					"slug": "outlined",
+					"shadow": "6px 6px 0px -3px rgba(255, 255, 255, 1), 6px 6px rgba(0, 0, 0, 1)"
+				},
+				{
+					"name": "Crisp",
+					"slug": "crisp",
+					"shadow": "6px 6px 0px rgba(0, 0, 0, 1)"
 				}
 			]
 		},
