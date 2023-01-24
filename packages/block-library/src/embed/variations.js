@@ -168,7 +168,7 @@ const variations = [
 		keywords: [ 'polldaddy', __( 'survey' ) ],
 		description: __( 'Embed Crowdsignal (formerly Polldaddy) content.' ),
 		patterns: [
-			/^https?:\/\/((.+\.)?polldaddy\.com|poll\.fm|.+\.survey\.fm)\/.+/i,
+			/^https?:\/\/((.+\.)?polldaddy\.com|poll\.fm|.+\.crowdsignal\.net|.+\.survey\.fm)\/.+/i,
 		],
 		attributes: { providerNameSlug: 'crowdsignal', responsive: true },
 	},
