@@ -397,19 +397,19 @@ describe( 'Button', () => {
 	} );
 
 	describe( 'static typing', () => {
-		it( 'should have the right props', () => {
-			render( <Button href="foo" /> );
-			// @ts-expect-error - `target` requires `href`
-			render( <Button target="foo" /> );
-			// @ts-expect-error - `disabled` is only for buttons
-			render( <Button href="foo" disabled /> );
-			render( <Button href="foo" type="image/png" /> );
-			// @ts-expect-error - if button, type must be submit/reset/button
-			render( <Button type="image/png" /> );
-			// @ts-expect-error
-			render( <Button type="invalidtype" /> );
-			// @ts-expect-error - although the runtime behavior will allow this to be an anchor, this is probably a mistake.
-			render( <Button disabled __experimentalIsFocusable href="foo" /> );
-		} );
+		<>
+			<Button href="foo" />
+			{ /* @ts-expect-error - `target` requires `href` */ }
+			<Button target="foo" />
+			{ /* @ts-expect-error - `disabled` is only for buttons */ }
+			<Button href="foo" disabled />
+			<Button href="foo" type="image/png" />
+			{ /* @ts-expect-error - if button, type must be submit/reset/button */ }
+			<Button type="image/png" />
+			{ /* @ts-expect-error */ }
+			<Button type="invalidtype" />
+			{ /* @ts-expect-error - although the runtime behavior will allow this to be an anchor, this is probably a mistake. */ }
+			<Button disabled __experimentalIsFocusable href="foo" />
+		</>;
 	} );
 } );
