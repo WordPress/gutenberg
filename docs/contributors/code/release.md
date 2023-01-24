@@ -58,8 +58,8 @@ You can find some more tips on writing the release notes and post in the section
 At any point after the release candidate has been published but before the final stable release, some bugs related to this release might be fixed and committed to `trunk`. These fixes won't automatically be incorporated into the final stable release, including them is a manual process.
 
 There are a couple of ways a release coordinator might be made aware of these bugs:
-- You may receive a direct message or a ping in the #core-editor channel in slack notifying you of PRs that need to be included in the release candidate.
 - Contributors may add the `Backport to Gutenberg RC` label to a closed PR. [https://github.com/WordPress/gutenberg/pulls?q=is%3Apr+label%3A%22Backport+to+Gutenberg+RC%22+is%3Aclosed](Do a search for any of these PRs) before publishing the final release.
+- You may receive a direct message or a ping in the #core-editor channel in slack notifying you of PRs that need to be included in the release candidate. Even when this is the case, the `Backport to Gutenberg RC` should be added to the PR.
 
 The cherry-picking process is handled as follows:
 1. Checkout the corresponding release branch with: `git checkout release/x.x`.
