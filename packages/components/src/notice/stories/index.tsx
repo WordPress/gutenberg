@@ -20,19 +20,6 @@ const meta: ComponentMeta< typeof Notice > = {
 	title: 'Components/Notice',
 	component: Notice,
 	subcomponents: { NoticeList },
-	argTypes: {
-		onDismiss: { control: { type: null } },
-		onRemove: { control: { type: null } },
-		politeness: {
-			control: 'radio',
-			options: [ 'assertive', 'polite' ],
-		},
-		spokenMessage: { control: 'text' },
-		status: {
-			control: 'radio',
-			options: [ 'warning', 'success', 'error', 'info' ],
-		},
-	},
 	parameters: {
 		controls: { expanded: true },
 		docs: { source: { state: 'open' } },
