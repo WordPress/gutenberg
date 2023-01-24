@@ -9,6 +9,8 @@
  * Registers the block pattern categories.
  */
 function gutenberg_register_core_block_patterns_categories() {
+	// Register universal block pattern categories
+	// Available in post and site editor.
 	register_block_pattern_category(
 		'banner',
 		array(
@@ -51,7 +53,8 @@ function gutenberg_register_core_block_patterns_categories() {
 		)
 	);
 
-	// Register new core block pattern categories.
+	// Register new universal core block pattern categories.
+	// Available in post and site editor.
 	register_block_pattern_category(
 		'call-to-action',
 		array(
@@ -122,7 +125,9 @@ function gutenberg_register_core_block_patterns_categories() {
 			'description' => __( 'Display your latest posts in lists, grids or other layouts.', 'gutenberg' ),
 		)
 	);
-	// Site building pattern categories.
+
+	// Register site building pattern categories.
+	// Available in site editor.
 	register_block_pattern_category(
 		'footer',
 		array(
