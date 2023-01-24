@@ -134,6 +134,7 @@ function gutenberg_register_core_block_patterns_categories() {
 		array(
 			'label'       => _x( 'Footers', 'Block pattern category', 'gutenberg' ),
 			'description' => __( 'A variety of footer designs displaying information and site navigation.', 'gutenberg' ),
+			'editors'     => array( 'core/site' ),
 		)
 	);
 	register_block_pattern_category(
