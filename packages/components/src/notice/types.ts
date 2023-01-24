@@ -27,6 +27,10 @@ export type NoticeChildren = string | JSX.Element;
 
 export type NoticeProps = {
 	/**
+	 * A CSS `class` to give to the wrapper element.
+	 */
+	className?: string;
+	/**
 	 * The displayed message of a notice. Also used as the spoken message for
 	 * assistive technology, unless `spokenMessage` is provided as an alternative message.
 	 */
