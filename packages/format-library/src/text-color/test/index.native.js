@@ -150,11 +150,11 @@ describe( 'Text color', () => {
 	it( 'supports old text color format using "span" tag', async () => {
 		await initializeEditor( {
 			initialHtml: `<!-- wp:paragraph -->
-			<p>this <span class="has-inline-color has-green-color">is</span> <span class="has-inline-color has-red-color">test</span></p>
+			<p class="wp-block-paragraph">this <span class="has-inline-color has-green-color">is</span> <span class="has-inline-color has-red-color">test</span></p>
 			<!-- /wp:paragraph -->
 
 			<!-- wp:paragraph -->
-			<p><span style="color:#08a5e9" class="has-inline-color">this is a test</span></p>
+			<p class="wp-block-paragraph"><span style="color:#08a5e9" class="has-inline-color">this is a test</span></p>
 			<!-- /wp:paragraph -->`,
 		} );
 
