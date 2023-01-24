@@ -74,7 +74,7 @@ export default function PostTemplateEdit( {
 	context: {
 		query: {
 			perPage,
-			offset,
+			offset = 0,
 			postType,
 			order,
 			orderBy,

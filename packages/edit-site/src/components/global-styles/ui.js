@@ -192,6 +192,10 @@ function ContextScreens( { name, parentMenu = '' } ) {
 				<ScreenLayout name={ name } variationPath={ variationPath } />
 			</GlobalStylesNavigationScreen>
 
+			<GlobalStylesNavigationScreen path={ parentMenu + '/css' }>
+				<ScreenCSS name={ name } />
+			</GlobalStylesNavigationScreen>
+
 			{ !! blockStyleVariations?.length && (
 				<BlockStylesNavigationScreens
 					blockStyles={ blockStyleVariations }
@@ -280,9 +284,6 @@ function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
 			{ isStyleBookOpened && (
 				<GlobalStylesStyleBook onClose={ onCloseStyleBook } />
 			) }
-			<GlobalStylesNavigationScreen path="/css">
-				<ScreenCSS />
-			</GlobalStylesNavigationScreen>
 		</NavigatorProvider>
 	);
 }

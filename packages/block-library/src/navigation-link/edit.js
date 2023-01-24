@@ -312,12 +312,17 @@ export default function NavigationLinkEdit( {
 	 */
 	function removeLink() {
 		// Reset all attributes that comprise the link.
+		// It is critical that all attributes are reset
+		// to their default values otherwise this may
+		// in advertently trigger side effects because
+		// the values will have "changed".
 		setAttributes( {
-			url: '',
-			label: '',
-			id: '',
-			kind: '',
-			type: '',
+			url: undefined,
+			label: undefined,
+			id: undefined,
+			kind: undefined,
+			type: undefined,
+			opensInNewTab: false,
 		} );
 
 		// Close the link editing UI.

@@ -11,6 +11,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import {
 	InspectorAdvancedControls,
 	store as blockEditorStore,
+	experiments as blockEditorExperiments,
 } from '@wordpress/block-editor';
 import { BaseControl, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -26,11 +27,68 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import { getSupportedGlobalStylesPanels } from '../../components/global-styles/hooks';
-import { GlobalStylesContext } from '../../components/global-styles/context';
-import {
-	STYLE_PATH_TO_CSS_VAR_INFIX,
-	STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE,
-} from '../../components/global-styles/utils';
+import { unlock } from '../../experiments';
+
+const { GlobalStylesContext } = unlock( blockEditorExperiments );
+
+// TODO: Temporary duplication of constant in @wordpress/block-editor. Can be
+// removed by moving PushChangesToGlobalStylesControl to
+// @wordpress/block-editor.
+const STYLE_PATH_TO_CSS_VAR_INFIX = {
+	'color.background': 'color',
+	'color.text': 'color',
+	'elements.link.color.text': 'color',
+	'elements.link.:hover.color.text': 'color',
+	'elements.link.typography.fontFamily': 'font-family',
+	'elements.link.typography.fontSize': 'font-size',
+	'elements.button.color.text': 'color',
+	'elements.button.color.background': 'color',
+	'elements.button.typography.fontFamily': 'font-family',
+	'elements.button.typography.fontSize': 'font-size',
+	'elements.heading.color': 'color',
+	'elements.heading.color.background': 'color',
+	'elements.heading.typography.fontFamily': 'font-family',
+	'elements.heading.gradient': 'gradient',
+	'elements.heading.color.gradient': 'gradient',
+	'elements.h1.color': 'color',
+	'elements.h1.color.background': 'color',
+	'elements.h1.typography.fontFamily': 'font-family',
+	'elements.h1.color.gradient': 'gradient',
+	'elements.h2.color': 'color',
+	'elements.h2.color.background': 'color',
+	'elements.h2.typography.fontFamily': 'font-family',
+	'elements.h2.color.gradient': 'gradient',
+	'elements.h3.color': 'color',
+	'elements.h3.color.background': 'color',
+	'elements.h3.typography.fontFamily': 'font-family',
+	'elements.h3.color.gradient': 'gradient',
+	'elements.h4.color': 'color',
+	'elements.h4.color.background': 'color',
+	'elements.h4.typography.fontFamily': 'font-family',
+	'elements.h4.color.gradient': 'gradient',
+	'elements.h5.color': 'color',
+	'elements.h5.color.background': 'color',
+	'elements.h5.typography.fontFamily': 'font-family',
+	'elements.h5.color.gradient': 'gradient',
+	'elements.h6.color': 'color',
+	'elements.h6.color.background': 'color',
+	'elements.h6.typography.fontFamily': 'font-family',
+	'elements.h6.color.gradient': 'gradient',
+	'color.gradient': 'gradient',
+	'typography.fontSize': 'font-size',
+	'typography.fontFamily': 'font-family',
+};
+
+// TODO: Temporary duplication of constant in @wordpress/block-editor. Can be
+// removed by moving PushChangesToGlobalStylesControl to
+// @wordpress/block-editor.
+const STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE = {
+	'color.background': 'backgroundColor',
+	'color.text': 'textColor',
+	'color.gradient': 'gradient',
+	'typography.fontSize': 'fontSize',
+	'typography.fontFamily': 'fontFamily',
+};
 
 function getChangesToPush( name, attributes ) {
 	return getSupportedGlobalStylesPanels( name ).flatMap( ( key ) => {
