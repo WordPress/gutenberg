@@ -28,7 +28,9 @@ import ScreenHeader from './header';
 import { NavigationButtonAsItem } from './navigation-button';
 import { unlock } from '../../experiments';
 
-const { useHasTypographyPanel } = unlock( blockEditorExperiments );
+const { useHasTypographyPanel, useGlobalSetting } = unlock(
+	blockEditorExperiments
+);
 
 function useSortedBlockTypes() {
 	const blockItems = useSelect(
@@ -54,7 +56,8 @@ function useSortedBlockTypes() {
 }
 
 function BlockMenuItem( { block } ) {
-	const hasTypographyPanel = useHasTypographyPanel( block.name );
+	const [ settings ] = useGlobalSetting( '', block.name );
+	const hasTypographyPanel = useHasTypographyPanel( block.name, settings );
 	const hasColorPanel = useHasColorPanel( block.name );
 	const hasBorderPanel = useHasBorderPanel( block.name );
 	const hasDimensionsPanel = useHasDimensionsPanel( block.name );

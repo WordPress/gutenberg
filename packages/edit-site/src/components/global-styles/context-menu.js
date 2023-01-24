@@ -36,10 +36,13 @@ import { ScreenVariations } from './screen-variations';
 import { useHasShadowControl } from './shadow-panel';
 import { unlock } from '../../experiments';
 
-const { useHasTypographyPanel } = unlock( blockEditorExperiments );
+const { useHasTypographyPanel, useGlobalSetting } = unlock(
+	blockEditorExperiments
+);
 
 function ContextMenu( { name, parentMenu = '' } ) {
-	const hasTypographyPanel = useHasTypographyPanel( name );
+	const [ settings ] = useGlobalSetting( '', name );
+	const hasTypographyPanel = useHasTypographyPanel( name, settings );
 	const hasColorPanel = useHasColorPanel( name );
 	const hasBorderPanel = useHasBorderPanel( name );
 	const hasEffectsPanel = useHasShadowControl( name );

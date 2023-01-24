@@ -8,9 +8,11 @@ import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
  */
 import { unlock } from '../../experiments';
 
-const { useGlobalStyle, TypographyPanel: StylesTypographyPanel } = unlock(
-	blockEditorExperiments
-);
+const {
+	useGlobalStyle,
+	useGlobalSetting,
+	TypographyPanel: StylesTypographyPanel,
+} = unlock( blockEditorExperiments );
 
 export default function TypographyPanel( {
 	name,
@@ -29,16 +31,17 @@ export default function TypographyPanel( {
 			? `variations.${ variation }.${ prefix }`
 			: `variations.${ variation }`;
 	}
+
 	const [ style, setStyle ] = useGlobalStyle( prefix, name );
 	const [ inheritedStyle ] = useGlobalStyle( prefix, name, 'user' );
+	const [ settings ] = useGlobalSetting( '', name );
 
 	return (
 		<StylesTypographyPanel
 			inherit={ inheritedStyle }
 			value={ style }
 			onChange={ setStyle }
-			name={ name }
-			element={ element === 'heading' ? headingLevel : element }
+			settings={ settings }
 		/>
 	);
 }
