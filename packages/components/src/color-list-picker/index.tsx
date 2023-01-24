@@ -12,6 +12,7 @@ import ColorPalette from '../color-palette';
 import ColorIndicator from '../color-indicator';
 import Icon from '../icon';
 import { HStack } from '../h-stack';
+import type { ColorListPickerProps, ColorOptionProps } from './types';
 
 function ColorOption( {
 	label,
@@ -20,7 +21,7 @@ function ColorOption( {
 	disableCustomColors,
 	enableAlpha,
 	onChange,
-} ) {
+}: ColorOptionProps ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 	return (
 		<>
@@ -62,7 +63,7 @@ function ColorListPicker( {
 	disableCustomColors,
 	enableAlpha,
 	onChange,
-} ) {
+}: ColorListPickerProps ) {
 	return (
 		<div className="components-color-list-picker">
 			{ labels.map( ( label, index ) => (

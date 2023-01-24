@@ -13,6 +13,7 @@ const CORE_MODULES_USING_EXPERIMENTS = [
 	'@wordpress/data',
 	'@wordpress/blocks',
 	'@wordpress/block-editor',
+	'@wordpress/edit-site',
 ];
 
 /**
