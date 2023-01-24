@@ -2,7 +2,9 @@
  * External dependencies
  */
 import type { RefObject } from 'react';
-import { colord } from 'colord';
+import { colord, extend } from 'colord';
+import namesPlugin from 'colord/plugins/names';
+import a11yPlugin from 'colord/plugins/a11y';
 
 /**
  * WordPress dependencies
@@ -13,6 +15,8 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import type { ColorObject, ColorPaletteProps, PaletteObject } from './types';
+
+extend( [ namesPlugin, a11yPlugin ] );
 
 export const extractColorNameFromCurrentValue = (
 	currentValue?: ColorPaletteProps[ 'value' ],
