@@ -5,10 +5,15 @@ import {
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
 	__experimentalUseNavigator as useNavigator,
+	createSlotFill,
+	DropdownMenu,
 } from '@wordpress/components';
 import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
-import { usePrevious } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+import { __ } from '@wordpress/i18n';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { moreVertical } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -31,6 +36,43 @@ import { ScreenVariation } from './screen-variations';
 import ScreenBorder from './screen-border';
 import StyleBook from '../style-book';
 import ScreenCSS from './screen-css';
+import { unlock } from '../../experiments';
+
+const SLOT_FILL_NAME = 'GlobalStylesMenu';
+const { Slot: GlobalStylesMenuSlot, Fill: GlobalStylesMenuFill } =
+	createSlotFill( SLOT_FILL_NAME );
+
+function GlobalStylesMenu() {
+	const { toggle } = useDispatch( preferencesStore );
+	const { useGlobalStylesReset } = unlock( blockEditorExperiments );
+	const [ canReset, onReset ] = useGlobalStylesReset();
+	const { goTo } = useNavigator();
+	const loadCustomCSS = () => goTo( '/css' );
+	return (
+		<GlobalStylesMenuFill>
+			<DropdownMenu
+				icon={ moreVertical }
+				label={ __( 'More Styles actions' ) }
+				controls={ [
+					{
+						title: __( 'Reset to defaults' ),
+						onClick: onReset,
+						isDisabled: ! canReset,
+					},
+					{
+						title: __( 'Additional CSS' ),
+						onClick: loadCustomCSS,
+					},
+					{
+						title: __( 'Welcome Guide' ),
+						onClick: () =>
+							toggle( 'core/edit-site', 'welcomeGuideStyles' ),
+					},
+				] }
+			/>
+		</GlobalStylesMenuFill>
+	);
+}
 
 function GlobalStylesNavigationScreen( { className, ...props } ) {
 	return (
@@ -239,26 +281,7 @@ function GlobalStylesStyleBook( { onClose } ) {
 	);
 }
 
-function NavigatorControl( { navigatorPath, setNavigatorPath } ) {
-	const { goTo, location } = useNavigator();
-	const previousNavigatorPath = usePrevious( navigatorPath );
-
-	if (
-		navigatorPath !== previousNavigatorPath &&
-		previousNavigatorPath !== '/css' &&
-		location.isBack !== true
-	) {
-		goTo( navigatorPath );
-		setNavigatorPath( '/' );
-	}
-}
-
-function GlobalStylesUI( {
-	isStyleBookOpened,
-	onCloseStyleBook,
-	navigatorPath,
-	setNavigatorPath,
-} ) {
+function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
 	const blocks = getBlockTypes();
 
 	return (
@@ -286,10 +309,7 @@ function GlobalStylesUI( {
 					<ScreenBlock name={ block.name } />
 				</GlobalStylesNavigationScreen>
 			) ) }
-			<NavigatorControl
-				navigatorPath={ navigatorPath }
-				setNavigatorPath={ setNavigatorPath }
-			/>
+
 			<ContextScreens />
 
 			{ blocks.map( ( block ) => (
@@ -311,8 +331,12 @@ function GlobalStylesUI( {
 			{ isStyleBookOpened && (
 				<GlobalStylesStyleBook onClose={ onCloseStyleBook } />
 			) }
+			<GlobalStylesNavigationScreen path="/css">
+				<ScreenCSS />
+			</GlobalStylesNavigationScreen>
+			<GlobalStylesMenu />
 		</NavigatorProvider>
 	);
 }
-
+export { GlobalStylesMenuSlot };
 export default GlobalStylesUI;
