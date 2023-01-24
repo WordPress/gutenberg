@@ -19,11 +19,15 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 	}
 
 	$post_ID = $block->context['postId'];
-	$classes = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
-	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
-		$classes .= ' has-link-color';
+
+	$classes = array();
+	if ( isset( $attributes['textAlign'] ) ) {
+		$classes[] = 'has-text-align-' . $attributes['textAlign'];
 	}
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
+	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
+		$classes[] = 'has-link-color';
+	}
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
 
 	if ( isset( $attributes['displayType'] ) && 'modified' === $attributes['displayType'] ) {
 		$formatted_date   = get_the_modified_date( empty( $attributes['format'] ) ? '' : $attributes['format'], $post_ID );
