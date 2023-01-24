@@ -10,7 +10,14 @@ import a11yPlugin from 'colord/plugins/a11y';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { useCallback, useRef, useMemo, forwardRef } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useRef,
+	useMemo,
+	useState,
+	forwardRef,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -250,7 +257,17 @@ function UnforwardedColorPalette(
 		__experimentalIsRenderedInSidebar = false,
 		...otherProps
 	} = props;
+	const [ normalizedColorValue, setNormalizedColorValue ] = useState( value );
 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
+
+	useEffect( () => {
+		if ( ! customColorPaletteRef.current ) {
+			return;
+		}
+		setNormalizedColorValue(
+			normalizeColorValue( value, customColorPaletteRef )
+		);
+	}, [ value ] );
 
 	const hasMultipleColorOrigins =
 		colors.length > 0 &&
@@ -276,11 +293,6 @@ function UnforwardedColorPalette(
 		);
 		return null;
 	}
-
-	const normalizedColorValue = normalizeColorValue(
-		value,
-		customColorPaletteRef
-	);
 
 	const renderCustomColorPicker = () => (
 		<DropdownContentWrapper paddingSize="none">
