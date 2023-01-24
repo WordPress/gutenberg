@@ -557,6 +557,22 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_get_attribute_returns_updated_values_before_they_are_updated_with_different_name_casing() {
+		$p = new WP_HTML_Tag_Processor( self::HTML_SIMPLE );
+		$p->next_tag();
+		$p->set_attribute( 'test-ATTribute', 'test-value' );
+		$this->assertSame(
+			'test-value',
+			$p->get_attribute( 'test-attribute' ),
+			'get_attribute() (called before get_updated_html()) did not return attribute added via set_attribute()'
+		);
+		$this->assertSame(
+			'<div test-ATTribute="test-value" id="first"><span id="second">Text</span></div>',
+			$p->get_updated_html(),
+			'Updated HTML does not include attribute added via set_attribute()'
+		);
+	}
+
 	/**
 	 * @ticket 56299
 	 *
@@ -1044,10 +1060,12 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * When both set_attribute( 'class', $value ) and add_class( $different_value ) are called, the
+	 * When add_class( $different_value ) is called _after_ set_attribute( 'class', $value ), the
 	 * final class name should be "$value $different_value". In other words, the `add_class` call
-	 * should append its class to the one(s) set by `set_attribute`. This holds regardless of the
-	 * order in which these methods are called.
+	 * should append its class to the one(s) set by `set_attribute`. When `add_class( $different_value )`
+	 * is called _before_ `set_attribute( 'class', $value )`, however, the final class name should be
+	 * "$value" instead, as any direct updates to the `class` attribute supersede any changes enqueued
+	 * via the class builder methods.
 	 *
 	 * @ticket 56299
 	 *
@@ -1062,12 +1080,12 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 		$p->add_class( 'add_class' );
 		$p->set_attribute( 'class', 'set_attribute' );
 		$this->assertSame(
-			'<div class="set_attribute add_class" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
+			'<div class="set_attribute" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
 			$p->get_updated_html(),
 			"Calling get_updated_html after updating first tag's attributes did not return the expected HTML"
 		);
 		$this->assertSame(
-			'set_attribute add_class',
+			'set_attribute',
 			$p->get_attribute( 'class' ),
 			"Calling get_attribute after updating first tag's attributes did not return the expected class name"
 		);
@@ -1089,10 +1107,14 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * When both set_attribute( 'class', $value ) and add_class( $different_value ) are called, the
+	 * When add_class( $different_value ) is called _after_ set_attribute( 'class', $value ), the
 	 * final class name should be "$value $different_value". In other words, the `add_class` call
-	 * should append its class to the one(s) set by `set_attribute`. This holds regardless of the
-	 * order in which these methods are called, and even before `get_updated_html` is called.
+	 * should append its class to the one(s) set by `set_attribute`. When `add_class( $different_value )`
+	 * is called _before_ `set_attribute( 'class', $value )`, however, the final class name should be
+	 * "$value" instead, as any direct updates to the `class` attribute supersede any changes enqueued
+	 * via the class builder methods.
+	 *
+	 * This is still true if we read enqueued updates before calling `get_updated_html()`.
 	 *
 	 * @ticket 56299
 	 *
@@ -1107,12 +1129,12 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 		$p->add_class( 'add_class' );
 		$p->set_attribute( 'class', 'set_attribute' );
 		$this->assertSame(
-			'set_attribute add_class',
+			'set_attribute',
 			$p->get_attribute( 'class' ),
 			"Calling get_attribute after updating first tag's attributes did not return the expected class name"
 		);
 		$this->assertSame(
-			'<div class="set_attribute add_class" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
+			'<div class="set_attribute" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
 			$p->get_updated_html(),
 			"Calling get_updated_html after updating first tag's attributes did not return the expected HTML"
 		);
