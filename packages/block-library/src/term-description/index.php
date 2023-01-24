@@ -23,10 +23,11 @@ function render_block_core_term_description( $attributes ) {
 		return '';
 	}
 
-	$extra_attributes   = ( isset( $attributes['textAlign'] ) )
-		? array( 'class' => 'has-text-align-' . $attributes['textAlign'] )
-		: array();
-	$wrapper_attributes = get_block_wrapper_attributes( $extra_attributes );
+	$classes = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
+	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
+		$classes .= ' has-link-color';
+	}
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 
 	return '<div ' . $wrapper_attributes . '>' . $term_description . '</div>';
 }
