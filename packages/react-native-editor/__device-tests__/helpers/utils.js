@@ -12,8 +12,6 @@ const path = require( 'path' );
 const serverConfigs = require( './serverConfigs' );
 const { iosServer, iosLocal, android } = require( './caps' );
 const AppiumLocal = require( './appium-local' );
-// eslint-disable-next-line import/no-extraneous-dependencies
-const _ = require( 'underscore' );
 
 // Platform setup.
 const defaultPlatform = 'android';
@@ -95,7 +93,7 @@ const setupDriver = async () => {
 
 	let desiredCaps;
 	if ( isAndroid() ) {
-		desiredCaps = _.clone( android );
+		desiredCaps = { ...android };
 		if ( isLocalEnvironment() ) {
 			desiredCaps.app = path.resolve( localAndroidAppPath );
 			try {
@@ -117,10 +115,10 @@ const setupDriver = async () => {
 			desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.apk`; // App should be preloaded to sauce storage, this can also be a URL.
 		}
 	} else {
-		desiredCaps = _.clone( iosServer );
+		desiredCaps = { ...iosServer };
 		desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.app.zip`; // App should be preloaded to sauce storage, this can also be a URL.
 		if ( isLocalEnvironment() ) {
-			desiredCaps = _.clone( iosLocal );
+			desiredCaps = { ...iosLocal };
 
 			const iosPlatformVersions = getIOSPlatformVersions();
 			if ( iosPlatformVersions.length === 0 ) {
@@ -315,15 +313,21 @@ const clickElementOutsideOfTextInput = async ( driver, element ) => {
 };
 
 // Long press to activate context menu.
-const longPressMiddleOfElement = async ( driver, element ) => {
+const longPressMiddleOfElement = async (
+	driver,
+	element,
+	waitTime = 5000, // Setting to wait a bit longer because this is failing more frequently on the CI
+	customElementSize
+) => {
 	const location = await element.getLocation();
-	const size = await element.getSize();
+	const size = customElementSize || ( await element.getSize() );
 
 	const x = location.x + size.width / 2;
 	const y = location.y + size.height / 2;
+
 	const action = new wd.TouchAction( driver )
 		.longPress( { x, y } )
-		.wait( 5000 ) // Setting to wait a bit longer because this is failing more frequently on the CI
+		.wait( waitTime )
 		.release();
 	await action.perform();
 };

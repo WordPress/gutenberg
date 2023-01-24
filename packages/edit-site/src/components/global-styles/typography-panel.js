@@ -7,27 +7,32 @@ import {
 	__experimentalFontAppearanceControl as FontAppearanceControl,
 	__experimentalLetterSpacingControl as LetterSpacingControl,
 	__experimentalTextTransformControl as TextTransformControl,
+	__experimentalTextDecorationControl as TextDecorationControl,
+	experiments as blockEditorExperiments,
 } from '@wordpress/block-editor';
 import {
-	PanelBody,
 	FontSizePicker,
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-	__experimentalGrid as Grid,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+
 /**
  * Internal dependencies
  */
-import { getSupportedGlobalStylesPanels, useSetting, useStyle } from './hooks';
+import { getSupportedGlobalStylesPanels } from './hooks';
+import { unlock } from '../../experiments';
+
+const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 
 export function useHasTypographyPanel( name ) {
+	const hasFontFamily = useHasFontFamilyControl( name );
 	const hasLineHeight = useHasLineHeightControl( name );
 	const hasFontAppearance = useHasAppearanceControl( name );
 	const hasLetterSpacing = useHasLetterSpacingControl( name );
 	const supports = getSupportedGlobalStylesPanels( name );
 	return (
+		hasFontFamily ||
 		hasLineHeight ||
 		hasFontAppearance ||
 		hasLetterSpacing ||
@@ -35,10 +40,19 @@ export function useHasTypographyPanel( name ) {
 	);
 }
 
+function useHasFontFamilyControl( name ) {
+	const supports = getSupportedGlobalStylesPanels( name );
+	const [ fontFamilies ] = useGlobalSetting(
+		'typography.fontFamilies',
+		name
+	);
+	return supports.includes( 'fontFamily' ) && !! fontFamilies?.length;
+}
+
 function useHasLineHeightControl( name ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	return (
-		useSetting( 'typography.lineHeight', name )[ 0 ] &&
+		useGlobalSetting( 'typography.lineHeight', name )[ 0 ] &&
 		supports.includes( 'lineHeight' )
 	);
 }
@@ -46,16 +60,33 @@ function useHasLineHeightControl( name ) {
 function useHasAppearanceControl( name ) {
 	const supports = getSupportedGlobalStylesPanels( name );
 	const hasFontStyles =
-		useSetting( 'typography.fontStyle', name )[ 0 ] &&
+		useGlobalSetting( 'typography.fontStyle', name )[ 0 ] &&
 		supports.includes( 'fontStyle' );
 	const hasFontWeights =
-		useSetting( 'typography.fontWeight', name )[ 0 ] &&
+		useGlobalSetting( 'typography.fontWeight', name )[ 0 ] &&
 		supports.includes( 'fontWeight' );
 	return hasFontStyles || hasFontWeights;
 }
 
+function useAppearanceControlLabel( name ) {
+	const supports = getSupportedGlobalStylesPanels( name );
+	const hasFontStyles =
+		useGlobalSetting( 'typography.fontStyle', name )[ 0 ] &&
+		supports.includes( 'fontStyle' );
+	const hasFontWeights =
+		useGlobalSetting( 'typography.fontWeight', name )[ 0 ] &&
+		supports.includes( 'fontWeight' );
+	if ( ! hasFontStyles ) {
+		return __( 'Font weight' );
+	}
+	if ( ! hasFontWeights ) {
+		return __( 'Font style' );
+	}
+	return __( 'Appearance' );
+}
+
 function useHasLetterSpacingControl( name, element ) {
-	const setting = useSetting( 'typography.letterSpacing', name )[ 0 ];
+	const setting = useGlobalSetting( 'typography.letterSpacing', name )[ 0 ];
 	if ( ! setting ) {
 		return false;
 	}
@@ -67,7 +98,7 @@ function useHasLetterSpacingControl( name, element ) {
 }
 
 function useHasTextTransformControl( name, element ) {
-	const setting = useSetting( 'typography.textTransform', name )[ 0 ];
+	const setting = useGlobalSetting( 'typography.textTransform', name )[ 0 ];
 	if ( ! setting ) {
 		return false;
 	}
@@ -78,163 +109,226 @@ function useHasTextTransformControl( name, element ) {
 	return supports.includes( 'textTransform' );
 }
 
-export default function TypographyPanel( { name, element } ) {
-	const [ selectedLevel, setCurrentTab ] = useState( 'heading' );
-	const supports = getSupportedGlobalStylesPanels( name );
-	let prefix = '';
-	if ( element === 'heading' ) {
-		prefix = `elements.${ selectedLevel }.`;
-	} else if ( element && element !== 'text' ) {
-		prefix = `elements.${ element }.`;
-	}
-	const [ fontSizes ] = useSetting( 'typography.fontSizes', name );
-	const disableCustomFontSizes = ! useSetting(
-		'typography.customFontSize',
-		name
-	)[ 0 ];
-	const [ fontFamilies ] = useSetting( 'typography.fontFamilies', name );
-	const hasFontStyles =
-		useSetting( 'typography.fontStyle', name )[ 0 ] &&
-		supports.includes( 'fontStyle' );
-	const hasFontWeights =
-		useSetting( 'typography.fontWeight', name )[ 0 ] &&
-		supports.includes( 'fontWeight' );
-	const hasLineHeightEnabled = useHasLineHeightControl( name );
-	const hasAppearanceControl = useHasAppearanceControl( name );
-	const hasLetterSpacingControl = useHasLetterSpacingControl( name, element );
-	const hasTextTransformControl = useHasTextTransformControl( name, element );
+function useHasTextDecorationControl( name, element ) {
+	// This is an exception for link elements.
+	// We shouldn't allow other blocks or elements to set textDecoration
+	// because this will be inherited by their children.
+	return ! name && element === 'link';
+}
 
-	/* Disable font size controls when the option to style all headings is selected. */
-	let hasFontSizeEnabled = supports.includes( 'fontSize' );
-	if ( element === 'heading' && selectedLevel === 'heading' ) {
-		hasFontSizeEnabled = false;
-	}
+function useStyleWithReset( path, blockName ) {
+	const [ style, setStyle ] = useGlobalStyle( path, blockName );
+	const [ userStyle ] = useGlobalStyle( path, blockName, 'user' );
+	const hasStyle = () => !! userStyle;
+	const resetStyle = () => setStyle( undefined );
+	return [ style, setStyle, hasStyle, resetStyle ];
+}
 
-	const [ fontFamily, setFontFamily ] = useStyle(
-		prefix + 'typography.fontFamily',
-		name
-	);
-	const [ fontSize, setFontSize ] = useStyle(
-		prefix + 'typography.fontSize',
-		name
-	);
+function useFontSizeWithReset( path, blockName ) {
+	const [ fontSize, setStyleCallback ] = useGlobalStyle( path, blockName );
+	const [ userStyle ] = useGlobalStyle( path, blockName, 'user' );
+	const hasFontSize = () => !! userStyle;
+	const resetFontSize = () => setStyleCallback( undefined );
+	const setFontSize = ( newValue, metadata ) => {
+		if ( !! metadata?.slug ) {
+			newValue = `var:preset|font-size|${ metadata?.slug }`;
+		}
+		setStyleCallback( newValue );
+	};
 
-	const [ fontStyle, setFontStyle ] = useStyle(
+	return {
+		fontSize,
+		setFontSize,
+		hasFontSize,
+		resetFontSize,
+	};
+}
+
+function useFontAppearance( prefix, name ) {
+	const [ fontStyle, setFontStyle ] = useGlobalStyle(
 		prefix + 'typography.fontStyle',
 		name
 	);
-	const [ fontWeight, setFontWeight ] = useStyle(
+	const [ userFontStyle ] = useGlobalStyle(
+		prefix + 'typography.fontStyle',
+		name,
+		'user'
+	);
+	const [ fontWeight, setFontWeight ] = useGlobalStyle(
 		prefix + 'typography.fontWeight',
 		name
 	);
-	const [ lineHeight, setLineHeight ] = useStyle(
-		prefix + 'typography.lineHeight',
+	const [ userFontWeight ] = useGlobalStyle(
+		prefix + 'typography.fontWeight',
+		name,
+		'user'
+	);
+	const hasFontAppearance = () => !! userFontStyle || !! userFontWeight;
+	const resetFontAppearance = () => {
+		setFontStyle( undefined );
+		setFontWeight( undefined );
+	};
+	return {
+		fontStyle,
+		setFontStyle,
+		fontWeight,
+		setFontWeight,
+		hasFontAppearance,
+		resetFontAppearance,
+	};
+}
+
+export default function TypographyPanel( {
+	name,
+	element,
+	headingLevel,
+	variationPath = '',
+} ) {
+	const supports = getSupportedGlobalStylesPanels( name );
+	let prefix = '';
+	if ( element === 'heading' ) {
+		prefix = `elements.${ headingLevel }.`;
+	} else if ( element && element !== 'text' ) {
+		prefix = `elements.${ element }.`;
+	}
+	const [ fontSizes ] = useGlobalSetting( 'typography.fontSizes', name );
+
+	const disableCustomFontSizes = ! useGlobalSetting(
+		'typography.customFontSize',
+		name
+	)[ 0 ];
+	const [ fontFamilies ] = useGlobalSetting(
+		'typography.fontFamilies',
 		name
 	);
-	const [ letterSpacing, setLetterSpacing ] = useStyle(
-		prefix + 'typography.letterSpacing',
+	const hasFontStyles =
+		useGlobalSetting( 'typography.fontStyle', name )[ 0 ] &&
+		supports.includes( 'fontStyle' );
+	const hasFontWeights =
+		useGlobalSetting( 'typography.fontWeight', name )[ 0 ] &&
+		supports.includes( 'fontWeight' );
+	const hasFontFamilyEnabled = useHasFontFamilyControl( name );
+	const hasLineHeightEnabled = useHasLineHeightControl( name );
+	const hasAppearanceControl = useHasAppearanceControl( name );
+	const appearanceControlLabel = useAppearanceControlLabel( name );
+	const hasLetterSpacingControl = useHasLetterSpacingControl( name, element );
+	const hasTextTransformControl = useHasTextTransformControl( name, element );
+	const hasTextDecorationControl = useHasTextDecorationControl(
+		name,
+		element
+	);
+
+	/* Disable font size controls when the option to style all headings is selected. */
+	let hasFontSizeEnabled = supports.includes( 'fontSize' );
+	if ( element === 'heading' && headingLevel === 'heading' ) {
+		hasFontSizeEnabled = false;
+	}
+
+	const [ fontFamily, setFontFamily, hasFontFamily, resetFontFamily ] =
+		useStyleWithReset(
+			variationPath + prefix + 'typography.fontFamily',
+			name
+		);
+	const { fontSize, setFontSize, hasFontSize, resetFontSize } =
+		useFontSizeWithReset(
+			variationPath + prefix + 'typography.fontSize',
+			name
+		);
+	const {
+		fontStyle,
+		setFontStyle,
+		fontWeight,
+		setFontWeight,
+		hasFontAppearance,
+		resetFontAppearance,
+	} = useFontAppearance( variationPath + prefix, name );
+	const [ lineHeight, setLineHeight, hasLineHeight, resetLineHeight ] =
+		useStyleWithReset(
+			variationPath + prefix + 'typography.lineHeight',
+			name
+		);
+	const [
+		letterSpacing,
+		setLetterSpacing,
+		hasLetterSpacing,
+		resetLetterSpacing,
+	] = useStyleWithReset(
+		variationPath + prefix + 'typography.letterSpacing',
 		name
 	);
-	const [ textTransform, setTextTransform ] = useStyle(
-		prefix + 'typography.textTransform',
+	const [
+		textTransform,
+		setTextTransform,
+		hasTextTransform,
+		resetTextTransform,
+	] = useStyleWithReset(
+		variationPath + prefix + 'typography.textTransform',
 		name
 	);
-	const [ backgroundColor ] = useStyle( prefix + 'color.background', name );
-	const [ gradientValue ] = useStyle( prefix + 'color.gradient', name );
-	const [ color ] = useStyle( prefix + 'color.text', name );
-	const extraStyles =
-		element === 'link'
-			? {
-					textDecoration: 'underline',
-			  }
-			: {};
+	const [
+		textDecoration,
+		setTextDecoration,
+		hasTextDecoration,
+		resetTextDecoration,
+	] = useStyleWithReset(
+		variationPath + prefix + 'typography.textDecoration',
+		name
+	);
+
+	const resetAll = () => {
+		resetFontFamily();
+		resetFontSize();
+		resetFontAppearance();
+		resetLineHeight();
+		resetLetterSpacing();
+		resetTextTransform();
+	};
 
 	return (
-		<PanelBody className="edit-site-typography-panel" initialOpen={ true }>
-			<div
-				className="edit-site-typography-panel__preview"
-				style={ {
-					fontFamily: fontFamily ?? 'serif',
-					background: gradientValue ?? backgroundColor,
-					color,
-					fontSize,
-					fontStyle,
-					fontWeight,
-					letterSpacing,
-					...extraStyles,
-				} }
-			>
-				Aa
-			</div>
-			<Grid columns={ 2 } rowGap={ 16 } columnGap={ 8 }>
-				{ element === 'heading' && (
-					<div className="edit-site-typography-panel__full-width-control">
-						<ToggleGroupControl
-							label={ __( 'Select heading level' ) }
-							hideLabelFromVision
-							value={ selectedLevel }
-							onChange={ setCurrentTab }
-							isBlock
-							size="__unstable-large"
-							__nextHasNoMarginBottom
-						>
-							<ToggleGroupControlOption
-								value="heading"
-								/* translators: 'All' refers to selecting all heading levels 
-							and applying the same style to h1-h6. */
-								label={ __( 'All' ) }
-							/>
-							<ToggleGroupControlOption
-								value="h1"
-								label={ __( 'H1' ) }
-							/>
-							<ToggleGroupControlOption
-								value="h2"
-								label={ __( 'H2' ) }
-							/>
-							<ToggleGroupControlOption
-								value="h3"
-								label={ __( 'H3' ) }
-							/>
-							<ToggleGroupControlOption
-								value="h4"
-								label={ __( 'H4' ) }
-							/>
-							<ToggleGroupControlOption
-								value="h5"
-								label={ __( 'H5' ) }
-							/>
-							<ToggleGroupControlOption
-								value="h6"
-								label={ __( 'H6' ) }
-							/>
-						</ToggleGroupControl>
-					</div>
-				) }
-				{ supports.includes( 'fontFamily' ) && (
-					<div className="edit-site-typography-panel__full-width-control">
-						<FontFamilyControl
-							fontFamilies={ fontFamilies }
-							value={ fontFamily }
-							onChange={ setFontFamily }
-							size="__unstable-large"
-							__nextHasNoMarginBottom
-						/>
-					</div>
-				) }
-				{ hasFontSizeEnabled && (
-					<div className="edit-site-typography-panel__full-width-control">
-						<FontSizePicker
-							value={ fontSize }
-							onChange={ setFontSize }
-							fontSizes={ fontSizes }
-							disableCustomFontSizes={ disableCustomFontSizes }
-							size="__unstable-large"
-							__nextHasNoMarginBottom
-						/>
-					</div>
-				) }
-				{ hasAppearanceControl && (
+		<ToolsPanel label={ __( 'Typography' ) } resetAll={ resetAll }>
+			{ hasFontFamilyEnabled && (
+				<ToolsPanelItem
+					label={ __( 'Font family' ) }
+					hasValue={ hasFontFamily }
+					onDeselect={ resetFontFamily }
+					isShownByDefault
+				>
+					<FontFamilyControl
+						fontFamilies={ fontFamilies }
+						value={ fontFamily }
+						onChange={ setFontFamily }
+						size="__unstable-large"
+						__nextHasNoMarginBottom
+					/>
+				</ToolsPanelItem>
+			) }
+			{ hasFontSizeEnabled && (
+				<ToolsPanelItem
+					label={ __( 'Font size' ) }
+					hasValue={ hasFontSize }
+					onDeselect={ resetFontSize }
+					isShownByDefault
+				>
+					<FontSizePicker
+						value={ fontSize }
+						onChange={ setFontSize }
+						fontSizes={ fontSizes }
+						disableCustomFontSizes={ disableCustomFontSizes }
+						withReset={ false }
+						withSlider
+						size="__unstable-large"
+						__nextHasNoMarginBottom
+					/>
+				</ToolsPanelItem>
+			) }
+			{ hasAppearanceControl && (
+				<ToolsPanelItem
+					className="single-column"
+					label={ appearanceControlLabel }
+					hasValue={ hasFontAppearance }
+					onDeselect={ resetFontAppearance }
+					isShownByDefault
+				>
 					<FontAppearanceControl
 						value={ {
 							fontStyle,
@@ -252,8 +346,16 @@ export default function TypographyPanel( { name, element } ) {
 						size="__unstable-large"
 						__nextHasNoMarginBottom
 					/>
-				) }
-				{ hasLineHeightEnabled && (
+				</ToolsPanelItem>
+			) }
+			{ hasLineHeightEnabled && (
+				<ToolsPanelItem
+					className="single-column"
+					label={ __( 'Line height' ) }
+					hasValue={ hasLineHeight }
+					onDeselect={ resetLineHeight }
+					isShownByDefault
+				>
 					<LineHeightControl
 						__nextHasNoMarginBottom
 						__unstableInputWidth="auto"
@@ -261,28 +363,57 @@ export default function TypographyPanel( { name, element } ) {
 						onChange={ setLineHeight }
 						size="__unstable-large"
 					/>
-				) }
-				{ hasLetterSpacingControl && (
+				</ToolsPanelItem>
+			) }
+			{ hasLetterSpacingControl && (
+				<ToolsPanelItem
+					className="single-column"
+					label={ __( 'Letter spacing' ) }
+					hasValue={ hasLetterSpacing }
+					onDeselect={ resetLetterSpacing }
+					isShownByDefault
+				>
 					<LetterSpacingControl
 						value={ letterSpacing }
 						onChange={ setLetterSpacing }
 						size="__unstable-large"
 						__unstableInputWidth="auto"
 					/>
-				) }
-				{ hasTextTransformControl && (
-					<div className="edit-site-typography-panel__full-width-control">
-						<TextTransformControl
-							value={ textTransform }
-							onChange={ setTextTransform }
-							showNone
-							isBlock
-							size="__unstable-large"
-							__nextHasNoMarginBottom
-						/>
-					</div>
-				) }
-			</Grid>
-		</PanelBody>
+				</ToolsPanelItem>
+			) }
+			{ hasTextTransformControl && (
+				<ToolsPanelItem
+					label={ __( 'Letter case' ) }
+					hasValue={ hasTextTransform }
+					onDeselect={ resetTextTransform }
+					isShownByDefault
+				>
+					<TextTransformControl
+						value={ textTransform }
+						onChange={ setTextTransform }
+						showNone
+						isBlock
+						size="__unstable-large"
+						__nextHasNoMarginBottom
+					/>
+				</ToolsPanelItem>
+			) }
+			{ hasTextDecorationControl && (
+				<ToolsPanelItem
+					className="single-column"
+					label={ __( 'Text decoration' ) }
+					hasValue={ hasTextDecoration }
+					onDeselect={ resetTextDecoration }
+					isShownByDefault
+				>
+					<TextDecorationControl
+						value={ textDecoration }
+						onChange={ setTextDecoration }
+						size="__unstable-large"
+						__unstableInputWidth="auto"
+					/>
+				</ToolsPanelItem>
+			) }
+		</ToolsPanel>
 	);
 }

@@ -14,10 +14,7 @@ import { useState } from '@wordpress/element';
  */
 import BaseInputControl from '../';
 
-const setupUser = () =>
-	userEvent.setup( {
-		advanceTimers: jest.advanceTimersByTime,
-	} );
+const setupUser = () => userEvent.setup();
 
 const getInput = () => screen.getByTestId( 'input' );
 
@@ -40,7 +37,7 @@ describe( 'InputControl', () => {
 
 			const input = getInput();
 
-			expect( input.getAttribute( 'type' ) ).toBe( 'number' );
+			expect( input ).toHaveAttribute( 'type', 'number' );
 		} );
 
 		it( 'should render label', () => {
@@ -48,7 +45,26 @@ describe( 'InputControl', () => {
 
 			const input = screen.getByText( 'Hello' );
 
-			expect( input ).toBeTruthy();
+			expect( input ).toBeInTheDocument();
+		} );
+
+		it( 'should render help text as description', () => {
+			render( <InputControl help="My help text" /> );
+			expect(
+				screen.getByRole( 'textbox', { description: 'My help text' } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should render help as aria-details when not plain text', () => {
+			render( <InputControl help={ <a href="/foo">My help text</a> } /> );
+
+			const input = screen.getByRole( 'textbox' );
+			const help = screen.getByRole( 'link', { name: 'My help text' } );
+
+			expect(
+				// eslint-disable-next-line testing-library/no-node-access
+				help.closest( `#${ input.getAttribute( 'aria-details' ) }` )
+			).toBeVisible();
 		} );
 	} );
 

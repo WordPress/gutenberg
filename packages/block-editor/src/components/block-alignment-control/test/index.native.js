@@ -13,9 +13,9 @@ it( 'should call onChange with undefined when the control is already active', ()
 	const screen = render(
 		<BlockAlignmentUI value="right" onChange={ onChangeMock } />
 	);
-	const alignButton = screen.getByA11yLabel( 'Align' );
+	const alignButton = screen.getByLabelText( 'Align' );
 	fireEvent.press( alignButton );
-	const rightAlignmentButton = screen.getByA11yLabel( 'Align right' );
+	const rightAlignmentButton = screen.getByLabelText( 'Align right' );
 	fireEvent.press( rightAlignmentButton );
 
 	expect( onChangeMock ).toHaveBeenCalledTimes( 1 );
@@ -27,9 +27,9 @@ it( 'should call onChange with alignment value when the control is inactive', ()
 	const screen = render(
 		<BlockAlignmentUI value="left" onChange={ onChangeMock } />
 	);
-	const alignButton = screen.getByA11yLabel( 'Align' );
+	const alignButton = screen.getByLabelText( 'Align' );
 	fireEvent.press( alignButton );
-	const centerAlignmentButton = screen.getByA11yLabel( 'Align center' );
+	const centerAlignmentButton = screen.getByLabelText( 'Align center' );
 	fireEvent.press( centerAlignmentButton );
 
 	expect( onChangeMock ).toHaveBeenCalledTimes( 1 );

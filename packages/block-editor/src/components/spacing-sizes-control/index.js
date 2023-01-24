@@ -1,9 +1,14 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { __experimentalText as Text } from '@wordpress/components';
+import { BaseControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -24,6 +29,8 @@ export default function SpacingSizesControl( {
 	splitOnAxis = false,
 	useSelect,
 	minimumCustomValue = 0,
+	onMouseOver,
+	onMouseOut,
 } ) {
 	const spacingSizes = [
 		{ name: 0, slug: '0', size: 0 },
@@ -65,11 +72,19 @@ export default function SpacingSizesControl( {
 		useSelect,
 		type: label,
 		minimumCustomValue,
+		onMouseOver,
+		onMouseOut,
 	};
 
 	return (
-		<fieldset role="region" className="component-spacing-sizes-control">
-			<Text as="legend">{ label }</Text>
+		<fieldset
+			className={ classnames( 'component-spacing-sizes-control', {
+				'is-unlinked': ! isLinked,
+			} ) }
+		>
+			<BaseControl.VisualLabel as="legend">
+				{ label }
+			</BaseControl.VisualLabel>
 			{ ! hasOneSide && (
 				<LinkedButton onClick={ toggleLinked } isLinked={ isLinked } />
 			) }

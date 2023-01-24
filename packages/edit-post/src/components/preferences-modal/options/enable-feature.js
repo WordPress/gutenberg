@@ -17,7 +17,10 @@ export default compose(
 			isChecked: isFeatureActive( featureName ),
 		};
 	} ),
-	withDispatch( ( dispatch, { featureName } ) => ( {
-		onChange: () => dispatch( editPostStore ).toggleFeature( featureName ),
+	withDispatch( ( dispatch, { featureName, onToggle = () => {} } ) => ( {
+		onChange: () => {
+			onToggle();
+			dispatch( editPostStore ).toggleFeature( featureName );
+		},
 	} ) )
 )( BaseOption );

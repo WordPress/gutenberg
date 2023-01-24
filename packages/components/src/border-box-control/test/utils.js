@@ -244,6 +244,54 @@ describe( 'BorderBoxControl Utils', () => {
 
 			expect( getCommonBorder( sideBorders ) ).toEqual( commonBorder );
 		} );
+
+		it( 'should return most common unit selection if border widths are mixed', () => {
+			const sideBorders = {
+				top: { color: '#fff', style: 'solid', width: '10px' },
+				right: { color: '#000', style: 'solid', width: '1rem' },
+				bottom: { color: '#000', style: 'solid', width: '2em' },
+				left: { color: '#000', style: undefined, width: '2em' },
+			};
+			const commonBorder = {
+				color: undefined,
+				style: undefined,
+				width: 'em',
+			};
+
+			expect( getCommonBorder( sideBorders ) ).toEqual( commonBorder );
+		} );
+
+		it( 'should return first unit when multiple units are equal most common', () => {
+			const sideBorders = {
+				top: { color: '#fff', style: 'solid', width: '1rem' },
+				right: { color: '#000', style: 'solid', width: '0.75em' },
+				bottom: { color: '#000', style: 'solid', width: '1vw' },
+				left: { color: '#000', style: undefined, width: '2vh' },
+			};
+			const commonBorder = {
+				color: undefined,
+				style: undefined,
+				width: 'rem',
+			};
+
+			expect( getCommonBorder( sideBorders ) ).toEqual( commonBorder );
+		} );
+
+		it( 'should ignore undefined values in determining most common unit', () => {
+			const sideBorders = {
+				top: { color: '#fff', style: 'solid', width: undefined },
+				right: { color: '#000', style: 'solid', width: '5vw' },
+				bottom: { color: '#000', style: 'solid', width: undefined },
+				left: { color: '#000', style: undefined, width: '2vh' },
+			};
+			const commonBorder = {
+				color: undefined,
+				style: undefined,
+				width: 'vw',
+			};
+
+			expect( getCommonBorder( sideBorders ) ).toEqual( commonBorder );
+		} );
 	} );
 
 	describe( 'getShorthandBorderStyle', () => {

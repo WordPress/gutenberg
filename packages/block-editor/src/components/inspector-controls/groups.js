@@ -10,9 +10,11 @@ const InspectorControlsColor = createSlotFill( 'InspectorControlsColor' );
 const InspectorControlsDimensions = createSlotFill(
 	'InspectorControlsDimensions'
 );
+const InspectorControlsPosition = createSlotFill( 'InspectorControlsPosition' );
 const InspectorControlsTypography = createSlotFill(
 	'InspectorControlsTypography'
 );
+const InspectorControlsListView = createSlotFill( 'InspectorControlsListView' );
 
 const groups = {
 	default: InspectorControlsDefault,
@@ -20,7 +22,9 @@ const groups = {
 	border: InspectorControlsBorder,
 	color: InspectorControlsColor,
 	dimensions: InspectorControlsDimensions,
+	list: InspectorControlsListView,
 	typography: InspectorControlsTypography,
+	position: InspectorControlsPosition,
 };
 
 export default groups;

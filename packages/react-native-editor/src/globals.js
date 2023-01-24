@@ -55,7 +55,9 @@ if ( ! global.window.matchMedia ) {
 	global.window.matchMedia = () => ( {
 		matches: false,
 		addListener: () => {},
+		addEventListener: () => {},
 		removeListener: () => {},
+		removeEventListener: () => {},
 	} );
 }
 

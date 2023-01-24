@@ -19,7 +19,10 @@ function BlockEditorProvider( props ) {
 
 	const { updateSettings } = useDispatch( blockEditorStore );
 	useEffect( () => {
-		updateSettings( settings );
+		updateSettings( {
+			...settings,
+			__internalIsInitialized: true,
+		} );
 	}, [ settings ] );
 
 	// Syncs the entity provider with changes in the block-editor store.

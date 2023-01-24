@@ -9,12 +9,12 @@ import classnames from 'classnames';
 import { useState, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
+	BaseControl,
 	Button,
 	RangeControl,
 	CustomSelectControl,
 	__experimentalUnitControl as UnitControl,
 	__experimentalHStack as HStack,
-	__experimentalText as Text,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 } from '@wordpress/components';
@@ -34,6 +34,15 @@ import {
 	isValueSpacingPreset,
 } from './utils';
 
+const CUSTOM_VALUE_SETTINGS = {
+	px: { max: 300, steps: 1 },
+	'%': { max: 100, steps: 1 },
+	vw: { max: 100, steps: 1 },
+	vh: { max: 100, steps: 1 },
+	em: { max: 10, steps: 0.1 },
+	rm: { max: 10, steps: 0.1 },
+};
+
 export default function SpacingInputControl( {
 	spacingSizes,
 	value,
@@ -42,6 +51,8 @@ export default function SpacingInputControl( {
 	isMixed = false,
 	type,
 	minimumCustomValue,
+	onMouseOver,
+	onMouseOut,
 } ) {
 	// Treat value as a preset value if the passed in value matches the value of one of the spacingSizes.
 	value = getPresetValueFromCustomValue( value, spacingSizes );
@@ -107,7 +118,7 @@ export default function SpacingInputControl( {
 	const customTooltipContent = ( newValue ) =>
 		value === undefined ? undefined : spacingSizes[ newValue ]?.name;
 
-	const customRangeValue = parseInt( currentValue, 10 );
+	const customRangeValue = parseFloat( currentValue, 10 );
 
 	const getNewCustomValue = ( newSize ) => {
 		const isNumeric = ! isNaN( parseFloat( newSize ) );
@@ -167,21 +178,21 @@ export default function SpacingInputControl( {
 		<>
 			{ side !== 'all' && (
 				<HStack className="components-spacing-sizes-control__side-labels">
-					<Text className="components-spacing-sizes-control__side-label">
+					<BaseControl.VisualLabel className="components-spacing-sizes-control__side-label">
 						{ LABELS[ side ] }
-					</Text>
+					</BaseControl.VisualLabel>
 
 					{ showHint && (
-						<Text className="components-spacing-sizes-control__hint-single">
+						<BaseControl.VisualLabel className="components-spacing-sizes-control__hint-single">
 							{ currentValueHint }
-						</Text>
+						</BaseControl.VisualLabel>
 					) }
 				</HStack>
 			) }
 			{ side === 'all' && showHint && (
-				<Text className="components-spacing-sizes-control__hint-all">
+				<BaseControl.VisualLabel className="components-spacing-sizes-control__hint-all">
 					{ currentValueHint }
-				</Text>
+				</BaseControl.VisualLabel>
 			) }
 
 			{ ! disableCustomSpacingSizes && (
@@ -209,6 +220,10 @@ export default function SpacingInputControl( {
 			{ showCustomValueControl && (
 				<>
 					<UnitControl
+						onMouseOver={ onMouseOver }
+						onMouseOut={ onMouseOut }
+						onFocus={ onMouseOver }
+						onBlur={ onMouseOut }
 						onChange={ ( newSize ) =>
 							onChange( getNewCustomValue( newSize ) )
 						}
@@ -220,21 +235,31 @@ export default function SpacingInputControl( {
 						label={ ariaLabel }
 						hideLabelFromVision={ true }
 						className="components-spacing-sizes-control__custom-value-input"
-						style={ { gridColumn: '1' } }
+						size={ '__unstable-large' }
 					/>
 
 					<RangeControl
+						onMouseOver={ onMouseOver }
+						onMouseOut={ onMouseOut }
+						onFocus={ onMouseOver }
+						onBlur={ onMouseOut }
 						value={ customRangeValue }
 						min={ 0 }
-						max={ 100 }
+						max={ CUSTOM_VALUE_SETTINGS[ selectedUnit ]?.max ?? 10 }
+						step={
+							CUSTOM_VALUE_SETTINGS[ selectedUnit ]?.steps ?? 0.1
+						}
 						withInputField={ false }
 						onChange={ handleCustomValueSliderChange }
 						className="components-spacing-sizes-control__custom-value-range"
+						__nextHasNoMarginBottom
 					/>
 				</>
 			) }
 			{ showRangeControl && ! showCustomValueControl && (
 				<RangeControl
+					onMouseOver={ onMouseOver }
+					onMouseOut={ onMouseOut }
 					className="components-spacing-sizes-control__range-control"
 					value={ currentValue }
 					onChange={ ( newSize ) =>
@@ -256,6 +281,9 @@ export default function SpacingInputControl( {
 					marks={ marks }
 					label={ ariaLabel }
 					hideLabelFromVision={ true }
+					__nextHasNoMarginBottom={ true }
+					onFocus={ onMouseOver }
+					onBlur={ onMouseOut }
 				/>
 			) }
 			{ ! showRangeControl && ! showCustomValueControl && (
@@ -278,6 +306,11 @@ export default function SpacingInputControl( {
 					label={ ariaLabel }
 					hideLabelFromVision={ true }
 					__nextUnconstrainedWidth={ true }
+					size={ '__unstable-large' }
+					onMouseOver={ onMouseOver }
+					onMouseOut={ onMouseOut }
+					onFocus={ onMouseOver }
+					onBlur={ onMouseOut }
 				/>
 			) }
 		</>

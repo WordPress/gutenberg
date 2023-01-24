@@ -1,7 +1,7 @@
 /**
- * Generates core block documentation using block.json files.
- * Reads from  : packages/block-library/src
- * Publishes to: docs/reference-guides/core-blocks.ms
+ * Generates theme.json documentation using theme.json schema.
+ * Reads from  : schemas/json/theme.json
+ * Publishes to: docs/reference-guides/theme-json-reference/theme-json-living.md
  */
 
 /**
@@ -127,7 +127,8 @@ const getStylePropertiesMarkup = ( struct ) => {
 			props[ key ].type === 'object'
 				? keys( props[ key ].properties ).sort().join( ', ' )
 				: '';
-		markup += `| ${ key } | ${ props[ key ].type } | ${ ps } |\n`;
+		const type = formatType( props[ key ] );
+		markup += `| ${ key } | ${ type } | ${ ps } |\n`;
 	} );
 
 	return markup;
@@ -159,6 +160,32 @@ ${ markupFn( data ) }
 };
 
 let autogen = '';
+
+/**
+ * Format list of types.
+ *
+ * @param {Object} prop
+ * @return {string} type
+ */
+const formatType = ( prop ) => {
+	let type = prop.type || '';
+
+	if ( prop.hasOwnProperty( 'anyOf' ) || prop.hasOwnProperty( 'oneOf' ) ) {
+		const propTypes = prop.anyOf || prop.oneOf;
+		const types = [];
+
+		propTypes.forEach( ( item ) => {
+			if ( item.type ) types.push( item.type );
+			// refComplete is always an object
+			if ( item.$ref && item.$ref === '#/definitions/refComplete' )
+				types.push( 'object' );
+		} );
+
+		type = [ ...new Set( types ) ].join( ', ' );
+	}
+
+	return type;
+};
 
 // Settings
 const settings = Object.entries( themejson.definitions )

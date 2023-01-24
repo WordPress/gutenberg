@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { map, without } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { store as blocksStore } from '@wordpress/blocks';
@@ -38,7 +33,7 @@ function Editor( {
 	const {
 		hasFixedToolbar,
 		focusMode,
-		hasReducedUI,
+		isDistractionFree,
 		hasInlineToolbar,
 		hasThemeStyles,
 		post,
@@ -85,7 +80,7 @@ function Editor( {
 					isFeatureActive( 'fixedToolbar' ) ||
 					__experimentalGetPreviewDeviceType() !== 'Desktop',
 				focusMode: isFeatureActive( 'focusMode' ),
-				hasReducedUI: isFeatureActive( 'reducedUI' ),
+				isDistractionFree: isFeatureActive( 'distractionFree' ),
 				hasInlineToolbar: isFeatureActive( 'inlineToolbar' ),
 				hasThemeStyles: isFeatureActive( 'themeStyles' ),
 				preferredStyleVariations: select( preferencesStore ).get(
@@ -118,7 +113,7 @@ function Editor( {
 			},
 			hasFixedToolbar,
 			focusMode,
-			hasReducedUI,
+			isDistractionFree,
 			hasInlineToolbar,
 
 			// This is marked as experimental to give time for the quick inserter to mature.
@@ -136,12 +131,11 @@ function Editor( {
 			// all block types).
 			const defaultAllowedBlockTypes =
 				true === settings.allowedBlockTypes
-					? map( blockTypes, 'name' )
+					? blockTypes.map( ( { name } ) => name )
 					: settings.allowedBlockTypes || [];
 
-			result.allowedBlockTypes = without(
-				defaultAllowedBlockTypes,
-				...hiddenBlockTypes
+			result.allowedBlockTypes = defaultAllowedBlockTypes.filter(
+				( type ) => ! hiddenBlockTypes.includes( type )
 			);
 		}
 
@@ -150,7 +144,7 @@ function Editor( {
 		settings,
 		hasFixedToolbar,
 		focusMode,
-		hasReducedUI,
+		isDistractionFree,
 		hiddenBlockTypes,
 		blockTypes,
 		preferredStyleVariations,

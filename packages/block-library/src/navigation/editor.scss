@@ -32,13 +32,6 @@
  * Submenus.
  */
 
-// Ensure sub-menus stay open and visible when a nested block is selected.
-.wp-block-navigation__container.is-parent-of-selected-block {
-	visibility: visible;
-	opacity: 1;
-	overflow: visible;
-}
-
 // Low specificity default to ensure background color applies to submenus.
 .wp-block-navigation__container,
 .wp-block-navigation-item {
@@ -261,10 +254,6 @@ $color-control-label-height: 20px;
 	}
 }
 
-.wp-block-navigation-placeholder .components-spinner {
-	margin-top: 0;
-}
-
 // Unselected state.
 .wp-block-navigation-placeholder__preview {
 	display: flex;
@@ -291,6 +280,7 @@ $color-control-label-height: 20px;
 		bottom: 0;
 		left: 0;
 		pointer-events: none;
+		border: $border-width dashed currentColor;
 		@include placeholder-style();
 
 		// Inherit border radius from style variations.
@@ -543,6 +533,13 @@ body.editor-styles-wrapper
 	color: inherit;
 }
 
+.components-heading.wp-block-navigation-off-canvas-editor__title {
+	margin: 0;
+}
+.wp-block-navigation-off-canvas-editor__header {
+	margin-bottom: $grid-unit-10;
+}
+
 // Customize the mobile editing.
 // This can be revisited in the future, but for now, inherit design from the parent.
 .is-menu-open .wp-block-navigation__responsive-container-content * {
@@ -566,6 +563,10 @@ body.editor-styles-wrapper
 	padding: $grid-unit-10 $grid-unit-15;
 }
 
+.wp-block-navigation .wp-block-navigation__uncontrolled-inner-blocks-loading-indicator {
+	margin-top: 0;
+}
+
 @keyframes fadeouthalf {
 	0% {
 		opacity: 1;
@@ -578,6 +579,13 @@ body.editor-styles-wrapper
 .wp-block-navigation-delete-menu-button {
 	width: 100%;
 	justify-content: center;
+	margin-bottom: $grid-unit-20;
+}
+
+// increased specificity to override button variant
+// for the manage menus button in the advanced area
+// of the navigation block
+.components-button.is-link.wp-block-navigation-manage-menus-button {
 	margin-bottom: $grid-unit-20;
 }
 
@@ -624,8 +632,25 @@ body.editor-styles-wrapper
 	width: 100%;
 }
 
+.wp-block-navigation__navigation-selector-button__icon {
+	flex: 0 0 auto;
+}
+
+.wp-block-navigation__navigation-selector-button__label {
+	flex: 0 1 auto;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
 .wp-block-navigation__navigation-selector-button--createnew {
 	border: 1px solid;
 	margin-bottom: $grid-unit-20;
 	width: 100%;
+}
+
+// Buttons inside a disabled component get semitransparent when there's a clickthrough overlay.
+// Since this navigation button is content rather than UI, however, override that.
+.wp-block-navigation__responsive-container-open.components-button {
+	opacity: 1;
 }

@@ -2,12 +2,11 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { useLayoutEffect } from '@wordpress/element';
+import { useLayoutEffect, useRef, useEffect } from '@wordpress/element';
 import { useAnchor } from '@wordpress/rich-text';
 
 /**
@@ -31,6 +30,7 @@ export function getAutoCompleterUI( autocompleter ) {
 		onChangeOptions,
 		onSelect,
 		onReset,
+		reset,
 		value,
 		contentRef,
 	} ) {
@@ -39,6 +39,10 @@ export function getAutoCompleterUI( autocompleter ) {
 			editableContentElement: contentRef.current,
 			value,
 		} );
+
+		const popoverRef = useRef();
+
+		useOnClickOutside( popoverRef, reset );
 
 		useLayoutEffect( () => {
 			onChangeOptions( items );
@@ -55,16 +59,17 @@ export function getAutoCompleterUI( autocompleter ) {
 			<Popover
 				focusOnMount={ false }
 				onClose={ onReset }
-				position="top right"
+				placement="top-start"
 				className="components-autocomplete__popover"
 				anchor={ popoverAnchor }
+				ref={ popoverRef }
 			>
 				<div
 					id={ listBoxId }
 					role="listbox"
 					className="components-autocomplete__results"
 				>
-					{ map( items, ( option, index ) => (
+					{ items.map( ( option, index ) => (
 						<Button
 							key={ option.key }
 							id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
@@ -89,4 +94,25 @@ export function getAutoCompleterUI( autocompleter ) {
 	}
 
 	return AutocompleterUI;
+}
+
+function useOnClickOutside( ref, handler ) {
+	useEffect( () => {
+		const listener = ( event ) => {
+			// Do nothing if clicking ref's element or descendent elements, or if the ref is not referencing an element
+			if ( ! ref.current || ref.current.contains( event.target ) ) {
+				return;
+			}
+			handler( event );
+		};
+		document.addEventListener( 'mousedown', listener );
+		document.addEventListener( 'touchstart', listener );
+		return () => {
+			document.removeEventListener( 'mousedown', listener );
+			document.removeEventListener( 'touchstart', listener );
+		};
+		// Disable reason: `ref` is a ref object and should not be included in a
+		// hook's dependency list.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ handler ] );
 }

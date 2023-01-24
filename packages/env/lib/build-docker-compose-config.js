@@ -181,9 +181,11 @@ module.exports = function buildDockerComposeConfig( config ) {
 		phpunitTag = '6' + phpunitPhpVersion;
 	} else if ( testsPhpVersion === '7.1' ) {
 		phpunitTag = '7' + phpunitPhpVersion;
-	} else if ( [ '7.2', '7.3', '7.4' ].indexOf( testsPhpVersion ) >= 0 ) {
+	} else if ( testsPhpVersion === '7.2' ) {
 		phpunitTag = '8' + phpunitPhpVersion;
-	} else if ( testsPhpVersion === '8.0' ) {
+	} else if (
+		[ '7.3', '7.4', '8.0', '8.1', '8.2' ].indexOf( testsPhpVersion ) >= 0
+	) {
 		phpunitTag = '9' + phpunitPhpVersion;
 	}
 	const phpunitImage = `wordpressdevelop/phpunit:${ phpunitTag }`;
@@ -206,6 +208,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				image: 'mariadb',
 				ports: [ '3306' ],
 				environment: {
+					MYSQL_ROOT_HOST: '%',
 					MYSQL_ROOT_PASSWORD:
 						dbEnv.credentials.WORDPRESS_DB_PASSWORD,
 					MYSQL_DATABASE: dbEnv.development.WORDPRESS_DB_NAME,
@@ -216,6 +219,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				image: 'mariadb',
 				ports: [ '3306' ],
 				environment: {
+					MYSQL_ROOT_HOST: '%',
 					MYSQL_ROOT_PASSWORD:
 						dbEnv.credentials.WORDPRESS_DB_PASSWORD,
 					MYSQL_DATABASE: dbEnv.tests.WORDPRESS_DB_NAME,

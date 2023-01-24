@@ -163,7 +163,7 @@ extension GutenbergWebSingleBlockViewController: WKNavigationDelegate {
 
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         // Sometimes the editor takes longer loading and its CSS can override what
-        // Injectic Editor specific CSS when everything is loaded to avoid overwritting parameters if gutenberg CSS load later.
+        // Injectic Editor specific CSS when everything is loaded to avoid overwriting parameters if gutenberg CSS load later.
         evaluateJavascript(jsInjection.preventAutosavesScript)
         evaluateJavascript(jsInjection.injectEditorCssScript)
         evaluateJavascript(jsInjection.gutenbergObserverScript)

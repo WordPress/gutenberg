@@ -17,18 +17,15 @@ export function useBorderBoxControlLinkedButton(
 ) {
 	const {
 		className,
-		__next36pxDefaultSize = false,
+		size = 'default',
 		...otherProps
 	} = useContextSystem( props, 'BorderBoxControlLinkedButton' );
 
 	// Generate class names.
 	const cx = useCx();
 	const classes = useMemo( () => {
-		return cx(
-			styles.BorderBoxControlLinkedButton( __next36pxDefaultSize ),
-			className
-		);
-	}, [ className, cx, __next36pxDefaultSize ] );
+		return cx( styles.borderBoxControlLinkedButton( size ), className );
+	}, [ className, cx, size ] );
 
 	return { ...otherProps, className: classes };
 }

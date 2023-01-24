@@ -47,6 +47,7 @@ export function FormFileUpload( {
 			{ children }
 		</Button>
 	);
+
 	return (
 		<div className="components-form-file-upload">
 			{ ui }

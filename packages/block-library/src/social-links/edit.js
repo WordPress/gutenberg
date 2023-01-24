@@ -229,7 +229,6 @@ export function SocialLinksEdit( props ) {
 					( { onChange, label, value, resetAllFilter } ) => (
 						<ColorGradientSettingsDropdown
 							key={ `social-links-color-${ label }` }
-							__experimentalHasMultipleOrigins
 							__experimentalIsRenderedInSidebar
 							settings={ [
 								{

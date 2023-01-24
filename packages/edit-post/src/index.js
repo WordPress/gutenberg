@@ -10,6 +10,7 @@ import { render, unmountComponentAtNode } from '@wordpress/element';
 import { dispatch, select } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { registerLegacyWidgetBlock } from '@wordpress/widgets';
 
 /**
  * Internal dependencies
@@ -80,22 +81,6 @@ export function initializeEditor(
 	settings,
 	initialEdits
 ) {
-	// Prevent adding template part in the post editor.
-	// Only add the filter when the post editor is initialized, not imported.
-	addFilter(
-		'blockEditor.__unstableCanInsertBlockType',
-		'removeTemplatePartsFromInserter',
-		( can, blockType ) => {
-			if (
-				! select( editPostStore ).isEditingTemplate() &&
-				blockType.name === 'core/template-part'
-			) {
-				return false;
-			}
-			return can;
-		}
-	);
-
 	const target = document.getElementById( id );
 	const reboot = reinitializeEditor.bind(
 		null,
@@ -131,11 +116,32 @@ export function initializeEditor(
 	}
 
 	registerCoreBlocks();
+	registerLegacyWidgetBlock( { inserter: false } );
 	if ( process.env.IS_GUTENBERG_PLUGIN ) {
 		__experimentalRegisterExperimentalCoreBlocks( {
 			enableFSEBlocks: settings.__unstableEnableFullSiteEditingBlocks,
 		} );
 	}
+
+	/*
+	 * Prevent adding template part in the post editor.
+	 * Only add the filter when the post editor is initialized, not imported.
+	 * Also only add the filter(s) after registerCoreBlocks()
+	 * so that common filters in the block library are not overwritten.
+	 */
+	addFilter(
+		'blockEditor.__unstableCanInsertBlockType',
+		'removeTemplatePartsFromInserter',
+		( canInsert, blockType ) => {
+			if (
+				! select( editPostStore ).isEditingTemplate() &&
+				blockType.name === 'core/template-part'
+			) {
+				return false;
+			}
+			return canInsert;
+		}
+	);
 
 	// Show a console log warning if the browser is not in Standards rendering mode.
 	const documentMode =

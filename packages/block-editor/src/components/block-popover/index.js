@@ -32,6 +32,7 @@ function BlockPopover(
 		__unstableCoverTarget = false,
 		__unstablePopoverSlot,
 		__unstableContentRef,
+		shift = true,
 		...props
 	},
 	ref
@@ -42,24 +43,15 @@ function BlockPopover(
 		ref,
 		usePopoverScroll( __unstableContentRef ),
 	] );
-	const style = useMemo( () => {
-		if ( ! selectedElement || lastSelectedElement !== selectedElement ) {
-			return {};
-		}
 
-		return {
-			position: 'absolute',
-			width: selectedElement.offsetWidth,
-			height: selectedElement.offsetHeight,
-		};
-	}, [ selectedElement, lastSelectedElement, __unstableRefreshSize ] );
-
-	const [ popoverAnchorRecomputeCounter, forceRecomputePopoverAnchor ] =
-		useReducer(
-			// Module is there to make sure that the counter doesn't overflow.
-			( s ) => ( s + 1 ) % MAX_POPOVER_RECOMPUTE_COUNTER,
-			0
-		);
+	const [
+		popoverDimensionsRecomputeCounter,
+		forceRecomputePopoverDimensions,
+	] = useReducer(
+		// Module is there to make sure that the counter doesn't overflow.
+		( s ) => ( s + 1 ) % MAX_POPOVER_RECOMPUTE_COUNTER,
+		0
+	);
 
 	// When blocks are moved up/down, they are animated to their new position by
 	// updating the `transform` property manually (i.e. without using CSS
@@ -74,7 +66,7 @@ function BlockPopover(
 		}
 
 		const observer = new window.MutationObserver(
-			forceRecomputePopoverAnchor
+			forceRecomputePopoverDimensions
 		);
 		observer.observe( selectedElement, { attributes: true } );
 
@@ -83,12 +75,36 @@ function BlockPopover(
 		};
 	}, [ selectedElement ] );
 
-	const popoverAnchor = useMemo( () => {
+	const style = useMemo( () => {
 		if (
-			// popoverAnchorRecomputeCounter is by definition always equal or greater
+			// popoverDimensionsRecomputeCounter is by definition always equal or greater
 			// than 0. This check is only there to satisfy the correctness of the
 			// exhaustive-deps rule for the `useMemo` hook.
-			popoverAnchorRecomputeCounter < 0 ||
+			popoverDimensionsRecomputeCounter < 0 ||
+			! selectedElement ||
+			lastSelectedElement !== selectedElement
+		) {
+			return {};
+		}
+
+		return {
+			position: 'absolute',
+			width: selectedElement.offsetWidth,
+			height: selectedElement.offsetHeight,
+		};
+	}, [
+		selectedElement,
+		lastSelectedElement,
+		__unstableRefreshSize,
+		popoverDimensionsRecomputeCounter,
+	] );
+
+	const popoverAnchor = useMemo( () => {
+		if (
+			// popoverDimensionsRecomputeCounter is by definition always equal or greater
+			// than 0. This check is only there to satisfy the correctness of the
+			// exhaustive-deps rule for the `useMemo` hook.
+			popoverDimensionsRecomputeCounter < 0 ||
 			! selectedElement ||
 			( bottomClientId && ! lastSelectedElement )
 		) {
@@ -132,7 +148,7 @@ function BlockPopover(
 		bottomClientId,
 		lastSelectedElement,
 		selectedElement,
-		popoverAnchorRecomputeCounter,
+		popoverDimensionsRecomputeCounter,
 	] );
 
 	if ( ! selectedElement || ( bottomClientId && ! lastSelectedElement ) ) {
@@ -148,14 +164,16 @@ function BlockPopover(
 			// Render in the old slot if needed for backward compatibility,
 			// otherwise render in place (not in the default popover slot).
 			__unstableSlotName={ __unstablePopoverSlot || null }
+			placement="top-start"
 			resize={ false }
 			flip={ false }
-			shift
+			shift={ shift }
 			{ ...props }
 			className={ classnames(
 				'block-editor-block-popover',
 				props.className
 			) }
+			variant="unstyled"
 		>
 			{ __unstableCoverTarget && <div style={ style }>{ children }</div> }
 			{ ! __unstableCoverTarget && children }

@@ -6,8 +6,7 @@ import { render, screen } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import Toolbar from '../';
-import ToolbarButton from '../../toolbar-button';
+import { Toolbar, ToolbarButton } from '..';
 
 describe( 'Toolbar', () => {
 	describe( 'basic rendering', () => {
@@ -21,10 +20,10 @@ describe( 'Toolbar', () => {
 
 			expect(
 				screen.getByLabelText( 'control1', { selector: 'button' } )
-			).toBeTruthy();
+			).toBeInTheDocument();
 			expect(
 				screen.getByLabelText( 'control2', { selector: 'button' } )
-			).toBeTruthy();
+			).toBeInTheDocument();
 		} );
 	} );
 } );

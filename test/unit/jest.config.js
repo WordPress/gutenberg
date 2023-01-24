@@ -37,7 +37,6 @@ module.exports = {
 		'^.+\\.[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
 	},
 	snapshotSerializers: [
-		'enzyme-to-json/serializer',
 		'@emotion/jest/serializer',
 		'snapshot-diff/serializer',
 	],

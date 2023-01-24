@@ -252,8 +252,17 @@ class AztecView extends Component {
 			window.console.warn(
 				"Removing lineHeight style as it's not supported by native AztecView"
 			);
-			// Prevents passing line-heigth within styles to avoid a crash due to values without units
+			// Prevents passing line-height within styles to avoid a crash due to values without units
 			// We now support this but passing line-height as a prop instead.
+		}
+
+		// Remove Font size rendering for pre elements until we fix an issue with AztecAndroid.
+		if (
+			Platform.OS === 'android' &&
+			this.props.text?.tag === 'pre' &&
+			style.hasOwnProperty( 'fontSize' )
+		) {
+			delete style.fontSize;
 		}
 
 		return (
@@ -284,5 +293,6 @@ class AztecView extends Component {
 const RCTAztecView = requireNativeComponent( 'RCTAztecView', AztecView );
 
 AztecView.InputState = AztecInputState;
+AztecView.KeyCodes = KEYCODES;
 
 export default AztecView;

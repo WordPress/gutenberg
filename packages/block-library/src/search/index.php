@@ -66,14 +66,14 @@ function render_block_core_search( $attributes ) {
 
 	if ( $show_input ) {
 		$input_classes = array( 'wp-block-search__input' );
-		if ( $is_button_inside ) {
+		if ( ! $is_button_inside && ! empty( $border_color_classes ) ) {
 			$input_classes[] = $border_color_classes;
 		}
 		if ( ! empty( $typography_classes ) ) {
 			$input_classes[] = $typography_classes;
 		}
 		$input_markup = sprintf(
-			'<input type="search" id="%s" class="wp-block-search__input %s" name="s" value="%s" placeholder="%s" %s required />',
+			'<input type="search" id="%s" class="%s" name="s" value="%s" placeholder="%s" %s required />',
 			$input_id,
 			esc_attr( implode( ' ', $input_classes ) ),
 			get_search_query(),
@@ -367,12 +367,12 @@ function styles_for_block_core_search( $attributes ) {
 	// Add color styles.
 	$has_text_color = ! empty( $attributes['style']['color']['text'] );
 	if ( $has_text_color ) {
-		$button_styles[] = sprintf( 'color: %s;', esc_attr( $attributes['style']['color']['text'] ) );
+		$button_styles[] = sprintf( 'color: %s;', $attributes['style']['color']['text'] );
 	}
 
 	$has_background_color = ! empty( $attributes['style']['color']['background'] );
 	if ( $has_background_color ) {
-		$button_styles[] = sprintf( 'background-color: %s;', esc_attr( $attributes['style']['color']['background'] ) );
+		$button_styles[] = sprintf( 'background-color: %s;', $attributes['style']['color']['background'] );
 	}
 
 	$has_custom_gradient = ! empty( $attributes['style']['color']['gradient'] );
@@ -381,7 +381,7 @@ function styles_for_block_core_search( $attributes ) {
 	}
 
 	// Get typography styles to be shared across inner elements.
-	$typography_styles = get_typography_styles_for_block_core_search( $attributes );
+	$typography_styles = esc_attr( get_typography_styles_for_block_core_search( $attributes ) );
 	if ( ! empty( $typography_styles ) ) {
 		$label_styles [] = $typography_styles;
 		$button_styles[] = $typography_styles;
@@ -399,9 +399,9 @@ function styles_for_block_core_search( $attributes ) {
 	}
 
 	return array(
-		'input'   => ! empty( $input_styles ) ? sprintf( ' style="%s"', safecss_filter_attr( implode( ' ', $input_styles ) ) ) : '',
-		'button'  => ! empty( $button_styles ) ? sprintf( ' style="%s"', safecss_filter_attr( implode( ' ', $button_styles ) ) ) : '',
-		'wrapper' => ! empty( $wrapper_styles ) ? sprintf( ' style="%s"', safecss_filter_attr( implode( ' ', $wrapper_styles ) ) ) : '',
+		'input'   => ! empty( $input_styles ) ? sprintf( ' style="%s"', esc_attr( safecss_filter_attr( implode( ' ', $input_styles ) ) ) ) : '',
+		'button'  => ! empty( $button_styles ) ? sprintf( ' style="%s"', esc_attr( safecss_filter_attr( implode( ' ', $button_styles ) ) ) ) : '',
+		'wrapper' => ! empty( $wrapper_styles ) ? sprintf( ' style="%s"', esc_attr( safecss_filter_attr( implode( ' ', $wrapper_styles ) ) ) ) : '',
 		'label'   => ! empty( $label_styles ) ? sprintf( ' style="%s"', esc_attr( safecss_filter_attr( implode( ' ', $label_styles ) ) ) ) : '',
 	);
 }
@@ -442,31 +442,39 @@ function get_typography_styles_for_block_core_search( $attributes ) {
 
 	// Add typography styles.
 	if ( ! empty( $attributes['style']['typography']['fontSize'] ) ) {
-		$typography_styles[] = sprintf( 'font-size: %s;', esc_attr( $attributes['style']['typography']['fontSize'] ) );
+		$typography_styles[] = sprintf(
+			'font-size: %s;',
+			wp_get_typography_font_size_value(
+				array(
+					'size' => $attributes['style']['typography']['fontSize'],
+				)
+			)
+		);
+
 	}
 
 	if ( ! empty( $attributes['style']['typography']['fontFamily'] ) ) {
-		$typography_styles[] = sprintf( 'font-family: %s;', esc_attr( $attributes['style']['typography']['fontFamily'] ) );
+		$typography_styles[] = sprintf( 'font-family: %s;', $attributes['style']['typography']['fontFamily'] );
 	}
 
 	if ( ! empty( $attributes['style']['typography']['letterSpacing'] ) ) {
-		$typography_styles[] = sprintf( 'letter-spacing: %s;', esc_attr( $attributes['style']['typography']['letterSpacing'] ) );
+		$typography_styles[] = sprintf( 'letter-spacing: %s;', $attributes['style']['typography']['letterSpacing'] );
 	}
 
 	if ( ! empty( $attributes['style']['typography']['fontWeight'] ) ) {
-		$typography_styles[] = sprintf( 'font-weight: %s;', esc_attr( $attributes['style']['typography']['fontWeight'] ) );
+		$typography_styles[] = sprintf( 'font-weight: %s;', $attributes['style']['typography']['fontWeight'] );
 	}
 
 	if ( ! empty( $attributes['style']['typography']['fontStyle'] ) ) {
-		$typography_styles[] = sprintf( 'font-style: %s;', esc_attr( $attributes['style']['typography']['fontStyle'] ) );
+		$typography_styles[] = sprintf( 'font-style: %s;', $attributes['style']['typography']['fontStyle'] );
 	}
 
 	if ( ! empty( $attributes['style']['typography']['lineHeight'] ) ) {
-		$typography_styles[] = sprintf( 'line-height: %s;', esc_attr( $attributes['style']['typography']['lineHeight'] ) );
+		$typography_styles[] = sprintf( 'line-height: %s;', $attributes['style']['typography']['lineHeight'] );
 	}
 
 	if ( ! empty( $attributes['style']['typography']['textTransform'] ) ) {
-		$typography_styles[] = sprintf( 'text-transform: %s;', esc_attr( $attributes['style']['typography']['textTransform'] ) );
+		$typography_styles[] = sprintf( 'text-transform: %s;', $attributes['style']['typography']['textTransform'] );
 	}
 
 	return implode( '', $typography_styles );

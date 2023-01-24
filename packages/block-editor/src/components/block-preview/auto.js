@@ -1,10 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { Disabled } from '@wordpress/components';
 import { useResizeObserver, pure, useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
+import { Disabled } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -23,16 +23,19 @@ const MAX_HEIGHT = 2000;
 function ScaledBlockPreview( {
 	viewportWidth,
 	containerWidth,
-	__experimentalPadding,
-	__experimentalMinHeight,
+	minHeight,
+	additionalStyles = [],
 } ) {
+	if ( ! viewportWidth ) {
+		viewportWidth = containerWidth;
+	}
+
 	const [ contentResizeListener, { height: contentHeight } ] =
 		useResizeObserver();
-	const { styles, assets, duotone } = useSelect( ( select ) => {
+	const { styles, duotone } = useSelect( ( select ) => {
 		const settings = select( store ).getSettings();
 		return {
 			styles: settings.styles,
-			assets: settings.__unstableResolvedAssets,
 			duotone: settings.__experimentalFeatures?.color?.duotone,
 		};
 	}, [] );
@@ -43,14 +46,15 @@ function ScaledBlockPreview( {
 			return [
 				...styles,
 				{
-					css: 'body{height:auto;overflow:hidden;}',
+					css: 'body{height:auto;overflow:hidden;border:none;padding:0;}',
 					__unstableType: 'presets',
 				},
+				...additionalStyles,
 			];
 		}
 
 		return styles;
-	}, [ styles ] );
+	}, [ styles, additionalStyles ] );
 
 	const svgFilters = useMemo( () => {
 		return [ ...( duotone?.default ?? [] ), ...( duotone?.theme ?? [] ) ];
@@ -68,12 +72,11 @@ function ScaledBlockPreview( {
 				height: contentHeight * scale,
 				maxHeight:
 					contentHeight > MAX_HEIGHT ? MAX_HEIGHT * scale : undefined,
-				minHeight: __experimentalMinHeight,
+				minHeight,
 			} }
 		>
 			<Iframe
 				head={ <EditorStyles styles={ editorStyles } /> }
-				assets={ assets }
 				contentRef={ useRefEffect( ( bodyElement ) => {
 					const {
 						ownerDocument: { documentElement },
@@ -83,7 +86,6 @@ function ScaledBlockPreview( {
 					);
 					documentElement.style.position = 'absolute';
 					documentElement.style.width = '100%';
-					bodyElement.style.padding = __experimentalPadding + 'px';
 
 					// Necessary for contentResizeListener to work.
 					bodyElement.style.boxSizing = 'border-box';
@@ -101,9 +103,9 @@ function ScaledBlockPreview( {
 					// See: https://github.com/WordPress/gutenberg/pull/38175.
 					maxHeight: MAX_HEIGHT,
 					minHeight:
-						scale !== 0 && scale < 1 && __experimentalMinHeight
-							? __experimentalMinHeight / scale
-							: __experimentalMinHeight,
+						scale !== 0 && scale < 1 && minHeight
+							? minHeight / scale
+							: minHeight,
 				} }
 			>
 				{ contentResizeListener }
