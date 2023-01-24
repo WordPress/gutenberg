@@ -22,11 +22,7 @@ function render_block_core_comments_pagination( $attributes, $content ) {
 		return;
 	}
 
-	$classes = '';
-	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
-		$classes .= ' has-link-color';
-	}
-
+	$classes = ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) ? 'has-link-color' : '';
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 
 	return sprintf(
