@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ReactNode, SyntheticEvent } from 'react';
+import type { MouseEventHandler, ReactNode } from 'react';
 
 type CommonNoticeActionProps = {
 	label: string;
@@ -14,11 +14,11 @@ type CommonNoticeActionProps = {
 // `onClick` will be ignored.
 type NoticeActionWithURL = CommonNoticeActionProps & {
 	url: string;
-	onClick?: () => void;
+	onClick?: never;
 };
 type NoticeActionWithOnClick = CommonNoticeActionProps & {
-	url?: string;
-	onClick: ( event: SyntheticEvent ) => void;
+	url?: never;
+	onClick: MouseEventHandler;
 };
 
 export type NoticeAction = NoticeActionWithURL | NoticeActionWithOnClick;
