@@ -236,6 +236,13 @@ export default function Layout( { onError } ) {
 										<ResizeHandle
 											direction="right"
 											variation="separator"
+											resizeWidthBy={ ( delta ) => {
+												setForcedWidth(
+													( forcedWidth ??
+														defaultSidebarWidth ) +
+														delta
+												);
+											} }
 										/>
 									),
 								} }

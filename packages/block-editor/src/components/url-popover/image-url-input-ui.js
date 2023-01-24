@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -260,7 +255,7 @@ const ImageURLInputUI = ( {
 					additionalControls={
 						! linkEditorValue && (
 							<NavigableMenu>
-								{ map( getLinkDestinations(), ( link ) => (
+								{ getLinkDestinations().map( ( link ) => (
 									<MenuItem
 										key={ link.linkDestination }
 										icon={ link.icon }

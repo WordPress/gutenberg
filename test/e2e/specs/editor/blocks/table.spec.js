@@ -77,7 +77,9 @@ test.describe( 'Table', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/table' } );
 		await editor.openDocumentSettingsSidebar();
-		await editor.switchBlockInspectorTab( 'Settings' );
+		await page.click(
+			`role=region[name="Editor settings"i] >> role=tab[name="Settings"i]`
+		);
 
 		const headerSwitch = page.locator(
 			'role=checkbox[name="Header section"i]'
@@ -133,13 +135,17 @@ test.describe( 'Table', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/table' } );
 		await editor.openDocumentSettingsSidebar();
-		await editor.switchBlockInspectorTab( 'Settings' );
+		await page.click(
+			`role=region[name="Editor settings"i] >> role=tab[name="Settings"i]`
+		);
 
 		// Create the table.
 		await page.click( 'role=button[name="Create Table"i]' );
 
 		// Toggle on the switches and add some content.
-		await editor.switchBlockInspectorTab( 'Settings' );
+		await page.click(
+			`role=region[name="Editor settings"i] >> role=tab[name="Settings"i]`
+		);
 		await page.locator( 'role=checkbox[name="Header section"i]' ).check();
 		await page.locator( 'role=checkbox[name="Footer section"i]' ).check();
 		await page.click( 'role=textbox[name="Body cell text"i] >> nth=0' );
@@ -205,7 +211,9 @@ test.describe( 'Table', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/table' } );
 		await editor.openDocumentSettingsSidebar();
-		await editor.switchBlockInspectorTab( 'Settings' );
+		await page.click(
+			`role=region[name="Editor settings"i] >> role=tab[name="Settings"i]`
+		);
 
 		// Create the table.
 		await page.click( 'role=button[name="Create Table"i]' );
