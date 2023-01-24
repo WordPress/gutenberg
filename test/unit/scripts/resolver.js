@@ -23,7 +23,8 @@ module.exports = ( path, options ) => {
 			if (
 				pkg.name === 'uuid' ||
 				pkg.name === 'react-colorful' ||
-				pkg.name === '@eslint/eslintrc'
+				pkg.name === '@eslint/eslintrc' ||
+				pkg.name === 'expect'
 			) {
 				delete pkg.exports;
 				delete pkg.module;
