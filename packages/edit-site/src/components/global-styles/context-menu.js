@@ -42,7 +42,7 @@ const { useHasTypographyPanel, useGlobalSetting } = unlock(
 
 function ContextMenu( { name, parentMenu = '' } ) {
 	const [ settings ] = useGlobalSetting( '', name );
-	const hasTypographyPanel = useHasTypographyPanel( name, settings );
+	const hasTypographyPanel = useHasTypographyPanel( name, null, settings );
 	const hasColorPanel = useHasColorPanel( name );
 	const hasBorderPanel = useHasBorderPanel( name );
 	const hasEffectsPanel = useHasShadowControl( name );

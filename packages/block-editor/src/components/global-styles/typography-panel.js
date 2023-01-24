@@ -19,14 +19,26 @@ import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
 import { useSupportedStyles } from './hooks';
 
-export function useHasTypographyPanel( name, settings ) {
-	const hasFontFamily = useHasFontFamilyControl( name, settings );
-	const hasLineHeight = useHasLineHeightControl( name, settings );
-	const hasFontAppearance = useHasAppearanceControl( name, settings );
-	const hasLetterSpacing = useHasLetterSpacingControl( name, settings );
-	const hasTextTransform = useHasTextTransformControl( name, settings );
-	const hasTextDecoration = useHasTextDecorationControl( settings );
-	const hasFontSize = useHasFontSizeControl( name, settings );
+export function useHasTypographyPanel( name, element, settings ) {
+	const hasFontFamily = useHasFontFamilyControl( name, element, settings );
+	const hasLineHeight = useHasLineHeightControl( name, element, settings );
+	const hasFontAppearance = useHasAppearanceControl(
+		name,
+		element,
+		settings
+	);
+	const hasLetterSpacing = useHasLetterSpacingControl(
+		name,
+		element,
+		settings
+	);
+	const hasTextTransform = useHasTextTransformControl(
+		name,
+		element,
+		settings
+	);
+	const hasTextDecoration = useHasTextDecorationControl( name, element );
+	const hasFontSize = useHasFontSizeControl( name, element, settings );
 
 	return (
 		hasFontFamily ||
@@ -39,8 +51,8 @@ export function useHasTypographyPanel( name, settings ) {
 	);
 }
 
-function useHasFontSizeControl( name, settings ) {
-	const supports = useSupportedStyles( name );
+function useHasFontSizeControl( name, element, settings ) {
+	const supports = useSupportedStyles( name, element );
 	const disableCustomFontSizes = ! settings?.typography?.customFontSize;
 	const fontSizes = settings?.typography?.fontSizes;
 	return (
@@ -49,21 +61,21 @@ function useHasFontSizeControl( name, settings ) {
 	);
 }
 
-function useHasFontFamilyControl( name, settings ) {
-	const supports = useSupportedStyles( name );
+function useHasFontFamilyControl( name, element, settings ) {
+	const supports = useSupportedStyles( name, element );
 	const fontFamilies = settings?.typography?.fontFamilies;
 	return supports.includes( 'fontFamily' ) && !! fontFamilies?.length;
 }
 
-function useHasLineHeightControl( name, settings ) {
-	const supports = useSupportedStyles( name );
+function useHasLineHeightControl( name, element, settings ) {
+	const supports = useSupportedStyles( name, element );
 	return (
 		settings?.typography?.lineHeight && supports.includes( 'lineHeight' )
 	);
 }
 
-function useHasAppearanceControl( name, settings ) {
-	const supports = useSupportedStyles( name );
+function useHasAppearanceControl( name, element, settings ) {
+	const supports = useSupportedStyles( name, element );
 	const hasFontStyles =
 		settings?.typography?.fontStyle && supports.includes( 'fontStyle' );
 	const hasFontWeights =
@@ -71,8 +83,8 @@ function useHasAppearanceControl( name, settings ) {
 	return hasFontStyles || hasFontWeights;
 }
 
-function useAppearanceControlLabel( name, settings ) {
-	const supports = useSupportedStyles( name );
+function useAppearanceControlLabel( name, element, settings ) {
+	const supports = useSupportedStyles( name, element );
 	const hasFontStyles =
 		settings?.typography?.fontStyle && supports.includes( 'fontStyle' );
 	const hasFontWeights =
@@ -86,42 +98,43 @@ function useAppearanceControlLabel( name, settings ) {
 	return __( 'Appearance' );
 }
 
-function useHasLetterSpacingControl( name, settings ) {
+function useHasLetterSpacingControl( name, element, settings ) {
 	const setting = settings?.typography?.letterSpacing;
-	const supports = useSupportedStyles( name );
+	const supports = useSupportedStyles( name, element );
 	if ( ! setting ) {
 		return false;
 	}
 	return supports.includes( 'letterSpacing' );
 }
 
-function useHasTextTransformControl( name, settings ) {
+function useHasTextTransformControl( name, element, settings ) {
 	const setting = settings?.typography?.textTransform;
-	const supports = useSupportedStyles( name );
+	const supports = useSupportedStyles( name, element );
 	if ( ! setting ) {
 		return false;
 	}
-	/* Todo check condition
-	if ( ! name && element === 'heading' ) {
-		return true;
-	}
-	*/
 	return supports.includes( 'textTransform' );
 }
 
-function useHasTextDecorationControl( settings ) {
-	return !! settings?.typography?.textDecoration;
+function useHasTextDecorationControl( name, element ) {
+	const supports = useSupportedStyles( name, element );
+	return supports.includes( 'textDecoration' );
 }
 
 export default function TypographyPanel( {
 	name,
+	element,
 	value,
 	onChange,
 	inherit,
 	settings,
 } ) {
 	// Font Family
-	const hasFontFamilyEnabled = useHasFontFamilyControl( name, settings );
+	const hasFontFamilyEnabled = useHasFontFamilyControl(
+		name,
+		element,
+		settings
+	);
 	const fontFamilies = settings?.typography?.fontFamilies;
 	const fontFamily = inherit?.typography?.fontFamily;
 	const setFontFamily = ( newValue ) => {
@@ -137,7 +150,7 @@ export default function TypographyPanel( {
 	const resetFontFamily = () => setFontFamily( undefined );
 
 	// Font Size
-	const hasFontSizeEnabled = useHasFontSizeControl( name, settings );
+	const hasFontSizeEnabled = useHasFontSizeControl( name, element, settings );
 	const disableCustomFontSizes = ! settings?.typography?.customFontSize;
 	const fontSizes = settings?.typography?.fontSizes;
 	const fontSize = inherit?.typography?.fontSize;
@@ -158,8 +171,16 @@ export default function TypographyPanel( {
 	const resetFontSize = () => setFontSize( undefined );
 
 	// Appearance
-	const hasAppearanceControl = useHasAppearanceControl( name, settings );
-	const appearanceControlLabel = useAppearanceControlLabel( name, settings );
+	const hasAppearanceControl = useHasAppearanceControl(
+		name,
+		element,
+		settings
+	);
+	const appearanceControlLabel = useAppearanceControlLabel(
+		name,
+		element,
+		settings
+	);
 	const hasFontStyles = settings?.typography?.fontStyle;
 	const hasFontWeights = settings?.typography?.fontWeight;
 	const fontStyle = inherit?.typography?.fontStyle;
@@ -190,7 +211,11 @@ export default function TypographyPanel( {
 	};
 
 	// Line Height
-	const hasLineHeightEnabled = useHasLineHeightControl( name, settings );
+	const hasLineHeightEnabled = useHasLineHeightControl(
+		name,
+		element,
+		settings
+	);
 	const lineHeight = inherit?.typography?.lineHeight;
 	const setLineHeight = ( newValue ) => {
 		onChange( {
@@ -207,6 +232,7 @@ export default function TypographyPanel( {
 	// Letter Spacing
 	const hasLetterSpacingControl = useHasLetterSpacingControl(
 		name,
+		element,
 		settings
 	);
 	const letterSpacing = inherit?.typography?.letterSpacing;
@@ -225,6 +251,7 @@ export default function TypographyPanel( {
 	// Text Transform
 	const hasTextTransformControl = useHasTextTransformControl(
 		name,
+		element,
 		settings
 	);
 	const textTransform = inherit?.typography?.textTransform;
@@ -241,7 +268,10 @@ export default function TypographyPanel( {
 	const resetTextTransform = () => setTextTransform( undefined );
 
 	// Text Decoration
-	const hasTextDecorationControl = useHasTextDecorationControl( settings );
+	const hasTextDecorationControl = useHasTextDecorationControl(
+		name,
+		element
+	);
 	const textDecoration = inherit?.typography?.textDecoration;
 	const setTextDecoration = ( newValue ) => {
 		onChange( {

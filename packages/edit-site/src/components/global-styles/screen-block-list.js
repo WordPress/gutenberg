@@ -57,7 +57,11 @@ function useSortedBlockTypes() {
 
 function BlockMenuItem( { block } ) {
 	const [ settings ] = useGlobalSetting( '', block.name );
-	const hasTypographyPanel = useHasTypographyPanel( block.name, settings );
+	const hasTypographyPanel = useHasTypographyPanel(
+		block.name,
+		null,
+		settings
+	);
 	const hasColorPanel = useHasColorPanel( block.name );
 	const hasBorderPanel = useHasBorderPanel( block.name );
 	const hasDimensionsPanel = useHasDimensionsPanel( block.name );
