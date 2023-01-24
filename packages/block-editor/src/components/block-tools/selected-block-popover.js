@@ -21,6 +21,7 @@ import { store as blockEditorStore } from '../../store';
 import BlockPopover from '../block-popover';
 import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 import Inserter from '../inserter';
+import { unlock } from '../../experiments';
 
 function selector( select ) {
 	const {
@@ -31,7 +32,7 @@ function selector( select ) {
 		__experimentalIsBlockInterfaceHidden: isBlockInterfaceHidden,
 		getSettings,
 		getLastMultiSelectedBlockClientId,
-	} = select( blockEditorStore );
+	} = unlock( select( blockEditorStore ) );
 
 	return {
 		editorMode: __unstableGetEditorMode(),
