@@ -23,14 +23,15 @@ function render_block_core_post_author_name( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$author_name      = get_the_author_meta( 'display_name', $author_id );
-	$align_class_name = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
-
+	$author_name = get_the_author_meta( 'display_name', $author_id );
+	$classes     = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
+	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
+		$classes .= ' has-link-color';
+	}
 	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
 		$author_name = sprintf( '<a href="%1$s" target="%2$s" class="wp-block-post-author-name__link">%3$s</a>', get_author_posts_url( $author_id ), esc_attr( $attributes['linkTarget'] ), $author_name );
 	}
-
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 
 	return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, $author_name );
 }
