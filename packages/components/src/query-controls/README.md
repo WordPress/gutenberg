@@ -70,10 +70,12 @@ const QUERY_DEFAULTS = {
 		{
 			id: 1,
 			value: 'Category 1',
+			parent: 0,
 		},
 		{
 			id: 2,
 			value: 'Category 1b',
+			parent: 1,
 		},
 	],
 	categories: {
