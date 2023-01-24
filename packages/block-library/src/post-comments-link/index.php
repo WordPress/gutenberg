@@ -22,8 +22,12 @@ function render_block_core_post_comments_link( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$align_class_name   = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
+	$classes = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
+	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
+		$classes .= ' has-link-color';
+	}
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
+	
 	$comments_number    = (int) get_comments_number( $block->context['postId'] );
 	$comments_link      = get_comments_link( $block->context['postId'] );
 	$post_title         = get_the_title( $block->context['postId'] );
