@@ -35,7 +35,7 @@ import type { WordPressComponentProps } from '../ui/context';
 import type { DropdownProps } from '../dropdown/types';
 import {
 	extractColorNameFromCurrentValue,
-	areColorsMultiplePalette,
+	isMultiplePaletteArray,
 	normalizeColorValue,
 	showTransparentBackground,
 } from './utils';
@@ -203,7 +203,7 @@ function UnforwardedColorPalette(
 	// Make sure that the `colors` array has a valid format.
 	if (
 		colors.length > 0 &&
-		hasMultipleColorOrigins !== areColorsMultiplePalette( colors )
+		hasMultipleColorOrigins !== isMultiplePaletteArray( colors )
 	) {
 		// eslint-disable-next-line no-console
 		console.warn(

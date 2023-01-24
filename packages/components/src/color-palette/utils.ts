@@ -56,11 +56,19 @@ export const showTransparentBackground = ( currentValue?: string ) => {
 	return colord( currentValue ).alpha() === 0;
 };
 
-export const areColorsMultiplePalette = (
-	colors: NonNullable< ColorPaletteProps[ 'colors' ] >
-): colors is PaletteObject[] => {
-	return colors.every( ( colorObj ) =>
-		Array.isArray( ( colorObj as PaletteObject ).colors )
+// The PaletteObject type has a `colors` property (an array of ColorObject),
+// while the ColorObject type has a `color` property (the CSS color value).
+export const isMultiplePaletteObject = (
+	obj: PaletteObject | ColorObject
+): obj is PaletteObject =>
+	Array.isArray( ( obj as PaletteObject ).colors ) && ! ( 'color' in obj );
+
+export const isMultiplePaletteArray = (
+	arr: ( PaletteObject | ColorObject )[]
+): arr is PaletteObject[] => {
+	return (
+		arr.length > 0 &&
+		arr.every( ( colorObj ) => isMultiplePaletteObject( colorObj ) )
 	);
 };
 
