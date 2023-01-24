@@ -92,8 +92,10 @@
 		},
 		"__experimentalBorder": {
 			"radius": true,
+			"color": true,
 			"__experimentalSkipSerialization": true,
 			"__experimentalDefaultControls": {
+				"color": true,
 				"radius": true
 			}
 		},
