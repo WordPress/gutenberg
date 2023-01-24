@@ -7,7 +7,7 @@ import {
 	__experimentalUseNavigator as useNavigator,
 } from '@wordpress/components';
 import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
-
+import { usePrevious } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -239,7 +239,26 @@ function GlobalStylesStyleBook( { onClose } ) {
 	);
 }
 
-function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
+function NavigatorControl( { navigatorPath, setNavigatorPath } ) {
+	const { goTo, location } = useNavigator();
+	const previousNavigatorPath = usePrevious( navigatorPath );
+
+	if (
+		navigatorPath !== previousNavigatorPath &&
+		previousNavigatorPath !== '/css' &&
+		location.isBack !== true
+	) {
+		goTo( navigatorPath );
+		setNavigatorPath( '/' );
+	}
+}
+
+function GlobalStylesUI( {
+	isStyleBookOpened,
+	onCloseStyleBook,
+	navigatorPath,
+	setNavigatorPath,
+} ) {
 	const blocks = getBlockTypes();
 
 	return (
@@ -267,7 +286,10 @@ function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
 					<ScreenBlock name={ block.name } />
 				</GlobalStylesNavigationScreen>
 			) ) }
-
+			<NavigatorControl
+				navigatorPath={ navigatorPath }
+				setNavigatorPath={ setNavigatorPath }
+			/>
 			<ContextScreens />
 
 			{ blocks.map( ( block ) => (

@@ -26,6 +26,7 @@ import { unlock } from '../../experiments';
 const { useGlobalStylesReset } = unlock( blockEditorExperiments );
 
 export default function GlobalStylesSidebar() {
+	const [ navigatorPath, setNavigatorPath ] = useState( '/' );
 	const [ canReset, onReset ] = useGlobalStylesReset();
 	const { toggle } = useDispatch( preferencesStore );
 	const [ isStyleBookOpened, setIsStyleBookOpened ] = useState( false );
@@ -33,6 +34,9 @@ export default function GlobalStylesSidebar() {
 		( select ) => select( editSiteStore ).getEditorMode(),
 		[]
 	);
+
+	const loadCustomCSS = () => setNavigatorPath( '/css' );
+
 	useEffect( () => {
 		if ( editorMode !== 'visual' ) {
 			setIsStyleBookOpened( false );
@@ -77,6 +81,10 @@ export default function GlobalStylesSidebar() {
 									isDisabled: ! canReset,
 								},
 								{
+									title: __( 'Additional CSS' ),
+									onClick: loadCustomCSS,
+								},
+								{
 									title: __( 'Welcome Guide' ),
 									onClick: () =>
 										toggle(
@@ -93,6 +101,8 @@ export default function GlobalStylesSidebar() {
 			<GlobalStylesUI
 				isStyleBookOpened={ isStyleBookOpened }
 				onCloseStyleBook={ () => setIsStyleBookOpened( false ) }
+				navigatorPath={ navigatorPath }
+				setNavigatorPath={ setNavigatorPath }
 			/>
 		</DefaultSidebar>
 	);
