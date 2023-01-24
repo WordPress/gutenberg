@@ -17,7 +17,7 @@ export default function AuthorSelect( {
 	const termsTree = buildTermsTree( authorList );
 	return (
 		<TreeSelect
-		{ ...{
+			{ ...{
 				label,
 				noOptionLabel,
 				// Since the `multiple` attribute is not passed to `TreeSelect`, it is

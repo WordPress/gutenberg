@@ -25,7 +25,7 @@ export default function CategorySelect( {
 
 	return (
 		<TreeSelect
-		{ ...{
+			{ ...{
 				label,
 				noOptionLabel,
 				// Since the `multiple` attribute is not passed to `TreeSelect`, it is

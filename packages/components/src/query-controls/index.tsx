@@ -140,9 +140,9 @@ export function QueryControls( {
 					),
 				isMultipleCategorySelection( props ) &&
 					props.categorySuggestions &&
-				props.onCategoryChange && (
+					props.onCategoryChange && (
 						<FormTokenField
-						key="query-controls-categories-select"
+							key="query-controls-categories-select"
 							label={ __( 'Categories' ) }
 							value={
 								props.selectedCategories &&
