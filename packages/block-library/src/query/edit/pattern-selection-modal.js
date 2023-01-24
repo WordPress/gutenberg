@@ -1,9 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { Modal, SearchControl } from '@wordpress/components';
+import { useAsyncList } from '@wordpress/compose';
 import {
 	store as blockEditorStore,
 	__experimentalBlockPatternsList as BlockPatternsList,
@@ -18,6 +19,7 @@ import {
 	getTransformedBlocksFromPattern,
 	usePatterns,
 } from '../utils';
+import { searchPatterns } from '../../utils/search-patterns';
 
 export default function PatternSelectionModal( {
 	clientId,
@@ -41,6 +43,10 @@ export default function PatternSelectionModal( {
 		attributes
 	);
 	const blockPatterns = usePatterns( clientId, blockNameForPatterns );
+	const filteredBlockPatterns = useMemo( () => {
+		return searchPatterns( blockPatterns, searchValue );
+	}, [ blockPatterns, searchValue ] );
+	const shownBlockPatterns = useAsyncList( filteredBlockPatterns );
 
 	return (
 		<Modal
@@ -59,8 +65,8 @@ export default function PatternSelectionModal( {
 					/>
 				</div>
 				<BlockPatternsList
-					blockPatterns={ blockPatterns }
-					shownPatterns={ blockPatterns }
+					blockPatterns={ filteredBlockPatterns }
+					shownPatterns={ shownBlockPatterns }
 					onClickPattern={ onBlockPatternSelect }
 				/>
 			</div>
