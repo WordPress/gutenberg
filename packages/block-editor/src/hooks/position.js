@@ -274,10 +274,7 @@ export function PositionPanel( props ) {
 	return Platform.select( {
 		web:
 			options.length > 1 ? (
-				<InspectorControls
-					key="position"
-					__experimentalGroup="position"
-				>
+				<InspectorControls __experimentalGroup="position">
 					<BaseControl className="block-editor-hooks__position-selection">
 						<CustomSelectControl
 							__nextUnconstrainedWidth
@@ -323,7 +320,9 @@ export const withInspectorControls = createHigherOrderComponent(
 			positionSupport && ! useIsPositionDisabled( props );
 
 		return [
-			showPositionControls && <PositionPanel { ...props } />,
+			showPositionControls && (
+				<PositionPanel key="position" { ...props } />
+			),
 			<BlockEdit key="edit" { ...props } />,
 		];
 	},
