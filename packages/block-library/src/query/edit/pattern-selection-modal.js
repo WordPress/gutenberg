@@ -26,7 +26,7 @@ export default function PatternSelectionModal( {
 } ) {
 	const [ searchValue, setSearchValue ] = useState( '' );
 	const { replaceBlock, selectBlock } = useDispatch( blockEditorStore );
-	const onBlockPatternSelect = ( blocks ) => {
+	const onBlockPatternSelect = ( pattern, blocks ) => {
 		const { newBlocks, queryClientIds } = getTransformedBlocksFromPattern(
 			blocks,
 			attributes
