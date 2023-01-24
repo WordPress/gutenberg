@@ -53,6 +53,25 @@ When editing the notes, you should be sure to:
 
 You can find some more tips on writing the release notes and post in the section below.
 
+#### Creating Release Candidate Patches (done via `git cherry-pick`)
+
+At any point after the release candidate has been published but before the final stable release, some bugs related to this release might be fixed and committed to `trunk`. These fixes won't automatically be incorporated into the final stable release, including them is a manual process.
+
+There are a couple of ways a release coordinator might be made aware of these bugs:
+- You may receive a direct message or a ping in the #core-editor channel in slack notifying you of PRs that need to be included in the release candidate.
+- Contributors may add the `Backport to Gutenberg RC` label to a closed PR. [https://github.com/WordPress/gutenberg/pulls?q=is%3Apr+label%3A%22Backport+to+Gutenberg+RC%22+is%3Aclosed](Do a search for any of these PRs) before publishing the final release.
+
+The cherry-picking process is handled as follows:
+1. Checkout the corresponding release branch with: `git checkout release/x.x`.
+2. Cherry-pick fix commits (in chronological order) with `git cherry-pick [SHA]`. The cherry-picking process can be automated with the [`npm run cherry-pick` script](/docs/contributors/code/auto-cherry-picking.md), but make sure to use the `Backport to Gutenberg RC` label when running the command.
+3. When done, push the changes to GitHub: `git push`.
+
+Tip: To find the `[SHA]` for a pull request, open the PR and near the end you'll see a message "[Username] merged commit [SHA] into `trunk`".
+
+Once the commits have been cherry-picked, remove the `Backport to Gutenberg RC` label and update the milestone to the current release for all cherry-picked PRs.
+
+If you decide that the fixes deserve another release candidate before the stable version is published, create one by following the instructions above. Let other contributors know that a new release candidate has been released in the [`#core-editor` channel](https://wordpress.slack.com/messages/C02QB2JS7).
+
 #### Publishing the release
 
 Only once you're happy with the shape of the release notes should you press the green "Publish release" button. This will create a `git` tag for the version, publish the release, and trigger [another GHA workflow](https://github.com/WordPress/gutenberg/actions/workflows/upload-release-to-plugin-repo.yml) that has a twofold purpose:
@@ -131,16 +150,6 @@ The performance values usually displayed in the release post are:
 #### 5. Publishing the post
 
 Once the post content is ready, an author already having permissions to post in [make.wordpress.org/core](https://make.wordpress.org/core/) will create a new draft and import the content; this post should be published after the actual release, helping external media to echo and amplify the release news. Remember asking for peer review is encouraged by the [make/core posting guidelines](https://make.wordpress.org/core/handbook/best-practices/post-comment-guidelines/#peer-review)!
-
-### Creating Release Candidate Patches (done via `git cherry-pick`)
-
-If a bug is found in a release candidate and a fix is committed to `trunk`, we should include that fix in the stable version (or optionally in another release candidate before that). To do this you'll need to use `git cherry-pick` to add these changes to the milestone's release branch. This way only the desired fixes are added rather than all the new code that has landed on `trunk` since tagging:
-
-1. Checkout the corresponding release branch with: `git checkout release/x.x`.
-2. Cherry-pick fix commits (in chronological order) with `git cherry-pick [SHA]`. The cherry-picking process can be automated with the [`npm run cherry-pick` script](/docs/contributors/code/auto-cherry-picking.md).
-3. When done, push the changes to GitHub: `git push`.
-
-If you decide that the fixes deserve another release candidate before the stable version is published, create one by following the instructions above. Let other contributors know that a new release candidate has been released in the [`#core-editor` channel](https://wordpress.slack.com/messages/C02QB2JS7).
 
 ### Creating Point Releases
 
