@@ -55,6 +55,9 @@ function render_block_core_comment_reply_link( $attributes, $content, $block ) {
 	if ( isset( $attributes['textAlign'] ) ) {
 		$classes .= 'has-text-align-' . $attributes['textAlign'];
 	}
+	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
+		$classes .= ' has-link-color';
+	}
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 
