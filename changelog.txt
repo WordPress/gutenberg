@@ -1,5 +1,27 @@
 == Changelog ==
 
+= 15.0.1 =
+
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Block Editor
+- Move block variation picker styles in the iframe ([47109](https://github.com/WordPress/gutenberg/pull/47109)) 
+- Add useBlockPreview styles in iframe ([47110](https://github.com/WordPress/gutenberg/pull/47110))
+
+#### Block Library
+- Tag cloud: Disable clicking on the tag links in the editor. ([47338](https://github.com/WordPress/gutenberg/pull/47338))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@carolinan @ntsekouras
+
+
 = 15.0.0 =
 
 
