@@ -73,6 +73,16 @@ function gutenberg_enqueue_global_styles() {
 	gutenberg_add_global_styles_for_blocks();
 }
 
+function gutenberg_enqueue_global_styles_custom_css(){
+	$custom_css     = get_global_styles_custom_css();
+	$is_block_theme = wp_is_block_theme();
+	if ( $custom_css && $is_block_theme ) {
+		wp_register_style( 'global-styles-custom-css', false, array(), true, true );
+		wp_add_inline_style( 'global-styles-custom-css', $custom_css );
+		wp_enqueue_style( 'global-styles-custom-css' );
+	}
+}
+
 remove_action( 'wp_enqueue_scripts', 'wp_enqueue_global_styles' );
 remove_action( 'wp_footer', 'wp_enqueue_global_styles', 1 );
 remove_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_global_styles_assets' );
@@ -81,6 +91,7 @@ remove_action( 'wp_footer', 'gutenberg_enqueue_global_styles_assets' );
 // Enqueue global styles, and then block supports styles.
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_global_styles' );
 add_action( 'wp_footer', 'gutenberg_enqueue_global_styles', 1 );
+add_action( 'wp_head', 'gutenberg_enqueue_global_styles_custom_css', 102 );
 
 /**
  * Loads classic theme styles on classic themes in the frontend.

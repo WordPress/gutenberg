@@ -1084,7 +1084,7 @@ class WP_Theme_JSON_Gutenberg {
 		// Load the custom CSS last so it has the highest specificity.
 		if ( in_array( 'custom-css', $types, true ) ) {
 			// Add the global styles root CSS.
-			$stylesheet .= _wp_array_get( $this->theme_json, array( 'styles', 'css' ) );
+			//$stylesheet .= _wp_array_get( $this->theme_json, array( 'styles', 'css' ) );
 
 			// Add the global styles block CSS.
 			if ( isset( $this->theme_json['styles']['blocks'] ) ) {
@@ -1099,6 +1099,10 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		return $stylesheet;
+	}
+
+	public function get_custom_css() {
+		return _wp_array_get( $this->theme_json, array( 'styles', 'css' ) );
 	}
 	/**
 	 * Returns the page templates of the active theme.
