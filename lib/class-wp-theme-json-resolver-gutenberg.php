@@ -673,7 +673,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *
 	 * @since 6.2.0
 	 *
-	 * @param dir $dir The directory to recursively iterate and list files of.
+	 * @param string $dir The directory to recursively iterate and list files of.
 	 * @return array The merged array.
 	 */
 	private static function recursively_iterate_json( $dir ) {
