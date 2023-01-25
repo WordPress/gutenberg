@@ -143,11 +143,11 @@ describe( 'Private data APIs', () => {
 		} );
 
 		it( 'should support mixing createReduxStore and registerStore', () => {
-			const groceryStore1 = createReduxStore(
+			createReduxStore( storeName, storeDescriptor );
+			const groceryStore2 = registry.registerStore(
 				storeName,
 				storeDescriptor
 			);
-			const groceryStore2 = registry.registerStore( storeName, storeDescriptor );
 			unlock( groceryStore2 ).registerPrivateSelectors( {
 				getSecretDiscount,
 			} );
