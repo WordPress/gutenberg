@@ -55,6 +55,16 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					),
 				),
 				'styles'   => array(
+					'blocks'  => array(
+						'core/group' => array(
+							'spacing' => array(
+								'margin' => array(
+									'top'    => '25px',
+									'bottom' => '50px',
+								),
+							),
+						),
+					),
 					'spacing' => array(
 						'blockGap' => '1em',
 					),
@@ -65,7 +75,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		// Results also include root site blocks styles.
 		$this->assertEquals(
-			'body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.wp-site-blocks > * { margin-block-start: 0; margin-block-end: 0; }.wp-site-blocks > * + * { margin-block-start: 1em; }body { --wp--style--block-gap: 1em; }body .is-layout-flow > *{margin-block-start: 0;margin-block-end: 0;}body .is-layout-flow > * + *{margin-block-start: 1em;margin-block-end: 0;}body .is-layout-flex{gap: 1em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}',
+			'body { margin: 0;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.wp-site-blocks > * { margin-block-start: 0; margin-block-end: 0; }.wp-site-blocks > * + * { margin-block-start: 1em; }body { --wp--style--block-gap: 1em; }body .is-layout-flow > *{margin-block-start: 0;margin-block-end: 0;}body .is-layout-flow > * + *{margin-block-start: 1em;margin-block-end: 0;}body .is-layout-flex{gap: 1em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}.wp-block-group{margin-top: 25px;margin-bottom: 50px;}.is-layout-flow > .wp-block-group {margin-top:25px;margin-bottom:50px;}',
 			$theme_json->get_stylesheet( array( 'styles' ) )
 		);
 	}
@@ -261,10 +271,10 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'layout definitions' => array(
 				array(
 					'default' => array(
-						'name'          => 'default',
-						'slug'          => 'flow',
-						'className'     => 'is-layout-flow',
-						'baseStyles'    => array(
+						'name'           => 'default',
+						'slug'           => 'flow',
+						'className'      => 'is-layout-flow',
+						'baseStyles'     => array(
 							array(
 								'selector' => ' > .alignleft',
 								'rules'    => array(
@@ -289,7 +299,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 								),
 							),
 						),
-						'spacingStyles' => array(
+						'spacingStyles'  => array(
 							array(
 								'selector' => ' > *',
 								'rules'    => array(
@@ -305,6 +315,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 								),
 							),
 						),
+						'marginSelector' => ' > ',
 					),
 					'flex'    => array(
 						'name'          => 'flex',

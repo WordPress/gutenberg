@@ -549,6 +549,7 @@ describe( 'global styles renderer', () => {
 									},
 								},
 							],
+							marginSelector: ' > ',
 						},
 						flex: {
 							name: 'flex',
@@ -664,6 +665,24 @@ describe( 'global styles renderer', () => {
 				':where(.wp-block-group.is-layout-flex) { gap: 2em; }'
 			);
 		} );
+
+		it( 'should return layout aware margin styles', () => {
+			const style = {
+				spacing: { margin: { top: '25px', bottom: '50px' } },
+			};
+
+			const layoutStyles = getLayoutStyles( {
+				tree: layoutDefinitionsTree,
+				style,
+				selector: '.wp-block-cover',
+				hasBlockGapSupport: true,
+				hasFallbackGapSupport: true,
+			} );
+
+			expect( layoutStyles ).toEqual(
+				'.is-layout-flow > .wp-block-cover { margin-top: 25px; margin-bottom: 50px; }'
+			);
+		} );
 	} );
 
 	describe( 'getBlockSelectors', () => {
@@ -691,6 +710,7 @@ describe( 'global styles renderer', () => {
 						border: '.my-image img, .my-image .crop-area',
 					},
 					hasLayoutSupport: false,
+					hasMarginSupport: false,
 				},
 			} );
 		} );

@@ -14,7 +14,7 @@ import {
 } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { useContext, useMemo } from '@wordpress/element';
-import { getCSSRules } from '@wordpress/style-engine';
+import { compileCSS, getCSSRules } from '@wordpress/style-engine';
 
 /**
  * Internal dependencies
@@ -356,6 +356,26 @@ export function getLayoutStyles( {
 		}
 	}
 
+	// If the theme has block support support, and the block has margin values, add layout-aware margin styles.
+	if (
+		hasBlockGapSupport &&
+		style?.spacing?.margin &&
+		tree?.settings?.layout?.definitions
+	) {
+		const marginRules = compileCSS( {
+			spacing: { margin: style.spacing.margin },
+		} );
+		if ( marginRules ) {
+			Object.values( tree.settings.layout.definitions ).forEach(
+				( { className, marginSelector } ) => {
+					if ( marginSelector ) {
+						ruleset += `.${ className }${ marginSelector }${ selector } { ${ marginRules } }`;
+					}
+				}
+			);
+		}
+	}
+
 	if ( gapValue && tree?.settings?.layout?.definitions ) {
 		Object.values( tree.settings.layout.definitions ).forEach(
 			( { className, name, spacingStyles } ) => {
@@ -529,6 +549,8 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 						blockSelectors[ blockName ].fallbackGapValue,
 					hasLayoutSupport:
 						blockSelectors[ blockName ].hasLayoutSupport,
+					hasMarginSupport:
+						blockSelectors[ blockName ].hasMarginSupport,
 					selector: blockSelectors[ blockName ].selector,
 					styles: blockStyles,
 					featureSelectors:
@@ -682,6 +704,7 @@ export const toStyles = (
 			styles,
 			fallbackGapValue,
 			hasLayoutSupport,
+			hasMarginSupport,
 			featureSelectors,
 			styleVariationSelectors,
 		} ) => {
@@ -795,7 +818,9 @@ export const toStyles = (
 			// Process blockGap and layout styles.
 			if (
 				! disableLayoutStyles &&
-				( ROOT_BLOCK_SELECTOR === selector || hasLayoutSupport )
+				( ROOT_BLOCK_SELECTOR === selector ||
+					hasLayoutSupport ||
+					hasMarginSupport )
 			) {
 				ruleset += getLayoutStyles( {
 					tree,
@@ -912,6 +937,7 @@ export const getBlockSelectors = ( blockTypes, getBlockStyles ) => {
 		const duotoneSelector =
 			blockType?.supports?.color?.__experimentalDuotone ?? null;
 		const hasLayoutSupport = !! blockType?.supports?.__experimentalLayout;
+		const hasMarginSupport = !! blockType?.supports?.spacing?.margin;
 		const fallbackGapValue =
 			blockType?.supports?.spacing?.blockGap?.__experimentalDefault;
 
@@ -947,6 +973,7 @@ export const getBlockSelectors = ( blockTypes, getBlockStyles ) => {
 				? featureSelectors
 				: undefined,
 			hasLayoutSupport,
+			hasMarginSupport,
 			name,
 			selector,
 			styleVariationSelectors: Object.keys( styleVariationSelectors )

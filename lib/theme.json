@@ -262,7 +262,8 @@
 								"margin-block-end": "0"
 							}
 						}
-					]
+					],
+					"marginSelector": " > "
 				},
 				"constrained": {
 					"name": "constrained",
@@ -322,7 +323,8 @@
 								"margin-block-end": "0"
 							}
 						}
-					]
+					],
+					"marginSelector": " > "
 				},
 				"flex": {
 					"name": "flex",

@@ -1215,7 +1215,10 @@ class WP_Theme_JSON_Gutenberg {
 
 		if ( isset( $block_metadata['name'] ) ) {
 			$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_metadata['name'] );
-			if ( ! block_has_support( $block_type, array( '__experimentalLayout' ), false ) ) {
+			if (
+				! block_has_support( $block_type, array( '__experimentalLayout' ), false ) &&
+				! block_has_support( $block_type, array( 'spacing', 'margin' ), false )
+			) {
 				return $block_rules;
 			}
 		}
@@ -1250,6 +1253,35 @@ class WP_Theme_JSON_Gutenberg {
 				} else {
 					// Skip outputting gap value if not all sides are provided.
 					$block_gap_value = null;
+				}
+			}
+
+			// If the theme has block support support, and the block has margin values, add layout-aware margin styles.
+			$margin_value = static::get_property_value( $node, array( 'spacing', 'margin' ) );
+			if (
+				$has_block_gap_support &&
+				isset( $margin_value ) && '' !== $margin_value
+			) {
+				$margin_styles = gutenberg_style_engine_get_styles(
+					array( 'spacing' => array( 'margin' => $margin_value ) )
+				);
+
+				if ( ! empty( $margin_styles['css'] ) ) {
+					foreach ( $layout_definitions as $layout_definition_key => $layout_definition ) {
+						$class_name = sanitize_title( _wp_array_get( $layout_definition, array( 'className' ), '' ) );
+						if (
+							isset( $layout_definition['marginSelector'] ) &&
+							preg_match( $layout_selector_pattern, $layout_definition['marginSelector'] )
+						) {
+							$block_rules .= sprintf(
+								'.%s%s%s {%s}',
+								$class_name,
+								$layout_definition['marginSelector'],
+								$selector,
+								$margin_styles['css']
+							);
+						}
+					}
 				}
 			}
 
