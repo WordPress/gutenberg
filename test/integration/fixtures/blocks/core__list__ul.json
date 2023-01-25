@@ -4,6 +4,7 @@
 		"isValid": true,
 		"attributes": {
 			"ordered": false,
+			"position": false,
 			"values": ""
 		},
 		"innerBlocks": [
