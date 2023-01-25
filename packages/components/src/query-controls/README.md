@@ -122,34 +122,34 @@ const MyQueryControls = () => {
 };
 ```
 
-The format of the categories list also needs to be updated to match what `FormTokenField` expects for making suggestions.
+The format of the categories list also needs to be updated to match the expected type for the category suggestions.
 
 ### Props
 
-#### `authorList`: `AuthorSelectProps[ 'authorList' ]`
+#### `authorList`: `Author[]`
 
-An array of authors that is passed into an `AuthorSelect` sub-component.
+An array of the authors to select from.
 
 -   Required: No
 -   Platform: Web
 
-#### `categoriesList`: `CategorySelectProps[ 'categoriesList' ]`
+#### `categoriesList`: `Category[]`
 
-An array of categories, renders a `CategorySelect` sub-component when passed in conjunction with `onCategoryChange`.
+An array of categories. When passed in conjunction with the `onCategoryChange` prop, it causes the component to render UI that allows selecting one category at a time.
 
 -   Required: No
 -   Platform: Web
 
 #### `categorySuggestions`: `Record< Category[ 'name' ], Category >`
 
-An object of categories, renders a `FormTokenField` component when passed in conjunction with `onCategoryChange`.
+An object of categories with the category name as the key. When passed in conjunction with the `onCategoryChange` prop, it causes the component to render UI that enables multiple selection.
 
 -   Required: No
 -   Platform: Web
 
 #### `maxItems`: `number`
 
-The maximum of items.
+The maximum number of items.
 
 -   Required: No
 -   Default: 100
@@ -157,7 +157,7 @@ The maximum of items.
 
 #### `minItems`: `number`
 
-The minimum of items.
+The minimum number of items.
 
 -   Required: No
 -   Default: 1
@@ -170,56 +170,56 @@ The selected number of items to retrieve via the query.
 -   Required: No
 -   Platform: Web
 
-#### `onAuthorChange`: `AuthorSelectProps[ 'onChange' ]`
+#### `onAuthorChange`: `( newAuthor: string ) => void`
 
-A function that receives the new author value. If this is not specified, the author controls are not included.
+A function that receives the new author value. If not specified, the author controls are not rendered.
 
 -   Required: No
 -   Platform: Web
 
 #### `onCategoryChange`: `CategorySelectProps[ 'onChange' ] | FormTokenFieldProps[ 'onChange' ]`
 
-A function that receives the new category value. If this is not specified, the category controls are not included.
+A function that receives the new category value. If not specified, the category controls are not rendered.
 
 -   Required: No
 -   Platform: Web
 
 #### `onNumberOfItemsChange`: `( newNumber?: number ) => void`
 
-A function that receives the new number of items value. If this is not specified, then the number of items range control is not included.
+A function that receives the new number of items. If not specified, then the number of items range control is not rendered.
 
 -   Required: No
 -   Platform: Web
 
-#### `onOrderChange`: `( newOrder: Order ) => void`
+#### `onOrderChange`: `( newOrder: 'asc' | 'desc' ) => void`
 
-A function that receives the new order value. If this or onOrderByChange are not specified, then the order controls are not included.
-
--   Required: No
--   Platform: Web
-
-#### `onOrderByChange`: `( newOrderBy: OrderBy ) => void`
-
-A function that receives the new orderby value. If this or onOrderChange are not specified, then the order controls are not included.
+A function that receives the new order value. If this prop or the `onOrderByChange` prop are not specified, then the order controls are not rendered.
 
 -   Required: No
 -   Platform: Web
 
-#### `order`: `Order`
+#### `onOrderByChange`: `( newOrderBy: 'date' | 'title' ) => void`
+
+A function that receives the new orderby value. If this prop or the `onOrderChange` prop are not specified, then the order controls are not rendered.
+
+-   Required: No
+-   Platform: Web
+
+#### `order`: `'asc' | 'desc'`
 
 The order in which to retrieve posts.
 
 -   Required: No
 -   Platform: Web
 
-#### `orderBy`: `OrderBy`
+#### `orderBy`: `'date' | 'title'`
 
 The meta key by which to order posts.
 
 -   Required: No
 -   Platform: Web
 
-#### `selectedAuthorId`: `AuthorSelectProps[ 'selectedAuthorId' ]`
+#### `selectedAuthorId`: `number`
 
 The selected author ID.
 
@@ -228,14 +228,14 @@ The selected author ID.
 
 #### `selectedCategories`: `Category[]`
 
-The selected categories for the `categorySuggestions`.
+The selected categories for the `categorySuggestions` prop.
 
 -   Required: No
 -   Platform: Web
 
-#### `selectedCategoryId`: `CategorySelectProps[ 'selectedCategoryId' ]`
+#### `selectedCategoryId`: `number`
 
-The selected category for the `categoriesList`.
+The selected category for the `categoriesList` prop.
 
 -   Required: No
 -   Platform: Web
