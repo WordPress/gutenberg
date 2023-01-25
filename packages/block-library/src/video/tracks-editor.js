@@ -126,52 +126,58 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 						help={ __( 'Language tag (en, fr, etc.)' ) }
 					/>
 				</Grid>
-				<SelectControl
-					__nextHasNoMarginBottom
-					className="block-library-video-tracks-editor__single-track-editor-kind-select"
-					options={ KIND_OPTIONS }
-					value={ kind }
-					label={ __( 'Kind' ) }
-					onChange={ ( newKind ) => {
-						onChange( {
-							...track,
-							kind: newKind,
-						} );
-					} }
-				/>
-				<HStack className="block-library-video-tracks-editor__single-track-editor-buttons-container">
-					<Button
-						variant="secondary"
-						onClick={ () => {
-							const changes = {};
-							let hasChanges = false;
-							if ( label === '' ) {
-								changes.label = __( 'English' );
-								hasChanges = true;
-							}
-							if ( srcLang === '' ) {
-								changes.srcLang = 'en';
-								hasChanges = true;
-							}
-							if ( track.kind === undefined ) {
-								changes.kind = DEFAULT_KIND;
-								hasChanges = true;
-							}
-							if ( hasChanges ) {
-								onChange( {
-									...track,
-									...changes,
-								} );
-							}
-							onClose();
+				<VStack spacing="8">
+					<SelectControl
+						__nextHasNoMarginBottom
+						className="block-library-video-tracks-editor__single-track-editor-kind-select"
+						options={ KIND_OPTIONS }
+						value={ kind }
+						label={ __( 'Kind' ) }
+						onChange={ ( newKind ) => {
+							onChange( {
+								...track,
+								kind: newKind,
+							} );
 						} }
-					>
-						{ __( 'Close' ) }
-					</Button>
-					<Button isDestructive variant="link" onClick={ onRemove }>
-						{ __( 'Remove track' ) }
-					</Button>
-				</HStack>
+					/>
+					<HStack className="block-library-video-tracks-editor__single-track-editor-buttons-container">
+						<Button
+							variant="secondary"
+							onClick={ () => {
+								const changes = {};
+								let hasChanges = false;
+								if ( label === '' ) {
+									changes.label = __( 'English' );
+									hasChanges = true;
+								}
+								if ( srcLang === '' ) {
+									changes.srcLang = 'en';
+									hasChanges = true;
+								}
+								if ( track.kind === undefined ) {
+									changes.kind = DEFAULT_KIND;
+									hasChanges = true;
+								}
+								if ( hasChanges ) {
+									onChange( {
+										...track,
+										...changes,
+									} );
+								}
+								onClose();
+							} }
+						>
+							{ __( 'Close' ) }
+						</Button>
+						<Button
+							isDestructive
+							variant="link"
+							onClick={ onRemove }
+						>
+							{ __( 'Remove track' ) }
+						</Button>
+					</HStack>
+				</VStack>
 			</VStack>
 		</NavigableMenu>
 	);
