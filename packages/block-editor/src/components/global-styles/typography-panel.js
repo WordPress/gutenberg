@@ -205,29 +205,23 @@ export default function TypographyPanel( {
 	const hasFontWeights = settings?.typography?.fontWeight;
 	const fontStyle = decodeValue( inherit?.typography?.fontStyle );
 	const fontWeight = decodeValue( inherit?.typography?.fontWeight );
-	const setFontStyle = ( newValue ) => {
+	const setFontAppearance = ( {
+		fontStyle: newFontStyle,
+		fontWeight: newFontWeight,
+	} ) => {
 		onChange( {
 			...value,
 			typography: {
 				...value?.typography,
-				fontStyle: newValue,
-			},
-		} );
-	};
-	const setFontWeight = ( newValue ) => {
-		onChange( {
-			...value,
-			typography: {
-				...value?.typography,
-				fontWeight: newValue,
+				fontStyle: newFontStyle,
+				fontWeight: newFontWeight,
 			},
 		} );
 	};
 	const hasFontAppearance = () =>
 		!! value?.typography?.fontStyle || !! value?.typography?.fontWeight;
 	const resetFontAppearance = () => {
-		setFontStyle( undefined );
-		setFontWeight( undefined );
+		setFontAppearance( {} );
 	};
 
 	// Line Height
@@ -306,12 +300,10 @@ export default function TypographyPanel( {
 	const resetTextDecoration = () => setTextDecoration( undefined );
 
 	const resetAll = () => {
-		resetFontFamily();
-		setFontSize();
-		resetFontAppearance();
-		resetLineHeight();
-		resetLetterSpacing();
-		resetTextDecoration();
+		onChange( {
+			...value,
+			typography: {},
+		} );
 	};
 
 	return (
@@ -364,13 +356,7 @@ export default function TypographyPanel( {
 							fontStyle,
 							fontWeight,
 						} }
-						onChange={ ( {
-							fontStyle: newFontStyle,
-							fontWeight: newFontWeight,
-						} ) => {
-							setFontStyle( newFontStyle );
-							setFontWeight( newFontWeight );
-						} }
+						onChange={ setFontAppearance }
 						hasFontStyles={ hasFontStyles }
 						hasFontWeights={ hasFontWeights }
 						size="__unstable-large"
