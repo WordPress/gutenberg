@@ -20,6 +20,8 @@ function gutenberg_get_block_editor_settings_6_2( $settings ) {
 			'__unstableType' => 'user',
 			'isGlobalStyles' => true,
 		);
+		// TODO: Should we combine __experimentalFeatures and __experimentalStyles into a single setting?
+		$settings['__experimentalStyles'] = wp_get_global_styles();
 	}
 
 	return $settings;

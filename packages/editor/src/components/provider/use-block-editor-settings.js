@@ -137,6 +137,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 						'__experimentalBlockDirectory',
 						'__experimentalDiscussionSettings',
 						'__experimentalFeatures',
+						'__experimentalStyles',
 						'__experimentalPreferredStyleVariations',
 						'__experimentalSetIsInserterOpened',
 						'__unstableGalleryWithImageBlocks',

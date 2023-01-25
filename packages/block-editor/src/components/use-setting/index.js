@@ -18,6 +18,7 @@ import { applyFilters } from '@wordpress/hooks';
  */
 import { useBlockEditContext } from '../block-edit';
 import { store as blockEditorStore } from '../../store';
+import { useGlobalSetting } from '../global-styles';
 
 const blockedPaths = [
 	'color',
@@ -112,6 +113,8 @@ const removeCustomPrefixes = ( path ) => {
  */
 export default function useSetting( path ) {
 	const { name: blockName, clientId } = useBlockEditContext();
+	const normalizedPath = removeCustomPrefixes( path );
+	const [ globalSetting ] = useGlobalSetting( normalizedPath, blockName );
 
 	return useSelect(
 		( select ) => {
@@ -135,8 +138,6 @@ export default function useSetting( path ) {
 			if ( undefined !== result ) {
 				return result;
 			}
-
-			const normalizedPath = removeCustomPrefixes( path );
 
 			// 1. Take settings from the block instance or its ancestors.
 			// Start from the current block and work our way up the ancestors.
@@ -178,12 +179,8 @@ export default function useSetting( path ) {
 			}
 
 			// 2. Fall back to the settings from the block editor store (__experimentalFeatures).
-			const settings = select( blockEditorStore ).getSettings();
 			if ( result === undefined ) {
-				const defaultsPath = `__experimentalFeatures.${ normalizedPath }`;
-				const blockPath = `__experimentalFeatures.blocks.${ blockName }.${ normalizedPath }`;
-				result =
-					get( settings, blockPath ) ?? get( settings, defaultsPath );
+				result = globalSetting;
 			}
 
 			// Return if the setting was found in either the block instance or the store.
@@ -195,6 +192,7 @@ export default function useSetting( path ) {
 			}
 
 			// 3. Otherwise, use deprecated settings.
+			const settings = select( blockEditorStore ).getSettings();
 			const deprecatedSettingsValue = deprecatedFlags[ normalizedPath ]
 				? deprecatedFlags[ normalizedPath ]( settings )
 				: undefined;
@@ -208,6 +206,6 @@ export default function useSetting( path ) {
 			// To remove when __experimentalFeatures are ported to core.
 			return normalizedPath === 'typography.dropCap' ? true : undefined;
 		},
-		[ blockName, clientId, path ]
+		[ blockName, clientId, path, normalizedPath, globalSetting ]
 	);
 }

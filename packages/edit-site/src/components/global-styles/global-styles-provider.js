@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mergeWith, isEmpty, mapValues } from 'lodash';
+import { isEmpty, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -19,19 +19,6 @@ import { unlock } from '../../experiments';
 
 const { GlobalStylesContext } = unlock( blockEditorExperiments );
 
-function mergeTreesCustomizer( _, srcValue ) {
-	// We only pass as arrays the presets,
-	// in which case we want the new array of values
-	// to override the old array (no merging).
-	if ( Array.isArray( srcValue ) ) {
-		return srcValue;
-	}
-}
-
-export function mergeBaseAndUserConfigs( base, user ) {
-	return mergeWith( {}, base, user, mergeTreesCustomizer );
-}
-
 const cleanEmptyObject = ( object ) => {
 	if (
 		object === null ||
@@ -48,7 +35,7 @@ const cleanEmptyObject = ( object ) => {
 	return isEmpty( cleanedNestedObjects ) ? undefined : cleanedNestedObjects;
 };
 
-function useGlobalStylesUserConfig() {
+function useGlobalStylesContext() {
 	const { globalStylesId, isReady, settings, styles } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, hasFinishedResolution } =
@@ -90,14 +77,14 @@ function useGlobalStylesUserConfig() {
 
 	const { getEditedEntityRecord } = useSelect( coreStore );
 	const { editEntityRecord } = useDispatch( coreStore );
-	const config = useMemo( () => {
+	const userConfig = useMemo( () => {
 		return {
 			settings: settings ?? {},
 			styles: styles ?? {},
 		};
 	}, [ settings, styles ] );
 
-	const setConfig = useCallback(
+	const setUserConfig = useCallback(
 		( callback, options = {} ) => {
 			const record = getEditedEntityRecord(
 				'root',
@@ -123,47 +110,7 @@ function useGlobalStylesUserConfig() {
 		[ globalStylesId ]
 	);
 
-	return [ isReady, config, setConfig ];
-}
-
-function useGlobalStylesBaseConfig() {
-	const baseConfig = useSelect( ( select ) => {
-		return select(
-			coreStore
-		).__experimentalGetCurrentThemeBaseGlobalStyles();
-	}, [] );
-
-	return [ !! baseConfig, baseConfig ];
-}
-
-function useGlobalStylesContext() {
-	const [ isUserConfigReady, userConfig, setUserConfig ] =
-		useGlobalStylesUserConfig();
-	const [ isBaseConfigReady, baseConfig ] = useGlobalStylesBaseConfig();
-	const mergedConfig = useMemo( () => {
-		if ( ! baseConfig || ! userConfig ) {
-			return {};
-		}
-		return mergeBaseAndUserConfigs( baseConfig, userConfig );
-	}, [ userConfig, baseConfig ] );
-	const context = useMemo( () => {
-		return {
-			isReady: isUserConfigReady && isBaseConfigReady,
-			user: userConfig,
-			base: baseConfig,
-			merged: mergedConfig,
-			setUserConfig,
-		};
-	}, [
-		mergedConfig,
-		userConfig,
-		baseConfig,
-		setUserConfig,
-		isUserConfigReady,
-		isBaseConfigReady,
-	] );
-
-	return context;
+	return { isReady, userConfig, setUserConfig };
 }
 
 export function GlobalStylesProvider( { children } ) {
