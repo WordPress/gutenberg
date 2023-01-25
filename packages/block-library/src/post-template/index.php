@@ -72,7 +72,7 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 		$classnames .= ' has-link-color';
 	}
 
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classnames ) );
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => trim( $classnames ) ) );
 
 	$content = '';
 	while ( $query->have_posts() ) {

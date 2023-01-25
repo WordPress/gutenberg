@@ -40,7 +40,7 @@ function render_block_core_site_title( $attributes ) {
 			esc_html( $site_title )
 		);
 	}
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => trim( $classes ) ) );
 
 	return sprintf(
 		'<%1$s %2$s>%3$s</%1$s>',
