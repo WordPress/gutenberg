@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, isEmpty, map } from 'lodash';
+import { get, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -148,7 +148,7 @@ function GalleryEdit( props ) {
 				...newAttrs,
 				// Unlike images[ n ].id which is a string, always ensure the
 				// ids array contains numbers as per its attribute type.
-				ids: map( newAttrs.images, ( { id } ) => parseInt( id, 10 ) ),
+				ids: newAttrs.images.map( ( { id } ) => parseInt( id, 10 ) ),
 			};
 		}
 
@@ -298,16 +298,15 @@ function GalleryEdit( props ) {
 
 	function getImagesSizeOptions() {
 		const resizedImageSizes = Object.values( resizedImages );
-		return map(
-			imageSizes.filter( ( { slug } ) =>
+		return imageSizes
+			.filter( ( { slug } ) =>
 				resizedImageSizes.some( ( sizes ) => sizes[ slug ] )
-			),
-			( { name, slug } ) => ( { value: slug, label: name } )
-		);
+			)
+			.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
 	}
 
 	function updateImagesSize( newSizeSlug ) {
-		const updatedImages = map( images, ( image ) => {
+		const updatedImages = ( images ?? [] ).map( ( image ) => {
 			if ( ! image.id ) {
 				return image;
 			}
@@ -331,7 +330,7 @@ function GalleryEdit( props ) {
 			images.length > 0 &&
 			images.every( ( { url } ) => isBlobURL( url ) )
 		) {
-			const filesList = map( images, ( { url } ) => getBlobByURL( url ) );
+			const filesList = images.map( ( { url } ) => getBlobByURL( url ) );
 			images.forEach( ( { url } ) => revokeBlobURL( url ) );
 			mediaUpload( {
 				filesList,
@@ -420,6 +419,7 @@ function GalleryEdit( props ) {
 						help={ getImageCropHelp }
 					/>
 					<SelectControl
+						__nextHasNoMarginBottom
 						label={ __( 'Link to' ) }
 						value={ linkTo }
 						onChange={ setLinkTo }
@@ -428,6 +428,7 @@ function GalleryEdit( props ) {
 					/>
 					{ shouldShowSizeOptions && (
 						<SelectControl
+							__nextHasNoMarginBottom
 							label={ __( 'Image size' ) }
 							value={ sizeSlug }
 							options={ imageSizeOptions }

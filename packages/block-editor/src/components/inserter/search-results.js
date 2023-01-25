@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useMemo, useEffect } from '@wordpress/element';
@@ -135,7 +130,7 @@ function InserterSearchResults( {
 	);
 
 	const hasItems =
-		! isEmpty( filteredBlockTypes ) || ! isEmpty( filteredBlockPatterns );
+		filteredBlockTypes.length > 0 || filteredBlockPatterns.length > 0;
 
 	const blocksUI = !! filteredBlockTypes.length && (
 		<InserterPanel

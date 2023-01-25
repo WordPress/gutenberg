@@ -73,7 +73,9 @@ function gutenberg_resolve_assets_override() {
 	global $pagenow, $editor_styles;
 
 
-	$script_handles = array();
+	$script_handles = array(
+		'wp-polyfill',
+	);
 	// Note for core merge: only 'wp-edit-blocks' should be in this array.
 	$style_handles = array(
 		'wp-edit-blocks',
@@ -131,6 +133,30 @@ function gutenberg_resolve_assets_override() {
 
 	$scripts = ob_get_clean();
 
+	/*
+	 * Generate font @font-face styles for the site editor iframe.
+	 * Use the registered font families for printing.
+	 */
+	if ( class_exists( 'WP_Fonts' ) ) {
+		$wp_fonts   = wp_fonts();
+		$registered = $wp_fonts->get_registered_font_families();
+		if ( ! empty( $registered ) ) {
+			$queue = $wp_fonts->queue;
+			$done  = $wp_fonts->done;
+
+			$wp_fonts->done  = array();
+			$wp_fonts->queue = $registered;
+
+			ob_start();
+			$wp_fonts->do_items();
+			$styles .= ob_get_clean();
+
+			// Reset the Web Fonts API.
+			$wp_fonts->done  = $done;
+			$wp_fonts->queue = $queue;
+		}
+	}
+
 	return array(
 		'styles'  => $styles,
 		'scripts' => $scripts,
@@ -141,7 +167,8 @@ add_filter(
 	'block_editor_settings_all',
 	function( $settings ) {
 		// We must override what core is passing now.
-		$settings['__unstableResolvedAssets'] = gutenberg_resolve_assets_override();
+		$settings['__unstableResolvedAssets']    = gutenberg_resolve_assets_override();
+		$settings['__unstableIsBlockBasedTheme'] = wp_is_block_theme();
 		return $settings;
 	},
 	100

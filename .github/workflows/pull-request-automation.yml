@@ -20,12 +20,12 @@ jobs:
                   ref: trunk
 
             - name: Use desired version of NodeJS
-              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
               with:
                   node-version: ${{ matrix.node }}
 
             - name: Cache NPM packages
-              uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 # v3.0.11
+              uses: actions/cache@4723a57e26efda3a62cbde1812113b730952852d # v3.2.2
               with:
                   # npm cache files are stored in `~/.npm` on Linux/macOS
                   path: ~/.npm

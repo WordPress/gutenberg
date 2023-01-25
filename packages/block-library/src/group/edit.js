@@ -51,6 +51,7 @@ function GroupEditControls( { tagName, onSelectTagName } ) {
 	return (
 		<InspectorControls __experimentalGroup="advanced">
 			<SelectControl
+				__nextHasNoMarginBottom
 				label={ __( 'HTML element' ) }
 				options={ [
 					{ label: __( 'Default (<div>)' ), value: 'div' },

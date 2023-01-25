@@ -932,6 +932,11 @@ export class RichText extends Component {
 
 		let newFontSize = DEFAULT_FONT_SIZE;
 
+		// Disables line-height rendering for pre elements until we fix some issues with AztecAndroid.
+		if ( tagName === 'pre' && ! this.isIOS ) {
+			return undefined;
+		}
+
 		// For block-based themes, get the default editor font size.
 		if ( baseGlobalStyles?.typography?.fontSize && tagName === 'p' ) {
 			newFontSize = baseGlobalStyles?.typography?.fontSize;
@@ -968,6 +973,11 @@ export class RichText extends Component {
 			baseGlobalStyles?.elements?.[ tagName ]?.typography?.lineHeight;
 		let newLineHeight;
 
+		// Disables line-height rendering for pre elements until we fix some issues with AztecAndroid.
+		if ( tagName === 'pre' && ! this.isIOS ) {
+			return undefined;
+		}
+
 		if ( ! this.getIsBlockBasedTheme() ) {
 			return;
 		}
@@ -1000,6 +1010,11 @@ export class RichText extends Component {
 		// Check the final value is not over the minimum supported value.
 		if ( newLineHeight && newLineHeight < MIN_LINE_HEIGHT ) {
 			newLineHeight = MIN_LINE_HEIGHT;
+		}
+
+		// Until we parse CSS values correctly, avoid passing NaN values to Aztec
+		if ( isNaN( newLineHeight ) ) {
+			return undefined;
 		}
 
 		return newLineHeight;

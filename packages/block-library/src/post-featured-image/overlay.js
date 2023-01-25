@@ -66,7 +66,6 @@ const Overlay = ( {
 			) }
 			<InspectorControls __experimentalGroup="color">
 				<ColorGradientSettingsDropdown
-					__experimentalHasMultipleOrigins
 					__experimentalIsRenderedInSidebar
 					settings={ [
 						{
