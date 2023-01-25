@@ -96,8 +96,10 @@ function useHasMinHeight( name ) {
 
 function useHasSpacingPresets() {
 	const [ settings ] = useGlobalSetting( 'spacing.spacingSizes' );
+	const { custom, theme, default: defaultPresets } = settings || {};
+	const presets = custom ?? theme ?? defaultPresets ?? [];
 
-	return settings && settings.length > 0;
+	return settings && presets.length > 0;
 }
 
 function filterValuesBySides( values, sides ) {
