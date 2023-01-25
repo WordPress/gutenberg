@@ -161,3 +161,11 @@ html :where(img[class*="wp-image-"]) {
 figure {
 	margin: 0 0 1em 0;
 }
+
+list-style-position-inside {
+	list-style-position: inside;
+}
+
+list-style-position-outside {
+	list-style-position: outside;
+}
