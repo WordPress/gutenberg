@@ -37,7 +37,7 @@ describe( 'Front End Performance', () => {
 			);
 			const [ navigationTiming ] = JSON.parse( navigationTimingJson );
 			results.timeToFirstByte.push(
-				navigationTiming.responseStart - navigationTiming.requestStart
+				navigationTiming.responseStart - navigationTiming.startTime
 			);
 		}
 	} );
