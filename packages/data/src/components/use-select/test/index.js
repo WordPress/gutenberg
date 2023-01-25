@@ -118,6 +118,49 @@ describe( 'useSelect', () => {
 		expect( screen.getByRole( 'status' ) ).toHaveTextContent( 'bar' );
 	} );
 
+	it( 'does not rerender if updated data is equal to the previous data', () => {
+		registry.registerStore( 'counter', {
+			reducer: ( state = { field: { count: 0 } }, action ) =>
+				action.type === 'REFRESH'
+					? { field: { count: state.field.count } }
+					: state,
+			actions: {
+				refresh: () => ( { type: 'REFRESH' } ),
+			},
+			selectors: {
+				get: ( state ) => state,
+			},
+		} );
+
+		const mapSelect = ( select ) => select( 'counter' ).get();
+
+		const mapSelectCount = jest.fn( mapSelect );
+		const Count = jest.fn( () => {
+			const count = useSelect( mapSelectCount, [] ).field.count;
+			return count;
+		} );
+
+		render(
+			<RegistryProvider value={ registry }>
+				<Count />
+			</RegistryProvider>
+		);
+
+		// Initial render renders the count component and subscribes the count to store.
+		expect( screen.getByText( '0' ) ).toBeInTheDocument();
+		expect( mapSelectCount ).toHaveBeenCalledTimes( 2 );
+		expect( Count ).toHaveBeenCalledTimes( 1 );
+
+		act( () => {
+			registry.dispatch( 'counter' ).refresh();
+		} );
+
+		// If changed data is equal to previous data, do not rerender.
+		expect( screen.getByText( '0' ) ).toBeInTheDocument();
+		expect( mapSelectCount ).toHaveBeenCalledTimes( 3 );
+		expect( Count ).toHaveBeenCalledTimes( 1 );
+	} );
+
 	it( 'does not rerender a nested component that is to be unmounted', () => {
 		registry.registerStore( 'toggler', {
 			reducer: ( state = false, action ) =>

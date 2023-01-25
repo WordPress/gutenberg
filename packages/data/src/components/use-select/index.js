@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import fastDeepEqual from 'fast-deep-equal/es6';
+
+/**
  * WordPress dependencies
  */
 import { createQueue } from '@wordpress/priority-queue';
@@ -9,7 +14,6 @@ import {
 	useSyncExternalStore,
 	useDebugValue,
 } from '@wordpress/element';
-import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -91,9 +95,9 @@ function Store( registry, suspense ) {
 
 			const mapResult = selectFromStore();
 
-			// If the new value is shallow-equal to the old one, keep the old one so
+			// If the new value is equal to the old one, keep the old one so
 			// that we don't trigger unwanted updates that do a `===` check.
-			if ( ! isShallowEqual( lastMapResult, mapResult ) ) {
+			if ( ! fastDeepEqual( lastMapResult, mapResult ) ) {
 				lastMapResult = mapResult;
 			}
 			lastMapResultValid = true;
