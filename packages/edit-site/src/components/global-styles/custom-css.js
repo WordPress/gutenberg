@@ -61,14 +61,19 @@ function CustomCSSControl( { blockName } ) {
 		}
 	}
 
-	function handleOnBlur( value ) {
-		const [ transformed ] = transformStyles(
-			[ { css: value } ],
-			'.editor-styles-wrapper'
-		);
-		setCSSError(
-			transformed === null ? __( 'Error while parsing the CSS.' ) : null
-		);
+	function handleOnBlur( event ) {
+		if ( event?.target?.value ) {
+			const [ transformed ] = transformStyles(
+				[ { css: event.target.value } ],
+				'.editor-styles-wrapper'
+			);
+
+			setCSSError(
+				transformed === null
+					? __( 'Error while parsing the CSS.' )
+					: null
+			);
+		}
 	}
 
 	const originalThemeCustomCSS =
