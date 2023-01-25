@@ -6,18 +6,18 @@ import { render, screen } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import Panel from '../';
+import Panel from '..';
 
 describe( 'Panel', () => {
 	describe( 'basic rendering', () => {
 		it( 'should render an empty div without any provided props', () => {
-			const { container } = render( <Panel /> );
+			const { container } = render( <Panel children={ null } /> );
 
 			expect( container ).toMatchSnapshot();
 		} );
 
 		it( 'should render a heading when provided text in the header prop', () => {
-			render( <Panel header="Header Label" /> );
+			render( <Panel header="Header Label" children={ null } /> );
 
 			const heading = screen.getByRole( 'heading' );
 			expect( heading ).toBeVisible();
@@ -25,7 +25,9 @@ describe( 'Panel', () => {
 		} );
 
 		it( 'should render an additional className', () => {
-			const { container } = render( <Panel className="the-panel" /> );
+			const { container } = render(
+				<Panel className="the-panel" children={ null } />
+			);
 
 			expect( container ).toMatchSnapshot();
 		} );
