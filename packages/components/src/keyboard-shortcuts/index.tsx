@@ -49,7 +49,7 @@ function KeyboardShortcuts( {
 	// Render as non-visual if there are no children pressed. Keyboard
 	// events will be bound to the document instead.
 	if ( ! Children.count( children ) ) {
-		return element;
+		return <>{ element }</>;
 	}
 
 	return (
