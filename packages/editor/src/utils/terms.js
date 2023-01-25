@@ -23,20 +23,21 @@ export function buildTermsTree( flatTerms ) {
 	if ( termsByParent.null && termsByParent.null.length ) {
 		return flatTermsWithParentAndChildren;
 	}
-	const fillWithChildren = ( terms ) => {
+	const fillWithChildren = ( terms, level ) => {
 		return terms.map( ( term ) => {
 			const children = termsByParent[ term.id ];
 			return {
 				...term,
+				level,
 				children:
 					children && children.length
-						? fillWithChildren( children )
+						? fillWithChildren( children, level + 1 )
 						: [],
 			};
 		} );
 	};
 
-	return fillWithChildren( termsByParent[ '0' ] || [] );
+	return fillWithChildren( termsByParent[ '0' ] || [], 0 );
 }
 
 // Lodash unescape function handles &#39; but not &#039; which may be return in some API requests.
