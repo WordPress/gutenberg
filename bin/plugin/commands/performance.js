@@ -49,34 +49,35 @@ const config = require( '../config' );
 /**
  * @typedef WPPerformanceResults
  *
- * @property {number=} timeToFirstByte      Represents the time since the browser started the request until it received a response.
- * @property {number=} serverResponse       Represents the time the server takes to respond.
- * @property {number=} firstPaint           Represents the time when the user agent first rendered after navigation.
- * @property {number=} domContentLoaded     Represents the time immediately after the document's DOMContentLoaded event completes.
- * @property {number=} loaded               Represents the time when the load event of the current document is completed.
- * @property {number=} firstContentfulPaint Represents the time when the browser first renders any text or media.
- * @property {number=} firstBlock           Represents the time when Puppeteer first sees a block selector in the DOM.
- * @property {number=} type                 Average type time.
- * @property {number=} minType              Minimum type time.
- * @property {number=} maxType              Maximum type time.
- * @property {number=} typeContainer        Average type time within a container.
- * @property {number=} minTypeContainer     Minimum type time within a container.
- * @property {number=} maxTypeContainer     Maximum type time within a container.
- * @property {number=} focus                Average block selection time.
- * @property {number=} minFocus             Min block selection time.
- * @property {number=} maxFocus             Max block selection time.
- * @property {number=} inserterOpen         Average time to open global inserter.
- * @property {number=} minInserterOpen      Min time to open global inserter.
- * @property {number=} maxInserterOpen      Max time to open global inserter.
- * @property {number=} inserterSearch       Average time to open global inserter.
- * @property {number=} minInserterSearch    Min time to open global inserter.
- * @property {number=} maxInserterSearch    Max time to open global inserter.
- * @property {number=} inserterHover        Average time to move mouse between two block item in the inserter.
- * @property {number=} minInserterHover     Min time to move mouse between two block item in the inserter.
- * @property {number=} maxInserterHover     Max time to move mouse between two block item in the inserter.
- * @property {number=} listViewOpen         Average time to open list view.
- * @property {number=} minListViewOpen      Min time to open list view.
- * @property {number=} maxListViewOpen      Max time to open list view.
+ * @property {number=} timeToFirstByteMedian Represents the time since the browser started the request until it received a response (median).
+ * @property {number=} timeToFirstByteP75    Represents the time since the browser started the request until it received a response (75th percentile).
+ * @property {number=} serverResponse        Represents the time the server takes to respond.
+ * @property {number=} firstPaint            Represents the time when the user agent first rendered after navigation.
+ * @property {number=} domContentLoaded      Represents the time immediately after the document's DOMContentLoaded event completes.
+ * @property {number=} loaded                Represents the time when the load event of the current document is completed.
+ * @property {number=} firstContentfulPaint  Represents the time when the browser first renders any text or media.
+ * @property {number=} firstBlock            Represents the time when Puppeteer first sees a block selector in the DOM.
+ * @property {number=} type                  Average type time.
+ * @property {number=} minType               Minimum type time.
+ * @property {number=} maxType               Maximum type time.
+ * @property {number=} typeContainer         Average type time within a container.
+ * @property {number=} minTypeContainer      Minimum type time within a container.
+ * @property {number=} maxTypeContainer      Maximum type time within a container.
+ * @property {number=} focus                 Average block selection time.
+ * @property {number=} minFocus              Min block selection time.
+ * @property {number=} maxFocus              Max block selection time.
+ * @property {number=} inserterOpen          Average time to open global inserter.
+ * @property {number=} minInserterOpen       Min time to open global inserter.
+ * @property {number=} maxInserterOpen       Max time to open global inserter.
+ * @property {number=} inserterSearch        Average time to open global inserter.
+ * @property {number=} minInserterSearch     Min time to open global inserter.
+ * @property {number=} maxInserterSearch     Max time to open global inserter.
+ * @property {number=} inserterHover         Average time to move mouse between two block item in the inserter.
+ * @property {number=} minInserterHover      Min time to move mouse between two block item in the inserter.
+ * @property {number=} maxInserterHover      Max time to move mouse between two block item in the inserter.
+ * @property {number=} listViewOpen          Average time to open list view.
+ * @property {number=} minListViewOpen       Min time to open list view.
+ * @property {number=} maxListViewOpen       Max time to open list view.
  */
 
 /**
@@ -106,6 +107,19 @@ function median( array ) {
 }
 
 /**
+ * Computes the 75th percentile from an array of numbers.
+ *
+ * @param {number[]} array
+ *
+ * @return {number} 75th percentile of the given dataset.
+ */
+function percentile75( array ) {
+	const ascending = array.sort( ( a, b ) => a - b );
+	const position = Math.floor( ( 75 / 100 ) * array.length );
+	return ascending[ position ];
+}
+
+/**
  * Rounds and format a time passed in milliseconds.
  *
  * @param {number} number
@@ -131,7 +145,8 @@ function curateResults( testSuite, results ) {
 		testSuite === 'front-end-block-theme'
 	) {
 		return {
-			timeToFirstByte: median( results.timeToFirstByte ),
+			timeToFirstByteMedian: median( results.timeToFirstByte ),
+			timeToFirstByteP75: percentile75( results.timeToFirstByte ),
 		};
 	}
 
