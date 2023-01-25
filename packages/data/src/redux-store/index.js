@@ -111,6 +111,16 @@ function createResolversCache() {
 export default function createReduxStore( key, options ) {
 	const privateActions = {};
 	const privateSelectors = {};
+	const privateRegistrationFunctions = {
+		privateActions,
+		registerPrivateActions: ( actions ) => {
+			Object.assign( privateActions, actions );
+		},
+		privateSelectors,
+		registerPrivateSelectors: ( selectors ) => {
+			Object.assign( privateSelectors, selectors );
+		},
+	};
 	const storeDescriptor = {
 		name: key,
 		instantiate: ( registry ) => {
@@ -141,6 +151,7 @@ export default function createReduxStore( key, options ) {
 				registry,
 				thunkArgs
 			);
+			lock( store, privateRegistrationFunctions );
 			const resolversCache = createResolversCache();
 
 			let resolvers;
@@ -260,14 +271,7 @@ export default function createReduxStore( key, options ) {
 		},
 	};
 
-	lock( storeDescriptor, {
-		registerPrivateActions: ( actions ) => {
-			Object.assign( privateActions, actions );
-		},
-		registerPrivateSelectors: ( selectors ) => {
-			Object.assign( privateSelectors, selectors );
-		},
-	} );
+	lock( storeDescriptor, privateRegistrationFunctions );
 
 	return storeDescriptor;
 }

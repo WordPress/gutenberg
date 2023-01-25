@@ -14,6 +14,7 @@ import deprecated from '@wordpress/deprecated';
 import createReduxStore from './redux-store';
 import coreDataStore from './store';
 import { createEmitter } from './utils/emitter';
+import { lock, unlock } from './experiments';
 
 /** @typedef {import('./types').StoreDescriptor} StoreDescriptor */
 
@@ -280,6 +281,19 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		const store = createReduxStore( storeName, options ).instantiate(
 			registry
 		);
+		// If creating a sub store, we need to copy the private actions and selectors
+		// from the parent store.
+		if ( parent ) {
+			try {
+				const getParentStore = unlock( parent ).getRegisteredStore;
+				unlock( store.store ).registerPrivateActions(
+					unlock( getParentStore( storeName ).store ).privateActions
+				);
+				unlock( store.store ).registerPrivateSelectors(
+					unlock( getParentStore( storeName ).store ).privateSelectors
+				);
+			} catch ( e ) {}
+		}
 		registerStoreInstance( storeName, store );
 		return store.store;
 	}
@@ -334,5 +348,9 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		parent.subscribe( globalListener );
 	}
 
-	return withPlugins( registry );
+	const registryWithPlugins = withPlugins( registry );
+	lock( registryWithPlugins, {
+		getRegisteredStore: ( name ) => stores[ name ],
+	} );
+	return registryWithPlugins;
 }
