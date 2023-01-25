@@ -65,6 +65,17 @@ if ( ! function_exists( 'wp_theme_has_theme_json_clean_cache' ) ) {
  * @return string
  */
 function get_global_styles_custom_css() {
+	// Ignore cache when `WP_DEBUG` is enabled, so it doesn't interfere with the theme developers workflow.
+	$can_use_cached = empty( $types ) && ! WP_DEBUG;
+	$cache_key      = 'gutenberg_get_global_custom_css_stylesheet';
+	$cache_group    = 'theme_json';
+	if ( $can_use_cached ) {
+		$cached = wp_cache_get( $cache_key, $cache_group );
+		if ( $cached ) {
+			return $cached;
+		}
+	}
+
 	$tree                = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
 	$supports_theme_json = wp_theme_has_theme_json();
 
@@ -72,17 +83,23 @@ function get_global_styles_custom_css() {
 		return;
 	}
 
-	return  $tree->get_custom_css();
+	$stylesheet = $tree->get_custom_css();
+
+	if ( $can_use_cached ) {
+		wp_cache_set( $cache_key, $stylesheet, $cache_group );
+	}
+
+	return  $stylesheet;
 }
 
 /**
  * Returns the stylesheet resulting of merging core, theme, and user data.
  *
  * @param array $types Types of styles to load. Optional.
- *                     It accepts as values: 'variables', 'presets', 'styles', 'base-layout-styles, and 'custom-css'.
+ *                     It accepts as values: 'variables', 'presets', 'styles', 'base-layout-styles.
  *                     If empty, it'll load the following:
  *                     - for themes without theme.json: 'variables', 'presets', 'base-layout-styles'.
- *                     - for themes with theme.json: 'variables', 'presets', 'styles', 'custom-css'.
+ *                     - for themes with theme.json: 'variables', 'presets', 'styles'.
  *
  * @return string Stylesheet.
  */
@@ -102,7 +119,7 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 	if ( empty( $types ) && ! $supports_theme_json ) {
 		$types = array( 'variables', 'presets', 'base-layout-styles' );
 	} elseif ( empty( $types ) ) {
-		$types = array( 'variables', 'presets', 'styles', 'custom-css' );
+		$types = array( 'variables', 'presets', 'styles' );
 	}
 
 	/*
