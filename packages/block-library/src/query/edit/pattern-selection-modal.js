@@ -6,6 +6,7 @@ import { useDispatch } from '@wordpress/data';
 import { Modal, SearchControl } from '@wordpress/components';
 import { useAsyncList } from '@wordpress/compose';
 import {
+	BlockContextProvider,
 	store as blockEditorStore,
 	__experimentalBlockPatternsList as BlockPatternsList,
 } from '@wordpress/block-editor';
@@ -38,6 +39,14 @@ export default function PatternSelectionModal( {
 			selectBlock( queryClientIds[ 0 ] );
 		}
 	};
+	// When we preview Query Loop blocks we should prefer the current
+	// block's postType, which is passed through block context.
+	const blockPreviewContext = useMemo(
+		() => ( {
+			previewPostType: attributes.query.postType,
+		} ),
+		[ attributes.query.postType ]
+	);
 	const blockNameForPatterns = useBlockNameForPatterns(
 		clientId,
 		attributes
@@ -54,22 +63,24 @@ export default function PatternSelectionModal( {
 			title={ __( 'Choose a pattern' ) }
 			onRequestClose={ () => setIsPatternSelectionModalOpen( false ) }
 		>
-			<div className="block-library-query-pattern__selection-content">
-				<div className="block-library-query-pattern__selection-search">
-					<SearchControl
-						__nextHasNoMarginBottom
-						onChange={ setSearchValue }
-						value={ searchValue }
-						label={ __( 'Search for patterns' ) }
-						placeholder={ __( 'Search' ) }
+			<BlockContextProvider value={ blockPreviewContext }>
+				<div className="block-library-query-pattern__selection-content">
+					<div className="block-library-query-pattern__selection-search">
+						<SearchControl
+							__nextHasNoMarginBottom
+							onChange={ setSearchValue }
+							value={ searchValue }
+							label={ __( 'Search for patterns' ) }
+							placeholder={ __( 'Search' ) }
+						/>
+					</div>
+					<BlockPatternsList
+						blockPatterns={ filteredBlockPatterns }
+						shownPatterns={ shownBlockPatterns }
+						onClickPattern={ onBlockPatternSelect }
 					/>
 				</div>
-				<BlockPatternsList
-					blockPatterns={ filteredBlockPatterns }
-					shownPatterns={ shownBlockPatterns }
-					onClickPattern={ onBlockPatternSelect }
-				/>
-			</div>
+			</BlockContextProvider>
 		</Modal>
 	);
 }
