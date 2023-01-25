@@ -6,13 +6,20 @@ import { fireEvent, render, screen } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import KeyboardShortcuts from '../';
+import KeyboardShortcuts from '..';
 
 describe( 'KeyboardShortcuts', () => {
-	function keyPress( which, target ) {
+	function keyPress(
+		which: KeyboardEvent[ 'which' ],
+		target: Parameters< typeof fireEvent >[ 0 ]
+	) {
 		[ 'keydown', 'keypress', 'keyup' ].forEach( ( eventName ) => {
-			const event = new window.Event( eventName, { bubbles: true } );
+			const event = new window.Event( eventName, {
+				bubbles: true,
+			} );
+			// @ts-expect-error
 			event.keyCode = which;
+			// @ts-expect-error
 			event.which = which;
 			fireEvent( target, event );
 		} );
