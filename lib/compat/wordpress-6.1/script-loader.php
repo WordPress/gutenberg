@@ -82,9 +82,11 @@ function gutenberg_enqueue_global_styles_custom_css() {
 	$custom_css     = get_global_styles_custom_css();
 	$is_block_theme = wp_is_block_theme();
 	if ( $custom_css && $is_block_theme ) {
-		wp_register_style( 'global-styles-custom-css', false, array(), true, true );
-		wp_add_inline_style( 'global-styles-custom-css', $custom_css );
-		wp_enqueue_style( 'global-styles-custom-css' );
+		?>
+		<style id="global-styles-custom-css-inline-css" type="text/css">
+			<?php echo $custom_css; ?>
+		</style>
+		<?php
 	}
 }
 
