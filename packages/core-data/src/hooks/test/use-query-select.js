@@ -54,7 +54,9 @@ describe( 'useQuerySelect', () => {
 		// - 1 for initial mount
 		// - 1 for after mount before subscription set.
 		expect( selectSpy ).toHaveBeenCalledTimes( 2 );
-		expect( TestComponent ).toHaveBeenCalledTimes( 2 );
+
+		// only 1 render expected - equal data won't trigger a rerender.
+		expect( TestComponent ).toHaveBeenCalledTimes( 1 );
 
 		// ensure expected state was rendered
 		expect( screen.getByText( 'bar' ) ).toBeInTheDocument();
