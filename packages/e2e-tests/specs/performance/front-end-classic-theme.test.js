@@ -7,7 +7,7 @@ import { writeFileSync } from 'fs';
 /**
  * WordPress dependencies
  */
-import { activateTheme, createURL, logout } from '@wordpress/e2e-test-utils';
+import { createURL, logout } from '@wordpress/e2e-test-utils';
 
 describe( 'Front End Performance', () => {
 	const results = {
@@ -15,12 +15,10 @@ describe( 'Front End Performance', () => {
 	};
 
 	beforeAll( async () => {
-		await activateTheme( 'twentytwentythree' );
 		await logout();
 	} );
 
 	afterAll( async () => {
-		await activateTheme( 'twentytwentyone' );
 		const resultsFilename = basename( __filename, '.js' ) + '.results.json';
 		writeFileSync(
 			join( __dirname, resultsFilename ),
@@ -29,7 +27,10 @@ describe( 'Front End Performance', () => {
 	} );
 
 	it( 'Time To First Byte (TTFB)', async () => {
-		let i = 10;
+		// We derive the 75th percentile of the TTFB based on these results.
+		// By running it 16 times, the percentile value would be (75/100)*16=12,
+		// meaning that we discard the worst 4 values.
+		let i = 16;
 		while ( i-- ) {
 			await page.goto( createURL( '/' ) );
 			const navigationTimingJson = await page.evaluate( () =>

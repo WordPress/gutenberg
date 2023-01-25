@@ -127,11 +127,11 @@ function formatTime( number ) {
  */
 function curateResults( testSuite, results ) {
 	if (
-		testSuite === 'front-end-twentytwentyone' ||
-		testSuite === 'front-end-twentytwentythree'
+		testSuite === 'front-end-classic-theme' ||
+		testSuite === 'front-end-block-theme'
 	) {
 		return {
-			timeToFirstByte: average( results.timeToFirstByte ),
+			timeToFirstByte: median( results.timeToFirstByte ),
 		};
 	}
 
@@ -359,8 +359,8 @@ async function runPerformanceTests( branches, options ) {
 	const testSuites = [
 		'post-editor',
 		'site-editor',
-		'front-end-twentytwentyone',
-		'front-end-twentytwentythree',
+		'front-end-classic-theme',
+		'front-end-block-theme',
 	];
 
 	/** @type {Record<string,Record<string, WPPerformanceResults>>} */
