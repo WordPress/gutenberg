@@ -44,11 +44,8 @@ const { Slot: GlobalStylesMenuSlot, Fill: GlobalStylesMenuFill } =
 
 function GlobalStylesMenu() {
 	const { toggle } = useDispatch( preferencesStore );
-	const { useGlobalStylesReset, useGlobalStyle } = unlock(
-		blockEditorExperiments
-	);
+	const { useGlobalStylesReset } = unlock( blockEditorExperiments );
 	const [ canReset, onReset ] = useGlobalStylesReset();
-	const [ customCSS ] = useGlobalStyle( 'css' );
 	const { goTo } = useNavigator();
 	const loadCustomCSS = () => goTo( '/css' );
 	return (
@@ -62,14 +59,10 @@ function GlobalStylesMenu() {
 						onClick: onReset,
 						isDisabled: ! canReset,
 					},
-					...( ! customCSS
-						? [
-								{
-									title: __( 'Additional CSS' ),
-									onClick: loadCustomCSS,
-								},
-						  ]
-						: [] ),
+					{
+						title: __( 'Additional CSS' ),
+						onClick: loadCustomCSS,
+					},
 					{
 						title: __( 'Welcome Guide' ),
 						onClick: () =>
@@ -338,10 +331,6 @@ function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
 			{ isStyleBookOpened && (
 				<GlobalStylesStyleBook onClose={ onCloseStyleBook } />
 			) }
-
-			<GlobalStylesNavigationScreen path="/css">
-				<ScreenCSS />
-			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesMenu />
 		</NavigatorProvider>
