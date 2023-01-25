@@ -236,10 +236,9 @@ function NavigationMenuSelector( {
 
 	if ( ! hasNavigationMenus && ! hasClassicMenus ) {
 		if ( ! process.env.IS_GUTENBERG_PLUGIN ) {
+			// This has to be in it's own conditional so it is removed by dead code elimination. Previously used isOffCanvasNavigationEditorEnabled.
 			return NavigationMenuSelectorButton;
 		}
-
-		return NavigationMenuSelectorButton;
 	}
 
 	return NavigationMenuSelectorDropdown;
