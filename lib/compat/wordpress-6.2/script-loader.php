@@ -72,7 +72,6 @@ function gutenberg_enqueue_block_support_styles( $style, $priority = 10 ) {
 function gutenberg_resolve_assets_override() {
 	global $pagenow, $editor_styles;
 
-
 	$script_handles = array(
 		'wp-polyfill',
 	);
