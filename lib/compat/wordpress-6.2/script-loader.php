@@ -72,7 +72,9 @@ function gutenberg_enqueue_block_support_styles( $style, $priority = 10 ) {
 function gutenberg_resolve_assets_override() {
 	global $pagenow;
 
-	$script_handles = array();
+	$script_handles = array(
+		'wp-polyfill',
+	);
 	// Note for core merge: only 'wp-edit-blocks' should be in this array.
 	$style_handles = array(
 		'wp-edit-blocks',
