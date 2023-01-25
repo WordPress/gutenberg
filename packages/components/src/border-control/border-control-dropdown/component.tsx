@@ -167,7 +167,7 @@ const BorderControlDropdown = (
 			onClick={ onToggle }
 			variant="tertiary"
 			aria-label={ toggleAriaLabel }
-			position={ dropdownPosition }
+			tooltipPosition={ dropdownPosition }
 			label={ __( 'Border color and style picker' ) }
 			showTooltip={ true }
 		>

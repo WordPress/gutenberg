@@ -16,6 +16,7 @@
 -   `ColorListPicker`: Convert to TypeScript ([#46358](https://github.com/WordPress/gutenberg/pull/46358)).
 -   `ColorPalette`, `BorderControl`, `GradientPicker`: refine types and logic around single vs multiple palettes
  ([#47384](https://github.com/WordPress/gutenberg/pull/47384)).
+-   `Button`: Convert to TypeScript ([#46997](https://github.com/WordPress/gutenberg/pull/46997)).
 
 ### Bug Fix
 
