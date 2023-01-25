@@ -330,6 +330,38 @@ function MyComponent() {
 }
 ```
 
+Importantly, some packages call both `createReduxStore` **and** `registerStore`:
+
+```js
+export const store = createReduxStore( STORE_NAME, {
+	...storeConfig,
+	persist: [ 'preferences' ],
+} );
+
+registerStore( STORE_NAME, {
+	...storeConfig,
+	persist: [ 'preferences' ],
+} );
+```
+
+In this scenario, register the private actions and selectors on the **registered** store:
+
+```js
+export const store = createReduxStore( STORE_NAME, {
+	...storeConfig,
+	persist: [ 'preferences' ],
+} );
+
+const registeredStore = registerStore( STORE_NAME, {
+	...storeConfig,
+	persist: [ 'preferences' ],
+} );
+
+unlock( registeredStore ).registerPrivateActions({
+	// ...
+});
+```
+
 ##### Experimental functions, classes, and variables
 
 ```js
