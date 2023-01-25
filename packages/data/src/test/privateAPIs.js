@@ -142,6 +142,20 @@ describe( 'Private data APIs', () => {
 			expect( privateSelectors.getSecretDiscount() ).toEqual( 800 );
 		} );
 
+		it( 'should support mixing createReduxStore and registerStore', () => {
+			const groceryStore1 = createReduxStore(
+				storeName,
+				storeDescriptor
+			);
+			const groceryStore2 = registry.registerStore( storeName, storeDescriptor );
+			unlock( groceryStore2 ).registerPrivateSelectors( {
+				getSecretDiscount,
+			} );
+
+			const privateSelectors = unlock( registry.select( storeName ) );
+			expect( privateSelectors.getSecretDiscount() ).toEqual( 800 );
+		} );
+
 		it( 'should support sub registries', () => {
 			const groceryStore = registry.registerStore(
 				storeName,
