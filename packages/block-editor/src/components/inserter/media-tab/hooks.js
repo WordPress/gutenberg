@@ -76,16 +76,11 @@ function useInserterMediaCategories() {
 		allowedMimeTypes,
 		enableOpenverseMediaCategory,
 	} = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		const {
-			__unstableInserterMediaCategories,
-			allowedMimeTypes: _allowedMimeTypes,
-			enableOpenverseMediaCategory: _enableOpenverseMediaCategory,
-		} = getSettings();
+		const settings = select( blockEditorStore ).getSettings();
 		return {
-			inserterMediaCategories: __unstableInserterMediaCategories,
-			allowedMimeTypes: _allowedMimeTypes,
-			enableOpenverseMediaCategory: _enableOpenverseMediaCategory,
+			inserterMediaCategories: settings.__unstableInserterMediaCategories,
+			allowedMimeTypes: settings.allowedMimeTypes,
+			enableOpenverseMediaCategory: settings.enableOpenverseMediaCategory,
 		};
 	}, [] );
 	// The allowed `mime_types` can be altered by `upload_mimes` filter and restrict
