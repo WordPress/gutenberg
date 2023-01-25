@@ -6,9 +6,11 @@ import {
 	MenuItem,
 	MenuItemsChoice,
 	DropdownMenu,
+	Button,
+	VisuallyHidden,
 } from '@wordpress/components';
 import { useEntityProp } from '@wordpress/core-data';
-import { moreVertical } from '@wordpress/icons';
+import { Icon, chevronUp, chevronDown, moreVertical } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useEffect, useMemo, useState } from '@wordpress/element';
@@ -33,6 +35,8 @@ function NavigationMenuSelector( {
 	const createActionLabel = __( "Create from '%s'" );
 
 	const [ selectorLabel, setSelectorLabel ] = useState( '' );
+	const [ isPressed, setIsPressed ] = useState( false );
+	const [ enableOptions, setEnableOptions ] = useState( false );
 	const [ isCreatingMenu, setIsCreatingMenu ] = useState( false );
 
 	actionLabel = actionLabel || createActionLabel;
@@ -52,6 +56,11 @@ function NavigationMenuSelector( {
 		'wp_navigation',
 		'title'
 	);
+
+	const shouldEnableMenuSelector =
+		( canSwitchNavigationMenu || canUserCreateNavigationMenu ) &&
+		hasResolvedNavigationMenus &&
+		! isCreatingMenu;
 
 	const menuChoices = useMemo( () => {
 		return (
@@ -116,11 +125,37 @@ function NavigationMenuSelector( {
 		isNavigationMenuResolved,
 	] );
 
-	return (
+	toggleProps = {
+		...toggleProps,
+		className: 'wp-block-navigation__navigation-selector-button',
+		children: (
+			<>
+				<VisuallyHidden as="span">
+					{ __( 'Select Menu' ) }
+				</VisuallyHidden>
+				<Icon
+					icon={ isPressed ? chevronUp : chevronDown }
+					className="wp-block-navigation__navigation-selector-button__icon"
+				/>
+			</>
+		),
+		isBusy: ! enableOptions,
+		disabled: ! enableOptions,
+		__experimentalIsFocusable: true,
+		onClick: () => {
+			setIsPressed( ! isPressed );
+		},
+	};
+
+	const NavigationMenuSelectorDropdown = (
 		<DropdownMenu
 			label={ selectorLabel }
 			icon={ moreVertical }
-			toggleProps={ { isSmall: true } }
+			toggleProps={
+				process.env.IS_GUTENBERG_PLUGIN
+					? { isSmall: true }
+					: toggleProps // Previously isOffCanvasNavigationEditorEnabled
+			}
 		>
 			{ ( { onClose } ) => (
 				<>
@@ -145,6 +180,7 @@ function NavigationMenuSelector( {
 											setSelectorLabel(
 												__( 'Loading …' )
 											);
+											setEnableOptions( false );
 											onSelectClassicMenu( menu );
 											onClose();
 										} }
@@ -169,6 +205,7 @@ function NavigationMenuSelector( {
 									onCreateNew();
 									setIsCreatingMenu( true );
 									setSelectorLabel( __( 'Loading …' ) );
+									setEnableOptions( false );
 								} }
 							>
 								{ __( 'Create new menu' ) }
@@ -179,6 +216,33 @@ function NavigationMenuSelector( {
 			) }
 		</DropdownMenu>
 	);
+
+	const NavigationMenuSelectorButton = (
+		<Button
+			className="wp-block-navigation__navigation-selector-button--createnew"
+			isBusy={ ! enableOptions }
+			disabled={ ! enableOptions }
+			__experimentalIsFocusable
+			onClick={ () => {
+				onCreateNew();
+				setIsCreatingMenu( true );
+				setSelectorLabel( __( 'Loading …' ) );
+				setEnableOptions( false );
+			} }
+		>
+			{ __( 'Create new menu' ) }
+		</Button>
+	);
+
+	if ( ! hasNavigationMenus && ! hasClassicMenus ) {
+		if ( ! process.env.IS_GUTENBERG_PLUGIN ) {
+			return NavigationMenuSelectorButton;
+		}
+
+		return NavigationMenuSelectorButton;
+	}
+
+	return NavigationMenuSelectorDropdown;
 }
 
 export default NavigationMenuSelector;
