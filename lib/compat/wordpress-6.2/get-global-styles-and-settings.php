@@ -59,7 +59,12 @@ if ( ! function_exists( 'wp_theme_has_theme_json_clean_cache' ) ) {
 	}
 }
 
-function get_global_styles_custom_css(){
+/**
+ * Gets the global styles custom css from theme.json.
+ *
+ * @return string
+ */
+function get_global_styles_custom_css() {
 	$tree                = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
 	$supports_theme_json = wp_theme_has_theme_json();
 
@@ -69,6 +74,7 @@ function get_global_styles_custom_css(){
 
 	return  $tree->get_custom_css();
 }
+
 /**
  * Returns the stylesheet resulting of merging core, theme, and user data.
  *

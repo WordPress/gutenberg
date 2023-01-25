@@ -73,7 +73,12 @@ function gutenberg_enqueue_global_styles() {
 	gutenberg_add_global_styles_for_blocks();
 }
 
-function gutenberg_enqueue_global_styles_custom_css(){
+/**
+ * Enqueues the global styles custom css.
+ *
+ * @since 6.2.0
+ */
+function gutenberg_enqueue_global_styles_custom_css() {
 	$custom_css     = get_global_styles_custom_css();
 	$is_block_theme = wp_is_block_theme();
 	if ( $custom_css && $is_block_theme ) {
