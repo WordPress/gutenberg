@@ -130,13 +130,30 @@ function useHasTextDecorationControl( name, element ) {
 	return supports.includes( 'textDecoration' );
 }
 
+function TypographyToolsPanel( { ...props } ) {
+	return <ToolsPanel label={ __( 'Typography' ) } { ...props } />;
+}
+
+const DEFAULT_CONTROLS = {
+	fontFamily: true,
+	fontSize: true,
+	fontAppearance: true,
+	lineHeight: true,
+	letterSpacing: true,
+	textTransform: true,
+	textDecoration: true,
+};
+
 export default function TypographyPanel( {
+	as: Wrapper = TypographyToolsPanel,
 	name,
 	element,
 	value,
 	onChange,
-	inherit,
+	inherit = value,
 	settings,
+	panelId,
+	defaultControls = DEFAULT_CONTROLS,
 } ) {
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
@@ -154,11 +171,16 @@ export default function TypographyPanel( {
 		fontFamiliesPerOrigin.default;
 	const fontFamily = decodeValue( inherit?.typography?.fontFamily );
 	const setFontFamily = ( newValue ) => {
+		const slug = fontFamilies?.find(
+			( { fontFamily: f } ) => f === newValue
+		)?.slug;
 		onChange( {
 			...value,
 			typography: {
 				...value?.typography,
-				fontFamily: newValue,
+				fontFamily: slug
+					? `var:preset|font-family|${ slug }`
+					: newValue,
 			},
 		} );
 	};
@@ -307,13 +329,14 @@ export default function TypographyPanel( {
 	};
 
 	return (
-		<ToolsPanel label={ __( 'Typography' ) } resetAll={ resetAll }>
+		<Wrapper resetAll={ resetAll }>
 			{ hasFontFamilyEnabled && (
 				<ToolsPanelItem
 					label={ __( 'Font family' ) }
 					hasValue={ hasFontFamily }
 					onDeselect={ resetFontFamily }
-					isShownByDefault
+					isShownByDefault={ defaultControls.fontFamily }
+					panelId={ panelId }
 				>
 					<FontFamilyControl
 						fontFamilies={ fontFamilies }
@@ -329,7 +352,8 @@ export default function TypographyPanel( {
 					label={ __( 'Font size' ) }
 					hasValue={ hasFontSize }
 					onDeselect={ resetFontSize }
-					isShownByDefault
+					isShownByDefault={ defaultControls.fontSize }
+					panelId={ panelId }
 				>
 					<FontSizePicker
 						value={ fontSize }
@@ -349,7 +373,8 @@ export default function TypographyPanel( {
 					label={ appearanceControlLabel }
 					hasValue={ hasFontAppearance }
 					onDeselect={ resetFontAppearance }
-					isShownByDefault
+					isShownByDefault={ defaultControls.fontAppearance }
+					panelId={ panelId }
 				>
 					<FontAppearanceControl
 						value={ {
@@ -370,7 +395,8 @@ export default function TypographyPanel( {
 					label={ __( 'Line height' ) }
 					hasValue={ hasLineHeight }
 					onDeselect={ resetLineHeight }
-					isShownByDefault
+					isShownByDefault={ defaultControls.lineHeight }
+					panelId={ panelId }
 				>
 					<LineHeightControl
 						__nextHasNoMarginBottom
@@ -387,7 +413,8 @@ export default function TypographyPanel( {
 					label={ __( 'Letter spacing' ) }
 					hasValue={ hasLetterSpacing }
 					onDeselect={ resetLetterSpacing }
-					isShownByDefault
+					isShownByDefault={ defaultControls.letterSpacing }
+					panelId={ panelId }
 				>
 					<LetterSpacingControl
 						value={ letterSpacing }
@@ -402,7 +429,8 @@ export default function TypographyPanel( {
 					label={ __( 'Letter case' ) }
 					hasValue={ hasTextTransform }
 					onDeselect={ resetTextTransform }
-					isShownByDefault
+					isShownByDefault={ defaultControls.textTransform }
+					panelId={ panelId }
 				>
 					<TextTransformControl
 						value={ textTransform }
@@ -420,7 +448,8 @@ export default function TypographyPanel( {
 					label={ __( 'Text decoration' ) }
 					hasValue={ hasTextDecoration }
 					onDeselect={ resetTextDecoration }
-					isShownByDefault
+					isShownByDefault={ defaultControls.textDecoration }
+					panelId={ panelId }
 				>
 					<TextDecorationControl
 						value={ textDecoration }
@@ -430,6 +459,6 @@ export default function TypographyPanel( {
 					/>
 				</ToolsPanelItem>
 			) }
-		</ToolsPanel>
+		</Wrapper>
 	);
 }
