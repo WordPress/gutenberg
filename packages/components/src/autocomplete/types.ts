@@ -2,6 +2,10 @@
  * WordPress dependencies
  */
 import type { WPElement } from '@wordpress/element';
+/**
+ * External dependencies
+ */
+import type { MutableRefObject } from 'react';
 
 type GetOptions< TCompleterOption = any > = (
 	filterValue: AutocompleterUIProps[ 'filterValue' ]
@@ -86,4 +90,54 @@ export type WPCompleter< TCompleterOption = any > = {
 	 * A CSS class name to be applied to the completion menu.
 	 */
 	className?: string;
+};
+
+type ContentRef = MutableRefObject< HTMLElement | undefined >;
+
+export type AutocompleterUIProps = {
+	/**
+	 * The value to filter the options by.
+	 */
+	filterValue: string;
+	/**
+	 * An id unique to each instance of the component, used in the IDs of the
+	 * buttons generated for individual options.
+	 */
+	instanceId: number;
+	/**
+	 * The id of to be applied to the listbox of options.
+	 */
+	listBoxId: string | undefined;
+	/**
+	 * The class to apply to the wrapper element.
+	 */
+	className?: string;
+	/**
+	 * The index of the currently selected option.
+	 */
+	selectedIndex: number;
+	/**
+	 * A function to be called when the filterValue changes.
+	 */
+	onChangeOptions: ( items: Array< KeyedOption > ) => void;
+	/**
+	 * A function to be called when an option is selected.
+	 */
+	onSelect: ( option: KeyedOption ) => void; //should the param be an index?
+	/**
+	 * A function to be called when the completer is reset (e.g. when the user hits the escape key).
+	 */
+	onReset?: () => void;
+	/**
+	 * A function that defines the behavior of the completer when it is reset
+	 */
+	reset: ( event: Event ) => void;
+	/**
+	 * The rich text value object the autocomleter is being applied to.
+	 */
+	value: RichTextValue;
+	/**
+	 * A ref containing the editable element that will serve as the anchor for `Autocomplete`'s `Popover`.
+	 */
+	contentRef: ContentRef;
 };
