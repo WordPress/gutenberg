@@ -49,9 +49,6 @@
 			"type": "boolean",
 			"default": true
 		},
-		"__unstableLocation": {
-			"type": "string"
-		},
 		"overlayBackgroundColor": {
 			"type": "string"
 		},
