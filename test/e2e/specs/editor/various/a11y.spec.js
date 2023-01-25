@@ -170,12 +170,13 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'Shift+Tab' );
 		await expect( preferencesModalContent ).toBeFocused();
 
-		// Make the Blocks tab panel content shorter by searching for a block.
-		// It's now not scrollable. Check it's not focusable.
+		// Make the Blocks tab panel content shorter by searching for a block
+		// that doesn't exist. The content only shows 'No blocks found' and it's
+		// not scrollable any longer. Check it's not focusable.
 		await clickAndFocusTab( blocksTab );
 		await page.type(
 			'role=searchbox[name="Search for a block"i]',
-			'cover'
+			'qwerty'
 		);
 		await clickAndFocusTab( blocksTab );
 		await page.keyboard.press( 'Shift+Tab' );
