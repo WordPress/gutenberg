@@ -335,7 +335,7 @@ export default function CoverInspectorControls( {
 					/>
 				</ToolsPanelItem>
 			</InspectorControls>
-			<InspectorControls __experimentalGroup="advanced">
+			<InspectorControls group="advanced">
 				<SelectControl
 					__nextHasNoMarginBottom
 					label={ __( 'HTML element' ) }
