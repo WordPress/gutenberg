@@ -871,8 +871,16 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 		$p = new WP_HTML_Tag_Processor( self::HTML_SIMPLE );
 		$p->next_tag();
 		$p->add_class( 'foo-class' );
-		$this->assertSame( '<div class="foo-class" id="first"><span id="second">Text</span></div>', $p->get_updated_html() );
-		$this->assertSame( 'foo-class', $p->get_attribute( 'class' ) );
+		$this->assertSame(
+			'<div class="foo-class" id="first"><span id="second">Text</span></div>',
+			$p->get_updated_html(),
+			'Updated HTML does not include class name added via add_class()'
+		);
+		$this->assertSame(
+			'foo-class',
+			$p->get_attribute( 'class' ),
+			"get_attribute( 'class' ) did not return class name added via add_class()"
+		);
 	}
 
 	/**
@@ -887,8 +895,16 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 		$p->next_tag();
 		$p->add_class( 'foo-class' );
 		$p->add_class( 'bar-class' );
-		$this->assertSame( '<div class="foo-class bar-class" id="first"><span id="second">Text</span></div>', $p->get_updated_html() );
-		$this->assertSame( 'foo-class bar-class', $p->get_attribute( 'class' ) );
+		$this->assertSame(
+			'<div class="foo-class bar-class" id="first"><span id="second">Text</span></div>',
+			$p->get_updated_html(),
+			'Updated HTML does not include class names added via subsequent add_class() calls'
+		);
+		$this->assertSame(
+			'foo-class bar-class',
+			$p->get_attribute( 'class' ),
+			"get_attribute( 'class' ) did not return class names added via subsequent add_class() calls"
+		);
 	}
 
 	/**
@@ -902,8 +918,15 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 		$p = new WP_HTML_Tag_Processor( self::HTML_SIMPLE );
 		$p->next_tag();
 		$p->remove_class( 'foo-class' );
-		$this->assertSame( self::HTML_SIMPLE, $p->get_updated_html() );
-		$this->assertNull( $p->get_attribute( 'class' ) );
+		$this->assertSame(
+			self::HTML_SIMPLE,
+			$p->get_updated_html(),
+			'Updated HTML includes class name that was removed by remove_class()'
+		);
+		$this->assertNull(
+			$p->get_attribute( 'class' ),
+			"get_attribute( 'class' ) did not return null for class name that was removed by remove_class()"
+		);
 	}
 
 	/**
@@ -920,9 +943,14 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 		$p->add_class( 'bar-class' );
 		$this->assertSame(
 			'<div class="main with-border foo-class bar-class" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
-			$p->get_updated_html()
+			$p->get_updated_html(),
+			'Updated HTML does not reflect class names added to existing class attribute via subsequent add_class() calls'
 		);
-		$this->assertSame( 'main with-border foo-class bar-class', $p->get_attribute( 'class' ) );
+		$this->assertSame(
+			'main with-border foo-class bar-class',
+			$p->get_attribute( 'class' ),
+			"get_attribute( 'class' ) does not reflect class names added to existing class attribute via subsequent add_class() calls"
+		);
 	}
 
 	/**
@@ -938,9 +966,14 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 		$p->remove_class( 'main' );
 		$this->assertSame(
 			'<div class=" with-border" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
-			$p->get_updated_html()
+			$p->get_updated_html(),
+			'Updated HTML does not reflect class name removed from existing class attribute via remove_class()'
 		);
-		$this->assertSame( ' with-border', $p->get_attribute( 'class' ) );
+		$this->assertSame(
+			' with-border',
+			$p->get_attribute( 'class' ),
+			"get_attribute( 'class' ) does not reflect class name removed from existing class attribute via remove_class()"
+		);
 	}
 
 	/**
@@ -957,9 +990,13 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 		$p->remove_class( 'with-border' );
 		$this->assertSame(
 			'<div  id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
-			$p->get_updated_html()
+			$p->get_updated_html(),
+			'Updated HTML does not reflect class attribute removed via subesequent remove_class() calls'
 		);
-		$this->assertNull( $p->get_attribute( 'class' ) );
+		$this->assertNull(
+			$p->get_attribute( 'class' ),
+			"get_attribute( 'class' ) did not return null for class attribute removed via subesequent remove_class() calls"
+		);
 	}
 
 	/**
@@ -975,9 +1012,14 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 		$p->add_class( 'with-border' );
 		$this->assertSame(
 			'<div class="main with-border" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
-			$p->get_updated_html()
+			$p->get_updated_html(),
+			'Updated HTML does not reflect deduplicated class name added via add_class()'
 		);
-		$this->assertSame( 'main with-border', $p->get_attribute( 'class' ) );
+		$this->assertSame(
+			'main with-border',
+			$p->get_attribute( 'class' ),
+			"get_attribute( 'class' ) does not reflect deduplicated class name added via add_class()"
+		);
 	}
 
 	/**
@@ -993,9 +1035,14 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 		$p->add_class( 'main' );
 		$this->assertSame(
 			'<div class="main with-border" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
-			$p->get_updated_html()
+			$p->get_updated_html(),
+			'Updated HTML does not reflect class name order after adding duplicated class name via add_class()'
 		);
-		$this->assertSame( 'main with-border', $p->get_attribute( 'class' ) );
+		$this->assertSame(
+			'main with-border',
+			$p->get_attribute( 'class' ),
+			"get_attribute( 'class' ) does not reflect class name order after adding duplicated class name added via add_class()"
+		);
 	}
 
 	/**
@@ -1013,9 +1060,14 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 		$p->add_class( 'foo-class' );
 		$this->assertSame(
 			'<div class="   main   with-border foo-class" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
-			$p->get_updated_html()
+			$p->get_updated_html(),
+			'Updated HTML does not reflect existing excessive whitespace after adding class name via add_class()'
 		);
-		$this->assertSame( '   main   with-border foo-class', $p->get_attribute( 'class' ) );
+		$this->assertSame(
+			'   main   with-border foo-class',
+			$p->get_attribute( 'class' ),
+			"get_attribute( 'class' ) does not reflect existing excessive whitespace after adding class name via add_class()"
+		);
 	}
 
 	/**
@@ -1033,9 +1085,14 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 		$p->remove_class( 'with-border' );
 		$this->assertSame(
 			'<div class="   main" id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
-			$p->get_updated_html()
+			$p->get_updated_html(),
+			'Updated HTML does not reflect existing excessive whitespace after removing class name via remove_class()'
 		);
-		$this->assertSame( '   main', $p->get_attribute( 'class' ) );
+		$this->assertSame(
+			'   main',
+			$p->get_attribute( 'class' ),
+			"get_attribute( 'class' ) does not reflect existing excessive whitespace after removing class name via removing_class()"
+		);
 	}
 
 	/**
@@ -1054,9 +1111,13 @@ class WP_HTML_Tag_Processor_Test extends WP_UnitTestCase {
 		$p->remove_class( 'with-border' );
 		$this->assertSame(
 			'<div  id="first"><span class="not-main bold with-border" id="second">Text</span></div>',
-			$p->get_updated_html()
+			$p->get_updated_html(),
+			'Updated HTML does not reflect removed class attribute after removing all class names via remove_class()'
 		);
-		$this->assertNull( $p->get_attribute( 'class' ) );
+		$this->assertNull(
+			$p->get_attribute( 'class' ),
+			"get_attribute( 'class' ) did not return null after removing all class names via remove_class()"
+		);
 	}
 
 	/**
