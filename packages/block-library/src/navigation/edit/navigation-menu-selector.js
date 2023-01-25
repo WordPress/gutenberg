@@ -149,8 +149,14 @@ function NavigationMenuSelector( {
 
 	const NavigationMenuSelectorDropdown = (
 		<DropdownMenu
+			className={
+				process.env.IS_GUTENBERG_PLUGIN // Previously isOffCanvasNavigationEditorEnabled
+					? ''
+					: 'wp-block-navigation__navigation-selector'
+			}
 			label={ selectorLabel }
-			icon={ moreVertical }
+			text={ process.env.IS_GUTENBERG_PLUGIN ? '' : selectorLabel } // Previously isOffCanvasNavigationEditorEnabled
+			icon={ process.env.IS_GUTENBERG_PLUGIN ? moreVertical : null } // Previously isOffCanvasNavigationEditorEnabled
 			toggleProps={
 				process.env.IS_GUTENBERG_PLUGIN
 					? { isSmall: true }
