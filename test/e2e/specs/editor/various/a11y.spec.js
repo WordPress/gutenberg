@@ -117,12 +117,12 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 	} ) => {
 		// Open the top bar Options menu.
 		await page.click(
-			'role=region[name=/Editor top bar/i] >> role=button[name=/Options/i]'
+			'role=region[name="Editor top bar"i] >> role=button[name="Options"i]'
 		);
 
 		// Open the Preferences modal.
 		await page.click(
-			'role=menu[name=/Options/i] >> role=menuitem[name=/Preferences/i]'
+			'role=menu[name="Options"i] >> role=menuitem[name="Preferences"i]'
 		);
 
 		const preferencesModal = page.locator(
