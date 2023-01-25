@@ -18,6 +18,7 @@ import LetterSpacingControl from '../letter-spacing-control';
 import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
 import { useSupportedStyles } from './hooks';
+import { getValueFromVariable } from './utils';
 
 export function useHasTypographyPanel( name, element, settings ) {
 	const hasFontFamily = useHasFontFamilyControl( name, element, settings );
@@ -54,7 +55,11 @@ export function useHasTypographyPanel( name, element, settings ) {
 function useHasFontSizeControl( name, element, settings ) {
 	const supports = useSupportedStyles( name, element );
 	const disableCustomFontSizes = ! settings?.typography?.customFontSize;
-	const fontSizes = settings?.typography?.fontSizes;
+	const fontSizesPerOrigin = settings?.typography?.fontSizes ?? {};
+	const fontSizes =
+		fontSizesPerOrigin?.custom ??
+		fontSizesPerOrigin?.theme ??
+		fontSizesPerOrigin.default;
 	return (
 		supports.includes( 'fontSize' ) &&
 		( !! fontSizes?.length || ! disableCustomFontSizes )
@@ -63,7 +68,11 @@ function useHasFontSizeControl( name, element, settings ) {
 
 function useHasFontFamilyControl( name, element, settings ) {
 	const supports = useSupportedStyles( name, element );
-	const fontFamilies = settings?.typography?.fontFamilies;
+	const fontFamiliesPerOrigin = settings?.typography?.fontFamilies;
+	const fontFamilies =
+		fontFamiliesPerOrigin?.custom ??
+		fontFamiliesPerOrigin?.theme ??
+		fontFamiliesPerOrigin.default;
 	return supports.includes( 'fontFamily' ) && !! fontFamilies?.length;
 }
 
@@ -129,14 +138,21 @@ export default function TypographyPanel( {
 	inherit,
 	settings,
 } ) {
+	const decodeValue = ( rawValue ) =>
+		getValueFromVariable( { settings }, '', rawValue );
+
 	// Font Family
 	const hasFontFamilyEnabled = useHasFontFamilyControl(
 		name,
 		element,
 		settings
 	);
-	const fontFamilies = settings?.typography?.fontFamilies;
-	const fontFamily = inherit?.typography?.fontFamily;
+	const fontFamiliesPerOrigin = settings?.typography?.fontFamilies;
+	const fontFamilies =
+		fontFamiliesPerOrigin?.custom ??
+		fontFamiliesPerOrigin?.theme ??
+		fontFamiliesPerOrigin.default;
+	const fontFamily = decodeValue( inherit?.typography?.fontFamily );
 	const setFontFamily = ( newValue ) => {
 		onChange( {
 			...value,
@@ -152,8 +168,12 @@ export default function TypographyPanel( {
 	// Font Size
 	const hasFontSizeEnabled = useHasFontSizeControl( name, element, settings );
 	const disableCustomFontSizes = ! settings?.typography?.customFontSize;
-	const fontSizes = settings?.typography?.fontSizes;
-	const fontSize = inherit?.typography?.fontSize;
+	const fontSizesPerOrigin = settings?.typography?.fontSizes ?? {};
+	const fontSizes =
+		fontSizesPerOrigin?.custom ??
+		fontSizesPerOrigin?.theme ??
+		fontSizesPerOrigin.default;
+	const fontSize = decodeValue( inherit?.typography?.fontSize );
 	const setFontSize = ( newValue, metadata ) => {
 		const actualValue = !! metadata?.slug
 			? `var:preset|font-size|${ metadata?.slug }`
@@ -183,8 +203,8 @@ export default function TypographyPanel( {
 	);
 	const hasFontStyles = settings?.typography?.fontStyle;
 	const hasFontWeights = settings?.typography?.fontWeight;
-	const fontStyle = inherit?.typography?.fontStyle;
-	const fontWeight = inherit?.typography?.fontWeight;
+	const fontStyle = decodeValue( inherit?.typography?.fontStyle );
+	const fontWeight = decodeValue( inherit?.typography?.fontWeight );
 	const setFontStyle = ( newValue ) => {
 		onChange( {
 			...value,
@@ -216,7 +236,7 @@ export default function TypographyPanel( {
 		element,
 		settings
 	);
-	const lineHeight = inherit?.typography?.lineHeight;
+	const lineHeight = decodeValue( inherit?.typography?.lineHeight );
 	const setLineHeight = ( newValue ) => {
 		onChange( {
 			...value,
@@ -235,7 +255,7 @@ export default function TypographyPanel( {
 		element,
 		settings
 	);
-	const letterSpacing = inherit?.typography?.letterSpacing;
+	const letterSpacing = decodeValue( inherit?.typography?.letterSpacing );
 	const setLetterSpacing = ( newValue ) => {
 		onChange( {
 			...value,
@@ -254,7 +274,7 @@ export default function TypographyPanel( {
 		element,
 		settings
 	);
-	const textTransform = inherit?.typography?.textTransform;
+	const textTransform = decodeValue( inherit?.typography?.textTransform );
 	const setTextTransform = ( newValue ) => {
 		onChange( {
 			...value,
@@ -272,7 +292,7 @@ export default function TypographyPanel( {
 		name,
 		element
 	);
-	const textDecoration = inherit?.typography?.textDecoration;
+	const textDecoration = decodeValue( inherit?.typography?.textDecoration );
 	const setTextDecoration = ( newValue ) => {
 		onChange( {
 			...value,

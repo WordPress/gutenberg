@@ -163,7 +163,12 @@ export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
 	return [ resultWithFallback, setSetting ];
 }
 
-export function useGlobalStyle( path, blockName, source = 'all' ) {
+export function useGlobalStyle(
+	path,
+	blockName,
+	source = 'all',
+	shouldDecodeEncode = true
+) {
 	const {
 		merged: mergedConfig,
 		base: baseConfig,
@@ -182,43 +187,43 @@ export function useGlobalStyle( path, blockName, source = 'all' ) {
 			set(
 				newUserConfig,
 				finalPath,
-				getPresetVariableFromValue(
-					mergedConfig.settings,
-					blockName,
-					path,
-					newValue
-				)
+				shouldDecodeEncode
+					? getPresetVariableFromValue(
+							mergedConfig.settings,
+							blockName,
+							path,
+							newValue
+					  )
+					: newValue
 			);
 			return newUserConfig;
 		} );
 	};
 
-	let result;
+	let rawResult, result;
 	switch ( source ) {
 		case 'all':
-			result = getValueFromVariable(
-				mergedConfig,
-				blockName,
+			rawResult =
 				// The stlyes.css path is allowed to be empty, so don't revert to base if undefined.
 				finalPath === 'styles.css'
 					? get( userConfig, finalPath )
 					: get( userConfig, finalPath ) ??
-							get( baseConfig, finalPath )
-			);
+					  get( baseConfig, finalPath );
+			result = shouldDecodeEncode
+				? getValueFromVariable( mergedConfig, blockName, rawResult )
+				: rawResult;
 			break;
 		case 'user':
-			result = getValueFromVariable(
-				mergedConfig,
-				blockName,
-				get( userConfig, finalPath )
-			);
+			rawResult = get( userConfig, finalPath );
+			result = shouldDecodeEncode
+				? getValueFromVariable( mergedConfig, blockName, rawResult )
+				: rawResult;
 			break;
 		case 'base':
-			result = getValueFromVariable(
-				baseConfig,
-				blockName,
-				get( baseConfig, finalPath )
-			);
+			rawResult = get( baseConfig, finalPath );
+			result = shouldDecodeEncode
+				? getValueFromVariable( baseConfig, blockName, rawResult )
+				: rawResult;
 			break;
 		default:
 			throw 'Unsupported source';
