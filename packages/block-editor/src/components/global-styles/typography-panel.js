@@ -150,7 +150,7 @@ export default function TypographyPanel( {
 	element,
 	value,
 	onChange,
-	inherit = value,
+	inheritedValue = value,
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
@@ -169,7 +169,7 @@ export default function TypographyPanel( {
 		fontFamiliesPerOrigin?.custom ??
 		fontFamiliesPerOrigin?.theme ??
 		fontFamiliesPerOrigin.default;
-	const fontFamily = decodeValue( inherit?.typography?.fontFamily );
+	const fontFamily = decodeValue( inheritedValue?.typography?.fontFamily );
 	const setFontFamily = ( newValue ) => {
 		const slug = fontFamilies?.find(
 			( { fontFamily: f } ) => f === newValue
@@ -195,7 +195,7 @@ export default function TypographyPanel( {
 		fontSizesPerOrigin?.custom ??
 		fontSizesPerOrigin?.theme ??
 		fontSizesPerOrigin.default;
-	const fontSize = decodeValue( inherit?.typography?.fontSize );
+	const fontSize = decodeValue( inheritedValue?.typography?.fontSize );
 	const setFontSize = ( newValue, metadata ) => {
 		const actualValue = !! metadata?.slug
 			? `var:preset|font-size|${ metadata?.slug }`
@@ -225,8 +225,8 @@ export default function TypographyPanel( {
 	);
 	const hasFontStyles = settings?.typography?.fontStyle;
 	const hasFontWeights = settings?.typography?.fontWeight;
-	const fontStyle = decodeValue( inherit?.typography?.fontStyle );
-	const fontWeight = decodeValue( inherit?.typography?.fontWeight );
+	const fontStyle = decodeValue( inheritedValue?.typography?.fontStyle );
+	const fontWeight = decodeValue( inheritedValue?.typography?.fontWeight );
 	const setFontAppearance = ( {
 		fontStyle: newFontStyle,
 		fontWeight: newFontWeight,
@@ -252,7 +252,7 @@ export default function TypographyPanel( {
 		element,
 		settings
 	);
-	const lineHeight = decodeValue( inherit?.typography?.lineHeight );
+	const lineHeight = decodeValue( inheritedValue?.typography?.lineHeight );
 	const setLineHeight = ( newValue ) => {
 		onChange( {
 			...value,
@@ -271,7 +271,9 @@ export default function TypographyPanel( {
 		element,
 		settings
 	);
-	const letterSpacing = decodeValue( inherit?.typography?.letterSpacing );
+	const letterSpacing = decodeValue(
+		inheritedValue?.typography?.letterSpacing
+	);
 	const setLetterSpacing = ( newValue ) => {
 		onChange( {
 			...value,
@@ -290,7 +292,9 @@ export default function TypographyPanel( {
 		element,
 		settings
 	);
-	const textTransform = decodeValue( inherit?.typography?.textTransform );
+	const textTransform = decodeValue(
+		inheritedValue?.typography?.textTransform
+	);
 	const setTextTransform = ( newValue ) => {
 		onChange( {
 			...value,
@@ -308,7 +312,9 @@ export default function TypographyPanel( {
 		name,
 		element
 	);
-	const textDecoration = decodeValue( inherit?.typography?.textDecoration );
+	const textDecoration = decodeValue(
+		inheritedValue?.typography?.textDecoration
+	);
 	const setTextDecoration = ( newValue ) => {
 		onChange( {
 			...value,

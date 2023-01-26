@@ -45,7 +45,7 @@ export default function TypographyPanel( {
 		<StylesTypographyPanel
 			name={ name }
 			element={ element === 'heading' ? headingLevel : element }
-			inherit={ inheritedStyle }
+			inheritedValue={ inheritedStyle }
 			value={ style }
 			onChange={ setStyle }
 			settings={ settings }
