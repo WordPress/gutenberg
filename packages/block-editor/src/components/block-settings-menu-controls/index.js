@@ -28,16 +28,14 @@ const BlockSettingsMenuControlsSlot = ( {
 	const { selectedBlocks, selectedClientIds, canRemove } = useSelect(
 		( select ) => {
 			const {
-				getBlocksByClientId,
+				getBlockNamesByClientId,
 				getSelectedBlockClientIds,
 				canRemoveBlocks,
 			} = select( blockEditorStore );
 			const ids =
 				clientIds !== null ? clientIds : getSelectedBlockClientIds();
 			return {
-				selectedBlocks: getBlocksByClientId( ids )
-					.filter( Boolean )
-					.map( ( block ) => block.name ),
+				selectedBlocks: getBlockNamesByClientId( ids ),
 				selectedClientIds: ids,
 				canRemove: canRemoveBlocks( ids ),
 			};
