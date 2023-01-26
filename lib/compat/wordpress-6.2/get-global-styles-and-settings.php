@@ -137,6 +137,42 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 	return $stylesheet;
 }
 
+
+/**
+ * Returns a string containing the SVGs to be referenced as filters (duotone).
+ *
+ * @return string
+ */
+function gutenberg_get_global_styles_svg_filters() {
+	// Return cached value if it can be used and exists.
+	// It's cached by theme to make sure that theme switching clears the cache.
+	$can_use_cached = ! WP_DEBUG && ! is_admin();
+	$cache_key      = 'gutenberg_get_global_styles_svg_filters';
+	$cache_group    = 'theme_json';
+	if ( $can_use_cached ) {
+		$cached = wp_cache_get( $cache_key, $cache_group );
+		if ( $cached ) {
+			return $cached;
+		}
+	}
+
+	$supports_theme_json = wp_theme_has_theme_json();
+
+	$origins = array( 'default', 'theme', 'custom' );
+	if ( ! $supports_theme_json ) {
+		$origins = array( 'default' );
+	}
+
+	$tree = WP_Theme_JSON_Resolver::get_merged_data();
+	$svgs = $tree->get_svg_filters( $origins );
+
+	if ( $can_use_cached ) {
+		wp_cache_set( $cache_key, $svgs, $cache_group );
+	}
+
+	return $svgs;
+}
+
 /**
  * Function to get the settings resulting of merging core, theme, and user data.
  *
@@ -192,6 +228,7 @@ function gutenberg_get_global_settings( $path = array(), $context = array() ) {
 function _gutenberg_clean_theme_json_caches() {
 	wp_cache_delete( 'wp_theme_has_theme_json', 'theme_json' );
 	wp_cache_delete( 'gutenberg_get_global_stylesheet', 'theme_json' );
+	wp_cache_delete( 'gutenberg_get_global_styles_svg_filters', 'theme_json' );
 	wp_cache_delete( 'gutenberg_get_global_settings_custom', 'theme_json' );
 	wp_cache_delete( 'gutenberg_get_global_settings_theme', 'theme_json' );
 	WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
