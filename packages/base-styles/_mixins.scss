@@ -517,4 +517,12 @@
 	& > * {
 		visibility: visible;
 	}
+
+	// Always enable scrollbar on Mobile devices.
+	@media (hover: none) {
+		.scrollable {
+			visibility: visible;
+		}
+	}
+
 }
