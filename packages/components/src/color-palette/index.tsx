@@ -5,6 +5,7 @@ import type { ForwardedRef, RefObject } from 'react';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
+import mixPlugin from 'colord/plugins/mix';
 
 /**
  * WordPress dependencies
@@ -41,7 +42,7 @@ import type {
 import type { WordPressComponentProps } from '../ui/context';
 import type { DropdownProps } from '../dropdown/types';
 
-extend( [ namesPlugin, a11yPlugin ] );
+extend( [ namesPlugin, a11yPlugin, mixPlugin ] );
 
 function SinglePalette( {
 	className,
@@ -305,6 +306,13 @@ function UnforwardedColorPalette(
 	);
 
 	const colordColor = colord( normalizedColorValue ?? '' );
+	const mixedColor =
+		colordColor.alpha() < 1
+			? colord( '#fff' ).mix(
+					colordColor.alpha( 1 ),
+					colordColor.alpha()
+			  )
+			: colordColor;
 
 	const valueWithoutLeadingHash = value?.startsWith( '#' )
 		? value.substring( 1 )
@@ -356,8 +364,8 @@ function UnforwardedColorPalette(
 									: {
 											background: value,
 											color:
-												colordColor.contrast() >
-												colordColor.contrast( '#000' )
+												mixedColor.contrast() >
+												mixedColor.contrast( '#000' )
 													? '#fff'
 													: '#000',
 									  }
