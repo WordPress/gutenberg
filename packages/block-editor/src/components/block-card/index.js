@@ -46,7 +46,7 @@ function BlockCard( { title, icon, description, blockType, className } ) {
 
 	return (
 		<div className={ classnames( 'block-editor-block-card', className ) }>
-			{ parentNavBlockClientId && (
+			{ parentNavBlockClientId && ( // This is only used by the Navigation block for now. It's not ideal having Navigation block specific code here.
 				<Button
 					onClick={ () => selectBlock( parentNavBlockClientId ) }
 					label={ __( 'Go to parent Navigation block' ) }
