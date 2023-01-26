@@ -1,12 +1,13 @@
 .block-editor-list-view-tree {
-	width: 100%;
-	max-width: 100%;
+	//extending over the padding of the sidebar so that we don't get the icons cut off
+	width: calc(100% + #{ $grid-unit-20 });
+	max-width: calc(100% + #{ $grid-unit-20 });
+	margin: 0 ($grid-unit-20 * -1) 0 0;
+	padding: 0;
 	overflow-x: auto;
 	@include custom-scrollbars-on-hover(#ffffff);
 	display: block;
 	border-collapse: collapse;
-	padding: 0;
-	margin: 0;
 
 	// Move upwards when in modal.
 	.components-modal__content & {
