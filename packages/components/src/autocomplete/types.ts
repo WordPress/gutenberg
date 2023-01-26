@@ -141,3 +141,12 @@ export type AutocompleterUIProps = {
 	 */
 	contentRef: ContentRef;
 };
+
+/**
+ * A debounced promise used retrieve completer options.
+ *
+ * @see `get-default-use-items.tsx`
+ */
+export type DebouncedPromise< T = void > = Promise< T > & {
+	canceled?: boolean;
+};
