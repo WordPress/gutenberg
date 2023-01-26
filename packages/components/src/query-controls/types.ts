@@ -116,8 +116,10 @@ export type QueryControlsWithSingleCategorySelectionProps =
 		 */
 		selectedCategoryId?: CategorySelectProps[ 'selectedCategoryId' ];
 		/**
-		 * A function that receives the new category value.
-		 * If not specified, the category controls are not rendered.
+		 * A function that receives the new category value. If not specified, the
+		 * category controls are not rendered.
+		 * The function's signature changes depending on whether multiple category
+		 * selection is enabled or not.
 		 */
 		onCategoryChange?: CategorySelectProps[ 'onChange' ];
 	};
@@ -135,8 +137,10 @@ export type QueryControlsWithMultipleCategorySelectionProps =
 		 */
 		selectedCategories?: Category[];
 		/**
-		 * A function that receives the new category value.
-		 * If not specified, the category controls are not rendered.
+		 * A function that receives the new category value. If not specified, the
+		 * category controls are not rendered.
+		 * The function's signature changes depending on whether multiple category
+		 * selection is enabled or not.
 		 */
 		onCategoryChange?: FormTokenFieldProps[ 'onChange' ];
 	};
