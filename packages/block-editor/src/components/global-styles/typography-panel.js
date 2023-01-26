@@ -72,7 +72,7 @@ function useHasFontFamilyControl( name, element, settings ) {
 	const fontFamilies =
 		fontFamiliesPerOrigin?.custom ??
 		fontFamiliesPerOrigin?.theme ??
-		fontFamiliesPerOrigin.default;
+		fontFamiliesPerOrigin?.default;
 	return supports.includes( 'fontFamily' ) && !! fontFamilies?.length;
 }
 
