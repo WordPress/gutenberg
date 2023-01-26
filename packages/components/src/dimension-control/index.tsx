@@ -74,4 +74,24 @@ export function DimensionControl( props: DimensionControlProps ) {
 	);
 }
 
+/**
+ * `DimensionControl` is a component designed to provide a UI to control spacing and/or dimensions.
+ *
+ * This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+ *
+ *  * ```jsx
+ * import {
+ *	__experimentalDimensionControl as DimensionControl
+ * } from '@wordpress/components';
+ *
+ * const MyDimensionControl = () => {
+ * 	return (
+ *		<DimensionConrol
+ *			label="Please select a size"
+ *			onChange={ (size) => console.log(size) }
+ *		/>
+ * 	);
+ * };
+ * ```
+ */
 export default DimensionControl;
