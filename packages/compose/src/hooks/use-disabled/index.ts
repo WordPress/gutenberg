@@ -39,11 +39,16 @@ export default function useDisabled( {
 				return;
 			}
 
+			const defaultView = node?.ownerDocument?.defaultView;
+			if ( ! defaultView ) {
+				return;
+			}
+
 			/** A variable keeping track of the previous updates in order to restore them. */
 			const updates: Function[] = [];
 			const disable = () => {
 				node.childNodes.forEach( ( child ) => {
-					if ( ! ( child instanceof HTMLElement ) ) {
+					if ( ! ( child instanceof defaultView.HTMLElement ) ) {
 						return;
 					}
 					if ( ! child.getAttribute( 'inert' ) ) {
