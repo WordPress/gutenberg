@@ -1,12 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	ExternalLink,
-	TextareaControl,
-	Panel,
-	PanelBody,
-} from '@wordpress/components';
+import { TextareaControl, Panel, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
 
@@ -52,24 +47,6 @@ function CustomCSSControl( { blockName } ) {
 
 	return (
 		<>
-			<TextareaControl
-				__nextHasNoMarginBottom
-				value={
-					customCSS?.replace( ignoreThemeCustomCSS, '' ) ||
-					themeCustomCSS
-				}
-				onChange={ ( value ) => handleOnChange( value ) }
-				rows={ 15 }
-				className="edit-site-global-styles__custom-css-input"
-				spellCheck={ false }
-				help={
-					<>
-						<ExternalLink href="https://wordpress.org/support/article/css/">
-							{ __( 'Learn more about CSS' ) }
-						</ExternalLink>
-					</>
-				}
-			/>
 			{ originalThemeCustomCSS && (
 				<Panel>
 					<PanelBody
@@ -82,6 +59,24 @@ function CustomCSSControl( { blockName } ) {
 					</PanelBody>
 				</Panel>
 			) }
+
+			<Panel className="edit-site-global-styles__custom-css-panel-additional-css">
+				<PanelBody
+					title={ __( 'Additional CSS' ) }
+					initialOpen={ true }
+				>
+					<TextareaControl
+						__nextHasNoMarginBottom
+						value={
+							customCSS?.replace( ignoreThemeCustomCSS, '' ) ||
+							themeCustomCSS
+						}
+						onChange={ ( value ) => handleOnChange( value ) }
+						className="edit-site-global-styles__custom-css-input"
+						spellCheck={ false }
+					/>
+				</PanelBody>
+			</Panel>
 		</>
 	);
 }
