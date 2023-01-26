@@ -62,7 +62,7 @@ import { store as editPostStore } from '@wordpress/edit-post';
 /**
  * Internal dependencies
  */
-import { ExperimentalEditorProvider } from './index.js';
+import EditorProvider from './index.js';
 
 class NativeEditorProvider extends Component {
 	constructor() {
@@ -327,13 +327,13 @@ class NativeEditorProvider extends Component {
 
 		return (
 			<>
-				<ExperimentalEditorProvider
+				<EditorProvider
 					post={ this.post }
 					settings={ editorSettings }
 					{ ...props }
 				>
 					<SafeAreaProvider>{ children }</SafeAreaProvider>
-				</ExperimentalEditorProvider>
+				</EditorProvider>
 				<EditorHelpTopics
 					isVisible={ this.state.isHelpVisible }
 					onClose={ () => this.setState( { isHelpVisible: false } ) }
@@ -345,7 +345,7 @@ class NativeEditorProvider extends Component {
 	}
 }
 
-const ComposedNativeEditorProvider = compose([
+export default compose( [
 	withSelect( ( select ) => {
 		const {
 			__unstableIsEditorReady: isEditorReady,
@@ -414,6 +414,3 @@ const ComposedNativeEditorProvider = compose([
 		};
 	} ),
 ] )( NativeEditorProvider );
-
-export { ComposedNativeEditorProvider as ExperimentalEditorProvider };
-export default ComposedNativeEditorProvider;

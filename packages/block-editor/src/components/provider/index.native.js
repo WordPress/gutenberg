@@ -14,7 +14,7 @@ import { BlockRefsProvider } from './block-refs-provider';
 
 /** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
 
-const BlockEditorProvider = withRegistryProvider( function ( props ) {
+function BlockEditorProvider( props ) {
 	const { children, settings } = props;
 
 	const { updateSettings } = useDispatch( blockEditorStore );
@@ -26,7 +26,6 @@ const BlockEditorProvider = withRegistryProvider( function ( props ) {
 	useBlockSync( props );
 
 	return <BlockRefsProvider>{ children }</BlockRefsProvider>;
-} );
+}
 
-export { BlockEditorProvider as ExperimentalBlockEditorProvider };
-export default BlockEditorProvider;
+export default withRegistryProvider( BlockEditorProvider );
