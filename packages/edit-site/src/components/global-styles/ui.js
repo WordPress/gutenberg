@@ -60,13 +60,13 @@ function GlobalStylesMenu() {
 						isDisabled: ! canReset,
 					},
 					{
-						title: __( 'Additional CSS' ),
-						onClick: loadCustomCSS,
-					},
-					{
 						title: __( 'Welcome Guide' ),
 						onClick: () =>
 							toggle( 'core/edit-site', 'welcomeGuideStyles' ),
+					},
+					{
+						title: __( 'Additional CSS' ),
+						onClick: loadCustomCSS,
 					},
 				] }
 			/>
