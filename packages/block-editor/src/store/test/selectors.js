@@ -2493,6 +2493,44 @@ describe( 'selectors', () => {
 			} );
 		} );
 
+		it( 'should cache and return the same object if state has not changed', () => {
+			const state = {
+				selection: {
+					selectionStart: { clientId: 'clientId1' },
+					selectionEnd: { clientId: 'clientId1' },
+				},
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							clientId1: { clientId: 'clientId1' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							clientId1: {},
+						} )
+					),
+					order: new Map(
+						Object.entries( {
+							'': [ 'clientId1' ],
+							clientId1: [],
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							clientId1: '',
+						} )
+					),
+				},
+				insertionPoint: null,
+			};
+
+			const insertionPoint1 = getBlockInsertionPoint( state );
+			const insertionPoint2 = getBlockInsertionPoint( state );
+
+			expect( insertionPoint1 ).toBe( insertionPoint2 );
+		} );
+
 		it( 'should return an object for the nested selected block', () => {
 			const state = {
 				selection: {

@@ -1361,28 +1361,31 @@ export function isCaretWithinFormattedText() {
  *
  * @return {Object} Insertion point object with `rootClientId`, `index`.
  */
-export function getBlockInsertionPoint( state ) {
-	let rootClientId, index;
+export const getBlockInsertionPoint = createSelector(
+	( state ) => {
+		let rootClientId, index;
 
-	const {
-		insertionPoint,
-		selection: { selectionEnd },
-	} = state;
-	if ( insertionPoint !== null ) {
-		return insertionPoint;
-	}
+		const {
+			insertionPoint,
+			selection: { selectionEnd },
+		} = state;
+		if ( insertionPoint !== null ) {
+			return insertionPoint;
+		}
 
-	const { clientId } = selectionEnd;
+		const { clientId } = selectionEnd;
 
-	if ( clientId ) {
-		rootClientId = getBlockRootClientId( state, clientId ) || undefined;
-		index = getBlockIndex( state, selectionEnd.clientId ) + 1;
-	} else {
-		index = getBlockOrder( state ).length;
-	}
+		if ( clientId ) {
+			rootClientId = getBlockRootClientId( state, clientId ) || undefined;
+			index = getBlockIndex( state, selectionEnd.clientId ) + 1;
+		} else {
+			index = getBlockOrder( state ).length;
+		}
 
-	return { rootClientId, index };
-}
+		return { rootClientId, index };
+	},
+	( state ) => [ state.blocks.parents, state.blocks.order ]
+);
 
 /**
  * Returns true if we should show the block insertion point.
