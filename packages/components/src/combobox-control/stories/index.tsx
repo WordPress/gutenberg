@@ -336,8 +336,8 @@ WithCustomRenderItem.args = {
 	...Default.args,
 	label: 'Select an author',
 	options: authorOptions,
-	__experimentalRenderItem: ( item ) => {
-		const { label, age, country } = item.item;
+	__experimentalRenderItem: ( { item } ) => {
+		const { label, age, country } = item;
 		return (
 			<div>
 				<div style={ { marginBottom: '0.2rem' } }>

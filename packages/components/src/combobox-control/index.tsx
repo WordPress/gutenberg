@@ -190,7 +190,7 @@ function ComboboxControl( {
 	const onInputChange: ComponentProps< typeof TokenInput >[ 'onChange' ] = (
 		event
 	) => {
-		const text = event?.value;
+		const text = event.value;
 		setInputValue( text );
 		onFilterValueChange( text );
 		if ( inputHasFocus ) {
