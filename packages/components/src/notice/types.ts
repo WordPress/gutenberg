@@ -18,7 +18,7 @@ type NoticeActionWithURL = CommonNoticeActionProps & {
 };
 type NoticeActionWithOnClick = CommonNoticeActionProps & {
 	url?: never;
-	onClick: MouseEventHandler;
+	onClick: MouseEventHandler< HTMLButtonElement >;
 };
 
 export type NoticeAction = NoticeActionWithURL | NoticeActionWithOnClick;
