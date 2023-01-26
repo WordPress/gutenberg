@@ -22,7 +22,7 @@ export type MenuItemsChoiceProps = {
 	 * Callback function to be called with a choice when user
 	 * hovers over a new choice (will be empty on mouse leave).
 	 */
-	onHover: ( value?: string ) => void;
+	onHover: ( value: string | null ) => void;
 };
 
 export type MenuItemChoice = {

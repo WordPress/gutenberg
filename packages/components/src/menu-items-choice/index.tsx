@@ -36,7 +36,7 @@ function MenuItemsChoice( {
 							}
 						} }
 						onMouseEnter={ () => onHover( item.value ) }
-						onMouseLeave={ () => onHover() }
+						onMouseLeave={ () => onHover( null ) }
 						aria-label={ item[ 'aria-label' ] }
 					>
 						{ item.label }
