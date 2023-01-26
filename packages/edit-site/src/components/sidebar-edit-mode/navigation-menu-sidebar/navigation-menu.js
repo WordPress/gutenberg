@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import {
-	__experimentalListView as ListView,
 	__experimentalOffCanvasEditor as OffCanvasEditor,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -32,7 +31,7 @@ const ALLOWED_BLOCKS = {
 	],
 };
 
-export default function NavigationMenu( { innerBlocks, id } ) {
+export default function NavigationMenu( { innerBlocks } ) {
 	const { updateBlockListSettings } = useDispatch( blockEditorStore );
 
 	//TODO: Block settings are normally updated as a side effect of rendering InnerBlocks in BlockList
@@ -50,13 +49,7 @@ export default function NavigationMenu( { innerBlocks, id } ) {
 		} );
 	}, [ updateBlockListSettings, innerBlocks ] );
 
-	if ( window?.__experimentalEnableOffCanvasNavigationEditor ) {
-		return (
-			<OffCanvasEditor
-				blocks={ innerBlocks }
-				selectBlockInCanvas={ false }
-			/>
-		);
-	}
-	return <ListView id={ id } />;
+	return (
+		<OffCanvasEditor blocks={ innerBlocks } selectBlockInCanvas={ false } />
+	);
 }
