@@ -462,7 +462,7 @@ function block_core_navigation_get_fallback_blocks() {
 
 	// Use the first non-empty Navigation as fallback if available.
 	if ( $navigation_post ) {
-		$parsed_blocks = parse_blocks( $navigation_post->post_content );
+		$parsed_blocks  = parse_blocks( $navigation_post->post_content );
 		$maybe_fallback = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
 
 		// Normalizing blocks may result in an empty array of blocks if they were all `null` blocks.
