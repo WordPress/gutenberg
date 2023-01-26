@@ -22,7 +22,7 @@ export type DimensionControlProps< IconProps = unknown > = {
 	/**
 	 * An array of sizes to choose from.
 	 */
-	sizes: Size[];
+	sizes?: Size[];
 	/**
 	 * Optional icon rendered in front on the label.
 	 */
