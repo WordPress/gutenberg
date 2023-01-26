@@ -21,6 +21,7 @@ const meta: ComponentMeta< typeof Notice > = {
 	component: Notice,
 	subcomponents: { NoticeList },
 	parameters: {
+		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { source: { state: 'open' } },
 	},
