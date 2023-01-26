@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+/**
+ * External dependencies
+ */
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
 /**
  * Internal dependencies
  */
@@ -11,25 +14,28 @@ import sizes from '../sizes';
 export default {
 	component: DimensionControl,
 	title: 'Components (Experimental)/DimensionControl',
+	argTypes: {
+		onChange: { action: 'onChange' },
+		value: { control: { type: null } },
+	},
+} as ComponentMeta< typeof DimensionControl >;
+
+const Template: ComponentStory< typeof DimensionControl > = ( args ) => (
+	<DimensionControl { ...args } />
+);
+
+export const Default = Template.bind( {} );
+
+Default.args = {
+	label: 'Please select a size',
+	sizes,
 };
 
-export const _default = () => {
-	const [ size, setSize ] = useState< string | undefined >();
-	return (
-		<>
-			<DimensionControl
-				label="Please select a size"
-				sizes={ sizes }
-				onChange={ ( v ) => setSize( v ) }
-			/>
-			<div>Selected size: { size ?? '-' }</div>
-		</>
-	);
-};
+export const CustomSizes = Template.bind( {} );
 
-export const _withSizesProp = () => {
-	const [ size, setSize ] = useState< string | undefined >();
-	const customSizes = [
+CustomSizes.args = {
+	label: 'How tall are you?',
+	sizes: [
 		{
 			name: 'Tall',
 			slug: 'tall',
@@ -42,15 +48,5 @@ export const _withSizesProp = () => {
 			name: 'Very Very Tall',
 			slug: 'very-very-tall',
 		},
-	];
-	return (
-		<>
-			<DimensionControl
-				label="Please select a size"
-				sizes={ customSizes }
-				onChange={ ( v ) => setSize( v ) }
-			/>
-			<div>Selected size: { size ?? '-' }</div>
-		</>
-	);
+	],
 };
