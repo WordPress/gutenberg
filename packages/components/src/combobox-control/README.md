@@ -67,6 +67,19 @@ function MyComboboxControl() {
 
 ### Props
 
+#### `allowReset`: `boolean`
+
+Whether to render a reset button.
+
+-   Required: No
+-   Default: true
+
+#### `className`: `string`
+
+The component class name.
+
+-   Required: No
+
 #### `help`: `string`
 
 If this property is added, a help text will be generated using help property as the content.
@@ -96,6 +109,26 @@ Function called with the selected value changes.
 Function called with the control's search input value changes. The argument contains the next input value.
 
 -   Required: No
+
+#### `messages`: `Record< string, string >`
+
+Messages to display.
+
+-   Required: No
+-   Default: `{ selected: __( 'Item selected.' ) }`
+
+`onChange`: `( selectedValue: string ) => void`
+
+Function called with the selected value changes.
+
+-   Required: No
+
+`onFilterValueChange`: `( nextInput: string ) => void`
+
+Function called with the control's search input value changes. The argument contains the next input value.
+
+-   Required: No
+-   Default: `() => void`
 
 #### `options`: `Array<{ value: string, label: string }>`
 
