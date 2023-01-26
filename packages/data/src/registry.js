@@ -246,6 +246,22 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		};
 		stores[ name ] = store;
 		store.subscribe( globalListener );
+
+		// Copy private actions and selectors from the parent store.
+		if ( parent ) {
+			try {
+				unlock( store.store ).registerPrivateActions(
+					unlock( parent ).privateActionsOf( name )
+				);
+				unlock( store.store ).registerPrivateSelectors(
+					unlock( parent ).privateSelectorsOf( name )
+				);
+			} catch ( e ) {
+				// unlock() throws if store.store was not locked.
+				// The error indicates there's nothing to do here so let's
+				// ignore it.
+			}
+		}
 	}
 
 	/**
@@ -281,19 +297,6 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		const store = createReduxStore( storeName, options ).instantiate(
 			registry
 		);
-		// If creating a sub store, we need to copy the private actions and selectors
-		// from the parent store.
-		if ( parent ) {
-			try {
-				const getParentStore = unlock( parent ).getRegisteredStore;
-				unlock( store.store ).registerPrivateActions(
-					unlock( getParentStore( storeName ).store ).privateActions
-				);
-				unlock( store.store ).registerPrivateSelectors(
-					unlock( getParentStore( storeName ).store ).privateSelectors
-				);
-			} catch ( e ) {}
-		}
 		registerStoreInstance( storeName, store );
 		return store.store;
 	}
@@ -350,7 +353,22 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 
 	const registryWithPlugins = withPlugins( registry );
 	lock( registryWithPlugins, {
-		getRegisteredStore: ( name ) => stores[ name ],
+		privateActionsOf: ( name ) => {
+			try {
+				return unlock( stores[ name ].store ).privateActions;
+			} catch ( e ) {
+				// unlock() throws an error the store was not locked – this means
+				// there no private actions are available
+				return {};
+			}
+		},
+		privateSelectorsOf: ( name ) => {
+			try {
+				return unlock( stores[ name ].store ).privateSelectors;
+			} catch ( e ) {
+				return {};
+			}
+		},
 	} );
 	return registryWithPlugins;
 }

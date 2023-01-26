@@ -330,38 +330,6 @@ function MyComponent() {
 }
 ```
 
-Remember to always register the private actions and selectors on the **registered** store.
-
-Sometimes that's easy:
-```js
-export const store = createReduxStore( STORE_NAME, storeConfig() );
-
-register( store );
-
-unlock( registeredStore ).registerPrivateActions({
-	// ...
-});
-```
-
-However, some packages call both `createReduxStore` **and** `registerStore`. In this case,
-always choose the store that gets registered:
-
-```js
-export const store = createReduxStore( STORE_NAME, {
-	...storeConfig,
-	persist: [ 'preferences' ],
-} );
-
-const registeredStore = registerStore( STORE_NAME, {
-	...storeConfig,
-	persist: [ 'preferences' ],
-} );
-
-unlock( registeredStore ).registerPrivateActions({
-	// ...
-});
-```
-
 ##### Experimental functions, classes, and variables
 
 ```js
