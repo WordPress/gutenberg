@@ -323,6 +323,23 @@ export const getBlocksByClientId = createSelector(
 );
 
 /**
+ * Given an array of block client IDs, returns the corresponding array of block
+ * names.
+ *
+ * @param {Object}   state     Editor state.
+ * @param {string[]} clientIds Client IDs for which block names are to be returned.
+ *
+ * @return {string[]} Block names.
+ */
+export const getBlockNamesByClientId = createSelector(
+	( state, clientIds ) =>
+		getBlocksByClientId( state, clientIds )
+			.filter( Boolean )
+			.map( ( block ) => block.name ),
+	( state, clientIds ) => getBlocksByClientId( state, clientIds )
+);
+
+/**
  * Returns the number of blocks currently present in the post.
  *
  * @param {Object}  state        Editor state.
