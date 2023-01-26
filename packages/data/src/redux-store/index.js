@@ -151,6 +151,8 @@ export default function createReduxStore( key, options ) {
 				registry,
 				thunkArgs
 			);
+			// Expose the private registration functions on the store
+			// so they can be copied to a sub registry in registry.js.
 			lock( store, privateRegistrationFunctions );
 			const resolversCache = createResolversCache();
 
@@ -271,6 +273,9 @@ export default function createReduxStore( key, options ) {
 		},
 	};
 
+	// Expose the private registration functions on the store
+	// descriptor. That's a natural choice since that's where the
+	// public actions and selectors are stored .
 	lock( storeDescriptor, privateRegistrationFunctions );
 
 	return storeDescriptor;
