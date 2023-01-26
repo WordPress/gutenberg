@@ -411,6 +411,25 @@ function block_core_navigation_filter_out_empty_blocks( $parsed_blocks ) {
 }
 
 /**
+ * Returns true if the navigation block contains a nested navigation block.
+ *
+ * @param array $parsed_blocks the parsed blocks to be normalized.
+ * @return bool true if the navigation block contains a nested navigation block.
+ */
+function block_core_navigation_block_contains_core_navigation( $parsed_blocks ) {
+	foreach ( $parsed_blocks as $block ) {
+		if ( 'core/navigation' === $block['blockName'] ) {
+			return true;
+		}
+		if ( block_core_navigation_block_contains_core_navigation( $block['innerBlocks'] ) ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
  * Retrieves the appropriate fallback to be used on the front of the
  * site when there is no menu assigned to the Nav block.
  *
@@ -443,7 +462,8 @@ function block_core_navigation_get_fallback_blocks() {
 
 	// Use the first non-empty Navigation as fallback if available.
 	if ( $navigation_post ) {
-		$maybe_fallback = block_core_navigation_filter_out_empty_blocks( parse_blocks( $navigation_post->post_content ) );
+		$parsed_blocks  = parse_blocks( $navigation_post->post_content );
+		$maybe_fallback = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
 
 		// Normalizing blocks may result in an empty array of blocks if they were all `null` blocks.
 		// In this case default to the (Page List) fallback.
@@ -511,7 +531,6 @@ function block_core_navigation_from_block_get_post_ids( $block ) {
 function render_block_core_navigation( $attributes, $content, $block ) {
 
 	static $seen_menu_names = array();
-	static $seen_ref        = array();
 
 	// Flag used to indicate whether the rendered output is considered to be
 	// a fallback (i.e. the block has no menu associated with it).
@@ -582,11 +601,6 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	// Load inner blocks from the navigation post.
 	if ( array_key_exists( 'ref', $attributes ) ) {
-		if ( in_array( $attributes['ref'], $seen_ref, true ) ) {
-			return '';
-		}
-		$seen_ref[] = $attributes['ref'];
-
 		$navigation_post = get_post( $attributes['ref'] );
 		if ( ! isset( $navigation_post ) ) {
 			return '';
@@ -627,6 +641,11 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		}
 
 		$inner_blocks = new WP_Block_List( $fallback_blocks, $attributes );
+	}
+
+	$parsed_blocks = parse_blocks( $navigation_post->post_content );
+	if ( block_core_navigation_block_contains_core_navigation( $parsed_blocks ) ) {
+		return '';
 	}
 
 	/**
