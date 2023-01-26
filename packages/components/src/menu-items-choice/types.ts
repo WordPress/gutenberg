@@ -5,7 +5,7 @@ import type { ShortcutProps } from '../shortcut/types';
 
 export type MenuItemsChoiceProps = {
 	/**
-	 * Array of choices
+	 * Array of choices.
 	 */
 	choices: readonly MenuItemChoice[];
 	/**
@@ -35,7 +35,7 @@ export type MenuItemChoice = {
 	 */
 	value: string;
 	/**
-	 * Additional information which will be rendered below the given label
+	 * Additional information which will be rendered below the given label.
 	 */
 	info?: string;
 	/**
@@ -44,7 +44,7 @@ export type MenuItemChoice = {
 	 */
 	shortcut?: ShortcutProps[ 'shortcut' ];
 	/**
-	 * Aria compliant label
+	 * Aria compliant label.
 	 */
 	[ 'aria-label' ]?: string;
 };
