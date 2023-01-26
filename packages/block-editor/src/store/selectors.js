@@ -2338,11 +2338,15 @@ export const getPatternsByBlockTypes = createSelector(
 		const normalizedBlockNames = Array.isArray( blockNames )
 			? blockNames
 			: [ blockNames ];
-		return patterns.filter( ( pattern ) =>
+		const filteredPatterns = patterns.filter( ( pattern ) =>
 			pattern?.blockTypes?.some?.( ( blockName ) =>
 				normalizedBlockNames.includes( blockName )
 			)
 		);
+		if ( filteredPatterns.length === 0 ) {
+			return EMPTY_ARRAY;
+		}
+		return filteredPatterns;
 	},
 	( state, blockNames, rootClientId ) => [
 		...__experimentalGetAllowedPatterns.getDependants(
