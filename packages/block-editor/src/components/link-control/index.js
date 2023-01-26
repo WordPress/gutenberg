@@ -371,6 +371,9 @@ function LinkControl( {
 										open: { opacity: 1, height: 'auto' },
 										collapsed: { opacity: 0, height: 0 },
 									} }
+									transition={ {
+										duration: 0.2,
+									} }
 								>
 									{ showTextControl && (
 										<TextControl
