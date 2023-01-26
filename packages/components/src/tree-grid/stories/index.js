@@ -12,6 +12,7 @@ import { Button } from '../../';
 export default {
 	title: 'Components (Experimental)/TreeGrid',
 	component: TreeGrid,
+	subcomponents: { TreeGridRow },
 };
 
 const groceries = [

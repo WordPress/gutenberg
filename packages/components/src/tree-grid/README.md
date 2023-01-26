@@ -157,7 +157,7 @@ An integer value that represents the position in the set. A set is the count of 
 
 ###### setSize
 
-An integer value that represents the total number of items in the set ... that is the total number of items at this specific level of the hierarchy.
+An integer value that represents the total number of items in the set, at this specific level of the hierarchy.
 
 -   Type: `Number`
 -   Required: Yes
