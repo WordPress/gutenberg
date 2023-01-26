@@ -351,12 +351,19 @@ function LinkControl( {
 			<div className="block-editor-link-control__tools">
 				{ ( showSettings || showTextControl ) && (
 					<>
+						<Button
+							aria-expanded={ settingsOpen }
+							onClick={ () => setSettingsOpen( ! settingsOpen ) }
+							icon={ settingsIcon }
+							label={ __( 'Toggle link settings' ) }
+							aria-controls="link-1" // todo - this should be dynamic
+						/>
 						<AnimatePresence>
 							{ settingsOpen && (
 								<motion.div
 									className="block-editor-link-control__drawer"
 									hidden={ ! settingsOpen }
-									id={ 'link-1' }
+									id={ 'link-1' } // todo - this should be dynamic
 									initial="collapsed"
 									animate="open"
 									exit="collapsed"
@@ -388,13 +395,6 @@ function LinkControl( {
 								</motion.div>
 							) }
 						</AnimatePresence>
-						<Button
-							aria-expanded={ settingsOpen }
-							onClick={ () => setSettingsOpen( ! settingsOpen ) }
-							icon={ settingsIcon }
-							label={ __( 'Toggle link settings' ) }
-							aria-controls="link-1"
-						/>
 					</>
 				) }
 

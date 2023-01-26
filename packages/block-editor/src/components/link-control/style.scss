@@ -80,6 +80,7 @@ $preview-image-height: 140px;
 	flex-direction: row-reverse; // put "Cancel" on the left but retain DOM order.
 	justify-content: flex-start;
 	gap: $grid-unit-10;
+	order: 20;
 }
 
 .components-button .block-editor-link-control__search-submit .has-icon {
@@ -427,7 +428,24 @@ $preview-image-height: 140px;
 }
 
 .block-editor-link-control__drawer {
+	display: flex; // allow for ordering.
+	order: 30;
+	flex-direction: column;
 	flex-basis: 100%; // occupy full width.
+	margin-top: $grid-unit-20;
+	padding-top: $grid-unit-20;
+	position: relative;
+
+	&::after {
+		content: "";
+		display: block;
+		height: 1px;
+		background-color: $gray-300;
+		position: absolute;
+		left: -$grid-unit-20;
+		right: -$grid-unit-20;
+		top: 0;
+	}
 }
 
 .block-editor-link-control__tools {
@@ -435,9 +453,9 @@ $preview-image-height: 140px;
 	flex-wrap: wrap;
 	align-items: center;
 	justify-content: space-between;
-	border-top: $border-width solid $gray-300;
 	margin: 0;
 	padding: $grid-unit-20;
+	padding-top: 0;
 }
 
 .block-editor-link-control__unlink {
