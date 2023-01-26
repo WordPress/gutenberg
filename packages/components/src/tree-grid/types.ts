@@ -22,3 +22,22 @@ export type TreeGridRowProps = {
 	 */
 	isExpanded?: React.AriaAttributes[ 'aria-expanded' ];
 };
+
+type RovingTabIndexItemPassThruProps = {
+	ref: React.ForwardedRef< any >;
+	tabIndex?: number;
+	onFocus: React.FocusEventHandler< any >;
+} & Record< string, any >;
+
+export type RovingTabIndexItemProps = {
+	/**
+	 * A component that will receive the props necessary to
+	 * make it roving tab index compliant. All props will be passed through
+	 * to this component.
+	 */
+	children?: ( props: RovingTabIndexItemPassThruProps ) => JSX.Element;
+	/**
+	 * If `children` is not a function, this component will be used instead.
+	 */
+	as?: React.ComponentType< RovingTabIndexItemPassThruProps >;
+} & Record< string, any >;

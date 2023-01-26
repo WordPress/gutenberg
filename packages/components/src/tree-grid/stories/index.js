@@ -6,13 +6,13 @@ import { Fragment } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import TreeGrid, { TreeGridRow, TreeGridCell } from '../';
+import TreeGrid, { TreeGridRow, TreeGridCell, TreeGridItem } from '../';
 import { Button } from '../../';
 
 export default {
 	title: 'Components (Experimental)/TreeGrid',
 	component: TreeGrid,
-	subcomponents: { TreeGridRow },
+	subcomponents: { TreeGridRow, TreeGridItem },
 };
 
 const groceries = [
