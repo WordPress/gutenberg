@@ -416,12 +416,12 @@ function block_core_navigation_filter_out_empty_blocks( $parsed_blocks ) {
  * @param array $parsed_blocks the parsed blocks to be normalized.
  * @return bool true if the navigation block contains a nested navigation block.
  */
-function block_core_navigation_has_nested_core_navigation( $parsed_blocks ) {
+function block_core_navigation_block_contains_core_navigation( $parsed_blocks ) {
 	foreach ( $parsed_blocks as $block ) {
 		if ( 'core/navigation' === $block['blockName'] ) {
 			return true;
 		}
-		if ( block_core_navigation_has_nested_core_navigation( $block['innerBlocks'] ) ) {
+		if ( block_core_navigation_block_contains_core_navigation( $block['innerBlocks'] ) ) {
 			return true;
 		}
 	}
@@ -469,8 +469,6 @@ function block_core_navigation_get_fallback_blocks() {
 		// In this case default to the (Page List) fallback.
 		$fallback_blocks = ! empty( $maybe_fallback ) ? $maybe_fallback : $fallback_blocks;
 	}
-
-
 
 	/**
 	 * Filters the fallback experience for the Navigation block.
@@ -646,7 +644,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	}
 
 	$parsed_blocks = parse_blocks( $navigation_post->post_content );
-	if ( block_core_navigation_has_nested_core_navigation( $parsed_blocks ) ) {
+	if ( block_core_navigation_block_contains_core_navigation( $parsed_blocks ) ) {
 		return '';
 	}
 
