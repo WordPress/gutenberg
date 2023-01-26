@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
+
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -6,7 +11,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import ComboboxControl from '../';
+import ComboboxControl from '..';
 
 const countries = [
 	{ name: 'Afghanistan', code: 'AF' },
@@ -254,7 +259,7 @@ const countries = [
 	{ name: 'Zimbabwe', code: 'ZW' },
 ];
 
-export default {
+const meta: ComponentMeta< typeof ComboboxControl > = {
 	title: 'Components/ComboboxControl',
 	component: ComboboxControl,
 	argTypes: {
@@ -262,16 +267,20 @@ export default {
 		onChange: { action: 'onChange' },
 	},
 };
+export default meta;
 
-const mapCountryOption = ( country ) => ( {
+const mapCountryOption = ( country: { name: string; code: string } ) => ( {
 	value: country.code,
 	label: country.name,
 } );
 
 const countryOptions = countries.map( mapCountryOption );
 
-function Template( { onChange, ...args } ) {
-	const [ value, setValue ] = useState( null );
+const Template: ComponentStory< typeof ComboboxControl > = ( {
+	onChange,
+	...args
+} ) => {
+	const [ value, setValue ] = useState< string >();
 
 	return (
 		<>
@@ -285,7 +294,8 @@ function Template( { onChange, ...args } ) {
 			/>
 		</>
 	);
-}
+};
+
 export const Default = Template.bind( {} );
 Default.args = {
 	__next36pxDefaultSize: false,
@@ -320,19 +330,20 @@ const authorOptions = [
  * render function to the `__experimentalRenderItem` prop. (This is still an experimental feature
  * and is subject to change.)
  */
-export const WithCustomRenderItem = Template.bind( {} );
+export const WithCustomRenderItem: ComponentStory< typeof ComboboxControl > =
+	Template.bind( {} );
 WithCustomRenderItem.args = {
 	...Default.args,
 	label: 'Select an author',
 	options: authorOptions,
-	__experimentalRenderItem: ( { item } ) => {
-		const { label, age, country } = item;
+	__experimentalRenderItem: ( item ) => {
+		const { label, age, country } = item.item;
 		return (
 			<div>
-				<div style={ { marginBottom: '0.2rem' } }>{ label }</div>
-				<small>
-					Age: { age }, Country: { country }
-				</small>
+				<div style={ { marginBottom: '0.2rem' } }>
+					{ label as string }
+				</div>
+				<small>{ `Age: ${ age }, Country: ${ country }` }</small>
 			</div>
 		);
 	},

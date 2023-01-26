@@ -92,7 +92,7 @@ If this property is added, a help text will be generated using help property as 
 
 The options that can be chosen from.
 
--   Type: `Array<{ value: String, label: String }>`
+-   Type: `Array<{ value: string, label: string }>`
 -   Required: Yes
 
 #### onFilterValueChange

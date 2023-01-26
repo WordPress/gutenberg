@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import type { ComponentProps, KeyboardEvent } from 'react';
 
 /**
  * WordPress dependencies
@@ -30,12 +31,13 @@ import { FlexBlock, FlexItem } from '../flex';
 import withFocusOutside from '../higher-order/with-focus-outside';
 import { useControlledValue } from '../utils/hooks';
 import { normalizeTextString } from '../utils/strings';
+import type { ComboboxControlProps, DetectOutsideProps, Option } from './types';
 
 const noop = () => {};
 
 const DetectOutside = withFocusOutside(
-	class extends Component {
-		handleFocusOutside( event ) {
+	class extends Component< DetectOutsideProps > {
+		handleFocusOutside( event: Event ) {
 			this.props.onFocusOutside( event );
 		}
 
@@ -62,7 +64,7 @@ function ComboboxControl( {
 		selected: __( 'Item selected.' ),
 	},
 	__experimentalRenderItem,
-} ) {
+}: ComboboxControlProps ) {
 	const [ value, setValue ] = useControlledValue( {
 		value: valueProp,
 		onChange: onChangeProp,
@@ -80,11 +82,11 @@ function ComboboxControl( {
 	const [ isExpanded, setIsExpanded ] = useState( false );
 	const [ inputHasFocus, setInputHasFocus ] = useState( false );
 	const [ inputValue, setInputValue ] = useState( '' );
-	const inputContainer = useRef();
+	const inputContainer = useRef< HTMLInputElement >( null );
 
 	const matchingSuggestions = useMemo( () => {
-		const startsWithMatch = [];
-		const containsMatch = [];
+		const startsWithMatch: Option[] = [];
+		const containsMatch: Option[] = [];
 		const match = normalizeTextString( inputValue );
 		options.forEach( ( option ) => {
 			const index = normalizeTextString( option.label ).indexOf( match );
@@ -98,7 +100,11 @@ function ComboboxControl( {
 		return startsWithMatch.concat( containsMatch );
 	}, [ inputValue, options ] );
 
-	const onSuggestionSelected = ( newSelectedSuggestion ) => {
+	const onSuggestionSelected = ( newSelectedSuggestion: Option | null ) => {
+		if ( ! newSelectedSuggestion ) {
+			return;
+		}
+
 		setValue( newSelectedSuggestion.value );
 		speak( messages.selected, 'assertive' );
 		setSelectedSuggestion( newSelectedSuggestion );
@@ -107,6 +113,10 @@ function ComboboxControl( {
 	};
 
 	const handleArrowNavigation = ( offset = 1 ) => {
+		if ( ! selectedSuggestion ) {
+			return;
+		}
+
 		const index = matchingSuggestions.indexOf( selectedSuggestion );
 		let nextIndex = index + offset;
 		if ( nextIndex < 0 ) {
@@ -118,7 +128,7 @@ function ComboboxControl( {
 		setIsExpanded( true );
 	};
 
-	const onKeyDown = ( event ) => {
+	const onKeyDown = ( event: KeyboardEvent< HTMLDivElement > ) => {
 		let preventDefault = false;
 
 		if (
@@ -177,8 +187,10 @@ function ComboboxControl( {
 		setIsExpanded( false );
 	};
 
-	const onInputChange = ( event ) => {
-		const text = event.value;
+	const onInputChange: ComponentProps< typeof TokenInput >[ 'onChange' ] = (
+		event
+	) => {
+		const text = event?.value;
 		setInputValue( text );
 		onFilterValueChange( text );
 		if ( inputHasFocus ) {
@@ -187,14 +199,15 @@ function ComboboxControl( {
 	};
 
 	const handleOnReset = () => {
-		setValue( null );
-		inputContainer.current.focus();
+		setValue( undefined );
+		inputContainer.current?.focus();
 	};
 
 	// Update current selections when the filter input changes.
 	useEffect( () => {
 		const hasMatchingSuggestions = matchingSuggestions.length > 0;
 		const hasSelectedMatchingSuggestions =
+			selectedSuggestion &&
 			matchingSuggestions.indexOf( selectedSuggestion ) > 0;
 
 		if ( hasMatchingSuggestions && ! hasSelectedMatchingSuggestions ) {
@@ -235,7 +248,6 @@ function ComboboxControl( {
 					className,
 					'components-combobox-control'
 				) }
-				tabIndex="-1"
 				label={ label }
 				id={ `components-form-token-input-${ instanceId }` }
 				hideLabelFromVision={ hideLabelFromVision }
@@ -243,7 +255,7 @@ function ComboboxControl( {
 			>
 				<div
 					className="components-combobox-control__suggestions-container"
-					tabIndex="-1"
+					tabIndex={ -1 }
 					onKeyDown={ onKeyDown }
 				>
 					<InputWrapperFlex
@@ -258,9 +270,13 @@ function ComboboxControl( {
 								onFocus={ onFocus }
 								onBlur={ onBlur }
 								isExpanded={ isExpanded }
-								selectedSuggestionIndex={ matchingSuggestions.indexOf(
+								selectedSuggestionIndex={
 									selectedSuggestion
-								) }
+										? matchingSuggestions.indexOf(
+												selectedSuggestion
+										  )
+										: 0
+								}
 								onChange={ onInputChange }
 							/>
 						</FlexBlock>
@@ -279,14 +295,18 @@ function ComboboxControl( {
 					{ isExpanded && (
 						<SuggestionsList
 							instanceId={ instanceId }
-							match={ { label: inputValue } }
+							match={ { label: inputValue, value: inputValue } }
 							displayTransform={ ( suggestion ) =>
 								suggestion.label
 							}
 							suggestions={ matchingSuggestions }
-							selectedIndex={ matchingSuggestions.indexOf(
+							selectedIndex={
 								selectedSuggestion
-							) }
+									? matchingSuggestions.indexOf(
+											selectedSuggestion
+									  )
+									: 0
+							}
 							onHover={ setSelectedSuggestion }
 							onSelect={ onSuggestionSelected }
 							scrollIntoView
