@@ -305,6 +305,13 @@
 								"margin-block-start": null,
 								"margin-block-end": "0"
 							}
+						},
+						{
+							"selector": " .wp-block-group__inner-container > * + *",
+							"rules": {
+								"margin-block-start": null,
+								"margin-block-end": "0"
+							}
 						}
 					]
 				},

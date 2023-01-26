@@ -180,6 +180,13 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 							'margin-block-start' => $gap_value,
 							'margin-block-end'   => '0',
 						),
+					),
+					array(
+						'selector'     => "$selector$selector .wp-block-group__inner-container > * + *",
+						'declarations' => array(
+							'margin-block-start' => $gap_value,
+							'margin-block-end'   => '0',
+						),
 					)
 				);
 			}
