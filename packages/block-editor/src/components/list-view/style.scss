@@ -25,6 +25,7 @@
 	// Use position relative for row animation.
 	position: relative;
 	display: flex;
+	align-items: center;
 
 	// The background has to be applied to the td, not tr, or border-radius won't work.
 	&.is-selected td {
