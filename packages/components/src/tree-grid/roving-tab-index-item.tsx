@@ -21,6 +21,7 @@ export default forwardRef( function RovingTabIndexItem(
 ) {
 	const localRef = useRef< any >();
 	const ref = forwardedRef || localRef;
+	// @ts-expect-error - We actually want to throw an error if this is undefined.
 	const { lastFocusedElement, setLastFocusedElement } =
 		useRovingTabIndexContext();
 	let tabIndex;
