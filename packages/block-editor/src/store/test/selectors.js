@@ -4265,12 +4265,20 @@ describe( 'selectors', () => {
 		it( 'should return empty array if no block name is provided', () => {
 			expect( getPatternsByBlockTypes( state ) ).toEqual( [] );
 		} );
-		it( 'shoud return empty array if no match is found', () => {
+		it( 'should return empty array if no match is found', () => {
 			const patterns = getPatternsByBlockTypes(
 				state,
 				'test/block-not-exists'
 			);
 			expect( patterns ).toEqual( [] );
+		} );
+		it( 'should return the same empty array in both empty array cases', () => {
+			const patterns1 = getPatternsByBlockTypes( state );
+			const patterns2 = getPatternsByBlockTypes(
+				state,
+				'test/block-not-exists'
+			);
+			expect( patterns1 ).toBe( patterns2 );
 		} );
 		it( 'should return proper results when there are matched block patterns', () => {
 			const patterns = getPatternsByBlockTypes( state, 'test/block-a' );
