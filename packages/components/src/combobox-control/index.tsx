@@ -100,11 +100,7 @@ function ComboboxControl( {
 		return startsWithMatch.concat( containsMatch );
 	}, [ inputValue, options ] );
 
-	const onSuggestionSelected = ( newSelectedSuggestion: Option | null ) => {
-		if ( ! newSelectedSuggestion ) {
-			return;
-		}
-
+	const onSuggestionSelected = ( newSelectedSuggestion: Option ) => {
 		setValue( newSelectedSuggestion.value );
 		speak( messages.selected, 'assertive' );
 		setSelectedSuggestion( newSelectedSuggestion );
