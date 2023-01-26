@@ -1384,7 +1384,12 @@ export const getBlockInsertionPoint = createSelector(
 
 		return { rootClientId, index };
 	},
-	( state ) => [ state.blocks.parents, state.blocks.order ]
+	( state ) => [
+		state.insertionPoint,
+		state.selection.selectionEnd,
+		state.blocks.parents,
+		state.blocks.order,
+	]
 );
 
 /**
