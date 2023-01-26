@@ -411,21 +411,22 @@ function block_core_navigation_filter_out_empty_blocks( $parsed_blocks ) {
 }
 
 /**
- * Bail on rendering nested navigation blocks
+ * Returns true if the navigation block contains a nested navigation block.
  *
  * @param array $parsed_blocks the parsed blocks to be normalized.
- * @return array the normalized parsed blocks.
+ * @return bool true if the navigation block contains a nested navigation block.
  */
 function block_core_navigation_has_nested_core_navigation( $parsed_blocks ) {
-	$filtered = array_filter(
-		$parsed_blocks,
-		function( $block ) {
-			return $block['blockName'] === 'core/navigation';
+	foreach ( $parsed_blocks as $block ) {
+		if ( 'core/navigation' === $block['blockName'] ) {
+			return true;
 		}
-	);
+		if ( block_core_navigation_has_nested_core_navigation( $block['innerBlocks'] ) ) {
+			return true;
+		}
+	}
 
-	// Reset keys.
-	return count( $filtered ) > 0;
+	return false;
 }
 
 /**
