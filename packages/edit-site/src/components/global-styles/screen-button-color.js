@@ -16,7 +16,8 @@ import { unlock } from '../../experiments';
 
 const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 
-function ScreenButtonColor( { name, variationPath = '' } ) {
+function ScreenButtonColor( { name, variation = '' } ) {
+	const prefix = variation ? `variations.${ variation }.` : '';
 	const supports = getSupportedGlobalStylesPanels( name );
 	const colorsPerOrigin = useColorsPerOrigin( name );
 	const [ areCustomSolidsEnabled ] = useGlobalSetting( 'color.custom', name );
@@ -31,7 +32,7 @@ function ScreenButtonColor( { name, variationPath = '' } ) {
 		( colorsPerOrigin.length > 0 || areCustomSolidsEnabled );
 
 	const [ buttonTextColor, setButtonTextColor ] = useGlobalStyle(
-		variationPath + 'elements.button.color.text',
+		prefix + 'elements.button.color.text',
 		name
 	);
 	const [ userButtonTextColor ] = useGlobalStyle(
