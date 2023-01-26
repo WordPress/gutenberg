@@ -12,7 +12,7 @@ const USABLE_HREF_REGEXP = /^(?:[a-z]+:|#|\?|\.|\/)/i;
  *
  * @example
  * ```js
- * const actualURL = prependHTTP( 'wordpress.org' ); // http://wordpress.org
+ * const actualURL = prependHTTP( 'wordpress.org' ); // https://wordpress.org
  * ```
  *
  * @return {string} The updated URL.
@@ -24,7 +24,7 @@ export function prependHTTP( url ) {
 
 	url = url.trim();
 	if ( ! USABLE_HREF_REGEXP.test( url ) && ! isEmail( url ) ) {
-		return 'http://' + url;
+		return 'https://' + url;
 	}
 
 	return url;

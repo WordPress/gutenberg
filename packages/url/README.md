@@ -470,7 +470,7 @@ Prepends "http\://" to a url, if it looks like something that is meant to be a T
 _Usage_
 
 ```js
-const actualURL = prependHTTP( 'wordpress.org' ); // http://wordpress.org
+const actualURL = prependHTTP( 'wordpress.org' ); // https://wordpress.org
 ```
 
 _Parameters_

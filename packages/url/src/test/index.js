@@ -823,70 +823,70 @@ describe( 'removeQueryArgs', () => {
 } );
 
 describe( 'prependHTTP', () => {
-	it( 'should prepend http to a domain', () => {
+	it( 'should prepend https to a domain', () => {
 		const url = 'wordpress.org';
 
-		expect( prependHTTP( url ) ).toBe( 'http://' + url );
+		expect( prependHTTP( url ) ).toBe( 'https://' + url );
 	} );
 
-	it( 'shouldn’t prepend http to an email', () => {
+	it( 'shouldn’t prepend https to an email', () => {
 		const url = 'foo@wordpress.org';
 
 		expect( prependHTTP( url ) ).toBe( url );
 	} );
 
-	it( 'shouldn’t prepend http to an absolute URL', () => {
+	it( 'shouldn’t prepend https to an absolute URL', () => {
 		const url = '/wordpress';
 
 		expect( prependHTTP( url ) ).toBe( url );
 	} );
 
-	it( 'shouldn’t prepend http to a relative URL', () => {
+	it( 'shouldn’t prepend https to a relative URL', () => {
 		const url = './wordpress';
 
 		expect( prependHTTP( url ) ).toBe( url );
 	} );
 
-	it( 'shouldn’t prepend http to an anchor URL', () => {
+	it( 'shouldn’t prepend https to an anchor URL', () => {
 		const url = '#wordpress';
 
 		expect( prependHTTP( url ) ).toBe( url );
 	} );
 
-	it( 'shouldn’t prepend http to a URL that already has http', () => {
-		const url = 'http://wordpress.org';
-
-		expect( prependHTTP( url ) ).toBe( url );
-	} );
-
-	it( 'shouldn’t prepend http to a URL that already has https', () => {
+	it( 'shouldn’t prepend https to a URL that already has http', () => {
 		const url = 'https://wordpress.org';
 
 		expect( prependHTTP( url ) ).toBe( url );
 	} );
 
-	it( 'shouldn’t prepend http to a URL that already has ftp', () => {
+	it( 'shouldn’t prepend https to a URL that already has https', () => {
+		const url = 'https://wordpress.org';
+
+		expect( prependHTTP( url ) ).toBe( url );
+	} );
+
+	it( 'shouldn’t prepend https to a URL that already has ftp', () => {
 		const url = 'ftp://wordpress.org';
 
 		expect( prependHTTP( url ) ).toBe( url );
 	} );
 
-	it( 'shouldn’t prepend http to a URL that already has mailto', () => {
+	it( 'shouldn’t prepend https to a URL that already has mailto', () => {
 		const url = 'mailto:foo@wordpress.org';
 
 		expect( prependHTTP( url ) ).toBe( url );
 	} );
 
-	it( 'should remove leading whitespace before prepending HTTP', () => {
+	it( 'should remove leading whitespace before prepending https', () => {
 		const url = ' wordpress.org';
 
-		expect( prependHTTP( url ) ).toBe( 'http://wordpress.org' );
+		expect( prependHTTP( url ) ).toBe( 'https://wordpress.org' );
 	} );
 
 	it( 'should not have trailing whitespaces', () => {
 		const url = 'wordpress.org ';
 
-		expect( prependHTTP( url ) ).toBe( 'http://wordpress.org' );
+		expect( prependHTTP( url ) ).toBe( 'https://wordpress.org' );
 	} );
 } );
 
