@@ -67,11 +67,11 @@ function MyComboboxControl() {
 
 ### Props
 
-#### `label`: `string`
+#### `help`: `string`
 
-The label for the control.
+If this property is added, a help text will be generated using help property as the content.
 
--   Required: Yes
+-   Required: No
 
 #### `hideLabelFromVision`: `boolean`
 
@@ -79,9 +79,21 @@ If true, the label will only be visible to screen readers.
 
 -   Required: No
 
-#### `help`: `string`
+#### `label`: `string`
 
-If this property is added, a help text will be generated using help property as the content.
+The label for the control.
+
+-   Required: Yes
+
+#### `onChange`: `( selectedValue: string ) => void`
+
+Function called with the selected value changes.
+
+-   Required: No
+
+#### `onFilterValueChange`: `( nextInput: string ) => void`
+
+Function called with the control's search input value changes. The argument contains the next input value.
 
 -   Required: No
 
@@ -91,23 +103,11 @@ The options that can be chosen from.
 
 -   Required: Yes
 
-#### `onFilterValueChange`: `( nextInput: string ) => void`
-
-Function called with the control's search input value changes. The argument contains the next input value.
-
--   Required: No
-
-#### `onChange`: `( selectedValue: string ) => void`
-
-Function called with the selected value changes.
-
--   Required: No
-
 #### `value`: `string`
 
 The current value of the input.
 
--   Required: Yes
+-   Required: No
 
 #### `__experimentalRenderItem`: `( item: Record< 'item', Record< string, unknown > >	) => ReactNode`
 
