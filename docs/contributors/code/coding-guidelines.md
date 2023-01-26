@@ -441,6 +441,23 @@ export function MyComponent() {
 }
 ```
 
+#### Experimental editor settings
+
+WordPress extenders cannot update the experimental settings on their own.
+Experimental block editor settings passed to the `updateSettings()` actions of
+the `@wordpress/block-editor` store are **not** saved. Only the private action
+`__experimentalUpdateSettings()` can preserve the private settings.
+
+To privatize a block editor setting, add it to the `privateSettings` list in 
+[/packages/block-editor/src/store/actions.js](/packages/block-editor/src/store/actions.js):
+
+```js
+const privateSettings = [
+	'__unstableInserterMediaCategories',
+	// List a block editor setting here to make it private
+];
+```
+
 #### Experimental block.json and theme.json APIs
 
 As of today, there is no way to restrict the `block.json` and `theme.json` APIs
