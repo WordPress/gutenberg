@@ -177,9 +177,10 @@ A function that receives the new author value. If not specified, the author cont
 -   Required: No
 -   Platform: Web
 
-#### `onCategoryChange`: `CategorySelectProps[ 'onChange' ] | FormTokenFieldProps[ 'onChange' ]`
+#### `onCategoryChange`: `( newCategory: string ) => void | FormTokenFieldProps[ 'onChange' ]`
 
 A function that receives the new category value. If not specified, the category controls are not rendered.
+The function's signature changes depending on whether multiple category selection is enabled or not.
 
 -   Required: No
 -   Platform: Web
