@@ -130,9 +130,7 @@ const MenuInspectorControls = ( props ) => {
 	return (
 		<InspectorControls __experimentalGroup="list">
 			<PanelBody
-				title={
-					process.env.IS_GUTENBERG_PLUGIN ? null : __( 'Menu' )
-				}
+				title={ process.env.IS_GUTENBERG_PLUGIN ? null : __( 'Menu' ) }
 			>
 				{ process.env.IS_GUTENBERG_PLUGIN ? (
 					<ExperimentControls { ...props } />
