@@ -141,29 +141,21 @@ $block-preview-height: 150px;
 	display: flex;
 	flex-direction: column;
 
-	.edit-site-global-styles__custom-css-panel-additional-css {
+	.components-v-stack {
 		flex: 1 1 auto;
-		display: flex;
-		flex-direction: column;
 
-		.components-panel__body.is-opened {
+		.edit-site-global-styles__custom-css-input {
 			flex: 1 1 auto;
 			display: flex;
 			flex-direction: column;
 
-			.edit-site-global-styles__custom-css-input {
+			.components-base-control__field {
 				flex: 1 1 auto;
 				display: flex;
 				flex-direction: column;
 
-				.components-base-control__field {
+				.components-textarea-control__input {
 					flex: 1 1 auto;
-					display: flex;
-					flex-direction: column;
-
-					.components-textarea-control__input {
-						flex: 1 1 auto;
-					}
 				}
 			}
 		}

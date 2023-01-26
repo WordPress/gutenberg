@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { TextareaControl, Panel, PanelBody } from '@wordpress/components';
+import {
+	TextareaControl,
+	Panel,
+	PanelBody,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
 
@@ -9,6 +14,7 @@ import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { unlock } from '../../experiments';
+import Subtitle from './subtitle';
 
 const { useGlobalStyle } = unlock( blockEditorExperiments );
 function CustomCSSControl( { blockName } ) {
@@ -59,24 +65,19 @@ function CustomCSSControl( { blockName } ) {
 					</PanelBody>
 				</Panel>
 			) }
-
-			<Panel className="edit-site-global-styles__custom-css-panel-additional-css">
-				<PanelBody
-					title={ __( 'Additional CSS' ) }
-					initialOpen={ true }
-				>
-					<TextareaControl
-						__nextHasNoMarginBottom
-						value={
-							customCSS?.replace( ignoreThemeCustomCSS, '' ) ||
-							themeCustomCSS
-						}
-						onChange={ ( value ) => handleOnChange( value ) }
-						className="edit-site-global-styles__custom-css-input"
-						spellCheck={ false }
-					/>
-				</PanelBody>
-			</Panel>
+			<VStack spacing={ 3 }>
+				<Subtitle>{ __( 'ADDITIONAL CSS' ) }</Subtitle>
+				<TextareaControl
+					__nextHasNoMarginBottom
+					value={
+						customCSS?.replace( ignoreThemeCustomCSS, '' ) ||
+						themeCustomCSS
+					}
+					onChange={ ( value ) => handleOnChange( value ) }
+					className="edit-site-global-styles__custom-css-input"
+					spellCheck={ false }
+				/>
+			</VStack>
 		</>
 	);
 }
