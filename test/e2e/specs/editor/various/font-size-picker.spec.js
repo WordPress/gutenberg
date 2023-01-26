@@ -8,6 +8,16 @@ test.describe( 'Font Size Picker', () => {
 		await admin.createNewPost();
 	} );
 
+	test.afterEach( async ( { page } ) => {
+		const closeButton = page.locator(
+			'role=region[name="Editor settings"i] >> role=button[name^="Close settings"i]'
+		);
+
+		if ( await closeButton.isVisible() ) {
+			await closeButton.click();
+		}
+	} );
+
 	test.describe( 'Common', () => {
 		test( 'should apply a named font size using the font size input', async ( {
 			editor,
