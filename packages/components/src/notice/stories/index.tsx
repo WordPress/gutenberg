@@ -90,7 +90,7 @@ export const NoticeListSubcomponent: ComponentStory<
 			content: 'second notice content',
 		},
 		{
-			id: 'fist-notice',
+			id: 'first-notice',
 			content: 'first notice content',
 		},
 	];
