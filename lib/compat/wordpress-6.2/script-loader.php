@@ -167,3 +167,22 @@ add_filter(
 	},
 	100
 );
+
+/**
+ * Enqueues the global styles custom css.
+ *
+ * @since 6.2.0
+ */
+function gutenberg_enqueue_global_styles_custom_css() {
+	$custom_css     = get_global_styles_custom_css();
+	$is_block_theme = wp_is_block_theme();
+	if ( $custom_css && $is_block_theme ) {
+		?>
+		<style id="global-styles-custom-css-inline-css" type="text/css">
+			<?php echo $custom_css; ?>
+		</style>
+		<?php
+	}
+}
+
+add_action( 'wp_head', 'gutenberg_enqueue_global_styles_custom_css', 102 );
