@@ -67,60 +67,52 @@ function MyComboboxControl() {
 
 ### Props
 
-#### label
+#### `label`: `string`
 
 The label for the control.
 
--   Type: `String`
 -   Required: Yes
 
-#### hideLabelFromVision
+#### `hideLabelFromVision`: `boolean`
 
 If true, the label will only be visible to screen readers.
 
--   Type: `Boolean`
 -   Required: No
 
-#### help
+#### `help`: `string`
 
 If this property is added, a help text will be generated using help property as the content.
 
--   Type: `String`
 -   Required: No
 
-#### options
+#### `options`: `Array<{ value: string, label: string }>`
 
 The options that can be chosen from.
 
--   Type: `Array<{ value: string, label: string }>`
 -   Required: Yes
 
-#### onFilterValueChange
+#### `onFilterValueChange`: `( nextInput: string ) => void`
 
 Function called with the control's search input value changes. The argument contains the next input value.
 
--   Type: `Function`
 -   Required: No
 
-#### onChange
+#### `onChange`: `( selectedValue: string ) => void`
 
 Function called with the selected value changes.
 
--   Type: `Function`
 -   Required: No
 
-#### value
+#### `value`: `string`
 
 The current value of the input.
 
--   Type: `mixed`
 -   Required: Yes
 
-#### __experimentalRenderItem
+#### `__experimentalRenderItem`: `( item: Record< 'item', Record< string, unknown > >	) => ReactNode`
 
 Custom renderer invoked for each option in the suggestion list. The render prop receives as its argument an object containing, under the `item` key, the single option's data (directly from the array of data passed to the `options` prop).
 
--   Type: `Function` - `( args: { item: object } ) => ReactNode`
 -   Required: No
 
 ## Related components
