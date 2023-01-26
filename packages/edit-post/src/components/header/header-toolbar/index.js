@@ -15,7 +15,14 @@ import {
 	store as editorStore,
 } from '@wordpress/editor';
 import { Button, ToolbarItem } from '@wordpress/components';
-import { listView, plus } from '@wordpress/icons';
+import {
+	listView,
+	plus,
+	paragraph,
+	heading,
+	list,
+	image,
+} from '@wordpress/icons';
 import { useRef, useCallback } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
@@ -74,23 +81,6 @@ function HeaderToolbar() {
 		() => setIsListViewOpened( ! isListViewOpen ),
 		[ setIsListViewOpened, isListViewOpen ]
 	);
-	const overflowItems = (
-		<>
-			<ToolbarItem
-				as={ Button }
-				className="edit-post-header-toolbar__document-overview-toggle"
-				icon={ listView }
-				disabled={ isTextModeEnabled }
-				isPressed={ isListViewOpen }
-				/* translators: button label text should, if possible, be under 16 characters. */
-				label={ __( 'Document Overview' ) }
-				onClick={ toggleListView }
-				shortcut={ listViewShortcut }
-				showTooltip={ ! showIconLabels }
-				variant={ showIconLabels ? 'tertiary' : undefined }
-			/>
-		</>
-	);
 	const openInserter = useCallback( () => {
 		if ( isInserterOpened ) {
 			// Focusing the inserter button closes the inserter popover.
@@ -106,6 +96,93 @@ function HeaderToolbar() {
 		'Generic label for block inserter button'
 	);
 	const shortLabel = ! isInserterOpened ? __( 'Add' ) : __( 'Close' );
+
+	const inserterClosedItems = (
+		<>
+			{ isLargeViewport && (
+				<ToolbarItem
+					as={ ToolSelector }
+					showTooltip={ ! showIconLabels }
+					variant={ showIconLabels ? 'tertiary' : undefined }
+					disabled={ isTextModeEnabled }
+				/>
+			) }
+			<ToolbarItem
+				as={ EditorHistoryUndo }
+				showTooltip={ ! showIconLabels }
+				variant={ showIconLabels ? 'tertiary' : undefined }
+			/>
+			<ToolbarItem
+				as={ EditorHistoryRedo }
+				showTooltip={ ! showIconLabels }
+				variant={ showIconLabels ? 'tertiary' : undefined }
+			/>
+			<ToolbarItem
+				as={ Button }
+				className="edit-post-header-toolbar__document-overview-toggle"
+				icon={ listView }
+				disabled={ isTextModeEnabled }
+				isPressed={ isListViewOpen }
+				/* translators: button label text should, if possible, be under 16 characters. */
+				label={ __( 'Document Overview' ) }
+				onClick={ toggleListView }
+				shortcut={ listViewShortcut }
+				showTooltip={ ! showIconLabels }
+				variant={ showIconLabels ? 'tertiary' : undefined }
+			/>
+		</>
+	);
+
+	const inserterOpenItems = (
+		<>
+			<ToolbarItem
+				as={ Button }
+				className="edit-post-header-toolbar__insert-block"
+				variant="secondary"
+				onClick={ openInserter }
+				icon={ paragraph }
+				label={ __( 'Insert Paragraph Block' ) }
+				showTooltip={ ! showIconLabels }
+			/>
+			<ToolbarItem
+				as={ Button }
+				className="edit-post-header-toolbar__insert-block"
+				variant="secondary"
+				onClick={ openInserter }
+				icon={ heading }
+				label={ __( 'Insert Heading Block' ) }
+				showTooltip={ ! showIconLabels }
+			/>
+			<ToolbarItem
+				as={ Button }
+				className="edit-post-header-toolbar__insert-block"
+				variant="secondary"
+				onClick={ openInserter }
+				icon={ list }
+				label={ __( 'Insert List Block' ) }
+				showTooltip={ ! showIconLabels }
+			/>
+			<ToolbarItem
+				as={ Button }
+				className="edit-post-header-toolbar__insert-block"
+				variant="secondary"
+				onClick={ openInserter }
+				icon={ image }
+				label={ __( 'Insert Image Block' ) }
+				showTooltip={ ! showIconLabels }
+			/>
+			<ToolbarItem
+				as={ EditorHistoryUndo }
+				showTooltip={ ! showIconLabels }
+				variant={ showIconLabels ? 'tertiary' : undefined }
+			/>
+			<ToolbarItem
+				as={ EditorHistoryRedo }
+				showTooltip={ ! showIconLabels }
+				variant={ showIconLabels ? 'tertiary' : undefined }
+			/>
+		</>
+	);
 
 	return (
 		<NavigableToolbar
@@ -128,27 +205,8 @@ function HeaderToolbar() {
 				/>
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<>
-						{ isLargeViewport && (
-							<ToolbarItem
-								as={ ToolSelector }
-								showTooltip={ ! showIconLabels }
-								variant={
-									showIconLabels ? 'tertiary' : undefined
-								}
-								disabled={ isTextModeEnabled }
-							/>
-						) }
-						<ToolbarItem
-							as={ EditorHistoryUndo }
-							showTooltip={ ! showIconLabels }
-							variant={ showIconLabels ? 'tertiary' : undefined }
-						/>
-						<ToolbarItem
-							as={ EditorHistoryRedo }
-							showTooltip={ ! showIconLabels }
-							variant={ showIconLabels ? 'tertiary' : undefined }
-						/>
-						{ overflowItems }
+						{ isInserterOpened && inserterOpenItems }
+						{ ! isInserterOpened && inserterClosedItems }
 					</>
 				) }
 			</div>
