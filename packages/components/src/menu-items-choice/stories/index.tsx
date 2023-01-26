@@ -17,7 +17,11 @@ import MenuGroup from '../../menu-group';
 const meta: ComponentMeta< typeof MenuItemsChoice > = {
 	component: MenuItemsChoice,
 	title: 'Components/MenuItemsChoice',
-	argTypes: {},
+	argTypes: {
+		onHover: { action: 'onHover' },
+		onSelect: { action: 'onSelect' },
+		value: { control: { type: null } },
+	},
 	parameters: {
 		controls: {
 			expanded: true,
@@ -27,19 +31,24 @@ const meta: ComponentMeta< typeof MenuItemsChoice > = {
 };
 export default meta;
 
-const Template: ComponentStory< typeof MenuItemsChoice > = ( args ) => {
-	const [ choice, setChoice ] = useState( args.value ?? '' );
-	const [ hovered, setHovered ] = useState< string | undefined >();
+const Template: ComponentStory< typeof MenuItemsChoice > = ( {
+	onHover,
+	onSelect,
+	choices,
+} ) => {
+	const [ choice, setChoice ] = useState( choices[ 0 ]?.value ?? '' );
 
 	return (
 		<MenuGroup label="Editor">
 			<MenuItemsChoice
-				{ ...args }
+				choices={ choices }
 				value={ choice }
-				onSelect={ ( value ) => setChoice( value ) }
-				onHover={ ( value ) => setHovered( value ) }
+				onSelect={ ( ...selectArgs ) => {
+					onSelect( ...selectArgs );
+					setChoice( ...selectArgs );
+				} }
+				onHover={ onHover }
 			/>
-			<div>Currently hovered value: { hovered ? hovered : '-' }</div>
 		</MenuGroup>
 	);
 };
