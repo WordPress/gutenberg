@@ -94,7 +94,6 @@ if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
 }
 require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
-require __DIR__ . '/experimental/navigation-page.php';
 require __DIR__ . '/experimental/kses.php';
 
 // Fonts API.
