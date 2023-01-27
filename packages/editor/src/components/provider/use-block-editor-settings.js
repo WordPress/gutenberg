@@ -188,7 +188,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
-			__unstableInserterMediaCategories: inserterMediaCategories,
+			inserterMediaCategories,
 			__experimentalFetchRichUrlData: fetchUrlData,
 			__experimentalCanUserUseUnfilteredHTML: canUseUnfilteredHTML,
 			__experimentalUndo: undo,

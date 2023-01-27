@@ -122,7 +122,7 @@ export default function BlockEditor() {
 
 		return {
 			...restStoredSettings,
-			__unstableInserterMediaCategories: inserterMediaCategories,
+			inserterMediaCategories,
 			__experimentalBlockPatterns: blockPatterns,
 			__experimentalBlockPatternCategories: blockPatternCategories,
 		};
