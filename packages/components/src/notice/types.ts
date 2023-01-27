@@ -59,9 +59,6 @@ export type NoticeProps = {
 	 * a sensible default is used based on the notice status. Note that this
 	 * value should be considered a suggestion; assistive technologies may
 	 * override it based on internal heuristics.
-	 *
-	 * @ default - 'assertive' for 'error' status
-	 * 			 - 'polite' for all other statuses
 	 */
 	politeness?: 'polite' | 'assertive';
 	/**
