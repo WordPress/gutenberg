@@ -210,6 +210,7 @@ async function runTestSuite( testSuite, performanceTestDirectory, runKey ) {
 	);
 	fs.mkdirSync( './__test-results', { recursive: true } );
 	fs.copyFileSync( resultsFile, `./__test-results/${ runKey }.results.json` );
+	);
 	const rawResults = await readJSONFile(
 		path.join(
 			performanceTestDirectory,
