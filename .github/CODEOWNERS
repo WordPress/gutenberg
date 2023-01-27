@@ -50,9 +50,6 @@
 /packages/customize-widgets                     @noisysocks
 /packages/widgets                               @noisysocks
 
-# Navigation
-/packages/edit-navigation                       @draganescu @talldan @tellthemachines @adamziel @kevin940726 @getdave
-
 # Full Site Editing
 /packages/edit-site
 

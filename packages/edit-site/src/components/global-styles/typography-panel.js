@@ -42,10 +42,14 @@ export function useHasTypographyPanel( name ) {
 
 function useHasFontFamilyControl( name ) {
 	const supports = getSupportedGlobalStylesPanels( name );
-	const [ fontFamilies ] = useGlobalSetting(
+	const [ fontFamiliesPerOrigin ] = useGlobalSetting(
 		'typography.fontFamilies',
 		name
 	);
+	const fontFamilies =
+		fontFamiliesPerOrigin?.custom ||
+		fontFamiliesPerOrigin?.theme ||
+		fontFamiliesPerOrigin?.default;
 	return supports.includes( 'fontFamily' ) && !! fontFamilies?.length;
 }
 
@@ -191,16 +195,27 @@ export default function TypographyPanel( {
 	} else if ( element && element !== 'text' ) {
 		prefix = `elements.${ element }.`;
 	}
-	const [ fontSizes ] = useGlobalSetting( 'typography.fontSizes', name );
+	const [ fontSizesPerOrigin ] = useGlobalSetting(
+		'typography.fontSizes',
+		name
+	);
+	const fontSizes =
+		fontSizesPerOrigin?.custom ||
+		fontSizesPerOrigin?.theme ||
+		fontSizesPerOrigin?.default;
 
 	const disableCustomFontSizes = ! useGlobalSetting(
 		'typography.customFontSize',
 		name
 	)[ 0 ];
-	const [ fontFamilies ] = useGlobalSetting(
+	const [ fontFamiliesPerOrigin ] = useGlobalSetting(
 		'typography.fontFamilies',
 		name
 	);
+	const fontFamilies =
+		fontFamiliesPerOrigin?.custom ||
+		fontFamiliesPerOrigin?.theme ||
+		fontFamiliesPerOrigin?.default;
 	const hasFontStyles =
 		useGlobalSetting( 'typography.fontStyle', name )[ 0 ] &&
 		supports.includes( 'fontStyle' );

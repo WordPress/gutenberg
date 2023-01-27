@@ -19,17 +19,14 @@ const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 
 function ScreenLinkColor( { name, variationPath = '' } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
-	const [ solids ] = useGlobalSetting( 'color.palette', name );
 	const [ areCustomSolidsEnabled ] = useGlobalSetting( 'color.custom', name );
-
 	const colorsPerOrigin = useColorsPerOrigin( name );
-
 	const [ isLinkEnabled ] = useGlobalSetting( 'color.link', name );
 
 	const hasLinkColor =
 		supports.includes( 'linkColor' ) &&
 		isLinkEnabled &&
-		( solids.length > 0 || areCustomSolidsEnabled );
+		( colorsPerOrigin.length > 0 || areCustomSolidsEnabled );
 
 	const pseudoStates = {
 		default: {

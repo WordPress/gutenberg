@@ -126,20 +126,13 @@ const DefaultControls = ( props ) => {
 };
 
 const MenuInspectorControls = ( props ) => {
-	const isOffCanvasNavigationEditorEnabled =
-		window?.__experimentalEnableOffCanvasNavigationEditor === true;
-	const menuControlsSlot = isOffCanvasNavigationEditorEnabled
-		? 'list'
-		: undefined;
-
+	// Show the OffCanvasEditor controls if we're in the Gutenberg plugin. Previously used isOffCanvasNavigationEditorEnabled.
 	return (
-		<InspectorControls __experimentalGroup={ menuControlsSlot }>
+		<InspectorControls __experimentalGroup="list">
 			<PanelBody
-				title={
-					isOffCanvasNavigationEditorEnabled ? null : __( 'Menu' )
-				}
+				title={ process.env.IS_GUTENBERG_PLUGIN ? null : __( 'Menu' ) }
 			>
-				{ isOffCanvasNavigationEditorEnabled ? (
+				{ process.env.IS_GUTENBERG_PLUGIN ? (
 					<ExperimentControls { ...props } />
 				) : (
 					<DefaultControls { ...props } />
