@@ -1,4 +1,7 @@
 export type TreeGridRowProps = {
+	/**
+	 * The children to be rendered in the row.
+	 */
 	children: React.ReactNode;
 	/**
 	 * An integer value designating the level in the hierarchical tree structure.

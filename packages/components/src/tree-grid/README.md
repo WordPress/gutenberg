@@ -10,7 +10,7 @@ This feature is still experimental. “Experimental” means this is an early im
 
 ## Development guidelines
 
-`TreeGrid`, `TreeGridRow`, and `TreeGridCell` are components used to create a tree hierarchy. They're not visually styled components, but instead help with adding keyboard navigation and roving tab index behaviors to tree grid structures.
+`TreeGrid`, `TreeGridRow`, and `TreeGridCell` are components used to create a tree hierarchy. They're not visually styled components, but instead help with adding keyboard navigation and roving tabindex behaviors to tree grid structures.
 
 A tree grid is a hierarchical 2 dimensional UI component, for example it could be used to implement a file system browser.
 
@@ -156,7 +156,7 @@ An optional value that designates whether a row is expanded or collapsed. Curren
 </TreeGridCell>
 ```
 
-Props passed as an argument to the render prop must be passed to the child focusable component/element within the cell. If a component is used, it must correctly handle the `onFocus`, `tabIndex`, and `ref` props, passing these to the element it renders. These props are used to handle the roving tab index functionality of the tree grid.
+Props passed as an argument to the render prop must be passed to the child focusable component/element within the cell. If a component is used, it must correctly handle the `onFocus`, `tabIndex`, and `ref` props, passing these to the element it renders. These props are used to handle the roving tabindex functionality of the tree grid.
 
 ## Related components
 
