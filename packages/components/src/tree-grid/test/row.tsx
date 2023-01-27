@@ -13,7 +13,7 @@ describe( 'TreeGridRow', () => {
 		const { container } = render(
 			<table>
 				<tbody>
-					<TreeGridRow level="1" positionInSet="1" setSize="1">
+					<TreeGridRow level={ 1 } positionInSet={ 1 } setSize={ 1 }>
 						<td>Test</td>
 					</TreeGridRow>
 				</tbody>
@@ -29,9 +29,9 @@ describe( 'TreeGridRow', () => {
 				<tbody>
 					<TreeGridRow
 						className="my-row"
-						level="1"
-						positionInSet="1"
-						setSize="1"
+						level={ 1 }
+						positionInSet={ 1 }
+						setSize={ 1 }
 					>
 						<td>Test</td>
 					</TreeGridRow>

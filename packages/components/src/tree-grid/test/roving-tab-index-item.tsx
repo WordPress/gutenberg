@@ -14,9 +14,12 @@ import { forwardRef } from '@wordpress/element';
 import RovingTabIndex from '../roving-tab-index';
 import RovingTabIndexItem from '../roving-tab-index-item';
 
-const TestButton = forwardRef( ( { ...props }, ref ) => (
-	<button { ...props } ref={ ref }></button>
-) );
+const TestButton = forwardRef(
+	(
+		{ ...props }: React.ComponentPropsWithoutRef< 'button' >,
+		ref: React.ForwardedRef< HTMLButtonElement >
+	) => <button { ...props } ref={ ref }></button>
+);
 
 describe( 'RovingTabIndexItem', () => {
 	it( 'requires RovingTabIndex to be declared as a parent component somewhere in the component hierarchy', () => {
@@ -52,7 +55,7 @@ describe( 'RovingTabIndexItem', () => {
 		const { container } = render(
 			<RovingTabIndex>
 				<RovingTabIndexItem>
-					{ ( props ) => (
+					{ ( props: React.ComponentProps< typeof TestButton > ) => (
 						<TestButton className="my-button" { ...props }>
 							Click Me!
 						</TestButton>

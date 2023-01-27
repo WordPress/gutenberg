@@ -12,13 +12,16 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import TreeGrid from '../';
+import TreeGrid from '..';
 import TreeGridRow from '../row';
 import TreeGridCell from '../cell';
 
-const TestButton = forwardRef( ( { ...props }, ref ) => (
-	<button { ...props } ref={ ref }></button>
-) );
+const TestButton = forwardRef(
+	(
+		{ ...props }: React.ComponentPropsWithoutRef< 'button' >,
+		ref: React.ForwardedRef< HTMLButtonElement >
+	) => <button { ...props } ref={ ref }></button>
+);
 
 describe( 'TreeGrid', () => {
 	const originalGetClientRects = window.Element.prototype.getClientRects;
@@ -35,6 +38,7 @@ describe( 'TreeGrid', () => {
 	] );
 
 	beforeAll( () => {
+		// @ts-expect-error - This is just a mock
 		window.Element.prototype.getClientRects =
 			jest.fn( mockedGetClientRects );
 	} );
@@ -162,7 +166,11 @@ describe( 'TreeGrid', () => {
 	} );
 
 	describe( 'onFocusRow', () => {
-		const TestTree = ( { onFocusRow } ) => (
+		const TestTree = ( {
+			onFocusRow,
+		}: {
+			onFocusRow: React.ComponentProps< typeof TreeGrid >[ 'onFocusRow' ];
+		} ) => (
 			<TreeGrid onFocusRow={ onFocusRow }>
 				<TreeGridRow level={ 1 } positionInSet={ 1 } setSize={ 3 }>
 					<TreeGridCell withoutGridItem>
