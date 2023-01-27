@@ -315,14 +315,16 @@ function useIsScreenReaderEnabled() {
 	return isScreenReaderEnabled;
 }
 
-function useIsEditingText() {
+function useIsEditingText( isBlockSelected ) {
 	const [ isEditingText, setIsEditingText ] = useState( () =>
 		RCTAztecView.InputState.isFocused()
 	);
 
 	useEffect( () => {
 		const onFocusChangeAztec = ( { isFocused } ) => {
-			setIsEditingText( isFocused );
+			if ( isBlockSelected ) {
+				setIsEditingText( isFocused );
+			}
 		};
 
 		RCTAztecView.InputState.addFocusChangeListener( onFocusChangeAztec );
@@ -332,7 +334,7 @@ function useIsEditingText() {
 				onFocusChangeAztec
 			);
 		};
-	}, [] );
+	}, [ isBlockSelected ] );
 
 	return isEditingText;
 }
@@ -362,7 +364,7 @@ const BlockDraggable = ( {
 	testID,
 } ) => {
 	const wasBeingDragged = useRef( false );
-	const isEditingText = useIsEditingText();
+	const isEditingText = useIsEditingText( isSelected );
 	const isScreenReaderEnabled = useIsScreenReaderEnabled();
 
 	const draggingAnimation = {
