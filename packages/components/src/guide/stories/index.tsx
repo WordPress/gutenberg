@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ComponentMeta, ComponentStory } from '@storybook/react';
+
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -7,9 +12,9 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import Button from '../../button';
-import Guide from '../';
+import Guide from '..';
 
-export default {
+const meta: ComponentMeta< typeof Guide > = {
 	title: 'Components/Guide',
 	component: Guide,
 	argTypes: {
@@ -18,8 +23,9 @@ export default {
 		onFinish: { action: 'onFinish' },
 	},
 };
+export default meta;
 
-const Template = ( { onFinish, ...props } ) => {
+const Template: ComponentStory< typeof Guide > = ( { onFinish, ...props } ) => {
 	const [ isOpen, setOpen ] = useState( false );
 
 	const openGuide = () => setOpen( true );
@@ -35,7 +41,7 @@ const Template = ( { onFinish, ...props } ) => {
 					{ ...props }
 					onFinish={ ( ...finishArgs ) => {
 						closeGuide( ...finishArgs );
-						onFinish( ...finishArgs );
+						onFinish?.( ...finishArgs );
 					} }
 				/>
 			) }

@@ -3,7 +3,12 @@
  */
 import { SVG, Circle } from '@wordpress/primitives';
 
-export const PageControlIcon = ( { isSelected } ) => (
+/**
+ * Internal dependencies
+ */
+import type { PageControlIconProps } from './types';
+
+export const PageControlIcon = ( { isSelected }: PageControlIconProps ) => (
 	<SVG width="8" height="8" fill="none" xmlns="http://www.w3.org/2000/svg">
 		<Circle
 			cx="4"

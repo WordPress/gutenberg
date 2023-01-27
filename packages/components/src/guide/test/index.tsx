@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 /**
  * Internal dependencies
  */
-import Guide from '../';
+import Guide from '..';
 
 describe( 'Guide', () => {
 	it( 'renders nothing when there are no pages', () => {

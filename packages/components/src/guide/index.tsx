@@ -17,15 +17,16 @@ import { focus } from '@wordpress/dom';
 import Modal from '../modal';
 import Button from '../button';
 import PageControl from './page-control';
+import type { GuideProps } from './types';
 
 export default function Guide( {
 	children,
 	className,
 	contentLabel,
 	finishButtonText,
-	onFinish,
+	onFinish = () => {},
 	pages = [],
-} ) {
+}: GuideProps ) {
 	const guideContainer = useRef();
 	const [ currentPage, setCurrentPage ] = useState( 0 );
 
@@ -42,12 +43,16 @@ export default function Guide( {
 		// Each time we change the current page, start from the first element of the page.
 		// This also solves any focus loss that can happen.
 		if ( guideContainer.current ) {
+			// @ts-expect-error
 			focus.tabbable.find( guideContainer.current )?.[ 0 ]?.focus();
 		}
 	}, [ currentPage ] );
 
 	if ( Children.count( children ) ) {
-		pages = Children.map( children, ( child ) => ( { content: child } ) );
+		pages =
+			Children.map( children, ( child ) => ( {
+				content: child,
+			} ) ) ?? [];
 	}
 
 	const canGoBack = currentPage > 0;
@@ -85,6 +90,7 @@ export default function Guide( {
 					event.preventDefault();
 				}
 			} }
+			// @ts-expect-error
 			ref={ guideContainer }
 		>
 			<div className="components-guide__container">
