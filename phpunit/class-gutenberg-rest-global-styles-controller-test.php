@@ -75,9 +75,11 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 		);
 	}
 
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_context_param() {
-		// TODO: Implement test_context_param() method.
-		$this->markTestIncomplete();
+		// Controller does not use get_context_param().
 	}
 
 	public function test_get_theme_items() {
@@ -116,8 +118,11 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 		$this->assertSameSetsWithIndex( $data, $expected );
 	}
 
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_get_items() {
-		$this->markTestIncomplete();
+		// Controller does not implement get_items().
 	}
 
 	public function test_get_item() {
@@ -141,8 +146,11 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 		);
 	}
 
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_create_item() {
-		$this->markTestIncomplete();
+		// Controller does not implement create_item().
 	}
 
 	public function test_update_item() {
@@ -158,17 +166,29 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 		$this->assertEquals( 'My new global styles title', $data['title']['raw'] );
 	}
 
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_delete_item() {
-		$this->markTestIncomplete();
+		// Controller does not implement delete_item().
 	}
 
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_prepare_item() {
-		// TODO: Implement test_prepare_item() method.
-		$this->markTestIncomplete();
+		// Controller does not implement prepare_item().
 	}
 
 	public function test_get_item_schema() {
-		// TODO: Implement test_get_item_schema() method.
-		$this->markTestIncomplete();
+		$request    = new WP_REST_Request( 'OPTIONS', '/wp/v2/global-styles/' . self::$global_styles_id );
+		$response   = rest_get_server()->dispatch( $request );
+		$data       = $response->get_data();
+		$properties = $data['schema']['properties'];
+		$this->assertCount( 4, $properties, 'Schema properties array does not have exactly 4 elements' );
+		$this->assertArrayHasKey( 'id', $properties, 'Schema properties array does not have "id" key' );
+		$this->assertArrayHasKey( 'styles', $properties, 'Schema properties array does not have "styles" key' );
+		$this->assertArrayHasKey( 'settings', $properties, 'Schema properties array does not have "settings" key' );
+		$this->assertArrayHasKey( 'title', $properties, 'Schema properties array does not have "title" key' );
 	}
 }
