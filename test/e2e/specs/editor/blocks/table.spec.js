@@ -77,9 +77,6 @@ test.describe( 'Table', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/table' } );
 		await editor.openDocumentSettingsSidebar();
-		await page.click(
-			`role=region[name="Editor settings"i] >> role=tab[name="Settings"i]`
-		);
 
 		const headerSwitch = page.locator(
 			'role=checkbox[name="Header section"i]'
@@ -135,9 +132,6 @@ test.describe( 'Table', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/table' } );
 		await editor.openDocumentSettingsSidebar();
-		await page.click(
-			`role=region[name="Editor settings"i] >> role=tab[name="Settings"i]`
-		);
 
 		// Create the table.
 		await page.click( 'role=button[name="Create Table"i]' );
@@ -211,14 +205,14 @@ test.describe( 'Table', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/table' } );
 		await editor.openDocumentSettingsSidebar();
-		await page.click(
-			`role=region[name="Editor settings"i] >> role=tab[name="Settings"i]`
-		);
 
 		// Create the table.
 		await page.click( 'role=button[name="Create Table"i]' );
 
 		// Enable fixed width as it exacerbates the amount of empty space around the RichText.
+		await page.click(
+			`role=region[name="Editor settings"i] >> role=tab[name="Settings"i]`
+		);
 		await page
 			.locator( 'role=checkbox[name="Fixed width table cells"i]' )
 			.check();
