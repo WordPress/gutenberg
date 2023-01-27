@@ -18,7 +18,7 @@ const CORE_MODULES_USING_EXPERIMENTS = [
 	'@wordpress/edit-site',
 	'@wordpress/edit-post',
 	'@wordpress/edit-widgets',
-	'@wordpress/edit-navigation',
+	'@wordpress/block-library',
 ];
 
 /**

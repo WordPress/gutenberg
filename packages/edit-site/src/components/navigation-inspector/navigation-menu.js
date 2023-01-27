@@ -2,11 +2,16 @@
  * WordPress dependencies
  */
 import {
-	__experimentalOffCanvasEditor as OffCanvasEditor,
+	experiments as blockEditorExperiments,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../experiments';
 
 const ALLOWED_BLOCKS = {
 	'core/navigation': [
@@ -33,6 +38,10 @@ const ALLOWED_BLOCKS = {
 
 export default function NavigationMenu( { innerBlocks } ) {
 	const { updateBlockListSettings } = useDispatch( blockEditorStore );
+
+	const { __experimentalOffCanvasEditor: OffCanvasEditor } = unlock(
+		blockEditorExperiments
+	);
 
 	//TODO: Block settings are normally updated as a side effect of rendering InnerBlocks in BlockList
 	//Think through a better way of doing this, possible with adding allowed blocks to block library metadata
