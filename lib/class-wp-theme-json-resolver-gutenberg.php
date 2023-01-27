@@ -523,7 +523,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			$post_id = wp_update_post(
 				array(
 					'ID'        => $post_id,
-					'post_name' => self::generate_user_style_variation_post_name( $post_id ),
+					'post_name' => self::generate_user_style_variation_post_name( $post_id, $args['stylesheet'] ),
 				)
 			);
 		}
@@ -537,10 +537,10 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @since 6.2
 	 *
 	 * @param int|null $variation_id Variation ID.
+	 * @param string   $stylesheet   Stylesheet.
 	 * @return string Post name.
 	 */
-	public static function generate_user_style_variation_post_name( $variation_id ) {
-		$stylesheet = get_stylesheet();
+	public static function generate_user_style_variation_post_name( $variation_id, $stylesheet ) {
 		return "wp-global-styles-{$stylesheet}-variation-{$variation_id}";
 	}
 
