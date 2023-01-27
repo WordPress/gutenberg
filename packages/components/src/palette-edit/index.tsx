@@ -42,10 +42,21 @@ import {
 import { NavigableMenu } from '../navigable-container';
 import { DEFAULT_GRADIENT } from '../custom-gradient-picker/constants';
 import CustomGradientPicker from '../custom-gradient-picker';
+import type {
+	Color,
+	ColorOrGradient,
+	Colors,
+	Gradient,
+	NameInputProps,
+	OptionProps,
+	PaletteEditListViewProps,
+	PaletteEditProps,
+	SlugPrefix,
+} from './types';
 
 const DEFAULT_COLOR = '#000';
 
-function NameInput( { value, onChange, label } ) {
+function NameInput( { value, onChange, label }: NameInputProps ) {
 	return (
 		<NameInputControl
 			label={ label }
@@ -67,7 +78,10 @@ function NameInput( { value, onChange, label } ) {
  *
  * @return {string} A unique name for a palette item.
  */
-export function getNameForPosition( elements, slugPrefix ) {
+export function getNameForPosition(
+	elements: ColorOrGradient[],
+	slugPrefix: SlugPrefix
+) {
 	const temporaryNameRegex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
 	const position = elements.reduce( ( previousValue, currentValue ) => {
 		if ( typeof currentValue?.slug === 'string' ) {
@@ -94,7 +108,13 @@ function ColorPickerPopover( {
 	element,
 	onChange,
 	onClose = () => {},
+}: {
+	isGradient: boolean;
+	element: ColorOrGradient;
+	onChange: ( element: ColorOrGradient ) => void;
+	onClose?: () => void;
 } ) {
+	const { name, slug } = element;
 	return (
 		<Popover
 			placement="left-start"
@@ -108,7 +128,8 @@ function ColorPickerPopover( {
 					enableAlpha
 					onChange={ ( newColor ) =>
 						onChange( {
-							...element,
+							name,
+							slug,
 							color: newColor,
 						} )
 					}
@@ -120,9 +141,10 @@ function ColorPickerPopover( {
 						__nextHasNoMargin
 						__experimentalIsRenderedInSidebar
 						value={ element.gradient }
-						onChange={ ( newGradient ) =>
+						onChange={ ( newGradient: string ) =>
 							onChange( {
-								...element,
+								name,
+								slug,
 								gradient: newGradient,
 							} )
 						}
@@ -143,7 +165,7 @@ function Option( {
 	onStopEditing,
 	slugPrefix,
 	isGradient,
-} ) {
+}: OptionProps ) {
 	const focusOutsideProps = useFocusOutside( onStopEditing );
 	const value = isGradient ? element.gradient : element.color;
 
@@ -175,7 +197,7 @@ function Option( {
 									: __( 'Color name' )
 							}
 							value={ element.name }
-							onChange={ ( nextName ) =>
+							onChange={ ( nextName: string ) =>
 								onChange( {
 									...element,
 									name: nextName,
@@ -209,7 +231,10 @@ function Option( {
 	);
 }
 
-function isTemporaryElement( slugPrefix, { slug, color, gradient } ) {
+function isTemporaryElement(
+	slugPrefix: SlugPrefix,
+	{ slug, color, gradient }: ColorOrGradient
+) {
 	const regex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
 	return (
 		regex.test( slug ) &&
@@ -226,17 +251,17 @@ function PaletteEditListView( {
 	canOnlyChangeValues,
 	slugPrefix,
 	isGradient,
-} ) {
+}: PaletteEditListViewProps ) {
 	// When unmounting the component if there are empty elements (the user did not complete the insertion) clean them.
-	const elementsReference = useRef();
+	const elementsReference = useRef< ColorOrGradient[] >();
 	useEffect( () => {
 		elementsReference.current = elements;
 	}, [ elements ] );
 	useEffect( () => {
 		return () => {
 			if (
-				elementsReference.current.some( ( element, index ) =>
-					isTemporaryElement( slugPrefix, element, index )
+				elementsReference.current?.some( ( element ) =>
+					isTemporaryElement( slugPrefix, element )
 				)
 			) {
 				const newElements = elementsReference.current.filter(
@@ -281,7 +306,10 @@ function PaletteEditListView( {
 						onRemove={ () => {
 							setEditingElement( null );
 							const newElements = elements.filter(
-								( _currentElement, currentIndex ) => {
+								(
+									_currentElement: Gradient | Color,
+									currentIndex: number
+								) => {
 									if ( currentIndex === index ) {
 										return false;
 									}
@@ -306,33 +334,37 @@ function PaletteEditListView( {
 	);
 }
 
-const EMPTY_ARRAY = [];
+const EMPTY_COLOR_ARRAY: Colors = [];
 
 export default function PaletteEdit( {
 	gradients,
-	colors = EMPTY_ARRAY,
+	colors = EMPTY_COLOR_ARRAY,
 	onChange,
 	paletteLabel,
 	emptyMessage,
 	canOnlyChangeValues,
 	canReset,
 	slugPrefix = '',
-} ) {
+}: PaletteEditProps ) {
 	const isGradient = !! gradients;
 	const elements = isGradient ? gradients : colors;
 	const [ isEditing, setIsEditing ] = useState( false );
-	const [ editingElement, setEditingElement ] = useState( null );
-	const isAdding =
+	const [ editingElement, setEditingElement ] = useState< number | null >(
+		null
+	);
+	const isAdding = !! (
 		isEditing &&
 		editingElement &&
 		elements[ editingElement ] &&
-		! elements[ editingElement ].slug;
+		! elements[ editingElement ].slug
+	);
 	const elementsLength = elements.length;
 	const hasElements = elementsLength > 0;
 	const debounceOnChange = useDebounce( onChange, 100 );
 	const onSelectPaletteItem = useCallback(
-		( value, newEditingElementIndex ) => {
-			const selectedElement = elements[ newEditingElementIndex ];
+		( value?: string, newEditingElementIndex?: number ) => {
+			const selectedElement =
+				newEditingElementIndex && elements[ newEditingElementIndex ];
 			const key = isGradient ? 'gradient' : 'color';
 			// Ensures that the index returned matches a known element value.
 			if ( !! selectedElement && selectedElement[ key ] === value ) {
@@ -376,18 +408,17 @@ export default function PaletteEdit( {
 									slugPrefix
 								);
 
-								onChange( [
-									...elements,
-									{
-										...( isGradient
-											? { gradient: DEFAULT_GRADIENT }
-											: { color: DEFAULT_COLOR } ),
-										name: tempOptionName,
-										slug:
-											slugPrefix +
-											kebabCase( tempOptionName ),
-									},
-								] );
+								const tmpElement: ColorOrGradient = {
+									...( isGradient
+										? { gradient: DEFAULT_GRADIENT }
+										: { color: DEFAULT_COLOR } ),
+									name: tempOptionName,
+									slug:
+										slugPrefix +
+										kebabCase( tempOptionName ),
+								};
+
+								onChange( [ ...elements, tmpElement ] );
 								setIsEditing( true );
 								setEditingElement( elements.length );
 							} }
