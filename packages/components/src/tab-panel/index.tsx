@@ -25,7 +25,7 @@ const TabButton = ( {
 }: TabButtonProps ) => (
 	<Button
 		role="tab"
-		tabIndex={ selected ? null : -1 }
+		tabIndex={ selected ? undefined : -1 }
 		aria-selected={ selected }
 		id={ tabId }
 		__experimentalIsFocusable

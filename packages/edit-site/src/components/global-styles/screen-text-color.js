@@ -18,16 +18,14 @@ const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 
 function ScreenTextColor( { name, variationPath = '' } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
-	const [ solids ] = useGlobalSetting( 'color.palette', name );
 	const [ areCustomSolidsEnabled ] = useGlobalSetting( 'color.custom', name );
 	const [ isTextEnabled ] = useGlobalSetting( 'color.text', name );
-
 	const colorsPerOrigin = useColorsPerOrigin( name );
 
 	const hasTextColor =
 		supports.includes( 'color' ) &&
 		isTextEnabled &&
-		( solids.length > 0 || areCustomSolidsEnabled );
+		( colorsPerOrigin.length > 0 || areCustomSolidsEnabled );
 
 	const [ color, setColor ] = useGlobalStyle(
 		variationPath + 'color.text',

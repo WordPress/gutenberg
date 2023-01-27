@@ -1,15 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { createReduxStore, registerStore } from '@wordpress/data';
+import { createReduxStore, register } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import reducer from './reducer';
 import * as selectors from './selectors';
-import * as actions from './actions';
+import * as allActions from './actions';
 import { STORE_NAME } from './constants';
+import { unlock } from '../experiments';
+
+const { __experimentalUpdateSettings, ...actions } = allActions;
 
 /**
  * Block editor data store configuration.
@@ -32,8 +35,8 @@ export const store = createReduxStore( STORE_NAME, {
 	persist: [ 'preferences' ],
 } );
 
-// Ideally we'd use register instead of register stores.
-registerStore( STORE_NAME, {
-	...storeConfig,
-	persist: [ 'preferences' ],
+register( store );
+
+unlock( store ).registerPrivateActions( {
+	__experimentalUpdateSettings,
 } );

@@ -27,14 +27,11 @@ const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 
 function ScreenBackgroundColor( { name, variationPath = '' } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
-	const [ solids ] = useGlobalSetting( 'color.palette', name );
-	const [ gradients ] = useGlobalSetting( 'color.gradients', name );
 	const [ areCustomSolidsEnabled ] = useGlobalSetting( 'color.custom', name );
 	const [ areCustomGradientsEnabled ] = useGlobalSetting(
 		'color.customGradient',
 		name
 	);
-
 	const colorsPerOrigin = useColorsPerOrigin( name );
 	const gradientsPerOrigin = useGradientsPerOrigin( name );
 
@@ -46,10 +43,10 @@ function ScreenBackgroundColor( { name, variationPath = '' } ) {
 	const hasBackgroundColor =
 		supports.includes( 'backgroundColor' ) &&
 		isBackgroundEnabled &&
-		( solids.length > 0 || areCustomSolidsEnabled );
+		( colorsPerOrigin.length > 0 || areCustomSolidsEnabled );
 	const hasGradientColor =
 		supports.includes( 'background' ) &&
-		( gradients.length > 0 || areCustomGradientsEnabled );
+		( gradientsPerOrigin.length > 0 || areCustomGradientsEnabled );
 	const [ backgroundColor, setBackgroundColor ] = useGlobalStyle(
 		variationPath + 'color.background',
 		name

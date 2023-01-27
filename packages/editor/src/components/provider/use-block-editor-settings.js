@@ -171,6 +171,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 						'keepCaretInsideBlock',
 						'maxWidth',
 						'onUpdateDefaultBlockStyles',
+						'enableOpenverseMediaCategory',
 						'styles',
 						'template',
 						'templateLock',

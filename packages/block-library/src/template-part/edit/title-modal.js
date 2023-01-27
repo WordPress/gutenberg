@@ -5,10 +5,10 @@ import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	TextControl,
-	Flex,
-	FlexItem,
 	Button,
 	Modal,
+	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 
 export default function TitleModal( { areaLabel, onClose, onSubmit } ) {
@@ -33,16 +33,14 @@ export default function TitleModal( { areaLabel, onClose, onSubmit } ) {
 			onRequestClose={ onClose }
 		>
 			<form onSubmit={ submitForCreation }>
-				<TextControl
-					label={ __( 'Name' ) }
-					value={ title }
-					onChange={ setTitle }
-				/>
-				<Flex
-					className="wp-block-template-part__placeholder-create-new__title-form-actions"
-					justify="flex-end"
-				>
-					<FlexItem>
+				<VStack spacing="5">
+					<TextControl
+						__nextHasNoMarginBottom
+						label={ __( 'Name' ) }
+						value={ title }
+						onChange={ setTitle }
+					/>
+					<HStack justify="right">
 						<Button
 							variant="primary"
 							type="submit"
@@ -51,8 +49,8 @@ export default function TitleModal( { areaLabel, onClose, onSubmit } ) {
 						>
 							{ __( 'Create' ) }
 						</Button>
-					</FlexItem>
-				</Flex>
+					</HStack>
+				</VStack>
 			</form>
 		</Modal>
 	);

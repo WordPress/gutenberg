@@ -111,6 +111,16 @@ function createResolversCache() {
 export default function createReduxStore( key, options ) {
 	const privateActions = {};
 	const privateSelectors = {};
+	const privateRegistrationFunctions = {
+		privateActions,
+		registerPrivateActions: ( actions ) => {
+			Object.assign( privateActions, actions );
+		},
+		privateSelectors,
+		registerPrivateSelectors: ( selectors ) => {
+			Object.assign( privateSelectors, selectors );
+		},
+	};
 	const storeDescriptor = {
 		name: key,
 		instantiate: ( registry ) => {
@@ -141,6 +151,9 @@ export default function createReduxStore( key, options ) {
 				registry,
 				thunkArgs
 			);
+			// Expose the private registration functions on the store
+			// so they can be copied to a sub registry in registry.js.
+			lock( store, privateRegistrationFunctions );
 			const resolversCache = createResolversCache();
 
 			let resolvers;
@@ -260,14 +273,10 @@ export default function createReduxStore( key, options ) {
 		},
 	};
 
-	lock( storeDescriptor, {
-		registerPrivateActions: ( actions ) => {
-			Object.assign( privateActions, actions );
-		},
-		registerPrivateSelectors: ( selectors ) => {
-			Object.assign( privateSelectors, selectors );
-		},
-	} );
+	// Expose the private registration functions on the store
+	// descriptor. That's a natural choice since that's where the
+	// public actions and selectors are stored .
+	lock( storeDescriptor, privateRegistrationFunctions );
 
 	return storeDescriptor;
 }

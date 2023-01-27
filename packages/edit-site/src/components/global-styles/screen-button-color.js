@@ -18,11 +18,8 @@ const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 
 function ScreenButtonColor( { name, variationPath = '' } ) {
 	const supports = getSupportedGlobalStylesPanels( name );
-	const [ solids ] = useGlobalSetting( 'color.palette', name );
-	const [ areCustomSolidsEnabled ] = useGlobalSetting( 'color.custom', name );
-
 	const colorsPerOrigin = useColorsPerOrigin( name );
-
+	const [ areCustomSolidsEnabled ] = useGlobalSetting( 'color.custom', name );
 	const [ isBackgroundEnabled ] = useGlobalSetting(
 		'color.background',
 		name
@@ -31,7 +28,7 @@ function ScreenButtonColor( { name, variationPath = '' } ) {
 	const hasButtonColor =
 		supports.includes( 'buttonColor' ) &&
 		isBackgroundEnabled &&
-		( solids.length > 0 || areCustomSolidsEnabled );
+		( colorsPerOrigin.length > 0 || areCustomSolidsEnabled );
 
 	const [ buttonTextColor, setButtonTextColor ] = useGlobalStyle(
 		variationPath + 'elements.button.color.text',

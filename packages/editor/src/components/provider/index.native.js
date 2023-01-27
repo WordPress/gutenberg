@@ -345,7 +345,7 @@ class NativeEditorProvider extends Component {
 	}
 }
 
-export default compose( [
+const ComposedNativeProvider = compose( [
 	withSelect( ( select ) => {
 		const {
 			__unstableIsEditorReady: isEditorReady,
@@ -414,3 +414,6 @@ export default compose( [
 		};
 	} ),
 ] )( NativeEditorProvider );
+
+export default ComposedNativeProvider;
+export { ComposedNativeProvider as ExperimentalEditorProvider };

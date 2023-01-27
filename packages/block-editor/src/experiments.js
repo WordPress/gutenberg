@@ -7,6 +7,7 @@ import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/exp
  * Internal dependencies
  */
 import * as globalStyles from './components/global-styles';
+import { ExperimentalBlockEditorProvider } from './components/provider';
 
 export const { lock, unlock } =
 	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
@@ -20,4 +21,5 @@ export const { lock, unlock } =
 export const experiments = {};
 lock( experiments, {
 	...globalStyles,
+	ExperimentalBlockEditorProvider,
 } );
