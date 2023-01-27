@@ -204,7 +204,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$vertical_alignment_options += array( 'stretch' => 'stretch' );
 		} else {
 			$justify_content_options    += array( 'stretch' => 'stretch' );
-			$vertical_alignment_options += array( 'spaceBetween' => 'space-between' );
+			$vertical_alignment_options += array( 'space-between' => 'space-between' );
 		}
 
 		if ( ! empty( $layout['flexWrap'] ) && 'nowrap' === $layout['flexWrap'] ) {

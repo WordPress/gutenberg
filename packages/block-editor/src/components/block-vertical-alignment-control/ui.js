@@ -32,7 +32,7 @@ const BLOCK_ALIGNMENTS_CONTROLS = {
 		icon: alignStretch,
 		title: _x( 'Stretch to fill', 'Block vertical alignment setting' ),
 	},
-	spaceBetween: {
+	'space-between': {
 		icon: spaceBetween,
 		title: _x( 'Space between', 'Block vertical alignment setting' ),
 	},
@@ -40,10 +40,6 @@ const BLOCK_ALIGNMENTS_CONTROLS = {
 
 const DEFAULT_CONTROLS = [ 'top', 'center', 'bottom' ];
 const DEFAULT_CONTROL = 'top';
-
-const POPOVER_PROPS = {
-	variant: 'toolbar',
-};
 
 function BlockVerticalAlignmentUI( {
 	value,
@@ -63,7 +59,7 @@ function BlockVerticalAlignmentUI( {
 	const UIComponent = isToolbar ? ToolbarGroup : ToolbarDropdownMenu;
 	const extraProps = isToolbar
 		? { isCollapsed }
-		: { popoverProps: { POPOVER_PROPS } };
+		: { popoverProps: { variant: 'toolbar' } };
 
 	return (
 		<UIComponent

@@ -52,7 +52,7 @@ const verticalAlignmentMap = {
 	center: 'center',
 	bottom: 'flex-end',
 	stretch: 'stretch',
-	spaceBetween: 'space-between',
+	'space-between': 'space-between',
 };
 
 const flexWrapOptions = [ 'wrap', 'nowrap' ];
@@ -216,7 +216,7 @@ function FlexLayoutVerticalAlignmentControl( {
 				controls={
 					orientation === 'horizontal'
 						? [ 'top', 'center', 'bottom', 'stretch' ]
-						: [ 'top', 'center', 'bottom', 'spaceBetween' ]
+						: [ 'top', 'center', 'bottom', 'space-between' ]
 				}
 			/>
 		);
