@@ -14,10 +14,10 @@ import { isRTL } from '@wordpress/i18n';
  * Internal dependencies
  */
 import ToolbarContext from '../toolbar-context';
-import type { ToolbarContainerProps } from './types';
+import type { ToolbarProps } from './types';
 
 function UnforwardedToolbarContainer(
-	{ label, ...props }: ToolbarContainerProps,
+	{ label, ...props }: ToolbarProps,
 	ref: ForwardedRef< any >
 ) {
 	// https://reakit.io/docs/basic-concepts/#state-hooks
