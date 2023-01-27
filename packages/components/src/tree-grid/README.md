@@ -182,8 +182,8 @@ An optional value that designates whether a row is expanded or collapsed. Curren
 ```jsx
 <TreeGridCell>
 	{ ( props ) => (
-		<Button onClick={ onMoveDown } { ...props }>
-			Move Down
+		<Button onClick={ doSomething } { ...props }>
+			Do something
 		</Button>
 	) }
 </TreeGridCell>

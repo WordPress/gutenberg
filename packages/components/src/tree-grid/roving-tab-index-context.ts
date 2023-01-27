@@ -5,9 +5,9 @@ import { createContext, useContext } from '@wordpress/element';
 
 const RovingTabIndexContext = createContext<
 	| {
-			lastFocusedElement?: Element | null;
-			setLastFocusedElement?: React.Dispatch<
-				React.SetStateAction< Element | null >
+			lastFocusedElement: Element | undefined;
+			setLastFocusedElement: React.Dispatch<
+				React.SetStateAction< Element | undefined >
 			>;
 	  }
 	| undefined

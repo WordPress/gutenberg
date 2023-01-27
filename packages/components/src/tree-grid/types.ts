@@ -27,17 +27,48 @@ type RovingTabIndexItemPassThruProps = {
 	ref: React.ForwardedRef< any >;
 	tabIndex?: number;
 	onFocus: React.FocusEventHandler< any >;
-} & Record< string, any >;
+	[ key: string ]: any;
+};
 
 export type RovingTabIndexItemProps = {
 	/**
-	 * A component that will receive the props necessary to
-	 * make it roving tab index compliant. All props will be passed through
-	 * to this component.
+	 * A render function that receives the props necessary to make it participate in the
+	 * roving tabindex. Any extra props will also be passed through to this function.
+	 *
+	 * Props passed as an argument to the render prop must be passed to the child
+	 * focusable component/element within the cell. If a component is used, it must
+	 * correctly handle the `onFocus`, `tabIndex`, and `ref` props, passing these to the
+	 * element it renders. These props are used to handle the roving tabindex functionality
+	 * of the tree grid.
+	 *
+	 * ```jsx
+	 * <TreeGridCell>
+	 * 	{ ( props ) => (
+	 * 		<Button onClick={ doSomething } { ...props }>
+	 * 			Do something
+	 * 		</Button>
+	 * 	) }
+	 * </TreeGridCell>
+	 * ```
 	 */
 	children?: ( props: RovingTabIndexItemPassThruProps ) => JSX.Element;
 	/**
 	 * If `children` is not a function, this component will be used instead.
 	 */
 	as?: React.ComponentType< RovingTabIndexItemPassThruProps >;
-} & Record< string, any >;
+	[ key: string ]: any;
+};
+
+export type TreeGridCellProps =
+	| ( {
+			/**
+			 * Render `children` without wrapping it in a `TreeGridItem` component.
+			 *
+			 * @default false
+			 */
+			withoutGridItem?: false;
+	  } & NonNullable< Pick< RovingTabIndexItemProps, 'children' > > )
+	| {
+			children: React.ReactNode;
+			withoutGridItem: true;
+	  };
