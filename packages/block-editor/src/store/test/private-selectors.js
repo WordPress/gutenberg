@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { __experimentalIsBlockInterfaceHidden as isBlockInterfaceHidden } from '../private-selectors';
+import { isBlockInterfaceHidden } from '../private-selectors';
 
 describe( 'private selectors', () => {
 	describe( 'isBlockInterfaceHidden', () => {

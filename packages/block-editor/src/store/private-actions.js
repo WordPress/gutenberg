@@ -47,9 +47,9 @@ export function __experimentalUpdateSettings(
  *
  * @return {Object} Action object.
  */
-export function __experimentalHideBlockInterface() {
+export function hideBlockInterface() {
 	return {
-		type: '__experimental_HIDE_BLOCK_INTERFACE',
+		type: 'HIDE_BLOCK_INTERFACE',
 	};
 }
 
@@ -58,8 +58,8 @@ export function __experimentalHideBlockInterface() {
  *
  * @return {Object} Action object.
  */
-export function __experimentalShowBlockInterface() {
+export function showBlockInterface() {
 	return {
-		type: '__experimental_SHOW_BLOCK_INTERFACE',
+		type: 'SHOW_BLOCK_INTERFACE',
 	};
 }

@@ -1197,10 +1197,10 @@ export const blocks = pipe(
  */
 export function isBlockInterfaceHidden( state = false, action ) {
 	switch ( action.type ) {
-		case '__experimental_HIDE_BLOCK_INTERFACE':
+		case 'HIDE_BLOCK_INTERFACE':
 			return true;
 
-		case '__experimental_SHOW_BLOCK_INTERFACE':
+		case 'SHOW_BLOCK_INTERFACE':
 			return false;
 	}
 

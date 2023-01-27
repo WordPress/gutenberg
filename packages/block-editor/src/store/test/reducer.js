@@ -2410,7 +2410,7 @@ describe( 'state', () => {
 	describe( 'isBlockInterfaceHidden()', () => {
 		it( 'should set the hide block interface flag to true', () => {
 			const state = isBlockInterfaceHidden( false, {
-				type: '__experimental_HIDE_BLOCK_INTERFACE',
+				type: 'HIDE_BLOCK_INTERFACE',
 			} );
 
 			expect( state ).toBe( true );
@@ -2418,7 +2418,7 @@ describe( 'state', () => {
 
 		it( 'should set the hide block interface flag to false', () => {
 			const state = isBlockInterfaceHidden( false, {
-				type: '__experimental_SHOW_BLOCK_INTERFACE',
+				type: 'SHOW_BLOCK_INTERFACE',
 			} );
 
 			expect( state ).toBe( false );

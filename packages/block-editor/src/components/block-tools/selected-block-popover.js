@@ -29,7 +29,7 @@ function selector( select ) {
 		isMultiSelecting,
 		hasMultiSelection,
 		isTyping,
-		__experimentalIsBlockInterfaceHidden: isBlockInterfaceHidden,
+		isBlockInterfaceHidden,
 		getSettings,
 		getLastMultiSelectedBlockClientId,
 	} = unlock( select( blockEditorStore ) );

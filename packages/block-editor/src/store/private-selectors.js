@@ -5,6 +5,6 @@
  *
  * @return {boolean} Whether the block toolbar is hidden.
  */
-export function __experimentalIsBlockInterfaceHidden( state ) {
+export function isBlockInterfaceHidden( state ) {
 	return state.isBlockInterfaceHidden;
 }
