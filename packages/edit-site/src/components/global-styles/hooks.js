@@ -9,19 +9,24 @@ import a11yPlugin from 'colord/plugins/a11y';
  * WordPress dependencies
  */
 import { _x } from '@wordpress/i18n';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useContext, useCallback } from '@wordpress/element';
 import {
 	getBlockType,
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 } from '@wordpress/blocks';
 import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
+import { compareVariations } from './utils';
 import { unlock } from '../../experiments';
 
-const { useGlobalSetting } = unlock( blockEditorExperiments );
+const { useGlobalSetting, GlobalStylesContext } = unlock(
+	blockEditorExperiments
+);
 
 // Enable colord's a11y plugin.
 extend( [ a11yPlugin ] );
@@ -234,4 +239,82 @@ export function useColorRandomizer( name ) {
 	return window.__experimentalEnableColorRandomizer
 		? [ randomizeColors ]
 		: [];
+}
+
+export function useHasUserModifiedStyles() {
+	const { user } = useContext( GlobalStylesContext );
+	const hasModifiedStyles = useMemo( () => {
+		return (
+			Object.keys( user.settings ).length > 0 ||
+			Object.keys( user.styles ).length > 0
+		);
+	}, [ user ] );
+
+	return hasModifiedStyles;
+}
+
+export function useCreateNewStyleRecord( title ) {
+	const { saveEntityRecord } = useDispatch( coreStore );
+	const { user } = useContext( GlobalStylesContext );
+	const callback = useCallback( () => {
+		const recordData = {
+			...user,
+			title,
+		};
+		/* eslint-disable dot-notation */
+		delete recordData[ 'associated_style_id' ];
+		delete recordData[ 'id' ];
+		/* eslint-enable dot-notation */
+		return saveEntityRecord( 'root', 'globalStyles', recordData ).then(
+			( rawVariation ) => {
+				return {
+					...rawVariation,
+					title: rawVariation?.title?.rendered,
+				};
+			}
+		);
+	}, [ title, user ] );
+	return callback;
+}
+
+export function useCustomSavedStyles() {
+	const { globalStylesId } = useSelect( ( select ) => {
+		return {
+			globalStylesId:
+				select( coreStore ).__experimentalGetCurrentGlobalStylesId(),
+		};
+	}, [] );
+	const { records: variations } = useEntityRecords( 'root', 'globalStyles' );
+
+	const customVariations = useMemo( () => {
+		return (
+			variations
+				?.filter( ( variation ) => variation.id !== globalStylesId )
+				?.map( ( variation ) => {
+					let newVariation = variation;
+					if ( variation?.title?.rendered !== undefined ) {
+						newVariation = {
+							...variation,
+							title: variation.title.rendered,
+						};
+					}
+
+					return newVariation;
+				} ) || []
+		);
+	}, [ globalStylesId, variations ] );
+
+	return customVariations;
+}
+
+export function useUserChangesMatchAnyVariation( variations ) {
+	const { user } = useContext( GlobalStylesContext );
+	const matches = useMemo(
+		() =>
+			variations?.some( ( variation ) =>
+				compareVariations( user, variation )
+			),
+		[ user, variations ]
+	);
+	return matches;
 }

@@ -834,3 +834,40 @@ export function receiveAutosaves( postId, autosaves ) {
 		autosaves: Array.isArray( autosaves ) ? autosaves : [ autosaves ],
 	};
 }
+
+/**
+ * Discards changes in the specified record.
+ *
+ * @param {string} kind     Entity kind.
+ * @param {string} name     Entity name.
+ * @param {*} recordId Record ID.
+ *
+ */
+export const __experimentalDiscardRecordChanges =
+	( kind, name, recordId ) =>
+	( { dispatch, select } ) => {
+		const edits = select.getEntityRecordEdits( kind, name, recordId );
+
+		if ( ! edits ) {
+			return;
+		}
+
+		const clearedEdits = Object.keys( edits ).reduce( ( acc, key ) => {
+			return {
+				...acc,
+				[ key ]: undefined,
+			};
+		}, {} );
+
+		dispatch( {
+			type: 'EDIT_ENTITY_RECORD',
+			kind,
+			name,
+			recordId,
+			edits: clearedEdits,
+			transientEdits: clearedEdits,
+			meta: {
+				isUndo: false,
+			},
+		} );
+	};

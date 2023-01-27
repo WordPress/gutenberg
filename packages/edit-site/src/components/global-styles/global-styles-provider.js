@@ -6,7 +6,7 @@ import { mergeWith, isEmpty, mapValues } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useMemo, useCallback } from '@wordpress/element';
+import { useMemo, useCallback, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
@@ -18,6 +18,8 @@ import CanvasSpinner from '../canvas-spinner';
 import { unlock } from '../../experiments';
 
 const { GlobalStylesContext } = unlock( blockEditorExperiments );
+
+/* eslint-disable dot-notation, camelcase */
 
 function mergeTreesCustomizer( _, srcValue ) {
 	// We only pass as arrays the presets,
@@ -49,10 +51,15 @@ const cleanEmptyObject = ( object ) => {
 };
 
 function useGlobalStylesUserConfig() {
-	const { globalStylesId, isReady, settings, styles } = useSelect(
+	const { hasFinishedResolution } = useSelect( coreStore );
+	const { editEntityRecord, __experimentalDiscardRecordChanges } =
+		useDispatch( coreStore );
+
+	const [ isReady, setIsReady ] = useState( false );
+
+	const { globalStylesId, settings, styles, associated_style_id } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, hasFinishedResolution } =
-				select( coreStore );
+			const { getEditedEntityRecord } = select( coreStore );
 			const _globalStylesId =
 				select( coreStore ).__experimentalGetCurrentGlobalStylesId();
 			const record = _globalStylesId
@@ -62,40 +69,74 @@ function useGlobalStylesUserConfig() {
 						_globalStylesId
 				  )
 				: undefined;
+			const _associatedStyleId = record
+				? record[ 'associated_style_id' ]
+				: undefined;
+			if ( _associatedStyleId ) {
+				getEditedEntityRecord(
+					'root',
+					'globalStyles',
+					_associatedStyleId
+				);
+			}
 
 			let hasResolved = false;
 			if (
+				! isReady &&
 				hasFinishedResolution(
 					'__experimentalGetCurrentGlobalStylesId'
 				)
 			) {
-				hasResolved = _globalStylesId
-					? hasFinishedResolution( 'getEditedEntityRecord', [
+				hasResolved = ( () => {
+					if ( ! _globalStylesId ) {
+						return true;
+					}
+
+					const userStyleFinishedResolution = hasFinishedResolution(
+						'getEditedEntityRecord',
+						[ 'root', 'globalStyles', _globalStylesId ]
+					);
+
+					if ( ! _associatedStyleId ) {
+						return userStyleFinishedResolution;
+					}
+
+					const associatedStyleFinishedResolution =
+						hasFinishedResolution( 'getEditedEntityRecord', [
 							'root',
 							'globalStyles',
-							_globalStylesId,
-					  ] )
-					: true;
+							_associatedStyleId,
+						] );
+
+					return (
+						userStyleFinishedResolution &&
+						associatedStyleFinishedResolution
+					);
+				} )();
+
+				if ( hasResolved && ! isReady ) {
+					setIsReady( true );
+				}
 			}
 
 			return {
 				globalStylesId: _globalStylesId,
-				isReady: hasResolved,
 				settings: record?.settings,
 				styles: record?.styles,
+				associated_style_id: _associatedStyleId,
 			};
 		},
 		[]
 	);
 
 	const { getEditedEntityRecord } = useSelect( coreStore );
-	const { editEntityRecord } = useDispatch( coreStore );
 	const config = useMemo( () => {
 		return {
 			settings: settings ?? {},
 			styles: styles ?? {},
+			associated_style_id: associated_style_id ?? null,
 		};
-	}, [ settings, styles ] );
+	}, [ settings, styles, associated_style_id ] );
 
 	const setConfig = useCallback(
 		( callback, options = {} ) => {
@@ -107,18 +148,97 @@ function useGlobalStylesUserConfig() {
 			const currentConfig = {
 				styles: record?.styles ?? {},
 				settings: record?.settings ?? {},
+				associated_style_id: record?.associated_style_id ?? 0,
 			};
 			const updatedConfig = callback( currentConfig );
+			const updatedRecord = {
+				styles: cleanEmptyObject( updatedConfig.styles ) || {},
+				settings: cleanEmptyObject( updatedConfig.settings ) || {},
+				associated_style_id:
+					updatedConfig[ 'associated_style_id' ] || 0,
+			};
+
+			let associatedStyleIdChanged = false;
+
+			if (
+				currentConfig[ 'associated_style_id' ] !==
+				updatedRecord[ 'associated_style_id' ]
+			) {
+				associatedStyleIdChanged = true;
+				__experimentalDiscardRecordChanges(
+					'root',
+					'globalStyles',
+					currentConfig[ 'associated_style_id' ]
+				);
+			}
+
 			editEntityRecord(
 				'root',
 				'globalStyles',
 				globalStylesId,
-				{
-					styles: cleanEmptyObject( updatedConfig.styles ) || {},
-					settings: cleanEmptyObject( updatedConfig.settings ) || {},
-				},
+				updatedRecord,
 				options
 			);
+
+			// Also add changes that were made to the user record to the associated record.
+			if (
+				! associatedStyleIdChanged &&
+				updatedRecord[ 'associated_style_id' ]
+			) {
+				if (
+					( ! hasFinishedResolution( 'getEditedEntityRecord' ),
+					[
+						'root',
+						'globalStyles',
+						updatedRecord[ 'associated_style_id' ],
+					] )
+				) {
+					let numTries = 0;
+					const MAX_NUM_TRIES = 30;
+					const intervalId = setInterval( () => {
+						++numTries;
+
+						if ( numTries > MAX_NUM_TRIES ) {
+							clearInterval( intervalId );
+							throw new Error(
+								'Failed editing associated global style entity record.'
+							);
+						}
+
+						if (
+							( hasFinishedResolution( 'getEditedEntityRecord' ),
+							[
+								'root',
+								'globalStyles',
+								updatedRecord[ 'associated_style_id' ],
+							] )
+						) {
+							editEntityRecord(
+								'root',
+								'globalStyles',
+								updatedRecord[ 'associated_style_id' ],
+								{
+									settings: updatedRecord.settings,
+									styles: updatedRecord.styles,
+								},
+								options
+							);
+							clearInterval( intervalId );
+						}
+					}, 500 );
+				} else {
+					editEntityRecord(
+						'root',
+						'globalStyles',
+						updatedRecord[ 'associated_style_id' ],
+						{
+							settings: updatedRecord.settings,
+							styles: updatedRecord.styles,
+						},
+						options
+					);
+				}
+			}
 		},
 		[ globalStylesId ]
 	);
@@ -165,6 +285,8 @@ function useGlobalStylesContext() {
 
 	return context;
 }
+
+/* eslint-enable dot-notation, camelcase */
 
 export function GlobalStylesProvider( { children } ) {
 	const context = useGlobalStylesContext();

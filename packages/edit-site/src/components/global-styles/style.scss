@@ -91,6 +91,8 @@ $block-preview-height: 150px;
 
 .edit-site-global-styles-variations_item {
 	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
 
 	.edit-site-global-styles-variations_item-preview {
 		padding: $border-width * 2;
@@ -108,6 +110,16 @@ $block-preview-height: 150px;
 
 	&:focus .edit-site-global-styles-variations_item-preview {
 		border: var(--wp-admin-theme-color) var(--wp-admin-border-width-focus) solid;
+	}
+
+	.components-dropdown {
+		margin-left: auto;
+	}
+
+	.components-dropdown-menu__toggle {
+		> svg {
+			transform: rotate(90deg);
+		}
 	}
 }
 
@@ -154,5 +166,23 @@ $block-preview-height: 150px;
 
 	& > * {
 		margin: $grid-unit-30 $grid-unit-20;
+	}
+}
+
+.edit-site-global-styles__cs {
+	margin-bottom: 0.5em;
+
+	.components-heading {
+		margin: 0 !important;
+	}
+}
+
+.edit-site-global-styles__cs-content {
+	display: flex;
+	gap: 2em;
+	flex-direction: column;
+
+	.components-button {
+		margin-left: auto;
 	}
 }

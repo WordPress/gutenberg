@@ -4,8 +4,8 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
-	siteEditorStyleVariations: async ( { page }, use ) => {
-		await use( new SiteEditorStyleVariations( { page } ) );
+	siteEditorStyleVariations: async ( { page, requestUtils }, use ) => {
+		await use( new SiteEditorStyleVariations( { page, requestUtils } ) );
 	},
 } );
 
@@ -14,19 +14,34 @@ test.describe( 'Global styles variations', () => {
 		await requestUtils.activateTheme(
 			'gutenberg-test-themes/style-variations'
 		);
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-global-styles'
+		);
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
+		// Delete all user global styles
+		await requestUtils.rest( {
+			method: 'DELETE',
+			path: '/wp/v2/delete-all-global-styles',
+		} );
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.deleteAllTemplates( 'wp_template' ),
 			requestUtils.deleteAllTemplates( 'wp_template_part' ),
+			requestUtils.rest( {
+				method: 'DELETE',
+				path: '/wp/v2/delete-all-global-styles',
+			} ),
 		] );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-global-styles'
+		);
 	} );
 
 	test( 'should have three variations available with the first one being active', async ( {
@@ -209,6 +224,106 @@ test.describe( 'Global styles variations', () => {
 			'background-color',
 			'rgb(255, 239, 11)'
 		);
+	} );
+
+	test( 'can create custom style variations', async ( {
+		admin,
+		page,
+		siteEditorStyleVariations,
+		siteEditor,
+	} ) => {
+		await admin.visitSiteEditor( {
+			postId: 'gutenberg-test-themes/style-variations//index',
+			postType: 'wp_template',
+		} );
+		await siteEditor.enterEditMode();
+
+		// Assert no custom styles yet.
+		await siteEditorStyleVariations.browseStyles();
+		await page.getByText( 'No custom styles yet.' ).click();
+
+		// Change background color
+		await page
+			.getByRole( 'button', { name: 'Navigate to the previous view' } )
+			.click();
+		await page.getByRole( 'button', { name: 'Colors styles' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Colors background styles' } )
+			.click();
+		await page
+			.getByRole( 'button', { name: 'Color: Cyan bluish gray' } )
+			.click();
+
+		// Create new style
+		await page
+			.getByRole( 'button', { name: 'Navigate to the previous view' } )
+			.click();
+		await page
+			.getByRole( 'button', { name: 'Navigate to the previous view' } )
+			.click();
+		await page.getByRole( 'button', { name: 'Browse styles' } ).click();
+		await page
+			.locator(
+				'.components-card__body > .components-flex > .components-button'
+			)
+			.click();
+		await page.getByLabel( 'Style name' ).click();
+		await page.getByLabel( 'Style name' ).fill( 'My custom style' );
+		await page.getByRole( 'button', { name: 'Create' } ).click();
+
+		// Check that the new style exists
+		await page.getByRole( 'button', { name: 'My custom style' } ).click();
+	} );
+
+	test( 'can delete custom style variations', async ( {
+		admin,
+		page,
+		siteEditorStyleVariations,
+		siteEditor,
+	} ) => {
+		await admin.visitSiteEditor( {
+			postId: 'gutenberg-test-themes/style-variations//index',
+			postType: 'wp_template',
+		} );
+		await siteEditor.enterEditMode();
+		await siteEditorStyleVariations.disableWelcomeGuide();
+
+		// Change background color
+		await page.getByRole( 'button', { name: 'Styles' } ).click();
+		await page.getByRole( 'button', { name: 'Colors styles' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Colors background styles' } )
+			.click();
+		await page
+			.getByRole( 'button', { name: 'Color: Cyan bluish gray' } )
+			.click();
+
+		// Create new style
+		await page
+			.getByRole( 'button', { name: 'Navigate to the previous view' } )
+			.click();
+		await page
+			.getByRole( 'button', { name: 'Navigate to the previous view' } )
+			.click();
+		await page.getByRole( 'button', { name: 'Browse styles' } ).click();
+		await page
+			.locator(
+				'.components-card__body > .components-flex > .components-button'
+			)
+			.click();
+		await page.getByLabel( 'Style name' ).click();
+		await page.getByLabel( 'Style name' ).fill( 'My custom style' );
+		await page.getByRole( 'button', { name: 'Create' } ).click();
+
+		// Delete the style
+		await page
+			.getByRole( 'button', { name: 'My custom style' } )
+			.getByRole( 'button', { name: 'Options' } )
+			.click();
+		await page.getByRole( 'menuitem', { name: 'Delete style' } ).click();
+
+		// Check that there are no custom styles
+		await page.getByText( 'No custom styles yet.' ).click();
 	} );
 } );
 
