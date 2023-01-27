@@ -93,6 +93,9 @@ test.describe( 'Table', () => {
 		await page.click( 'role=button[name="Create Table"i]' );
 
 		// Expect the header and footer switches to be present now that the table has been created.
+		await page.click(
+			`role=region[name="Editor settings"i] >> role=tab[name="Settings"i]`
+		);
 		await expect( headerSwitch ).toBeVisible();
 		await expect( footerSwitch ).toBeVisible();
 
