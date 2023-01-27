@@ -11,19 +11,18 @@ import { expect } from '../test';
  * @param {Editor} this
  */
 export async function openDocumentSettingsSidebar( this: Editor ) {
-	const editorSettingsButton = this.page
+	const toggleButton = this.page
 		.getByRole( 'region', { name: 'Editor top bar' } )
 		.getByRole( 'button', {
 			name: 'Settings',
 			disabled: false,
 		} );
 
-	const isEditorSettingsOpened =
-		( await editorSettingsButton.getAttribute( 'aria-expanded' ) ) ===
-		'true';
+	const isClosed =
+		( await toggleButton.getAttribute( 'aria-expanded' ) ) === 'false';
 
-	if ( ! isEditorSettingsOpened ) {
-		await editorSettingsButton.click();
+	if ( isClosed ) {
+		await toggleButton.click();
 
 		await expect(
 			this.page
