@@ -7,6 +7,7 @@ import {
 	justifyCenter,
 	justifyRight,
 	justifySpaceBetween,
+	justifyStretch,
 	arrowRight,
 	arrowDown,
 } from '@wordpress/icons';
@@ -316,7 +317,7 @@ function FlexLayoutJustifyContentControl( {
 		// Todo: we also need an icon here.
 		justificationOptions.push( {
 			value: 'stretch',
-			icon: justifySpaceBetween,
+			icon: justifyStretch,
 			label: __( 'Stretch items' ),
 		} );
 	}
