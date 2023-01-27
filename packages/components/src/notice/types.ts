@@ -71,6 +71,8 @@ export type NoticeProps = {
 	 * technologies may override it based on internal heuristics.
 	 *
 	 * @see https://www.w3.org/TR/wai-aria-1.1/#aria-live
+	 *
+	 * @default 'assertive' for 'error' status, 'polite' for all other statuses
 	 */
 	politeness?: 'polite' | 'assertive';
 	/**
