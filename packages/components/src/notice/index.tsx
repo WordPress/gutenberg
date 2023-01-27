@@ -17,6 +17,7 @@ import { close } from '@wordpress/icons';
 import Button from '../button';
 import type { NoticeAction, NoticeProps } from './types';
 import type { SyntheticEvent } from 'react';
+import type { DeprecatedButtonProps } from '../button/types';
 
 const noop = () => {};
 
@@ -113,12 +114,11 @@ function Notice( {
 								noDefaultClasses = false,
 								onClick,
 								url,
-							}: NoticeAction & {
+							}: NoticeAction &
 								// `isPrimary` is a legacy prop included for
 								// backcompat, but `variant` should be used
 								// instead.
-								isPrimary?: boolean;
-							},
+								Pick< DeprecatedButtonProps, 'isPrimary' >,
 							index
 						) => {
 							let computedVariant = variant;
