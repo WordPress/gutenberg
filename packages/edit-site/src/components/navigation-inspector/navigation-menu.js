@@ -11,7 +11,7 @@ import { useDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../../experiments';
+import { unlock } from '../../experiments';
 
 const ALLOWED_BLOCKS = {
 	'core/navigation': [
