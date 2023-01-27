@@ -4,6 +4,19 @@
 	align-items: center;
 	border: none;
 
+	.edit-post-header-toolbar__toolbar-items {
+		position: relative;
+		height: 32px; // Match inserter button height below.
+	}
+
+	.edit-post-header-toolbar__inserter-open-items,
+	.edit-post-header-toolbar__inserter-closed-items {
+		position: absolute;
+		display: flex;
+		top: 0;
+		left: 0;
+	}
+
 	// Hide all action buttons except the inserter on mobile.
 	.edit-post-header-toolbar__left > .components-button {
 		display: none;
@@ -39,8 +52,8 @@
 
 	// The Toolbar component adds different styles to buttons, so we reset them
 	// here to the original button styles
-	.edit-post-header-toolbar__left > .components-button.has-icon,
-	.edit-post-header-toolbar__left > .components-dropdown > .components-button.has-icon {
+	.edit-post-header-toolbar__left .components-button.has-icon,
+	.edit-post-header-toolbar__left .components-dropdown > .components-button.has-icon {
 		height: $button-size;
 		min-width: $button-size;
 		padding: 6px;
@@ -67,6 +80,10 @@
 		outline: none;
 		box-shadow: none;
 		margin-right: $grid-unit-10;
+		min-width: 32px;
+		width: 32px;
+		height: 32px;
+		padding: 0;
 
 		&:hover,
 		&:active,
@@ -122,10 +139,9 @@
 	}
 }
 
-.edit-post-header-toolbar .edit-post-header-toolbar__left > .edit-post-header-toolbar__inserter-toggle.has-icon,
-.edit-post-header-toolbar .edit-post-header-toolbar__left > .components-button.edit-post-header-toolbar__insert-block {
+.edit-post-header-toolbar .edit-post-header-toolbar__left > .edit-post-header-toolbar__inserter-toggle.has-icon {
 	margin-right: $grid-unit-10;
-	// Special dimensions for inserter toggle and block insert buttons.
+	// Special dimensions for inserter toggle
 	min-width: 32px;
 	width: 32px;
 	height: 32px;
