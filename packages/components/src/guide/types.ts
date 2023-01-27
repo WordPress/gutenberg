@@ -16,9 +16,9 @@ export type Page = {
 export type GuideProps = {
 	children?: ReactNode;
 	className?: string;
-	contentLabel?: ModalProps[ 'contentLabel' ];
+	contentLabel: ModalProps[ 'contentLabel' ];
 	finishButtonText?: string;
-	onFinish?: ModalProps[ 'onRequestClose' ];
+	onFinish: ModalProps[ 'onRequestClose' ];
 	pages?: Page[];
 };
 

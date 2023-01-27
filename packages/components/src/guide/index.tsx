@@ -24,7 +24,7 @@ export default function Guide( {
 	className,
 	contentLabel,
 	finishButtonText,
-	onFinish = () => {},
+	onFinish,
 	pages = [],
 }: GuideProps ) {
 	const guideContainer = useRef< HTMLDivElement >( null );
