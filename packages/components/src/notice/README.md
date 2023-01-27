@@ -132,6 +132,7 @@ Note that this value should be considered a suggestion; assistive technologies m
 - Default: `'assertive'` or `'polite'`, based on the notice status.
 
 #### `isDismissible`: `boolean`
+
 Whether the notice should be dismissible or not
 
 - Required: No
