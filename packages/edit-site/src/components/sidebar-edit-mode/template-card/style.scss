@@ -57,6 +57,10 @@
 			min-width: auto;
 		}
 	}
+
+	& .block-editor-block-patterns-list__item .block-editor-block-preview__container {
+		border: 1px solid $gray-300;
+	}
 }
 
 h3.edit-site-template-card__template-areas-title {
