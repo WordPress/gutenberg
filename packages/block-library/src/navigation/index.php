@@ -619,6 +619,10 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 			$parsed_blocks = parse_blocks( $navigation_post->post_content );
 
+			if ( block_core_navigation_block_contains_core_navigation( $parsed_blocks ) ) {
+				return '';
+			}
+
 			// 'parse_blocks' includes a null block with '\n\n' as the content when
 			// it encounters whitespace. This code strips it.
 			$compacted_blocks = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
@@ -641,11 +645,6 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		}
 
 		$inner_blocks = new WP_Block_List( $fallback_blocks, $attributes );
-	}
-
-	$parsed_blocks = parse_blocks( $navigation_post->post_content );
-	if ( block_core_navigation_block_contains_core_navigation( $parsed_blocks ) ) {
-		return '';
 	}
 
 	/**
