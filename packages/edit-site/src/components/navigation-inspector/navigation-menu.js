@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import {
-	__experimentalListView as ListView,
 	experiments as blockEditorExperiments,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
