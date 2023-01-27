@@ -27,7 +27,3 @@ export type PageControlProps = {
 	numberOfPages: number;
 	setCurrentPage: ( page: number ) => void;
 };
-
-export type PageControlIconProps = {
-	isSelected: boolean;
-};

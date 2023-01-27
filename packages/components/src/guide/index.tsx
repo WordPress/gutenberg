@@ -27,7 +27,7 @@ export default function Guide( {
 	onFinish = () => {},
 	pages = [],
 }: GuideProps ) {
-	const guideContainer = useRef();
+	const guideContainer = useRef< HTMLDivElement >( null );
 	const [ currentPage, setCurrentPage ] = useState( 0 );
 
 	useEffect( () => {
@@ -43,8 +43,9 @@ export default function Guide( {
 		// Each time we change the current page, start from the first element of the page.
 		// This also solves any focus loss that can happen.
 		if ( guideContainer.current ) {
-			// @ts-expect-error
-			focus.tabbable.find( guideContainer.current )?.[ 0 ]?.focus();
+			(
+				focus.tabbable.find( guideContainer.current ) as HTMLElement[]
+			 )[ 0 ]?.focus();
 		}
 	}, [ currentPage ] );
 
@@ -90,7 +91,6 @@ export default function Guide( {
 					event.preventDefault();
 				}
 			} }
-			// @ts-expect-error
 			ref={ guideContainer }
 		>
 			<div className="components-guide__container">
