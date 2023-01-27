@@ -377,6 +377,21 @@
 									}
 								}
 							]
+						},
+						"blockGap": {
+							"default": false,
+							"oneOf": [
+								{
+									"type": "boolean"
+								},
+								{
+									"type": "array",
+									"items": {
+										"type": "string",
+										"enum": [ "vertical", "horizontal" ]
+									}
+								}
+							]
 						}
 					}
 				},
