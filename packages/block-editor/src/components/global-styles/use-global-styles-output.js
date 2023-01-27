@@ -366,6 +366,7 @@ export function getLayoutStyles( {
 			spacing: { margin: style.spacing.margin },
 		} );
 		if ( marginRules ) {
+			// Add layout aware margin rules for each supported layout type.
 			Object.values( tree.settings.layout.definitions ).forEach(
 				( { className, marginSelector } ) => {
 					if ( marginSelector ) {
@@ -373,6 +374,8 @@ export function getLayoutStyles( {
 					}
 				}
 			);
+			// Add layout aware margin rule for children of the root site blocks class.
+			ruleset += `.wp-site-blocks > ${ selector } { ${ marginRules } }`;
 		}
 	}
 

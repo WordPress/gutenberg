@@ -1269,6 +1269,7 @@ class WP_Theme_JSON_Gutenberg {
 				);
 
 				if ( ! empty( $margin_styles['css'] ) ) {
+					// Add layout aware margin rules for each supported layout type.
 					foreach ( $layout_definitions as $layout_definition_key => $layout_definition ) {
 						$class_name = sanitize_title( _wp_array_get( $layout_definition, array( 'className' ), '' ) );
 						if (
@@ -1284,6 +1285,12 @@ class WP_Theme_JSON_Gutenberg {
 							);
 						}
 					}
+					// Add layout aware margin rule for children of the root site blocks class.
+					$block_rules .= sprintf(
+						'.wp-site-blocks > %s {%s}',
+						$selector,
+						$margin_styles['css']
+					);
 				}
 			}
 
