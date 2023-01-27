@@ -9,21 +9,54 @@ import type { ReactNode } from 'react';
 import type { ModalProps } from '../modal/types';
 
 export type Page = {
+	/**
+	 * Content of the page.
+	 */
 	content: ReactNode;
+	/**
+	 * Image displayed above the page content.
+	 */
 	image?: ReactNode;
 };
 
 export type GuideProps = {
+	/**
+	 * @deprecated since 5.5 – use `pages` prop instead
+	 */
 	children?: ReactNode;
+	/**
+	 * A custom class to add to the modal.
+	 */
 	className?: string;
+	/**
+	 * Used as the modal's accessibility label.
+	 */
 	contentLabel: ModalProps[ 'contentLabel' ];
+	/**
+	 * Use this to customize the label of the _Finish_ button shown at the end of the guide.
+	 */
 	finishButtonText?: string;
+	/**
+	 * A function which is called when the guide is finished.
+	 */
 	onFinish: ModalProps[ 'onRequestClose' ];
+	/**
+	 * An array of objects describing each page in the guide.
+	 */
 	pages?: Page[];
 };
 
 export type PageControlProps = {
+	/**
+	 * Current page index.
+	 */
 	currentPage: number;
+	/**
+	 * Total number of pages.
+	 */
 	numberOfPages: number;
+	/**
+	 * Called when user clicks on a `PageControlIcon` button.
+	 */
 	setCurrentPage: ( page: number ) => void;
 };
