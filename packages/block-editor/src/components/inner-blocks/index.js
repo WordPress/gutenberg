@@ -29,7 +29,7 @@ import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { store as blockEditorStore } from '../../store';
 import useBlockDropZone from '../use-block-drop-zone';
-
+import useSetting from '../use-setting';
 /**
  * InnerBlocks is a component which allows a single block to have multiple blocks
  * as children. The UncontrolledInnerBlocks component is used whenever the inner
@@ -53,7 +53,7 @@ function UncontrolledInnerBlocks( props ) {
 		renderAppender,
 		orientation,
 		placeholder,
-		__experimentalLayout,
+		layout,
 	} = props;
 
 	useNestedSettingsUpdate(
@@ -64,7 +64,7 @@ function UncontrolledInnerBlocks( props ) {
 		templateLock,
 		captureToolbars,
 		orientation,
-		__experimentalLayout
+		layout
 	);
 
 	useInnerBlockTemplateSync(
@@ -82,17 +82,25 @@ function UncontrolledInnerBlocks( props ) {
 		[ clientId ]
 	);
 
-	const { allowSizingOnChildren = false } =
+	const defaultLayoutBlockSupport =
 		getBlockSupport( name, '__experimentalLayout' ) || {};
 
-	const layout = useMemo(
+	const { allowSizingOnChildren = false } = defaultLayoutBlockSupport;
+
+	const defaultLayout = useSetting( 'layout' ) || {};
+
+	const usedLayout = layout || defaultLayoutBlockSupport;
+
+	const memoedLayout = useMemo(
 		() => ( {
-			...__experimentalLayout,
+			// Default layout will know about any content/wide size defined by the theme.
+			...defaultLayout,
+			...usedLayout,
 			...( allowSizingOnChildren && {
 				allowSizingOnChildren: true,
 			} ),
 		} ),
-		[ __experimentalLayout, allowSizingOnChildren ]
+		[ defaultLayout, usedLayout, allowSizingOnChildren ]
 	);
 
 	// This component needs to always be synchronous as it's the one changing
@@ -103,7 +111,7 @@ function UncontrolledInnerBlocks( props ) {
 				rootClientId={ clientId }
 				renderAppender={ renderAppender }
 				__experimentalAppenderTagName={ __experimentalAppenderTagName }
-				__experimentalLayout={ layout }
+				__experimentalLayout={ memoedLayout }
 				wrapperRef={ wrapperRef }
 				placeholder={ placeholder }
 			/>
@@ -152,8 +160,11 @@ const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
 export function useInnerBlocksProps( props = {}, options = {} ) {
 	const { __unstableDisableLayoutClassNames, __unstableDisableDropZone } =
 		options;
-	const { clientId, __unstableLayoutClassNames: layoutClassNames = '' } =
-		useBlockEditContext();
+	const {
+		clientId,
+		layout = null,
+		__unstableLayoutClassNames: layoutClassNames = '',
+	} = useBlockEditContext();
 	const isSmallScreen = useViewportMatch( 'medium', '<' );
 	const { __experimentalCaptureToolbars, hasOverlay } = useSelect(
 		( select ) => {
@@ -199,6 +210,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 
 	const innerBlocksProps = {
 		__experimentalCaptureToolbars,
+		layout,
 		...options,
 	};
 	const InnerBlocks =

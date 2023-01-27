@@ -117,7 +117,6 @@ function GroupEdit( {
 			renderAppender: hasInnerBlocks
 				? undefined
 				: InnerBlocks.ButtonBlockAppender,
-			__experimentalLayout: layoutSupportEnabled ? usedLayout : undefined,
 			__unstableDisableLayoutClassNames: ! layoutSupportEnabled,
 		}
 	);

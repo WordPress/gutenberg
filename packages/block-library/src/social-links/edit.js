@@ -6,7 +6,6 @@ import classNames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { getBlockSupport } from '@wordpress/blocks';
 import { useEffect, useRef } from '@wordpress/element';
 import {
 	BlockControls,
@@ -37,18 +36,9 @@ const sizeOptions = [
 	{ name: __( 'Huge' ), value: 'has-huge-icon-size' },
 ];
 
-const getDefaultBlockLayout = ( blockTypeOrName ) => {
-	const layoutBlockSupportConfig = getBlockSupport(
-		blockTypeOrName,
-		'__experimentalLayout'
-	);
-	return layoutBlockSupportConfig?.default;
-};
-
 export function SocialLinksEdit( props ) {
 	const {
 		clientId,
-		name,
 		attributes,
 		iconBackgroundColor,
 		iconColor,
@@ -65,9 +55,7 @@ export function SocialLinksEdit( props ) {
 		openInNewTab,
 		showLabels,
 		size,
-		layout,
 	} = attributes;
-	const usedLayout = layout || getDefaultBlockLayout( name );
 
 	const logosOnly = attributes.className?.includes( 'is-style-logos-only' );
 
@@ -122,7 +110,6 @@ export function SocialLinksEdit( props ) {
 		placeholder: isSelected ? SelectedSocialPlaceholder : SocialPlaceholder,
 		templateLock: false,
 		__experimentalAppenderTagName: 'li',
-		__experimentalLayout: usedLayout,
 	} );
 
 	const POPOVER_PROPS = {
