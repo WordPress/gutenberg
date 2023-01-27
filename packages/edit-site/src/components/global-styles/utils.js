@@ -8,5 +8,5 @@ export function getVariationClassName( variation ) {
 	if ( ! variation ) {
 		return '';
 	}
-	return `is-style-variations-${ variation }`;
+	return `is-style-${ variation }`;
 }
