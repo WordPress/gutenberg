@@ -148,6 +148,7 @@ A deprecated alternative to `onRemove`. This prop is kept for compatibilty reaso
 #### `actions`: `Array<NoticeAction>`.
 
 An array of notice actions. Each member object should contain:
+
 - `label`: `string` containing the text of the button/link
 - `url`: `string` OR `onClick`: `( event: SyntheticEvent ) => void` to specify what the action does.
 - `className`: `string` (optional) to add custom classes to the button styles.
