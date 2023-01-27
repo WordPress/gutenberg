@@ -48,6 +48,10 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/compat/wordpress-6.2/block-patterns.php';
 	require_once __DIR__ . '/compat/wordpress-6.2/class-gutenberg-rest-global-styles-controller-6-2.php';
 
+	// WordPress 6.3 compat.
+	require_once __DIR__ . '/compat/wordpress-6.3/class-gutenberg-rest-pattern-directory-controller-6-3.php';
+	require_once __DIR__ . '/compat/wordpress-6.3/rest-api.php';
+
 	// Experimental.
 	if ( ! class_exists( 'WP_Rest_Customizer_Nonces' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-customizer-nonces.php';
@@ -82,6 +86,7 @@ require __DIR__ . '/compat/wordpress-6.2/get-global-styles-and-settings.php';
 require __DIR__ . '/compat/wordpress-6.2/default-filters.php';
 require __DIR__ . '/compat/wordpress-6.2/edit-form-blocks.php';
 require __DIR__ . '/compat/wordpress-6.2/site-editor.php';
+require __DIR__ . '/compat/wordpress-6.2/block-editor.php';
 require __DIR__ . '/compat/wordpress-6.2/block-editor-settings.php';
 require __DIR__ . '/compat/wordpress-6.2/theme.php';
 require __DIR__ . '/compat/wordpress-6.2/widgets.php';
@@ -94,7 +99,6 @@ if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
 }
 require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
-require __DIR__ . '/experimental/navigation-page.php';
 require __DIR__ . '/experimental/kses.php';
 
 // Fonts API.

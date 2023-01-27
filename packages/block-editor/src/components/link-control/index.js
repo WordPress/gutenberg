@@ -6,13 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	ButtonGroup,
-	Spinner,
-	Notice,
-	TextControl,
-} from '@wordpress/components';
+import { Button, Spinner, Notice, TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
@@ -280,6 +274,7 @@ function LinkControl( {
 	// See https://github.com/WordPress/gutenberg/pull/33849/#issuecomment-932194927.
 	const showTextControl = hasLinkValue && hasTextControl;
 
+	const isEditing = ( isEditingLink || ! value ) && ! isCreatingPage;
 	return (
 		<div
 			tabIndex={ -1 }
@@ -292,7 +287,7 @@ function LinkControl( {
 				</div>
 			) }
 
-			{ ( isEditingLink || ! value ) && ! isCreatingPage && (
+			{ isEditing && (
 				<>
 					<div
 						className={ classnames( {
@@ -341,19 +336,6 @@ function LinkControl( {
 							{ errorMessage }
 						</Notice>
 					) }
-					<ButtonGroup className="block-editor-link-control__search-actions">
-						<Button
-							variant="primary"
-							onClick={ handleSubmit }
-							className="xblock-editor-link-control__search-submit"
-							disabled={ currentInputIsEmpty } // Disallow submitting empty values.
-						>
-							{ __( 'Apply' ) }
-						</Button>
-						<Button variant="secondary" onClick={ handleCancel }>
-							{ __( 'Cancel' ) }
-						</Button>
-					</ButtonGroup>
 				</>
 			) }
 
@@ -368,15 +350,34 @@ function LinkControl( {
 				/>
 			) }
 
-			{ showSettingsDrawer && (
-				<div className="block-editor-link-control__tools">
-					<LinkControlSettingsDrawer
-						value={ value }
-						settings={ settings }
-						onChange={ onChange }
-					/>
-				</div>
-			) }
+			<div className="block-editor-link-control__drawer">
+				{ showSettingsDrawer && (
+					<div className="block-editor-link-control__tools">
+						<LinkControlSettingsDrawer
+							value={ value }
+							settings={ settings }
+							onChange={ onChange }
+						/>
+					</div>
+				) }
+
+				{ isEditing && (
+					<div className="block-editor-link-control__search-actions">
+						<Button
+							variant="primary"
+							onClick={ handleSubmit }
+							className="xblock-editor-link-control__search-submit"
+							disabled={ currentInputIsEmpty } // Disallow submitting empty values.
+						>
+							{ __( 'Apply' ) }
+						</Button>
+						<Button variant="tertiary" onClick={ handleCancel }>
+							{ __( 'Cancel' ) }
+						</Button>
+					</div>
+				) }
+			</div>
+
 			{ renderControlBottom && renderControlBottom() }
 		</div>
 	);

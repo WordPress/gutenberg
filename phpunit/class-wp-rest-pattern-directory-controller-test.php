@@ -53,7 +53,7 @@ class WP_REST_Pattern_Directory_Controller_Test extends WP_Test_REST_Controller_
 
 		self::$http_request_urls = array();
 
-		static::$controller = new Gutenberg_REST_Pattern_Directory_Controller_6_2();
+		static::$controller = new Gutenberg_REST_Pattern_Directory_Controller_6_3();
 	}
 
 	public static function wpTearDownAfterClass() {
