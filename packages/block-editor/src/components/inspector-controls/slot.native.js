@@ -19,6 +19,7 @@ export default function InspectorControlsSlot( {
 			'`__experimentalGroup` property in `InspectorControlsSlot`',
 			{
 				since: '6.2',
+				version: '6.4',
 				alternative: '`group`',
 			}
 		);

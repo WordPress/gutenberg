@@ -29,6 +29,7 @@ export default function InspectorControlsFill( {
 			'`__experimentalGroup` property in `InspectorControlsFill`',
 			{
 				since: '6.2',
+				version: '6.4',
 				alternative: '`group`',
 			}
 		);
