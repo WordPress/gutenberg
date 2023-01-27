@@ -16,7 +16,288 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 	 * @return void
 	 */
 	public function register_routes() {
-		parent::register_routes();
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base,
+			array(
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'create_item' ),
+					'permission_callback' => array( $this, 'create_item_permissions_check' ),
+					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::CREATABLE ),
+				),
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_items' ),
+					'permission_callback' => array( $this, 'get_items_permissions_check' ),
+				),
+				'schema' => array( $this, 'get_public_item_schema' ),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/themes/(?P<stylesheet>[\/\s%\w\.\(\)\[\]\@_\-]+)/variations',
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_theme_items' ),
+					'permission_callback' => array( $this, 'get_theme_items_permissions_check' ),
+					'args'                => array(
+						'stylesheet' => array(
+							'description' => __( 'The theme identifier', 'gutenberg' ),
+							'type'        => 'string',
+						),
+					),
+				),
+			)
+		);
+
+		// List themes global styles.
+		register_rest_route(
+			$this->namespace,
+			// The route.
+			sprintf(
+				'/%s/themes/(?P<stylesheet>%s)',
+				$this->rest_base,
+				// Matches theme's directory: `/themes/<subdirectory>/<theme>/` or `/themes/<theme>/`.
+				// Excludes invalid directory name characters: `/:<>*?"|`.
+				'[^\/:<>\*\?"\|]+(?:\/[^\/:<>\*\?"\|]+)?'
+			),
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_theme_item' ),
+					'permission_callback' => array( $this, 'get_theme_item_permissions_check' ),
+					'args'                => array(
+						'stylesheet' => array(
+							'description'       => __( 'The theme identifier', 'gutenberg' ),
+							'type'              => 'string',
+							'sanitize_callback' => array( $this, '_sanitize_global_styles_callback' ),
+						),
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<id>[\/\w-]+)',
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_item' ),
+					'permission_callback' => array( $this, 'get_item_permissions_check' ),
+					'args'                => array(
+						'id' => array(
+							'description'       => __( 'The id of a template', 'gutenberg' ),
+							'type'              => 'string',
+							'sanitize_callback' => array( $this, '_sanitize_global_styles_callback' ),
+						),
+					),
+				),
+				array(
+					'methods'             => WP_REST_Server::DELETABLE,
+					'callback'            => array( $this, 'delete_item' ),
+					'permission_callback' => array( $this, 'delete_item_permissions_check' ),
+					'args'                => array(
+						'id' => array(
+							'description'       => __( 'The id of a template', 'gutenberg' ),
+							'type'              => 'string',
+							'sanitize_callback' => array( $this, '_sanitize_global_styles_callback' ),
+						),
+					),
+				),
+				array(
+					'methods'             => WP_REST_Server::EDITABLE,
+					'callback'            => array( $this, 'update_item' ),
+					'permission_callback' => array( $this, 'update_item_permissions_check' ),
+					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE ),
+				),
+				'schema' => array( $this, 'get_public_item_schema' ),
+			)
+		);
+
+	}
+
+	/**
+	 * Checks if a given request has access to read all theme global styles configs.
+	 *
+	 * @since 6.0.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has read access for the item, WP_Error object otherwise.
+	 */
+	public function get_items_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		// Verify if the current user has edit_theme_options capability.
+		// This capability is required to edit/view/delete templates.
+		if ( ! current_user_can( 'edit_theme_options' ) ) {
+			return new WP_Error(
+				'rest_cannot_manage_global_styles',
+				__( 'Sorry, you are not allowed to access the global styles on this site.', 'gutenberg' ),
+				array(
+					'status' => rest_authorization_required_code(),
+				)
+			);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Gets all user global styles.
+	 *
+	 * @since 6.2
+	 *
+	 * @param WP_REST_Request $request The request instance.
+	 *
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function get_items( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		$variations = WP_Theme_JSON_Resolver_Gutenberg::get_user_style_variations();
+		$response   = rest_ensure_response( $variations );
+		return $response;
+	}
+
+	/**
+	 * Checks if a given request has access to delete a single global style.
+	 *
+	 * @since 6.2
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
+	 */
+	public function delete_item_permissions_check( $request ) {
+		$post = $this->get_post( $request['id'] );
+		if ( is_wp_error( $post ) ) {
+			return $post;
+		}
+
+		if ( $post && $this->check_delete_permission( $post ) ) {
+			return new WP_Error(
+				'rest_forbidden_context',
+				__( 'Sorry, you are not allowed to delete this global style.', 'gutenberg' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Deletes the given global styles config.
+	 *
+	 * @since 6.2
+	 *
+	 * @param WP_REST_Request $request The request instance.
+	 *
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function delete_item( $request ) {
+		$post = $this->get_post( $request['id'] );
+		if ( is_wp_error( $post ) ) {
+			return $post;
+		}
+
+		$previous = $this->prepare_item_for_response( $post, $request );
+		$result   = wp_delete_post( $post->ID, true );
+		$response = new WP_REST_Response();
+		$response->set_data(
+			array(
+				'deleted'  => true,
+				'previous' => $previous->get_data(),
+			)
+		);
+
+		$association_result = true;
+
+		// Delete association if we're deleting an associated style.
+		if ( WP_Theme_JSON_Resolver_Gutenberg::get_associated_user_variation_id() === $post->ID ) {
+			$association_result = WP_Theme_JSON_Resolver_Gutenberg::associate_user_variation_with_global_styles_post( null );
+		}
+
+		if ( ! $result || ! $association_result ) {
+			return new WP_Error(
+				'rest_cannot_delete',
+				__( 'The global style cannot be deleted.', 'gutenberg' ),
+				array( 'status' => 500 )
+			);
+		}
+
+		return $response;
+	}
+
+	/**
+	 * Checks if a given request has access to write a single global styles config.
+	 *
+	 * @since 6.2
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has write access for the item, WP_Error object otherwise.
+	 */
+	public function create_item_permissions_check( $request ) {
+		if ( ! empty( $request['id'] ) ) {
+			return new WP_Error(
+				'rest_post_exists',
+				__( 'Cannot create existing style variation.', 'gutenberg' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		$post_type = get_post_type_object( $this->post_type );
+
+		if ( ! current_user_can( $post_type->cap->create_posts ) ) {
+			return new WP_Error(
+				'rest_cannot_create',
+				__( 'Sorry, you are not allowed to create global style variations as this user.', 'gutenberg' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Adds a single global style config.
+	 *
+	 * @since 6.2
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
+	public function create_item( $request ) {
+		$changes = $this->prepare_item_for_database( $request );
+
+		if ( is_wp_error( $changes ) ) {
+			return $changes;
+		}
+
+		$stylesheet = get_stylesheet();
+
+		$post_id = WP_Theme_JSON_Resolver_Gutenberg::add_user_global_styles_variation(
+			array(
+				'title'         => sanitize_text_field( $request['title'] ),
+				'global_styles' => $changes->post_content,
+				'stylesheet'    => $stylesheet,
+			)
+		);
+
+		if ( is_wp_error( $post_id ) ) {
+
+			if ( 'db_insert_error' === $post_id->get_error_code() ) {
+				$post_id->add_data( array( 'status' => 500 ) );
+			} else {
+				$post_id->add_data( array( 'status' => 400 ) );
+			}
+
+			return $post_id;
+		}
+
+		$post = get_post( $post_id );
+
+		$response = $this->prepare_item_for_response( $post, $request );
+
+		return rest_ensure_response( $response );
 	}
 
 	/**
@@ -65,6 +346,16 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 
 		if ( rest_is_field_included( 'styles', $fields ) ) {
 			$data['styles'] = ! empty( $config['styles'] ) && $is_global_styles_user_theme_json ? $config['styles'] : new stdClass();
+		}
+
+		if ( rest_is_field_included( 'associated_style_id', $fields ) ) {
+			$associated_style_id = get_post_meta( $post->ID, 'associated_user_variation', true );
+
+			if ( ! empty( $associated_style_id ) ) {
+				$data['associated_style_id'] = (int) $associated_style_id;
+			} else {
+				$data['associated_style_id'] = null;
+			}
 		}
 
 		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
@@ -132,6 +423,24 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 			return $changes;
 		}
 
+		if ( isset( $request['associated_style_id'] ) ) {
+			if ( ( (int) $request['id'] ) !== WP_Theme_JSON_Resolver_Gutenberg::get_user_global_styles_post_id() ) {
+				return new WP_Error(
+					'rest_cannot_edit',
+					__( 'Sorry, you are not allowed to add an associated style id to this global style.', 'gutenberg' ),
+					array( 'status' => 400 )
+				);
+			}
+
+			if ( is_numeric( $request['associated_style_id'] ) && $request['associated_style_id'] <= 0 ) {
+				$id = null;
+			} else {
+				$id = $request['associated_style_id'];
+			}
+
+			WP_Theme_JSON_Resolver_Gutenberg::associate_user_variation_with_global_styles_post( $id );
+		}
+
 		$result = wp_update_post( wp_slash( (array) $changes ), true, false );
 		if ( is_wp_error( $result ) ) {
 			return $result;
@@ -159,10 +468,16 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 	 * @return stdClass Changes to pass to wp_update_post.
 	 */
 	protected function prepare_item_for_database( $request ) {
-		$changes         = new stdClass();
-		$changes->ID     = $request['id'];
-		$post            = get_post( $request['id'] );
+		$changes = new stdClass();
+		if ( ! empty( $request['id'] ) ) {
+			$changes->ID = $request['id'];
+			$post        = get_post( $request['id'] );
+		} else {
+			$post = null;
+		}
+
 		$existing_config = array();
+
 		if ( $post ) {
 			$existing_config     = json_decode( $post->post_content, true );
 			$json_decoding_error = json_last_error();
@@ -201,6 +516,7 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 				$changes->post_title = $request['title']['raw'];
 			}
 		}
+
 		return $changes;
 	}
 
@@ -274,6 +590,109 @@ class Gutenberg_REST_Global_Styles_Controller_6_2 extends WP_REST_Global_Styles_
 		}
 
 		return $response;
+	}
+
+	/**
+	 * Checks if a global style can be deleted.
+	 *
+	 * @since 6.2
+	 *
+	 * @param WP_Post $post Post object.
+	 * @return bool Whether the post can be deleted.
+	 */
+	protected function check_delete_permission( $post ) {
+		$post_type = get_post_type_object( $post->post_type );
+
+		if ( ! $this->check_is_post_type_allowed( $post_type ) ) {
+			return false;
+		}
+
+		return current_user_can( 'delete_post', $post->ID );
+	}
+
+	/**
+	 * Checks if a given post type can be viewed or managed.
+	 *
+	 * @since 6.2
+	 *
+	 * @param WP_Post_Type|string $post_type Post type name or object.
+	 * @return bool Whether the post type is allowed in REST.
+	 */
+	protected function check_is_post_type_allowed( $post_type ) {
+		if ( ! is_object( $post_type ) ) {
+			$post_type = get_post_type_object( $post_type );
+		}
+
+		if ( ! empty( $post_type ) && ! empty( $post_type->show_in_rest ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Retrieves the global styles type' schema, conforming to JSON Schema.
+	 *
+	 * @since 5.9.0
+	 *
+	 * @return array Item schema data.
+	 */
+	public function get_item_schema() {
+		if ( $this->schema ) {
+			return $this->add_additional_fields_schema( $this->schema );
+		}
+
+		$schema = array(
+			'$schema'    => 'http://json-schema.org/draft-04/schema#',
+			'title'      => $this->post_type,
+			'type'       => 'object',
+			'properties' => array(
+				'id'                  => array(
+					'description' => __( 'ID of global styles config.', 'gutenberg' ),
+					'type'        => 'string',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'readonly'    => true,
+				),
+				'styles'              => array(
+					'description' => __( 'Global styles.', 'gutenberg' ),
+					'type'        => array( 'object' ),
+					'context'     => array( 'view', 'edit' ),
+				),
+				'settings'            => array(
+					'description' => __( 'Global settings.', 'gutenberg' ),
+					'type'        => array( 'object' ),
+					'context'     => array( 'view', 'edit' ),
+				),
+				'title'               => array(
+					'description' => __( 'Title of the global styles variation.', 'gutenberg' ),
+					'type'        => array( 'object', 'string' ),
+					'default'     => '',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'properties'  => array(
+						'raw'      => array(
+							'description' => __( 'Title for the global styles variation, as it exists in the database.', 'gutenberg' ),
+							'type'        => 'string',
+							'context'     => array( 'view', 'edit', 'embed' ),
+						),
+						'rendered' => array(
+							'description' => __( 'HTML title for the post, transformed for display.', 'gutenberg' ),
+							'type'        => 'string',
+							'context'     => array( 'view', 'edit', 'embed' ),
+							'readonly'    => true,
+						),
+					),
+				),
+				'associated_style_id' => array(
+					'description' => __( 'ID of the associated variation style.', 'gutenberg' ),
+					'type'        => array( 'null', 'integer' ),
+					'context'     => array( 'view', 'edit' ),
+				),
+			),
+		);
+
+		$this->schema = $schema;
+
+		return $this->add_additional_fields_schema( $this->schema );
 	}
 
 	/**
