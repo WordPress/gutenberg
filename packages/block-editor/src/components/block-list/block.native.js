@@ -273,6 +273,7 @@ class BlockListBlock extends Component {
 							clientId={ clientId }
 							draggingClientId={ draggingClientId }
 							enabled={ draggingEnabled }
+							isSelected={ isSelected }
 							testID="draggable-trigger-content"
 						>
 							{ () =>

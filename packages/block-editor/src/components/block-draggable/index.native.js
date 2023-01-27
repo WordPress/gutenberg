@@ -347,6 +347,7 @@ function useIsEditingText() {
  * @param {JSX.Element} props.children           Children to be rendered.
  * @param {string}      props.clientId           Client id of the block.
  * @param {string}      [props.draggingClientId] Client id to use for dragging. If not defined, the value from `clientId` will be used.
+ * @param {boolean}     [props.isSelected]       If the block is actively selected.
  * @param {boolean}     [props.enabled]          Enables the draggable trigger.
  * @param {string}      [props.testID]           Id used for querying the long-press gesture handler in tests.
  *
@@ -356,6 +357,7 @@ const BlockDraggable = ( {
 	clientId,
 	children,
 	draggingClientId,
+	isSelected,
 	enabled = true,
 	testID,
 } ) => {
@@ -381,25 +383,21 @@ const BlockDraggable = ( {
 		);
 	};
 
-	const { isDraggable, isBeingDragged, isBlockSelected } = useSelect(
+	const { isDraggable, isBeingDragged } = useSelect(
 		( _select ) => {
 			const {
 				getBlockRootClientId,
 				getTemplateLock,
 				isBlockBeingDragged,
-				getSelectedBlockClientId,
 			} = _select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
 			const templateLock = rootClientId
 				? getTemplateLock( rootClientId )
 				: null;
-			const selectedBlockClientId = getSelectedBlockClientId();
 
 			return {
 				isBeingDragged: isBlockBeingDragged( clientId ),
 				isDraggable: 'all' !== templateLock,
-				isBlockSelected:
-					selectedBlockClientId && selectedBlockClientId === clientId,
 			};
 		},
 		[ clientId ]
@@ -434,7 +432,7 @@ const BlockDraggable = ( {
 	const canDragBlock =
 		enabled &&
 		! isScreenReaderEnabled &&
-		( ! isBlockSelected || ! isEditingText );
+		( ! isSelected || ! isEditingText );
 
 	if ( ! isDraggable ) {
 		return children( { isDraggable: false } );
