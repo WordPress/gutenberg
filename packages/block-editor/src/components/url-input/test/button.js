@@ -134,12 +134,13 @@ describe( 'URLInputButton', () => {
 	it( 'should close the form when user submits it', async () => {
 		const user = userEvent.setup();
 
-		function TestInputButton() {
-			const [ url, onChange ] = useState( '' );
-			return <URLInputButton url={ url } onChange={ onChange } />;
+		function TestURLInputButton() {
+			// maintain state for the controlled component and process value changes
+			const [ url, setUrl ] = useState( '' );
+			return <URLInputButton url={ url } onChange={ setUrl } />;
 		}
 
-		render( <TestInputButton /> );
+		render( <TestURLInputButton /> );
 
 		// Click the button to insert a link.
 		await user.click(
