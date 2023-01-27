@@ -531,6 +531,25 @@ _Returns_
 
 -   `Object`: Typography block support derived CSS classes & styles.
 
+### HeightControl
+
+HeightControl renders a linked unit control and range control for adjusting the height of a block.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/height-control/README.md>
+
+_Parameters_
+
+-   _props_ `Object`:
+-   _props.label_ `?string`: A label for the control.
+-   _props.onChange_ `( value: string ) => void`: Called when the height changes.
+-   _props.value_ `string`: The current height value.
+
+_Returns_
+
+-   `WPComponent`: The component to be rendered.
+
 ### InnerBlocks
 
 _Related_
