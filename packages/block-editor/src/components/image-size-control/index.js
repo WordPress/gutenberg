@@ -7,7 +7,6 @@ import {
 	SelectControl,
 	__experimentalNumberControl as NumberControl,
 	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -47,11 +46,12 @@ export default function ImageSizeControl( {
 				/>
 			) }
 			{ isResizable && (
-				<VStack className="block-editor-image-size-control" spacing="0">
+				<div className="block-editor-image-size-control">
 					<p>{ __( 'Image dimensions' ) }</p>
 
 					<HStack align="baseline" spacing="3">
 						<NumberControl
+							className="block-editor-image-size-control__width"
 							label={ __( 'Width' ) }
 							value={ currentWidth }
 							min={ 1 }
@@ -60,6 +60,7 @@ export default function ImageSizeControl( {
 							}
 						/>
 						<NumberControl
+							className="block-editor-image-size-control__height"
 							label={ __( 'Height' ) }
 							value={ currentHeight }
 							min={ 1 }
@@ -106,7 +107,7 @@ export default function ImageSizeControl( {
 							{ __( 'Reset' ) }
 						</Button>
 					</HStack>
-				</VStack>
+				</div>
 			) }
 		</>
 	);

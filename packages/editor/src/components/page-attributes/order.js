@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { __experimentalNumberControl as NumberControl } from '@wordpress/components';
+import {
+	Flex,
+	FlexBlock,
+	__experimentalNumberControl as NumberControl,
+} from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
@@ -25,15 +29,19 @@ export const PageAttributesOrder = ( { onUpdateOrder, order = 0 } ) => {
 	};
 	const value = orderInput === null ? order : orderInput;
 	return (
-		<NumberControl
-			label={ __( 'Order' ) }
-			value={ value }
-			onChange={ setUpdatedOrder }
-			labelPosition="side"
-			onBlur={ () => {
-				setOrderInput( null );
-			} }
-		/>
+		<Flex>
+			<FlexBlock>
+				<NumberControl
+					label={ __( 'Order' ) }
+					value={ value }
+					onChange={ setUpdatedOrder }
+					labelPosition="side"
+					onBlur={ () => {
+						setOrderInput( null );
+					} }
+				/>
+			</FlexBlock>
+		</Flex>
 	);
 };
 
