@@ -1,12 +1,4 @@
-.components-color-palette__custom-color {
-	position: relative;
-	border: none;
-	background: none;
-	border-radius: $radius-block-ui;
-	height: $grid-unit-80;
-	padding: $grid-unit-15;
-	font-family: inherit;
-	width: 100%;
+.components-color-palette__transparent-background {
 	// The background image creates a checkerboard pattern. Ignore rtlcss to
 	// make it work both in LTR and RTL.
 	// See https://github.com/WordPress/gutenberg/pull/42510
@@ -17,6 +9,16 @@
 	background-position: 0 0, 24px 24px;
 	/*rtl:end:ignore*/
 	background-size: calc(2 * 24px) calc(2 * 24px);
+}
+
+.components-color-palette__custom-color {
+	position: relative;
+	border: none;
+	background: none;
+	border-radius: $radius-block-ui;
+	height: $grid-unit-80;
+	padding: $grid-unit-15;
+	font-family: inherit;
 	box-sizing: border-box;
 	color: $white;
 	cursor: pointer;

@@ -241,6 +241,7 @@ function UnforwardedColorPalette(
 		<VStack spacing={ 3 } ref={ forwardedRef } { ...otherProps }>
 			{ ! disableCustomColors && (
 				<CustomColorPickerDropdown
+					className="components-color-palette__transparent-background"
 					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
 					renderContent={ renderCustomColorPicker }
 					renderToggle={ ( { isOpen, onToggle } ) => (
