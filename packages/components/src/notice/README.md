@@ -139,6 +139,7 @@ Whether the notice should be dismissible or not
 - Default: `true`
 
 #### `onDismiss` : `() => void`
+
 A deprecated alternative to `onRemove`. This prop is kept for compatibilty reasons but should be avoided.
 
 - Requiered: No
