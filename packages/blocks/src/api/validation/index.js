@@ -548,7 +548,7 @@ export const isEqualTokensOfType = {
  *
  * @param {Object[]} tokens Set of tokens to search.
  *
- * @return {Object | void} Next non-whitespace token.
+ * @return {Object | undefined} Next non-whitespace token.
  */
 export function getNextNonWhitespaceToken( tokens ) {
 	let token;

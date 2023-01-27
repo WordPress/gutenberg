@@ -30,7 +30,7 @@ export function createTable( { rowCount, columnCount } ) {
  *
  * @param {Object} state Current table state.
  *
- * @return {Object | void} The first table row.
+ * @return {Object | undefined} The first table row.
  */
 export function getFirstRow( state ) {
 	if ( ! isEmptyTableSection( state.head ) ) {
