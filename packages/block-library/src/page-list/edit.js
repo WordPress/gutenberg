@@ -116,7 +116,6 @@ function ConvertToLinksModal( { onClick, disabled } ) {
 			</BlockControls>
 			{ isOpen && (
 				<Modal
-					closeLabel={ __( 'Close' ) }
 					onRequestClose={ closeModal }
 					title={ __( 'Customize this menu' ) }
 					className={ 'wp-block-page-list-modal' }

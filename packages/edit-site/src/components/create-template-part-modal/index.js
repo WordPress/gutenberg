@@ -41,7 +41,6 @@ export default function CreateTemplatePartModal( { closeModal, onCreate } ) {
 	return (
 		<Modal
 			title={ __( 'Create a template part' ) }
-			closeLabel={ __( 'Close' ) }
 			onRequestClose={ closeModal }
 			overlayClassName="edit-site-create-template-part-modal"
 		>

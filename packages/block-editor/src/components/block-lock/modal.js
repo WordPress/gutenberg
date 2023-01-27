@@ -88,7 +88,6 @@ export default function BlockLockModal( { clientId, onClose } ) {
 				blockInformation.title
 			) }
 			overlayClassName="block-editor-block-lock-modal"
-			closeLabel={ __( 'Close' ) }
 			onRequestClose={ onClose }
 		>
 			<p>
