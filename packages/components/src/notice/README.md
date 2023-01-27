@@ -113,6 +113,7 @@ Determines the color of the notice: `warning` (yellow), `success` (green), `erro
 - Default: `info`
 
 #### `onRemove`: `() => void`
+
 A function called to dismiss/remove the notice.
 
 - Required: No
