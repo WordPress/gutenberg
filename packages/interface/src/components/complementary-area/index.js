@@ -148,7 +148,7 @@ function ComplementaryArea( {
 								isActive && ( ! showIconLabels || isLarge )
 							}
 							aria-expanded={ isActive }
-							disabled={ isActive === undefined }
+							aria-disabled={ isActive === undefined }
 							label={ title }
 							icon={ showIconLabels ? check : icon }
 							showTooltip={ ! showIconLabels }
