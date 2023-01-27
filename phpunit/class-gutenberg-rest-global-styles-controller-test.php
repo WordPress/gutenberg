@@ -11,17 +11,6 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 	 */
 	protected static $global_styles_id;
 
-	private function find_and_normalize_global_styles_by_id( $global_styles, $id ) {
-		foreach ( $global_styles as $style ) {
-			if ( $style['id'] === $id ) {
-				unset( $style['_links'] );
-				return $style;
-			}
-		}
-
-		return null;
-	}
-
 	public function set_up() {
 		parent::set_up();
 		switch_theme( 'emptytheme' );
