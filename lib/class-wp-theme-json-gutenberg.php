@@ -1213,6 +1213,8 @@ class WP_Theme_JSON_Gutenberg {
 			return $block_rules;
 		}
 
+		// Skip outputting layout styles if the block does not support layout or margin.
+		// For blocks that have margin but not layout support, only layout aware margin styles are output.
 		if ( isset( $block_metadata['name'] ) ) {
 			$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_metadata['name'] );
 			if (
