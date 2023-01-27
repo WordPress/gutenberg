@@ -102,15 +102,17 @@ function ComplementaryArea( {
 			const { getActiveComplementaryArea, isItemPinned } =
 				select( interfaceStore );
 			const _activeArea = getActiveComplementaryArea( scope );
+			const _isSmall =
+				select( viewportStore ).isViewportMatch( '< medium' );
 
 			return {
 				isActive:
-					_activeArea === undefined
+					_activeArea === undefined && ! _isSmall
 						? undefined
 						: _activeArea === identifier,
 				isPinned: isItemPinned( scope, identifier ),
 				activeArea: _activeArea,
-				isSmall: select( viewportStore ).isViewportMatch( '< medium' ),
+				isSmall: _isSmall,
 				isLarge: select( viewportStore ).isViewportMatch( 'large' ),
 			};
 		},
