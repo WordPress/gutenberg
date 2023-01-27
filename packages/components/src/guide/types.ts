@@ -18,7 +18,7 @@ export type GuideProps = {
 	className?: string;
 	contentLabel?: ModalProps[ 'contentLabel' ];
 	finishButtonText?: string;
-	onFinish?: () => void;
+	onFinish?: ModalProps[ 'onRequestClose' ];
 	pages?: Page[];
 };
 

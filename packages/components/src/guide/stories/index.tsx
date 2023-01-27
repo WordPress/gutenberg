@@ -40,7 +40,7 @@ const Template: ComponentStory< typeof Guide > = ( { onFinish, ...props } ) => {
 				<Guide
 					{ ...props }
 					onFinish={ ( ...finishArgs ) => {
-						closeGuide( ...finishArgs );
+						closeGuide();
 						onFinish?.( ...finishArgs );
 					} }
 				/>
