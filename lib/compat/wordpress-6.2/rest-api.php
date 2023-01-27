@@ -15,15 +15,6 @@ function gutenberg_register_rest_block_pattern_categories() {
 add_action( 'rest_api_init', 'gutenberg_register_rest_block_pattern_categories' );
 
 /**
- * Registers the block pattern directory.
- */
-function gutenberg_register_rest_pattern_directory() {
-	$pattern_directory_controller = new Gutenberg_REST_Pattern_Directory_Controller_6_2();
-	$pattern_directory_controller->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_pattern_directory' );
-
-/**
  * Registers the block patterns REST API routes.
  */
 function gutenberg_register_rest_block_patterns() {
