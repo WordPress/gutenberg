@@ -22,6 +22,7 @@
  ([#47384](https://github.com/WordPress/gutenberg/pull/47384)).
 -   `Button`: Convert to TypeScript ([#46997](https://github.com/WordPress/gutenberg/pull/46997)).
 -   `QueryControls`: Convert to TypeScript ([#46721](https://github.com/WordPress/gutenberg/pull/46721)).
+-   `Toolbar`: Convert to TypeScript ([#47087](https://github.com/WordPress/gutenberg/pull/47087)).
 
 ### Bug Fix
 
