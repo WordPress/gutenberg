@@ -102,8 +102,12 @@ function ComplementaryArea( {
 			const { getActiveComplementaryArea, isItemPinned } =
 				select( interfaceStore );
 			const _activeArea = getActiveComplementaryArea( scope );
+
 			return {
-				isActive: _activeArea === identifier,
+				isActive:
+					_activeArea === undefined
+						? undefined
+						: _activeArea === identifier,
 				isPinned: isItemPinned( scope, identifier ),
 				activeArea: _activeArea,
 				isSmall: select( viewportStore ).isViewportMatch( '< medium' ),
@@ -144,6 +148,7 @@ function ComplementaryArea( {
 								isActive && ( ! showIconLabels || isLarge )
 							}
 							aria-expanded={ isActive }
+							disabled={ isActive === undefined }
 							label={ title }
 							icon={ showIconLabels ? check : icon }
 							showTooltip={ ! showIconLabels }
