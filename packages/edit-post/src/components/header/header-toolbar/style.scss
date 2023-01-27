@@ -16,6 +16,9 @@
 		top: 0;
 		left: 0;
 	}
+	.edit-post-header-toolbar__inserter-open-items {
+		left: $grid-unit-05;
+	}
 
 	// Hide all action buttons except the inserter on mobile.
 	.edit-post-header-toolbar__left > .components-button {
@@ -79,7 +82,7 @@
 		color: $black;
 		outline: none;
 		box-shadow: none;
-		margin-right: $grid-unit-10;
+		margin-right: $grid-unit-15;
 		min-width: 32px;
 		width: 32px;
 		height: 32px;

@@ -49,6 +49,10 @@ const BUTTON_ANIMATION_VARIANTS = {
 	},
 };
 
+const preventDefault = ( event ) => {
+	event.preventDefault();
+};
+
 export default function InserterOpenItems( {
 	isInserterOpened,
 	showIconLabels,
@@ -82,6 +86,7 @@ export default function InserterOpenItems( {
 							icon={ paragraph }
 							label={ __( 'Insert Paragraph Block' ) }
 							showTooltip={ ! showIconLabels }
+							onMouseDown={ preventDefault }
 						/>
 					</motion.div>
 
@@ -96,6 +101,7 @@ export default function InserterOpenItems( {
 							icon={ heading }
 							label={ __( 'Insert Heading Block' ) }
 							showTooltip={ ! showIconLabels }
+							onMouseDown={ preventDefault }
 						/>
 					</motion.div>
 
@@ -110,6 +116,7 @@ export default function InserterOpenItems( {
 							icon={ list }
 							label={ __( 'Insert List Block' ) }
 							showTooltip={ ! showIconLabels }
+							onMouseDown={ preventDefault }
 						/>
 					</motion.div>
 
@@ -124,6 +131,7 @@ export default function InserterOpenItems( {
 							icon={ image }
 							label={ __( 'Insert Image Block' ) }
 							showTooltip={ ! showIconLabels }
+							onMouseDown={ preventDefault }
 						/>
 					</motion.div>
 
