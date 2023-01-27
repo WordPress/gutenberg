@@ -95,7 +95,7 @@ require __DIR__ . '/compat/wordpress-6.2/widgets.php';
 remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WP 6.0's stopgap handler for Webfonts API.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
-	require __DIR__ . '/experimental/html/index.php';
+	require __DIR__ . '/experimental/html/wp-html.php';
 }
 require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
