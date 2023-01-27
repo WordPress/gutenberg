@@ -72,3 +72,41 @@ export type TreeGridCellProps =
 			children: React.ReactNode;
 			withoutGridItem: true;
 	  };
+
+export type TreeGridProps = {
+	/**
+	 * Label to use for the element with the `application` role.
+	 */
+	applicationAriaLabel?: string;
+	/**
+	 * The children to be rendered in the tree grid.
+	 */
+	children: React.ReactNode;
+	/**
+	 * Callback to fire when row is expanded.
+	 *
+	 * @default noop
+	 */
+	onExpandRow?: ( row: Element ) => void;
+	/**
+	 * Callback to fire when row is collapsed.
+	 *
+	 * @default noop
+	 */
+	onCollapseRow?: ( row: Element ) => void;
+	/**
+	 * Callback that fires when focus is shifted from one row to another via
+	 * the Up and Down keys. Callback is also fired on Home and End keys which
+	 * move focus from the beginning row to the end row.
+	 *
+	 * The callback is passed the event, the start row element that the focus was on
+	 * originally, and the destination row element after the focus has moved.
+	 *
+	 * @default noop
+	 */
+	onFocusRow?: (
+		event: React.KeyboardEvent< HTMLTableElement >,
+		startRow: Element,
+		destinationRow: Element
+	) => void;
+};

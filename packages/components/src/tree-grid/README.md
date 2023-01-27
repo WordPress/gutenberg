@@ -31,69 +31,36 @@ function TreeMenu() {
 			<TreeGridRow level={ 1 } positionInSet={ 1 } setSize={ 2 }>
 				<TreeGridCell>
 					{ ( props ) => (
-						<Button onClick={ onSelect } { ...props }>
-							Select
-						</Button>
+						<Button onClick={ onSelect } { ...props }>Select</Button>
 					) }
 				</TreeGridCell>
 				<TreeGridCell>
 					{ ( props ) => (
-						<Button onClick={ onMoveUp } { ...props }>
-							Move Up
-						</Button>
-					) }
-				</TreeGridCell>
-				<TreeGridCell>
-					{ ( props ) => (
-						<Button onClick={ onMoveDown } { ...props }>
-							Move Down
-						</Button>
+						<Button onClick={ onMove } { ...props }>Move</Button>
 					) }
 				</TreeGridCell>
 			</TreeGridRow>
 			<TreeGridRow level={ 1 } positionInSet={ 2 } setSize={ 2 }>
 				<TreeGridCell>
 					{ ( props ) => (
-						<Button onClick={ onSelect } { ...props }>
-							Select
-						</Button>
+						<Button onClick={ onSelect } { ...props }>Select</Button>
 					) }
 				</TreeGridCell>
 				<TreeGridCell>
 					{ ( props ) => (
-						<Button onClick={ onMoveUp } { ...props }>
-							Move Up
-						</Button>
-					) }
-				</TreeGridCell>
-				<TreeGridCell>
-					{ ( props ) => (
-						<Button onClick={ onMoveDown } { ...props }>
-							Move Down
-						</Button>
+						<Button onClick={ onMove } { ...props }>Move</Button>
 					) }
 				</TreeGridCell>
 			</TreeGridRow>
 			<TreeGridRow level={ 2 } positionInSet={ 1 } setSize={ 1 }>
 				<TreeGridCell>
 					{ ( props ) => (
-						<Button onClick={ onSelect } { ...props }>
-							Select
-						</Button>
+						<Button onClick={ onSelect } { ...props }>Select</Button>
 					) }
 				</TreeGridCell>
 				<TreeGridCell>
 					{ ( props ) => (
-						<Button onClick={ onMoveUp } { ...props }>
-							Move Up
-						</Button>
-					) }
-				</TreeGridCell>
-				<TreeGridCell>
-					{ ( props ) => (
-						<Button onClick={ onMoveDown } { ...props }>
-							Move Down
-						</Button>
+						<Button onClick={ onMove } { ...props }>Move</Button>
 					) }
 				</TreeGridCell>
 			</TreeGridRow>
@@ -112,7 +79,7 @@ Aside from the documented callback functions, any props specified will be passed
 
 `TreeGrid` should always have children.
 
-###### onFocusRow( event: Event, startRow: HTMLElement, destinationRow: HTMLElement )
+###### onFocusRow( event: KeyboardEvent, startRow: Element, destinationRow: Element )
 
 Callback that fires when focus is shifted from one row to another via the Up and Down keys. Callback is also fired on Home and End keys which move focus from the beginning row to the end row.
 The callback is passed the event, the start row element that the focus was on originally, and
@@ -121,14 +88,14 @@ the destination row element after the focus has moved.
 -   Type: `Function`
 -   Required: No
 
-###### onCollapseRow( row: HTMLElement )
+###### onCollapseRow( row: Element )
 
 A callback that passes in the row element to be collapsed.
 
 -   Type: `Function`
 -   Required: No
 
-###### onExpandRow( row: HTMLElement )
+###### onExpandRow( row: Element )
 
 A callback that passes in the row element to be expanded.
 
