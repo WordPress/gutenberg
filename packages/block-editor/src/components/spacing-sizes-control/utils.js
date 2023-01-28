@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -211,5 +206,5 @@ export function isValuesDefined( values ) {
 	if ( values === undefined || values === null ) {
 		return false;
 	}
-	return ! isEmpty( Object.values( values ).filter( ( value ) => !! value ) );
+	return Object.values( values ).filter( ( value ) => !! value ).length > 0;
 }

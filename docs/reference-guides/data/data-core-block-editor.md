@@ -306,6 +306,20 @@ _Returns_
 
 -   `string`: Block name.
 
+### getBlockNamesByClientId
+
+Given an array of block client IDs, returns the corresponding array of block
+names.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _clientIds_ `string[]`: Client IDs for which block names are to be returned.
+
+_Returns_
+
+-   `string[]`: Block names.
+
 ### getBlockOrder
 
 Returns an array containing all block client IDs in the editor in the order

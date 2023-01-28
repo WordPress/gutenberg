@@ -26,24 +26,23 @@ export default function SidebarNavigationScreenMain() {
 			} ),
 		};
 	} );
+
 	return (
 		<SidebarNavigationScreen
 			path="/"
 			title={ __( 'Design' ) }
 			content={
 				<ItemGroup>
-					{ !! window?.__experimentalEnableOffCanvasNavigationEditor &&
-						!! navigationMenus &&
-						navigationMenus.length > 0 && (
-							<NavigatorButton
-								as={ SidebarNavigationItem }
-								path="/navigation"
-								withChevron
-								icon={ navigation }
-							>
-								{ __( 'Navigation' ) }
-							</NavigatorButton>
-						) }
+					{ !! navigationMenus && navigationMenus.length > 0 && (
+						<NavigatorButton
+							as={ SidebarNavigationItem }
+							path="/navigation"
+							withChevron
+							icon={ navigation }
+						>
+							{ __( 'Navigation' ) }
+						</NavigatorButton>
+					) }
 					<NavigatorButton
 						as={ SidebarNavigationItem }
 						path="/templates"

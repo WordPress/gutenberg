@@ -2493,6 +2493,44 @@ describe( 'selectors', () => {
 			} );
 		} );
 
+		it( 'should cache and return the same object if state has not changed', () => {
+			const state = {
+				selection: {
+					selectionStart: { clientId: 'clientId1' },
+					selectionEnd: { clientId: 'clientId1' },
+				},
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							clientId1: { clientId: 'clientId1' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							clientId1: {},
+						} )
+					),
+					order: new Map(
+						Object.entries( {
+							'': [ 'clientId1' ],
+							clientId1: [],
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							clientId1: '',
+						} )
+					),
+				},
+				insertionPoint: null,
+			};
+
+			const insertionPoint1 = getBlockInsertionPoint( state );
+			const insertionPoint2 = getBlockInsertionPoint( state );
+
+			expect( insertionPoint1 ).toBe( insertionPoint2 );
+		} );
+
 		it( 'should return an object for the nested selected block', () => {
 			const state = {
 				selection: {
@@ -4265,12 +4303,20 @@ describe( 'selectors', () => {
 		it( 'should return empty array if no block name is provided', () => {
 			expect( getPatternsByBlockTypes( state ) ).toEqual( [] );
 		} );
-		it( 'shoud return empty array if no match is found', () => {
+		it( 'should return empty array if no match is found', () => {
 			const patterns = getPatternsByBlockTypes(
 				state,
 				'test/block-not-exists'
 			);
 			expect( patterns ).toEqual( [] );
+		} );
+		it( 'should return the same empty array in both empty array cases', () => {
+			const patterns1 = getPatternsByBlockTypes( state );
+			const patterns2 = getPatternsByBlockTypes(
+				state,
+				'test/block-not-exists'
+			);
+			expect( patterns1 ).toBe( patterns2 );
 		} );
 		it( 'should return proper results when there are matched block patterns', () => {
 			const patterns = getPatternsByBlockTypes( state, 'test/block-a' );

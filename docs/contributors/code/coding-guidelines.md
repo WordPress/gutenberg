@@ -136,7 +136,7 @@ export { __unstableDoTerribleAwfulAction } from './api';
 -   An **experimental API** is one which is planned for eventual public availability, but is subject to further experimentation, testing, and discussion.
 -   An **unstable API** is one which serves as a means to an end. It is not desired to ever be converted into a public API.
 
-In both cases, the API should be made stable or removed at the earliest opportunity. 
+In both cases, the API should be made stable or removed at the earliest opportunity.
 
 While an experimental API may often stabilize into a publicly-available API, there is no guarantee that it will. The conversion to a stable API will inherently be considered a breaking change by the mere fact that the function name must be changed to remove the `__experimental` prefix.
 
@@ -147,14 +147,14 @@ While an experimental API may often stabilize into a publicly-available API, the
 As of June 2022, WordPress Core contains 280 publicly exported experimental APIs. They got merged from the Gutenberg
 plugin during the major WordPress releases. Many plugins and themes rely on these experimental APIs for essential
 features that can't be accessed in any other way. Naturally, these APIs can't be removed without a warning anymore.
-They are a part of the WordPress public API and fall under the 
-[WordPress Backwards Compatibility policy](https://developer.wordpress.org/block-editor/contributors/code/backward-compatibility/). 
+They are a part of the WordPress public API and fall under the
+[WordPress Backwards Compatibility policy](https://developer.wordpress.org/block-editor/contributors/code/backward-compatibility/).
 Removing them involves a deprecation process. It may be relatively easy for some APIs, but it may require effort and
 span multiple WordPress releases for others.
 
 **Use private experimental APIs instead.**
 
-Make your experimental APIs private and don't expose them to WordPress extenders. 
+Make your experimental APIs private and don't expose them to WordPress extenders.
 
 This way they'll remain internal implementation details that can be changed or removed
  without a warning and without breaking WordPress plugins.
@@ -203,7 +203,7 @@ Sometimes a non-exported React hook suffices as a substitute for introducing a n
 	function hasActiveBlockOverlayActive ( selectors, parent ) { /* ... */ }
 	function useIsWithinBlockOverlay( clientId ) {
 		return useSelect( ( select ) => {
-			const selectors = select( blockEditorStore ); 
+			const selectors = select( blockEditorStore );
 			let parent = selectors.getBlockRootClientId( clientId );
 			while ( !!parent ) {
 				if ( hasActiveBlockOverlayActive( selectors, parent ) ) {
@@ -412,17 +412,17 @@ import { lock } from './experiments';
 // The experimental component contains all the logic
 const ExperimentalMyButton = ( { title, __experimentalShowIcon = true } ) => {
 	// ...complex logic we don't want to duplicate...
-  
+
 	return (
 		<button>
-			{ __experimentalShowIcon  && <Icon src={some icon} /> } { title }  
+			{ __experimentalShowIcon  && <Icon src={some icon} /> } { title }
 		</button>
 	);
 }
 
 // The stable public component is a thin wrapper that calls the
 // experimental component with the experimental features disabled
-export const MyButton = ( { title } ) => 
+export const MyButton = ( { title } ) =>
     <ExperimentalMyButton title={ title } __experimentalShowIcon={ false } />
 
 lock(MyButton, ExperimentalMyButton);
@@ -439,6 +439,19 @@ export function MyComponent() {
 		<ExperimentalMyButton data={data} __experimentalShowIcon={ true } />
 	)
 }
+```
+
+#### Experimental editor settings
+
+WordPress extenders cannot update the experimental block settings on their own. The `updateSettings()` actions of the `@wordpress/block-editor` store will filter out all the settings that are **not** a part of the public API. The only way to actually store them is via private action. `__experimentalUpdateSettings()`.
+
+To privatize a block editor setting, add it to the `privateSettings` list in [/packages/block-editor/src/store/actions.js](/packages/block-editor/src/store/actions.js):
+
+```js
+const privateSettings = [
+	'inserterMediaCategories',
+	// List a block editor setting here to make it private
+];
 ```
 
 #### Experimental block.json and theme.json APIs
