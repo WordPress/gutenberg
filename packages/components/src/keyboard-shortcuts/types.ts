@@ -3,6 +3,7 @@
  */
 import type { useKeyboardShortcut } from '@wordpress/compose';
 
+// TODO: We wouldn't have to do this if this type was exported from `@wordpress/compose`.
 type WPKeyboardShortcutConfig = NonNullable<
 	Parameters< typeof useKeyboardShortcut >[ 2 ]
 >;
