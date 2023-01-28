@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { createEvent, fireEvent, render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -14,13 +14,16 @@ describe( 'KeyboardShortcuts', () => {
 		target: Parameters< typeof fireEvent >[ 0 ]
 	) {
 		[ 'keydown', 'keypress', 'keyup' ].forEach( ( eventName ) => {
-			const event = new window.Event( eventName, {
-				bubbles: true,
-			} );
-			// @ts-expect-error
-			event.keyCode = which;
-			// @ts-expect-error
-			event.which = which;
+			const event = createEvent(
+				eventName,
+				target,
+				{
+					bubbles: true,
+					keyCode: which,
+					which,
+				},
+				{ EventType: 'KeyboardEvent' }
+			);
 			fireEvent( target, event );
 		} );
 	}
