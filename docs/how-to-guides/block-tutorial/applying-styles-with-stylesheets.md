@@ -195,7 +195,7 @@ Edit the asset file to include the block-editor dependency for the scripts.
 
 Like scripts, you can enqueue your block's styles using the `block.json` file.
 
-Use the `editorStyle` property to a CSS file you want to load in the editor view, and use the `style` property for a CSS file you want to load on the frontend when the block is used.
+Use the `editorStyle` property to a CSS file you want to load in the editor view, and use the `style` property for a CSS file you want to load on frontend also when the block is used.
 
 For example:
 
