@@ -71,12 +71,13 @@ function getExamples() {
 
 	const otherExamples = getBlockTypes()
 		.filter( ( blockType ) => {
-			const { name, example, supports, parent } = blockType;
+			const { name, example, supports, parent, ancestor } = blockType;
 			return (
 				name !== 'core/heading' &&
 				!! example &&
 				supports.inserter !== false &&
-				! parent
+				! parent &&
+				! ancestor
 			);
 		} )
 		.map( ( blockType ) => ( {
