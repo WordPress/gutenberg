@@ -43,6 +43,7 @@ import type { WordPressComponentProps } from '../ui/context';
 import type { DropdownProps } from '../dropdown/types';
 import {
 	extractColorNameFromCurrentValue,
+	getCompositeBackgroundColor,
 	isMultiplePaletteArray,
 	normalizeColorValue,
 	showTransparentBackground,
@@ -227,14 +228,10 @@ function UnforwardedColorPalette(
 	);
 
 	const colordColor = colord( normalizedColorValue ?? '' );
-	const mixedColor =
-		colordColor.alpha() < 1
-			? colord( '#fff' ).mix(
-					colordColor.alpha( 1 ),
-					colordColor.alpha()
-			  )
-			: colordColor;
-
+	const compositeColor = getCompositeBackgroundColor(
+		colord( '#fff' ),
+		colordColor
+	);
 	const valueWithoutLeadingHash = value?.startsWith( '#' )
 		? value.substring( 1 )
 		: value ?? '';
@@ -285,8 +282,10 @@ function UnforwardedColorPalette(
 									: {
 											background: value,
 											color:
-												mixedColor.contrast() >
-												mixedColor.contrast( '#000' )
+												compositeColor.contrast() >
+												compositeColor.contrast(
+													'#000'
+												)
 													? '#fff'
 													: '#000',
 									  }
