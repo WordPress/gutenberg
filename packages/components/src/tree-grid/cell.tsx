@@ -13,7 +13,7 @@ import type { TreeGridCellProps } from './types';
 function UnforwardedTreeGridCell(
 	{
 		children,
-		withoutGridItem,
+		withoutGridItem = false,
 		...props
 	}: WordPressComponentProps< TreeGridCellProps, 'td', false >,
 	ref: React.ForwardedRef< any >
@@ -21,7 +21,7 @@ function UnforwardedTreeGridCell(
 	return (
 		<td { ...props } role="gridcell">
 			{ withoutGridItem ? (
-				children
+				<>{ children }</>
 			) : (
 				<TreeGridItem ref={ ref }>{ children }</TreeGridItem>
 			) }

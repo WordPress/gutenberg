@@ -60,7 +60,9 @@ function UnforwardedTreeGrid(
 
 			if (
 				hasModifierKeyPressed ||
-				! [ UP, DOWN, LEFT, RIGHT, HOME, END ].includes( keyCode )
+				! ( [ UP, DOWN, LEFT, RIGHT, HOME, END ] as number[] ).includes(
+					keyCode
+				)
 			) {
 				return;
 			}
@@ -95,7 +97,7 @@ function UnforwardedTreeGrid(
 				activeRow.getAttribute( 'aria-expanded' ) === 'false' &&
 				keyCode === RIGHT;
 
-			if ( [ LEFT, RIGHT ].includes( keyCode ) ) {
+			if ( ( [ LEFT, RIGHT ] as number[] ).includes( keyCode ) ) {
 				// Calculate to the next element.
 				let nextIndex;
 				if ( keyCode === LEFT ) {
@@ -179,7 +181,7 @@ function UnforwardedTreeGrid(
 				// Prevent key use for anything else. This ensures Voiceover
 				// doesn't try to handle key navigation.
 				event.preventDefault();
-			} else if ( [ UP, DOWN ].includes( keyCode ) ) {
+			} else if ( ( [ UP, DOWN ] as number[] ).includes( keyCode ) ) {
 				// Calculate the rowIndex of the next row.
 				const rows = Array.from(
 					treeGridElement.querySelectorAll( '[role="row"]' )
@@ -233,7 +235,7 @@ function UnforwardedTreeGrid(
 				// Prevent key use for anything else. This ensures Voiceover
 				// doesn't try to handle key navigation.
 				event.preventDefault();
-			} else if ( [ HOME, END ].includes( keyCode ) ) {
+			} else if ( ( [ HOME, END ] as number[] ).includes( keyCode ) ) {
 				// Calculate the rowIndex of the next row.
 				const rows = Array.from(
 					treeGridElement.querySelectorAll( '[role="row"]' )
