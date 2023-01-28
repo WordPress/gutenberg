@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	__experimentalOffCanvasEditor as OffCanvasEditor,
+	experiments as blockEditorExperiments,
 	InspectorControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -21,6 +21,7 @@ import { __ } from '@wordpress/i18n';
 import ManageMenusButton from './manage-menus-button';
 import NavigationMenuSelector from './navigation-menu-selector';
 import { LeafMoreMenu } from '../leaf-more-menu';
+import { unlock } from '../../experiments';
 
 /* translators: %s: The name of a menu. */
 const actionLabel = __( "Switch to '%s'" );
@@ -31,6 +32,9 @@ const ExperimentMainContent = ( {
 	isLoading,
 	isNavigationMenuMissing,
 } ) => {
+	const { __experimentalOffCanvasEditor: OffCanvasEditor } = unlock(
+		blockEditorExperiments
+	);
 	// Provide a hierarchy of clientIds for the given Navigation block (clientId).
 	// This is required else the list view will display the entire block tree.
 	const clientIdsTree = useSelect(
