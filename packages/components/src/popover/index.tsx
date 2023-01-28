@@ -366,9 +366,9 @@ const UnforwardedPopover = (
 		middlewareData: { arrow: arrowData },
 	} = useFloating( {
 		placement:
-			( normalizedPlacementFromProps === 'overlay'
+			normalizedPlacementFromProps === 'overlay'
 				? undefined
-				: normalizedPlacementFromProps ) || 'bottom',
+				: normalizedPlacementFromProps,
 		middleware,
 		whileElementsMounted: ( referenceParam, floatingParam, updateParam ) =>
 			autoUpdate( referenceParam, floatingParam, updateParam, {
