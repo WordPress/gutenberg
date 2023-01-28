@@ -25,6 +25,18 @@
 		},
 		"align": {
 			"type": "string"
+		},
+		"style": {
+			"type": "object",
+			"default": {
+				"border": {
+					"left": {
+						"color": "#000",
+						"style": "solid",
+						"width": "1px"
+					}
+				}
+			}
 		}
 	},
 	"supports": {
@@ -50,6 +62,18 @@
 			"__experimentalDefaultControls": {
 				"background": true,
 				"text": true
+			}
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
 			}
 		}
 	},
