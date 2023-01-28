@@ -131,7 +131,7 @@ export function useInputAndSelection( props ) {
 			// Check if the implementor disabled editing. `contentEditable`
 			// does disable input, but not text selection, so we must ignore
 			// selection changes.
-			if ( element.contentEditable !== 'true' ) {
+			if ( ! element.isContentEditable ) {
 				return;
 			}
 
@@ -145,7 +145,7 @@ export function useInputAndSelection( props ) {
 				// bug in Firefox where it strangely selects the closest
 				// contentEditable element, even though the click was outside
 				// any contentEditable element.
-				if ( ownerDocument.activeElement.contentEditable !== 'true' ) {
+				if ( ! ownerDocument.activeElement.isContentEditable ) {
 					return;
 				}
 
@@ -155,24 +155,23 @@ export function useInputAndSelection( props ) {
 
 				const selection = defaultView.getSelection();
 				const { anchorNode, focusNode } = selection;
+				const containsAnchor = element.contains( anchorNode );
+				const containsFocus = element.contains( focusNode );
 
 				if (
-					element.contains( anchorNode ) &&
+					containsAnchor &&
 					element !== anchorNode &&
-					element.contains( focusNode ) &&
+					containsFocus &&
 					element !== focusNode
 				) {
 					const { start, end } = createRecord();
 					record.current.activeFormats = EMPTY_ACTIVE_FORMATS;
 					onSelectionChange( start, end );
-				} else if (
-					element.contains( anchorNode ) &&
-					element !== anchorNode
-				) {
+				} else if ( containsAnchor && element !== anchorNode ) {
 					const { start, end: offset = start } = createRecord();
 					record.current.activeFormats = EMPTY_ACTIVE_FORMATS;
 					onSelectionChange( offset );
-				} else if ( element.contains( focusNode ) ) {
+				} else if ( containsFocus ) {
 					const { start, end: offset = start } = createRecord();
 					record.current.activeFormats = EMPTY_ACTIVE_FORMATS;
 					onSelectionChange( undefined, offset );

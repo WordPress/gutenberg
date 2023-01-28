@@ -302,11 +302,12 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	}
 
 	function batch( callback ) {
-		emitter.pause();
-		Object.values( stores ).forEach( ( store ) => store.emitter.pause() );
+		emitter.pauseGlobal();
+		// emitter.pause();
+		// Object.values( stores ).forEach( ( store ) => store.emitter.pause() );
 		callback();
 		emitter.resume();
-		Object.values( stores ).forEach( ( store ) => store.emitter.resume() );
+		// Object.values( stores ).forEach( ( store ) => store.emitter.resume() );
 	}
 
 	let registry = {

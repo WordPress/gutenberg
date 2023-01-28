@@ -67,27 +67,33 @@ class SlotComponent extends Component {
 	render() {
 		const { children, name, fillProps = {}, getFills } = this.props;
 
-		const fills = ( getFills( name, this ) ?? [] )
-			.map( ( fill ) => {
-				const fillChildren = isFunction( fill.children )
-					? fill.children( fillProps )
-					: fill.children;
+		const fills = [];
 
-				return Children.map( fillChildren, ( child, childIndex ) => {
-					if ( ! child || typeof child === 'string' ) {
-						return child;
-					}
+		for ( const fill of getFills( name, this ) ?? [] ) {
+			const fillChildren = isFunction( fill.children )
+				? fill.children( fillProps )
+				: fill.children;
 
-					const childKey = child.key || childIndex;
-					return cloneElement( child, { key: childKey } );
-				} );
-			} )
-			.filter(
-				// In some cases fills are rendered only when some conditions apply.
-				// This ensures that we only use non-empty fills when rendering, i.e.,
-				// it allows us to render wrappers only when the fills are actually present.
-				( element ) => ! isEmptyElement( element )
-			);
+			const actualChildren = [];
+			Children.forEach( fillChildren, ( child, childIndex ) => {
+				if ( ! child || typeof child === 'string' ) {
+					actualChildren.push( child );
+				}
+
+				const childKey = child.key || childIndex;
+				if ( child.key === childKey ) {
+					actualChildren.push( child );
+				} else {
+					actualChildren.push(
+						cloneElement( child, { key: childKey } )
+					);
+				}
+			} );
+
+			if ( ! isEmptyElement( actualChildren ) ) {
+				fills.push( actualChildren );
+			}
+		}
 
 		return <>{ isFunction( children ) ? children( fills ) : fills }</>;
 	}

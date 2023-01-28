@@ -6,6 +6,9 @@ import { assertIsDefined } from '../utils/assert-is-defined';
 import isInputOrTextArea from './is-input-or-text-area';
 import isRTL from './is-rtl';
 
+let totalTime = 0;
+setInterval( () => console.log( { placeCaretMs: totalTime } ), 1000 );
+
 /**
  * Gets the range to place.
  *
@@ -79,8 +82,11 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 		! range.startContainer ||
 		! container.contains( range.startContainer )
 	) {
+		const tic = performance.now();
 		container.scrollIntoView( isReverse );
 		range = range = getRange( container, isReverse, x );
+		const toc = performance.now();
+		totalTime += toc - tic;
 
 		if (
 			! range ||

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
@@ -19,13 +14,7 @@ import { applyFilters } from '@wordpress/hooks';
 import { useBlockEditContext } from '../block-edit';
 import { store as blockEditorStore } from '../../store';
 
-const blockedPaths = [
-	'color',
-	'border',
-	'dimensions',
-	'typography',
-	'spacing',
-];
+const blockedPathsPattern = /border|color|dimensions|spacing|typography/;
 
 const deprecatedFlags = {
 	'color.palette': ( settings ) => settings.colors,
@@ -81,6 +70,38 @@ const prefixedFlags = {
 	'typography.customLineHeight': 'typography.lineHeight',
 };
 
+const get = ( o, path ) => {
+	if ( null === o || undefined === o ) {
+		return undefined;
+	}
+
+	let v = o;
+	let lastAt = 0;
+	let at = path.indexOf( '.' );
+
+	while ( at < path.length ) {
+		if ( -1 === at ) {
+			if ( lastAt > 0 ) {
+				const segment = path.slice( lastAt, at );
+				return segment in v ? v[ segment ] : undefined;
+			} else {
+				return path in v ? v[ path ] : undefined;
+			}
+		}
+		const segment = path.slice( lastAt, at );
+		lastAt = at + 1;
+
+		if ( ! ( segment in v ) ) {
+			return undefined;
+		}
+
+		v = v[ segment ];
+		at = path.indexOf( '.', lastAt );
+	}
+
+	return undefined;
+};
+
 /**
  * Remove `custom` prefixes for flags that did not land in 5.8.
  *
@@ -115,7 +136,7 @@ export default function useSetting( path ) {
 
 	return useSelect(
 		( select ) => {
-			if ( blockedPaths.includes( path ) ) {
+			if ( blockedPathsPattern.test( path ) ) {
 				// eslint-disable-next-line no-console
 				console.warn(
 					'Top level useSetting paths are disabled. Please use a subpath to query the information needed.'

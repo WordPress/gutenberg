@@ -5,7 +5,7 @@ import { __unsafe_useEmotionCache as useEmotionCache } from '@emotion/react';
 import type { SerializedStyles } from '@emotion/serialize';
 import { insertStyles } from '@emotion/utils';
 // eslint-disable-next-line no-restricted-imports
-import { cx as innerCx, ClassNamesArg } from '@emotion/css';
+import { cx as innerCx } from '@emotion/css';
 
 /**
  * WordPress dependencies
@@ -15,7 +15,8 @@ import { useCallback } from '@wordpress/element';
 const isSerializedStyles = ( o: any ): o is SerializedStyles =>
 	typeof o !== 'undefined' &&
 	o !== null &&
-	[ 'name', 'styles' ].every( ( p ) => typeof o[ p ] !== 'undefined' );
+	typeof o.name !== 'undefined' &&
+	typeof o.styles !== 'undefined';
 
 /**
  * Retrieve a `cx` function that knows how to handle `SerializedStyles`
@@ -42,21 +43,40 @@ export const useCx = () => {
 	const cache = useEmotionCache();
 
 	const cx = useCallback(
-		( ...classNames: ( ClassNamesArg | SerializedStyles )[] ) => {
+		function () {
 			if ( cache === null ) {
 				throw new Error(
 					'The `useCx` hook should be only used within a valid Emotion Cache Context'
 				);
 			}
 
-			return innerCx(
-				...classNames.map( ( arg ) => {
-					if ( isSerializedStyles( arg ) ) {
-						insertStyles( cache, arg, false );
-						return `${ cache.key }-${ arg.name }`;
-					}
-					return arg;
-				} )
+			let classNames = null;
+			for ( let i = 0; i < arguments.length; i++ ) {
+				// eslint-disable-next-line prefer-rest-params
+				if ( isSerializedStyles( arguments[ i ] ) ) {
+					// eslint-disable-next-line prefer-rest-params
+					insertStyles( cache, arguments[ i ], false );
+					// eslint-disable-next-line prefer-rest-params
+					classNames = Array.prototype.slice.call( arguments, 0, i );
+					classNames.push(
+						// eslint-disable-next-line prefer-rest-params
+						`${ cache.key }-${ arguments[ i ].name }`
+					);
+					continue;
+				}
+
+				if ( null !== classNames ) {
+					// eslint-disable-next-line prefer-rest-params
+					classNames.push( arguments[ i ] );
+				}
+			}
+
+			// eslint-disable-next-line prefer-spread
+			return innerCx.apply(
+				null,
+				// @ts-ignore
+				// eslint-disable-next-line prefer-rest-params
+				null === classNames ? arguments : classNames
 			);
 		},
 		[ cache ]

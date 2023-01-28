@@ -13,20 +13,35 @@ const coreDataStore = {
 				return registry.dispatch( key )[ actionName ]( ...args );
 			};
 
+		const selectors = {
+			getIsResolving( key, ...args ) {
+				return registry
+					.select( key )
+					.getIsResolving.apply( null, args );
+			},
+			hasStartedResolution( key, ...args ) {
+				return registry
+					.select( key )
+					.hasStartedResolution.apply( null, args );
+			},
+			hasFinishedResolution( key, ...args ) {
+				return registry
+					.select( key )
+					.hasFinishedResolution.apply( null, args );
+			},
+			isResolving( key, ...args ) {
+				return registry.select( key ).isResolving.apply( null, args );
+			},
+			getCachedResolvers( key, ...args ) {
+				return registry
+					.select( key )
+					.getCachedResolvers.apply( null, args );
+			},
+		};
+
 		return {
 			getSelectors() {
-				return Object.fromEntries(
-					[
-						'getIsResolving',
-						'hasStartedResolution',
-						'hasFinishedResolution',
-						'isResolving',
-						'getCachedResolvers',
-					].map( ( selectorName ) => [
-						selectorName,
-						getCoreDataSelector( selectorName ),
-					] )
-				);
+				return selectors;
 			},
 
 			getActions() {

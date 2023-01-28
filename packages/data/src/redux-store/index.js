@@ -350,6 +350,45 @@ function instantiateReduxStore( key, options, registry, thunkArgs ) {
 function mapSelectors( selectors, store ) {
 	const createStateSelector = ( registrySelector ) => {
 		const selector = function runSelector() {
+			const originalState = store.__unstableOriginalGetState();
+
+			switch ( arguments.length ) {
+				case 0:
+					return registrySelector( originalState );
+				case 1:
+					return registrySelector( originalState, arguments[ 0 ] );
+				case 2:
+					return registrySelector(
+						originalState,
+						arguments[ 0 ],
+						arguments[ 1 ]
+					);
+				case 3:
+					return registrySelector(
+						originalState,
+						arguments[ 0 ],
+						arguments[ 1 ],
+						arguments[ 2 ]
+					);
+				case 4:
+					return registrySelector(
+						originalState,
+						arguments[ 0 ],
+						arguments[ 1 ],
+						arguments[ 2 ],
+						arguments[ 3 ]
+					);
+				case 5:
+					return registrySelector(
+						originalState,
+						arguments[ 0 ],
+						arguments[ 1 ],
+						arguments[ 2 ],
+						arguments[ 3 ],
+						arguments[ 4 ]
+					);
+			}
+
 			// This function is an optimized implementation of:
 			//
 			//   selector( store.getState(), ...arguments )
@@ -359,12 +398,12 @@ function mapSelectors( selectors, store ) {
 			// direct assignment.
 			const argsLength = arguments.length;
 			const args = new Array( argsLength + 1 );
-			args[ 0 ] = store.__unstableOriginalGetState();
+			args[ 0 ] = originalState;
 			for ( let i = 0; i < argsLength; i++ ) {
 				args[ i + 1 ] = arguments[ i ];
 			}
 
-			return registrySelector( ...args );
+			return registrySelector.apply( null, args );
 		};
 		selector.hasResolver = false;
 		return selector;
@@ -382,11 +421,14 @@ function mapSelectors( selectors, store ) {
  * @return {Object} Actions mapped to the redux store provided.
  */
 function mapActions( actions, store ) {
-	const createBoundAction =
-		( action ) =>
-		( ...args ) => {
-			return Promise.resolve( store.dispatch( action( ...args ) ) );
+	const createBoundAction = ( action ) => {
+		return function () {
+			const processedAction = action.apply( null, arguments );
+			const dispatchReturn = store.dispatch( processedAction );
+
+			return Promise.resolve( dispatchReturn );
 		};
+	};
 
 	return mapValues( actions, createBoundAction );
 }
@@ -416,7 +458,9 @@ function mapResolveSelectors( selectors, store ) {
 		// If the selector doesn't have a resolver, just convert the return value
 		// (including exceptions) to a Promise, no additional extra behavior is needed.
 		if ( ! selector.hasResolver ) {
-			return async ( ...args ) => selector.apply( null, args );
+			return async function () {
+				return selector.apply( null, arguments );
+			};
 		}
 
 		return ( ...args ) => {

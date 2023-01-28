@@ -3,6 +3,8 @@
  *
  * @return {import("../types").DataEmitter} Emitter.
  */
+let globalPause = false;
+
 export function createEmitter() {
 	let isPaused = false;
 	let isPending = false;
@@ -15,7 +17,7 @@ export function createEmitter() {
 
 	return {
 		get isPaused() {
-			return isPaused;
+			return isPaused || globalPause;
 		},
 
 		subscribe( listener ) {
@@ -27,8 +29,13 @@ export function createEmitter() {
 			isPaused = true;
 		},
 
+		pauseGlobal() {
+			globalPause = true;
+		},
+
 		resume() {
 			isPaused = false;
+			globalPause = false;
 			if ( isPending ) {
 				isPending = false;
 				notifyListeners();
@@ -36,7 +43,7 @@ export function createEmitter() {
 		},
 
 		emit() {
-			if ( isPaused ) {
+			if ( isPaused || globalPause ) {
 				isPending = true;
 				return;
 			}

@@ -17,6 +17,8 @@ import { insertAt, moveTo } from './array';
 
 const identity = ( x ) => x;
 
+console.log( 'block-editor: store > reducer' );
+
 /**
  * Given an array of blocks, returns an object where each key is a nesting
  * context, the value of which is an array of block client IDs existing within
