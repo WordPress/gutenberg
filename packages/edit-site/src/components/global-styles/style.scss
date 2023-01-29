@@ -136,6 +136,32 @@ $block-preview-height: 150px;
 	border-radius: $radius-block-ui;
 }
 
+.edit-site-global-styles-screen-css {
+	flex: 1 1 auto;
+	display: flex;
+	flex-direction: column;
+
+	.components-v-stack {
+		flex: 1 1 auto;
+
+		.edit-site-global-styles__custom-css-input {
+			flex: 1 1 auto;
+			display: flex;
+			flex-direction: column;
+
+			.components-base-control__field {
+				flex: 1 1 auto;
+				display: flex;
+				flex-direction: column;
+
+				.components-textarea-control__input {
+					flex: 1 1 auto;
+				}
+			}
+		}
+	}
+}
+
 .edit-site-global-styles__custom-css-input textarea {
 	font-family: $editor_html_font;
 }
@@ -148,6 +174,9 @@ $block-preview-height: 150px;
 	overflow-y: scroll;
 }
 
+.edit-site-global-styles-screen-css-help-link {
+	padding-left: $grid-unit-20;
+}
 .edit-site-global-styles-screen-variations {
 	margin-top: $grid-unit-20;
 	border-top: 1px solid $gray-300;
@@ -155,4 +184,9 @@ $block-preview-height: 150px;
 	& > * {
 		margin: $grid-unit-30 $grid-unit-20;
 	}
+}
+
+.edit-site-global-styles-sidebar__navigator-screen {
+	display: flex;
+	flex-direction: column;
 }
