@@ -115,7 +115,7 @@ function ScreenRoot() {
 				</ItemGroup>
 			</CardBody>
 
-			{ canEditCSS && customCSS && (
+			{ canEditCSS && !! customCSS && (
 				<>
 					<CardDivider />
 					<CardBody>
