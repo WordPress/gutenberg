@@ -13,10 +13,9 @@ import mixPlugin from 'colord/plugins/mix';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	useCallback,
-	useEffect,
-	useRef,
 	useMemo,
 	useState,
+	useRef,
 	forwardRef,
 } from '@wordpress/element';
 
@@ -197,14 +196,17 @@ function UnforwardedColorPalette(
 	const [ normalizedColorValue, setNormalizedColorValue ] = useState( value );
 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
 
-	useEffect( () => {
-		if ( ! customColorPaletteRef.current ) {
-			return;
-		}
-		setNormalizedColorValue(
-			normalizeColorValue( value, customColorPaletteRef )
-		);
-	}, [ value ] );
+	const customColorPaletteCallbackRef = useCallback(
+		( ref: HTMLElement | null ) => {
+			if ( ref ) {
+				customColorPaletteRef.current = ref;
+				setNormalizedColorValue(
+					normalizeColorValue( value, customColorPaletteRef )
+				);
+			}
+		},
+		[ value ]
+	);
 
 	const hasMultipleColorOrigins = isMultiplePaletteArray( colors );
 	const buttonLabelName = useMemo(
@@ -268,7 +270,7 @@ function UnforwardedColorPalette(
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<Flex
 							as={ 'button' }
-							ref={ customColorPaletteRef }
+							ref={ customColorPaletteCallbackRef }
 							justify="space-between"
 							align="flex-start"
 							className="components-color-palette__custom-color"
