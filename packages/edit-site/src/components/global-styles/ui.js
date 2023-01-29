@@ -42,7 +42,7 @@ const SLOT_FILL_NAME = 'GlobalStylesMenu';
 const { Slot: GlobalStylesMenuSlot, Fill: GlobalStylesMenuFill } =
 	createSlotFill( SLOT_FILL_NAME );
 
-function GlobalStylesMenu() {
+function GlobalStylesActionMenu() {
 	const { toggle } = useDispatch( preferencesStore );
 	const { useGlobalStylesReset } = unlock( blockEditorExperiments );
 	const [ canReset, onReset ] = useGlobalStylesReset();
@@ -332,7 +332,7 @@ function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
 				<GlobalStylesStyleBook onClose={ onCloseStyleBook } />
 			) }
 
-			<GlobalStylesMenu />
+			<GlobalStylesActionMenu />
 		</NavigatorProvider>
 	);
 }
