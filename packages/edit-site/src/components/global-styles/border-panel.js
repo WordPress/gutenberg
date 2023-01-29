@@ -14,6 +14,7 @@ import {
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { debounce } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -117,6 +118,9 @@ export default function BorderPanel( { name, variation = '' } ) {
 		`${ prefix }border.radius`,
 		name
 	);
+
+	const debouncedSetBorderRadius = debounce( setBorderRadius, 5 );
+
 	const hasBorderRadius = () => {
 		const borderValues = userBorderStyles?.radius;
 		if ( typeof borderValues === 'object' ) {
@@ -205,7 +209,7 @@ export default function BorderPanel( { name, variation = '' } ) {
 					<BorderRadiusControl
 						values={ borderRadiusValues }
 						onChange={ ( value ) => {
-							setBorderRadius( value || undefined );
+							debouncedSetBorderRadius( value || undefined );
 						} }
 					/>
 				</ToolsPanelItem>
