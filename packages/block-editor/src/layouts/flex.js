@@ -7,6 +7,7 @@ import {
 	justifyCenter,
 	justifyRight,
 	justifySpaceBetween,
+	justifyStretch,
 	arrowRight,
 	arrowDown,
 } from '@wordpress/icons';
@@ -44,12 +45,15 @@ const alignItemsMap = {
 	left: 'flex-start',
 	right: 'flex-end',
 	center: 'center',
+	stretch: 'stretch',
 };
 
 const verticalAlignmentMap = {
 	top: 'flex-start',
 	center: 'center',
 	bottom: 'flex-end',
+	stretch: 'stretch',
+	'space-between': 'space-between',
 };
 
 const flexWrapOptions = [ 'wrap', 'nowrap' ];
@@ -101,14 +105,13 @@ export default {
 					onChange={ onChange }
 					isToolbar
 				/>
-				{ allowVerticalAlignment &&
-					layout?.orientation !== 'vertical' && (
-						<FlexLayoutVerticalAlignmentControl
-							layout={ layout }
-							onChange={ onChange }
-							isToolbar
-						/>
-					) }
+				{ allowVerticalAlignment && (
+					<FlexLayoutVerticalAlignmentControl
+						layout={ layout }
+						onChange={ onChange }
+						isToolbar
+					/>
+				) }
 			</BlockControls>
 		);
 	},
@@ -153,6 +156,9 @@ export default {
 				rules.push( `justify-content: ${ justifyContent }` );
 			}
 		} else {
+			if ( verticalAlignment ) {
+				rules.push( `justify-content: ${ verticalAlignment }` );
+			}
 			rules.push( 'flex-direction: column' );
 			rules.push( `align-items: ${ alignItems }` );
 		}
@@ -188,7 +194,14 @@ function FlexLayoutVerticalAlignmentControl( {
 	onChange,
 	isToolbar = false,
 } ) {
-	const { verticalAlignment = verticalAlignmentMap.center } = layout;
+	const { orientation = 'horizontal' } = layout;
+
+	const defaultVerticalAlignment =
+		orientation === 'horizontal'
+			? verticalAlignmentMap.center
+			: verticalAlignmentMap.top;
+
+	const { verticalAlignment = defaultVerticalAlignment } = layout;
 
 	const onVerticalAlignmentChange = ( value ) => {
 		onChange( {
@@ -201,6 +214,11 @@ function FlexLayoutVerticalAlignmentControl( {
 			<BlockVerticalAlignmentControl
 				onChange={ onVerticalAlignmentChange }
 				value={ verticalAlignment }
+				controls={
+					orientation === 'horizontal'
+						? [ 'top', 'center', 'bottom', 'stretch' ]
+						: [ 'top', 'center', 'bottom', 'space-between' ]
+				}
 			/>
 		);
 	}
@@ -255,6 +273,8 @@ function FlexLayoutJustifyContentControl( {
 	const allowedControls = [ 'left', 'center', 'right' ];
 	if ( orientation === 'horizontal' ) {
 		allowedControls.push( 'space-between' );
+	} else {
+		allowedControls.push( 'stretch' );
 	}
 	if ( isToolbar ) {
 		return (
@@ -292,6 +312,13 @@ function FlexLayoutJustifyContentControl( {
 			value: 'space-between',
 			icon: justifySpaceBetween,
 			label: __( 'Space between items' ),
+		} );
+	} else {
+		// Todo: we also need an icon here.
+		justificationOptions.push( {
+			value: 'stretch',
+			icon: justifyStretch,
+			label: __( 'Stretch items' ),
 		} );
 	}
 
