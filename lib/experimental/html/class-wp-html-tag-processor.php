@@ -20,6 +20,7 @@
  * @TODO: Add slow mode to escape character entities in CSS class names?
  *        (This requires a custom decoder since `html_entity_decode()`
  *        doesn't handle attribute character reference decoding rules.
+ * @TODO: Do we make any indexing assumptions based on only scanning tag openers? $tag_name - 1 vs. </tag>?
  *
  * @package WordPress
  * @subpackage HTML
@@ -388,7 +389,7 @@ class WP_HTML_Tag_Processor {
 	 * @since 6.2.0
 	 * @var WP_HTML_Span[]
 	 */
-	private $bookmarks = array();
+	protected $bookmarks = array();
 
 	const ADD_CLASS    = true;
 	const REMOVE_CLASS = false;
@@ -1586,6 +1587,26 @@ class WP_HTML_Tag_Processor {
 	}
 
 	/**
+	 * Returns a representation of the currently-open tag, for debug purposes.
+	 *
+	 * @since 6.3.0
+	 * @return string
+	 */
+	public function debug_current_token() {
+		if ( null === $this->tag_name_starts_at ) {
+			return '';
+		}
+
+		if ( $this->is_tag_closer() ) {
+			$tag_name = substr( $this->html, $this->tag_name_starts_at, $this->tag_name_length );
+			return "</{$tag_name}>";
+		}
+
+		$tag_starts_at = $this->tag_name_starts_at - 1;
+		return substr( $this->html, $tag_starts_at, $this->tag_ends_at - $tag_starts_at + 1 );
+	}
+
+	/**
 	 * Indicates if the current tag token is a tag closer.
 	 *
 	 * Example:
@@ -1900,7 +1921,7 @@ class WP_HTML_Tag_Processor {
 	 *     @type string      $tag_closers  "visit" or "skip": whether to stop on tag closers, e.g. </div>.
 	 * }
 	 */
-	private function parse_query( $query ) {
+	protected function parse_query( $query ) {
 		if ( null !== $query && $query === $this->last_query ) {
 			return;
 		}
@@ -1947,7 +1968,7 @@ class WP_HTML_Tag_Processor {
 	 *
 	 * @return boolean
 	 */
-	private function matches() {
+	protected function matches() {
 		if ( $this->is_closing_tag && ! $this->stop_on_tag_closers ) {
 			return false;
 		}
