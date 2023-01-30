@@ -421,7 +421,7 @@ function block_core_navigation_block_contains_core_navigation( $inner_blocks ) {
 		if ( 'core/navigation' === $block->name ) {
 			return true;
 		}
-		if ( block_core_navigation_block_contains_core_navigation( $block->inner_blocks ) ) {
+		if ( $block->inner_blocks && block_core_navigation_block_contains_core_navigation( $block->inner_blocks ) ) {
 			return true;
 		}
 	}
