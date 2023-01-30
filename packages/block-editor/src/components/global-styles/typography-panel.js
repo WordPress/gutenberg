@@ -430,6 +430,23 @@ export default function TypographyPanel( {
 					/>
 				</ToolsPanelItem>
 			) }
+			{ hasTextDecorationControl && (
+				<ToolsPanelItem
+					className="single-column"
+					label={ __( 'Text decoration' ) }
+					hasValue={ hasTextDecoration }
+					onDeselect={ resetTextDecoration }
+					isShownByDefault={ defaultControls.textDecoration }
+					panelId={ panelId }
+				>
+					<TextDecorationControl
+						value={ textDecoration }
+						onChange={ setTextDecoration }
+						size="__unstable-large"
+						__unstableInputWidth="auto"
+					/>
+				</ToolsPanelItem>
+			) }
 			{ hasTextTransformControl && (
 				<ToolsPanelItem
 					label={ __( 'Letter case' ) }
@@ -445,23 +462,6 @@ export default function TypographyPanel( {
 						isBlock
 						size="__unstable-large"
 						__nextHasNoMarginBottom
-					/>
-				</ToolsPanelItem>
-			) }
-			{ hasTextDecorationControl && (
-				<ToolsPanelItem
-					className="single-column"
-					label={ __( 'Text decoration' ) }
-					hasValue={ hasTextDecoration }
-					onDeselect={ resetTextDecoration }
-					isShownByDefault={ defaultControls.textDecoration }
-					panelId={ panelId }
-				>
-					<TextDecorationControl
-						value={ textDecoration }
-						onChange={ setTextDecoration }
-						size="__unstable-large"
-						__unstableInputWidth="auto"
 					/>
 				</ToolsPanelItem>
 			) }
