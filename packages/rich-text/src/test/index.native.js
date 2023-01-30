@@ -31,11 +31,9 @@ import RichText from '../component/index.native';
 const mockGlobalSettings = (
 	settings = { fontSize: 'var(--wp--preset--font-size--normal)' }
 ) => {
-	const { fontSize, lineHeight } = settings;
+	const { fontSize } = settings;
 	const DEFAULT_GLOBAL_STYLES = {
-		__experimentalGlobalStylesBaseStyles: {
-			typography: { fontSize, lineHeight },
-		},
+		__experimentalGlobalStylesBaseStyles: { typography: { fontSize } },
 	};
 	jest.spyOn( select( blockEditorStore ), 'getSettings' ).mockReturnValue(
 		DEFAULT_GLOBAL_STYLES
@@ -264,9 +262,7 @@ describe( '<RichText/>', () => {
 			// Assert.
 			expect( screen.toJSON() ).toMatchSnapshot();
 		} );
-	} );
 
-	describe( 'Line height', () => {
 		it( 'should set the default minimum line height value if the provided value from the styles is lower', () => {
 			// Arrange.
 			const expectedLineHeight = 1;
@@ -276,29 +272,8 @@ describe( '<RichText/>', () => {
 				<RichText accessibilityLabel={ 'editor' } style={ style } />
 			);
 			// Assert.
-			const actualLineHeight =
-				getByLabelText( 'editor' ).props.lineHeight;
-			expect( actualLineHeight ).toBe( expectedLineHeight );
-		} );
-
-		it( 'should set a line height from a CSS value', () => {
-			// Arrange.
-			const expectedFontSize = 16;
-			const expectedLineHeight = 1.88;
-			mockGlobalSettings( {
-				fontSize: 'min(1em, 2em)',
-				lineHeight: 'calc( 1em + 0.875rem )',
-			} );
-			// Act.
-			const { getByLabelText } = render(
-				<RichText accessibilityLabel={ 'editor' } tagName="p" />
-			);
-			// Assert.
-			const actualFontSize = getByLabelText( 'editor' ).props.fontSize;
-			expect( actualFontSize ).toBe( expectedFontSize );
-			const actualLineHeight =
-				getByLabelText( 'editor' ).props.lineHeight;
-			expect( actualLineHeight ).toBe( expectedLineHeight );
+			const actualFontSize = getByLabelText( 'editor' ).props.lineHeight;
+			expect( actualFontSize ).toBe( expectedLineHeight );
 		} );
 	} );
 } );

@@ -59,6 +59,7 @@ import {
 } from './child-layout';
 import useSetting from '../components/use-setting';
 import { store as blockEditorStore } from '../store';
+import { unlock } from '../experiments';
 
 export const DIMENSIONS_SUPPORT_KEY = 'dimensions';
 export const SPACING_SUPPORT_KEY = 'spacing';
@@ -67,10 +68,9 @@ export const AXIAL_SIDES = [ 'vertical', 'horizontal' ];
 
 function useVisualizerMouseOver() {
 	const [ isMouseOver, setIsMouseOver ] = useState( false );
-	const {
-		__experimentalHideBlockInterface: hideBlockInterface,
-		__experimentalShowBlockInterface: showBlockInterface,
-	} = useDispatch( blockEditorStore );
+	const { hideBlockInterface, showBlockInterface } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const onMouseOver = ( e ) => {
 		e.stopPropagation();
 		hideBlockInterface();
@@ -137,7 +137,7 @@ export function DimensionsPanel( props ) {
 
 	return (
 		<>
-			<InspectorControls __experimentalGroup="dimensions">
+			<InspectorControls group="dimensions">
 				{ ! isPaddingDisabled && (
 					<ToolsPanelItem
 						className={ spacingClassnames }
@@ -301,7 +301,7 @@ const useIsDimensionsDisabled = ( props = {} ) => {
  * @param {string} blockName Block name.
  * @param {string} feature   The feature custom sides relate to e.g. padding or margins.
  *
- * @return {?string[]} Strings representing the custom sides available.
+ * @return {string[] | undefined} Strings representing the custom sides available.
  */
 export function useCustomSides( blockName, feature ) {
 	const support = getBlockSupport( blockName, SPACING_SUPPORT_KEY );

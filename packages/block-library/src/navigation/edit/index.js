@@ -89,9 +89,6 @@ function Navigation( {
 	hasColorSettings = true,
 	customPlaceholder: CustomPlaceholder = null,
 } ) {
-	const isOffCanvasNavigationEditorEnabled =
-		window?.__experimentalEnableOffCanvasNavigationEditor === true;
-
 	const {
 		openSubmenusOnClick,
 		overlayMenu,
@@ -653,7 +650,7 @@ function Navigation( {
 					</PanelBody>
 				) }
 			</InspectorControls>
-			<InspectorControls __experimentalGroup="color">
+			<InspectorControls group="color">
 				{ hasColorSettings && (
 					<>
 						<ColorGradientSettingsDropdown
@@ -857,7 +854,7 @@ function Navigation( {
 				/>
 				{ stylingInspectorControls }
 				{ isEntityAvailable && (
-					<InspectorControls __experimentalGroup="advanced">
+					<InspectorControls group="advanced">
 						{ hasResolvedCanUserUpdateNavigationMenu &&
 							canUserUpdateNavigationMenu && (
 								<NavigationMenuNameControl />
@@ -879,12 +876,10 @@ function Navigation( {
 									} }
 								/>
 							) }
-						{ isOffCanvasNavigationEditorEnabled && (
-							<ManageMenusButton
-								disabled={ isManageMenusButtonDisabled }
-								className="wp-block-navigation-manage-menus-button"
-							/>
-						) }
+						<ManageMenusButton
+							disabled={ isManageMenusButtonDisabled }
+							className="wp-block-navigation-manage-menus-button"
+						/>
 					</InspectorControls>
 				) }
 

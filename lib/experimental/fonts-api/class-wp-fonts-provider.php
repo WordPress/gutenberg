@@ -25,7 +25,7 @@ if ( class_exists( 'WP_Fonts_Provider' ) ) {
  * and how to generate the `@font-face` styles for its service.
  *
  * It receives a collection of fonts from the Controller
- * {@see WP_Fonts_Provider::set_setfonts()}, and when requested
+ * {@see WP_Fonts_Provider::set_fonts()}, and when requested
  * {@see WP_Fonts_Provider::get_css()}, it transforms them
  * into styles (in a performant way for the provider service
  * it manages).

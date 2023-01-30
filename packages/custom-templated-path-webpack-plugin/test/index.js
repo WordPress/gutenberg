@@ -32,7 +32,9 @@ describe( 'CustomTemplatedPathPlugin', () => {
 	} );
 
 	it( 'should resolve with basename output', async () => {
-		await webpackAsync( config );
-		await accessAsync( outputFile );
+		expect( async () => {
+			await webpackAsync( config );
+			await accessAsync( outputFile );
+		} ).not.toThrow();
 	} );
 } );

@@ -110,7 +110,7 @@ function getNodeAsString( node ) {
  * @param {number} _originalNodeLine Private: In recursion, line number of
  *                                   the original node passed.
  *
- * @return {?string} Extracted comment.
+ * @return {string | undefined} Extracted comment.
  */
 function getExtractedComment( path, _originalNodeLine ) {
 	const { node, parent, parentPath } = path;

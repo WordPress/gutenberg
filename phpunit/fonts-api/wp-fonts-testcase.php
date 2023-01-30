@@ -256,13 +256,4 @@ abstract class WP_Fonts_TestCase extends WP_UnitTestCase {
 
 		return $handles;
 	}
-
-	/**
-	 * Suppresses deprecation notices allowing a test to skip deprecations
-	 * to test notices or other specifics.
-	 */
-	protected function suppress_deprecations() {
-		$this->error_reporting_level = error_reporting();
-		error_reporting( $this->error_reporting_level & ~E_USER_DEPRECATED );
-	}
 }

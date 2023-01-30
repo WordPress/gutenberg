@@ -86,7 +86,7 @@ _Parameters_
 
 _Returns_
 
--   `boolean`: Whether the given block is allowed to be moved.
+-   `boolean | undefined`: Whether the given block is allowed to be moved.
 
 ### canMoveBlocks
 
@@ -305,6 +305,20 @@ _Parameters_
 _Returns_
 
 -   `string`: Block name.
+
+### getBlockNamesByClientId
+
+Given an array of block client IDs, returns the corresponding array of block
+names.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _clientIds_ `string[]`: Client IDs for which block names are to be returned.
+
+_Returns_
+
+-   `string[]`: Block names.
 
 ### getBlockOrder
 

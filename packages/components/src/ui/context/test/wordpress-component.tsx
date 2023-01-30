@@ -14,6 +14,7 @@ import { forwardRef } from '@wordpress/element';
 import type { WordPressComponentProps } from '../wordpress-component';
 
 // Static TypeScript checks
+/* eslint-disable jest/expect-expect */
 describe( 'WordPressComponentProps', () => {
 	it( 'should not accept a ref', () => {
 		const Foo = ( props: WordPressComponentProps< {}, 'div' > ) => (
@@ -34,3 +35,4 @@ describe( 'WordPressComponentProps', () => {
 		<ForwardedFoo ref={ null } />;
 	} );
 } );
+/* eslint-enable jest/expect-expect */

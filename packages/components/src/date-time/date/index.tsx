@@ -16,6 +16,7 @@ import {
 	startOfWeek,
 	endOfWeek,
 } from 'date-fns';
+import type { KeyboardEventHandler } from 'react';
 
 /**
  * WordPress dependencies
@@ -273,7 +274,7 @@ type DayProps = {
 	numEvents: number;
 	isInvalid: boolean;
 	onClick: () => void;
-	onKeyDown: ( event: KeyboardEvent ) => void;
+	onKeyDown: KeyboardEventHandler;
 };
 
 function Day( {

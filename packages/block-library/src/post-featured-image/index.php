@@ -31,7 +31,15 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	$overlay_markup = get_block_core_post_featured_image_overlay_element_markup( $attributes );
 
 	if ( $is_link ) {
-		$attr['alt'] = trim( strip_tags( get_the_title( $post_ID ) ) );
+		if ( get_the_title( $post_ID ) ) {
+			$attr['alt'] = trim( strip_tags( get_the_title( $post_ID ) ) );
+		} else {
+			$attr['alt'] = sprintf(
+				// translators: %d is the post ID.
+				__( 'Untitled post %d' ),
+				$post_ID
+			);
+		}
 	}
 
 	if ( ! empty( $attributes['height'] ) ) {

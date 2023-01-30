@@ -38,6 +38,7 @@ export default function useInspectorControlsTabs( blockName ) {
 		dimensions: dimensionsGroup,
 		list: listGroup,
 		position: positionGroup,
+		styles: stylesGroup,
 		typography: typographyGroup,
 	} = InspectorControlsGroups;
 
@@ -55,6 +56,7 @@ export default function useInspectorControlsTabs( blockName ) {
 		...( useSlotFills( borderGroup.Slot.__unstableName ) || [] ),
 		...( useSlotFills( colorGroup.Slot.__unstableName ) || [] ),
 		...( useSlotFills( dimensionsGroup.Slot.__unstableName ) || [] ),
+		...( useSlotFills( stylesGroup.Slot.__unstableName ) || [] ),
 		...( useSlotFills( typographyGroup.Slot.__unstableName ) || [] ),
 	];
 
@@ -62,12 +64,17 @@ export default function useInspectorControlsTabs( blockName ) {
 		tabs.push( TAB_STYLES );
 	}
 
-	// Settings Tab: If there are any fills for the general InspectorControls
-	// or Advanced Controls slot, then add this tab.
+	// Settings Tab: If we don't already have multiple tabs to display
+	// (i.e. both list view and styles), check only the default and position
+	// InspectorControls slots. If we have multiple tabs, we'll need to check
+	// the advanced controls slot as well to ensure they are rendered.
+	const advancedFills =
+		useSlotFills( InspectorAdvancedControls.slotName ) || [];
+
 	const settingsFills = [
 		...( useSlotFills( defaultGroup.Slot.__unstableName ) || [] ),
 		...( useSlotFills( positionGroup.Slot.__unstableName ) || [] ),
-		...( useSlotFills( InspectorAdvancedControls.slotName ) || [] ),
+		...( tabs.length > 1 ? advancedFills : [] ),
 	];
 
 	if ( settingsFills.length ) {

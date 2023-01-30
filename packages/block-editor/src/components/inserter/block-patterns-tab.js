@@ -92,6 +92,7 @@ function usePatternsCategories( rootClientId ) {
 export function BlockPatternsCategoryDialog( {
 	rootClientId,
 	onInsert,
+	onHover,
 	category,
 	showTitlesAsTooltip,
 } ) {
@@ -113,6 +114,7 @@ export function BlockPatternsCategoryDialog( {
 			<BlockPatternsCategoryPanel
 				rootClientId={ rootClientId }
 				onInsert={ onInsert }
+				onHover={ onHover }
 				category={ category }
 				showTitlesAsTooltip={ showTitlesAsTooltip }
 			/>
@@ -123,6 +125,7 @@ export function BlockPatternsCategoryDialog( {
 export function BlockPatternsCategoryPanel( {
 	rootClientId,
 	onInsert,
+	onHover,
 	category,
 	showTitlesAsTooltip,
 } ) {
@@ -156,6 +159,9 @@ export function BlockPatternsCategoryPanel( {
 
 	const currentShownPatterns = useAsyncList( currentCategoryPatterns );
 
+	// Hide block pattern preview on unmount.
+	useEffect( () => () => onHover( null ), [] );
+
 	if ( ! currentCategoryPatterns.length ) {
 		return null;
 	}
@@ -170,6 +176,7 @@ export function BlockPatternsCategoryPanel( {
 				shownPatterns={ currentShownPatterns }
 				blockPatterns={ currentCategoryPatterns }
 				onClickPattern={ onClick }
+				onHover={ onHover }
 				label={ category.label }
 				orientation="vertical"
 				category={ category.label }
