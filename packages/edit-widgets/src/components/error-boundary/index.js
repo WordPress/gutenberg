@@ -17,24 +17,12 @@ function CopyButton( { text, children } ) {
 	);
 }
 
-function ErrorBoundaryWarning( { message, error, reboot } ) {
-	const actions = [];
-
-	if ( reboot ) {
-		actions.push(
-			<Button key="recovery" onClick={ reboot } variant="secondary">
-				{ __( 'Attempt Recovery' ) }
-			</Button>
-		);
-	}
-
-	if ( error ) {
-		actions.push(
-			<CopyButton key="copy-error" text={ error.stack }>
-				{ __( 'Copy Error' ) }
-			</CopyButton>
-		);
-	}
+function ErrorBoundaryWarning( { message, error } ) {
+	const actions = [
+		<CopyButton key="copy-error" text={ error.stack }>
+			{ __( 'Copy Error' ) }
+		</CopyButton>,
+	];
 
 	return (
 		<Warning className="edit-widgets-error-boundary" actions={ actions }>
@@ -71,7 +59,6 @@ export default class ErrorBoundary extends Component {
 					'The editor has encountered an unexpected error.'
 				) }
 				error={ this.state.error }
-				reboot={ this.props.onError }
 			/>
 		);
 	}

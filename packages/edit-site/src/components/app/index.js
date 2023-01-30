@@ -15,7 +15,7 @@ import { PluginArea } from '@wordpress/plugins';
 import { Routes } from '../routes';
 import Layout from '../layout';
 
-export default function App( { onError } ) {
+export default function App() {
 	const { createErrorNotice } = useDispatch( noticesStore );
 
 	function onPluginAreaError( name ) {
@@ -37,7 +37,7 @@ export default function App( { onError } ) {
 				<UnsavedChangesWarning />
 
 				<Routes>
-					<Layout onError={ onError } />
+					<Layout />
 					<PluginArea onError={ onPluginAreaError } />
 				</Routes>
 			</SlotFillProvider>

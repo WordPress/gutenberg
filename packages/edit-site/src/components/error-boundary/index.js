@@ -38,7 +38,6 @@ export default class ErrorBoundary extends Component {
 					'The editor has encountered an unexpected error.'
 				) }
 				error={ this.state.error }
-				reboot={ this.props.onError }
 			/>
 		);
 	}

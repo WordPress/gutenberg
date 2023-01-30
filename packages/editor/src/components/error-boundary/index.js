@@ -39,8 +39,6 @@ class ErrorBoundary extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.getContent = this.getContent.bind( this );
-
 		this.state = {
 			error: null,
 		};
@@ -60,31 +58,14 @@ class ErrorBoundary extends Component {
 			return this.props.children;
 		}
 
-		const actions = [];
-
-		if ( this.props.onError ) {
-			actions.push(
-				<Button
-					key="recovery"
-					onClick={ this.props.onError }
-					variant="secondary"
-				>
-					{ __( 'Attempt Recovery' ) }
-				</Button>
-			);
-		}
-
-		actions.push(
+		const actions = [
 			<CopyButton key="copy-post" text={ getContent }>
 				{ __( 'Copy Post Text' ) }
-			</CopyButton>
-		);
-
-		actions.push(
+			</CopyButton>,
 			<CopyButton key="copy-error" text={ error.stack }>
 				{ __( 'Copy Error' ) }
-			</CopyButton>
-		);
+			</CopyButton>,
+		];
 
 		return (
 			<Warning className="editor-error-boundary" actions={ actions }>
