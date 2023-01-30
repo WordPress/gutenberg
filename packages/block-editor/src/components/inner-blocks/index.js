@@ -82,12 +82,15 @@ function UncontrolledInnerBlocks( props ) {
 		[ clientId ]
 	);
 
+	// Avoid creating new objects if there is no layout defined.
+	const emptyLayout = {};
+
 	const defaultLayoutBlockSupport =
-		getBlockSupport( name, '__experimentalLayout' ) || {};
+		getBlockSupport( name, '__experimentalLayout' ) || emptyLayout;
 
 	const { allowSizingOnChildren = false } = defaultLayoutBlockSupport;
 
-	const defaultLayout = useSetting( 'layout' ) || {};
+	const defaultLayout = useSetting( 'layout' ) || emptyLayout;
 
 	const usedLayout = layout || defaultLayoutBlockSupport;
 
