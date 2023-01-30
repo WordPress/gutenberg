@@ -7,13 +7,15 @@ import {
 	Panel,
 	PanelBody,
 	__experimentalVStack as VStack,
-	Notice,
+	Tooltip,
+	Icon,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
 	experiments as blockEditorExperiments,
 	transformStyles,
 } from '@wordpress/block-editor';
+import { info } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -109,13 +111,14 @@ function CustomCSSControl( { blockName } ) {
 					spellCheck={ false }
 				/>
 				{ cssError && (
-					<Notice
-						status="warning"
-						onRemove={ () => setCSSError( null ) }
-						politeness="polite"
-					>
-						{ cssError }
-					</Notice>
+					<Tooltip text={ cssError }>
+						<div className="edit-site-global-styles__custom-css-validation-wrapper">
+							<Icon
+								icon={ info }
+								className="edit-site-global-styles__custom-css-validation-icon"
+							/>
+						</div>
+					</Tooltip>
 				) }
 			</VStack>
 		</>
