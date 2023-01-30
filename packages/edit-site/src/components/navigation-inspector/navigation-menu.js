@@ -39,9 +39,7 @@ const ALLOWED_BLOCKS = {
 export default function NavigationMenu( { innerBlocks } ) {
 	const { updateBlockListSettings } = useDispatch( blockEditorStore );
 
-	const { __experimentalOffCanvasEditor: OffCanvasEditor } = unlock(
-		blockEditorExperiments
-	);
+	const { OffCanvasEditor } = unlock( blockEditorExperiments );
 
 	//TODO: Block settings are normally updated as a side effect of rendering InnerBlocks in BlockList
 	//Think through a better way of doing this, possible with adding allowed blocks to block library metadata
