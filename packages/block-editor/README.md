@@ -401,7 +401,7 @@ _Returns_
 
 ### getComputedFluidTypographyValue
 
-Computes a fluid font-size value that uses clamp(). A minimum and maxinmum
+Computes a fluid font-size value that uses clamp(). A minimum and maximum
 font size OR a single font size can be specified.
 
 If a single font size is specified, it is scaled up and down by
@@ -757,7 +757,7 @@ to try to find a match we need to things:
 1\. Block's client id to extract it's current attributes.
 2\. A block variation should have set `isActive` prop to a proper function.
 
-If for any reason a block variaton match cannot be found,
+If for any reason a block variation match cannot be found,
 the returned information come from the Block Type.
 If no blockType is found with the provided clientId, returns null.
 
