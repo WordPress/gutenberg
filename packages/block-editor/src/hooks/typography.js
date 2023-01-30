@@ -88,17 +88,19 @@ export function TypographyPanel( {
 			},
 		};
 	}, [ attributes.style, attributes.fontSize, attributes.fontFamily ] );
+
 	const onChange = ( newStyle ) => {
 		const updatedStyle = { ...omit( newStyle, [ 'fontFamily' ] ) };
 		const fontSizeValue = newStyle?.typography?.fontSize;
 		const fontFamilyValue = newStyle?.typography?.fontFamily;
-		const fontSizeSlug =
-			fontSizeValue?.indexOf( 'var:preset|font-size|' ) === 0
-				? fontSizeValue.substring( 21 )
-				: undefined;
+		const fontSizeSlug = fontSizeValue?.startsWith(
+			'var:preset|font-size|'
+		)
+			? fontSizeValue.substring( 'var:preset|font-size|'.length )
+			: undefined;
 		const fontFamilySlug =
-			fontFamilyValue?.indexOf( 'var:preset|font-family|' ) === 0
-				? fontFamilyValue.substring( 23 )
+			fontFamilyValue?.startsWith( 'var:preset|font-family|' ) === 0
+				? fontFamilyValue.substring( 'var:preset|font-family|'.length )
 				: undefined;
 		updatedStyle.typography = {
 			...omit( updatedStyle.typography, [ 'fontFamily' ] ),
@@ -110,7 +112,10 @@ export function TypographyPanel( {
 			fontSize: fontSizeSlug,
 		} );
 	};
-	if ( ! isEnabled || ! isSupported ) return null;
+
+	if ( ! isEnabled || ! isSupported ) {
+		return null;
+	}
 
 	const defaultControls = getBlockSupport( name, [
 		TYPOGRAPHY_SUPPORT_KEY,
