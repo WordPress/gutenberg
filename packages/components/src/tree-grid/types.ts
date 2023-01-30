@@ -66,6 +66,7 @@ export type TreeGridCellProps =
 	| ( {
 			/**
 			 * Render `children` without wrapping it in a `TreeGridItem` component.
+			 * This means that `children` will not participate in the roving tabindex.
 			 *
 			 * @default false
 			 */
