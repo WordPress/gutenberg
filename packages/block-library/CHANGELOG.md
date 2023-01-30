@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Feature
+
+-   Added support for `border-control` to `Quote Block` ([47537](https://github.com/WordPress/gutenberg/pull/47537))
+
 ## 8.2.0 (2023-01-11)
 
 ## 8.1.0 (2023-01-02)
