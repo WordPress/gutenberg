@@ -89,6 +89,7 @@ export async function getLoadingDurations() {
 				requestStart,
 				responseStart,
 				responseEnd,
+				startTime,
 				domContentLoadedEventEnd,
 				loadEventEnd,
 			},
@@ -110,6 +111,7 @@ export async function getLoadingDurations() {
 				).startTime - responseEnd,
 			// This is evaluated right after Puppeteer found the block selector.
 			firstBlock: performance.now() - responseEnd,
+			timeToFirstByte: responseStart - startTime,
 		};
 	} );
 }
