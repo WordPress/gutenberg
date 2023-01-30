@@ -204,7 +204,7 @@ function TableEdit( {
 	/**
 	 * Get the alignment of the currently selected cell.
 	 *
-	 * @return {string} The new alignment to apply to the column.
+	 * @return {string | undefined} The new alignment to apply to the column.
 	 */
 	function getCellAlignment() {
 		if ( ! selectedCell ) {

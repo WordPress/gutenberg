@@ -129,6 +129,33 @@ describe( 'Private data APIs', () => {
 			expect( unlockedSelectors.getPublicPrice() ).toEqual( 1000 );
 		} );
 
+		it( 'should support registerStore', () => {
+			const groceryStore = registry.registerStore(
+				storeName,
+				storeDescriptor
+			);
+			unlock( groceryStore ).registerPrivateSelectors( {
+				getSecretDiscount,
+			} );
+
+			const privateSelectors = unlock( registry.select( storeName ) );
+			expect( privateSelectors.getSecretDiscount() ).toEqual( 800 );
+		} );
+
+		it( 'should support mixing createReduxStore and registerStore', () => {
+			createReduxStore( storeName, storeDescriptor );
+			const groceryStore2 = registry.registerStore(
+				storeName,
+				storeDescriptor
+			);
+			unlock( groceryStore2 ).registerPrivateSelectors( {
+				getSecretDiscount,
+			} );
+
+			const privateSelectors = unlock( registry.select( storeName ) );
+			expect( privateSelectors.getSecretDiscount() ).toEqual( 800 );
+		} );
+
 		it( 'should support sub registries', () => {
 			const groceryStore = registry.registerStore(
 				storeName,
@@ -247,6 +274,21 @@ describe( 'Private data APIs', () => {
 			expect(
 				unlock( registry.select( groceryStore ) ).getSecretDiscount()
 			).toEqual( 100 );
+		} );
+
+		it( 'should support registerStore', () => {
+			const groceryStore = registry.registerStore(
+				storeName,
+				storeDescriptor
+			);
+			unlock( groceryStore ).registerPrivateActions( {
+				setSecretDiscount,
+			} );
+			const privateActions = unlock( registry.dispatch( storeName ) );
+			privateActions.setSecretDiscount( 400 );
+			expect(
+				registry.select( storeName ).getState().secretDiscount
+			).toEqual( 400 );
 		} );
 
 		it( 'should support sub registries', () => {

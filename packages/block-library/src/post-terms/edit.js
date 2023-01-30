@@ -83,7 +83,7 @@ export default function PostTermsEdit( {
 					} }
 				/>
 			</BlockControls>
-			<InspectorControls __experimentalGroup="advanced">
+			<InspectorControls group="advanced">
 				<TextControl
 					__nextHasNoMarginBottom
 					autoComplete="off"

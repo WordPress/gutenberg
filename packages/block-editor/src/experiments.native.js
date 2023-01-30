@@ -8,7 +8,6 @@ import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/exp
  */
 import * as globalStyles from './components/global-styles';
 import { ExperimentalBlockEditorProvider } from './components/provider';
-import { default as __experimentalOffCanvasEditor } from './components/off-canvas-editor';
 
 export const { lock, unlock } =
 	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
@@ -23,5 +22,4 @@ export const experiments = {};
 lock( experiments, {
 	...globalStyles,
 	ExperimentalBlockEditorProvider,
-	__experimentalOffCanvasEditor,
 } );

@@ -183,7 +183,7 @@ export function registerPlugin( name, settings ) {
  * unregisterPlugin( 'plugin-name' );
  * ```
  *
- * @return {?WPPlugin} The previous plugin settings object, if it has been
+ * @return {WPPlugin | undefined} The previous plugin settings object, if it has been
  *                     successfully unregistered; otherwise `undefined`.
  */
 export function unregisterPlugin( name ) {

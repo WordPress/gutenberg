@@ -49,7 +49,7 @@ function GroupEditControls( { tagName, onSelectTagName } ) {
 		),
 	};
 	return (
-		<InspectorControls __experimentalGroup="advanced">
+		<InspectorControls group="advanced">
 			<SelectControl
 				__nextHasNoMarginBottom
 				label={ __( 'HTML element' ) }

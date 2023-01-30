@@ -111,7 +111,7 @@ export function TypographyPanel( props ) {
 	} );
 
 	return (
-		<InspectorControls __experimentalGroup="typography">
+		<InspectorControls group="typography">
 			{ ! isFontFamilyDisabled && (
 				<ToolsPanelItem
 					hasValue={ () => hasFontFamilyValue( props ) }

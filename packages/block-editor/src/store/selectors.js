@@ -1403,7 +1403,7 @@ export const getBlockInsertionPoint = createSelector(
 	},
 	( state ) => [
 		state.insertionPoint,
-		state.selection.selectionEnd,
+		state.selection.selectionEnd.clientId,
 		state.blocks.parents,
 		state.blocks.order,
 	]
@@ -1682,7 +1682,7 @@ export function canRemoveBlocks( state, clientIds, rootClientId = null ) {
  * @param {string}  clientId     The block client Id.
  * @param {?string} rootClientId Optional root client ID of block list.
  *
- * @return {boolean} Whether the given block is allowed to be moved.
+ * @return {boolean | undefined} Whether the given block is allowed to be moved.
  */
 export function canMoveBlock( state, clientId, rootClientId = null ) {
 	const attributes = getBlockAttributes( state, clientId );
