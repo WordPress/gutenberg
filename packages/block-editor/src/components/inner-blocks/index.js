@@ -30,6 +30,9 @@ import useBlockSync from '../provider/use-block-sync';
 import { store as blockEditorStore } from '../../store';
 import useBlockDropZone from '../use-block-drop-zone';
 import useSetting from '../use-setting';
+
+const EMPTY_OBJECT = {};
+
 /**
  * InnerBlocks is a component which allows a single block to have multiple blocks
  * as children. The UncontrolledInnerBlocks component is used whenever the inner
@@ -82,15 +85,12 @@ function UncontrolledInnerBlocks( props ) {
 		[ clientId ]
 	);
 
-	// Avoid creating new objects if there is no layout defined.
-	const emptyLayout = {};
-
 	const defaultLayoutBlockSupport =
-		getBlockSupport( name, '__experimentalLayout' ) || emptyLayout;
+		getBlockSupport( name, '__experimentalLayout' ) || EMPTY_OBJECT;
 
 	const { allowSizingOnChildren = false } = defaultLayoutBlockSupport;
 
-	const defaultLayout = useSetting( 'layout' ) || emptyLayout;
+	const defaultLayout = useSetting( 'layout' ) || EMPTY_OBJECT;
 
 	const usedLayout = layout || defaultLayoutBlockSupport;
 
