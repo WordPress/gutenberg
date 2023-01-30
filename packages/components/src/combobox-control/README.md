@@ -92,35 +92,35 @@ If this property is added, a help text will be generated using help property as 
 
 The options that can be chosen from.
 
--   Type: `Array<{ value: String, label: String }>`
+-   Type: `Array<{ value: string, label: string }>`
 -   Required: Yes
 
 #### onFilterValueChange
 
 Function called with the control's search input value changes. The argument contains the next input value.
 
--   Type: `Function`
+-   Type: `( value: string ) => void`
 -   Required: No
 
 #### onChange
 
 Function called with the selected value changes.
 
--   Type: `Function`
+-   Type: `( value: string | null ) => void`
 -   Required: No
 
 #### value
 
 The current value of the input.
 
--   Type: `mixed`
+-   Type: `string | null`
 -   Required: Yes
 
 #### __experimentalRenderItem
 
 Custom renderer invoked for each option in the suggestion list. The render prop receives as its argument an object containing, under the `item` key, the single option's data (directly from the array of data passed to the `options` prop).
 
--   Type: `Function` - `( args: { item: object } ) => ReactNode`
+-   Type: `( args: { item: object } ) => ReactNode`
 -   Required: No
 
 ## Related components
