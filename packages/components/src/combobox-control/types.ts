@@ -61,5 +61,5 @@ export type ComboboxControlProps = Pick<
 	 * The options that can be chosen from.
 	 */
 	options: ComboboxControlOption[];
-	value: string | null;
+	value?: string | null;
 };

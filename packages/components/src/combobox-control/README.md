@@ -114,7 +114,7 @@ Function called with the selected value changes.
 The current value of the input.
 
 -   Type: `string | null`
--   Required: Yes
+-   Required: No
 
 #### __experimentalRenderItem
 
