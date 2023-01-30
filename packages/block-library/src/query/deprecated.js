@@ -352,7 +352,9 @@ const v4 = {
 		return <Tag { ...innerBlocksProps } />;
 	},
 	isEligible: ( { layout } ) =>
-		! layout || layout.inherit || layout.contentSize,
+		! layout ||
+		layout.inherit ||
+		( layout.contentSize && layout.type !== 'constrained' ),
 	migrate: ( attributes ) => {
 		const { layout = null } = attributes;
 		if ( ! layout ) {
