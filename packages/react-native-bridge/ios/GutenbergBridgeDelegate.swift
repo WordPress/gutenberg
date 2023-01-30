@@ -21,6 +21,7 @@ public enum Capabilities: String {
     case contactInfoBlock
     case layoutGridBlock
     case tiledGalleryBlock
+    case videoPressBlock
     case mediaFilesCollectionBlock
     case mentions
     case xposts
