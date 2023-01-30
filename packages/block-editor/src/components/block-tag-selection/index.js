@@ -10,7 +10,32 @@ import { __ } from '@wordpress/i18n';
 import TagIcon from './tag-icon';
 
 // Default HTML tags
-const DEFAULT_TAGS = [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ];
+const DEFAULT_TAGS = [
+	{
+		tag: 'h1',
+		title: __( 'Heading 1' ),
+	},
+	{
+		tag: 'h2',
+		title: __( 'Heading 2' ),
+	},
+	{
+		tag: 'h3',
+		title: __( 'Heading 3' ),
+	},
+	{
+		tag: 'h4',
+		title: __( 'Heading 4' ),
+	},
+	{
+		tag: 'h5',
+		title: __( 'Heading 5' ),
+	},
+	{
+		tag: 'h6',
+		title: __( 'Heading 6' ),
+	},
+];
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-tag-selection',
@@ -50,15 +75,18 @@ export default function TagSelectionDropdown( {
 			label={ __( 'Change HTML tag' ) }
 			controls={ tagslist.map( ( targetTag ) => {
 				{
-					const isActive = targetTag === selectedTag;
+					const isActive = targetTag.tag === selectedTag;
 					return {
 						icon: (
-							<TagIcon tag={ targetTag } isPressed={ isActive } />
+							<TagIcon
+								tag={ targetTag.tag }
+								isPressed={ isActive }
+							/>
 						),
-						label: targetTag,
+						title: targetTag.title,
 						isActive,
 						onClick() {
-							onChange( targetTag );
+							onChange( targetTag.tag );
 						},
 						role: 'menuitemradio',
 					};
