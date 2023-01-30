@@ -117,15 +117,6 @@ function CustomCSSControl( { blockName } ) {
 						{ cssError }
 					</Notice>
 				) }
-				{ cssError && (
-					<Notice
-						status="warning"
-						onRemove={ () => setCSSError( null ) }
-						politeness="polite"
-					>
-						{ cssError }
-					</Notice>
-				) }
 			</VStack>
 		</>
 	);
