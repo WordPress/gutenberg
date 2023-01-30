@@ -73,7 +73,6 @@ export function SnackbarList( {
 
 					return (
 						<motion.div
-							layout={ ! isReducedMotion } // See https://www.framer.com/docs/animation/#layout-animations
 							initial={ 'init' }
 							animate={ 'open' }
 							exit={ 'exit' }
