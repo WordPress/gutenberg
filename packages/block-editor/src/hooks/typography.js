@@ -62,6 +62,7 @@ export function TypographyPanel( {
 			fontSizes: {
 				custom: useSetting( 'typography.fontSizes' ),
 			},
+			customFontSize: useSetting( 'typography.customFontSize' ),
 			fontStyle: useSetting( 'typography.fontStyle' ),
 			fontWeight: useSetting( 'typography.fontWeight' ),
 			lineHeight: useSetting( 'typography.lineHeight' ),
