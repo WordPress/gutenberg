@@ -1,6 +1,12 @@
-// Zero out the margin on the excerpt paragraph, to match the body paragragraphs.
-.wp-block-post-excerpt p {
+// Zero out the margin on the excerpt paragraph, to match the body paragraphs.
+.wp-block-post-excerpt__excerpt {
 	margin-top: 0;
+	margin-bottom: 0;
+}
+
+// Matches block gap.
+.wp-block-post-excerpt__more-text {
+	margin-top: var(--wp--style--block-gap);
 	margin-bottom: 0;
 }
 
