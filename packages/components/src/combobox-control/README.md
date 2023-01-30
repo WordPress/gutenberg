@@ -17,9 +17,6 @@ These are the same as [the ones for `SelectControl`s](/packages/components/src/s
 ### Usage
 
 ```jsx
-/**
- * WordPress dependencies
- */
 import { ComboboxControl } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 

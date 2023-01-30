@@ -58,6 +58,56 @@ const getIndexOfMatchingSuggestion = (
 		? -1
 		: matchingSuggestions.indexOf( selectedSuggestion );
 
+/**
+ * `ComboboxControl` is an enhanced version of a [`SelectControl`](../select-control/README.md) with the addition of
+ * being able to search for options using a search input.
+ *
+ * ```jsx
+ * import { ComboboxControl } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const options = [
+ * 	{
+ * 		value: 'small',
+ * 		label: 'Small',
+ * 	},
+ * 	{
+ * 		value: 'normal',
+ * 		label: 'Normal',
+ * 	},
+ * 	{
+ * 		value: 'large',
+ * 		label: 'Large',
+ * 	},
+ * 	{
+ * 		value: 'huge',
+ * 		label: 'Huge',
+ * 	},
+ * ];
+ *
+ * function MyComboboxControl() {
+ * 	const [ fontSize, setFontSize ] = useState();
+ * 	const [ filteredOptions, setFilteredOptions ] = useState( options );
+ * 	return (
+ * 		<ComboboxControl
+ * 			label="Font Size"
+ * 			value={ fontSize }
+ * 			onChange={ setFontSize }
+ * 			options={ filteredOptions }
+ * 			onFilterValueChange={ ( inputValue ) =>
+ * 				setFilteredOptions(
+ * 					options.filter( ( option ) =>
+ * 						option.label
+ * 							.toLowerCase()
+ * 							.startsWith( inputValue.toLowerCase() )
+ * 					)
+ * 				)
+ * 			}
+ * 		/>
+ * 	);
+ * }
+ * ```
+ */
 function ComboboxControl( {
 	__nextHasNoMarginBottom = false,
 	__next36pxDefaultSize,
