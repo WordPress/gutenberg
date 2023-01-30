@@ -21,3 +21,7 @@ if ( ! class_exists( 'WP_HTML_Text_Replacement' ) ) {
 if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
 	require_once __DIR__ . '/class-wp-html-tag-processor.php';
 }
+
+if ( ! class_exists( 'WP_HTML_Processor' ) ) {
+	require_once __DIR__ . '/class-wp-html-processor.php';
+}
