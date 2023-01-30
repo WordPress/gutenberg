@@ -22,6 +22,10 @@ if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
 	require_once __DIR__ . '/class-wp-html-tag-processor.php';
 }
 
+if ( ! class_exists( 'WP_HTML_Processor_Scan_State' ) ) {
+	require_once __DIR__ . '/class-wp-html-processor-scan-state.php';
+}
+
 if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 	require_once __DIR__ . '/class-wp-html-processor.php';
 }

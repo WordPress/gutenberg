@@ -18,16 +18,6 @@
  */
 
 
-class WP_HTML_Processor_Scan_State {
-	public $budget      = 1000;
-	public $open_tags   = array();
-	public $match_depth = null;
-
-	public function relative_depth() {
-		return count( $this->open_tags );
-	}
-}
-
 
 class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 	public function new_state() {
