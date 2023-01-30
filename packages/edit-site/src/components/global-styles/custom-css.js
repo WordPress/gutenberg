@@ -1,14 +1,19 @@
 /**
  * WordPress dependencies
  */
+import { useState } from '@wordpress/element';
 import {
 	TextareaControl,
 	Panel,
 	PanelBody,
 	__experimentalVStack as VStack,
+	Notice,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+import {
+	experiments as blockEditorExperiments,
+	transformStyles,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -24,6 +29,7 @@ function CustomCSSControl( { blockName } ) {
 
 	const [ customCSS, setCustomCSS ] = useGlobalStyle( 'css', block );
 	const [ themeCSS ] = useGlobalStyle( 'css', block, 'base' );
+	const [ cssError, setCSSError ] = useState( null );
 	const ignoreThemeCustomCSS = '/* IgnoreThemeCustomCSS */';
 
 	// If there is custom css from theme.json show it in the edit box
@@ -44,6 +50,15 @@ function CustomCSSControl( { blockName } ) {
 			return;
 		}
 		setCustomCSS( value );
+		// TODO: transform it to find syntax error. Note that it will be transformed again
+		// after applied to the preview frame. We should refactor this to prevent double-transform.
+		const [ transformed ] = transformStyles(
+			[ { css: value } ],
+			'.editor-styles-wrapper'
+		);
+		setCSSError(
+			transformed === null ? __( 'Error while parsing the CSS.' ) : null
+		);
 	}
 
 	const originalThemeCustomCSS =
@@ -77,6 +92,15 @@ function CustomCSSControl( { blockName } ) {
 					className="edit-site-global-styles__custom-css-input"
 					spellCheck={ false }
 				/>
+				{ cssError && (
+					<Notice
+						status="warning"
+						onRemove={ () => setCSSError( null ) }
+						politeness="polite"
+					>
+						{ cssError }
+					</Notice>
+				) }
 			</VStack>
 		</>
 	);
