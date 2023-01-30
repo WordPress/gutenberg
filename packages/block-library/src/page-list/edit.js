@@ -41,7 +41,7 @@ const MAX_PAGE_COUNT = 100;
 const NOOP = () => {};
 
 const convertDescription = __(
-	'This menu is automatically kept in sync with pages on your site. You can manage the menu yourself by clicking customize below.'
+	'This menu is automatically kept in sync with pages on your site. You can manage the menu yourself by clicking "Edit" below.'
 );
 
 function BlockContent( {
@@ -117,7 +117,7 @@ function ConvertToLinksModal( { onClick, disabled } ) {
 			{ isOpen && (
 				<Modal
 					onRequestClose={ closeModal }
-					title={ __( 'Customize this menu' ) }
+					title={ __( 'Edit this menu' ) }
 					className={ 'wp-block-page-list-modal' }
 					aria={ {
 						describedby: 'wp-block-page-list-modal__description',
@@ -135,7 +135,7 @@ function ConvertToLinksModal( { onClick, disabled } ) {
 							disabled={ disabled }
 							onClick={ onClick }
 						>
-							{ __( 'Customize' ) }
+							{ __( 'Edit' ) }
 						</Button>
 					</div>
 				</Modal>
@@ -319,14 +319,14 @@ export default function PageListEdit( {
 					</PanelBody>
 				) }
 				{ allowConvertToLinks && (
-					<PanelBody title={ __( 'Customize this menu' ) }>
+					<PanelBody title={ __( 'Edit this menu' ) }>
 						<p>{ convertDescription }</p>
 						<Button
 							variant="primary"
 							disabled={ ! hasResolvedPages }
 							onClick={ convertToNavigationLinks }
 						>
-							{ __( 'Customize' ) }
+							{ __( 'Edit' ) }
 						</Button>
 					</PanelBody>
 				) }
