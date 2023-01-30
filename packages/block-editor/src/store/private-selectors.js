@@ -1,5 +1,5 @@
 /**
- * Returns true if the the block interface should be hidden, or false otherwise.
+ * Returns true if the block interface is hidden, or false otherwise.
  *
  * @param {Object} state Global application state.
  *

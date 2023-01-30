@@ -1,7 +1,4 @@
 /**
- * External dependencies
- */
-/**
  * Internal dependencies
  */
 import { hideBlockInterface, showBlockInterface } from '../private-actions';

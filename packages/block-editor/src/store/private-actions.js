@@ -43,7 +43,7 @@ export function __experimentalUpdateSettings(
 }
 
 /**
- * Returns an action object used in signalling that the block interface, eg. toolbar, outline, etc. should be hidden.
+ * Hides the block interface (eg. toolbar, outline, etc.)
  *
  * @return {Object} Action object.
  */
@@ -54,7 +54,7 @@ export function hideBlockInterface() {
 }
 
 /**
- * Returns an action object used in signalling that the block interface, eg. toolbar, outline, etc. should be shown.
+ * Shows the block interface (eg. toolbar, outline, etc.)
  *
  * @return {Object} Action object.
  */
