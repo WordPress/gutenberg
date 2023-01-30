@@ -308,11 +308,11 @@ add_action( 'init', 'register_block_core_navigation_submenu' );
 function gutenberg_disable_tabs_for_navigation_submenu_block( $settings ) {
 	$current_tab_settings = _wp_array_get(
 		$settings,
-		array( '__experimentalBlockInspectorTabs' ),
+		array( 'blockInspectorTabs' ),
 		array()
 	);
 
-	$settings['__experimentalBlockInspectorTabs'] = array_merge(
+	$settings['blockInspectorTabs'] = array_merge(
 		$current_tab_settings,
 		array( 'core/navigation-submenu' => false )
 	);
@@ -321,3 +321,35 @@ function gutenberg_disable_tabs_for_navigation_submenu_block( $settings ) {
 }
 
 add_filter( 'block_editor_settings_all', 'gutenberg_disable_tabs_for_navigation_submenu_block' );
+
+/**
+ * Enables animation of the block inspector for the Navigation Submenu block.
+ *
+ * See:
+ * - https://github.com/WordPress/gutenberg/pull/46342
+ * - https://github.com/WordPress/gutenberg/issues/45884
+ *
+ * @param array $settings Default editor settings.
+ * @return array Filtered editor settings.
+ */
+function gutenberg_enable_animation_for_navigation_submenu_inspector( $settings ) {
+	$current_animation_settings = _wp_array_get(
+		$settings,
+		array( '__experimentalBlockInspectorAnimation' ),
+		array()
+	);
+
+	$settings['__experimentalBlockInspectorAnimation'] = array_merge(
+		$current_animation_settings,
+		array(
+			'core/navigation-submenu' =>
+				array(
+					'enterDirection' => 'rightToLeft',
+				),
+		)
+	);
+
+	return $settings;
+}
+
+add_filter( 'block_editor_settings_all', 'gutenberg_enable_animation_for_navigation_submenu_inspector' );

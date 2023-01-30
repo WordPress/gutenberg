@@ -4,7 +4,7 @@
 import {
 	extractColorNameFromCurrentValue,
 	showTransparentBackground,
-} from '../';
+} from '../utils';
 
 describe( 'ColorPalette: Utils', () => {
 	describe( 'extractColorNameFromCurrentValue', () => {

@@ -78,7 +78,6 @@ export default function SpacingSizesControl( {
 
 	return (
 		<fieldset
-			role="region"
 			className={ classnames( 'component-spacing-sizes-control', {
 				'is-unlinked': ! isLinked,
 			} ) }

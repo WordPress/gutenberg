@@ -52,9 +52,7 @@ export default function InspectorControlsTabs( {
 				}
 
 				if ( tab.name === TAB_LIST_VIEW.name ) {
-					return (
-						<InspectorControls.Slot __experimentalGroup="list" />
-					);
+					return <InspectorControls.Slot group="list" />;
 				}
 			} }
 		</TabPanel>

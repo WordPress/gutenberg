@@ -75,6 +75,7 @@ function LinkControlTransforms( { clientId } ) {
 	const { replaceBlock } = useDispatch( blockEditorStore );
 
 	const featuredBlocks = [
+		'core/page-list',
 		'core/site-logo',
 		'core/social-links',
 		'core/search',
@@ -98,10 +99,10 @@ function LinkControlTransforms( { clientId } ) {
 				{ __( 'Transform' ) }
 			</h3>
 			<div className="link-control-transform__items">
-				{ transforms.map( ( item, index ) => {
+				{ transforms.map( ( item ) => {
 					return (
 						<Button
-							key={ `transform-${ index }` }
+							key={ `transform-${ item.name }` }
 							onClick={ () =>
 								replaceBlock(
 									clientId,

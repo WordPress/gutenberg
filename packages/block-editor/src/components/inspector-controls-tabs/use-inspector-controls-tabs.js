@@ -16,12 +16,6 @@ import { store as blockEditorStore } from '../../store';
 const EMPTY_ARRAY = [];
 
 function getShowTabs( blockName, tabSettings = {} ) {
-	// Don't allow settings to force the display of tabs if the block inspector
-	// tabs experiment hasn't been opted into.
-	if ( ! window?.__experimentalEnableBlockInspectorTabs ) {
-		return false;
-	}
-
 	// Block specific setting takes precedence over generic default.
 	if ( tabSettings[ blockName ] !== undefined ) {
 		return tabSettings[ blockName ];
@@ -43,6 +37,8 @@ export default function useInspectorControlsTabs( blockName ) {
 		default: defaultGroup,
 		dimensions: dimensionsGroup,
 		list: listGroup,
+		position: positionGroup,
+		styles: stylesGroup,
 		typography: typographyGroup,
 	} = InspectorControlsGroups;
 
@@ -60,6 +56,7 @@ export default function useInspectorControlsTabs( blockName ) {
 		...( useSlotFills( borderGroup.Slot.__unstableName ) || [] ),
 		...( useSlotFills( colorGroup.Slot.__unstableName ) || [] ),
 		...( useSlotFills( dimensionsGroup.Slot.__unstableName ) || [] ),
+		...( useSlotFills( stylesGroup.Slot.__unstableName ) || [] ),
 		...( useSlotFills( typographyGroup.Slot.__unstableName ) || [] ),
 	];
 
@@ -67,11 +64,17 @@ export default function useInspectorControlsTabs( blockName ) {
 		tabs.push( TAB_STYLES );
 	}
 
-	// Settings Tab: If there are any fills for the general InspectorControls
-	// or Advanced Controls slot, then add this tab.
+	// Settings Tab: If we don't already have multiple tabs to display
+	// (i.e. both list view and styles), check only the default and position
+	// InspectorControls slots. If we have multiple tabs, we'll need to check
+	// the advanced controls slot as well to ensure they are rendered.
+	const advancedFills =
+		useSlotFills( InspectorAdvancedControls.slotName ) || [];
+
 	const settingsFills = [
 		...( useSlotFills( defaultGroup.Slot.__unstableName ) || [] ),
-		...( useSlotFills( InspectorAdvancedControls.slotName ) || [] ),
+		...( useSlotFills( positionGroup.Slot.__unstableName ) || [] ),
+		...( tabs.length > 1 ? advancedFills : [] ),
 	];
 
 	if ( settingsFills.length ) {
@@ -79,8 +82,7 @@ export default function useInspectorControlsTabs( blockName ) {
 	}
 
 	const tabSettings = useSelect( ( select ) => {
-		return select( blockEditorStore ).getSettings()
-			.__experimentalBlockInspectorTabs;
+		return select( blockEditorStore ).getSettings().blockInspectorTabs;
 	}, [] );
 
 	const showTabs = getShowTabs( blockName, tabSettings );

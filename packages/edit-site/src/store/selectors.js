@@ -10,9 +10,13 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { uploadMedia } from '@wordpress/media-utils';
-import { isTemplatePart } from '@wordpress/blocks';
 import { Platform } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
+
+/**
+ * Internal dependencies
+ */
+import { getFilteredTemplatePartBlocks } from './utils';
 
 /**
  * @typedef {'template'|'template_type'} TemplateType Template type.
@@ -146,18 +150,13 @@ export const getSettings = createSelector(
 );
 
 /**
- * Returns the current home template ID.
- *
- * @param {Object} state Global application state.
- *
- * @return {number?} Home template ID.
+ * @deprecated
  */
-export function getHomeTemplateId( state ) {
-	return state.homeTemplateId;
-}
-
-function getCurrentEditedPost( state ) {
-	return state.editedPost;
+export function getHomeTemplateId() {
+	deprecated( "select( 'core/edit-site' ).getHomeTemplateId", {
+		since: '6.2',
+		version: '6.4',
+	} );
 }
 
 /**
@@ -168,7 +167,7 @@ function getCurrentEditedPost( state ) {
  * @return {TemplateType?} Template type.
  */
 export function getEditedPostType( state ) {
-	return getCurrentEditedPost( state ).type;
+	return state.editedPost.postType;
 }
 
 /**
@@ -179,18 +178,31 @@ export function getEditedPostType( state ) {
  * @return {string?} Post ID.
  */
 export function getEditedPostId( state ) {
-	return getCurrentEditedPost( state ).id;
+	return state.editedPost.id;
+}
+
+/**
+ * Returns the edited post's context object.
+ *
+ * @deprecated
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} Page.
+ */
+export function getEditedPostContext( state ) {
+	return state.editedPost.context;
 }
 
 /**
  * Returns the current page object.
  *
+ * @deprecated
  * @param {Object} state Global application state.
  *
  * @return {Object} Page.
  */
 export function getPage( state ) {
-	return getCurrentEditedPost( state ).page;
+	return { context: state.editedPost.context };
 }
 
 /**
@@ -260,32 +272,8 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
 			'wp_template_part',
 			{ per_page: -1 }
 		);
-		const templatePartsById = templateParts
-			? // Key template parts by their ID.
-			  templateParts.reduce(
-					( newTemplateParts, part ) => ( {
-						...newTemplateParts,
-						[ part.id ]: part,
-					} ),
-					{}
-			  )
-			: {};
 
-		return ( template.blocks ?? [] )
-			.filter( ( block ) => isTemplatePart( block ) )
-			.map( ( block ) => {
-				const {
-					attributes: { theme, slug },
-				} = block;
-				const templatePartId = `${ theme }//${ slug }`;
-				const templatePart = templatePartsById[ templatePartId ];
-
-				return {
-					templatePart,
-					block,
-				};
-			} )
-			.filter( ( { templatePart } ) => !! templatePart );
+		return getFilteredTemplatePartBlocks( template.blocks, templateParts );
 	}
 );
 

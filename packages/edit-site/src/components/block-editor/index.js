@@ -7,24 +7,17 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback, useMemo, useRef, Fragment } from '@wordpress/element';
-import {
-	useEntityBlockEditor,
-	__experimentalFetchMedia as fetchMedia,
-	store as coreStore,
-} from '@wordpress/core-data';
+import { useMemo, useRef } from '@wordpress/element';
+import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
 import {
 	BlockList,
-	BlockEditorProvider,
-	__experimentalLinkControl,
 	BlockInspector,
 	BlockTools,
-	__unstableBlockToolbarLastItem,
-	__unstableBlockSettingsMenuFirstItem,
+	__unstableUseClipboardHandler as useClipboardHandler,
 	__unstableUseTypingObserver as useTypingObserver,
 	BlockEditorKeyboardShortcuts,
 	store as blockEditorStore,
-	__unstableBlockNameContext,
+	experiments as blockEditorExperiments,
 } from '@wordpress/block-editor';
 import {
 	useMergeRefs,
@@ -32,23 +25,21 @@ import {
 	useResizeObserver,
 } from '@wordpress/compose';
 import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
-import { listView } from '@wordpress/icons';
-import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
+import inserterMediaCategories from './inserter-media-categories';
 import TemplatePartConverter from '../template-part-converter';
-import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar-edit-mode';
 import { store as editSiteStore } from '../../store';
-import BlockInspectorButton from './block-inspector-button';
 import BackButton from './back-button';
 import ResizableEditor from './resizable-editor';
 import EditorCanvas from './editor-canvas';
 import StyleBook from '../style-book';
+import { unlock } from '../../experiments';
+
+const { ExperimentalBlockEditorProvider } = unlock( blockEditorExperiments );
 
 const LAYOUT = {
 	type: 'default',
@@ -56,36 +47,20 @@ const LAYOUT = {
 	alignments: [],
 };
 
-const NAVIGATION_SIDEBAR_NAME = 'edit-site/navigation-menu';
-
-export default function BlockEditor( { setIsInserterOpen } ) {
-	const {
-		storedSettings,
-		templateType,
-		page,
-		isNavigationSidebarOpen,
-		canvasMode,
-	} = useSelect(
+export default function BlockEditor() {
+	const { setIsInserterOpened } = useDispatch( editSiteStore );
+	const { storedSettings, templateType, canvasMode } = useSelect(
 		( select ) => {
-			const {
-				getSettings,
-				getEditedPostType,
-				getPage,
-				__unstableGetCanvasMode,
-			} = select( editSiteStore );
+			const { getSettings, getEditedPostType, __unstableGetCanvasMode } =
+				select( editSiteStore );
 
 			return {
-				storedSettings: getSettings( setIsInserterOpen ),
+				storedSettings: getSettings( setIsInserterOpened ),
 				templateType: getEditedPostType(),
-				page: getPage(),
-				isNavigationSidebarOpen:
-					select( interfaceStore ).getActiveComplementaryArea(
-						editSiteStore.name
-					) === NAVIGATION_SIDEBAR_NAME,
 				canvasMode: __unstableGetCanvasMode(),
 			};
 		},
-		[ setIsInserterOpen ]
+		[ setIsInserterOpened ]
 	);
 
 	const settingsBlockPatterns =
@@ -145,7 +120,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 
 		return {
 			...restStoredSettings,
-			__unstableFetchMedia: fetchMedia,
+			inserterMediaCategories,
 			__experimentalBlockPatterns: blockPatterns,
 			__experimentalBlockPatternCategories: blockPatternCategories,
 		};
@@ -155,17 +130,13 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		'postType',
 		templateType
 	);
-	const { setPage } = useDispatch( editSiteStore );
-	const { enableComplementaryArea, disableComplementaryArea } =
-		useDispatch( interfaceStore );
-	const toggleNavigationSidebar = useCallback( () => {
-		const toggleComplementaryArea = isNavigationSidebarOpen
-			? disableComplementaryArea
-			: enableComplementaryArea;
-		toggleComplementaryArea( editSiteStore.name, NAVIGATION_SIDEBAR_NAME );
-	}, [ isNavigationSidebarOpen ] );
+
 	const contentRef = useRef();
-	const mergedRefs = useMergeRefs( [ contentRef, useTypingObserver() ] );
+	const mergedRefs = useMergeRefs( [
+		contentRef,
+		useClipboardHandler(),
+		useTypingObserver(),
+	] );
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const [ resizeObserver, sizes ] = useResizeObserver();
@@ -178,34 +149,11 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		// Disable resizing in mobile viewport.
 		! isMobileViewport;
 	const isViewMode = canvasMode === 'view';
-
-	const NavMenuSidebarToggle = () => (
-		<ToolbarGroup>
-			<ToolbarButton
-				className="components-toolbar__control"
-				label={
-					isNavigationSidebarOpen
-						? __( 'Close list view' )
-						: __( 'Open list view' )
-				}
-				onClick={ toggleNavigationSidebar }
-				icon={ listView }
-				isActive={ isNavigationSidebarOpen }
-			/>
-		</ToolbarGroup>
-	);
-
-	// Conditionally include NavMenu sidebar in Plugin only.
-	// Optimise for dead code elimination.
-	// See https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/feature-flags.md#dead-code-elimination.
-	let MaybeNavMenuSidebarToggle = Fragment;
-
-	if ( process.env.IS_GUTENBERG_PLUGIN ) {
-		MaybeNavMenuSidebarToggle = NavMenuSidebarToggle;
-	}
+	const showBlockAppender =
+		( isTemplatePart && hasBlocks ) || isViewMode ? false : undefined;
 
 	return (
-		<BlockEditorProvider
+		<ExperimentalBlockEditorProvider
 			settings={ settings }
 			value={ blocks }
 			onInput={ onInput }
@@ -213,18 +161,6 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			useSubRegistry={ false }
 		>
 			<TemplatePartConverter />
-			<__experimentalLinkControl.ViewerFill>
-				{ useCallback(
-					( fillProps ) => (
-						<NavigateToLink
-							{ ...fillProps }
-							activePage={ page }
-							onActivePageChange={ setPage }
-						/>
-					),
-					[ page ]
-				) }
-			</__experimentalLinkControl.ViewerFill>
 			<SidebarInspectorFill>
 				<BlockInspector />
 			</SidebarInspectorFill>
@@ -255,7 +191,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 							<BackButton />
 							<ResizableEditor
 								enableResizing={ enableResizing }
-								height={ sizes.height }
+								height={ sizes.height ?? '100%' }
 							>
 								<EditorCanvas
 									enableResizing={ enableResizing }
@@ -267,33 +203,15 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 									<BlockList
 										className="edit-site-block-editor__block-list wp-site-blocks"
 										__experimentalLayout={ LAYOUT }
-										renderAppender={
-											isTemplatePart && hasBlocks
-												? false
-												: undefined
-										}
+										renderAppender={ showBlockAppender }
 									/>
 								</EditorCanvas>
 							</ResizableEditor>
-							<__unstableBlockSettingsMenuFirstItem>
-								{ ( { onClose } ) => (
-									<BlockInspectorButton onClick={ onClose } />
-								) }
-							</__unstableBlockSettingsMenuFirstItem>
-							<__unstableBlockToolbarLastItem>
-								<__unstableBlockNameContext.Consumer>
-									{ ( blockName ) =>
-										blockName === 'core/navigation' && (
-											<MaybeNavMenuSidebarToggle />
-										)
-									}
-								</__unstableBlockNameContext.Consumer>
-							</__unstableBlockToolbarLastItem>
 						</BlockTools>
 					)
 				}
 			</StyleBook.Slot>
 			<ReusableBlocksMenuItems />
-		</BlockEditorProvider>
+		</ExperimentalBlockEditorProvider>
 	);
 }

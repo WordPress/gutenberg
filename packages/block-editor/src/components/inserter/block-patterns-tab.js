@@ -28,8 +28,11 @@ import BlockPatternList from '../block-patterns-list';
 import PatternsExplorerModal from './block-patterns-explorer/explorer';
 import MobileTabNavigation from './mobile-tab-navigation';
 
-function usePatternsCategories() {
-	const [ allPatterns, allCategories ] = usePatternsState();
+function usePatternsCategories( rootClientId ) {
+	const [ allPatterns, allCategories ] = usePatternsState(
+		undefined,
+		rootClientId
+	);
 
 	const hasRegisteredCategory = useCallback(
 		( pattern ) => {
@@ -53,10 +56,17 @@ function usePatternsCategories() {
 				)
 			)
 			.sort( ( { name: currentName }, { name: nextName } ) => {
-				if ( ! [ currentName, nextName ].includes( 'featured' ) ) {
+				if (
+					! [ currentName, nextName ].some( ( categoryName ) =>
+						[ 'featured', 'text' ].includes( categoryName )
+					)
+				) {
 					return 0;
 				}
-				return currentName === 'featured' ? -1 : 1;
+				// Move `featured` category to the top and `text` to the bottom.
+				return currentName === 'featured' || nextName === 'text'
+					? -1
+					: 1;
 			} );
 
 		if (
@@ -82,6 +92,7 @@ function usePatternsCategories() {
 export function BlockPatternsCategoryDialog( {
 	rootClientId,
 	onInsert,
+	onHover,
 	category,
 	showTitlesAsTooltip,
 } ) {
@@ -103,6 +114,7 @@ export function BlockPatternsCategoryDialog( {
 			<BlockPatternsCategoryPanel
 				rootClientId={ rootClientId }
 				onInsert={ onInsert }
+				onHover={ onHover }
 				category={ category }
 				showTitlesAsTooltip={ showTitlesAsTooltip }
 			/>
@@ -113,6 +125,7 @@ export function BlockPatternsCategoryDialog( {
 export function BlockPatternsCategoryPanel( {
 	rootClientId,
 	onInsert,
+	onHover,
 	category,
 	showTitlesAsTooltip,
 } ) {
@@ -121,7 +134,7 @@ export function BlockPatternsCategoryPanel( {
 		rootClientId
 	);
 
-	const availableCategories = usePatternsCategories();
+	const availableCategories = usePatternsCategories( rootClientId );
 	const currentCategoryPatterns = useMemo(
 		() =>
 			allPatterns.filter( ( pattern ) => {
@@ -146,6 +159,9 @@ export function BlockPatternsCategoryPanel( {
 
 	const currentShownPatterns = useAsyncList( currentCategoryPatterns );
 
+	// Hide block pattern preview on unmount.
+	useEffect( () => () => onHover( null ), [] );
+
 	if ( ! currentCategoryPatterns.length ) {
 		return null;
 	}
@@ -160,6 +176,7 @@ export function BlockPatternsCategoryPanel( {
 				shownPatterns={ currentShownPatterns }
 				blockPatterns={ currentCategoryPatterns }
 				onClickPattern={ onClick }
+				onHover={ onHover }
 				label={ category.label }
 				orientation="vertical"
 				category={ category.label }
@@ -177,7 +194,7 @@ function BlockPatternsTabs( {
 	rootClientId,
 } ) {
 	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
-	const categories = usePatternsCategories();
+	const categories = usePatternsCategories( rootClientId );
 	const isMobile = useViewportMatch( 'medium', '<' );
 	return (
 		<>

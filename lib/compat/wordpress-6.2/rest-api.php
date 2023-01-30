@@ -15,13 +15,13 @@ function gutenberg_register_rest_block_pattern_categories() {
 add_action( 'rest_api_init', 'gutenberg_register_rest_block_pattern_categories' );
 
 /**
- * Registers the block pattern directory.
+ * Registers the block patterns REST API routes.
  */
-function gutenberg_register_rest_pattern_directory() {
-	$pattern_directory_controller = new Gutenberg_REST_Pattern_Directory_Controller_6_2();
-	$pattern_directory_controller->register_routes();
+function gutenberg_register_rest_block_patterns() {
+	$block_patterns = new Gutenberg_REST_Block_Patterns_Controller_6_2();
+	$block_patterns->register_routes();
 }
-add_action( 'rest_api_init', 'gutenberg_register_rest_pattern_directory' );
+add_action( 'rest_api_init', 'gutenberg_register_rest_block_patterns' );
 
 /**
  * Add extra collection params to pattern directory requests.
@@ -83,3 +83,28 @@ function gutenberg_pattern_directory_collection_params_6_2( $query_params ) {
 	return $query_params;
 }
 add_filter( 'rest_pattern_directory_collection_params', 'gutenberg_pattern_directory_collection_params_6_2' );
+
+/**
+ * Registers the Global Styles REST API routes.
+ */
+function gutenberg_register_global_styles_endpoints() {
+	$editor_settings = new Gutenberg_REST_Global_Styles_Controller_6_2();
+	$editor_settings->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_global_styles_endpoints' );
+
+/**
+ * Updates REST API response for the sidebars and marks them as 'inactive'.
+ *
+ * Note: This can be a part of the `prepare_item_for_response` in `class-wp-rest-sidebars-controller.php`.
+ *
+ * @param WP_REST_Response $response The sidebar response object.
+ * @return WP_REST_Response $response Updated response object.
+ */
+function gutenberg_modify_rest_sidebars_response( $response ) {
+	if ( wp_is_block_theme() ) {
+		$response->data['status'] = 'inactive';
+	}
+	return $response;
+}
+add_filter( 'rest_prepare_sidebar', 'gutenberg_modify_rest_sidebars_response' );

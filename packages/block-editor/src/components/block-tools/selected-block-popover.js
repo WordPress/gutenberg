@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { find } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -22,6 +21,7 @@ import { store as blockEditorStore } from '../../store';
 import BlockPopover from '../block-popover';
 import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 import Inserter from '../inserter';
+import { unlock } from '../../experiments';
 
 function selector( select ) {
 	const {
@@ -29,10 +29,10 @@ function selector( select ) {
 		isMultiSelecting,
 		hasMultiSelection,
 		isTyping,
-		__experimentalIsBlockInterfaceHidden: isBlockInterfaceHidden,
+		isBlockInterfaceHidden,
 		getSettings,
 		getLastMultiSelectedBlockClientId,
-	} = select( blockEditorStore );
+	} = unlock( select( blockEditorStore ) );
 
 	return {
 		editorMode: __unstableGetEditorMode(),
@@ -240,8 +240,7 @@ function wrapperSelector( select ) {
 	);
 
 	// Get the clientId of the topmost parent with the capture toolbars setting.
-	const capturingClientId = find(
-		blockParentsClientIds,
+	const capturingClientId = blockParentsClientIds.find(
 		( parentClientId ) =>
 			parentBlockListSettings[ parentClientId ]
 				?.__experimentalCaptureToolbars

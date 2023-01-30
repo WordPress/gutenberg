@@ -10,7 +10,7 @@ import {
 	VisuallyHidden,
 } from '@wordpress/components';
 import { useEntityProp } from '@wordpress/core-data';
-import { Icon, chevronUp, chevronDown } from '@wordpress/icons';
+import { Icon, chevronUp, chevronDown, moreVertical } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useEffect, useMemo, useState } from '@wordpress/element';
@@ -64,10 +64,17 @@ function NavigationMenuSelector( {
 
 	const menuChoices = useMemo( () => {
 		return (
-			navigationMenus?.map( ( { id, title } ) => {
-				const label = decodeEntities( title.rendered );
+			navigationMenus?.map( ( { id, title }, index ) => {
+				const label =
+					decodeEntities( title.rendered ) ||
+					/* translators: %s is the index of the menu in the list of menus. */
+					sprintf( __( '(no title %s)' ), index + 1 );
+
 				if ( id === currentMenuId && ! isCreatingMenu ) {
-					setSelectorLabel( currentTitle );
+					setSelectorLabel(
+						/* translators: %s is the name of a navigation menu. */
+						sprintf( __( 'You are currently editing %s' ), label )
+					);
 					setEnableOptions( shouldEnableMenuSelector );
 				}
 				return {
@@ -100,7 +107,7 @@ function NavigationMenuSelector( {
 		if ( ! hasResolvedNavigationMenus ) {
 			setSelectorLabel( __( 'Loading …' ) );
 		} else if ( noMenuSelected || noBlockMenus || menuUnavailable ) {
-			setSelectorLabel( __( 'Select menu' ) );
+			setSelectorLabel( __( 'Choose a Navigation menu' ) );
 			setEnableOptions( shouldEnableMenuSelector );
 		}
 
@@ -140,36 +147,21 @@ function NavigationMenuSelector( {
 		},
 	};
 
-	if ( ! hasNavigationMenus && ! hasClassicMenus ) {
-		return (
-			<Button
-				className="wp-block-navigation__navigation-selector-button--createnew"
-				isBusy={ ! enableOptions }
-				disabled={ ! enableOptions }
-				__experimentalIsFocusable
-				onClick={ () => {
-					onCreateNew();
-					setIsCreatingMenu( true );
-					setSelectorLabel( __( 'Loading …' ) );
-					setEnableOptions( false );
-				} }
-			>
-				{ __( 'Create new menu' ) }
-			</Button>
-		);
-	}
-
-	return (
+	const NavigationMenuSelectorDropdown = (
 		<DropdownMenu
-			className="wp-block-navigation__navigation-selector"
-			label={ selectorLabel }
-			text={
-				<span className="wp-block-navigation__navigation-selector-button__label">
-					{ selectorLabel }
-				</span>
+			className={
+				process.env.IS_GUTENBERG_PLUGIN // Previously isOffCanvasNavigationEditorEnabled
+					? ''
+					: 'wp-block-navigation__navigation-selector'
 			}
-			icon={ null }
-			toggleProps={ toggleProps }
+			label={ selectorLabel }
+			text={ process.env.IS_GUTENBERG_PLUGIN ? '' : selectorLabel } // Previously isOffCanvasNavigationEditorEnabled
+			icon={ process.env.IS_GUTENBERG_PLUGIN ? moreVertical : null } // Previously isOffCanvasNavigationEditorEnabled
+			toggleProps={
+				process.env.IS_GUTENBERG_PLUGIN
+					? { isSmall: true }
+					: toggleProps // Previously isOffCanvasNavigationEditorEnabled
+			}
 		>
 			{ ( { onClose } ) => (
 				<>
@@ -230,6 +222,32 @@ function NavigationMenuSelector( {
 			) }
 		</DropdownMenu>
 	);
+
+	const NavigationMenuSelectorButton = (
+		<Button
+			className="wp-block-navigation__navigation-selector-button--createnew"
+			isBusy={ ! enableOptions }
+			disabled={ ! enableOptions }
+			__experimentalIsFocusable
+			onClick={ () => {
+				onCreateNew();
+				setIsCreatingMenu( true );
+				setSelectorLabel( __( 'Loading …' ) );
+				setEnableOptions( false );
+			} }
+		>
+			{ __( 'Create new menu' ) }
+		</Button>
+	);
+
+	if ( ! hasNavigationMenus && ! hasClassicMenus ) {
+		if ( ! process.env.IS_GUTENBERG_PLUGIN ) {
+			// This has to be in it's own conditional so it is removed by dead code elimination. Previously used isOffCanvasNavigationEditorEnabled.
+			return NavigationMenuSelectorButton;
+		}
+	}
+
+	return NavigationMenuSelectorDropdown;
 }
 
 export default NavigationMenuSelector;

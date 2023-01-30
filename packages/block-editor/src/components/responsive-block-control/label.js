@@ -4,7 +4,6 @@
 import { useInstanceId } from '@wordpress/compose';
 import { VisuallyHidden } from '@wordpress/components';
 import { _x, sprintf } from '@wordpress/i18n';
-import { Fragment } from '@wordpress/element';
 
 export default function ResponsiveBlockControlLabel( {
 	property,
@@ -24,13 +23,13 @@ export default function ResponsiveBlockControlLabel( {
 			viewport.label
 		);
 	return (
-		<Fragment>
+		<>
 			<span aria-describedby={ `rbc-desc-${ instanceId }` }>
 				{ viewport.label }
 			</span>
 			<VisuallyHidden as="span" id={ `rbc-desc-${ instanceId }` }>
 				{ accessibleLabel }
 			</VisuallyHidden>
-		</Fragment>
+		</>
 	);
 }

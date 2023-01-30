@@ -9,8 +9,8 @@ import {
 	ExternalLink,
 	VisuallyHidden,
 	CustomSelectControl,
-	BaseControl,
 	ToggleControl,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 
 // So that we can illustrate the different formats in the dropdown properly,
@@ -110,31 +110,30 @@ function NonDefaultControls( { format, onChange } ) {
 	);
 
 	return (
-		<>
-			<BaseControl className="block-editor-date-format-picker__custom-format-select-control">
-				<CustomSelectControl
-					__nextUnconstrainedWidth
-					label={ __( 'Choose a format' ) }
-					options={ [ ...suggestedOptions, customOption ] }
-					value={
-						isCustom
-							? customOption
-							: suggestedOptions.find(
-									( option ) => option.format === format
-							  ) ?? customOption
+		<VStack>
+			<CustomSelectControl
+				__nextUnconstrainedWidth
+				label={ __( 'Choose a format' ) }
+				options={ [ ...suggestedOptions, customOption ] }
+				value={
+					isCustom
+						? customOption
+						: suggestedOptions.find(
+								( option ) => option.format === format
+						  ) ?? customOption
+				}
+				onChange={ ( { selectedItem } ) => {
+					if ( selectedItem === customOption ) {
+						setIsCustom( true );
+					} else {
+						setIsCustom( false );
+						onChange( selectedItem.format );
 					}
-					onChange={ ( { selectedItem } ) => {
-						if ( selectedItem === customOption ) {
-							setIsCustom( true );
-						} else {
-							setIsCustom( false );
-							onChange( selectedItem.format );
-						}
-					} }
-				/>
-			</BaseControl>
+				} }
+			/>
 			{ isCustom && (
 				<TextControl
+					__nextHasNoMarginBottom
 					label={ __( 'Custom format' ) }
 					hideLabelFromVision
 					help={ createInterpolateElement(
@@ -155,6 +154,6 @@ function NonDefaultControls( { format, onChange } ) {
 					onChange={ ( value ) => onChange( value ) }
 				/>
 			) }
-		</>
+		</VStack>
 	);
 }
