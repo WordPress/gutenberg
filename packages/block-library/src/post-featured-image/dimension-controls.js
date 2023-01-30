@@ -71,7 +71,7 @@ const DimensionControls = ( {
 	};
 	const scaleLabel = _x( 'Scale', 'Image scaling options' );
 	return (
-		<InspectorControls __experimentalGroup="dimensions">
+		<InspectorControls group="dimensions">
 			<ToolsPanelItem
 				className="single-column"
 				hasValue={ () => !! height }

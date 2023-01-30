@@ -38,6 +38,7 @@ export default function useInspectorControlsTabs( blockName ) {
 		dimensions: dimensionsGroup,
 		list: listGroup,
 		position: positionGroup,
+		styles: stylesGroup,
 		typography: typographyGroup,
 	} = InspectorControlsGroups;
 
@@ -55,6 +56,7 @@ export default function useInspectorControlsTabs( blockName ) {
 		...( useSlotFills( borderGroup.Slot.__unstableName ) || [] ),
 		...( useSlotFills( colorGroup.Slot.__unstableName ) || [] ),
 		...( useSlotFills( dimensionsGroup.Slot.__unstableName ) || [] ),
+		...( useSlotFills( stylesGroup.Slot.__unstableName ) || [] ),
 		...( useSlotFills( typographyGroup.Slot.__unstableName ) || [] ),
 	];
 
