@@ -348,6 +348,10 @@ _Returns_
 
 Undocumented declaration.
 
+### experiments
+
+Experimental @wordpress/block-editor APIs.
+
 ### FontSizePicker
 
 _Related_
@@ -428,7 +432,7 @@ _Parameters_
 -   _args.minimumFontSize_ `?string`: Minimum font size for any clamp() calculation. Optional.
 -   _args.scaleFactor_ `?number`: A scale factor to determine how fast a font scales within boundaries. Optional.
 -   _args.minimumFontSizeFactor_ `?number`: How much to scale defaultFontSize by to derive minimumFontSize. Optional.
--   _args.maximumFontSizeFactor_ `?number`: How much to scale defaultFontSize by to derive maximumFontSize. Optional.
+-   _args.minimumFontSizeLimit_ `?string`: The smallest a calculated font size may be. Optional.
 
 _Returns_
 
@@ -521,7 +525,7 @@ attributes.
 _Parameters_
 
 -   _attributes_ `Object`: Block attributes.
--   _isFluidFontSizeActive_ `boolean`: Whether the function should try to convert font sizes to fluid values.
+-   _fluidTypographySettings_ `Object|boolean`: If boolean, whether the function should try to convert font sizes to fluid values, otherwise an object containing theme fluid typography settings.
 
 _Returns_
 
@@ -655,7 +659,9 @@ _Properties_
 -   _canLockBlocks_ `boolean`: Whether the user can manage Block Lock state
 -   _codeEditingEnabled_ `boolean`: Whether or not the user can switch to the code editor
 -   _generateAnchors_ `boolean`: Enable/Disable auto anchor generation for Heading blocks
+-   _enableOpenverseMediaCategory_ `boolean`: Enable/Disable the Openverse media category in the inserter.
 -   _\_\_experimentalCanUserUseUnfilteredHTML_ `boolean`: Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
+-   _\_\_experimentalClearBlockSelection_ `boolean`: Whether the block editor should clear selection on mousedown when a block is not clicked.
 -   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
 -   _\_\_experimentalBlockPatterns_ `Array`: Array of objects representing the block patterns
 -   _\_\_experimentalBlockPatternCategories_ `Array`: Array of objects representing the block pattern categories

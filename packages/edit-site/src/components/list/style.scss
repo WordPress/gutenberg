@@ -1,7 +1,6 @@
 .edit-site-list-header {
 	position: relative;
 	align-items: center;
-	background-color: $white;
 	display: flex;
 	height: $header-height;
 	box-sizing: border-box;
@@ -44,8 +43,8 @@
 
 		.interface-interface-skeleton__content {
 			background: $white;
-			align-items: center;
 			padding: $grid-unit-20;
+			align-items: center;
 
 			@include break-medium() {
 				padding: $grid-unit * 9;
@@ -55,10 +54,10 @@
 }
 
 .edit-site-list-table {
-	width: 100%;
+	min-width: 100%;
 	border: $border-width solid $gray-300;
 	border-radius: 2px;
-	margin: 0;
+	margin: 0 auto;
 	overflow: hidden;
 	border-spacing: 0;
 	max-width: 960px;
@@ -131,10 +130,6 @@
 			width: $grid-unit * 40;
 		}
 	}
-}
-
-.edit-site-list__rename-modal-actions {
-	margin-top: $grid-unit-15;
 }
 
 .edit-site-template__actions {

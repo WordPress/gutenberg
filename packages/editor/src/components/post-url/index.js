@@ -23,16 +23,20 @@ export default function PostURL( { onClose } ) {
 		permalinkPrefix,
 		permalinkSuffix,
 	} = useSelect( ( select ) => {
+		const post = select( editorStore ).getCurrentPost();
 		const postTypeSlug = select( editorStore ).getCurrentPostType();
 		const postType = select( coreStore ).getPostType( postTypeSlug );
 		const permalinkParts = select( editorStore ).getPermalinkParts();
+		const hasPublishAction = post?._links?.[ 'wp:action-publish' ] ?? false;
+
 		return {
-			isEditable: select( editorStore ).isPermalinkEditable(),
+			isEditable:
+				select( editorStore ).isPermalinkEditable() && hasPublishAction,
 			postSlug: safeDecodeURIComponent(
 				select( editorStore ).getEditedPostSlug()
 			),
 			viewPostLabel: postType?.labels.view_item,
-			postLink: select( editorStore ).getCurrentPost().link,
+			postLink: post.link,
 			permalinkPrefix: permalinkParts?.prefix,
 			permalinkSuffix: permalinkParts?.suffix,
 		};
@@ -47,6 +51,7 @@ export default function PostURL( { onClose } ) {
 			<InspectorPopoverHeader title={ __( 'URL' ) } onClose={ onClose } />
 			{ isEditable && (
 				<TextControl
+					__nextHasNoMarginBottom
 					label={ __( 'Permalink' ) }
 					value={ forceEmptyField ? '' : postSlug }
 					autoComplete="off"

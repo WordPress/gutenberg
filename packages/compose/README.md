@@ -326,7 +326,7 @@ Dispatches a bubbling focus event when the iframe receives focus. Use
 
 _Returns_
 
--   `Object`: Ref to pass to the iframe.
+-   `RefCallback< HTMLIFrameElement >`: Ref to pass to the iframe.
 
 ### useFocusOnMount
 

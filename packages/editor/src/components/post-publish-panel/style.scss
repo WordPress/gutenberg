@@ -4,7 +4,7 @@
 
 .editor-post-publish-panel__content {
 	// Ensure the post-publish panel accounts for the header and footer height.
-	min-height: calc(100% - #{ $header-height + 84px });
+	min-height: calc(100% - #{$header-height + 84px});
 
 	.components-spinner {
 		display: block;
@@ -156,10 +156,6 @@
 	display: flex;
 	align-items: flex-end;
 	margin-bottom: $grid-unit-20;
-
-	.components-base-control__field {
-		margin-bottom: 0;
-	}
 
 	.post-publish-panel__postpublish-post-address {
 		flex: 1;

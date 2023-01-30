@@ -1,18 +1,13 @@
 /**
- * External dependencies
- */
-import { map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	EditorProvider,
 	ErrorBoundary,
 	PostLockedModal,
 	store as editorStore,
+	experiments as editorExperiments,
 } from '@wordpress/editor';
 import { StrictMode, useMemo } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
@@ -26,6 +21,9 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import Layout from './components/layout';
 import EditorInitialization from './components/editor-initialization';
 import { store as editPostStore } from './store';
+import { unlock } from './experiments';
+
+const { ExperimentalEditorProvider } = unlock( editorExperiments );
 
 function Editor( {
 	postId,
@@ -136,7 +134,7 @@ function Editor( {
 			// all block types).
 			const defaultAllowedBlockTypes =
 				true === settings.allowedBlockTypes
-					? map( blockTypes, 'name' )
+					? blockTypes.map( ( { name } ) => name )
 					: settings.allowedBlockTypes || [];
 
 			result.allowedBlockTypes = defaultAllowedBlockTypes.filter(
@@ -185,7 +183,7 @@ function Editor( {
 		<StrictMode>
 			<ShortcutProvider>
 				<SlotFillProvider>
-					<EditorProvider
+					<ExperimentalEditorProvider
 						settings={ editorSettings }
 						post={ post }
 						initialEdits={ initialEdits }
@@ -200,7 +198,7 @@ function Editor( {
 							<Layout styles={ styles } />
 						</ErrorBoundary>
 						<PostLockedModal />
-					</EditorProvider>
+					</ExperimentalEditorProvider>
 				</SlotFillProvider>
 			</ShortcutProvider>
 		</StrictMode>

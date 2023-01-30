@@ -150,6 +150,7 @@ export function FontSizeEdit( props ) {
 			onChange={ onChange }
 			value={ fontSizeValue }
 			withReset={ false }
+			withSlider
 			size="__unstable-large"
 			__nextHasNoMarginBottom
 		/>
@@ -323,13 +324,22 @@ function addEditPropsForFluidCustomFontSizes( blockType ) {
 		// BlockListContext.Provider. If we set fontSize using editor.
 		// BlockListBlock instead of using getEditWrapperProps then the value is
 		// clobbered when the core/style/addEditProps filter runs.
-		const isFluidTypographyEnabled =
-			!! select( blockEditorStore ).getSettings().__experimentalFeatures
+		const fluidTypographyConfig =
+			select( blockEditorStore ).getSettings().__experimentalFeatures
 				?.typography?.fluid;
 
+		const fluidTypographySettings =
+			typeof fluidTypographyConfig === 'object'
+				? fluidTypographyConfig
+				: {};
+
 		const newFontSize =
-			fontSize && isFluidTypographyEnabled
-				? getComputedFluidTypographyValue( { fontSize } )
+			fontSize && !! fluidTypographyConfig
+				? getComputedFluidTypographyValue( {
+						fontSize,
+						minimumFontSizeLimit:
+							fluidTypographySettings?.minFontSize,
+				  } )
 				: null;
 
 		if ( newFontSize === null ) {

@@ -1,37 +1,3 @@
-.rich-text {
-	[data-rich-text-placeholder] {
-		pointer-events: none;
-	}
-
-	[data-rich-text-placeholder]::after {
-		content: attr(data-rich-text-placeholder);
-		// Use opacity to work in various editor styles.
-		// We don't specify the color here, because blocks or editor styles might provide their own.
-		opacity: 0.62;
-	}
-
-	&:focus {
-		// Removes outline added by the browser.
-		outline: none;
-
-		[data-rich-text-format-boundary] {
-			border-radius: 2px;
-		}
-	}
-}
-
-.block-editor-rich-text__editable {
-	> p:first-child {
-		margin-top: 0;
-	}
-}
-
-// Captions may have lighter (gray) text, or be shown on a range of different background luminosites.
-// To ensure legibility, we increase the default placeholder opacity to ensure contrast.
-figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before {
-	opacity: 0.8;
-}
-
 .components-popover.block-editor-rich-text__inline-format-toolbar {
 	// Set z-index as if it's displayed on the bottom, otherwise the block
 	// switcher popover might overlap if displayed on the bottom.
@@ -78,14 +44,5 @@ figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before
 				content: attr(aria-label);
 			}
 		}
-	}
-}
-
-[data-rich-text-script] {
-	display: inline;
-
-	&::before {
-		content: "</>";
-		background: rgb(255, 255, 0);
 	}
 }

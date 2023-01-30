@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, isEqual, find } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 import { v4 as uuid } from 'uuid';
 
 /**
@@ -33,7 +33,7 @@ import { STORE_NAME } from './name';
 export function receiveUserQuery( queryID, users ) {
 	return {
 		type: 'RECEIVE_USER_QUERY',
-		users: castArray( users ),
+		users: Array.isArray( users ) ? users : [ users ],
 		queryID,
 	};
 }
@@ -91,8 +91,11 @@ export function receiveEntityRecords(
 	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
 	// on the server.
 	if ( kind === 'postType' ) {
-		records = castArray( records ).map( ( record ) =>
-			record.status === 'auto-draft' ? { ...record, title: '' } : record
+		records = ( Array.isArray( records ) ? records : [ records ] ).map(
+			( record ) =>
+				record.status === 'auto-draft'
+					? { ...record, title: '' }
+					: record
 		);
 	}
 	let action;
@@ -252,7 +255,9 @@ export const deleteEntityRecord =
 	) =>
 	async ( { dispatch } ) => {
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
-		const entityConfig = find( configs, { kind, name } );
+		const entityConfig = configs.find(
+			( config ) => config.kind === kind && config.name === name
+		);
 		let error;
 		let deletedRecord = false;
 		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
@@ -352,7 +357,9 @@ export const editEntityRecord =
 				const value = mergedEdits[ key ]
 					? { ...editedRecordValue, ...edits[ key ] }
 					: edits[ key ];
-				acc[ key ] = isEqual( recordValue, value ) ? undefined : value;
+				acc[ key ] = fastDeepEqual( recordValue, value )
+					? undefined
+					: value;
 				return acc;
 			}, {} ),
 			transientEdits,
@@ -445,7 +452,9 @@ export const saveEntityRecord =
 	) =>
 	async ( { select, resolveSelect, dispatch } ) => {
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
-		const entityConfig = find( configs, { kind, name } );
+		const entityConfig = configs.find(
+			( config ) => config.kind === kind && config.name === name
+		);
 		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
 			return;
 		}
@@ -717,7 +726,9 @@ export const saveEditedEntityRecord =
 			return;
 		}
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
-		const entityConfig = find( configs, { kind, name } );
+		const entityConfig = configs.find(
+			( config ) => config.kind === kind && config.name === name
+		);
 		if ( ! entityConfig ) {
 			return;
 		}
@@ -820,6 +831,6 @@ export function receiveAutosaves( postId, autosaves ) {
 	return {
 		type: 'RECEIVE_AUTOSAVES',
 		postId,
-		autosaves: castArray( autosaves ),
+		autosaves: Array.isArray( autosaves ) ? autosaves : [ autosaves ],
 	};
 }

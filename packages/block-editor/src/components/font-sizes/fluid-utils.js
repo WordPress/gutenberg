@@ -9,7 +9,7 @@ const DEFAULT_MAXIMUM_VIEWPORT_WIDTH = '1600px';
 const DEFAULT_MINIMUM_VIEWPORT_WIDTH = '768px';
 const DEFAULT_SCALE_FACTOR = 1;
 const DEFAULT_MINIMUM_FONT_SIZE_FACTOR = 0.75;
-const DEFAULT_MAXIMUM_FONT_SIZE_FACTOR = 1.5;
+const DEFAULT_MINIMUM_FONT_SIZE_LIMIT = '14px';
 
 /**
  * Computes a fluid font-size value that uses clamp(). A minimum and maxinmum
@@ -40,7 +40,7 @@ const DEFAULT_MAXIMUM_FONT_SIZE_FACTOR = 1.5;
  * @param {?string}       args.minimumFontSize       Minimum font size for any clamp() calculation. Optional.
  * @param {?number}       args.scaleFactor           A scale factor to determine how fast a font scales within boundaries. Optional.
  * @param {?number}       args.minimumFontSizeFactor How much to scale defaultFontSize by to derive minimumFontSize. Optional.
- * @param {?number}       args.maximumFontSizeFactor How much to scale defaultFontSize by to derive maximumFontSize. Optional.
+ * @param {?string}       args.minimumFontSizeLimit  The smallest a calculated font size may be. Optional.
  *
  * @return {string|null} A font-size value using clamp().
  */
@@ -52,12 +52,19 @@ export function getComputedFluidTypographyValue( {
 	maximumViewPortWidth = DEFAULT_MAXIMUM_VIEWPORT_WIDTH,
 	scaleFactor = DEFAULT_SCALE_FACTOR,
 	minimumFontSizeFactor = DEFAULT_MINIMUM_FONT_SIZE_FACTOR,
-	maximumFontSizeFactor = DEFAULT_MAXIMUM_FONT_SIZE_FACTOR,
+	minimumFontSizeLimit,
 } ) {
-	// Calculate missing minimumFontSize and maximumFontSize from
-	// defaultFontSize if provided.
-	if ( fontSize && ( ! minimumFontSize || ! maximumFontSize ) ) {
-		// Parse default font size.
+	// Validate incoming settings and set defaults.
+	minimumFontSizeLimit = !! getTypographyValueAndUnit( minimumFontSizeLimit )
+		? minimumFontSizeLimit
+		: DEFAULT_MINIMUM_FONT_SIZE_LIMIT;
+
+	/*
+	 * Calculates missing minimumFontSize and maximumFontSize from
+	 * defaultFontSize if provided.
+	 */
+	if ( fontSize ) {
+		// Parses default font size.
 		const fontSizeParsed = getTypographyValueAndUnit( fontSize );
 
 		// Protect against invalid units.
@@ -65,24 +72,55 @@ export function getComputedFluidTypographyValue( {
 			return null;
 		}
 
-		// If no minimumFontSize is provided, derive using min scale factor.
-		if ( ! minimumFontSize ) {
-			minimumFontSize =
-				fontSizeParsed.value * minimumFontSizeFactor +
-				fontSizeParsed.unit;
+		// Parses the minimum font size limit, so we can perform checks using it.
+		const minimumFontSizeLimitParsed = getTypographyValueAndUnit(
+			minimumFontSizeLimit,
+			{
+				coerceTo: fontSizeParsed.unit,
+			}
+		);
+
+		// Don't enforce minimum font size if a font size has explicitly set a min and max value.
+		if (
+			!! minimumFontSizeLimitParsed?.value &&
+			! minimumFontSize &&
+			! maximumFontSize
+		) {
+			/*
+			 * If a minimum size was not passed to this function
+			 * and the user-defined font size is lower than $minimum_font_size_limit,
+			 * do not calculate a fluid value.
+			 */
+			if ( fontSizeParsed?.value <= minimumFontSizeLimitParsed?.value ) {
+				return null;
+			}
 		}
 
-		// If no maximumFontSize is provided, derive using max scale factor.
+		// If no fluid max font size is available use the incoming value.
 		if ( ! maximumFontSize ) {
-			maximumFontSize =
-				fontSizeParsed.value * maximumFontSizeFactor +
-				fontSizeParsed.unit;
+			maximumFontSize = `${ fontSizeParsed.value }${ fontSizeParsed.unit }`;
 		}
-	}
 
-	// Return early if one of the provided inputs is not provided.
-	if ( ! minimumFontSize || ! maximumFontSize ) {
-		return null;
+		/*
+		 * If no minimumFontSize is provided, create one using
+		 * the given font size multiplied by the min font size scale factor.
+		 */
+		if ( ! minimumFontSize ) {
+			const calculatedMinimumFontSize = roundToPrecision(
+				fontSizeParsed.value * minimumFontSizeFactor,
+				3
+			);
+
+			// Only use calculated min font size if it's > $minimum_font_size_limit value.
+			if (
+				!! minimumFontSizeLimitParsed?.value &&
+				calculatedMinimumFontSize < minimumFontSizeLimitParsed?.value
+			) {
+				minimumFontSize = `${ minimumFontSizeLimitParsed.value }${ minimumFontSizeLimitParsed.unit }`;
+			} else {
+				minimumFontSize = `${ calculatedMinimumFontSize }${ fontSizeParsed.unit }`;
+			}
+		}
 	}
 
 	// Grab the minimum font size and normalize it in order to use the value for calculations.
@@ -92,17 +130,17 @@ export function getComputedFluidTypographyValue( {
 	// otherwise the result will not be accurate.
 	const fontSizeUnit = minimumFontSizeParsed?.unit || 'rem';
 
-	// Grab the maximum font size and normalize it in order to use the value for calculations.
+	// Grabs the maximum font size and normalize it in order to use the value for calculations.
 	const maximumFontSizeParsed = getTypographyValueAndUnit( maximumFontSize, {
 		coerceTo: fontSizeUnit,
 	} );
 
-	// Protect against unsupported units.
+	// Checks for mandatory min and max sizes, and protects against unsupported units.
 	if ( ! minimumFontSizeParsed || ! maximumFontSizeParsed ) {
 		return null;
 	}
 
-	// Use rem for accessible fluid target font scaling.
+	// Uses rem for accessible fluid target font scaling.
 	const minimumFontSizeRem = getTypographyValueAndUnit( minimumFontSize, {
 		coerceTo: 'rem',
 	} );
@@ -133,14 +171,17 @@ export function getComputedFluidTypographyValue( {
 		3
 	);
 
-	const viewPortWidthOffset = minViewPortWidthOffsetValue + fontSizeUnit;
-	let linearFactor =
+	const viewPortWidthOffset =
+		roundToPrecision( minViewPortWidthOffsetValue, 3 ) + fontSizeUnit;
+	const linearFactor =
 		100 *
 		( ( maximumFontSizeParsed.value - minimumFontSizeParsed.value ) /
 			( maximumViewPortWidthParsed.value -
 				minumumViewPortWidthParsed.value ) );
-	linearFactor = roundToPrecision( linearFactor, 3 ) || 1;
-	const linearFactorScaled = linearFactor * scaleFactor;
+	const linearFactorScaled = roundToPrecision(
+		( linearFactor || 1 ) * scaleFactor,
+		3
+	);
 	const fluidTargetFontSize = `${ minimumFontSizeRem.value }${ minimumFontSizeRem.unit } + ((1vw - ${ viewPortWidthOffset }) * ${ linearFactorScaled })`;
 
 	return `clamp(${ minimumFontSize }, ${ fluidTargetFontSize }, ${ maximumFontSize })`;
@@ -199,8 +240,20 @@ export function getTypographyValueAndUnit( rawValue, options = {} ) {
 		unit = coerceTo;
 	}
 
+	/*
+	 * No calculation is required if swapping between em and rem yet,
+	 * since we assume a root size value. Later we might like to differentiate between
+	 * :root font size (rem) and parent element font size (em) relativity.
+	 */
+	if (
+		( 'em' === coerceTo || 'rem' === coerceTo ) &&
+		( 'em' === unit || 'rem' === unit )
+	) {
+		unit = coerceTo;
+	}
+
 	return {
-		value: returnValue,
+		value: roundToPrecision( returnValue, 3 ),
 		unit,
 	};
 }
@@ -215,7 +268,8 @@ export function getTypographyValueAndUnit( rawValue, options = {} ) {
  * @return {number|undefined} Value rounded to standard precision.
  */
 export function roundToPrecision( value, digits = 3 ) {
+	const base = Math.pow( 10, digits );
 	return Number.isFinite( value )
-		? parseFloat( value.toFixed( digits ) )
+		? parseFloat( Math.round( value * base ) / base )
 		: undefined;
 }

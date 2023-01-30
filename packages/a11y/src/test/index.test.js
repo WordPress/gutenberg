@@ -43,7 +43,7 @@ describe( 'speak', () => {
 		it( 'should set the textcontent of the polite aria-live region', () => {
 			speak( 'default message' );
 			expect( containerPolite ).toHaveTextContent( 'default message' );
-			expect( containerAssertive ).toHaveTextContent( '' );
+			expect( containerAssertive ).toBeEmptyDOMElement();
 			expect( clear ).toHaveBeenCalled();
 			expect( filterMessage ).toHaveBeenCalledWith( 'default message' );
 		} );
@@ -52,7 +52,7 @@ describe( 'speak', () => {
 	describe( 'in assertive mode', () => {
 		it( 'should set the textcontent of the assertive aria-live region', () => {
 			speak( 'assertive message', 'assertive' );
-			expect( containerPolite ).toHaveTextContent( '' );
+			expect( containerPolite ).toBeEmptyDOMElement();
 			expect( containerAssertive ).toHaveTextContent(
 				'assertive message'
 			);
@@ -63,7 +63,7 @@ describe( 'speak', () => {
 		it( 'should set the textcontent of the polite aria-live region', () => {
 			speak( 'polite message', 'polite' );
 			expect( containerPolite ).toHaveTextContent( 'polite message' );
-			expect( containerAssertive ).toHaveTextContent( '' );
+			expect( containerAssertive ).toBeEmptyDOMElement();
 		} );
 	} );
 

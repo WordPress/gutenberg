@@ -25,10 +25,17 @@ import type { Borders, BorderSide, BorderBoxControlProps } from '../types';
 export function useBorderBoxControl(
 	props: WordPressComponentProps< BorderBoxControlProps, 'div' >
 ) {
-	const { className, onChange, value, ...otherProps } = useContextSystem(
-		props,
-		'BorderBoxControl'
-	);
+	const {
+		className,
+		colors = [],
+		onChange,
+		enableAlpha = false,
+		enableStyle = true,
+		size = 'default',
+		value,
+		__experimentalIsRenderedInSidebar = false,
+		...otherProps
+	} = useContextSystem( props, 'BorderBoxControl' );
 
 	const mixedBorders = hasMixedBorders( value );
 	const splitBorders = hasSplitBorders( value );
@@ -100,17 +107,24 @@ export function useBorderBoxControl(
 
 	const cx = useCx();
 	const classes = useMemo( () => {
-		return cx( styles.BorderBoxControl, className );
+		return cx( styles.borderBoxControl, className );
 	}, [ cx, className ] );
 
 	const linkedControlClassName = useMemo( () => {
-		return cx( styles.LinkedBorderControl );
+		return cx( styles.linkedBorderControl() );
+	}, [ cx ] );
+
+	const wrapperClassName = useMemo( () => {
+		return cx( styles.wrapper );
 	}, [ cx ] );
 
 	return {
 		...otherProps,
 		className: classes,
+		colors,
 		disableUnits: mixedBorders && ! hasWidthValue,
+		enableAlpha,
+		enableStyle,
 		hasMixedBorders: mixedBorders,
 		isLinked,
 		linkedControlClassName,
@@ -118,6 +132,9 @@ export function useBorderBoxControl(
 		onSplitChange,
 		toggleLinked,
 		linkedValue,
+		size,
 		splitValue,
+		wrapperClassName,
+		__experimentalIsRenderedInSidebar,
 	};
 }

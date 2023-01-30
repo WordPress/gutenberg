@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { some, groupBy } from 'lodash';
+import { groupBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -127,8 +127,7 @@ export default function EntitiesSavedStates( { close } ) {
 	const saveCheckedEntities = () => {
 		const entitiesToSave = dirtyEntityRecords.filter(
 			( { kind, name, key, property } ) => {
-				return ! some(
-					unselectedEntities,
+				return ! unselectedEntities.some(
 					( elt ) =>
 						elt.kind === kind &&
 						elt.name === name &&

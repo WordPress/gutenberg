@@ -25,6 +25,13 @@ export const Circle = ( props ) => createElement( 'circle', props );
 export const G = ( props ) => createElement( 'g', props );
 
 /**
+ * @param {import('react').ComponentPropsWithoutRef<'line'>} props
+ *
+ * @return {JSX.Element} Path component
+ */
+export const Line = ( props ) => createElement( 'line', props );
+
+/**
  * @param {import('react').ComponentPropsWithoutRef<'path'>} props
  *
  * @return {JSX.Element} Path component

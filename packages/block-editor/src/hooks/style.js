@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -28,7 +27,11 @@ import {
 	TYPOGRAPHY_SUPPORT_KEY,
 	TYPOGRAPHY_SUPPORT_KEYS,
 } from './typography';
-import { SPACING_SUPPORT_KEY, DimensionsPanel } from './dimensions';
+import {
+	DIMENSIONS_SUPPORT_KEY,
+	SPACING_SUPPORT_KEY,
+	DimensionsPanel,
+} from './dimensions';
 import useDisplayBlockControls from '../components/use-display-block-controls';
 import { shouldSkipSerialization } from './utils';
 
@@ -36,6 +39,7 @@ const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
 	BORDER_SUPPORT_KEY,
 	COLOR_SUPPORT_KEY,
+	DIMENSIONS_SUPPORT_KEY,
 	SPACING_SUPPORT_KEY,
 ];
 
@@ -99,8 +103,11 @@ const skipSerializationPathsEdit = {
 	[ `${ TYPOGRAPHY_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
 		TYPOGRAPHY_SUPPORT_KEY,
 	],
+	[ `${ DIMENSIONS_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
+		DIMENSIONS_SUPPORT_KEY,
+	],
 	[ `${ SPACING_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
-		'spacing',
+		SPACING_SUPPORT_KEY,
 	],
 };
 
@@ -135,6 +142,126 @@ const skipSerializationPathsSave = {
 const renamedFeatures = { gradients: 'gradient' };
 
 /**
+ * A utility function used to remove one or more paths from a style object.
+ * Works in a way similar to Lodash's `omit()`. See unit tests and examples below.
+ *
+ * It supports a single string path:
+ *
+ * ```
+ * omitStyle( { color: 'red' }, 'color' ); // {}
+ * ```
+ *
+ * or an array of paths:
+ *
+ * ```
+ * omitStyle( { color: 'red', background: '#fff' }, [ 'color', 'background' ] ); // {}
+ * ```
+ *
+ * It also allows you to specify paths at multiple levels in a string.
+ *
+ * ```
+ * omitStyle( { typography: { textDecoration: 'underline' } }, 'typography.textDecoration' ); // {}
+ * ```
+ *
+ * You can remove multiple paths at the same time:
+ *
+ * ```
+ * omitStyle(
+ * 		{
+ * 			typography: {
+ * 				textDecoration: 'underline',
+ * 				textTransform: 'uppercase',
+ * 			}
+ *		},
+ *		[
+ * 			'typography.textDecoration',
+ * 			'typography.textTransform',
+ *		]
+ * );
+ * // {}
+ * ```
+ *
+ * You can also specify nested paths as arrays:
+ *
+ * ```
+ * omitStyle(
+ * 		{
+ * 			typography: {
+ * 				textDecoration: 'underline',
+ * 				textTransform: 'uppercase',
+ * 			}
+ *		},
+ *		[
+ * 			[ 'typography', 'textDecoration' ],
+ * 			[ 'typography', 'textTransform' ],
+ *		]
+ * );
+ * // {}
+ * ```
+ *
+ * With regards to nesting of styles, infinite depth is supported:
+ *
+ * ```
+ * omitStyle(
+ * 		{
+ * 			border: {
+ * 				radius: {
+ * 					topLeft: '10px',
+ * 					topRight: '0.5rem',
+ * 				}
+ * 			}
+ *		},
+ *		[
+ * 			[ 'border', 'radius', 'topRight' ],
+ *		]
+ * );
+ * // { border: { radius: { topLeft: '10px' } } }
+ * ```
+ *
+ * The third argument, `preserveReference`, defines how to treat the input style object.
+ * It is mostly necessary to properly handle mutation when recursively handling the style object.
+ * Defaulting to `false`, this will always create a new object, avoiding to mutate `style`.
+ * However, when recursing, we change that value to `true` in order to work with a single copy
+ * of the original style object.
+ *
+ * @see https://lodash.com/docs/4.17.15#omit
+ *
+ * @param {Object}       style             Styles object.
+ * @param {Array|string} paths             Paths to remove.
+ * @param {boolean}      preserveReference True to mutate the `style` object, false otherwise.
+ * @return {Object}      Styles object with the specified paths removed.
+ */
+export function omitStyle( style, paths, preserveReference = false ) {
+	if ( ! style ) {
+		return style;
+	}
+
+	let newStyle = style;
+	if ( ! preserveReference ) {
+		newStyle = JSON.parse( JSON.stringify( style ) );
+	}
+
+	if ( ! Array.isArray( paths ) ) {
+		paths = [ paths ];
+	}
+
+	paths.forEach( ( path ) => {
+		if ( ! Array.isArray( path ) ) {
+			path = path.split( '.' );
+		}
+
+		if ( path.length > 1 ) {
+			const [ firstSubpath, ...restPath ] = path;
+			omitStyle( newStyle[ firstSubpath ], [ restPath ], true );
+		} else if ( path.length === 1 ) {
+			delete newStyle[ path[ 0 ] ];
+		}
+	} );
+
+	return newStyle;
+}
+
+/**
  * Override props assigned to save component to inject the CSS variables definition.
  *
  * @param {Object}                    props      Additional props applied to save element.
@@ -159,13 +286,13 @@ export function addSaveProps(
 		const skipSerialization = getBlockSupport( blockType, indicator );
 
 		if ( skipSerialization === true ) {
-			style = omit( style, path );
+			style = omitStyle( style, path );
 		}
 
 		if ( Array.isArray( skipSerialization ) ) {
 			skipSerialization.forEach( ( featureName ) => {
 				const feature = renamedFeatures[ featureName ] || featureName;
-				style = omit( style, [ [ ...path, feature ] ] );
+				style = omitStyle( style, [ [ ...path, feature ] ] );
 			} );
 		}
 	} );

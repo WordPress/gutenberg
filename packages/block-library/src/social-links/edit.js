@@ -224,12 +224,11 @@ export function SocialLinksEdit( props ) {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<InspectorControls __experimentalGroup="color">
+			<InspectorControls group="color">
 				{ colorSettings.map(
 					( { onChange, label, value, resetAllFilter } ) => (
 						<ColorGradientSettingsDropdown
 							key={ `social-links-color-${ label }` }
-							__experimentalHasMultipleOrigins
 							__experimentalIsRenderedInSidebar
 							settings={ [
 								{

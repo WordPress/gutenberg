@@ -26,7 +26,7 @@ import type {
 	NavigatorContext as NavigatorContextType,
 } from '../types';
 
-function NavigatorProvider(
+function UnconnectedNavigatorProvider(
 	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
@@ -43,29 +43,34 @@ function NavigatorProvider(
 
 	const goTo: NavigatorContextType[ 'goTo' ] = useCallback(
 		( path, options = {} ) => {
-			setLocationHistory( [
-				...locationHistory,
+			setLocationHistory( ( prevLocationHistory ) => [
+				...prevLocationHistory,
 				{
 					...options,
 					path,
 					isBack: false,
+					hasRestoredFocus: false,
 				},
 			] );
 		},
-		[ locationHistory ]
+		[]
 	);
 
 	const goBack: NavigatorContextType[ 'goBack' ] = useCallback( () => {
-		if ( locationHistory.length > 1 ) {
-			setLocationHistory( [
-				...locationHistory.slice( 0, -2 ),
+		setLocationHistory( ( prevLocationHistory ) => {
+			if ( prevLocationHistory.length <= 1 ) {
+				return prevLocationHistory;
+			}
+			return [
+				...prevLocationHistory.slice( 0, -2 ),
 				{
-					...locationHistory[ locationHistory.length - 2 ],
+					...prevLocationHistory[ prevLocationHistory.length - 2 ],
 					isBack: true,
+					hasRestoredFocus: false,
 				},
-			] );
-		}
-	}, [ locationHistory ] );
+			];
+		} );
+	}, [] );
 
 	const navigatorContextValue: NavigatorContextType = useMemo(
 		() => ( {
@@ -129,9 +134,9 @@ function NavigatorProvider(
  * );
  * ```
  */
-const ConnectedNavigatorProvider = contextConnect(
-	NavigatorProvider,
+export const NavigatorProvider = contextConnect(
+	UnconnectedNavigatorProvider,
 	'NavigatorProvider'
 );
 
-export default ConnectedNavigatorProvider;
+export default NavigatorProvider;

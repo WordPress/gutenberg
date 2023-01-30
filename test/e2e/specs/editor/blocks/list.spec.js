@@ -1090,9 +1090,11 @@ test.describe( 'List', () => {
 <p></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
-<p>2</p>
-<!-- /wp:paragraph -->`
+<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>2</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
 		);
 	} );
 
@@ -1228,6 +1230,30 @@ test.describe( 'List', () => {
 		await page.keyboard.type( '* ' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '1' );
+
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	test( 'selects all transformed output', async ( { editor, page } ) => {
+		await editor.insertBlock( {
+			name: 'core/list',
+			innerBlocks: [
+				{ name: 'core/list-item', attributes: { content: '1' } },
+				{ name: 'core/list-item', attributes: { content: '2' } },
+			],
+		} );
+
+		await editor.selectBlocks(
+			page.locator( 'role=document[name="Block: List"i]' )
+		);
+
+		await page.getByRole( 'button', { name: 'List' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Paragraph' } ).click();
+
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+
+		await page.getByRole( 'button', { name: 'Paragraph' } ).click();
+		await page.getByRole( 'menuitem', { name: 'List' } ).click();
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );

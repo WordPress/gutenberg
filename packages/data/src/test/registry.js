@@ -1,3 +1,5 @@
+/* eslint jest/expect-expect: ["warn", { "assertFunctionNames": ["expect", "subscribeUntil"] }] */
+
 /**
  * Internal dependencies
  */
@@ -719,16 +721,15 @@ describe( 'createRegistry', () => {
 			const listener2 = jest.fn();
 			// useSelect subscribes to the stores differently,
 			// This test ensures batching works in this case as well.
-			const unsubscribe = registry.__unstableSubscribeStore(
-				'myAwesomeReducer',
-				listener2
+			const unsubscribe = registry.subscribe(
+				listener2,
+				'myAwesomeReducer'
 			);
 			registry.batch( () => {
 				store.dispatch( { type: 'dummy' } );
 				store.dispatch( { type: 'dummy' } );
 			} );
 			unsubscribe();
-
 			expect( listener2 ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
@@ -736,6 +737,7 @@ describe( 'createRegistry', () => {
 	describe( 'use', () => {
 		it( 'should pass through options object to plugin', () => {
 			const expectedOptions = {};
+			const anyObject = expect.any( Object );
 			let actualOptions;
 
 			function plugin( _registry, options ) {
@@ -747,7 +749,7 @@ describe( 'createRegistry', () => {
 					Object.fromEntries(
 						Object.entries( registry ).map( ( [ key ] ) => {
 							if ( key === 'stores' ) {
-								return [ key, expect.any( Object ) ];
+								return [ key, anyObject ];
 							}
 							// TODO: Remove this after namsespaces is removed.
 							if ( key === 'namespaces' ) {

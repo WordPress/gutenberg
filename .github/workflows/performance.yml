@@ -24,7 +24,7 @@ jobs:
             - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
 
             - name: Use desired version of NodeJS
-              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
               with:
                   node-version-file: '.nvmrc'
                   cache: npm
@@ -33,9 +33,16 @@ jobs:
               run: |
                   npm ci
 
+            - name: Install specific versions of the themes used in tests
+              run: |
+                  npm run wp-env start
+                  npm run wp-env -- run tests-cli "wp theme update twentytwentyone --version=1.7"
+                  npm run wp-env -- run tests-cli "wp theme update twentytwentythree --version=1.0"
+                  npm run wp-env stop
+
             - name: Compare performance with trunk
               if: github.event_name == 'pull_request'
-              run: ./bin/plugin/cli.js perf --ci $GITHUB_SHA trunk --tests-branch $GITHUB_SHA
+              run: ./bin/plugin/cli.js perf $GITHUB_SHA trunk --tests-branch $GITHUB_SHA
 
             - name: Compare performance with current WordPress Core and previous Gutenberg versions
               if: github.event_name == 'release'
@@ -50,7 +57,7 @@ jobs:
                   WP_VERSION=$(awk -F ': ' '/^Tested up to/{print $2}' readme.txt)
                   IFS=. read -ra WP_VERSION_ARRAY <<< "$WP_VERSION"
                   WP_MAJOR="${WP_VERSION_ARRAY[0]}.${WP_VERSION_ARRAY[1]}"
-                  ./bin/plugin/cli.js perf --ci "wp/$WP_MAJOR" "$PREVIOUS_RELEASE_BRANCH" "$CURRENT_RELEASE_BRANCH" --wp-version "$WP_MAJOR"
+                  ./bin/plugin/cli.js perf "wp/$WP_MAJOR" "$PREVIOUS_RELEASE_BRANCH" "$CURRENT_RELEASE_BRANCH" --wp-version "$WP_MAJOR"
 
             - name: Compare performance with base branch
               if: github.event_name == 'push'
@@ -61,9 +68,9 @@ jobs:
                   WP_VERSION=$(awk -F ': ' '/^Tested up to/{print $2}' readme.txt)
                   IFS=. read -ra WP_VERSION_ARRAY <<< "$WP_VERSION"
                   WP_MAJOR="${WP_VERSION_ARRAY[0]}.${WP_VERSION_ARRAY[1]}"
-                  ./bin/plugin/cli.js perf --ci $GITHUB_SHA debd225d007f4e441ceec80fbd6fa96653f94737 --tests-branch $GITHUB_SHA  --wp-version "$WP_MAJOR"
+                  ./bin/plugin/cli.js perf $GITHUB_SHA debd225d007f4e441ceec80fbd6fa96653f94737 --tests-branch $GITHUB_SHA --wp-version "$WP_MAJOR"
 
-            - uses: actions/github-script@100527700e8b29ca817ac0e0dfbfc5e8ff38edda # v6.3.2
+            - uses: actions/github-script@d556feaca394842dc55e4734bf3bb9f685482fa0 # v6.3.3
               if: github.event_name == 'push'
               id: commit-timestamp
               with:

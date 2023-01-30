@@ -146,15 +146,10 @@
 		}
 	}
 
-	// The post saved state button has a custom label only on small breakpoint
-	.editor-post-save-draft.editor-post-save-draft {
+	.editor-post-save-draft.editor-post-save-draft,
+	.editor-post-saved-state.editor-post-saved-state {
 		&::after {
 			content: none;
-		}
-		@include break-small {
-			&::after {
-				content: attr(aria-label);
-			}
 		}
 	}
 }
@@ -220,7 +215,7 @@
 		}
 
 		& > .edit-post-header__toolbar .edit-post-header-toolbar__inserter-toggle,
-		& > .edit-post-header__toolbar .edit-post-header-toolbar__list-view-toggle,
+		& > .edit-post-header__toolbar .edit-post-header-toolbar__document-overview-toggle,
 		& > .edit-post-header__settings > .block-editor-post-preview__dropdown,
 		& > .edit-post-header__settings > .interface-pinned-items {
 			display: none;
@@ -242,5 +237,4 @@
 		position: absolute;
 		z-index: 35;
 	}
-
 }

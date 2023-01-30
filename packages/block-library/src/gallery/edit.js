@@ -2,12 +2,11 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { find } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
+import { compose, usePrevious } from '@wordpress/compose';
 import {
 	BaseControl,
 	PanelBody,
@@ -15,16 +14,24 @@ import {
 	ToggleControl,
 	RangeControl,
 	Spinner,
+	ToolbarButton,
 } from '@wordpress/components';
 import {
 	store as blockEditorStore,
 	MediaPlaceholder,
 	InspectorControls,
 	useBlockProps,
+	useInnerBlocksProps,
 	BlockControls,
 	MediaReplaceFlow,
 } from '@wordpress/block-editor';
-import { Platform, useEffect, useMemo } from '@wordpress/element';
+import {
+	Platform,
+	useCallback,
+	useEffect,
+	useState,
+	useMemo,
+} from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -32,6 +39,7 @@ import { View } from '@wordpress/primitives';
 import { createBlock } from '@wordpress/blocks';
 import { createBlobURL } from '@wordpress/blob';
 import { store as noticesStore } from '@wordpress/notices';
+import { caption as captionIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -64,6 +72,8 @@ const linkOptions = [
 	},
 ];
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
+const allowedBlocks = [ 'core/image' ];
+const LAYOUT = { type: 'default', alignments: [] };
 
 const PLACEHOLDER_TEXT = Platform.isNative
 	? __( 'ADD MEDIA' )
@@ -81,9 +91,37 @@ function GalleryEdit( props ) {
 		clientId,
 		isSelected,
 		insertBlocksAfter,
+		isContentLocked,
 	} = props;
 
-	const { columns, imageCrop, linkTarget, linkTo, sizeSlug } = attributes;
+	const { columns, imageCrop, linkTarget, linkTo, sizeSlug, caption } =
+		attributes;
+	const [ showCaption, setShowCaption ] = useState( !! caption );
+	const prevCaption = usePrevious( caption );
+
+	// We need to show the caption when changes come from
+	// history navigation(undo/redo).
+	useEffect( () => {
+		if ( caption && ! prevCaption ) {
+			setShowCaption( true );
+		}
+	}, [ caption, prevCaption ] );
+
+	useEffect( () => {
+		if ( ! isSelected && ! caption ) {
+			setShowCaption( false );
+		}
+	}, [ isSelected, caption ] );
+
+	// Focus the caption when we click to add one.
+	const captionRef = useCallback(
+		( node ) => {
+			if ( node && ! caption ) {
+				node.focus();
+			}
+		},
+		[ caption ]
+	);
 
 	const {
 		__unstableMarkNextChangeAsNotPersistent,
@@ -174,7 +212,7 @@ function GalleryEdit( props ) {
 	 */
 	function buildImageAttributes( imageAttributes ) {
 		const image = imageAttributes.id
-			? find( imageData, { id: imageAttributes.id } )
+			? imageData.find( ( { id } ) => id === imageAttributes.id )
 			: null;
 
 		let newClassName;
@@ -217,9 +255,19 @@ function GalleryEdit( props ) {
 	}
 
 	function isValidFileType( file ) {
+		// It's necessary to retrieve the media type from the raw image data for already-uploaded images on native.
+		const nativeFileData =
+			Platform.isNative && file.id
+				? imageData.find( ( { id } ) => id === file.id )
+				: null;
+
+		const mediaTypeSelector = nativeFileData
+			? nativeFileData?.media_type
+			: file.type;
+
 		return (
 			ALLOWED_MEDIA_TYPES.some(
-				( mediaType ) => file.type?.indexOf( mediaType ) === 0
+				( mediaType ) => mediaTypeSelector?.indexOf( mediaType ) === 0
 			) || file.url?.indexOf( 'blob:' ) === 0
 		);
 	}
@@ -323,7 +371,7 @@ function GalleryEdit( props ) {
 		getBlock( clientId ).innerBlocks.forEach( ( block ) => {
 			blocks.push( block.clientId );
 			const image = block.attributes.id
-				? find( imageData, { id: block.attributes.id } )
+				? imageData.find( ( { id } ) => id === block.attributes.id )
 				: null;
 			changedAttributes[ block.clientId ] = getHrefAndDestination(
 				image,
@@ -391,7 +439,7 @@ function GalleryEdit( props ) {
 		getBlock( clientId ).innerBlocks.forEach( ( block ) => {
 			blocks.push( block.clientId );
 			const image = block.attributes.id
-				? find( imageData, { id: block.attributes.id } )
+				? imageData.find( ( { id } ) => id === block.attributes.id )
 				: null;
 			changedAttributes[ block.clientId ] = getImageSizeAttributes(
 				image,
@@ -474,8 +522,26 @@ function GalleryEdit( props ) {
 		className: classnames( className, 'has-nested-images' ),
 	} );
 
+	const nativeInnerBlockProps = Platform.isNative && {
+		marginHorizontal: 0,
+		marginVertical: 0,
+	};
+
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		allowedBlocks,
+		orientation: 'horizontal',
+		renderAppender: false,
+		__experimentalLayout: LAYOUT,
+		...nativeInnerBlockProps,
+	} );
+
 	if ( ! hasImages ) {
-		return <View { ...blockProps }>{ mediaPlaceholder }</View>;
+		return (
+			<View { ...innerBlocksProps }>
+				{ innerBlocksProps.children }
+				{ mediaPlaceholder }
+			</View>
+		);
 	}
 
 	const hasLinkTo = linkTo && linkTo !== 'none';
@@ -486,6 +552,7 @@ function GalleryEdit( props ) {
 				<PanelBody title={ __( 'Settings' ) }>
 					{ images.length > 1 && (
 						<RangeControl
+							__nextHasNoMarginBottom
 							label={ __( 'Columns' ) }
 							value={
 								columns
@@ -506,6 +573,7 @@ function GalleryEdit( props ) {
 						help={ getImageCropHelp }
 					/>
 					<SelectControl
+						__nextHasNoMarginBottom
 						label={ __( 'Link to' ) }
 						value={ linkTo }
 						onChange={ setLinkTo }
@@ -521,6 +589,7 @@ function GalleryEdit( props ) {
 					) }
 					{ imageSizeOptions?.length > 0 && (
 						<SelectControl
+							__nextHasNoMarginBottom
 							label={ __( 'Image size' ) }
 							value={ sizeSlug }
 							options={ imageSizeOptions }
@@ -541,6 +610,25 @@ function GalleryEdit( props ) {
 					) }
 				</PanelBody>
 			</InspectorControls>
+			<BlockControls group="block">
+				{ ! isContentLocked && (
+					<ToolbarButton
+						onClick={ () => {
+							setShowCaption( ! showCaption );
+							if ( showCaption && caption ) {
+								setAttributes( { caption: undefined } );
+							}
+						} }
+						icon={ captionIcon }
+						isPressed={ showCaption }
+						label={
+							showCaption
+								? __( 'Remove caption' )
+								: __( 'Add caption' )
+						}
+					/>
+				) }
+			</BlockControls>
 			<BlockControls group="other">
 				<MediaReplaceFlow
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
@@ -563,13 +651,15 @@ function GalleryEdit( props ) {
 			) }
 			<Gallery
 				{ ...props }
+				showCaption={ showCaption }
+				ref={ Platform.isWeb ? captionRef : undefined }
 				images={ images }
 				mediaPlaceholder={
 					! hasImages || Platform.isNative
 						? mediaPlaceholder
 						: undefined
 				}
-				blockProps={ blockProps }
+				blockProps={ innerBlocksProps }
 				insertBlocksAfter={ insertBlocksAfter }
 			/>
 		</>

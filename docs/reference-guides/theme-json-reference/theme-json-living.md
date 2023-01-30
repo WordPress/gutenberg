@@ -52,6 +52,16 @@ Settings related to borders.
 
 ---
 
+### shadow
+
+Settings related to shadows.
+
+| Property  | Type   | Default | Props  |
+| ---       | ---    | ---    |---   |
+| presets | array |  | name, shadow, slug |
+
+---
+
 ### color
 
 Settings related to colors.
@@ -70,6 +80,16 @@ Settings related to colors.
 | link | boolean | false |  |
 | palette | array |  | color, name, slug |
 | text | boolean | true |  |
+
+---
+
+### dimensions
+
+Settings related to dimensions.
+
+| Property  | Type   | Default | Props  |
+| ---       | ---    | ---    |---   |
+| minHeight | boolean | false |  |
 
 ---
 
@@ -109,7 +129,7 @@ Settings related to typography.
 | customFontSize | boolean | true |  |
 | fontStyle | boolean | true |  |
 | fontWeight | boolean | true |  |
-| fluid | boolean |  |  |
+| fluid | undefined | false |  |
 | letterSpacing | boolean | true |  |
 | lineHeight | boolean | false |  |
 | textDecoration | boolean | true |  |
@@ -135,10 +155,10 @@ Border styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
-| color | string |  |
-| radius | undefined |  |
-| style | string |  |
-| width | string |  |
+| color | string, object |  |
+| radius | string, object |  |
+| style | string, object |  |
+| width | string, object |  |
 | top | object | color, style, width |
 | right | object | color, style, width |
 | bottom | object | color, style, width |
@@ -152,9 +172,9 @@ Color styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
-| background | string |  |
-| gradient | string |  |
-| text | string |  |
+| background | string, object |  |
+| gradient | string, object |  |
+| text | string, object |  |
 
 ---
 
@@ -164,7 +184,7 @@ Spacing styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
-| blockGap | string |  |
+| blockGap | string, object |  |
 | margin | object | bottom, left, right, top |
 | padding | object | bottom, left, right, top |
 
@@ -176,14 +196,14 @@ Typography styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
-| fontFamily | string |  |
-| fontSize | string |  |
-| fontStyle | string |  |
-| fontWeight | string |  |
-| letterSpacing | string |  |
-| lineHeight | string |  |
-| textDecoration | string |  |
-| textTransform | string |  |
+| fontFamily | string, object |  |
+| fontSize | string, object |  |
+| fontStyle | string, object |  |
+| fontWeight | string, object |  |
+| letterSpacing | string, object |  |
+| lineHeight | string, object |  |
+| textDecoration | string, object |  |
+| textTransform | string, object |  |
 
 ---
 
@@ -193,7 +213,7 @@ CSS and SVG filter styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
-| duotone | string |  |
+| duotone | string, object |  |
 
 ---
 
@@ -210,10 +230,17 @@ Outline styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
-| color | string |  |
-| offset | string |  |
-| style | string |  |
-| width | string |  |
+| color | string, object |  |
+| offset | string, object |  |
+| style | string, object |  |
+| width | string, object |  |
+
+---
+
+### css
+
+Sets custom CSS to apply styling not covered by other theme.json properties.
+
 
 ---
 

@@ -193,7 +193,7 @@ function gutenberg_override_style( $styles, $handle, $src, $deps = array(), $ver
 function gutenberg_register_packages_scripts( $scripts ) {
 	// When in production, use the plugin's version as the default asset version;
 	// else (for development or test) default to use the current time.
-	$default_version = defined( 'GUTENBERG_VERSION' ) && ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? GUTENBERG_VERSION : time();
+	$default_version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
 
 	foreach ( glob( gutenberg_dir_path() . 'build/*/index.min.js' ) as $path ) {
 		// Prefix `wp-` to package directory to get script handle.
@@ -249,7 +249,16 @@ add_action( 'wp_default_scripts', 'gutenberg_register_packages_scripts' );
 function gutenberg_register_packages_styles( $styles ) {
 	// When in production, use the plugin's version as the asset version;
 	// else (for development or test) default to use the current time.
-	$version = defined( 'GUTENBERG_VERSION' ) && ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? GUTENBERG_VERSION : time();
+	$version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
+
+	gutenberg_override_style(
+		$styles,
+		'wp-block-editor-content',
+		gutenberg_url( 'build/block-editor/content.css' ),
+		array(),
+		$version
+	);
+	$styles->add_data( 'wp-block-editor-content', 'rtl', 'replace' );
 
 	// Editor Styles.
 	gutenberg_override_style(
@@ -265,7 +274,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-editor',
 		gutenberg_url( 'build/editor/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-nux', 'wp-reusable-blocks' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-reusable-blocks' ),
 		$version
 	);
 	$styles->add_data( 'wp-editor', 'rtl', 'replace' );
@@ -274,7 +283,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-edit-post',
 		gutenberg_url( 'build/edit-post/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-block-library', 'wp-nux' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-block-library' ),
 		$version
 	);
 	$styles->add_data( 'wp-edit-post', 'rtl', 'replace' );
@@ -315,10 +324,13 @@ function gutenberg_register_packages_styles( $styles ) {
 		'wp-reset-editor-styles',
 		'wp-block-library',
 		'wp-reusable-blocks',
+		// Until #37466, we can't specifically add them as editor styles yet,
+		// so we must hard-code it here as a dependency.
+		'wp-block-editor-content',
 	);
 
 	// Only load the default layout and margin styles for themes without theme.json file.
-	if ( ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
+	if ( ! wp_theme_has_theme_json() ) {
 		$wp_edit_blocks_dependencies[] = 'wp-editor-classic-layout-styles';
 	}
 
@@ -357,15 +369,6 @@ function gutenberg_register_packages_styles( $styles ) {
 
 	gutenberg_override_style(
 		$styles,
-		'wp-nux',
-		gutenberg_url( 'build/nux/style.css' ),
-		array( 'wp-components' ),
-		$version
-	);
-	$styles->add_data( 'wp-nux', 'rtl', 'replace' );
-
-	gutenberg_override_style(
-		$styles,
 		'wp-block-library-theme',
 		gutenberg_url( 'build/block-library/theme.css' ),
 		array(),
@@ -381,15 +384,6 @@ function gutenberg_register_packages_styles( $styles ) {
 		$version
 	);
 	$styles->add_data( 'wp-list-reusable-block', 'rtl', 'replace' );
-
-	gutenberg_override_style(
-		$styles,
-		'wp-edit-navigation',
-		gutenberg_url( 'build/edit-navigation/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks' ),
-		$version
-	);
-	$styles->add_data( 'wp-edit-navigation', 'rtl', 'replace' );
 
 	gutenberg_override_style(
 		$styles,
@@ -486,7 +480,7 @@ function gutenberg_enqueue_stored_styles( $options = array() ) {
 	$style_tag_id             = 'core';
 	foreach ( $core_styles_keys as $style_key ) {
 		// Adds comment if code is prettified to identify core styles sections in debugging.
-		$should_prettify = isset( $options['prettify'] ) ? true === $options['prettify'] : defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG;
+		$should_prettify = isset( $options['prettify'] ) ? true === $options['prettify'] : SCRIPT_DEBUG;
 		if ( $should_prettify ) {
 			$compiled_core_stylesheet .= "/**\n * Core styles: $style_key\n */\n";
 		}
@@ -526,6 +520,39 @@ function gutenberg_enqueue_stored_styles( $options = array() ) {
 		}
 	}
 }
+
+/**
+ * Registers vendor JavaScript files to be used as dependencies of the editor
+ * and plugins.
+ *
+ * This function is called from a script during the plugin build process, so it
+ * should not call any WordPress PHP functions.
+ *
+ * @since 13.0
+ *
+ * @param WP_Scripts $scripts WP_Scripts instance.
+ */
+function gutenberg_register_vendor_scripts( $scripts ) {
+	$extension = SCRIPT_DEBUG ? '.js' : '.min.js';
+
+	gutenberg_override_script(
+		$scripts,
+		'react',
+		gutenberg_url( 'build/vendors/react' . $extension ),
+		// See https://github.com/pmmmwh/react-refresh-webpack-plugin/blob/main/docs/TROUBLESHOOTING.md#externalising-react.
+		SCRIPT_DEBUG ? array( 'wp-react-refresh-entry', 'wp-polyfill' ) : array( 'wp-polyfill' ),
+		'18'
+	);
+	gutenberg_override_script(
+		$scripts,
+		'react-dom',
+		gutenberg_url( 'build/vendors/react-dom' . $extension ),
+		array( 'react' ),
+		'18'
+	);
+}
+add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
+
 
 /*
  * Always remove the Core action hook while gutenberg_enqueue_stored_styles() exists to avoid styles being printed twice.

@@ -20,7 +20,18 @@ import {
 } from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
 import { useState, useMemo } from '@wordpress/element';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	store as blockEditorStore,
+	useBlockDisplayInformation,
+	BlockIcon,
+} from '@wordpress/block-editor';
+import { store as preferencesStore } from '@wordpress/preferences';
+
+/**
+ * Internal dependencies
+ */
+import TemplateDetails from '../../template-details';
+import useEditedEntityRecord from '../../use-edited-entity-record';
 
 function getBlockDisplayText( block ) {
 	if ( block ) {
@@ -42,36 +53,30 @@ function useSecondaryText() {
 		[]
 	);
 
+	const blockInformation = useBlockDisplayInformation( activeEntityBlockId );
+
 	if ( activeEntityBlockId ) {
 		return {
 			label: getBlockDisplayText( getBlock( activeEntityBlockId ) ),
 			isActive: true,
+			icon: blockInformation?.icon,
 		};
 	}
 
 	return {};
 }
 
-/**
- * @param {Object}   props                Props for the DocumentActions component.
- * @param {string}   props.entityTitle    The title to display.
- * @param {string}   props.entityLabel    A label to use for entity-related options.
- *                                        E.g. "template" would be used for "edit
- *                                        template" and "show template details".
- * @param {boolean}  props.isLoaded       Whether the data is available.
- * @param {Function} props.children       React component to use for the
- *                                        information dropdown area. Should be a
- *                                        function which accepts dropdown props.
- * @param {boolean}  props.showIconLabels Whether buttons display icons or text labels.
- */
-export default function DocumentActions( {
-	entityTitle,
-	entityLabel,
-	isLoaded,
-	children: dropdownContent,
-	showIconLabels,
-} ) {
-	const { label } = useSecondaryText();
+export default function DocumentActions() {
+	const showIconLabels = useSelect(
+		( select ) =>
+			select( preferencesStore ).get(
+				'core/edit-site',
+				'showIconLabels'
+			),
+		[]
+	);
+	const { isLoaded, record, getTitle } = useEditedEntityRecord();
+	const { label, icon } = useSecondaryText();
 
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
@@ -83,6 +88,7 @@ export default function DocumentActions( {
 			// Use the title wrapper as the popover anchor so that the dropdown is
 			// centered over the whole title area rather than just one part of it.
 			anchor: popoverAnchor,
+			placement: 'bottom',
 		} ),
 		[ popoverAnchor ]
 	);
@@ -97,13 +103,18 @@ export default function DocumentActions( {
 	}
 
 	// Return feedback that the template does not seem to exist.
-	if ( ! entityTitle ) {
+	if ( ! record ) {
 		return (
 			<div className="edit-site-document-actions">
 				{ __( 'Template not found' ) }
 			</div>
 		);
 	}
+
+	const entityLabel =
+		record.type === 'wp_template_part'
+			? __( 'template part' )
+			: __( 'template' );
 
 	return (
 		<div
@@ -127,43 +138,40 @@ export default function DocumentActions( {
 							entityLabel
 						) }
 					</VisuallyHidden>
-					{ entityTitle }
+					{ getTitle() }
 				</Text>
+				<div className="edit-site-document-actions__secondary-item">
+					<BlockIcon icon={ icon } showColors />
+					<Text size="body">{ label ?? '' }</Text>
+				</div>
 
-				<Text
-					size="body"
-					className="edit-site-document-actions__secondary-item"
-				>
-					{ label ?? '' }
-				</Text>
-
-				{ dropdownContent && (
-					<Dropdown
-						popoverProps={ popoverProps }
-						position="bottom center"
-						renderToggle={ ( { isOpen, onToggle } ) => (
-							<Button
-								className="edit-site-document-actions__get-info"
-								icon={ chevronDown }
-								aria-expanded={ isOpen }
-								aria-haspopup="true"
-								onClick={ onToggle }
-								variant={
-									showIconLabels ? 'tertiary' : undefined
-								}
-								label={ sprintf(
-									/* translators: %s: the entity to see details about, like "template"*/
-									__( 'Show %s details' ),
-									entityLabel
-								) }
-							>
-								{ showIconLabels && __( 'Details' ) }
-							</Button>
-						) }
-						contentClassName="edit-site-document-actions__info-dropdown"
-						renderContent={ dropdownContent }
-					/>
-				) }
+				<Dropdown
+					popoverProps={ popoverProps }
+					renderToggle={ ( { isOpen, onToggle } ) => (
+						<Button
+							className="edit-site-document-actions__get-info"
+							icon={ chevronDown }
+							aria-expanded={ isOpen }
+							aria-haspopup="true"
+							onClick={ onToggle }
+							variant={ showIconLabels ? 'tertiary' : undefined }
+							label={ sprintf(
+								/* translators: %s: the entity to see details about, like "template"*/
+								__( 'Show %s details' ),
+								entityLabel
+							) }
+						>
+							{ showIconLabels && __( 'Details' ) }
+						</Button>
+					) }
+					contentClassName="edit-site-document-actions__info-dropdown"
+					renderContent={ ( { onClose } ) => (
+						<TemplateDetails
+							template={ record }
+							onClose={ onClose }
+						/>
+					) }
+				/>
 			</div>
 		</div>
 	);

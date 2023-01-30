@@ -40,9 +40,7 @@ describe( 'pure', () => {
 	} );
 
 	it( 'class component should rerender if the props or state change', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		let i = 0;
 		const MyComp = pure(
 			class extends Component {
