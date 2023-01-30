@@ -14,20 +14,21 @@ import { close } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { Button } from '../';
-
-/** @typedef {import('@wordpress/element').WPElement} WPElement */
+import Button from '../button';
+import type { NoticeAction, NoticeProps } from './types';
+import type { SyntheticEvent } from 'react';
+import type { DeprecatedButtonProps } from '../button/types';
 
 const noop = () => {};
 
 /**
  * Custom hook which announces the message with the given politeness, if a
  * valid message is provided.
- *
- * @param {string|WPElement}     [message]  Message to announce.
- * @param {'polite'|'assertive'} politeness Politeness to announce.
  */
-function useSpokenMessage( message, politeness ) {
+function useSpokenMessage(
+	message: NoticeProps[ 'spokenMessage' ],
+	politeness: NoticeProps[ 'politeness' ]
+) {
 	const spokenMessage =
 		typeof message === 'string' ? message : renderToString( message );
 
@@ -38,15 +39,7 @@ function useSpokenMessage( message, politeness ) {
 	}, [ spokenMessage, politeness ] );
 }
 
-/**
- * Given a notice status, returns an assumed default politeness for the status.
- * Defaults to 'assertive'.
- *
- * @param {string} [status] Notice status.
- *
- * @return {'polite'|'assertive'} Notice politeness.
- */
-function getDefaultPoliteness( status ) {
+function getDefaultPoliteness( status: NoticeProps[ 'status' ] ) {
 	switch ( status ) {
 		case 'success':
 		case 'warning':
@@ -59,6 +52,17 @@ function getDefaultPoliteness( status ) {
 	}
 }
 
+/**
+ * `Notice` is a component used to communicate feedback to the user.
+ *
+ *```jsx
+ * import { Notice } from `@wordpress/components`;
+ *
+ * const MyNotice = () => (
+ *   <Notice status="error">An unknown error occurred.</Notice>
+ * );
+ * ```
+ */
 function Notice( {
 	className,
 	status = 'info',
@@ -73,7 +77,7 @@ function Notice( {
 	// It is distinct from onRemove, which _looks_ like a callback but is
 	// actually the function to call to remove the notice from the UI.
 	onDismiss = noop,
-} ) {
+}: NoticeProps ) {
 	useSpokenMessage( spokenMessage, politeness );
 
 	const classes = classnames(
@@ -85,11 +89,11 @@ function Notice( {
 		}
 	);
 
-	if ( __unstableHTML ) {
+	if ( __unstableHTML && typeof children === 'string' ) {
 		children = <RawHTML>{ children }</RawHTML>;
 	}
 
-	const onDismissNotice = ( event ) => {
+	const onDismissNotice = ( event: SyntheticEvent ) => {
 		event?.preventDefault?.();
 		onDismiss();
 		onRemove();
@@ -110,7 +114,11 @@ function Notice( {
 								noDefaultClasses = false,
 								onClick,
 								url,
-							},
+							}: NoticeAction &
+								// `isPrimary` is a legacy prop included for
+								// backcompat, but `variant` should be used
+								// instead.
+								Pick< DeprecatedButtonProps, 'isPrimary' >,
 							index
 						) => {
 							let computedVariant = variant;
