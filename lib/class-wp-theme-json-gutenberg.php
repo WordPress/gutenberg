@@ -1258,7 +1258,7 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 
-			// If the theme has block support support, and the block has margin values, add layout-aware margin styles.
+			// If the theme has block gap support, and the block has margin values, add layout-aware margin styles.
 			$margin_value = static::get_property_value( $node, array( 'spacing', 'margin' ) );
 			if (
 				$has_block_gap_support &&
