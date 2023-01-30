@@ -9,6 +9,11 @@ import { writeFileSync } from 'fs';
  */
 import { createURL, logout } from '@wordpress/e2e-test-utils';
 
+/**
+ * Internal dependencies
+ */
+import { getLoadingDurations } from './utils';
+
 describe( 'Front End Performance', () => {
 	const results = {
 		timeToFirstByte: [],
@@ -33,13 +38,8 @@ describe( 'Front End Performance', () => {
 		let i = 16;
 		while ( i-- ) {
 			await page.goto( createURL( '/' ) );
-			const navigationTimingJson = await page.evaluate( () =>
-				JSON.stringify( performance.getEntriesByType( 'navigation' ) )
-			);
-			const [ navigationTiming ] = JSON.parse( navigationTimingJson );
-			results.timeToFirstByte.push(
-				navigationTiming.responseStart - navigationTiming.startTime
-			);
+			const { timeToFirstByte } = await getLoadingDurations();
+			results.timeToFirstByte.push( timeToFirstByte );
 		}
 	} );
 } );
