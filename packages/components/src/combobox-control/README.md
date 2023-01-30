@@ -33,10 +33,6 @@ const options = [
 		value: 'large',
 		label: 'Large',
 	},
-	{
-		value: 'huge',
-		label: 'Huge',
-	},
 ];
 
 function MyComboboxControl() {
