@@ -28,6 +28,9 @@ Starting in WordPress 5.8 release, we encourage using the `block.json` metadata 
 		"my-plugin/message": "message"
 	},
 	"usesContext": [ "groupId" ],
+	"selectors": {
+		"root": ".wp-block-my-plugin-notice"
+	},
 	"supports": {
 		"align": true
 	},
@@ -378,6 +381,18 @@ See [the block context documentation](/docs/reference-guides/block-api/block-con
 	"usesContext": [ "message" ]
 }
 ```
+
+### Selectors
+
+-   Type: `object`
+-   Optional
+-   Localized: No
+-   Property: `selectors`
+-   Default: `{}`
+
+Any custom CSS selectors, keyed by `root`, feature, or sub-feature, to be used
+when generating block styles for theme.json (global styles) stylesheets.
+See the [the selectors documentation](/docs/reference-guides/block-api/block-selectors.md) for more details.
 
 ### Supports
 
