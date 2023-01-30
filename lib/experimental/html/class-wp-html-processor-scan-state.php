@@ -7,6 +7,16 @@
  * @since 6.2.0
  */
 
+/**
+ * Track opening tags and scanning depth.
+ *
+ * This class is for internal usage of the WP_HTML_Processor class.
+ *
+ * @access private
+ * @since 6.2.0
+ *
+ * @see WP_HTML_Processor
+ */
 class WP_HTML_Processor_Scan_State {
 	public $budget      = 1000;
 	public $open_tags   = array();
