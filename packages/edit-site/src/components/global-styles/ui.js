@@ -110,6 +110,7 @@ function BlockStyleVariationsScreens( { name } ) {
 				'/variations/' +
 				encodeURIComponent( variation.name )
 			}
+			variation={ variation.name }
 		/>
 	) );
 }
@@ -129,15 +130,7 @@ function BlockStylesNavigationScreens( {
 	) );
 }
 
-function ContextScreens( { name, parentMenu = '' } ) {
-	const hasVariationPath = parentMenu.search( 'variations' );
-	const variationPath =
-		hasVariationPath !== -1
-			? parentMenu
-					.substring( hasVariationPath )
-					.replace( '/', '.' )
-					.concat( '', '.' )
-			: '';
+function ContextScreens( { name, parentMenu = '', variation = '' } ) {
 	const blockStyleVariations = useSelect(
 		( select ) => {
 			const { getBlockStyles } = select( blocksStore );
@@ -149,10 +142,7 @@ function ContextScreens( { name, parentMenu = '' } ) {
 	return (
 		<>
 			<GlobalStylesNavigationScreen path={ parentMenu + '/typography' }>
-				<ScreenTypography
-					name={ name }
-					variationPath={ variationPath }
-				/>
+				<ScreenTypography name={ name } variation={ variation } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen
@@ -180,7 +170,7 @@ function ContextScreens( { name, parentMenu = '' } ) {
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/colors' }>
-				<ScreenColors name={ name } variationPath={ variationPath } />
+				<ScreenColors name={ name } variation={ variation } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen
@@ -192,50 +182,35 @@ function ContextScreens( { name, parentMenu = '' } ) {
 			<GlobalStylesNavigationScreen
 				path={ parentMenu + '/colors/background' }
 			>
-				<ScreenBackgroundColor
-					name={ name }
-					variationPath={ variationPath }
-				/>
+				<ScreenBackgroundColor name={ name } variation={ variation } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/colors/text' }>
-				<ScreenTextColor
-					name={ name }
-					variationPath={ variationPath }
-				/>
+				<ScreenTextColor name={ name } variation={ variation } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/colors/link' }>
-				<ScreenLinkColor
-					name={ name }
-					variationPath={ variationPath }
-				/>
+				<ScreenLinkColor name={ name } variation={ variation } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen
 				path={ parentMenu + '/colors/heading' }
 			>
-				<ScreenHeadingColor
-					name={ name }
-					variationPath={ variationPath }
-				/>
+				<ScreenHeadingColor name={ name } variation={ variation } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen
 				path={ parentMenu + '/colors/button' }
 			>
-				<ScreenButtonColor
-					name={ name }
-					variationPath={ variationPath }
-				/>
+				<ScreenButtonColor name={ name } variation={ variation } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/border' }>
-				<ScreenBorder name={ name } variationPath={ variationPath } />
+				<ScreenBorder name={ name } variation={ variation } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/layout' }>
-				<ScreenLayout name={ name } variationPath={ variationPath } />
+				<ScreenLayout name={ name } variation={ variation } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ parentMenu + '/css' }>
