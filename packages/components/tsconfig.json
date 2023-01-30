@@ -54,7 +54,6 @@
 		"src/higher-order/with-filters",
 		"src/higher-order/with-focus-return",
 		"src/higher-order/with-notices",
-		"src/keyboard-shortcuts",
 		"src/menu-items-choice",
 		"src/navigation",
 		"src/notice",

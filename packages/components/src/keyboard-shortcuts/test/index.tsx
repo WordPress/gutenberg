@@ -1,19 +1,29 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { createEvent, fireEvent, render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
  */
-import KeyboardShortcuts from '../';
+import KeyboardShortcuts from '..';
 
 describe( 'KeyboardShortcuts', () => {
-	function keyPress( which, target ) {
+	function keyPress(
+		which: KeyboardEvent[ 'which' ],
+		target: Parameters< typeof fireEvent >[ 0 ]
+	) {
 		[ 'keydown', 'keypress', 'keyup' ].forEach( ( eventName ) => {
-			const event = new window.Event( eventName, { bubbles: true } );
-			event.keyCode = which;
-			event.which = which;
+			const event = createEvent(
+				eventName,
+				target,
+				{
+					bubbles: true,
+					keyCode: which,
+					which,
+				},
+				{ EventType: 'KeyboardEvent' }
+			);
 			fireEvent( target, event );
 		} );
 	}
