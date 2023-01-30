@@ -97,7 +97,7 @@ The options that can be chosen from.
 
 #### onFilterValueChange
 
-Function called with the control's search input value changes. The argument contains the next input value.
+Function called when the control's search input value changes. The argument contains the next input value.
 
 -   Type: `( value: string ) => void`
 -   Required: No
@@ -111,7 +111,7 @@ Function called with the selected value changes.
 
 #### value
 
-The current value of the input.
+The current value of the control.
 
 -   Type: `string | null`
 -   Required: No

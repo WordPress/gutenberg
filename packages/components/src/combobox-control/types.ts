@@ -6,6 +6,7 @@ import type { BaseControlProps } from '../base-control/types';
 export type ComboboxControlOption = {
 	label: string;
 	value: string;
+	[ key: string ]: any;
 };
 
 export type ComboboxControlProps = Pick<
@@ -52,7 +53,7 @@ export type ComboboxControlProps = Pick<
 	 */
 	onChange?: ( value: ComboboxControlProps[ 'value' ] ) => void;
 	/**
-	 * Function called with the control's search input value changes. The argument contains the next input value.
+	 * Function called when the control's search input value changes. The argument contains the next input value.
 	 *
 	 * @default noop
 	 */
@@ -61,5 +62,8 @@ export type ComboboxControlProps = Pick<
 	 * The options that can be chosen from.
 	 */
 	options: ComboboxControlOption[];
+	/**
+	 * The current value of the control.
+	 */
 	value?: string | null;
 };
