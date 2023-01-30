@@ -179,6 +179,11 @@ class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 	}
 
 	/**
+	 * Whether a given HTML element is void (e.g. <br>).
+	 *
+	 * @param string $tag_name The element in question.
+	 * @return bool True if the element is void.
+	 *
 	 * @see https://html.spec.whatwg.org/#elements-2
 	 */
 	public static function is_html_void_element( $tag_name ) {
