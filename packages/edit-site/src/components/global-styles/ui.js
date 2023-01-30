@@ -5,10 +5,15 @@ import {
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
 	__experimentalUseNavigator as useNavigator,
+	createSlotFill,
+	DropdownMenu,
 } from '@wordpress/components';
 import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
-
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+import { __ } from '@wordpress/i18n';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { moreVertical } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -31,6 +36,43 @@ import { ScreenVariation } from './screen-variations';
 import ScreenBorder from './screen-border';
 import StyleBook from '../style-book';
 import ScreenCSS from './screen-css';
+import { unlock } from '../../experiments';
+
+const SLOT_FILL_NAME = 'GlobalStylesMenu';
+const { Slot: GlobalStylesMenuSlot, Fill: GlobalStylesMenuFill } =
+	createSlotFill( SLOT_FILL_NAME );
+
+function GlobalStylesActionMenu() {
+	const { toggle } = useDispatch( preferencesStore );
+	const { useGlobalStylesReset } = unlock( blockEditorExperiments );
+	const [ canReset, onReset ] = useGlobalStylesReset();
+	const { goTo } = useNavigator();
+	const loadCustomCSS = () => goTo( '/css' );
+	return (
+		<GlobalStylesMenuFill>
+			<DropdownMenu
+				icon={ moreVertical }
+				label={ __( 'More Styles actions' ) }
+				controls={ [
+					{
+						title: __( 'Reset to defaults' ),
+						onClick: onReset,
+						isDisabled: ! canReset,
+					},
+					{
+						title: __( 'Welcome Guide' ),
+						onClick: () =>
+							toggle( 'core/edit-site', 'welcomeGuideStyles' ),
+					},
+					{
+						title: __( 'Additional CSS' ),
+						onClick: loadCustomCSS,
+					},
+				] }
+			/>
+		</GlobalStylesMenuFill>
+	);
+}
 
 function GlobalStylesNavigationScreen( { className, ...props } ) {
 	return (
@@ -289,8 +331,10 @@ function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
 			{ isStyleBookOpened && (
 				<GlobalStylesStyleBook onClose={ onCloseStyleBook } />
 			) }
+
+			<GlobalStylesActionMenu />
 		</NavigatorProvider>
 	);
 }
-
+export { GlobalStylesMenuSlot };
 export default GlobalStylesUI;
