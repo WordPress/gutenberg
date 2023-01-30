@@ -235,7 +235,6 @@ function ComboboxControl( {
 					className,
 					'components-combobox-control'
 				) }
-				tabIndex="-1"
 				label={ label }
 				id={ `components-form-token-input-${ instanceId }` }
 				hideLabelFromVision={ hideLabelFromVision }
