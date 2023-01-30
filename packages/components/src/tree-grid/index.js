@@ -16,7 +16,7 @@ import RovingTabIndexContainer from './roving-tab-index';
  *
  * @param {Element} rowElement The DOM element representing the row.
  *
- * @return {?Array} The array of focusables in the row.
+ * @return {Array | undefined} The array of focusables in the row.
  */
 function getRowFocusables( rowElement ) {
 	const focusablesInRow = focus.focusable.find( rowElement, {

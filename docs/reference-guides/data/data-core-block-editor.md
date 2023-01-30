@@ -86,7 +86,7 @@ _Parameters_
 
 _Returns_
 
--   `boolean`: Whether the given block is allowed to be moved.
+-   `boolean | undefined`: Whether the given block is allowed to be moved.
 
 ### canMoveBlocks
 

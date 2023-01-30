@@ -122,7 +122,7 @@ export default function QueryContent( {
 					openPatternSelectionModal={ openPatternSelectionModal }
 				/>
 			</BlockControls>
-			<InspectorControls __experimentalGroup="advanced">
+			<InspectorControls group="advanced">
 				<SelectControl
 					__nextHasNoMarginBottom
 					label={ __( 'HTML element' ) }
