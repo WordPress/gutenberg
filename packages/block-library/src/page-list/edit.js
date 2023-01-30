@@ -303,18 +303,6 @@ export default function PageListEdit( {
 	return (
 		<>
 			<InspectorControls>
-				{ allowConvertToLinks && (
-					<PanelBody title={ __( 'Customize this menu' ) }>
-						<p>{ convertDescription }</p>
-						<Button
-							variant="primary"
-							disabled={ ! hasResolvedPages }
-							onClick={ convertToNavigationLinks }
-						>
-							{ __( 'Customize' ) }
-						</Button>
-					</PanelBody>
-				) }
 				{ pagesTree.length > 0 && (
 					<PanelBody>
 						<ComboboxControl
@@ -329,6 +317,18 @@ export default function PageListEdit( {
 								'Choose a page to show only its subpages.'
 							) }
 						/>
+					</PanelBody>
+				) }
+				{ allowConvertToLinks && (
+					<PanelBody title={ __( 'Customize this menu' ) }>
+						<p>{ convertDescription }</p>
+						<Button
+							variant="primary"
+							disabled={ ! hasResolvedPages }
+							onClick={ convertToNavigationLinks }
+						>
+							{ __( 'Customize' ) }
+						</Button>
 					</PanelBody>
 				) }
 			</InspectorControls>
