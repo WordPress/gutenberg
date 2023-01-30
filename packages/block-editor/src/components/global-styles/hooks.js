@@ -81,93 +81,66 @@ export const useGlobalStylesReset = () => {
 };
 
 export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
-	const {
-		merged: mergedConfig,
-		base: baseConfig,
-		user: userConfig,
-		setUserConfig,
-	} = useContext( GlobalStylesContext );
+	const { setUserConfig, ...configs } = useContext( GlobalStylesContext );
 
-	const pathParts = [ 'settings' ];
-	if ( blockName ) {
-		pathParts.push( `blocks.${ blockName }` );
-	}
-	if ( propertyPath ) {
-		pathParts.push( propertyPath );
-	}
-	const fullPath = pathParts.join( '.' );
+	const appendedBlockPath = blockName ? '.blocks.' + blockName : '';
+	const appendedPropertyPath = propertyPath ? '.' + propertyPath : '';
+	const contextualPath = `settings${ appendedBlockPath }${ appendedPropertyPath }`;
+	const globalPath = `settings${ appendedPropertyPath }`;
+	const sourceKey = source === 'all' ? 'merged' : source;
+
+	const settingValue = useMemo( () => {
+		const configToUse = configs[ sourceKey ];
+		if ( ! configToUse ) {
+			throw 'Unsupported source';
+		}
+
+		if ( propertyPath ) {
+			return (
+				get( configToUse, contextualPath ) ??
+				get( configToUse, globalPath )
+			);
+		}
+
+		const result = {};
+		VALID_SETTINGS.forEach( ( setting ) => {
+			const value =
+				get(
+					configToUse,
+					`settings${ appendedBlockPath }.${ setting }`
+				) ?? get( configToUse, `settings.${ setting }` );
+			if ( value ) {
+				set( result, setting, value );
+			}
+		} );
+		return result;
+	}, [
+		configs,
+		sourceKey,
+		propertyPath,
+		contextualPath,
+		globalPath,
+		appendedBlockPath,
+	] );
 
 	const setSetting = ( newValue ) => {
 		setUserConfig( ( currentConfig ) => {
 			// Deep clone `currentConfig` to avoid mutating it later.
 			const newUserConfig = JSON.parse( JSON.stringify( currentConfig ) );
-			set( newUserConfig, fullPath, newValue );
+			set( newUserConfig, contextualPath, newValue );
 
 			return newUserConfig;
 		} );
 	};
 
-	const getSettingValueForContext = ( currentBlockName, settingPath ) => {
-		const currentPathParts = [ 'settings' ];
-		if ( currentBlockName ) {
-			currentPathParts.push( `blocks.${ currentBlockName }` );
-		}
-		currentPathParts.push( settingPath );
-		const currentPath = currentPathParts.join( '.' );
-
-		let result;
-		switch ( source ) {
-			case 'all':
-				result = get( mergedConfig, currentPath );
-				break;
-			case 'user':
-				result = get( userConfig, currentPath );
-				break;
-			case 'base':
-				result = get( baseConfig, currentPath );
-				break;
-			default:
-				throw 'Unsupported source';
-		}
-
-		return result;
-	};
-
-	// Unlike styles settings get inherited from top level settings.
-	const resultWithFallback = useMemo( () => {
-		if ( propertyPath ) {
-			return (
-				getSettingValueForContext( blockName, propertyPath ) ??
-				getSettingValueForContext( undefined, propertyPath )
-			);
-		}
-		const result = {};
-		VALID_SETTINGS.forEach( ( setting ) => {
-			set(
-				result,
-				setting,
-				getSettingValueForContext( blockName, setting ) ??
-					getSettingValueForContext( undefined, setting )
-			);
-		} );
-		return result;
-	}, [
-		mergedConfig,
-		userConfig,
-		baseConfig,
-		blockName,
-		propertyPath,
-		source,
-	] );
-
-	return [ resultWithFallback, setSetting ];
+	return [ settingValue, setSetting ];
 }
 
 export function useGlobalStyle(
 	path,
 	blockName,
 	source = 'all',
-	shouldDecodeEncode = true
+	{ shouldDecodeEncode = true } = {}
 ) {
 	const {
 		merged: mergedConfig,

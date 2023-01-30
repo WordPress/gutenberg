@@ -33,12 +33,9 @@ export default function TypographyPanel( {
 	}
 
 	const [ style ] = useGlobalStyle( prefix, name, 'user', false );
-	const [ inheritedStyle, setStyle ] = useGlobalStyle(
-		prefix,
-		name,
-		'all',
-		false
-	);
+	const [ inheritedStyle, setStyle ] = useGlobalStyle( prefix, name, 'all', {
+		shouldDecodeEncode: false,
+	} );
 	const [ settings ] = useGlobalSetting( '', name );
 
 	return (
