@@ -7,7 +7,7 @@
  * @subpackage HTML
  */
 
-require_once __DIR__ . '/../../lib/experimental/html/index.php';
+require_once __DIR__ . '/../../lib/experimental/html/wp-html.php';
 
 if ( ! function_exists( 'esc_attr' ) ) {
 	function esc_attr( $s ) { return htmlentities( $s, ENT_QUOTES, null, false ); }
