@@ -5,6 +5,7 @@ import {
 	experiments as blockEditorExperiments,
 	InspectorControls,
 	store as blockEditorStore,
+	Warning,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -47,6 +48,14 @@ const ExperimentMainContent = ( {
 
 	if ( currentMenuId && isNavigationMenuMissing ) {
 		return <p>{ __( 'Select or create a menu' ) }</p>;
+	}
+
+	if ( isNavigationMenuMissing ) {
+		return (
+			<Warning>
+				{ __( 'Navigation menu has been deleted or is unavailable. ' ) }
+			</Warning>
+		);
 	}
 
 	if ( isLoading ) {
