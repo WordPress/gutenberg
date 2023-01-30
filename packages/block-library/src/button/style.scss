@@ -9,8 +9,6 @@ $blocks-block__margin: 0.5em;
 	text-align: center;
 	word-break: break-word; // overflow-wrap doesn't work well if a link is wrapped in the div, so use word-break here.
 	box-sizing: border-box;
-	// Stretch to button width if it is set.
-	width: 100%;
 
 	&.aligncenter {
 		text-align: center;
@@ -44,6 +42,9 @@ $blocks-block__margin: 0.5em;
 .wp-block-buttons > .wp-block-button {
 	&.has-custom-width {
 		max-width: none;
+		.wp-block-button__link {
+			width: 100%;
+		}
 	}
 
 	&.has-custom-font-size {
