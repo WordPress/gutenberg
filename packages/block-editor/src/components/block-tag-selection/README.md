@@ -9,7 +9,33 @@ Uses `<ToolbarDropdownMenu>`.
 
 import { BlockControls, TagSelectionDropdown } from '@wordpress/block-editor';
 
-const DEFAULT_TAGS = [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p' ];
+// Default HTML tags
+const DEFAULT_TAGS = [
+	{
+		tag: 'h1',
+		title: __( 'Heading 1' ),
+	},
+	{
+		tag: 'h2',
+		title: __( 'Heading 2' ),
+	},
+	{
+		tag: 'h3',
+		title: __( 'Heading 3' ),
+	},
+	{
+		tag: 'h4',
+		title: __( 'Heading 4' ),
+	},
+	{
+		tag: 'h5',
+		title: __( 'Heading 5' ),
+	},
+	{
+		tag: 'h6',
+		title: __( 'Heading 6' ),
+	},
+];
 
 const MyTagSelectionToolbar = () => (
 	<BlockControls group="block">
@@ -30,7 +56,7 @@ const MyTagSelectionToolbar = () => (
 
 The list of available HTML tags, passed from the block.
 
--   Type: `Array`
+-   Type: `Object`
 -   Required: no
 
 #### selectedTag
