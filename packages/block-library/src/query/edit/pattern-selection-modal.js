@@ -63,24 +63,24 @@ export default function PatternSelectionModal( {
 			title={ __( 'Choose a pattern' ) }
 			onRequestClose={ () => setIsPatternSelectionModalOpen( false ) }
 		>
-			<BlockContextProvider value={ blockPreviewContext }>
-				<div className="block-library-query-pattern__selection-content">
-					<div className="block-library-query-pattern__selection-search">
-						<SearchControl
-							__nextHasNoMarginBottom
-							onChange={ setSearchValue }
-							value={ searchValue }
-							label={ __( 'Search for patterns' ) }
-							placeholder={ __( 'Search' ) }
-						/>
-					</div>
+			<div className="block-library-query-pattern__selection-content">
+				<div className="block-library-query-pattern__selection-search">
+					<SearchControl
+						__nextHasNoMarginBottom
+						onChange={ setSearchValue }
+						value={ searchValue }
+						label={ __( 'Search for patterns' ) }
+						placeholder={ __( 'Search' ) }
+					/>
+				</div>
+				<BlockContextProvider value={ blockPreviewContext }>
 					<BlockPatternsList
 						blockPatterns={ filteredBlockPatterns }
 						shownPatterns={ shownBlockPatterns }
 						onClickPattern={ onBlockPatternSelect }
 					/>
-				</div>
-			</BlockContextProvider>
+				</BlockContextProvider>
+			</div>
 		</Modal>
 	);
 }
