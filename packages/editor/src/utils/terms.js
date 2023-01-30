@@ -44,7 +44,6 @@ export function buildTermsTree( flatTerms ) {
 	return fillWithChildren( termsByParent[ '0' ] || [] );
 }
 
-// Lodash unescape function handles &#39; but not &#039; which may be return in some API requests.
 export const unescapeString = ( arg ) => {
 	return decodeEntities( arg );
 };
