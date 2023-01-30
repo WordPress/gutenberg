@@ -10,7 +10,8 @@
 require_once __DIR__ . '/../../lib/experimental/html/wp-html.php';
 
 if ( ! function_exists( 'esc_attr' ) ) {
-	function esc_attr( $s ) { return htmlentities( $s, ENT_QUOTES, null, false ); }
+	function esc_attr( $s ) {
+		return htmlentities( $s, ENT_QUOTES, null, false ); }
 }
 
 if ( ! class_exists( 'WP_UnitTestCase' ) ) {
@@ -39,7 +40,7 @@ class WP_HTML_Processor_Test extends WP_UnitTestCase {
 		$tags = new WP_HTML_Processor( '<div><div><div><img></div></div></div>' );
 
 		$tags->next_tag( 'div' );
-		$state = $tags->new_state();
+		$state              = $tags->new_state();
 		$state->match_depth = 1;
 		$this->assertFalse( $tags->balanced_next( $state, 'img' ) );
 	}
@@ -48,7 +49,7 @@ class WP_HTML_Processor_Test extends WP_UnitTestCase {
 		$tags = new WP_HTML_Processor( '<div><div><div><img></div></div><img wanted></div>' );
 
 		$tags->next_tag( 'div' );
-		$state = $tags->new_state();
+		$state              = $tags->new_state();
 		$state->match_depth = 1;
 		$this->assertTrue( $tags->balanced_next( $state, 'img' ), 'Did not find the wanted <img>' );
 		$this->assertTrue( $tags->get_attribute( 'wanted' ), 'Found the wrong <img>' );
@@ -58,13 +59,14 @@ class WP_HTML_Processor_Test extends WP_UnitTestCase {
 		$tags = new WP_HTML_Processor( '<div><div><div><img></div></div></div>' );
 
 		$tags->next_tag( 'div' );
-		$state = $tags->new_state();
+		$state              = $tags->new_state();
 		$state->match_depth = 3;
 		$this->assertTrue( $tags->balanced_next( $state, 'img' ) );
 	}
 
 	public function test_flushes_up_to_close_tag_from_deep_within() {
-		$tags = new WP_HTML_Processor( <<<HTML
+		$tags = new WP_HTML_Processor(
+			<<<HTML
 			<main>
 				<section>
 					<h2>Cows</h2>
@@ -107,7 +109,8 @@ HTML
 	}
 
 	public function test_can_navigate_with_unique_state_throughout_structure() {
-		$tags = new WP_HTML_Processor( <<<HTML
+		$tags = new WP_HTML_Processor(
+			<<<HTML
 			<main>
 				<section>
 					<h2>Cows</h2>
@@ -168,7 +171,8 @@ HTML
 	}
 
 	public function test_can_scan_through_tags_at_a_given_depth() {
-		$tags = new WP_HTML_Processor( <<<HTML
+		$tags = new WP_HTML_Processor(
+			<<<HTML
 			<main>
 				<section>
 					<h2>Cows</h2>
@@ -200,7 +204,7 @@ HTML
 		);
 
 		$tags->next_tag( 'section' );
-		$state = $tags->new_state();
+		$state              = $tags->new_state();
 		$state->match_depth = 3;
 
 		$p3_count = 0;
@@ -211,7 +215,7 @@ HTML
 		// Did we only visit the tags inside section > * > * > p?
 		$this->assertEquals( 5, $p3_count );
 
-		$state = $tags->new_state();
+		$state              = $tags->new_state();
 		$state->match_depth = 2;
 
 		$p2_count = 0;

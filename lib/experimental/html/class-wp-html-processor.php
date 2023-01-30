@@ -19,8 +19,8 @@
 
 
 class WP_HTML_Processor_Scan_State {
-	public $budget = 1000;
-	public $open_tags = array();
+	public $budget      = 1000;
+	public $open_tags   = array();
 	public $match_depth = null;
 
 	public function relative_depth() {
@@ -31,10 +31,10 @@ class WP_HTML_Processor_Scan_State {
 
 class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 	public function new_state() {
-		$state = new WP_HTML_Processor_Scan_State();
+		$state    = new WP_HTML_Processor_Scan_State();
 		$tag_name = $this->get_tag();
 
-		if ( ! self::is_html_void_element( $tag_name  ) && ! $this->is_tag_closer() ) {
+		if ( ! self::is_html_void_element( $tag_name ) && ! $this->is_tag_closer() ) {
 			$state->open_tags[] = $tag_name;
 		}
 
@@ -136,15 +136,15 @@ class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 
 	public function get_content_inside_balanced_tags() {
 		static $start_name = null;
-		static $end_name = null;
+		static $end_name   = null;
 
 		if ( null === $start_name || array_key_exists( $start_name, $this->bookmarks ) ) {
-			$rand_id = rand( 1, PHP_INT_MAX );
+			$rand_id    = rand( 1, PHP_INT_MAX );
 			$start_name = "start_{$rand_id}";
 		}
 
 		if ( null === $end_name || array_key_exists( $end_name, $this->bookmarks ) ) {
-			$rand_id = rand( 1, PHP_INT_MAX );
+			$rand_id  = rand( 1, PHP_INT_MAX );
 			$end_name = "start_{$rand_id}";
 		}
 
