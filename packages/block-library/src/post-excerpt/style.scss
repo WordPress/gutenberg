@@ -1,3 +1,9 @@
+// Zero out the margin on the excerpt paragraph, to match the body paragragraphs.
+.wp-block-post-excerpt p {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
 .wp-block-post-excerpt__more-link {
 	display: inline-block;
 }
