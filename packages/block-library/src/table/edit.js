@@ -204,7 +204,7 @@ function TableEdit( {
 	/**
 	 * Get the alignment of the currently selected cell.
 	 *
-	 * @return {string} The new alignment to apply to the column.
+	 * @return {string | undefined} The new alignment to apply to the column.
 	 */
 	function getCellAlignment() {
 		if ( ! selectedCell ) {
@@ -510,6 +510,7 @@ function TableEdit( {
 			) }
 			{ ! isEmpty && (
 				<RichText
+					identifier="caption"
 					tagName="figcaption"
 					className={ __experimentalGetElementClassName( 'caption' ) }
 					aria-label={ __( 'Table caption text' ) }
@@ -538,6 +539,7 @@ function TableEdit( {
 						onSubmit={ onCreateTable }
 					>
 						<TextControl
+							__nextHasNoMarginBottom
 							type="number"
 							label={ __( 'Column count' ) }
 							value={ initialColumnCount }
@@ -546,6 +548,7 @@ function TableEdit( {
 							className="blocks-table__placeholder-input"
 						/>
 						<TextControl
+							__nextHasNoMarginBottom
 							type="number"
 							label={ __( 'Row count' ) }
 							value={ initialRowCount }

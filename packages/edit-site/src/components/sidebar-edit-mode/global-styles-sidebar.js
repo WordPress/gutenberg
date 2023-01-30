@@ -1,34 +1,28 @@
 /**
  * WordPress dependencies
  */
-import {
-	DropdownMenu,
-	FlexItem,
-	FlexBlock,
-	Flex,
-	Button,
-} from '@wordpress/components';
+import { FlexItem, FlexBlock, Flex, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { styles, moreVertical, seen } from '@wordpress/icons';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { store as preferencesStore } from '@wordpress/preferences';
+import { styles, seen } from '@wordpress/icons';
+import { useSelect } from '@wordpress/data';
+
 import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import DefaultSidebar from './default-sidebar';
-import { GlobalStylesUI, useGlobalStylesReset } from '../global-styles';
+import { GlobalStylesUI } from '../global-styles';
 import { store as editSiteStore } from '../../store';
+import { GlobalStylesMenuSlot } from '../global-styles/ui';
 
 export default function GlobalStylesSidebar() {
-	const [ canReset, onReset ] = useGlobalStylesReset();
-	const { toggle } = useDispatch( preferencesStore );
 	const [ isStyleBookOpened, setIsStyleBookOpened ] = useState( false );
 	const editorMode = useSelect(
 		( select ) => select( editSiteStore ).getEditorMode(),
 		[]
 	);
+
 	useEffect( () => {
 		if ( editorMode !== 'visual' ) {
 			setIsStyleBookOpened( false );
@@ -63,25 +57,7 @@ export default function GlobalStylesSidebar() {
 						/>
 					</FlexItem>
 					<FlexItem>
-						<DropdownMenu
-							icon={ moreVertical }
-							label={ __( 'More Styles actions' ) }
-							controls={ [
-								{
-									title: __( 'Reset to defaults' ),
-									onClick: onReset,
-									isDisabled: ! canReset,
-								},
-								{
-									title: __( 'Welcome Guide' ),
-									onClick: () =>
-										toggle(
-											'core/edit-site',
-											'welcomeGuideStyles'
-										),
-								},
-							] }
-						/>
+						<GlobalStylesMenuSlot />
 					</FlexItem>
 				</Flex>
 			}

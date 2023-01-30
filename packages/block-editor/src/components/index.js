@@ -55,10 +55,7 @@ export { default as __experimentalColorGradientSettingsDropdown } from './colors
 export { default as __experimentalPanelColorGradientSettings } from './colors-gradients/panel-color-gradient-settings';
 export { default as __experimentalUseMultipleOriginColorsAndGradients } from './colors-gradients/use-multiple-origin-colors-and-gradients';
 export { default as __experimentalHeightControl } from './height-control';
-export {
-	default as __experimentalImageEditor,
-	ImageEditingProvider as __experimentalImageEditingProvider,
-} from './image-editor';
+export { default as __experimentalImageEditor } from './image-editor';
 export { default as __experimentalImageSizeControl } from './image-size-control';
 export { default as InnerBlocks, useInnerBlocksProps } from './inner-blocks';
 export {
@@ -75,7 +72,6 @@ export { default as __experimentalLinkControlSearchResults } from './link-contro
 export { default as __experimentalLinkControlSearchItem } from './link-control/search-item';
 export { default as LineHeightControl } from './line-height-control';
 export { default as __experimentalListView } from './list-view';
-export { default as __experimentalOffCanvasEditor } from './off-canvas-editor';
 export { default as MediaReplaceFlow } from './media-replace-flow';
 export { default as MediaPlaceholder } from './media-placeholder';
 export { default as MediaUpload } from './media-upload';

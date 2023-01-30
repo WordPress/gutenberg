@@ -552,6 +552,10 @@ _Parameters_
 -   _username_ `?string`: String to be used as user credential.
 -   _password_ `?string`: String to be used as user credential.
 
+### logout
+
+Performs log out.
+
 ### mockOrTransform
 
 Mocks a request with the supplied mock object, or allows it to run with an optional transform, based on the
@@ -796,6 +800,15 @@ _Parameters_
 
 The block toolbar is not always visible while typing.
 Call this function to reveal it.
+
+### switchBlockInspectorTab
+
+Clicks on the block inspector tab button with the supplied label and waits
+for the tab switch.
+
+_Parameters_
+
+-   _label_ `string`: Aria label to find tab button by.
 
 ### switchEditorModeTo
 

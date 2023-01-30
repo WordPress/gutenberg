@@ -137,7 +137,7 @@ export function DimensionsPanel( props ) {
 
 	return (
 		<>
-			<InspectorControls __experimentalGroup="dimensions">
+			<InspectorControls group="dimensions">
 				{ ! isPaddingDisabled && (
 					<ToolsPanelItem
 						className={ spacingClassnames }
@@ -301,7 +301,7 @@ const useIsDimensionsDisabled = ( props = {} ) => {
  * @param {string} blockName Block name.
  * @param {string} feature   The feature custom sides relate to e.g. padding or margins.
  *
- * @return {?string[]} Strings representing the custom sides available.
+ * @return {string[] | undefined} Strings representing the custom sides available.
  */
 export function useCustomSides( blockName, feature ) {
 	const support = getBlockSupport( blockName, SPACING_SUPPORT_KEY );

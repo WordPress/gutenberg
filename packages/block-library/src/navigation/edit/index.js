@@ -89,9 +89,6 @@ function Navigation( {
 	hasColorSettings = true,
 	customPlaceholder: CustomPlaceholder = null,
 } ) {
-	const isOffCanvasNavigationEditorEnabled =
-		window?.__experimentalEnableOffCanvasNavigationEditor === true;
-
 	const {
 		openSubmenusOnClick,
 		overlayMenu,
@@ -467,10 +464,19 @@ function Navigation( {
 			setDetectedColor,
 			setDetectedBackgroundColor
 		);
+
 		const subMenuElement = navRef.current?.querySelector(
-			'[data-type="core/navigation-link"] [data-type="core/navigation-link"]'
+			'[data-type="core/navigation-submenu"] [data-type="core/navigation-link"]'
 		);
-		if ( subMenuElement ) {
+
+		if ( ! subMenuElement ) {
+			return;
+		}
+
+		// Only detect submenu overlay colors if they have previously been explicitly set.
+		// This avoids the contrast checker from reporting on inherited submenu colors and
+		// showing the contrast warning twice.
+		if ( overlayTextColor.color || overlayBackgroundColor.color ) {
 			detectColors(
 				subMenuElement,
 				setDetectedOverlayColor,
@@ -644,7 +650,7 @@ function Navigation( {
 					</PanelBody>
 				) }
 			</InspectorControls>
-			<InspectorControls __experimentalGroup="color">
+			<InspectorControls group="color">
 				{ hasColorSettings && (
 					<>
 						<ColorGradientSettingsDropdown
@@ -727,6 +733,7 @@ function Navigation( {
 					onCreateNew={ createUntitledEmptyNavigationMenu }
 					onSelectClassicMenu={ onSelectClassicMenu }
 					onSelectNavigationMenu={ onSelectNavigationMenu }
+					isLoading={ isLoading }
 				/>
 				{ stylingInspectorControls }
 				<ResponsiveWrapper
@@ -768,6 +775,7 @@ function Navigation( {
 					onCreateNew={ createUntitledEmptyNavigationMenu }
 					onSelectClassicMenu={ onSelectClassicMenu }
 					onSelectNavigationMenu={ onSelectNavigationMenu }
+					isLoading={ isLoading }
 				/>
 				<Warning>
 					{ __(
@@ -842,10 +850,11 @@ function Navigation( {
 					onCreateNew={ createUntitledEmptyNavigationMenu }
 					onSelectClassicMenu={ onSelectClassicMenu }
 					onSelectNavigationMenu={ onSelectNavigationMenu }
+					isLoading={ isLoading }
 				/>
 				{ stylingInspectorControls }
 				{ isEntityAvailable && (
-					<InspectorControls __experimentalGroup="advanced">
+					<InspectorControls group="advanced">
 						{ hasResolvedCanUserUpdateNavigationMenu &&
 							canUserUpdateNavigationMenu && (
 								<NavigationMenuNameControl />
@@ -867,12 +876,10 @@ function Navigation( {
 									} }
 								/>
 							) }
-						{ isOffCanvasNavigationEditorEnabled && (
-							<ManageMenusButton
-								disabled={ isManageMenusButtonDisabled }
-								className="wp-block-navigation-manage-menus-button"
-							/>
-						) }
+						<ManageMenusButton
+							disabled={ isManageMenusButtonDisabled }
+							className="wp-block-navigation-manage-menus-button"
+						/>
 					</InspectorControls>
 				) }
 
