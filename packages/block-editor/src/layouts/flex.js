@@ -314,7 +314,6 @@ function FlexLayoutJustifyContentControl( {
 			label: __( 'Space between items' ),
 		} );
 	} else {
-		// Todo: we also need an icon here.
 		justificationOptions.push( {
 			value: 'stretch',
 			icon: justifyStretch,
