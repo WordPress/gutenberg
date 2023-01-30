@@ -13,13 +13,7 @@
  * @TODO: Clean up attribute token class after is_true addition
  * @TODO: Prune whitespace when removing classes/attributes: e.g. "a b c" -> "c" not " c"
  * @TODO: Skip over `/` in attributes area, split attribute names by `/`
- * @TODO: Decode HTML references/entities in class names when matching.
- *        E.g. match having class `1<"2` needs to recognize `class="1&lt;&quot;2"`.
- * @TODO: Decode character references in `get_attribute()`
  * @TODO: Properly escape attribute value in `set_attribute()`
- * @TODO: Add slow mode to escape character entities in CSS class names?
- *        (This requires a custom decoder since `html_entity_decode()`
- *        doesn't handle attribute character reference decoding rules.
  *
  * @package WordPress
  * @subpackage HTML
@@ -1197,7 +1191,8 @@ class WP_HTML_Tag_Processor {
 				break;
 			}
 
-			$name = substr( $existing_class, $at, $name_length );
+			$raw_name = substr( $existing_class, $at, $name_length );
+			$name = WP_HTML_Character_Reference_Transcoder::decode_utf8( 'attribute', $raw_name );
 			$at  += $name_length;
 
 			// If this class is marked for removal, start processing the next one.
@@ -1512,7 +1507,7 @@ class WP_HTML_Tag_Processor {
 
 		$raw_value = substr( $this->html, $attribute->value_starts_at, $attribute->value_length );
 
-		return html_entity_decode( $raw_value );
+		return WP_HTML_Character_Reference_Transcoder::decode_utf8( 'attribute', $raw_value );
 	}
 
 	/**
@@ -2003,9 +1998,15 @@ class WP_HTML_Tag_Processor {
 			 * See https://html.spec.whatwg.org/#attributes-3
 			 * See https://html.spec.whatwg.org/#space-separated-tokens
 			 */
+			$decoded_class = WP_HTML_Character_Reference_Transcoder::decode_utf8(
+				'attribute',
+				substr( $this->html, $class_start, $class_end - $class_start )
+			);
+			$class_at = 0;
+			$class_end = strlen( $decoded_class );
 			while (
 				// phpcs:ignore WordPress.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition
-				false !== ( $class_at = strpos( $this->html, $this->sought_class_name, $class_at ) ) &&
+				false !== ( $class_at = strpos( $decoded_class, $this->sought_class_name, $class_at ) ) &&
 				$class_at < $class_end
 			) {
 				/*
@@ -2014,7 +2015,7 @@ class WP_HTML_Tag_Processor {
 				 * to start at a place where the preceding character is whitespace.
 				 */
 				if ( $class_at > $class_start ) {
-					$character = $this->html[ $class_at - 1 ];
+					$character = $decoded_class[ $class_at - 1 ];
 
 					if ( ' ' !== $character && "\t" !== $character && "\f" !== $character && "\r" !== $character && "\n" !== $character ) {
 						$class_at += strlen( $this->sought_class_name );
@@ -2028,7 +2029,7 @@ class WP_HTML_Tag_Processor {
 				 * to end at a place where the next character is whitespace.
 				 */
 				if ( $class_at + strlen( $this->sought_class_name ) < $class_end ) {
-					$character = $this->html[ $class_at + strlen( $this->sought_class_name ) ];
+					$character = $decoded_class[ $class_at + strlen( $this->sought_class_name ) ];
 
 					if ( ' ' !== $character && "\t" !== $character && "\f" !== $character && "\r" !== $character && "\n" !== $character ) {
 						$class_at += strlen( $this->sought_class_name );

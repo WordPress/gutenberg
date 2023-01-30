@@ -10,3 +10,4 @@ require_once __DIR__ . '/class-wp-html-attribute-token.php';
 require_once __DIR__ . '/class-wp-html-span.php';
 require_once __DIR__ . '/class-wp-html-text-replacement.php';
 require_once __DIR__ . '/class-wp-html-tag-processor.php';
+require_once __DIR__ . '/class-wp-html-character-reference-transcoder.php';
