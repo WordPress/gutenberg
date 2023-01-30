@@ -168,7 +168,7 @@ export default function TypographyPanel( {
 	const fontFamilies =
 		fontFamiliesPerOrigin?.custom ??
 		fontFamiliesPerOrigin?.theme ??
-		fontFamiliesPerOrigin.default;
+		fontFamiliesPerOrigin?.default;
 	const fontFamily = decodeValue( inheritedValue?.typography?.fontFamily );
 	const setFontFamily = ( newValue ) => {
 		const slug = fontFamilies?.find(
