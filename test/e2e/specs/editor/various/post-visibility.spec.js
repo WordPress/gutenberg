@@ -84,15 +84,17 @@ test.describe( 'Post visibility', () => {
 
 		// Set a publish date for the next month.
 		await page.click( 'role=button[name="Change date: Immediately"i]' );
+		const calender = page.locator( 'role=application[name="Calendar"i]' );
+		await calender
+			.locator( 'role=button[name="View next month"i]' )
+			.click();
+		// The aria label contains the full date, so use the
+		await calender.locator( 'text=15' ).click();
 
-		await page.click( 'role=button[name="View next month"i]' );
-		await page.click( 'text=15' );
-
+		// Change the visibility to private.
 		await page.click( 'role=button[name="Select visibility: Public"i]' );
-
 		await page.click( 'role=radio[name="Private"i]' );
-
-		await page.click( 'role=button[name="OK"i]' );
+		await page.click( 'role=dialog >> role=button[name="OK"i]' );
 
 		const currentStatus = await page.evaluate( () => {
 			return window.wp.data
