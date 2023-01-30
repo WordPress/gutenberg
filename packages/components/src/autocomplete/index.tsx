@@ -34,6 +34,13 @@ import { speak } from '@wordpress/a11y';
  */
 import { getAutoCompleterUI } from './autocompleter-ui';
 import { escapeRegExp } from '../utils/strings';
+import type {
+	AutocompleterUIProps,
+	KeyedOption,
+	OptionCompletion,
+	UseAutocompleteProps,
+	WPCompleter,
+} from './types';
 
 const EMPTY_ARRAY: any[] = [];
 
@@ -43,17 +50,28 @@ export function useAutocomplete( {
 	onReplace,
 	completers,
 	contentRef,
-} ) {
+}: UseAutocompleteProps ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const instanceId = useInstanceId( useAutocomplete );
 	const [ selectedIndex, setSelectedIndex ] = useState( 0 );
-	const [ filteredOptions, setFilteredOptions ] = useState( EMPTY_ARRAY );
-	const [ filterValue, setFilterValue ] = useState( '' );
-	const [ autocompleter, setAutocompleter ] = useState( null );
-	const [ AutocompleterUI, setAutocompleterUI ] = useState( null );
+
+	const [ filteredOptions, setFilteredOptions ] =
+		useState< Array< KeyedOption > >( EMPTY_ARRAY );
+	const [ filterValue, setFilterValue ] =
+		useState< AutocompleterUIProps[ 'filterValue' ] >( '' );
+	const [ autocompleter, setAutocompleter ] = useState< WPCompleter | null >(
+		null
+	);
+	const [ AutocompleterUI, setAutocompleterUI ] = useState<
+		( ( props: AutocompleterUIProps ) => JSX.Element | null ) | null
+	>( null );
+
 	const backspacing = useRef( false );
 
-	function insertCompletion( replacement ) {
+	function insertCompletion( replacement: OptionCompletion[ 'value' ] ) {
+		if ( autocompleter === null ) {
+			return;
+		}
 		const end = record.start;
 		const start =
 			end - autocompleter.triggerPrefix.length - filterValue.length;
@@ -62,7 +80,7 @@ export function useAutocomplete( {
 		onChange( insert( record, toInsert, start, end ) );
 	}
 
-	function select( option ) {
+	function select( option: KeyedOption ) {
 		const { getOptionCompletion } = autocompleter || {};
 
 		if ( option.isDisabled ) {
@@ -72,11 +90,20 @@ export function useAutocomplete( {
 		if ( getOptionCompletion ) {
 			const completion = getOptionCompletion( option.value, filterValue );
 
-			const { action, value } =
-				undefined === completion.action ||
-				undefined === completion.value
-					? { action: 'insert-at-caret', value: completion }
-					: completion;
+			function isCompletionObject(
+				completionData: any
+			): completionData is OptionCompletion {
+				return ! (
+					undefined === completionData.action ||
+					undefined === completionData.value
+				);
+			}
+			const action = isCompletionObject( completion )
+				? completion.action
+				: 'insert-at-caret';
+			const value = isCompletionObject( completion )
+				? completion.value
+				: completion;
 
 			if ( 'replace' === action ) {
 				onReplace( [ value ] );
@@ -101,7 +128,7 @@ export function useAutocomplete( {
 		setAutocompleterUI( null );
 	}
 
-	function announce( options ) {
+	function announce( options: Array< KeyedOption > ) {
 		if ( ! debouncedSpeak ) {
 			return;
 		}
@@ -128,7 +155,7 @@ export function useAutocomplete( {
 	 *
 	 * @param {Array} options
 	 */
-	function onChangeOptions( options ) {
+	function onChangeOptions( options: Array< KeyedOption > ) {
 		setSelectedIndex(
 			options.length === filteredOptions.length ? selectedIndex : 0
 		);
@@ -136,7 +163,7 @@ export function useAutocomplete( {
 		announce( options );
 	}
 
-	function handleKeyDown( event ) {
+	function handleKeyDown( event: KeyboardEvent ) {
 		backspacing.current = event.key === 'Backspace';
 
 		if ( ! autocompleter ) {
@@ -304,7 +331,7 @@ export function useAutocomplete( {
 				? getAutoCompleterUI( completer )
 				: AutocompleterUI
 		);
-		setFilterValue( query );
+		setFilterValue( query === null ? '' : query );
 		// Temporarily disabling exhaustive-deps to avoid introducing unexpected side effecst.
 		// See https://github.com/WordPress/gutenberg/pull/41820
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -315,7 +342,7 @@ export function useAutocomplete( {
 	const isExpanded = !! autocompleter && filteredOptions.length > 0;
 	const listBoxId = isExpanded
 		? `components-autocomplete-listbox-${ instanceId }`
-		: null;
+		: undefined;
 	const activeId = isExpanded
 		? `components-autocomplete-item-${ instanceId }-${ selectedKey }`
 		: null;

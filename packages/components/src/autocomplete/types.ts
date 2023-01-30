@@ -150,3 +150,47 @@ export type AutocompleterUIProps = {
 export type DebouncedPromise< T = void > = Promise< T > & {
 	canceled?: boolean;
 };
+
+/**
+ * When `@wordpress/rich-text` is fully typed, the following
+ * types should be moved to and imported from there
+ *
+ * @see @wordpress/rich-text/src/create.js
+ */
+type RichTextFormat = {
+	type: string;
+};
+type RichTextFormatList = Array< RichTextFormat >;
+type RichTextValue = {
+	text: string;
+	formats?: Array< RichTextFormatList >;
+	replacements?: Array< RichTextFormat >;
+	start: number | undefined;
+	end: number | undefined;
+};
+
+export type UseAutocompleteProps = {
+	/**
+	 * The rich text value object the autocomleter is being applied to.
+	 */
+	record: RichTextValue & {
+		start: NonNullable< RichTextValue[ 'start' ] >;
+		end: NonNullable< RichTextValue[ 'end' ] >;
+	};
+	/**
+	 * A function to be called when an option is selected to insert into the existing text.
+	 */
+	onChange: ( value: string ) => void;
+	/**
+	 * A function to be called when an option is selected to replace the existing text.
+	 */
+	onReplace: ( arg: [ OptionCompletion[ 'value' ] ] ) => void;
+	/**
+	 * An array of all of the completers to apply to the current element.
+	 */
+	completers: Array< WPCompleter >;
+	/**
+	 * A ref containing the editable element that will serve as the anchor for `Autocomplete`'s `Popover`.
+	 */
+	contentRef: ContentRef;
+};
