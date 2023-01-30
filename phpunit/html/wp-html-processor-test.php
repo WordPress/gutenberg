@@ -95,7 +95,7 @@ HTML
 		$tags->next_tag( 'section' );
 		$state = $tags->new_state();
 
-		// Jump inside this tag
+		// Jump inside this tag.
 		$tags->balanced_next( $state, 'p' );
 		$this->assertTrue( $tags->get_attribute( 'start' ) );
 		// Then exit the outer section we were scanning.
@@ -139,7 +139,7 @@ HTML
 		$tags->next_tag( 'section' );
 		$state = $tags->new_state();
 
-		// Jump inside this tag
+		// Jump inside this tag.
 		$tags->balanced_next( $state, 'p' );
 		$this->assertTrue( $tags->get_attribute( 'start' ) );
 
@@ -158,7 +158,7 @@ HTML
 		$tags->next_tag();
 		$this->assertTrue( $tags->get_attribute( 'inner' ) );
 
-		// And now flush out the previous stack/frame
+		// And now flush out the previous stack/frame.
 		while ( $tags->balanced_next( $state ) ) {
 			continue;
 		}
