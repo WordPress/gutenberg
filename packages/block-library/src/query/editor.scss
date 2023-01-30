@@ -38,7 +38,11 @@
 	}
 
 	.block-library-query-pattern__selection-search {
-		margin-bottom: $grid-unit-30;
+		background: $white;
+		position: sticky;
+		top: 0;
+		padding: $grid-unit-20 0;
+		z-index: z-index(".block-library-query-pattern__selection-search");
 	}
 }
 
