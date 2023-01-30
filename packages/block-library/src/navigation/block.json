@@ -119,6 +119,7 @@
 			"allowSwitching": false,
 			"allowInheriting": false,
 			"allowVerticalAlignment": false,
+			"allowSizingOnChildren": true,
 			"default": {
 				"type": "flex"
 			}
