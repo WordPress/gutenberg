@@ -170,6 +170,16 @@ class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 	 * HTML-related Utility Functions
 	 */
 
+	/**
+	 * Classify a given HTML tag type.
+	 *
+	 * Return 'opener' for an opening element, 'closer' for a closing element,
+	 * and 'void' for a void element.
+	 *
+	 * @param bool $is_closer Whether the current element is a closing element.
+	 * @param bool $is_void Whether the current element is a void element.
+	 * @return 'opener'|'closer'|'void' The type of element in question.
+	 */
 	public static function classify_tag_type( $is_closer, $is_void ) {
 		if ( $is_void ) {
 			return 'void';
