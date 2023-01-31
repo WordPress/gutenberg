@@ -84,15 +84,26 @@ function BlockContent( {
 		const parentPageDetails = pages.find(
 			( page ) => page.id === parentPageID
 		);
+
+		if ( parentPageDetails?.title?.rendered ) {
+			return (
+				<div { ...blockProps }>
+					<Warning>
+						{ sprintf(
+							// translators: %s: Page title.
+							__( 'Page List: "%s" page has no children.' ),
+							parentPageDetails.title.rendered
+						) }
+					</Warning>
+				</div>
+			);
+		}
+
 		return (
 			<div { ...blockProps }>
-				<Warning>
-					{ sprintf(
-						// translators: %s: Page title.
-						__( '"%s" page has no children.' ),
-						parentPageDetails.title.rendered
-					) }
-				</Warning>
+				<Notice status={ 'warning' } isDismissible={ false }>
+					{ __( 'Page List: Cannot retrieve Pages.' ) }
+				</Notice>
 			</div>
 		);
 	}
