@@ -86,7 +86,7 @@
 
 ### Bug Fixes
 
--   Fix missing file entry for `util.js` in `package.json`
+-   Fix missing file entry for `utils.js` in `package.json`
 
 ## 1.0.0 (2019-05-21)
 
