@@ -25,6 +25,8 @@ import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import ListViewExpander from './expander';
 import { useBlockLock } from '../block-lock';
 
+const noop = () => {};
+
 function ListViewBlockSelectButton(
 	{
 		className,
@@ -59,7 +61,10 @@ function ListViewBlockSelectButton(
 	};
 
 	function onKeyDownHandler( event ) {
-		if ( event.keyCode === ENTER || event.keyCode === SPACE ) {
+		if (
+			( isEditable && event.keyCode === ENTER ) ||
+			event.keyCode === SPACE
+		) {
 			onClick( event );
 		}
 	}
@@ -79,7 +84,7 @@ function ListViewBlockSelectButton(
 					'block-editor-list-view-block-select-button',
 					className
 				) }
-				onClick={ onClick }
+				onClick={ isEditable ? onClick : noop }
 				onKeyDown={ onKeyDownHandler }
 				ref={ ref }
 				tabIndex={ tabIndex }
@@ -89,7 +94,7 @@ function ListViewBlockSelectButton(
 				draggable={ draggable }
 				href={ isEditable ? `#block-${ clientId }` : undefined }
 				aria-hidden={ true }
-				title={ editAriaLabel }
+				title={ isEditable ? editAriaLabel : undefined }
 			>
 				<ListViewExpander onClick={ onToggleExpanded } />
 				<BlockIcon
