@@ -112,7 +112,7 @@ class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 			 * when existing this function, but by tracking it like this we don't
 			 * have to remember to do that.
 			 */
-			$depth = $type === 'void'
+			$depth = 'void' === $type
 				? $state->relative_depth() + 1
 				: $state->relative_depth();
 
