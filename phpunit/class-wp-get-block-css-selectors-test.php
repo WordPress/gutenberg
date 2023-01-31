@@ -118,10 +118,7 @@ class WP_Get_Block_CSS_Selector_Test extends WP_UnitTestCase {
 	public function test_get_feature_selector_via_selectors_api() {
 		$block_type = self::register_test_block(
 			'test/feature-selector',
-			array(
-				'root'       => '.root',
-				'typography' => array( 'root' => '.typography' ),
-			),
+			array( 'typography' => array( 'root' => '.typography' ) ),
 			null
 		);
 
@@ -132,10 +129,7 @@ class WP_Get_Block_CSS_Selector_Test extends WP_UnitTestCase {
 	public function test_get_feature_selector_via_selectors_api_shorthand_property() {
 		$block_type = self::register_test_block(
 			'test/shorthand-feature-selector',
-			array(
-				'root'       => '.root',
-				'typography' => '.typography',
-			),
+			array( 'typography' => '.typography' ),
 			null
 		);
 
@@ -206,9 +200,7 @@ class WP_Get_Block_CSS_Selector_Test extends WP_UnitTestCase {
 		$block_type = self::register_test_block(
 			'test/subfeature-selector',
 			array(
-				'root'       => '.root',
 				'typography' => array(
-					'root'           => '.root .typography',
 					'textDecoration' => '.root .typography .text-decoration',
 				),
 			),
@@ -227,10 +219,7 @@ class WP_Get_Block_CSS_Selector_Test extends WP_UnitTestCase {
 		$block_type = self::register_test_block(
 			'test/subfeature-selector',
 			array(
-				'root'       => '.root',
-				'typography' => array(
-					'root' => '.root .typography',
-				),
+				'typography' => array( 'root' => '.root .typography' ),
 			),
 			null
 		);
@@ -247,7 +236,7 @@ class WP_Get_Block_CSS_Selector_Test extends WP_UnitTestCase {
 	public function test_no_subfeature_level_selector_via_selectors_api() {
 		$block_type = self::register_test_block(
 			'test/null-subfeature-selector',
-			array( 'root' => '.root' ),
+			array(),
 			null
 		);
 
