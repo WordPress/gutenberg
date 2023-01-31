@@ -63,7 +63,7 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
  * @param {Object}  props.LeafMoreMenu        Optional more menu substitution.
  * @param {Object}  ref                       Forwarded ref
  */
-function __ExperimentalOffCanvasEditor(
+function OffCanvasEditor(
 	{
 		id,
 		blocks,
@@ -252,4 +252,4 @@ function __ExperimentalOffCanvasEditor(
 	);
 }
 
-export default forwardRef( __ExperimentalOffCanvasEditor );
+export default forwardRef( OffCanvasEditor );
