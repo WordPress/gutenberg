@@ -38,13 +38,10 @@ const data = new TextEncoder().encode(
 		metrics: resultsFiles.reduce( ( result, { metricsPrefix }, index ) => {
 			return {
 				...result,
-				...Object.keys( performanceResults[ index ][ hash ] ).reduce(
-					( accumulator, key ) => {
-						accumulator[ metricsPrefix + key ] =
-							performanceResults[ index ][ hash ][ key ];
-						return accumulator;
-					},
-					{}
+				...Object.fromEntries(
+					Object.entries( performanceResults[ index ][ hash ] ).map(
+						( [ key, value ] ) => [ metricsPrefix + key, value ]
+					)
 				),
 			};
 		} ),
@@ -52,13 +49,14 @@ const data = new TextEncoder().encode(
 			( result, { metricsPrefix }, index ) => {
 				return {
 					...result,
-					...Object.keys(
-						performanceResults[ index ][ baseHash ]
-					).reduce( ( accumulator, key ) => {
-						accumulator[ metricsPrefix + key ] =
-							performanceResults[ index ][ hash ][ key ];
-						return accumulator;
-					}, {} ),
+					...Object.fromEntries(
+						Object.entries(
+							performanceResults[ index ][ baseHash ]
+						).map( ( [ key, value ] ) => [
+							metricsPrefix + key,
+							value,
+						] )
+					),
 				};
 			},
 			{}
