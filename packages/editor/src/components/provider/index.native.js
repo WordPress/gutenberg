@@ -325,7 +325,7 @@ class NativeEditorProvider extends Component {
 	}
 
 	updateCapabilitiesAction( capabilities ) {
-		this.props.updateEditorSettings( capabilities );
+		this.props.updateEditorSettings( { capabilities } );
 	}
 
 	render() {
