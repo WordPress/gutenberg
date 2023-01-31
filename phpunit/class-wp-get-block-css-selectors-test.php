@@ -85,7 +85,7 @@ class WP_Get_Block_CSS_Selector_Test extends WP_UnitTestCase {
 			null
 		);
 
-		$selector = wp_get_block_css_selector( $block_type, 'duotone' );
+		$selector = wp_get_block_css_selector( $block_type, array( 'color', 'duotone' ) );
 		$this->assertEquals( '.duotone-selector', $selector );
 	}
 
@@ -100,7 +100,7 @@ class WP_Get_Block_CSS_Selector_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$selector = wp_get_block_css_selector( $block_type, 'duotone' );
+		$selector = wp_get_block_css_selector( $block_type, 'color.duotone' );
 		$this->assertEquals( '.experimental-duotone', $selector );
 	}
 
@@ -111,8 +111,7 @@ class WP_Get_Block_CSS_Selector_Test extends WP_UnitTestCase {
 			null
 		);
 
-		$selector = wp_get_block_css_selector( $block_type, 'duotone' );
-		$this->assertEquals( '', $selector );
+		$selector = wp_get_block_css_selector( $block_type, 'color.duotone' );
 		$this->assertEquals( null, $selector );
 	}
 
