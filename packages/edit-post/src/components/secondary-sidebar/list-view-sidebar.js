@@ -56,7 +56,7 @@ export default function ListViewSidebar() {
 			// Either focus the list view or the list view tab. Must have a fallback because the list view does not render when there are no blocks. If list view is available, need to skip close, list view, and outline tabs. If list view is not available, need to skip close button.
 			const listViewFocusLocation =
 				sidebarTabbables[ 3 ] || sidebarTabbables[ 1 ];
-			listViewFocusLocation.focus();
+			listViewFocusLocation.focus( { preventScroll: true } );
 			// Outline tab is selected.
 		} else {
 			// Find the 3rd tabbable based on the attached sidebar ref. This is to skip over the close button, list view tab button, and landing on outline tab button since there is nothing else to focus after.
