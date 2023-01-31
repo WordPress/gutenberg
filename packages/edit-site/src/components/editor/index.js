@@ -165,6 +165,12 @@ export default function Editor() {
 	useTitle( hasLoadedPost && title );
 
 	const contentDependencies = [
+		// Current post entity,
+		{
+			store: coreStore,
+			selector: 'getEntityRecord',
+			args: [ 'postType', 'postType', editedPostId ],
+		},
 		// Global styles entity ID
 		{
 			store: coreStore,
