@@ -87,45 +87,52 @@ function Layout( { styles } ) {
 		showBlockBreadcrumbs,
 		isTemplateMode,
 		documentLabel,
-	} = useSelect( ( select ) => {
-		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
-		const editorSettings = getEditorSettings();
-		const postTypeLabel = getPostTypeLabel();
+	} = useSelect(
+		( select ) => {
+			const { getEditorSettings, getPostTypeLabel } =
+				select( editorStore );
+			const editorSettings = getEditorSettings();
+			const postTypeLabel = getPostTypeLabel();
 
-		return {
-			isTemplateMode: select( editPostStore ).isEditingTemplate(),
-			hasFixedToolbar:
-				select( editPostStore ).isFeatureActive( 'fixedToolbar' ),
-			sidebarIsOpened: !! (
-				select( interfaceStore ).getActiveComplementaryArea(
-					editPostStore.name
-				) || select( editPostStore ).isPublishSidebarOpened()
-			),
-			isFullscreenActive:
-				select( editPostStore ).isFeatureActive( 'fullscreenMode' ),
-			isInserterOpened: select( editPostStore ).isInserterOpened(),
-			isListViewOpened: select( editPostStore ).isListViewOpened(),
-			mode: select( editPostStore ).getEditorMode(),
-			isRichEditingEnabled: editorSettings.richEditingEnabled,
-			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
-			previousShortcut: select(
-				keyboardShortcutsStore
-			).getAllShortcutKeyCombinations( 'core/edit-post/previous-region' ),
-			nextShortcut: select(
-				keyboardShortcutsStore
-			).getAllShortcutKeyCombinations( 'core/edit-post/next-region' ),
-			showIconLabels:
-				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
-			isDistractionFree:
-				select( editPostStore ).isFeatureActive( 'distractionFree' ) &&
-				isLargeViewport,
-			showBlockBreadcrumbs: select( editPostStore ).isFeatureActive(
-				'showBlockBreadcrumbs'
-			),
-			// translators: Default label for the Document in the Block Breadcrumb.
-			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
-		};
-	}, [] );
+			return {
+				isTemplateMode: select( editPostStore ).isEditingTemplate(),
+				hasFixedToolbar:
+					select( editPostStore ).isFeatureActive( 'fixedToolbar' ),
+				sidebarIsOpened: !! (
+					select( interfaceStore ).getActiveComplementaryArea(
+						editPostStore.name
+					) || select( editPostStore ).isPublishSidebarOpened()
+				),
+				isFullscreenActive:
+					select( editPostStore ).isFeatureActive( 'fullscreenMode' ),
+				isInserterOpened: select( editPostStore ).isInserterOpened(),
+				isListViewOpened: select( editPostStore ).isListViewOpened(),
+				mode: select( editPostStore ).getEditorMode(),
+				isRichEditingEnabled: editorSettings.richEditingEnabled,
+				hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
+				previousShortcut: select(
+					keyboardShortcutsStore
+				).getAllShortcutKeyCombinations(
+					'core/edit-post/previous-region'
+				),
+				nextShortcut: select(
+					keyboardShortcutsStore
+				).getAllShortcutKeyCombinations( 'core/edit-post/next-region' ),
+				showIconLabels:
+					select( editPostStore ).isFeatureActive( 'showIconLabels' ),
+				isDistractionFree:
+					select( editPostStore ).isFeatureActive(
+						'distractionFree'
+					) && isLargeViewport,
+				showBlockBreadcrumbs: select( editPostStore ).isFeatureActive(
+					'showBlockBreadcrumbs'
+				),
+				// translators: Default label for the Document in the Block Breadcrumb.
+				documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
+			};
+		},
+		[ isLargeViewport ]
+	);
 
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
