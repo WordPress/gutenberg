@@ -54,7 +54,6 @@ const MainContent = ( {
 		<OffCanvasEditor
 			blocks={ clientIdsTree }
 			isExpanded={ true }
-			selectBlockInCanvas={ false }
 			LeafMoreMenu={ LeafMoreMenu }
 		/>
 	);
