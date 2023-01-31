@@ -45,7 +45,7 @@ function filterElementBlockSupports( blockSuppots, name, element ) {
 		if (
 			support === 'textTransform' &&
 			! name &&
-			[ 'heading', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ].includes(
+			! [ 'heading', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ].includes(
 				element
 			)
 		) {
@@ -56,7 +56,7 @@ function filterElementBlockSupports( blockSuppots, name, element ) {
 		if (
 			support === 'letterSpacing' &&
 			! name &&
-			[ 'heading', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ].includes(
+			! [ 'heading', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ].includes(
 				element
 			)
 		) {
