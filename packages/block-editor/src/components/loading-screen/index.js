@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classNames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -34,11 +39,16 @@ const SuspenseDataDependency = ( { store, selector, args = [] } ) => {
  * Component that will render a loading screen if dependencies have not resolved,
  * or its children if all dependencies have resolved.
  *
- * @param {Object} props                  Component props
- * @param {Array}  props.dataDependencies Array of dependencies
- * @param {string} props.children         Component children
+ * @param {Object}  props                  Component props
+ * @param {Array}   props.dataDependencies Array of dependencies
+ * @param {string}  props.children         Component children
+ * @param {string?} props.overlayClassName Additional overlay classname
  */
-const SuspenseWithLoadingScreen = ( { dataDependencies, children } ) => {
+const SuspenseWithLoadingScreen = ( {
+	dataDependencies,
+	children,
+	overlayClassName,
+} ) => {
 	const [ loaded, setLoaded ] = useState( false );
 
 	const finishedLoading = () => {
@@ -51,12 +61,20 @@ const SuspenseWithLoadingScreen = ( { dataDependencies, children } ) => {
 		<LoadingScreenContext.Provider value={ loaded }>
 			{ loaded ? (
 				<>
-					<LoadingScreen autoClose />
+					<LoadingScreen
+						overlayClassName={ overlayClassName }
+						autoClose
+					/>
 					{ children }
 				</>
 			) : (
 				<Suspense
-					fallback={ <LoadingScreen onUnmount={ finishedLoading } /> }
+					fallback={
+						<LoadingScreen
+							onUnmount={ finishedLoading }
+							overlayClassName={ overlayClassName }
+						/>
+					}
 				>
 					{ dataDependencies.map(
 						( { store, selector, args }, depindex ) => (
@@ -79,11 +97,12 @@ const SuspenseWithLoadingScreen = ( { dataDependencies, children } ) => {
  * Renders a loading screen.
  * Supports automatic closing with the `autoClose` prop.
  *
- * @param {Object}    props           Component props
- * @param {Function?} props.onUnmount Optional callback to call on unmount.
- * @param {boolean}   props.autoClose Whether to automatically close.
+ * @param {Object}    props                  Component props
+ * @param {Function?} props.onUnmount        Optional callback to call on unmount.
+ * @param {boolean}   props.autoClose        Whether to automatically close.
+ * @param {string?}   props.overlayClassName Additional overlay classname
  */
-const LoadingScreen = ( { onUnmount, autoClose } ) => {
+const LoadingScreen = ( { onUnmount, autoClose, overlayClassName } ) => {
 	const [ visible, setVisible ] = useState( true );
 
 	useEffect( () => {
@@ -111,7 +130,10 @@ const LoadingScreen = ( { onUnmount, autoClose } ) => {
 			onRequestClose={ () => {} }
 			__experimentalHideHeader
 			className="block-editor-loading-screen-modal"
-			overlayClassName="block-editor-loading-screen-modal-overlay"
+			overlayClassName={ classNames(
+				'block-editor-loading-screen-modal-overlay',
+				overlayClassName
+			) }
 		>
 			<div className="block-editor-loading-screen-wrapper">
 				<Spinner />

@@ -4,6 +4,10 @@
 	padding-top: $header-height;
 }
 
+.block-editor-loading-screen-modal-overlay.is-canvas-view {
+	padding-top: 0;
+}
+
 .block-editor-loading-screen-modal.is-full-screen {
 	box-shadow: 0 0 0 transparent;
 	width: 100%;
