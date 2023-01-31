@@ -12,10 +12,11 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import BoxControl from '../';
+import BoxControl from '..';
+import type { BoxControlProps, BoxControlValue } from '../types';
 
-const Example = ( extraProps ) => {
-	const [ state, setState ] = useState();
+const Example = ( extraProps: BoxControlProps ) => {
+	const [ state, setState ] = useState< BoxControlValue >();
 
 	return (
 		<BoxControl
