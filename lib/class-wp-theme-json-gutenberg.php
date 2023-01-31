@@ -1092,7 +1092,7 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	public function get_custom_css() {
 		// Add the global styles root CSS.
-		$stylesheet = _wp_array_get( $this->theme_json, array( 'styles', 'css' ) );
+		$stylesheet = _wp_array_get( $this->theme_json, array( 'styles', 'css' ), '' );
 
 		// Add the global styles block CSS.
 		if ( isset( $this->theme_json['styles']['blocks'] ) ) {
