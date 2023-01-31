@@ -59,6 +59,11 @@ export const useDefaultTemplateTypes = () => {
 		[]
 	);
 };
+export const useExtraTemplateTypes = () => {
+	return useSelect( ( select ) => {
+		return select( editorStore ).__experimentalGetExtraTemplateTypes();
+	}, [] );
+};
 
 const usePublicPostTypes = () => {
 	const postTypes = useSelect(

@@ -85,6 +85,7 @@ export function reinitializeEditor( target, settings ) {
 		dispatch( editorStore ).updateEditorSettings( {
 			defaultTemplateTypes: settings.defaultTemplateTypes,
 			defaultTemplatePartAreas: settings.defaultTemplatePartAreas,
+			extraTemplateTypes: settings.extraTemplateTypes,
 		} );
 	}
 

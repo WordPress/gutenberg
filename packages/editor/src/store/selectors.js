@@ -1550,6 +1550,17 @@ export function __experimentalGetDefaultTemplateTypes( state ) {
 }
 
 /**
+ * Returns the extra template slugs.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Array} The template slugs.
+ */
+export function __experimentalGetExtraTemplateTypes( state ) {
+	return getEditorSettings( state )?.extraTemplateTypes;
+}
+
+/**
  * Returns the default template part areas.
  *
  * @param {Object} state Global application state.
