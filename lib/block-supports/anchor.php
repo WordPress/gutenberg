@@ -40,7 +40,7 @@ function gutenberg_apply_anchor_support( $block_type, $block_attributes ) {
 		return array();
 	}
 
-	if ( gutenberg_should_skip_block_supports_serialization( $block_type, 'anchor' ) ) {
+	if ( wp_should_skip_block_supports_serialization( $block_type, 'anchor' ) ) {
 		return array();
 	}
 
