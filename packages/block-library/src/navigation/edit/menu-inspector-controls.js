@@ -32,9 +32,7 @@ const ExperimentMainContent = ( {
 	isLoading,
 	isNavigationMenuMissing,
 } ) => {
-	const { __experimentalOffCanvasEditor: OffCanvasEditor } = unlock(
-		blockEditorExperiments
-	);
+	const { OffCanvasEditor } = unlock( blockEditorExperiments );
 	// Provide a hierarchy of clientIds for the given Navigation block (clientId).
 	// This is required else the list view will display the entire block tree.
 	const clientIdsTree = useSelect(
