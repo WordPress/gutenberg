@@ -9,7 +9,7 @@
 	"textdomain": "default",
 	"attributes": {
 		"parentPageID": {
-			"type": "integer",
+			"type": "number",
 			"default": 0
 		},
 		"isNested": {
