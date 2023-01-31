@@ -31,6 +31,20 @@ class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 		return $state;
 	}
 
+	/**
+	 * Find the matching closing tag for an opening tag.
+	 *
+	 * When called while on an open tag, move to the matching closing tag,
+	 * respecting any in-between content, including nested tags of the same
+	 * name. Return false when called on a closing or void tag, or if no
+	 * matching closing tag was found.
+	 *
+	 * @param WP_HTML_Processor_Scan_State $state Tracking state.
+	 * @param array|string                 $query Query criteria for the closing tag.
+	 * @return bool                        True if a matching closing tag was found.
+	 *
+	 * @see WP_HTML_Tag_Processor::parse_query
+	 */
 	public function balanced_next( WP_HTML_Processor_Scan_State $state, $query = null ) {
 		while ( $this->next_tag( array( 'tag_closers' => 'visit' ) ) && $state->budget-- > 0 ) {
 			$tag_name  = $this->get_tag();
