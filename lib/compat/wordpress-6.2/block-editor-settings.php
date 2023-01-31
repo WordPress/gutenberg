@@ -16,7 +16,7 @@ function gutenberg_get_block_editor_settings_6_2( $settings ) {
 	if ( wp_theme_has_theme_json() ) {
 		// Add the custom CSS as separate style sheet so any invalid CSS entered by users does not break other global styles.
 		$settings['styles'][] = array(
-			'css'            => gutenberg_get_global_stylesheet( array( 'custom-css' ) ),
+			'css'            => gutenberg_get_global_styles_custom_css(),
 			'__unstableType' => 'user',
 			'isGlobalStyles' => true,
 		);
