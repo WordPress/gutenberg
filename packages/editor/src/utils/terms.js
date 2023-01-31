@@ -50,7 +50,6 @@ export const unescapeString = ( arg ) => {
 
 /**
  * Returns a term object with name unescaped.
- * The unescape of the name property is done using lodash unescape function.
  *
  * @param {Object} term The term object to unescape.
  *

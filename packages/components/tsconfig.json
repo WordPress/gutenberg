@@ -24,6 +24,7 @@
 		{ "path": "../deprecated" },
 		{ "path": "../dom" },
 		{ "path": "../element" },
+		{ "path": "../html-entities" },
 		{ "path": "../hooks" },
 		{ "path": "../icons" },
 		{ "path": "../is-shallow-equal" },

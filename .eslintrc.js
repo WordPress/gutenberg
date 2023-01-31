@@ -140,6 +140,7 @@ const restrictedImports = [
 			'toString',
 			'trim',
 			'truncate',
+			'unescape',
 			'unionBy',
 			'uniq',
 			'uniqBy',
