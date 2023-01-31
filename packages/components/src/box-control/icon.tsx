@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import type { WordPressComponentProps } from '../ui/context';
 import {
 	Root,
 	Viewbox,
@@ -9,6 +10,7 @@ import {
 	BottomStroke,
 	LeftStroke,
 } from './styles/box-control-icon-styles';
+import type { BoxControlIconProps, BoxControlProps } from './types';
 
 const BASE_ICON_SIZE = 24;
 
@@ -17,11 +19,14 @@ export default function BoxControlIcon( {
 	side = 'all',
 	sides,
 	...props
-} ) {
-	const isSideDisabled = ( value ) =>
-		sides?.length && ! sides.includes( value );
+}: WordPressComponentProps< BoxControlIconProps, 'span' > ) {
+	const isSideDisabled = (
+		value: NonNullable< BoxControlProps[ 'sides' ] >[ number ]
+	) => sides?.length && ! sides.includes( value );
 
-	const hasSide = ( value ) => {
+	const hasSide = (
+		value: NonNullable< BoxControlProps[ 'sides' ] >[ number ]
+	) => {
 		if ( isSideDisabled( value ) ) {
 			return false;
 		}

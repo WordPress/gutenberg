@@ -27,10 +27,13 @@ import {
 	getInitialSide,
 	isValuesMixed,
 	isValuesDefined,
-	LABELS,
 } from './utils';
 import { useControlledState } from '../utils/hooks';
-import type { BoxControlProps, BoxControlValue } from './types';
+import type {
+	BoxControlIconProps,
+	BoxControlProps,
+	BoxControlValue,
+} from './types';
 
 const defaultInputProps = {
 	min: 0,
@@ -69,7 +72,7 @@ function BoxControl( {
 		! hasInitialValue || ! isValuesMixed( inputValues ) || hasOneSide
 	);
 
-	const [ side, setSide ] = useState(
+	const [ side, setSide ] = useState< BoxControlIconProps[ 'side' ] >(
 		getInitialSide( isLinked, splitOnAxis )
 	);
 
@@ -93,7 +96,7 @@ function BoxControl( {
 
 	const handleOnFocus = (
 		_event: React.FocusEvent< HTMLInputElement >,
-		{ side: nextSide }: { side: keyof typeof LABELS }
+		{ side: nextSide }: { side: typeof side }
 	) => {
 		setSide( nextSide );
 	};

@@ -102,3 +102,15 @@ export type BoxUnitControlProps = UnitControlPassthroughProps &
 			state: Omit< ReturnType< typeof useHover >, 'event' >
 		) => void;
 	};
+
+export type BoxControlIconProps = {
+	/**
+	 * @default 24
+	 */
+	size?: number;
+	/**
+	 * @default 'all'
+	 */
+	side?: keyof typeof LABELS;
+	sides?: BoxControlProps[ 'sides' ];
+};
