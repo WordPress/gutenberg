@@ -173,7 +173,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
     data-wp-component="VStack"
   >
     <div
-      class="components-dropdown"
+      class="components-dropdown components-color-palette__transparent-background"
       tabindex="-1"
     >
       <button
