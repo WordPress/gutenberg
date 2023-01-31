@@ -25,8 +25,6 @@ import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import ListViewExpander from './expander';
 import { useBlockLock } from '../block-lock';
 
-const noop = () => {};
-
 function ListViewBlockSelectButton(
 	{
 		className,
@@ -49,8 +47,6 @@ function ListViewBlockSelectButton(
 	} );
 	const { isLocked } = useBlockLock( clientId );
 
-	const isEditable = !! block && block.name !== 'core/page-list-item';
-
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
 	// We need to clear any HTML drag data to prevent `pasteHandler` from firing
@@ -61,10 +57,7 @@ function ListViewBlockSelectButton(
 	};
 
 	function onKeyDownHandler( event ) {
-		if (
-			( isEditable && event.keyCode === ENTER ) ||
-			event.keyCode === SPACE
-		) {
+		if ( event.keyCode === ENTER || event.keyCode === SPACE ) {
 			onClick( event );
 		}
 	}
@@ -84,7 +77,7 @@ function ListViewBlockSelectButton(
 					'block-editor-list-view-block-select-button',
 					className
 				) }
-				onClick={ isEditable ? onClick : noop }
+				onClick={ onClick }
 				onKeyDown={ onKeyDownHandler }
 				ref={ ref }
 				tabIndex={ tabIndex }
@@ -92,9 +85,9 @@ function ListViewBlockSelectButton(
 				onDragStart={ onDragStartHandler }
 				onDragEnd={ onDragEnd }
 				draggable={ draggable }
-				href={ isEditable ? `#block-${ clientId }` : undefined }
+				href={ `#block-${ clientId }` }
 				aria-hidden={ true }
-				title={ isEditable ? editAriaLabel : undefined }
+				title={ editAriaLabel }
 			>
 				<ListViewExpander onClick={ onToggleExpanded } />
 				<BlockIcon
