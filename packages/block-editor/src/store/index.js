@@ -8,11 +8,11 @@ import { createReduxStore, registerStore } from '@wordpress/data';
  */
 import reducer from './reducer';
 import * as selectors from './selectors';
-import * as allActions from './actions';
+import * as privateActions from './private-actions';
+import * as privateSelectors from './private-selectors';
+import * as actions from './actions';
 import { STORE_NAME } from './constants';
 import { unlock } from '../experiments';
-
-const { __experimentalUpdateSettings, ...actions } = allActions;
 
 /**
  * Block editor data store configuration.
@@ -41,7 +41,5 @@ const registeredStore = registerStore( STORE_NAME, {
 	...storeConfig,
 	persist: [ 'preferences' ],
 } );
-
-unlock( registeredStore ).registerPrivateActions( {
-	__experimentalUpdateSettings,
-} );
+unlock( registeredStore ).registerPrivateActions( privateActions );
+unlock( registeredStore ).registerPrivateSelectors( privateSelectors );

@@ -9,17 +9,17 @@ import { __ } from '@wordpress/i18n';
 import ScreenHeader from './header';
 import BorderPanel, { useHasBorderPanel } from './border-panel';
 import BlockPreviewPanel from './block-preview-panel';
-import { getVariationClassNameFromPath } from './utils';
+import { getVariationClassName } from './utils';
 
-function ScreenBorder( { name, variationPath = '' } ) {
+function ScreenBorder( { name, variation = '' } ) {
 	const hasBorderPanel = useHasBorderPanel( name );
-	const variationClassName = getVariationClassNameFromPath( variationPath );
+	const variationClassName = getVariationClassName( variation );
 	return (
 		<>
 			<ScreenHeader title={ __( 'Border' ) } />
 			<BlockPreviewPanel name={ name } variation={ variationClassName } />
 			{ hasBorderPanel && (
-				<BorderPanel name={ name } variationPath={ variationPath } />
+				<BorderPanel name={ name } variation={ variation } />
 			) }
 		</>
 	);

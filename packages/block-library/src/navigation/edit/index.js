@@ -595,6 +595,7 @@ function Navigation( {
 						) }
 						<h3>{ __( 'Overlay Menu' ) }</h3>
 						<ToggleGroupControl
+							__nextHasNoMarginBottom
 							label={ __( 'Configure overlay menu' ) }
 							value={ overlayMenu }
 							help={ __(
@@ -650,7 +651,7 @@ function Navigation( {
 					</PanelBody>
 				) }
 			</InspectorControls>
-			<InspectorControls __experimentalGroup="color">
+			<InspectorControls group="color">
 				{ hasColorSettings && (
 					<>
 						<ColorGradientSettingsDropdown
@@ -854,7 +855,7 @@ function Navigation( {
 				/>
 				{ stylingInspectorControls }
 				{ isEntityAvailable && (
-					<InspectorControls __experimentalGroup="advanced">
+					<InspectorControls group="advanced">
 						{ hasResolvedCanUserUpdateNavigationMenu &&
 							canUserUpdateNavigationMenu && (
 								<NavigationMenuNameControl />

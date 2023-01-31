@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import { groupBy, unescape as lodashUnescapeString } from 'lodash';
+import { groupBy } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Returns terms in a tree form.
@@ -39,9 +44,8 @@ export function buildTermsTree( flatTerms ) {
 	return fillWithChildren( termsByParent[ '0' ] || [] );
 }
 
-// Lodash unescape function handles &#39; but not &#039; which may be return in some API requests.
 export const unescapeString = ( arg ) => {
-	return lodashUnescapeString( arg.replace( '&#039;', "'" ) );
+	return decodeEntities( arg );
 };
 
 /**
