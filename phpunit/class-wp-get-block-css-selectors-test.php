@@ -113,6 +113,7 @@ class WP_Get_Block_CSS_Selector_Test extends WP_UnitTestCase {
 
 		$selector = wp_get_block_css_selector( $block_type, 'duotone' );
 		$this->assertEquals( '', $selector );
+		$this->assertEquals( null, $selector );
 	}
 
 	public function test_get_feature_selector_via_selectors_api() {
