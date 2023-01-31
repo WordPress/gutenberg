@@ -8,10 +8,17 @@
 	"keywords": [ "bullet list", "ordered list", "numbered list" ],
 	"textdomain": "default",
 	"attributes": {
+		"align": {
+			"type": "string"
+		},
 		"ordered": {
 			"type": "boolean",
 			"default": false,
 			"__experimentalRole": "content"
+		},
+		"position": {
+			"type": "boolean",
+			"default": false
 		},
 		"values": {
 			"type": "string",

@@ -1,13 +1,19 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
+	AlignmentControl,
 	BlockControls,
 	useBlockProps,
 	useInnerBlocksProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { ToolbarButton } from '@wordpress/components';
+import { ToolbarButton, Toolbar, ToolbarGroup } from '@wordpress/components';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { isRTL, __ } from '@wordpress/i18n';
 import {
@@ -124,8 +130,16 @@ function IndentUI( { clientId } ) {
 }
 
 export default function Edit( { attributes, setAttributes, clientId, style } ) {
+	const { align, ordered, position, type, reversed, start } = attributes;
+
 	const blockProps = useBlockProps( {
 		...( Platform.isNative && { style } ),
+		className: classnames( {
+			[ `has-text-align-${ align }` ]: align,
+			[ `list-style-position-${
+				position === false ? 'outside' : 'inside'
+			}` ]: position,
+		} ),
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: [ 'core/list-item' ],
@@ -139,7 +153,6 @@ export default function Edit( { attributes, setAttributes, clientId, style } ) {
 		} ),
 	} );
 	useMigrateOnLoad( attributes, clientId );
-	const { ordered, type, reversed, start } = attributes;
 
 	const controls = (
 		<BlockControls group="block">
@@ -161,6 +174,36 @@ export default function Edit( { attributes, setAttributes, clientId, style } ) {
 					setAttributes( { ordered: true } );
 				} }
 			/>
+			<AlignmentControl
+				value={ align }
+				onChange={ ( newAlign ) =>
+					setAttributes( {
+						align: newAlign,
+					} )
+				}
+			/>
+			<Toolbar label="List Style Options">
+				<ToolbarGroup>
+					<ToolbarButton
+						title={ __( 'List Inside' ) }
+						describedBy={ __( 'Convert List to Inside' ) }
+						icon={ formatOutdent }
+						isActive={ position === true }
+						onClick={ () => {
+							setAttributes( { position: true } );
+						} }
+					/>
+					<ToolbarButton
+						title={ __( 'List Outside' ) }
+						describedBy={ __( 'Convert List to Outside' ) }
+						icon={ formatOutdentRTL }
+						isActive={ position === false }
+						onClick={ () => {
+							setAttributes( { position: false } );
+						} }
+					/>
+				</ToolbarGroup>
+			</Toolbar>
 			<IndentUI clientId={ clientId } />
 		</BlockControls>
 	);
