@@ -33,6 +33,7 @@ export function parseDropEvent( event ) {
 		srcIndex: null,
 		type: null,
 		blocks: null,
+		context: null,
 	};
 
 	if ( ! event.dataTransfer ) {
@@ -61,6 +62,7 @@ export function parseDropEvent( event ) {
  * @param {Function} moveBlocks                A function that moves blocks.
  * @param {Function} insertOrReplaceBlocks     A function that inserts or replaces blocks.
  * @param {Function} clearSelectedBlock        A function that clears block selection.
+ * @param {string}   context                   The context where the drop event will occur (e.g. 'list-view', 'canvas)
  * @return {Function} The event handler for a block drop event.
  */
 export function onBlockDrop(
@@ -70,7 +72,8 @@ export function onBlockDrop(
 	getClientIdsOfDescendants,
 	moveBlocks,
 	insertOrReplaceBlocks,
-	clearSelectedBlock
+	clearSelectedBlock,
+	context
 ) {
 	return ( event ) => {
 		const {
@@ -78,7 +81,12 @@ export function onBlockDrop(
 			srcClientIds: sourceClientIds,
 			type: dropType,
 			blocks,
+			context: dragContext,
 		} = parseDropEvent( event );
+
+		if ( context && dragContext && context !== dragContext ) {
+			return;
+		}
 
 		// If the user is inserting a block.
 		if ( dropType === 'inserter' ) {
@@ -210,7 +218,7 @@ export default function useOnBlockDrop(
 	targetBlockIndex,
 	options = {}
 ) {
-	const { operation = 'insert' } = options;
+	const { operation = 'insert', context } = options;
 	const hasUploadPermissions = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
 		[]
@@ -307,7 +315,8 @@ export default function useOnBlockDrop(
 		getClientIdsOfDescendants,
 		moveBlocks,
 		insertOrReplaceBlocks,
-		clearSelectedBlock
+		clearSelectedBlock,
+		context
 	);
 	const _onFilesDrop = onFilesDrop(
 		targetRootClientId,
