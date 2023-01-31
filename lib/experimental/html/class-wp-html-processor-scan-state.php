@@ -33,7 +33,7 @@ class WP_HTML_Processor_Scan_State {
 	public $open_tags = array();
 
 	/**
-	 * The maximum depth of nested tags we're willing to traverse.
+	 * The depth of nested tags at which we expect to find the matching closing tag.
 	 *
 	 * @var int
 	 */
