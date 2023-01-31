@@ -71,6 +71,7 @@ export { default as __experimentalLinkControlSearchResults } from './link-contro
 export { default as __experimentalLinkControlSearchItem } from './link-control/search-item';
 export { default as LineHeightControl } from './line-height-control';
 export { default as __experimentalListView } from './list-view';
+export { default as __experimentalLoadingScreen } from './loading-screen';
 export { default as MediaReplaceFlow } from './media-replace-flow';
 export { default as MediaPlaceholder } from './media-placeholder';
 export { default as MediaUpload } from './media-upload';
