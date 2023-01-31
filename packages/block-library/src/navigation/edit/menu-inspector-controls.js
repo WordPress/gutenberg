@@ -21,6 +21,7 @@ import { __ } from '@wordpress/i18n';
 import NavigationMenuSelector from './navigation-menu-selector';
 import { LeafMoreMenu } from '../leaf-more-menu';
 import { unlock } from '../../experiments';
+import DeletedNavigationWarning from './deleted-navigation-warning';
 
 /* translators: %s: The name of a menu. */
 const actionLabel = __( "Switch to '%s'" );
@@ -30,6 +31,7 @@ const MainContent = ( {
 	currentMenuId,
 	isLoading,
 	isNavigationMenuMissing,
+	onCreateNew,
 } ) => {
 	const { OffCanvasEditor } = unlock( blockEditorExperiments );
 	// Provide a hierarchy of clientIds for the given Navigation block (clientId).
@@ -44,6 +46,10 @@ const MainContent = ( {
 
 	if ( currentMenuId && isNavigationMenuMissing ) {
 		return <p>{ __( 'Select or create a menu' ) }</p>;
+	}
+
+	if ( isNavigationMenuMissing ) {
+		return <DeletedNavigationWarning onCreateNew={ onCreateNew } />;
 	}
 
 	if ( isLoading ) {
