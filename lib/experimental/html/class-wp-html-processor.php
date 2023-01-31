@@ -1,6 +1,11 @@
 <?php
-
 /**
+ * Scans through an HTML document to find specific tags, then
+ * transforms those tags by adding, removing, or updating the
+ * values of the HTML attributes within that tag (opener).
+ * Furthermore finds the matching closing tag for a given
+ * opening tag, and retrieves the content in between them.
+ *
  * @TODO: Handle self-closing foreign elements.
  * @TODO: Detect non-normative HTML input.
  * @TODO: Consider parsing non-normative HTML input, support adoption agency algorithm.
