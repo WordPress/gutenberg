@@ -64,18 +64,21 @@ function CustomCSSControl( { blockName } ) {
 	}
 
 	function handleOnBlur( event ) {
-		if ( event?.target?.value ) {
-			const [ transformed ] = transformStyles(
-				[ { css: event.target.value } ],
-				'.editor-styles-wrapper'
-			);
-
-			setCSSError(
-				transformed === null
-					? __( 'There is an error with your CSS structure.' )
-					: null
-			);
+		if ( ! event?.target?.value ) {
+			setCSSError( null );
+			return;
 		}
+
+		const [ transformed ] = transformStyles(
+			[ { css: event.target.value } ],
+			'.editor-styles-wrapper'
+		);
+
+		setCSSError(
+			transformed === null
+				? __( 'There is an error with your CSS structure.' )
+				: null
+		);
 	}
 
 	const originalThemeCustomCSS =
