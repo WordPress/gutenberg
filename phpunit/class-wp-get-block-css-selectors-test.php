@@ -148,6 +148,18 @@ class WP_Get_Block_CSS_Selector_Test extends WP_UnitTestCase {
 		$this->assertEquals( null, $selector );
 	}
 
+	public function test_fallback_feature_level_selector_via_selectors_api_to_generated_class() {
+		$block_type = self::register_test_block(
+			'test/fallback-feature-selector',
+			array(),
+			null
+		);
+
+		$selector = wp_get_block_css_selector( $block_type, 'typography', true );
+		$this->assertEquals( '.wp-block-test-fallback-feature-selector', $selector );
+	}
+
+
 	public function test_fallback_feature_level_selector_via_selectors_api() {
 		$block_type = self::register_test_block(
 			'test/fallback-feature-selector',
