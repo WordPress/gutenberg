@@ -49,7 +49,7 @@ function GroupEditControls( { tagName, onSelectTagName } ) {
 		),
 	};
 	return (
-		<InspectorControls __experimentalGroup="advanced">
+		<InspectorControls group="advanced">
 			<SelectControl
 				__nextHasNoMarginBottom
 				label={ __( 'HTML element' ) }
@@ -117,7 +117,6 @@ function GroupEdit( {
 			renderAppender: hasInnerBlocks
 				? undefined
 				: InnerBlocks.ButtonBlockAppender,
-			__experimentalLayout: layoutSupportEnabled ? usedLayout : undefined,
 			__unstableDisableLayoutClassNames: ! layoutSupportEnabled,
 		}
 	);

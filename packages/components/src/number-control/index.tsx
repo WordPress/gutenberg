@@ -52,7 +52,7 @@ function UnforwardedNumberControl(
 	forwardedRef: ForwardedRef< any >
 ) {
 	if ( hideHTMLArrows ) {
-		deprecated( 'hideHTMLArrows', {
+		deprecated( 'wp.components.NumberControl hideHTMLArrows prop ', {
 			alternative: 'spinControls="none"',
 			since: '6.2',
 			version: '6.3',

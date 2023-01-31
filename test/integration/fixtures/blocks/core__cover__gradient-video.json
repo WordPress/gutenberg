@@ -11,7 +11,8 @@
 			"dimRatio": 70,
 			"backgroundType": "video",
 			"customGradient": "linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)",
-			"isDark": true
+			"isDark": true,
+			"tagName": "div"
 		},
 		"innerBlocks": [
 			{

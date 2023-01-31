@@ -16,6 +16,7 @@ import { compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import { builtinControls } from '../controls';
+import { lock } from '../experiments';
 import promise from '../promise-middleware';
 import createResolversCacheMiddleware from '../resolvers-cache-middleware';
 import createThunkMiddleware from './thunk-middleware';
@@ -108,7 +109,19 @@ function createResolversCache() {
  * @return   {StoreDescriptor<ReduxStoreConfig<State,Actions,Selectors>>} Store Object.
  */
 export default function createReduxStore( key, options ) {
-	return {
+	const privateActions = {};
+	const privateSelectors = {};
+	const privateRegistrationFunctions = {
+		privateActions,
+		registerPrivateActions: ( actions ) => {
+			Object.assign( privateActions, actions );
+		},
+		privateSelectors,
+		registerPrivateSelectors: ( selectors ) => {
+			Object.assign( privateSelectors, selectors );
+		},
+	};
+	const storeDescriptor = {
 		name: key,
 		instantiate: ( registry ) => {
 			const reducer = options.reducer;
@@ -138,6 +151,9 @@ export default function createReduxStore( key, options ) {
 				registry,
 				thunkArgs
 			);
+			// Expose the private registration functions on the store
+			// so they can be copied to a sub registry in registry.js.
+			lock( store, privateRegistrationFunctions );
 			const resolversCache = createResolversCache();
 
 			let resolvers;
@@ -147,6 +163,17 @@ export default function createReduxStore( key, options ) {
 					...options.actions,
 				},
 				store
+			);
+			lock(
+				actions,
+				new Proxy( privateActions, {
+					get: ( target, prop ) => {
+						return (
+							mapActions( privateActions, store )[ prop ] ||
+							actions[ prop ]
+						);
+					},
+				} )
 			);
 
 			let selectors = mapSelectors(
@@ -168,6 +195,25 @@ export default function createReduxStore( key, options ) {
 				},
 				store
 			);
+			lock(
+				selectors,
+				new Proxy( privateSelectors, {
+					get: ( target, prop ) => {
+						return (
+							mapSelectors(
+								mapValues(
+									privateSelectors,
+									( selector ) =>
+										( state, ...args ) =>
+											selector( state.root, ...args )
+								),
+								store
+							)[ prop ] || selectors[ prop ]
+						);
+					},
+				} )
+			);
+
 			if ( options.resolvers ) {
 				const result = mapResolvers(
 					options.resolvers,
@@ -226,6 +272,13 @@ export default function createReduxStore( key, options ) {
 			};
 		},
 	};
+
+	// Expose the private registration functions on the store
+	// descriptor. That's a natural choice since that's where the
+	// public actions and selectors are stored .
+	lock( storeDescriptor, privateRegistrationFunctions );
+
+	return storeDescriptor;
 }
 
 /**

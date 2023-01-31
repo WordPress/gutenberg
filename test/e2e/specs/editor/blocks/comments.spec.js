@@ -1,11 +1,7 @@
 /**
  * WordPress dependencies
  */
-const {
-	test,
-	expect,
-	Editor,
-} = require( '@wordpress/e2e-test-utils-playwright' );
+const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 /**
  * @typedef {import('@playwright/test').Page} Page
@@ -15,9 +11,6 @@ const {
 test.use( {
 	commentsBlockUtils: async ( { page, admin, requestUtils }, use ) => {
 		await use( new CommentsBlockUtils( { page, admin, requestUtils } ) );
-	},
-	editor: async ( { page }, use ) => {
-		await use( new Editor( { page, hasIframe: true } ) );
 	},
 } );
 

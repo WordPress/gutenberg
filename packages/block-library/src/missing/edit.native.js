@@ -298,13 +298,12 @@ export class UnsupportedBlockEdit extends Component {
 
 export default compose( [
 	withSelect( ( select, { attributes } ) => {
-		const { getSettings } = select( blockEditorStore );
+		const { capabilities } = select( blockEditorStore ).getSettings();
 		return {
 			isUnsupportedBlockEditorSupported:
-				getSettings( 'capabilities' ).unsupportedBlockEditor === true,
+				capabilities?.unsupportedBlockEditor === true,
 			canEnableUnsupportedBlockEditor:
-				getSettings( 'capabilities' )
-					.canEnableUnsupportedBlockEditor === true,
+				capabilities?.canEnableUnsupportedBlockEditor === true,
 			isEditableInUnsupportedBlockEditor:
 				! UBE_INCOMPATIBLE_BLOCKS.includes( attributes.originalName ),
 		};

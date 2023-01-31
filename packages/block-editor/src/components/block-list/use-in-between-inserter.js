@@ -43,6 +43,11 @@ export function useInBetweenInserter() {
 					return;
 				}
 
+				// Ignore text nodes sometimes detected in FireFox.
+				if ( event.target.nodeType === event.target.TEXT_NODE ) {
+					return;
+				}
+
 				if ( isMultiSelecting() ) {
 					return;
 				}

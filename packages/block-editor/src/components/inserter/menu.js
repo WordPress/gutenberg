@@ -296,6 +296,7 @@ function InserterMenu(
 				<BlockPatternsCategoryDialog
 					rootClientId={ destinationRootClientId }
 					onInsert={ onInsertPattern }
+					onHover={ onHover }
 					category={ selectedPatternCategory }
 					showTitlesAsTooltip
 				/>

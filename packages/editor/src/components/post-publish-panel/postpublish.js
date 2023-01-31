@@ -122,6 +122,7 @@ class PostPublishPanelPostpublish extends Component {
 					</p>
 					<div className="post-publish-panel__postpublish-post-address-container">
 						<TextControl
+							__nextHasNoMarginBottom
 							className="post-publish-panel__postpublish-post-address"
 							readOnly
 							label={ sprintf(

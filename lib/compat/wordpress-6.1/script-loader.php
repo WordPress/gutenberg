@@ -75,8 +75,6 @@ function gutenberg_enqueue_global_styles() {
 
 remove_action( 'wp_enqueue_scripts', 'wp_enqueue_global_styles' );
 remove_action( 'wp_footer', 'wp_enqueue_global_styles', 1 );
-remove_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_global_styles_assets' );
-remove_action( 'wp_footer', 'gutenberg_enqueue_global_styles_assets' );
 
 // Enqueue global styles, and then block supports styles.
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_global_styles' );

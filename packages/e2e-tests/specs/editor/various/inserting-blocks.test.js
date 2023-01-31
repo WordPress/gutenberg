@@ -318,7 +318,7 @@ describe( 'Inserting blocks', () => {
 		);
 		await browseAll.click();
 		const availableBlocks = await page.$$(
-			'.block-editor-block-types-list__list-item'
+			'.edit-post-editor__inserter-panel .block-editor-block-types-list__list-item'
 		);
 		expect( availableBlocks ).toHaveLength( 1 );
 	} );
@@ -347,8 +347,10 @@ describe( 'Inserting blocks', () => {
 
 	it( 'shows block preview when hovering over block in inserter', async () => {
 		await openGlobalBlockInserter();
-		await page.waitForSelector( '.editor-block-list-item-paragraph' );
-		await page.focus( '.editor-block-list-item-paragraph' );
+		const paragraphButton = (
+			await page.$x( `//button//span[contains(text(), 'Paragraph')]` )
+		 )[ 0 ];
+		await paragraphButton.hover();
 		const preview = await page.waitForSelector(
 			'.block-editor-inserter__preview',
 			{

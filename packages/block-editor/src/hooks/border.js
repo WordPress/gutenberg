@@ -255,7 +255,7 @@ export function BorderPanel( props ) {
 	const hydratedBorder = getBorderObject( attributes, colors );
 
 	return (
-		<InspectorControls __experimentalGroup="border">
+		<InspectorControls group="border">
 			{ ( isWidthSupported || isColorSupported ) && (
 				<ToolsPanelItem
 					hasValue={ () => hasBorderValue( props ) }

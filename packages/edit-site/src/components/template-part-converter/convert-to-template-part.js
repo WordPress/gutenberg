@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { kebabCase } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -24,12 +19,18 @@ import { symbolFilled } from '@wordpress/icons';
  */
 import CreateTemplatePartModal from '../create-template-part-modal';
 import { store as editSiteStore } from '../../store';
+import {
+	useExistingTemplateParts,
+	getUniqueTemplatePartTitle,
+	getCleanTemplatePartSlug,
+} from '../../utils/template-part-create';
 
 export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
+	const existingTemplateParts = useExistingTemplateParts();
 
 	const { canCreate } = useSelect( ( select ) => {
 		const { supportsTemplatePartsMode } =
@@ -44,17 +45,18 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 	}
 
 	const onConvert = async ( { title, area } ) => {
-		// Currently template parts only allow latin chars.
-		// Fallback slug will receive suffix by default.
-		const cleanSlug =
-			kebabCase( title ).replace( /[^\w-]+/g, '' ) || 'wp-custom-part';
+		const uniqueTitle = getUniqueTemplatePartTitle(
+			title,
+			existingTemplateParts
+		);
+		const cleanSlug = getCleanTemplatePartSlug( uniqueTitle );
 
 		const templatePart = await saveEntityRecord(
 			'postType',
 			'wp_template_part',
 			{
 				slug: cleanSlug,
-				title,
+				title: uniqueTitle,
 				content: serialize( blocks ),
 				area,
 			}
