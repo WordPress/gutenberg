@@ -6,7 +6,6 @@
 const fs = require( 'fs' );
 const path = require( 'path' );
 const https = require( 'https' );
-const { mapKeys } = require( 'lodash' );
 const [ token, branch, hash, baseHash, timestamp ] = process.argv.slice( 2 );
 
 const resultsFiles = [
@@ -39,19 +38,24 @@ const data = new TextEncoder().encode(
 		metrics: resultsFiles.reduce( ( result, { metricsPrefix }, index ) => {
 			return {
 				...result,
-				...mapKeys(
-					performanceResults[ index ][ hash ],
-					( _, key ) => metricsPrefix + key
+				...Object.fromEntries(
+					Object.entries( performanceResults[ index ][ hash ] ).map(
+						( [ key, value ] ) => [ metricsPrefix + key, value ]
+					)
 				),
 			};
-		}, {} ),
+		} ),
 		baseMetrics: resultsFiles.reduce(
 			( result, { metricsPrefix }, index ) => {
 				return {
 					...result,
-					...mapKeys(
-						performanceResults[ index ][ baseHash ],
-						( _, key ) => metricsPrefix + key
+					...Object.fromEntries(
+						Object.entries(
+							performanceResults[ index ][ baseHash ]
+						).map( ( [ key, value ] ) => [
+							metricsPrefix + key,
+							value,
+						] )
 					),
 				};
 			},
