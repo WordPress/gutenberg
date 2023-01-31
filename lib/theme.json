@@ -193,8 +193,8 @@
 		"dimensions": {
 			"aspectRatio": [
 				{
-					"name": "1:1",
-					"slug": "1-1",
+					"name": "Square",
+					"slug": "square",
 					"ratio": "1/1"
 				},
 				{
