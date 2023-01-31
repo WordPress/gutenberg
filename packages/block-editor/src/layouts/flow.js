@@ -67,21 +67,12 @@ export default {
 				info: alignmentInfo[ alignment ],
 			} ) );
 		}
-		const { contentSize, wideSize } = layout;
 
 		const alignments = [
 			{ name: 'left' },
 			{ name: 'center' },
 			{ name: 'right' },
 		];
-
-		if ( contentSize ) {
-			alignments.unshift( { name: 'full' } );
-		}
-
-		if ( wideSize ) {
-			alignments.unshift( { name: 'wide', info: alignmentInfo.wide } );
-		}
 
 		alignments.unshift( { name: 'none', info: alignmentInfo.none } );
 

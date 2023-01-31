@@ -44,14 +44,7 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { store as editPostStore } from '../../store';
 
-function MaybeIframe( {
-	children,
-	contentRef,
-	shouldIframe,
-	styles,
-	assets,
-	style,
-} ) {
+function MaybeIframe( { children, contentRef, shouldIframe, styles, style } ) {
 	const ref = useMouseMoveTypingReset();
 
 	if ( ! shouldIframe ) {
@@ -73,7 +66,6 @@ function MaybeIframe( {
 	return (
 		<Iframe
 			head={ <EditorStyles styles={ styles } /> }
-			assets={ assets }
 			ref={ ref }
 			contentRef={ contentRef }
 			style={ { width: '100%', height: '100%', display: 'block' } }
@@ -90,7 +82,7 @@ function MaybeIframe( {
  *
  * @param {Array} blocks A list of blocks.
  *
- * @return {Object} The Post Content block.
+ * @return {Object | undefined} The Post Content block.
  */
 function findPostContent( blocks ) {
 	for ( let i = 0; i < blocks.length; i++ ) {
@@ -163,20 +155,15 @@ export default function VisualEditor( { styles } ) {
 		( select ) => select( editPostStore ).hasMetaBoxes(),
 		[]
 	);
-	const {
-		themeHasDisabledLayoutStyles,
-		themeSupportsLayout,
-		assets,
-		isFocusMode,
-	} = useSelect( ( select ) => {
-		const _settings = select( blockEditorStore ).getSettings();
-		return {
-			themeHasDisabledLayoutStyles: _settings.disableLayoutStyles,
-			themeSupportsLayout: _settings.supportsLayout,
-			assets: _settings.__unstableResolvedAssets,
-			isFocusMode: _settings.focusMode,
-		};
-	}, [] );
+	const { themeHasDisabledLayoutStyles, themeSupportsLayout, isFocusMode } =
+		useSelect( ( select ) => {
+			const _settings = select( blockEditorStore ).getSettings();
+			return {
+				themeHasDisabledLayoutStyles: _settings.disableLayoutStyles,
+				themeSupportsLayout: _settings.supportsLayout,
+				isFocusMode: _settings.focusMode,
+			};
+		}, [] );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const desktopCanvasStyles = {
@@ -359,7 +346,6 @@ export default function VisualEditor( { styles } ) {
 						}
 						contentRef={ contentRef }
 						styles={ styles }
-						assets={ assets }
 					>
 						{ themeSupportsLayout &&
 							! themeHasDisabledLayoutStyles &&

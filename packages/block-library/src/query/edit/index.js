@@ -84,7 +84,6 @@ function PatternSelectionModal( {
 		<Modal
 			className="block-editor-query-pattern__selection-modal"
 			title={ __( 'Choose a pattern' ) }
-			closeLabel={ __( 'Cancel' ) }
 			onRequestClose={ () => setIsPatternSelectionModalOpen( false ) }
 		>
 			<BlockContextProvider value={ blockPreviewContext }>

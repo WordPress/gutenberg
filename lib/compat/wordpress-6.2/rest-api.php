@@ -15,15 +15,6 @@ function gutenberg_register_rest_block_pattern_categories() {
 add_action( 'rest_api_init', 'gutenberg_register_rest_block_pattern_categories' );
 
 /**
- * Registers the block pattern directory.
- */
-function gutenberg_register_rest_pattern_directory() {
-	$pattern_directory_controller = new Gutenberg_REST_Pattern_Directory_Controller_6_2();
-	$pattern_directory_controller->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_pattern_directory' );
-
-/**
  * Registers the block patterns REST API routes.
  */
 function gutenberg_register_rest_block_patterns() {
@@ -111,8 +102,9 @@ add_action( 'rest_api_init', 'gutenberg_register_global_styles_endpoints' );
  * @return WP_REST_Response $response Updated response object.
  */
 function gutenberg_modify_rest_sidebars_response( $response ) {
-	$response->data['status'] = wp_is_block_theme() ? 'inactive' : 'active';
-
+	if ( wp_is_block_theme() ) {
+		$response->data['status'] = 'inactive';
+	}
 	return $response;
 }
 add_filter( 'rest_prepare_sidebar', 'gutenberg_modify_rest_sidebars_response' );

@@ -34,19 +34,15 @@ export default function QueryPlaceholder( {
 	const { blockType, allVariations, hasPatterns } = useSelect(
 		( select ) => {
 			const { getBlockVariations, getBlockType } = select( blocksStore );
-			const {
-				getBlockRootClientId,
-				__experimentalGetPatternsByBlockTypes,
-			} = select( blockEditorStore );
+			const { getBlockRootClientId, getPatternsByBlockTypes } =
+				select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
 
 			return {
 				blockType: getBlockType( name ),
 				allVariations: getBlockVariations( name ),
-				hasPatterns: !! __experimentalGetPatternsByBlockTypes(
-					name,
-					rootClientId
-				).length,
+				hasPatterns: !! getPatternsByBlockTypes( name, rootClientId )
+					.length,
 			};
 		},
 		[ name, clientId ]

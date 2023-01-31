@@ -15,8 +15,6 @@ import { useSelect } from '@wordpress/data';
 import DownloadableBlockListItem from '../';
 import { plugin } from '../../test/fixtures';
 
-jest.useFakeTimers();
-
 jest.mock( '@wordpress/data/src/components/use-select', () => {
 	// This allows us to tweak the returned value on each test.
 	const mock = jest.fn();
@@ -68,9 +66,7 @@ describe( 'DownloadableBlockListItem', () => {
 	} );
 
 	it( 'should try to install the block plugin', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		useSelect.mockImplementation( () => ( {
 			isInstalling: false,

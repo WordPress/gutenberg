@@ -209,6 +209,7 @@ function ListViewBlock( {
 
 	const listViewBlockEditClassName = classnames(
 		'block-editor-list-view-block__menu-cell',
+		'block-editor-list-view-block__menu-edit',
 		{ 'is-visible': isHovered || isFirstSelectedBlock }
 	);
 
@@ -331,28 +332,27 @@ function ListViewBlock( {
 
 			{ showBlockActions && (
 				<>
-					{ isEditable && (
-						<TreeGridCell
-							className={ listViewBlockEditClassName }
-							aria-selected={
-								!! isSelected || forceSelectionContentLock
-							}
-						>
-							{ ( props ) => (
+					<TreeGridCell
+						className={ listViewBlockEditClassName }
+						aria-selected={
+							!! isSelected || forceSelectionContentLock
+						}
+					>
+						{ ( props ) =>
+							isEditable && (
 								<BlockEditButton
 									{ ...props }
 									label={ editAriaLabel }
 									clientId={ clientId }
 								/>
-							) }
-						</TreeGridCell>
-					) }
+							)
+						}
+					</TreeGridCell>
 					<TreeGridCell
 						className={ listViewBlockSettingsClassName }
 						aria-selected={
 							!! isSelected || forceSelectionContentLock
 						}
-						colSpan={ isEditable ? 1 : 2 } // When an item is not editable then we don't output the cell for the edit button, so we need to adjust the colspan so that the HTML is valid.
 					>
 						{ ( { ref, tabIndex, onFocus } ) => (
 							<>

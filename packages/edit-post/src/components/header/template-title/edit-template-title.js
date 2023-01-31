@@ -46,6 +46,7 @@ export default function EditTemplateTitle() {
 	return (
 		<div className="edit-site-template-details__group">
 			<TextControl
+				__nextHasNoMarginBottom
 				label={ __( 'Title' ) }
 				value={ forceEmpty ? '' : templateTitle }
 				help={ __(
