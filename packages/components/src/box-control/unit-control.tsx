@@ -54,7 +54,7 @@ function Tooltip( {
 	text,
 }: {
 	children: JSX.Element;
-	text: string;
+	text?: string;
 } ) {
 	if ( ! text ) return children;
 

@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import type { UnitControlProps } from '../unit-control/types';
-import type { AllInputControlProps } from './types';
+import type { BoxControlInputControlProps } from './types';
 import UnitControl from './unit-control';
 import {
 	LABELS,
@@ -24,7 +24,7 @@ export default function AllInputControl( {
 	selectedUnits,
 	setSelectedUnits,
 	...props
-}: AllInputControlProps ) {
+}: BoxControlInputControlProps ) {
 	const allValue = getAllValue( values, selectedUnits, sides );
 	const hasValues = isValuesDefined( values );
 	const isMixed = hasValues && isValuesMixed( values, selectedUnits, sides );

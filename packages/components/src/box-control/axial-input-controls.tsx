@@ -5,8 +5,10 @@ import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 import UnitControl from './unit-control';
 import { LABELS } from './utils';
 import { Layout } from './styles/box-control-styles';
+import type { BoxControlInputControlProps } from './types';
 
-const groupedSides = [ 'vertical', 'horizontal' ];
+const groupedSides = [ 'vertical', 'horizontal' ] as const;
+type GroupedSide = typeof groupedSides[ number ];
 
 export default function AxialInputControls( {
 	onChange,
@@ -18,15 +20,17 @@ export default function AxialInputControls( {
 	setSelectedUnits,
 	sides,
 	...props
-} ) {
-	const createHandleOnFocus = ( side ) => ( event ) => {
-		if ( ! onFocus ) {
-			return;
-		}
-		onFocus( event, { side } );
-	};
+}: BoxControlInputControlProps ) {
+	const createHandleOnFocus =
+		( side: GroupedSide ) =>
+		( event: React.FocusEvent< HTMLInputElement > ) => {
+			if ( ! onFocus ) {
+				return;
+			}
+			onFocus( event, { side } );
+		};
 
-	const createHandleOnHoverOn = ( side ) => () => {
+	const createHandleOnHoverOn = ( side: GroupedSide ) => () => {
 		if ( ! onHoverOn ) {
 			return;
 		}
@@ -44,7 +48,7 @@ export default function AxialInputControls( {
 		}
 	};
 
-	const createHandleOnHoverOff = ( side ) => () => {
+	const createHandleOnHoverOff = ( side: GroupedSide ) => () => {
 		if ( ! onHoverOff ) {
 			return;
 		}
@@ -62,12 +66,12 @@ export default function AxialInputControls( {
 		}
 	};
 
-	const createHandleOnChange = ( side ) => ( next ) => {
+	const createHandleOnChange = ( side: GroupedSide ) => ( next?: string ) => {
 		if ( ! onChange ) {
 			return;
 		}
 		const nextValues = { ...values };
-		const isNumeric = ! isNaN( parseFloat( next ) );
+		const isNumeric = next !== undefined && ! isNaN( parseFloat( next ) );
 		const nextValue = isNumeric ? next : undefined;
 
 		if ( side === 'vertical' ) {
@@ -83,21 +87,22 @@ export default function AxialInputControls( {
 		onChange( nextValues );
 	};
 
-	const createHandleOnUnitChange = ( side ) => ( next ) => {
-		const newUnits = { ...selectedUnits };
+	const createHandleOnUnitChange =
+		( side: GroupedSide ) => ( next?: string ) => {
+			const newUnits = { ...selectedUnits };
 
-		if ( side === 'vertical' ) {
-			newUnits.top = next;
-			newUnits.bottom = next;
-		}
+			if ( side === 'vertical' ) {
+				newUnits.top = next;
+				newUnits.bottom = next;
+			}
 
-		if ( side === 'horizontal' ) {
-			newUnits.left = next;
-			newUnits.right = next;
-		}
+			if ( side === 'horizontal' ) {
+				newUnits.left = next;
+				newUnits.right = next;
+			}
 
-		setSelectedUnits( newUnits );
-	};
+			setSelectedUnits( newUnits );
+		};
 
 	// Filter sides if custom configuration provided, maintaining default order.
 	const filteredSides = sides?.length
