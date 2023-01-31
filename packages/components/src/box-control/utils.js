@@ -48,9 +48,9 @@ function mode( arr ) {
 /**
  * Gets the 'all' input value and unit from values data.
  *
- * @param {Object} values         Box values.
- * @param {Object} selectedUnits  Box units.
- * @param {Array}  availableSides Available box sides to evaluate.
+ * @param {Object} values            Box values.
+ * @param {Object} [ selectedUnits ] Box units.
+ * @param {Array}  availableSides    Available box sides to evaluate.
  *
  * @return {string} A value + unit for the 'all' input.
  */
@@ -101,8 +101,8 @@ export function getAllValue(
 /**
  * Determine the most common unit selection to use as a fallback option.
  *
- * @param {Object} selectedUnits Current unit selections for individual sides.
- * @return {string} Most common unit selection.
+ * @param {Object|undefined} selectedUnits Current unit selections for individual sides.
+ * @return {string|undefined} Most common unit selection.
  */
 export function getAllUnitFallback( selectedUnits ) {
 	if ( ! selectedUnits || typeof selectedUnits !== 'object' ) {
@@ -117,9 +117,9 @@ export function getAllUnitFallback( selectedUnits ) {
 /**
  * Checks to determine if values are mixed.
  *
- * @param {Object} values        Box values.
- * @param {Object} selectedUnits Box units.
- * @param {Array}  sides         Available box sides to evaluate.
+ * @param {Object} values            Box values.
+ * @param {Object} [ selectedUnits ] Box units.
+ * @param {Array}  sides             Available box sides to evaluate.
  *
  * @return {boolean} Whether values are mixed.
  */
@@ -133,7 +133,7 @@ export function isValuesMixed( values = {}, selectedUnits, sides = ALL_SIDES ) {
 /**
  * Checks to determine if values are defined.
  *
- * @param {Object} values Box values.
+ * @param {Object} [values] Box values.
  *
  * @return {boolean} Whether values are mixed.
  */

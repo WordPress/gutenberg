@@ -27,8 +27,11 @@ import {
 	getInitialSide,
 	isValuesMixed,
 	isValuesDefined,
+	LABELS,
 } from './utils';
 import { useControlledState } from '../utils/hooks';
+import type { BoxControlProps, BoxControlValue } from './types';
+import type { UnitControlProps } from '../unit-control/types';
 
 const defaultInputProps = {
 	min: 0,
@@ -36,12 +39,12 @@ const defaultInputProps = {
 
 const noop = () => {};
 
-function useUniqueId( idProp ) {
+function useUniqueId( idProp?: string ) {
 	const instanceId = useInstanceId( BoxControl, 'inspector-box-control' );
 
 	return idProp || instanceId;
 }
-export default function BoxControl( {
+function BoxControl( {
 	id: idProp,
 	inputProps = defaultInputProps,
 	onChange = noop,
@@ -54,7 +57,7 @@ export default function BoxControl( {
 	resetValues = DEFAULT_VALUES,
 	onMouseOver,
 	onMouseOut,
-} ) {
+}: BoxControlProps ) {
 	const [ values, setValues ] = useControlledState( valuesProp, {
 		fallback: DEFAULT_VALUES,
 	} );
@@ -74,7 +77,7 @@ export default function BoxControl( {
 	// Tracking selected units via internal state allows filtering of CSS unit
 	// only values from being saved while maintaining preexisting unit selection
 	// behaviour. Filtering CSS only values prevents invalid style values.
-	const [ selectedUnits, setSelectedUnits ] = useState( {
+	const [ selectedUnits, setSelectedUnits ] = useState< BoxControlValue >( {
 		top: parseQuantityAndUnitFromRawValue( valuesProp?.top )[ 1 ],
 		right: parseQuantityAndUnitFromRawValue( valuesProp?.right )[ 1 ],
 		bottom: parseQuantityAndUnitFromRawValue( valuesProp?.bottom )[ 1 ],
@@ -89,11 +92,14 @@ export default function BoxControl( {
 		setSide( getInitialSide( ! isLinked, splitOnAxis ) );
 	};
 
-	const handleOnFocus = ( event, { side: nextSide } ) => {
+	const handleOnFocus = (
+		_event: React.FocusEvent< HTMLInputElement >,
+		{ side: nextSide }: { side: keyof typeof LABELS }
+	) => {
 		setSide( nextSide );
 	};
 
-	const handleOnChange = ( nextValues ) => {
+	const handleOnChange = ( nextValues: BoxControlValue ) => {
 		onChange( nextValues );
 		setValues( nextValues );
 		setIsDirty( true );
@@ -132,7 +138,7 @@ export default function BoxControl( {
 					<FlexItem>
 						<Button
 							className="component-box-control__reset-button"
-							isSecondary
+							variant="secondary"
 							isSmall
 							onClick={ handleOnReset }
 							disabled={ ! isDirty }
@@ -176,3 +182,4 @@ export default function BoxControl( {
 }
 
 export { applyValueToSides } from './utils';
+export default BoxControl;

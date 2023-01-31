@@ -11,8 +11,8 @@ import { isValueDefined, getDefinedValue } from '../values';
 /**
  * @template T
  * @typedef Options
- * @property {T | undefined} initial  Initial value
- * @property {T | ""}        fallback Fallback value
+ * @property {T}      [initial] Initial value
+ * @property {T | ""} fallback  Fallback value
  */
 
 /** @type {Readonly<{ initial: undefined, fallback: '' }>} */

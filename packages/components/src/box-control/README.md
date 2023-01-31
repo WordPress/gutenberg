@@ -52,6 +52,7 @@ Props for the internal [InputControl](../input-control) components.
 
 -   Type: `Object`
 -   Required: No
+-   Default: `{ min: 0 }`
 
 ### label
 
