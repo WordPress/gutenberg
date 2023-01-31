@@ -20,7 +20,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { getSupportedGlobalStylesPanels } from './hooks';
+import { useSupportedStyles } from './hooks';
 import { unlock } from '../../experiments';
 
 const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
@@ -30,7 +30,7 @@ export function useHasTypographyPanel( name ) {
 	const hasLineHeight = useHasLineHeightControl( name );
 	const hasFontAppearance = useHasAppearanceControl( name );
 	const hasLetterSpacing = useHasLetterSpacingControl( name );
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	return (
 		hasFontFamily ||
 		hasLineHeight ||
@@ -41,7 +41,7 @@ export function useHasTypographyPanel( name ) {
 }
 
 function useHasFontFamilyControl( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	const [ fontFamiliesPerOrigin ] = useGlobalSetting(
 		'typography.fontFamilies',
 		name
@@ -54,7 +54,7 @@ function useHasFontFamilyControl( name ) {
 }
 
 function useHasLineHeightControl( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	return (
 		useGlobalSetting( 'typography.lineHeight', name )[ 0 ] &&
 		supports.includes( 'lineHeight' )
@@ -62,7 +62,7 @@ function useHasLineHeightControl( name ) {
 }
 
 function useHasAppearanceControl( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	const hasFontStyles =
 		useGlobalSetting( 'typography.fontStyle', name )[ 0 ] &&
 		supports.includes( 'fontStyle' );
@@ -73,7 +73,7 @@ function useHasAppearanceControl( name ) {
 }
 
 function useAppearanceControlLabel( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	const hasFontStyles =
 		useGlobalSetting( 'typography.fontStyle', name )[ 0 ] &&
 		supports.includes( 'fontStyle' );
@@ -90,27 +90,19 @@ function useAppearanceControlLabel( name ) {
 }
 
 function useHasLetterSpacingControl( name, element ) {
-	const setting = useGlobalSetting( 'typography.letterSpacing', name )[ 0 ];
-	if ( ! setting ) {
-		return false;
-	}
-	if ( ! name && element === 'heading' ) {
-		return true;
-	}
-	const supports = getSupportedGlobalStylesPanels( name );
-	return supports.includes( 'letterSpacing' );
+	const supports = useSupportedStyles( name, element );
+	return (
+		useGlobalSetting( 'typography.letterSpacing', name )[ 0 ] &&
+		supports.includes( 'letterSpacing' )
+	);
 }
 
 function useHasTextTransformControl( name, element ) {
-	const setting = useGlobalSetting( 'typography.textTransform', name )[ 0 ];
-	if ( ! setting ) {
-		return false;
-	}
-	if ( ! name && element === 'heading' ) {
-		return true;
-	}
-	const supports = getSupportedGlobalStylesPanels( name );
-	return supports.includes( 'textTransform' );
+	const supports = useSupportedStyles( name, element );
+	return (
+		useGlobalSetting( 'typography.textTransform', name )[ 0 ] &&
+		supports.includes( 'textTransform' )
+	);
 }
 
 function useHasTextDecorationControl( name, element ) {
@@ -188,7 +180,7 @@ export default function TypographyPanel( {
 	headingLevel,
 	variation = '',
 } ) {
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	let prefix = '';
 	if ( element === 'heading' ) {
 		prefix = `elements.${ headingLevel }.`;

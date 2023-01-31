@@ -18,7 +18,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { getSupportedGlobalStylesPanels, useColorsPerOrigin } from './hooks';
+import { useSupportedStyles, useColorsPerOrigin } from './hooks';
 import { unlock } from '../../experiments';
 
 const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
@@ -35,7 +35,7 @@ export function useHasBorderPanel( name ) {
 }
 
 function useHasBorderColorControl( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	return (
 		useGlobalSetting( 'border.color', name )[ 0 ] &&
 		supports.includes( 'borderColor' )
@@ -43,7 +43,7 @@ function useHasBorderColorControl( name ) {
 }
 
 function useHasBorderRadiusControl( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	return (
 		useGlobalSetting( 'border.radius', name )[ 0 ] &&
 		supports.includes( 'borderRadius' )
@@ -51,7 +51,7 @@ function useHasBorderRadiusControl( name ) {
 }
 
 function useHasBorderStyleControl( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	return (
 		useGlobalSetting( 'border.style', name )[ 0 ] &&
 		supports.includes( 'borderStyle' )
@@ -59,7 +59,7 @@ function useHasBorderStyleControl( name ) {
 }
 
 function useHasBorderWidthControl( name ) {
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	return (
 		useGlobalSetting( 'border.width', name )[ 0 ] &&
 		supports.includes( 'borderWidth' )

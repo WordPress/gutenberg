@@ -17,7 +17,7 @@ import { useState } from '@wordpress/element';
  */
 import ScreenHeader from './header';
 import {
-	getSupportedGlobalStylesPanels,
+	useSupportedStyles,
 	useColorsPerOrigin,
 	useGradientsPerOrigin,
 } from './hooks';
@@ -28,7 +28,7 @@ const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 function ScreenHeadingColor( { name, variation = '' } ) {
 	const prefix = variation ? `variations.${ variation }.` : '';
 	const [ selectedLevel, setCurrentTab ] = useState( 'heading' );
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	const [ areCustomSolidsEnabled ] = useGlobalSetting( 'color.custom', name );
 	const [ areCustomGradientsEnabled ] = useGlobalSetting(
 		'color.customGradient',

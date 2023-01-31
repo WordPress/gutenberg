@@ -11,14 +11,14 @@ import {
  * Internal dependencies
  */
 import ScreenHeader from './header';
-import { getSupportedGlobalStylesPanels, useColorsPerOrigin } from './hooks';
+import { useSupportedStyles, useColorsPerOrigin } from './hooks';
 import { unlock } from '../../experiments';
 
 const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorExperiments );
 
 function ScreenButtonColor( { name, variation = '' } ) {
 	const prefix = variation ? `variations.${ variation }.` : '';
-	const supports = getSupportedGlobalStylesPanels( name );
+	const supports = useSupportedStyles( name );
 	const colorsPerOrigin = useColorsPerOrigin( name );
 	const [ areCustomSolidsEnabled ] = useGlobalSetting( 'color.custom', name );
 	const [ isBackgroundEnabled ] = useGlobalSetting(
