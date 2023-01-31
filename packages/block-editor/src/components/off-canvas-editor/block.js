@@ -33,7 +33,6 @@ import {
 } from '../block-mover/button';
 import ListViewBlockContents from './block-contents';
 import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdown';
-import BlockEditButton from './block-edit-button';
 import { useListViewContext } from './context';
 import { getBlockPositionDescription } from './utils';
 import { store as blockEditorStore } from '../../store';
@@ -186,15 +185,6 @@ function ListViewBlock( {
 		  )
 		: __( 'Options' );
 
-	const editAriaLabel = blockInformation
-		? sprintf(
-				// translators: %s: The title of the block.
-				__( 'Edit %s block' ),
-				blockInformation.title
-		  )
-		: __( 'Edit' );
-
-	const isEditable = !! block && block.name !== 'core/page-list-item';
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
 	const moverCellClassName = classnames(
@@ -207,17 +197,11 @@ function ListViewBlock( {
 		{ 'is-visible': isHovered || isFirstSelectedBlock }
 	);
 
-	const listViewBlockEditClassName = classnames(
-		'block-editor-list-view-block__menu-cell',
-		'block-editor-list-view-block__menu-edit',
-		{ 'is-visible': isHovered || isFirstSelectedBlock }
-	);
-
 	let colSpan;
 	if ( hasRenderedMovers ) {
-		colSpan = 2;
+		colSpan = 1;
 	} else if ( ! showBlockActions ) {
-		colSpan = 3;
+		colSpan = 2;
 	}
 
 	const classes = classnames( {
@@ -332,22 +316,6 @@ function ListViewBlock( {
 
 			{ showBlockActions && (
 				<>
-					<TreeGridCell
-						className={ listViewBlockEditClassName }
-						aria-selected={
-							!! isSelected || forceSelectionContentLock
-						}
-					>
-						{ ( props ) =>
-							isEditable && (
-								<BlockEditButton
-									{ ...props }
-									label={ editAriaLabel }
-									clientId={ clientId }
-								/>
-							)
-						}
-					</TreeGridCell>
 					<TreeGridCell
 						className={ listViewBlockSettingsClassName }
 						aria-selected={

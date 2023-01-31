@@ -14,6 +14,7 @@ import {
 import { forwardRef } from '@wordpress/element';
 import { Icon, lockSmall as lock } from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
+import { sprintf, __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -27,7 +28,7 @@ import { useBlockLock } from '../block-lock';
 function ListViewBlockSelectButton(
 	{
 		className,
-		block: { clientId },
+		block,
 		onClick,
 		onToggleExpanded,
 		tabIndex,
@@ -38,12 +39,15 @@ function ListViewBlockSelectButton(
 	},
 	ref
 ) {
+	const { clientId } = block;
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const blockTitle = useBlockDisplayTitle( {
 		clientId,
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
+
+	const isEditable = !! block && block.name !== 'core/page-list-item';
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
@@ -60,6 +64,14 @@ function ListViewBlockSelectButton(
 		}
 	}
 
+	const editAriaLabel = blockInformation
+		? sprintf(
+				// translators: %s: The title of the block.
+				__( 'Edit %s block' ),
+				blockInformation.title
+		  )
+		: __( 'Edit' );
+
 	return (
 		<>
 			<Button
@@ -75,8 +87,9 @@ function ListViewBlockSelectButton(
 				onDragStart={ onDragStartHandler }
 				onDragEnd={ onDragEnd }
 				draggable={ draggable }
-				href={ `#block-${ clientId }` }
+				href={ isEditable ? `#block-${ clientId }` : undefined }
 				aria-hidden={ true }
+				title={ editAriaLabel }
 			>
 				<ListViewExpander onClick={ onToggleExpanded } />
 				<BlockIcon
