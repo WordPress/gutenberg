@@ -267,7 +267,7 @@
 		"fixtures:regenerate": "npm-run-all fixtures:clean fixtures:generate",
 		"format": "wp-scripts format",
 		"format:php": "wp-env run composer run-script format",
-		"lint": "concurrently \"npm run lint:lockfile\" \"npm run lint:js\" \"npm run lint:pkg-json\" \"npm run lint:css\"",
+		"lint": "concurrently \"npm run lint:lockfile\" \"npm run lint:tsconfig\" \"npm run lint:js\" \"npm run lint:pkg-json\" \"npm run lint:css\"",
 		"lint:css": "wp-scripts lint-style \"**/*.scss\"",
 		"lint:css:fix": "npm run lint:css -- --fix",
 		"lint:js": "wp-scripts lint-js",

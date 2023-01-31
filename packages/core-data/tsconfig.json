@@ -9,6 +9,7 @@
 	},
 	"references": [
 		{ "path": "../api-fetch" },
+		{ "path": "../compose" },
 		{ "path": "../data" },
 		{ "path": "../deprecated" },
 		{ "path": "../element" },
