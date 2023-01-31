@@ -65,6 +65,7 @@ export function ChildLayoutEdit( {
 	return (
 		<>
 			<ToggleGroupControl
+				__nextHasNoMarginBottom
 				size={ '__unstable-large' }
 				label={ childLayoutOrientation( parentLayout ) }
 				value={ selfStretch || 'fit' }

@@ -184,7 +184,6 @@ function AddCustomTemplateModal( {
 				entityForSuggestions.labels.singular_name
 			) }
 			className={ baseCssClass }
-			closeLabel={ __( 'Close' ) }
 			onRequestClose={ onClose }
 		>
 			{ isCreatingTemplate && <TemplateActionsLoadingScreen /> }

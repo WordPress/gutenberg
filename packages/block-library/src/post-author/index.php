@@ -36,10 +36,16 @@ function render_block_core_post_author( $attributes, $content, $block ) {
 	}
 
 	$byline  = ! empty( $attributes['byline'] ) ? $attributes['byline'] : false;
-	$classes = array_merge(
-		isset( $attributes['itemsJustification'] ) ? array( 'items-justified-' . $attributes['itemsJustification'] ) : array(),
-		isset( $attributes['textAlign'] ) ? array( 'has-text-align-' . $attributes['textAlign'] ) : array()
-	);
+	$classes = array();
+	if ( isset( $attributes['itemsJustification'] ) ) {
+		$classes[] = 'items-justified-' . $attributes['itemsJustification'];
+	}
+	if ( isset( $attributes['textAlign'] ) ) {
+		$classes[] = 'has-text-align-' . $attributes['textAlign'];
+	}
+	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
+		$classes[] = 'has-link-color';
+	}
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
 

@@ -255,7 +255,7 @@ export function BorderPanel( props ) {
 	const hydratedBorder = getBorderObject( attributes, colors );
 
 	return (
-		<InspectorControls __experimentalGroup="border">
+		<InspectorControls group="border">
 			{ ( isWidthSupported || isColorSupported ) && (
 				<ToolsPanelItem
 					hasValue={ () => hasBorderValue( props ) }
@@ -274,7 +274,6 @@ export function BorderPanel( props ) {
 						popoverPlacement="left-start"
 						size="__unstable-large"
 						value={ hydratedBorder }
-						__experimentalHasMultipleOrigins={ true }
 						__experimentalIsRenderedInSidebar={ true }
 					/>
 				</ToolsPanelItem>

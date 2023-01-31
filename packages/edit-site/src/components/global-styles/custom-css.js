@@ -1,17 +1,29 @@
 /**
  * WordPress dependencies
  */
-import { TextareaControl, Panel, PanelBody } from '@wordpress/components';
+import {
+	TextareaControl,
+	Panel,
+	PanelBody,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { useStyle } from './hooks';
+import { unlock } from '../../experiments';
+import Subtitle from './subtitle';
 
-function CustomCSSControl() {
-	const [ customCSS, setCustomCSS ] = useStyle( 'css' );
-	const [ themeCSS ] = useStyle( 'css', null, 'base' );
+const { useGlobalStyle } = unlock( blockEditorExperiments );
+function CustomCSSControl( { blockName } ) {
+	// If blockName is defined, we are customizing CSS at the block level:
+	// styles.blocks.blockName.css
+	const block = !! blockName ? blockName : null;
+
+	const [ customCSS, setCustomCSS ] = useGlobalStyle( 'css', block );
+	const [ themeCSS ] = useGlobalStyle( 'css', block, 'base' );
 	const ignoreThemeCustomCSS = '/* IgnoreThemeCustomCSS */';
 
 	// If there is custom css from theme.json show it in the edit box
@@ -41,20 +53,6 @@ function CustomCSSControl() {
 
 	return (
 		<>
-			<TextareaControl
-				__nextHasNoMarginBottom
-				value={
-					customCSS?.replace( ignoreThemeCustomCSS, '' ) ||
-					themeCustomCSS
-				}
-				onChange={ ( value ) => handleOnChange( value ) }
-				rows={ 15 }
-				className="edit-site-global-styles__custom-css-input"
-				spellCheck={ false }
-				help={ __(
-					"Enter your custom CSS in the textarea and preview in the editor. Changes won't take effect until you've saved the template."
-				) }
-			/>
 			{ originalThemeCustomCSS && (
 				<Panel>
 					<PanelBody
@@ -67,6 +65,19 @@ function CustomCSSControl() {
 					</PanelBody>
 				</Panel>
 			) }
+			<VStack spacing={ 3 }>
+				<Subtitle>{ __( 'ADDITIONAL CSS' ) }</Subtitle>
+				<TextareaControl
+					__nextHasNoMarginBottom
+					value={
+						customCSS?.replace( ignoreThemeCustomCSS, '' ) ||
+						themeCustomCSS
+					}
+					onChange={ ( value ) => handleOnChange( value ) }
+					className="edit-site-global-styles__custom-css-input"
+					spellCheck={ false }
+				/>
+			</VStack>
 		</>
 	);
 }

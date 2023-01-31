@@ -22,6 +22,7 @@ Setting that enables the following UI tools:
 
 - border: color, radius, style, width
 - color: link
+- dimensions: minHeight
 - spacing: blockGap, margin, padding
 - typography: lineHeight
 
@@ -49,6 +50,16 @@ Settings related to borders.
 | radius | boolean | false |  |
 | style | boolean | false |  |
 | width | boolean | false |  |
+
+---
+
+### shadow
+
+Settings related to shadows.
+
+| Property  | Type   | Default | Props  |
+| ---       | ---    | ---    |---   |
+| presets | array |  | name, shadow, slug |
 
 ---
 

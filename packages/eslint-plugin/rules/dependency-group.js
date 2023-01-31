@@ -120,7 +120,7 @@ module.exports = {
 		 * @param {Node}              node     Node to test.
 		 * @param {WPPackageLocality} locality Desired package locality.
 		 *
-		 * @return {WPDependencyBlockCorrection=} Correction, if applicable.
+		 * @return {WPDependencyBlockCorrection | undefined} Correction, if applicable.
 		 */
 		function getDependencyBlockCorrection( node, locality ) {
 			const value = getCommentValue( locality );

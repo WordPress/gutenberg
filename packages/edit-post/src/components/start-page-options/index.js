@@ -23,15 +23,11 @@ function useStartPatterns() {
 	// the current post type is part of the postTypes declared.
 	const { blockPatternsWithPostContentBlockType, postType } = useSelect(
 		( select ) => {
-			const { __experimentalGetPatternsByBlockTypes } =
-				select( blockEditorStore );
+			const { getPatternsByBlockTypes } = select( blockEditorStore );
 			const { getCurrentPostType } = select( editorStore );
 			return {
-				// get pa
 				blockPatternsWithPostContentBlockType:
-					__experimentalGetPatternsByBlockTypes(
-						'core/post-content'
-					),
+					getPatternsByBlockTypes( 'core/post-content' ),
 				postType: getCurrentPostType(),
 			};
 		},
@@ -117,7 +113,6 @@ export default function StartPageOptions() {
 		<Modal
 			className="edit-post-start-page-options__modal"
 			title={ __( 'Choose a pattern' ) }
-			closeLabel={ __( 'Cancel' ) }
 			onRequestClose={ () => {
 				setModalState( START_PAGE_MODAL_STATES.CLOSED );
 			} }
