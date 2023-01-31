@@ -44,7 +44,7 @@ doc.implementation.createHTMLDocument = function ( html ) {
 	return jsdom.html( html, null, null );
 };
 
-// Flag used to enable a patch to `react-devtools` to support `jsdom-jscore-rn`.
+// Flag used to enable a patch to `react-devtools-core` to support `jsdom-jscore-rn`.
 doc.__isJsdom = true;
 
 // `hpq` depends on `document` be available globally.
