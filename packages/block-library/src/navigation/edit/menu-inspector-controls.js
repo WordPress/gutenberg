@@ -5,7 +5,6 @@ import {
 	experiments as blockEditorExperiments,
 	InspectorControls,
 	store as blockEditorStore,
-	Warning,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -23,6 +22,7 @@ import ManageMenusButton from './manage-menus-button';
 import NavigationMenuSelector from './navigation-menu-selector';
 import { LeafMoreMenu } from '../leaf-more-menu';
 import { unlock } from '../../experiments';
+import DeletedNavigationWarning from './deleted-navigation-warning';
 
 /* translators: %s: The name of a menu. */
 const actionLabel = __( "Switch to '%s'" );
@@ -32,6 +32,7 @@ const ExperimentMainContent = ( {
 	currentMenuId,
 	isLoading,
 	isNavigationMenuMissing,
+	onCreateNew,
 } ) => {
 	const { __experimentalOffCanvasEditor: OffCanvasEditor } = unlock(
 		blockEditorExperiments
@@ -51,11 +52,7 @@ const ExperimentMainContent = ( {
 	}
 
 	if ( isNavigationMenuMissing ) {
-		return (
-			<Warning>
-				{ __( 'Navigation menu has been deleted or is unavailable. ' ) }
-			</Warning>
-		);
+		return <DeletedNavigationWarning onCreateNew={ onCreateNew } />;
 	}
 
 	if ( isLoading ) {
