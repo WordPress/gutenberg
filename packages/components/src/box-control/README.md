@@ -48,7 +48,7 @@ If this property is true, when the box control is unlinked, vertical and horizon
 
 ### inputProps
 
-Props for the internal [InputControl](../input-control) components.
+Props for the internal [UnitControl](../unit-control) components.
 
 -   Type: `Object`
 -   Required: No

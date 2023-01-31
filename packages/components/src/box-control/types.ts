@@ -1,8 +1,13 @@
 /**
+ * External dependencies
+ */
+import type { useHover } from '@use-gesture/react';
+
+/**
  * Internal dependencies
  */
-import type { InputControlProps } from '../input-control/types';
 import type { UnitControlProps } from '../unit-control/types';
+import type { LABELS } from './utils';
 
 export type BoxControlValue = {
 	top?: string;
@@ -10,6 +15,11 @@ export type BoxControlValue = {
 	bottom?: string;
 	left?: string;
 };
+
+type UnitControlPassthroughProps = Omit<
+	UnitControlProps,
+	'label' | 'onChange' | 'onFocus' | 'onMouseOver' | 'onMouseOut' | 'units'
+>;
 
 export type BoxControlProps = Pick<
 	UnitControlProps,
@@ -23,11 +33,11 @@ export type BoxControlProps = Pick<
 	allowReset?: boolean;
 	id?: string;
 	/**
-	 * Props for the internal `InputControl` components.
+	 * Props for the internal `UnitControl` components.
 	 *
-	 * @default `{ min 0 }`
+	 * @default `{ min: 0 }`
 	 */
-	inputProps?: InputControlProps;
+	inputProps?: UnitControlPassthroughProps;
 	/**
 	 * Heading label for the control.
 	 *
@@ -57,4 +67,33 @@ export type BoxControlProps = Pick<
 	 * The current values of the control, expressed as an object of `top`, `right`, `bottom`, and `left` values.
 	 */
 	values?: BoxControlValue;
+};
+
+export type AllInputControlProps = UnitControlPassthroughProps & {
+	onChange?: ( nextValues: BoxControlValue ) => void;
+	onFocus?: (
+		_event: React.FocusEvent< HTMLInputElement >,
+		{ side: nextSide }: { side: keyof typeof LABELS }
+	) => void;
+	onHoverOff?: ( sides: Record< keyof BoxControlValue, boolean > ) => void;
+	onHoverOn?: ( sides: Record< keyof BoxControlValue, boolean > ) => void;
+	selectedUnits: BoxControlValue;
+	setSelectedUnits: React.Dispatch< React.SetStateAction< BoxControlValue > >;
+	sides: BoxControlProps[ 'sides' ];
+	values: BoxControlValue;
+};
+
+export type BoxUnitControlProps = UnitControlPassthroughProps & {
+	isFirst?: boolean;
+	isLast?: boolean;
+	isOnly?: boolean;
+	label: string;
+	onHoverOff?: (
+		event: ReturnType< typeof useHover >[ 'event' ],
+		state: Omit< ReturnType< typeof useHover >, 'event' >
+	) => void;
+	onHoverOn?: (
+		event: ReturnType< typeof useHover >[ 'event' ],
+		state: Omit< ReturnType< typeof useHover >, 'event' >
+	) => void;
 };

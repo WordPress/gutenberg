@@ -31,7 +31,6 @@ import {
 } from './utils';
 import { useControlledState } from '../utils/hooks';
 import type { BoxControlProps, BoxControlValue } from './types';
-import type { UnitControlProps } from '../unit-control/types';
 
 const defaultInputProps = {
 	min: 0,
