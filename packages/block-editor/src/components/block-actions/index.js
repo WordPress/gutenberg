@@ -135,7 +135,7 @@ export default function BlockActions( {
 		async onPasteStyles() {
 			await pasteStyles( blocks );
 
-			// Need to reselect the block(s) in order for optional tool panel control changes to register
+			// Need to reselect the block(s) in order for optional tool panel control changes to register.
 			clearSelectedBlock();
 			multiSelect(
 				blocks[ 0 ].clientId,
