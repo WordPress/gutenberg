@@ -43,7 +43,6 @@
 		"src/index.js",
 		"src/angle-picker-control",
 		"src/autocomplete",
-		"src/box-control",
 		"src/combobox-control",
 		"src/custom-gradient-picker",
 		"src/dimension-control",
