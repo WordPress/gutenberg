@@ -26,6 +26,7 @@ describe( 'parseDropEvent', () => {
 			srcClientIds: [ 'abc' ],
 			srcIndex: 1,
 			type: 'block',
+			context: 'canvas',
 		};
 		const event = {
 			dataTransfer: {
@@ -55,6 +56,7 @@ describe( 'parseDropEvent', () => {
 			srcRootClientId: null,
 			srcIndex: null,
 			blocks: null,
+			context: null,
 			...rawDataTransfer,
 		} );
 	} );
@@ -66,6 +68,7 @@ describe( 'parseDropEvent', () => {
 			srcClientIds: null,
 			srcIndex: null,
 			type: null,
+			context: null,
 		};
 		const event = {
 			dataTransfer: {
@@ -85,6 +88,7 @@ describe( 'parseDropEvent', () => {
 			srcClientIds: null,
 			srcIndex: null,
 			type: null,
+			context: null,
 		};
 		const event = {};
 
@@ -297,6 +301,50 @@ describe( 'onBlockDrop', () => {
 			sourceRootClientId,
 			insertIndex
 		);
+	} );
+
+	it( 'does nothing if the block is dropped into a context that does not match origin of the drag', () => {
+		const targetRootClientId = '1';
+		const targetBlockIndex = 0;
+
+		const dropContext = 'canvas';
+		const dragContext = 'list-view';
+
+		const getBlockIndex = jest.fn( () => 1 );
+		// Dragged block is being dropped as a descendant of itself.
+		const getClientIdsOfDescendants = jest.fn( () => [
+			targetRootClientId,
+		] );
+		const moveBlocks = jest.fn();
+		const insertOrReplaceBlocks = jest.fn();
+		const clearSelectedBlock = jest.fn();
+
+		const event = {
+			dataTransfer: {
+				getData() {
+					return JSON.stringify( {
+						type: 'block',
+						srcRootClientId: '0',
+						srcClientIds: [ '5' ],
+						context: dragContext,
+					} );
+				},
+			},
+		};
+
+		const eventHandler = onBlockDrop(
+			targetRootClientId,
+			targetBlockIndex,
+			getBlockIndex,
+			getClientIdsOfDescendants,
+			moveBlocks,
+			insertOrReplaceBlocks,
+			clearSelectedBlock,
+			dropContext
+		);
+		eventHandler( event );
+
+		expect( moveBlocks ).not.toHaveBeenCalled();
 	} );
 } );
 

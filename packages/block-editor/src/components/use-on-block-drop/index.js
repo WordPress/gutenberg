@@ -84,10 +84,6 @@ export function onBlockDrop(
 			context: dragContext,
 		} = parseDropEvent( event );
 
-		if ( context && dragContext && context !== dragContext ) {
-			return;
-		}
-
 		// If the user is inserting a block.
 		if ( dropType === 'inserter' ) {
 			clearSelectedBlock();
@@ -99,6 +95,9 @@ export function onBlockDrop(
 
 		// If the user is moving a block.
 		if ( dropType === 'block' ) {
+			if ( context && dragContext && context !== dragContext ) {
+				return;
+			}
 			const sourceBlockIndex = getBlockIndex( sourceClientIds[ 0 ] );
 
 			// If the user is dropping to the same position, return early.
