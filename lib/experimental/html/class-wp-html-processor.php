@@ -15,11 +15,19 @@
  * input. E.g. it's clear to me how to handle `</b></b></b>` but not clear to how
  * handle `</p></p></p>` given that `<b>` is a formatting element but `<p>` is
  * not, that `<p>` itself is a special element.
+ *
+ * @package WordPress
+ * @subpackage HTML
+ * @since 6.2.0
  */
 
 
-
 class WP_HTML_Processor extends WP_HTML_Tag_Processor {
+	/**
+	 * Create a new tracking state for, based on the current opening tag.
+	 *
+	 * @return WP_HTML_Processor_Scan_State
+	 */
 	public function new_state() {
 		$state    = new WP_HTML_Processor_Scan_State();
 		$tag_name = $this->get_tag();
@@ -138,6 +146,14 @@ class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 		return false;
 	}
 
+	/**
+	 * Return the content between two balanced tags.
+	 *
+	 * When called on an opening tag, return the HTML content found between
+	 * that opening tag and its matching closing tag.
+	 *
+	 * @return string The content between the current opening and its matching closing tag.
+	 */
 	public function get_content_inside_balanced_tags() {
 		static $start_name = null;
 		static $end_name   = null;
@@ -169,6 +185,14 @@ class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 		return $content;
 	}
 
+	/**
+	 * Return the content between two bookmarks.
+	 *
+	 * @param WP_HTML_Span $start_bookmark The bookmark marking the start of the content.
+	 * @param WP_HTML_Span $end_bookmark   The bookmark marking the start of the content.
+	 * @return string|null                 The content between the two bookmarks.
+	 *                                     Null if either of the bookmarks isn't set.
+	 */
 	private function content_inside_bookmarks( $start_bookmark, $end_bookmark ) {
 		if ( ! isset( $this->bookmarks[ $start_bookmark ], $this->bookmarks[ $end_bookmark ] ) ) {
 			return null;
