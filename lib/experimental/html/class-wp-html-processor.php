@@ -76,10 +76,10 @@ class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 	/**
 	 * Find the matching closing tag for an opening tag.
 	 *
-	 * When called while on an open tag, move to the matching closing tag,
-	 * respecting any in-between content, including nested tags of the same
-	 * name. Return false when called on a closing or void tag, or if no
-	 * matching closing tag was found.
+	 * When called while on an open tag, traverse the HTML until we find
+	 * the matching closing tag, respecting any in-between content, including
+	 * nested tags of the same name. Return false when called on a closing or
+	 * void tag, or if no matching closing tag was found.
 	 *
 	 * @param WP_HTML_Processor_Scan_State $state Tracking state.
 	 * @param array|string                 $query Query criteria for the closing tag.
