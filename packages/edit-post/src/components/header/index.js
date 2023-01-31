@@ -44,7 +44,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				select( editPostStore ).isFeatureActive( 'distractionFree' ) &&
 				isLargeViewport,
 		} ),
-		[]
+		[ isLargeViewport ]
 	);
 
 	const classes = classnames( 'edit-post-header' );
