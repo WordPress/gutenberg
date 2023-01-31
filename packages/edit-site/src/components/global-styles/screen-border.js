@@ -14,7 +14,7 @@ import ShadowPanel, { useHasShadowControl } from './shadow-panel';
 
 function ScreenBorder( { name, variation = '' } ) {
 	const hasBorderPanel = useHasBorderPanel( name );
-	const variationClassName = getVariationClassName( variationPath );
+	const variationClassName = getVariationClassName( variation );
 	const hasShadowPanel = useHasShadowControl( name );
 	return (
 		<>
@@ -24,7 +24,7 @@ function ScreenBorder( { name, variation = '' } ) {
 				<BorderPanel name={ name } variation={ variation } />
 			) }
 			{ hasShadowPanel && (
-				<ShadowPanel name={ name } variationPath={ variationPath } />
+				<ShadowPanel name={ name } variation={ variation } />
 			) }
 		</>
 	);

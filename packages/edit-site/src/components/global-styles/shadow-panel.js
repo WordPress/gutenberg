@@ -38,13 +38,13 @@ export function useHasShadowControl( name ) {
 	return supports.includes( 'shadow' );
 }
 
-export default function ShadowPanel( { name, variationPath = '' } ) {
+export default function ShadowPanel( { name, variation = '' } ) {
 	const [ shadow, setShadow ] = useGlobalStyle(
-		`${ variationPath }shadow`,
+		`${ variation }shadow`,
 		name
 	);
 	const [ userShadow ] = useGlobalStyle(
-		`${ variationPath }shadow`,
+		`${ variation }shadow`,
 		name,
 		'user'
 	);
