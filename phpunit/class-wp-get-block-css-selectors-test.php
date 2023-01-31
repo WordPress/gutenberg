@@ -54,6 +54,17 @@ class WP_Get_Block_CSS_Selector_Test extends WP_UnitTestCase {
 		$this->assertEquals( '.experimental-selector', $selector );
 	}
 
+	public function test_default_root_selector_generation_for_core_block() {
+		$block_type = self::register_test_block(
+			'core/without-selectors-or-supports',
+			null,
+			null
+		);
+
+		$selector = wp_get_block_css_selector( $block_type );
+		$this->assertEquals( '.wp-block-without-selectors-or-supports', $selector );
+	}
+
 	public function test_default_root_selector_generation() {
 		$block_type = self::register_test_block(
 			'test/without-selectors-or-supports',
