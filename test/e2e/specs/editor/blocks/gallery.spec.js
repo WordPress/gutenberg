@@ -2,11 +2,20 @@
  * External dependencies
  */
 const path = require( 'path' );
+const fs = require( 'fs/promises' );
+const os = require( 'os' );
+const { v4: uuid } = require( 'uuid' );
 
 /**
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+
+test.use( {
+	galleryBlockUtils: async ( { page }, use ) => {
+		await use( new GalleryBlockUtils( { page } ) );
+	},
+} );
 
 test.describe( 'Gallery', () => {
 	let uploadedMedia;
@@ -74,4 +83,163 @@ test.describe( 'Gallery', () => {
 			.poll( editor.getEditedPostContent )
 			.toBe( editedPostContent );
 	} );
+
+	test( 'can be created using uploaded images', async ( {
+		admin,
+		editor,
+		page,
+		galleryBlockUtils,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( { name: 'core/gallery' } );
+		const galleryBlock = page.locator(
+			'role=document[name="Block: Gallery"i]'
+		);
+		await expect( galleryBlock ).toBeVisible();
+
+		const filename = await galleryBlockUtils.upload(
+			galleryBlock.locator( 'data-testid=form-file-upload-input' )
+		);
+
+		const image = galleryBlock.locator( 'role=img' );
+		await expect( image ).toBeVisible();
+		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
+
+		const regex = new RegExp(
+			`<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":\\d+,\\"sizeSlug\\":\\"(?:full|large)\\",\\"linkDestination\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-image (?:size-full|size-large)\\"><img src=\\"[^"]+\/${ filename }\.png\\" alt=\\"\\" class=\\"wp-image-\\d+\\"\/><\/figure>\\s*<!-- \/wp:image --><\/figure>\\s*<!-- \/wp:gallery -->`
+		);
+		await expect.poll( editor.getEditedPostContent ).toMatch( regex );
+	} );
+
+	test( 'gallery caption can be edited', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		const galleryCaption = 'Tested gallery caption';
+
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/gallery',
+			innerBlocks: [
+				{
+					name: 'core/image',
+					attributes: {
+						id: uploadedMedia.id,
+						url: uploadedMedia.source_url,
+					},
+				},
+			],
+		} );
+
+		const gallery = page.locator( 'role=document[name="Block: Gallery"i]' );
+
+		await expect( gallery ).toBeVisible();
+		await editor.selectBlocks( gallery );
+		await editor.clickBlockToolbarButton( 'Add caption' );
+
+		const caption = gallery.locator(
+			'role=textbox[name="Gallery caption text"i]'
+		);
+		await expect( caption ).toBeFocused();
+
+		await page.keyboard.type( galleryCaption );
+
+		await expect
+			.poll( editor.getEditedPostContent )
+			.toMatch(
+				new RegExp( `<figcaption.*?>${ galleryCaption }</figcaption>` )
+			);
+	} );
+
+	test( "uploaded images' captions can be edited", async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		const caption = 'Tested caption';
+
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/gallery',
+			innerBlocks: [
+				{
+					name: 'core/image',
+					attributes: {
+						id: uploadedMedia.id,
+						url: uploadedMedia.source_url,
+					},
+				},
+			],
+		} );
+
+		const galleryImage = page.locator(
+			'role=document[name="Block: Gallery"i] >> role=document[name="Block: Image"i]'
+		);
+		const imageCaption = galleryImage.locator(
+			'role=textbox[name="Image caption text"i]'
+		);
+		await expect( galleryImage ).toBeVisible();
+
+		await galleryImage.click();
+		await editor.clickBlockToolbarButton( 'Add caption' );
+
+		await expect( imageCaption ).toBeVisible();
+		await imageCaption.click();
+
+		await page.keyboard.type( caption );
+
+		await expect
+			.poll( editor.getEditedPostContent )
+			.toMatch(
+				new RegExp( `<figcaption.*?>${ caption }</figcaption>` )
+			);
+	} );
+
+	test( 'when initially added the media library shows the Create Gallery view', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( { name: 'core/gallery' } );
+		await page.click( 'role=button[name="Media Library"i]' );
+
+		const mediaLibrary = page.locator(
+			'role=dialog[name="Create gallery"i]'
+		);
+
+		await expect( mediaLibrary ).toBeVisible();
+		await expect(
+			mediaLibrary.locator( 'role=button[name="Create a new gallery"i]' )
+		).toBeVisible();
+	} );
 } );
+
+class GalleryBlockUtils {
+	constructor( { page } ) {
+		this.page = page;
+
+		this.TEST_IMAGE_FILE_PATH = path.join(
+			__dirname,
+			'..',
+			'..',
+			'..',
+			'assets',
+			'10x10_e2e_test_image_z9T8jK.png'
+		);
+	}
+
+	async upload( inputElement ) {
+		const tmpDirectory = await fs.mkdtemp(
+			path.join( os.tmpdir(), 'gutenberg-test-image-' )
+		);
+		const filename = uuid();
+		const tmpFileName = path.join( tmpDirectory, filename + '.png' );
+		await fs.copyFile( this.TEST_IMAGE_FILE_PATH, tmpFileName );
+
+		await inputElement.setInputFiles( tmpFileName );
+
+		return filename;
+	}
+}

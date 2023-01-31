@@ -1,11 +1,13 @@
 /**
  * WordPress dependencies
  */
+import { useState } from '@wordpress/element';
 import {
 	VisuallyHidden,
 	__unstableComposite as Composite,
 	__unstableUseCompositeState as useCompositeState,
 	__unstableCompositeItem as CompositeItem,
+	Tooltip,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -16,7 +18,22 @@ import { __ } from '@wordpress/i18n';
 import BlockPreview from '../block-preview';
 import InserterDraggableBlocks from '../inserter-draggable-blocks';
 
-function BlockPattern( { isDraggable, pattern, onClick, composite } ) {
+const WithToolTip = ( { showTooltip, title, children } ) => {
+	if ( showTooltip ) {
+		return <Tooltip text={ title }>{ children }</Tooltip>;
+	}
+	return <>{ children }</>;
+};
+
+function BlockPattern( {
+	isDraggable,
+	pattern,
+	onClick,
+	onHover,
+	composite,
+	showTooltip,
+} ) {
+	const [ isDragging, setIsDragging ] = useState( false );
 	const { blocks, viewportWidth } = pattern;
 	const instanceId = useInstanceId( BlockPattern );
 	const descriptionId = `block-editor-block-patterns-list__item-description-${ instanceId }`;
@@ -31,33 +48,61 @@ function BlockPattern( { isDraggable, pattern, onClick, composite } ) {
 				<div
 					className="block-editor-block-patterns-list__list-item"
 					draggable={ draggable }
-					onDragStart={ onDragStart }
-					onDragEnd={ onDragEnd }
-				>
-					<CompositeItem
-						role="option"
-						as="div"
-						{ ...composite }
-						className="block-editor-block-patterns-list__item"
-						onClick={ () => onClick( pattern, blocks ) }
-						aria-label={ pattern.title }
-						aria-describedby={
-							pattern.description ? descriptionId : undefined
+					onDragStart={ ( event ) => {
+						setIsDragging( true );
+						if ( onDragStart ) {
+							onHover?.( null );
+							onDragStart( event );
 						}
+					} }
+					onDragEnd={ ( event ) => {
+						setIsDragging( false );
+						if ( onDragEnd ) {
+							onDragEnd( event );
+						}
+					} }
+				>
+					<WithToolTip
+						showTooltip={ showTooltip }
+						title={ pattern.title }
 					>
-						<BlockPreview
-							blocks={ blocks }
-							viewportWidth={ viewportWidth }
-						/>
-						<div className="block-editor-block-patterns-list__item-title">
-							{ pattern.title }
-						</div>
-						{ !! pattern.description && (
-							<VisuallyHidden id={ descriptionId }>
-								{ pattern.description }
-							</VisuallyHidden>
-						) }
-					</CompositeItem>
+						<CompositeItem
+							role="option"
+							as="div"
+							{ ...composite }
+							className="block-editor-block-patterns-list__item"
+							onClick={ () => {
+								onClick( pattern, blocks );
+								onHover?.( null );
+							} }
+							onMouseEnter={ () => {
+								if ( isDragging ) {
+									return;
+								}
+								onHover?.( pattern );
+							} }
+							onMouseLeave={ () => onHover?.( null ) }
+							aria-label={ pattern.title }
+							aria-describedby={
+								pattern.description ? descriptionId : undefined
+							}
+						>
+							<BlockPreview
+								blocks={ blocks }
+								viewportWidth={ viewportWidth }
+							/>
+							{ ! showTooltip && (
+								<div className="block-editor-block-patterns-list__item-title">
+									{ pattern.title }
+								</div>
+							) }
+							{ !! pattern.description && (
+								<VisuallyHidden id={ descriptionId }>
+									{ pattern.description }
+								</VisuallyHidden>
+							) }
+						</CompositeItem>
+					</WithToolTip>
 				</div>
 			) }
 		</InserterDraggableBlocks>
@@ -74,9 +119,11 @@ function BlockPatternList( {
 	isDraggable,
 	blockPatterns,
 	shownPatterns,
+	onHover,
 	onClickPattern,
 	orientation,
 	label = __( 'Block Patterns' ),
+	showTitlesAsTooltip,
 } ) {
 	const composite = useCompositeState( { orientation } );
 	return (
@@ -93,8 +140,10 @@ function BlockPatternList( {
 						key={ pattern.name }
 						pattern={ pattern }
 						onClick={ onClickPattern }
+						onHover={ onHover }
 						isDraggable={ isDraggable }
 						composite={ composite }
+						showTooltip={ showTitlesAsTooltip }
 					/>
 				) : (
 					<BlockPatternPlaceholder key={ pattern.name } />

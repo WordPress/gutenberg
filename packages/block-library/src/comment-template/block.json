@@ -9,10 +9,14 @@
 	"textdomain": "default",
 	"usesContext": [ "postId" ],
 	"supports": {
-		"anchor": true,
-		"reusable": false,
-		"html": false,
 		"align": true,
+		"anchor": true,
+		"html": false,
+		"reusable": false,
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,

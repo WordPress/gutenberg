@@ -27,6 +27,7 @@ const orderOptions = [
 function OrderControl( { order, orderBy, onChange } ) {
 	return (
 		<SelectControl
+			__nextHasNoMarginBottom
 			label={ __( 'Order by' ) }
 			value={ `${ orderBy }/${ order }` }
 			options={ orderOptions }

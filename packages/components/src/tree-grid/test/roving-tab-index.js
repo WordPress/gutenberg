@@ -16,6 +16,6 @@ describe( 'RovingTabIndex', () => {
 			</RovingTabIndex>
 		);
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 } );

@@ -143,18 +143,31 @@ class Inserter extends Component {
 			// Feel free to make them stable after a few releases.
 			__experimentalIsQuick: isQuick,
 			prioritizePatterns,
+			onSelectOrClose,
+			selectBlockOnInsert,
 		} = this.props;
 
 		if ( isQuick ) {
 			return (
 				<QuickInserter
-					onSelect={ () => {
+					onSelect={ ( blocks ) => {
+						const firstBlock =
+							Array.isArray( blocks ) && blocks?.length
+								? blocks[ 0 ]
+								: blocks;
+						if (
+							onSelectOrClose &&
+							typeof onSelectOrClose === 'function'
+						) {
+							onSelectOrClose( firstBlock );
+						}
 						onClose();
 					} }
 					rootClientId={ rootClientId }
 					clientId={ clientId }
 					isAppender={ isAppender }
 					prioritizePatterns={ prioritizePatterns }
+					selectBlockOnInsert={ selectBlockOnInsert }
 				/>
 			);
 		}
@@ -194,7 +207,7 @@ class Inserter extends Component {
 					'block-editor-inserter__popover',
 					{ 'is-quick': isQuick }
 				) }
-				position={ position }
+				popoverProps={ { position } }
 				onToggle={ this.onToggle }
 				expandOnMobile
 				headerTitle={ __( 'Add a block' ) }
@@ -207,48 +220,52 @@ class Inserter extends Component {
 }
 
 export default compose( [
-	withSelect( ( select, { clientId, rootClientId } ) => {
-		const {
-			getBlockRootClientId,
-			hasInserterItems,
-			__experimentalGetAllowedBlocks,
-			__experimentalGetDirectInsertBlock,
-			getSettings,
-		} = select( blockEditorStore );
+	withSelect(
+		( select, { clientId, rootClientId, shouldDirectInsert = true } ) => {
+			const {
+				getBlockRootClientId,
+				hasInserterItems,
+				getAllowedBlocks,
+				__experimentalGetDirectInsertBlock,
+				getSettings,
+			} = select( blockEditorStore );
 
-		const { getBlockVariations } = select( blocksStore );
+			const { getBlockVariations } = select( blocksStore );
 
-		rootClientId =
-			rootClientId || getBlockRootClientId( clientId ) || undefined;
+			rootClientId =
+				rootClientId || getBlockRootClientId( clientId ) || undefined;
 
-		const allowedBlocks = __experimentalGetAllowedBlocks( rootClientId );
+			const allowedBlocks = getAllowedBlocks( rootClientId );
 
-		const directInsertBlock =
-			__experimentalGetDirectInsertBlock( rootClientId );
+			const directInsertBlock =
+				shouldDirectInsert &&
+				__experimentalGetDirectInsertBlock( rootClientId );
 
-		const settings = getSettings();
+			const settings = getSettings();
 
-		const hasSingleBlockType =
-			allowedBlocks?.length === 1 &&
-			getBlockVariations( allowedBlocks[ 0 ].name, 'inserter' )
-				?.length === 0;
+			const hasSingleBlockType =
+				allowedBlocks?.length === 1 &&
+				getBlockVariations( allowedBlocks[ 0 ].name, 'inserter' )
+					?.length === 0;
 
-		let allowedBlockType = false;
-		if ( hasSingleBlockType ) {
-			allowedBlockType = allowedBlocks[ 0 ];
+			let allowedBlockType = false;
+			if ( hasSingleBlockType ) {
+				allowedBlockType = allowedBlocks[ 0 ];
+			}
+
+			return {
+				hasItems: hasInserterItems( rootClientId ),
+				hasSingleBlockType,
+				blockTitle: allowedBlockType ? allowedBlockType.title : '',
+				allowedBlockType,
+				directInsertBlock,
+				rootClientId,
+				prioritizePatterns:
+					settings.__experimentalPreferPatternsOnRoot &&
+					! rootClientId,
+			};
 		}
-
-		return {
-			hasItems: hasInserterItems( rootClientId ),
-			hasSingleBlockType,
-			blockTitle: allowedBlockType ? allowedBlockType.title : '',
-			allowedBlockType,
-			directInsertBlock,
-			rootClientId,
-			prioritizePatterns:
-				settings.__experimentalPreferPatternsOnRoot && ! rootClientId,
-		};
-	} ),
+	),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
 		return {
 			insertOnlyAllowedBlock() {
@@ -260,6 +277,7 @@ export default compose( [
 					allowedBlockType,
 					directInsertBlock,
 					onSelectOrClose,
+					selectBlockOnInsert,
 				} = ownProps;
 
 				if ( ! hasSingleBlockType && ! directInsertBlock ) {
@@ -370,10 +388,17 @@ export default compose( [
 					blockToInsert = createBlock( allowedBlockType.name );
 				}
 
-				insertBlock( blockToInsert, getInsertionIndex(), rootClientId );
+				insertBlock(
+					blockToInsert,
+					getInsertionIndex(),
+					rootClientId,
+					selectBlockOnInsert
+				);
 
 				if ( onSelectOrClose ) {
-					onSelectOrClose();
+					onSelectOrClose( {
+						clientId: blockToInsert?.clientId,
+					} );
 				}
 
 				const message = sprintf(

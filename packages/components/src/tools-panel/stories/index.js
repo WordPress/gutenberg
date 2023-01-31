@@ -87,6 +87,7 @@ export const _default = () => {
 						onDeselect={ () => setScale( undefined ) }
 					>
 						<ToggleGroupControl
+							__nextHasNoMarginBottom
 							label="Scale"
 							value={ scale }
 							onChange={ ( next ) => setScale( next ) }
@@ -367,6 +368,7 @@ export const WithConditionalDefaultControl = () => {
 					isShownByDefault={ !! height }
 				>
 					<ToggleGroupControl
+						__nextHasNoMarginBottom
 						label="Scale"
 						value={ scale }
 						onChange={ ( next ) =>
@@ -456,6 +458,7 @@ export const WithConditionallyRenderedControl = () => {
 						isShownByDefault={ true }
 					>
 						<ToggleGroupControl
+							__nextHasNoMarginBottom
 							label="Scale"
 							value={ scale }
 							onChange={ ( next ) =>
@@ -494,10 +497,9 @@ export const WithConditionallyRenderedControl = () => {
 	);
 };
 
-export { ToolsPanelWithItemGroupSlot } from './tools-panel-with-item-group-slot';
+export { ToolsPanelWithItemGroupSlot } from './utils/tools-panel-with-item-group-slot';
 
 const PanelWrapperView = styled.div`
-	max-width: 280px;
 	font-size: 13px;
 
 	.components-dropdown-menu__menu {

@@ -93,7 +93,7 @@ The current font size value.
 
 ### withSlider
 
-If `true`, the UI will contain a slider, instead of a numeric text input field. If `false`, no slider will be present.
+If `true`, a slider will be displayed alongside the input field when a custom font size is active. Has no effect when `disableCustomFontSizes` is `true`.
 
 -   Type: `Boolean`
 -   Required: no
@@ -101,7 +101,7 @@ If `true`, the UI will contain a slider, instead of a numeric text input field. 
 
 ### withReset
 
-If `true`, a reset button will be displayed alongside the input field when a custom font size is active. Has no effect when `disableCustomFontSizes` or `withSlider` is `true`.
+If `true`, a reset button will be displayed alongside the input field when a custom font size is active. Has no effect when `disableCustomFontSizes` is `true`.
 
 -   Type: `Boolean`
 -   Required: no

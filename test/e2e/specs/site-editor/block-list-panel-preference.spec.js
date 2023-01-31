@@ -12,11 +12,13 @@ test.describe( 'Block list view', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test( 'Should open by default', async ( { admin, page } ) => {
+	test( 'Should open by default', async ( { admin, page, siteEditor } ) => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
 		} );
+
+		await siteEditor.enterEditMode();
 
 		// Should display the Preview button.
 		await expect(

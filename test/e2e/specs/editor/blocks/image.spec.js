@@ -157,7 +157,7 @@ test.describe( 'Image', () => {
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
 		);
 		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
-		await editor.clickBlockToolbarButton( 'Caption' );
+		await editor.clickBlockToolbarButton( 'Add caption' );
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Backspace' );
@@ -186,7 +186,7 @@ test.describe( 'Image', () => {
 
 		await expect( image ).toBeVisible();
 		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ) );
-		await editor.clickBlockToolbarButton( 'Caption' );
+		await editor.clickBlockToolbarButton( 'Add caption' );
 		await page.keyboard.type( '12' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'Enter' );
@@ -217,7 +217,7 @@ test.describe( 'Image', () => {
 		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ) );
 
 		// Add caption and navigate to inline toolbar.
-		await editor.clickBlockToolbarButton( 'Caption' );
+		await editor.clickBlockToolbarButton( 'Add caption' );
 		await pageUtils.pressKeyWithModifier( 'shift', 'Tab' );
 		await expect(
 			await page.evaluate( () =>
@@ -486,7 +486,7 @@ test.describe( 'Image', () => {
 			await page.click( 'role=button[name="Edit"i]' );
 			// Replace the url.
 			await page.fill( 'role=combobox[name="URL"i]', imageUrl );
-			await page.click( 'role=button[name="Submit"i]' );
+			await page.click( 'role=button[name="Apply"i]' );
 
 			const regex = new RegExp(
 				`<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->

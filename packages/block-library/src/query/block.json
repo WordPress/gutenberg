@@ -51,14 +51,6 @@
 		"align": [ "wide", "full" ],
 		"anchor": true,
 		"html": false,
-		"color": {
-			"gradients": true,
-			"link": true,
-			"__experimentalDefaultControls": {
-				"background": true,
-				"text": true
-			}
-		},
 		"__experimentalLayout": true
 	},
 	"editorStyle": "wp-block-query-editor"

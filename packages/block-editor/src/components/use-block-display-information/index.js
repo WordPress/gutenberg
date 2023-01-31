@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { store as blocksStore } from '@wordpress/blocks';
+import {
+	store as blocksStore,
+	isReusableBlock,
+	isTemplatePart,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -16,10 +20,11 @@ import { store as blockEditorStore } from '../../store';
  *
  * @typedef {Object} WPBlockDisplayInformation
  *
- * @property {string} title       Human-readable block type label.
- * @property {WPIcon} icon        Block type icon.
- * @property {string} description A detailed block type description.
- * @property {string} anchor      HTML anchor.
+ * @property {boolean} isSynced    True if is a reusable block or template part
+ * @property {string}  title       Human-readable block type label.
+ * @property {WPIcon}  icon        Block type icon.
+ * @property {string}  description A detailed block type description.
+ * @property {string}  anchor      HTML anchor.
  */
 
 /**
@@ -29,7 +34,7 @@ import { store as blockEditorStore } from '../../store';
  * 1. Block's client id to extract it's current attributes.
  * 2. A block variation should have set `isActive` prop to a proper function.
  *
- * If for any reason a block variaton match cannot be found,
+ * If for any reason a block variation match cannot be found,
  * the returned information come from the Block Type.
  * If no blockType is found with the provided clientId, returns null.
  *
@@ -50,7 +55,10 @@ export default function useBlockDisplayInformation( clientId ) {
 			if ( ! blockType ) return null;
 			const attributes = getBlockAttributes( clientId );
 			const match = getActiveBlockVariation( blockName, attributes );
+			const isSynced =
+				isReusableBlock( blockType ) || isTemplatePart( blockType );
 			const blockTypeInfo = {
+				isSynced,
 				title: blockType.title,
 				icon: blockType.icon,
 				description: blockType.description,
@@ -59,6 +67,7 @@ export default function useBlockDisplayInformation( clientId ) {
 			if ( ! match ) return blockTypeInfo;
 
 			return {
+				isSynced,
 				title: match.title || blockType.title,
 				icon: match.icon || blockType.icon,
 				description: match.description || blockType.description,

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -117,7 +117,9 @@ describe( 'PostTextEditor', () => {
 		await user.clear( textarea );
 
 		// Stop editing.
-		textarea.blur();
+		act( () => {
+			textarea.blur();
+		} );
 
 		expect( mockResetEditorBlocks ).toHaveBeenCalledWith( [] );
 	} );
@@ -147,7 +149,9 @@ describe( 'PostTextEditor', () => {
 
 		rerender( <PostTextEditor /> );
 
-		textarea.blur();
+		act( () => {
+			textarea.blur();
+		} );
 
 		expect( textarea ).toHaveValue( 'Goodbye World' );
 	} );

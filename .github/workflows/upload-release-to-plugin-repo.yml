@@ -20,7 +20,7 @@ jobs:
               run: |
                   IFS='.' read -r -a VERSION_ARRAY <<< "${TAG#v}"
                   RELEASE_BRANCH="release/${VERSION_ARRAY[0]}.${VERSION_ARRAY[1]}"
-                  echo "::set-output name=release_branch::$(echo $RELEASE_BRANCH)"
+                  echo "release_branch=${RELEASE_BRANCH}" >> $GITHUB_OUTPUT
 
     update-changelog:
         name: Update Changelog on ${{ matrix.branch }} branch
@@ -39,7 +39,7 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+              uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
               with:
                   ref: ${{ matrix.branch }}
                   token: ${{ secrets.GUTENBERG_TOKEN }}
@@ -79,7 +79,7 @@ jobs:
             - name: Commit the Changelog update
               run: |
                   git add changelog.txt
-                  # Remove files that are not meant to be commited
+                  # Remove files that are not meant to be committed
                   # ie. release_notes.txt created on the previous step.
                   git clean -fd
                   # Only attempt to commit changelog if it has been modified.
@@ -89,7 +89,7 @@ jobs:
                   fi
 
             - name: Upload Changelog artifact
-              uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
+              uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
               with:
                   name: changelog ${{ matrix.label }}
                   path: ./changelog.txt
@@ -113,7 +113,7 @@ jobs:
 
             - name: Get previous stable version
               id: get_previous_stable_version
-              run: echo ::set-output name=stable_version::$(awk -F ':\ ' '$1 == "Stable tag" {print $2}' ./trunk/readme.txt)
+              run: echo "stable_version=$(awk -F ':\ ' '$1 == "Stable tag" {print $2}' ./trunk/readme.txt)" >> $GITHUB_OUTPUT
 
             - name: Delete everything
               working-directory: ./trunk
@@ -134,7 +134,7 @@ jobs:
               run: sed -i "s/${STABLE_TAG_PLACEHOLDER}/${STABLE_TAG}/g" ./trunk/readme.txt
 
             - name: Download Changelog Artifact
-              uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v3.0.0
+              uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # v3.0.1
               with:
                   name: changelog trunk
                   path: trunk

@@ -1,4 +1,7 @@
 .wp-block-post-comments-form {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+
 	&[style*="font-weight"] :where(.comment-reply-title) {
 		font-weight: inherit;
 	}
