@@ -72,7 +72,7 @@ function CustomCSSControl( { blockName } ) {
 
 			setCSSError(
 				transformed === null
-					? __( 'Error while parsing the CSS.' )
+					? __( 'There is an error with your CSS structure.' )
 					: null
 			);
 		}
