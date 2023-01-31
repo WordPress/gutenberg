@@ -595,6 +595,7 @@ function Navigation( {
 						) }
 						<h3>{ __( 'Overlay Menu' ) }</h3>
 						<ToggleGroupControl
+							__nextHasNoMarginBottom
 							label={ __( 'Configure overlay menu' ) }
 							value={ overlayMenu }
 							help={ __(
