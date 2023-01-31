@@ -3,6 +3,7 @@
  */
 import { useMemo } from '@wordpress/element';
 
+import { hasBlockSupport } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
@@ -28,11 +29,16 @@ export default function BlockEdit( props ) {
 		__unstableLayoutClassNames,
 	} = props;
 	const { layout = null } = attributes;
+	const layoutSupport = hasBlockSupport(
+		name,
+		'__experimentalLayout',
+		false
+	);
 	const context = {
 		name,
 		isSelected,
 		clientId,
-		layout,
+		layout: layoutSupport ? layout : null,
 		__unstableLayoutClassNames,
 	};
 	return (
