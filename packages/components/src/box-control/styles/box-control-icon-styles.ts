@@ -21,7 +21,7 @@ export const Viewbox = styled.span`
 	height: 100%;
 `;
 
-const strokeFocus = ( { isFocused } ) => {
+const strokeFocus = ( { isFocused }: { isFocused: boolean } ) => {
 	return css( {
 		backgroundColor: 'currentColor',
 		opacity: isFocused ? 1 : 0.3,
