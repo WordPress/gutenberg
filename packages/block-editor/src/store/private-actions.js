@@ -11,7 +11,7 @@ import { Platform } from '@wordpress/element';
  *
  * @see https://github.com/WordPress/gutenberg/pull/46131
  */
-const privateSettings = [ 'inserterMediaCategories' ];
+const privateSettings = [ 'clearBlockSelection', 'inserterMediaCategories' ];
 
 /**
  * Action that updates the block editor settings and
