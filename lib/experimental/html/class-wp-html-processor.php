@@ -21,7 +21,36 @@
  * @since 6.2.0
  */
 
-
+/**
+ * Processes an input HTML document by applying a specified set of patches
+ * to that input. Retrieves content between matching opening and closing tags.
+ * Tokenizes HTML but does not fully parse the input document.
+ *
+ * ## Usage
+ *
+ * Note that this is a subclass of `WP_HTML_Tag_Processor`. Most of the
+ * functionality of this class is thus covered by `WP_HTML_Tag_Processor`'s
+ * documentation.
+ * The following documentation covers the additional features added by
+ * `WP_HTML_Processor`.
+ *
+ * ### Retrieving content
+ *
+ * When on an opening tag, it's possible to retrieve the content enclosed between
+ * that opening tag and its matching closing tag.
+ *
+ * Example:
+ * ```php
+ *     $html = '<div id="outer"><div>Inner div content</div><img></div>';
+ *     $tags = new WP_HTML_Processor( $html );
+ *     $tags->next_tag( [ 'tag_name' => 'div' ];
+ *     $label = $tags->get_content_inside_balanced_tags();
+ *     // $label === '<div>Inner div content</div><img>'
+ *     }
+ * ```
+ *
+ * @see WP_HTML_Tag_Processor
+ */
 class WP_HTML_Processor extends WP_HTML_Tag_Processor {
 	/**
 	 * Create a new tracking state for, based on the current opening tag.
