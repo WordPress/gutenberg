@@ -4,11 +4,12 @@
 import { useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Notice } from '@wordpress/components';
-import { EntityProvider } from '@wordpress/core-data';
+import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	BlockContextProvider,
 	BlockBreadcrumb,
+	__experimentalLoadingScreen as LoadingScreen,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
@@ -68,6 +69,7 @@ export default function Editor() {
 		isListViewOpen,
 		showIconLabels,
 		showBlockBreadcrumbs,
+		globalStylesId,
 	} = useSelect( ( select ) => {
 		const {
 			getEditedPostContext,
@@ -76,8 +78,16 @@ export default function Editor() {
 			isInserterOpened,
 			isListViewOpened,
 		} = unlock( select( editSiteStore ) );
+		const {
+			__experimentalGetCurrentGlobalStylesId,
+			getEditedEntityRecord,
+		} = select( coreStore );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
+		const _globalStylesId = __experimentalGetCurrentGlobalStylesId();
+		const globalStylesRecord = _globalStylesId
+			? getEditedEntityRecord( 'root', 'globalStyles', _globalStylesId )
+			: undefined;
 
 		// The currently selected entity to display.
 		// Typically template or template part in the site editor.
@@ -99,6 +109,8 @@ export default function Editor() {
 				'core/edit-site',
 				'showBlockBreadcrumbs'
 			),
+			globalStylesId: _globalStylesId,
+			globalStylesRecord,
 		};
 	}, [] );
 	const { setEditedPostContext } = useDispatch( editSiteStore );
@@ -152,6 +164,42 @@ export default function Editor() {
 	// action in <URlQueryController> from double-announcing.
 	useTitle( hasLoadedPost && title );
 
+	const contentDependencies = [
+		// Global styles entity ID
+		{
+			store: coreStore,
+			selector: '__experimentalGetCurrentGlobalStylesId',
+		},
+		// Global styles entity
+		globalStylesId && {
+			store: coreStore,
+			selector: 'getEditedEntityRecord',
+			args: [ 'root', 'globalStyles', globalStylesId ],
+		},
+		// Menus
+		{
+			store: coreStore,
+			selector: 'getEntityRecords',
+			args: [ 'root', 'menu', { per_page: -1, context: 'edit' } ],
+		},
+		// Pages
+		{
+			store: coreStore,
+			selector: 'getEntityRecords',
+			args: [
+				'postType',
+				'page',
+				{
+					parent: 0,
+					order: 'asc',
+					orderby: 'id',
+					per_page: -1,
+					context: 'view',
+				},
+			],
+		},
+	].filter( Boolean );
+
 	if ( ! hasLoadedPost ) {
 		return <CanvasSpinner />;
 	}
@@ -174,27 +222,31 @@ export default function Editor() {
 							notices={ isEditMode && <EditorSnackbars /> }
 							content={
 								<>
-									<GlobalStylesRenderer />
-									{ isEditMode && <EditorNotices /> }
-									{ showVisualEditor && editedPost && (
-										<BlockEditor />
-									) }
-									{ editorMode === 'text' &&
-										editedPost &&
-										isEditMode && <CodeEditor /> }
-									{ hasLoadedPost && ! editedPost && (
-										<Notice
-											status="warning"
-											isDismissible={ false }
-										>
-											{ __(
-												"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
-											) }
-										</Notice>
-									) }
-									{ isEditMode && (
-										<KeyboardShortcutsEditMode />
-									) }
+									<LoadingScreen
+										dataDependencies={ contentDependencies }
+									>
+										<GlobalStylesRenderer />
+										{ isEditMode && <EditorNotices /> }
+										{ showVisualEditor && editedPost && (
+											<BlockEditor />
+										) }
+										{ editorMode === 'text' &&
+											editedPost &&
+											isEditMode && <CodeEditor /> }
+										{ hasLoadedPost && ! editedPost && (
+											<Notice
+												status="warning"
+												isDismissible={ false }
+											>
+												{ __(
+													"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
+												) }
+											</Notice>
+										) }
+										{ isEditMode && (
+											<KeyboardShortcutsEditMode />
+										) }
+									</LoadingScreen>
 								</>
 							}
 							secondarySidebar={
