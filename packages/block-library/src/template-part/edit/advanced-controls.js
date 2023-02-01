@@ -71,10 +71,11 @@ export function TemplatePartAdvancedControls( {
 	};
 
 	return (
-		<InspectorControls __experimentalGroup="advanced">
+		<InspectorControls group="advanced">
 			{ isEntityAvailable && (
 				<>
 					<TextControl
+						__nextHasNoMarginBottom
 						label={ __( 'Title' ) }
 						value={ title }
 						onChange={ ( value ) => {

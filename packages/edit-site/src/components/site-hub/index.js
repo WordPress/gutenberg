@@ -100,6 +100,7 @@ const SiteHub = forwardRef(
 				<HStack
 					justify="flex-start"
 					className="edit-site-site-hub__text-content"
+					spacing="0"
 				>
 					<motion.div
 						className="edit-site-site-hub__view-mode-toggle-container"
@@ -135,7 +136,6 @@ const SiteHub = forwardRef(
 				{ showEditButton && (
 					<Button
 						className="edit-site-site-hub__edit-button"
-						label={ __( 'Open the editor' ) }
 						onClick={ () => {
 							__unstableSetCanvasMode( 'edit' );
 						} }

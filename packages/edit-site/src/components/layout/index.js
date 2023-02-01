@@ -52,7 +52,7 @@ const emptyResizeHandleStyles = {
 	left: undefined,
 };
 
-export default function Layout( { onError } ) {
+export default function Layout() {
 	// This ensures the edited entity id and type are initialized properly.
 	useInitEditedEntityFromURL();
 	useSyncCanvasModeWithURL();
@@ -236,6 +236,13 @@ export default function Layout( { onError } ) {
 										<ResizeHandle
 											direction="right"
 											variation="separator"
+											resizeWidthBy={ ( delta ) => {
+												setForcedWidth(
+													( forcedWidth ??
+														defaultSidebarWidth ) +
+														delta
+												);
+											} }
 										/>
 									),
 								} }
@@ -307,7 +314,7 @@ export default function Layout( { onError } ) {
 											ease: 'easeOut',
 										} }
 									>
-										<ErrorBoundary onError={ onError }>
+										<ErrorBoundary>
 											{ isEditorPage && <Editor /> }
 											{ isListPage && <ListPage /> }
 										</ErrorBoundary>

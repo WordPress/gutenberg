@@ -27,6 +27,11 @@
 		height: 100%;
 	}
 
+	.edit-site-visual-editor__editor-canvas {
+		height: 100%;
+		background: $white;
+	}
+
 	&.is-focus-mode {
 		.edit-site-layout.is-full-canvas & {
 			padding: $grid-unit-60;
@@ -97,13 +102,16 @@
 
 	&.is-variation-separator {
 		height: 100%;
+		width: $grid-unit-30;
+		right: 0;
 
 		&::after {
-			width: 1px;
+			width: 2px;
 			border-radius: 0;
-			background: $gray-800;
-			left: auto;
-			right: 50%;
+			background: transparent;
+			left: 50%;
+			transform: translateX(-1px);
+			right: 0;
 			transition: all ease 0.2s;
 			transition-delay: 0.1s;
 			@include reduce-motion;
@@ -112,10 +120,10 @@
 
 	&::after {
 		position: absolute;
-		top: 0;
+		top: $grid-unit-30;
 		left: $grid-unit-05;
 		right: 0;
-		bottom: 0;
+		bottom: $grid-unit-30;
 		content: "";
 		width: $grid-unit-05;
 		background: $gray-600;
@@ -137,12 +145,16 @@
 			background: $gray-400;
 		}
 		&.is-variation-separator::after {
-			width: 2px;
 			background: var(--wp-admin-theme-color);
 		}
 	}
 
 	&:focus::after {
 		box-shadow: 0 0 0 1px $gray-800, 0 0 0 calc(var(--wp-admin-border-width-focus) + 1px) var(--wp-admin-theme-color);
+	}
+
+	&.is-variation-separator:focus::after {
+		border-radius: $radius-block-ui;
+		box-shadow: inset 0 0 0 2px var(--wp-admin-theme-color);
 	}
 }

@@ -63,7 +63,6 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 .edit-site-layout__content {
 	flex-grow: 1;
 	display: flex;
-	gap: $canvas-padding;
 
 	// Hide scrollbars during the edit/view animation.
 	overflow: hidden;
@@ -85,14 +84,14 @@ $hub-height: $grid-unit-20 * 2 + $button-size;
 		top: 0;
 	}
 
-	.resizable-editor__drag-handle.is-right {
-		right: math.div(-$grid-unit-15, 2);
-	}
-
 	> div {
 		overflow-y: auto;
 		min-height: 100%;
 		@include custom-scrollbars-on-hover;
+	}
+
+	.resizable-editor__drag-handle {
+		right: 0;
 	}
 }
 

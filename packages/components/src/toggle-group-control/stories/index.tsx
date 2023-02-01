@@ -48,6 +48,7 @@ const Template: ComponentStory< typeof ToggleGroupControl > = ( {
 
 	return (
 		<ToggleGroupControl
+			__nextHasNoMarginBottom
 			{ ...props }
 			onChange={ ( ...changeArgs ) => {
 				setValue( ...changeArgs );

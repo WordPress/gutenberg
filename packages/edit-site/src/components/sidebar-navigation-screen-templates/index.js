@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalItemGroup as ItemGroup,
-	__experimentalHStack as HStack,
-} from '@wordpress/components';
+import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useEntityRecords } from '@wordpress/core-data';
@@ -119,21 +116,17 @@ export default function SidebarNavigationScreenTemplates( {
 		<SidebarNavigationScreen
 			path={ config[ postType ].path }
 			parentTitle={ __( 'Design' ) }
-			title={
-				<HStack justify="space-between">
-					<div style={ { flexShrink: 0 } }>
-						{ config[ postType ].labels.title }
-					</div>
-					{ ! isMobileViewport && (
-						<AddNewTemplate
-							templateType={ postType }
-							toggleProps={ {
-								className:
-									'edit-site-sidebar-navigation-screen-templates__add-button',
-							} }
-						/>
-					) }
-				</HStack>
+			title={ config[ postType ].labels.title }
+			actions={
+				! isMobileViewport && (
+					<AddNewTemplate
+						templateType={ postType }
+						toggleProps={ {
+							className:
+								'edit-site-sidebar-navigation-screen-templates__add-button',
+						} }
+					/>
+				)
 			}
 			content={
 				<>

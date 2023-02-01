@@ -6,11 +6,11 @@ import { useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import {
 	Button,
-	Flex,
-	FlexItem,
 	MenuItem,
 	Modal,
 	TextControl,
+	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -75,30 +75,22 @@ export default function RenameMenuItem( { template, onClose } ) {
 			{ isModalOpen && (
 				<Modal
 					title={ __( 'Rename' ) }
-					closeLabel={ __( 'Close' ) }
 					onRequestClose={ () => {
 						setIsModalOpen( false );
 					} }
 					overlayClassName="edit-site-list__rename-modal"
 				>
 					<form onSubmit={ onTemplateRename }>
-						<Flex align="flex-start" gap={ 8 }>
-							<FlexItem>
-								<TextControl
-									label={ __( 'Name' ) }
-									value={ title }
-									onChange={ setTitle }
-									required
-								/>
-							</FlexItem>
-						</Flex>
+						<VStack spacing="5">
+							<TextControl
+								__nextHasNoMarginBottom
+								label={ __( 'Name' ) }
+								value={ title }
+								onChange={ setTitle }
+								required
+							/>
 
-						<Flex
-							className="edit-site-list__rename-modal-actions"
-							justify="flex-end"
-							expanded={ false }
-						>
-							<FlexItem>
+							<HStack justify="right">
 								<Button
 									variant="tertiary"
 									onClick={ () => {
@@ -107,13 +99,12 @@ export default function RenameMenuItem( { template, onClose } ) {
 								>
 									{ __( 'Cancel' ) }
 								</Button>
-							</FlexItem>
-							<FlexItem>
+
 								<Button variant="primary" type="submit">
 									{ __( 'Save' ) }
 								</Button>
-							</FlexItem>
-						</Flex>
+							</HStack>
+						</VStack>
 					</form>
 				</Modal>
 			) }

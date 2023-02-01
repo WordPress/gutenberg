@@ -15,8 +15,6 @@ import { arrowLeft, arrowRight, arrowUp, arrowDown } from '@wordpress/icons';
 import DropdownMenu from '../';
 import { MenuItem } from '../../';
 
-jest.useFakeTimers();
-
 describe( 'DropdownMenu', () => {
 	it( 'should not render when neither controls nor children are assigned', () => {
 		render( <DropdownMenu /> );
@@ -33,9 +31,7 @@ describe( 'DropdownMenu', () => {
 	} );
 
 	it( 'should open menu when pressing arrow down on the toggle and the controls prop is used to define menu items', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		const controls = [
 			{
@@ -82,9 +78,7 @@ describe( 'DropdownMenu', () => {
 	} );
 
 	it( 'should open menu when pressing arrow down on the toggle and the children prop is used to define menu items', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render(
 			<DropdownMenu

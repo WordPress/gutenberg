@@ -1,7 +1,14 @@
 /**
+ * WordPress dependencies
+ */
+import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+
+/**
  * Internal dependencies
  */
-import { useStyle } from './hooks';
+import { unlock } from '../../experiments';
+
+const { useGlobalStyle } = unlock( blockEditorExperiments );
 
 export default function TypographyPreview( { name, element, headingLevel } ) {
 	let prefix = '';
@@ -11,14 +18,26 @@ export default function TypographyPreview( { name, element, headingLevel } ) {
 		prefix = `elements.${ element }.`;
 	}
 
-	const [ fontFamily ] = useStyle( prefix + 'typography.fontFamily', name );
-	const [ gradientValue ] = useStyle( prefix + 'color.gradient', name );
-	const [ backgroundColor ] = useStyle( prefix + 'color.background', name );
-	const [ color ] = useStyle( prefix + 'color.text', name );
-	const [ fontSize ] = useStyle( prefix + 'typography.fontSize', name );
-	const [ fontStyle ] = useStyle( prefix + 'typography.fontStyle', name );
-	const [ fontWeight ] = useStyle( prefix + 'typography.fontWeight', name );
-	const [ letterSpacing ] = useStyle(
+	const [ fontFamily ] = useGlobalStyle(
+		prefix + 'typography.fontFamily',
+		name
+	);
+	const [ gradientValue ] = useGlobalStyle( prefix + 'color.gradient', name );
+	const [ backgroundColor ] = useGlobalStyle(
+		prefix + 'color.background',
+		name
+	);
+	const [ color ] = useGlobalStyle( prefix + 'color.text', name );
+	const [ fontSize ] = useGlobalStyle( prefix + 'typography.fontSize', name );
+	const [ fontStyle ] = useGlobalStyle(
+		prefix + 'typography.fontStyle',
+		name
+	);
+	const [ fontWeight ] = useGlobalStyle(
+		prefix + 'typography.fontWeight',
+		name
+	);
+	const [ letterSpacing ] = useGlobalStyle(
 		prefix + 'typography.letterSpacing',
 		name
 	);
