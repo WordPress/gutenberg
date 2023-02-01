@@ -1287,7 +1287,7 @@ class WP_Theme_JSON_Gutenberg {
 					}
 					// Add layout aware margin rule for children of the root site blocks class.
 					$block_rules .= sprintf(
-						'.wp-site-blocks > %s {%s}',
+						'.wp-site-blocks > * + %s {%s}',
 						$selector,
 						$margin_styles['css']
 					);

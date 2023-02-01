@@ -263,7 +263,7 @@
 							}
 						}
 					],
-					"marginSelector": " > "
+					"marginSelector": " > * + "
 				},
 				"constrained": {
 					"name": "constrained",
@@ -324,7 +324,7 @@
 							}
 						}
 					],
-					"marginSelector": " > "
+					"marginSelector": " > * + "
 				},
 				"flex": {
 					"name": "flex",

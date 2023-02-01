@@ -375,7 +375,7 @@ export function getLayoutStyles( {
 				}
 			);
 			// Add layout aware margin rule for children of the root site blocks class.
-			ruleset += `.wp-site-blocks > ${ selector } { ${ marginRules } }`;
+			ruleset += `.wp-site-blocks > * + ${ selector } { ${ marginRules } }`;
 		}
 	}
 
