@@ -9,7 +9,7 @@ import {
 	store as editorStore,
 	experiments as editorExperiments,
 } from '@wordpress/editor';
-import { useMemo } from '@wordpress/element';
+import { StrictMode, useMemo } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
@@ -173,24 +173,28 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 	}
 
 	return (
-		<ShortcutProvider>
-			<SlotFillProvider>
-				<ExperimentalEditorProvider
-					settings={ editorSettings }
-					post={ post }
-					initialEdits={ initialEdits }
-					useSubRegistry={ false }
-					__unstableTemplate={ isTemplateMode ? template : undefined }
-					{ ...props }
-				>
-					<ErrorBoundary>
-						<EditorInitialization postId={ postId } />
-						<Layout styles={ styles } />
-					</ErrorBoundary>
-					<PostLockedModal />
-				</ExperimentalEditorProvider>
-			</SlotFillProvider>
-		</ShortcutProvider>
+		<StrictMode>
+			<ShortcutProvider>
+				<SlotFillProvider>
+					<ExperimentalEditorProvider
+						settings={ editorSettings }
+						post={ post }
+						initialEdits={ initialEdits }
+						useSubRegistry={ false }
+						__unstableTemplate={
+							isTemplateMode ? template : undefined
+						}
+						{ ...props }
+					>
+						<ErrorBoundary>
+							<EditorInitialization postId={ postId } />
+							<Layout styles={ styles } />
+						</ErrorBoundary>
+						<PostLockedModal />
+					</ExperimentalEditorProvider>
+				</SlotFillProvider>
+			</ShortcutProvider>
+		</StrictMode>
 	);
 }
 
