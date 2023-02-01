@@ -39,15 +39,9 @@ export function useHasShadowControl( name ) {
 }
 
 export default function ShadowPanel( { name, variation = '' } ) {
-	const [ shadow, setShadow ] = useGlobalStyle(
-		`${ variation }shadow`,
-		name
-	);
-	const [ userShadow ] = useGlobalStyle(
-		`${ variation }shadow`,
-		name,
-		'user'
-	);
+	const prefix = variation ? `variations.${ variation }.` : '';
+	const [ shadow, setShadow ] = useGlobalStyle( `${ prefix }shadow`, name );
+	const [ userShadow ] = useGlobalStyle( `${ prefix }shadow`, name, 'user' );
 	const hasShadow = () => !! userShadow;
 
 	const resetShadow = () => setShadow( undefined );
