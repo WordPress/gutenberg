@@ -39,9 +39,12 @@ const data = new TextEncoder().encode(
 			return {
 				...result,
 				...Object.fromEntries(
-					Object.entries( performanceResults[ index ][ hash ] ).map(
-						( [ key, value ] ) => [ metricsPrefix + key, value ]
-					)
+					Object.entries(
+						performanceResults[ index ][ hash ] ?? {}
+					).map( ( [ key, value ] ) => [
+						metricsPrefix + key,
+						value,
+					] )
 				),
 			};
 		} ),
@@ -51,7 +54,7 @@ const data = new TextEncoder().encode(
 					...result,
 					...Object.fromEntries(
 						Object.entries(
-							performanceResults[ index ][ baseHash ]
+							performanceResults[ index ][ baseHash ] ?? {}
 						).map( ( [ key, value ] ) => [
 							metricsPrefix + key,
 							value,
