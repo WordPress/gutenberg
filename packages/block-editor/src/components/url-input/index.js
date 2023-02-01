@@ -7,6 +7,7 @@ import scrollIntoView from 'dom-scroll-into-view';
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import { UP, DOWN, ENTER, TAB } from '@wordpress/keycodes';
@@ -424,6 +425,8 @@ class URLInput extends Component {
 
 	renderControl() {
 		const {
+			/** Start opting into the new margin-free styles that will become the default in a future version. */
+			__nextHasNoMarginBottom = false,
 			label = null,
 			className,
 			isFullWidth,
@@ -477,8 +480,19 @@ class URLInput extends Component {
 			return renderControl( controlProps, inputProps, loading );
 		}
 
+		if ( ! __nextHasNoMarginBottom ) {
+			deprecated( 'Bottom margin styles for wp.blockEditor.URLInput', {
+				since: '6.2',
+				version: '6.5',
+				hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version',
+			} );
+		}
+
 		return (
-			<BaseControl { ...controlProps }>
+			<BaseControl
+				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+				{ ...controlProps }
+			>
 				<input { ...inputProps } />
 				{ loading && <Spinner /> }
 			</BaseControl>

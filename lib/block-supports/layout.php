@@ -200,7 +200,11 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		);
 
 		if ( 'horizontal' === $layout_orientation ) {
-			$justify_content_options += array( 'space-between' => 'space-between' );
+			$justify_content_options    += array( 'space-between' => 'space-between' );
+			$vertical_alignment_options += array( 'stretch' => 'stretch' );
+		} else {
+			$justify_content_options    += array( 'stretch' => 'stretch' );
+			$vertical_alignment_options += array( 'space-between' => 'space-between' );
 		}
 
 		if ( ! empty( $layout['flexWrap'] ) && 'nowrap' === $layout['flexWrap'] ) {
@@ -267,6 +271,12 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				$layout_styles[] = array(
 					'selector'     => $selector,
 					'declarations' => array( 'align-items' => 'flex-start' ),
+				);
+			}
+			if ( ! empty( $layout['verticalAlignment'] ) && array_key_exists( $layout['verticalAlignment'], $vertical_alignment_options ) ) {
+				$layout_styles[] = array(
+					'selector'     => $selector,
+					'declarations' => array( 'justify-content' => $vertical_alignment_options[ $layout['verticalAlignment'] ] ),
 				);
 			}
 		}
@@ -458,7 +468,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		 * If a block's block.json skips serialization for spacing or spacing.blockGap,
 		 * don't apply the user-defined value to the styles.
 		 */
-		$should_skip_gap_serialization = gutenberg_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' );
+		$should_skip_gap_serialization = wp_should_skip_block_supports_serialization( $block_type, 'spacing', 'blockGap' );
 
 		$style = gutenberg_get_layout_style(
 			".$container_class.$container_class",
