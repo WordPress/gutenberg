@@ -288,6 +288,7 @@ export const __EXPERIMENTAL_PATHS_WITH_OVERRIDE = {
 	'color.duotone': true,
 	'color.gradients': true,
 	'color.palette': true,
+	'dimensions.aspectRatios': true,
 	'typography.fontSizes': true,
 	'spacing.spacingSizes': true,
 };
