@@ -76,7 +76,7 @@ export type BoxControlInputControlProps = UnitControlPassthroughProps & {
 	onChange?: ( nextValues: BoxControlValue ) => void;
 	onFocus?: (
 		_event: React.FocusEvent< HTMLInputElement >,
-		{ side: nextSide }: { side: keyof typeof LABELS }
+		{ side }: { side: keyof typeof LABELS }
 	) => void;
 	onHoverOff?: (
 		sides: Partial< Record< keyof BoxControlValue, boolean > >
