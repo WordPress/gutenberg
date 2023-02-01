@@ -100,6 +100,30 @@ test.describe( 'Buttons', () => {
 		).toBeVisible();
 	} );
 
+	test( 'appends http protocol to links added which are missing a protocol', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Regression: https://github.com/WordPress/gutenberg/issues/34307
+		await editor.insertBlock( { name: 'core/buttons' } );
+		await pageUtils.pressKeyWithModifier( 'primary', 'k' );
+		await expect(
+			page.locator( 'role=combobox[name="URL"i]' )
+		).toBeFocused();
+		await page.keyboard.type( 'example.com' );
+		await page.keyboard.press( 'Enter' );
+
+		// Move to "Edit" and switch back to edit
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Enter' );
+
+		// Check the value of the URL input has had http:// prepended.
+		const urlInput = await page.locator( 'role=combobox[name="URL"i]' );
+
+		await expect( urlInput ).toHaveValue( 'http://example.com' );
+	} );
+
 	test( 'can jump to the link editor using the keyboard shortcut', async ( {
 		editor,
 		page,
