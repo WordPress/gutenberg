@@ -296,16 +296,18 @@ const config = {
 	},
 };
 
+// WP_DEVTOOL global variable controls how source maps are generated.
+// By default, production (!) and development builds should include sourcemaps.
+// See: https://webpack.js.org/configuration/devtool/#devtool.
+config.devtool = process.env.WP_DEVTOOL || 'source-map';
+config.module.rules.unshift( {
+	test: /\.(j|t)sx?$/,
+	exclude: [ /node_modules/ ],
+	use: require.resolve( 'source-map-loader' ),
+	enforce: 'pre',
+} );
+
 if ( ! isProduction ) {
-	// WP_DEVTOOL global variable controls how source maps are generated.
-	// See: https://webpack.js.org/configuration/devtool/#devtool.
-	config.devtool = process.env.WP_DEVTOOL || 'source-map';
-	config.module.rules.unshift( {
-		test: /\.(j|t)sx?$/,
-		exclude: [ /node_modules/ ],
-		use: require.resolve( 'source-map-loader' ),
-		enforce: 'pre',
-	} );
 	config.devServer = {
 		devMiddleware: {
 			writeToDisk: true,
