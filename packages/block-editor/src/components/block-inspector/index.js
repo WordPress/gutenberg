@@ -210,10 +210,10 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 							group="dimensions"
 							label={ __( 'Dimensions' ) }
 						/>
-						<InspectorControls.Slot
+						{/* <InspectorControls.Slot
 							group="border"
 							label={ __( 'Border' ) }
-						/>
+						/> */}
 						<InspectorControls.Slot group="styles" />
 					</>
 				) }
@@ -369,10 +369,10 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 						group="dimensions"
 						label={ __( 'Dimensions' ) }
 					/>
-					<InspectorControls.Slot
+					{/* <InspectorControls.Slot
 						group="border"
 						label={ __( 'Border' ) }
-					/>
+					/> */}
 					<InspectorControls.Slot group="styles" />
 					<PositionControls />
 					<div>

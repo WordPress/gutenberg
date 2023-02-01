@@ -34,6 +34,7 @@ import {
 } from './dimensions';
 import useDisplayBlockControls from '../components/use-display-block-controls';
 import { shouldSkipSerialization } from './utils';
+import { EffectsPanel } from './effects';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
@@ -355,6 +356,7 @@ export const withBlockControls = createHigherOrderComponent(
 						<ColorEdit { ...props } />
 						<TypographyPanel { ...props } />
 						<BorderPanel { ...props } />
+						<EffectsPanel { ...props } />
 						<DimensionsPanel { ...props } />
 					</>
 				) }
