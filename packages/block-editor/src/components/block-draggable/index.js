@@ -19,7 +19,7 @@ const BlockDraggable = ( {
 	cloneClassname,
 	onDragStart,
 	onDragEnd,
-	context = 'canvas',
+	context,
 } ) => {
 	const { srcRootClientId, isDraggable, icon } = useSelect(
 		( select ) => {
