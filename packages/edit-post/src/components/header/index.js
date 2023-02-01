@@ -31,7 +31,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 		isPublishSidebarOpened,
 		isSaving,
 		showIconLabels,
-		isDistractionFree,
+		isDistractionFreeMode,
 	} = useSelect(
 		( select ) => ( {
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
@@ -40,12 +40,13 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 			isSaving: select( editPostStore ).isSavingMetaBoxes(),
 			showIconLabels:
 				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
-			isDistractionFree:
-				select( editPostStore ).isFeatureActive( 'distractionFree' ) &&
-				isLargeViewport,
+			isDistractionFreeMode:
+				select( editPostStore ).isFeatureActive( 'distractionFree' ),
 		} ),
 		[]
 	);
+
+	const isDistractionFree = isDistractionFreeMode && isLargeViewport;
 
 	const classes = classnames( 'edit-post-header' );
 

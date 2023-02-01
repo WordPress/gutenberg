@@ -323,6 +323,23 @@ export const getBlocksByClientId = createSelector(
 );
 
 /**
+ * Given an array of block client IDs, returns the corresponding array of block
+ * names.
+ *
+ * @param {Object}   state     Editor state.
+ * @param {string[]} clientIds Client IDs for which block names are to be returned.
+ *
+ * @return {string[]} Block names.
+ */
+export const getBlockNamesByClientId = createSelector(
+	( state, clientIds ) =>
+		getBlocksByClientId( state, clientIds )
+			.filter( Boolean )
+			.map( ( block ) => block.name ),
+	( state, clientIds ) => getBlocksByClientId( state, clientIds )
+);
+
+/**
  * Returns the number of blocks currently present in the post.
  *
  * @param {Object}  state        Editor state.
@@ -1263,17 +1280,6 @@ export function isTyping( state ) {
 }
 
 /**
- * Returns true if the the block interface should be hidden, or false otherwise.
- *
- * @param {Object} state Global application state.
- *
- * @return {boolean} Whether the block toolbar is hidden.
- */
-export function __experimentalIsBlockInterfaceHidden( state ) {
-	return state.isBlockInterfaceHidden;
-}
-
-/**
  * Returns true if the user is dragging blocks, or false otherwise.
  *
  * @param {Object} state Global application state.
@@ -1361,28 +1367,36 @@ export function isCaretWithinFormattedText() {
  *
  * @return {Object} Insertion point object with `rootClientId`, `index`.
  */
-export function getBlockInsertionPoint( state ) {
-	let rootClientId, index;
+export const getBlockInsertionPoint = createSelector(
+	( state ) => {
+		let rootClientId, index;
 
-	const {
-		insertionPoint,
-		selection: { selectionEnd },
-	} = state;
-	if ( insertionPoint !== null ) {
-		return insertionPoint;
-	}
+		const {
+			insertionPoint,
+			selection: { selectionEnd },
+		} = state;
+		if ( insertionPoint !== null ) {
+			return insertionPoint;
+		}
 
-	const { clientId } = selectionEnd;
+		const { clientId } = selectionEnd;
 
-	if ( clientId ) {
-		rootClientId = getBlockRootClientId( state, clientId ) || undefined;
-		index = getBlockIndex( state, selectionEnd.clientId ) + 1;
-	} else {
-		index = getBlockOrder( state ).length;
-	}
+		if ( clientId ) {
+			rootClientId = getBlockRootClientId( state, clientId ) || undefined;
+			index = getBlockIndex( state, selectionEnd.clientId ) + 1;
+		} else {
+			index = getBlockOrder( state ).length;
+		}
 
-	return { rootClientId, index };
-}
+		return { rootClientId, index };
+	},
+	( state ) => [
+		state.insertionPoint,
+		state.selection.selectionEnd.clientId,
+		state.blocks.parents,
+		state.blocks.order,
+	]
+);
 
 /**
  * Returns true if we should show the block insertion point.
@@ -1657,7 +1671,7 @@ export function canRemoveBlocks( state, clientIds, rootClientId = null ) {
  * @param {string}  clientId     The block client Id.
  * @param {?string} rootClientId Optional root client ID of block list.
  *
- * @return {boolean} Whether the given block is allowed to be moved.
+ * @return {boolean | undefined} Whether the given block is allowed to be moved.
  */
 export function canMoveBlock( state, clientId, rootClientId = null ) {
 	const attributes = getBlockAttributes( state, clientId );
@@ -2338,11 +2352,15 @@ export const getPatternsByBlockTypes = createSelector(
 		const normalizedBlockNames = Array.isArray( blockNames )
 			? blockNames
 			: [ blockNames ];
-		return patterns.filter( ( pattern ) =>
+		const filteredPatterns = patterns.filter( ( pattern ) =>
 			pattern?.blockTypes?.some?.( ( blockName ) =>
 				normalizedBlockNames.includes( blockName )
 			)
 		);
+		if ( filteredPatterns.length === 0 ) {
+			return EMPTY_ARRAY;
+		}
+		return filteredPatterns;
 	},
 	( state, blockNames, rootClientId ) => [
 		...__experimentalGetAllowedPatterns.getDependants(

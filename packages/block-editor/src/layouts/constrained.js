@@ -118,6 +118,7 @@ export default {
 					) }
 				</p>
 				<ToggleGroupControl
+					__nextHasNoMarginBottom
 					label={ __( 'Justification' ) }
 					value={ justifyContent }
 					onChange={ onJustificationChange }

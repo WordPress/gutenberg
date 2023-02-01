@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import BlockLibrary from '../library';
-import BlockEditorProvider from '../../provider';
+import { ExperimentalBlockEditorProvider } from '../../provider';
 import { patternCategories, patterns, reusableBlocks } from './utils/fixtures';
 import Inserter from '../';
 
@@ -16,11 +16,11 @@ export const libraryWithoutPatterns = () => {
 		display: 'inline-block',
 	};
 	return (
-		<BlockEditorProvider>
+		<ExperimentalBlockEditorProvider>
 			<div style={ wrapperStyle }>
 				<BlockLibrary showInserterHelpPanel />
 			</div>
-		</BlockEditorProvider>
+		</ExperimentalBlockEditorProvider>
 	);
 };
 
@@ -32,7 +32,7 @@ export const libraryWithPatterns = () => {
 		display: 'inline-block',
 	};
 	return (
-		<BlockEditorProvider
+		<ExperimentalBlockEditorProvider
 			settings={ {
 				__experimentalBlockPatternCategories: patternCategories,
 				__experimentalBlockPatterns: patterns,
@@ -41,7 +41,7 @@ export const libraryWithPatterns = () => {
 			<div style={ wrapperStyle }>
 				<BlockLibrary showInserterHelpPanel />
 			</div>
-		</BlockEditorProvider>
+		</ExperimentalBlockEditorProvider>
 	);
 };
 
@@ -53,7 +53,7 @@ export const libraryWithPatternsAndReusableBlocks = () => {
 		display: 'inline-block',
 	};
 	return (
-		<BlockEditorProvider
+		<ExperimentalBlockEditorProvider
 			settings={ {
 				__experimentalBlockPatternCategories: patternCategories,
 				__experimentalBlockPatterns: patterns,
@@ -63,7 +63,7 @@ export const libraryWithPatternsAndReusableBlocks = () => {
 			<div style={ wrapperStyle }>
 				<BlockLibrary showInserterHelpPanel />
 			</div>
-		</BlockEditorProvider>
+		</ExperimentalBlockEditorProvider>
 	);
 };
 
@@ -75,7 +75,7 @@ export const quickInserter = () => {
 		display: 'inline-block',
 	};
 	return (
-		<BlockEditorProvider
+		<ExperimentalBlockEditorProvider
 			settings={ {
 				__experimentalBlockPatternCategories: patternCategories,
 				__experimentalBlockPatterns: patterns,
@@ -85,6 +85,6 @@ export const quickInserter = () => {
 			<div style={ wrapperStyle }>
 				<Inserter __experimentalIsQuick />
 			</div>
-		</BlockEditorProvider>
+		</ExperimentalBlockEditorProvider>
 	);
 };

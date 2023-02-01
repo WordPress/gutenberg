@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring `^37.0.3` to requiring `^39.6.9`
+
 ### Enhancement
 
 -   Bump `eslint-plugin-jest` version to 27.2.1.

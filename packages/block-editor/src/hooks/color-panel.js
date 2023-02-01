@@ -75,7 +75,7 @@ export default function ColorPanel( {
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 
 	return (
-		<InspectorControls __experimentalGroup="color">
+		<InspectorControls group="color">
 			<ColorGradientSettingsDropdown
 				enableAlpha={ enableAlpha }
 				panelId={ clientId }

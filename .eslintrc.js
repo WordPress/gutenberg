@@ -140,6 +140,7 @@ const restrictedImports = [
 			'toString',
 			'trim',
 			'truncate',
+			'unescape',
 			'unionBy',
 			'uniq',
 			'uniqBy',
@@ -188,11 +189,6 @@ const restrictedImports = [
 		name: '@wordpress/edit-widgets',
 		message:
 			"edit-widgets is a WordPress top level package that shouldn't be imported into other packages",
-	},
-	{
-		name: '@wordpress/edit-navigation',
-		message:
-			"edit-navigation is a WordPress top level package that shouldn't be imported into other packages",
 	},
 ];
 

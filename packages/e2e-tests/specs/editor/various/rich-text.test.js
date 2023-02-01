@@ -515,11 +515,15 @@ describe( 'RichText', () => {
 		// text in the DOM directly, setting selection in the right place, and
 		// firing `compositionend`.
 		// See https://github.com/puppeteer/puppeteer/issues/4981.
-		await page.evaluate( () => {
+		await page.evaluate( async () => {
 			document.activeElement.textContent = '`a`';
 			const selection = window.getSelection();
+			// The `selectionchange` and `compositionend` events should run in separate event
+			// loop ticks to process all data store updates in time. Native events would be
+			// scheduled the same way.
 			selection.selectAllChildren( document.activeElement );
 			selection.collapseToEnd();
+			await new Promise( ( r ) => setTimeout( r, 0 ) );
 			document.activeElement.dispatchEvent(
 				new CompositionEvent( 'compositionend' )
 			);

@@ -14,6 +14,7 @@ $z-layers: (
 
 	// These next three share a stacking context
 	".block-library-template-part__selection-search": 2, // higher sticky element
+	".block-library-query-pattern__selection-search": 2, // higher sticky element
 
 	// These next two share a stacking context
 	".interface-complementary-area .components-panel" : 0, // lower scrolling content
@@ -135,7 +136,6 @@ $z-layers: (
 	".components-popover.interface-more-menu__content": 99998,
 	".components-popover.block-editor-rich-text__inline-format-toolbar": 99998,
 	".components-popover.block-editor-warning__dropdown": 99998,
-	".components-popover.edit-navigation-menu-actions__switcher-dropdown": 99998,
 
 	".components-autocomplete__results": 1000000,
 
@@ -170,7 +170,6 @@ $z-layers: (
 	".components-circular-option-picker__option.is-pressed": 1,
 	// Needs to be higher than .components-circular-option-picker__option.is-pressed.
 	".components-circular-option-picker__option.is-pressed + svg": 2,
-	".edit-navigation-layout__overlay": 999,
 
 	// Appear under the customizer heading UI, but over anything else.
 	".customize-widgets__topbar": 8,
