@@ -31,6 +31,9 @@ export type BoxControlProps = Pick<
 	 * @default true
 	 */
 	allowReset?: boolean;
+	/**
+	 * The id to use as a base for the unique HTML id attribute of the control.
+	 */
 	id?: string;
 	/**
 	 * Props for the internal `UnitControl` components.
