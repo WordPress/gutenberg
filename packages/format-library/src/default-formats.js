@@ -14,6 +14,7 @@ import { superscript } from './superscript';
 import { keyboard } from './keyboard';
 import { unknown } from './unknown';
 import { currentYear } from './current-year';
+import { footnote } from './footnote';
 
 export default [
 	bold,
@@ -29,4 +30,5 @@ export default [
 	keyboard,
 	unknown,
 	currentYear,
+	footnote,
 ];

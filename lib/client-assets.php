@@ -628,3 +628,72 @@ add_filter(
 		);
 	}
 );
+
+
+// We'd like to do some custom handling without attribute parsing.
+add_shortcode( '#', function( $attr, $content, $tag ) {
+	return $content;
+} );
+
+add_filter( 'do_shortcode_tag' , function( $output, $tag, $attr, $m ) {
+	if ( $tag !== '#' ) {
+		return $output;
+	}
+
+	// $m is the match:
+	// $m[0] is the full match.
+	// $m[1] is to check shortcode escaping.
+	// $m[2] is the shortcode name.
+	// $m[3] is the contents within the shortcode after the name. This includes
+	// the space between the name and the contents.
+	// $m[5] is the contents between the opening and closing shortcode tags (if
+	// any).
+	$note = $m[3];
+	$content = isset( $m[5] ) ? $m[5] : '';
+
+	// To do: find the most accessible markup.
+	return (
+		'<span data-core-footnote tabindex="0">' .
+			$content .
+		'</span>' .
+		'<span role="note">' .
+			$note .
+		'</span>' .
+		// To do: move to a proper stylesheet.
+		// The numbering is just a stylistic choice, it could also just be an
+		// asterisk or something else. We're not creating a numbered list so it
+		// doesn't matter.
+		'<style>
+			body {
+				counter-reset: footnotes;
+			}
+			[data-core-footnote] {
+				counter-increment: footnotes;
+			}
+			[data-core-footnote]::after,
+			[data-core-footnote] + span::before {
+				content: "[" counter(footnotes) "]";
+				vertical-align: super;
+				font-size: smaller;
+			}
+			[data-core-footnote]:focus {
+				outline: 1px dotted black;
+			}
+			[data-core-footnote] + span {
+				display: none;
+			}
+			[data-core-footnote]:focus + span {
+				display: block;
+				position: fixed;
+				bottom: 0;
+				padding: 10px;
+				border-top: 1px solid black;
+				background: white;
+			}
+			[data-core-footnote]:focus,
+			[data-core-footnote]:focus + span::before {
+				background: yellow;
+			}
+		</style>'
+	);
+}, 10, 4 );
