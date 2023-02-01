@@ -147,6 +147,8 @@ describe( 'Basic rendering', () => {
 		const searchInput = screen.getByRole( 'combobox', { name: 'URL' } );
 
 		expect( searchInput ).toBeVisible();
+		// Make sure we use the ARIA 1.0 pattern with aria-owns.
+		// See https://github.com/WordPress/gutenberg/issues/47147
 		expect( searchInput ).not.toHaveAttribute( 'aria-controls' );
 		expect( searchInput ).toHaveAttribute( 'aria-owns' );
 	} );
@@ -208,7 +210,7 @@ describe( 'Basic rendering', () => {
 		// We should have highlighted the first item using the keyboard.
 		expect( selectedSearchResultElement ).toEqual( firstSearchSuggestion );
 
-		// Check the aria-selected attribute is set on the highlighted item.
+		// Check the aria-selected attribute is set only on the highlighted item.
 		expect( firstSearchSuggestion ).toHaveAttribute(
 			'aria-selected',
 			'true'
@@ -228,7 +230,7 @@ describe( 'Basic rendering', () => {
 
 		// Check the aria-selected attribute is omitted on non-highlighted items.
 		expect( firstSearchSuggestion ).not.toHaveAttribute( 'aria-selected' );
-		// Check the aria-selected attribute is set on the highlighted item.
+		// Check the aria-selected attribute is set only on the highlighted item.
 		expect( secondSearchSuggestion ).toHaveAttribute(
 			'aria-selected',
 			'true'
@@ -244,7 +246,7 @@ describe( 'Basic rendering', () => {
 		// We should be back to highlighting the first search result again.
 		expect( selectedSearchResultElement ).toEqual( firstSearchSuggestion );
 
-		// Check the aria-selected attribute is set on the highlighted item.
+		// Check the aria-selected attribute is set only on the highlighted item.
 		expect( firstSearchSuggestion ).toHaveAttribute(
 			'aria-selected',
 			'true'
