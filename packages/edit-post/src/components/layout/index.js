@@ -83,7 +83,7 @@ function Layout( { styles } ) {
 		isInserterOpened,
 		isListViewOpened,
 		showIconLabels,
-		isDistractionFree,
+		isDistractionFreeMode,
 		showBlockBreadcrumbs,
 		isTemplateMode,
 		documentLabel,
@@ -116,9 +116,8 @@ function Layout( { styles } ) {
 			).getAllShortcutKeyCombinations( 'core/edit-post/next-region' ),
 			showIconLabels:
 				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
-			isDistractionFree:
-				select( editPostStore ).isFeatureActive( 'distractionFree' ) &&
-				isLargeViewport,
+			isDistractionFreeMode:
+				select( editPostStore ).isFeatureActive( 'distractionFree' ),
 			showBlockBreadcrumbs: select( editPostStore ).isFeatureActive(
 				'showBlockBreadcrumbs'
 			),
@@ -126,6 +125,8 @@ function Layout( { styles } ) {
 			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
 		};
 	}, [] );
+
+	const isDistractionFree = isDistractionFreeMode && isLargeViewport;
 
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
