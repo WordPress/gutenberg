@@ -2,6 +2,58 @@
 
 ## Unreleased
 
+### Deprecations
+
+-   `NumberControl`: Clarify deprecation message about `hideHTMLArrows` prop ([#47370](https://github.com/WordPress/gutenberg/pull/47370)).
+
+### Enhancements
+
+-   `Dropdown`: deprecate `position`  prop, use `popoverProps` instead ([46865](https://github.com/WordPress/gutenberg/pull/46865)).
+-   `Button`: improve padding for buttons with icon and text. ([46764](https://github.com/WordPress/gutenberg/pull/46764)).
+-   `ColorPalette`: Use computed color when css variable is passed to `ColorPicker` ([47181](https://github.com/WordPress/gutenberg/pull/47181)).
+
+### Internal
+
+-   `Toolbar`: unify Storybook examples under one file, migrate from knobs to controls ([47117](https://github.com/WordPress/gutenberg/pull/47117)).
+-   `DropdownMenu`: migrate Storybook to controls ([47149](https://github.com/WordPress/gutenberg/pull/47149)).
+-   Removed deprecated `@storybook/addon-knobs` dependency from the package ([47152](https://github.com/WordPress/gutenberg/pull/47152)).
+-   `ColorListPicker`: Convert to TypeScript ([#46358](https://github.com/WordPress/gutenberg/pull/46358)).
+-   `KeyboardShortcuts`: Convert to TypeScript ([#47429](https://github.com/WordPress/gutenberg/pull/47429)).
+-   `ColorPalette`, `BorderControl`, `GradientPicker`: refine types and logic around single vs multiple palettes
+ ([#47384](https://github.com/WordPress/gutenberg/pull/47384)).
+-   `Button`: Convert to TypeScript ([#46997](https://github.com/WordPress/gutenberg/pull/46997)).
+-   `QueryControls`: Convert to TypeScript ([#46721](https://github.com/WordPress/gutenberg/pull/46721)).
+-   `Notice`: refactor to TypeScript ([47118](https://github.com/WordPress/gutenberg/pull/47118)).
+
+### Bug Fix
+
+-   `TabPanel`: Fix initial tab selection when the tab declaration is lazily added to the `tabs` array ([47100](https://github.com/WordPress/gutenberg/pull/47100)).
+-   `InputControl`: Avoid the "controlled to uncontrolled" warning by forcing the internal `<input />` element to be always in controlled mode ([47250](https://github.com/WordPress/gutenberg/pull/47250)).
+
+## 23.2.0 (2023-01-11)
+
+### Internal
+-   `AlignmentMatrixControl`: Update center cell label to 'Center' instead of 'Center Center' ([#46852](https://github.com/WordPress/gutenberg/pull/46852)).
+-   `Toolbar`: move all subcomponents under the same folder ([46951](https://github.com/WordPress/gutenberg/pull/46951)).
+-   `Dashicon`: remove unnecessary type for `className` prop ([46849](https://github.com/WordPress/gutenberg/pull/46849)).
+-   `ColorPicker` & `QueryControls`: Replace bottom margin overrides with `__nextHasNoMarginBottom` ([#46448](https://github.com/WordPress/gutenberg/pull/46448)).
+-   `SandBox`: Convert to TypeScript ([#46478](https://github.com/WordPress/gutenberg/pull/46478)).
+-   `ResponsiveWrapper`: Convert to TypeScript ([#46480](https://github.com/WordPress/gutenberg/pull/46480)).
+-   `ItemGroup`: migrate Storybook to controls, refactor to TypeScript ([46945](https://github.com/WordPress/gutenberg/pull/46945)).
+
+### Bug Fix
+
+-   `Placeholder`: set fixed right margin for label's icon ([46918](https://github.com/WordPress/gutenberg/pull/46918)).
+-   `TreeGrid`: Fix right-arrow keyboard navigation when a row contains more than two focusable elements ([46998](https://github.com/WordPress/gutenberg/pull/46998)).
+
+## 23.1.0 (2023-01-02)
+
+### Breaking Changes
+
+-   `ColorPalette`: The experimental `__experimentalHasMultipleOrigins` prop has been removed ([#46315](https://github.com/WordPress/gutenberg/pull/46315)).
+
+## 23.0.0 (2022-12-14)
+
 ### Breaking Changes
 
 -   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
@@ -9,6 +61,7 @@
 ### New Feature
 
 -   `TabPanel`: support manual tab activation ([#46004](https://github.com/WordPress/gutenberg/pull/46004)).
+-   `TabPanel`: support disabled prop for tab buttons ([#46471](https://github.com/WordPress/gutenberg/pull/46471)).
 -   `BaseControl`: Add `useBaseControlProps` hook to help generate id-releated props ([#46170](https://github.com/WordPress/gutenberg/pull/46170)).
 
 ### Bug Fix
@@ -17,6 +70,9 @@
 -   `InputControl`: Fix internal `Flex` wrapper usage that could add an unintended `height: 100%` ([#46213](https://github.com/WordPress/gutenberg/pull/46213)).
 -   `Navigator`: Allow calling `goTo` and `goBack` twice in one render cycle ([#46391](https://github.com/WordPress/gutenberg/pull/46391)).
 -   `Modal`: Fix unexpected modal closing in IME Composition ([#46453](https://github.com/WordPress/gutenberg/pull/46453)).
+-   `Toolbar`: Fix duplicate focus style on anchor link button ([#46759](https://github.com/WordPress/gutenberg/pull/46759)).
+-   `useNavigateRegions`: Ensure region navigation picks the next region based on where the current user focus is located instead of starting at the beginning ([#44883](https://github.com/WordPress/gutenberg/pull/44883)).
+-   `ComboboxControl`: Fix unexpected behaviour in IME Composition ([#46827](https://github.com/WordPress/gutenberg/pull/46827)).
 
 ### Enhancements
 
@@ -45,10 +101,12 @@
 -   `Dashicon`: Convert to TypeScript ([#45924](https://github.com/WordPress/gutenberg/pull/45924)).
 -   `PaletteEdit`: add follow up changelog for #45681 and tests [#46095](https://github.com/WordPress/gutenberg/pull/46095).
 -   `AlignmentMatrixControl`: Convert to TypeScript ([#46162](https://github.com/WordPress/gutenberg/pull/46162)).
+-   `Theme`: Remove public export ([#46427](https://github.com/WordPress/gutenberg/pull/46427)).
 -   `Autocomplete`: Refactor away from `_.find()` ([#46537](https://github.com/WordPress/gutenberg/pull/46537)).
 -   `TabPanel`: Refactor away from `_.find()` ([#46537](https://github.com/WordPress/gutenberg/pull/46537)).
 -   `BottomSheetPickerCell`: Refactor away from `_.find()` for mobile ([#46537](https://github.com/WordPress/gutenberg/pull/46537)).
 -   Refactor global styles context away from `_.find()` for mobile ([#46537](https://github.com/WordPress/gutenberg/pull/46537)).
+-   `Dropdown`: Convert to TypeScript ([#45787](https://github.com/WordPress/gutenberg/pull/45787)).
 
 ### Documentation
 
@@ -62,6 +120,7 @@
 -   `TabPanel`: Add ability to set icon only tab buttons ([#45005](https://github.com/WordPress/gutenberg/pull/45005)).
 
 ### Internal
+
 -   `AnglePickerControl`: remove `:focus-visible' outline on `CircleOutlineWrapper` ([#45758](https://github.com/WordPress/gutenberg/pull/45758))
 
 ### Bug Fix

@@ -34,7 +34,6 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalImageEditor as ImageEditor,
-	__experimentalImageEditingProvider as ImageEditingProvider,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -219,27 +218,21 @@ const SiteLogo = ( {
 
 	const imgEdit =
 		canEditImage && isEditingImage ? (
-			<ImageEditingProvider
+			<ImageEditor
 				id={ logoId }
 				url={ logoUrl }
-				naturalWidth={ naturalWidth }
-				naturalHeight={ naturalHeight }
+				width={ currentWidth }
+				height={ currentHeight }
 				clientWidth={ clientWidth }
+				naturalHeight={ naturalHeight }
+				naturalWidth={ naturalWidth }
 				onSaveImage={ ( imageAttributes ) => {
 					setLogo( imageAttributes.id );
 				} }
-				isEditing={ isEditingImage }
-				onFinishEditing={ () => setIsEditingImage( false ) }
-			>
-				<ImageEditor
-					url={ logoUrl }
-					width={ currentWidth }
-					height={ currentHeight }
-					clientWidth={ clientWidth }
-					naturalHeight={ naturalHeight }
-					naturalWidth={ naturalWidth }
-				/>
-			</ImageEditingProvider>
+				onFinishEditing={ () => {
+					setIsEditingImage( false );
+				} }
+			/>
 		) : (
 			<ResizableBox
 				size={ {

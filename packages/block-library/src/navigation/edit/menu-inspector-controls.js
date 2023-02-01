@@ -2,38 +2,38 @@
  * WordPress dependencies
  */
 import {
-	__experimentalOffCanvasEditor as OffCanvasEditor,
+	experiments as blockEditorExperiments,
 	InspectorControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { PanelBody, VisuallyHidden } from '@wordpress/components';
+import {
+	PanelBody,
+	__experimentalHStack as HStack,
+	__experimentalHeading as Heading,
+	Spinner,
+} from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import ManageMenusButton from './manage-menus-button';
 import NavigationMenuSelector from './navigation-menu-selector';
+import { LeafMoreMenu } from '../leaf-more-menu';
+import { unlock } from '../../experiments';
+import DeletedNavigationWarning from './deleted-navigation-warning';
 
-const MenuInspectorControls = ( {
+/* translators: %s: The name of a menu. */
+const actionLabel = __( "Switch to '%s'" );
+
+const MainContent = ( {
 	clientId,
-	createNavigationMenuIsSuccess,
-	createNavigationMenuIsError,
-	currentMenuId = null,
-	isManageMenusButtonDisabled,
+	currentMenuId,
+	isLoading,
+	isNavigationMenuMissing,
 	onCreateNew,
-	onSelectClassicMenu,
-	onSelectNavigationMenu,
 } ) => {
-	const isOffCanvasNavigationEditorEnabled =
-		window?.__experimentalEnableOffCanvasNavigationEditor === true;
-	const menuControlsSlot = window?.__experimentalEnableBlockInspectorTabs
-		? 'list'
-		: undefined;
-	/* translators: %s: The name of a menu. */
-	const actionLabel = __( "Switch to '%s'" );
-
+	const { OffCanvasEditor } = unlock( blockEditorExperiments );
 	// Provide a hierarchy of clientIds for the given Navigation block (clientId).
 	// This is required else the list view will display the entire block tree.
 	const clientIdsTree = useSelect(
@@ -44,19 +44,50 @@ const MenuInspectorControls = ( {
 		[ clientId ]
 	);
 
+	if ( currentMenuId && isNavigationMenuMissing ) {
+		return <p>{ __( 'Select or create a menu' ) }</p>;
+	}
+
+	if ( isNavigationMenuMissing ) {
+		return <DeletedNavigationWarning onCreateNew={ onCreateNew } />;
+	}
+
+	if ( isLoading ) {
+		return <Spinner />;
+	}
+
 	return (
-		<InspectorControls __experimentalGroup={ menuControlsSlot }>
+		<OffCanvasEditor
+			blocks={ clientIdsTree }
+			isExpanded={ true }
+			LeafMoreMenu={ LeafMoreMenu }
+		/>
+	);
+};
+
+const MenuInspectorControls = ( props ) => {
+	const {
+		createNavigationMenuIsSuccess,
+		createNavigationMenuIsError,
+		currentMenuId = null,
+		onCreateNew,
+		onSelectClassicMenu,
+		onSelectNavigationMenu,
+		isManageMenusButtonDisabled,
+	} = props;
+
+	return (
+		<InspectorControls group="list">
 			<PanelBody
-				title={
-					isOffCanvasNavigationEditorEnabled ? null : __( 'Menu' )
-				}
+				title={ process.env.IS_GUTENBERG_PLUGIN ? null : __( 'Menu' ) }
 			>
-				<>
-					{ isOffCanvasNavigationEditorEnabled && (
-						<VisuallyHidden as="h2">
-							{ __( 'Menu' ) }
-						</VisuallyHidden>
-					) }
+				<HStack className="wp-block-navigation-off-canvas-editor__header">
+					<Heading
+						className="wp-block-navigation-off-canvas-editor__title"
+						level={ 2 }
+					>
+						{ __( 'Menu' ) }
+					</Heading>
 					<NavigationMenuSelector
 						currentMenuId={ currentMenuId }
 						onSelectClassicMenu={ onSelectClassicMenu }
@@ -69,19 +100,12 @@ const MenuInspectorControls = ( {
 							createNavigationMenuIsError
 						}
 						actionLabel={ actionLabel }
+						isManageMenusButtonDisabled={
+							isManageMenusButtonDisabled
+						}
 					/>
-					{ isOffCanvasNavigationEditorEnabled ? (
-						<OffCanvasEditor
-							blocks={ clientIdsTree }
-							isExpanded={ true }
-							selectBlockInCanvas={ false }
-						/>
-					) : (
-						<ManageMenusButton
-							disabled={ isManageMenusButtonDisabled }
-						/>
-					) }
-				</>
+				</HStack>
+				<MainContent { ...props } />
 			</PanelBody>
 		</InspectorControls>
 	);

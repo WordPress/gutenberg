@@ -28,6 +28,7 @@ export default function TemplatePartAreaSelector( { id } ) {
 
 	return (
 		<SelectControl
+			__nextHasNoMarginBottom
 			label={ __( 'Area' ) }
 			labelPosition="top"
 			options={ areaOptions }

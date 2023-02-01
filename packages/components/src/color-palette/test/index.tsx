@@ -52,9 +52,7 @@ describe( 'ColorPalette', () => {
 	} );
 
 	it( 'should call onClick on an active button with undefined', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const onChange = jest.fn();
 
 		render(
@@ -74,9 +72,7 @@ describe( 'ColorPalette', () => {
 	} );
 
 	it( 'should call onClick on an inactive button', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const onChange = jest.fn();
 
 		render(
@@ -102,9 +98,7 @@ describe( 'ColorPalette', () => {
 	} );
 
 	it( 'should call onClick with undefined, when the clearButton onClick is triggered', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const onChange = jest.fn();
 
 		render(
@@ -137,9 +131,7 @@ describe( 'ColorPalette', () => {
 	} );
 
 	it( 'should render dropdown and its content', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const onChange = jest.fn();
 
 		render(

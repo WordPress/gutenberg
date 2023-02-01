@@ -478,17 +478,7 @@ _Returns_
 
 ### reinitializeEditor
 
-Reinitializes the editor after the user chooses to reboot the editor after
-an unhandled error occurs, replacing previously mounted editor element using
-an initial state from prior to the crash.
-
-_Parameters_
-
--   _postType_ `Object`: Post type of the post to edit.
--   _postId_ `Object`: ID of the post to edit.
--   _target_ `Element`: DOM node in which editor is rendered.
--   _settings_ `?Object`: Editor settings object.
--   _initialEdits_ `Object`: Programmatic edits to apply initially, to be considered as non-user-initiated (bypass for unsaved changes prompt).
+Used to reinitialize the editor after an error. Now it's a deprecated noop function.
 
 ### store
 

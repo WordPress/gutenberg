@@ -16,6 +16,8 @@ data class GutenbergProps @JvmOverloads constructor(
     val enableMentions: Boolean,
     val enableXPosts: Boolean,
     val enableUnsupportedBlockEditor: Boolean,
+    val enableSupportSection: Boolean,
+    val enableOnlyCoreBlocks: Boolean,
     val canEnableUnsupportedBlockEditor: Boolean,
     val isAudioBlockMediaUploadEnabled: Boolean,
     val shouldUseFastImage: Boolean,
@@ -76,6 +78,8 @@ data class GutenbergProps @JvmOverloads constructor(
         putBoolean(PROP_CAPABILITIES_INSTAGRAM_EMBED_BLOCK, enableInstagramEmbed)
         putBoolean(PROP_CAPABILITIES_LOOM_EMBED_BLOCK, enableLoomEmbed)
         putBoolean(PROP_CAPABILITIES_SMARTFRAME_EMBED_BLOCK, enableSmartframeEmbed)
+        putBoolean(PROP_CAPABILITIES_SUPPORT_SECTION, enableSupportSection)
+        putBoolean(PROP_CAPABILITIES_ONLY_CORE_BLOCKS, enableOnlyCoreBlocks)
     }
 
     companion object {
@@ -119,6 +123,8 @@ data class GutenbergProps @JvmOverloads constructor(
         const val PROP_CAPABILITIES_IS_AUDIO_BLOCK_MEDIA_UPLOAD_ENABLED = "isAudioBlockMediaUploadEnabled"
         const val PROP_CAPABILITIES_SHOULD_USE_FASTIMAGE = "shouldUseFastImage"
         const val PROP_CAPABILITIES_REUSABLE_BLOCK = "reusableBlock"
+        const val PROP_CAPABILITIES_SUPPORT_SECTION = "supportSection"
+        const val PROP_CAPABILITIES_ONLY_CORE_BLOCKS = "onlyCoreBlocks"
 
         /**
          * Android converts some new language codes to older, deprecated ones, to preserve

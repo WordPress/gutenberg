@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -36,7 +31,7 @@ export function MetaBoxesSection( {
 			{ areCustomFieldsRegistered && (
 				<EnableCustomFieldsOption label={ __( 'Custom fields' ) } />
 			) }
-			{ map( thirdPartyMetaBoxes, ( { id, title } ) => (
+			{ thirdPartyMetaBoxes.map( ( { id, title } ) => (
 				<EnablePanelOption
 					key={ id }
 					label={ title }

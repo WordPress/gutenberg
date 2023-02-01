@@ -23,8 +23,6 @@ function InserterPreviewPanel( { item } ) {
 				{ isReusable || example ? (
 					<div className="block-editor-inserter__preview-content">
 						<BlockPreview
-							__experimentalPadding={ 16 }
-							viewportWidth={ example?.viewportWidth ?? 500 }
 							blocks={
 								example
 									? getBlockFromExample( name, {
@@ -36,6 +34,10 @@ function InserterPreviewPanel( { item } ) {
 									  } )
 									: createBlock( name, initialAttributes )
 							}
+							viewportWidth={ example?.viewportWidth ?? 500 }
+							additionalStyles={ [
+								{ css: 'body { padding: 16px; }' },
+							] }
 						/>
 					</div>
 				) : (

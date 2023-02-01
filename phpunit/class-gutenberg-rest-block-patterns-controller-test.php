@@ -67,24 +67,27 @@ class Gutenberg_REST_Block_Patterns_Controller_6_2_Test extends WP_Test_REST_Con
 				'categories'    => array( 'test' ),
 				'viewportWidth' => 1440,
 				'content'       => '<!-- wp:heading {"level":1} --><h1>One</h1><!-- /wp:heading -->',
+				'templateTypes' => array( 'page' ),
 			)
 		);
 
 		$test_registry->register(
 			'test/two',
 			array(
-				'title'      => 'Pattern Two',
-				'categories' => array( 'test' ),
-				'content'    => '<!-- wp:paragraph --><p>Two</p><!-- /wp:paragraph -->',
+				'title'         => 'Pattern Two',
+				'categories'    => array( 'test' ),
+				'content'       => '<!-- wp:paragraph --><p>Two</p><!-- /wp:paragraph -->',
+				'templateTypes' => array( 'single' ),
 			)
 		);
 
 		$test_registry->register(
 			'test/three',
 			array(
-				'title'      => 'Pattern Three',
-				'categories' => array( 'test', 'buttons', 'query' ),
-				'content'    => '<!-- wp:paragraph --><p>Three</p><!-- /wp:paragraph -->',
+				'title'         => 'Pattern Three',
+				'categories'    => array( 'test', 'buttons', 'query' ),
+				'content'       => '<!-- wp:paragraph --><p>Three</p><!-- /wp:paragraph -->',
+				'templateTypes' => array( '404' ),
 			)
 		);
 	}
@@ -142,32 +145,77 @@ class Gutenberg_REST_Block_Patterns_Controller_6_2_Test extends WP_Test_REST_Con
 
 	/**
 	 * Abstract methods that we must implement.
+	 *
+	 * @doesNotPerformAssertions
 	 */
 	public function test_register_routes() {
-		$this->markTestIncomplete();
+		// Controller does not implement this method.
 	}
+
 	public function test_get_items() {
-		$this->markTestIncomplete();
+		wp_set_current_user( self::$admin_id );
+
+		$expected_names  = array( 'test/one', 'test/two', 'test/three' );
+		$expected_fields = array( 'name', 'content', 'template_types' );
+
+		$request            = new WP_REST_Request( 'GET', '/wp/v2/block-patterns/patterns' );
+		$request['_fields'] = 'name,content,template_types';
+		$response           = rest_get_server()->dispatch( $request );
+		$data               = $response->get_data();
+
+		$this->assertCount( count( $expected_names ), $data );
+		foreach ( $data as $idx => $item ) {
+			$this->assertEquals( $expected_names[ $idx ], $item['name'] );
+			$this->assertEquals( $expected_fields, array_keys( $item ) );
+		}
 	}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_context_param() {
-		$this->markTestIncomplete();
+		// Controller does not implement this method.
 	}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_get_item() {
-		$this->markTestIncomplete();
+		// Controller does not implement this method.
 	}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_create_item() {
-		$this->markTestIncomplete();
+		// Controller does not implement this method.
 	}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_update_item() {
-		$this->markTestIncomplete();
+		// Controller does not implement this method.
 	}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_delete_item() {
-		$this->markTestIncomplete();
+		// Controller does not implement this method.
 	}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_prepare_item() {
-		$this->markTestIncomplete();
+		// Controller does not implement this method.
 	}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_get_item_schema() {
-		$this->markTestIncomplete();
+		// Controller does not implement this method.
 	}
 }

@@ -7,17 +7,74 @@ import {
 	store as coreStore,
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 	__experimentalFetchUrlData as fetchUrlData,
-	__experimentalFetchMedia as fetchMedia,
 } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
+import inserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import { store as editorStore } from '../../store';
 
 const EMPTY_BLOCKS_LIST = [];
+
+const BLOCK_EDITOR_SETTINGS = [
+	'__experimentalBlockDirectory',
+	'__experimentalBlockInspectorAnimation',
+	'__experimentalDiscussionSettings',
+	'__experimentalFeatures',
+	'__experimentalGlobalStylesBaseStyles',
+	'__experimentalPreferredStyleVariations',
+	'__experimentalSetIsInserterOpened',
+	'__unstableGalleryWithImageBlocks',
+	'alignWide',
+	'allowedBlockTypes',
+	'blockInspectorTabs',
+	'allowedMimeTypes',
+	'bodyPlaceholder',
+	'canLockBlocks',
+	'capabilities',
+	'clearBlockSelection',
+	'codeEditingEnabled',
+	'colors',
+	'disableCustomColors',
+	'disableCustomFontSizes',
+	'disableCustomSpacingSizes',
+	'disableCustomGradients',
+	'disableLayoutStyles',
+	'enableCustomLineHeight',
+	'enableCustomSpacing',
+	'enableCustomUnits',
+	'enableOpenverseMediaCategory',
+	'focusMode',
+	'fontSizes',
+	'gradients',
+	'generateAnchors',
+	'hasFixedToolbar',
+	'hasInlineToolbar',
+	'isDistractionFree',
+	'imageDefaultSize',
+	'imageDimensions',
+	'imageEditing',
+	'imageSizes',
+	'isRTL',
+	'keepCaretInsideBlock',
+	'locale',
+	'maxWidth',
+	'onUpdateDefaultBlockStyles',
+	'postsPerPage',
+	'readOnly',
+	'styles',
+	'template',
+	'templateLock',
+	'titlePlaceholder',
+	'supportsLayout',
+	'widgetTypesToHideFromLegacyWidgetBlock',
+	'__unstableHasCustomAppender',
+	'__unstableIsPreviewMode',
+	'__unstableResolvedAssets',
+];
 
 /**
  * React hook used to compute the block editor settings to use for the post editor.
@@ -133,51 +190,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		() => ( {
 			...Object.fromEntries(
 				Object.entries( settings ).filter( ( [ key ] ) =>
-					[
-						'__experimentalBlockDirectory',
-						'__experimentalBlockInspectorTabs',
-						'__experimentalDiscussionSettings',
-						'__experimentalFeatures',
-						'__experimentalPreferredStyleVariations',
-						'__experimentalSetIsInserterOpened',
-						'__unstableGalleryWithImageBlocks',
-						'alignWide',
-						'allowedBlockTypes',
-						'bodyPlaceholder',
-						'canLockBlocks',
-						'codeEditingEnabled',
-						'colors',
-						'disableCustomColors',
-						'disableCustomFontSizes',
-						'disableCustomSpacingSizes',
-						'disableCustomGradients',
-						'disableLayoutStyles',
-						'enableCustomLineHeight',
-						'enableCustomSpacing',
-						'enableCustomUnits',
-						'focusMode',
-						'fontSizes',
-						'gradients',
-						'generateAnchors',
-						'hasFixedToolbar',
-						'isDistractionFree',
-						'hasInlineToolbar',
-						'imageDefaultSize',
-						'imageDimensions',
-						'imageEditing',
-						'imageSizes',
-						'isRTL',
-						'keepCaretInsideBlock',
-						'maxWidth',
-						'onUpdateDefaultBlockStyles',
-						'styles',
-						'template',
-						'templateLock',
-						'titlePlaceholder',
-						'supportsLayout',
-						'widgetTypesToHideFromLegacyWidgetBlock',
-						'__unstableResolvedAssets',
-					].includes( key )
+					BLOCK_EDITOR_SETTINGS.includes( key )
 				)
 			),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
@@ -186,9 +199,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
-			// TODO: We should find a proper way to consolidate similar cases
-			// like reusable blocks, fetch entities, etc.
-			__unstableFetchMedia: fetchMedia,
+			inserterMediaCategories,
 			__experimentalFetchRichUrlData: fetchUrlData,
 			__experimentalCanUserUseUnfilteredHTML: canUseUnfilteredHTML,
 			__experimentalUndo: undo,

@@ -544,9 +544,9 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { name, attributes } = props;
 		const { backgroundColor, textColor } = attributes;
-		const userPalette = useSetting( 'color.palette.custom' ) || [];
-		const themePalette = useSetting( 'color.palette.theme' ) || [];
-		const defaultPalette = useSetting( 'color.palette.default' ) || [];
+		const userPalette = useSetting( 'color.palette.custom' );
+		const themePalette = useSetting( 'color.palette.theme' );
+		const defaultPalette = useSetting( 'color.palette.default' );
 		const colors = useMemo(
 			() => [
 				...( userPalette || [] ),

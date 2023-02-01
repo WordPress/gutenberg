@@ -83,7 +83,7 @@ _Parameters_
 
 _Returns_
 
--   `?WPShortcodeMatch`: Matched information.
+-   `WPShortcodeMatch | undefined`: Matched information.
 
 ### regexp
 

@@ -3,7 +3,9 @@
  */
 import * as github from '@actions/github';
 import * as core from '@actions/core';
-import type { WorkflowRunCompletedEvent } from '@octokit/webhooks-types';
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import type { PullRequestEvent } from '@octokit/webhooks-types';
 
 /**
  * Internal dependencies
@@ -14,39 +16,45 @@ import {
 	formatTestErrorMessage,
 	formatTestResults,
 	parseIssueBody,
+	renderCommitComment,
+	isReportComment,
 } from './markdown';
+import type { ReportedIssue } from './types';
 
 async function run() {
-	if (
-		github.context.eventName !== 'workflow_run' ||
-		github.context.payload.action !== 'completed'
-	) {
-		return;
-	}
-
 	const token = core.getInput( 'repo-token', { required: true } );
-	const artifactNamePrefix = core.getInput( 'artifact-name-prefix', {
+	const artifactPath = core.getInput( 'artifact-path', {
 		required: true,
 	} );
 
-	const api = new GitHubAPI( token, github.context.repo );
-	// Cast the payload type: https://github.com/actions/toolkit/tree/main/packages/github#webhook-payload-typescript-definitions
-	const {
-		workflow_run: { head_branch: headBranch, html_url: runURL, id: runID },
-	} = github.context.payload as WorkflowRunCompletedEvent;
+	const { runId: runID, repo, ref } = github.context;
+	const runURL = `https://github.com/${ repo.owner }/${ repo.repo }/actions/runs/${ runID }`;
+	const api = new GitHubAPI( token, repo );
 
-	const flakyTests = await api.downloadReportFromArtifact(
-		runID,
-		artifactNamePrefix
+	const flakyTestsDir = await fs.readdir( artifactPath );
+	const flakyTests = await Promise.all(
+		flakyTestsDir.map( ( filename ) =>
+			fs
+				.readFile( path.join( artifactPath, filename ), 'utf-8' )
+				.then( ( text ) => JSON.parse( text ) )
+		)
 	);
 
-	if ( ! flakyTests ) {
+	if ( ! flakyTests || flakyTests.length === 0 ) {
 		// No flaky tests reported in this run.
 		return;
 	}
 
+	const headBranch =
+		github.context.eventName === 'pull_request'
+			? // Cast the payload type: https://github.com/actions/toolkit/tree/main/packages/github#webhook-payload-typescript-definitions
+			  ( github.context.payload as PullRequestEvent ).pull_request.head
+					.ref
+			: ref.replace( /^refs\/(heads|tag)\//, '' );
+
 	const label = core.getInput( 'label', { required: true } );
 	const issues = await api.fetchAllIssuesLabeledFlaky( label );
+	const reportedIssues: ReportedIssue[] = [];
 
 	for ( const flakyTest of flakyTests ) {
 		const { title: testTitle } = flakyTest;
@@ -143,8 +151,44 @@ async function run() {
 			} );
 		}
 
+		reportedIssues.push( {
+			testTitle,
+			testPath,
+			issueNumber: issue.number,
+			issueUrl: issue.html_url,
+		} );
 		core.info( `Reported flaky test to ${ issue.html_url }` );
 	}
+
+	if ( reportedIssues.length === 0 ) {
+		return;
+	}
+
+	const { html_url: commentUrl } =
+		github.context.eventName === 'pull_request'
+			? await api.createCommentOnPR(
+					// Cast the payload type: https://github.com/actions/toolkit/tree/main/packages/github#webhook-payload-typescript-definitions
+					( github.context.payload as PullRequestEvent ).number,
+					renderCommitComment( {
+						runURL,
+						reportedIssues,
+						commitSHA: (
+							github.context.payload as PullRequestEvent
+						 ).pull_request.head.sha,
+					} ),
+					isReportComment
+			  )
+			: await api.createCommentOnCommit(
+					github.context.sha,
+					renderCommitComment( {
+						runURL,
+						reportedIssues,
+						commitSHA: github.context.sha,
+					} ),
+					isReportComment
+			  );
+
+	core.info( `Reported the summary of the flaky tests to ${ commentUrl }` );
 }
 
 function getIssueTitle( testTitle: string ) {

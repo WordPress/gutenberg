@@ -1,7 +1,7 @@
-.offcanvas-editor__appender .block-editor-inserter__toggle {
+.offcanvas-editor-appender .block-editor-inserter__toggle {
 	background-color: #1e1e1e;
 	color: #fff;
-	margin: $grid-unit-10 0 0 28px;
+	margin: $grid-unit-10 0 0 24px;
 	border-radius: 2px;
 	height: 24px;
 	min-width: 24px;
@@ -14,6 +14,10 @@
 	}
 }
 
+.offcanvas-editor-appender__description {
+	display: none;
+}
+
 .offcanvas-editor-list-view-tree-wrapper {
 	max-width: 100%;
 	overflow-x: auto;
@@ -23,4 +27,8 @@
 	display: block;
 	// sidebar width - tab panel padding
 	max-width: $sidebar-width - (2 * $grid-unit-20);
+}
+
+.offcanvas-editor-list-view-is-empty {
+	margin-left: $grid-unit-20;
 }

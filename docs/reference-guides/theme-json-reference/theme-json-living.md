@@ -22,6 +22,7 @@ Setting that enables the following UI tools:
 
 - border: color, radius, style, width
 - color: link
+- dimensions: minHeight
 - spacing: blockGap, margin, padding
 - typography: lineHeight
 
@@ -49,6 +50,16 @@ Settings related to borders.
 | radius | boolean | false |  |
 | style | boolean | false |  |
 | width | boolean | false |  |
+
+---
+
+### shadow
+
+Settings related to shadows.
+
+| Property  | Type   | Default | Props  |
+| ---       | ---    | ---    |---   |
+| presets | array |  | name, shadow, slug |
 
 ---
 
@@ -145,10 +156,10 @@ Border styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
-| color | string |  |
-| radius | undefined |  |
-| style | string |  |
-| width | string |  |
+| color | string, object |  |
+| radius | string, object |  |
+| style | string, object |  |
+| width | string, object |  |
 | top | object | color, style, width |
 | right | object | color, style, width |
 | bottom | object | color, style, width |
@@ -162,9 +173,9 @@ Color styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
-| background | string |  |
-| gradient | string |  |
-| text | string |  |
+| background | string, object |  |
+| gradient | string, object |  |
+| text | string, object |  |
 
 ---
 
@@ -174,7 +185,7 @@ Spacing styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
-| blockGap | string |  |
+| blockGap | string, object |  |
 | margin | object | bottom, left, right, top |
 | padding | object | bottom, left, right, top |
 
@@ -186,14 +197,14 @@ Typography styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
-| fontFamily | string |  |
-| fontSize | string |  |
-| fontStyle | string |  |
-| fontWeight | string |  |
-| letterSpacing | string |  |
-| lineHeight | string |  |
-| textDecoration | string |  |
-| textTransform | string |  |
+| fontFamily | string, object |  |
+| fontSize | string, object |  |
+| fontStyle | string, object |  |
+| fontWeight | string, object |  |
+| letterSpacing | string, object |  |
+| lineHeight | string, object |  |
+| textDecoration | string, object |  |
+| textTransform | string, object |  |
 
 ---
 
@@ -203,7 +214,7 @@ CSS and SVG filter styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
-| duotone | string |  |
+| duotone | string, object |  |
 
 ---
 
@@ -220,10 +231,10 @@ Outline styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
-| color | string |  |
-| offset | string |  |
-| style | string |  |
-| width | string |  |
+| color | string, object |  |
+| offset | string, object |  |
+| style | string, object |  |
+| width | string, object |  |
 
 ---
 

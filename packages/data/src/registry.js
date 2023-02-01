@@ -14,6 +14,7 @@ import deprecated from '@wordpress/deprecated';
 import createReduxStore from './redux-store';
 import coreDataStore from './store';
 import { createEmitter } from './utils/emitter';
+import { lock, unlock } from './experiments';
 
 /** @typedef {import('./types').StoreDescriptor} StoreDescriptor */
 
@@ -60,7 +61,7 @@ function getStoreName( storeNameOrDescriptor ) {
 export function createRegistry( storeConfigs = {}, parent = null ) {
 	const stores = {};
 	const emitter = createEmitter();
-	const listeningStores = new Set();
+	let listeningStores = null;
 
 	/**
 	 * Global listener called for each store's update.
@@ -112,7 +113,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 */
 	function select( storeNameOrDescriptor ) {
 		const storeName = getStoreName( storeNameOrDescriptor );
-		listeningStores.add( storeName );
+		listeningStores?.add( storeName );
 		const store = stores[ storeName ];
 		if ( store ) {
 			return store.getSelectors();
@@ -122,11 +123,12 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	}
 
 	function __unstableMarkListeningStores( callback, ref ) {
-		listeningStores.clear();
+		listeningStores = new Set();
 		try {
 			return callback.call( this );
 		} finally {
 			ref.current = Array.from( listeningStores );
+			listeningStores = null;
 		}
 	}
 
@@ -143,7 +145,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 */
 	function resolveSelect( storeNameOrDescriptor ) {
 		const storeName = getStoreName( storeNameOrDescriptor );
-		listeningStores.add( storeName );
+		listeningStores?.add( storeName );
 		const store = stores[ storeName ];
 		if ( store ) {
 			return store.getResolveSelectors();
@@ -165,7 +167,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 */
 	function suspendSelect( storeNameOrDescriptor ) {
 		const storeName = getStoreName( storeNameOrDescriptor );
-		listeningStores.add( storeName );
+		listeningStores?.add( storeName );
 		const store = stores[ storeName ];
 		if ( store ) {
 			return store.getSuspendSelectors();
@@ -244,6 +246,22 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		};
 		stores[ name ] = store;
 		store.subscribe( globalListener );
+
+		// Copy private actions and selectors from the parent store.
+		if ( parent ) {
+			try {
+				unlock( store.store ).registerPrivateActions(
+					unlock( parent ).privateActionsOf( name )
+				);
+				unlock( store.store ).registerPrivateSelectors(
+					unlock( parent ).privateSelectorsOf( name )
+				);
+			} catch ( e ) {
+				// unlock() throws if store.store was not locked.
+				// The error indicates there's nothing to do here so let's
+				// ignore it.
+			}
+		}
 	}
 
 	/**
@@ -333,5 +351,24 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		parent.subscribe( globalListener );
 	}
 
-	return withPlugins( registry );
+	const registryWithPlugins = withPlugins( registry );
+	lock( registryWithPlugins, {
+		privateActionsOf: ( name ) => {
+			try {
+				return unlock( stores[ name ].store ).privateActions;
+			} catch ( e ) {
+				// unlock() throws an error the store was not locked – this means
+				// there no private actions are available
+				return {};
+			}
+		},
+		privateSelectorsOf: ( name ) => {
+			try {
+				return unlock( stores[ name ].store ).privateSelectors;
+			} catch ( e ) {
+				return {};
+			}
+		},
+	} );
+	return registryWithPlugins;
 }
