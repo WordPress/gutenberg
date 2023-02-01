@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import useSetting from '../use-setting';
+import { useSettings } from '../use-settings';
 import { POPOVER_PROPS } from './constants';
 import { useImageEditingContext } from './context';
 
@@ -51,7 +51,11 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 	const { isInProgress, aspect, setAspect, defaultAspect } =
 		useImageEditingContext();
 
-	const themeRatios = useSetting( 'dimensions.aspectRatios.theme' ) || [];
+	const [ themeRatios ] =
+		useSettings( [ 'dimensions.aspectRatios.theme' ] ) || [];
+	const [ showDefaultRatios ] = useSettings( [
+		'dimensions.defaultAspectRatios',
+	] );
 
 	return (
 		<DropdownMenu
@@ -76,10 +80,14 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 								title: __( 'Original' ),
 								aspect: defaultAspect,
 							},
-							{
-								title: __( 'Square' ),
-								aspect: 1,
-							},
+							...( showDefaultRatios
+								? [
+										{
+											title: __( 'Square' ),
+											aspect: 1,
+										},
+								  ]
+								: [] ),
 						] }
 					/>
 					{ themeRatios.length > 0 && (
@@ -99,52 +107,56 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 							) }
 						/>
 					) }
-					<AspectGroup
-						label={ __( 'Landscape' ) }
-						isDisabled={ isInProgress }
-						onClick={ ( newAspect ) => {
-							setAspect( newAspect );
-							onClose();
-						} }
-						value={ aspect }
-						aspectRatios={ [
-							{
-								title: __( '16:9' ),
-								aspect: 16 / 9,
-							},
-							{
-								title: __( '4:3' ),
-								aspect: 4 / 3,
-							},
-							{
-								title: __( '3:2' ),
-								aspect: 3 / 2,
-							},
-						] }
-					/>
-					<AspectGroup
-						label={ __( 'Portrait' ) }
-						isDisabled={ isInProgress }
-						onClick={ ( newAspect ) => {
-							setAspect( newAspect );
-							onClose();
-						} }
-						value={ aspect }
-						aspectRatios={ [
-							{
-								title: __( '9:16' ),
-								aspect: 9 / 16,
-							},
-							{
-								title: __( '3:4' ),
-								aspect: 3 / 4,
-							},
-							{
-								title: __( '2:3' ),
-								aspect: 2 / 3,
-							},
-						] }
-					/>
+					{ showDefaultRatios && (
+						<AspectGroup
+							label={ __( 'Landscape' ) }
+							isDisabled={ isInProgress }
+							onClick={ ( newAspect ) => {
+								setAspect( newAspect );
+								onClose();
+							} }
+							value={ aspect }
+							aspectRatios={ [
+								{
+									title: __( '16:9' ),
+									aspect: 16 / 9,
+								},
+								{
+									title: __( '4:3' ),
+									aspect: 4 / 3,
+								},
+								{
+									title: __( '3:2' ),
+									aspect: 3 / 2,
+								},
+							] }
+						/>
+					) }
+					{ showDefaultRatios && (
+						<AspectGroup
+							label={ __( 'Portrait' ) }
+							isDisabled={ isInProgress }
+							onClick={ ( newAspect ) => {
+								setAspect( newAspect );
+								onClose();
+							} }
+							value={ aspect }
+							aspectRatios={ [
+								{
+									title: __( '9:16' ),
+									aspect: 9 / 16,
+								},
+								{
+									title: __( '3:4' ),
+									aspect: 3 / 4,
+								},
+								{
+									title: __( '2:3' ),
+									aspect: 2 / 3,
+								},
+							] }
+						/>
+					) }
 				</>
 			) }
 		</DropdownMenu>
