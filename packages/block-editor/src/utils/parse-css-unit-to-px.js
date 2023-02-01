@@ -24,7 +24,11 @@ function parseUnit( cssUnit ) {
  * @return {number} evaluated expression.
  */
 function calculate( expression ) {
-	return Function( `'use strict'; return (${ expression })` )();
+	try {
+		return Function( `'use strict'; return (${ expression })` )();
+	} catch ( err ) {
+		return null;
+	}
 }
 
 /**
@@ -117,21 +121,43 @@ function isMathExpression( cssUnit ) {
 function evalMathExpression( cssUnit ) {
 	let errorFound = false;
 	// Convert every part of the expression to px values.
-	const cssUnitsBits = cssUnit
-		.split( /(?!^-)[+*\/-](\s?-)?/g )
-		.filter( Boolean );
-	for ( const unit of cssUnitsBits ) {
+	// The following regex matches numbers that have a following unit
+	// E.g. 5.25rem, 1vw
+	const regex = /\d+\.?\d*[a-zA-Z]+|\.\d+[a-zA-Z]+/g;
+	cssUnit = cssUnit.replace( regex, ( foundUnit ) => {
 		// Standardize the unit to px and extract the value.
-		const parsedUnit = parseUnit( getPxFromCssUnit( unit ) );
+		const parsedUnit = parseUnit( getPxFromCssUnit( foundUnit ) );
 		if ( ! parseFloat( parsedUnit.value ) ) {
 			errorFound = true;
-			// End early since we are dealing with a null value.
-			break;
+			return;
 		}
-		cssUnit = cssUnit.replace( unit, parsedUnit.value );
+		return parsedUnit.value;
+	} );
+
+	// For mixed math expressions wrapped within CSS expressions
+	if ( ! errorFound && cssUnit.match( /(max|min|clamp)/g ) ) {
+		const values = cssUnit.split( ',' );
+		for ( const currentValue of values ) {
+			if ( isMathExpression( currentValue ) ) {
+				const calculatedExpression = calculate( currentValue );
+
+				if ( calculatedExpression ) {
+					const calculatedValue =
+						calculatedExpression.toFixed( 0 ) + 'px';
+					cssUnit = cssUnit.replace( currentValue, calculatedValue );
+				}
+			}
+		}
+		const parsedValue = parseUnitFunction( cssUnit );
+		return ! parsedValue ? null : parsedValue.value + parsedValue.unit;
 	}
 
-	return errorFound ? null : calculate( cssUnit ).toFixed( 0 ) + 'px';
+	if ( errorFound ) {
+		return null;
+	}
+
+	const calculatedResult = calculate( cssUnit );
+	return calculatedResult ? calculatedResult.toFixed( 0 ) + 'px' : null;
 }
 
 /**
