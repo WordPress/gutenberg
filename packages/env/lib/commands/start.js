@@ -44,8 +44,9 @@ const CONFIG_CACHE_KEY = 'config_checksum';
  * @param {boolean} options.debug   True if debug mode is enabled.
  * @param {boolean} options.update  If true, update sources.
  * @param {string}  options.xdebug  The Xdebug mode to set.
+ * @param {string}  options.xhprof  The XHProf mode to set.
  */
-module.exports = async function start( { spinner, debug, update, xdebug } ) {
+module.exports = async function start( { spinner, debug, update, xdebug, xhprof } ) {
 	spinner.text = 'Reading configuration.';
 	await checkForLegacyInstall( spinner );
 
@@ -53,6 +54,7 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 		spinner,
 		debug,
 		xdebug,
+		xhprof,
 		writeChanges: true,
 	} );
 
