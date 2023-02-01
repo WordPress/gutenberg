@@ -8,6 +8,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import useSetting from '../use-setting';
 import { POPOVER_PROPS } from './constants';
 import { useImageEditingContext } from './context';
 
@@ -32,9 +33,25 @@ function AspectGroup( { aspectRatios, isDisabled, label, onClick, value } ) {
 	);
 }
 
+function ratioToNumber( str ) {
+	const [ a, b, ...rest ] = str.split( '/' ).map( Number );
+	if (
+		a <= 0 ||
+		b <= 0 ||
+		Number.isNaN( a ) ||
+		Number.isNaN( b ) ||
+		rest.length
+	) {
+		return NaN;
+	}
+	return b ? a / b : a;
+}
+
 export default function AspectRatioDropdown( { toggleProps } ) {
 	const { isInProgress, aspect, setAspect, defaultAspect } =
 		useImageEditingContext();
+
+	const themeRatios = useSetting( 'dimensions.aspectRatios.theme' ) || [];
 
 	return (
 		<DropdownMenu
@@ -65,6 +82,23 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 							},
 						] }
 					/>
+					{ themeRatios.length > 0 && (
+						<AspectGroup
+							label={ __( 'Theme' ) }
+							isDisabled={ isInProgress }
+							onClick={ ( newAspect ) => {
+								setAspect( newAspect );
+								onClose();
+							} }
+							value={ aspect }
+							aspectRatios={ themeRatios.map(
+								( { name, ratio } ) => ( {
+									title: name,
+									aspect: ratioToNumber( ratio ),
+								} )
+							) }
+						/>
+					) }
 					<AspectGroup
 						label={ __( 'Landscape' ) }
 						isDisabled={ isInProgress }
