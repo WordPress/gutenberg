@@ -20,7 +20,7 @@
 
 	@include break-medium {
 		.has-secondary-sidebar .components-editor-notices__snackbar {
-			padding-left: calc(#{$grid-unit-20} + #{$nav-sidebar-width});
+			padding-left: $grid-unit-20 + $nav-sidebar-width;
 		}
 	}
 }

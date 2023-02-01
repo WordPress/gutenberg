@@ -14,13 +14,13 @@
 
 .is-distraction-free {
 	.components-editor-notices__snackbar {
-		bottom: calc(#{$grid-unit-50} / 2);
+		bottom: math.div($grid-unit-50, 2);
 	}
 }
 
 .has-secondary-sidebar {
 	.components-editor-notices__snackbar {
-		padding-left: calc(#{$grid-unit-20} + #{$nav-sidebar-width});
+		padding-left: $grid-unit-20 + $nav-sidebar-width;
 	}
 }
 
