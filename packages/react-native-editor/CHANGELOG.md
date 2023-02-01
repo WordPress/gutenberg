@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Update React Native Reanimated to 2.9.1-wp-3 [#47574]
 
 ## 1.87.2
 -   [*] Add boolean contentStyle and clientId check to Column Edit InnerBlocks [#47234]
