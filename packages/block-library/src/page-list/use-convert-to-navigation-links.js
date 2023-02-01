@@ -5,6 +5,13 @@ import { createBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
+/**
+ * Converts an array of pages into a nested array of navigation link blocks.
+ *
+ * @param {Array}  pages An array of pages.
+ *
+ * @return {Array} A nested array of navigation link blocks.
+ */
 function createNavigationLinks( pages = [] ) {
 	const linkMap = {};
 	const navigationLinks = [];
@@ -41,6 +48,7 @@ function createNavigationLinks( pages = [] ) {
 
 /**
  * Finds a navigation link block by id, recursively.
+ * It might be possible to make this a more generic helper function.
  *
  * @param {Array}  navigationLinks An array of navigation link blocks.
  * @param {number} id              The id of the navigation link to find.
@@ -49,17 +57,19 @@ function createNavigationLinks( pages = [] ) {
  */
 function findById( navigationLinks, id ) {
 	for ( const navigationLink of navigationLinks ) {
+		// Is this the link we're looking for?
 		if ( navigationLink.attributes.id === id ) {
 			return navigationLink;
 		}
-		if (
-			navigationLink.innerBlocks &&
-			navigationLink.innerBlocks.length > 0
-		) {
+
+		// If not does it have innerBlocks?
+		if ( navigationLink.innerBlocks && navigationLink.innerBlocks.length ) {
 			const foundNavigationLink = findById(
 				navigationLink.innerBlocks,
 				id
 			);
+
+			// Does the innerBlocks have the link we're looking for?
 			if ( foundNavigationLink ) {
 				return foundNavigationLink;
 			}
