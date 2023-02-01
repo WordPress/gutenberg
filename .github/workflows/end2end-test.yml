@@ -70,7 +70,7 @@ jobs:
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
-            martix:
+            matrix:
                 part: [1, 2]
 
         steps:
