@@ -2,19 +2,22 @@
 
 This document introduces the main concepts related to styles that affect the user content in the block editor. It points to the relevant reference guides and tutorials for readers to dig deeper into each one of the ideas presented. It's aimed to block authors and people working in the block editor project.
 
-1. HTML and CSS
-2. Block styles
-
--   From UI controls to HTML markup
--   Block Supports API
--   Current limits of the Block Supports API
-
-3. Global styles
-
--   Gather data
--   Consolidate data
--   From data to styles
--   Current limits of the Global styles API
+1. [HTML and CSS](#html-and-css)
+2. [Block styles](#block-styles)
+  - [From UI controls to HTML markup](#from-ui-controls-to-html-markup)
+  - [Block Supports API](#block-supports-api)
+  - [Current limitations of the Block Supports API](#current-limitations-of-the-block-supports-api)
+3. [Global styles](#global-styles)
+  - [Gather data](#gather-data)
+  - [Consolidate data](#consolidate-data)
+  - [From data to styles](#from-data-to-styles)
+  - [Current limitations of the Global Styles API](#current-limitations-of-the-global-styles-api)
+4. [Layout styles](#layout-styles)
+  - [Base layout styles](#base-layout-styles)
+  - [Individual layout styles](#individual-layout-styles)
+  - [Available layout types](#available-layout-types)
+  - [Targeting layout or container blocks from themes](#targeting-layout-or-container-blocks-from-themes)
+  - [Opting out of generated layout styles](#opting-out-of-generated-layout-styles)
 
 ### HTML and CSS
 
@@ -464,7 +467,7 @@ In addition to the CSS Custom Properties, all presets but duotone generate CSS c
 /* vivid-red */
 .has-vivid-red-color { color: var(--wp--preset--color--vivid-red) !important; }
 .has-vivid-red-background-color { background-color: var(--wp--preset--color--vivid-red) !important; }
-.has-vivid-red-bordfer-color { border-color: var(--wp--preset--color--vivid-red) !important; }
+.has-vivid-red-border-color { border-color: var(--wp--preset--color--vivid-red) !important; }
 
 /* foreground */
 .has-foreground-color { color: var(--wp--preset--color--foreground) !important; }
@@ -479,22 +482,87 @@ In addition to the CSS Custom Properties, all presets but duotone generate CSS c
 
 #### Current limitations of the Global Styles API
 
-1. **Setting a different CSS selector for blocks requires server-registration**
+##### 1. **Setting a different CSS selector for blocks requires server-registration**
 
 By default, the selector assigned to a block is `.wp-block-<block-name>`. However, blocks can change this should they need. They can provide a CSS selector via the `__experimentalSelector` property in its `block.json`.
 
 If blocks do this, they need to be registered in the server using the `block.json`, otherwise, the global styles code doesn't have access to that information and will use the default CSS selector for the block.
 
-2. **Can't target different HTML nodes for different styles**
+##### 2. **Can't target different HTML nodes for different styles**
 
 Every chunk of styles can only use a single selector.
 
 This is particularly relevant if the block is using `__experimentalSkipSerialization` to serialize the different style properties to different nodes other than the wrapper. See "Current limitations of blocks supports" for more.
 
-3. **Only a single property per block**
+##### 3. **Only a single property per block**
 
 Similarly to block supports, there can be only one instance of any style in use by the block. For example, the block can only have a single font size. See related "Current limitations of block supports".
 
-4. **Only blocks using block supports are shown in the Global Styles UI**
+##### 4. **Only blocks using block supports are shown in the Global Styles UI**
 
 The global styles UI in the site editor has a screen for per-block styles. The list of blocks is generated dynamically using the block supports from the `block.json` of blocks. If a block wants to be listed there, it needs to use the block supports mechanism.
+
+### Layout styles
+
+In addition to styles at the individual block level and in global styles, there is the concept of layout styles that are output for both blocks-based and classic themes.
+
+The layout block support is an experimental approach for outputting common layout styles that are shared between blocks that are used for creating layouts. Layout styles are useful for providing common styling for any block that is a container for other blocks. Examples of blocks that depend on these layout styles include Group, Row, Columns, Buttons, and Social Icons.
+
+While the feature is part of WordPress core, it is still flagged as experimental in the sense that the features and output are still undergoing active development. It is therefore not yet a stable feature from the perspective of 3rd party blocks, as the API is likely to change. The feature is enabled in core blocks via the `__experimentalLayout` setting under `supports` in a block's `block.json` file.
+
+There are two primary places where Layout styles are output:
+
+#### Base layout styles
+
+Base layout styles are those styles that are common to all blocks that opt in to a particular layout type. Examples of common base layout styling include setting `display: flex` for blocks that use the Flex layout type (such as Buttons and Social Icons), and providing default max-width for constrained layouts.
+
+Base layout styles are output from within [the main PHP class](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/class-wp-theme-json.php) that handles global styles, and form part of the global styles stylesheet. In order to provide support for core blocks in classic themes, these styles are always output, irrespective of whether the theme provides its own `theme.json` file.
+
+Common layout definitions are stored in [the core `theme.json` file](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/theme.json), but are not intended to be extended or overridden by themes.
+
+#### Individual layout styles
+
+When a block that opts in to the experimental layout support is rendered, two things are processed and added to the output via [`layout.php`](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/block-supports/layout.php):
+
+- Semantic class names are added to the block markup to indicate which layout settings are in use. For example, `is-layout-flow` is for blocks (such as Group) that use the default/flow layout, and `is-content-justification-right` is added when a user sets a block to use right justification.
+- Individual styles are generated for non-default layout values that are set on the individual block being rendered. These styles are attached to the block via a container class name using the form `wp-container-$id` where the `$id` is a [unique number](https://developer.wordpress.org/reference/functions/wp_unique_id/).
+
+#### Available layout types
+
+There are currently three layout types in use:
+
+* Default/Flow: Items are stacked vertically. The parent container block is set to `display: flow` and the spacing between children is handled via vertical margins.
+* Constrained: Items are stacked vertically, using the same spacing logic as the Flow layout. Features constrained widths for child content, outputting widths for standard content size and wide size. Defaults to using global `contentSize` and `wideSize` values set in `settings.layout` in the `theme.json`.
+* Flex: Items are displayed using a Flexbox layout. Defaults to a horizontal orientation. Spacing between children is handled via the `gap` CSS property.
+
+For controlling spacing between blocks, and enabling block spacing controls see: [What is blockGap and how can I use it?](https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-json/#what-is-blockgap-and-how-can-i-use-it).
+
+#### Targeting layout or container blocks from themes
+
+The layout block support is designed to enable control over layout features from within the block and site editors. Where possible, try to use the features of the blocks to determine particular layout requirements rather than relying upon additional stylesheets.
+
+For themes that wish to target container blocks in order to add or adjust particular styles, the block's class name is often the best class name to use. Class names such as `wp-block-group` or `wp-block-columns` are usually reliable class names for targeting a particular block.
+
+For targeting a block that uses a particular layout type, avoid targeting `wp-container-` as container classes may not always be present in the rendered markup.
+
+##### Semantic class names
+
+Work is currently underway to expand stable semantic classnames in Layout block support output. The task is being discussed in [this issue](https://github.com/WordPress/gutenberg/issues/38719).
+
+The current semantic class names that can be output by the Layout block support are:
+
+* `is-layout-flow`: Blocks that use the Default/Flow layout type.
+* `is-layout-constrained`: Blocks that use the Constrained layout type.
+* `is-layout-flex`: Blocks that use the Flex layout type.
+* `wp-container-$id`: Where `$id` is a semi-random number. A container class that only exists when the block contains non-default Layout values. This class should not be used directly for any CSS targeting as it may or may not be present.
+* `is-horizontal`: When a block explicitly sets `orientation` to `horizontal`.
+* `is-vertical`: When a block explicitly sets `orientation` to `vertical`.
+* `is-content-justification-left`: When a block explicitly sets `justifyContent` to `left`.
+* `is-content-justification-center`: When a block explicitly sets `justifyContent` to `center`.
+* `is-content-justification-right`: When a block explicitly sets `justifyContent` to `right`.
+* `is-content-justification-space-between`: When a block explicitly sets `justifyContent` to `space-between`.
+* `is-nowrap`: When a block explicitly sets `flexWrap` to `nowrap`.
+
+#### Opting out of generated layout styles
+
+Layout styles output is switched on by default because the styles are required by core structural blocks. However, themes can opt out of generated block layout styles while retaining semantic class name output by using the `disable-layout-styles` block support. Such themes will be responsible for providing all their own layout styles. See [the entry under Theme Support](https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/#disabling-base-layout-styles).

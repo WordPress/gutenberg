@@ -1,31 +1,45 @@
 /**
  * Internal dependencies
  */
-import type {
-	BorderIndividualStyles,
-	BorderIndividualProperty,
-	GeneratedCSSRule,
-	Style,
-	StyleDefinition,
-	StyleOptions,
-} from '../../types';
-import { generateRule, generateBoxRules, upperFirst } from '../utils';
+import type { BoxEdge, GenerateFunction, StyleDefinition } from '../../types';
+import { generateRule, generateBoxRules, camelCaseJoin } from '../utils';
 
-const color = {
+/**
+ * Creates a function for generating CSS rules when the style path is the same as the camelCase CSS property used in React.
+ *
+ * @param  path An array of strings representing the path to the style value in the style object.
+ *
+ * @return A function that generates CSS rules.
+ */
+function createBorderGenerateFunction( path: string[] ): GenerateFunction {
+	return ( style, options ) =>
+		generateRule( style, options, path, camelCaseJoin( path ) );
+}
+
+/**
+ * Creates a function for generating border-{top,bottom,left,right}-{color,style,width} CSS rules.
+ *
+ * @param  edge The edge to create CSS rules for.
+ *
+ * @return A function that generates CSS rules.
+ */
+function createBorderEdgeGenerateFunction( edge: BoxEdge ): GenerateFunction {
+	return ( style, options ) => {
+		return [ 'color', 'style', 'width' ].flatMap( ( key ) => {
+			const path = [ 'border', edge, key ];
+			return createBorderGenerateFunction( path )( style, options );
+		} );
+	};
+}
+
+const color: StyleDefinition = {
 	name: 'color',
-	generate: (
-		style: Style,
-		options: StyleOptions,
-		path: string[] = [ 'border', 'color' ],
-		ruleKey: string = 'borderColor'
-	): GeneratedCSSRule[] => {
-		return generateRule( style, options, path, ruleKey );
-	},
+	generate: createBorderGenerateFunction( [ 'border', 'color' ] ),
 };
 
-const radius = {
+const radius: StyleDefinition = {
 	name: 'radius',
-	generate: ( style: Style, options: StyleOptions ): GeneratedCSSRule[] => {
+	generate: ( style, options ) => {
 		return generateBoxRules(
 			style,
 			options,
@@ -39,104 +53,40 @@ const radius = {
 	},
 };
 
-const borderStyle = {
+const borderStyle: StyleDefinition = {
 	name: 'style',
-	generate: (
-		style: Style,
-		options: StyleOptions,
-		path: string[] = [ 'border', 'style' ],
-		ruleKey: string = 'borderStyle'
-	): GeneratedCSSRule[] => {
-		return generateRule( style, options, path, ruleKey );
-	},
+	generate: createBorderGenerateFunction( [ 'border', 'style' ] ),
 };
 
-const width = {
+const width: StyleDefinition = {
 	name: 'width',
-	generate: (
-		style: Style,
-		options: StyleOptions,
-		path: string[] = [ 'border', 'width' ],
-		ruleKey: string = 'borderWidth'
-	): GeneratedCSSRule[] => {
-		return generateRule( style, options, path, ruleKey );
-	},
+	generate: createBorderGenerateFunction( [ 'border', 'width' ] ),
 };
 
-const borderDefinitionsWithIndividualStyles: StyleDefinition[] = [
-	color,
-	borderStyle,
-	width,
-];
-
-/**
- * Returns a curried generator function with the individual border property ('top' | 'right' | 'bottom' | 'left') baked in.
- *
- * @param  individualProperty Individual border property ('top' | 'right' | 'bottom' | 'left').
- *
- * @return StyleDefinition[ 'generate' ]
- */
-const createBorderGenerateFunction =
-	( individualProperty: BorderIndividualProperty ) =>
-	( style: Style, options: StyleOptions ) => {
-		const styleValue:
-			| BorderIndividualStyles< typeof individualProperty >
-			| undefined = style?.border?.[ individualProperty ];
-
-		if ( ! styleValue ) {
-			return [];
-		}
-
-		return borderDefinitionsWithIndividualStyles.reduce(
-			(
-				acc: GeneratedCSSRule[],
-				borderDefinition: StyleDefinition
-			): GeneratedCSSRule[] => {
-				const key = borderDefinition.name;
-				if (
-					styleValue.hasOwnProperty( key ) &&
-					typeof borderDefinition.generate === 'function'
-				) {
-					const ruleKey = `border${ upperFirst(
-						individualProperty
-					) }${ upperFirst( key ) }`;
-					acc.push(
-						...borderDefinition.generate(
-							style,
-							options,
-							[ 'border', individualProperty, key ],
-							ruleKey
-						)
-					);
-				}
-				return acc;
-			},
-			[]
-		);
-	};
-
-const borderTop = {
+const borderTop: StyleDefinition = {
 	name: 'borderTop',
-	generate: createBorderGenerateFunction( 'top' ),
+	generate: createBorderEdgeGenerateFunction( 'top' ),
 };
 
-const borderRight = {
+const borderRight: StyleDefinition = {
 	name: 'borderRight',
-	generate: createBorderGenerateFunction( 'right' ),
+	generate: createBorderEdgeGenerateFunction( 'right' ),
 };
 
-const borderBottom = {
+const borderBottom: StyleDefinition = {
 	name: 'borderBottom',
-	generate: createBorderGenerateFunction( 'bottom' ),
+	generate: createBorderEdgeGenerateFunction( 'bottom' ),
 };
 
-const borderLeft = {
+const borderLeft: StyleDefinition = {
 	name: 'borderLeft',
-	generate: createBorderGenerateFunction( 'left' ),
+	generate: createBorderEdgeGenerateFunction( 'left' ),
 };
 
 export default [
-	...borderDefinitionsWithIndividualStyles,
+	color,
+	borderStyle,
+	width,
 	radius,
 	borderTop,
 	borderRight,

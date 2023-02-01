@@ -42,22 +42,24 @@ export { hasBlockSwitcher } from './has-block-switcher';
 export { getPageError } from './get-page-error';
 export { getOption } from './get-option';
 export {
-	insertBlock,
-	insertPattern,
-	insertReusableBlock,
-	searchForBlock,
-	searchForPattern,
-	searchForReusableBlock,
-	insertBlockDirectoryBlock,
 	openGlobalBlockInserter,
 	closeGlobalBlockInserter,
 	toggleGlobalBlockInserter,
+	searchForBlock,
+	searchForPattern,
+	searchForReusableBlock,
+	searchForBlockDirectoryBlock,
+	insertBlock,
+	insertPattern,
+	insertReusableBlock,
+	insertBlockDirectoryBlock,
 } from './inserter';
 export { installPlugin } from './install-plugin';
 export { installTheme } from './install-theme';
 export { isCurrentURL } from './is-current-url';
 export { isInDefaultBlock } from './is-in-default-block';
 export { loginUser } from './login-user';
+export { logout } from './logout';
 export { createMenu, deleteAllMenus } from './menus';
 export {
 	enableFocusLossObservation,
@@ -80,6 +82,7 @@ export { selectBlockByClientId } from './select-block-by-client-id';
 export { setBrowserViewport } from './set-browser-viewport';
 export { setOption } from './set-option';
 export { setPostContent } from './set-post-content';
+export { switchBlockInspectorTab } from './switch-block-inspector-tab.js';
 export { switchEditorModeTo } from './switch-editor-mode-to';
 export { switchUserToAdmin } from './switch-user-to-admin';
 export { switchUserToTest } from './switch-user-to-test';
@@ -103,20 +106,14 @@ export {
 } from './rest-api';
 export { openListView, closeListView } from './list-view';
 export {
-	clickSiteEditorMenuItem,
-	closeSiteEditorNavigationPanel,
 	disableSiteEditorWelcomeGuide,
 	getCurrentSiteEditorContent,
-	getSiteEditorMenuItem,
-	isSiteEditorRoot,
-	navigateSiteEditorBack,
-	navigateSiteEditorBackToRoot,
-	openSiteEditorNavigationPanel,
-	siteEditorNavigateSequence,
 	visitSiteEditor,
 	toggleGlobalStyles,
+	enterEditMode,
 	openGlobalStylesPanel,
 	openPreviousGlobalStylesPanel,
 } from './site-editor';
+export { createNewTemplate } from './create-new-template';
 
 export * from './mocks';

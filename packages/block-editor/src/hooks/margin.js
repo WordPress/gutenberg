@@ -28,6 +28,8 @@ import {
 } from './dimensions';
 import { cleanEmptyObject } from './utils';
 import BlockPopover from '../components/block-popover';
+import SpacingSizesControl from '../components/spacing-sizes-control';
+import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
 
 /**
  * Determines if there is margin support.
@@ -99,7 +101,11 @@ export function MarginEdit( props ) {
 		name: blockName,
 		attributes: { style },
 		setAttributes,
+		onMouseOver,
+		onMouseOut,
 	} = props;
+
+	const spacingSizes = useSetting( 'spacing.spacingSizes' );
 
 	const units = useCustomUnits( {
 		availableUnits: useSetting( 'spacing.units' ) || [
@@ -135,33 +141,64 @@ export function MarginEdit( props ) {
 	return Platform.select( {
 		web: (
 			<>
-				<BoxControl
-					values={ style?.spacing?.margin }
-					onChange={ onChange }
-					label={ __( 'Margin' ) }
-					sides={ sides }
-					units={ units }
-					allowReset={ false }
-					splitOnAxis={ splitOnAxis }
-				/>
+				{ ( ! spacingSizes || spacingSizes?.length === 0 ) && (
+					<BoxControl
+						values={ style?.spacing?.margin }
+						onChange={ onChange }
+						label={ __( 'Margin' ) }
+						sides={ sides }
+						units={ units }
+						allowReset={ false }
+						splitOnAxis={ splitOnAxis }
+						onMouseOver={ onMouseOver }
+						onMouseOut={ onMouseOut }
+					/>
+				) }
+				{ spacingSizes?.length > 0 && (
+					<SpacingSizesControl
+						values={ style?.spacing?.margin }
+						onChange={ onChange }
+						label={ __( 'Margin' ) }
+						sides={ sides }
+						units={ units }
+						allowReset={ false }
+						splitOnAxis={ false }
+						onMouseOver={ onMouseOver }
+						onMouseOut={ onMouseOut }
+					/>
+				) }
 			</>
 		),
 		native: null,
 	} );
 }
 
-export function MarginVisualizer( { clientId, attributes } ) {
+export function MarginVisualizer( { clientId, attributes, forceShow } ) {
 	const margin = attributes?.style?.spacing?.margin;
+
 	const style = useMemo( () => {
+		const marginTop = margin?.top
+			? getSpacingPresetCssVar( margin?.top )
+			: 0;
+		const marginRight = margin?.right
+			? getSpacingPresetCssVar( margin?.right )
+			: 0;
+		const marginBottom = margin?.bottom
+			? getSpacingPresetCssVar( margin?.bottom )
+			: 0;
+		const marginLeft = margin?.left
+			? getSpacingPresetCssVar( margin?.left )
+			: 0;
+
 		return {
-			borderTopWidth: margin?.top ?? 0,
-			borderRightWidth: margin?.right ?? 0,
-			borderBottomWidth: margin?.bottom ?? 0,
-			borderLeftWidth: margin?.left ?? 0,
-			top: margin?.top ? `-${ margin.top }` : 0,
-			right: margin?.right ? `-${ margin.right }` : 0,
-			bottom: margin?.bottom ? `-${ margin.bottom }` : 0,
-			left: margin?.left ? `-${ margin.left }` : 0,
+			borderTopWidth: marginTop,
+			borderRightWidth: marginRight,
+			borderBottomWidth: marginBottom,
+			borderLeftWidth: marginLeft,
+			top: marginTop ? `calc(${ marginTop } * -1)` : 0,
+			right: marginRight ? `calc(${ marginRight } * -1)` : 0,
+			bottom: marginBottom ? `calc(${ marginBottom } * -1)` : 0,
+			left: marginLeft ? `calc(${ marginLeft } * -1)` : 0,
 		};
 	}, [ margin ] );
 
@@ -176,21 +213,22 @@ export function MarginVisualizer( { clientId, attributes } ) {
 	};
 
 	useEffect( () => {
-		if ( ! isShallowEqual( margin, valueRef.current ) ) {
+		if ( ! isShallowEqual( margin, valueRef.current ) && ! forceShow ) {
 			setIsActive( true );
 			valueRef.current = margin;
-
-			clearTimer();
 
 			timeoutRef.current = setTimeout( () => {
 				setIsActive( false );
 			}, 400 );
 		}
 
-		return () => clearTimer();
-	}, [ margin ] );
+		return () => {
+			setIsActive( false );
+			clearTimer();
+		};
+	}, [ margin, forceShow ] );
 
-	if ( ! isActive ) {
+	if ( ! isActive && ! forceShow ) {
 		return null;
 	}
 
@@ -199,6 +237,8 @@ export function MarginVisualizer( { clientId, attributes } ) {
 			clientId={ clientId }
 			__unstableCoverTarget
 			__unstableRefreshSize={ margin }
+			__unstablePopoverSlot="block-toolbar"
+			shift={ false }
 		>
 			<div className="block-editor__padding-visualizer" style={ style } />
 		</BlockPopover>

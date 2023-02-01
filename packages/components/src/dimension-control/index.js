@@ -6,17 +6,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
+
 /**
  * Internal dependencies
  */
 import { Icon, SelectControl } from '../';
-import { __ } from '@wordpress/i18n';
-
-import { Fragment } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import sizesTable, { findSizeBySlug } from './sizes';
 
 export function DimensionControl( props ) {
@@ -54,10 +49,10 @@ export function DimensionControl( props ) {
 	};
 
 	const selectLabel = (
-		<Fragment>
+		<>
 			{ icon && <Icon icon={ icon } /> }
 			{ label }
-		</Fragment>
+		</>
 	);
 
 	return (

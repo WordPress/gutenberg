@@ -40,6 +40,18 @@ describe( 'getMatchingVariation', () => {
 				getMatchingVariation( { level: 1, other: 'prop' }, variations )
 			).toBeUndefined();
 		} );
+		it( 'when variation has a nested attribute', () => {
+			const variations = [
+				{ name: 'one', attributes: { query: { author: 'somebody' } } },
+				{ name: 'two', attributes: { query: { author: 'nobody' } } },
+			];
+			expect(
+				getMatchingVariation(
+					{ query: { author: 'foobar' }, other: 'prop' },
+					variations
+				)
+			).toBeUndefined();
+		} );
 	} );
 	describe( 'should find a match', () => {
 		it( 'when variation has one attribute', () => {
@@ -62,6 +74,18 @@ describe( 'getMatchingVariation', () => {
 			expect(
 				getMatchingVariation(
 					{ level: 1, content: 'hi', other: 'prop' },
+					variations
+				).name
+			).toEqual( 'one' );
+		} );
+		it( 'when variation has a nested attribute', () => {
+			const variations = [
+				{ name: 'one', attributes: { query: { author: 'somebody' } } },
+				{ name: 'two', attributes: { query: { author: 'nobody' } } },
+			];
+			expect(
+				getMatchingVariation(
+					{ query: { author: 'somebody' }, other: 'prop' },
 					variations
 				).name
 			).toEqual( 'one' );

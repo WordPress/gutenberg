@@ -83,7 +83,6 @@ function PullQuoteEdit( props ) {
 				<BlockQuote textColor={ getTextColor( props ) }>
 					<RichText
 						identifier="value"
-						multiline
 						value={ value }
 						onChange={ ( nextValue ) =>
 							setAttributes( {

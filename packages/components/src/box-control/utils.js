@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -145,14 +140,12 @@ export function isValuesMixed( values = {}, selectedUnits, sides = ALL_SIDES ) {
 export function isValuesDefined( values ) {
 	return (
 		values !== undefined &&
-		! isEmpty(
-			Object.values( values ).filter(
-				// Switching units when input is empty causes values only
-				// containing units. This gives false positive on mixed values
-				// unless filtered.
-				( value ) => !! value && /\d/.test( value )
-			)
-		)
+		Object.values( values ).filter(
+			// Switching units when input is empty causes values only
+			// containing units. This gives false positive on mixed values
+			// unless filtered.
+			( value ) => !! value && /\d/.test( value )
+		).length > 0
 	);
 }
 
@@ -200,4 +193,36 @@ export function normalizeSides( sides ) {
 	}
 
 	return filteredSides;
+}
+
+/**
+ * Applies a value to an object representing top, right, bottom and left sides
+ * while taking into account any custom side configuration.
+ *
+ * @param {Object}        currentValues The current values for each side.
+ * @param {string|number} newValue      The value to apply to the sides object.
+ * @param {string[]}      sides         Array defining valid sides.
+ *
+ * @return {Object} Object containing the updated values for each side.
+ */
+export function applyValueToSides( currentValues, newValue, sides ) {
+	const newValues = { ...currentValues };
+
+	if ( sides?.length ) {
+		sides.forEach( ( side ) => {
+			if ( side === 'vertical' ) {
+				newValues.top = newValue;
+				newValues.bottom = newValue;
+			} else if ( side === 'horizontal' ) {
+				newValues.left = newValue;
+				newValues.right = newValue;
+			} else {
+				newValues[ side ] = newValue;
+			}
+		} );
+	} else {
+		ALL_SIDES.forEach( ( side ) => ( newValues[ side ] = newValue ) );
+	}
+
+	return newValues;
 }

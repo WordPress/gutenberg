@@ -11,6 +11,21 @@
 		width: 100%;
 	}
 
+	thead {
+		border-bottom: 3px solid;
+	}
+
+	tfoot {
+		border-top: 3px solid;
+	}
+
+	// Match default border style to default style in editor
+	td,
+	th {
+		border: $border-width solid;
+		padding: 0.5em;
+	}
+
 	// Fixed layout toggle
 	.has-fixed-layout {
 		table-layout: fixed;

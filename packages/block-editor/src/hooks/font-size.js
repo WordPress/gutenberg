@@ -5,6 +5,7 @@ import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
 import TokenList from '@wordpress/token-list';
 import { createHigherOrderComponent } from '@wordpress/compose';
+import { select } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -14,6 +15,7 @@ import {
 	getFontSizeClass,
 	getFontSizeObjectByValue,
 	FontSizePicker,
+	getComputedFluidTypographyValue,
 } from '../components/font-sizes';
 import { TYPOGRAPHY_SUPPORT_KEY } from './typography';
 import {
@@ -22,6 +24,7 @@ import {
 	shouldSkipSerialization,
 } from './utils';
 import useSetting from '../components/use-setting';
+import { store as blockEditorStore } from '../store';
 
 export const FONT_SIZE_SUPPORT_KEY = 'typography.fontSize';
 
@@ -147,6 +150,9 @@ export function FontSizeEdit( props ) {
 			onChange={ onChange }
 			value={ fontSizeValue }
 			withReset={ false }
+			withSlider
+			size="__unstable-large"
+			__nextHasNoMarginBottom
 		/>
 	);
 }
@@ -280,6 +286,78 @@ export function addTransforms( result, source, index, results ) {
 	);
 }
 
+/**
+ * Allow custom font sizes to appear fluid when fluid typography is enabled at
+ * the theme level.
+ *
+ * Adds a custom getEditWrapperProps() callback to all block types that support
+ * font sizes. Then, if fluid typography is enabled, this callback will swap any
+ * custom font size in style.fontSize with a fluid font size (i.e. one that uses
+ * clamp()).
+ *
+ * It's important that this hook runs after 'core/style/addEditProps' sets
+ * style.fontSize as otherwise fontSize will be overwritten.
+ *
+ * @param {Object} blockType Block settings object.
+ */
+function addEditPropsForFluidCustomFontSizes( blockType ) {
+	if (
+		! hasBlockSupport( blockType, FONT_SIZE_SUPPORT_KEY ) ||
+		shouldSkipSerialization( blockType, TYPOGRAPHY_SUPPORT_KEY, 'fontSize' )
+	) {
+		return blockType;
+	}
+
+	const existingGetEditWrapperProps = blockType.getEditWrapperProps;
+
+	blockType.getEditWrapperProps = ( attributes ) => {
+		const wrapperProps = existingGetEditWrapperProps
+			? existingGetEditWrapperProps( attributes )
+			: {};
+
+		const fontSize = wrapperProps?.style?.fontSize;
+
+		// TODO: This sucks! We should be using useSetting( 'typography.fluid' )
+		// or even useSelect( blockEditorStore ). We can't do either here
+		// because getEditWrapperProps is a plain JavaScript function called by
+		// BlockListBlock and not a React component rendered within
+		// BlockListContext.Provider. If we set fontSize using editor.
+		// BlockListBlock instead of using getEditWrapperProps then the value is
+		// clobbered when the core/style/addEditProps filter runs.
+		const fluidTypographyConfig =
+			select( blockEditorStore ).getSettings().__experimentalFeatures
+				?.typography?.fluid;
+
+		const fluidTypographySettings =
+			typeof fluidTypographyConfig === 'object'
+				? fluidTypographyConfig
+				: {};
+
+		const newFontSize =
+			fontSize && !! fluidTypographyConfig
+				? getComputedFluidTypographyValue( {
+						fontSize,
+						minimumFontSizeLimit:
+							fluidTypographySettings?.minFontSize,
+				  } )
+				: null;
+
+		if ( newFontSize === null ) {
+			return wrapperProps;
+		}
+
+		return {
+			...wrapperProps,
+			style: {
+				...wrapperProps?.style,
+				fontSize: newFontSize,
+			},
+		};
+	};
+
+	return blockType;
+}
+
 addFilter(
 	'blocks.registerBlockType',
 	'core/font/addAttribute',
@@ -304,4 +382,13 @@ addFilter(
 	'blocks.switchToBlockType.transformedBlock',
 	'core/font-size/addTransforms',
 	addTransforms
+);
+
+addFilter(
+	'blocks.registerBlockType',
+	'core/font-size/addEditPropsForFluidCustomFontSizes',
+	addEditPropsForFluidCustomFontSizes,
+	// Run after 'core/style/addEditProps' so that the style object has already
+	// been translated into inline CSS.
+	11
 );

@@ -14,6 +14,7 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import Notice from './';
 import styles from './style.scss';
+import { useCallback } from '@wordpress/element';
 
 function NoticeList() {
 	const { notices } = useSelect( ( select ) => {
@@ -25,9 +26,12 @@ function NoticeList() {
 
 	const { removeNotice } = useDispatch( noticesStore );
 
-	function onRemoveNotice( id ) {
-		removeNotice( id );
-	}
+	const onRemoveNotice = useCallback(
+		( id ) => {
+			removeNotice( id );
+		},
+		[ removeNotice ]
+	);
 
 	if ( ! notices.length ) {
 		return null;

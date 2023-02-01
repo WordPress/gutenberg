@@ -6,8 +6,8 @@
  */
 
 class Override_Script_Test extends WP_UnitTestCase {
-	function setUp() {
-		parent::setUp();
+	public function set_up() {
+		parent::set_up();
 
 		wp_register_script(
 			'gutenberg-dummy-script',
@@ -18,8 +18,8 @@ class Override_Script_Test extends WP_UnitTestCase {
 		);
 	}
 
-	function tearDown() {
-		parent::tearDown();
+	public function tear_down() {
+		parent::tear_down();
 
 		wp_deregister_script( 'gutenberg-dummy-script' );
 	}
@@ -27,7 +27,7 @@ class Override_Script_Test extends WP_UnitTestCase {
 	/**
 	 * Tests that script is localized.
 	 */
-	function test_localizes_script() {
+	public function test_localizes_script() {
 		global $wp_scripts;
 
 		gutenberg_override_script(
@@ -46,7 +46,7 @@ class Override_Script_Test extends WP_UnitTestCase {
 	/**
 	 * Tests that script properties are overridden.
 	 */
-	function test_replaces_registered_properties() {
+	public function test_replaces_registered_properties() {
 		global $wp_scripts;
 
 		gutenberg_override_script(
@@ -68,7 +68,7 @@ class Override_Script_Test extends WP_UnitTestCase {
 	/**
 	 * Tests that new script registers normally if no handle by the name.
 	 */
-	function test_registers_new_script() {
+	public function test_registers_new_script() {
 		global $wp_scripts;
 
 		gutenberg_override_script(

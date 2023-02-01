@@ -21,7 +21,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 Returns a string with ampersands escaped. Note that this is an imperfect
 implementation, where only ampersands which do not appear as a pattern of
 named, decimal, or hexadecimal character references are escaped. Invalid
-named references (i.e. ambiguous ampersand) are are still permitted.
+named references (i.e. ambiguous ampersand) are still permitted.
 
 _Related_
 

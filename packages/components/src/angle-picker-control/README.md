@@ -11,7 +11,7 @@ import { AnglePickerControl } from '@wordpress/components';
 
 const MyAnglePicker = () => {
 	const [ angle, setAngle ] = useState();
-	return <AnglePickerControl value={ angle } onChange={ setAngle } />;
+	return <AnglePickerControl value={ angle } onChange={ setAngle } __nextHasNoMarginBottom />;
 };
 ```
 
@@ -39,3 +39,11 @@ A function that receives the new value of the input.
 
 -   Type: `function`
 -   Required: Yes
+
+### __nextHasNoMarginBottom
+
+Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.4. (The prop can be safely removed once this happens.)
+
+-   Type: `boolean`
+-   Required: No
+-   Default: `false`

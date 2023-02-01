@@ -15,10 +15,8 @@ const CONTROL_PROPS = {
 	controlPaddingXSmall: `calc(${ CONTROL_PADDING_X } / 1.3334)`,
 	controlBackgroundColor: COLORS.white,
 	controlBorderRadius: '2px',
-	controlBorderColor: COLORS.gray[ 700 ],
 	controlBoxShadow: 'transparent',
-	controlBorderColorHover: COLORS.gray[ 700 ],
-	controlBoxShadowFocus: `0 0 0 0.5px ${ COLORS.admin.theme }`,
+	controlBoxShadowFocus: `0 0 0 0.5px ${ COLORS.ui.theme }`,
 	controlDestructiveBorderColor: COLORS.alert.red,
 	controlHeight: CONTROL_HEIGHT,
 	controlHeightXSmall: `calc( ${ CONTROL_HEIGHT } * 0.6 )`,
@@ -33,7 +31,6 @@ const TOGGLE_GROUP_CONTROL_PROPS = {
 	toggleGroupControlBackdropBackgroundColor:
 		CONTROL_PROPS.controlSurfaceColor,
 	toggleGroupControlBackdropBorderColor: COLORS.ui.border,
-	toggleGroupControlBackdropBoxShadow: 'transparent',
 	toggleGroupControlButtonColorActive: CONTROL_PROPS.controlBackgroundColor,
 };
 

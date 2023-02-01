@@ -28,7 +28,8 @@ import {
 } from './dimensions';
 import { cleanEmptyObject } from './utils';
 import BlockPopover from '../components/block-popover';
-
+import SpacingSizesControl from '../components/spacing-sizes-control';
+import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
 /**
  * Determines if there is padding support.
  *
@@ -99,7 +100,11 @@ export function PaddingEdit( props ) {
 		name: blockName,
 		attributes: { style },
 		setAttributes,
+		onMouseOver,
+		onMouseOut,
 	} = props;
+
+	const spacingSizes = useSetting( 'spacing.spacingSizes' );
 
 	const units = useCustomUnits( {
 		availableUnits: useSetting( 'spacing.units' ) || [
@@ -135,29 +140,54 @@ export function PaddingEdit( props ) {
 	return Platform.select( {
 		web: (
 			<>
-				<BoxControl
-					values={ style?.spacing?.padding }
-					onChange={ onChange }
-					label={ __( 'Padding' ) }
-					sides={ sides }
-					units={ units }
-					allowReset={ false }
-					splitOnAxis={ splitOnAxis }
-				/>
+				{ ( ! spacingSizes || spacingSizes?.length === 0 ) && (
+					<BoxControl
+						values={ style?.spacing?.padding }
+						onChange={ onChange }
+						label={ __( 'Padding' ) }
+						sides={ sides }
+						units={ units }
+						allowReset={ false }
+						splitOnAxis={ splitOnAxis }
+						onMouseOver={ onMouseOver }
+						onMouseOut={ onMouseOut }
+					/>
+				) }
+				{ spacingSizes?.length > 0 && (
+					<SpacingSizesControl
+						values={ style?.spacing?.padding }
+						onChange={ onChange }
+						label={ __( 'Padding' ) }
+						sides={ sides }
+						units={ units }
+						allowReset={ false }
+						splitOnAxis={ splitOnAxis }
+						onMouseOver={ onMouseOver }
+						onMouseOut={ onMouseOut }
+					/>
+				) }
 			</>
 		),
 		native: null,
 	} );
 }
 
-export function PaddingVisualizer( { clientId, attributes } ) {
+export function PaddingVisualizer( { clientId, attributes, forceShow } ) {
 	const padding = attributes?.style?.spacing?.padding;
 	const style = useMemo( () => {
 		return {
-			borderTopWidth: padding?.top ?? 0,
-			borderRightWidth: padding?.right ?? 0,
-			borderBottomWidth: padding?.bottom ?? 0,
-			borderLeftWidth: padding?.left ?? 0,
+			borderTopWidth: padding?.top
+				? getSpacingPresetCssVar( padding?.top )
+				: 0,
+			borderRightWidth: padding?.right
+				? getSpacingPresetCssVar( padding?.right )
+				: 0,
+			borderBottomWidth: padding?.bottom
+				? getSpacingPresetCssVar( padding?.bottom )
+				: 0,
+			borderLeftWidth: padding?.left
+				? getSpacingPresetCssVar( padding?.left )
+				: 0,
 		};
 	}, [ padding ] );
 
@@ -172,21 +202,22 @@ export function PaddingVisualizer( { clientId, attributes } ) {
 	};
 
 	useEffect( () => {
-		if ( ! isShallowEqual( padding, valueRef.current ) ) {
+		if ( ! isShallowEqual( padding, valueRef.current ) && ! forceShow ) {
 			setIsActive( true );
 			valueRef.current = padding;
-
-			clearTimer();
 
 			timeoutRef.current = setTimeout( () => {
 				setIsActive( false );
 			}, 400 );
 		}
 
-		return () => clearTimer();
-	}, [ padding ] );
+		return () => {
+			setIsActive( false );
+			clearTimer();
+		};
+	}, [ padding, forceShow ] );
 
-	if ( ! isActive ) {
+	if ( ! isActive && ! forceShow ) {
 		return null;
 	}
 
@@ -195,6 +226,8 @@ export function PaddingVisualizer( { clientId, attributes } ) {
 			clientId={ clientId }
 			__unstableCoverTarget
 			__unstableRefreshSize={ padding }
+			__unstablePopoverSlot="block-toolbar"
+			shift={ false }
 		>
 			<div className="block-editor__padding-visualizer" style={ style } />
 		</BlockPopover>

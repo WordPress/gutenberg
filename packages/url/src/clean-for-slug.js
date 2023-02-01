@@ -31,6 +31,8 @@ export function cleanForSlug( string ) {
 			.replace( /[^\p{L}\p{N}_-]+/gu, '' )
 			// Convert to lowercase
 			.toLowerCase()
+			// Replace multiple hyphens with a single one.
+			.replace( /-+/g, '-' )
 			// Remove any remaining leading or trailing hyphens.
 			.replace( /(^-+)|(-+$)/g, '' )
 	);

@@ -37,6 +37,7 @@ function render_block_core_search( $attributes ) {
 	$query_params_markup = '';
 	$inline_styles       = styles_for_block_core_search( $attributes );
 	$color_classes       = get_color_classes_for_block_core_search( $attributes );
+	$typography_classes  = get_typography_classes_for_block_core_search( $attributes );
 	$is_button_inside    = ! empty( $attributes['buttonPosition'] ) &&
 		'button-inside' === $attributes['buttonPosition'];
 	// Border color classes need to be applied to the elements that have a border color.
@@ -50,19 +51,31 @@ function render_block_core_search( $attributes ) {
 		$label_inner_html
 	);
 	if ( $show_label && ! empty( $attributes['label'] ) ) {
+		$label_classes = array( 'wp-block-search__label' );
+		if ( ! empty( $typography_classes ) ) {
+			$label_classes[] = $typography_classes;
+		}
 		$label_markup = sprintf(
-			'<label for="%1$s" class="wp-block-search__label">%2$s</label>',
-			$input_id,
+			'<label for="%1$s" class="%2$s" %3$s>%4$s</label>',
+			esc_attr( $input_id ),
+			esc_attr( implode( ' ', $label_classes ) ),
+			$inline_styles['label'],
 			$label_inner_html
 		);
 	}
 
 	if ( $show_input ) {
-		$input_classes = ! $is_button_inside ? $border_color_classes : '';
-		$input_markup  = sprintf(
-			'<input type="search" id="%s" class="wp-block-search__input %s" name="s" value="%s" placeholder="%s" %s required />',
+		$input_classes = array( 'wp-block-search__input' );
+		if ( ! $is_button_inside && ! empty( $border_color_classes ) ) {
+			$input_classes[] = $border_color_classes;
+		}
+		if ( ! empty( $typography_classes ) ) {
+			$input_classes[] = $typography_classes;
+		}
+		$input_markup = sprintf(
+			'<input type="search" id="%s" class="%s" name="s" value="%s" placeholder="%s" %s required />',
 			$input_id,
-			esc_attr( $input_classes ),
+			esc_attr( implode( ' ', $input_classes ) ),
 			get_search_query(),
 			esc_attr( $attributes['placeholder'] ),
 			$inline_styles['input']
@@ -80,10 +93,13 @@ function render_block_core_search( $attributes ) {
 	}
 
 	if ( $show_button ) {
-		$button_classes         = array();
+		$button_classes         = array( 'wp-block-search__button' );
 		$button_internal_markup = '';
 		if ( ! empty( $color_classes ) ) {
 			$button_classes[] = $color_classes;
+		}
+		if ( ! empty( $typography_classes ) ) {
+			$button_classes[] = $typography_classes;
 		}
 		$aria_label = '';
 
@@ -105,9 +121,9 @@ function render_block_core_search( $attributes ) {
 		}
 
 		// Include the button element class.
-		$button_classes[] = WP_Theme_JSON_Gutenberg::get_element_class_name( 'button' );
+		$button_classes[] = wp_theme_get_element_class_name( 'button' );
 		$button_markup    = sprintf(
-			'<button type="submit" class="wp-block-search__button %s" %s %s>%s</button>',
+			'<button type="submit" class="%s" %s %s>%s</button>',
 			esc_attr( implode( ' ', $button_classes ) ),
 			$inline_styles['button'],
 			$aria_label,
@@ -122,7 +138,9 @@ function render_block_core_search( $attributes ) {
 		$inline_styles['wrapper'],
 		$input_markup . $query_params_markup . $button_markup
 	);
-	$wrapper_attributes   = get_block_wrapper_attributes( array( 'class' => $classnames ) );
+	$wrapper_attributes   = get_block_wrapper_attributes(
+		array( 'class' => $classnames )
+	);
 
 	return sprintf(
 		'<form role="search" method="get" action="%s" %s>%s</form>',
@@ -217,7 +235,7 @@ function apply_block_core_search_border_style( $attributes, $property, $side, &$
 	}
 
 	if ( 'color' === $property && $side ) {
-		$has_color_preset = strpos( $value, 'var:preset|color|' ) !== false;
+		$has_color_preset = str_contains( $value, 'var:preset|color|' );
 		if ( $has_color_preset ) {
 			$named_color_value = substr( $value, strrpos( $value, '|' ) + 1 );
 			$value             = sprintf( 'var(--wp--preset--color--%s)', $named_color_value );
@@ -270,8 +288,10 @@ function styles_for_block_core_search( $attributes ) {
 	$wrapper_styles   = array();
 	$button_styles    = array();
 	$input_styles     = array();
+	$label_styles     = array();
 	$is_button_inside = ! empty( $attributes['buttonPosition'] ) &&
 		'button-inside' === $attributes['buttonPosition'];
+	$show_label       = ( isset( $attributes['showLabel'] ) ) && false !== $attributes['showLabel'];
 
 	// Add width styles.
 	$has_width   = ! empty( $attributes['width'] ) && ! empty( $attributes['widthUnit'] );
@@ -347,12 +367,12 @@ function styles_for_block_core_search( $attributes ) {
 	// Add color styles.
 	$has_text_color = ! empty( $attributes['style']['color']['text'] );
 	if ( $has_text_color ) {
-		$button_styles[] = sprintf( 'color: %s;', esc_attr( $attributes['style']['color']['text'] ) );
+		$button_styles[] = sprintf( 'color: %s;', $attributes['style']['color']['text'] );
 	}
 
 	$has_background_color = ! empty( $attributes['style']['color']['background'] );
 	if ( $has_background_color ) {
-		$button_styles[] = sprintf( 'background-color: %s;', esc_attr( $attributes['style']['color']['background'] ) );
+		$button_styles[] = sprintf( 'background-color: %s;', $attributes['style']['color']['background'] );
 	}
 
 	$has_custom_gradient = ! empty( $attributes['style']['color']['gradient'] );
@@ -360,11 +380,104 @@ function styles_for_block_core_search( $attributes ) {
 		$button_styles[] = sprintf( 'background: %s;', $attributes['style']['color']['gradient'] );
 	}
 
+	// Get typography styles to be shared across inner elements.
+	$typography_styles = esc_attr( get_typography_styles_for_block_core_search( $attributes ) );
+	if ( ! empty( $typography_styles ) ) {
+		$label_styles [] = $typography_styles;
+		$button_styles[] = $typography_styles;
+		$input_styles [] = $typography_styles;
+	}
+
+	// Typography text-decoration is only applied to the label and button.
+	if ( ! empty( $attributes['style']['typography']['textDecoration'] ) ) {
+		$text_decoration_value = sprintf( 'text-decoration: %s;', esc_attr( $attributes['style']['typography']['textDecoration'] ) );
+		$button_styles[]       = $text_decoration_value;
+		// Input opts out of text decoration.
+		if ( $show_label ) {
+			$label_styles[] = $text_decoration_value;
+		}
+	}
+
 	return array(
-		'input'   => ! empty( $input_styles ) ? sprintf( ' style="%s"', safecss_filter_attr( implode( ' ', $input_styles ) ) ) : '',
-		'button'  => ! empty( $button_styles ) ? sprintf( ' style="%s"', safecss_filter_attr( implode( ' ', $button_styles ) ) ) : '',
-		'wrapper' => ! empty( $wrapper_styles ) ? sprintf( ' style="%s"', safecss_filter_attr( implode( ' ', $wrapper_styles ) ) ) : '',
+		'input'   => ! empty( $input_styles ) ? sprintf( ' style="%s"', esc_attr( safecss_filter_attr( implode( ' ', $input_styles ) ) ) ) : '',
+		'button'  => ! empty( $button_styles ) ? sprintf( ' style="%s"', esc_attr( safecss_filter_attr( implode( ' ', $button_styles ) ) ) ) : '',
+		'wrapper' => ! empty( $wrapper_styles ) ? sprintf( ' style="%s"', esc_attr( safecss_filter_attr( implode( ' ', $wrapper_styles ) ) ) ) : '',
+		'label'   => ! empty( $label_styles ) ? sprintf( ' style="%s"', esc_attr( safecss_filter_attr( implode( ' ', $label_styles ) ) ) ) : '',
 	);
+}
+
+/**
+ * Returns typography classnames depending on whether there are named font sizes/families .
+ *
+ * @param array $attributes The block attributes.
+ *
+ * @return string The typography color classnames to be applied to the block elements.
+ */
+function get_typography_classes_for_block_core_search( $attributes ) {
+	$typography_classes    = array();
+	$has_named_font_family = ! empty( $attributes['fontFamily'] );
+	$has_named_font_size   = ! empty( $attributes['fontSize'] );
+
+	if ( $has_named_font_size ) {
+		$typography_classes[] = sprintf( 'has-%s-font-size', esc_attr( $attributes['fontSize'] ) );
+	}
+
+	if ( $has_named_font_family ) {
+		$typography_classes[] = sprintf( 'has-%s-font-family', esc_attr( $attributes['fontFamily'] ) );
+	}
+
+	return implode( ' ', $typography_classes );
+}
+
+/**
+ * Returns typography styles to be included in an HTML style tag.
+ * This excludes text-decoration, which is applied only to the label and button elements of the search block.
+ *
+ * @param array $attributes The block attributes.
+ *
+ * @return string A string of typography CSS declarations.
+ */
+function get_typography_styles_for_block_core_search( $attributes ) {
+	$typography_styles = array();
+
+	// Add typography styles.
+	if ( ! empty( $attributes['style']['typography']['fontSize'] ) ) {
+		$typography_styles[] = sprintf(
+			'font-size: %s;',
+			wp_get_typography_font_size_value(
+				array(
+					'size' => $attributes['style']['typography']['fontSize'],
+				)
+			)
+		);
+
+	}
+
+	if ( ! empty( $attributes['style']['typography']['fontFamily'] ) ) {
+		$typography_styles[] = sprintf( 'font-family: %s;', $attributes['style']['typography']['fontFamily'] );
+	}
+
+	if ( ! empty( $attributes['style']['typography']['letterSpacing'] ) ) {
+		$typography_styles[] = sprintf( 'letter-spacing: %s;', $attributes['style']['typography']['letterSpacing'] );
+	}
+
+	if ( ! empty( $attributes['style']['typography']['fontWeight'] ) ) {
+		$typography_styles[] = sprintf( 'font-weight: %s;', $attributes['style']['typography']['fontWeight'] );
+	}
+
+	if ( ! empty( $attributes['style']['typography']['fontStyle'] ) ) {
+		$typography_styles[] = sprintf( 'font-style: %s;', $attributes['style']['typography']['fontStyle'] );
+	}
+
+	if ( ! empty( $attributes['style']['typography']['lineHeight'] ) ) {
+		$typography_styles[] = sprintf( 'line-height: %s;', $attributes['style']['typography']['lineHeight'] );
+	}
+
+	if ( ! empty( $attributes['style']['typography']['textTransform'] ) ) {
+		$typography_styles[] = sprintf( 'text-transform: %s;', $attributes['style']['typography']['textTransform'] );
+	}
+
+	return implode( '', $typography_styles );
 }
 
 /**

@@ -148,6 +148,23 @@ describe( 'RichText', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should transform when typing backtick over selection', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'A selection test.' );
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowRight' );
+		await pressKeyWithModifier( 'shiftAlt', 'ArrowRight' );
+		await page.keyboard.type( '`' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Should undo the transform.
+		await pressKeyWithModifier( 'primary', 'z' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'should only mutate text data on input', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '1' );
@@ -391,6 +408,10 @@ describe( 'RichText', () => {
 		await button.evaluate( ( element ) => element.scrollIntoView() );
 		await button.click();
 
+		// Wait for the popover with "Text" tab to appear.
+		await page.waitForXPath(
+			'//button[@role="tab"][@aria-selected="true"][text()="Text"]'
+		);
 		// Tab to the "Text" tab.
 		await page.keyboard.press( 'Tab' );
 		// Tab to black.
@@ -456,15 +477,18 @@ describe( 'RichText', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( ' 2' );
 
-		// Select all and copy.
+		// Select all text.
+		await pressKeyWithModifier( 'primary', 'a' );
+		// Select the nested list.
+		await pressKeyWithModifier( 'primary', 'a' );
+		// Select the parent list item.
+		await pressKeyWithModifier( 'primary', 'a' );
+		// Select all the parent list item text.
+		await pressKeyWithModifier( 'primary', 'a' );
+		// Select the entire list.
 		await pressKeyWithModifier( 'primary', 'a' );
 		await pressKeyWithModifier( 'primary', 'c' );
 
-		// Collapse the selection to the end.
-		await page.keyboard.press( 'ArrowRight' );
-
-		// Create a paragraph.
-		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
 
 		// Paste paragraph contents.
@@ -491,11 +515,15 @@ describe( 'RichText', () => {
 		// text in the DOM directly, setting selection in the right place, and
 		// firing `compositionend`.
 		// See https://github.com/puppeteer/puppeteer/issues/4981.
-		await page.evaluate( () => {
+		await page.evaluate( async () => {
 			document.activeElement.textContent = '`a`';
 			const selection = window.getSelection();
+			// The `selectionchange` and `compositionend` events should run in separate event
+			// loop ticks to process all data store updates in time. Native events would be
+			// scheduled the same way.
 			selection.selectAllChildren( document.activeElement );
 			selection.collapseToEnd();
+			await new Promise( ( r ) => setTimeout( r, 0 ) );
 			document.activeElement.dispatchEvent(
 				new CompositionEvent( 'compositionend' )
 			);

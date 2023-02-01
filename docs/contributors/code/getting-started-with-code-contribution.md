@@ -18,6 +18,9 @@ We recommend using the [Node Version Manager](https://github.com/nvm-sh/nvm) (nv
 
 As an alternative to Docker setup, you can use [Local](https://localwp.com/), [WampServer](http://www.wampserver.com/en/), or [MAMP](https://www.mamp.info/), or even use a remote server.
 
+-   GitHub CLI
+    Although not a requirement, the [GitHub CLI](https://cli.github.com/) can be very useful in helping you checkout pull requests locally. Both from the Gutenberg repo and forked repos. This can be a major time saver while code reviewing and testing pull requests.
+
 ## Getting the Gutenberg code
 
 Fork the Gutenberg repository, clone it to your computer and add the WordPress repository as upstream.
@@ -71,7 +74,7 @@ To stop the running environment:
 npm run wp-env stop
 ```
 
-If everyting went well, you should see the following message in your terminal:
+If everything went well, you should see the following message in your terminal:
 
 ```bash
 WordPress development site started at http://localhost:8888/
@@ -144,7 +147,7 @@ ln -s gutenberg/packages/e2e-tests/plugins/* .
 You'll need to run this again if new plugins are added. To run e2e tests:
 
 ```bash
-WP_BASE_URL=http://localhost:8888/gutenberg npm run test-e2e
+WP_BASE_URL=http://localhost:8888/gutenberg/ npm run test:e2e
 ```
 
 #### Caching of PHP files

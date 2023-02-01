@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -11,8 +12,6 @@ import ImageSizeControl from '../index';
 describe( 'ImageSizeControl', () => {
 	const mockOnChange = jest.fn();
 	const mockOnChangeImage = jest.fn();
-	const getHeightInput = () => screen.getByLabelText( 'Height' );
-	const getWidthInput = () => screen.getByLabelText( 'Width' );
 
 	afterEach( () => {
 		// Cleanup on exiting.
@@ -31,8 +30,12 @@ describe( 'ImageSizeControl', () => {
 			/>
 		);
 
-		expect( getHeightInput().value ).toBe( '300' );
-		expect( getWidthInput().value ).toBe( '400' );
+		expect(
+			screen.getByRole( 'spinbutton', { name: 'Height' } )
+		).toHaveValue( 300 );
+		expect(
+			screen.getByRole( 'spinbutton', { name: 'Width' } )
+		).toHaveValue( 400 );
 	} );
 
 	it( 'returns default dimensions when custom dimensions are undefined', () => {
@@ -44,15 +47,23 @@ describe( 'ImageSizeControl', () => {
 			/>
 		);
 
-		expect( getHeightInput().value ).toBe( '100' );
-		expect( getWidthInput().value ).toBe( '200' );
+		expect(
+			screen.getByRole( 'spinbutton', { name: 'Height' } )
+		).toHaveValue( 100 );
+		expect(
+			screen.getByRole( 'spinbutton', { name: 'Width' } )
+		).toHaveValue( 200 );
 	} );
 
-	it( 'returns empty string when custom and default dimensions are undefined', () => {
+	it( 'returns no value when custom and default dimensions are undefined', () => {
 		render( <ImageSizeControl onChange={ mockOnChange } /> );
 
-		expect( getHeightInput().value ).toBe( '' );
-		expect( getWidthInput().value ).toBe( '' );
+		expect(
+			screen.getByRole( 'spinbutton', { name: 'Height' } )
+		).toHaveValue( null );
+		expect(
+			screen.getByRole( 'spinbutton', { name: 'Width' } )
+		).toHaveValue( null );
 	} );
 
 	it( 'returns default dimensions when initially undefined defaults are defined on rerender', () => {
@@ -62,12 +73,14 @@ describe( 'ImageSizeControl', () => {
 			<ImageSizeControl onChange={ mockOnChange } />
 		);
 
-		const heightInput = getHeightInput();
-		const widthInput = getWidthInput();
+		const heightInput = screen.getByRole( 'spinbutton', {
+			name: 'Height',
+		} );
+		const widthInput = screen.getByRole( 'spinbutton', { name: 'Width' } );
 
 		// The dimensions are initially set to an empty string.
-		expect( heightInput.value ).toBe( '' );
-		expect( widthInput.value ).toBe( '' );
+		expect( heightInput ).toHaveValue( null );
+		expect( widthInput ).toHaveValue( null );
 
 		// When new default dimensions are passed on a rerender (for example after they
 		// are calculated following an image upload), update values to the new defaults.
@@ -80,51 +93,66 @@ describe( 'ImageSizeControl', () => {
 		);
 
 		// The dimensions should update to the defaults.
-		expect( heightInput.value ).toBe( '300' );
-		expect( widthInput.value ).toBe( '400' );
+		expect( heightInput ).toHaveValue( 300 );
+		expect( widthInput ).toHaveValue( 400 );
 	} );
 
 	describe( 'updating dimension inputs', () => {
 		it( 'updates height and calls onChange', async () => {
+			const user = userEvent.setup();
 			render( <ImageSizeControl onChange={ mockOnChange } /> );
 
-			const heightInput = getHeightInput();
-			const widthInput = getWidthInput();
-
-			expect( heightInput.value ).toBe( '' );
-			expect( widthInput.value ).toBe( '' );
-
-			fireEvent.change( heightInput, { target: { value: '500' } } );
-
-			await waitFor( () => {
-				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
-				expect( mockOnChange ).toHaveBeenCalledWith( { height: 500 } );
+			const heightInput = screen.getByRole( 'spinbutton', {
+				name: 'Height',
+			} );
+			const widthInput = screen.getByRole( 'spinbutton', {
+				name: 'Width',
 			} );
 
-			expect( heightInput.value ).toBe( '500' );
-			expect( widthInput.value ).toBe( '' );
+			expect( heightInput ).toHaveValue( null );
+			expect( widthInput ).toHaveValue( null );
+
+			const newHeight = '500';
+
+			await user.clear( heightInput );
+			await user.type( heightInput, newHeight );
+
+			expect( mockOnChange ).toHaveBeenCalledTimes( newHeight.length );
+			expect( mockOnChange ).toHaveBeenLastCalledWith( { height: 500 } );
+
+			expect( heightInput ).toHaveValue( 500 );
+			expect( widthInput ).toHaveValue( null );
 		} );
 
 		it( 'updates width and calls onChange', async () => {
+			const user = userEvent.setup();
+
 			render( <ImageSizeControl onChange={ mockOnChange } /> );
 
-			const heightInput = getHeightInput();
-			const widthInput = getWidthInput();
-
-			expect( heightInput.value ).toBe( '' );
-			expect( widthInput.value ).toBe( '' );
-
-			fireEvent.change( widthInput, { target: { value: '500' } } );
-			await waitFor( () => {
-				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
-				expect( mockOnChange ).toHaveBeenCalledWith( { width: 500 } );
+			const heightInput = screen.getByRole( 'spinbutton', {
+				name: 'Height',
+			} );
+			const widthInput = screen.getByRole( 'spinbutton', {
+				name: 'Width',
 			} );
 
-			expect( heightInput.value ).toBe( '' );
-			expect( widthInput.value ).toBe( '500' );
+			expect( heightInput ).toHaveValue( null );
+			expect( widthInput ).toHaveValue( null );
+
+			const newWidth = '500';
+			await user.clear( widthInput );
+			await user.type( widthInput, newWidth );
+
+			expect( mockOnChange ).toHaveBeenCalledTimes( newWidth.length );
+			expect( mockOnChange ).toHaveBeenLastCalledWith( { width: 500 } );
+
+			expect( heightInput ).toHaveValue( null );
+			expect( widthInput ).toHaveValue( 500 );
 		} );
 
 		it( 'updates height and calls onChange for empty value', async () => {
+			const user = userEvent.setup();
+
 			render(
 				<ImageSizeControl
 					imageHeight="100"
@@ -133,28 +161,33 @@ describe( 'ImageSizeControl', () => {
 				/>
 			);
 
-			const heightInput = getHeightInput();
-			const widthInput = getWidthInput();
-
-			expect( heightInput.value ).toBe( '100' );
-			expect( widthInput.value ).toBe( '100' );
-
-			fireEvent.change( heightInput, { target: { value: '' } } );
-
-			await waitFor( () => {
-				// onChange is called and sets the dimension to undefined rather than
-				// the empty string.
-				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
-				expect( mockOnChange ).toHaveBeenCalledWith( {
-					height: undefined,
-				} );
+			const heightInput = screen.getByRole( 'spinbutton', {
+				name: 'Height',
 			} );
+			const widthInput = screen.getByRole( 'spinbutton', {
+				name: 'Width',
+			} );
+
+			expect( heightInput ).toHaveValue( 100 );
+			expect( widthInput ).toHaveValue( 100 );
+
+			await user.clear( heightInput );
+
+			// onChange is called and sets the dimension to undefined rather than
+			// the empty string.
+			expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
+			expect( mockOnChange ).toHaveBeenLastCalledWith( {
+				height: undefined,
+			} );
+
 			// Height is updated to empty value and does not reset to default.
-			expect( heightInput.value ).toBe( '' );
-			expect( widthInput.value ).toBe( '100' );
+			expect( heightInput ).toHaveValue( null );
+			expect( widthInput ).toHaveValue( 100 );
 		} );
 
 		it( 'updates width and calls onChange for empty value', async () => {
+			const user = userEvent.setup();
+
 			render(
 				<ImageSizeControl
 					imageHeight="100"
@@ -163,30 +196,35 @@ describe( 'ImageSizeControl', () => {
 				/>
 			);
 
-			const heightInput = getHeightInput();
-			const widthInput = getWidthInput();
-
-			expect( heightInput.value ).toBe( '100' );
-			expect( widthInput.value ).toBe( '100' );
-
-			fireEvent.change( widthInput, { target: { value: '' } } );
-
-			await waitFor( () => {
-				// onChange is called and sets the dimension to undefined rather than
-				// the empty string.
-				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
-				expect( mockOnChange ).toHaveBeenCalledWith( {
-					width: undefined,
-				} );
+			const heightInput = screen.getByRole( 'spinbutton', {
+				name: 'Height',
 			} );
+			const widthInput = screen.getByRole( 'spinbutton', {
+				name: 'Width',
+			} );
+
+			expect( heightInput ).toHaveValue( 100 );
+			expect( widthInput ).toHaveValue( 100 );
+
+			await user.clear( widthInput );
+
+			// onChange is called and sets the dimension to undefined rather than
+			// the empty string.
+			expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
+			expect( mockOnChange ).toHaveBeenLastCalledWith( {
+				width: undefined,
+			} );
+
 			// Width is updated to empty value and does not reset to default.
-			expect( heightInput.value ).toBe( '100' );
-			expect( widthInput.value ).toBe( '' );
+			expect( heightInput ).toHaveValue( 100 );
+			expect( widthInput ).toHaveValue( null );
 		} );
 	} );
 
 	describe( 'reset button', () => {
 		it( 'resets both height and width to default values', async () => {
+			const user = userEvent.setup();
+
 			render(
 				<ImageSizeControl
 					imageHeight="100"
@@ -197,31 +235,35 @@ describe( 'ImageSizeControl', () => {
 				/>
 			);
 
-			const heightInput = getHeightInput();
-			const widthInput = getWidthInput();
+			const heightInput = screen.getByRole( 'spinbutton', {
+				name: 'Height',
+			} );
+			const widthInput = screen.getByRole( 'spinbutton', {
+				name: 'Width',
+			} );
 
 			// The initial dimension values display first.
-			expect( heightInput.value ).toBe( '300' );
-			expect( widthInput.value ).toBe( '400' );
+			expect( heightInput ).toHaveValue( 300 );
+			expect( widthInput ).toHaveValue( 400 );
 
-			fireEvent.click( screen.getByText( 'Reset' ) );
+			await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
 
-			await waitFor( () => {
-				// Both attributes are set to undefined to clear custom values.
-				expect( mockOnChange ).toHaveBeenCalledWith( {
-					height: undefined,
-					width: undefined,
-				} );
-
-				// The inputs display the default values once more.
-				expect( heightInput.value ).toBe( '100' );
-				expect( widthInput.value ).toBe( '200' );
+			// Both attributes are set to undefined to clear custom values.
+			expect( mockOnChange ).toHaveBeenLastCalledWith( {
+				height: undefined,
+				width: undefined,
 			} );
+
+			// The inputs display the default values once more.
+			expect( heightInput ).toHaveValue( 100 );
+			expect( widthInput ).toHaveValue( 200 );
 		} );
 	} );
 
 	describe( 'image size percentage presets', () => {
 		it( 'updates height and width attributes on selection', async () => {
+			const user = userEvent.setup();
+
 			render(
 				<ImageSizeControl
 					imageHeight="100"
@@ -230,20 +272,25 @@ describe( 'ImageSizeControl', () => {
 				/>
 			);
 
-			fireEvent.click( screen.getByText( '50%' ) );
+			const button = screen.getByRole( 'button', {
+				name: '50%',
+				pressed: false,
+			} );
 
-			await waitFor( () => {
-				expect( screen.getByText( '50%' ) ).toHaveClass( 'is-pressed' );
+			await user.click( button );
 
-				// Both attributes are set to the rounded scaled value.
-				expect( mockOnChange ).toHaveBeenCalledWith( {
-					height: 50,
-					width: 101,
-				} );
+			expect( button ).toHaveClass( 'is-pressed' );
+
+			// Both attributes are set to the rounded scaled value.
+			expect( mockOnChange ).toHaveBeenLastCalledWith( {
+				height: 50,
+				width: 101,
 			} );
 		} );
 
 		it( 'updates height and width inputs on selection', async () => {
+			const user = userEvent.setup();
+
 			render(
 				<ImageSizeControl
 					imageHeight="100"
@@ -252,13 +299,20 @@ describe( 'ImageSizeControl', () => {
 				/>
 			);
 
-			fireEvent.click( screen.getByText( '50%' ) );
-
-			await waitFor( () => {
-				// Both attributes are set to the rounded scaled value.
-				expect( getHeightInput().value ).toBe( '50' );
-				expect( getWidthInput().value ).toBe( '101' );
+			const button = screen.getByRole( 'button', {
+				name: '50%',
+				pressed: false,
 			} );
+
+			await user.click( button );
+
+			// Both attributes are set to the rounded scaled value.
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Height' } )
+			).toHaveValue( 50 );
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Width' } )
+			).toHaveValue( 101 );
 		} );
 	} );
 
@@ -279,12 +333,14 @@ describe( 'ImageSizeControl', () => {
 				/>
 			);
 
-			expect( screen.getByLabelText( 'Image size' ).value ).toBe(
-				'medium'
-			);
+			expect(
+				screen.getByRole( 'combobox', { name: 'Image size' } )
+			).toHaveValue( 'medium' );
 		} );
 
 		it( 'calls onChangeImage with selected slug on selection', async () => {
+			const user = userEvent.setup();
+
 			render(
 				<ImageSizeControl
 					imageSizeOptions={ IMAGE_SIZE_OPTIONS }
@@ -294,17 +350,16 @@ describe( 'ImageSizeControl', () => {
 				/>
 			);
 
-			fireEvent.change( screen.getByLabelText( 'Image size' ), {
-				target: { value: 'thumbnail' },
-			} );
+			await user.selectOptions(
+				screen.getByRole( 'combobox', { name: 'Image size' } ),
+				'thumbnail'
+			);
 
-			await waitFor( () => {
-				// onChangeImage is called with the slug and the event.
-				expect( mockOnChangeImage ).toHaveBeenCalledWith(
-					'thumbnail',
-					expect.any( Object )
-				);
-			} );
+			// onChangeImage is called with the slug and the event.
+			expect( mockOnChangeImage ).toHaveBeenLastCalledWith(
+				'thumbnail',
+				expect.any( Object )
+			);
 		} );
 	} );
 } );

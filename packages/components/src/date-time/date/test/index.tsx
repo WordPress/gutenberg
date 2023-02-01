@@ -1,10 +1,9 @@
 /**
  * External dependencies
  */
-import moment from 'moment';
+import { format } from 'date-fns';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import 'react-dates/initialize';
 
 /**
  * Internal dependencies
@@ -16,26 +15,23 @@ describe( 'DatePicker', () => {
 		render( <DatePicker currentDate="2022-05-02T11:00:00" /> );
 
 		expect(
-			screen.getByRole( 'button', { name: 'Monday, May 2, 2022' } )
-		).toHaveClass( 'CalendarDay__selected' );
-
-		// Expect React deprecation warning due to 'react-dates' using outdated
-		// React lifecycle methods.
-		// https://github.com/react-dates/react-dates/issues/1748
-		expect( console ).toHaveWarned();
+			screen.getByRole( 'button', { name: 'May 2, 2022. Selected' } )
+		).toBeInTheDocument();
 	} );
 
 	it( "should highlight today's date when not provided a currentDate", () => {
 		render( <DatePicker /> );
 
-		const todayDescription = moment().format( 'dddd, MMMM D, YYYY' );
+		const todayDescription = format( new Date(), 'MMMM d, yyyy' );
 		expect(
-			screen.getByRole( 'button', { name: todayDescription } )
-		).toHaveClass( 'CalendarDay__selected' );
+			screen.getByRole( 'button', {
+				name: `${ todayDescription }. Selected`,
+			} )
+		).toBeInTheDocument();
 	} );
 
 	it( 'should call onChange when a day is selected', async () => {
-		const user = userEvent.setup( { delay: null } );
+		const user = userEvent.setup();
 
 		const onChange = jest.fn();
 
@@ -47,14 +43,14 @@ describe( 'DatePicker', () => {
 		);
 
 		await user.click(
-			screen.getByRole( 'button', { name: 'Friday, May 20, 2022' } )
+			screen.getByRole( 'button', { name: 'May 20, 2022' } )
 		);
 
 		expect( onChange ).toHaveBeenCalledWith( '2022-05-20T11:00:00' );
 	} );
 
 	it( 'should call onMonthPreviewed and onChange when a day in a different month is selected', async () => {
-		const user = userEvent.setup( { delay: null } );
+		const user = userEvent.setup();
 
 		const onMonthPreviewed = jest.fn();
 		const onChange = jest.fn();
@@ -69,7 +65,7 @@ describe( 'DatePicker', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Move forward to switch to the next month.',
+				name: 'View next month',
 			} )
 		);
 
@@ -78,7 +74,7 @@ describe( 'DatePicker', () => {
 		);
 
 		await user.click(
-			screen.getByRole( 'button', { name: 'Monday, June 20, 2022' } )
+			screen.getByRole( 'button', { name: 'June 20, 2022' } )
 		);
 
 		expect( onChange ).toHaveBeenCalledWith( '2022-06-20T11:00:00' );
@@ -97,31 +93,25 @@ describe( 'DatePicker', () => {
 
 		expect(
 			screen
-				.getAllByLabelText( 'There is 1 event.', { exact: false } )
+				.getAllByLabelText( 'There is 1 event', { exact: false } )
 				.map( ( day ) => day.getAttribute( 'aria-label' ) )
 		).toEqual( [
-			'Wednesday, May 4, 2022. There is 1 event.',
-			'Thursday, May 19, 2022. There is 1 event.',
+			'May 4, 2022. There is 1 event',
+			'May 19, 2022. There is 1 event',
 		] );
 	} );
 
 	it( 'should not allow invalid date to be selected', async () => {
-		const user = userEvent.setup( { delay: null } );
-
-		const onChange = jest.fn();
-
 		render(
 			<DatePicker
 				currentDate="2022-05-02T11:00:00"
-				onChange={ onChange }
 				isInvalidDate={ ( date ) => date.getDate() === 20 }
 			/>
 		);
 
-		await user.click(
-			screen.getByRole( 'button', { name: 'Friday, May 20, 2022' } )
-		);
-
-		expect( onChange ).not.toHaveBeenCalledWith( '2022-05-20T11:00:00' );
+		const button = screen.getByRole( 'button', {
+			name: 'May 20, 2022',
+		} ) as HTMLButtonElement;
+		expect( button.disabled ).toBe( true );
 	} );
 } );

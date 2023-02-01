@@ -97,7 +97,14 @@ exports[`Audio block renders audio block error state without crashing 1`] = `
         }
       }
     >
-      <View>
+      <View
+        style={
+          Array [
+            undefined,
+            undefined,
+          ]
+        }
+      >
         <RCTAztecView
           accessible={true}
           activeFormats={Array []}
@@ -277,7 +284,14 @@ exports[`Audio block renders audio file without crashing 1`] = `
         }
       }
     >
-      <View>
+      <View
+        style={
+          Array [
+            undefined,
+            undefined,
+          ]
+        }
+      >
         <RCTAztecView
           accessible={true}
           activeFormats={Array []}

@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { ResizableBox, Spinner, withNotices } from '@wordpress/components';
+import { ResizableBox, Spinner } from '@wordpress/components';
 import {
 	BlockControls,
 	BlockIcon,
@@ -19,6 +19,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
 import { isBlobURL } from '@wordpress/blob';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -36,7 +37,9 @@ export function imageFillStyles( url, focalPoint ) {
 		? {
 				backgroundImage: `url(${ url })`,
 				backgroundPosition: focalPoint
-					? `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`
+					? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round(
+							focalPoint.y * 100
+					  ) }%`
 					: `50% 50%`,
 		  }
 		: {};
@@ -71,16 +74,11 @@ function ToolbarEditButton( { mediaId, mediaUrl, onSelectMedia } ) {
 	);
 }
 
-function PlaceholderContainer( {
-	className,
-	noticeOperations,
-	noticeUI,
-	mediaUrl,
-	onSelectMedia,
-} ) {
+function PlaceholderContainer( { className, mediaUrl, onSelectMedia } ) {
+	const { createErrorNotice } = useDispatch( noticesStore );
+
 	const onUploadError = ( message ) => {
-		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
+		createErrorNotice( message, { type: 'snackbar' } );
 	};
 
 	return (
@@ -93,7 +91,6 @@ function PlaceholderContainer( {
 			onSelect={ onSelectMedia }
 			accept="image/*,video/*"
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
-			notices={ noticeUI }
 			onError={ onUploadError }
 			disableMediaButtons={ mediaUrl }
 		/>
@@ -116,6 +113,7 @@ function MediaContainer( props, ref ) {
 		mediaWidth,
 		onSelectMedia,
 		onWidthChange,
+		isContentLocked,
 	} = props;
 
 	const isTemporaryMedia = ! mediaId && isBlobURL( mediaUrl );
@@ -134,8 +132,8 @@ function MediaContainer( props, ref ) {
 			commitWidthChange( parseInt( elt.style.width ) );
 		};
 		const enablePositions = {
-			right: mediaPosition === 'left',
-			left: mediaPosition === 'right',
+			right: ! isContentLocked && mediaPosition === 'left',
+			left: ! isContentLocked && mediaPosition === 'right',
 		};
 
 		const backgroundStyles =
@@ -184,4 +182,4 @@ function MediaContainer( props, ref ) {
 	return <PlaceholderContainer { ...props } />;
 }
 
-export default withNotices( forwardRef( MediaContainer ) );
+export default forwardRef( MediaContainer );

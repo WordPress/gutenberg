@@ -11,6 +11,7 @@ import {
 	ColorIndicator,
 	Dropdown,
 	FlexItem,
+	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	__experimentalHStack as HStack,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -60,7 +61,12 @@ const LabeledColorIndicator = ( { colorValue, label } ) => (
 			className="block-editor-panel-color-gradient-settings__color-indicator"
 			colorValue={ colorValue }
 		/>
-		<FlexItem>{ label }</FlexItem>
+		<FlexItem
+			className="block-editor-panel-color-gradient-settings__color-name"
+			title={ label }
+		>
+			{ label }
+		</FlexItem>
 	</HStack>
 );
 
@@ -105,7 +111,6 @@ export default function ColorGradientSettingsDropdown( {
 	enableAlpha,
 	gradients,
 	settings,
-	__experimentalHasMultipleOrigins,
 	__experimentalIsRenderedInSidebar,
 	...props
 } ) {
@@ -114,7 +119,7 @@ export default function ColorGradientSettingsDropdown( {
 		popoverProps = {
 			placement: 'left-start',
 			offset: 36,
-			__unstableShift: true,
+			shift: true,
 		};
 	}
 
@@ -134,7 +139,6 @@ export default function ColorGradientSettingsDropdown( {
 					onColorChange: setting.onColorChange,
 					onGradientChange: setting.onGradientChange,
 					showTitle: false,
-					__experimentalHasMultipleOrigins,
 					__experimentalIsRenderedInSidebar,
 					...setting,
 				};
@@ -155,10 +159,15 @@ export default function ColorGradientSettingsDropdown( {
 							<Dropdown
 								popoverProps={ popoverProps }
 								className="block-editor-tools-panel-color-gradient-settings__dropdown"
-								contentClassName="block-editor-panel-color-gradient-settings__dropdown-content"
 								renderToggle={ renderToggle( toggleSettings ) }
 								renderContent={ () => (
-									<ColorGradientControl { ...controlProps } />
+									<DropdownContentWrapper paddingSize="none">
+										<div className="block-editor-panel-color-gradient-settings__dropdown-content">
+											<ColorGradientControl
+												{ ...controlProps }
+											/>
+										</div>
+									</DropdownContentWrapper>
 								) }
 							/>
 						</WithToolsPanelItem>

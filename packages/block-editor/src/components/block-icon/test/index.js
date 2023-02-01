@@ -1,12 +1,11 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render } from '@testing-library/react';
 
 /**
  * WordPress dependencies
  */
-import { Icon } from '@wordpress/components';
 import { image } from '@wordpress/icons';
 
 /**
@@ -14,44 +13,64 @@ import { image } from '@wordpress/icons';
  */
 import BlockIcon from '../';
 
+function getIconWrapper( container ) {
+	return container.firstChild;
+}
+
 describe( 'BlockIcon', () => {
 	it( 'renders a Icon', () => {
-		const wrapper = shallow( <BlockIcon icon={ image } /> );
+		const { container } = render( <BlockIcon icon={ image } /> );
 
-		expect(
-			wrapper.containsMatchingElement( <Icon icon={ image } /> )
-		).toBe( true );
+		expect( container ).toMatchSnapshot();
 	} );
 
 	it( 'renders a span without the has-colors classname', () => {
-		const wrapper = shallow( <BlockIcon icon={ image } /> );
+		const { container } = render( <BlockIcon icon={ image } /> );
 
-		expect( wrapper.find( 'span' ).hasClass( 'has-colors' ) ).toBe( false );
+		expect( getIconWrapper( container ) ).not.toHaveClass( 'has-colors' );
 	} );
 
 	it( 'renders a span with the has-colors classname', () => {
-		const wrapper = shallow( <BlockIcon icon={ image } showColors /> );
+		const { container } = render( <BlockIcon icon={ image } showColors /> );
 
-		expect( wrapper.find( 'span' ).hasClass( 'has-colors' ) ).toBe( true );
+		expect( getIconWrapper( container ) ).toHaveClass( 'has-colors' );
+	} );
+
+	it( 'supports adding a className to the wrapper', () => {
+		const { container } = render(
+			<BlockIcon icon={ image } className="foo-bar" />
+		);
+
+		expect( getIconWrapper( container ) ).toHaveClass( 'foo-bar' );
 	} );
 
 	it( 'skips adding background and foreground styles when colors are not enabled', () => {
-		const wrapper = shallow(
-			<BlockIcon icon={ { background: 'white', foreground: 'black' } } />
+		const { container } = render(
+			<BlockIcon
+				icon={ {
+					background: 'white',
+					foreground: 'black',
+					src: 'image',
+				} }
+			/>
 		);
 
-		expect( wrapper.find( 'span' ).prop( 'style' ) ).toEqual( {} );
+		expect( getIconWrapper( container ) ).not.toHaveAttribute( 'style' );
 	} );
 
 	it( 'adds background and foreground styles when colors are enabled', () => {
-		const wrapper = shallow(
+		const { container } = render(
 			<BlockIcon
-				icon={ { background: 'white', foreground: 'black' } }
+				icon={ {
+					background: 'white',
+					foreground: 'black',
+					src: 'image',
+				} }
 				showColors
 			/>
 		);
 
-		expect( wrapper.find( 'span' ).prop( 'style' ) ).toEqual( {
+		expect( getIconWrapper( container ) ).toHaveStyle( {
 			backgroundColor: 'white',
 			color: 'black',
 		} );

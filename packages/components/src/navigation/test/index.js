@@ -190,9 +190,7 @@ describe( 'Navigation', () => {
 	} );
 
 	it( 'should set an active category on click', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render( <TestNavigation /> );
 
@@ -220,7 +218,7 @@ describe( 'Navigation', () => {
 		render( <TestNavigation showBadge /> );
 
 		const menuItem = screen.getAllByRole( 'listitem' );
-		expect( menuItem[ 0 ].textContent ).toBe( 'Item 1' + '21' );
+		expect( menuItem[ 0 ] ).toHaveTextContent( 'Item 1' + '21' );
 	} );
 
 	it( 'should render menu titles when items exist', () => {
@@ -234,9 +232,7 @@ describe( 'Navigation', () => {
 	} );
 
 	it( 'should navigate up a level when clicking the back button', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render( <TestNavigation rootTitle="Home" /> );
 
@@ -250,9 +246,7 @@ describe( 'Navigation', () => {
 	} );
 
 	it( 'should navigate correctly when controlled', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 
 		render( <TestNavigationControlled /> );
 

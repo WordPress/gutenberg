@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, kebabCase } from 'lodash';
+import { kebabCase } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -111,14 +111,12 @@ export function FontFamilyEdit( {
 } ) {
 	const fontFamilies = useSetting( 'typography.fontFamilies' );
 
-	const value = find(
-		fontFamilies,
+	const value = fontFamilies?.find(
 		( { slug } ) => fontFamily === slug
 	)?.fontFamily;
 
 	function onChange( newValue ) {
-		const predefinedFontFamily = find(
-			fontFamilies,
+		const predefinedFontFamily = fontFamilies?.find(
 			( { fontFamily: f } ) => f === newValue
 		);
 		setAttributes( {
@@ -132,6 +130,8 @@ export function FontFamilyEdit( {
 			fontFamilies={ fontFamilies }
 			value={ value }
 			onChange={ onChange }
+			size="__unstable-large"
+			__nextHasNoMarginBottom
 		/>
 	);
 }

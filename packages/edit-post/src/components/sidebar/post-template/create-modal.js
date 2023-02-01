@@ -7,10 +7,10 @@ import { useState } from '@wordpress/element';
 import { serialize, createBlock } from '@wordpress/blocks';
 import {
 	Modal,
-	Flex,
-	FlexItem,
 	TextControl,
 	Button,
+	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { cleanForSlug } from '@wordpress/url';
@@ -100,7 +100,6 @@ export default function PostTemplateCreateModal( { onClose } ) {
 	return (
 		<Modal
 			title={ __( 'Create custom template' ) }
-			closeLabel={ __( 'Close' ) }
 			onRequestClose={ cancel }
 			className="edit-post-post-template__create-modal"
 		>
@@ -108,28 +107,23 @@ export default function PostTemplateCreateModal( { onClose } ) {
 				className="edit-post-post-template__create-form"
 				onSubmit={ submit }
 			>
-				<Flex align="flex-start" gap={ 8 }>
-					<FlexItem>
-						<TextControl
-							label={ __( 'Name' ) }
-							value={ title }
-							onChange={ setTitle }
-							placeholder={ DEFAULT_TITLE }
-							disabled={ isBusy }
-							help={ __(
-								'Describe the purpose of the template, e.g. "Full Width". Custom templates can be applied to any post or page.'
-							) }
-						/>
-					</FlexItem>
-				</Flex>
-
-				<Flex justify="flex-end" expanded={ false }>
-					<FlexItem>
+				<VStack spacing="3">
+					<TextControl
+						__nextHasNoMarginBottom
+						label={ __( 'Name' ) }
+						value={ title }
+						onChange={ setTitle }
+						placeholder={ DEFAULT_TITLE }
+						disabled={ isBusy }
+						help={ __(
+							'Describe the template, e.g. "Post with sidebar". Custom templates can be applied to any post or page.'
+						) }
+					/>
+					<HStack justify="right">
 						<Button variant="tertiary" onClick={ cancel }>
 							{ __( 'Cancel' ) }
 						</Button>
-					</FlexItem>
-					<FlexItem>
+
 						<Button
 							variant="primary"
 							type="submit"
@@ -138,8 +132,8 @@ export default function PostTemplateCreateModal( { onClose } ) {
 						>
 							{ __( 'Create' ) }
 						</Button>
-					</FlexItem>
-				</Flex>
+					</HStack>
+				</VStack>
 			</form>
 		</Modal>
 	);

@@ -1,10 +1,4 @@
 /**
- * External dependencies
- */
-
-import { reject } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useCallback, useMemo } from '@wordpress/element';
@@ -110,7 +104,9 @@ function setColors( value, name, colorSettings, colors ) {
 		const newFormat = applyFormat( value, format );
 		const { activeFormats } = newFormat;
 		newFormat.formats[ value.start ] = [
-			...reject( activeFormats, { type: format.type } ),
+			...( activeFormats?.filter(
+				( { type } ) => type !== format.type
+			) || [] ),
 			format,
 		];
 		return newFormat;

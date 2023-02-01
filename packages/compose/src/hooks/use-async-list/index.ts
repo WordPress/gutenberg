@@ -44,7 +44,7 @@ function useAsyncList< T >(
 	config: AsyncListConfig = { step: 1 }
 ): T[] {
 	const { step = 1 } = config;
-	const [ current, setCurrent ] = useState( [] as T[] );
+	const [ current, setCurrent ] = useState< T[] >( [] );
 
 	useEffect( () => {
 		// On reset, we keep the first items that were previously rendered.
@@ -55,10 +55,9 @@ function useAsyncList< T >(
 			);
 		}
 		setCurrent( firstItems );
-		let nextIndex = firstItems.length;
 
 		const asyncQueue = createQueue();
-		const append = () => {
+		const append = ( nextIndex: number ) => () => {
 			if ( list.length <= nextIndex ) {
 				return;
 			}
@@ -66,10 +65,9 @@ function useAsyncList< T >(
 				...state,
 				...list.slice( nextIndex, nextIndex + step ),
 			] );
-			nextIndex += step;
-			asyncQueue.add( {}, append );
+			asyncQueue.add( {}, append( nextIndex + step ) );
 		};
-		asyncQueue.add( {}, append );
+		asyncQueue.add( {}, append( firstItems.length ) );
 
 		return () => asyncQueue.reset();
 	}, [ list ] );

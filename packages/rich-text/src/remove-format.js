@@ -1,10 +1,4 @@
 /**
- * External dependencies
- */
-
-import { find, reject } from 'lodash';
-
-/**
  * Internal dependencies
  */
 
@@ -36,17 +30,27 @@ export function removeFormat(
 	// If the selection is collapsed, expand start and end to the edges of the
 	// format.
 	if ( startIndex === endIndex ) {
-		const format = find( newFormats[ startIndex ], { type: formatType } );
+		const format = newFormats[ startIndex ]?.find(
+			( { type } ) => type === formatType
+		);
 
 		if ( format ) {
-			while ( find( newFormats[ startIndex ], format ) ) {
+			while (
+				newFormats[ startIndex ]?.find(
+					( newFormat ) => newFormat === format
+				)
+			) {
 				filterFormats( newFormats, startIndex, formatType );
 				startIndex--;
 			}
 
 			endIndex++;
 
-			while ( find( newFormats[ endIndex ], format ) ) {
+			while (
+				newFormats[ endIndex ]?.find(
+					( newFormat ) => newFormat === format
+				)
+			) {
 				filterFormats( newFormats, endIndex, formatType );
 				endIndex++;
 			}
@@ -62,7 +66,8 @@ export function removeFormat(
 	return normaliseFormats( {
 		...value,
 		formats: newFormats,
-		activeFormats: reject( activeFormats, { type: formatType } ),
+		activeFormats:
+			activeFormats?.filter( ( { type } ) => type !== formatType ) || [],
 	} );
 }
 

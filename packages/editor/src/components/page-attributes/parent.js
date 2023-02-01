@@ -1,20 +1,15 @@
 /**
  * External dependencies
  */
-import {
-	get,
-	unescape as unescapeString,
-	debounce,
-	repeat,
-	find,
-	deburr,
-} from 'lodash';
+import { get } from 'lodash';
+import removeAccents from 'remove-accents';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { ComboboxControl } from '@wordpress/components';
+import { debounce } from '@wordpress/compose';
 import { useState, useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -33,8 +28,8 @@ function getTitle( post ) {
 }
 
 export const getItemPriority = ( name, searchValue ) => {
-	const normalizedName = deburr( name ).toLowerCase();
-	const normalizedSearch = deburr( searchValue ).toLowerCase();
+	const normalizedName = removeAccents( name || '' ).toLowerCase();
+	const normalizedSearch = removeAccents( searchValue || '' ).toLowerCase();
 	if ( normalizedName === normalizedSearch ) {
 		return 0;
 	}
@@ -98,7 +93,7 @@ export function PageAttributesParent() {
 				{
 					value: treeNode.id,
 					label:
-						repeat( '— ', level ) + unescapeString( treeNode.name ),
+						'— '.repeat( level ) + decodeEntities( treeNode.name ),
 					rawName: treeNode.name,
 				},
 				...getOptionsFromTree( treeNode.children || [], level + 1 ),
@@ -127,8 +122,7 @@ export function PageAttributesParent() {
 		const opts = getOptionsFromTree( tree );
 
 		// Ensure the current parent is in the options list.
-		const optsHasParent = find(
-			opts,
+		const optsHasParent = opts.find(
 			( item ) => item.value === parentPostId
 		);
 		if ( parentPost && ! optsHasParent ) {
@@ -163,6 +157,7 @@ export function PageAttributesParent() {
 
 	return (
 		<ComboboxControl
+			__nextHasNoMarginBottom
 			className="editor-page-attributes__parent"
 			label={ parentPageLabel }
 			value={ parentPostId }

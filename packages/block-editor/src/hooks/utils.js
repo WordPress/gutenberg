@@ -1,18 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	pickBy,
-	isEmpty,
-	isObject,
-	identity,
-	mapValues,
-	forEach,
-	get,
-	setWith,
-	clone,
-	every,
-} from 'lodash';
+import { isEmpty, mapValues, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -26,18 +15,89 @@ import { getBlockSupport } from '@wordpress/blocks';
  * @return {*} Object cleaned from falsy values
  */
 export const cleanEmptyObject = ( object ) => {
-	if ( ! isObject( object ) || Array.isArray( object ) ) {
+	if (
+		object === null ||
+		typeof object !== 'object' ||
+		Array.isArray( object )
+	) {
 		return object;
 	}
-	const cleanedNestedObjects = pickBy(
-		mapValues( object, cleanEmptyObject ),
-		identity
+	const cleanedNestedObjects = Object.fromEntries(
+		Object.entries( mapValues( object, cleanEmptyObject ) ).filter(
+			( [ , value ] ) => Boolean( value )
+		)
 	);
 	return isEmpty( cleanedNestedObjects ) ? undefined : cleanedNestedObjects;
 };
 
+/**
+ * Converts a path to an array of its fragments.
+ * Supports strings, numbers and arrays:
+ *
+ * 'foo' => [ 'foo' ]
+ * 2 => [ '2' ]
+ * [ 'foo', 'bar' ] => [ 'foo', 'bar' ]
+ *
+ * @param {string|number|Array} path Path
+ * @return {Array} Normalized path.
+ */
+function normalizePath( path ) {
+	if ( Array.isArray( path ) ) {
+		return path;
+	} else if ( typeof path === 'number' ) {
+		return [ path.toString() ];
+	}
+
+	return [ path ];
+}
+
+/**
+ * Clones an object.
+ * Non-object values are returned unchanged.
+ *
+ * @param {*} object Object to clone.
+ * @return {*} Cloned object, or original literal non-object value.
+ */
+function cloneObject( object ) {
+	if ( typeof object === 'object' ) {
+		return {
+			...Object.fromEntries(
+				Object.entries( object ).map( ( [ key, value ] ) => [
+					key,
+					cloneObject( value ),
+				] )
+			),
+		};
+	}
+
+	return object;
+}
+
+/**
+ * Perform an immutable set.
+ * Handles nullish initial values.
+ * Clones all nested objects in the specified object.
+ *
+ * @param {Object}              object Object to set a value in.
+ * @param {number|string|Array} path   Path in the object to modify.
+ * @param {*}                   value  New value to set.
+ * @return {Object} Cloned object with the new value set.
+ */
 export function immutableSet( object, path, value ) {
-	return setWith( object ? clone( object ) : {}, path, value, clone );
+	const normalizedPath = normalizePath( path );
+	const newObject = object ? cloneObject( object ) : {};
+
+	normalizedPath.reduce( ( acc, key, i ) => {
+		if ( acc[ key ] === undefined ) {
+			acc[ key ] = {};
+		}
+		if ( i === normalizedPath.length - 1 ) {
+			acc[ key ] = value;
+		}
+		return acc[ key ];
+	}, newObject );
+
+	return newObject;
 }
 
 export function transformStyles(
@@ -49,7 +109,11 @@ export function transformStyles(
 	results
 ) {
 	// If there are no active supports return early.
-	if ( every( activeSupports, ( isActive ) => ! isActive ) ) {
+	if (
+		Object.values( activeSupports ?? {} ).every(
+			( isActive ) => ! isActive
+		)
+	) {
 		return result;
 	}
 	// If the condition verifies we are probably in the presence of a wrapping transform
@@ -73,7 +137,7 @@ export function transformStyles(
 		}
 	}
 	let returnBlock = result;
-	forEach( activeSupports, ( isActive, support ) => {
+	Object.entries( activeSupports ).forEach( ( [ support, isActive ] ) => {
 		if ( isActive ) {
 			migrationPaths[ support ].forEach( ( path ) => {
 				const styleValue = get( referenceBlockAttributes, path );

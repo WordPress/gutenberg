@@ -1,12 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
+import { useInnerBlocksProps, useBlockProps } from '@wordpress/block-editor';
 
-export default function CommentsSave( { attributes: { tagName: Tag } } ) {
-	return (
-		<Tag { ...useBlockProps.save() }>
-			<InnerBlocks.Content />
-		</Tag>
-	);
+export default function save( { attributes: { tagName: Tag, legacy } } ) {
+	const blockProps = useBlockProps.save();
+	const innerBlocksProps = useInnerBlocksProps.save( blockProps );
+
+	// The legacy version is dynamic (i.e. PHP rendered) and doesn't allow inner
+	// blocks, so nothing is saved in that case.
+	return legacy ? null : <Tag { ...innerBlocksProps } />;
 }

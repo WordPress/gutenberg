@@ -1,8 +1,4 @@
 .edit-site-new-template-dropdown {
-	.components-dropdown-menu__toggle {
-		padding: 6px 12px;
-	}
-
 	.edit-site-new-template-dropdown__popover {
 		@include break-small() {
 			min-width: 300px;
@@ -12,33 +8,45 @@
 
 .edit-site-custom-template-modal {
 	&__contents {
-		> div {
-			text-align: center;
-			cursor: pointer;
+		> .components-button {
 			padding: $grid-unit-30;
-			border: 1px solid $gray-300;
+			box-shadow: inset 0 0 0 $border-width $gray-600;
 			border-radius: $radius-block-ui;
 			width: 256px;
+			height: auto;
 			display: flex;
 			flex-direction: column;
 			gap: $grid-unit;
-			align-items: center;
-			justify-content: center;
+
+			// Show the boundary of the button, in High Contrast Mode.
+			outline: 1px solid transparent;
+
+			span:first-child {
+				color: $gray-900;
+			}
 
 			span {
 				color: $gray-700;
 			}
 
 			&:hover {
-				border-color: var(--wp-admin-theme-color);
+				color: var(--wp-admin-theme-color-darker-10);
+				box-shadow: inset 0 0 0 $border-width var(--wp-admin-theme-color-darker-10);
 
-				h5 {
+				span:first-child {
 					color: var(--wp-admin-theme-color);
 				}
 			}
 
 			&:focus {
 				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+				// Windows High Contrast mode will show this outline, but not the box-shadow.
+				outline: 3px solid transparent;
+
+				span:first-child {
+					color: var(--wp-admin-theme-color);
+				}
 			}
 		}
 	}
@@ -124,4 +132,40 @@
 	padding: $grid-unit-20;
 	margin-bottom: 0;
 	margin-top: $grid-unit-20;
+}
+
+
+.edit-site-custom-generic-template__modal {
+	.components-base-control {
+		@include break-medium() {
+			width: $grid-unit * 40;
+		}
+	}
+
+	.components-modal__header {
+		border-bottom: none;
+	}
+
+	.components-modal__content::before {
+		margin-bottom: $grid-unit-05;
+	}
+}
+
+.edit-site-template-actions-loading-screen-modal {
+	backdrop-filter: none;
+	background-color: transparent;
+
+	&.is-full-screen {
+		background-color: $white;
+		box-shadow: 0 0 0 transparent;
+		min-width: 100%;
+		min-height: 100%;
+	}
+
+	&__content {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 100%;
+	}
 }

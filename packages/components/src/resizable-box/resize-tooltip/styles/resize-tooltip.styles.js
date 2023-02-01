@@ -30,7 +30,7 @@ export const TooltipWrapper = styled.div`
 `;
 
 export const Tooltip = styled.div`
-	background: ${ COLORS.ui.border };
+	background: ${ COLORS.gray[ 900 ] };
 	border-radius: 2px;
 	box-sizing: border-box;
 	font-size: 12px;

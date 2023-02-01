@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { shallow, mount } from 'enzyme';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -9,22 +10,39 @@ import { shallow, mount } from 'enzyme';
 import { createCustomColorsHOC } from '../with-colors';
 
 describe( 'createCustomColorsHOC', () => {
-	it( 'provides the the wrapped component with color values and setter functions as props', () => {
+	it( 'provides the wrapped component with color values and setter functions as props', () => {
 		const withCustomColors = createCustomColorsHOC( [
 			{ name: 'Red', slug: 'red', color: 'ff0000' },
 		] );
-		const EnhancedComponent = withCustomColors( 'backgroundColor' )( () => (
-			<div />
-		) );
+		const BaseComponent = jest.fn( () => <div /> );
+		const EnhancedComponent =
+			withCustomColors( 'backgroundColor' )( BaseComponent );
 
-		const wrapper = shallow(
+		render(
 			<EnhancedComponent attributes={ { backgroundColor: null } } />
 		);
 
-		expect( wrapper.dive() ).toMatchSnapshot();
+		expect( BaseComponent ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				attributes: {
+					backgroundColor: null,
+				},
+				backgroundColor: {
+					class: undefined,
+					color: undefined,
+				},
+				colorUtils: {
+					getMostReadableColor: expect.any( Function ),
+				},
+				colors: undefined,
+				setBackgroundColor: expect.any( Function ),
+			} ),
+			expect.anything()
+		);
 	} );
 
-	it( 'setting the color to a value in the provided custom color array updated the backgroundColor attribute', () => {
+	it( 'setting the color to a value in the provided custom color array updated the backgroundColor attribute', async () => {
+		const user = userEvent.setup();
 		const withCustomColors = createCustomColorsHOC( [
 			{ name: 'Red', slug: 'red', color: 'ff0000' },
 		] );
@@ -38,21 +56,23 @@ describe( 'createCustomColorsHOC', () => {
 
 		const setAttributes = jest.fn();
 
-		const wrapper = mount(
+		render(
 			<EnhancedComponent
 				attributes={ { backgroundColor: null } }
 				setAttributes={ setAttributes }
 			/>
 		);
 
-		wrapper.find( 'button' ).simulate( 'click' );
+		await user.click( screen.getByRole( 'button' ) );
+
 		expect( setAttributes ).toHaveBeenCalledWith( {
 			backgroundColor: 'red',
 			customBackgroundColor: undefined,
 		} );
 	} );
 
-	it( 'setting the color to a value not in the provided custom color array updates customBackgroundColor attribute', () => {
+	it( 'setting the color to a value not in the provided custom color array updates customBackgroundColor attribute', async () => {
+		const user = userEvent.setup();
 		const withCustomColors = createCustomColorsHOC( [
 			{ name: 'Red', slug: 'red', color: 'ff0000' },
 		] );
@@ -66,14 +86,15 @@ describe( 'createCustomColorsHOC', () => {
 
 		const setAttributes = jest.fn();
 
-		const wrapper = mount(
+		render(
 			<EnhancedComponent
 				attributes={ { backgroundColor: null } }
 				setAttributes={ setAttributes }
 			/>
 		);
 
-		wrapper.find( 'button' ).simulate( 'click' );
+		await user.click( screen.getByRole( 'button' ) );
+
 		expect( setAttributes ).toHaveBeenCalledWith( {
 			backgroundColor: undefined,
 			customBackgroundColor: '000000',

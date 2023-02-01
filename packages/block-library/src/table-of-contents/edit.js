@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
@@ -21,7 +21,6 @@ import {
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
-import { useDisabled } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { renderToString, useEffect } from '@wordpress/element';
@@ -55,7 +54,6 @@ export default function TableOfContentsEdit( {
 	setAttributes,
 } ) {
 	const blockProps = useBlockProps();
-	const disabledRef = useDisabled();
 
 	const canInsertList = useSelect(
 		( select ) => {
@@ -206,7 +204,7 @@ export default function TableOfContentsEdit( {
 				}
 			}
 
-			if ( isEqual( headings, _latestHeadings ) ) {
+			if ( fastDeepEqual( headings, _latestHeadings ) ) {
 				return null;
 			}
 			return _latestHeadings;
@@ -281,7 +279,7 @@ export default function TableOfContentsEdit( {
 				<div { ...blockProps }>
 					<Placeholder
 						icon={ <BlockIcon icon={ icon } /> }
-						label="Table of Contents"
+						label={ __( 'Table of Contents' ) }
 						instructions={ __(
 							'Start adding Heading blocks to create a table of contents. Headings with HTML anchors will be linked here.'
 						) }
@@ -295,7 +293,7 @@ export default function TableOfContentsEdit( {
 	return (
 		<>
 			<nav { ...blockProps }>
-				<ol ref={ disabledRef }>
+				<ol inert="true">
 					<TableOfContentsList nestedHeadingList={ headingTree } />
 				</ol>
 			</nav>

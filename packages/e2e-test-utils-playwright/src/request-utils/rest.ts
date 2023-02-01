@@ -70,7 +70,7 @@ type RequestFetchOptions = Exclude<
 	Parameters< APIRequestContext[ 'fetch' ] >[ 1 ],
 	undefined
 >;
-interface RestOptions extends RequestFetchOptions {
+export interface RestOptions extends RequestFetchOptions {
 	path: string;
 }
 
@@ -152,7 +152,7 @@ async function getMaxBatchSize( this: RequestUtils, forceRefetch = false ) {
 	return this.maxBatchSize;
 }
 
-interface BatchRequest {
+export interface BatchRequest {
 	method?: string;
 	path: string;
 	headers?: Record< string, string | string[] >;

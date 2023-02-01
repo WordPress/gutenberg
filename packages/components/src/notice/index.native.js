@@ -14,7 +14,7 @@ import { BlurView } from '@react-native-community/blur';
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef, Platform } from '@wordpress/element';
+import { useEffect, useRef, useCallback, Platform } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
@@ -30,27 +30,7 @@ const Notice = ( { onNoticeHidden, content, id, status } ) => {
 	const timer = useRef( null );
 
 	useEffect( () => {
-		startAnimation();
-
-		return () => {
-			clearTimeout( timer?.current );
-		};
-	}, [] );
-
-	function onHide() {
-		Animated.timing( animationValue, {
-			toValue: 0,
-			duration: 150,
-			useNativeDriver: true,
-			easing: Easing.out( Easing.quad ),
-		} ).start( ( { finished } ) => {
-			if ( finished && onNoticeHidden ) {
-				onNoticeHidden( id );
-			}
-		} );
-	}
-
-	function startAnimation() {
+		// start animation
 		Animated.timing( animationValue, {
 			toValue: 1,
 			duration: 300,
@@ -63,7 +43,24 @@ const Notice = ( { onNoticeHidden, content, id, status } ) => {
 				}, HIDE_TIMER );
 			}
 		} );
-	}
+
+		return () => {
+			clearTimeout( timer?.current );
+		};
+	}, [ animationValue, onHide, onNoticeHidden ] );
+
+	const onHide = useCallback( () => {
+		Animated.timing( animationValue, {
+			toValue: 0,
+			duration: 150,
+			useNativeDriver: true,
+			easing: Easing.out( Easing.quad ),
+		} ).start( ( { finished } ) => {
+			if ( finished && onNoticeHidden ) {
+				onNoticeHidden( id );
+			}
+		} );
+	}, [ animationValue, onNoticeHidden, id ] );
 
 	const noticeSolidStyles = usePreferredColorSchemeStyle(
 		styles.noticeSolid,

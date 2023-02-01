@@ -10,10 +10,12 @@ import {
 	insert,
 	isCollapsed,
 	applyFormat,
-	useAnchorRef,
+	useAnchor,
 	removeFormat,
 	slice,
 	replace,
+	split,
+	concat,
 } from '@wordpress/rich-text';
 import {
 	__experimentalLinkControl as LinkControl,
@@ -119,6 +121,7 @@ function InlineLinkUI( {
 		} );
 
 		const newText = nextValue.title || newUrl;
+
 		if ( isCollapsed( value ) && ! isActive ) {
 			// Scenario: we don't have any actively selected text or formats.
 			const toInsert = applyFormat(
@@ -148,14 +151,37 @@ function InlineLinkUI( {
 					newText.length
 				);
 
+				// Get the boundaries of the active link format.
+				const boundary = getFormatBoundary( value, {
+					type: 'core/link',
+				} );
+
+				// Split the value at the start of the active link format.
+				// Passing "start" as the 3rd parameter is required to ensure
+				// the second half of the split value is split at the format's
+				// start boundary and avoids relying on the value's "end" property
+				// which may not correspond correctly.
+				const [ valBefore, valAfter ] = split(
+					value,
+					boundary.start,
+					boundary.start
+				);
+
 				// Update the original (full) RichTextValue replacing the
 				// target text with the *new* RichTextValue containing:
 				// 1. The new text content.
 				// 2. The new link format.
+				// As "replace" will operate on the first match only, it is
+				// run only against the second half of the value which was
+				// split at the active format's boundary. This avoids a bug
+				// with incorrectly targetted replacements.
+				// See: https://github.com/WordPress/gutenberg/issues/41771.
 				// Note original formats will be lost when applying this change.
 				// That is expected behaviour.
 				// See: https://github.com/WordPress/gutenberg/pull/33849#issuecomment-936134179.
-				newValue = replace( value, richTextText, newValue );
+				const newValAfter = replace( valAfter, richTextText, newValue );
+
+				newValue = concat( valBefore, newValAfter );
 			}
 
 			newValue.start = newValue.end;
@@ -183,13 +209,17 @@ function InlineLinkUI( {
 		}
 	}
 
-	const anchorRef = useAnchorRef( { ref: contentRef, value, settings } );
+	const popoverAnchor = useAnchor( {
+		editableContentElement: contentRef.current,
+		value,
+		settings,
+	} );
 
 	// Generate a string based key that is unique to this anchor reference.
 	// This is used to force re-mount the LinkControl component to avoid
 	// potential stale state bugs caused by the component not being remounted
 	// See https://github.com/WordPress/gutenberg/pull/34742.
-	const forceRemountKey = useLinkInstanceKey( anchorRef );
+	const forceRemountKey = useLinkInstanceKey( popoverAnchor );
 
 	// The focusOnMount prop shouldn't evolve during render of a Popover
 	// otherwise it causes a render of the content.
@@ -223,10 +253,11 @@ function InlineLinkUI( {
 
 	return (
 		<Popover
-			anchorRef={ anchorRef }
+			anchor={ popoverAnchor }
 			focusOnMount={ focusOnMount.current }
 			onClose={ stopAddingLink }
-			position="bottom center"
+			placement="bottom"
+			shift
 		>
 			<LinkControl
 				key={ forceRemountKey }

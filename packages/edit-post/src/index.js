@@ -6,10 +6,12 @@ import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
-import { render, unmountComponentAtNode } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
+import { createRoot } from '@wordpress/element';
 import { dispatch, select } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { registerLegacyWidgetBlock } from '@wordpress/widgets';
 
 /**
  * Internal dependencies
@@ -18,49 +20,6 @@ import './hooks';
 import './plugins';
 import Editor from './editor';
 import { store as editPostStore } from './store';
-
-/**
- * Reinitializes the editor after the user chooses to reboot the editor after
- * an unhandled error occurs, replacing previously mounted editor element using
- * an initial state from prior to the crash.
- *
- * @param {Object}  postType     Post type of the post to edit.
- * @param {Object}  postId       ID of the post to edit.
- * @param {Element} target       DOM node in which editor is rendered.
- * @param {?Object} settings     Editor settings object.
- * @param {Object}  initialEdits Programmatic edits to apply initially, to be
- *                               considered as non-user-initiated (bypass for
- *                               unsaved changes prompt).
- */
-export function reinitializeEditor(
-	postType,
-	postId,
-	target,
-	settings,
-	initialEdits
-) {
-	unmountComponentAtNode( target );
-	const reboot = reinitializeEditor.bind(
-		null,
-		postType,
-		postId,
-		target,
-		settings,
-		initialEdits
-	);
-
-	render(
-		<Editor
-			settings={ settings }
-			onError={ reboot }
-			postId={ postId }
-			postType={ postType }
-			initialEdits={ initialEdits }
-			recovery
-		/>,
-		target
-	);
-}
 
 /**
  * Initializes and returns an instance of Editor.
@@ -80,31 +39,8 @@ export function initializeEditor(
 	settings,
 	initialEdits
 ) {
-	// Prevent adding template part in the post editor.
-	// Only add the filter when the post editor is initialized, not imported.
-	addFilter(
-		'blockEditor.__unstableCanInsertBlockType',
-		'removeTemplatePartsFromInserter',
-		( can, blockType ) => {
-			if (
-				! select( editPostStore ).isEditingTemplate() &&
-				blockType.name === 'core/template-part'
-			) {
-				return false;
-			}
-			return can;
-		}
-	);
-
 	const target = document.getElementById( id );
-	const reboot = reinitializeEditor.bind(
-		null,
-		postType,
-		postId,
-		target,
-		settings,
-		initialEdits
-	);
+	const root = createRoot( target );
 
 	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
 		editorMode: 'visual',
@@ -131,11 +67,32 @@ export function initializeEditor(
 	}
 
 	registerCoreBlocks();
+	registerLegacyWidgetBlock( { inserter: false } );
 	if ( process.env.IS_GUTENBERG_PLUGIN ) {
 		__experimentalRegisterExperimentalCoreBlocks( {
 			enableFSEBlocks: settings.__unstableEnableFullSiteEditingBlocks,
 		} );
 	}
+
+	/*
+	 * Prevent adding template part in the post editor.
+	 * Only add the filter when the post editor is initialized, not imported.
+	 * Also only add the filter(s) after registerCoreBlocks()
+	 * so that common filters in the block library are not overwritten.
+	 */
+	addFilter(
+		'blockEditor.__unstableCanInsertBlockType',
+		'removeTemplatePartsFromInserter',
+		( canInsert, blockType ) => {
+			if (
+				! select( editPostStore ).isEditingTemplate() &&
+				blockType.name === 'core/template-part'
+			) {
+				return false;
+			}
+			return canInsert;
+		}
+	);
 
 	// Show a console log warning if the browser is not in Standards rendering mode.
 	const documentMode =
@@ -177,16 +134,30 @@ export function initializeEditor(
 		} );
 	}
 
-	render(
+	// Prevent the default browser action for files dropped outside of dropzones.
+	window.addEventListener( 'dragover', ( e ) => e.preventDefault(), false );
+	window.addEventListener( 'drop', ( e ) => e.preventDefault(), false );
+
+	root.render(
 		<Editor
 			settings={ settings }
-			onError={ reboot }
 			postId={ postId }
 			postType={ postType }
 			initialEdits={ initialEdits }
-		/>,
-		target
+		/>
 	);
+
+	return root;
+}
+
+/**
+ * Used to reinitialize the editor after an error. Now it's a deprecated noop function.
+ */
+export function reinitializeEditor() {
+	deprecated( 'wp.editPost.reinitializeEditor', {
+		since: '6.2',
+		version: '6.3',
+	} );
 }
 
 export { default as PluginBlockSettingsMenuItem } from './components/block-settings-menu/plugin-block-settings-menu-item';

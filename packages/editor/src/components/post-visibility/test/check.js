@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -9,19 +9,27 @@ import { shallow } from 'enzyme';
 import { PostVisibilityCheck } from '../check';
 
 describe( 'PostVisibilityCheck', () => {
-	const render = ( { canEdit } ) => ( canEdit ? 'yes' : 'no' );
+	const renderProp = ( { canEdit } ) => ( canEdit ? 'yes' : 'no' );
 
 	it( "should not render the edit link if the user doesn't have the right capability", () => {
-		const wrapper = shallow(
-			<PostVisibilityCheck hasPublishAction={ false } render={ render } />
+		render(
+			<PostVisibilityCheck
+				hasPublishAction={ false }
+				render={ renderProp }
+			/>
 		);
-		expect( wrapper.text() ).toBe( 'no' );
+		expect( screen.queryByText( 'yes' ) ).not.toBeInTheDocument();
+		expect( screen.getByText( 'no' ) ).toBeVisible();
 	} );
 
 	it( 'should render if the user has the correct capability', () => {
-		const wrapper = shallow(
-			<PostVisibilityCheck hasPublishAction={ true } render={ render } />
+		render(
+			<PostVisibilityCheck
+				hasPublishAction={ true }
+				render={ renderProp }
+			/>
 		);
-		expect( wrapper.text() ).toBe( 'yes' );
+		expect( screen.queryByText( 'no' ) ).not.toBeInTheDocument();
+		expect( screen.getByText( 'yes' ) ).toBeVisible();
 	} );
 } );

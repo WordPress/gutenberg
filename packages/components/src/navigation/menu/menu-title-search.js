@@ -3,7 +3,6 @@
  */
 import { useEffect, useRef } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -53,6 +52,8 @@ function MenuTitleSearch( {
 			count
 		);
 		debouncedSpeak( resultsFoundMessage );
+		// Ignore exhaustive-deps rule for now. See https://github.com/WordPress/gutenberg/pull/44090
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ items, search ] );
 
 	const onClose = () => {
@@ -61,7 +62,7 @@ function MenuTitleSearch( {
 	};
 
 	function onKeyDown( event ) {
-		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
+		if ( event.code === 'Escape' && ! event.defaultPrevented ) {
 			event.preventDefault();
 			onClose();
 		}

@@ -7,10 +7,10 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
-	getBlockType,
+	getBlockSupport,
 	store as blocksStore,
 	__unstableGetInnerBlocksProps as getInnerBlocksProps,
 } from '@wordpress/blocks';
@@ -22,13 +22,16 @@ import ButtonBlockAppender from './button-block-appender';
 import DefaultBlockAppender from './default-block-appender';
 import useNestedSettingsUpdate from './use-nested-settings-update';
 import useInnerBlockTemplateSync from './use-inner-block-template-sync';
-import getBlockContext from './get-block-context';
+import useBlockContext from './use-block-context';
 import { BlockListItems } from '../block-list';
 import { BlockContextProvider } from '../block-context';
 import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { store as blockEditorStore } from '../../store';
 import useBlockDropZone from '../use-block-drop-zone';
+import useSetting from '../use-setting';
+
+const EMPTY_OBJECT = {};
 
 /**
  * InnerBlocks is a component which allows a single block to have multiple blocks
@@ -53,7 +56,7 @@ function UncontrolledInnerBlocks( props ) {
 		renderAppender,
 		orientation,
 		placeholder,
-		__experimentalLayout,
+		layout,
 	} = props;
 
 	useNestedSettingsUpdate(
@@ -64,7 +67,7 @@ function UncontrolledInnerBlocks( props ) {
 		templateLock,
 		captureToolbars,
 		orientation,
-		__experimentalLayout
+		layout
 	);
 
 	useInnerBlockTemplateSync(
@@ -74,18 +77,33 @@ function UncontrolledInnerBlocks( props ) {
 		templateInsertUpdatesSelection
 	);
 
-	const context = useSelect(
+	const context = useBlockContext( clientId );
+	const name = useSelect(
 		( select ) => {
-			const block = select( blockEditorStore ).getBlock( clientId );
-			const blockType = getBlockType( block.name );
-
-			if ( ! blockType || ! blockType.providesContext ) {
-				return;
-			}
-
-			return getBlockContext( block.attributes, blockType );
+			return select( blockEditorStore ).getBlock( clientId )?.name;
 		},
 		[ clientId ]
+	);
+
+	const defaultLayoutBlockSupport =
+		getBlockSupport( name, '__experimentalLayout' ) || EMPTY_OBJECT;
+
+	const { allowSizingOnChildren = false } = defaultLayoutBlockSupport;
+
+	const defaultLayout = useSetting( 'layout' ) || EMPTY_OBJECT;
+
+	const usedLayout = layout || defaultLayoutBlockSupport;
+
+	const memoedLayout = useMemo(
+		() => ( {
+			// Default layout will know about any content/wide size defined by the theme.
+			...defaultLayout,
+			...usedLayout,
+			...( allowSizingOnChildren && {
+				allowSizingOnChildren: true,
+			} ),
+		} ),
+		[ defaultLayout, usedLayout, allowSizingOnChildren ]
 	);
 
 	// This component needs to always be synchronous as it's the one changing
@@ -96,7 +114,7 @@ function UncontrolledInnerBlocks( props ) {
 				rootClientId={ clientId }
 				renderAppender={ renderAppender }
 				__experimentalAppenderTagName={ __experimentalAppenderTagName }
-				__experimentalLayout={ __experimentalLayout }
+				__experimentalLayout={ memoedLayout }
 				wrapperRef={ wrapperRef }
 				placeholder={ placeholder }
 			/>
@@ -143,7 +161,13 @@ const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md
  */
 export function useInnerBlocksProps( props = {}, options = {} ) {
-	const { clientId } = useBlockEditContext();
+	const { __unstableDisableLayoutClassNames, __unstableDisableDropZone } =
+		options;
+	const {
+		clientId,
+		layout = null,
+		__unstableLayoutClassNames: layoutClassNames = '',
+	} = useBlockEditContext();
 	const isSmallScreen = useViewportMatch( 'medium', '<' );
 	const { __experimentalCaptureToolbars, hasOverlay } = useSelect(
 		( select ) => {
@@ -155,10 +179,11 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				getBlockName,
 				isBlockSelected,
 				hasSelectedInnerBlock,
-				isNavigationMode,
+				__unstableGetEditorMode,
 			} = select( blockEditorStore );
 			const blockName = getBlockName( clientId );
-			const enableClickThrough = isNavigationMode() || isSmallScreen;
+			const enableClickThrough =
+				__unstableGetEditorMode() === 'navigation' || isSmallScreen;
 			return {
 				__experimentalCaptureToolbars: select(
 					blocksStore
@@ -177,27 +202,32 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		[ clientId, isSmallScreen ]
 	);
 
+	const blockDropZoneRef = useBlockDropZone( {
+		rootClientId: clientId,
+	} );
+
 	const ref = useMergeRefs( [
 		props.ref,
-		useBlockDropZone( {
-			rootClientId: clientId,
-		} ),
+		__unstableDisableDropZone ? null : blockDropZoneRef,
 	] );
 
 	const innerBlocksProps = {
 		__experimentalCaptureToolbars,
+		layout,
 		...options,
 	};
 	const InnerBlocks =
 		innerBlocksProps.value && innerBlocksProps.onChange
 			? ControlledInnerBlocks
 			: UncontrolledInnerBlocks;
+
 	return {
 		...props,
 		ref,
 		className: classnames(
 			props.className,
 			'block-editor-block-list__layout',
+			__unstableDisableLayoutClassNames ? '' : layoutClassNames,
 			{
 				'has-overlay': hasOverlay,
 			}

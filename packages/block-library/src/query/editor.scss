@@ -3,7 +3,7 @@
 }
 
 .wp-block-query__create-new-link {
-	padding: 0 $grid-unit-20 $grid-unit-20 56px;
+	padding: 0 $grid-unit-20 $grid-unit-20 52px;
 }
 
 .block-library-query__pattern-selection-content .block-editor-block-patterns-list {
@@ -19,27 +19,38 @@
 	}
 }
 
-.block-editor-query-pattern__selection-modal .components-modal__content {
-	overflow: hidden;
-	padding: 0;
-	&::before {
-		margin-bottom: 0;
+.block-library-query-pattern__selection-modal {
+	// To keep modal dimensions consistent as subsections are navigated, width
+	// and height are used instead of max-(width/height).
+	.components-modal__frame {
+		@include break-small() {
+			width: calc(100% - #{$grid-unit-20 * 2});
+			height: calc(100% - #{$header-height * 2});
+		}
+
+		@include break-medium() {
+			width: $break-medium - $grid-unit-20 * 2;
+		}
+
+		@include break-large() {
+			height: 70%;
+		}
+	}
+
+	.block-library-query-pattern__selection-search {
+		background: $white;
+		position: sticky;
+		top: 0;
+		padding: $grid-unit-20 0;
+		z-index: z-index(".block-library-query-pattern__selection-search");
 	}
 }
 
-.block-editor-query-pattern__selection-modal {
-	// To keep modal dimensions consistent as subsections are navigated, width
-	// and height are used instead of max-(width/height).
-	@include break-small() {
-		width: calc(100% - #{ $grid-unit-20 * 2 });
-		height: calc(100% - #{ $header-height * 2 });
+.block-library-query-toolspanel__filters {
+	.components-form-token-field__help {
+		margin-bottom: 0;
 	}
-	@include break-medium() {
-		width: $break-medium - $grid-unit-20 * 2;
-	}
-	@include break-large() {
-		height: 80%;
-		width: 80%;
-		max-height: none;
+	.block-library-query-inspector__taxonomy-control:not(:last-child) {
+		margin-bottom: $grid-unit-30;
 	}
 }

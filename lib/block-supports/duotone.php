@@ -16,14 +16,14 @@
  * @return float      Value in the range [0,1].
  */
 function gutenberg_tinycolor_bound01( $n, $max ) {
-	if ( 'string' === gettype( $n ) && false !== strpos( $n, '.' ) && 1 === (float) $n ) {
+	if ( 'string' === gettype( $n ) && str_contains( $n, '.' ) && 1 === (float) $n ) {
 		$n = '100%';
 	}
 
 	$n = min( $max, max( 0, (float) $n ) );
 
 	// Automatically convert percentage into number.
-	if ( 'string' === gettype( $n ) && false !== strpos( $n, '%' ) ) {
+	if ( 'string' === gettype( $n ) && str_contains( $n, '%' ) ) {
 		$n = (int) ( $n * $max ) / 100;
 	}
 
@@ -83,10 +83,10 @@ function gutenberg_tinycolor_rgb_to_rgb( $rgb_color ) {
  */
 function gutenberg_tinycolor_hue_to_rgb( $p, $q, $t ) {
 	if ( $t < 0 ) {
-		$t += 1;
+		++$t;
 	}
 	if ( $t > 1 ) {
-		$t -= 1;
+		--$t;
 	}
 	if ( $t < 1 / 6 ) {
 		return $p + ( $q - $p ) * 6 * $t;
@@ -387,10 +387,10 @@ function gutenberg_get_duotone_filter_svg( $preset ) {
 
 	$svg = ob_get_clean();
 
-	if ( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) {
+	if ( ! SCRIPT_DEBUG ) {
 		// Clean up the whitespace.
 		$svg = preg_replace( "/[\r\n\t ]+/", ' ', $svg );
-		$svg = preg_replace( '/> </', '><', $svg );
+		$svg = str_replace( '> <', '><', $svg );
 		$svg = trim( $svg );
 	}
 
@@ -464,7 +464,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 
 	// !important is needed because these styles render before global styles,
 	// and they should be overriding the duotone filters set by global styles.
-	$filter_style = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG
+	$filter_style = SCRIPT_DEBUG
 		? $selector . " {\n\tfilter: " . $filter_property . " !important;\n}\n"
 		: $selector . '{filter:' . $filter_property . ' !important;}';
 

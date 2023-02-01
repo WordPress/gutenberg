@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useLayoutEffect, useMemo } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
@@ -12,6 +12,8 @@ import { store as blockEditorStore } from '../../store';
 import { getLayoutType } from '../../layouts';
 
 /** @typedef {import('../../selectors').WPDirectInsertBlock } WPDirectInsertBlock */
+
+const pendingSettingsUpdates = new WeakMap();
 
 /**
  * This hook is a side effect which updates the block-editor store when changes
@@ -46,6 +48,7 @@ export default function useNestedSettingsUpdate(
 	layout
 ) {
 	const { updateBlockListSettings } = useDispatch( blockEditorStore );
+	const registry = useRegistry();
 
 	const { blockListSettings, parentLock } = useSelect(
 		( select ) => {
@@ -69,7 +72,9 @@ export default function useNestedSettingsUpdate(
 		const newSettings = {
 			allowedBlocks: _allowedBlocks,
 			templateLock:
-				templateLock === undefined ? parentLock : templateLock,
+				templateLock === undefined || parentLock === 'contentOnly'
+					? parentLock
+					: templateLock,
 		};
 
 		// These values are not defined for RN, so only include them if they
@@ -96,7 +101,30 @@ export default function useNestedSettingsUpdate(
 		}
 
 		if ( ! isShallowEqual( blockListSettings, newSettings ) ) {
-			updateBlockListSettings( clientId, newSettings );
+			// Batch updates to block list settings to avoid triggering cascading renders
+			// for each container block included in a tree and optimize initial render.
+			// To avoid triggering updateBlockListSettings for each container block
+			// causing X re-renderings for X container blocks,
+			// we batch all the updatedBlockListSettings in a single "data" batch
+			// which results in a single re-render.
+			if ( ! pendingSettingsUpdates.get( registry ) ) {
+				pendingSettingsUpdates.set( registry, [] );
+			}
+			pendingSettingsUpdates
+				.get( registry )
+				.push( [ clientId, newSettings ] );
+			window.queueMicrotask( () => {
+				if ( pendingSettingsUpdates.get( registry )?.length ) {
+					registry.batch( () => {
+						pendingSettingsUpdates
+							.get( registry )
+							.forEach( ( args ) => {
+								updateBlockListSettings( ...args );
+							} );
+						pendingSettingsUpdates.set( registry, [] );
+					} );
+				}
+			} );
 		}
 	}, [
 		clientId,
@@ -110,5 +138,6 @@ export default function useNestedSettingsUpdate(
 		orientation,
 		updateBlockListSettings,
 		layout,
+		registry,
 	] );
 }

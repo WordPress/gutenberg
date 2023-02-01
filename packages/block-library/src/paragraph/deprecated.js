@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,7 +11,10 @@ import {
 	getColorClassName,
 	getFontSizeClass,
 	RichText,
+	useBlockProps,
 } from '@wordpress/block-editor';
+
+import { isRTL } from '@wordpress/i18n';
 
 const supports = {
 	className: false,
@@ -74,21 +76,60 @@ const migrateCustomColorsAndFontSizes = ( attributes ) => {
 	if ( attributes.customFontSize ) {
 		style.typography = { fontSize: attributes.customFontSize };
 	}
+
+	const {
+		customTextColor,
+		customBackgroundColor,
+		customFontSize,
+		...restAttributes
+	} = attributes;
+
 	return {
-		...omit( attributes, [
-			'customTextColor',
-			'customBackgroundColor',
-			'customFontSize',
-		] ),
+		...restAttributes,
 		style,
 	};
 };
 
+const { style, ...restBlockAttributes } = blockAttributes;
+
 const deprecated = [
+	// Version without drop cap on aligned text.
 	{
 		supports,
 		attributes: {
-			...omit( blockAttributes, [ 'style' ] ),
+			...restBlockAttributes,
+			customTextColor: {
+				type: 'string',
+			},
+			customBackgroundColor: {
+				type: 'string',
+			},
+			customFontSize: {
+				type: 'number',
+			},
+		},
+		save( { attributes } ) {
+			const { align, content, dropCap, direction } = attributes;
+			const className = classnames( {
+				'has-drop-cap':
+					align === ( isRTL() ? 'left' : 'right' ) ||
+					align === 'center'
+						? false
+						: dropCap,
+				[ `has-text-align-${ align }` ]: align,
+			} );
+
+			return (
+				<p { ...useBlockProps.save( { className, dir: direction } ) }>
+					<RichText.Content value={ content } />
+				</p>
+			);
+		},
+	},
+	{
+		supports,
+		attributes: {
+			...restBlockAttributes,
 			customTextColor: {
 				type: 'string',
 			},
@@ -153,7 +194,7 @@ const deprecated = [
 	{
 		supports,
 		attributes: {
-			...omit( blockAttributes, [ 'style' ] ),
+			...restBlockAttributes,
 			customTextColor: {
 				type: 'string',
 			},
@@ -218,7 +259,7 @@ const deprecated = [
 	{
 		supports,
 		attributes: {
-			...omit( blockAttributes, [ 'style' ] ),
+			...restBlockAttributes,
 			customTextColor: {
 				type: 'string',
 			},
@@ -284,15 +325,12 @@ const deprecated = [
 	},
 	{
 		supports,
-		attributes: omit(
-			{
-				...blockAttributes,
-				fontSize: {
-					type: 'number',
-				},
+		attributes: {
+			...restBlockAttributes,
+			fontSize: {
+				type: 'number',
 			},
-			[ 'style' ]
-		),
+		},
 		save( { attributes } ) {
 			const {
 				width,
@@ -325,25 +363,21 @@ const deprecated = [
 			);
 		},
 		migrate( attributes ) {
-			return migrateCustomColorsAndFontSizes(
-				omit( {
-					...attributes,
-					customFontSize: Number.isFinite( attributes.fontSize )
-						? attributes.fontSize
+			return migrateCustomColorsAndFontSizes( {
+				...attributes,
+				customFontSize: Number.isFinite( attributes.fontSize )
+					? attributes.fontSize
+					: undefined,
+				customTextColor:
+					attributes.textColor && '#' === attributes.textColor[ 0 ]
+						? attributes.textColor
 						: undefined,
-					customTextColor:
-						attributes.textColor &&
-						'#' === attributes.textColor[ 0 ]
-							? attributes.textColor
-							: undefined,
-					customBackgroundColor:
-						attributes.backgroundColor &&
-						'#' === attributes.backgroundColor[ 0 ]
-							? attributes.backgroundColor
-							: undefined,
-				} ),
-				[ 'fontSize', 'textColor', 'backgroundColor', 'style' ]
-			);
+				customBackgroundColor:
+					attributes.backgroundColor &&
+					'#' === attributes.backgroundColor[ 0 ]
+						? attributes.backgroundColor
+						: undefined,
+			} );
 		},
 	},
 	{

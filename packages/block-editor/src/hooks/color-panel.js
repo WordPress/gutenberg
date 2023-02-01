@@ -26,9 +26,22 @@ export default function ColorPanel( {
 	const [ detectedColor, setDetectedColor ] = useState();
 	const [ detectedLinkColor, setDetectedLinkColor ] = useState();
 	const ref = useBlockRef( clientId );
+	const definedColors = settings.filter( ( setting ) => setting?.colorValue );
 
 	useEffect( () => {
 		if ( ! enableContrastChecking ) {
+			return;
+		}
+		if ( ! definedColors.length ) {
+			if ( detectedBackgroundColor ) {
+				setDetectedBackgroundColor();
+			}
+			if ( detectedColor ) {
+				setDetectedColor();
+			}
+			if ( detectedLinkColor ) {
+				setDetectedColor();
+			}
 			return;
 		}
 
@@ -62,13 +75,12 @@ export default function ColorPanel( {
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 
 	return (
-		<InspectorControls __experimentalGroup="color">
+		<InspectorControls group="color">
 			<ColorGradientSettingsDropdown
 				enableAlpha={ enableAlpha }
 				panelId={ clientId }
 				settings={ settings }
 				__experimentalIsItemGroup={ false }
-				__experimentalHasMultipleOrigins
 				__experimentalIsRenderedInSidebar
 				{ ...colorGradientSettings }
 			/>

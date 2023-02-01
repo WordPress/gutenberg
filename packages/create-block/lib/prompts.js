@@ -1,14 +1,19 @@
 /**
- * External dependencies
+ * Capitalizes the first letter in a string.
+ *
+ * @param {string} str The string whose first letter the function will capitalize.
+ *
+ * @return {string} Capitalized string.
  */
-const { isEmpty, upperFirst } = require( 'lodash' );
+const upperFirst = ( [ firstLetter, ...rest ] ) =>
+	firstLetter.toUpperCase() + rest.join( '' );
 
 // Block metadata.
 const slug = {
 	type: 'input',
 	name: 'slug',
 	message:
-		'The block slug used for identification (also the plugin and output folder name):',
+		'The block slug used for identification (also the output folder name):',
 	validate( input ) {
 		if ( ! /^[a-z][a-z0-9\-]*$/.test( input ) ) {
 			return 'Invalid block slug specified. Block slug can contain only lowercase alphanumeric characters or dashes, and start with a letter.';
@@ -56,7 +61,7 @@ const dashicon = {
 	message:
 		'The dashicon to make it easier to identify your block (optional):',
 	validate( input ) {
-		if ( ! isEmpty( input ) && ! /^[a-z][a-z0-9\-]*$/.test( input ) ) {
+		if ( input.length && ! /^[a-z][a-z0-9\-]*$/.test( input ) ) {
 			return 'Invalid dashicon name specified. Visit https://developer.wordpress.org/resource/dashicons/ to discover available names.';
 		}
 

@@ -1,4 +1,5 @@
 @import "./functions";
+@import "./long-content-fade";
 
 /**
  * Breakpoint mixins
@@ -52,69 +53,6 @@
 	}
 }
 
-
-/**
- * Long content fade mixin
- *
- * Creates a fading overlay to signify that the content is longer
- * than the space allows.
- */
-
-@mixin long-content-fade($direction: right, $size: 20%, $color: #fff, $edge: 0, $z-index: false) {
-	content: "";
-	display: block;
-	position: absolute;
-	-webkit-touch-callout: none;
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-	pointer-events: none;
-
-	@if $z-index {
-		z-index: $z-index;
-	}
-
-	@if $direction == "bottom" {
-		background: linear-gradient(to top, rgba($color, 0), $color 90%);
-		left: $edge;
-		right: $edge;
-		top: $edge;
-		bottom: calc(100% - $size);
-		width: auto;
-	}
-
-	@if $direction == "top" {
-		background: linear-gradient(to bottom, rgba($color, 0), $color 90%);
-		top: calc(100% - $size);
-		left: $edge;
-		right: $edge;
-		bottom: $edge;
-		width: auto;
-	}
-
-	@if $direction == "left" {
-		background: linear-gradient(to left, rgba($color, 0), $color 90%);
-		top: $edge;
-		left: $edge;
-		bottom: $edge;
-		right: auto;
-		width: $size;
-		height: auto;
-	}
-
-	@if $direction == "right" {
-		background: linear-gradient(to right, rgba($color, 0), $color 90%);
-		top: $edge;
-		bottom: $edge;
-		right: $edge;
-		left: auto;
-		width: $size;
-		height: auto;
-	}
-}
-
 /**
  * Focus styles.
  */
@@ -131,7 +69,7 @@
 	box-shadow: 0 0 0 transparent;
 	transition: box-shadow 0.1s linear;
 	border-radius: $radius-block-ui;
-	border: $border-width solid $gray-700;
+	border: $border-width solid $gray-600;
 	@include reduce-motion("transition");
 }
 
@@ -202,6 +140,22 @@
 	}
 }
 
+@mixin placeholder-style() {
+	border-radius: $radius-block-ui;
+
+	&::before {
+		content: "";
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		pointer-events: none;
+		background: currentColor;
+		opacity: 0.1;
+	}
+}
+
 /**
  * Allows users to opt-out of animations via OS-level preferences.
  */
@@ -226,7 +180,6 @@
 			animation-delay: 0s;
 		}
 	}
-
 }
 
 @mixin input-control {
@@ -371,6 +324,7 @@
  * Reset default styles for JavaScript UI based pages.
  * This is a WP-admin agnostic reset
  */
+
 @mixin reset {
 	box-sizing: border-box;
 
@@ -384,6 +338,7 @@
 /**
  * Reset the WP Admin page styles for Gutenberg-like pages.
  */
+
 @mixin wp-admin-reset( $content-container ) {
 	background: $white;
 
@@ -532,4 +487,37 @@
 		background: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);
 	}
 	/* stylelint-enable function-comma-space-after */
+}
+
+@mixin custom-scrollbars-on-hover() {
+	visibility: hidden;
+
+	$handle-color: #757575;
+	$track-color: #1e1e1e;
+
+	// WebKit
+	&::-webkit-scrollbar {
+		width: 12px;
+		height: 12px;
+	}
+	&::-webkit-scrollbar-track {
+		background-color: $track-color;
+	}
+	&::-webkit-scrollbar-thumb {
+		background-color: $handle-color;
+		border-radius: 8px;
+		border: 3px solid transparent;
+		background-clip: padding-box;
+	}
+
+	// Firefox 109+ and Chrome 111+
+	scrollbar-color: $handle-color $track-color; // Syntax, "dark", "light", or "#handle-color #track-color"
+	scrollbar-width: thin;
+	scrollbar-gutter: stable;
+
+	&:hover,
+	&:focus,
+	& > * {
+		visibility: visible;
+	}
 }

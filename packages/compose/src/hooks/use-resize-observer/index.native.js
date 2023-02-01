@@ -47,7 +47,11 @@ const useResizeObserver = () => {
 	}, [] );
 
 	const observer = (
-		<View style={ StyleSheet.absoluteFill } onLayout={ onLayout } />
+		<View
+			testID="resize-observer"
+			style={ StyleSheet.absoluteFill }
+			onLayout={ onLayout }
+		/>
 	);
 
 	return [ observer, measurements ];

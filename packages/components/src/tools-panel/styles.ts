@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 
 /**
@@ -9,17 +10,19 @@ import { css } from '@emotion/react';
 import {
 	StyledField as BaseControlField,
 	StyledHelp as BaseControlHelp,
-	StyledLabel as BaseControlLabel,
 	Wrapper as BaseControlWrapper,
 } from '../base-control/styles/base-control-styles';
 import { LabelWrapper } from '../input-control/styles/input-control-styles';
-import { COLORS, CONFIG } from '../utils';
+import { COLORS, CONFIG, rtl } from '../utils';
 import { space } from '../ui/utils/space';
 
 const toolsPanelGrid = {
+	columns: ( columns: number ) => css`
+		grid-template-columns: ${ `repeat( ${ columns }, minmax(0, 1fr) )` };
+	`,
 	spacing: css`
-		column-gap: ${ space( 4 ) };
-		row-gap: ${ space( 6 ) };
+		column-gap: ${ space( 2 ) };
+		row-gap: ${ space( 4 ) };
 	`,
 	item: {
 		fullWidth: css`
@@ -28,8 +31,9 @@ const toolsPanelGrid = {
 	},
 };
 
-export const ToolsPanel = css`
-	${ toolsPanelGrid.spacing };
+export const ToolsPanel = ( columns: number ) => css`
+	${ toolsPanelGrid.columns( columns ) }
+	${ toolsPanelGrid.spacing }
 
 	border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 300 ] };
 	margin-top: -1px;
@@ -46,7 +50,7 @@ export const ToolsPanelWithInnerWrapper = ( columns: number ) => {
 	return css`
 		> div:not( :first-of-type ) {
 			display: grid;
-			grid-template-columns: ${ `repeat( ${ columns }, 1fr )` };
+			${ toolsPanelGrid.columns( columns ) }
 			${ toolsPanelGrid.spacing }
 			${ toolsPanelGrid.item.fullWidth }
 		}
@@ -133,18 +137,6 @@ export const ToolsPanelItem = css`
 			line-height: 1.4em;
 		}
 	}
-
-	/**
-	 * The targeting of .components-custom-select-control__label here is a
-	 * temporary measure only.
-	 *
-	 * It should be replaced once CustomSelectControl component has been
-	 * refactored and can be targeted via component interpolation.
-	 */
-	.components-custom-select-control__label,
-	${ BaseControlLabel } {
-		line-height: 1.4em;
-	}
 `;
 
 export const ToolsPanelItemPlaceholder = css`
@@ -153,4 +145,30 @@ export const ToolsPanelItemPlaceholder = css`
 
 export const DropdownMenu = css`
 	min-width: 200px;
+`;
+
+export const ResetLabel = styled.span`
+	color: ${ COLORS.ui.themeDark10 };
+	font-size: 11px;
+	font-weight: 500;
+	line-height: 1.4;
+	${ rtl( { marginLeft: space( 3 ) } ) }
+	text-transform: uppercase;
+`;
+
+export const DefaultControlsItem = css`
+	color: ${ COLORS.gray[ 900 ] };
+
+	&&[aria-disabled='true'] {
+		color: ${ COLORS.gray[ 700 ] };
+		opacity: 1;
+
+		&:hover {
+			color: ${ COLORS.gray[ 700 ] };
+		}
+
+		${ ResetLabel } {
+			opacity: 0.3;
+		}
+	}
 `;

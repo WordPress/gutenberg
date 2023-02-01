@@ -20,7 +20,8 @@ export default function NavigationPlaceholder( {
 	clientId,
 	canUserCreateNavigationMenu = false,
 	isResolvingCanUserCreateNavigationMenu,
-	onFinish,
+	onSelectNavigationMenu,
+	onSelectClassicMenu,
 	onCreateEmpty,
 } ) {
 	const { isResolvingMenus, hasResolvedMenus } = useNavigationEntities();
@@ -67,13 +68,8 @@ export default function NavigationPlaceholder( {
 						<NavigationMenuSelector
 							currentMenuId={ currentMenuId }
 							clientId={ clientId }
-							onSelect={ onFinish }
-							toggleProps={ {
-								variant: 'tertiary',
-								iconPosition: 'right',
-								className:
-									'wp-block-navigation-placeholder__actions__dropdown',
-							} }
+							onSelectNavigationMenu={ onSelectNavigationMenu }
+							onSelectClassicMenu={ onSelectClassicMenu }
 						/>
 
 						<hr />

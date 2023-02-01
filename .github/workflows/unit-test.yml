@@ -9,6 +9,8 @@ on:
             - trunk
             - 'release/**'
             - 'wp/**'
+    # Allow manually triggering the workflow.
+    workflow_dispatch:
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
@@ -26,13 +28,13 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                node: ['12', '14']
+                node: ['14']
 
         steps:
-            - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+            - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
 
             - name: Use desired version of NodeJS
-              uses: actions/setup-node@5b52f097d36d4b0b2f94ed6de710023fbb8b2236 # v3.1.0
+              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
               with:
                   node-version: ${{ matrix.node }}
                   cache: npm
@@ -46,44 +48,184 @@ jobs:
                   npx lerna run build
 
             - name: Running the tests
-              run: npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+              run: npm run test:unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
             - name: Running the date tests
-              run: npm run test-unit:date -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+              run: npm run test:unit:date -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
-    unit-php:
-        name: PHP
+    test-php:
+        name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }} on ubuntu-latest
         runs-on: ubuntu-latest
+        timeout-minutes: 20
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        strategy:
+            fail-fast: true
+            matrix:
+                php:
+                    - '5.6'
+                    - '7.0'
+                    - '7.1'
+                    - '7.2'
+                    - '7.3'
+                    - '7.4'
+                    - '8.0'
+                    - '8.1'
+                    - '8.2'
+                multisite: [false, true]
+
+        env:
+            WP_ENV_PHP_VERSION: ${{ matrix.php }}
 
         steps:
-            - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+            - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
 
-            - name: Use desired version of NodeJS
-              uses: actions/setup-node@5b52f097d36d4b0b2f94ed6de710023fbb8b2236 # v3.1.0
+            - name: Set up Node.js
+              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
               with:
                   node-version-file: '.nvmrc'
                   cache: npm
 
-            - name: Npm install and build
+            ##
+            # This allows Composer dependencies to be installed using a single step.
+            #
+            # Since the tests are currently run within the Docker containers where the PHP version varies,
+            # the same PHP version needs to be configured for the action runner machine so that the correct
+            # dependency versions are installed and cached.
+            ##
+            - name: Set up PHP
+              uses: shivammathur/setup-php@d30ad8b1843ace22e6698ab99bbafaa747b6bd0d # v2.24.0
+              with:
+                  php-version: '${{ matrix.php }}'
+                  ini-file: development
+                  coverage: none
+
+            # Ensure that Composer installs the correct versions of packages.
+            - name: Override PHP version in composer.json
+              run: composer config platform.php ${{ matrix.php }}
+
+            # The spatie/phpunit-watcher package is not compatible with PHP < 7.2.
+            # It must be removed before running the tests.
+            - name: Remove incompatible Composer packages
+              if: ${{ matrix.php < '7.2' }}
+              run: composer remove spatie/phpunit-watcher --dev --no-update
+
+            # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
+            # passing a custom cache suffix ensures that the cache is flushed at least once per week.
+            - name: Install Composer dependencies
+              uses: ramsey/composer-install@83af392bf5f031813d25e6fe4cd626cdba9a2df6 # v2.2.0
+              with:
+                  custom-cache-suffix: $(/bin/date -u --date='last Mon' "+%F")
+
+            - name: Install npm dependencies
               run: |
                   npm ci
                   npm run build
 
-            - name: Install WordPress
+            - name: Docker debug information
               run: |
-                  npm run wp-env start
+                  docker -v
+                  docker-compose -v
 
-            - name: Running lint check
-              run: npm run lint-php
+            - name: General debug information
+              run: |
+                  npm --version
+                  node --version
+                  curl --version
+                  git --version
+                  svn --version
+                  locale -a
+
+            - name: Start Docker environment
+              run: npm run wp-env start
+
+            - name: Log running Docker containers
+              run: docker ps -a
+
+            - name: Docker container debug information
+              run: |
+                  npm run wp-env run tests-mysql "mysql --version"
+                  npm run wp-env run tests-wordpress "php --version"
+                  npm run wp-env run tests-wordpress "php -m"
+                  npm run wp-env run tests-wordpress "php -i"
+                  npm run wp-env run tests-wordpress "/var/www/html/wp-content/plugins/gutenberg/vendor/bin/phpunit --version"
+                  npm run wp-env run tests-wordpress "locale -a"
 
             - name: Running single site unit tests
-              run: npm run test-unit-php
-              if: ${{ success() || failure() }}
+              if: ${{ ! matrix.multisite }}
+              run: npm run test:unit:php
 
             - name: Running multisite unit tests
-              run: npm run test-unit-php-multisite
-              if: ${{ success() || failure() }}
+              if: ${{ matrix.multisite }}
+              run: npm run test:unit:php:multisite
+
+    phpcs:
+        name: PHP coding standards
+        runs-on: ubuntu-latest
+        timeout-minutes: 20
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+
+            - name: Set up PHP
+              uses: shivammathur/setup-php@d30ad8b1843ace22e6698ab99bbafaa747b6bd0d # v2.24.0
+              with:
+                  php-version: '7.4'
+                  coverage: none
+                  tools: cs2pr
+
+            # This date is used to ensure that the PHPCS cache is cleared at least once every week.
+            # http://man7.org/linux/man-pages/man1/date.1.html
+            - name: "Get last Monday's date"
+              id: get-date
+              run: echo "date=$(/bin/date -u --date='last Mon' "+%F")" >> $GITHUB_OUTPUT
+
+            - name: Cache PHPCS scan cache
+              uses: actions/cache@627f0f41f6904a5b1efbaed9f96d9eb58e92e920 # v3.0.11
+              with:
+                  path: .cache/phpcs.json
+                  key: ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpcs-cache-${{ hashFiles('**/composer.json', 'phpcs.xml.dist') }}
+
+            # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
+            # passing a custom cache suffix ensures that the cache is flushed at least once per week.
+            - name: Install Composer dependencies
+              uses: ramsey/composer-install@83af392bf5f031813d25e6fe4cd626cdba9a2df6 # v2.2.0
+              with:
+                  custom-cache-suffix: ${{ steps.get-date.outputs.date }}
+
+            - name: Make Composer packages available globally
+              run: echo "${PWD}/vendor/bin" >> $GITHUB_PATH
+
+            - name: Run PHPCS on all Gutenberg files
+              id: phpcs-gutenberg
+              run: phpcs --report-full --report-checkstyle=./.cache/phpcs-report.xml
+
+            - name: Show PHPCS results in PR
+              if: ${{ always() && steps.phpcs-gutenberg.outcome == 'failure' }}
+              run: cs2pr ./.cache/phpcs-report.xml
+
+            - name: Ensure version-controlled files are not modified during the tests
+              run: git diff --exit-code
+
+    # This job is deprecated but be present for compatibility reasons.
+    unit-php:
+        name: PHP
+        runs-on: ubuntu-latest
+        needs: [test-php, phpcs]
+        if: ${{ always() }}
+        steps:
+            - name: Fail the job if the PHPUnit tests fail
+              if: ${{ needs.test-php.result != 'success' }}
+              run: exit 1
+
+            - name: "Fail the job if the code doesn't conform to the coding standards"
+              if: ${{ needs.phpcs.result != 'success' }}
+              run: exit 1
+
+            - name: Mark the job as passed if all the checks pass
+              if: ${{ needs.test-php.result == 'success' && needs.phpcs.result == 'success' }}
+              run: exit 0
 
     mobile-unit-js:
         name: Mobile
@@ -91,10 +233,10 @@ jobs:
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
         steps:
-            - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+            - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
 
             - name: Use desired version of NodeJS
-              uses: actions/setup-node@5b52f097d36d4b0b2f94ed6de710023fbb8b2236 # v3.1.0
+              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
               with:
                   node-version-file: '.nvmrc'
                   cache: npm

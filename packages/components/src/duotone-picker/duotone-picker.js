@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
@@ -14,9 +14,11 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import ColorListPicker from '../color-list-picker';
 import CircularOptionPicker from '../circular-option-picker';
+import { VStack } from '../v-stack';
 
 import CustomDuotoneBar from './custom-duotone-bar';
 import { getDefaultColors, getGradientFromCSSColors } from './utils';
+import { Spacer } from '../spacer';
 
 function DuotonePicker( {
 	clearable = true,
@@ -67,7 +69,7 @@ function DuotonePicker( {
 					name
 			  )
 			: tooltipText;
-		const isSelected = isEqual( colors, value );
+		const isSelected = fastDeepEqual( colors, value );
 
 		return (
 			<CircularOptionPicker.Option
@@ -97,32 +99,38 @@ function DuotonePicker( {
 				)
 			}
 		>
-			{ ! disableCustomColors && ! disableCustomDuotone && (
-				<CustomDuotoneBar
-					value={ isUnset ? undefined : value }
-					onChange={ onChange }
-				/>
-			) }
-			{ ! disableCustomDuotone && (
-				<ColorListPicker
-					labels={ [ __( 'Shadows' ), __( 'Highlights' ) ] }
-					colors={ colorPalette }
-					value={ isUnset ? undefined : value }
-					disableCustomColors={ disableCustomColors }
-					enableAlpha
-					onChange={ ( newColors ) => {
-						if ( ! newColors[ 0 ] ) {
-							newColors[ 0 ] = defaultDark;
-						}
-						if ( ! newColors[ 1 ] ) {
-							newColors[ 1 ] = defaultLight;
-						}
-						const newValue =
-							newColors.length >= 2 ? newColors : undefined;
-						onChange( newValue );
-					} }
-				/>
-			) }
+			<Spacer paddingTop={ 4 }>
+				<VStack spacing={ 3 }>
+					{ ! disableCustomColors && ! disableCustomDuotone && (
+						<CustomDuotoneBar
+							value={ isUnset ? undefined : value }
+							onChange={ onChange }
+						/>
+					) }
+					{ ! disableCustomDuotone && (
+						<ColorListPicker
+							labels={ [ __( 'Shadows' ), __( 'Highlights' ) ] }
+							colors={ colorPalette }
+							value={ isUnset ? undefined : value }
+							disableCustomColors={ disableCustomColors }
+							enableAlpha
+							onChange={ ( newColors ) => {
+								if ( ! newColors[ 0 ] ) {
+									newColors[ 0 ] = defaultDark;
+								}
+								if ( ! newColors[ 1 ] ) {
+									newColors[ 1 ] = defaultLight;
+								}
+								const newValue =
+									newColors.length >= 2
+										? newColors
+										: undefined;
+								onChange( newValue );
+							} }
+						/>
+					) }
+				</VStack>
+			</Spacer>
 		</CircularOptionPicker>
 	);
 }

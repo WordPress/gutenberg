@@ -84,13 +84,13 @@ exports[`Multi-block selection should forward delete across blocks 1`] = `
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
-<h2>]2</h2>
+<h2 class=\\"wp-block-heading\\">]2</h2>
 <!-- /wp:heading -->"
 `;
 
 exports[`Multi-block selection should forward delete across blocks 2`] = `
 "<!-- wp:heading -->
-<h2>1&amp;2</h2>
+<h2 class=\\"wp-block-heading\\">1&amp;2</h2>
 <!-- /wp:heading -->"
 `;
 
@@ -128,7 +128,7 @@ exports[`Multi-block selection should handle Enter across blocks 1`] = `
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
-<h2>]2</h2>
+<h2 class=\\"wp-block-heading\\">]2</h2>
 <!-- /wp:heading -->"
 `;
 
@@ -142,24 +142,8 @@ exports[`Multi-block selection should handle Enter across blocks 2`] = `
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
-<h2>2</h2>
+<h2 class=\\"wp-block-heading\\">2</h2>
 <!-- /wp:heading -->"
-`;
-
-exports[`Multi-block selection should merge into quote with correct selection 1`] = `
-"<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>1[</p></blockquote>
-<!-- /wp:quote -->
-
-<!-- wp:paragraph -->
-<p>]2</p>
-<!-- /wp:paragraph -->"
-`;
-
-exports[`Multi-block selection should merge into quote with correct selection 2`] = `
-"<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>1</p><p>&amp;2</p></blockquote>
-<!-- /wp:quote -->"
 `;
 
 exports[`Multi-block selection should multi-select from within the list block 1`] = `
@@ -168,7 +152,9 @@ exports[`Multi-block selection should multi-select from within the list block 1`
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
-<ul><li>1</li></ul>
+<ul><!-- wp:list-item -->
+<li>1</li>
+<!-- /wp:list-item --></ul>
 <!-- /wp:list -->"
 `;
 
@@ -264,6 +250,28 @@ exports[`Multi-block selection should preserve dragged selection on move 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`Multi-block selection should properly select multiple blocks if selected nested blocks belong to different parent 1`] = `
+"<!-- wp:group {\\"layout\\":{\\"type\\":\\"constrained\\"}} -->
+<div class=\\"wp-block-group\\"><!-- wp:paragraph -->
+<p>first</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>group</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+
+<!-- wp:group {\\"layout\\":{\\"type\\":\\"constrained\\"}} -->
+<div class=\\"wp-block-group\\"><!-- wp:paragraph -->
+<p>second</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>group</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->"
+`;
+
 exports[`Multi-block selection should return original focus after failed multi selection attempt 1`] = `
 "<!-- wp:paragraph -->
 <p>2</p>
@@ -283,13 +291,17 @@ exports[`Multi-block selection should select all from empty selection 1`] = `
 exports[`Multi-block selection should select all from empty selection 2`] = `""`;
 
 exports[`Multi-block selection should select separator (single element block) 1`] = `
-"<!-- wp:separator -->
-<hr class=\\"wp-block-separator has-alpha-channel-opacity\\"/>
-<!-- /wp:separator -->
+"<!-- wp:paragraph -->
+<p>a</p>
+<!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>a</p>
-<!-- /wp:paragraph -->"
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:separator -->
+<hr class=\\"wp-block-separator has-alpha-channel-opacity\\"/>
+<!-- /wp:separator -->"
 `;
 
 exports[`Multi-block selection should select separator (single element block) 2`] = `

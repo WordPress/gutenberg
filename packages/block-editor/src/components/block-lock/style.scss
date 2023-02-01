@@ -22,34 +22,35 @@
 	.components-base-control__field {
 		align-items: center;
 		display: flex;
-		margin: 0;
 	}
 }
 .block-editor-block-lock-modal__checklist-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: $grid-unit-15;
 	margin-bottom: 0;
 	padding: $grid-unit-15 0 $grid-unit-15 $grid-unit-40;
 
-	.components-base-control__field {
-		align-items: center;
-		display: flex;
-		margin: 0;
-	}
-
-	.components-checkbox-control__label {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		flex-grow: 1;
-
-		svg {
-			margin-right: $grid-unit-15;
-			fill: $gray-900;
-		}
+	.block-editor-block-lock-modal__lock-icon {
+		flex-shrink: 0;
+		margin-right: $grid-unit-15;
+		fill: $gray-900;
 	}
 
 	&:hover {
 		background-color: $gray-100;
 		border-radius: $radius-block-ui;
+	}
+}
+
+.block-editor-block-lock-modal__template-lock {
+	border-top: $border-width solid $gray-300;
+	margin-top: $grid-unit-20;
+	padding: $grid-unit-15 0;
+
+	.components-base-control__field {
+		margin: 0;
 	}
 }
 

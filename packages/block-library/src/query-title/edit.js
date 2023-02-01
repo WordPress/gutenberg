@@ -9,9 +9,11 @@ import classnames from 'classnames';
 import {
 	AlignmentControl,
 	BlockControls,
+	InspectorControls,
 	useBlockProps,
 	Warning,
 } from '@wordpress/block-editor';
+import { ToggleControl, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -19,21 +21,19 @@ import { __ } from '@wordpress/i18n';
  */
 import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 
-const SUPPORTED_TYPES = [ 'archive' ];
+const SUPPORTED_TYPES = [ 'archive', 'search' ];
 
 export default function QueryTitleEdit( {
-	attributes: { type, level, textAlign },
+	attributes: { type, level, textAlign, showPrefix, showSearchTerm },
 	setAttributes,
 } ) {
 	const TagName = `h${ level }`;
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: classnames( 'wp-block-query-title__placeholder', {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
-			'wp-block-query-title__placeholder': type === 'archive',
 		} ),
 	} );
-	// The plan is to augment this block with more
-	// block variations like `Search Title`.
+
 	if ( ! SUPPORTED_TYPES.includes( type ) ) {
 		return (
 			<div { ...blockProps }>
@@ -45,9 +45,53 @@ export default function QueryTitleEdit( {
 	let titleElement;
 	if ( type === 'archive' ) {
 		titleElement = (
-			<TagName { ...blockProps }>{ __( 'Archive title' ) }</TagName>
+			<>
+				<InspectorControls>
+					<PanelBody title={ __( 'Settings' ) }>
+						<ToggleControl
+							label={ __( 'Show archive type in title' ) }
+							onChange={ () =>
+								setAttributes( { showPrefix: ! showPrefix } )
+							}
+							checked={ showPrefix }
+						/>
+					</PanelBody>
+				</InspectorControls>
+				<TagName { ...blockProps }>
+					{ showPrefix
+						? __( 'Archive type: Name' )
+						: __( 'Archive title' ) }
+				</TagName>
+			</>
 		);
 	}
+
+	if ( type === 'search' ) {
+		titleElement = (
+			<>
+				<InspectorControls>
+					<PanelBody title={ __( 'Settings' ) }>
+						<ToggleControl
+							label={ __( 'Show search term in title' ) }
+							onChange={ () =>
+								setAttributes( {
+									showSearchTerm: ! showSearchTerm,
+								} )
+							}
+							checked={ showSearchTerm }
+						/>
+					</PanelBody>
+				</InspectorControls>
+
+				<TagName { ...blockProps }>
+					{ showSearchTerm
+						? __( 'Search results for: “search term”' )
+						: __( 'Search results' ) }
+				</TagName>
+			</>
+		);
+	}
+
 	return (
 		<>
 			<BlockControls group="block">

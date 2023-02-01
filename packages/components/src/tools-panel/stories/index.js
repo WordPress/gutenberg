@@ -29,11 +29,13 @@ export const _default = () => {
 	const [ height, setHeight ] = useState();
 	const [ minHeight, setMinHeight ] = useState();
 	const [ width, setWidth ] = useState();
+	const [ scale, setScale ] = useState();
 
 	const resetAll = () => {
 		setHeight( undefined );
 		setWidth( undefined );
 		setMinHeight( undefined );
+		setScale( undefined );
 	};
 
 	return (
@@ -78,6 +80,32 @@ export const _default = () => {
 							value={ minHeight }
 							onChange={ ( next ) => setMinHeight( next ) }
 						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						hasValue={ () => !! scale }
+						label="Scale"
+						onDeselect={ () => setScale( undefined ) }
+					>
+						<ToggleGroupControl
+							__nextHasNoMarginBottom
+							label="Scale"
+							value={ scale }
+							onChange={ ( next ) => setScale( next ) }
+							isBlock
+						>
+							<ToggleGroupControlOption
+								value="cover"
+								label="Cover"
+							/>
+							<ToggleGroupControlOption
+								value="contain"
+								label="Contain"
+							/>
+							<ToggleGroupControlOption
+								value="fill"
+								label="Fill"
+							/>
+						</ToggleGroupControl>
 					</ToolsPanelItem>
 				</ToolsPanel>
 			</Panel>
@@ -340,6 +368,7 @@ export const WithConditionalDefaultControl = () => {
 					isShownByDefault={ !! height }
 				>
 					<ToggleGroupControl
+						__nextHasNoMarginBottom
 						label="Scale"
 						value={ scale }
 						onChange={ ( next ) =>
@@ -429,6 +458,7 @@ export const WithConditionallyRenderedControl = () => {
 						isShownByDefault={ true }
 					>
 						<ToggleGroupControl
+							__nextHasNoMarginBottom
 							label="Scale"
 							value={ scale }
 							onChange={ ( next ) =>
@@ -467,10 +497,9 @@ export const WithConditionallyRenderedControl = () => {
 	);
 };
 
-export { ToolsPanelWithItemGroupSlot } from './tools-panel-with-item-group-slot';
+export { ToolsPanelWithItemGroupSlot } from './utils/tools-panel-with-item-group-slot';
 
 const PanelWrapperView = styled.div`
-	max-width: 280px;
 	font-size: 13px;
 
 	.components-dropdown-menu__menu {

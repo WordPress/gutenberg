@@ -2,7 +2,6 @@
  * External dependencies
  */
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
-const { escapeRegExp } = require( 'lodash' );
 const { join, sep } = require( 'path' );
 const fastGlob = require( 'fast-glob' );
 
@@ -28,7 +27,23 @@ const blockViewRegex = new RegExp(
  * but have been declared elsewhere. This way we can call Gutenberg override functions, but
  * the block will still call the core function when updates are back ported.
  */
-const prefixFunctions = [ 'build_query_vars_from_query_block' ];
+const prefixFunctions = [
+	'build_query_vars_from_query_block',
+	'wp_enqueue_block_support_styles',
+	'wp_get_typography_font_size_value',
+	'wp_style_engine_get_styles',
+];
+
+/**
+ * Escapes the RegExp special characters.
+ *
+ * @param {string} string Input string.
+ *
+ * @return {string} Regex-escaped string.
+ */
+function escapeRegExp( string ) {
+	return string.replace( /[\\^$.*+?()[\]{}|]/g, '\\$&' );
+}
 
 const createEntrypoints = () => {
 	/*
@@ -130,7 +145,11 @@ module.exports = {
 							// block will still call the core function when updates are back ported.
 							content = content.replace(
 								new RegExp( prefixFunctions.join( '|' ), 'g' ),
-								( match ) => `${ prefix }${ match }`
+								( match ) =>
+									`${ prefix }${ match.replace(
+										/^wp_/,
+										''
+									) }`
 							);
 
 							// Within content, search for any function definitions. For

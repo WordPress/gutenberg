@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow, mount } from 'enzyme';
+import { render, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -28,13 +28,14 @@ describe( 'Edit', () => {
 	} );
 
 	it( 'should return null if block type not defined', () => {
-		const wrapper = shallow( <Edit name="core/test-block" /> );
+		const { container } = render( <Edit name="core/test-block" /> );
 
-		expect( wrapper.type() ).toBe( null );
+		expect( container ).toBeEmptyDOMElement();
 	} );
 
 	it( 'should use edit implementation of block', () => {
-		const edit = () => <div />;
+		const edit = () => <div data-testid="foo-bar" />;
+
 		registerBlockType( 'core/test-block', {
 			save: noop,
 			category: 'text',
@@ -42,29 +43,33 @@ describe( 'Edit', () => {
 			edit,
 		} );
 
-		const wrapper = shallow( <Edit name="core/test-block" /> );
+		render( <Edit name="core/test-block" /> );
 
-		expect( wrapper.exists( edit ) ).toBe( true );
+		expect( screen.getByTestId( 'foo-bar' ) ).toBeVisible();
 	} );
 
 	it( 'should use save implementation of block as fallback', () => {
-		const save = () => <div />;
+		const save = () => <div data-testid="foo-bar" />;
+
 		registerBlockType( 'core/test-block', {
 			save,
 			category: 'text',
 			title: 'block title',
 		} );
 
-		const wrapper = shallow( <Edit name="core/test-block" /> );
+		render( <Edit name="core/test-block" /> );
 
-		expect( wrapper.exists( save ) ).toBe( true );
+		expect( screen.getByTestId( 'foo-bar' ) ).toBeVisible();
 	} );
 
 	it( 'should combine the default class name with a custom one', () => {
-		const edit = ( { className } ) => <div className={ className } />;
+		const edit = ( { className } ) => (
+			<div data-testid="foo-bar" className={ className } />
+		);
 		const attributes = {
 			className: 'my-class',
 		};
+
 		registerBlockType( 'core/test-block', {
 			edit,
 			save: noop,
@@ -72,14 +77,11 @@ describe( 'Edit', () => {
 			title: 'block title',
 		} );
 
-		const wrapper = shallow(
-			<Edit name="core/test-block" attributes={ attributes } />
-		);
+		render( <Edit name="core/test-block" attributes={ attributes } /> );
 
-		expect( wrapper.find( edit ).hasClass( 'wp-block-test-block' ) ).toBe(
-			true
-		);
-		expect( wrapper.find( edit ).hasClass( 'my-class' ) ).toBe( true );
+		const editElement = screen.getByTestId( 'foo-bar' );
+		expect( editElement ).toHaveClass( 'wp-block-test-block' );
+		expect( editElement ).toHaveClass( 'my-class' );
 	} );
 
 	it( 'should assign context', () => {
@@ -92,13 +94,13 @@ describe( 'Edit', () => {
 			save: noop,
 		} );
 
-		const wrapper = mount(
+		const { container } = render(
 			<BlockContextProvider value={ { value: 'Ok' } }>
 				<Edit name="core/test-block" />
 			</BlockContextProvider>
 		);
 
-		expect( wrapper.html() ).toBe( 'Ok' );
+		expect( container ).toHaveTextContent( 'Ok' );
 	} );
 
 	describe( 'light wrapper', () => {
@@ -113,13 +115,13 @@ describe( 'Edit', () => {
 				save: noop,
 			} );
 
-			const wrapper = mount(
+			const { container } = render(
 				<BlockContextProvider value={ { value: 'Ok' } }>
 					<Edit name="core/test-block" />
 				</BlockContextProvider>
 			);
 
-			expect( wrapper.html() ).toBe( 'Ok' );
+			expect( container ).toHaveTextContent( 'Ok' );
 		} );
 	} );
 } );

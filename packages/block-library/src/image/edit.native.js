@@ -61,8 +61,9 @@ import {
 	textColor,
 } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as editPostStore } from '@wordpress/edit-post';
 import { store as noticesStore } from '@wordpress/notices';
+// eslint-disable-next-line no-restricted-imports
+import { store as editPostStore } from '@wordpress/edit-post';
 
 /**
  * Internal dependencies
@@ -268,11 +269,15 @@ export class ImageEdit extends Component {
 	componentDidUpdate( previousProps ) {
 		const { image, attributes, setAttributes, featuredImageId } =
 			this.props;
+		const { url } = attributes;
 		if ( ! previousProps.image && image ) {
-			const url =
-				getUrlForSlug( image, attributes?.sizeSlug ) ||
-				image.source_url;
-			setAttributes( { url } );
+			if ( ! hasQueryArg( url, 'w' ) && attributes?.sizeSlug ) {
+				const updatedUrl =
+					getUrlForSlug( image, attributes.sizeSlug ) ||
+					image.source_url;
+
+				setAttributes( { url: updatedUrl } );
+			}
 		}
 
 		const { id } = attributes;
@@ -574,7 +579,7 @@ export class ImageEdit extends Component {
 					<>
 						{ __(
 							'Describe the purpose of the image. Leave empty if the image is purely decorative.'
-						) }
+						) }{ ' ' }
 						<FooterMessageLink
 							href={
 								'https://www.w3.org/WAI/tutorials/images/decision-tree/'
@@ -665,6 +670,7 @@ export class ImageEdit extends Component {
 			context,
 			featuredImageId,
 			wasBlockJustInserted,
+			shouldUseFastImage,
 		} = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
 		const hasImageContext = context
@@ -845,6 +851,9 @@ export class ImageEdit extends Component {
 											isUploadInProgress={
 												isUploadInProgress
 											}
+											shouldUseFastImage={
+												shouldUseFastImage
+											}
 											onSelectMediaUploadOption={
 												this.onSelectMediaUploadOption
 											}
@@ -870,7 +879,7 @@ export class ImageEdit extends Component {
 				<BlockCaption
 					clientId={ this.props.clientId }
 					isSelected={ this.state.isCaptionSelected }
-					accessible
+					accessible={ ! this.state.isCaptionSelected }
 					accessibilityLabelCreator={ this.accessibilityLabelCreator }
 					onFocus={ this.onFocusCaption }
 					onBlur={ this.props.onBlur } // Always assign onBlur as props.
@@ -904,7 +913,7 @@ export default compose( [
 			isSelected,
 			clientId,
 		} = props;
-		const { imageSizes, imageDefaultSize } = getSettings();
+		const { imageSizes, imageDefaultSize, capabilities } = getSettings();
 		const isNotFileUrl = id && getProtocol( url ) !== 'file:';
 		const featuredImageId = getEditedPostAttribute( 'featured_media' );
 
@@ -916,11 +925,13 @@ export default compose( [
 				isNotFileUrl &&
 				url &&
 				! hasQueryArg( url, 'w' ) );
+		const image = shouldGetMedia ? getMedia( id ) : null;
 
 		return {
-			image: shouldGetMedia ? getMedia( id ) : null,
+			image,
 			imageSizes,
 			imageDefaultSize,
+			shouldUseFastImage: capabilities?.shouldUseFastImage === true,
 			featuredImageId,
 			wasBlockJustInserted: wasBlockJustInserted(
 				clientId,

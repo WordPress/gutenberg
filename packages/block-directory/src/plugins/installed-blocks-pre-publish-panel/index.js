@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { _n, sprintf } from '@wordpress/i18n';
-import { PluginPrePublishPanel } from '@wordpress/edit-post';
 import { useSelect } from '@wordpress/data';
 import { blockDefault } from '@wordpress/icons';
 
@@ -11,6 +10,10 @@ import { blockDefault } from '@wordpress/icons';
  */
 import CompactList from '../../components/compact-list';
 import { store as blockDirectoryStore } from '../../store';
+
+// We shouldn't import the edit-post package directly
+// because it would include the wp-edit-post in all pages loading the block-directory script.
+const { PluginPrePublishPanel } = window?.wp?.editPost ?? {};
 
 export default function InstalledBlocksPrePublishPanel() {
 	const newBlockTypes = useSelect(

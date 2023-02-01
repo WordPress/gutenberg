@@ -1,12 +1,18 @@
 /**
  * External dependencies
  */
-import { debounce, deburr, escapeRegExp } from 'lodash';
+import removeAccents from 'remove-accents';
 
 /**
  * WordPress dependencies
  */
+import { debounce } from '@wordpress/compose';
 import { useLayoutEffect, useState } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { escapeRegExp } from '../utils/strings';
 
 function filterOptions( search, options = [], maxResults = 10 ) {
 	const filtered = [];
@@ -20,7 +26,7 @@ function filterOptions( search, options = [], maxResults = 10 ) {
 		}
 
 		const isMatch = keywords.some( ( keyword ) =>
-			search.test( deburr( keyword ) )
+			search.test( removeAccents( keyword ) )
 		);
 		if ( ! isMatch ) {
 			continue;

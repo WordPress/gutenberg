@@ -12,6 +12,7 @@ import type { BaseControlProps } from '../base-control/types';
 export interface SelectControlProps
 	extends Pick<
 			InputBaseProps,
+			| '__next36pxDefaultSize'
 			| 'disabled'
 			| 'hideLabelFromVision'
 			| 'label'

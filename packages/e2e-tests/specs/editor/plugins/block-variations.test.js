@@ -148,6 +148,8 @@ describe( 'Block variations', () => {
 
 		it( 'should show block information when no matching variation is found', async () => {
 			await insertBlock( 'Large Quote' );
+			// Select the quote block.
+			await page.keyboard.press( 'ArrowDown' );
 			const breadcrumb = await getActiveBreadcrumb();
 			expect( breadcrumb ).toEqual( 'Quote' );
 			const navigationItem = await getFirstNavigationItem();

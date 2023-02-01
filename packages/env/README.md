@@ -16,9 +16,9 @@ The local environment will be available at http://localhost:8888 (Username: `adm
 
 ## Prerequisites
 
-`wp-env` requires Docker to be installed. There are instructions available for installing Docker on [Windows 10 Pro](https://docs.docker.com/docker-for-windows/install/), [all other versions of Windows](https://docs.docker.com/toolbox/toolbox_install_windows/), [macOS](https://docs.docker.com/docker-for-mac/install/), and [Linux](https://docs.docker.com/v17.12/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script).
+`wp-env` requires Docker to be installed. There are instructions available for installing Docker on [Windows](https://docs.docker.com/desktop/install/windows-install/), [macOS](https://docs.docker.com/docker-for-mac/install/), and [Linux](https://docs.docker.com/desktop/install/linux-install/).
 
-Node.js and NPM are required. The latest LTS version of Node.js is used to develop `wp-env` and is recommended.
+Node.js and npm are required. The latest LTS version of Node.js is used to develop `wp-env` and is recommended.
 
 ## Installation
 
@@ -40,7 +40,9 @@ If your project already has a package.json, it's also possible to use `wp-env` a
 $ npm i @wordpress/env --save-dev
 ```
 
-Then modify your package.json and add an extra command to npm `scripts` (https://docs.npmjs.com/misc/scripts):
+At this point, you can use the local, project-level version of wp-env via [`npx`](https://www.npmjs.com/package/npx), a utility automatically installed with `npm`.`npx` finds binaries like wp-env installed through node modules. As an example: `npx wp-env start --update`.
+
+If you don't wish to use `npx`, modify your package.json and add an extra command to npm `scripts` (https://docs.npmjs.com/misc/scripts):
 
 ```json
 "scripts": {
@@ -51,7 +53,7 @@ Then modify your package.json and add an extra command to npm `scripts` (https:/
 When installing `wp-env` in this way, all `wp-env` commands detailed in these docs must be prefixed with `npm run`, for example:
 
 ```sh
-# You must add another double dash to pass the "update" flag to wp-env
+# You must add another double dash to pass flags to the script (wp-env) rather than to npm itself
 $ npm run wp-env start -- --update
 ```
 
@@ -117,15 +119,14 @@ Running `docker ps` and inspecting the `PORTS` column allows you to determine wh
 
 You may also specify the port numbers in your `.wp-env.json` file, but the environment variables take precedent.
 
-### 3. Restart `wp-env`
+### 3. Restart `wp-env` with updates
 
 Restarting `wp-env` will restart the underlying Docker containers which can fix many issues.
 
-To restart `wp-env`:
+To restart `wp-env`, just run `wp-env start` again. It will automatically stop and start the container. If you also pass the `--update` argument, it will download updates and configure WordPress again.
 
 ```sh
-$ wp-env stop
-$ wp-env start
+$ wp-env start --update
 ```
 
 ### 4. Restart Docker
@@ -156,16 +157,17 @@ $ wp-env clean all
 $ wp-env start
 ```
 
-### 6. Nuke everything and start again 🔥
+### 6. Destroy everything and start again 🔥
 
-When all else fails, you can use `wp-env destroy` to forcibly remove all of the underlying Docker containers and volumes. This will allow you to start from scratch.
+When all else fails, you can use `wp-env destroy` to forcibly remove all of the underlying Docker containers, volumes, and files. This will allow you to start from scratch.
 
-To nuke everything:
+To do so:
 
 **⚠️ WARNING: This will permanently delete any posts, pages, media, etc. in the local WordPress installation.**
 
 ```sh
 $ wp-env destroy
+# This new instance is a fresh start with no existing data:
 $ wp-env start
 ```
 
@@ -188,6 +190,14 @@ wp-env start --debug
 	...
 ```
 
+## Using included WordPress PHPUnit test files
+
+Out of the box `wp-env` includes the [WordPress' PHPUnit test files](https://develop.svn.wordpress.org/trunk/tests/phpunit/) corresponding to the version of WordPress installed. There is an environment variable, `WP_TESTS_DIR`, which points to the location of these files within each container. By including these files in the environment, we remove the need for you to use a package or install and mount them yourself. If you do not want to use these files, you should ignore the `WP_TESTS_DIR` environment variable and load them from the location of your choosing.
+
+### Customizing the `wp-tests-config.php` file
+
+While we do provide a default `wp-tests-config.php` file within the environment, there may be cases where you want to use your own. WordPress provides a `WP_TESTS_CONFIG_FILE_PATH` constant that you can use to change the `wp-config.php` file used for testing. Set this to a desired path in your `bootstrap.php` file and the file you've chosen will be used instead of the one included in the environment.
+
 ## Using Xdebug
 
 Xdebug is installed in the wp-env environment, but it is turned off by default. To enable Xdebug, you can use the `--xdebug` flag with the `wp-env start` command. Here is a reference to how the flag works:
@@ -203,13 +213,15 @@ wp-env start
 wp-env start --xdebug=profile,trace,debug
 ```
 
-When you're running `wp-env` using `npm run`, like when working in the Gutenberg repo or when having `wp-env` as a local project dependency, don't forget to add an extra double dash before the `--xdebug` command:
+When you're running `wp-env` using `npm run`, like when working in the Gutenberg repo or when `wp-env` is a local project dependency, don't forget to add an extra double dash before the `--xdebug` command:
 
 ```sh
 npm run wp-env start -- --xdebug
+# Alternatively, use npx:
+npx wp-env start --xdebug
 ```
 
-If you forget about that, the `--xdebug` parameter will be passed to NPM instead of the `wp-env start` command and it will be ignored.
+If you forget about that, the `--xdebug` parameter will be passed to npm instead of the `wp-env start` command and it will be ignored.
 
 You can see a reference on each of the Xdebug modes and what they do in the [Xdebug documentation](https://xdebug.org/docs/all_settings#mode).
 
@@ -300,7 +312,7 @@ Positionals:
 The run command can be used to open shell sessions or invoke WP-CLI commands.
 
 <div class="callout callout-alert">
-In some cases, `wp-env` may consume options that you are attempting to pass to 
+In some cases, `wp-env` may consume options that you are attempting to pass to
 the container. This happens with options that `wp-env` has already declared,
 such as `--debug`, `--help`, and `--version`. When this happens, you should fall
 back to using quotation marks; `wp-env` considers everything inside the
@@ -511,7 +523,7 @@ SCRIPT_DEBUG: true,
 WP_PHP_BINARY: 'php',
 WP_TESTS_EMAIL: 'admin@example.org',
 WP_TESTS_TITLE: 'Test Blog',
-WP_TESTS_DOMAIN: 'http://localhost',
+WP_TESTS_DOMAIN: 'localhost',
 WP_SITEURL: 'http://localhost',
 WP_HOME: 'http://localhost',
 ```
@@ -524,7 +536,7 @@ Additionally, the values referencing a URL include the specified port for the gi
 
 ### Examples
 
-#### Latest production WordPress + current directory as a plugin
+#### Latest stable WordPress + current directory as a plugin
 
 This is useful for plugin development.
 

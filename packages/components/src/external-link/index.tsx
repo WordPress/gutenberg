@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { compact, uniq } from 'lodash';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -28,16 +27,41 @@ function UnforwardedExternalLink(
 	ref: ForwardedRef< HTMLAnchorElement >
 ) {
 	const { href, children, className, rel = '', ...additionalProps } = props;
-	const optimizedRel = uniq(
-		compact( [ ...rel.split( ' ' ), 'external', 'noreferrer', 'noopener' ] )
-	).join( ' ' );
+	const optimizedRel = [
+		...new Set(
+			[
+				...rel.split( ' ' ),
+				'external',
+				'noreferrer',
+				'noopener',
+			].filter( Boolean )
+		),
+	].join( ' ' );
 	const classes = classnames( 'components-external-link', className );
+	/* Anchor links are perceived as external links.
+	This constant helps check for on page anchor links,
+	to prevent them from being opened in the editor. */
+	const isInternalAnchor = !! href?.startsWith( '#' );
+
+	const onClickHandler = (
+		event: React.MouseEvent< HTMLAnchorElement, MouseEvent >
+	) => {
+		if ( isInternalAnchor ) {
+			event.preventDefault();
+		}
+
+		if ( props.onClick ) {
+			props.onClick( event );
+		}
+	};
+
 	return (
 		/* eslint-disable react/jsx-no-target-blank */
 		<a
 			{ ...additionalProps }
 			className={ classes }
 			href={ href }
+			onClick={ onClickHandler }
 			target="_blank"
 			rel={ optimizedRel }
 			ref={ ref }

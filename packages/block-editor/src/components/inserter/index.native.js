@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { AccessibilityInfo, Platform, Text } from 'react-native';
-import { delay } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -80,12 +79,18 @@ const defaultRenderToggle = ( {
 };
 
 export class Inserter extends Component {
+	announcementTimeout;
+
 	constructor() {
 		super( ...arguments );
 
 		this.onToggle = this.onToggle.bind( this );
 		this.renderInserterToggle = this.renderInserterToggle.bind( this );
 		this.renderContent = this.renderContent.bind( this );
+	}
+
+	componentWillUnmount() {
+		clearTimeout( this.announcementTimeout );
 	}
 
 	getInsertionOptions() {
@@ -211,13 +216,13 @@ export class Inserter extends Component {
 	}
 
 	onInserterToggledAnnouncement( isOpen ) {
-		AccessibilityInfo.isScreenReaderEnabled().done( ( isEnabled ) => {
+		AccessibilityInfo.isScreenReaderEnabled().then( ( isEnabled ) => {
 			if ( isEnabled ) {
 				const isIOS = Platform.OS === 'ios';
 				const announcement = isOpen
 					? __( 'Scrollable block menu opened. Select a block.' )
 					: __( 'Scrollable block menu closed.' );
-				delay(
+				this.announcementTimeout = setTimeout(
 					() =>
 						AccessibilityInfo.announceForAccessibility(
 							announcement

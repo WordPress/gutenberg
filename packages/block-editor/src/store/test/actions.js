@@ -27,7 +27,6 @@ const noop = () => {};
 
 const {
 	clearSelectedBlock,
-	hideInsertionPoint,
 	insertBlock,
 	insertBlocks,
 	mergeBlocks,
@@ -606,14 +605,6 @@ describe( 'actions', () => {
 		it( 'should return the SHOW_INSERTION_POINT action', () => {
 			expect( showInsertionPoint() ).toEqual( {
 				type: 'SHOW_INSERTION_POINT',
-			} );
-		} );
-	} );
-
-	describe( 'hideInsertionPoint', () => {
-		it( 'should return the HIDE_INSERTION_POINT action', () => {
-			expect( hideInsertionPoint() ).toEqual( {
-				type: 'HIDE_INSERTION_POINT',
 			} );
 		} );
 	} );

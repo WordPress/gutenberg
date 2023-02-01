@@ -1,17 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	every,
-	filter,
-	find,
-	forEach,
-	get,
-	isEmpty,
-	map,
-	reduce,
-	some,
-} from 'lodash';
+import { get, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -108,34 +98,29 @@ function GalleryEdit( props ) {
 
 	const resizedImages = useMemo( () => {
 		if ( isSelected ) {
-			return reduce(
-				attributes.ids,
+			return ( attributes.ids ?? [] ).reduce(
 				( currentResizedImages, id ) => {
 					if ( ! id ) {
 						return currentResizedImages;
 					}
 					const image = getMedia( id );
-					const sizes = reduce(
-						imageSizes,
-						( currentSizes, size ) => {
-							const defaultUrl = get( image, [
-								'sizes',
-								size.slug,
-								'url',
-							] );
-							const mediaDetailsUrl = get( image, [
-								'media_details',
-								'sizes',
-								size.slug,
-								'source_url',
-							] );
-							return {
-								...currentSizes,
-								[ size.slug ]: defaultUrl || mediaDetailsUrl,
-							};
-						},
-						{}
-					);
+					const sizes = imageSizes.reduce( ( currentSizes, size ) => {
+						const defaultUrl = get( image, [
+							'sizes',
+							size.slug,
+							'url',
+						] );
+						const mediaDetailsUrl = get( image, [
+							'media_details',
+							'sizes',
+							size.slug,
+							'source_url',
+						] );
+						return {
+							...currentSizes,
+							[ size.slug ]: defaultUrl || mediaDetailsUrl,
+						};
+					}, {} );
 					return {
 						...currentResizedImages,
 						[ parseInt( id, 10 ) ]: sizes,
@@ -163,7 +148,7 @@ function GalleryEdit( props ) {
 				...newAttrs,
 				// Unlike images[ n ].id which is a string, always ensure the
 				// ids array contains numbers as per its attribute type.
-				ids: map( newAttrs.images, ( { id } ) => parseInt( id, 10 ) ),
+				ids: newAttrs.images.map( ( { id } ) => parseInt( id, 10 ) ),
 			};
 		}
 
@@ -210,7 +195,7 @@ function GalleryEdit( props ) {
 
 	function onRemoveImage( index ) {
 		return () => {
-			const newImages = filter( images, ( img, i ) => index !== i );
+			const newImages = images.filter( ( img, i ) => index !== i );
 			setSelectedImage();
 			setAttributes( {
 				images: newImages,
@@ -226,7 +211,7 @@ function GalleryEdit( props ) {
 		// string, so ensure comparison works correctly by converting the
 		// newImage.id to a string.
 		const newImageId = newImage.id.toString();
-		const currentImage = find( images, { id: newImageId } );
+		const currentImage = images.find( ( { id } ) => id === newImageId );
 		const currentImageCaption = currentImage
 			? currentImage.caption
 			: newImage.caption;
@@ -235,9 +220,9 @@ function GalleryEdit( props ) {
 			return currentImageCaption;
 		}
 
-		const attachment = find( attachmentCaptions, {
-			id: newImageId,
-		} );
+		const attachment = attachmentCaptions.find(
+			( { id } ) => id === newImageId
+		);
 
 		// If the attachment caption is updated.
 		if ( attachment && attachment.caption !== newImage.caption ) {
@@ -312,16 +297,16 @@ function GalleryEdit( props ) {
 	}
 
 	function getImagesSizeOptions() {
-		return map(
-			filter( imageSizes, ( { slug } ) =>
-				some( resizedImages, ( sizes ) => sizes[ slug ] )
-			),
-			( { name, slug } ) => ( { value: slug, label: name } )
-		);
+		const resizedImageSizes = Object.values( resizedImages );
+		return imageSizes
+			.filter( ( { slug } ) =>
+				resizedImageSizes.some( ( sizes ) => sizes[ slug ] )
+			)
+			.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
 	}
 
 	function updateImagesSize( newSizeSlug ) {
-		const updatedImages = map( images, ( image ) => {
+		const updatedImages = ( images ?? [] ).map( ( image ) => {
 			if ( ! image.id ) {
 				return image;
 			}
@@ -343,10 +328,10 @@ function GalleryEdit( props ) {
 			Platform.OS === 'web' &&
 			images &&
 			images.length > 0 &&
-			every( images, ( { url } ) => isBlobURL( url ) )
+			images.every( ( { url } ) => isBlobURL( url ) )
 		) {
-			const filesList = map( images, ( { url } ) => getBlobByURL( url ) );
-			forEach( images, ( { url } ) => revokeBlobURL( url ) );
+			const filesList = images.map( ( { url } ) => getBlobByURL( url ) );
+			images.forEach( ( { url } ) => revokeBlobURL( url ) );
 			mediaUpload( {
 				filesList,
 				onFileChange: onSelectImages,
@@ -417,6 +402,7 @@ function GalleryEdit( props ) {
 				<PanelBody title={ __( 'Settings' ) }>
 					{ images.length > 1 && (
 						<RangeControl
+							__nextHasNoMarginBottom
 							label={ __( 'Columns' ) }
 							value={ columns }
 							onChange={ setColumnsNumber }
@@ -433,6 +419,7 @@ function GalleryEdit( props ) {
 						help={ getImageCropHelp }
 					/>
 					<SelectControl
+						__nextHasNoMarginBottom
 						label={ __( 'Link to' ) }
 						value={ linkTo }
 						onChange={ setLinkTo }
@@ -441,6 +428,7 @@ function GalleryEdit( props ) {
 					/>
 					{ shouldShowSizeOptions && (
 						<SelectControl
+							__nextHasNoMarginBottom
 							label={ __( 'Image size' ) }
 							value={ sizeSlug }
 							options={ imageSizeOptions }

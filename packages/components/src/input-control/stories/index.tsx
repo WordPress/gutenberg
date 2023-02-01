@@ -7,10 +7,13 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
  * Internal dependencies
  */
 import InputControl from '..';
+import { InputControlPrefixWrapper } from '../input-prefix-wrapper';
+import { InputControlSuffixWrapper } from '../input-suffix-wrapper';
 
 const meta: ComponentMeta< typeof InputControl > = {
 	title: 'Components (Experimental)/InputControl',
 	component: InputControl,
+	subcomponents: { InputControlPrefixWrapper, InputControlSuffixWrapper },
 	argTypes: {
 		__unstableInputWidth: { control: { type: 'text' } },
 		__unstableStateReducer: { control: { type: null } },
@@ -37,16 +40,32 @@ Default.args = {
 	placeholder: 'Placeholder',
 };
 
+export const WithHelpText = Template.bind( {} );
+WithHelpText.args = {
+	...Default.args,
+	help: 'Help text to describe the control.',
+};
+
+/**
+ * A `prefix` can be inserted before the input. By default, the prefix is aligned with the edge of the input border,
+ * with no padding. If you want to apply standard padding in accordance with the size variant, use the provided
+ * `<InputControlPrefixWrapper>` convenience wrapper.
+ */
 export const WithPrefix = Template.bind( {} );
 WithPrefix.args = {
 	...Default.args,
-	prefix: <span style={ { paddingLeft: 8 } }>@</span>,
+	prefix: <InputControlPrefixWrapper>@</InputControlPrefixWrapper>,
 };
 
+/**
+ * A `suffix` can be inserted after the input. By default, the suffix is aligned with the edge of the input border,
+ * with no padding. If you want to apply standard padding in accordance with the size variant, use the provided
+ * `<InputControlSuffixWrapper>` convenience wrapper.
+ */
 export const WithSuffix = Template.bind( {} );
 WithSuffix.args = {
 	...Default.args,
-	suffix: <button style={ { marginRight: 4 } }>Send</button>,
+	suffix: <InputControlSuffixWrapper>%</InputControlSuffixWrapper>,
 };
 
 export const WithSideLabel = Template.bind( {} );

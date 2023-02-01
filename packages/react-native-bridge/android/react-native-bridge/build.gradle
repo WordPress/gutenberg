@@ -14,11 +14,11 @@ group='org.wordpress-mobile.gutenberg-mobile'
 def buildAssetsFolder = 'build/assets'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
 
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 30
+        minSdkVersion 24
+        targetSdkVersion 31
         buildConfigField "boolean", "SHOULD_ATTACH_JS_BUNDLE", willPublishReactNativeBridgeBinary.toString()
     }
 
@@ -45,10 +45,15 @@ android {
 
 repositories {
     maven { url "https://a8c-libs.s3.amazonaws.com/android" }
-    maven { url "https://a8c-libs.s3.amazonaws.com/android/hermes-mirror" }
     maven { url "https://jitpack.io" }
     google()
-    mavenCentral()
+    mavenCentral {
+        // We don't want to fetch react-native from Maven Central as there are
+        // older versions over there.
+        content {
+            excludeGroup "com.facebook.react"
+        }
+    }
 }
 
 dependencies {
@@ -64,25 +69,33 @@ dependencies {
     def packageJson = '../../../react-native-editor/package.json'
 
     implementation "com.facebook.react:react-native:$rnVersion"
-    implementation "org.wordpress-mobile:react-native-svg:${extractPackageVersion(packageJson, 'react-native-svg', 'dependencies')}"
     implementation "com.github.wordpress-mobile:react-native-video:${extractPackageVersion(packageJson, 'react-native-video', 'dependencies')}"
     implementation "com.github.wordpress-mobile:react-native-linear-gradient:${extractPackageVersion(packageJson, 'react-native-linear-gradient', 'dependencies')}"
     implementation "com.github.wordpress-mobile:react-native-slider:${extractPackageVersion(packageJson, '@react-native-community/slider', 'dependencies')}"
-    implementation "org.wordpress-mobile:react-native-get-random-values:${extractPackageVersion(packageJson, 'react-native-get-random-values', 'dependencies')}"
-    implementation "org.wordpress-mobile:react-native-masked-view:${extractPackageVersion(packageJson, '@react-native-masked-view/masked-view', 'dependencies')}"
-    implementation "org.wordpress-mobile:react-native-screens:${extractPackageVersion(packageJson, 'react-native-screens', 'dependencies')}"
-    implementation "org.wordpress-mobile:react-native-safe-area-context:${extractPackageVersion(packageJson, 'react-native-safe-area-context', 'dependencies')}"
     implementation "com.github.wordpress-mobile:react-native-reanimated:${extractPackageVersion(packageJson, 'react-native-reanimated', 'dependencies')}"
     implementation "com.github.wordpress-mobile:react-native-prompt-android:${extractPackageVersion(packageJson, 'react-native-prompt-android', 'dependencies')}"
-    implementation "org.wordpress-mobile:react-native-webview:${extractPackageVersion(packageJson, 'react-native-webview', 'dependencies')}"
-    implementation "org.wordpress-mobile:react-native-clipboard:${extractPackageVersion(packageJson, '@react-native-clipboard/clipboard', 'dependencies')}"
 
     implementation("com.github.wordpress-mobile:react-native-gesture-handler:${extractPackageVersion(packageJson, 'react-native-gesture-handler', 'dependencies')}", {
         // Remove Reanimated transitive dependency as it's already defined here
         exclude group: 'com.github.wordpress-mobile', module: 'react-native-reanimated'
     })
 
-    runtimeOnly "org.wordpress-mobile:hermes-release-mirror:$rnVersion"
+    // Published by `wordpress-mobile/react-native-libraries-publisher`
+    // See the documentation for this value in `build.gradle.kts` of `wordpress-mobile/react-native-libraries-publisher`
+    def reactNativeLibrariesPublisherVersion = "v1"
+    def reactNativeLibrariesGroupId = "org.wordpress-mobile.react-native-libraries.$reactNativeLibrariesPublisherVersion"
+    implementation "$reactNativeLibrariesGroupId:react-native-get-random-values:${extractPackageVersion(packageJson, 'react-native-get-random-values', 'dependencies')}"
+    implementation "$reactNativeLibrariesGroupId:react-native-safe-area-context:${extractPackageVersion(packageJson, 'react-native-safe-area-context', 'dependencies')}"
+    implementation "$reactNativeLibrariesGroupId:react-native-screens:${extractPackageVersion(packageJson, 'react-native-screens', 'dependencies')}"
+    implementation "$reactNativeLibrariesGroupId:react-native-svg:${extractPackageVersion(packageJson, 'react-native-svg', 'dependencies')}"
+    implementation "$reactNativeLibrariesGroupId:react-native-webview:${extractPackageVersion(packageJson, 'react-native-webview', 'dependencies')}"
+    implementation "$reactNativeLibrariesGroupId:react-native-masked-view:${extractPackageVersion(packageJson, '@react-native-masked-view/masked-view', 'dependencies')}"
+    implementation "$reactNativeLibrariesGroupId:react-native-clipboard:${extractPackageVersion(packageJson, '@react-native-clipboard/clipboard', 'dependencies')}"
+    implementation "$reactNativeLibrariesGroupId:react-native-fast-image:${extractPackageVersion(packageJson, 'react-native-fast-image', 'dependencies')}"
+
+    runtimeOnly("com.facebook.react:hermes-engine:$rnVersion", {
+        exclude group:'com.facebook.fbjni'
+    })
 
     if (willPublishReactNativeBridgeBinary) {
         implementation "org.wordpress-mobile.gutenberg-mobile:react-native-aztec:$reactNativeAztecVersion"

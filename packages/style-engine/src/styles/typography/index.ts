@@ -40,6 +40,18 @@ const fontWeight = {
 	},
 };
 
+const fontFamily = {
+	name: 'fontFamily',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'typography', 'fontFamily' ],
+			'fontFamily'
+		);
+	},
+};
+
 const letterSpacing = {
 	name: 'letterSpacing',
 	generate: ( style: Style, options: StyleOptions ) => {
@@ -60,6 +72,18 @@ const lineHeight = {
 			options,
 			[ 'typography', 'lineHeight' ],
 			'lineHeight'
+		);
+	},
+};
+
+const textColumns = {
+	name: 'textColumns',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'typography', 'textColumns' ],
+			'columnCount'
 		);
 	},
 };
@@ -89,11 +113,13 @@ const textTransform = {
 };
 
 export default [
+	fontFamily,
 	fontSize,
 	fontStyle,
 	fontWeight,
 	letterSpacing,
 	lineHeight,
+	textColumns,
 	textDecoration,
 	textTransform,
 ];

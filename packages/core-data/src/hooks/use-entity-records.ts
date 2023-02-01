@@ -9,20 +9,33 @@ import deprecated from '@wordpress/deprecated';
  */
 import useQuerySelect from './use-query-select';
 import { store as coreStore } from '../';
-import type { Options, EntityRecordResolution } from './use-entity-record';
+import type { Options } from './use-entity-record';
+import type { Status } from './constants';
 
-type EntityRecordsResolution< RecordType > = Omit<
-	EntityRecordResolution< RecordType >,
-	'record'
-> & {
+interface EntityRecordsResolution< RecordType > {
 	/** The requested entity record */
 	records: RecordType[] | null;
-};
+
+	/**
+	 * Is the record still being resolved?
+	 */
+	isResolving: boolean;
+
+	/**
+	 * Is the record resolved by now?
+	 */
+	hasResolved: boolean;
+
+	/** Resolution status */
+	status: Status;
+}
 
 const EMPTY_ARRAY = [];
 
 /**
  * Resolves the specified entity records.
+ *
+ * @since 6.1.0 Introduced in WordPress core.
  *
  * @param  kind      Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ../entities.ts for a list of available kinds.
  * @param  name      Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ../entities.ts for a list of available names.

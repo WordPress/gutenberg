@@ -15,6 +15,7 @@ import {
 	closeGlobalBlockInserter,
 	openListView,
 	closeListView,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -32,6 +33,34 @@ import {
 
 jest.setTimeout( 1000000 );
 
+async function loadHtmlIntoTheBlockEditor( html ) {
+	await page.evaluate( ( _html ) => {
+		const { parse } = window.wp.blocks;
+		const { dispatch } = window.wp.data;
+		const blocks = parse( _html );
+
+		blocks.forEach( ( block ) => {
+			if ( block.name === 'core/image' ) {
+				delete block.attributes.id;
+				delete block.attributes.url;
+			}
+		} );
+
+		dispatch( 'core/block-editor' ).resetBlocks( blocks );
+	}, html );
+}
+
+async function load1000Paragraphs() {
+	await page.evaluate( () => {
+		const { createBlock } = window.wp.blocks;
+		const { dispatch } = window.wp.data;
+		const blocks = Array.from( { length: 1000 } ).map( () =>
+			createBlock( 'core/paragraph' )
+		);
+		dispatch( 'core/block-editor' ).resetBlocks( blocks );
+	} );
+}
+
 describe( 'Post Editor Performance', () => {
 	const results = {
 		serverResponse: [],
@@ -41,6 +70,7 @@ describe( 'Post Editor Performance', () => {
 		firstContentfulPaint: [],
 		firstBlock: [],
 		type: [],
+		typeContainer: [],
 		focus: [],
 		listViewOpen: [],
 		inserterOpen: [],
@@ -49,29 +79,6 @@ describe( 'Post Editor Performance', () => {
 	};
 	const traceFile = __dirname + '/trace.json';
 	let traceResults;
-
-	beforeAll( async () => {
-		const html = readFile(
-			join( __dirname, '../../assets/large-post.html' )
-		);
-
-		await createNewPost();
-		await page.evaluate( ( _html ) => {
-			const { parse } = window.wp.blocks;
-			const { dispatch } = window.wp.data;
-			const blocks = parse( _html );
-
-			blocks.forEach( ( block ) => {
-				if ( block.name === 'core/image' ) {
-					delete block.attributes.id;
-					delete block.attributes.url;
-				}
-			} );
-
-			dispatch( 'core/block-editor' ).resetBlocks( blocks );
-		}, html );
-		await saveDraft();
-	} );
 
 	afterAll( async () => {
 		const resultsFilename = basename( __filename, '.js' ) + '.results.json';
@@ -83,6 +90,7 @@ describe( 'Post Editor Performance', () => {
 	} );
 
 	beforeEach( async () => {
+		await createNewPost();
 		// Disable auto-save to avoid impacting the metrics.
 		await page.evaluate( () => {
 			window.wp.data.dispatch( 'core/editor' ).updateEditorSettings( {
@@ -93,11 +101,17 @@ describe( 'Post Editor Performance', () => {
 	} );
 
 	it( 'Loading', async () => {
-		// Measuring loading time.
+		await loadHtmlIntoTheBlockEditor(
+			readFile( join( __dirname, '../../assets/large-post.html' ) )
+		);
+		await saveDraft();
 		let i = 5;
 		while ( i-- ) {
 			await page.reload();
-			await page.waitForSelector( '.wp-block' );
+			await page.waitForSelector( '.edit-post-layout', {
+				timeout: 120000,
+			} );
+			await canvas().waitForSelector( '.wp-block', { timeout: 120000 } );
 			const {
 				serverResponse,
 				firstPaint,
@@ -117,7 +131,9 @@ describe( 'Post Editor Performance', () => {
 	} );
 
 	it( 'Typing', async () => {
-		// Measuring typing performance.
+		await loadHtmlIntoTheBlockEditor(
+			readFile( join( __dirname, '../../assets/large-post.html' ) )
+		);
 		await insertBlock( 'Paragraph' );
 		let i = 20;
 		await page.tracing.start( {
@@ -151,18 +167,59 @@ describe( 'Post Editor Performance', () => {
 		}
 	} );
 
-	it( 'Selecting blocks', async () => {
-		// Measuring block selection performance.
-		await createNewPost();
-		await page.evaluate( () => {
-			const { createBlock } = window.wp.blocks;
-			const { dispatch } = window.wp.data;
-			const blocks = window.lodash
-				.times( 1000 )
-				.map( () => createBlock( 'core/paragraph' ) );
-			dispatch( 'core/block-editor' ).resetBlocks( blocks );
+	it( 'Typing within containers', async () => {
+		await loadHtmlIntoTheBlockEditor(
+			readFile(
+				join(
+					__dirname,
+					'../../assets/small-post-with-containers.html'
+				)
+			)
+		);
+		// Select the block where we type in
+		await canvas().waitForSelector( 'p[aria-label="Paragraph block"]' );
+		await canvas().click( 'p[aria-label="Paragraph block"]' );
+		// Ignore firsted typed character because it's different
+		// It probably deserves a dedicated metric.
+		// (isTyping triggers so it's slower)
+		await page.keyboard.type( 'x' );
+
+		let i = 10;
+		await page.tracing.start( {
+			path: traceFile,
+			screenshots: false,
+			categories: [ 'devtools.timeline' ],
 		} );
-		const paragraphs = await page.$$( '.wp-block' );
+
+		while ( i-- ) {
+			// Wait for the browser to be idle before starting the monitoring.
+			// eslint-disable-next-line no-restricted-syntax
+			await page.waitForTimeout( 500 );
+			await page.keyboard.type( 'x' );
+		}
+		// eslint-disable-next-line no-restricted-syntax
+		await page.waitForTimeout( 500 );
+		await page.tracing.stop();
+		traceResults = JSON.parse( readFile( traceFile ) );
+		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
+			getTypingEventDurations( traceResults );
+		if (
+			keyDownEvents.length === keyPressEvents.length &&
+			keyPressEvents.length === keyUpEvents.length
+		) {
+			// The first character typed triggers a longer time (isTyping change)
+			// It can impact the stability of the metric, so we exclude it.
+			for ( let j = 1; j < keyDownEvents.length; j++ ) {
+				results.typeContainer.push(
+					keyDownEvents[ j ] + keyPressEvents[ j ] + keyUpEvents[ j ]
+				);
+			}
+		}
+	} );
+
+	it( 'Selecting blocks', async () => {
+		await load1000Paragraphs();
+		const paragraphs = await canvas().$$( '.wp-block' );
 		await page.tracing.start( {
 			path: traceFile,
 			screenshots: false,
@@ -182,8 +239,7 @@ describe( 'Post Editor Performance', () => {
 	} );
 
 	it( 'Opening persistent list view', async () => {
-		// Measure time to open inserter.
-		await page.waitForSelector( '.edit-post-layout' );
+		await load1000Paragraphs();
 		for ( let j = 0; j < 10; j++ ) {
 			await page.tracing.start( {
 				path: traceFile,
@@ -202,8 +258,7 @@ describe( 'Post Editor Performance', () => {
 	} );
 
 	it( 'Opening the inserter', async () => {
-		// Measure time to open inserter.
-		await page.waitForSelector( '.edit-post-layout' );
+		await load1000Paragraphs();
 		for ( let j = 0; j < 10; j++ ) {
 			await page.tracing.start( {
 				path: traceFile,
@@ -225,8 +280,7 @@ describe( 'Post Editor Performance', () => {
 		function sum( arr ) {
 			return arr.reduce( ( a, b ) => a + b, 0 );
 		}
-
-		// Measure time to search the inserter and get results.
+		await load1000Paragraphs();
 		await openGlobalBlockInserter();
 		for ( let j = 0; j < 10; j++ ) {
 			// Wait for the browser to be idle before starting the monitoring.
@@ -258,7 +312,7 @@ describe( 'Post Editor Performance', () => {
 	} );
 
 	it( 'Hovering Inserter Items', async () => {
-		// Measure inserter hover performance.
+		await load1000Paragraphs();
 		const paragraphBlockItem =
 			'.block-editor-inserter__menu .editor-block-list-item-paragraph';
 		const headingBlockItem =

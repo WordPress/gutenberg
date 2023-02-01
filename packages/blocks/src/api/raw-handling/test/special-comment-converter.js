@@ -49,6 +49,44 @@ describe( 'specialCommentConverter', () => {
 			<p>Third paragraph</p>`
 		);
 	} );
+	describe( 'when more comment is inside paragraph', () => {
+		it( 'should split the paragraph', () => {
+			const output = deepFilterHTML(
+				`<p>First part<!--more-->second part</p>`,
+				[ specialCommentConverter ]
+			);
+			expect( output ).toEqual(
+				`<p>First part</p><wp-block data-block=\"core/more\"></wp-block><p>second part</p>`
+			);
+		} );
+		it( 'should preserve inline formatting', () => {
+			const output = deepFilterHTML(
+				`<p><em>First <span>part</span></em><!--more-->second part, some more <u>text</u>.</p>`,
+				[ specialCommentConverter ]
+			);
+			expect( output ).toEqual(
+				`<p><em>First <span>part</span></em></p><wp-block data-block=\"core/more\"></wp-block><p>second part, some more <u>text</u>.</p>`
+			);
+		} );
+		it( 'should position the more block first', () => {
+			const output = deepFilterHTML(
+				`<p><!--more-->First paragraph.</p>`,
+				[ specialCommentConverter ]
+			);
+			expect( output ).toEqual(
+				`<wp-block data-block=\"core/more\"></wp-block><p>First paragraph.</p>`
+			);
+		} );
+		it( 'should position the more block last', () => {
+			const output = deepFilterHTML(
+				`<p>First paragraph.<!--more--></p>`,
+				[ specialCommentConverter ]
+			);
+			expect( output ).toEqual(
+				`<p>First paragraph.</p><wp-block data-block=\"core/more\"></wp-block>`
+			);
+		} );
+	} );
 
 	describe( 'when tags have been reformatted', () => {
 		it( 'should parse special comments', () => {

@@ -26,17 +26,6 @@
 	background-color: $white;
 	box-shadow: inset 0 0 0 $border-width $gray-900;
 	outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
-
-	.components-base-control__label {
-		font-size: $default-font-size;
-	}
-
-	&.has-illustration {
-		background: none;
-		border: none;
-		box-shadow: none;
-		min-width: 100px;
-	}
 }
 
 .components-placeholder__error,
@@ -56,7 +45,7 @@
 	> svg,
 	.dashicon,
 	.block-editor-block-icon {
-		margin-right: 1ch;
+		margin-right: $grid-unit-15;
 		fill: currentColor;
 		// Optimizate for high contrast modes.
 		// See also https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/.
@@ -114,11 +103,6 @@
 .components-placeholder__error {
 	margin-top: 1em;
 	width: 100%;
-}
-
-.components-placeholder__preview img {
-	margin: 3%;
-	width: 50%;
 }
 
 .components-placeholder__fieldset .components-button {
@@ -179,18 +163,81 @@
 	}
 }
 
-// Style the placeholder illustration.
+
+/**
+ * Dashed style placeholders
+ */
+
+// @todo
+// These styles are only applied after the has-illustration gets added.
+// This is mainly an issue in terms of Site Logo which has a brief flash of the square placeholder.
+.components-placeholder.has-illustration {
+	color: inherit;
+	display: flex;
+	box-shadow: none;
+	min-width: 100px;
+
+	// Blur the background so layered dashed placeholders are still visually separate.
+	// Make the background transparent to not interfere with the background overlay in placeholder-style() pseudo element
+	backdrop-filter: blur(100px);
+	background-color: transparent;
+
+	// This appears to fix an occasional Chrome bug where the blurred background would have an incorrect color.
+	backface-visibility: hidden;
+
+	// Invert the colors in themes deemed dark.
+	.is-dark-theme & {
+		background-color: rgba($black, 0.1);
+	}
+
+	.components-placeholder__fieldset {
+		width: auto;
+
+		// Unset intrinsic margins.
+		margin-left: 0;
+		margin-right: 0;
+	}
+
+	// Show placeholder buttons on block selection.
+	// Note that these can't be display: none; or visibility: hidden;, as that breaks the writing flow.
+	.components-placeholder__label,
+	.components-placeholder__instructions,
+	.components-button {
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 0.1s linear;
+		@include reduce-motion("transition");
+	}
+
+	.is-selected > & {
+		.components-placeholder__label,
+		.components-placeholder__instructions,
+		.components-button {
+			opacity: 1;
+			pointer-events: auto;
+		}
+	}
+
+	// By painting the borders here, we enable them to be replaced by the Border control.
+	@include placeholder-style();
+	overflow: hidden;
+}
+
+// Position the spinner.
+// @todo these rules should ideally live with the spinner component itself.
+.components-placeholder__preview {
+	display: flex;
+	justify-content: center;
+}
+
 .components-placeholder__illustration {
-	border: $border-width dashed currentColor;
-	box-sizing: border-box;
+	box-sizing: content-box;
 	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
 	width: 100%;
 	height: 100%;
 	stroke: currentColor;
-	stroke-dasharray: 3;
-	opacity: 0.4;
+	opacity: 0.25;
 }

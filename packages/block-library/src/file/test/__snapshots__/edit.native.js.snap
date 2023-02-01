@@ -44,9 +44,7 @@ exports[`File block renders file error state without crashing 1`] = `
           "color": "gray",
         }
       }
-    >
-      
-    </Text>
+    />
     <View
       style={
         Object {
@@ -54,7 +52,14 @@ exports[`File block renders file error state without crashing 1`] = `
         }
       }
     >
-      <View>
+      <View
+        style={
+          Array [
+            undefined,
+            undefined,
+          ]
+        }
+      >
         <RCTAztecView
           accessible={true}
           activeFormats={Array []}
@@ -144,7 +149,14 @@ exports[`File block renders file error state without crashing 1`] = `
         ]
       }
     >
-      <View>
+      <View
+        style={
+          Array [
+            undefined,
+            undefined,
+          ]
+        }
+      >
         <RCTAztecView
           accessible={true}
           activeFormats={Array []}
@@ -252,9 +264,7 @@ exports[`File block renders file without crashing 1`] = `
           "color": "gray",
         }
       }
-    >
-      
-    </Text>
+    />
     <View
       style={
         Object {
@@ -262,7 +272,14 @@ exports[`File block renders file without crashing 1`] = `
         }
       }
     >
-      <View>
+      <View
+        style={
+          Array [
+            undefined,
+            undefined,
+          ]
+        }
+      >
         <RCTAztecView
           accessible={true}
           activeFormats={Array []}
@@ -334,7 +351,14 @@ exports[`File block renders file without crashing 1`] = `
         ]
       }
     >
-      <View>
+      <View
+        style={
+          Array [
+            undefined,
+            undefined,
+          ]
+        }
+      >
         <RCTAztecView
           accessible={true}
           activeFormats={Array []}

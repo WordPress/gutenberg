@@ -1,30 +1,27 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
-import { sprintf, __ } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	Button,
 	MenuGroup,
 	MenuItem,
-	__experimentalHeading as Heading,
+	__experimentalVStack as VStack,
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
  */
 import isTemplateRevertable from '../../utils/is-template-revertable';
-import {
-	MENU_TEMPLATES,
-	TEMPLATE_PARTS_SUB_MENUS,
-} from '../navigation-sidebar/navigation-panel/constants';
 import { store as editSiteStore } from '../../store';
 import TemplateAreas from './template-areas';
 import EditTemplateTitle from './edit-template-title';
 import { useLink } from '../routes/link';
+import TemplatePartAreaSelector from './template-part-area-selector';
 
 export default function TemplateDetails( { template, onClose } ) {
 	const { title, description } = useSelect(
@@ -34,24 +31,19 @@ export default function TemplateDetails( { template, onClose } ) {
 	);
 	const { revertTemplate } = useDispatch( editSiteStore );
 
-	const templateSubMenu = useMemo( () => {
-		if ( template?.type === 'wp_template' ) {
-			return { title: __( 'templates' ), menu: MENU_TEMPLATES };
-		}
-
-		return TEMPLATE_PARTS_SUB_MENUS.find(
-			( { area } ) => area === template?.area
-		);
-	}, [ template ] );
-
 	const browseAllLinkProps = useLink( {
 		// TODO: We should update this to filter by template part's areas as well.
 		postType: template.type,
 		postId: undefined,
 	} );
 
+	const isTemplatePart = template.type === 'wp_template_part';
+
 	// Only user-created and non-default templates can change the name.
-	const canEditTitle = template.is_custom && ! template.has_theme_file;
+	// But any user-created template part can be renamed.
+	const canEditTitle = isTemplatePart
+		? ! template.has_theme_file
+		: template.is_custom && ! template.has_theme_file;
 
 	if ( ! template ) {
 		return null;
@@ -64,17 +56,18 @@ export default function TemplateDetails( { template, onClose } ) {
 
 	return (
 		<div className="edit-site-template-details">
-			<div className="edit-site-template-details__group">
+			<VStack className="edit-site-template-details__group" spacing={ 3 }>
 				{ canEditTitle ? (
 					<EditTemplateTitle template={ template } />
 				) : (
-					<Heading
-						level={ 4 }
+					<Text
+						size={ 16 }
 						weight={ 600 }
 						className="edit-site-template-details__title"
+						as="p"
 					>
-						{ title }
-					</Heading>
+						{ decodeEntities( title ) }
+					</Text>
 				) }
 
 				{ description && (
@@ -83,10 +76,16 @@ export default function TemplateDetails( { template, onClose } ) {
 						className="edit-site-template-details__description"
 						as="p"
 					>
-						{ description }
+						{ decodeEntities( description ) }
 					</Text>
 				) }
-			</div>
+			</VStack>
+
+			{ isTemplatePart && (
+				<div className="edit-site-template-details__group">
+					<TemplatePartAreaSelector id={ template.id } />
+				</div>
+			) }
 
 			<TemplateAreas closeTemplateDetailsDropdown={ onClose } />
 
@@ -94,7 +93,9 @@ export default function TemplateDetails( { template, onClose } ) {
 				<MenuGroup className="edit-site-template-details__group edit-site-template-details__revert">
 					<MenuItem
 						className="edit-site-template-details__revert-button"
-						info={ __( 'Restore template to default state' ) }
+						info={ __(
+							'Use the template as supplied by the theme.'
+						) }
 						onClick={ revert }
 					>
 						{ __( 'Clear customizations' ) }
@@ -106,11 +107,9 @@ export default function TemplateDetails( { template, onClose } ) {
 				className="edit-site-template-details__show-all-button"
 				{ ...browseAllLinkProps }
 			>
-				{ sprintf(
-					/* translators: the template part's area name ("Headers", "Sidebars") or "templates". */
-					__( 'Browse all %s' ),
-					templateSubMenu.title
-				) }
+				{ template?.type === 'wp_template'
+					? __( 'Browse all templates' )
+					: __( 'Browse all template parts' ) }
 			</Button>
 		</div>
 	);

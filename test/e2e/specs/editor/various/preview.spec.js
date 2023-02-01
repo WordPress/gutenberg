@@ -184,6 +184,12 @@ test.describe( 'Preview', () => {
 		// FIXME: The confirmation dialog is not named yet.
 		await page.click( 'role=dialog >> role=button[name="OK"i]' );
 
+		// Wait for the status change.
+		// @see https://github.com/WordPress/gutenberg/pull/43933
+		await expect(
+			page.locator( 'role=button[name="Publish"i]' )
+		).toBeVisible();
+
 		// Change the title.
 		await editorPage.type( 'role=textbox[name="Add title"i]', ' Draft' );
 
@@ -275,7 +281,7 @@ test.describe( 'Preview with private custom post type', () => {
 	} ) => {
 		await admin.createNewPost( { postType: 'not_public', title: 'aaaaa' } );
 
-		// Open the preview menu.
+		// Open the view menu.
 		await page.click( 'role=button[name="Preview"i]' );
 
 		await expect(
@@ -337,6 +343,8 @@ class PreviewUtils {
 			return;
 		}
 
-		await this.page.click( 'role=button[name="Close dialog"i]' );
+		await this.page.click(
+			'role=dialog[name="Preferences"i] >> role=button[name="Close"i]'
+		);
 	}
 }

@@ -28,6 +28,8 @@ module.exports = {
 		'/packages/e2e-test-utils-playwright/src/test.ts',
 		'<rootDir>/.*/build/',
 		'<rootDir>/.*/build-module/',
+		'<rootDir>/.*/build-types/',
+		'<rootDir>/.+.d.ts$',
 		'<rootDir>/.+.native.js$',
 		'/packages/react-native-*',
 	],
@@ -35,7 +37,6 @@ module.exports = {
 		'^.+\\.[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
 	},
 	snapshotSerializers: [
-		'enzyme-to-json/serializer',
 		'@emotion/jest/serializer',
 		'snapshot-diff/serializer',
 	],

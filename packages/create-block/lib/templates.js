@@ -6,7 +6,6 @@ const glob = require( 'fast-glob' );
 const { resolve } = require( 'path' );
 const { existsSync } = require( 'fs' );
 const { mkdtemp, readFile } = require( 'fs' ).promises;
-const { fromPairs, isObject } = require( 'lodash' );
 const npmPackageArg = require( 'npm-package-arg' );
 const { tmpdir } = require( 'os' );
 const { join } = require( 'path' );
@@ -25,24 +24,42 @@ const predefinedPluginTemplates = {
 			slug: 'example-static-es5',
 			title: 'Example Static (ES5)',
 			description:
-				'Example static block scaffolded with Create Block tool – no build step required.',
-			dashicon: 'smiley',
-			wpScripts: false,
-			editorScript: 'file:./index.js',
-			editorStyle: 'file:./editor.css',
-			style: 'file:./style.css',
-		},
-		templatesPath: join( __dirname, 'templates', 'es5' ),
-	},
-	static: {
-		defaultValues: {
-			slug: 'example-static',
-			title: 'Example Static',
-			description:
-				'Example static block scaffolded with Create Block tool.',
+				'Example block scaffolded with Create Block tool – no build step required.',
 			dashicon: 'smiley',
 			supports: {
 				html: false,
+			},
+			wpScripts: false,
+			editorScript: null,
+			editorStyle: null,
+			style: null,
+		},
+		templatesPath: join( __dirname, 'templates', 'es5' ),
+		variants: {
+			static: {},
+			dynamic: {
+				slug: 'example-dynamic-es5',
+				title: 'Example Dynamic (ES5)',
+				render: 'file:./render.php',
+			},
+		},
+	},
+	standard: {
+		defaultValues: {
+			slug: 'example-static',
+			title: 'Example Static',
+			description: 'Example block scaffolded with Create Block tool.',
+			dashicon: 'smiley',
+			supports: {
+				html: false,
+			},
+		},
+		variants: {
+			static: {},
+			dynamic: {
+				slug: 'example-dynamic',
+				title: 'Example Dynamic',
+				render: 'file:./render.php',
 			},
 		},
 	},
@@ -53,7 +70,7 @@ const getOutputTemplates = async ( outputTemplatesPath ) => {
 		cwd: outputTemplatesPath,
 		dot: true,
 	} );
-	return fromPairs(
+	return Object.fromEntries(
 		await Promise.all(
 			outputTemplatesFiles.map( async ( outputTemplateFile ) => {
 				const outputFile = outputTemplateFile.replace(
@@ -75,7 +92,7 @@ const getOutputAssets = async ( outputAssetsPath ) => {
 		cwd: outputAssetsPath,
 		dot: true,
 	} );
-	return fromPairs(
+	return Object.fromEntries(
 		await Promise.all(
 			outputAssetFiles.map( async ( outputAssetFile ) => {
 				const outputAsset = await readFile(
@@ -99,11 +116,12 @@ const externalTemplateExists = async ( templateName ) => {
 const configToTemplate = async ( {
 	pluginTemplatesPath,
 	blockTemplatesPath,
-	defaultValues = {},
 	assetsPath,
+	defaultValues = {},
+	variants = {},
 	...deprecated
 } ) => {
-	if ( ! isObject( defaultValues ) ) {
+	if ( defaultValues === null || typeof defaultValues !== 'object' ) {
 		throw new CLIError( 'Template found but invalid definition provided.' );
 	}
 
@@ -127,9 +145,10 @@ const configToTemplate = async ( {
 		blockOutputTemplates: blockTemplatesPath
 			? await getOutputTemplates( blockTemplatesPath )
 			: {},
-		defaultValues,
-		outputAssets: assetsPath ? await getOutputAssets( assetsPath ) : {},
 		pluginOutputTemplates: await getOutputTemplates( pluginTemplatesPath ),
+		outputAssets: assetsPath ? await getOutputAssets( assetsPath ) : {},
+		defaultValues,
+		variants,
 	};
 };
 
@@ -198,7 +217,7 @@ const getPluginTemplate = async ( templateName ) => {
 	}
 };
 
-const getDefaultValues = ( pluginTemplate ) => {
+const getDefaultValues = ( pluginTemplate, variant ) => {
 	return {
 		$schema: 'https://schemas.wp.org/trunk/block.json',
 		apiVersion: 2,
@@ -217,17 +236,37 @@ const getDefaultValues = ( pluginTemplate ) => {
 		editorStyle: 'file:./index.css',
 		style: 'file:./style-index.css',
 		...pluginTemplate.defaultValues,
+		...pluginTemplate.variants?.[ variant ],
+		variantVars: getVariantVars( pluginTemplate.variants, variant ),
 	};
 };
 
-const getPrompts = ( pluginTemplate, keys ) => {
-	const defaultValues = getDefaultValues( pluginTemplate );
+const getPrompts = ( pluginTemplate, keys, variant ) => {
+	const defaultValues = getDefaultValues( pluginTemplate, variant );
 	return keys.map( ( promptName ) => {
 		return {
 			...prompts[ promptName ],
 			default: defaultValues[ promptName ],
 		};
 	} );
+};
+
+const getVariantVars = ( variants, variant ) => {
+	const variantVars = {};
+	const variantNames = Object.keys( variants );
+	if ( variantNames.length === 0 ) {
+		return variantVars;
+	}
+
+	const currentVariant = variant ?? variantNames[ 0 ];
+	for ( const variantName of variantNames ) {
+		const key =
+			variantName.charAt( 0 ).toUpperCase() + variantName.slice( 1 );
+		variantVars[ `is${ key }Variant` ] =
+			currentVariant === variantName ?? false;
+	}
+
+	return variantVars;
 };
 
 module.exports = {

@@ -14,7 +14,7 @@
  */
 class WP_REST_Block_Pattern_Categories_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	protected static $admin_id;
-	protected static $orig_registry;
+	protected static $original_instance_value;
 
 	public function set_up() {
 		parent::set_up();
@@ -26,11 +26,13 @@ class WP_REST_Block_Pattern_Categories_Controller_Test extends WP_Test_REST_Cont
 		self::$admin_id = $factory->user->create( array( 'role' => 'administrator' ) );
 
 		// Setup an empty testing instance of `WP_Block_Pattern_Categories_Registry` and save the original.
-		$reflection = new ReflectionClass( 'WP_Block_Pattern_Categories_Registry' );
-		$reflection->getProperty( 'instance' )->setAccessible( true );
-		self::$orig_registry = $reflection->getStaticPropertyValue( 'instance' );
-		$test_registry       = new WP_Block_Pattern_Categories_Registry();
-		$reflection->setStaticPropertyValue( 'instance', $test_registry );
+		$reflection        = new ReflectionClass( 'WP_Block_Pattern_Categories_Registry' );
+		$instance_property = $reflection->getProperty( 'instance' );
+		$instance_property->setAccessible( true );
+		self::$original_instance_value = $instance_property->getValue( null );
+
+		$test_registry = new WP_Block_Pattern_Categories_Registry();
+		$instance_property->setValue( $test_registry );
 
 		// Register some categories in the test registry.
 		$test_registry->register( 'test', array( 'label' => 'Test' ) );
@@ -42,8 +44,11 @@ class WP_REST_Block_Pattern_Categories_Controller_Test extends WP_Test_REST_Cont
 		self::delete_user( self::$admin_id );
 
 		// Restore the original registry instance.
-		$reflection = new ReflectionClass( 'WP_Block_Pattern_Categories_Registry' );
-		$reflection->setStaticPropertyValue( 'instance', self::$orig_registry );
+		$reflection        = new ReflectionClass( 'WP_Block_Pattern_Categories_Registry' );
+		$instance_property = $reflection->getProperty( 'instance' );
+		$instance_property->setAccessible( true );
+		$instance_property->setValue( self::$original_instance_value );
+		$instance_property->setAccessible( false );
 	}
 
 	public function test_register_routes() {
@@ -76,11 +81,31 @@ class WP_REST_Block_Pattern_Categories_Controller_Test extends WP_Test_REST_Cont
 	/**
 	 * Abstract methods that we must implement.
 	 */
-	public function test_context_param() {}
-	public function test_get_item() {}
-	public function test_create_item() {}
-	public function test_update_item() {}
-	public function test_delete_item() {}
-	public function test_prepare_item() {}
-	public function test_get_item_schema() {}
+	public function test_context_param() {
+		$this->markTestIncomplete();
+	}
+
+	public function test_get_item() {
+		$this->markTestIncomplete();
+	}
+
+	public function test_create_item() {
+		$this->markTestIncomplete();
+	}
+
+	public function test_update_item() {
+		$this->markTestIncomplete();
+	}
+
+	public function test_delete_item() {
+		$this->markTestIncomplete();
+	}
+
+	public function test_prepare_item() {
+		$this->markTestIncomplete();
+	}
+
+	public function test_get_item_schema() {
+		$this->markTestIncomplete();
+	}
 }

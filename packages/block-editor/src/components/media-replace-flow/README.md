@@ -54,7 +54,7 @@ Callback used when media is replaced from the Media Library or when a new media 
 Callback used when media is replaced with an URL. It is called with one argument `newURL` which is a `string` containing the new URL.
 
 -   Type: `func`
--   Required: Yes
+-   Required: No
 
 ### onError
 

@@ -8,7 +8,7 @@ import styled from '@emotion/styled';
  */
 import { Flex } from '../../flex';
 import BaseUnitControl from '../../unit-control';
-import { COLORS, rtl } from '../../utils';
+import { rtl } from '../../utils';
 
 export const Root = styled.div`
 	box-sizing: border-box;
@@ -18,7 +18,6 @@ export const Root = styled.div`
 `;
 
 export const Header = styled( Flex )`
-	color: ${ COLORS.ui.label };
 	margin-bottom: 8px;
 `;
 

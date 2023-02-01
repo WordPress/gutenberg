@@ -5,6 +5,8 @@
 	span {
 		display: block;
 		width: 45%;
+		// Match padding on tertiary buttons for alignment.
+		padding: $grid-unit-15 * 0.5 0;
 	}
 }
 
@@ -27,16 +29,6 @@
 	// sidebar width - popover padding - form margin
 	min-width: $sidebar-width - $grid-unit-20 - $grid-unit-20;
 	margin: $grid-unit-10;
-}
-
-.edit-post-post-template__create-modal {
-	.components-modal__header {
-		border-bottom: none;
-	}
-
-	.components-modal__content::before {
-		margin-bottom: $grid-unit-05;
-	}
 }
 
 .edit-post-post-template__create-form {

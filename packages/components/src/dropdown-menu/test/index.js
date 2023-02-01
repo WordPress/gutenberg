@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { fireEvent, render } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
  */
-import { DOWN } from '@wordpress/keycodes';
 import { arrowLeft, arrowRight, arrowUp, arrowDown } from '@wordpress/icons';
 
 /**
@@ -15,19 +15,25 @@ import { arrowLeft, arrowRight, arrowUp, arrowDown } from '@wordpress/icons';
 import DropdownMenu from '../';
 import { MenuItem } from '../../';
 
-function getMenuToggleButton( container ) {
-	return container.querySelector( '.components-dropdown-menu__toggle' );
-}
-function getNavigableMenu( container ) {
-	return container.querySelector( '.components-dropdown-menu__menu' );
-}
-
 describe( 'DropdownMenu', () => {
-	const children = ( { onClose } ) => <MenuItem onClick={ onClose } />;
+	it( 'should not render when neither controls nor children are assigned', () => {
+		render( <DropdownMenu /> );
 
-	let controls;
-	beforeEach( () => {
-		controls = [
+		// The button toggle should not even be rendered
+		expect( screen.queryByRole( 'button' ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'should not render when controls are empty and children is not specified', () => {
+		render( <DropdownMenu controls={ [] } /> );
+
+		// The button toggle should not even be rendered
+		expect( screen.queryByRole( 'button' ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'should open menu when pressing arrow down on the toggle and the controls prop is used to define menu items', async () => {
+		const user = userEvent.setup();
+
+		const controls = [
 			{
 				title: 'Up',
 				icon: arrowUp,
@@ -49,62 +55,54 @@ describe( 'DropdownMenu', () => {
 				onClick: jest.fn(),
 			},
 		];
+
+		render( <DropdownMenu controls={ controls } /> );
+
+		// Move focus on the toggle button
+		await user.tab();
+
+		await user.keyboard( '[ArrowDown]' );
+
+		// Wait for the `floating-ui` effects in `Dropdown`/`Popover` to finish running
+		// See also: https://floating-ui.com/docs/react-dom#testing
+		await act( () => Promise.resolve() );
+
+		const menu = screen.getByRole( 'menu' );
+
+		// we need to wait because showing the dropdown is animated
+		await waitFor( () => expect( menu ).toBeVisible() );
+
+		expect( within( menu ).getAllByRole( 'menuitem' ) ).toHaveLength(
+			controls.length
+		);
 	} );
 
-	describe( 'basic rendering', () => {
-		it( 'should render a null element when neither controls nor children are assigned', () => {
-			const { container } = render( <DropdownMenu /> );
+	it( 'should open menu when pressing arrow down on the toggle and the children prop is used to define menu items', async () => {
+		const user = userEvent.setup();
 
-			expect( container.firstChild ).toBeNull();
-		} );
+		render(
+			<DropdownMenu
+				children={ ( { onClose } ) => <MenuItem onClick={ onClose } /> }
+			/>
+		);
 
-		it( 'should render a null element when controls are empty and children is not specified', () => {
-			const { container } = render( <DropdownMenu controls={ [] } /> );
+		const button = screen.getByRole( 'button' );
+		act( () => button.focus() );
 
-			expect( container.firstChild ).toBeNull();
-		} );
+		await user.keyboard( '[ArrowDown]' );
 
-		it( 'should open menu on arrow down (controls)', () => {
-			const {
-				container: { firstChild: dropdownMenuContainer },
-			} = render( <DropdownMenu controls={ controls } /> );
+		// Wait for the `floating-ui` effects in `Dropdown`/`Popover` to finish running
+		// See also: https://floating-ui.com/docs/react-dom#testing
+		await act( () => Promise.resolve() );
 
-			const button = getMenuToggleButton( dropdownMenuContainer );
-			button.focus();
-			fireEvent.keyDown( button, {
-				keyCode: DOWN,
-				preventDefault: () => {},
-			} );
-			const menu = getNavigableMenu( dropdownMenuContainer );
-			expect( menu ).toBeTruthy();
+		const menu = screen.getByRole( 'menu' );
 
-			expect(
-				dropdownMenuContainer.querySelectorAll(
-					'.components-dropdown-menu__menu-item'
-				)
-			).toHaveLength( controls.length );
-		} );
+		// we need to wait because showing the dropdown is animated
+		await waitFor( () => expect( menu ).toBeVisible() );
 
-		it( 'should open menu on arrow down (children)', () => {
-			const {
-				container: { firstChild: dropdownMenuContainer },
-			} = render( <DropdownMenu children={ children } /> );
+		// Clicking the menu item will close the dropdown menu
+		await user.click( within( menu ).getByRole( 'menuitem' ) );
 
-			const button = getMenuToggleButton( dropdownMenuContainer );
-			button.focus();
-			fireEvent.keyDown( button, {
-				keyCode: DOWN,
-				preventDefault: () => {},
-			} );
-
-			expect( getNavigableMenu( dropdownMenuContainer ) ).toBeTruthy();
-
-			const menuItem = dropdownMenuContainer.querySelector(
-				'.components-menu-item__button'
-			);
-			fireEvent.click( menuItem );
-
-			expect( getNavigableMenu( dropdownMenuContainer ) ).toBeNull();
-		} );
+		expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
 	} );
 } );

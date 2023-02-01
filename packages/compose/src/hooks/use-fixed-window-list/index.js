@@ -1,14 +1,14 @@
 /**
- * External dependencies
- */
-import { debounce } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useState, useLayoutEffect } from '@wordpress/element';
 import { getScrollContainer } from '@wordpress/dom';
 import { PAGEUP, PAGEDOWN, HOME, END } from '@wordpress/keycodes';
+
+/**
+ * Internal dependencies
+ */
+import { debounce } from '../../utils/debounce';
 
 const DEFAULT_INIT_WINDOW_SIZE = 30;
 

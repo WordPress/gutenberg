@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { castArray, first, last, every } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -17,6 +12,7 @@ import {
  * Internal dependencies
  */
 import { useNotifyCopy } from '../copy-handler';
+import usePasteStyles from '../use-paste-styles';
 import { store as blockEditorStore } from '../../store';
 
 export default function BlockActions( {
@@ -36,7 +32,7 @@ export default function BlockActions( {
 
 	const blocks = getBlocksByClientId( clientIds );
 	const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
-	const canDuplicate = every( blocks, ( block ) => {
+	const canDuplicate = blocks.every( ( block ) => {
 		return (
 			!! block &&
 			hasBlockSupport( block.name, 'multiple', true ) &&
@@ -65,6 +61,7 @@ export default function BlockActions( {
 	} = useDispatch( blockEditorStore );
 
 	const notifyCopy = useNotifyCopy();
+	const pasteStyles = usePasteStyles();
 
 	return children( {
 		canDuplicate,
@@ -80,10 +77,16 @@ export default function BlockActions( {
 			return removeBlocks( clientIds, updateSelection );
 		},
 		onInsertBefore() {
-			insertBeforeBlock( first( castArray( clientIds ) ) );
+			const clientId = Array.isArray( clientIds )
+				? clientIds[ 0 ]
+				: clientId;
+			insertBeforeBlock( clientId );
 		},
 		onInsertAfter() {
-			insertAfterBlock( last( castArray( clientIds ) ) );
+			const clientId = Array.isArray( clientIds )
+				? clientIds[ clientIds.length - 1 ]
+				: clientId;
+			insertAfterBlock( clientId );
 		},
 		onMoveTo() {
 			setNavigationMode( true );
@@ -126,6 +129,9 @@ export default function BlockActions( {
 				flashBlock( selectedBlockClientIds[ 0 ] );
 			}
 			notifyCopy( 'copy', selectedBlockClientIds );
+		},
+		async onPasteStyles() {
+			await pasteStyles( blocks );
 		},
 	} );
 }

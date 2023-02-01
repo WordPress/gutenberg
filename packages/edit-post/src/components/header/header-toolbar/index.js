@@ -10,7 +10,6 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
-	TableOfContents,
 	EditorHistoryRedo,
 	EditorHistoryUndo,
 	store as editorStore,
@@ -78,23 +77,17 @@ function HeaderToolbar() {
 	const overflowItems = (
 		<>
 			<ToolbarItem
-				as={ TableOfContents }
-				hasOutlineItemsDisabled={ isTextModeEnabled }
-				repositionDropdown={ showIconLabels && ! isWideViewport }
-				showTooltip={ ! showIconLabels }
-				variant={ showIconLabels ? 'tertiary' : undefined }
-			/>
-			<ToolbarItem
 				as={ Button }
-				className="edit-post-header-toolbar__list-view-toggle"
+				className="edit-post-header-toolbar__document-overview-toggle"
 				icon={ listView }
 				disabled={ isTextModeEnabled }
 				isPressed={ isListViewOpen }
 				/* translators: button label text should, if possible, be under 16 characters. */
-				label={ __( 'List View' ) }
+				label={ __( 'Document Overview' ) }
 				onClick={ toggleListView }
 				shortcut={ listViewShortcut }
 				showTooltip={ ! showIconLabels }
+				variant={ showIconLabels ? 'tertiary' : undefined }
 			/>
 		</>
 	);
@@ -106,6 +99,14 @@ function HeaderToolbar() {
 			setIsInserterOpened( true );
 		}
 	}, [ isInserterOpened, setIsInserterOpened ] );
+
+	/* translators: button label text should, if possible, be under 16 characters. */
+	const longLabel = _x(
+		'Toggle block inserter',
+		'Generic label for block inserter button'
+	);
+	const shortLabel = ! isInserterOpened ? __( 'Add' ) : __( 'Close' );
+
 	return (
 		<NavigableToolbar
 			className="edit-post-header-toolbar"
@@ -122,17 +123,9 @@ function HeaderToolbar() {
 					onClick={ openInserter }
 					disabled={ ! isInserterEnabled }
 					icon={ plus }
-					/* translators: button label text should, if possible, be under 16
-			characters. */
-					label={ _x(
-						'Toggle block inserter',
-						'Generic label for block inserter button'
-					) }
+					label={ showIconLabels ? shortLabel : longLabel }
 					showTooltip={ ! showIconLabels }
-				>
-					{ showIconLabels &&
-						( ! isInserterOpened ? __( 'Add' ) : __( 'Close' ) ) }
-				</ToolbarItem>
+				/>
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<>
 						{ isLargeViewport && (

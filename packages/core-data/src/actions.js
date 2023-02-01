@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, isEqual, find } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 import { v4 as uuid } from 'uuid';
 
 /**
@@ -21,6 +21,9 @@ import { STORE_NAME } from './name';
 
 /**
  * Returns an action object used in signalling that authors have been received.
+ * Ignored from documentation as it's internal to the data store.
+ *
+ * @ignore
  *
  * @param {string}       queryID Query ID.
  * @param {Array|Object} users   Users received.
@@ -30,13 +33,16 @@ import { STORE_NAME } from './name';
 export function receiveUserQuery( queryID, users ) {
 	return {
 		type: 'RECEIVE_USER_QUERY',
-		users: castArray( users ),
+		users: Array.isArray( users ) ? users : [ users ],
 		queryID,
 	};
 }
 
 /**
  * Returns an action used in signalling that the current user has been received.
+ * Ignored from documentation as it's internal to the data store.
+ *
+ * @ignore
  *
  * @param {Object} currentUser Current user object.
  *
@@ -85,8 +91,11 @@ export function receiveEntityRecords(
 	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
 	// on the server.
 	if ( kind === 'postType' ) {
-		records = castArray( records ).map( ( record ) =>
-			record.status === 'auto-draft' ? { ...record, title: '' } : record
+		records = ( Array.isArray( records ) ? records : [ records ] ).map(
+			( record ) =>
+				record.status === 'auto-draft'
+					? { ...record, title: '' }
+					: record
 		);
 	}
 	let action;
@@ -106,6 +115,9 @@ export function receiveEntityRecords(
 
 /**
  * Returns an action object used in signalling that the current theme has been received.
+ * Ignored from documentation as it's internal to the data store.
+ *
+ * @ignore
  *
  * @param {Object} currentTheme The current theme.
  *
@@ -120,6 +132,9 @@ export function receiveCurrentTheme( currentTheme ) {
 
 /**
  * Returns an action object used in signalling that the current global styles id has been received.
+ * Ignored from documentation as it's internal to the data store.
+ *
+ * @ignore
  *
  * @param {string} currentGlobalStylesId The current global styles id.
  *
@@ -136,6 +151,9 @@ export function __experimentalReceiveCurrentGlobalStylesId(
 
 /**
  * Returns an action object used in signalling that the theme base global styles have been received
+ * Ignored from documentation as it's internal to the data store.
+ *
+ * @ignore
  *
  * @param {string} stylesheet   The theme's identifier
  * @param {Object} globalStyles The global styles object.
@@ -155,6 +173,9 @@ export function __experimentalReceiveThemeBaseGlobalStyles(
 
 /**
  * Returns an action object used in signalling that the theme global styles variations have been received.
+ * Ignored from documentation as it's internal to the data store.
+ *
+ * @ignore
  *
  * @param {string} stylesheet The theme's identifier
  * @param {Array}  variations The global styles variations.
@@ -192,6 +213,9 @@ export function receiveThemeSupports() {
 /**
  * Returns an action object used in signalling that the preview data for
  * a given URl has been received.
+ * Ignored from documentation as it's internal to the data store.
+ *
+ * @ignore
  *
  * @param {string} url     URL to preview the embed for.
  * @param {*}      preview Preview data.
@@ -231,7 +255,9 @@ export const deleteEntityRecord =
 	) =>
 	async ( { dispatch } ) => {
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
-		const entityConfig = find( configs, { kind, name } );
+		const entityConfig = configs.find(
+			( config ) => config.kind === kind && config.name === name
+		);
 		let error;
 		let deletedRecord = false;
 		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
@@ -331,7 +357,9 @@ export const editEntityRecord =
 				const value = mergedEdits[ key ]
 					? { ...editedRecordValue, ...edits[ key ] }
 					: edits[ key ];
-				acc[ key ] = isEqual( recordValue, value ) ? undefined : value;
+				acc[ key ] = fastDeepEqual( recordValue, value )
+					? undefined
+					: value;
 				return acc;
 			}, {} ),
 			transientEdits,
@@ -424,7 +452,9 @@ export const saveEntityRecord =
 	) =>
 	async ( { select, resolveSelect, dispatch } ) => {
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
-		const entityConfig = find( configs, { kind, name } );
+		const entityConfig = configs.find(
+			( config ) => config.kind === kind && config.name === name
+		);
 		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
 			return;
 		}
@@ -696,7 +726,9 @@ export const saveEditedEntityRecord =
 			return;
 		}
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
-		const entityConfig = find( configs, { kind, name } );
+		const entityConfig = configs.find(
+			( config ) => config.kind === kind && config.name === name
+		);
 		if ( ! entityConfig ) {
 			return;
 		}
@@ -766,6 +798,9 @@ export function receiveUploadPermissions( hasUploadPermissions ) {
 /**
  * Returns an action object used in signalling that the current user has
  * permission to perform an action on a REST resource.
+ * Ignored from documentation as it's internal to the data store.
+ *
+ * @ignore
  *
  * @param {string}  key       A key that represents the action and REST resource.
  * @param {boolean} isAllowed Whether or not the user can perform the action.
@@ -783,6 +818,9 @@ export function receiveUserPermission( key, isAllowed ) {
 /**
  * Returns an action object used in signalling that the autosaves for a
  * post have been received.
+ * Ignored from documentation as it's internal to the data store.
+ *
+ * @ignore
  *
  * @param {number}       postId    The id of the post that is parent to the autosave.
  * @param {Array|Object} autosaves An array of autosaves or singular autosave object.
@@ -793,6 +831,6 @@ export function receiveAutosaves( postId, autosaves ) {
 	return {
 		type: 'RECEIVE_AUTOSAVES',
 		postId,
-		autosaves: castArray( autosaves ),
+		autosaves: Array.isArray( autosaves ) ? autosaves : [ autosaves ],
 	};
 }

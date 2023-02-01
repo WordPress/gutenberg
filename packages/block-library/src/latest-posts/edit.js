@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, includes, invoke, pickBy } from 'lodash';
+import { get } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -19,7 +19,7 @@ import {
 	ToolbarGroup,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { dateI18n, format, __experimentalGetSettings } from '@wordpress/date';
+import { dateI18n, format, getSettings } from '@wordpress/date';
 import {
 	InspectorControls,
 	BlockAlignmentToolbar,
@@ -104,16 +104,15 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 				categories && categories.length > 0
 					? categories.map( ( cat ) => cat.id )
 					: [];
-			const latestPostsQuery = pickBy(
-				{
+			const latestPostsQuery = Object.fromEntries(
+				Object.entries( {
 					categories: catIds,
 					author: selectedAuthor,
 					order,
 					orderby: orderBy,
 					per_page: postsToShow,
 					_embed: 'wp:featuredmedia',
-				},
-				( value ) => typeof value !== 'undefined'
+				} ).filter( ( [ , value ] ) => typeof value !== 'undefined' )
 			);
 
 			return {
@@ -196,7 +195,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 		} );
 		// We do nothing if the category is not selected
 		// from suggestions.
-		if ( includes( allCategories, null ) ) {
+		if ( allCategories.includes( null ) ) {
 			return false;
 		}
 		setAttributes( { categories: allCategories } );
@@ -234,6 +233,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 				{ displayPostContent &&
 					displayPostContentRadio === 'excerpt' && (
 						<RangeControl
+							__nextHasNoMarginBottom
 							label={ __( 'Max number of words in excerpt' ) }
 							value={ excerptLength }
 							onChange={ ( value ) =>
@@ -355,6 +355,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 
 				{ postLayout === 'grid' && (
 					<RangeControl
+						__nextHasNoMarginBottom
 						label={ __( 'Columns' ) }
 						value={ columns }
 						onChange={ ( value ) =>
@@ -422,7 +423,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 		},
 	];
 
-	const dateFormat = __experimentalGetSettings().formats.date;
+	const dateFormat = getSettings().formats.date;
 
 	return (
 		<div>
@@ -431,12 +432,8 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 				<ToolbarGroup controls={ layoutControls } />
 			</BlockControls>
 			<ul { ...blockProps }>
-				{ displayPosts.map( ( post, i ) => {
-					const titleTrimmed = invoke( post, [
-						'title',
-						'rendered',
-						'trim',
-					] );
+				{ displayPosts.map( ( post ) => {
+					const titleTrimmed = post.title.rendered.trim();
 					let excerpt = post.excerpt.rendered;
 					const currentAuthor = authorList?.find(
 						( author ) => author.id === post.author
@@ -495,7 +492,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 					);
 
 					return (
-						<li key={ i }>
+						<li key={ post.id }>
 							{ renderFeaturedImage && (
 								<div className={ imageClasses }>
 									{ addLinkToFeaturedImage ? (

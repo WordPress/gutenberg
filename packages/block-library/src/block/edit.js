@@ -18,8 +18,8 @@ import {
 import { __ } from '@wordpress/i18n';
 import {
 	useInnerBlocksProps,
-	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
-	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
+	__experimentalRecursionProvider as RecursionProvider,
+	__experimentalUseHasRecursion as useHasRecursion,
 	InnerBlocks,
 	BlockControls,
 	InspectorControls,
@@ -31,8 +31,7 @@ import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 import { ungroup } from '@wordpress/icons';
 
 export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
-	const [ hasAlreadyRendered, RecursionProvider ] =
-		useNoRecursiveRenders( ref );
+	const hasAlreadyRendered = useHasRecursion( ref );
 	const { record, hasResolved } = useEntityRecord(
 		'postType',
 		'wp_block',
@@ -40,8 +39,15 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	);
 	const isMissing = hasResolved && ! record;
 
-	const canRemove = useSelect(
-		( select ) => select( blockEditorStore ).canRemoveBlock( clientId ),
+	const { canRemove, innerBlockCount } = useSelect(
+		( select ) => {
+			const { canRemoveBlock, getBlockCount } =
+				select( blockEditorStore );
+			return {
+				canRemove: canRemoveBlock( clientId ),
+				innerBlockCount: getBlockCount( clientId ),
+			};
+		},
 		[ clientId ]
 	);
 
@@ -60,15 +66,9 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 		ref
 	);
 
-	const hasBlockOverlay = useBlockOverlayActive( clientId );
-	const blockProps = useBlockProps(
-		{
-			className: hasBlockOverlay
-				? 'block-library-block__reusable-block-container block-editor-block-content-overlay'
-				: 'block-library-block__reusable-block-container',
-		},
-		{ __unstableIsDisabled: hasBlockOverlay }
-	);
+	const blockProps = useBlockProps( {
+		className: 'block-library-block__reusable-block-container',
+	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		value: blocks,
@@ -110,13 +110,17 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	}
 
 	return (
-		<RecursionProvider>
+		<RecursionProvider uniqueId={ ref }>
 			{ canRemove && (
 				<BlockControls>
 					<ToolbarGroup>
 						<ToolbarButton
 							onClick={ () => convertBlockToStatic( clientId ) }
-							label={ __( 'Convert to regular blocks' ) }
+							label={
+								innerBlockCount > 1
+									? __( 'Convert to regular blocks' )
+									: __( 'Convert to regular block' )
+							}
 							icon={ ungroup }
 							showTooltip
 						/>
@@ -126,6 +130,7 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 			<InspectorControls>
 				<PanelBody>
 					<TextControl
+						__nextHasNoMarginBottom
 						label={ __( 'Name' ) }
 						value={ title }
 						onChange={ setTitle }

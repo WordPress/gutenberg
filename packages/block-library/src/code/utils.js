@@ -1,7 +1,7 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { flow } from 'lodash';
+import { pipe } from '@wordpress/compose';
 
 /**
  * Escapes ampersands, shortcodes, and links.
@@ -10,7 +10,7 @@ import { flow } from 'lodash';
  * @return {string} The given content with some characters escaped.
  */
 export function escape( content ) {
-	return flow(
+	return pipe(
 		escapeOpeningSquareBrackets,
 		escapeProtocolInIsolatedUrls
 	)( content || '' );

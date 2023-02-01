@@ -49,7 +49,7 @@ describe( 'createQueue', () => {
 			expect( callbackElementA ).toHaveBeenCalledTimes( 1 );
 			expect( callbackElementB ).not.toHaveBeenCalled();
 
-			// ElementB will be be processed after second tick.
+			// ElementB will be processed after second tick.
 			requestIdleCallback.tick();
 			expect( callbackElementA ).toHaveBeenCalledTimes( 1 );
 			expect( callbackElementB ).toHaveBeenCalledTimes( 1 );

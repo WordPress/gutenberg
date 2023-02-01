@@ -3,21 +3,22 @@
  */
 import type { CSSProperties } from 'react';
 
-type BoxVariants = 'margin' | 'padding' | undefined;
-export type Box< T extends BoxVariants = undefined > = {
+type BoxVariant = 'margin' | 'padding';
+export interface Box< T extends BoxVariant | undefined = undefined > {
 	top?: CSSProperties[ T extends undefined ? 'top' : `${ T }Top` ];
 	right?: CSSProperties[ T extends undefined ? 'right' : `${ T }Right` ];
 	bottom?: CSSProperties[ T extends undefined ? 'bottom' : `${ T }Bottom` ];
 	left?: CSSProperties[ T extends undefined ? 'left' : `${ T }Left` ];
-};
+}
 
-export type BorderIndividualProperty = 'top' | 'right' | 'bottom' | 'left';
+export type BoxEdge = 'top' | 'right' | 'bottom' | 'left';
+
 // `T` is one of the values in `BorderIndividualProperty`. The expected CSSProperties key is something like `borderTopColor`.
-export type BorderIndividualStyles< T extends BorderIndividualProperty > = {
-	color?: CSSProperties[ `border${ Capitalize< string & T > }Color` ];
-	style?: CSSProperties[ `border${ Capitalize< string & T > }Style` ];
-	width?: CSSProperties[ `border${ Capitalize< string & T > }Width` ];
-};
+export interface BorderIndividualStyles< T extends BoxEdge > {
+	color?: CSSProperties[ `border${ Capitalize< T > }Color` ];
+	style?: CSSProperties[ `border${ Capitalize< T > }Style` ];
+	width?: CSSProperties[ `border${ Capitalize< T > }Width` ];
+}
 
 export interface Style {
 	border?: {
@@ -37,6 +38,9 @@ export interface Style {
 		bottom?: BorderIndividualStyles< 'bottom' >;
 		left?: BorderIndividualStyles< 'left' >;
 	};
+	dimensions?: {
+		minHeight?: CSSProperties[ 'minHeight' ];
+	};
 	spacing?: {
 		margin?: CSSProperties[ 'margin' ] | Box< 'margin' >;
 		padding?: CSSProperties[ 'padding' ] | Box< 'padding' >;
@@ -48,6 +52,7 @@ export interface Style {
 		fontStyle?: CSSProperties[ 'fontStyle' ];
 		letterSpacing?: CSSProperties[ 'letterSpacing' ];
 		lineHeight?: CSSProperties[ 'lineHeight' ];
+		textColumns?: CSSProperties[ 'columnCount' ];
 		textDecoration?: CSSProperties[ 'textDecoration' ];
 		textTransform?: CSSProperties[ 'textTransform' ];
 	};
@@ -65,32 +70,33 @@ export interface Style {
 	};
 }
 
-export type CssRulesKeys = { default: string; individual: string };
+export interface CssRulesKeys {
+	default: string;
+	individual: string;
+}
 
-export type StyleOptions = {
+export interface StyleOptions {
 	/**
 	 * CSS selector for the generated style.
 	 */
-	selector: string;
-};
+	selector?: string;
+}
 
-export type GeneratedCSSRule = {
-	selector: string;
+export interface GeneratedCSSRule {
+	selector?: string;
 	value: string;
 	/**
 	 * The CSS key in JS style attribute format, compatible with React.
 	 * E.g. `paddingTop` instead of `padding-top`.
 	 */
 	key: string;
-};
+}
+
+export interface GenerateFunction {
+	( style: Style, options: StyleOptions ): GeneratedCSSRule[];
+}
 
 export interface StyleDefinition {
 	name: string;
-	generate?: (
-		style: Style,
-		options: StyleOptions,
-		path?: string[],
-		ruleKey?: string
-	) => GeneratedCSSRule[];
-	getClassNames?: ( style: Style ) => string[];
+	generate?: GenerateFunction;
 }

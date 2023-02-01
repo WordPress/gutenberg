@@ -2,7 +2,7 @@
  * External dependencies
  */
 import glob from 'fast-glob';
-import { fromPairs, startsWith, get } from 'lodash';
+import { get } from 'lodash';
 import { format } from 'util';
 
 /**
@@ -57,7 +57,7 @@ describe( 'full post content fixture', () => {
 		const blockMetadataFiles = glob.sync(
 			'packages/block-library/src/*/block.json'
 		);
-		const blockDefinitions = fromPairs(
+		const blockDefinitions = Object.fromEntries(
 			blockMetadataFiles.map( ( file ) => {
 				const { name, ...metadata } = require( file );
 				return [ name, metadata ];
@@ -221,76 +221,80 @@ describe( 'full post content fixture', () => {
 	} );
 
 	it( 'should be present for each block', () => {
-		const errors = [];
+		expect( () => {
+			const errors = [];
 
-		getBlockTypes()
-			.map( ( block ) => block.name )
-			// We don't want tests for each oembed provider, which all have the same
-			// `save` functions and attributes.
-			// The `core/template` is not worth testing here because it's never saved, it's covered better in e2e tests.
-			.filter(
-				( name ) => ! [ 'core/embed', 'core/template' ].includes( name )
-			)
-			.forEach( ( name ) => {
-				const nameToFilename = blockNameToFixtureBasename( name );
-				const foundFixtures = blockBasenames
-					.filter(
-						( basename ) =>
-							basename === nameToFilename ||
-							startsWith( basename, nameToFilename + '__' )
-					)
-					.map( ( basename ) => {
-						const { filename: htmlFixtureFileName } =
-							getBlockFixtureHTML( basename );
-						const { file: jsonFixtureContent } =
-							getBlockFixtureJSON( basename );
-						// The parser output for this test.  For missing files,
-						// JSON.parse( null ) === null.
-						const parserOutput = JSON.parse( jsonFixtureContent );
-						// The name of the first block that this fixture file
-						// contains (if any).
-						const firstBlock = get(
-							parserOutput,
-							[ '0', 'name' ],
-							null
-						);
-						return {
-							filename: htmlFixtureFileName,
-							parserOutput,
-							firstBlock,
-						};
-					} )
-					.filter( ( fixture ) => fixture.parserOutput !== null );
-
-				if ( ! foundFixtures.length ) {
-					errors.push(
-						format(
-							"Expected a fixture file called '%s.html' or '%s__*.html' in `test/integration/fixtures/blocks/` " +
-								'\n\n' +
-								'For more information on how to create test fixtures see https://github.com/WordPress/gutenberg/blob/1f75f8f6f500a20df5b9d6e317b4d72dd5af4ede/test/integration/fixtures/blocks/README.md\n\n',
-							nameToFilename,
-							nameToFilename
+			getBlockTypes()
+				.map( ( block ) => block.name )
+				// We don't want tests for each oembed provider, which all have the same
+				// `save` functions and attributes.
+				// The `core/template` is not worth testing here because it's never saved, it's covered better in e2e tests.
+				.filter(
+					( name ) =>
+						! [ 'core/embed', 'core/template' ].includes( name )
+				)
+				.forEach( ( name ) => {
+					const nameToFilename = blockNameToFixtureBasename( name );
+					const foundFixtures = blockBasenames
+						.filter(
+							( basename ) =>
+								basename === nameToFilename ||
+								basename.startsWith( nameToFilename + '__' )
 						)
-					);
-				}
+						.map( ( basename ) => {
+							const { filename: htmlFixtureFileName } =
+								getBlockFixtureHTML( basename );
+							const { file: jsonFixtureContent } =
+								getBlockFixtureJSON( basename );
+							// The parser output for this test.  For missing files,
+							// JSON.parse( null ) === null.
+							const parserOutput =
+								JSON.parse( jsonFixtureContent );
+							// The name of the first block that this fixture file
+							// contains (if any).
+							const firstBlock = get(
+								parserOutput,
+								[ '0', 'name' ],
+								null
+							);
+							return {
+								filename: htmlFixtureFileName,
+								parserOutput,
+								firstBlock,
+							};
+						} )
+						.filter( ( fixture ) => fixture.parserOutput !== null );
 
-				foundFixtures.forEach( ( fixture ) => {
-					if ( name !== fixture.firstBlock ) {
+					if ( ! foundFixtures.length ) {
 						errors.push(
 							format(
-								"Expected fixture file '%s' to test the '%s' block.",
-								fixture.filename,
-								name
+								"Expected a fixture file called '%s.html' or '%s__*.html' in `test/integration/fixtures/blocks/` " +
+									'\n\n' +
+									'For more information on how to create test fixtures see https://github.com/WordPress/gutenberg/blob/1f75f8f6f500a20df5b9d6e317b4d72dd5af4ede/test/integration/fixtures/blocks/README.md\n\n',
+								nameToFilename,
+								nameToFilename
 							)
 						);
 					}
-				} );
-			} );
 
-		if ( errors.length ) {
-			throw new Error(
-				'Problem(s) with fixture files:\n\n' + errors.join( '\n' )
-			);
-		}
+					foundFixtures.forEach( ( fixture ) => {
+						if ( name !== fixture.firstBlock ) {
+							errors.push(
+								format(
+									"Expected fixture file '%s' to test the '%s' block.",
+									fixture.filename,
+									name
+								)
+							);
+						}
+					} );
+				} );
+
+			if ( errors.length ) {
+				throw new Error(
+					'Problem(s) with fixture files:\n\n' + errors.join( '\n' )
+				);
+			}
+		} ).not.toThrow();
 	} );
 } );

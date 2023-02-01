@@ -1,106 +1,898 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`KeyboardShortcutHelpModal should match snapshot when the modal is active 1`] = `
-<ForwardRef(Modal)
-  className="edit-post-keyboard-shortcut-help-modal"
-  closeLabel="Close"
-  onRequestClose={[Function]}
-  title="Keyboard shortcuts"
+<div
+  aria-labelledby="components-modal-header-0"
+  class="components-modal__frame edit-post-keyboard-shortcut-help-modal"
+  role="dialog"
+  tabindex="-1"
 >
-  <ShortcutSection
-    className="edit-post-keyboard-shortcut-help-modal__main-shortcuts"
-    shortcuts={
-      Array [
-        "core/edit-post/keyboard-shortcuts",
-      ]
-    }
-  />
-  <ShortcutCategorySection
-    categoryName="global"
-    title="Global shortcuts"
-  />
-  <ShortcutCategorySection
-    categoryName="selection"
-    title="Selection shortcuts"
-  />
-  <ShortcutCategorySection
-    additionalShortcuts={
-      Array [
-        Object {
-          "ariaLabel": "Forward-slash",
-          "description": "Change the block type after adding a new paragraph.",
-          "keyCombination": Object {
-            "character": "/",
-          },
-        },
-      ]
-    }
-    categoryName="block"
-    title="Block shortcuts"
-  />
-  <ShortcutSection
-    shortcuts={
-      Array [
-        Object {
-          "description": "Make the selected text bold.",
-          "keyCombination": Object {
-            "character": "b",
-            "modifier": "primary",
-          },
-        },
-        Object {
-          "description": "Make the selected text italic.",
-          "keyCombination": Object {
-            "character": "i",
-            "modifier": "primary",
-          },
-        },
-        Object {
-          "description": "Convert the selected text into a link.",
-          "keyCombination": Object {
-            "character": "k",
-            "modifier": "primary",
-          },
-        },
-        Object {
-          "description": "Remove a link.",
-          "keyCombination": Object {
-            "character": "k",
-            "modifier": "primaryShift",
-          },
-        },
-        Object {
-          "description": "Insert a link to a post or page",
-          "keyCombination": Object {
-            "character": "[[",
-          },
-        },
-        Object {
-          "description": "Underline the selected text.",
-          "keyCombination": Object {
-            "character": "u",
-            "modifier": "primary",
-          },
-        },
-        Object {
-          "description": "Strikethrough the selected text.",
-          "keyCombination": Object {
-            "character": "d",
-            "modifier": "access",
-          },
-        },
-        Object {
-          "description": "Make the selected text inline code.",
-          "keyCombination": Object {
-            "character": "x",
-            "modifier": "access",
-          },
-        },
-      ]
-    }
-    title="Text formatting"
-  />
-</ForwardRef(Modal)>
+  <div
+    class="components-modal__content"
+    role="document"
+  >
+    <div
+      class="components-modal__header"
+    >
+      <div
+        class="components-modal__header-heading-container"
+      >
+        <h1
+          class="components-modal__header-heading"
+          id="components-modal-header-0"
+        >
+          Keyboard shortcuts
+        </h1>
+      </div>
+      <button
+        aria-label="Close"
+        class="components-button has-icon"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          height="24"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"
+          />
+        </svg>
+      </button>
+    </div>
+    <section
+      class="edit-post-keyboard-shortcut-help-modal__section edit-post-keyboard-shortcut-help-modal__main-shortcuts"
+    >
+      <ul
+        class="edit-post-keyboard-shortcut-help-modal__shortcut-list"
+        role="list"
+      >
+        <li
+          class="edit-post-keyboard-shortcut-help-modal__shortcut"
+        />
+      </ul>
+    </section>
+    <section
+      class="edit-post-keyboard-shortcut-help-modal__section"
+    >
+      <h2
+        class="edit-post-keyboard-shortcut-help-modal__section-title"
+      >
+        Global shortcuts
+      </h2>
+      <ul
+        class="edit-post-keyboard-shortcut-help-modal__shortcut-list"
+        role="list"
+      >
+        <li
+          class="edit-post-keyboard-shortcut-help-modal__shortcut"
+        >
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-description"
+          >
+            Navigate to the nearest toolbar.
+          </div>
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-term"
+          >
+            <kbd
+              aria-label="Alt + F10"
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+            >
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Alt
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                F10
+              </kbd>
+            </kbd>
+          </div>
+        </li>
+        <li
+          class="edit-post-keyboard-shortcut-help-modal__shortcut"
+        >
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-description"
+          >
+            Save your changes.
+          </div>
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-term"
+          >
+            <kbd
+              aria-label="Control + S"
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+            >
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Ctrl
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                S
+              </kbd>
+            </kbd>
+          </div>
+        </li>
+        <li
+          class="edit-post-keyboard-shortcut-help-modal__shortcut"
+        >
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-description"
+          >
+            Undo your last changes.
+          </div>
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-term"
+          >
+            <kbd
+              aria-label="Control + Z"
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+            >
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Ctrl
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Z
+              </kbd>
+            </kbd>
+          </div>
+        </li>
+        <li
+          class="edit-post-keyboard-shortcut-help-modal__shortcut"
+        >
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-description"
+          >
+            Redo your last undo.
+          </div>
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-term"
+          >
+            <kbd
+              aria-label="Control + Shift + Z"
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+            >
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Ctrl
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Shift
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Z
+              </kbd>
+            </kbd>
+            <kbd
+              aria-label="Control + Y"
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+            >
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Ctrl
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Y
+              </kbd>
+            </kbd>
+          </div>
+        </li>
+      </ul>
+    </section>
+    <section
+      class="edit-post-keyboard-shortcut-help-modal__section"
+    >
+      <h2
+        class="edit-post-keyboard-shortcut-help-modal__section-title"
+      >
+        Selection shortcuts
+      </h2>
+      <ul
+        class="edit-post-keyboard-shortcut-help-modal__shortcut-list"
+        role="list"
+      >
+        <li
+          class="edit-post-keyboard-shortcut-help-modal__shortcut"
+        >
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-description"
+          >
+            Select all text when typing. Press again to select all blocks.
+          </div>
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-term"
+          >
+            <kbd
+              aria-label="Control + A"
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+            >
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Ctrl
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                A
+              </kbd>
+            </kbd>
+          </div>
+        </li>
+        <li
+          class="edit-post-keyboard-shortcut-help-modal__shortcut"
+        >
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-description"
+          >
+            Clear selection.
+          </div>
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-term"
+          >
+            <kbd
+              aria-label="escape"
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+            >
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                escape
+              </kbd>
+            </kbd>
+          </div>
+        </li>
+      </ul>
+    </section>
+    <section
+      class="edit-post-keyboard-shortcut-help-modal__section"
+    >
+      <h2
+        class="edit-post-keyboard-shortcut-help-modal__section-title"
+      >
+        Block shortcuts
+      </h2>
+      <ul
+        class="edit-post-keyboard-shortcut-help-modal__shortcut-list"
+        role="list"
+      >
+        <li
+          class="edit-post-keyboard-shortcut-help-modal__shortcut"
+        >
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-description"
+          >
+            Duplicate the selected block(s).
+          </div>
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-term"
+          >
+            <kbd
+              aria-label="Control + Shift + D"
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+            >
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Ctrl
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Shift
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                D
+              </kbd>
+            </kbd>
+          </div>
+        </li>
+        <li
+          class="edit-post-keyboard-shortcut-help-modal__shortcut"
+        >
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-description"
+          >
+            Remove the selected block(s).
+          </div>
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-term"
+          >
+            <kbd
+              aria-label="Shift + Alt + Z"
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+            >
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Shift
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Alt
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Z
+              </kbd>
+            </kbd>
+          </div>
+        </li>
+        <li
+          class="edit-post-keyboard-shortcut-help-modal__shortcut"
+        >
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-description"
+          >
+            Insert a new block before the selected block(s).
+          </div>
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-term"
+          >
+            <kbd
+              aria-label="Control + Alt + T"
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+            >
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Ctrl
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Alt
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                T
+              </kbd>
+            </kbd>
+          </div>
+        </li>
+        <li
+          class="edit-post-keyboard-shortcut-help-modal__shortcut"
+        >
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-description"
+          >
+            Insert a new block after the selected block(s).
+          </div>
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-term"
+          >
+            <kbd
+              aria-label="Control + Alt + Y"
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+            >
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Ctrl
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Alt
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Y
+              </kbd>
+            </kbd>
+          </div>
+        </li>
+        <li
+          class="edit-post-keyboard-shortcut-help-modal__shortcut"
+        >
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-description"
+          >
+            Delete selection.
+          </div>
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-term"
+          >
+            <kbd
+              aria-label="del"
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+            >
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                del
+              </kbd>
+            </kbd>
+            <kbd
+              aria-label="backspace"
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+            >
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                backspace
+              </kbd>
+            </kbd>
+          </div>
+        </li>
+        <li
+          class="edit-post-keyboard-shortcut-help-modal__shortcut"
+        >
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-description"
+          >
+            Move the selected block(s) up.
+          </div>
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-term"
+          >
+            <kbd
+              aria-label="Control + Shift + Alt + T"
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+            >
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Ctrl
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Shift
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Alt
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                T
+              </kbd>
+            </kbd>
+          </div>
+        </li>
+        <li
+          class="edit-post-keyboard-shortcut-help-modal__shortcut"
+        >
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-description"
+          >
+            Move the selected block(s) down.
+          </div>
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-term"
+          >
+            <kbd
+              aria-label="Control + Shift + Alt + Y"
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+            >
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Ctrl
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Shift
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Alt
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Y
+              </kbd>
+            </kbd>
+          </div>
+        </li>
+        <li
+          class="edit-post-keyboard-shortcut-help-modal__shortcut"
+        >
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-description"
+          >
+            Change the block type after adding a new paragraph.
+          </div>
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-term"
+          >
+            <kbd
+              aria-label="Forward-slash"
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+            >
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                /
+              </kbd>
+            </kbd>
+          </div>
+        </li>
+      </ul>
+    </section>
+    <section
+      class="edit-post-keyboard-shortcut-help-modal__section"
+    >
+      <h2
+        class="edit-post-keyboard-shortcut-help-modal__section-title"
+      >
+        Text formatting
+      </h2>
+      <ul
+        class="edit-post-keyboard-shortcut-help-modal__shortcut-list"
+        role="list"
+      >
+        <li
+          class="edit-post-keyboard-shortcut-help-modal__shortcut"
+        >
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-description"
+          >
+            Make the selected text bold.
+          </div>
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-term"
+          >
+            <kbd
+              aria-label="Control + B"
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+            >
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Ctrl
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                B
+              </kbd>
+            </kbd>
+          </div>
+        </li>
+        <li
+          class="edit-post-keyboard-shortcut-help-modal__shortcut"
+        >
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-description"
+          >
+            Make the selected text italic.
+          </div>
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-term"
+          >
+            <kbd
+              aria-label="Control + I"
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+            >
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Ctrl
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                I
+              </kbd>
+            </kbd>
+          </div>
+        </li>
+        <li
+          class="edit-post-keyboard-shortcut-help-modal__shortcut"
+        >
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-description"
+          >
+            Convert the selected text into a link.
+          </div>
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-term"
+          >
+            <kbd
+              aria-label="Control + K"
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+            >
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Ctrl
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                K
+              </kbd>
+            </kbd>
+          </div>
+        </li>
+        <li
+          class="edit-post-keyboard-shortcut-help-modal__shortcut"
+        >
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-description"
+          >
+            Remove a link.
+          </div>
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-term"
+          >
+            <kbd
+              aria-label="Control + Shift + K"
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+            >
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Ctrl
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Shift
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                K
+              </kbd>
+            </kbd>
+          </div>
+        </li>
+        <li
+          class="edit-post-keyboard-shortcut-help-modal__shortcut"
+        >
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-description"
+          >
+            Insert a link to a post or page
+          </div>
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-term"
+          >
+            <kbd
+              aria-label="[["
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+            >
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                [[
+              </kbd>
+            </kbd>
+          </div>
+        </li>
+        <li
+          class="edit-post-keyboard-shortcut-help-modal__shortcut"
+        >
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-description"
+          >
+            Underline the selected text.
+          </div>
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-term"
+          >
+            <kbd
+              aria-label="Control + U"
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+            >
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Ctrl
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                U
+              </kbd>
+            </kbd>
+          </div>
+        </li>
+        <li
+          class="edit-post-keyboard-shortcut-help-modal__shortcut"
+        >
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-description"
+          >
+            Strikethrough the selected text.
+          </div>
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-term"
+          >
+            <kbd
+              aria-label="Shift + Alt + D"
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+            >
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Shift
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Alt
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                D
+              </kbd>
+            </kbd>
+          </div>
+        </li>
+        <li
+          class="edit-post-keyboard-shortcut-help-modal__shortcut"
+        >
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-description"
+          >
+            Make the selected text inline code.
+          </div>
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-term"
+          >
+            <kbd
+              aria-label="Shift + Alt + X"
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+            >
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Shift
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Alt
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                X
+              </kbd>
+            </kbd>
+          </div>
+        </li>
+        <li
+          class="edit-post-keyboard-shortcut-help-modal__shortcut"
+        >
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-description"
+          >
+            Convert the current heading to a paragraph.
+          </div>
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-term"
+          >
+            <kbd
+              aria-label="Shift + Alt + 0"
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+            >
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Shift
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Alt
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                0
+              </kbd>
+            </kbd>
+          </div>
+        </li>
+        <li
+          class="edit-post-keyboard-shortcut-help-modal__shortcut"
+        >
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-description"
+          >
+            Convert the current paragraph or heading to a heading of level 1 to 6.
+          </div>
+          <div
+            class="edit-post-keyboard-shortcut-help-modal__shortcut-term"
+          >
+            <kbd
+              aria-label="Shift + Alt + 1 6"
+              class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+            >
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Shift
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                Alt
+              </kbd>
+              +
+              <kbd
+                class="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+              >
+                1-6
+              </kbd>
+            </kbd>
+          </div>
+        </li>
+      </ul>
+    </section>
+  </div>
+</div>
 `;
-
-exports[`KeyboardShortcutHelpModal should match snapshot when the modal is not active 1`] = `""`;

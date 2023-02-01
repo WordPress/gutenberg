@@ -14,10 +14,7 @@ import { useState } from '@wordpress/element';
  */
 import BaseInputControl from '../';
 
-const setupUser = () =>
-	userEvent.setup( {
-		advanceTimers: jest.advanceTimersByTime,
-	} );
+const setupUser = () => userEvent.setup();
 
 const getInput = () => screen.getByTestId( 'input' );
 
@@ -40,7 +37,7 @@ describe( 'InputControl', () => {
 
 			const input = getInput();
 
-			expect( input.getAttribute( 'type' ) ).toBe( 'number' );
+			expect( input ).toHaveAttribute( 'type', 'number' );
 		} );
 
 		it( 'should render label', () => {
@@ -48,7 +45,26 @@ describe( 'InputControl', () => {
 
 			const input = screen.getByText( 'Hello' );
 
-			expect( input ).toBeTruthy();
+			expect( input ).toBeInTheDocument();
+		} );
+
+		it( 'should render help text as description', () => {
+			render( <InputControl help="My help text" /> );
+			expect(
+				screen.getByRole( 'textbox', { description: 'My help text' } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should render help as aria-details when not plain text', () => {
+			render( <InputControl help={ <a href="/foo">My help text</a> } /> );
+
+			const input = screen.getByRole( 'textbox' );
+			const help = screen.getByRole( 'link', { name: 'My help text' } );
+
+			expect(
+				// eslint-disable-next-line testing-library/no-node-access
+				help.closest( `#${ input.getAttribute( 'aria-details' ) }` )
+			).toBeVisible();
 		} );
 	} );
 
@@ -85,9 +101,10 @@ describe( 'InputControl', () => {
 			expect( spy ).toHaveBeenLastCalledWith( 'Hello there' );
 		} );
 
-		it( 'should work as a controlled component', async () => {
+		it( 'should work as a controlled component given normal, falsy or nullish values', async () => {
 			const user = setupUser();
 			const spy = jest.fn();
+			const heldKeySet = new Set();
 			const Example = () => {
 				const [ state, setState ] = useState( 'one' );
 				const onChange = ( value ) => {
@@ -95,13 +112,21 @@ describe( 'InputControl', () => {
 					spy( value );
 				};
 				const onKeyDown = ( { key } ) => {
-					if ( key === 'Escape' ) setState( 'three' );
+					heldKeySet.add( key );
+					if ( key === 'Escape' ) {
+						if ( heldKeySet.has( 'Meta' ) ) setState( 'qux' );
+						else if ( heldKeySet.has( 'Alt' ) )
+							setState( undefined );
+						else setState( '' );
+					}
 				};
+				const onKeyUp = ( { key } ) => heldKeySet.delete( key );
 				return (
 					<InputControl
 						value={ state }
 						onChange={ onChange }
 						onKeyDown={ onKeyDown }
+						onKeyUp={ onKeyUp }
 					/>
 				);
 			};
@@ -109,10 +134,17 @@ describe( 'InputControl', () => {
 			const input = getInput();
 
 			await user.type( input, '2' );
-			// Make a controlled update.
+			// Make a controlled update with a falsy value.
 			await user.keyboard( '{Escape}' );
+			expect( input ).toHaveValue( '' );
 
-			expect( input ).toHaveValue( 'three' );
+			// Make a controlled update with a normal value.
+			await user.keyboard( '{Meta>}{Escape}{/Meta}' );
+			expect( input ).toHaveValue( 'qux' );
+
+			// Make a controlled update with a nullish value.
+			await user.keyboard( '{Alt>}{Escape}{/Alt}' );
+			expect( input ).toHaveValue( '' );
 			/*
 			 * onChange called only once. onChange is not called when a
 			 * parent component explicitly passed a (new value) change down to

@@ -134,11 +134,11 @@ test.describe( 'Copy/cut/paste', () => {
 	} ) => {
 		// Add group block with paragraph.
 		await editor.insertBlock( {
-			name: 'core/group',
+			name: 'core/buttons',
 			innerBlocks: [
 				{
-					name: 'core/paragraph',
-					attributes: { content: 'P' },
+					name: 'core/button',
+					attributes: { text: 'Click' },
 				},
 			],
 		} );
@@ -188,11 +188,11 @@ test.describe( 'Copy/cut/paste', () => {
 	} ) => {
 		// Add group block with paragraph.
 		await editor.insertBlock( {
-			name: 'core/group',
+			name: 'core/buttons',
 			innerBlocks: [
 				{
-					name: 'core/paragraph',
-					attributes: { content: 'P' },
+					name: 'core/button',
+					attributes: { text: 'Click' },
 				},
 			],
 		} );
@@ -395,6 +395,57 @@ test.describe( 'Copy/cut/paste', () => {
 		// Create a new code block to paste there.
 		await editor.insertBlock( { name: 'core/code' } );
 		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	test( 'should paste single line in post title', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		// This test checks whether we are correctly handling single line
+		// pasting in the post title. Previously we were accidentally falling
+		// back to default browser behaviour, allowing the browser to insert
+		// unfiltered HTML. When we swap out the post title in the post editor
+		// with the proper block, this test can be removed.
+		await pageUtils.setClipboardData( {
+			html: '<span style="border: 1px solid black">Hello World</span>',
+		} );
+		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		// Expect the span to be filtered out.
+		expect(
+			await page.evaluate( () => document.activeElement.innerHTML )
+		).toMatchSnapshot();
+	} );
+
+	test( 'should paste single line in post title with existing content', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		await page.keyboard.type( 'ab' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await pageUtils.setClipboardData( {
+			html: '<span style="border: 1px solid black">x</span>',
+		} );
+		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		// Ensure the selection is correct.
+		await page.keyboard.type( 'y' );
+		expect(
+			await page.evaluate( () => document.activeElement.innerHTML )
+		).toBe( 'axyb' );
+	} );
+
+	test( 'should paste preformatted in list', async ( {
+		page,
+		pageUtils,
+		editor,
+	} ) => {
+		await pageUtils.setClipboardData( {
+			html: '<pre>x</pre>',
+		} );
+		await editor.insertBlock( { name: 'core/list' } );
+		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		// Ensure the selection is correct.
+		await page.keyboard.type( 'y' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

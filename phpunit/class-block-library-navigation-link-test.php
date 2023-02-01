@@ -18,6 +18,10 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 
 	private static $pages;
 	private static $terms;
+	/**
+	 * @var array|null
+	 */
+	private $original_block_supports;
 
 	public static function wpSetUpBeforeClass() {
 
@@ -83,14 +87,29 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 
 	public static function wpTearDownAfterClass() {
 		foreach ( self::$pages as $page_to_delete ) {
-			wp_delete_post( $page_to_delete );
+			wp_delete_post( $page_to_delete->ID );
 		}
 		foreach ( self::$terms as $term_to_delete ) {
 			wp_delete_term( $term_to_delete->term_id, $term_to_delete->taxonomy );
 		}
 	}
 
-	function test_returns_link_when_post_is_published() {
+	public function set_up() {
+		parent::set_up();
+
+		$this->original_block_supports      = WP_Block_Supports::$block_to_render;
+		WP_Block_Supports::$block_to_render = array(
+			'attrs'     => array(),
+			'blockName' => '',
+		);
+	}
+
+	public function tear_down() {
+		WP_Block_Supports::$block_to_render = $this->original_block_supports;
+		parent::tear_down();
+	}
+
+	public function test_returns_link_when_post_is_published() {
 		$page_id = self::$page->ID;
 
 		$parsed_blocks = parse_blocks(
@@ -102,7 +121,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		$this->assertEquals(
 			true,
 			strpos(
-				render_block_core_navigation_link(
+				gutenberg_render_block_core_navigation_link(
 					$navigation_link_block->attributes,
 					array(),
 					$navigation_link_block
@@ -112,7 +131,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		);
 	}
 
-	function test_returns_empty_when_label_is_missing() {
+	public function test_returns_empty_when_label_is_missing() {
 		$page_id = self::$page->ID;
 
 		$parsed_blocks = parse_blocks(
@@ -123,7 +142,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		$navigation_link_block = new WP_Block( $parsed_blocks[0], array() );
 		$this->assertEquals(
 			'',
-			render_block_core_navigation_link(
+			gutenberg_render_block_core_navigation_link(
 				$navigation_link_block->attributes,
 				array(),
 				$navigation_link_block
@@ -131,7 +150,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		);
 	}
 
-	function test_returns_empty_when_draft() {
+	public function test_returns_empty_when_draft() {
 		$page_id = self::$draft->ID;
 
 		$parsed_blocks = parse_blocks(
@@ -143,7 +162,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 
 		$this->assertEquals(
 			'',
-			render_block_core_navigation_link(
+			gutenberg_render_block_core_navigation_link(
 				$navigation_link_block->attributes,
 				array(),
 				$navigation_link_block
@@ -151,7 +170,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		);
 	}
 
-	function test_returns_link_for_category() {
+	public function test_returns_link_for_category() {
 		$category_id = self::$category->term_id;
 
 		$parsed_blocks = parse_blocks(
@@ -163,7 +182,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		$this->assertEquals(
 			true,
 			strpos(
-				render_block_core_navigation_link(
+				gutenberg_render_block_core_navigation_link(
 					$navigation_link_block->attributes,
 					array(),
 					$navigation_link_block
@@ -173,7 +192,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		);
 	}
 
-	function test_returns_link_for_plain_link() {
+	public function test_returns_link_for_plain_link() {
 		$parsed_blocks = parse_blocks(
 			'<!-- wp:navigation-link {"label":"My Website","url":"https://example.com"} /-->'
 		);
@@ -183,7 +202,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		$this->assertEquals(
 			true,
 			strpos(
-				render_block_core_navigation_link(
+				gutenberg_render_block_core_navigation_link(
 					$navigation_link_block->attributes,
 					array(),
 					$navigation_link_block
@@ -193,7 +212,40 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		);
 	}
 
-	function test_returns_empty_when_custom_post_type_draft() {
+	public function test_returns_link_for_decoded_link() {
+
+		$urls_before_render = array(
+			'https://example.com/?id=10&data=lzB%252Fzd%252FZA%253D%253D',
+			'https://example.com/?id=10&data=lzB%2Fzd%FZA%3D%3D',
+			'https://example.com/?id=10&data=1234',
+		);
+
+		$urls_after_render = array(
+			'https://example.com/?id=10&#038;data=lzB%2Fzd%2FZA%3D%3D',
+			'https://example.com/?id=10&#038;data=lzB%2Fzd%FZA%3D%3D',
+			'https://example.com/?id=10&#038;data=1234',
+		);
+
+		foreach ( $urls_before_render as $idx => $link ) {
+				$parsed_blocks = parse_blocks( '<!-- wp:navigation-link {"label":"test label", "url": "' . $link . '"} /-->' );
+			$this->assertEquals( 1, count( $parsed_blocks ) );
+				$block             = $parsed_blocks[0];
+			$navigation_link_block = new WP_Block( $block, array() );
+				$this->assertEquals(
+					true,
+					strpos(
+						gutenberg_render_block_core_navigation_link(
+							$navigation_link_block->attributes,
+							array(),
+							$navigation_link_block
+						),
+						$urls_after_render[ $idx ]
+					) !== false
+				);
+		};
+	}
+
+	public function test_returns_empty_when_custom_post_type_draft() {
 		$page_id = self::$custom_draft->ID;
 
 		$parsed_blocks = parse_blocks(
@@ -205,7 +257,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 
 		$this->assertEquals(
 			'',
-			render_block_core_navigation_link(
+			gutenberg_render_block_core_navigation_link(
 				$navigation_link_block->attributes,
 				array(),
 				$navigation_link_block
@@ -213,7 +265,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		);
 	}
 
-	function test_returns_link_when_custom_post_is_published() {
+	public function test_returns_link_when_custom_post_is_published() {
 		$page_id = self::$custom_post->ID;
 
 		$parsed_blocks = parse_blocks(
@@ -225,7 +277,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		$this->assertEquals(
 			true,
 			strpos(
-				render_block_core_navigation_link(
+				gutenberg_render_block_core_navigation_link(
 					$navigation_link_block->attributes,
 					array(),
 					$navigation_link_block

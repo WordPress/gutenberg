@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { some } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -21,22 +16,17 @@ import { store as editorStore } from '../../store';
 function MaybeCategoryPanel() {
 	const hasNoCategory = useSelect( ( select ) => {
 		const postType = select( editorStore ).getCurrentPostType();
-		const categoriesTaxonomy =
-			select( coreStore ).getTaxonomy( 'category' );
-		const defaultCategoryId = select( coreStore ).getEntityRecord(
-			'root',
-			'site'
-		)?.default_category;
-		const defaultCategory = select( coreStore ).getEntityRecords(
-			'taxonomy',
-			'category',
-			{
-				id: defaultCategoryId,
-			}
-		)?.[ 0 ];
+		const { canUser, getEntityRecord, getTaxonomy } = select( coreStore );
+		const categoriesTaxonomy = getTaxonomy( 'category' );
+		const defaultCategoryId = canUser( 'read', 'settings' )
+			? getEntityRecord( 'root', 'site' )?.default_category
+			: undefined;
+		const defaultCategory = defaultCategoryId
+			? getEntityRecord( 'taxonomy', 'category', defaultCategoryId )
+			: undefined;
 		const postTypeSupportsCategories =
 			categoriesTaxonomy &&
-			some( categoriesTaxonomy.types, ( type ) => type === postType );
+			categoriesTaxonomy.types.some( ( type ) => type === postType );
 		const categories =
 			categoriesTaxonomy &&
 			select( editorStore ).getEditedPostAttribute(
@@ -52,7 +42,7 @@ function MaybeCategoryPanel() {
 			postTypeSupportsCategories &&
 			( categories?.length === 0 ||
 				( categories?.length === 1 &&
-					defaultCategory.id === categories[ 0 ] ) )
+					defaultCategory?.id === categories[ 0 ] ) )
 		);
 	}, [] );
 	const [ shouldShowPanel, setShouldShowPanel ] = useState( false );

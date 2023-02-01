@@ -22,6 +22,10 @@ figure.wp-block-gallery.has-nested-images {
 		position: relative;
 		flex-direction: column;
 		max-width: 100%;
+		// Prevents theme.json and global styles borders that apply to the outer
+		// wrapper from incorrectly enlarging gallery images to a point they
+		// result in a single column gallery.
+		box-sizing: border-box;
 
 		> div,
 		> a {
@@ -63,7 +67,12 @@ figure.wp-block-gallery.has-nested-images {
 			}
 		}
 
-		&.is-style-rounded {
+		&.has-custom-border img {
+			box-sizing: border-box;
+		}
+
+		&.is-style-rounded,
+		&.has-custom-border {
 			> div,
 			> a {
 				flex: 1 1 auto;

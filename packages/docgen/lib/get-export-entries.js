@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-const { get } = require( 'lodash' );
-
-/**
  * Returns the export entry records of the given export statement.
  * Unlike [the standard](http://www.ecma-international.org/ecma-262/9.0/#exportentry-record),
  * the `importName` and the `localName` are merged together.
@@ -31,7 +26,7 @@ module.exports = ( token ) => {
 					name = t.declaration.left.name;
 					break;
 				default:
-					name = get( t.declaration, [ 'id', 'name' ], '*default*' );
+					name = t.declaration.id?.name ?? '*default*';
 			}
 			return name;
 		};
@@ -64,7 +59,7 @@ module.exports = ( token ) => {
 			name.push( {
 				localName: specifier.local.name,
 				exportName: specifier.exported.name,
-				module: get( token.source, [ 'value' ], null ),
+				module: token.source?.value ?? null,
 				lineStart: specifier.loc.start.line,
 				lineEnd: specifier.loc.end.line,
 			} )

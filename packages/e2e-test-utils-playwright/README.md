@@ -1,8 +1,6 @@
 # E2E Test Utils
 
-Experimental End-To-End (E2E) Playwright test utils for WordPress.
-
-**This package is still experimental and breaking changes could be introduced in future minor versions (`v0.x`). Use it at your own risks.**
+End-To-End (E2E) Playwright test utils for WordPress.
 
 _It works properly with the minimum version of Gutenberg `9.2.0` or the minimum version of WordPress `5.6.0`._
 
@@ -20,7 +18,7 @@ npm install @wordpress/e2e-test-utils-playwright --save-dev
 
 ### test
 
-The extended Playwright's [test](https://playwright.dev/docs/api/class-test) module with the `admin`, `pageUtils` and the `requestUtils` fixtures.
+The extended Playwright's [test](https://playwright.dev/docs/api/class-test) module with the `admin`, `editor`, `pageUtils` and the `requestUtils` fixtures.
 
 ### expect
 
@@ -43,12 +41,10 @@ To use these utilities, instantiate them within each test file:
 ```js
 test.use( {
 	editor: async ( { page }, use ) => {
-		await use( new Editor( { page, hasIframe: true } ) );
+		await use( new Editor( { page } ) );
 	},
 } );
 ```
-
-The `hasIframe` property denotes whether the editor canvas uses an Iframe, as the site editor currently does. Omit this for non-iframe editors.
 
 Within a test or test utility, use the `canvas` property to select elements within the iframe canvas:
 
@@ -80,4 +76,10 @@ const requestUtils = await RequestUtils.setup( {
 } );
 ```
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

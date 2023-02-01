@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { find, startsWith, get, camelCase, has } from 'lodash';
+import { camelCase } from 'change-case';
+import { get } from 'lodash';
 import { Dimensions } from 'react-native';
 
 /**
@@ -32,6 +33,7 @@ const BLOCK_STYLE_ATTRIBUTES_MAPPING = {
 
 const PADDING = 12; // $solid-border-space
 const UNKNOWN_VALUE = 'undefined';
+const DEFAULT_FONT_SIZE = 16;
 
 export function getBlockPaddings(
 	mergedStyle,
@@ -103,7 +105,7 @@ export function getBlockColors(
 
 	// Custom colors.
 	Object.entries( blockStyleAttributes ).forEach( ( [ key, value ] ) => {
-		const isCustomColor = startsWith( value, '#' );
+		const isCustomColor = value?.startsWith?.( '#' );
 		let styleKey = key;
 
 		if ( BLOCK_STYLE_ATTRIBUTES_MAPPING[ styleKey ] ) {
@@ -111,9 +113,9 @@ export function getBlockColors(
 		}
 
 		if ( ! isCustomColor ) {
-			const mappedColor = find( defaultColors, {
-				slug: value,
-			} );
+			const mappedColor = Object.values( defaultColors ?? {} ).find(
+				( { slug } ) => slug === value
+			);
 
 			if ( mappedColor ) {
 				blockStyles[ styleKey ] = mappedColor.color;
@@ -141,6 +143,7 @@ export function getBlockTypography(
 	const typographyStyles = {};
 	const customBlockStyles = blockStyleAttributes?.style?.typography || {};
 	const blockGlobalStyles = baseGlobalStyles?.blocks?.[ blockName ];
+	const parsedFontSizes = Object.values( fontSizes ?? {} );
 
 	// Global styles.
 	if ( blockGlobalStyles?.typography ) {
@@ -151,9 +154,9 @@ export function getBlockTypography(
 			if ( parseInt( fontSize, 10 ) ) {
 				typographyStyles.fontSize = fontSize;
 			} else {
-				const mappedFontSize = find( fontSizes, {
-					slug: fontSize,
-				} );
+				const mappedFontSize = parsedFontSizes.find(
+					( { slug } ) => slug === fontSize
+				);
 
 				if ( mappedFontSize ) {
 					typographyStyles.fontSize = mappedFontSize?.size;
@@ -167,9 +170,9 @@ export function getBlockTypography(
 	}
 
 	if ( blockStyleAttributes?.fontSize && baseGlobalStyles ) {
-		const mappedFontSize = find( fontSizes, {
-			slug: blockStyleAttributes?.fontSize,
-		} );
+		const mappedFontSize = parsedFontSizes.find(
+			( { slug } ) => slug === blockStyleAttributes?.fontSize
+		);
 
 		if ( mappedFontSize ) {
 			typographyStyles.fontSize = mappedFontSize?.size;
@@ -190,7 +193,7 @@ export function getBlockTypography(
 
 export function parseStylesVariables( styles, mappedValues, customValues ) {
 	let stylesBase = styles;
-	const variables = [ 'preset', 'custom', 'var' ];
+	const variables = [ 'preset', 'custom', 'var', 'fontSize' ];
 
 	if ( ! stylesBase ) {
 		return styles;
@@ -203,15 +206,16 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 		// var:preset|color|custom-color-2
 		const regex = new RegExp( `var\\(--wp--${ variable }--(.*?)\\)`, 'g' );
 		const varRegex = /\"var:preset\|color\|(.*?)\"/gm;
+		const fontSizeRegex = /"fontSize":"(.*?)"/gm;
 
 		if ( variable === 'preset' ) {
 			stylesBase = stylesBase.replace( regex, ( _$1, $2 ) => {
 				const path = $2.split( '--' );
 				const mappedPresetValue = mappedValues[ path[ 0 ] ];
 				if ( mappedPresetValue && mappedPresetValue.slug ) {
-					const matchedValue = find( mappedPresetValue.values, {
-						slug: path[ 1 ],
-					} );
+					const matchedValue = Object.values(
+						mappedPresetValue.values ?? {}
+					).find( ( { slug } ) => slug === path[ 1 ] );
 					return matchedValue?.[ mappedPresetValue.slug ];
 				}
 				return UNKNOWN_VALUE;
@@ -221,7 +225,12 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 			const customValuesData = customValues ?? JSON.parse( stylesBase );
 			stylesBase = stylesBase.replace( regex, ( _$1, $2 ) => {
 				const path = $2.split( '--' );
-				if ( has( customValuesData, path ) ) {
+				if (
+					path.reduce(
+						( prev, curr ) => prev && prev[ curr ],
+						customValuesData
+					)
+				) {
 					return get( customValuesData, path );
 				}
 
@@ -236,12 +245,27 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 		if ( variable === 'var' ) {
 			stylesBase = stylesBase.replace( varRegex, ( _$1, $2 ) => {
 				if ( mappedValues?.color ) {
-					const matchedValue = find( mappedValues.color?.values, {
-						slug: $2,
-					} );
+					const matchedValue = mappedValues.color?.values?.find(
+						( { slug } ) => slug === $2
+					);
 					return `"${ matchedValue?.color }"`;
 				}
 				return UNKNOWN_VALUE;
+			} );
+		}
+
+		if ( variable === 'fontSize' ) {
+			const { width, height } = Dimensions.get( 'window' );
+
+			stylesBase = stylesBase.replace( fontSizeRegex, ( _$1, $2 ) => {
+				const parsedFontSize =
+					getPxFromCssUnit( $2, {
+						width,
+						height,
+						fontSize: DEFAULT_FONT_SIZE,
+					} ) || `${ DEFAULT_FONT_SIZE }px`;
+
+				return `"fontSize":"${ parsedFontSize }"`;
 			} );
 		}
 	} );
@@ -297,7 +321,7 @@ function normalizeFontSizes( fontSizes ) {
 						{
 							width: dimensions.width,
 							height: dimensions.height,
-							fontSize: 16,
+							fontSize: DEFAULT_FONT_SIZE,
 						}
 					);
 					return fontSizeObject;

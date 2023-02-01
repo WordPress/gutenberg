@@ -57,7 +57,7 @@ const HELP_TOPICS = [
 	},
 ];
 
-function EditorHelpTopics( { close, isVisible, onClose } ) {
+function EditorHelpTopics( { close, isVisible, onClose, showSupport } ) {
 	const { postType } = useSelect( ( select ) => ( {
 		postType: select( editorStore ).getEditedPostAttribute( 'type' ),
 	} ) );
@@ -66,6 +66,20 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 		postType === 'page'
 			? __( 'How to edit your page' )
 			: __( 'How to edit your post' );
+
+	const supportSection = (
+		<>
+			<HelpSectionTitle>{ __( 'Get support' ) }</HelpSectionTitle>
+			<HelpGetSupportButton
+				title={ __( 'Contact support' ) }
+				onPress={ requestContactCustomerSupport }
+			/>
+			<HelpGetSupportButton
+				title={ __( 'More support options' ) }
+				onPress={ requestGotoCustomerSupportOptions }
+			/>
+		</>
+	);
 
 	return (
 		<BottomSheet
@@ -153,31 +167,8 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 														);
 													}
 												) }
-												{
-													<HelpSectionTitle>
-														{ __( 'Get support' ) }
-													</HelpSectionTitle>
-												}
-												{
-													<HelpGetSupportButton
-														title={ __(
-															'Contact support'
-														) }
-														onPress={
-															requestContactCustomerSupport
-														}
-													/>
-												}
-												{
-													<HelpGetSupportButton
-														title={ __(
-															'More support options'
-														) }
-														onPress={
-															requestGotoCustomerSupportOptions
-														}
-													/>
-												}
+												{ showSupport &&
+													supportSection }
 											</PanelBody>
 										</ScrollView>
 									);

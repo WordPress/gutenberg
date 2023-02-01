@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
+/**
  * Internal dependencies
  */
 import * as children from './children';
@@ -24,6 +29,12 @@ import * as children from './children';
  * @return {boolean} Whether node is of intended type.
  */
 function isNodeOfType( node, type ) {
+	deprecated( 'wp.blocks.node.isNodeOfType', {
+		since: '6.1',
+		version: '6.3',
+		link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
+	} );
+
 	return node && node.type === type;
 }
 
@@ -58,6 +69,13 @@ export function getNamedNodeMapAsObject( nodeMap ) {
  * @return {WPBlockNode} Block node equivalent to DOM node.
  */
 export function fromDOM( domNode ) {
+	deprecated( 'wp.blocks.node.fromDOM', {
+		since: '6.1',
+		version: '6.3',
+		alternative: 'wp.richText.create',
+		link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
+	} );
+
 	if ( domNode.nodeType === domNode.TEXT_NODE ) {
 		return domNode.nodeValue;
 	}
@@ -86,6 +104,13 @@ export function fromDOM( domNode ) {
  * @return {string} String HTML representation of block node.
  */
 export function toHTML( node ) {
+	deprecated( 'wp.blocks.node.toHTML', {
+		since: '6.1',
+		version: '6.3',
+		alternative: 'wp.richText.toHTMLString',
+		link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
+	} );
+
 	return children.toHTML( [ node ] );
 }
 
@@ -98,6 +123,13 @@ export function toHTML( node ) {
  * @return {Function} hpq matcher.
  */
 export function matcher( selector ) {
+	deprecated( 'wp.blocks.node.matcher', {
+		since: '6.1',
+		version: '6.3',
+		alternative: 'html source',
+		link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
+	} );
+
 	return ( domNode ) => {
 		let match = domNode;
 

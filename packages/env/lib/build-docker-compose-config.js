@@ -19,13 +19,18 @@ const { dbEnv } = require( './config' );
 /**
  * Gets the volume mounts for an individual service.
  *
- * @param {WPServiceConfig} config           The service config to get the mounts from.
- * @param {string}          wordpressDefault The default internal path for the WordPress
- *                                           source code (such as tests-wordpress).
+ * @param {string}          workDirectoryPath The working directory for wp-env.
+ * @param {WPServiceConfig} config            The service config to get the mounts from.
+ * @param {string}          wordpressDefault  The default internal path for the WordPress
+ *                                            source code (such as tests-wordpress).
  *
  * @return {string[]} An array of volumes to mount in string format.
  */
-function getMounts( config, wordpressDefault = 'wordpress' ) {
+function getMounts(
+	workDirectoryPath,
+	config,
+	wordpressDefault = 'wordpress'
+) {
 	// Top-level WordPress directory mounts (like wp-content/themes)
 	const directoryMounts = Object.entries( config.mappings ).map(
 		( [ wpDir, source ] ) => `${ source.path }:/var/www/html/${ wpDir }`
@@ -45,9 +50,19 @@ function getMounts( config, wordpressDefault = 'wordpress' ) {
 		config.coreSource ? config.coreSource.path : wordpressDefault
 	}:/var/www/html`;
 
+	const corePHPUnitMount = `${ path.join(
+		workDirectoryPath,
+		wordpressDefault === 'wordpress'
+			? 'WordPress-PHPUnit'
+			: 'tests-WordPress-PHPUnit',
+		'tests',
+		'phpunit'
+	) }:/wordpress-phpunit`;
+
 	return [
 		...new Set( [
 			coreMount,
+			corePHPUnitMount,
 			...directoryMounts,
 			...pluginMounts,
 			...themeMounts,
@@ -64,8 +79,15 @@ function getMounts( config, wordpressDefault = 'wordpress' ) {
  * @return {Object} A docker-compose config object, ready to serialize into YAML.
  */
 module.exports = function buildDockerComposeConfig( config ) {
-	const developmentMounts = getMounts( config.env.development );
-	const testsMounts = getMounts( config.env.tests, 'tests-wordpress' );
+	const developmentMounts = getMounts(
+		config.workDirectoryPath,
+		config.env.development
+	);
+	const testsMounts = getMounts(
+		config.workDirectoryPath,
+		config.env.tests,
+		'tests-wordpress'
+	);
 
 	// When both tests and development reference the same WP source, we need to
 	// ensure that tests pulls from a copy of the files so that it maintains
@@ -159,9 +181,11 @@ module.exports = function buildDockerComposeConfig( config ) {
 		phpunitTag = '6' + phpunitPhpVersion;
 	} else if ( testsPhpVersion === '7.1' ) {
 		phpunitTag = '7' + phpunitPhpVersion;
-	} else if ( [ '7.2', '7.3', '7.4' ].indexOf( testsPhpVersion ) >= 0 ) {
+	} else if ( testsPhpVersion === '7.2' ) {
 		phpunitTag = '8' + phpunitPhpVersion;
-	} else if ( testsPhpVersion === '8.0' ) {
+	} else if (
+		[ '7.3', '7.4', '8.0', '8.1', '8.2' ].indexOf( testsPhpVersion ) >= 0
+	) {
 		phpunitTag = '9' + phpunitPhpVersion;
 	}
 	const phpunitImage = `wordpressdevelop/phpunit:${ phpunitTag }`;
@@ -184,6 +208,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				image: 'mariadb',
 				ports: [ '3306' ],
 				environment: {
+					MYSQL_ROOT_HOST: '%',
 					MYSQL_ROOT_PASSWORD:
 						dbEnv.credentials.WORDPRESS_DB_PASSWORD,
 					MYSQL_DATABASE: dbEnv.development.WORDPRESS_DB_NAME,
@@ -194,6 +219,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				image: 'mariadb',
 				ports: [ '3306' ],
 				environment: {
+					MYSQL_ROOT_HOST: '%',
 					MYSQL_ROOT_PASSWORD:
 						dbEnv.credentials.WORDPRESS_DB_PASSWORD,
 					MYSQL_DATABASE: dbEnv.tests.WORDPRESS_DB_NAME,
@@ -208,6 +234,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				environment: {
 					...dbEnv.credentials,
 					...dbEnv.development,
+					WP_TESTS_DIR: '/wordpress-phpunit',
 				},
 				volumes: developmentMounts,
 			},
@@ -218,6 +245,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				environment: {
 					...dbEnv.credentials,
 					...dbEnv.tests,
+					WP_TESTS_DIR: '/wordpress-phpunit',
 				},
 				volumes: testsMounts,
 			},
@@ -229,6 +257,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				environment: {
 					...dbEnv.credentials,
 					...dbEnv.development,
+					WP_TESTS_DIR: '/wordpress-phpunit',
 				},
 			},
 			'tests-cli': {
@@ -239,6 +268,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				environment: {
 					...dbEnv.credentials,
 					...dbEnv.tests,
+					WP_TESTS_DIR: '/wordpress-phpunit',
 				},
 			},
 			composer: {
@@ -256,8 +286,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				],
 				environment: {
 					LOCAL_DIR: 'html',
-					WP_PHPUNIT__TESTS_CONFIG:
-						'/var/www/html/phpunit-wp-config.php',
+					WP_TESTS_DIR: '/wordpress-phpunit',
 					...dbEnv.credentials,
 					...dbEnv.tests,
 				},

@@ -28,24 +28,20 @@ export function mode( inputArray ) {
 }
 
 /**
- * Returns the most common CSS unit in the radius values.
- * Falls back to `px` as a default unit.
+ * Returns the most common CSS unit from the current CSS unit selections.
  *
- * @param {Object|string} values Radius values.
- * @return {string}              Most common CSS unit in values. Default: `px`.
+ * - If a single flat border radius is set, its unit will be used
+ * - If individual corner selections, the most common of those will be used
+ * - Failing any unit selections a default of 'px' is returned.
+ *
+ * @param {Object} selectedUnits Unit selections for flat radius & each corner.
+ * @return {string} Most common CSS unit from current selections. Default: `px`.
  */
-export function getAllUnit( values = {} ) {
-	if ( typeof values === 'string' ) {
-		const [ , unit ] = parseQuantityAndUnitFromRawValue( values );
-		return unit || 'px';
-	}
-
-	const allUnits = Object.values( values ).map( ( value ) => {
-		const [ , unit ] = parseQuantityAndUnitFromRawValue( value );
-		return unit;
-	} );
-
-	return mode( allUnits ) || 'px';
+export function getAllUnit( selectedUnits = {} ) {
+	const { flat, ...cornerUnits } = selectedUnits;
+	return (
+		flat || mode( Object.values( cornerUnits ).filter( Boolean ) ) || 'px'
+	);
 }
 
 /**

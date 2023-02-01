@@ -1,11 +1,13 @@
 /**
  * External dependencies
  */
-import { keyBy, map, groupBy, flowRight, isEqual, get } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
+import { groupBy, get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import { compose } from '@wordpress/compose';
 import { combineReducers } from '@wordpress/data';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
@@ -55,14 +57,18 @@ export function users( state = { byId: {}, queries: {} }, action ) {
 			return {
 				byId: {
 					...state.byId,
-					...keyBy( action.users, 'id' ),
+					// Key users by their ID.
+					...action.users.reduce(
+						( newUsers, user ) => ( {
+							...newUsers,
+							[ user.id ]: user,
+						} ),
+						{}
+					),
 				},
 				queries: {
 					...state.queries,
-					[ action.queryID ]: map(
-						action.users,
-						( user ) => user.id
-					),
+					[ action.queryID ]: action.users.map( ( user ) => user.id ),
 				},
 			};
 	}
@@ -190,7 +196,7 @@ export function themeGlobalStyleVariations( state = {}, action ) {
  * @return {AnyFunction} Reducer.
  */
 function entity( entityConfig ) {
-	return flowRight( [
+	return compose( [
 		// Limit to matching action type so we don't attempt to replace action on
 		// an unhandled action.
 		ifMatchingAction(
@@ -237,7 +243,7 @@ function entity( entityConfig ) {
 										// Edits are the "raw" attribute values, but records may have
 										// objects with more properties, so we use `get` here for the
 										// comparison.
-										! isEqual(
+										! fastDeepEqual(
 											edits[ key ],
 											get(
 												record[ key ],
@@ -248,7 +254,7 @@ function entity( entityConfig ) {
 										// Sometimes the server alters the sent value which means
 										// we need to also remove the edits before the api request.
 										( ! action.persistedEdits ||
-											! isEqual(
+											! fastDeepEqual(
 												edits[ key ],
 												action.persistedEdits[ key ]
 											) )

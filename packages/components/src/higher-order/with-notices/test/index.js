@@ -5,6 +5,7 @@ import {
 	act,
 	render,
 	fireEvent,
+	screen,
 	waitForElementToBeRemoved,
 	within,
 } from '@testing-library/react';
@@ -48,7 +49,7 @@ const BaseComponent = ( { noticeOperations, noticeUI, notifications } ) => {
 				noticeOperations.createNotice( item )
 			);
 		}
-	}, [] );
+	}, [ noticeOperations, notifications ] );
 	return (
 		<div>
 			{ noticeUI }
@@ -90,7 +91,7 @@ describe( 'withNotices operations', () => {
 		act( () => {
 			handle.current.createNotice( { content: message } );
 		} );
-		expect( getByText( message ) ).not.toBeNull();
+		expect( getByText( message ) ).toBeInTheDocument();
 	} );
 
 	it( 'should create notices of error status with createErrorNotice', () => {
@@ -100,6 +101,7 @@ describe( 'withNotices operations', () => {
 		act( () => {
 			handle.current.createErrorNotice( message );
 		} );
+		// eslint-disable-next-line testing-library/no-node-access
 		expect( getByText( message )?.closest( '.is-error' ) ).not.toBeNull();
 	} );
 
@@ -145,10 +147,11 @@ describe( 'withNotices rendering', () => {
 	it( 'should display notices with functioning dismissal triggers', async () => {
 		const messages = [ 'Aló!', 'hu dis?', 'Otis' ];
 		const notices = noticesFrom( messages );
-		const { container, getAllByLabelText } = render(
+		const { container } = render(
 			<TestComponent notifications={ notices } />
 		);
-		const [ buttonRemoveFirst ] = getAllByLabelText( stockDismissText );
+		const [ buttonRemoveFirst ] =
+			screen.getAllByLabelText( stockDismissText );
 		const getRemovalTarget = () =>
 			within( container ).getByText(
 				// The last item corresponds to the first notice in the DOM.

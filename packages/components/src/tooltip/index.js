@@ -1,8 +1,4 @@
 // @ts-nocheck
-/**
- * External dependencies
- */
-import { includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -14,7 +10,7 @@ import {
 	useEffect,
 	useState,
 } from '@wordpress/element';
-import { useDebounce } from '@wordpress/compose';
+import { useDebounce, useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -31,29 +27,45 @@ export const TOOLTIP_DELAY = 700;
 
 const eventCatcher = <div className="event-catcher" />;
 
-const getDisabledElement = ( { eventHandlers, child, childrenWithPopover } ) =>
-	cloneElement(
+const getDisabledElement = ( {
+	eventHandlers,
+	child,
+	childrenWithPopover,
+	mergedRefs,
+} ) => {
+	return cloneElement(
 		<span className="disabled-element-wrapper">
 			{ cloneElement( eventCatcher, eventHandlers ) }
 			{ cloneElement( child, {
 				children: childrenWithPopover,
+				ref: mergedRefs,
 			} ) }
 		</span>,
-		eventHandlers
+		{ ...eventHandlers }
 	);
+};
 
-const getRegularElement = ( { child, eventHandlers, childrenWithPopover } ) =>
-	cloneElement( child, {
+const getRegularElement = ( {
+	child,
+	eventHandlers,
+	childrenWithPopover,
+	mergedRefs,
+} ) => {
+	return cloneElement( child, {
 		...eventHandlers,
 		children: childrenWithPopover,
+		ref: mergedRefs,
 	} );
+};
 
 const addPopoverToGrandchildren = ( {
+	anchor,
 	grandchildren,
 	isOver,
+	offset,
 	position,
-	text,
 	shortcut,
+	text,
 } ) =>
 	concatChildren(
 		grandchildren,
@@ -64,8 +76,9 @@ const addPopoverToGrandchildren = ( {
 				className="components-tooltip"
 				aria-hidden="true"
 				animate={ false }
-				offset={ 12 }
-				__unstableShift
+				offset={ offset }
+				anchor={ anchor }
+				shift
 			>
 				{ text }
 				<Shortcut
@@ -110,8 +123,29 @@ function Tooltip( props ) {
 	const [ isMouseDown, setIsMouseDown ] = useState( false );
 	const [ isOver, setIsOver ] = useState( false );
 	const delayedSetIsOver = useDebounce( setIsOver, delay );
+	// Using internal state (instead of a ref) for the popover anchor to make sure
+	// that the component re-renders when the anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+
+	// Create a reference to the Tooltip's child, to be passed to the Popover
+	// so that the Tooltip can be correctly positioned. Also, merge with the
+	// existing ref for the first child, so that its ref is preserved.
+	const existingChildRef = Children.toArray( children )[ 0 ]?.ref;
+	const mergedChildRefs = useMergeRefs( [
+		setPopoverAnchor,
+		existingChildRef,
+	] );
 
 	const createMouseDown = ( event ) => {
+		// In firefox, the mouse down event is also fired when the select
+		// list is chosen.
+		// Cancel further processing because re-rendering of child components
+		// causes onChange to be triggered with the old value.
+		// See https://github.com/WordPress/gutenberg/pull/42483
+		if ( event.target.tagName === 'OPTION' ) {
+			return;
+		}
+
 		// Preserve original child callback behavior.
 		emitToChild( children, 'onMouseDown', event );
 
@@ -124,6 +158,15 @@ function Tooltip( props ) {
 	};
 
 	const createMouseUp = ( event ) => {
+		// In firefox, the mouse up event is also fired when the select
+		// list is chosen.
+		// Cancel further processing because re-rendering of child components
+		// causes onChange to be triggered with the old value.
+		// See https://github.com/WordPress/gutenberg/pull/42483
+		if ( event.target.tagName === 'OPTION' ) {
+			return;
+		}
+
 		emitToChild( children, 'onMouseUp', event );
 		document.removeEventListener( 'mouseup', cancelIsMouseDown );
 		setIsMouseDown( false );
@@ -150,7 +193,7 @@ function Tooltip( props ) {
 			// Mouse events behave unreliably in React for disabled elements,
 			// firing on mouseenter but not mouseleave.  Further, the default
 			// behavior for disabled elements in some browsers is to ignore
-			// mouse events. Don't bother trying to to handle them.
+			// mouse events. Don't bother trying to handle them.
 			//
 			// See: https://github.com/facebook/react/issues/4251
 			if ( event.currentTarget.disabled ) {
@@ -168,7 +211,7 @@ function Tooltip( props ) {
 			// quickly blur/mouseleave before delayedSetIsOver is called.
 			delayedSetIsOver.cancel();
 
-			const _isOver = includes( [ 'focus', 'mouseenter' ], event.type );
+			const _isOver = [ 'focus', 'mouseenter' ].includes( event.type );
 			if ( _isOver === isOver ) {
 				return;
 			}
@@ -185,6 +228,9 @@ function Tooltip( props ) {
 		document.removeEventListener( 'mouseup', cancelIsMouseDown );
 	};
 
+	// Ignore reason: updating the deps array here could cause unexpected changes in behavior.
+	// Deferring until a more detailed investigation/refactor can be performed.
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect( () => clearOnUnmount, [] );
 
 	if ( Children.count( children ) !== 1 ) {
@@ -214,10 +260,12 @@ function Tooltip( props ) {
 		: getRegularElement;
 
 	const popoverData = {
+		anchor: popoverAnchor,
 		isOver,
+		offset: 4,
 		position,
-		text,
 		shortcut,
+		text,
 	};
 	const childrenWithPopover = addPopoverToGrandchildren( {
 		grandchildren,
@@ -228,6 +276,7 @@ function Tooltip( props ) {
 		child,
 		eventHandlers,
 		childrenWithPopover,
+		mergedRefs: mergedChildRefs,
 	} );
 }
 

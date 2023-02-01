@@ -112,6 +112,9 @@ function BottomSheetNavigationContainer( {
 				}
 			}
 		},
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[ currentHeight ]
 	);
 
@@ -133,6 +136,9 @@ function BottomSheetNavigationContainer( {
 				/>
 			);
 		} );
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ children ] );
 
 	return useMemo( () => {
@@ -158,6 +164,9 @@ function BottomSheetNavigationContainer( {
 				</BottomSheetNavigationProvider>
 			</View>
 		);
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ currentHeight, _theme ] );
 }
 

@@ -21,6 +21,7 @@ const LineHeightControl = ( {
 	/** Start opting into the new margin-free styles that will become the default in a future version. */
 	__nextHasNoMarginBottom = false,
 	__unstableInputWidth = '60px',
+	...otherProps
 } ) => {
 	const isDefined = isLineHeightDefined( lineHeight );
 
@@ -89,6 +90,7 @@ const LineHeightControl = ( {
 			style={ deprecatedStyles }
 		>
 			<NumberControl
+				{ ...otherProps }
 				__unstableInputWidth={ __unstableInputWidth }
 				__unstableStateReducer={ stateReducer }
 				onChange={ onChange }
@@ -97,6 +99,7 @@ const LineHeightControl = ( {
 				step={ STEP }
 				value={ value }
 				min={ 0 }
+				spinControls="custom"
 			/>
 		</div>
 	);

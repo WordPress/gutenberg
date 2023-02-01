@@ -50,7 +50,7 @@ const hasCssnanoConfig = () =>
  *
  * @param {"e2e"|"unit"} suffix Suffix of configuration file to accept.
  *
- * @return {string=} Override or fallback configuration file path.
+ * @return {string= | undefined} Override or fallback configuration file path.
  */
 function getJestOverrideConfigFile( suffix ) {
 	if ( hasArgInCLI( '-c' ) || hasArgInCLI( '--config' ) ) {
@@ -169,6 +169,16 @@ const getWebpackArgs = () => {
 };
 
 /**
+ * Returns the WordPress source directory. It defaults to 'src' if the
+ * `process.env.WP_SRC_DIRECTORY` variable is not set.
+ *
+ * @return {string} The WordPress source directory.
+ */
+function getWordPressSrcDirectory() {
+	return process.env.WP_SRC_DIRECTORY || 'src';
+}
+
+/**
  * Detects the list of entry points to use with webpack. There are three ways to do this:
  *  1. Use the legacy webpack 4 format passed as CLI arguments.
  *  2. Scan `block.json` files for scripts.
@@ -185,10 +195,10 @@ function getWebpackEntryPoints() {
 	}
 
 	// Continue only if the source directory exists.
-	if ( ! hasProjectFile( process.env.WP_SRC_DIRECTORY ) ) {
+	if ( ! hasProjectFile( getWordPressSrcDirectory() ) ) {
 		log(
 			chalk.yellow(
-				`Source directory "${ process.env.WP_SRC_DIRECTORY }" was not found. Please confirm there is a "src" directory in the root or the value passed to --webpack-src-dir is correct.`
+				`Source directory "${ getWordPressSrcDirectory() }" was not found. Please confirm there is a "src" directory in the root or the value passed to --webpack-src-dir is correct.`
 			)
 		);
 		return {};
@@ -197,7 +207,7 @@ function getWebpackEntryPoints() {
 	// 2. Checks whether any block metadata files can be detected in the defined source directory.
 	//    It scans all discovered files looking for JavaScript assets and converts them to entry points.
 	const blockMetadataFiles = glob(
-		`${ process.env.WP_SRC_DIRECTORY }/**/block.json`,
+		`${ getWordPressSrcDirectory() }/**/block.json`,
 		{
 			absolute: true,
 		}
@@ -205,7 +215,7 @@ function getWebpackEntryPoints() {
 
 	if ( blockMetadataFiles.length > 0 ) {
 		const srcDirectory = fromProjectRoot(
-			process.env.WP_SRC_DIRECTORY + sep
+			getWordPressSrcDirectory() + sep
 		);
 		const entryPoints = blockMetadataFiles.reduce(
 			( accumulator, blockMetadataFile ) => {
@@ -232,9 +242,7 @@ function getWebpackEntryPoints() {
 									) }" listed in "${ blockMetadataFile.replace(
 										fromProjectRoot( sep ),
 										''
-									) }". File is located outside of the "${
-										process.env.WP_SRC_DIRECTORY
-									}" directory.`
+									) }". File is located outside of the "${ getWordPressSrcDirectory() }" directory.`
 								)
 							);
 							return;
@@ -246,7 +254,7 @@ function getWebpackEntryPoints() {
 
 						// Detects the proper file extension used in the defined source directory.
 						const [ entryFilepath ] = glob(
-							`${ process.env.WP_SRC_DIRECTORY }/${ entryName }.[jt]s?(x)`,
+							`${ getWordPressSrcDirectory() }/${ entryName }.[jt]s?(x)`,
 							{
 								absolute: true,
 							}
@@ -261,9 +269,7 @@ function getWebpackEntryPoints() {
 									) }" listed in "${ blockMetadataFile.replace(
 										fromProjectRoot( sep ),
 										''
-									) }". File does not exist in the "${
-										process.env.WP_SRC_DIRECTORY
-									}" directory.`
+									) }". File does not exist in the "${ getWordPressSrcDirectory() }" directory.`
 								)
 							);
 							return;
@@ -283,7 +289,7 @@ function getWebpackEntryPoints() {
 	// 3. Checks whether a standard file name can be detected in the defined source directory,
 	//    and converts the discovered file to entry point.
 	const [ entryFile ] = glob(
-		`${ process.env.WP_SRC_DIRECTORY }/index.[jt]s?(x)`,
+		`${ getWordPressSrcDirectory() }/index.[jt]s?(x)`,
 		{
 			absolute: true,
 		}
@@ -291,7 +297,7 @@ function getWebpackEntryPoints() {
 	if ( ! entryFile ) {
 		log(
 			chalk.yellow(
-				`No entry file discovered in the "${ process.env.WP_SRC_DIRECTORY }" directory.`
+				`No entry file discovered in the "${ getWordPressSrcDirectory() }" directory.`
 			)
 		);
 		return {};
@@ -302,10 +308,65 @@ function getWebpackEntryPoints() {
 	};
 }
 
+/**
+ * Returns the list of paths included in the `render` props by scanning the `block.json` files.
+ *
+ * @return {Array}  The list of all the `render` prop paths included in `block.json` files.
+ */
+function getRenderPropPaths() {
+	// Continue only if the source directory exists.
+	if ( ! hasProjectFile( getWordPressSrcDirectory() ) ) {
+		return [];
+	}
+
+	// Checks whether any block metadata files can be detected in the defined source directory.
+	const blockMetadataFiles = glob(
+		`${ getWordPressSrcDirectory() }/**/block.json`,
+		{
+			absolute: true,
+		}
+	);
+
+	const srcDirectory = fromProjectRoot( getWordPressSrcDirectory() + sep );
+
+	const renderPaths = blockMetadataFiles.map( ( blockMetadataFile ) => {
+		const { render } = JSON.parse( readFileSync( blockMetadataFile ) );
+		if ( render && render.startsWith( 'file:' ) ) {
+			// Removes the `file:` prefix.
+			const filepath = join(
+				dirname( blockMetadataFile ),
+				render.replace( 'file:', '' )
+			);
+
+			// Takes the path without the file extension, and relative to the defined source directory.
+			if ( ! filepath.startsWith( srcDirectory ) ) {
+				log(
+					chalk.yellow(
+						`Skipping "${ render.replace(
+							'file:',
+							''
+						) }" listed in "${ blockMetadataFile.replace(
+							fromProjectRoot( sep ),
+							''
+						) }". File is located outside of the "${ getWordPressSrcDirectory() }" directory.`
+					)
+				);
+				return false;
+			}
+			return filepath;
+		}
+		return false;
+	} );
+
+	return renderPaths.filter( ( renderPath ) => renderPath );
+}
+
 module.exports = {
 	getJestOverrideConfigFile,
 	getWebpackArgs,
+	getWordPressSrcDirectory,
 	getWebpackEntryPoints,
+	getRenderPropPaths,
 	hasBabelConfig,
 	hasCssnanoConfig,
 	hasJestConfig,

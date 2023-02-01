@@ -1,22 +1,20 @@
 /**
  * External dependencies
  */
-import { get, has, isEmpty, kebabCase, omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { useContext, createPortal } from '@wordpress/element';
+import { useContext, useMemo, createPortal } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import {
 	getBlockSupport,
 	hasBlockSupport,
-	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
 } from '@wordpress/blocks';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
-import { getCSSRules } from '@wordpress/style-engine';
+import { getCSSRules, compileCSS } from '@wordpress/style-engine';
 
 /**
  * Internal dependencies
@@ -29,7 +27,11 @@ import {
 	TYPOGRAPHY_SUPPORT_KEY,
 	TYPOGRAPHY_SUPPORT_KEYS,
 } from './typography';
-import { SPACING_SUPPORT_KEY, DimensionsPanel } from './dimensions';
+import {
+	DIMENSIONS_SUPPORT_KEY,
+	SPACING_SUPPORT_KEY,
+	DimensionsPanel,
+} from './dimensions';
 import useDisplayBlockControls from '../components/use-display-block-controls';
 import { shouldSkipSerialization } from './utils';
 
@@ -37,25 +39,12 @@ const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
 	BORDER_SUPPORT_KEY,
 	COLOR_SUPPORT_KEY,
+	DIMENSIONS_SUPPORT_KEY,
 	SPACING_SUPPORT_KEY,
 ];
 
 const hasStyleSupport = ( blockType ) =>
 	styleSupportKeys.some( ( key ) => hasBlockSupport( blockType, key ) );
-
-const VARIABLE_REFERENCE_PREFIX = 'var:';
-const VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE = '|';
-const VARIABLE_PATH_SEPARATOR_TOKEN_STYLE = '--';
-function compileStyleValue( uncompiledValue ) {
-	if ( uncompiledValue?.startsWith?.( VARIABLE_REFERENCE_PREFIX ) ) {
-		const variable = uncompiledValue
-			.slice( VARIABLE_REFERENCE_PREFIX.length )
-			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
-			.join( VARIABLE_PATH_SEPARATOR_TOKEN_STYLE );
-		return `var(--wp--${ variable })`;
-	}
-	return uncompiledValue;
-}
 
 /**
  * Returns the inline styles to add depending on the style object
@@ -65,66 +54,14 @@ function compileStyleValue( uncompiledValue ) {
  * @return {Object} Flattened CSS variables declaration.
  */
 export function getInlineStyles( styles = {} ) {
-	const ignoredStyles = [ 'spacing.blockGap' ];
 	const output = {};
-	Object.keys( STYLE_PROPERTY ).forEach( ( propKey ) => {
-		const path = STYLE_PROPERTY[ propKey ].value;
-		const subPaths = STYLE_PROPERTY[ propKey ].properties;
-		// Ignore styles on elements because they are handled on the server.
-		if ( has( styles, path ) && 'elements' !== path?.[ 0 ] ) {
-			// Checking if style value is a string allows for shorthand css
-			// option and backwards compatibility for border radius support.
-			const styleValue = get( styles, path );
-
-			if ( ! STYLE_PROPERTY[ propKey ].useEngine ) {
-				if ( !! subPaths && typeof styleValue !== 'string' ) {
-					Object.entries( subPaths ).forEach( ( entry ) => {
-						const [ name, subPath ] = entry;
-						const value = get( styleValue, [ subPath ] );
-
-						if ( value ) {
-							output[ name ] = compileStyleValue( value );
-						}
-					} );
-				} else if ( ! ignoredStyles.includes( path.join( '.' ) ) ) {
-					output[ propKey ] = compileStyleValue(
-						get( styles, path )
-					);
-				}
-			}
-		}
-	} );
-
 	// The goal is to move everything to server side generated engine styles
 	// This is temporary as we absorb more and more styles into the engine.
-	const extraRules = getCSSRules( styles );
-	extraRules.forEach( ( rule ) => {
+	getCSSRules( styles ).forEach( ( rule ) => {
 		output[ rule.key ] = rule.value;
 	} );
 
 	return output;
-}
-
-function compileElementsStyles( selector, elements = {} ) {
-	return Object.entries( elements )
-		.map( ( [ element, styles ] ) => {
-			const elementStyles = getInlineStyles( styles );
-			if ( ! isEmpty( elementStyles ) ) {
-				// The .editor-styles-wrapper selector is required on elements styles. As it is
-				// added to all other editor styles, not providing it causes reset and global
-				// styles to override element styles because of higher specificity.
-				return [
-					`.editor-styles-wrapper .${ selector } ${ ELEMENTS[ element ] }{`,
-					...Object.entries( elementStyles ).map(
-						( [ cssProperty, value ] ) =>
-							`\t${ kebabCase( cssProperty ) }: ${ value };`
-					),
-					'}',
-				].join( '\n' );
-			}
-			return '';
-		} )
-		.join( '\n' );
 }
 
 /**
@@ -166,8 +103,11 @@ const skipSerializationPathsEdit = {
 	[ `${ TYPOGRAPHY_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
 		TYPOGRAPHY_SUPPORT_KEY,
 	],
+	[ `${ DIMENSIONS_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
+		DIMENSIONS_SUPPORT_KEY,
+	],
 	[ `${ SPACING_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
-		'spacing',
+		SPACING_SUPPORT_KEY,
 	],
 };
 
@@ -202,6 +142,126 @@ const skipSerializationPathsSave = {
 const renamedFeatures = { gradients: 'gradient' };
 
 /**
+ * A utility function used to remove one or more paths from a style object.
+ * Works in a way similar to Lodash's `omit()`. See unit tests and examples below.
+ *
+ * It supports a single string path:
+ *
+ * ```
+ * omitStyle( { color: 'red' }, 'color' ); // {}
+ * ```
+ *
+ * or an array of paths:
+ *
+ * ```
+ * omitStyle( { color: 'red', background: '#fff' }, [ 'color', 'background' ] ); // {}
+ * ```
+ *
+ * It also allows you to specify paths at multiple levels in a string.
+ *
+ * ```
+ * omitStyle( { typography: { textDecoration: 'underline' } }, 'typography.textDecoration' ); // {}
+ * ```
+ *
+ * You can remove multiple paths at the same time:
+ *
+ * ```
+ * omitStyle(
+ * 		{
+ * 			typography: {
+ * 				textDecoration: 'underline',
+ * 				textTransform: 'uppercase',
+ * 			}
+ *		},
+ *		[
+ * 			'typography.textDecoration',
+ * 			'typography.textTransform',
+ *		]
+ * );
+ * // {}
+ * ```
+ *
+ * You can also specify nested paths as arrays:
+ *
+ * ```
+ * omitStyle(
+ * 		{
+ * 			typography: {
+ * 				textDecoration: 'underline',
+ * 				textTransform: 'uppercase',
+ * 			}
+ *		},
+ *		[
+ * 			[ 'typography', 'textDecoration' ],
+ * 			[ 'typography', 'textTransform' ],
+ *		]
+ * );
+ * // {}
+ * ```
+ *
+ * With regards to nesting of styles, infinite depth is supported:
+ *
+ * ```
+ * omitStyle(
+ * 		{
+ * 			border: {
+ * 				radius: {
+ * 					topLeft: '10px',
+ * 					topRight: '0.5rem',
+ * 				}
+ * 			}
+ *		},
+ *		[
+ * 			[ 'border', 'radius', 'topRight' ],
+ *		]
+ * );
+ * // { border: { radius: { topLeft: '10px' } } }
+ * ```
+ *
+ * The third argument, `preserveReference`, defines how to treat the input style object.
+ * It is mostly necessary to properly handle mutation when recursively handling the style object.
+ * Defaulting to `false`, this will always create a new object, avoiding to mutate `style`.
+ * However, when recursing, we change that value to `true` in order to work with a single copy
+ * of the original style object.
+ *
+ * @see https://lodash.com/docs/4.17.15#omit
+ *
+ * @param {Object}       style             Styles object.
+ * @param {Array|string} paths             Paths to remove.
+ * @param {boolean}      preserveReference True to mutate the `style` object, false otherwise.
+ * @return {Object}      Styles object with the specified paths removed.
+ */
+export function omitStyle( style, paths, preserveReference = false ) {
+	if ( ! style ) {
+		return style;
+	}
+
+	let newStyle = style;
+	if ( ! preserveReference ) {
+		newStyle = JSON.parse( JSON.stringify( style ) );
+	}
+
+	if ( ! Array.isArray( paths ) ) {
+		paths = [ paths ];
+	}
+
+	paths.forEach( ( path ) => {
+		if ( ! Array.isArray( path ) ) {
+			path = path.split( '.' );
+		}
+
+		if ( path.length > 1 ) {
+			const [ firstSubpath, ...restPath ] = path;
+			omitStyle( newStyle[ firstSubpath ], [ restPath ], true );
+		} else if ( path.length === 1 ) {
+			delete newStyle[ path[ 0 ] ];
+		}
+	} );
+
+	return newStyle;
+}
+
+/**
  * Override props assigned to save component to inject the CSS variables definition.
  *
  * @param {Object}                    props      Additional props applied to save element.
@@ -226,13 +286,13 @@ export function addSaveProps(
 		const skipSerialization = getBlockSupport( blockType, indicator );
 
 		if ( skipSerialization === true ) {
-			style = omit( style, path );
+			style = omitStyle( style, path );
 		}
 
 		if ( Array.isArray( skipSerialization ) ) {
 			skipSerialization.forEach( ( featureName ) => {
 				const feature = renamedFeatures[ featureName ] || featureName;
-				style = omit( style, [ [ ...path, feature ] ] );
+				style = omitStyle( style, [ [ ...path, feature ] ] );
 			} );
 		}
 	} );
@@ -306,7 +366,7 @@ export const withBlockControls = createHigherOrderComponent(
 );
 
 /**
- * Override the default block element to include duotone styles.
+ * Override the default block element to include elements styles.
  *
  * @param {Function} BlockListBlock Original component
  * @return {Function}                Wrapped component
@@ -323,23 +383,46 @@ const withElementsStyles = createHigherOrderComponent(
 			'link'
 		);
 
-		// The Elements API only supports link colors for now,
-		// hence the specific omission of `link` in the elements styles.
-		// This might need to be refactored or removed if the Elements API
-		// changes or `link` supports styles beyond `color`.
-		const elements = skipLinkColorSerialization
-			? omit( props.attributes.style?.elements, [ 'link' ] )
-			: props.attributes.style?.elements;
+		const styles = useMemo( () => {
+			const rawElementsStyles = props.attributes.style?.elements;
+			const elementCssRules = [];
+			if (
+				rawElementsStyles &&
+				Object.keys( rawElementsStyles ).length > 0
+			) {
+				// Remove values based on whether serialization has been skipped for a specific style.
+				const filteredElementsStyles = {
+					...rawElementsStyles,
+					link: {
+						...rawElementsStyles.link,
+						color: ! skipLinkColorSerialization
+							? rawElementsStyles.link?.color
+							: undefined,
+					},
+				};
 
-		const styles = compileElementsStyles(
-			blockElementsContainerIdentifier,
-			elements
-		);
+				for ( const [ elementName, elementStyles ] of Object.entries(
+					filteredElementsStyles
+				) ) {
+					const cssRule = compileCSS( elementStyles, {
+						// The .editor-styles-wrapper selector is required on elements styles. As it is
+						// added to all other editor styles, not providing it causes reset and global
+						// styles to override element styles because of higher specificity.
+						selector: `.editor-styles-wrapper .${ blockElementsContainerIdentifier } ${ ELEMENTS[ elementName ] }`,
+					} );
+					if ( !! cssRule ) {
+						elementCssRules.push( cssRule );
+					}
+				}
+			}
+			return elementCssRules.length > 0 ? elementCssRules : undefined;
+		}, [ props.attributes.style?.elements ] );
+
 		const element = useContext( BlockList.__unstableElementContext );
 
 		return (
 			<>
-				{ elements &&
+				{ styles &&
 					element &&
 					createPortal(
 						<style
@@ -353,7 +436,7 @@ const withElementsStyles = createHigherOrderComponent(
 				<BlockListBlock
 					{ ...props }
 					className={
-						elements
+						props.attributes.style?.elements
 							? classnames(
 									props.className,
 									blockElementsContainerIdentifier

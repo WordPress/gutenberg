@@ -12,15 +12,15 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 	 */
 	private $test_block_name;
 
-	function setUp() {
-		parent::setUp();
+	public function set_up() {
+		parent::set_up();
 		$this->test_block_name = null;
 	}
 
-	function tearDown() {
+	public function tear_down() {
 		unregister_block_type( $this->test_block_name );
 		$this->test_block_name = null;
-		parent::tearDown();
+		parent::tear_down();
 	}
 
 	/**
@@ -53,7 +53,7 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 		return $registry->get_registered( $this->test_block_name );
 	}
 
-	function test_border_object_with_no_styles() {
+	public function test_border_object_with_no_styles() {
 		$block_type  = self::register_bordered_block_with_support(
 			'test/border-object-with-no-styles',
 			array(
@@ -72,7 +72,7 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 		$this->assertSame( $expected, $actual );
 	}
 
-	function test_border_object_with_invalid_style_prop() {
+	public function test_border_object_with_invalid_style_prop() {
 		$block_type  = self::register_bordered_block_with_support(
 			'test/border-object-with-invalid-style-prop',
 			array(
@@ -91,7 +91,7 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 		$this->assertSame( $expected, $actual );
 	}
 
-	function test_border_color_slug_with_numbers_is_kebab_cased_properly() {
+	public function test_border_color_slug_with_numbers_is_kebab_cased_properly() {
 		$block_type = self::register_bordered_block_with_support(
 			'test/border-color-slug-with-numbers-is-kebab-cased-properly',
 			array(
@@ -117,13 +117,13 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 		$actual   = gutenberg_apply_border_support( $block_type, $block_atts );
 		$expected = array(
 			'class' => 'has-border-color has-red-border-color',
-			'style' => 'border-radius: 10px; border-style: dashed; border-width: 1px;',
+			'style' => 'border-radius:10px;border-style:dashed;border-width:1px;',
 		);
 
 		$this->assertSame( $expected, $actual );
 	}
 
-	function test_flat_border_with_skipped_serialization() {
+	public function test_flat_border_with_skipped_serialization() {
 		$block_type = self::register_bordered_block_with_support(
 			'test/flat-border-with-skipped-serialization',
 			array(
@@ -153,7 +153,7 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 		$this->assertSame( $expected, $actual );
 	}
 
-	function test_flat_border_with_individual_skipped_serialization() {
+	public function test_flat_border_with_individual_skipped_serialization() {
 		$block_type = self::register_bordered_block_with_support(
 			'test/flat-border-with-individual-skipped-serialization',
 			array(
@@ -179,13 +179,13 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 
 		$actual   = gutenberg_apply_border_support( $block_type, $block_atts );
 		$expected = array(
-			'style' => 'border-style: dotted; border-width: 1px;',
+			'style' => 'border-style:dotted;border-width:1px;',
 		);
 
 		$this->assertSame( $expected, $actual );
 	}
 
-	function test_split_border_radius() {
+	public function test_split_border_radius() {
 		$block_type  = self::register_bordered_block_with_support(
 			'test/split-border-radius',
 			array(
@@ -208,13 +208,13 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 		);
 		$actual      = gutenberg_apply_border_support( $block_type, $block_attrs );
 		$expected    = array(
-			'style' => 'border-top-left-radius: 1em; border-top-right-radius: 2rem; border-bottom-left-radius: 30px; border-bottom-right-radius: 4vh;',
+			'style' => 'border-top-left-radius:1em;border-top-right-radius:2rem;border-bottom-left-radius:30px;border-bottom-right-radius:4vh;',
 		);
 
 		$this->assertSame( $expected, $actual );
 	}
 
-	function test_flat_border_with_custom_color() {
+	public function test_flat_border_with_custom_color() {
 		$block_type  = self::register_bordered_block_with_support(
 			'test/flat-border-with-custom-color',
 			array(
@@ -237,13 +237,13 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 		$actual      = gutenberg_apply_border_support( $block_type, $block_attrs );
 		$expected    = array(
 			'class' => 'has-border-color',
-			'style' => 'border-color: #72aee6; border-style: dashed; border-width: 2px;',
+			'style' => 'border-color:#72aee6;border-style:dashed;border-width:2px;',
 		);
 
 		$this->assertSame( $expected, $actual );
 	}
 
-	function test_split_borders_with_custom_colors() {
+	public function test_split_borders_with_custom_colors() {
 		$block_type  = self::register_bordered_block_with_support(
 			'test/split-borders-with-custom-colors',
 			array(
@@ -282,13 +282,13 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 		);
 		$actual      = gutenberg_apply_border_support( $block_type, $block_attrs );
 		$expected    = array(
-			'style' => 'border-top-width: 2px; border-top-color: #72aee6; border-top-style: dashed; border-right-width: 0.25rem; border-right-color: #e65054; border-right-style: dotted; border-bottom-width: 0.5em; border-bottom-color: #007017; border-bottom-style: solid; border-left-width: 1px; border-left-color: #f6f7f7; border-left-style: solid;',
+			'style' => 'border-top-width:2px;border-top-color:#72aee6;border-top-style:dashed;border-right-width:0.25rem;border-right-color:#e65054;border-right-style:dotted;border-bottom-width:0.5em;border-bottom-color:#007017;border-bottom-style:solid;border-left-width:1px;border-left-color:#f6f7f7;border-left-style:solid;',
 		);
 
 		$this->assertSame( $expected, $actual );
 	}
 
-	function test_split_borders_with_skipped_serialization() {
+	public function test_split_borders_with_skipped_serialization() {
 		$block_type  = self::register_bordered_block_with_support(
 			'test/split-borders-with-skipped-serialization',
 			array(
@@ -332,7 +332,7 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 		$this->assertSame( $expected, $actual );
 	}
 
-	function test_split_borders_with_skipped_individual_feature_serialization() {
+	public function test_split_borders_with_skipped_individual_feature_serialization() {
 		$block_type  = self::register_bordered_block_with_support(
 			'test/split-borders-with-skipped-individual-feature-serialization',
 			array(
@@ -372,13 +372,13 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 		);
 		$actual      = gutenberg_apply_border_support( $block_type, $block_attrs );
 		$expected    = array(
-			'style' => 'border-top-color: #72aee6; border-right-color: #e65054; border-bottom-color: #007017; border-left-color: #f6f7f7;',
+			'style' => 'border-top-color:#72aee6;border-right-color:#e65054;border-bottom-color:#007017;border-left-color:#f6f7f7;',
 		);
 
 		$this->assertSame( $expected, $actual );
 	}
 
-	function test_partial_split_borders() {
+	public function test_partial_split_borders() {
 		$block_type  = self::register_bordered_block_with_support(
 			'test/partial-split-borders',
 			array(
@@ -409,13 +409,13 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 		);
 		$actual      = gutenberg_apply_border_support( $block_type, $block_attrs );
 		$expected    = array(
-			'style' => 'border-top-width: 2px; border-top-color: #72aee6; border-top-style: dashed; border-right-width: 0.25rem; border-right-color: #e65054; border-left-style: solid;',
+			'style' => 'border-top-width:2px;border-top-color:#72aee6;border-top-style:dashed;border-right-width:0.25rem;border-right-color:#e65054;border-left-style:solid;',
 		);
 
 		$this->assertSame( $expected, $actual );
 	}
 
-	function test_split_borders_with_named_colors() {
+	public function test_split_borders_with_named_colors() {
 		$block_type  = self::register_bordered_block_with_support(
 			'test/split-borders-with-named-colors',
 			array(
@@ -454,7 +454,7 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 		);
 		$actual      = gutenberg_apply_border_support( $block_type, $block_attrs );
 		$expected    = array(
-			'style' => 'border-top-width: 2px; border-top-color: var(--wp--preset--color--red); border-top-style: dashed; border-right-width: 0.25rem; border-right-color: var(--wp--preset--color--green); border-right-style: dotted; border-bottom-width: 0.5em; border-bottom-color: var(--wp--preset--color--blue); border-bottom-style: solid; border-left-width: 1px; border-left-color: var(--wp--preset--color--yellow); border-left-style: solid;',
+			'style' => 'border-top-width:2px;border-top-color:var(--wp--preset--color--red);border-top-style:dashed;border-right-width:0.25rem;border-right-color:var(--wp--preset--color--green);border-right-style:dotted;border-bottom-width:0.5em;border-bottom-color:var(--wp--preset--color--blue);border-bottom-style:solid;border-left-width:1px;border-left-color:var(--wp--preset--color--yellow);border-left-style:solid;',
 		);
 
 		$this->assertSame( $expected, $actual );

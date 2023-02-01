@@ -23,6 +23,8 @@ export function UnforwardedSpinner(
 		<StyledSpinner
 			className={ classNames( 'components-spinner', className ) }
 			viewBox="0 0 100 100"
+			width="16"
+			height="16"
 			xmlns="http://www.w3.org/2000/svg"
 			role="presentation"
 			focusable="false"

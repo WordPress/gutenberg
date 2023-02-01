@@ -17,7 +17,7 @@ import Button from '../../button';
 import { default as DatePicker } from '../date';
 import { default as TimePicker } from '../time';
 import type { DateTimePickerProps } from '../types';
-import { CalendarHelp } from './styles';
+import { Wrapper, CalendarHelp } from './styles';
 import { HStack } from '../../h-stack';
 import { Heading } from '../../heading';
 import { Spacer } from '../../spacer';
@@ -43,14 +43,14 @@ function UnforwardedDateTimePicker(
 	if ( ! __nextRemoveHelpButton ) {
 		deprecated( 'Help button in wp.components.DateTimePicker', {
 			since: '13.4',
-			version: '14.6', // Six months of plugin releases.
+			version: '15.8', // One year of plugin releases.
 			hint: 'Set the `__nextRemoveHelpButton` prop to `true` to remove this warning and opt in to the new behaviour, which will become the default in a future version.',
 		} );
 	}
 	if ( ! __nextRemoveResetButton ) {
 		deprecated( 'Reset button in wp.components.DateTimePicker', {
 			since: '13.4',
-			version: '14.6', // Six months of plugin releases.
+			version: '15.8', // One year of plugin releases.
 			hint: 'Set the `__nextRemoveResetButton` prop to `true` to remove this warning and opt in to the new behaviour, which will become the default in a future version.',
 		} );
 	}
@@ -63,7 +63,7 @@ function UnforwardedDateTimePicker(
 	}
 
 	return (
-		<div ref={ ref } className="components-datetime">
+		<Wrapper ref={ ref } className="components-datetime" spacing={ 4 }>
 			{ ! calendarHelpIsVisible && (
 				<>
 					<TimePicker
@@ -186,7 +186,7 @@ function UnforwardedDateTimePicker(
 					) }
 				</HStack>
 			) }
-		</div>
+		</Wrapper>
 	);
 }
 
@@ -207,6 +207,8 @@ function UnforwardedDateTimePicker(
  *       currentDate={ date }
  *       onChange={ ( newDate ) => setDate( newDate ) }
  *       is12Hour
+ *       __nextRemoveHelpButton
+ *       __nextRemoveResetButton
  *     />
  *   );
  * };

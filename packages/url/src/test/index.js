@@ -723,6 +723,16 @@ describe( 'getQueryArgs', () => {
 				)
 			).toEqual( data );
 		} );
+
+		it( 'should not blow up on malformed params', () => {
+			const url = 'https://andalouses.example/beach?foo=bar&baz=%E0%A4%A';
+
+			expect( () => getQueryArgs( url ) ).not.toThrow();
+			expect( getQueryArgs( url ) ).toEqual( {
+				baz: '%E0%A4%A',
+				foo: 'bar',
+			} );
+		} );
 	} );
 } );
 
@@ -1003,6 +1013,11 @@ describe( 'cleanForSlug', () => {
 		expect( cleanForSlug( '  -Is th@t Déjà_vu- 	' ) ).toBe(
 			'is-tht-deja_vu'
 		);
+	} );
+
+	it( 'Should replace multiple hyphens with a single one', () => {
+		expect( cleanForSlug( 'the long - cat' ) ).toBe( 'the-long-cat' );
+		expect( cleanForSlug( 'the----long---cat' ) ).toBe( 'the-long-cat' );
 	} );
 } );
 

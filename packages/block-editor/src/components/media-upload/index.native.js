@@ -3,8 +3,6 @@
  */
 import { Platform } from 'react-native';
 
-import { delay } from 'lodash';
-
 import prompt from 'react-native-prompt-android';
 
 /**
@@ -46,6 +44,8 @@ const URL_MEDIA_SOURCE = 'URL';
 const PICKER_OPENING_DELAY = 200;
 
 export class MediaUpload extends Component {
+	pickerTimeout;
+
 	constructor( props ) {
 		super( props );
 		this.onPickerPresent = this.onPickerPresent.bind( this );
@@ -76,6 +76,10 @@ export class MediaUpload extends Component {
 		if ( autoOpen ) {
 			this.onPickerPresent();
 		}
+	}
+
+	componentWillUnmount() {
+		clearTimeout( this.pickerTimeout );
 	}
 
 	getAllSources() {
@@ -189,7 +193,7 @@ export class MediaUpload extends Component {
 			// the delay below is required because on iOS this action sheet gets dismissed by the close event of the Inserter
 			// so this delay allows the Inserter to be closed fully before presenting action sheet.
 			if ( autoOpen && isIOS ) {
-				delay(
+				this.pickerTimeout = setTimeout(
 					() => this.picker.presentPicker(),
 					PICKER_OPENING_DELAY
 				);
@@ -311,10 +315,10 @@ export class MediaUpload extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
+		const { capabilities } = select( blockEditorStore ).getSettings();
 		return {
 			isAudioBlockMediaUploadEnabled:
-				select( blockEditorStore ).getSettings( 'capabilities' )
-					.isAudioBlockMediaUploadEnabled === true,
+				capabilities?.isAudioBlockMediaUploadEnabled === true,
 		};
 	} ),
 ] )( MediaUpload );

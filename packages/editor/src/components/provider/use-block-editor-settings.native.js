@@ -11,29 +11,29 @@ import { store as coreStore } from '@wordpress/core-data';
 import useBlockEditorSettings from './use-block-editor-settings.js';
 import { store as editorStore } from '../../store';
 
-function useNativeBlockEditorSettings( settings, hasTemplate ) {
-	const capabilities = settings.capabilities ?? {};
-	const editorSettings = useBlockEditorSettings( settings, hasTemplate );
+const EMPTY_BLOCKS_LIST = [];
 
-	const supportReusableBlock = capabilities.reusableBlock === true;
-	const { reusableBlocks } = useSelect(
-		( select ) => ( {
-			reusableBlocks: supportReusableBlock
-				? select( coreStore ).getEntityRecords(
-						'postType',
-						'wp_block',
-						// Unbounded queries are not supported on native so as a workaround, we set per_page with the maximum value that native version can handle.
-						// Related issue: https://github.com/wordpress-mobile/gutenberg-mobile/issues/2661
-						{ per_page: 100 }
-				  )
-				: [],
-		} ),
+function useNativeBlockEditorSettings( settings, hasTemplate ) {
+	const editorSettings = useBlockEditorSettings( settings, hasTemplate );
+	const supportReusableBlock = settings.capabilities?.reusableBlock === true;
+
+	const { reusableBlocks, isTitleSelected } = useSelect(
+		( select ) => {
+			return {
+				reusableBlocks: supportReusableBlock
+					? select( coreStore ).getEntityRecords(
+							'postType',
+							'wp_block',
+							// Unbounded queries are not supported on native so as a workaround, we set per_page with the maximum value that native version can handle.
+							// Related issue: https://github.com/wordpress-mobile/gutenberg-mobile/issues/2661
+							{ per_page: 100 }
+					  )
+					: EMPTY_BLOCKS_LIST,
+				isTitleSelected: select( editorStore ).isPostTitleSelected(),
+			};
+		},
 		[ supportReusableBlock ]
 	);
-
-	const { isTitleSelected } = useSelect( ( select ) => ( {
-		isTitleSelected: select( editorStore ).isPostTitleSelected(),
-	} ) );
 
 	return useMemo(
 		() => ( {

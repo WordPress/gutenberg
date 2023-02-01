@@ -16,11 +16,15 @@ data class GutenbergProps @JvmOverloads constructor(
     val enableMentions: Boolean,
     val enableXPosts: Boolean,
     val enableUnsupportedBlockEditor: Boolean,
+    val enableSupportSection: Boolean,
+    val enableOnlyCoreBlocks: Boolean,
     val canEnableUnsupportedBlockEditor: Boolean,
     val isAudioBlockMediaUploadEnabled: Boolean,
+    val shouldUseFastImage: Boolean,
     val enableReusableBlock: Boolean,
     val localeSlug: String,
     val postType: String,
+    val hostAppNamespace: String,
     val featuredImageId: Int,
     val editorTheme: Bundle?,
     val translations: Bundle,
@@ -33,6 +37,7 @@ data class GutenbergProps @JvmOverloads constructor(
         putString(PROP_INITIAL_TITLE, "")
         putString(PROP_LOCALE, revertDeprecatedLanguageCode(localeSlug))
         putString(PROP_POST_TYPE, postType)
+        putString(PROP_HOST_APP_NAMESPACE, hostAppNamespace)
         putInt(PROP_INITIAL_FEATURED_IMAGE_ID, featuredImageId)
         putBundle(PROP_TRANSLATIONS, translations)
         putBoolean(PROP_INITIAL_HTML_MODE_ENABLED, htmlModeEnabled)
@@ -52,6 +57,8 @@ data class GutenbergProps @JvmOverloads constructor(
                     ?.let { putSerializable(PROP_GALLERY_WITH_IMAGE_BLOCKS, it) }
             theme.getSerializable(PROP_QUOTE_BLOCK_V2)
                     ?.let { putSerializable(PROP_QUOTE_BLOCK_V2, it) }
+            theme.getSerializable(PROP_LIST_BLOCK_V2)
+                    ?.let { putSerializable(PROP_LIST_BLOCK_V2, it) }
         }
     }
 
@@ -65,11 +72,14 @@ data class GutenbergProps @JvmOverloads constructor(
         putBoolean(PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR, enableUnsupportedBlockEditor)
         putBoolean(PROP_CAPABILITIES_CAN_ENABLE_UNSUPPORTED_BLOCK_EDITOR, canEnableUnsupportedBlockEditor)
         putBoolean(PROP_CAPABILITIES_IS_AUDIO_BLOCK_MEDIA_UPLOAD_ENABLED, isAudioBlockMediaUploadEnabled)
+        putBoolean(PROP_CAPABILITIES_SHOULD_USE_FASTIMAGE, shouldUseFastImage)
         putBoolean(PROP_CAPABILITIES_REUSABLE_BLOCK, enableReusableBlock)
         putBoolean(PROP_CAPABILITIES_FACEBOOK_EMBED_BLOCK, enableFacebookEmbed)
         putBoolean(PROP_CAPABILITIES_INSTAGRAM_EMBED_BLOCK, enableInstagramEmbed)
         putBoolean(PROP_CAPABILITIES_LOOM_EMBED_BLOCK, enableLoomEmbed)
         putBoolean(PROP_CAPABILITIES_SMARTFRAME_EMBED_BLOCK, enableSmartframeEmbed)
+        putBoolean(PROP_CAPABILITIES_SUPPORT_SECTION, enableSupportSection)
+        putBoolean(PROP_CAPABILITIES_ONLY_CORE_BLOCKS, enableOnlyCoreBlocks)
     }
 
     companion object {
@@ -84,6 +94,7 @@ data class GutenbergProps @JvmOverloads constructor(
         private const val PROP_INITIAL_TITLE = "initialTitle"
         private const val PROP_INITIAL_HTML_MODE_ENABLED = "initialHtmlModeEnabled"
         private const val PROP_POST_TYPE = "postType"
+        private const val PROP_HOST_APP_NAMESPACE = "hostAppNamespace"
         private const val PROP_INITIAL_FEATURED_IMAGE_ID = "featuredImageId"
         private const val PROP_TRANSLATIONS = "translations"
         private const val PROP_COLORS = "colors"
@@ -93,6 +104,7 @@ data class GutenbergProps @JvmOverloads constructor(
         private const val PROP_IS_FSE_THEME = "isFSETheme"
         private const val PROP_GALLERY_WITH_IMAGE_BLOCKS = "galleryWithImageBlocks"
         private const val PROP_QUOTE_BLOCK_V2 = "quoteBlockV2"
+        private const val PROP_LIST_BLOCK_V2 = "listBlockV2"
 
         const val PROP_LOCALE = "locale"
         const val PROP_CAPABILITIES = "capabilities"
@@ -109,7 +121,10 @@ data class GutenbergProps @JvmOverloads constructor(
         const val PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR = "unsupportedBlockEditor"
         const val PROP_CAPABILITIES_CAN_ENABLE_UNSUPPORTED_BLOCK_EDITOR = "canEnableUnsupportedBlockEditor"
         const val PROP_CAPABILITIES_IS_AUDIO_BLOCK_MEDIA_UPLOAD_ENABLED = "isAudioBlockMediaUploadEnabled"
+        const val PROP_CAPABILITIES_SHOULD_USE_FASTIMAGE = "shouldUseFastImage"
         const val PROP_CAPABILITIES_REUSABLE_BLOCK = "reusableBlock"
+        const val PROP_CAPABILITIES_SUPPORT_SECTION = "supportSection"
+        const val PROP_CAPABILITIES_ONLY_CORE_BLOCKS = "onlyCoreBlocks"
 
         /**
          * Android converts some new language codes to older, deprecated ones, to preserve

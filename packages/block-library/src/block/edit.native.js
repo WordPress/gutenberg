@@ -27,7 +27,8 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import {
-	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
+	__experimentalRecursionProvider as RecursionProvider,
+	__experimentalUseHasRecursion as useHasRecursion,
 	InnerBlocks,
 	Warning,
 	store as blockEditorStore,
@@ -48,8 +49,7 @@ export default function ReusableBlockEdit( {
 	clientId,
 	isSelected,
 } ) {
-	const [ hasAlreadyRendered, RecursionProvider ] =
-		useNoRecursiveRenders( ref );
+	const hasAlreadyRendered = useHasRecursion( ref );
 
 	const [ showHelp, setShowHelp ] = useState( false );
 	const infoTextStyle = usePreferredColorSchemeStyle(
@@ -77,7 +77,7 @@ export default function ReusableBlockEdit( {
 		styles.spinnerDark
 	);
 
-	const { hasResolved, isEditing, isMissing } = useSelect(
+	const { hasResolved, isEditing, isMissing, innerBlockCount } = useSelect(
 		( select ) => {
 			const persistedBlock = select( coreStore ).getEntityRecord(
 				'postType',
@@ -88,6 +88,9 @@ export default function ReusableBlockEdit( {
 				'getEntityRecord',
 				[ 'postType', 'wp_block', ref ]
 			);
+
+			const { getBlockCount } = select( blockEditorStore );
+
 			return {
 				hasResolved: hasResolvedBlock,
 				isEditing:
@@ -95,6 +98,7 @@ export default function ReusableBlockEdit( {
 						reusableBlocksStore
 					).__experimentalIsEditingReusableBlock( clientId ),
 				isMissing: hasResolvedBlock && ! persistedBlock,
+				innerBlockCount: getBlockCount( clientId ),
 			};
 		},
 		[ ref, clientId ]
@@ -122,13 +126,13 @@ export default function ReusableBlockEdit( {
 	}
 
 	const onConvertToRegularBlocks = useCallback( () => {
-		createSuccessNotice(
-			sprintf(
-				/* translators: %s: name of the reusable block */
-				__( '%s converted to regular blocks' ),
-				title
-			)
-		);
+		const successNotice =
+			innerBlockCount > 1
+				? /* translators: %s: name of the reusable block */
+				  __( '%s converted to regular blocks' )
+				: /* translators: %s: name of the reusable block */
+				  __( '%s converted to regular block' );
+		createSuccessNotice( sprintf( successNotice, title ) );
 
 		clearSelectedBlock();
 		// Convert action is executed at the end of the current JavaScript execution block
@@ -162,12 +166,20 @@ export default function ReusableBlockEdit( {
 						{ infoTitle }
 					</Text>
 					<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
-						{ __(
-							'Alternatively, you can detach and edit these blocks separately by tapping "Convert to regular blocks".'
-						) }
+						{ innerBlockCount > 1
+							? __(
+									'Alternatively, you can detach and edit these blocks separately by tapping “Convert to regular blocks”.'
+							  )
+							: __(
+									'Alternatively, you can detach and edit this block separately by tapping “Convert to regular block”.'
+							  ) }
 					</Text>
 					<TextControl
-						label={ __( 'Convert to regular blocks' ) }
+						label={
+							innerBlockCount > 1
+								? __( 'Convert to regular blocks' )
+								: __( 'Convert to regular block' )
+						}
 						separatorType="topFullWidth"
 						onPress={ onConvertToRegularBlocks }
 						labelStyle={ actionButtonStyle }
@@ -214,7 +226,7 @@ export default function ReusableBlockEdit( {
 	}
 
 	return (
-		<RecursionProvider>
+		<RecursionProvider uniqueId={ ref }>
 			<TouchableWithoutFeedback
 				disabled={ ! isSelected }
 				accessibilityLabel={ __( 'Help button' ) }

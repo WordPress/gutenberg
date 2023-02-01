@@ -13,31 +13,30 @@ exports[`props should render alignment 1`] = `
   -webkit-flex-direction: column;
   -ms-flex-direction: column;
   flex-direction: column;
+  gap: calc(4px * 2);
   -webkit-box-pack: center;
   -ms-flex-pack: center;
   -webkit-justify-content: center;
   justify-content: center;
 }
 
-.emotion-0>*+*:not( marquee ) {
-  margin-top: calc(4px * 2);
-}
-
 .emotion-0>* {
   min-height: 0;
 }
 
-<div
-  class="components-flex components-h-stack components-v-stack emotion-0 emotion-1"
-  data-wp-c16t="true"
-  data-wp-component="VStack"
->
+<div>
   <div
-    class="emotion-2 emotion-1"
-  />
-  <div
-    class="emotion-2 emotion-1"
-  />
+    class="components-flex components-h-stack components-v-stack emotion-0 emotion-1"
+    data-wp-c16t="true"
+    data-wp-component="VStack"
+  >
+    <div
+      class="emotion-2 emotion-1"
+    />
+    <div
+      class="emotion-2 emotion-1"
+    />
+  </div>
 </div>
 `;
 
@@ -54,30 +53,29 @@ exports[`props should render correctly 1`] = `
   -webkit-flex-direction: column;
   -ms-flex-direction: column;
   flex-direction: column;
+  gap: calc(4px * 2);
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
-}
-
-.emotion-0>*+*:not( marquee ) {
-  margin-top: calc(4px * 2);
 }
 
 .emotion-0>* {
   min-height: 0;
 }
 
-<div
-  class="components-flex components-h-stack components-v-stack emotion-0 emotion-1"
-  data-wp-c16t="true"
-  data-wp-component="VStack"
->
+<div>
   <div
-    class="emotion-2 emotion-1"
-  />
-  <div
-    class="emotion-2 emotion-1"
-  />
+    class="components-flex components-h-stack components-v-stack emotion-0 emotion-1"
+    data-wp-c16t="true"
+    data-wp-component="VStack"
+  >
+    <div
+      class="emotion-2 emotion-1"
+    />
+    <div
+      class="emotion-2 emotion-1"
+    />
+  </div>
 </div>
 `;
 
@@ -94,29 +92,28 @@ exports[`props should render spacing 1`] = `
   -webkit-flex-direction: column;
   -ms-flex-direction: column;
   flex-direction: column;
+  gap: calc(4px * 5);
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
-}
-
-.emotion-0>*+*:not( marquee ) {
-  margin-top: calc(4px * 5);
 }
 
 .emotion-0>* {
   min-height: 0;
 }
 
-<div
-  class="components-flex components-h-stack components-v-stack emotion-0 emotion-1"
-  data-wp-c16t="true"
-  data-wp-component="VStack"
->
+<div>
   <div
-    class="emotion-2 emotion-1"
-  />
-  <div
-    class="emotion-2 emotion-1"
-  />
+    class="components-flex components-h-stack components-v-stack emotion-0 emotion-1"
+    data-wp-c16t="true"
+    data-wp-component="VStack"
+  >
+    <div
+      class="emotion-2 emotion-1"
+    />
+    <div
+      class="emotion-2 emotion-1"
+    />
+  </div>
 </div>
 `;

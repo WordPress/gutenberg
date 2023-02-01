@@ -31,12 +31,7 @@ export const noop = () => {};
  * ```
  */
 export function FormToggle(
-	// ref is omitted until we have `WordPressComponentPropsWithoutRef` or add
-	// ref forwarding to FormToggle.
-	props: Omit<
-		WordPressComponentProps< FormToggleProps, 'input', false >,
-		'ref'
-	>
+	props: WordPressComponentProps< FormToggleProps, 'input', false >
 ) {
 	const {
 		className,

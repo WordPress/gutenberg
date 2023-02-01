@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -31,7 +31,7 @@ describe( 'DownloadableBlocksList', () => {
 			isInstallable: true,
 		} ) );
 
-		it( 'should render and empty list', () => {
+		it( 'should render an empty list', () => {
 			const { container } = render(
 				<DownloadableBlocksList
 					items={ [] }
@@ -40,18 +40,18 @@ describe( 'DownloadableBlocksList', () => {
 				/>
 			);
 
-			expect( container.firstChild ).toBe( null );
+			expect( container ).toBeEmptyDOMElement();
 		} );
 
 		it( 'should render plugins items into the list', () => {
-			const { getAllByRole } = render(
+			render(
 				<DownloadableBlocksList
 					items={ items }
 					onSelect={ jest.fn() }
 					onHover={ jest.fn() }
 				/>
 			);
-			const downloadableBlocks = getAllByRole( 'option' );
+			const downloadableBlocks = screen.getAllByRole( 'option' );
 
 			expect( downloadableBlocks ).toHaveLength( items.length );
 		} );

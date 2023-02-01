@@ -146,21 +146,10 @@
 		}
 	}
 
-	// The inserter has a custom label, different from its aria-label, so we don't want to display both.
-	.edit-post-header-toolbar__inserter-toggle.edit-post-header-toolbar__inserter-toggle {
+	.editor-post-save-draft.editor-post-save-draft,
+	.editor-post-saved-state.editor-post-saved-state {
 		&::after {
 			content: none;
-		}
-	}
-	// The post saved state button has a custom label only on small breakpoint
-	.editor-post-save-draft.editor-post-save-draft {
-		&::after {
-			content: none;
-		}
-		@include break-small {
-			&::after {
-				content: attr(aria-label);
-			}
 		}
 	}
 }
@@ -204,5 +193,48 @@
 		svg {
 			margin-right: 8px;
 		}
+	}
+}
+
+.is-distraction-free {
+	.interface-interface-skeleton__header {
+		border-bottom: none;
+	}
+
+	.edit-post-header {
+		backdrop-filter: blur(20px) !important;
+		background-color: rgba(255, 255, 255, 0.9);
+		border-bottom: 1px solid #e0e0e0;
+		position: absolute;
+		width: 100%;
+
+
+		// hide some parts
+		& > .edit-post-header__settings > .editor-post-preview {
+			visibility: hidden;
+		}
+
+		& > .edit-post-header__toolbar .edit-post-header-toolbar__inserter-toggle,
+		& > .edit-post-header__toolbar .edit-post-header-toolbar__document-overview-toggle,
+		& > .edit-post-header__settings > .block-editor-post-preview__dropdown,
+		& > .edit-post-header__settings > .interface-pinned-items {
+			display: none;
+		}
+
+	}
+
+	// We need ! important because we override inline styles
+	// set by the motion component.
+	.interface-interface-skeleton__header:focus-within {
+		opacity: 1 !important;
+		div {
+			transform: translateX(0) translateZ(0) !important;
+		}
+
+	}
+
+	.components-editor-notices__dismissible {
+		position: absolute;
+		z-index: 35;
 	}
 }

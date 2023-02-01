@@ -23,6 +23,9 @@ const navigateToContentEditorTop = async () => {
 	// Use 'Ctrl+`' to return to the top of the editor.
 	await pressKeyWithModifier( 'ctrl', '`' );
 	await pressKeyWithModifier( 'ctrl', '`' );
+	await pressKeyWithModifier( 'ctrl', '`' );
+	await pressKeyWithModifier( 'ctrl', '`' );
+	await pressKeyWithModifier( 'ctrl', '`' );
 };
 
 const tabThroughParagraphBlock = async ( paragraphText ) => {
@@ -36,6 +39,10 @@ const tabThroughParagraphBlock = async ( paragraphText ) => {
 
 	await page.keyboard.press( 'Tab' );
 	await expect( await getActiveLabel() ).toBe( 'Open document settings' );
+
+	// Need to shift+tab here to end back in the block. If not, we'll be in the next region and it will only require 4 region jumps instead of 5.
+	await pressKeyWithModifier( 'shift', 'Tab' );
+	await expect( await getActiveLabel() ).toBe( 'Paragraph block' );
 };
 
 const tabThroughBlockToolbar = async () => {
@@ -49,7 +56,7 @@ const tabThroughBlockToolbar = async () => {
 	await expect( await getActiveLabel() ).toBe( 'Move down' );
 
 	await page.keyboard.press( 'ArrowRight' );
-	await expect( await getActiveLabel() ).toBe( 'Align' );
+	await expect( await getActiveLabel() ).toBe( 'Align text' );
 
 	await page.keyboard.press( 'ArrowRight' );
 	await expect( await getActiveLabel() ).toBe( 'Bold' );
@@ -223,7 +230,10 @@ describe( 'Order of block keyboard navigation', () => {
 	it( 'allows the block wrapper to gain focus for a group block instead of the first element', async () => {
 		// Insert a group block.
 		await insertBlock( 'Group' );
-
+		// Select the default, selected Group layout from the variation picker.
+		await page.click(
+			'button[aria-label="Group: Gather blocks in a container."]'
+		);
 		// If active label matches, that means focus did not change from group block wrapper.
 		await expect( await getActiveLabel() ).toBe( 'Block: Group' );
 	} );

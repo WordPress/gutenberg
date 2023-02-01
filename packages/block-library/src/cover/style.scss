@@ -1,16 +1,16 @@
 .wp-block-cover-image,
 .wp-block-cover {
 	position: relative;
-	background-size: cover;
 	background-position: center center;
 	min-height: 430px;
-	width: 100%;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	padding: 1em;
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
+	// Keep the flex layout direction to the physical direction (LTR) in RTL languages.
+	/*rtl:raw: direction: ltr; */
 
 	/**
 	 * Set a default background color for has-background-dim _unless_ it includes another
@@ -107,6 +107,8 @@
 		width: 100%;
 		z-index: z-index(".wp-block-cover__inner-container");
 		color: $white;
+		// Reset the fixed LTR direction at the root of the block in RTL languages.
+		/*rtl:raw: direction: rtl; */
 	}
 
 	&.is-light {
@@ -201,6 +203,8 @@
 video.wp-block-cover__video-background {
 	&.has-parallax {
 		background-attachment: fixed;
+		background-size: cover;
+		background-repeat: no-repeat;
 
 		// Mobile Safari does not support fixed background attachment properly.
 		// See also https://stackoverflow.com/questions/24154666/background-size-cover-not-working-on-ios

@@ -1,8 +1,13 @@
 // The `createHigherOrderComponent` helper and helper types.
 export * from './utils/create-higher-order-component';
+// The `debounce` helper and its types.
+export * from './utils/debounce';
+// The `throttle` helper and its types.
+export * from './utils/throttle';
 
-// Compose helper (aliased flowRight from Lodash)
+// The `compose` and `pipe` helpers (inspired by `flowRight` and `flow` from Lodash).
 export { default as compose } from './higher-order/compose';
+export { default as pipe } from './higher-order/pipe';
 
 // Higher-order components.
 export { default as ifCondition } from './higher-order/if-condition';

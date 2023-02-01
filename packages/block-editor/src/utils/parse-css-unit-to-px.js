@@ -117,7 +117,9 @@ function isMathExpression( cssUnit ) {
 function evalMathExpression( cssUnit ) {
 	let errorFound = false;
 	// Convert every part of the expression to px values.
-	const cssUnitsBits = cssUnit.split( /[+-/*/]/g ).filter( Boolean );
+	const cssUnitsBits = cssUnit
+		.split( /(?!^-)[+*\/-](\s?-)?/g )
+		.filter( Boolean );
 	for ( const unit of cssUnitsBits ) {
 		// Standardize the unit to px and extract the value.
 		const parsedUnit = parseUnit( getPxFromCssUnit( unit ) );
@@ -221,7 +223,7 @@ export function getPxFromCssUnit( cssUnit, options = {} ) {
 	let parsedUnit = parseUnit( cssUnit );
 
 	if ( ! parsedUnit.unit ) {
-		parsedUnit = parseUnitFunction( cssUnit, options );
+		parsedUnit = parseUnitFunction( cssUnit );
 	}
 
 	if ( isMathExpression( cssUnit ) && ! parsedUnit.unit ) {

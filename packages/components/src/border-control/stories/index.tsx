@@ -36,9 +36,12 @@ export default meta;
 
 // Available border colors.
 const colors = [
-	{ name: 'Blue', color: '#72aee6' },
-	{ name: 'Red', color: '#e65054' },
-	{ name: 'Yellow', color: '#f2d675' },
+	{ name: 'Blue 20', color: '#72aee6' },
+	{ name: 'Blue 40', color: '#3582c4' },
+	{ name: 'Red 40', color: '#e65054' },
+	{ name: 'Red 70', color: '#8a2424' },
+	{ name: 'Yellow 10', color: '#f2d675' },
+	{ name: 'Yellow 40', color: '#bd8600' },
 ];
 
 // Multiple origin colors.
@@ -81,14 +84,12 @@ const Template: ComponentStory< typeof BorderControl > = ( {
 
 	return (
 		<SlotFillProvider>
-			<div style={ { maxWidth: '280px' } }>
-				<BorderControl
-					onChange={ onChangeMerged }
-					value={ border }
-					{ ...props }
-				/>
-			</div>
-			{ /* @ts-expect-error Ignore until Popover is converted to TS */ }
+			<BorderControl
+				onChange={ onChangeMerged }
+				value={ border }
+				{ ...props }
+			/>
+			{ /* @ts-expect-error Ignore until Popover.Slot is converted to TS */ }
 			<Popover.Slot />
 		</SlotFillProvider>
 	);
@@ -137,7 +138,6 @@ export const WithMultipleOrigins = Template.bind( {} );
 WithMultipleOrigins.args = {
 	...Default.args,
 	colors: multipleOriginColors,
-	__experimentalHasMultipleOrigins: true,
 };
 
 /**

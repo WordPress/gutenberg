@@ -206,10 +206,10 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/group' ],
-			isMatch: ( { url } ) => {
+			isMatch: ( { url, useFeaturedImage } ) => {
 				// If the Cover block uses background media, skip this transform,
 				// and instead use the Group block's default transform.
-				if ( url ) {
+				if ( url || useFeaturedImage ) {
 					return false;
 				}
 				return true;

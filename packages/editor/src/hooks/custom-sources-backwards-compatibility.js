@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { pickBy, mapValues, isEmpty, mapKeys } from 'lodash';
+import { mapValues, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -69,17 +69,18 @@ const createWithMetaAttributeSource = ( metaAttributes ) =>
 					<BlockEdit
 						attributes={ mergedAttributes }
 						setAttributes={ ( nextAttributes ) => {
-							const nextMeta = mapKeys(
-								// Filter to intersection of keys between the updated
-								// attributes and those with an associated meta key.
-								pickBy(
-									nextAttributes,
-									( value, key ) => metaAttributes[ key ]
-								),
-
-								// Rename the keys to the expected meta key name.
-								( value, attributeKey ) =>
-									metaAttributes[ attributeKey ]
+							const nextMeta = Object.fromEntries(
+								Object.entries( nextAttributes ?? {} )
+									.filter(
+										// Filter to intersection of keys between the updated
+										// attributes and those with an associated meta key.
+										( [ key ] ) => key in metaAttributes
+									)
+									.map( ( [ attributeKey, value ] ) => [
+										// Rename the keys to the expected meta key name.
+										metaAttributes[ attributeKey ],
+										value,
+									] )
 							);
 
 							if ( ! isEmpty( nextMeta ) ) {
@@ -106,7 +107,11 @@ const createWithMetaAttributeSource = ( metaAttributes ) =>
 function shimAttributeSource( settings ) {
 	/** @type {WPMetaAttributeMapping} */
 	const metaAttributes = mapValues(
-		pickBy( settings.attributes, { source: 'meta' } ),
+		Object.fromEntries(
+			Object.entries( settings.attributes ?? {} ).filter(
+				( [ , { source } ] ) => source === 'meta'
+			)
+		),
 		'meta'
 	);
 	if ( ! isEmpty( metaAttributes ) ) {

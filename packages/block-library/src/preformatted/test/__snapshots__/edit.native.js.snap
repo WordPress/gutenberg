@@ -10,7 +10,14 @@ exports[`core/more/edit/native should match snapshot when content is empty 1`] =
     ]
   }
 >
-  <View>
+  <View
+    style={
+      Array [
+        undefined,
+        undefined,
+      ]
+    }
+  >
     <TextInput
       accessibilityLabel="Text input. Empty"
       activeFormats={Array []}
@@ -21,7 +28,6 @@ exports[`core/more/edit/native should match snapshot when content is empty 1`] =
       }
       disableEditingMenu={false}
       fontFamily="serif"
-      fontSize={16}
       isMultiline={false}
       maxImagesWidth={200}
       onBlur={[Function]}
@@ -50,7 +56,14 @@ exports[`core/more/edit/native should match snapshot when content is not empty 1
     ]
   }
 >
-  <View>
+  <View
+    style={
+      Array [
+        undefined,
+        undefined,
+      ]
+    }
+  >
     <TextInput
       accessibilityLabel="Text input. <pre>Hello World!</pre>"
       activeFormats={Array []}
@@ -61,7 +74,6 @@ exports[`core/more/edit/native should match snapshot when content is not empty 1
       }
       disableEditingMenu={false}
       fontFamily="serif"
-      fontSize={16}
       isMultiline={false}
       maxImagesWidth={200}
       onBlur={[Function]}

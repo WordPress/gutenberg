@@ -54,7 +54,7 @@ lines preserved[/myshortcode]
 `;
 
 exports[`Inserting blocks inserts a block in proper place after having clicked \`Browse All\` from block appender 1`] = `
-"<!-- wp:group -->
+"<!-- wp:group {\\"layout\\":{\\"type\\":\\"constrained\\"}} -->
 <div class=\\"wp-block-group\\"><!-- wp:paragraph -->
 <p>Paragraph inside group</p>
 <!-- /wp:paragraph --></div>
@@ -71,7 +71,7 @@ exports[`Inserting blocks inserts a block in proper place after having clicked \
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
-<h2>Heading</h2>
+<h2 class=\\"wp-block-heading\\">Heading</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
@@ -93,7 +93,7 @@ exports[`Inserting blocks inserts a block in proper place after having clicked \
 <!-- /wp:cover -->
 
 <!-- wp:heading -->
-<h2>Heading</h2>
+<h2 class=\\"wp-block-heading\\">Heading</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->

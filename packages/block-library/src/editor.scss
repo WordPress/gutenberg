@@ -5,6 +5,7 @@
 @import "./button/editor.scss";
 @import "./buttons/editor.scss";
 @import "./categories/editor.scss";
+@import "./code/editor.scss";
 @import "./columns/editor.scss";
 @import "./comments/editor.scss";
 @import "./comment-author-avatar/editor.scss";
@@ -49,8 +50,9 @@
 @import "./query-pagination/editor.scss";
 @import "./query-pagination-numbers/editor.scss";
 @import "./post-featured-image/editor.scss";
-@import "./post-comments/editor.scss";
 @import "./post-comments-form/editor.scss";
+
+@import "./editor-elements.scss";
 
 :root .editor-styles-wrapper {
 	@include background-colors-deprecated();

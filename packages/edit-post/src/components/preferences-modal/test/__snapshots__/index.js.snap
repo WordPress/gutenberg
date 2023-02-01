@@ -1,272 +1,921 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`EditPostPreferencesModal should match snapshot when the modal is active large viewports 1`] = `
-<PreferencesModal
-  closeModal={[Function]}
+.emotion-0 {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.emotion-0 *,
+.emotion-0 *::before,
+.emotion-0 *::after {
+  box-sizing: inherit;
+}
+
+.components-panel__row .emotion-2 {
+  margin-bottom: inherit;
+}
+
+.emotion-4 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  gap: calc(4px * 3);
+  -webkit-box-pack: start;
+  -ms-flex-pack: start;
+  -webkit-justify-content: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.emotion-4>* {
+  min-width: 0;
+}
+
+.emotion-6 {
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.emotion-8 {
+  margin-top: calc(4px * 2);
+  margin-bottom: 0;
+  font-size: 12px;
+  font-style: normal;
+  color: #757575;
+}
+
+<div
+  aria-labelledby="components-modal-header-0"
+  class="components-modal__frame interface-preferences-modal"
+  role="dialog"
+  tabindex="-1"
 >
-  <PreferencesModalTabs
-    sections={
-      Array [
-        Object {
-          "content": <React.Fragment>
-            <Section
-              description="Change options related to publishing."
-              title="Publishing"
+  <div
+    class="components-modal__content"
+    role="document"
+  >
+    <div
+      class="components-modal__header"
+    >
+      <div
+        class="components-modal__header-heading-container"
+      >
+        <h1
+          class="components-modal__header-heading"
+          id="components-modal-header-0"
+        >
+          Preferences
+        </h1>
+      </div>
+      <button
+        aria-label="Close"
+        class="components-button has-icon"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          height="24"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"
+          />
+        </svg>
+      </button>
+    </div>
+    <div
+      class="interface-preferences__tabs"
+    >
+      <div
+        aria-orientation="vertical"
+        class="components-tab-panel__tabs"
+        role="tablist"
+      >
+        <button
+          aria-controls="tab-panel-0-general-view"
+          aria-selected="true"
+          class="components-button components-tab-panel__tabs-item is-active"
+          id="tab-panel-0-general"
+          role="tab"
+          type="button"
+        >
+          General
+        </button>
+        <button
+          aria-controls="tab-panel-0-blocks-view"
+          aria-selected="false"
+          class="components-button components-tab-panel__tabs-item"
+          id="tab-panel-0-blocks"
+          role="tab"
+          tabindex="-1"
+          type="button"
+        >
+          Blocks
+        </button>
+        <button
+          aria-controls="tab-panel-0-panels-view"
+          aria-selected="false"
+          class="components-button components-tab-panel__tabs-item"
+          id="tab-panel-0-panels"
+          role="tab"
+          tabindex="-1"
+          type="button"
+        >
+          Panels
+        </button>
+      </div>
+      <div
+        aria-labelledby="tab-panel-0-general"
+        class="components-tab-panel__tab-content"
+        id="tab-panel-0-general-view"
+        role="tabpanel"
+      >
+        <fieldset
+          class="interface-preferences-modal__section"
+        >
+          <legend
+            class="interface-preferences-modal__section-legend"
+          >
+            <h2
+              class="interface-preferences-modal__section-title"
             >
-              <WithSelect(WithDispatch(IfViewportMatches(BaseOption)))
-                help="Review settings, such as visibility and tags."
-                label="Include pre-publish checklist"
-              />
-            </Section>
-            <Section
-              description="Customize options related to the block editor interface and editing flow."
-              title="Appearance"
+              Publishing
+            </h2>
+            <p
+              class="interface-preferences-modal__section-description"
             >
-              <WithSelect(WithDispatch(BaseOption))
-                featureName="focusMode"
-                help="Highlights the current block and fades other content."
-                label="Spotlight mode"
-              />
-              <WithSelect(WithDispatch(BaseOption))
-                featureName="showIconLabels"
-                help="Show text instead of icons on buttons."
-                label="Show button text labels"
-              />
-              <WithSelect(WithDispatch(BaseOption))
-                featureName="showListViewByDefault"
-                help="Opens the block list view sidebar by default."
-                label="Always open list view"
-              />
-              <WithSelect(WithDispatch(BaseOption))
-                featureName="reducedUI"
-                help="Compacts options and outlines in the toolbar."
-                label="Reduce the interface"
-              />
-              <WithSelect(WithDispatch(BaseOption))
-                featureName="themeStyles"
-                help="Make the editor look like your theme."
-                label="Use theme styles"
-              />
-              <WithSelect(WithDispatch(BaseOption))
-                featureName="showBlockBreadcrumbs"
-                help="Shows block breadcrumbs at the bottom of the editor."
-                label="Display block breadcrumbs"
-              />
-            </Section>
-          </React.Fragment>,
-          "name": "general",
-          "tabLabel": "General",
-        },
-        Object {
-          "content": <React.Fragment>
-            <Section
-              description="Customize how you interact with blocks in the block library and editing canvas."
-              title="Block interactions"
+              Change options related to publishing.
+            </p>
+          </legend>
+          <div
+            class="interface-preferences-modal__option"
+          >
+            <div
+              class="components-base-control components-toggle-control emotion-0 emotion-1"
             >
-              <WithSelect(WithDispatch(BaseOption))
-                featureName="mostUsedBlocks"
-                help="Places the most frequent blocks in the block library."
-                label="Show most used blocks"
-              />
-              <WithSelect(WithDispatch(BaseOption))
-                featureName="keepCaretInsideBlock"
-                help="Aids screen readers by stopping text caret from leaving blocks."
-                label="Contain text cursor inside block"
-              />
-            </Section>
-            <Section
-              description="Disable blocks that you don't want to appear in the inserter. They can always be toggled back on later."
-              title="Visible blocks"
-            >
-              <WithSelect(BlockManager) />
-            </Section>
-          </React.Fragment>,
-          "name": "blocks",
-          "tabLabel": "Blocks",
-        },
-        Object {
-          "content": <React.Fragment>
-            <Section
-              description="Choose what displays in the panel."
-              title="Document settings"
-            >
-              <EnablePluginDocumentSettingPanelOptionSlot />
-              <WithSelect(PostTaxonomies)
-                taxonomyWrapper={[Function]}
-              />
-              <PostFeaturedImageCheck>
-                <WithSelect(IfCondition(WithDispatch(BaseOption)))
-                  label="Featured image"
-                  panelName="featured-image"
-                />
-              </PostFeaturedImageCheck>
-              <PostExcerptCheck>
-                <WithSelect(IfCondition(WithDispatch(BaseOption)))
-                  label="Excerpt"
-                  panelName="post-excerpt"
-                />
-              </PostExcerptCheck>
-              <WithSelect(PostTypeSupportCheck)
-                supportKeys={
-                  Array [
-                    "comments",
-                    "trackbacks",
-                  ]
-                }
+              <div
+                class="components-base-control__field emotion-2 emotion-3"
               >
-                <WithSelect(IfCondition(WithDispatch(BaseOption)))
-                  label="Discussion"
-                  panelName="discussion-panel"
-                />
-              </WithSelect(PostTypeSupportCheck)>
-              <PageAttributesCheck>
-                <WithSelect(IfCondition(WithDispatch(BaseOption)))
-                  label="Page attributes"
-                  panelName="page-attributes"
-                />
-              </PageAttributesCheck>
-            </Section>
-            <WithSelect(MetaBoxesSection)
-              description="Add extra areas to the editor."
-              title="Additional"
-            />
-          </React.Fragment>,
-          "name": "panels",
-          "tabLabel": "Panels",
-        },
-      ]
-    }
-  />
-</PreferencesModal>
+                <div
+                  class="components-flex components-h-stack emotion-4 emotion-5"
+                  data-wp-c16t="true"
+                  data-wp-component="HStack"
+                >
+                  <span
+                    class="components-form-toggle"
+                  >
+                    <input
+                      aria-describedby="inspector-toggle-control-0__help"
+                      class="components-form-toggle__input"
+                      id="inspector-toggle-control-0"
+                      type="checkbox"
+                    />
+                    <span
+                      class="components-form-toggle__track"
+                    />
+                    <span
+                      class="components-form-toggle__thumb"
+                    />
+                  </span>
+                  <label
+                    class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+                    data-wp-c16t="true"
+                    data-wp-component="FlexBlock"
+                    for="inspector-toggle-control-0"
+                  >
+                    Include pre-publish checklist
+                  </label>
+                </div>
+              </div>
+              <p
+                class="components-base-control__help emotion-8 emotion-9"
+                id="inspector-toggle-control-0__help"
+              >
+                Review settings, such as visibility and tags.
+              </p>
+            </div>
+          </div>
+        </fieldset>
+        <fieldset
+          class="interface-preferences-modal__section"
+        >
+          <legend
+            class="interface-preferences-modal__section-legend"
+          >
+            <h2
+              class="interface-preferences-modal__section-title"
+            >
+              Appearance
+            </h2>
+            <p
+              class="interface-preferences-modal__section-description"
+            >
+              Customize options related to the block editor interface and editing flow.
+            </p>
+          </legend>
+          <div
+            class="interface-preferences-modal__option"
+          >
+            <div
+              class="components-base-control components-toggle-control emotion-0 emotion-1"
+            >
+              <div
+                class="components-base-control__field emotion-2 emotion-3"
+              >
+                <div
+                  class="components-flex components-h-stack emotion-4 emotion-5"
+                  data-wp-c16t="true"
+                  data-wp-component="HStack"
+                >
+                  <span
+                    class="components-form-toggle"
+                  >
+                    <input
+                      aria-describedby="inspector-toggle-control-1__help"
+                      class="components-form-toggle__input"
+                      id="inspector-toggle-control-1"
+                      type="checkbox"
+                    />
+                    <span
+                      class="components-form-toggle__track"
+                    />
+                    <span
+                      class="components-form-toggle__thumb"
+                    />
+                  </span>
+                  <label
+                    class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+                    data-wp-c16t="true"
+                    data-wp-component="FlexBlock"
+                    for="inspector-toggle-control-1"
+                  >
+                    Distraction free
+                  </label>
+                </div>
+              </div>
+              <p
+                class="components-base-control__help emotion-8 emotion-9"
+                id="inspector-toggle-control-1__help"
+              >
+                Reduce visual distractions by hiding the toolbar and other elements to focus on writing.
+              </p>
+            </div>
+          </div>
+          <div
+            class="interface-preferences-modal__option"
+          >
+            <div
+              class="components-base-control components-toggle-control emotion-0 emotion-1"
+            >
+              <div
+                class="components-base-control__field emotion-2 emotion-3"
+              >
+                <div
+                  class="components-flex components-h-stack emotion-4 emotion-5"
+                  data-wp-c16t="true"
+                  data-wp-component="HStack"
+                >
+                  <span
+                    class="components-form-toggle"
+                  >
+                    <input
+                      aria-describedby="inspector-toggle-control-2__help"
+                      class="components-form-toggle__input"
+                      id="inspector-toggle-control-2"
+                      type="checkbox"
+                    />
+                    <span
+                      class="components-form-toggle__track"
+                    />
+                    <span
+                      class="components-form-toggle__thumb"
+                    />
+                  </span>
+                  <label
+                    class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+                    data-wp-c16t="true"
+                    data-wp-component="FlexBlock"
+                    for="inspector-toggle-control-2"
+                  >
+                    Spotlight mode
+                  </label>
+                </div>
+              </div>
+              <p
+                class="components-base-control__help emotion-8 emotion-9"
+                id="inspector-toggle-control-2__help"
+              >
+                Highlights the current block and fades other content.
+              </p>
+            </div>
+          </div>
+          <div
+            class="interface-preferences-modal__option"
+          >
+            <div
+              class="components-base-control components-toggle-control emotion-0 emotion-1"
+            >
+              <div
+                class="components-base-control__field emotion-2 emotion-3"
+              >
+                <div
+                  class="components-flex components-h-stack emotion-4 emotion-5"
+                  data-wp-c16t="true"
+                  data-wp-component="HStack"
+                >
+                  <span
+                    class="components-form-toggle"
+                  >
+                    <input
+                      aria-describedby="inspector-toggle-control-3__help"
+                      class="components-form-toggle__input"
+                      id="inspector-toggle-control-3"
+                      type="checkbox"
+                    />
+                    <span
+                      class="components-form-toggle__track"
+                    />
+                    <span
+                      class="components-form-toggle__thumb"
+                    />
+                  </span>
+                  <label
+                    class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+                    data-wp-c16t="true"
+                    data-wp-component="FlexBlock"
+                    for="inspector-toggle-control-3"
+                  >
+                    Show button text labels
+                  </label>
+                </div>
+              </div>
+              <p
+                class="components-base-control__help emotion-8 emotion-9"
+                id="inspector-toggle-control-3__help"
+              >
+                Show text instead of icons on buttons.
+              </p>
+            </div>
+          </div>
+          <div
+            class="interface-preferences-modal__option"
+          >
+            <div
+              class="components-base-control components-toggle-control emotion-0 emotion-1"
+            >
+              <div
+                class="components-base-control__field emotion-2 emotion-3"
+              >
+                <div
+                  class="components-flex components-h-stack emotion-4 emotion-5"
+                  data-wp-c16t="true"
+                  data-wp-component="HStack"
+                >
+                  <span
+                    class="components-form-toggle"
+                  >
+                    <input
+                      aria-describedby="inspector-toggle-control-4__help"
+                      class="components-form-toggle__input"
+                      id="inspector-toggle-control-4"
+                      type="checkbox"
+                    />
+                    <span
+                      class="components-form-toggle__track"
+                    />
+                    <span
+                      class="components-form-toggle__thumb"
+                    />
+                  </span>
+                  <label
+                    class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+                    data-wp-c16t="true"
+                    data-wp-component="FlexBlock"
+                    for="inspector-toggle-control-4"
+                  >
+                    Always open list view
+                  </label>
+                </div>
+              </div>
+              <p
+                class="components-base-control__help emotion-8 emotion-9"
+                id="inspector-toggle-control-4__help"
+              >
+                Opens the block list view sidebar by default.
+              </p>
+            </div>
+          </div>
+          <div
+            class="interface-preferences-modal__option"
+          >
+            <div
+              class="components-base-control components-toggle-control emotion-0 emotion-1"
+            >
+              <div
+                class="components-base-control__field emotion-2 emotion-3"
+              >
+                <div
+                  class="components-flex components-h-stack emotion-4 emotion-5"
+                  data-wp-c16t="true"
+                  data-wp-component="HStack"
+                >
+                  <span
+                    class="components-form-toggle"
+                  >
+                    <input
+                      aria-describedby="inspector-toggle-control-5__help"
+                      class="components-form-toggle__input"
+                      id="inspector-toggle-control-5"
+                      type="checkbox"
+                    />
+                    <span
+                      class="components-form-toggle__track"
+                    />
+                    <span
+                      class="components-form-toggle__thumb"
+                    />
+                  </span>
+                  <label
+                    class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+                    data-wp-c16t="true"
+                    data-wp-component="FlexBlock"
+                    for="inspector-toggle-control-5"
+                  >
+                    Use theme styles
+                  </label>
+                </div>
+              </div>
+              <p
+                class="components-base-control__help emotion-8 emotion-9"
+                id="inspector-toggle-control-5__help"
+              >
+                Make the editor look like your theme.
+              </p>
+            </div>
+          </div>
+          <div
+            class="interface-preferences-modal__option"
+          >
+            <div
+              class="components-base-control components-toggle-control emotion-0 emotion-1"
+            >
+              <div
+                class="components-base-control__field emotion-2 emotion-3"
+              >
+                <div
+                  class="components-flex components-h-stack emotion-4 emotion-5"
+                  data-wp-c16t="true"
+                  data-wp-component="HStack"
+                >
+                  <span
+                    class="components-form-toggle"
+                  >
+                    <input
+                      aria-describedby="inspector-toggle-control-6__help"
+                      class="components-form-toggle__input"
+                      id="inspector-toggle-control-6"
+                      type="checkbox"
+                    />
+                    <span
+                      class="components-form-toggle__track"
+                    />
+                    <span
+                      class="components-form-toggle__thumb"
+                    />
+                  </span>
+                  <label
+                    class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+                    data-wp-c16t="true"
+                    data-wp-component="FlexBlock"
+                    for="inspector-toggle-control-6"
+                  >
+                    Display block breadcrumbs
+                  </label>
+                </div>
+              </div>
+              <p
+                class="components-base-control__help emotion-8 emotion-9"
+                id="inspector-toggle-control-6__help"
+              >
+                Shows block breadcrumbs at the bottom of the editor.
+              </p>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+  </div>
+</div>
 `;
 
 exports[`EditPostPreferencesModal should match snapshot when the modal is active small viewports 1`] = `
-<PreferencesModal
-  closeModal={[Function]}
+.emotion-0 {
+  overflow-x: hidden;
+}
+
+.emotion-2 {
+  overflow-x: auto;
+  max-height: 100%;
+}
+
+.emotion-3 {
+  background-color: #fff;
+  color: #1e1e1e;
+  position: relative;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+  outline: none;
+  box-shadow: none;
+  border-radius: calc(2px - 1px);
+}
+
+.emotion-5 {
+  height: 100%;
+}
+
+.emotion-7 {
+  box-sizing: border-box;
+  height: auto;
+  max-height: 100%;
+  padding: calc(4px * 4);
+}
+
+.emotion-7:first-of-type {
+  border-top-left-radius: calc(2px - 1px);
+  border-top-right-radius: calc(2px - 1px);
+}
+
+.emotion-7:last-of-type {
+  border-bottom-left-radius: calc(2px - 1px);
+  border-bottom-right-radius: calc(2px - 1px);
+}
+
+.emotion-9 {
+  border-radius: 2px;
+}
+
+.emotion-9>*:first-of-type>* {
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+}
+
+.emotion-9>*:last-of-type>* {
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+}
+
+.emotion-11 {
+  width: 100%;
+  display: block;
+}
+
+.emotion-13 {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  background: none;
+  text-align: start;
+  padding: calc((36px - calc(13px * 1.2) - 2px) / 2) 12px;
+  box-sizing: border-box;
+  width: 100%;
+  display: block;
+  margin: 0;
+  color: inherit;
+  border-radius: 2px;
+}
+
+.emotion-13:hover {
+  color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+}
+
+.emotion-13:focus {
+  background-color: transparent;
+  color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+  outline: 3px solid transparent;
+}
+
+.emotion-15 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  gap: calc(4px * 2);
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.emotion-15>* {
+  min-width: 0;
+}
+
+.emotion-17 {
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+}
+
+.emotion-19 {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.emotion-47 {
+  background: transparent;
+  display: block;
+  margin: 0!important;
+  pointer-events: none;
+  position: absolute;
+  will-change: box-shadow;
+  border-radius: inherit;
+  bottom: 0;
+  box-shadow: 0 0px 0px 0 rgba(0, 0, 0, 0);
+  opacity: 1;
+  left: 0;
+  right: 0;
+  top: 0;
+  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+  border-radius: 2px;
+}
+
+@media ( prefers-reduced-motion: reduce ) {
+  .emotion-47 {
+    transition-duration: 0ms;
+  }
+}
+
+<div
+  aria-labelledby="components-modal-header-1"
+  class="components-modal__frame interface-preferences-modal"
+  role="dialog"
+  tabindex="-1"
 >
-  <PreferencesModalTabs
-    sections={
-      Array [
-        Object {
-          "content": <React.Fragment>
-            <Section
-              description="Customize options related to the block editor interface and editing flow."
-              title="Appearance"
+  <div
+    class="components-modal__content"
+    role="document"
+  >
+    <div
+      class="components-modal__header"
+    >
+      <div
+        class="components-modal__header-heading-container"
+      >
+        <h1
+          class="components-modal__header-heading"
+          id="components-modal-header-1"
+        >
+          Preferences
+        </h1>
+      </div>
+      <button
+        aria-label="Close"
+        class="components-button has-icon"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          height="24"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"
+          />
+        </svg>
+      </button>
+    </div>
+    <div
+      class="components-navigator-provider interface-preferences__provider emotion-0 emotion-1"
+      data-wp-c16t="true"
+      data-wp-component="NavigatorProvider"
+    >
+      <div
+        class="emotion-2 components-navigator-screen"
+        data-wp-c16t="true"
+        data-wp-component="NavigatorScreen"
+        style="opacity: 0; transform: translateX(50px) translateZ(0);"
+      >
+        <div
+          class="components-surface components-card emotion-3 emotion-1"
+          data-wp-c16t="true"
+          data-wp-component="Card"
+        >
+          <div
+            class="emotion-5 emotion-1"
+          >
+            <div
+              class="components-card__body components-card-body emotion-7 emotion-1"
+              data-wp-c16t="true"
+              data-wp-component="CardBody"
             >
-              <WithSelect(WithDispatch(BaseOption))
-                featureName="focusMode"
-                help="Highlights the current block and fades other content."
-                label="Spotlight mode"
-              />
-              <WithSelect(WithDispatch(BaseOption))
-                featureName="showIconLabels"
-                help="Show text instead of icons on buttons."
-                label="Show button text labels"
-              />
-              <WithSelect(WithDispatch(BaseOption))
-                featureName="showListViewByDefault"
-                help="Opens the block list view sidebar by default."
-                label="Always open list view"
-              />
-              <WithSelect(WithDispatch(BaseOption))
-                featureName="reducedUI"
-                help="Compacts options and outlines in the toolbar."
-                label="Reduce the interface"
-              />
-              <WithSelect(WithDispatch(BaseOption))
-                featureName="themeStyles"
-                help="Make the editor look like your theme."
-                label="Use theme styles"
-              />
-              <WithSelect(WithDispatch(BaseOption))
-                featureName="showBlockBreadcrumbs"
-                help="Shows block breadcrumbs at the bottom of the editor."
-                label="Display block breadcrumbs"
-              />
-            </Section>
-          </React.Fragment>,
-          "name": "general",
-          "tabLabel": "General",
-        },
-        Object {
-          "content": <React.Fragment>
-            <Section
-              description="Customize how you interact with blocks in the block library and editing canvas."
-              title="Block interactions"
-            >
-              <WithSelect(WithDispatch(BaseOption))
-                featureName="mostUsedBlocks"
-                help="Places the most frequent blocks in the block library."
-                label="Show most used blocks"
-              />
-              <WithSelect(WithDispatch(BaseOption))
-                featureName="keepCaretInsideBlock"
-                help="Aids screen readers by stopping text caret from leaving blocks."
-                label="Contain text cursor inside block"
-              />
-            </Section>
-            <Section
-              description="Disable blocks that you don't want to appear in the inserter. They can always be toggled back on later."
-              title="Visible blocks"
-            >
-              <WithSelect(BlockManager) />
-            </Section>
-          </React.Fragment>,
-          "name": "blocks",
-          "tabLabel": "Blocks",
-        },
-        Object {
-          "content": <React.Fragment>
-            <Section
-              description="Choose what displays in the panel."
-              title="Document settings"
-            >
-              <EnablePluginDocumentSettingPanelOptionSlot />
-              <WithSelect(PostTaxonomies)
-                taxonomyWrapper={[Function]}
-              />
-              <PostFeaturedImageCheck>
-                <WithSelect(IfCondition(WithDispatch(BaseOption)))
-                  label="Featured image"
-                  panelName="featured-image"
-                />
-              </PostFeaturedImageCheck>
-              <PostExcerptCheck>
-                <WithSelect(IfCondition(WithDispatch(BaseOption)))
-                  label="Excerpt"
-                  panelName="post-excerpt"
-                />
-              </PostExcerptCheck>
-              <WithSelect(PostTypeSupportCheck)
-                supportKeys={
-                  Array [
-                    "comments",
-                    "trackbacks",
-                  ]
-                }
+              <div
+                class="components-item-group emotion-9 emotion-1"
+                data-wp-c16t="true"
+                data-wp-component="ItemGroup"
+                role="list"
               >
-                <WithSelect(IfCondition(WithDispatch(BaseOption)))
-                  label="Discussion"
-                  panelName="discussion-panel"
-                />
-              </WithSelect(PostTypeSupportCheck)>
-              <PageAttributesCheck>
-                <WithSelect(IfCondition(WithDispatch(BaseOption)))
-                  label="Page attributes"
-                  panelName="page-attributes"
-                />
-              </PageAttributesCheck>
-            </Section>
-            <WithSelect(MetaBoxesSection)
-              description="Add extra areas to the editor."
-              title="Additional"
-            />
-          </React.Fragment>,
-          "name": "panels",
-          "tabLabel": "Panels",
-        },
-      ]
-    }
-  />
-</PreferencesModal>
+                <div
+                  class="emotion-11"
+                  role="listitem"
+                >
+                  <button
+                    class="components-item components-navigator-button emotion-1 emotion-13 emotion-1"
+                    data-wp-c16t="true"
+                    data-wp-component="NavigatorButton"
+                    id="general"
+                  >
+                    <div
+                      class="components-flex components-h-stack emotion-15 emotion-1"
+                      data-wp-c16t="true"
+                      data-wp-component="HStack"
+                    >
+                      <div
+                        class="components-flex-item emotion-17 emotion-1"
+                        data-wp-c16t="true"
+                        data-wp-component="FlexItem"
+                      >
+                        <span
+                          class="components-truncate emotion-19 emotion-1"
+                          data-wp-c16t="true"
+                          data-wp-component="Truncate"
+                        >
+                          General
+                        </span>
+                      </div>
+                      <div
+                        class="components-flex-item emotion-17 emotion-1"
+                        data-wp-c16t="true"
+                        data-wp-component="FlexItem"
+                      >
+                        <svg
+                          aria-hidden="true"
+                          focusable="false"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          width="24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  </button>
+                </div>
+                <div
+                  class="emotion-11"
+                  role="listitem"
+                >
+                  <button
+                    class="components-item components-navigator-button emotion-1 emotion-13 emotion-1"
+                    data-wp-c16t="true"
+                    data-wp-component="NavigatorButton"
+                    id="blocks"
+                  >
+                    <div
+                      class="components-flex components-h-stack emotion-15 emotion-1"
+                      data-wp-c16t="true"
+                      data-wp-component="HStack"
+                    >
+                      <div
+                        class="components-flex-item emotion-17 emotion-1"
+                        data-wp-c16t="true"
+                        data-wp-component="FlexItem"
+                      >
+                        <span
+                          class="components-truncate emotion-19 emotion-1"
+                          data-wp-c16t="true"
+                          data-wp-component="Truncate"
+                        >
+                          Blocks
+                        </span>
+                      </div>
+                      <div
+                        class="components-flex-item emotion-17 emotion-1"
+                        data-wp-c16t="true"
+                        data-wp-component="FlexItem"
+                      >
+                        <svg
+                          aria-hidden="true"
+                          focusable="false"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          width="24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  </button>
+                </div>
+                <div
+                  class="emotion-11"
+                  role="listitem"
+                >
+                  <button
+                    class="components-item components-navigator-button emotion-1 emotion-13 emotion-1"
+                    data-wp-c16t="true"
+                    data-wp-component="NavigatorButton"
+                    id="panels"
+                  >
+                    <div
+                      class="components-flex components-h-stack emotion-15 emotion-1"
+                      data-wp-c16t="true"
+                      data-wp-component="HStack"
+                    >
+                      <div
+                        class="components-flex-item emotion-17 emotion-1"
+                        data-wp-c16t="true"
+                        data-wp-component="FlexItem"
+                      >
+                        <span
+                          class="components-truncate emotion-19 emotion-1"
+                          data-wp-c16t="true"
+                          data-wp-component="Truncate"
+                        >
+                          Panels
+                        </span>
+                      </div>
+                      <div
+                        class="components-flex-item emotion-17 emotion-1"
+                        data-wp-c16t="true"
+                        data-wp-component="FlexItem"
+                      >
+                        <svg
+                          aria-hidden="true"
+                          focusable="false"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          width="24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+            class="components-elevation emotion-47 emotion-1"
+            data-wp-c16t="true"
+            data-wp-component="Elevation"
+          />
+          <div
+            aria-hidden="true"
+            class="components-elevation emotion-47 emotion-1"
+            data-wp-c16t="true"
+            data-wp-component="Elevation"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 `;

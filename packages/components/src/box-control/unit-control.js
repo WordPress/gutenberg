@@ -35,7 +35,6 @@ export default function BoxUnitControl( {
 				<UnitControl
 					aria-label={ label }
 					className="component-box-control__unit-control"
-					hideHTMLArrows
 					isFirst={ isFirst }
 					isLast={ isLast }
 					isOnly={ isOnly }

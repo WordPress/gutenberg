@@ -22,6 +22,7 @@ export async function openPreviewPage( this: Editor ): Promise< Page > {
 	const previewButton = editorTopBar.locator(
 		'role=button[name="Preview"i]'
 	);
+
 	await previewButton.click();
 
 	const [ previewPage ] = await Promise.all( [

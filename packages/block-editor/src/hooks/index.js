@@ -14,10 +14,17 @@ import './color';
 import './duotone';
 import './font-size';
 import './border';
+import './position';
 import './layout';
+import './content-lock-ui';
+import './metadata';
+import './metadata-name';
 
 export { useCustomSides } from './dimensions';
+export { useLayoutClasses, useLayoutStyles } from './layout';
 export { getBorderClassesAndStyles, useBorderProps } from './use-border-props';
 export { getColorClassesAndStyles, useColorProps } from './use-color-props';
 export { getSpacingClassesAndStyles } from './use-spacing-props';
+export { getTypographyClassesAndStyles } from './use-typography-props';
+export { getGapCSSValue } from './gap';
 export { useCachedTruthy } from './use-cached-truthy';

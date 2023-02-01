@@ -46,6 +46,7 @@ export function TextTransformEdit( props ) {
 		<TextTransformControl
 			value={ style?.typography?.textTransform }
 			onChange={ onChange }
+			size="__unstable-large"
 		/>
 	);
 }

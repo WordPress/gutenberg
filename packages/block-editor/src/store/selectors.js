@@ -1,19 +1,6 @@
 /**
  * External dependencies
  */
-import {
-	castArray,
-	first,
-	isBoolean,
-	last,
-	map,
-	reduce,
-	some,
-	find,
-	filter,
-	mapKeys,
-	orderBy,
-} from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -39,6 +26,7 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import { mapRichTextSettings } from './utils';
+import { orderBy } from '../utils/sorting';
 
 /**
  * A block selection object.
@@ -77,12 +65,12 @@ const EMPTY_ARRAY = [];
  * @return {string} Block name.
  */
 export function getBlockName( state, clientId ) {
-	const block = state.blocks.byClientId[ clientId ];
+	const block = state.blocks.byClientId.get( clientId );
 	const socialLinkName = 'core/social-link';
 
 	if ( Platform.OS !== 'web' && block?.name === socialLinkName ) {
-		const attributes = state.blocks.attributes[ clientId ];
-		const { service } = attributes;
+		const attributes = state.blocks.attributes.get( clientId );
+		const { service } = attributes ?? {};
 
 		return service ? `${ socialLinkName }-${ service }` : socialLinkName;
 	}
@@ -98,7 +86,7 @@ export function getBlockName( state, clientId ) {
  * @return {boolean} Is Valid.
  */
 export function isBlockValid( state, clientId ) {
-	const block = state.blocks.byClientId[ clientId ];
+	const block = state.blocks.byClientId.get( clientId );
 	return !! block && block.isValid;
 }
 
@@ -112,12 +100,12 @@ export function isBlockValid( state, clientId ) {
  * @return {Object?} Block attributes.
  */
 export function getBlockAttributes( state, clientId ) {
-	const block = state.blocks.byClientId[ clientId ];
+	const block = state.blocks.byClientId.get( clientId );
 	if ( ! block ) {
 		return null;
 	}
 
-	return state.blocks.attributes[ clientId ];
+	return state.blocks.attributes.get( clientId );
 }
 
 /**
@@ -142,29 +130,27 @@ export function getBlockAttributes( state, clientId ) {
  * @return {Object} Parsed block object.
  */
 export function getBlock( state, clientId ) {
-	const block = state.blocks.byClientId[ clientId ];
-	if ( ! block ) {
+	if ( ! state.blocks.byClientId.has( clientId ) ) {
 		return null;
 	}
 
-	return state.blocks.tree[ clientId ];
+	return state.blocks.tree.get( clientId );
 }
 
 export const __unstableGetBlockWithoutInnerBlocks = createSelector(
 	( state, clientId ) => {
-		const block = state.blocks.byClientId[ clientId ];
-		if ( ! block ) {
+		if ( ! state.blocks.byClientId.has( clientId ) ) {
 			return null;
 		}
 
 		return {
-			...block,
+			...state.blocks.byClientId.get( clientId ),
 			attributes: getBlockAttributes( state, clientId ),
 		};
 	},
 	( state, clientId ) => [
-		state.blocks.byClientId[ clientId ],
-		state.blocks.attributes[ clientId ],
+		state.blocks.byClientId.get( clientId ),
+		state.blocks.attributes.get( clientId ),
 	]
 );
 
@@ -183,7 +169,7 @@ export function getBlocks( state, rootClientId ) {
 		! rootClientId || ! areInnerBlocksControlled( state, rootClientId )
 			? rootClientId || ''
 			: 'controlled||' + rootClientId;
-	return state.blocks.tree[ treeKey ]?.innerBlocks || EMPTY_ARRAY;
+	return state.blocks.tree.get( treeKey )?.innerBlocks || EMPTY_ARRAY;
 }
 
 /**
@@ -215,7 +201,7 @@ export const __unstableGetClientIdWithClientIdsTree = createSelector(
  */
 export const __unstableGetClientIdsTree = createSelector(
 	( state, rootClientId = '' ) =>
-		map( getBlockOrder( state, rootClientId ), ( clientId ) =>
+		getBlockOrder( state, rootClientId ).map( ( clientId ) =>
 			__unstableGetClientIdWithClientIdsTree( state, clientId )
 		),
 	( state ) => [ state.blocks.order ]
@@ -285,14 +271,10 @@ export const getGlobalBlockCount = createSelector(
 		if ( ! blockName ) {
 			return clientIds.length;
 		}
-		return reduce(
-			clientIds,
-			( accumulator, clientId ) => {
-				const block = state.blocks.byClientId[ clientId ];
-				return block.name === blockName ? accumulator + 1 : accumulator;
-			},
-			0
-		);
+		return clientIds.reduce( ( accumulator, clientId ) => {
+			const block = state.blocks.byClientId.get( clientId );
+			return block.name === blockName ? accumulator + 1 : accumulator;
+		}, 0 );
 	},
 	( state ) => [ state.blocks.order, state.blocks.byClientId ]
 );
@@ -312,7 +294,7 @@ export const __experimentalGetGlobalBlocksByName = createSelector(
 		}
 		const clientIds = getClientIdsWithDescendants( state );
 		const foundBlocks = clientIds.filter( ( clientId ) => {
-			const block = state.blocks.byClientId[ clientId ];
+			const block = state.blocks.byClientId.get( clientId );
 			return block.name === blockName;
 		} );
 		return foundBlocks.length > 0 ? foundBlocks : EMPTY_ARRAY;
@@ -331,14 +313,30 @@ export const __experimentalGetGlobalBlocksByName = createSelector(
  */
 export const getBlocksByClientId = createSelector(
 	( state, clientIds ) =>
-		map( castArray( clientIds ), ( clientId ) =>
-			getBlock( state, clientId )
+		( Array.isArray( clientIds ) ? clientIds : [ clientIds ] ).map(
+			( clientId ) => getBlock( state, clientId )
 		),
 	( state, clientIds ) =>
-		map(
-			castArray( clientIds ),
-			( clientId ) => state.blocks.tree[ clientId ]
+		( Array.isArray( clientIds ) ? clientIds : [ clientIds ] ).map(
+			( clientId ) => state.blocks.tree.get( clientId )
 		)
+);
+
+/**
+ * Given an array of block client IDs, returns the corresponding array of block
+ * names.
+ *
+ * @param {Object}   state     Editor state.
+ * @param {string[]} clientIds Client IDs for which block names are to be returned.
+ *
+ * @return {string[]} Block names.
+ */
+export const getBlockNamesByClientId = createSelector(
+	( state, clientIds ) =>
+		getBlocksByClientId( state, clientIds )
+			.filter( Boolean )
+			.map( ( block ) => block.name ),
+	( state, clientIds ) => getBlocksByClientId( state, clientIds )
 );
 
 /**
@@ -478,8 +476,8 @@ export function getSelectedBlock( state ) {
  * @return {?string} Root client ID, if exists
  */
 export function getBlockRootClientId( state, clientId ) {
-	return state.blocks.parents[ clientId ] !== undefined
-		? state.blocks.parents[ clientId ]
+	return state.blocks.parents.has( clientId )
+		? state.blocks.parents.get( clientId )
 		: null;
 }
 
@@ -496,8 +494,8 @@ export const getBlockParents = createSelector(
 	( state, clientId, ascending = false ) => {
 		const parents = [];
 		let current = clientId;
-		while ( !! state.blocks.parents[ current ] ) {
-			current = state.blocks.parents[ current ];
+		while ( !! state.blocks.parents.get( current ) ) {
+			current = state.blocks.parents.get( current );
 			parents.push( current );
 		}
 
@@ -523,25 +521,21 @@ export const getBlockParents = createSelector(
 export const getBlockParentsByBlockName = createSelector(
 	( state, clientId, blockName, ascending = false ) => {
 		const parents = getBlockParents( state, clientId, ascending );
-		return map(
-			filter(
-				map( parents, ( id ) => ( {
-					id,
-					name: getBlockName( state, id ),
-				} ) ),
-				( { name } ) => {
-					if ( Array.isArray( blockName ) ) {
-						return blockName.includes( name );
-					}
-					return name === blockName;
+		return parents
+			.map( ( id ) => ( {
+				id,
+				name: getBlockName( state, id ),
+			} ) )
+			.filter( ( { name } ) => {
+				if ( Array.isArray( blockName ) ) {
+					return blockName.includes( name );
 				}
-			),
-			( { id } ) => id
-		);
+				return name === blockName;
+			} )
+			.map( ( { id } ) => id );
 	},
 	( state ) => [ state.blocks.parents ]
 );
-
 /**
  * Given a block client ID, returns the root of the hierarchy from which the block is nested, return the block itself for root level blocks.
  *
@@ -555,7 +549,7 @@ export function getBlockHierarchyRootClientId( state, clientId ) {
 	let parent;
 	do {
 		parent = current;
-		current = state.blocks.parents[ current ];
+		current = state.blocks.parents.get( current );
 	} while ( current );
 	return parent;
 }
@@ -632,7 +626,7 @@ export function getAdjacentBlockClientId( state, startClientId, modifier = 1 ) {
 	}
 
 	const { order } = state.blocks;
-	const orderSet = order[ rootClientId ];
+	const orderSet = order.get( rootClientId );
 	const index = orderSet.indexOf( startClientId );
 	const nextIndex = index + 1 * modifier;
 
@@ -706,10 +700,7 @@ export const getSelectedBlockClientIds = createSelector(
 	( state ) => {
 		const { selectionStart, selectionEnd } = state.selection;
 
-		if (
-			selectionStart.clientId === undefined ||
-			selectionEnd.clientId === undefined
-		) {
+		if ( ! selectionStart.clientId || ! selectionEnd.clientId ) {
 			return EMPTY_ARRAY;
 		}
 
@@ -724,6 +715,7 @@ export const getSelectedBlockClientIds = createSelector(
 			state,
 			selectionStart.clientId
 		);
+
 		if ( rootClientId === null ) {
 			return EMPTY_ARRAY;
 		}
@@ -800,7 +792,7 @@ export const getMultiSelectedBlocks = createSelector(
  * @return {?string} First block client ID in the multi-selection set.
  */
 export function getFirstMultiSelectedBlockClientId( state ) {
-	return first( getMultiSelectedBlockClientIds( state ) ) || null;
+	return getMultiSelectedBlockClientIds( state )[ 0 ] || null;
 }
 
 /**
@@ -812,7 +804,8 @@ export function getFirstMultiSelectedBlockClientId( state ) {
  * @return {?string} Last block client ID in the multi-selection set.
  */
 export function getLastMultiSelectedBlockClientId( state ) {
-	return last( getMultiSelectedBlockClientIds( state ) ) || null;
+	const selectedClientIds = getMultiSelectedBlockClientIds( state );
+	return selectedClientIds[ selectedClientIds.length - 1 ] || null;
 }
 
 /**
@@ -950,6 +943,14 @@ export function __unstableIsSelectionCollapsed( state ) {
 	);
 }
 
+export function __unstableSelectionHasUnmergeableBlock( state ) {
+	return getSelectedBlockClientIds( state ).some( ( clientId ) => {
+		const blockName = getBlockName( state, clientId );
+		const blockType = getBlockType( blockName );
+		return ! blockType.merge;
+	} );
+}
+
 /**
  * Check whether the selection is mergeable.
  *
@@ -1011,19 +1012,19 @@ export function __unstableIsSelectionMergeable( state, isForward ) {
 		? selectionStart.clientId
 		: selectionEnd.clientId;
 
-	const targetBlock = getBlock( state, targetBlockClientId );
-	const targetBlockType = getBlockType( targetBlock.name );
+	const targetBlockName = getBlockName( state, targetBlockClientId );
+	const targetBlockType = getBlockType( targetBlockName );
 
 	if ( ! targetBlockType.merge ) return false;
 
 	const blockToMerge = getBlock( state, blockToMergeClientId );
 
 	// It's mergeable if the blocks are of the same type.
-	if ( blockToMerge.name === targetBlock.name ) return true;
+	if ( blockToMerge.name === targetBlockName ) return true;
 
 	// If the blocks are of a different type, try to transform the block being
 	// merged into the same type of block.
-	const blocksToMerge = switchToBlockType( blockToMerge, targetBlock.name );
+	const blocksToMerge = switchToBlockType( blockToMerge, targetBlockName );
 
 	return blocksToMerge && blocksToMerge.length;
 }
@@ -1140,7 +1141,7 @@ export const __unstableGetSelectedBlocksWithPartialSelection = ( state ) => {
  * @return {Array} Ordered client IDs of editor blocks.
  */
 export function getBlockOrder( state, rootClientId ) {
-	return state.blocks.order[ rootClientId || '' ] || EMPTY_ARRAY;
+	return state.blocks.order.get( rootClientId || '' ) || EMPTY_ARRAY;
 }
 
 /**
@@ -1186,8 +1187,7 @@ export function isBlockSelected( state, clientId ) {
  * @return {boolean} Whether the block as an inner block selected
  */
 export function hasSelectedInnerBlock( state, clientId, deep = false ) {
-	return some(
-		getBlockOrder( state, clientId ),
+	return getBlockOrder( state, clientId ).some(
 		( innerClientId ) =>
 			isBlockSelected( state, innerClientId ) ||
 			isBlockMultiSelected( state, innerClientId ) ||
@@ -1335,7 +1335,7 @@ export function isAncestorBeingDragged( state, clientId ) {
 	}
 
 	const parents = getBlockParents( state, clientId );
-	return some( parents, ( parentClientId ) =>
+	return parents.some( ( parentClientId ) =>
 		isBlockBeingDragged( state, parentClientId )
 	);
 }
@@ -1367,28 +1367,36 @@ export function isCaretWithinFormattedText() {
  *
  * @return {Object} Insertion point object with `rootClientId`, `index`.
  */
-export function getBlockInsertionPoint( state ) {
-	let rootClientId, index;
+export const getBlockInsertionPoint = createSelector(
+	( state ) => {
+		let rootClientId, index;
 
-	const {
-		insertionPoint,
-		selection: { selectionEnd },
-	} = state;
-	if ( insertionPoint !== null ) {
-		return insertionPoint;
-	}
+		const {
+			insertionPoint,
+			selection: { selectionEnd },
+		} = state;
+		if ( insertionPoint !== null ) {
+			return insertionPoint;
+		}
 
-	const { clientId } = selectionEnd;
+		const { clientId } = selectionEnd;
 
-	if ( clientId ) {
-		rootClientId = getBlockRootClientId( state, clientId ) || undefined;
-		index = getBlockIndex( state, selectionEnd.clientId, rootClientId ) + 1;
-	} else {
-		index = getBlockOrder( state ).length;
-	}
+		if ( clientId ) {
+			rootClientId = getBlockRootClientId( state, clientId ) || undefined;
+			index = getBlockIndex( state, selectionEnd.clientId ) + 1;
+		} else {
+			index = getBlockOrder( state ).length;
+		}
 
-	return { rootClientId, index };
-}
+		return { rootClientId, index };
+	},
+	( state ) => [
+		state.insertionPoint,
+		state.selection.selectionEnd.clientId,
+		state.blocks.parents,
+		state.blocks.order,
+	]
+);
 
 /**
  * Returns true if we should show the block insertion point.
@@ -1429,23 +1437,18 @@ export function getTemplate( state ) {
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional block root client ID.
  *
- * @return {?string} Block Template Lock
+ * @return {string|false} Block Template Lock
  */
 export function getTemplateLock( state, rootClientId ) {
 	if ( ! rootClientId ) {
-		return state.settings.templateLock;
+		return state.settings.templateLock ?? false;
 	}
 
-	const blockListSettings = getBlockListSettings( state, rootClientId );
-	if ( ! blockListSettings ) {
-		return null;
-	}
-
-	return blockListSettings.templateLock;
+	return getBlockListSettings( state, rootClientId )?.templateLock ?? false;
 }
 
 const checkAllowList = ( list, item, defaultResult = null ) => {
-	if ( isBoolean( list ) ) {
+	if ( typeof list === 'boolean' ) {
 		return list;
 	}
 	if ( Array.isArray( list ) ) {
@@ -1534,7 +1537,7 @@ const canInsertBlockTypeUnmemoized = (
 			...getBlockParents( state, rootClientId ),
 		];
 
-		hasBlockAllowedAncestor = some( ancestors, ( ancestorClientId ) =>
+		hasBlockAllowedAncestor = ancestors.some( ( ancestorClientId ) =>
 			checkAllowList(
 				blockAllowedAncestorBlocks,
 				getBlockName( state, ancestorClientId )
@@ -1596,7 +1599,7 @@ export const canInsertBlockType = createSelector(
 	canInsertBlockTypeUnmemoized,
 	( state, blockName, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
-		state.blocks.byClientId[ rootClientId ],
+		state.blocks.byClientId.get( rootClientId ),
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 	]
@@ -1668,7 +1671,7 @@ export function canRemoveBlocks( state, clientIds, rootClientId = null ) {
  * @param {string}  clientId     The block client Id.
  * @param {?string} rootClientId Optional root client ID of block list.
  *
- * @return {boolean} Whether the given block is allowed to be moved.
+ * @return {boolean | undefined} Whether the given block is allowed to be moved.
  */
 export function canMoveBlock( state, clientId, rootClientId = null ) {
 	const attributes = getBlockAttributes( state, clientId );
@@ -1848,13 +1851,10 @@ const buildBlockTypeItem =
 
 		let isDisabled = false;
 		if ( ! hasBlockSupport( blockType.name, 'multiple', true ) ) {
-			isDisabled = some(
-				getBlocksByClientId(
-					state,
-					getClientIdsWithDescendants( state )
-				),
-				{ name: blockType.name }
-			);
+			isDisabled = getBlocksByClientId(
+				state,
+				getClientIdsWithDescendants( state )
+			).some( ( { name } ) => name === blockType.name );
 		}
 
 		const { time, count = 0 } = getInsertUsage( state, id ) || {};
@@ -2068,7 +2068,7 @@ export const getInserterItems = createSelector(
  */
 export const getBlockTransformItems = createSelector(
 	( state, blocks, rootClientId = null ) => {
-		const normalizedBlocks = castArray( blocks );
+		const normalizedBlocks = Array.isArray( blocks ) ? blocks : [ blocks ];
 		const [ sourceBlock ] = normalizedBlocks;
 		const buildBlockTypeTransformItem = buildBlockTypeItem( state, {
 			buildScope: 'transform',
@@ -2079,9 +2079,11 @@ export const getBlockTransformItems = createSelector(
 			)
 			.map( buildBlockTypeTransformItem );
 
-		const itemsByName = mapKeys(
-			blockTypeTransformItems,
-			( { name } ) => name
+		const itemsByName = Object.fromEntries(
+			Object.entries( blockTypeTransformItems ).map( ( [ , value ] ) => [
+				value.name,
+				value,
+			] )
 		);
 
 		// Consider unwraping the highest priority.
@@ -2110,7 +2112,7 @@ export const getBlockTransformItems = createSelector(
 			'desc'
 		);
 	},
-	( state, rootClientId ) => [
+	( state, blocks, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
 		state.blocks.byClientId,
 		state.preferences.insertUsage,
@@ -2130,7 +2132,7 @@ export const getBlockTransformItems = createSelector(
  */
 export const hasInserterItems = createSelector(
 	( state, rootClientId = null ) => {
-		const hasBlockType = some( getBlockTypes(), ( blockType ) =>
+		const hasBlockType = getBlockTypes().some( ( blockType ) =>
 			canIncludeBlockTypeInInserter( state, blockType, rootClientId )
 		);
 		if ( hasBlockType ) {
@@ -2153,20 +2155,20 @@ export const hasInserterItems = createSelector(
 );
 
 /**
- * Returns the list of allowed inserter blocks for inner blocks children
+ * Returns the list of allowed inserter blocks for inner blocks children.
  *
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional root client ID of block list.
  *
  * @return {Array?} The list of allowed block types.
  */
-export const __experimentalGetAllowedBlocks = createSelector(
+export const getAllowedBlocks = createSelector(
 	( state, rootClientId = null ) => {
 		if ( ! rootClientId ) {
 			return;
 		}
 
-		return filter( getBlockTypes(), ( blockType ) =>
+		return getBlockTypes().filter( ( blockType ) =>
 			canIncludeBlockTypeInInserter( state, blockType, rootClientId )
 		);
 	},
@@ -2176,6 +2178,24 @@ export const __experimentalGetAllowedBlocks = createSelector(
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 		getBlockTypes(),
+	]
+);
+
+export const __experimentalGetAllowedBlocks = createSelector(
+	( state, rootClientId = null ) => {
+		deprecated(
+			'wp.data.select( "core/block-editor" ).__experimentalGetAllowedBlocks',
+			{
+				alternative:
+					'wp.data.select( "core/block-editor" ).getAllowedBlocks',
+				since: '6.2',
+				version: '6.4',
+			}
+		);
+		return getAllowedBlocks( state, rootClientId );
+	},
+	( state, rootClientId ) => [
+		...getAllowedBlocks.getDependants( state, rootClientId ),
 	]
 );
 
@@ -2213,12 +2233,12 @@ export const __experimentalGetDirectInsertBlock = createSelector(
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
-		state.blocks.tree[ rootClientId ],
+		state.blocks.tree.get( rootClientId ),
 	]
 );
 
 const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
-	if ( isBoolean( allowedBlockTypes ) ) {
+	if ( typeof allowedBlockTypes === 'boolean' ) {
 		return allowedBlockTypes;
 	}
 
@@ -2291,8 +2311,7 @@ const getAllAllowedPatterns = createSelector(
 export const __experimentalGetAllowedPatterns = createSelector(
 	( state, rootClientId = null ) => {
 		const availableParsedPatterns = getAllAllowedPatterns( state );
-		const patternsAllowed = filter(
-			availableParsedPatterns,
+		const patternsAllowed = availableParsedPatterns.filter(
 			( { blocks } ) =>
 				blocks.every( ( { name } ) =>
 					canInsertBlockType( state, name, rootClientId )
@@ -2306,7 +2325,7 @@ export const __experimentalGetAllowedPatterns = createSelector(
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 		state.blockListSettings[ rootClientId ],
-		state.blocks.byClientId[ rootClientId ],
+		state.blocks.byClientId.get( rootClientId ),
 	]
 );
 
@@ -2323,7 +2342,7 @@ export const __experimentalGetAllowedPatterns = createSelector(
  *
  * @return {Array} The list of matched block patterns based on declared `blockTypes` and block name.
  */
-export const __experimentalGetPatternsByBlockTypes = createSelector(
+export const getPatternsByBlockTypes = createSelector(
 	( state, blockNames, rootClientId = null ) => {
 		if ( ! blockNames ) return EMPTY_ARRAY;
 		const patterns = __experimentalGetAllowedPatterns(
@@ -2333,13 +2352,38 @@ export const __experimentalGetPatternsByBlockTypes = createSelector(
 		const normalizedBlockNames = Array.isArray( blockNames )
 			? blockNames
 			: [ blockNames ];
-		return patterns.filter( ( pattern ) =>
+		const filteredPatterns = patterns.filter( ( pattern ) =>
 			pattern?.blockTypes?.some?.( ( blockName ) =>
 				normalizedBlockNames.includes( blockName )
 			)
 		);
+		if ( filteredPatterns.length === 0 ) {
+			return EMPTY_ARRAY;
+		}
+		return filteredPatterns;
 	},
-	( state, rootClientId ) => [
+	( state, blockNames, rootClientId ) => [
+		...__experimentalGetAllowedPatterns.getDependants(
+			state,
+			rootClientId
+		),
+	]
+);
+
+export const __experimentalGetPatternsByBlockTypes = createSelector(
+	( state, blockNames, rootClientId = null ) => {
+		deprecated(
+			'wp.data.select( "core/block-editor" ).__experimentalGetPatternsByBlockTypes',
+			{
+				alternative:
+					'wp.data.select( "core/block-editor" ).getPatternsByBlockTypes',
+				since: '6.2',
+				version: '6.4',
+			}
+		);
+		return getPatternsByBlockTypes( state, blockNames, rootClientId );
+	},
+	( state, blockNames, rootClientId ) => [
 		...__experimentalGetAllowedPatterns.getDependants(
 			state,
 			rootClientId
@@ -2394,17 +2438,14 @@ export const __experimentalGetPatternTransformItems = createSelector(
 		 * block pattern's blocks and try to find matches from the selected blocks.
 		 * Now this happens in the consumer to avoid heavy operations in the selector.
 		 */
-		return __experimentalGetPatternsByBlockTypes(
+		return getPatternsByBlockTypes(
 			state,
 			selectedBlockNames,
 			rootClientId
 		);
 	},
-	( state, rootClientId ) => [
-		...__experimentalGetPatternsByBlockTypes.getDependants(
-			state,
-			rootClientId
-		),
+	( state, blocks, rootClientId ) => [
+		...getPatternsByBlockTypes.getDependants( state, rootClientId ),
 	]
 );
 
@@ -2479,8 +2520,7 @@ export const __experimentalGetBlockListSettingsForBlocks = createSelector(
  */
 export const __experimentalGetReusableBlockTitle = createSelector(
 	( state, ref ) => {
-		const reusableBlock = find(
-			getReusableBlocks( state ),
+		const reusableBlock = getReusableBlocks( state ).find(
 			( block ) => block.id === ref
 		);
 		if ( ! reusableBlock ) {
@@ -2542,7 +2582,18 @@ function getReusableBlocks( state ) {
  * @return {boolean} Is navigation mode enabled.
  */
 export function isNavigationMode( state ) {
-	return state.isNavigationMode;
+	return state.editorMode === 'navigation';
+}
+
+/**
+ * Returns the current editor mode.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {string} the editor mode.
+ */
+export function __unstableGetEditorMode( state ) {
+	return state.editorMode;
 }
 
 /**
@@ -2625,7 +2676,7 @@ export const __experimentalGetActiveBlockIdByBlockNames = createSelector(
 		);
 		if ( entityAreaParents ) {
 			// Last parent closest/most interior.
-			return last( entityAreaParents );
+			return entityAreaParents[ entityAreaParents.length - 1 ];
 		}
 		return null;
 	},
@@ -2647,9 +2698,19 @@ export const __experimentalGetActiveBlockIdByBlockNames = createSelector(
 export function wasBlockJustInserted( state, clientId, source ) {
 	const { lastBlockInserted } = state;
 	return (
-		lastBlockInserted.clientId === clientId &&
+		lastBlockInserted.clientIds?.includes( clientId ) &&
 		lastBlockInserted.source === source
 	);
+}
+
+/**
+ * Gets the client ids of the last inserted blocks.
+ *
+ * @param {Object} state Global application state.
+ * @return {Array|undefined} Client Ids of the last inserted block(s).
+ */
+export function getLastInsertedBlocksClientIds( state ) {
+	return state?.lastBlockInserted?.clientIds;
 }
 
 /**
@@ -2660,7 +2721,7 @@ export function wasBlockJustInserted( state, clientId, source ) {
  * @return {boolean} True if the block is visible.
  */
 export function isBlockVisible( state, clientId ) {
-	return state.blocks.visibility?.[ clientId ] ?? true;
+	return state.blockVisibility?.[ clientId ] ?? true;
 }
 
 /**
@@ -2672,10 +2733,92 @@ export function isBlockVisible( state, clientId ) {
 export const __unstableGetVisibleBlocks = createSelector(
 	( state ) => {
 		return new Set(
-			Object.keys( state.blocks.visibility ).filter(
-				( key ) => state.blocks.visibility[ key ]
+			Object.keys( state.blockVisibility ).filter(
+				( key ) => state.blockVisibility[ key ]
 			)
 		);
 	},
-	( state ) => [ state.blocks.visibility ]
+	( state ) => [ state.blockVisibility ]
 );
+
+/**
+ * DO-NOT-USE in production.
+ * This selector is created for internal/experimental only usage and may be
+ * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
+ */
+export const __unstableGetContentLockingParent = createSelector(
+	( state, clientId ) => {
+		let current = clientId;
+		let result;
+		while ( state.blocks.parents.has( current ) ) {
+			current = state.blocks.parents.get( current );
+			if ( getTemplateLock( state, current ) === 'contentOnly' ) {
+				result = current;
+			}
+		}
+		return result;
+	},
+	( state ) => [ state.blocks.parents, state.blockListSettings ]
+);
+
+/**
+ * DO-NOT-USE in production.
+ * This selector is created for internal/experimental only usage and may be
+ * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
+ *
+ * @param {Object} state Global application state.
+ */
+export function __unstableGetTemporarilyEditingAsBlocks( state ) {
+	return state.temporarilyEditingAsBlocks;
+}
+
+export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
+	// If the block editing is locked, the block overlay is always active.
+	if ( ! canEditBlock( state, clientId ) ) {
+		return true;
+	}
+
+	const editorMode = __unstableGetEditorMode( state );
+
+	// In zoom-out mode, the block overlay is always active for top level blocks.
+	if (
+		editorMode === 'zoom-out' &&
+		clientId &&
+		! getBlockRootClientId( state, clientId )
+	) {
+		return true;
+	}
+
+	// In navigation mode, the block overlay is active when the block is not
+	// selected (and doesn't contain a selected child). The same behavior is
+	// also enabled in all modes for blocks that have controlled children
+	// (reusable block, template part, navigation), unless explicitly disabled
+	// with `supports.__experimentalDisableBlockOverlay`.
+	const blockSupportDisable = hasBlockSupport(
+		getBlockName( state, clientId ),
+		'__experimentalDisableBlockOverlay',
+		false
+	);
+	const shouldEnableIfUnselected =
+		editorMode === 'navigation' ||
+		( blockSupportDisable
+			? false
+			: areInnerBlocksControlled( state, clientId ) );
+
+	return (
+		shouldEnableIfUnselected &&
+		! isBlockSelected( state, clientId ) &&
+		! hasSelectedInnerBlock( state, clientId, true )
+	);
+}
+
+export function __unstableIsWithinBlockOverlay( state, clientId ) {
+	let parent = state.blocks.parents[ clientId ];
+	while ( !! parent ) {
+		if ( __unstableHasActiveBlockOverlayActive( state, parent ) ) {
+			return true;
+		}
+		parent = state.blocks.parents[ parent ];
+	}
+	return false;
+}

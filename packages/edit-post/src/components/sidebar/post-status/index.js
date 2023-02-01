@@ -20,6 +20,7 @@ import PostPendingStatus from '../post-pending-status';
 import PluginPostStatusInfo from '../plugin-post-status-info';
 import { store as editPostStore } from '../../../store';
 import PostTemplate from '../post-template';
+import PostURL from '../post-url';
 
 /**
  * Module Constants
@@ -40,9 +41,10 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 						<PostVisibility />
 						<PostSchedule />
 						<PostTemplate />
-						<PostFormat />
+						<PostURL />
 						<PostSticky />
 						<PostPendingStatus />
+						<PostFormat />
 						<PostSlug />
 						<PostAuthor />
 						{ fills }

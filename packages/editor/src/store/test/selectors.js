@@ -148,7 +148,6 @@ const {
 	hasEditorUndo,
 	hasEditorRedo,
 	isEditedPostNew,
-	hasChangedContent,
 	isEditedPostDirty,
 	hasNonPostEntityChanges,
 	isCleanNewPost,
@@ -389,57 +388,6 @@ describe( 'selectors', () => {
 			};
 
 			expect( isEditedPostNew( state ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'hasChangedContent', () => {
-		it( 'should return false if no dirty blocks nor content property edit', () => {
-			const state = {
-				editor: {
-					present: {
-						blocks: {
-							isDirty: false,
-						},
-						edits: {},
-					},
-				},
-			};
-
-			expect( hasChangedContent( state ) ).toBe( false );
-		} );
-
-		it( 'should return true if dirty blocks', () => {
-			const state = {
-				editor: {
-					present: {
-						blocks: {
-							isDirty: true,
-							value: [],
-						},
-						edits: {},
-					},
-				},
-			};
-
-			expect( hasChangedContent( state ) ).toBe( true );
-		} );
-
-		it( 'should return true if content property edit', () => {
-			const state = {
-				editor: {
-					present: {
-						blocks: {
-							isDirty: false,
-							value: [],
-						},
-						edits: {
-							content: 'text mode edited',
-						},
-					},
-				},
-			};
-
-			expect( hasChangedContent( state ) ).toBe( true );
 		} );
 	} );
 
@@ -1566,11 +1514,9 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocks: {
-							value: [],
-							isDirty: true,
+						edits: {
+							content: () => 'new-content',
 						},
-						edits: {},
 					},
 				},
 				currentPost: {
@@ -1599,7 +1545,7 @@ describe( 'selectors', () => {
 
 			for ( const variantField of fields ) {
 				for ( const constantField of fields.filter(
-					( f ) => ! f === variantField
+					( f ) => f !== variantField
 				) ) {
 					const state = {
 						editor: {

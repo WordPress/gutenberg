@@ -68,6 +68,8 @@ public class Gutenberg: UIResponder {
 
         initialProps["postType"] = dataSource.gutenbergPostType()
 
+        initialProps["hostAppNamespace"] = dataSource.gutenbergHostAppNamespace()
+
         if let locale = dataSource.gutenbergLocale() {
             initialProps["locale"] = locale
         }
@@ -208,6 +210,10 @@ public class Gutenberg: UIResponder {
             settingsUpdates["quoteBlockV2"] = quoteBlockV2
         }
 
+        if let listBlockV2 = editorSettings?.listBlockV2 {
+            settingsUpdates["listBlockV2"] = listBlockV2
+        }
+
         if let rawStyles = editorSettings?.rawStyles {
             settingsUpdates["rawStyles"] = rawStyles
         }
@@ -250,7 +256,11 @@ extension Gutenberg: RCTBridgeDelegate {
             return Bundle.main.url(forResource: "main", withExtension: "jsbundle")
         }
         #endif
-        return RCTBundleURLProvider.sharedSettings()?.jsBundleURL(forBundleRoot: "index", fallbackResource: "")
+        
+        guard let localBundle = RCTBundleURLProvider.sharedSettings()?.jsBundleURL(forBundleRoot: "index", fallbackExtension: "") else {
+            return Bundle.main.url(forResource: "main", withExtension: "jsbundle")
+        }
+        return localBundle
     }
 
     public func extraModules(for bridge: RCTBridge!) -> [RCTBridgeModule]! {

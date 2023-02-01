@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-const { last } = require( 'lodash' );
-
-/**
  * Function that returns the leading comment
  * of a Espree node.
  *
@@ -14,7 +9,10 @@ const { last } = require( 'lodash' );
 module.exports = ( declaration ) => {
 	let comments;
 	if ( declaration.leadingComments ) {
-		const lastComment = last( declaration.leadingComments );
+		const lastComment =
+			declaration.leadingComments[
+				declaration.leadingComments.length - 1
+			];
 		if ( lastComment ) {
 			comments = lastComment.value;
 		}
