@@ -6,6 +6,8 @@ import { speak } from '@wordpress/a11y';
 import { useSelect } from '@wordpress/data';
 import { forwardRef, useState, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { Button } from '@wordpress/components';
+import { plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -84,6 +86,41 @@ export const Appender = forwardRef(
 					selectBlockOnInsert={ false }
 					shouldDirectInsert={ false }
 					__experimentalIsQuick
+					renderToggle={ ( {
+						onToggle,
+						disabled,
+						isOpen,
+						hasSingleBlockType,
+						toggleProps = {},
+					} ) => {
+						const { onClick, ...rest } = toggleProps;
+						// Handle both onClick functions from the toggle and the parent component.
+						function handleClick( event ) {
+							if ( onToggle ) {
+								onToggle( event );
+							}
+							if ( onClick ) {
+								onClick( event );
+							}
+						}
+						return (
+							<Button
+								icon={ plus }
+								onClick={ handleClick }
+								className="block-editor-inserter__toggle"
+								aria-haspopup={
+									! hasSingleBlockType ? 'true' : false
+								}
+								aria-expanded={
+									! hasSingleBlockType ? isOpen : false
+								}
+								disabled={ disabled }
+								{ ...rest }
+							>
+								{ __( 'Add menu item' ) }
+							</Button>
+						);
+					} }
 					{ ...props }
 					toggleProps={ { 'aria-describedby': descriptionId } }
 					onSelectOrClose={ ( maybeInsertedBlock ) => {
