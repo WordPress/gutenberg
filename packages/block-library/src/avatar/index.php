@@ -16,67 +16,14 @@
 function render_block_core_avatar( $attributes, $content, $block ) {
 	$size               = isset( $attributes['size'] ) ? $attributes['size'] : 96;
 	$wrapper_attributes = get_block_wrapper_attributes();
+	$border_attributes  = gutenberg_get_border_support_attributes( $attributes );
 
-	$image_styles = array();
-
-	// Add border width styles.
-	$has_border_width = ! empty( $attributes['style']['border']['width'] );
-
-	if ( $has_border_width ) {
-		$border_width   = $attributes['style']['border']['width'];
-		$image_styles[] = sprintf( 'border-width: %s;', esc_attr( $border_width ) );
-	}
-
-	// Add border radius styles.
-	$has_border_radius = ! empty( $attributes['style']['border']['radius'] );
-
-	if ( $has_border_radius ) {
-		$border_radius = $attributes['style']['border']['radius'];
-
-		if ( is_array( $border_radius ) ) {
-			// Apply styles for individual corner border radii.
-			foreach ( $border_radius as $key => $value ) {
-				if ( null !== $value ) {
-					$name = _wp_to_kebab_case( $key );
-					// Add shared styles for individual border radii.
-					$border_style   = sprintf(
-						'border-%s-radius: %s;',
-						esc_attr( $name ),
-						esc_attr( $value )
-					);
-					$image_styles[] = $border_style;
-				}
-			}
-		} else {
-			$border_style   = sprintf( 'border-radius: %s;', esc_attr( $border_radius ) );
-			$image_styles[] = $border_style;
-		}
-	}
-
-	// Add border color styles.
-	$has_border_color = ! empty( $attributes['style']['border']['color'] );
-
-	if ( $has_border_color ) {
-		$border_color   = $attributes['style']['border']['color'];
-		$image_styles[] = sprintf( 'border-color: %s;', esc_attr( $border_color ) );
-	}
-
-	// Add border style (solid, dashed, dotted ).
-	$has_border_style = ! empty( $attributes['style']['border']['style'] );
-
-	if ( $has_border_style ) {
-		$border_style   = $attributes['style']['border']['style'];
-		$image_styles[] = sprintf( 'border-style: %s;', esc_attr( $border_style ) );
-	}
-
-	// Add border classes to the avatar image for both custom colors and palette colors.
-	$image_classes = '';
-	if ( $has_border_color || isset( $attributes['borderColor'] ) ) {
-		$image_classes .= 'has-border-color';
-	}
-	if ( isset( $attributes['borderColor'] ) ) {
-		$image_classes .= ' has-' . $attributes['borderColor'] . '-border-color';
-	}
+	$image_classes = ! empty( $border_attributes['class'] )
+		? "wp-block-avatar__image {$border_attributes['class']}"
+		: 'wp-block-avatar__image';
+	$image_styles  = ! empty( $border_attributes['style'] )
+		? sprintf( ' style="%s"', safecss_filter_attr( $border_attributes['style'] ) )
+		: '';
 
 	if ( ! isset( $block->context['commentId'] ) ) {
 		$author_id   = isset( $attributes['userId'] ) ? $attributes['userId'] : get_post_field( 'post_author', $block->context['postId'] );
@@ -89,8 +36,8 @@ function render_block_core_avatar( $attributes, $content, $block ) {
 			'',
 			$alt,
 			array(
-				'extra_attr' => isset( $image_styles ) ? sprintf( ' style="%s"', safecss_filter_attr( implode( ' ', $image_styles ) ) ) : '',
-				'class'      => "wp-block-avatar__image $image_classes ",
+				'extra_attr' => $image_styles,
+				'class'      => $image_classes,
 			)
 		);
 		if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
@@ -116,8 +63,8 @@ function render_block_core_avatar( $attributes, $content, $block ) {
 		'',
 		$alt,
 		array(
-			'extra_attr' => isset( $image_styles ) ? sprintf( ' style="%s"', safecss_filter_attr( implode( ' ', $image_styles ) ) ) : '',
-			'class'      => "wp-block-avatar__image $image_classes",
+			'extra_attr' => $image_styles,
+			'class'      => $image_classes,
 		)
 	);
 	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] && isset( $comment->comment_author_url ) && '' !== $comment->comment_author_url ) {

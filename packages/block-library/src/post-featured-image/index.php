@@ -154,48 +154,7 @@ function get_block_core_post_featured_image_overlay_element_markup( $attributes 
  * @return array The border-related classnames and styles for the block.
  */
 function get_block_core_post_featured_image_border_attributes( $attributes ) {
-	$border_styles = array();
-	$sides         = array( 'top', 'right', 'bottom', 'left' );
-
-	// Border radius.
-	if ( isset( $attributes['style']['border']['radius'] ) ) {
-		$border_styles['radius'] = $attributes['style']['border']['radius'];
-	}
-
-	// Border style.
-	if ( isset( $attributes['style']['border']['style'] ) ) {
-		$border_styles['style'] = $attributes['style']['border']['style'];
-	}
-
-	// Border width.
-	if ( isset( $attributes['style']['border']['width'] ) ) {
-		$border_styles['width'] = $attributes['style']['border']['width'];
-	}
-
-	// Border color.
-	$preset_color           = array_key_exists( 'borderColor', $attributes ) ? "var:preset|color|{$attributes['borderColor']}" : null;
-	$custom_color           = _wp_array_get( $attributes, array( 'style', 'border', 'color' ), null );
-	$border_styles['color'] = $preset_color ? $preset_color : $custom_color;
-
-	// Individual border styles e.g. top, left etc.
-	foreach ( $sides as $side ) {
-		$border                 = _wp_array_get( $attributes, array( 'style', 'border', $side ), null );
-		$border_styles[ $side ] = array(
-			'color' => isset( $border['color'] ) ? $border['color'] : null,
-			'style' => isset( $border['style'] ) ? $border['style'] : null,
-			'width' => isset( $border['width'] ) ? $border['width'] : null,
-		);
-	}
-
-	$styles     = wp_style_engine_get_styles( array( 'border' => $border_styles ) );
-	$attributes = array();
-	if ( ! empty( $styles['classnames'] ) ) {
-		$attributes['class'] = $styles['classnames'];
-	}
-	if ( ! empty( $styles['css'] ) ) {
-		$attributes['style'] = $styles['css'];
-	}
-	return $attributes;
+	return gutenberg_get_border_support_attributes( $attributes );
 }
 
 /**

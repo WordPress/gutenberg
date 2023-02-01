@@ -154,6 +154,60 @@ function gutenberg_has_border_feature_support( $block_type, $feature, $default =
 	return block_has_support( $block_type, array( '__experimentalBorder', $feature ), $default );
 }
 
+/**
+ * Generates CSS class names and styles to apply border support styles for
+ * blocks that skip serialization of the border block support. This is useful
+ * for dynamic blocks that need to apply the border classes and styles to an
+ * inner element.
+ *
+ * @param array $attributes The block attributes.
+ * @return array The border support classnames and styles for the block.
+ */
+function gutenberg_get_border_support_attributes( $attributes ) {
+	$border_styles = array();
+	$sides         = array( 'top', 'right', 'bottom', 'left' );
+
+	// Border radius.
+	if ( isset( $attributes['style']['border']['radius'] ) ) {
+		$border_styles['radius'] = $attributes['style']['border']['radius'];
+	}
+
+	// Border style.
+	if ( isset( $attributes['style']['border']['style'] ) ) {
+		$border_styles['style'] = $attributes['style']['border']['style'];
+	}
+
+	// Border width.
+	if ( isset( $attributes['style']['border']['width'] ) ) {
+		$border_styles['width'] = $attributes['style']['border']['width'];
+	}
+
+	// Border color.
+	$preset_color           = array_key_exists( 'borderColor', $attributes ) ? "var:preset|color|{$attributes['borderColor']}" : null;
+	$custom_color           = _wp_array_get( $attributes, array( 'style', 'border', 'color' ), null );
+	$border_styles['color'] = $preset_color ? $preset_color : $custom_color;
+
+	// Individual border styles e.g. top, left etc.
+	foreach ( $sides as $side ) {
+		$border                 = _wp_array_get( $attributes, array( 'style', 'border', $side ), null );
+		$border_styles[ $side ] = array(
+			'color' => isset( $border['color'] ) ? $border['color'] : null,
+			'style' => isset( $border['style'] ) ? $border['style'] : null,
+			'width' => isset( $border['width'] ) ? $border['width'] : null,
+		);
+	}
+
+	$styles     = wp_style_engine_get_styles( array( 'border' => $border_styles ) );
+	$attributes = array();
+	if ( ! empty( $styles['classnames'] ) ) {
+		$attributes['class'] = $styles['classnames'];
+	}
+	if ( ! empty( $styles['css'] ) ) {
+		$attributes['style'] = $styles['css'];
+	}
+	return $attributes;
+}
+
 // Register the block support.
 WP_Block_Supports::get_instance()->register(
 	'border',
