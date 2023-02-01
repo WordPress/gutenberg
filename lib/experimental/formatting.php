@@ -2,14 +2,12 @@
 /**
  * New WordPress Formatting API.
  *
- * @package WordPress
+ * @package gutenberg
  */
 
 if ( ! function_exists( 'wp_word_count' ) ) {
 	/**
 	 * Count words or characters in a provided text string.
-	 *
-	 * @since 6.2.0
 	 *
 	 * @param string $text  Text to count elements in.
 	 * @param string $type The type of count. Accepts 'words', 'characters_excluding_spaces', or 'characters_including_spaces'.

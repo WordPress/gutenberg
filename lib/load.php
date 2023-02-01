@@ -93,7 +93,6 @@ require __DIR__ . '/compat/wordpress-6.2/block-editor.php';
 require __DIR__ . '/compat/wordpress-6.2/block-editor-settings.php';
 require __DIR__ . '/compat/wordpress-6.2/theme.php';
 require __DIR__ . '/compat/wordpress-6.2/widgets.php';
-require __DIR__ . '/compat/wordpress-6.2/formatting.php';
 
 if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
 	require __DIR__ . '/compat/wordpress-6.2/html-api/class-wp-html-attribute-token.php';
@@ -108,6 +107,7 @@ require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/kses.php';
+require __DIR__ . '/experimental/formatting.php';
 
 // Fonts API.
 if ( ! class_exists( 'WP_Fonts' ) ) {
