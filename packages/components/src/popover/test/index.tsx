@@ -12,10 +12,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import {
-	popoverLegacyPositionToPlacement,
-	placementToMotionAnimationProps,
-} from '../utils';
+import { positionToPlacement, placementToMotionAnimationProps } from '../utils';
 import Popover from '..';
 import type { PopoverProps } from '../types';
 
@@ -171,13 +168,13 @@ describe( 'Popover', () => {
 		} );
 	} );
 
-	describe( 'popoverLegacyPositionToPlacement', () => {
+	describe( 'positionToPlacement', () => {
 		it.each( ALL_POSITIONS_TO_EXPECTED_PLACEMENTS )(
 			'converts `%s` to `%s`',
 			( inputPosition, expectedPlacement ) => {
-				expect(
-					popoverLegacyPositionToPlacement( inputPosition )
-				).toEqual( expectedPlacement );
+				expect( positionToPlacement( inputPosition ) ).toEqual(
+					expectedPlacement
+				);
 			}
 		);
 	} );
