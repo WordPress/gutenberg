@@ -5,7 +5,7 @@ import { createBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
-export function convertToNavigationLinks( pages = [] ) {
+function createNavigationLinks( pages = [] ) {
 	const linkMap = {};
 	const navigationLinks = [];
 	pages.forEach( ( { id, title, link: url, type, parent } ) => {
@@ -30,10 +30,53 @@ export function convertToNavigationLinks( pages = [] ) {
 				// Use a placeholder if the child appears before parent in list.
 				linkMap[ parent ] = { innerBlocks: [] };
 			}
+			// Although these variables are not referenced, they are needed to store the innerBlocks in memory.
 			const parentLinkInnerBlocks = linkMap[ parent ].innerBlocks;
 			parentLinkInnerBlocks.push( linkMap[ id ] );
 		}
 	} );
+
+	return navigationLinks;
+}
+
+/**
+ * Finds a navigation link block by id, recursively.
+ *
+ * @param {Array}  navigationLinks An array of navigation link blocks.
+ * @param {number} id              The id of the navigation link to find.
+ *
+ * @return {Object} The navigation link block with the given id.
+ */
+function findById( navigationLinks, id ) {
+	for ( const navigationLink of navigationLinks ) {
+		if ( navigationLink.attributes.id === id ) {
+			return navigationLink;
+		}
+		if (
+			navigationLink.innerBlocks &&
+			navigationLink.innerBlocks.length > 0
+		) {
+			const foundNavigationLink = findById(
+				navigationLink.innerBlocks,
+				id
+			);
+			if ( foundNavigationLink ) {
+				return foundNavigationLink;
+			}
+		}
+	}
+}
+
+export function convertToNavigationLinks( pages = [], parentPageID = null ) {
+	let navigationLinks = createNavigationLinks( pages );
+
+	// If a parent page ID is provided, only return the children of that page.
+	if ( parentPageID ) {
+		const parentPage = findById( navigationLinks, parentPageID );
+		if ( parentPage && parentPage.innerBlocks ) {
+			navigationLinks = parentPage.innerBlocks;
+		}
+	}
 
 	// Transform all links with innerBlocks into Submenus. This can't be done
 	// sooner because page objects have no information on their children.
@@ -53,11 +96,14 @@ export function convertToNavigationLinks( pages = [] ) {
 	};
 
 	transformSubmenus( navigationLinks );
-
 	return navigationLinks;
 }
 
-export function useConvertToNavigationLinks( { clientId, pages } ) {
+export function useConvertToNavigationLinks( {
+	clientId,
+	pages,
+	parentPageID,
+} ) {
 	const { replaceBlock, selectBlock } = useDispatch( blockEditorStore );
 
 	const { parentNavBlockClientId } = useSelect(
@@ -79,7 +125,7 @@ export function useConvertToNavigationLinks( { clientId, pages } ) {
 	);
 
 	return () => {
-		const navigationLinks = convertToNavigationLinks( pages );
+		const navigationLinks = convertToNavigationLinks( pages, parentPageID );
 
 		// Replace the Page List block with the Navigation Links.
 		replaceBlock( clientId, navigationLinks );
