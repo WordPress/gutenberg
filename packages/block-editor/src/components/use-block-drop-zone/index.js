@@ -141,7 +141,7 @@ export default function useBlockDropZone( {
 	// values returned by the `getRootBlockClientId` selector, which also uses
 	// an empty string to represent top-level blocks.
 	rootClientId: targetRootClientId = '',
-	dropTargetName,
+	dropZoneName,
 } = {} ) {
 	const [ dropTarget, setDropTarget ] = useState( {
 		index: null,
@@ -174,7 +174,7 @@ export default function useBlockDropZone( {
 
 	const onBlockDrop = useOnBlockDrop( targetRootClientId, dropTarget.index, {
 		operation: dropTarget.operation,
-		dropTargetName,
+		dropZoneName,
 	} );
 	const throttled = useThrottle(
 		useCallback(

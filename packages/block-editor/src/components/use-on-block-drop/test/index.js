@@ -307,7 +307,7 @@ describe( 'onBlockDrop', () => {
 		const targetRootClientId = '1';
 		const targetBlockIndex = 0;
 
-		const dropTargetName = 'canvas';
+		const dropZoneName = 'canvas';
 		const dragOrigin = 'list-view';
 
 		const getBlockIndex = jest.fn( () => 1 );
@@ -340,7 +340,7 @@ describe( 'onBlockDrop', () => {
 			moveBlocks,
 			insertOrReplaceBlocks,
 			clearSelectedBlock,
-			dropTargetName
+			dropZoneName
 		);
 		eventHandler( event );
 
