@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 23.3.0 (2023-02-01)
+
 ### Deprecations
 
 -   `NumberControl`: Clarify deprecation message about `hideHTMLArrows` prop ([#47370](https://github.com/WordPress/gutenberg/pull/47370)).
