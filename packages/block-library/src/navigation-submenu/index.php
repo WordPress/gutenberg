@@ -300,7 +300,7 @@ add_action( 'init', 'register_block_core_navigation_submenu' );
  * @param array $settings Default editor settings.
  * @return array Filtered editor settings.
  */
-function gutenberg_enable_animation_for_navigation_submenu_inspector( $settings ) {
+function block_core_navigation_submenu_enable_inspector_animation( $settings ) {
 	$current_animation_settings = _wp_array_get(
 		$settings,
 		array( '__experimentalBlockInspectorAnimation' ),
@@ -320,4 +320,4 @@ function gutenberg_enable_animation_for_navigation_submenu_inspector( $settings 
 	return $settings;
 }
 
-add_filter( 'block_editor_settings_all', 'gutenberg_enable_animation_for_navigation_submenu_inspector' );
+add_filter( 'block_editor_settings_all', 'block_core_navigation_submenu_enable_inspector_animation' );
