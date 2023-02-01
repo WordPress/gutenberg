@@ -111,9 +111,7 @@
 			}
 		},
 		"__experimentalLayout": {
-			"default": {
-				"type": "constrained"
-			}
+			"allowJustification": false
 		}
 	},
 	"editorStyle": "wp-block-cover-editor",
