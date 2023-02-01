@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
 import {
 	Button,
 	Popover,
-	popoverLegacyPositionToPlacement,
+	__experimentalPopoverPositionToPlacement as positionToPlacement,
 } from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
@@ -46,7 +46,7 @@ function URLPopover( {
 	if ( placement !== undefined ) {
 		computedPlacement = placement;
 	} else if ( position !== undefined ) {
-		computedPlacement = popoverLegacyPositionToPlacement( position );
+		computedPlacement = positionToPlacement( position );
 	}
 	computedPlacement = computedPlacement || DEFAULT_PLACEMENT;
 

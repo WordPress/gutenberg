@@ -52,7 +52,7 @@ import ScrollLock from '../scroll-lock';
 import { Slot, Fill, useSlot } from '../slot-fill';
 import {
 	getFrameOffset,
-	popoverLegacyPositionToPlacement,
+	positionToPlacement,
 	placementToMotionAnimationProps,
 	getReferenceOwnerDocument,
 	getReferenceElement,
@@ -256,7 +256,7 @@ const UnforwardedPopover = (
 	const isExpanded = expandOnMobile && isMobileViewport;
 	const hasArrow = ! isExpanded && ! noArrow;
 	const normalizedPlacementFromProps = position
-		? popoverLegacyPositionToPlacement( position )
+		? positionToPlacement( position )
 		: placementProp;
 
 	/**

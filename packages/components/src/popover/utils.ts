@@ -71,12 +71,13 @@ const POSITION_TO_PLACEMENT: Record<
 };
 
 /**
- * Converts the `Popover`'s legacy "position" prop to the new "placement" prop.
+ * Converts the `Popover`'s legacy "position" prop to the new "placement" prop
+ * (used by `floating-ui`).
  *
  * @param  position The legacy position
  * @return The corresponding placement
  */
-export const popoverLegacyPositionToPlacement = (
+export const positionToPlacement = (
 	position: NonNullable< PopoverProps[ 'position' ] >
 ): NonNullable< PopoverProps[ 'placement' ] > =>
 	POSITION_TO_PLACEMENT[ position ] ?? 'bottom';
