@@ -71,6 +71,11 @@ export function getSupportedGlobalStylesPanels( name ) {
 		supportKeys.push( 'blockGap' );
 	}
 
+	// check for shadow support
+	if ( blockType?.supports?.shadow ) {
+		supportKeys.push( 'shadow' );
+	}
+
 	Object.keys( STYLE_PROPERTY ).forEach( ( styleName ) => {
 		if ( ! STYLE_PROPERTY[ styleName ].support ) {
 			return;

@@ -10,7 +10,7 @@ import removeAccents from 'remove-accents';
  *
  * @return {string} The normalized search input.
  */
-function normalizeSearchInput( input = '' ) {
+export function normalizeSearchInput( input = '' ) {
 	// Disregard diacritics.
 	input = removeAccents( input );
 
@@ -27,7 +27,7 @@ function normalizeSearchInput( input = '' ) {
  * @param {string} searchValue Search term
  * @return {number} A pattern search rank
  */
-function getPatternSearchRank( pattern, searchValue ) {
+export function getPatternSearchRank( pattern, searchValue ) {
 	const normalizedSearchValue = normalizeSearchInput( searchValue );
 	const normalizedTitle = normalizeSearchInput( pattern.title );
 

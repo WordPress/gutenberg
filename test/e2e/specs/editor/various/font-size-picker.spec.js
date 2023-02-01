@@ -8,6 +8,16 @@ test.describe( 'Font Size Picker', () => {
 		await admin.createNewPost();
 	} );
 
+	test.afterEach( async ( { page } ) => {
+		const closeButton = page.locator(
+			'role=region[name="Editor settings"i] >> role=button[name^="Close settings"i]'
+		);
+
+		if ( await closeButton.isVisible() ) {
+			await closeButton.click();
+		}
+	} );
+
 	test.describe( 'Common', () => {
 		test( 'should apply a named font size using the font size input', async ( {
 			editor,
@@ -183,6 +193,7 @@ test.describe( 'Font Size Picker', () => {
 
 			await page.click( 'role=button[name="Typography options"i]' );
 			await page.click( 'role=menuitem[name="Reset Font size"i]' );
+			await page.keyboard.press( 'Escape' ); // Close the menu
 
 			await expect.poll( editor.getEditedPostContent )
 				.toBe( `<!-- wp:paragraph -->
@@ -263,6 +274,7 @@ test.describe( 'Font Size Picker', () => {
 
 			await page.click( 'role=button[name="Typography options"i]' );
 			await page.click( 'role=menuitem[name="Reset Font size"i]' );
+			await page.keyboard.press( 'Escape' ); // Close the menu
 
 			await expect.poll( editor.getEditedPostContent )
 				.toBe( `<!-- wp:paragraph -->

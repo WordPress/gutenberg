@@ -413,15 +413,15 @@ function block_core_navigation_filter_out_empty_blocks( $parsed_blocks ) {
 /**
  * Returns true if the navigation block contains a nested navigation block.
  *
- * @param array $parsed_blocks the parsed blocks to be normalized.
+ * @param WP_Block_List $inner_blocks Inner block instance to be normalized.
  * @return bool true if the navigation block contains a nested navigation block.
  */
-function block_core_navigation_block_contains_core_navigation( $parsed_blocks ) {
-	foreach ( $parsed_blocks as $block ) {
-		if ( 'core/navigation' === $block['blockName'] ) {
+function block_core_navigation_block_contains_core_navigation( $inner_blocks ) {
+	foreach ( $inner_blocks as $block ) {
+		if ( 'core/navigation' === $block->name ) {
 			return true;
 		}
-		if ( block_core_navigation_block_contains_core_navigation( $block['innerBlocks'] ) ) {
+		if ( $block->inner_blocks && block_core_navigation_block_contains_core_navigation( $block->inner_blocks ) ) {
 			return true;
 		}
 	}
@@ -643,8 +643,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$inner_blocks = new WP_Block_List( $fallback_blocks, $attributes );
 	}
 
-	$parsed_blocks = parse_blocks( $navigation_post->post_content );
-	if ( block_core_navigation_block_contains_core_navigation( $parsed_blocks ) ) {
+	if ( block_core_navigation_block_contains_core_navigation( $inner_blocks ) ) {
 		return '';
 	}
 
