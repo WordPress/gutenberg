@@ -3,6 +3,7 @@
 > This is the living specification for  **version 3** of `theme.json`. This version works with WordPress 6.6 or later, and the latest Gutenberg plugin.
 >
 > There are some related documents that you may be interested in: 
+>
 > - the [theme.json v1](/docs/reference-guides/theme-json-reference/theme-json-v1.md) specification,
 > - the [theme.json v2](/docs/reference-guides/theme-json-reference/theme-json-v2.md) specification, and
 > - the [reference to migrate from older theme.json versions](/docs/reference-guides/theme-json-reference/theme-json-migrations.md).
@@ -113,8 +114,11 @@ Settings related to background.
 Settings related to dimensions.
 
 | Property  | Type   | Default | Props  |
+<<<<<<< HEAD
 | ---    | ---    | ---    |---   |
 | aspectRatio | boolean | false |  |
+| defaultAspectRatios | boolean | true |  |
+| aspectRatios | array | 1/1,16/9,4/3,3/2,10/16,9/16,3/4 | name, ratio, slug |
 | minHeight | boolean | false |  |
 
 ---
@@ -199,6 +203,7 @@ Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-
 
 
 ---
+
 ## Styles
 
 
@@ -310,6 +315,7 @@ Sets custom CSS to apply styling not covered by other theme.json properties.
 
 
 ---
+
 ## customTemplates
 
 Additional metadata for custom templates defined in the templates folder.

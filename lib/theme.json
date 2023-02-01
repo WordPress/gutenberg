@@ -190,6 +190,51 @@
 			],
 			"text": true
 		},
+		"dimensions": {
+			"defaultAspectRatios": false,
+			"aspectRatio": [
+				{
+					"name": "1:1",
+					"slug": "1-1",
+					"ratio": "1/1"
+				},
+				{
+					"name": "16:10",
+					"slug": "16-10",
+					"ratio": "16/10"
+				},
+				{
+					"name": "16:9",
+					"slug": "16-9",
+					"ratio": "16/9"
+				},
+				{
+					"name": "4:3",
+					"slug": "4-3",
+					"ratio": "4/3"
+				},
+				{
+					"name": "3:2",
+					"slug": "3-2",
+					"ratio": "3/2"
+				},
+				{
+					"name": "10:16",
+					"slug": "10-16",
+					"ratio": "10/16"
+				},
+				{
+					"name": "9:16",
+					"slug": "9-16",
+					"ratio": "9/16"
+				},
+				{
+					"name": "3:4",
+					"slug": "3-4",
+					"ratio": "3/4"
+				}
+			]
+		},
 		"shadow": {
 			"defaultPresets": true,
 			"presets": [
