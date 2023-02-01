@@ -122,6 +122,7 @@ function ShadowPopoverContainer( { shadow, onShadowChange } ) {
 	);
 
 	const shadows = [
+		{ name: 'Unset', slug: 'unset', shadow: 'none' },
 		...( defaultPresetsEnabled ? defaultShadows : [] ),
 		...( themeShadows || [] ),
 	];
