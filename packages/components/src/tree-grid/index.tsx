@@ -12,10 +12,6 @@ import RovingTabIndexContainer from './roving-tab-index';
 import type { TreeGridProps } from './types';
 import type { WordPressComponentProps } from '../ui/context';
 
-type FocusableElement = Element & {
-	focus: ( options?: { preventScroll?: boolean } ) => void;
-};
-
 /**
  * Return focusables in a row element, excluding those from other branches
  * nested within the row.
@@ -27,7 +23,7 @@ type FocusableElement = Element & {
 function getRowFocusables( rowElement: Element ) {
 	const focusablesInRow = focus.focusable.find( rowElement, {
 		sequential: true,
-	} ) as FocusableElement[];
+	} );
 
 	return focusablesInRow.filter( ( focusable ) => {
 		return focusable.closest( '[role="row"]' ) === rowElement;
@@ -89,7 +85,7 @@ function UnforwardedTreeGrid(
 
 			const focusablesInRow = getRowFocusables( activeRow );
 			const currentColumnIndex = focusablesInRow.indexOf(
-				activeElement as FocusableElement
+				activeElement as HTMLElement
 			);
 			const canExpandCollapse = 0 === currentColumnIndex;
 			const cannotFocusNextColumn =
