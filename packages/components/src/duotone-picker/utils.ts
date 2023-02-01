@@ -46,12 +46,15 @@ export function getDefaultColors( palette ) {
 /**
  * Generate a duotone gradient from a list of colors.
  *
- * @param {string[]} colors CSS color strings.
- * @param {string}   angle  CSS gradient angle.
+ * @param colors CSS color strings.
+ * @param angle  CSS gradient angle.
  *
- * @return {string} CSS gradient string for the duotone swatch.
+ * @return  CSS gradient string for the duotone swatch.
  */
-export function getGradientFromCSSColors( colors = [], angle = '90deg' ) {
+export function getGradientFromCSSColors(
+	colors: string[] = [],
+	angle = '90deg'
+) {
 	const l = 100 / colors.length;
 
 	const stops = colors

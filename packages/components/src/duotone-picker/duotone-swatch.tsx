@@ -10,7 +10,7 @@ import ColorIndicator from '../color-indicator';
 import Icon from '../icon';
 import { getGradientFromCSSColors } from './utils';
 
-function DuotoneSwatch( { values } ) {
+function DuotoneSwatch( { values }: { values: string[] } ) {
 	return values ? (
 		<ColorIndicator
 			colorValue={ getGradientFromCSSColors( values, '135deg' ) }
