@@ -125,7 +125,7 @@ const ListViewBlockContents = forwardRef(
 				) }
 				<BlockDraggable
 					clientIds={ draggableClientIds }
-					context="offcanvas"
+					dragOrigin="offcanvas"
 				>
 					{ ( { draggable, onDragStart, onDragEnd } ) => (
 						<ListViewBlockSelectButton

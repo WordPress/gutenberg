@@ -204,7 +204,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 
 	const blockDropZoneRef = useBlockDropZone( {
 		rootClientId: clientId,
-		context: 'canvas',
+		dropTargetName: 'canvas',
 	} );
 
 	const ref = useMergeRefs( [
