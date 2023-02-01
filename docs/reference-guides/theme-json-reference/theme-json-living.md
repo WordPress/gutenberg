@@ -118,7 +118,7 @@ Settings related to dimensions.
 | ---    | ---    | ---    |---   |
 | aspectRatio | boolean | false |  |
 | defaultAspectRatios | boolean | true |  |
-| aspectRatios | array | 1/1,16/9,4/3,3/2,10/16,9/16,3/4 | name, ratio, slug |
+| aspectRatios | array |  | name, ratio, slug |
 | minHeight | boolean | false |  |
 
 ---

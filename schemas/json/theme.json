@@ -294,12 +294,15 @@
 						"aspectRatios": {
 							"description": "Allow users to define aspect ratios for some blocks.",
 							"type": "array",
-							"default": false,
 							"items": {
 								"type": "object",
 								"properties": {
 									"name": {
-										"description": "Name of the aspect ratio.",
+										"description": "Name of the aspect ratio preset.",
+										"type": "string"
+									},
+									"slug": {
+										"description": "Kebab-case unique identifier for the aspect ratio preset.",
 										"type": "string"
 									},
 									"ratio": {
