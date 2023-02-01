@@ -160,7 +160,6 @@ export const SETTINGS_DEFAULTS = {
 	// Allows to disable Openverse media category in the inserter.
 	enableOpenverseMediaCategory: true,
 
-	// Is the selected block cleared upon deselection.
 	clearBlockSelection: true,
 
 	__experimentalCanUserUseUnfilteredHTML: false,
