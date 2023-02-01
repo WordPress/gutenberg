@@ -20,17 +20,16 @@ export default function TypographyPanel( {
 	headingLevel,
 	variation = '',
 } ) {
-	let prefix = '';
+	let prefixParts = [];
 	if ( element === 'heading' ) {
-		prefix = `elements.${ headingLevel }.`;
+		prefixParts = prefixParts.concat( [ 'elements', headingLevel ] );
 	} else if ( element && element !== 'text' ) {
-		prefix = `elements.${ element }.`;
+		prefixParts = prefixParts.concat( [ 'elements', element ] );
 	}
 	if ( variation ) {
-		prefix = prefix
-			? `variations.${ variation }.${ prefix }`
-			: `variations.${ variation }`;
+		prefixParts = [ 'variations', variation ].concat( prefixParts );
 	}
+	const prefix = prefixParts.join( '.' );
 
 	const [ style ] = useGlobalStyle( prefix, name, 'user', false );
 	const [ inheritedStyle, setStyle ] = useGlobalStyle( prefix, name, 'all', {
