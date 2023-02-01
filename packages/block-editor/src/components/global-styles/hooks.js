@@ -180,8 +180,7 @@ export function useGlobalStyle(
 				// The stlyes.css path is allowed to be empty, so don't revert to base if undefined.
 				finalPath === 'styles.css'
 					? get( userConfig, finalPath )
-					: get( userConfig, finalPath ) ??
-					  get( baseConfig, finalPath );
+					: get( mergedConfig, finalPath );
 			result = shouldDecodeEncode
 				? getValueFromVariable( mergedConfig, blockName, rawResult )
 				: rawResult;
