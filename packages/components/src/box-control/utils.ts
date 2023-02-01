@@ -33,7 +33,7 @@ export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ] as const;
  * Gets an items with the most occurrence within an array
  * https://stackoverflow.com/a/20762713
  *
- * @param  arr Array of items to check.
+ * @param arr Array of items to check.
  * @return The item with the most occurrences.
  */
 function mode< T >( arr: T[] ) {
@@ -49,9 +49,9 @@ function mode< T >( arr: T[] ) {
 /**
  * Gets the 'all' input value and unit from values data.
  *
- * @param  values         Box values.
- * @param  selectedUnits  Box units.
- * @param  availableSides Available box sides to evaluate.
+ * @param values         Box values.
+ * @param selectedUnits  Box units.
+ * @param availableSides Available box sides to evaluate.
  *
  * @return A value + unit for the 'all' input.
  */
@@ -102,7 +102,7 @@ export function getAllValue(
 /**
  * Determine the most common unit selection to use as a fallback option.
  *
- * @param  selectedUnits Current unit selections for individual sides.
+ * @param selectedUnits Current unit selections for individual sides.
  * @return  Most common unit selection.
  */
 export function getAllUnitFallback( selectedUnits?: BoxControlValue ) {
@@ -118,9 +118,9 @@ export function getAllUnitFallback( selectedUnits?: BoxControlValue ) {
 /**
  * Checks to determine if values are mixed.
  *
- * @param  values        Box values.
- * @param  selectedUnits Box units.
- * @param  sides         Available box sides to evaluate.
+ * @param values        Box values.
+ * @param selectedUnits Box units.
+ * @param sides         Available box sides to evaluate.
  *
  * @return Whether values are mixed.
  */
@@ -138,7 +138,7 @@ export function isValuesMixed(
 /**
  * Checks to determine if values are defined.
  *
- * @param  values Box values.
+ * @param values Box values.
  *
  * @return  Whether values are mixed.
  */
@@ -158,8 +158,8 @@ export function isValuesDefined( values?: BoxControlValue ) {
  * Get initial selected side, factoring in whether the sides are linked,
  * and whether the vertical / horizontal directions are grouped via splitOnAxis.
  *
- * @param  isLinked    Whether the box control's fields are linked.
- * @param  splitOnAxis Whether splitting by horizontal or vertical axis.
+ * @param isLinked    Whether the box control's fields are linked.
+ * @param splitOnAxis Whether splitting by horizontal or vertical axis.
  * @return The initial side.
  */
 export function getInitialSide( isLinked: boolean, splitOnAxis: boolean ) {
@@ -178,7 +178,7 @@ export function getInitialSide( isLinked: boolean, splitOnAxis: boolean ) {
  * to their appropriate sides to facilitate correctly determining value for
  * all input control.
  *
- * @param  sides Available sides for box control.
+ * @param sides Available sides for box control.
  * @return Normalized sides configuration.
  */
 export function normalizeSides( sides: BoxControlProps[ 'sides' ] ) {
@@ -204,9 +204,9 @@ export function normalizeSides( sides: BoxControlProps[ 'sides' ] ) {
  * Applies a value to an object representing top, right, bottom and left sides
  * while taking into account any custom side configuration.
  *
- * @param  currentValues The current values for each side.
- * @param  newValue      The value to apply to the sides object.
- * @param  sides         Array defining valid sides.
+ * @param currentValues The current values for each side.
+ * @param newValue      The value to apply to the sides object.
+ * @param sides         Array defining valid sides.
  *
  * @return Object containing the updated values for each side.
  */
