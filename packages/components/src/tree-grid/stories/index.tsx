@@ -13,6 +13,7 @@ import { Fragment } from '@wordpress/element';
  */
 import TreeGrid, { TreeGridRow, TreeGridCell } from '..';
 import { Button } from '../../button';
+import InputControl from '../../input-control';
 
 const meta: ComponentMeta< typeof TreeGrid > = {
 	title: 'Components (Experimental)/TreeGrid',
@@ -104,16 +105,22 @@ const Rows = ( {
 							</TreeGridCell>
 							<TreeGridCell>
 								{ ( props ) => (
-									<Button variant="secondary" { ...props }>
-										Move Up
-									</Button>
+									<InputControl
+										label="Description"
+										hideLabelFromVision
+										placeholder="Description"
+										{ ...props }
+									/>
 								) }
 							</TreeGridCell>
 							<TreeGridCell>
 								{ ( props ) => (
-									<Button variant="secondary" { ...props }>
-										Move Down
-									</Button>
+									<InputControl
+										label="Notes"
+										hideLabelFromVision
+										placeholder="Notes"
+										{ ...props }
+									/>
 								) }
 							</TreeGridCell>
 						</TreeGridRow>
