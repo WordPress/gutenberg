@@ -99,10 +99,11 @@ export function TypographyPanel( {
 		)
 			? fontSizeValue.substring( 'var:preset|font-size|'.length )
 			: undefined;
-		const fontFamilySlug =
-			fontFamilyValue?.startsWith( 'var:preset|font-family|' ) === 0
-				? fontFamilyValue.substring( 'var:preset|font-family|'.length )
-				: undefined;
+		const fontFamilySlug = fontFamilyValue?.startsWith(
+			'var:preset|font-family|'
+		)
+			? fontFamilyValue.substring( 'var:preset|font-family|'.length )
+			: undefined;
 		updatedStyle.typography = {
 			...omit( updatedStyle.typography, [ 'fontFamily' ] ),
 			fontSize: fontSizeSlug ? undefined : fontSizeValue,
