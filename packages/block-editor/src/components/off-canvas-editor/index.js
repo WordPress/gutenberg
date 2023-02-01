@@ -216,6 +216,7 @@ function OffCanvasEditor(
 					onCollapseRow={ collapseRow }
 					onExpandRow={ expandRow }
 					onFocusRow={ focusRow }
+					// eslint-disable-next-line jsx-a11y/aria-props
 					aria-description={ description }
 				>
 					<ListViewContext.Provider value={ contextValue }>
