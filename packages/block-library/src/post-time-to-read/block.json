@@ -1,6 +1,7 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
+	"__experimental": true,
 	"name": "core/post-time-to-read",
 	"title": "Time To Read",
 	"category": "theme",
