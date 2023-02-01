@@ -79,27 +79,24 @@ Aside from the documented callback functions, any props specified will be passed
 
 `TreeGrid` should always have children.
 
-###### onFocusRow( event: KeyboardEvent, startRow: Element, destinationRow: Element )
+###### `onFocusRow`: `( event: KeyboardEvent, startRow: Element, destinationRow: Element ) => void`
 
 Callback that fires when focus is shifted from one row to another via the Up and Down keys. Callback is also fired on Home and End keys which move focus from the beginning row to the end row.
 The callback is passed the event, the start row element that the focus was on originally, and
 the destination row element after the focus has moved.
 
--   Type: `Function`
 -   Required: No
 
-###### onCollapseRow( row: Element )
+###### `onCollapseRow`: `( row: Element ) => void`
 
 A callback that passes in the row element to be collapsed.
 
--   Type: `Function`
 -   Required: No
 
-###### onExpandRow( row: Element )
+###### `onExpandRow`: `( row: Element ) => void`
 
 A callback that passes in the row element to be expanded.
 
--   Type: `Function`
 -   Required: No
 
 #### TreeGridRow
@@ -108,32 +105,28 @@ A callback that passes in the row element to be expanded.
 
 Additional props other than those specified below will be passed to the `tr` element rendered by `TreeGridRow`, so for example, it is possible to also set a `className` on a row.
 
-###### level
+###### `level`: `number`
 
 An integer value designating the level in the hierarchical tree structure. Counting starts at 1. A value of `1` indicates the root level of the structure.
 
--   Type: `Number`
 -   Required: Yes
 
-###### positionInSet
+###### `positionInSet`: `number`
 
 An integer value that represents the position in the set. A set is the count of elements at a specific level. Counting starts at 1.
 
--   Type: `Number`
 -   Required: Yes
 
-###### setSize
+###### `setSize`: `number`
 
 An integer value that represents the total number of items in the set, at this specific level of the hierarchy.
 
--   Type: `Number`
 -   Required: Yes
 
-###### isExpanded
+###### `isExpanded`: `boolean`
 
 An optional value that designates whether a row is expanded or collapsed. Currently this value only sets the correct aria-expanded property on a row, it has no other built-in behavior.
 
--   Type: `Boolean`
 -   Required: No
 
 ### TreeGridCell
