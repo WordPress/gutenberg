@@ -1,9 +1,7 @@
 /**
  * Internal dependencies
  */
-import { isEmail } from './is-email';
-
-const USABLE_HREF_REGEXP = /^(?:[a-z]+:|#|\?|\.|\/)/i;
+import { prependHTTP } from './prepend-http';
 
 /**
  * Prepends "https://" to a url, if it looks like something that is meant to be a TLD.
@@ -22,10 +20,12 @@ export function prependHTTPS( url ) {
 		return url;
 	}
 
-	url = url.trim();
-	if ( ! USABLE_HREF_REGEXP.test( url ) && ! isEmail( url ) ) {
-		return 'https://' + url;
+	// If url starts with http://, return it as is.
+	if ( url.startsWith( 'http://' ) ) {
+		return url;
 	}
 
-	return url;
+	url = prependHTTP( url );
+
+	return url.replace( /^http:/, 'https:' );
 }
