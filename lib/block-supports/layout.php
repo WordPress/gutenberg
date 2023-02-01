@@ -180,13 +180,6 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 							'margin-block-start' => $gap_value,
 							'margin-block-end'   => '0',
 						),
-					),
-					array(
-						'selector'     => "$selector$selector .wp-block-group__inner-container > * + *",
-						'declarations' => array(
-							'margin-block-start' => $gap_value,
-							'margin-block-end'   => '0',
-						),
 					)
 				);
 			}
@@ -546,6 +539,7 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 		'/(^\s*<%1$s\b[^>]*wp-block-group(\s|")[^>]*>)(\s*<div\b[^>]*wp-block-group__inner-container(\s|")[^>]*>)((.|\S|\s)*)/U',
 		preg_quote( $tag_name, '/' )
 	);
+
 	if (
 		wp_theme_has_theme_json() ||
 		1 === preg_match( $group_with_inner_container_regex, $block_content ) ||
@@ -554,14 +548,22 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$replace_regex   = sprintf(
+	$constrained       = ! wp_theme_has_theme_json() && ( isset( $block['attrs']['layout']['type'] ) && 'constrained' === $block['attrs']['layout']['type'] );
+	$constrained_class = $constrained ? ' is-layout-constrained' : '';
+	// 'is-layout-constrained' is not in the className attribute, so we need to remove it in a less optimal way.
+	// This needs to be replaced with a proper regex.
+	if ( $constrained === true ) {
+		$block_content = str_replace( 'is-layout-constrained ', '', $block_content );
+	}
+
+	$replace_regex = sprintf(
 		'/(^\s*<%1$s\b[^>]*wp-block-group[^>]*>)(.*)(<\/%1$s>\s*$)/ms',
 		preg_quote( $tag_name, '/' )
 	);
 	$updated_content = preg_replace_callback(
 		$replace_regex,
-		function( $matches ) {
-			return $matches[1] . '<div class="wp-block-group__inner-container">' . $matches[2] . '</div>' . $matches[3];
+		function( $matches ) use( $constrained_class ) {
+			return $matches[1] . '<div class="wp-block-group__inner-container' . $constrained_class . '">' . $matches[2] . '</div>' . $matches[3];
 		},
 		$block_content
 	);
