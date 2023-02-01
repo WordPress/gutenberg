@@ -679,8 +679,8 @@ _Properties_
 -   _codeEditingEnabled_ `boolean`: Whether or not the user can switch to the code editor
 -   _generateAnchors_ `boolean`: Enable/Disable auto anchor generation for Heading blocks
 -   _enableOpenverseMediaCategory_ `boolean`: Enable/Disable the Openverse media category in the inserter.
+-   _clearBlockSelection_ `boolean`: Whether the block editor should clear selection on mousedown when a block is not clicked.
 -   _\_\_experimentalCanUserUseUnfilteredHTML_ `boolean`: Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
--   _\_\_experimentalClearBlockSelection_ `boolean`: Whether the block editor should clear selection on mousedown when a block is not clicked.
 -   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
 -   _\_\_experimentalBlockPatterns_ `Array`: Array of objects representing the block patterns
 -   _\_\_experimentalBlockPatternCategories_ `Array`: Array of objects representing the block pattern categories
