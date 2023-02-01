@@ -988,7 +988,6 @@ class WP_Theme_JSON_Gutenberg {
 	 *                       - `variables`: only the CSS Custom Properties for presets & custom ones.
 	 *                       - `styles`: only the styles section in theme.json.
 	 *                       - `presets`: only the classes for the presets.
-	 *                       - `custom-css`: only the css from global styles.css.
 	 * @param array $origins A list of origins to include. By default it includes VALID_ORIGINS.
 	 * @param array $options An array of options for now used for internal purposes only (may change without notice).
 	 *                       The options currently supported are 'scope' that makes sure all style are scoped to a given selector,
@@ -1081,25 +1080,33 @@ class WP_Theme_JSON_Gutenberg {
 			$stylesheet .= $this->get_preset_classes( $setting_nodes, $origins );
 		}
 
-		// Load the custom CSS last so it has the highest specificity.
-		if ( in_array( 'custom-css', $types, true ) ) {
-			// Add the global styles root CSS.
-			$stylesheet .= _wp_array_get( $this->theme_json, array( 'styles', 'css' ) );
+		return $stylesheet;
+	}
 
-			// Add the global styles block CSS.
-			if ( isset( $this->theme_json['styles']['blocks'] ) ) {
-				foreach ( $this->theme_json['styles']['blocks'] as $name => $node ) {
-					$custom_block_css = _wp_array_get( $this->theme_json, array( 'styles', 'blocks', $name, 'css' ) );
-					if ( $custom_block_css ) {
-						$selector    = static::$blocks_metadata[ $name ]['selector'];
-						$stylesheet .= $this->process_blocks_custom_css( $custom_block_css, $selector );
-					}
+	/**
+	 * Returns the global styles custom css.
+	 *
+	 * @since 6.2.0
+	 *
+	 * @return string
+	 */
+	public function get_custom_css() {
+		// Add the global styles root CSS.
+		$stylesheet = _wp_array_get( $this->theme_json, array( 'styles', 'css' ), '' );
+
+		// Add the global styles block CSS.
+		if ( isset( $this->theme_json['styles']['blocks'] ) ) {
+			foreach ( $this->theme_json['styles']['blocks'] as $name => $node ) {
+				$custom_block_css = _wp_array_get( $this->theme_json, array( 'styles', 'blocks', $name, 'css' ) );
+				if ( $custom_block_css ) {
+					$selector    = static::$blocks_metadata[ $name ]['selector'];
+					$stylesheet .= $this->process_blocks_custom_css( $custom_block_css, $selector );
 				}
 			}
 		}
-
 		return $stylesheet;
 	}
+
 	/**
 	 * Returns the page templates of the active theme.
 	 *

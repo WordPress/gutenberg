@@ -8,7 +8,6 @@ import { get, set } from 'lodash';
  * WordPress dependencies
  */
 import { useContext, useCallback } from '@wordpress/element';
-import { __EXPERIMENTAL_PATHS_WITH_MERGE as PATHS_WITH_MERGE } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -46,10 +45,7 @@ export function useGlobalSetting( path, blockName, source = 'all' ) {
 		setUserConfig( ( currentConfig ) => {
 			// Deep clone `currentConfig` to avoid mutating it later.
 			const newUserConfig = JSON.parse( JSON.stringify( currentConfig ) );
-			const pathToSet = PATHS_WITH_MERGE[ path ]
-				? fullPath + '.custom'
-				: fullPath;
-			set( newUserConfig, pathToSet, newValue );
+			set( newUserConfig, fullPath, newValue );
 
 			return newUserConfig;
 		} );
@@ -60,24 +56,16 @@ export function useGlobalSetting( path, blockName, source = 'all' ) {
 			? `settings.${ path }`
 			: `settings.blocks.${ name }.${ path }`;
 
-		const getSettingValue = ( configToUse ) => {
-			const result = get( configToUse, currentPath );
-			if ( PATHS_WITH_MERGE[ path ] ) {
-				return result?.custom ?? result?.theme ?? result?.default;
-			}
-			return result;
-		};
-
 		let result;
 		switch ( source ) {
 			case 'all':
-				result = getSettingValue( mergedConfig );
+				result = get( mergedConfig, currentPath );
 				break;
 			case 'user':
-				result = getSettingValue( userConfig );
+				result = get( userConfig, currentPath );
 				break;
 			case 'base':
-				result = getSettingValue( baseConfig );
+				result = get( baseConfig, currentPath );
 				break;
 			default:
 				throw 'Unsupported source';

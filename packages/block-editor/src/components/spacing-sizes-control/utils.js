@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -75,7 +70,7 @@ export function getPresetValueFromCustomValue( value, spacingSizes ) {
  *
  * @param {string} value Value to convert.
  *
- * @return {string} CSS var string for given spacing preset value.
+ * @return {string | undefined} CSS var string for given spacing preset value.
  */
 export function getSpacingPresetCssVar( value ) {
 	if ( ! value ) {
@@ -211,5 +206,5 @@ export function isValuesDefined( values ) {
 	if ( values === undefined || values === null ) {
 		return false;
 	}
-	return ! isEmpty( Object.values( values ).filter( ( value ) => !! value ) );
+	return Object.values( values ).filter( ( value ) => !! value ).length > 0;
 }

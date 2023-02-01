@@ -1615,18 +1615,23 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 	}
 
-	public function test_get_stylesheet_handles_custom_css() {
+	public function test_get_custom_css_handles_global_custom_css() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'styles'  => array(
-					'css' => 'body { color:purple; }',
+					'css'    => 'body {color:purple;}',
+					'blocks' => array(
+						'core/paragraph' => array(
+							'css' => 'color:red;',
+						),
+					),
 				),
 			)
 		);
 
-		$custom_css = 'body { color:purple; }';
-		$this->assertEquals( $custom_css, $theme_json->get_stylesheet( array( 'custom-css' ) ) );
+		$custom_css = 'body {color:purple;}p{color:red;}';
+		$this->assertEquals( $custom_css, $theme_json->get_custom_css() );
 	}
 
 	/**

@@ -8,7 +8,7 @@ import { registerBlockType } from '@wordpress/blocks';
  *
  * @param {Object} block The block to be registered.
  *
- * @return {?WPBlockType} The block, if it has been successfully registered;
+ * @return {WPBlockType | undefined} The block, if it has been successfully registered;
  *                        otherwise `undefined`.
  */
 export default function initBlock( block ) {

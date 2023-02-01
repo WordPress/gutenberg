@@ -10,6 +10,10 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Bump Android `minSdkVersion` to 24 [#47604]
+
+## 1.87.3
+-   [*] Fix insert blocks not handling raw string properly in unsupported block editor [#47472]
 
 ## 1.87.2
 -   [*] Add boolean contentStyle and clientId check to Column Edit InnerBlocks [#47234]

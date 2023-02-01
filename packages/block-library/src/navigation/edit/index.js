@@ -67,6 +67,7 @@ import { useInnerBlocks } from './use-inner-blocks';
 import { detectColors } from './utils';
 import ManageMenusButton from './manage-menus-button';
 import MenuInspectorControls from './menu-inspector-controls';
+import DeletedNavigationWarning from './deleted-navigation-warning';
 
 function Navigation( {
 	attributes,
@@ -89,9 +90,6 @@ function Navigation( {
 	hasColorSettings = true,
 	customPlaceholder: CustomPlaceholder = null,
 } ) {
-	const isOffCanvasNavigationEditorEnabled =
-		window?.__experimentalEnableOffCanvasNavigationEditor === true;
-
 	const {
 		openSubmenusOnClick,
 		overlayMenu,
@@ -598,6 +596,7 @@ function Navigation( {
 						) }
 						<h3>{ __( 'Overlay Menu' ) }</h3>
 						<ToggleGroupControl
+							__nextHasNoMarginBottom
 							label={ __( 'Configure overlay menu' ) }
 							value={ overlayMenu }
 							help={ __(
@@ -653,7 +652,7 @@ function Navigation( {
 					</PanelBody>
 				) }
 			</InspectorControls>
-			<InspectorControls __experimentalGroup="color">
+			<InspectorControls group="color">
 				{ hasColorSettings && (
 					<>
 						<ColorGradientSettingsDropdown
@@ -780,17 +779,9 @@ function Navigation( {
 					onSelectNavigationMenu={ onSelectNavigationMenu }
 					isLoading={ isLoading }
 				/>
-				<Warning>
-					{ __(
-						'Navigation menu has been deleted or is unavailable. '
-					) }
-					<Button
-						onClick={ createUntitledEmptyNavigationMenu }
-						variant="link"
-					>
-						{ __( 'Create a new menu?' ) }
-					</Button>
-				</Warning>
+				<DeletedNavigationWarning
+					onCreateNew={ createUntitledEmptyNavigationMenu }
+				/>
 			</TagName>
 		);
 	}
@@ -857,7 +848,7 @@ function Navigation( {
 				/>
 				{ stylingInspectorControls }
 				{ isEntityAvailable && (
-					<InspectorControls __experimentalGroup="advanced">
+					<InspectorControls group="advanced">
 						{ hasResolvedCanUserUpdateNavigationMenu &&
 							canUserUpdateNavigationMenu && (
 								<NavigationMenuNameControl />
@@ -879,12 +870,10 @@ function Navigation( {
 									} }
 								/>
 							) }
-						{ isOffCanvasNavigationEditorEnabled && (
-							<ManageMenusButton
-								disabled={ isManageMenusButtonDisabled }
-								className="wp-block-navigation-manage-menus-button"
-							/>
-						) }
+						<ManageMenusButton
+							disabled={ isManageMenusButtonDisabled }
+							className="wp-block-navigation-manage-menus-button"
+						/>
 					</InspectorControls>
 				) }
 

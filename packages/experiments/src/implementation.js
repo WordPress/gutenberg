@@ -11,9 +11,14 @@
  */
 const CORE_MODULES_USING_EXPERIMENTS = [
 	'@wordpress/data',
+	'@wordpress/editor',
 	'@wordpress/blocks',
 	'@wordpress/block-editor',
+	'@wordpress/customize-widgets',
 	'@wordpress/edit-site',
+	'@wordpress/edit-post',
+	'@wordpress/edit-widgets',
+	'@wordpress/block-library',
 ];
 
 /**
