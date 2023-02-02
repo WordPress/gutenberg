@@ -231,8 +231,6 @@ class EditorPage {
 
 		await htmlContentView.click();
 		await doubleTap( this.driver, htmlContentView );
-		// Sometimes double tap is not enough for paste menu to appear, so we also long press.
-
 		await tapPasteAboveElement( this.driver, htmlContentView );
 
 		await toggleHtmlMode( this.driver, false );
