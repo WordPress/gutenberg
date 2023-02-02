@@ -16,7 +16,7 @@
 	box-sizing: border-box;
 	padding: 6px 12px;
 	border-radius: $radius-block-ui;
-	color: $gray-900;
+	color: $components-color-foreground;
 
 	&[aria-expanded="true"],
 	&:hover {
@@ -44,7 +44,7 @@
 	&.is-primary {
 		white-space: nowrap;
 		background: $components-color-accent;
-		color: $white;
+		color: $components-color-accent-inverted;
 		text-decoration: none;
 		text-shadow: none;
 
@@ -53,17 +53,17 @@
 
 		&:hover:not(:disabled) {
 			background: $components-color-accent-darker-10;
-			color: $white;
+			color: $components-color-accent-inverted;
 		}
 
 		&:active:not(:disabled) {
 			background: $components-color-accent-darker-20;
 			border-color: $components-color-accent-darker-20;
-			color: $white;
+			color: $components-color-accent-inverted;
 		}
 
 		&:focus:not(:disabled) {
-			box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+			box-shadow: inset 0 0 0 1px $components-color-background, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
 		}
 
 		&:disabled,
@@ -71,6 +71,7 @@
 		&[aria-disabled="true"],
 		&[aria-disabled="true"]:enabled, // This catches a situation where a Button is aria-disabled, but not disabled.
 		&[aria-disabled="true"]:active:enabled {
+			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
 			color: rgba($white, 0.4);
 			background: $components-color-accent;
 			border-color: $components-color-accent;
@@ -79,7 +80,7 @@
 
 			&:focus:enabled {
 				box-shadow:
-					0 0 0 $border-width $white,
+					0 0 0 $border-width $components-color-background,
 					0 0 0 3px $components-color-accent;
 			}
 		}
@@ -87,7 +88,7 @@
 		&.is-busy,
 		&.is-busy:disabled,
 		&.is-busy[aria-disabled="true"] {
-			color: $white;
+			color: $components-color-accent-inverted;
 			background-size: 100px 100%;
 			// Disable reason: This function call looks nicer when each argument is on its own line.
 			/* stylelint-disable */
@@ -113,7 +114,7 @@
 		outline: 1px solid transparent;
 
 		&:active:not(:disabled) {
-			background: $gray-300;
+			background: $components-color-gray-300;
 			color: $components-color-accent-darker-10;
 			box-shadow: none;
 		}
@@ -126,6 +127,7 @@
 		&:disabled,
 		&[aria-disabled="true"],
 		&[aria-disabled="true"]:hover {
+			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
 			color: lighten($gray-700, 5%);
 			background: lighten($gray-300, 5%);
 			transform: none;
@@ -171,51 +173,29 @@
 	/**
 	 * Destructive buttons.
 	 */
-
 	&.is-destructive {
-		color: $alert-red;
-		box-shadow: inset 0 0 0 $border-width $alert-red;
+		--wp-components-color-accent: #{$alert-red};
+		--wp-components-color-accent-darker-10: #{darken($alert-red, 10%)};
+		--wp-components-color-accent-darker-20: #{darken($alert-red, 20%)};
 
-		&:hover:not(:disabled) {
-			color: darken($alert-red, 20%);
-			box-shadow: inset 0 0 0 $border-width darken($alert-red, 20%);
-		}
-
-		&:focus:not(:disabled) {
-			color: $components-color-accent;
-		}
-
-		&:active:not(:disabled) {
-			background: $gray-400;
-		}
-	}
-
-	&.is-destructive.is-primary {
-		color: #fff;
-		background: $alert-red;
-		box-shadow: inset 0 0 0 $border-width $alert-red;
-
-		&:hover:not(:disabled) {
-			color: #fff;
-			background: darken($alert-red, 20%);
-			box-shadow: inset 0 0 0 $border-width darken($alert-red, 20%);
-		}
-	}
-
-	&.is-destructive.is-tertiary {
-		box-shadow: none;
-
-		&:hover:not(:disabled) {
+		// Only the default variant is styled differently from the non-destructive counterparts.
+		&:not(.is-primary):not(.is-secondary):not(.is-tertiary):not(.is-link) {
+			color: $alert-red;
 			box-shadow: inset 0 0 0 $border-width $alert-red;
-			color: $alert-red;
-		}
 
-		&:focus:not(:disabled) {
-			box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) $alert-red;
-			color: $alert-red;
+			&:hover:not(:disabled) {
+				color: darken($alert-red, 20%);
+			}
+
+			&:focus:not(:disabled) {
+				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $alert-red;
+			}
+
+			&:active:not(:disabled) {
+				background: $gray-400;
+			}
 		}
 	}
-
 
 	/**
 	 * Link buttons.
@@ -241,25 +221,10 @@
 		&:focus {
 			border-radius: $radius-block-ui;
 		}
-
-		// Link buttons that are red to indicate destructive behavior.
-		&.is-destructive {
-			color: $alert-red;
-
-			&:active:not(:disabled),
-			&:hover:not(:disabled) {
-				color: darken($alert-red, 20%);
-				background: none;
-			}
-
-			&:focus:not(:disabled) {
-				color: $components-color-accent;
-			}
-		}
 	}
 
 	&:not([aria-disabled="true"]):active {
-		color: inherit;
+		color: $components-color-foreground;
 	}
 
 	&:disabled,
@@ -279,6 +244,7 @@
 		/* stylelint-disable */
 		background-image: linear-gradient(
 			-45deg,
+			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
 			darken($white, 2%) 33%,
 			darken($white, 12%) 33%,
 			darken($white, 12%) 70%,
@@ -316,32 +282,33 @@
 
 		&.has-text {
 			justify-content: start;
+			padding-right: 12px;
 		}
 
 		&.has-text svg {
-			margin-right: 8px;
+			margin-right: $grid-unit-10;
 		}
 
 		&.has-text .dashicon {
-			margin-right: 10px;
+			margin-right: $grid-unit-10 + 2px;
 		}
 	}
 
 	// Toggled style.
 	&.is-pressed {
-		color: $white;
-		background: $gray-900;
+		color: $components-color-foreground-inverted;
+		background: $components-color-foreground;
 
 		&:focus:not(:disabled) {
-			box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+			box-shadow: inset 0 0 0 1px $components-color-background, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
 
 			// Windows High Contrast mode will show this outline, but not the box-shadow.
 			outline: 2px solid transparent;
 		}
 
 		&:hover:not(:disabled) {
-			color: $white;
-			background: $gray-900;
+			color: $components-color-foreground-inverted;
+			background: $components-color-foreground;
 		}
 	}
 

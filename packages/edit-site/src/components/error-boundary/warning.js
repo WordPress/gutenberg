@@ -15,41 +15,12 @@ function CopyButton( { text, children } ) {
 	);
 }
 
-export default function ErrorBoundaryWarning( {
-	message,
-	error,
-	reboot,
-	dashboardLink,
-} ) {
-	const actions = [];
-
-	if ( reboot ) {
-		actions.push(
-			<Button key="recovery" onClick={ reboot } variant="secondary">
-				{ __( 'Attempt Recovery' ) }
-			</Button>
-		);
-	}
-
-	if ( error ) {
-		actions.push(
-			<CopyButton key="copy-error" text={ error.stack }>
-				{ __( 'Copy Error' ) }
-			</CopyButton>
-		);
-	}
-
-	if ( dashboardLink ) {
-		actions.push(
-			<Button
-				key="back-to-dashboard"
-				variant="secondary"
-				href={ dashboardLink }
-			>
-				{ __( 'Back to dashboard' ) }
-			</Button>
-		);
-	}
+export default function ErrorBoundaryWarning( { message, error } ) {
+	const actions = [
+		<CopyButton key="copy-error" text={ error.stack }>
+			{ __( 'Copy Error' ) }
+		</CopyButton>,
+	];
 
 	return (
 		<Warning className="editor-error-boundary" actions={ actions }>

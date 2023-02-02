@@ -206,14 +206,15 @@ export function PaddingVisualizer( { clientId, attributes, forceShow } ) {
 			setIsActive( true );
 			valueRef.current = padding;
 
-			clearTimer();
-
 			timeoutRef.current = setTimeout( () => {
 				setIsActive( false );
 			}, 400 );
 		}
 
-		return () => clearTimer();
+		return () => {
+			setIsActive( false );
+			clearTimer();
+		};
 	}, [ padding, forceShow ] );
 
 	if ( ! isActive && ! forceShow ) {
@@ -225,6 +226,7 @@ export function PaddingVisualizer( { clientId, attributes, forceShow } ) {
 			clientId={ clientId }
 			__unstableCoverTarget
 			__unstableRefreshSize={ padding }
+			__unstablePopoverSlot="block-toolbar"
 			shift={ false }
 		>
 			<div className="block-editor__padding-visualizer" style={ style } />

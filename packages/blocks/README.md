@@ -529,10 +529,9 @@ _Returns_
 
 -   `boolean`: Whether the given block is a template part.
 
-### isUnmodifiedDefaultBlock
+### isUnmodifiedBlock
 
-Determines whether the block is a default block
-and its attributes are equal to the default attributes
+Determines whether the block's attributes are equal to the default attributes
 which means the block is unmodified.
 
 _Parameters_
@@ -541,7 +540,20 @@ _Parameters_
 
 _Returns_
 
--   `boolean`: Whether the block is an unmodified default block
+-   `boolean`: Whether the block is an unmodified block.
+
+### isUnmodifiedDefaultBlock
+
+Determines whether the block is a default block and its attributes are equal
+to the default attributes which means the block is unmodified.
+
+_Parameters_
+
+-   _block_ `WPBlock`: Block Object
+
+_Returns_
+
+-   `boolean`: Whether the block is an unmodified default block.
 
 ### isValidBlockContent
 
@@ -692,7 +704,7 @@ _Parameters_
 
 ### registerBlockStyle
 
-Registers a new block style variation for the given block.
+Registers a new block style for the given block.
 
 For more information on connecting the styles with CSS [the official documentation](/docs/reference-guides/block-api/block-styles.md#styles)
 
@@ -752,7 +764,7 @@ _Parameters_
 
 _Returns_
 
--   `?WPBlockType`: The block, if it has been successfully registered; otherwise `undefined`.
+-   `WPBlockType | undefined`: The block, if it has been successfully registered; otherwise `undefined`.
 
 ### registerBlockVariation
 
@@ -970,7 +982,7 @@ _Returns_
 
 ### unregisterBlockStyle
 
-Unregisters a block style variation for the given block.
+Unregisters a block style for the given block.
 
 _Usage_
 
@@ -1024,7 +1036,7 @@ _Parameters_
 
 _Returns_
 
--   `?WPBlockType`: The previous block value, if it has been successfully unregistered; otherwise `undefined`.
+-   `WPBlockType | undefined`: The previous block value, if it has been successfully unregistered; otherwise `undefined`.
 
 ### unregisterBlockVariation
 

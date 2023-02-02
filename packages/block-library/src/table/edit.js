@@ -204,7 +204,7 @@ function TableEdit( {
 	/**
 	 * Get the alignment of the currently selected cell.
 	 *
-	 * @return {string} The new alignment to apply to the column.
+	 * @return {string | undefined} The new alignment to apply to the column.
 	 */
 	function getCellAlignment() {
 		if ( ! selectedCell ) {
@@ -404,7 +404,14 @@ function TableEdit( {
 				<tr key={ rowIndex }>
 					{ cells.map(
 						(
-							{ content, tag: CellTag, scope, align },
+							{
+								content,
+								tag: CellTag,
+								scope,
+								align,
+								colspan,
+								rowspan,
+							},
 							columnIndex
 						) => (
 							<RichText
@@ -417,6 +424,8 @@ function TableEdit( {
 									'wp-block-table__cell-content'
 								) }
 								scope={ CellTag === 'th' ? scope : undefined }
+								colSpan={ colspan }
+								rowSpan={ rowspan }
 								value={ content }
 								onChange={ onChange }
 								unstableOnFocus={ () => {
@@ -463,30 +472,32 @@ function TableEdit( {
 					</BlockControls>
 				</>
 			) }
-			{ ! isEmpty && (
-				<InspectorControls>
-					<PanelBody
-						title={ __( 'Settings' ) }
-						className="blocks-table-settings"
-					>
-						<ToggleControl
-							label={ __( 'Fixed width table cells' ) }
-							checked={ !! hasFixedLayout }
-							onChange={ onChangeFixedLayout }
-						/>
-						<ToggleControl
-							label={ __( 'Header section' ) }
-							checked={ !! ( head && head.length ) }
-							onChange={ onToggleHeaderSection }
-						/>
-						<ToggleControl
-							label={ __( 'Footer section' ) }
-							checked={ !! ( foot && foot.length ) }
-							onChange={ onToggleFooterSection }
-						/>
-					</PanelBody>
-				</InspectorControls>
-			) }
+			<InspectorControls>
+				<PanelBody
+					title={ __( 'Settings' ) }
+					className="blocks-table-settings"
+				>
+					<ToggleControl
+						label={ __( 'Fixed width table cells' ) }
+						checked={ !! hasFixedLayout }
+						onChange={ onChangeFixedLayout }
+					/>
+					{ ! isEmpty && (
+						<>
+							<ToggleControl
+								label={ __( 'Header section' ) }
+								checked={ !! ( head && head.length ) }
+								onChange={ onToggleHeaderSection }
+							/>
+							<ToggleControl
+								label={ __( 'Footer section' ) }
+								checked={ !! ( foot && foot.length ) }
+								onChange={ onToggleFooterSection }
+							/>
+						</>
+					) }
+				</PanelBody>
+			</InspectorControls>
 			{ ! isEmpty && (
 				<table
 					className={ classnames(
@@ -509,6 +520,7 @@ function TableEdit( {
 			) }
 			{ ! isEmpty && (
 				<RichText
+					identifier="caption"
 					tagName="figcaption"
 					className={ __experimentalGetElementClassName( 'caption' ) }
 					aria-label={ __( 'Table caption text' ) }
@@ -537,6 +549,7 @@ function TableEdit( {
 						onSubmit={ onCreateTable }
 					>
 						<TextControl
+							__nextHasNoMarginBottom
 							type="number"
 							label={ __( 'Column count' ) }
 							value={ initialColumnCount }
@@ -545,6 +558,7 @@ function TableEdit( {
 							className="blocks-table__placeholder-input"
 						/>
 						<TextControl
+							__nextHasNoMarginBottom
 							type="number"
 							label={ __( 'Row count' ) }
 							value={ initialRowCount }

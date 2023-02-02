@@ -1,7 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
-	"__experimental": true,
 	"name": "core/post-author-name",
 	"title": "Post Author Name",
 	"category": "theme",
@@ -22,6 +21,7 @@
 	},
 	"usesContext": [ "postType", "postId" ],
 	"supports": {
+		"anchor": true,
 		"html": false,
 		"spacing": {
 			"margin": true,

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -39,8 +34,9 @@ export default function ImageSizeControl( {
 
 	return (
 		<>
-			{ ! isEmpty( imageSizeOptions ) && (
+			{ imageSizeOptions && imageSizeOptions.length > 0 && (
 				<SelectControl
+					__nextHasNoMarginBottom
 					label={ __( 'Image size' ) }
 					value={ slug }
 					options={ imageSizeOptions }

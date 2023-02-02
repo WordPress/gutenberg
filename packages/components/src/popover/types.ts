@@ -93,10 +93,6 @@ export type PopoverProps = {
 	 */
 	headerTitle?: string;
 	/**
-	 * Used to enable a different visual style for the popover.
-	 */
-	isAlternate?: boolean;
-	/**
 	 * Used to show/hide the arrow that points at the popover's anchor.
 	 *
 	 * @default true
@@ -138,7 +134,20 @@ export type PopoverProps = {
 	 * @default false
 	 */
 	shift?: boolean;
-
+	/**
+	 * Specifies the popover's style.
+	 *
+	 * Leave undefined for the default style. Other values are:
+	 * - 'unstyled':  The popover is essentially without any visible style, it
+	 *                has no background, border, outline or drop shadow, but
+	 *                the popover contents are still displayed.
+	 * - 'toolbar':   A style that has no elevation, but a high contrast with
+	 *                other elements. This is matches the style of the
+	 *                `Toolbar` component.
+	 *
+	 * @default undefined
+	 */
+	variant?: 'unstyled' | 'toolbar';
 	// Deprecated props
 	/**
 	 * Prevent the popover from flipping and resizing when meeting the viewport
@@ -176,4 +185,12 @@ export type PopoverProps = {
 	getAnchorRect?: (
 		fallbackReferenceElement: Element | null
 	) => DomRectWithOwnerDocument;
+	/**
+	 * Used to enable a different visual style for the popover.
+	 * _Note: this prop is deprecated. Use the `variant` prop with the
+	 * 'toolbar' value instead._
+	 *
+	 * @deprecated
+	 */
+	isAlternate?: boolean;
 };

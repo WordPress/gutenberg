@@ -217,14 +217,15 @@ export function MarginVisualizer( { clientId, attributes, forceShow } ) {
 			setIsActive( true );
 			valueRef.current = margin;
 
-			clearTimer();
-
 			timeoutRef.current = setTimeout( () => {
 				setIsActive( false );
 			}, 400 );
 		}
 
-		return () => clearTimer();
+		return () => {
+			setIsActive( false );
+			clearTimer();
+		};
 	}, [ margin, forceShow ] );
 
 	if ( ! isActive && ! forceShow ) {
@@ -236,6 +237,7 @@ export function MarginVisualizer( { clientId, attributes, forceShow } ) {
 			clientId={ clientId }
 			__unstableCoverTarget
 			__unstableRefreshSize={ margin }
+			__unstablePopoverSlot="block-toolbar"
 			shift={ false }
 		>
 			<div className="block-editor__padding-visualizer" style={ style } />

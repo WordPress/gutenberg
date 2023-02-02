@@ -71,6 +71,7 @@ export default {
 				<div className="block-editor-hooks__layout-controls">
 					<div className="block-editor-hooks__layout-controls-unit">
 						<UnitControl
+							className="block-editor-hooks__layout-controls-unit-input"
 							label={ __( 'Content' ) }
 							labelPosition="top"
 							__unstableInputWidth="80px"
@@ -91,6 +92,7 @@ export default {
 					</div>
 					<div className="block-editor-hooks__layout-controls-unit">
 						<UnitControl
+							className="block-editor-hooks__layout-controls-unit-input"
 							label={ __( 'Wide' ) }
 							labelPosition="top"
 							__unstableInputWidth="80px"
@@ -116,7 +118,7 @@ export default {
 					) }
 				</p>
 				<ToggleGroupControl
-					__experimentalIsBorderless
+					__nextHasNoMarginBottom
 					label={ __( 'Justification' ) }
 					value={ justifyContent }
 					onChange={ onJustificationChange }

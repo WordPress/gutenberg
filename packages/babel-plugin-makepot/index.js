@@ -33,7 +33,7 @@
  */
 
 const { po } = require( 'gettext-parser' );
-const { pick, reduce, isEqual, merge, isEmpty } = require( 'lodash' );
+const { merge, isEmpty } = require( 'lodash' );
 const { relative, sep } = require( 'path' );
 const { writeFileSync } = require( 'fs' );
 
@@ -110,7 +110,7 @@ function getNodeAsString( node ) {
  * @param {number} _originalNodeLine Private: In recursion, line number of
  *                                   the original node passed.
  *
- * @return {?string} Extracted comment.
+ * @return {string | undefined} Extracted comment.
  */
 function getExtractedComment( path, _originalNodeLine ) {
 	const { node, parent, parentPath } = path;
@@ -182,10 +182,7 @@ function isValidTranslationKey( key ) {
  * @return {boolean} Whether valid translation keys match.
  */
 function isSameTranslation( a, b ) {
-	return isEqual(
-		pick( a, VALID_TRANSLATION_KEYS ),
-		pick( b, VALID_TRANSLATION_KEYS )
-	);
+	return VALID_TRANSLATION_KEYS.every( ( key ) => a[ key ] === b[ key ] );
 }
 
 /**
@@ -324,50 +321,45 @@ module.exports = () => {
 					const files = Object.keys( strings ).sort();
 
 					// Combine translations from each file grouped by context.
-					const translations = reduce(
-						files,
-						( memo, file ) => {
-							for ( const context in strings[ file ] ) {
-								// Within the same file, sort translations by line.
-								const sortedTranslations = sortByReference(
-									Object.values( strings[ file ][ context ] )
-								);
+					const translations = files.reduce( ( memo, file ) => {
+						for ( const context in strings[ file ] ) {
+							// Within the same file, sort translations by line.
+							const sortedTranslations = sortByReference(
+								Object.values( strings[ file ][ context ] )
+							);
 
-								sortedTranslations.forEach( ( translation ) => {
-									const { msgctxt = '', msgid } = translation;
-									if ( ! memo.hasOwnProperty( msgctxt ) ) {
-										memo[ msgctxt ] = {};
-									}
+							sortedTranslations.forEach( ( translation ) => {
+								const { msgctxt = '', msgid } = translation;
+								if ( ! memo.hasOwnProperty( msgctxt ) ) {
+									memo[ msgctxt ] = {};
+								}
 
-									// Merge references if translation already exists.
-									if (
-										isSameTranslation(
-											translation,
-											memo[ msgctxt ][ msgid ]
-										)
-									) {
-										translation.comments.reference = [
-											...new Set(
-												[
-													memo[ msgctxt ][ msgid ]
-														.comments.reference,
-													translation.comments
-														.reference,
-												]
-													.join( '\n' )
-													.split( '\n' )
-											),
-										].join( '\n' );
-									}
+								// Merge references if translation already exists.
+								if (
+									isSameTranslation(
+										translation,
+										memo[ msgctxt ][ msgid ]
+									)
+								) {
+									translation.comments.reference = [
+										...new Set(
+											[
+												memo[ msgctxt ][ msgid ]
+													.comments.reference,
+												translation.comments.reference,
+											]
+												.join( '\n' )
+												.split( '\n' )
+										),
+									].join( '\n' );
+								}
 
-									memo[ msgctxt ][ msgid ] = translation;
-								} );
-							}
+								memo[ msgctxt ][ msgid ] = translation;
+							} );
+						}
 
-							return memo;
-						},
-						{}
-					);
+						return memo;
+					}, {} );
 
 					// Merge translations from individual files into headers
 					const data = merge( {}, baseData, { translations } );

@@ -3,7 +3,7 @@
  */
 import createSelector from 'rememo';
 import removeAccents from 'remove-accents';
-import { filter, get, map, some } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -553,12 +553,11 @@ export function getGroupingBlockName( state ) {
  */
 export const getChildBlockNames = createSelector(
 	( state, blockName ) => {
-		return map(
-			filter( state.blockTypes, ( blockType ) => {
+		return getBlockTypes( state )
+			.filter( ( blockType ) => {
 				return blockType.parent?.includes( blockName );
-			} ),
-			( { name } ) => name
-		);
+			} )
+			.map( ( { name } ) => name );
 	},
 	( state ) => [ state.blockTypes ]
 );
@@ -715,7 +714,7 @@ export function isMatchingSearchTerm( state, nameOrType, searchTerm ) {
 
 	return (
 		isSearchMatch( blockType.title ) ||
-		some( blockType.keywords, isSearchMatch ) ||
+		blockType.keywords?.some( isSearchMatch ) ||
 		isSearchMatch( blockType.category ) ||
 		( typeof blockType.description === 'string' &&
 			isSearchMatch( blockType.description ) )
@@ -792,7 +791,7 @@ export const hasChildBlocks = ( state, blockName ) => {
  *                   and false otherwise.
  */
 export const hasChildBlocksWithInserterSupport = ( state, blockName ) => {
-	return some( getChildBlockNames( state, blockName ), ( childBlockName ) => {
+	return getChildBlockNames( state, blockName ).some( ( childBlockName ) => {
 		return hasBlockSupport( state, childBlockName, 'inserter', true );
 	} );
 };

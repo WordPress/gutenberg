@@ -25,6 +25,7 @@ import {
 	retrieveSelectedAttribute,
 	START_OF_SELECTED_AREA,
 } from '../utils/selection';
+import { __experimentalUpdateSettings } from './private-actions';
 
 /** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
 
@@ -1420,10 +1421,7 @@ export function updateBlockListSettings( clientId, settings ) {
  * @return {Object} Action object
  */
 export function updateSettings( settings ) {
-	return {
-		type: 'UPDATE_SETTINGS',
-		settings,
-	};
+	return __experimentalUpdateSettings( settings, true );
 }
 
 /**

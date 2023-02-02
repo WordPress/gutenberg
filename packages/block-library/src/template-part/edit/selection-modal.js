@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useMemo, useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
@@ -22,7 +22,7 @@ import {
 	useCreateTemplatePartFromBlocks,
 } from './utils/hooks';
 import { createTemplatePartId } from './utils/create-template-part-id';
-import { searchPatterns } from './utils/search';
+import { searchPatterns } from '../../utils/search-patterns';
 
 export default function TemplatePartSelectionModal( {
 	setAttributes,
@@ -57,7 +57,7 @@ export default function TemplatePartSelectionModal( {
 
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
-	const onTemplatePartSelect = useCallback( ( templatePart ) => {
+	const onTemplatePartSelect = ( templatePart ) => {
 		setAttributes( {
 			slug: templatePart.slug,
 			theme: templatePart.theme,
@@ -74,7 +74,7 @@ export default function TemplatePartSelectionModal( {
 			}
 		);
 		onClose();
-	}, [] );
+	};
 
 	const createFromBlocks = useCreateTemplatePartFromBlocks(
 		area,
@@ -88,6 +88,7 @@ export default function TemplatePartSelectionModal( {
 		<div className="block-library-template-part__selection-content">
 			<div className="block-library-template-part__selection-search">
 				<SearchControl
+					__nextHasNoMarginBottom
 					onChange={ setSearchValue }
 					value={ searchValue }
 					label={ __( 'Search for replacements' ) }

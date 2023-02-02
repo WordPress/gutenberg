@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { isPlainObject } from 'is-plain-object';
-import { pick, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -52,7 +51,7 @@ function isFunction( maybeFunc ) {
  * @param {Object}      thunkArgs        Argument object for the thunk middleware.
  * @param {Function}    thunkArgs.select Function to select from the store.
  *
- * @return {?WPBlockType} The block, if it has been successfully registered; otherwise `undefined`.
+ * @return {WPBlockType | undefined} The block, if it has been successfully registered; otherwise `undefined`.
  */
 const processBlockType = ( blockType, { select } ) => {
 	const { name } = blockType;
@@ -72,23 +71,24 @@ const processBlockType = ( blockType, { select } ) => {
 
 	if ( settings.deprecated ) {
 		settings.deprecated = settings.deprecated.map( ( deprecation ) =>
-			pick(
-				// Only keep valid deprecation keys.
-				applyFilters(
-					'blocks.registerBlockType',
-					// Merge deprecation keys with pre-filter settings
-					// so that filters that depend on specific keys being
-					// present don't fail.
-					{
-						// Omit deprecation keys here so that deprecations
-						// can opt out of specific keys like "supports".
-						...omit( blockType, DEPRECATED_ENTRY_KEYS ),
-						...deprecation,
-					},
-					name,
-					deprecation
-				),
-				DEPRECATED_ENTRY_KEYS
+			Object.fromEntries(
+				Object.entries(
+					// Only keep valid deprecation keys.
+					applyFilters(
+						'blocks.registerBlockType',
+						// Merge deprecation keys with pre-filter settings
+						// so that filters that depend on specific keys being
+						// present don't fail.
+						{
+							// Omit deprecation keys here so that deprecations
+							// can opt out of specific keys like "supports".
+							...omit( blockType, DEPRECATED_ENTRY_KEYS ),
+							...deprecation,
+						},
+						name,
+						deprecation
+					)
+				).filter( ( [ key ] ) => DEPRECATED_ENTRY_KEYS.includes( key ) )
 			)
 		);
 	}
@@ -114,9 +114,9 @@ const processBlockType = ( blockType, { select } ) => {
 
 	if (
 		'category' in settings &&
-		! some( select.getCategories(), {
-			slug: settings.category,
-		} )
+		! select
+			.getCategories()
+			.some( ( { slug } ) => slug === settings.category )
 	) {
 		warn(
 			'The block "' +

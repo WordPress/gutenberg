@@ -8,7 +8,10 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import { CONFIG, COLORS, reduceMotion } from '../../utils';
-import type { ToggleGroupControlProps } from '../types';
+import type {
+	ToggleGroupControlProps,
+	ToggleGroupControlOptionBaseProps,
+} from '../types';
 
 export const LabelView = styled.div`
 	display: inline-flex;
@@ -21,7 +24,15 @@ export const labelBlock = css`
 	flex: 1;
 `;
 
-export const buttonView = css`
+export const buttonView = ( {
+	isDeselectable,
+	isIcon,
+	isPressed,
+	size,
+}: Pick< ToggleGroupControlProps, 'isDeselectable' | 'size' > &
+	Pick< ToggleGroupControlOptionBaseProps, 'isIcon' > & {
+		isPressed?: boolean;
+	} ) => css`
 	align-items: center;
 	appearance: none;
 	background: transparent;
@@ -53,22 +64,39 @@ export const buttonView = css`
 	&:active {
 		background: ${ CONFIG.toggleGroupControlBackgroundColor };
 	}
+
+	${ isDeselectable && deselectable }
+	${ isIcon && isIconStyles( { size } ) }
+	${ isPressed && pressed }
+`;
+
+const pressed = css`
+	color: ${ COLORS.white };
+
+	&:active {
+		background: transparent;
+	}
+`;
+
+const deselectable = css`
+	color: ${ COLORS.gray[ 900 ] };
+
+	&:focus {
+		box-shadow: inset 0 0 0 1px ${ COLORS.white },
+			0 0 0 ${ CONFIG.borderWidthFocus } ${ COLORS.ui.theme };
+		outline: 2px solid transparent;
+	}
 `;
 
 export const ButtonContentView = styled.div`
+	display: flex;
 	font-size: ${ CONFIG.fontSize };
 	line-height: 1;
 `;
 
-export const separatorActive = css`
-	background: transparent;
-`;
-
-export const isIcon = ( {
-	size,
-}: {
-	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
-} ) => {
+const isIconStyles = ( {
+	size = 'default',
+}: Pick< ToggleGroupControlProps, 'size' > ) => {
 	const iconButtonSizes = {
 		default: '30px',
 		'__unstable-large': '34px',
@@ -81,11 +109,3 @@ export const isIcon = ( {
 		padding-right: 0;
 	`;
 };
-
-export const buttonActive = css`
-	color: ${ COLORS.white };
-
-	&:active {
-		background: transparent;
-	}
-`;

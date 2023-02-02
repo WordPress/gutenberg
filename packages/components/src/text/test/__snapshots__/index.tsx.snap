@@ -36,6 +36,7 @@ exports[`Text should render highlighted words with highlightCaseSensitive 1`] = 
     class="components-truncate components-text emotion-0 emotion-1"
     data-wp-c16t="true"
     data-wp-component="Text"
+    role="heading"
   >
     <span
       class=""

@@ -33,11 +33,13 @@ test.describe( 'Global styles variations', () => {
 		admin,
 		page,
 		siteEditorStyleVariations,
+		siteEditor,
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
+		await siteEditor.enterEditMode();
 
 		await siteEditorStyleVariations.browseStyles();
 
@@ -68,11 +70,13 @@ test.describe( 'Global styles variations', () => {
 		admin,
 		page,
 		siteEditorStyleVariations,
+		siteEditor,
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
+		await siteEditor.enterEditMode();
 		await siteEditorStyleVariations.browseStyles();
 		await page.click( 'role=button[name="pink"i]' );
 		await page.click(
@@ -100,18 +104,20 @@ test.describe( 'Global styles variations', () => {
 
 		await expect(
 			page.locator( 'css=.components-font-size-picker__header__hint' )
-		).toHaveText( 'Medium(px)' );
+		).toHaveText( 'Medium' );
 	} );
 
 	test( 'should apply custom colors and font sizes in a variation', async ( {
 		admin,
 		page,
 		siteEditorStyleVariations,
+		siteEditor,
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
+		await siteEditor.enterEditMode();
 		await siteEditorStyleVariations.browseStyles();
 		await page.click( 'role=button[name="yellow"i]' );
 		await page.click(
@@ -141,7 +147,7 @@ test.describe( 'Global styles variations', () => {
 		//  we could provide accessible attributes to the source code in packages/components/src/font-size-picker/index.js.
 		await expect(
 			page.locator( 'css=.components-font-size-picker__header__hint' )
-		).toHaveText( '(Custom)' );
+		).toHaveText( 'Custom' );
 
 		await expect(
 			page.locator( 'role=spinbutton[name="Custom"i]' )
@@ -152,11 +158,13 @@ test.describe( 'Global styles variations', () => {
 		admin,
 		page,
 		siteEditorStyleVariations,
+		siteEditor,
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
+		await siteEditor.enterEditMode();
 		await siteEditorStyleVariations.browseStyles();
 		await page.click( 'role=button[name="pink"i]' );
 		await page.click(
@@ -182,11 +190,13 @@ test.describe( 'Global styles variations', () => {
 		admin,
 		page,
 		siteEditorStyleVariations,
+		siteEditor,
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
+		await siteEditor.enterEditMode();
 		await siteEditorStyleVariations.browseStyles();
 		await page.click( 'role=button[name="yellow"i]' );
 

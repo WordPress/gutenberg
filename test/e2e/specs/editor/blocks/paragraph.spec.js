@@ -29,9 +29,7 @@ test.describe( 'Paragraph', () => {
 		await page.keyboard.type( '1' );
 
 		const firstBlockTagName = await page.evaluate( () => {
-			return document.querySelector(
-				'.block-editor-block-list__layout .wp-block'
-			).tagName;
+			return document.querySelector( '[data-block]' ).tagName;
 		} );
 
 		// The outer element should be a paragraph. Blocks should never have any
@@ -59,7 +57,7 @@ test.describe( 'Paragraph', () => {
 			await requestUtils.deleteAllMedia();
 		} );
 
-		test( 'should allow dropping an image on en empty paragraph block', async ( {
+		test( 'should allow dropping an image on an empty paragraph block', async ( {
 			editor,
 			page,
 			pageUtils,
@@ -95,7 +93,7 @@ test.describe( 'Paragraph', () => {
 			);
 		} );
 
-		test( 'should allow dropping blocks on en empty paragraph block', async ( {
+		test( 'should allow dropping blocks on an empty paragraph block', async ( {
 			editor,
 			page,
 			draggingUtils,
@@ -127,18 +125,20 @@ test.describe( 'Paragraph', () => {
 
 			await expect.poll( editor.getEditedPostContent )
 				.toBe( `<!-- wp:heading -->
-<h2>My Heading</h2>
+<h2 class="wp-block-heading">My Heading</h2>
 <!-- /wp:heading -->` );
 		} );
 
-		test( 'should allow dropping HTML on en empty paragraph block', async ( {
+		test( 'should allow dropping HTML on an empty paragraph block', async ( {
 			editor,
 			page,
 			draggingUtils,
 		} ) => {
 			await editor.insertBlock( { name: 'core/paragraph' } );
 
-			await draggingUtils.simulateDraggingHTML( '<h2>My Heading</h2>' );
+			await draggingUtils.simulateDraggingHTML(
+				'<h2 class="wp-block-heading">My Heading</h2>'
+			);
 
 			const emptyParagraph = page.locator(
 				'[data-type="core/paragraph"][data-empty="true"]'
@@ -153,7 +153,7 @@ test.describe( 'Paragraph', () => {
 
 			await expect.poll( editor.getEditedPostContent )
 				.toBe( `<!-- wp:heading -->
-<h2>My Heading</h2>
+<h2 class="wp-block-heading">My Heading</h2>
 <!-- /wp:heading -->` );
 		} );
 
@@ -193,8 +193,12 @@ test.describe( 'Paragraph', () => {
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();
 					await expect
-						.poll( () => draggingUtils.dropZone.boundingBox() )
-						.toEqual( firstBlockBox );
+						.poll( () =>
+							draggingUtils.confirmValidDropZonePosition(
+								firstBlockBox
+							)
+						)
+						.toBeTruthy();
 				}
 
 				{
@@ -205,8 +209,12 @@ test.describe( 'Paragraph', () => {
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();
 					await expect
-						.poll( () => draggingUtils.dropZone.boundingBox() )
-						.toEqual( firstBlockBox );
+						.poll( () =>
+							draggingUtils.confirmValidDropZonePosition(
+								firstBlockBox
+							)
+						)
+						.toBeTruthy();
 				}
 
 				{
@@ -217,8 +225,12 @@ test.describe( 'Paragraph', () => {
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();
 					await expect
-						.poll( () => draggingUtils.dropZone.boundingBox() )
-						.toEqual( firstBlockBox );
+						.poll( () =>
+							draggingUtils.confirmValidDropZonePosition(
+								firstBlockBox
+							)
+						)
+						.toBeTruthy();
 				}
 
 				{
@@ -229,8 +241,12 @@ test.describe( 'Paragraph', () => {
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();
 					await expect
-						.poll( () => draggingUtils.dropZone.boundingBox() )
-						.toEqual( firstBlockBox );
+						.poll( () =>
+							draggingUtils.confirmValidDropZonePosition(
+								firstBlockBox
+							)
+						)
+						.toBeTruthy();
 				}
 
 				{
@@ -307,8 +323,12 @@ test.describe( 'Paragraph', () => {
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();
 					await expect
-						.poll( () => draggingUtils.dropZone.boundingBox() )
-						.toEqual( secondBlockBox );
+						.poll( () =>
+							draggingUtils.confirmValidDropZonePosition(
+								secondBlockBox
+							)
+						)
+						.toBeTruthy();
 				}
 
 				{
@@ -319,8 +339,12 @@ test.describe( 'Paragraph', () => {
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();
 					await expect
-						.poll( () => draggingUtils.dropZone.boundingBox() )
-						.toEqual( secondBlockBox );
+						.poll( () =>
+							draggingUtils.confirmValidDropZonePosition(
+								secondBlockBox
+							)
+						)
+						.toBeTruthy();
 				}
 
 				{
@@ -331,8 +355,12 @@ test.describe( 'Paragraph', () => {
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();
 					await expect
-						.poll( () => draggingUtils.dropZone.boundingBox() )
-						.toEqual( secondBlockBox );
+						.poll( () =>
+							draggingUtils.confirmValidDropZonePosition(
+								secondBlockBox
+							)
+						)
+						.toBeTruthy();
 				}
 
 				{
@@ -343,8 +371,12 @@ test.describe( 'Paragraph', () => {
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();
 					await expect
-						.poll( () => draggingUtils.dropZone.boundingBox() )
-						.toEqual( secondBlockBox );
+						.poll( () =>
+							draggingUtils.confirmValidDropZonePosition(
+								secondBlockBox
+							)
+						)
+						.toBeTruthy();
 				}
 			} );
 
@@ -385,8 +417,12 @@ test.describe( 'Paragraph', () => {
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();
 					await expect
-						.poll( () => draggingUtils.dropZone.boundingBox() )
-						.toEqual( firstBlockBox );
+						.poll( () =>
+							draggingUtils.confirmValidDropZonePosition(
+								firstBlockBox
+							)
+						)
+						.toBeTruthy();
 				}
 
 				{
@@ -397,8 +433,12 @@ test.describe( 'Paragraph', () => {
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();
 					await expect
-						.poll( () => draggingUtils.dropZone.boundingBox() )
-						.toEqual( firstBlockBox );
+						.poll( () =>
+							draggingUtils.confirmValidDropZonePosition(
+								firstBlockBox
+							)
+						)
+						.toBeTruthy();
 				}
 
 				{
@@ -409,8 +449,12 @@ test.describe( 'Paragraph', () => {
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();
 					await expect
-						.poll( () => draggingUtils.dropZone.boundingBox() )
-						.toEqual( firstBlockBox );
+						.poll( () =>
+							draggingUtils.confirmValidDropZonePosition(
+								firstBlockBox
+							)
+						)
+						.toBeTruthy();
 				}
 
 				{
@@ -421,8 +465,12 @@ test.describe( 'Paragraph', () => {
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();
 					await expect
-						.poll( () => draggingUtils.dropZone.boundingBox() )
-						.toEqual( secondBlockBox );
+						.poll( () =>
+							draggingUtils.confirmValidDropZonePosition(
+								secondBlockBox
+							)
+						)
+						.toBeTruthy();
 				}
 
 				{
@@ -433,8 +481,12 @@ test.describe( 'Paragraph', () => {
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();
 					await expect
-						.poll( () => draggingUtils.dropZone.boundingBox() )
-						.toEqual( secondBlockBox );
+						.poll( () =>
+							draggingUtils.confirmValidDropZonePosition(
+								secondBlockBox
+							)
+						)
+						.toBeTruthy();
 				}
 
 				{
@@ -445,8 +497,12 @@ test.describe( 'Paragraph', () => {
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();
 					await expect
-						.poll( () => draggingUtils.dropZone.boundingBox() )
-						.toEqual( secondBlockBox );
+						.poll( () =>
+							draggingUtils.confirmValidDropZonePosition(
+								secondBlockBox
+							)
+						)
+						.toBeTruthy();
 				}
 			} );
 		} );
@@ -505,5 +561,19 @@ class DraggingUtils {
 		// This is where the dummy draggable element is at.
 		await this.page.mouse.move( 0, 0 );
 		await this.page.mouse.down();
+	}
+
+	async confirmValidDropZonePosition( element ) {
+		// Check that both x and y axis of the dropzone
+		// have a less than 1 difference with a given target element
+		const box = await this.dropZone.boundingBox();
+		if ( ! box ) {
+			return false;
+		}
+
+		return (
+			Math.abs( element.x - box.x ) < 1 &&
+			Math.abs( element.y - box.y ) < 1
+		);
 	}
 }

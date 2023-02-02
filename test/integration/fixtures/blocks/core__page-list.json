@@ -2,7 +2,10 @@
 	{
 		"name": "core/page-list",
 		"isValid": true,
-		"attributes": {},
+		"attributes": {
+			"parentPageID": 0,
+			"isNested": false
+		},
 		"innerBlocks": []
 	}
 ]

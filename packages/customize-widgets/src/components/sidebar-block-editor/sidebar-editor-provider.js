@@ -1,13 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { BlockEditorProvider } from '@wordpress/block-editor';
+import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import useSidebarBlockEditor from './use-sidebar-block-editor';
 import useBlocksFocusControl from '../focus-control/use-blocks-focus-control';
+
+import { unlock } from '../../experiments';
+
+const { ExperimentalBlockEditorProvider } = unlock( blockEditorExperiments );
 
 export default function SidebarEditorProvider( {
 	sidebar,
@@ -19,7 +23,7 @@ export default function SidebarEditorProvider( {
 	useBlocksFocusControl( blocks );
 
 	return (
-		<BlockEditorProvider
+		<ExperimentalBlockEditorProvider
 			value={ blocks }
 			onInput={ onInput }
 			onChange={ onChange }
@@ -27,6 +31,6 @@ export default function SidebarEditorProvider( {
 			useSubRegistry={ false }
 		>
 			{ children }
-		</BlockEditorProvider>
+		</ExperimentalBlockEditorProvider>
 	);
 }

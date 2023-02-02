@@ -459,6 +459,8 @@ export function ColorEdit( props ) {
 		Platform.OS === 'web' &&
 		! gradient &&
 		! style?.color?.gradient &&
+		hasBackgroundColor &&
+		( hasLinkColor || hasTextColor ) &&
 		// Contrast checking is enabled by default.
 		// Deactivating it requires `enableContrastChecker` to have
 		// an explicit value of `false`.
@@ -520,8 +522,6 @@ export function ColorEdit( props ) {
 									allSolids,
 									style?.elements?.link?.color?.text
 								),
-								clearable:
-									!! style?.elements?.link?.color?.text,
 								isShownByDefault: defaultColorControls?.link,
 								resetAllFilter: resetAllLinkFilter,
 							},
@@ -544,9 +544,9 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { name, attributes } = props;
 		const { backgroundColor, textColor } = attributes;
-		const userPalette = useSetting( 'color.palette.custom' ) || [];
-		const themePalette = useSetting( 'color.palette.theme' ) || [];
-		const defaultPalette = useSetting( 'color.palette.default' ) || [];
+		const userPalette = useSetting( 'color.palette.custom' );
+		const themePalette = useSetting( 'color.palette.theme' );
+		const defaultPalette = useSetting( 'color.palette.default' );
 		const colors = useMemo(
 			() => [
 				...( userPalette || [] ),

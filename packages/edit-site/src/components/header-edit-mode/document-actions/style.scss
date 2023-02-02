@@ -41,9 +41,12 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+		color: currentColor;
 	}
 
 	.edit-site-document-actions__secondary-item {
+		display: flex;
+		align-items: center;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -51,9 +54,13 @@
 		opacity: 0;
 		padding: 0;
 		transition: all ease 0.2s;
-		background: $gray-200;
+		background: rgba(var(--wp-block-synced-color--rgb), 0.04);
 		border-radius: 2px;
 		@include reduce-motion(transition);
+
+		.block-editor-block-icon.has-colors {
+			color: var(--wp-block-synced-color);
+		}
 	}
 
 	&.has-secondary-label {

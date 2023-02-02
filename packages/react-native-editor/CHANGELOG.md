@@ -10,6 +10,36 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Bump Android `minSdkVersion` to 24 [#47604]
+-   [*] Update React Native Reanimated to 2.9.1-wp-3 [#47574]
+-   [*] Bump Aztec version to `1.6.3` [#47610]
+
+## 1.87.3
+-   [*] Fix insert blocks not handling raw string properly in unsupported block editor [#47472]
+
+## 1.87.2
+-   [*] Add boolean contentStyle and clientId check to Column Edit InnerBlocks [#47234]
+-   [*] Line-height and font-size regression fixes [#47284]
+
+## 1.87.1
+-   [**] Gallery block: Address styling regression, in which negative margin was added [#47086]
+-   [*] RichText - Parse CSS values and avoid setting undefined ones [#47080]
+
+## 1.87.0
+-   [*] Add capabilities to force only Core blocks and control Support section [#46215]
+
+## 1.86.1
+-   [*] Block Actions Menu - Fix block title regression and adds integration tests [#46699]
+
+## 1.86.0
+-   [**] Upgrade React Native to 0.69.4 [#43485]
+-   [**] Prevent error message from unneccesarily firing when uploading to Gallery block [#46175]
+
+## 1.85.1
+-   [**] Prevent error message from unneccesarily firing when uploading to Gallery block [#46175]
+
+## 1.85.0
+-   [*] [iOS] Fixed iOS Voice Control support within Image block captions. [#44850]
 
 ## 1.84.1
 -   [**] Native inner blocks merge where appropriate [#45048]

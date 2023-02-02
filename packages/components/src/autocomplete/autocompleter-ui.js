@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -60,7 +59,7 @@ export function getAutoCompleterUI( autocompleter ) {
 			<Popover
 				focusOnMount={ false }
 				onClose={ onReset }
-				position="top right"
+				placement="top-start"
 				className="components-autocomplete__popover"
 				anchor={ popoverAnchor }
 				ref={ popoverRef }
@@ -70,7 +69,7 @@ export function getAutoCompleterUI( autocompleter ) {
 					role="listbox"
 					className="components-autocomplete__results"
 				>
-					{ map( items, ( option, index ) => (
+					{ items.map( ( option, index ) => (
 						<Button
 							key={ option.key }
 							id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
