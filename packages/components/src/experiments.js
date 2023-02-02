@@ -7,7 +7,7 @@ import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/exp
  * Internal dependencies
  */
 import { default as CustomSelectControl } from './custom-select-control';
-import { positionToPlacement as popoverLegacyPositionToPlacement } from './popover/utils';
+import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
 
 export const { lock, unlock } =
 	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
@@ -18,5 +18,5 @@ export const { lock, unlock } =
 export const experiments = {};
 lock( experiments, {
 	CustomSelectControl,
-	popoverLegacyPositionToPlacement,
+	__experimentalPopoverLegacyPositionToPlacement,
 } );

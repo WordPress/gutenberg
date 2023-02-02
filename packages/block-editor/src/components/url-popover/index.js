@@ -18,7 +18,9 @@ import LinkViewer from './link-viewer';
 import LinkEditor from './link-editor';
 import { unlock } from '../../lock-unlock';
 
-const { popoverLegacyPositionToPlacement } = unlock( componentsExperiments );
+const { __experimentalPopoverLegacyPositionToPlacement } = unlock(
+	componentsExperiments
+);
 
 const DEFAULT_PLACEMENT = 'bottom';
 
@@ -49,7 +51,8 @@ function URLPopover( {
 	if ( placement !== undefined ) {
 		computedPlacement = placement;
 	} else if ( position !== undefined ) {
-		computedPlacement = popoverLegacyPositionToPlacement( position );
+		computedPlacement =
+			__experimentalPopoverLegacyPositionToPlacement( position );
 	}
 	computedPlacement = computedPlacement || DEFAULT_PLACEMENT;
 
