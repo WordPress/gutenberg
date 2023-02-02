@@ -8,18 +8,20 @@ import classnames from 'classnames';
  */
 import { useReducedMotion, useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useRef } from '@wordpress/element';
+import type { ForwardedRef } from 'react';
 import { chevronUp, chevronDown } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
+import type { PanelBodyProps } from './types';
 import Button from '../button';
 import Icon from '../icon';
 import { useControlledState, useUpdateEffect } from '../utils';
 
 const noop = () => {};
 
-export function PanelBody(
+export function UnforwardedPanelBody(
 	{
 		buttonProps = {},
 		children,
@@ -30,19 +32,20 @@ export function PanelBody(
 		opened,
 		title,
 		scrollAfterOpen = true,
-	},
-	ref
+	}: PanelBodyProps,
+	ref: ForwardedRef< HTMLDivElement >
 ) {
 	const [ isOpened, setIsOpened ] = useControlledState( opened, {
 		initial: initialOpen === undefined ? true : initialOpen,
+		fallback: '',
 	} );
-	const nodeRef = useRef();
+	const nodeRef = useRef< HTMLElement >( null );
 
 	// Defaults to 'smooth' scrolling
 	// https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView
 	const scrollBehavior = useReducedMotion() ? 'auto' : 'smooth';
 
-	const handleOnToggle = ( event ) => {
+	const handleOnToggle = ( event: MouseEvent ) => {
 		event.preventDefault();
 		const next = ! isOpened;
 		setIsOpened( next );
@@ -50,7 +53,7 @@ export function PanelBody(
 	};
 
 	// Ref is used so that the effect does not re-run upon scrollAfterOpen changing value.
-	const scrollAfterOpenRef = useRef();
+	const scrollAfterOpenRef = useRef< boolean | null >( null );
 	scrollAfterOpenRef.current = scrollAfterOpen;
 	// Runs after initial render.
 	useUpdateEffect( () => {
@@ -128,7 +131,6 @@ const PanelBodyTitle = forwardRef(
 	}
 );
 
-const ForwardedComponent = forwardRef( PanelBody );
-ForwardedComponent.displayName = 'PanelBody';
+export const PanelBody = forwardRef( UnforwardedPanelBody );
 
-export default ForwardedComponent;
+export default PanelBody;
