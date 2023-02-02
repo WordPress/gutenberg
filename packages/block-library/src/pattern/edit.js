@@ -69,7 +69,9 @@ const PatternEdit = ( { attributes, clientId, setAttributes } ) => {
 	const innerBlockProps = useInnerBlocksProps( blockProps, {
 		templateLock: attributes.templateLock,
 		onInput: () => {},
-		onChange: () => {},
+		onChange: ( blocks ) => {
+			replaceBlocks( clientId, blocks );
+		},
 		value: selectedPattern?.blocks ?? [],
 	} );
 
