@@ -379,6 +379,7 @@
 							]
 						},
 						"blockGap": {
+							"description": "Enables block spacing UI control. blockGap may define an array of allowable sides that can be configured, but doesn't support arbitrary edges.",
 							"default": false,
 							"oneOf": [
 								{
@@ -389,8 +390,7 @@
 									"items": {
 										"type": "string",
 										"enum": [ "vertical", "horizontal" ]
-									},
-									"default": [ "vertical", "horizontal" ]
+									}
 								}
 							]
 						}
