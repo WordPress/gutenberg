@@ -130,7 +130,7 @@ Function called with the control's search input value changes. The argument cont
 -   Required: No
 -   Default: `() => void`
 
-#### `options`: `Array<{ value: string, label: string }>`
+#### `options`: `Array< { value: string; label: string } >`
 
 The options that can be chosen from.
 

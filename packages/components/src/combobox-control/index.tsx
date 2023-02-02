@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import type { ComponentProps, KeyboardEvent } from 'react';
+import type { ComponentProps } from 'react';
 
 /**
  * WordPress dependencies
@@ -124,7 +124,7 @@ function ComboboxControl( {
 		setIsExpanded( true );
 	};
 
-	const onKeyDown = ( event: KeyboardEvent< HTMLDivElement > ) => {
+	const onKeyDown: ComponentProps< 'div' >[ 'onKeyDown' ] = ( event ) => {
 		let preventDefault = false;
 
 		if (
